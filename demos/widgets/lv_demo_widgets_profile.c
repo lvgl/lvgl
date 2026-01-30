@@ -93,7 +93,7 @@ void lv_demo_widgets_profile_create(lv_obj_t * parent)
 
     /*Create a keyboard*/
     lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
-    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(kb, true);
 
     /*Create the second panel*/
     lv_obj_t * panel2 = lv_obj_create(parent);
@@ -146,7 +146,7 @@ void lv_demo_widgets_profile_create(lv_obj_t * parent)
     lv_obj_t * slider1 = lv_slider_create(panel3);
     lv_obj_set_width(slider1, LV_PCT(95));
     lv_obj_add_event_cb(slider1, slider_event_cb, LV_EVENT_ALL, NULL);
-    lv_obj_add_flag(slider1, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(slider1, true);
     lv_obj_refresh_ext_draw_size(slider1);
 
     lv_obj_t * team_player_label = lv_label_create(panel3);
@@ -376,7 +376,7 @@ static void ta_event_cb(lv_event_t * e)
             lv_obj_set_style_max_height(kb, LV_HOR_RES * 2 / 3, 0);
             lv_obj_update_layout(tv);   /*Be sure the sizes are recalculated*/
             lv_obj_set_height(tv, LV_VER_RES - lv_obj_get_height(kb));
-            lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_hidden(kb, false);
             lv_obj_scroll_to_view_recursive(ta, LV_ANIM_OFF);
             lv_indev_wait_release(lv_event_get_param(e));
         }
@@ -384,13 +384,13 @@ static void ta_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_DEFOCUSED) {
         lv_keyboard_set_textarea(kb, NULL);
         lv_obj_set_height(tv, LV_VER_RES);
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_hidden(kb, true);
         lv_indev_reset(NULL, ta);
 
     }
     else if(code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
         lv_obj_set_height(tv, LV_VER_RES);
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_hidden(kb, true);
         lv_indev_reset(NULL, ta);   /*To forget the last clicked object to make it focusable again*/
     }
 }
@@ -403,7 +403,7 @@ static void birthday_event_cb(lv_event_t * e)
     if(code == LV_EVENT_FOCUSED) {
         if(lv_indev_get_type(lv_indev_active()) == LV_INDEV_TYPE_POINTER) {
             if(calendar == NULL) {
-                lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
+                lv_obj_set_clickable(lv_layer_top(), true);
                 calendar = lv_calendar_create(lv_layer_top());
                 lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_50, 0);
                 lv_obj_set_style_bg_color(lv_layer_top(), lv_palette_main(LV_PALETTE_GREY), 0);
@@ -434,7 +434,7 @@ static void calendar_event_cb(lv_event_t * e)
 
         lv_obj_delete(calendar);
         calendar = NULL;
-        lv_obj_remove_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_set_clickable(lv_layer_top(), false);
         lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_TRANSP, 0);
     }
 }

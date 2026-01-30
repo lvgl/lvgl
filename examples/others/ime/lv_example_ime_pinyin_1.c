@@ -10,11 +10,11 @@ static void ta_event_cb(lv_event_t * e)
     if(code == LV_EVENT_FOCUSED) {
         if(lv_indev_get_type(lv_indev_active()) != LV_INDEV_TYPE_KEYPAD) {
             lv_keyboard_set_textarea(kb, ta);
-            lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_hidden(kb, false);
         }
     }
     else if(code == LV_EVENT_CANCEL) {
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_hidden(kb, true);
         lv_obj_remove_state(ta, LV_STATE_FOCUSED);
         lv_indev_reset(NULL, ta);   /*To forget the last clicked object to make it focusable again*/
     }

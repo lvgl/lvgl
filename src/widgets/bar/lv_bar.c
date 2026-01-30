@@ -337,8 +337,8 @@ static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_bar_init_anim(obj, &bar->cur_value_anim);
     lv_bar_init_anim(obj, &bar->start_value_anim);
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_checkable(obj, false);
+    lv_obj_set_scrollable(obj, false);
     lv_bar_set_value(obj, 0, LV_ANIM_OFF);
 
     LV_TRACE_OBJ_CREATE("finished");

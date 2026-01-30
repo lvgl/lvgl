@@ -70,7 +70,7 @@ void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl)
     dsc->focused_obj = NULL;
     lv_obj_add_event_cb(obj, gridnav_event_cb, LV_EVENT_ALL, dsc);
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+    lv_obj_set_scroll_with_arrow(obj, false);
 }
 
 void lv_gridnav_remove(lv_obj_t * obj)

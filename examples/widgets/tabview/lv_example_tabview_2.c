@@ -50,6 +50,6 @@ void lv_example_tabview_2(void)
     label = lv_label_create(tab5);
     lv_label_set_text(label, "Fifth tab");
 
-    lv_obj_remove_flag(lv_tabview_get_content(tabview), LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(lv_tabview_get_content(tabview), false);
 }
 #endif

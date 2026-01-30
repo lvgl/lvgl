@@ -31,7 +31,7 @@ void lv_example_event_bubble(void)
     for(i = 0; i < 30; i++) {
         lv_obj_t * btn = lv_button_create(cont);
         lv_obj_set_size(btn, 70, 50);
-        lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
+        lv_obj_set_event_bubble(btn, true);
 
         lv_obj_t * label = lv_label_create(btn);
         lv_label_set_text_fmt(label, "%" LV_PRIu32, i);

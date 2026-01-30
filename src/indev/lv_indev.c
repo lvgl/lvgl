@@ -483,7 +483,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     indev->cursor = cur_obj;
     lv_obj_set_parent(indev->cursor, lv_display_get_layer_sys(indev->disp));
     lv_obj_set_pos(indev->cursor, indev->pointer.act_point.x, indev->pointer.act_point.y);
-    lv_obj_remove_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(indev->cursor, false);
 
     lv_obj_set_ignore_layout(indev->cursor, true);
     lv_obj_set_floating()(indev->cursor, true);

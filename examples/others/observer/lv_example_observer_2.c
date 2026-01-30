@@ -126,7 +126,7 @@ static void ui_init(void)
     /*Create button which will be active only when logged in*/
     btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn, 10, 80);
-    lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_set_checkable(btn, true);
     lv_obj_bind_state_if_not_eq(btn, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);
     lv_obj_bind_checked(btn, &engine_subject);
     label = lv_label_create(btn);

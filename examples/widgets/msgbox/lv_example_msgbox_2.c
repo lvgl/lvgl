@@ -4,7 +4,7 @@
 static void minimize_button_event_cb(lv_event_t * e)
 {
     lv_obj_t * mbox = (lv_obj_t *) lv_event_get_user_data(e);
-    lv_obj_add_flag(mbox, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(mbox, true);
 }
 
 void lv_example_msgbox_2(void)

@@ -28,9 +28,9 @@ static void btn_event_handler(lv_event_t * e)
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         if(lv_obj_has_state(btn, LV_STATE_CHECKED))
-            lv_obj_add_flag(file_explorer, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_hidden(file_explorer, true);
         else
-            lv_obj_remove_flag(file_explorer, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_hidden(file_explorer, false);
     }
 }
 
@@ -122,7 +122,7 @@ void lv_example_file_explorer_2(void)
     lv_obj_set_style_radius(btn, 2, 0);
     lv_obj_set_style_pad_all(btn, 4, 0);
     lv_obj_align(btn, LV_ALIGN_LEFT_MID, 0, 0);
-    lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_set_checkable(btn, true);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, LV_SYMBOL_LIST);

@@ -46,7 +46,7 @@ void lv_example_chart_7(void)
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(chart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(chart, true);
     lv_obj_set_style_line_width(chart, 0, LV_PART_ITEMS);   /*Remove the lines*/
 
     lv_chart_set_type(chart, LV_CHART_TYPE_SCATTER);

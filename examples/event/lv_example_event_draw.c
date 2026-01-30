@@ -53,7 +53,7 @@ void lv_example_event_draw(void)
     lv_obj_set_size(cont, 200, 200);
     lv_obj_center(cont);
     lv_obj_add_event_cb(cont, event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(cont, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(cont, true);
     lv_timer_create(timer_cb, 30, cont);
 }
 

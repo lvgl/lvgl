@@ -348,8 +348,8 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
     lv_tabview_set_tab_bar_position(obj, default_direction);
 
-    lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);
-    lv_obj_remove_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_one(cont, true);
+    lv_obj_set_scroll_on_focus(cont, false);
 }
 
 static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)

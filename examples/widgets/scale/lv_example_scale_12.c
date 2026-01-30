@@ -75,7 +75,7 @@ void lv_example_scale_12(void)
     lv_scale_set_rotation(scale, 270);
 
     lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(scale, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(scale, true);
 
     label = lv_label_create(lv_screen_active());
     lv_obj_set_width(label, 100);

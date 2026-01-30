@@ -227,7 +227,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     bool original_send_draw_task_event = false;
     if(obj) {
         original_send_draw_task_event = lv_obj_has_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-        lv_obj_remove_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+        lv_obj_set_send_draw_task_events(obj, false);
     }
 
     switch(task->type) {

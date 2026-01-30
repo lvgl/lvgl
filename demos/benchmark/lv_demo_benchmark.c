@@ -147,7 +147,7 @@ static void multiple_rgb_images_cb(void)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_lvgl_logo_rgb);
-            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(obj, true);
 
             fall_anim(obj, 80);
         }
@@ -174,7 +174,7 @@ static void multiple_argb_images_cb(void)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_lvgl_logo_argb);
-            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(obj, true);
 
             fall_anim(obj, 80);
         }
@@ -201,7 +201,7 @@ static void rotated_argb_image_cb(void)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_lvgl_logo_argb);
-            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(obj, true);
 
             lv_image_set_rotation(obj, lv_rand(100, 3500));
             fall_anim(obj, 80);
@@ -242,7 +242,7 @@ static void multiple_labels_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_label_create(lv_screen_active());
-            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(obj, true);
             lv_label_set_text_static(obj, "Hello LVGL!");
             color_anim(obj);
         }
@@ -303,7 +303,7 @@ static void multiple_arcs_cb(void)
         for(x = 0; x < hor_cnt; x++) {
 
             lv_obj_t * obj = lv_arc_create(lv_screen_active());
-            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(obj, true);
             lv_obj_set_size(obj, 100, 100);
             lv_obj_center(obj);
 
@@ -337,7 +337,7 @@ static void containers_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
-            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(card, true);
             fall_anim(card, 30);
         }
     }
@@ -361,7 +361,7 @@ static void containers_with_overlay_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
-            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(card, true);
             fall_anim(card, 30);
         }
     }
@@ -388,7 +388,7 @@ static void containers_with_opa_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
-            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(card, true);
             lv_obj_set_style_opa(card, LV_OPA_50, 0);
             fall_anim(card, 30);
         }
@@ -414,7 +414,7 @@ static void containers_with_opa_layer_cb(void)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             lv_obj_set_style_opa_layered(card, LV_OPA_50, 0);
-            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(card, true);
             fall_anim(card, 30);
         }
     }
@@ -441,7 +441,7 @@ static void containers_with_scrolling_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
-            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            if(x == 0) lv_obj_set_flex_in_new_track(card, true);
         }
     }
 
@@ -525,7 +525,7 @@ void lv_demo_benchmark(void)
     lv_display_t * disp = lv_display_get_default();
     lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, sysmon_perf_observer_cb, title, NULL);
 #if LV_USE_PERF_MONITOR_LOG_MODE
-    lv_obj_add_flag(title, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(title, true);
 #endif
 #else
     lv_label_set_text(title, "LV_USE_PERF_MONITOR is not enabled");
@@ -549,7 +549,7 @@ void lv_demo_benchmark_summary_display(const lv_demo_benchmark_summary_t * summa
     lv_obj_t * table = lv_table_create(lv_screen_active());
     lv_obj_set_width(table, lv_pct(100));
     lv_obj_set_style_max_height(table, lv_pct(100), 0);
-    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(table, true);
     lv_obj_set_style_text_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
     lv_obj_set_style_border_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
     lv_obj_add_event_cb(table, table_draw_task_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);

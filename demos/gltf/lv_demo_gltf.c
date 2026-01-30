@@ -119,7 +119,7 @@ lv_obj_t * lv_demo_gltf(const char * path)
 {
     lv_obj_t * viewer = lv_gltf_create(lv_screen_active());
     lv_obj_set_size(viewer, LV_PCT(100), LV_PCT(100));
-    lv_obj_remove_flag(viewer, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(viewer, false);
     lv_gltf_set_background_mode(viewer, LV_GLTF_BG_MODE_ENVIRONMENT);
     lv_gltf_model_t * model = lv_gltf_load_model_from_file(viewer, path);
     LV_ASSERT_NULL(model);
@@ -335,13 +335,13 @@ static void create_background_panel(lv_obj_t * panel)
     lv_obj_t * background_blur_title = add_title_to_row(bg_row, "");
     lv_label_bind_text(background_blur_title, &background_blur_subject, "Background Blur %d");
 
-    lv_obj_t * backgorund_blur_slider = lv_slider_create(bg_row);
-    lv_slider_bind_value(backgorund_blur_slider, &background_blur_subject);
-    lv_obj_set_width(backgorund_blur_slider, LV_PCT(100));
-    lv_slider_set_min_value(backgorund_blur_slider, 0);
-    lv_slider_set_max_value(backgorund_blur_slider, 100);
+    lv_obj_t * background_blur_slider = lv_slider_create(bg_row);
+    lv_slider_bind_value(background_blur_slider, &background_blur_subject);
+    lv_obj_set_width(background_blur_slider, LV_PCT(100));
+    lv_slider_set_min_value(background_blur_slider, 0);
+    lv_slider_set_max_value(background_blur_slider, 100);
 
-    style_slider(backgorund_blur_slider, SLIDER_COLOR);
+    style_slider(background_blur_slider, SLIDER_COLOR);
 
 }
 

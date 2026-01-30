@@ -31,7 +31,7 @@ void lv_example_scale_11(void)
     lv_obj_set_style_radius(bg, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(bg, lv_palette_darken(LV_PALETTE_GREY, 4), 0);
     lv_obj_set_style_bg_opa(bg, LV_OPA_COVER, 0);
-    lv_obj_remove_flag(bg, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(bg, false);
     lv_obj_set_style_pad_all(bg, 0, LV_PART_MAIN);
 
     lv_obj_t * scale = lv_scale_create(bg);
@@ -92,7 +92,7 @@ void lv_example_scale_11(void)
     };
     lv_scale_set_text_src(scale, hour_labels);
 
-    lv_obj_add_flag(scale, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(scale, true);
     lv_obj_add_event_cb(scale, label_color_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
 
     lv_obj_t * today = lv_label_create(bg);

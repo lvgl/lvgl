@@ -38,7 +38,7 @@ void lv_example_textarea_1(void)
     lv_obj_set_size(btnm, 200, 150);
     lv_obj_align(btnm, LV_ALIGN_BOTTOM_MID, 0, -10);
     lv_obj_add_event_cb(btnm, btnm_event_handler, LV_EVENT_VALUE_CHANGED, ta);
-    lv_obj_remove_flag(btnm, LV_OBJ_FLAG_CLICK_FOCUSABLE); /*To keep the text area focused on button clicks*/
+    lv_obj_set_click_focusable(btnm, false); /*To keep the text area focused on button clicks*/
     lv_buttonmatrix_set_map(btnm, btnm_map);
 }
 

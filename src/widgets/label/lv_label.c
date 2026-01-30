@@ -759,7 +759,7 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     label->sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
 #endif
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(obj, false);
     lv_label_set_long_mode(obj, LV_LABEL_LONG_MODE_WRAP);
     lv_label_set_text(obj, LV_LABEL_DEFAULT_TEXT);
 

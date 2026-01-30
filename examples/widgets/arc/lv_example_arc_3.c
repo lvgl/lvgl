@@ -124,7 +124,7 @@ static void create_slice(lv_obj_t * parent, int percentage, lv_color_t color)
     lv_obj_set_style_arc_color(arc, color, LV_PART_MAIN);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_MAIN);
     lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
-    lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_set_adv_hittest(arc, true);
 
     lv_obj_t * label = lv_label_create(arc);
     lv_label_set_text_fmt(label, "%d%%", percentage);
@@ -158,7 +158,7 @@ void lv_example_arc_3(void)
     lv_obj_set_style_border_width(root, 0, LV_PART_MAIN);
     lv_obj_set_style_border_color(root, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(root, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_remove_flag(root, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(root, false);
 
     /* Slices container */
     lv_obj_t * slices_container = lv_obj_create(root);
@@ -168,7 +168,7 @@ void lv_example_arc_3(void)
     lv_obj_set_style_border_width(slices_container, 0, LV_PART_MAIN);
     lv_obj_set_style_border_color(slices_container, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(slices_container, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_remove_flag(slices_container, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(slices_container, false);
 
     /* Create slices */
     angle_accum = 0.0f;

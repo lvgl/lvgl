@@ -145,7 +145,7 @@ static void lv_spinner_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     LV_UNUSED(class_p);
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(obj, false);
 
     lv_spinner_set_anim_params(obj, DEF_TIME, DEF_ARC_ANGLE);
 }
