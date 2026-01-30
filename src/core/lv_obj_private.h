@@ -47,13 +47,14 @@ struct _lv_obj_spec_attr_t {
     int32_t ext_click_pad;          /**< Extra click padding in all direction*/
     int32_t ext_draw_size;          /**< EXTend the size in every direction for drawing.*/
 
-    uint16_t child_cnt;             /**< Number of children*/
-    uint16_t scrollbar_mode : 2;    /**< How to display scrollbars, see `lv_scrollbar_mode_t`*/
-    uint16_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally, see `lv_scroll_snap_t`*/
-    uint16_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
-    uint16_t scroll_dir : 4;        /**< The allowed scroll direction(s), see `lv_dir_t`*/
-    uint16_t layer_type : 2;        /**< Cache the layer type here. Element of lv_intermediate_layer_type_t */
-    uint16_t name_static : 1;        /**< 1: `name` was not dynamically allocated */
+    uint32_t child_cnt;             /**< Number of children*/
+    uint32_t scrollbar_mode : 2;    /**< How to display scrollbars, see `lv_scrollbar_mode_t`*/
+    uint32_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally, see `lv_scroll_snap_t`*/
+    uint32_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
+    uint32_t scroll_dir : 4;        /**< The allowed scroll direction(s), see `lv_dir_t`*/
+    uint32_t layer_type : 2;        /**< Cache the layer type here. Element of lv_intermediate_layer_type_t */
+    uint32_t name_static : 1;       /**< 1: `name` was not dynamically allocated */
+    uint32_t user_bits : 8;         /**< Store custom flags */
 };
 
 struct _lv_obj_t {
@@ -73,7 +74,81 @@ struct _lv_obj_t {
     void * id;
 #endif
     lv_area_t coords;
-    lv_obj_flag_t flags;
+    /** Make the object hidden. (Like it wasn't there at all) */
+    uint32_t hidden : 1;
+
+    /** Make the object clickable by the input devices */
+    uint32_t clickable : 1;
+
+    /** Add focused state to the object when clicked */
+    uint32_t click_focusable : 1;
+
+    /** Toggle checked state when the object is clicked */
+    uint32_t checkable : 1;
+
+    /** Make the object scrollable */
+    uint32_t scrollable : 1;
+
+    /** Allow scrolling inside but with slower speed */
+    uint32_t scroll_elastic : 1;
+
+    /** Make the object scroll further when "thrown" */
+    uint32_t scroll_momentum : 1;
+
+    /** Allow scrolling only one snappable child */
+    uint32_t scroll_one : 1;
+
+    /** Allow propagating the horizontal scroll to a parent */
+    uint32_t scroll_chain_hor : 1;
+
+    /** Allow propagating the vertical scroll to a parent */
+    uint32_t scroll_chain_ver : 1;
+
+    /** Automatically scroll object to make it visible when focused */
+    uint32_t scroll_on_focus : 1;
+
+    /** Allow scrolling the focused object with arrow keys */
+    uint32_t scroll_with_arrow : 1;
+
+    /** If scroll snap is enabled on the parent it can snap to this object */
+    uint32_t snappable : 1;
+
+    /** Keep the object pressed even if the press slid from the object */
+    uint32_t press_lock : 1;
+
+    /** Propagate the events to the parent too */
+    uint32_t event_bubble : 1;
+
+    /** Propagate the gestures to the parent */
+    uint32_t gesture_bubble : 1;
+
+    /** Allow performing more accurate hit (click) test */
+    uint32_t adv_hittest : 1;
+
+    /** Make the object not positioned by the layouts */
+    uint32_t ignore_layout : 1;
+
+    /** Do not scroll the object when the parent scrolls and ignore layout */
+    uint32_t floating : 1;
+
+    /** Send LV_EVENT_DRAW_TASK_ADDED events */
+    uint32_t send_draw_task_events : 1;
+
+    /** Do not clip the children to the parent's ext draw size */
+    uint32_t overflow_visible : 1;
+
+    /** Propagate the events to the children too */
+    uint32_t event_trickle : 1;
+
+    /** Propagate the states to the children too */
+    uint32_t state_trickle : 1;
+
+    /** Allow only one RADIO_BUTTON sibling to be checked */
+    uint32_t radio_button : 1;
+
+    /** Start a new flex track on this item */
+    uint32_t flex_in_new_track : 1;
+
     uint16_t state;
     uint16_t layout_inv : 1;
     uint16_t readjust_scroll_after_layout : 1;

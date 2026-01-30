@@ -320,7 +320,7 @@ void lv_obj_set_layout(lv_obj_t * obj, uint32_t layout)
 
 bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
 {
-    if(lv_obj_has_flag_any(obj, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING)) return false;
+    if(obj->hidden || obj->ignore_layout || obj->floating) return false;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return false;
