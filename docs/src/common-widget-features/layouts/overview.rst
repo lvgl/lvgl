@@ -64,6 +64,7 @@ LVGL can be freely extended by a custom layout like this:
    ...
 
    MY_LAYOUT = lv_layout_register(my_layout_update, &user_data);
+   lv_layout_set_min_size_cb(MY_LAYOUT, my_layout_get_min_size); /* Optional */
 
    ...
 
@@ -71,6 +72,10 @@ LVGL can be freely extended by a custom layout like this:
    {
        /* Will be called automatically if it's required to reposition/resize the children of "widget" */
    }
+
+The min size callback is optional and can be used to precompute the minimum size of all the children in
+the layout before sizing and positioning them. This is useful for layouts like flex that need to know
+the minimum size of children to properly calculate the grow size of the children.
 
 Custom style properties can be added which can be retrieved and used in the update
 callback. For example:
