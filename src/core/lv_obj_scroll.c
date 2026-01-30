@@ -467,7 +467,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
     lv_area_set(hor_area, 0, 0, -1, -1);
     lv_area_set(ver_area, 0, 0, -1, -1);
 
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
+    if(lv_obj_get_scrollable(obj) == false) return;
 
     lv_scrollbar_mode_t sm = lv_obj_get_scrollbar_mode(obj);
     if(sm == LV_SCROLLBAR_MODE_OFF)  return;
@@ -707,7 +707,7 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
                                   lv_anim_enable_t anim_en)
 {
     lv_obj_t * parent = lv_obj_get_parent(child);
-    if(!lv_obj_has_flag(parent, LV_OBJ_FLAG_SCROLLABLE)) return;
+    if(!lv_obj_get_scrollable(parent)) return;
 
     lv_dir_t scroll_dir = lv_obj_get_scroll_dir(parent);
     int32_t snap_goal = 0;

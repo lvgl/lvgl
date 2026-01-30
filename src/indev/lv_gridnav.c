@@ -145,7 +145,7 @@ static void gridnav_event_cb(lv_event_t * e)
         lv_obj_t * guess = NULL;
 
         if(key == LV_KEY_RIGHT && !(dsc->ctrl & LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY)) {
-            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_get_scrollable(dsc->focused_obj) &&
                lv_obj_get_scroll_right(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_width(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
@@ -165,7 +165,7 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
         else if(key == LV_KEY_LEFT && !(dsc->ctrl & LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY)) {
-            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_get_scrollable(dsc->focused_obj) &&
                lv_obj_get_scroll_left(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_width(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
@@ -185,7 +185,7 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
         else if(key == LV_KEY_DOWN && !(dsc->ctrl & LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY)) {
-            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_get_scrollable(dsc->focused_obj) &&
                lv_obj_get_scroll_bottom(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_height(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
@@ -204,7 +204,7 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
         else if(key == LV_KEY_UP && !(dsc->ctrl & LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY)) {
-            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
+            if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_get_scrollable(dsc->focused_obj) &&
                lv_obj_get_scroll_top(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_height(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
@@ -382,7 +382,7 @@ static lv_obj_t * find_last_focusable(lv_obj_t * obj)
 
 static bool obj_is_focusable(lv_obj_t * obj)
 {
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
+    if(lv_obj_get_hidden(obj)) return false;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE)) return true;
     else return false;
 }

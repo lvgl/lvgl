@@ -648,7 +648,7 @@ bool lv_dropdown_is_open(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    return lv_obj_has_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN) ? false : true;
+    return lv_obj_get_hidden(dropdown->list) ? false : true;
 }
 
 #if LV_USE_OBSERVER

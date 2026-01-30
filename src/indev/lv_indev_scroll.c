@@ -129,7 +129,7 @@ void lv_indev_scroll_throw_handler(lv_indev_t * indev)
 
     int32_t scroll_throw = indev->scroll_throw;
 
-    if(lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_MOMENTUM) == false) {
+    if(lv_obj_get_scroll_momentum(scroll_obj) == false) {
         indev->pointer.scroll_throw_vect.y = 0;
         indev->pointer.scroll_throw_vect.x = 0;
     }
@@ -324,10 +324,10 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
             ver_en = true;
         }
 
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
+        if(lv_obj_get_scrollable(obj_act) == false) {
             /*If this object don't want to chain the scroll to the parent stop searching*/
-            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false && hor_en) break;
-            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_VER) == false && ver_en) break;
+            if(lv_obj_get_scroll_chain_hor(obj_act) == false && hor_en) break;
+            if(lv_obj_get_scroll_chain_ver(obj_act) == false && ver_en) break;
 
             obj_act = lv_obj_get_parent(obj_act);
             continue;
@@ -417,8 +417,8 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
         }
 
         /*If this object don't want to chain the scroll to the parent stop searching*/
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false && hor_en) break;
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_VER) == false && ver_en) break;
+        if(lv_obj_get_scroll_chain_hor(obj_act) == false && hor_en) break;
+        if(lv_obj_get_scroll_chain_ver(obj_act) == false && ver_en) break;
 
         /*Try the parent*/
         obj_act = lv_obj_get_parent(obj_act);
@@ -443,7 +443,7 @@ static void init_scroll_limits(lv_indev_t * indev)
 {
     lv_obj_t * obj = indev->pointer.scroll_obj;
     /*If there no STOP allow scrolling anywhere*/
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ONE) == false) {
+    if(lv_obj_get_scroll_one(obj) == false) {
         lv_area_set(&indev->pointer.scroll_area, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MAX, LV_COORD_MAX);
     }
     /*With STOP limit the scrolling to the perv and next snap point*/
@@ -528,7 +528,7 @@ static int32_t find_snap_point_x(const lv_obj_t * obj, int32_t min, int32_t max,
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
-        if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPPABLE)) {
+        if(lv_obj_get_snappable(child)) {
             int32_t x_child = 0;
             int32_t x_parent = 0;
             switch(align) {
@@ -584,7 +584,7 @@ static int32_t find_snap_point_y(const lv_obj_t * obj, int32_t min, int32_t max,
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
-        if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPPABLE)) {
+        if(lv_obj_get_snappable(child)) {
             int32_t y_child = 0;
             int32_t y_parent = 0;
             switch(align) {
@@ -644,7 +644,7 @@ static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_
     if(diff == 0) return 0;
 
     /*Scroll back to the edge if required*/
-    if(!lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_ELASTIC)) {
+    if(!lv_obj_get_scroll_elastic(scroll_obj)) {
         /*
          * If the scrolling object does not set the `LV_OBJ_FLAG_SCROLL_ELASTIC` flag,
          * make sure that `diff` will not cause the scroll to exceed the `start` or `end` boundary of the content.

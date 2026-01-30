@@ -583,7 +583,7 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
         update_obj_state(obj, new_state);
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_STATE_TRICKLE)) {
+        if(lv_obj_get_state_trickle(obj)) {
             lv_obj_children_add_state(obj, state);
         }
     }
@@ -596,7 +596,7 @@ void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state & (~state);
     if(obj->state != new_state) {
         update_obj_state(obj, new_state);
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_STATE_TRICKLE)) {
+        if(lv_obj_get_state_trickle(obj)) {
             lv_obj_children_remove_state(obj, state);
         }
     }
@@ -1332,7 +1332,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
         void * param = lv_event_get_param(e);
         /*Go the checked state if enabled*/
-        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
+        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_get_checkable(obj)) {
 
             bool was_checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) {
@@ -1378,7 +1378,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_KEY) {
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
+        if(lv_obj_get_checkable(obj)) {
             uint32_t c = lv_event_get_key(e);
             bool was_checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -1427,7 +1427,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_FOCUSED) {
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS)) {
+        if(lv_obj_get_scroll_on_focus(obj)) {
             lv_obj_scroll_to_view_recursive(obj, LV_ANIM_ON);
         }
 

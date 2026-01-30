@@ -262,7 +262,7 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     bool first_item = true;
     while(item) {
-        if(item_id != item_start_id && lv_obj_has_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)) break;
+        if(item_id != item_start_id && lv_obj_get_flex_in_new_track(item)) break;
 
         if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
             uint8_t grow_value = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);

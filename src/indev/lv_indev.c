@@ -622,7 +622,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     lv_obj_t * found_p = NULL;
 
     /*If this obj is hidden the children are hidden too so return immediately*/
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
+    if(lv_obj_get_hidden(obj)) return NULL;
 
     lv_point_t p_trans = *point;
     lv_obj_transform_point(obj, &p_trans, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE);
@@ -631,7 +631,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 
     /*If the point is on this object check its children too*/
     lv_area_t obj_coords = obj->coords;
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+    if(lv_obj_get_overflow_visible(obj)) {
         int32_t ext_draw_size = lv_obj_get_ext_draw_size(obj);
         lv_area_increase(&obj_coords, ext_draw_size, ext_draw_size);
     }
@@ -985,7 +985,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
         if(data->key == LV_KEY_ENTER) {
             bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
-                                          lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
+                                          lv_obj_get_scrollable(indev_obj_act);
             if(lv_group_get_editing(g) == true || editable_or_scrollable == false) {
 
                 if(is_enabled) {
@@ -1030,7 +1030,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 if(indev_reset_check(indev_act)) return;
 
                 bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
-                                              lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
+                                              lv_obj_get_scrollable(indev_obj_act);
 
                 /*On enter long press toggle edit mode.*/
                 if(editable_or_scrollable) {
@@ -1084,7 +1084,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
         if(data->key == LV_KEY_ENTER) {
             bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
-                                          lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
+                                          lv_obj_get_scrollable(indev_obj_act);
 
             /*The button was released on a non-editable object. Just send enter*/
             if(editable_or_scrollable == false) {
@@ -1261,7 +1261,7 @@ static void indev_proc_press(lv_indev_t * indev)
     }
     /*If there is an active object it's not scrolled and not press locked also search*/
     else if(indev->pointer.scroll_obj == NULL &&
-            lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_PRESS_LOCK) == false) {
+            lv_obj_get_press_lock(indev_obj_act) == false) {
         indev_obj_act = pointer_search_obj(disp, &indev->pointer.act_point);
         new_obj_searched = true;
     }
@@ -1697,7 +1697,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 static void indev_click_focus(lv_indev_t * indev)
 {
     /*Handle click focus*/
-    if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_CLICK_FOCUSABLE) == false) {
+    if(lv_obj_get_click_focusable(indev_obj_act) == false) {
         return;
     }
 
@@ -1770,7 +1770,7 @@ void indev_gesture(lv_indev_t * indev)
     lv_obj_t * gesture_obj = indev->pointer.act_obj;
 
     /*If gesture parent is active check recursively the gesture attribute*/
-    while(gesture_obj && lv_obj_has_flag(gesture_obj, LV_OBJ_FLAG_GESTURE_BUBBLE)) {
+    while(gesture_obj && lv_obj_get_gesture_bubble(gesture_obj)) {
         gesture_obj = lv_obj_get_parent(gesture_obj);
     }
 
