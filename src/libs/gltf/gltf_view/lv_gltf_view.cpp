@@ -666,7 +666,7 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
-    lv_array_init(&view->models, LV_GLTF_INITIAL_MODEL_CAPACITY, sizeof(lv_gltf_model_data_t *));
+    lv_array_init(&view->models, LV_GLTF_INITIAL_MODEL_CAPACITY, sizeof(lv_gltf_model_data_t));
 
     LV_TRACE_OBJ_CREATE("end");
 }
