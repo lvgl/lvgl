@@ -355,7 +355,9 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_buttonmatrix_set_button_ctrl_all(calendar->btnm, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT);
     lv_obj_add_event_cb(calendar->btnm, draw_task_added_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_set_width(calendar->btnm, lv_pct(100));
-    lv_obj_add_flag(calendar->btnm, LV_OBJ_FLAG_EVENT_BUBBLE | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+
+    lv_obj_set_event_bubble(calendar->btnm, true);
+    lv_obj_set_send_draw_task_events(calendar->btnm, true);
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);

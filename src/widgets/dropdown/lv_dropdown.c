@@ -638,7 +638,7 @@ void lv_dropdown_close(lv_obj_t * obj)
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
-    lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(dropdown->list, true);
 
     lv_obj_send_event(obj, LV_EVENT_CANCEL, NULL);
 }
