@@ -233,6 +233,17 @@
 #define LV_USE_NEMA_GFX 0
 
 #if LV_USE_NEMA_GFX
+    /** Select which NemaGFX static library headers to use. Possible options:
+     * - LV_NEMA_LIB_NONE           an alias of LV_NEMA_LIB_M33_REVC
+     * - LV_NEMA_LIB_M33_REVC
+     * - LV_NEMA_LIB_M33_NEMAPVG
+     * - LV_NEMA_LIB_M55
+     * - LV_NEMA_LIB_M7
+     * You must also take care to link the correct corresponding static library
+     * in libs/nema_gfx/lib/core/
+     */
+    #define LV_USE_NEMA_LIB LV_NEMA_LIB_NONE
+
     /** Select which NemaGFX HAL to use. Possible options:
      * - LV_NEMA_HAL_CUSTOM
      * - LV_NEMA_HAL_STM32 */

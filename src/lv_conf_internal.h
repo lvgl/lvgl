@@ -31,6 +31,12 @@
 #define LV_DRAW_SW_ASM_RISCV_V          3
 #define LV_DRAW_SW_ASM_CUSTOM           255
 
+#define LV_NEMA_LIB_NONE            0
+#define LV_NEMA_LIB_M33_REVC        1
+#define LV_NEMA_LIB_M33_NEMAPVG     2
+#define LV_NEMA_LIB_M55             3
+#define LV_NEMA_LIB_M7              4
+
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
 
@@ -660,6 +666,23 @@
 #endif
 
 #if LV_USE_NEMA_GFX
+    /** Select which NemaGFX static library headers to use. Possible options:
+     * - LV_NEMA_LIB_NONE           an alias of LV_NEMA_LIB_M33_REVC
+     * - LV_NEMA_LIB_M33_REVC
+     * - LV_NEMA_LIB_M33_NEMAPVG
+     * - LV_NEMA_LIB_M55
+     * - LV_NEMA_LIB_M7
+     * You must also take care to link the correct corresponding static library
+     * in libs/nema_gfx/lib/core/
+     */
+    #ifndef LV_USE_NEMA_LIB
+        #ifdef CONFIG_LV_USE_NEMA_LIB
+            #define LV_USE_NEMA_LIB CONFIG_LV_USE_NEMA_LIB
+        #else
+            #define LV_USE_NEMA_LIB LV_NEMA_LIB_NONE
+        #endif
+    #endif
+
     /** Select which NemaGFX HAL to use. Possible options:
      * - LV_NEMA_HAL_CUSTOM
      * - LV_NEMA_HAL_STM32 */
