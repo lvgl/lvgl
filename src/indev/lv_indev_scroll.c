@@ -527,7 +527,7 @@ static int32_t find_snap_point_x(const lv_obj_t * obj, int32_t min, int32_t max,
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+        if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
         if(lv_obj_get_snappable(child)) {
             int32_t x_child = 0;
             int32_t x_parent = 0;
@@ -583,7 +583,7 @@ static int32_t find_snap_point_y(const lv_obj_t * obj, int32_t min, int32_t max,
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+        if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
         if(lv_obj_get_snappable(child)) {
             int32_t y_child = 0;
             int32_t y_parent = 0;

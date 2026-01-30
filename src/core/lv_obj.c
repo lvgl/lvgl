@@ -301,7 +301,7 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /* If none of the requested flags are set, do nothing */
-    if(!lv_obj_has_flag_any(obj, f)) return;
+    if(!()) return;
 
     if(f & LV_OBJ_FLAG_HIDDEN)               lv_obj_set_hidden(obj, false);
     if(f & LV_OBJ_FLAG_CLICKABLE)            lv_obj_set_clickable(obj, false);

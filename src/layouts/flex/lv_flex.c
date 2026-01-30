@@ -264,7 +264,7 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     while(item) {
         if(item_id != item_start_id && lv_obj_get_flex_in_new_track(item)) break;
 
-        if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
+        if(!(lv_obj_get_ignore_layout(item) || lv_obj_get_hidden(item) || lv_obj_get_floating(item))) {
             uint8_t grow_value = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
             if(grow_value) {
                 int32_t min_size = f->row ? lv_obj_calc_dynamic_width(item, LV_STYLE_MIN_WIDTH, NULL)
@@ -397,7 +397,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
     lv_obj_t * item = lv_obj_get_child(cont, item_first_id);
     /*Reposition the children*/
     while(item && item_first_id != item_last_id) {
-        if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
+        if((lv_obj_get_ignore_layout(item) || lv_obj_get_hidden(item) || lv_obj_get_floating(item))) {
             item = get_next_item(cont, f->rev, &item_first_id);
             continue;
         }

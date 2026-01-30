@@ -1245,7 +1245,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
         for(i = 0; i < child_cnt; i++) {
             int32_t child_res_tmp = LV_COORD_MIN;
             lv_obj_t * child = obj->spec_attr->children[i];
-            if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+            if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
 
             if(child->w_ignore_size)
                 continue;
@@ -1284,7 +1284,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
         for(i = 0; i < child_cnt; i++) {
             int32_t child_res_tmp = LV_COORD_MIN;
             lv_obj_t * child = obj->spec_attr->children[i];
-            if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+            if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
 
             if(child->w_ignore_size)
                 continue;
@@ -1344,7 +1344,7 @@ static int32_t calc_content_height(lv_obj_t * obj)
     for(i = 0; i < child_cnt; i++) {
         int32_t child_res_tmp = LV_COORD_MIN;
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+        if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
 
         if(child->h_ignore_size)
             continue;
