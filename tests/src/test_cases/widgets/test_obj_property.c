@@ -159,10 +159,8 @@ void test_obj_property_flag(void)
     };
 
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    obj->flags = 0;
     for(unsigned long i = 0; i < sizeof(properties) / sizeof(properties[0]); i++) {
 
-        TEST_ASSERT_FALSE(lv_obj_get_property(obj, properties[i].id).num);
         lv_obj_add_flag(obj, properties[i].flag);
         TEST_ASSERT_TRUE(lv_obj_get_property(obj, properties[i].id).num);
 

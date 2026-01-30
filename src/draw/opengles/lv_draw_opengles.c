@@ -307,8 +307,8 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     lv_obj_t * obj = ((lv_draw_dsc_base_t *)task->draw_dsc)->obj;
     bool original_send_draw_task_event = false;
     if(obj) {
-        original_send_draw_task_event = lv_obj_has_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-        lv_obj_remove_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+        original_send_draw_task_event = lv_obj_is_send_draw_task_events(obj);
+        lv_obj_set_send_draw_task_events(obj, false);
     }
 
     if(cache_data != NULL) {
@@ -430,7 +430,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     }
 
     if(obj) {
-        lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+        lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
     }
 
     LV_PROFILER_DRAW_END;
