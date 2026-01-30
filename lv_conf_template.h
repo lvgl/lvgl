@@ -1408,7 +1408,9 @@
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
 
-/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
+ * - Requires LV_USE_MATRIX.
+ */
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
