@@ -84,6 +84,7 @@ Functions that add something to the message box return a pointer to the newly ad
 .. code:: c
 
    lv_obj_t * lv_msgbox_add_text(lv_obj_t * msgbox, const char * text);
+   lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...);
    lv_obj_t * lv_msgbox_add_title(lv_obj_t * msgbox, const char * title);
    lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * msgbox);
    lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * msgbox, const void * symbol);
