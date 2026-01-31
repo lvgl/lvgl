@@ -17,7 +17,7 @@ void lv_example_event_trickle(void)
     lv_style_set_bg_color(&style_black, lv_color_black());
 
     /*Enable event trickle-down on the container*/
-    lv_obj_add_flag(cont, LV_OBJ_FLAG_EVENT_TRICKLE);
+    lv_obj_set_event_trickle(cont, true);
 
     lv_obj_add_style(cont, &style_black, LV_STATE_PRESSED);
 

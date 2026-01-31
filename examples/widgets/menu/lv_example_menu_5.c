@@ -166,7 +166,7 @@ static lv_obj_t * create_text(lv_obj_t * parent, const char * icon, const char *
     }
 
     if(builder_variant == LV_MENU_ITEM_BUILDER_VARIANT_2 && icon && txt) {
-        lv_obj_add_flag(img, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+        lv_obj_set_flex_in_new_track(img, true);
         lv_obj_swap(img, label);
     }
 
@@ -184,7 +184,7 @@ static lv_obj_t * create_slider(lv_obj_t * parent, const char * icon, const char
     lv_slider_set_value(slider, val, LV_ANIM_OFF);
 
     if(icon == NULL) {
-        lv_obj_add_flag(slider, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+        lv_obj_set_flex_in_new_track(slider, true);
     }
 
     return obj;

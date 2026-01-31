@@ -121,11 +121,7 @@ void lv_sysmon_show_performance(lv_display_t * disp)
         lv_display_add_event_cb(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
     }
 
-#if LV_USE_PERF_MONITOR_LOG_MODE
-    lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
-#else
-    lv_obj_remove_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
-#endif
+    lv_obj_set_hidden(disp->perf_label, LV_USE_PERF_MONITOR_LOG_MODE ? true : false);
 }
 
 void lv_sysmon_hide_performance(lv_display_t * disp)
@@ -136,7 +132,7 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
         return;
     }
 
-    lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(disp->perf_label, true);
 }
 
 void lv_sysmon_performance_dump(lv_display_t * disp)
@@ -182,7 +178,7 @@ void lv_sysmon_show_memory(lv_display_t * disp)
         lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
     }
 
-    lv_obj_remove_flag(disp->mem_label, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(disp->mem_label, false);
 }
 
 void lv_sysmon_hide_memory(lv_display_t * disp)
@@ -193,7 +189,7 @@ void lv_sysmon_hide_memory(lv_display_t * disp)
         return;
     }
 
-    lv_obj_add_flag(disp->mem_label, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(disp->mem_label, true);
 }
 
 #endif

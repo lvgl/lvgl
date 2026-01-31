@@ -132,9 +132,9 @@ static void lv_switch_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     sw->anim_state = LV_SWITCH_ANIM_STATE_INV;
     sw->orientation = LV_SWITCH_ORIENTATION_AUTO;
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scrollable(obj, false);
+    lv_obj_set_checkable(obj, true);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

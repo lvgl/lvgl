@@ -17,7 +17,7 @@ void lv_example_arc_2(void)
     lv_arc_set_rotation(arc, 270);
     lv_arc_set_bg_angles(arc, 0, 360);
     lv_obj_remove_style(arc, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
-    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
+    lv_obj_set_clickable(arc, false);  /*To not allow adjusting by click*/
     lv_obj_center(arc);
 
     lv_anim_t a;

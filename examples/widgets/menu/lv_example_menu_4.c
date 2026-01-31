@@ -58,7 +58,7 @@ void lv_example_menu_4(void)
     /*Create floating btn*/
     lv_obj_t * float_btn = lv_button_create(lv_screen_active());
     lv_obj_set_size(float_btn, 50, 50);
-    lv_obj_add_flag(float_btn, LV_OBJ_FLAG_FLOATING);
+    lv_obj_set_floating(float_btn, true);
     lv_obj_align(float_btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
     lv_obj_add_event_cb(float_btn, float_button_event_cb, LV_EVENT_CLICKED, menu);
     lv_obj_set_style_radius(float_btn, LV_RADIUS_CIRCLE, 0);

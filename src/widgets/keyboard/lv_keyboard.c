@@ -443,7 +443,7 @@ const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
 static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_set_click_focusable(obj, false);
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     keyboard->ta         = NULL;

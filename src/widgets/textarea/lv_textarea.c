@@ -927,8 +927,8 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_label_set_text(ta->label, "");
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_STYLE_CHANGED, NULL);
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_SIZE_CHANGED, NULL);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+    lv_obj_set_scroll_on_focus(obj, true);
+    lv_obj_set_scroll_with_arrow(obj, false);
 
     lv_textarea_set_cursor_pos(obj, 0);
 
@@ -1290,7 +1290,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
             ta->sel_start    = char_id_at_click;
             ta->sel_end      = LV_LABEL_TEXT_SELECTION_OFF;
             ta->text_sel_in_prog = 1;
-            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+            lv_obj_set_scroll_chain(obj, false);
         }
         else if(ta->text_sel_in_prog && code == LV_EVENT_PRESSING) {
             /*Input device may be moving. Store the end position*/
@@ -1298,7 +1298,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
         }
         else if(ta->text_sel_in_prog && (code == LV_EVENT_PRESS_LOST || code == LV_EVENT_RELEASED)) {
             /*Input device is released. Check if anything was selected.*/
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+            lv_obj_set_scroll_chain(obj, true);
         }
     }
 

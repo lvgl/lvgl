@@ -146,8 +146,8 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     lv_obj_remove_style_all(disp->bottom_layer);
     lv_obj_remove_style_all(disp->top_layer);
     lv_obj_remove_style_all(disp->sys_layer);
-    lv_obj_remove_flag(disp->top_layer, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(disp->sys_layer, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(disp->top_layer, false);
+    lv_obj_set_clickable(disp->sys_layer, false);
 
     if(lv_color_format_has_alpha(disp->color_format)) {
         lv_obj_remove_local_style_prop(disp->bottom_layer, LV_STYLE_BG_OPA, 0);

@@ -87,7 +87,7 @@ void lv_example_buttonmatrix_2(void)
 {
     lv_obj_t * btnm = lv_buttonmatrix_create(lv_screen_active());
     lv_obj_add_event_cb(btnm, event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(btnm, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(btnm, true);
     lv_obj_center(btnm);
 }
 

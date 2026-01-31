@@ -315,7 +315,7 @@ static lv_result_t calc_cols(lv_obj_t * cont, lv_grid_calc_t * c)
             uint32_t ci;
             for(ci = 0; ci < lv_obj_get_child_count(cont); ci++) {
                 lv_obj_t * item = lv_obj_get_child(cont, ci);
-                if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+                if((lv_obj_get_ignore_layout(item) || lv_obj_get_hidden(item) || lv_obj_get_floating(item))) continue;
                 uint32_t col_span = get_col_span(item);
                 if(col_span != 1) continue;
 
@@ -405,7 +405,7 @@ static lv_result_t calc_rows(lv_obj_t * cont, lv_grid_calc_t * c)
             uint32_t ci;
             for(ci = 0; ci < lv_obj_get_child_count(cont); ci++) {
                 lv_obj_t * item = lv_obj_get_child(cont, ci);
-                if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+                if((lv_obj_get_ignore_layout(item) || lv_obj_get_hidden(item) || lv_obj_get_floating(item))) continue;
                 uint32_t row_span = get_row_span(item);
                 if(row_span != 1) continue;
 
@@ -469,7 +469,7 @@ static lv_result_t calc_rows(lv_obj_t * cont, lv_grid_calc_t * c)
  */
 static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * hint)
 {
-    if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) return;
+    if((lv_obj_get_ignore_layout(item) || lv_obj_get_hidden(item) || lv_obj_get_floating(item))) return;
     uint32_t col_span = get_col_span(item);
     uint32_t row_span = get_row_span(item);
     if(row_span == 0 || col_span == 0) return;
