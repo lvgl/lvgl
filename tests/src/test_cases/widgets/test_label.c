@@ -164,7 +164,7 @@ void test_label_long_text_get_letter_pos_align_left(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = 0,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
@@ -291,7 +291,7 @@ void test_label_long_text_get_letter_pos_align_right(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = -3,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
@@ -418,7 +418,7 @@ void test_label_long_text_get_letter_pos_align_center(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = -1,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
