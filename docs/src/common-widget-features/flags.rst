@@ -4,6 +4,13 @@
 Flags
 =====
 
+
+.. note::
+
+  Flags are deprecated in LVGL v9.5 and dedicated API functions are created instead,
+  for example :cpp:expr:`lv_obj_set_hidden(widget, true)`
+
+
 Some widget attributes can be enabled or disabled using
 :cpp:expr:`lv_obj_add_flag(widget, LV_OBJ_FLAG_...)` and
 :cpp:expr:`lv_obj_remove_flag(widget, LV_OBJ_FLAG_...)`.
