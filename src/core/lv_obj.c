@@ -578,12 +578,18 @@ void lv_obj_set_flex_in_new_track(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    /*For backward compatibility use it as as LV_OBJ_FLAG_LAYOUT_1
-     *It will have it's on bin in lv_obj_t after v9.5*/
-    lv_obj_allocate_spec_attr(obj);
-
-    if(en) obj->spec_attr->user_bits |= 1 << 0;
-    else obj->spec_attr->user_bits &= ~(1 << 0);
+    /*For backward compatibility use it as an LV_OBJ_FLAG_LAYOUT_1
+     *It will have its on bit in lv_obj_t after v9.5*/
+    if(en) {
+        /*Need to allocate spec_attr to set the bit*/
+        lv_obj_allocate_spec_attr(obj);
+        obj->spec_attr->user_bits |= 1 << 0;
+    }
+    else {
+        /*If spec_attr is not allocated,
+         *its not needed to clear it as 0 is the default value*/
+        if(obj->spec_attr) obj->spec_attr->user_bits &= ~(1 << 0);
+    }
 
     lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
     lv_obj_mark_layout_as_dirty(obj);
@@ -674,7 +680,6 @@ bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
 
     LV_LOG_WARN("Object flags are deprecated. Use dedicated API functions instead");
 
-    if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;;
 
     if((f & LV_OBJ_FLAG_HIDDEN) && obj->hidden) return true;
     if((f & LV_OBJ_FLAG_CLICKABLE) && obj->clickable) return true;
@@ -699,6 +704,9 @@ bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
     if((f & LV_OBJ_FLAG_OVERFLOW_VISIBLE) && obj->overflow_visible) return true;
     if((f & LV_OBJ_FLAG_EVENT_TRICKLE) && obj->event_trickle) return true;
     if((f & LV_OBJ_FLAG_STATE_TRICKLE) && obj->state_trickle) return true;
+
+    if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;
+
     if((f & LV_OBJ_FLAG_LAYOUT_1) && (obj->spec_attr->user_bits & (1 << 0))) return true;
     if((f & LV_OBJ_FLAG_LAYOUT_2) && (obj->spec_attr->user_bits & (1 << 1))) return true;
     if((f & LV_OBJ_FLAG_WIDGET_1) && (obj->spec_attr->user_bits & (1 << 2))) return true;
