@@ -334,7 +334,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     cache_data->texture = texture;
 
     if(obj) {
-        lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+        lv_obj_set_send_draw_task_events(obj, original_send_draw_task_event);
     }
 
     return true;
