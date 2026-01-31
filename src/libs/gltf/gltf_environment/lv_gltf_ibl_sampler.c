@@ -234,28 +234,48 @@ static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
 static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler)
 {
     GLint prev_framebuffer;
+    GLint prev_viewport[4];
+    GLint prev_program;
+    GLint prev_texture_2d;
+    GLint prev_texture_cube;
+
     GL_CALL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_framebuffer));
+    GL_CALL(glGetIntegerv(GL_VIEWPORT, prev_viewport));
+    GL_CALL(glGetIntegerv(GL_CURRENT_PROGRAM, &prev_program));
+    GL_CALL(glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev_texture_2d));
+    GL_CALL(glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &prev_texture_cube));
 
     ibl_panorama_to_cubemap(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_cube_map_to_lambertian(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_cube_map_to_ggx(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_cube_map_to_sheen(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_sample_ggx_lut(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_sample_charlie_lut(sampler);
+
+    // Restore all GL state
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
+    GL_CALL(glViewport(prev_viewport[0], prev_viewport[1], prev_viewport[2], prev_viewport[3]));
+    GL_CALL(glUseProgram(prev_program));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, prev_texture_2d));
+    GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, prev_texture_cube));
 }
 static void ibl_sampler_destroy(lv_gltf_ibl_sampler_t * sampler)
 {
+    if(sampler->framebuffer != 0) {
+        GL_CALL(glDeleteFramebuffers(1, &sampler->framebuffer));
+        sampler->framebuffer = 0;
+    }
+    
+    if(sampler->input_texture_id != 0) {
+        GL_CALL(glDeleteTextures(1, &sampler->input_texture_id));
+        sampler->input_texture_id = 0;
+    }
+    
+    if(sampler->cube_map_texture_id != 0) {
+        GL_CALL(glDeleteTextures(1, &sampler->cube_map_texture_id));
+        sampler->cube_map_texture_id = 0;
+    }
+    
     GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_vertex_buffer));
     GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_tex_coord_buffer));
     lv_opengl_shader_manager_deinit(&sampler->shader_manager);
