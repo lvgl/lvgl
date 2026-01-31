@@ -211,6 +211,7 @@ lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...)
     va_start(args, fmt);
     lv_obj_t * label = lv_label_create(mbox->content);
     lv_label_set_text_vfmt(label, fmt, args);
+    lv_obj_set_width(label, lv_pct(100));
     va_end(args);
 
     return label;
