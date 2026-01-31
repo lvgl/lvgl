@@ -579,7 +579,7 @@ void lv_obj_set_flex_in_new_track(lv_obj_t * obj, bool en)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     /*For backward compatibility use it as an LV_OBJ_FLAG_LAYOUT_1
-     *It will have its on bit in lv_obj_t after v9.5*/
+     *It will have its own bit in lv_obj_t after v9.5*/
     if(en) {
         /*Need to allocate spec_attr to set the bit*/
         lv_obj_allocate_spec_attr(obj);
