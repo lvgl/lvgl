@@ -178,6 +178,13 @@ uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t eve
     return removed_count;
 }
 
+void lv_obj_remove_event_all(lv_obj_t * obj)
+{
+    if(obj == NULL) return;
+    if(obj->spec_attr == NULL) return;
+    lv_event_remove_all(&obj->spec_attr->event_list);
+}
+
 lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
 {
     return lv_event_get_current_target(e);

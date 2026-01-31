@@ -953,6 +953,12 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
     return removed_count;
 }
 
+void lv_display_remove_event_all(lv_display_t * disp)
+{
+    if(disp == NULL) return;
+    lv_event_remove_all(&disp->event_list);
+}
+
 lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param)
 {
     return lv_event_push_and_send(&disp->event_list, code, disp, param);

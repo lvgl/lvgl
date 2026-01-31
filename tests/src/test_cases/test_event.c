@@ -177,4 +177,34 @@ void test_event_remove_event_cb(void)
     lv_obj_delete(obj);
 }
 
+static void test_event_cb_2(lv_event_t * e)
+{
+    LV_UNUSED(e);
+}
+
+void test_event_remove_event_all(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+
+    // Add multiple event callbacks
+    lv_obj_add_event_cb(obj, test_event_cb_1, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(obj, test_event_cb_2, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_event_cb(obj, test_event_cb_1, LV_EVENT_RELEASED, NULL);
+
+    // Verify that 3 events were added
+    TEST_ASSERT_EQUAL_UINT32(3, lv_obj_get_event_count(obj));
+
+    // Remove all events
+    lv_obj_remove_event_all(obj);
+
+    // Verify that all events were removed
+    TEST_ASSERT_EQUAL_UINT32(0, lv_obj_get_event_count(obj));
+
+    // Test calling on object with no events (should not crash)
+    lv_obj_remove_event_all(obj);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_obj_get_event_count(obj));
+
+    lv_obj_delete(obj);
+}
+
 #endif

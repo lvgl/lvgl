@@ -697,6 +697,12 @@ uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb
     return removed_count;
 }
 
+void lv_indev_remove_event_all(lv_indev_t * indev)
+{
+    if(indev == NULL) return;
+    lv_event_remove_all(&indev->event_list);
+}
+
 lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void * param)
 {
     return lv_event_push_and_send(&indev->event_list, code, indev, param);

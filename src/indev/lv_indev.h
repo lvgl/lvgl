@@ -458,6 +458,12 @@ bool lv_indev_remove_event(lv_indev_t * indev, uint32_t index);
 uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb_t event_cb, void * user_data);
 
 /**
+ * Remove all events
+ * @param indev         pointer to an indev
+ */
+void lv_indev_remove_event_all(lv_indev_t * indev);
+
+/**
  * Send an event to an indev
  * @param indev         pointer to an indev
  * @param code          an event code. LV_EVENT_...
