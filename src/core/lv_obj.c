@@ -256,6 +256,8 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
+    if(f >= LV_OBJ_FLAG_LAYOUT_1) lv_obj_allocate_spec_attr(obj);
+
     /* If all requested flags are already set, do nothing */
     if(lv_obj_has_flag(obj, f)) return;
 
@@ -282,15 +284,19 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
     if(f & LV_OBJ_FLAG_OVERFLOW_VISIBLE)      lv_obj_set_overflow_visible(obj, true);
     if(f & LV_OBJ_FLAG_EVENT_TRICKLE)         lv_obj_set_event_trickle(obj, true);
     if(f & LV_OBJ_FLAG_STATE_TRICKLE)         lv_obj_set_state_trickle(obj, true);
-    if(f & LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)     lv_obj_set_flex_in_new_track(obj, true);
-    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_bits |= 1 << 0;
-    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_bits |= 1 << 1;
-    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_bits |= 1 << 2;
-    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_bits |= 1 << 3;
-    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_bits |= 1 << 4;
-    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_bits |= 1 << 5;
-    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_bits |= 1 << 6;
-    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_bits |= 1 << 7;
+    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_bits |= 1 << 0;
+    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_bits |= 1 << 1;
+    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_bits |= 1 << 2;
+    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_bits |= 1 << 3;
+    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_bits |= 1 << 4;
+    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_bits |= 1 << 5;
+    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_bits |= 1 << 6;
+    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_bits |= 1 << 7;
+
+    if((f & LV_OBJ_FLAG_LAYOUT_1) || (f & LV_OBJ_FLAG_LAYOUT_2)) {
+        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+        lv_obj_mark_layout_as_dirty(obj);
+    }
 }
 
 
@@ -300,9 +306,9 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    /* If none of the requested flags are set, do nothing */
-    if(!()) return;
+    if(f >= LV_OBJ_FLAG_LAYOUT_1) lv_obj_allocate_spec_attr(obj);
 
+    /* If none of the requested flags are set, do nothing */
     if(f & LV_OBJ_FLAG_HIDDEN)               lv_obj_set_hidden(obj, false);
     if(f & LV_OBJ_FLAG_CLICKABLE)            lv_obj_set_clickable(obj, false);
     if(f & LV_OBJ_FLAG_CLICK_FOCUSABLE)      lv_obj_set_click_focusable(obj, false);
@@ -326,15 +332,19 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
     if(f & LV_OBJ_FLAG_OVERFLOW_VISIBLE)      lv_obj_set_overflow_visible(obj, false);
     if(f & LV_OBJ_FLAG_EVENT_TRICKLE)         lv_obj_set_event_trickle(obj, false);
     if(f & LV_OBJ_FLAG_STATE_TRICKLE)         lv_obj_set_state_trickle(obj, false);
-    if(f & LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)     lv_obj_set_flex_in_new_track(obj, false);
-    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_bits &= ~(1 << 0);
-    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_bits &= ~(1 << 1);
-    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_bits &= ~(1 << 2);
-    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_bits &= ~(1 << 3);
-    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_bits &= ~(1 << 4);
-    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_bits &= ~(1 << 5);
-    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_bits &= ~(1 << 6);
-    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_bits &= ~(1 << 7);
+    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_bits &= ~(1 << 0);
+    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_bits &= ~(1 << 1);
+    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_bits &= ~(1 << 2);
+    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_bits &= ~(1 << 3);
+    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_bits &= ~(1 << 4);
+    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_bits &= ~(1 << 5);
+    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_bits &= ~(1 << 6);
+    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_bits &= ~(1 << 7);
+
+    if((f & LV_OBJ_FLAG_LAYOUT_1) || (f & LV_OBJ_FLAG_LAYOUT_2)) {
+        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+        lv_obj_mark_layout_as_dirty(obj);
+    }
 }
 
 
@@ -568,12 +578,15 @@ void lv_obj_set_flex_in_new_track(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    obj->flex_in_new_track = en;
+    /*For backward compatibility use it as as LV_OBJ_FLAG_LAYOUT_1
+     *It will have it's on bin in lv_obj_t after v9.5*/
+    lv_obj_allocate_spec_attr(obj);
 
-    if(lv_obj_is_layout_positioned(obj)) {
-        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
-        lv_obj_mark_layout_as_dirty(obj);
-    }
+    if(en) obj->spec_attr->user_bits |= 1 << 0;
+    else obj->spec_attr->user_bits &= ~(1 << 0);
+
+    lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+    lv_obj_mark_layout_as_dirty(obj);
 }
 
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
@@ -618,6 +631,8 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
 
     LV_LOG_WARN("Object flags are deprecated. Use dedicated API functions instead");
 
+    if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;;
+
     if((f & LV_OBJ_FLAG_HIDDEN) && !obj->hidden) return false;
     if((f & LV_OBJ_FLAG_CLICKABLE) && !obj->clickable) return false;
     if((f & LV_OBJ_FLAG_CLICK_FOCUSABLE) && !obj->click_focusable) return false;
@@ -641,15 +656,14 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
     if((f & LV_OBJ_FLAG_OVERFLOW_VISIBLE) && !obj->overflow_visible) return false;
     if((f & LV_OBJ_FLAG_EVENT_TRICKLE) && !obj->event_trickle) return false;
     if((f & LV_OBJ_FLAG_STATE_TRICKLE) && !obj->state_trickle) return false;
-    if((f & LV_OBJ_FLAG_FLEX_IN_NEW_TRACK) && !obj->flex_in_new_track) return false;
-    if((f & LV_OBJ_FLAG_USER_1) && (!obj->spec_attr->user_bits & (1 << 0))) return false;
-    if((f & LV_OBJ_FLAG_USER_2) && (!obj->spec_attr->user_bits & (1 << 1))) return false;
-    if((f & LV_OBJ_FLAG_USER_3) && (!obj->spec_attr->user_bits & (1 << 2))) return false;
-    if((f & LV_OBJ_FLAG_USER_4) && (!obj->spec_attr->user_bits & (1 << 3))) return false;
-    if((f & LV_OBJ_FLAG_LAYOUT_1) && (!obj->spec_attr->user_bits & (1 << 4))) return false;
-    if((f & LV_OBJ_FLAG_LAYOUT_2) && (!obj->spec_attr->user_bits & (1 << 5))) return false;
-    if((f & LV_OBJ_FLAG_WIDGET_1) && (!obj->spec_attr->user_bits & (1 << 6))) return false;
-    if((f & LV_OBJ_FLAG_WIDGET_2) && (!obj->spec_attr->user_bits & (1 << 7))) return false;
+    if((f & LV_OBJ_FLAG_LAYOUT_1) && !(obj->spec_attr->user_bits & (1 << 0))) return false;
+    if((f & LV_OBJ_FLAG_LAYOUT_2) && !(obj->spec_attr->user_bits & (1 << 1))) return false;
+    if((f & LV_OBJ_FLAG_WIDGET_1) && !(obj->spec_attr->user_bits & (1 << 2))) return false;
+    if((f & LV_OBJ_FLAG_WIDGET_2) && !(obj->spec_attr->user_bits & (1 << 3))) return false;
+    if((f & LV_OBJ_FLAG_USER_1) && !(obj->spec_attr->user_bits & (1 << 4))) return false;
+    if((f & LV_OBJ_FLAG_USER_2) && !(obj->spec_attr->user_bits & (1 << 5))) return false;
+    if((f & LV_OBJ_FLAG_USER_3) && !(obj->spec_attr->user_bits & (1 << 6))) return false;
+    if((f & LV_OBJ_FLAG_USER_4) && !(obj->spec_attr->user_bits & (1 << 7))) return false;
 
     return true;
 }
@@ -659,6 +673,8 @@ bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     LV_LOG_WARN("Object flags are deprecated. Use dedicated API functions instead");
+
+    if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;;
 
     if((f & LV_OBJ_FLAG_HIDDEN) && obj->hidden) return true;
     if((f & LV_OBJ_FLAG_CLICKABLE) && obj->clickable) return true;
@@ -683,14 +699,14 @@ bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
     if((f & LV_OBJ_FLAG_OVERFLOW_VISIBLE) && obj->overflow_visible) return true;
     if((f & LV_OBJ_FLAG_EVENT_TRICKLE) && obj->event_trickle) return true;
     if((f & LV_OBJ_FLAG_STATE_TRICKLE) && obj->state_trickle) return true;
-    if((f & LV_OBJ_FLAG_USER_1) && (obj->spec_attr->user_bits & (1 << 0))) return false;
-    if((f & LV_OBJ_FLAG_USER_2) && (obj->spec_attr->user_bits & (1 << 1))) return false;
-    if((f & LV_OBJ_FLAG_USER_3) && (obj->spec_attr->user_bits & (1 << 2))) return false;
-    if((f & LV_OBJ_FLAG_USER_4) && (obj->spec_attr->user_bits & (1 << 3))) return false;
-    if((f & LV_OBJ_FLAG_LAYOUT_1) && (obj->spec_attr->user_bits & (1 << 4))) return false;
-    if((f & LV_OBJ_FLAG_LAYOUT_2) && (obj->spec_attr->user_bits & (1 << 5))) return false;
-    if((f & LV_OBJ_FLAG_WIDGET_1) && (obj->spec_attr->user_bits & (1 << 6))) return false;
-    if((f & LV_OBJ_FLAG_WIDGET_2) && (obj->spec_attr->user_bits & (1 << 7))) return false;
+    if((f & LV_OBJ_FLAG_LAYOUT_1) && (obj->spec_attr->user_bits & (1 << 0))) return true;
+    if((f & LV_OBJ_FLAG_LAYOUT_2) && (obj->spec_attr->user_bits & (1 << 1))) return true;
+    if((f & LV_OBJ_FLAG_WIDGET_1) && (obj->spec_attr->user_bits & (1 << 2))) return true;
+    if((f & LV_OBJ_FLAG_WIDGET_2) && (obj->spec_attr->user_bits & (1 << 3))) return true;
+    if((f & LV_OBJ_FLAG_USER_1) && (obj->spec_attr->user_bits & (1 << 4))) return true;
+    if((f & LV_OBJ_FLAG_USER_2) && (obj->spec_attr->user_bits & (1 << 5))) return true;
+    if((f & LV_OBJ_FLAG_USER_3) && (obj->spec_attr->user_bits & (1 << 6))) return true;
+    if((f & LV_OBJ_FLAG_USER_4) && (obj->spec_attr->user_bits & (1 << 7))) return true;
 
     return false;
 }
@@ -840,10 +856,15 @@ bool lv_obj_get_radio_button(const lv_obj_t * obj)
     return obj->radio_button;
 }
 
-bool lv_obj_get_flex_new_track(const lv_obj_t * obj)
+bool lv_obj_get_flex_in_new_track(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    return obj->flex_in_new_track;
+
+    /*For backward compatibility use it as as LV_OBJ_FLAG_LAYOUT_1
+     *It will have it's on bin in lv_obj_t after v9.5*/
+    if(obj->spec_attr == NULL) return false;
+
+    return obj->spec_attr->user_bits & (1 << 0);
 }
 
 
@@ -1767,7 +1788,7 @@ static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_prop
     if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
         prop->id = id;
-        prop->num = obj->flags & flag;
+        prop->num = lv_obj_has_flag_any(obj, flag);
         return LV_RESULT_OK;
     }
     else if(id >= LV_PROPERTY_OBJ_STATE_START && id <= LV_PROPERTY_OBJ_STATE_END) {

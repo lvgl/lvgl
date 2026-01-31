@@ -146,9 +146,6 @@ struct _lv_obj_t {
     /** Allow only one RADIO_BUTTON sibling to be checked */
     uint32_t radio_button : 1;
 
-    /** Start a new flex track on this item */
-    uint32_t flex_in_new_track : 1;
-
     uint16_t state;
     uint16_t layout_inv : 1;
     uint16_t readjust_scroll_after_layout : 1;

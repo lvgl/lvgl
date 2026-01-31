@@ -73,10 +73,10 @@ typedef enum {
 
     LV_OBJ_FLAG_LAYOUT_1        = (1u << 23), /**< Custom flag, free to use by layouts*/
     LV_OBJ_FLAG_LAYOUT_2        = (1u << 24), /**< Custom flag, free to use by layouts*/
-#if LV_USE_FLEX
-    LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = LV_OBJ_FLAG_LAYOUT_1,     /**< Start a new flex track on this item*/
-#endif
 
+#if LV_USE_FLEX
+    LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = LV_OBJ_FLAG_LAYOUT_1, /**< Start a new flex track on this item*/
+#endif
     LV_OBJ_FLAG_WIDGET_1        = (1u << 25), /**< Custom flag, free to use by widget*/
     LV_OBJ_FLAG_WIDGET_2        = (1u << 26), /**< Custom flag, free to use by widget*/
     LV_OBJ_FLAG_USER_1          = (1u << 27), /**< Custom flag, free to use by user*/
@@ -112,14 +112,15 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, FLAG_OVERFLOW_VISIBLE,      LV_PROPERTY_TYPE_INT,       20),
     LV_PROPERTY_ID(OBJ, FLAG_EVENT_TRICKLE,         LV_PROPERTY_TYPE_INT,       21),
     LV_PROPERTY_ID(OBJ, FLAG_STATE_TRICKLE,         LV_PROPERTY_TYPE_INT,       22),
-    LV_PROPERTY_ID(OBJ, FLAG_RADIO_BUTTON,          LV_PROPERTY_TYPE_INT,       23),
-    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_1,              LV_PROPERTY_TYPE_INT,       24),
-    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_2,              LV_PROPERTY_TYPE_INT,       25),
-    LV_PROPERTY_ID(OBJ, FLAG_FLEX_IN_NEW_TRACK,     LV_PROPERTY_TYPE_INT,       24), /*Mapped to FLAG_LAYOUT_1*/
-    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_1,              LV_PROPERTY_TYPE_INT,       26),
-    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_2,              LV_PROPERTY_TYPE_INT,       27),
-    LV_PROPERTY_ID(OBJ, FLAG_USER_1,                LV_PROPERTY_TYPE_INT,       28),
-    LV_PROPERTY_ID(OBJ, FLAG_USER_2,                LV_PROPERTY_TYPE_INT,       29),
+    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_1,              LV_PROPERTY_TYPE_INT,       23),
+    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_2,              LV_PROPERTY_TYPE_INT,       24),
+    LV_PROPERTY_ID(OBJ, FLAG_FLEX_IN_NEW_TRACK,     LV_PROPERTY_TYPE_INT,       23), /*Mapped to FLAG_LAYOUT_1*/
+    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_1,              LV_PROPERTY_TYPE_INT,       25),
+    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_2,              LV_PROPERTY_TYPE_INT,       26),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_1,                LV_PROPERTY_TYPE_INT,       27),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_2,                LV_PROPERTY_TYPE_INT,       28),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_3,                LV_PROPERTY_TYPE_INT,       29),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_4,                LV_PROPERTY_TYPE_INT,       30),
     LV_PROPERTY_ID(OBJ, FLAG_END,                   LV_PROPERTY_TYPE_INT,       30),
 
     LV_PROPERTY_ID(OBJ, STATE_START,                LV_PROPERTY_TYPE_INT,       31),
@@ -564,6 +565,13 @@ bool lv_obj_get_state_trickle(const lv_obj_t * obj);
  * @return        true if radio button behavior is enabled
  */
 bool lv_obj_get_radio_button(const lv_obj_t * obj);
+
+/**
+ * Get whether the widget should be placed in a new flex track
+ * @param obj   pointer to a widget
+ * @return      true if flex in new track is enabled
+ */
+bool lv_obj_get_flex_in_new_track(const lv_obj_t * obj);
 
 
 /**

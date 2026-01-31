@@ -25,7 +25,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_MSGBOX_FLAG_AUTO_PARENT  LV_OBJ_FLAG_WIDGET_1        /*Mark that the parent was automatically created*/
 #define MY_CLASS (&lv_msgbox_class)
 
 /**********************
@@ -127,7 +126,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent)
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
 
-    if(auto_parent) lv_obj_add_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT);
+    mbox->auto_parent = auto_parent;
 
     mbox->content = lv_obj_class_create_obj(&lv_msgbox_content_class, obj);
     LV_ASSERT_MALLOC(mbox->content);
@@ -268,13 +267,15 @@ lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 
 void lv_msgbox_close(lv_obj_t * obj)
 {
-    if(lv_obj_has_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_delete(lv_obj_get_parent(obj));
+    lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
+    if(mbox->auto_parent) lv_obj_delete(lv_obj_get_parent(obj));
     else lv_obj_delete(obj);
 }
 
 void lv_msgbox_close_async(lv_obj_t * obj)
 {
-    if(lv_obj_has_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_delete_async(lv_obj_get_parent(obj));
+    lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
+    if(mbox->auto_parent) lv_obj_delete_async(lv_obj_get_parent(obj));
     else lv_obj_delete_async(obj);
 }
 

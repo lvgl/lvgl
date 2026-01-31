@@ -587,9 +587,9 @@ int32_t lv_obj_get_index(const lv_obj_t * obj)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return -1;
 
-    int32_t i = 0;
+    uint32_t i = 0;
     for(i = 0; i < parent->spec_attr->child_cnt; i++) {
-        if(parent->spec_attr->children[i] == obj) return i;
+        if(parent->spec_attr->children[i] == obj) return (int32_t)i;
     }
 
     /*Shouldn't reach this point*/
