@@ -362,7 +362,7 @@ static lv_result_t add_write_op(lv_gltf_model_node_t * node, lv_gltf_node_prop_t
         return LV_RESULT_OK;
     }
     /* Else create a new one */
-    lv_gltf_write_op_t write_op = {.prop = prop, .channel = channel, .value = value};
+    lv_gltf_write_op_t write_op {prop, channel, value};
     lv_result_t res = lv_array_push_back(&node->write_ops, &write_op);
     if(res != LV_RESULT_OK) {
         return res;
