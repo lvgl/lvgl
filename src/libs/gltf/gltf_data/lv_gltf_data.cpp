@@ -295,7 +295,6 @@ void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_view
     for(uint32_t i = 0; i < viewer_count; ++i) {
         lv_obj_t * viewer = *(lv_obj_t **)lv_array_at(&model->viewers, i);
         if(viewer == target_viewer) {
-            LV_LOG_USER("Removing %u", i);
             lv_array_remove_unordered(&model->viewers, i);
             return;
         }
