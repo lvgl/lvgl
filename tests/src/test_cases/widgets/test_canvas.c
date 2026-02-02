@@ -1,6 +1,7 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../../lvgl_private.h"
+#include "lv_test_init.h"
 
 #include "unity/unity.h"
 
@@ -759,6 +760,39 @@ void test_canvas_out_of_area(void)
     TEST_ASSERT_EQUAL_UINT8(0x00, px.green);
     TEST_ASSERT_EQUAL_UINT8(0x00, px.blue);
     TEST_ASSERT_EQUAL_UINT8(0x00, px.alpha);
+}
+
+void test_line_bigger_than_display_resolution(void)
+{
+    int32_t hor_res = lv_display_get_horizontal_resolution(lv_display_get_default());
+    int32_t ver_res = lv_display_get_vertical_resolution(lv_display_get_default());
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, LV_TEST_DISPLAY_HOR_RES + 1, LV_TEST_DISPLAY_VER_RES + 1, LV_COLOR_FORMAT_NATIVE);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf);
+    draw_buf.header.stride = LV_STRIDE_AUTO;
+
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
+    lv_obj_center(canvas);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    lv_draw_line_dsc_t dsc;
+    lv_draw_line_dsc_init(&dsc);
+    dsc.color = lv_palette_main(LV_PALETTE_RED);
+    dsc.width = 4;
+    dsc.round_end = 1;
+    dsc.round_start = 1;
+    dsc.p1.x = 0;
+    dsc.p1.y = 0;
+    dsc.p2.x = hor_res + 1;
+    dsc.p2.y = ver_res + 1;
+    lv_draw_line(&layer, &dsc);
+    lv_canvas_finish_layer(canvas, &layer);
+
+    /* Test passes if no crash occurs when drawing a line with endpoint
+     * at (hor_res+1, ver_res+1) on a buffer of size (hor_res+1)x(ver_res+1)*/
 }
 
 #endif
