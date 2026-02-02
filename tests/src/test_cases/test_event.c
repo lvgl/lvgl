@@ -177,4 +177,56 @@ void test_event_remove_event_cb(void)
     lv_obj_delete(obj);
 }
 
+static void test_event_cb_2(lv_event_t * e)
+{
+    LV_UNUSED(e);
+}
+
+void test_event_remove_event_all(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+
+    /* Add several event callbacks */
+    lv_obj_add_event_cb(obj, test_event_cb_1, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(obj, test_event_cb_1, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_event_cb(obj, test_event_cb_2, LV_EVENT_RELEASED, NULL);
+
+    /* Verify that 3 events were added */
+    uint32_t event_count_after_add = lv_obj_get_event_count(obj);
+    TEST_ASSERT_EQUAL_UINT32(3, event_count_after_add);
+
+    /* Remove all events */
+    lv_obj_remove_event_all(obj);
+
+    /* Verify that all events were removed */
+    uint32_t event_count_after_remove = lv_obj_get_event_count(obj);
+    TEST_ASSERT_EQUAL_UINT32(0, event_count_after_remove);
+
+    lv_obj_delete(obj);
+}
+
+void test_event_remove_event_all_null(void)
+{
+    /* Should not crash when called with NULL */
+    lv_obj_remove_event_all(NULL);
+}
+
+void test_event_remove_event_all_no_events(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+
+    /* Verify obj starts with no events */
+    uint32_t event_count_before = lv_obj_get_event_count(obj);
+    TEST_ASSERT_EQUAL_UINT32(0, event_count_before);
+
+    /* Should not crash when no events are registered */
+    lv_obj_remove_event_all(obj);
+
+    /* Verify still no events */
+    uint32_t event_count_after = lv_obj_get_event_count(obj);
+    TEST_ASSERT_EQUAL_UINT32(0, event_count_after);
+
+    lv_obj_delete(obj);
+}
+
 #endif
