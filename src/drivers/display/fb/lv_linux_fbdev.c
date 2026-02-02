@@ -396,9 +396,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     const int32_t w = lv_area_get_width(area);
     if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
         uint32_t color_pos =
-            area->x1 * px_size +
-            area->y1 * disp->hor_res * px_size;
-
+            (area->x1 - disp->offset_x) * px_size +
+            (area->y1 - disp->offset_y) * disp->hor_res * px_size;
         for(int32_t y = area->y1; y <= area->y2; y++) {
             write_to_fb(dsc, fb_pos, &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
