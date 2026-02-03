@@ -701,6 +701,18 @@
                 #define LV_NEMA_STM32_HAL_INCLUDE <stm32u5xx_hal.h>
             #endif
         #endif
+
+        /** Set it to a value like __attribute__((section("Nemagfx_Memory_Pool_Buffer")))
+         * and define the section in the linker script if you need the GPU memory to
+         * be, e.g. in a region where accesses will not be cached.
+         */
+        #ifndef LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+            #ifdef CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+                #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+            #else
+                #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+            #endif
+        #endif
     #endif
 
     /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
