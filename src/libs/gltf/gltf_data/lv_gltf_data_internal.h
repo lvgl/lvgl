@@ -205,13 +205,6 @@ double lv_gltf_data_get_radius(const lv_gltf_model_t * model);
 
 
 /**
- * @brief Destroy a GLTF data object and free associated resources.
- *
- * @param _data Pointer to the lv_gltf_data_t object to be destroyed.
- */
-void lv_gltf_model_delete(lv_gltf_model_t * _data);
-
-/**
  * @brief Copy the bounds information from one GLTF data object to another.
  *
  * @param to Pointer to the destination lv_gltf_data_t object.
