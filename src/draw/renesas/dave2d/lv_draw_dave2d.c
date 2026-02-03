@@ -18,9 +18,11 @@
 /* The amount of tasks exercising pressure to the current to get finished
  * This one is used as the main signal to start to render a block of tasks.
  */
-#define DAVE2D_MAX_DRAW_PRESSURE    256
+#ifndef LV_DAVE2D_MAX_DRAW_PRESSURE
+    #define LV_DAVE2D_MAX_DRAW_PRESSURE    256
+#endif
 
-#if (DAVE2D_MAX_DRAW_PRESSURE < 256)
+#if (LV_DAVE2D_MAX_DRAW_PRESSURE < 256)
     #error "DRAW Pressure should be at least 256 otherwise the Dave engine may crash!"
 #endif
 /**********************
@@ -403,7 +405,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     deps = lv_draw_get_dependent_count(t);
     if(deps > 0 || draw_pressure > 0) {
         draw_pressure += deps;
-        if(draw_pressure < DAVE2D_MAX_DRAW_PRESSURE) {
+        if(draw_pressure < LV_DAVE2D_MAX_DRAW_PRESSURE) {
             /* No other tasks are pressuring to get the current block
              * of tasks including the latest one, just accumulate it
              * and tells the drawing pipeline to send a new one if there is any
