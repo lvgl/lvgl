@@ -7,10 +7,33 @@
 #include "lv_gltf_model_node.h"
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_event.h"
+#include "lv_gltf_model_loader.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * Load a glTF model from a file
+ * @param file_path path to the glTF file to load
+ * @param loader pointer to the glTF model loader instance, or NULL to create a new one
+ * @return pointer to the loaded glTF model, or NULL on failure
+ * @note If loader is NULL, an internal loader will be created and managed automatically
+ */
+lv_gltf_model_t * lv_gltf_data_load_from_file(const char * file_path,
+                                              lv_gltf_model_loader_t * loader);
+
+/**
+ * Load a glTF model from a byte array
+ * @param data pointer to the glTF data buffer
+ * @param data_size size of the data buffer in bytes
+ * @param loader pointer to the glTF model loader instance, or NULL to create a new one
+ * @return pointer to the loaded glTF model, or NULL on failure
+ * @note If loader is NULL, an internal loader will be created and managed automatically
+ */
+lv_gltf_model_t * lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
+                                               lv_gltf_model_loader_t * loader);
+
 /**
  * @brief Get the number of images in the glTF model
  *
