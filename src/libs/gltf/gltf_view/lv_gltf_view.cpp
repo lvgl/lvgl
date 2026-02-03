@@ -121,7 +121,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path
         }
     }
 
-    lv_gltf_model_t * model = lv_gltf_data_load_from_file(path, &viewer->shader_manager);
+    lv_gltf_model_t * model = lv_gltf_data_load_from_file(path, viewer->model_loader);
     return add_model(viewer, model, true);
 }
 
@@ -138,7 +138,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
         }
     }
 
-    lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, &viewer->shader_manager);
+    lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, viewer->model_loader);
     return add_model(viewer, model, true);
 }
 
@@ -670,6 +670,8 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
+    view->model_loader = lv_gltf_model_loader_create();
+
     lv_array_init(&view->models, LV_GLTF_INITIAL_MODEL_CAPACITY, sizeof(lv_gltf_model_data_t));
 
     LV_TRACE_OBJ_CREATE("end");
@@ -717,6 +719,7 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     if(view->environment && view->owns_environment) {
         lv_gltf_environment_delete(view->environment);
     }
+    lv_gltf_model_loader_delete(view->model_loader);
     lv_display_t * disp = lv_obj_get_display(obj);
     LV_ASSERT_NULL(disp);
     lv_display_remove_event_cb_with_user_data(disp, display_refr_end_event_cb, obj);

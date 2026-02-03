@@ -208,18 +208,16 @@ size_t lv_gltf_model_get_animation(lv_gltf_model_t * model)
     return model->current_animation;
 }
 
-lv_gltf_model_t *
-lv_gltf_data_load_from_file(const char * file_path,
-                            lv_opengl_shader_manager_t * shader_manager)
+
+lv_gltf_model_t * lv_gltf_data_load_from_file(const char * file_path, lv_gltf_model_loader_t * loader)
 {
-    return lv_gltf_data_load_internal(file_path, 0, shader_manager);
+    return lv_gltf_data_load_internal(file_path, 0, loader);
 }
 
-lv_gltf_model_t *
-lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
-                             lv_opengl_shader_manager_t * shader_manager)
+
+lv_gltf_model_t * lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size, lv_gltf_model_loader_t * loader)
 {
-    return lv_gltf_data_load_internal(data, data_size, shader_manager);
+    return lv_gltf_data_load_internal(data, data_size, loader);
 }
 
 fastgltf::Asset * lv_gltf_data_get_asset(lv_gltf_model_t * data)

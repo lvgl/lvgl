@@ -167,6 +167,7 @@ struct _lv_gltf_t {
     lv_gltf_view_desc_t desc;
     lv_gltf_view_desc_t last_desc;
     lv_opengl_shader_manager_t shader_manager;
+    lv_gltf_model_loader_t * model_loader;
     lv_gltf_environment_t * environment;
     fastgltf::math::fmat4x4 view_matrix;
     fastgltf::math::fmat4x4 projection_matrix;
