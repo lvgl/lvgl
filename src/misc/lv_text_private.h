@@ -148,7 +148,7 @@ static inline bool lv_text_is_break_char(uint32_t letter)
     uint8_t i;
     bool ret = false;
 
-#ifdef LV_TXT_SOFT_HYPHEN_BREAK
+#if LV_TXT_SOFT_HYPHEN_BREAK
     if (letter == LV_TXT_SOFT_HYPHEN_BREAK_CHAR) {
         return true;
     }
