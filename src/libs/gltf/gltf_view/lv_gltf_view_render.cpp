@@ -72,7 +72,8 @@ struct lv_gltf_matrices_saver_t {
  *  STATIC PROTOTYPES
  **********************/
 
-static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg, bool dirty);
+static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_data_t * modeld, bool is_first_model,
+                                        bool dirty);
 static void lv_gltf_view_push_opengl_state(lv_opengl_state_t * state);
 static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state);
 static void setup_finish_frame(void);
@@ -83,7 +84,7 @@ static lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwi
                                          int32_t texture_w,
                                          int32_t texture_h, bool prepare_bg);
 
-static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data);
+static void lv_gltf_view_recache_all_transforms(lv_gltf_model_data_t * gltf_data);
 static fastgltf::math::fmat3x3 create_texture_transform_matrix(std::unique_ptr<fastgltf::TextureTransform> & transform);
 static fastgltf::math::nvec4 color_convert_to_srgb(fastgltf::math::nvec4 color);
 static void render_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color);
@@ -141,20 +142,20 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
     if(n == 0) {
         return GL_NONE;
     }
-    lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
+    lv_gltf_model_data_t * model_data = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, 0);
 
     bool dirty = lv_memcmp(&viewer->last_desc, &viewer->desc, sizeof(viewer->desc)) != 0;
 
     for(size_t i = 0; i < n; ++i) {
-        lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
-        dirty |= model->is_animation_enabled || model->write_ops_pending;
+        lv_gltf_model_data_t * model_data = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, i);
+        dirty |= model_data->model->is_animation_enabled || model_data->model->write_ops_pending;
     }
 
     GLuint texture_id = GL_NONE;
-    texture_id = lv_gltf_view_render_model(viewer, model, true, dirty);
+    texture_id = lv_gltf_view_render_model(viewer, model_data, true, dirty);
     for(size_t i = 1; i < n; ++i) {
-        lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
-        lv_gltf_view_render_model(viewer, model, false, dirty);
+        lv_gltf_model_data_t * model_data = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, i);
+        lv_gltf_view_render_model(viewer, model_data, false, dirty);
     }
 
     lv_memcpy(&(viewer->last_desc), &viewer->desc, sizeof(viewer->desc));
@@ -285,13 +286,14 @@ static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
     GL_CALL(glClearDepthf(state->clear_depth));
 }
 
-static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool is_first_model, bool dirty)
+static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_data_t * modeld, bool is_first_model,
+                                        bool dirty)
 {
     lv_gltf_view_state_t * vstate = &viewer->state;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
     bool opt_draw_bg = is_first_model && (view_desc->bg_mode == LV_GLTF_BG_MODE_ENVIRONMENT);
     bool opt_aa_this_frame = (view_desc->aa_mode == LV_GLTF_AA_MODE_ON) ||
-                             (view_desc->aa_mode == LV_GLTF_AA_MODE_DYNAMIC && model->last_frame_no_motion == true);
+                             (view_desc->aa_mode == LV_GLTF_AA_MODE_DYNAMIC && modeld->last_frame_no_motion == true);
     if(!is_first_model) {
         /* If this data object is a secondary render pass, inherit the anti-alias setting for this frame from the first gltf_data drawn*/
         opt_aa_this_frame = view_desc->frame_was_antialiased;
@@ -307,7 +309,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
 
     bool new_size = last_render_h != view_desc->render_height || last_render_w != view_desc->render_width;
 
-    if(opt_aa_this_frame != model->last_frame_was_antialiased) {
+    if(opt_aa_this_frame != modeld->last_frame_was_antialiased) {
         /* Antialiasing state has changed since the last render */
         if(is_first_model) {
             if(vstate->render_state_ready) {
@@ -317,7 +319,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
                                                             opt_aa_this_frame);
             }
         }
-        model->last_frame_was_antialiased = opt_aa_this_frame;
+        modeld->last_frame_was_antialiased = opt_aa_this_frame;
     }
 
     view_desc->frame_was_antialiased = opt_aa_this_frame;
@@ -334,33 +336,34 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         setup_finish_frame();
     }
 
-    bool last_frame_no_motion = model->_last_frame_no_motion;
-    model->_last_frame_no_motion = model->last_frame_no_motion;
-    model->last_frame_no_motion = true;
+    bool last_frame_no_motion = modeld->_last_frame_no_motion;
+    modeld->_last_frame_no_motion = modeld->last_frame_no_motion;
+    modeld->last_frame_no_motion = true;
 
 
-    if(dirty || lv_gltf_data_transform_cache_is_empty(model) || (model->camera != model->last_camera_index)) {
-        model->last_frame_no_motion = false;
-        lv_gltf_view_recache_all_transforms(model);
+    if(dirty || lv_gltf_model_needs_transforms(modeld->model) ||
+       (modeld->model->camera != modeld->last_camera_index)) {
+        modeld->last_frame_no_motion = false;
+        lv_gltf_view_recache_all_transforms(modeld);
     }
-    else if(model->last_frame_no_motion && model->_last_frame_no_motion && last_frame_no_motion) {
+    else if(modeld->last_frame_no_motion && modeld->_last_frame_no_motion && last_frame_no_motion) {
         /* Nothing changed at all, return the previous output frame */
         setup_finish_frame();
         lv_gltf_view_pop_opengl_state(&opengl_state);
         return vstate->render_state.texture;
     }
 
-    render_skins(viewer, model);
+    render_skins(viewer, modeld->model);
 
     NodeDistanceVector distance_sort_nodes;
 
-    for(const auto & kv : model->blended_nodes_by_material_index) {
+    for(const auto & kv : modeld->model->blended_nodes_by_material_index) {
         for(const auto & pair : kv.second) {
             auto node = pair.first;
             auto new_node = NodeIndexDistancePair(
                                 fastgltf::math::length(
-                                    model->view_pos -
-                                    lv_gltf_data_get_centerpoint(model, lv_gltf_data_get_cached_transform(model, node),
+                                    modeld->model->view_pos -
+                                    lv_gltf_data_get_centerpoint(modeld->model, lv_gltf_data_get_cached_transform(modeld->model, node),
                                                                  node->meshIndex.value(), pair.second)),
                                 NodeIndexPair(node, pair.second));
             distance_sort_nodes.push_back(new_node);
@@ -372,7 +375,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     });
 
     /* Reset the last material index to an unused value once per frame at the start*/
-    model->last_material_index = 99999;
+    modeld->model->last_material_index = 99999;
 
     if(vstate->render_opaque_buffer) {
         std::optional<lv_gltf_matrices_saver_t> saver;
@@ -381,11 +384,11 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
             saver.emplace(viewer);
         }
 
-        if(model->camera > 0) {
-            setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model, true);
+        if(modeld->model->camera > 0) {
+            setup_view_proj_matrix_from_camera(viewer, modeld->model->camera - 1, view_desc, modeld->model, true);
         }
         else {
-            setup_view_proj_matrix(viewer, view_desc, model, true);
+            setup_view_proj_matrix(viewer, view_desc, modeld->model, true);
         }
         lv_result_t result = setup_restore_opaque_output(viewer, &vstate->opaque_render_state,
                                                          vstate->opaque_frame_buffer_width,
@@ -400,13 +403,13 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
             setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
         }
 
-        render_materials(viewer, model, model->opaque_nodes_by_material_index, true);
+        render_materials(viewer, modeld->model, modeld->model->opaque_nodes_by_material_index, true);
 
         for(const auto & node_distance_pair : distance_sort_nodes) {
             const auto & node_element = node_distance_pair.second;
             const auto & node = node_element.first;
-            draw_primitive(node_element.second, viewer, model, *node, node->meshIndex.value(),
-                           lv_gltf_data_get_cached_transform(model, node), viewer->environment, true);
+            draw_primitive(node_element.second, viewer, modeld->model, *node, node->meshIndex.value(),
+                           lv_gltf_data_get_cached_transform(modeld->model, node), viewer->environment, true);
         }
 
         GL_CALL(glBindTexture(GL_TEXTURE_2D, vstate->opaque_render_state.texture));
@@ -416,11 +419,11 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     }
 
     if(is_first_model) {
-        if(model->camera > 0) {
-            setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model, false);
+        if(modeld->model->camera > 0) {
+            setup_view_proj_matrix_from_camera(viewer, modeld->model->camera - 1, view_desc, modeld->model, false);
         }
         else {
-            setup_view_proj_matrix(viewer, view_desc, model, false);
+            setup_view_proj_matrix(viewer, view_desc, modeld->model, false);
         }
     }
 
@@ -436,13 +439,13 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
     }
 
-    render_materials(viewer, model, model->opaque_nodes_by_material_index, false);
+    render_materials(viewer, modeld->model, modeld->model->opaque_nodes_by_material_index, false);
 
     for(const auto & node_distance_pair : distance_sort_nodes) {
         const auto & node_element = node_distance_pair.second;
         const auto & node = node_element.first;
-        draw_primitive(node_element.second, viewer, model, *node, node->meshIndex.value(),
-                       lv_gltf_data_get_cached_transform(model, node), viewer->environment, false);
+        draw_primitive(node_element.second, viewer, modeld->model, *node, node->meshIndex.value(),
+                       lv_gltf_data_get_cached_transform(modeld->model, node), viewer->environment, false);
     }
     if(opt_aa_this_frame) {
         GL_CALL(glBindTexture(GL_TEXTURE_2D, vstate->render_state.texture));
@@ -1313,27 +1316,28 @@ static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color,
 
 }
 
-static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
+static void lv_gltf_view_recache_all_transforms(lv_gltf_model_data_t * modeld)
 {
-    int32_t anim_num = model->current_animation;
+    int32_t anim_num = modeld->model->current_animation;
     uint32_t scene_index = 0;
 
-    model->last_camera_index = model->camera;
-    model->write_ops_flushed = true;
-    model->write_ops_pending = false;
+    modeld->last_camera_index = modeld->model->camera;
+    modeld->model->write_ops_flushed = true;
+    modeld->model->write_ops_pending = false;
     size_t current_camera_count = 0;
 
-    lv_gltf_data_clear_transform_cache(model);
+    lv_gltf_data_clear_transform_cache(modeld->model);
 
     auto tmat = fastgltf::math::fmat4x4{};
     fastgltf::custom_iterate_scene_nodes(
-        model, scene_index, &tmat,
+        modeld->model, scene_index, &tmat,
         [&](lv_gltf_model_node_t * node, fastgltf::math::fmat4x4 & parentworldmatrix,
     fastgltf::math::fmat4x4 & localmatrix) {
         bool made_changes = false;
         bool made_rotation_changes = false;
-        if(lv_gltf_data_animation_get_channel_set(anim_num, model, node->fastgltf_node)->size() > 0) {
-            lv_gltf_data_animation_matrix_apply(model->local_timestamp / 1000., anim_num, model, node->fastgltf_node,
+        if(lv_gltf_data_animation_get_channel_set(anim_num, modeld->model, node->fastgltf_node)->size() > 0) {
+            lv_gltf_data_animation_matrix_apply(modeld->model->local_timestamp / 1000., anim_num, modeld->model,
+                                                node->fastgltf_node,
                                                 localmatrix);
             made_changes = true;
         }
@@ -1411,18 +1415,18 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
             }
         }
 
-        if(made_changes || !lv_gltf_data_has_cached_transform(model, node->fastgltf_node)) {
+        if(made_changes || !lv_gltf_data_has_cached_transform(modeld->model, node->fastgltf_node)) {
             auto world_matrix = worldmatrix_was_inlined ? inlined_worldmatrix : (parentworldmatrix * localmatrix);
-            lv_gltf_data_set_cached_transform(model, node->fastgltf_node, world_matrix);
+            lv_gltf_data_set_cached_transform(modeld->model, node->fastgltf_node, world_matrix);
         }
 
         if(node->fastgltf_node->cameraIndex.has_value()) {
             current_camera_count++;
-            if(current_camera_count == model->camera) {
+            if(current_camera_count == modeld->model->camera) {
                 fastgltf::math::fmat4x4 cammat = worldmatrix_was_inlined ? inlined_worldmatrix : (parentworldmatrix * localmatrix);
                 fastgltf::removeScale(cammat);
-                model->view_pos = cammat.col(3);  /* Implicit conversion from 4 element column to 3 element vector */
-                model->view_mat = fastgltf::math::inverse(cammat);
+                modeld->model->view_pos = cammat.col(3);  /* Implicit conversion from 4 element column to 3 element vector */
+                modeld->model->view_mat = fastgltf::math::inverse(cammat);
             }
         }
     });

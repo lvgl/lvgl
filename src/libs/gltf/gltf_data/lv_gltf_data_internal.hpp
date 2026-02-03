@@ -127,7 +127,6 @@ struct _lv_gltf_model_t {
     size_t last_material_index;
 
     int32_t animation_speed_ratio;
-    uint32_t last_camera_index;
     int32_t last_anim_num;
 
     float bound_radius;
@@ -137,11 +136,9 @@ struct _lv_gltf_model_t {
     uint32_t last_tick;
     uint32_t camera;
 
+    bool node_transform_cache_changed;
     bool is_animation_enabled;
     bool last_pass_was_transmission;
-    bool last_frame_was_antialiased;
-    bool last_frame_no_motion;
-    bool _last_frame_no_motion;
     bool write_ops_pending;
     bool write_ops_flushed;
     struct _lv_gltf_model_t * linked_view_source;
@@ -313,7 +310,7 @@ bool lv_gltf_data_has_cached_transform(lv_gltf_model_t * data, fastgltf::Node * 
  * @param D Pointer to the lv_gltf_data_t object containing the model data.
  * @return True if the transformation cache is empty, false otherwise.
  */
-bool lv_gltf_data_transform_cache_is_empty(lv_gltf_model_t * data);
+bool lv_gltf_model_needs_transforms(lv_gltf_model_t * data);
 
 /**
  * @brief Retrieve the size of the skins in the GLTF model data.
