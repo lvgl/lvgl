@@ -2,6 +2,11 @@
 #define LV_GLTFDATA_PRIVATE_H
 
 #include "../../../lv_conf_internal.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if LV_USE_GLTF
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../draw/lv_image_dsc.h"
@@ -243,4 +248,9 @@ void lv_gltf_data_rgb_to_bgr(uint8_t * pixel_buffer,
                              bool has_alpha);
 
 #endif /*LV_USE_GLTF*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* LV_GLTFDATA_PRIVATE_H */
