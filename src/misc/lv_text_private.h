@@ -149,7 +149,7 @@ static inline bool lv_text_is_break_char(uint32_t letter)
     bool ret = false;
 
 #if LV_TXT_SOFT_HYPHEN_BREAK
-    if (letter == LV_TXT_SOFT_HYPHEN_BREAK_CHAR) {
+    if(letter == LV_TXT_SOFT_HYPHEN_BREAK_CHAR) {
         return true;
     }
 #endif

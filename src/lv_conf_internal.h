@@ -2071,6 +2071,10 @@
     #endif
 #endif
 
+#ifndef LV_TXT_SOFT_HYPHEN_BREAK
+    #define LV_TXT_SOFT_HYPHEN_BREAK 0
+#endif
+
 /** While rendering text strings, break (wrap) text on these chars. */
 #ifndef LV_TXT_BREAK_CHARS
     #ifdef CONFIG_LV_TXT_BREAK_CHARS
