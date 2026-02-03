@@ -7,7 +7,7 @@
 #define __ASSEMBLY__
 #endif
 
-#include "lv_blend_helium.h"
+#include "../../../../lv_conf_internal.h"
 
 /*GCC Workaround: missing .note.GNU-stack section implies executable stack*/
 #ifdef __ELF__
