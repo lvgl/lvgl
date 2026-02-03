@@ -215,6 +215,8 @@ void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines);
  * Get a pointer to the style of a span's built-in style.
  * @param span  pointer to the span.
  * @return      pointer to the style.
+ *
+ * @deprecated This function should no longer be used to set the span style properties directly.
  */
 const lv_style_t * lv_span_get_style(lv_span_t * span);
 
