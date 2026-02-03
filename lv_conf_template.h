@@ -460,6 +460,10 @@
      *  Can be overwritten by `lv_log_register_print_cb`. */
     //#define LV_LOG_PRINT_CB
 
+    /** - 1: Enable printing log level;
+     *  - 0: Disable printing log level. */
+    #define LV_LOG_USE_LEVEL 1
+
     /** - 1: Enable printing timestamp;
      *  - 0: Disable printing timestamp. */
     #define LV_LOG_USE_TIMESTAMP 1
