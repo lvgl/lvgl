@@ -1182,8 +1182,8 @@ static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * vie
                                    bool transmission_pass)
 {
     LV_UNUSED(model);
-    const lv_gltf_model_t * main_model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
-    auto b_radius = lv_gltf_data_get_radius(main_model);
+    const lv_gltf_model_node_t * main_model = (lv_gltf_model_node_t *)lv_array_at(&viewer->models, 0);
+    auto b_radius = lv_gltf_data_get_radius(main_model->model);
 
     float radius = b_radius * LV_GLTF_DISTANCE_SCALE_FACTOR;
     radius *= view_desc->distance;
