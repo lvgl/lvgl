@@ -49,14 +49,16 @@ void lv_gltf_data_set_cached_transform(lv_gltf_model_t * data, fastgltf::Node * 
                                        fastgltf::math::fmat4x4 M)
 {
     data->node_transform_cache[node] = M;
+    data->node_transform_cache_changed = true;
 }
 void lv_gltf_data_clear_transform_cache(lv_gltf_model_t * data)
 {
     data->node_transform_cache.clear();
+    data->node_transform_cache_changed = true;
 }
-bool lv_gltf_data_transform_cache_is_empty(lv_gltf_model_t * data)
+bool lv_gltf_model_needs_transforms(lv_gltf_model_t * data)
 {
-    return data->node_transform_cache.size() == 0;
+    return data->node_transform_cache.size() == 0 || data->node_transform_cache_changed;
 }
 
 void recache_centerpoint(lv_gltf_model_t * data, size_t index_mesh, int32_t primitive)

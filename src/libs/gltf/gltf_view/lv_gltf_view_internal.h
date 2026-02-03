@@ -158,6 +158,10 @@ typedef struct {
 typedef struct {
     lv_gltf_model_t * model;
     bool owned;
+    bool last_frame_was_antialiased;
+    bool last_frame_no_motion;
+    bool _last_frame_no_motion;
+    uint32_t last_camera_index;
 } lv_gltf_model_data_t;
 
 struct _lv_gltf_t {

@@ -51,14 +51,10 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(data) lv_gltf_model_t;
     new(&data->asset) fastgltf::Asset(std::move(asset));
     data->filename = gltf_path;
-    data->last_camera_index = -5;
     data->last_anim_num = -5;
     data->current_animation_max_time = 0;
     data->local_timestamp = 0.0f;
     data->last_material_index = 99999;
-    data->last_frame_was_antialiased = false;
-    data->last_frame_no_motion = false;
-    data->_last_frame_no_motion = false;
 
     data->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     data->animation_update_timer = lv_timer_create(update_animation_cb, LV_DEF_REFR_PERIOD, data);
