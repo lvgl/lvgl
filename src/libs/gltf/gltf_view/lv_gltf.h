@@ -82,7 +82,12 @@ lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path
 lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * bytes, size_t len);
 
 /**
- * Add a glTF model to the viewer
+ * Add a glTF model to the viewer.
+ *
+ * Contrary to `lv_gltf_load_model_from_file` and `lv_gltf_load_model_from_bytes`, the model
+ * is owned by the caller of this function meaning that it's the caller's responsibility
+ * to delete the model when it is no longer needed.
+ *
  * @param obj pointer to a glTF viewer object
  * @param model glTF model to add to the viewer
  * @return LV_RESULT_OK if the model was added to the viewer or LV_RESULT_INVALID on failure
