@@ -3,8 +3,14 @@ on:
   pull_request:
   push:
     branches:
-    - master
-    - 'release/*'
+      - master
+      - 'release/*'
+    paths:
+      # These are the only files that impact the doc build.
+      - 'docs/**'
+      - 'src/**/lv*.h'
+      - 'examples/**'
+      - 'demos/**'
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each PR
@@ -42,11 +48,13 @@ jobs:
             !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
           key: ${{ env.pythonLocation }}-${{ hashFiles('docs/requirements.txt') }}
-      - name: Install Doxygen and Latex dependencies
+      - name: Install Doxygen
         run: |
           sudo apt-get update
-          sudo apt-get install doxygen texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
-      - name: Install requirements
+          sudo apt-get install doxygen
+          # Remember these for possible future use.
+          # texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
+      - name: Install Requirements
         run: |
           pip install -r docs/requirements.txt
       - name: Setup Emscripten cache
@@ -75,7 +83,7 @@ jobs:
         run: rm -rf docs/build/html/.doctrees
       - name: Retrieve version
         run: |
-          echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
+          echo "VERSION_NAME=$(scripts/find_version.sh)" >> "$GITHUB_OUTPUT"
         id: version
       - name: Deploy to subfolder
         if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
