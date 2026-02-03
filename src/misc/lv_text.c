@@ -370,7 +370,8 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
     if(attributes->text_flags & LV_TEXT_FLAG_EXPAND) {
         attributes->max_width = LV_COORD_MAX;
 #if LV_TXT_SOFT_HYPHEN_BREAK
-    } else {
+    }
+    else {
         uint16_t dash_w = lv_font_get_glyph_width(font, '-', '\0');
         attributes->max_width -= (attributes->max_width >= dash_w ? dash_w : 0);
 #endif
