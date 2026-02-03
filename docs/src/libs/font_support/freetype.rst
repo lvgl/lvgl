@@ -114,7 +114,7 @@ These values can be combined, e.g.
 unless the font is variable weight.
 
 Variable weight fonts are supported. You can set the weight of the font using
-:cpp:enumerator:`LV_FREETYPE_FONT_STYLE_WEIGHT(x)` where ``x`` is the weight value between 1 and 2000.
+:c:macro:`LV_FREETYPE_FONT_STYLE_WEIGHT(x)` where ``x`` is the weight value between 1 and 2000.
 The default weight is 400. If :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_BOLD` is set and
 :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_WEIGHT(x)` is not set, the weight will be set to 700.
 If both are set, the weight set by :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_WEIGHT(x)` will be used.
