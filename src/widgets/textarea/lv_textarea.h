@@ -46,12 +46,11 @@ enum _lv_property_textarea_id_t {
     LV_PROPERTY_ID(TEXTAREA, ONE_LINE,          LV_PROPERTY_TYPE_BOOL,  6),
     LV_PROPERTY_ID(TEXTAREA, ACCEPTED_CHARS,    LV_PROPERTY_TYPE_TEXT,  7),
     LV_PROPERTY_ID(TEXTAREA, MAX_LENGTH,        LV_PROPERTY_TYPE_INT,   8),
-    LV_PROPERTY_ID(TEXTAREA, INSERT_REPLACE,    LV_PROPERTY_TYPE_TEXT,  9),
-    LV_PROPERTY_ID(TEXTAREA, TEXT_SELECTION,    LV_PROPERTY_TYPE_BOOL,  10),
-    LV_PROPERTY_ID(TEXTAREA, PASSWORD_SHOW_TIME, LV_PROPERTY_TYPE_INT,   11),
-    LV_PROPERTY_ID(TEXTAREA, LABEL,             LV_PROPERTY_TYPE_OBJ,   12),
-    LV_PROPERTY_ID(TEXTAREA, TEXT_IS_SELECTED,  LV_PROPERTY_TYPE_INT,   13),
-    LV_PROPERTY_ID(TEXTAREA, CURRENT_CHAR,      LV_PROPERTY_TYPE_INT,   14),
+    LV_PROPERTY_ID(TEXTAREA, TEXT_SELECTION,    LV_PROPERTY_TYPE_BOOL,  9),
+    LV_PROPERTY_ID(TEXTAREA, PASSWORD_SHOW_TIME, LV_PROPERTY_TYPE_INT,  10),
+    LV_PROPERTY_ID(TEXTAREA, LABEL,             LV_PROPERTY_TYPE_OBJ,   11),
+    LV_PROPERTY_ID(TEXTAREA, TEXT_IS_SELECTED,  LV_PROPERTY_TYPE_INT,   12),
+    LV_PROPERTY_ID(TEXTAREA, CURRENT_CHAR,      LV_PROPERTY_TYPE_INT,   13),
     LV_PROPERTY_TEXTAREA_END,
 };
 #endif
@@ -158,9 +157,16 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en);
 /**
  * Set a list of characters. Only these characters will be accepted by the text area
  * @param obj       pointer to a text area object
- * @param list      list of characters. Only the pointer is saved. E.g. "+-.,0123456789"
+ * @param list      list of characters. A copy is saved. Example: "+-.,0123456789"
  */
 void lv_textarea_set_accepted_chars(lv_obj_t * obj, const char * list);
+
+/**
+ * Set a list of characters. Only these characters will be accepted by the text area
+ * @param obj       pointer to a text area object
+ * @param list      list of characters. Only the pointer is saved. Example: "+-.,0123456789"
+ */
+void lv_textarea_set_accepted_chars_static(lv_obj_t * obj, const char * list);
 
 /**
  * Set max length of a Text Area.

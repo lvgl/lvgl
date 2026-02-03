@@ -299,8 +299,8 @@ The commands must be put into a 'uint8_t' array:
     lv_lcd_generic_mipi_send_cmd_list(my_disp, init_cmd_list);
 
 You can add a delay between the commands by using the pseudo-command
-``LV_LCD_CMD_DELAY_MS``, which must be followed by the delay given in 10ms units.  To
-terminate the command list you must use a delay with a value of ``LV_LCD_CMD_EOF``,
+:c:macro:`LV_LCD_CMD_DELAY_MS`, which must be followed by the delay given in 10ms units.  To
+terminate the command list you must use a delay with a value of :c:macro:`LV_LCD_CMD_EOF`,
 as shown above.
 
 See an actual example of sending a command list

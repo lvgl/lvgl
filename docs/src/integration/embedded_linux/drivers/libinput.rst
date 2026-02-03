@@ -56,13 +56,13 @@ Usage
 -----
 
 To set up an input device via the libinput driver, all you need to do is call ``lv_libinput_create`` with the respective device type
-(``LV_INDEV_TYPE_POINTER`` or ``LV_INDEV_TYPE_KEYPAD``) and device node path (e.g. ``/dev/input/event5``).
+(:cpp:enumerator:`LV_INDEV_TYPE_POINTER` or :cpp:enumerator:`LV_INDEV_TYPE_KEYPAD`) and device node path (e.g. ``/dev/input/event5``).
 
 .. code-block:: c
 
     lv_indev_t *indev = lv_libinput_create(LV_INDEV_TYPE_POINTER, "/dev/input/event5");
 
-Note that touchscreens are treated as (absolute) pointer devices by the libinput driver and require ``LV_INDEV_TYPE_POINTER``.
+Note that touchscreens are treated as (absolute) pointer devices by the libinput driver and require :cpp:enumerator:`LV_INDEV_TYPE_POINTER`.
 
 Depending on your system, the device node paths might not be stable across reboots. If this is the case, you can use ``lv_libinput_find_dev``
 to find the first device that has a specific capability.

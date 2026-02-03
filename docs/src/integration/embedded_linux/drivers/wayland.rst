@@ -161,7 +161,7 @@ Getting started
 #. In ``main.c`` ``#include "lv_drivers/wayland/wayland.h"``
 #. Enable the Wayland driver in ``lv_conf.h`` with ``LV_USE_WAYLAND 1``
 
-#. ``LV_COLOR_DEPTH`` should be set either to ``32`` or ``16`` in ``lv_conf.h``
+#. :c:macro:`LV_COLOR_DEPTH` should be set either to ``32`` or ``16`` in ``lv_conf.h``
 
 #. Add a display using ``lv_wayland_window_create()``,
    possibly with a close callback to track the status of each display:
@@ -303,7 +303,7 @@ The wayland driver is currently under construction, bug reports, contributions a
 
 It is however important to create detailed issues when a problem is encountered, logs and screenshots of the problem are of great help.
 
-Please enable ``LV_USE_LOG`` and launch the simulator executable like so
+Please enable :c:macro:`LV_USE_LOG` and launch the simulator executable like so
 
 .. code::
 

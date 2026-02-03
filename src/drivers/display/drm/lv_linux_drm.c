@@ -228,12 +228,13 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_
     int32_t width = drm_dev->mmWidth;
 
     size_t buf_size = LV_MIN(drm_dev->drm_bufs[1].size, drm_dev->drm_bufs[0].size);
+    uint32_t stride = drm_dev->drm_bufs[0].pitch;
     /* Resolution must be set first because if the screen is smaller than the size passed
      * to lv_display_create then the buffers aren't big enough for LV_DISPLAY_RENDER_MODE_DIRECT.
      */
     lv_display_set_resolution(disp, hor_res, ver_res);
-    lv_display_set_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
-                           LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers_with_stride(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
+                                       stride, LV_DISPLAY_RENDER_MODE_DIRECT);
 
 
     /* Set the handler that is called before a redraw occurs to set the active buffer/plane

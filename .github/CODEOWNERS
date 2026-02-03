@@ -13,7 +13,7 @@ src/draw/nxp/g2d @AndreCostaaa
 src/draw/nxp/pxp @uLipe
 src/draw/opengles @AndreCostaaa @kisvegabor
 src/draw/renesas/dave2d @uLipe
-src/draw/sdl @kisvegabor
+src/draw/sdl @kisvegabor @AndreCostaaa
 src/draw/vg_lite @uLipe @FASTSHIFT
 src/drivers/display/drm @AndreCostaaa
 src/drivers/display/fb @AndreCostaaa
@@ -33,3 +33,4 @@ src/libs/gstreamer @AndreCostaaa
 src/libs/tiny_ttf @AndreCostaaa
 src/libs/vg_lite_driver @uLipe
 src/misc/cache @AndreCostaaa @FASTSHIFT
+src/widgets/gif @liamHowatt

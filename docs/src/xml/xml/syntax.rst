@@ -65,7 +65,7 @@ The following simple built-in types are supported:
 :%:         Percentage.  ``%`` must be appended to the value as the unit.
             (Means the same as :cpp:expr:`lv_pct()`.)
 
-:content:   Means ``LV_SIZE_CONTENT``.
+:content:   Means :c:macro:`LV_SIZE_CONTENT`.
 
 :string:    Simple ``\0``-terminated string.  When multiple strings are used in a
             property or string array, ``'`` should be used.  E.g. ``foo="'a' 'b'"``.

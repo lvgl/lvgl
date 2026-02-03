@@ -14,12 +14,11 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_textarea_property_names[15] = {
+const lv_property_name_t lv_textarea_property_names[14] = {
     {"accepted_chars",         LV_PROPERTY_TEXTAREA_ACCEPTED_CHARS,},
     {"current_char",           LV_PROPERTY_TEXTAREA_CURRENT_CHAR,},
     {"cursor_click_pos",       LV_PROPERTY_TEXTAREA_CURSOR_CLICK_POS,},
     {"cursor_pos",             LV_PROPERTY_TEXTAREA_CURSOR_POS,},
-    {"insert_replace",         LV_PROPERTY_TEXTAREA_INSERT_REPLACE,},
     {"label",                  LV_PROPERTY_TEXTAREA_LABEL,},
     {"max_length",             LV_PROPERTY_TEXTAREA_MAX_LENGTH,},
     {"one_line",               LV_PROPERTY_TEXTAREA_ONE_LINE,},

@@ -194,6 +194,27 @@ void lv_indev_set_scroll_limit(lv_indev_t * indev, uint8_t scroll_limit);
 void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw);
 
 /**
+ * Set the minimum velocity threshold for gesture detection.
+ * The difference between consecutive points must exceed this value (in pixels)
+ * for the movement to be considered fast enough to trigger a gesture.
+ *
+ * @param indev pointer to an input device
+ * @param min_velocity minimum velocity threshold in pixels (default: 3)
+ */
+void lv_indev_set_gesture_min_velocity(lv_indev_t * indev, uint8_t min_velocity);
+
+/**
+ * Set the minimum distance threshold for gesture detection.
+ * The total distance from the first point to the current point must exceed
+ * this value (in pixels) for the movement to be considered large enough
+ * to trigger a gesture.
+ *
+ * @param indev pointer to an input device
+ * @param min_distance minimum distance threshold in pixels (default: 50)
+ */
+void lv_indev_set_gesture_min_distance(lv_indev_t * indev, uint8_t min_distance);
+
+/**
  * Get the type of an input device
  * @param indev pointer to an input device
  * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)

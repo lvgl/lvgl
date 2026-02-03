@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../misc/lv_types.h"
 #include "../misc/lv_style.h"
+#include "lv_obj_style.h"
 
 #if LV_USE_OBJ_PROPERTY
 
@@ -222,7 +223,7 @@ lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, u
 
 /**
  * Read property value from Widget.
- * If id is a style property.  Style selector is 0 by default.
+ * If id is a style property, computes the style of PART_MAIN.
  * @param obj       pointer to Widget
  * @param id        ID of property to read
  * @return          return property value read. The returned property ID is set to `LV_PROPERTY_ID_INVALID` if read failed.
@@ -233,10 +234,10 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
  * Read style property value from Widget
  * @param obj       pointer to Widget
  * @param id        ID of style property
- * @param selector  selector for style property
+ * @param part      part for which the style property should be computed
  * @return          return property value read. The returned property ID is set to `LV_PROPERTY_ID_INVALID` if read failed.
  */
-lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector);
+lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, lv_part_t part);
 
 /**
  * Get property ID by recursively searching for name in Widget's class hierarchy, and

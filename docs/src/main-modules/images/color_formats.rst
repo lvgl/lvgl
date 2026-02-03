@@ -59,7 +59,7 @@ The following image pixel color formats have built-in decoding support:
     | RAW_ALPHA [2]_         | ?   | n/a        | See :ref:`custom_image_formats`                                 |
     +------------------------+-----+------------+-----------------------------------------------------------------+
 
-.. [1]  I1, I2, I4 and I8 indexed formats require ``LV_DRAW_SW_SUPPORT_ARGB8888`` to
+.. [1]  I1, I2, I4 and I8 indexed formats require :c:macro:`LV_DRAW_SW_SUPPORT_ARGB8888` to
         be configured to ``1`` in your ``lv_conf.h`` file.  Palette colors are
         always ``ARGB8888``.
 

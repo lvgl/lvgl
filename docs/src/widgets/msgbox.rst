@@ -56,7 +56,7 @@ If you want to add an [OK] or [Cancel] or other buttons for the
 user to have a choice of responses, add each button using the
 :cpp:expr:`lv_msgbox_add_footer_button(msgbox, btn_text)` function.  Calling this
 function adds a footer (container) if one was not already present, and it returns a
-pointer to the button created, which can be used to add ``LV_EVENT_CLICKED`` (or
+pointer to the button created, which can be used to add :cpp:enumerator:`LV_EVENT_CLICKED` (or
 other) events to detect and act on the user's response.
 
 Footer buttons so added are evenly spaced and centered.

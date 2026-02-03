@@ -19,7 +19,7 @@ OpenGL Support in LVGL
 The OpenGL integration consists of two main components:
 
 - OpenGL Display Drivers: Handle output by showing the LVGL rendered content on the display, window, or texture in OpenGL-based environments
-- OpenGL Draw Unit: When enabled, LVGL uses OpenGL for hardware-accelerated rendering operations, including texture caching for improved performance
+- OpenGL Draw Unit (see :ref:`OpenGL Draw Unit <opengles_draw_unit>`): When enabled, LVGL uses OpenGL for hardware-accelerated rendering operations, including texture caching for improved performance
 
 OpenGL support addresses several key use cases:
 
@@ -39,34 +39,21 @@ The OpenGL implementation provides significant performance benefits in most scen
 OpenGL Driver Options
 ======================
 
-LVGL provides three OpenGL drivers to suit different application needs and platforms:
 
+The following drivers can be used with OpenGL
 
-1. GLFW Driver
---------------
+The following drivers can be used and will automatically create and maintain an OpenGL context.
 
-The GLFW display/input driver offers support for creating
-LVGL displays and keyboard/mouse inputs that can be used in an OpenGL context.
-The GLFW driver provides automatic window creation and context management with comprehensive input handling for rapid development on PC-like platforms.
+- :ref:`SDL driver <sdl_driver>`
+- :ref:`Wayland driver <wayland_driver>`
+- :ref:`DRM driver <linux_drm>`
+- :ref:`GLFW driver <glfw_driver>`
 
-For complete implementation details, see :ref:`GLFW driver <glfw_driver>`.
+All drivers except the GLFW driver use EGL (Embedded-System Graphics Library) under the hood.
 
-2. EGL Driver
--------------
-
-The EGL display driver offers support for creating
-LVGL displays using the EGL (Embedded-System Graphics Library) API that can be used in an OpenGL context.
-This driver provides lower-level hardware integration with direct driver access, supporting both DRM-based systems and standalone implementations for embedded platforms.
-
-For complete implementation details, see :ref:`EGL driver <egl_driver>`.
-
-3. Generic OpenGL Driver
-------------------------
-
-The generic OpenGL driver offers support for creating
-LVGL displays as OpenGL textures that can be embedded in existing OpenGL applications.
-This driver assumes an existing OpenGL context and generates textures with hardware acceleration 
-for integration into custom graphics pipelines.
+Additionally, LVGL provides a generic OpenGL driver which the user may use to embed 
+OpenGL textures in existing OpenGL applications. This driver assumes an existing OpenGL context
+and generates textures with hardware acceleration for integration into custom graphics pipelines.
 
 For complete implementation details, see :ref:`OpenGL driver <opengl_driver>`.
 

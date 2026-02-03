@@ -47,40 +47,81 @@ of RT-Thread. By using
 RT-Thread users can easily download LVGL source code and combine with
 RT-Thread project.
 
-RT-Thread community has port LVGL to several BSPs:
+RT-Thread community has port LVGL to several Board-Support Packages (BSPs):
 
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| BSP                                                                                                                                  | BSP                                                                                                                                                  |
-+======================================================================================================================================+======================================================================================================================================================+
-| `QEMU simulator <https://github.com/RT-Thread/rt-thread/tree/master/bsp/qemu-vexpress-a9/applications/lvgl>`__                       | `Infineon psoc6-evaluationkit-062S2 <https://github.com/RT-Thread/rt-thread/tree/master/bsp/Infineon/psoc6-evaluationkit-062S2/applications/lvgl>`__ |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Visual Studio simulator <https://github.com/RT-Thread/rt-thread/tree/master/bsp/simulator/applications/lvgl>`__                     | `Renesas ra6m3-ek <https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra6m3-ek/board/lvgl>`__                                            |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton numaker-iot-m487 <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-iot-m487/applications/lvgl>`__     | `Renesas ra6m4-cpk <https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra6m4-cpk/board/lvgl>`__                                          |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton numaker-pfm-m487 <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-pfm-m487/applications/lvgl>`__     | `Renesas ra6m3-hmi <https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra6m3-hmi-board/board/lvgl>`__                                    |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton nk-980iot <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-980iot/applications/lvgl>`__                   | `STM32H750 ART-Pi <https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32h750-artpi/applications/lvgl>`__                                |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton numaker-m2354 <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m2354/applications/lvgl>`__           | `STM32F469 Discovery <https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f469-st-disco/applications/lvgl>`__                          |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton nk-n9h30 <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-n9h30/applications/lvgl>`__                     | `STM32F407 explorer <https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f407-atk-explorer/applications/lvgl>`__                       |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton numaker-m032ki <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m032ki/applications/lvgl>`__         | `STM32L475 pandora <https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32l475-atk-pandora/applications/lvgl>`__                         |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton numaker-hmi-ma35d1 <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-hmi-ma35d1/applications/lvgl>`__ | `NXP imxrt1060-evk <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nxp/imx/imxrt/imxrt1060-nxp-evk/applications/lvgl>`__                     |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton numaker-iot-m467 <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-iot-m467/applications/lvgl>`__     | `Raspberry PICO <https://github.com/RT-Thread/rt-thread/tree/master/bsp/raspberry-pico/RP2040/applications/lvgl>`__                                  |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `Nuvoton numaker-m467hj <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m467hj/applications/lvgl>`__         | `NXP LPC55S69 <https://github.com/RT-Thread/rt-thread/tree/master/bsp/nxp/lpc/lpc55sxx/lpc55s69_nxp_evk/applications/lvgl>`__                        |
-+--------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------+
-
++---------------------------------------+------------------------+
+| BSP                                   | BSP                    |
++=======================================+========================+
+| `QEMU simulator`_                     | `Renesas ra6m3-ek`_    |
++---------------------------------------+------------------------+
+| `Visual Studio simulator`_            | `Renesas ra6m4-cpk`_   |
++---------------------------------------+------------------------+
+| `Nuvoton numaker-iot-m487`_           | `Renesas ra6m3-hmi`_   |
++---------------------------------------+------------------------+
+| `Nuvoton numaker-pfm-m487`_           | `Renesas ra8d1-ek`_    |
++---------------------------------------+------------------------+
+| `Nuvoton nk-980iot`_                  | `Renesas ra8m1-ek`_    |
++---------------------------------------+------------------------+
+| `Nuvoton numaker-m2354`_              | `STM32F407 explorer`_  |
++---------------------------------------+------------------------+
+| `Nuvoton nk-n9h30`_                   | `STM32F407 RT-Spark`_  |
++---------------------------------------+------------------------+
+| `Nuvoton numaker-m032ki`_             | `STM32F469 Discovery`_ |
++---------------------------------------+------------------------+
+| `Nuvoton numaker-hmi-ma35d1`_         | `STM32H750 ART-Pi`_    |
++---------------------------------------+------------------------+
+| `Nuvoton numaker-iot-m467`_           | `STM32H787 Discovery`_ |
++---------------------------------------+------------------------+
+| `Nuvoton numaker-m467hj`_             | `STM32L475 pandora`_   |
++---------------------------------------+------------------------+
+| `Infineon psoc6-evaluationkit-062S2`_ | `NXP imxrt1060-evk`_   |
++---------------------------------------+------------------------+
+| `Raspberry PICO`_                     | `NXP LPC55S69`_        |
++---------------------------------------+------------------------+
 
 Tutorials
 ~~~~~~~~~
 
--  `Introduce about RT-Thread and how to run LVGL on RT-Thread in simulators <https://www.youtube.com/watch?v=k7QYk6hSwnc>`__
--  `How to import a BSP project with latest code into RT-Thread Studio <https://www.youtube.com/watch?v=fREPLuh-h8k>`__
--  `How to Use LVGL with RT-Thread Studio in STM32F469 Discovery Board <https://www.youtube.com/watch?v=O_QA99BxnOE>`__
--  `RT-Thread Youtube Channel <https://www.youtube.com/channel/UCdDHtIfSYPq4002r27ffqPw>`__
--  `RT-Thread documentation center <https://www.rt-thread.io/document/site/>`__
+-  `Introduce about RT-Thread and how to run LVGL on RT-Thread in simulators`_
+-  `How to import a BSP project with latest code into RT-Thread Studio`_
+-  `How to Use LVGL with RT-Thread Studio in STM32F469 Discovery Board`_
+-  `RT-Thread Youtube Channel`_
+-  `RT-Thread documentation center`_
+
+.. ------------------------------------------------------------------------
+.. RT-Thread External Links
+.. ------------------------------------------------------------------------
+.. _Infineon psoc6-evaluationkit-062S2:  https://github.com/RT-Thread/rt-thread/tree/master/bsp/Infineon/psoc6-evaluationkit-062S2/applications/lvgl
+.. _Nuvoton nk-980iot:                   https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-980iot/applications/lvgl
+.. _Nuvoton nk-n9h30:                    https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-n9h30/applications/lvgl
+.. _Nuvoton numaker-hmi-ma35d1:          https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-hmi-ma35d1/applications/lvgl
+.. _Nuvoton numaker-iot-m467:            https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-iot-m467/applications/lvgl
+.. _Nuvoton numaker-iot-m487:            https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-iot-m487/applications/lvgl
+.. _Nuvoton numaker-m032ki:              https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m032ki/applications/lvgl
+.. _Nuvoton numaker-m2354:               https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m2354/applications/lvgl
+.. _Nuvoton numaker-m467hj:              https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m467hj/applications/lvgl
+.. _Nuvoton numaker-pfm-m487:            https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-pfm-m487/applications/lvgl
+.. _NXP imxrt1060-evk:                   https://github.com/RT-Thread/rt-thread/tree/master/bsp/nxp/imx/imxrt/imxrt1060-nxp-evk/applications/lvgl
+.. _NXP LPC55S69:                        https://github.com/RT-Thread/rt-thread/tree/master/bsp/nxp/lpc/lpc55sxx/lpc55s69_nxp_evk/applications/lvgl
+.. _QEMU simulator:                      https://github.com/RT-Thread/rt-thread/tree/master/bsp/qemu-vexpress-a9/applications/lvgl
+.. _Raspberry PICO:                      https://github.com/RT-Thread/rt-thread/tree/master/bsp/raspberry-pico/RP2040/applications/lvgl
+.. _Renesas ra6m3-ek:                    https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra6m3-ek/board/lvgl
+.. _Renesas ra6m3-hmi:                   https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra6m3-hmi-board/board/lvgl
+.. _Renesas ra6m4-cpk:                   https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra6m4-cpk/board/lvgl
+.. _Renesas ra8d1-ek:                    https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra8d1-ek/board/lvgl
+.. _Renesas ra8m1-ek:                    https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra8m1-ek/board/lvgl
+.. _Visual Studio simulator:             https://github.com/RT-Thread/rt-thread/tree/master/bsp/simulator/applications/lvgl
+.. _STM32F407 explorer:                  https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f407-atk-explorer/applications/lvgl
+.. _STM32F407 RT-Spark:                  https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f407-rt-spark/board/ports/lvgl
+.. _STM32F469 Discovery:                 https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f469-st-disco/applications/lvgl
+.. _STM32H750 ART-Pi:                    https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32h750-artpi/applications/lvgl
+.. _STM32H787 Discovery:                 https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32h7s7-st-disco/applications/lvgl
+.. _STM32L475 pandora:                   https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32l475-atk-pandora/applications/lvgl
+.. _Introduce about RT-Thread and how to run LVGL on RT-Thread in simulators:
+                                         https://www.youtube.com/watch?v=k7QYk6hSwnc
+.. _How to import a BSP project with latest code into RT-Thread Studio:
+                                         https://www.youtube.com/watch?v=fREPLuh-h8k
+.. _How to Use LVGL with RT-Thread Studio in STM32F469 Discovery Board:
+                                         https://www.youtube.com/watch?v=O_QA99BxnOE
+.. _RT-Thread Youtube Channel:           https://www.youtube.com/channel/UCdDHtIfSYPq4002r27ffqPw
+.. _RT-Thread documentation center:      https://www.rt-thread.io/document/site/

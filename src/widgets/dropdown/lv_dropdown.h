@@ -33,16 +33,16 @@ LV_EXPORT_CONST_INT(LV_DROPDOWN_POS_LAST);
 
 #if LV_USE_OBJ_PROPERTY
 enum _lv_property_dropdown_id_t {
-    LV_PROPERTY_ID(DROPDOWN, TEXT,                LV_PROPERTY_TYPE_TEXT,  0),
-    LV_PROPERTY_ID(DROPDOWN, OPTIONS,             LV_PROPERTY_TYPE_TEXT,  1),
-    LV_PROPERTY_ID(DROPDOWN, OPTION_COUNT,        LV_PROPERTY_TYPE_INT,   2),
-    LV_PROPERTY_ID(DROPDOWN, SELECTED,            LV_PROPERTY_TYPE_INT,   3),
-    // LV_PROPERTY_ID(DROPDOWN, SELECTED_STR,        LV_PROPERTY_TYPE_TEXT,  4),
-    LV_PROPERTY_ID(DROPDOWN, DIR,                 LV_PROPERTY_TYPE_INT,   5),
-    LV_PROPERTY_ID(DROPDOWN, SYMBOL,              LV_PROPERTY_TYPE_TEXT,  6),
-    LV_PROPERTY_ID(DROPDOWN, SELECTED_HIGHLIGHT,  LV_PROPERTY_TYPE_INT,   7),
-    LV_PROPERTY_ID(DROPDOWN, LIST,                LV_PROPERTY_TYPE_OBJ,   8),
-    LV_PROPERTY_ID(DROPDOWN, IS_OPEN,             LV_PROPERTY_TYPE_BOOL,  9),
+    LV_PROPERTY_ID(DROPDOWN, TEXT,                LV_PROPERTY_TYPE_TEXT,   0),
+    LV_PROPERTY_ID(DROPDOWN, OPTIONS,             LV_PROPERTY_TYPE_TEXT,   1),
+    LV_PROPERTY_ID(DROPDOWN, OPTION_COUNT,        LV_PROPERTY_TYPE_INT,    2),
+    LV_PROPERTY_ID(DROPDOWN, SELECTED,            LV_PROPERTY_TYPE_INT,    3),
+    // LV_PROPERTY_ID(DROPDOWN, SELECTED_STR,        LV_PROPERTY_TYPE_TEXT,   4),
+    LV_PROPERTY_ID(DROPDOWN, DIR,                 LV_PROPERTY_TYPE_INT,    5),
+    LV_PROPERTY_ID(DROPDOWN, SYMBOL,              LV_PROPERTY_TYPE_IMGSRC, 6),
+    LV_PROPERTY_ID(DROPDOWN, SELECTED_HIGHLIGHT,  LV_PROPERTY_TYPE_INT,    7),
+    LV_PROPERTY_ID(DROPDOWN, LIST,                LV_PROPERTY_TYPE_OBJ,    8),
+    LV_PROPERTY_ID(DROPDOWN, IS_OPEN,             LV_PROPERTY_TYPE_BOOL,   9),
     LV_PROPERTY_DROPDOWN_END,
 };
 #endif
@@ -70,9 +70,18 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
  * If set to `NULL` the selected option's text will be displayed on the button.
  * If set to a specific text then that text will be shown regardless of the selected option.
  * @param obj       pointer to a drop-down list object
- * @param txt       the text as a string (Only its pointer is saved)
+ * @param text      the text as a string (Copy is saved)
  */
-void lv_dropdown_set_text(lv_obj_t * obj, const char * txt);
+void lv_dropdown_set_text(lv_obj_t * obj, const char * text);
+
+/**
+ * Set text of the drop-down list's button.
+ * If set to `NULL` the selected option's text will be displayed on the button.
+ * If set to a specific text then that text will be shown regardless of the selected option.
+ * @param obj       pointer to a drop-down list object
+ * @param text      the text as a string (Only its pointer is saved)
+ */
+void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text);
 
 /**
  * Set the options in a drop-down list from a string.

@@ -211,10 +211,6 @@ html_theme = 'furo'
 #
 # Various other builders are derived from the HTML output, and also make use
 # of these options.
-
-# Note:  'display_version' option is now obsolete in the current (08-Oct-2024)
-# version of sphinx-rtd-theme (upgraded for Sphinx v8.x).  The removed line
-# is preserved by commenting it out in case it is ever needed again.
 html_theme_options = {
     "sidebar_hide_name": True,      # True when the logo carries project name
     "light_logo": "images/logo-light.svg",
@@ -453,7 +449,7 @@ todo_include_todos = True
 # See https://sphinx-sitemap.readthedocs.io/en/latest/index.html
 sitemap_url_scheme = "{link}"
 # Prettyfy output using 4 spaces to indent.
-sitemap_prettify = 4
+sitemap_indent = 4
 
 # -------------------------------------------------------------------------
 # Options for breathe extension

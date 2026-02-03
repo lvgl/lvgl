@@ -584,12 +584,23 @@ uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop);
 
 #include "lv_style_gen.h"
 
+/**
+ * Set `style`s width and height.
+ * @param  style   pointer to style to be modified
+ * @param  width   width in pixels
+ * @param  height  height in pixels
+ */
 static inline void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height)
 {
     lv_style_set_width(style, width);
     lv_style_set_height(style, height);
 }
 
+/**
+ * Set all 4 of `style`s padding values.
+ * @param  style   pointer to style to be modified
+ * @param  value   padding dimension in pixels
+ */
 static inline void lv_style_set_pad_all(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_left(style, value);
@@ -598,36 +609,66 @@ static inline void lv_style_set_pad_all(lv_style_t * style, int32_t value)
     lv_style_set_pad_bottom(style, value);
 }
 
+/**
+ * Set `style`s left and right padding values.
+ * @param  style   pointer to style to be modified
+ * @param  value   padding dimension in pixels
+ */
 static inline void lv_style_set_pad_hor(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_left(style, value);
     lv_style_set_pad_right(style, value);
 }
 
+/**
+ * Set `style`s top and bottom padding values.
+ * @param  style   pointer to style to be modified
+ * @param  value   padding dimension in pixels
+ */
 static inline void lv_style_set_pad_ver(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_top(style, value);
     lv_style_set_pad_bottom(style, value);
 }
 
+/**
+ * Set `style`s row and column padding gaps (applies only to Grid and Flex layouts).
+ * @param  style   pointer to style to be modified
+ * @param  value   gap dimension in pixels
+ */
 static inline void lv_style_set_pad_gap(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_row(style, value);
     lv_style_set_pad_column(style, value);
 }
 
+/**
+ * Set `style`s left and right margin values.
+ * @param  style   pointer to style to be modified
+ * @param  value   margin dimension in pixels
+ */
 static inline void lv_style_set_margin_hor(lv_style_t * style, int32_t value)
 {
     lv_style_set_margin_left(style, value);
     lv_style_set_margin_right(style, value);
 }
 
+/**
+ * Set `style`s top and bottom margin values.
+ * @param  style   pointer to style to be modified
+ * @param  value   margin dimension in pixels
+ */
 static inline void lv_style_set_margin_ver(lv_style_t * style, int32_t value)
 {
     lv_style_set_margin_top(style, value);
     lv_style_set_margin_bottom(style, value);
 }
 
+/**
+ * Set all 4 of `style`s margin values.
+ * @param  style   pointer to style to be modified
+ * @param  value   margin dimension in pixels
+ */
 static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
 {
     lv_style_set_margin_left(style, value);
@@ -636,6 +677,16 @@ static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
     lv_style_set_margin_bottom(style, value);
 }
 
+/**
+ * Set `style`s X and Y transform scale values.
+ * @param  style   pointer to style to be modified
+ * @param  value   scale factor.  Example values:
+ *                     - 256 or LV_SCALE_NONE:  no zoom
+ *                     - <256:  scale down
+ *                     - >256:  scale up
+ *                     - 128:  half size
+ *                     - 512:  double size
+ */
 static inline void lv_style_set_transform_scale(lv_style_t * style, int32_t value)
 {
     lv_style_set_transform_scale_x(style, value);

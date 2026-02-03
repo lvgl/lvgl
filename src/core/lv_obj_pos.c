@@ -813,19 +813,42 @@ void lv_obj_refr_pos(lv_obj_t * obj)
 
     lv_align_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
 
-    bool rtl = false;
-
     if(align == LV_ALIGN_DEFAULT) {
-        rtl = lv_obj_get_style_base_dir(parent, LV_PART_MAIN) == LV_BASE_DIR_RTL;
-        if(rtl) align = LV_ALIGN_TOP_RIGHT;
-        else align = LV_ALIGN_TOP_LEFT;
+        align = LV_ALIGN_TOP_LEFT;
+    }
+
+    bool rtl = lv_obj_get_style_base_dir(parent, LV_PART_MAIN) == LV_BASE_DIR_RTL;
+
+    if(rtl) {
+        switch(align) {
+            case LV_ALIGN_TOP_LEFT:
+                align = LV_ALIGN_TOP_RIGHT;
+                break;
+            case LV_ALIGN_TOP_RIGHT:
+                align = LV_ALIGN_TOP_LEFT;
+                break;
+            case LV_ALIGN_LEFT_MID:
+                align = LV_ALIGN_RIGHT_MID;
+                break;
+            case LV_ALIGN_RIGHT_MID:
+                align = LV_ALIGN_LEFT_MID;
+                break;
+            case LV_ALIGN_BOTTOM_LEFT:
+                align = LV_ALIGN_BOTTOM_RIGHT;
+                break;
+            case LV_ALIGN_BOTTOM_RIGHT:
+                align = LV_ALIGN_BOTTOM_LEFT;
+                break;
+            default:
+                break;
+        }
     }
 
     switch(align) {
         case LV_ALIGN_TOP_LEFT:
             break;
         case LV_ALIGN_TOP_MID:
-            x += pw / 2 - w / 2;
+            x = rtl ? pw / 2 - w / 2 - x : pw / 2 - w / 2 + x;
             break;
         case LV_ALIGN_TOP_RIGHT:
             x = rtl ? pw - w - x : pw - w + x;
@@ -837,19 +860,19 @@ void lv_obj_refr_pos(lv_obj_t * obj)
             y += ph - h;
             break;
         case LV_ALIGN_BOTTOM_MID:
-            x += pw / 2 - w / 2;
+            x = rtl ? pw / 2 - w / 2 - x : pw / 2 - w / 2 + x;
             y += ph - h;
             break;
         case LV_ALIGN_BOTTOM_RIGHT:
-            x += pw - w;
+            x = rtl ? pw - w - x : pw - w + x;
             y += ph - h;
             break;
         case LV_ALIGN_RIGHT_MID:
-            x += pw - w;
+            x = rtl ? pw - w - x : pw - w + x;
             y += ph / 2 - h / 2;
             break;
         case LV_ALIGN_CENTER:
-            x += pw / 2 - w / 2;
+            x = rtl ? pw / 2 - w / 2 - x : pw / 2 - w / 2 + x;
             y += ph / 2 - h / 2;
             break;
         default:

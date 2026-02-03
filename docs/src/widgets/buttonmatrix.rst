@@ -79,7 +79,7 @@ Each button's behavior can be customized with the following control flags:
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED`: Disables button like :cpp:enumerator:`LV_STATE_DISABLED` on normal Widgets.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKABLE`: Enable toggling of :cpp:enumerator:`LV_STATE_CHECKED` when clicked.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECKED` styles.
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: 1: Enables sending :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on ``CLICK``, 0: sends :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on ``PRESS``.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: 1: Enables sending :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` on ``CLICK``, 0: sends :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` on ``PRESS``.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_POPOVER`: Show button text in a pop-over while being pressed.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_RECOLOR`: Enable text recoloring with ``#color``
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_1`: Custom free-to-use flag

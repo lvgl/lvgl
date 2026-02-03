@@ -109,7 +109,7 @@ functions are in :cpp:func:`lv_init`.
 Thread Priority
 ---------------
 
-If ``LV_USE_OS`` is set to something other than ``LV_OS_NONE``, draw units might use a thread to
+If :c:macro:`LV_USE_OS` is set to something other than :c:macro:`LV_OS_NONE`, draw units might use a thread to
 allow waiting for the completion of rendering in a non-blocking way.
 
 The thread priority can be set using the :c:macro:`LV_DRAW_THREAD_PRIO`

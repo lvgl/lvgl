@@ -12,6 +12,7 @@
 
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_profiler.h"
+#include "../../misc/lv_matrix.h"
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
 
@@ -146,12 +147,27 @@ void lv_opengles_deinit(void)
     is_init = false;
 }
 
+void lv_opengles_render_params_init(lv_opengles_render_params_t * params)
+{
+    LV_ASSERT_NULL(params);
+    lv_memzero(params, sizeof(lv_opengles_render_params_t));
+}
+
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                       lv_color_black(), false, false);
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = texture;
+    params.texture_area = texture_area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = texture_clip_area;
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+    lv_opengles_render(&params);
     LV_PROFILER_DRAW_END;
 }
 
@@ -160,15 +176,34 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
                                        int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                       lv_color_black(), false, true);
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = texture;
+    params.texture_area = texture_area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = texture_clip_area;
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+    params.rb_swap = true;
+    lv_opengles_render(&params);
     LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false, true);
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture_area = area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = area;
+    params.fill_color = color;
+    params.rb_swap = true;
+    lv_opengles_render(&params);
     LV_PROFILER_DRAW_END;
 }
 
@@ -239,41 +274,62 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool swap_red_blue)
+void lv_opengles_reinit_state(void)
 {
     LV_PROFILER_DRAW_BEGIN;
+
+    /* Rebind VAO, VBO, IBO to restore state after NanoVG or other external GL operations */
+    lv_opengles_vertex_array_bind();
+    lv_opengles_vertex_buffer_bind();
+    lv_opengles_index_buffer_bind();
+
+    /* Re-setup vertex attributes since NanoVG may have modified them */
+    for(unsigned int i = 0; i < 2; i++) {
+        GL_CALL(glEnableVertexAttribArray(i));
+        GL_CALL(glVertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, 16, (const void *)(intptr_t)(i * 2 * 4)));
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render(const lv_opengles_render_params_t * params)
+{
+    LV_ASSERT_NULL(params);
+    LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
-    if(!lv_area_intersect(&intersection, texture_area, texture_clip_area)) {
+    if(!lv_area_intersect(&intersection, params->texture_area, params->texture_clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
     GL_CALL(glActiveTexture(GL_TEXTURE0));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, params->texture));
 
     float tex_w = (float)lv_area_get_width(&intersection);
     float tex_h = (float)lv_area_get_height(&intersection);
 
-    float hor_scale = tex_w / (float)disp_w;
-    float ver_scale = tex_h / (float)disp_h;
-    float hor_translate = (float)intersection.x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
-    float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
-    hor_scale = h_flip ? -hor_scale : hor_scale;
-    ver_scale = v_flip ? ver_scale : -ver_scale;
+    float hor_scale = tex_w / (float)params->disp_w;
+    float ver_scale = tex_h / (float)params->disp_h;
+    float hor_translate = (float)intersection.x1 / (float)params->disp_w * 2.0f - (1.0f - hor_scale);
+    float ver_translate = -((float)intersection.y1 / (float)params->disp_h * 2.0f - (1.0f - ver_scale));
+    hor_scale = params->h_flip ? -hor_scale : hor_scale;
+    ver_scale = params->v_flip ? ver_scale : -ver_scale;
 
-    if(texture != 0) {
-        float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, 0.f, 1.f);
-        float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, 0.f, 1.f);
-        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, 0.f, 1.f);
-        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, 0.f, 1.f);
+    if(params->texture != 0) {
+        float clip_x1 = params->h_flip ? lv_opengles_map_float(params->texture_clip_area->x2, params->texture_area->x2,
+                                                               params->texture_area->x1, 0.f, 1.f)
+                        : lv_opengles_map_float(params->texture_clip_area->x1, params->texture_area->x1, params->texture_area->x2, 0.f, 1.f);
+        float clip_x2 = params->h_flip ? lv_opengles_map_float(params->texture_clip_area->x1, params->texture_area->x2,
+                                                               params->texture_area->x1, 0.f, 1.f)
+                        : lv_opengles_map_float(params->texture_clip_area->x2, params->texture_area->x1, params->texture_area->x2, 0.f, 1.f);
+        float clip_y1 = params->v_flip ? lv_opengles_map_float(params->texture_clip_area->y2, params->texture_area->y2,
+                                                               params->texture_area->y1, 0.f, 1.f)
+                        : lv_opengles_map_float(params->texture_clip_area->y1, params->texture_area->y1, params->texture_area->y2, 0.f, 1.f);
+        float clip_y2 = params->v_flip ? lv_opengles_map_float(params->texture_clip_area->y1, params->texture_area->y2,
+                                                               params->texture_area->y1, 0.f, 1.f)
+                        : lv_opengles_map_float(params->texture_clip_area->y2, params->texture_area->y1, params->texture_area->y2, 0.f, 1.f);
 
-        float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
+        const float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
             -1.f,  1.0f, clip_x1, clip_y2,
             1.0f,  1.0f, clip_x2, clip_y2,
             1.0f, -1.0f, clip_x2, clip_y1,
@@ -282,23 +338,27 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
         lv_opengles_vertex_buffer_init(positions, sizeof(positions));
     }
 
-    const float transposed_matrix[9] = {
-        hor_scale,  0.0f,        0.0f,
-        0.0f,       ver_scale,   0.0f,
-        hor_translate, ver_translate, 1.0f
-    };
-
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    if(params->matrix) {
+        lv_matrix_multiply(&matrix, params->matrix);
+    }
+    else {
+        lv_matrix_translate(&matrix, hor_translate, ver_translate);
+        lv_matrix_scale(&matrix, hor_scale, ver_scale);
+    }
 
     lv_opengles_shader_bind();
-    lv_opengles_enable_blending(blend_opt);
+    lv_opengles_enable_blending(params->blend_opt);
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
-    lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
-    lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
-    lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
-                                     (float)fill_color.blue / 255.0f);
-    lv_opengles_shader_set_uniform1i("u_SwapRB", swap_red_blue ? 1 : 0);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, (const float *)&matrix);
+    lv_opengles_shader_set_uniform1f("u_Opa", (float)params->opa / (float)LV_OPA_100);
+    lv_opengles_shader_set_uniform1i("u_IsFill", params->texture == 0);
+    lv_opengles_shader_set_uniform3f("u_FillColor", (float)params->fill_color.red / 255.0f,
+                                     (float)params->fill_color.green / 255.0f,
+                                     (float)params->fill_color.blue / 255.0f);
+    lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap ? 1 : 0);
 
     lv_opengles_render_draw();
     lv_opengles_disable_blending();

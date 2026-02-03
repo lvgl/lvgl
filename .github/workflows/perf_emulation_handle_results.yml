@@ -48,7 +48,7 @@ jobs:
 
       - name: Download Results from master
         if: ${{ github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'master' }}
-        uses: dawidd6/action-download-artifact@v12
+        uses: dawidd6/action-download-artifact@v14
         with:
           workflow: perf_emulation.yml
           path: artifacts
@@ -57,7 +57,7 @@ jobs:
 
       - name: Download Results from PR
         if: ${{ github.event.workflow_run.event == 'pull_request' }}
-        uses: dawidd6/action-download-artifact@v12
+        uses: dawidd6/action-download-artifact@v14
         with:
           workflow: perf_emulation.yml
           path: artifacts

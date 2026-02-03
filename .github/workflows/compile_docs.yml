@@ -79,7 +79,7 @@ jobs:
         id: version
       - name: Deploy to subfolder
         if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
-        uses: JamesIves/github-pages-deploy-action@v4.7.6
+        uses: JamesIves/github-pages-deploy-action@v4.8.0
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
@@ -91,7 +91,7 @@ jobs:
           single-commit: true
       - name: Deploy to master
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@v4.7.6
+        uses: JamesIves/github-pages-deploy-action@v4.8.0
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs

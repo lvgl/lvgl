@@ -17,6 +17,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <time.h>
+#include <errno.h>
 
 #if LV_LINUX_FBDEV_BSD
     #include <sys/fcntl.h>

@@ -61,7 +61,7 @@ LVGL has built-in support to improve the performance of software rendering by ut
 Architecture Support
 --------------------
 
-Both 32-bit and 64-bit ARM architectures are supported. Simply set ``LV_USE_DRAW_SW_ASM`` to ``LV_DRAW_SW_ASM_NEON`` in ``lv_conf``.
+Both 32-bit and 64-bit ARM architectures are supported. Simply set :c:macro:`LV_USE_DRAW_SW_ASM` to :c:macro:`LV_DRAW_SW_ASM_NEON` in ``lv_conf``.
 
 .. note::
    All ARM Cortex-A and Cortex-R 64-bit processors include Neon support as a mandatory feature starting with the ARMv8 architecture specification. This makes Neon acceleration universally available on all 64-bit ARM platforms, including current and future ARM architectures.

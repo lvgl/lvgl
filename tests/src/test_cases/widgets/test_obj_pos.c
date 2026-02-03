@@ -216,13 +216,12 @@ void test_circular_width_dependency(void)
     TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(item2), lv_obj_get_width(item3));
 }
 
-static void cont_create_x_y(lv_obj_t * parent, const char * text, int32_t x, int32_t y)
+static lv_obj_t * cont_create(lv_obj_t * parent, const char * text)
 {
     lv_obj_t * cont = lv_obj_create(parent);
     lv_obj_remove_style(cont, NULL, LV_PART_MAIN);
     lv_obj_set_style_border_width(cont, 1, LV_PART_MAIN);
     lv_obj_set_size(cont, 150, 30);
-    lv_obj_set_pos(cont, x, y);
 
     lv_obj_t * label = lv_label_create(cont);
     lv_label_set_text(label, text);
@@ -247,6 +246,14 @@ static void cont_create_x_y(lv_obj_t * parent, const char * text, int32_t x, int
     lv_obj_set_align(rect_bottom_right, LV_ALIGN_BOTTOM_RIGHT);
     lv_obj_set_style_bg_color(rect_bottom_right, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(rect_bottom_right, LV_OPA_COVER, LV_PART_MAIN);
+
+    return cont;
+}
+
+static void cont_create_x_y(lv_obj_t * parent, const char * text, int32_t x, int32_t y)
+{
+    lv_obj_t * cont = cont_create(parent, text);
+    lv_obj_set_pos(cont, x, y);
 }
 
 void test_rtl_pos_x_y(void)
@@ -262,7 +269,97 @@ void test_rtl_pos_x_y(void)
     cont_create_x_y(cont, "(150,150)", 150, 150);
     cont_create_x_y(cont, "(100,200)", 100, 200);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/rtl_pos_x_y.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/rtl_obj_pos_x_y.png");
 }
 
+static void cont_create_align(lv_obj_t * parent, const char * text, lv_align_t align)
+{
+    lv_obj_t * cont = cont_create(parent, text);
+    lv_obj_set_align(cont, align);
+}
+
+static void cont_create_align_offset(lv_obj_t * parent, const char * text, lv_align_t align, int32_t x_ofs,
+                                     int32_t y_ofs)
+{
+    lv_obj_t * cont = cont_create(parent, text);
+    lv_obj_align(cont, align, x_ofs, y_ofs);
+}
+
+void test_align_left(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_LTR, LV_PART_MAIN);
+
+    cont_create_align(cont, "TOP_LEFT", LV_ALIGN_TOP_LEFT);
+    cont_create_align(cont, "LEFT_MID", LV_ALIGN_LEFT_MID);
+    cont_create_align(cont, "BOTTOM_LEFT", LV_ALIGN_BOTTOM_LEFT);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_align_left.png");
+}
+
+void test_align_right(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_LTR, LV_PART_MAIN);
+
+    cont_create_align(cont, "TOP_RIGHT", LV_ALIGN_TOP_RIGHT);
+    cont_create_align(cont, "RIGHT_MID", LV_ALIGN_RIGHT_MID);
+    cont_create_align(cont, "BOTTOM_RIGHT", LV_ALIGN_BOTTOM_RIGHT);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_align_right.png");
+}
+
+void test_align_center(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_LTR, LV_PART_MAIN);
+
+    cont_create_align_offset(cont, "TOP_MID (150,0)", LV_ALIGN_TOP_MID, 150, 0);
+    cont_create_align_offset(cont, "CENTER (150,0)", LV_ALIGN_CENTER, 150, 0);
+    cont_create_align_offset(cont, "BOTTOM_MID (150,0)", LV_ALIGN_BOTTOM_MID, 150, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_align_center.png");
+}
+
+void test_rtl_align_left(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_RTL, LV_PART_MAIN);
+
+    cont_create_align(cont, "TOP_LEFT", LV_ALIGN_TOP_LEFT);
+    cont_create_align(cont, "LEFT_MID", LV_ALIGN_LEFT_MID);
+    cont_create_align(cont, "BOTTOM_LEFT", LV_ALIGN_BOTTOM_LEFT);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/rtl_obj_align_left.png");
+}
+
+void test_rtl_align_right(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_RTL, LV_PART_MAIN);
+
+    cont_create_align(cont, "TOP_RIGHT", LV_ALIGN_TOP_RIGHT);
+    cont_create_align(cont, "RIGHT_MID", LV_ALIGN_RIGHT_MID);
+    cont_create_align(cont, "BOTTOM_RIGHT", LV_ALIGN_BOTTOM_RIGHT);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/rtl_obj_align_right.png");
+}
+
+void test_rtl_align_center(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_RTL, LV_PART_MAIN);
+
+    cont_create_align_offset(cont, "TOP_MID (150,0)", LV_ALIGN_TOP_MID, 150, 0);
+    cont_create_align_offset(cont, "CENTER (150,0)", LV_ALIGN_CENTER, 150, 0);
+    cont_create_align_offset(cont, "BOTTOM_MID (150,0)", LV_ALIGN_BOTTOM_MID, 150, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/rtl_obj_align_center.png");
+}
 #endif

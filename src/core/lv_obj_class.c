@@ -196,7 +196,9 @@ void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void
 
 static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(class_p->name);
+    if(LV_USE_OBJ_NAME) {
+        LV_ASSERT_NULL(class_p->name);
+    }
 
 #if LV_USE_EXT_DATA
     obj->ext_data.free_cb = NULL;

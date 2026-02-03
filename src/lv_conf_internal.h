@@ -1132,7 +1132,14 @@
         #ifdef CONFIG_LV_USE_PPA_IMG
             #define LV_USE_PPA_IMG CONFIG_LV_USE_PPA_IMG
         #else
-            #define LV_USE_PPA_IMG 0
+            #define LV_USE_PPA_IMG      0
+        #endif
+    #endif
+    #ifndef LV_PPA_BURST_LENGTH
+        #ifdef CONFIG_LV_PPA_BURST_LENGTH
+            #define LV_PPA_BURST_LENGTH CONFIG_LV_PPA_BURST_LENGTH
+        #else
+            #define LV_PPA_BURST_LENGTH    128
         #endif
     #endif
 #endif
@@ -3909,15 +3916,6 @@
 
 #endif /*LV_USE_TEST*/
 
-/** Enable loading XML UIs runtime */
-#ifndef LV_USE_XML
-    #ifdef CONFIG_LV_USE_XML
-        #define LV_USE_XML CONFIG_LV_USE_XML
-    #else
-        #define LV_USE_XML    0
-    #endif
-#endif
-
 /** 1: Enable text translation support */
 #ifndef LV_USE_TRANSLATION
     #ifdef CONFIG_LV_USE_TRANSLATION
@@ -4517,7 +4515,9 @@
     #endif
 #endif
 
-/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
+ * - Requires LV_USE_MATRIX.
+ */
 #ifndef LV_USE_OPENGLES
     #ifdef CONFIG_LV_USE_OPENGLES
         #define LV_USE_OPENGLES CONFIG_LV_USE_OPENGLES
@@ -4901,13 +4901,20 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #endif
 #endif
 
+#if LV_USE_SDL && LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
+    #define LV_SDL_USE_EGL 1
+#else
+    #define LV_SDL_USE_EGL 0
+#endif
+
 #ifndef LV_USE_EGL
-    #if LV_LINUX_DRM_USE_EGL || LV_WAYLAND_USE_EGL
+    #if LV_LINUX_DRM_USE_EGL || LV_WAYLAND_USE_EGL || LV_SDL_USE_EGL
         #define LV_USE_EGL 1
     #else
         #define LV_USE_EGL 0
     #endif
 #endif /* LV_USE_EGL */
+
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)

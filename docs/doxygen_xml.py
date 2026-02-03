@@ -1640,6 +1640,15 @@ class DoxygenXml(object):
         full_path = os.path.join(lvgl_src_dir, 'libs', 'gltf', 'fastgltf', 'lv_fastgltf.hpp')
         exclude_paths.append(full_path)
 
+        # As of 07-Jan-2026, LVGL doc-build now replaces `lv_conf_internal.h`
+        # (which has no Doxygen documentation) with a temporary `lv_conf.h`
+        # generated ONLY for the purpose of doc-builds, which file goes away
+        # after Doxygen is done.  This causes conflicts of symbols between
+        # these 2 files because the former is a "generated copy" of the latter.
+        # So this exclusion removes the file with no documentation in it.
+        full_path = os.path.join(lvgl_src_dir, 'lv_conf_internal.h')
+        exclude_paths.append(full_path)
+
         cfg.set('EXCLUDE', exclude_paths)
 
         # Include TAGFILES if requested.
