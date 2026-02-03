@@ -58,7 +58,7 @@ and style properties:
     lv_style_set_<property_name>(&style, <value>);
     lv_spangroup_set_span_style(spangroup, span, &style);
 
-If no style is set for a span then the style properties of the spangroup is used.
+If no style is set for a span, the style properties of the Spangroup are used.
 
 If the Spangroup Widget's ``mode != LV_SPAN_MODE_FIXED`` call
 :cpp:expr:`lv_spangroup_refr_mode(spangroup)` after you have modifying any of its
