@@ -702,6 +702,9 @@
  */
 #define LV_TXT_ENC LV_TXT_ENC_UTF8
 
+/** When a line is breaks on a soft hyphen, a dash is added to the end. */
+#define LV_TXT_SOFT_HYPHEN_BREAK 0
+
 /** While rendering text strings, break (wrap) text on these chars. */
 #define LV_TXT_BREAK_CHARS " ,.;:-_)]}"
 
