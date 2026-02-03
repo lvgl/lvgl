@@ -34,6 +34,13 @@ lv_gltf_model_t * lv_gltf_data_load_from_file(const char * file_path,
 lv_gltf_model_t * lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
                                                lv_gltf_model_loader_t * loader);
 
+
+/**
+ * Delete a glTF model
+ * @param model the gltf model to delete
+ */
+void lv_gltf_model_delete(lv_gltf_model_t * model);
+
 /**
  * @brief Get the number of images in the glTF model
  *
