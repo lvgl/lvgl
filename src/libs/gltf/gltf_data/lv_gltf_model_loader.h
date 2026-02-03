@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_MODEL_LOADER_H
-#define LV_MODEL_LOADER_H
+#ifndef LV_GLTF_MODEL_LOADER_H
+#define LV_GLTF_MODEL_LOADER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,4 +72,4 @@ void lv_gltf_model_loader_delete(lv_gltf_model_loader_t * loader);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_MODEL_LOADER_H*/
+#endif /*LV_GLTF_MODEL_LOADER_H*/
