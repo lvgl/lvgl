@@ -19,3 +19,10 @@ Load multiple models in a single glTF object and modify their position, rotation
 
 .. lv_example:: libs/gltf/lv_example_gltf_3
   :language: c
+
+
+Share a model across different glTF objects
+-------------------------------------------
+
+.. lv_example:: libs/gltf/lv_example_gltf_4
+  :language: c
