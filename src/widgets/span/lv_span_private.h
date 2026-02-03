@@ -29,7 +29,7 @@ extern "C" {
 
 struct _lv_span_t {
     char * txt;                /**<  a pointer to display text */
-    lv_style_t style;          /**<  display text style */
+    const lv_style_t * style;  /**<  display text style */
     uint32_t static_flag : 1;  /**<  the text is static flag */
 
     lv_point_t trailing_pos;

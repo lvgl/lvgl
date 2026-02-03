@@ -14,7 +14,7 @@ different fonts, colors, and sizes into the Spangroup Widget.
 See example below.
 
 A Spangroup contains 0 or more Span Descriptors ("Spans").  Each Span contains its
-own text and style properties for that text.  You add 1 Span (as a child) to the
+own text and can have a style assigned for that text.  You add 1 Span (as a child) to the
 Spangroup for each "span" of uniquely-styled text needed.  Each Span so added is
 appended to the end of the list.  The list sequence determines the order in which the
 Spans are displayed.  Spans can be added to, and removed from, the Spangroup
@@ -50,9 +50,15 @@ After a Span is created, use the following functions to set its text
 and style properties:
 
 - :cpp:expr:`lv_span_set_text(span, "text")`
-- :cpp:expr:`lv_style_set_<property_name>(&span->style, value)`
 
-Example of the latter:  :cpp:expr:`lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED))`.
+.. code-block:: c
+
+    static lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_<property_name>(&style, <value>);
+    lv_spangroup_set_span_style(spangroup, span, style);
+
+If no style is set for a span then the style properties of the spangroup is used.
 
 If the Spangroup Widget's ``mode != LV_SPAN_MODE_FIXED`` call
 :cpp:expr:`lv_spangroup_refr_mode(spangroup)` after you have modifying any of its
