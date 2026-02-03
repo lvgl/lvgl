@@ -56,7 +56,7 @@ and style properties:
     static lv_style_t style;
     lv_style_init(&style);
     lv_style_set_<property_name>(&style, <value>);
-    lv_spangroup_set_span_style(spangroup, span, style);
+    lv_spangroup_set_span_style(spangroup, span, &style);
 
 If no style is set for a span then the style properties of the spangroup is used.
 
