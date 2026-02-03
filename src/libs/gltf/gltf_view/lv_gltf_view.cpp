@@ -611,7 +611,7 @@ static lv_gltf_model_t * add_model(lv_gltf_t * viewer, lv_gltf_model_t * model, 
     if(!model) {
         return NULL;
     }
-    lv_gltf_model_data_t model_data = {.model = model, .owned = owned};
+    lv_gltf_model_data_t model_data {.model = model, .owned = owned};
     if(lv_array_push_back(&viewer->models, &model_data) != LV_RESULT_OK) {
         if(owned) {
             lv_gltf_model_delete(model);
