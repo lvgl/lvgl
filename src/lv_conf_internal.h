@@ -28,10 +28,16 @@
 #define LV_DRAW_SW_ASM_NONE             0
 #define LV_DRAW_SW_ASM_NEON             1
 #define LV_DRAW_SW_ASM_HELIUM           2
+#define LV_DRAW_SW_ASM_RISCV_V          3
 #define LV_DRAW_SW_ASM_CUSTOM           255
 
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
+
+#define LV_NANOVG_BACKEND_GL2       1
+#define LV_NANOVG_BACKEND_GL3       2
+#define LV_NANOVG_BACKEND_GLES2     3
+#define LV_NANOVG_BACKEND_GLES3     4
 
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
@@ -913,12 +919,30 @@
         #endif
     #endif
 
+    /** VG-Lite unaligned bitmap font maximum cache number. */
+    #ifndef LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+        #ifdef CONFIG_LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+            #define LV_VG_LITE_BITMAP_FONT_CACHE_CNT CONFIG_LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+        #else
+            #define LV_VG_LITE_BITMAP_FONT_CACHE_CNT 256
+        #endif
+    #endif
+
     /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
     #ifndef LV_VG_LITE_DISABLE_VLC_OP_CLOSE
         #ifdef CONFIG_LV_VG_LITE_DISABLE_VLC_OP_CLOSE
             #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE CONFIG_LV_VG_LITE_DISABLE_VLC_OP_CLOSE
         #else
             #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
+        #endif
+    #endif
+
+    /** Disable blit rectangular offset to resolve certain hardware errors. */
+    #ifndef LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+        #ifdef CONFIG_LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+            #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET CONFIG_LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+        #else
+            #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET 0
         #endif
     #endif
 
@@ -1108,7 +1132,14 @@
         #ifdef CONFIG_LV_USE_PPA_IMG
             #define LV_USE_PPA_IMG CONFIG_LV_USE_PPA_IMG
         #else
-            #define LV_USE_PPA_IMG 0
+            #define LV_USE_PPA_IMG      0
+        #endif
+    #endif
+    #ifndef LV_PPA_BURST_LENGTH
+        #ifdef CONFIG_LV_PPA_BURST_LENGTH
+            #define LV_PPA_BURST_LENGTH CONFIG_LV_PPA_BURST_LENGTH
+        #else
+            #define LV_PPA_BURST_LENGTH    128
         #endif
     #endif
 #endif
@@ -1139,6 +1170,50 @@
             #define LV_DRAW_EVE_WRITE_BUFFER_SIZE CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
         #else
             #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
+        #endif
+    #endif
+#endif
+
+/** Use NanoVG Renderer
+ * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
+ */
+#ifndef LV_USE_DRAW_NANOVG
+    #ifdef CONFIG_LV_USE_DRAW_NANOVG
+        #define LV_USE_DRAW_NANOVG CONFIG_LV_USE_DRAW_NANOVG
+    #else
+        #define LV_USE_DRAW_NANOVG 0
+    #endif
+#endif
+#if LV_USE_DRAW_NANOVG
+    /** Select OpenGL backend for NanoVG:
+     * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
+     * - LV_NANOVG_BACKEND_GL3:   OpenGL 3.0+
+     * - LV_NANOVG_BACKEND_GLES2: OpenGL ES 2.0
+     * - LV_NANOVG_BACKEND_GLES3: OpenGL ES 3.0+
+     */
+    #ifndef LV_NANOVG_BACKEND
+        #ifdef CONFIG_LV_NANOVG_BACKEND
+            #define LV_NANOVG_BACKEND CONFIG_LV_NANOVG_BACKEND
+        #else
+            #define LV_NANOVG_BACKEND   LV_NANOVG_BACKEND_GLES2
+        #endif
+    #endif
+
+    /** Draw image texture cache count. */
+    #ifndef LV_NANOVG_IMAGE_CACHE_CNT
+        #ifdef CONFIG_LV_NANOVG_IMAGE_CACHE_CNT
+            #define LV_NANOVG_IMAGE_CACHE_CNT CONFIG_LV_NANOVG_IMAGE_CACHE_CNT
+        #else
+            #define LV_NANOVG_IMAGE_CACHE_CNT 128
+        #endif
+    #endif
+
+    /** Draw letter texture cache count. */
+    #ifndef LV_NANOVG_LETTER_CACHE_CNT
+        #ifdef CONFIG_LV_NANOVG_LETTER_CACHE_CNT
+            #define LV_NANOVG_LETTER_CACHE_CNT CONFIG_LV_NANOVG_LETTER_CACHE_CNT
+        #else
+            #define LV_NANOVG_LETTER_CACHE_CNT 512
         #endif
     #endif
 #endif
@@ -2081,7 +2156,7 @@
 /*==================
  * WIDGETS
  *================*/
-/* Documentation for widgets can be found here: https://docs.lvgl.io/master/details/widgets/index.html . */
+/* Documentation for widgets can be found here: https://docs.lvgl.io/master/widgets/index.html . */
 
 /** 1: Causes these widgets to be given default values at creation time.
  *  - lv_buttonmatrix_t:  Get default maps:  {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""}, else map not set.
@@ -2619,7 +2694,7 @@
 /*==================
  * THEMES
  *==================*/
-/* Documentation for themes can be found here: https://docs.lvgl.io/master/details/common-widget-features/styles/styles.html#themes . */
+/* Documentation for themes can be found here: https://docs.lvgl.io/master/common-widget-features/styles/styles.html#themes . */
 
 /** A simple, impressive and very complete theme */
 #ifndef LV_USE_THEME_DEFAULT
@@ -2695,7 +2770,7 @@
 /*==================
  * LAYOUTS
  *==================*/
-/* Documentation for layouts can be found here: https://docs.lvgl.io/master/details/common-widget-features/layouts/index.html . */
+/* Documentation for layouts can be found here: https://docs.lvgl.io/master/common-widget-features/layouts/index.html . */
 
 /** A layout similar to Flexbox in CSS. */
 #ifndef LV_USE_FLEX
@@ -2726,13 +2801,13 @@
 /*====================
  * 3RD PARTS LIBRARIES
  *====================*/
-/* Documentation for libraries can be found here: https://docs.lvgl.io/master/details/libs/index.html . */
+/* Documentation for libraries can be found here: https://docs.lvgl.io/master/libs/index.html . */
 
 /* File system interfaces for common APIs */
 
 /** Setting a default driver letter allows skipping the driver prefix in filepaths.
  *  Documentation about how to use the below driver-identifier letters can be found at
- *  https://docs.lvgl.io/master/details/main-modules/fs.html#lv-fs-identifier-letters . */
+ *  https://docs.lvgl.io/master/main-modules/fs.html#lv-fs-identifier-letters . */
 #ifndef LV_FS_DEFAULT_DRIVER_LETTER
     #ifdef CONFIG_LV_FS_DEFAULT_DRIVER_LETTER
         #define LV_FS_DEFAULT_DRIVER_LETTER CONFIG_LV_FS_DEFAULT_DRIVER_LETTER
@@ -3198,7 +3273,9 @@
 #endif
 
 /** Enable Vector Graphic APIs
- *  Requires `LV_USE_MATRIX = 1` */
+ *  Requires `LV_USE_MATRIX = 1`
+ *  and a rendering engine supporting vector graphics, e.g.
+ *  (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE or LV_USE_NEMA_VG. */
 #ifndef LV_USE_VECTOR_GRAPHIC
     #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
         #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
@@ -3224,6 +3301,15 @@
         #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
     #else
         #define LV_USE_THORVG_EXTERNAL 0
+    #endif
+#endif
+
+/** Enable NanoVG (vector graphics library) */
+#ifndef LV_USE_NANOVG
+    #ifdef CONFIG_LV_USE_NANOVG
+        #define LV_USE_NANOVG CONFIG_LV_USE_NANOVG
+    #else
+        #define LV_USE_NANOVG 0
     #endif
 #endif
 
@@ -3302,7 +3388,7 @@
 /*==================
  * OTHERS
  *==================*/
-/* Documentation for several of the below items can be found here: https://docs.lvgl.io/master/details/auxiliary-modules/index.html . */
+/* Documentation for several of the below items can be found here: https://docs.lvgl.io/master/auxiliary-modules/index.html . */
 
 /** 1: Enable API to take snapshot for object */
 #ifndef LV_USE_SNAPSHOT
@@ -3812,16 +3898,23 @@
         #define LV_USE_TEST_SCREENSHOT_COMPARE 0
     #endif
 #endif
-#endif /*LV_USE_TEST*/
 
-/** Enable loading XML UIs runtime */
-#ifndef LV_USE_XML
-    #ifdef CONFIG_LV_USE_XML
-        #define LV_USE_XML CONFIG_LV_USE_XML
-    #else
-        #define LV_USE_XML    0
+#if LV_USE_TEST_SCREENSHOT_COMPARE
+    /** 1: Automatically create missing reference images*/
+    #ifndef LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+                #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+            #else
+                #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 0
+            #endif
+        #else
+            #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 1
+        #endif
     #endif
-#endif
+#endif /*LV_USE_TEST_SCREENSHOT_COMPARE*/
+
+#endif /*LV_USE_TEST*/
 
 /** 1: Enable text translation support */
 #ifndef LV_USE_TRANSLATION
@@ -3985,37 +4078,15 @@
     #endif
 #endif
 #if LV_USE_WAYLAND
-    #ifndef LV_WAYLAND_BUF_COUNT
+    #ifndef LV_WAYLAND_DIRECT_EXIT
         #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_WAYLAND_BUF_COUNT
-                #define LV_WAYLAND_BUF_COUNT CONFIG_LV_WAYLAND_BUF_COUNT
+            #ifdef CONFIG_LV_WAYLAND_DIRECT_EXIT
+                #define LV_WAYLAND_DIRECT_EXIT CONFIG_LV_WAYLAND_DIRECT_EXIT
             #else
-                #define LV_WAYLAND_BUF_COUNT 0
+                #define LV_WAYLAND_DIRECT_EXIT 0
             #endif
         #else
-            #define LV_WAYLAND_BUF_COUNT            1    /**< Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
-        #endif
-    #endif
-    #ifndef LV_WAYLAND_USE_DMABUF
-        #ifdef CONFIG_LV_WAYLAND_USE_DMABUF
-            #define LV_WAYLAND_USE_DMABUF CONFIG_LV_WAYLAND_USE_DMABUF
-        #else
-            #define LV_WAYLAND_USE_DMABUF           0    /**< Use DMA buffers for frame buffers. Requires LV_DRAW_USE_G2D */
-        #endif
-    #endif
-    #ifndef LV_WAYLAND_RENDER_MODE
-        #ifdef CONFIG_LV_WAYLAND_RENDER_MODE
-            #define LV_WAYLAND_RENDER_MODE CONFIG_LV_WAYLAND_RENDER_MODE
-        #else
-            #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL   /**< DMABUF supports LV_DISPLAY_RENDER_MODE_FULL and LV_DISPLAY_RENDER_MODE_DIRECT*/
-        #endif
-    #endif
-                                                                             /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
-    #ifndef LV_WAYLAND_WINDOW_DECORATIONS
-        #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
-            #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
-        #else
-            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
+            #define LV_WAYLAND_DIRECT_EXIT          1     /**< 1: Exit the application when all Wayland windows are closed */
         #endif
     #endif
 #endif
@@ -4444,7 +4515,9 @@
     #endif
 #endif
 
-/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
+ * - Requires LV_USE_MATRIX.
+ */
 #ifndef LV_USE_OPENGLES
     #ifdef CONFIG_LV_USE_OPENGLES
         #define LV_USE_OPENGLES CONFIG_LV_USE_OPENGLES
@@ -4495,6 +4568,15 @@
         #else
             #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
         #endif
+    #endif
+#endif
+
+/** Enable or disable for external data and destructor function */
+#ifndef LV_USE_EXT_DATA
+    #ifdef CONFIG_LV_USE_EXT_DATA
+        #define LV_USE_EXT_DATA CONFIG_LV_USE_EXT_DATA
+    #else
+        #define LV_USE_EXT_DATA   0
     #endif
 #endif
 
@@ -4752,10 +4834,26 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
-#if LV_USE_WAYLAND == 0
-    #define LV_WAYLAND_USE_DMABUF           0
-    #define LV_WAYLAND_WINDOW_DECORATIONS   0
-#endif /* LV_USE_WAYLAND */
+#if LV_USE_WAYLAND
+    /*Automatically detect wayland backend*/
+    #if LV_USE_OPENGLES
+        #define LV_WAYLAND_USE_EGL 1
+        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_SHM 0
+    #elif LV_USE_G2D
+        #define LV_WAYLAND_USE_EGL 0
+        #define LV_WAYLAND_USE_G2D 1
+        #define LV_WAYLAND_USE_SHM 0
+    #else
+        #define LV_WAYLAND_USE_EGL 0
+        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_SHM 1
+    #endif
+#else
+    #define LV_WAYLAND_USE_G2D 0
+    #define LV_WAYLAND_USE_SHM 0
+    #define LV_WAYLAND_USE_EGL 0
+#endif
 
 #if LV_USE_LINUX_DRM == 0
     #define LV_LINUX_DRM_USE_EGL     0
@@ -4784,6 +4882,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0
+    #define LV_USE_DEMO_GLTF            0
 #endif /* LV_BUILD_DEMOS */
 
 #ifndef LV_USE_LZ4
@@ -4802,9 +4901,20 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #endif
 #endif
 
+#if LV_USE_SDL && LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
+    #define LV_SDL_USE_EGL 1
+#else
+    #define LV_SDL_USE_EGL 0
+#endif
+
 #ifndef LV_USE_EGL
-	#define LV_USE_EGL LV_LINUX_DRM_USE_EGL
+    #if LV_LINUX_DRM_USE_EGL || LV_WAYLAND_USE_EGL || LV_SDL_USE_EGL
+        #define LV_USE_EGL 1
+    #else
+        #define LV_USE_EGL 0
+    #endif
 #endif /* LV_USE_EGL */
+
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)

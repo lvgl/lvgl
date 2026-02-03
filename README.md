@@ -67,33 +67,33 @@ export C code, or load the XMLs at runtime. Learn more here.
 **Free and Portable**
   - A fully portable C (C++ compatible) library with no external dependencies.
   - Can be compiled for any MCU or MPU, with any (RT)OS. Make, CMake, and simple globbing are all supported.
-  - Supports monochrome, ePaper, OLED, or TFT displays, or even monitors. [Displays](https://docs.lvgl.io/master/details/main-modules/display/index.html)
+  - Supports monochrome, ePaper, OLED, or TFT displays, or even monitors. [Displays](https://docs.lvgl.io/master/main-modules/display/index.html)
   - Distributed under the MIT license, so you can easily use it in commercial projects too.
   - Needs only 32kB RAM and 128kB Flash, a frame buffer, and at least a 1/10 screen-sized buffer for rendering.
   - OS, external memory, and GPU are supported but not required.
 
 **Widgets, Styles, Layouts, and More**
-  - 30+ built-in [Widgets](https://docs.lvgl.io/master/details/widgets/index.html): Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table, and many more.
-  - Flexible [Style system](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html) with ~100 style properties to customize any part of the widgets in any state.
-  - [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)-like layout engines to automatically size and position the widgets responsively.
+  - 30+ built-in [Widgets](https://docs.lvgl.io/master/widgets/index.html): Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table, and many more.
+  - Flexible [Style system](https://docs.lvgl.io/master/common-widget-features/styles/index.html) with ~100 style properties to customize any part of the widgets in any state.
+  - [Flexbox](https://docs.lvgl.io/master/common-widget-features/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/common-widget-features/layouts/grid.html)-like layout engines to automatically size and position the widgets responsively.
   - Text is rendered with UTF-8 encoding, supporting CJK, Thai, Hindi, Arabic, and Persian writing systems.
-  - [Data bindings](https://docs.lvgl.io/master/details/auxiliary-modules/observer/index.html) to easily connect the UI with the application.
+  - [Data bindings](https://docs.lvgl.io/master/main-modules/observer/index.html) to easily connect the UI with the application.
   - Rendering engine supports animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc.
-  - [Powerful 3D rendering engine](https://docs.lvgl.io/master/details/libs/gltf.html) to show [glTF models](https://sketchfab.com/) with OpenGL.
-  - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/details/main-modules/indev.html).
-  - [Multiple display](https://docs.lvgl.io/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use) support.
+  - [Powerful 3D rendering engine](https://docs.lvgl.io/master/libs/gltf.html) to show [glTF models](https://sketchfab.com/) with OpenGL.
+  - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/main-modules/indev.html).
+  - [Multiple display](https://docs.lvgl.io/master/main-modules/display/overview.html#how-many-displays-can-lvgl-use) support.
 
 ## 📦️ Platform Support
 
 LVGL has no external dependencies, so it can be easily compiled for any devices and it's  also available in many package managers and RTOSes:
 
-- [Arduino library](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
+- [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.lvgl.io/master/details/integration/os/zephyr.html)
+- [Zephyr library](https://docs.lvgl.io/master/integration/os/zephyr.html)
 - [ESP-IDF(ESP32) component](https://components.espressif.com/components/lvgl/lvgl)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/details/integration/os/rt-thread.html)
+- [NuttX library](https://docs.lvgl.io/master/integration/os/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
 - CMSIS-Pack
 - [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 
@@ -103,10 +103,10 @@ LVGL Pro is a complete toolkit to build, test, share, and ship embedded UIs effi
 
 It consists of four tightly related tools:
 
-1. **XML Editor**: The heart of LVGL Pro. A desktop app to build components and screens in XML, manage data bindings, translations, animations, tests, and more. Learn more about the [XML Format](https://docs.lvgl.io/master/details/xml/xml/index.html) and the [Editor](https://docs.lvgl.io/master/details/xml/editor/index.html).
+1. **XML Editor**: The heart of LVGL Pro. A desktop app to build components and screens in XML, manage data bindings, translations, animations, tests, and more. Learn more about the [XML Format](https://docs.lvgl.io/master/xml/xml/index.html) and the [Editor](https://docs.lvgl.io/master/xml/editor/index.html).
 2. **Online Viewer**: Run the Editor in your browser, open GitHub projects, and share easily without setting up a developer environment. Visit [https://viewer.lvgl.io](https://viewer.lvgl.io).
-3. **CLI Tool**: Generate C code and run tests in CI/CD. See the details [here](https://docs.lvgl.io/master/details/xml/tools/cli.html).
-4. **Figma Plugin**: Sync and extract styles directly from Figma. See how it works [here](https://docs.lvgl.io/master/details/xml/tools/figma.html).
+3. **CLI Tool**: Generate C code and run tests in CI/CD. See the details [here](https://docs.lvgl.io/master/xml/tools/cli.html).
+4. **Figma Plugin**: Sync and extract styles directly from Figma. See how it works [here](https://docs.lvgl.io/master/xml/tools/figma.html).
 
 Together, these tools let developers build UIs efficiently, test them reliably, and collaborate with team members and customers.
 

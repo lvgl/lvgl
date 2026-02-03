@@ -150,9 +150,9 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
     }
 
     if(index < LV_PROPERTY_ID_START) {
-        lv_obj_get_local_style_prop(obj, index, &value.style, 0);
+        value.style = lv_obj_get_style_prop(obj, LV_PART_MAIN, index);
         value.id = id;
-        value.selector = 0;
+        value.selector = LV_PART_MAIN | obj->state;
         return value;
     }
 
@@ -163,7 +163,7 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
     return value;
 }
 
-lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector)
+lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, lv_part_t part)
 {
     lv_property_t value;
     uint32_t index = LV_PROPERTY_ID_INDEX(id);
@@ -175,9 +175,9 @@ lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_
         return value;
     }
 
-    lv_obj_get_local_style_prop(obj, id, &value.style, selector);
+    value.style = lv_obj_get_style_prop(obj, part, index);
     value.id = id;
-    value.selector = selector;
+    value.selector = part | obj->state;
     return value;
 }
 

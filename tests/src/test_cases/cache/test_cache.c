@@ -304,4 +304,21 @@ void test_cache_sc_da_eviction_second_chance_spares_referenced_entries(void)
     lv_cache_destroy(cache, NULL);
 }
 
+void test_cache_entry_alloc(void)
+{
+    lv_cache_t * cache = create_cache(&lv_cache_class_lru_rb_size, CACHE_SIZE_BYTES);
+    TEST_ASSERT_NOT_NULL(cache);
+
+    uint32_t node_size = 4096;
+    lv_cache_entry_t * entry = lv_cache_entry_alloc(node_size, cache);
+    TEST_ASSERT_NOT_NULL(entry);
+
+    TEST_ASSERT_EQUAL(node_size, lv_cache_entry_get_node_size(entry));
+
+    TEST_ASSERT_EQUAL(cache, lv_cache_entry_get_cache(entry));
+
+    lv_cache_entry_delete(entry);
+    lv_cache_destroy(cache, NULL);
+}
+
 #endif

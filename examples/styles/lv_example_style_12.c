@@ -2,23 +2,49 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Local styles
+ * Using multiple styles
  */
 void lv_example_style_12(void)
 {
-    static lv_style_t style;
-    lv_style_init(&style);
-    lv_style_set_bg_color(&style, lv_palette_main(LV_PALETTE_GREEN));
-    lv_style_set_border_color(&style, lv_palette_lighten(LV_PALETTE_GREEN, 3));
-    lv_style_set_border_width(&style, 3);
+    /*A base style*/
+    static lv_style_t style_base;
+    lv_style_init(&style_base);
+    lv_style_set_bg_color(&style_base, lv_palette_main(LV_PALETTE_LIGHT_BLUE));
+    lv_style_set_border_color(&style_base, lv_palette_darken(LV_PALETTE_LIGHT_BLUE, 3));
+    lv_style_set_border_width(&style_base, 2);
+    lv_style_set_radius(&style_base, 10);
+    lv_style_set_shadow_width(&style_base, 10);
+    lv_style_set_shadow_offset_y(&style_base, 5);
+    lv_style_set_shadow_opa(&style_base, LV_OPA_50);
+    lv_style_set_text_color(&style_base, lv_color_white());
+    lv_style_set_width(&style_base, 100);
+    lv_style_set_height(&style_base, LV_SIZE_CONTENT);
 
-    lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    lv_obj_add_style(obj, &style, 0);
+    /*Set only the properties that should be different*/
+    static lv_style_t style_warning;
+    lv_style_init(&style_warning);
+    lv_style_set_bg_color(&style_warning, lv_palette_main(LV_PALETTE_YELLOW));
+    lv_style_set_border_color(&style_warning, lv_palette_darken(LV_PALETTE_YELLOW, 3));
+    lv_style_set_text_color(&style_warning, lv_palette_darken(LV_PALETTE_YELLOW, 4));
 
-    /*Overwrite the background color locally*/
-    lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_ORANGE), LV_PART_MAIN);
+    /*Create an object with the base style only*/
+    lv_obj_t * obj_base = lv_obj_create(lv_screen_active());
+    lv_obj_add_style(obj_base, &style_base, 0);
+    lv_obj_align(obj_base, LV_ALIGN_LEFT_MID, 20, 0);
 
-    lv_obj_center(obj);
+    lv_obj_t * label = lv_label_create(obj_base);
+    lv_label_set_text(label, "Base");
+    lv_obj_center(label);
+
+    /*Create another object with the base style and warning style too*/
+    lv_obj_t * obj_warning = lv_obj_create(lv_screen_active());
+    lv_obj_add_style(obj_warning, &style_base, 0);
+    lv_obj_add_style(obj_warning, &style_warning, 0);
+    lv_obj_align(obj_warning, LV_ALIGN_RIGHT_MID, -20, 0);
+
+    label = lv_label_create(obj_warning);
+    lv_label_set_text(label, "Warning");
+    lv_obj_center(label);
 }
 
 #endif

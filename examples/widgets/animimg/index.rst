@@ -1,3 +1,5 @@
+.. example_heading: Animation Image
+
 
 Simple Animation Image
 ----------------------

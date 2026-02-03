@@ -1,3 +1,5 @@
+.. example_heading: Button Matrix
+
 
 Simple Button matrix
 --------------------

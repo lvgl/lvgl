@@ -52,6 +52,7 @@ static void draw_main(lv_event_t * e);
 static void set_text_internal(lv_obj_t * obj, const char * text);
 static void remove_translation_tag(lv_obj_t * obj);
 static void lv_label_refr_text(lv_obj_t * obj);
+static void update_layout_completed_cb(lv_event_t * e);
 static void lv_label_revert_dots(lv_obj_t * label);
 static void lv_label_set_dots(lv_obj_t * label, uint32_t dot_begin);
 
@@ -71,7 +72,7 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_label_properties[] = {
     {
         .id = LV_PROPERTY_LABEL_TEXT,
         .setter = lv_label_set_text,
@@ -104,18 +105,7 @@ const lv_obj_class_t lv_label_class = {
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class,
     .name = "lv_label",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_LABEL_START,
-    .prop_index_end = LV_PROPERTY_LABEL_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_label_property_names,
-    .names_count = sizeof(lv_label_property_names) / sizeof(lv_property_name_t),
-#endif
-
-#endif
+    LV_PROPERTY_CLASS_FIELDS(label, LABEL)
 };
 
 /**********************
@@ -787,6 +777,9 @@ static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     if(label->translation_tag) lv_free(label->translation_tag);
     label->translation_tag = NULL;
 #endif /*LV_USE_TRANSLATION*/
+
+    lv_display_t * disp = lv_obj_get_display(obj);
+    lv_display_remove_event_cb_with_user_data(disp, update_layout_completed_cb, obj);
 }
 
 static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
@@ -853,9 +846,6 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
 
-    }
-    else if(code == LV_EVENT_UPDATE_LAYOUT_COMPLETED) {
-        lv_label_refr_text(obj);
     }
 #if LV_USE_TRANSLATION
     else if(code == LV_EVENT_TRANSLATION_LANGUAGE_CHANGED) {
@@ -937,6 +927,8 @@ static void draw_main(lv_event_t * e)
         lv_area_move(&txt_coords, 0, -s);
         txt_coords.y2 = obj->coords.y2;
     }
+
+    /*Clip to the text in some cases to avoid ugly overflows*/
     if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL ||
        label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR ||
        label->long_mode == LV_LABEL_LONG_MODE_CLIP) {
@@ -945,10 +937,14 @@ static void draw_main(lv_event_t * e)
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
         layer->_clip_area = clip_area_ori;
     }
+    /*Do not clip to make the drop shadow  visible*/
+    else if(label_draw_dsc.base.drop_shadow_opa > 0) {
+        lv_draw_label(layer, &label_draw_dsc, &txt_coords);
+    }
+    /*Labels have some extra draw area by default to not clip characters with
+     *italic, handwritten and other less standard fonts.
+     *However, with most of the fonts typically it's safe to clip at least to bottom side*/
     else {
-        /*Labels have some extra draw area by default to not clip characters with
-         *italic, handwritten and other less standard fonts.
-         *However, with most of the fonts typically it's safe to clip at least to bottom side*/
         const lv_area_t clip_area_ori = layer->_clip_area;
         layer->_clip_area.y2 = txt_clip.y2;
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
@@ -1065,7 +1061,6 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj)
     lv_label_t * label = (lv_label_t *)obj;
     if(label->text == NULL) return;
     label->invalid_size_cache = true;
-    label->need_refr_text = true;
 
     lv_obj_invalidate(obj);
 
@@ -1079,7 +1074,23 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj)
     if(lv_obj_is_style_any_height_content(obj) || lv_obj_is_style_any_width_content(obj))
         lv_obj_mark_layout_as_dirty(obj);
 
-    lv_obj_request_layout_complete_event(obj);
+    if(!label->need_refr_text) {
+        label->need_refr_text = true;
+        lv_display_t * disp = lv_obj_get_display(obj);
+        lv_display_add_event_cb(disp, update_layout_completed_cb, LV_EVENT_UPDATE_LAYOUT_COMPLETED, obj);
+    }
+}
+
+static void update_layout_completed_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_user_data(e);
+    lv_label_t * label = (lv_label_t *)obj;
+
+    lv_display_t * disp = lv_obj_get_display(obj);
+    lv_display_remove_event_cb_with_user_data(disp, update_layout_completed_cb, obj);
+    if(!label->need_refr_text) return;
+    label->need_refr_text = false;
+    lv_label_refr_text(obj);
 }
 
 /**
@@ -1090,8 +1101,6 @@ static void lv_label_refr_text(lv_obj_t * obj)
 {
     lv_label_t * label = (lv_label_t *)obj;
     if(label->text == NULL) return;
-    if(!label->need_refr_text) return;
-    label->need_refr_text = false;
 #if LV_LABEL_LONG_TXT_HINT
     label->hint.line_start = -1; /*The hint is invalid if the text changes*/
 #endif

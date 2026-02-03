@@ -118,6 +118,12 @@ typedef enum {
     LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 } lv_border_side_t;
 
+typedef enum {
+    LV_BLUR_QUALITY_AUTO = 0,   /**< Set the quality automatically */
+    LV_BLUR_QUALITY_SPEED,      /**< Prefer speed over precision */
+    LV_BLUR_QUALITY_PRECISION,  /**< Prefer precision over speed*/
+} lv_blur_quality_t;
+
 /** A image colorkey definition.
  *  The transparency within the color range of [low, high] will be set to LV_OPA_TRANSP If the "enable" flag is set to true.
  */
@@ -143,158 +149,192 @@ typedef union {
 enum _lv_style_id_t {
     LV_STYLE_PROP_INV               = 0,
 
-    /*Group 0*/
-    LV_STYLE_WIDTH                  = 1,
-    LV_STYLE_HEIGHT                 = 2,
-    LV_STYLE_LENGTH                 = 3,
+    /*The properties are listed in a special order to make caching more effective.
+     *Groups are used when LV_OBJ_STYLE_CACHE is enabled.
+     *If a property from a groups is set, a bit will be set in
+     *obj->style_main_prop_is_set and style_other_prop_is_set
+     *to indicate that the property is set.
+     *
+     *Strategy 1: group related properties. E.g. if no "border" properties are set
+     *            they will be skipped quickly.
+     *
+     *Strategy 2: group common property with rarely used properties. This way
+     *            the common property is cached properly and it's rarely affected
+     *            by other props. The other props are cached in an sub-optimal way,
+     *            but they are used rarely.
+     *
+     *Strategy 3: group properties they are used rarely together so that caching doesn't
+     *            interfere
+     *
+     *Each group can have 8 properties. (see STYLE_PROP_SHIFTED)*/
 
-    LV_STYLE_MIN_WIDTH              = 4,
-    LV_STYLE_MAX_WIDTH              = 5,
-    LV_STYLE_MIN_HEIGHT             = 6,
-    LV_STYLE_MAX_HEIGHT             = 7,
+    /* Size related properties*/
+    LV_STYLE_WIDTH = 1,
+    LV_STYLE_HEIGHT,
+    LV_STYLE_LENGTH,
+    LV_STYLE_TRANSFORM_WIDTH,
+    LV_STYLE_TRANSFORM_HEIGHT,
 
-    LV_STYLE_X                      = 8,
-    LV_STYLE_Y                      = 9,
-    LV_STYLE_ALIGN                  = 10,
+    LV_STYLE_MIN_WIDTH = 8,
+    LV_STYLE_MAX_WIDTH,
+    LV_STYLE_MIN_HEIGHT,
+    LV_STYLE_MAX_HEIGHT,
+    LV_STYLE_TRANSLATE_X,
+    LV_STYLE_TRANSLATE_Y,
+    LV_STYLE_RADIAL_OFFSET,
 
-    LV_STYLE_RADIUS                 = 12,
-    LV_STYLE_RADIAL_OFFSET          = 13,
-    LV_STYLE_PAD_RADIAL             = 14,
+    /*Position related properties */
+    LV_STYLE_X = 16,
+    LV_STYLE_Y,
+    LV_STYLE_ALIGN,
 
-    /*Group 1*/
-    LV_STYLE_PAD_TOP                = 16,
-    LV_STYLE_PAD_BOTTOM             = 17,
-    LV_STYLE_PAD_LEFT               = 18,
-    LV_STYLE_PAD_RIGHT              = 19,
+    /*Padding related properties */
+    LV_STYLE_PAD_TOP = 24,
+    LV_STYLE_PAD_BOTTOM,
+    LV_STYLE_PAD_LEFT,
+    LV_STYLE_PAD_RIGHT,
+    LV_STYLE_PAD_RADIAL,
+    LV_STYLE_PAD_ROW,
+    LV_STYLE_PAD_COLUMN,
 
-    LV_STYLE_PAD_ROW                = 20,
-    LV_STYLE_PAD_COLUMN             = 21,
-    LV_STYLE_LAYOUT                 = 22,
+    /*Margin related properties*/
+    LV_STYLE_MARGIN_TOP = 32,
+    LV_STYLE_MARGIN_BOTTOM,
+    LV_STYLE_MARGIN_LEFT,
+    LV_STYLE_MARGIN_RIGHT,
 
-    LV_STYLE_MARGIN_TOP             = 24,
-    LV_STYLE_MARGIN_BOTTOM          = 25,
-    LV_STYLE_MARGIN_LEFT            = 26,
-    LV_STYLE_MARGIN_RIGHT           = 27,
+    /*Bg. Gradient*/
+    LV_STYLE_BG_GRAD = 40,
+    LV_STYLE_BG_GRAD_DIR,
+    LV_STYLE_BG_MAIN_OPA,
+    LV_STYLE_BG_GRAD_OPA,
+    LV_STYLE_BG_GRAD_COLOR,
+    LV_STYLE_BG_MAIN_STOP,
+    LV_STYLE_BG_GRAD_STOP,
 
-    /*Group 2*/
-    LV_STYLE_BG_COLOR               = 28,
-    LV_STYLE_BG_OPA                 = 29,
-
-    LV_STYLE_BG_GRAD_DIR            = 32,
-    LV_STYLE_BG_MAIN_STOP           = 33,
-    LV_STYLE_BG_GRAD_STOP           = 34,
-    LV_STYLE_BG_GRAD_COLOR          = 35,
-
-    LV_STYLE_BG_MAIN_OPA            = 36,
-    LV_STYLE_BG_GRAD_OPA            = 37,
-    LV_STYLE_BG_GRAD                = 38,
-    LV_STYLE_BASE_DIR               = 39,
-
-    LV_STYLE_BG_IMAGE_SRC             = 40,
-    LV_STYLE_BG_IMAGE_OPA             = 41,
-    LV_STYLE_BG_IMAGE_RECOLOR         = 42,
-    LV_STYLE_BG_IMAGE_RECOLOR_OPA     = 43,
-
-    LV_STYLE_BG_IMAGE_TILED           = 44,
-    LV_STYLE_CLIP_CORNER            = 45,
+    /*Bg image*/
+    LV_STYLE_BG_IMAGE_SRC = 48,
+    LV_STYLE_BG_IMAGE_OPA,
+    LV_STYLE_BG_IMAGE_RECOLOR_OPA,
+    LV_STYLE_BG_IMAGE_TILED,
+    LV_STYLE_BG_IMAGE_RECOLOR,
 
     /*Group 3*/
-    LV_STYLE_BORDER_WIDTH           = 48,
-    LV_STYLE_BORDER_COLOR           = 49,
-    LV_STYLE_BORDER_OPA             = 50,
+    LV_STYLE_BORDER_WIDTH = 56,
+    LV_STYLE_BORDER_COLOR,
+    LV_STYLE_BORDER_OPA,
+    LV_STYLE_BORDER_POST,
+    LV_STYLE_BORDER_SIDE,
 
-    LV_STYLE_BORDER_SIDE            = 52,
-    LV_STYLE_BORDER_POST            = 53,
+    /*Outline */
+    LV_STYLE_OUTLINE_WIDTH = 64,
+    LV_STYLE_OUTLINE_COLOR,
+    LV_STYLE_OUTLINE_OPA,
+    LV_STYLE_OUTLINE_PAD,
 
-    LV_STYLE_OUTLINE_WIDTH          = 56,
-    LV_STYLE_OUTLINE_COLOR          = 57,
-    LV_STYLE_OUTLINE_OPA            = 58,
-    LV_STYLE_OUTLINE_PAD            = 59,
+    /*Image, Shadow, Line, Arc, and Text are rarely used together.*/
+    LV_STYLE_BG_OPA = 72,
+    LV_STYLE_BG_COLOR,
+    LV_STYLE_SHADOW_WIDTH,
+    LV_STYLE_LINE_WIDTH,
+    LV_STYLE_ARC_WIDTH,
+    LV_STYLE_TEXT_FONT,
+    LV_STYLE_IMAGE_RECOLOR_OPA,
 
-    /*Group 4*/
-    LV_STYLE_SHADOW_WIDTH           = 60,
-    LV_STYLE_SHADOW_COLOR           = 61,
-    LV_STYLE_SHADOW_OPA             = 62,
+    LV_STYLE_IMAGE_OPA = 80,
+    LV_STYLE_SHADOW_OPA,
+    LV_STYLE_LINE_OPA,
+    LV_STYLE_ARC_OPA,
+    LV_STYLE_TEXT_OPA,
 
-    LV_STYLE_SHADOW_OFFSET_X        = 64,
-    LV_STYLE_SHADOW_OFFSET_Y        = 65,
-    LV_STYLE_SHADOW_SPREAD          = 66,
+    LV_STYLE_SHADOW_COLOR = 88,
+    LV_STYLE_IMAGE_RECOLOR,
+    LV_STYLE_LINE_COLOR,
+    LV_STYLE_ARC_COLOR,
+    LV_STYLE_TEXT_COLOR,
 
-    LV_STYLE_IMAGE_OPA                = 68,
-    LV_STYLE_IMAGE_RECOLOR            = 69,
-    LV_STYLE_IMAGE_RECOLOR_OPA        = 70,
+    LV_STYLE_ARC_IMAGE_SRC = 96,
+    LV_STYLE_SHADOW_OFFSET_X,
+    LV_STYLE_SHADOW_OFFSET_Y,
+    LV_STYLE_SHADOW_SPREAD,
+    LV_STYLE_LINE_DASH_WIDTH,
+    LV_STYLE_TEXT_ALIGN,
+    LV_STYLE_TEXT_LETTER_SPACE,
+    LV_STYLE_TEXT_LINE_SPACE,
 
-    LV_STYLE_LINE_WIDTH             = 72,
-    LV_STYLE_LINE_DASH_WIDTH        = 73,
-    LV_STYLE_LINE_DASH_GAP          = 74,
-    LV_STYLE_LINE_ROUNDED           = 75,
-    LV_STYLE_LINE_COLOR             = 76,
-    LV_STYLE_LINE_OPA               = 77,
+    LV_STYLE_LINE_DASH_GAP = 104,
+    LV_STYLE_LINE_ROUNDED,
+    LV_STYLE_IMAGE_COLORKEY,
+    LV_STYLE_TEXT_OUTLINE_STROKE_WIDTH,
+    LV_STYLE_TEXT_OUTLINE_STROKE_OPA,
+    LV_STYLE_TEXT_OUTLINE_STROKE_COLOR,
+    LV_STYLE_TEXT_DECOR,
+    LV_STYLE_ARC_ROUNDED,
 
-    /*Group 5*/
-    LV_STYLE_ARC_WIDTH              = 80,
-    LV_STYLE_ARC_ROUNDED            = 81,
-    LV_STYLE_ARC_COLOR              = 82,
-    LV_STYLE_ARC_OPA                = 83,
-    LV_STYLE_ARC_IMAGE_SRC            = 84,
+    /*Group unrelated props*/
+    LV_STYLE_OPA = 112,
+    LV_STYLE_OPA_LAYERED,
+    LV_STYLE_COLOR_FILTER_DSC,
+    LV_STYLE_COLOR_FILTER_OPA,
+    LV_STYLE_ANIM,
+    LV_STYLE_ANIM_DURATION,
+    LV_STYLE_TRANSITION,
 
-    LV_STYLE_TEXT_COLOR             = 88,
-    LV_STYLE_TEXT_OPA               = 89,
-    LV_STYLE_TEXT_FONT              = 90,
+    /*Radius is requested a lot, group it with rarely requested ones*/
+    LV_STYLE_RADIUS = 120,
+    LV_STYLE_BITMAP_MASK_SRC,
+    LV_STYLE_BLEND_MODE,
+    LV_STYLE_ROTARY_SENSITIVITY,
+    LV_STYLE_TRANSLATE_RADIAL,
 
-    LV_STYLE_TEXT_LETTER_SPACE      = 91,
-    LV_STYLE_TEXT_LINE_SPACE        = 92,
-    LV_STYLE_TEXT_DECOR             = 93,
-    LV_STYLE_TEXT_ALIGN             = 94,
-    LV_STYLE_TEXT_OUTLINE_STROKE_WIDTH = 95,
-    LV_STYLE_TEXT_OUTLINE_STROKE_OPA   = 96,
-    LV_STYLE_TEXT_OUTLINE_STROKE_COLOR = 97,
+    /*Requested a lot but rarely used*/
+    LV_STYLE_CLIP_CORNER = 128,
+    LV_STYLE_BASE_DIR,
+    LV_STYLE_RECOLOR,
+    LV_STYLE_RECOLOR_OPA,
+    LV_STYLE_LAYOUT,
 
-    LV_STYLE_OPA                    = 98,
-    LV_STYLE_OPA_LAYERED            = 99,
-    LV_STYLE_COLOR_FILTER_DSC       = 100,
-    LV_STYLE_COLOR_FILTER_OPA       = 101,
-    LV_STYLE_ANIM                   = 102,
-    LV_STYLE_ANIM_DURATION          = 103,
-    LV_STYLE_TRANSITION             = 104,
-    LV_STYLE_BLEND_MODE             = 105,
-    LV_STYLE_TRANSFORM_WIDTH        = 106,
-    LV_STYLE_TRANSFORM_HEIGHT       = 107,
-    LV_STYLE_TRANSLATE_X            = 108,
-    LV_STYLE_TRANSLATE_Y            = 109,
-    LV_STYLE_TRANSFORM_SCALE_X      = 110,
-    LV_STYLE_TRANSFORM_SCALE_Y      = 111,
-    LV_STYLE_TRANSFORM_ROTATION     = 112,
-    LV_STYLE_TRANSFORM_PIVOT_X      = 113,
-    LV_STYLE_TRANSFORM_PIVOT_Y      = 114,
-    LV_STYLE_TRANSFORM_SKEW_X       = 115,
-    LV_STYLE_TRANSFORM_SKEW_Y       = 116,
-    LV_STYLE_BITMAP_MASK_SRC        = 117,
-    LV_STYLE_ROTARY_SENSITIVITY     = 118,
-    LV_STYLE_TRANSLATE_RADIAL       = 119,
-    LV_STYLE_RECOLOR                = 120,
-    LV_STYLE_RECOLOR_OPA            = 121,
+    /*Blur*/
+    LV_STYLE_BLUR_RADIUS = 136,
+    LV_STYLE_BLUR_BACKDROP,
+    LV_STYLE_BLUR_QUALITY,
 
-    LV_STYLE_FLEX_FLOW              = 122,
-    LV_STYLE_FLEX_MAIN_PLACE        = 123,
-    LV_STYLE_FLEX_CROSS_PLACE       = 124,
-    LV_STYLE_FLEX_TRACK_PLACE       = 125,
-    LV_STYLE_FLEX_GROW              = 126,
+    /*Drop shadow*/
+    LV_STYLE_DROP_SHADOW_RADIUS = 144,
+    LV_STYLE_DROP_SHADOW_OFFSET_X,
+    LV_STYLE_DROP_SHADOW_OFFSET_Y,
+    LV_STYLE_DROP_SHADOW_COLOR,
+    LV_STYLE_DROP_SHADOW_OPA,
+    LV_STYLE_DROP_SHADOW_QUALITY,
 
-    LV_STYLE_GRID_COLUMN_ALIGN      = 127,
-    LV_STYLE_GRID_ROW_ALIGN         = 128,
-    LV_STYLE_GRID_ROW_DSC_ARRAY     = 129,
-    LV_STYLE_GRID_COLUMN_DSC_ARRAY  = 130,
-    LV_STYLE_GRID_CELL_COLUMN_POS   = 131,
-    LV_STYLE_GRID_CELL_COLUMN_SPAN  = 132,
-    LV_STYLE_GRID_CELL_X_ALIGN      = 133,
-    LV_STYLE_GRID_CELL_ROW_POS      = 134,
-    LV_STYLE_GRID_CELL_ROW_SPAN     = 135,
-    LV_STYLE_GRID_CELL_Y_ALIGN      = 136,
-    LV_STYLE_IMAGE_COLORKEY         = 137,
+    /*Scale and transform*/
+    LV_STYLE_TRANSFORM_SCALE_X = 152,
+    LV_STYLE_TRANSFORM_SCALE_Y,
+    LV_STYLE_TRANSFORM_PIVOT_X,
+    LV_STYLE_TRANSFORM_PIVOT_Y,
+    LV_STYLE_TRANSFORM_ROTATION,
+    LV_STYLE_TRANSFORM_SKEW_X,
+    LV_STYLE_TRANSFORM_SKEW_Y,
 
-    LV_STYLE_LAST_BUILT_IN_PROP     = 138,
+    /*Flex and basic grid (rarely used together)*/
+    LV_STYLE_FLEX_FLOW = 160,
+    LV_STYLE_FLEX_MAIN_PLACE,
+    LV_STYLE_FLEX_CROSS_PLACE,
+    LV_STYLE_FLEX_TRACK_PLACE,
+    LV_STYLE_FLEX_GROW,
+    LV_STYLE_GRID_COLUMN_DSC_ARRAY,
+    LV_STYLE_GRID_ROW_DSC_ARRAY,
 
+    LV_STYLE_GRID_COLUMN_ALIGN = 168,
+    LV_STYLE_GRID_ROW_ALIGN,
+    LV_STYLE_GRID_CELL_COLUMN_POS,
+    LV_STYLE_GRID_CELL_COLUMN_SPAN,
+    LV_STYLE_GRID_CELL_X_ALIGN,
+    LV_STYLE_GRID_CELL_ROW_POS,
+    LV_STYLE_GRID_CELL_ROW_SPAN,
+    LV_STYLE_GRID_CELL_Y_ALIGN,
+
+    LV_STYLE_LAST_BUILT_IN_PROP,
     LV_STYLE_NUM_BUILT_IN_PROPS     = LV_STYLE_LAST_BUILT_IN_PROP + 1,
 
     LV_STYLE_PROP_ANY                = 0xFF,
@@ -544,12 +584,23 @@ uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop);
 
 #include "lv_style_gen.h"
 
+/**
+ * Set `style`s width and height.
+ * @param  style   pointer to style to be modified
+ * @param  width   width in pixels
+ * @param  height  height in pixels
+ */
 static inline void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height)
 {
     lv_style_set_width(style, width);
     lv_style_set_height(style, height);
 }
 
+/**
+ * Set all 4 of `style`s padding values.
+ * @param  style   pointer to style to be modified
+ * @param  value   padding dimension in pixels
+ */
 static inline void lv_style_set_pad_all(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_left(style, value);
@@ -558,36 +609,66 @@ static inline void lv_style_set_pad_all(lv_style_t * style, int32_t value)
     lv_style_set_pad_bottom(style, value);
 }
 
+/**
+ * Set `style`s left and right padding values.
+ * @param  style   pointer to style to be modified
+ * @param  value   padding dimension in pixels
+ */
 static inline void lv_style_set_pad_hor(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_left(style, value);
     lv_style_set_pad_right(style, value);
 }
 
+/**
+ * Set `style`s top and bottom padding values.
+ * @param  style   pointer to style to be modified
+ * @param  value   padding dimension in pixels
+ */
 static inline void lv_style_set_pad_ver(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_top(style, value);
     lv_style_set_pad_bottom(style, value);
 }
 
+/**
+ * Set `style`s row and column padding gaps (applies only to Grid and Flex layouts).
+ * @param  style   pointer to style to be modified
+ * @param  value   gap dimension in pixels
+ */
 static inline void lv_style_set_pad_gap(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_row(style, value);
     lv_style_set_pad_column(style, value);
 }
 
+/**
+ * Set `style`s left and right margin values.
+ * @param  style   pointer to style to be modified
+ * @param  value   margin dimension in pixels
+ */
 static inline void lv_style_set_margin_hor(lv_style_t * style, int32_t value)
 {
     lv_style_set_margin_left(style, value);
     lv_style_set_margin_right(style, value);
 }
 
+/**
+ * Set `style`s top and bottom margin values.
+ * @param  style   pointer to style to be modified
+ * @param  value   margin dimension in pixels
+ */
 static inline void lv_style_set_margin_ver(lv_style_t * style, int32_t value)
 {
     lv_style_set_margin_top(style, value);
     lv_style_set_margin_bottom(style, value);
 }
 
+/**
+ * Set all 4 of `style`s margin values.
+ * @param  style   pointer to style to be modified
+ * @param  value   margin dimension in pixels
+ */
 static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
 {
     lv_style_set_margin_left(style, value);
@@ -596,6 +677,16 @@ static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
     lv_style_set_margin_bottom(style, value);
 }
 
+/**
+ * Set `style`s X and Y transform scale values.
+ * @param  style   pointer to style to be modified
+ * @param  value   scale factor.  Example values:
+ *                     - 256 or LV_SCALE_NONE:  no zoom
+ *                     - <256:  scale down
+ *                     - >256:  scale up
+ *                     - 128:  half size
+ *                     - 512:  double size
+ */
 static inline void lv_style_set_transform_scale(lv_style_t * style, int32_t value)
 {
     lv_style_set_transform_scale_x(style, value);

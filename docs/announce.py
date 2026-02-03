@@ -25,7 +25,7 @@ It is the designer's intention that:
 import os
 import datetime
 
-__all__ = ('announce', 'announce_colored', 'announce_start', 'announce_finish', 'announce_set_silent_mode')
+__all__ = ('announce', 'announce_colored', 'announce_start', 'announce_finish', 'announce_set_silent_mode', 'is_silent_mode')
 _announce_start_time: datetime.datetime
 _announce_silent_mode: bool = False
 _console_color_commands = {
@@ -116,3 +116,8 @@ def announce_finish():
 def announce_set_silent_mode(mode=True):
     global _announce_silent_mode
     _announce_silent_mode = mode
+
+
+def is_silent_mode(mode=True):
+    global _announce_silent_mode
+    return _announce_silent_mode

@@ -81,7 +81,7 @@ Indent using 4 spaces (not tab characters).  This applies to code blocks as well
 
 If you create a new directory you will need an `index.rst` file in that directory and that index file needs to be pointed to in the `index.rst` file that is located in the parent directory.
 
-Let's take a look at the `index.rst` file that is located in the `docs/src/details/common-widget-features/layouts` directory.
+Let's take a look at the `index.rst` file that is located in the `docs/src/common-widget-features/layouts` directory.
 
 ```rst
 .. _layouts:
@@ -164,7 +164,7 @@ For improved readability in text editors:
 
 Emphasis using `*italics*`.  Emphasis using `**boldface**`.
 
-Normally underlining and combining these text styles is not possible in reStructuredText.  However, LVGL documentation provides a work-around for this using reST <u>Interpreted Text Roles</u>.  Just remember that the Interpreted Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:  ``:u:`underline` ``, ``:ub:`underline and bold` ``, `` `:bi:bold italic` ``.
+Normally underlining and combining these text styles is not possible in reStructuredText.  However, LVGL documentation provides a work-around for this using reST <u>Interpreted Text Roles</u>.  Just remember that the Interpreted Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:  ``:u:`underline` ``, ``:ub:`underline and bold` ``, `` :bi:`bold italic` ``.
 
 
 
@@ -391,10 +391,12 @@ API
 
 .. API equals: lv_scale_t, lv_scale_create
 
-.. API startswith: lv_scale, lv_obj_set_style
+.. API startswith:
 
+    lv_scale
+    lv_obj_set_style
 ```
 
-The list of symbols (or prefixes) can be separated by commas or spaces, and they can wrap onto subsequent lines of text so long as they are indented.  A blank line after each list ends that list.
+The list of symbols (or prefixes) can be separated by commas or spaces, and they can wrap onto subsequent lines of text so long as they are indented.  Each list is terminated by the next ``.. API `` pseudo-directive or end-of-file, whichever comes first.
 
 The API-page generation logic will add at most 1 link to each API documentation page containing matched symbols.  The links are to the whole API page, not to the symbols.  The purpose is to provide the reader with links to applicable API pages.  Links directly to code (e.g. function documentation) are accomplished by using the In-Line Code Expressions documented above.

@@ -67,7 +67,7 @@ void lv_example_file_explorer_2(void)
      * The "C:" following that is indeed the Windows/DOS drive letter and is
      * part of the actual path that gets passed to the OS-level functions.
      *
-     * See https://docs.lvgl.io/master/details/main-components/fs.html for details.
+     * See https://docs.lvgl.io/master/main-modules/fs.html for details.
      * File Explorer uses `lv_fs` internally, thus the required prefix in path strings.
      */
     lv_file_explorer_open_dir(file_explorer, "C:C:/");

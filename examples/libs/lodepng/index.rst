@@ -1,3 +1,6 @@
+.. example_heading: LodePNG
+
+
 Open a PNG image from file and variable
 ---------------------------------------
 

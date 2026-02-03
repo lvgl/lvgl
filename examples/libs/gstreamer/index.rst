@@ -1,3 +1,6 @@
+.. example_heading: GStreamer
+
+
 Loads a video from the internet using the gstreamer widget
 ----------------------------------------------------------
 

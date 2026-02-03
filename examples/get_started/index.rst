@@ -1,3 +1,5 @@
+.. example_heading: Getting Started
+
 
 A very simple *hello world* label
 ---------------------------------

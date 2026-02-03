@@ -23,6 +23,7 @@ void lv_test_init(void)
 
     lv_test_display_create(HOR_RES, VER_RES);
     lv_test_indev_create_all();
+    lv_test_fs_init();
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_test_indev_gesture_create();

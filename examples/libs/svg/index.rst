@@ -1,3 +1,6 @@
+.. example_heading: SVG
+
+
 Load and render SVG data
 ------------------------
 

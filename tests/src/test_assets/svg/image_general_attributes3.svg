@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width='600' height='600' viewBox='0 0 600 600'>
+    <rect x='0' y='0' width='100' height='400'  stroke='blue' fill='none' /><!-- 1 -->
+    <rect x='100' y='0' width='100' height='400' stroke='yellow' fill='none' /><!-- 2 -->
+    <rect x='200' y='0' width='100' height='400' stroke='red' fill='none' /><!-- 3 -->
+    <rect x='0' y='0' width='600' height='100' stroke='green' fill='none' /><!-- 4 -->
+    <rect x='0' y='100' width='600' height='100' stroke='pink' fill='none' /><!-- 5 -->
+    <rect x='0' y='200' width='600' height='100' stroke='purple' fill='none' /><!-- 6 -->
+    <rect x='0' y='400' width='600' height='100' stroke='black' fill='none' /><!-- 6 -->
+
+    <image xlink:href='dot_square.png' x='0' y='0' width='100' height='400' preserveAspectRatio='xMaxYMid meet'/><!-- 1 -->
+    <text x='10' y='220' fill="black" font-size="16">xMaxYMid</text>
+
+    <image xlink:href='dot_square.png' x='100' y='0' width='100' height='400' preserveAspectRatio='xMaxYMax meet'/><!-- 2 -->
+    <text x='110' y='380' fill="black" font-size="16">xMaxYMax</text>
+
+    <image xlink:href='dot_square.png' x='200' y='0' width='100' height='400' preserveAspectRatio='xMaxYMin meet'/><!-- 3 -->
+    <text x='210' y='20' fill="black" font-size="16">xMaxYMin</text>
+
+    <image xlink:href='dot_square.png' x='0' y='0' width='600' height='100' preserveAspectRatio='xMaxYMax meet'/><!-- 4 -->
+    <text x='510' y='20' fill="black" font-size="16">xMaxYMax</text>
+
+    <image xlink:href='dot_square.png' x='0' y='100' width='600' height='100' preserveAspectRatio='xMidYMax meet'/><!-- 5 -->
+    <text x='280' y='180' fill="black" font-size="16">xMidYMax</text>
+
+    <image xlink:href='dot_square.png' x='0' y='200' width='600' height='100' opacity='0.7' preserveAspectRatio='xMinYMax meet'/><!-- 6 -->
+    <text x='20' y='280' fill="black" font-size="16">xMidYMax</text>
+
+    <image xlink:href='dot_square.png' x='0' y='400' width='600' height='100' opacity='0.7' preserveAspectRatio='xMinYMax slice'/><!-- 7 -->
+</svg>

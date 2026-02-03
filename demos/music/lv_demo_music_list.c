@@ -106,7 +106,7 @@ lv_obj_t * lv_demo_music_list_create(lv_obj_t * parent)
 #endif
     lv_style_init(&style_button_pr);
     lv_style_set_bg_opa(&style_button_pr, LV_OPA_COVER);
-    lv_style_set_bg_color(&style_button_pr,  lv_color_hex(0x4c4965));
+    lv_style_set_bg_color(&style_button_pr, lv_color_hex(0x4c4965));
 
     lv_style_init(&style_button_chk);
     lv_style_set_bg_opa(&style_button_chk, LV_OPA_COVER);
@@ -132,7 +132,7 @@ lv_obj_t * lv_demo_music_list_create(lv_obj_t * parent)
     list = lv_obj_create(parent);
     lv_obj_add_event_cb(list, list_delete_event_cb, LV_EVENT_DELETE, NULL);
     lv_obj_remove_style_all(list);
-    lv_obj_set_size(list, LV_HOR_RES, LV_VER_RES - LV_DEMO_MUSIC_HANDLE_SIZE);
+    lv_obj_set_size(list, lv_pct(100), lv_obj_get_content_height(parent) - LV_DEMO_MUSIC_HANDLE_SIZE);
     lv_obj_set_y(list, LV_DEMO_MUSIC_HANDLE_SIZE);
     lv_obj_add_style(list, &style_scrollbar, LV_PART_SCROLLBAR);
     lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);

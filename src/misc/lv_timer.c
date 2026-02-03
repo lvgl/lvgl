@@ -177,6 +177,10 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
     new_timer->last_run = lv_tick_get();
     new_timer->user_data = user_data;
     new_timer->auto_delete = true;
+#if LV_USE_EXT_DATA
+    new_timer->ext_data.free_cb = NULL;
+    new_timer->ext_data.data = NULL;
+#endif
 
     state.timer_created = true;
 
@@ -195,6 +199,13 @@ void lv_timer_delete(lv_timer_t * timer)
 {
     lv_ll_remove(timer_ll_p, timer);
     state.timer_deleted = true;
+
+#if LV_USE_EXT_DATA
+    if(timer->ext_data.free_cb) {
+        timer->ext_data.free_cb(timer->ext_data.data);
+        timer->ext_data.data = NULL;
+    }
+#endif
 
     lv_free(timer);
 }
@@ -300,6 +311,19 @@ bool lv_timer_get_paused(lv_timer_t * timer)
 {
     return timer->paused;
 }
+
+#if LV_USE_EXT_DATA
+void lv_timer_set_external_data(lv_timer_t * timer, void * data, void (* free_cb)(void * data))
+{
+    if(!timer) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL timer");
+        return;
+    }
+
+    timer->ext_data.data = data;
+    timer->ext_data.free_cb = free_cb;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

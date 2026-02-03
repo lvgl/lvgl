@@ -1,3 +1,6 @@
+.. example_heading: LibWebP
+
+
 Open a WEBP image from file and variable
 ----------------------------------------
 

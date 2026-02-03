@@ -12,10 +12,12 @@
 
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_profiler.h"
+#include "../../misc/lv_matrix.h"
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
 
-#include "../../display/lv_display.h"
+#include "../../display/lv_display_private.h"
+#include "../../draw/nanovg/lv_draw_nanovg.h"
 #include "../../misc/lv_area_private.h"
 #include "opengl_shader/lv_opengl_shader_internal.h"
 #include "assets/lv_opengles_shader.h"
@@ -86,8 +88,8 @@ static unsigned int index_buffer_count = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_Hue", "u_Saturation", "u_Value" };
-static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_SwapRB", "u_Hue", "u_Saturation", "u_Value" };
+static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**********************
  *      MACROS
@@ -126,6 +128,10 @@ void lv_opengles_init(void)
     lv_opengles_index_buffer_unbind();
     lv_opengles_shader_unbind();
 
+#if LV_USE_DRAW_NANOVG
+    lv_draw_nanovg_init();
+#endif /*LV_USE_DRAW_NANOVG*/
+
     is_init = true;
 }
 
@@ -141,30 +147,76 @@ void lv_opengles_deinit(void)
     is_init = false;
 }
 
+void lv_opengles_render_params_init(lv_opengles_render_params_t * params)
+{
+    LV_ASSERT_NULL(params);
+    lv_memzero(params, sizeof(lv_opengles_render_params_t));
+}
+
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                       lv_color_black(), false);
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = texture;
+    params.texture_area = texture_area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = texture_clip_area;
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+    lv_opengles_render(&params);
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                       int32_t disp_w,
+                                       int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = texture;
+    params.texture_area = texture_area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = texture_clip_area;
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+    params.rb_swap = true;
+    lv_opengles_render(&params);
     LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false);
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture_area = area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = area;
+    params.fill_color = color;
+    params.rb_swap = true;
+    lv_opengles_render(&params);
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
+void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render_params_t * params)
 {
     LV_PROFILER_DRAW_BEGIN;
-    unsigned int texture = *(unsigned int *)lv_display_get_driver_data(display);
+    unsigned int texture = (lv_uintptr_t)display->layer_head->user_data;
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
 
     lv_display_rotation_t rotation = lv_display_get_rotation(display);
+    bool h_flip = params->h_flip;
+    bool v_flip = params->v_flip;
 
     float vert_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN];
     populate_vertex_buffer(vert_buffer, rotation, &h_flip, &v_flip, 0.f, 0.f, 1.f, 1.f);
@@ -190,9 +242,22 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
+    lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap);
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
+{
+    /*TODO: Deprecate this function and make lv_opengles_render_display public instead*/
+
+    lv_opengles_render_params_t params = {
+        .v_flip = v_flip,
+        .h_flip = h_flip,
+        .rb_swap = true
+    };
+    lv_opengles_render_display(display, &params);
 }
 
 void lv_opengles_render_clear(void)
@@ -209,41 +274,62 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt)
+void lv_opengles_reinit_state(void)
 {
     LV_PROFILER_DRAW_BEGIN;
+
+    /* Rebind VAO, VBO, IBO to restore state after NanoVG or other external GL operations */
+    lv_opengles_vertex_array_bind();
+    lv_opengles_vertex_buffer_bind();
+    lv_opengles_index_buffer_bind();
+
+    /* Re-setup vertex attributes since NanoVG may have modified them */
+    for(unsigned int i = 0; i < 2; i++) {
+        GL_CALL(glEnableVertexAttribArray(i));
+        GL_CALL(glVertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, 16, (const void *)(intptr_t)(i * 2 * 4)));
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render(const lv_opengles_render_params_t * params)
+{
+    LV_ASSERT_NULL(params);
+    LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
-    if(!lv_area_intersect(&intersection, texture_area, texture_clip_area)) {
+    if(!lv_area_intersect(&intersection, params->texture_area, params->texture_clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
 
     GL_CALL(glActiveTexture(GL_TEXTURE0));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, params->texture));
 
     float tex_w = (float)lv_area_get_width(&intersection);
     float tex_h = (float)lv_area_get_height(&intersection);
 
-    float hor_scale = tex_w / (float)disp_w;
-    float ver_scale = tex_h / (float)disp_h;
-    float hor_translate = (float)intersection.x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
-    float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
-    hor_scale = h_flip ? -hor_scale : hor_scale;
-    ver_scale = v_flip ? ver_scale : -ver_scale;
+    float hor_scale = tex_w / (float)params->disp_w;
+    float ver_scale = tex_h / (float)params->disp_h;
+    float hor_translate = (float)intersection.x1 / (float)params->disp_w * 2.0f - (1.0f - hor_scale);
+    float ver_translate = -((float)intersection.y1 / (float)params->disp_h * 2.0f - (1.0f - ver_scale));
+    hor_scale = params->h_flip ? -hor_scale : hor_scale;
+    ver_scale = params->v_flip ? ver_scale : -ver_scale;
 
-    if(texture != 0) {
-        float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, 0.f, 1.f);
-        float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, 0.f, 1.f);
-        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, 0.f, 1.f);
-        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, 0.f, 1.f);
+    if(params->texture != 0) {
+        float clip_x1 = params->h_flip ? lv_opengles_map_float(params->texture_clip_area->x2, params->texture_area->x2,
+                                                               params->texture_area->x1, 0.f, 1.f)
+                        : lv_opengles_map_float(params->texture_clip_area->x1, params->texture_area->x1, params->texture_area->x2, 0.f, 1.f);
+        float clip_x2 = params->h_flip ? lv_opengles_map_float(params->texture_clip_area->x1, params->texture_area->x2,
+                                                               params->texture_area->x1, 0.f, 1.f)
+                        : lv_opengles_map_float(params->texture_clip_area->x2, params->texture_area->x1, params->texture_area->x2, 0.f, 1.f);
+        float clip_y1 = params->v_flip ? lv_opengles_map_float(params->texture_clip_area->y2, params->texture_area->y2,
+                                                               params->texture_area->y1, 0.f, 1.f)
+                        : lv_opengles_map_float(params->texture_clip_area->y1, params->texture_area->y1, params->texture_area->y2, 0.f, 1.f);
+        float clip_y2 = params->v_flip ? lv_opengles_map_float(params->texture_clip_area->y1, params->texture_area->y2,
+                                                               params->texture_area->y1, 0.f, 1.f)
+                        : lv_opengles_map_float(params->texture_clip_area->y2, params->texture_area->y1, params->texture_area->y2, 0.f, 1.f);
 
-        float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
+        const float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
             -1.f,  1.0f, clip_x1, clip_y2,
             1.0f,  1.0f, clip_x2, clip_y2,
             1.0f, -1.0f, clip_x2, clip_y1,
@@ -252,21 +338,28 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
         lv_opengles_vertex_buffer_init(positions, sizeof(positions));
     }
 
-    const float transposed_matrix[9] = {
-        hor_scale,  0.0f,        0.0f,
-        0.0f,       ver_scale,   0.0f,
-        hor_translate, ver_translate, 1.0f
-    };
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    if(params->matrix) {
+        lv_matrix_multiply(&matrix, params->matrix);
+    }
+    else {
+        lv_matrix_translate(&matrix, hor_translate, ver_translate);
+        lv_matrix_scale(&matrix, hor_scale, ver_scale);
+    }
 
     lv_opengles_shader_bind();
-    lv_opengles_enable_blending(blend_opt);
+    lv_opengles_enable_blending(params->blend_opt);
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
-    lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
-    lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
-    lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
-                                     (float)fill_color.blue / 255.0f);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, (const float *)&matrix);
+    lv_opengles_shader_set_uniform1f("u_Opa", (float)params->opa / (float)LV_OPA_100);
+    lv_opengles_shader_set_uniform1i("u_IsFill", params->texture == 0);
+    lv_opengles_shader_set_uniform3f("u_FillColor", (float)params->fill_color.red / 255.0f,
+                                     (float)params->fill_color.green / 255.0f,
+                                     (float)params->fill_color.blue / 255.0f);
+    lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap ? 1 : 0);
+
     lv_opengles_render_draw();
     lv_opengles_disable_blending();
     LV_PROFILER_DRAW_END;
@@ -380,45 +473,31 @@ static void lv_opengles_index_buffer_unbind(void)
 
 static unsigned int lv_opengles_shader_manager_init(void)
 {
-    lv_opengl_shader_program_t * program  = NULL;
-    for(lv_opengl_glsl_version version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
+    for(lv_opengl_glsl_version_t version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
         LV_LOG_INFO("Trying GLSL version %s", lv_opengles_glsl_version_to_string(version));
-        lv_opengl_shader_portions_t portions;
-        lv_opengles_shader_get_source(&portions, version);
-        char * vertex_shader = lv_opengles_shader_get_vertex(version);
-        char * frag_shader = lv_opengles_shader_get_fragment(version);
-        lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
-        lv_free(vertex_shader);
-        lv_free(frag_shader);
+        {
+            /* Initialize the shader manager*/
+            lv_opengl_shader_portions_t portions;
+            lv_opengles_shader_get_source(&portions, version);
+            char * vertex_shader = lv_opengles_shader_get_vertex(version);
+            char * frag_shader = lv_opengles_shader_get_fragment(version);
+            lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
+            lv_free(vertex_shader);
+            lv_free(frag_shader);
+        }
 
-        uint32_t frag_shader_hash;
-        uint32_t vert_shader_hash;
-
-        lv_result_t res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.frag", NULL, 0, version,
-                                                                 &frag_shader_hash);
-        if(res != LV_RESULT_OK) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
+        lv_opengl_shader_params_t frag_shader = {.name = "__MAIN__.frag"};
+        lv_opengl_shader_params_t vert_shader = {.name = "__MAIN__.vert"};
+        lv_opengl_shader_program_t * program = lv_opengl_shader_manager_compile_program(&shader_manager, &frag_shader,
+                                                                                        &vert_shader, version);
+        if(program) {
+            LV_LOG_INFO("Compiled shaders with version %s", lv_opengles_glsl_version_to_string(version));
+            return lv_opengl_shader_program_get_id(program);
         }
-        res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.vert", NULL, 0, version, &vert_shader_hash);
-        if(res != LV_RESULT_OK) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
-        }
-        program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash, vert_shader_hash);
-        if(!program) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
-        }
-        LV_LOG_INFO("Compiled shaders with version %s", lv_opengles_glsl_version_to_string(version));
-        break;
+        lv_opengl_shader_manager_deinit(&shader_manager);
     }
-
-    if(!program) {
-        LV_LOG_ERROR("Failed to initialize shaders");
-        return 0;
-    }
-    return lv_opengl_shader_program_get_id(program);
+    LV_LOG_ERROR("Failed to initialize shaders");
+    return 0;
 }
 
 static lv_result_t lv_opengles_shader_init(void)

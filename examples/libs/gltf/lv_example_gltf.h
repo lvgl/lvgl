@@ -29,6 +29,7 @@ extern "C" {
  **********************/
 void lv_example_gltf_1(void);
 void lv_example_gltf_2(void);
+void lv_example_gltf_3(void);
 
 /**********************
  *      MACROS

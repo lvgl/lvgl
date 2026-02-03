@@ -42,6 +42,52 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_spinbox_properties[] = {
+    {
+        .id = LV_PROPERTY_SPINBOX_VALUE,
+        .setter = lv_spinbox_set_value,
+        .getter = lv_spinbox_get_value,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_ROLLOVER,
+        .setter = lv_spinbox_set_rollover,
+        .getter = lv_spinbox_get_rollover,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_DIGIT_COUNT,
+        .setter = lv_spinbox_set_digit_count,
+        .getter = lv_spinbox_get_digit_count,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_DEC_POINT_POS,
+        .setter = lv_spinbox_set_dec_point_pos,
+        .getter = lv_spinbox_get_dec_point_pos,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_STEP,
+        .setter = lv_spinbox_set_step,
+        .getter = lv_spinbox_get_step,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_MIN_VALUE,
+        .setter = lv_spinbox_set_min_value,
+        .getter = lv_spinbox_get_min_value,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_MAX_VALUE,
+        .setter = lv_spinbox_set_max_value,
+        .getter = lv_spinbox_get_max_value,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_DIGIT_STEP_DIRECTION,
+        .setter = lv_spinbox_set_digit_step_direction,
+        .getter = lv_spinbox_get_digit_step_direction,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_spinbox_class = {
     .constructor_cb = lv_spinbox_constructor,
     .event_cb = lv_spinbox_event,
@@ -50,6 +96,7 @@ const lv_obj_class_t lv_spinbox_class = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_textarea_class,
     .name = "lv_spinbox",
+    LV_PROPERTY_CLASS_FIELDS(spinbox, SPINBOX)
 };
 /**********************
  *      MACROS
@@ -257,6 +304,41 @@ bool lv_spinbox_get_rollover(lv_obj_t * obj)
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     return spinbox->rollover;
+}
+
+uint32_t lv_spinbox_get_digit_count(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->digit_count;
+}
+
+uint32_t lv_spinbox_get_dec_point_pos(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->dec_point_pos;
+}
+
+int32_t lv_spinbox_get_min_value(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->range_min;
+}
+
+int32_t lv_spinbox_get_max_value(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->range_max;
+}
+
+lv_dir_t lv_spinbox_get_digit_step_direction(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->digit_step_dir;
 }
 
 void lv_spinbox_increment(lv_obj_t * obj)
@@ -495,7 +577,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     const size_t digits_len = lv_strlen(digits);
 
     const int leading_zeros_cnt = spinbox->digit_count - digits_len;
-    if(leading_zeros_cnt) {
+    if(leading_zeros_cnt > 0) {
         for(i = (int32_t) digits_len; i >= 0; i--) {
             digits[i + leading_zeros_cnt] = digits[i];
         }

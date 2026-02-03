@@ -20,6 +20,7 @@ extern "C" {
 #include "../draw/lv_draw_line.h"
 #include "../draw/lv_draw_arc.h"
 #include "../draw/lv_draw_triangle.h"
+#include "../draw/lv_draw_blur.h"
 #include "lv_obj_style.h"
 
 /*********************
@@ -102,6 +103,18 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_
  *                  Should be initialized with `lv_draw_arc_dsc_init(draw_dsc)`.
  */
 void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t * draw_dsc);
+
+
+/**
+ * Initialize a blur draw descriptor from an object's styles in its current state.
+ * draw_dsc->radius will only be calculated if it's 0 initially. Radius can be set before calling this function
+ * to avoid getting it twice.
+ * @param obj       pointer to an object
+ * @param part      part of the object, e.g. `LV_PART_MAIN`, `LV_PART_SCROLLBAR`, `LV_PART_KNOB`, etc
+ * @param draw_dsc  the descriptor to initialize.
+ *                  Should be initialized with `lv_draw_blur_dsc_init(draw_dsc)`.
+ */
+void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc);
 
 /**
  * Get the required extra size (around the object's part) to draw shadow, outline, value etc.

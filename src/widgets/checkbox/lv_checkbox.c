@@ -38,6 +38,17 @@ static void lv_checkbox_draw(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_checkbox_properties[] = {
+    {
+        .id = LV_PROPERTY_CHECKBOX_TEXT,
+        .setter = lv_checkbox_set_text,
+        .getter = lv_checkbox_get_text,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_checkbox_class = {
     .constructor_cb = lv_checkbox_constructor,
     .destructor_cb = lv_checkbox_destructor,
@@ -48,6 +59,7 @@ const lv_obj_class_t lv_checkbox_class = {
     .instance_size = sizeof(lv_checkbox_t),
     .base_class = &lv_obj_class,
     .name = "lv_checkbox",
+    LV_PROPERTY_CLASS_FIELDS(checkbox, CHECKBOX)
 };
 
 /**********************

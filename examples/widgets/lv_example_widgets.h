@@ -63,6 +63,7 @@ void lv_example_canvas_8(void);
 void lv_example_canvas_9(void);
 void lv_example_canvas_10(void);
 void lv_example_canvas_11(void);
+void lv_example_canvas_12(void);
 
 void lv_example_chart_1(void);
 void lv_example_chart_2(void);
@@ -118,6 +119,7 @@ void lv_example_menu_5(void);
 
 void lv_example_msgbox_1(void);
 void lv_example_msgbox_2(void);
+void lv_example_msgbox_3(void);
 
 void lv_example_obj_1(void);
 void lv_example_obj_2(void);

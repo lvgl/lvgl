@@ -252,8 +252,8 @@ void lv_demo_widgets_profile_create(lv_obj_t * parent)
         lv_obj_set_grid_dsc_array(parent, grid_main_col_dsc, grid_main_row_dsc);
         lv_obj_set_grid_cell(panel1, LV_GRID_ALIGN_STRETCH, 0, 2, LV_GRID_ALIGN_CENTER, 0, 1);
 
-        lv_obj_set_width(log_out_btn, 120);
-        lv_obj_set_width(invite_btn, 120);
+        lv_obj_set_width(log_out_btn, 110);
+        lv_obj_set_width(invite_btn, 110);
 
         lv_obj_set_grid_dsc_array(panel1, grid_1_col_dsc, grid_1_row_dsc);
         lv_obj_set_grid_cell(avatar, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_START, 0, 4);

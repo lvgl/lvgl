@@ -7,10 +7,10 @@
 static void timer_cb(lv_timer_t * timer)
 {
     static int32_t counter = 0;
-    const char * string = "windstorrrrrrrrrrrrrrrrm~>>>";
+    const char * string = "lol~ I'm wavvvvvvving~>>>";
     const int16_t string_len = lv_strlen(string);
 
-    lv_obj_t * canvas = (lv_obj_t *) lv_timer_get_user_data(timer);
+    lv_obj_t * canvas = (lv_obj_t *)lv_timer_get_user_data(timer);
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
@@ -22,23 +22,21 @@ static void timer_cb(lv_timer_t * timer)
     letter_dsc.font = lv_font_get_default();
 
     {
-#define CURVE2_X(t) ((t) * 2 + lv_trigo_cos((t) * 5) * 40 / 32767 - 10)
-#define CURVE2_Y(t, T) ((t) * lv_trigo_sin(((t) + (T)) * 5) * 40 / 32767 / 80 + CANVAS_HEIGHT / 2)
+#define CURVE2_X(t) (t * 2 + 10)
+#define CURVE2_Y(t) (lv_trigo_sin((t) * 5) * 40 / 32767 + CANVAS_HEIGHT / 2)
 
         int32_t pre_x = CURVE2_X(-1);
-        int32_t pre_y = CURVE2_Y(-1, 0);
+        int32_t pre_y = CURVE2_Y(-1);
         for(int16_t i = 0; i < string_len; i++) {
-            const int32_t angle = i * 5;
+            const int16_t angle = (int16_t)(i * 5);
             const int32_t x = CURVE2_X(angle);
-            const int32_t y = CURVE2_Y(angle + 30, counter / 2);
+            const int32_t y = CURVE2_Y(angle + counter / 2);
+            const lv_point_t point = { .x = x, .y = y };
 
             letter_dsc.unicode = (uint32_t)string[i % string_len];
             letter_dsc.rotation = lv_atan2(y - pre_y, x - pre_x) * 10;
             letter_dsc.color = lv_color_hsv_to_rgb(i * 10, 100, 100);
-            lv_point_t p = (lv_point_t) {
-                .x = x, .y = y
-            };
-            lv_draw_letter(&layer, &letter_dsc, &p);
+            lv_draw_letter(&layer, &letter_dsc, &point);
 
             pre_x = x;
             pre_y = y;

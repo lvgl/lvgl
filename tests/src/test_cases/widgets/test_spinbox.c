@@ -305,4 +305,63 @@ void test_spinbox_zero_crossing(void)
     TEST_ASSERT_EQUAL(13, lv_spinbox_get_value(spinbox_events));
 }
 
+void test_spinbox_few_digits(void)
+{
+    lv_spinbox_set_range(spinbox_events, -20000, 20000);
+    lv_spinbox_set_value(spinbox_events, 19000);
+    lv_spinbox_set_digit_count(spinbox_events, 3);
+    lv_obj_t * label = lv_obj_get_child(spinbox_events, 0);
+    TEST_ASSERT_EQUAL_STRING("+190", lv_label_get_text(label));
+}
+
+void test_spinbox_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * spinbox = lv_spinbox_create(lv_screen_active());
+
+    lv_spinbox_set_range(spinbox, -100, 200);
+    lv_spinbox_set_value(spinbox, 50);
+    lv_spinbox_set_rollover(spinbox, true);
+    lv_spinbox_set_digit_count(spinbox, 4);
+    lv_spinbox_set_dec_point_pos(spinbox, 1);
+    lv_spinbox_set_step(spinbox, 10);
+    lv_spinbox_set_digit_step_direction(spinbox, LV_DIR_LEFT);
+
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_SPINBOX_VALUE;
+    TEST_ASSERT_EQUAL_INT(50, lv_obj_get_property(spinbox, prop.id).num);
+
+    prop.id = LV_PROPERTY_SPINBOX_ROLLOVER;
+    TEST_ASSERT_TRUE(lv_obj_get_property(spinbox, prop.id).enable);
+
+    prop.id = LV_PROPERTY_SPINBOX_DIGIT_COUNT;
+    TEST_ASSERT_EQUAL_INT(4, lv_obj_get_property(spinbox, prop.id).num);
+
+    prop.id = LV_PROPERTY_SPINBOX_DEC_POINT_POS;
+    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(spinbox, prop.id).num);
+
+    prop.id = LV_PROPERTY_SPINBOX_STEP;
+    TEST_ASSERT_EQUAL_INT(10, lv_obj_get_property(spinbox, prop.id).num);
+
+    prop.id = LV_PROPERTY_SPINBOX_MIN_VALUE;
+    TEST_ASSERT_EQUAL_INT(-100, lv_obj_get_property(spinbox, prop.id).num);
+
+    prop.id = LV_PROPERTY_SPINBOX_MAX_VALUE;
+    TEST_ASSERT_EQUAL_INT(200, lv_obj_get_property(spinbox, prop.id).num);
+
+    prop.id = LV_PROPERTY_SPINBOX_DIGIT_STEP_DIRECTION;
+    TEST_ASSERT_EQUAL_INT(LV_DIR_LEFT, lv_obj_get_property(spinbox, prop.id).num);
+
+    /* Test setter */
+    prop.id = LV_PROPERTY_SPINBOX_VALUE;
+    prop.num = 75;
+    TEST_ASSERT_TRUE(lv_obj_set_property(spinbox, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(75, lv_spinbox_get_value(spinbox));
+
+    lv_obj_delete(spinbox);
 #endif
+}
+
+#endif
+

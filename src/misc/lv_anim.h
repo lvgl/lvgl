@@ -19,6 +19,10 @@ extern "C" {
 #include "lv_timer.h"
 #include "lv_ll.h"
 
+#if LV_USE_EXT_DATA
+#include "../lvgl_private.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -122,6 +126,9 @@ typedef struct {
 
 /** Describes an animation*/
 struct _lv_anim_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     void * var;                               /**< Variable (Widget or other user-provided object) to animate */
     lv_anim_exec_xcb_t exec_cb;               /**< Function to execute to animate */
     lv_anim_custom_exec_cb_t custom_exec_cb;  /**< Function to execute to animate,
@@ -554,6 +561,25 @@ int32_t lv_anim_path_step(const lv_anim_t * a);
  * @return      the current value to set
  */
 int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a);
+
+#if LV_USE_EXT_DATA
+/**
+ * @brief Associates external user data with an animation instance
+ *
+ * Attaches arbitrary user-defined data to an LVGL animation object along with an optional
+ * destructor callback that will be automatically invoked when the animation completes
+ * or is deleted, enabling proper resource cleanup.
+ *
+ * @param anim       Pointer to the animation object to configure
+ * @param data       User-defined data pointer to associate
+ * @param free_cb    Cleanup callback that receives ext_data when:
+ *                   - Animation completes naturally
+ *                   - Animation is deleted prematurely
+ *                   - New data replaces current association
+ *                   NULL indicates no cleanup required
+ */
+void lv_anim_set_external_data(lv_anim_t * anim, void * data, void (* free_cb)(void * data));
+#endif
 
 /**********************
  *   GLOBAL VARIABLES

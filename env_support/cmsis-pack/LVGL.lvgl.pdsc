@@ -1875,7 +1875,7 @@
               <files>
                 <!-- src/libs/gif -->
                 <file category="sourceC"    name="src/libs/gif/lv_gif.c" />
-                <file category="sourceC"    name="src/libs/gif/AnimatedGIF/src/gif.c" />
+                <file category="sourceC"    name="src/libs/gif/gif.c" />
               </files>
 
               <RTE_Components_h>

@@ -21,6 +21,10 @@ else()
     set_source_files_properties(${EXAMPLE_SOURCES} COMPILE_FLAGS "-Wno-unused-variable -Wno-format")
   endif()
 
+  if(CONFIG_LV_BUILD_DEMOS)
+    list(APPEND DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/lv_demos.c)
+  endif()
+
   if(CONFIG_LV_USE_DEMO_WIDGETS)
     file(GLOB_RECURSE DEMO_WIDGETS_SOURCES ${LVGL_ROOT_DIR}/demos/widgets/*.c)
     list(APPEND DEMO_SOURCES ${DEMO_WIDGETS_SOURCES})

@@ -1,3 +1,5 @@
+.. example_heading: Fragment Manager
+
 
 Basic fragment usage
 --------------------

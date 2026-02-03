@@ -60,7 +60,7 @@ lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon);
  * Add a text to the content area of message box. Multiple texts will be created below each other.
  * @param obj           pointer to a message box
  * @param text          text to add
- * @return              the created button
+ * @return              the created label
  */
 lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text);
 

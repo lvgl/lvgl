@@ -75,6 +75,13 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
  */
 void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort);
 
+/**
+ * Set the visibility of the "< Back" button
+ * @param obj   pointer to a file explorer object
+ * @param show  bool true/false, enable or disable button
+ */
+void lv_file_explorer_show_back_button(lv_obj_t * obj, bool show);
+
 /*=====================
  * Getter functions
  *====================*/

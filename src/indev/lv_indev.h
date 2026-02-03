@@ -194,6 +194,27 @@ void lv_indev_set_scroll_limit(lv_indev_t * indev, uint8_t scroll_limit);
 void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw);
 
 /**
+ * Set the minimum velocity threshold for gesture detection.
+ * The difference between consecutive points must exceed this value (in pixels)
+ * for the movement to be considered fast enough to trigger a gesture.
+ *
+ * @param indev pointer to an input device
+ * @param min_velocity minimum velocity threshold in pixels (default: 3)
+ */
+void lv_indev_set_gesture_min_velocity(lv_indev_t * indev, uint8_t min_velocity);
+
+/**
+ * Set the minimum distance threshold for gesture detection.
+ * The total distance from the first point to the current point must exceed
+ * this value (in pixels) for the movement to be considered large enough
+ * to trigger a gesture.
+ *
+ * @param indev pointer to an input device
+ * @param min_distance minimum distance threshold in pixels (default: 50)
+ */
+void lv_indev_set_gesture_min_distance(lv_indev_t * indev, uint8_t min_distance);
+
+/**
  * Get the type of an input device
  * @param indev pointer to an input device
  * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)
@@ -451,6 +472,22 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
  * @param remap_cb      remapping function callback. Use NULL to disable callback.
  */
 void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb);
+
+#if LV_USE_EXT_DATA
+/**
+ * @brief Attaches external user data and destructor callback to an indev
+ *
+ * Associates custom user data with an LVGL indev and specifies a destructor function
+ * that will be automatically invoked when the indev is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param indev      Pointer to an indev
+ * @param data       User-defined data pointer to associate with the indev
+ * @param free_cb    Callback function for cleaning up ext_data when indev is deleted.
+ *                   Receives ext_data as parameter. NULL means no cleanup required.
+ */
+void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data));
+#endif
 
 /**********************
  *      MACROS

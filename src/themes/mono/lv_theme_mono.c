@@ -198,6 +198,10 @@ lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font
     theme->base.font_normal = LV_FONT_DEFAULT;
     theme->base.font_large = LV_FONT_DEFAULT;
     theme->base.apply_cb = theme_apply;
+#if LV_USE_EXT_DATA
+    theme->base.ext_data.free_cb = NULL;
+    theme->base.ext_data.data = NULL;
+#endif
 
     style_init(theme, dark_bg, font);
 
@@ -237,6 +241,12 @@ void lv_theme_mono_deinit(void)
                 lv_style_reset(theme_styles + i);
             }
         }
+#if LV_USE_EXT_DATA
+        if(theme->base.ext_data.free_cb) {
+            theme->base.ext_data.free_cb(theme->base.ext_data.data);
+            theme->base.ext_data.data = NULL;
+        }
+#endif
         lv_free(theme_def);
         theme_def = NULL;
     }

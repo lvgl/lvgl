@@ -40,6 +40,7 @@ struct  _lv_egl_config {
     EGLint stencil;
     EGLint samples;
     EGLint surface_type;
+    EGLint renderable_type;
     EGLint r_bits;
     EGLint g_bits;
     EGLint b_bits;

@@ -50,7 +50,7 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
 
 **LVGL's XML format**
 - Path:
-    - docs/src/details/auxiliary-modules/xml
+    - docs/src/auxiliary-modules/xml
     - src/others/xml
     - xmls
 
@@ -59,7 +59,7 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
 - Source: https://github.com/RudolphRiedel/FT800-FT813
 
 **AnimatedGIF (GIF decoder library)**
-- Path: src/libs/gif/AnimatedGIF
+- Path: src/libs/gif
 - Source: https://github.com/bitbank2/AnimatedGIF
 
 **FrogFS (read-only filesystem)**

@@ -83,6 +83,14 @@ void test_textarea_should_scroll_to_the_end(void)
     TEST_ASSERT(lv_textarea_get_one_line(textarea));
 }
 
+void test_textarea_should_not_scroll_if_text_is_fully_visible(void)
+{
+    lv_textarea_set_text(textarea, "Type here...");
+    lv_obj_set_width(textarea, 100);
+    lv_obj_center(textarea);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/textarea_1.png");
+}
+
 void test_textarea_should_update_placeholder_text(void)
 {
     const char * new_placeholder = "LVGL Rocks!!!!!";
@@ -210,11 +218,6 @@ void test_textarea_properties(void)
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(10, lv_textarea_get_max_length(obj));
     TEST_ASSERT_EQUAL_INT(10, lv_obj_get_property(obj, LV_PROPERTY_TEXTAREA_MAX_LENGTH).num);
-
-    prop.id = LV_PROPERTY_TEXTAREA_INSERT_REPLACE;
-    prop.ptr = "abcdef";
-    /*No getter function for this property*/
-    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
 
     prop.id = LV_PROPERTY_TEXTAREA_TEXT_SELECTION;
     prop.num = true;

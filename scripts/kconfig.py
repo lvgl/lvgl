@@ -242,7 +242,7 @@ up as the choice selection. """
 # Hint on where to find symbol information. Used like
 # SYM_INFO_HINT.format(sym).
 SYM_INFO_HINT = """\
-See https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/configuration.html
+See https://docs.lvgl.io/master/integration/overview/configuration.html
 look up {0.name} in the menuconfig/guiconfig interface. The Application
 Development Primer, Setting Configuration Values, and Kconfig - Tips and Best
 Practices sections of the manual might be helpful too.\

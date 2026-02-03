@@ -286,7 +286,7 @@ follow some coding conventions:
      needs to be passed as the last argument of the callback.
 
 
-To learn more refer to the documentation of `MicroPython <integration/bindings/micropython>`__.
+To learn more refer to the documentation of :ref:`MicroPython <micropython>`.
 
 
 Formatting

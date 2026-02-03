@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width='800' height='800' viewBox='0 0 800 800' >
+    <defs>
+        <linearGradient id='ggg1' x1='0%' y1='0%' x2='100%' y2='0%'>
+        <stop offset='0' stop-color='red' />
+        <stop offset='0.5' stop-color='green' />
+        <stop offset='1' stop-color='blue' />
+        </linearGradient>
+    </defs>
+        <text x='100' y='20' font-family='Arial' font-size='16'> Hello SVG!</text>
+    <text x='200' y='20' font-family='Courier' font-size='16'> Hello SVG!</text>
+    <text x='300' y='20' font-family='Arial' font-size='16' font-variant='small-caps'> Hello SVG!</text>
+    <text x='100' y='40' font-family='Courier' font-size='16' font-weight='900'> Hello SVG!</text>
+    <text x='100' y='60' font-family='Courier' font-size='16' font-style='normal' > Hello SVG!</text>
+    <text x='200' y='60' font-family='Courier' font-size='16' font-style='italic'> Hello SVG!</text>
+    <text x='300' y='60' font-family='Courier' font-size='16' font-style='oblique'> Hello SVG!</text>
+
+    <text x='100' y='100' font-family='Arial' font-size='16' fill='red' > Hello SVG!</text>
+    <text x='200' y='100' font-family='Arial' font-size='16' fill='#ff0000' > Hello SVG!</text>
+    <text x='300' y='100' font-family='Arial' font-size='16' fill='rgb(255,0,0)' > Hello SVG!</text>
+    <text x='100' y='120' font-family='Arial' font-size='16' fill='rgba(255,0,0,0.5)' > Hello SVG!</text>
+    <text x='200' y='120' font-family='Arial' font-size='16' fill='none' > Hello SVG!</text>
+    <text x='300' y='120' font-family='Arial' font-size='16' fill='url(#ggg1)' > Hello SVG!</text>
+
+    <text x='0' y='180' font-family='Arial' font-size='50' fill='yellow' stroke='green'> Hello SVG!</text>
+    <text x='0' y='230' font-family='Arial' font-size='50' fill='yellow' stroke='url(#ggg1)'> Hello SVG!</text>
+
+    <text x='0' y='220' font-family='Arial' font-size='16' transform='translate(0, 50)' > Hello SVG!</text>
+    <text x='100' y='250' font-family='Arial' font-size='16' transform='rotate(10, 100, 100)'> Hello SVG!</text>
+    <text x='200' y='250' font-family='Arial' font-size='16' transform='scale(1.4, 1.4)'> Hello SVG!</text>
+    <text x='0' y='270' font-family='Arial' font-size='16' transform='skewX(30)'> Hello SVG!</text>
+    <text x='100' y='270' font-family='Arial' font-size='16' transform='skewY(30)'> Hello SVG!</text>
+    <text x='200' y='220' font-family='Arial' font-size='16' transform='matrix(1, 0, 0.3640, 1, 0, 0)'> Hello SVG!</text>
+    <text x='180' y='280' font-family='Arial' fill='pink' stroke='red' font-size='30' font-weight='900' transform='matrix(1, 0, 0.3640, 1, 0, 0)'> Hello SVG!</text>
+</svg>

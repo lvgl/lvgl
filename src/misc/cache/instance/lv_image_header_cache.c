@@ -103,12 +103,13 @@ lv_iter_t * lv_image_header_cache_iter_create(void)
 
 void lv_image_header_cache_dump(void)
 {
-    lv_iter_t * iter = lv_image_cache_iter_create();
+    lv_iter_t * iter = lv_image_header_cache_iter_create();
     if(iter == NULL) return;
 
     LV_LOG_USER("Image cache dump:");
     LV_LOG_USER("\tsize\tdata_size\tcf\trc\ttype\tdecoded\t\t\tsrc");
     lv_iter_inspect(iter, iter_inspect_cb);
+    lv_iter_destroy(iter);
 }
 
 /**********************

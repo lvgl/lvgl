@@ -196,6 +196,22 @@ void * lv_timer_get_user_data(lv_timer_t * timer);
  */
 bool lv_timer_get_paused(lv_timer_t * timer);
 
+#if LV_USE_EXT_DATA
+/**
+ * @brief Attaches external user data and destructor callback to a timer object
+ *
+ * Associates custom user data with an LVGL timer and specifies a destructor function
+ * that will be automatically invoked when the timer is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param timer      Pointer to the timer object
+ * @param data       User-defined data pointer to associate with the timer
+ * @param destructor Callback function for cleaning up ext_data when timer is deleted.
+ *                   Receives ext_data as parameter. NULL means no cleanup required.
+ */
+void lv_timer_set_external_data(lv_timer_t * timer, void * data, void (* free_cb)(void * data));
+#endif
+
 /**********************
  *      MACROS
  **********************/

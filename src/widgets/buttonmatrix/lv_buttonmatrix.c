@@ -66,6 +66,21 @@ static void free_map(lv_buttonmatrix_t * btnm);
 static const char * const lv_buttonmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
 #endif
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_buttonmatrix_properties[] = {
+    {
+        .id = LV_PROPERTY_BUTTONMATRIX_SELECTED_BUTTON,
+        .setter = lv_buttonmatrix_set_selected_button,
+        .getter = lv_buttonmatrix_get_selected_button,
+    },
+    {
+        .id = LV_PROPERTY_BUTTONMATRIX_ONE_CHECKED,
+        .setter = lv_buttonmatrix_set_one_checked,
+        .getter = lv_buttonmatrix_get_one_checked,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_buttonmatrix_class = {
     .constructor_cb = lv_buttonmatrix_constructor,
     .destructor_cb = lv_buttonmatrix_destructor,
@@ -77,6 +92,7 @@ const lv_obj_class_t lv_buttonmatrix_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
     .name = "lv_buttonmatrix",
+    LV_PROPERTY_CLASS_FIELDS(buttonmatrix, BUTTONMATRIX)
 };
 
 /**********************

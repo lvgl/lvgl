@@ -796,7 +796,7 @@
 
         /** Setting a default driver letter allows skipping the driver prefix in filepaths.
         *  Documentation about how to use the below driver-identifier letters can be found at
-        *  https://docs.lvgl.io/master/details/main-components/fs.html#lv-fs-identifier-letters . */
+        *  https://docs.lvgl.io/master/main-modules/fs.html#lv-fs-identifier-letters . */
         #define LV_FS_DEFAULT_DRIVER_LETTER '\0'
 
         /** API for fopen, fread, etc. */
@@ -1135,9 +1135,6 @@
 
         /** Use Wayland to open a window and handle input on Linux or BSD desktops */
         #define LV_USE_WAYLAND          0
-        #if LV_USE_WAYLAND
-            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
-        #endif
 
         /** Driver for /dev/fb */
         #define LV_USE_LINUX_FBDEV      0

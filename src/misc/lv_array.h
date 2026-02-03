@@ -143,11 +143,25 @@ void lv_array_shrink(lv_array_t * array);
 
 /**
  * Remove the element at the specified position in the array.
+ *
+ * This function keeps the array order. Complexity is O(n)
+ *
  * @param array pointer to an `lv_array_t` variable
  * @param index the index of the element to remove
  * @return LV_RESULT_OK: success, otherwise: error
  */
 lv_result_t lv_array_remove(lv_array_t * array, uint32_t index);
+
+/**
+ * Remove the element at the specified position in the array.
+ *
+ * This function does not guarantee the array order. Complexity is O(1)
+ *
+ * @param array pointer to an `lv_array_t` variable
+ * @param index the index of the element to remove
+ * @return LV_RESULT_OK: success, otherwise: error
+ */
+lv_result_t lv_array_remove_unordered(lv_array_t * array, uint32_t index);
 
 /**
  * Remove from the array either a single element or a range of elements ([start, end)).

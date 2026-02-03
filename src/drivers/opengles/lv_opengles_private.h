@@ -15,20 +15,26 @@ extern "C" {
  *********************/
 
 #include "../../lv_conf_internal.h"
+
 #if LV_USE_OPENGLES
 
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
 
+#if !LV_USE_MATRIX
+#error "LV_USE_OPENGLES requires LV_USE_MATRIX"
+#endif
+
 #if LV_USE_EGL
 #include "glad/include/glad/gles2.h"
 #include "glad/include/glad/egl.h"
 #else
-/* For now, by default we add glew and glfw.
-   In the future we need to consider adding a config for setting these includes*/
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "glad/include/glad/gl.h"
 #endif /*LV_USE_EGL*/
+
+#if LV_USE_GLFW
+#include <GLFW/glfw3.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -79,6 +85,15 @@ extern "C" {
 #define GL_RGBA8 0x8058
 #endif
 
+/* In Desktop GL GL_RGB565 is not supported. Use RGB instead */
+#if !LV_USE_EGL
+#define GL_RGB565 GL_RGB
+#endif
+
+#if !defined(glClearDepthf) && defined(glClearDepth)
+#define glClearDepthf glClearDepth
+#endif
+
 #ifndef LV_GL_PREFERRED_DEPTH
 #ifdef GL_DEPTH_COMPONENT24
 #define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24
@@ -99,13 +114,61 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    unsigned int texture;
+    const lv_area_t * texture_area;
+    lv_opa_t opa;
+    int32_t disp_w;
+    int32_t disp_h;
+    const lv_area_t * texture_clip_area;
+    bool h_flip;
+    bool v_flip;
+    bool rb_swap;
+    lv_color_t fill_color;
+    bool blend_opt;
+    const lv_matrix_t * matrix;
+} lv_opengles_render_params_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt);
+/**
+ * Initialize the render parameters with default values
+ * @param params pointer to an initialized `lv_opengles_render_params_t` struct
+ */
+void lv_opengles_render_params_init(lv_opengles_render_params_t * params);
+
+/**
+ * Render the content of the window/framebuffer using OpenGL
+ * @param params pointer to an initialized `lv_opengles_render_params_t` struct
+ */
+void lv_opengles_render(const lv_opengles_render_params_t * params);
+
+/**
+ * Render a texture using alternate blending mode, with red and blue channels flipped in the shader.
+ * @param texture        OpenGL texture ID
+ * @param texture_area   the area in the window to render the texture in
+ * @param opa            opacity to blend the texture with existing contents
+ * @param disp_w         width of the window/framebuffer being rendered to
+ * @param disp_h         height of the window/framebuffer being rendered to
+ * @param h_flip         horizontal flip
+ * @param v_flip         vertical flip
+ */
+void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                       int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
+                                       bool h_flip, bool v_flip);
+
+/**
+ * Set the OpenGL viewport, with vertical co-ordinate conversion
+ * @param x        x position of the viewport
+ * @param y        y position of the viewport
+ * @param w        width of the viewport
+ * @param h        height of the viewport
+ */
+void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
+
+void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render_params_t * params);
 
 /**********************
  *      MACROS

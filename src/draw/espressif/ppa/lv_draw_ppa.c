@@ -48,20 +48,30 @@ void lv_draw_ppa_init(void)
     /* Register SRM client */
     cfg.oper_type = PPA_OPERATION_SRM;
     cfg.max_pending_trans_num = 1;
+#if (LV_PPA_BURST_LENGTH == 128)
     cfg.data_burst_length = PPA_DATA_BURST_LENGTH_128;
+#elif (LV_PPA_BURST_LENGTH == 64)
+    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_64;
+#elif (LV_PPA_BURST_LENGTH == 32)
+    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_32;
+#elif (LV_PPA_BURST_LENGTH == 16)
+    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_16;
+#elif (LV_PPA_BURST_LENGTH == 8)
+    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_8;
+#else
+#error "Invalid burst length selection for PPA"
+#endif
 
     res = ppa_register_client(&cfg, &draw_ppa_unit->srm_client);
     LV_ASSERT(res == ESP_OK);
 
     /* Register Fill client */
     cfg.oper_type = PPA_OPERATION_FILL;
-    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_128;
     res = ppa_register_client(&cfg, &draw_ppa_unit->fill_client);
     LV_ASSERT(res == ESP_OK);
 
     /* Register Blend client */
     cfg.oper_type = PPA_OPERATION_BLEND;
-    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_128;
 
     res = ppa_register_client(&cfg, &draw_ppa_unit->blend_client);
     LV_ASSERT(res == ESP_OK);

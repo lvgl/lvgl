@@ -1,10 +1,8 @@
 #ifndef __khrplatform_h_
 #define __khrplatform_h_
 
-#include "../../../lv_opengles_egl.h"
-
-#if LV_USE_EGL
-
+#include "../../../../../lv_conf_internal.h"
+#if LV_USE_OPENGLES
 /*
 ** Copyright (c) 2008-2018 The Khronos Group Inc.
 **
@@ -312,6 +310,5 @@ typedef enum {
     KHRONOS_BOOLEAN_ENUM_FORCE_SIZE = KHRONOS_MAX_ENUM
 } khronos_boolean_enum_t;
 
-#endif /* LV_USE_EGL */
-
+#endif /*LV_USE_OPENGLES*/
 #endif /* __khrplatform_h_ */

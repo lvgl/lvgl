@@ -1,0 +1,83 @@
+============================
+ST7735 LCD Controller Driver
+============================
+
+Overview
+********
+
+The `ST7735S <https://www.buydisplay.com/download/ic/ST7735S.pdf>`__ is a single-chip
+controller/driver for 262K-color, graphic type TFT-LCD.  It consists of 396 source
+line and 162 gate line driving circuits.  This chip is capable of connecting directly
+to an external microprocessor, and accepts Serial Peripheral Interface
+(SPI), 8-bit/9-bit/16-bit/18-bit parallel interface.  Display data can be stored in
+the on-chip display data RAM of 132 x 162 x 18 bits.  It can perform display data RAM
+read/write operation with no external operation clock to minimize power consumption.
+In addition, because of the integrated power supply circuits necessary to drive
+liquid crystal, it is possible to make a display system with fewer components.
+
+The ST7735 LCD controller
+`driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/display/st7735>`__ is a
+platform-agnostic driver, based on the :ref:`generic MIPI driver`.  It implements
+display initialization, supports display rotation and implements the display flush
+callback.  The user needs to implement only two platform-specific functions to send a
+command or pixel data to the controller via SPI or parallel bus.  Typically these are
+implemented by calling the appropriate SDK library functions on the given platform.
+
+
+
+Prerequisites
+*************
+
+There are no prerequisites.
+
+
+
+Configuring the Driver
+**********************
+
+Enable the ST7735 driver support in lv_conf.h, by cmake compiler define or by KConfig:
+
+.. code-block:: c
+
+    #define LV_USE_ST7735  1
+
+
+
+Usage
+*****
+
+You need to implement two platform-dependent functions:
+
+.. code-block:: c
+
+    /* Send short command to the LCD. This function shall wait until the transaction finishes. */
+    void my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
+    {
+        ...
+    }
+
+    /* Send large array of pixel data to the LCD. If necessary, this function has to
+     * do the byte-swapping. This function can do the transfer in the background. */
+    void my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+    {
+        ...
+    }
+
+To create an ST7735-based display use the function
+
+.. code-block:: c
+
+    /**
+     * Create an LCD display with ST7735 driver
+     * @param hor_res       horizontal resolution
+     * @param ver_res       vertical resolution
+     * @param flags         default configuration settings (mirror, RGB ordering, etc.)
+     * @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
+     * @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
+     * @return              pointer to the created display
+     */
+    lv_display_t * lv_st7735_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
+                                    lv_st7735_send_cmd_cb_t send_cmd_cb, lv_st7735_send_color_cb_t send_color_cb);
+
+For additional details and a working example see the :ref:`generic MIPI driver`
+documentation.
