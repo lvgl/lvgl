@@ -145,6 +145,10 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
 lv_result_t lv_gltf_add_model(lv_obj_t * obj, lv_gltf_model_t * model)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(!model) {
+        return LV_RESULT_INVALID;
+    }
+
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(!viewer->environment) {
