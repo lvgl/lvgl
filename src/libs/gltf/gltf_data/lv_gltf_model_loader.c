@@ -28,8 +28,8 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static inline lv_rb_compare_res_t opengl_texture_compare_cb(const lv_opengl_compiled_shader_t * lhs,
-                                                            const lv_opengl_compiled_shader_t * rhs)
+static inline lv_rb_compare_res_t opengl_texture_compare_cb(const lv_opengl_texture_t * lhs,
+                                                            const lv_opengl_texture_t * rhs)
 {
     return lhs->hash - rhs->hash;
 }
