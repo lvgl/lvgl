@@ -1117,6 +1117,15 @@ menu "LVGL configuration"
 		config LV_TXT_BREAK_CHARS
 			string "Can break (wrap) texts on these chars"
 			default " ,.;:-_)}"
+		
+		config LV_TXT_SOFT_HYPHEN_BREAK
+			bool "Enable soft hyphen breaks"
+			default n
+		
+		config LV_TXT_SOFT_HYPHEN_BREAK_CHAR
+			int
+			depends on LV_TXT_SOFT_HYPHEN_BREAK
+			default 0xAD
 
 		config LV_TXT_LINE_BREAK_LONG_LEN
 			int "Line break long length"
