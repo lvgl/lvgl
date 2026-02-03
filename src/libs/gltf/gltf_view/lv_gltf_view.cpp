@@ -611,7 +611,6 @@ static lv_gltf_model_t * add_model(lv_gltf_t * viewer, lv_gltf_model_t * model, 
     if(!model) {
         return NULL;
     }
-    lv_gltf_model_data_t model_data {.model = model, .owned = owned};
     lv_gltf_model_data_t model_data;
     lv_memset(&model_data, 0, sizeof(model_data));
     model_data.model = model;
