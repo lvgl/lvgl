@@ -245,8 +245,14 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_WAYLAND_USE_EGL 0
 #endif
 
-#if LV_USE_LINUX_DRM == 0
-    #define LV_LINUX_DRM_USE_EGL     0
+#if LV_USE_LINUX_DRM
+    #if LV_USE_OPENGLES
+        #define LV_LINUX_DRM_USE_EGL 1
+    #else
+        #define LV_LINUX_DRM_USE_EGL 0
+    #endif /* LV_USE_OPENGLES */
+#else
+    #define LV_LINUX_DRM_USE_EGL 0
 #endif /*LV_USE_LINUX_DRM*/
 
 #if LV_USE_SYSMON == 0
