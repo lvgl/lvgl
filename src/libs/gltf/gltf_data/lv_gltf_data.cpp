@@ -290,7 +290,7 @@ lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer)
 void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer)
 {
     LV_ASSERT_NULL(model);
-    LV_ASSERT_NULL(viewer);
+    LV_ASSERT_NULL(target_viewer);
     const uint32_t viewer_count = lv_array_size(&model->viewers);
     for(uint32_t i = 0; i < viewer_count; ++i) {
         lv_obj_t * viewer = *(lv_obj_t **)lv_array_at(&model->viewers, i);
