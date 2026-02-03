@@ -207,6 +207,10 @@ static lv_result_t ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char 
         extern unsigned char chromatic_jpg[];
         extern unsigned int chromatic_jpg_len;
         data = stbi_loadf_from_memory(chromatic_jpg, chromatic_jpg_len, &src_width, &src_height, &src_nrChannels, 3);
+        if(!data) {
+            LV_LOG_ERROR("Failed to load fallback env image");
+            return LV_RESULT_INVALID;
+        }
     }
 
     {
