@@ -160,15 +160,6 @@ static void load_mesh_texture(lv_gltf_model_t * data,
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
                                              lv_gltf_model_loader_t * loader)
 {
-    bool owns_loader = loader == NULL;
-    if(!loader) {
-        loader = lv_gltf_model_loader_create();
-        if(!loader) {
-            LV_LOG_ERROR("Failed to create gltf model loader");
-            return NULL;
-        }
-    }
-
     lv_gltf_model_t * model = NULL;
     if(data_size > 0) {
         model = create_data_from_bytes((const uint8_t *)data_source, data_size);
@@ -220,10 +211,21 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
     });
 
     {
+        bool owns_loader = loader == NULL;
+        if(!loader) {
+            loader = lv_gltf_model_loader_create();
+            if(!loader) {
+                LV_LOG_ERROR("Failed to create gltf model loader");
+                return NULL;
+            }
+        }
         uint32_t i = 0;
         for(auto & image : model->asset.images) {
             injest_image(loader, model, image, i);
             i++;
+        }
+        if(owns_loader) {
+            lv_gltf_model_loader_delete(loader);
         }
     }
     uint16_t lightnum = 0;
@@ -237,9 +239,6 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
 
     if(model->asset.defaultScene.has_value()) {
         LV_LOG_INFO("Default scene = #%d", data->asset.defaultScene.value());
-    }
-    if(owns_loader) {
-        lv_gltf_model_loader_delete(loader);
     }
 
     return model;
@@ -492,6 +491,7 @@ static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::ma
 bool injest_image(lv_gltf_model_loader_t * loader, lv_gltf_model_t * data, fastgltf::Image & image,
                   uint32_t index)
 {
+    LV_ASSERT_NULL(loader);
     std::string _tex_id = std::string(lv_gltf_get_filename(data)) + "_IMG" + std::to_string(index);
 
     char tmp[512];
