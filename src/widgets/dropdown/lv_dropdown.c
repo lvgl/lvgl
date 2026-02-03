@@ -166,7 +166,7 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(lv_strcmp(dropdown->text, text) == 0) {
+    if(!dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
         return;
     }
 
@@ -188,11 +188,12 @@ void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    if(lv_strcmp(dropdown->text, text) == 0) {
+    if(dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
         return;
     }
 
-    if(!dropdown->static_text) lv_free(dropdown->text);
+    if(!dropdown->static_text)
+        lv_free(dropdown->text);
     dropdown->static_text = 1;
     dropdown->text = (char *)text;
 
