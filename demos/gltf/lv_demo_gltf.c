@@ -42,6 +42,7 @@ typedef struct {
 
 typedef void (*lv_gltf_set_float_fn)(lv_obj_t *, float);
 typedef void (*lv_gltf_set_int_fn)(lv_obj_t *, uint32_t);
+typedef void (*lv_gltf_model_set_int_fn)(lv_gltf_model_t *, uint32_t);
 
 typedef union {
     void * ptr;
@@ -52,6 +53,11 @@ typedef union {
     void * ptr;
     lv_gltf_set_int_fn fn;
 } lv_gltf_set_int_fn_union_t;
+
+typedef union {
+    void * ptr;
+    lv_gltf_set_int_fn fn;
+} lv_gltf_model_set_int_fn_union_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -77,6 +83,7 @@ static lv_obj_t * add_dropdown_to_row(lv_obj_t * row);
 static void viewer_observer_float_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void viewer_observer_int_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void animation_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void animation_speed_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void style_dropdown(lv_obj_t * dropdown);
 static void style_slider(lv_obj_t * slider, lv_color_t accent_color);
 static void style_control_panel(lv_obj_t * panel);
@@ -89,7 +96,6 @@ static lv_gltf_set_float_fn_union_t pitch_fn = { .fn = lv_gltf_set_pitch };
 static lv_gltf_set_float_fn_union_t yaw_fn = { .fn = lv_gltf_set_yaw };
 static lv_gltf_set_float_fn_union_t distance_fn = { .fn = lv_gltf_set_distance };
 static lv_gltf_set_int_fn_union_t camera_fn = { .fn = lv_gltf_set_camera };
-static lv_gltf_set_int_fn_union_t animation_speed_fn = { .fn = lv_gltf_set_animation_speed };
 static lv_gltf_set_int_fn_union_t background_mode_fn = { .fn = lv_gltf_set_background_mode };
 static lv_gltf_set_int_fn_union_t antialiasing_mode_fn = { .fn = lv_gltf_set_antialiasing_mode };
 
@@ -165,7 +171,7 @@ static void init_subjects(lv_obj_t * viewer)
     lv_subject_add_observer_obj(&distance_subject, viewer_observer_float_cb, viewer, distance_fn.ptr);
 
     lv_subject_add_observer(&animation_subject, animation_observer_cb, viewer);
-    lv_subject_add_observer_obj(&animation_speed_subject, viewer_observer_int_cb, viewer, animation_speed_fn.ptr);
+    lv_subject_add_observer(&animation_speed_subject, animation_speed_observer_cb, viewer);
 
     lv_subject_add_observer_obj(&background_subject, viewer_observer_int_cb, viewer, background_mode_fn.ptr);
     lv_subject_add_observer_obj(&env_brightness_subject, viewer_observer_int_cb, viewer, env_brightness_fn.ptr);
@@ -516,6 +522,15 @@ static void animation_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     lv_gltf_model_t * model = lv_gltf_get_primary_model(viewer);
 
     lv_gltf_model_play_animation(model, value);
+}
+
+static void animation_speed_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    int value = lv_subject_get_int(subject);
+    lv_obj_t * viewer = lv_observer_get_user_data(observer);
+    lv_gltf_model_t * model = lv_gltf_get_primary_model(viewer);
+
+    lv_gltf_model_set_animation_speed(model, value);
 }
 static void style_slider(lv_obj_t * slider, lv_color_t accent_color)
 {
