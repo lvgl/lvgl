@@ -1125,7 +1125,7 @@ menu "LVGL configuration"
 		config LV_TXT_SOFT_HYPHEN_BREAK_CHAR
 			int
 			depends on LV_TXT_SOFT_HYPHEN_BREAK
-			default 0xAD
+			default 172
 
 		config LV_TXT_LINE_BREAK_LONG_LEN
 			int "Line break long length"
