@@ -286,11 +286,15 @@ uint32_t lv_gltf_model_get_animation_speed(const lv_gltf_model_t * model)
 
 lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer)
 {
+    LV_ASSERT_NULL(model);
+    LV_ASSERT_NULL(viewer);
     return lv_array_push_back(&model->viewers, &viewer);
 }
 
 void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer)
 {
+    LV_ASSERT_NULL(model);
+    LV_ASSERT_NULL(viewer);
     const uint32_t viewer_count = lv_array_size(&model->viewers);
     for(uint32_t i = 0; i < viewer_count; ++i) {
         lv_obj_t * viewer = *(lv_obj_t **)lv_array_at(&model->viewers, i);
@@ -303,6 +307,7 @@ void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_view
 
 void lv_gltf_model_invalidate(lv_gltf_model_t * model)
 {
+    LV_ASSERT_NULL(model);
     const uint32_t viewer_count = lv_array_size(&model->viewers);
     for(uint32_t i = 0; i < viewer_count; ++i) {
         lv_obj_t * viewer = *(lv_obj_t **)lv_array_at(&model->viewers, i);
