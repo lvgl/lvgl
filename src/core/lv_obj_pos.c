@@ -1389,71 +1389,71 @@ static int32_t calc_content_width(lv_obj_t * obj)
                 if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING))
                     continue;
 
-            if(child->w_ignore_size)
-                continue;
+                if(child->w_ignore_size)
+                    continue;
 
-            if(!lv_obj_is_layout_positioned(child)) {
-                lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
-                switch(align) {
-                    case LV_ALIGN_DEFAULT:
-                    case LV_ALIGN_TOP_RIGHT:
-                    case LV_ALIGN_BOTTOM_RIGHT:
-                    case LV_ALIGN_RIGHT_MID:
-                        /*Normal right aligns. Other are ignored due to possible circular dependencies*/
-                        child_res_tmp = obj->coords.x2 - child->coords.x1 + 1;
-                        break;
-                    default:
-                        /* Consider other cases only if x=0 and use the width of the object.
-                         * With x!=0 circular dependency could occur. */
-                        if(lv_obj_get_style_x(child, LV_PART_MAIN) == 0) {
-                            child_res_tmp = lv_area_get_width(&child->coords) + space_right;
-                            child_res_tmp += lv_obj_get_style_margin_left(child, LV_PART_MAIN);
-                        }
-                        break;
+                if(!lv_obj_is_layout_positioned(child)) {
+                    lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
+                    switch(align) {
+                        case LV_ALIGN_DEFAULT:
+                        case LV_ALIGN_TOP_RIGHT:
+                        case LV_ALIGN_BOTTOM_RIGHT:
+                        case LV_ALIGN_RIGHT_MID:
+                            /*Normal right aligns. Other are ignored due to possible circular dependencies*/
+                            child_res_tmp = obj->coords.x2 - child->coords.x1 + 1;
+                            break;
+                        default:
+                            /* Consider other cases only if x=0 and use the width of the object.
+                             * With x!=0 circular dependency could occur. */
+                            if(lv_obj_get_style_x(child, LV_PART_MAIN) == 0) {
+                                child_res_tmp = lv_area_get_width(&child->coords) + space_right;
+                                child_res_tmp += lv_obj_get_style_margin_left(child, LV_PART_MAIN);
+                            }
+                            break;
+                    }
                 }
-            }
-            else {
-                child_res_tmp = obj->coords.x2 - child->coords.x1 + 1;
-            }
-            child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_left(child, LV_PART_MAIN));
-        }
-        if(child_res != LV_COORD_MIN) {
-            child_res += space_left;
-        }
-    }
-    /*Else find the right most coordinate*/
-    else {
-        for(i = 0; i < child_cnt; i++) {
-            int32_t child_res_tmp = LV_COORD_MIN;
-            lv_obj_t * child = obj->spec_attr->children[i];
-            if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
-
-            if(child->w_ignore_size)
-                continue;
-
-            if(!lv_obj_is_layout_positioned(child)) {
-                lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
-                switch(align) {
-                    case LV_ALIGN_DEFAULT:
-                    case LV_ALIGN_TOP_LEFT:
-                    case LV_ALIGN_BOTTOM_LEFT:
-                    case LV_ALIGN_LEFT_MID:
-                        /*Normal left aligns.*/
-                        child_res_tmp = child->coords.x2 - obj->coords.x1 + 1;
-                        break;
-                    default:
-                        /* Consider other cases only if x=0 and use the width of the object.
-                         * With x!=0 circular dependency could occur. */
-                        if(lv_obj_get_style_x(child, LV_PART_MAIN) == 0) {
-                            child_res_tmp = lv_area_get_width(&child->coords) + space_left;
-                            child_res_tmp += lv_obj_get_style_margin_right(child, LV_PART_MAIN);
-                        }
-                        break;
+                else {
+                    child_res_tmp = obj->coords.x2 - child->coords.x1 + 1;
                 }
+                child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_left(child, LV_PART_MAIN));
             }
-            else {
-                child_res_tmp = child->coords.x2 - obj->coords.x1 + 1;
+            if(child_res != LV_COORD_MIN) {
+                child_res += space_left;
             }
+        }
+        /*Else find the right most coordinate*/
+        else {
+            for(i = 0; i < child_cnt; i++) {
+                int32_t child_res_tmp = LV_COORD_MIN;
+                lv_obj_t * child = obj->spec_attr->children[i];
+                if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+
+                if(child->w_ignore_size)
+                    continue;
+
+                if(!lv_obj_is_layout_positioned(child)) {
+                    lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
+                    switch(align) {
+                        case LV_ALIGN_DEFAULT:
+                        case LV_ALIGN_TOP_LEFT:
+                        case LV_ALIGN_BOTTOM_LEFT:
+                        case LV_ALIGN_LEFT_MID:
+                            /*Normal left aligns.*/
+                            child_res_tmp = child->coords.x2 - obj->coords.x1 + 1;
+                            break;
+                        default:
+                            /* Consider other cases only if x=0 and use the width of the object.
+                             * With x!=0 circular dependency could occur. */
+                            if(lv_obj_get_style_x(child, LV_PART_MAIN) == 0) {
+                                child_res_tmp = lv_area_get_width(&child->coords) + space_left;
+                                child_res_tmp += lv_obj_get_style_margin_right(child, LV_PART_MAIN);
+                            }
+                            break;
+                    }
+                }
+                else {
+                    child_res_tmp = child->coords.x2 - obj->coords.x1 + 1;
+                }
 
                 child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_right(child, LV_PART_MAIN));
             }
@@ -1497,32 +1497,32 @@ static int32_t calc_content_height(lv_obj_t * obj)
             if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING))
                 continue;
 
-        if(child->h_ignore_size)
-            continue;
+            if(child->h_ignore_size)
+                continue;
 
-        if(!lv_obj_is_layout_positioned(child)) {
-            lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
-            switch(align) {
-                case LV_ALIGN_DEFAULT:
-                case LV_ALIGN_TOP_RIGHT:
-                case LV_ALIGN_TOP_MID:
-                case LV_ALIGN_TOP_LEFT:
-                    /*Normal top aligns. */
-                    child_res_tmp = child->coords.y2 - obj->coords.y1 + 1;
-                    break;
-                default:
-                    /* Consider other cases only if y=0 and use the height of the object.
-                     * With y!=0 circular dependency could occur. */
-                    if(lv_obj_get_style_y(child, LV_PART_MAIN) == 0) {
-                        child_res_tmp = lv_area_get_height(&child->coords) + space_top;
-                        child_res_tmp += lv_obj_get_style_margin_top(child, LV_PART_MAIN);
-                    }
-                    break;
+            if(!lv_obj_is_layout_positioned(child)) {
+                lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
+                switch(align) {
+                    case LV_ALIGN_DEFAULT:
+                    case LV_ALIGN_TOP_RIGHT:
+                    case LV_ALIGN_TOP_MID:
+                    case LV_ALIGN_TOP_LEFT:
+                        /*Normal top aligns. */
+                        child_res_tmp = child->coords.y2 - obj->coords.y1 + 1;
+                        break;
+                    default:
+                        /* Consider other cases only if y=0 and use the height of the object.
+                         * With y!=0 circular dependency could occur. */
+                        if(lv_obj_get_style_y(child, LV_PART_MAIN) == 0) {
+                            child_res_tmp = lv_area_get_height(&child->coords) + space_top;
+                            child_res_tmp += lv_obj_get_style_margin_top(child, LV_PART_MAIN);
+                        }
+                        break;
+                }
             }
-        }
-        else {
-            child_res_tmp = child->coords.y2 - obj->coords.y1 + 1;
-        }
+            else {
+                child_res_tmp = child->coords.y2 - obj->coords.y1 + 1;
+            }
 
             child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN));
         }
