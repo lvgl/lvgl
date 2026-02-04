@@ -51,6 +51,7 @@ static void value_update(lv_obj_t * arc);
 static int32_t knob_get_extra_size(lv_obj_t * obj);
 static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise_t angle,
                                           const lv_value_precise_t tolerance_deg);
+static int32_t get_indicator_max_pad(lv_obj_t * obj);
 #if LV_USE_OBSERVER
     static void arc_value_changed_event_cb(lv_event_t * e);
     static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -767,11 +768,7 @@ static void lv_arc_draw(lv_event_t * e)
     }
 
     /*Make the indicator arc smaller or larger according to its greatest padding value*/
-    int32_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-    int32_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-    int32_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-    int32_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
-    int32_t indic_r = arc_r - LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
+    int32_t indic_r = arc_r - get_indicator_max_pad(obj);
 
     if(indic_r > 0) {
         lv_draw_arc_dsc_init(&arc_dsc);
@@ -821,11 +818,7 @@ static void inv_arc_area(lv_obj_t * obj, lv_value_precise_t start_angle, lv_valu
     get_center(obj, &c, &r);
 
     if(part == LV_PART_INDICATOR) {
-        int32_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-        int32_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-        int32_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-        int32_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
-        r -= LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
+        r -= get_indicator_max_pad(obj);
     }
 
     int32_t w = lv_obj_get_style_arc_width(obj, part);
@@ -902,11 +895,7 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, int32_t r, 
     int32_t indic_width_half = indic_width / 2;
     r -= indic_width_half;
 
-    int32_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-    int32_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-    int32_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-    int32_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
-    r -= LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
+    r -= get_indicator_max_pad(obj);
 
     int32_t angle = (int32_t)get_angle(obj);
     int32_t knob_offset = lv_arc_get_knob_offset(obj);
@@ -1061,6 +1050,15 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
     }
 
     return false;
+}
+
+static int32_t get_indicator_max_pad(lv_obj_t * obj)
+{
+    int32_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+    int32_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+    int32_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+    int32_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+    return LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
 }
 
 #if LV_USE_OBSERVER
