@@ -38,9 +38,6 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit);
 #if LV_DRAW_DMA2D_ASYNC
     static int32_t wait_finish_cb(lv_draw_unit_t * u);
 #endif
-#if !LV_DRAW_DMA2D_ASYNC
-    static bool check_transfer_completion(void);
-#endif
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 #if LV_DRAW_DMA2D_CACHE
     static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
@@ -345,15 +342,8 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_dma2d_unit_t * draw_dma2d_unit = (lv_draw_dma2d_unit_t *) draw_unit;
 
     if(draw_dma2d_unit->task_act) {
-#if LV_DRAW_DMA2D_ASYNC
         /*Return immediately if it's busy with draw task*/
         return LV_DRAW_UNIT_IDLE;
-#else
-        if(!check_transfer_completion()) {
-            return LV_DRAW_UNIT_IDLE;
-        }
-        post_transfer_tasks(draw_dma2d_unit);
-#endif
     }
 
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_DMA2D);
@@ -404,9 +394,17 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         lv_draw_dma2d_image(t, t->draw_dsc, &t->area);
     }
 
+#if LV_DRAW_DMA2D_ASYNC
+    return LV_DRAW_UNIT_IDLE;
+#else
+    while(DMA2D->CR & DMA2D_CR_START);
+
+    post_transfer_tasks(draw_dma2d_unit);
+
     lv_draw_dispatch_request();
 
     return 1;
+#endif
 }
 
 static int32_t delete_cb(lv_draw_unit_t * draw_unit)
@@ -427,13 +425,6 @@ static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
     return 0;
 }
 #endif /*LV_DRAW_DMA2D_ASYNC*/
-
-#if !LV_DRAW_DMA2D_ASYNC
-static bool check_transfer_completion(void)
-{
-    return !(DMA2D->CR & DMA2D_CR_START);
-}
-#endif
 
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u)
 {
