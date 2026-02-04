@@ -296,6 +296,23 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/overlapping_arcs_test.png");
 }
 
+void test_arc_padding(void)
+{
+    arc = lv_arc_create(lv_screen_active());
+    lv_obj_set_size(arc, 412, 412);
+    lv_obj_set_style_arc_width(arc, 100, LV_PART_MAIN);
+
+    lv_obj_set_style_arc_width(arc, 60, LV_PART_INDICATOR);
+    lv_obj_set_style_pad_bottom(arc, 10, LV_PART_INDICATOR);
+
+    lv_obj_set_style_bg_color(arc, lv_palette_darken(LV_PALETTE_BLUE, 3), LV_PART_KNOB);
+    lv_obj_set_style_pad_all(arc, -5, LV_PART_KNOB);
+
+    lv_obj_center(arc);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_4.png");
+}
+
 
 static void dummy_event_cb(lv_event_t * e)
 {
