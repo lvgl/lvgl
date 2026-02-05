@@ -172,7 +172,7 @@ Here's how to create a basic GStreamer player and load media:
 Events
 ------
 
--  :cpp:enumerator:`LV_EVENT_STATE_CHANGED` Sent when the stream state changes. The event that originated the event can be retrieved by the event parameter (e.g :cpp:func:`lv_event_get_param`)
+-  :cpp:enumerator:`LV_EVENT_STATE_CHANGED` Sent when the stream state changes. The stream state can be retrieved via :cpp:expr:`lv_gstreamer_get_stream_state(e)`.
 
 Event Handling
 --------------
