@@ -101,8 +101,8 @@ static inline int32_t div_round_closest(int32_t dividend, int32_t divisor)
 
 void lv_flex_init(void)
 {
-    layout_list_def[LV_LAYOUT_FLEX].cb = flex_update;
-    layout_list_def[LV_LAYOUT_FLEX].min_size_cb = calc_min_size;
+    layout_list_def[LV_LAYOUT_FLEX].callbacks.layout_update_cb = flex_update;
+    layout_list_def[LV_LAYOUT_FLEX].callbacks.get_min_size_cb = calc_min_size;
     layout_list_def[LV_LAYOUT_FLEX].user_data = NULL;
 }
 
