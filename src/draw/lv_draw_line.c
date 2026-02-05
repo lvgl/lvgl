@@ -81,7 +81,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
         new_points = lv_malloc(array_size);
         LV_ASSERT_MALLOC(new_points);
         if(!new_points) {
-            LV_LOG_WARN("Couldn't allocate %d points", dsc->point_cnt);
+            LV_LOG_WARN("Couldn't allocate %" LV_PRId32 "points", dsc->point_cnt);
             LV_PROFILER_DRAW_END;
             return;
         }
