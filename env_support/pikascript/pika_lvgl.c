@@ -23,6 +23,7 @@ PikaObj* pika_lv_event_listener_g;
 
 void pika_lvgl_STATE___init__(PikaObj* self) {
     obj_setInt(self, "DEFAULT", LV_STATE_DEFAULT);
+    obj_setInt(self, "ALT", LV_STATE_ALT);
     obj_setInt(self, "CHECKED", LV_STATE_CHECKED);
     obj_setInt(self, "FOCUSED", LV_STATE_FOCUSED);
     obj_setInt(self, "FOCUS_KEY", LV_STATE_FOCUS_KEY);
