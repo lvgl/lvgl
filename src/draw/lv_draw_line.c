@@ -58,6 +58,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
     LV_PROFILER_DRAW_BEGIN;
 
     lv_area_t a;
+    lv_point_precise_t * new_points = NULL;
     if(dsc->points == NULL) {
         a.x1 = (int32_t)LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width;
         a.x2 = (int32_t)LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width;
@@ -76,8 +77,18 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
         a.x2 = LV_COORD_MIN;
         a.y2 = LV_COORD_MIN;
 
+        const size_t array_size = dsc->point_cnt * sizeof(lv_point_precise_t);
+        new_points = lv_malloc(array_size);
+        LV_ASSERT_MALLOC(new_points);
+        if(!new_points) {
+            LV_LOG_WARN("Couldn't allocate %d points", dsc->point_cnt);
+            LV_PROFILER_DRAW_END;
+            return;
+        }
+
         int32_t i;
         for(i = 0; i < dsc->point_cnt; i++) {
+            new_points[i] = dsc->points[i];
             if(dsc->points[i].x == LV_DRAW_LINE_POINT_NONE ||
                dsc->points[i].y == LV_DRAW_LINE_POINT_NONE) {
                 continue;
@@ -90,6 +101,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
         }
 
         if(a.x1 == LV_COORD_MAX) {
+            lv_free(new_points);
             LV_LOG_INFO("No valid point was found. Not adding the draw task.");
             LV_PROFILER_DRAW_END;
             return;
@@ -107,21 +119,9 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
     }
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LINE);
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-
-    if(dsc->points) {
-        lv_draw_line_dsc_t * new_draw_dsc = t->draw_dsc;
-        size_t array_size = dsc->point_cnt * sizeof(lv_point_precise_t);
-        lv_point_precise_t * new_points = lv_malloc(array_size);
-        if(new_points == NULL) {
-            LV_LOG_WARN("Couldn't allocate %d points", dsc->point_cnt);
-            LV_ASSERT_NULL(new_points);
-            LV_PROFILER_DRAW_END;
-            return;
-        }
-        lv_memcpy(new_points, dsc->points, array_size);
-        new_draw_dsc->points = new_points;
-    }
+    lv_draw_line_dsc_t * line_draw_dsc = t->draw_dsc;
+    lv_memcpy(line_draw_dsc, dsc, sizeof(*dsc));
+    line_draw_dsc->points = new_points;
 
     lv_draw_finalize_task_creation(layer, t);
     LV_PROFILER_DRAW_END;
