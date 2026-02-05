@@ -136,10 +136,13 @@ static size_t display_screen_load_start = 0;
 static size_t display_screen_loaded = 0;
 static size_t display_screen_unload_start = 0;
 static size_t display_screen_unloaded = 0;
-static void display_screen_load_cb(lv_event_t * e)
+static void count_display_screen_load_events_cb(lv_event_t * e)
 {
     lv_obj_t * screen = lv_event_get_param(e);
+    TEST_ASSERT_NOT_NULL(screen);
+
     lv_display_t * screen_display = lv_obj_get_display(screen);
+    TEST_ASSERT_NOT_NULL(screen_display);
     TEST_ASSERT_EQUAL(screen_display, lv_event_get_target(e));
 
     switch(lv_event_get_code(e)) {
@@ -162,15 +165,20 @@ static void display_screen_load_cb(lv_event_t * e)
 
 void test_display_receives_screen_load_events(void)
 {
+    display_screen_load_start = 0;
+    display_screen_loaded = 0;
+    display_screen_unload_start = 0;
+    display_screen_unloaded = 0;
+
     lv_display_t * display = lv_display_create(100, 100);
     lv_display_set_default(display);
 
     lv_obj_t * screen1 = lv_obj_create(NULL);
 
-    lv_display_add_event_cb(display, display_screen_load_cb, LV_EVENT_SCREEN_UNLOAD_START, NULL);
-    lv_display_add_event_cb(display, display_screen_load_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
-    lv_display_add_event_cb(display, display_screen_load_cb, LV_EVENT_SCREEN_LOAD_START, NULL);
-    lv_display_add_event_cb(display, display_screen_load_cb, LV_EVENT_SCREEN_LOADED, NULL);
+    lv_display_add_event_cb(display, count_display_screen_load_events_cb, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+    lv_display_add_event_cb(display, count_display_screen_load_events_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
+    lv_display_add_event_cb(display, count_display_screen_load_events_cb, LV_EVENT_SCREEN_LOAD_START, NULL);
+    lv_display_add_event_cb(display, count_display_screen_load_events_cb, LV_EVENT_SCREEN_LOADED, NULL);
 
     lv_screen_load(screen1);
     TEST_ASSERT_EQUAL(1, display_screen_unloaded);
@@ -200,8 +208,14 @@ static size_t display_event_count = 0;
 static void display_event_delete_cb(lv_event_t * e)
 {
     lv_obj_t * screen = lv_event_get_param(e);
+    TEST_ASSERT_NOT_NULL(screen);
+
     lv_display_t * screen_display = lv_obj_get_display(screen);
+    TEST_ASSERT_NOT_NULL(screen_display);
     lv_display_t * event_display = lv_event_get_target(e);
+    TEST_ASSERT_NOT_NULL(event_display);
+
+    /* Screen display and event display should match*/
     TEST_ASSERT_EQUAL(screen_display, event_display);
     lv_display_delete(event_display);
     display_event_count++;
@@ -354,6 +368,9 @@ void test_old_screen_delete_when_screen_is_loaded(void)
         TEST_ASSERT_EQUAL(screen, lv_display_get_screen_active(lv_display_get_default()));
         screen_delete_event_count = 0;
     }
+    lv_obj_t * active_screen = lv_screen_active();
+    TEST_ASSERT_NOT_NULL(active_screen);
+    lv_obj_delete(active_screen);
 }
 
 static size_t display_screen_delete_screen_event_count = 0;
