@@ -126,6 +126,7 @@ static void control_bar_create(event_data_t * event_data)
     lv_obj_center(event_data->pp_button);
     lv_obj_add_event_cb(event_data->pp_button, play_pause_pressed, LV_EVENT_CLICKED, event_data);
     event_data->button_label = lv_label_create(event_data->pp_button);
+    lv_label_set_text_static(event_data->button_label, LV_SYMBOL_PAUSE);
 
     lv_obj_t * position_slider = lv_bar_create(cont);
     lv_bar_set_range(position_slider, 0, 1000);
