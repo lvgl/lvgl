@@ -189,7 +189,6 @@ static void stream_state_changed(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     event_data_t * event_data = (event_data_t *)lv_event_get_user_data(e);
 
-    lv_obj_t * btn = event_data->pp_button;
     lv_obj_t * streamer = event_data->streamer;
 
     if(code != LV_EVENT_STATE_CHANGED) {
@@ -199,7 +198,6 @@ static void stream_state_changed(lv_event_t * e)
     lv_gstreamer_stream_state_t stream_state = lv_gstreamer_get_stream_state(e);
     switch(stream_state) {
         case LV_GSTREAMER_STREAM_STATE_START: {
-                lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, 0);
                 uint32_t duration = lv_gstreamer_get_duration(streamer);
                 LV_LOG_USER("Stream is starting");
                 LV_LOG_USER("\tStream resolution %" LV_PRId32 "x%" LV_PRId32, lv_image_get_src_width(streamer),
