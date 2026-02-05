@@ -225,7 +225,7 @@ void test_spangroup_draw(void)
 
     lv_span_t * span_2 = lv_spangroup_add_span(spangroup);
     lv_span_set_text(span_2, "This text is also over 100 pixels width");
-    static lv_style_t span_2_style;
+    lv_style_t span_2_style;
     lv_style_init(&span_2_style);
     lv_style_set_text_decor(&span_2_style, LV_TEXT_DECOR_STRIKETHROUGH);
     lv_spangroup_set_span_style(spangroup, span_2, &span_2_style);
@@ -243,6 +243,8 @@ void test_spangroup_draw(void)
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_FIXED);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_05.png");
+
+    lv_style_reset(&span_2_style);
 }
 
 void test_spangroup_get_child(void)
@@ -338,27 +340,31 @@ void test_spangroup_chinese_break_line(void)
     lv_span_set_text(span1, "八百标兵奔北坡");
     lv_span_t * span2 = lv_spangroup_add_span(spangroup);
     lv_span_set_text(span2, "炮兵并排北边跑");
-    static lv_style_t span2_style;
+    lv_style_t span2_style;
     lv_style_init(&span2_style);
     lv_style_set_text_color(&span2_style, lv_palette_main(LV_PALETTE_RED));
     lv_spangroup_set_span_style(spangroup, span2, &span2_style);
     lv_span_t * span3 = lv_spangroup_add_span(spangroup);
     lv_span_set_text(span3, "中英文测试。The quick brown fox jumps over a lazy dog. ");
-    static lv_style_t span3_style;
+    lv_style_t span3_style;
     lv_style_init(&span3_style);
     lv_style_set_text_color(&span3_style, lv_palette_main(LV_PALETTE_BLUE));
     lv_spangroup_set_span_style(spangroup, span3, &span3_style);
     lv_span_t * span4 = lv_spangroup_add_span(spangroup);
     lv_span_set_text(span4, "abcdefghijklmn中英文测试");
-    static lv_style_t span4_style;
+    lv_style_t span4_style;
     lv_style_init(&span4_style);
-    lv_spangroup_set_span_style(spangroup, span4, &span4_style);
     lv_style_set_text_color(&span4_style, lv_palette_main(LV_PALETTE_GREEN));
+    lv_spangroup_set_span_style(spangroup, span4, &span4_style);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_07.png");
 
     lv_obj_set_style_text_font(spangroup, LV_FONT_DEFAULT, 0);
     lv_freetype_font_delete(font);
+
+    lv_style_reset(&span2_style);
+    lv_style_reset(&span3_style);
+    lv_style_reset(&span4_style);
 }
 
 #else
@@ -407,7 +413,7 @@ void test_spangroup_get_span_coords(void)
     /* Create spans and set their properties */
     spans[0] = lv_spangroup_add_span(spangroup);
     lv_span_set_text(spans[0], "China is a beautiful country.");
-    static lv_style_t span0_style;
+    lv_style_t span0_style;
     lv_style_init(&span0_style);
     lv_style_set_text_color(&span0_style, lv_palette_main(LV_PALETTE_RED));
     lv_style_set_text_decor(&span0_style, LV_TEXT_DECOR_UNDERLINE);
@@ -416,55 +422,79 @@ void test_spangroup_get_span_coords(void)
 
     spans[1] = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(spans[1], "good good study, day day up.");
-    static lv_style_t span1_style;
+    lv_style_t span1_style;
     lv_style_init(&span1_style);
-    lv_spangroup_set_span_style(spangroup, spans[1], &span1_style);
     lv_style_set_text_font(&span1_style, &lv_font_montserrat_24);
     lv_style_set_text_color(&span1_style, lv_palette_main(LV_PALETTE_GREEN));
+    lv_spangroup_set_span_style(spangroup, spans[1], &span1_style);
 
     spans[2] = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(spans[2], "LVGL is an open-source graphics library.");
-    static lv_style_t span2_style;
+    lv_style_t span2_style;
     lv_style_init(&span2_style);
-    lv_spangroup_set_span_style(spangroup, spans[2], &span2_style);
     lv_style_set_text_color(&span2_style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_spangroup_set_span_style(spangroup, spans[2], &span2_style);
 
     spans[3] = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(spans[3], "the boy no name.");
-    static lv_style_t span3_style;
+    lv_style_t span3_style;
     lv_style_init(&span3_style);
-    lv_spangroup_set_span_style(spangroup, spans[3], &span3_style);
     lv_style_set_text_color(&span3_style, lv_palette_main(LV_PALETTE_GREEN));
     lv_style_set_text_font(&span3_style, &lv_font_montserrat_20);
     lv_style_set_text_decor(&span3_style, LV_TEXT_DECOR_UNDERLINE);
+    lv_spangroup_set_span_style(spangroup, spans[3], &span3_style);
 
     spans[4] = lv_spangroup_add_span(spangroup);
     lv_span_set_text(spans[4], "I have a dream that hope to come true.");
-    static lv_style_t span4_style;
+    lv_style_t span4_style;
     lv_style_init(&span4_style);
-    lv_spangroup_set_span_style(spangroup, spans[4], &span4_style);
     lv_style_set_text_decor(&span4_style, LV_TEXT_DECOR_STRIKETHROUGH);
+    lv_spangroup_set_span_style(spangroup, spans[4], &span4_style);
 
     /* Refresh the span group mode and update layout */
     lv_spangroup_refresh(spangroup);
     lv_obj_update_layout(spangroup);
 
     /* Define expected coordinates for testing */
-    const lv_span_coords_t test_coords[] = {
-        {.heading = {.x1 = 40, .y1 = 20, .x2 = 280, .y2 = 20}, .middle = {.x1 = 40, .y1 = 20, .x2 = 241, .y2 = 36}, .trailing = {.x1 = 0, .y1 = 0, .x2 = 0, .y2 = 0}},
-        {.heading = {.x1 = 241, .y1 = 20, .x2 = 280, .y2 = 36}, .middle = {.x1 = 20, .y1 = 36, .x2 = 280, .y2 = 63}, .trailing = {.x1 = 20, .y1 = 63, .x2 = 155, .y2 = 90}},
-        {.heading = {.x1 = 155, .y1 = 63, .x2 = 280, .y2 = 90}, .middle = {.x1 = 20, .y1 = 90, .x2 = 280, .y2 = 90}, .trailing = {.x1 = 20, .y1 = 90, .x2 = 188, .y2 = 112}},
-        {.heading = {.x1 = 188, .y1 = 90, .x2 = 280, .y2 = 112}, .middle = {.x1 = 20, .y1 = 112, .x2 = 280, .y2 = 112}, .trailing = {.x1 = 20, .y1 = 112, .x2 = 116, .y2 = 134}},
-        {.heading = {.x1 = 116, .y1 = 112, .x2 = 280, .y2 = 134}, .middle = {.x1 = 20, .y1 = 134, .x2 = 280, .y2 = 134}, .trailing = {.x1 = 20, .y1 = 134, .x2 = 160, .y2 = 150}}
+    const lv_span_coords_t test_coords[] = {{
+            .heading = {.x1 = 40, .y1 = 20, .x2 = 280, .y2 = 20},
+            .middle = {.x1 = 40, .y1 = 20, .x2 = 241, .y2 = 36},
+            .trailing = {.x1 = 0, .y1 = 0, .x2 = 0, .y2 = 0}
+        },
+        {
+            .heading = {.x1 = 241, .y1 = 20, .x2 = 280, .y2 = 36},
+            .middle = {.x1 = 20, .y1 = 36, .x2 = 280, .y2 = 63},
+            .trailing = {.x1 = 20, .y1 = 63, .x2 = 155, .y2 = 90}
+        },
+        {
+            .heading = {.x1 = 155, .y1 = 63, .x2 = 280, .y2 = 90},
+            .middle = {.x1 = 20, .y1 = 90, .x2 = 280, .y2 = 90},
+            .trailing = {.x1 = 20, .y1 = 90, .x2 = 188, .y2 = 112}
+        },
+        {
+            .heading = {.x1 = 188, .y1 = 90, .x2 = 280, .y2 = 112},
+            .middle = {.x1 = 20, .y1 = 112, .x2 = 280, .y2 = 112},
+            .trailing = {.x1 = 20, .y1 = 112, .x2 = 116, .y2 = 134}
+        },
+        {
+            .heading = {.x1 = 116, .y1 = 112, .x2 = 280, .y2 = 134},
+            .middle = {.x1 = 20, .y1 = 134, .x2 = 280, .y2 = 134},
+            .trailing = {.x1 = 20, .y1 = 134, .x2 = 160, .y2 = 150}
+        }
     };
 
     /* Define colors for visual testing */
-    const lv_color_t colors[] = {
-        lv_palette_main(LV_PALETTE_RED), lv_palette_main(LV_PALETTE_GREEN), lv_palette_main(LV_PALETTE_BLUE),
-        lv_palette_main(LV_PALETTE_YELLOW), lv_palette_main(LV_PALETTE_PURPLE), lv_palette_main(LV_PALETTE_ORANGE),
-        lv_palette_main(LV_PALETTE_INDIGO), lv_palette_main(LV_PALETTE_BROWN), lv_palette_main(LV_PALETTE_GREY),
-        lv_palette_main(LV_PALETTE_PINK)
-    };
+    const lv_color_t colors[] = {lv_palette_main(LV_PALETTE_RED),
+                                 lv_palette_main(LV_PALETTE_GREEN),
+                                 lv_palette_main(LV_PALETTE_BLUE),
+                                 lv_palette_main(LV_PALETTE_YELLOW),
+                                 lv_palette_main(LV_PALETTE_PURPLE),
+                                 lv_palette_main(LV_PALETTE_ORANGE),
+                                 lv_palette_main(LV_PALETTE_INDIGO),
+                                 lv_palette_main(LV_PALETTE_BROWN),
+                                 lv_palette_main(LV_PALETTE_GREY),
+                                 lv_palette_main(LV_PALETTE_PINK)
+                                };
     const uint32_t color_count = sizeof(colors) / sizeof(colors[0]);
     const lv_area_t area = spangroup->coords;
 
@@ -503,6 +533,13 @@ void test_spangroup_get_span_coords(void)
 
     /* Validate the final screenshot */
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_09.png");
+
+    /* Clean up styles */
+    lv_style_reset(&span0_style);
+    lv_style_reset(&span1_style);
+    lv_style_reset(&span2_style);
+    lv_style_reset(&span3_style);
+    lv_style_reset(&span4_style);
 }
 #endif
 
@@ -669,6 +706,47 @@ void test_span_properties(void)
 
     lv_obj_delete(obj);
 #endif
+}
+
+void test_span_static_style(void)
+{
+    static lv_style_t static_span_style;
+    lv_style_init(&static_span_style);
+    lv_style_set_text_color(&static_span_style, lv_palette_main(LV_PALETTE_RED));
+
+    lv_style_t span_style;
+    lv_style_init(&span_style);
+    lv_style_set_text_color(&span_style, lv_palette_main(LV_PALETTE_GREEN));
+
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+    lv_obj_set_size(spangroup, 300, 100);
+
+    lv_obj_set_style_text_color(spangroup, lv_palette_main(LV_PALETTE_BLUE), 0);
+
+    lv_span_t * span = lv_spangroup_add_span(spangroup);
+    lv_span_set_text(span, "Test Span Static Style");
+
+    /* Setting a static style */
+    lv_spangroup_set_span_style_static(spangroup, span, &static_span_style);
+    lv_style_set_text_decor(
+        &static_span_style,
+        LV_TEXT_DECOR_UNDERLINE); // Modifying the static style after assignment should affect the span
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_16.png");
+
+    /* Overriding a static style with an internal style */
+    lv_spangroup_set_span_style(spangroup, span, &span_style);
+    lv_style_set_text_decor(
+        &span_style,
+        LV_TEXT_DECOR_UNDERLINE); // Modifying the copied from style after assignment should *not* affect the span
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_17.png");
+
+    /* Unassigning a span style */
+    lv_spangroup_set_span_style_static(spangroup, span, NULL);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_18.png");
+
+    lv_style_reset(&static_span_style);
+    lv_style_reset(&span_style);
 }
 
 #endif

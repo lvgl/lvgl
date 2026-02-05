@@ -53,10 +53,17 @@ and style properties:
 
 .. code-block:: c
 
+    lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_<property_name>(&style, <value>);
+    lv_spangroup_set_span_style(spangroup, span, &style); // style will be copied into the span
+
+.. code-block:: c
+
     static lv_style_t style;
     lv_style_init(&style);
     lv_style_set_<property_name>(&style, <value>);
-    lv_spangroup_set_span_style(spangroup, span, &style);
+    lv_spangroup_set_span_style_static(spangroup, span, &style); // style pointer will be used directly, so its lifetime must be managed by the caller
 
 If no style is set for a span, the style properties of the Spangroup are used.
 

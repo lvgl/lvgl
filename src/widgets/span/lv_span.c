@@ -172,6 +172,7 @@ lv_span_t * lv_spangroup_add_span(lv_obj_t * obj)
     span->style = NULL;
     span->txt = (char *)"";
     span->static_flag = 1;
+    span->static_style_flag = 0;
 
     lv_spangroup_refresh(obj);
 
@@ -193,6 +194,11 @@ void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
             if(cur_span->txt && cur_span->static_flag == 0) {
                 lv_free(cur_span->txt);
                 cur_span->txt = NULL;
+            }
+            if(cur_span->style && cur_span->static_style_flag == 0) {
+                lv_style_reset((lv_style_t *)cur_span->style);
+                lv_free((void *)cur_span->style);
+                cur_span->style = NULL;
             }
             lv_free(cur_span);
             cur_span = NULL;
@@ -333,7 +339,36 @@ void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_styl
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(span);
+    LV_ASSERT_NULL(style);
 
+    if(!span->style || span->static_style_flag) {
+        /* Either the span doesn't have a style yet or the current style is not owned by the span */
+        span->style = lv_malloc(sizeof(lv_style_t));
+        span->static_style_flag = 0;
+        LV_ASSERT_MALLOC(span->style);
+        if(!span->style) {
+            return;
+        }
+
+        lv_style_init((lv_style_t *)span->style);
+    }
+    lv_style_copy((lv_style_t *)span->style, style);
+
+    lv_spangroup_refresh(obj);
+}
+
+void lv_spangroup_set_span_style_static(lv_obj_t * obj, lv_span_t * span, const lv_style_t * style)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(span);
+
+    if(span->style && !span->static_style_flag) {
+        /* The span has a style and it's owned by the span, free it before assigning the new style */
+        lv_style_reset((lv_style_t *)span->style);
+        lv_free((void *)span->style);
+    }
+
+    span->static_style_flag = 1;
     span->style = style;
 
     lv_spangroup_refresh(obj);
@@ -846,6 +881,11 @@ static void lv_spangroup_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         if(cur_span->txt && cur_span->static_flag == 0) {
             lv_free(cur_span->txt);
             cur_span->txt = NULL;
+        }
+        if(cur_span->style && cur_span->static_style_flag == 0) {
+            lv_style_reset((lv_style_t *)cur_span->style);
+            lv_free((void *)cur_span->style);
+            cur_span->style = NULL;
         }
         lv_free(cur_span);
         cur_span = lv_ll_get_head(&spans->child_ll);
