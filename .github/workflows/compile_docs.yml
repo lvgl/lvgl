@@ -2,7 +2,6 @@ name: Build docs
 on:
   pull_request:
     paths:
-      # These are the only files that impact the doc build.
       - 'docs/**'
       - 'src/**/lv*.h'
       - 'examples/**'
