@@ -99,10 +99,15 @@ void lv_draw_dma2d_init(void)
     /* enable the DMA2D clock */
 #if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
+#if defined(STM32F4) || defined(STM32F7)
+    RCC->AHB1LPENR |= RCC_AHB1LPENR_DMA2DLPEN;
+#endif
 #elif defined(STM32H7)
     RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
+    RCC->AHB3LPENR |= RCC_AHB3LPENR_DMA2DLPEN;
 #elif defined(STM32H7RS) || defined(STM32N6)
     RCC->AHB5ENR |= RCC_AHB5ENR_DMA2DEN;
+    RCC->AHB5LPENR |= RCC_AHB5LPENR_DMA2DLPEN;
 #else
 #warning "LVGL can't enable the clock for DMA2D"
 #endif
