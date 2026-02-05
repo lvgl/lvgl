@@ -67,5 +67,8 @@ if compr:
 cmd.extend(["--bpp", str(args.bpp), "--size", str(args.size), "--font", args.font, "-r", args.range[0]])
 if args.symbols[0]:
     cmd.extend(args.symbols[0].split())
-cmd.extend(["--font", "FontAwesome5-Solid+Brands+Regular.woff", "-r", syms, "--format", "lvgl", "-o", args.output, "--force-fast-kern-format"])
+cmd.extend(["--font", "FontAwesome5-Solid+Brands+Regular.woff", "-r", syms, "--format", "lvgl"])
+if args.output:
+    cmd.extend(["-o", args.output])
+cmd.append("--force-fast-kern-format")
 subprocess.run(cmd, check=True)
