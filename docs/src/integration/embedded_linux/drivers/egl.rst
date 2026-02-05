@@ -20,7 +20,7 @@ EGL with DRM
 
 EGL can be used together with the DRM driver for hardware-accelerated rendering.
 
-When :c:macro:`LV_LINUX_DRM_USE_EGL` is enabled, the DRM driver will automatically set up EGL.
+When :c:macro:`LV_USE_OPENGLES` is enabled, the DRM driver will automatically set up EGL.
 No additional initialization is required beyond the normal DRM setup.
 
 See :ref:`linux_drm` for configuration and a basic usage example.
