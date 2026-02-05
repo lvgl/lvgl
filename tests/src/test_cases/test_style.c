@@ -226,4 +226,23 @@ void test_style_has_prop(void)
     lv_style_reset(&style);
 }
 
+void test_style_remove_theme(void)
+{
+    lv_obj_t * sw = lv_switch_create(lv_screen_active());
+    lv_obj_set_size(sw, 100, 50);
+    lv_obj_set_style_bg_color(sw, lv_color_hex(0xff0000), 0);
+
+    lv_obj_remove_theme(sw);
+
+    lv_obj_update_layout(sw);
+
+    /*Local style props are kept*/
+    TEST_ASSERT_EQUAL(100, lv_obj_get_width(sw));
+    TEST_ASSERT_EQUAL(50, lv_obj_get_height(sw));
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(sw, 0));
+
+    /*Bg. opa is back to the default 0*/
+    TEST_ASSERT_EQUAL(0, lv_obj_get_style_bg_opa(sw, 0));
+}
+
 #endif

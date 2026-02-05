@@ -137,6 +137,13 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
  */
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
+
+/**
+ * Remove all styles added by a theme from a widget
+ * @param obj   pointer to a widget
+ */
+void lv_obj_remove_theme(lv_obj_t * obj);
+
 /**
  * Remove all styles from an object
  * @param obj       pointer to an object

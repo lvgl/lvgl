@@ -262,6 +262,17 @@ void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_sele
     }
 }
 
+void lv_obj_remove_theme(lv_obj_t * obj)
+{
+    if(obj->style_cnt == 0) return;
+    for(int32_t i = obj->style_cnt - 1; i >= 0; i--) {
+        lv_obj_style_t * s = &obj->styles[i];
+
+        if(s->is_theme) lv_obj_remove_style(obj, s->style, s->selector);
+    }
+
+}
+
 void lv_obj_remove_style_all(lv_obj_t * obj)
 {
     lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
