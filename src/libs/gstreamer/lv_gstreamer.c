@@ -14,6 +14,7 @@
 #include <glib.h>
 #include <gst/gstelementfactory.h>
 #include "../../core/lv_obj_class_private.h"
+#include "../../misc/lv_event_private.h"
 
 /*********************
  *      DEFINES
@@ -45,6 +46,7 @@ static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer);
 static void gstreamer_update_frame(lv_gstreamer_t * streamer);
 static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
                                                       const lv_gstreamer_pipeline_element_t * elements, size_t element_count);
+static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state);
 
 /**********************
  *  STATIC VARIABLES
@@ -184,7 +186,9 @@ void lv_gstreamer_play(lv_obj_t * obj)
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_PLAYING);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to play pipeline");
+        return;
     }
+    gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_PLAY);
 }
 
 void lv_gstreamer_pause(lv_obj_t * obj)
@@ -202,7 +206,9 @@ void lv_gstreamer_pause(lv_obj_t * obj)
 
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to pause pipeline");
+        return;
     }
+    gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_PAUSE);
 }
 
 void lv_gstreamer_stop(lv_obj_t * obj)
@@ -219,7 +225,9 @@ void lv_gstreamer_stop(lv_obj_t * obj)
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_READY);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to stop pipeline");
+        return;
     }
+    gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_STOP);
 }
 void lv_gstreamer_set_position(lv_obj_t * obj, uint32_t position)
 {
@@ -362,6 +370,15 @@ void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
     }
 }
 
+lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e)
+{
+    if(!e || e->code != LV_EVENT_STATE_CHANGED) {
+        LV_LOG_WARN("Invalid event");
+        return -1;
+    }
+    return *(lv_gstreamer_stream_state_t *)lv_event_get_param(e);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -401,8 +418,7 @@ static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
                     break;
                 }
             case GST_MESSAGE_EOS:
-                LV_LOG_INFO("End of stream");
-                if(lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_STATE_CHANGED, NULL) == LV_RESULT_INVALID) {
+                if(gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_END) == LV_RESULT_INVALID) {
                     /* Object deleted inside event handler */
                     gst_object_unref(bus);
                     gst_message_unref(msg);
@@ -476,6 +492,11 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     /* We send the event AFTER setting the image source so that users can query the
      * resolution on this specific event callback */
     if(first_frame) {
+        if(gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_START) == LV_RESULT_INVALID) {
+            /* Object deleted inside event handler */
+            return;
+        }
+        /*Send READY event for backwards compatibility with v9.4*/
         lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_READY, streamer);
     }
 
@@ -647,5 +668,10 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
 
     g_async_queue_push(streamer->frame_queue, sample);
     return GST_FLOW_OK;
+}
+
+static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state)
+{
+    return lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_STATE_CHANGED, &state);
 }
 #endif

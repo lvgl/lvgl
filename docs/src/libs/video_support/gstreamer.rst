@@ -172,9 +172,7 @@ Here's how to create a basic GStreamer player and load media:
 Events
 ------
 
--  :cpp:enumerator:`LV_EVENT_READY` Sent when the stream is parsed and the first frame is ready.
--  :cpp:enumerator:`LV_EVENT_STATE_CHANGED` Sent when the stream state changes (e.g. end of stream is reached).
-
+-  :cpp:enumerator:`LV_EVENT_STATE_CHANGED` Sent when the stream state changes. The event that originated the event can be retrieved by the event parameter (e.g :cpp:func:`lv_event_get_param`)
 
 Event Handling
 --------------
@@ -185,22 +183,38 @@ Handle GStreamer events using LVGL's event system:
 
     static void gstreamer_event_cb(lv_event_t * e)
     {
+
         lv_event_code_t code = lv_event_get_code(e);
         lv_obj_t * streamer = lv_event_get_target_obj(e);
 
-        if(code == LV_EVENT_READY) {
+        if(code != LV_EVENT_STATE_CHANGED) {
+            return;
+        }
+
+        lv_gstreamer_stream_state_t stream_state = lv_gstreamer_get_stream_state(e);
+        switch(stream_state) {
+            case LV_GSTREAMER_STREAM_STATE_START:
                 LV_LOG_USER("Stream ready - Duration: %" LV_PRIu32 " ms",
-                           lv_gstreamer_get_duration(streamer));
-                LV_LOG_USER("Resolution: %" LV_PRId32 "x%" LV_PRId32,
-                           lv_image_get_src_width(streamer),
-                           lv_image_get_src_height(streamer));
-        } else if (code == LV_EVENT_STATE_CHANGED) {
+                        lv_gstreamer_get_duration(streamer));
+                LV_LOG_USER("\tStream resolution %" LV_PRId32 "x%" LV_PRId32, lv_image_get_src_width(streamer),
+                        lv_image_get_src_height(streamer));
+                break;
+            case LV_GSTREAMER_STREAM_STATE_END:
                 LV_LOG_USER("Stream is over");
+                break;
+            case LV_GSTREAMER_STREAM_STATE_PLAY:
+                LV_LOG_USER("Stream set to play");
+                break;
+            case LV_GSTREAMER_STREAM_STATE_PAUSE:
+                LV_LOG_USER("Stream set to pause");
+                break;
+            case LV_GSTREAMER_STREAM_STATE_STOP:
+                LV_LOG_USER("Stream set to stop");
+                break;
         }
     }
 
     /* Add event callback */
-    lv_obj_add_event_cb(streamer, gstreamer_event_cb, LV_EVENT_READY, NULL);
     lv_obj_add_event_cb(streamer, gstreamer_event_cb, LV_EVENT_STATE_CHANGED, NULL);
 
 
