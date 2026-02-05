@@ -1409,7 +1409,22 @@ static void screen_event_delete_cb(lv_event_t * e)
     *screen_var = NULL;
 }
 
-/* Returns true if the old screen was deleted while loading the new screen*/
+/**
+ * Load a new screen and report the result.
+ *
+ * @param scr  the screen object to load; must not be NULL
+ * @return     a value of ::lv_load_screen_result_t indicating the outcome:
+ *             - LV_LOAD_SCREEN_RESULT_OK: the new screen was loaded successfully;
+ *               both the old and new screens remain valid.
+ *             - LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED: the old screen was
+ *               deleted while loading the new screen, but the new screen remains valid.
+ *             - LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED: the new screen was
+ *               deleted during loading/unloading events; the old screen remains valid.
+ *             - LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED: both the old and new
+ *               screens were deleted during the operation.
+ *             - LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED: the display was deleted
+ *               while processing screen load/unload events.
+ */
 static lv_load_screen_result_t load_new_screen(lv_obj_t * scr)
 {
     /*scr must not be NULL, but d->act_scr might be*/
