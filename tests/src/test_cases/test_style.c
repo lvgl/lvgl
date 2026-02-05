@@ -230,19 +230,21 @@ void test_style_remove_theme(void)
 {
     lv_obj_t * sw = lv_switch_create(lv_screen_active());
     lv_obj_set_size(sw, 100, 50);
-    lv_obj_set_style_bg_color(sw, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_bg_color(sw, lv_color_hex(0xff0000), LV_PART_KNOB);
 
-    lv_obj_remove_theme(sw);
+    lv_obj_remove_theme(sw, LV_PART_KNOB);
 
     lv_obj_update_layout(sw);
 
-    /*Local style props are kept*/
+    /*Local style props are kept on main*/
     TEST_ASSERT_EQUAL(100, lv_obj_get_width(sw));
     TEST_ASSERT_EQUAL(50, lv_obj_get_height(sw));
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(sw, 0));
+
+    /*Local style is kept on the knob*/
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(sw, LV_PART_KNOB));
 
     /*Bg. opa is back to the default 0*/
-    TEST_ASSERT_EQUAL(0, lv_obj_get_style_bg_opa(sw, 0));
+    TEST_ASSERT_EQUAL(0, lv_obj_get_style_bg_opa(sw, LV_PART_KNOB));
 }
 
 #endif
