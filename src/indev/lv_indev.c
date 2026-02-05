@@ -816,12 +816,16 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL);
 
     lv_group_t * g = i->group;
-    if(g == NULL) return;
 
-    indev_obj_act = lv_group_get_focused(g);
-    if(indev_obj_act == NULL) return;
+    if(g != NULL) {
+        indev_obj_act = lv_group_get_focused(g);
+        if(indev_obj_act == NULL) return;
+    }
+    else {
+        indev_obj_act = NULL;
+    }
 
-    const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+    const bool is_enabled = (g == NULL) || !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
     /*Save the previous state so we can detect state changes below and also set the last state now
      *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
@@ -834,8 +838,11 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_INFO("%" LV_PRIu32 " key is pressed", data->key);
         i->pr_timestamp = i->timestamp;
 
+        if(g == NULL) {
+            if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
+        }
         /*Move the focus on NEXT*/
-        if(data->key == LV_KEY_NEXT) {
+        else if(data->key == LV_KEY_NEXT) {
             lv_group_set_editing(g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
             lv_group_focus_next(g);
             if(indev_reset_check(i)) return;
@@ -873,14 +880,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Pressing*/
     else if(is_enabled && data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
 
-        if(data->key == LV_KEY_ENTER) {
+        if(g == NULL || data->key == LV_KEY_ENTER) {
             if(send_event(LV_EVENT_PRESSING, indev_act) == LV_RESULT_INVALID) return;
         }
 
         /*Long press time has elapsed?*/
         if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) >= i->long_press_time) {
             i->long_pr_sent = 1;
-            if(data->key == LV_KEY_ENTER) {
+            if(g == NULL || data->key == LV_KEY_ENTER) {
                 i->longpr_rep_timestamp = i->timestamp;
 
                 if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
@@ -893,7 +900,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->longpr_rep_timestamp = i->timestamp;
 
             /*Send LONG_PRESS_REP on ENTER*/
-            if(data->key == LV_KEY_ENTER) {
+            if(g == NULL || data->key == LV_KEY_ENTER) {
                 if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
             }
             /*Move the focus on NEXT again*/
@@ -921,7 +928,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
-        if(data->key == LV_KEY_ENTER) {
+        if(g == NULL || data->key == LV_KEY_ENTER) {
 
             if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
 
