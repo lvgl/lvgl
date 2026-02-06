@@ -687,7 +687,7 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
     params.disp_h = targ_tex_h;
     params.texture_clip_area = &clip_area;
     params.h_flip = dsc->h_flip;
-    params.v_flip = !dsc->v_flip;
+    params.v_flip = dsc->v_flip;
     params.blend_opt = true;
     lv_opengles_render(&params);
 
