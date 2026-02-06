@@ -2,7 +2,7 @@ name: Build docs
 on:
   pull_request:
     paths:
-      # './**/lv*.h' is not included for pull requests because files in this path
+      # '**/lv*.h' is not included for pull requests because files in this path
       # cannot break the doc build, and the purpose of having the docs build for
       # pull requests is to catch when something breaks the build.  No input files
       # in that path have the capacity to break the doc build.
@@ -17,7 +17,7 @@ on:
       - 'release/*'
     paths:
       - 'docs/**'
-      - './**/lv*.h'
+      - '**/lv*.h'
       - 'examples/**'
       - 'demos/**'
       - 'scripts/build_html_examples.sh'
