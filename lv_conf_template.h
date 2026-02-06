@@ -608,6 +608,9 @@
 /** Define a custom attribute for `lv_display_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
 
+/** Define a custom attribute for `lv_display_sync_ready` function */
+#define LV_ATTRIBUTE_SYNC_READY
+
 /** Align VG_LITE buffers on this number of bytes.
  *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
