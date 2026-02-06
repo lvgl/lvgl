@@ -112,11 +112,18 @@ void lv_draw_nema_gfx_init(void)
     /*Initialize Freetype Support*/
     lv_draw_nema_gfx_label_init(&(draw_nema_gfx_unit->base_unit));
 #endif
+
+#if CONFIG_LV_NEMA_LIB_M55
+    /*Create GPU Command List*/
+    draw_nema_gfx_unit->cl = nema_cl_create_sized(8*1024);
+    /*Bind Command List*/
+    nema_cl_bind_sectored_circular(&(draw_nema_gfx_unit->cl),8);
+#else
     /*Create GPU Command List*/
     draw_nema_gfx_unit->cl = nema_cl_create();
     /*Bind Command List*/
-    nema_cl_bind_circular(&(draw_nema_gfx_unit->cl));
-
+    nema_cl_bind_circular(&draw_nema_gfx_unit->cl);
+#endif
 
 #if LV_USE_OS
     lv_thread_init(&draw_nema_gfx_unit->thread, "nemagfx", LV_DRAW_THREAD_PRIO, nema_gfx_render_thread_cb, 2 * 1024,

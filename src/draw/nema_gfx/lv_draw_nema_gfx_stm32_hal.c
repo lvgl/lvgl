@@ -26,12 +26,21 @@
 
 #include LV_NEMA_STM32_HAL_INCLUDE
 
-extern GPU2D_HandleTypeDef hgpu2d;
-
+#if defined(__ZEPHYR__)
+#include <zephyr/kernel.h>
+#include <zephyr/irq.h>
+static struct k_sem gpu2d_sync;
+#else
+static lv_thread_sync_t sync;
+#endif
+static GPU2D_HandleTypeDef hgpu2d;
+static volatile int last_cl_id = -1;
 /*********************
  *      DEFINES
  *********************/
-
+#if CONFIG_LV_NEMA_LIB_M55
+#define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM  __attribute__((section("Nemagfx_Memory_Pool_Buffer"))) /* Non-Cachable GPU Memory */
+#endif
 #define RING_SIZE                      1024 /* Ring Buffer Size in byte */
 
 /* NemaGFX byte pool size in bytes.
@@ -51,6 +60,8 @@ extern GPU2D_HandleTypeDef hgpu2d;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void stm32_gpu2d_isr(const void *arg);
+static void stm32_gpu2d_interrupt_init(void);
 
 #if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
     static void GPU2D_CommandListCpltCallback(GPU2D_HandleTypeDef * hgpu2d, uint32_t CmdListID);
@@ -59,12 +70,12 @@ extern GPU2D_HandleTypeDef hgpu2d;
 /**********************
  *  STATIC VARIABLES
  **********************/
-
+#if CONFIG_LV_NEMA_LIB_M55
 static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE] LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM; /* NemaGFX memory pool */
-
+#else
+static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE]; /* NemaGFX memory pool */
+#endif
 static nema_ringbuffer_t ring_buffer_str;
-static volatile int last_cl_id = -1;
-static lv_thread_sync_t sync;
 
 /**********************
  *      MACROS
@@ -73,6 +84,10 @@ static lv_thread_sync_t sync;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+static void stm32_gpu2d_isr(const void *arg)
+{
+	HAL_GPU2D_IRQHandler(&hgpu2d);
+}
 
 #if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
     static void GPU2D_CommandListCpltCallback(GPU2D_HandleTypeDef * hgpu2d, uint32_t CmdListID)
@@ -83,14 +98,51 @@ static lv_thread_sync_t sync;
     LV_UNUSED(hgpu2d);
 
     last_cl_id = CmdListID;
+#if defined(__ZEPHYR__)
+    k_sem_give(&gpu2d_sync);
+#else
     lv_thread_sync_signal_isr(&sync);
+#endif
+}
+
+static void stm32_gpu2d_interrupt_init(void)
+{
+#if defined(__ZEPHYR__)
+	k_sem_init(&gpu2d_sync, 0, 1);
+
+	IRQ_CONNECT(DT_IRQN(DT_NODELABEL(gpu2d)),
+		DT_IRQ_BY_NAME(DT_NODELABEL(gpu2d), gpu2d, priority),
+		stm32_gpu2d_isr,
+		NULL,
+		0);
+	irq_enable(DT_IRQN(DT_NODELABEL(gpu2d)));
+#else
+	lv_thread_sync_init(&sync);
+	NVIC_EnableIRQ(GPU2D_IRQn);
+#endif
 }
 
 int32_t nema_sys_init(void)
 {
     int error_code = 0;
 
-    lv_thread_sync_init(&sync);
+    /* Enable GPU2D clock */
+    __HAL_RCC_GPU2D_CLK_ENABLE();
+    /* Force reset GPU2D peripheral */
+    __HAL_RCC_GPU2D_FORCE_RESET();
+    __HAL_RCC_GPU2D_RELEASE_RESET();
+    /* Enable ICACHE and set Associativity Mode*/
+    HAL_ICACHE_Enable();
+    HAL_ICACHE_ConfigAssociativityMode(ICACHE_1WAY);
+
+    hgpu2d.Instance = GPU2D;
+
+    if (HAL_GPU2D_Init(&hgpu2d) != HAL_OK) {
+            printk("HAL_GPU2D_Init failed\n");
+    }
+
+    /* Configure  GPU2D Interrupt */
+    stm32_gpu2d_interrupt_init();
 
     /* Setup GPU2D Callback */
 #if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
@@ -134,8 +186,12 @@ void nema_reg_write(uint32_t reg, uint32_t value)
 
 int nema_wait_irq(void)
 {
-    lv_thread_sync_wait(&sync);
-    return 0;
+#if defined(__ZEPHYR__)
+	return k_sem_take(&gpu2d_sync, K_FOREVER);
+#else
+	lv_thread_sync_wait(&sync);
+	return 0;
+#endif
 }
 
 

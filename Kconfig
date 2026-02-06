@@ -530,7 +530,7 @@ menu "LVGL configuration"
 
 		config LV_DRAW_DMA2D_HAL_INCLUDE
 			string "the header file for LVGL to include for DMA2D"
-			default "stm32h7xx_hal.h"
+			default "stm32u5xx_hal.h"
 			depends on LV_USE_DRAW_DMA2D
 
 		config LV_USE_DRAW_DMA2D_INTERRUPT
@@ -2330,6 +2330,80 @@ menu "LVGL configuration"
 			config LV_USE_DEMO_HIGH_RES
 			bool "High resolution demo"
 		endif
+	endmenu
+
+	menu "LVGL NemaGFX support"
+		config LV_USE_NEMA_GFX
+		bool "Enable Think Silicon NemaGFX acceleration"
+			depends on LVGL
+			help
+			Enable LVGL rendering acceleration using Think Silicon NemaGFX.
+
+	if LV_USE_NEMA_GFX
+
+		choice LV_NEMA_LIB_CHOICE
+			prompt "NemaGFX library variant"
+			default LV_NEMA_LIB_M33_REVC
+
+			config LV_NEMA_LIB_NONE
+				bool "Default (M33 RevC)"
+
+			config LV_NEMA_LIB_M33_REVC
+				bool "M33 RevC"
+
+			config LV_NEMA_LIB_M33_NEMAPVG
+				bool "M33 NemaP-VG"
+
+			config LV_NEMA_LIB_M55
+				bool "M55"
+
+			config LV_NEMA_LIB_M7
+				bool "M7"
+		endchoice
+
+		config LV_USE_NEMA_LIB
+			int
+			default 0 if LV_NEMA_LIB_NONE
+			default 1 if LV_NEMA_LIB_M33_REVC
+			default 2 if LV_NEMA_LIB_M33_NEMAPVG
+			default 3 if LV_NEMA_LIB_M55
+			default 4 if LV_NEMA_LIB_M7
+
+		choice LV_NEMA_HAL_CHOICE
+			prompt "NemaGFX HAL implementation"
+			default LV_NEMA_HAL_STM32
+
+			config LV_NEMA_HAL_CUSTOM
+			bool "Custom HAL"
+
+			config LV_NEMA_HAL_STM32
+			bool "STM32 HAL"
+			depends on SOC_FAMILY_STM32
+		endchoice
+
+			config LV_USE_NEMA_HAL
+			int
+			default 0 if LV_NEMA_HAL_CUSTOM
+			default 1 if LV_NEMA_HAL_STM32
+
+			config LV_NEMA_STM32_HAL_INCLUDE
+			string "STM32 HAL header include"
+			depends on LV_NEMA_HAL_STM32
+			default "stm32u5xx_hal.h"
+
+		config LV_USE_NEMA_VG
+			bool "Enable NemaVG (Vector Graphics)"
+
+		if LV_USE_NEMA_VG
+			config LV_NEMA_GFX_MAX_RESX
+			int "Maximum horizontal resolution"
+			default 800
+
+			config LV_NEMA_GFX_MAX_RESY
+			int "Maximum vertical resolution"
+			default 600
+		endif # LV_USE_NEMA_VG
+	endif # LV_USE_NEMA_GFX
 	endmenu
 
 endmenu
