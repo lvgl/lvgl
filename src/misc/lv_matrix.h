@@ -123,6 +123,14 @@ bool lv_matrix_is_identity(const lv_matrix_t * matrix);
  */
 bool lv_matrix_is_identity_or_translation(const lv_matrix_t * matrix);
 
+/**
+ * Convert the internal row-major matrix to a column-major flat array.
+ * Required for OpenGLES which expects translation components in the last column of the matrix memory.
+ * @param matrix    pointer to the source lv_matrix_t (row-major)
+ * @param out_ptr   pointer to a float[9] array where the result will be stored
+ */
+void lv_matrix_get_gl_matrix(const lv_matrix_t * matrix, float * out_ptr);
+
 /**********************
  *      MACROS
  **********************/

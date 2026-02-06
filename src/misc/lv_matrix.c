@@ -243,6 +243,22 @@ bool lv_matrix_is_identity_or_translation(const lv_matrix_t * matrix)
             matrix->m[2][2] == 1.0f);
 }
 
+void lv_matrix_get_gl_matrix(const lv_matrix_t * matrix, float * out_ptr)
+{
+    /* Unrolled transposition: Row-Major to Column-Major */
+    out_ptr[0] = matrix->m[0][0];
+    out_ptr[1] = matrix->m[1][0];
+    out_ptr[2] = matrix->m[2][0];
+
+    out_ptr[3] = matrix->m[0][1];
+    out_ptr[4] = matrix->m[1][1];
+    out_ptr[5] = matrix->m[2][1];
+
+    out_ptr[6] = matrix->m[0][2];
+    out_ptr[7] = matrix->m[1][2];
+    out_ptr[8] = matrix->m[2][2];
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
