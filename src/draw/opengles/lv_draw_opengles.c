@@ -577,8 +577,9 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 float tex_h = (float)lv_area_get_height(&fill_area);
                 GL_CALL(glEnable(GL_SCISSOR_TEST));
                 GL_CALL(glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h));
-                GL_CALL(glClearColor((float)fill_dsc->color.red / 255.0f, (float)fill_dsc->color.green / 255.0f,
-                                     (float)fill_dsc->color.blue / 255.0f, 1.0f));
+                /* swap red and blue channels here as they will be swapped back during flushing*/
+                GL_CALL(glClearColor((float)fill_dsc->color.blue / 255.0f, (float)fill_dsc->color.green / 255.0f,
+                                     (float)fill_dsc->color.red / 255.0f, 1.0f));
                 GL_CALL(glClearDepthf(1.0f));
                 GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
                 GL_CALL(glDisable(GL_SCISSOR_TEST));
