@@ -17,11 +17,13 @@ on:
       - 'release/*'
     paths:
       - 'docs/**'
-      - '**/lv*.h'
+      - 'src/**/lv*.h'
       - 'examples/**'
       - 'demos/**'
       - 'scripts/build_html_examples.sh'
       - 'scripts/find_version.sh'
+      - 'lv_conf_template.h'
+      - 'lvgl.h'
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each PR
