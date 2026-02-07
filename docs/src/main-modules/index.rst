@@ -17,3 +17,4 @@ Main Modules
     fs
     observer/index
     draw/index
+    translation
