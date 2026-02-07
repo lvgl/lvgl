@@ -32,7 +32,7 @@ Usage
 Create a Window
 ---------------
 
-:cpp:expr:`lv_win_create(parent, header_height)` creates a Window with an empty
+:cpp:expr:`lv_win_create(parent)` creates a Window with an empty
 header.
 
 Title and buttons
