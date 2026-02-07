@@ -73,6 +73,14 @@ typedef enum {
     LV_GSTREAMER_STATE_PLAYING
 } lv_gstreamer_state_t;
 
+typedef enum {
+    LV_GSTREAMER_STREAM_STATE_START,
+    LV_GSTREAMER_STREAM_STATE_PLAY,
+    LV_GSTREAMER_STREAM_STATE_PAUSE,
+    LV_GSTREAMER_STREAM_STATE_STOP,
+    LV_GSTREAMER_STREAM_STATE_END
+} lv_gstreamer_stream_state_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -169,6 +177,13 @@ uint8_t lv_gstreamer_get_volume(lv_obj_t * gstreamer);
  *                      - 512:   2x
  */
 void lv_gstreamer_set_rate(lv_obj_t * gstreamer, uint32_t rate);
+
+/**
+ * Retrieve the stream state from a STATE_CHANGED event callback
+ * @param e     pointer to the event
+ * @return the stream state or -1 if `e` is invalid (i.e. NULL or does not match expected event)
+ */
+lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e);
 
 
 /**********************
