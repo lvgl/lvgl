@@ -2106,6 +2106,15 @@
     #endif
 #endif
 
+/** When a line is breaks on a soft hyphen, a dash is added to the end. */
+#ifndef LV_TXT_SOFT_HYPHEN_BREAK
+    #ifdef CONFIG_LV_TXT_SOFT_HYPHEN_BREAK
+        #define LV_TXT_SOFT_HYPHEN_BREAK CONFIG_LV_TXT_SOFT_HYPHEN_BREAK
+    #else
+        #define LV_TXT_SOFT_HYPHEN_BREAK 0
+    #endif
+#endif
+
 /** While rendering text strings, break (wrap) text on these chars. */
 #ifndef LV_TXT_BREAK_CHARS
     #ifdef CONFIG_LV_TXT_BREAK_CHARS
