@@ -107,18 +107,9 @@ typedef struct {
 } lv_draw_dma2d_configuration_t;
 
 typedef struct {
-    const void * first_byte;
-    uint32_t width_bytes;
-    uint32_t height;
-    uint32_t stride;
-} lv_draw_dma2d_cache_area_t;
-
-typedef struct {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * volatile task_act;
-#if LV_DRAW_DMA2D_CACHE
-    lv_draw_dma2d_cache_area_t writing_area;
-#endif
+    lv_area_t clipped_area;
 #if LV_DRAW_DMA2D_ASYNC
     lv_thread_sync_t interrupt_signal;
 #endif
@@ -128,19 +119,12 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_dma2d_opaque_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32_t h, int32_t stride);
 void lv_draw_dma2d_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32_t h, int32_t stride);
-void lv_draw_dma2d_opaque_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                                const lv_area_t * coords);
 void lv_draw_dma2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                          const lv_area_t * coords);
 lv_draw_dma2d_output_cf_t lv_draw_dma2d_cf_to_dma2d_output_cf(lv_color_format_t cf);
 uint32_t lv_draw_dma2d_color_to_dma2d_color(lv_draw_dma2d_output_cf_t cf, lv_color_t color);
 void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf);
-#if LV_DRAW_DMA2D_CACHE
-void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area);
-void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area);
-#endif
 
 /**********************
  *      MACROS
