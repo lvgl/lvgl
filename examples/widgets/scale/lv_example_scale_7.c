@@ -66,7 +66,7 @@ void lv_example_scale_7(void)
     lv_scale_set_range(scale, 10, 40);
 
     lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(scale, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(scale, true);
 }
 
 #endif

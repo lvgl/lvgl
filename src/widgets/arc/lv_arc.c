@@ -536,8 +536,9 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     arc->last_angle = arc->indic_angle_end;
     arc->in_out = CLICK_OUTSIDE_BG_ANGLES;
 
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN | LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_clickable(obj, true);
+    lv_obj_set_scroll_chain(obj, false);
+    lv_obj_set_scrollable(obj, false);
     lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -581,7 +582,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             r -= indic_width;
             /*Add some more sensitive area if there is no advanced hit testing.
              * (Advanced hit testing is more precise)*/
-            if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
+            if(lv_obj_get_adv_hittest(obj)) {
                 r -= indic_width;
             }
             else {

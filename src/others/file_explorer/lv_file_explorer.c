@@ -305,7 +305,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*The area displayed above the file browse list(head)*/
     explorer->head_area = lv_obj_create(explorer->browser_area);
     lv_obj_set_size(explorer->head_area, LV_PCT(100), LV_PCT(14));
-    lv_obj_remove_flag(explorer->head_area, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(explorer->head_area, false);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
     /*Two lists of quick access bar*/
@@ -502,7 +502,7 @@ static void quick_access_area_event_handler(lv_event_t * e)
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     if(code == LV_EVENT_LAYOUT_CHANGED) {
-        if(lv_obj_has_flag(area, LV_OBJ_FLAG_HIDDEN))
+        if(lv_obj_get_hidden(area))
             lv_obj_set_size(explorer->browser_area, LV_PCT(100), LV_PCT(100));
         else
             lv_obj_set_size(explorer->browser_area, LV_PCT(FILE_EXPLORER_BROWSER_AREA_WIDTH), LV_PCT(100));

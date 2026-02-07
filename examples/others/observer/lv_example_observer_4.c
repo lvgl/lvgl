@@ -57,7 +57,7 @@ void lv_example_observer_4(void)
     lv_subject_add_observer_obj(&current_tab_subject, indicator_observer_cb, indicator, NULL);
     lv_obj_set_height(indicator, 10);
     lv_obj_align(indicator, LV_ALIGN_BOTTOM_LEFT, 0, 0);
-    lv_obj_add_flag(indicator, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_set_ignore_layout(indicator, true);
 
     /*Be sure the indicator has the correct size*/
     lv_obj_update_layout(indicator);

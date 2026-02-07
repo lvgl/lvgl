@@ -85,10 +85,10 @@ void lv_example_gestures(void)
 
     lv_obj_set_style_bg_color(root_view, lv_color_hex(0xffffff), LV_PART_MAIN);
     label = lv_label_create(root_view);
-    lv_obj_remove_flag(root_view, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(root_view, false);
 
     lv_label_set_text(label, "Zoom, rotate or move");
-    lv_obj_add_flag(label, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(label, true);
 
     lv_style_init(&label_style);
     lv_style_set_bg_color(&label_style, lv_color_hex(RECT_COLOR));

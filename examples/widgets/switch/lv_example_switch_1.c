@@ -20,7 +20,7 @@ void lv_example_switch_1(void)
 
     sw = lv_switch_create(lv_screen_active());
     lv_obj_add_event_cb(sw, event_handler, LV_EVENT_ALL, NULL);
-    lv_obj_add_flag(sw, LV_OBJ_FLAG_EVENT_BUBBLE);
+    lv_obj_set_event_bubble(sw, true);
 
     sw = lv_switch_create(lv_screen_active());
     lv_obj_add_state(sw, LV_STATE_CHECKED);

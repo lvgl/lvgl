@@ -140,7 +140,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 #endif
 
     const lv_area_t * obj_coords;
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+    if(lv_obj_get_overflow_visible(obj)) {
         obj_coords = &obj_coords_ext;
     }
     else {
@@ -459,7 +459,7 @@ lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_obj_t * found_p = NULL;
 
     if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
+    if(lv_obj_get_hidden(obj)) return NULL;
     if(lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
     if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return NULL;
 
@@ -495,7 +495,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
 {
     LV_ASSERT_NULL(layer);
     LV_ASSERT_NULL(obj);
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
+    if(lv_obj_get_hidden(obj)) return;
 
     /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/
     const lv_opa_t opa_layered = lv_obj_get_style_opa_layered(obj, LV_PART_MAIN);

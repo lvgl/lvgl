@@ -640,7 +640,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->txt_src = NULL;
     lv_array_init(&scale->needles, 0, sizeof(lv_scale_needle_t));
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(obj, false);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

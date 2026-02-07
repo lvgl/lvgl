@@ -9,8 +9,8 @@ static void sw_event_cb(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t * list = (lv_obj_t *) lv_event_get_user_data(e);
 
-        if(lv_obj_has_state(sw, LV_STATE_CHECKED)) lv_obj_add_flag(list, LV_OBJ_FLAG_SCROLL_ONE);
-        else lv_obj_remove_flag(list, LV_OBJ_FLAG_SCROLL_ONE);
+        if(lv_obj_has_state(sw, LV_STATE_CHECKED)) lv_obj_set_scroll_one(list, true);
+        else lv_obj_set_scroll_one(list, false);
     }
 }
 
@@ -33,7 +33,7 @@ void lv_example_scroll_2(void)
         lv_obj_t * label = lv_label_create(btn);
         if(i == 3) {
             lv_label_set_text_fmt(label, "Panel %" LV_PRIu32"\nno snap", i);
-            lv_obj_remove_flag(btn, LV_OBJ_FLAG_SNAPPABLE);
+            lv_obj_set_snappable(btn, false);
         }
         else {
             lv_label_set_text_fmt(label, "Panel %" LV_PRIu32, i);

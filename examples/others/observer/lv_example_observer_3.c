@@ -76,7 +76,7 @@ static void set_btn_clicked_event_cb(lv_event_t * e)
     lv_obj_align(cont, LV_ALIGN_BOTTOM_MID, 0, 0);
 
     lv_obj_t * hour_roller = lv_roller_create(cont);
-    lv_obj_add_flag(hour_roller, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    lv_obj_set_flex_in_new_track(hour_roller, true);
     lv_subject_add_observer_obj(&format_subject, hour_roller_options_update, hour_roller, NULL);
     lv_roller_bind_value(hour_roller, &hour_subject);
     lv_obj_set_pos(hour_roller, 0, 0);

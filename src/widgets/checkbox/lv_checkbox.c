@@ -156,10 +156,10 @@ static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     cb->static_txt = 1;
 #endif
 
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_clickable(obj, true);
+    lv_obj_set_checkable(obj, true);
+    lv_obj_set_scroll_on_focus(obj, true);
+    lv_obj_set_scrollable(obj, false);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
