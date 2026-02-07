@@ -634,7 +634,7 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     view->view_projection_matrix = fastgltf::math::fmat4x4(1.0f);
     view->camera_pos = fastgltf::math::fvec3(0.0f);
     view->texture.h_flip = false;
-    view->texture.v_flip = false;
+    view->texture.v_flip = true;
     new(&view->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
     lv_opengl_shader_portions_t portions;
