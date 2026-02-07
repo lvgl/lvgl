@@ -23,6 +23,7 @@ on:
       - 'scripts/build_html_examples.sh'
       - 'scripts/find_version.sh'
       - 'lv_conf_template.h'
+      - 'lv_version.h'
       - 'lvgl.h'
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
