@@ -140,6 +140,15 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
  */
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
+
+/**
+ * Remove all styles added by a theme from a widget
+ * @param selector  OR-ed values of states and a part to remove only styles with matching selectors.
+ *                  LV_STATE_ANY and LV_PART_ANY can be used
+ * @param obj   pointer to a widget
+ */
+void lv_obj_remove_theme(lv_obj_t * obj, lv_style_selector_t selector);
+
 /**
  * Remove all styles from an object
  * @param obj       pointer to an object
