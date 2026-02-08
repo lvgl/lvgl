@@ -926,4 +926,21 @@ void test_label_no_leading_space_after_line_wrap(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_no_leading_space.png");
 }
 
+void test_label_preserve_spaces_after_explicit_newline(void)
+{
+    /*
+     * Spaces after explicit \n should be preserved as intentional indentation,
+     * while spaces after automatic word-wrap should still be removed.
+     */
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * test_label = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label, "Hello\n   World\n\n   Indent");
+    lv_obj_set_size(test_label, 200, 120);
+    lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(test_label, LV_OPA_COVER, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_preserve_indent_after_newline.png");
+}
+
 #endif
