@@ -348,14 +348,14 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
         lv_matrix_scale(&matrix, hor_scale, ver_scale);
     }
 
-    float gl_matrix[9];
-    lv_matrix_get_gl_matrix(&matrix, gl_matrix);
+    lv_matrix_t gl_matrix;
+    lv_matrix_transpose(&matrix, &gl_matrix);
 
     lv_opengles_shader_bind();
     lv_opengles_enable_blending(params->blend_opt);
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, gl_matrix);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, (float *)&gl_matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)params->opa / (float)LV_OPA_100);
     lv_opengles_shader_set_uniform1i("u_IsFill", params->texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)params->fill_color.red / 255.0f,
