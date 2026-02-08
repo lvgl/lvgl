@@ -245,21 +245,37 @@ bool lv_matrix_is_identity_or_translation(const lv_matrix_t * matrix)
 
 void lv_matrix_transpose(const lv_matrix_t * src, lv_matrix_t * dst)
 {
-    lv_matrix_t res;
+    if(src == NULL || dst == NULL) return;
 
-    res.m[0][0] = src->m[0][0];
-    res.m[0][1] = src->m[1][0];
-    res.m[0][2] = src->m[2][0];
+    if(src == dst) {
+        /* In-place transposition: 3 swaps, minimal stack usage */
+        float tmp;
 
-    res.m[1][0] = src->m[0][1];
-    res.m[1][1] = src->m[1][1];
-    res.m[1][2] = src->m[2][1];
+        tmp = dst->m[0][1];
+        dst->m[0][1] = dst->m[1][0];
+        dst->m[1][0] = tmp;
 
-    res.m[2][0] = src->m[0][2];
-    res.m[2][1] = src->m[1][2];
-    res.m[2][2] = src->m[2][2];
+        tmp = dst->m[0][2];
+        dst->m[0][2] = dst->m[2][0];
+        dst->m[2][0] = tmp;
 
-    lv_memcpy(dst, &res, sizeof(lv_matrix_t));
+        tmp = dst->m[1][2];
+        dst->m[1][2] = dst->m[2][1];
+        dst->m[2][1] = tmp;
+    }
+    else {
+        dst->m[0][0] = src->m[0][0];
+        dst->m[0][1] = src->m[1][0];
+        dst->m[0][2] = src->m[2][0];
+
+        dst->m[1][0] = src->m[0][1];
+        dst->m[1][1] = src->m[1][1];
+        dst->m[1][2] = src->m[2][1];
+
+        dst->m[2][0] = src->m[0][2];
+        dst->m[2][1] = src->m[1][2];
+        dst->m[2][2] = src->m[2][2];
+    }
 }
 
 /**********************

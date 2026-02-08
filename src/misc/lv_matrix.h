@@ -125,8 +125,9 @@ bool lv_matrix_is_identity_or_translation(const lv_matrix_t * matrix);
 
 /**
  * Transpose a matrix.
- * @param src   pointer to the source matrix
- * @param dst   pointer to the destination matrix to store the result
+ * @param src   pointer to the source matrix. If NULL, the function returns.
+ * @param dst   pointer to the destination matrix. If NULL, the function returns.
+ * Note: src and dst may point to the same matrix for in-place transposition.
  */
 void lv_matrix_transpose(const lv_matrix_t * src, lv_matrix_t * dst);
 
