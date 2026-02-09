@@ -69,3 +69,4 @@ void lv_uefi_platform_deinit(void);
 #endif
 
 #endif //__LV_UEFI_CONTEXT_H__
+
