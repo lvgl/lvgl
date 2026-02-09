@@ -15,7 +15,7 @@
 void lv_example_freetype_2_vector_font(uint32_t font_size, uint32_t border_width)
 {
     lv_font_t * font = lv_freetype_font_create(PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
-                                               LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                               LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
                                                font_size,
                                                LV_FREETYPE_FONT_STYLE_NORMAL);
 
@@ -28,13 +28,13 @@ void lv_example_freetype_2_vector_font(uint32_t font_size, uint32_t border_width
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-
+    lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
     lv_style_set_text_color(&style, lv_color_hex(0xFF0000));
     lv_style_set_text_opa(&style, LV_OPA_100);
-    //    lv_style_set_text_outline_stroke_opa(&style, LV_OPA_100);
-    //    lv_style_set_text_outline_stroke_color(&style, lv_color_hex(0x00FF00));
-    //    lv_style_set_text_outline_stroke_width(&style, border_width);
+    lv_style_set_text_outline_stroke_opa(&style, LV_OPA_100);
+    lv_style_set_text_outline_stroke_color(&style, lv_color_hex(0x00FF00));
+    lv_style_set_text_outline_stroke_width(&style, border_width);
 
     /*Avoid overlapping issue when using letter outlines*/
     lv_style_set_text_letter_space(&style, border_width);
