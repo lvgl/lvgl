@@ -17,8 +17,7 @@
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     #if LV_WAYLAND_WINDOW_DECORATIONS == 1
         #warning LV_WAYLAND_WINDOW_DECORATIONS has been removed for v9.5. \
-        It's now the user's responsability to generate their own window decorations. Server side window decorations will be \
-        added before the v9.5 release.
+        It's now the user's responsibility to generate their own window decorations. See `lv_win`
     #endif
 #endif
 
