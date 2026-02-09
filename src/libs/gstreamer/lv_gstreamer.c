@@ -482,6 +482,7 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
             .header = {
                 .magic = LV_IMAGE_HEADER_MAGIC,
                 .cf = IMAGE_FORMAT,
+                .flags = LV_IMAGE_FLAGS_MODIFIABLE,
                 .h = GST_VIDEO_INFO_HEIGHT(&streamer->video_info),
                 .w = GST_VIDEO_INFO_WIDTH(&streamer->video_info),
                 .stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0),

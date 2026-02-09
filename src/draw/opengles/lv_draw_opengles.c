@@ -530,6 +530,14 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
+    /*Do not cache modifiable images as they might change in the next frame
+     *resulting in stale textures in the cache. */
+    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+        lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
+        if(img_dsc->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) {
+            lv_cache_drop(u->texture_cache, &data_to_find, u);
+        }
+    }
     /*Do not cache non static (const) texts as the text's pointer can be freed/reallocated
      *at any time resulting in a wild pointer in the cached draw dsc. */
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
