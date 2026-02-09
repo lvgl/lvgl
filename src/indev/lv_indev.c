@@ -1285,8 +1285,11 @@ static void indev_proc_press(lv_indev_t * indev)
 
     /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != indev->pointer.act_obj) {
-        indev->pointer.last_point.x = indev->pointer.act_point.x;
-        indev->pointer.last_point.y = indev->pointer.act_point.y;
+        /*If no previous object was lost, overwrite the last point.*/
+        if(indev->pointer.act_obj == NULL) {
+            indev->pointer.last_point.x = indev->pointer.act_point.x;
+            indev->pointer.last_point.y = indev->pointer.act_point.y;
+        }
         indev->pointer.pressed = indev->prev_state == LV_INDEV_STATE_RELEASED;
 
         /*Without `LV_OBJ_FLAG_PRESS_LOCK` new widget can be found while pressing.*/
