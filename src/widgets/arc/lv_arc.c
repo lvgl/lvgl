@@ -581,7 +581,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             r -= indic_width;
             /*Add some more sensitive area if there is no advanced hit testing.
              * (Advanced hit testing is more precise)*/
-            if(lv_obj_get_adv_hittest(obj)) {
+            if(lv_obj_is_adv_hittest(obj)) {
                 r -= indic_width;
             }
             else {

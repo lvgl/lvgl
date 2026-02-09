@@ -426,153 +426,152 @@ bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj     pointer to a widget
  * @return        true if the object is hidden, false otherwise
  */
-bool lv_obj_get_hidden(const lv_obj_t * obj);
+bool lv_obj_is_hidden(const lv_obj_t * obj);
 
 /** Get whether the object is clickable by input devices
  * @param obj     pointer to a widget
  * @return        true if the object is clickable
  */
-bool lv_obj_get_clickable(const lv_obj_t * obj);
+bool lv_obj_is_clickable(const lv_obj_t * obj);
 
 /** Get whether the object gets focused when clicked
  * @param obj     pointer to a widget
  * @return        true if click focusable is enabled
  */
-bool lv_obj_get_click_focusable(const lv_obj_t * obj);
+bool lv_obj_is_click_focusable(const lv_obj_t * obj);
 
 /** Get whether the object toggles checked state when clicked
  * @param obj     pointer to a widget
  * @return        true if the object is checkable
  */
-bool lv_obj_get_checkable(const lv_obj_t * obj);
+bool lv_obj_is_checkable(const lv_obj_t * obj);
 
 /** Get whether the object is scrollable
  * @param obj     pointer to a widget
  * @return        true if the object is scrollable
  */
-bool lv_obj_get_scrollable(const lv_obj_t * obj);
+bool lv_obj_is_scrollable(const lv_obj_t * obj);
 
 /** Get whether elastic scrolling is enabled
  * @param obj     pointer to a widget
  * @return        true if scroll elastic is enabled
  */
-bool lv_obj_get_scroll_elastic(const lv_obj_t * obj);
+bool lv_obj_is_scroll_elastic(const lv_obj_t * obj);
 
 /** Get whether scroll momentum is enabled
  * @param obj     pointer to a widget
  * @return        true if scroll momentum is enabled
  */
-bool lv_obj_get_scroll_momentum(const lv_obj_t * obj);
+bool lv_obj_is_scroll_momentum(const lv_obj_t * obj);
 
 /** Get whether only one snappable child can be scrolled
  * @param obj     pointer to a widget
  * @return        true if scroll one is enabled
  */
-bool lv_obj_get_scroll_one(const lv_obj_t * obj);
+bool lv_obj_is_scroll_one(const lv_obj_t * obj);
 
 /** Get whether horizontal scroll chaining is enabled
  * @param obj     pointer to a widget
  * @return        true if horizontal scroll chaining is enabled
  */
-bool lv_obj_get_scroll_chain_hor(const lv_obj_t * obj);
+bool lv_obj_is_scroll_chain_hor(const lv_obj_t * obj);
 
 /** Get whether vertical scroll chaining is enabled
  * @param obj     pointer to a widget
  * @return        true if vertical scroll chaining is enabled
  */
-bool lv_obj_get_scroll_chain_ver(const lv_obj_t * obj);
+bool lv_obj_is_scroll_chain_ver(const lv_obj_t * obj);
 
 /** Get whether the object auto-scrolls into view when focused
  * @param obj     pointer to a widget
  * @return        true if scroll on focus is enabled
  */
-bool lv_obj_get_scroll_on_focus(const lv_obj_t * obj);
+bool lv_obj_is_scroll_on_focus(const lv_obj_t * obj);
 
 /** Get whether the focused object can be scrolled with arrow keys
  * @param obj     pointer to a widget
  * @return        true if scroll with arrow keys is enabled
  */
-bool lv_obj_get_scroll_with_arrow(const lv_obj_t * obj);
+bool lv_obj_is_scroll_with_arrow(const lv_obj_t * obj);
 
 /** Get whether the object is snappable by a scrolling parent
  * @param obj     pointer to a widget
  * @return        true if the object is snappable
  */
-bool lv_obj_get_snappable(const lv_obj_t * obj);
+bool lv_obj_is_snappable(const lv_obj_t * obj);
 
 /** Get whether press lock is enabled
  * @param obj     pointer to a widget
  * @return        true if press lock is enabled
  */
-bool lv_obj_get_press_lock(const lv_obj_t * obj);
+bool lv_obj_is_press_lock(const lv_obj_t * obj);
 
 /** Get whether events bubble to the parent
  * @param obj     pointer to a widget
  * @return        true if event bubbling is enabled
  */
-bool lv_obj_get_event_bubble(const lv_obj_t * obj);
+bool lv_obj_is_event_bubble(const lv_obj_t * obj);
 
 /** Get whether gestures bubble to the parent
  * @param obj     pointer to a widget
  * @return        true if gesture bubbling is enabled
  */
-bool lv_obj_get_gesture_bubble(const lv_obj_t * obj);
+bool lv_obj_is_gesture_bubble(const lv_obj_t * obj);
 
 /** Get whether advanced hit testing is enabled
  * @param obj     pointer to a widget
  * @return        true if advanced hit testing is enabled
  */
-bool lv_obj_get_adv_hittest(const lv_obj_t * obj);
+bool lv_obj_is_adv_hittest(const lv_obj_t * obj);
 
 /** Get whether the object ignores layout positioning
  * @param obj     pointer to a widget
  * @return        true if ignore layout is enabled
  */
-bool lv_obj_get_ignore_layout(const lv_obj_t * obj);
+bool lv_obj_is_ignore_layout(const lv_obj_t * obj);
 
 /** Get whether the object is floating
  * @param obj     pointer to a widget
  * @return        true if floating mode is enabled
  */
-bool lv_obj_get_floating(const lv_obj_t * obj);
+bool lv_obj_is_floating(const lv_obj_t * obj);
 
 /** Get whether draw task events are sent
  * @param obj     pointer to a widget
  * @return        true if draw task events are enabled
  */
-bool lv_obj_get_send_draw_task_events(const lv_obj_t * obj);
+bool lv_obj_is_send_draw_task_events(const lv_obj_t * obj);
 
 /** Get whether overflow is visible outside the parent
  * @param obj     pointer to a widget
  * @return        true if overflow is visible
  */
-bool lv_obj_get_overflow_visible(const lv_obj_t * obj);
+bool lv_obj_is_overflow_visible(const lv_obj_t * obj);
 
 /** Get whether events trickle to the children
  * @param obj     pointer to a widget
  * @return        true if event trickling is enabled
  */
-bool lv_obj_get_event_trickle(const lv_obj_t * obj);
+bool lv_obj_is_event_trickle(const lv_obj_t * obj);
 
 /** Get whether states trickle to the children
  * @param obj     pointer to a widget
  * @return        true if state trickling is enabled
  */
-bool lv_obj_get_state_trickle(const lv_obj_t * obj);
+bool lv_obj_is_state_trickle(const lv_obj_t * obj);
 
 /** Get whether the object is a radio button
  * @param obj     pointer to a widget
  * @return        true if radio button behavior is enabled
  */
-bool lv_obj_get_radio_button(const lv_obj_t * obj);
+bool lv_obj_is_radio_button(const lv_obj_t * obj);
 
 /**
  * Get whether the widget should be placed in a new flex track
  * @param obj   pointer to a widget
  * @return      true if flex in new track is enabled
  */
-bool lv_obj_get_flex_in_new_track(const lv_obj_t * obj);
-
+bool lv_obj_is_flex_in_new_track(const lv_obj_t * obj);
 
 /**
  * Get the state of an object

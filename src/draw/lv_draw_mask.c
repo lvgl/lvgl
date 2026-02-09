@@ -62,7 +62,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_m
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
 
-    if(base_dsc->obj && lv_obj_get_send_draw_task_events(base_dsc->obj)) {
+    if(base_dsc->obj && lv_obj_is_send_draw_task_events(base_dsc->obj)) {
         /*Disable sending LV_EVENT_DRAW_TASK_ADDED first to avoid triggering recursive
          *event calls due draw task adds in the event*/
         lv_obj_set_send_draw_task_events(base_dsc->obj, false);

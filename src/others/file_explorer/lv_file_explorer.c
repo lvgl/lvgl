@@ -502,7 +502,7 @@ static void quick_access_area_event_handler(lv_event_t * e)
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     if(code == LV_EVENT_LAYOUT_CHANGED) {
-        if(lv_obj_get_hidden(area))
+        if(lv_obj_is_hidden(area))
             lv_obj_set_size(explorer->browser_area, LV_PCT(100), LV_PCT(100));
         else
             lv_obj_set_size(explorer->browser_area, LV_PCT(FILE_EXPLORER_BROWSER_AREA_WIDTH), LV_PCT(100));

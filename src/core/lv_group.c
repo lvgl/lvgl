@@ -510,11 +510,11 @@ static bool focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
          *If any parent is hidden, the object is also hidden)*/
         lv_obj_t * parent = *obj_next;
         while(parent) {
-            if(lv_obj_get_hidden(parent)) break;
+            if(lv_obj_is_hidden(parent)) break;
             parent = lv_obj_get_parent(parent);
         }
 
-        if(parent && lv_obj_get_hidden(parent)) continue;
+        if(parent && lv_obj_is_hidden(parent)) continue;
 
         /*If we got her a good candidate is found*/
         break;

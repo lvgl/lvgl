@@ -602,7 +602,7 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
         update_obj_state(obj, new_state);
-        if(lv_obj_get_state_trickle(obj)) {
+        if(lv_obj_is_state_trickle(obj)) {
             lv_obj_children_add_state(obj, state);
         }
     }
@@ -615,7 +615,7 @@ void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state & (~state);
     if(obj->state != new_state) {
         update_obj_state(obj, new_state);
-        if(lv_obj_get_state_trickle(obj)) {
+        if(lv_obj_is_state_trickle(obj)) {
             lv_obj_children_remove_state(obj, state);
         }
     }
@@ -720,151 +720,151 @@ bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
 }
 
 
-bool lv_obj_get_hidden(const lv_obj_t * obj)
+bool lv_obj_is_hidden(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->hidden;
 }
 
-bool lv_obj_get_clickable(const lv_obj_t * obj)
+bool lv_obj_is_clickable(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->clickable;
 }
 
-bool lv_obj_get_click_focusable(const lv_obj_t * obj)
+bool lv_obj_is_click_focusable(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->click_focusable;
 }
 
-bool lv_obj_get_checkable(const lv_obj_t * obj)
+bool lv_obj_is_checkable(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->checkable;
 }
 
-bool lv_obj_get_scrollable(const lv_obj_t * obj)
+bool lv_obj_is_scrollable(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->scrollable;
 }
 
-bool lv_obj_get_scroll_elastic(const lv_obj_t * obj)
+bool lv_obj_is_scroll_elastic(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->scroll_elastic;
 }
 
-bool lv_obj_get_scroll_momentum(const lv_obj_t * obj)
+bool lv_obj_is_scroll_momentum(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->scroll_momentum;
 }
 
-bool lv_obj_get_scroll_one(const lv_obj_t * obj)
+bool lv_obj_is_scroll_one(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->scroll_one;
 }
 
-bool lv_obj_get_scroll_chain_hor(const lv_obj_t * obj)
+bool lv_obj_is_scroll_chain_hor(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->scroll_chain_hor;
 }
 
-bool lv_obj_get_scroll_chain_ver(const lv_obj_t * obj)
+bool lv_obj_is_scroll_chain_ver(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->scroll_chain_ver;
 }
 
-bool lv_obj_get_scroll_on_focus(const lv_obj_t * obj)
+bool lv_obj_is_scroll_on_focus(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->scroll_on_focus;
 }
 
-bool lv_obj_get_scroll_with_arrow(const lv_obj_t * obj)
+bool lv_obj_is_scroll_with_arrow(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->scroll_with_arrow;
 }
 
-bool lv_obj_get_snappable(const lv_obj_t * obj)
+bool lv_obj_is_snappable(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->snappable;
 }
 
-bool lv_obj_get_press_lock(const lv_obj_t * obj)
+bool lv_obj_is_press_lock(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->press_lock;
 }
 
-bool lv_obj_get_event_bubble(const lv_obj_t * obj)
+bool lv_obj_is_event_bubble(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->event_bubble;
 }
 
-bool lv_obj_get_gesture_bubble(const lv_obj_t * obj)
+bool lv_obj_is_gesture_bubble(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->gesture_bubble;
 }
 
-bool lv_obj_get_adv_hittest(const lv_obj_t * obj)
+bool lv_obj_is_adv_hittest(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->adv_hittest;
 }
 
-bool lv_obj_get_ignore_layout(const lv_obj_t * obj)
+bool lv_obj_is_ignore_layout(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->ignore_layout;
 }
 
-bool lv_obj_get_floating(const lv_obj_t * obj)
+bool lv_obj_is_floating(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->floating;
 }
 
-bool lv_obj_get_send_draw_task_events(const lv_obj_t * obj)
+bool lv_obj_is_send_draw_task_events(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->send_draw_task_events;
 }
 
-bool lv_obj_get_overflow_visible(const lv_obj_t * obj)
+bool lv_obj_is_overflow_visible(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->overflow_visible;
 }
 
-bool lv_obj_get_event_trickle(const lv_obj_t * obj)
+bool lv_obj_is_event_trickle(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->event_trickle;
 }
 
-bool lv_obj_get_state_trickle(const lv_obj_t * obj)
+bool lv_obj_is_state_trickle(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->state_trickle;
 }
 
-bool lv_obj_get_radio_button(const lv_obj_t * obj)
+bool lv_obj_is_radio_button(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return obj->radio_button;
 }
 
-bool lv_obj_get_flex_in_new_track(const lv_obj_t * obj)
+bool lv_obj_is_flex_in_new_track(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -1361,14 +1361,14 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
         void * param = lv_event_get_param(e);
         /*Go the checked state if enabled*/
-        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_get_checkable(obj)) {
+        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_is_checkable(obj)) {
 
             bool was_checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
             }
             /*Radio buttons can't be checked off directly*/
-            else if(!lv_obj_get_radio_button(obj)) {
+            else if(!lv_obj_is_radio_button(obj)) {
                 lv_obj_remove_state(obj, LV_STATE_CHECKED);
             }
             if(was_checked != lv_obj_has_state(obj, LV_STATE_CHECKED)) {
@@ -1378,7 +1378,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_VALUE_CHANGED) {
-        if(lv_obj_get_radio_button(obj) && lv_obj_has_state(obj, LV_STATE_CHECKED)) {
+        if(lv_obj_is_radio_button(obj) && lv_obj_has_state(obj, LV_STATE_CHECKED)) {
             lv_obj_t * parent = lv_obj_get_parent(obj);
             if(parent) {
                 uint32_t child_cnt = lv_obj_get_child_count(parent);
@@ -1387,7 +1387,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
                     lv_obj_t * sibling = lv_obj_get_child(parent, i);
                     if(obj == sibling) continue;
 
-                    if(lv_obj_get_radio_button(sibling) && lv_obj_has_state(sibling, LV_STATE_CHECKED)) {
+                    if(lv_obj_is_radio_button(sibling) && lv_obj_has_state(sibling, LV_STATE_CHECKED)) {
                         lv_obj_remove_state(sibling, LV_STATE_CHECKED);
                         lv_result_t res = lv_obj_send_event(sibling, LV_EVENT_VALUE_CHANGED, NULL);
                         if(res != LV_RESULT_OK) return;
@@ -1407,7 +1407,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_KEY) {
-        if(lv_obj_get_checkable(obj)) {
+        if(lv_obj_is_checkable(obj)) {
             uint32_t c = lv_event_get_key(e);
             bool was_checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -1415,7 +1415,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
             else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
                 /*Radio buttons can't be checked off directly*/
-                if(!lv_obj_get_radio_button(obj)) {
+                if(!lv_obj_is_radio_button(obj)) {
                     lv_obj_remove_state(obj, LV_STATE_CHECKED);
                 }
             }
@@ -1456,7 +1456,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_FOCUSED) {
-        if(lv_obj_get_scroll_on_focus(obj)) {
+        if(lv_obj_is_scroll_on_focus(obj)) {
             lv_obj_scroll_to_view_recursive(obj, LV_ANIM_ON);
         }
 

@@ -235,7 +235,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     }
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
-        if(base_dsc->obj && !lv_obj_get_send_draw_task_events(base_dsc->obj)) {
+        if(base_dsc->obj && !lv_obj_is_send_draw_task_events(base_dsc->obj)) {
             w = dsc->text_size.x;
         }
         else {

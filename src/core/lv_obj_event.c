@@ -431,7 +431,7 @@ static bool event_is_bubbled(lv_event_t * e)
     }
 
     /*Check other codes only if bubbling is enabled*/
-    if(lv_obj_get_event_bubble(e->current_target) == false) return false;
+    if(lv_obj_is_event_bubble(e->current_target) == false) return false;
 
     switch(e->code) {
         case LV_EVENT_HIT_TEST:
@@ -463,7 +463,7 @@ static bool event_is_trickled(lv_event_t * e)
     if(e->stop_trickling) return false;
 
     /*Check other codes only if trickle is enabled*/
-    if(lv_obj_get_event_trickle(e->current_target) == false) return false;
+    if(lv_obj_is_event_trickle(e->current_target) == false) return false;
 
     switch(e->code) {
         case LV_EVENT_HIT_TEST:

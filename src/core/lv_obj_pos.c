@@ -778,7 +778,7 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
     lv_obj_t * parent = obj->parent;
 
     if(parent) {
-        if(lv_obj_get_floating(obj)) {
+        if(lv_obj_is_floating(obj)) {
             x += parent->coords.x1;
             y += parent->coords.y1;
         }
@@ -847,7 +847,7 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(ignore_floating && lv_obj_get_floating(child)) continue;
+        if(ignore_floating && lv_obj_is_floating(child)) continue;
         child->coords.x1 += x_diff;
         child->coords.y1 += y_diff;
         child->coords.x2 += x_diff;
@@ -1017,7 +1017,7 @@ lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
 
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 {
-    if(lv_obj_get_hidden(obj)) return false;
+    if(lv_obj_is_hidden(obj)) return false;
 
     /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
@@ -1047,11 +1047,11 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     while(parent != NULL) {
         /*If the parent is hidden then the child is hidden and won't be drawn*/
-        if(lv_obj_get_hidden(parent)) return false;
+        if(lv_obj_is_hidden(parent)) return false;
 
         /*Truncate to the parent and if no common parts break*/
         lv_area_t parent_coords = parent->coords;
-        if(lv_obj_get_overflow_visible(parent)) {
+        if(lv_obj_is_overflow_visible(parent)) {
             int32_t parent_ext_size = lv_obj_get_ext_draw_size(parent);
             lv_area_increase(&parent_coords, parent_ext_size, parent_ext_size);
         }
@@ -1100,14 +1100,14 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 
 bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
-    if(!lv_obj_get_clickable(obj)) return false;
+    if(!lv_obj_is_clickable(obj)) return false;
 
     lv_area_t a;
     lv_obj_get_click_area(obj, &a);
     bool res = lv_area_is_point_on(&a, point, 0);
     if(res == false) return false;
 
-    if(lv_obj_get_adv_hittest(obj)) {
+    if(lv_obj_is_adv_hittest(obj)) {
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
         hit_info.res = true;
@@ -1245,7 +1245,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
         for(i = 0; i < child_cnt; i++) {
             int32_t child_res_tmp = LV_COORD_MIN;
             lv_obj_t * child = obj->spec_attr->children[i];
-            if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
+            if((lv_obj_is_hidden(child) || lv_obj_is_floating(child))) continue;
 
             if(child->w_ignore_size)
                 continue;
@@ -1284,7 +1284,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
         for(i = 0; i < child_cnt; i++) {
             int32_t child_res_tmp = LV_COORD_MIN;
             lv_obj_t * child = obj->spec_attr->children[i];
-            if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
+            if((lv_obj_is_hidden(child) || lv_obj_is_floating(child))) continue;
 
             if(child->w_ignore_size)
                 continue;
@@ -1344,7 +1344,7 @@ static int32_t calc_content_height(lv_obj_t * obj)
     for(i = 0; i < child_cnt; i++) {
         int32_t child_res_tmp = LV_COORD_MIN;
         lv_obj_t * child = obj->spec_attr->children[i];
-        if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
+        if((lv_obj_is_hidden(child) || lv_obj_is_floating(child))) continue;
 
         if(child->h_ignore_size)
             continue;

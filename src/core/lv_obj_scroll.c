@@ -146,7 +146,7 @@ int32_t lv_obj_get_scroll_bottom(const lv_obj_t * obj)
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         const lv_obj_t * child = obj->spec_attr->children[i];
-        if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
+        if((lv_obj_is_hidden(child) || lv_obj_is_floating(child))) continue;
 
         int32_t tmp_y = child->coords.y2 + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN);
         child_res = LV_MAX(child_res, tmp_y);
@@ -187,7 +187,7 @@ int32_t lv_obj_get_scroll_left(const lv_obj_t * obj)
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         const lv_obj_t * child = obj->spec_attr->children[i];
-        if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
+        if((lv_obj_is_hidden(child) || lv_obj_is_floating(child))) continue;
 
         int32_t tmp_x = child->coords.x1 - lv_obj_get_style_margin_left(child, LV_PART_MAIN);
         x1 = LV_MIN(x1, tmp_x);
@@ -225,7 +225,7 @@ int32_t lv_obj_get_scroll_right(const lv_obj_t * obj)
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         const lv_obj_t * child = obj->spec_attr->children[i];
-        if((lv_obj_get_hidden(child) || lv_obj_get_floating(child))) continue;
+        if((lv_obj_is_hidden(child) || lv_obj_is_floating(child))) continue;
 
         int32_t tmp_x = child->coords.x2 + lv_obj_get_style_margin_right(child, LV_PART_MAIN);
         child_res = LV_MAX(child_res, tmp_x);
@@ -467,7 +467,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
     lv_area_set(hor_area, 0, 0, -1, -1);
     lv_area_set(ver_area, 0, 0, -1, -1);
 
-    if(lv_obj_get_scrollable(obj) == false) return;
+    if(lv_obj_is_scrollable(obj) == false) return;
 
     lv_scrollbar_mode_t sm = lv_obj_get_scrollbar_mode(obj);
     if(sm == LV_SCROLLBAR_MODE_OFF)  return;
@@ -707,7 +707,7 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
                                   lv_anim_enable_t anim_en)
 {
     lv_obj_t * parent = lv_obj_get_parent(child);
-    if(!lv_obj_get_scrollable(parent)) return;
+    if(!lv_obj_is_scrollable(parent)) return;
 
     lv_dir_t scroll_dir = lv_obj_get_scroll_dir(parent);
     int32_t snap_goal = 0;
