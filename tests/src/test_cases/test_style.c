@@ -232,6 +232,8 @@ void test_style_remove_theme(void)
     lv_obj_set_size(sw, 100, 50);
     lv_obj_set_style_bg_color(sw, lv_color_hex(0xff0000), LV_PART_KNOB);
 
+    TEST_ASSERT_NOT_EQUAL(0, lv_obj_get_style_bg_opa(sw, LV_PART_KNOB));
+
     lv_obj_remove_theme(sw, LV_PART_KNOB);
 
     lv_obj_update_layout(sw);
