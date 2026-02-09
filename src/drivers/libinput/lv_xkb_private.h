@@ -16,7 +16,7 @@ extern "C" {
 
 #include "lv_xkb.h"
 
-#if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
+#if (defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB) || (defined(LV_EVDEV_XKB) && LV_EVDEV_XKB)
 
 /*********************
  *      DEFINES
@@ -44,7 +44,7 @@ struct _lv_xkb_t {
  *      MACROS
  **********************/
 
-#endif /* defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB */
+#endif /* (defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB) || (defined(LV_EVDEV_XKB) && LV_EVDEV_XKB) */
 
 #ifdef __cplusplus
 } /*extern "C"*/

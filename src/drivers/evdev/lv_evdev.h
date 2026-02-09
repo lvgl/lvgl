@@ -18,6 +18,10 @@ extern "C" {
 
 #if LV_USE_EVDEV
 
+#   if LV_EVDEV_XKB
+#     include <xkbcommon/xkbcommon.h>
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -90,6 +94,18 @@ void lv_evdev_set_swap_axes(lv_indev_t * indev, bool swap_axes);
  * @param max_y pointer coordinate mapped to max y of display
  */
 void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_x, int max_y);
+
+#if LV_EVDEV_XKB
+/**
+ * Set the XKB keymap for an evdev keyboard device at runtime.
+ * Can be called at any time to change the keyboard layout.
+ * @param indev evdev input device (must be LV_INDEV_TYPE_KEYPAD)
+ * @param names XKB rule names describing the desired layout
+ *              (use {0} or {.layout="us"} etc.; NULL fields use system defaults)
+ * @return true if the keymap was set successfully
+ */
+bool lv_evdev_set_keymap(lv_indev_t * indev, struct xkb_rule_names names);
+#endif
 
 /**
  * Remove evdev input device.

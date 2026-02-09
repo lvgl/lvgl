@@ -4375,6 +4375,27 @@
     #endif
 #endif
 
+#if LV_USE_EVDEV
+    /** Full keyboard support via XKB */
+    #ifndef LV_EVDEV_XKB
+        #ifdef CONFIG_LV_EVDEV_XKB
+            #define LV_EVDEV_XKB CONFIG_LV_EVDEV_XKB
+        #else
+            #define LV_EVDEV_XKB             0
+        #endif
+    #endif
+    #if LV_EVDEV_XKB
+        /** "setxkbmap -query" can help find the right values for your keyboard */
+        #ifndef LV_EVDEV_XKB_KEY_MAP
+            #ifdef CONFIG_LV_EVDEV_XKB_KEY_MAP
+                #define LV_EVDEV_XKB_KEY_MAP CONFIG_LV_EVDEV_XKB_KEY_MAP
+            #else
+                #define LV_EVDEV_XKB_KEY_MAP { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
+            #endif
+        #endif
+    #endif
+#endif
+
 /** Driver for libinput input devices */
 #ifndef LV_USE_LIBINPUT
     #ifdef CONFIG_LV_USE_LIBINPUT

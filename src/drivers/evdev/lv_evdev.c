@@ -35,6 +35,10 @@
 #include "../../widgets/image/lv_image.h"
 #include "../../indev/lv_indev_gesture.h"
 
+#if LV_EVDEV_XKB
+    #include "../libinput/lv_xkb_private.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -68,11 +72,15 @@ typedef struct {
     int key;
     lv_indev_state_t state;
     bool deleting;
+#  if LV_EVDEV_XKB
+    lv_xkb_t xkb_dsc;
+    bool xkb_ready;
+#  endif
     /* Multi-touch support */
-#if LV_USE_GESTURE_RECOGNITION
+#  if LV_USE_GESTURE_RECOGNITION
     lv_indev_touch_data_t touch_data[MAX_TOUCH_POINTS]; /* Array of touch points for gesture recognition */
-    uint8_t touch_count; /* Number of valid touch points */
-    uint8_t current_slot; /* Current touch point slot */
+    uint8_t touch_count;                                /* Number of valid touch points */
+    uint8_t current_slot;                               /* Current touch point slot */
     bool touch_data_changed; /* Flag to indicate if touch data has changed since last SYN_REPORT */
 #endif
 } lv_evdev_t;
@@ -241,12 +249,51 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                 else if(in.value == 1) dsc->state = LV_INDEV_STATE_PRESSED;
             }
             else {
+#  if LV_EVDEV_XKB
+                if(dsc->xkb_ready) {
+                    /* evdev key values: 0=release, 1=press, 2=repeat.
+                     * Only forward genuine press/release to xkb_state_update_key;
+                     * repeat events (value==2) must not update XKB modifier state
+                     * or the press count will diverge from the release count,
+                     * breaking Shift/Ctrl/Alt tracking. */
+                    if(in.value == 2) {
+                        /* For repeat events, we do nothing. LVGL handles this already */
+                        break;
+                    }
+                    else {
+                        bool key_down = (in.value == 1);
+                        uint32_t xkb_key = lv_xkb_process_key(&dsc->xkb_dsc, in.code, key_down);
+                        if(xkb_key) {
+                            dsc->key = xkb_key;
+                            dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+                            data->continue_reading = true;
+                            break;
+                        }
+                        else {
+                            /* Bare modifier (Shift, Ctrl, Alt, etc.) or unmapped key.
+                             * XKB state was already updated inside lv_xkb_process_key.
+                             * Release any currently held key so it doesn't keep repeating. */
+                            dsc->state = LV_INDEV_STATE_RELEASED;
+                        }
+                    }
+                }
+                else {
+                    LV_LOG_WARN("Key event code: %d, value: %d", in.code, in.value);
+                    dsc->key = _evdev_process_key(in.code);
+                    if(dsc->key) {
+                        dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+                        data->continue_reading = true;
+                        break;
+                    }
+                }
+#  else
                 dsc->key = _evdev_process_key(in.code);
                 if(dsc->key) {
                     dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
                     data->continue_reading = true; /*Keep following events in buffer for now*/
                     break;
                 }
+#  endif
             }
         }
 #if LV_USE_GESTURE_RECOGNITION
@@ -350,6 +397,11 @@ static void _evdev_indev_delete_cb(lv_event_t * e)
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
     LV_ASSERT_NULL(dsc);
     lv_async_call_cancel(_evdev_async_delete_cb, indev);
+#  if LV_EVDEV_XKB
+    if(dsc->xkb_ready) {
+        lv_xkb_deinit(&dsc->xkb_dsc);
+    }
+#  endif
     close(dsc->fd);
     lv_free(dsc);
 }
@@ -571,6 +623,19 @@ lv_indev_t * lv_evdev_create_fd(lv_indev_type_t indev_type, int fd)
     lv_indev_set_driver_data(indev, dsc);
     lv_indev_add_event_cb(indev, _evdev_indev_delete_cb, LV_EVENT_DELETE, NULL);
 
+#  if LV_EVDEV_XKB
+    if(indev_type == LV_INDEV_TYPE_KEYPAD) {
+        struct xkb_rule_names names = LV_EVDEV_XKB_KEY_MAP;
+        if(lv_xkb_init(&dsc->xkb_dsc, names)) {
+            dsc->xkb_ready = true;
+            LV_LOG_INFO("XKB keyboard support initialised for evdev");
+        }
+        else {
+            LV_LOG_WARN("XKB init failed, falling back to basic key mapping");
+        }
+    }
+#  endif
+
     return indev;
 
 err_after_malloc:
@@ -667,6 +732,35 @@ void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_
     dsc->max_x = max_x;
     dsc->max_y = max_y;
 }
+
+#  if LV_EVDEV_XKB
+bool lv_evdev_set_keymap(lv_indev_t * indev, struct xkb_rule_names names)
+{
+    LV_ASSERT_NULL(indev);
+
+    if(lv_indev_get_type(indev) != LV_INDEV_TYPE_KEYPAD) {
+        LV_LOG_ERROR("Cannot set keymap for non-keypad indev");
+        return false;
+    }
+
+    lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
+    LV_ASSERT_NULL(dsc);
+
+    if(dsc->xkb_ready) {
+        lv_xkb_deinit(&dsc->xkb_dsc);
+        dsc->xkb_ready = false;
+    }
+
+    if(lv_xkb_init(&dsc->xkb_dsc, names)) {
+        dsc->xkb_ready = true;
+        LV_LOG_INFO("XKB keymap updated for evdev");
+        return true;
+    }
+
+    LV_LOG_ERROR("Failed to set XKB keymap for evdev");
+    return false;
+}
+#  endif
 
 void lv_evdev_delete(lv_indev_t * indev)
 {
