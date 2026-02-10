@@ -24,7 +24,7 @@ struct {
     lv_anim_t a;
 } ginfo;
 
-static int32_t anim_path_bezier3_cb(const lv_anim_t * a);
+static lv_value_precise_t anim_path_bezier3_cb(const lv_anim_t * a);
 static void refer_chart_cubic_bezier(void);
 static void run_button_event_handler(lv_event_t * e);
 static void slider_event_cb(lv_event_t * e);
@@ -62,15 +62,15 @@ void lv_example_anim_3(void)
     refer_chart_cubic_bezier();
 }
 
-static int32_t anim_path_bezier3_cb(const lv_anim_t * a)
+static lv_value_precise_t anim_path_bezier3_cb(const lv_anim_t * a)
 {
     int32_t t = lv_map(a->act_time, 0, a->duration, 0, 1024);
     int32_t step = lv_bezier3(t, 0, ginfo.p1, ginfo.p2, 1024);
     int32_t new_value;
-    new_value = step * (a->end_value - a->start_value);
+    new_value = step * ((int32_t)a->end_value - (int32_t)a->start_value);
     new_value = new_value >> 10;
-    new_value += a->start_value;
-    return new_value;
+    new_value += (int32_t)a->start_value;
+    return (lv_value_precise_t)new_value;
 }
 
 static void refer_chart_cubic_bezier(void)

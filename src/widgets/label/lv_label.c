@@ -1166,7 +1166,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(reverse_play_in_progress) {
                 a.reverse_play_in_progress = 1;
                 /*Swap the start and end values*/
-                int32_t tmp;
+                lv_value_precise_t tmp;
                 tmp      = a.start_value;
                 a.start_value = a.end_value;
                 a.end_value   = tmp;
@@ -1206,7 +1206,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(reverse_play_in_progress) {
                 a.reverse_play_in_progress = 1;
                 /*Swap the start and end values*/
-                int32_t tmp;
+                lv_value_precise_t tmp;
                 tmp      = a.start_value;
                 a.start_value = a.end_value;
                 a.end_value   = tmp;
@@ -1267,7 +1267,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
 
             /*To keep the old position when the label text is updated mid-scrolling*/
-            int32_t duration_resolved = lv_anim_resolve_speed(anim_time, a.start_value, a.end_value);
+            int32_t duration_resolved = lv_anim_resolve_speed(anim_time, (int32_t)a.start_value, (int32_t)a.end_value);
             if(act_time < duration_resolved) {
                 a.act_time = act_time;
             }

@@ -90,19 +90,44 @@ LV_EXPORT_CONST_INT(LV_ANIM_PLAYTIME_INFINITE);
 typedef bool lv_anim_enable_t;
 
 /** Get the current value during an animation*/
-typedef int32_t (*lv_anim_path_cb_t)(const lv_anim_t *);
+typedef lv_value_precise_t (*lv_anim_path_cb_t)(const lv_anim_t *);
+
+/**
+ * Optional callback to decide whether an animation is finished.
+ * If set, the animation core will call it from `anim_timer`.
+ * Return true to finish the animation (run `anim_completed_handler`).
+ *
+ * Typical use: spring-like curves that converge based on error/velocity
+ * thresholds rather than only `duration`.
+ */
+typedef bool (*lv_anim_is_finished_cb_t)(const lv_anim_t *);
 
 /** Generic prototype of "animator" functions.
  * First parameter is the variable to animate.
  * Second parameter is the value to set.
  * Compatible with `lv_xxx_set_yyy(obj, value)` functions
  * The `x` in `_xcb_t` means it's not a fully generic prototype because
- * it doesn't receive `lv_anim_t *` as its first argument*/
+ * it doesn't receive `lv_anim_t *` as its first argument
+ *
+ * NOTE: This signature is kept stable for compatibility.
+ * Use `lv_anim_set_exec_cb_precise` to receive `lv_value_precise_t` (float when LV_USE_FLOAT=1).
+ */
 typedef void (*lv_anim_exec_xcb_t)(void *, int32_t);
 
 /** Same as `lv_anim_exec_xcb_t` but receives `lv_anim_t *` as the first parameter.
- * It's more consistent but less convenient. Might be used by binding generator functions.*/
+ * It's more consistent but less convenient. Might be used by binding generator functions.
+ *
+ * NOTE: This signature is kept stable for compatibility.
+ * Use `lv_anim_set_custom_exec_cb_precise` to receive `lv_value_precise_t`.
+ */
 typedef void (*lv_anim_custom_exec_cb_t)(lv_anim_t *, int32_t);
+
+/** Precise exec callback variants.
+ * When LV_USE_FLOAT=1, the value is a float and keeps fractional precision.
+ * When LV_USE_FLOAT=0, the value is int32_t.
+ */
+typedef void (*lv_anim_exec_precise_xcb_t)(void *, lv_value_precise_t);
+typedef void (*lv_anim_custom_exec_precise_cb_t)(lv_anim_t *, lv_value_precise_t);
 
 /** Callback to call when the animation is ready*/
 typedef void (*lv_anim_completed_cb_t)(lv_anim_t *);
@@ -112,6 +137,12 @@ typedef void (*lv_anim_start_cb_t)(lv_anim_t *);
 
 /** Callback used when the animation values are relative to get the current value*/
 typedef int32_t (*lv_anim_get_value_cb_t)(lv_anim_t *);
+
+/** Precise variant of `lv_anim_get_value_cb_t`.
+ * When LV_USE_FLOAT=1, return value is float to preserve fractional offsets.
+ * When LV_USE_FLOAT=0, return value is int32_t.
+ */
+typedef lv_value_precise_t (*lv_anim_get_value_precise_cb_t)(lv_anim_t *);
 
 /** Callback used when the animation is deleted*/
 typedef void (*lv_anim_deleted_cb_t)(lv_anim_t *);
@@ -124,6 +155,20 @@ typedef struct {
     int16_t y2;
 } lv_anim_bezier3_para_t;
 
+/** Different custom paths represent different parameters.
+ * For example, in a spring curve,
+ * p1 represents tension,
+ * p2 represents damping,
+ * p3 represents speed,
+ * p4 represents the threshold.*/
+typedef struct _lv_anim_ease_para_t {
+    lv_value_precise_t p1;
+    lv_value_precise_t p2;
+    lv_value_precise_t p3;
+    lv_value_precise_t p4;
+    int32_t last_act_time; /**< last act_time used to derive dt for ease integration */
+} lv_anim_ease_para_t; /**< Parameter used when path is custom_ease*/
+
 /** Describes an animation*/
 struct _lv_anim_t {
 #if LV_USE_EXT_DATA
@@ -133,15 +178,19 @@ struct _lv_anim_t {
     lv_anim_exec_xcb_t exec_cb;               /**< Function to execute to animate */
     lv_anim_custom_exec_cb_t custom_exec_cb;  /**< Function to execute to animate,
                                                * same purpose as exec_cb but different parameters */
+    lv_anim_exec_precise_xcb_t exec_precise_cb; /**< Precise execute callback (lv_value_precise_t value) */
+    lv_anim_custom_exec_precise_cb_t custom_exec_precise_cb; /**< Precise execute callback (lv_value_precise_t value) */
     lv_anim_start_cb_t start_cb;              /**< Call it when animation is starts (considering `delay`) */
     lv_anim_completed_cb_t completed_cb;      /**< Call it when animation is fully completed */
     lv_anim_deleted_cb_t deleted_cb;          /**< Call it when animation is deleted */
     lv_anim_get_value_cb_t get_value_cb;      /**< Get current value in relative mode */
+    lv_anim_get_value_precise_cb_t get_value_precise_cb; /**< Get the current value in relative mode (precise)*/
     void * user_data;                         /**< Custom user data */
     lv_anim_path_cb_t path_cb;                /**< Provides path (curve) of animation */
-    int32_t start_value;                      /**< Start value */
-    int32_t current_value;                    /**< Current value */
-    int32_t end_value;                        /**< End value */
+    lv_anim_is_finished_cb_t is_finished_cb; /**< Optional finish condition override */
+    lv_value_precise_t start_value;                      /**< Start value */
+    lv_value_precise_t current_value;                    /**< Current value */
+    lv_value_precise_t end_value;                        /**< End value */
     int32_t duration;                         /**< Animation duration in ms */
     int32_t act_time;                         /**< Ms elapsed since animation started. Set to negative to make delay. */
     uint32_t reverse_delay;                   /**< Wait (in ms) after forward play ends and before reverse play begins. */
@@ -150,6 +199,7 @@ struct _lv_anim_t {
     uint32_t repeat_cnt;                      /**< Repeat count for animation */
     union _lv_anim_path_para_t {
         lv_anim_bezier3_para_t bezier3;       /**< Parameter used when path is custom_bezier */
+        lv_anim_ease_para_t ease; /**< Parameter used when path is custom_ease*/
     } parameter;
 
     /* Animation system use these - user shouldn't set */
@@ -194,6 +244,14 @@ void lv_anim_set_var(lv_anim_t * a, void * var);
  *                  E.g. lv_obj_set_x
  */
 void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_xcb_t exec_cb);
+
+/** Set a precise exec callback.
+ * This callback receives `lv_value_precise_t` to preserve fractional values when LV_USE_FLOAT=1.
+ */
+static inline void lv_anim_set_exec_cb_precise(lv_anim_t * a, lv_anim_exec_precise_xcb_t exec_cb)
+{
+    a->exec_precise_cb = exec_cb;
+}
 
 /**
  * Set the duration of an animation
@@ -241,7 +299,7 @@ bool lv_anim_is_paused(lv_anim_t * a);
  * @param start     the start value
  * @param end       the end value
  */
-void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end);
+void lv_anim_set_values(lv_anim_t * a, lv_value_precise_t start, lv_value_precise_t end);
 
 /**
  * Similar to `lv_anim_set_exec_cb` but `lv_anim_custom_exec_cb_t` receives
@@ -253,12 +311,30 @@ void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end);
  */
 void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb);
 
+/** Set a precise custom exec callback.
+ * This callback receives `lv_value_precise_t` to preserve fractional values when LV_USE_FLOAT=1.
+ */
+static inline void lv_anim_set_custom_exec_cb_precise(lv_anim_t * a, lv_anim_custom_exec_precise_cb_t exec_cb)
+{
+    a->custom_exec_precise_cb = exec_cb;
+}
+
 /**
  * Set the path (curve) of the animation.
  * @param a         pointer to an initialized `lv_anim_t` variable
- * @param path_cb a function to set the current value of the animation.
+ * @param path_cb    a function to set the current value of the animation.
  */
 void lv_anim_set_path_cb(lv_anim_t * a, lv_anim_path_cb_t path_cb);
+
+/**
+ * Set a custom finish condition.
+ * If set, the animation core can finish an animation before `duration` (or later)
+ * based on custom logic.
+ */
+static inline void lv_anim_set_is_finished_cb(lv_anim_t * a, lv_anim_is_finished_cb_t cb)
+{
+    a->is_finished_cb = cb;
+}
 
 /**
  * Set a function call when the animation really starts (considering `delay`)
@@ -274,6 +350,14 @@ void lv_anim_set_start_cb(lv_anim_t * a, lv_anim_start_cb_t start_cb);
  * @param get_value_cb  a function call when the animation starts
  */
 void lv_anim_set_get_value_cb(lv_anim_t * a, lv_anim_get_value_cb_t get_value_cb);
+
+/** Set a precise get-value callback.
+ * This callback returns `lv_value_precise_t` to preserve fractional offsets when LV_USE_FLOAT=1.
+ */
+static inline void lv_anim_set_get_value_cb_precise(lv_anim_t * a, lv_anim_get_value_precise_cb_t get_value_cb)
+{
+    a->get_value_precise_cb = get_value_cb;
+}
 
 /**
  * Set a function call when the animation is completed
@@ -510,42 +594,42 @@ void lv_anim_refr_now(void);
  * @param a     pointer to an animation
  * @return      the current value to set
  */
-int32_t lv_anim_path_linear(const lv_anim_t * a);
+lv_value_precise_t lv_anim_path_linear(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation slowing down the start phase
  * @param a     pointer to an animation
  * @return      the current value to set
  */
-int32_t lv_anim_path_ease_in(const lv_anim_t * a);
+lv_value_precise_t lv_anim_path_ease_in(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation slowing down the end phase
  * @param a     pointer to an animation
  * @return      the current value to set
  */
-int32_t lv_anim_path_ease_out(const lv_anim_t * a);
+lv_value_precise_t lv_anim_path_ease_out(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation applying an "S" characteristic (cosine)
  * @param a     pointer to an animation
  * @return      the current value to set
  */
-int32_t lv_anim_path_ease_in_out(const lv_anim_t * a);
+lv_value_precise_t lv_anim_path_ease_in_out(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation with overshoot at the end
  * @param a     pointer to an animation
  * @return      the current value to set
  */
-int32_t lv_anim_path_overshoot(const lv_anim_t * a);
+lv_value_precise_t lv_anim_path_overshoot(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation with 3 bounces
  * @param a     pointer to an animation
  * @return      the current value to set
  */
-int32_t lv_anim_path_bounce(const lv_anim_t * a);
+lv_value_precise_t lv_anim_path_bounce(const lv_anim_t * a);
 
 /**
  * Calculate the current value of an animation applying step characteristic.
@@ -553,14 +637,14 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a);
  * @param a     pointer to an animation
  * @return      the current value to set
  */
-int32_t lv_anim_path_step(const lv_anim_t * a);
+lv_value_precise_t lv_anim_path_step(const lv_anim_t * a);
 
 /**
  * A custom cubic bezier animation path, need to specify cubic-parameters in a->parameter.bezier3
  * @param a     pointer to an animation
  * @return      the current value to set
  */
-int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a);
+lv_value_precise_t lv_anim_path_custom_bezier3(const lv_anim_t * a);
 
 #if LV_USE_EXT_DATA
 /**
