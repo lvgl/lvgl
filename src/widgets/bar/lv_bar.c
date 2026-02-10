@@ -56,7 +56,7 @@ static void draw_indic(lv_event_t * e);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
                                        lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
-static void lv_bar_anim(void * bar, int32_t value);
+static void lv_bar_anim(void * bar, lv_anim_value_t value);
 static void lv_bar_anim_completed(lv_anim_t * a);
 
 #if LV_USE_OBSERVER
@@ -717,7 +717,7 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
 }
 
-static void lv_bar_anim(void * var, int32_t value)
+static void lv_bar_anim(void * var, lv_anim_value_t value)
 {
     lv_bar_anim_t * bar_anim = var;
     bar_anim->anim_state    = value;

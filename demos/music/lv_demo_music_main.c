@@ -52,8 +52,8 @@ static lv_obj_t * create_spectrum_obj(lv_obj_t * parent);
 static lv_obj_t * create_ctrl_box(lv_obj_t * parent);
 static lv_obj_t * create_handle(lv_obj_t * parent);
 
-static void spectrum_anim_cb(void * a, int32_t v);
-static void start_anim_cb(void * var, int32_t v);
+static void spectrum_anim_cb(void * a, lv_anim_value_t v);
+static void start_anim_cb(void * var, lv_anim_value_t v);
 static void del_counter_timer_cb(lv_event_t * e);
 static void spectrum_draw_event_cb(lv_event_t * e);
 static lv_obj_t * album_image_create(lv_obj_t * parent);
@@ -65,7 +65,7 @@ static void timer_cb(lv_timer_t * t);
 static void track_load(uint32_t id);
 static void stop_start_anim(lv_timer_t * t);
 static void spectrum_end_cb(lv_anim_t * a);
-static void album_fade_anim_cb(void * var, int32_t v);
+static void album_fade_anim_cb(void * var, lv_anim_value_t v);
 static int32_t get_cos(int32_t deg, int32_t a);
 static int32_t get_sin(int32_t deg, int32_t a);
 
@@ -112,7 +112,7 @@ static uint32_t bar_color3_stop = 0;
  * Callback adapter function to convert parameter types to avoid compile-time
  * warning.
  */
-static void _image_set_scale_anim_cb(void * obj, int32_t scale)
+static void _image_set_scale_anim_cb(void * obj, lv_anim_value_t scale)
 {
     lv_image_set_scale((lv_obj_t *)obj, (uint16_t)scale);
 }
@@ -121,7 +121,7 @@ static void _image_set_scale_anim_cb(void * obj, int32_t scale)
  * Callback adapter function to convert parameter types to avoid compile-time
  * warning.
  */
-static void _obj_set_x_anim_cb(void * obj, int32_t x)
+static void _obj_set_x_anim_cb(void * obj, lv_anim_value_t x)
 {
     lv_obj_set_x((lv_obj_t *)obj, (int32_t)x);
 }
@@ -907,7 +907,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
     }
 }
 
-static void spectrum_anim_cb(void * a, int32_t v)
+static void spectrum_anim_cb(void * a, lv_anim_value_t v)
 {
     lv_obj_t * obj = a;
     if(start_anim) {
@@ -936,7 +936,7 @@ static void spectrum_anim_cb(void * a, int32_t v)
     lv_image_set_scale(album_image_obj, LV_SCALE_NONE + spectrum[spectrum_i][0]);
 }
 
-static void start_anim_cb(void * var, int32_t v)
+static void start_anim_cb(void * var, lv_anim_value_t v)
 {
     int32_t * av = var;
     *av = v;
@@ -1033,7 +1033,7 @@ static void stop_start_anim(lv_timer_t * t)
     lv_obj_refresh_ext_draw_size(spectrum_obj);
 }
 
-static void album_fade_anim_cb(void * var, int32_t v)
+static void album_fade_anim_cb(void * var, lv_anim_value_t v)
 {
     lv_obj_set_style_image_opa(var, v, 0);
 }

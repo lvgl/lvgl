@@ -4,17 +4,17 @@
 static const int32_t obj_width = 90;
 static const int32_t obj_height = 70;
 
-static void set_width(lv_anim_t * var, int32_t v)
+static void set_width(lv_anim_t * var, lv_anim_value_t v)
 {
     lv_obj_set_width((lv_obj_t *) var->var, v);
 }
 
-static void set_height(lv_anim_t * var, int32_t v)
+static void set_height(lv_anim_t * var, lv_anim_value_t v)
 {
     lv_obj_set_height((lv_obj_t *) var->var, v);
 }
 
-static void set_slider_value(lv_anim_t * var, int32_t v)
+static void set_slider_value(lv_anim_t * var, lv_anim_value_t v)
 {
     lv_slider_set_value((lv_obj_t *) var->var, v, LV_ANIM_OFF);
 }

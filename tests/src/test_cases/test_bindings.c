@@ -8,7 +8,7 @@ static void create_ui(void);
 static void chart_type_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void buttonmatrix_event_cb(lv_event_t * e);
 static lv_obj_t * list_button_create(lv_obj_t * parent);
-static void opa_anim_cb(void * var, int32_t v);
+static void opa_anim_cb(void * var, lv_anim_value_t v);
 static void draw_to_canvas(lv_obj_t * canvas);
 
 void setUp(void)
@@ -224,7 +224,7 @@ static lv_obj_t * list_button_create(lv_obj_t * parent)
     return btn;
 }
 
-static void opa_anim_cb(void * var, int32_t v)
+static void opa_anim_cb(void * var, lv_anim_value_t v)
 {
     lv_obj_set_style_opa(var, v, 0);
 }
