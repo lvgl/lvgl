@@ -185,8 +185,10 @@ void lv_wayland_deinit(void)
         lv_wl_ctx.wl_display = NULL;
     }
 
-    lv_timer_delete(lv_wl_ctx.read_compositor_events_timer);
-    lv_wl_ctx.read_compositor_events_timer = NULL;
+    if(lv_wl_ctx.read_compositor_events_timer) {
+        lv_timer_delete(lv_wl_ctx.read_compositor_events_timer);
+        lv_wl_ctx.read_compositor_events_timer = NULL;
+    }
 
     lv_ll_clear(&lv_wl_ctx.window_ll);
     is_wayland_initialized = false;
