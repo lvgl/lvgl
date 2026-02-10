@@ -258,6 +258,7 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                      * breaking Shift/Ctrl/Alt tracking. */
                     if(in.value == 2) {
                         /* For repeat events, we do nothing. LVGL handles this already */
+                        data->continue_reading = true;
                         break;
                     }
                     else {
@@ -278,7 +279,6 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                     }
                 }
                 else {
-                    LV_LOG_WARN("Key event code: %d, value: %d", in.code, in.value);
                     dsc->key = _evdev_process_key(in.code);
                     if(dsc->key) {
                         dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
