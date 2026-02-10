@@ -1445,16 +1445,27 @@ static lv_text_flag_t get_label_flags(lv_label_t * label)
 static void calculate_x_coordinate(int32_t * x, const lv_text_align_t align, const char * txt, uint32_t length,
                                    const lv_font_t * font, lv_area_t * txt_coords, lv_text_attributes_t * attributes)
 {
-    if(align == LV_TEXT_ALIGN_CENTER) {
-        const int32_t line_w = lv_text_get_width(txt, length, font, attributes);
-        *x += lv_area_get_width(txt_coords) / 2 - line_w / 2;
-    }
-    else if(align == LV_TEXT_ALIGN_RIGHT) {
-        const int32_t line_w = lv_text_get_width(txt, length, font, attributes);
-        *x += lv_area_get_width(txt_coords) - line_w;
-    }
-    else {
-        /* Nothing to do */
+    if(align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT) {
+        uint32_t trimmed_len = length;
+        while(trimmed_len > 0) {
+            char c = txt[trimmed_len - 1];
+            if(c == '\0' || c == '\n' || c == '\r') {
+                trimmed_len--;
+            }
+            else {
+                break;
+            }
+        }
+        while(trimmed_len > 0 && txt[trimmed_len - 1] == ' ') {
+            trimmed_len--;
+        }
+        const int32_t line_w = lv_text_get_width(txt, trimmed_len, font, attributes);
+        if(align == LV_TEXT_ALIGN_CENTER) {
+            *x += lv_area_get_width(txt_coords) / 2 - line_w / 2;
+        }
+        else {
+            *x += lv_area_get_width(txt_coords) - line_w;
+        }
     }
 }
 
