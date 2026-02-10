@@ -72,6 +72,11 @@ typedef struct {
     int key;
     lv_indev_state_t state;
     bool deleting;
+    /* Key rollover: when a new key is pressed before the previous one is released,
+     * we must first report the old key as released, then the new key as pressed
+     * on the next read cycle. */
+    int pending_key;
+    bool pending_key_valid;
 #  if LV_EVDEV_XKB
     lv_xkb_t xkb_dsc;
     bool xkb_ready;
@@ -169,6 +174,18 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
     LV_ASSERT_NULL(dsc);
 
+    /* If a key press was deferred (key rollover), deliver it now.
+     * The previous read cycle already reported the old key as released. */
+    if(dsc->pending_key_valid) {
+        dsc->key = dsc->pending_key;
+        dsc->state = LV_INDEV_STATE_PRESSED;
+        dsc->pending_key_valid = false;
+        data->state = dsc->state;
+        data->key = dsc->key;
+        data->continue_reading = true;
+        return;
+    }
+
     /*Update dsc with buffered events*/
     struct input_event in = { 0 };
     ssize_t br;
@@ -265,8 +282,18 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                         bool key_down = (in.value == 1);
                         uint32_t xkb_key = lv_xkb_process_key(&dsc->xkb_dsc, in.code, key_down);
                         if(xkb_key) {
-                            dsc->key = xkb_key;
-                            dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+                            if(key_down && dsc->state == LV_INDEV_STATE_PRESSED && (int)xkb_key != dsc->key) {
+                                /* Key rollover: a new key was pressed while a different key
+                                 * is still held. First release the old key; defer the new
+                                 * key press to the next read cycle. */
+                                dsc->pending_key = xkb_key;
+                                dsc->pending_key_valid = true;
+                                dsc->state = LV_INDEV_STATE_RELEASED;
+                            }
+                            else {
+                                dsc->key = xkb_key;
+                                dsc->state = key_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+                            }
                             data->continue_reading = true;
                             break;
                         }
@@ -278,22 +305,24 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                         }
                     }
                 }
-                else {
-                    dsc->key = _evdev_process_key(in.code);
-                    if(dsc->key) {
-                        dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+                else
+#  endif
+                {
+                    int evdev_key = _evdev_process_key(in.code);
+                    if(evdev_key) {
+                        if(in.value && dsc->state == LV_INDEV_STATE_PRESSED && evdev_key != dsc->key) {
+                            dsc->pending_key = evdev_key;
+                            dsc->pending_key_valid = true;
+                            dsc->state = LV_INDEV_STATE_RELEASED;
+                        }
+                        else {
+                            dsc->key = evdev_key;
+                            dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+                        }
                         data->continue_reading = true;
                         break;
                     }
                 }
-#  else
-                dsc->key = _evdev_process_key(in.code);
-                if(dsc->key) {
-                    dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
-                    data->continue_reading = true; /*Keep following events in buffer for now*/
-                    break;
-                }
-#  endif
             }
         }
 #if LV_USE_GESTURE_RECOGNITION
