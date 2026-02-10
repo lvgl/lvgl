@@ -65,7 +65,7 @@ jobs:
       - name: Install Doxygen
         run: |
           sudo apt-get update
-          sudo apt-get install doxygen
+          sudo apt-get install -y --no-install-recommends doxygen
           # Remember these for possible future use.
           # texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
       - name: Install Requirements
