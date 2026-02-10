@@ -516,13 +516,13 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
 
     if(stroke_width_scaled > 0) {
         /*Set the stroke and update the path type */
-        vg_lite_set_stroke(lv_vg_lite_path_get_path(outline),
-                           VG_LITE_CAP_ROUND, VG_LITE_JOIN_MITER, stroke_width_scaled, 1.0,
-                           NULL, 0, 0,
-                           lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_stroke(lv_vg_lite_path_get_path(outline),
+                                                  VG_LITE_CAP_ROUND, VG_LITE_JOIN_MITER, stroke_width_scaled, 1.0,
+                                                  NULL, 0, 0,
+                                                  lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true)), {});
 
-        vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_STROKE_PATH);
-        vg_lite_update_stroke(lv_vg_lite_path_get_path(outline));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_STROKE_PATH), {});
+        LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(lv_vg_lite_path_get_path(outline)), {});
 
         /*Draw the stroke (transparent fill)*/
         lv_vg_lite_draw(
@@ -533,15 +533,8 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
             VG_LITE_BLEND_SRC_OVER,
             lv_vg_lite_color(dsc->color, 0, true));
 
-        /*Remove the stroke (transparent stroke)*/
-        vg_lite_set_stroke(lv_vg_lite_path_get_path(outline),
-                           VG_LITE_CAP_ROUND, VG_LITE_JOIN_MITER, stroke_width_scaled, 1.0,
-                           NULL, stroke_width_scaled, 0,
-                           lv_vg_lite_color(dsc->outline_stroke_color, 0, true));
-
-        /*Set the stroke and update the path type */
-        vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_STROKE_PATH);
-        vg_lite_update_stroke(lv_vg_lite_path_get_path(outline));
+        /*Restore the path to fill mode, it will release the local memory allocated for the stroke op */
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_PATH), {});
 
     }
 
