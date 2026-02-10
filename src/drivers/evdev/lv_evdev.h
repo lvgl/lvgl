@@ -18,8 +18,8 @@ extern "C" {
 
 #if LV_USE_EVDEV
 
-#   if LV_EVDEV_XKB
-#     include <xkbcommon/xkbcommon.h>
+#if LV_EVDEV_XKB
+#include <xkbcommon/xkbcommon.h>
 #endif
 
 /**********************
