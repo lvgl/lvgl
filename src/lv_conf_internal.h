@@ -2080,6 +2080,13 @@
     #endif
 #endif
 
+#ifndef LV_TXT_SOFT_HYPHEN_BREAK_CHAR
+    #ifdef CONFIG_LV_TXT_SOFT_HYPHEN_BREAK_CHAR
+        #define LV_TXT_SOFT_HYPHEN_BREAK_CHAR CONFIG_LV_TXT_SOFT_HYPHEN_BREAK_CHAR
+    #else
+        #define LV_TXT_SOFT_HYPHEN_BREAK_CHAR 173    /* U+00AD SOFT HYPHEN */
+    #endif
+#endif
 /** While rendering text strings, break (wrap) text on these chars. */
 #ifndef LV_TXT_BREAK_CHARS
     #ifdef CONFIG_LV_TXT_BREAK_CHARS
