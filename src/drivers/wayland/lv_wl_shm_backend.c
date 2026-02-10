@@ -410,16 +410,6 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         }
     }
 
-    if(!lv_display_flush_is_last(disp)) {
-        lv_display_flush_ready(disp);
-        return;
-    }
-
-    lv_wl_buffer_t * buffer = &ddata->buffers[ddata->curr_wl_buffer_idx];
-    if(buffer->busy) {
-        LV_LOG_WARN("Failed to acquire a non-busy buffer");
-    }
-
     /* If we have rotation, copy from rotated_buf to Wayland buffer */
     if(rotation != LV_DISPLAY_ROTATION_0) {
         const int32_t hor_res = lv_display_get_horizontal_resolution(disp);
@@ -442,6 +432,16 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         const int32_t w = lv_area_get_width(area);
         const int32_t h = lv_area_get_height(area);
         wl_surface_damage(surface, area->x1, area->y1, w, h);
+    }
+
+    if(!lv_display_flush_is_last(disp)) {
+        lv_display_flush_ready(disp);
+        return;
+    }
+
+    lv_wl_buffer_t * buffer = &ddata->buffers[ddata->curr_wl_buffer_idx];
+    if(buffer->busy) {
+        LV_LOG_WARN("Failed to acquire a non-busy buffer");
     }
 
     struct wl_callback * callback = wl_surface_frame(surface);
