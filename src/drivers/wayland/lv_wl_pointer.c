@@ -205,7 +205,6 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
 
 static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint32_t serial, struct wl_surface * surface)
 {
-
     LV_UNUSED(data);
     LV_UNUSED(serial);
     LV_UNUSED(surface);
@@ -245,8 +244,6 @@ static void pointer_handle_button(void * data, struct wl_pointer * pointer, uint
     else if(button == BTN_MIDDLE) {
         seat_pointer->wheel_btn_state = lv_state;
     }
-
-
 }
 
 static void pointer_handle_axis(void * data, struct wl_pointer * pointer, uint32_t time, uint32_t axis,

@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
 #include <poll.h>
 #include <sys/mman.h>
 #include <linux/input.h>
@@ -50,6 +51,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static void read_compositor_events_timer_cb(lv_timer_t * timer);
 
 static void handle_global(void * data, struct wl_registry * registry, uint32_t name, const char * interface,
                           uint32_t version);
@@ -139,6 +142,7 @@ lv_result_t lv_wayland_init(void)
     lv_ll_init(&lv_wl_ctx.window_ll, sizeof(lv_wl_window_t));
 
     lv_tick_set_cb(tick_get_cb);
+    lv_wl_ctx.read_compositor_events_timer = lv_timer_create(read_compositor_events_timer_cb, LV_DEF_REFR_PERIOD, NULL);
 
     is_wayland_initialized = true;
     return LV_RESULT_OK;
@@ -177,13 +181,45 @@ void lv_wayland_deinit(void)
         lv_wl_ctx.wl_display = NULL;
     }
 
+    lv_timer_delete(lv_wl_ctx.read_compositor_events_timer);
+    lv_wl_ctx.read_compositor_events_timer = NULL;
+
     lv_ll_clear(&lv_wl_ctx.window_ll);
     is_wayland_initialized = false;
 }
 
+void lv_wayland_flush(void)
+{
+    int ret;
+    while((ret = wl_display_flush(lv_wl_ctx.wl_display)) == -1 && errno == EAGAIN) {
+        struct pollfd pfd = {
+            .fd = wl_display_get_fd(lv_wl_ctx.wl_display),
+            .events = POLLOUT,
+        };
+
+        if(poll(&pfd, 1, -1) == -1) {
+            LV_LOG_ERROR("poll failed: %s", strerror(errno));
+            break;
+        }
+        /* Socket is writable now, loop back and try flush again */
+    }
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void read_compositor_events_timer_cb(lv_timer_t * timer)
+{
+    LV_UNUSED(timer);
+
+    lv_wayland_flush();
+
+    while(wl_display_prepare_read(lv_wl_ctx.wl_display) != 0) {
+        wl_display_dispatch_pending(lv_wl_ctx.wl_display);
+    }
+    wl_display_read_events(lv_wl_ctx.wl_display);
+    wl_display_dispatch_pending(lv_wl_ctx.wl_display);
+}
 
 static void output_geometry(void * data, struct wl_output * output, int32_t x, int32_t y, int32_t physical_width,
                             int32_t physical_height,
