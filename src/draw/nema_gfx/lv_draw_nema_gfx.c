@@ -115,9 +115,9 @@ void lv_draw_nema_gfx_init(void)
 
 #if CONFIG_LV_NEMA_LIB_M55
     /*Create GPU Command List*/
-    draw_nema_gfx_unit->cl = nema_cl_create_sized(8*1024);
+    draw_nema_gfx_unit->cl = nema_cl_create_sized(LV_NEMA_GFX_CL_SIZE);
     /*Bind Command List*/
-    nema_cl_bind_sectored_circular(&(draw_nema_gfx_unit->cl),8);
+    nema_cl_bind_sectored_circular(&(draw_nema_gfx_unit->cl), LV_NEMA_GFX_CL_SECTOR_COUNT);
 #else
     /*Create GPU Command List*/
     draw_nema_gfx_unit->cl = nema_cl_create();
