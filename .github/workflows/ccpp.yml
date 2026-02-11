@@ -136,15 +136,70 @@ jobs:
     - name: Run tests
       run: python tests/main.py --report --update-image test --auto-clean --keep-report
     - name: Code coverage analysis
+      id: coverage
+      if: github.event_name == 'pull_request'
       run: |
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
-          git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
-          MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
-          echo "Merge-base: $MB"
-          python scripts/check_gcov_coverage.py --commit="${MB}...${{ github.event.pull_request.head.sha }}"
-        else
-          echo "Not a pull request, skipping code coverage analysis."
-        fi
+        git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
+        MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+        echo "Merge-base: $MB"
+        COMMIT_RANGE="${MB}...${{ github.event.pull_request.head.sha }}"
+        
+        # Capture coverage output
+        COVERAGE_OUTPUT=$(python scripts/check_gcov_coverage.py --commit="$COMMIT_RANGE" 2>&1) || true
+        echo "$COVERAGE_OUTPUT"
+        
+        # Extract key metrics for the summary
+        COVERAGE_PERCENT=$(echo "$COVERAGE_OUTPUT" | grep -oP 'Coverage: \K[\d.]+' || echo "N/A")
+        COVERED_LINES=$(echo "$COVERAGE_OUTPUT" | grep -oP 'Covered lines: \K\d+' || echo "0")
+        UNCOVERED_LINES=$(echo "$COVERAGE_OUTPUT" | grep -oP 'Uncovered lines: \K\d+' || echo "0")
+        TOTAL_LINES=$(echo "$COVERAGE_OUTPUT" | grep -oP 'New coverable lines \(per gcovr\): \K\d+' || echo "0")
+        
+        echo "coverage_percent=$COVERAGE_PERCENT" >> $GITHUB_OUTPUT
+        echo "covered_lines=$COVERED_LINES" >> $GITHUB_OUTPUT
+        echo "uncovered_lines=$UNCOVERED_LINES" >> $GITHUB_OUTPUT
+        echo "total_lines=$TOTAL_LINES" >> $GITHUB_OUTPUT
+        
+        # Extract uncovered lines list (limit to first 30 lines to avoid huge comments)
+        UNCOVERED_LIST=$(echo "$COVERAGE_OUTPUT" | grep -A 1000 "Uncovered lines" | tail -n +2 | head -30)
+        UNCOVERED_COUNT=$(echo "$COVERAGE_OUTPUT" | grep -A 1000 "Uncovered lines" | tail -n +2 | wc -l)
+        
+        # Save uncovered lines separately
+        {
+          echo 'uncovered_list<<EOF'
+          echo "$UNCOVERED_LIST"
+          if [ "$UNCOVERED_COUNT" -gt 30 ]; then
+            echo "  ... and $((UNCOVERED_COUNT - 30)) more uncovered lines"
+          fi
+          echo 'EOF'
+        } >> $GITHUB_OUTPUT
+
+    - name: Post coverage report to PR
+      if: github.event_name == 'pull_request'
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: coverage-${{ matrix.build_config }}
+        message: |
+          ## 📊 Code Coverage Report - ${{ matrix.build_config }}
+          
+          | Metric | Value |
+          |--------|-------|
+          | **Coverage** | ${{ steps.coverage.outputs.coverage_percent }}% |
+          | **Covered Lines** | ${{ steps.coverage.outputs.covered_lines }} |
+          | **Uncovered Lines** | ${{ steps.coverage.outputs.uncovered_lines }} |
+          | **Total New Coverable Lines** | ${{ steps.coverage.outputs.total_lines }} |
+          
+          <details>
+          <summary>📋 Uncovered Lines (max 30 shown)</summary>
+          
+          ```
+          ${{ steps.coverage.outputs.uncovered_list }}
+          ```
+          
+          </details>
+          
+          ---
+          *Report generated for commit ${{ github.event.pull_request.head.sha }}*
+
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v6
