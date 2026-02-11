@@ -17,6 +17,8 @@ or you can create your own animations using, for example, Adobe After Effects.
 The Lottie Widget is based on :ref:`lv_canvas` because in order to render the animation
 the user needs to provide a buffer where the current animation frame is stored.
 
+Lottie animations can be rendered purely in software or by :ref:`draw units` that support vector graphics.
+
 .. _lv_lottie_parts_and_styles:
 
 Parts and Styles
@@ -36,6 +38,7 @@ The Lottie Widget uses the `ThorVG <https://github.com/thorvg/thorvg>`__ library
 In order to use Lottie animations :c:macro:`LV_USE_THORVG_INTERNAL` (to use the built-in ThorVG) or
 :c:macro:`LV_USE_THORVG_EXTERNAL` (to link it externally) needs to be enabled in ``lv_conf.h``. For vector graphics in general
 :c:macro:`LV_USE_VECTOR_GRAPHIC` also needs to be enabled.
+If your Lottie files contain gradients, ensure :c:macro:`LV_GRADIENT_MAX_STOPS` is set sufficiently high.
 
 As ThorVG is written in C++, when using :c:macro:`LV_USE_THORVG_INTERNAL` be sure that you
 can compile the cpp files.
