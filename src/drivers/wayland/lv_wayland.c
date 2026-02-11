@@ -223,6 +223,16 @@ static void read_compositor_events_timer_cb(lv_timer_t * timer)
     while(wl_display_prepare_read(lv_wl_ctx.wl_display) != 0) {
         wl_display_dispatch_pending(lv_wl_ctx.wl_display);
     }
+
+    struct pollfd fds = {
+        .fd = wl_display_get_fd(lv_wl_ctx.wl_display),
+        .events = POLLIN,
+    };
+    const bool is_event_ready = poll(&fds, 1, 0) > 0;
+    if(!is_event_ready) {
+        wl_display_cancel_read(lv_wl_ctx.wl_display);
+        return;
+    }
     wl_display_read_events(lv_wl_ctx.wl_display);
     wl_display_dispatch_pending(lv_wl_ctx.wl_display);
 }
