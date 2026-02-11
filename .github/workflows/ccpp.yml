@@ -105,6 +105,9 @@ jobs:
 
   test-native:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
      matrix:
        # A valid option parameter to the cmake file.
@@ -138,6 +141,7 @@ jobs:
     - name: Code coverage analysis
       id: coverage
       if: github.event_name == 'pull_request'
+      continue-on-error: true
       run: |
         git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
         MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
@@ -145,14 +149,34 @@ jobs:
         COMMIT_RANGE="${MB}...${{ github.event.pull_request.head.sha }}"
         
         # Capture coverage output
-        COVERAGE_OUTPUT=$(python scripts/check_gcov_coverage.py --commit="$COMMIT_RANGE" 2>&1) || true
+        COVERAGE_OUTPUT=$(python scripts/check_gcov_coverage.py --commit="$COMMIT_RANGE" 2>&1)
+        COVERAGE_EXIT_CODE=$?
         echo "$COVERAGE_OUTPUT"
         
+        if [ $COVERAGE_EXIT_CODE -ne 0 ]; then
+          echo "coverage_status=failed" >> $GITHUB_OUTPUT
+          echo "coverage_percent=N/A" >> $GITHUB_OUTPUT
+          echo "covered_lines=N/A" >> $GITHUB_OUTPUT
+          echo "uncovered_lines=N/A" >> $GITHUB_OUTPUT
+          echo "total_lines=N/A" >> $GITHUB_OUTPUT
+          echo "uncovered_list=Coverage analysis failed. Check the logs for details." >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        echo "coverage_status=success" >> $GITHUB_OUTPUT
+        
         # Extract key metrics for the summary
-        COVERAGE_PERCENT=$(echo "$COVERAGE_OUTPUT" | grep -oP 'Coverage: \K[\d.]+' || echo "N/A")
+        COVERAGE_PERCENT=$(echo "$COVERAGE_OUTPUT" | grep -oP 'Coverage: \K[\d.]+' || echo "")
         COVERED_LINES=$(echo "$COVERAGE_OUTPUT" | grep -oP 'Covered lines: \K\d+' || echo "0")
         UNCOVERED_LINES=$(echo "$COVERAGE_OUTPUT" | grep -oP 'Uncovered lines: \K\d+' || echo "0")
         TOTAL_LINES=$(echo "$COVERAGE_OUTPUT" | grep -oP 'New coverable lines \(per gcovr\): \K\d+' || echo "0")
+        
+        # Handle case when no coverable lines found
+        if [ -z "$COVERAGE_PERCENT" ]; then
+          COVERAGE_PERCENT="N/A"
+        else
+          COVERAGE_PERCENT="${COVERAGE_PERCENT}%"
+        fi
         
         echo "coverage_percent=$COVERAGE_PERCENT" >> $GITHUB_OUTPUT
         echo "covered_lines=$COVERED_LINES" >> $GITHUB_OUTPUT
@@ -166,15 +190,19 @@ jobs:
         # Save uncovered lines separately
         {
           echo 'uncovered_list<<EOF'
-          echo "$UNCOVERED_LIST"
-          if [ "$UNCOVERED_COUNT" -gt 30 ]; then
-            echo "  ... and $((UNCOVERED_COUNT - 30)) more uncovered lines"
+          if [ -n "$UNCOVERED_LIST" ]; then
+            echo "$UNCOVERED_LIST"
+            if [ "$UNCOVERED_COUNT" -gt 30 ]; then
+              echo "  ... and $((UNCOVERED_COUNT - 30)) more uncovered lines"
+            fi
+          else
+            echo "No uncovered lines found."
           fi
           echo 'EOF'
         } >> $GITHUB_OUTPUT
 
     - name: Post coverage report to PR
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         header: coverage-${{ matrix.build_config }}
@@ -183,7 +211,7 @@ jobs:
           
           | Metric | Value |
           |--------|-------|
-          | **Coverage** | ${{ steps.coverage.outputs.coverage_percent }}% |
+          | **Coverage** | ${{ steps.coverage.outputs.coverage_percent }} |
           | **Covered Lines** | ${{ steps.coverage.outputs.covered_lines }} |
           | **Uncovered Lines** | ${{ steps.coverage.outputs.uncovered_lines }} |
           | **Total New Coverable Lines** | ${{ steps.coverage.outputs.total_lines }} |
