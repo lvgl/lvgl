@@ -52,6 +52,10 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/* Timer callback to process Wayland compositor events without blocking the UI.
+ * We use an independent timer so that we always read and flush compositor events even if LVGL
+ * doesn't need to redraw anything.
+ */
 static void read_compositor_events_timer_cb(lv_timer_t * timer);
 
 static void handle_global(void * data, struct wl_registry * registry, uint32_t name, const char * interface,
