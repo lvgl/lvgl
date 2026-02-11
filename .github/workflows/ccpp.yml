@@ -117,6 +117,21 @@ jobs:
     name: Run tests with ${{ matrix.build_config }}
     steps:
     - uses: actions/checkout@v6
+
+    # Early comment to verify permissions (can remove after confirming it works)
+    - name: Post initial comment to PR (permission test)
+      if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: coverage-${{ matrix.build_config }}
+        message: |
+          ## ⏳ Code Coverage Report - ${{ matrix.build_config }}
+          
+          🔄 **Running tests...** Please wait for the coverage analysis to complete.
+          
+          ---
+          *Started at: ${{ github.event.pull_request.updated_at }}*
+
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
       uses: actions/setup-python@v6
