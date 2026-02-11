@@ -706,6 +706,7 @@
          * and define the section in the linker script if you need the GPU memory to
          * be, e.g. in a region where accesses will not be cached.
          */
+    #if LV_USE_NEMA_LIB == LV_NEMA_LIB_M55
         #ifndef LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
             #ifdef CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
                 #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
@@ -713,6 +714,7 @@
                 #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM __attribute__((section("Nemagfx_Memory_Pool_Buffer")))
             #endif
         #endif
+    #endif
     #endif
 
     #if LV_USE_NEMA_GFX

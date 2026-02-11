@@ -113,7 +113,7 @@ void lv_draw_nema_gfx_init(void)
     lv_draw_nema_gfx_label_init(&(draw_nema_gfx_unit->base_unit));
 #endif
 
-#if CONFIG_LV_NEMA_LIB_M55
+#if LV_USE_NEMA_LIB == LV_NEMA_LIB_M55
     /*Create GPU Command List*/
     draw_nema_gfx_unit->cl = nema_cl_create_sized(LV_NEMA_GFX_CL_SIZE);
     /*Bind Command List*/

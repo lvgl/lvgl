@@ -35,14 +35,10 @@
     static lv_thread_sync_t sync;
     extern GPU2D_HandleTypeDef hgpu2d;
 #endif
-static GPU2D_HandleTypeDef hgpu2d;
 static volatile int last_cl_id = -1;
 /*********************
  *      DEFINES
  *********************/
-#if CONFIG_LV_NEMA_LIB_M55
-    #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM  __attribute__((section("Nemagfx_Memory_Pool_Buffer"))) /* Non-Cachable GPU Memory */
-#endif
 #define RING_SIZE                      1024 /* Ring Buffer Size in byte */
 
 /* NemaGFX byte pool size in bytes.
@@ -78,7 +74,7 @@ static volatile int last_cl_id = -1;
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_NEMA_LIB == LV_NEMA_LIB_M55
+#if LV_USE_NEMA_LIB == LV_NEMA_LIB_M55
     static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE] LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM; /* NemaGFX memory pool */
 #else
     static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE]; /* NemaGFX memory pool */
@@ -115,8 +111,8 @@ static void stm32_gpu2d_isr(const void * arg)
 #endif
 }
 
-static void stm32_gpu2d_interrupt_init(void)
 #if defined(__ZEPHYR__)
+static void stm32_gpu2d_interrupt_init(void)
 {
     IRQ_CONNECT(DT_IRQN(DT_NODELABEL(gpu2d)),
                 DT_IRQ_BY_NAME(DT_NODELABEL(gpu2d), gpu2d, priority),
@@ -145,6 +141,7 @@ int32_t nema_sys_init(void)
 
     if(HAL_GPU2D_Init(&hgpu2d) != HAL_OK) {
         LV_LOG_ERROR("HAL_GPU2D_Init failed\n");
+        return -1;
     }
 
     /* Configure  GPU2D Interrupt */
