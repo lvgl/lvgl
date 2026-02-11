@@ -323,14 +323,6 @@ static void refr_start_event(lv_event_t * e)
     lv_display_t * display = lv_event_get_target(e);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
 
-    while(wl_display_prepare_read(lv_wl_ctx.wl_display) != 0) {
-        wl_display_dispatch_pending(lv_wl_ctx.wl_display);
-    }
-
-    wl_display_read_events(lv_wl_ctx.wl_display);
-    wl_display_dispatch_pending(lv_wl_ctx.wl_display);
-
-
     if(lv_wayland_xdg_is_resize_pending(window)) {
         lv_wayland_xdg_resize(window);
     }
@@ -339,20 +331,9 @@ static void refr_start_event(lv_event_t * e)
 static void refr_end_event(lv_event_t * e)
 {
     LV_UNUSED(e);
-    int ret;
-    while((ret = wl_display_flush(lv_wl_ctx.wl_display)) == -1 && errno == EAGAIN) {
-        struct pollfd pfd = {
-            .fd = wl_display_get_fd(lv_wl_ctx.wl_display),
-            .events = POLLOUT,
-        };
-
-        if(poll(&pfd, 1, -1) == -1) {
-            LV_LOG_ERROR("poll failed: %s", strerror(errno));
-            break;
-        }
-        /* Socket is writable now, loop back and try flush again */
-    }
+    lv_wayland_flush();
 }
+
 static void res_changed_event(lv_event_t * e)
 {
     lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
