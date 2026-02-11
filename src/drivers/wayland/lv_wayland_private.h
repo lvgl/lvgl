@@ -106,7 +106,7 @@ typedef struct {
     struct xdg_wm_base * xdg_wm;
 
     lv_ll_t window_ll;
-    lv_timer_t * cycle_timer;
+    lv_timer_t * read_compositor_events_timer;
 } lv_wl_ctx_t;
 
 typedef struct {
@@ -165,6 +165,8 @@ extern lv_wl_ctx_t lv_wl_ctx;
 
 lv_result_t lv_wayland_init(void);
 void lv_wayland_deinit(void);
+
+void lv_wayland_flush(void);
 
 /**********************
  *      Window
