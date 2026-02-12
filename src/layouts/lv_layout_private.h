@@ -25,8 +25,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_layout_update_cb_t cb;
-    lv_layout_get_min_size_cb_t min_size_cb;
+    lv_layout_callbacks_t callbacks;
     void * user_data;
 } lv_layout_dsc_t;
 

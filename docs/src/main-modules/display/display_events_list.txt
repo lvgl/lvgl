@@ -30,3 +30,7 @@
   Call returns immediately if `disp->flushing == 0`.
 - :cpp:enumerator:`LV_EVENT_FLUSH_WAIT_FINISH`: Sent when the call to `wait_for_flushing()`
   is about to return, regardless whether any actual waiting occurred.
+- :cpp:enumerator:`LV_EVENT_SCREEN_UNLOAD_START`: Sent when a screen starts to be unloaded on this display
+- :cpp:enumerator:`LV_EVENT_SCREEN_LOAD_START`: Sent when a screen starts to be loaded on this display
+- :cpp:enumerator:`LV_EVENT_SCREEN_LOADED`: Sent when a screen finishes being loaded on this display
+- :cpp:enumerator:`LV_EVENT_SCREEN_UNLOADED`: Sent when a screen finishes being unloaded on this display

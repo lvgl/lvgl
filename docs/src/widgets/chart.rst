@@ -60,10 +60,11 @@ Point count (number of data points in all data series added to the chart)
 - default 10
 - If you provide your own data-value arrays, each array so provided must contain
   at least this number of values.
-- For LINE-, BAR-, STACKED-charts, this is the number of points on the X axis.
-- LINE-, BAR-, STACKED-charts require only one data-value array to supply Y-values for each data point.
+- For LINE-, CURVE-, BAR-, STACKED-charts, this is the number of points on the X axis.
+- LINE-, CURVE-, BAR-, STACKED-charts require only one data-value array to supply Y-values for each data point.
 - For SCATTER charts, this is the number of scatter-points in the data series.
 - SCATTER charts have separate data-value arrays for both X-values and Y-values.
+
 
 Any number of data series
 
@@ -157,6 +158,10 @@ A chart can be one of the following types:
   can also be illustrated if their ``width``, ``height``, ``bg_color`` and ``radius``
   styles (for :cpp:enumerator:`LV_PART_ITEMS`) are set and both ``width`` and
   ``height`` have non-zero values.
+- :cpp:enumerator:`LV_CHART_TYPE_CURVE`: Similar to the LINE type, but it draws Bezier curves
+  between data points.  ``LV_USE_VECTOR_GRAPHICS`` and a draw unit (e.g. VGLite, or ThorVG for
+  software rendering) need to be enabled. It also supports the ``line_dash_gap/width`` style
+  properties.
 - :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw individual vertical bars for each point in each series.
 - :cpp:enumerator:`LV_CHART_TYPE_STACKED`: Draw vertical stacked bars where multiple data series
   are displayed as segments within a single bar for each data point. Supports only positive values.

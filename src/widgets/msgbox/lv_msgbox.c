@@ -14,6 +14,7 @@
 #include "../label/lv_label.h"
 #include "../image/lv_image.h"
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_text_private.h"
 #include "../../display/lv_display.h"
 #include "../../layouts/flex/lv_flex.h"
 #include "../../stdlib/lv_string.h"
@@ -198,6 +199,20 @@ lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text)
     lv_obj_t * label = lv_label_create(mbox->content);
     lv_label_set_text(label, text);
     lv_obj_set_width(label, lv_pct(100));
+
+    return label;
+}
+
+lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...)
+{
+    lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
+
+    va_list args;
+    va_start(args, fmt);
+    lv_obj_t * label = lv_label_create(mbox->content);
+    lv_label_set_text_vfmt(label, fmt, args);
+    lv_obj_set_width(label, lv_pct(100));
+    va_end(args);
 
     return label;
 }

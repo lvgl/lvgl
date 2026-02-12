@@ -1178,6 +1178,7 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t came
 static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * model,
                                    bool transmission_pass)
 {
+    LV_UNUSED(model);
     const lv_gltf_model_t * main_model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
     auto b_radius = lv_gltf_data_get_radius(main_model);
 
@@ -1301,6 +1302,7 @@ static void setup_draw_environment_background(lv_opengl_shader_manager_t * manag
 
 static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color, lv_opa_t bg_opa)
 {
+    LV_UNUSED(viewer);
     GL_CALL(glClearDepthf(1.0f));
     /* Red / blue color order reversed below so they'll end up in the correct order
      * after the shader swaps the channels again, back to correct. */
@@ -1405,7 +1407,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                     lv_memcpy(target_scale, local_scale.data(), sizeof(*target_scale));
                     value_changed = true;
                 }
-                node->read_attrs->value_changed = value_changed;
+                node->read_attrs->value_changed |= value_changed;
             }
         }
 

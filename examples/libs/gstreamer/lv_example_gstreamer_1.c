@@ -18,7 +18,7 @@ static void update_duration_label(lv_obj_t * label, uint32_t duration);
 static void volume_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void update_position_slider(lv_timer_t * timer);
 static void play_pause_pressed(lv_event_t * e);
-static void streamer_ready(lv_event_t * e);
+static void stream_state_changed(lv_event_t * e);
 
 /**
  * Loads a video from the internet using the gstreamer widget
@@ -46,13 +46,6 @@ void lv_example_gstreamer_1(void)
 
     lv_obj_center(event_data.streamer);
 
-    /* The LV_EVENT_READY will fire when the stream is ready at that point you can query the stream
-     * information like its resolution and duration. See `streamer_ready` */
-    lv_obj_add_event_cb(event_data.streamer, streamer_ready, LV_EVENT_READY, &event_data);
-
-    /* Play the stream immediately */
-    lv_gstreamer_play(event_data.streamer);
-
     /* Create a slider to modify the stream volume and a label to visualize the current value */
     volume_setter_create(&event_data);
 
@@ -60,6 +53,13 @@ void lv_example_gstreamer_1(void)
      * One for the current position in the stream and the other for the total duration of the stream
      * Also add a pause/play button*/
     control_bar_create(&event_data);
+
+    /* The LV_EVENT_STATE_CHANGED will fire when the stream is ready at that point we can query the stream
+     * information like its resolution and duration. See `streamer_ready` */
+    lv_obj_add_event_cb(event_data.streamer, stream_state_changed, LV_EVENT_STATE_CHANGED, &event_data);
+
+    /* Play the stream immediately */
+    lv_gstreamer_play(event_data.streamer);
 
     /* Create a timer that will update the slider position based on the stream position
      * Make it 3 times faster than the refresh rate for a smoother effect */
@@ -173,30 +173,50 @@ static void play_pause_pressed(lv_event_t * e)
 {
     event_data_t * event_data = (event_data_t *)lv_event_get_user_data(e);
 
-    if(lv_streq(lv_label_get_text(event_data->button_label), LV_SYMBOL_PLAY)) {
-        lv_label_set_text(event_data->button_label, LV_SYMBOL_PAUSE);
+    if(lv_streq(lv_label_get_text(event_data->button_label), LV_SYMBOL_REFRESH)) {
+        lv_gstreamer_set_position(event_data->streamer, 0);
+        lv_gstreamer_play(event_data->streamer);
+    }
+    else if(lv_streq(lv_label_get_text(event_data->button_label), LV_SYMBOL_PLAY)) {
         lv_gstreamer_play(event_data->streamer);
     }
     else {
-        lv_label_set_text(event_data->button_label, LV_SYMBOL_PLAY);
         lv_gstreamer_pause(event_data->streamer);
     }
 }
-static void streamer_ready(lv_event_t * e)
+static void stream_state_changed(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     event_data_t * event_data = (event_data_t *)lv_event_get_user_data(e);
-    lv_obj_t * btn = event_data->pp_button;
+
     lv_obj_t * streamer = event_data->streamer;
 
-    if(code == LV_EVENT_READY) {
-        lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, 0);
-        uint32_t duration = lv_gstreamer_get_duration(streamer);
-        LV_LOG_USER("Video is starting");
-        LV_LOG_USER("\tStream resolution %" LV_PRId32 "x%" LV_PRId32, lv_image_get_src_width(streamer),
-                    lv_image_get_src_height(streamer));
-        LV_LOG_USER("\tStream duration %" LV_PRIu32, duration);
-        update_duration_label(event_data->duration_label, duration);
+    if(code != LV_EVENT_STATE_CHANGED) {
+        return;
+    }
+
+    lv_gstreamer_stream_state_t stream_state = lv_gstreamer_get_stream_state(e);
+    switch(stream_state) {
+        case LV_GSTREAMER_STREAM_STATE_START: {
+                uint32_t duration = lv_gstreamer_get_duration(streamer);
+                LV_LOG_USER("Stream is starting");
+                LV_LOG_USER("\tStream resolution %" LV_PRId32 "x%" LV_PRId32, lv_image_get_src_width(streamer),
+                            lv_image_get_src_height(streamer));
+                LV_LOG_USER("\tStream duration %" LV_PRIu32, duration);
+                update_duration_label(event_data->duration_label, duration);
+                break;
+            }
+        case LV_GSTREAMER_STREAM_STATE_END:
+            LV_LOG_USER("Stream is over");
+            lv_label_set_text_static(event_data->button_label, LV_SYMBOL_REFRESH);
+            break;
+        case LV_GSTREAMER_STREAM_STATE_PLAY:
+            lv_label_set_text_static(event_data->button_label, LV_SYMBOL_PAUSE);
+            break;
+        case LV_GSTREAMER_STREAM_STATE_PAUSE:
+        case LV_GSTREAMER_STREAM_STATE_STOP:
+            lv_label_set_text_static(event_data->button_label, LV_SYMBOL_PLAY);
+            break;
     }
 }
 

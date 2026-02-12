@@ -801,10 +801,10 @@ def local_style_set_doxygen_comment(p):
     print(' * @param  obj        Pointer to Widget')
     print_value_param(p, indent='   ')
     print(' * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:')
-    print('                          - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`')
-    print('                          - `LV_STATE_PRESSED`')
-    print('                          - `LV_PART_KNOB`')
-    print('                          - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`')
+    print(' *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`')
+    print(' *                        - `LV_STATE_PRESSED`')
+    print(' *                        - `LV_PART_KNOB`')
+    print(' *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`')
     print(' */')
 
 

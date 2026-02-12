@@ -8,6 +8,7 @@
  *********************/
 #include "lv_theme_private.h"
 #include "../core/lv_obj_private.h"
+#include "../core/lv_obj_style_private.h"
 #include "../core/lv_obj_class_private.h"
 #include "../../lvgl.h"
 
@@ -133,7 +134,12 @@ void lv_theme_set_external_data(lv_theme_t * theme, void * data, void (* free_cb
 static void apply_theme(lv_theme_t * th, lv_obj_t * obj)
 {
     if(th->parent) apply_theme(th->parent, obj);
-    if(th->apply_cb) th->apply_cb(th, obj);
+    if(th->apply_cb) {
+        th->apply_cb(th, obj);
+        for(uint32_t i = 0; i < obj->style_cnt; i++) {
+            obj->styles[i].is_theme = 1;
+        }
+    }
 }
 
 static void apply_theme_recursion(lv_theme_t * th, lv_obj_t * obj)

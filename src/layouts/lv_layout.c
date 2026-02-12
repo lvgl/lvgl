@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_layout.h"
 #include "lv_layout_private.h"
 #include "../core/lv_global.h"
-#include "../core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -55,24 +55,26 @@ void lv_layout_deinit(void)
     lv_free(layout_list_def);
 }
 
-uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
+uint32_t lv_layout_create(lv_layout_callbacks_t callbacks, void * user_data)
 {
+
     layout_list_def = lv_realloc(layout_list_def, (layout_cnt + 1) * sizeof(lv_layout_dsc_t));
     LV_ASSERT_MALLOC(layout_list_def);
 
-    layout_list_def[layout_cnt].cb = cb;
-    layout_list_def[layout_cnt].min_size_cb = NULL;
+    layout_list_def[layout_cnt].callbacks = callbacks;
     layout_list_def[layout_cnt].user_data = user_data;
     return layout_cnt++;
 }
 
-bool lv_layout_set_min_size_cb(uint32_t layout_id, lv_layout_get_min_size_cb_t min_size_cb)
+uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
 {
-    if(layout_id > 0 && layout_id < layout_cnt) {
-        layout_list_def[layout_id].min_size_cb = min_size_cb;
-        return true;
+    static bool warned = false;
+    if(!warned) {
+        LV_LOG_WARN("`lv_layout_register` is deprecated and replaced by `lv_layout_create`.");
+        warned = true;
     }
-    return false;
+    lv_layout_callbacks_t cbs = {.layout_update_cb  = cb, . get_min_size_cb = NULL};
+    return lv_layout_create(cbs, user_data);
 }
 
 bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
@@ -80,8 +82,8 @@ bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id < layout_cnt) {
         void * user_data = layout_list_def[layout_id].user_data;
-        if(layout_list_def[layout_id].min_size_cb) {
-            return layout_list_def[layout_id].min_size_cb(obj, size, width, user_data);
+        if(layout_list_def[layout_id].callbacks.get_min_size_cb) {
+            return layout_list_def[layout_id].callbacks.get_min_size_cb(obj, size, width, user_data);
         }
     }
     return false;
@@ -92,7 +94,7 @@ void lv_layout_apply(lv_obj_t * obj)
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id < layout_cnt) {
         void  * user_data = layout_list_def[layout_id].user_data;
-        layout_list_def[layout_id].cb(obj, user_data);
+        layout_list_def[layout_id].callbacks.layout_update_cb(obj, user_data);
     }
 }
 

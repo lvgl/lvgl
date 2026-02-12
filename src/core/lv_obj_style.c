@@ -73,6 +73,7 @@ static void fade_in_anim_completed(lv_anim_t * a);
 static bool style_has_flag(const lv_style_t * style, uint32_t flag);
 static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                               lv_style_value_t * value_act);
+static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool theme_only);
 #if LV_USE_OBSERVER
     static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void bind_style_prop_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -211,55 +212,12 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
 
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
-    lv_state_t state = lv_obj_style_get_selector_state(selector);
-    lv_part_t part = lv_obj_style_get_selector_part(selector);
-    lv_style_prop_t prop = LV_STYLE_PROP_ANY;
-    if(style && style->prop_cnt == 0) prop = LV_STYLE_PROP_INV;
+    remove_style_core(obj, style, selector, false);
+}
 
-    if(style && part == LV_PART_MAIN && style_has_flag(style, LV_STYLE_PROP_FLAG_TRANSFORM)) {
-        lv_obj_invalidate(obj);
-    }
-
-    uint32_t i = 0;
-    bool deleted = false;
-    while(i <  obj->style_cnt) {
-        lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
-        lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
-        if((state != LV_STATE_ANY && state_act != state) ||
-           (part != LV_PART_ANY && part_act != part) ||
-           (style != NULL && style != obj->styles[i].style)) {
-            i++;
-            continue;
-        }
-
-        if(obj->styles[i].is_trans) {
-            trans_delete(obj, part, LV_STYLE_PROP_ANY, NULL);
-        }
-
-        if(obj->styles[i].is_local || obj->styles[i].is_trans) {
-            if(obj->styles[i].style) lv_style_reset((lv_style_t *)obj->styles[i].style);
-            lv_free((lv_style_t *)obj->styles[i].style);
-            obj->styles[i].style = NULL;
-        }
-
-        /*Shift the styles after `i` by one*/
-        uint32_t j;
-        for(j = i; j < (uint32_t)obj->style_cnt - 1 ; j++) {
-            obj->styles[j] = obj->styles[j + 1];
-        }
-
-        obj->style_cnt--;
-        obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-
-        deleted = true;
-        /*The style from the current `i` index is removed, so `i` points to the next style.
-         *Therefore it doesn't needs to be incremented*/
-    }
-
-    if(deleted && prop != LV_STYLE_PROP_INV) {
-        full_cache_refresh(obj, part);
-        lv_obj_refresh_style(obj, part, prop);
-    }
+void lv_obj_remove_theme(lv_obj_t * obj, lv_style_selector_t selector)
+{
+    remove_style_core(obj, NULL, selector, true);
 }
 
 void lv_obj_remove_style_all(lv_obj_t * obj)
@@ -1297,6 +1255,65 @@ static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_sel
     return LV_STYLE_RES_NOT_FOUND;
 }
 
+static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool theme_only)
+{
+    lv_state_t state = lv_obj_style_get_selector_state(selector);
+    lv_part_t part = lv_obj_style_get_selector_part(selector);
+    lv_style_prop_t prop = LV_STYLE_PROP_ANY;
+    if(style && style->prop_cnt == 0) prop = LV_STYLE_PROP_INV;
+
+    if(style && part == LV_PART_MAIN && style_has_flag(style, LV_STYLE_PROP_FLAG_TRANSFORM)) {
+        lv_obj_invalidate(obj);
+    }
+
+    uint32_t i = 0;
+    bool deleted = false;
+    while(i <  obj->style_cnt) {
+        lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
+        if(theme_only && !obj->styles[i].is_theme) {
+            i++;
+            continue;
+        }
+        if((state != LV_STATE_ANY && state_act != state) ||
+           (part != LV_PART_ANY && part_act != part) ||
+           (style != NULL && style != obj->styles[i].style)) {
+            i++;
+            continue;
+        }
+
+        if(obj->styles[i].is_trans) {
+            trans_delete(obj, part, LV_STYLE_PROP_ANY, NULL);
+        }
+
+        if(obj->styles[i].is_local || obj->styles[i].is_trans) {
+            if(obj->styles[i].style) lv_style_reset((lv_style_t *)obj->styles[i].style);
+            lv_free((lv_style_t *)obj->styles[i].style);
+            obj->styles[i].style = NULL;
+        }
+
+        /*Shift the styles after `i` by one*/
+        uint32_t j;
+        for(j = i; j < (uint32_t)obj->style_cnt - 1 ; j++) {
+            obj->styles[j] = obj->styles[j + 1];
+        }
+
+        obj->style_cnt--;
+        obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+
+        deleted = true;
+        /*The style from the current `i` index is removed, so `i` points to the next style.
+         *Therefore it doesn't needs to be incremented*/
+    }
+
+    if(deleted && prop != LV_STYLE_PROP_INV) {
+        full_cache_refresh(obj, part);
+        lv_obj_refresh_style(obj, part, prop);
+    }
+}
+
+
+
 #if LV_USE_OBSERVER
 
 static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -1323,5 +1340,6 @@ static void bind_style_prop_observer_cb(lv_observer_t * observer, lv_subject_t *
 
     lv_obj_set_local_style_prop(observer->target, p->prop, style_v, p->selector);
 }
+
 
 #endif /*LV_USE_OBSERVER*/

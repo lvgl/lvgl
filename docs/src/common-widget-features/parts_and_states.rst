@@ -46,6 +46,7 @@ States
 A widget can be in a combination of the following states:
 
 - :cpp:enumerator:`LV_STATE_DEFAULT`: Normal, released state.
+- :cpp:enumerator:`LV_STATE_ALT`: Alternative style settings, e.g. dark mode.
 - :cpp:enumerator:`LV_STATE_CHECKED`: Toggled or checked state.
 - :cpp:enumerator:`LV_STATE_FOCUSED`: Focused via keypad, encoder, or clicked via
   touchpad/mouse.

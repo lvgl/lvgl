@@ -3,6 +3,7 @@
 import argparse
 from argparse import RawTextHelpFormatter
 import os
+import subprocess
 import sys
 
 parser = argparse.ArgumentParser(description="""Create fonts for LVGL including the built-in symbols. lv_font_conv needs to be installed. See https://github.com/lvgl/lv_font_conv
@@ -58,5 +59,16 @@ if args.subpx: subpx = "--lcd"
 syms = "61441,61448,61451,61452,61452,61453,61457,61459,61461,61465,61468,61473,61478,61479,61480,61502,61507,61512,61515,61516,61517,61521,61522,61523,61524,61543,61544,61550,61552,61553,61556,61559,61560,61561,61563,61587,61589,61636,61637,61639,61641,61664,61671,61674,61683,61724,61732,61787,61931,62016,62017,62018,62019,62020,62087,62099,62212,62189,62810,63426,63650"
 
 #Run the command (Add degree and bullet symbol)
-cmd = "lv_font_conv {} {} --bpp {} --size {} --font {} -r {} {} --font FontAwesome5-Solid+Brands+Regular.woff -r {} --format lvgl -o {} --force-fast-kern-format".format(subpx, compr, args.bpp, args.size, args.font, args.range[0], args.symbols[0], syms, args.output)
-os.system(cmd)
+cmd = ["lv_font_conv"]
+if subpx:
+    cmd.append(subpx)
+if compr:
+    cmd.extend(compr.split())
+cmd.extend(["--bpp", str(args.bpp), "--size", str(args.size), "--font", args.font, "-r", args.range[0]])
+if args.symbols[0]:
+    cmd.extend(args.symbols[0].split())
+cmd.extend(["--font", "FontAwesome5-Solid+Brands+Regular.woff", "-r", syms, "--format", "lvgl"])
+if args.output:
+    cmd.extend(["-o", args.output])
+cmd.append("--force-fast-kern-format")
+subprocess.run(cmd, check=True)

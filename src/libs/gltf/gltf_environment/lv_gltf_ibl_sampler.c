@@ -38,7 +38,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path);
+static lv_result_t ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path);
 static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler);
 static void ibl_sampler_destroy(lv_gltf_ibl_sampler_t * sampler);
 static bool ibl_gl_has_extension(const char * extension);
@@ -153,7 +153,11 @@ lv_gltf_environment_t * lv_gltf_environment_create(lv_gltf_ibl_sampler_t * sampl
         LV_LOG_WARN("Failed to create environment");
         return NULL;
     }
-    ibl_sampler_load(sampler, file_path);
+    if(ibl_sampler_load(sampler, file_path) != LV_RESULT_OK) {
+        LV_LOG_WARN("Failed to initialize ibl sampler");
+        lv_free(env);
+        return NULL;
+    }
     ibl_sampler_filter(sampler);
 
     env->diffuse = sampler->lambertian_texture_id;
@@ -178,7 +182,7 @@ void lv_gltf_environment_delete(lv_gltf_environment_t * env)
  *   STATIC FUNCTIONS
  **********************/
 
-static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
+static lv_result_t ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
 {
     // vv -- WebGL Naming
     if(ibl_gl_has_extension("GL_NV_float") && ibl_gl_has_extension("GL_ARB_color_buffer_float")) {
@@ -191,29 +195,34 @@ static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
 
     int32_t src_width, src_height, src_nrChannels;
 
-    float * data;
-    if(path != NULL) {
+    float * data = NULL;
+    if(path) {
         data = stbi_loadf(path, &src_width, &src_height, &src_nrChannels, 3);
     }
-    else {
+
+    if(!data) {
+        if(path) {
+            LV_LOG_WARN("Failed to load environment image. Falling back to default");
+        }
         extern unsigned char chromatic_jpg[];
         extern unsigned int chromatic_jpg_len;
         data = stbi_loadf_from_memory(chromatic_jpg, chromatic_jpg_len, &src_width, &src_height, &src_nrChannels, 3);
+        if(!data) {
+            LV_LOG_ERROR("Failed to load fallback env image");
+            return LV_RESULT_INVALID;
+        }
     }
 
     {
         lv_gltf_ibl_image_t panorama_image = {
-            .data = (float *)lv_malloc(src_width * src_height * 3 * sizeof(float)),
+            .data = data,
             .data_len = src_width * src_height * 3,
             .width = src_width,
             .height = src_height,
         };
-        LV_ASSERT_MALLOC(panorama_image.data);
 
-        lv_memcpy(panorama_image.data, data, panorama_image.data_len * sizeof(*panorama_image.data));
-        stbi_image_free(data);
         sampler->input_texture_id = ibl_load_texture_hdr(sampler, &panorama_image);
-        lv_free(panorama_image.data);
+        stbi_image_free(data);
     }
 
     GL_CALL(glGenFramebuffers(1, &sampler->framebuffer));
@@ -229,33 +238,57 @@ static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
     GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, sampler->sheen_texture_id));
     GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
     sampler->mipmap_levels = ibl_count_bits(sampler->cube_map_resolution) + 1 - sampler->lowest_mip_level;
+    return LV_RESULT_OK;
 }
 
 static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler)
 {
     GLint prev_framebuffer;
+    GLint prev_viewport[4];
+    GLint prev_program;
+    GLint prev_texture_2d;
+    GLint prev_texture_cube;
+    GLint prev_active_texture;
+
     GL_CALL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_framebuffer));
+    GL_CALL(glGetIntegerv(GL_VIEWPORT, prev_viewport));
+    GL_CALL(glGetIntegerv(GL_CURRENT_PROGRAM, &prev_program));
+    GL_CALL(glGetIntegerv(GL_ACTIVE_TEXTURE, &prev_active_texture));
+    GL_CALL(glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev_texture_2d));
+    GL_CALL(glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &prev_texture_cube));
 
     ibl_panorama_to_cubemap(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_cube_map_to_lambertian(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_cube_map_to_ggx(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_cube_map_to_sheen(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_sample_ggx_lut(sampler);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
-
     ibl_sample_charlie_lut(sampler);
+
+    // Restore all GL state
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
+    GL_CALL(glViewport(prev_viewport[0], prev_viewport[1], prev_viewport[2], prev_viewport[3]));
+    GL_CALL(glUseProgram(prev_program));
+    GL_CALL(glActiveTexture(prev_active_texture));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, prev_texture_2d));
+    GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, prev_texture_cube));
 }
 static void ibl_sampler_destroy(lv_gltf_ibl_sampler_t * sampler)
 {
+    if(sampler->framebuffer != 0) {
+        GL_CALL(glDeleteFramebuffers(1, &sampler->framebuffer));
+        sampler->framebuffer = 0;
+    }
+
+    if(sampler->input_texture_id != 0) {
+        GL_CALL(glDeleteTextures(1, &sampler->input_texture_id));
+        sampler->input_texture_id = 0;
+    }
+
+    if(sampler->cube_map_texture_id != 0) {
+        GL_CALL(glDeleteTextures(1, &sampler->cube_map_texture_id));
+        sampler->cube_map_texture_id = 0;
+    }
+
     GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_vertex_buffer));
     GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_tex_coord_buffer));
     lv_opengl_shader_manager_deinit(&sampler->shader_manager);

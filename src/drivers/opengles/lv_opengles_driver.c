@@ -305,13 +305,30 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, params->texture));
 
-    float tex_w = (float)lv_area_get_width(&intersection);
-    float tex_h = (float)lv_area_get_height(&intersection);
+    bool is_turned = false;
+    if(params->matrix) {
+        is_turned = params->matrix->m[0][0] == 0.f;
+    }
+    float tex_w, tex_h, full_w, full_h, inter_w, inter_h;
+    full_w = (float)params->disp_w;
+    full_h = (float)params->disp_h;
+    if(is_turned) {
+        tex_w = (float)lv_area_get_height(&intersection);
+        tex_h = (float)lv_area_get_width(&intersection);
+        inter_w = (float)intersection.y1;
+        inter_h = (float)intersection.x1;
+    }
+    else {
+        tex_w = (float)lv_area_get_width(&intersection);
+        tex_h = (float)lv_area_get_height(&intersection);
+        inter_w = (float)intersection.x1;
+        inter_h = (float)intersection.y1;
+    }
 
-    float hor_scale = tex_w / (float)params->disp_w;
-    float ver_scale = tex_h / (float)params->disp_h;
-    float hor_translate = (float)intersection.x1 / (float)params->disp_w * 2.0f - (1.0f - hor_scale);
-    float ver_translate = -((float)intersection.y1 / (float)params->disp_h * 2.0f - (1.0f - ver_scale));
+    float hor_scale = tex_w / full_w;
+    float ver_scale = tex_h / full_h;
+    float hor_translate = inter_w / full_w * 2.0f - (1.0f - hor_scale);
+    float ver_translate = -(inter_h / full_h * 2.0f - (1.0f - ver_scale));
     hor_scale = params->h_flip ? -hor_scale : hor_scale;
     ver_scale = params->v_flip ? ver_scale : -ver_scale;
 
@@ -340,19 +357,53 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
 
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
+
     if(params->matrix) {
-        lv_matrix_multiply(&matrix, params->matrix);
+        if(is_turned) {
+            /* Display turned 90 or 270 */
+            if(params->matrix->m[0][1] < 0.f) hor_translate = -hor_translate;
+            if(params->matrix->m[1][0] < 0.f) ver_translate = -ver_translate;
+            hor_scale = -hor_scale;
+            ver_scale = -ver_scale;
+            lv_matrix_translate(&matrix, hor_translate, ver_translate);
+            lv_matrix_scale(&matrix, hor_scale, ver_scale);
+
+            lv_matrix_t adj_matrix;
+            lv_memcpy(&adj_matrix, params->matrix, sizeof(lv_matrix_t));
+            adj_matrix.m[0][2] = 0.f;
+            adj_matrix.m[1][2] = 0.f;
+            lv_matrix_multiply(&matrix, &adj_matrix);
+
+        }
+        else {
+            /* Display turned 0 or 180 */
+            if(params->matrix->m[0][0] < -0.0001f) {
+                ver_scale = -ver_scale;
+                ver_translate = -ver_translate;
+            }
+
+            if(params->matrix->m[1][1] < -0.0001f) {
+                hor_scale = -hor_scale;
+                hor_translate = -hor_translate;
+            }
+
+            lv_matrix_translate(&matrix, hor_translate, ver_translate);
+            lv_matrix_scale(&matrix, hor_scale, ver_scale);
+        }
     }
     else {
         lv_matrix_translate(&matrix, hor_translate, ver_translate);
         lv_matrix_scale(&matrix, hor_scale, ver_scale);
     }
 
+    lv_matrix_t gl_matrix;
+    lv_matrix_transpose(&matrix, &gl_matrix);
+
     lv_opengles_shader_bind();
     lv_opengles_enable_blending(params->blend_opt);
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, (const float *)&matrix);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, (float *)&gl_matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)params->opa / (float)LV_OPA_100);
     lv_opengles_shader_set_uniform1i("u_IsFill", params->texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)params->fill_color.red / 255.0f,

@@ -1,5 +1,5 @@
 .. include:: /include/substitutions.txt
-.. _stm32 ltdc driver:
+.. _stm32_ltdc_driver:
 
 =========================
 STM32 LTDC Display Driver
