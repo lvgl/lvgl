@@ -494,7 +494,7 @@ lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t *
 
     lv_3dray_t outray  {{0, 0, 0}, {0, 0, 0}};
 
-    fastgltf::math::fmat4x4 proj_mat = fastgltf::math::invert(fastgltf::math::fmat4x4(viewer->projection_matrix));
+    fastgltf::math::fmat4x4 proj_mat = fastgltf::math::inverse(fastgltf::math::fmat4x4(viewer->projection_matrix));
 
     /* Convert mouse coordinates to NDC */
     float x = norm_mouse_x * 2.0f - 1.0f;
@@ -507,7 +507,7 @@ lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t *
     ray_eye[3] = 0.0f;
 
     /* Calculate ray world direction */
-    fastgltf::math::fvec4 ray_world = fastgltf::math::invert(viewer->view_matrix) * ray_eye;
+    fastgltf::math::fvec4 ray_world = fastgltf::math::inverse(viewer->view_matrix) * ray_eye;
     auto ray_direction = fastgltf::math::normalize(fastgltf::math::fvec3(ray_world[0], ray_world[1], ray_world[2]));
 
     outray.direction = {ray_direction[0], ray_direction[1], ray_direction[2]};
