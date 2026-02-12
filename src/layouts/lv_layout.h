@@ -66,16 +66,6 @@ uint32_t lv_layout_create(lv_layout_callbacks_t callbacks, void * user_data);
  */
 uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data);
 
-/**
- * Set the optional callback which is used to precompute the minimum required size for a layout before it is applied to
- * the children.
- * @param layout_id the ID of the layout
- * @param cb        the callback
- * @return          `true` if the callback was set successfully, `false` if not.
- * @note            `user_data` set with `lv_layout_register()` will be passed to the callback.
- */
-bool lv_layout_set_min_size_cb(uint32_t layout_id, lv_layout_get_min_size_cb_t cb);
-
 /**********************
  *      MACROS
  **********************/
