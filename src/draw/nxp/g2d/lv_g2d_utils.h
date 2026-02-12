@@ -22,7 +22,7 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_G2D
-#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
+#if LV_USE_DRAW_G2D
 #include "../../sw/lv_draw_sw_private.h"
 #include "g2d.h"
 #include "g2dExt.h"
@@ -65,15 +65,13 @@ void g2d_set_handle(void * handle);
 
 void * g2d_get_handle(void);
 
-#if LV_USE_ROTATE_G2D
 void g2d_rotate(lv_draw_buf_t * buf1, lv_draw_buf_t * buf2, int32_t width, int32_t height, uint32_t rotation,
                 lv_color_format_t cf);
-#endif
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_DRAW_G2D */
 #endif /*LV_USE_G2D*/
 
 #ifdef __cplusplus
