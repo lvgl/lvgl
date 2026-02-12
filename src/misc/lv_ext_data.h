@@ -1,10 +1,10 @@
 /**
- * @file lvgl_private.h
- * This file exists only to be compatible with Arduino's library structure
+ * @file lv_ext_data.h
+ *
  */
 
-#ifndef LVGL_PRIVATE_SRC_H
-#define LVGL_PRIVATE_SRC_H
+#ifndef LV_EXT_DATA_H
+#define LV_EXT_DATA_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl_private.h"
+#include "../lv_conf_internal.h"
 
 /*********************
  *      DEFINES
@@ -22,6 +22,12 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+#if LV_USE_EXT_DATA
+typedef struct {
+    void * data;
+    void (* free_cb)(void * data);
+} lv_ext_data_t;
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -35,4 +41,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /* LVGL_PRIVATE_SRC_H */
+#endif /* LV_EXT_DATA_H */

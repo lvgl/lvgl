@@ -14,11 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "lv_ext_data.h"
 #include "lv_timer.h"
-
-#if LV_USE_EXT_DATA
-#include "../lvgl_private.h"
-#endif
 
 /*********************
  *      DEFINES
