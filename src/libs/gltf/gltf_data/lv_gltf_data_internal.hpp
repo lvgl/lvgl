@@ -8,11 +8,9 @@
 #include "../gltf_view/lv_gltf.h"
 #include "lv_gltf_data_internal.h"
 
-#include "../../../misc/lv_array.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
 
 #include "../../../misc/lv_types.h"
-#include "../../../misc/lv_ll.h"
 #include "../../../misc/lv_event.h"
 
 #ifdef __cplusplus
@@ -111,7 +109,7 @@ struct _lv_gltf_model_t {
     std::vector<size_t> validated_skins;
     std::vector<GLuint> skin_tex;
     NodePrimCenterMap local_mesh_to_center_points_by_primitive;
-    lv_gltf_t * viewer;
+    lv_array_t viewers;
 
     std::vector<lv_gltf_mesh_data_t> meshes;
     std::vector<GLuint> textures;
@@ -128,7 +126,7 @@ struct _lv_gltf_model_t {
     size_t current_animation;
     size_t last_material_index;
 
-    uint32_t last_camera_index;
+    int32_t animation_speed_ratio;
     int32_t last_anim_num;
 
     float bound_radius;
@@ -138,11 +136,9 @@ struct _lv_gltf_model_t {
     uint32_t last_tick;
     uint32_t camera;
 
+    bool node_transform_cache_changed;
     bool is_animation_enabled;
     bool last_pass_was_transmission;
-    bool last_frame_was_antialiased;
-    bool last_frame_no_motion;
-    bool _last_frame_no_motion;
     bool write_ops_pending;
     bool write_ops_flushed;
     struct _lv_gltf_model_t * linked_view_source;
@@ -314,7 +310,7 @@ bool lv_gltf_data_has_cached_transform(lv_gltf_model_t * data, fastgltf::Node * 
  * @param D Pointer to the lv_gltf_data_t object containing the model data.
  * @return True if the transformation cache is empty, false otherwise.
  */
-bool lv_gltf_data_transform_cache_is_empty(lv_gltf_model_t * data);
+bool lv_gltf_model_needs_transforms(lv_gltf_model_t * data);
 
 /**
  * @brief Retrieve the size of the skins in the GLTF model data.
@@ -361,7 +357,7 @@ lv_gltf_mesh_data_t * lv_gltf_get_new_meshdata(lv_gltf_model_t * _data);
 lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path, fastgltf::Asset);
 
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
-                                             lv_opengl_shader_manager_t * shaders);
+                                             lv_gltf_model_loader_t * loader);
 
 fastgltf::math::fvec4 lv_gltf_get_primitive_centerpoint(lv_gltf_model_t * data, fastgltf::Mesh & mesh,
                                                         uint32_t prim_num);

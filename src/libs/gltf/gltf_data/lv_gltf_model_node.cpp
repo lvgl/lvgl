@@ -12,14 +12,12 @@
 
 #include <float.h>
 #include "fastgltf/types.hpp"
-#include "lv_gltf_model.h"
 #include "../../../misc/lv_array.h"
 #include "../../../misc/lv_assert.h"
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_event_private.h"
 #include "../../../stdlib/lv_string.h"
 #include "../../../stdlib/lv_sprintf.h"
-#include "../../../core/lv_obj_pos.h"
 
 /*********************
  *      DEFINES
@@ -169,6 +167,7 @@ void lv_gltf_model_send_new_values(lv_gltf_model_t * model)
         lv_event_push_and_send(&node->read_attrs->event_list, LV_EVENT_VALUE_CHANGED, node, &node->read_attrs->node_data);
         node->read_attrs->value_changed = false;
     }
+    model->node_transform_cache_changed = false;
     model->write_ops_flushed = false;
 }
 
@@ -335,7 +334,7 @@ lv_result_t lv_gltf_model_node_get_euler_rotation(lv_event_t * e, lv_3dpoint_t *
 
 static void invalidate_model(lv_gltf_model_t * model)
 {
-    lv_obj_invalidate((lv_obj_t *)model->viewer);
+    lv_gltf_model_invalidate(model);
     model->write_ops_pending = true;
 }
 
