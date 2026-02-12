@@ -401,6 +401,9 @@
     #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
 #endif
 
+/* Use EVE BT820 GPU through EVE HAL. */
+#define LV_USE_DRAW_EVE5 0
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

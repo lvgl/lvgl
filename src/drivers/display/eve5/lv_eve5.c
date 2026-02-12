@@ -52,6 +52,7 @@ typedef struct
 /* Display callbacks */
 static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map);
 static void wait_cb(lv_display_t *disp);
+static void invalidate_area_cb(lv_event_t *e);
 static void composite_to_framebuffer(lv_eve5_driver_t *drvr);
 
 /**********************
@@ -115,6 +116,11 @@ lv_display_t *lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     lv_display_set_driver_data(disp, drvr);
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_flush_wait_cb(disp, wait_cb);
+
+    /* Expand invalidated areas by 1px to account for EVE AA fringe bleed.
+     * Without this, sub-pixel AA at primitive edges can leave ghost pixels
+     * outside the redrawn area when objects disappear (e.g., blinking cursor). */
+    lv_display_add_event_cb(disp, invalidate_area_cb, LV_EVENT_INVALIDATE_AREA, NULL);
 
     /* Allocate render buffer for LVGL - use partial rendering */
     /* 64 lines buffer is a good balance for RAM usage vs Draw Call overhead */
@@ -203,6 +209,19 @@ Esd_GpuAlloc *lv_eve5_get_allocator(lv_display_t *disp)
  * Display Callbacks
  *--------------------*/
 
+static void invalidate_area_cb(lv_event_t *e)
+{
+    lv_area_t *area = lv_event_get_invalidated_area(e);
+    if(area == NULL) return;
+
+    /* Expand by 1px in each direction to cover EVE AA fringe */
+    lv_display_t *disp = lv_event_get_target_obj(e);
+    area->x1 = LV_MAX(area->x1 - 1, 0);
+    area->y1 = LV_MAX(area->y1 - 1, 0);
+    area->x2 = LV_MIN(area->x2 + 1, lv_display_get_horizontal_resolution(disp) - 1);
+    area->y2 = LV_MIN(area->y2 + 1, lv_display_get_vertical_resolution(disp) - 1);
+}
+
 static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
 {
     lv_eve5_driver_t *drvr = lv_display_get_driver_data(disp);
@@ -217,8 +236,8 @@ static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
     lv_display_t *disp_refr = lv_refr_get_disp_refreshing();
     lv_layer_t *layer = disp_refr ? disp_refr->layer_head : NULL;
 
-    printf("Flush layer 0x%p area (%d,%d)-(%d,%d)\n",
-           layer, area->x1, area->y1, area->x2, area->y2);
+	// LOG_DEBUG_MEMORY: printf("Flush layer 0x%p area (%d,%d)-(%d,%d)\n",
+	// LOG_DEBUG_MEMORY:        layer, area->x1, area->y1, area->x2, area->y2);
 
     /* Calculate area dimensions */
     int32_t w = lv_area_get_width(area);
