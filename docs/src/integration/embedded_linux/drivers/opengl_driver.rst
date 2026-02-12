@@ -1,15 +1,15 @@
 .. _opengl_driver:
 
-=============
-OpenGL Driver
-=============
+======
+OpenGL
+======
 
 Overview
 --------
 
-The **OpenGL** display driver is a generic driver that creates textures for embedding 
-LVGL content in other applications. The goal is to create textures that people can 
-embed in other applications. The OpenGL context must be created by the user or they 
+The **OpenGL** display driver is a generic driver that creates textures for embedding
+LVGL content in other applications. The goal is to create textures that people can
+embed in other applications. The OpenGL context must be created by the user or they
 can use GLFW or EGL as backends.
 
 Getting Started with OpenGL
@@ -74,7 +74,7 @@ Basic Usage
         /* If you already have an OpenGL texture ready, you can use it instead:
          * lv_display_t * texture = lv_opengles_texture_create_from_texture_id(WIDTH, HEIGHT, my_texture_id); */
 
-        /* Set the display render mode and flush callback 
+        /* Set the display render mode and flush callback
          * lv_display_set_render_mode(texture, LV_DISPLAY_RENDER_MODE_FULL);
          * lv_display_set_flush_cb(texture, flush_cb); */
 

@@ -530,6 +530,14 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
+    /*Do not cache modifiable images as they might change in the next frame
+     *resulting in stale textures in the cache. */
+    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+        lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
+        if(img_dsc->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) {
+            lv_cache_drop(u->texture_cache, &data_to_find, u);
+        }
+    }
     /*Do not cache non static (const) texts as the text's pointer can be freed/reallocated
      *at any time resulting in a wild pointer in the cached draw dsc. */
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
@@ -577,8 +585,9 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 float tex_h = (float)lv_area_get_height(&fill_area);
                 GL_CALL(glEnable(GL_SCISSOR_TEST));
                 GL_CALL(glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h));
-                GL_CALL(glClearColor((float)fill_dsc->color.red / 255.0f, (float)fill_dsc->color.green / 255.0f,
-                                     (float)fill_dsc->color.blue / 255.0f, 1.0f));
+                /* swap red and blue channels here as they will be swapped back during flushing*/
+                GL_CALL(glClearColor((float)fill_dsc->color.blue / 255.0f, (float)fill_dsc->color.green / 255.0f,
+                                     (float)fill_dsc->color.red / 255.0f, 1.0f));
                 GL_CALL(glClearDepthf(1.0f));
                 GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
                 GL_CALL(glDisable(GL_SCISSOR_TEST));
@@ -687,7 +696,7 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
     params.disp_h = targ_tex_h;
     params.texture_clip_area = &clip_area;
     params.h_flip = dsc->h_flip;
-    params.v_flip = !dsc->v_flip;
+    params.v_flip = dsc->v_flip;
     params.blend_opt = true;
     lv_opengles_render(&params);
 

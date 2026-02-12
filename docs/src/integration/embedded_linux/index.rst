@@ -1,16 +1,16 @@
 .. _embedded_linux:
 
-============================
-Running under Embedded Linux
-============================
+======================
+Embedded Linux Support
+======================
 
 .. toctree::
     :maxdepth: 2
 
+    opengl
     draw_opengl
     draw_sdl
-    overview
-    opengl
     nanovg
     os/index
     drivers/index
+

@@ -837,7 +837,7 @@ static AASpans* _AASpans(float ymin, float ymax, const SwImage* image, const SwB
     aaSpans->yEnd = yEnd;
 
     //Initialize X range
-    auto height = yEnd - yStart;
+    auto height = std::abs(yEnd - yStart);
 
     aaSpans->lines = static_cast<AALine*>(lv_malloc(height * sizeof(AALine)));
     LV_ASSERT_MALLOC(aaSpans->lines);

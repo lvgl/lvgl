@@ -143,7 +143,8 @@ static inline int32_t lv_div_round_closest(int32_t dividend, int32_t divisor)
 
 void lv_grid_init(void)
 {
-    layout_list_def[LV_LAYOUT_GRID].cb = grid_update;
+    layout_list_def[LV_LAYOUT_GRID].callbacks.layout_update_cb = grid_update;
+    layout_list_def[LV_LAYOUT_GRID].callbacks.get_min_size_cb = NULL;
     layout_list_def[LV_LAYOUT_GRID].user_data = NULL;
 }
 

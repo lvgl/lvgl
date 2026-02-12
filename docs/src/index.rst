@@ -74,9 +74,9 @@ Details
 
     examples
     integration/index
+    main-modules/index
     common-widget-features/index
     widgets/index
-    main-modules/index
     xml/index
     auxiliary-modules/index
     libs/index
