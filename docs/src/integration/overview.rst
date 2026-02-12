@@ -292,7 +292,6 @@ LVGL run again later:
 - wait for an event that you will trigger when LVGL needs to run again, or
 - sleep the CPU (not just the thread)
 
-<<<<<<< HEAD
 Also check the :ref:`lvgl_and_threads` section of the documentation to learn more
 about the considerations when using LVGL in an operating system.
 
@@ -302,11 +301,6 @@ Sleep Management
 
 The MCU can go to sleep when no user input has been received for a certain period.
 In this case, the main ``while(1)`` could look like this:
-=======
-:cpp:func:`lv_display_get_inactive_time` can also be used to go to sleep when
-no user input has been received for a certain period. In this case, the main
-``while(1)`` could look like this:
->>>>>>> d74b4efe2 (integration reord ready, compiles well)
 
 .. code-block:: c
 
