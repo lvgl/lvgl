@@ -507,7 +507,7 @@ static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * model)
 
             lv_memcpy(&texture_data[texture_data_index], final_joint_matrix.data(), sizeof(float) * 16);
             lv_memcpy(&texture_data[texture_data_index + 16],
-                      fastgltf::math::transpose(fastgltf::math::invert(final_joint_matrix)).data(),
+                      fastgltf::math::transpose(fastgltf::math::inverse(final_joint_matrix)).data(),
                       sizeof(float) * 16);
 
             texture_data_index += 32;
@@ -1422,8 +1422,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                 fastgltf::math::fmat4x4 cammat = worldmatrix_was_inlined ? inlined_worldmatrix : (parentworldmatrix * localmatrix);
                 fastgltf::removeScale(cammat);
                 model->view_pos = cammat.col(3);  /* Implicit conversion from 4 element column to 3 element vector */
-                model->view_mat = fastgltf::math::invert(cammat);
-
+                model->view_mat = fastgltf::math::inverse(cammat);
             }
         }
     });
