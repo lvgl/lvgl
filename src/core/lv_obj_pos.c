@@ -368,11 +368,18 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 {
     obj->layout_inv = 1;
 
-    /*Mark the screen as dirty too to mark that there is something to do on this screen*/
-    lv_obj_t * scr = lv_obj_get_screen(obj);
-    scr->scr_layout_inv = 1;
+    /*Propagate the subtree-dirty flag up to the screen so that
+     *layout_update_core can skip entire clean subtrees.*/
+    lv_obj_t * cur = obj;
+    while(cur) {
+        if(cur->scr_layout_inv)
+            break; /*Ancestors already marked*/
+        cur->scr_layout_inv = 1;
+        cur = lv_obj_get_parent(cur);
+    }
 
     /*Make the display refreshing*/
+    lv_obj_t * scr = lv_obj_get_screen(obj);
     lv_display_t * disp = lv_obj_get_display(scr);
     lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
 }
@@ -390,7 +397,6 @@ void lv_obj_update_layout(const lv_obj_t * obj)
     /*Repeat until there are no more layout invalidations*/
     while(scr->scr_layout_inv) {
         LV_LOG_TRACE("Layout update begin");
-        scr->scr_layout_inv = 0;
         layout_update_core(scr);
         LV_LOG_TRACE("Layout update end");
     }
@@ -1516,11 +1522,19 @@ static int32_t calc_content_height(lv_obj_t * obj)
 
 static void layout_update_core(lv_obj_t * obj)
 {
+    /*Skip subtrees that have no pending layout work.
+     *scr_layout_inv is propagated from dirty objects up to the screen
+     *by lv_obj_mark_layout_as_dirty, so a clear flag means the entire
+     *subtree is clean.*/
+    if(!obj->layout_inv && !obj->readjust_scroll_after_layout && !obj->scr_layout_inv) {
+        return;
+    }
+
+    LV_PROFILER_LAYOUT_BEGIN;
+    uint32_t child_cnt = obj->spec_attr ? obj->spec_attr->child_cnt : 0;
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = obj->spec_attr->children[i];
-        layout_update_core(child);
+        layout_update_core(obj->spec_attr->children[i]);
     }
 
     if(obj->layout_inv) {
@@ -1537,6 +1551,24 @@ static void layout_update_core(lv_obj_t * obj)
         obj->readjust_scroll_after_layout = 0;
         lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
     }
+
+    /*Recompute the subtree flag: keep it set only if a child
+     *was (re-)dirtied during the processing above.*/
+    if(obj->scr_layout_inv) {
+        bool child_dirty = false;
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            if(child->layout_inv || child->readjust_scroll_after_layout || child->scr_layout_inv) {
+                child_dirty = true;
+                break;
+            }
+        }
+        if(!child_dirty && !obj->layout_inv && !obj->readjust_scroll_after_layout) {
+            obj->scr_layout_inv = 0;
+        }
+    }
+
+    LV_PROFILER_LAYOUT_END;
 }
 
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv)
