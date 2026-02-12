@@ -878,10 +878,64 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         /* Image masking uses alpha-as-scratch */
         lv_draw_eve5_track_alpha_trashed(u, mask_x1, mask_y1, mask_x2, mask_y2);
     }
+    else if(!is_layer && dsc->recolor_opa >= LV_OPA_COVER) {
+        /* Full recolor via alpha-channel masking.
+         * The image's RGB may be black (alpha-only mask); EVE's color modulation
+         * (colorRgb * texel) gives black * recolor = black. Instead, use the
+         * image alpha to stamp a mask, then fill with the recolor through it.
+         * NOTE: Partial recolor (0 < recolor_opa < 255) is not yet implemented
+         * via this stencil path — it falls through to the standard draw below
+         * where colorRgb modulation handles it (works for white-RGB images only). */
+        int32_t mask_x1 = t->clip_area.x1 - layer->buf_area.x1;
+        int32_t mask_y1 = t->clip_area.y1 - layer->buf_area.y1;
+        int32_t mask_x2 = t->clip_area.x2 - layer->buf_area.x1;
+        int32_t mask_y2 = t->clip_area.y2 - layer->buf_area.y1;
+
+        int32_t draw_vx = x;
+        int32_t draw_vy = y;
+
+        EVE_CoDl_bitmapTransform_identity(phost);
+        EVE_CoDl_vertexFormat(phost, 0);
+        EVE_CoDl_saveContext(phost);
+
+        /* Phase 1a: Clear bbox alpha to 0 */
+        EVE_CoDl_colorArgb_ex(phost, 0x00000000);
+        EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+        EVE_CoDl_blendFunc(phost, ONE, ZERO);
+        lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
+                                &t->clip_area, &layer->buf_area);
+
+        /* Phase 1b: Stamp image alpha into render target alpha.
+         * blend(ONE, ZERO) overwrites dest alpha with texel.a * colorA.
+         * Areas outside the image keep alpha=0 from Phase 1a. */
+        EVE_CoDl_colorA(phost, dsc->opa);
+        EVE_CoDl_begin(phost, BITMAPS);
+        EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
+        EVE_CoDl_end(phost);
+
+        /* Phase 2: Fill with recolor through the alpha mask */
+        EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
+        EVE_CoDl_colorRgb(phost, dsc->recolor.red, dsc->recolor.green, dsc->recolor.blue);
+        EVE_CoDl_colorA(phost, 255);
+        if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
+            EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE);
+        else
+            EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
+        lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
+                                &t->clip_area, &layer->buf_area);
+
+        EVE_CoDl_restoreContext(phost);
+
+        /* Alpha channel used as scratch — mark for repair */
+        lv_draw_eve5_track_alpha_trashed(u, mask_x1, mask_y1, mask_x2, mask_y2);
+    }
     else {
         /* No clip radius or bitmap mask — standard draw path.
          * Structured as linear phases: compute → save → transform → colorkey → draw → restore.
-         * Colorkey uses stencil test directly (no alpha masking needed). */
+         * Colorkey uses stencil test directly (no alpha masking needed).
+         * NOTE: Partial recolor (0 < recolor_opa < 255) uses colorRgb modulation here,
+         * which only works correctly when the source image has white RGB channels.
+         * Images with black RGB (alpha-only masks) will appear darker than expected. */
         bool has_colorkey = (dsc->colorkey != NULL);
         bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
                              || dsc->scale_y != LV_SCALE_NONE

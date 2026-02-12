@@ -348,21 +348,21 @@ void lv_draw_eve5_hal_draw_mask_rect(lv_draw_eve5_unit_t *u, const lv_draw_task_
 void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t r16);
 void build_triangle_stencil(EVE_HalContext *phost, const lv_point_t p[3]);
 bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
-                            lv_opa_t opa, int32_t w, int32_t h);
+                            lv_opa_t opa, int32_t w, int32_t h, bool l8);
 
 /* Alpha correction pass — per-task drawing (defined in lv_draw_eve5_alpha_pass.c) */
-void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);
+void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool l8);
 void lv_draw_eve5_alpha_draw_fill_with_border(lv_draw_eve5_unit_t *u,
                                                const lv_draw_task_t *fill_task,
                                                const lv_draw_task_t *border_task);
 void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);
 void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);
-void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);
+void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool l8);
 void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);
 void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t);
 void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t *u, lv_draw_task_t *t);
 void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);
-void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);
+void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool l8);
 
 /* Alpha repair tracking helpers.
  * Call track_alpha_opaque for fully opaque fills (records the largest).

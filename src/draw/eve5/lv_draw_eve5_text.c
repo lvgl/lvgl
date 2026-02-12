@@ -36,7 +36,7 @@ static const lv_draw_letter_dsc_t *s_alpha_letter_dsc = NULL;
  **********************/
 
 /* Font/glyph helpers */
-static void glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
+static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
                                           const uint8_t *src, uint32_t width,
                                           uint32_t height, uint32_t eve_stride,
                                           uint8_t src_stride_align);
@@ -56,31 +56,36 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
  * GLYPH UPLOAD
  **********************/
 
-static void glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
+static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
                                           const uint8_t *src, uint32_t width,
                                           uint32_t height, uint32_t eve_stride,
-                                          uint8_t src_stride_align)
+                                          uint8_t src_stride_align, uint8_t bpp)
 {
-    uint32_t natural_stride = (width + 1) / 2;
+    uint32_t natural_stride = (width * bpp + 7) / 8;
 
     /* Allocate row buffer for aligned stride */
     uint8_t *row_buf = lv_malloc(eve_stride);
     if(!row_buf) {
         LV_LOG_ERROR("EVE5: Failed to allocate glyph row buffer");
-        return;
+        return false;
     }
 
     /* Clear buffer to ensure padding bytes are zero */
     lv_memzero(row_buf, eve_stride);
 
-    /* Simple case: source has no special alignment */
-    if(src_stride_align == 1 || (src_stride_align == 0 && width % 2 == 0)) {
+    /* For 8bpp and whole-byte-aligned sub-byte formats, or when source
+     * has no special alignment, use simple row copy */
+    bool simple_copy = (bpp == 8)
+        || (src_stride_align == 1)
+        || (src_stride_align == 0 && (width * bpp) % 8 == 0);
+
+    if(simple_copy) {
         for(uint32_t y = 0; y < height; y++) {
             lv_memcpy(row_buf, src + y * natural_stride, natural_stride);
             EVE_Hal_wrMem(u->hal, addr + y * eve_stride, row_buf, eve_stride);
         }
         lv_free(row_buf);
-        return;
+        return true;
     }
 
     /* Aligned source stride case */
@@ -91,45 +96,77 @@ static void glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
             EVE_Hal_wrMem(u->hal, addr + y * eve_stride, row_buf, eve_stride);
         }
         lv_free(row_buf);
-        return;
+        return true;
     }
 
-    /* Complex case: need to repack nibbles (src_stride_align == 0 and odd width) */
-    uint32_t src_i = 0;
-    uint8_t key = 0;
+    /* Complex case: need to repack nibbles (4bpp, src_stride_align == 0 and odd width) */
+    if(bpp == 4) {
+        uint32_t src_i = 0;
+        uint8_t key = 0;
 
+        for(uint32_t y = 0; y < height; y++) {
+            lv_memzero(row_buf, eve_stride);  /* Clear for each row */
+
+            uint32_t row_i;
+            for(row_i = 0; row_i < (width / 2); ++row_i) {
+                uint8_t n1, n2;
+                if(key == 0) {
+                    n1 = GET_NIBBLE_HI(src[src_i]);
+                    n2 = GET_NIBBLE_LO(src[src_i]);
+                }
+                else {
+                    n1 = GET_NIBBLE_LO(src[src_i - 1]);
+                    n2 = GET_NIBBLE_HI(src[src_i]);
+                }
+                row_buf[row_i] = (n1 << 4) | n2;
+                src_i++;
+            }
+
+            /* Last nibble if odd width */
+            if(width % 2 != 0) {
+                row_buf[row_i] = (key == 0) ?
+                                 (GET_NIBBLE_HI(src[src_i]) << 4) :
+                                 (GET_NIBBLE_LO(src[src_i - 1]) << 4);
+            }
+
+            key = (key == 0) ? 1 : 0;
+            src_i += (key == 1) ? 1 : 0;
+
+            EVE_Hal_wrMem(u->hal, addr + y * eve_stride, row_buf, eve_stride);
+        }
+
+        lv_free(row_buf);
+        return true;
+    }
+
+    /* For 1bpp and 2bpp with unaligned bit streams, fall back to row copy
+     * (sub-byte formats with stride==0 pack bits continuously across rows,
+     * but LVGL built-in fonts typically use stride==1 or aligned strides) */
     for(uint32_t y = 0; y < height; y++) {
-        lv_memzero(row_buf, eve_stride);  /* Clear for each row */
-
-        uint32_t row_i;
-        for(row_i = 0; row_i < (width / 2); ++row_i) {
-            uint8_t n1, n2;
-            if(key == 0) {
-                n1 = GET_NIBBLE_HI(src[src_i]);
-                n2 = GET_NIBBLE_LO(src[src_i]);
-            }
-            else {
-                n1 = GET_NIBBLE_LO(src[src_i - 1]);
-                n2 = GET_NIBBLE_HI(src[src_i]);
-            }
-            row_buf[row_i] = (n1 << 4) | n2;
-            src_i++;
-        }
-
-        /* Last nibble if odd width */
-        if(width % 2 != 0) {
-            row_buf[row_i] = (key == 0) ?
-                             (GET_NIBBLE_HI(src[src_i]) << 4) :
-                             (GET_NIBBLE_LO(src[src_i - 1]) << 4);
-        }
-
-        key = (key == 0) ? 1 : 0;
-        src_i += (key == 1) ? 1 : 0;
-
+        lv_memcpy(row_buf, src + y * natural_stride, natural_stride);
         EVE_Hal_wrMem(u->hal, addr + y * eve_stride, row_buf, eve_stride);
     }
 
     lv_free(row_buf);
+    return true;
+}
+
+/* Map LVGL font bpp to EVE bitmap format */
+static uint32_t bpp_to_eve_format(uint8_t bpp)
+{
+    switch(bpp) {
+        case 1: return L1;
+        case 2: return L2;
+        case 4: return L4;
+        case 8: return L8;
+        default: return L4;
+    }
+}
+
+/* Check if a font's bpp is supported */
+static bool is_bpp_supported(uint8_t bpp)
+{
+    return bpp == 1 || bpp == 2 || bpp == 4 || bpp == 8;
 }
 
 static uint32_t upload_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t *font_dsc,
@@ -140,10 +177,10 @@ static uint32_t upload_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t
 
     uint16_t g_w = glyph_dsc->box_w;
     uint16_t g_h = glyph_dsc->box_h;
+    uint8_t bpp = font_dsc->bpp;
 
-    /* L4 format: 4 bits per pixel, so stride = ceil(width / 2) bytes
-     * Align stride to 4 bytes for optimal memory access */
-    uint16_t g_stride_natural = (g_w + 1) / 2;
+    /* Stride = ceil(width * bpp / 8), aligned to 4 bytes for optimal memory access */
+    uint16_t g_stride_natural = (g_w * bpp + 7) / 8;
     uint16_t g_stride = ALIGN_UP(g_stride_natural, 4);
     uint32_t glyph_size = g_stride * g_h;
 
@@ -163,8 +200,11 @@ static uint32_t upload_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t
     }
 
     /* Upload glyph data with aligned stride */
-    glyph_bitmap_to_ramg_aligned(u, ram_g_addr, glyph_bitmap, g_w, g_h,
-                                  g_stride, font_dsc->stride);
+    if(!glyph_bitmap_to_ramg_aligned(u, ram_g_addr, glyph_bitmap, g_w, g_h,
+                                      g_stride, font_dsc->stride, bpp)) {
+        Esd_GpuAlloc_Free(u->allocator, handle);
+        return GA_INVALID;
+    }
 
     /* Insert into cache */
     lv_draw_eve5_glyph_cache_insert(u, glyph_bitmap, handle, g_w, g_h, g_stride);
@@ -269,6 +309,11 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
 
     const lv_font_t *font = glyph_dsc->g->resolved_font;
 
+    if(!font) {
+		LV_LOG_WARN("EVE5: Font not resolved");
+        return;
+    }
+
     /* Check font compatibility */
     if(font->get_glyph_bitmap != lv_font_get_bitmap_fmt_txt) {
         LV_LOG_WARN("EVE5: Only static fonts supported");
@@ -276,8 +321,8 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     }
 
     const lv_font_fmt_txt_dsc_t *font_dsc = font->dsc;
-    if(font_dsc->bpp != 4) {
-        LV_LOG_WARN("EVE5: Only 4bpp fonts supported");
+    if(!is_bpp_supported(font_dsc->bpp)) {
+        LV_LOG_WARN("EVE5: Unsupported font bpp: %d", font_dsc->bpp);
         return;
     }
 
@@ -301,7 +346,7 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
 
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
-    EVE_CoDl_bitmapLayout(u->hal, L4, g_stride, g_h);
+    EVE_CoDl_bitmapLayout(u->hal, bpp_to_eve_format(font_dsc->bpp), g_stride, g_h);
 
     emit_glyph_vertex(u, layer, t, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
 }
@@ -319,7 +364,7 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
         const lv_font_fmt_txt_dsc_t *font_dsc = dsc->font->dsc;
-        if(font_dsc->bpp == 4) {
+        if(is_bpp_supported(font_dsc->bpp)) {
             use_bitmap_font = true;
         }
     }
@@ -451,7 +496,7 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     if(font->get_glyph_bitmap != lv_font_get_bitmap_fmt_txt) return;
 
     const lv_font_fmt_txt_dsc_t *font_dsc = font->dsc;
-    if(font_dsc->bpp != 4) return;
+    if(!is_bpp_supported(font_dsc->bpp)) return;
 
     uint32_t gid = glyph_dsc->g->gid.index;
     const lv_font_fmt_txt_glyph_dsc_t *g_dsc = &font_dsc->glyph_dsc[gid];
@@ -472,7 +517,7 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
 
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
-    EVE_CoDl_bitmapLayout(u->hal, L4, g_stride, g_h);
+    EVE_CoDl_bitmapLayout(u->hal, bpp_to_eve_format(font_dsc->bpp), g_stride, g_h);
 
     emit_glyph_vertex(u, layer, t, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y);
 }
@@ -493,7 +538,7 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
         const lv_font_fmt_txt_dsc_t *font_dsc = dsc->font->dsc;
-        if(font_dsc->bpp == 4) {
+        if(is_bpp_supported(font_dsc->bpp)) {
             use_bitmap_font = true;
         }
     }

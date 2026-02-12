@@ -40,7 +40,7 @@
  * ALPHA-ONLY FUNCTIONS
  **********************/
 
-void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool l8)
 {
     lv_layer_t *layer = t->target_layer;
     const lv_draw_fill_dsc_t *dsc = t->draw_dsc;
@@ -73,7 +73,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
             lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
             EVE_CoDl_vertexFormat(u->hal, 0);
             EVE_CoDl_saveContext(u->hal);
-            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h)) {
+            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h, l8)) {
                 EVE_CoDl_begin(u->hal, BITMAPS);
                 EVE_CoDl_vertex2f_0(u->hal, x1, y1);
                 EVE_CoDl_end(u->hal);
@@ -160,7 +160,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
              *   Zone 4 (d_rgb <= -2):  255  (interior) */
             EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
             EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
-            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h)) {
+            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h, l8)) {
                 /* Interior: stencil >= 4, full gradient alpha */
                 EVE_CoDl_colorA(u->hal, 255);
                 EVE_CoDl_stencilFunc(u->hal, GEQUAL, 4, 255);
@@ -223,7 +223,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
             EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
             EVE_CoDl_stencilFunc(u->hal, NOTEQUAL, 0, 255);
             EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
-            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h)) {
+            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h, l8)) {
                 EVE_CoDl_begin(u->hal, BITMAPS);
                 EVE_CoDl_vertex2f_0(u->hal, x1, y1);
                 EVE_CoDl_end(u->hal);
@@ -798,7 +798,7 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     }
 }
 
-void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool l8)
 {
     lv_layer_t *layer = t->target_layer;
     const lv_draw_triangle_dsc_t *dsc = t->draw_dsc;
@@ -858,7 +858,7 @@ void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task
             EVE_CoDl_stencilFunc(u->hal, EQUAL, 255, 255);
             EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
 
-            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h)) {
+            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h, l8)) {
                 EVE_CoDl_begin(u->hal, BITMAPS);
                 EVE_CoDl_vertex2f_0(u->hal, xmin, ymin);
                 EVE_CoDl_end(u->hal);
@@ -896,7 +896,7 @@ void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task
     EVE_CoDl_restoreContext(u->hal);
 }
 
-void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool l8)
 {
     EVE_HalContext *phost = u->hal;
     lv_layer_t *layer = t->target_layer;
@@ -908,7 +908,11 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_ta
     /* Shadow is drawn as a 9-slice of L8 textures. For the alpha pass,
      * draw a solid rect covering the shadow bounding box at opa.
      * The shadow's Gaussian falloff already produced correct RGB;
-     * the alpha just needs to show the shape's coverage. */
+     * the alpha just needs to show the shape's coverage.
+     *
+     * Note: L8 format maps A=255, so the Gaussian profile in the luminance
+     * channel does not reach the alpha output — the result is flat dsc->opa
+     * for all shadow pixels regardless of L value. */
     const lv_area_t *coords = &t->area;
     lv_area_t core_area;
     core_area.x1 = coords->x1 + dsc->ofs_x - dsc->spread;
@@ -924,6 +928,30 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_ta
     int32_t corner_size = blur_radius + r_sh;
     if(corner_size <= 0) return;
 
+    /* Shadow bounding box in layer-local coordinates */
+    int32_t lx = layer->buf_area.x1;
+    int32_t ly = layer->buf_area.y1;
+    int32_t sx1 = core_area.x1 - blur_radius - lx;
+    int32_t sy1 = core_area.y1 - blur_radius - ly;
+    int32_t sx2 = core_area.x2 + blur_radius - lx;
+    int32_t sy2 = core_area.y2 + blur_radius - ly;
+
+    if(l8) {
+        /* L8 mode: draw a flat rect at dsc->opa covering the shadow bbox.
+         * Under blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA) with colorRgb(255,255,255):
+         *   result.r = dsc->opa + dst.r * (1 - dsc->opa/255)
+         * This matches the current alpha pass output which is also flat
+         * (L8.A=255 means the Gaussian L value doesn't modulate alpha). */
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+        EVE_CoDl_colorA(phost, dsc->opa);
+        EVE_CoDl_lineWidth(phost, 16);
+        EVE_CoDl_begin(phost, RECTS);
+        EVE_CoDl_vertex2f_0(phost, sx1, sy1);
+        EVE_CoDl_vertex2f_0(phost, sx2, sy2);
+        EVE_CoDl_end(phost);
+        return;
+    }
+
     int32_t ratio_idx = (r_sh * (EVE5_SHADOW_TEX_SIZE - 1)) / corner_size;
     if(ratio_idx < 0) ratio_idx = 0;
     if(ratio_idx >= EVE5_SHADOW_TEX_SIZE) ratio_idx = EVE5_SHADOW_TEX_SIZE - 1;
@@ -933,14 +961,6 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_ta
     uint32_t edge_addr = Esd_GpuAlloc_Get(u->allocator, slot->edge_handle);
 
     if(corner_addr == GA_INVALID || edge_addr == GA_INVALID) return;
-
-    /* Shadow bounding box in layer-local coordinates */
-    int32_t lx = layer->buf_area.x1;
-    int32_t ly = layer->buf_area.y1;
-    int32_t sx1 = core_area.x1 - blur_radius - lx;
-    int32_t sy1 = core_area.y1 - blur_radius - ly;
-    int32_t sx2 = core_area.x2 + blur_radius - lx;
-    int32_t sy2 = core_area.y2 + blur_radius - ly;
 
     int32_t shadow_w = sx2 - sx1 + 1;
     int32_t shadow_h = sy2 - sy1 + 1;

@@ -495,6 +495,17 @@ static int32_t evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
         return 0;
     }
 
+    /* Skip tasks targeting layers not managed by EVE5 (e.g. canvas).
+     * Canvas layers have parent==NULL (like the screen layer) but are not
+     * the display's layer_head. Child layers always have parent != NULL. */
+    if(task->target_layer && task->target_layer->parent == NULL) {
+        lv_display_t *disp = lv_display_get_default();
+        if(!disp || task->target_layer != disp->layer_head) {
+            LV_LOG_WARN("EVE5: Evaluate: type=%s -> non-EVE5 layer, skipping", task_type_str(task->type));
+            return 0;
+        }
+    }
+
     task->preference_score = 10;
     task->preferred_draw_unit_id = DRAW_UNIT_ID_EVE5;
 
@@ -943,7 +954,7 @@ static void eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                     }
                 }
 
-                lv_draw_eve5_alpha_draw_fill(u, t);
+                lv_draw_eve5_alpha_draw_fill(u, t, false);
                 break;
             }
 
@@ -956,7 +967,7 @@ static void eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                 break;
 
             case LV_DRAW_TASK_TYPE_TRIANGLE:
-                lv_draw_eve5_alpha_draw_triangle(u, t);
+                lv_draw_eve5_alpha_draw_triangle(u, t, false);
                 break;
 
             case LV_DRAW_TASK_TYPE_IMAGE:
@@ -973,7 +984,7 @@ static void eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                 break;
 
             case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-                lv_draw_eve5_alpha_draw_box_shadow(u, t);
+                lv_draw_eve5_alpha_draw_box_shadow(u, t, false);
                 break;
 
             case LV_DRAW_TASK_TYPE_ARC:

@@ -34,7 +34,7 @@ void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t
 static void draw_circle(lv_draw_eve5_unit_t *u, int32_t cx, int32_t cy, int32_t radius);
 /* Gradient bitmap helpers */
 bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
-                            lv_opa_t opa, int32_t w, int32_t h);
+                            lv_opa_t opa, int32_t w, int32_t h, bool l8);
 static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t *dsc,
                                int32_t x, int32_t y, int32_t w, int32_t h,
                                int32_t radius, const lv_area_t *clip, const lv_area_t *layer_area);
@@ -171,7 +171,7 @@ static inline uint32_t lerp_argb8(uint32_t c0, uint32_t c1, uint8_t t)
  * Returns true if gradient was set up, false if not a supported type.
  */
 bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
-                           lv_opa_t opa, int32_t w, int32_t h)
+                           lv_opa_t opa, int32_t w, int32_t h, bool l8)
 {
     EVE_HalContext *phost = u->hal;
 
@@ -190,9 +190,10 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
     uint32_t pixel_count;
 
     if(simple) {
-        uint32_t c0 = pack_argb8(grad->stops[0].color,
+        lv_color_t white = { .red = 255, .green = 255, .blue = 255 };
+        uint32_t c0 = pack_argb8(l8 ? white : grad->stops[0].color,
                                   LV_OPA_MIX2(opa, grad->stops[0].opa));
-        uint32_t c1 = pack_argb8(grad->stops[1].color,
+        uint32_t c1 = pack_argb8(l8 ? white : grad->stops[1].color,
                                   LV_OPA_MIX2(opa, grad->stops[1].opa));
 
         if(is_ver || w < 16) {
@@ -215,8 +216,9 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
         pixel_count = 256;
 
         uint32_t stop_colors[LV_GRADIENT_MAX_STOPS];
+        lv_color_t white = { .red = 255, .green = 255, .blue = 255 };
         for(uint8_t i = 0; i < grad->stops_count; i++) {
-            stop_colors[i] = pack_argb8(grad->stops[i].color,
+            stop_colors[i] = pack_argb8(l8 ? white : grad->stops[i].color,
                                         LV_OPA_MIX2(opa, grad->stops[i].opa));
         }
 
@@ -311,7 +313,7 @@ static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t 
     EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
 
-    if(!setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h)) {
+    if(!setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h, false)) {
         EVE_CoDl_restoreContext(phost);
         return false;
     }
@@ -1137,7 +1139,7 @@ static bool draw_gradient_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t 
     EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
     EVE_CoDl_stencilFunc(phost, EQUAL, 255, 255);
 
-    if(!setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h)) {
+    if(!setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h, false)) {
         EVE_CoDl_restoreContext(phost);
         return false;
     }

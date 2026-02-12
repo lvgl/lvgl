@@ -246,6 +246,8 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t *u, int32_t ratio_idx)
         uint8_t *buf = lv_malloc(corner_bytes);
         if(!buf) {
             LV_LOG_ERROR("EVE5: Failed to allocate corner generation buffer");
+            Esd_GpuAlloc_Free(u->allocator, slot->corner_handle);
+            slot->corner_handle = GA_HANDLE_INVALID;
             return false;
         }
 
@@ -273,6 +275,8 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t *u, int32_t ratio_idx)
         uint8_t *buf = lv_malloc(edge_bytes);
         if(!buf) {
             LV_LOG_ERROR("EVE5: Failed to allocate edge generation buffer");
+            Esd_GpuAlloc_Free(u->allocator, slot->edge_handle);
+            slot->edge_handle = GA_HANDLE_INVALID;
             return false;
         }
 
