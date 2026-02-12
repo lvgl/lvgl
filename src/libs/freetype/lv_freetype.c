@@ -517,8 +517,9 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
             if(target > max_v)
                 target = max_v;
             coords[wght_index] = target;
-            (void)FT_Set_Var_Design_Coordinates(face, axis_count, coords);
-            applied = true;
+            if(FT_Set_Var_Design_Coordinates(face, axis_count, coords) == 0) {
+                applied = true;
+            }
         }
     }
 
