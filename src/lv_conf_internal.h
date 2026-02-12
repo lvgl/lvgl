@@ -822,15 +822,6 @@
         #endif
     #endif
 
-    /** Use G2D to rotate display. **/
-    #ifndef LV_USE_ROTATE_G2D
-        #ifdef CONFIG_LV_USE_ROTATE_G2D
-            #define LV_USE_ROTATE_G2D CONFIG_LV_USE_ROTATE_G2D
-        #else
-            #define LV_USE_ROTATE_G2D 0
-        #endif
-    #endif
-
     /** Maximum number of buffers that can be stored for G2D draw unit.
      *  Includes the frame buffers and assets. */
     #ifndef LV_G2D_HASH_TABLE_SIZE

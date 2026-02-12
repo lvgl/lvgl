@@ -414,11 +414,6 @@ menu "LVGL configuration"
 			depends on LV_USE_G2D
 			default y
 
-		config LV_USE_ROTATE_G2D
-			bool "Use G2D to rotate display."
-			depends on LV_USE_G2D
-			default n
-
 		config LV_G2D_HASH_TABLE_SIZE
 			bool "Maximum number of buffers that can be stored for G2D draw unit."
 			default 50
