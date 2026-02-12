@@ -11,7 +11,7 @@
 #if LV_USE_DRAW_OPENGLES
 
 #if LV_USE_DRAW_NANOVG
-    #error LV_USE_DRAW_NANOVG and LV_USE_DRAW_OPENGLES can not be enabled at the same time
+    #error "LV_USE_DRAW_NANOVG and LV_USE_DRAW_OPENGLES cannot be enabled at the same time. Disable one of them in lv_conf.h or Kconfig."
 #endif
 
 #include "../lv_draw_private.h"
