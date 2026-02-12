@@ -2,6 +2,15 @@
  * @file lv_draw_eve5.c
  *
  * EVE5 (BT820) Draw Unit for LVGL
+ * 
+ * Architecture:
+ * - Uses QUEUED state to accumulate tasks until all are added
+ * - Each layer renders atomically when no WAITING tasks remain but QUEUED exist
+ * - LVGL's dispatch-all-layers behavior ensures children complete before parents
+ * - Each layer has its own complete display list cycle:
+ *   dlStart -> commands -> display -> swap -> graphicsFinish
+ * - Screen partial textures are handed to the display driver via layer->user_data
+ * - Child layer textures are freed after compositing into their parent
  */
 
 #include "lv_draw_eve5_private.h"
@@ -60,7 +69,9 @@
  **********************/
 static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer);
 static int32_t evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task);
+static int eve5_render_tasks(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool is_screen);
 static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer);
+static void eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer);
 static const char *task_state_str(lv_draw_task_state_t state);
 static const char *task_type_str(lv_draw_task_type_t type);
 
@@ -460,6 +471,7 @@ static const char *task_type_str(lv_draw_task_type_t type)
         case LV_DRAW_TASK_TYPE_LINE:       return "LINE";
         case LV_DRAW_TASK_TYPE_TRIANGLE:   return "TRIANGLE";
         case LV_DRAW_TASK_TYPE_LABEL:      return "LABEL";
+        case LV_DRAW_TASK_TYPE_LETTER:     return "LETTER";
         case LV_DRAW_TASK_TYPE_IMAGE:      return "IMAGE";
         case LV_DRAW_TASK_TYPE_ARC:        return "ARC";
         case LV_DRAW_TASK_TYPE_LAYER:      return "LAYER";
@@ -579,52 +591,37 @@ static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
 }
 
 /**********************
- * LAYER RENDERING
+ * RGB RENDER PASS
  **********************/
 
-static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
+/**
+ * RGB render pass: process all QUEUED tasks for a layer.
+ *
+ * On non-screen layers, MASK_RECTANGLE tasks are deferred until after the
+ * alpha correction pass — mask_rect scales all premultiplied RGBA channels
+ * and must run after the alpha pass has corrected the squared-alpha from
+ * blending. Deferring also avoids a separate alpha pass bitmap redraw
+ * for the mask, since the mask can scale both RGB and alpha in one step
+ * once both channels are correct.
+ *
+ * Tasks are left in IN_PROGRESS state on non-screen layers so the alpha
+ * pass can find and re-process them. On screen layers (no alpha pass),
+ * tasks are marked FINISHED immediately.
+ */
+static int eve5_render_tasks(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool is_screen)
 {
-    lv_draw_task_t *t;
-    bool is_screen = (layer->parent == NULL);
-
-    u->rendering_in_progress = true;
-
-    EVE5_LOG("EVE5: === RENDER START layer=%p is_screen=%d ===",
-             (void *)layer, is_screen);
-    EVE5_LOG("EVE5: Layer buf_area=(%d,%d)-(%d,%d) clip=(%d,%d)-(%d,%d)",
-             layer->buf_area.x1, layer->buf_area.y1,
-             layer->buf_area.x2, layer->buf_area.y2,
-             layer->_clip_area.x1, layer->_clip_area.y1,
-             layer->_clip_area.x2, layer->_clip_area.y2);
-
-    /* Initialize the layer (allocate texture, start display list) */
-    lv_draw_eve5_hal_init_layer(u, layer, is_screen);
-
-    if(layer->user_data == NULL) {
-        LV_LOG_ERROR("EVE5: Layer allocation failed!");
-
-        t = layer->draw_task_head;
-        while(t) {
-            if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-               t->state == LV_DRAW_TASK_STATE_QUEUED) {
-                t->state = LV_DRAW_TASK_STATE_FINISHED;
-            }
-            t = t->next;
-        }
-        u->rendering_in_progress = false;
-        return;
-    }
-
-    /* Advance SW cache frame counter */
-    lv_draw_eve5_sw_cache_new_frame(u);
-
-    /* Process all QUEUED tasks for this layer */
-    t = layer->draw_task_head;
+    lv_draw_task_t *t = layer->draw_task_head;
     int rendered_count = 0;
 
     while(t) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
            t->state != LV_DRAW_TASK_STATE_QUEUED) {
+            t = t->next;
+            continue;
+        }
+
+        /* Defer mask_rect on non-screen layers */
+        if(!is_screen && t->type == LV_DRAW_TASK_TYPE_MASK_RECTANGLE) {
             t = t->next;
             continue;
         }
@@ -678,7 +675,7 @@ case LV_DRAW_TASK_TYPE_FILL: {
 #else
                     lv_draw_eve5_hal_draw_fill_with_border(u, t, next);
 #endif
-                    next->state = LV_DRAW_TASK_STATE_FINISHED;
+                    if(is_screen) next->state = LV_DRAW_TASK_STATE_FINISHED;
                     rendered_count++;
                 }
                 else {
@@ -723,6 +720,14 @@ case LV_DRAW_TASK_TYPE_FILL: {
 #endif
                 break;
 
+            case LV_DRAW_TASK_TYPE_LETTER:
+#if LV_DRAW_EVE5_SW_LABEL
+                render_task_via_sw(u, t);
+#else
+                lv_draw_eve5_hal_draw_letter(u, t);
+#endif
+                break;
+
             case LV_DRAW_TASK_TYPE_IMAGE:
                 lv_draw_eve5_hal_draw_image(u, t);
                 break;
@@ -740,17 +745,16 @@ case LV_DRAW_TASK_TYPE_FILL: {
                 lv_layer_t *child = (lv_layer_t *)dsc->src;
 
                 if(child->user_data == NULL) {
-                    /* Child layer was never rendered (empty or clipped out).
-                    * Either allocate a transparent texture or skip entirely. */
-
                     if(child->draw_buf == NULL) {
-                        /* Truly empty layer - nothing to composite */
-						LV_LOG_WARN("EVE5: Skipping empty LAYER task for child %p", (void *)child);
-                        break;  /* Skip rendering, task will be marked FINISHED */
+                        /* Layer was never rendered (empty or clipped out) */
+                        // LV_LOG_WARN("EVE5: Skipping empty LAYER task for child %p", (void *)child);
+                        break;
                     }
 
-                    /* Child has a CPU buffer but no GPU texture - upload it now */
-                    // lv_draw_eve5_hal_upload_layer_buffer(u, child);
+                    /* TODO: Child has a CPU buffer but no GPU texture — upload to RAM_G.
+                     * Currently can't happen (EVE5 claims all draw tasks). */
+                    LV_LOG_WARN("EVE5: CPU-rendered layer not supported, skipping child %p", (void *)child);
+                    break;
                 }
 
                 if(child->user_data != NULL) {
@@ -767,18 +771,373 @@ case LV_DRAW_TASK_TYPE_FILL: {
 #endif
                 break;
 
+            case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+                lv_draw_eve5_hal_draw_mask_rect(u, t);
+                break;
+
             default:
                 EVE5_LOG("EVE5:   Unhandled task type %d, skipping", t->type);
                 break;
         }
 
-        t->state = LV_DRAW_TASK_STATE_FINISHED;
+        if(is_screen) t->state = LV_DRAW_TASK_STATE_FINISHED;
         rendered_count++;
+        t = t->next;
+    }
+
+    return rendered_count;
+}
+
+/**********************
+ * ALPHA CORRECTION PASS
+ **********************/
+
+/**
+ * Check if a task's visible area is fully inside the opaque region.
+ * Uses conservative cross-shaped containment (rect minus 4 corner r*r squares).
+ * Insets the opaque boundary by 1px to account for EVE's ~1px AA feathering
+ * around primitives — a task at the exact edge may have AA pixels extending
+ * outside the opaque area that need correct per-task alpha.
+ */
+static bool is_fully_inside_opaque(lv_draw_eve5_unit_t *u, const lv_area_t *task_area,
+                                    const lv_area_t *clip_area, const lv_area_t *layer_area)
+{
+    if(!u->has_alpha_opaque) return false;
+
+    /* Compute visible area: task_real_area intersected with clip, in layer coords */
+    lv_area_t visible;
+    if(!lv_area_intersect(&visible, task_area, clip_area)) return true; /* fully clipped = skip */
+
+    /* Convert to layer-relative coordinates */
+    int32_t vx1 = visible.x1 - layer_area->x1;
+    int32_t vy1 = visible.y1 - layer_area->y1;
+    int32_t vx2 = visible.x2 - layer_area->x1;
+    int32_t vy2 = visible.y2 - layer_area->y1;
+
+    const lv_area_t *oa = &u->alpha_opaque_area;
+    int32_t r = u->alpha_opaque_radius;
+
+    /* Must be inside the opaque rect, inset by 1px for AA feathering.
+     * EVE primitives produce ~1px of anti-aliased blending at edges,
+     * so a task whose _real_area touches the boundary may have rendered
+     * pixels 1px outside that need per-task alpha correction. */
+    if(vx1 < oa->x1 + 1 || vy1 < oa->y1 + 1 ||
+       vx2 > oa->x2 - 1 || vy2 > oa->y2 - 1) return false;
+
+    /* If no radius, the inset rect containment is sufficient */
+    if(r <= 0) return true;
+
+    /* Check cross-shaped interior: the visible area must not overlap
+     * any of the 4 corner (r+1)*(r+1) squares (inset by 1px for AA) */
+    bool in_left = (vx1 < oa->x1 + r + 1);
+    bool in_right = (vx2 > oa->x2 - r - 1);
+    bool in_top = (vy1 < oa->y1 + r + 1);
+    bool in_bottom = (vy2 > oa->y2 - r - 1);
+
+    if(in_left && in_top) return false;     /* overlaps top-left corner */
+    if(in_right && in_top) return false;    /* overlaps top-right corner */
+    if(in_left && in_bottom) return false;  /* overlaps bottom-left corner */
+    if(in_right && in_bottom) return false; /* overlaps bottom-right corner */
+
+    return true;
+}
+
+/**
+ * Alpha correction pass: re-iterate FINISHED tasks and write correct alpha.
+ *
+ * EVE hardware applies blend factors uniformly to all 4 RGBA channels.
+ * With blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA) on a cleared layer (alpha=0),
+ * the alpha channel gets squared: result.a = src.a * src.a / 255.
+ *
+ * This pass clears the layer alpha to 0, then re-draws each task's shape
+ * with blend(ONE, ONE_MINUS_SRC_ALPHA) and colorMask(0,0,0,1), producing
+ * correct Porter-Duff "over" alpha: result.a = src.a + dst.a * (1 - src.a/255).
+ */
+static void eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
+{
+    EVE_HalContext *phost = u->hal;
+    const lv_area_t *layer_area = &layer->buf_area;
+    int32_t layer_w = lv_area_get_width(layer_area);
+    int32_t layer_h = lv_area_get_height(layer_area);
+
+    /* Step 1: Clear entire layer alpha to 0.
+     * Reset auto-optimized states before saveContext so restoreContext pops
+     * back to clean defaults. The main render pass may have left a restricted
+     * scissor from the last task's clip area — without resetting, the alpha
+     * clear would only cover that region, leaving squared alpha elsewhere. */
+    EVE_CoDl_vertexFormat(phost, 0);
+    EVE_CoDl_scissorXY(phost, 0, 0);
+    EVE_CoDl_scissorSize(phost, layer_w, layer_h);
+	EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+    EVE_CoDl_saveContext(phost);
+    EVE_CoDl_colorA(phost, 0);
+    EVE_CoDl_blendFunc(phost, ONE, ZERO);
+    EVE_CoDl_lineWidth(phost, 16);
+    EVE_CoDl_begin(phost, RECTS);
+    EVE_CoDl_vertex2f_0(phost, 0, 0);
+    EVE_CoDl_vertex2f_0(phost, layer_w, layer_h);
+    EVE_CoDl_end(phost);
+    EVE_CoDl_restoreContext(phost);
+
+    /* Step 2: Set alpha pass modes (non-optimized, persist until restored).
+     * colorMask(0,0,0,1) — only write to the alpha channel.
+     * blend(ONE, ONE_MINUS_SRC_ALPHA) — Porter-Duff "over" for alpha:
+     *   result.a = src.a + dst.a * (1 - src.a/255)
+     * Per-task alpha functions assume these as defaults. Any function that
+     * changes blendFunc internally must restore it to ONE/ONE_MINUS_SRC_ALPHA
+     * (not the real default) before returning. */
+    // EVE_CoDl_colorMask(phost, 0, 0, 0, 1); // Applied before saveContext
+    EVE_CoDl_blendFunc(phost, ONE, ONE_MINUS_SRC_ALPHA);
+
+    /* Step 3: Re-iterate IN_PROGRESS tasks and call alpha-only draw functions.
+     * Tasks stay IN_PROGRESS until all passes (render + alpha) are complete. */
+    lv_draw_task_t *t = layer->draw_task_head;
+    while(t) {
+        if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
+           t->state != LV_DRAW_TASK_STATE_IN_PROGRESS) {
+            t = t->next;
+            continue;
+        }
+
+        /* Skip tasks fully inside the opaque area */
+        if(is_fully_inside_opaque(u, &t->_real_area, &t->clip_area, layer_area)) {
+            t->state = LV_DRAW_TASK_STATE_FINISHED;
+            t = t->next;
+            continue;
+        }
+
+        switch(t->type) {
+            case LV_DRAW_TASK_TYPE_FILL: {
+                const lv_draw_fill_dsc_t *fill_dsc = t->draw_dsc;
+
+                /* When this opaque fill has a matching border (same detection
+                 * as main loop), the entire panel is one solid shape — draw a
+                 * single rounded rect at alpha=255 covering the border's outer
+                 * area instead of separate fill + border alpha draws. */
+                lv_draw_task_t *next = t->next;
+                if(fill_dsc->opa >= LV_OPA_MAX &&
+                   fill_dsc->grad.dir == LV_GRAD_DIR_NONE &&
+                   next &&
+                   next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+                   next->state == LV_DRAW_TASK_STATE_IN_PROGRESS &&
+                   next->type == LV_DRAW_TASK_TYPE_BORDER &&
+                   next->target_layer == t->target_layer) {
+
+                    const lv_draw_border_dsc_t *border_dsc = next->draw_dsc;
+
+                    int32_t dx1 = t->area.x1 - next->area.x1;
+                    int32_t dy1 = t->area.y1 - next->area.y1;
+                    int32_t dx2 = t->area.x2 - next->area.x2;
+                    int32_t dy2 = t->area.y2 - next->area.y2;
+
+                    bool area_match = (dx1 >= 0 && dx1 <= 2) &&
+                                      (dy1 >= 0 && dy1 <= 2) &&
+                                      (dx2 <= 0 && dx2 >= -2) &&
+                                      (dy2 <= 0 && dy2 >= -2);
+
+                    if(area_match && fill_dsc->radius == border_dsc->radius) {
+                        lv_draw_eve5_alpha_draw_fill_with_border(u, t, next);
+                        t->state = LV_DRAW_TASK_STATE_FINISHED;
+                        t = next;  /* skip border — marked FINISHED after switch */
+                        break;
+                    }
+                }
+
+                lv_draw_eve5_alpha_draw_fill(u, t);
+                break;
+            }
+
+            case LV_DRAW_TASK_TYPE_BORDER:
+                lv_draw_eve5_alpha_draw_border(u, t);
+                break;
+
+            case LV_DRAW_TASK_TYPE_LINE:
+                lv_draw_eve5_alpha_draw_line(u, t);
+                break;
+
+            case LV_DRAW_TASK_TYPE_TRIANGLE:
+                lv_draw_eve5_alpha_draw_triangle(u, t);
+                break;
+
+            case LV_DRAW_TASK_TYPE_IMAGE:
+            case LV_DRAW_TASK_TYPE_LAYER:
+                lv_draw_eve5_hal_alpha_draw_image(u, t);
+                break;
+
+            case LV_DRAW_TASK_TYPE_LABEL:
+                lv_draw_eve5_alpha_draw_label(u, t);
+                break;
+
+            case LV_DRAW_TASK_TYPE_LETTER:
+                lv_draw_eve5_alpha_draw_letter(u, t);
+                break;
+
+            case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+                lv_draw_eve5_alpha_draw_box_shadow(u, t);
+                break;
+
+            case LV_DRAW_TASK_TYPE_ARC:
+                lv_draw_eve5_alpha_draw_arc(u, t);
+                break;
+
+            case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+                /* Deferred — processed after the alpha pass. Scales all
+                 * premultiplied RGBA channels in one step, avoiding an
+                 * extra bitmap redraw in the alpha pass. */
+                break;
+
+            default:
+                break;
+        }
+
+        t->state = LV_DRAW_TASK_STATE_FINISHED;
+        t = t->next;
+    }
+
+    /* Step 4: If we have a tracked opaque area, fill it with alpha=255.
+     * This ensures the opaque interior has correct alpha (the individual
+     * task draws above handle AA edges, but the interior should be solid). */
+    if(u->has_alpha_opaque) {
+        EVE_CoDl_colorA(phost, 255);
+        EVE_CoDl_blendFunc(phost, ONE, ZERO);  /* Overwrite — guaranteed opaque */
+        lv_draw_eve5_set_scissor(u, &(lv_area_t){
+            u->alpha_opaque_area.x1 + layer_area->x1,
+            u->alpha_opaque_area.y1 + layer_area->y1,
+            u->alpha_opaque_area.x2 + layer_area->x1,
+            u->alpha_opaque_area.y2 + layer_area->y1
+        }, layer_area);
+        lv_draw_eve5_draw_rect(u,
+            u->alpha_opaque_area.x1, u->alpha_opaque_area.y1,
+            u->alpha_opaque_area.x2, u->alpha_opaque_area.y2,
+            u->alpha_opaque_radius,
+            &(lv_area_t){
+                u->alpha_opaque_area.x1 + layer_area->x1,
+                u->alpha_opaque_area.y1 + layer_area->y1,
+                u->alpha_opaque_area.x2 + layer_area->x1,
+                u->alpha_opaque_area.y2 + layer_area->y1
+            }, layer_area);
+    }
+
+    /* Step 5: Restore default blend and colorMask */
+    EVE_CoDl_blendFunc_default(phost);
+    EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
+}
+
+/**********************
+ * LAYER RENDERING
+ **********************/
+
+static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
+{
+    lv_draw_task_t *t;
+    bool is_screen = (layer->parent == NULL);
+
+    u->rendering_in_progress = true;
+
+    EVE5_LOG("EVE5: === RENDER START layer=%p is_screen=%d ===",
+             (void *)layer, is_screen);
+    EVE5_LOG("EVE5: Layer buf_area=(%d,%d)-(%d,%d) clip=(%d,%d)-(%d,%d)",
+             layer->buf_area.x1, layer->buf_area.y1,
+             layer->buf_area.x2, layer->buf_area.y2,
+             layer->_clip_area.x1, layer->_clip_area.y1,
+             layer->_clip_area.x2, layer->_clip_area.y2);
+
+    /* Initialize the layer (allocate texture, start display list) */
+    lv_draw_eve5_hal_init_layer(u, layer, is_screen);
+
+    if(layer->user_data == NULL) {
+        LV_LOG_ERROR("EVE5: Layer allocation failed!");
+
+        t = layer->draw_task_head;
+        while(t) {
+            if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+               t->state == LV_DRAW_TASK_STATE_QUEUED) {
+                t->state = LV_DRAW_TASK_STATE_FINISHED;
+            }
+            t = t->next;
+        }
+        u->rendering_in_progress = false;
+        return;
+    }
+
+    /* Advance SW cache frame counter */
+    lv_draw_eve5_sw_cache_new_frame(u);
+
+    /* RGB render pass: process all QUEUED tasks */
+    int rendered_count = eve5_render_tasks(u, layer, is_screen);
+
+    /* Alpha correction pass: re-iterate IN_PROGRESS tasks and write correct
+     * alpha values. EVE hardware applies blend factors uniformly to RGBA,
+     * so SRC_ALPHA blend on a cleared layer squares the alpha channel.
+     * The alpha pass clears alpha to 0 and re-draws each task's shape with
+     * blend(ONE, ONE_MINUS_SRC_ALPHA) into the alpha channel only.
+     * Skip for screen layers — their alpha isn't used for compositing. */
+    if(!is_screen) {
+        eve5_alpha_pass(u, layer);
+    }
+
+    /* Deferred mask_rect tasks: process MASK_RECTANGLE tasks that were
+     * skipped during the main loop (non-screen layers only). These run
+     * after the alpha pass so they operate on fully corrected premultiplied
+     * RGBA. The mask scales all four channels — not just alpha — because
+     * premultiplied content requires RGB to be scaled alongside alpha to
+     * avoid white fringing at partially masked edges. This is also more
+     * efficient than adding a separate bitmap redraw in the alpha pass,
+     * since the mask geometry is a simple rounded rect. */
+    if(!is_screen) {
+        t = layer->draw_task_head;
+        while(t) {
+            if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+               t->type == LV_DRAW_TASK_TYPE_MASK_RECTANGLE &&
+               t->state == LV_DRAW_TASK_STATE_QUEUED) {
+                t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
+                lv_draw_eve5_hal_draw_mask_rect(u, t);
+                t->state = LV_DRAW_TASK_STATE_FINISHED;
+                rendered_count++;
+            }
+            t = t->next;
+        }
+    }
+
+    /* Null child layer user_data for LAYER tasks — deferred from normal draw
+     * so the alpha pass can re-access child textures for alpha correction. */
+    t = layer->draw_task_head;
+    while(t) {
+        if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+           t->type == LV_DRAW_TASK_TYPE_LAYER &&
+           t->state == LV_DRAW_TASK_STATE_FINISHED) {
+            lv_draw_image_dsc_t *layer_dsc = t->draw_dsc;
+            lv_layer_t *child = (lv_layer_t *)layer_dsc->src;
+            child->user_data = NULL;
+        }
         t = t->next;
     }
 
     EVE5_LOG("EVE5: Finishing layer, rendered %d tasks", rendered_count);
     lv_draw_eve5_hal_finish_layer(u, layer, is_screen);
+    
+    /* For child layers: texture stays in user_data for parent to use.
+     * For screen layers: texture ownership transfers to display driver.
+     * 
+     * Child texture cleanup happens automatically when LVGL processes
+     * the LAYER task in cleanup_task() - but we allocated via Esd_GpuAlloc,
+     * so we need to handle it ourselves. 
+     *
+     * The parent will have already rendered by the time cleanup_task()
+     * is called for the LAYER task (because we just finished the parent),
+     * so we're safe.
+     *
+     * Actually - with the QUEUED pattern, LVGL handles the ordering:
+     * - Child finishes and gets cleaned up 
+     * - ONLY THEN parent's LAYER task becomes WAITING
+     * - Parent queues and renders
+     *
+     * So by the time parent renders, child texture is still valid!
+     * We need to free child textures AFTER parent's graphicsFinish().
+     * 
+     * For now, let's track this via layer->user_data and free in
+     * the HAL finish or via a separate cleanup pass.
+     */
 
     EVE5_LOG("EVE5: === RENDER END layer=%p ===", (void *)layer);
 

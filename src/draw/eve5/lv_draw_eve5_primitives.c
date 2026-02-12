@@ -8,57 +8,63 @@
  * - Borders (hollow rectangles with rounded corners)
  * - Lines (horizontal, vertical, diagonal)
  * - Triangles
- * - Arcs (with rounded ends, angle masking)
  *
  * Uses EVE's stencil buffer for complex shapes and masking operations.
+ * Arc drawing is in lv_draw_eve5_arc.c.
  */
 
 #include "lv_draw_eve5_private.h"
 
 #if LV_USE_DRAW_EVE5
 
+#if !LV_DRAW_EVE5_NO_FLOAT
+#include <math.h>
+#endif
 #include "../lv_draw.h"
 #include "../lv_draw_rect.h"
 #include "../lv_draw_line.h"
 #include "../lv_draw_triangle.h"
-#include "../lv_draw_arc.h"
 
 /**********************
  * STATIC PROTOTYPES
  **********************/
 
 /* Primitive helpers */
+void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t r16);
 static void draw_circle(lv_draw_eve5_unit_t *u, int32_t cx, int32_t cy, int32_t radius);
-static void draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int32_t x2, int32_t y2, 
-                      int32_t radius, const lv_area_t *clip_area, const lv_area_t *layer_area);
-
-/* Stencil reset (call after any stencil-based rendering) */
-static void reset_stencil(lv_draw_eve5_unit_t *u);
-
-/* Arc helpers */
-static void draw_arc_mask_angle(lv_draw_eve5_unit_t *u, const lv_draw_arc_dsc_t *dsc,
-                                int32_t cx, int32_t cy, int32_t start_angle, int32_t end_angle,
-                                const lv_area_t *clip_area, const lv_area_t *layer_area);
-static uint8_t get_edge_strip_direction(int16_t angle);
-static bool is_same_quadrant(int16_t start_angle, int16_t end_angle);
-static int32_t chord_length(int16_t radius, int16_t angle_degrees);
+/* Gradient bitmap helpers */
+bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
+                            lv_opa_t opa, int32_t w, int32_t h);
+static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t *dsc,
+                               int32_t x, int32_t y, int32_t w, int32_t h,
+                               int32_t radius, const lv_area_t *clip, const lv_area_t *layer_area);
 
 /**********************
  * PRIMITIVE HELPERS
  **********************/
 
-static void draw_circle(lv_draw_eve5_unit_t *u, int32_t cx, int32_t cy, int32_t radius)
+/* Half-pixel precision circle.
+ * cx2/cy2: center in 1/2 pixel units.
+ * r16: radius in 1/16 pixel units. */
+void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t r16)
 {
-    if(radius <= 0) return;
+    if(r16 <= 0) return;
 
-    EVE_CoDl_pointSize(u->hal, radius * 16 + 8);  /* +8 for half-pixel alignment */
+    EVE_CoDl_pointSize(u->hal, r16);
     EVE_CoDl_begin(u->hal, POINTS);
-    EVE_CoDl_vertex2f_0(u->hal, cx, cy);
+    EVE_CoDl_vertex2f_1(u->hal, cx2, cy2);
     EVE_CoDl_end(u->hal);
 }
 
-static void draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int32_t x2, int32_t y2, 
-                      int32_t radius, const lv_area_t *clip_area, const lv_area_t *layer_area)
+/* Integer pixel circle (center in pixels, radius in pixels).
+ * Adds +0.5px for anti-aliased edge coverage. */
+static void draw_circle(lv_draw_eve5_unit_t *u, int32_t cx, int32_t cy, int32_t radius)
+{
+    draw_circle_subpx(u, cx * 2, cy * 2, radius * 16 + 8);
+}
+
+void lv_draw_eve5_draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int32_t x2, int32_t y2,
+                             int32_t radius, const lv_area_t *clip_area, const lv_area_t *layer_area)
 {
     int32_t w = x2 - x1;
     int32_t h = y2 - y1;
@@ -68,6 +74,14 @@ static void draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int32_t x2
     int32_t max_r = LV_MIN(w, h) / 2;
     if(radius > max_r) radius = max_r;
     if(radius < 0) radius = 0;
+
+    /* Perfect circle: use POINTS with sub-pixel precision when the shape
+     * is a fully-rounded square. RECTS can't achieve this because its
+     * vertex pair would need to cross (radius > coord_diff/2). */
+    if(w == h && radius == max_r && w >= 3) {
+        draw_circle_subpx(u, x1 * 2 + w, y1 * 2 + h, (w + 1) * 8);
+        return;
+    }
 
     bool needs_scissor_fix = (radius < 1);
 
@@ -114,134 +128,243 @@ static void draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int32_t x2
     }
 }
 
-static void reset_stencil(lv_draw_eve5_unit_t *u)
-{
-    EVE_CoDl_stencilFunc(u->hal, ALWAYS, 0, 0);
-    EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
-    EVE_CoDl_colorMask(u->hal, 1, 1, 1, 1);
-    EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
-}
-
 /**********************
- * ARC HELPERS
+ * GRADIENT BITMAP FILL
  **********************/
 
-static int32_t chord_length(int16_t radius, int16_t angle_degrees)
+/* Pack LVGL color+opa into an ARGB8 pixel (BT820 format: A[31:24] R[23:16] G[15:8] B[7:0]) */
+static inline uint32_t pack_argb8(lv_color_t c, lv_opa_t a)
 {
-    angle_degrees %= 360;
-    if(angle_degrees < 0) angle_degrees += 360;
-    int32_t sin_value = lv_trigo_sin(angle_degrees / 2);
-    return (int32_t)(2 * radius * sin_value / 32768);
+    return ((uint32_t)a << 24) | ((uint32_t)c.red << 16) | ((uint32_t)c.green << 8) | c.blue;
 }
 
-static uint8_t get_edge_strip_direction(int16_t angle)
+/* Linearly interpolate between two ARGB8 values at position t (0-255) */
+static inline uint32_t lerp_argb8(uint32_t c0, uint32_t c1, uint8_t t)
 {
-    if(angle >= 315 || angle < 45)  return EDGE_STRIP_R;
-    if(angle >= 45  && angle < 135) return EDGE_STRIP_B;
-    if(angle >= 135 && angle < 225) return EDGE_STRIP_L;
-    if(angle >= 225 && angle < 315) return EDGE_STRIP_A;
-    return EDGE_STRIP_R;
+    uint32_t a = ((c0 >> 24) * (255 - t) + (c1 >> 24) * t) / 255;
+    uint32_t r = (((c0 >> 16) & 0xFF) * (255 - t) + ((c1 >> 16) & 0xFF) * t) / 255;
+    uint32_t g = (((c0 >> 8) & 0xFF) * (255 - t) + ((c1 >> 8) & 0xFF) * t) / 255;
+    uint32_t b = ((c0 & 0xFF) * (255 - t) + (c1 & 0xFF) * t) / 255;
+    return (a << 24) | (r << 16) | (g << 8) | b;
 }
 
-static bool is_same_quadrant(int16_t start_angle, int16_t end_angle)
+/**
+ * Build a gradient bitmap and configure bitmap DL state.
+ *
+ * Generates gradient pixels, allocates GPU memory, uploads bitmap data,
+ * and sets up bitmap handle, layout, size, source, and transform in the
+ * display list. After this returns true, the caller can draw BITMAPS at
+ * the desired position with whatever masking is appropriate.
+ *
+ * The hardware's bitmap transform X computation splits into high/low parts:
+ *   xosH = (xs16 & ~255) - px;  xosL = xs16 & 255;
+ *   xx = (xosH * A) >> 7 + xosL * (A >> 7)
+ * When A is small (2-pixel bitmap), A >> 7 truncates to nearly zero,
+ * causing visible 16-pixel-wide banding in horizontal gradients.
+ * VER gradients don't have this issue — Y uses a single yo*E multiply
+ * without the xosH/xosL split.
+ *
+ * Minimum bitmap width to avoid visible banding: n=16 (worst case
+ * banding ≤ 1 color level = imperceptible). For w < 16, the 2-pixel
+ * path is fine since the entire fill is smaller than one 16-pixel band.
+ *
+ * Returns true if gradient was set up, false if not a supported type.
+ */
+bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
+                           lv_opa_t opa, int32_t w, int32_t h)
 {
-    if(start_angle <= end_angle) return false;
+    EVE_HalContext *phost = u->hal;
 
-    int q_start = start_angle / 90;
-    int q_end = end_angle / 90;
-    return (q_start == q_end);
-}
+    /* Only handle HOR and VER gradients */
+    if(grad->dir != LV_GRAD_DIR_HOR && grad->dir != LV_GRAD_DIR_VER) return false;
+    if(grad->stops_count < 2) return false;
 
-static void draw_arc_mask_angle(lv_draw_eve5_unit_t *u, const lv_draw_arc_dsc_t *dsc,
-                                int32_t cx, int32_t cy, int32_t start_angle, int32_t end_angle,
-                                const lv_area_t *clip_area, const lv_area_t *layer_area)
-{
-    /* Constrain angles */
-    start_angle = LV_CLAMP(0, start_angle, 359);
-    end_angle = LV_CLAMP(0, end_angle, 359);
+    bool is_ver = (grad->dir == LV_GRAD_DIR_VER);
 
-    int32_t angle_range;
-    if(end_angle > start_angle) {
-        angle_range = end_angle - start_angle;
+    bool simple = (grad->stops_count == 2
+                   && grad->stops[0].frac == 0
+                   && grad->stops[1].frac == 255);
+
+    /* Build bitmap pixels */
+    uint32_t pixels[256];
+    uint32_t pixel_count;
+
+    if(simple) {
+        uint32_t c0 = pack_argb8(grad->stops[0].color,
+                                  LV_OPA_MIX2(opa, grad->stops[0].opa));
+        uint32_t c1 = pack_argb8(grad->stops[1].color,
+                                  LV_OPA_MIX2(opa, grad->stops[1].opa));
+
+        if(is_ver || w < 16) {
+            /* VER: 2-pixel path (Y transform has no precision issue).
+             * Also used for narrow HOR fills where banding isn't visible. */
+            pixel_count = 2;
+            pixels[0] = c0;
+            pixels[1] = c1;
+        }
+        else {
+            /* HOR: 16-pixel pre-rendered strip avoids banding (64 bytes). */
+            pixel_count = 16;
+            for(uint32_t i = 0; i < 16; i++) {
+                pixels[i] = lerp_argb8(c0, c1, (uint8_t)(i * 255 / 15));
+            }
+        }
     }
     else {
-        angle_range = 360 - start_angle + end_angle;
+        /* Multi-stop: pre-render 256-pixel strip */
+        pixel_count = 256;
+
+        uint32_t stop_colors[LV_GRADIENT_MAX_STOPS];
+        for(uint8_t i = 0; i < grad->stops_count; i++) {
+            stop_colors[i] = pack_argb8(grad->stops[i].color,
+                                        LV_OPA_MIX2(opa, grad->stops[i].opa));
+        }
+
+        uint8_t si = 0;
+        for(uint32_t i = 0; i < 256; i++) {
+            while(si < grad->stops_count - 2 && i >= grad->stops[si + 1].frac) {
+                si++;
+            }
+
+            uint8_t frac0 = grad->stops[si].frac;
+            uint8_t frac1 = grad->stops[si + 1].frac;
+
+            if(frac1 == frac0) {
+                pixels[i] = stop_colors[si + 1];
+            }
+            else {
+                uint8_t t = (uint8_t)(((uint32_t)(i - frac0) * 255) / (frac1 - frac0));
+                pixels[i] = lerp_argb8(stop_colors[si], stop_colors[si + 1], t);
+            }
+        }
     }
 
-    int32_t mid_angle_op = ((angle_range / 2) + start_angle + 180) % 360;
-    int32_t mask_dir_end = (((360 - angle_range) / 4) + end_angle) % 360;
-    int32_t mask_dir_start = (((360 - angle_range) / 4) + mid_angle_op) % 360;
-
-    /* Calculate edge points (using >> 5 for ~1024 pixel radius) */
-    lv_point_t start_pt, end_pt, mid_pt;
-    start_pt.x = (lv_trigo_cos(start_angle) >> 5) + cx;
-    start_pt.y = (lv_trigo_sin(start_angle) >> 5) + cy;
-    end_pt.x = (lv_trigo_cos(end_angle) >> 5) + cx;
-    end_pt.y = (lv_trigo_sin(end_angle) >> 5) + cy;
-    mid_pt.x = (lv_trigo_cos(mid_angle_op) >> 5) + cx;
-    mid_pt.y = (lv_trigo_sin(mid_angle_op) >> 5) + cy;
-
-    if(angle_range <= 180) {
-        /* Two-sided mask with 6 vertices */
-
-        /* Mask end angle */
-        uint8_t edge = get_edge_strip_direction(mask_dir_end);
-        EVE_CoDl_begin(u->hal, edge);
-        EVE_CoDl_vertex2f_0(u->hal, mid_pt.x, mid_pt.y);
-        EVE_CoDl_vertex2f_0(u->hal, cx, cy);
-        EVE_CoDl_vertex2f_0(u->hal, end_pt.x, end_pt.y);
-        EVE_CoDl_end(u->hal);
-
-        /* Mask start angle */
-        edge = get_edge_strip_direction(mask_dir_start);
-        EVE_CoDl_begin(u->hal, edge);
-        EVE_CoDl_vertex2f_0(u->hal, mid_pt.x, mid_pt.y);
-        EVE_CoDl_vertex2f_0(u->hal, cx, cy);
-        EVE_CoDl_vertex2f_0(u->hal, start_pt.x, start_pt.y);
-        EVE_CoDl_end(u->hal);
+    /* Allocate temporary GPU memory */
+    uint32_t byte_count = pixel_count * 4;
+    uint32_t byte_count_aligned = ALIGN_UP(byte_count, 4);
+    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, byte_count_aligned, 0);
+    uint32_t addr = Esd_GpuAlloc_Get(u->allocator, handle);
+    if(addr == GA_INVALID) {
+        LV_LOG_WARN("EVE5: Failed to allocate GPU memory for gradient bitmap");
+        return false;
     }
-    else if(is_same_quadrant(start_angle, end_angle)) {
-        /* Both angles in same quadrant - special case */
-        int16_t chord = chord_length(dsc->radius, 360 - angle_range);
-        int16_t r_width = LV_MAX(chord / 4, 1);
 
-        lv_point_t end_brd, start_brd;
-        end_brd.x = cx + ((lv_trigo_cos(end_angle) * dsc->radius) >> LV_TRIGO_SHIFT);
-        end_brd.y = cy + ((lv_trigo_sin(end_angle) * dsc->radius) >> LV_TRIGO_SHIFT);
-        start_brd.x = cx + ((lv_trigo_cos(start_angle) * dsc->radius) >> LV_TRIGO_SHIFT);
-        start_brd.y = cy + ((lv_trigo_sin(start_angle) * dsc->radius) >> LV_TRIGO_SHIFT);
+    if(u->frame_alloc_count < EVE5_MAX_FRAME_ALLOCS) {
+        u->frame_allocs[u->frame_alloc_count++] = handle;
+    }
 
-        /* Draw blocking rectangle */
-        draw_rect(u, start_brd.x, start_brd.y, end_brd.x, end_brd.y, 0, clip_area, layer_area);
+    EVE_CoCmd_memWrite(phost, addr, byte_count);
+    for(uint32_t i = 0; i < pixel_count; i++) {
+        EVE_Cmd_wr32(phost, pixels[i]);
+    }
 
-        lv_point_t start_brd2, end_brd2, start_ctr, end_ctr;
-        start_brd2.x = start_brd.x + ((lv_trigo_cos(start_angle - 90) * r_width) >> LV_TRIGO_SHIFT);
-        start_brd2.y = start_brd.y + ((lv_trigo_sin(start_angle - 90) * r_width) >> LV_TRIGO_SHIFT);
-        end_brd2.x = end_brd.x + ((lv_trigo_cos(end_angle + 90) * r_width) >> LV_TRIGO_SHIFT);
-        end_brd2.y = end_brd.y + ((lv_trigo_sin(end_angle + 90) * r_width) >> LV_TRIGO_SHIFT);
-        end_ctr.x = cx + ((lv_trigo_cos(end_angle + 90) * r_width) >> LV_TRIGO_SHIFT);
-        end_ctr.y = cy + ((lv_trigo_sin(end_angle + 90) * r_width) >> LV_TRIGO_SHIFT);
-        start_ctr.x = cx + ((lv_trigo_cos(start_angle + 270) * r_width) >> LV_TRIGO_SHIFT);
-        start_ctr.y = cy + ((lv_trigo_sin(start_angle + 270) * r_width) >> LV_TRIGO_SHIFT);
+    /* Configure bitmap in display list */
+    int32_t bmp_w = is_ver ? 1 : (int32_t)pixel_count;
+    int32_t bmp_h = is_ver ? (int32_t)pixel_count : 1;
+    int32_t stride = bmp_w * 4;
 
-        EVE_CoDl_lineWidth(u->hal, r_width * 16);
-        EVE_CoDl_begin(u->hal, LINE_STRIP);
-        EVE_CoDl_vertex2f_0(u->hal, start_ctr.x, start_ctr.y);
-        EVE_CoDl_vertex2f_0(u->hal, start_brd2.x, start_brd2.y);
-        EVE_CoDl_vertex2f_0(u->hal, end_brd2.x, end_brd2.y);
-        EVE_CoDl_vertex2f_0(u->hal, end_ctr.x, end_ctr.y);
-        EVE_CoDl_end(u->hal);
+    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoCmd_dl(phost, BITMAP_LAYOUT_H(0, 0));
+    EVE_CoCmd_dl(phost, BITMAP_SIZE_H(w >> 9, h >> 9));
+    EVE_CoCmd_dl(phost, BITMAP_LAYOUT(ARGB8, stride, bmp_h));
+    if(is_ver) {
+        EVE_CoCmd_dl(phost, BITMAP_SIZE(BILINEAR, REPEAT, BORDER, w, h));
     }
     else {
-        /* Single-sided mask with 3 vertices */
-        uint8_t edge = get_edge_strip_direction(mid_angle_op);
-        EVE_CoDl_begin(u->hal, edge);
-        EVE_CoDl_vertex2f_0(u->hal, end_pt.x, end_pt.y);
-        EVE_CoDl_vertex2f_0(u->hal, cx, cy);
-        EVE_CoDl_vertex2f_0(u->hal, start_pt.x, start_pt.y);
-        EVE_CoDl_end(u->hal);
+        EVE_CoCmd_dl(phost, BITMAP_SIZE(BILINEAR, BORDER, REPEAT, w, h));
     }
+    EVE_CoCmd_dl(phost, BITMAP_SOURCE_H(addr >> 24));
+    EVE_CoCmd_dl(phost, BITMAP_SOURCE(addr));
+
+    /* Scale bitmap: map (pixel_count - 1) texels to the gradient dimension.
+     * Use signed 1.15 for best precision; fall back to unsigned 8.8 on overflow. */
+    int32_t grad_dim = is_ver ? h : w;
+    int32_t grad_coeff = (int32_t)(pixel_count - 1) * 0x8000 / grad_dim;
+    bool grad_p = 1;
+    if(grad_coeff > 0xFFFF) {
+        grad_coeff = (int32_t)(pixel_count - 1) * 0x0100 / grad_dim;
+        grad_p = 0;
+    }
+    if(is_ver) {
+        EVE_CoDl_bitmapTransformA_ex(phost, 1, 0x8000 / w);
+        EVE_CoDl_bitmapTransformE_ex(phost, grad_p, grad_coeff);
+    }
+    else {
+        EVE_CoDl_bitmapTransformA_ex(phost, grad_p, grad_coeff);
+        EVE_CoDl_bitmapTransformE_ex(phost, 1, 0x8000 / h);
+    }
+
+    return true;
 }
+
+/**
+ * Draw a gradient fill, optionally masked to a rounded rect.
+ * Returns true if gradient was drawn, false if not a supported gradient type.
+ */
+static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t *dsc,
+                               int32_t x, int32_t y, int32_t w, int32_t h,
+                               int32_t radius, const lv_area_t *clip, const lv_area_t *layer_area)
+{
+    EVE_HalContext *phost = u->hal;
+
+    EVE_CoDl_vertexFormat(phost, 0);
+    EVE_CoDl_saveContext(phost);
+
+    if(!setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h)) {
+        EVE_CoDl_restoreContext(phost);
+        return false;
+    }
+
+    if(radius > 0) {
+        /* Check if gradient has any per-pixel alpha */
+        bool grad_has_alpha = (dsc->opa < LV_OPA_MAX);
+        if(!grad_has_alpha) {
+            for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
+                if(dsc->grad.stops[i].opa < LV_OPA_MAX) { grad_has_alpha = true; break; }
+            }
+        }
+
+        /* Phase 1a: Clear bbox alpha to 0 */
+        EVE_CoDl_colorArgb_ex(phost, 0x00000000);
+        EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+        EVE_CoDl_blendFunc(phost, ONE, ZERO);
+        lv_draw_eve5_draw_rect(u, x, y, x + w - 1, y + h - 1, 0, clip, layer_area);
+
+        /* Phase 1b: Write rounded rect mask (alpha=255 inside) */
+        EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+        lv_draw_eve5_draw_rect(u, x, y, x + w - 1, y + h - 1, radius, clip, layer_area);
+
+        if(grad_has_alpha) {
+            /* Phase 1c: Multiply mask by gradient bitmap alpha.
+             * blend(ZERO, SRC_ALPHA): result_a = (bitmap_a / 255) * mask_a */
+            EVE_CoDl_blendFunc(phost, ZERO, SRC_ALPHA);
+            EVE_CoDl_begin(phost, BITMAPS);
+            EVE_CoDl_vertex2f_0(phost, x, y);
+            EVE_CoDl_end(phost);
+        }
+
+        /* Phase 2: Draw gradient RGB using the combined mask */
+        EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
+        EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
+        EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+        EVE_CoDl_begin(phost, BITMAPS);
+        EVE_CoDl_vertex2f_0(phost, x, y);
+        EVE_CoDl_end(phost);
+    }
+    else {
+        /* No radius: standard alpha blending */
+        EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+        EVE_CoDl_begin(phost, BITMAPS);
+        EVE_CoDl_vertex2f_0(phost, x, y);
+        EVE_CoDl_end(phost);
+    }
+
+    EVE_CoDl_restoreContext(phost);
+
+    return true;
+}
+
 
 /**********************
  * FILL DRAWING
@@ -266,12 +389,35 @@ void lv_draw_eve5_hal_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
 
     lv_draw_eve5_set_scissor(u, clip, layer_area);
 
-    /* Determine fill color - use gradient color if available, otherwise solid color */
+    int32_t radius = dsc->radius;
+    int32_t real_radius = LV_MIN3((w - 1) / 2, (h - 1) / 2, radius);
+
+    /* Try gradient bitmap path for HOR/VER gradients */
+    if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count >= 2) {
+        if(draw_gradient_fill(u, dsc, x1, y1, w, h, real_radius, clip, layer_area)) {
+            /* Track fully opaque gradient fills for alpha repair */
+            if(dsc->opa >= LV_OPA_MAX) {
+                bool grad_opaque = true;
+                for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
+                    if(dsc->grad.stops[i].opa < LV_OPA_MAX) { grad_opaque = false; break; }
+                }
+                if(grad_opaque) lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, real_radius);
+            }
+            /* Rounded gradient fills use alpha-as-scratch masking */
+            if(real_radius > 0) {
+                lv_draw_eve5_track_alpha_trashed(u, x1, y1, x2, y2);
+            }
+            return;
+        }
+        /* Fall through to solid fill approximation for unsupported gradient types */
+    }
+
+    /* Determine fill color */
     lv_color_t fill_color;
     uint8_t fill_opa = dsc->opa;
 
     if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count > 0) {
-        /* Gradient defined - pick a representative color */
+        /* Unsupported gradient type - pick a representative color */
         if(dsc->grad.stops_count == 1) {
             /* Single stop - just use it */
             fill_color = dsc->grad.stops[0].color;
@@ -290,22 +436,29 @@ void lv_draw_eve5_hal_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
         }
     }
     else {
-        /* No gradient - use solid color */
         fill_color = dsc->color;
     }
 
     EVE_CoDl_colorRgb(u->hal, fill_color.red, fill_color.green, fill_color.blue);
     EVE_CoDl_colorA(u->hal, fill_opa);
 
-    int32_t radius = dsc->radius;
-    int32_t real_radius = LV_MIN3(w / 2, h / 2, radius);
-
-    /* Check for perfect circle */
-    if(w == h && radius == LV_RADIUS_CIRCLE) {
-        draw_circle(u, x1 + w / 2, y1 + h / 2, real_radius);
+    /* Perfect circle: use POINTS with half-pixel precision for exact bounding box.
+     * Skip for w < 4 (pixel radius < 2) — AA makes tiny circles too transparent. */
+    if(w == h && radius == LV_RADIUS_CIRCLE && w >= 4) {
+        /* Center at (x1 + (w-1)/2.0, y1 + (h-1)/2.0) in 1/2 px units */
+        int32_t cx2 = x1 * 2 + (w - 1);
+        int32_t cy2 = y1 * 2 + (h - 1);
+        /* Radius = w/2.0 in 1/16 px units (covers outer edges of boundary pixels) */
+        int32_t r16 = w * 8;
+        draw_circle_subpx(u, cx2, cy2, r16);
     }
     else {
-        draw_rect(u, x1, y1, x2, y2, real_radius, clip, layer_area);
+        lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, real_radius, clip, layer_area);
+    }
+
+    /* Track fully opaque solid fills for alpha repair */
+    if(fill_opa >= LV_OPA_MAX) {
+        lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, real_radius);
     }
 }
 
@@ -330,8 +483,8 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     int32_t h = y2 - y1 + 1;
 
     int32_t rout = dsc->radius;
-    int32_t short_side = LV_MIN(w, h);
-    if(rout > short_side >> 1) rout = short_side >> 1;
+    int32_t max_r = (LV_MIN(w, h) - 1) / 2;
+    if(rout > max_r) rout = max_r;
 
     const lv_area_t *clip = &t->clip_area;
     const lv_area_t *layer_area = &layer->buf_area;
@@ -357,8 +510,10 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                            (clip_x1 > x2 - rout || clip_x2 < x2 - rout || 
                             clip_y2 < y2 - rout);    /* bottom-right */
 
-    if(corners_clipped || rout == 0) {
-        /* Fast path: draw borders as simple lines */
+    if(corners_clipped || (rout == 0 && dsc->opa >= LV_OPA_MAX)) {
+        /* Fast path: draw borders as simple lines.
+         * Only safe when corners aren't visible (clipped) or at full opacity
+         * (overlap at corners from LINES rounded caps is invisible at opa=255). */
         lv_draw_eve5_set_scissor(u, clip, layer_area);
 
         EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
@@ -389,10 +544,31 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
         }
 
         EVE_CoDl_end(u->hal);
+
+        /* LINES path doesn't trash alpha, but an opaque full border still
+         * expands the opaque area (LVGL may have shrunk the fill by 1px).
+         * Upgrade tracking so alpha repair from later operations (arcs,
+         * images, etc.) covers the full widget area including the border. */
+        if(dsc->opa >= LV_OPA_MAX && dsc->side == LV_BORDER_SIDE_FULL && u->has_alpha_opaque) {
+            int32_t dx1 = u->alpha_opaque_area.x1 - x1;
+            int32_t dy1 = u->alpha_opaque_area.y1 - y1;
+            int32_t dx2 = u->alpha_opaque_area.x2 - x2;
+            int32_t dy2 = u->alpha_opaque_area.y2 - y2;
+            if(dx1 >= 0 && dx1 <= 2 && dy1 >= 0 && dy1 <= 2 &&
+               dx2 <= 0 && dx2 >= -2 && dy2 <= 0 && dy2 >= -2) {
+                lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, rout);
+            }
+        }
         return;
     }
 
-    /* Full stencil-based path for visible rounded corners */
+    /* Alpha-channel masking path for visible rounded corners.
+     *
+     * Builds a "donut" mask in the alpha channel (outer minus inner rounded rect),
+     * then composites the border color through it. Same technique as gradient fill.
+     * Works for both full and partial sides — when a side is disabled, the inner
+     * rect extends past the outer rect on that edge, zeroing the mask there.
+     */
 
     /* Calculate inner area based on border sides */
     int32_t inner_x1 = x1 + ((dsc->side & LV_BORDER_SIDE_LEFT)   ? dsc->width : -dsc->width);
@@ -403,45 +579,78 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     int32_t rin = rout - dsc->width;
     if(rin < 0) rin = 0;
 
-    lv_draw_eve5_set_scissor(u, clip, layer_area);
-
-    EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
-    EVE_CoDl_colorA(u->hal, dsc->opa);
-
-    /* Use stencil to create hollow border */
-
-    /* Step 1: Draw outer rect to alpha only, init stencil */
-    EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
-    EVE_CoDl_stencilFunc(u->hal, ALWAYS, 0, 1);
-    EVE_CoDl_stencilOp(u->hal, REPLACE, REPLACE);
-    draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
-
-    /* Step 2: Punch hole for inner region */
-    EVE_CoDl_blendFunc(u->hal, ONE, ZERO);
-    draw_rect(u, inner_x1 - 2, inner_y1 - 1, inner_x2 + 1, inner_y2 + 2, rin, clip, layer_area);
-
-    /* Step 3: Set stencil for inner region */
-    EVE_CoDl_stencilFunc(u->hal, ALWAYS, 1, 1);
-    EVE_CoDl_stencilOp(u->hal, REPLACE, REPLACE);
-    EVE_CoDl_blendFunc(u->hal, ZERO, ONE_MINUS_SRC_ALPHA);
-    EVE_CoDl_colorA(u->hal, 255);
-    draw_rect(u, inner_x1, inner_y1, inner_x2, inner_y2, rin, clip, layer_area);
-
-    /* Step 4: Enable color output */
-    EVE_CoDl_colorMask(u->hal, 1, 1, 1, 1);
-
-    if(dsc->side == LV_BORDER_SIDE_FULL) {
-        EVE_CoDl_blendFunc(u->hal, DST_ALPHA, ONE_MINUS_DST_ALPHA);
-        draw_rect(u, inner_x1, inner_y1, inner_x2, inner_y2, rin, clip, layer_area);
+    /* Detect perfect circle: square widget, max radius, all sides.
+     * Skip for w < 4 (pixel radius < 2) — AA makes tiny circles too transparent. */
+    bool is_circle = (w == h && dsc->radius == LV_RADIUS_CIRCLE &&
+                      dsc->side == LV_BORDER_SIDE_FULL && w >= 4);
+    int32_t cx2 = 0, cy2 = 0;
+    if(is_circle) {
+        cx2 = x1 * 2 + (w - 1);
+        cy2 = y1 * 2 + (h - 1);
     }
 
-    /* Step 5: Draw final border where stencil != 1 */
-    EVE_CoDl_stencilFunc(u->hal, NOTEQUAL, 1, 255);
-    EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
-    EVE_CoDl_colorA(u->hal, dsc->opa);
-    draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
+    lv_draw_eve5_set_scissor(u, clip, layer_area);
 
-    reset_stencil(u);
+    EVE_CoDl_vertexFormat(u->hal, 0);
+    EVE_CoDl_saveContext(u->hal);
+
+    /* Phase 1a: Clear bbox alpha to 0 */
+    EVE_CoDl_colorArgb_ex(u->hal, 0x00000000);
+    EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
+    EVE_CoDl_blendFunc(u->hal, ONE, ZERO);
+    lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, 0, clip, layer_area);
+
+    /* Phase 1b: Write outer shape into alpha (alpha = opa inside) */
+    EVE_CoDl_colorA(u->hal, dsc->opa);
+    if(is_circle)
+        draw_circle_subpx(u, cx2, cy2, w * 8);
+    else
+        lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
+
+    /* Phase 1c: Subtract inner shape from alpha.
+     * dst_a = dst_a * (1 - src_a/255). With colorA=255, zeroes alpha inside
+     * the inner shape. AA edge pixels get partial subtraction for smooth inner edges. */
+    EVE_CoDl_colorA(u->hal, 255);
+    EVE_CoDl_blendFunc(u->hal, ZERO, ONE_MINUS_SRC_ALPHA);
+    if(is_circle) {
+        int32_t inner_d = w - 2 * dsc->width;
+        if(inner_d > 0)
+            draw_circle_subpx(u, cx2, cy2, inner_d * 8);
+    }
+    else
+        lv_draw_eve5_draw_rect(u, inner_x1, inner_y1, inner_x2, inner_y2, rin, clip, layer_area);
+
+    /* Phase 2: Draw border color using the mask.
+     * result = border_color * mask + background * (1 - mask) */
+    EVE_CoDl_colorMask(u->hal, 1, 1, 1, 1);
+    EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
+    EVE_CoDl_colorA(u->hal, 255);
+    EVE_CoDl_blendFunc(u->hal, DST_ALPHA, ONE_MINUS_DST_ALPHA);
+    if(is_circle)
+        draw_circle_subpx(u, cx2, cy2, w * 8);
+    else
+        lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
+
+    EVE_CoDl_restoreContext(u->hal);
+
+    /* Border masking trashes alpha in the bbox */
+    lv_draw_eve5_track_alpha_trashed(u, x1, y1, x2, y2);
+
+    /* When border is fully opaque and covers all sides, upgrade the opaque
+     * tracking to the border's area — but only if the existing opaque fill
+     * is approximately the same size (within 2px per edge, matching the
+     * dispatch pairing tolerance). LVGL shrinks fill by 1px when border is
+     * opaque with radius, so the fill is 0-2px inset on each side. */
+    if(dsc->opa >= LV_OPA_MAX && dsc->side == LV_BORDER_SIDE_FULL && u->has_alpha_opaque) {
+        int32_t dx1 = u->alpha_opaque_area.x1 - x1;
+        int32_t dy1 = u->alpha_opaque_area.y1 - y1;
+        int32_t dx2 = u->alpha_opaque_area.x2 - x2;
+        int32_t dy2 = u->alpha_opaque_area.y2 - y2;
+        if(dx1 >= 0 && dx1 <= 2 && dy1 >= 0 && dy1 <= 2 &&
+           dx2 <= 0 && dx2 >= -2 && dy2 <= 0 && dy2 >= -2) {
+            lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, rout);
+        }
+    }
 }
 
 /**********************
@@ -496,8 +705,8 @@ void lv_draw_eve5_hal_draw_fill_with_border(lv_draw_eve5_unit_t *u,
     int32_t h = y2 - y1 + 1;
 
     int32_t rout = border_dsc->radius;
-    int32_t short_side = LV_MIN(w, h);
-    if(rout > short_side >> 1) rout = short_side >> 1;
+    int32_t max_r = (LV_MIN(w, h) - 1) / 2;
+    if(rout > max_r) rout = max_r;
 
     int32_t rin = rout - border_dsc->width;
     if(rin < 0) rin = 0;
@@ -528,22 +737,44 @@ void lv_draw_eve5_hal_draw_fill_with_border(lv_draw_eve5_unit_t *u,
         border_b = (border_dsc->color.blue * opa + fill_dsc->color.blue * inv_opa) / 255;
     }
 
-    /* Outer rectangle (blended border color) */
-    EVE_CoDl_colorRgb(u->hal, border_r, border_g, border_b);
-    EVE_CoDl_colorA(u->hal, 255);
-    draw_rect(u, x1, y1, x2, y2, rout, &clip, layer_area);
+    if(w == h && border_dsc->radius == LV_RADIUS_CIRCLE && w >= 4) {
+        /* Perfect circle: use POINTS with sub-pixel precision */
+        int32_t cx2 = x1 * 2 + (w - 1);
+        int32_t cy2 = y1 * 2 + (h - 1);
 
-    /* Inner rectangle (fill color) */
-    int32_t bw = border_dsc->width;
-    int32_t inner_x1 = x1 + bw;
-    int32_t inner_y1 = y1 + bw;
-    int32_t inner_x2 = x2 - bw;
-    int32_t inner_y2 = y2 - bw;
+        /* Outer circle (blended border color) */
+        EVE_CoDl_colorRgb(u->hal, border_r, border_g, border_b);
+        EVE_CoDl_colorA(u->hal, 255);
+        draw_circle_subpx(u, cx2, cy2, w * 8);
 
-    if(inner_x2 > inner_x1 && inner_y2 > inner_y1) {
-        EVE_CoDl_colorRgb(u->hal, fill_dsc->color.red, fill_dsc->color.green, fill_dsc->color.blue);
-        draw_rect(u, inner_x1, inner_y1, inner_x2, inner_y2, rin, &clip, layer_area);
+        /* Inner circle (fill color) */
+        int32_t inner_d = w - 2 * border_dsc->width;
+        if(inner_d >= 4) {
+            EVE_CoDl_colorRgb(u->hal, fill_dsc->color.red, fill_dsc->color.green, fill_dsc->color.blue);
+            draw_circle_subpx(u, cx2, cy2, inner_d * 8);
+        }
     }
+    else {
+        /* Outer rectangle (blended border color) */
+        EVE_CoDl_colorRgb(u->hal, border_r, border_g, border_b);
+        EVE_CoDl_colorA(u->hal, 255);
+        lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, &clip, layer_area);
+
+        /* Inner rectangle (fill color) */
+        int32_t bw = border_dsc->width;
+        int32_t inner_x1 = x1 + bw;
+        int32_t inner_y1 = y1 + bw;
+        int32_t inner_x2 = x2 - bw;
+        int32_t inner_y2 = y2 - bw;
+
+        if(inner_x2 > inner_x1 && inner_y2 > inner_y1) {
+            EVE_CoDl_colorRgb(u->hal, fill_dsc->color.red, fill_dsc->color.green, fill_dsc->color.blue);
+            lv_draw_eve5_draw_rect(u, inner_x1, inner_y1, inner_x2, inner_y2, rin, &clip, layer_area);
+        }
+    }
+
+    /* Track opaque fill for alpha repair (fill_dsc->opa >= LV_OPA_MAX is a precondition) */
+    lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, rout);
 }
 
 /**********************
@@ -566,52 +797,359 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
-    EVE_CoDl_colorA(u->hal, dsc->opa);
+    uint32_t line_w = dsc->width * 8; /* EVE LINE_WIDTH is half-width in 1/16 pixel units */
 
-    uint32_t line_w = dsc->width * 16; /* EVE uses 1/16 pixel units */
+    /* Half-pixel alignment: SW uses asymmetric w_half0/w_half1 for odd widths,
+     * shifting the line center by 0.5px. Even widths are symmetric. */
+    int32_t off = (dsc->width & 1) ? 0 : -1;
 
-    /* Horizontal or vertical without rounding - use RECTS */
-    bool is_vertical = (x1 == x2);
-    bool is_horizontal = (y1 == y2);
-    bool no_round = (!dsc->round_end && !dsc->round_start);
+    bool need_flat_start = !dsc->round_start && !dsc->raw_end;
+    bool need_flat_end = !dsc->round_end && !dsc->raw_end;
+    bool has_dashes = (dsc->dash_gap > 0 && dsc->dash_width > 0);
+    int32_t dx = x2 - x1;
+    int32_t dy = y2 - y1;
 
-    if(false) { // ((is_vertical || is_horizontal) && no_round) {
-        /* Adjust for line width */
-        int32_t half_w = dsc->width / 2;
+    /* H/V scissor optimization: for axis-aligned lines without round caps,
+     * draw an oversized line (+2px width, +1px length each end) and let the
+     * scissor clip to the exact pixel rectangle. Gives sharp edges and
+     * bypasses cap masking. */
+    bool is_hv_flat = (dx == 0 || dy == 0) && (dsc->raw_end || (!dsc->round_start && !dsc->round_end));
+    if(is_hv_flat) {
+        int32_t wm = dsc->width - 1;
+        int32_t w_half0 = wm >> 1;
+        int32_t w_half1 = w_half0 + (wm & 1);
         int32_t rx1, ry1, rx2, ry2;
-
-        if(is_vertical) {
-            rx1 = x1 - half_w;
-            rx2 = x1 + half_w;
-            ry1 = LV_MIN(y1, y2);
-            ry2 = LV_MAX(y1, y2);
+        if(dy == 0) {
+            rx1 = LV_MIN(x1, x2);      rx2 = LV_MAX(x1, x2) - 1;
+            ry1 = y1 - w_half1;         ry2 = y1 + w_half0;
         }
         else {
-            ry1 = y1 - half_w;
-            ry2 = y1 + half_w;
-            rx1 = LV_MIN(x1, x2);
-            rx2 = LV_MAX(x1, x2);
+            rx1 = x1 - w_half1;         rx2 = x1 + w_half0;
+            ry1 = LV_MIN(y1, y2);       ry2 = LV_MAX(y1, y2) - 1;
+        }
+        lv_area_t line_screen = { rx1 + layer->buf_area.x1, ry1 + layer->buf_area.y1,
+                                   rx2 + layer->buf_area.x1, ry2 + layer->buf_area.y1 };
+        lv_area_t line_scissor;
+        if(!lv_area_intersect(&line_scissor, &line_screen, &t->clip_area)) return;
+        lv_draw_eve5_set_scissor(u, &line_scissor, &layer->buf_area);
+
+        line_w += 16; /* +2px full width */
+        off = 0;
+    }
+
+    if ((!is_hv_flat && (need_flat_start || need_flat_end)) || has_dashes) {
+        /* Alpha-channel masking for flat end caps and/or dashed lines.
+         *
+         * EVE LINES always draws round caps. To create flat ends or dash gaps:
+         * 1) Draw line (with round caps) into alpha channel
+         * 2) Erase unwanted regions with perpendicular masking lines
+         * 3) Draw color through the resulting alpha mask
+         *
+         * For H/V scissored lines, the scissor already clips caps flat,
+         * so only dash gap masks are needed. */
+        EVE_HalContext *phost = u->hal;
+#if LV_DRAW_EVE5_NO_FLOAT
+        /* Integer direction: keep (dx, dy, len) and compute vertex positions
+         * as endpoint + dx * offset / len. Uses int64_t intermediates. */
+        int32_t len = lv_sqrt32((uint32_t)((int64_t)dx * dx + (int64_t)dy * dy));
+        if(len == 0) len = 1;
+        /* Perpendicular offset in 1/16 px: (-dy/len)*width*16, (dx/len)*width*16 */
+        int32_t perp_off_x_16 = (int32_t)(-(int64_t)dy * dsc->width * 16 / len);
+        int32_t perp_off_y_16 = (int32_t)((int64_t)dx * dsc->width * 16 / len);
+#else
+        float off_px = -0.5f; /* Masking lines are consistently 0.5px bottom-right */
+        float fx1 = x1 + off_px;
+        float fy1 = y1 + off_px;
+        float fx2 = x2 + off_px;
+        float fy2 = y2 + off_px;
+        float len = sqrtf((float)((int64_t)dx * dx + (int64_t)dy * dy));
+        float inv_len = (len > 0.0f) ? 1.0f / len : 0.0f;
+        float dir_x = dx * inv_len;
+        float dir_y = dy * inv_len;
+        float perp_x = -dir_y;
+        float perp_y = dir_x;
+        float perp_ext = (float)dsc->width; /* Perpendicular extent for masking lines */
+#endif
+
+        /* Bounding box for alpha clear and color draw (covers the line itself). */
+        int32_t margin = dsc->width;
+        int32_t bx1 = LV_MIN(x1, x2) - margin;
+        int32_t by1 = LV_MIN(y1, y2) - margin;
+        int32_t bx2 = LV_MAX(x1, x2) + margin;
+        int32_t by2 = LV_MAX(y1, y2) + margin;
+
+        /* Tracking margin: cap/dash masking lines erase alpha beyond the
+         * clear bbox via blend(ZERO, ONE_MINUS_SRC_ALPHA). They don't need
+         * the area pre-cleared, but the trashed extent must be tracked. */
+        int32_t track_margin = margin;
+        if(!is_hv_flat && (need_flat_start || need_flat_end)) {
+            uint32_t chw16 = LV_MAX(dsc->width * 4 + 24, 16);
+            int32_t chw = (int32_t)((chw16 + 15) / 16);
+            track_margin = LV_MAX(track_margin, LV_MAX(dsc->width + chw, 2 * chw));
+        }
+        if(has_dashes) {
+            int32_t ghw = (dsc->dash_gap + 1) / 2;
+            track_margin = LV_MAX(track_margin, dsc->width + ghw);
         }
 
-        EVE_CoDl_begin(u->hal, RECTS);
-        EVE_CoDl_vertex2f_0(u->hal, rx1, ry1);
-        EVE_CoDl_vertex2f_0(u->hal, rx2, ry2);
-        EVE_CoDl_end(u->hal);
+        EVE_CoDl_saveContext(phost);
+
+        /* Phase 1a: Clear bbox alpha to 0.
+         * +1px oversize so phase 2's RECTS AA feather lands on fully cleared pixels. */
+        EVE_CoDl_colorArgb_ex(phost, 0x00000000);
+        EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+        EVE_CoDl_blendFunc(phost, ONE, ZERO);
+        EVE_CoDl_lineWidth(phost, 16);
+        EVE_CoDl_begin(phost, RECTS);
+        EVE_CoDl_vertex2f_0(phost, bx1 - 1, by1 - 1);
+        EVE_CoDl_vertex2f_0(phost, bx2 + 1, by2 + 1);
+        EVE_CoDl_end(phost);
+
+        /* Phase 1b: Draw line into alpha (includes round caps) */
+        EVE_CoDl_colorA(phost, dsc->opa);
+        EVE_CoDl_lineWidth(phost, line_w);
+        EVE_CoDl_begin(phost, LINES);
+        EVE_CoDl_vertex2f_1(phost, x1 * 2 + off, y1 * 2 + off);
+        EVE_CoDl_vertex2f_1(phost, x2 * 2 + off, y2 * 2 + off);
+        EVE_CoDl_end(phost);
+
+        /* Phase 1c: Erase unwanted regions.
+         * Perpendicular masking lines with blend(ZERO, ONE_MINUS_SRC_ALPHA)
+         * multiply existing alpha toward 0. */
+        EVE_CoDl_colorA(phost, 255);
+        EVE_CoDl_blendFunc(phost, ZERO, ONE_MINUS_SRC_ALPHA);
+
+        /* Flat end cap masks (skipped for H/V scissored lines) */
+        if(!is_hv_flat && (need_flat_start || need_flat_end)) {
+            /* Half-width = W/4 + 1.5px to cover round cap AA fringe.
+             * Center offset = half-width (keeps inner edge at endpoint). */
+            uint32_t cap_hw_16 = LV_MAX(dsc->width * 4 + 24, 16);
+
+            EVE_CoDl_lineWidth(phost, cap_hw_16);
+            EVE_CoDl_begin(phost, LINES);
+
+#if LV_DRAW_EVE5_NO_FLOAT
+            /* Cap center: endpoint ± (dx,dy)/len * cap_hw_16, in 1/16 px.
+             * -8 is the -0.5px offset in 1/16 units. */
+            if(need_flat_start) {
+                int32_t cx_16 = x1 * 16 - 8 - (int32_t)((int64_t)dx * (int32_t)cap_hw_16 / len);
+                int32_t cy_16 = y1 * 16 - 8 - (int32_t)((int64_t)dy * (int32_t)cap_hw_16 / len);
+                EVE_CoDl_vertex2f_4(phost, cx_16 + perp_off_x_16, cy_16 + perp_off_y_16);
+                EVE_CoDl_vertex2f_4(phost, cx_16 - perp_off_x_16, cy_16 - perp_off_y_16);
+            }
+            if(need_flat_end) {
+                int32_t cx_16 = x2 * 16 - 8 + (int32_t)((int64_t)dx * (int32_t)cap_hw_16 / len);
+                int32_t cy_16 = y2 * 16 - 8 + (int32_t)((int64_t)dy * (int32_t)cap_hw_16 / len);
+                EVE_CoDl_vertex2f_4(phost, cx_16 + perp_off_x_16, cy_16 + perp_off_y_16);
+                EVE_CoDl_vertex2f_4(phost, cx_16 - perp_off_x_16, cy_16 - perp_off_y_16);
+            }
+#else
+            float cap_hw_px = cap_hw_16 / 16.0f;
+
+            if(need_flat_start) {
+                float cx = fx1 - dir_x * cap_hw_px;
+                float cy = fy1 - dir_y * cap_hw_px;
+                EVE_CoDl_vertex2f_4(phost,
+                    (int32_t)((cx + perp_x * perp_ext) * 16),
+                    (int32_t)((cy + perp_y * perp_ext) * 16));
+                EVE_CoDl_vertex2f_4(phost,
+                    (int32_t)((cx - perp_x * perp_ext) * 16),
+                    (int32_t)((cy - perp_y * perp_ext) * 16));
+            }
+            if(need_flat_end) {
+                float cx = fx2 + dir_x * cap_hw_px;
+                float cy = fy2 + dir_y * cap_hw_px;
+                EVE_CoDl_vertex2f_4(phost,
+                    (int32_t)((cx + perp_x * perp_ext) * 16),
+                    (int32_t)((cy + perp_y * perp_ext) * 16));
+                EVE_CoDl_vertex2f_4(phost,
+                    (int32_t)((cx - perp_x * perp_ext) * 16),
+                    (int32_t)((cy - perp_y * perp_ext) * 16));
+            }
+#endif
+
+            EVE_CoDl_end(phost);
+        }
+
+        /* Dash gap masks */
+        if(has_dashes) {
+            /* SW dash pattern has an off-by-one: dash is dash_width+1 pixels,
+             * gap is dash_gap pixels, actual period = dash_width+1+dash_gap.
+             * SW aligns to absolute coordinates via modulo (dash_gap+dash_width). */
+            uint32_t gap_hw_16 = dsc->dash_gap * 8; /* Half-width in 1/16 px */
+            int32_t period_sw = dsc->dash_gap + dsc->dash_width;
+
+#if LV_DRAW_EVE5_NO_FLOAT
+            /* Phase from absolute coordinate alignment (integer).
+             * abs_proj = min_coord_x * |dx|/len + min_coord_y * |dy|/len.
+             * Integer division truncates toward zero; since all terms are
+             * non-negative, this equals floor. */
+            int32_t abs_proj = (int32_t)(((int64_t)LV_MIN(dsc->p1.x, dsc->p2.x) * LV_ABS(dx)
+                              + (int64_t)LV_MIN(dsc->p1.y, dsc->p2.y) * LV_ABS(dy)) / len);
+            int32_t phase = abs_proj % period_sw;
+            if(phase < 0) phase += period_sw;
+
+            /* Work in x2 (half-pixel) units to handle 0.5px offsets.
+             * gap_center_pat = dash_width + 0.5 + dash_gap/2
+             *   → gap_center_pat_x2 = 2*dash_width + 1 + dash_gap */
+            int32_t period_x2 = 2 * (dsc->dash_width + dsc->dash_gap);
+            int32_t gap_center_x2 = 2 * dsc->dash_width + 1 + dsc->dash_gap - 2 * phase;
+            while(gap_center_x2 < -(int32_t)dsc->dash_gap) gap_center_x2 += period_x2;
+
+            EVE_CoDl_lineWidth(phost, gap_hw_16);
+            EVE_CoDl_begin(phost, LINES);
+
+            /* Walk gap centers along the line. Vertex positions in 1/16 px:
+             * cx_16 = x1*16 + dx * gap_center_x2 * 8 / len */
+            while(gap_center_x2 < 2 * len + (int32_t)dsc->dash_gap) {
+                int32_t cx_16 = x1 * 16 + (int32_t)((int64_t)dx * gap_center_x2 * 8 / len);
+                int32_t cy_16 = y1 * 16 + (int32_t)((int64_t)dy * gap_center_x2 * 8 / len);
+                EVE_CoDl_vertex2f_4(phost, cx_16 + perp_off_x_16, cy_16 + perp_off_y_16);
+                EVE_CoDl_vertex2f_4(phost, cx_16 - perp_off_x_16, cy_16 - perp_off_y_16);
+                gap_center_x2 += period_x2;
+            }
+#else
+            float period = (float)(dsc->dash_width + dsc->dash_gap);
+
+            /* Phase from absolute coordinate alignment.
+             * min coords + |dir| is endpoint-swap invariant, matches SW for
+             * H/V, and varies continuously during rotation (no phase jumps). */
+            float abs_proj = (float)LV_MIN(dsc->p1.x, dsc->p2.x) * fabsf(dir_x)
+                           + (float)LV_MIN(dsc->p1.y, dsc->p2.y) * fabsf(dir_y);
+            int32_t phase = ((int32_t)floorf(abs_proj)) % period_sw;
+            if(phase < 0) phase += period_sw;
+
+            /* Gap center in pattern: dash_width + 0.5 + dash_gap/2 */
+            float gap_center_pat = (float)(dsc->dash_width) + 0.5f + (float)(dsc->dash_gap) * 0.5f;
+
+            EVE_CoDl_lineWidth(phost, gap_hw_16);
+            EVE_CoDl_begin(phost, LINES);
+
+            /* First gap center relative to p1, then walk with period.
+             * Use unshifted x1/y1 — gap positions are absolute pattern positions,
+             * not relative to the -0.5px shifted line endpoints. */
+            float gap_center = gap_center_pat - (float)phase;
+            while(gap_center < -(float)(dsc->dash_gap) * 0.5f) gap_center += period;
+            float gap_hw_px = (float)(dsc->dash_gap) * 0.5f;
+            while(gap_center < len + gap_hw_px) {
+                float cx = (float)x1 + dir_x * gap_center;
+                float cy = (float)y1 + dir_y * gap_center;
+                EVE_CoDl_vertex2f_4(phost,
+                    (int32_t)((cx + perp_x * perp_ext) * 16),
+                    (int32_t)((cy + perp_y * perp_ext) * 16));
+                EVE_CoDl_vertex2f_4(phost,
+                    (int32_t)((cx - perp_x * perp_ext) * 16),
+                    (int32_t)((cy - perp_y * perp_ext) * 16));
+                gap_center += period;
+            }
+#endif
+
+            EVE_CoDl_end(phost);
+        }
+
+        /* Phase 2: Draw line color through the alpha mask */
+        EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
+        EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
+        EVE_CoDl_colorA(phost, 255);
+        EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
+        EVE_CoDl_lineWidth(phost, 16);
+        EVE_CoDl_begin(phost, RECTS);
+        EVE_CoDl_vertex2f_0(phost, bx1, by1);
+        EVE_CoDl_vertex2f_0(phost, bx2, by2);
+        EVE_CoDl_end(phost);
+
+        EVE_CoDl_restoreContext(phost);
+
+        /* Line masking trashes alpha in the clear bbox (+1px for RECTS AA feather)
+         * plus the cap/dash masking lines' extended reach. */
+        int32_t tx1 = LV_MIN(x1, x2) - track_margin - 1;
+        int32_t ty1 = LV_MIN(y1, y2) - track_margin - 1;
+        int32_t tx2 = LV_MAX(x1, x2) + track_margin + 1;
+        int32_t ty2 = LV_MAX(y1, y2) + track_margin + 1;
+        lv_draw_eve5_track_alpha_trashed(u, tx1, ty1, tx2, ty2);
     }
     else {
-        /* Diagonal or rounded - use LINES */
+        /* Both ends rounded (or raw_end), no dashes — simple direct draw */
+        EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
+        EVE_CoDl_colorA(u->hal, dsc->opa);
         EVE_CoDl_lineWidth(u->hal, line_w);
         EVE_CoDl_begin(u->hal, LINES);
-        EVE_CoDl_vertex2f_0(u->hal, x1, y1);
-        EVE_CoDl_vertex2f_0(u->hal, x2, y2);
+        EVE_CoDl_vertex2f_1(u->hal, x1 * 2 + off, y1 * 2 + off);
+        EVE_CoDl_vertex2f_1(u->hal, x2 * 2 + off, y2 * 2 + off);
         EVE_CoDl_end(u->hal);
+    }
+
+    /* Restore original scissor after H/V optimization */
+    if(is_hv_flat) {
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
     }
 }
 
 /**********************
  * TRIANGLE DRAWING
  **********************/
+
+/* Build the EDGE_STRIP_B stencil mask for a triangle.
+ * Caller must set colorMask, stencilOp, stencilFunc before calling. */
+void build_triangle_stencil(EVE_HalContext *phost, const lv_point_t p[3])
+{
+    /* Use half-pixel precision to correct EDGE_STRIP_B sub-pixel alignment.
+     * x: +0.5px (right) to center on pixel columns.
+     * y: -0.5px (up) to match LVGL's SW renderer convention.
+     * This asymmetry appears to be a BT820 EDGE_STRIP_B rasterization quirk. */
+    EVE_CoDl_begin(phost, EDGE_STRIP_B);
+    EVE_CoDl_vertex2f_1(phost, p[0].x * 2 + 1, p[0].y * 2 - 1);
+    EVE_CoDl_vertex2f_1(phost, p[1].x * 2 + 1, p[1].y * 2 - 1);
+    EVE_CoDl_vertex2f_1(phost, p[2].x * 2 + 1, p[2].y * 2 - 1);
+    EVE_CoDl_vertex2f_1(phost, p[0].x * 2 + 1, p[0].y * 2 - 1);  /* Close the triangle */
+    EVE_CoDl_end(phost);
+}
+
+/**
+ * Draw a gradient-filled triangle using stencil mask + gradient bitmap.
+ * Returns true if gradient was drawn, false if not a supported gradient type.
+ */
+static bool draw_gradient_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
+                                   const lv_draw_triangle_dsc_t *dsc,
+                                   const lv_point_t p[3],
+                                   int32_t xmin, int32_t ymin, int32_t xmax, int32_t ymax)
+{
+    EVE_HalContext *phost = u->hal;
+
+    int32_t w = xmax - xmin + 1;
+    int32_t h = ymax - ymin + 1;
+    if(w <= 0 || h <= 0) return false;
+
+    EVE_CoDl_vertexFormat(phost, 0);
+    EVE_CoDl_saveContext(phost);
+
+    lv_draw_eve5_clear_stencil(u, xmin, ymin, xmax, ymax,
+                                &t->clip_area, &t->target_layer->buf_area);
+
+    /* Build stencil mask from triangle edges */
+    EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
+    EVE_CoDl_stencilOp(phost, KEEP, INVERT);
+    EVE_CoDl_stencilFunc(phost, ALWAYS, 255, 255);
+
+    build_triangle_stencil(phost, p);
+
+    /* Set up gradient bitmap and draw through stencil */
+    EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
+    EVE_CoDl_stencilFunc(phost, EQUAL, 255, 255);
+
+    if(!setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h)) {
+        EVE_CoDl_restoreContext(phost);
+        return false;
+    }
+
+    EVE_CoDl_begin(phost, BITMAPS);
+    EVE_CoDl_vertex2f_0(phost, xmin, ymin);
+    EVE_CoDl_end(phost);
+
+    EVE_CoDl_restoreContext(phost);
+
+    return true;
+}
 
 void lv_draw_eve5_hal_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
 {
@@ -649,48 +1187,53 @@ void lv_draw_eve5_hal_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    /* Determine fill color - use gradient color if available, otherwise solid color */
+    /* Try gradient bitmap path for HOR/VER gradients */
+    if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count >= 2) {
+        if(draw_gradient_triangle(u, t, dsc, p, xmin, ymin, xmax, ymax)) {
+            return;
+        }
+        /* Fall through to solid fill approximation for unsupported gradient types */
+    }
+
+    /* Determine fill color */
     lv_color_t fill_color;
     uint8_t fill_opa = dsc->opa;
-    
+
     if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count > 0) {
-        /* Gradient defined - pick a representative color */
+        /* Unsupported gradient type - pick a representative color */
         if(dsc->grad.stops_count == 1) {
-            /* Single stop - just use it */
             fill_color = dsc->grad.stops[0].color;
             fill_opa = LV_OPA_MIX2(dsc->opa, dsc->grad.stops[0].opa);
         }
         else {
-            /* Multiple stops - blend first and last for an average */
             lv_color_t c0 = dsc->grad.stops[0].color;
             lv_color_t c1 = dsc->grad.stops[dsc->grad.stops_count - 1].color;
             fill_color.red   = (c0.red   + c1.red)   / 2;
             fill_color.green = (c0.green + c1.green) / 2;
             fill_color.blue  = (c0.blue  + c1.blue)  / 2;
-            fill_opa = LV_OPA_MIX2(dsc->opa, 
-                                   (dsc->grad.stops[0].opa + 
+            fill_opa = LV_OPA_MIX2(dsc->opa,
+                                   (dsc->grad.stops[0].opa +
                                     dsc->grad.stops[dsc->grad.stops_count - 1].opa) / 2);
         }
     }
     else {
-        /* No gradient - use solid color */
         fill_color = dsc->color;
     }
 
     EVE_CoDl_colorRgb(u->hal, fill_color.red, fill_color.green, fill_color.blue);
     EVE_CoDl_colorA(u->hal, fill_opa);
 
-    /* Use stencil with edge strip to fill triangle */
+    /* Use stencil with edge strip to fill triangle (even-odd rule) */
+    EVE_CoDl_saveContext(u->hal);
+
+    lv_draw_eve5_clear_stencil(u, xmin, ymin, xmax, ymax,
+                                &t->clip_area, &layer->buf_area);
+
     EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
     EVE_CoDl_stencilOp(u->hal, KEEP, INVERT);
     EVE_CoDl_stencilFunc(u->hal, ALWAYS, 255, 255);
 
-    EVE_CoDl_begin(u->hal, EDGE_STRIP_B);
-    EVE_CoDl_vertex2f_0(u->hal, p[0].x, p[0].y);
-    EVE_CoDl_vertex2f_0(u->hal, p[1].x, p[1].y);
-    EVE_CoDl_vertex2f_0(u->hal, p[2].x, p[2].y);
-    EVE_CoDl_vertex2f_0(u->hal, p[0].x, p[0].y);  /* Close the triangle */
-    EVE_CoDl_end(u->hal);
+    build_triangle_stencil(u->hal, p);
 
     /* Draw where stencil was inverted (inside triangle) using RECTS */
     EVE_CoDl_colorMask(u->hal, 1, 1, 1, 1);
@@ -702,144 +1245,7 @@ void lv_draw_eve5_hal_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t
     EVE_CoDl_vertex2f_0(u->hal, xmax, ymax);
     EVE_CoDl_end(u->hal);
 
-    reset_stencil(u);
-}
-
-/**********************
- * ARC DRAWING
- **********************/
-
-#if EVE_SUPPORT_CHIPID >= EVE_BT820
-/* Convert degrees (0-360) to furmans (0x0000-0xFFFF) */
-static uint16_t degrees_to_furmans(int32_t degrees)
-{
-    /* LVGL: 0° at 3 o'clock, EVE: 0 furmans at 12 o'clock */
-    /* Subtract 90° to rotate coordinate system */
-    degrees = (degrees - 90) % 360;
-    if(degrees < 0) degrees += 360;
-    return (uint16_t)((degrees * 65536UL) / 360);
-}
-#endif
-
-/* Stencil-based arc drawing for previous generation chips and edge cases */
-static void draw_arc_stencil(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
-                             int32_t cx, int32_t cy, int32_t radius_out, int32_t radius_in,
-                             int32_t start_angle, int32_t end_angle)
-{
-    lv_draw_arc_dsc_t *dsc = t->draw_dsc;
-    const lv_area_t *clip = &t->clip_area;
-    const lv_area_t *layer_area = &t->target_layer->buf_area;
-    int32_t width = dsc->width;
-
-    if(width > radius_out) width = radius_out;
-
-    /* Step 1: Draw outer circle to alpha only, init stencil */
-    EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
-    EVE_CoDl_stencilFunc(u->hal, ALWAYS, 0, 1);
-    EVE_CoDl_stencilOp(u->hal, REPLACE, REPLACE);
-    draw_circle(u, cx, cy, radius_out);
-
-    /* Step 2: Punch hole for inner radius */
-    EVE_CoDl_blendFunc(u->hal, ONE, ZERO);
-    draw_circle(u, cx, cy, radius_in + 2);
-
-    /* Step 3: Apply angle mask */
-    EVE_CoDl_stencilFunc(u->hal, ALWAYS, 1, 1);
-    EVE_CoDl_stencilOp(u->hal, REPLACE, REPLACE);
-    EVE_CoDl_blendFunc(u->hal, ZERO, ONE_MINUS_SRC_ALPHA);
-    EVE_CoDl_colorA(u->hal, 255);
-
-    draw_arc_mask_angle(u, dsc, cx, cy, start_angle, end_angle, clip, layer_area);
-
-    /* Step 4: Draw inner circle */
-    draw_circle(u, cx, cy, radius_in);
-
-    /* Step 5: Composite with destination alpha */
-    EVE_CoDl_colorMask(u->hal, 1, 1, 1, 1);
-    EVE_CoDl_blendFunc(u->hal, DST_ALPHA, ONE_MINUS_DST_ALPHA);
-    draw_circle(u, cx, cy, radius_in);
-
-    /* Step 6: Draw final arc where stencil != 1 */
-    EVE_CoDl_stencilFunc(u->hal, NOTEQUAL, 1, 255);
-    EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
-    EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
-    EVE_CoDl_colorA(u->hal, dsc->opa);
-    draw_circle(u, cx, cy, radius_out);
-
-    /* Step 7: Rounded ends */
-    if(dsc->rounded) {
-        EVE_CoDl_stencilFunc(u->hal, EQUAL, 1, 255);
-        if(dsc->opa < 255) {
-            EVE_CoDl_stencilOp(u->hal, ZERO, ZERO);
-        }
-
-        int32_t half_width = width / 2;
-        int32_t adj_radius = radius_out - half_width;
-
-        /* End cap */
-        int32_t ex = cx + ((lv_trigo_cos(end_angle) * adj_radius) >> LV_TRIGO_SHIFT);
-        int32_t ey = cy + ((lv_trigo_sin(end_angle) * adj_radius) >> LV_TRIGO_SHIFT);
-        draw_circle(u, ex, ey, half_width);
-
-        /* Start cap */
-        int32_t sx = cx + ((lv_trigo_cos(start_angle) * adj_radius) >> LV_TRIGO_SHIFT);
-        int32_t sy = cy + ((lv_trigo_sin(start_angle) * adj_radius) >> LV_TRIGO_SHIFT);
-        draw_circle(u, sx, sy, half_width);
-    }
-
-    reset_stencil(u);
-}
-
-void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
-{
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_arc_dsc_t *dsc = t->draw_dsc;
-
-    if(dsc->opa <= LV_OPA_MIN) return;
-    if(dsc->width == 0) return;
-    if(dsc->start_angle == dsc->end_angle) return;
-
-    int32_t cx = dsc->center.x - layer->buf_area.x1;
-    int32_t cy = dsc->center.y - layer->buf_area.y1;
-    int32_t radius_out = dsc->radius;
-    int32_t radius_in = dsc->radius - dsc->width;
-
-    if(radius_in < 0) radius_in = 0;
-
-    int32_t start_angle = ((int32_t)dsc->start_angle) % 360;
-    int32_t end_angle = ((int32_t)dsc->end_angle) % 360;
-
-    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
-
-    EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
-    EVE_CoDl_colorA(u->hal, dsc->opa);
-
-#if EVE_SUPPORT_CHIPID >= EVE_BT820
-    /*
-     * Use CMD_ARC (BT820+) when possible:
-     * - Chip must be BT820 or newer (runtime check for multi-target builds)
-     * - Radii must be within 1-511 range
-     * - Arc must have rounded ends (CMD_ARC always draws rounded caps)
-     */
-    bool use_cmd_arc = (EVE_CHIPID >= EVE_BT820) &&
-                       (radius_out <= 511) &&
-                       (radius_in >= 1 || radius_in == 0) &&
-                       (dsc->rounded);
-
-    if(use_cmd_arc) {
-        /* Handle filled arc (radius_in == 0) - CMD_ARC requires r0 >= 1 */
-        int32_t r_in = (radius_in == 0) ? 1 : radius_in;
-
-        uint16_t a0 = degrees_to_furmans(start_angle);
-        uint16_t a1 = degrees_to_furmans(end_angle);
-
-        EVE_CoCmd_arc(u->hal, cx, cy, r_in, radius_out, a0, a1);
-        return;
-    }
-#endif
-
-    /* Fallback: stencil-based rendering for pre-BT820 or unsupported cases */
-    draw_arc_stencil(u, t, cx, cy, radius_out, radius_in, start_angle, end_angle);
+    EVE_CoDl_restoreContext(u->hal);
 }
 
 #endif /* LV_USE_DRAW_EVE5 */

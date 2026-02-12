@@ -13,7 +13,9 @@
 
 #if LV_USE_DRAW_EVE5
 
+#if !LV_DRAW_EVE5_NO_FLOAT
 #include <math.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -47,6 +49,44 @@ static int32_t calc_ratio_index(int32_t radius, int32_t corner_size)
     return (radius * (SHADOW_TEX_SIZE - 1)) / corner_size;
 }
 
+#if LV_DRAW_EVE5_NO_FLOAT
+
+/* Precomputed Gaussian CDF lookup table (256 entries, ~256 bytes ROM).
+ * Maps normalized erf input x in [-4.0, +4.0] to alpha 0-255.
+ * table[i] = round(0.5 * (1 - erf((i - 128) / 32.0)) * 255)
+ * Index mapping: i = x * 32 + 128, clamped to [0, 255]. */
+static const uint8_t s_gauss_cdf[256] = {
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 254,
+    254, 254, 254, 254, 254, 254, 254, 253, 253, 253, 253, 253, 252, 252, 252, 251,
+    251, 250, 250, 249, 248, 248, 247, 246, 245, 244, 243, 242, 241, 239, 238, 237,
+    235, 233, 231, 230, 227, 225, 223, 221, 218, 216, 213, 210, 207, 204, 201, 197,
+    194, 190, 187, 183, 179, 175, 171, 167, 163, 158, 154, 150, 145, 141, 136, 132,
+    128, 123, 119, 114, 110, 105, 101,  97,  92,  88,  84,  80,  76,  72,  68,  65,
+     61,  58,  54,  51,  48,  45,  42,  39,  37,  34,  32,  30,  28,  25,  24,  22,
+     20,  18,  17,  16,  14,  13,  12,  11,  10,   9,   8,   7,   7,   6,   5,   5,
+      4,   4,   3,   3,   3,   2,   2,   2,   2,   2,   1,   1,   1,   1,   1,   1,
+      1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+};
+
+/* Look up Gaussian CDF alpha from signed distance and sigma (both in 8.8 format).
+ * x = signed_dist / (sigma * sqrt(2)), table index = x * 32 + 128. */
+static inline uint8_t gauss_cdf_lookup(int32_t signed_dist_256, int32_t sigma_sqrt2_256)
+{
+    /* i = (signed_dist_256 * 32) / sigma_sqrt2_256 + 128 */
+    int32_t idx = (int32_t)(((int64_t)signed_dist_256 * 32) / sigma_sqrt2_256) + 128;
+    if(idx < 0) idx = 0;
+    if(idx > 255) idx = 255;
+    return s_gauss_cdf[idx];
+}
+
+#else
+
 /* Fast erf approximation (Abramowitz & Stegun) */
 static float fast_erf(float x)
 {
@@ -56,15 +96,17 @@ static float fast_erf(float x)
     float a4 = -1.453152027f;
     float a5 =  1.061405429f;
     float p  =  0.3275911f;
-    
+
     int sign = (x >= 0) ? 1 : -1;
     x = fabsf(x);
-    
+
     float t = 1.0f / (1.0f + p * x);
     float y = 1.0f - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * expf(-x * x);
-    
+
     return sign * y;
 }
+
+#endif
 
 /**
 * Generate corner texture for a specific ratio index.
@@ -77,46 +119,57 @@ static float fast_erf(float x)
 */
 static void generate_corner_texture(uint8_t *buf, int32_t tex_size, int32_t solid_radius_idx)
 {
+#if LV_DRAW_EVE5_NO_FLOAT
+    /* Integer path: distance via lv_sqrt32 in 8.8 format,
+     * Gaussian CDF via precomputed lookup table. */
+    int32_t solid_radius_256 = (int32_t)((int64_t)solid_radius_idx * tex_size * 256 / (SHADOW_TEX_SIZE - 1));
+    int32_t blur_region_256 = tex_size * 256 - solid_radius_256;
+    if(blur_region_256 < 256) blur_region_256 = 256;
+
+    /* sigma_256 = blur_region * 0.45, min 0.5 (128 in 8.8) */
+    int32_t sigma_256 = blur_region_256 * 45 / 100;
+    if(sigma_256 < 128) sigma_256 = 128;
+
+    /* sigma * sqrt(2) in 8.8 */
+    int32_t sigma_sqrt2_256 = sigma_256 * 1414 / 1000;
+    if(sigma_sqrt2_256 < 1) sigma_sqrt2_256 = 1;
+
+    for(int32_t y = 0; y < tex_size; y++) {
+        for(int32_t x = 0; x < tex_size; x++) {
+            int32_t dx_i = tex_size - 1 - x;
+            int32_t dy_i = tex_size - 1 - y;
+            /* lv_sqrt32((dx*dx + dy*dy) << 16) = sqrt(dx*dx+dy*dy) * 256 */
+            int32_t dist_256 = lv_sqrt32((uint32_t)(dx_i * dx_i + dy_i * dy_i) << 16);
+            int32_t signed_dist_256 = dist_256 - solid_radius_256;
+
+            buf[y * tex_size + x] = gauss_cdf_lookup(signed_dist_256, sigma_sqrt2_256);
+        }
+    }
+#else
     float solid_radius = (float)solid_radius_idx * tex_size / (SHADOW_TEX_SIZE - 1);
-    
+
     float blur_region = tex_size - solid_radius;
     if(blur_region < 1.0f) blur_region = 1.0f;
-    
-    /*
-     * Sigma controls the blur width. The blur_region represents the 
-     * one-sided extent, but we want symmetric blur, so adjust accordingly.
-     * Factor of ~0.4-0.5 gives good visual match to box blur.
-     */
+
     float sigma = blur_region * 0.45f;
     if(sigma < 0.5f) sigma = 0.5f;
-    
+
     float inv_sigma_sqrt2 = 1.0f / (sigma * 1.41421356f);
-    
+
     for(int32_t y = 0; y < tex_size; y++) {
         for(int32_t x = 0; x < tex_size; x++) {
             float dx = (float)(tex_size - 1 - x);
             float dy = (float)(tex_size - 1 - y);
             float dist = sqrtf(dx * dx + dy * dy);
-            
-            /*
-             * Signed distance from shape edge:
-             *   negative = inside shape
-             *   positive = outside shape  
-             *   zero = exactly on edge (will give 50% opacity)
-             */
+
             float signed_dist = dist - solid_radius;
-            
-            /*
-             * erf-based alpha:
-             *   signed_dist << 0  →  erf → -1  →  alpha → 1.0
-             *   signed_dist = 0   →  erf → 0   →  alpha → 0.5
-             *   signed_dist >> 0  →  erf → +1  →  alpha → 0.0
-             */
+
             float alpha = 0.5f * (1.0f - fast_erf(signed_dist * inv_sigma_sqrt2));
-            
+
             buf[y * tex_size + x] = (uint8_t)(alpha * 255.0f + 0.5f);
         }
     }
+#endif
 }
 
 /**
@@ -127,27 +180,41 @@ static void generate_corner_texture(uint8_t *buf, int32_t tex_size, int32_t soli
  */
 static void generate_edge_texture(uint8_t *buf, int32_t tex_size, int32_t solid_radius_idx)
 {
+#if LV_DRAW_EVE5_NO_FLOAT
+    int32_t solid_width_256 = (int32_t)((int64_t)solid_radius_idx * tex_size * 256 / (SHADOW_TEX_SIZE - 1));
+    int32_t blur_region_256 = tex_size * 256 - solid_width_256;
+    if(blur_region_256 < 256) blur_region_256 = 256;
+
+    int32_t sigma_256 = blur_region_256 * 45 / 100;
+    if(sigma_256 < 128) sigma_256 = 128;
+
+    int32_t sigma_sqrt2_256 = sigma_256 * 1414 / 1000;
+    if(sigma_sqrt2_256 < 1) sigma_sqrt2_256 = 1;
+
+    for(int32_t x = 0; x < tex_size; x++) {
+        int32_t signed_dist_256 = (tex_size - 1 - x) * 256 - solid_width_256;
+        buf[x] = gauss_cdf_lookup(signed_dist_256, sigma_sqrt2_256);
+    }
+#else
     float solid_width = (float)solid_radius_idx * tex_size / (SHADOW_TEX_SIZE - 1);
-    
+
     float blur_region = tex_size - solid_width;
     if(blur_region < 1.0f) blur_region = 1.0f;
-    
+
     float sigma = blur_region * 0.45f;
     if(sigma < 0.5f) sigma = 0.5f;
-    
+
     float inv_sigma_sqrt2 = 1.0f / (sigma * 1.41421356f);
-    
+
     for(int32_t x = 0; x < tex_size; x++) {
-        /* Distance from inner edge (solid side) */
         float dist_from_inner = (float)(tex_size - 1 - x);
-        
-        /* Signed distance from shape edge */
         float signed_dist = dist_from_inner - solid_width;
-        
+
         float alpha = 0.5f * (1.0f - fast_erf(signed_dist * inv_sigma_sqrt2));
-        
+
         buf[x] = (uint8_t)(alpha * 255.0f + 0.5f);
     }
+#endif
 }
 
 /**
@@ -316,6 +383,7 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task
     int32_t scale = (SHADOW_TEX_SIZE * 256) / corner_size;
     int32_t tex_max = (SHADOW_TEX_SIZE - 1) * 256;
 
+    EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
