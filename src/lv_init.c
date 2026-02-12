@@ -56,7 +56,7 @@
     #endif
 #endif
 #if LV_USE_G2D
-    #if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
+    #if LV_USE_DRAW_G2D
         #include "draw/nxp/g2d/lv_draw_g2d.h"
     #endif
 #endif
@@ -248,7 +248,7 @@ void lv_init(void)
 #endif
 
 #if LV_USE_G2D
-#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
+#if LV_USE_DRAW_G2D
     lv_draw_g2d_init();
 #endif
 #endif
@@ -484,7 +484,7 @@ void lv_deinit(void)
     lv_wayland_deinit();
 #endif
 #if LV_USE_G2D
-#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
+#if LV_USE_DRAW_G2D
     lv_draw_g2d_deinit();
 #endif
 #endif

@@ -47,9 +47,10 @@ typedef struct {
 
 typedef struct {
     lv_wl_buffer_t buffers[LV_WL_G2D_BUF_COUNT];
-#if LV_USE_ROTATE_G2D
+    /* Use a separate buffer if rotation is enabled
+     * Let LVGL render to this buffer and then copy it
+     * and rotate it to one off the two main buffers*/
     lv_wl_buffer_t rotate_buffer;
-#endif
     uint32_t drm_cf;
     uint8_t last_used;
     bool flushing;
@@ -266,7 +267,6 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         return NULL;
     }
 
-    lv_display_rotation_t rotation = lv_display_get_rotation(display);
     lv_color_format_t cf = lv_display_get_color_format(display);
     if(cf == LV_COLOR_FORMAT_RGB565 && !ctx->supports_rgb565) {
         LV_LOG_WARN("RGB565 is not supported by the wayland compositor. Falling back to XRGB8888");
@@ -279,14 +279,13 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         init_buffer(ctx, &ddata->buffers[i], width, height, cf);
     }
 
-#if LV_USE_ROTATE_G2D
+    lv_display_rotation_t rotation = lv_display_get_rotation(display);
     if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
         init_buffer(ctx, &ddata->rotate_buffer, height, width, cf);
     }
-    else {
+    else if(rotation == LV_DISPLAY_ROTATION_180) {
         init_buffer(ctx, &ddata->rotate_buffer, width, height, cf);
     }
-#endif
 
     wl_display_flush(lv_wl_ctx.wl_display);
     wl_display_roundtrip(lv_wl_ctx.wl_display);
@@ -298,16 +297,18 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         }
     }
 
-#if LV_USE_ROTATE_G2D
+    if(rotation == LV_DISPLAY_ROTATION_0) {
+        lv_display_set_draw_buffers(display, ddata->buffers[0].lv_draw_buf, ddata->buffers[1].lv_draw_buf);
+        return ddata;
+    }
+
+    /*rotation != 0 so use a separate buffer for rendering and two other for flushing*/
     if(!ddata->rotate_buffer.wl_buffer) {
         wl_g2d_delete_display_data(ddata);
         LV_LOG_ERROR("DMABUF creation failed");
         return NULL;
     }
     lv_display_set_draw_buffers(display, ddata->rotate_buffer.lv_draw_buf, NULL);
-#else
-    lv_display_set_draw_buffers(display, ddata->buffers[0].lv_draw_buf, ddata->buffers[1].lv_draw_buf);
-#endif
 
     return ddata;
 }
@@ -318,9 +319,7 @@ static void wl_g2d_delete_display_data(lv_wl_g2d_display_data_t * ddata)
         delete_buffer(ddata->buffers + i);
     }
 
-#if LV_USE_ROTATE_G2D
     delete_buffer(&ddata->rotate_buffer);
-#endif
 
     lv_free(ddata);
 }
@@ -598,18 +597,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     lv_wl_g2d_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
     int32_t src_width = lv_area_get_width(area);
     int32_t src_height = lv_area_get_height(area);
-    uint32_t rotation = lv_display_get_rotation(disp);
-    lv_wl_buffer_t * buf = get_next_buffer(ddata);
-
-    if(!buf) {
-        LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
-        return;
-    }
-
-    lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
-#if LV_USE_ROTATE_G2D
-    lv_draw_buf_invalidate_cache(ddata->rotate_buffer.lv_draw_buf, NULL);
-#endif
+    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
     struct wl_surface * surface = lv_wayland_get_window_surface(disp);
     /* Mark surface damage */
@@ -620,20 +608,30 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
         return;
     }
 
+    lv_wl_buffer_t * buf = get_next_buffer(ddata);
+
+    if(!buf) {
+        LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
+        return;
+    }
+
+    lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
+
     /*Rerender the whole surface if we're using rotation*/
     if(rotation != LV_DISPLAY_ROTATION_0) {
         wl_surface_damage(surface, 0, 0,
                           lv_display_get_original_horizontal_resolution(disp),
                           lv_display_get_original_vertical_resolution(disp));
+
+        lv_draw_buf_invalidate_cache(ddata->rotate_buffer.lv_draw_buf, NULL);
+        g2d_rotate(ddata->rotate_buffer.lv_draw_buf, buf->lv_draw_buf,
+                   lv_display_get_original_horizontal_resolution(disp),
+                   lv_display_get_original_vertical_resolution(disp),
+                   lv_display_get_rotation(disp),
+                   lv_display_get_color_format(disp));
+
     }
 
-#if LV_USE_ROTATE_G2D
-    g2d_rotate(ddata->rotate_buffer.lv_draw_buf, buf->lv_draw_buf,
-               lv_display_get_original_horizontal_resolution(disp),
-               lv_display_get_original_vertical_resolution(disp),
-               lv_display_get_rotation(disp),
-               lv_display_get_color_format(disp));
-#endif
     /* Finally, attach buffer and commit to surface */
     struct wl_callback * cb = wl_surface_frame(surface);
     wl_callback_add_listener(cb, &frame_listener, disp);
