@@ -17,6 +17,7 @@ class LVImageCache(object):
         """Print image cache entries using prettytable format"""
         table = PrettyTable()
         table.field_names = [
+            "entry",
             "size",
             "data_size",
             "cf",
@@ -45,7 +46,7 @@ class LVImageCache(object):
                 cf = int(header.cf)
 
                 data_size = int(decoded.data_size) if decoded else 0
-                decoded_ptr = decoded.data if decoded else 0
+                decoded_ptr = int(decoded) if decoded else 0
                 decoder_name = data_ptr.decoder.name.as_string()
                 src_type = int(data_ptr.src_type)
                 src = data_ptr.src
@@ -70,6 +71,7 @@ class LVImageCache(object):
 
                 table.add_row(
                     [
+                        f"{int(entry):#x}",
                         size_str,
                         f"{data_size}",
                         f"{cf}",
@@ -82,7 +84,7 @@ class LVImageCache(object):
                 )
 
             except gdb.error as e:
-                table.add_row(["ERROR", "", "", "", "", "", "", str(e)])
+                table.add_row(["ERROR", "", "", "", "", "", "", "", str(e)])
                 continue
 
         print(table)
