@@ -124,8 +124,8 @@ Programmatically add these buttons to a group if required.
 
 .. _lv_tabview_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/tabview/index.rst
 

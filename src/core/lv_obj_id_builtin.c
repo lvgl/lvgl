@@ -88,17 +88,15 @@ void lv_obj_set_id(lv_obj_t * obj, void * id)
 
 void lv_obj_free_id(lv_obj_t * obj)
 {
-    LV_UNUSED(obj);
     obj->id = NULL;
 }
 
 const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len)
 {
-    const char * name;
     if(obj == NULL || obj->class_p == NULL) return NULL;
     if(buf == NULL) return NULL;
 
-    name = obj->class_p->name;
+    const char * name = obj->class_p->name;
     if(name == NULL) name = "nameless";
 
     lv_snprintf(buf, len, "%s%" LV_PRIu32 "", name, (uint32_t)(lv_uintptr_t)obj->id);

@@ -63,6 +63,7 @@ enum {
 *      TYPEDEFS
 **********************/
 static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr);
+static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr);
 static void _init_draw_dsc(lv_vector_path_ctx_t * dsc);
 static void _deinit_draw_dsc(lv_vector_path_ctx_t * dsc);
 static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_t * src);
@@ -208,7 +209,7 @@ struct _lv_svg_drawing_builder_state {
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_svg_render_hal_t hal_funcs = {NULL};
+static lv_svg_render_hal_t hal_funcs = {NULL, NULL};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -263,6 +264,7 @@ static struct _lv_svg_draw_dsc * _lv_svg_draw_dsc_pop(struct _lv_svg_draw_dsc * 
 
 static void _set_viewport_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr)
 {
+    _set_draw_attr(obj, dsc, attr);
     lv_svg_render_viewport_t * view = (lv_svg_render_viewport_t *)obj;
     switch(attr->id) {
         case LV_SVG_ATTR_WIDTH:
@@ -716,7 +718,7 @@ static void _set_image_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * ds
     }
 }
 
-static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr)
+static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr)
 {
     LV_UNUSED(obj);
     switch(attr->id) {
@@ -879,16 +881,22 @@ static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, con
                 }
             }
             break;
-        case LV_SVG_ATTR_TRANSFORM: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
-                    return;
-                }
-                lv_memcpy(&(obj->matrix), attr->value.val, sizeof(lv_matrix_t));
-            }
-            break;
         case LV_SVG_ATTR_STROKE_DASH_OFFSET:
             /* not support yet */
             break;
+    }
+}
+
+static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr)
+{
+    if(attr->id == LV_SVG_ATTR_TRANSFORM) {
+        if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+            return;
+        }
+        lv_memcpy(&(obj->matrix), attr->value.val, sizeof(lv_matrix_t));
+    }
+    else {
+        _set_draw_attr(obj, dsc, attr);
     }
 }
 

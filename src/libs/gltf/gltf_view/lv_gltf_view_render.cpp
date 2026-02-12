@@ -168,17 +168,59 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
 
 static void lv_gltf_view_push_opengl_state(lv_opengl_state_t * state)
 {
+    /* Blend state */
     GL_CALL(glGetBooleanv(GL_BLEND, &state->blend_enabled));
     GL_CALL(glGetIntegerv(GL_BLEND_SRC_ALPHA, &state->blend_src));
     GL_CALL(glGetIntegerv(GL_BLEND_DST_ALPHA, &state->blend_dst));
     GL_CALL(glGetIntegerv(GL_BLEND_EQUATION, &state->blend_equation));
+
+    /* Depth state */
+    GL_CALL(glGetBooleanv(GL_DEPTH_TEST, &state->depth_test_enabled));
+    GL_CALL(glGetBooleanv(GL_DEPTH_WRITEMASK, &state->depth_mask));
+    GL_CALL(glGetIntegerv(GL_DEPTH_FUNC, &state->depth_func));
+
+    /* Face culling state */
+    GL_CALL(glGetBooleanv(GL_CULL_FACE, &state->cull_face_enabled));
+    GL_CALL(glGetIntegerv(GL_CULL_FACE_MODE, &state->cull_face_mode));
+    GL_CALL(glGetIntegerv(GL_FRONT_FACE, &state->front_face));
+
+    /* Stencil state */
+    GL_CALL(glGetBooleanv(GL_STENCIL_TEST, &state->stencil_test_enabled));
+    GL_CALL(glGetIntegerv(GL_STENCIL_WRITEMASK, (GLint *)&state->stencil_mask));
+    GL_CALL(glGetIntegerv(GL_STENCIL_FUNC, &state->stencil_func));
+    GL_CALL(glGetIntegerv(GL_STENCIL_REF, &state->stencil_ref));
+    GL_CALL(glGetIntegerv(GL_STENCIL_VALUE_MASK, (GLint *)&state->stencil_value_mask));
+
+    /* Buffer bindings */
+#ifndef GL_VERTEX_ARRAY_BINDING
+#ifdef GL_VERTEX_ARRAY_BINDING_OES
+#define GL_VERTEX_ARRAY_BINDING GL_VERTEX_ARRAY_BINDING_OES
+#else
+#define GL_VERTEX_ARRAY_BINDING 0x85B5
+#endif
+#endif
+    GL_CALL(glGetIntegerv(GL_VERTEX_ARRAY_BINDING, (GLint *)&state->current_vao));
+    GL_CALL(glGetIntegerv(GL_ARRAY_BUFFER_BINDING, (GLint *)&state->current_vbo));
+    GL_CALL(glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, (GLint *)&state->current_ibo));
+    GL_CALL(glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *)&state->current_program));
+
+    /* Texture state */
+    GL_CALL(glGetIntegerv(GL_ACTIVE_TEXTURE, &state->active_texture));
+    GL_CALL(glGetIntegerv(GL_TEXTURE_BINDING_2D, (GLint *)&state->bound_texture_2d));
+
+    /* Viewport and scissor */
+    GL_CALL(glGetIntegerv(GL_VIEWPORT, state->viewport));
+    GL_CALL(glGetBooleanv(GL_SCISSOR_TEST, &state->scissor_test_enabled));
+    GL_CALL(glGetIntegerv(GL_SCISSOR_BOX, state->scissor_box));
+
+    /* Clear values */
     GL_CALL(glGetFloatv(GL_COLOR_CLEAR_VALUE, state->clear_color));
     GL_CALL(glGetFloatv(GL_DEPTH_CLEAR_VALUE, &state->clear_depth));
 }
 
 static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
 {
-    GL_CALL(glDisable(GL_CULL_FACE));
+    /* Restore blend state */
     if(state->blend_enabled) {
         GL_CALL(glEnable(GL_BLEND));
     }
@@ -187,7 +229,58 @@ static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
     }
     GL_CALL(glBlendFunc(state->blend_src, state->blend_dst));
     GL_CALL(glBlendEquation(state->blend_equation));
-    GL_CALL(glDepthMask(GL_TRUE));
+
+    /* Restore depth state */
+    if(state->depth_test_enabled) {
+        GL_CALL(glEnable(GL_DEPTH_TEST));
+    }
+    else {
+        GL_CALL(glDisable(GL_DEPTH_TEST));
+    }
+    GL_CALL(glDepthMask(state->depth_mask));
+    GL_CALL(glDepthFunc(state->depth_func));
+
+    /* Restore face culling state */
+    if(state->cull_face_enabled) {
+        GL_CALL(glEnable(GL_CULL_FACE));
+    }
+    else {
+        GL_CALL(glDisable(GL_CULL_FACE));
+    }
+    GL_CALL(glCullFace(state->cull_face_mode));
+    GL_CALL(glFrontFace(state->front_face));
+
+    /* Restore stencil state */
+    if(state->stencil_test_enabled) {
+        GL_CALL(glEnable(GL_STENCIL_TEST));
+    }
+    else {
+        GL_CALL(glDisable(GL_STENCIL_TEST));
+    }
+    GL_CALL(glStencilMask(state->stencil_mask));
+    GL_CALL(glStencilFunc(state->stencil_func, state->stencil_ref, state->stencil_value_mask));
+
+    /* Restore buffer bindings */
+    GL_CALL(glBindVertexArray(state->current_vao));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, state->current_vbo));
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, state->current_ibo));
+    GL_CALL(glUseProgram(state->current_program));
+
+    /* Restore texture state */
+    GL_CALL(glActiveTexture(state->active_texture));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, state->bound_texture_2d));
+
+    /* Restore viewport and scissor */
+    GL_CALL(glViewport(state->viewport[0], state->viewport[1], state->viewport[2], state->viewport[3]));
+    if(state->scissor_test_enabled) {
+        GL_CALL(glEnable(GL_SCISSOR_TEST));
+    }
+    else {
+        GL_CALL(glDisable(GL_SCISSOR_TEST));
+    }
+    GL_CALL(glScissor(state->scissor_box[0], state->scissor_box[1], state->scissor_box[2], state->scissor_box[3]));
+
+    /* Restore clear values */
     GL_CALL(glClearColor(state->clear_color[0], state->clear_color[1], state->clear_color[2], state->clear_color[3]));
     GL_CALL(glClearDepthf(state->clear_depth));
 }
@@ -275,7 +368,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     }
     std::sort(distance_sort_nodes.begin(), distance_sort_nodes.end(),
     [](const NodeIndexDistancePair & a, const NodeIndexDistancePair & b) {
-        return a.first < b.first;
+        return a.first > b.first;
     });
 
     /* Reset the last material index to an unused value once per frame at the start*/
@@ -474,7 +567,7 @@ static bool setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     model->last_material_index = materialIndex;
     model->last_pass_was_transmission = is_transmission_pass;
 
-    const GLuint program = compiled_shader->shaderset.program;
+    const GLuint program = compiled_shader->program;
 
     GL_CALL(glUseProgram(program));
 
@@ -572,7 +665,9 @@ static bool draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
         GL_CALL(glDisable(GL_CULL_FACE));
     if(gltfMaterial.alphaMode == fastgltf::AlphaMode::Blend) {
         GL_CALL(glEnable(GL_BLEND));
-        GL_CALL(glDepthMask(GL_FALSE));
+        if(!is_transmission_pass) {
+            GL_CALL(glDepthMask(GL_FALSE));
+        }
         GL_CALL(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
         GL_CALL(glBlendEquation(GL_FUNC_ADD));
         GL_CALL(glEnable(GL_CULL_FACE));
@@ -1037,8 +1132,8 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t came
 
     float aspect = (float)width / (float)height;
     if(transmission_pass) {
-        width = 256;
-        height = 256;
+        width = LV_GLTF_TRANSMISSION_PASS_SIZE;
+        height = LV_GLTF_TRANSMISSION_PASS_SIZE;
     }
 
     std::visit(fastgltf::visitor{
@@ -1083,6 +1178,7 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t came
 static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * model,
                                    bool transmission_pass)
 {
+    LV_UNUSED(model);
     const lv_gltf_model_t * main_model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
     auto b_radius = lv_gltf_data_get_radius(main_model);
 
@@ -1206,9 +1302,12 @@ static void setup_draw_environment_background(lv_opengl_shader_manager_t * manag
 
 static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color, lv_opa_t bg_opa)
 {
+    LV_UNUSED(viewer);
     GL_CALL(glClearDepthf(1.0f));
-    GL_CALL(glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
-                         (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f));
+    /* Red / blue color order reversed below so they'll end up in the correct order
+     * after the shader swaps the channels again, back to correct. */
+    GL_CALL(glClearColor((float)bg_color.blue / 255.0f, (float)bg_color.green / 255.0f,
+                         (float)bg_color.red / 255.0f, (float)bg_opa / 255.0f));
 
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
@@ -1238,6 +1337,8 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                                                 localmatrix);
             made_changes = true;
         }
+        bool worldmatrix_was_inlined = false;
+        fastgltf::math::fmat4x4 inlined_worldmatrix;
         const uint32_t write_ops_count = lv_array_size(&node->write_ops);
         if(node->read_attrs || write_ops_count > 0) {
             fastgltf::math::fvec3 local_pos;
@@ -1264,13 +1365,17 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
             }
 
             /* Rebuild the local matrix after applying all write operations*/
-            localmatrix = fastgltf::math::scale(
-                              fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(), local_pos),
-                                                     made_rotation_changes ?
-                                                     lv_gltf_math_euler_to_quaternion(
-                                                         local_rot[0], local_rot[1], local_rot[2]) :
-                                                     local_quat),
-                              local_scale);
+            if(made_rotation_changes) local_quat = lv_gltf_math_euler_to_quaternion(local_rot[0], local_rot[1], local_rot[2]);
+
+            if(node->fastgltf_node->children.size() == 0) {
+                worldmatrix_was_inlined = true;
+                inlined_worldmatrix = fastgltf::math::scale(fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(
+                                                                                                                 parentworldmatrix), local_pos), local_quat), local_scale);
+            }
+            else {
+                localmatrix = fastgltf::math::scale(fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(),
+                                                                                                     local_pos), local_quat), local_scale);
+            }
 
             if(node->read_attrs) {
                 bool value_changed = false;
@@ -1302,22 +1407,23 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                     lv_memcpy(target_scale, local_scale.data(), sizeof(*target_scale));
                     value_changed = true;
                 }
-                node->read_attrs->value_changed = value_changed;
+                node->read_attrs->value_changed |= value_changed;
             }
         }
 
         if(made_changes || !lv_gltf_data_has_cached_transform(model, node->fastgltf_node)) {
-            lv_gltf_data_set_cached_transform(model, node->fastgltf_node, parentworldmatrix * localmatrix);
+            auto world_matrix = worldmatrix_was_inlined ? inlined_worldmatrix : (parentworldmatrix * localmatrix);
+            lv_gltf_data_set_cached_transform(model, node->fastgltf_node, world_matrix);
         }
 
         if(node->fastgltf_node->cameraIndex.has_value()) {
             current_camera_count++;
             if(current_camera_count == model->camera) {
-                fastgltf::math::fmat4x4 cammat = (parentworldmatrix * localmatrix);
-                model->view_pos[0] = cammat[3][0];
-                model->view_pos[1] = cammat[3][1];
-                model->view_pos[2] = cammat[3][2];
+                fastgltf::math::fmat4x4 cammat = worldmatrix_was_inlined ? inlined_worldmatrix : (parentworldmatrix * localmatrix);
+                fastgltf::removeScale(cammat);
+                model->view_pos = cammat.col(3);  /* Implicit conversion from 4 element column to 3 element vector */
                 model->view_mat = fastgltf::math::invert(cammat);
+
             }
         }
     });

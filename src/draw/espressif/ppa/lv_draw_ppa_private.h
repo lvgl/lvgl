@@ -38,7 +38,7 @@ extern "C" {
 #include "sdkconfig.h"
 
 #if (CONFIG_LV_DRAW_BUF_ALIGN != CONFIG_CACHE_L2_CACHE_LINE_SIZE)
-#error "For using PPA buffers need to be aligned to 64-byte boundary!"
+#error "CONFIG_LV_DRAW_BUF_ALIGN must be equal to CONFIG_CACHE_L2_CACHE_LINE_SIZE!"
 #endif
 
 

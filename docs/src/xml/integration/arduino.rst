@@ -1,14 +1,14 @@
 .. _editor_integration_arduino:
 
-========================================
-Using the Exported C Code on Arduino IDE
-========================================
+===========
+Arduino IDE
+===========
 
 Overview
 ********
 
-This guide explains how to properly integrate your LVGL Editor exported project into 
-an Arduino sketch, why it must go inside the src folder, and how to fix include paths 
+This guide explains how to properly integrate your LVGL Editor exported project into
+an Arduino sketch, why it must go inside the src folder, and how to fix include paths
 for successful compilation.
 
 Arduino Build System
@@ -58,11 +58,11 @@ LVGL source files typically use this include pattern:
         #include "lvgl/lvgl.h"
     #endif
 
-The ``LV_LVGL_H_INCLUDE_SIMPLE`` define controls how LVGL headers are included.
+The :c:macro:`LV_LVGL_H_INCLUDE_SIMPLE` define controls how LVGL headers are included.
 However, the Arduino IDE does not provide a way to add custom compiler symbols through its interface.
 Instead, you must modify the ``platform.txt`` file for the specific board core you are using.
 
-To ensure correct compilation, you need to instruct the Arduino build system to define ``LV_LVGL_H_INCLUDE_SIMPLE`` during compilation.
+To ensure correct compilation, you need to instruct the Arduino build system to define :c:macro:`LV_LVGL_H_INCLUDE_SIMPLE` during compilation.
 
 1. Locate the ``platform.txt`` file for your Arduino core.
     Example paths:

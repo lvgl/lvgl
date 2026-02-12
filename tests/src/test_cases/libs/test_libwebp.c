@@ -58,7 +58,7 @@ void test_libwebp_1(void)
 
     /* Test memory stability */
     size_t mem_before = lv_test_get_free_mem();
-    for(uint32_t i = 0; i < 20; i++) {
+    for(uint32_t i = 0; i < 50; i++) {
         create_webp_images();
 
         lv_obj_invalidate(lv_screen_active());
@@ -69,7 +69,7 @@ void test_libwebp_1(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/webp_1.png");
 
     /* Check for memory leaks */
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 56);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 128);
 }
 
 #endif

@@ -125,6 +125,8 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     layer._clip_area = snapshot_area;
     layer.phy_clip_area = snapshot_area;
 
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, &layer);
+
     lv_display_t * disp_old = lv_refr_get_disp_refreshing();
     lv_display_t * disp_new = lv_obj_get_display(obj);
     lv_layer_t * layer_old = disp_new->layer_head;
@@ -177,6 +179,9 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
 
     disp_new->layer_head = layer_old;
     lv_refr_set_disp_refreshing(disp_old);
+
+    lv_draw_unit_send_event(NULL, LV_EVENT_SCREEN_LOAD_START, &layer);
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, &layer);
 
     return LV_RESULT_OK;
 }

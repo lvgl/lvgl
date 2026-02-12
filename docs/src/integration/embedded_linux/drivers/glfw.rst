@@ -19,14 +19,12 @@ Getting Started with GLFW
 Prerequisites
 ~~~~~~~~~~~~~
 
-The GLFW driver uses GLEW GLFW to access the OpenGL window manager.
-
-1. Install GLEW and GLFW: ``sudo apt-get install libglew-dev libglfw3-dev``
+1. Install GLFW: ``sudo apt-get install libglfw3-dev``
 
 Configure GLFW Driver
 ~~~~~~~~~~~~~~~~~~~~~
 
-1. Required linked libraries: -lGL -lGLEW -lglfw
+1. Required linked libraries: -lGL -lglfw
 2. Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
 
     .. code-block:: c
@@ -92,7 +90,6 @@ used to add content to a texture and the driver will draw the texture in the win
 .. code-block:: c
 
     #include "lvgl/lvgl.h"
-    #include <GL/glew.h>
     #include <GLFW/glfw3.h>
 
     #define WIDTH 640
@@ -181,7 +178,7 @@ used to add content to a texture and the driver will draw the texture in the win
     #else
     #error("Unsupported color format")
     #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, texture_format, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, img_cogwheel_argb.data);
+        glTexImage2D(GL_TEXTURE_2D, 0, texture_format, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_cogwheel_argb.data);
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
 

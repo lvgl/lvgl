@@ -16,6 +16,7 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 #include "../../core/lv_obj.h"
 #include "../../core/lv_observer.h"
+#include "../../core/lv_obj_property.h"
 
 #if LV_USE_SPAN != 0
 
@@ -50,6 +51,17 @@ typedef struct _lv_span_coords_t {
 } lv_span_coords_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spangroup_class;
+
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_span_id_t {
+    LV_PROPERTY_ID(SPAN, ALIGN,     LV_PROPERTY_TYPE_INT, 0),
+    LV_PROPERTY_ID(SPAN, OVERFLOW,  LV_PROPERTY_TYPE_INT, 1),
+    LV_PROPERTY_ID(SPAN, INDENT,    LV_PROPERTY_TYPE_INT, 2),
+    LV_PROPERTY_ID(SPAN, MODE,      LV_PROPERTY_TYPE_INT, 3),
+    LV_PROPERTY_ID(SPAN, MAX_LINES, LV_PROPERTY_TYPE_INT, 4),
+    LV_PROPERTY_SPAN_END,
+};
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -2,6 +2,11 @@
 #define LV_GLTFDATA_PRIVATE_H
 
 #include "../../../lv_conf_internal.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if LV_USE_GLTF
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../draw/lv_image_dsc.h"
@@ -175,15 +180,8 @@ typedef struct {
 lv_gltf_uniform_locations_t lv_gltf_uniform_locations_create(GLuint program);
 
 typedef struct {
-    GLuint program;
-    uint32_t bg_program;
-    uint32_t vert;
-    uint32_t frag;
-} lv_gltf_shaderset_t;
-
-typedef struct {
     lv_gltf_uniform_locations_t uniforms;
-    lv_gltf_shaderset_t shaderset;
+    GLuint program;
 } lv_gltf_compiled_shader_t;
 
 void lv_gltf_store_compiled_shader(lv_gltf_model_t * data, size_t identifier, lv_gltf_compiled_shader_t * shader);
@@ -250,4 +248,9 @@ void lv_gltf_data_rgb_to_bgr(uint8_t * pixel_buffer,
                              bool has_alpha);
 
 #endif /*LV_USE_GLTF*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* LV_GLTFDATA_PRIVATE_H */

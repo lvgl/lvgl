@@ -48,8 +48,8 @@ Note that ``input_range`` has different meanings depending on the ``type`` input
 
 .. _monkey_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/others/monkey/index.rst
 

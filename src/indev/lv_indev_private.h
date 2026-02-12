@@ -18,6 +18,10 @@ extern "C" {
 #include "lv_indev_scroll.h"
 #include "lv_indev_gesture.h"
 
+#if LV_USE_EXT_DATA
+#include "../lvgl_private.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -28,6 +32,9 @@ extern "C" {
  **********************/
 
 struct _lv_indev_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     /** Input device type*/
     lv_indev_type_t type;
 
@@ -64,11 +71,11 @@ struct _lv_indev_t {
     /**< Drag throw slow-down in [%]. Greater value means faster slow-down*/
     uint8_t scroll_throw;
 
-    /**< At least this difference should be between two points to evaluate as gesture*/
+    /**< Minimum velocity: difference between consecutive points must exceed this (in pixels) to detect gesture speed */
     uint8_t gesture_min_velocity;
 
-    /**< At least this difference should be to send a gesture*/
-    uint8_t gesture_limit;
+    /**< Minimum distance: total travel from first to current point must exceed this (in pixels) to trigger gesture */
+    uint8_t gesture_min_distance;
 
     /**< Long press time in milliseconds*/
     uint16_t long_press_time;

@@ -108,7 +108,7 @@ to set text alignment.
 Modes
 -----
 
-**DEPRECATED**, set the width to ``LV_SIZE_CONTENT`` or fixed value to control expanding/wrapping.
+**DEPRECATED**, set the width to :c:macro:`LV_SIZE_CONTENT` or fixed value to control expanding/wrapping.
 
 A Spangroup can be set to one the following modes:
 

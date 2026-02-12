@@ -82,12 +82,32 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
 
 void lv_gltf_data_delete(lv_gltf_model_t * data)
 {
+    LV_ASSERT_NULL(data);
+    lv_timer_delete(data->animation_update_timer);
+    data->animation_update_timer = NULL;
+
     lv_gltf_data_delete_textures(data);
     uint32_t node_count = lv_array_size(&data->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
         lv_gltf_model_node_t * node  = (lv_gltf_model_node_t *) lv_array_at(&data->nodes, i);
         lv_gltf_model_node_deinit(node);
     }
+    lv_array_deinit(&data->nodes);
+    lv_array_deinit(&data->compiled_shaders);
+
+    /* Explicitly call destructors for C++ objects initialized with placement new */
+    data->textures.~vector();
+    data->meshes.~vector();
+    data->node_by_light_index.~vector();
+    data->local_mesh_to_center_points_by_primitive.~map();
+    data->skin_tex.~vector();
+    data->validated_skins.~vector();
+    data->blended_nodes_by_material_index.~map();
+    data->opaque_nodes_by_material_index.~map();
+    data->node_transform_cache.~map();
+    data->channel_set_cache.~map();
+    data->asset.~Asset();
+
     lv_free(data);
 }
 

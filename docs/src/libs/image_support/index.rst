@@ -9,7 +9,7 @@ Image Support
     :maxdepth: 2
 
     bmp
-    gif
+    ../../widgets/gif
     libjpeg_turbo
     libpng
     lodepng

@@ -87,10 +87,10 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         goto create_window_err;
     }
 
+    lv_display_set_driver_data(window->lv_disp, window);
+
     /* Initialize display driver */
     window->backend_display_data = wl_backend_ops.init_display(lv_wl_ctx.backend_data, window->lv_disp, hor_res, ver_res);
-
-    lv_display_set_driver_data(window->lv_disp, window);
 
     lv_wayland_xdg_configure_surface(window);
 
@@ -146,6 +146,14 @@ void * lv_wayland_get_backend_display_data(lv_display_t * display)
     lv_wl_window_t * window = lv_display_get_driver_data(display);
     LV_ASSERT_NULL(window);
     return window->backend_display_data;
+}
+
+void lv_wayland_set_backend_display_data(lv_display_t * display, void * data)
+{
+    LV_ASSERT_NULL(display);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_ASSERT_NULL(window);
+    window->backend_display_data = data;
 }
 
 struct wl_surface * lv_wayland_get_window_surface(lv_display_t * display)
@@ -315,14 +323,6 @@ static void refr_start_event(lv_event_t * e)
     lv_display_t * display = lv_event_get_target(e);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
 
-    while(wl_display_prepare_read(lv_wl_ctx.wl_display) != 0) {
-        wl_display_dispatch_pending(lv_wl_ctx.wl_display);
-    }
-
-    wl_display_read_events(lv_wl_ctx.wl_display);
-    wl_display_dispatch_pending(lv_wl_ctx.wl_display);
-
-
     if(lv_wayland_xdg_is_resize_pending(window)) {
         lv_wayland_xdg_resize(window);
     }
@@ -331,20 +331,9 @@ static void refr_start_event(lv_event_t * e)
 static void refr_end_event(lv_event_t * e)
 {
     LV_UNUSED(e);
-    int ret;
-    while((ret = wl_display_flush(lv_wl_ctx.wl_display)) == -1 && errno == EAGAIN) {
-        struct pollfd pfd = {
-            .fd = wl_display_get_fd(lv_wl_ctx.wl_display),
-            .events = POLLOUT,
-        };
-
-        if(poll(&pfd, 1, -1) == -1) {
-            LV_LOG_ERROR("poll failed: %s", strerror(errno));
-            break;
-        }
-        /* Socket is writable now, loop back and try flush again */
-    }
+    lv_wayland_flush();
 }
+
 static void res_changed_event(lv_event_t * e)
 {
     lv_display_t * display = (lv_display_t *) lv_event_get_target(e);

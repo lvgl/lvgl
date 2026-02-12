@@ -41,7 +41,7 @@ Highlights of MicroPython
 Why MicroPython + LVGL?
 ***********************
 
-MicroPython `does not have a good native high-level GUI library <https://forum.micropython.org/viewtopic.php?f=18&t=5543>`__.
+MicroPython does not have a good native high-level GUI library.
 LVGL is an `Object-Oriented Component Based <https://blog.lvgl.io/2018-12-13/extend-lvgl-objects>`__
 high-level GUI library, which is a natural candidate to map into a higher level language, such as Python.
 LVGL is implemented in C and its APIs are in C.
@@ -227,7 +227,7 @@ Solving the Problem
 ~~~~~~~~~~~~~~~~~~~
 
 - Replace the global/static local var with :cpp:expr:`(LV_GLOBAL_DEFAULT()->_var)`
-- Include ``lv_global.h`` on files that use ``LV_GLOBAL_DEFAULT``
+- Include ``lv_global.h`` on files that use :c:macro:`LV_GLOBAL_DEFAULT`
 - Add ``_var`` to ``lv_global_t`` on ``lv_global.h``
 
 

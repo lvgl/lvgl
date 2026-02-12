@@ -143,7 +143,8 @@ static inline int32_t lv_div_round_closest(int32_t dividend, int32_t divisor)
 
 void lv_grid_init(void)
 {
-    layout_list_def[LV_LAYOUT_GRID].cb = grid_update;
+    layout_list_def[LV_LAYOUT_GRID].callbacks.layout_update_cb = grid_update;
+    layout_list_def[LV_LAYOUT_GRID].callbacks.get_min_size_cb = NULL;
     layout_list_def[LV_LAYOUT_GRID].user_data = NULL;
 }
 
@@ -474,14 +475,27 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
     uint32_t row_span = get_row_span(item);
     if(row_span == 0 || col_span == 0) return;
 
+    bool rev = lv_obj_get_style_base_dir(lv_obj_get_parent(item), LV_PART_MAIN) == LV_BASE_DIR_RTL;
+
     uint32_t col_pos = get_col_pos(item);
     uint32_t row_pos = get_row_pos(item);
     lv_grid_align_t col_align = get_cell_col_align(item);
     lv_grid_align_t row_align = get_cell_row_align(item);
 
-    int32_t col_x1 = c->x[col_pos];
-    int32_t col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];
-    int32_t col_w = col_x2 - col_x1;
+    int32_t col_x1 = 0;
+    int32_t col_x2 = 0;
+    int32_t col_w = 0;
+
+    if(rev && col_span > 1) {
+        col_x1 = c->x[col_pos + col_span - 1];
+        col_x2 = c->x[col_pos] + c->w[col_pos];
+        col_w = col_x2 - col_x1;
+    }
+    else {
+        col_x1 = c->x[col_pos];
+        col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];
+        col_w = col_x2 - col_x1;
+    }
 
     int32_t row_y1 = c->y[row_pos];
     int32_t row_y2 = c->y[row_pos + row_span - 1] + c->h[row_pos + row_span - 1];
@@ -497,6 +511,8 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
     int32_t y;
     int32_t item_w = lv_area_get_width(&item->coords);
     int32_t item_h = lv_area_get_height(&item->coords);
+
+    col_pos = rev && col_span > 1 ? col_pos + col_span - 1 : col_pos;
 
     switch(col_align) {
         default:

@@ -363,6 +363,8 @@ menu "LVGL configuration"
 				bool "1: NEON"
 			config LV_DRAW_SW_ASM_HELIUM
 				bool "2: HELIUM"
+			config LV_DRAW_SW_ASM_RISCV_V
+				bool "3: RISC-V Vector"
 			config LV_DRAW_SW_ASM_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -372,6 +374,7 @@ menu "LVGL configuration"
 			default 0 if LV_DRAW_SW_ASM_NONE
 			default 1 if LV_DRAW_SW_ASM_NEON
 			default 2 if LV_DRAW_SW_ASM_HELIUM
+			default 3 if LV_DRAW_SW_ASM_RISCV_V
 			default 255 if LV_DRAW_SW_ASM_CUSTOM
 
 		config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
@@ -405,12 +408,12 @@ menu "LVGL configuration"
 		config LV_USE_G2D
 			bool "Use NXP's G2D on MPU platforms"
 			default n
-		
+
 		config LV_USE_DRAW_G2D
 			bool "Use G2D for drawing."
 			depends on LV_USE_G2D
 			default y
-		
+
 		config LV_USE_ROTATE_G2D
 			bool "Use G2D to rotate display."
 			depends on LV_USE_G2D
@@ -502,6 +505,11 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_DRAW_VG_LITE
 
+		config LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+			bool "Disable blit rectangular offset to resolve certain hardware errors."
+			default n
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_VG_LITE_PATH_DUMP_MAX_LEN
 			int "Maximum path dump print length (in points)"
 			default 1000
@@ -548,6 +556,13 @@ menu "LVGL configuration"
 		default n
 		depends on LV_USE_PPA
 
+		config LV_PPA_BURST_LENGTH
+		int "PPA Burst length in bytes"
+		depends on LV_USE_PPA
+		default 128
+		help
+			PPA burst length size in bytes.
+
 		config LV_USE_DRAW_EVE
 			bool "Use EVE FT81X GPU."
 			default n
@@ -563,6 +578,38 @@ menu "LVGL configuration"
 			default 2048
 			depends on LV_USE_DRAW_EVE
 
+		config LV_USE_DRAW_NANOVG
+			bool "Use NanoVG Renderer."
+			default n
+			depends on LV_USE_NANOVG && LV_USE_MATRIX
+
+		choice LV_NANOVG_BACKEND
+			prompt "NanoVG OpenGL backend"
+			default LV_NANOVG_BACKEND_GLES2
+			depends on LV_USE_DRAW_NANOVG
+			help
+				Select which OpenGL implementation to use for NanoVG rendering.
+
+			config LV_NANOVG_BACKEND_GL2
+				bool "OpenGL 2.0"
+			config LV_NANOVG_BACKEND_GL3
+				bool "OpenGL 3.0+"
+			config LV_NANOVG_BACKEND_GLES2
+				bool "OpenGL ES 2.0"
+			config LV_NANOVG_BACKEND_GLES3
+				bool "OpenGL ES 3.0+"
+		endchoice
+
+		config LV_NANOVG_IMAGE_CACHE_CNT
+			int "Draw image texture cache count"
+			default 128
+			depends on LV_USE_DRAW_NANOVG
+
+		config LV_NANOVG_LETTER_CACHE_CNT
+			int "Draw letter cache count"
+			default 512
+			depends on LV_USE_DRAW_NANOVG
+
 	endmenu
 
 	menu "Feature Configuration"
@@ -577,17 +624,17 @@ menu "LVGL configuration"
 					Specify how important log should be added.
 
 				config LV_LOG_LEVEL_TRACE
-					bool "A lot of logs to give detailed information"
+					bool "LOG_LEVEL_TRACE: A lot of logs to give detailed information"
 				config LV_LOG_LEVEL_INFO
-					bool "Log important events"
+					bool "LOG_LEVEL_INFO: Log important events"
 				config LV_LOG_LEVEL_WARN
-					bool "Log if something unwanted happened but didn't cause a problem"
+					bool "LOG_LEVEL_WARN: Log if something unwanted happened but didn't cause a problem"
 				config LV_LOG_LEVEL_ERROR
-					bool "Only critical issues, when the system may fail"
+					bool "LOG_LEVEL_ERROR: Only critical issues, when the system may fail"
 				config LV_LOG_LEVEL_USER
-					bool "Only logs added by the user"
+					bool "LOG_LEVEL_USER: Only logs added by the user"
 				config LV_LOG_LEVEL_NONE
-					bool "Do not log anything"
+					bool "LOG_LEVEL_NONE: Do not log anything"
 			endchoice
 
 			config LV_LOG_LEVEL
@@ -832,6 +879,23 @@ menu "LVGL configuration"
 				bool "Enable the multi-touch gesture recognition feature"
 				depends on LV_USE_FLOAT
 				default n
+
+			config LV_USE_EXT_DATA
+				bool "External data and destructor"
+				default n
+				help
+					Enable this option to activate external data and destructor functionality,
+					which assists in resource cleanup when objects are freed by either LVGL core
+					or applications. Currently supported features include:
+						- event
+						- object
+						- observer
+						- anim
+						- timer
+						- group
+						- display
+						- indev (input device)
+						- theme
 		endmenu
 	endmenu
 
@@ -1448,7 +1512,7 @@ menu "LVGL configuration"
 
 		config LV_USE_LIBJPEG_TURBO
 			bool "libjpeg-turbo decoder library"
-		
+
 		config LV_USE_LIBWEBP
 			bool "WebP decoder library"
 
@@ -1522,6 +1586,10 @@ menu "LVGL configuration"
 				config LV_USE_THORVG_EXTERNAL
 					bool "Use ThorVG external"
 			endchoice
+
+		config LV_USE_NANOVG
+			bool "NanoVG library"
+			default n
 
 		config LV_USE_LZ4
 			bool "Enable LZ4 compress/decompress lib"
@@ -1766,8 +1834,6 @@ menu "LVGL configuration"
 			depends on LV_USE_TEST
 		config LV_USE_TRANSLATION
 			bool "Enable text translation support"
-		config LV_USE_XML
-			bool "Enable loading XML UIs runtime"
 		config LV_USE_COLOR_FILTER
 			bool "Enable color filter style"
 			default n
@@ -2102,18 +2168,22 @@ menu "LVGL configuration"
 		config LV_USE_ST7735
 			bool "Use ST7735 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ST7789
 			bool "Use ST7789 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ST7796
 			bool "Use ST7796 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ILI9341
 			bool "Use ILI9341 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_GENERIC_MIPI
 			bool "Generic MIPI driver"
@@ -2161,6 +2231,7 @@ menu "LVGL configuration"
 
 		config LV_USE_OPENGLES
 			bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
+			depends on LV_USE_MATRIX
 			default n
 
 		config LV_USE_OPENGLES_DEBUG

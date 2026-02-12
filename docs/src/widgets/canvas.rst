@@ -33,12 +33,19 @@ Buffer
 The Canvas needs a buffer in which to store the drawn image. To assign a
 buffer to a Canvas, use
 :cpp:expr:`lv_canvas_set_buffer(canvas, buffer, width, height, LV_COLOR_FORMAT_...)`.
-Where ``buffer`` is a static buffer (not just a local variable) to hold
-the image of the Canvas. For example, for a 100x50 ARGB8888 buffer:
-``static uint8_t buffer[100 * 50 * 4]``.
 
-Or you can use
-``static uint8_t buffer[LV_CANVAS_BUF_SIZE(width, height, bits_per_pixel, stride_in_bytes)]``.
+Where ``buffer`` has to be valid for the entire lifecycle of the object created by :cpp:expr:`lv_canvas_create`.
+It can be allocated by using :cpp:func:`lv_malloc` or a statically allocated array.
+
+For example, for a 100x50 ARGB8888 buffer you can use:
+
+-  ``uint8_t* buffer = lv_malloc(100 * 50 * 4)``
+
+-  ``static uint8_t buffer[100 * 50 * 4]``
+
+-  ``static uint8_t buffer[LV_CANVAS_BUF_SIZE(width, height, bits_per_pixel, stride_in_bytes)]``
+
+In case you choose the :cpp:expr:`lv_malloc` way, it is up to the programmer to free the memory area, for example, on :cpp:enumerator:`LV_EVENT_DELETE` event.
 
 Canvas supports all the color formats like
 :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` or :cpp:enumerator:`LV_COLOR_FORMAT_I2`. See the full
@@ -64,6 +71,15 @@ To set an individual pixel's color on the Canvas, use
 (``LV_COLOR_FORMAT_I1/2/4/8``) pass the color index as the ``color`` argument by using
 the *blue* channel in the ``color`` value, e.g. :cpp:expr:`lv_color_make(0, 0, index)`.
 
+.. tip::
+
+    When updating multiple pixels in a loop, follow these steps to improve performance:
+
+    1. Use :cpp:func:`lv_canvas_set_px_skip_invalidate` to set pixel colors without triggering a redraw.
+    2. Call :cpp:func:`lv_obj_invalidate` once after the loop is finished.
+
+    This prevents the canvas from being redundantly invalidated for every single pixel update.
+
 :cpp:expr:`lv_canvas_fill_bg(canvas, lv_color_hex(0x00ff00), LV_OPA_50)` fills the whole
 Canvas to blue with 50% opacity. Note that if the current color format
 doesn't support colors (e.g. :cpp:enumerator:`LV_COLOR_FORMAT_A8`) the color will be
@@ -71,8 +87,9 @@ ignored. Similarly, if opacity is not supported
 (e.g. :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`), it will be ignored.
 
 An array of pixels can be copied to the Canvas with
-:cpp:expr:`lv_canvas_copy_buf(canvas, buffer_to_copy, x, y, width, height)`. The
-color format of the buffer and Canvas need to match.
+:cpp:expr:`lv_canvas_copy_buf(canvas, canvas_area, src_buf, src_area)`. The
+color format of the buffer and Canvas need to match. If the canvas area and source buffer
+are the same size, the source area can be left NULL.
 
 To draw something to the Canvas use LVGL's draw functions directly. See the examples for more details.
 
@@ -112,8 +129,8 @@ No *Keys* are processed by Canvas Widgets.
 
 .. _lv_canvas_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/canvas/index.rst
 

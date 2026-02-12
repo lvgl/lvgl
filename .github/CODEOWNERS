@@ -1,0 +1,36 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence
+* @kisvegabor @AndreCostaaa @liamHowatt @uLipe @FASTSHIFT
+
+demos/gltf @AndreCostaaa
+examples/libs/gltf @AndreCostaaa
+examples/libs/gstreamer @AndreCostaaa
+src/draw/dma2d @liamHowatt @uLipe
+src/draw/espressif/ppa @uLipe
+src/draw/eve @liamHowatt
+src/draw/nema_gfx @liamHowatt
+src/draw/nxp/g2d @AndreCostaaa
+src/draw/nxp/pxp @uLipe
+src/draw/opengles @AndreCostaaa @kisvegabor
+src/draw/renesas/dave2d @uLipe
+src/draw/sdl @kisvegabor @AndreCostaaa
+src/draw/vg_lite @uLipe @FASTSHIFT
+src/drivers/display/drm @AndreCostaaa
+src/drivers/display/fb @AndreCostaaa
+src/drivers/display/ft81x @liamHowatt
+src/drivers/draw/eve @liamHowatt
+src/drivers/evdev @AndreCostaaa
+src/drivers/libinput @AndreCostaaa
+src/drivers/nuttx @liamHowatt @FASTSHIFT @XuNeo
+src/drivers/qnx @uLipe
+src/drivers/sdl @kisvegabor
+src/drivers/wayland @AndreCostaaa
+src/libs/frogfs @liamHowatt
+src/libs/FT800-FT813 @liamHowatt
+src/libs/gif @liamHowatt
+src/libs/gltf @AndreCostaaa
+src/libs/gstreamer @AndreCostaaa
+src/libs/tiny_ttf @AndreCostaaa
+src/libs/vg_lite_driver @uLipe
+src/misc/cache @AndreCostaaa @FASTSHIFT
+src/widgets/gif @liamHowatt

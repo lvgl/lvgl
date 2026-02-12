@@ -373,7 +373,7 @@ void test_dropdown_render_2(void)
     lv_dropdown_open(dd1);
 
     lv_obj_t * dd2 = lv_dropdown_create(lv_screen_active());
-    lv_dropdown_set_text(dd2, "Go Up");
+    lv_dropdown_set_text_static(dd2, "Go Up");
     lv_dropdown_set_options(dd2, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15");
     lv_dropdown_set_symbol(dd2, NULL);
     lv_obj_align(dd2, LV_ALIGN_LEFT_MID, 150, 50);
@@ -403,7 +403,7 @@ void test_dropdown_render_2(void)
     lv_dropdown_open(dd5);
 
     lv_obj_t * dd6 = lv_dropdown_create(lv_screen_active());
-    lv_dropdown_set_text(dd6, "Right");
+    lv_dropdown_set_text_static(dd6, "Right");
     lv_dropdown_set_options(dd6, "1aaa\n2aa\n3aa");
     lv_dropdown_set_dir(dd6, LV_DIR_RIGHT);
     lv_dropdown_set_symbol(dd6, LV_SYMBOL_RIGHT);
@@ -412,7 +412,7 @@ void test_dropdown_render_2(void)
     lv_obj_set_style_text_align(lv_dropdown_get_list(dd6), LV_TEXT_ALIGN_RIGHT, 0);
 
     lv_obj_t * dd7 = lv_dropdown_create(lv_screen_active());
-    lv_dropdown_set_text(dd7, "Left");
+    lv_dropdown_set_text_static(dd7, "Left");
     lv_dropdown_set_options(dd7, "1aaa\n2\n3");
     lv_dropdown_set_dir(dd7, LV_DIR_LEFT);
     lv_dropdown_set_symbol(dd7, LV_SYMBOL_LEFT);

@@ -1,3 +1,4 @@
+.. include:: /include/external_links.txt
 .. _grid:
 
 ====
@@ -139,7 +140,7 @@ Limitations:
 - The sub-grid is resolved only to a depth of 1 level. That is, a grid can have a
   sub-grid child, but that sub-grid cannot have another sub-grid.
 
-- ``LV_GRID_CONTENT`` tracks on the grid are not handled in the sub-grid, only in its
+- :c:macro:`LV_GRID_CONTENT` tracks on the grid are not handled in the sub-grid, only in its
   own grid.
 
 The sub-grid feature works the same as in CSS.  For further information, see
@@ -198,6 +199,15 @@ The columns will be placed from right to left.
 
 
 
+Edge cases and notes
+--------------------
+
+- Min/max as content or percent: Child Widgets can set min/max width/height to
+  :c:macro:`LV_SIZE_CONTENT` or :cpp:expr:`LV_PCT(x)`. These constraints are respected
+  when computing :c:macro:`LV_GRID_CONTENT` tracks (tracks sized to their largest
+  child) and when distributing space to FR-unit tracks.
+
+
 .. admonition::  Further Reading
 
     - Learn more about `CSS Grid`_ layout.
@@ -207,17 +217,10 @@ The columns will be placed from right to left.
 
 .. _grid_examples:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/layouts/grid/index.rst
-
-
-..  Hyperlinks
-
-.. _css grid:     https://css-tricks.com/snippets/css/complete-guide-grid/
-.. _fr units:     https://css-tricks.com/introduction-fr-css-unit/
-.. _css subgrid:  https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid
 
 
 

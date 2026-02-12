@@ -8,7 +8,7 @@
  *********************/
 #include "lv_bar_private.h"
 #include "../../misc/lv_area_private.h"
-#include "../../draw/lv_draw_mask_private.h"
+#include "../../draw/lv_draw_mask.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
 #if LV_USE_BAR != 0
@@ -63,9 +63,50 @@ static void lv_bar_anim_completed(lv_anim_t * a);
     static void bar_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
+#if LV_USE_OBJ_PROPERTY
+    static void lv_bar_set_value_helper(lv_obj_t * obj, int32_t value);
+    static void lv_bar_set_start_value_helper(lv_obj_t * obj, int32_t value);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_bar_properties[] = {
+    {
+        .id = LV_PROPERTY_BAR_VALUE,
+        .setter = lv_bar_set_value_helper,
+        .getter = lv_bar_get_value,
+    },
+    {
+        .id = LV_PROPERTY_BAR_START_VALUE,
+        .setter = lv_bar_set_start_value_helper,
+        .getter = lv_bar_get_start_value,
+    },
+    {
+        .id = LV_PROPERTY_BAR_MIN_VALUE,
+        .setter = lv_bar_set_min_value,
+        .getter = lv_bar_get_min_value,
+    },
+    {
+        .id = LV_PROPERTY_BAR_MAX_VALUE,
+        .setter = lv_bar_set_max_value,
+        .getter = lv_bar_get_max_value,
+    },
+    {
+        .id = LV_PROPERTY_BAR_MODE,
+        .setter = lv_bar_set_mode,
+        .getter = lv_bar_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_BAR_ORIENTATION,
+        .setter = lv_bar_set_orientation,
+        .getter = lv_bar_get_orientation,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_bar_class = {
     .constructor_cb = lv_bar_constructor,
     .destructor_cb = lv_bar_destructor,
@@ -75,6 +116,7 @@ const lv_obj_class_t lv_bar_class = {
     .instance_size = sizeof(lv_bar_t),
     .base_class = &lv_obj_class,
     .name = "lv_bar",
+    LV_PROPERTY_CLASS_FIELDS(bar, BAR)
 };
 
 /**********************
@@ -760,6 +802,18 @@ static void bar_value_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     }
 #endif
 }
+
+#if LV_USE_OBJ_PROPERTY
+static void lv_bar_set_value_helper(lv_obj_t * obj, int32_t value)
+{
+    lv_bar_set_value(obj, value, LV_ANIM_OFF);
+}
+
+static void lv_bar_set_start_value_helper(lv_obj_t * obj, int32_t value)
+{
+    lv_bar_set_start_value(obj, value, LV_ANIM_OFF);
+}
+#endif
 
 #endif /*LV_USE_OBSERVER*/
 

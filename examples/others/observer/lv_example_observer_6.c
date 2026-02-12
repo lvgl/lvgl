@@ -59,7 +59,6 @@ typedef struct {
 static void my_panel_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
-    LV_UNUSED(observer);
 
     lv_theme_mode_t m = (lv_theme_mode_t) lv_subject_get_int(&theme_subject);
     lv_panel_styles_t * styles = (lv_panel_styles_t *) lv_observer_get_target(observer);
@@ -129,7 +128,6 @@ typedef struct {
 static void my_button_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
-    LV_UNUSED(observer);
 
     lv_theme_mode_t m = (lv_theme_mode_t) lv_subject_get_int(&theme_subject);
     lv_button_styles_t * styles = (lv_button_styles_t *) lv_observer_get_target(observer);

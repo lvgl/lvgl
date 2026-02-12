@@ -7,10 +7,11 @@
  *      INCLUDES
  *********************/
 #include "lv_textarea_private.h"
-#include "../label/lv_label_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_TEXTAREA != 0
 
+#include "../label/lv_label_private.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_group.h"
 #include "../../core/lv_refr.h"
 #include "../../indev/lv_indev.h"
@@ -114,11 +115,6 @@ static const lv_property_ops_t lv_textarea_properties[] = {
         .id = LV_PROPERTY_TEXTAREA_MAX_LENGTH,
         .setter = lv_textarea_set_max_length,
         .getter = lv_textarea_get_max_length,
-    },
-    {
-        .id = LV_PROPERTY_TEXTAREA_INSERT_REPLACE,
-        .setter = lv_textarea_set_insert_replace,
-        .getter = NULL,
     },
     {
         .id = LV_PROPERTY_TEXTAREA_TEXT_SELECTION,
@@ -558,8 +554,28 @@ void lv_textarea_set_accepted_chars(lv_obj_t * obj, const char * list)
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    ta->accepted_chars = list;
+    char * copied_list = NULL;
+    if(list) {
+        copied_list = lv_strdup(list);
+        LV_ASSERT_MALLOC(copied_list);
+    }
+
+    if(!ta->static_accepted_chars) lv_free(ta->accepted_chars);
+    ta->static_accepted_chars = 0;
+    ta->accepted_chars = copied_list;
 }
+
+void lv_textarea_set_accepted_chars_static(lv_obj_t * obj, const char * list)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+
+    if(!ta->static_accepted_chars) lv_free(ta->accepted_chars);
+    ta->static_accepted_chars = 1;
+    ta->accepted_chars = (char *)list;
+}
+
 
 void lv_textarea_set_max_length(lv_obj_t * obj, uint32_t num)
 {
@@ -892,6 +908,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->pwd_bullet        = NULL;
     ta->pwd_show_time     = LV_TEXTAREA_DEF_PWD_SHOW_TIME;
     ta->accepted_chars    = NULL;
+    ta->static_accepted_chars = 1;
     ta->max_length        = 0;
     ta->cursor.show      = 1;
     /*It will be set to zero later (with zero value lv_textarea_set_cursor_pos(obj, 0); wouldn't do anything as there is no difference)*/
@@ -937,6 +954,8 @@ static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         lv_free(ta->placeholder_txt);
         ta->placeholder_txt = NULL;
     }
+    if(!ta->static_accepted_chars) lv_free(ta->accepted_chars);
+    ta->accepted_chars = NULL;
 }
 
 static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
@@ -988,7 +1007,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_POST) {
         draw_cursor(e);
     }
-    else if(code == LV_EVENT_SIZE_CHANGED) {
+    else if(code == LV_EVENT_SIZE_CHANGED || code == LV_EVENT_STYLE_CHANGED) {
         lv_textarea_t * ta = (lv_textarea_t *)obj;
         lv_textarea_scroll_to_cusor_pos(obj, ta->cursor.pos);
     }
@@ -1474,6 +1493,7 @@ static void lv_textarea_scroll_to_cusor_pos(lv_obj_t * obj, int32_t pos)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
     lv_point_t cur_pos;
+    lv_obj_update_layout(ta->label);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_label_get_letter_pos(ta->label, pos, &cur_pos);
 

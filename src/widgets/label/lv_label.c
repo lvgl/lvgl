@@ -927,6 +927,8 @@ static void draw_main(lv_event_t * e)
         lv_area_move(&txt_coords, 0, -s);
         txt_coords.y2 = obj->coords.y2;
     }
+
+    /*Clip to the text in some cases to avoid ugly overflows*/
     if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL ||
        label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR ||
        label->long_mode == LV_LABEL_LONG_MODE_CLIP) {
@@ -935,10 +937,14 @@ static void draw_main(lv_event_t * e)
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
         layer->_clip_area = clip_area_ori;
     }
+    /*Do not clip to make the drop shadow  visible*/
+    else if(label_draw_dsc.base.drop_shadow_opa > 0) {
+        lv_draw_label(layer, &label_draw_dsc, &txt_coords);
+    }
+    /*Labels have some extra draw area by default to not clip characters with
+     *italic, handwritten and other less standard fonts.
+     *However, with most of the fonts typically it's safe to clip at least to bottom side*/
     else {
-        /*Labels have some extra draw area by default to not clip characters with
-         *italic, handwritten and other less standard fonts.
-         *However, with most of the fonts typically it's safe to clip at least to bottom side*/
         const lv_area_t clip_area_ori = layer->_clip_area;
         layer->_clip_area.y2 = txt_clip.y2;
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);

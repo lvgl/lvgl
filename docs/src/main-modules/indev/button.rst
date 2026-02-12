@@ -32,8 +32,8 @@ To assign Hardware Buttons to coordinates, use
 
 The index of the pressed button should be set in ``data->btn_id`` in the ``read_cb``.
 
-``data->state`` should also be set to either ``LV_INDEV_STATE_PRESSED`` or
-``LV_INDEV_STATE_RELEASED``.
+``data->state`` should also be set to either :cpp:enumerator:`LV_INDEV_STATE_PRESSED` or
+:cpp:enumerator:`LV_INDEV_STATE_RELEASED`.
 
 
 

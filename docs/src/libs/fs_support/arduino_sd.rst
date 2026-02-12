@@ -10,7 +10,7 @@ and read from, and write to them.  You can also move through directories on the 
 
 For a detailed introduction, see:
 
-- https://www.arduino.cc/reference/en/libraries/sd/
+- https://docs.arduino.cc/libraries/sd/
 
 
 Usage

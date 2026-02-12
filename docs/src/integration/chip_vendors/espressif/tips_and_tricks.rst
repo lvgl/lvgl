@@ -107,7 +107,21 @@ To fix that behavior just add to the `sdkconfig.defaults` the following option:
 
 .. code-block:: c
 
-        CONFIG_SPIRAM_SPEED_200M=y 
+        CONFIG_SPIRAM_SPEED_200M=y
+
+Additionally it is possible to set the PPA burst length in order to increase
+the memory bandwidth of a particular channel to get speed improvement of the 
+drawing operations, using the option:
+
+.. code-block:: c
+
+        CONFIG_LV_PPA_BURST_LENGTH=128
+
+There is a downside of increasing the burst length, if another piece of code from
+ESP-IDF is using a DMA2D channel which is shared to PPA, this increase may cause 
+slow-down on that channel consumer. Also mind the burst length value supported
+are the following: 128, 64, 32, 16, and 8 bytes, other values set will result
+in a build error.
 
 
 Enabling LVGL logs on IDF project

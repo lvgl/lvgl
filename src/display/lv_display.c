@@ -32,13 +32,25 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum {
+    LV_LOAD_SCREEN_RESULT_OK,
+    LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED,
+    LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED,
+    LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED,
+    LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED,
+} lv_load_screen_result_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static bool old_screen_deleted(lv_load_screen_result_t res);
+static bool new_screen_deleted(lv_load_screen_result_t res);
+
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
 static void update_resolution(lv_display_t * disp);
-static bool load_new_screen(lv_obj_t * scr);
+static void screen_event_delete_cb(lv_event_t * e);
+static lv_load_screen_result_t load_new_screen(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
 static void opa_scale_anim(void * obj, int32_t v);
 static void set_x_anim(void * obj, int32_t v);
@@ -76,7 +88,10 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
     disp->dpi              = LV_DPI_DEF;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
-
+#if LV_USE_EXT_DATA
+    disp->ext_data.free_cb = NULL;
+    disp->ext_data.data = NULL;
+#endif
 
 #if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && (LV_DRAW_SW_DRAW_UNIT_CNT != 0)
     disp->tile_cnt = LV_DRAW_SW_DRAW_UNIT_CNT;
@@ -226,6 +241,13 @@ void lv_display_delete(lv_display_t * disp)
 
     if(disp->layer_deinit) disp->layer_deinit(disp, disp->layer_head);
     lv_free(disp->layer_head);
+
+#if LV_USE_EXT_DATA
+    if(disp->ext_data.free_cb) {
+        disp->ext_data.free_cb(disp->ext_data.data);
+        disp->ext_data.data = NULL;
+    }
+#endif
 
     lv_free(disp);
 
@@ -762,9 +784,15 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
         d->prev_scr = d->act_scr;
         act_scr = d->scr_to_load; /*Active screen changed.*/
-
-        if(load_new_screen(d->scr_to_load)) {
+        lv_load_screen_result_t res = load_new_screen(d->scr_to_load);
+        if(res == LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED) {
+            return;
+        }
+        if(old_screen_deleted(res)) {
             d->prev_scr = NULL;
+        }
+        if(new_screen_deleted(res)) {
+            return;
         }
     }
 
@@ -790,8 +818,14 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
-        bool old_screen_deleted = load_new_screen(new_scr);
-        if(!old_screen_deleted && auto_del && act_scr) {
+        lv_load_screen_result_t res = load_new_screen(new_scr);
+        if(res == LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED) {
+            return;
+        }
+        if(new_screen_deleted(res)) {
+            d->act_scr = NULL;
+        }
+        if(!old_screen_deleted(res) && auto_del && act_scr) {
             lv_obj_delete(act_scr);
         }
         return;
@@ -1211,6 +1245,33 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
     }
 }
 
+void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point)
+{
+    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+
+    if(rotation == LV_DISPLAY_ROTATION_0) return;
+
+    const int32_t x = point->x;
+    const int32_t y = point->y;
+
+    switch(rotation) {
+        case LV_DISPLAY_ROTATION_90:
+            point->x = disp->ver_res - y - 1;
+            point->y = x;
+            break;
+        case LV_DISPLAY_ROTATION_180:
+            point->x = disp->hor_res - x - 1;
+            point->y = disp->ver_res - y - 1;
+            break;
+        case LV_DISPLAY_ROTATION_270:
+            point->x = y;
+            point->y = disp->hor_res - x - 1;
+            break;
+        default:
+            break;
+    }
+}
+
 uint32_t lv_display_get_draw_buf_size(lv_display_t * disp)
 {
     if(!disp) disp = lv_display_get_default();
@@ -1273,9 +1334,31 @@ int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
     return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
 
+#if LV_USE_EXT_DATA
+void lv_display_set_external_data(lv_display_t * disp, void * data, void (* free_cb)(void * data))
+{
+    if(!disp) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL display");
+        return;
+    }
+
+    disp->ext_data.data = data;
+    disp->ext_data.free_cb = free_cb;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static bool old_screen_deleted(lv_load_screen_result_t res)
+{
+    return res == LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED || res == LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED;
+}
+static bool new_screen_deleted(lv_load_screen_result_t res)
+{
+    return res == LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED || res == LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED;
+}
 
 static void update_resolution(lv_display_t * disp)
 {
@@ -1320,8 +1403,29 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
     return LV_OBJ_TREE_WALK_NEXT;
 }
 
-/* Returns true if the old screen was deleted while loading the new screen*/
-static bool load_new_screen(lv_obj_t * scr)
+static void screen_event_delete_cb(lv_event_t * e)
+{
+    lv_obj_t ** screen_var = lv_event_get_user_data(e);
+    *screen_var = NULL;
+}
+
+/**
+ * Load a new screen and report the result.
+ *
+ * @param scr  the screen object to load; must not be NULL
+ * @return     a value of ::lv_load_screen_result_t indicating the outcome:
+ *             - LV_LOAD_SCREEN_RESULT_OK: the new screen was loaded successfully;
+ *               both the old and new screens remain valid.
+ *             - LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED: the old screen was
+ *               deleted while loading the new screen, but the new screen remains valid.
+ *             - LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED: the new screen was
+ *               deleted during loading/unloading events; the old screen remains valid.
+ *             - LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED: both the old and new
+ *               screens were deleted during the operation.
+ *             - LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED: the display was deleted
+ *               while processing screen load/unload events.
+ */
+static lv_load_screen_result_t load_new_screen(lv_obj_t * scr)
 {
     /*scr must not be NULL, but d->act_scr might be*/
     LV_ASSERT_NULL(scr);
@@ -1331,27 +1435,60 @@ static bool load_new_screen(lv_obj_t * scr)
     LV_ASSERT_NULL(d);
 
     lv_obj_t * old_scr = d->act_scr;
-    bool old_screen_deleted = false;
+    /* Attach an event delete cb to the screen so we know if the screen is deleted during an event*/
     if(old_scr) {
-        if(lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL) == LV_RESULT_INVALID) {
-            old_screen_deleted = true;
+        lv_obj_add_event_cb(old_scr, screen_event_delete_cb, LV_EVENT_DELETE, &old_scr);
+    }
+    lv_obj_add_event_cb(scr, screen_event_delete_cb, LV_EVENT_DELETE, &scr);
+
+    if(old_scr) {
+        if(lv_display_send_event(d, LV_EVENT_SCREEN_UNLOAD_START, old_scr) == LV_RESULT_INVALID) {
+            return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+        }
+        if(old_scr && lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL) == LV_RESULT_INVALID) {
             old_scr = NULL;
         }
     }
-    lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+
+    if(lv_display_send_event(d, LV_EVENT_SCREEN_LOAD_START, scr) == LV_RESULT_INVALID) {
+        return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+    }
+
+    if(scr && lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL) == LV_RESULT_INVALID) {
+        scr = NULL;
+    }
 
     d->act_scr = scr;
     d->scr_to_load = NULL;
 
-    lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
+    if(scr && lv_display_send_event(d, LV_EVENT_SCREEN_LOADED, scr) == LV_RESULT_INVALID) {
+        return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+    }
+
+    if(scr && lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL) == LV_RESULT_INVALID) {
+        d->act_scr = NULL;
+        scr = NULL;
+    }
+
     if(old_scr) {
-        if(lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL) == LV_RESULT_INVALID) {
-            old_screen_deleted = true;
+        if(lv_display_send_event(d, LV_EVENT_SCREEN_UNLOADED, old_scr) == LV_RESULT_INVALID) {
+            return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+        }
+        if(old_scr && lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL) == LV_RESULT_INVALID) {
+            old_scr = NULL;
         }
     }
 
-    lv_obj_invalidate(scr);
-    return old_screen_deleted;
+    if(scr) {
+        lv_obj_invalidate(scr);
+        lv_obj_remove_event_cb(scr, screen_event_delete_cb);
+    }
+
+    if(!old_scr) {
+        return scr ? LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED : LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED;
+    }
+    lv_obj_remove_event_cb(old_scr, screen_event_delete_cb);
+    return scr ? LV_LOAD_SCREEN_RESULT_OK : LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED;
 }
 
 static void scr_load_anim_start(lv_anim_t * a)

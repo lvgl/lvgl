@@ -328,7 +328,7 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area);
 
 /**
  * Get the width occupied by the "parts" of the widget. E.g. the width of all columns of a table.
- * @param obj       pointer to an objects
+ * @param obj       pointer to an object
  * @return          the width of the virtually drawn content
  * @note            This size independent from the real size of the widget.
  *                  It just tells how large the internal ("virtual") content is.
@@ -337,12 +337,78 @@ int32_t lv_obj_get_self_width(const lv_obj_t * obj);
 
 /**
  * Get the height occupied by the "parts" of the widget. E.g. the height of all rows of a table.
- * @param obj       pointer to an objects
+ * @param obj       pointer to an object
  * @return          the width of the virtually drawn content
  * @note            This size independent from the real size of the widget.
  *                  It just tells how large the internal ("virtual") content is.
  */
 int32_t lv_obj_get_self_height(const lv_obj_t * obj);
+
+/**
+ * Get the style width actually used by the object after clamping the width within the min max range.
+ * @param obj       pointer to an object
+ * @return          the min/max/normal width set by `lv_obj_set_style_<min/max>_width()`
+ * @note            This is not the calculated size, so if the size was set as `LV_SIZE_CONTENT` or `LV_PCT()`
+ *                  then that value will be returned.
+ */
+int32_t lv_obj_get_style_clamped_width(lv_obj_t * obj);
+
+/**
+ * Get the style height actually used by the object after clamping the height within the min max range.
+ * @param obj       pointer to an object
+ * @return          the min/max/normal height set by `lv_obj_set_style_<min/max>_height()`
+ * @note            This is not the calculated size, so if the size was set as `LV_SIZE_CONTENT` or `LV_PCT()`
+ *                  then that value will be returned.
+ */
+int32_t lv_obj_get_style_clamped_height(lv_obj_t * obj);
+
+/**
+ * @brief Determine if the object's resolved width was limited by its minimum width constraint.
+ *
+ * This function reports whether, in the most recent layout / size calculation, the object's
+ * final (used) width had to be raised to satisfy a minimum width requirement.
+ *
+ * @param obj Pointer to a valid object.
+ * @return true  The computed width == the effective minimum width (i.e. it was clamped).
+ * @return false The width is larger than the minimum (not min‑clamped).
+ */
+bool lv_obj_is_width_min(lv_obj_t * obj);
+
+/**
+ * @brief Determine if the object's resolved height was limited by its minimum height constraint.
+ *
+ * This function reports whether, in the most recent layout / size calculation, the object's
+ * final (used) height had to be raised to satisfy a minimum height requirement.
+ *
+ * @param obj Pointer to a valid object.
+ * @return true  The computed height == the effective minimum height (i.e. it was clamped).
+ * @return false The height is larger than the minimum (not min‑clamped).
+ */
+bool lv_obj_is_height_min(lv_obj_t * obj);
+
+/**
+ * @brief Determine if the object's resolved width was limited by its maximum width constraint.
+ *
+ * This function reports whether, in the most recent layout / size calculation, the object's
+ * final (used) width had to be raised to satisfy a maximum width requirement.
+ *
+ * @param obj Pointer to a valid object.
+ * @return true  The computed width == the effective maximum width (i.e. it was clamped).
+ * @return false The width is smaller than the maximum (not min‑clamped).
+ */
+bool lv_obj_is_width_max(lv_obj_t * obj);
+
+/**
+ * @brief Determine if the object's resolved height was limited by its maximum height constraint.
+ *
+ * This function reports whether, in the most recent layout / size calculation, the object's
+ * final (used) height had to be raised to satisfy a maximum height requirement.
+ *
+ * @param obj Pointer to a valid object.
+ * @return true  The computed height == the effective maximum height (i.e. it was clamped).
+ * @return false The height is smaller than the maximum (not min‑clamped).
+ */
+bool lv_obj_is_height_max(lv_obj_t * obj);
 
 /**
  * Handle if the size of the internal ("virtual") content of an object has changed.
@@ -471,28 +537,24 @@ int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, 
  * @param obj Pointer to the LVGL object whose width is being calculated.
  * @param prop Which style width to calculate for. Valid values are: LV_STYLE_WIDTH, LV_STYLE_MIN_WIDTH, or
  * LV_STYLE_MAX_WIDTH.
- * @param content_width Pointer to an integer storing the object's content width. If negative and width is
- * `LV_SIZE_CONTENT`, it will be calculated.
  * @return The computed width for the object:
  * @note If the style width is a fixed value, that value is returned.
  * @note If the style width is `LV_SIZE_CONTENT`, the content width is calculated and returned.
  * @note If the style width is a `LV_PCT()`, the percentage is applied to the parent's width.
  */
-int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_width);
+int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop);
 
 /**
  * @brief Calculates the height in pixels of an LVGL object based on its style and parent for a given height `prop`.
  * @param obj Pointer to the LVGL object whose height is being calculated.
  * @param prop Which style height to calculate for. Valid values are: LV_STYLE_HEIGHT, LV_STYLE_MIN_HEIGHT, or
  * LV_STYLE_MAX_HEIGHT.
- * @param content_height Pointer to an integer storing the object's content height. If negative and height is
- * `LV_SIZE_CONTENT`, it will be calculated.
  * @return The computed height for the object:
  * @note If the style height is a fixed value, that value is returned.
  * @note If the style height is `LV_SIZE_CONTENT`, the content height is calculated and returned.
  * @note If the style height is a `LV_PCT()`, the percentage is applied to the parent's height.
  */
-int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_height);
+int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop);
 
 /**********************
  *      MACROS

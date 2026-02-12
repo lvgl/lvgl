@@ -585,9 +585,6 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
             return VG_LITE_BGR565;
 
-        case LV_COLOR_FORMAT_RGB565_SWAPPED:
-            return VG_LITE_RGB565;
-
         case LV_COLOR_FORMAT_ARGB8565:
             return VG_LITE_BGRA5658;
 

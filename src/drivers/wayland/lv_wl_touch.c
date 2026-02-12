@@ -68,6 +68,7 @@ lv_indev_t * lv_wayland_touch_create(void)
     lv_indev_t * indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, touch_read);
+    lv_indev_set_driver_data(indev, lv_wl_ctx.seat.touch);
 
     return indev;
 }

@@ -149,8 +149,8 @@ Keys
 
 .. _lv_keyboard_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/keyboard/index.rst
 

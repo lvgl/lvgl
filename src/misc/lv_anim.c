@@ -114,6 +114,10 @@ void lv_anim_init(lv_anim_t * a)
     a->repeat_cnt = 1;
     a->path_cb = lv_anim_path_linear;
     a->early_apply = 1;
+#if LV_USE_EXT_DATA
+    a->ext_data.free_cb = NULL;
+    a->ext_data.data = NULL;
+#endif
 }
 
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
@@ -555,6 +559,19 @@ void lv_anim_resume(lv_anim_t * a)
     a->run_round = state.anim_run_round;
 }
 
+#if LV_USE_EXT_DATA
+void lv_anim_set_external_data(lv_anim_t * anim, void * data, void (* free_cb)(void * data))
+{
+    if(!a) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL animation");
+        return;
+    }
+
+    anim->ext_data.data = data;
+    anim->ext_data.free_cb = free_cb;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -632,9 +649,11 @@ static void anim_timer(lv_timer_t * param)
                 }
 
                 if(!state.anim_list_changed) {
-                    /*Restore the original time to see is there is over time.
+                    /*Restore the original time to see if there is over time, ignoring silly values.
                      *Restore only if it wasn't changed in the `exec_cb` for some special reasons.*/
-                    if(a->act_time == act_time_before_exec) a->act_time = act_time_original;
+                    if(a->act_time == act_time_before_exec && act_time_original < a->duration * 2) {
+                        a->act_time = act_time_original;
+                    }
 
                     /*If the time is elapsed the animation is ready*/
                     if(a->act_time >= a->duration) {
@@ -680,6 +699,12 @@ static void anim_completed_handler(lv_anim_t * a)
         /*Call the callback function at the end*/
         if(a->completed_cb != NULL) a->completed_cb(a);
         if(a->deleted_cb != NULL) a->deleted_cb(a);
+#if LV_USE_EXT_DATA
+        if(a->ext_data.free_cb) {
+            a->ext_data.free_cb(a->ext_data.data);
+            a->ext_data.data = NULL;
+        }
+#endif
         lv_free(a);
     }
     /*If the animation is not deleted then restart it*/
@@ -797,6 +822,12 @@ static bool remove_concurrent_anims(const lv_anim_t * a_current)
             /*|| (a->custom_exec_cb && a->custom_exec_cb == a_current->custom_exec_cb)*/)) {
             lv_ll_remove(anim_ll_p, a);
             if(a->deleted_cb != NULL) a->deleted_cb(a);
+#if LV_USE_EXT_DATA
+            if(a->ext_data.free_cb) {
+                a->ext_data.free_cb(a->ext_data.data);
+                a->ext_data.data = NULL;
+            }
+#endif
             lv_free(a);
             /*Read by `anim_timer`. It need to know if a delete occurred in the linked list*/
             anim_mark_list_change();
@@ -818,5 +849,11 @@ static void remove_anim(void * a)
     lv_anim_t * anim = a;
     lv_ll_remove(anim_ll_p, a);
     if(anim->deleted_cb != NULL) anim->deleted_cb(anim);
+#if LV_USE_EXT_DATA
+    if(anim->ext_data.free_cb) {
+        anim->ext_data.free_cb(anim->ext_data.data);
+        anim->ext_data.data = NULL;
+    }
+#endif
     lv_free(a);
 }

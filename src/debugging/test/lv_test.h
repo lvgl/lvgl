@@ -21,6 +21,7 @@ extern "C" {
  *********************/
 #include "lv_test_indev.h"
 #include "lv_test_display.h"
+#include "lv_test_fs.h"
 #include "lv_test_helpers.h"
 #include "lv_test_screenshot_compare.h"
 #include "lv_test_indev_gesture.h"

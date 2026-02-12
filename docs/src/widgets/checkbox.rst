@@ -98,8 +98,8 @@ Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated t
 
 .. _lv_checkbox_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/checkbox/index.rst
 

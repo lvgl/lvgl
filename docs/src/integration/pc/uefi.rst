@@ -1,3 +1,5 @@
+.. _uefi:
+
 ====
 UEFI
 ====
@@ -5,8 +7,8 @@ UEFI
 Overview
 ********
 
-The **UEFI** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/uefi>`__ offers support
-for using LVGL to create UIs in UEFI environments.
+The **UEFI** display/input `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/uefi>`__
+offers support for using LVGL to create UIs in UEFI environments.
 
 Prerequisites
 *************

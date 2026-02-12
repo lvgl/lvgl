@@ -133,8 +133,8 @@ Symbols
 *******
 
 LVGL supports some predefined "symbols". A symbol is a specific Unicode character
-in a font with an icon-like image. The symbols have names like ``LV_SYMBOL_OK``,
-``LV_SYMBOL_HOME``, etc. See the full list of predefined symbols below:
+in a font with an icon-like image. The symbols have names like :c:macro:`LV_SYMBOL_OK`,
+:c:macro:`LV_SYMBOL_HOME`, etc. See the full list of predefined symbols below:
 
 .. image:: /_static/images/symbols.png
 
@@ -173,7 +173,7 @@ Using Your Custom Symbol
 ------------------------
 
 1. Convert the Unicode value to UTF8, for example on
-   `this site <http://www.ltg.ed.ac.uk/~richard/utf-8.cgi?input=f287&mode=hex>`__.
+   `this site <https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi?input=f287&mode=hex>`__.
    For ``0xf287`` the *Hex UTF-8 bytes* are ``EF 8A 87``.
 2. Create a ``#define`` string from the UTF8 values: ``#define MY_USB_SYMBOL "\xEF\x8A\x87"``
 3. Create a label and set the text. Eg. :cpp:expr:`lv_label_set_text(label, MY_USB_SYMBOL)`

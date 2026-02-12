@@ -131,17 +131,21 @@ lv_indev_t * lv_indev_create(void)
 
     indev->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
 
-    indev->disp                 = lv_display_get_default();
-    indev->type                 = LV_INDEV_TYPE_NONE;
-    indev->mode                 = LV_INDEV_MODE_TIMER;
-    indev->scroll_limit         = LV_INDEV_DEF_SCROLL_LIMIT;
-    indev->scroll_throw         = LV_INDEV_DEF_SCROLL_THROW;
-    indev->long_press_time      = LV_INDEV_DEF_LONG_PRESS_TIME;
-    indev->long_press_repeat_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
-    indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
-    indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
-    indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
-    indev->key_remap_cb         = NULL;
+    indev->disp                   = lv_display_get_default();
+    indev->type                   = LV_INDEV_TYPE_NONE;
+    indev->mode                   = LV_INDEV_MODE_TIMER;
+    indev->scroll_limit           = LV_INDEV_DEF_SCROLL_LIMIT;
+    indev->scroll_throw           = LV_INDEV_DEF_SCROLL_THROW;
+    indev->long_press_time        = LV_INDEV_DEF_LONG_PRESS_TIME;
+    indev->long_press_repeat_time = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
+    indev->gesture_min_distance   = LV_INDEV_DEF_GESTURE_LIMIT;
+    indev->gesture_min_velocity   = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
+    indev->rotary_sensitivity     = LV_INDEV_DEF_ROTARY_SENSITIVITY;
+    indev->key_remap_cb           = NULL;
+#if LV_USE_EXT_DATA
+    indev->ext_data.free_cb = NULL;
+    indev->ext_data.data = NULL;
+#endif
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_gesture_init(indev);
@@ -163,6 +167,14 @@ void lv_indev_delete(lv_indev_t * indev)
 
     /*Remove the input device from the list*/
     lv_ll_remove(indev_ll_head, indev);
+
+#if LV_USE_EXT_DATA
+    if(indev->ext_data.free_cb) {
+        indev->ext_data.free_cb(indev->ext_data.data);
+        indev->ext_data.data = NULL;
+    }
+#endif
+
     /*Free the memory of the input device*/
     lv_free(indev);
 }
@@ -400,6 +412,21 @@ void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw)
     if(indev == NULL) return;
 
     indev->scroll_throw = scroll_throw;
+}
+
+void lv_indev_set_gesture_min_distance(lv_indev_t * indev, uint8_t min_distance)
+{
+
+    if(indev == NULL) return;
+
+    indev->gesture_min_distance = min_distance;
+}
+
+void lv_indev_set_gesture_min_velocity(lv_indev_t * indev, uint8_t gesture_min_velocity)
+{
+    if(indev == NULL) return;
+
+    indev->gesture_min_velocity = gesture_min_velocity;
 }
 
 void * lv_indev_get_user_data(const lv_indev_t * indev)
@@ -685,6 +712,19 @@ void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap
     indev->key_remap_cb = remap_cb;
 }
 
+#if LV_USE_EXT_DATA
+void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data))
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't attach external user data and free_cb callback to a NULL indev");
+        return;
+    }
+
+    indev->ext_data.data = data;
+    indev->ext_data.free_cb = free_cb;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -696,20 +736,11 @@ void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap
  */
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    lv_display_t * disp = i->disp;
     /*Save the raw points so they can be used again in indev_read_core*/
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    if(disp->rotation == LV_DISPLAY_ROTATION_180 || disp->rotation == LV_DISPLAY_ROTATION_270) {
-        data->point.x = disp->hor_res - data->point.x - 1;
-        data->point.y = disp->ver_res - data->point.y - 1;
-    }
-    if(disp->rotation == LV_DISPLAY_ROTATION_90 || disp->rotation == LV_DISPLAY_ROTATION_270) {
-        int32_t tmp = data->point.y;
-        data->point.y = data->point.x;
-        data->point.x = disp->ver_res - tmp - 1;
-    }
+    lv_display_rotate_point(i->disp, &data->point);
 
     /*Simple sanity check*/
     if(data->point.x < 0) {
@@ -785,12 +816,16 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL);
 
     lv_group_t * g = i->group;
-    if(g == NULL) return;
 
-    indev_obj_act = lv_group_get_focused(g);
-    if(indev_obj_act == NULL) return;
+    if(g != NULL) {
+        indev_obj_act = lv_group_get_focused(g);
+        if(indev_obj_act == NULL) return;
+    }
+    else {
+        indev_obj_act = NULL;
+    }
 
-    const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+    const bool is_enabled = (g == NULL) || !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
     /*Save the previous state so we can detect state changes below and also set the last state now
      *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
@@ -803,8 +838,11 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_INFO("%" LV_PRIu32 " key is pressed", data->key);
         i->pr_timestamp = i->timestamp;
 
+        if(g == NULL) {
+            if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
+        }
         /*Move the focus on NEXT*/
-        if(data->key == LV_KEY_NEXT) {
+        else if(data->key == LV_KEY_NEXT) {
             lv_group_set_editing(g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
             lv_group_focus_next(g);
             if(indev_reset_check(i)) return;
@@ -842,14 +880,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Pressing*/
     else if(is_enabled && data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
 
-        if(data->key == LV_KEY_ENTER) {
+        if(g == NULL || data->key == LV_KEY_ENTER) {
             if(send_event(LV_EVENT_PRESSING, indev_act) == LV_RESULT_INVALID) return;
         }
 
         /*Long press time has elapsed?*/
         if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) >= i->long_press_time) {
             i->long_pr_sent = 1;
-            if(data->key == LV_KEY_ENTER) {
+            if(g == NULL || data->key == LV_KEY_ENTER) {
                 i->longpr_rep_timestamp = i->timestamp;
 
                 if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
@@ -862,7 +900,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->longpr_rep_timestamp = i->timestamp;
 
             /*Send LONG_PRESS_REP on ENTER*/
-            if(data->key == LV_KEY_ENTER) {
+            if(g == NULL || data->key == LV_KEY_ENTER) {
                 if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
             }
             /*Move the focus on NEXT again*/
@@ -890,7 +928,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
-        if(data->key == LV_KEY_ENTER) {
+        if(g == NULL || data->key == LV_KEY_ENTER) {
 
             if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
 
@@ -1247,8 +1285,11 @@ static void indev_proc_press(lv_indev_t * indev)
 
     /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != indev->pointer.act_obj) {
-        indev->pointer.last_point.x = indev->pointer.act_point.x;
-        indev->pointer.last_point.y = indev->pointer.act_point.y;
+        /*If no previous object was lost, overwrite the last point.*/
+        if(indev->pointer.act_obj == NULL) {
+            indev->pointer.last_point.x = indev->pointer.act_point.x;
+            indev->pointer.last_point.y = indev->pointer.act_point.y;
+        }
         indev->pointer.pressed = indev->prev_state == LV_INDEV_STATE_RELEASED;
 
         /*Without `LV_OBJ_FLAG_PRESS_LOCK` new widget can be found while pressing.*/
@@ -1753,8 +1794,8 @@ void indev_gesture(lv_indev_t * indev)
     indev->pointer.gesture_sum.x += indev->pointer.vect.x;
     indev->pointer.gesture_sum.y += indev->pointer.vect.y;
 
-    if((LV_ABS(indev->pointer.gesture_sum.x) > indev_act->gesture_limit) ||
-       (LV_ABS(indev->pointer.gesture_sum.y) > indev_act->gesture_limit)) {
+    if((LV_ABS(indev->pointer.gesture_sum.x) > indev_act->gesture_min_distance) ||
+       (LV_ABS(indev->pointer.gesture_sum.y) > indev_act->gesture_min_distance)) {
 
         indev->pointer.gesture_sent = 1;
 

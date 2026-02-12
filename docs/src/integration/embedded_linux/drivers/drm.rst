@@ -141,12 +141,10 @@ To enable this, set the following options in your ``lv_conf.h`` (or via Kconfig/
 .. code-block:: c
 
     #define LV_USE_LINUX_DRM             1
-    #define LV_USE_LINUX_DRM_GBM_BUFFERS 1
-    #define LV_LINUX_DRM_USE_EGL         1
     #define LV_USE_OPENGLES              1
     #define LV_USE_DRAW_OPENGLES         1   /* optional but recommended for performance */
 
-When ``LV_LINUX_DRM_USE_EGL`` is enabled, the DRM driver will automatically initialize EGL.  
+When :c:macro:`LV_USE_OPENGLES` is enabled, the DRM driver will automatically initialize EGL.
 No special setup is required beyond the basic DRM initialization shown in :ref:`linux_drm_basic_usage`.
 
 For a detailed overview of EGL usage and configuration, see :ref:`egl_driver`.
@@ -157,7 +155,7 @@ Selecting Display Mode
 
 .. note::
     Custom mode selection is currently only supported when using DRM with EGL 
-    (``LV_LINUX_DRM_USE_EGL`` enabled). When using DRM without EGL, the driver 
+    (:c:macro:`LV_USE_OPENGLES` enabled). When using DRM without EGL, the driver
     will always use the preferred display mode.
 
 By default, the DRM driver automatically selects the preferred display mode for the connected display. However, you can customize this behavior by providing a mode selection callback.

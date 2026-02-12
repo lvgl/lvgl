@@ -124,18 +124,18 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int
 
     /* Let the opengles texture driver handle the texture lifetime */
     ctx->texture.is_texture_owner = true;
-    lv_result_t res = lv_opengles_texture_create_draw_buffers(&ctx->texture, display);
+    /*Initialize the draw buffers and texture*/
+    lv_result_t res = lv_opengles_texture_reshape(&ctx->texture, display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create draw buffers");
         lv_opengles_egl_context_destroy(ctx->egl_ctx);
         ctx->egl_ctx = NULL;
         return LV_RESULT_INVALID;
     }
-    /* This creates the texture for the first time*/
-    lv_opengles_texture_reshape(display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
 
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
 
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
@@ -172,9 +172,14 @@ static void event_cb(lv_event_t * e)
                 lv_display_set_driver_data(display, NULL);
             }
             break;
-        case LV_EVENT_RESOLUTION_CHANGED:
-            lv_opengles_texture_reshape(display, lv_display_get_horizontal_resolution(display),
-                                        lv_display_get_vertical_resolution(display));
+        case LV_EVENT_RESOLUTION_CHANGED: {
+                lv_result_t res = lv_opengles_texture_reshape(&ctx->texture, display, lv_display_get_horizontal_resolution(display),
+                                                              lv_display_get_vertical_resolution(display));
+
+                if(res != LV_RESULT_OK) {
+                    LV_LOG_ERROR("Failed to resize display");
+                }
+            }
             break;
         default:
             return;
@@ -203,7 +208,7 @@ static inline void set_viewport(lv_display_t * display)
     lv_opengles_viewport(0, 0, disp_width, disp_height);
 }
 
-#if LV_USE_DRAW_OPENGLES
+#if LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
@@ -212,7 +217,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     if(lv_display_flush_is_last(disp)) {
         set_viewport(disp);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+#if LV_USE_DRAW_OPENGLES
         lv_opengles_render_display_texture(disp, false, true);
+#endif /*LV_USE_DRAW_OPENGLES*/
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
@@ -242,13 +249,18 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp_width, disp_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
                              ctx->texture.fb1));
 #elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_BGRA, GL_UNSIGNED_BYTE,
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                              ctx->texture.fb1));
 #else
 #error("Unsupported color format")
 #endif
 
-        lv_opengles_render_display_texture(disp, false, false);
+        lv_opengles_render_params_t params = {
+            .h_flip = false,
+            .v_flip = false,
+            .rb_swap = LV_COLOR_DEPTH == 32,
+        };
+        lv_opengles_render_display(disp, &params);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);

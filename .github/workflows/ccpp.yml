@@ -147,7 +147,7 @@ jobs:
         fi
     - name: Archive screenshot errors
       if: failure()
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: screenshot-errors-amd64
         path: |
@@ -173,7 +173,7 @@ jobs:
 
     - name: Upload untracked reference images
       if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: Untracked Reference Images
         path: untracked_ref_imgs.zip
@@ -186,7 +186,7 @@ jobs:
 
     - name: Upload coverage reports as artifacts
       if: always()
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: coverage-reports-${{ matrix.build_config }}
         path: tests/report/

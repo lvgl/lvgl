@@ -888,6 +888,48 @@ extern "C" {
                                  vg_lite_color_t color)
     {
         auto ctx = vg_lite_ctx::get_instance();
+
+        /**
+         * Special handling for DST_IN blend mode using ThorVG's CompositeMethod::InvAlphaMask.
+         * DST_IN (Sa * D): pixels inside the shape are cleared, pixels outside are preserved.
+         * Implementation details:
+         *   - The mask shape is filled with (255 - A(color)), used with InvAlphaMask.
+         *   - InvAlphaMask formula: dst = dst * (255 - mask_alpha) / 255.
+         *   - When color=0, mask alpha=255 inside the shape, so (255-255=0): inside is cleared; outside (255-0=255): preserved.
+         *   - The target buffer is cleared with lv_memzero before rendering, ensuring inside pixels are zeroed.
+         *   - This simulates the erase effect of VG_LITE_BLEND_DST_IN.
+         */
+        if(blend == VG_LITE_BLEND_DST_IN) {
+            /* Flush any pending operations first */
+            vg_lite_error_t error;
+            VG_LITE_RETURN_ERROR(vg_lite_finish());
+
+            TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
+
+            /* Create mask shape with white color (full alpha) */
+            auto mask = Shape::gen();
+            TVG_CHECK_RETURN_VG_ERROR(shape_append_path(mask, path, matrix));
+            TVG_CHECK_RETURN_VG_ERROR(mask->transform(matrix_conv(matrix)));
+            TVG_CHECK_RETURN_VG_ERROR(mask->fill(fill_rule_conv(fill_rule)));
+            TVG_CHECK_RETURN_VG_ERROR(mask->fill(255 - B(color), 255 - G(color), 255 - R(color), 255 - A(color)));
+
+            /* Create a Picture from current target buffer content */
+            auto picture = Picture::gen();
+            TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, target));
+
+            /**
+             * Since the contents of the target buffer have already been copied into the picture,
+             * we can now clean up the target buffer in preparation for rendering the masked image.
+             */
+            lv_memzero(target->memory, target->stride * target->height);
+
+            /* Render masked picture back */
+            TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(mask), CompositeMethod::InvAlphaMask));
+            TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
+
+            return VG_LITE_SUCCESS;
+        }
+
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
         auto shape = Shape::gen();

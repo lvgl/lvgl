@@ -39,7 +39,7 @@
  **********************/
 
 #if LV_USE_OPENGLES_DEBUG
-void GLClearError()
+void GLClearError(void)
 {
     while(glGetError() != GL_NO_ERROR);
 }

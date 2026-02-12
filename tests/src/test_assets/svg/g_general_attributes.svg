@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width='400' height='400'>
+    <defs>
+        <linearGradient id='ggg1' x1='0%' y1='0%' x2='100%' y2='0%'>
+            <stop offset='0' stop-color='red' />
+            <stop offset='0.5' stop-color='green' />
+            <stop offset='1' stop-color='blue' />
+        </linearGradient>
+    </defs>
+
+    <g id='group1' fill='red'>
+            <rect x='0' y='115' width='50' height='50' />
+            <text x='0' y='110' fill='black' font-size='8'>color name</text>
+    </g>
+    <g fill='#ff0000'>
+            <rect x='51' y='115' width='50' height='50' />
+            <text x='51' y='110' fill='black' font-size='8'>hex</text>
+    </g>
+    <g fill='rgb(255, 0, 0)'>
+            <rect x='102' y='115' width='50' height='50' />
+            <text x='102' y='110' fill='black' font-size='8'>RGB</text>
+    </g>
+    <g fill='rgba(255, 0, 0, 0.5)'>
+            <rect x='153' y='115' width='50' height='50' />
+            <text x='153' y='110' fill='black' font-size='8'>RGBA</text>
+    </g>
+    <g fill='none'>
+            <rect x='204' y='115' width='50' height='50' />
+            <text x='204' y='110' fill='black' font-size='8'>none</text>
+    </g>
+    <g fill='url(#ggg1)'>
+            <rect x='255' y='115' width='50' height='50' />
+            <text x='255' y='110' fill='black' font-size='8'>gradient</text>
+    </g>
+
+    <g fill='none'  stroke='black'>
+            <rect x='0' y='180' width='50' height='50' />
+            <text x='0' y='175' fill='black' font-size='16'>solid</text>
+    </g>
+    <g fill='none' stroke='url(#ggg1)'>
+            <rect x='55' y='180' width='50' height='50' />
+            <text x='55' y='175' fill='black' font-size='16'>gradient</text>
+    </g>
+
+    <g transform='translate(0,50)' >
+
+            <rect x='20' y='250' width='50' height='50' />
+            <text x='20' y='245' fill='black' font-size='16'>translate</text>
+    </g>
+    <g transform='rotate(300, 100, 100)'>
+            <rect x='55' y='250' width='50' height='50' />
+            <text x='55' y='245' fill='black' font-size='16'>rotate</text>
+    </g>
+    <g transform='scale(1.4, 1.4)'>
+            <rect x='110' y='270' width='50' height='50' />
+            <text x='110' y='265' fill='black' font-size='16'>scale</text>
+    </g>
+    <g transform='skewX(10)'>
+            <rect x='220' y='250' width='50' height='50' />
+            <text x='220' y='245' fill='black' font-size='16'>X skew</text>
+    </g>
+    <g transform='skewY(20)'>
+            <rect x='280' y='250' width='50' height='50' />
+            <text x='280' y='245' fill='black' font-size='16'>Y skew</text>
+    </g>
+    <g transform='matrix(1, 0, 0.3640, 1, 0, 0)'>
+            <rect x='350' y='250' width='50' height='50' />
+            <text x='350' y='245' fill='black' font-size='16'>matrix</text>
+    </g>
+    <g id='xxxx' fill='pink' stroke='red' transform='matrix(1, 0, 0.3640, 1, 0, 0)'>
+            <rect x='0' y='300' width='50' height='50' />
+            <text x='0' y='295' fill='black' font-size='16'>mixed</text>
+    </g>
+</svg>

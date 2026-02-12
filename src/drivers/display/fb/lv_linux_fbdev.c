@@ -17,6 +17,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <time.h>
+#include <errno.h>
 
 #if LV_LINUX_FBDEV_BSD
     #include <sys/fcntl.h>
@@ -379,35 +380,40 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     }
 
     lv_area_t display_area;
-    /* vinfo.xres and vinfo.yres will already be 1 less than the actual resolution. i.e: 1023x767 on a 1024x768 screen */
-    lv_area_set(&display_area, 0, 0, dsc->vinfo.xres, dsc->vinfo.yres);
+    lv_area_set(&display_area, 0, 0, dsc->vinfo.xres - 1, dsc->vinfo.yres - 1);
 
-    /* TODO: Consider rendering the clipped area*/
-    if(!lv_area_is_in(area, &display_area, 0)) {
+    /* Clip the area to the display bounds */
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, area, &display_area)) {
+        /* No intersection at all, nothing to render */
         lv_display_flush_ready(disp);
         return;
     }
 
     uint32_t fb_pos =
-        (area->x1 + dsc->vinfo.xoffset) * px_size +
-        (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
+        (clipped_area.x1 + dsc->vinfo.xoffset) * px_size +
+        (clipped_area.y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
+    const int32_t w = lv_area_get_width(&clipped_area);
 
-
-    const int32_t w = lv_area_get_width(area);
     if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
         uint32_t color_pos =
-            area->x1 * px_size +
-            area->y1 * disp->hor_res * px_size;
-
-        for(int32_t y = area->y1; y <= area->y2; y++) {
+            (clipped_area.x1 - disp->offset_x) * px_size +
+            (clipped_area.y1 - disp->offset_y) * disp->hor_res * px_size;
+        for(int32_t y = clipped_area.y1; y <= clipped_area.y2; y++) {
             write_to_fb(dsc, fb_pos, &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
             color_pos += disp->hor_res * px_size;
         }
     }
     else {
-        const int32_t stride = lv_draw_buf_width_to_stride(w, cf);
-        for(int32_t y = area->y1; y <= area->y2; y++) {
+        /* Calculate offset into color_p buffer based on original area */
+        const int32_t x_offset = clipped_area.x1 - area->x1;
+        const int32_t y_offset = clipped_area.y1 - area->y1;
+        const int32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
+
+        color_p += y_offset * stride + x_offset * px_size;
+
+        for(int32_t y = clipped_area.y1; y <= clipped_area.y2; y++) {
             write_to_fb(dsc, fb_pos, color_p, w * px_size);
             fb_pos += dsc->finfo.line_length;
             color_p += stride;

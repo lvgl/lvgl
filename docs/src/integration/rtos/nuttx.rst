@@ -75,7 +75,7 @@ How to get started with NuttX and LVGL?
 ***************************************
 
 There are many boards in the `NuttX
-mainline <https://github.com/apache/incubator-nuttx>`__ with support for
+mainline <https://github.com/apache/nuttx>`__ with support for
 LVGL. Let's use the
 `STM32F429IDISCOVERY <https://www.st.com/en/evaluation-tools/32f429idiscovery.html>`__
 as an example because it is a very popular board.
@@ -239,8 +239,8 @@ reasonable as NuttX fully implements these standard library APIs. Whether or
 not you choose to use NuttX's ``malloc`` depends on whether you want LVGL
 to allocate from the NuttX global heap or use its own.
 
-Where is ``LV_OS_NUTTX``?
--------------------------
+Where is :c:macro:`LV_OS_NUTTX`?
+--------------------------------
 
 NuttX tries to be POSIX compliant where possible, meaning it supports
 pthreads (POSIX threads). To enable OS features in LVGL on NuttX,
@@ -303,7 +303,7 @@ Where can I find more information?
 -  This blog post: `LVGL on
    LPCXpresso54628 <https://acassis.wordpress.com/2018/07/19/running-nuttx-on-lpcxpresso54628-om13098/>`__
 -  NuttX mailing list: `Apache NuttX Mailing
-   List <http://nuttx.incubator.apache.org/community/>`__
+   List <https://nuttx.incubator.apache.org/community/>`__
 
 
 .. Comment:  The above blank line is necessary for Sphinx to not complain,

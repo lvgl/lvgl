@@ -120,8 +120,9 @@ will be shown on the left, otherwise on the right.
 Show selected
 -------------
 
-The main part can either show the selected item or static text. If
-static is set with :cpp:expr:`lv_dropdown_set_text(dropdown, "Some text")` it
+The main part can either show the selected item or fixed text. If
+fixed text is set with :cpp:expr:`lv_dropdown_set_text(dropdown, "Some text")`
+or :cpp:expr:`lv_dropdown_set_text_static(dropdown, "Some text")` it
 will be shown regardless of the selected item. If the text is ``NULL``
 the selected option is displayed on the button.
 
@@ -183,8 +184,8 @@ Keys
 
 .. _lv_dropdown_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/dropdown/index.rst
 

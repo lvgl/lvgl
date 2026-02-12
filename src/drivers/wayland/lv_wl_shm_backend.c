@@ -11,6 +11,7 @@
 
 #if LV_WAYLAND_USE_SHM
 
+#include "../../draw/sw/lv_draw_sw_utils.h"
 #include "../../display/lv_display_private.h"
 #include <errno.h>
 #include <fcntl.h>
@@ -41,6 +42,7 @@ typedef struct {
 typedef struct {
     void * mmap_ptr;
     size_t mmap_size;
+    uint8_t * rotated_buf;
     struct wl_shm_pool * pool;
     lv_wl_buffer_t buffers[LV_WL_SHM_BUF_COUNT];
     size_t curr_wl_buffer_idx;
@@ -65,8 +67,8 @@ static int create_shm_file(size_t size);
 static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 
 static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx, lv_display_t * display, int32_t width,
-                                                          int32_t height, size_t buf_count);
-static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata);
+                                                          int32_t height);
+static void shm_delete_display_data(lv_wl_shm_display_data_t * ddata);
 
 static void frame_done(void * data, struct wl_callback * callback, uint32_t time);
 static void buffer_release(void * data, struct wl_buffer * wl_buffer);
@@ -117,7 +119,7 @@ static void buffer_release(void * data, struct wl_buffer * wl_buffer)
     }
 
     if(ddata->delete_on_release) {
-        shm_destroy_display_data(ddata);
+        shm_delete_display_data(ddata);
     }
 }
 
@@ -158,8 +160,10 @@ static void shm_deinit(void * backend_ctx)
     }
 }
 
-static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx, lv_display_t * display, int32_t width,
-                                                          int32_t height, size_t buf_count)
+static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
+                                                          lv_display_t * display,
+                                                          int32_t width,
+                                                          int32_t height)
 {
     lv_wl_shm_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
     if(!ddata) {
@@ -167,6 +171,7 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
         return NULL;
     }
 
+    const lv_display_rotation_t rotation = lv_display_get_rotation(display);
     lv_color_format_t cf = lv_display_get_color_format(display);
     ddata->shm_cf = lv_cf_to_shm_cf(cf);
 
@@ -177,30 +182,37 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
         ddata->shm_cf = WL_SHM_FORMAT_XRGB8888;
     }
 
-    const uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
-    const size_t buf_size = stride * height;
+    const bool needs_rotation = rotation != LV_DISPLAY_ROTATION_0;
+    const int32_t phy_width = lv_display_get_original_horizontal_resolution(display);
+    const int32_t phy_height = lv_display_get_original_vertical_resolution(display);
+    const uint32_t phy_stride = lv_draw_buf_width_to_stride(phy_width, cf);
+    const size_t phy_buf_size = phy_stride * phy_height;
 
-    ddata->mmap_size = buf_size * buf_count;
+    ddata->mmap_size = phy_buf_size * LV_WL_SHM_BUF_COUNT;
 
     ddata->fd = create_shm_file(ddata->mmap_size);
     if(ddata->fd < 0) {
         LV_LOG_ERROR("Failed to create shm file");
         goto shm_file_err;
     }
+
     ddata->mmap_ptr = mmap(NULL, ddata->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, ddata->fd, 0);
     if(ddata->mmap_ptr == MAP_FAILED) {
         LV_LOG_ERROR("Failed to map shm file: %s", strerror(errno));
         goto mmap_err;
     }
+
     ddata->pool = wl_shm_create_pool(ctx->shm, ddata->fd, ddata->mmap_size);
     if(!ddata->pool) {
         LV_LOG_ERROR("Failed to create wl_shm_pool");
         goto shm_pool_err;
     }
 
-    for(size_t i = 0; i < buf_count; ++i) {
-        size_t offset = i * buf_size;
-        ddata->buffers[i].wl_buffer = wl_shm_pool_create_buffer(ddata->pool, offset, width, height, stride, ddata->shm_cf);
+    for(size_t i = 0; i < LV_WL_SHM_BUF_COUNT; ++i) {
+        size_t offset = i * phy_buf_size;
+        ddata->buffers[i].wl_buffer =
+            wl_shm_pool_create_buffer(ddata->pool, offset, phy_width, phy_height, phy_stride, ddata->shm_cf);
+
         if(!ddata->buffers[i].wl_buffer) {
             LV_LOG_ERROR("Failed to create wl_buffer %zu", i);
             goto pool_buffer_err;
@@ -209,11 +221,30 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
         ddata->buffers[i].busy = false;
     }
 
-    lv_display_set_buffers(display, ddata->mmap_ptr, (uint8_t *)ddata->mmap_ptr + buf_size,
-                           buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+    if(needs_rotation) {
+        const uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
+        const size_t buf_size = stride * height;
+
+        ddata->rotated_buf = lv_malloc(buf_size);
+        LV_ASSERT_MALLOC(ddata->rotated_buf);
+        if(!ddata->rotated_buf) {
+            LV_LOG_ERROR("Failed to allocate LVGL render buffer");
+            goto rotated_buf_err;
+        }
+
+        lv_display_set_buffers(display, ddata->rotated_buf, NULL,
+                               buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+    }
+    else {
+        lv_display_set_buffers(display, ddata->mmap_ptr,
+                               (uint8_t *)ddata->mmap_ptr + phy_buf_size,
+                               phy_buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+    }
 
     return ddata;
 
+    lv_free(ddata->rotated_buf);
+rotated_buf_err:
 pool_buffer_err:
     wl_shm_pool_destroy(ddata->pool);
 shm_pool_err:
@@ -225,7 +256,7 @@ shm_file_err:
     return NULL;
 }
 
-static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata)
+static void shm_delete_display_data(lv_wl_shm_display_data_t * ddata)
 {
     for(size_t i = 0; i < LV_WL_SHM_BUF_COUNT; ++i) {
         lv_wl_buffer_t * buffer = &ddata->buffers[i];
@@ -257,6 +288,10 @@ static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata)
         close(ddata->fd);
         ddata->fd = -1;
     }
+    if(ddata->rotated_buf) {
+        lv_free(ddata->rotated_buf);
+        ddata->rotated_buf = NULL;
+    }
 
     LV_LOG_INFO("Deleted buffers and display data");
     lv_free(ddata);
@@ -277,7 +312,7 @@ static void * shm_init_display(void * backend_ctx, lv_display_t * display, int32
         return NULL;
     }
 
-    lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, width, height, LV_WL_SHM_BUF_COUNT);
+    lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, width, height);
     if(!ddata) {
         LV_LOG_ERROR("Failed to allocate data for display");
         return NULL;
@@ -296,7 +331,7 @@ static void * shm_resize_display(void * backend_ctx, lv_display_t * display)
     const int32_t new_width = lv_display_get_horizontal_resolution(display);
     const int32_t new_height = lv_display_get_vertical_resolution(display);
 
-    lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, new_width, new_height, LV_WL_SHM_BUF_COUNT);
+    lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, new_width, new_height);
 
     if(!ddata) {
         LV_LOG_ERROR("Failed to allocate data for new display resolution");
@@ -304,7 +339,7 @@ static void * shm_resize_display(void * backend_ctx, lv_display_t * display)
     }
 
     lv_wl_shm_display_data_t * curr_ddata = lv_wayland_get_backend_display_data(display);
-    shm_destroy_display_data(curr_ddata);
+    shm_delete_display_data(curr_ddata);
     return ddata;
 }
 
@@ -316,7 +351,7 @@ static void shm_deinit_display(void * backend_ctx, lv_display_t * display)
     if(!ddata) {
         return;
     }
-    shm_destroy_display_data(ddata);
+    shm_delete_display_data(ddata);
 }
 
 static int create_shm_file(size_t size)
@@ -351,10 +386,8 @@ static void shm_global_handler(void * backend_ctx, struct wl_registry * registry
         ctx->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
     }
 }
-
 static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    LV_UNUSED(px_map);
     lv_wl_shm_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
     struct wl_surface * surface = lv_wayland_get_window_surface(disp);
     if(!surface) {
@@ -362,32 +395,58 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         return;
     }
 
-    int32_t w = lv_area_get_width(area);
-    int32_t h = lv_area_get_height(area);
-    lv_color_format_t cf = lv_display_get_color_format(disp);
+    const lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    const lv_color_format_t cf = lv_display_get_color_format(disp);
+
     /* When using ARGB8888, the compositor expects premultiplied ARGB8888 so premultiply it here*/
     if(ddata->shm_cf == WL_SHM_FORMAT_ARGB8888 && cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
+        const int32_t w = lv_area_get_width(area);
+        const int32_t h = lv_area_get_height(area);
         size_t index = 0;
-        for(int32_t y = area->y1; y <= area->y2; ++y) {
-            for(int32_t x = area->x1; x <= area->x2; ++x) {
+        for(int32_t y = 0; y < h; ++y) {
+            for(int32_t x = 0; x < w; ++x) {
                 lv_color_premultiply((lv_color32_t *) px_map + (index++));
             }
         }
     }
 
-    wl_surface_damage(surface, area->x1, area->y1, w, h);
+    /* If we have rotation, copy from rotated_buf to Wayland buffer */
+    if(rotation != LV_DISPLAY_ROTATION_0) {
+        const int32_t hor_res = lv_display_get_horizontal_resolution(disp);
+        const int32_t ver_res = lv_display_get_vertical_resolution(disp);
+        const uint32_t src_stride = lv_draw_buf_width_to_stride(hor_res, cf);
+
+        const int32_t phy_width = lv_display_get_original_horizontal_resolution(disp);
+        const int32_t phy_height = lv_display_get_original_vertical_resolution(disp);
+        const uint32_t dest_stride = lv_draw_buf_width_to_stride(phy_width, cf);
+
+        size_t buf_size = dest_stride * phy_height;
+        uint8_t * wl_buf = (uint8_t *)ddata->mmap_ptr + (ddata->curr_wl_buffer_idx * buf_size);
+
+        lv_draw_sw_rotate(ddata->rotated_buf, wl_buf, hor_res, ver_res,
+                          src_stride, dest_stride, rotation, cf);
+
+        wl_surface_damage(surface, 0, 0, phy_width, phy_height);
+    }
+    else {
+        const int32_t w = lv_area_get_width(area);
+        const int32_t h = lv_area_get_height(area);
+        wl_surface_damage(surface, area->x1, area->y1, w, h);
+    }
+
     if(!lv_display_flush_is_last(disp)) {
         lv_display_flush_ready(disp);
         return;
     }
 
-    struct wl_callback * callback = wl_surface_frame(surface);
-    wl_callback_add_listener(callback, &frame_listener, disp);
-
     lv_wl_buffer_t * buffer = &ddata->buffers[ddata->curr_wl_buffer_idx];
     if(buffer->busy) {
         LV_LOG_WARN("Failed to acquire a non-busy buffer");
     }
+
+    struct wl_callback * callback = wl_surface_frame(surface);
+    wl_callback_add_listener(callback, &frame_listener, disp);
+
     wl_surface_attach(surface, buffer->wl_buffer, 0, 0);
     wl_surface_commit(surface);
 

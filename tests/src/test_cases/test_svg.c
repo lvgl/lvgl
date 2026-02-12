@@ -21,6 +21,7 @@ void setUp(void)
 
 void tearDown(void)
 {
+    lv_obj_clean(lv_screen_active());
 }
 
 void testSvgParser(void)
@@ -58,6 +59,33 @@ void testNodeTree(void)
 
     lv_svg_node_delete(node2);
     lv_svg_node_delete(root);
+}
+
+void test_property_is_inherited(void)
+{
+
+    /* Circle should not be filled as parent node has 'fill="none"' attribute*/
+    const char * svg =
+        "<svg width=\"200\" height=\"200\" viewBox=\"0 0 200 200\" fill=\"none\">\n"
+        "<circle cx=\"100\" cy=\"100\" r=\"50\" stroke=\"black\"/>\n"
+        "</svg>";
+
+    static lv_image_dsc_t svg_dsc;
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 200;
+    svg_dsc.header.h = 200;
+    svg_dsc.data_size = lv_strlen(svg);
+    svg_dsc.data = (const uint8_t *) svg;
+
+    lv_obj_t * svg_img = lv_image_create(lv_screen_active());
+    lv_image_set_src(svg_img, &svg_dsc);
+    lv_obj_center(svg_img);
+
+#ifndef NON_AMD64_BUILD
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.lp64.png");
+#else
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.lp32.png");
+#endif
 }
 
 void testSvgElement(void)
@@ -218,6 +246,43 @@ void testSvgElement(void)
     svg_node_ar = lv_svg_load_data(svg_ar10, lv_strlen(svg_ar10));
     TEST_ASSERT_EQUAL(lv_array_size(&svg_node_ar->attrs), 1);
     lv_svg_node_delete(svg_node_ar);
+}
+void test_inline_styles(void)
+{
+    const char * svg_inline_style =
+        "<svg width=\"65px\" height=\"65px\" viewBox=\"0 0 65 65\">"
+        "<path "
+        "style=\"fill:none;"
+        "stroke-width:6;"
+        "stroke-linecap:round;"
+        "stroke-linejoin:miter;"
+        "stroke:rgb(0%,0%,0%);"
+        "stroke-opacity:1;"
+        "stroke-miterlimit:10;\" "
+        "d=\"M 12.603125 39.39375 "
+        "L 21.725 30.271875 "
+        "M 30.903125 44.3 "
+        "L 27.565625 31.8375 "
+        "M 44.303125 30.9 "
+        "L 31.840625 27.5625 "
+        "M 39.396875 12.6 "
+        "L 30.275 21.721875 "
+        "M 21.096875 7.69375 "
+        "L 24.434375 20.15625 "
+        "M 7.696875 21.09375 "
+        "L 20.15625 24.43125\"/>"
+        "</svg>";
+
+    static lv_image_dsc_t svg_dsc;
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 65;
+    svg_dsc.header.h = 65;
+    svg_dsc.data_size = lv_strlen(svg_inline_style);
+    svg_dsc.data = (const uint8_t *) svg_inline_style;
+    lv_obj_t * svg = lv_image_create(lv_screen_active());
+    lv_image_set_src(svg, &svg_dsc);
+    lv_obj_center(svg);
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_1.png")
 }
 
 void testPolylineElement(void)

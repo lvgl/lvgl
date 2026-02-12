@@ -82,8 +82,8 @@ No *Keys* are processed by List Widgets.
 
 .. _lv_list_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/list/index.rst
 

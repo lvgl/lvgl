@@ -25,7 +25,6 @@
 #include "libs/ffmpeg/lv_ffmpeg.h"
 #include "libs/freetype/lv_freetype.h"
 #include "libs/fsdrv/lv_fsdrv.h"
-#include "libs/gif/lv_gif.h"
 #include "libs/tjpgd/lv_tjpgd.h"
 #include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
@@ -35,13 +34,13 @@
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs_private.h"
+#include "widgets/gif/lv_gif.h"
 #include "widgets/span/lv_span.h"
 #include "themes/simple/lv_theme_simple.h"
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
 #include "debugging/sysmon/lv_sysmon_private.h"
 #include "others/translation/lv_translation.h"
-#include "xml/lv_xml.h"
 #include "drivers/wayland/lv_wayland_private.h"
 
 #if LV_USE_SVG
@@ -416,10 +415,6 @@ void lv_init(void)
     lv_translation_init();
 #endif
 
-#if LV_USE_XML
-    lv_xml_init();
-#endif
-
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");
@@ -526,10 +521,6 @@ void lv_deinit(void)
 
 #if LV_USE_OBJ_ID && LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
-#endif
-
-#if LV_USE_XML
-    lv_xml_deinit();
 #endif
 
 #if LV_USE_TRANSLATION

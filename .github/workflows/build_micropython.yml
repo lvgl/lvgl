@@ -96,7 +96,7 @@ jobs:
         python3 user_modules/lv_binding_micropython/lvgl/tests/micropy_test/__init__.py --artifact-path=user_modules/lv_binding_micropython/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-lvgl/micropython
 
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: test-artifacts
         path: user_modules/lv_binding_micropython/lvgl/tests/micropy_test/artifacts

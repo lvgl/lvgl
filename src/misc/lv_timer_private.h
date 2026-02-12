@@ -16,6 +16,10 @@ extern "C" {
 
 #include "lv_timer.h"
 
+#if LV_USE_EXT_DATA
+#include "../lvgl_private.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -28,6 +32,9 @@ extern "C" {
  * Descriptor of a lv_timer
  */
 struct _lv_timer_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     uint32_t period;           /**< How often the timer should run */
     uint32_t last_run;         /**< Last time the timer ran */
     lv_timer_cb_t timer_cb;    /**< Timer function */

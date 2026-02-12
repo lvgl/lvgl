@@ -100,6 +100,7 @@ static const struct _lv_svg_attr_map {
     {"d", 1, LV_SVG_ATTR_D},
     {"pathLength", 10, LV_SVG_ATTR_PATH_LENGTH},
     {"xlink:href", 10, LV_SVG_ATTR_XLINK_HREF},
+    {"style", 5, LV_SVG_ATTR_STYLE},
     {"fill", 4, LV_SVG_ATTR_FILL},
     {"fill-rule", 9, LV_SVG_ATTR_FILL_RULE},
     {"fill-opacity", 12, LV_SVG_ATTR_FILL_OPACITY},
@@ -420,6 +421,22 @@ static bool _is_number_begin(char ch)
     return ch != 0 && strchr("0123456789+-.", ch) != NULL;
 }
 
+static const char * _next_semicolon(const char * str, const char * str_end)
+{
+    while((str < str_end) && *str != ';') {
+        ++str;
+    }
+    return str;
+}
+
+static const char * _next_colon(const char * str, const char * str_end)
+{
+    while((str < str_end) && *str != ':') {
+        ++str;
+    }
+    return str;
+}
+
 static const char * _skip_space(const char * str, const char * str_end)
 {
     while((str < str_end) && isspace((unsigned char) * str)) {
@@ -511,7 +528,7 @@ static const char * _parse_color(const char * str, const char * str_end, uint32_
     }
 
     uint32_t len = ptr - str;
-    uint8_t r = 0, g = 0, b = 0;
+    uint32_t r = 0, g = 0, b = 0;
 
     if(*str == '#') {
         if(len == 4) { // three digit hex format '#rgb'
@@ -547,7 +564,7 @@ static const char * _parse_color(const char * str, const char * str_end, uint32_
         str += 5;
         bool valid_color = true;
         float vals[3] = {0};
-        uint8_t alpha = 255;
+        uint32_t alpha = 255;
 
         for(int i = 0; i < 3; i++) {
             str = _parse_number(str, ptr, &vals[i]);
@@ -2091,148 +2108,223 @@ static void _process_anim_attr_values(lv_svg_node_t * node, lv_svg_attr_type_t t
 
 #endif
 
+static void create_tokens_from_style_attr(lv_array_t * result, _lv_svg_token_attr_t * tok_attr)
+{
+    lv_svg_attr_type_t type = _get_svg_attr_type(tok_attr->name_start, tok_attr->name_end);
+    LV_ASSERT(type == LV_SVG_ATTR_STYLE);
+    tok_attr->value_start = _skip_space(tok_attr->value_start, tok_attr->value_end);
+
+    /*Generate extra tokens from a style attribute (eg: style="fill:none;stroke-width:6;")*/
+    while(tok_attr->value_end - tok_attr->value_start > 0) {
+        const char * name_start = tok_attr->value_start;
+        /*colon separates attribute name from value*/
+        const char * colon = _next_colon(tok_attr->value_start, tok_attr->value_end);
+        if(colon == tok_attr->value_end) {
+            /* No colon found, invalid style property */
+            break;
+        }
+        /* semicolon marks the end of the value*/
+        const char * semicolon = _next_semicolon(colon, tok_attr->value_end);
+
+        const char * value_start = colon + 1;
+        if(value_start >= semicolon) {
+            /* Empty value like "fill:;" or "fill:" at end*/
+            tok_attr->value_start = _skip_space(semicolon + 1, tok_attr->value_end);
+            continue;
+        }
+
+        _lv_svg_token_attr_t new_attr = {
+            .name_start = name_start,
+            .name_end = colon,
+            .value_start = value_start,
+            .value_end = semicolon,
+
+        };
+        tok_attr->value_start = _skip_space(semicolon + 1, tok_attr->value_end);
+#if LV_USE_SVG_DEBUG
+        LV_LOG_INFO("'%.*s': '%.*s'\n",
+                    (int)(colon - name_start), name_start,
+                    (int)(semicolon - value_start), value_start);
+#endif
+        lv_array_push_back(result, &new_attr);
+    }
+}
+static void _process_attr_tag(_lv_svg_parser_t * parser, lv_svg_node_t * node, _lv_svg_token_attr_t * tok_attr)
+{
+    lv_svg_attr_type_t type = _get_svg_attr_type(tok_attr->name_start, tok_attr->name_end);
+
+    /* Style attributes are processed separately and expanded into individual
+     * property attributes (e.g., style="fill:red;stroke:blue" becomes separate
+     * fill and stroke attributes). Skip processing the style attribute itself
+     * since its constituent properties have already been added to the token array */
+    if(type == LV_SVG_ATTR_STYLE) {
+        return;
+    }
+
+    tok_attr->value_start = _skip_space(tok_attr->value_start, tok_attr->value_end);
+    uint32_t value_len = tok_attr->value_end - tok_attr->value_start;
+    if(value_len == 0) {
+        return; // skip empty value attribute
+    }
+
+    if(type == LV_SVG_ATTR_XML_ID || type == LV_SVG_ATTR_ID) { // get xml:id
+        char * str = lv_malloc(value_len + 1);
+        LV_ASSERT_MALLOC(str);
+        lv_memcpy(str, tok_attr->value_start, value_len);
+        str[value_len] = '\0';
+        node->xml_id = str;
+        return;
+    }
+
+    switch(type) {
+        case LV_SVG_ATTR_VERSION:
+        case LV_SVG_ATTR_BASE_PROFILE:
+            _process_string(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_VIEWBOX:
+            _process_view_box(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_PRESERVE_ASPECT_RATIO:
+            _process_preserve_aspect_ratio(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_X:
+        case LV_SVG_ATTR_Y:
+        case LV_SVG_ATTR_WIDTH:
+        case LV_SVG_ATTR_HEIGHT:
+        case LV_SVG_ATTR_RX:
+        case LV_SVG_ATTR_RY:
+        case LV_SVG_ATTR_CX:
+        case LV_SVG_ATTR_CY:
+        case LV_SVG_ATTR_R:
+        case LV_SVG_ATTR_X1:
+        case LV_SVG_ATTR_Y1:
+        case LV_SVG_ATTR_X2:
+        case LV_SVG_ATTR_Y2:
+        case LV_SVG_ATTR_PATH_LENGTH:
+            _process_length_value(node, type, tok_attr->value_start, tok_attr->value_end, parser->dpi);
+            break;
+        case LV_SVG_ATTR_OPACITY:
+        case LV_SVG_ATTR_FILL_OPACITY:
+        case LV_SVG_ATTR_STROKE_OPACITY:
+        case LV_SVG_ATTR_SOLID_OPACITY:
+        case LV_SVG_ATTR_VIEWPORT_FILL_OPACITY:
+        case LV_SVG_ATTR_GRADIENT_STOP_OPACITY:
+            _process_opacity_value(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_POINTS:
+            _process_points_value(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_D:
+#if LV_USE_SVG_ANIMATION
+        case LV_SVG_ATTR_PATH:
+#endif
+            _process_path_value(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_TRANSFORM:
+            _process_transform(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_FILL:
+        case LV_SVG_ATTR_STROKE:
+        case LV_SVG_ATTR_VIEWPORT_FILL:
+        case LV_SVG_ATTR_SOLID_COLOR:
+        case LV_SVG_ATTR_GRADIENT_STOP_COLOR:
+            _process_paint(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_FILL_RULE:
+        case LV_SVG_ATTR_STROKE_LINECAP:
+        case LV_SVG_ATTR_STROKE_LINEJOIN:
+        case LV_SVG_ATTR_STROKE_WIDTH:
+        case LV_SVG_ATTR_STROKE_MITER_LIMIT:
+        case LV_SVG_ATTR_STROKE_DASH_OFFSET:
+        case LV_SVG_ATTR_GRADIENT_STOP_OFFSET:
+            _process_paint_attrs(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_STROKE_DASH_ARRAY:
+            _process_paint_dasharray(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_GRADIENT_UNITS:
+            _process_gradient_units(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_FONT_FAMILY:
+        case LV_SVG_ATTR_FONT_STYLE:
+        case LV_SVG_ATTR_FONT_VARIANT:
+        case LV_SVG_ATTR_FONT_WEIGHT:
+        case LV_SVG_ATTR_FONT_SIZE:
+            _process_font_attrs(node, type, tok_attr->value_start, tok_attr->value_end, parser->dpi);
+            break;
+        case LV_SVG_ATTR_XLINK_HREF:
+            _process_xlink(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+#if LV_USE_SVG_ANIMATION
+        case LV_SVG_ATTR_DUR:
+        case LV_SVG_ATTR_MIN:
+        case LV_SVG_ATTR_MAX:
+        case LV_SVG_ATTR_REPEAT_DUR:
+            _process_clock_time(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_ATTRIBUTE_NAME:
+            _process_anim_attr_names(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_FROM:
+        case LV_SVG_ATTR_TO:
+        case LV_SVG_ATTR_BY:
+        case LV_SVG_ATTR_VALUES:
+        case LV_SVG_ATTR_KEY_TIMES:
+        case LV_SVG_ATTR_KEY_POINTS:
+        case LV_SVG_ATTR_KEY_SPLINES:
+        case LV_SVG_ATTR_BEGIN:
+        case LV_SVG_ATTR_END:
+            _process_anim_attr_values(node, type, tok_attr->value_start, tok_attr->value_end, parser->dpi);
+            break;
+        case LV_SVG_ATTR_ROTATE:
+        case LV_SVG_ATTR_REPEAT_COUNT:
+            _process_anim_attr_number(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_RESTART:
+        case LV_SVG_ATTR_CALC_MODE:
+        case LV_SVG_ATTR_ADDITIVE:
+        case LV_SVG_ATTR_ACCUMULATE:
+        case LV_SVG_ATTR_TRANSFORM_TYPE:
+            _process_anim_attr_options(node, type, tok_attr->value_start, tok_attr->value_end);
+            break;
+        case LV_SVG_ATTR_ATTRIBUTE_TYPE:
+#endif
+        case LV_SVG_ATTR_DISPLAY:
+        case LV_SVG_ATTR_VISIBILITY:
+        case LV_SVG_ATTR_TEXT_ANCHOR:
+            LV_LOG_USER("Attribute not supported %.*s", (int)(tok_attr->name_end - tok_attr->name_start), tok_attr->name_start);
+            // not support yet
+            break;
+    }
+
+}
 static void _process_attrs_tag(_lv_svg_parser_t * parser, lv_svg_node_t * node, const _lv_svg_token_t * token)
 {
     uint32_t len = lv_array_size(&token->attrs);
+    lv_array_t inline_style_tokens;
+    lv_array_init(&inline_style_tokens, 0, sizeof(_lv_svg_token_attr_t));
+
     for(uint32_t i = 0; i < len; i++) {
         _lv_svg_token_attr_t * tok_attr = lv_array_at(&token->attrs, i);
         lv_svg_attr_type_t type = _get_svg_attr_type(tok_attr->name_start, tok_attr->name_end);
 
-        tok_attr->value_start = _skip_space(tok_attr->value_start, tok_attr->value_end);
-        uint32_t value_len = tok_attr->value_end - tok_attr->value_start;
-        if(value_len == 0) {
-            continue; // skip empty value attribute
-        }
-
-        if(type == LV_SVG_ATTR_XML_ID || type == LV_SVG_ATTR_ID) { // get xml:id
-            char * str = lv_malloc(value_len + 1);
-            LV_ASSERT_MALLOC(str);
-            lv_memcpy(str, tok_attr->value_start, value_len);
-            str[value_len] = '\0';
-            node->xml_id = str;
+        /* Expand style attributes into individual property attributes */
+        if(type == LV_SVG_ATTR_STYLE) {
+            create_tokens_from_style_attr(&inline_style_tokens, tok_attr);
             continue;
         }
-
-        switch(type) {
-            case LV_SVG_ATTR_VERSION:
-            case LV_SVG_ATTR_BASE_PROFILE:
-                _process_string(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_VIEWBOX:
-                _process_view_box(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_PRESERVE_ASPECT_RATIO:
-                _process_preserve_aspect_ratio(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_X:
-            case LV_SVG_ATTR_Y:
-            case LV_SVG_ATTR_WIDTH:
-            case LV_SVG_ATTR_HEIGHT:
-            case LV_SVG_ATTR_RX:
-            case LV_SVG_ATTR_RY:
-            case LV_SVG_ATTR_CX:
-            case LV_SVG_ATTR_CY:
-            case LV_SVG_ATTR_R:
-            case LV_SVG_ATTR_X1:
-            case LV_SVG_ATTR_Y1:
-            case LV_SVG_ATTR_X2:
-            case LV_SVG_ATTR_Y2:
-            case LV_SVG_ATTR_PATH_LENGTH:
-                _process_length_value(node, type, tok_attr->value_start, tok_attr->value_end, parser->dpi);
-                break;
-            case LV_SVG_ATTR_OPACITY:
-            case LV_SVG_ATTR_FILL_OPACITY:
-            case LV_SVG_ATTR_STROKE_OPACITY:
-            case LV_SVG_ATTR_SOLID_OPACITY:
-            case LV_SVG_ATTR_VIEWPORT_FILL_OPACITY:
-            case LV_SVG_ATTR_GRADIENT_STOP_OPACITY:
-                _process_opacity_value(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_POINTS:
-                _process_points_value(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_D:
-#if LV_USE_SVG_ANIMATION
-            case LV_SVG_ATTR_PATH:
-#endif
-                _process_path_value(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_TRANSFORM:
-                _process_transform(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_FILL:
-            case LV_SVG_ATTR_STROKE:
-            case LV_SVG_ATTR_VIEWPORT_FILL:
-            case LV_SVG_ATTR_SOLID_COLOR:
-            case LV_SVG_ATTR_GRADIENT_STOP_COLOR:
-                _process_paint(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_FILL_RULE:
-            case LV_SVG_ATTR_STROKE_LINECAP:
-            case LV_SVG_ATTR_STROKE_LINEJOIN:
-            case LV_SVG_ATTR_STROKE_WIDTH:
-            case LV_SVG_ATTR_STROKE_MITER_LIMIT:
-            case LV_SVG_ATTR_STROKE_DASH_OFFSET:
-            case LV_SVG_ATTR_GRADIENT_STOP_OFFSET:
-                _process_paint_attrs(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_STROKE_DASH_ARRAY:
-                _process_paint_dasharray(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_GRADIENT_UNITS:
-                _process_gradient_units(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_FONT_FAMILY:
-            case LV_SVG_ATTR_FONT_STYLE:
-            case LV_SVG_ATTR_FONT_VARIANT:
-            case LV_SVG_ATTR_FONT_WEIGHT:
-            case LV_SVG_ATTR_FONT_SIZE:
-                _process_font_attrs(node, type, tok_attr->value_start, tok_attr->value_end, parser->dpi);
-                break;
-            case LV_SVG_ATTR_XLINK_HREF:
-                _process_xlink(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-#if LV_USE_SVG_ANIMATION
-            case LV_SVG_ATTR_DUR:
-            case LV_SVG_ATTR_MIN:
-            case LV_SVG_ATTR_MAX:
-            case LV_SVG_ATTR_REPEAT_DUR:
-                _process_clock_time(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_ATTRIBUTE_NAME:
-                _process_anim_attr_names(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_FROM:
-            case LV_SVG_ATTR_TO:
-            case LV_SVG_ATTR_BY:
-            case LV_SVG_ATTR_VALUES:
-            case LV_SVG_ATTR_KEY_TIMES:
-            case LV_SVG_ATTR_KEY_POINTS:
-            case LV_SVG_ATTR_KEY_SPLINES:
-            case LV_SVG_ATTR_BEGIN:
-            case LV_SVG_ATTR_END:
-                _process_anim_attr_values(node, type, tok_attr->value_start, tok_attr->value_end, parser->dpi);
-                break;
-            case LV_SVG_ATTR_ROTATE:
-            case LV_SVG_ATTR_REPEAT_COUNT:
-                _process_anim_attr_number(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_RESTART:
-            case LV_SVG_ATTR_CALC_MODE:
-            case LV_SVG_ATTR_ADDITIVE:
-            case LV_SVG_ATTR_ACCUMULATE:
-            case LV_SVG_ATTR_TRANSFORM_TYPE:
-                _process_anim_attr_options(node, type, tok_attr->value_start, tok_attr->value_end);
-                break;
-            case LV_SVG_ATTR_ATTRIBUTE_TYPE:
-#endif
-            case LV_SVG_ATTR_DISPLAY:
-            case LV_SVG_ATTR_VISIBILITY:
-            case LV_SVG_ATTR_TEXT_ANCHOR:
-                // not support yet
-                break;
-        }
+        _process_attr_tag(parser, node, tok_attr);
     }
+
+    len = lv_array_size(&inline_style_tokens);
+
+    /* Process style-derived attributes last to ensure inline
+     * style properties override regular attributes*/
+    for(uint32_t i = 0; i < len; i++) {
+        _lv_svg_token_attr_t * tok_attr = lv_array_at(&inline_style_tokens, i);
+        _process_attr_tag(parser, node, tok_attr);
+    }
+    lv_array_deinit(&inline_style_tokens);
 }
 
 static bool _process_begin_tag(_lv_svg_parser_t * parser, lv_svg_tag_t tag, const _lv_svg_token_t * token)

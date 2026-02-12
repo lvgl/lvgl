@@ -85,6 +85,7 @@ static const char *src_fragment_shader_v100 = R"(
     uniform float u_Opa;
     uniform bool u_IsFill;
     uniform vec3 u_FillColor;
+    uniform bool u_SwapRB;
     
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
@@ -104,6 +105,9 @@ static const char *src_fragment_shader_v100 = R"(
         } else {
             float combinedAlpha = texColor.a * u_Opa;
             gl_FragColor = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
+        }
+        if (u_SwapRB) {
+            gl_FragColor.bgr = gl_FragColor.rgb;
         }
         #ifdef HSV_ADJUST
         gl_FragColor.rgb = adjustHSV(gl_FragColor.rgb);
@@ -208,6 +212,7 @@ static const char *src_fragment_shader_v300es = R"(
     
     uniform sampler2D u_Texture;
     uniform lowp float u_Opa;
+    uniform bool u_SwapRB;
     
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
@@ -232,6 +237,9 @@ static const char *src_fragment_shader_v300es = R"(
                 color.rgb *= color.a;
             }
         }
+        if (u_SwapRB) {
+            color.bgr = color.rgb;
+        }
         #ifdef HSV_ADJUST
         color.rgb = adjustHSV(color.rgb);
         #endif
@@ -245,8 +253,9 @@ static const size_t src_includes_v300es_count = sizeof src_includes_v300es / siz
  *   GLOBAL FUNCTIONS
  **********************/
 
-char * lv_opengles_shader_get_vertex(lv_opengl_glsl_version version) {
+char * lv_opengles_shader_get_vertex(lv_opengl_glsl_version_t version) {
     switch (version){
+        case LV_OPENGL_GLSL_VERSION_330:
         case LV_OPENGL_GLSL_VERSION_300ES:
             return lv_opengl_shader_manager_process_includes(src_vertex_shader_v300es, src_includes_v300es, src_includes_v300es_count);
         case LV_OPENGL_GLSL_VERSION_100:
@@ -258,8 +267,9 @@ char * lv_opengles_shader_get_vertex(lv_opengl_glsl_version version) {
     LV_UNREACHABLE();
 }
 
-char * lv_opengles_shader_get_fragment(lv_opengl_glsl_version version) {
+char * lv_opengles_shader_get_fragment(lv_opengl_glsl_version_t version) {
     switch (version){
+        case LV_OPENGL_GLSL_VERSION_330:
         case LV_OPENGL_GLSL_VERSION_300ES:
             return lv_opengl_shader_manager_process_includes(src_fragment_shader_v300es, src_includes_v300es, src_includes_v300es_count);
         case LV_OPENGL_GLSL_VERSION_100:
@@ -271,9 +281,10 @@ char * lv_opengles_shader_get_fragment(lv_opengl_glsl_version version) {
     LV_UNREACHABLE();
 }
 
-void lv_opengles_shader_get_source(lv_opengl_shader_portions_t *portions, lv_opengl_glsl_version version)
+void lv_opengles_shader_get_source(lv_opengl_shader_portions_t *portions, lv_opengl_glsl_version_t version)
 {
     switch (version){
+        case LV_OPENGL_GLSL_VERSION_330:
         case LV_OPENGL_GLSL_VERSION_300ES:
             portions->all = src_includes_v300es;
             portions->count = src_includes_v300es_count;

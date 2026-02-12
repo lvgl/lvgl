@@ -182,7 +182,7 @@ void lv_free_core(void * p)
 #endif
 
 #if LV_MEM_ADD_JUNK
-    lv_memset(p, 0xbb, lv_tlsf_block_size(data));
+    lv_memset(p, 0xbb, lv_tlsf_block_size(p));
 #endif
     size_t size = lv_tlsf_block_size(p);
     lv_tlsf_free(state.tlsf, p);

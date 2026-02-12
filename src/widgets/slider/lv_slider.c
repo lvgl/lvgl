@@ -75,12 +75,12 @@ static const lv_property_ops_t lv_slider_properties[] = {
     },
     {
         .id = LV_PROPERTY_SLIDER_MIN_VALUE,
-        .setter = NULL,
+        .setter = lv_slider_set_min_value,
         .getter = lv_slider_get_min_value,
     },
     {
         .id = LV_PROPERTY_SLIDER_MAX_VALUE,
-        .setter = NULL,
+        .setter = lv_slider_set_max_value,
         .getter = lv_slider_get_max_value,
     },
     {

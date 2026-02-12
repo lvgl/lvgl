@@ -1,9 +1,8 @@
 #ifndef __eglplatform_h_
 #define __eglplatform_h_
 
-#include "../../../lv_opengles_egl.h"
-
-#if LV_USE_EGL
+#include "../../../../../lv_conf_internal.h"
+#if LV_USE_OPENGLES
 
 /*
 ** Copyright 2007-2020 The Khronos Group Inc.
@@ -176,6 +175,5 @@ typedef khronos_int32_t EGLint;
 #define EGL_CAST(type, value) ((type) (value))
 #endif
 
-#endif /*LV_USE_EGL*/
-
+#endif /*LV_USE_OPENGLES*/
 #endif /* __eglplatform_h */

@@ -233,12 +233,29 @@
 #define LV_USE_NEMA_GFX 0
 
 #if LV_USE_NEMA_GFX
+    /** Select which NemaGFX static library headers to use. Possible options:
+     * - LV_NEMA_LIB_NONE           an alias of LV_NEMA_LIB_M33_REVC
+     * - LV_NEMA_LIB_M33_REVC
+     * - LV_NEMA_LIB_M33_NEMAPVG
+     * - LV_NEMA_LIB_M55
+     * - LV_NEMA_LIB_M7
+     * You must also take care to link the correct corresponding static library
+     * in libs/nema_gfx/lib/core/
+     */
+    #define LV_USE_NEMA_LIB LV_NEMA_LIB_NONE
+
     /** Select which NemaGFX HAL to use. Possible options:
      * - LV_NEMA_HAL_CUSTOM
      * - LV_NEMA_HAL_STM32 */
     #define LV_USE_NEMA_HAL LV_NEMA_HAL_CUSTOM
     #if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
         #define LV_NEMA_STM32_HAL_INCLUDE <stm32u5xx_hal.h>
+
+        /** Set it to a value like __attribute__((section("Nemagfx_Memory_Pool_Buffer")))
+         * and define the section in the linker script if you need the GPU memory to
+         * be, e.g. in a region where accesses will not be cached.
+         */
+        #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
     #endif
 
     /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
@@ -328,6 +345,9 @@
     /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
     #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
 
+    /** Disable blit rectangular offset to resolve certain hardware errors. */
+    #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET 0
+
     /** Disable linear gradient extension for some older versions of drivers. */
     #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 
@@ -392,7 +412,8 @@
 /** Draw using espressif PPA accelerator */
 #define LV_USE_PPA  0
 #if LV_USE_PPA
-    #define LV_USE_PPA_IMG 0
+    #define LV_USE_PPA_IMG      0
+    #define LV_PPA_BURST_LENGTH    128
 #endif
 
 /* Use EVE FT81X GPU. */
@@ -405,6 +426,26 @@
      * Set it to 0 to disable write buffering.
      */
     #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
+#endif
+
+/** Use NanoVG Renderer
+ * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
+ */
+#define LV_USE_DRAW_NANOVG 0
+#if LV_USE_DRAW_NANOVG
+    /** Select OpenGL backend for NanoVG:
+     * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
+     * - LV_NANOVG_BACKEND_GL3:   OpenGL 3.0+
+     * - LV_NANOVG_BACKEND_GLES2: OpenGL ES 2.0
+     * - LV_NANOVG_BACKEND_GLES3: OpenGL ES 3.0+
+     */
+    #define LV_NANOVG_BACKEND   LV_NANOVG_BACKEND_GLES2
+
+    /** Draw image texture cache count. */
+    #define LV_NANOVG_IMAGE_CACHE_CNT 128
+
+    /** Draw letter texture cache count. */
+    #define LV_NANOVG_LETTER_CACHE_CNT 512
 #endif
 
 /*=======================
@@ -1019,6 +1060,9 @@
  *  Requires LV_USE_VECTOR_GRAPHIC */
 #define LV_USE_THORVG_EXTERNAL 0
 
+/** Enable NanoVG (vector graphics library) */
+#define LV_USE_NANOVG 0
+
 /** Use lvgl built-in LZ4 lib */
 #define LV_USE_LZ4_INTERNAL  0
 
@@ -1212,9 +1256,6 @@
 
 #endif /*LV_USE_TEST*/
 
-/** Enable loading XML UIs runtime */
-#define LV_USE_XML    0
-
 /** 1: Enable text translation support */
 #define LV_USE_TRANSLATION 0
 
@@ -1315,8 +1356,6 @@
      * The GBM library aims to provide a platform independent memory management system
      * it supports the major GPU vendors - This option requires linking with libgbm */
     #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
-
-    #define LV_LINUX_DRM_USE_EGL     0
 #endif
 
 /** Interface for TFT_eSPI */
@@ -1384,7 +1423,9 @@
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
 
-/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
+ * - Requires LV_USE_MATRIX.
+ */
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
@@ -1399,6 +1440,9 @@
 #if LV_USE_QNX
     #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
 #endif
+
+/** Enable or disable for external data and destructor function */
+#define LV_USE_EXT_DATA   0
 
 /*=====================
 * BUILD OPTIONS

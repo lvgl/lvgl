@@ -27,7 +27,7 @@ where there are no memory constraints.
 Usage
 *****
 
-The Test module can be enabled by configuring ``LV_USE_TEST`` to a non-zero value,
+The Test module can be enabled by configuring :c:macro:`LV_USE_TEST` to a non-zero value,
 and it consists of the following components:
 
 - Helpers
@@ -56,7 +56,7 @@ widget coordinates are recalculated.
 Memory Usage
 ~~~~~~~~~~~~
 
-If ``LV_USE_STDLIB_MALLOC`` is set to ``LV_STDLIB_BUILTIN``, memory usage and memory leaks can be monitored.
+If :c:macro:`LV_USE_STDLIB_MALLOC` is set to :c:macro:`LV_STDLIB_BUILTIN`, memory usage and memory leaks can be monitored.
 
 .. code-block:: c
 
@@ -137,7 +137,7 @@ This function works in a practical way:
 
 - If the folder(s) referenced in ``fn_ref`` do not exist, they will be created automatically.
 - If the reference image is not found, it will be created automatically from the rendered screen
-  (unless ``LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE`` is ``0``).
+  (unless :c:macro:`LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE` is ``0``).
 - If the comparison fails, an ``<image_name>_err.png`` file will be created with the rendered content next to the reference image.
 - If the comparison fails, the X and Y coordinates of the first divergent pixel, along with the actual and expected colors, will also be printed.
 
@@ -162,10 +162,10 @@ To read and decode PNG images and to store the converted rendered image, a few M
 
 
 The screenshot comparison uses ``lodepng`` which is built-in to LVGL and just needs to be enabled with
-``LV_USE_LODEPNG``.
+:c:macro:`LV_USE_LODEPNG`.
 
 To avoid making the entire Test module dependent on ``lodepng``, screenshot comparison can be individually enabled by
-``LV_USE_TEST_SCREENSHOT_COMPARE``.
+:c:macro:`LV_USE_TEST_SCREENSHOT_COMPARE`.
 
 
 .. _test_api:

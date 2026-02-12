@@ -68,6 +68,7 @@ static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * oute
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
+    d2_u8 current_alpha = d2_getalpha(u->d2_handle);
     local_outer_area = *outer_area;
     local_inner_area = *inner_area;
 
@@ -136,6 +137,8 @@ static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * oute
                      (d2_point)D2_FIX4(lv_area_get_height(&a)));
     }
 
+    d2_setalpha(u->d2_handle, current_alpha);
+
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
     LV_ASSERT(LV_RESULT_OK == status);
@@ -167,6 +170,8 @@ static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * ori
     status = lv_mutex_lock(u->pd2Mutex);
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
+
+    d2_u8 current_alpha = d2_getalpha(u->d2_handle);
 
     x = 0 - t->target_layer->buf_area.x1;
     y = 0 - t->target_layer->buf_area.y1;
@@ -383,6 +388,8 @@ static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * ori
         }
         d2_setantialiasing(u->d2_handle, aa); //restore original setting
     }
+
+    d2_setalpha(u->d2_handle, current_alpha);
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);

@@ -147,6 +147,7 @@ void test_obj_property_flag(void)
         { LV_OBJ_FLAG_FLOATING,                  LV_PROPERTY_OBJ_FLAG_FLOATING },
         { LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS,     LV_PROPERTY_OBJ_FLAG_SEND_DRAW_TASK_EVENTS },
         { LV_OBJ_FLAG_OVERFLOW_VISIBLE,          LV_PROPERTY_OBJ_FLAG_OVERFLOW_VISIBLE },
+        { LV_OBJ_FLAG_RADIO_BUTTON,              LV_PROPERTY_OBJ_FLAG_RADIO_BUTTON },
         { LV_OBJ_FLAG_FLEX_IN_NEW_TRACK,         LV_PROPERTY_OBJ_FLAG_FLEX_IN_NEW_TRACK },
         { LV_OBJ_FLAG_LAYOUT_1,                  LV_PROPERTY_OBJ_FLAG_LAYOUT_1 },
         { LV_OBJ_FLAG_LAYOUT_2,                  LV_PROPERTY_OBJ_FLAG_LAYOUT_2 },
@@ -154,8 +155,6 @@ void test_obj_property_flag(void)
         { LV_OBJ_FLAG_WIDGET_2,                  LV_PROPERTY_OBJ_FLAG_WIDGET_2 },
         { LV_OBJ_FLAG_USER_1,                    LV_PROPERTY_OBJ_FLAG_USER_1 },
         { LV_OBJ_FLAG_USER_2,                    LV_PROPERTY_OBJ_FLAG_USER_2 },
-        { LV_OBJ_FLAG_USER_3,                    LV_PROPERTY_OBJ_FLAG_USER_3 },
-        { LV_OBJ_FLAG_USER_4,                    LV_PROPERTY_OBJ_FLAG_USER_4 },
     };
 
     lv_obj_t * obj = lv_obj_create(lv_screen_active());

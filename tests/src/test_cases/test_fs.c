@@ -15,6 +15,9 @@ static void read_random_drv(char drv_letter, uint32_t cache_size);
 void setUp(void)
 {
     /* Function run before every test */
+    lv_test_fs_clear_open_cb(false);
+    lv_test_fs_clear_close_cb(false);
+    lv_test_fs_set_ready(true);
 }
 
 void tearDown(void)
@@ -70,15 +73,19 @@ void test_read_random(void)
 {
     read_random_drv('A', 8);
     read_random_drv('B', 8);
+    read_random_drv('T', 8);
 
     read_random_drv('A', 32);
     read_random_drv('B', 32);
+    read_random_drv('T', 32);
 
     read_random_drv('A', 128);
     read_random_drv('B', 128);
+    read_random_drv('T', 128);
 
     read_random_drv('A', 1024);
     read_random_drv('B', 1024);
+    read_random_drv('T', 1024);
 }
 
 /**
@@ -273,6 +280,402 @@ void test_write_read_random(void)
     TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
 
     drv->cache_size = original_cache_size;
+}
+
+void test_fs_is_ready(void)
+{
+    lv_test_fs_set_ready(true);
+    TEST_ASSERT_TRUE(lv_fs_is_ready('T'));
+    lv_test_fs_set_ready(false);
+    TEST_ASSERT_FALSE(lv_fs_is_ready('T'));
+    TEST_ASSERT_FALSE(lv_fs_is_ready('Z'));
+}
+
+void test_fs_open(void)
+{
+    /*'T' has cache*/
+    lv_fs_file_t fa;
+    lv_fs_res_t res;
+    res = lv_fs_open(&fa, NULL, LV_FS_MODE_RD);
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+
+    lv_test_fs_set_ready(false);
+    res = lv_fs_open(&fa, "T:src/test_files/readtest.txt", LV_FS_MODE_RD);
+    TEST_ASSERT_EQUAL(LV_FS_RES_HW_ERR, res);
+
+    lv_test_fs_clear_open_cb(true);
+    lv_test_fs_set_ready(true);
+    res = lv_fs_open(&fa, "T:src/test_files/readtest.txt", LV_FS_MODE_RD);
+    TEST_ASSERT_EQUAL(LV_FS_RES_NOT_IMP, res);
+}
+
+void test_fs_close(void)
+{
+    lv_fs_file_t fa = {0};
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, lv_fs_close(&fa));
+
+    lv_test_fs_clear_close_cb(true);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_open(&fa, "T:src/test_files/readtest.txt", LV_FS_MODE_RD));
+    TEST_ASSERT_EQUAL(LV_FS_RES_NOT_IMP, lv_fs_close(&fa));
+    lv_test_fs_clear_close_cb(false);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&fa));
+}
+
+void test_fs_seek(void)
+{
+    lv_fs_res_t res;
+    lv_fs_file_t f;
+
+    /* Test with drive 'A' (has cache) */
+    res = lv_fs_open(&f, "A:src/test_files/readtest.txt", LV_FS_MODE_RD);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Test forward seek from current position */
+    uint8_t buf[10];
+    uint32_t br;
+
+    /* Read first 10 bytes to establish position */
+    res = lv_fs_read(&f, buf, sizeof(buf), &br);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL_UINT32(sizeof(buf), br);
+
+    /* Seek forward 5 bytes from current position */
+    res = lv_fs_seek(&f, 5, LV_FS_SEEK_CUR);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Read next 5 bytes to verify position */
+    res = lv_fs_read(&f, buf, 5, &br);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL_UINT32(5, br);
+
+    /* Verify we're at position 20 (10 + 5 + 5) */
+    uint32_t pos;
+    res = lv_fs_tell(&f, &pos);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL_UINT32(20, pos);
+
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&f));
+
+    /* Test with drive 'B' (no cache) */
+    res = lv_fs_open(&f, "B:src/test_files/readtest.txt", LV_FS_MODE_RD);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Test backward seek from current position */
+    res = lv_fs_seek(&f, 20, LV_FS_SEEK_SET);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Read 5 bytes to establish position */
+    res = lv_fs_read(&f, buf, 5, &br);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL_UINT32(5, br);
+
+    /* Seek backward 3 bytes from current position */
+    res = lv_fs_seek(&f, -3, LV_FS_SEEK_CUR);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Verify position is now 22 (20 + 5 - 3) */
+    res = lv_fs_tell(&f, &pos);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL_UINT32(22, pos);
+
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_close(&f));
+
+    /* Test error cases */
+    lv_fs_file_t invalid_file = {0};
+    res = lv_fs_seek(&invalid_file, 0, LV_FS_SEEK_CUR);
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+
+    /* Test with drive 'T' (has cache, but not ready) */
+    lv_test_fs_set_ready(false);
+    res = lv_fs_open(&f, "T:src/test_files/readtest.txt", LV_FS_MODE_RD);
+    TEST_ASSERT_EQUAL(LV_FS_RES_HW_ERR, res);
+    lv_test_fs_set_ready(true);
+}
+
+void test_fs_path_get_size(void)
+{
+    lv_fs_res_t res;
+    uint32_t size;
+    const uint32_t expected_size = 745; /* Size of readtest.txt */
+
+    /* Test with drive 'A' (has cache) */
+    res = lv_fs_path_get_size("A:src/test_files/readtest.txt", &size);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL_UINT32(expected_size, size);
+
+    /* Test with drive 'B' (no cache) */
+    res = lv_fs_path_get_size("B:src/test_files/readtest.txt", &size);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL_UINT32(expected_size, size);
+
+    /* Test error cases */
+    res = lv_fs_path_get_size(NULL, &size);
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+
+    /* Test with non-existent file */
+    res = lv_fs_path_get_size("A:src/test_files/nonexistent.txt", &size);
+    TEST_ASSERT_EQUAL(LV_FS_RES_UNKNOWN, res);
+
+    /* Test with drive 'T' (has cache, but not ready) */
+    lv_test_fs_set_ready(false);
+    res = lv_fs_path_get_size("T:src/test_files/readtest.txt", &size);
+    TEST_ASSERT_EQUAL(LV_FS_RES_HW_ERR, res);
+    lv_test_fs_set_ready(true);
+}
+
+void test_fs_load_to_buf(void)
+{
+    lv_fs_res_t res;
+    uint8_t buf[256];
+
+    /* Test with drive 'A' (has cache) - load partial content */
+    res = lv_fs_load_to_buf(buf, 50, "A:src/test_files/readtest.txt");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Verify first few bytes match expected content */
+    TEST_ASSERT_TRUE(lv_memcmp(buf, read_exp, 50) == 0);
+
+    /* Test with drive 'B' (no cache) - load full content */
+    res = lv_fs_load_to_buf(buf, sizeof(buf), "B:src/test_files/readtest.txt");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Test with non-existent file */
+    res = lv_fs_load_to_buf(buf, 10, "A:src/test_files/nonexistent.txt");
+    TEST_ASSERT_EQUAL(LV_FS_RES_UNKNOWN, res);
+
+    /* Test with drive 'T' (has cache, but not ready) */
+    lv_test_fs_set_ready(false);
+    res = lv_fs_load_to_buf(buf, 10, "T:src/test_files/readtest.txt");
+    TEST_ASSERT_EQUAL(LV_FS_RES_HW_ERR, res);
+    lv_test_fs_set_ready(true);
+}
+
+void test_fs_dir_open(void)
+{
+    lv_fs_res_t res;
+    lv_fs_dir_t dir;
+
+    /* Test with NULL path */
+    res = lv_fs_dir_open(&dir, NULL);
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+
+    /* Test with drive 'A' (has cache) */
+    res = lv_fs_dir_open(&dir, "A:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_dir_close(&dir));
+
+    /* Test with drive 'B' (no cache) */
+    res = lv_fs_dir_open(&dir, "B:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_dir_close(&dir));
+
+    /* Test with non-existent directory */
+    res = lv_fs_dir_open(&dir, "A:src/nonexistent_dir");
+    TEST_ASSERT_EQUAL(LV_FS_RES_UNKNOWN, res);
+
+    /* Test with drive 'T' (has cache, but not ready) */
+    lv_test_fs_set_ready(false);
+    res = lv_fs_dir_open(&dir, "T:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_HW_ERR, res);
+    lv_test_fs_set_ready(true);
+
+    /* Test with invalid drive letter */
+    res = lv_fs_dir_open(&dir, "Z:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_NOT_EX, res);
+}
+
+void test_fs_dir_read(void)
+{
+    lv_fs_res_t res;
+    lv_fs_dir_t dir;
+    char filename[256];
+
+    /* Test with invalid directory handle */
+    lv_fs_dir_t invalid_dir = {0};
+    res = lv_fs_dir_read(&invalid_dir, filename, sizeof(filename));
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+    TEST_ASSERT_EQUAL_CHAR('\0', filename[0]);
+
+    /* Test with zero buffer length */
+    res = lv_fs_dir_open(&dir, "A:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    res = lv_fs_dir_read(&dir, filename, 0);
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_dir_close(&dir));
+
+    /* Test normal directory reading with drive 'A' */
+    res = lv_fs_dir_open(&dir, "A:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Read directory entries until end */
+    uint32_t entry_count = 0;
+    while((res = lv_fs_dir_read(&dir, filename, sizeof(filename))) == LV_FS_RES_OK) {
+        if(filename[0] == '\0') break; /* End of directory */
+        entry_count++;
+    }
+
+    /* Should have at least one entry (readtest.txt) */
+    TEST_ASSERT_TRUE(entry_count > 0);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_dir_close(&dir));
+
+    /* Test normal directory reading with drive 'B' */
+    res = lv_fs_dir_open(&dir, "B:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    entry_count = 0;
+    while((res = lv_fs_dir_read(&dir, filename, sizeof(filename))) == LV_FS_RES_OK) {
+        if(filename[0] == '\0') break;
+        entry_count++;
+    }
+
+    TEST_ASSERT_TRUE(entry_count > 0);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, lv_fs_dir_close(&dir));
+
+    /* Test with drive 'T' (has cache, but not ready) */
+    lv_test_fs_set_ready(false);
+    res = lv_fs_dir_open(&dir, "T:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_HW_ERR, res);
+    lv_test_fs_set_ready(true);
+}
+
+void test_fs_dir_close(void)
+{
+    lv_fs_res_t res;
+    lv_fs_dir_t dir;
+
+    /* Test with invalid directory handle */
+    lv_fs_dir_t invalid_dir = {0};
+    res = lv_fs_dir_close(&invalid_dir);
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+
+    /* Test normal close with drive 'A' */
+    res = lv_fs_dir_open(&dir, "A:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    res = lv_fs_dir_close(&dir);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Test normal close with drive 'B' */
+    res = lv_fs_dir_open(&dir, "B:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    res = lv_fs_dir_close(&dir);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+
+    /* Test double close (should be safe) */
+    res = lv_fs_dir_open(&dir, "A:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    res = lv_fs_dir_close(&dir);
+    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+    res = lv_fs_dir_close(&dir); /* Second close on same handle */
+    TEST_ASSERT_EQUAL(LV_FS_RES_INV_PARAM, res);
+
+    /* Test with drive 'T' (has cache, but not ready) */
+    lv_test_fs_set_ready(false);
+    res = lv_fs_dir_open(&dir, "T:src/test_files");
+    TEST_ASSERT_EQUAL(LV_FS_RES_HW_ERR, res);
+    lv_test_fs_set_ready(true);
+}
+
+void test_fs_up(void)
+{
+    char path[256];
+
+    /* Test empty path */
+    lv_strcpy(path, "");
+    char * result = lv_fs_up(path);
+    TEST_ASSERT_EQUAL_STRING("", result);
+
+    /* Test root path (cannot go up further) */
+    lv_strcpy(path, "/");
+    result = lv_fs_up(path);
+    TEST_ASSERT_EQUAL_STRING("", result);
+
+    /* Test single level directory */
+    lv_strcpy(path, "/home");
+    result = lv_fs_up(path);
+    TEST_ASSERT_EQUAL_STRING("/home", result);
+
+    /* Test multi-level directory */
+    lv_strcpy(path, "/home/user/documents");
+    result = lv_fs_up(path);
+    TEST_ASSERT_EQUAL_STRING("/home/user", result);
+
+    /* Test path with trailing slash */
+    lv_strcpy(path, "/home/user/documents/");
+    result = lv_fs_up(path);
+    TEST_ASSERT_EQUAL_STRING("/home/user", result);
+
+    /* Test path with mixed slashes */
+    lv_strcpy(path, "C:\\Users\\Documents\\");
+    result = lv_fs_up(path);
+    TEST_ASSERT_EQUAL_STRING("C:\\Users", result);
+
+    /* Test path with only filename */
+    lv_strcpy(path, "file.txt");
+    result = lv_fs_up(path);
+    TEST_ASSERT_EQUAL_STRING("file.txt", result);
+
+    /* Test path with drive letter and multiple levels */
+    lv_strcpy(path, "A:src/test_files");
+    result = lv_fs_up(path);
+    TEST_ASSERT_EQUAL_STRING("A:src", result);
+}
+
+void test_fs_get_last(void)
+{
+    const char * result;
+
+    /* Test empty path */
+    result = lv_fs_get_last("");
+    TEST_ASSERT_EQUAL_STRING("", result);
+
+    /* Test path with only filename */
+    result = lv_fs_get_last("file.txt");
+    TEST_ASSERT_EQUAL_STRING("file.txt", result);
+
+    /* Test multi-level directory path */
+    result = lv_fs_get_last("/home/user/documents");
+    TEST_ASSERT_EQUAL_STRING("documents", result);
+
+    /* Test path with trailing slash */
+    result = lv_fs_get_last("/home/user/documents/");
+    TEST_ASSERT_EQUAL_STRING("documents/", result);
+
+    /* Test path with mixed slashes */
+    result = lv_fs_get_last("C:\\Users\\Documents");
+    TEST_ASSERT_EQUAL_STRING("Documents", result);
+
+    /* Test path with no separators */
+    result = lv_fs_get_last("filename");
+    TEST_ASSERT_EQUAL_STRING("filename", result);
+
+    /* Test root path */
+    result = lv_fs_get_last("/");
+    TEST_ASSERT_EQUAL_STRING("/", result);
+
+    /* Test path with drive letter */
+    result = lv_fs_get_last("A:src/test_files/readtest.txt");
+    TEST_ASSERT_EQUAL_STRING("readtest.txt", result);
+
+    /* Test path ending with separator */
+    result = lv_fs_get_last("A:src/test_files/");
+    TEST_ASSERT_EQUAL_STRING("test_files/", result);
+
+    /* Test single character path */
+    result = lv_fs_get_last("a");
+    TEST_ASSERT_EQUAL_STRING("a", result);
+}
+
+void test_fs_get_letters(void)
+{
+    char buf[16]; /* Increased buffer size to accommodate more drive letters */
+    char * result;
+
+    /* Test with sufficient buffer size */
+    result = lv_fs_get_letters(buf);
+    TEST_ASSERT_EQUAL_PTR(buf, result); /* Should return the same buffer */
+
+    /* Verify that the buffer contains valid drive letters */
+    TEST_ASSERT_EQUAL_STRING("TMBA", buf);
 }
 
 #endif

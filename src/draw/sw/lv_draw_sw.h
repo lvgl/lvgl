@@ -25,6 +25,7 @@ extern "C" {
 #include "../lv_draw_label.h"
 #include "../lv_draw_image.h"
 #include "../lv_draw_line.h"
+#include "../lv_draw_mask.h"
 #include "../lv_draw_arc.h"
 #include "../lv_draw_blur.h"
 #include "lv_draw_sw_utils.h"

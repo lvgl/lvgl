@@ -66,7 +66,7 @@ The buttons' width can be set in proportion to the width of other buttons in the
 row with :cpp:expr:`lv_buttonmatrix_set_button_width(btn_matrix, button_id, width)` E.g. in a
 line with two buttons: *buttonA, width = 1* and *buttonB, width = 2*, *buttonA*
 will have 33 % width and *buttonB* will have 66 % width.  This is similar to how the
-`"flex-grow" <https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow>`__
+`"flex-grow" <https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-grow>`__
 property works in CSS. The width must be in the range [1..15] with the default being 1.
 
 Button behavior
@@ -79,7 +79,7 @@ Each button's behavior can be customized with the following control flags:
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED`: Disables button like :cpp:enumerator:`LV_STATE_DISABLED` on normal Widgets.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKABLE`: Enable toggling of :cpp:enumerator:`LV_STATE_CHECKED` when clicked.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECKED` styles.
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: 1: Enables sending :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on ``CLICK``, 0: sends :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on ``PRESS``.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: 1: Enables sending :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` on ``CLICK``, 0: sends :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` on ``PRESS``.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_POPOVER`: Show button text in a pop-over while being pressed.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_RECOLOR`: Enable text recoloring with ``#color``
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_1`: Custom free-to-use flag
@@ -168,8 +168,8 @@ the button will not be activated upon leaving edit mode.
 
 .. _lv_buttonmatrix_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/buttonmatrix/index.rst
 
