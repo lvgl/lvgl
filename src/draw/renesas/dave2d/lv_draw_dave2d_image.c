@@ -43,10 +43,10 @@ void lv_draw_dave2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
                           const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
-        lv_draw_image_normal_helper(t, draw_dsc, coords, img_draw_core);
+        lv_draw_image_normal_helper(t, draw_dsc, coords, img_draw_core, NULL);
     }
     else {
-        lv_draw_image_tiled_helper(t, draw_dsc, coords, img_draw_core);
+        lv_draw_image_tiled_helper(t, draw_dsc, coords, img_draw_core, NULL);
     }
 }
 

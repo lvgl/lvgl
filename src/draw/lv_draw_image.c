@@ -214,7 +214,8 @@ lv_image_src_t lv_image_src_get_type(const void * src)
 }
 
 void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                                 const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb)
+                                 const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb,
+                                 const lv_image_decoder_args_t * decoder_args)
 {
     if(draw_core_cb == NULL) {
         LV_LOG_WARN("draw_core_cb is NULL");
@@ -242,7 +243,7 @@ void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     }
 
     lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, decoder_args);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;
@@ -254,7 +255,8 @@ void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t *
 }
 
 void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                                const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb)
+                                const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb,
+                                const lv_image_decoder_args_t * decoder_args)
 {
     if(draw_core_cb == NULL) {
         LV_LOG_WARN("draw_core_cb is NULL");
@@ -262,7 +264,7 @@ void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
     }
 
     lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, decoder_args);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;
