@@ -2,12 +2,11 @@ import argparse
 import gdb
 
 from lvglgdb.value import Value
-from lvglgdb.lvgl import LVObject
-from lvglgdb.lvgl import dump_style_info
+from lvglgdb.lvgl import LVStyle, dump_obj_styles
 
 
 class InfoStyle(gdb.Command):
-    """dump obj style value for specified obj"""
+    """Dump style properties. Default: single lv_style_t. Use --obj for object styles."""
 
     def __init__(self):
         super(InfoStyle, self).__init__(
@@ -15,11 +14,18 @@ class InfoStyle(gdb.Command):
         )
 
     def invoke(self, args, from_tty):
-        parser = argparse.ArgumentParser(description="Dump lvgl obj local style.")
+        parser = argparse.ArgumentParser(description="Dump lvgl style properties.")
         parser.add_argument(
-            "obj",
+            "style",
             type=str,
-            help="obj to show style.",
+            nargs="?",
+            help="lv_style_t variable to inspect.",
+        )
+        parser.add_argument(
+            "--obj",
+            type=str,
+            default=None,
+            help="lv_obj_t variable to inspect all styles.",
         )
 
         try:
@@ -27,14 +33,17 @@ class InfoStyle(gdb.Command):
         except SystemExit:
             return
 
-        obj = gdb.parse_and_eval(args.obj)
-        if not obj:
-            print("Invalid obj: ", args.obj)
-            return
-
-        obj = Value(obj)
-
-        # show all styles applied to this obj
-        for style in LVObject(obj).styles:
-            print("  ", end="")
-            dump_style_info(style)
+        if args.obj:
+            obj = gdb.parse_and_eval(args.obj)
+            if not obj:
+                print("Invalid obj:", args.obj)
+                return
+            dump_obj_styles(Value(obj))
+        elif args.style:
+            style = gdb.parse_and_eval(args.style)
+            if not style:
+                print("Invalid style:", args.style)
+                return
+            LVStyle(Value(style)).print_entries()
+        else:
+            print("Usage: info style <style_var> or info style --obj <obj_var>")

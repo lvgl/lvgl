@@ -1,9 +1,14 @@
-from .core import LVObject, curr_inst, dump_obj_info
+from .core import LVObject, ObjStyle, curr_inst, dump_obj_info, dump_obj_styles
 from .display import LVDisplay
 from .draw import LVDrawBuf
 from .misc import (
     LVList,
+    LVStyle,
+    StyleEntry,
     dump_style_info,
+    style_prop_name,
+    decode_selector,
+    format_style_value,
     LVRedBlackTree,
     dump_rb_info,
     LVCache,
@@ -21,12 +26,19 @@ from .misc import (
 
 __all__ = [
     "LVObject",
+    "ObjStyle",
     "LVDisplay",
     "LVDrawBuf",
     "curr_inst",
     "LVList",
+    "LVStyle",
+    "StyleEntry",
     "dump_style_info",
+    "dump_obj_styles",
     "dump_obj_info",
+    "style_prop_name",
+    "decode_selector",
+    "format_style_value",
     "LVRedBlackTree",
     "dump_rb_info",
     "LVCache",
