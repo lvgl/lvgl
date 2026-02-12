@@ -13,14 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../misc/lv_ext_data.h"
 #include "lv_indev.h"
 #include "../misc/lv_anim.h"
 #include "lv_indev_scroll.h"
 #include "lv_indev_gesture.h"
-
-#if LV_USE_EXT_DATA
-#include "../lvgl_private.h"
-#endif
 
 /*********************
  *      DEFINES
