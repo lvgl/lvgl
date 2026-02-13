@@ -594,9 +594,9 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_event_mark_deleted(obj);
 
     /*Remove all style*/
-    lv_obj_enable_style_refresh(false); /*No need to refresh the style because the object will be deleted*/
+    lv_obj_enable_style_refresh(obj, false); /*No need to refresh the style because the object will be deleted*/
     lv_obj_remove_style_all(obj);
-    lv_obj_enable_style_refresh(true);
+    lv_obj_enable_style_refresh(obj, true);
 
     /*Remove the animations from this object*/
     lv_anim_delete(obj, NULL);
