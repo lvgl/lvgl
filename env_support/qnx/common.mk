@@ -34,6 +34,7 @@ $(SRC_ROOT)/libs/rle \
 $(SRC_ROOT)/libs/gif \
 $(SRC_ROOT)/libs/freetype \
 $(SRC_ROOT)/draw \
+$(SRC_ROOT)/draw/convert \
 $(SRC_ROOT)/draw/vg_lite \
 $(SRC_ROOT)/draw/sw \
 $(SRC_ROOT)/draw/sw/arm2d \
@@ -43,7 +44,10 @@ $(SRC_ROOT)/draw/sw/blend/arm2d \
 $(SRC_ROOT)/draw/sw/blend/neon \
 $(SRC_ROOT)/misc \
 $(SRC_ROOT)/misc/cache \
+$(SRC_ROOT)/misc/cache/class \
+$(SRC_ROOT)/misc/cache/instance \
 $(SRC_ROOT)/font \
+$(SRC_ROOT)/font/fmt_txt \
 $(SRC_ROOT)/stdlib \
 $(SRC_ROOT)/stdlib/builtin \
 $(SRC_ROOT)/stdlib/rtthread \
