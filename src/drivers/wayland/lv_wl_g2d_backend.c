@@ -599,14 +599,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     int32_t src_width = lv_area_get_width(area);
     int32_t src_height = lv_area_get_height(area);
     uint32_t rotation = lv_display_get_rotation(disp);
-    lv_wl_buffer_t * buf = get_next_buffer(ddata);
-
-    if(!buf) {
-        LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
-        return;
-    }
-
-    lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
 #if LV_USE_ROTATE_G2D
     lv_draw_buf_invalidate_cache(ddata->rotate_buffer.lv_draw_buf, NULL);
 #endif
@@ -620,6 +612,14 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
         return;
     }
 
+    lv_wl_buffer_t * buf = get_next_buffer(ddata);
+
+    if(!buf) {
+        LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
+        return;
+    }
+
+    lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
     /*Rerender the whole surface if we're using rotation*/
     if(rotation != LV_DISPLAY_ROTATION_0) {
         wl_surface_damage(surface, 0, 0,

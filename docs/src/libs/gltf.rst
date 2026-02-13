@@ -141,7 +141,7 @@ The recommended way to integrate the required libraries is using CMake's FetchCo
     FetchContent_Declare(
       fastgltf
       GIT_REPOSITORY https://github.com/spnda/fastgltf
-      GIT_TAG 4e2261350888bae7c35a1f39991f6233d57795f5)
+      GIT_TAG f04052ebd8d157c7b6e8fc3dd9f1ed83df99f3e5)
     set(FASTGLTF_ENABLE_DEPRECATED_EXT
         ON
         CACHE BOOL "" FORCE)

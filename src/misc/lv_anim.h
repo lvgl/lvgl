@@ -14,14 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
+#include "lv_ext_data.h"
 #include "lv_types.h"
 #include "lv_math.h"
 #include "lv_timer.h"
 #include "lv_ll.h"
-
-#if LV_USE_EXT_DATA
-#include "../lvgl_private.h"
-#endif
 
 /*********************
  *      DEFINES

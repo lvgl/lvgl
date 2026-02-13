@@ -562,7 +562,7 @@ void lv_anim_resume(lv_anim_t * a)
 #if LV_USE_EXT_DATA
 void lv_anim_set_external_data(lv_anim_t * anim, void * data, void (* free_cb)(void * data))
 {
-    if(!a) {
+    if(!anim) {
         LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL animation");
         return;
     }

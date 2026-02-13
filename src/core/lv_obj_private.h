@@ -13,12 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
+#include "../misc/lv_ext_data.h"
 #include "lv_obj.h"
-
-#if LV_USE_EXT_DATA
-#include "../lvgl_private.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -85,6 +81,7 @@ struct _lv_obj_t {
     uint16_t h_ignore_size : 1; /* ignore this obj when calculating content height of parent */
     uint16_t w_ignore_size : 1; /* ignore this obj when calculating content width of parent */
     uint16_t is_deleting : 1;
+    uint16_t radio_button : 1; /**< Allow only one RADIO_BUTTON sibling to be checked*/
 
     /** The widget is rendered at least once already.
      * It's used to skip initial animations and transitions. */

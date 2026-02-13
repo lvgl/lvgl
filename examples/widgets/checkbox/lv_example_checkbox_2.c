@@ -43,7 +43,7 @@ void lv_example_checkbox_2(void)
         lv_obj_add_event_cb(obj, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
         /*This makes the checkboxes act as radio buttons*/
-        lv_obj_add_flag(obj, LV_OBJ_FLAG_RADIO_BUTTON);
+        lv_obj_set_radio_button(obj, true);
 
         lv_obj_add_style(obj, &style_radio, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &style_radio_chk, LV_PART_INDICATOR | LV_STATE_CHECKED);
