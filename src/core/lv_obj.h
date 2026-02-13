@@ -70,19 +70,19 @@ typedef enum {
     LV_OBJ_FLAG_OVERFLOW_VISIBLE = (1u << 20),/**< Do not clip the children to the parent's ext draw size*/
     LV_OBJ_FLAG_EVENT_TRICKLE   = (1u << 21), /**< Propagate the events to the children too*/
     LV_OBJ_FLAG_STATE_TRICKLE   = (1u << 22), /**< Propagate the states to the children too*/
-    LV_OBJ_FLAG_RADIO_BUTTON    = (1u << 23), /**< Allow only one RADIO_BUTTON sibling to be checked*/
-    LV_OBJ_FLAG_STYLE_REFR_DISABLED = (1u << 24), /**< Defer style refresh on this object*/
 
-    LV_OBJ_FLAG_LAYOUT_1        = (1u << 25), /**< Custom flag, free to use by layouts*/
-    LV_OBJ_FLAG_LAYOUT_2        = (1u << 26), /**< Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_1        = (1u << 23), /**< Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_2        = (1u << 24), /**< Custom flag, free to use by layouts*/
 #if LV_USE_FLEX
     LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = LV_OBJ_FLAG_LAYOUT_1,     /**< Start a new flex track on this item*/
 #endif
 
-    LV_OBJ_FLAG_WIDGET_1        = (1u << 27), /**< Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_WIDGET_2        = (1u << 28), /**< Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_USER_1          = (1u << 29), /**< Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_2          = (1u << 30), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_WIDGET_1        = (1u << 25), /**< Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_WIDGET_2        = (1u << 26), /**< Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_USER_1          = (1u << 27), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_2          = (1u << 28), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_3          = (1u << 29), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_4          = (1u << 30), /**< Custom flag, free to use by user*/
 } lv_obj_flag_t;
 
 #if LV_USE_OBJ_PROPERTY
@@ -112,16 +112,16 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, FLAG_OVERFLOW_VISIBLE,      LV_PROPERTY_TYPE_INT,       20),
     LV_PROPERTY_ID(OBJ, FLAG_EVENT_TRICKLE,         LV_PROPERTY_TYPE_INT,       21),
     LV_PROPERTY_ID(OBJ, FLAG_STATE_TRICKLE,         LV_PROPERTY_TYPE_INT,       22),
-    LV_PROPERTY_ID(OBJ, FLAG_RADIO_BUTTON,          LV_PROPERTY_TYPE_INT,       23),
-    LV_PROPERTY_ID(OBJ, FLAG_STYLE_REFR_DISABLED,   LV_PROPERTY_TYPE_INT,       24),
-    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_1,              LV_PROPERTY_TYPE_INT,       25),
-    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_2,              LV_PROPERTY_TYPE_INT,       26),
-    LV_PROPERTY_ID(OBJ, FLAG_FLEX_IN_NEW_TRACK,     LV_PROPERTY_TYPE_INT,       25), /*Mapped to FLAG_LAYOUT_1*/
-    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_1,              LV_PROPERTY_TYPE_INT,       27),
-    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_2,              LV_PROPERTY_TYPE_INT,       28),
-    LV_PROPERTY_ID(OBJ, FLAG_USER_1,                LV_PROPERTY_TYPE_INT,       29),
-    LV_PROPERTY_ID(OBJ, FLAG_USER_2,                LV_PROPERTY_TYPE_INT,       30),
-    LV_PROPERTY_ID(OBJ, FLAG_END,                   LV_PROPERTY_TYPE_INT,       31),
+    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_1,              LV_PROPERTY_TYPE_INT,       23),
+    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_2,              LV_PROPERTY_TYPE_INT,       24),
+    LV_PROPERTY_ID(OBJ, FLAG_FLEX_IN_NEW_TRACK,     LV_PROPERTY_TYPE_INT,       23), /*Mapped to FLAG_LAYOUT_1*/
+    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_1,              LV_PROPERTY_TYPE_INT,       25),
+    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_2,              LV_PROPERTY_TYPE_INT,       26),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_1,                LV_PROPERTY_TYPE_INT,       27),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_2,                LV_PROPERTY_TYPE_INT,       28),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_3,                LV_PROPERTY_TYPE_INT,       29),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_4,                LV_PROPERTY_TYPE_INT,       30),
+    LV_PROPERTY_ID(OBJ, FLAG_END,                   LV_PROPERTY_TYPE_INT,       30),
 
     LV_PROPERTY_ID(OBJ, STATE_START,                LV_PROPERTY_TYPE_INT,       32),
     LV_PROPERTY_ID(OBJ, STATE_ALT,                  LV_PROPERTY_TYPE_INT,       32),
@@ -247,6 +247,13 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
  */
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
 
+
+/** Allow only one RADIO_BUTTON sibling to be checked
+ * @param obj     pointer to a widget
+ * @param en      enable or disable radio button behavior
+ */
+void lv_obj_set_radio_button(lv_obj_t * obj, bool en);
+
 /*=======================
  * Getter functions
  *======================*/
@@ -281,6 +288,12 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj);
  * @return          true: `obj` is in `state`; false: `obj` is not in `state`
  */
 bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
+
+/** Get whether the object is a radio button
+ * @param obj     pointer to a widget
+ * @return        true if radio button behavior is enabled
+ */
+bool lv_obj_is_radio_button(const lv_obj_t * obj);
 
 /**
  * Get the group of the object

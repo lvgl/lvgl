@@ -244,7 +244,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    if(!style_refr || (obj->flags & LV_OBJ_FLAG_STYLE_REFR_DISABLED))
+    if(!style_refr || (obj->disable_style_refresh))
         return;
 
     LV_PROFILER_STYLE_BEGIN;
@@ -328,22 +328,19 @@ void lv_obj_enable_style_refresh(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    bool currently_disabled = lv_obj_has_flag(obj, LV_OBJ_FLAG_STYLE_REFR_DISABLED);
+    bool currently_disabled = obj->disable_style_refresh;
     if(en == !currently_disabled)
         return; /*Already in the desired state*/
 
-    if(en)
-        obj->flags &= ~LV_OBJ_FLAG_STYLE_REFR_DISABLED;
-    else
-        obj->flags |= LV_OBJ_FLAG_STYLE_REFR_DISABLED;
+    obj->disable_style_refresh = !en;
     if(en) {
         lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
     }
 }
 
-bool lv_obj_get_style_refresh_enabled(lv_obj_t * obj)
+bool lv_obj_is_style_refresh_enabled(lv_obj_t * obj)
 {
-    return !lv_obj_has_flag(obj, LV_OBJ_FLAG_STYLE_REFR_DISABLED);
+    return !obj->disable_style_refresh;
 }
 
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)

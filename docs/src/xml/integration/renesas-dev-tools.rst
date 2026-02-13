@@ -13,7 +13,7 @@ Setup
 First, download and install the LVGL Editor from `pro.lvgl.io <https://pro.lvgl.io/#download>`_.
 
 LVGL provides an e2 Studio plugin to facilitate working with LVGL projects. You can
-download it from `this link <https://github.com/lvgl/lvgl_editor/releases/download/v1.0.0/LVGL_Pro_e2.studio_plugin.v1.0.0.zip>`_.
+download it from `this link <https://github.com/lvgl/lvgl_editor/releases/download/v1.1.0/LVGL_Pro_e2.studio_plugin.v1.0.1.zip>`_.
 
 To install the plugin in e2 Studio:
 

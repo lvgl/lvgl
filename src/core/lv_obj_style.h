@@ -212,7 +212,7 @@ void lv_obj_enable_style_refresh(lv_obj_t * obj, bool en);
  * @param obj       pointer to an object
  * @return          true: refreshing is enabled; false: disabled
  */
-bool lv_obj_get_style_refresh_enabled(lv_obj_t * obj);
+bool lv_obj_is_style_refresh_enabled(lv_obj_t * obj);
 
 /**
  * Get the value of a style property. The current state of the object will be considered.
