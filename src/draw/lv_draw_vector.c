@@ -389,8 +389,6 @@ void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area
 
 void lv_vector_path_append_rectangle(lv_vector_path_t * path, float x, float y, float w, float h, float rx, float ry)
 {
-    if(w <= 0.0f || h <= 0.0f) return;
-
     float hw = w * 0.5f;
     float hh = h * 0.5f;
 
