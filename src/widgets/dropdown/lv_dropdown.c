@@ -45,6 +45,7 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
+static void refresh_size(lv_obj_t * obj);
 
 static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_dropdownlist_destructor(const lv_obj_class_t * class_p, lv_obj_t * list_obj);
@@ -165,6 +166,9 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    if(!dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
+        return;
+    }
 
     char * copied_text = NULL;
     if(text) {
@@ -184,11 +188,16 @@ void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    if(!dropdown->static_text) lv_free(dropdown->text);
+    if(dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
+        return;
+    }
+
+    if(!dropdown->static_text)
+        lv_free(dropdown->text);
     dropdown->static_text = 1;
     dropdown->text = (char *)text;
 
-    lv_obj_invalidate(obj);
+    refresh_size(obj);
 }
 
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
@@ -234,8 +243,9 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     /*Now the text is dynamically allocated*/
     dropdown->static_options = 0;
 
-    lv_obj_invalidate(obj);
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_size(obj);
+    if(dropdown->list)
+        lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
@@ -263,8 +273,9 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
     dropdown->static_options = 1;
     dropdown->options = (char *)options;
 
-    lv_obj_invalidate(obj);
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_size(obj);
+    if(dropdown->list)
+        lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
@@ -335,8 +346,9 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 
     dropdown->option_cnt++;
 
-    lv_obj_invalidate(obj);
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_size(obj);
+    if(dropdown->list)
+        lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_clear_options(lv_obj_t * obj)
@@ -352,8 +364,9 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     dropdown->static_options = 1;
     dropdown->option_cnt = 0;
 
-    lv_obj_invalidate(obj);
-    if(dropdown->list) lv_obj_invalidate(dropdown->list);
+    refresh_size(obj);
+    if(dropdown->list)
+        lv_obj_invalidate(dropdown->list);
 }
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
@@ -370,7 +383,7 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
         position_to_selected(obj, LV_ANIM_OFF);
     }
 
-    lv_obj_invalidate(obj);
+    refresh_size(obj);
 }
 
 void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
@@ -391,7 +404,7 @@ void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     dropdown->symbol = symbol;
-    lv_obj_invalidate(obj);
+    refresh_size(obj);
 }
 
 void lv_dropdown_set_selected_highlight(lv_obj_t * obj, bool en)
@@ -795,7 +808,11 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         res = btn_release_handler(obj);
-        if(res != LV_RESULT_OK) return;
+        if(res != LV_RESULT_OK)
+            return;
+    }
+    else if(code == LV_EVENT_VALUE_CHANGED) {
+        refresh_size(obj);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
         lv_obj_refresh_self_size(obj);
@@ -804,9 +821,73 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_refresh_self_size(obj);
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
-        lv_point_t * p = lv_event_get_param(e);
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        p->y = lv_font_get_line_height(font);
+
+        lv_point_t size;
+        size.x = 0;
+        size.y = 0;
+
+        /* Calculate the symbol width */
+        int32_t symbol_w = 0;
+        if(dropdown->symbol) {
+            lv_draw_label_dsc_t symbol_dsc;
+            lv_draw_label_dsc_init(&symbol_dsc);
+
+            lv_image_src_t symbol_type = lv_image_src_get_type(dropdown->symbol);
+            if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
+                lv_point_t text_size;
+
+                lv_text_get_size(&text_size,
+                                 dropdown->symbol,
+                                 symbol_dsc.font,
+                                 symbol_dsc.letter_space,
+                                 symbol_dsc.line_space,
+                                 LV_COORD_MAX,
+                                 symbol_dsc.flag);
+                symbol_w = text_size.x;
+            }
+            else {
+                lv_image_header_t header;
+                lv_result_t decoder_res = lv_image_decoder_get_info(dropdown->symbol, &header);
+                if(decoder_res == LV_RESULT_OK) {
+                    symbol_w = header.w;
+                }
+                else {
+                    symbol_w = 0;
+                }
+            }
+            size.x += symbol_w;
+            size.x += lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+        }
+
+        /* Calculate the text width */
+        const char * opt_txt;
+        char buf[128];
+        if(dropdown->text)
+            opt_txt = dropdown->text;
+        else {
+            lv_dropdown_get_selected_str(obj, buf, 128);
+            opt_txt = buf;
+        }
+
+        if(opt_txt == NULL) {
+            size.y = LV_MAX(size.y, lv_font_get_line_height(font));
+        }
+        else {
+            lv_draw_label_dsc_t dsc;
+            lv_draw_label_dsc_init(&dsc);
+
+            lv_point_t text_size;
+            int32_t max_width = lv_obj_calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH) - size.x;
+            lv_text_get_size(&text_size, opt_txt, font, dsc.letter_space, dsc.line_space, max_width, dsc.flag);
+
+            size.x += text_size.x;
+            size.y = LV_MAX(size.y, text_size.y);
+        }
+
+        lv_point_t * p = lv_event_get_param(e);
+        p->x = LV_MAX(p->x, size.x);
+        p->y = LV_MAX(p->y, size.y);
     }
     else if(code == LV_EVENT_KEY) {
         uint32_t c = lv_event_get_key(e);
@@ -839,7 +920,8 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_t * indev_obj = lv_indev_get_active_obj();
             if(indev_obj != obj) {
                 res = btn_release_handler(obj);
-                if(res != LV_RESULT_OK) return;
+                if(res != LV_RESULT_OK)
+                    return;
             }
         }
     }
@@ -1030,6 +1112,12 @@ static void draw_main(lv_event_t * e)
     }
 
     lv_draw_label(layer, &label_dsc, &txt_area);
+}
+
+static void refresh_size(lv_obj_t * obj)
+{
+    lv_obj_invalidate(obj);
+    lv_obj_refresh_self_size(obj);
 }
 
 static void draw_list(lv_event_t * e)
