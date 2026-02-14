@@ -45,12 +45,14 @@
 #define REL_XY_MASK ((1 << REL_X) | (1 << REL_Y))
 #define ABS_XY_MASK ((1 << ABS_X) | (1 << ABS_Y))
 #define MAX_TOUCH_POINTS 5
+#define EVDEV_DSC_MAGIC 0x45564456u
 
 /**********************
  *      TYPEDEFS
  **********************/
 
 typedef struct {
+    uint32_t magic;
     /*Device*/
     int fd;
     dev_t st_dev;
@@ -480,6 +482,7 @@ lv_indev_t * lv_evdev_create_fd(lv_indev_type_t indev_type, int fd)
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) goto err_malloc;
 
+    dsc->magic = EVDEV_DSC_MAGIC;
     dsc->fd = fd;
 
     struct stat sb;
@@ -671,6 +674,74 @@ void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_
 void lv_evdev_delete(lv_indev_t * indev)
 {
     lv_indev_delete(indev);
+}
+
+bool lv_evdev_is_indev(const lv_indev_t * indev)
+{
+    if(indev == NULL) {
+        return false;
+    }
+
+    if(lv_indev_get_read_cb((lv_indev_t *)indev) != _evdev_read) {
+        return false;
+    }
+
+    lv_evdev_t * dsc = lv_indev_get_driver_data((lv_indev_t *)indev);
+    if(dsc == NULL) {
+        return false;
+    }
+
+    return dsc->magic == EVDEV_DSC_MAGIC;
+}
+
+uint8_t lv_evdev_get_active_touches(lv_indev_t * indev, lv_evdev_touch_point_t * touches, uint8_t max_touches)
+{
+    if(indev == NULL || touches == NULL || max_touches == 0) {
+        return 0;
+    }
+
+    if(!lv_evdev_is_indev(indev) || lv_indev_get_type(indev) != LV_INDEV_TYPE_POINTER) {
+        return 0;
+    }
+
+    lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
+    LV_ASSERT_NULL(dsc);
+
+    uint8_t touch_count = 0;
+#if LV_USE_GESTURE_RECOGNITION
+    for(uint8_t i = 0; i < MAX_TOUCH_POINTS; i++) {
+        if(dsc->touch_data[i].state != LV_INDEV_STATE_PRESSED) {
+            continue;
+        }
+
+        if(touch_count >= max_touches) {
+            break;
+        }
+
+        touches[touch_count].id = dsc->touch_data[i].id;
+        touches[touch_count].state = dsc->touch_data[i].state;
+        touches[touch_count].point =
+            _evdev_process_pointer(indev, dsc->touch_data[i].point.x, dsc->touch_data[i].point.y);
+        lv_display_t * disp = lv_indev_get_display(indev);
+        if(disp) {
+            lv_display_rotate_point(disp, &touches[touch_count].point);
+        }
+        touch_count++;
+    }
+#else
+    if(dsc->state == LV_INDEV_STATE_PRESSED) {
+        touches[0].id = 0;
+        touches[0].state = LV_INDEV_STATE_PRESSED;
+        touches[0].point = _evdev_process_pointer(indev, dsc->root_x, dsc->root_y);
+        lv_display_t * disp = lv_indev_get_display(indev);
+        if(disp) {
+            lv_display_rotate_point(disp, &touches[0].point);
+        }
+        touch_count = 1;
+    }
+#endif
+
+    return touch_count;
 }
 
 void lv_evdev_deinit(void)

@@ -35,6 +35,12 @@ typedef enum {
  */
 typedef void (*lv_evdev_discovery_cb_t)(lv_indev_t * indev, lv_evdev_type_t type, void * user_data);
 
+typedef struct {
+    lv_point_t point;
+    lv_indev_state_t state;
+    uint8_t id;
+} lv_evdev_touch_point_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -96,6 +102,22 @@ void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_
  * @param indev evdev input device to close and free
  */
 void lv_evdev_delete(lv_indev_t * indev);
+
+/**
+ * Check if an indev is managed by the evdev driver.
+ * @param indev input device
+ * @return true if this indev uses lv_evdev, false otherwise
+ */
+bool lv_evdev_is_indev(const lv_indev_t * indev);
+
+/**
+ * Read currently active touch points for an evdev pointer device.
+ * @param indev evdev indev
+ * @param touches output buffer
+ * @param max_touches output buffer capacity
+ * @return number of active touch points written to `touches`
+ */
+uint8_t lv_evdev_get_active_touches(lv_indev_t * indev, lv_evdev_touch_point_t * touches, uint8_t max_touches);
 
 #endif /*LV_USE_EVDEV*/
 
