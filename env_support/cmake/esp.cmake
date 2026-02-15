@@ -56,9 +56,9 @@ else()
   endif()
 
 if(${target} STREQUAL "esp32p4")
-  set(IDF_COMPONENTS esp_driver_ppa esp_mm esp_timer log)
+  set(IDF_COMPONENTS esp_driver_ppa esp_mm esp_timer fatfs log)
 else()
-  set(IDF_COMPONENTS esp_timer log)
+  set(IDF_COMPONENTS esp_timer fatfs log)
 endif()
 
   idf_component_register(SRCS ${SOURCES} ${EXAMPLE_SOURCES} ${DEMO_SOURCES}
