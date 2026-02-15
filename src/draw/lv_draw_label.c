@@ -480,6 +480,11 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                 logical_char_pos -= (LABEL_RECOLOR_PAR_LENGTH + 1);
             }
 
+#if LV_TXT_SOFT_HYPHEN_BREAK
+            if((next_char_offset == line_end - line_start) && letter == LV_TXT_SOFT_HYPHEN_BREAK_CHAR) {
+                letter = '-';
+            }
+#endif
             lv_font_get_glyph_dsc(font, &glyph_dsc, letter, letter_next);
             letter_w = lv_text_is_marker(letter) ? 0 : glyph_dsc.adv_w;
 
