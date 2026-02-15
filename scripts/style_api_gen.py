@@ -377,6 +377,10 @@ props = [
  'style_type': 'num',  'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of the letter outline stroke. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
+{'name': 'TEXT_LEADING_TRIM',
+ 'style_type': 'num',  'var_type': 'lv_text_leading_trim_t',  'default':'`LV_TEXT_LEADING_TRIM_NONE`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Set the text leading trim mode. Removes empty space above and/or below text based on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`. Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`."},
+
 {'section': 'Blur', 'dsc':'Blur the widget or its background' },
 {'name': 'BLUR_RADIUS',
  'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
