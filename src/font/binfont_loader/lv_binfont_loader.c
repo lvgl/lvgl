@@ -255,8 +255,11 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
             case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL: {
                     uint32_t ids_size = (uint32_t)(sizeof(uint8_t) * cmap_table[i].data_entries_count);
                     uint8_t * glyph_id_ofs_list = lv_malloc(ids_size);
+                    LV_ASSERT_MALLOC(glyph_id_ofs_list);
 
                     cmap->glyph_id_ofs_list = glyph_id_ofs_list;
+
+                    if(glyph_id_ofs_list == NULL) return false;
 
                     if(lv_fs_read(fp, glyph_id_ofs_list, ids_size, NULL) != LV_FS_RES_OK) {
                         return false;
@@ -271,9 +274,12 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
             case LV_FONT_FMT_TXT_CMAP_SPARSE_TINY: {
                     uint32_t list_size = sizeof(uint16_t) * cmap_table[i].data_entries_count;
                     uint16_t * unicode_list = (uint16_t *)lv_malloc(list_size);
+                    LV_ASSERT_MALLOC(unicode_list);
 
                     cmap->unicode_list = unicode_list;
                     cmap->list_length = cmap_table[i].data_entries_count;
+
+                    if(unicode_list == NULL) return false;
 
                     if(lv_fs_read(fp, unicode_list, list_size, NULL) != LV_FS_RES_OK) {
                         return false;
@@ -281,8 +287,11 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
                     if(cmap_table[i].format_type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
                         uint16_t * buf = lv_malloc(sizeof(uint16_t) * cmap->list_length);
+                        LV_ASSERT_MALLOC(buf);
 
                         cmap->glyph_id_ofs_list = buf;
+
+                        if(buf == NULL) return false;
 
                         if(lv_fs_read(fp, buf, sizeof(uint16_t) * cmap->list_length, NULL) != LV_FS_RES_OK) {
                             return false;
@@ -312,6 +321,8 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
 
     lv_font_fmt_txt_cmap_t * cmaps =
         lv_malloc(cmaps_subtables_count * sizeof(lv_font_fmt_txt_cmap_t));
+    LV_ASSERT_MALLOC(cmaps);
+    if(cmaps == NULL) return -1;
 
     lv_memset(cmaps, 0, cmaps_subtables_count * sizeof(lv_font_fmt_txt_cmap_t));
 
@@ -319,6 +330,8 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
     font_dsc->cmap_num = cmaps_subtables_count;
 
     cmap_table_bin_t * cmaps_tables = lv_malloc(sizeof(cmap_table_bin_t) * font_dsc->cmap_num);
+    LV_ASSERT_MALLOC(cmaps_tables);
+    if(cmaps_tables == NULL) return -1;
 
     bool success = load_cmaps_tables(fp, font_dsc, cmaps_start, cmaps_tables);
 
@@ -337,6 +350,8 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
 
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc = (lv_font_fmt_txt_glyph_dsc_t *)
                                               lv_malloc(loca_count * sizeof(lv_font_fmt_txt_glyph_dsc_t));
+    LV_ASSERT_MALLOC(glyph_dsc);
+    if(glyph_dsc == NULL) return -1;
 
     lv_memset(glyph_dsc, 0, loca_count * sizeof(lv_font_fmt_txt_glyph_dsc_t));
 
@@ -408,6 +423,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
 
     uint8_t * glyph_bmp = (uint8_t *)lv_malloc(sizeof(uint8_t) * cur_bmp_size);
     LV_ASSERT_MALLOC(glyph_bmp);
+    if(glyph_bmp == NULL) return -1;
 
     font_dsc->glyph_bitmap = glyph_bmp;
 
@@ -484,6 +500,8 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 {
     lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *)
                                        lv_malloc(sizeof(lv_font_fmt_txt_dsc_t));
+    LV_ASSERT_MALLOC(font_dsc);
+    if(font_dsc == NULL) return false;
 
     lv_memset(font_dsc, 0, sizeof(lv_font_fmt_txt_dsc_t));
 
@@ -534,6 +552,8 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 
     bool failed = false;
     uint32_t * glyph_offset = lv_malloc(sizeof(uint32_t) * (loca_count + 1));
+    LV_ASSERT_MALLOC(glyph_offset);
+    if(glyph_offset == NULL) return false;
 
     if(font_header.index_to_loc_format == 0) {
         for(unsigned int i = 0; i < loca_count; ++i) {
@@ -602,6 +622,8 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
 
     if(0 == kern_format_type) { /*sorted pairs*/
         lv_font_fmt_txt_kern_pair_t * kern_pair = lv_malloc(sizeof(lv_font_fmt_txt_kern_pair_t));
+        LV_ASSERT_MALLOC(kern_pair);
+        if(kern_pair == NULL) return -1;
 
         lv_memset(kern_pair, 0, sizeof(lv_font_fmt_txt_kern_pair_t));
 
@@ -622,12 +644,16 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         }
 
         uint8_t * glyph_ids = lv_malloc(ids_size);
+        LV_ASSERT_MALLOC(glyph_ids);
         int8_t * values = lv_malloc(glyph_entries);
+        LV_ASSERT_MALLOC(values);
 
         kern_pair->glyph_ids_size = format;
         kern_pair->pair_cnt = glyph_entries;
         kern_pair->glyph_ids = glyph_ids;
         kern_pair->values = values;
+
+        if(glyph_ids == NULL || values == NULL) return -1;
 
         if(lv_fs_read(fp, glyph_ids, ids_size, NULL) != LV_FS_RES_OK) {
             return -1;
@@ -640,6 +666,8 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
     else if(3 == kern_format_type) { /*array M*N of classes*/
 
         lv_font_fmt_txt_kern_classes_t * kern_classes = lv_malloc(sizeof(lv_font_fmt_txt_kern_classes_t));
+        LV_ASSERT_MALLOC(kern_classes);
+        if(kern_classes == NULL) return -1;
 
         lv_memset(kern_classes, 0, sizeof(lv_font_fmt_txt_kern_classes_t));
 
@@ -659,14 +687,19 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
         int kern_values_length = sizeof(int8_t) * kern_table_rows * kern_table_cols;
 
         uint8_t * kern_left = lv_malloc(kern_class_mapping_length);
+        LV_ASSERT_MALLOC(kern_left);
         uint8_t * kern_right = lv_malloc(kern_class_mapping_length);
+        LV_ASSERT_MALLOC(kern_right);
         int8_t * kern_values = lv_malloc(kern_values_length);
+        LV_ASSERT_MALLOC(kern_values);
 
         kern_classes->left_class_mapping  = kern_left;
         kern_classes->right_class_mapping = kern_right;
         kern_classes->left_class_cnt = kern_table_rows;
         kern_classes->right_class_cnt = kern_table_cols;
         kern_classes->class_pair_values = kern_values;
+
+        if(kern_left == NULL || kern_right == NULL || kern_values == NULL) return -1;
 
         if(lv_fs_read(fp, kern_left, kern_class_mapping_length, NULL) != LV_FS_RES_OK ||
            lv_fs_read(fp, kern_right, kern_class_mapping_length, NULL) != LV_FS_RES_OK ||
