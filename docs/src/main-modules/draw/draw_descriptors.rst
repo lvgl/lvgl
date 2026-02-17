@@ -737,10 +737,10 @@ There are several options to mask parts of a layer, Widget, or drawing:
    By using the Canvas Widget with an :cpp:enumerator:`LV_COLOR_FORMAT_L8` buffer,
    bitmap masks can be rendered dynamically.
 
-.. lv_example:: widgets/canvas/lv_example_label_4
+.. lv_example:: widgets/label/lv_example_label_4
   :language: c
 
-.. lv_example:: widgets/canvas/lv_example_roller_3
+.. lv_example:: widgets/roller/lv_example_roller_3
   :language: c
 
 
