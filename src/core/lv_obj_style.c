@@ -259,15 +259,17 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     if(is_layout_refr) {
         if(part == LV_PART_ANY ||
            part == LV_PART_MAIN ||
-           lv_obj_get_style_height(obj, LV_PART_MAIN) == LV_SIZE_CONTENT ||
-           lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+           lv_obj_is_style_any_height_content(obj) ||
+           lv_obj_is_style_any_width_content(obj)) {
             lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || is_layout_refr)) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
-        if(parent) lv_obj_mark_layout_as_dirty(parent);
+        if(parent) {
+            lv_obj_mark_layout_as_dirty(parent);
+        }
     }
 
     /*Cache the layer type*/

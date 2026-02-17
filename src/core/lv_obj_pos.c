@@ -1075,11 +1075,14 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(ignore_floating && lv_obj_has_flag(child, LV_OBJ_FLAG_FLOATING)) continue;
+        if(ignore_floating && lv_obj_has_flag(child, LV_OBJ_FLAG_FLOATING))
+            continue;
         child->coords.x1 += x_diff;
         child->coords.y1 += y_diff;
         child->coords.x2 += x_diff;
         child->coords.y2 += y_diff;
+
+        lv_obj_send_event(obj, LV_EVENT_CHILD_CHANGED, child);
 
         lv_obj_move_children_by(child, x_diff, y_diff, false);
     }
