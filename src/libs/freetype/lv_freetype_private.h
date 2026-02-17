@@ -99,6 +99,11 @@ struct _lv_freetype_cache_node_t {
 
     /*draw data cache*/
     lv_cache_t * draw_data_cache;
+
+#if LV_USE_HARFBUZZ
+    void * hb_font;                     /**< Cached HarfBuzz font (hb_font_t *), NULL until first use.*/
+    uint32_t hb_font_size;              /**< The pixel size for which hb_font was created.*/
+#endif
 };
 
 typedef struct _lv_freetype_context_t {

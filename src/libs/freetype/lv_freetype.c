@@ -13,6 +13,11 @@
 #include "../../misc/lv_fs_private.h"
 #include "../../core/lv_global.h"
 
+#if LV_USE_HARFBUZZ
+    #include <hb.h>
+    #include <hb-ft.h>
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -437,6 +442,12 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
+#if LV_USE_HARFBUZZ
+    if(node->hb_font) {
+        hb_font_destroy((hb_font_t *)node->hb_font);
+        node->hb_font = NULL;
+    }
+#endif
     FT_Done_Face(node->face);
     lv_mutex_delete(&node->face_lock);
 

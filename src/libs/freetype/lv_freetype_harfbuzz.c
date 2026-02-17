@@ -47,7 +47,8 @@ bool lv_freetype_is_harfbuzz_font(const lv_font_t * font)
     return LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc);
 }
 
-lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text, uint32_t byte_len)
+lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text, uint32_t byte_len,
+                                        lv_base_dir_t dir_hint)
 {
     if(font == NULL || text == NULL || byte_len == 0) return NULL;
 
@@ -62,7 +63,7 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     lv_mutex_lock(&cache_node->face_lock);
     FT_Face face = cache_node->face;
 
-    /* Set pixel size before creating HarfBuzz font */
+    /* Set pixel size before creating/using HarfBuzz font */
     FT_Error error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
     if(error) {
         FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
@@ -70,25 +71,50 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
         return NULL;
     }
 
-    /* Create HarfBuzz font from FreeType face */
-    hb_font_t * hb_font = hb_ft_font_create_referenced(face);
-    if(hb_font == NULL) {
-        LV_LOG_ERROR("hb_ft_font_create_referenced failed");
-        lv_mutex_unlock(&cache_node->face_lock);
-        return NULL;
+    /* Get or create cached HarfBuzz font.
+     * Recreate if the pixel size has changed since the last call. */
+    hb_font_t * hb_font = (hb_font_t *)cache_node->hb_font;
+    if(hb_font == NULL || cache_node->hb_font_size != dsc->size) {
+        if(hb_font) {
+            hb_font_destroy(hb_font);
+        }
+        hb_font = hb_ft_font_create_referenced(face);
+        if(hb_font == NULL) {
+            LV_LOG_ERROR("hb_ft_font_create_referenced failed");
+            cache_node->hb_font = NULL;
+            lv_mutex_unlock(&cache_node->face_lock);
+            return NULL;
+        }
+        cache_node->hb_font = hb_font;
+        cache_node->hb_font_size = dsc->size;
     }
 
     /* Create and configure HarfBuzz buffer */
     hb_buffer_t * hb_buf = hb_buffer_create();
     if(!hb_buffer_allocation_successful(hb_buf)) {
         LV_LOG_ERROR("hb_buffer_create failed");
-        hb_font_destroy(hb_font);
         lv_mutex_unlock(&cache_node->face_lock);
         return NULL;
     }
 
     hb_buffer_add_utf8(hb_buf, text, (int)byte_len, 0, (int)byte_len);
-    hb_buffer_guess_segment_properties(hb_buf);
+
+    /* Set direction based on hint to avoid double-reordering when LVGL BIDI
+     * has already processed the text into visual order. */
+    if(dir_hint == LV_BASE_DIR_LTR) {
+        hb_buffer_set_direction(hb_buf, HB_DIRECTION_LTR);
+        hb_buffer_guess_segment_properties(hb_buf); /* still guess script and language */
+        hb_buffer_set_direction(hb_buf, HB_DIRECTION_LTR); /* re-force after guess */
+    }
+    else if(dir_hint == LV_BASE_DIR_RTL) {
+        hb_buffer_set_direction(hb_buf, HB_DIRECTION_RTL);
+        hb_buffer_guess_segment_properties(hb_buf);
+        hb_buffer_set_direction(hb_buf, HB_DIRECTION_RTL);
+    }
+    else {
+        /* LV_BASE_DIR_AUTO: let HarfBuzz auto-detect everything */
+        hb_buffer_guess_segment_properties(hb_buf);
+    }
 
     /* Perform shaping */
     hb_shape(hb_font, hb_buf, NULL, 0);
@@ -100,7 +126,6 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
 
     if(glyph_count == 0) {
         hb_buffer_destroy(hb_buf);
-        hb_font_destroy(hb_font);
         lv_mutex_unlock(&cache_node->face_lock);
         return NULL;
     }
@@ -110,7 +135,6 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     LV_ASSERT_MALLOC(result);
     if(result == NULL) {
         hb_buffer_destroy(hb_buf);
-        hb_font_destroy(hb_font);
         lv_mutex_unlock(&cache_node->face_lock);
         return NULL;
     }
@@ -120,7 +144,6 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     if(result->glyphs == NULL) {
         lv_free(result);
         hb_buffer_destroy(hb_buf);
-        hb_font_destroy(hb_font);
         lv_mutex_unlock(&cache_node->face_lock);
         return NULL;
     }
@@ -138,7 +161,6 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     }
 
     hb_buffer_destroy(hb_buf);
-    hb_font_destroy(hb_font);
     lv_mutex_unlock(&cache_node->face_lock);
 
     return result;
@@ -149,6 +171,29 @@ void lv_hb_shaped_text_destroy(lv_hb_shaped_text_t * shaped)
     if(shaped == NULL) return;
     if(shaped->glyphs) lv_free(shaped->glyphs);
     lv_free(shaped);
+}
+
+int32_t lv_hb_get_text_width(const lv_font_t * font, const char * text, uint32_t byte_len, int32_t letter_space)
+{
+    if(font == NULL || text == NULL || byte_len == 0) return 0;
+
+    lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, text, byte_len, LV_BASE_DIR_AUTO);
+    if(shaped == NULL) return -1;
+
+    int32_t width = 0;
+    for(uint32_t i = 0; i < shaped->count; i++) {
+        if(shaped->glyphs[i].x_advance > 0) {
+            width += shaped->glyphs[i].x_advance + letter_space;
+        }
+    }
+
+    /* Trim the last letter space */
+    if(width > 0) {
+        width -= letter_space;
+    }
+
+    lv_hb_shaped_text_destroy(shaped);
+    return width;
 }
 
 /**********************
