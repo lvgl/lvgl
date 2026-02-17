@@ -393,7 +393,14 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         /*HarfBuzz shaping path: shape the entire line and render shaped glyphs*/
         if(lv_freetype_is_harfbuzz_font(font)) {
             uint32_t line_byte_len = line_end - line_start;
-            lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, bidi_txt, line_byte_len);
+            /* When BIDI is enabled, text has been reordered to visual order.
+             * Force LTR direction in HarfBuzz to prevent double-reordering. */
+#if LV_USE_BIDI
+            lv_base_dir_t hb_dir = LV_BASE_DIR_LTR;
+#else
+            lv_base_dir_t hb_dir = LV_BASE_DIR_AUTO;
+#endif
+            lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, bidi_txt, line_byte_len, hb_dir);
             if(shaped) {
                 for(uint32_t si = 0; si < shaped->count; si++) {
                     lv_hb_glyph_info_t * gi = &shaped->glyphs[si];
@@ -435,7 +442,16 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                         }
                     }
 
+                    /* Handle text selection using cluster-to-character mapping */
                     draw_letter_dsc.color = dsc->color;
+                    if(sel_start != LV_DRAW_LABEL_NO_TXT_SEL && sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
+                        uint32_t logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + gi->cluster);
+                        if(logical_char_pos >= sel_start && logical_char_pos < sel_end) {
+                            draw_letter_dsc.color = dsc->sel_color;
+                            fill_dsc.color = dsc->sel_bg_color;
+                            cb(t, NULL, &fill_dsc, &bg_coords);
+                        }
+                    }
 
                     /* Draw the glyph using glyph descriptor directly */
                     lv_point_t glyph_pos;
