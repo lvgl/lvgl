@@ -27,6 +27,10 @@
 #include "../../core/lv_observer_private.h"
 #include "../../others/translation/lv_translation.h"
 
+#if LV_USE_HARFBUZZ
+    #include "../../libs/freetype/lv_freetype_harfbuzz.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -478,6 +482,54 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
 
     uint32_t i = 0;
     uint32_t i_act = i;
+
+#if LV_USE_HARFBUZZ
+    /* HarfBuzz path: shape the line and walk shaped glyphs to find the character at pos.x */
+    if(lv_freetype_is_harfbuzz_font(font) && new_line_start > 0) {
+        uint32_t line_byte_len = new_line_start - line_start;
+        /* Strip trailing newline from shaping input */
+        if(line_byte_len > 0 && (bidi_txt[line_byte_len - 1] == '\n' || bidi_txt[line_byte_len - 1] == '\r')) {
+            line_byte_len--;
+        }
+        lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, bidi_txt, line_byte_len, LV_BASE_DIR_AUTO);
+        if(shaped) {
+            uint32_t best_cluster = 0;
+            for(uint32_t si = 0; si < shaped->count; si++) {
+                int32_t gw = shaped->glyphs[si].x_advance;
+                if(pos.x < x + gw || si == shaped->count - 1) {
+                    best_cluster = shaped->glyphs[si].cluster;
+                    break;
+                }
+                x += gw + attributes.letter_space;
+            }
+            lv_hb_shaped_text_destroy(shaped);
+            i = best_cluster;
+
+            uint32_t logical_pos;
+#if LV_USE_BIDI
+            if(bidi) {
+                uint32_t cid = lv_text_encoded_get_char_id(bidi_txt, i);
+                if(txt[line_start + i] == '\0') {
+                    logical_pos = i;
+                }
+                else {
+                    bool is_rtl;
+                    uint32_t txt_len_hb = new_line_start - line_start;
+                    logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL,
+                                                          txt_len_hb, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), cid, &is_rtl);
+                    if(is_rtl) logical_pos++;
+                }
+                lv_free(bidi_txt);
+            }
+            else
+#endif
+            {
+                logical_pos = lv_text_encoded_get_char_id(bidi_txt, i);
+            }
+            return logical_pos + lv_text_encoded_get_char_id(txt, line_start);
+        }
+    }
+#endif /*LV_USE_HARFBUZZ*/
 
     if(new_line_start > 0) {
         while(i + line_start < new_line_start) {
