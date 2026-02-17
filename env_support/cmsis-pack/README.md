@@ -71,6 +71,8 @@ remove the misleading guide above this code segment.
    - LV_USE_DRAW_DAVE2D
    - LV_USE_DRAW_DMA2D
    - LV_USE_DRAW_EVE
+   - LV_USE_DRAW_NANOVG
+   - LV_USE_NANOVG
    - LV_USE_PPA
    - LV_USE_NV3007
    - LV_USE_NXP_ELCDIF
@@ -132,8 +134,7 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_RLOTTIE 0
     - \#define LV_USE_FFMPEG 0
     - \#define LV_USE_FONT_MANAGER 0
-    - \#define LV_USE_XML 0
-
+    
 9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVE_INTERNAL` and `LV_USE_THORVE_EXTERNAL` as 
 
     ```c

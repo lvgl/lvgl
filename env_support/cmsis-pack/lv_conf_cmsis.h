@@ -429,7 +429,6 @@
 /** Use NanoVG Renderer
  * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
  */
-#define LV_USE_DRAW_NANOVG 0
 #if LV_USE_DRAW_NANOVG
     /** Select OpenGL backend for NanoVG:
      * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
@@ -967,11 +966,6 @@
     #define LV_FS_FROGFS_LETTER '\0'
 #endif
 
-/** JPG + split JPG decoder library.
-
-/** libjpeg-turbo decoder library.
- *  - Supports complete JPEG specifications and high-performance JPEG decoding. */
-
 /** GIF decoder library */
 #if LV_USE_GIF
     /** GIF decoder accelerate */
@@ -1012,9 +1006,6 @@
 /* Enable ThorVG by assuming that its installed and linked to the project */
 #   define LV_USE_THORVG_EXTERNAL 0
 #endif
-
-/** Enable NanoVG (vector graphics library) */
-#define LV_USE_NANOVG 0
 
 /*Enable LZ4 compress/decompress lib*/
 #ifndef LV_USE_LZ4
