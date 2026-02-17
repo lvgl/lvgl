@@ -195,6 +195,7 @@ static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width,
 
 static void flex_update(lv_obj_t * cont, void * user_data)
 {
+    LV_PROFILER_LAYOUT_BEGIN;
     LV_LOG_INFO("update %p container", (void *)cont);
     LV_UNUSED(user_data);
 
@@ -291,6 +292,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
     lv_obj_send_event(cont, LV_EVENT_LAYOUT_CHANGED, NULL);
 
     LV_TRACE_LAYOUT("finished");
+    LV_PROFILER_LAYOUT_END;
 }
 
 /**
@@ -299,6 +301,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
 static int32_t find_track_end(
     const lv_obj_t * cont, flex_t * f, int32_t item_start_id, int32_t max_main_size, int32_t item_gap, track_t * t)
 {
+    LV_PROFILER_LAYOUT_BEGIN;
     int32_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     int32_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
 
@@ -363,8 +366,10 @@ static int32_t find_track_end(
                 if(t->grow_dsc_calc) {
                     grow_dsc_t * new_dsc = lv_realloc(t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt));
                     LV_ASSERT_MALLOC(new_dsc);
-                    if(new_dsc == NULL)
+                    if(new_dsc == NULL) {
+                        LV_PROFILER_LAYOUT_END;
                         return item_id;
+                    }
 
                     const int32_t max_size = f->row ? lv_obj_calc_dynamic_width(item, LV_STYLE_MAX_WIDTH)
                                              : lv_obj_calc_dynamic_height(item, LV_STYLE_MAX_HEIGHT);
@@ -413,6 +418,7 @@ static int32_t find_track_end(
         }
     }
 
+    LV_PROFILER_LAYOUT_END;
     return item_id;
 }
 
@@ -422,6 +428,7 @@ static int32_t find_track_end(
 static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, int32_t item_last_id, int32_t abs_x,
                            int32_t abs_y, int32_t max_main_size, int32_t item_gap, track_t * t)
 {
+    LV_PROFILER_LAYOUT_BEGIN;
     void (*area_set_main_size)(lv_area_t *, int32_t) = (f->row ? lv_area_set_width : lv_area_set_height);
     int32_t (*area_get_main_size)(const lv_area_t *) = (f->row ? lv_area_get_width : lv_area_get_height);
     int32_t (*area_get_cross_size)(const lv_area_t *) = (!f->row ? lv_area_get_width : lv_area_get_height);
@@ -451,16 +458,17 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
         for(i = 0; i < t->grow_item_cnt; i++) {
             if(t->grow_dsc[i].clamped == 0) {
                 LV_ASSERT(grow_value_sum != 0);
-                int32_t size = div_round_closest(grow_max_size * t->grow_dsc[i].grow_value, grow_value_sum);
-                int32_t size_clamp = LV_CLAMP(t->grow_dsc[i].min_size, size, t->grow_dsc[i].max_size);
+                grow_dsc_t * dsc = &t->grow_dsc[i];
+                int32_t size = div_round_closest(grow_max_size * dsc->grow_value, grow_value_sum);
+                dsc->final_size = LV_CLAMP(dsc->min_size, size, dsc->max_size);
 
-                if(size_clamp != size) {
-                    t->grow_dsc[i].clamped = 1;
+                if(dsc->final_size != size) {
+                    dsc->clamped = 1;
                     grow_reiterate = true;
+                    break;
                 }
-                t->grow_dsc[i].final_size = size_clamp;
-                grow_value_sum -= t->grow_dsc[i].grow_value;
-                grow_max_size -= t->grow_dsc[i].final_size;
+                grow_value_sum -= dsc->grow_value;
+                grow_max_size -= dsc->final_size;
             }
         }
     }
@@ -577,6 +585,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
         item = get_next_item(cont, f->rev, &item_first_id);
     }
+    LV_PROFILER_LAYOUT_END;
 }
 
 /**
