@@ -54,5 +54,6 @@ Enable in lv_conf.h
 
     #define LV_USE_SDL 1
     #define LV_USE_DRAW_SDL 1
+    #define LV_USE_DRAW_SW 1
 
 The SDL Draw Unit automatically integrates with the SDL display driver when both are enabled.
