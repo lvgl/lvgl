@@ -31,8 +31,8 @@ remove the misleading guide above this code segment.
 3. Add including for '**RTE_Components.h**'
 
 ```c
-#ifndef LV_CONF_H
-#define LV_CONF_H
+#ifndef LV_CONF_CMSIS_H
+#define LV_CONF_CMSIS_H
 
 #if defined(_RTE_)
 #include "RTE_Components.h"
@@ -57,7 +57,6 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_HIGH_RES
    - LV_USE_DEMO_SMARTWATCH
    - LV_USE_DEMO_GLTF
-   - LV_USE_DRAW_VGLITE
    - LV_USE_DRAW_VG_LITE
    - LV_USE_PXP
    - LV_USE_FS_FROGFS
@@ -91,7 +90,7 @@ remove the misleading guide above this code segment.
    - LV_USE_ST_LTDC
    - LV_USE_FT81X
    - LV_USE_ILI9341
-   - LV_USE_RENESAS_GLCDC   
+   - LV_USE_RENESAS_GLCDC
    - LV_USE_NEMA_GFX
    - LV_USE_SVG
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
