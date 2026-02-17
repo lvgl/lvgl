@@ -148,6 +148,18 @@ void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc);
 lv_cache_t * lv_freetype_create_draw_data_outline(uint32_t cache_size);
 void lv_freetype_set_cbs_outline_font(lv_freetype_font_dsc_t * dsc);
 
+#if LV_USE_HARFBUZZ
+/**
+ * Get a glyph descriptor by glyph ID (bypassing unicode lookup).
+ * Used by HarfBuzz shaping path where glyph IDs are already known.
+ * @param font pointer to an LVGL font (must be a FreeType font)
+ * @param g_dsc pointer to glyph descriptor to fill
+ * @param glyph_id FreeType glyph index
+ * @return true on success
+ */
+bool lv_freetype_get_glyph_dsc_by_gid(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t glyph_id);
+#endif
+
 /**********************
  *      MACROS
  **********************/

@@ -1013,6 +1013,9 @@
     #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
 #endif
 
+/** HarfBuzz text shaping (requires LV_USE_FREETYPE) */
+#define LV_USE_HARFBUZZ 0
+
 /** Built-in TTF decoder */
 #define LV_USE_TINY_TTF 0
 #if LV_USE_TINY_TTF

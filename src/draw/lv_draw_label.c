@@ -21,6 +21,11 @@
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
 
+#if LV_USE_HARFBUZZ
+    #include "../libs/freetype/lv_freetype_harfbuzz.h"
+    #include "../libs/freetype/lv_freetype_private.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -383,6 +388,75 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         const char * bidi_txt = dsc->text + line_start;
 #endif
 
+
+#if LV_USE_HARFBUZZ
+        /*HarfBuzz shaping path: shape the entire line and render shaped glyphs*/
+        if(lv_freetype_is_harfbuzz_font(font)) {
+            uint32_t line_byte_len = line_end - line_start;
+            lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, bidi_txt, line_byte_len);
+            if(shaped) {
+                for(uint32_t si = 0; si < shaped->count; si++) {
+                    lv_hb_glyph_info_t * gi = &shaped->glyphs[si];
+
+                    lv_font_glyph_dsc_t hb_glyph_dsc;
+                    lv_memzero(&hb_glyph_dsc, sizeof(hb_glyph_dsc));
+
+                    if(!lv_freetype_get_glyph_dsc_by_gid(font, &hb_glyph_dsc, gi->glyph_id)) {
+                        continue;
+                    }
+
+                    letter_w = hb_glyph_dsc.adv_w;
+
+                    bg_coords.x1 = pos.x + gi->x_offset - dsc->letter_space / 2;
+                    bg_coords.y1 = pos.y;
+                    bg_coords.x2 = pos.x + gi->x_offset + letter_w - 1 + (dsc->letter_space + 1) / 2;
+                    bg_coords.y2 = pos.y + line_height - 1;
+
+                    /* Decorations on last glyph */
+                    if(si == shaped->count - 1) {
+                        if(dsc->decor & LV_TEXT_DECOR_UNDERLINE) {
+                            lv_area_t fill_area;
+                            fill_area.x1 = line_start_x;
+                            fill_area.x2 = pos.x + gi->x_offset + letter_w - 1;
+                            fill_area.y1 = pos.y + font->line_height - font->base_line - font->underline_position;
+                            fill_area.y2 = fill_area.y1 + underline_width - 1;
+                            fill_dsc.color = dsc->color;
+                            cb(t, NULL, &fill_dsc, &fill_area);
+                        }
+                        if(dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH) {
+                            lv_area_t fill_area;
+                            fill_area.x1 = line_start_x;
+                            fill_area.x2 = pos.x + gi->x_offset + letter_w - 1;
+                            fill_area.y1 = pos.y + (font->line_height - font->base_line) * 2 / 3
+                                           + font->underline_thickness / 2;
+                            fill_area.y2 = fill_area.y1 + underline_width - 1;
+                            fill_dsc.color = dsc->color;
+                            cb(t, NULL, &fill_dsc, &fill_area);
+                        }
+                    }
+
+                    draw_letter_dsc.color = dsc->color;
+
+                    /* Draw the glyph using glyph descriptor directly */
+                    lv_point_t glyph_pos;
+                    glyph_pos.x = pos.x + gi->x_offset;
+                    glyph_pos.y = pos.y - gi->y_offset;
+
+                    draw_letter_dsc.g = &hb_glyph_dsc;
+                    draw_letter_dsc.bg_coords = &bg_coords;
+                    /* Pass 'A' as letter to avoid lv_text_is_marker() false positives on glyph IDs.
+                     * The actual glyph descriptor is already set via draw_letter_dsc.g. */
+                    lv_draw_unit_draw_letter(t, &draw_letter_dsc, &glyph_pos, font, 'A', cb);
+                    draw_letter_dsc.g = NULL;
+
+                    pos.x += gi->x_advance + dsc->letter_space;
+                }
+                lv_hb_shaped_text_destroy(shaped);
+                goto harfbuzz_next_line;
+            }
+        }
+#endif /*LV_USE_HARFBUZZ*/
+
         while(next_char_offset < remaining_len && next_char_offset < line_end - line_start) {
             uint32_t logical_char_pos = 0;
 
@@ -532,6 +606,10 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                 pos.x += letter_w + dsc->letter_space;
             }
         }
+
+#if LV_USE_HARFBUZZ
+harfbuzz_next_line:
+#endif
 
 #if LV_USE_BIDI
         lv_free(bidi_txt);
