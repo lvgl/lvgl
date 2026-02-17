@@ -941,6 +941,10 @@
     /** Cache count of glyphs in FreeType, i.e. number of glyphs that can be cached.
      *  The higher the value, the more memory will be used. */
     #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
+
+    /** HarfBuzz text shaping for complex scripts (e.g. Devanagari, Arabic).
+     *  Requires the HarfBuzz library to be installed. */
+    #define LV_USE_HARFBUZZ 0
 #endif
 
 /** Built-in TTF decoder */
