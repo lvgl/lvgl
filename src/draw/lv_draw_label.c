@@ -408,15 +408,36 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                     lv_font_glyph_dsc_t hb_glyph_dsc;
                     lv_memzero(&hb_glyph_dsc, sizeof(hb_glyph_dsc));
 
-                    if(!lv_freetype_get_glyph_dsc_by_gid(font, &hb_glyph_dsc, gi->glyph_id)) {
+                    bool use_fallback = false;
+                    uint32_t fallback_letter = 0;
+
+                    if(gi->glyph_id == 0 && font->fallback != NULL) {
+                        /* .notdef glyph: character not in this font. Try fallback chain. */
+                        uint32_t tmp_ofs = gi->cluster;
+                        fallback_letter = lv_text_encoded_next(bidi_txt, &tmp_ofs);
+                        if(fallback_letter && lv_font_get_glyph_dsc(font->fallback, &hb_glyph_dsc,
+                                                                     fallback_letter, 0)) {
+                            use_fallback = true;
+                        }
+                        else {
+                            /* No fallback found either, load .notdef from primary font */
+                            if(!lv_freetype_get_glyph_dsc_by_gid(font, &hb_glyph_dsc, 0)) {
+                                continue;
+                            }
+                        }
+                    }
+                    else if(!lv_freetype_get_glyph_dsc_by_gid(font, &hb_glyph_dsc, gi->glyph_id)) {
                         continue;
                     }
 
-                    letter_w = hb_glyph_dsc.adv_w;
+                    letter_w = use_fallback ? hb_glyph_dsc.adv_w : hb_glyph_dsc.adv_w;
+                    int32_t x_off = use_fallback ? 0 : gi->x_offset;
+                    int32_t y_off = use_fallback ? 0 : gi->y_offset;
+                    int32_t x_adv = use_fallback ? hb_glyph_dsc.adv_w : gi->x_advance;
 
-                    bg_coords.x1 = pos.x + gi->x_offset - dsc->letter_space / 2;
+                    bg_coords.x1 = pos.x + x_off - dsc->letter_space / 2;
                     bg_coords.y1 = pos.y;
-                    bg_coords.x2 = pos.x + gi->x_offset + letter_w - 1 + (dsc->letter_space + 1) / 2;
+                    bg_coords.x2 = pos.x + x_off + letter_w - 1 + (dsc->letter_space + 1) / 2;
                     bg_coords.y2 = pos.y + line_height - 1;
 
                     /* Decorations on last glyph */
@@ -424,7 +445,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                         if(dsc->decor & LV_TEXT_DECOR_UNDERLINE) {
                             lv_area_t fill_area;
                             fill_area.x1 = line_start_x;
-                            fill_area.x2 = pos.x + gi->x_offset + letter_w - 1;
+                            fill_area.x2 = pos.x + x_off + letter_w - 1;
                             fill_area.y1 = pos.y + font->line_height - font->base_line - font->underline_position;
                             fill_area.y2 = fill_area.y1 + underline_width - 1;
                             fill_dsc.color = dsc->color;
@@ -433,7 +454,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                         if(dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH) {
                             lv_area_t fill_area;
                             fill_area.x1 = line_start_x;
-                            fill_area.x2 = pos.x + gi->x_offset + letter_w - 1;
+                            fill_area.x2 = pos.x + x_off + letter_w - 1;
                             fill_area.y1 = pos.y + (font->line_height - font->base_line) * 2 / 3
                                            + font->underline_thickness / 2;
                             fill_area.y2 = fill_area.y1 + underline_width - 1;
@@ -453,19 +474,27 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                         }
                     }
 
-                    /* Draw the glyph using glyph descriptor directly */
                     lv_point_t glyph_pos;
-                    glyph_pos.x = pos.x + gi->x_offset;
-                    glyph_pos.y = pos.y - gi->y_offset;
+                    glyph_pos.x = pos.x + x_off;
+                    glyph_pos.y = pos.y - y_off;
 
-                    draw_letter_dsc.g = &hb_glyph_dsc;
-                    draw_letter_dsc.bg_coords = &bg_coords;
-                    /* Pass 'A' as letter to avoid lv_text_is_marker() false positives on glyph IDs.
-                     * The actual glyph descriptor is already set via draw_letter_dsc.g. */
-                    lv_draw_unit_draw_letter(t, &draw_letter_dsc, &glyph_pos, font, 'A', cb);
-                    draw_letter_dsc.g = NULL;
+                    if(use_fallback) {
+                        /* Render via standard path using the fallback font */
+                        draw_letter_dsc.g = &hb_glyph_dsc;
+                        draw_letter_dsc.bg_coords = &bg_coords;
+                        lv_draw_unit_draw_letter(t, &draw_letter_dsc, &glyph_pos,
+                                                 hb_glyph_dsc.resolved_font, fallback_letter, cb);
+                        draw_letter_dsc.g = NULL;
+                    }
+                    else {
+                        /* Render using HarfBuzz glyph descriptor directly */
+                        draw_letter_dsc.g = &hb_glyph_dsc;
+                        draw_letter_dsc.bg_coords = &bg_coords;
+                        lv_draw_unit_draw_letter(t, &draw_letter_dsc, &glyph_pos, font, 'A', cb);
+                        draw_letter_dsc.g = NULL;
+                    }
 
-                    pos.x += gi->x_advance + dsc->letter_space;
+                    pos.x += x_adv + dsc->letter_space;
                 }
                 lv_hb_shaped_text_destroy(shaped);
                 goto harfbuzz_next_line;

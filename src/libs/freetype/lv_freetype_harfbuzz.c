@@ -8,6 +8,7 @@
  *********************/
 
 #include "../../lvgl.h"
+#include "../../misc/lv_text_private.h"
 #include "lv_freetype_private.h"
 #include "lv_freetype_harfbuzz.h"
 
@@ -182,8 +183,19 @@ int32_t lv_hb_get_text_width(const lv_font_t * font, const char * text, uint32_t
 
     int32_t width = 0;
     for(uint32_t i = 0; i < shaped->count; i++) {
-        if(shaped->glyphs[i].x_advance > 0) {
-            width += shaped->glyphs[i].x_advance + letter_space;
+        int32_t glyph_w = shaped->glyphs[i].x_advance;
+
+        /* For .notdef glyphs (glyph_id == 0), try the fallback font chain */
+        if(shaped->glyphs[i].glyph_id == 0 && font->fallback != NULL) {
+            uint32_t tmp_ofs = shaped->glyphs[i].cluster;
+            uint32_t letter = lv_text_encoded_next(text, &tmp_ofs);
+            if(letter) {
+                glyph_w = lv_font_get_glyph_width(font->fallback, letter, 0);
+            }
+        }
+
+        if(glyph_w > 0) {
+            width += glyph_w + letter_space;
         }
     }
 
