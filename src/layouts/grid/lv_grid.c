@@ -53,6 +53,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static bool calc_min_size(const lv_obj_t * obj, int32_t * req_size, bool width, void * user_data);
 static void grid_update(lv_obj_t * cont, void * user_data);
 static lv_result_t calc(lv_obj_t * obj, lv_grid_calc_t * calc);
 static void calc_free(lv_grid_calc_t * calc);
@@ -64,19 +65,19 @@ static int32_t grid_align(int32_t cont_size, bool auto_size, lv_grid_align_t ali
                           int32_t * size_array, int32_t * pos_array, bool reverse);
 static uint32_t count_tracks(const int32_t * templ);
 
-static inline const int32_t * get_col_dsc(lv_obj_t * obj)
+static inline const int32_t * get_col_dsc(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_column_dsc_array(obj, LV_PART_MAIN);
 }
-static inline const int32_t * get_row_dsc(lv_obj_t * obj)
+static inline const int32_t * get_row_dsc(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_row_dsc_array(obj, LV_PART_MAIN);
 }
-static inline int32_t get_col_pos(lv_obj_t * obj)
+static inline int32_t get_col_pos(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_column_pos(obj, LV_PART_MAIN);
 }
-static inline int32_t get_row_pos(lv_obj_t * obj)
+static inline int32_t get_row_pos(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_row_pos(obj, LV_PART_MAIN);
 }
@@ -84,32 +85,32 @@ static inline int32_t get_col_span(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_column_span(obj, LV_PART_MAIN);
 }
-static inline int32_t get_row_span(lv_obj_t * obj)
+static inline int32_t get_row_span(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_row_span(obj, LV_PART_MAIN);
 }
-static inline lv_grid_align_t get_cell_col_align(lv_obj_t * obj)
+static inline lv_grid_align_t get_cell_col_align(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_x_align(obj, LV_PART_MAIN);
 }
-static inline lv_grid_align_t get_cell_row_align(lv_obj_t * obj)
+static inline lv_grid_align_t get_cell_row_align(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_y_align(obj, LV_PART_MAIN);
 }
-static inline lv_grid_align_t get_grid_col_align(lv_obj_t * obj)
+static inline lv_grid_align_t get_grid_col_align(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_column_align(obj, LV_PART_MAIN);
 }
-static inline lv_grid_align_t get_grid_row_align(lv_obj_t * obj)
+static inline lv_grid_align_t get_grid_row_align(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_row_align(obj, LV_PART_MAIN);
 }
-static inline int32_t get_margin_hor(lv_obj_t * obj)
+static inline int32_t get_margin_hor(const lv_obj_t * obj)
 {
     return lv_obj_get_style_margin_left(obj, LV_PART_MAIN)
            + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
 }
-static inline int32_t get_margin_ver(lv_obj_t * obj)
+static inline int32_t get_margin_ver(const lv_obj_t * obj)
 {
     return lv_obj_get_style_margin_top(obj, LV_PART_MAIN)
            + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
@@ -144,7 +145,7 @@ static inline int32_t lv_div_round_closest(int32_t dividend, int32_t divisor)
 void lv_grid_init(void)
 {
     layout_list_def[LV_LAYOUT_GRID].callbacks.layout_update_cb = grid_update;
-    layout_list_def[LV_LAYOUT_GRID].callbacks.get_min_size_cb = NULL;
+    layout_list_def[LV_LAYOUT_GRID].callbacks.get_min_size_cb = calc_min_size;
     layout_list_def[LV_LAYOUT_GRID].user_data = NULL;
 }
 
@@ -185,6 +186,113 @@ int32_t lv_grid_fr(uint8_t x)
  *   STATIC FUNCTIONS
  **********************/
 
+static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width, void * user_data)
+{
+    LV_PROFILER_LAYOUT_BEGIN;
+    LV_UNUSED(user_data);
+
+    if(cont->spec_attr == NULL) {
+        LV_PROFILER_LAYOUT_END;
+        return false;
+    }
+
+    const int32_t * templ = width ? get_col_dsc(cont) : get_row_dsc(cont);
+    if(templ == NULL) {
+        LV_PROFILER_LAYOUT_END;
+        return false;
+    }
+
+    uint32_t track_num = count_tracks(templ);
+    if(track_num == 0) {
+        LV_PROFILER_LAYOUT_END;
+        return false;
+    }
+
+    int32_t total = 0;
+    uint32_t i;
+    for(i = 0; i < track_num; i++) {
+        int32_t t = templ[i];
+        if(IS_FR(t) || IS_CONTENT(t)) {
+            /*For FR and CONTENT tracks, find the largest single-span child in this track*/
+            int32_t max_child_size = 0;
+            uint32_t ci;
+            for(ci = 0; ci < cont->spec_attr->child_cnt; ci++) {
+                lv_obj_t * item = cont->spec_attr->children[ci];
+                if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING))
+                    continue;
+
+                uint32_t span = width ? get_col_span(item) : get_row_span(item);
+                if(span != 1)
+                    continue;
+
+                uint32_t pos = width ? get_col_pos(item) : get_row_pos(item);
+                if(pos != i)
+                    continue;
+
+                int32_t item_size = width ? lv_obj_get_width(item) : lv_obj_get_height(item);
+
+                lv_grid_align_t align = width ? get_cell_col_align(item) : get_cell_row_align(item);
+                /*If the item has RTL base dir switch start and end*/
+                if(width && lv_obj_get_style_base_dir(item, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
+                    if(align == LV_GRID_ALIGN_START)
+                        align = LV_GRID_ALIGN_END;
+                    else if(align == LV_GRID_ALIGN_END)
+                        align = LV_GRID_ALIGN_START;
+                }
+
+                switch(align) {
+                    default:
+                    case LV_GRID_ALIGN_START:
+                        item_size += width ? lv_obj_get_style_margin_left(item, LV_PART_MAIN)
+                                     : lv_obj_get_style_margin_top(item, LV_PART_MAIN);
+                        break;
+                    case LV_GRID_ALIGN_STRETCH:
+                        item_size += width ? get_margin_hor(item) : get_margin_ver(item);
+                        break;
+                    case LV_GRID_ALIGN_CENTER:
+                        if(width)
+                            item_size += (lv_obj_get_style_margin_left(item, LV_PART_MAIN) -
+                                          lv_obj_get_style_margin_right(item, LV_PART_MAIN)) / 2;
+                        else
+                            item_size += (lv_obj_get_style_margin_top(item, LV_PART_MAIN) -
+                                          lv_obj_get_style_margin_bottom(item, LV_PART_MAIN)) / 2;
+                        break;
+                    case LV_GRID_ALIGN_END:
+                        item_size += width ? lv_obj_get_style_margin_right(item, LV_PART_MAIN)
+                                     : lv_obj_get_style_margin_bottom(item, LV_PART_MAIN);
+                        break;
+                }
+                max_child_size = LV_MAX(max_child_size, item_size);
+            }
+            total += max_child_size;
+        }
+        else {
+            /*Fixed size track*/
+            total += t;
+        }
+    }
+
+    /*Add gaps between tracks*/
+    int32_t gap =
+        width ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
+    total += gap * (int32_t)(track_num - 1);
+    total += track_num; // without this the size can be undercalculated by 1 pixel per track + 1 (because of rounding?)
+
+    /*Add container padding*/
+    int32_t space_start =
+        width ? lv_obj_get_style_space_left(cont, LV_PART_MAIN) : lv_obj_get_style_space_top(cont, LV_PART_MAIN);
+    int32_t space_end =
+        width ? lv_obj_get_style_space_right(cont, LV_PART_MAIN) : lv_obj_get_style_space_bottom(cont, LV_PART_MAIN);
+
+    total += space_start + space_end;
+    LV_LOG("gap: %d, space_start: %d, space_end: %d", gap, space_start, space_end);
+
+    *req_size = total;
+
+    LV_PROFILER_LAYOUT_END;
+    return true;
+}
+
 static void grid_update(lv_obj_t * cont, void * user_data)
 {
     LV_LOG_INFO("update %p container", (void *)cont);
@@ -211,8 +319,8 @@ static void grid_update(lv_obj_t * cont, void * user_data)
     }
     calc_free(&c);
 
-    int32_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
-    int32_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
+    int32_t w_set = lv_obj_get_style_clamped_width(cont);
+    int32_t h_set = lv_obj_get_style_clamped_height(cont);
     if(w_set == LV_SIZE_CONTENT || h_set == LV_SIZE_CONTENT) {
         lv_obj_refr_size(cont);
     }
