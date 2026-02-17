@@ -976,7 +976,8 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
     /*Do nothing if the position is not changed*/
     /*It is very important else recursive positioning can
      *occur without position change*/
-    if(diff.x == 0 && diff.y == 0) return;
+    if(diff.x == 0 && diff.y == 0)
+        return;
 
     /*Invalidate the original area*/
     lv_obj_invalidate(obj);
@@ -994,7 +995,8 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
         /*If the object is already out of the parent and its position is changes
          *surely the scrollbars also changes so invalidate them*/
         on1 = lv_area_is_in(&ori, &parent_fit_area, 0);
-        if(!on1) lv_obj_scrollbar_invalidate(parent);
+        if(!on1)
+            lv_obj_scrollbar_invalidate(parent);
     }
 
     obj->coords.x1 += diff.x;
@@ -1005,7 +1007,8 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
     lv_obj_move_children_by(obj, diff.x, diff.y, false);
 
     /*Call the ancestor's event handler to the parent too*/
-    if(parent) lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
+    if(parent)
+        lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -1014,7 +1017,8 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
      *If it wasn't out of the parent but out now, also invalidate the scrollbars*/
     if(parent) {
         bool on2 = lv_area_is_in(&obj->coords, &parent_fit_area, 0);
-        if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
+        if(on1 || (!on1 && on2))
+            lv_obj_scrollbar_invalidate(parent);
     }
 }
 
@@ -1039,7 +1043,9 @@ void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, lv_obj_point_t
     lv_obj_transform_point_array(obj, p, 1, flags);
 }
 
-void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], size_t count,
+void lv_obj_transform_point_array(const lv_obj_t * obj,
+                                  lv_point_t points[],
+                                  size_t count,
                                   lv_obj_point_transform_flag_t flags)
 {
     if(obj) {
@@ -1048,12 +1054,16 @@ void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], siz
         bool recursive = flags & LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE;
         bool inverse = flags & LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE;
         if(inverse) {
-            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
-            if(do_tranf) transform_point_array(obj, points, count, inverse);
+            if(recursive)
+                lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
+            if(do_tranf)
+                transform_point_array(obj, points, count, inverse);
         }
         else {
-            if(do_tranf) transform_point_array(obj, points, count, inverse);
-            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
+            if(do_tranf)
+                transform_point_array(obj, points, count, inverse);
+            if(recursive)
+                lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
         }
     }
 }
@@ -1083,7 +1093,8 @@ typedef struct {
 static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
 {
     blur_walk_data_t * blur_data = user_data;
-    if(obj == blur_data->requester_obj) return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
+    if(obj == blur_data->requester_obj)
+        return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
@@ -1105,10 +1116,12 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
         uint32_t i;
         for(i = 0; i < obj->style_cnt; i++) {
             lv_obj_style_t * obj_style = &obj->styles[i];
-            if(obj_style->is_disabled) continue;
+            if(obj_style->is_disabled)
+                continue;
 
             lv_state_t state_style = lv_obj_style_get_selector_state(obj->styles[i].selector);
-            if((state_style & state_inv)) continue;
+            if((state_style & state_inv))
+                continue;
 
             bool invalidation_needed = false;
             if((obj_style->style->has_group & group_blur) &&
@@ -1120,7 +1133,8 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
                 invalidation_needed = true;
             }
 
-            if(invalidation_needed == false) continue;
+            if(invalidation_needed == false)
+                continue;
 
             /*Truncate the area to the object*/
             ext_size = lv_obj_get_ext_draw_size(obj);
@@ -1144,35 +1158,36 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
         /*Not on the area of interest, skip it*/
         return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
     }
-
 }
 
 lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_display_t * disp   = lv_obj_get_display(obj);
-    if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
+    lv_display_t * disp = lv_obj_get_display(obj);
+    if(!lv_display_is_invalidation_enabled(disp))
+        return LV_RESULT_INVALID;
 
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);
 
     lv_result_t res = invalidate_area_core(obj, &area_tmp);
-    if(res == LV_RESULT_INVALID) return res;
+    if(res == LV_RESULT_INVALID)
+        return res;
 
     /*If this area is on a blurred widget, invalidate that widget too*/
     blur_walk_data_t blur_walk_data;
     blur_walk_data.requester_obj = obj;
     blur_walk_data.inv_area = &area_tmp;
     lv_obj_tree_walk(disp->act_scr, blur_walk_cb, &blur_walk_data);
-    if(disp->prev_scr) lv_obj_tree_walk(disp->prev_scr, blur_walk_cb, &blur_walk_data);
+    if(disp->prev_scr)
+        lv_obj_tree_walk(disp->prev_scr, blur_walk_cb, &blur_walk_data);
     lv_obj_tree_walk(disp->sys_layer, blur_walk_cb, &blur_walk_data);
     lv_obj_tree_walk(disp->top_layer, blur_walk_cb, &blur_walk_data);
     lv_obj_tree_walk(disp->bottom_layer, blur_walk_cb, &blur_walk_data);
 
     return res;
 }
-
 
 lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
 {
@@ -1194,15 +1209,14 @@ lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
 
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 {
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN))
+        return false;
 
     /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    lv_display_t * disp   = lv_obj_get_display(obj_scr);
-    if(obj_scr != lv_display_get_screen_active(disp) &&
-       obj_scr != lv_display_get_screen_prev(disp) &&
-       obj_scr != lv_display_get_layer_bottom(disp) &&
-       obj_scr != lv_display_get_layer_top(disp) &&
+    lv_display_t * disp = lv_obj_get_display(obj_scr);
+    if(obj_scr != lv_display_get_screen_active(disp) && obj_scr != lv_display_get_screen_prev(disp) &&
+       obj_scr != lv_display_get_layer_bottom(disp) && obj_scr != lv_display_get_layer_top(disp) &&
        obj_scr != lv_display_get_layer_sys(disp)) {
         return false;
     }
@@ -1214,7 +1228,8 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     lv_area_increase(&obj_coords, ext_size, ext_size);
 
     /*The area is not on the object*/
-    if(!lv_area_intersect(area, area, &obj_coords)) return false;
+    if(!lv_area_intersect(area, area, &obj_coords))
+        return false;
 
     if(is_transformed(obj)) {
         lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
@@ -1224,7 +1239,8 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     while(parent != NULL) {
         /*If the parent is hidden then the child is hidden and won't be drawn*/
-        if(lv_obj_has_flag(parent, LV_OBJ_FLAG_HIDDEN)) return false;
+        if(lv_obj_has_flag(parent, LV_OBJ_FLAG_HIDDEN))
+            return false;
 
         /*Truncate to the parent and if no common parts break*/
         lv_area_t parent_coords = parent->coords;
@@ -1236,7 +1252,8 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
         if(is_transformed(parent)) {
             lv_obj_get_transformed_area(parent, &parent_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
         }
-        if(!lv_area_intersect(area, area, &parent_coords)) return false;
+        if(!lv_area_intersect(area, area, &parent_coords))
+            return false;
 
         parent = lv_obj_get_parent(parent);
     }
@@ -1277,12 +1294,14 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 
 bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
-    if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) return false;
+    if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE))
+        return false;
 
     lv_area_t a;
     lv_obj_get_click_area(obj, &a);
     bool res = lv_area_is_point_on(&a, point, 0);
-    if(res == false) return false;
+    if(res == false)
+        return false;
 
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
         lv_hit_test_info_t hit_info;
@@ -1297,15 +1316,19 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 
 int32_t lv_clamp_width(int32_t width, int32_t min_width, int32_t max_width, int32_t ref_width)
 {
-    if(LV_COORD_IS_PCT(min_width)) min_width = (ref_width * LV_COORD_GET_PCT(min_width)) / 100;
-    if(LV_COORD_IS_PCT(max_width)) max_width = (ref_width * LV_COORD_GET_PCT(max_width)) / 100;
+    if(LV_COORD_IS_PCT(min_width))
+        min_width = (ref_width * LV_COORD_GET_PCT(min_width)) / 100;
+    if(LV_COORD_IS_PCT(max_width))
+        max_width = (ref_width * LV_COORD_GET_PCT(max_width)) / 100;
     return LV_CLAMP(min_width, width, max_width);
 }
 
 int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, int32_t ref_height)
 {
-    if(LV_COORD_IS_PCT(min_height)) min_height = (ref_height * LV_COORD_GET_PCT(min_height)) / 100;
-    if(LV_COORD_IS_PCT(max_height)) max_height = (ref_height * LV_COORD_GET_PCT(max_height)) / 100;
+    if(LV_COORD_IS_PCT(min_height))
+        min_height = (ref_height * LV_COORD_GET_PCT(min_height)) / 100;
+    if(LV_COORD_IS_PCT(max_height))
+        max_height = (ref_height * LV_COORD_GET_PCT(max_height)) / 100;
     return LV_CLAMP(min_height, height, max_height);
 }
 
@@ -1397,7 +1420,8 @@ const lv_matrix_t * lv_obj_get_transform(const lv_obj_t * obj)
 static bool is_transformed(const lv_obj_t * obj)
 {
     while(obj) {
-        if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) return true;
+        if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM)
+            return true;
         obj = obj->parent;
     }
     return false;
