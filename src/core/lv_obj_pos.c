@@ -420,8 +420,6 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
     while(cur) {
         if(cur->subtree_layout_inv && cur->layout_inv)
             break; /*Both flags already propagated above*/
-        LV_LOG("Marking obj '%s' subtree_layout_inv = 1",
-               cur->spec_attr && cur->spec_attr->name ? cur->spec_attr->name : "<unknown>");
 
         cur->subtree_layout_inv = 1;
         cur->layout_inv = 1;
