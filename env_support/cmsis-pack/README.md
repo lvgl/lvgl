@@ -135,7 +135,7 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_FFMPEG 0
     - \#define LV_USE_FONT_MANAGER 0
     
-9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVE_INTERNAL` and `LV_USE_THORVE_EXTERNAL` as 
+9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVG_INTERNAL` and `LV_USE_THORVG_EXTERNAL` as 
 
     ```c
     /*Enable Vector Graphic APIs*/
