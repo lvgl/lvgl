@@ -81,7 +81,7 @@ static inline int32_t get_row_pos(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_row_pos(obj, LV_PART_MAIN);
 }
-static inline int32_t get_col_span(lv_obj_t * obj)
+static inline int32_t get_col_span(const lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_column_span(obj, LV_PART_MAIN);
 }
@@ -217,7 +217,7 @@ static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width,
             int32_t max_child_size = 0;
             uint32_t ci;
             for(ci = 0; ci < cont->spec_attr->child_cnt; ci++) {
-                lv_obj_t * item = cont->spec_attr->children[ci];
+                const lv_obj_t * item = cont->spec_attr->children[ci];
                 if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING))
                     continue;
 
@@ -229,15 +229,23 @@ static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width,
                 if(pos != i)
                     continue;
 
-                int32_t item_size = width ? lv_obj_get_width(item) : lv_obj_get_height(item);
-
                 lv_grid_align_t align = width ? get_cell_col_align(item) : get_cell_row_align(item);
+
                 /*If the item has RTL base dir switch start and end*/
                 if(width && lv_obj_get_style_base_dir(item, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
                     if(align == LV_GRID_ALIGN_START)
                         align = LV_GRID_ALIGN_END;
                     else if(align == LV_GRID_ALIGN_END)
                         align = LV_GRID_ALIGN_START;
+                }
+
+                int32_t item_size = width ? lv_obj_get_width(item) : lv_obj_get_height(item);
+
+                if(align == LV_GRID_ALIGN_STRETCH) {
+                    /* Stretch items will grow to the size of the column so using the current width/height will lead to
+                     * an inaccurate result */
+                    item_size = width ? lv_obj_calc_dynamic_width(item, LV_STYLE_MIN_WIDTH)
+                                : lv_obj_calc_dynamic_height(item, LV_STYLE_MIN_HEIGHT);
                 }
 
                 switch(align) {
@@ -252,10 +260,12 @@ static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width,
                     case LV_GRID_ALIGN_CENTER:
                         if(width)
                             item_size += (lv_obj_get_style_margin_left(item, LV_PART_MAIN) -
-                                          lv_obj_get_style_margin_right(item, LV_PART_MAIN)) / 2;
+                                          lv_obj_get_style_margin_right(item, LV_PART_MAIN)) /
+                                         2;
                         else
                             item_size += (lv_obj_get_style_margin_top(item, LV_PART_MAIN) -
-                                          lv_obj_get_style_margin_bottom(item, LV_PART_MAIN)) / 2;
+                                          lv_obj_get_style_margin_bottom(item, LV_PART_MAIN)) /
+                                         2;
                         break;
                     case LV_GRID_ALIGN_END:
                         item_size += width ? lv_obj_get_style_margin_right(item, LV_PART_MAIN)
@@ -276,7 +286,9 @@ static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width,
     int32_t gap =
         width ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
     total += gap * (int32_t)(track_num - 1);
-    total += track_num; // without this the size can be undercalculated by 1 pixel per track + 1 (because of rounding?)
+
+    /*Add 1 pixel per track to account for rounding errors*/
+    total += track_num;
 
     /*Add container padding*/
     int32_t space_start =
@@ -285,7 +297,15 @@ static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width,
         width ? lv_obj_get_style_space_right(cont, LV_PART_MAIN) : lv_obj_get_style_space_bottom(cont, LV_PART_MAIN);
 
     total += space_start + space_end;
-    LV_LOG("gap: %d, space_start: %d, space_end: %d", gap, space_start, space_end);
+    LV_LOG("Calc min grid %s for obj '%s': total %d (space %d+%d, gap %d*%d, tracks %d)",
+           width ? "width" : "height",
+           LV_OBJ_NAME(cont),
+           total,
+           space_start,
+           space_end,
+           gap,
+           track_num - 1,
+           track_num);
 
     *req_size = total;
 
