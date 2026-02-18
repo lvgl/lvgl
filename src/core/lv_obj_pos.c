@@ -182,6 +182,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     if(parent == NULL) return false;
 
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) {
+        LV_LOG_TRACE("Object '%s' is not visible - skipping refr_size", LV_OBJ_NAME(obj));
         return false;
     }
 
@@ -261,6 +262,14 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     obj->h_ignore_size = LV_COORD_IS_PCT(h_style);
 
+    LV_LOG_TRACE("refr_size: obj '%s', height = %d, min = %d, max = %d, ignore = %d%s",
+                 LV_OBJ_NAME(obj),
+                 h,
+                 minh,
+                 maxh,
+                 obj->h_ignore_size,
+                 obj->h_layout ? " (layout)" : "");
+
     /*Do nothing if the size is not changed*/
     /*It is very important else recursive resizing can occur without size change*/
     if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h) {
@@ -268,10 +277,24 @@ bool lv_obj_refr_size(lv_obj_t * obj)
          *produce a different result even though this object's size didn't change.
          *Mark the parent dirty so it recalculates on the next layout pass.*/
         if(obj->w_ignore_size != old_w_ignore || obj->h_ignore_size != old_h_ignore) {
+            LV_LOG_TRACE("Object '%s' ignore size changed (w_ignore_size: %d -> %d, h_ignore_size: %d -> %d), marking parent "
+                         "layout dirty",
+                         LV_OBJ_NAME(obj),
+                         old_w_ignore,
+                         obj->w_ignore_size,
+                         old_h_ignore,
+                         obj->h_ignore_size);
             lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
         }
         return false;
     }
+
+    LV_LOG_TRACE("Object '%s' size changed, (%d, %d) -> (%d, %d), marking layout dirty",
+                 LV_OBJ_NAME(obj),
+                 lv_obj_get_width(obj),
+                 lv_obj_get_height(obj),
+                 w,
+                 h);
 
     /*Invalidate the original area*/
     lv_obj_invalidate(obj);
@@ -376,6 +399,7 @@ void lv_obj_set_layout(lv_obj_t * obj, uint32_t layout)
 
     lv_obj_set_style_layout(obj, layout, 0);
 
+    LV_LOG_TRACE("Object '%s' layout set to %d, marking layout dirty", LV_OBJ_NAME(obj), layout);
     lv_obj_mark_layout_as_dirty(obj);
 }
 
@@ -404,6 +428,8 @@ bool lv_obj_is_height_layout_positioned(const lv_obj_t * obj)
 void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 {
     LV_PROFILER_LAYOUT_BEGIN;
+    LV_LOG_TRACE("Marking obj '%s' layout as dirty", LV_OBJ_NAME(obj));
+
     obj->layout_inv = 1;
 
     /*Propagate the subtree-dirty flag up to the screen so that
@@ -865,6 +891,7 @@ bool lv_obj_is_width_clamped(const lv_obj_t * obj)
     if(!lv_obj_is_style_any_width_content(obj) && !lv_obj_is_style_any_height_content(obj))
         return false;
 
+    LV_LOG_TRACE("Refreshing self size of obj '%s'", LV_OBJ_NAME(obj));
     /**
      * Refresh the parent's layout, because the childs size is in some way dependent on its contents we need to force a
      * recalculation of the parents layout
@@ -1075,6 +1102,8 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
         lv_obj_t * child = obj->spec_attr->children[i];
         if(ignore_floating && lv_obj_has_flag(child, LV_OBJ_FLAG_FLOATING))
             continue;
+
+        LV_LOG_TRACE("Moving child '%s' of obj '%s' by (%d, %d)", LV_OBJ_NAME(child), LV_OBJ_NAME(obj), x_diff, y_diff);
         child->coords.x1 += x_diff;
         child->coords.y1 += y_diff;
         child->coords.x2 += x_diff;
@@ -1540,8 +1569,12 @@ static int32_t calc_content_width(const lv_obj_t * obj)
                 lv_obj_t * child = obj->spec_attr->children[i];
                 if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
-                if(child->w_ignore_size)
+                if(child->w_ignore_size) {
+                    LV_LOG_TRACE("Child '%s' has w_ignore_size set, ignoring in content width calculation, width = %d",
+                                 LV_OBJ_NAME(child),
+                                 lv_obj_get_width(child));
                     continue;
+                }
 
                 if(!lv_obj_is_layout_positioned(child)) {
                     lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
@@ -1567,6 +1600,7 @@ static int32_t calc_content_width(const lv_obj_t * obj)
                 else {
                     /*Compensate: child coords already include the scroll offset*/
                     child_res_tmp = child->coords.x2 - obj->coords.x1 + 1 + scroll_x_tmp;
+                    LV_LOG_TRACE("Child '%s' is layout positioned, width = %d", LV_OBJ_NAME(child), lv_obj_get_width(child));
                 }
 
                 child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_right(child, LV_PART_MAIN));
@@ -1611,8 +1645,12 @@ static int32_t calc_content_height(const lv_obj_t * obj)
             if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING))
                 continue;
 
-            if(child->h_ignore_size)
+            if(child->h_ignore_size) {
+                LV_LOG_TRACE("Child '%s' has h_ignore_size set, ignoring in content height calculation, height = %d",
+                             LV_OBJ_NAME(child),
+                             lv_obj_get_height(child));
                 continue;
+            }
 
             if(!lv_obj_is_layout_positioned(child)) {
                 lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
@@ -1638,6 +1676,7 @@ static int32_t calc_content_height(const lv_obj_t * obj)
             else {
                 /*Compensate: child coords already include the scroll offset*/
                 child_res_tmp = child->coords.y2 - obj->coords.y1 + 1 + scroll_y_tmp;
+                LV_LOG_TRACE("Child '%s' is layout positioned, height = %d", LV_OBJ_NAME(child), lv_obj_get_height(child));
             }
 
             child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN));
@@ -1674,6 +1713,7 @@ static void layout_update_core(lv_obj_t * obj)
     }
 
     LV_PROFILER_LAYOUT_BEGIN;
+    LV_LOG_TRACE("Updating layout of object '%s'", LV_OBJ_NAME(obj));
     uint32_t child_cnt = obj->spec_attr ? obj->spec_attr->child_cnt : 0;
     uint32_t i;
     for(i = 0; i < child_cnt; i++) {

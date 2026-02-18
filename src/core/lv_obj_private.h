@@ -19,6 +19,11 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_OBJ_NAME
+#  define LV_OBJ_NAME(obj) ((obj)->spec_attr && (obj)->spec_attr->name ? (obj)->spec_attr->name : "<unnamed>")
+#else
+#  define LV_OBJ_NAME(obj) ""
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -29,7 +34,7 @@ extern "C" {
  * They are allocated automatically if any elements is set.
  */
 struct _lv_obj_spec_attr_t {
-    lv_obj_t ** children;           /**< Store the pointer of the children in an array.*/
+    lv_obj_t ** children; /**< Store the pointer of the children in an array.*/
     lv_group_t * group_p;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_t * matrix;           /**< The transform matrix*/

@@ -277,6 +277,7 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
+        LV_LOG_TRACE("Object '%s' layout changed by flag change, marking layout dirty", LV_OBJ_NAME(obj));
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
         lv_obj_mark_layout_as_dirty(obj);
     }
@@ -306,12 +307,14 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
     obj->flags &= (~f);
 
     if(f & LV_OBJ_FLAG_HIDDEN) {
+        LV_LOG_TRACE("Obj '%s' hidden flag removed, marking layout dirty", LV_OBJ_NAME(obj));
         lv_obj_invalidate(obj);
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
         lv_obj_mark_layout_as_dirty(obj);
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 | LV_OBJ_FLAG_LAYOUT_2))) {
+        LV_LOG_TRACE("Object '%s' layout changed by flag change, marking layout dirty", LV_OBJ_NAME(obj));
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
     }
 }
@@ -943,6 +946,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
+        LV_LOG_TRACE("EVENT_STYLE_CHANGED for obj '%s', marking children dirty", LV_OBJ_NAME(obj));
         uint32_t child_cnt = lv_obj_get_child_count(obj);
         for(uint32_t i = 0; i < child_cnt; i++) {
             lv_obj_t * child = obj->spec_attr->children[i];
@@ -1041,6 +1045,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
+        LV_LOG_TRACE("EVENT_SIZE_CHANGED for obj '%s', marking children dirty", LV_OBJ_NAME(obj));
         int32_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
         uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
         if(layout || align) {
@@ -1055,11 +1060,10 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_CHILD_CHANGED) {
-        int32_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        int32_t h = lv_obj_get_style_height(obj, LV_PART_MAIN);
+        LV_LOG_TRACE("EVENT_CHILD_CHANGED for obj '%s'", LV_OBJ_NAME(obj));
         int32_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
         uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
-        if(layout || align || w == LV_SIZE_CONTENT || h == LV_SIZE_CONTENT) {
+        if(layout || align || lv_obj_is_style_any_width_content(obj) || lv_obj_is_style_any_height_content(obj)) {
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
