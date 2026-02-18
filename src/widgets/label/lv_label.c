@@ -819,9 +819,17 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 flag |= LV_TEXT_FLAG_EXPAND;
 
             int32_t w;
-            if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
-            else w = lv_obj_get_content_width(obj);
-            w = LV_MIN(w, lv_obj_get_style_max_width(obj, LV_PART_MAIN));
+            if((lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) ||
+               lv_obj_get_style_min_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+                w = LV_COORD_MAX;
+            }
+            else {
+                w = lv_obj_get_content_width(obj);
+            }
+            if(lv_obj_get_style_max_width(obj, LV_PART_MAIN) != LV_SIZE_CONTENT) {
+                /* LV_SIZE_CONTENT would cause an infinite loop */
+                w = LV_MIN(w, lv_obj_calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH));
+            }
 
             uint32_t dot_begin = label->dot_begin;
             lv_label_revert_dots(obj);
@@ -1065,7 +1073,17 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj)
     label->invalid_size_cache = true;
 
     lv_obj_invalidate(obj);
-    lv_obj_refresh_self_size(obj);
+
+    /**
+     * Ideally we would use `lv_obj_refresh_self_size(obj);` here but it can cause an infinite loop due to the way label
+     * self size is implemented.
+     * The implementation should be revisited in the future since it currently doesn't handle fixed height, content
+     * width in all scenarios properly.
+     * Once that is fixed we should be able to use `lv_obj_refresh_self_size(obj);` here.
+     */
+    if(lv_obj_is_style_any_height_content(obj) || lv_obj_is_style_any_width_content(obj)) {
+        lv_obj_mark_layout_as_dirty(obj);
+    }
 
     if(!label->need_refr_text) {
         label->need_refr_text = true;
@@ -1434,9 +1452,9 @@ static lv_text_flag_t get_label_flags(lv_label_t * label)
     if(label->expand) flag |= LV_TEXT_FLAG_EXPAND;
 
     lv_obj_t * obj = (lv_obj_t *) label;
-    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT &&
-       lv_obj_get_style_max_width(obj, LV_PART_MAIN) == LV_COORD_MAX &&
-       !obj->w_layout) {
+    if((lv_obj_get_style_min_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT ||
+        (lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout)) &&
+       lv_obj_get_style_max_width(obj, LV_PART_MAIN) == LV_COORD_MAX) {
         flag |= LV_TEXT_FLAG_FIT;
     }
 

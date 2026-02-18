@@ -56,7 +56,7 @@ void test_textarea_should_update_label_style_with_one_line_enabled(void)
 
     TEST_ASSERT(lv_textarea_get_one_line(textarea));
     TEST_ASSERT_EQUAL_UINT16(expected_size, lv_obj_get_width(txt_ptr->label));
-    TEST_ASSERT_EQUAL_UINT16(lv_pct(100), lv_obj_get_style_min_width(txt_ptr->label, LV_PART_MAIN));
+    TEST_ASSERT_EQUAL_UINT16(LV_SIZE_CONTENT, lv_obj_get_style_min_width(txt_ptr->label, LV_PART_MAIN));
 }
 
 void test_textarea_cursor_click_pos_field_update(void)
