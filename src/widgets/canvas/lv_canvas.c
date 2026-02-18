@@ -411,6 +411,8 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
         return;
     }
 
+    layer->all_tasks_added = true;
+
     bool task_dispatched;
 
     while(layer->draw_task_head) {
