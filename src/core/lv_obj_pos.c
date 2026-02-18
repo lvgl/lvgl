@@ -886,7 +886,7 @@ bool lv_obj_is_height_clamped(const lv_obj_t * obj)
     return h == minh || h == maxh;
 }
 
-bool lv_obj_is_width_clamped(const lv_obj_t * obj)
+bool lv_obj_refresh_self_size(lv_obj_t * obj)
 {
     if(!lv_obj_is_style_any_width_content(obj) && !lv_obj_is_style_any_height_content(obj))
         return false;

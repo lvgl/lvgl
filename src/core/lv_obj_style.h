@@ -192,16 +192,14 @@ bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_styl
 
 /**
  * Enable or disable automatic style refreshing globally.
- * Supports nesting: each `false` call increments an internal counter, each `true` call decrements it.
- * Style refresh is only active when the counter reaches zero.
- * @param en        true: decrement disable counter; false: increment disable counter
+ * @param en        true: enable style refresh; false: disable style refresh
  */
 void lv_enable_style_refresh(bool en);
 
 /**
  * Enable or disable automatic style refreshing for a specific object.
  * When disabled, style changes are accumulated but not visually applied.
- * When re-enabled, a full style refresh is triggered automatically on the object and its children.
+ * When re-enabled, a full style refresh is triggered automatically on the object.
  * @param obj       pointer to an object
  * @param en        true: enable refreshing; false: disable refreshing
  */
