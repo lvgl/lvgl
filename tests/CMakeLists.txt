@@ -539,10 +539,13 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             ${WebP_LINK_LIBRARIES}
-            PkgConfig::FFMPEG
             m
             pthread
             ${TEST_LIBS})
+
+    if(FFMPEG_FOUND)
+        target_link_libraries(${test_name} PRIVATE PkgConfig::FFMPEG)
+    endif()
 
     if(OPTIONS_SDL)
         target_link_libraries(${test_name} PRIVATE ${SDL_LIBRARY})
