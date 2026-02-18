@@ -208,11 +208,6 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     else {
         w = calc_dynamic_width(obj, LV_STYLE_WIDTH, &content_width);
 
-        /**
-         * If the object style (after clamping) results in a width that is defined as a percentage of the parent,
-         * and if the parent's width is set to LV_SIZE_CONTENT and not managed by a layout, this object should not
-         * influence the parent's content width calculation. Thus, the `w_ignore_size` flag is set accordingly.
-         */
         if(w <= minw) {
             w_style = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
         }
@@ -224,6 +219,11 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         }
         w = LV_CLAMP(minw, w, maxw);
     }
+    /**
+     * If the object style (after clamping) results in a width that is defined as a percentage of the parent,
+     * when the parent does a LV_SIZE_CONTENT calculation, this object should not influence the parent's content width
+     * calculation. Thus, the `w_ignore_size` flag is set accordingly.
+     */
     obj->w_ignore_size = LV_COORD_IS_PCT(w_style);
 
     int32_t content_height = -1;
@@ -244,11 +244,6 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     else {
         h = calc_dynamic_height(obj, LV_STYLE_HEIGHT, &content_height);
 
-        /**
-         * If the object style (after clamping) results in a height that is defined as a percentage of the parent,
-         * and if the parent's height is set to LV_SIZE_CONTENT and not managed by a layout, this object should not
-         * influence the parent's content height calculation. Thus, the `h_ignore_size` flag is set accordingly.
-         */
         if(h <= minh) {
             h_style = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
         }
@@ -260,6 +255,11 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         }
         h = LV_CLAMP(minh, h, maxh);
     }
+    /**
+     * If the object style (after clamping) results in a height that is defined as a percentage of the parent,
+     * when the parent does a LV_SIZE_CONTENT calculation, this object should not influence the parent's content height
+     * calculation. Thus, the `h_ignore_size` flag is set accordingly.
+     */
     obj->h_ignore_size = LV_COORD_IS_PCT(h_style);
 
     LV_LOG_TRACE("refr_size: obj '%s', height = %d, min = %d, max = %d, ignore = %d%s",
@@ -1108,8 +1108,6 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
         child->coords.y1 += y_diff;
         child->coords.x2 += x_diff;
         child->coords.y2 += y_diff;
-
-        lv_obj_send_event(obj, LV_EVENT_CHILD_CHANGED, child);
 
         lv_obj_move_children_by(child, x_diff, y_diff, false);
     }
