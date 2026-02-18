@@ -1416,7 +1416,6 @@
                 <file category="sourceC"      name="src/draw/nanovg/lv_nanovg_utils.c" />
                 
                 <file category="sourceC"      name="src/libs/nanovg/nanovg.c" />
-                <file category="sourceC"      name="src/libs/nanovg/nanovg.c" />
               </files>
 
               <RTE_Components_h>
@@ -1921,34 +1920,6 @@
 
             </component>
 
-            -->
-            
-            <!--
-            <component Cgroup="LVGL9" Csub="PikaScript Binding" Cversion="0.2.0" condition="LVGL-Essential">
-              <description>Add the binding for PikaScript, an ultra-light-weight python VM.</description>
-              <files>
-                <file category="doc"        name="pikascript/README.md"/>
-                <file category="sourceC"    name="pikascript/pika_lvgl.c" />
-                <file category="sourceC"    name="pikascript/pika_lvgl_indev_t.c" />
-                <file category="sourceC"    name="pikascript/pika_lvgl_lv_event.c" />
-                <file category="sourceC"    name="pikascript/pika_lvgl_lv_obj.c" />
-                <file category="sourceC"    name="pikascript/pika_lvgl_lv_style_t.c" />
-                <file category="sourceC"    name="pikascript/pika_lv_point_t.c" />
-                <file category="sourceC"    name="pikascript/pika_lv_timer_t.c" />
-                <file category="sourceC"    name="pikascript/pika_lv_wegit.c" />
-              </files>
-              <Pre_Include_Local_Component_h>
-
-/* enabling PikaScript Binding */
-#define PIKASCRIPT     1
-              </Pre_Include_Local_Component_h>
-              <RTE_Components_h>
-
-/*! \brief enable PikaScript Binding */
-#define LV_USE_PIKASCRIPT_BINDING          1
-              </RTE_Components_h>
-
-            </component>
             -->
             
             <component Cgroup="Libraries and Others" Csub="Libs SVG"  condition="LVGL-Essential">
