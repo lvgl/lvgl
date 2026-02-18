@@ -36,7 +36,8 @@ static void layout_update_core(lv_obj_t * obj);
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv);
 static bool is_transformed(const lv_obj_t * obj);
 static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_tmp);
-
+static lv_result_t obj_invalidate_area_internal(const lv_display_t * disp, const lv_obj_t * obj,
+                                                const lv_area_t * area);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -1087,29 +1088,16 @@ lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
     lv_display_t * disp   = lv_obj_get_display(obj);
     if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
 
-    lv_area_t area_tmp;
-    lv_area_copy(&area_tmp, area);
-
-    lv_result_t res = invalidate_area_core(obj, &area_tmp);
-    if(res == LV_RESULT_INVALID) return res;
-
-    /*If this area is on a blurred widget, invalidate that widget too*/
-    blur_walk_data_t blur_walk_data;
-    blur_walk_data.requester_obj = obj;
-    blur_walk_data.inv_area = &area_tmp;
-    lv_obj_tree_walk(disp->act_scr, blur_walk_cb, &blur_walk_data);
-    if(disp->prev_scr) lv_obj_tree_walk(disp->prev_scr, blur_walk_cb, &blur_walk_data);
-    lv_obj_tree_walk(disp->sys_layer, blur_walk_cb, &blur_walk_data);
-    lv_obj_tree_walk(disp->top_layer, blur_walk_cb, &blur_walk_data);
-    lv_obj_tree_walk(disp->bottom_layer, blur_walk_cb, &blur_walk_data);
-
-    return res;
+    return obj_invalidate_area_internal(disp, obj, area);
 }
 
 
 lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_display_t * disp = lv_obj_get_display(obj);
+    if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
@@ -1120,7 +1108,7 @@ lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
     obj_coords.x2 += ext_size;
     obj_coords.y2 += ext_size;
 
-    lv_result_t res = lv_obj_invalidate_area(obj, &obj_coords);
+    lv_result_t res = obj_invalidate_area_internal(disp, obj, &obj_coords);
 
     return res;
 }
@@ -1326,6 +1314,32 @@ const lv_matrix_t * lv_obj_get_transform(const lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_result_t obj_invalidate_area_internal(const lv_display_t * disp, const lv_obj_t * obj,
+                                                const lv_area_t * area)
+{
+    LV_ASSERT_NULL(disp);
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NULL(area);
+
+    lv_area_t area_tmp;
+    lv_area_copy(&area_tmp, area);
+
+    lv_result_t res = invalidate_area_core(obj, &area_tmp);
+    if(res == LV_RESULT_INVALID) return res;
+
+    /*If this area is on a blurred widget, invalidate that widget too*/
+    blur_walk_data_t blur_walk_data;
+    blur_walk_data.requester_obj = obj;
+    blur_walk_data.inv_area = &area_tmp;
+    lv_obj_tree_walk(disp->act_scr, blur_walk_cb, &blur_walk_data);
+    if(disp->prev_scr) lv_obj_tree_walk(disp->prev_scr, blur_walk_cb, &blur_walk_data);
+    lv_obj_tree_walk(disp->sys_layer, blur_walk_cb, &blur_walk_data);
+    lv_obj_tree_walk(disp->top_layer, blur_walk_cb, &blur_walk_data);
+    lv_obj_tree_walk(disp->bottom_layer, blur_walk_cb, &blur_walk_data);
+
+    return res;
+}
 
 static bool is_transformed(const lv_obj_t * obj)
 {

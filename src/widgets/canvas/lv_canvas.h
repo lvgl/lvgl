@@ -81,6 +81,10 @@ void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
  *              LV_COLOR_FORMAT_I1/2/4/8, LV_COLOR_FORMAT_A8,
  *              LV_COLOR_FORMAT_RGB565, LV_COLOR_FORMAT_RGB888,
  *              LV_COLOR_FORMAT_XRGB8888, LV_COLOR_FORMAT_ARGB8888
+ * @note    this function invalidates the canvas object every time,
+ *      for best performance, if you're changing a lot of pixels in a loop,
+ *      call `lv_display_enable_invalidation` before the loop starts
+ *      so the invalidation isn't done on every call
  */
 void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv_opa_t opa);
 
