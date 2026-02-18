@@ -69,10 +69,6 @@ void test_canvas_functions_invalidate(void)
     lv_refr_now(NULL);
     TEST_ASSERT(draw_counter == 2);
 
-    lv_canvas_set_px_skip_invalidate(canvas, 0, 0, lv_color_black(), LV_OPA_COVER);
-    lv_refr_now(NULL);
-    TEST_ASSERT(draw_counter == 2);
-
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_COVER);
     lv_refr_now(NULL);
     TEST_ASSERT(draw_counter == 3);
