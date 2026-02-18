@@ -34,6 +34,7 @@
 static bool lv_timer_exec(lv_timer_t * timer);
 static uint32_t lv_timer_time_remaining(lv_timer_t * timer);
 static void lv_timer_handler_resume(void);
+static void lv_timer_delete_cb(lv_event_t * event);
 
 /**********************
  *  STATIC VARIABLES
@@ -160,6 +161,15 @@ LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void)
 lv_timer_t * lv_timer_create_basic(void)
 {
     return lv_timer_create(NULL, DEF_PERIOD, NULL);
+}
+
+lv_timer_t * lv_timer_create_window(lv_obj_t * parent)
+{
+    lv_timer_t * t;
+    t = lv_timer_create(NULL, DEF_PERIOD, NULL);
+
+    lv_obj_add_event_cb(parent, lv_timer_delete_cb, LV_EVENT_DELETE, t);
+    return t;
 }
 
 lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data)
@@ -411,4 +421,17 @@ void lv_timer_handler_set_resume_cb(lv_timer_handler_resume_cb_t cb, void * data
 {
     state.resume_cb = cb;
     state.resume_data = data;
+}
+
+/**
+ * Implements the event_cb used in lv_timer_create_window.
+ */
+static void lv_timer_delete_cb(lv_event_t * event)
+{
+    lv_timer_t * t;
+    t = lv_event_get_user_data(event);
+
+    if(t != NULL) {
+        lv_timer_delete(t);
+    }
 }
