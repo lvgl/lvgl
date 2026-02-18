@@ -97,7 +97,26 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    if(g_dsc->req_raw_bitmap) {
+#if LV_BINFONT_DYNAMIC_LOAD
+        if(fdsc->loader) {
+            LV_ASSERT_MSG(!fdsc->loader->raw_lock_held,
+                          "Raw bitmap already held. Call lv_font_glyph_release_draw_data() first.");
+            const uint8_t * raw = NULL;
+            lv_mutex_lock(&fdsc->loader->lock);
+            fdsc->loader->raw_lock_held = true;
+            fdsc->loader->raw_lock_gid = gid;
+            raw = fdsc->loader->get_glyph_bitmap_cb(fdsc, (void *)gdsc);
+            if(raw == NULL) {
+                fdsc->loader->raw_lock_held = false;
+                fdsc->loader->raw_lock_gid = 0;
+                lv_mutex_unlock(&fdsc->loader->lock);
+            }
+            return raw;
+        }
+#endif
+        return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    }
 
     uint8_t * bitmap_out = draw_buf->data;
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
@@ -107,7 +126,22 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-        const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        const uint8_t * bitmap_in = NULL;
+#if LV_BINFONT_DYNAMIC_LOAD
+        if(fdsc->loader) {
+            lv_mutex_lock(&fdsc->loader->lock);
+            bitmap_in = fdsc->loader->get_glyph_bitmap_cb(fdsc, (void *)gdsc);
+            if(bitmap_in == NULL) {
+                lv_mutex_unlock(&fdsc->loader->lock);
+                return NULL;
+            }
+        }
+        else {
+            bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        }
+#else
+        bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+#endif
         uint8_t * bitmap_out_tmp = bitmap_out;
         int32_t i = 0;
         int32_t x, y;
@@ -199,14 +233,40 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
         }
 
         lv_draw_buf_flush_cache(draw_buf, NULL);
+#if LV_BINFONT_DYNAMIC_LOAD
+        if(fdsc->loader) {
+            lv_mutex_unlock(&fdsc->loader->lock);
+        }
+#endif
         return draw_buf;
     }
     /*Handle compressed bitmap*/
     else {
 #if LV_USE_FONT_COMPRESSED
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
+        const uint8_t * bitmap_in = NULL;
+#if LV_BINFONT_DYNAMIC_LOAD
+        if(fdsc->loader) {
+            lv_mutex_lock(&fdsc->loader->lock);
+            bitmap_in = fdsc->loader->get_glyph_bitmap_cb(fdsc, (void *)gdsc);
+            if(bitmap_in == NULL) {
+                lv_mutex_unlock(&fdsc->loader->lock);
+                return NULL;
+            }
+        }
+        else {
+            bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        }
+#else
+        bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+#endif
+        decompress(bitmap_in, bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
+#if LV_BINFONT_DYNAMIC_LOAD
+        if(fdsc->loader) {
+            lv_mutex_unlock(&fdsc->loader->lock);
+        }
+#endif
         lv_draw_buf_flush_cache(draw_buf, NULL);
         return draw_buf;
 #else /*!LV_USE_FONT_COMPRESSED*/
