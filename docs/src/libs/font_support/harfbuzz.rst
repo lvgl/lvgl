@@ -25,8 +25,11 @@ transparently --- no application-level changes are needed.
 
 
 
-Installing HarfBuzz
-********************
+Adding HarfBuzz to Your Project
+*******************************
+
+HarfBuzz requires FreeType as a dependency.  If you haven't already added
+FreeType, see :ref:`freetype` first.
 
 For UNIX
 --------
@@ -50,16 +53,101 @@ Then add the include and linker flags to your build:
    CFLAGS  += $(shell pkg-config --cflags harfbuzz)
    LDFLAGS += $(shell pkg-config --libs   harfbuzz)
 
-For Embedded Devices
---------------------
 
-Cross-compile HarfBuzz from source (or use a package manager such as
-``vcpkg`` or ``buildroot``).  The minimum required HarfBuzz build options are
-the FreeType integration (``-DHB_HAVE_FREETYPE=ON``) and the built-in
-Unicode functions (``-DHB_HAVE_GLIB=OFF`` if GLib is not available).
+Using CMake
+-----------
 
-Add the HarfBuzz headers to your include path and link against
-``libharfbuzz``.
+If your project uses CMake, use ``find_package`` or ``FetchContent`` to
+pull in both FreeType and HarfBuzz.
+
+**Using system-installed libraries (find_package):**
+
+.. code-block:: cmake
+
+   find_package(Freetype REQUIRED)
+   find_package(harfbuzz REQUIRED)
+
+   target_include_directories(my_app PRIVATE
+       ${FREETYPE_INCLUDE_DIRS}
+       ${HARFBUZZ_INCLUDE_DIRS}
+   )
+   target_link_libraries(my_app PRIVATE
+       lvgl
+       ${FREETYPE_LIBRARIES}
+       harfbuzz
+   )
+
+**Building from source (FetchContent):**
+
+When cross-compiling or when system packages are not available, you can
+build both libraries from source.  Because FreeType and HarfBuzz have a
+circular dependency, the simplest approach is to build FreeType first
+without HarfBuzz support, then build HarfBuzz against it:
+
+.. code-block:: cmake
+
+   include(FetchContent)
+
+   # Step 1 - FreeType (without HarfBuzz)
+   FetchContent_Declare(freetype
+       GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype.git
+       GIT_TAG        VER-2-13-3
+   )
+   set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "" FORCE)
+   set(FT_DISABLE_BZIP2    ON CACHE BOOL "" FORCE)
+   set(FT_DISABLE_PNG      ON CACHE BOOL "" FORCE)
+   set(FT_DISABLE_BROTLI   ON CACHE BOOL "" FORCE)
+   FetchContent_MakeAvailable(freetype)
+
+   # Step 2 - HarfBuzz (with FreeType, without optional deps)
+   FetchContent_Declare(harfbuzz
+       GIT_REPOSITORY https://github.com/harfbuzz/harfbuzz.git
+       GIT_TAG        9.0.0
+   )
+   set(HB_HAVE_FREETYPE ON  CACHE BOOL "" FORCE)
+   set(HB_HAVE_GLIB     OFF CACHE BOOL "" FORCE)
+   set(HB_HAVE_ICU      OFF CACHE BOOL "" FORCE)
+   set(HB_HAVE_GOBJECT  OFF CACHE BOOL "" FORCE)
+   set(HB_BUILD_SUBSET  OFF CACHE BOOL "" FORCE)
+   FetchContent_MakeAvailable(harfbuzz)
+
+   target_link_libraries(my_app PRIVATE lvgl freetype harfbuzz)
+
+
+Using Makefile (Amalgamated Source)
+-----------------------------------
+
+For projects that do not use CMake (e.g. IDE-managed builds for MCUs),
+HarfBuzz provides an **amalgamated source file** that bundles the entire
+library into a single compilation unit.  This eliminates the need for a
+build system.
+
+-  Download the HarfBuzz source from its `official repository
+   <https://github.com/harfbuzz/harfbuzz/releases>`__.
+-  Copy the FreeType source code to your project directory (see
+   :ref:`freetype` for details).
+-  Refer to the following ``Makefile`` for configuration:
+
+.. code-block:: make
+
+   # FreeType (see FreeType documentation for full source list)
+   CFLAGS  += -DFT2_BUILD_LIBRARY
+   CFLAGS  += -DFT_CONFIG_MODULES_H=<lvgl/src/libs/freetype/ftmodule.h>
+   CFLAGS  += -DFT_CONFIG_OPTIONS_H=<lvgl/src/libs/freetype/ftoption.h>
+   CFLAGS  += -Ifreetype/include
+
+   # HarfBuzz amalgamated source (single file, no build system needed)
+   CXXFLAGS += -DHB_TINY
+   CXXFLAGS += -Iharfbuzz/src
+   CXXSRCS  += harfbuzz/src/harfbuzz.cc
+
+``harfbuzz.cc`` includes all HarfBuzz source files internally.  No other
+HarfBuzz ``.c`` or ``.cc`` files need to be added to your build.
+
+.. note::
+
+   HarfBuzz is written in C++ (C++11 or later).  The amalgamated source
+   must be compiled with a C++ compiler.
 
 
 
@@ -106,6 +194,88 @@ alongside Devanagari), set a fallback font:
 
 When HarfBuzz encounters a glyph that the primary font cannot render, it
 falls back to this font automatically.
+
+
+
+Font Subsetting
+***************
+
+Full font files can be very large (500 KB+).  For production builds it is
+recommended to **subset** fonts to include only the Unicode ranges your
+application needs.  Use ``pyftsubset`` (from the ``fonttools`` Python
+package) or HarfBuzz's own ``hb-subset`` tool.
+
+.. code-block:: bash
+
+   pip install fonttools
+
+   # Subset to Latin + Devanagari only
+   pyftsubset NotoSansDevanagari-Regular.ttf \
+       --unicodes="U+0000-007F,U+0900-097F" \
+       --layout-features='*' \
+       --output-file=NotoSansDevanagari-Subset.ttf
+
+.. warning::
+
+   Always keep ``--layout-features='*'`` (or at minimum
+   ``ccmp,rlig,liga,calt,mark,mkmk,kern,locl``) when subsetting fonts
+   intended for HarfBuzz.  Removing OpenType layout features will break
+   text shaping for complex scripts.
+
+Typical size reductions:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 30
+
+   * - Subset
+     - Typical input
+     - Typical output
+   * - Full font (no subsetting)
+     - 500--900 KB
+     - ---
+   * - Single script (e.g. Devanagari + Basic Latin)
+     - 500--900 KB
+     - 30--100 KB
+   * - Latin only
+     - 500--900 KB
+     - 30--50 KB
+
+
+
+Build Size Optimization
+***********************
+
+HarfBuzz provides compile-time defines to reduce binary size.  The most
+relevant for LVGL projects:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Define
+     - Effect
+   * - ``HB_TINY``
+     - Maximum size reduction.  Disables legacy shapers (AAT, Graphite),
+       thread safety, debug code, and fallback shaper.  OpenType shaping
+       (used by LVGL) is fully retained.
+   * - ``HB_LEAN``
+     - Disables non-shaping APIs and CFF glyph drawing.
+   * - ``HB_NO_MT``
+     - Disables thread safety (mutexes, atomics).  Already included in
+       ``HB_TINY``.
+
+For all builds, the following compiler and linker flags are recommended:
+
+.. code-block:: make
+
+   CXXFLAGS += -Os                           # optimize for size
+   CFLAGS   += -ffunction-sections -fdata-sections
+   CXXFLAGS += -ffunction-sections -fdata-sections
+   LDFLAGS  += -Wl,--gc-sections             # strip unused code
+
+Enabling Link-Time Optimization (``-flto``) can provide an additional
+~20% size reduction.
 
 
 
@@ -188,6 +358,7 @@ Known Limitations
 .. admonition::  Further Reading
 
    - `HarfBuzz documentation <https://harfbuzz.github.io/>`__
+   - `HarfBuzz build configuration (CONFIG.md) <https://github.com/harfbuzz/harfbuzz/blob/main/CONFIG.md>`__
    - :ref:`FreeType Font Engine <freetype>`
    - LVGL's :ref:`add_font`
 
@@ -208,4 +379,3 @@ API
 ***
 
 .. API startswith:  lv_hb_
-
