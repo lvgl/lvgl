@@ -73,12 +73,12 @@ the *blue* channel in the ``color`` value, e.g. :cpp:expr:`lv_color_make(0, 0, i
 
 .. tip::
 
-    When updating multiple pixels in a loop, follow these steps to improve performance:
+    To prevent the canvas from being redundantly invalidated for every single pixel update in a loop:
 
-    1. Use :cpp:func:`lv_canvas_set_px_skip_invalidate` to set pixel colors without triggering a redraw.
-    2. Call :cpp:func:`lv_obj_invalidate` once after the loop is finished.
+    1. Use :cpp:func:`lv_display_enable_invalidation` to disable intermediate object invalidation
+    2. After the loop is done, re-enable the display invalidation (via :cpp:func:`lv_display_enable_invalidation`)
+    3. With the invalidation re-enabled, call :cpp:func:`lv_obj_invalidate` once.
 
-    This prevents the canvas from being redundantly invalidated for every single pixel update.
 
 :cpp:expr:`lv_canvas_fill_bg(canvas, lv_color_hex(0x00ff00), LV_OPA_50)` fills the whole
 Canvas to blue with 50% opacity. Note that if the current color format
