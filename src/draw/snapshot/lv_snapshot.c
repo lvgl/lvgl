@@ -172,6 +172,8 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
         }
     }
 
+    layer.all_tasks_added = true;
+
     while(layer.draw_task_head) {
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch();
