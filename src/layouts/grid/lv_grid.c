@@ -248,6 +248,13 @@ static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width,
                                 : lv_obj_calc_dynamic_height(item, LV_STYLE_MIN_HEIGHT);
                 }
 
+                LV_TRACE_LAYOUT("Grid item '%s' %s in grid track %d: %d (align %d)",
+                                LV_OBJ_NAME(item),
+                                width ? "width" : "height",
+                                i,
+                                item_size,
+                                align);
+
                 switch(align) {
                     default:
                     case LV_GRID_ALIGN_START:
@@ -297,15 +304,15 @@ static bool calc_min_size(const lv_obj_t * cont, int32_t * req_size, bool width,
         width ? lv_obj_get_style_space_right(cont, LV_PART_MAIN) : lv_obj_get_style_space_bottom(cont, LV_PART_MAIN);
 
     total += space_start + space_end;
-    LV_LOG_TRACE("Calc min grid %s for obj '%s': total %d (space %d+%d, gap %d*%d, tracks %d)",
-                 width ? "width" : "height",
-                 LV_OBJ_NAME(cont),
-                 total,
-                 space_start,
-                 space_end,
-                 gap,
-                 track_num - 1,
-                 track_num);
+    LV_TRACE_LAYOUT("Calc min grid %s for obj '%s': total %d (space %d+%d, gap %d*%d, tracks %d)",
+                    width ? "width" : "height",
+                    LV_OBJ_NAME(cont),
+                    total,
+                    space_start,
+                    space_end,
+                    gap,
+                    track_num - 1,
+                    track_num);
 
     *req_size = total;
 

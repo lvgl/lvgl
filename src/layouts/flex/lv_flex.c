@@ -470,11 +470,11 @@ static int32_t find_track_end(
                     new_dsc[t->grow_item_cnt - 1].grow_value = grow_value;
                     new_dsc[t->grow_item_cnt - 1].clamped = 0;
 
-                    LV_LOG_TRACE("Grow item: '%s', min: %d, max: %d, grow value: %d",
-                                 LV_OBJ_NAME(item),
-                                 min_size,
-                                 max_size,
-                                 grow_value);
+                    LV_TRACE_LAYOUT("Grow item: '%s', min: %d, max: %d, grow value: %d",
+                                    LV_OBJ_NAME(item),
+                                    min_size,
+                                    max_size,
+                                    grow_value);
 
                     t->grow_dsc = new_dsc;
                 }
@@ -566,11 +566,11 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                 grow_value_sum -= dsc->grow_value;
                 grow_max_size -= dsc->final_size;
 
-                LV_LOG_TRACE("Grow item '%s' final %s: %d%s",
-                             LV_OBJ_NAME(dsc->item),
-                             f->row ? "width" : "height",
-                             dsc->final_size,
-                             dsc->clamped ? " (clamped)" : "");
+                LV_TRACE_LAYOUT("Grow item '%s' final %s: %d%s",
+                                LV_OBJ_NAME(dsc->item),
+                                f->row ? "width" : "height",
+                                dsc->final_size,
+                                dsc->clamped ? " (clamped)" : "");
             }
         }
     }
@@ -616,11 +616,11 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
             if(s != area_get_main_size(&item->coords)) {
                 lv_obj_invalidate(item);
-                LV_LOG_TRACE("Item '%s' %s changed by flex update, (%d -> %d), marking layout dirty",
-                             LV_OBJ_NAME(item),
-                             f->row ? "width" : "height",
-                             area_get_main_size(&item->coords),
-                             s);
+                LV_TRACE_LAYOUT("Item '%s' %s changed by flex update, (%d -> %d), marking layout dirty",
+                                LV_OBJ_NAME(item),
+                                f->row ? "width" : "height",
+                                area_get_main_size(&item->coords),
+                                s);
 
                 lv_area_t old_coords;
                 lv_area_copy(&old_coords, &item->coords);
@@ -636,13 +636,14 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
         }
 
         if(item->w_layout != item_w_layout || item->h_layout != item_h_layout) {
-            LV_LOG_TRACE("Item '%s' layout changed by flex update, w_layout (%d -> %d), h_layout (%d -> %d), marking "
-                         "layout dirty",
-                         LV_OBJ_NAME(item),
-                         item_w_layout,
-                         item->w_layout,
-                         item_h_layout,
-                         item->h_layout);
+            LV_TRACE_LAYOUT(
+                "Item '%s' layout changed by flex update, w_layout (%d -> %d), h_layout (%d -> %d), marking "
+                "layout dirty",
+                LV_OBJ_NAME(item),
+                item_w_layout,
+                item->w_layout,
+                item_h_layout,
+                item->h_layout);
             lv_obj_mark_layout_as_dirty(item);
         }
 
