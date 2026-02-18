@@ -227,7 +227,8 @@ void lv_obj_remove_style_all(lv_obj_t * obj)
 
 void lv_obj_report_style_change(lv_style_t * style)
 {
-    if(!style_refr) return;
+    if(!style_refr)
+        return;
     lv_display_t * d = lv_display_get_next(NULL);
 
     while(d) {
@@ -243,7 +244,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    if(!style_refr) return;
+    if(!style_refr || (obj->disable_style_refresh))
+        return;
 
     LV_PROFILER_STYLE_BEGIN;
 
@@ -257,15 +259,19 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     if(is_layout_refr) {
         if(part == LV_PART_ANY ||
            part == LV_PART_MAIN ||
-           lv_obj_get_style_height(obj, LV_PART_MAIN) == LV_SIZE_CONTENT ||
-           lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+           lv_obj_is_style_any_height_content(obj) ||
+           lv_obj_is_style_any_width_content(obj)) {
+            LV_LOG_TRACE("Object '%s' layout changed by style refresh, marking layout dirty", LV_OBJ_NAME(obj));
             lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || is_layout_refr)) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
-        if(parent) lv_obj_mark_layout_as_dirty(parent);
+        if(parent) {
+            LV_LOG_TRACE("Object '%s' layout changed by style refresh, marking parent layout dirty", LV_OBJ_NAME(obj));
+            lv_obj_mark_layout_as_dirty(parent);
+        }
     }
 
     /*Cache the layer type*/
@@ -317,10 +323,28 @@ bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_styl
     return false;
 }
 
-
-void lv_obj_enable_style_refresh(bool en)
+void lv_enable_style_refresh(bool en)
 {
     style_refr = en;
+}
+
+void lv_obj_enable_style_refresh(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    bool currently_disabled = obj->disable_style_refresh;
+    if(en == !currently_disabled)
+        return; /*Already in the desired state*/
+
+    obj->disable_style_refresh = !en;
+    if(en) {
+        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+    }
+}
+
+bool lv_obj_is_style_refresh_enabled(lv_obj_t * obj)
+{
+    return !obj->disable_style_refresh;
 }
 
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)

@@ -41,7 +41,7 @@ void lv_layout_init(void);
 
 void lv_layout_deinit(void);
 
-bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width);
+bool lv_layout_get_min_size(const lv_obj_t * obj, int32_t * size, bool width);
 
 /**
  * Update the layout of a widget

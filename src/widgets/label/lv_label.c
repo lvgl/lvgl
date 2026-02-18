@@ -813,13 +813,23 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
             int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
             lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-            if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
-            if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
+            if(label->recolor != 0)
+                flag |= LV_TEXT_FLAG_RECOLOR;
+            if(label->expand != 0)
+                flag |= LV_TEXT_FLAG_EXPAND;
 
             int32_t w;
-            if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
-            else w = lv_obj_get_content_width(obj);
-            w = LV_MIN(w, lv_obj_get_style_max_width(obj, LV_PART_MAIN));
+            if((lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) ||
+               lv_obj_get_style_min_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+                w = LV_COORD_MAX;
+            }
+            else {
+                w = lv_obj_get_content_width(obj);
+            }
+            if(lv_obj_get_style_max_width(obj, LV_PART_MAIN) != LV_SIZE_CONTENT) {
+                /* LV_SIZE_CONTENT would cause an infinite loop */
+                w = LV_MIN(w, lv_obj_calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH));
+            }
 
             uint32_t dot_begin = label->dot_begin;
             lv_label_revert_dots(obj);
@@ -1063,7 +1073,17 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj)
     label->invalid_size_cache = true;
 
     lv_obj_invalidate(obj);
-    lv_obj_refresh_self_size(obj);
+
+    /**
+     * Ideally we would use `lv_obj_refresh_self_size(obj);` here but it can cause an infinite loop due to the way label
+     * self size is implemented.
+     * The implementation should be revisited in the future since it currently doesn't handle fixed height, content
+     * width in all scenarios properly.
+     * Once that is fixed we should be able to use `lv_obj_refresh_self_size(obj);` here.
+     */
+    if(lv_obj_is_style_any_height_content(obj) || lv_obj_is_style_any_width_content(obj)) {
+        lv_obj_mark_layout_as_dirty(obj);
+    }
 
     if(!label->need_refr_text) {
         label->need_refr_text = true;
@@ -1116,7 +1136,8 @@ static void lv_label_refr_text(lv_obj_t * obj)
     if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL) {
         const lv_anim_t * anim_template = lv_obj_get_style_anim(obj, LV_PART_MAIN);
         uint32_t anim_time = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
-        if(anim_time == 0) anim_time = LV_LABEL_DEF_SCROLL_SPEED;
+        if(anim_time == 0)
+            anim_time = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
@@ -1313,17 +1334,16 @@ static void lv_label_refr_text(lv_obj_t * obj)
     }
     else if(label->long_mode == LV_LABEL_LONG_MODE_DOTS) {
 
-        if(size.y > lv_area_get_height(&txt_coords) && /*Text overflows available area*/
-           size.y > lv_font_get_line_height(font) && /*No break requested, so no dots required*/
-           lv_text_get_encoded_length(label->text) > LV_LABEL_DOT_NUM) { /*Do not turn all characters into dots*/
+        if(size.y > lv_area_get_height(&txt_coords) &&  /*Text overflows available area*/
+           size.y > lv_font_get_line_height(font) &&   /*No break requested, so no dots required*/
+           lv_text_get_encoded_length(label->text) > LV_LABEL_DOT_NUM) {
+            /*Do not turn all characters into dots*/
             lv_point_t p;
             int32_t y_overed;
-            p.x = lv_area_get_width(&txt_coords) -
-                  (lv_font_get_glyph_width(font, '.', '.') + attributes.letter_space) *
+            p.x = lv_area_get_width(&txt_coords) - (lv_font_get_glyph_width(font, '.', '.') + attributes.letter_space) *
                   LV_LABEL_DOT_NUM; /*Shrink with dots*/
             p.y = lv_area_get_height(&txt_coords);
-            y_overed = p.y %
-                       (lv_font_get_line_height(font) + attributes.line_space); /*Round down to the last line*/
+            y_overed = p.y % (lv_font_get_line_height(font) + attributes.line_space); /*Round down to the last line*/
             if(y_overed >= lv_font_get_line_height(font)) {
                 p.y -= y_overed;
                 p.y += lv_font_get_line_height(font);
@@ -1432,9 +1452,9 @@ static lv_text_flag_t get_label_flags(lv_label_t * label)
     if(label->expand) flag |= LV_TEXT_FLAG_EXPAND;
 
     lv_obj_t * obj = (lv_obj_t *) label;
-    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT &&
-       lv_obj_get_style_max_width(obj, LV_PART_MAIN) == LV_COORD_MAX &&
-       !obj->w_layout) {
+    if((lv_obj_get_style_min_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT ||
+        (lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout)) &&
+       lv_obj_get_style_max_width(obj, LV_PART_MAIN) == LV_COORD_MAX) {
         flag |= LV_TEXT_FLAG_FIT;
     }
 

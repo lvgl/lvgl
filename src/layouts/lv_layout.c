@@ -77,7 +77,7 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
     return lv_layout_create(cbs, user_data);
 }
 
-bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
+bool lv_layout_get_min_size(const lv_obj_t * obj, int32_t * size, bool width)
 {
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id < layout_cnt) {

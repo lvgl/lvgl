@@ -141,11 +141,25 @@ void lv_obj_set_content_height(lv_obj_t * obj, int32_t h);
 void lv_obj_set_layout(lv_obj_t * obj, uint32_t layout);
 
 /**
- * Test whether the and object is positioned by a layout or not
+ * Test whether the object is positioned by a layout or not
  * @param obj       pointer to an object to test
  * @return true:    positioned by a layout; false: not positioned by a layout
  */
 bool lv_obj_is_layout_positioned(const lv_obj_t * obj);
+
+/**
+ * Test whether the width of the object is managed by a layout or not
+ * @param obj       pointer to an object to test
+ * @return true:    positioned by a layout; false: not positioned by a layout
+ */
+bool lv_obj_is_width_layout_positioned(const lv_obj_t * obj);
+
+/**
+ * Test whether the height of the object is managed by a layout or not
+ * @param obj       pointer to an object to test
+ * @return true:    positioned by a layout; false: not positioned by a layout
+ */
+bool lv_obj_is_height_layout_positioned(const lv_obj_t * obj);
 
 /**
  * Mark the object for layout update.
@@ -351,7 +365,7 @@ int32_t lv_obj_get_self_height(const lv_obj_t * obj);
  * @note            This is not the calculated size, so if the size was set as `LV_SIZE_CONTENT` or `LV_PCT()`
  *                  then that value will be returned.
  */
-int32_t lv_obj_get_style_clamped_width(lv_obj_t * obj);
+int32_t lv_obj_get_style_clamped_width(const lv_obj_t * obj);
 
 /**
  * Get the style height actually used by the object after clamping the height within the min max range.
@@ -360,7 +374,23 @@ int32_t lv_obj_get_style_clamped_width(lv_obj_t * obj);
  * @note            This is not the calculated size, so if the size was set as `LV_SIZE_CONTENT` or `LV_PCT()`
  *                  then that value will be returned.
  */
-int32_t lv_obj_get_style_clamped_height(lv_obj_t * obj);
+int32_t lv_obj_get_style_clamped_height(const lv_obj_t * obj);
+
+/**
+ * Determine if any of the object's width style properties are set to `LV_SIZE_CONTENT`.
+ * @param obj Pointer to a valid object.
+ * @return `true`  At least one of the following width style properties is `LV_SIZE_CONTENT`: `LV_STYLE_WIDTH`, `LV_STYLE_MIN_WIDTH`, `LV_STYLE_MAX_WIDTH`.
+ * @return `false` No width style properties are `LV_SIZE_CONTENT`.
+ */
+bool lv_obj_is_style_any_width_content(const lv_obj_t * obj);
+
+/**
+ * Determine if any of the object's height style properties are set to `LV_SIZE_CONTENT`.
+ * @param obj Pointer to a valid object.
+ * @return `true`  At least one of the following height style properties is `LV_SIZE_CONTENT`: `LV_STYLE_HEIGHT`, `LV_STYLE_MIN_HEIGHT`, `LV_STYLE_MAX_HEIGHT`.
+ * @return `false` No height style properties are `LV_SIZE_CONTENT`.
+ */
+bool lv_obj_is_style_any_height_content(const lv_obj_t * obj);
 
 /**
  * @brief Determine if the object's resolved width was limited by its minimum width constraint.
@@ -372,7 +402,7 @@ int32_t lv_obj_get_style_clamped_height(lv_obj_t * obj);
  * @return true  The computed width == the effective minimum width (i.e. it was clamped).
  * @return false The width is larger than the minimum (not min‑clamped).
  */
-bool lv_obj_is_width_min(lv_obj_t * obj);
+bool lv_obj_is_width_min(const lv_obj_t * obj);
 
 /**
  * @brief Determine if the object's resolved height was limited by its minimum height constraint.
@@ -384,7 +414,7 @@ bool lv_obj_is_width_min(lv_obj_t * obj);
  * @return true  The computed height == the effective minimum height (i.e. it was clamped).
  * @return false The height is larger than the minimum (not min‑clamped).
  */
-bool lv_obj_is_height_min(lv_obj_t * obj);
+bool lv_obj_is_height_min(const lv_obj_t * obj);
 
 /**
  * @brief Determine if the object's resolved width was limited by its maximum width constraint.
@@ -396,7 +426,7 @@ bool lv_obj_is_height_min(lv_obj_t * obj);
  * @return true  The computed width == the effective maximum width (i.e. it was clamped).
  * @return false The width is smaller than the maximum (not min‑clamped).
  */
-bool lv_obj_is_width_max(lv_obj_t * obj);
+bool lv_obj_is_width_max(const lv_obj_t * obj);
 
 /**
  * @brief Determine if the object's resolved height was limited by its maximum height constraint.
@@ -408,7 +438,31 @@ bool lv_obj_is_width_max(lv_obj_t * obj);
  * @return true  The computed height == the effective maximum height (i.e. it was clamped).
  * @return false The height is smaller than the maximum (not min‑clamped).
  */
-bool lv_obj_is_height_max(lv_obj_t * obj);
+bool lv_obj_is_height_max(const lv_obj_t * obj);
+
+/**
+ * @brief Determine if the object's resolved width was clamped by its minimum or maximum width constraints.
+ *
+ * This function reports whether, in the most recent layout / size calculation, the object's
+ * final (used) width had to be adjusted to satisfy either a minimum or maximum width requirement.
+ *
+ * @param obj Pointer to a valid object.
+ * @return true  The computed width was clamped by either the minimum or maximum width.
+ * @return false The width is within the allowed range (not clamped).
+ */
+bool lv_obj_is_width_clamped(const lv_obj_t * obj);
+
+/**
+ * @brief Determine if the object's resolved height was clamped by its minimum or maximum height constraints.
+ *
+ * This function reports whether, in the most recent layout / size calculation, the object's
+ * final (used) height had to be adjusted to satisfy either a minimum or maximum height requirement.
+ *
+ * @param obj Pointer to a valid object.
+ * @return true  The computed height was clamped by either the minimum or maximum height.
+ * @return false The height is within the allowed range (not clamped).
+ */
+bool lv_obj_is_height_clamped(const lv_obj_t * obj);
 
 /**
  * Handle if the size of the internal ("virtual") content of an object has changed.
@@ -542,7 +596,7 @@ int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, 
  * @note If the style width is `LV_SIZE_CONTENT`, the content width is calculated and returned.
  * @note If the style width is a `LV_PCT()`, the percentage is applied to the parent's width.
  */
-int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop);
+int32_t lv_obj_calc_dynamic_width(const lv_obj_t * obj, lv_style_prop_t prop);
 
 /**
  * @brief Calculates the height in pixels of an LVGL object based on its style and parent for a given height `prop`.
@@ -554,7 +608,7 @@ int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop);
  * @note If the style height is `LV_SIZE_CONTENT`, the content height is calculated and returned.
  * @note If the style height is a `LV_PCT()`, the percentage is applied to the parent's height.
  */
-int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop);
+int32_t lv_obj_calc_dynamic_height(const lv_obj_t * obj, lv_style_prop_t prop);
 
 /**********************
  *      MACROS

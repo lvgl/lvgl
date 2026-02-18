@@ -191,11 +191,26 @@ void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_styl
 bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
 /**
- * Enable or disable automatic style refreshing when a new style is added/removed to/from an object
- * or any other style change happens.
+ * Enable or disable automatic style refreshing globally.
+ * @param en        true: enable style refresh; false: disable style refresh
+ */
+void lv_enable_style_refresh(bool en);
+
+/**
+ * Enable or disable automatic style refreshing for a specific object.
+ * When disabled, style changes are accumulated but not visually applied.
+ * When re-enabled, a full style refresh is triggered automatically on the object.
+ * @param obj       pointer to an object
  * @param en        true: enable refreshing; false: disable refreshing
  */
-void lv_obj_enable_style_refresh(bool en);
+void lv_obj_enable_style_refresh(lv_obj_t * obj, bool en);
+
+/**
+ * Get whether style refreshing is enabled for a specific object.
+ * @param obj       pointer to an object
+ * @return          true: refreshing is enabled; false: disabled
+ */
+bool lv_obj_is_style_refresh_enabled(lv_obj_t * obj);
 
 /**
  * Get the value of a style property. The current state of the object will be considered.

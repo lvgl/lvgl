@@ -19,6 +19,11 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_OBJ_NAME
+#  define LV_OBJ_NAME(obj) ((obj)->spec_attr && (obj)->spec_attr->name ? (obj)->spec_attr->name : "<unnamed>")
+#else
+#  define LV_OBJ_NAME(obj) ""
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -29,7 +34,7 @@ extern "C" {
  * They are allocated automatically if any elements is set.
  */
 struct _lv_obj_spec_attr_t {
-    lv_obj_t ** children;           /**< Store the pointer of the children in an array.*/
+    lv_obj_t ** children; /**< Store the pointer of the children in an array.*/
     lv_group_t * group_p;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_t * matrix;           /**< The transform matrix*/
@@ -73,15 +78,16 @@ struct _lv_obj_t {
     uint16_t state;
     uint16_t layout_inv : 1;
     uint16_t readjust_scroll_after_layout : 1;
-    uint16_t scr_layout_inv : 1;
+    uint16_t subtree_layout_inv : 1;
     uint16_t skip_trans : 1;
-    uint16_t style_cnt  : 6;
+    uint16_t style_cnt : 6;
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
-    uint16_t h_ignore_size : 1; /* ignore this obj when calculating content height of parent */
-    uint16_t w_ignore_size : 1; /* ignore this obj when calculating content width of parent */
+    uint16_t h_ignore_size : 1; /**< Ignore this obj when calculating content height of parent */
+    uint16_t w_ignore_size : 1; /**< Ignore this obj when calculating content width of parent */
     uint16_t is_deleting : 1;
     uint16_t radio_button : 1; /**< Allow only one RADIO_BUTTON sibling to be checked*/
+    uint16_t disable_style_refresh : 1; /**< If set the style refresh will be skipped*/
 
     /** The widget is rendered at least once already.
      * It's used to skip initial animations and transitions. */

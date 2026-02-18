@@ -532,9 +532,8 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
     if(ta->one_line == en) return;
 
     ta->one_line = en ? 1U : 0U;
-    int32_t width = en ? LV_SIZE_CONTENT : lv_pct(100);
-    int32_t min_width_value = en ? lv_pct(100) : 0;
-
+    int32_t width = lv_pct(100);
+    int32_t min_width_value = en ? LV_SIZE_CONTENT : 0;
     lv_obj_set_width(ta->label, width);
     lv_obj_set_style_min_width(ta->label, min_width_value, 0);
 
@@ -924,6 +923,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     ta->label = lv_label_create(obj);
     lv_obj_set_width(ta->label, lv_pct(100));
+    lv_obj_set_height(ta->label, LV_SIZE_CONTENT);
     lv_label_set_text(ta->label, "");
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_STYLE_CHANGED, NULL);
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_SIZE_CHANGED, NULL);
@@ -1007,7 +1007,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_POST) {
         draw_cursor(e);
     }
-    else if(code == LV_EVENT_SIZE_CHANGED || code == LV_EVENT_STYLE_CHANGED) {
+    else if(code == LV_EVENT_SIZE_CHANGED) { // LV_EVENT_STYLE_CHANGED removed because it could cause an infinite loop
         lv_textarea_t * ta = (lv_textarea_t *)obj;
         lv_textarea_scroll_to_cusor_pos(obj, ta->cursor.pos);
     }
