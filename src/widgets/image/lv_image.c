@@ -587,6 +587,11 @@ int32_t lv_image_get_transformed_width(lv_obj_t * obj)
     lv_image_t * img = (lv_image_t *)obj;
     update_align(obj);
 
+    /* Fast path: no rotation */
+    if(img->rotation == 0) {
+        return (img->w * img->scale_x) >> 8;
+    }
+
     lv_point_t pivot_px;
     lv_image_get_pivot(obj, &pivot_px);
 
@@ -602,6 +607,11 @@ int32_t lv_image_get_transformed_height(lv_obj_t * obj)
 
     lv_image_t * img = (lv_image_t *)obj;
     update_align(obj);
+
+    /* Fast path: no rotation */
+    if(img->rotation == 0) {
+        return (img->h * img->scale_y) >> 8;
+    }
 
     lv_point_t pivot_px;
     lv_image_get_pivot(obj, &pivot_px);
