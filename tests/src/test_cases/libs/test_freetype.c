@@ -420,6 +420,25 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
                                                             LV_FREETYPE_FONT_STYLE_NORMAL);
     TEST_ASSERT_NOT_NULL(font_normal_small);
 
+    lv_font_t * font_variable_default = lv_freetype_font_create(
+                                            "./src/test_files/fonts/Montserrat-VariableFont.ttf", render_mode, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NOT_NULL(font_variable_default);
+
+    lv_font_t * font_variable_bold = lv_freetype_font_create(
+                                         "./src/test_files/fonts/Montserrat-VariableFont.ttf", render_mode, 24, LV_FREETYPE_FONT_STYLE_BOLD);
+    TEST_ASSERT_NOT_NULL(font_variable_bold);
+
+    lv_font_t * font_variable_thin =
+        lv_freetype_font_create("./src/test_files/fonts/Montserrat-VariableFont.ttf",
+                                render_mode,
+                                24,
+                                LV_FREETYPE_FONT_STYLE_ITALIC | LV_FREETYPE_FONT_STYLE_WEIGHT(100));
+    TEST_ASSERT_NOT_NULL(font_variable_thin);
+
+    lv_font_t * font_variable_thick = lv_freetype_font_create(
+                                          "./src/test_files/fonts/Montserrat-VariableFont.ttf", render_mode, 24, LV_FREETYPE_FONT_STYLE_WEIGHT(1000));
+    TEST_ASSERT_NOT_NULL(font_variable_thick);
+
     /* Emoji is only supported in bitmap mode */
     lv_font_t * font_emoji = lv_freetype_font_create("../examples/libs/freetype/NotoColorEmoji-32.subset.ttf",
                                                      LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
@@ -427,8 +446,7 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
                                                      LV_FREETYPE_FONT_STYLE_NORMAL);
     TEST_ASSERT_NOT_NULL(font_emoji);
 
-    lv_font_t * font_path_error = lv_freetype_font_create("ERROR_PATH", render_mode, 24,
-                                                          LV_FREETYPE_FONT_STYLE_NORMAL);
+    lv_font_t * font_path_error = lv_freetype_font_create("ERROR_PATH", render_mode, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
     TEST_ASSERT_NULL(font_path_error);
 
     font_path_error = lv_freetype_font_create("", render_mode, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
@@ -457,30 +475,70 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
     static lv_style_t style_normal_small;
     lv_style_init(&style_normal_small);
     lv_style_set_text_font(&style_normal_small, font_normal_small);
+    lv_style_set_text_align(&style_normal_small, LV_TEXT_ALIGN_CENTER);
+
+    static lv_style_t style_variable_default;
+    lv_style_init(&style_variable_default);
+    lv_style_set_text_font(&style_variable_default, font_variable_default);
+    lv_style_set_text_align(&style_variable_default, LV_TEXT_ALIGN_CENTER);
+
+    static lv_style_t style_variable_bold;
+    lv_style_init(&style_variable_bold);
+    lv_style_set_text_font(&style_variable_bold, font_variable_bold);
+    lv_style_set_text_align(&style_variable_bold, LV_TEXT_ALIGN_CENTER);
+
+    static lv_style_t style_variable_thin;
+    lv_style_init(&style_variable_thin);
+    lv_style_set_text_font(&style_variable_thin, font_variable_thin);
+    lv_style_set_text_align(&style_variable_thin, LV_TEXT_ALIGN_CENTER);
+
+    static lv_style_t style_variable_thick;
+    lv_style_init(&style_variable_thick);
+    lv_style_set_text_font(&style_variable_thick, font_variable_thick);
+    lv_style_set_text_align(&style_variable_thick, LV_TEXT_ALIGN_CENTER);
 
     static lv_style_t style_normal_emoji;
     lv_style_init(&style_normal_emoji);
     lv_style_set_text_font(&style_normal_emoji, font_emoji);
     lv_style_set_text_align(&style_normal_emoji, LV_TEXT_ALIGN_CENTER);
 
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
+
     /*Create a label with the new style*/
     lv_obj_t * label0 = lv_label_create(lv_screen_active());
     lv_obj_add_style(label0, &style_italic, 0);
     lv_obj_set_width(label0, lv_obj_get_width(lv_screen_active()) - 20);
     lv_label_set_text(label0, UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_CN);
-    lv_obj_align(label0,  LV_ALIGN_TOP_MID, 0, 10);
 
     lv_obj_t * label1 = lv_label_create(lv_screen_active());
     lv_obj_add_style(label1, &style_normal, 0);
     lv_obj_set_width(label1, lv_obj_get_width(lv_screen_active()) - 20);
     lv_label_set_text(label1, UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_EN);
-    lv_obj_align_to(label1, label0, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
     lv_obj_t * label2 = lv_label_create(lv_screen_active());
     lv_obj_add_style(label2, &style_normal_small, 0);
     lv_obj_set_width(label2, lv_obj_get_width(lv_screen_active()) - 20);
     lv_label_set_text(label2, UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_JP);
-    lv_obj_align_to(label2, label1, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
+
+    lv_obj_t * label3 = lv_label_create(lv_screen_active());
+    lv_obj_add_style(label3, &style_variable_default, 0);
+    lv_obj_set_width(label3, lv_obj_get_width(lv_screen_active()) - 20);
+    lv_label_set_text(label3, "Variable Font Default Weight");
+
+    lv_obj_t * label4 = lv_label_create(lv_screen_active());
+    lv_obj_add_style(label4, &style_variable_bold, 0);
+    lv_obj_set_width(label4, lv_obj_get_width(lv_screen_active()) - 20);
+    lv_label_set_text(label4, "Variable Font Bold Weight");
+
+    lv_obj_t * label5 = lv_label_create(lv_screen_active());
+    lv_obj_add_style(label5, &style_variable_thin, 0);
+    lv_obj_set_width(label5, lv_obj_get_width(lv_screen_active()) - 20);
+    lv_label_set_text(label5, "Variable Font 100 Weight");
+
+    lv_obj_t * label6 = lv_label_create(lv_screen_active());
+    lv_obj_add_style(label6, &style_variable_thick, 0);
+    lv_obj_set_width(label6, lv_obj_get_width(lv_screen_active()) - 20);
+    lv_label_set_text(label6, "Variable Font 1000 Weight");
 
     /* test emoji rendering
      * emoji font does not contain normal characters, use fallback to render them */
@@ -490,7 +548,6 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
     lv_obj_add_style(label_emoji, &style_normal_emoji, 0);
     lv_obj_set_width(label_emoji, lv_obj_get_width(lv_screen_active()) - 20);
     lv_label_set_text(label_emoji, "FreeType Emoji test: 😀");
-    lv_obj_align_to(label_emoji, label2, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
     TEST_ASSERT_EQUAL_SCREENSHOT(screenshot_name);
 
@@ -498,11 +555,19 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
     lv_style_reset(&style_italic);
     lv_style_reset(&style_normal);
     lv_style_reset(&style_normal_small);
+    lv_style_reset(&style_variable_default);
+    lv_style_reset(&style_variable_bold);
+    lv_style_reset(&style_variable_thin);
+    lv_style_reset(&style_variable_thick);
     lv_style_reset(&style_normal_emoji);
     lv_freetype_font_delete(font_italic);
     lv_freetype_font_delete(font_normal);
     lv_freetype_font_delete(font_normal_small);
     lv_freetype_font_delete(font_emoji);
+    lv_freetype_font_delete(font_variable_default);
+    lv_freetype_font_delete(font_variable_bold);
+    lv_freetype_font_delete(font_variable_thin);
+    lv_freetype_font_delete(font_variable_thick);
 }
 
 void test_freetype_render_bitmap(void)
