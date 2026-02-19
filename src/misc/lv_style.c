@@ -167,6 +167,7 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROP
 #endif
     [LV_STYLE_IMAGE_COLORKEY]         = 0,
 
+    [LV_STYLE_TEXT_LEADING_TRIM] =     LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
 };
 
 /**********************
