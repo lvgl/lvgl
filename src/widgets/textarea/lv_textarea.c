@@ -21,6 +21,7 @@
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_string.h"
+#include "../../misc/lv_text_ap.h"
 
 /*********************
  *      DEFINES
@@ -418,6 +419,20 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
         ta->placeholder_txt = NULL;
     }
     else {
+#if LV_USE_ARABIC_PERSIAN_CHARS  
+        /*Get the size of the text and process it*/
+        size_t len = lv_text_ap_calc_bytes_count(txt);  
+        
+        ta->placeholder_txt = lv_realloc(ta->placeholder_txt, len + 1);
+        LV_ASSERT_MALLOC(ta->placeholder_txt);
+        if(ta->placeholder_txt == NULL) {
+            LV_LOG_ERROR("Couldn't allocate memory for placeholder");
+            return;
+        }
+        
+        lv_text_ap_proc(txt, ta->placeholder_txt);
+        ta->placeholder_txt[len] = '\0';
+#else
         /*Allocate memory for the placeholder_txt text*/
         /*NOTE: Using special realloc behavior, malloc-like when data_p is NULL*/
         ta->placeholder_txt = lv_realloc(ta->placeholder_txt, txt_len + 1);
@@ -429,8 +444,8 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
 
         lv_strcpy(ta->placeholder_txt, txt);
         ta->placeholder_txt[txt_len] = '\0';
+#endif
     }
-
     lv_obj_invalidate(obj);
 }
 
