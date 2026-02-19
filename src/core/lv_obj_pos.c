@@ -36,9 +36,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static int32_t calc_content_width(const lv_obj_t * obj);
-static int32_t calc_content_height(const lv_obj_t * obj);
-static void layout_update_core(lv_obj_t * obj);
+static bool layout_update_core(lv_obj_t * obj);
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv);
 static bool is_transformed(const lv_obj_t * obj);
 static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_tmp);
@@ -112,11 +110,11 @@ static int32_t calc_dynamic_width(const lv_obj_t * obj, lv_style_prop_t prop, in
     int32_t width;
     if(width_style == LV_SIZE_CONTENT) {
         if(content_width == NULL) {
-            width = calc_content_width(obj);
+            width = lv_obj_calc_content_width(obj);
         }
         else {
             if(*content_width < 0) {
-                *content_width = calc_content_width(obj);
+                *content_width = lv_obj_calc_content_width(obj);
             }
             width = *content_width;
         }
@@ -164,11 +162,11 @@ static int32_t calc_dynamic_height(const lv_obj_t * obj, lv_style_prop_t prop, i
 
     if(height_style == LV_SIZE_CONTENT) {
         if(content_height == NULL) {
-            height = calc_content_height(obj);
+            height = lv_obj_calc_content_height(obj);
         }
         else {
             if(*content_height < 0) {
-                *content_height = calc_content_height(obj);
+                *content_height = lv_obj_calc_content_height(obj);
             }
             height = *content_height;
         }
@@ -221,6 +219,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     int32_t w_style = 0;
     if(obj->w_layout) {
         w = lv_obj_get_width(obj);
+        LV_TRACE_LAYOUT("Object '%s' width from layout: %d", LV_OBJ_NAME(obj), w);
 
         if(w <= minw) {
             w_style = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
@@ -257,6 +256,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     int32_t h_style = 0;
     if(obj->h_layout) {
         h = lv_obj_get_height(obj);
+        LV_TRACE_LAYOUT("Object '%s' height from layout: %d", LV_OBJ_NAME(obj), h);
 
         if(h <= minh) {
             h_style = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
@@ -310,6 +310,9 @@ bool lv_obj_refr_size(lv_obj_t * obj)
                 old_h_ignore,
                 obj->h_ignore_size);
             lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
+        }
+        else {
+            LV_TRACE_LAYOUT("Object '%s' size not changed, skipping layout update", LV_OBJ_NAME(obj));
         }
         return false;
     }
@@ -1539,7 +1542,7 @@ static bool is_transformed(const lv_obj_t * obj)
     return false;
 }
 
-static int32_t calc_content_width(const lv_obj_t * obj)
+int32_t lv_obj_calc_content_width(const lv_obj_t * obj)
 {
     int32_t scroll_x_tmp = lv_obj_get_scroll_x(obj);
     if(obj->spec_attr) obj->spec_attr->scroll.x = 0;
@@ -1660,7 +1663,7 @@ static int32_t calc_content_width(const lv_obj_t * obj)
     return LV_MAX(child_res, self_w);
 }
 
-static int32_t calc_content_height(const lv_obj_t * obj)
+int32_t lv_obj_calc_content_height(const lv_obj_t * obj)
 {
     int32_t scroll_y_tmp = lv_obj_get_scroll_y(obj);
     if(obj->spec_attr) obj->spec_attr->scroll.y = 0;
@@ -1736,28 +1739,77 @@ static int32_t calc_content_height(const lv_obj_t * obj)
     return LV_MAX(self_h, child_res);
 }
 
-static void layout_update_core(lv_obj_t * obj)
+/**
+ * @brief Updates the obj subtree layout
+ * @param obj obj to update
+ * @return `true`: the layout was updated and did not require another iteration.
+ * @return `false`: the layout needs another iteration.
+ */
+static bool layout_update_core(lv_obj_t * obj)
 {
     /*Skip subtrees that have no pending layout work.
      *subtree_layout_inv is propagated from dirty objects up to the screen
      *by lv_obj_mark_layout_as_dirty, so a clear flag means the entire
      *subtree is clean.*/
     if(!obj->layout_inv && !obj->readjust_scroll_after_layout && !obj->subtree_layout_inv) {
-        return;
+        return true;
     }
 
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) {
-        return;
+        return true;
     }
 
     LV_PROFILER_LAYOUT_BEGIN;
     LV_TRACE_LAYOUT("Updating layout of object '%s'", LV_OBJ_NAME(obj));
     uint32_t child_cnt = obj->spec_attr ? obj->spec_attr->child_cnt : 0;
     uint32_t i;
-    for(i = 0; i < child_cnt; i++) {
-        layout_update_core(obj->spec_attr->children[i]);
+    bool child_layout_dirty = true;
+    while(child_layout_dirty) {
+        /**
+         * This loop ensurses that all the children of the object are fully processed, without it there is a chance that
+         * a child can leave a previous sibling in an invalidate state that doesn't get processed until the whole
+         * subtree is recalculated.
+         *
+         * If a child changes size, it will invalidate itself which might mean its children need to be updated. Since
+         * with complex LV_SIZE_CONTENT / LV_PCT structures and childs subtree might affect the parent, we need to
+         * process the childs subtree again.
+         *
+         * Once a child has settled, there is a chance that it also invalidated a child that has already been processed.
+         * This is why we check if there are any dirty children and repeat the layout process. Most of the time this
+         * will be a quick process since the size/pos of the children won't change.
+         */
+        child_layout_dirty = false;
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            while(!layout_update_core(child)) {
+                LV_TRACE_LAYOUT("Child '%s' of object '%s' is still dirty, repeating layout update for it",
+                                LV_OBJ_NAME(child),
+                                LV_OBJ_NAME(obj));
+            }
+        }
+
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            if(lv_obj_has_flag(child, LV_OBJ_FLAG_HIDDEN))
+                continue;
+            if(child->layout_inv || child->readjust_scroll_after_layout || child->subtree_layout_inv) {
+                child_layout_dirty = true;
+                LV_TRACE_LAYOUT(
+                    "Child '%s' of object '%s' is still dirty after layout update, another iteration will be done",
+                    LV_OBJ_NAME(child),
+                    LV_OBJ_NAME(obj));
+                break;
+            }
+        }
     }
 
+    LV_TRACE_LAYOUT("Finished layout update of children of object '%s'", LV_OBJ_NAME(obj));
+
+    /**
+     * At this point we can be certain that the full subtree owned by `obj` is valid for the current size/pos of `obj`.
+     *
+     * We can now do calculations on the size/pos of the obj itself which might invalidate part of its subtree.
+     */
     if(obj->layout_inv) {
         obj->layout_inv = 0;
         lv_obj_refr_size(obj);
@@ -1773,8 +1825,16 @@ static void layout_update_core(lv_obj_t * obj)
         lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
     }
 
-    /*Recompute the subtree flag: keep it set only if a child
-     *was (re-)dirtied during the processing above.*/
+    /**
+     * Recompute the subtree flag: keep it set only if a child was (re-)dirtied during the processing above.
+     *
+     * It is possible that in processing the layout for this obj, some of the children became invalid. This should
+     * trigger a recalculation of the subtree.
+     *
+     * e.g. if the size changed then all the first level children will be invalidated and need to be reprocessed. If
+     * their sizes change the this will repeat down the subtree. If their sizes don't change then the recursion stops
+     * and the next child at that level is processed.
+     */
     if(obj->subtree_layout_inv) {
         bool child_dirty = false;
         for(i = 0; i < child_cnt; i++) {
@@ -1792,6 +1852,7 @@ static void layout_update_core(lv_obj_t * obj)
     }
 
     LV_PROFILER_LAYOUT_END;
+    return !obj->layout_inv;
 }
 
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv)

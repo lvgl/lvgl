@@ -769,7 +769,7 @@ void lv_spangroup_refresh(lv_obj_t * obj)
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     spans->refresh = 1;
     lv_obj_invalidate(obj);
-    lv_obj_refresh_self_size(obj);
+    lv_obj_mark_layout_as_dirty(obj);
 }
 
 #if LV_USE_OBSERVER

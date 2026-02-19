@@ -610,6 +610,20 @@ int32_t lv_obj_calc_dynamic_width(const lv_obj_t * obj, lv_style_prop_t prop);
  */
 int32_t lv_obj_calc_dynamic_height(const lv_obj_t * obj, lv_style_prop_t prop);
 
+/**
+ * @brief Calculates the width in pixels of an LVGL object if it was styled with `LV_SIZE_CONTENT`.
+ * @param obj Pointer to the LVGL object whose width is being calculated.
+ * @return The computed content width for the object:
+ */
+int32_t lv_obj_calc_content_width(const lv_obj_t * obj);
+
+/**
+ * @brief Calculates the height in pixels of an LVGL object if it was styled with `LV_SIZE_CONTENT`.
+ * @param obj Pointer to the LVGL object whose height is being calculated.
+ * @return The computed content height for the object:
+ */
+int32_t lv_obj_calc_content_height(const lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/

@@ -1082,6 +1082,12 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(layout || align || lv_obj_is_style_any_width_content(obj) || lv_obj_is_style_any_height_content(obj)) {
             lv_obj_mark_layout_as_dirty(obj);
         }
+        uint32_t i;
+        uint32_t child_cnt = lv_obj_get_child_count(obj);
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            lv_obj_mark_layout_as_dirty(child);
+        }
     }
     else if(code == LV_EVENT_CHILD_DELETED) {
         obj->readjust_scroll_after_layout = 1;
