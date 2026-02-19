@@ -1725,6 +1725,15 @@
     #endif
 #endif
 
+/** Define a custom attribute for `lv_display_sync_ready` function */
+#ifndef LV_ATTRIBUTE_SYNC_READY
+    #ifdef CONFIG_LV_ATTRIBUTE_SYNC_READY
+        #define LV_ATTRIBUTE_SYNC_READY CONFIG_LV_ATTRIBUTE_SYNC_READY
+    #else
+        #define LV_ATTRIBUTE_SYNC_READY
+    #endif
+#endif
+
 /** Align VG_LITE buffers on this number of bytes.
  *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
 #ifndef LV_ATTRIBUTE_MEM_ALIGN_SIZE
