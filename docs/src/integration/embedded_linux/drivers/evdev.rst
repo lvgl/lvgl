@@ -100,3 +100,51 @@ function which will be called when a new device is added.
     }
 
 At the time of writing, this feature is not supported in BSD.
+
+Full Keyboard Support (XKB)
+---------------------------
+
+By default, the evdev driver only supports a limited set of navigation keys (arrows, Enter, Backspace, Tab, etc.).
+To enable full keyboard support including letters, numbers, and modifiers (Shift, Ctrl, Alt), you need to enable XKB.
+
+First, ensure you have the development version of libxkbcommon installed (usually ``libxkbcommon-dev``).
+
+Then enable XKB support in ``lv_conf.h``:
+
+.. code-block:: c
+
+    #define LV_USE_EVDEV       1
+    #define LV_EVDEV_XKB       1
+    #define LV_EVDEV_XKB_KEY_MAP    { .rules = NULL, .model = "pc105", .layout = "us", .variant = NULL, .options = NULL }
+
+The ``LV_EVDEV_XKB_KEY_MAP`` macro defines the default keyboard layout using the XKB rule names structure:
+
+- ``rules``: Rule set (typically ``NULL`` or ``"evdev"``)
+- ``model``: Physical keyboard model (e.g., ``"pc104"``, ``"pc105"``)
+- ``layout``: Language layout (e.g., ``"us"``, ``"gb"``, ``"de"``, ``"fr"``)
+- ``variant``: Layout variant (e.g., ``"dvorak"``, ``"colemak"``, or ``NULL`` for default)
+- ``options``: Extra options (e.g., ``"ctrl:nocaps"`` to make CapsLock act as Ctrl)
+
+To find the right values for your keyboard, you can use:
+
+.. code-block:: console
+
+    $ setxkbmap -query
+
+Changing Keyboard Layout at Runtime
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can change the keyboard layout at runtime using :cpp:func:`lv_evdev_set_keymap`:
+
+.. code-block:: c
+
+    struct xkb_rule_names names = {
+        .rules = NULL,
+        .model = "pc105",
+        .layout = "de",      /* German layout */
+        .variant = NULL,
+        .options = NULL
+    };
+    lv_evdev_set_keymap(keyboard_indev, names);
+
+This can be useful for implementing a keyboard layout selector in your application's settings.
