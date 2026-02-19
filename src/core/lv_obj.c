@@ -276,9 +276,14 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
         }
     }
 
-    if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    if((f & LV_OBJ_FLAG_HIDDEN) || (was_on_layout != lv_obj_is_layout_positioned(obj)) ||
+       (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
         LV_LOG_TRACE("Object '%s' layout changed by flag change, marking layout dirty", LV_OBJ_NAME(obj));
-        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+        if(parent != NULL) {
+            lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
+        }
         lv_obj_mark_layout_as_dirty(obj);
     }
 
@@ -306,16 +311,22 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     obj->flags &= (~f);
 
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
     if(f & LV_OBJ_FLAG_HIDDEN) {
         LV_LOG_TRACE("Obj '%s' hidden flag removed, marking layout dirty", LV_OBJ_NAME(obj));
         lv_obj_invalidate(obj);
-        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
-        lv_obj_mark_layout_as_dirty(obj);
+        if(parent != NULL) {
+            lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
+        }
+        lv_obj_mark_layout_as_dirty(obj); // probably already marked unless there was no parent
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 | LV_OBJ_FLAG_LAYOUT_2))) {
         LV_LOG_TRACE("Object '%s' layout changed by flag change, marking layout dirty", LV_OBJ_NAME(obj));
-        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+        if(parent != NULL) {
+            lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
+        }
     }
 }
 
