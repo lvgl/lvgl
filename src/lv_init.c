@@ -378,6 +378,10 @@ void lv_init(void)
     lv_fs_frogfs_init();
 #endif
 
+#if LV_USE_FS_ROMFS
+    lv_fs_romfs_init();
+#endif
+
     /*Use the earlier initialized position of FFmpeg decoder as a fallback decoder*/
 #if LV_USE_FFMPEG
     lv_ffmpeg_init();

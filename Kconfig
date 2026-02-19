@@ -1498,6 +1498,13 @@ menu "LVGL configuration"
 			default 0
 			depends on LV_USE_FS_FROGFS
 
+		config LV_USE_FS_ROMFS
+			bool "Linux  read-only ROM File System"
+		config LV_FS_ROMFS_LETTER
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 82 for 'R')"
+			default 0
+			depends on LV_USE_FS_ROMFS
+
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 

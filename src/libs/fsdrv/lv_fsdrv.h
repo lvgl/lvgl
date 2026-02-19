@@ -108,6 +108,10 @@ void lv_fs_frogfs_unregister_blob(const char * path_prefix);
 
 #endif /*LV_USE_FS_FROGFS*/
 
+#if LV_USE_FS_ROMFS
+int lv_fs_romfs_init(void);
+#endif /*LV_USE_FS_ROMFS*/
+
 /**********************
  *      MACROS
  **********************/

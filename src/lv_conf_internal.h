@@ -3107,6 +3107,38 @@
     #endif
 #endif
 
+/** API for romfs. */
+#ifndef LV_USE_FS_ROMFS
+    #ifdef CONFIG_LV_USE_FS_ROMFS
+        #define LV_USE_FS_ROMFS CONFIG_LV_USE_FS_ROMFS
+    #else
+        #define LV_USE_FS_ROMFS 0
+    #endif
+#endif
+#if LV_USE_FS_ROMFS
+    #ifndef LV_FS_ROMFS_LETTER
+        #ifdef CONFIG_LV_FS_ROMFS_LETTER
+            #define LV_FS_ROMFS_LETTER CONFIG_LV_FS_ROMFS_LETTER
+        #else
+            #define LV_FS_ROMFS_LETTER '\0'
+        #endif
+    #endif
+    #ifndef LV_FS_ROMFS_PATH
+        #ifdef CONFIG_LV_FS_ROMFS_PATH
+            #define LV_FS_ROMFS_PATH CONFIG_LV_FS_ROMFS_PATH
+        #else
+            #define LV_FS_ROMFS_PATH ""
+        #endif
+    #endif
+    #ifndef LV_FS_ROMFS_OFFSET
+        #ifdef CONFIG_LV_FS_ROMFS_OFFSET
+            #define LV_FS_ROMFS_OFFSET CONFIG_LV_FS_ROMFS_OFFSET
+        #else
+            #define LV_FS_ROMFS_OFFSET 0
+        #endif
+    #endif
+#endif
+
 /** LODEPNG decoder library */
 #ifndef LV_USE_LODEPNG
     #ifdef CONFIG_LV_USE_LODEPNG
