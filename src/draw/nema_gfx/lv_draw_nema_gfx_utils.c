@@ -65,6 +65,7 @@ uint32_t lv_nemagfx_cf_to_nema(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB888:
             return NEMA_BGR24;
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
             return NEMA_BGRA8888;
         case LV_COLOR_FORMAT_XRGB8888:
             return NEMA_BGRX8888;

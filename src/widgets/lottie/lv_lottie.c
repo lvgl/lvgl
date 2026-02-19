@@ -16,6 +16,8 @@
     #include "../../libs/thorvg/thorvg_capi.h"
 #endif
 
+#include "../../misc/thorvg/lv_thorvg_private.h"
+
 #include "../../misc/lv_timer.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../misc/cache/lv_cache.h"
@@ -76,7 +78,7 @@ void lv_lottie_set_buffer(lv_obj_t * obj, int32_t w, int32_t h, void * buf)
     int32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     buf = lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
 
-    tvg_swcanvas_set_target(lottie->tvg_canvas, buf, stride / 4, w, h, TVG_COLORSPACE_ARGB8888);
+    lv_thorvg_canvas_set_target(lottie->tvg_canvas, buf, stride / 4, w, h);
     tvg_canvas_push(lottie->tvg_canvas, lottie->tvg_paint);
     lv_canvas_set_buffer(obj, buf, w, h, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     tvg_picture_set_size(lottie->tvg_paint, w, h);
@@ -99,8 +101,8 @@ void lv_lottie_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
     }
 
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
-    tvg_swcanvas_set_target(lottie->tvg_canvas, (void *)draw_buf->data, draw_buf->header.stride / 4,
-                            draw_buf->header.w, draw_buf->header.h, TVG_COLORSPACE_ARGB8888);
+    lv_thorvg_canvas_set_target(lottie->tvg_canvas, (void *)draw_buf->data, draw_buf->header.stride / 4,
+                                draw_buf->header.w, draw_buf->header.h);
     tvg_canvas_push(lottie->tvg_canvas, lottie->tvg_paint);
     lv_canvas_set_draw_buf(obj, draw_buf);
     tvg_picture_set_size(lottie->tvg_paint, draw_buf->header.w, draw_buf->header.h);
@@ -174,7 +176,7 @@ static void lv_lottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     lottie->tvg_paint = tvg_animation_get_picture(lottie->tvg_anim);
 
-    lottie->tvg_canvas = tvg_swcanvas_create();
+    lottie->tvg_canvas = lv_thorvg_canvas_create(lv_obj_get_display(obj));
 
     lv_anim_t a;
     lv_anim_init(&a);

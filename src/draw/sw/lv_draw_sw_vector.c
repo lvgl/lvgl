@@ -391,6 +391,26 @@ static void _set_paint_blend_mode(Tvg_Paint * obj, lv_vector_blend_t blend)
     tvg_paint_set_blend_method(obj, lv_blend_to_tvg(blend));
 }
 
+static void argb8888_to_a8(const lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    const int32_t h = dsc->dest_h;
+    const int32_t w = dsc->dest_w;
+    const int32_t src_stride = dsc->src_stride;
+    const int32_t dst_stride = dsc->dest_stride;
+
+    const lv_color32_t * src_p = dsc->src_buf;
+    lv_opa_t * dst_p = dsc->dest_buf;
+
+    for(int32_t y = 0; y < h; y++) {
+        for(int32_t x = 0; x < w; x++) {
+            dst_p[x] = src_p[x].alpha;
+        }
+
+        src_p += src_stride / 4;
+        dst_p += dst_stride;
+    }
+}
+
 static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area, const lv_draw_buf_t * new_buf,
                             const lv_area_t * src_area)
 {
@@ -424,6 +444,8 @@ static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area
             lv_draw_sw_blend_image_to_rgb888(&fill_dsc, 3);
             break;
 #endif
+        case LV_COLOR_FORMAT_A8:
+            argb8888_to_a8(&fill_dsc);
         default:
             break;
     }
