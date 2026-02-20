@@ -94,6 +94,7 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     hb_buffer_t * hb_buf = hb_buffer_create();
     if(!hb_buffer_allocation_successful(hb_buf)) {
         LV_LOG_ERROR("hb_buffer_create failed");
+        hb_buffer_destroy(hb_buf);
         lv_mutex_unlock(&cache_node->face_lock);
         return NULL;
     }
