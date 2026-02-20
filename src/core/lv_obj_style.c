@@ -61,6 +61,7 @@ static lv_obj_style_t * get_trans_style(lv_obj_t * obj, lv_style_selector_t sele
 static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                     lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
+static void refresh_obj_style_core(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
 static void refresh_children_style(lv_obj_t * obj);
 static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
 static void trans_anim_cb(void * _tr, int32_t v);
@@ -249,40 +250,11 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 
     LV_PROFILER_STYLE_BEGIN;
 
-    lv_obj_invalidate(obj);
-
     bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
     bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE);
     bool is_inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_INHERITABLE);
-    bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYER_UPDATE);
 
-    if(is_layout_refr) {
-        if(part == LV_PART_ANY ||
-           part == LV_PART_MAIN ||
-           lv_obj_is_style_any_height_content(obj) ||
-           lv_obj_is_style_any_width_content(obj)) {
-            LV_LOG_TRACE("Object '%s' layout changed by style refresh, marking layout dirty", LV_OBJ_NAME(obj));
-            lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
-            lv_obj_mark_layout_as_dirty(obj);
-        }
-    }
-    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || is_layout_refr)) {
-        lv_obj_t * parent = lv_obj_get_parent(obj);
-        if(parent) {
-            LV_LOG_TRACE("Object '%s' layout changed by style refresh, marking parent layout dirty", LV_OBJ_NAME(obj));
-            lv_obj_mark_layout_as_dirty(parent);
-        }
-    }
-
-    /*Cache the layer type*/
-    if((part == LV_PART_ANY || part == LV_PART_MAIN) && is_layer_refr) {
-        lv_obj_update_layer_type(obj);
-    }
-
-    if(prop == LV_STYLE_PROP_ANY || is_ext_draw) {
-        lv_obj_refresh_ext_draw_size(obj);
-    }
-    lv_obj_invalidate(obj);
+    refresh_obj_style_core(obj, part, prop);
 
     if(prop == LV_STYLE_PROP_ANY || (is_inheritable && (is_ext_draw || is_layout_refr))) {
         if(part != LV_PART_SCROLLBAR) {
@@ -906,7 +878,7 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
     for(i = 0; i < obj->style_cnt; i++) {
         if(style == NULL || obj->styles[i].style == style) {
             full_cache_refresh(obj, lv_obj_style_get_selector_part(obj->styles[i].selector));
-            lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+            refresh_obj_style_core(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
             break;
         }
     }
@@ -915,6 +887,48 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
     for(i = 0; i < child_cnt; i++) {
         report_style_change_core(style, obj->spec_attr->children[i]);
     }
+}
+
+static void refresh_obj_style_core(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
+{
+    if(!style_refr || (obj->disable_style_refresh))
+        return;
+
+    LV_PROFILER_STYLE_BEGIN;
+
+    lv_obj_invalidate(obj);
+
+    bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
+    bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE);
+    bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYER_UPDATE);
+
+    if(is_layout_refr) {
+        if(part == LV_PART_ANY || part == LV_PART_MAIN || lv_obj_is_style_any_height_content(obj) ||
+           lv_obj_is_style_any_width_content(obj)) {
+            LV_LOG_TRACE("Object '%s' layout changed by style refresh, marking layout dirty", LV_OBJ_NAME(obj));
+            lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
+            lv_obj_mark_layout_as_dirty(obj);
+        }
+    }
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || is_layout_refr)) {
+        lv_obj_t * parent = lv_obj_get_parent(obj);
+        if(parent) {
+            LV_LOG_TRACE("Object '%s' layout changed by style refresh, marking parent layout dirty", LV_OBJ_NAME(obj));
+            lv_obj_mark_layout_as_dirty(parent);
+        }
+    }
+
+    /*Cache the layer type*/
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && is_layer_refr) {
+        lv_obj_update_layer_type(obj);
+    }
+
+    if(prop == LV_STYLE_PROP_ANY || is_ext_draw) {
+        lv_obj_refresh_ext_draw_size(obj);
+    }
+    lv_obj_invalidate(obj);
+
+    LV_PROFILER_STYLE_END;
 }
 
 /**
