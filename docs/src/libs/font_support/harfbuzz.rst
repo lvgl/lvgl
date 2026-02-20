@@ -67,14 +67,10 @@ pull in both FreeType and HarfBuzz.
    find_package(Freetype REQUIRED)
    find_package(harfbuzz REQUIRED)
 
-   target_include_directories(my_app PRIVATE
-       ${FREETYPE_INCLUDE_DIRS}
-       ${HARFBUZZ_INCLUDE_DIRS}
-   )
    target_link_libraries(my_app PRIVATE
        lvgl
-       ${FREETYPE_LIBRARIES}
-       harfbuzz
+       Freetype::Freetype
+       harfbuzz::harfbuzz
    )
 
 **Building from source (FetchContent):**
@@ -137,8 +133,9 @@ build system.
    CFLAGS  += -Ifreetype/include
 
    # HarfBuzz amalgamated source (single file, no build system needed)
-   CXXFLAGS += -DHB_TINY
-   CXXFLAGS += -Iharfbuzz/src
+   # LVGL C sources include <hb.h>, so both CFLAGS and CXXFLAGS need the path
+   CFLAGS   += -Iharfbuzz/src
+   CXXFLAGS += -DHB_TINY -Iharfbuzz/src
    CXXSRCS  += harfbuzz/src/harfbuzz.cc
 
 ``harfbuzz.cc`` includes all HarfBuzz source files internally.  No other
@@ -352,6 +349,25 @@ Known Limitations
   ``hb_buffer_guess_segment_properties()`` to detect the script.  For
   text that mixes multiple complex scripts in a single string, detection
   may not always choose the correct script for every segment.
+
+- **RTL contextual shaping with BIDI**: When ``LV_USE_BIDI`` is enabled,
+  LVGL reorders text to visual order before passing it to HarfBuzz.
+  HarfBuzz is then forced to LTR direction to prevent double-reordering.
+  This is correct for glyph positioning but may produce incorrect
+  contextual forms for scripts with joining behavior (e.g. Arabic,
+  where initial/medial/final letter forms depend on logical adjacency).
+  Indic scripts and Hebrew are not affected.
+
+- **Recolor not supported**: The ``LV_TEXT_FLAG_RECOLOR`` feature
+  (inline color markers such as ``#ff0000 ``) is not processed in the
+  HarfBuzz rendering path.  Recolor markers will be rendered as visible
+  text.  Use separate styled labels instead.
+
+- **Line-breaking width approximation**: Line-breaking decisions use
+  per-glyph width sums rather than HarfBuzz-shaped widths.  For scripts
+  with extensive ligatures or conjuncts (Arabic, Devanagari), lines may
+  break slightly earlier than necessary.  Final rendered width is always
+  correct.
 
 
 
