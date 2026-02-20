@@ -4,6 +4,7 @@ COMPONENT_SRCDIRS := . \
                   src \
                   src/core \
                   src/draw \
+                  src/draw/sw \
                   src/extra \
                   src/font \
                   src/gpu \
