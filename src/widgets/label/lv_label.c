@@ -487,11 +487,18 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     /* HarfBuzz path: shape the line and walk shaped glyphs to find the character at pos.x */
     if(lv_freetype_is_harfbuzz_font(font) && new_line_start > 0) {
         uint32_t line_byte_len = new_line_start - line_start;
-        /* Strip trailing newline from shaping input */
-        if(line_byte_len > 0 && (bidi_txt[line_byte_len - 1] == '\n' || bidi_txt[line_byte_len - 1] == '\r')) {
+        /* Strip trailing newline/carriage return from shaping input */
+        while(line_byte_len > 0 && (bidi_txt[line_byte_len - 1] == '\n' || bidi_txt[line_byte_len - 1] == '\r')) {
             line_byte_len--;
         }
-        lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, bidi_txt, line_byte_len, LV_BASE_DIR_AUTO);
+        /* When BIDI is enabled, text has been reordered to visual order.
+         * Force LTR direction in HarfBuzz to prevent double-reordering. */
+#if LV_USE_BIDI
+        lv_base_dir_t hb_dir = LV_BASE_DIR_LTR;
+#else
+        lv_base_dir_t hb_dir = LV_BASE_DIR_AUTO;
+#endif
+        lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, bidi_txt, line_byte_len, hb_dir);
         if(shaped) {
             uint32_t best_cluster = 0;
             for(uint32_t si = 0; si < shaped->count; si++) {

@@ -466,7 +466,20 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                     /* Handle text selection using cluster-to-character mapping */
                     draw_letter_dsc.color = dsc->color;
                     if(sel_start != LV_DRAW_LABEL_NO_TXT_SEL && sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-                        uint32_t logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + gi->cluster);
+                        uint32_t logical_char_pos;
+#if LV_USE_BIDI
+                        if(dsc->has_bided) {
+                            logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + gi->cluster);
+                        }
+                        else {
+                            logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
+                            uint32_t c_idx = lv_text_encoded_get_char_id(bidi_txt, gi->cluster);
+                            logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start,
+                                                                        base_dir, c_idx, NULL);
+                        }
+#else
+                        logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + gi->cluster);
+#endif
                         if(logical_char_pos >= sel_start && logical_char_pos < sel_end) {
                             draw_letter_dsc.color = dsc->sel_color;
                             fill_dsc.color = dsc->sel_bg_color;
