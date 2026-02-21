@@ -96,6 +96,8 @@ struct _lv_fpoint_t {
     float y;
 };
 
+typedef void (*lv_vector_draw_dsc_delete_cb_t)(lv_draw_vector_dsc_t * dsc, void * user_data);
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -261,6 +263,13 @@ void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t 
  * @return              pointer to the created descriptor
  */
 lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer);
+
+/**
+ * Attach a delete callback that gets called when this vector descriptor is deleted
+ * @param dsc           pointer to the descriptor
+ * @param cb            callback to be called when the descriptor is deleted
+ */
+void lv_draw_vector_dsc_add_delete_cb(lv_draw_vector_dsc_t * dsc, lv_vector_draw_dsc_delete_cb_t cb, void * user_data);
 
 /**
  * Delete the vector graphic descriptor

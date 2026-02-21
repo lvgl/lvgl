@@ -32,6 +32,7 @@
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_area_private.h"
+#include "../lv_draw_vector_private.h"
 
 /*********************
  *      DEFINES
@@ -79,6 +80,8 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
 static unsigned int layer_get_texture(lv_layer_t * layer);
 static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u);
 static unsigned int create_texture(int32_t w, int32_t h, const void * data);
+
+static void vector_dsc_delete_cb(lv_draw_vector_dsc_t * dsc, void * user_data);
 
 #if LV_USE_3DTEXTURE
     static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
@@ -360,6 +363,17 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
                 lv_draw_image(&dest_layer, &image_dsc, &task->area);
                 break;
             }
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
+        case LV_DRAW_TASK_TYPE_VECTOR: {
+                lv_draw_vector_dsc_t vector_dsc;
+                lv_draw_vector_dsc_add_delete_cb(task->draw_dsc, vector_dsc_delete_cb, u);
+                lv_memcpy(&vector_dsc, task->draw_dsc, sizeof(vector_dsc));
+                vector_dsc.base.user_data = (void *)(uintptr_t)1;
+                vector_dsc.base.layer = &dest_layer;
+                lv_draw_vector(&vector_dsc);
+                break;
+            }
+#endif
         default:
             /*The malloced cache_data->draw_dsc will be freed automatically on failure
             *in opengles_texture_cache_free_cb*/
@@ -638,6 +652,7 @@ static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u)
     return u->framebuffer;
 }
 
+
 static unsigned int create_texture(int32_t w, int32_t h, const void * data)
 {
     LV_PROFILER_DRAW_BEGIN;
@@ -711,5 +726,14 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
     LV_PROFILER_DRAW_END;
 }
 #endif /*LV_USE_3DTEXTURE*/
+
+static void vector_dsc_delete_cb(lv_draw_vector_dsc_t * dsc, void * user_data)
+{
+    LV_LOG_USER("Delete vector dsc from cache");
+    lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *)user_data;
+    cache_data_t data_to_find;
+    data_to_find.draw_dsc = (lv_draw_dsc_base_t *)dsc;
+    lv_cache_drop(u->texture_cache, &data_to_find, u);
+}
 
 #endif /*LV_USE_DRAW_OPENGLES*/

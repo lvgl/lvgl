@@ -99,6 +99,14 @@ struct _lv_draw_vector_dsc_t {
      * Store path shapes and their attributes
      * in a list as `lv_draw_vector_subtask_t`. */
     lv_ll_t * task_list;
+
+    /**
+     * Stores a callback that can be used to know when this draw descriptor is deleted */
+    lv_vector_draw_dsc_delete_cb_t delete_cb;
+
+    /**
+     * User data passed to the delete callback*/
+    void * delete_cb_user_data;
 };
 
 
