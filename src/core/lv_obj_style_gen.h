@@ -1264,6 +1264,20 @@ static inline lv_opa_t lv_obj_get_style_text_outline_stroke_opa(const lv_obj_t *
 }
 
 /**
+ * Get the text leading trim mode. Removes empty space above and/or below text based
+ * on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
+ * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`.
+ * Default: `LV_TEXT_LEADING_TRIM_NONE`, inherited: Yes, layout: Yes, ext. draw: No.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ */
+static inline lv_text_leading_trim_t lv_obj_get_style_text_leading_trim(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_LEADING_TRIM);
+    return (lv_text_leading_trim_t)v.num;
+}
+
+/**
  * Gets the intensity of blurring. Applied on each lv_part separately before the
  * children are rendered.
  * Default: `0`, inherited: No, layout: No, ext. draw: No.
@@ -2997,6 +3011,21 @@ void lv_obj_set_style_text_outline_stroke_width(lv_obj_t * obj, int32_t value, l
  *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
 void lv_obj_set_style_text_outline_stroke_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
+
+/**
+ * Set the text leading trim mode. Removes empty space above and/or below text based
+ * on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
+ * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`.
+ * Default: `LV_TEXT_LEADING_TRIM_NONE`, inherited: Yes, layout: Yes, ext. draw: No.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_text_leading_trim(lv_obj_t * obj, lv_text_leading_trim_t value, lv_style_selector_t selector);
 
 /**
  * Sets the intensity of blurring. Applied on each lv_part separately before the
