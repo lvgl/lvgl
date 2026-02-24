@@ -779,6 +779,16 @@ void lv_style_set_text_outline_stroke_width(lv_style_t * style, int32_t value);
 void lv_style_set_text_outline_stroke_opa(lv_style_t * style, lv_opa_t value);
 
 /**
+ * Set the text leading trim mode. Removes empty space above and/or below text based
+ * on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
+ * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`.
+ * Default: `LV_TEXT_LEADING_TRIM_NONE`, inherited: Yes, layout: Yes, ext. draw: No.
+ * @param  style   Pointer to style
+ * @param  value   Value to submit
+ */
+void lv_style_set_text_leading_trim(lv_style_t * style, lv_text_leading_trim_t value);
+
+/**
  * Sets the intensity of blurring. Applied on each lv_part separately before the
  * children are rendered.
  * Default: `0`, inherited: No, layout: No, ext. draw: No.
@@ -2074,6 +2084,18 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 #define LV_STYLE_CONST_TEXT_OUTLINE_STROKE_OPA(val) \
     { \
         .prop = LV_STYLE_TEXT_OUTLINE_STROKE_OPA, .value = { .num = (int32_t)val } \
+    }
+
+/**
+ * Set the text leading trim mode. Removes empty space above and/or below text based
+ * on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
+ * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`.
+ * Default: `LV_TEXT_LEADING_TRIM_NONE`, inherited: Yes, layout: Yes, ext. draw: No.
+ * @param  val   Value to submit
+ */
+#define LV_STYLE_CONST_TEXT_LEADING_TRIM(val) \
+    { \
+        .prop = LV_STYLE_TEXT_LEADING_TRIM, .value = { .num = (int32_t)val } \
     }
 
 /**

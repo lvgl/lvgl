@@ -1346,6 +1346,22 @@ fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparenc
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
+text_leading_trim
+~~~~~~~~~~~~~~~~~
+
+Set the text leading trim mode. Removes empty space above and/or below text based
+on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
+Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_TEXT_LEADING_TRIM_NONE`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
 Blur
 ----
 

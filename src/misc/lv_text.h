@@ -58,9 +58,59 @@ typedef enum {
     LV_TEXT_ALIGN_RIGHT, /**< Align text to right*/
 } lv_text_align_t;
 
+/** Text leading trim mode (similar to CSS text-box-trim / text-box-edge) */
+typedef enum {
+  LV_TEXT_LEADING_TRIM_NONE = 0,       /**< No trimming (default behavior)*/
+  LV_TEXT_LEADING_TRIM_CAP_ALPHABETIC, /**< Trim top to cap-height, bottom to
+                                          alphabetic baseline*/
+  LV_TEXT_LEADING_TRIM_EX_ALPHABETIC,  /**< Trim top to x-height, bottom to
+                                          alphabetic baseline*/
+  LV_TEXT_LEADING_TRIM_CAP_ONLY,       /**< Trim top to cap-height only*/
+  LV_TEXT_LEADING_TRIM_EX_ONLY,        /**< Trim top to x-height only*/
+} lv_text_leading_trim_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Get the number of pixels to trim from the top of text for a given
+ * leading-trim mode.
+ * @param font  pointer to a font
+ * @param trim  leading-trim mode
+ * @return      pixels to trim from the top (0 if no trimming)
+ */
+static inline int32_t lv_font_get_top_trim(const lv_font_t *font,
+                                           lv_text_leading_trim_t trim) {
+  switch (trim) {
+  case LV_TEXT_LEADING_TRIM_CAP_ALPHABETIC:
+  case LV_TEXT_LEADING_TRIM_CAP_ONLY:
+    return (font->line_height - font->base_line) - font->cap_height;
+  case LV_TEXT_LEADING_TRIM_EX_ALPHABETIC:
+  case LV_TEXT_LEADING_TRIM_EX_ONLY:
+    return (font->line_height - font->base_line) - font->x_height;
+  default:
+    return 0;
+  }
+}
+
+/**
+ * Get the number of pixels to trim from the bottom of text for a given
+ * leading-trim mode.
+ * @param font  pointer to a font
+ * @param trim  leading-trim mode
+ * @return      pixels to trim from the bottom (0 if no trimming)
+ */
+static inline int32_t lv_font_get_bottom_trim(const lv_font_t *font,
+                                              lv_text_leading_trim_t trim) {
+  switch (trim) {
+  case LV_TEXT_LEADING_TRIM_CAP_ALPHABETIC:
+  case LV_TEXT_LEADING_TRIM_EX_ALPHABETIC:
+    return font->base_line;
+  default:
+    return 0;
+  }
+}
 
 /**
  * Get size of a text
