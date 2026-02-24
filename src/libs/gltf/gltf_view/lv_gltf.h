@@ -115,6 +115,19 @@ lv_gltf_model_t * lv_gltf_get_model_by_index(lv_obj_t * obj, size_t id);
 lv_gltf_model_t * lv_gltf_get_primary_model(lv_obj_t * obj);
 
 /**
+ * Remove a specific model from the glTF viewer
+ * @param obj pointer to a glTF viewer object
+ * @param model pointer to the model to remove
+ */
+void lv_gltf_remove_model(lv_obj_t * obj, lv_gltf_model_t * model);
+
+/**
+ * Remove all models from the glTF viewer
+ * @param obj pointer to a glTF viewer object
+ */
+void lv_gltf_remove_all_models(lv_obj_t * obj);
+
+/**
  * Set the yaw (horizontal rotation) of the camera
  * @param obj pointer to a glTF viewer object
  * @param yaw yaw angle in degrees

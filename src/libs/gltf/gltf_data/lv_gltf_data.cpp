@@ -111,6 +111,11 @@ void lv_gltf_data_delete(lv_gltf_model_t * data)
     lv_free(data);
 }
 
+void lv_gltf_model_delete(lv_gltf_model_t * data)
+{
+    lv_gltf_data_delete(data);
+}
+
 const char * lv_gltf_get_filename(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
