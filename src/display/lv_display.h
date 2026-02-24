@@ -80,6 +80,8 @@ typedef enum {
 
 typedef void (*lv_display_flush_cb_t)(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 typedef void (*lv_display_flush_wait_cb_t)(lv_display_t * disp);
+typedef void (*lv_display_sync_cb_t)(lv_display_t * disp, const lv_area_t * area);
+typedef void (*lv_display_sync_wait_cb_t)(lv_display_t * disp);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -324,6 +326,23 @@ void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb
 void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_t wait_cb);
 
 /**
+ * Set the sync callback which will be called to synchronize invalidated areas between frame buffers pre-render.
+ * @param disp     pointer to a display
+ * @param sync_cb  the sync callback (pointer to `area` needing to be synchronized)
+ */
+void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb);
+
+/**
+ * Set a callback to be used while LVGL is waiting sync to be finished.
+ * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
+ * If not set the `disp->syncing` flag is used which can be cleared with `lv_display_sync_ready()`
+ * @param disp      pointer to a display
+ * @param wait_cb   a callback to call while LVGL is waiting for sync ready.
+ *                  If NULL `lv_display_sync_ready()` can be used to signal that syncing is ready.
+ */
+void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t wait_cb);
+
+/**
  * Set the color format of the display.
  * @param disp              pointer to a display
  * @param color_format      Possible values are
@@ -380,13 +399,33 @@ LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp);
 
 /**
  * Tell if it's the last area of the refreshing process.
- * Can be called from `flush_cb` to execute some special display refreshing if needed when all areas area flushed.
+ * Can be called from `flush_cb` to execute some special display refreshing if needed when all areas are flushed.
  * @param disp      pointer to display
  * @return          true: it's the last area to flush;
  *                  false: there are other areas too which will be refreshed soon
  */
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp);
 
+/**
+ * Call from the display driver when the syncing is finished
+ * @param disp      pointer to display whose `sync_cb` was called
+ */
+LV_ATTRIBUTE_SYNC_READY void lv_display_sync_ready(lv_display_t * disp);
+
+/**
+ * Tell if it's the last area of the syncing process.
+ * Can be called from `sync_cb` to execute some special display refreshing if needed when all areas are synced.
+ * @param disp      pointer to display
+ * @return          true: it's the last area to sync;
+ *                  false: there are other areas too which will be synced soon
+ */
+LV_ATTRIBUTE_SYNC_READY bool lv_display_sync_is_last(lv_display_t * disp);
+
+/**
+ * Get display is double buffered.
+ * @param disp      pointer to a display (NULL to use the default display)
+ * @return return   true if display is double buffered
+ */
 bool lv_display_is_double_buffered(lv_display_t * disp);
 
 /**

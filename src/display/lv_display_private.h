@@ -93,6 +93,28 @@ struct _lv_display_t {
     volatile uint32_t last_area         : 1; /**< 1: last area is being rendered */
     volatile uint32_t last_part         : 1; /**< 1: last part of the current area is being rendered */
 
+    /**
+     * Used to synchronize changes between frame buffers between renders.
+     * Called for each area needing to be synchronized before rendering next frame. */
+    lv_display_sync_cb_t sync_cb;
+
+    /**
+     * Used to wait while syncing is ready.
+     * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
+     * If not set `syncing` flag is used which can be cleared with `lv_display_sync_ready()` */
+    lv_display_sync_wait_cb_t sync_wait_cb;
+
+    /** 1: syncing is in progress. (It can't be a bit field because when it's cleared from IRQ
+     * Read-Modify-Write issue might occur) */
+    volatile int syncing;
+
+    /** 1: It was the last chunk to sync. (It can't be a bit field because when it's cleared
+     * from IRQ Read-Modify-Write issue might occur) */
+    volatile int syncing_last;
+
+    /** Sync areas (redrawn during last refresh) */
+    lv_ll_t sync_areas;
+
     lv_display_render_mode_t render_mode;
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
     uint32_t tile_cnt     : 8;       /**< Divide the display buffer into these number of tiles */
@@ -109,9 +131,6 @@ struct _lv_display_t {
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
     uint32_t inv_p;
     int32_t inv_en_cnt;
-
-    /** Double buffer sync areas (redrawn during last refresh) */
-    lv_ll_t sync_areas;
 
     lv_draw_buf_t _static_buf1; /**< Used when user pass in a raw buffer as display draw buffer */
     lv_draw_buf_t _static_buf2;
