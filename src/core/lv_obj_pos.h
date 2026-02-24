@@ -363,6 +363,22 @@ int32_t lv_obj_get_style_clamped_width(lv_obj_t * obj);
 int32_t lv_obj_get_style_clamped_height(lv_obj_t * obj);
 
 /**
+ * Determine if any of the object's width style properties are set to `LV_SIZE_CONTENT`.
+ * @param obj Pointer to a valid object.
+ * @return `true`  At least one of the following width style properties is `LV_SIZE_CONTENT`: `LV_STYLE_WIDTH`, `LV_STYLE_MIN_WIDTH`, `LV_STYLE_MAX_WIDTH`.
+ * @return `false` No width style properties are `LV_SIZE_CONTENT`.
+ */
+bool lv_obj_is_style_any_width_content(lv_obj_t * obj);
+
+/**
+ * Determine if any of the object's height style properties are set to `LV_SIZE_CONTENT`.
+ * @param obj Pointer to a valid object.
+ * @return `true`  At least one of the following height style properties is `LV_SIZE_CONTENT`: `LV_STYLE_HEIGHT`, `LV_STYLE_MIN_HEIGHT`, `LV_STYLE_MAX_HEIGHT`.
+ * @return `false` No height style properties are `LV_SIZE_CONTENT`.
+ */
+bool lv_obj_is_style_any_height_content(lv_obj_t * obj);
+
+/**
  * @brief Determine if the object's resolved width was limited by its minimum width constraint.
  *
  * This function reports whether, in the most recent layout / size calculation, the object's
