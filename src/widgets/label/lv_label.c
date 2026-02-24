@@ -889,14 +889,17 @@ static void draw_main(lv_event_t * e)
     lv_obj_get_content_coords(obj, &txt_coords);
 
     /*Shift the text drawing origin up by the top trim amount so the
-     *cap-height or x-height aligns with the top of the trimmed boundary.*/
+     *cap-height or x-height aligns with the top of the trimmed boundary.
+     *Extend the bottom by the bottom trim so descenders are not clipped.*/
     lv_text_leading_trim_t leading_trim =
         lv_obj_get_style_text_leading_trim(obj, LV_PART_MAIN);
     if (leading_trim != LV_TEXT_LEADING_TRIM_NONE) {
       const lv_font_t *trim_font =
           lv_obj_get_style_text_font(obj, LV_PART_MAIN);
       int32_t top_trim = lv_font_get_top_trim(trim_font, leading_trim);
+      int32_t bottom_trim = lv_font_get_bottom_trim(trim_font, leading_trim);
       txt_coords.y1 -= top_trim;
+      txt_coords.y2 += bottom_trim;
     }
 
     lv_text_flag_t flag = get_label_flags(label);

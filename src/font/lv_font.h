@@ -112,10 +112,8 @@ struct _lv_font_t {
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
 
-#if LV_VERSION_CHECK(9, 6, 0) || LVGL_VERSION_MAJOR >= 10
     int32_t cap_height;             /**< Cap height of the font*/
     int32_t x_height;               /**< x-height of the font*/
-#endif
 
     const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
     const lv_font_t * fallback;     /**< Fallback font for missing glyph. Resolved recursively */
