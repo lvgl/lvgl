@@ -2160,6 +2160,11 @@ menu "LVGL configuration"
 			bool "Use evdev input driver"
 			default n
 
+		config LV_EVDEV_RAW_KEYCODE
+			bool "Use evdev raw keycode"
+			depends on LV_USE_EVDEV
+			default n
+
 		config LV_USE_LIBINPUT
 			bool "Use libinput input driver"
 			default n
