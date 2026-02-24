@@ -241,7 +241,7 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                 else if(in.value == 1) dsc->state = LV_INDEV_STATE_PRESSED;
             }
             else {
-#if LV_USE_RAW_KEYCODE
+#if LV_EVDEV_RAW_KEYCODE
                 dsc->key = in.code;
 #else
                 dsc->key = _evdev_process_key(in.code);
