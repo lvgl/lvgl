@@ -1147,4 +1147,54 @@ void test_image_draw_main_unknown_src_type(void)
     lv_refr_now(NULL);
 }
 
+static void  check_inv_area(lv_obj_t * obj, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    lv_display_t * disp = lv_display_get_default();
+    lv_refr_now(disp);
+    lv_obj_invalidate(obj);
+
+    TEST_ASSERT_EQUAL(1, disp->inv_p);
+    TEST_ASSERT_EQUAL(x1, disp->inv_areas[0].x1);
+    TEST_ASSERT_EQUAL(y1, disp->inv_areas[0].y1);
+    TEST_ASSERT_EQUAL(x2, disp->inv_areas[0].x2);
+    TEST_ASSERT_EQUAL(y2, disp->inv_areas[0].y2);
+}
+
+void test_image_transformed_invaldiaton_area(void)
+{
+
+    LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
+    lv_obj_t * img1 = lv_image_create(lv_screen_active());
+    lv_image_set_src(img1, &test_image_cogwheel_argb8888);
+    lv_obj_set_pos(img1, 200, 200);
+    check_inv_area(img1, 200, 200, 299, 299);
+
+    lv_image_set_scale(img1, 64);
+    check_inv_area(img1, 237, 237, 262, 262);
+
+    lv_image_set_scale(img1, 512);
+    check_inv_area(img1, 150, 150, 349, 349);
+
+    lv_image_set_rotation(img1, 450);
+    lv_image_set_scale(img1, 256);
+    check_inv_area(img1, 179, 179, 320, 320);
+
+    lv_image_set_scale(img1, 64);
+    check_inv_area(img1, 232, 232, 267, 267);
+
+    /*With non centered pivot the area is too large as we
+     *store only single ext_draw_size data for all sides which
+     *store makes it too large in all directions.
+     *Having 4  extra_draw_size for the 4 sides would be better */
+    lv_image_set_scale(img1, 256);
+    lv_image_set_pivot(img1, 0, 0);
+    check_inv_area(img1, 129, 129, 370, 370);
+
+    lv_image_set_pivot(img1, -50, -100);
+    check_inv_area(img1, 43, 43, 456, 456);
+
+    lv_image_set_scale(img1, 64);
+    check_inv_area(img1, 123, 123, 376, 376);
+}
+
 #endif

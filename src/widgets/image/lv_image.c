@@ -742,10 +742,20 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
             int32_t w = lv_obj_get_width(obj);
             int32_t h = lv_obj_get_height(obj);
             lv_image_buf_get_transformed_area(&a, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
-            *s = LV_MAX(*s, -a.x1);
-            *s = LV_MAX(*s, -a.y1);
-            *s = LV_MAX(*s, a.x2 - w);
-            *s = LV_MAX(*s, a.y2 - h);
+            int32_t ext_transform_size = LV_MAX4(-a.x1, -a.y1, a.x2 - w, a.y2 - h);
+
+            /*If there is a visible background don't use negative ext_draw_size*/
+            if(lv_obj_get_style_bg_opa(obj, 0) ||
+               (lv_obj_get_style_border_width(obj, 0) && lv_obj_get_style_border_opa(obj, 0)) ||
+               (lv_obj_get_style_outline_width(obj, 0) && lv_obj_get_style_outline_opa(obj, 0)) ||
+               (lv_obj_get_style_shadow_opa(obj, 0) && (lv_obj_get_style_shadow_spread(obj, 0) ||
+                                                        lv_obj_get_style_shadow_width(obj, 0))) ||
+               (lv_obj_get_style_bg_image_src(obj, 0) && lv_obj_get_style_bg_image_opa(obj, 0))) {
+                *s = LV_MAX(*s, ext_transform_size);
+            }
+            else {
+                *s = ext_transform_size;
+            }
         }
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
