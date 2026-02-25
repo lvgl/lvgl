@@ -353,7 +353,7 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
             &matrix,
             VG_LITE_BLEND_SRC_OVER,
             color,
-            VG_LITE_FILTER_LINEAR);
+            lv_vg_lite_matrix_get_filter(&matrix));
     }
     else {
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
@@ -378,7 +378,7 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
             VG_LITE_PATTERN_COLOR,
             0,
             color,
-            VG_LITE_FILTER_LINEAR);
+            lv_vg_lite_matrix_get_filter(&matrix));
 
         lv_vg_lite_path_drop(u, path);
     }

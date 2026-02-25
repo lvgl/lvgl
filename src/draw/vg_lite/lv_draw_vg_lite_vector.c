@@ -160,7 +160,7 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                         VG_LITE_PATTERN_COLOR,
                         0,
                         recolor,
-                        VG_LITE_FILTER_BI_LINEAR);
+                        lv_vg_lite_matrix_get_filter(&pattern_matrix));
 
                     if(ctx->fill_dsc.img_dsc.colorkey) {
                         lv_vg_lite_set_color_key(NULL);
