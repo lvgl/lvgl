@@ -540,5 +540,22 @@ void test_dropdown_properties(void)
 #endif
 }
 
+void test_dropdown_content_size()
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options(dd, "Short\nA bit longer option\nThe longest option in the list");
+    lv_obj_set_width(dd, LV_SIZE_CONTENT);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_content_size_1.png");
 
+    lv_dropdown_open(dd);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_content_size_1_open.png");
+
+    lv_dropdown_set_selected(dd, 1);
+    lv_obj_refresh_self_size(lv_screen_active());
+    lv_obj_invalidate(lv_screen_active());
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_content_size_2.png");
+
+    lv_dropdown_set_selected(dd, 2);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_content_size_3.png");
+}
 #endif

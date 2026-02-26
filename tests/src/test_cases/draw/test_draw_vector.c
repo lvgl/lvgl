@@ -50,7 +50,13 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_area_t rect1 = {50, 50, 150, 150};
     lv_draw_vector_dsc_set_transform(ctx, transform);
     lv_vector_path_clear(path);
-    lv_vector_path_append_rect(path, &rect1, 0, 0);
+
+    /*
+     * Regarding x=100, create two mirrored rectangles,
+     * using positive width and negative width respectively.
+     */
+    lv_vector_path_append_rectangle(path, 100, 50, 51, 101, 0, 0);
+    lv_vector_path_append_rectangle(path, 100, 50, -50, 101, 0, 0);
     lv_draw_vector_dsc_set_fill_color(ctx, lv_color_make(0xff, 0x00, 0x00));
     lv_draw_vector_dsc_add_path(ctx, path);
 

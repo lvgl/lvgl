@@ -707,14 +707,21 @@ static void lv_obj_draw(lv_event_t * e)
         lv_draw_rect_dsc_init(&draw_dsc);
         draw_dsc.base.layer = layer;
 
-        lv_draw_blur_dsc_t blur_dsc;
-        lv_draw_blur_dsc_init(&blur_dsc);
-        blur_dsc.corner_radius = draw_dsc.radius;
+        int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+        int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        lv_area_t coords;
+        lv_area_copy(&coords, &obj->coords);
+        lv_area_increase(&coords, w, h);
 
-        bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_INDICATOR);
-        lv_obj_init_draw_blur_dsc(obj, LV_PART_MAIN, &blur_dsc);
-        blur_dsc.base.layer = layer;
-        if(backdrop_blur) lv_draw_blur(layer, &blur_dsc, &obj->coords);
+        bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_MAIN);
+        if(backdrop_blur) {
+            lv_draw_blur_dsc_t blur_dsc;
+            lv_draw_blur_dsc_init(&blur_dsc);
+            lv_obj_init_draw_blur_dsc(obj, LV_PART_MAIN, &blur_dsc);
+            blur_dsc.corner_radius = draw_dsc.radius;
+            blur_dsc.base.layer = layer;
+            lv_draw_blur(layer, &blur_dsc, &coords);
+        }
 
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
         /*If the border is drawn later disable loading its properties*/
@@ -722,16 +729,27 @@ static void lv_obj_draw(lv_event_t * e)
             draw_dsc.border_post = 1;
         }
 
-        int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-        lv_area_t coords;
-        lv_area_copy(&coords, &obj->coords);
-        lv_area_increase(&coords, w, h);
 
         lv_draw_rect(layer, &draw_dsc, &coords);
+    }
+    else if(code == LV_EVENT_DRAW_MAIN_END) {
+        /*Draw the non backdrop blur when the main content is rendered the the children are not yet */
+        lv_layer_t * layer = lv_event_get_layer(e);
+        bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_MAIN);
+        if(!backdrop_blur) {
+            int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+            int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+            lv_area_t coords;
+            lv_area_copy(&coords, &obj->coords);
+            lv_area_increase(&coords, w, h);
 
-        blur_dsc.blur_radius = lv_obj_get_style_blur_radius(obj, LV_PART_MAIN);
-        if(!backdrop_blur) lv_draw_blur(layer, &blur_dsc, &coords);
+            lv_draw_blur_dsc_t blur_dsc;
+            lv_draw_blur_dsc_init(&blur_dsc);
+            lv_obj_init_draw_blur_dsc(obj, LV_PART_MAIN, &blur_dsc);
+            blur_dsc.corner_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+            blur_dsc.base.layer = layer;
+            lv_draw_blur(layer, &blur_dsc, &coords);
+        }
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -1017,11 +1035,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_CHILD_CHANGED) {
-        int32_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        int32_t h = lv_obj_get_style_height(obj, LV_PART_MAIN);
         int32_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
         uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
-        if(layout || align || w == LV_SIZE_CONTENT || h == LV_SIZE_CONTENT) {
+        if(layout || align || lv_obj_is_style_any_width_content(obj) || lv_obj_is_style_any_height_content(obj)) {
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
@@ -1033,7 +1049,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         int32_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         lv_event_set_ext_draw_size(e, d);
     }
-    else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_COVER_CHECK) {
+    else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_DRAW_MAIN_END ||
+            code == LV_EVENT_COVER_CHECK) {
         lv_obj_draw(e);
     }
     else if(code == LV_EVENT_INDEV_RESET) {
