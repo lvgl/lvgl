@@ -31,3 +31,10 @@ the idle function. To enable this, the following needs to be added in
 
     #define traceTASK_SWITCHED_IN()   lv_freertos_task_switch_in(pxCurrentTCB->pcTaskName);
     #define traceTASK_SWITCHED_OUT()  lv_freertos_task_switch_out();
+
+Alternatively, on multi-core environments (like the ESP32 SMP), this default
+implementation can be insufficient or inaccurate. In this case, you can set
+``LV_OS_IDLE_PERCENT_CUSTOM`` to ``1`` in ``lv_conf.h`` to disable the default
+implementation. Then, you can provide a custom implementation of
+:cpp:expr:`lv_os_get_idle_percent` tailored to your environment
+(e.g., using ``uxTaskGetSystemState()``) without modifying LVGL source files.
