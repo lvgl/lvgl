@@ -124,7 +124,7 @@ static lv_obj_t * card_create(void)
     lv_obj_t * name = lv_label_create(card);
     lv_label_set_text(name, "Pavel Svoboda");
     lv_obj_set_grid_cell(name, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_CENTER, 0, 1);
-    lv_obj_set_style_text_font(name, &lv_font_montserrat_14, 0);
+    lv_obj_set_style_text_font(name, LV_FONT_DEFAULT, 0);
 
     lv_obj_t * btn = lv_button_create(card);
     lv_obj_remove_flag(card, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
