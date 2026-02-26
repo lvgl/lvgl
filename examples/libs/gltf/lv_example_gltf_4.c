@@ -41,6 +41,7 @@ void lv_example_gltf_4(void)
     lv_gltf_model_t * logo_model = lv_gltf_data_load_from_file(
                                        "A:lvgl/examples/libs/gltf/lvgl_logo.glb", NULL);
 
+    LV_ASSERT_NULL(logo_model);
     /* Create first glTF viewer - Top Left */
     lv_obj_t * gltf1 = lv_gltf_create(lv_screen_active());
     lv_obj_set_size(gltf1, LV_PCT(50), LV_PCT(50));
