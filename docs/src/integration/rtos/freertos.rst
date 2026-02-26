@@ -67,17 +67,19 @@ in your ``FreeRTOSConfig.h`` (or via menuconfig for ESP-IDF).
         uxArraySize = uxTaskGetNumberOfTasks();
         pxTaskStatusArray = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t));
         
-        if (pxTaskStatusArray != NULL) {
-            uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, &ulTotalRunTime);
-            for (x = 0; x < uxArraySize; x++) {
-                /* ESP32 has IDLE0 and IDLE1 tasks */
-                if (strcmp(pxTaskStatusArray[x].pcTaskName, "IDLE0") == 0 ||
-                    strcmp(pxTaskStatusArray[x].pcTaskName, "IDLE1") == 0) {
-                    ulIdleTime += pxTaskStatusArray[x].ulRunTimeCounter;
-                }
-            }
-            vPortFree(pxTaskStatusArray);
+        if (pxTaskStatusArray == NULL) {
+            return 0;
         }
+        
+        uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, &ulTotalRunTime);
+        for (x = 0; x < uxArraySize; x++) {
+            /* ESP32 has IDLE0 and IDLE1 tasks */
+            if (strcmp(pxTaskStatusArray[x].pcTaskName, "IDLE0") == 0 ||
+                strcmp(pxTaskStatusArray[x].pcTaskName, "IDLE1") == 0) {
+                ulIdleTime += pxTaskStatusArray[x].ulRunTimeCounter;
+            }
+        }
+        vPortFree(pxTaskStatusArray);
         
         uint32_t idle_diff = ulIdleTime - last_idle_time;
         uint32_t total_diff = ulTotalRunTime - last_total_time;
