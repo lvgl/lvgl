@@ -5,13 +5,7 @@
 extern "C" {
 #endif
 
-
-
 #include "../../../lv_conf_internal.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #if LV_USE_GLTF
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
@@ -227,9 +221,6 @@ lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer)
 void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer);
 void lv_gltf_model_invalidate(lv_gltf_model_t * model);
 
-#ifdef __cplusplus
-}
-#endif
 #endif /*LV_USE_GLTF*/
 
 #ifdef __cplusplus
