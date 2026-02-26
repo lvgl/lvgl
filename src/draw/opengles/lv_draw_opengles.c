@@ -163,6 +163,12 @@ static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data
         return lhs->h > rhs->h ? 1 : -1;
     }
 
+    if(lhs->draw_dsc == NULL || rhs->draw_dsc == NULL) {
+        if(lhs->draw_dsc == rhs->draw_dsc) return 0;
+        if(lhs->draw_dsc == NULL) return -1;
+        return 1;
+    }
+
     uint32_t lhs_dsc_size = lhs->draw_dsc->dsc_size;
     uint32_t rhs_dsc_size = rhs->draw_dsc->dsc_size;
 
