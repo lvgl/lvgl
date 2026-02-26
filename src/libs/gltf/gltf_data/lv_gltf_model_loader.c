@@ -86,7 +86,7 @@ uint32_t lv_gltf_model_loader_get_texture(lv_gltf_model_loader_t * loader, uint3
     lv_opengl_texture_t key = { .hash = texture_hash };
     lv_rb_node_t * node = lv_rb_find(&loader->textures_map, &key);
     if(!node) {
-        LV_LOG_INFO("Couldn't find texture with hash %d in cache",
+        LV_LOG_INFO("Couldn't find texture with hash %" LV_PRIu32 " in cache",
                     texture_hash);
         return GL_NONE;
     }
