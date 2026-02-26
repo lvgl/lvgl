@@ -489,8 +489,8 @@ static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::ma
     set_bounds_info(data, v_min, v_max, v_cen, radius);
 }
 
-bool injest_image(lv_gltf_model_loader_t * loader, lv_gltf_model_t * data, fastgltf::Image & image,
-                  uint32_t index)
+static bool injest_image(lv_gltf_model_loader_t * loader, lv_gltf_model_t * data, fastgltf::Image & image,
+                         uint32_t index)
 {
     LV_ASSERT_NULL(loader);
     std::string _tex_id = std::string(lv_gltf_get_filename(data)) + "_IMG" + std::to_string(index);
