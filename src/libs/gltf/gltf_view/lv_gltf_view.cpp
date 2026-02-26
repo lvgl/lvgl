@@ -51,6 +51,7 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
 static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
+static bool model_requires_opaque_pass(lv_gltf_model_t * model);
 
 static lv_result_t create_default_environment(lv_gltf_t * gltf);
 
@@ -182,6 +183,54 @@ lv_gltf_model_t * lv_gltf_get_primary_model(lv_obj_t * obj)
 {
 
     return lv_gltf_get_model_by_index(obj, 0);
+}
+
+void lv_gltf_remove_model(lv_obj_t * obj, lv_gltf_model_t * model)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    uint32_t model_count = lv_array_size(&viewer->models);
+    for(uint32_t i = 0; i < model_count; ++i) {
+        lv_gltf_model_t ** m_ptr = (lv_gltf_model_t **)lv_array_at(&viewer->models, i);
+        if(*m_ptr == model) {
+            lv_gltf_data_delete(model);
+            lv_array_remove(&viewer->models, i);
+
+            /* Reset and recompute the flag based on remaining models */
+            viewer->state.render_opaque_buffer = false;
+            uint32_t remaining_count = lv_array_size(&viewer->models);
+            for(uint32_t j = 0; j < remaining_count; ++j) {
+                lv_gltf_model_t ** r_ptr = (lv_gltf_model_t **)lv_array_at(&viewer->models, j);
+                if(model_requires_opaque_pass(*r_ptr)) {
+                    viewer->state.render_opaque_buffer = true;
+                    break;
+                }
+            }
+
+            if(lv_array_is_empty(&viewer->models)) {
+                viewer->ibm_by_skin_then_node.clear();
+            }
+            lv_obj_invalidate(obj);
+            return;
+        }
+    }
+}
+
+void lv_gltf_remove_all_models(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    uint32_t model_count = lv_array_size(&viewer->models);
+    for(uint32_t i = 0; i < model_count; ++i) {
+        lv_gltf_model_t ** m_ptr = (lv_gltf_model_t **)lv_array_at(&viewer->models, i);
+        lv_gltf_data_delete(*m_ptr);
+    }
+    lv_array_clear(&viewer->models);
+    viewer->state.render_opaque_buffer = false;
+    viewer->ibm_by_skin_then_node.clear();
+    lv_obj_invalidate(obj);
 }
 
 void lv_gltf_set_yaw(lv_obj_t * obj, float yaw)
@@ -712,6 +761,20 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->fov = 45.f;
     desc->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     desc->frame_was_antialiased = false;
+}
+static bool model_requires_opaque_pass(lv_gltf_model_t * model)
+{
+    if(!model) {
+        return false;
+    }
+
+    /* Iterate through all materials to check if any require transmission */
+    for(const auto & material : model->asset.materials) {
+        if(material.transmission != nullptr) {
+            return true;
+        }
+    }
+    return false;
 }
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
 {

@@ -119,6 +119,13 @@ bool lv_gltf_model_is_animation_paused(lv_gltf_model_t * model);
  */
 size_t lv_gltf_model_get_animation(lv_gltf_model_t * model);
 
+/**
+ * @brief Delete a glTF model and free its resources.
+ * @note If the model is attached to a viewer, it's recommended to use `lv_gltf_remove_model` instead.
+ * @param model pointer to the model to delete
+ */
+void lv_gltf_model_delete(lv_gltf_model_t * model);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

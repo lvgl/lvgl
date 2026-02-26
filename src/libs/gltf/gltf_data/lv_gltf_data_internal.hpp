@@ -363,6 +363,8 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path, fastgltf:
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
                                              lv_opengl_shader_manager_t * shaders);
 
+void lv_gltf_data_delete(lv_gltf_model_t * data);
+
 fastgltf::math::fvec4 lv_gltf_get_primitive_centerpoint(lv_gltf_model_t * data, fastgltf::Mesh & mesh,
                                                         uint32_t prim_num);
 
