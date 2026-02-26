@@ -148,6 +148,9 @@ static void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * p
 {
     /*Write px_map to the area->x1, area->x2, area->y1, area->y2 area of the
      *frame buffer or external display controller. */
+
+    /* signal LVGL that we're done */
+    lv_display_flush_ready(disp);
 }
 
 static void my_touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
