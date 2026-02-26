@@ -40,23 +40,23 @@ typedef struct {
     lv_obj_t * label;
 } play_pause_event_data_t;
 
-typedef void (*lv_gltf_set_float_fn)(lv_obj_t *, float);
-typedef void (*lv_gltf_set_int_fn)(lv_obj_t *, uint32_t);
+typedef void (*lv_gltf_set_float_cb_t)(lv_obj_t *, float);
+typedef void (*lv_gltf_set_int_cb_t)(lv_obj_t *, uint32_t);
 typedef void (*lv_gltf_model_set_int_fn)(lv_gltf_model_t *, uint32_t);
 
 typedef union {
     void * ptr;
-    lv_gltf_set_float_fn fn;
+    lv_gltf_set_float_cb_t cb;
 } lv_gltf_set_float_fn_union_t;
 
 typedef union {
     void * ptr;
-    lv_gltf_set_int_fn fn;
+    lv_gltf_set_int_cb_t cb;
 } lv_gltf_set_int_fn_union_t;
 
 typedef union {
     void * ptr;
-    lv_gltf_set_int_fn fn;
+    lv_gltf_set_int_cb_t cb;
 } lv_gltf_model_set_int_fn_union_t;
 
 /**********************
@@ -92,15 +92,15 @@ static void style_control_panel(lv_obj_t * panel);
  *  STATIC VARIABLES
  **********************/
 
-static lv_gltf_set_float_fn_union_t pitch_fn = { .fn = lv_gltf_set_pitch };
-static lv_gltf_set_float_fn_union_t yaw_fn = { .fn = lv_gltf_set_yaw };
-static lv_gltf_set_float_fn_union_t distance_fn = { .fn = lv_gltf_set_distance };
-static lv_gltf_set_int_fn_union_t camera_fn = { .fn = lv_gltf_set_camera };
-static lv_gltf_set_int_fn_union_t background_mode_fn = { .fn = lv_gltf_set_background_mode };
-static lv_gltf_set_int_fn_union_t antialiasing_mode_fn = { .fn = lv_gltf_set_antialiasing_mode };
+static lv_gltf_set_float_fn_union_t pitch_fn = { .cb = lv_gltf_set_pitch };
+static lv_gltf_set_float_fn_union_t yaw_fn = { .cb = lv_gltf_set_yaw };
+static lv_gltf_set_float_fn_union_t distance_fn = { .cb = lv_gltf_set_distance };
+static lv_gltf_set_int_fn_union_t camera_fn = { .cb = lv_gltf_set_camera };
+static lv_gltf_set_int_fn_union_t background_mode_fn = { .cb = lv_gltf_set_background_mode };
+static lv_gltf_set_int_fn_union_t antialiasing_mode_fn = { .cb = lv_gltf_set_antialiasing_mode };
 
-static lv_gltf_set_int_fn_union_t env_brightness_fn = { .fn = lv_gltf_set_env_brightness };
-static lv_gltf_set_int_fn_union_t bg_blur_fn = { .fn = lv_gltf_set_background_blur };
+static lv_gltf_set_int_fn_union_t env_brightness_fn = { .cb = lv_gltf_set_env_brightness };
+static lv_gltf_set_int_fn_union_t bg_blur_fn = { .cb = lv_gltf_set_background_blur };
 
 static lv_subject_t yaw_subject;
 static lv_subject_t pitch_subject;
@@ -503,7 +503,7 @@ static void viewer_observer_float_cb(lv_observer_t * observer, lv_subject_t * su
     float value = lv_subject_get_float(subject);
     lv_gltf_set_float_fn_union_t fn_union = { .ptr = lv_observer_get_user_data(observer) };
 
-    fn_union.fn(viewer, value);
+    fn_union.cb(viewer, value);
 }
 
 static void viewer_observer_int_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -512,7 +512,7 @@ static void viewer_observer_int_cb(lv_observer_t * observer, lv_subject_t * subj
     lv_gltf_set_int_fn_union_t fn_union = { .ptr = lv_observer_get_user_data(observer) };
 
     lv_obj_t * viewer = lv_observer_get_target_obj(observer);
-    fn_union.fn(viewer, value);
+    fn_union.cb(viewer, value);
 }
 
 static void animation_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
