@@ -216,6 +216,7 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
             loader = lv_gltf_model_loader_create();
             if(!loader) {
                 LV_LOG_ERROR("Failed to create gltf model loader");
+                lv_gltf_model_delete(model);
                 return NULL;
             }
         }
