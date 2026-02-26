@@ -291,7 +291,7 @@ Control model animations with these functions:
     lv_gltf_model_play_animation(model, 0);
     
     /* Control animation speed */
-    lv_gltf_set_animation_speed(gltf, LV_GLTF_ANIM_SPEED_2X);
+    lv_gltf_model_set_animation_speed(model, LV_GLTF_ANIM_SPEED_2X);
     
     /* Pause/resume animation */
     lv_gltf_model_pause_animation(model);

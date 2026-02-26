@@ -8,11 +8,10 @@
 #include "../gltf_view/lv_gltf.h"
 #include "lv_gltf_data_internal.h"
 
-#include "../../../misc/lv_array.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
 
 #include "../../../misc/lv_types.h"
-#include "../../../misc/lv_ll.h"
+#include "../../../misc/lv_array.h"
 #include "../../../misc/lv_event.h"
 
 #ifdef __cplusplus
@@ -43,8 +42,6 @@ using NodePairVector = std::vector<NodeIndexPair>;
 using NodeDistanceVector = std::vector<NodeIndexDistancePair>;
 // Map of uint32_t to NodePairVector
 using MaterialIndexMap = std::map<uint32_t, NodePairVector>;
-// Map of Node Pointers to Transforms
-using NodeTransformMap = std::map<NodePtr, Transform>;
 // Map of Nodes by string (name)
 using StringNodeMap = std::map<std::string, NodePtr>;
 // Map of Nodes by string (name)
@@ -53,6 +50,10 @@ using NodeIntMap = std::map<NodePtr, uint32_t>;
 using NodeVector = std::vector<NodePtr>;
 // Map of Node Index to Map of Prim Index to CenterXYZ+RadiusW Vec4
 using NodePrimCenterMap = std::map<uint32_t, std::map<uint32_t, fastgltf::math::fvec4> >;
+// Map of Node Pointers to Transforms
+using NodeTransformMap = std::map<fastgltf::Node *, fastgltf::math::fmat4x4>;
+
+using IbmBySkinThenNodeMap = std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
 #define LV_GLTF_NODE_CHANNEL_X 0
 #define LV_GLTF_NODE_CHANNEL_Y 1
@@ -105,13 +106,14 @@ struct _lv_gltf_model_t {
     fastgltf::Asset asset;
     lv_array_t nodes;
     NodeVector node_by_light_index;
-    NodeTransformMap node_transform_cache;
+    NodeTransformMap transforms;
     MaterialIndexMap opaque_nodes_by_material_index;
     MaterialIndexMap blended_nodes_by_material_index;
+    IbmBySkinThenNodeMap ibm_by_skin_then_node;
     std::vector<size_t> validated_skins;
     std::vector<GLuint> skin_tex;
     NodePrimCenterMap local_mesh_to_center_points_by_primitive;
-    lv_gltf_t * viewer;
+    lv_array_t viewers;
 
     std::vector<lv_gltf_mesh_data_t> meshes;
     std::vector<GLuint> textures;
@@ -128,7 +130,7 @@ struct _lv_gltf_model_t {
     size_t current_animation;
     size_t last_material_index;
 
-    uint32_t last_camera_index;
+    int32_t animation_speed_ratio;
     int32_t last_anim_num;
 
     float bound_radius;
@@ -138,11 +140,9 @@ struct _lv_gltf_model_t {
     uint32_t last_tick;
     uint32_t camera;
 
+    bool transforms_changed;
     bool is_animation_enabled;
     bool last_pass_was_transmission;
-    bool last_frame_was_antialiased;
-    bool last_frame_no_motion;
-    bool _last_frame_no_motion;
     bool write_ops_pending;
     bool write_ops_flushed;
     struct _lv_gltf_model_t * linked_view_source;
@@ -275,48 +275,6 @@ void lv_gltf_data_add_blended_node_primitive(lv_gltf_model_t * data, size_t mesh
                                              size_t primitive_index);
 
 /**
- * @brief Set the cached transformation matrix for a specific node in the GLTF model data.
- *
- * @param D Pointer to the lv_gltf_data_t object containing the model data.
- * @param N Pointer to the NodePtr representing the node for which to set the transformation.
- * @param M The transformation matrix to cache.
- */
-void lv_gltf_data_set_cached_transform(lv_gltf_model_t * data, fastgltf::Node * node, fastgltf::math::fmat4x4 M);
-
-/**
- * @brief Clear the transformation cache for the GLTF model data.
- *
- * @param D Pointer to the lv_gltf_data_t object containing the model data.
- */
-void lv_gltf_data_clear_transform_cache(lv_gltf_model_t * data);
-
-/**
- * @brief Retrieve the cached transformation matrix for a specific node in the GLTF model data.
- *
- * @param D Pointer to the lv_gltf_data_t object containing the model data.
- * @param N Pointer to the NodePtr representing the node for which to retrieve the transformation.
- * @return The cached transformation matrix.
- */
-fastgltf::math::fmat4x4 lv_gltf_data_get_cached_transform(lv_gltf_model_t * data, fastgltf::Node * node);
-
-/**
- * @brief Check if a cached transformation matrix exists for a given node.
- *
- * @param D Pointer to the lv_gltf_data_t object containing the model data.
- * @param N Pointer to the NodePtr representing the node for which to retrieve the transformation.
- * @return true if a cache item exists, false otherwise
- int32_t*/
-bool lv_gltf_data_has_cached_transform(lv_gltf_model_t * data, fastgltf::Node * node);
-
-/**
- * @brief Check if the transformation cache is empty.
- *
- * @param D Pointer to the lv_gltf_data_t object containing the model data.
- * @return True if the transformation cache is empty, false otherwise.
- */
-bool lv_gltf_data_transform_cache_is_empty(lv_gltf_model_t * data);
-
-/**
  * @brief Retrieve the size of the skins in the GLTF model data.
  *
  * @param D Pointer to the lv_gltf_data_t object containing the model data.
@@ -361,7 +319,7 @@ lv_gltf_mesh_data_t * lv_gltf_get_new_meshdata(lv_gltf_model_t * _data);
 lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path, fastgltf::Asset);
 
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
-                                             lv_opengl_shader_manager_t * shaders);
+                                             lv_gltf_model_loader_t * loader);
 
 fastgltf::math::fvec4 lv_gltf_get_primitive_centerpoint(lv_gltf_model_t * data, fastgltf::Mesh & mesh,
                                                         uint32_t prim_num);
@@ -404,6 +362,16 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_internal_node(lv_gltf_model_t *
                                                                const fastgltf::Node * fastgltf_node);
 
 void lv_gltf_model_send_new_values(lv_gltf_model_t * model);
+
+void lv_gltf_model_set_transforms(lv_gltf_model_t * model, fastgltf::Node * node, fastgltf::math::fmat4x4 M);
+
+void lv_gltf_model_clear_transforms(lv_gltf_model_t * model);
+
+fastgltf::math::fmat4x4 lv_gltf_data_get_node_transform(lv_gltf_model_t * model, fastgltf::Node * node);
+
+bool lv_gltf_model_has_node_transform(lv_gltf_model_t * model, fastgltf::Node * node);
+
+bool lv_gltf_model_needs_transforms(lv_gltf_model_t * model);
 
 #endif
 
