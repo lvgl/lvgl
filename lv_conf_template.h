@@ -119,6 +119,9 @@
      * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
      */
     #define LV_USE_FREERTOS_TASK_NOTIFY 1
+
+    /* Enable this to provide a custom implementation of lv_os_get_idle_percent. */
+    #define LV_OS_IDLE_PERCENT_CUSTOM 0
 #endif
 
 /*========================

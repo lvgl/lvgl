@@ -312,6 +312,15 @@
             #define LV_USE_FREERTOS_TASK_NOTIFY 1
         #endif
     #endif
+
+    /* Enable this to provide a custom implementation of lv_os_get_idle_percent. */
+    #ifndef LV_OS_IDLE_PERCENT_CUSTOM
+        #ifdef CONFIG_LV_OS_IDLE_PERCENT_CUSTOM
+            #define LV_OS_IDLE_PERCENT_CUSTOM CONFIG_LV_OS_IDLE_PERCENT_CUSTOM
+        #else
+            #define LV_OS_IDLE_PERCENT_CUSTOM 0
+        #endif
+    #endif
 #endif
 
 /*========================
