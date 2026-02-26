@@ -34,30 +34,33 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-fastgltf::math::fmat4x4 lv_gltf_data_get_cached_transform(lv_gltf_model_t * data,
-                                                          fastgltf::Node * node)
+fastgltf::math::fmat4x4 lv_gltf_data_get_node_transform(lv_gltf_model_t * model,
+                                                        fastgltf::Node * node)
 {
-    return data->node_transform_cache[node];
+    return model->transforms[node];
 }
 
-bool lv_gltf_data_has_cached_transform(lv_gltf_model_t * data, fastgltf::Node * node)
+bool lv_gltf_model_has_node_transform(lv_gltf_model_t * model, fastgltf::Node * node)
 {
-    return (data->node_transform_cache.find(node) !=
-            data->node_transform_cache.end());
+    return model->transforms.find(node) !=
+           model->transforms.end();
 }
-void lv_gltf_data_set_cached_transform(lv_gltf_model_t * data, fastgltf::Node * node,
-                                       fastgltf::math::fmat4x4 M)
+void lv_gltf_model_set_transforms(lv_gltf_model_t * model, fastgltf::Node * node,
+                                  fastgltf::math::fmat4x4 M)
 {
-    data->node_transform_cache[node] = M;
+    model->transforms[node] = M;
+    model->transforms_changed = true;
 }
-void lv_gltf_data_clear_transform_cache(lv_gltf_model_t * data)
+void lv_gltf_model_clear_transforms(lv_gltf_model_t * model)
 {
-    data->node_transform_cache.clear();
+    model->transforms.clear();
+    model->transforms_changed = true;
 }
-bool lv_gltf_data_transform_cache_is_empty(lv_gltf_model_t * data)
+bool lv_gltf_model_needs_transforms(lv_gltf_model_t * model)
 {
-    return data->node_transform_cache.size() == 0;
+    return model->transforms.size() == 0 || model->transforms_changed;
 }
+
 
 void recache_centerpoint(lv_gltf_model_t * data, size_t index_mesh, int32_t primitive)
 {

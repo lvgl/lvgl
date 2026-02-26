@@ -15,7 +15,6 @@
 #include "../../../misc/lv_assert.h"
 #include "../../../core/lv_obj_pos.h"
 #include "../../../misc/lv_timer.h"
-#include "../gltf_view/lv_gltf_view_internal.h"
 
 
 /*********************
@@ -52,20 +51,17 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(data) lv_gltf_model_t;
     new(&data->asset) fastgltf::Asset(std::move(asset));
     data->filename = gltf_path;
-    data->last_camera_index = -5;
     data->last_anim_num = -5;
     data->current_animation_max_time = 0;
     data->local_timestamp = 0.0f;
     data->last_material_index = 99999;
-    data->last_frame_was_antialiased = false;
-    data->last_frame_no_motion = false;
-    data->_last_frame_no_motion = false;
 
+    data->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     data->animation_update_timer = lv_timer_create(update_animation_cb, LV_DEF_REFR_PERIOD, data);
     lv_timer_pause(data->animation_update_timer);
     LV_ASSERT_NULL(data->animation_update_timer);
 
-    new(&data->node_transform_cache) NodeTransformMap();
+    new(&data->transforms) NodeTransformMap();
     new(&data->opaque_nodes_by_material_index) MaterialIndexMap();
     new(&data->blended_nodes_by_material_index) MaterialIndexMap();
     new(&data->validated_skins) LongVector();
@@ -75,40 +71,46 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(&data->node_by_light_index) NodeVector();
     new(&data->meshes) std::vector<lv_gltf_mesh_data_t>();
     new(&data->textures) std::vector<GLuint>();
+    new(&data->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
+    lv_array_init(&data->viewers, 1, sizeof(lv_gltf_t *));
     lv_array_init(&data->compiled_shaders, 1, sizeof(lv_gltf_compiled_shader_t));
     return data;
 }
 
-void lv_gltf_data_delete(lv_gltf_model_t * data)
+void lv_gltf_model_delete(lv_gltf_model_t * model)
 {
-    LV_ASSERT_NULL(data);
-    lv_timer_delete(data->animation_update_timer);
-    data->animation_update_timer = NULL;
+    if(!model) {
+        return;
+    }
+    lv_timer_delete(model->animation_update_timer);
+    model->animation_update_timer = NULL;
 
-    lv_gltf_data_delete_textures(data);
-    uint32_t node_count = lv_array_size(&data->nodes);
+    lv_gltf_data_delete_textures(model);
+    uint32_t node_count = lv_array_size(&model->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
-        lv_gltf_model_node_t * node  = (lv_gltf_model_node_t *) lv_array_at(&data->nodes, i);
+        lv_gltf_model_node_t * node  = (lv_gltf_model_node_t *) lv_array_at(&model->nodes, i);
         lv_gltf_model_node_deinit(node);
     }
-    lv_array_deinit(&data->nodes);
-    lv_array_deinit(&data->compiled_shaders);
+    lv_array_deinit(&model->viewers);
+    lv_array_deinit(&model->nodes);
+    lv_array_deinit(&model->compiled_shaders);
 
     /* Explicitly call destructors for C++ objects initialized with placement new */
-    data->textures.~vector();
-    data->meshes.~vector();
-    data->node_by_light_index.~vector();
-    data->local_mesh_to_center_points_by_primitive.~map();
-    data->skin_tex.~vector();
-    data->validated_skins.~vector();
-    data->blended_nodes_by_material_index.~map();
-    data->opaque_nodes_by_material_index.~map();
-    data->node_transform_cache.~map();
-    data->channel_set_cache.~map();
-    data->asset.~Asset();
+    model->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
+    model->textures.~vector();
+    model->meshes.~vector();
+    model->node_by_light_index.~vector();
+    model->local_mesh_to_center_points_by_primitive.~map();
+    model->skin_tex.~vector();
+    model->validated_skins.~vector();
+    model->blended_nodes_by_material_index.~map();
+    model->opaque_nodes_by_material_index.~map();
+    model->transforms.~map();
+    model->channel_set_cache.~map();
+    model->asset.~Asset();
 
-    lv_free(data);
+    lv_free(model);
 }
 
 const char * lv_gltf_get_filename(const lv_gltf_model_t * data)
@@ -206,18 +208,16 @@ size_t lv_gltf_model_get_animation(lv_gltf_model_t * model)
     return model->current_animation;
 }
 
-lv_gltf_model_t *
-lv_gltf_data_load_from_file(const char * file_path,
-                            lv_opengl_shader_manager_t * shader_manager)
+
+lv_gltf_model_t * lv_gltf_data_load_from_file(const char * file_path, lv_gltf_model_loader_t * loader)
 {
-    return lv_gltf_data_load_internal(file_path, 0, shader_manager);
+    return lv_gltf_data_load_internal(file_path, 0, loader);
 }
 
-lv_gltf_model_t *
-lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
-                             lv_opengl_shader_manager_t * shader_manager)
+
+lv_gltf_model_t * lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size, lv_gltf_model_loader_t * loader)
 {
-    return lv_gltf_data_load_internal(data, data_size, shader_manager);
+    return lv_gltf_data_load_internal(data, data_size, loader);
 }
 
 fastgltf::Asset * lv_gltf_data_get_asset(lv_gltf_model_t * data)
@@ -266,6 +266,56 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
     to->bound_radius = from->bound_radius;
 }
 
+void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value)
+{
+    if(!model) {
+        return;
+    }
+    if(model->animation_speed_ratio == value) {
+        return;
+    }
+    model->animation_speed_ratio = value;
+    lv_gltf_model_invalidate(model);
+}
+uint32_t lv_gltf_model_get_animation_speed(const lv_gltf_model_t * model)
+{
+    if(!model) {
+        return 0;
+    }
+    return model->animation_speed_ratio;
+}
+
+lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer)
+{
+    LV_ASSERT_NULL(model);
+    LV_ASSERT_NULL(viewer);
+    return lv_array_push_back(&model->viewers, &viewer);
+}
+
+void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer)
+{
+    LV_ASSERT_NULL(model);
+    LV_ASSERT_NULL(target_viewer);
+    const uint32_t viewer_count = lv_array_size(&model->viewers);
+    for(uint32_t i = 0; i < viewer_count; ++i) {
+        lv_obj_t * viewer = *(lv_obj_t **)lv_array_at(&model->viewers, i);
+        if(viewer == target_viewer) {
+            lv_array_remove_unordered(&model->viewers, i);
+            return;
+        }
+    }
+}
+
+void lv_gltf_model_invalidate(lv_gltf_model_t * model)
+{
+    LV_ASSERT_NULL(model);
+    const uint32_t viewer_count = lv_array_size(&model->viewers);
+    for(uint32_t i = 0; i < viewer_count; ++i) {
+        lv_obj_t * viewer = *(lv_obj_t **)lv_array_at(&model->viewers, i);
+        lv_obj_invalidate(viewer);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -278,12 +328,13 @@ static void update_animation_cb(lv_timer_t * timer)
     const uint32_t delta = lv_tick_diff(current_tick, model->last_tick);
 
     model->last_tick = current_tick;
-    model->local_timestamp += (delta * model->viewer->desc.animation_speed_ratio) / 1000;
+    model->local_timestamp += (delta * model->animation_speed_ratio) / 1000;
 
     if(model->local_timestamp >= model->current_animation_max_time) {
         model->local_timestamp = 50;
     }
-    lv_obj_invalidate((lv_obj_t *)model->viewer);
+    lv_gltf_model_invalidate(model);
 }
+
 
 #endif /*LV_USE_GLTF*/
