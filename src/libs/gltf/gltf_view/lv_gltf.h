@@ -86,7 +86,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
  *
  * Contrary to `lv_gltf_load_model_from_file` and `lv_gltf_load_model_from_bytes`, the model
  * is owned by the caller of this function meaning that it's the caller's responsibility
- * to delete the model when it is no longer needed.
+ * to delete the model when it is no longer needed, that is, the model must outlive the viewer's lifetime.
  *
  * @param obj pointer to a glTF viewer object
  * @param model glTF model to add to the viewer
