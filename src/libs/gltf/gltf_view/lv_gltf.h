@@ -107,7 +107,7 @@ size_t lv_gltf_get_model_count(lv_obj_t * obj);
  * @param id index of the model to retrieve (0-based)
  * @return pointer to the model at the specified index, or NULL if index is invalid
  */
-lv_gltf_model_t * lv_gltf_get_model_by_index(lv_obj_t * obj, size_t id);
+lv_gltf_model_t * lv_gltf_get_model_by_index(const lv_obj_t * obj, size_t id);
 
 /**
  * Get the primary model from the glTF viewer
@@ -116,7 +116,7 @@ lv_gltf_model_t * lv_gltf_get_model_by_index(lv_obj_t * obj, size_t id);
  * @param obj pointer to a glTF viewer object
  * @return pointer to the primary model, or NULL if no models are loaded
  */
-lv_gltf_model_t * lv_gltf_get_primary_model(lv_obj_t * obj);
+lv_gltf_model_t * lv_gltf_get_primary_model(const lv_obj_t * obj);
 
 /**
  * Set the yaw (horizontal rotation) of the camera

@@ -271,6 +271,9 @@ void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value)
     if(!model) {
         return;
     }
+    if(model->animation_speed_ratio == value) {
+        return;
+    }
     model->animation_speed_ratio = value;
     lv_gltf_model_invalidate(model);
 }
