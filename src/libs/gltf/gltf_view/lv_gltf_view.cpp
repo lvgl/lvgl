@@ -281,7 +281,8 @@ float lv_gltf_get_world_distance(const lv_obj_t * obj)
     if(viewer->models.size == 0) {
         return 0.0f;
     }
-    lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
+    lv_gltf_model_data_t * modeld = *(lv_gltf_model_data_t **)lv_array_at(&viewer->models, 0);
+    lv_gltf_model_t * model = modeld->model;
     return (lv_gltf_data_get_radius(model) * LV_GLTF_DISTANCE_SCALE_FACTOR) * view_desc->distance;
 }
 
@@ -360,7 +361,8 @@ void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
         return;
     }
 
-    lv_gltf_model_t * model = *(lv_gltf_model_t **) lv_array_at(&viewer->models, 0);
+    lv_gltf_model_data_t * modeld = *(lv_gltf_model_data_t **)lv_array_at(&viewer->models, 0);
+    lv_gltf_model_t * model = modeld->model;
 
     if(value > model->asset.cameras.size()) {
         return;
@@ -615,6 +617,8 @@ static lv_gltf_model_t * add_model(lv_gltf_t * viewer, lv_gltf_model_t * model, 
     lv_memset(&model_data, 0, sizeof(model_data));
     model_data.model = model;
     model_data.owned = owned;
+    lv_array_init(&model_data.skin_textures, 0, sizeof(GLuint));
+
     if(lv_array_push_back(&viewer->models, &model_data) != LV_RESULT_OK) {
         if(owned) {
             lv_gltf_model_delete(model);
@@ -663,8 +667,6 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     view->camera_pos = fastgltf::math::fvec3(0.0f);
     view->texture.h_flip = false;
     view->texture.v_flip = true;
-    new(&view->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
-
     lv_opengl_shader_portions_t portions;
     lv_gltf_view_shader_get_src(&portions);
     char * vertex_shader = lv_gltf_view_shader_get_vertex();
@@ -705,9 +707,7 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     lv_gltf_t * view = (lv_gltf_t *)obj;
     lv_opengl_shader_manager_deinit(&view->shader_manager);
-    using IbmBySkinThenNodeMap = std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
-    view->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
     const size_t n = lv_array_size(&view->models);
     for(size_t i = 0; i < n; ++i) {
         lv_gltf_model_data_t * model_data = (lv_gltf_model_data_t *)lv_array_at(&view->models, i);
@@ -770,7 +770,7 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
                             model->asset, ibm_accessor,
                         [&](fastgltf::math::fmat4x4 _matrix, std::size_t idx) {
                             auto & joint_node = model->asset.nodes[skin.joints[idx]];
-                            viewer->ibm_by_skin_then_node[skin_index][&joint_node] = _matrix;
+                            model->ibm_by_skin_then_node[skin_index][&joint_node] = _matrix;
                         });
                     }
                 }
@@ -892,8 +892,9 @@ static void display_refr_end_event_cb(lv_event_t * e)
     lv_gltf_t * viewer = (lv_gltf_t *) lv_event_get_user_data(e);
     uint32_t model_count = lv_array_size(&viewer->models);
     for(uint32_t i = 0; i < model_count; ++i) {
-        lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
-        lv_gltf_model_send_new_values(model);
+        lv_gltf_model_data_t * modeld = *(lv_gltf_model_data_t **)lv_array_at(&viewer->models, i);
+        lv_gltf_model_send_new_values(modeld->model);
     }
 }
+
 #endif /*LV_USE_GLTF*/

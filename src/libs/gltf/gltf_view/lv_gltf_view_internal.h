@@ -157,12 +157,14 @@ typedef struct {
 
 typedef struct {
     lv_gltf_model_t * model;
+    lv_array_t skin_textures;
+    uint32_t last_camera_index;
     bool owned;
     bool last_frame_was_antialiased;
     bool last_frame_no_motion;
     bool _last_frame_no_motion;
-    uint32_t last_camera_index;
 } lv_gltf_model_data_t;
+
 
 struct _lv_gltf_t {
     lv_3dtexture_t texture;
@@ -178,7 +180,6 @@ struct _lv_gltf_t {
     fastgltf::math::fmat4x4 view_projection_matrix;
     fastgltf::math::fvec3 camera_pos;
 
-    std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>> ibm_by_skin_then_node;
     bool owns_environment;
 };
 

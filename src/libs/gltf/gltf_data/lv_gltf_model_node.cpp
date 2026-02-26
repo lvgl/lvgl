@@ -167,8 +167,8 @@ void lv_gltf_model_send_new_values(lv_gltf_model_t * model)
         lv_event_push_and_send(&node->read_attrs->event_list, LV_EVENT_VALUE_CHANGED, node, &node->read_attrs->node_data);
         node->read_attrs->value_changed = false;
     }
-    model->node_transform_cache_changed = false;
     model->write_ops_flushed = false;
+    model->transforms_changed = false;
 }
 
 lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv_event_cb_t cb,

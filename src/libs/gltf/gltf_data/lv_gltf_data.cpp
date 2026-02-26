@@ -61,7 +61,7 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     lv_timer_pause(data->animation_update_timer);
     LV_ASSERT_NULL(data->animation_update_timer);
 
-    new(&data->node_transform_cache) NodeTransformMap();
+    new(&data->transforms) NodeTransformMap();
     new(&data->opaque_nodes_by_material_index) MaterialIndexMap();
     new(&data->blended_nodes_by_material_index) MaterialIndexMap();
     new(&data->validated_skins) LongVector();
@@ -71,6 +71,7 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(&data->node_by_light_index) NodeVector();
     new(&data->meshes) std::vector<lv_gltf_mesh_data_t>();
     new(&data->textures) std::vector<GLuint>();
+    new(&data->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
     lv_array_init(&data->viewers, 1, sizeof(lv_gltf_t *));
     lv_array_init(&data->compiled_shaders, 1, sizeof(lv_gltf_compiled_shader_t));
@@ -96,6 +97,7 @@ void lv_gltf_model_delete(lv_gltf_model_t * model)
     lv_array_deinit(&model->compiled_shaders);
 
     /* Explicitly call destructors for C++ objects initialized with placement new */
+    model->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
     model->textures.~vector();
     model->meshes.~vector();
     model->node_by_light_index.~vector();
@@ -104,7 +106,7 @@ void lv_gltf_model_delete(lv_gltf_model_t * model)
     model->validated_skins.~vector();
     model->blended_nodes_by_material_index.~map();
     model->opaque_nodes_by_material_index.~map();
-    model->node_transform_cache.~map();
+    model->transforms.~map();
     model->channel_set_cache.~map();
     model->asset.~Asset();
 
