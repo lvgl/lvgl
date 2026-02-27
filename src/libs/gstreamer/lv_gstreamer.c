@@ -183,6 +183,13 @@ void lv_gstreamer_play(lv_obj_t * obj)
         LV_LOG_WARN("Cannot play: GStreamer pipeline not initialized");
         return;
     }
+
+    GstState state;
+    gst_element_get_state(streamer->pipeline, &state, NULL, 0);
+    if(state == GST_STATE_PLAYING) {
+        return;
+    }
+
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_PLAYING);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to play pipeline");
@@ -202,6 +209,13 @@ void lv_gstreamer_pause(lv_obj_t * obj)
         LV_LOG_WARN("Cannot pause: GStreamer pipeline not initialized");
         return;
     }
+
+    GstState state;
+    gst_element_get_state(streamer->pipeline, &state, NULL, 0);
+    if(state == GST_STATE_PAUSED) {
+        return;
+    }
+
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_PAUSED);
 
     if(ret == GST_STATE_CHANGE_FAILURE) {
@@ -222,6 +236,13 @@ void lv_gstreamer_stop(lv_obj_t * obj)
         LV_LOG_WARN("Cannot stop: GStreamer pipeline not initialized");
         return;
     }
+
+    GstState state;
+    gst_element_get_state(streamer->pipeline, &state, NULL, 0);
+    if(state == GST_STATE_READY || state == GST_STATE_NULL) {
+        return;
+    }
+
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_READY);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to stop pipeline");
@@ -392,6 +413,7 @@ static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     streamer->pixel_buffer = NULL;
     streamer->pixel_buffer_size = 0;
     streamer->image_src_set = false;
+    streamer->is_video_info_valid = false;
 
     streamer->gstreamer_timer = lv_timer_create(gstreamer_timer_cb, LV_DEF_REFR_PERIOD / 5, streamer);
     LV_ASSERT_NULL(streamer->gstreamer_timer);
@@ -480,6 +502,7 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     if(streamer->pixel_buffer == NULL || streamer->pixel_buffer_size != required_size) {
 
         if(streamer->pixel_buffer) {
+            lv_image_cache_drop(&streamer->frame);
             free(streamer->pixel_buffer);
             streamer->pixel_buffer = NULL;
         }
@@ -545,7 +568,10 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     if(streamer->pipeline) {
         gst_element_set_state(streamer->pipeline, GST_STATE_NULL);
+        /* Wait for the state change to finish to ensure all threads are joined */
+        gst_element_get_state(streamer->pipeline, NULL, NULL, GST_CLOCK_TIME_NONE);
         gst_object_unref(streamer->pipeline);
+        streamer->pipeline = NULL;
     }
     if(streamer->frame_queue) {
         GstSample * sample;
@@ -556,6 +582,8 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         streamer->frame_queue = NULL;
     }
     if(streamer->pixel_buffer) {
+        /* Drop the image from cache before freeing the buffer */
+        lv_image_cache_drop(&streamer->frame);
         free(streamer->pixel_buffer);
         streamer->pixel_buffer = NULL;
     }
@@ -688,6 +716,10 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
      * frames with this method*/
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
     GstSample * sample;
+
+    if(!streamer->frame_queue) {
+        return GST_FLOW_OK;
+    }
 
     g_signal_emit_by_name(sink, "pull-sample", &sample);
     if(!sample) {
