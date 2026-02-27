@@ -475,14 +475,19 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     }
 
     const bool first_frame = !streamer->is_video_info_valid;
-    if(first_frame) {
-        GstCaps * caps = gst_sample_get_caps(sample);
-        if(!caps || !gst_video_info_from_caps(&streamer->video_info, caps)) {
+    GstCaps * caps = gst_sample_get_caps(sample);
+    if(caps) {
+        if(!gst_video_info_from_caps(&streamer->video_info, caps)) {
             LV_LOG_ERROR("Failed to get video info from caps");
             gst_sample_unref(sample);
             return;
         }
         streamer->is_video_info_valid = true;
+    }
+    else if(!streamer->is_video_info_valid) {
+        /* No caps on sample and we don't have valid info yet */
+        gst_sample_unref(sample);
+        return;
     }
 
     GstBuffer * buffer = gst_sample_get_buffer(sample);
@@ -616,6 +621,10 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
     LV_UNUSED(element);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
     GstCaps * caps = gst_pad_get_current_caps(pad);
+    if(!caps) {
+        LV_LOG_WARN("Pad added without caps, unable to determine stream type");
+        return;
+    }
 
     GstStructure * structure = gst_caps_get_structure(caps, 0);
     const gchar * name = gst_structure_get_name(structure);
