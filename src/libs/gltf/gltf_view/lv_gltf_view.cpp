@@ -192,7 +192,8 @@ lv_gltf_model_t * lv_gltf_get_model_by_index(const lv_obj_t * obj, size_t id)
     if(id >= lv_array_size(&viewer->models)) {
         return NULL;
     }
-    lv_gltf_model_data_t * modeld = *(lv_gltf_model_data_t **)lv_array_at(&((lv_gltf_t *)obj)->models, id);
+
+    lv_gltf_model_data_t * modeld = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, id);
     LV_ASSERT_NULL(modeld);
     return modeld->model;
 
@@ -270,8 +271,10 @@ float lv_gltf_get_world_distance(const lv_obj_t * obj)
     if(viewer->models.size == 0) {
         return 0.0f;
     }
-    lv_gltf_model_data_t * modeld = *(lv_gltf_model_data_t **)lv_array_at(&viewer->models, 0);
+    lv_gltf_model_data_t * modeld = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, 0);
+    LV_ASSERT_NULL(modeld);
     lv_gltf_model_t * model = modeld->model;
+    LV_ASSERT_NULL(model);
     return (lv_gltf_data_get_radius(model) * LV_GLTF_DISTANCE_SCALE_FACTOR) * view_desc->distance;
 }
 
@@ -351,8 +354,11 @@ void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
         return;
     }
 
-    lv_gltf_model_data_t * modeld = *(lv_gltf_model_data_t **)lv_array_at(&viewer->models, 0);
+
+    lv_gltf_model_data_t * modeld = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, 0);
+    LV_ASSERT_NULL(modeld);
     lv_gltf_model_t * model = modeld->model;
+    LV_ASSERT_NULL(model);
 
     if(value > model->asset.cameras.size()) {
         return;
@@ -370,7 +376,10 @@ uint32_t lv_gltf_get_camera(const lv_obj_t * obj)
     if(lv_array_is_empty(&viewer->models)) {
         return 0;
     }
-    const lv_gltf_model_t * model = *(const lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
+    lv_gltf_model_data_t * modeld = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, 0);
+    LV_ASSERT_NULL(modeld);
+    lv_gltf_model_t * model = modeld->model;
+    LV_ASSERT_NULL(model);
     return model->camera;
 }
 
@@ -383,7 +392,10 @@ uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj)
     if(lv_array_is_empty(&viewer->models)) {
         return 0;
     }
-    const lv_gltf_model_t * model = *(const lv_gltf_model_t **) lv_array_at(&viewer->models, 0);
+    lv_gltf_model_data_t * modeld = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, 0);
+    LV_ASSERT_NULL(modeld);
+    lv_gltf_model_t * model = modeld->model;
+    LV_ASSERT_NULL(model);
     return lv_gltf_model_get_camera_count(model);
 }
 
@@ -866,7 +878,10 @@ static void display_refr_end_event_cb(lv_event_t * e)
     lv_gltf_t * viewer = (lv_gltf_t *) lv_event_get_user_data(e);
     uint32_t model_count = lv_array_size(&viewer->models);
     for(uint32_t i = 0; i < model_count; ++i) {
-        lv_gltf_model_data_t * modeld = *(lv_gltf_model_data_t **)lv_array_at(&viewer->models, i);
+        lv_gltf_model_data_t * modeld = (lv_gltf_model_data_t *)lv_array_at(&viewer->models, i);
+        LV_ASSERT_NULL(modeld);
+        lv_gltf_model_t * model = modeld->model;
+        LV_ASSERT_NULL(model);
         lv_gltf_model_send_new_values(modeld->model);
     }
 }
