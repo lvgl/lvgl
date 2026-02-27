@@ -109,13 +109,17 @@ lv_base_dir_t lv_bidi_detect_base_dir(const char * txt)
 {
     uint32_t i = 0;
     uint32_t letter;
+    bool found_ltr = false;
     while(txt[i] != '\0') {
         letter = lv_text_encoded_next(txt, &i);
 
         lv_base_dir_t dir;
         dir = lv_bidi_get_letter_dir(letter);
-        if(dir == LV_BASE_DIR_RTL || dir == LV_BASE_DIR_LTR) return dir;
+        if(dir == LV_BASE_DIR_RTL) return LV_BASE_DIR_RTL;
+        if(dir == LV_BASE_DIR_LTR) found_ltr = true;
     }
+
+    if(found_ltr) return LV_BASE_DIR_LTR;
 
     /*If there were no strong char earlier return with the default base dir*/
     if(LV_BIDI_BASE_DIR_DEF == LV_BASE_DIR_AUTO) return LV_BASE_DIR_LTR;
