@@ -1563,6 +1563,10 @@ menu "LVGL configuration"
 			int "The maximum number of Glyph in count"
 			default 256
 			depends on LV_USE_FREETYPE
+		config LV_USE_HARFBUZZ
+			bool "HarfBuzz text shaping for complex scripts (e.g. Devanagari, Arabic)"
+			default n
+			depends on LV_USE_FREETYPE
 
 		config LV_USE_TINY_TTF
 			bool "Enable Tiny TTF decoder"

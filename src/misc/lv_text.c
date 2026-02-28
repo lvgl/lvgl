@@ -15,6 +15,10 @@
 #include "../stdlib/lv_string.h"
 #include "../misc/lv_types.h"
 
+#if LV_USE_HARFBUZZ
+    #include "../libs/freetype/lv_freetype_harfbuzz.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -433,6 +437,22 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
     if(txt[0] == '\0') return 0;
+
+#if LV_USE_HARFBUZZ
+    /* Use HarfBuzz shaping for accurate width measurement when available */
+    if(lv_freetype_is_harfbuzz_font(font)) {
+        /* Find the actual byte length (length may include trailing newline) */
+        uint32_t byte_len = length;
+        /* Strip trailing newline/carriage return for width calculation */
+        while(byte_len > 0 && (txt[byte_len - 1] == '\n' || txt[byte_len - 1] == '\r')) {
+            byte_len--;
+        }
+        if(byte_len == 0) return 0;
+        int32_t hb_width = lv_hb_get_text_width(font, txt, byte_len, attributes->letter_space);
+        if(hb_width >= 0) return hb_width;
+        /* Fall through to character-by-character path on failure */
+    }
+#endif
 
     uint32_t i                = 0;
     int32_t width             = 0;
