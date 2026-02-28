@@ -8,8 +8,11 @@
  *********************/
 
 #include "lv_gltf_model_loader.h"
-#include "lv_gltf_data_internal.h"
 #if LV_USE_GLTF
+
+#include "lv_gltf_data_internal.h"
+#include "../../../misc/lv_rb.h"
+#include "../../../stdlib/lv_sprintf.h"
 
 /*********************
  *      DEFINES
