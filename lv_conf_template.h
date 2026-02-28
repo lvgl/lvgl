@@ -258,7 +258,17 @@
          * and define the section in the linker script if you need the GPU memory to
          * be, e.g. in a region where accesses will not be cached.
          */
-        #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+    #if LV_USE_NEMA_LIB == LV_NEMA_LIB_M55
+        #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM __attribute__((section("Nemagfx_Memory_Pool_Buffer")))
+    #endif
+    #endif
+
+    #if LV_USE_NEMA_GFX
+        /** Size of the NemaGFX command list buffer in bytes */
+        #define LV_NEMA_GFX_CL_SIZE          8192
+
+        /** Number of sectors used for the NemaGFX command list */
+        #define LV_NEMA_GFX_CL_SECTOR_COUNT  8
     #endif
 
     /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/

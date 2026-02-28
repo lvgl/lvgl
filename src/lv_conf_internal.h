@@ -715,11 +715,33 @@
          * and define the section in the linker script if you need the GPU memory to
          * be, e.g. in a region where accesses will not be cached.
          */
+    #if LV_USE_NEMA_LIB == LV_NEMA_LIB_M55
         #ifndef LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
             #ifdef CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
                 #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
             #else
-                #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+                #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM __attribute__((section("Nemagfx_Memory_Pool_Buffer")))
+            #endif
+        #endif
+    #endif
+    #endif
+
+    #if LV_USE_NEMA_GFX
+        /** Size of the NemaGFX command list buffer in bytes */
+        #ifndef LV_NEMA_GFX_CL_SIZE
+            #ifdef CONFIG_LV_NEMA_GFX_CL_SIZE
+                #define LV_NEMA_GFX_CL_SIZE CONFIG_LV_NEMA_GFX_CL_SIZE
+            #else
+                #define LV_NEMA_GFX_CL_SIZE          8192
+            #endif
+        #endif
+
+        /** Number of sectors used for the NemaGFX command list */
+        #ifndef LV_NEMA_GFX_CL_SECTOR_COUNT
+            #ifdef CONFIG_LV_NEMA_GFX_CL_SECTOR_COUNT
+                #define LV_NEMA_GFX_CL_SECTOR_COUNT CONFIG_LV_NEMA_GFX_CL_SECTOR_COUNT
+            #else
+                #define LV_NEMA_GFX_CL_SECTOR_COUNT  8
             #endif
         #endif
     #endif
