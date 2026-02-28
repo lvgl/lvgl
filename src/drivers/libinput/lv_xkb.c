@@ -9,7 +9,7 @@
 
 #include "lv_xkb_private.h"
 
-#if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
+#if (defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB) || (defined(LV_EVDEV_XKB) && LV_EVDEV_XKB)
 
 #include "../../core/lv_group.h"
 #include "../../misc/lv_log.h"
@@ -177,4 +177,4 @@ static bool _set_keymap(lv_xkb_t * dsc, struct xkb_rule_names names)
     return true;
 }
 
-#endif /* defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB */
+#endif /* (defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB) || (defined(LV_EVDEV_XKB) && LV_EVDEV_XKB) */

@@ -1375,6 +1375,15 @@
 /** Driver for evdev input devices */
 #define LV_USE_EVDEV    0
 
+#if LV_USE_EVDEV
+    /** Full keyboard support via XKB */
+    #define LV_EVDEV_XKB             0
+    #if LV_EVDEV_XKB
+        /** "setxkbmap -query" can help find the right values for your keyboard */
+        #define LV_EVDEV_XKB_KEY_MAP { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
+    #endif
+#endif
+
 /** Driver for libinput input devices */
 #define LV_USE_LIBINPUT    0
 
