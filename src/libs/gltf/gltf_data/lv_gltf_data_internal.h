@@ -1,17 +1,15 @@
 #ifndef LV_GLTFDATA_PRIVATE_H
 #define LV_GLTFDATA_PRIVATE_H
 
-#include "../../../lv_conf_internal.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include "../../../lv_conf_internal.h"
+
 #if LV_USE_GLTF
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
-#include "../../../draw/lv_image_dsc.h"
 #include "../../../misc/lv_types.h"
-#include "../../../misc/lv_array.h"
 
 
 typedef struct {
@@ -177,6 +175,10 @@ typedef struct {
 
 } lv_gltf_uniform_locations_t;
 
+struct _lv_gltf_model_loader_t {
+    lv_rb_t textures_map;
+};
+
 lv_gltf_uniform_locations_t lv_gltf_uniform_locations_create(GLuint program);
 
 typedef struct {
@@ -188,31 +190,6 @@ void lv_gltf_store_compiled_shader(lv_gltf_model_t * data, size_t identifier, lv
 lv_gltf_compiled_shader_t * lv_gltf_get_compiled_shader(lv_gltf_model_t * data, size_t identifier);
 
 /**
- * @brief Load the gltf file at the specified filepath
- *
- * @param gltf_path The gltf filename
- * @param ret_data Pointer to the data container that will be populated.
- * @param shaders Pointer to the shader cache object this file uses.
- */
-lv_gltf_model_t *
-lv_gltf_data_load_from_file(const char * file_path,
-                            lv_opengl_shader_manager_t * shader_manager);
-
-/**
- * @brief Load the gltf file encoded within the supplied byte array
- *
- * @param gltf_path The gltf filename
- * @param gltf_data_size if gltf_path is instead a byte array, pass the size of that array in through this variable (or 0 if it's a file path).
- * @param ret_data Pointer to the data container that will be populated.
- * @param shaders Pointer to the shader cache object this file uses.
- */
-
-lv_gltf_model_t *
-lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
-                             lv_opengl_shader_manager_t * shader_manager);
-
-
-/**
  * @brief Retrieve the radius of the GLTF data object.
  *
  * @param D Pointer to the lv_gltf_data_t object from which to get the radius.
@@ -220,13 +197,6 @@ lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
  */
 double lv_gltf_data_get_radius(const lv_gltf_model_t * model);
 
-
-/**
- * @brief Destroy a GLTF data object and free associated resources.
- *
- * @param _data Pointer to the lv_gltf_data_t object to be destroyed.
- */
-void lv_gltf_data_delete(lv_gltf_model_t * _data);
 
 /**
  * @brief Copy the bounds information from one GLTF data object to another.
@@ -246,6 +216,10 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
 void lv_gltf_data_rgb_to_bgr(uint8_t * pixel_buffer,
                              size_t byte_total_count,
                              bool has_alpha);
+
+lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer);
+void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer);
+void lv_gltf_model_invalidate(lv_gltf_model_t * model);
 
 #endif /*LV_USE_GLTF*/
 

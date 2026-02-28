@@ -412,7 +412,7 @@ static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
         buf_stride = 1;
     }
     buf_h = MAX_BUF_SIZE / buf_stride;
-    if(buf_h > blend_h) buf_h = blend_h;
+    buf_h = LV_CLAMP(1, buf_h, blend_h);
     tmp_buf = lv_malloc(buf_stride * buf_h);
     LV_ASSERT_MALLOC(tmp_buf);
     if(!tmp_buf) {
@@ -501,19 +501,19 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
     if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
         uint32_t buf_stride = blend_w * 3;
         buf_h = MAX_BUF_SIZE / buf_stride;
-        if(buf_h > blend_h) buf_h = blend_h;
+        buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     else if(cf_final == LV_COLOR_FORMAT_AL88) {
         uint32_t buf_stride = blend_w;
         buf_h = MAX_BUF_SIZE / (buf_stride * 2);
-        if(buf_h > blend_h) buf_h = blend_h;
+        buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h * 2);
     }
     else {
         uint32_t buf_stride = blend_w * lv_color_format_get_size(cf_final);
         buf_h = MAX_BUF_SIZE / buf_stride;
-        if(buf_h > blend_h) buf_h = blend_h;
+        buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     LV_ASSERT_MALLOC(transformed_buf);

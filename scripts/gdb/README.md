@@ -17,6 +17,12 @@ py import lvglgdb
 dump obj
 dump cache image
 dump cache image_header
+
+# Inspect a single lv_style_t variable
+info style my_style
+
+# Inspect all styles of an lv_obj_t
+info style --obj my_obj
 ```
 
 # Structure

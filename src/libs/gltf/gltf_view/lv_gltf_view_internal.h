@@ -95,7 +95,6 @@ typedef struct {
     float focal_y;
     float focal_z;
     bool frame_was_antialiased;
-    int32_t animation_speed_ratio;
     lv_gltf_aa_mode_t aa_mode;
     lv_gltf_bg_mode_t bg_mode;
     float blur_bg;              /** How much to blur the environment background, between 0.0 and 1.0 */
@@ -156,6 +155,17 @@ typedef struct {
 #include <fastgltf/types.hpp>
 #include <map>
 
+typedef struct {
+    lv_gltf_model_t * model;
+    lv_array_t skin_textures;
+    uint32_t last_camera_index;
+    bool owned;
+    bool last_frame_was_antialiased;
+    bool last_frame_no_motion;
+    bool _last_frame_no_motion;
+} lv_gltf_model_data_t;
+
+
 struct _lv_gltf_t {
     lv_3dtexture_t texture;
     lv_array_t models;
@@ -163,13 +173,13 @@ struct _lv_gltf_t {
     lv_gltf_view_desc_t desc;
     lv_gltf_view_desc_t last_desc;
     lv_opengl_shader_manager_t shader_manager;
+    lv_gltf_model_loader_t * model_loader;
     lv_gltf_environment_t * environment;
     fastgltf::math::fmat4x4 view_matrix;
     fastgltf::math::fmat4x4 projection_matrix;
     fastgltf::math::fmat4x4 view_projection_matrix;
     fastgltf::math::fvec3 camera_pos;
 
-    std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>> ibm_by_skin_then_node;
     bool owns_environment;
 };
 

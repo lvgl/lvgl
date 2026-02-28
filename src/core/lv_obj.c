@@ -1035,11 +1035,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_CHILD_CHANGED) {
-        int32_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        int32_t h = lv_obj_get_style_height(obj, LV_PART_MAIN);
         int32_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
         uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
-        if(layout || align || w == LV_SIZE_CONTENT || h == LV_SIZE_CONTENT) {
+        if(layout || align || lv_obj_is_style_any_width_content(obj) || lv_obj_is_style_any_height_content(obj)) {
             lv_obj_mark_layout_as_dirty(obj);
         }
     }

@@ -403,6 +403,7 @@ void lv_freertos_task_switch_out(void)
     else globals->freertos_non_idle_time_sum += elaps;
 }
 
+#if LV_OS_IDLE_PERCENT_CUSTOM == 0
 uint32_t lv_os_get_idle_percent(void)
 {
     if(globals->freertos_non_idle_time_sum + globals->freertos_idle_time_sum == 0) {
@@ -418,6 +419,7 @@ uint32_t lv_os_get_idle_percent(void)
 
     return pct;
 }
+#endif
 
 void lv_sleep_ms(uint32_t ms)
 {

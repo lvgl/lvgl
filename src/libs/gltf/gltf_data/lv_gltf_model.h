@@ -7,10 +7,40 @@
 #include "lv_gltf_model_node.h"
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_event.h"
+#include "lv_gltf_model_loader.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * Load a glTF model from a file
+ * @param file_path path to the glTF file to load
+ * @param loader pointer to the glTF model loader instance, or NULL to create a new one
+ * @return pointer to the loaded glTF model, or NULL on failure
+ * @note If loader is NULL, an internal loader will be created and managed automatically
+ */
+lv_gltf_model_t * lv_gltf_data_load_from_file(const char * file_path,
+                                              lv_gltf_model_loader_t * loader);
+
+/**
+ * Load a glTF model from a byte array
+ * @param data pointer to the glTF data buffer
+ * @param data_size size of the data buffer in bytes
+ * @param loader pointer to the glTF model loader instance, or NULL to create a new one
+ * @return pointer to the loaded glTF model, or NULL on failure
+ * @note If loader is NULL, an internal loader will be created and managed automatically
+ */
+lv_gltf_model_t * lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
+                                               lv_gltf_model_loader_t * loader);
+
+
+/**
+ * Delete a glTF model
+ * @param model the gltf model to delete
+ */
+void lv_gltf_model_delete(lv_gltf_model_t * model);
+
 /**
  * @brief Get the number of images in the glTF model
  *
@@ -118,6 +148,27 @@ bool lv_gltf_model_is_animation_paused(lv_gltf_model_t * model);
  * @param model Pointer to the glTF model structure
  */
 size_t lv_gltf_model_get_animation(lv_gltf_model_t * model);
+
+/**
+ * Set the animation speed ratio
+ *
+ * The actual ratio is the value parameter / LV_GLTF_ANIM_SPEED_NORMAL
+ * Values greater than LV_GLTF_ANIM_SPEED_NORMAL will speed-up the animation
+ * Values less than LV_GLTF_ANIM_SPEED_NORMAL will slow down the animation
+ *
+ * @param model pointer to a glTF model
+ * @param value speed-up ratio of the animation
+ */
+void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value);
+
+/**
+ * Get the animation speed ratio
+ *
+ * The actual ratio is the return value / LV_GLTF_ANIM_SPEED_NORMAL
+ *
+ * @param model pointer to a glTF model
+ */
+uint32_t lv_gltf_model_get_animation_speed(const lv_gltf_model_t * model);
 
 #ifdef __cplusplus
 } /*extern "C"*/

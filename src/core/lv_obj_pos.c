@@ -728,6 +728,26 @@ int32_t lv_obj_get_style_clamped_height(lv_obj_t * obj)
     return h;
 }
 
+bool lv_obj_is_style_any_width_content(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    int32_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
+    int32_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
+    int32_t maxw = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
+    return (w == LV_SIZE_CONTENT || minw == LV_SIZE_CONTENT || maxw == LV_SIZE_CONTENT);
+}
+
+bool lv_obj_is_style_any_height_content(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    int32_t h = lv_obj_get_style_height(obj, LV_PART_MAIN);
+    int32_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
+    int32_t maxh = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
+    return (h == LV_SIZE_CONTENT || minh == LV_SIZE_CONTENT || maxh == LV_SIZE_CONTENT);
+}
+
 bool lv_obj_is_width_min(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -766,10 +786,19 @@ bool lv_obj_is_height_max(lv_obj_t * obj)
 
 bool lv_obj_refresh_self_size(lv_obj_t * obj)
 {
-    int32_t w_set = lv_obj_get_style_width(obj, LV_PART_MAIN);
-    int32_t h_set = lv_obj_get_style_height(obj, LV_PART_MAIN);
-    if(w_set != LV_SIZE_CONTENT && h_set != LV_SIZE_CONTENT) return false;
+    if(!lv_obj_is_style_any_width_content(obj) && !lv_obj_is_style_any_height_content(obj))
+        return false;
 
+    /**
+     * Refresh the parent's layout, because the childs size is in some way dependent on its contents we need to force a
+     * recalculation of the parents layout
+     */
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent != NULL) {
+        parent->w_layout = 0;
+        parent->h_layout = 0;
+        lv_obj_mark_layout_as_dirty(parent);
+    }
     lv_obj_mark_layout_as_dirty(obj);
     return true;
 }
