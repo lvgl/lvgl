@@ -171,6 +171,14 @@ void lv_span_set_text_static(lv_span_t * span, const char * text);
 void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_style_t * style);
 
 /**
+ * Save a pointer to the style to the style member of the span.
+ * @param obj       pointer_to a spangroup
+ * @param span      pointer to a span.
+ * @param style     pointer to a style to store in the span
+ */
+void lv_spangroup_set_span_style_static(lv_obj_t * obj, lv_span_t * span, const lv_style_t * style);
+
+/**
  * DEPRECATED. Use the text_align style property instead
  * Set the align of the spangroup.
  * @param obj   pointer to a spangroup object.
@@ -212,12 +220,13 @@ void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines);
  *====================*/
 
 /**
- * Get a pointer to the style of a span's built-in style.
- * Any lv_style_set_... functions can be applied on the returned style.
- * @param span  pointer to the span
- * @return      pointer to the style. (valid as long as the span is valid)
+ * Get a pointer to the style of a span's style.
+ * @param span  pointer to the span.
+ * @return      pointer to the style.
+ *
+ * @deprecated This function should no longer be used to set the span style properties directly.
  */
-lv_style_t * lv_span_get_style(lv_span_t * span);
+const lv_style_t * lv_span_get_style(lv_span_t * span);
 
 /**
  * Get a pointer to the text of a span
