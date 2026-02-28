@@ -39,7 +39,7 @@ Example of usage:
 The plugin provides the following commands.
 
 - ``dump obj``: Dump the object tree.
-- ``info style``: Show the object's style.
+- ``info style``: Inspect style properties of an ``lv_style_t`` or an ``lv_obj_t``.
 - ``info draw_unit``: Display all current drawing unit information.
 
 .. note::
@@ -61,28 +61,34 @@ Dump Obj Tree
 
 
 
-Show Obj's Style
-****************
+Inspect Style
+*************
 
-This command can dump the object's local style, since style value is a union, it's
-displayed in all possible formats.
+``info style <style_var>``: Inspect a single ``lv_style_t`` variable. Properties are
+displayed with resolved names and formatted values (colors shown as hex).
 
-``info style address_of_obj``: Show the object's style.
-
+``info style --obj <obj_var>``: Inspect all styles of an ``lv_obj_t``, grouped by
+style slot with selector and flags.
 
 Example:
 
 .. code:: bash
 
-    (gdb) info style 0x60700000dd10
-      32 = {num = 90, ptr = 0x5a, color = {blue = 90 'Z', green = 0 '\000', red = 0 '\000'}}
-      158 = {num = 32767, ptr = 0x7fff, color = {blue = 255 '\377', green = 127 '\177', red = 0 '\000'}}
-    (gdb) p lv_global->disp_default->act_scr
-    $4 = (lv_obj_t *) 0x60700000dd10
-    (gdb) info style $4
-      32 = {num = 90, ptr = 0x5a, color = {blue = 90 'Z', green = 0 '\000', red = 0 '\000'}}
-      158 = {num = 32767, ptr = 0x7fff, color = {blue = 255 '\377', green = 127 '\177', red = 0 '\000'}}
-    (gdb)
+    (gdb) info style my_style
+    +-----------+---------+
+    | prop      | value   |
+    +-----------+---------+
+    | BG_COLOR  | #ff0000 |
+    | BG_OPA    | 255     |
+    +-----------+---------+
+
+    (gdb) info style --obj lv_global->disp_default->act_scr
+    [0] MAIN|DEFAULT  local
+    +-----------+---------+
+    | prop      | value   |
+    +-----------+---------+
+    | BG_COLOR  | #ff0000 |
+    +-----------+---------+
 
 
 
