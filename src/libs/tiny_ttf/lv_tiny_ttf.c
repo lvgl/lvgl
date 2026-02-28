@@ -390,14 +390,15 @@ static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g
 {
     LV_ASSERT_NULL(font);
 
+    if(g_dsc->entry == NULL) {
+        return;
+    }
+
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
     if(!dsc->cache_size) {  /* no cache, do everything directly */
         lv_draw_buf_destroy((lv_draw_buf_t *)g_dsc->entry);
     }
     else {
-        if(g_dsc->entry == NULL) {
-            return;
-        }
         lv_cache_release(dsc->draw_data_cache, g_dsc->entry, NULL);
     }
     g_dsc->entry = NULL;

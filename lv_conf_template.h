@@ -710,6 +710,9 @@
 /** Enable drawing placeholders when glyph dsc is not found. */
 #define LV_USE_FONT_PLACEHOLDER 1
 
+/** Enable dynamic glyph bitmap loading for binary fonts. */
+#define LV_BINFONT_DYNAMIC_LOAD 0
+
 /*=================
  *  TEXT SETTINGS
  *=================*/

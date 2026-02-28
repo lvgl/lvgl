@@ -296,8 +296,19 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc1 = (lv_font_fmt_txt_glyph_dsc_t *)dsc1->glyph_dsc;
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc2 = (lv_font_fmt_txt_glyph_dsc_t *)dsc2->glyph_dsc;
 
+    /*
+     * In dynamic mode, bitmap_index stores glyph index instead of byte offset,
+     * and glyph_bitmap is a small buffer for on-demand loading.
+     * Skip direct bitmap comparison in this case.
+     */
+#if LV_BINFONT_DYNAMIC_LOAD
+    bool skip_bitmap_compare = (dsc1->loader != NULL) || (dsc2->loader != NULL);
+#else
+    bool skip_bitmap_compare = false;
+#endif
+
     for(int i = 0; i < total_glyphs; ++i) {
-        if(i < total_glyphs - 1) {
+        if(!skip_bitmap_compare && i < total_glyphs - 1) {
             int size1 = glyph_dsc1[i + 1].bitmap_index - glyph_dsc1[i].bitmap_index;
 
             if(size1 > 0) {
@@ -317,6 +328,100 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
     LV_LOG_INFO("No differences found!");
     return 0;
 }
+
+/**********************
+ *   DYNAMIC LOAD TESTS
+ **********************/
+
+#if LV_BINFONT_DYNAMIC_LOAD
+
+void test_binfont_dynamic_loader_init(void)
+{
+    lv_font_t * font = lv_binfont_create("A:src/test_assets/test_font_1.fnt");
+    TEST_ASSERT_NOT_NULL(font);
+
+    lv_font_fmt_txt_dsc_t * dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    TEST_ASSERT_NOT_NULL_MESSAGE(dsc, "font dsc should not be NULL");
+    TEST_ASSERT_NOT_NULL_MESSAGE(dsc->loader, "loader should be initialized in dynamic mode");
+
+    lv_binfont_destroy(font);
+}
+
+void test_binfont_dynamic_render(void)
+{
+    lv_font_t * font = lv_binfont_create("A:src/test_assets/test_font_1.fnt");
+    TEST_ASSERT_NOT_NULL(font);
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_obj_set_style_text_font(label, font, 0);
+    lv_label_set_text(label, "Dynamic Load Test ABC 123");
+    lv_obj_center(label);
+
+    lv_refr_now(NULL);
+
+    lv_obj_clean(lv_screen_active());
+    lv_binfont_destroy(font);
+}
+
+void test_binfont_dynamic_multiple_glyphs(void)
+{
+    lv_font_t * font = lv_binfont_create("A:src/test_assets/test_font_1.fnt");
+    TEST_ASSERT_NOT_NULL(font);
+
+    lv_obj_t * scr = lv_screen_active();
+
+    /* Create multiple labels to trigger multiple glyph loads */
+    lv_obj_t * label1 = lv_label_create(scr);
+    lv_obj_set_style_text_font(label1, font, 0);
+    lv_label_set_text(label1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    lv_obj_align(label1, LV_ALIGN_TOP_MID, 0, 10);
+
+    lv_obj_t * label2 = lv_label_create(scr);
+    lv_obj_set_style_text_font(label2, font, 0);
+    lv_label_set_text(label2, "abcdefghijklmnopqrstuvwxyz");
+    lv_obj_align(label2, LV_ALIGN_CENTER, 0, 0);
+
+    lv_obj_t * label3 = lv_label_create(scr);
+    lv_obj_set_style_text_font(label3, font, 0);
+    lv_label_set_text(label3, "0123456789 !@#$%^&*()");
+    lv_obj_align(label3, LV_ALIGN_BOTTOM_MID, 0, -10);
+
+    lv_refr_now(NULL);
+
+    lv_obj_clean(scr);
+    lv_binfont_destroy(font);
+}
+
+void test_binfont_dynamic_reload(void)
+{
+    /* Load and destroy font multiple times to test resource cleanup */
+    for(int i = 0; i < 3; i++) {
+        lv_font_t * font = lv_binfont_create("A:src/test_assets/test_font_1.fnt");
+        TEST_ASSERT_NOT_NULL_MESSAGE(font, "Font should load on each iteration");
+
+        lv_obj_t * label = lv_label_create(lv_screen_active());
+        lv_obj_set_style_text_font(label, font, 0);
+        lv_label_set_text(label, "Reload test");
+
+        lv_obj_clean(lv_screen_active());
+        lv_binfont_destroy(font);
+    }
+}
+
+void test_binfont_dynamic_vs_static(void)
+{
+    /* Compare dynamic font rendering with static C font */
+    lv_font_t * font_dynamic = lv_binfont_create("A:src/test_assets/test_font_1.fnt");
+    TEST_ASSERT_NOT_NULL(font_dynamic);
+
+    /* Verify basic properties match */
+    TEST_ASSERT_EQUAL_INT_MESSAGE(test_font_1.line_height, font_dynamic->line_height, "line_height mismatch");
+    TEST_ASSERT_EQUAL_INT_MESSAGE(test_font_1.base_line, font_dynamic->base_line, "base_line mismatch");
+
+    lv_binfont_destroy(font_dynamic);
+}
+
+#endif /* LV_BINFONT_DYNAMIC_LOAD */
 
 /**********************
  *   STATIC FUNCTIONS
