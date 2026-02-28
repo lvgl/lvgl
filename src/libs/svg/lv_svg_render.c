@@ -2424,23 +2424,23 @@ static void _freetype_outline_cb(lv_event_t * e)
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
     switch(code) {
         case LV_EVENT_CREATE:
-            param->outline = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+            param->outlines = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
             break;
         case LV_EVENT_DELETE:
-            lv_vector_path_delete(param->outline);
+            lv_vector_path_delete(param->outlines);
             break;
         case LV_EVENT_INSERT: {
                 if(param->type == LV_FREETYPE_OUTLINE_MOVE_TO) {
                     lv_fpoint_t pt = {0};
                     pt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
                     pt.y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
-                    lv_vector_path_move_to(param->outline, &pt);
+                    lv_vector_path_move_to(param->outlines, &pt);
                 }
                 else if(param->type == LV_FREETYPE_OUTLINE_LINE_TO) {
                     lv_fpoint_t pt = {0};
                     pt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
                     pt.y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
-                    lv_vector_path_line_to(param->outline, &pt);
+                    lv_vector_path_line_to(param->outlines, &pt);
                 }
                 else if(param->type == LV_FREETYPE_OUTLINE_CUBIC_TO) {
                     lv_fpoint_t pt[3] = {0};
@@ -2450,7 +2450,7 @@ static void _freetype_outline_cb(lv_event_t * e)
                     pt[1].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->control2.y);
                     pt[2].x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
                     pt[2].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
-                    lv_vector_path_cubic_to(param->outline, &pt[0], &pt[1], &pt[2]);
+                    lv_vector_path_cubic_to(param->outlines, &pt[0], &pt[1], &pt[2]);
                 }
                 else if(param->type == LV_FREETYPE_OUTLINE_CONIC_TO) {
                     lv_fpoint_t pt[2] = {0};
@@ -2458,10 +2458,10 @@ static void _freetype_outline_cb(lv_event_t * e)
                     pt[0].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.y);
                     pt[1].x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
                     pt[1].y = -LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
-                    lv_vector_path_quad_to(param->outline, &pt[0], &pt[1]);
+                    lv_vector_path_quad_to(param->outlines, &pt[0], &pt[1]);
                 }
                 else if(param->type == LV_FREETYPE_OUTLINE_END) {
-                    lv_vector_path_close(param->outline);
+                    lv_vector_path_close(param->outlines);
                 }
             }
             break;

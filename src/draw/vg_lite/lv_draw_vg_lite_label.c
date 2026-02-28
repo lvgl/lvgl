@@ -35,12 +35,14 @@
     #define PATH_FLUSH_COUNT_MAX 8
 #endif
 
-#define FT_F26DOT6_SHIFT 6
+#if LV_USE_FREETYPE
+    #define FT_F26DOT6_SHIFT 6
 
-/** After converting the font reference size, it is also necessary to scale the 26dot6 data
- * in the path to the real physical size
- */
-#define FT_F26DOT6_TO_PATH_SCALE(x) (LV_FREETYPE_F26DOT6_TO_FLOAT(x) / (1 << FT_F26DOT6_SHIFT))
+    /** After converting the font reference size, it is also necessary to scale the 26dot6 data
+    * in the path to the real physical size
+    */
+    #define FT_F26DOT6_TO_PATH_SCALE(x) (LV_FREETYPE_F26DOT6_TO_FLOAT(x) / (1 << FT_F26DOT6_SHIFT))
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -57,10 +59,10 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
 static void bitmap_cache_release_cb(void * entry, void * user_data);
 
+static void outline_iter_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len);
+static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
 #if LV_USE_FREETYPE
     static void freetype_outline_event_cb(lv_event_t * e);
-    static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
-    static void outline_iter_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len);
 #endif /* LV_USE_FREETYPE */
 
 /**********************
@@ -199,18 +201,10 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                 }
                 break;
 
-#if LV_USE_FREETYPE
-            case LV_FONT_GLYPH_FORMAT_VECTOR: {
-                    if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
-                        if(!glyph_draw_dsc->glyph_data) {
-                            return;
-                        }
+            case LV_FONT_GLYPH_FORMAT_VECTOR:
+                draw_letter_outline(t, glyph_draw_dsc);
 
-                        draw_letter_outline(t, glyph_draw_dsc);
-                    }
-                }
                 break;
-#endif /* LV_USE_FREETYPE */
 
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
                     glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
@@ -275,7 +269,7 @@ static inline void convert_letter_matrix(vg_lite_matrix_t * matrix, const lv_dra
 }
 
 static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, lv_area_t * letter_area,
-                                   lv_area_t * cliped_area)
+                                   lv_area_t * clipped_area)
 {
     *letter_area = *dsc->letter_coords;
 
@@ -296,7 +290,7 @@ static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t
         lv_area_move(letter_area, dsc->letter_coords->x1, dsc->letter_coords->y1);
     }
 
-    if(!lv_area_intersect(cliped_area, &t->clip_area, letter_area)) {
+    if(!lv_area_intersect(clipped_area, &t->clip_area, letter_area)) {
         return false;
     }
 
@@ -400,7 +394,6 @@ static void bitmap_cache_release_cb(void * entry, void * user_data)
     lv_font_glyph_release_draw_data(g_dsc);
 }
 
-#if LV_USE_FREETYPE
 
 static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc)
 {
@@ -419,21 +412,25 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     path_clip_area.x2++;
     path_clip_area.y2++;
 
-    lv_vg_lite_path_t * outline = (lv_vg_lite_path_t *)dsc->glyph_data;
+    lv_vg_lite_path_t * outline = (void *)dsc->glyph_data;
     const lv_point_t glyph_pos = {
         dsc->letter_coords->x1 - dsc->g->ofs_x,
         dsc->letter_coords->y1 + dsc->g->box_h + dsc->g->ofs_y
     };
     /* scale size */
-    const float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
-
-    const bool has_rotation_with_cliped = dsc->rotation && !lv_area_is_in(&letter_area, &t->clip_area, false);
+    float scale = 1.0;
+#if LV_USE_FREETYPE
+    if(lv_freetype_is_outline_font(dsc->g->resolved_font)) {
+        scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
+    }
+#endif
+    const bool has_rotation_with_clipped = dsc->rotation && !lv_area_is_in(&letter_area, &t->clip_area, false);
 
     /* calc convert matrix */
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
-    if(!has_rotation_with_cliped && dsc->rotation) {
+    if(!has_rotation_with_clipped && dsc->rotation) {
         vg_lite_translate(glyph_pos.x + dsc->pivot.x, glyph_pos.y, &matrix);
         vg_lite_rotate(dsc->rotation / 10.0f, &matrix);
         vg_lite_translate(-dsc->pivot.x, 0, &matrix);
@@ -457,12 +454,13 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         return;
     }
 
-    const lv_point_precise_t p1 = { path_clip_area.x1, path_clip_area.y1 };
+    const int32_t stroke_width_scaled = (int32_t)(dsc->outline_stroke_width / scale);
+    const lv_point_precise_t p1 = { path_clip_area.x1 - stroke_width_scaled, path_clip_area.y1 - stroke_width_scaled };
     const lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
-    const lv_point_precise_t p2 = { path_clip_area.x2, path_clip_area.y2 };
+    const lv_point_precise_t p2 = { path_clip_area.x2 + stroke_width_scaled, path_clip_area.y2 + stroke_width_scaled };
     const lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
 
-    if(has_rotation_with_cliped) {
+    if(has_rotation_with_clipped) {
         /**
          * When intersecting the clipping region,
          * rotate the path contents without rotating the bounding box for cropping
@@ -497,10 +495,10 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     if(dsc->rotation) {
         /* The bounding rectangle before scaling relative to the original coordinates of the path */
         lv_area_t box_area;
-        box_area.x1 = dsc->g->ofs_x;
-        box_area.y1 = -dsc->g->box_h - dsc->g->ofs_y;
-        lv_area_set_width(&box_area, dsc->g->box_w);
-        lv_area_set_height(&box_area, dsc->g->box_h);
+        box_area.x1 = dsc->g->ofs_x - stroke_width_scaled;
+        box_area.y1 = -dsc->g->box_h - dsc->g->ofs_y - stroke_width_scaled;
+        lv_area_set_width(&box_area, dsc->g->box_w + stroke_width_scaled * 2);
+        lv_area_set_height(&box_area, dsc->g->box_h + stroke_width_scaled * 2);
 
         /* Workaround for loss of rotation precision */
         lv_area_increase(&box_area, 5, 5);
@@ -516,6 +514,30 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
     }
 
+    if(stroke_width_scaled > 0) {
+        /*Set the stroke and update the path type */
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_stroke(lv_vg_lite_path_get_path(outline),
+                                                  VG_LITE_CAP_ROUND, VG_LITE_JOIN_MITER, stroke_width_scaled, 1.0,
+                                                  NULL, 0, 0,
+                                                  lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true)), {});
+
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_STROKE_PATH), {});
+        LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(lv_vg_lite_path_get_path(outline)), {});
+
+        /*Draw the stroke (transparent fill)*/
+        lv_vg_lite_draw(
+            &u->target_buffer,
+            lv_vg_lite_path_get_path(outline),
+            VG_LITE_FILL_NON_ZERO,
+            &draw_matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            lv_vg_lite_color(dsc->color, 0, true));
+
+        /*Restore the path to fill mode, it will release the local memory allocated for the stroke op */
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_PATH), {});
+
+    }
+
     lv_vg_lite_draw(
         &u->target_buffer,
         lv_vg_lite_path_get_path(outline),
@@ -524,67 +546,7 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         VG_LITE_BLEND_SRC_OVER,
         lv_vg_lite_color(dsc->color, dsc->opa, true));
 
-    LV_PROFILER_DRAW_END;
-}
 
-static void vg_lite_outline_push(const lv_freetype_outline_event_param_t * param)
-{
-    LV_PROFILER_DRAW_BEGIN;
-    lv_vg_lite_path_t * outline = param->outline;
-    LV_ASSERT_NULL(outline);
-
-    lv_freetype_outline_type_t type = param->type;
-    switch(type) {
-
-        /**
-         * Reverse the Y-axis coordinate direction to achieve
-         * the conversion from Cartesian coordinate system to LCD coordinate system
-         */
-        case LV_FREETYPE_OUTLINE_END:
-            lv_vg_lite_path_end(outline);
-            break;
-        case LV_FREETYPE_OUTLINE_MOVE_TO:
-            lv_vg_lite_path_move_to(outline, param->to.x, -param->to.y);
-            break;
-        case LV_FREETYPE_OUTLINE_LINE_TO:
-            lv_vg_lite_path_line_to(outline, param->to.x, -param->to.y);
-            break;
-        case LV_FREETYPE_OUTLINE_CUBIC_TO:
-            lv_vg_lite_path_cubic_to(outline, param->control1.x, -param->control1.y,
-                                     param->control2.x, -param->control2.y,
-                                     param->to.x, -param->to.y);
-            break;
-        case LV_FREETYPE_OUTLINE_CONIC_TO:
-            lv_vg_lite_path_quad_to(outline, param->control1.x, -param->control1.y,
-                                    param->to.x, -param->to.y);
-            break;
-        default:
-            LV_LOG_ERROR("unknown point type: %d", type);
-            LV_ASSERT(false);
-            break;
-    }
-    LV_PROFILER_DRAW_END;
-}
-
-static void freetype_outline_event_cb(lv_event_t * e)
-{
-    LV_PROFILER_DRAW_BEGIN;
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
-    switch(code) {
-        case LV_EVENT_CREATE:
-            param->outline = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
-            break;
-        case LV_EVENT_DELETE:
-            lv_vg_lite_path_destroy(param->outline);
-            break;
-        case LV_EVENT_INSERT:
-            vg_lite_outline_push(param);
-            break;
-        default:
-            LV_LOG_WARN("unknown event code: %d", code);
-            break;
-    }
     LV_PROFILER_DRAW_END;
 }
 
@@ -623,6 +585,72 @@ static void outline_iter_cb(void * user_data, uint8_t op_code, const float * dat
             break;
     }
 }
+
+
+#if LV_USE_FREETYPE
+
+static void vg_lite_outline_push(const lv_freetype_outline_event_param_t * param)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    lv_vg_lite_path_t * path = param->outlines;
+    LV_ASSERT_NULL(path);
+
+    lv_freetype_outline_type_t type = param->type;
+    switch(type) {
+
+        /**
+         * Reverse the Y-axis coordinate direction to achieve
+         * the conversion from Cartesian coordinate system to LCD coordinate system
+         */
+        case LV_FREETYPE_OUTLINE_END:
+            lv_vg_lite_path_end(path);
+            break;
+        case LV_FREETYPE_OUTLINE_MOVE_TO:
+            lv_vg_lite_path_move_to(path, param->to.x, -param->to.y);
+            break;
+        case LV_FREETYPE_OUTLINE_LINE_TO:
+            lv_vg_lite_path_line_to(path, param->to.x, -param->to.y);
+            break;
+        case LV_FREETYPE_OUTLINE_CUBIC_TO:
+            lv_vg_lite_path_cubic_to(path, param->control1.x, -param->control1.y,
+                                     param->control2.x, -param->control2.y,
+                                     param->to.x, -param->to.y);
+            break;
+        case LV_FREETYPE_OUTLINE_CONIC_TO:
+            lv_vg_lite_path_quad_to(path, param->control1.x, -param->control1.y,
+                                    param->to.x, -param->to.y);
+            break;
+        default:
+            LV_LOG_ERROR("unknown point type: %d", type);
+            LV_ASSERT(false);
+            break;
+    }
+    LV_PROFILER_DRAW_END;
+}
+
+static void freetype_outline_event_cb(lv_event_t * e)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
+    switch(code) {
+        case LV_EVENT_CREATE:
+            param->outlines = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+            LV_ASSERT_MALLOC(param->outlines);
+            break;
+        case LV_EVENT_DELETE:
+            if(param->outlines) lv_vg_lite_path_destroy(param->outlines);
+            break;
+        case LV_EVENT_INSERT:
+            vg_lite_outline_push(param);
+            break;
+        default:
+            LV_LOG_WARN("unknown event code: %d", code);
+            break;
+    }
+    LV_PROFILER_DRAW_END;
+}
+
 
 #endif /* LV_USE_FREETYPE */
 
