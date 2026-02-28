@@ -29,6 +29,7 @@ extern "C" {
 #include FT_IMAGE_H
 #include FT_OUTLINE_H
 #include FT_STROKER_H
+#include FT_MULTIPLE_MASTERS_H
 
 /*********************
  *      DEFINES
