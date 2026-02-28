@@ -1,33 +1,20 @@
 from typing import Union, List, Optional, Dict
 import gdb
 
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 from .lv_cache_iter_factory import create_cache_iterator
 
 
 class LVCache(Value):
     """LVGL cache wrapper - focuses on cache-level operations"""
 
-    def __init__(
-        self, cache: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str]
-    ):
-        # Convert to Value first if needed
-        if isinstance(cache, int):
-            cache = Value(cache).cast("lv_cache_t", ptr=True)
-            if cache is None:
-                raise ValueError("Failed to cast pointer to lv_cache_t")
-        elif isinstance(cache, gdb.Value) and not isinstance(cache, Value):
-            cache = Value(cache)
-        elif not cache:
-            raise ValueError("Invalid cache")
-
+    def __init__(self, cache: ValueInput, datatype: Union[gdb.Type, str]):
+        super().__init__(Value.normalize(cache, "lv_cache_t"))
         self.datatype = (
             gdb.lookup_type(datatype).pointer()
             if isinstance(datatype, str)
             else datatype
         )
-
-        super().__init__(cache)
 
     def print_info(self):
         """Dump cache information"""
@@ -91,9 +78,7 @@ class LVCache(Value):
             print(f"  ... {cache_entries_cnt - count} more entries not shown")
 
 
-def dump_cache_info(
-    cache: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str]
-):
+def dump_cache_info(cache: ValueInput, datatype: Union[gdb.Type, str]):
     """Dump cache information"""
     cache_obj = LVCache(cache, datatype)
     cache_obj.print_info()

@@ -1,4 +1,4 @@
-from .value import Value
+from .value import Value, ValueInput
 from .lvgl import (
     curr_inst,
     LVDisplay,
@@ -44,6 +44,7 @@ __all__ = [
     "decode_selector",
     "format_style_value",
     "Value",
+    "ValueInput",
     "LVCacheEntry",
     "LVCacheLRURB",
     "LVCacheLRURBIterator",

@@ -1,13 +1,13 @@
 from ..core.lv_obj import LVObject
 from ..draw.lv_draw_buf import LVDrawBuf
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 
 
 class LVDisplay(Value):
     """LVGL display"""
 
-    def __init__(self, disp: Value):
-        super().__init__(disp)
+    def __init__(self, disp: ValueInput):
+        super().__init__(Value.normalize(disp, "lv_display_t"))
 
     @property
     def hor_res(self) -> int:
