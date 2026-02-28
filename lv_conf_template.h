@@ -1375,6 +1375,14 @@
 /** Driver for evdev input devices */
 #define LV_USE_EVDEV    0
 
+#if LV_USE_EVDEV
+
+    /** Return the raw keycode.
+     * Helpful when using GPIO keys that return key codes.
+     * Use the remap function to remap the keycode */
+    #define LV_EVDEV_RAW_KEYCODE    0
+#endif
+
 /** Driver for libinput input devices */
 #define LV_USE_LIBINPUT    0
 
