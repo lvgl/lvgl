@@ -1,7 +1,11 @@
 from .lv_ll import LVList
 from .lv_style import (
-    LVStyle, StyleEntry,
-    dump_style_info, style_prop_name, decode_selector, format_style_value,
+    LVStyle,
+    StyleEntry,
+    dump_style_info,
+    style_prop_name,
+    decode_selector,
+    format_style_value,
 )
 from .lv_rb import LVRedBlackTree, dump_rb_info
 from .lv_cache import LVCache, dump_cache_info
