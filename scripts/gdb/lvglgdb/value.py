@@ -7,6 +7,47 @@ class Value(gdb.Value):
     def __init__(self, value: Union[gdb.Value, "Value"]):
         super().__init__(value)
 
+    @staticmethod
+    def normalize(val: "ValueInput", target_type: Optional[str] = None) -> "Value":
+        """Normalize input to a typed Value pointer.
+
+        Args:
+            val: Input value - int (address), gdb.Value, or Value instance
+            target_type: C type name (e.g. "lv_obj_t"). If provided,
+                         result is cast to target_type*
+
+        Returns:
+            Value instance, optionally cast to target_type*
+
+        Raises:
+            ValueError: If target_type lookup fails or cast fails
+        """
+        if isinstance(val, int):
+            val = gdb.Value(val)
+
+        if not isinstance(val, Value):
+            val = Value(val)
+
+        if target_type is not None:
+            try:
+                gdb.lookup_type(target_type)
+            except gdb.error:
+                raise ValueError(f"Type not found: {target_type}")
+
+            typ = val.type.strip_typedefs()
+            if typ.code != gdb.TYPE_CODE_PTR:
+                if typ.code in (gdb.TYPE_CODE_INT, gdb.TYPE_CODE_ENUM):
+                    val = Value(val.cast(gdb.lookup_type(target_type).pointer()))
+                else:
+                    val = Value(val.address)
+
+            result = val.cast(target_type, ptr=True)
+            if result is None:
+                raise ValueError(f"Failed to cast to {target_type}*")
+            val = result
+
+        return val
+
     def __getitem__(self, key):
         try:
             value = super().__getitem__(key)
@@ -61,3 +102,7 @@ class Value(gdb.Value):
             pass
 
         return f"Value({self.__str__()})"
+
+
+# Type alias for all wrapper class __init__ parameters
+ValueInput = Union[int, gdb.Value, Value]

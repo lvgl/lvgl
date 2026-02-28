@@ -1,37 +1,22 @@
 from typing import Union
 import gdb
 
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 
 
 class LVCacheEntry(Value):
     """LVGL cache entry wrapper - focuses on entry-level operations"""
 
-    def __init__(
-        self, entry: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str]
-    ):
-        # Convert to Value first if needed
-        if isinstance(entry, int):
-            entry = Value(entry).cast("lv_cache_entry_t", ptr=True)
-            if entry is None:
-                raise ValueError("Failed to cast pointer to lv_cache_entry_t")
-        elif isinstance(entry, gdb.Value) and not isinstance(entry, Value):
-            entry = Value(entry)
-        elif not entry:
-            raise ValueError("Invalid cache entry")
-
+    def __init__(self, entry: ValueInput, datatype: Union[gdb.Type, str]):
+        super().__init__(Value.normalize(entry, "lv_cache_entry_t"))
         self.datatype = (
             gdb.lookup_type(datatype).pointer()
             if isinstance(datatype, str)
             else datatype
         )
 
-        super().__init__(entry)
-
     @classmethod
-    def from_data_ptr(
-        cls, data_ptr: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str]
-    ):
+    def from_data_ptr(cls, data_ptr: ValueInput, datatype: Union[gdb.Type, str]):
         """Create LVCacheEntry from data pointer"""
 
         if data_ptr.type == gdb.lookup_type("void").pointer() and datatype is None:
@@ -95,9 +80,7 @@ class LVCacheEntry(Value):
         return super().__str__()
 
 
-def dump_cache_entry_info(
-    entry: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str]
-):
+def dump_cache_entry_info(entry: ValueInput, datatype: Union[gdb.Type, str]):
     """Dump cache entry information"""
     entry_obj = LVCacheEntry(entry, datatype)
     entry_obj.print_info()

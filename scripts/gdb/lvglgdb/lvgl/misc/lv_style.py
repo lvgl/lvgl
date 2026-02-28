@@ -3,7 +3,7 @@ from typing import Iterator
 
 import gdb
 from prettytable import PrettyTable
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 from .lv_style_consts import (
     STYLE_PROP_NAMES,
     PART_NAMES,
@@ -74,12 +74,8 @@ class StyleEntry:
 class LVStyle(Value):
     """LVGL style wrapper for lv_style_t."""
 
-    def __init__(self, style: Value):
-        # Ensure we always hold a lv_style_t* pointer, like LVObject does
-        typ = style.type.strip_typedefs()
-        if typ.code != gdb.TYPE_CODE_PTR:
-            style = Value(style.address)
-        super().__init__(style.cast("lv_style_t", ptr=True))
+    def __init__(self, style: ValueInput):
+        super().__init__(Value.normalize(style, "lv_style_t"))
 
     def __iter__(self) -> Iterator[StyleEntry]:
         prop_cnt = int(self.prop_cnt)

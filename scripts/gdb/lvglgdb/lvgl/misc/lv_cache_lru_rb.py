@@ -1,7 +1,6 @@
-from typing import Union, List, Optional
 import gdb
 
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 from .lv_cache_iter_base import LVCacheIteratorBase
 from .lv_rb import LVRedBlackTree
 from .lv_cache_entry import LVCacheEntry
@@ -42,18 +41,12 @@ class LVCacheLRURBIterator(LVCacheIteratorBase):
 class LVCacheLRURB(LVCache):
     """LVGL LRU-based cache using red-black tree iterator"""
 
-    def __init__(self, cache: Union[Value, gdb.Value, int]):
-        # Convert to Value first if needed
-        if isinstance(cache, int):
-            cache = Value(cache).cast("lv_cache_lru_rb_t", ptr=True)
-            if cache is None:
-                raise ValueError("Failed to cast pointer to lv_cache_lru_rb_t")
-        elif isinstance(cache, gdb.Value) and not isinstance(cache, Value):
-            cache = Value(cache)
-        elif not cache:
-            raise ValueError("Invalid cache")
+    def __init__(self, cache: ValueInput):
+        # Extract datatype before normalize strips Python attributes
+        datatype = cache.datatype if isinstance(cache, LVCache) else None
+        cache = Value.normalize(cache, "lv_cache_t")
         self.cache_base = cache
-        super().__init__(cache, cache.datatype)
+        super().__init__(cache, datatype)
 
     def print_info(self):
         """Dump LRU RB cache information"""
@@ -98,7 +91,7 @@ class LVCacheLRURB(LVCache):
         return entries
 
 
-def dump_lru_rb_cache_info(cache: Union[Value, gdb.Value, int]):
+def dump_lru_rb_cache_info(cache: ValueInput):
     """Dump LRU RB cache information"""
     cache_obj = LVCacheLRURB(cache)
     cache_obj.print_info()

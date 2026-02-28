@@ -3,7 +3,6 @@ import gdb
 
 from lvglgdb.lvgl import curr_inst
 from lvglgdb.lvgl import LVObject, dump_obj_info
-from lvglgdb.value import Value
 
 
 class DumpObj(gdb.Command):
@@ -52,7 +51,7 @@ class DumpObj(gdb.Command):
 
         if args.root:
             root = gdb.parse_and_eval(args.root)
-            root = LVObject(Value(root))
+            root = LVObject(root)
             self.dump_obj(root, limit=args.level)
         else:
             # dump all displays

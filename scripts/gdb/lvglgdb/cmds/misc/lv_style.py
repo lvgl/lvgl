@@ -1,7 +1,6 @@
 import argparse
 import gdb
 
-from lvglgdb.value import Value
 from lvglgdb.lvgl import LVStyle, dump_obj_styles
 
 
@@ -38,12 +37,12 @@ class InfoStyle(gdb.Command):
             if not obj:
                 print("Invalid obj:", args.obj)
                 return
-            dump_obj_styles(Value(obj))
+            dump_obj_styles(obj)
         elif args.style:
             style = gdb.parse_and_eval(args.style)
             if not style:
                 print("Invalid style:", args.style)
                 return
-            LVStyle(Value(style)).print_entries()
+            LVStyle(style).print_entries()
         else:
             print("Usage: info style <style_var> or info style --obj <obj_var>")
