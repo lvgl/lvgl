@@ -239,7 +239,7 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
     }
 
     if(model->asset.defaultScene.has_value()) {
-        LV_LOG_INFO("Default scene = #%d", data->asset.defaultScene.value());
+        LV_LOG_INFO("Default scene = #%" LV_PRIu64, model->asset.defaultScene.value());
     }
 
     return model;
@@ -573,7 +573,7 @@ static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sour
        to just copy the buffer data again for the texture. Besides, this is just an example. */
     auto & buffer_view = data->asset.bufferViews[view.bufferViewIndex];
     auto & buffer = data->asset.buffers[buffer_view.bufferIndex];
-    LV_LOG_INFO("Unpacking image bufferView: %s from %d bytes", image.name, bufferView.byteLenght);
+    LV_LOG_INFO("Unpacking image bufferView: %s from %" LV_PRIu64 " bytes", buffer_view.name.c_str(), buffer.byteLength);
     return std::visit(
     fastgltf::visitor{
         // We only care about VectorWithMime here, because we specify LoadExternalBuffers, meaning
@@ -586,12 +586,12 @@ static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sour
         },
         [&](fastgltf::sources::Array & vector)
         {
-            LV_LOG_TRACE("[WEBP] width: %d height: %d", width, height);
             int32_t width, height, nrChannels;
             int32_t webpRes = WebPGetInfo(
                 reinterpret_cast<const uint8_t *>(vector.bytes.data() + buffer_view.byteOffset),
                 static_cast<std::size_t>(buffer_view.byteLength), &width, &height);
 
+            LV_LOG_TRACE("[WEBP] width: %d height: %d", width, height);
             if(!webpRes) {
                 unsigned char * data = stbi_load_from_memory(
                     reinterpret_cast<const stbi_uc *>(vector.bytes.data() + buffer_view.byteOffset),
@@ -653,7 +653,7 @@ static void injest_light(lv_gltf_model_t * data, size_t light_index, fastgltf::L
            node.lightIndex.value() != light_index) {
             return;
         }
-        LV_LOG_INFO("SCENE LIGHT BEING ADDED #%d\n", light_index);
+        LV_LOG_INFO("SCENE LIGHT BEING ADDED #%" LV_PRIu64 "\n", light_index);
         data->node_by_light_index.push_back(&node);
     });
 }
