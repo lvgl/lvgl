@@ -183,6 +183,13 @@ void lv_gstreamer_play(lv_obj_t * obj)
         LV_LOG_WARN("Cannot play: GStreamer pipeline not initialized");
         return;
     }
+
+    GstState state;
+    gst_element_get_state(streamer->pipeline, &state, NULL, 0);
+    if(state == GST_STATE_PLAYING) {
+        return;
+    }
+
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_PLAYING);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to play pipeline");
@@ -202,6 +209,13 @@ void lv_gstreamer_pause(lv_obj_t * obj)
         LV_LOG_WARN("Cannot pause: GStreamer pipeline not initialized");
         return;
     }
+
+    GstState state;
+    gst_element_get_state(streamer->pipeline, &state, NULL, 0);
+    if(state == GST_STATE_PAUSED) {
+        return;
+    }
+
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_PAUSED);
 
     if(ret == GST_STATE_CHANGE_FAILURE) {
@@ -222,6 +236,13 @@ void lv_gstreamer_stop(lv_obj_t * obj)
         LV_LOG_WARN("Cannot stop: GStreamer pipeline not initialized");
         return;
     }
+
+    GstState state;
+    gst_element_get_state(streamer->pipeline, &state, NULL, 0);
+    if(state == GST_STATE_READY || state == GST_STATE_NULL) {
+        return;
+    }
+
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_READY);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to stop pipeline");
@@ -389,13 +410,16 @@ static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     LV_TRACE_OBJ_CREATE("begin");
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
     lv_memzero(&streamer->frame, sizeof(streamer->frame));
+    streamer->pixel_buffer = NULL;
+    streamer->pixel_buffer_size = 0;
+    streamer->image_src_set = false;
+    streamer->is_video_info_valid = false;
 
     streamer->gstreamer_timer = lv_timer_create(gstreamer_timer_cb, LV_DEF_REFR_PERIOD / 5, streamer);
     LV_ASSERT_NULL(streamer->gstreamer_timer);
 
     streamer->frame_queue = g_async_queue_new();
     LV_ASSERT_NULL(streamer->frame_queue);
-    streamer->last_sample = NULL;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -451,47 +475,73 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     }
 
     const bool first_frame = !streamer->is_video_info_valid;
-    if(first_frame) {
-        GstCaps * caps = gst_sample_get_caps(sample);
-        if(!caps || !gst_video_info_from_caps(&streamer->video_info, caps)) {
+    GstCaps * caps = gst_sample_get_caps(sample);
+    if(caps) {
+        if(!gst_video_info_from_caps(&streamer->video_info, caps)) {
             LV_LOG_ERROR("Failed to get video info from caps");
             gst_sample_unref(sample);
             return;
         }
         streamer->is_video_info_valid = true;
     }
-
+    else if(!streamer->is_video_info_valid) {
+        /* No caps on sample and we don't have valid info yet */
+        gst_sample_unref(sample);
+        return;
+    }
 
     GstBuffer * buffer = gst_sample_get_buffer(sample);
     GstMapInfo map;
-    if(buffer && gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        if(streamer->last_buffer) {
-            gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
-        }
-        if(streamer->last_sample) {
-            gst_sample_unref(streamer->last_sample);
-        }
-        streamer->last_buffer = buffer;
-        streamer->last_map_info = map;
 
-        streamer->last_sample = sample;
-
-        streamer->frame = (lv_image_dsc_t) {
-            .data = map.data,
-            .data_size = map.size,
-            .header = {
-                .magic = LV_IMAGE_HEADER_MAGIC,
-                .cf = IMAGE_FORMAT,
-                .flags = LV_IMAGE_FLAGS_MODIFIABLE,
-                .h = GST_VIDEO_INFO_HEIGHT(&streamer->video_info),
-                .w = GST_VIDEO_INFO_WIDTH(&streamer->video_info),
-                .stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0),
-            }
-        };
-        lv_image_set_src((lv_obj_t *)streamer, &streamer->frame);
+    if(!buffer || !gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+        gst_sample_unref(sample);
+        return;
     }
-    /* We send the event AFTER setting the image source so that users can query the
-     * resolution on this specific event callback */
+
+    uint32_t width  = GST_VIDEO_INFO_WIDTH(&streamer->video_info);
+    uint32_t height = GST_VIDEO_INFO_HEIGHT(&streamer->video_info);
+    uint32_t stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0);
+    size_t required_size = map.size;
+
+    // Update pixel buffer once and on resolution change
+    if(streamer->pixel_buffer == NULL || streamer->pixel_buffer_size != required_size) {
+
+        if(streamer->pixel_buffer) {
+            lv_image_cache_drop(&streamer->frame);
+            free(streamer->pixel_buffer);
+            streamer->pixel_buffer = NULL;
+        }
+
+        streamer->pixel_buffer = malloc(required_size);
+        if(!streamer->pixel_buffer) {
+            gst_buffer_unmap(buffer, &map);
+            gst_sample_unref(sample);
+            return;
+        }
+
+        streamer->pixel_buffer_size = required_size;
+        streamer->frame.header.magic  = LV_IMAGE_HEADER_MAGIC;
+        streamer->frame.header.cf     = IMAGE_FORMAT;
+        streamer->frame.header.flags  = LV_IMAGE_FLAGS_MODIFIABLE;
+        streamer->frame.header.w      = width;
+        streamer->frame.header.h      = height;
+        streamer->frame.header.stride = stride;
+        streamer->frame.data_size = required_size;
+        streamer->frame.data      = streamer->pixel_buffer;
+        streamer->image_src_set = false;  // force rebind
+    }
+
+    /* Copy new pixels */
+    memcpy(streamer->pixel_buffer, map.data, required_size);
+    if(!streamer->image_src_set) {
+        lv_image_set_src((lv_obj_t *)streamer, &streamer->frame);
+        streamer->image_src_set = true;
+    }
+
+    lv_obj_invalidate((lv_obj_t *)streamer);
+    gst_buffer_unmap(buffer, &map);
+    gst_sample_unref(sample);
+
     if(first_frame) {
         if(gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_START) == LV_RESULT_INVALID) {
             /* Object deleted inside event handler */
@@ -523,13 +573,10 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     if(streamer->pipeline) {
         gst_element_set_state(streamer->pipeline, GST_STATE_NULL);
+        /* Wait for the state change to finish to ensure all threads are joined */
+        gst_element_get_state(streamer->pipeline, NULL, NULL, GST_CLOCK_TIME_NONE);
         gst_object_unref(streamer->pipeline);
-    }
-    if(streamer->last_buffer) {
-        gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
-    }
-    if(streamer->last_sample) {
-        gst_sample_unref(streamer->last_sample);
+        streamer->pipeline = NULL;
     }
     if(streamer->frame_queue) {
         GstSample * sample;
@@ -538,6 +585,12 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         }
         g_async_queue_unref(streamer->frame_queue);
         streamer->frame_queue = NULL;
+    }
+    if(streamer->pixel_buffer) {
+        /* Drop the image from cache before freeing the buffer */
+        lv_image_cache_drop(&streamer->frame);
+        free(streamer->pixel_buffer);
+        streamer->pixel_buffer = NULL;
     }
     lv_timer_delete(streamer->gstreamer_timer);
 }
@@ -568,6 +621,10 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
     LV_UNUSED(element);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
     GstCaps * caps = gst_pad_get_current_caps(pad);
+    if(!caps) {
+        LV_LOG_WARN("Pad added without caps, unable to determine stream type");
+        return;
+    }
 
     GstStructure * structure = gst_caps_get_structure(caps, 0);
     const gchar * name = gst_structure_get_name(structure);
@@ -669,11 +726,19 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
     GstSample * sample;
 
+    if(!streamer->frame_queue) {
+        return GST_FLOW_OK;
+    }
+
     g_signal_emit_by_name(sink, "pull-sample", &sample);
     if(!sample) {
         return GST_FLOW_OK;
     }
 
+    while(g_async_queue_length(streamer->frame_queue) > 0) {
+        GstSample * old = g_async_queue_try_pop(streamer->frame_queue);
+        if(old) gst_sample_unref(old);
+    }
     g_async_queue_push(streamer->frame_queue, sample);
     return GST_FLOW_OK;
 }
