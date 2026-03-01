@@ -79,7 +79,7 @@ jobs:
           sudo cat $(docker inspect --format='{{.LogPath}}' so3-lvperf) | python scripts/perf/filter_docker_benchmark_logs.py results-${{matrix.image_type}}-${{matrix.config}}.json
 
       - name: Upload Results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: results-${{matrix.image_type}}-${{matrix.config}}
           path: results-${{matrix.image_type}}-${{matrix.config}}.json
@@ -96,7 +96,7 @@ jobs:
           echo ${{ github.event.number }} > pr_number
 
       - name: Upload PR number as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: pr_number
           path: pr_number
