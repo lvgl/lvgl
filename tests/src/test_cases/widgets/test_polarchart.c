@@ -4,6 +4,12 @@
 
 #include "unity/unity.h"
 
+#ifndef NON_AMD64_BUILD
+    #define EXT_NAME ".lp64.png"
+#else
+    #define EXT_NAME ".lp32.png"
+#endif
+
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * polarchart = NULL;
 
@@ -218,6 +224,94 @@ void test_polarchart_scatter(void)
     lv_polarchart_set_next_value2(polarchart, ser, 180, 21);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/polarchart_scatter.png");
+}
+
+void test_chart_curve(void)
+{
+#if LV_USE_VECTOR_GRAPHIC
+    /*Create a polarchart*/
+    lv_obj_set_size(polarchart, 400, 300);
+    lv_obj_center(polarchart);
+    lv_obj_set_style_bg_opa(polarchart, LV_OPA_50, LV_PART_INDICATOR);
+    lv_obj_set_style_line_dash_gap(polarchart, 5, LV_PART_ITEMS);
+    lv_obj_set_style_line_dash_width(polarchart, 10, LV_PART_ITEMS);
+    lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_CURVE);
+    lv_polarchart_set_point_count(polarchart, 15);
+
+    lv_polarchart_series_t * ser1 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_GREEN), LV_POLARCHART_AXIS_RADIAL);
+    lv_polarchart_series_t * ser2 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), LV_POLARCHART_AXIS_RADIAL);
+
+    lv_polarchart_set_next_value(polarchart, ser1, 10);
+    lv_polarchart_set_next_value(polarchart, ser1, 20);
+    lv_polarchart_set_next_value(polarchart, ser1, 30);
+    lv_polarchart_set_next_value(polarchart, ser1, 80);
+    lv_polarchart_set_next_value(polarchart, ser1, 90);
+    lv_polarchart_set_next_value(polarchart, ser1, 90);
+    lv_polarchart_set_next_value(polarchart, ser1, 90);
+    lv_polarchart_set_next_value(polarchart, ser1, 10);
+    lv_polarchart_set_next_value(polarchart, ser1, 20);
+    lv_polarchart_set_next_value(polarchart, ser1, 10);
+    lv_polarchart_set_next_value(polarchart, ser1, 40);
+    lv_polarchart_set_next_value(polarchart, ser1, 60);
+    lv_polarchart_set_next_value(polarchart, ser1, 60);
+    lv_polarchart_set_next_value(polarchart, ser1, 40);
+    lv_polarchart_set_next_value(polarchart, ser1, 45);
+
+    lv_polarchart_set_next_value(polarchart, ser2, LV_POLARCHART_POINT_NONE);
+    lv_polarchart_set_next_value(polarchart, ser2, 40);
+    lv_polarchart_set_next_value(polarchart, ser2, 50);
+    lv_polarchart_set_next_value(polarchart, ser2, 60);
+    lv_polarchart_set_next_value(polarchart, ser2, LV_POLARCHART_POINT_NONE);
+    lv_polarchart_set_next_value(polarchart, ser2, LV_POLARCHART_POINT_NONE);
+    lv_polarchart_set_next_value(polarchart, ser2, 80);
+    lv_polarchart_set_next_value(polarchart, ser2, 80);
+    lv_polarchart_set_next_value(polarchart, ser2, LV_POLARCHART_POINT_NONE);
+    lv_polarchart_set_next_value(polarchart, ser2, LV_POLARCHART_POINT_NONE);
+    lv_polarchart_set_next_value(polarchart, ser2, LV_POLARCHART_POINT_NONE);
+    lv_polarchart_set_next_value(polarchart, ser2, 45);
+    lv_polarchart_set_next_value(polarchart, ser2, LV_POLARCHART_POINT_NONE);
+    lv_polarchart_set_next_value(polarchart, ser2, 55);
+    lv_polarchart_set_next_value(polarchart, ser2, LV_POLARCHART_POINT_NONE);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/polarchart_curve" EXT_NAME);
+#endif /*LV_USE_VECTOR_GRAPHIC*/
+}
+
+void test_polarchart_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_property_t prop;
+
+    /* Test TYPE property */
+    prop.id = LV_PROPERTY_POLARCHART_TYPE;
+    prop.num = LV_POLARCHART_TYPE_SCATTER;
+    TEST_ASSERT_TRUE(lv_obj_set_property(polarchart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_POLARCHART_TYPE_SCATTER, lv_obj_get_property(polarchart, LV_PROPERTY_POLARCHART_TYPE).num);
+
+    /* Test POINT_COUNT property */
+    prop.id = LV_PROPERTY_POLARCHART_POINT_COUNT;
+    prop.num = 20;
+    TEST_ASSERT_TRUE(lv_obj_set_property(polarchart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(20, lv_obj_get_property(chart, LV_PROPERTY_POLARCHART_POINT_COUNT).num);
+
+    /* Test UPDATE_MODE property */
+    prop.id = LV_PROPERTY_POLARCHART_UPDATE_MODE;
+    prop.num = LV_POLARCHART_UPDATE_MODE_CIRCULAR;
+    TEST_ASSERT_TRUE(lv_obj_set_property(polarchart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_POLARCHART_UPDATE_MODE_CIRCULAR, lv_obj_get_property(polarchart, LV_PROPERTY_POLARCHART_UPDATE_MODE).num);
+
+    /* Test RADIAL_DIV_LINE_COUNT property */
+    prop.id = LV_PROPERTY_POLARCHART_RADIAL_DIV_LINE_COUNT;
+    prop.num = 5;
+    TEST_ASSERT_TRUE(lv_obj_set_property(polarchart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(5, lv_obj_get_property(polarchart, LV_PROPERTY_POLARCHART_RADIAL_DIV_LINE_COUNT).num);
+
+    /* Test ANGLE_DIV_LINE_COUNT property */
+    prop.id = LV_PROPERTY_POLARCHART_ANGLE_DIV_LINE_COUNT;
+    prop.num = 7;
+    TEST_ASSERT_TRUE(lv_obj_set_property(polarchart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(7, lv_obj_get_property(polarchart, LV_PROPERTY_POLARCHART_ANGLE_DIV_LINE_COUNT).num);
+#endif
 }
 
 #endif
