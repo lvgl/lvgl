@@ -911,7 +911,9 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->point_cnt < 2) return;
 
-    uint32_t i;
+    uint32_t ser_cnt = lv_ll_get_len(&chart->series_ll);
+    if(ser_cnt == 0) return;
+
     int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
@@ -1137,8 +1139,8 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
         int32_t raw_points[3];
         int32_t s_prev = 0; /*Previous steepness around N-1 (y_diff of N-2 and N) */
         int32_t s_act = 0; /*Steepness around N (y_diff of N-1 and N+1)*/
-        int32_t min_v = chart->ymin[ser->y_axis_sec];
-        int32_t max_v = chart->ymax[ser->y_axis_sec];
+        int32_t min_v = chart->radial_min[ser->y_axis_sec];
+        int32_t max_v = chart->radial_max[ser->y_axis_sec];
 
         int32_t i;
         int32_t valid_point_cnt = 0;
