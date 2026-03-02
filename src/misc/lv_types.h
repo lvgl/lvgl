@@ -244,6 +244,12 @@ typedef struct _lv_menu_page_t lv_menu_page_t;
 
 typedef struct _lv_msgbox_t lv_msgbox_t;
 
+typedef struct _lv_polarchart_series_t lv_polarchart_series_t;
+
+typedef struct _lv_polarchart_cursor_t lv_polarchart_cursor_t;
+
+typedef struct _lv_polarchart_t lv_polarchart_t;
+
 typedef struct _lv_roller_t lv_roller_t;
 
 typedef struct _lv_scale_section_t lv_scale_section_t;
