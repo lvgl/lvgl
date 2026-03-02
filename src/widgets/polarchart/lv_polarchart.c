@@ -993,13 +993,13 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             p_act = (start_point + i) % chart->point_cnt;
 
             lv_value_precise_t p_y;
-            if(ser->y_points[p_act] == LV_POLARCHART_POINT_NONE) {
+            if(ser->radial_points[p_act] == LV_POLARCHART_POINT_NONE) {
                 p_y = LV_DRAW_LINE_POINT_NONE;
             }
             else {
-                int32_t v = ser->y_points[p_act];
-                int32_t min_v = chart->ymin[ser->y_axis_sec];
-                int32_t max_v = chart->ymax[ser->y_axis_sec];
+                int32_t v = ser->radial_points[p_act];
+                int32_t min_v = chart->radial_min;
+                int32_t max_v = chart->radial_max;
                 p_y = (int32_t)lv_map(v, min_v, max_v, y_ofs + h, y_ofs);
             }
 
@@ -1011,7 +1011,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             }
             /*In crowded mode draw vertical lines from the min/max on the same X coordinate*/
             else {
-                if(ser->y_points[p_prev] != LV_POLARCHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
+                if(ser->radial_points[p_prev] != LV_POLARCHART_POINT_NONE && ser->radial_points[p_act] != LV_POLARCHART_POINT_NONE) {
                     /*Draw only one vertical line between the min and max y-values on the same x-value*/
                     y_max = LV_MAX(y_max, p_y);
                     y_min = LV_MIN(y_min, p_y);
@@ -1129,7 +1129,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
         dsc->base.id2 = 0;
         point_dsc_default.base.id2 = 0;
 
-        int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        int32_t start_point = chart->update_mode == LV_POLARCHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
         /*The X distance between points.
          *Just a rough calculation to know the extra area of interest around the chart*/
@@ -1139,8 +1139,8 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
         int32_t raw_points[3];
         int32_t s_prev = 0; /*Previous steepness around N-1 (y_diff of N-2 and N) */
         int32_t s_act = 0; /*Steepness around N (y_diff of N-1 and N+1)*/
-        int32_t min_v = chart->radial_min[ser->y_axis_sec];
-        int32_t max_v = chart->radial_max[ser->y_axis_sec];
+        int32_t min_v = chart->radial_min;
+        int32_t max_v = chart->radial_max;
 
         int32_t i;
         int32_t valid_point_cnt = 0;
@@ -1161,17 +1161,17 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
             raw_points[1] = raw_points[2];
 
             int32_t p_next = (start_point + i) % point_cnt;
-            raw_points[2] = ser->y_points[p_next];
+            raw_points[2] = ser->radial_points[p_next];
             if(i > point_cnt - 1) {
                 s_act = 0;
             }
             else {
-                if(raw_points[2] == LV_CHART_POINT_NONE) {
+                if(raw_points[2] == LV_POLARCHART_POINT_NONE) {
                     s_act = s_prev;
                 }
                 else {
                     scaled_points[2].x = p_x;
-                    scaled_points[2].y = (int32_t)lv_map(ser->y_points[p_next], min_v, max_v, y_ofs + h, y_ofs);
+                    scaled_points[2].y = (int32_t)lv_map(ser->radial_points[p_next], min_v, max_v, y_ofs + h, y_ofs);
                     if(i == 0) {
                         scaled_points[0] = scaled_points[2];
                         scaled_points[1] = scaled_points[2];
@@ -1188,7 +1188,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
             }
 
             if(valid_point_cnt >= 2) {
-                if(raw_points[0] != LV_CHART_POINT_NONE && raw_points[1] != LV_CHART_POINT_NONE) {
+                if(raw_points[0] != LV_POLARCHART_POINT_NONE && raw_points[1] != LV_POLARCHART_POINT_NONE) {
                     lv_vector_path_move_to(path, &scaled_points[0]);
                     dsc->base.id2 = i;
 
@@ -1205,7 +1205,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
             }
             s_prev = s_act;
 
-            if(point_w && point_h && ser->y_points[p_next] != LV_CHART_POINT_NONE) {
+            if(point_w && point_h && ser->radial_points[p_next] != LV_POLARCHART_POINT_NONE) {
                 lv_area_t point_area;
                 point_area.x1 = (int32_t)scaled_points[2].x - point_w;
                 point_area.x2 = (int32_t)scaled_points[2].x + point_w;
@@ -1229,7 +1229,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(dsc);
 #else
-    LV_LOG_WARN("LV_USE_VECTOR_GRAPHIC is not enabled for LV_CHART_TYPE_CURVE. Falling back to LV_CHART_TYPE_LINE");
+    LV_LOG_WARN("LV_USE_VECTOR_GRAPHIC is not enabled for LV_POLARCHART_TYPE_CURVE. Falling back to LV_POLARCHART_TYPE_LINE");
     draw_series_line(obj, layer);
 #endif /*LV_USE_VECTOR_GRAPHIC*/
 
