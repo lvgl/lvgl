@@ -283,8 +283,8 @@ static lv_result_t calc_cols(lv_obj_t * cont, lv_grid_calc_t * c)
     const int32_t * col_templ;
     col_templ = get_col_dsc(cont);
     bool subgrid = false;
-    if(col_templ == NULL) {
-        lv_obj_t * parent = lv_obj_get_parent(cont);
+    lv_obj_t * parent = lv_obj_get_parent(cont);
+    if(parent && col_templ == NULL) {
         col_templ = get_col_dsc(parent);
         if(col_templ == NULL) {
             LV_LOG_WARN("No col descriptor found even on the parent");
@@ -376,8 +376,8 @@ static lv_result_t calc_rows(lv_obj_t * cont, lv_grid_calc_t * c)
     const int32_t * row_templ;
     row_templ = get_row_dsc(cont);
     bool subgrid = false;
-    if(row_templ == NULL) {
-        lv_obj_t * parent = lv_obj_get_parent(cont);
+    lv_obj_t * parent = lv_obj_get_parent(cont);
+    if(parent && row_templ == NULL) {
         row_templ = get_row_dsc(parent);
         if(row_templ == NULL) {
             LV_LOG_WARN("No row descriptor found even on the parent");
