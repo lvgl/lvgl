@@ -708,8 +708,8 @@ static void refr_sync_areas(void)
      *So the active buffer is the off screen buffer where LVGL will render*/
     lv_draw_buf_t * off_screen = disp_refr->buf_act;
     /*Triple buffer sync buffer for off-screen2 updates.*/
-    lv_draw_buf_t * off_screen2;
-    lv_draw_buf_t * on_screen;
+    lv_draw_buf_t * off_screen2 = NULL;
+    lv_draw_buf_t * on_screen = NULL;
 
     /* Only compute buffer relationships when auto_sync (direct double-buffered) is used.
      * When only user_sync is active, these pointers are not needed. */
