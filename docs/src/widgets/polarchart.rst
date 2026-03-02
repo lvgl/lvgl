@@ -44,7 +44,7 @@ Type (governs how a polarchart's data series are drawn)
 
 Circular and Radial division lines
 
-- default 3 and 4 respectively
+- default 5 and 8 respectively
 - can be any non-negative value including 0
 
 1 Radial axis and 1 Angle axis (the latter is used with SCATTER polarcharts)
