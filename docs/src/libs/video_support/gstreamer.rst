@@ -27,6 +27,7 @@ LVGL's GStreamer implementation provides comprehensive media playback capabiliti
 * Video4Linux2 (V4L2) camera devices on Linux
 * Audio capture from ALSA and PulseAudio devices
 * Test sources for audio and video development
+* WebRTC streaming for real-time communication applications
 
 **URI Scheme Support:**
 
@@ -39,6 +40,7 @@ Using the URI factory (:c:macro:`LV_GSTREAMER_FACTORY_URI_DECODE`), you can spec
 * **Multicast**: ``multicast://239.255.12.42:1234``
 * **V4L2 cameras**: ``v4l2:///dev/video0``
 * **Audio devices**: ``alsa://hw:0,0``, ``pulse://default``
+* **WebRTC**: ``webrtc://signalserver/``
 
 GStreamer's ``uridecodebin`` automatically selects the appropriate source element and decoder based on the URI scheme and media format.
 

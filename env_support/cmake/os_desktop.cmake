@@ -215,6 +215,37 @@ include_directories(${CONF_INC_DIR} ${LVGL_ROOT_DIR})
 
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${CONF_INC_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
+set(LV_BUILD_ENABLE_GSTREAMER OFF)
+if(DEFINED CONFIG_LV_USE_GSTREAMER)
+    if(CONFIG_LV_USE_GSTREAMER)
+        set(LV_BUILD_ENABLE_GSTREAMER ON)
+    endif()
+elseif(EXISTS ${CONF_PATH})
+    file(STRINGS ${CONF_PATH} LV_CONF_GSTREAMER_LINE REGEX "^#[ \\t]*define[ \\t]+LV_USE_GSTREAMER[ \\t]+1")
+    if(LV_CONF_GSTREAMER_LINE)
+        set(LV_BUILD_ENABLE_GSTREAMER ON)
+    endif()
+endif()
+
+if(LV_BUILD_ENABLE_GSTREAMER)
+    message(STATUS "Enabling GStreamer support for lvgl")
+
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GSTREAMER REQUIRED IMPORTED_TARGET gstreamer-1.0)
+    pkg_check_modules(GSTREAMER_VIDEO REQUIRED IMPORTED_TARGET gstreamer-video-1.0)
+    pkg_check_modules(GSTREAMER_APP REQUIRED IMPORTED_TARGET gstreamer-app-1.0)
+
+    target_include_directories(lvgl SYSTEM PUBLIC
+        ${GSTREAMER_INCLUDE_DIRS}
+        ${GSTREAMER_VIDEO_INCLUDE_DIRS}
+        ${GSTREAMER_APP_INCLUDE_DIRS})
+
+    target_link_libraries(lvgl PUBLIC
+        PkgConfig::GSTREAMER
+        PkgConfig::GSTREAMER_VIDEO
+        PkgConfig::GSTREAMER_APP)
+endif()
+
 # Propagate the compiler definitions set on LVGL to the rest of the targets
 # mentioned in this file
 get_target_property(COMP_DEF lvgl COMPILE_DEFINITIONS)
