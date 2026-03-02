@@ -1004,6 +1004,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.arc_indic, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &theme->styles.arc_indic_primary, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &theme->styles.knob, LV_PART_KNOB);
+        lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
     }
 #endif
 
@@ -1033,6 +1035,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_calendar_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.pad_zero, 0);
+        lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
     }
 
 #if LV_USE_CALENDAR_HEADER_ARROW
