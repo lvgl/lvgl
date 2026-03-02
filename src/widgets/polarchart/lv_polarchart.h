@@ -183,7 +183,7 @@ uint32_t lv_polarchart_get_radial_div_line_count(const lv_obj_t * obj);
  * @param obj       pointer to a polarchart object
  * @return          the number of angle division lines
  */
-uint32_t lv_chart_get_angle_div_line_count(const lv_obj_t * obj);
+uint32_t lv_polarchart_get_angle_div_line_count(const lv_obj_t * obj);
 
 /**
  * Get the current index of the angle-axis start point in the data array
