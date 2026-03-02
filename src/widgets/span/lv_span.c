@@ -217,7 +217,7 @@ void lv_span_set_text(lv_span_t * span, const char * text)
     size_t text_alloc_len = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    text_alloc_len = lv_text_ap_calc_bytes_count(text);
+    text_alloc_len = lv_text_ap_strlen(text) + 1;
 #else
     text_alloc_len = lv_strlen(text) + 1;
 #endif
@@ -287,7 +287,7 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
     span->static_flag = 1;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    size_t text_alloc_len = lv_text_ap_calc_bytes_count(text);
+    size_t text_alloc_len = lv_text_ap_strlen(text) + 1;
     span->txt = lv_malloc(text_alloc_len);
     LV_ASSERT_MALLOC(span->txt)
     lv_text_ap_proc(text, span->txt);

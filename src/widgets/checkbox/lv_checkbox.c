@@ -90,7 +90,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
         size_t len;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        len = lv_text_ap_calc_bytes_count(txt) + 1;
+        len = lv_text_ap_strlen(txt) + 1;
 #else
         len = lv_strlen(txt) + 1;
 #endif
