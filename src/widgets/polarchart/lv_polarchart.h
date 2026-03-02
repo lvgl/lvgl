@@ -36,6 +36,7 @@ LV_EXPORT_CONST_INT(LV_POLARCHART_POINT_NONE);
 typedef enum {
     LV_POLARCHART_TYPE_NONE,     /**< Don't draw the series*/
     LV_POLARCHART_TYPE_LINE,     /**< Connect the points with lines*/
+    LV_POLARCHART_TYPE_CURVE,    /**< Connect the points with curves*/
     LV_POLARCHART_TYPE_SCATTER,  /**< Draw points and lines in 2D (x,y coordinates)*/
 } lv_polarchart_type_t;
 
@@ -57,6 +58,17 @@ typedef enum {
 } lv_polarchart_axis_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_polarchart_class;
+
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_polarchart_id_t {
+    LV_PROPERTY_ID(POLARCHART, TYPE,               LV_PROPERTY_TYPE_INT,   0),
+    LV_PROPERTY_ID(POLARCHART, POINT_COUNT,        LV_PROPERTY_TYPE_INT,   1),
+    LV_PROPERTY_ID(POLARCHART, UPDATE_MODE,        LV_PROPERTY_TYPE_INT,   2),
+    LV_PROPERTY_ID(POLARCHART, RADIAL_DIV_LINE_COUNT, LV_PROPERTY_TYPE_INT,   3),
+    LV_PROPERTY_ID(POLARCHART, ANGLE_DIV_LINE_COUNT, LV_PROPERTY_TYPE_INT,   4),
+    LV_PROPERTY_POLARCHART_END,
+};
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -153,9 +165,30 @@ lv_polarchart_type_t lv_polarchart_get_type(const lv_obj_t * obj);
 uint32_t lv_polarchart_get_point_count(const lv_obj_t * obj);
 
 /**
+ * Get the update mode of a polarchart
+ * @param obj       pointer to a polarchart object
+ * @return          the update mode
+ */
+lv_polarchart_update_mode_t lv_polarchart_get_update_mode(const lv_obj_t * obj);
+
+/**
+ * Get the number of radial division lines
+ * @param obj       pointer to a polarchart object
+ * @return          the number of radial division lines
+ */
+uint32_t lv_polarchart_get_radial_div_line_count(const lv_obj_t * obj);
+
+/**
+ * Get the number of angle division lines
+ * @param obj       pointer to a polarchart object
+ * @return          the number of angle division lines
+ */
+uint32_t lv_chart_get_angle_div_line_count(const lv_obj_t * obj);
+
+/**
  * Get the current index of the angle-axis start point in the data array
  * @param obj       pointer to a polarchart object
- * @param ser       pointer to a data series on polarchart
+ * @param ser       pointer to a data series on 'polarchart'
  * @return          the index of the current angle start point in the data array
  */
 uint32_t lv_polarchart_get_angle_start_point(const lv_obj_t * obj, lv_polarchart_series_t * ser);
