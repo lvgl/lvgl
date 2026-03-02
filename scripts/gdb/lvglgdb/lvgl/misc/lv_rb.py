@@ -1,28 +1,15 @@
 from typing import Union
 import gdb
 
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 
 
 class LVRedBlackTree(Value):
     """LVGL red-black tree iterator"""
 
-    def __init__(
-        self, rb: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str] = None
-    ):
-        # Convert to Value first if needed
-        if isinstance(rb, int):
-            rb = Value(rb).cast("lv_rb_t", ptr=True)
-            if rb is None:
-                raise ValueError("Failed to cast pointer to lv_rb_t")
-        elif isinstance(rb, gdb.Value) and not isinstance(rb, Value):
-            rb = Value(rb)
-        elif not rb:
-            raise ValueError("Invalid red-black tree")
-        super().__init__(rb)
-
+    def __init__(self, rb: ValueInput, datatype: Union[gdb.Type, str] = None):
+        super().__init__(Value.normalize(rb, "lv_rb_t"))
         self.lv_rb_node_t = gdb.lookup_type("lv_rb_node_t").pointer()
-
         self.datatype = (
             gdb.lookup_type(datatype).pointer()
             if isinstance(datatype, str)
@@ -175,9 +162,7 @@ class LVRedBlackTreeIterator:
         return f"LVRedBlackTreeIterator(current=0x{int(current):x})"
 
 
-def dump_rb_info(
-    rb: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str] = None
-):
+def dump_rb_info(rb: ValueInput, datatype: Union[gdb.Type, str] = None):
     """Dump red-black tree information"""
     tree = LVRedBlackTree(rb, datatype=datatype)
     tree.print_info()

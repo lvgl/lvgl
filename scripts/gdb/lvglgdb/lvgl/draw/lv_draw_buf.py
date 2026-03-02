@@ -5,7 +5,7 @@ import gdb
 import numpy as np
 from PIL import Image
 
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 
 
 class LVDrawBuf(Value):
@@ -25,8 +25,8 @@ class LVDrawBuf(Value):
         "XRGB8888": 32,
     }
 
-    def __init__(self, draw_buf: Value):
-        super().__init__(draw_buf)
+    def __init__(self, draw_buf: ValueInput):
+        super().__init__(Value.normalize(draw_buf, "lv_draw_buf_t"))
         self._init_color_formats()
 
     def _init_color_formats(self):

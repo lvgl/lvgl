@@ -1,4 +1,4 @@
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 from lvglgdb.lvgl.misc.lv_style import LVStyle, StyleEntry, decode_selector
 
 
@@ -29,8 +29,8 @@ class ObjStyle:
 class LVObject(Value):
     """LVGL object"""
 
-    def __init__(self, obj: Value):
-        super().__init__(obj.cast("lv_obj_t", ptr=True))
+    def __init__(self, obj: ValueInput):
+        super().__init__(Value.normalize(obj, "lv_obj_t"))
 
     @property
     def class_name(self):
@@ -102,9 +102,9 @@ def dump_obj_info(obj: LVObject):
     print(f"{clzname}@{hex(obj)} {coords}")
 
 
-def dump_obj_styles(obj: Value):
+def dump_obj_styles(obj: ValueInput):
     """Print all styles of an object, reusing LVStyle.print_entries()."""
-    lv_obj = LVObject(Value(obj))
+    lv_obj = LVObject(obj)
 
     has_any = False
     for obj_style in lv_obj.obj_styles:
