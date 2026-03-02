@@ -220,13 +220,13 @@ void lv_polarchart_set_series_color(lv_obj_t * chart, lv_polarchart_series_t * s
 lv_color_t lv_polarchart_get_series_color(lv_obj_t * chart, const lv_polarchart_series_t * series);
 
 /**
- * Set the index of the x-axis start point in the data array.
- * This point will be considers the first (left) point and the other points will be drawn after it.
+ * Set the index of the angle-axis start point in the data array.
+ * This point will be considers the first point and the other points will be drawn after it.
  * @param obj       pointer to a chart object
  * @param ser       pointer to a data series on 'chart'
  * @param id        the index of the x point in the data array
  */
-void lv_polarchart_set_x_start_point(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id);
+void lv_polarchart_set_angle_start_point(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id);
 
 /**
  * Get the next series.

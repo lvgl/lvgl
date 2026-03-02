@@ -406,7 +406,7 @@ lv_color_t lv_polarchart_get_series_color(lv_obj_t * chart, const lv_polarchart_
     return series->color;
 }
 
-void lv_polarchart_set_x_start_point(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id)
+void lv_polarchart_set_angle_start_point(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
