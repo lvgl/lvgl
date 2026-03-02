@@ -813,7 +813,18 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     uint32_t prev_key = i->keypad.last_key;
     i->keypad.last_key = data->key;
 
-    lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL);
+    /*Save the previous state so we can detect state changes below and also set the last state now
+     *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
+     *for the next time*/
+    uint32_t prev_state = i->keypad.last_state;
+    i->keypad.last_state = data->state;
+
+
+    if(prev_key != data->key ||  prev_state != data->state) {
+        if(lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL) == LV_RESULT_INVALID) {
+            return;
+        }
+    }
 
     lv_group_t * g = i->group;
 
@@ -826,12 +837,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
 
     const bool is_enabled = (g == NULL) || !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-
-    /*Save the previous state so we can detect state changes below and also set the last state now
-     *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
-     *for the next time*/
-    uint32_t prev_state             = i->keypad.last_state;
-    i->keypad.last_state = data->state;
 
     /*Key press happened*/
     if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_RELEASED) {
