@@ -51,8 +51,8 @@ struct _lv_polarchart_cursor_t {
 
 struct _lv_polarchart_t {
     lv_obj_t obj;
-    lv_ll_t series_ll;          /**< Linked list for series (stores lv_polar_chart_series_t) */
-    lv_ll_t cursor_ll;          /**< Linked list for cursors (stores lv_polar_chart_cursor_t) */
+    lv_ll_t series_ll;          /**< Linked list for series (stores lv_polarchart_series_t) */
+    lv_ll_t cursor_ll;          /**< Linked list for cursors (stores lv_polarchart_cursor_t) */
     int32_t radial_min;
     int32_t radial_max;
     int32_t angle_min;
