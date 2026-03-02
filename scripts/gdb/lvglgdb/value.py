@@ -12,7 +12,8 @@ class Value(gdb.Value):
         """Normalize input to a typed Value pointer.
 
         Args:
-            val: Input value - int (address), gdb.Value, or Value instance
+            val: Input value - str (GDB expression), int (address),
+                 gdb.Value, or Value instance
             target_type: C type name (e.g. "lv_obj_t"). If provided,
                          result is cast to target_type*
 
@@ -22,11 +23,22 @@ class Value(gdb.Value):
         Raises:
             ValueError: If target_type lookup fails or cast fails
         """
+        if isinstance(val, str):
+            val = gdb.parse_and_eval(val)
+
         if isinstance(val, int):
             val = gdb.Value(val)
 
         if not isinstance(val, Value):
             val = Value(val)
+
+        # Auto-infer target_type from pointer type when not specified
+        if target_type is None:
+            typ = val.type.strip_typedefs()
+            if typ.code == gdb.TYPE_CODE_PTR:
+                target = typ.target().strip_typedefs()
+                if target.code in (gdb.TYPE_CODE_STRUCT, gdb.TYPE_CODE_UNION):
+                    target_type = str(target)
 
         if target_type is not None:
             try:
@@ -105,4 +117,4 @@ class Value(gdb.Value):
 
 
 # Type alias for all wrapper class __init__ parameters
-ValueInput = Union[int, gdb.Value, Value]
+ValueInput = Union[str, int, gdb.Value, Value]
