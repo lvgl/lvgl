@@ -658,8 +658,6 @@ static void load_scene(uint32_t scene)
 
 static void next_scene_timer_cb(lv_timer_t * timer)
 {
-    LV_UNUSED(timer);
-
     scene_act++;
 
     load_scene(scene_act);
@@ -977,6 +975,8 @@ static uint32_t loop_optimizable(void)
     for(i = 0; i < 100000; i++) {
         c++;
     }
+
+    LV_UNUSED(c);
     return 0;
 }
 static uint32_t loop_not_optimizable(void)

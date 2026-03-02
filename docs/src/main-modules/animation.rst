@@ -31,22 +31,23 @@ The main callback called during an Animation (when it is playing) is called an
 
 This prototype makes it easy to use most of the LVGL *set* functions directly or via a trivial wrapper. It includes:
 
-  - most of the widget properties
-  - functions that set :ref:`local style properties <style_local>` directly on objects (needs a wrapper to set the *selector*)
-  - set properties on :cpp:type:`lv_style_t` objects (e.g. :ref:`shared styles <style_initialize>`)  (``lv_obj_report_style_change`` needs to be called to notify the widgets having the style)
-
+- most of the widget properties
+- functions that set :ref:`local style properties <style_local>` directly on objects (needs a wrapper to set the *selector*)
+- set properties on :cpp:type:`lv_style_t` objects (e.g. :ref:`shared styles <style_initialize>`)  (``lv_obj_report_style_change`` needs to be called to notify the widgets having the style)
 - ``lv_style_set_<property_name>(&style, <value>)``
 - ``lv_obj_set_<property_name>(widget, <value>)``
 
-Because of the former, an animation on a single :cpp:type:`lv_style_t` object shared
+Using ``lv_style_set_<property_name>(&shared_style, <value>)``, an animation on a
+single :cpp:type:`lv_style_t` object shared
 among several objects can simultaneously modify the appearance of all objects that
 use it.  See :ref:`styles` for more details.
 
-Examples of the latter are:  :cpp:expr:`lv_obj_set_x(widget, value)` or
+Examples of ``lv_obj_set_<property_name>(widget, <value>)`` are:
+:cpp:expr:`lv_obj_set_x(widget, value)` or
 :cpp:expr:`lv_obj_set_width(widget, value)`.
 
 This makes it very convenient to apply to the appearance (and other attributes) of UI
-components.  But you can provide your own "set" functions, and so the application of
+components.  You can also provide your own "set" functions, so the application of
 Animations is really limited only by your imagination.
 
 The number of Animations that can be playing at the same time for a given object with
@@ -63,8 +64,8 @@ height being changed by another Animation.
 
 .. _animations_create:
 
-Create an Animation
-*******************
+Creating an Animation
+*********************
 
 To create an Animation, start by creating an Animation *template* in an
 :cpp:type:`lv_anim_t` variable.  It has to be initialized and configured with
@@ -126,7 +127,8 @@ To create an Animation, start by creating an Animation *template* in an
    /* Delay before repeat. Default is 0 (disabled) [ms] */
    lv_anim_set_repeat_delay(&anim_template, delay);
 
-   /* true (default): apply the start value immediately, false: apply start value after delay when the Anim. really starts. */
+   /* Apply the start value immediately (default true); false: apply start value after
+    * delay when the Animation actually starts. */
    lv_anim_set_early_apply(&anim_template, true/false);
 
    /* START THE ANIMATION
@@ -140,13 +142,13 @@ To create an Animation, start by creating an Animation *template* in an
 Animation Path
 **************
 
-You can control the Path (curve) of an Animation.  The simplest case is linear,
+You can control the Path (rate curve) of an Animation.  The simplest case is linear,
 meaning the current value between *start* and *end* is changed at the same rate (i.e.
 with fixed steps) over the duration of the Animation.  A *Path* is a function which
 calculates the next value to set based on the current state of the Animation.
 There are a number of built-in *Paths* that can be used:
 
--  :cpp:func:`lv_anim_path_linear`: linear Animation (default)
+-  :cpp:func:`lv_anim_path_linear`: linear animation (default)
 -  :cpp:func:`lv_anim_path_step`: change in one step at the end
 -  :cpp:func:`lv_anim_path_ease_in`: slow at the beginning
 -  :cpp:func:`lv_anim_path_ease_out`: slow at the end
@@ -159,7 +161,7 @@ Alternately, you can provide your own Path function.
 
 :cpp:expr:`lv_anim_init(&my_anim)` sets the Path to :cpp:func:`lv_anim_path_linear`
 by default.  If you want to use a different Path (including a custom Path function
-you provide), you set it using :cpp:expr:`lv_anim_set_path_cb(&anim_template, path_cb)`.
+you provide), set it using :cpp:expr:`lv_anim_set_path_cb(&anim_template, path_cb)`.
 
 If you provide your own custom Path function, its prototype is:
 
@@ -308,12 +310,16 @@ is also available if you wish for the animation to resume automatically after.
 
 .. _animations_timeline:
 
-Timeline
-********
+Timelines
+*********
 
 You can create a series of related animations that are linked together using an
 Animation Timeline.  A Timeline is a collection of multiple Animations which makes it
-easy to create complex composite Animations.  To create and use an Animation Timeline:
+easy to create complex composite Animations.
+
+.. image:: /_static/images/anim-timeline.png
+
+To create and use an Animation Timeline:
 
 - Create an Animation template but do not call :cpp:func:`lv_anim_start` on it.
 
@@ -347,7 +353,7 @@ beginning or at the point set by
 
 Call :cpp:expr:`lv_anim_timeline_set_progress(timeline, progress)` function to set the
 state of the Animation Timeline according to the ``progress`` value.  ``progress`` is
-a value between ``0`` and ``32767`` (:c:macro:`LV_ANIM_TIMELINE_PROGRESS_MAX`) to indicate the
+a value between ``0`` and ``65535`` (:c:macro:`LV_ANIM_TIMELINE_PROGRESS_MAX`) to indicate the
 proportion of the Timeline that has "played".  Example:  a ``progress`` value of
 :cpp:expr:`LV_ANIM_TIMELINE_PROGRESS_MAX / 2` would set the Timeline play to its
 half-way point.
@@ -366,7 +372,53 @@ Call :cpp:expr:`lv_anim_timeline_delete(timeline)` function to delete the Animat
     Timeline before deleting the Widget. Otherwise, the program may crash or behave
     abnormally.
 
-.. image:: /_static/images/anim-timeline.png
+.. caution::
+
+    To prevent undefined behavior, the Animations subsystem does not allow more than
+    one Animation to execute concurrently when they modify the same target object
+    with the same *animator* callback.
+
+    If you have set up an Animation Timeline from 2 or more Animation Templates with
+    these characteristics, be aware that when the Animation is started for any of
+    them, the Animation subsystem looks for such cases and considers it a conflict
+    when:
+
+    - more than one are running concurrently, or
+    - more than one have their "early apply" behavior turned on (which it is by default).
+
+    When this is detected, all such Animations are deleted except for the one most
+    recently added.
+
+    To avoid this, if you want to use more than one Animation Template that updates
+    the same object using the same *animator* callback:
+
+    - ensure that all but the first one to execute in the Timeline have their
+      "early apply" default behavior turned off before starting the Timeline, and
+
+    - ensure that they do not execute concurrently.
+
+    Example:
+
+    .. code-block:: c
+
+        /* These 4 Animation Templates execute in an Animation Timeline in the numbered
+         * sequence, and they modify the same object using the same callback. */
+        lv_anim_t anim_template_1;
+        lv_anim_t anim_template_2;
+        lv_anim_t anim_template_3;
+        lv_anim_t anim_template_4;
+
+        /* Initialization code for all 4 of them here. */
+
+        /* Ensure these steps are made before the Timeline is started. */
+        lv_anim_set_early_apply(&anim_template_2, false);
+        lv_anim_set_early_apply(&anim_template_3, false);
+        lv_anim_set_early_apply(&anim_template_4, false);
+
+        /* Start Timeline */
+        lv_anim_timeline_start(timeline);
+
+
 
 .. _animations_example:
 

@@ -314,15 +314,12 @@ static void task_draw_cb(void * user_data, const lv_vector_path_t * path, const 
             return;
         }
 
-        /* Reverse the clip area on the source */
-        lv_point_precise_t p1 = { scissor_area.x1, scissor_area.y1 };
-        lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
-
-        /* vg-lite bounding_box will crop the pixels on the edge, so +1px is needed here */
-        lv_point_precise_t p2 = { scissor_area.x2 + 1, scissor_area.y2 + 1 };
-        lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
-
-        lv_vg_lite_path_set_bounding_box(lv_vg_path, p1_res.x, p1_res.y, p2_res.x, p2_res.y);
+        /**
+         * Use lv_matrix to uniformly handle clipping region transformations,
+         * and obtain the transformed bounding rectangle.
+         */
+        const lv_area_t bounding_box_area = lv_matrix_transform_area((lv_matrix_t *)&result, &scissor_area);
+        lv_vg_lite_path_set_bounding_box_area(lv_vg_path, &bounding_box_area);
     }
 
     const lv_opa_t layer_opa = u->task_act->opa;

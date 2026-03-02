@@ -69,6 +69,12 @@ set(LVGL_TEST_OPTIONS_VG_LITE
     -Wno-dangling-pointer # workaround for thorvg dangling-pointer warning
 )
 
+set(LVGL_TEST_OPTIONS_RISCV_V
+    -DLV_TEST_OPTION=5
+    -DLVGL_CI_USING_SYS_HEAP
+    -DLV_USE_DRAW_SW_ASM=LV_DRAW_SW_ASM_RISCV_V
+)
+
 set(LVGL_TEST_OPTIONS_SDL
     -DLV_TEST_OPTION=7
 )
@@ -149,6 +155,13 @@ elseif (OPTIONS_TEST_VG_LITE)
         # Set a tolerance value for the VG-Lite tests.
         add_definitions(-DREF_IMG_TOLERANCE=9)
     endif()
+elseif (OPTIONS_TEST_RISCV_V)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_RISCV_V} ${SANITIZE_AND_COVERAGE_OPTIONS})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
+    message(STATUS "RISC-V Vector (RVV) software emulation test enabled")
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
@@ -207,7 +220,7 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
         -Wno-unreachable-code
         -Wno-gnu-zero-variadic-macro-arguments
         -Wunused-function
-	-Wno-overlength-strings
+	    -Wno-overlength-strings
     )
 else()
     list(APPEND COMPILE_OPTIONS
@@ -292,7 +305,9 @@ set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_CONF_DIR}>
 )
 
-file(GLOB_RECURSE TEST_IMAGES_SRC ${LVGL_TEST_DIR}/test_images/*.c)
+file(GLOB_RECURSE TEST_IMAGES_SRC 
+	${LVGL_TEST_DIR}/test_images/*.c 
+	${LVGL_TEST_DIR}/../examples/assets/*.c)
 
 add_library(test_common
     STATIC
@@ -320,6 +335,7 @@ add_library(test_common
         src/test_assets/test_font_3_bin.c
         src/test_assets/test_img_caret_down.c
         src/test_assets/test_arc_bg.c
+        src/test_assets/test_img_bulb_gif.c
         src/test_assets/test_img_lvgl_logo_png.c
         src/test_assets/test_img_lvgl_logo_jpg.c
         src/test_assets/test_img_emoji_F617.c
@@ -365,10 +381,8 @@ if(NOT WIN32)
     pkg_check_modules(wayland_client wayland-client)
 
     if (wayland_client_FOUND)
-        pkg_check_modules(wayland-cursor REQUIRED wayland-cursor)
-        pkg_check_modules(xkbcommon REQUIRED xkbcommon)
-
-        link_libraries(wayland-client wayland-cursor xkbcommon)
+        pkg_check_modules(WAYLAND REQUIRED wayland-cursor wayland-client wayland-egl xkbcommon)
+        link_libraries(${WAYLAND_LIBRARIES})
 
         # Add auto generated source required for XDG shell
         include_directories("${LVGL_TEST_DIR}/wayland_protocols")
@@ -385,7 +399,13 @@ include_directories(${PNG_INCLUDE_DIR})
 if(NOT WIN32)
     # FFmpeg is optional for the image and video test cases
     find_package(PkgConfig)
-    pkg_check_modules(FFMPEG libavformat libavcodec libswscale libavutil)
+    pkg_check_modules(FFMPEG IMPORTED_TARGET
+        libavformat
+        libavcodec
+        libswscale
+        libavutil
+    )
+
     if(FFMPEG_FOUND)
         include_directories(${FFMPEG_INCLUDE_DIRS})
     else()
@@ -414,21 +434,19 @@ endif()
 
 # OpenGL ES is required for its driver
 if ($ENV{NON_AMD64_BUILD})
-    message("Disable OpenGL, GLEW or glfw3 for non-amd64 build")
+    message("Disable OpenGL, glfw3 for non-amd64 build")
     add_definitions(-DLV_USE_OPENGLES=0)
 else()
     find_package(OpenGL)
-    find_package(GLEW)
     find_package(glfw3)
 
-    if(OpenGL_FOUND AND GLEW_FOUND AND glfw3_FOUND)
+    if(OpenGL_FOUND AND glfw3_FOUND)
         # Include directories
         include_directories(${OPENGL_INCLUDE_DIR})
-        include_directories(${GLEW_INCLUDE_DIRS})
         include_directories(${GLFW_INCLUDE_DIRS})
         message("Enable LV_USE_OPENGLES")
     else()
-        message("OpenGL, GLEW or glfw3 not found, defaulting to 0")
+        message("OpenGL, glfw3 not found, defaulting to 0")
         add_definitions(-DLV_USE_OPENGLES=0)
     endif()
 endif()
@@ -521,7 +539,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             ${WebP_LINK_LIBRARIES}
-            ${FFMPEG_LIBRARIES}
+            PkgConfig::FFMPEG
             m
             pthread
             ${TEST_LIBS})
@@ -532,7 +550,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
 
 	if (NOT $ENV{NON_AMD64_BUILD})
 	    target_link_libraries(${test_name} PRIVATE
-    	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+    	        ${OPENGL_LIBRARIES} glfw)
 	endif()
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})

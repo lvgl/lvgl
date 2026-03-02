@@ -667,6 +667,10 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     theme->base.font_large = font;
     theme->base.apply_cb = theme_apply;
     theme->base.flags = dark ? MODE_DARK : 0;
+#if LV_USE_EXT_DATA
+    theme->base.ext_data.free_cb = NULL;
+    theme->base.ext_data.data = NULL;
+#endif
 
     style_init(theme);
 
@@ -711,6 +715,12 @@ void lv_theme_default_deinit(void)
                 lv_style_reset(theme_styles + i);
             }
         }
+#if LV_USE_EXT_DATA
+        if(theme->base.ext_data.free_cb) {
+            theme->base.ext_data.free_cb(theme->base.ext_data.data);
+            theme->base.ext_data.data = NULL;
+        }
+#endif
         lv_free(theme_def);
         theme_def = NULL;
     }
@@ -994,6 +1004,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.arc_indic, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &theme->styles.arc_indic_primary, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &theme->styles.knob, LV_PART_KNOB);
+        lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
     }
 #endif
 
@@ -1023,6 +1035,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_calendar_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.pad_zero, 0);
+        lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
     }
 
 #if LV_USE_CALENDAR_HEADER_ARROW

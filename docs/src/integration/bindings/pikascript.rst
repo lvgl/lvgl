@@ -6,7 +6,7 @@ PikaScript
 What is PikaScript?
 *******************
 
-`PikaScript <https://github.com/pikasTech/pikascript>`__ is a Python interpreter designed specifically for
+`PikaScript <https://github.com/pikasTech/PikaPython>`__ is a Python interpreter designed specifically for
 microcontrollers, and it supports a subset of the common Python3 syntax.
 
 It's lighter than MicroPython, requiring only 32k of code space and 4k of RAM, which
@@ -198,4 +198,4 @@ size of the script and increasing its speed.
 How Can I Use It?
 *****************
 
-The simulation repository for Visual Studio is available at https://github.com/pikasTech/lv_pikascript .
+The simulation repository for Visual Studio is available at https://github.com/lvgl/lv_binding_pikascript.

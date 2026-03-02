@@ -44,8 +44,8 @@ allow kerning, if supported, or disable.
 
 .. _tiny_ttf_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/libs/tiny_ttf/index.rst
 

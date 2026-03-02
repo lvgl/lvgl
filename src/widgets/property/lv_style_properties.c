@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_style_property_names[123] = {
+const lv_property_name_t lv_style_property_names[130] = {
     {"align",                  LV_PROPERTY_STYLE_ALIGN,},
     {"anim",                   LV_PROPERTY_STYLE_ANIM,},
     {"anim_duration",          LV_PROPERTY_STYLE_ANIM_DURATION,},
@@ -51,6 +51,12 @@ const lv_property_name_t lv_style_property_names[123] = {
     {"clip_corner",            LV_PROPERTY_STYLE_CLIP_CORNER,},
     {"color_filter_dsc",       LV_PROPERTY_STYLE_COLOR_FILTER_DSC,},
     {"color_filter_opa",       LV_PROPERTY_STYLE_COLOR_FILTER_OPA,},
+    {"drop_shadow_color",      LV_PROPERTY_STYLE_DROP_SHADOW_COLOR,},
+    {"drop_shadow_offset_x",   LV_PROPERTY_STYLE_DROP_SHADOW_OFFSET_X,},
+    {"drop_shadow_offset_y",   LV_PROPERTY_STYLE_DROP_SHADOW_OFFSET_Y,},
+    {"drop_shadow_opa",        LV_PROPERTY_STYLE_DROP_SHADOW_OPA,},
+    {"drop_shadow_quality",    LV_PROPERTY_STYLE_DROP_SHADOW_QUALITY,},
+    {"drop_shadow_radius",     LV_PROPERTY_STYLE_DROP_SHADOW_RADIUS,},
     {"flex_cross_place",       LV_PROPERTY_STYLE_FLEX_CROSS_PLACE,},
     {"flex_flow",              LV_PROPERTY_STYLE_FLEX_FLOW,},
     {"flex_grow",              LV_PROPERTY_STYLE_FLEX_GROW,},
@@ -71,6 +77,7 @@ const lv_property_name_t lv_style_property_names[123] = {
     {"image_opa",              LV_PROPERTY_STYLE_IMAGE_OPA,},
     {"image_recolor",          LV_PROPERTY_STYLE_IMAGE_RECOLOR,},
     {"image_recolor_opa",      LV_PROPERTY_STYLE_IMAGE_RECOLOR_OPA,},
+    {"last_built_in_prop",     LV_PROPERTY_STYLE_LAST_BUILT_IN_PROP,},
     {"layout",                 LV_PROPERTY_STYLE_LAYOUT,},
     {"length",                 LV_PROPERTY_STYLE_LENGTH,},
     {"line_color",             LV_PROPERTY_STYLE_LINE_COLOR,},

@@ -19,8 +19,8 @@ def lvgl_version(version_file):
 
     if version_file is not None:
         with open(version_file, 'r') as file:
-            major_re = re.compile(r'define\s+LVGL_VERSION_MAJOR\s+(\d+)')
-            minor_re = re.compile(r'define\s+LVGL_VERSION_MINOR\s+(\d+)')
+            major_re = re.compile(r'#\s*define\s+LVGL_VERSION_MAJOR\s+(\d+)')
+            minor_re = re.compile(r'#\s*define\s+LVGL_VERSION_MINOR\s+(\d+)')
 
             for line in file.readlines():
                 # Skip if line not long enough to match.
@@ -30,6 +30,9 @@ def lvgl_version(version_file):
                 match = major_re.search(line)
                 if match is not None:
                     major = match[1]
+                    # Exit early if we have both values.
+                    if len(major) > 0 and len(minor) > 0:
+                        break
                 else:
                     match = minor_re.search(line)
                     if match is not None:

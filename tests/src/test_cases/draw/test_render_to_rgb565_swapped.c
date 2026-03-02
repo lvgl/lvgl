@@ -18,6 +18,9 @@ void tearDown(void)
 
 void test_render_to_rgb565_swapped(void)
 {
+#if LV_USE_DRAW_VG_LITE
+    TEST_IGNORE_MESSAGE("VG_LITE doesn't support RGB565_SWAPPED format");
+#endif
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_RGB565_SWAPPED);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};

@@ -141,7 +141,7 @@ The recommended way to integrate the required libraries is using CMake's FetchCo
     FetchContent_Declare(
       fastgltf
       GIT_REPOSITORY https://github.com/spnda/fastgltf
-      GIT_TAG 4e2261350888bae7c35a1f39991f6233d57795f5)
+      GIT_TAG f04052ebd8d157c7b6e8fc3dd9f1ed83df99f3e5)
     set(FASTGLTF_ENABLE_DEPRECATED_EXT
         ON
         CACHE BOOL "" FORCE)
@@ -291,7 +291,7 @@ Control model animations with these functions:
     lv_gltf_model_play_animation(model, 0);
     
     /* Control animation speed */
-    lv_gltf_set_animation_speed(gltf, LV_GLTF_ANIM_SPEED_2X);
+    lv_gltf_model_set_animation_speed(model, LV_GLTF_ANIM_SPEED_2X);
     
     /* Pause/resume animation */
     lv_gltf_model_pause_animation(model);
@@ -357,7 +357,7 @@ In order to read them, you must first register an event callback.
 
 This event callback will be called every time the node properties change.
 
-Property values can only be read from within the ``LV_EVENT_VALUE_CHANGED``
+Property values can only be read from within the :cpp:enumerator:`LV_EVENT_VALUE_CHANGED`
 callback to ensure data validity.
 
 .. code-block:: c
@@ -407,15 +407,20 @@ Note: World position registration incurs additional computational cost due to ma
 
 .. important::
 
-    - The ``LV_EVENT_VALUE_CHANGED`` event fires only when node properties are modified, not every frame 
-    - Getter functions return ``LV_RESULT_INVALID`` if called outside the event callback, ensuring you never read stale data
-    - Calling :cpp:func:`lv_gltf_model_node_get_world_position` without world position registration will return ``LV_RESULT_INVALID``
+    - The :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` event fires only when node
+      properties are modified, not every frame.
+    - Getter functions return :cpp:enumerator:`LV_RESULT_INVALID` if called outside
+      the event callback, ensuring you never read stale data.
+    - Calling :cpp:func:`lv_gltf_model_node_get_world_position` without world
+      position registration will return :cpp:enumerator:`LV_RESULT_INVALID`.
 
 .. tip::
-   When using the root node, the local position will equal the world position, meaning you can subscribe to 
-   :cpp:func:`lv_gltf_model_node_add_event_cb` instead of :cpp:func:`lv_gltf_model_node_add_event_cb_with_world_position`
-   and use :cpp:func:`lv_gltf_model_node_get_local_position` to get the world position without the computational 
-   overhead of matrix calculations.
+
+   When using the root node, the local position will equal the world position, meaning
+   you can subscribe to :cpp:func:`lv_gltf_model_node_add_event_cb` instead of
+   :cpp:func:`lv_gltf_model_node_add_event_cb_with_world_position` and use
+   :cpp:func:`lv_gltf_model_node_get_local_position` to get the world position without
+   the computational overhead of matrix calculations.
 
 Finding Nodes
 -------------
@@ -579,7 +584,7 @@ Animation Speed System
 Animation speeds use integer values to avoid floating-point arithmetic:
 
 - The speed ratio is calculated as: ``speed_value / LV_GLTF_ANIM_SPEED_NORMAL``
-- ``LV_GLTF_ANIM_SPEED_NORMAL`` equals 1000, representing 1.0x (normal) speed
+- :c:macro:`LV_GLTF_ANIM_SPEED_NORMAL` equals 1000, representing 1.0x (normal) speed
 - Values greater than 1000 speed up animations (e.g., 2000 = 2.0x speed)
 - Values less than 1000 slow down animations (e.g., 500 = 0.5x speed)
 

@@ -72,7 +72,7 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_label_properties[] = {
     {
         .id = LV_PROPERTY_LABEL_TEXT,
         .setter = lv_label_set_text,
@@ -105,18 +105,7 @@ const lv_obj_class_t lv_label_class = {
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class,
     .name = "lv_label",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_LABEL_START,
-    .prop_index_end = LV_PROPERTY_LABEL_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_label_property_names,
-    .names_count = sizeof(lv_label_property_names) / sizeof(lv_property_name_t),
-#endif
-
-#endif
+    LV_PROPERTY_CLASS_FIELDS(label, LABEL)
 };
 
 /**********************
@@ -938,6 +927,8 @@ static void draw_main(lv_event_t * e)
         lv_area_move(&txt_coords, 0, -s);
         txt_coords.y2 = obj->coords.y2;
     }
+
+    /*Clip to the text in some cases to avoid ugly overflows*/
     if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL ||
        label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR ||
        label->long_mode == LV_LABEL_LONG_MODE_CLIP) {
@@ -946,10 +937,14 @@ static void draw_main(lv_event_t * e)
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
         layer->_clip_area = clip_area_ori;
     }
+    /*Do not clip to make the drop shadow  visible*/
+    else if(label_draw_dsc.base.drop_shadow_opa > 0) {
+        lv_draw_label(layer, &label_draw_dsc, &txt_coords);
+    }
+    /*Labels have some extra draw area by default to not clip characters with
+     *italic, handwritten and other less standard fonts.
+     *However, with most of the fonts typically it's safe to clip at least to bottom side*/
     else {
-        /*Labels have some extra draw area by default to not clip characters with
-         *italic, handwritten and other less standard fonts.
-         *However, with most of the fonts typically it's safe to clip at least to bottom side*/
         const lv_area_t clip_area_ori = layer->_clip_area;
         layer->_clip_area.y2 = txt_clip.y2;
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
@@ -1068,7 +1063,16 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj)
     label->invalid_size_cache = true;
 
     lv_obj_invalidate(obj);
-    lv_obj_refresh_self_size(obj);
+
+    /**
+     * Ideally we would use `lv_obj_refresh_self_size(obj);` here but it can cause an infinite loop due to the way label
+     * self size is implemented.
+     * The implementation should be revisited in the future since it currently doesn't handle fixed height, content
+     * width in all scenarios properly.
+     * Once that is fixed we should be able to use `lv_obj_refresh_self_size(obj);` here.
+     */
+    if(lv_obj_is_style_any_height_content(obj) || lv_obj_is_style_any_width_content(obj))
+        lv_obj_mark_layout_as_dirty(obj);
 
     if(!label->need_refr_text) {
         label->need_refr_text = true;

@@ -4,6 +4,14 @@
 
 #include "unity/unity.h"
 
+static bool test_fill_cb(void * buf, uint32_t len, int32_t idx, void * user)
+{
+    TEST_ASSERT_EQUAL_UINT32(4, len);
+    TEST_ASSERT_NULL(user);
+    *(int32_t *)buf = idx * 10;
+    return true;
+}
+
 static lv_circle_buf_t * circle_buf;
 
 #define circle_buf_CAPACITY 4
@@ -206,6 +214,76 @@ void test_circle_buf_reset(void)
             TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
         }
     }
+}
+
+void test_circle_buf_create_methods(void)
+{
+    /* Test create from external buffer */
+    int32_t ext_buf[4];
+    lv_circle_buf_t * ext_cb = lv_circle_buf_create_from_buf(ext_buf, 4, sizeof(int32_t));
+    TEST_ASSERT_NOT_NULL(ext_cb);
+
+    /* Verify can write to external buffer */
+    int32_t test_val = 5;
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_circle_buf_write(ext_cb, &test_val));
+    lv_circle_buf_destroy(ext_cb);
+
+    /* Test create from array */
+    lv_array_t arr;
+    lv_array_init(&arr, 4, sizeof(int32_t));
+    lv_circle_buf_t * arr_cb = lv_circle_buf_create_from_array(&arr);
+    TEST_ASSERT_NOT_NULL(arr_cb);
+
+    /* Verify can write to array-based buffer */
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_circle_buf_write(arr_cb, &test_val));
+    lv_circle_buf_destroy(arr_cb);
+}
+
+void test_circle_buf_fill(void)
+{
+    lv_circle_buf_reset(circle_buf);
+
+    /* Test fill callback */
+    uint32_t filled = lv_circle_buf_fill(circle_buf, 4, test_fill_cb, NULL);
+
+    TEST_ASSERT_EQUAL_UINT32(4, filled);
+    TEST_ASSERT_TRUE(lv_circle_buf_is_full(circle_buf));
+
+    /* Verify filled values */
+    for(int i = 0; i < 4; i++) {
+        int32_t val = -1;
+        TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_circle_buf_peek_at(circle_buf, i, &val));
+        TEST_ASSERT_EQUAL_INT32(i * 10, val);
+    }
+}
+
+void test_circle_buf_edge_cases(void)
+{
+    lv_circle_buf_reset(circle_buf);
+    /* Test read when empty */
+    int32_t val;
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_circle_buf_read(circle_buf, &val));
+
+    /* Test skip when empty */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_circle_buf_skip(circle_buf));
+}
+
+void test_circle_buf_resize(void)
+{
+    /* Test resize to larger capacity */
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_circle_buf_resize(circle_buf, 8));
+    TEST_ASSERT_EQUAL_UINT32(8, lv_circle_buf_capacity(circle_buf));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_circle_buf_size(circle_buf));
+
+    /* Test resize to smaller capacity */
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_circle_buf_resize(circle_buf, 2));
+    TEST_ASSERT_EQUAL_UINT32(2, lv_circle_buf_capacity(circle_buf));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_circle_buf_size(circle_buf));
+
+    /* Test resize to zero capacity */
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_circle_buf_resize(circle_buf, 0));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_circle_buf_capacity(circle_buf));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_circle_buf_size(circle_buf));
 }
 
 #endif

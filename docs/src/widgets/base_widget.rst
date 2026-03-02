@@ -39,3 +39,21 @@ All these common and versatile features are introduced in the
 
 In HTML terms, think of it as a ``<div>``, a very versatile building block that,
 with some CSS and JS, can become almost anything.
+
+
+
+.. _lv_obj_example:
+
+Examples
+********
+
+.. include:: /examples/widgets/obj/index.rst
+
+
+
+.. _lv_obj_api:
+
+API
+***
+
+.. API equals:  lv_obj_create, lv_obj_add_style

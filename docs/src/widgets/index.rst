@@ -28,6 +28,7 @@ All Widgets
     chart
     checkbox
     dropdown
+    gif
     image
     imagebutton
     ime_pinyin

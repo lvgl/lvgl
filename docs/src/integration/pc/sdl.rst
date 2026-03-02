@@ -82,3 +82,73 @@ When building for 32-bit architecture, add the following workaround at the begin
     #ifndef WIN32
         setenv("DBUS_FATAL_WARNINGS", "0", 1);
     #endif
+
+
+
+******************
+Rendering Backends
+******************
+
+The SDL driver supports multiple rendering backends that determine how LVGL renders content to the screen.
+Each backend offers different performance characteristics and use cases.
+
+
+Standard Software Rendering (Default)
+======================================
+
+By default, the SDL driver uses pure software rendering with no additional configuration required.
+
+**Configuration:**
+
+No additional configuration needed - this is the default when only ``LV_USE_SDL 1`` is enabled.
+
+SDL Draw Unit
+=============
+
+The SDL Draw Unit uses software rendering to create SDL textures which are then cached and blended together by the GPU,
+providing a hybrid approach that combines software rendering flexibility with hardware-accelerated texture composition.
+
+**Configuration:**
+
+.. code-block:: c
+
+    #define LV_USE_SDL 1
+    #define LV_USE_DRAW_SDL 1
+
+For complete details, see :ref:`sdl_draw_unit`.
+
+
+OpenGL-Based Rendering
+=======================
+
+The SDL driver can leverage OpenGL for hardware-accelerated rendering. LVGL provides two OpenGL-based rendering options:
+
+- :ref:`NanoVG Draw Unit <nanovg_draw_unit>`
+- :ref:`OpenGL Draw Unit <opengles_draw_unit>`
+
+
+.. code-block:: c
+
+    #define LV_USE_SDL 1
+    #define LV_USE_OPENGLES 1
+
+    /* For NanoVG Draw Unit*/
+    #define LV_USE_DRAW_NANOVG 1 
+    #define LV_USE_NANOVG 1
+
+    /* For OpenGL Draw Unit */
+    #define LV_USE_DRAW_OPENGLES 1 
+
+See the :ref:`Complete OpenGL overview <opengl_overview>` for more information. 
+
+
+
+********
+See Also
+********
+
+- :ref:`sdl_draw_unit` - SDL texture-based rendering
+- :ref:`opengl_overview` - Complete OpenGL integration overview
+- :ref:`nanovg_draw_unit` - NanoVG vector graphics rendering
+- :ref:`opengles_draw_unit` - OpenGL ES for embedded systems
+

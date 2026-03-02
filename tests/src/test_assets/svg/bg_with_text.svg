@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox='0 0 400 100' width='400' height='400' viewport-fill='red' viewport-fill-opacity='0.5'>
+    <circle cx='200' cy='200' r='100' fill='green' />
+    <text x='50' y='200' fill='red' font-size='30'>Background color is red</text>
+    <text x='50' y='230' fill='red' font-size='30'>with 0.5 transparency</text>
+</svg>

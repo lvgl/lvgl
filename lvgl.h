@@ -67,6 +67,7 @@ extern "C" {
 #include "src/widgets/chart/lv_chart.h"
 #include "src/widgets/checkbox/lv_checkbox.h"
 #include "src/widgets/dropdown/lv_dropdown.h"
+#include "src/widgets/gif/lv_gif.h"
 #include "src/widgets/image/lv_image.h"
 #include "src/widgets/imagebutton/lv_imagebutton.h"
 #include "src/widgets/keyboard/lv_keyboard.h"
@@ -92,8 +93,6 @@ extern "C" {
 #include "src/widgets/3dtexture/lv_3dtexture.h"
 #include "src/widgets/ime/lv_ime_pinyin.h"
 
-#include "src/xml/lv_xml.h"
-
 #include "src/debugging/sysmon/lv_sysmon.h"
 #include "src/debugging/monkey/lv_monkey.h"
 #include "src/debugging/test/lv_test.h"
@@ -112,7 +111,6 @@ extern "C" {
 #include "src/libs/libwebp/lv_libwebp.h"
 #include "src/libs/gltf/gltf_data/lv_gltf_model.h"
 #include "src/libs/gltf/gltf_view/lv_gltf.h"
-#include "src/libs/gif/lv_gif.h"
 #include "src/libs/gstreamer/lv_gstreamer.h"
 #include "src/libs/qrcode/lv_qrcode.h"
 #include "src/libs/tjpgd/lv_tjpgd.h"

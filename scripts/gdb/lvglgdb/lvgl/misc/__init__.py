@@ -1,5 +1,12 @@
 from .lv_ll import LVList
-from .lv_style import dump_style_info
+from .lv_style import (
+    LVStyle,
+    StyleEntry,
+    dump_style_info,
+    style_prop_name,
+    decode_selector,
+    format_style_value,
+)
 from .lv_rb import LVRedBlackTree, dump_rb_info
 from .lv_cache import LVCache, dump_cache_info
 from .lv_cache_entry import LVCacheEntry, dump_cache_entry_info
@@ -11,7 +18,12 @@ from .lv_image_header_cache import LVImageHeaderCache
 
 __all__ = [
     "LVList",
+    "LVStyle",
+    "StyleEntry",
     "dump_style_info",
+    "style_prop_name",
+    "decode_selector",
+    "format_style_value",
     "LVRedBlackTree",
     "dump_rb_info",
     "LVCache",

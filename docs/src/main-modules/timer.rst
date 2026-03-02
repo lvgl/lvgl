@@ -75,10 +75,6 @@ Ready and Reset
 :cpp:expr:`lv_timer_reset(timer)` resets the period of a Timer. It will be
 called again after its currently-set period (in milliseconds) has elapsed.
 
-See what happens when :ref:`no timers are ready <timer_handler_no_timer_ready>`
-and :cpp:func:`lv_timer_handler` is called.
-
-
 
 Setting Parameters
 ******************
@@ -170,9 +166,7 @@ Some examples are:
 
 - you cannot delete a Widget because something else is still using it,
 - you don't want to block execution now, or
-- you detect the need to delete a Widget in a thread other than the thread making
-  LVGL calls (e.g. in a case where you are using a :ref:`Gateway Thread <Gateway
-  Thread>` to make all LVGL calls in a multi-threaded environment).
+- you just want to defer the deletion for any reason
 
 For these cases,
 :cpp:expr:`lv_async_call(my_function, data_p)` can be used to call ``my_function`` on

@@ -352,6 +352,16 @@ Use the following Interpreted Text Roles in text to include in-line C code that 
     :cpp:struct:`lv_image_dsc_t`
     :cpp:union:`lv_style_value_t`
 
+**Note:**  Doxygen documentation for macros with parameters works perfectly, but Sphinx does not yet know how to parse the parameter(s) on a macro that might look like this:
+```rst
+:c:macro:`LV_FREETYPE_FONT_STYLE_WEIGHT(x)`
+```
+
+Here is how to make that work, look right in the document, and also produce a link to Doxygen documentation if there is any:
+```rst
+:c:macro:`LV_FREETYPE_FONT_STYLE_WEIGHT`\ (x)
+```
+
 #### More Complex Expressions
 
 Use the `:cpp:expr:` Interpreted Text Role for more complex expressions, for example when showing the arguments passed to a function.
@@ -391,10 +401,12 @@ API
 
 .. API equals: lv_scale_t, lv_scale_create
 
-.. API startswith: lv_scale, lv_obj_set_style
+.. API startswith:
 
+    lv_scale
+    lv_obj_set_style
 ```
 
-The list of symbols (or prefixes) can be separated by commas or spaces, and they can wrap onto subsequent lines of text so long as they are indented.  A blank line after each list ends that list.
+The list of symbols (or prefixes) can be separated by commas or spaces, and they can wrap onto subsequent lines of text so long as they are indented.  Each list is terminated by the next ``.. API `` pseudo-directive or end-of-file, whichever comes first.
 
 The API-page generation logic will add at most 1 link to each API documentation page containing matched symbols.  The links are to the whole API page, not to the symbols.  The purpose is to provide the reader with links to applicable API pages.  Links directly to code (e.g. function documentation) are accomplished by using the In-Line Code Expressions documented above.

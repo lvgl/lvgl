@@ -9,5 +9,3 @@ Auxiliary Modules
 
     file_explorer
     fragment
-    obj_property
-    translation

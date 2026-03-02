@@ -56,7 +56,7 @@ If you want to add an [OK] or [Cancel] or other buttons for the
 user to have a choice of responses, add each button using the
 :cpp:expr:`lv_msgbox_add_footer_button(msgbox, btn_text)` function.  Calling this
 function adds a footer (container) if one was not already present, and it returns a
-pointer to the button created, which can be used to add ``LV_EVENT_CLICKED`` (or
+pointer to the button created, which can be used to add :cpp:enumerator:`LV_EVENT_CLICKED` (or
 other) events to detect and act on the user's response.
 
 Footer buttons so added are evenly spaced and centered.
@@ -84,6 +84,7 @@ Functions that add something to the message box return a pointer to the newly ad
 .. code:: c
 
    lv_obj_t * lv_msgbox_add_text(lv_obj_t * msgbox, const char * text);
+   lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...);
    lv_obj_t * lv_msgbox_add_title(lv_obj_t * msgbox, const char * title);
    lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * msgbox);
    lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * msgbox, const void * symbol);
@@ -132,8 +133,8 @@ No *Keys* are processed by Message Box Widgets.
 
 .. _lv_msgbox_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/msgbox/index.rst
 

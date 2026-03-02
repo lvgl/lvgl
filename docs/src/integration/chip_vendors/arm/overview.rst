@@ -49,6 +49,9 @@ To add Arm2D to your project, follow these steps:
 8. Arm2D tries to read/write multiple data with a single instruction. Therefore, it's important to use the fastest memory (e.g., ``BSS`` or ``TCM``) for LVGL's buffer to avoid memory bandwidth bottlenecks.
 9. Enable ``LV_USE_DRAW_ARM2D_SYNC 1`` and ``LV_USE_DRAW_SW_ASM LV_DRAW_SW_ASM_HELIUM`` in ``lv_conf.h``.
 
+
+.. _neon acceleration:
+
 Neon Acceleration
 -----------------
 
@@ -58,7 +61,7 @@ LVGL has built-in support to improve the performance of software rendering by ut
 Architecture Support
 --------------------
 
-Both 32-bit and 64-bit ARM architectures are supported. Simply set ``LV_USE_DRAW_SW_ASM`` to ``LV_DRAW_SW_ASM_NEON`` in ``lv_conf``.
+Both 32-bit and 64-bit ARM architectures are supported. Simply set :c:macro:`LV_USE_DRAW_SW_ASM` to :c:macro:`LV_DRAW_SW_ASM_NEON` in ``lv_conf``.
 
 .. note::
    All ARM Cortex-A and Cortex-R 64-bit processors include Neon support as a mandatory feature starting with the ARMv8 architecture specification. This makes Neon acceleration universally available on all 64-bit ARM platforms, including current and future ARM architectures.

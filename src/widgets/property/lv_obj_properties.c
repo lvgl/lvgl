@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_obj_property_names[75] = {
+const lv_property_name_t lv_obj_property_names[76] = {
     {"align",                  LV_PROPERTY_OBJ_ALIGN,},
     {"child_count",            LV_PROPERTY_OBJ_CHILD_COUNT,},
     {"content_height",         LV_PROPERTY_OBJ_CONTENT_HEIGHT,},
@@ -72,6 +72,7 @@ const lv_property_name_t lv_obj_property_names[75] = {
     {"scroll_x",               LV_PROPERTY_OBJ_SCROLL_X,},
     {"scroll_y",               LV_PROPERTY_OBJ_SCROLL_Y,},
     {"scrollbar_mode",         LV_PROPERTY_OBJ_SCROLLBAR_MODE,},
+    {"state_alt",              LV_PROPERTY_OBJ_STATE_ALT,},
     {"state_any",              LV_PROPERTY_OBJ_STATE_ANY,},
     {"state_checked",          LV_PROPERTY_OBJ_STATE_CHECKED,},
     {"state_disabled",         LV_PROPERTY_OBJ_STATE_DISABLED,},

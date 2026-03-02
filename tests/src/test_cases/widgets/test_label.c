@@ -164,7 +164,7 @@ void test_label_long_text_get_letter_pos_align_left(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = 0,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
@@ -291,7 +291,7 @@ void test_label_long_text_get_letter_pos_align_right(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = -3,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
@@ -418,7 +418,7 @@ void test_label_long_text_get_letter_pos_align_center(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = -1,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
@@ -906,6 +906,41 @@ void test_label_invalidate_area(void)
     TEST_ASSERT(i > 0);
 
     lv_display_remove_event_cb_with_user_data(lv_display_get_default(), display_invalidate_area_cb, &i);
+}
+
+void test_label_no_leading_space_after_line_wrap(void)
+{
+    /*
+     * Test for issue #9629: Leading space after line wrap in labels
+     * When text wraps at a space character, the next line should not
+     * start with that space.
+     */
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * test_label = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label, "LongWord not!");
+    lv_obj_set_size(test_label, 80, 100);
+    lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(test_label, LV_OPA_COVER, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_no_leading_space.png");
+}
+
+void test_label_preserve_spaces_after_explicit_newline(void)
+{
+    /*
+     * Spaces after explicit \n should be preserved as intentional indentation,
+     * while spaces after automatic word-wrap should still be removed.
+     */
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * test_label = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label, "Hello\n   World\n\n   Indent");
+    lv_obj_set_size(test_label, 200, 120);
+    lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(test_label, LV_OPA_COVER, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_preserve_indent_after_newline.png");
 }
 
 #endif

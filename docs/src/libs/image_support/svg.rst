@@ -55,8 +55,8 @@ It is also possible to draw SVG vector graphics in draw events:
 
 .. _svg_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/libs/svg/index.rst
 

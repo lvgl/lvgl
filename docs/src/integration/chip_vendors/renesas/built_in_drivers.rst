@@ -2,7 +2,7 @@
 Built-in Drivers
 ================
 
-`Renesas <https://renesas.com/>`__ is an official partner of LVGL. Therefore, LVGL contains built-in support for
+`Renesas <https://www.renesas.com/>`__ is an official partner of LVGL. Therefore, LVGL contains built-in support for
 `Dave2D <https://www.renesas.com/document/mas/tes-dave2d-driver-documentation>`__ (the GPU of Renesas) and we also maintain
 ready-to-use Renesas projects.
 

@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../misc/lv_ext_data.h"
 #include "../misc/lv_types.h"
 #include "../core/lv_obj.h"
 #include "../draw/lv_draw.h"
@@ -34,7 +35,9 @@ extern "C" {
  **********************/
 
 struct _lv_display_t {
-
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     /*---------------------
      * Resolution
      *--------------------*/

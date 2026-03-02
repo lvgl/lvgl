@@ -66,6 +66,17 @@ file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp
                                  ${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/*.cpp)
 
+# Check for the case where LVGL is distributed with only its source code
+if(NOT EXAMPLE_SOURCES AND CONFIG_LV_BUILD_EXAMPLES)
+    message(STATUS "No Examples found. Disabling Examples build")
+    set(CONFIG_LV_BUILD_EXAMPLES OFF)
+endif()
+
+if(NOT DEMO_SOURCES AND CONFIG_LV_BUILD_DEMOS)
+    message(STATUS "No Demos found. Disabling Demos build")
+    set(CONFIG_LV_BUILD_DEMOS OFF)
+endif()
+
 # Build LVGL library
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)

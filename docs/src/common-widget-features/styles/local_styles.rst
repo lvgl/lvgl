@@ -1,3 +1,4 @@
+.. include:: /include/external_links.txt
 .. _style_local:
 
 ============
@@ -45,14 +46,4 @@ For example:
 
    lv_obj_bind_style_prop(slider1, LV_STYLE_BG_OPA, LV_PART_MAIN, &subject_bg_opa);
    lv_obj_bind_style_prop(slider1, LV_STYLE_BG_COLOR, LV_PART_INDICATOR, &subject_bg_color);
-
-
-..  Hyperlinks
-
-.. _pseudo-elements:
-.. _pseudo-element:   https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors#pseudo-classes_and_pseudo-elements
-.. _pseudo-classes:
-.. _pseudo-class:     https://developer.mozilla.org/en-US/docs/Glossary/Pseudo-class
-
-
 

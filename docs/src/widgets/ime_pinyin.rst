@@ -118,8 +118,8 @@ The default mode is :cpp:enumerator:`LV_IME_PINYIN_MODE_K26`.
 
 .. _ime_pinyin_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/others/ime/index.rst
 

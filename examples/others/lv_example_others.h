@@ -23,7 +23,6 @@ extern "C" {
 #include "observer/lv_example_observer.h"
 #include "snapshot/lv_example_snapshot.h"
 #include "gestures/lv_example_gestures.h"
-#include "xml/lv_example_xml.h"
 #include "translation/lv_example_translation.h"
 
 /*********************

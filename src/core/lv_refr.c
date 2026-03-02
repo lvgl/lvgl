@@ -10,7 +10,7 @@
 #include "lv_obj_draw_private.h"
 #include "../misc/lv_area_private.h"
 #include "../draw/sw/lv_draw_sw_mask_private.h"
-#include "../draw/lv_draw_mask_private.h"
+#include "../draw/lv_draw_mask.h"
 #include "lv_obj_private.h"
 #include "lv_obj_event_private.h"
 #include "../display/lv_display.h"
@@ -529,7 +529,11 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
         lv_area_t layer_area_full;
         lv_area_t obj_draw_size;
         lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full, &obj_draw_size);
-        if(res != LV_RESULT_OK) return;
+        if(res != LV_RESULT_OK) {
+            layer->opa = layer_opa_ori;
+            layer->recolor = layer_recolor;
+            return;
+        }
 
         /*Simple layers can be subdivided into smaller layers*/
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
@@ -879,6 +883,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     layer->_clip_area = *area_p;
     layer->phy_clip_area = *area_p;
     layer->partial_y_offset = y_offset;
+    layer->all_tasks_added = false;
 
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /*In partial mode render this area to the buffer*/
@@ -920,6 +925,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
 
     if(tile_cnt == 1) {
         refr_configured_layer(layer);
+        layer->all_tasks_added = true;
     }
     else {
         /* Don't draw to the layers buffer of the display but create smaller dummy layers which are using the
@@ -947,6 +953,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
             tile_layer->draw_buf = layer->draw_buf;
             refr_configured_layer(tile_layer);
+            tile_layer->all_tasks_added = true;
         }
 
 
@@ -967,9 +974,12 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
                 layer_i = layer_i->next;
             }
 
+            lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, tile_layer);
             if(disp_refr->layer_deinit) disp_refr->layer_deinit(disp_refr, tile_layer);
         }
         lv_free(tile_layers);
+
+        layer->all_tasks_added = true;
     }
 
     disp_refr->refreshed_area = *area_p;

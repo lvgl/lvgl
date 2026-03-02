@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_mask_private.h"
-#include "../lv_draw_mask_private.h"
+#include "../lv_draw_mask.h"
 #include "../lv_draw.h"
 
 #if LV_DRAW_SW_COMPLEX
@@ -548,7 +548,7 @@ static lv_draw_sw_mask_res_t LV_ATTRIBUTE_FAST_MEM line_mask_flat(lv_opa_t * mas
         if(k < 0) {
             return LV_DRAW_SW_MASK_RES_TRANSP;
         }
-        if(k <= len) {
+        if(k < len) {
             lv_memzero(&mask_buf[k], len - k);
         }
     }

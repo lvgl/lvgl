@@ -609,7 +609,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_ARGB8888(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x++, src_x++) {
-                        dest_buf_c32[dest_x].alpha = src_buf_l8[src_x];
+                        dest_buf_c32[dest_x].alpha = 0xff;
                         dest_buf_c32[dest_x].red = src_buf_l8[src_x];
                         dest_buf_c32[dest_x].green = src_buf_l8[src_x];
                         dest_buf_c32[dest_x].blue = src_buf_l8[src_x];

@@ -7,7 +7,7 @@ File System Interfaces
 LVGL's :ref:`file_system` module provides an abstraction that enables you to attach
 any type of file system for LVGL's use.  File systems already supported are:
 
-- `FATFS <http://elm-chan.org/fsw/ff/00index_e.html>`__
+- `FATFS <https://elm-chan.org/fsw/ff/>`__
 - STDIO (Linux and Windows using C standard function .e.g ``fopen``, ``fread``)
 - POSIX (Linux and Windows using POSIX function .e.g ``open``, ``read``)
 - WIN32 (Windows using Win32 API function .e.g ``CreateFileA``, ``ReadFile``)
