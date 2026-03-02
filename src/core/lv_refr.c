@@ -1478,14 +1478,23 @@ static void wait_for_flushing(lv_display_t * disp)
 static void call_sync_cb(lv_display_t * disp, const lv_area_t * area)
 {
     LV_PROFILER_REFR_BEGIN;
+
+    /* Apply display offsets to the sync area for consistency with flush_cb */
+    lv_area_t offset_area = *area;
+    offset_area.x1 += disp->offset_x;
+    offset_area.x2 += disp->offset_x;
+    offset_area.y1 += disp->offset_y;
+    offset_area.y2 += disp->offset_y;
+
     LV_TRACE_REFR("Calling sync_cb on (%d;%d)(%d;%d) area",
-                  (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2);
+                  (int)offset_area.x1, (int)offset_area.y1,
+                  (int)offset_area.x2, (int)offset_area.y2);
 
-    lv_display_send_event(disp, LV_EVENT_SYNC_START, (void *)area);
+    lv_display_send_event(disp, LV_EVENT_SYNC_START, (void *)&offset_area);
 
-    disp->sync_cb(disp, area);
+    disp->sync_cb(disp, &offset_area);
 
-    lv_display_send_event(disp, LV_EVENT_SYNC_FINISH, (void *)area);
+    lv_display_send_event(disp, LV_EVENT_SYNC_FINISH, (void *)&offset_area);
 
     LV_PROFILER_REFR_END;
 }
