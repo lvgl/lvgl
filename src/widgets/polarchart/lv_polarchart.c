@@ -971,7 +971,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.color = ser->color;
         line_dsc.base.drop_shadow_color = ser->color;
 
-        int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        int32_t start_point = chart->update_mode == LV_POLARCHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
         int32_t p_act = start_point;
         int32_t p_prev = start_point;
 
@@ -993,7 +993,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             p_act = (start_point + i) % chart->point_cnt;
 
             lv_value_precise_t p_y;
-            if(ser->y_points[p_act] == LV_CHART_POINT_NONE) {
+            if(ser->y_points[p_act] == LV_POLARCHART_POINT_NONE) {
                 p_y = LV_DRAW_LINE_POINT_NONE;
             }
             else {
@@ -1011,7 +1011,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             }
             /*In crowded mode draw vertical lines from the min/max on the same X coordinate*/
             else {
-                if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
+                if(ser->y_points[p_prev] != LV_POLARCHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
                     /*Draw only one vertical line between the min and max y-values on the same x-value*/
                     y_max = LV_MAX(y_max, p_y);
                     y_min = LV_MIN(y_min, p_y);
@@ -1080,7 +1080,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
     int32_t h     = lv_obj_get_content_height(obj);
     int32_t x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
     int32_t y_ofs = obj->coords.y1 + pad_top - lv_obj_get_scroll_top(obj);
-    lv_chart_series_t * ser;
+    lv_polarchart_series_t * ser;
 
     lv_draw_rect_dsc_t point_dsc_default;
     lv_draw_rect_dsc_init(&point_dsc_default);
