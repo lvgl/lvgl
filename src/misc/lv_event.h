@@ -112,6 +112,10 @@ typedef enum {
     LV_EVENT_FLUSH_FINISH,        /**< Sent after flush callback call has returned. */
     LV_EVENT_FLUSH_WAIT_START,    /**< Sent before flush wait callback is called. */
     LV_EVENT_FLUSH_WAIT_FINISH,   /**< Sent after flush wait callback call has returned. */
+    LV_EVENT_SYNC_START,          /**< Sent before sync callback is called. */
+    LV_EVENT_SYNC_FINISH,         /**< Sent after sync callback call has returned. */
+    LV_EVENT_SYNC_WAIT_START,     /**< Sent before sync wait callback is called. */
+    LV_EVENT_SYNC_WAIT_FINISH,    /**< Sent after sync wait callback call has returned. */
     LV_EVENT_UPDATE_LAYOUT_COMPLETED,    /**< Sent after layout update completes*/
 
     LV_EVENT_VSYNC,
