@@ -48,6 +48,7 @@ static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
                                                       const lv_gstreamer_pipeline_element_t * elements, size_t element_count);
 static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state);
 static bool gstreamer_element_has_property(GstElement * element, const char * property_name);
+static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value);
 
 /**********************
  *  STATIC VARIABLES
@@ -136,7 +137,17 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     }
 
     if(property != NULL && source != NULL) {
-        g_object_set(G_OBJECT(head), property, source, NULL);
+        if(lv_streq(property, "signaller")) {
+            LV_LOG_WARN("webrtcsrc property 'signaller' is construct-only. Use 'signaller::uri' instead");
+        }
+        else if(lv_streq(property, "signaller::uri")) {
+            if(!gstreamer_set_child_proxy_string(head, property, source)) {
+                LV_LOG_WARN("Failed to set '%s' via child proxy", property);
+            }
+        }
+        else {
+            g_object_set(G_OBJECT(head), property, source, NULL);
+        }
     }
 
     /* The uri decode source element will automatically handle parsing and decoding for us
@@ -144,6 +155,9 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     if(!lv_streq(LV_GSTREAMER_FACTORY_URI_DECODE, factory_name)) {
         if(lv_streq(LV_GSTREAMER_FACTORY_WEBRTCSRC, factory_name)) {
             LV_LOG_INFO("Setting up webrtc pipeline");
+
+
+
             if(gstreamer_element_has_property(head, "connect-to-first-producer")) {
                 g_object_set(G_OBJECT(head), "connect-to-first-producer", TRUE, NULL);
             }
@@ -588,6 +602,25 @@ static bool gstreamer_element_has_property(GstElement * element, const char * pr
 
     GObjectClass * klass = G_OBJECT_GET_CLASS(element);
     return g_object_class_find_property(klass, property_name) != NULL;
+}
+
+static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value)
+{
+    if(!element || !property_name || !value) {
+        return false;
+    }
+
+    if(!GST_IS_CHILD_PROXY(element)) {
+        LV_LOG_WARN("Element does not support child proxy for property '%s'", property_name);
+        return false;
+    }
+
+    GValue gvalue = G_VALUE_INIT;
+    g_value_init(&gvalue, G_TYPE_STRING);
+    g_value_set_string(&gvalue, value);
+    gst_child_proxy_set_property(GST_CHILD_PROXY(element), property_name, &gvalue);
+    g_value_unset(&gvalue);
+    return true;
 }
 
 static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer user_data)
