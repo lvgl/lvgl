@@ -47,6 +47,7 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer);
 static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
                                                       const lv_gstreamer_pipeline_element_t * elements, size_t element_count);
 static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state);
+static bool gstreamer_element_has_property(GstElement * element, const char * property_name);
 
 /**********************
  *  STATIC VARIABLES
@@ -141,25 +142,37 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     /* The uri decode source element will automatically handle parsing and decoding for us
      * for other source types, we need to add a parser and a decoder ourselves element*/
     if(!lv_streq(LV_GSTREAMER_FACTORY_URI_DECODE, factory_name)) {
-        GstElement * decodebin = gst_element_factory_make("decodebin", "lv_gstreamer_decodebin");
-        if(!decodebin) {
-            gst_object_unref(pipeline);
-            LV_LOG_ERROR("Failed to create decodebin element");
-            return LV_RESULT_INVALID;
+        if(lv_streq(LV_GSTREAMER_FACTORY_WEBRTCSRC, factory_name)) {
+            LV_LOG_INFO("Setting up webrtc pipeline");
+            if(gstreamer_element_has_property(head, "connect-to-first-producer")) {
+                g_object_set(G_OBJECT(head), "connect-to-first-producer", TRUE, NULL);
+            }
+            else {
+                LV_LOG_WARN("webrtcsrc property 'connect-to-first-producer' is not available in this plugin build");
+            }
         }
-        if(!gst_bin_add(GST_BIN(pipeline), decodebin)) {
-            gst_object_unref(decodebin);
-            gst_object_unref(pipeline);
-            LV_LOG_ERROR("Failed to add decodebin element to pipeline");
-            return LV_RESULT_INVALID;
-        }
+        else
+        {
+            GstElement * decodebin = gst_element_factory_make("decodebin", "lv_gstreamer_decodebin");
+            if(!decodebin) {
+                gst_object_unref(pipeline);
+                LV_LOG_ERROR("Failed to create decodebin element");
+                return LV_RESULT_INVALID;
+            }
+            if(!gst_bin_add(GST_BIN(pipeline), decodebin)) {
+                gst_object_unref(decodebin);
+                gst_object_unref(pipeline);
+                LV_LOG_ERROR("Failed to add decodebin element to pipeline");
+                return LV_RESULT_INVALID;
+            }
 
-        if(!gst_element_link(head, decodebin)) {
-            gst_object_unref(pipeline);
-            LV_LOG_ERROR("Failed to link source with parsebin elements");
-            return LV_RESULT_INVALID;
+            if(!gst_element_link(head, decodebin)) {
+                gst_object_unref(pipeline);
+                LV_LOG_ERROR("Failed to link source with parsebin elements");
+                return LV_RESULT_INVALID;
+            }
+            head = decodebin;
         }
-        head = decodebin;
     }
 
     /* At this point we don't yet know the input format
@@ -412,7 +425,11 @@ static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
                     GError * err;
                     gchar * debug;
                     gst_message_parse_error(msg, &err, &debug);
-                    LV_LOG_ERROR("GStreamer error: %s", err->message);
+                    const gchar * source_name = GST_OBJECT_NAME(msg->src) ? GST_OBJECT_NAME(msg->src) : "unknown";
+                    LV_LOG_ERROR("GStreamer error from %s: %s", source_name, err->message);
+                    if(debug && debug[0] != '\0') {
+                        LV_LOG_ERROR("GStreamer error details: %s", debug);
+                    }
                     g_error_free(err);
                     g_free(debug);
                     break;
@@ -561,6 +578,16 @@ static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
         }
     }
     return LV_RESULT_OK;
+}
+
+static bool gstreamer_element_has_property(GstElement * element, const char * property_name)
+{
+    if(!element || !property_name) {
+        return false;
+    }
+
+    GObjectClass * klass = G_OBJECT_GET_CLASS(element);
+    return g_object_class_find_property(klass, property_name) != NULL;
 }
 
 static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer user_data)
