@@ -312,13 +312,21 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
 
     /*Align to middle*/
     if(align == LV_TEXT_ALIGN_CENTER) {
-        line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
+        uint32_t trimmed_len = line_end - line_start;
+        while(trimmed_len > 0 && dsc->text[line_start + trimmed_len - 1] == ' ') {
+            trimmed_len--;
+        }
+        line_width = lv_text_get_width(&dsc->text[line_start], trimmed_len, font, &attributes);
         pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
+        uint32_t trimmed_len = line_end - line_start;
+        while(trimmed_len > 0 && dsc->text[line_start + trimmed_len - 1] == ' ') {
+            trimmed_len--;
+        }
+        line_width = lv_text_get_width(&dsc->text[line_start], trimmed_len, font, &attributes);
         pos.x += lv_area_get_width(coords) - line_width;
     }
 
@@ -553,15 +561,23 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         pos.x = coords->x1;
         /*Align to middle*/
         if(align == LV_TEXT_ALIGN_CENTER) {
+            uint32_t trimmed_len = line_end - line_start;
+            while(trimmed_len > 0 && dsc->text[line_start + trimmed_len - 1] == ' ') {
+                trimmed_len--;
+            }
             line_width =
-                lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
+                lv_text_get_width(&dsc->text[line_start], trimmed_len, font, &text_attributes);
 
             pos.x += (lv_area_get_width(coords) - line_width) / 2;
         }
         /*Align to the right*/
         else if(align == LV_TEXT_ALIGN_RIGHT) {
+            uint32_t trimmed_len = line_end - line_start;
+            while(trimmed_len > 0 && dsc->text[line_start + trimmed_len - 1] == ' ') {
+                trimmed_len--;
+            }
             line_width =
-                lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
+                lv_text_get_width(&dsc->text[line_start], trimmed_len, font, &text_attributes);
             pos.x += lv_area_get_width(coords) - line_width;
         }
 
