@@ -595,13 +595,40 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
     LV_UNUSED(element);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
     GstCaps * caps = gst_pad_get_current_caps(pad);
+    if(!caps) {
+        caps = gst_pad_query_caps(pad, NULL);
+    }
+    if(!caps || gst_caps_is_empty(caps)) {
+        LV_LOG_WARN("Discovered a pad without caps. Ignoring it for now");
+        goto exit;
+    }
 
     GstStructure * structure = gst_caps_get_structure(caps, 0);
+    if(!structure) {
+        LV_LOG_WARN("Discovered a pad with invalid caps structure");
+        goto exit;
+    }
+
     const gchar * name = gst_structure_get_name(structure);
+    if(!name) {
+        LV_LOG_WARN("Discovered a pad with unnamed caps structure");
+        goto exit;
+    }
+
+    bool is_video = g_str_has_prefix(name, "video/");
+    bool is_audio = g_str_has_prefix(name, "audio/");
+
+    if(lv_streq(name, "application/x-rtp")) {
+        const gchar * media = gst_structure_get_string(structure, "media");
+        if(media) {
+            is_video = lv_streq(media, "video");
+            is_audio = lv_streq(media, "audio");
+        }
+    }
 
     LV_LOG_TRACE("Pad discovered %s", name);
 
-    if(g_str_has_prefix(name, "video/")) {
+    if(is_video) {
         if(!streamer->video_convert) {
             GstElement * video_app_sink;
             GstElement * video_rate;
@@ -648,7 +675,7 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
         }
         gst_object_unref(video_convert_sink_pad);
     }
-    else if(g_str_has_prefix(name, "audio/")) {
+    else if(is_audio) {
         if(!streamer->audio_convert) {
             GstElement * audio_resample;
             GstElement * audio_sink;
@@ -682,9 +709,14 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
         }
         gst_object_unref(audio_convert_sink_pad);
     }
+    else {
+        LV_LOG_WARN("Ignoring unsupported discovered pad caps '%s'", name);
+    }
 
 exit:
-    gst_caps_unref(caps);
+    if(caps) {
+        gst_caps_unref(caps);
+    }
 }
 
 static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
