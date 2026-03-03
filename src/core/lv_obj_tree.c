@@ -163,9 +163,11 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
         return;
     }
 
-    lv_obj_invalidate(obj);
+    if(!lv_obj_allocate_spec_attr(parent)) {
+        return;
+    }
 
-    lv_obj_allocate_spec_attr(parent);
+    lv_obj_invalidate(obj);
 
     lv_obj_t * old_parent = obj->parent;
     /*Remove the object from the old parent's child list*/
@@ -426,7 +428,9 @@ void lv_obj_set_name(lv_obj_t * obj, const char * name)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_allocate_spec_attr(obj);
+    if(!lv_obj_allocate_spec_attr(obj)) {
+        return;
+    }
 
     if(!obj->spec_attr->name_static && obj->spec_attr->name) lv_free((void *)obj->spec_attr->name);
 
@@ -444,8 +448,9 @@ void lv_obj_set_name_static(lv_obj_t * obj, const char * name)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_allocate_spec_attr(obj);
-
+    if(!lv_obj_allocate_spec_attr(obj)) {
+        return;
+    }
     if(!obj->spec_attr->name_static && obj->spec_attr->name) lv_free((void *)obj->spec_attr->name);
 
     obj->spec_attr->name = name;

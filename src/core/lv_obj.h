@@ -314,12 +314,6 @@ void * lv_obj_get_user_data(lv_obj_t * obj);
  *======================*/
 
 /**
- * Allocate special data for an object if not allocated yet.
- * @param obj   pointer to an object
- */
-void lv_obj_allocate_spec_attr(lv_obj_t * obj);
-
-/**
  * Check the type of obj.
  * @param obj       pointer to an object
  * @param class_p   a class to check (e.g. `lv_slider_class`)

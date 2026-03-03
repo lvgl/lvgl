@@ -637,7 +637,9 @@ void lv_obj_update_layer_type(lv_obj_t * obj)
     lv_layer_type_t layer_type = calculate_layer_type(obj);
     if(obj->spec_attr) obj->spec_attr->layer_type = layer_type;
     else if(layer_type != LV_LAYER_TYPE_NONE) {
-        lv_obj_allocate_spec_attr(obj);
+        if(!lv_obj_allocate_spec_attr(obj)) {
+            return;
+        }
         obj->spec_attr->layer_type = layer_type;
     }
 }

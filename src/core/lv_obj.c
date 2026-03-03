@@ -411,18 +411,26 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj)
  * OTHER FUNCTIONS
  *------------------*/
 
-void lv_obj_allocate_spec_attr(lv_obj_t * obj)
+lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    if(obj->spec_attr == NULL) {
-        obj->spec_attr = lv_malloc_zeroed(sizeof(lv_obj_spec_attr_t));
-        LV_ASSERT_MALLOC(obj->spec_attr);
-        if(obj->spec_attr == NULL) return;
-
-        obj->spec_attr->scroll_dir = LV_DIR_ALL;
-        obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
+    LV_ASSERT_NULL(obj);
+    if(!obj->spec_attr) {
+        obj->spec_attr = lv_obj_spec_attr_create();
     }
+    return obj->spec_attr;
+}
+
+lv_obj_spec_attr_t * lv_obj_spec_attr_create(void)
+{
+    lv_obj_spec_attr_t * spec_attr = lv_malloc_zeroed(sizeof(lv_obj_spec_attr_t));
+    LV_ASSERT_MALLOC(spec_attr);
+    if(!spec_attr) {
+        return NULL;
+    }
+
+    spec_attr->scroll_dir = LV_DIR_ALL;
+    spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
+    return spec_attr;
 }
 
 bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
