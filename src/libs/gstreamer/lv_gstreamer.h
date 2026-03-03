@@ -63,7 +63,7 @@ extern "C" {
 #define LV_GSTREAMER_PROPERTY_APP             NULL
 
 #define LV_GSTREAMER_FACTORY_WEBRTCSRC       "webrtcsrc"
-#define LV_GSTREAMER_PROPERTY_WEBRTCSRC      "signalling-server"
+#define LV_GSTREAMER_PROPERTY_WEBRTCSRC       NULL
 
 /**********************
  *      TYPEDEFS
