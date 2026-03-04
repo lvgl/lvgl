@@ -63,6 +63,7 @@ typedef struct {
 
 typedef struct {
     struct wl_keyboard * wl_keyboard;
+    struct xkb_context * xkb_context;
     struct xkb_keymap * xkb_keymap;
     struct xkb_state * xkb_state;
 
