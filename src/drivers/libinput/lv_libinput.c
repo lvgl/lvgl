@@ -66,6 +66,7 @@ static int _open_restricted(const char * path, int flags, void * user_data);
 static void _close_restricted(int fd, void * user_data);
 
 static void _delete(lv_libinput_t * dsc);
+static void _indev_delete(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -177,6 +178,7 @@ lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_pat
     lv_indev_set_type(indev, indev_type);
     lv_indev_set_read_cb(indev, _read);
     lv_indev_set_driver_data(indev, dsc);
+    lv_indev_add_event_cb(indev, _indev_delete, LV_EVENT_DELETE, NULL);
 
     /* Set up thread & lock */
     pthread_mutex_init(&dsc->event_lock, NULL);
@@ -187,7 +189,6 @@ lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_pat
 
 void lv_libinput_delete(lv_indev_t * indev)
 {
-    _delete(lv_indev_get_driver_data(indev));
     lv_indev_delete(indev);
 }
 
@@ -672,6 +673,14 @@ static void _delete(lv_libinput_t * dsc)
 #endif /* LV_LIBINPUT_XKB */
 
     lv_free(dsc);
+}
+
+static void _indev_delete(lv_event_t * e)
+{
+    lv_indev_t * indev = lv_event_get_target(e);
+    lv_libinput_t * dsc = lv_indev_get_driver_data(indev);
+    LV_ASSERT_NULL(dsc);
+    _delete(dsc);
 }
 
 #endif /* LV_USE_LIBINPUT */
