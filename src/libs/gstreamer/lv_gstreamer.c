@@ -137,10 +137,8 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     }
 
     if(property != NULL && source != NULL) {
-        if(lv_streq(property, "signaller")) {
-            LV_LOG_WARN("webrtcsrc property 'signaller' is construct-only. Use 'signaller::uri' instead");
-        }
-        else if(lv_streq(property, "signaller::uri")) {
+        /* the signaller::uri is a object of type GstRSWebRTCSignallableIface*/
+        if(lv_streq(property, "signaller::uri")) {
             if(!gstreamer_set_child_proxy_string(head, property, source)) {
                 LV_LOG_WARN("Failed to set '%s' via child proxy", property);
             }
@@ -155,9 +153,6 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     if(!lv_streq(LV_GSTREAMER_FACTORY_URI_DECODE, factory_name)) {
         if(lv_streq(LV_GSTREAMER_FACTORY_WEBRTCSRC, factory_name)) {
             LV_LOG_INFO("Setting up webrtc pipeline");
-
-
-
             if(gstreamer_element_has_property(head, "connect-to-first-producer")) {
                 g_object_set(G_OBJECT(head), "connect-to-first-producer", TRUE, NULL);
             }
@@ -637,115 +632,90 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
     }
 
     GstStructure * structure = gst_caps_get_structure(caps, 0);
-    if(!structure) {
-        LV_LOG_WARN("Discovered a pad with invalid caps structure");
-        goto exit;
-    }
 
     const gchar * name = gst_structure_get_name(structure);
-    if(!name) {
-        LV_LOG_WARN("Discovered a pad with unnamed caps structure");
-        goto exit;
-    }
 
-    bool is_video = g_str_has_prefix(name, "video/");
-    bool is_audio = g_str_has_prefix(name, "audio/");
-
-    if(lv_streq(name, "application/x-rtp")) {
-        const gchar * media = gst_structure_get_string(structure, "media");
-        if(media) {
-            is_video = lv_streq(media, "video");
-            is_audio = lv_streq(media, "audio");
-        }
-    }
 
     LV_LOG_TRACE("Pad discovered %s", name);
 
-    if(is_video) {
-        if(!streamer->video_convert) {
-            GstElement * video_app_sink;
-            GstElement * video_rate;
-            GstElement * video_queue;
-            const lv_gstreamer_pipeline_element_t elements[] = {
-                {"videoconvert",  "lv_gstreamer_video_convert",  &streamer->video_convert},
-                {"videorate",     "lv_gstreamer_video_rate",     &video_rate},
-                {"queue",         "lv_gstreamer_video_queue",    &video_queue},
-                {"appsink",       "lv_gstreamer_video_sink",     &video_app_sink},
-            };
-            const size_t element_count = sizeof(elements) / sizeof(elements[0]);
-            if(gstreamer_make_and_add_to_pipeline(streamer, elements, element_count) != LV_RESULT_OK) {
-                goto exit;
-            }
-
-            /* Here we set the fps we want the pipeline to produce and the color format
-             * This is achieved by the video_convert and video_rate elements that will automatically throttle and
-             * convert the image to the format we desire*/
-            uint32_t target_fps = 1000 / LV_DEF_REFR_PERIOD;
-            char caps_str[128];
-            lv_snprintf(caps_str, sizeof(caps_str), "video/x-raw,format=%s,framerate=%" LV_PRIu32 "/1", GST_FORMAT, target_fps);
-
-            GstCaps * appsink_caps = gst_caps_from_string(caps_str);
-            g_object_set(G_OBJECT(video_app_sink), "emit-signals", TRUE, "sync", TRUE, "max-buffers", 1, "drop", TRUE, "caps",
-                         appsink_caps, NULL);
-            gst_caps_unref(appsink_caps);
-
-            if(!gst_element_link_many(streamer->video_convert, video_rate, video_queue, video_app_sink, NULL)) {
-                LV_LOG_ERROR("Failed to link video convert to sink");
-                goto exit;
-            }
-            for(size_t i = 0; i < element_count; ++i) {
-                gst_element_sync_state_with_parent(*elements[i].store);
-            }
-            g_signal_connect(video_app_sink, "new-sample", G_CALLBACK(on_new_sample), streamer);
+    if(!streamer->video_convert) {
+        GstElement * video_app_sink;
+        GstElement * video_rate;
+        GstElement * video_queue;
+        const lv_gstreamer_pipeline_element_t elements[] = {
+            {"videoconvert",  "lv_gstreamer_video_convert",  &streamer->video_convert},
+            {"videorate",     "lv_gstreamer_video_rate",     &video_rate},
+            {"queue",         "lv_gstreamer_video_queue",    &video_queue},
+            {"appsink",       "lv_gstreamer_video_sink",     &video_app_sink},
+        };
+        const size_t element_count = sizeof(elements) / sizeof(elements[0]);
+        if(gstreamer_make_and_add_to_pipeline(streamer, elements, element_count) != LV_RESULT_OK) {
+            goto exit;
         }
 
-        GstPad * video_convert_sink_pad = gst_element_get_static_pad(streamer->video_convert, "sink");
-        if(gst_pad_is_linked(video_convert_sink_pad)) {
-            LV_LOG_WARN("Received another video pad '%s' but our video pipeline is already linked - Ignoring", name);
+        /* Here we set the fps we want the pipeline to produce and the color format
+            * This is achieved by the video_convert and video_rate elements that will automatically throttle and
+            * convert the image to the format we desire*/
+        uint32_t target_fps = 1000 / LV_DEF_REFR_PERIOD;
+        char caps_str[128];
+        lv_snprintf(caps_str, sizeof(caps_str), "video/x-raw,format=%s,framerate=%" LV_PRIu32 "/1", GST_FORMAT, target_fps);
+
+        GstCaps * appsink_caps = gst_caps_from_string(caps_str);
+        g_object_set(G_OBJECT(video_app_sink), "emit-signals", TRUE, "sync", TRUE, "max-buffers", 1, "drop", TRUE, "caps",
+                        appsink_caps, NULL);
+        gst_caps_unref(appsink_caps);
+
+        if(!gst_element_link_many(streamer->video_convert, video_rate, video_queue, video_app_sink, NULL)) {
+            LV_LOG_ERROR("Failed to link video convert to sink");
+            goto exit;
         }
-        else if(gst_pad_link(pad, video_convert_sink_pad) != GST_PAD_LINK_OK) {
-            LV_LOG_ERROR("Failed to link discovered pad '%s' to videoconvert", name);
+        for(size_t i = 0; i < element_count; ++i) {
+            gst_element_sync_state_with_parent(*elements[i].store);
         }
-        gst_object_unref(video_convert_sink_pad);
+        g_signal_connect(video_app_sink, "new-sample", G_CALLBACK(on_new_sample), streamer);
     }
-    else if(is_audio) {
-        if(!streamer->audio_convert) {
-            GstElement * audio_resample;
-            GstElement * audio_sink;
-            const lv_gstreamer_pipeline_element_t elements[] = {
-                {"audioconvert",  "lv_gstreamer_audio_convert",  &streamer->audio_convert},
-                {"volume",        "lv_gstreamer_audio_volume",   &streamer->audio_volume},
-                {"audioresample", "lv_gstreamer_audio_resample", &audio_resample},
-                {"autoaudiosink", "lv_gstreamer_audio_sink",     &audio_sink},
-            };
-            const size_t element_count = sizeof(elements) / sizeof(elements[0]);
-            if(gstreamer_make_and_add_to_pipeline(streamer, elements, element_count) != LV_RESULT_OK) {
-                goto exit;
-            }
-            if(!gst_element_link_many(streamer->audio_convert, audio_resample, streamer->audio_volume, audio_sink, NULL)) {
-                LV_LOG_ERROR("Failed to link audio convert to sink");
-                goto exit;
-            }
-            for(size_t i = 0; i < element_count; ++i) {
-                gst_element_sync_state_with_parent(*elements[i].store);
-            }
-        }
 
-        GstPad * audio_convert_sink_pad = gst_element_get_static_pad(streamer->audio_convert, "sink");
-        if(!gst_pad_is_linked(audio_convert_sink_pad)) {
-            if(gst_pad_link(pad, audio_convert_sink_pad) != GST_PAD_LINK_OK) {
-                LV_LOG_ERROR("Failed to link discovered pad '%s' to audioconvert", name);
-            }
+    GstPad * video_convert_sink_pad = gst_element_get_static_pad(streamer->video_convert, "sink");
+    if(gst_pad_is_linked(video_convert_sink_pad)) {
+        LV_LOG_WARN("Received another video pad '%s' but our video pipeline is already linked - Ignoring", name);
+    }
+    else if(gst_pad_link(pad, video_convert_sink_pad) != GST_PAD_LINK_OK) {
+        LV_LOG_ERROR("Failed to link discovered pad '%s' to videoconvert", name);
+    }
+    gst_object_unref(video_convert_sink_pad);
+    if(!streamer->audio_convert) {
+        GstElement * audio_resample;
+        GstElement * audio_sink;
+        const lv_gstreamer_pipeline_element_t elements[] = {
+            {"audioconvert",  "lv_gstreamer_audio_convert",  &streamer->audio_convert},
+            {"volume",        "lv_gstreamer_audio_volume",   &streamer->audio_volume},
+            {"audioresample", "lv_gstreamer_audio_resample", &audio_resample},
+            {"autoaudiosink", "lv_gstreamer_audio_sink",     &audio_sink},
+        };
+        const size_t element_count = sizeof(elements) / sizeof(elements[0]);
+        if(gstreamer_make_and_add_to_pipeline(streamer, elements, element_count) != LV_RESULT_OK) {
+            goto exit;
         }
-        else {
-            LV_LOG_WARN("Received another audio pad  '%s' but our audio pipeline is already linked - Ignoring", name);
+        if(!gst_element_link_many(streamer->audio_convert, audio_resample, streamer->audio_volume, audio_sink, NULL)) {
+            LV_LOG_ERROR("Failed to link audio convert to sink");
+            goto exit;
         }
-        gst_object_unref(audio_convert_sink_pad);
+        for(size_t i = 0; i < element_count; ++i) {
+            gst_element_sync_state_with_parent(*elements[i].store);
+        }
+    }
+
+    GstPad * audio_convert_sink_pad = gst_element_get_static_pad(streamer->audio_convert, "sink");
+    if(!gst_pad_is_linked(audio_convert_sink_pad)) {
+        if(gst_pad_link(pad, audio_convert_sink_pad) != GST_PAD_LINK_OK) {
+            LV_LOG_ERROR("Failed to link discovered pad '%s' to audioconvert", name);
+        }
     }
     else {
-        LV_LOG_WARN("Ignoring unsupported discovered pad caps '%s'", name);
+        LV_LOG_WARN("Received another audio pad  '%s' but our audio pipeline is already linked - Ignoring", name);
     }
-
+    gst_object_unref(audio_convert_sink_pad);
+     
 exit:
     if(caps) {
         gst_caps_unref(caps);
