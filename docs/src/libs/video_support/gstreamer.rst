@@ -352,6 +352,7 @@ WebRTC is using the Rust plugin "https://gitlab.freedesktop.org/gstreamer/gst-pl
 So to be able to stream to an LVGL plauer application you will need to run a signaller server and then a simpler pipeline like so:
 
 .. code-block:: bash
+
     ./gst-webrtc-signalling-server &
     gst-launch-1.0 videotestsrc pattern=ball ! webrtcsink
 
