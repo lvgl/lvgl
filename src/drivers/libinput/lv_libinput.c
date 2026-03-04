@@ -132,6 +132,11 @@ size_t lv_libinput_find_devs(lv_libinput_capability capabilities, char ** found,
     return num_found;
 }
 
+void lv_libinput_find_clear(void)
+{
+    _reset_scanned_devices();
+}
+
 lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_path)
 {
     lv_libinput_t * dsc = lv_malloc_zeroed(sizeof(lv_libinput_t));
