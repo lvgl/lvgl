@@ -75,6 +75,15 @@ char * lv_libinput_find_dev(lv_libinput_capability capabilities, bool force_resc
 size_t lv_libinput_find_devs(lv_libinput_capability capabilities, char ** found, size_t count, bool force_rescan);
 
 /**
+ * Clear the device cache.
+ *
+ * This frees the cached device path strings, so any pointers previously
+ * returned by lv_libinput_find_dev() or lv_libinput_find_devs() become
+ * invalid after this call.
+ */
+void lv_libinput_find_clear(void);
+
+/**
  * Create a new libinput input device
  * @param type LV_INDEV_TYPE_POINTER or LV_INDEV_TYPE_KEYPAD
  * @param dev_path device path, e.g. /dev/input/event0
