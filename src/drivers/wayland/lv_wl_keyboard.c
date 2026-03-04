@@ -126,6 +126,9 @@ lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat
 void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard)
 {
     lv_wayland_update_indevs(keyboard_read, NULL);
+    wl_keyboard_release(seat_keyboard->wl_keyboard);
+    xkb_keymap_unref(seat_keyboard->xkb_keymap);
+    xkb_state_unref(seat_keyboard->xkb_state);
     lv_free(seat_keyboard);
 }
 
