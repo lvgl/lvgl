@@ -257,6 +257,15 @@ The GStreamer widget supports various media sources through different factories:
                          "/path/to/video.mp4");
 
 
+** WebRTC Factory:**
+
+.. code-block:: c
+
+    /* WebRTC stream */
+    lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_WEBRTC,
+                         LV_GSTREAMER_PROPERTY_WEBRTC_SIGNAL_SERVER_URI,
+                         "ws://signalserver:port/");
+
 Playback Control
 ----------------
 
@@ -336,6 +345,17 @@ Example
 .. include:: /examples/libs/gstreamer/index.rst
 
 .. _gstreamer_api:
+
+WebRTC Notes
+************
+WebRTC is using the Rust plugin "https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs"
+So to be able to stream to an LVGL plauer application you will need to run a signaller server and then a simpler pipeline like so:
+
+.. code-block:: bash
+    ./gst-webrtc-signalling-server &
+    gst-launch-1.0 videotestsrc pattern=ball ! webrtcsink
+
+Then you can connect to the stream using the URI scheme "webrtc://localhost:8443/" 
 
 API
 ***
