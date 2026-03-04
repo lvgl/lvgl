@@ -181,8 +181,20 @@ lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_pat
     lv_indev_add_event_cb(indev, _indev_delete, LV_EVENT_DELETE, NULL);
 
     /* Set up thread & lock */
-    pthread_mutex_init(&dsc->event_lock, NULL);
-    pthread_create(&dsc->worker_thread, NULL, _poll_thread, dsc);
+    if(pthread_mutex_init(&dsc->event_lock, NULL) != 0) {
+        LV_LOG_ERROR("pthread_mutex_init failed");
+        lv_indev_delete(indev);
+        return NULL;
+    }
+
+    if(pthread_create(&dsc->worker_thread, NULL, _poll_thread, dsc) != 0) {
+        LV_LOG_ERROR("pthread_create failed");
+        pthread_mutex_destroy(&dsc->event_lock);
+        lv_indev_delete(indev);
+        return NULL;
+    }
+
+    dsc->running = 1;
 
     return indev;
 }
@@ -312,17 +324,13 @@ static void * _poll_thread(void * data)
 
     LV_LOG_INFO("libinput: poll worker started");
 
-    while(true) {
+    while(!dsc->deinit) {
         rc = poll(dsc->fds, nfds, timeout);
         switch(rc) {
             case -1:
                 perror(NULL);
                 __attribute__((fallthrough));
             case 0:
-                if(dsc->deinit) {
-                    dsc->deinit = false; /* Signal that we're done */
-                    return NULL;
-                }
                 continue;
             default:
                 break;
@@ -337,6 +345,8 @@ static void * _poll_thread(void * data)
         pthread_mutex_unlock(&dsc->event_lock);
         LV_LOG_INFO("libinput: event read");
     }
+
+    dsc->deinit = false; /* Signal that we're done */
 
     return NULL;
 }
@@ -642,19 +652,23 @@ static void _close_restricted(int fd, void * user_data)
 
 static void _delete(lv_libinput_t * dsc)
 {
-    if(dsc->fd)
+    if(dsc->running) {
         dsc->deinit = true;
 
-    /* Give worker thread a whole second to quit */
-    for(int i = 0; i < 100; i++) {
-        if(!dsc->deinit)
-            break;
-        usleep(10000);
-    }
+        /* Give worker thread a whole second to quit */
+        for(int i = 0; i < 100; i++) {
+            if(!dsc->deinit)
+                break;
+            usleep(10000);
+        }
 
-    if(dsc->deinit) {
-        LV_LOG_ERROR("libinput worker thread did not quit in time, cancelling it");
-        pthread_cancel(dsc->worker_thread);
+        if(dsc->deinit) {
+            LV_LOG_ERROR("libinput worker thread did not quit in time, cancelling it");
+            pthread_cancel(dsc->worker_thread);
+        }
+
+        pthread_join(dsc->worker_thread, NULL);
+        pthread_mutex_destroy(&dsc->event_lock);
     }
 
     if(dsc->libinput_device) {
