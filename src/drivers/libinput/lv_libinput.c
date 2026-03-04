@@ -656,6 +656,8 @@ static void _delete(lv_libinput_t * dsc)
         pthread_cancel(dsc->worker_thread);
     }
 
+    pthread_join(dsc->worker_thread, NULL);
+
     if(dsc->libinput_device) {
         libinput_path_remove_device(dsc->libinput_device);
         libinput_device_unref(dsc->libinput_device);
