@@ -180,6 +180,18 @@ void lv_wayland_deinit(void)
         lv_wl_ctx.wl_registry = NULL;
     }
 
+    if(lv_wl_ctx.wl_shm) {
+        wl_shm_destroy(lv_wl_ctx.wl_shm);
+        lv_wl_ctx.wl_shm = NULL;
+    }
+
+    for(uint8_t i = 0; i < lv_wl_ctx.wl_output_count; ++i) {
+        if(lv_wl_ctx.physical_outputs[i].wl_output) {
+            wl_output_destroy(lv_wl_ctx.physical_outputs[i].wl_output);
+            lv_wl_ctx.physical_outputs[i].wl_output = NULL;
+        }
+    }
+
     if(lv_wl_ctx.wl_compositor) {
         wl_compositor_destroy(lv_wl_ctx.wl_compositor);
         lv_wl_ctx.wl_compositor = NULL;
