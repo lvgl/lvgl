@@ -267,7 +267,7 @@ array so provided contains at least ``point_num`` elements.
 Handling large numbers of points
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-????
+To be defined.
 
 Vertical range
 --------------
