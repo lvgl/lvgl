@@ -18,6 +18,7 @@ extern "C" {
 #if LV_USE_GSTREAMER
 #include "../../core/lv_obj.h"
 
+
 /*********************
  *      DEFINES
  *********************/
@@ -186,6 +187,7 @@ void lv_gstreamer_set_rate(lv_obj_t * gstreamer, uint32_t rate);
  * @return the stream state or -1 if `e` is invalid (i.e. NULL or does not match expected event)
  */
 lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e);
+
 
 /**********************
  *      MACROS

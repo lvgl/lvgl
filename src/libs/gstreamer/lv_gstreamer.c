@@ -151,6 +151,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     /* The uri decode source element will automatically handle parsing and decoding for us
      * for other source types, we need to add a parser and a decoder ourselves element*/
     if(!lv_streq(LV_GSTREAMER_FACTORY_URI_DECODE, factory_name)) {
+        /* webrtcsrc plugins require its own handling to be able to connect on the first available video stream */
         if(lv_streq(LV_GSTREAMER_FACTORY_WEBRTCSRC, factory_name)) {
             LV_LOG_INFO("Setting up webrtc pipeline");
             if(gstreamer_element_has_property(head, "connect-to-first-producer")) {
@@ -160,8 +161,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
                 LV_LOG_WARN("webrtcsrc property 'connect-to-first-producer' is not available in this plugin build");
             }
         }
-        else
-        {
+        else {
             GstElement * decodebin = gst_element_factory_make("decodebin", "lv_gstreamer_decodebin");
             if(!decodebin) {
                 gst_object_unref(pipeline);
