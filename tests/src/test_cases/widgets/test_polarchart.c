@@ -238,8 +238,10 @@ void test_chart_curve(void)
     lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_CURVE);
     lv_polarchart_set_point_count(polarchart, 15);
 
-    lv_polarchart_series_t * ser1 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_GREEN), LV_POLARCHART_AXIS_RADIAL);
-    lv_polarchart_series_t * ser2 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), LV_POLARCHART_AXIS_RADIAL);
+    lv_polarchart_series_t * ser1 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_GREEN),
+                                                             LV_POLARCHART_AXIS_RADIAL);
+    lv_polarchart_series_t * ser2 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED),
+                                                             LV_POLARCHART_AXIS_RADIAL);
 
     lv_polarchart_set_next_value(polarchart, ser1, 10);
     lv_polarchart_set_next_value(polarchart, ser1, 20);
@@ -298,7 +300,8 @@ void test_polarchart_properties(void)
     prop.id = LV_PROPERTY_POLARCHART_UPDATE_MODE;
     prop.num = LV_POLARCHART_UPDATE_MODE_CIRCULAR;
     TEST_ASSERT_TRUE(lv_obj_set_property(polarchart, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(LV_POLARCHART_UPDATE_MODE_CIRCULAR, lv_obj_get_property(polarchart, LV_PROPERTY_POLARCHART_UPDATE_MODE).num);
+    TEST_ASSERT_EQUAL_INT(LV_POLARCHART_UPDATE_MODE_CIRCULAR, lv_obj_get_property(polarchart,
+                                                                                  LV_PROPERTY_POLARCHART_UPDATE_MODE).num);
 
     /* Test RADIAL_DIV_LINE_COUNT property */
     prop.id = LV_PROPERTY_POLARCHART_RADIAL_DIV_LINE_COUNT;

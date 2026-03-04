@@ -175,8 +175,7 @@ void lv_polarchart_set_axis_min_value(lv_obj_t * obj, lv_polarchart_axis_t axis,
             chart->radial_min = min;
             break;
         case LV_POLARCHART_AXIS_ANGLE:
-        	return;
-        	break;
+            return;
         default:
             LV_LOG_WARN("Invalid axis: %d", axis);
             return;
@@ -196,8 +195,7 @@ void lv_polarchart_set_axis_max_value(lv_obj_t * obj, lv_polarchart_axis_t axis,
             chart->radial_max = max;
             break;
         case LV_POLARCHART_AXIS_ANGLE:
-        	return;
-        	break;
+            return;
         default:
             LV_LOG_WARN("Invalid axis: %d", axis);
             return;
