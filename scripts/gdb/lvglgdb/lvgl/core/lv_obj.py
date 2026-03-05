@@ -60,6 +60,16 @@ class LVObject(Value):
         return self.spec_attr.child_cnt if self.spec_attr else 0
 
     @property
+    def event_list(self):
+        """Get event list from obj->spec_attr->event_list."""
+        from ..misc.lv_event import LVEventList
+
+        spec = self.spec_attr
+        if not spec or not int(spec):
+            return None
+        return LVEventList(spec.event_list)
+
+    @property
     def children(self):
         if not self.spec_attr:
             return

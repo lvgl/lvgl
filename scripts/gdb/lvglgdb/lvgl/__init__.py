@@ -30,6 +30,11 @@ from .misc import (
     LVImageHeaderCache,
     create_cache_iterator,
     LVArray,
+    LVEvent,
+    LVEventDsc,
+    LVEventList,
+    event_code_name,
+    EVENT_CODE_NAMES,
 )
 
 __all__ = [
@@ -66,4 +71,9 @@ __all__ = [
     "LVImageHeaderCache",
     "create_cache_iterator",
     "LVArray",
+    "LVEvent",
+    "LVEventDsc",
+    "LVEventList",
+    "event_code_name",
+    "EVENT_CODE_NAMES",
 ]
