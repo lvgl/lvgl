@@ -43,8 +43,7 @@ lv_display_t * lv_opengles_pbuffer_create(int32_t width, int32_t height);
 /**
  * Read the current framebuffer into a buffer
  * @param display The display to read from
- * @param buffer The buffer to store pixels (must be allocated by caller)
- * @param buffer_size Size of the buffer in bytes
+ * @param draw_buf The draw buffer to store pixels into
  * @return LV_RESULT_OK on success, LV_RESULT_INVALID on error
  */
 lv_result_t lv_opengles_pbuffer_read_to_draw_buf(lv_display_t * display, lv_draw_buf_t * draw_buf);
