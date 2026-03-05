@@ -73,6 +73,12 @@ class LVGL:
         for timer in LVList(self.lv_global.timer_state.timer_ll, "lv_timer_t"):
             yield LVTimer(timer)
 
+    def indevs(self):
+        from .lv_indev import LVIndev
+
+        for indev in LVList(self.lv_global.indev_ll, "lv_indev_t"):
+            yield LVIndev(indev)
+
     def image_decoders(self):
         from ..misc.lv_image_decoder import LVImageDecoder
 

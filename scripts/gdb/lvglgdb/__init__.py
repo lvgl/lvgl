@@ -38,6 +38,8 @@ from .lvgl import (
     LVTimer,
     LVImageDecoder,
     LVFsDrv,
+    LVIndev,
+    INDEV_TYPE_NAMES,
 )
 from . import cmds as cmds
 
@@ -79,4 +81,6 @@ __all__ = [
     "LVTimer",
     "LVImageDecoder",
     "LVFsDrv",
+    "LVIndev",
+    "INDEV_TYPE_NAMES",
 ]

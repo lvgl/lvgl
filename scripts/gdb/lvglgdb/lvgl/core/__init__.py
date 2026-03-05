@@ -1,5 +1,6 @@
 from .lv_obj import LVObject, ObjStyle, dump_obj_info, dump_obj_styles
 from .lv_global import curr_inst
+from .lv_indev import LVIndev, INDEV_TYPE_NAMES
 
 __all__ = [
     "LVObject",
@@ -7,4 +8,6 @@ __all__ = [
     "curr_inst",
     "dump_obj_info",
     "dump_obj_styles",
+    "LVIndev",
+    "INDEV_TYPE_NAMES",
 ]
