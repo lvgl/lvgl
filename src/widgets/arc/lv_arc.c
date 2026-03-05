@@ -663,8 +663,18 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         delta_angle = angle - last_angle_rel;
 
         uint32_t delta_tick = lv_tick_elaps(arc->last_tick);
+        if(delta_tick < 5) delta_tick = 5;  /*Ensure minimum time step to prevent getting stuck*/
+
+        /* Scale change rate based on value range - smaller ranges need faster angular response */
+        lv_value_precise_t value_range = arc->max_value - arc->min_value;
+        lv_value_precise_t effective_chg_rate = arc->chg_rate;
+        if(value_range > 0 && value_range < 50) {
+            /*Boost change rate for small value ranges to maintain responsiveness*/
+            effective_chg_rate = (arc->chg_rate * 50) / value_range;
+        }
+
         /* delta_angle_max can never be signed. delta_tick is always signed, same for ch_rate */
-        const lv_value_precise_t delta_angle_max = (arc->chg_rate * delta_tick) / 1000;
+        const lv_value_precise_t delta_angle_max = (effective_chg_rate * delta_tick) / 1000;
 
         if(delta_angle > delta_angle_max) {
             delta_angle = delta_angle_max;
@@ -676,9 +686,10 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         angle = last_angle_rel + delta_angle; /*Apply the limited angle change*/
 
-        /*Rounding for symmetry*/
+        /*Rounding for symmetry - cap to prevent excessive offset for small value ranges*/
         lv_value_precise_t round = ((bg_end - arc->bg_angle_start) * 8) / (arc->max_value - arc->min_value);
         round = (round + 4) / 16;
+        if(round > 4) round = 4;  /*Limit rounding to max 4 degrees*/
         angle += round;
 
         angle += arc->bg_angle_start;  /*Make the angle absolute again*/

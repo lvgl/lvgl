@@ -14,6 +14,8 @@ void test_arc_should_update_value_after_updating_range(void);
 void test_arc_should_update_angles_when_changing_to_symmetrical_mode(void);
 void test_arc_should_update_angles_when_changing_to_symmetrical_mode_value_more_than_middle_range(void);
 void test_arc_angles_when_reversed(void);
+void test_arc_small_value_range_drag_responsiveness(void);
+void test_arc_various_small_ranges_responsiveness(void);
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * arc = NULL;
@@ -791,6 +793,121 @@ void test_arc_angle_within_bg_bounds_edge_cases(void)
 
     /* Edge test 5: wrapped arc after-end tolerance */
     run_arc_drag_test(300, 60, 80, 60, 75);
+}
+
+/*
+ * Test that arcs with small value ranges (e.g., 0-5) can be manipulated properly.
+ * Uses keyboard events to test value changes, avoiding complex drag calculations.
+ */
+void test_arc_small_value_range_drag_responsiveness(void)
+{
+    arc = lv_arc_create(lv_screen_active());
+    lv_obj_set_size(arc, 200, 200);
+    lv_obj_center(arc);
+    lv_obj_update_layout(arc);
+
+    /* Set a small value range (0-5) */
+    lv_arc_set_range(arc, 0, 5);
+    lv_arc_set_value(arc, 0);
+
+    /* Test using KEY events - these should work for any range */
+    uint32_t key_right = LV_KEY_RIGHT;
+
+    /* Press RIGHT key multiple times to increase value */
+    lv_obj_send_event(arc, LV_EVENT_KEY, &key_right);
+    TEST_ASSERT_EQUAL_INT32(1, lv_arc_get_value(arc));
+
+    lv_obj_send_event(arc, LV_EVENT_KEY, &key_right);
+    TEST_ASSERT_EQUAL_INT32(2, lv_arc_get_value(arc));
+
+    lv_obj_send_event(arc, LV_EVENT_KEY, &key_right);
+    TEST_ASSERT_EQUAL_INT32(3, lv_arc_get_value(arc));
+
+    /* Test rotary events - should also work with small ranges */
+    lv_arc_set_value(arc, 0);
+    int32_t rotary_diff = 2;
+    lv_obj_send_event(arc, LV_EVENT_ROTARY, &rotary_diff);
+    TEST_ASSERT_EQUAL_INT32(2, lv_arc_get_value(arc));
+
+    /* Test that value clamps at max */
+    lv_arc_set_value(arc, 4);
+    rotary_diff = 5;  /* Try to go past max */
+    lv_obj_send_event(arc, LV_EVENT_ROTARY, &rotary_diff);
+    TEST_ASSERT_EQUAL_INT32(5, lv_arc_get_value(arc));  /* Should clamp at 5 */
+
+    /* Test drag with small range - must actually change the value*/
+    lv_arc_set_bg_angles(arc, 135, 45);  /* Default angles: 270° span */
+    lv_arc_set_value(arc, 1);  /* Start near min */
+    int32_t value_before_drag = lv_arc_get_value(arc);
+
+    int32_t center_x = 400;
+    int32_t center_y = 240;
+    int32_t radius = 85;
+
+    /* Calculate drag positions:
+     * - Start at angle ~150° (near value 0-1)
+     * - End at angle ~330° (near value 4-5)
+     * This should produce a significant value change */
+    int32_t x_start = center_x + (radius * lv_trigo_sin(160)) / LV_TRIGO_SIN_MAX;
+    int32_t y_start = center_y - (radius * lv_trigo_cos(160)) / LV_TRIGO_SIN_MAX;
+    int32_t x_end = center_x + (radius * lv_trigo_sin(350)) / LV_TRIGO_SIN_MAX;
+    int32_t y_end = center_y - (radius * lv_trigo_cos(350)) / LV_TRIGO_SIN_MAX;
+
+    /* Perform drag with sufficient time for rate-limited movement */
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    lv_test_mouse_move_to(x_start, y_start);
+    lv_test_mouse_press();
+    lv_test_wait(500);
+    lv_test_mouse_move_to(x_end, y_end);
+    lv_test_wait(500);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    int32_t value_after_drag = lv_arc_get_value(arc);
+
+    /* The drag MUST change the value - this is the core assertion for drag responsiveness.*/
+    TEST_ASSERT_NOT_EQUAL_INT32(value_before_drag, value_after_drag);
+
+    /* Additionally verify the value moved in the expected direction (increased) */
+    TEST_ASSERT_GREATER_THAN_INT32(value_before_drag, value_after_drag);
+}
+
+/*
+ * Test arc responsiveness with various small value ranges using rotary events.
+ */
+void test_arc_various_small_ranges_responsiveness(void)
+{
+    arc = lv_arc_create(lv_screen_active());
+    lv_obj_set_size(arc, 200, 200);
+    lv_obj_center(arc);
+    lv_obj_update_layout(arc);
+
+    /* Test ranges: 0-3, 0-5, 0-10, 0-20 */
+    int32_t test_ranges[] = {3, 5, 10, 20};
+    int32_t num_ranges = sizeof(test_ranges) / sizeof(test_ranges[0]);
+
+    for(int32_t i = 0; i < num_ranges; i++) {
+        int32_t max_val = test_ranges[i];
+
+        lv_arc_set_range(arc, 0, max_val);
+        lv_arc_set_value(arc, 0);
+
+        /* Use rotary event to change value */
+        int32_t rotary_diff = max_val / 2;  /* Move to middle */
+        lv_obj_send_event(arc, LV_EVENT_ROTARY, &rotary_diff);
+
+        int32_t value_at_mid = lv_arc_get_value(arc);
+
+        /* Value should have changed to approximately middle */
+        TEST_ASSERT_GREATER_THAN_INT32(0, value_at_mid);
+        TEST_ASSERT_LESS_THAN_INT32(max_val, value_at_mid);
+
+        /* Test that we can reach max value */
+        rotary_diff = max_val;  /* Try to move to max */
+        lv_obj_send_event(arc, LV_EVENT_ROTARY, &rotary_diff);
+        TEST_ASSERT_EQUAL_INT32(max_val, lv_arc_get_value(arc));
+    }
 }
 
 #endif
