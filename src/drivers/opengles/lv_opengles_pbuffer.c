@@ -79,6 +79,9 @@ lv_display_t * lv_opengles_pbuffer_create(int32_t hor_res, int32_t ver_res)
         .flip_cb = pbuffer_flip_cb,
         .create_surface_cb = pbuffer_create_surface,
         .destroy_surface_cb = NULL, /* Default surface destroyer works*/
+        /* Window doesn't exist with pbuffers */
+        .create_window_cb = NULL,
+        .destroy_window_cb = NULL,
     };
 
     /* Create EGL context */
