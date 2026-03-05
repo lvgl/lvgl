@@ -2,8 +2,8 @@ import gdb
 
 from .core import DumpObj
 from .display import DumpDisplayBuf
-from .draw import InfoDrawUnit
 from .misc import InfoStyle, DumpCache, CheckPrefix, CheckCache
+from .draw import InfoDrawUnit, DumpDrawTask
 from .debugger import Debugger
 from .drivers import Lvglobal
 
@@ -25,6 +25,7 @@ DumpDisplayBuf()
 DumpCache()
 CheckPrefix()
 CheckCache()
+DumpDrawTask()
 
 # Infos
 InfoStyle()
