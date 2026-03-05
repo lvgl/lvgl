@@ -737,7 +737,7 @@ static void draw_main(lv_event_t * e)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the Arabic text and process it*/
-        size_t len_ap = lv_text_ap_calc_bytes_count(txt);
+        size_t len_ap = lv_text_ap_strlen(txt) + 1;
         if(len_ap < sizeof(txt_ap)) {
             lv_text_ap_proc(txt, txt_ap);
             txt = txt_ap;
