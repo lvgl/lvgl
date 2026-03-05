@@ -24,6 +24,7 @@ from .lv_event import (
     EVENT_CODE_NAMES,
 )
 from .lv_anim import LVAnim
+from .lv_timer import LVTimer
 
 __all__ = [
     "LVList",
@@ -53,4 +54,5 @@ __all__ = [
     "event_code_name",
     "EVENT_CODE_NAMES",
     "LVAnim",
+    "LVTimer",
 ]

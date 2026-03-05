@@ -36,6 +36,7 @@ from .misc import (
     event_code_name,
     EVENT_CODE_NAMES,
     LVAnim,
+    LVTimer,
 )
 
 __all__ = [
@@ -78,4 +79,5 @@ __all__ = [
     "event_code_name",
     "EVENT_CODE_NAMES",
     "LVAnim",
+    "LVTimer",
 ]
