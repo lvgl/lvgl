@@ -1,4 +1,12 @@
-from .core import LVObject, ObjStyle, curr_inst, dump_obj_info, dump_obj_styles
+from .core import (
+    LVObject,
+    ObjStyle,
+    curr_inst,
+    dump_obj_info,
+    dump_obj_styles,
+    LVIndev,
+    INDEV_TYPE_NAMES,
+)
 from .display import LVDisplay
 from .draw import (
     LVDrawBuf,
@@ -84,4 +92,6 @@ __all__ = [
     "LVTimer",
     "LVImageDecoder",
     "LVFsDrv",
+    "LVIndev",
+    "INDEV_TYPE_NAMES",
 ]
