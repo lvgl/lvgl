@@ -59,7 +59,7 @@ typedef struct {
 typedef void * (*lv_egl_init_display_t)(void * driver_data, int32_t width, int32_t height);
 typedef void * (*lv_egl_get_display_t)(void * driver_data);
 typedef void * (*lv_egl_create_window_t)(void * driver_data, const lv_egl_native_window_properties_t * props);
-typedef void (*lv_destroy_window_t)(void * driver_data, void * native_window);
+typedef void (*lv_egl_destroy_window_t)(void * driver_data, void * native_window);
 
 typedef void * (*lv_egl_create_surface_t)(void * driver_data, const lv_egl_create_surface_params_t * props);
 typedef void (*lv_egl_destroy_surface_t)(void * driver_data, void * surface);
@@ -76,7 +76,7 @@ struct _lv_egl_interface {
     void * native_display;
     uint16_t egl_platform;
     lv_egl_create_window_t create_window_cb;
-    lv_destroy_window_t destroy_window_cb;
+    lv_egl_destroy_window_t destroy_window_cb;
 
     lv_egl_create_surface_t create_surface_cb;
     lv_egl_destroy_surface_t destroy_surface_cb;
