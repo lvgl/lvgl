@@ -10,6 +10,7 @@ from .misc import (
     CheckCache,
     DumpAnim,
     DumpTimer,
+    DumpFsDrv,
 )
 from .debugger import Debugger
 from .drivers import Lvglobal
@@ -34,6 +35,7 @@ CheckPrefix()
 CheckCache()
 DumpAnim()
 DumpTimer()
+DumpFsDrv()
 DumpDrawTask()
 
 # Infos
