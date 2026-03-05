@@ -29,6 +29,7 @@ from .misc import (
     LVImageCache,
     LVImageHeaderCache,
     create_cache_iterator,
+    LVArray,
 )
 
 __all__ = [
@@ -64,4 +65,5 @@ __all__ = [
     "LVImageCache",
     "LVImageHeaderCache",
     "create_cache_iterator",
+    "LVArray",
 ]

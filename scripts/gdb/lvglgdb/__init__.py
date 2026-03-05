@@ -28,6 +28,7 @@ from .lvgl import (
     LVImageHeaderCache,
     create_cache_iterator,
     LVRedBlackTree,
+    LVArray,
 )
 from . import cmds as cmds
 
@@ -59,4 +60,5 @@ __all__ = [
     "LVImageCache",
     "LVImageHeaderCache",
     "create_cache_iterator",
+    "LVArray",
 ]
