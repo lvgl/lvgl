@@ -73,6 +73,12 @@ class LVGL:
         for timer in LVList(self.lv_global.timer_state.timer_ll, "lv_timer_t"):
             yield LVTimer(timer)
 
+    def image_decoders(self):
+        from ..misc.lv_image_decoder import LVImageDecoder
+
+        for dec in LVList(self.lv_global.img_decoder_ll, "lv_image_decoder_t"):
+            yield LVImageDecoder(dec)
+
     def fs_drivers(self):
         from ..misc.lv_fs import LVFsDrv
 
