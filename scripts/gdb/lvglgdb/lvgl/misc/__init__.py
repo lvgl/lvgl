@@ -25,6 +25,7 @@ from .lv_event import (
 )
 from .lv_anim import LVAnim
 from .lv_timer import LVTimer
+from .lv_fs import LVFsDrv
 
 __all__ = [
     "LVList",
@@ -55,4 +56,5 @@ __all__ = [
     "EVENT_CODE_NAMES",
     "LVAnim",
     "LVTimer",
+    "LVFsDrv",
 ]
