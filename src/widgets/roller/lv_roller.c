@@ -7,13 +7,13 @@
  *      INCLUDES
  *********************/
 #include "lv_roller_private.h"
+#if LV_USE_ROLLER != 0
+
 #include "../label/lv_label_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_ROLLER != 0
-
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../draw/lv_draw_private.h"
@@ -820,7 +820,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
             int32_t label_unit = font_h + line_space;
             int32_t mid        = obj->coords.y1 + (obj->coords.y2 - obj->coords.y1) / 2;
 
-            lv_point_t p = indev->pointer.scroll_throw_vect_ori;
+            lv_point_t p = indev->d.pointer.scroll_throw_vect_ori;
             transform_vect_recursive(obj, &p);
 
             int32_t scroll_throw = indev->scroll_throw;

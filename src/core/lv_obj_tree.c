@@ -696,14 +696,14 @@ static void obj_delete_core(lv_obj_t * obj)
     while(indev) {
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
-            if(indev->pointer.act_obj == obj || indev->pointer.scroll_obj == obj) {
+            if(indev->d.pointer.act_obj == obj || indev->d.pointer.scroll_obj == obj) {
                 obj_indev_reset(indev, obj);
             }
-            if(indev->pointer.last_pressed == obj) {
-                indev->pointer.last_pressed = NULL;
+            if(indev->d.pointer.last_pressed == obj) {
+                indev->d.pointer.last_pressed = NULL;
             }
-            if(indev->pointer.last_hovered == obj) {
-                indev->pointer.last_hovered = NULL;
+            if(indev->d.pointer.last_hovered == obj) {
+                indev->d.pointer.last_hovered = NULL;
             }
         }
 
