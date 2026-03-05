@@ -422,7 +422,7 @@ lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child)
     if(!children) {
         return LV_RESULT_INVALID;
     }
-    children[lv_obj_get_child_count(parent) - 1] = child;
+    children[new_child_cnt - 1] = child;
 
     parent->spec_attr->child_cnt = new_child_cnt;
     parent->spec_attr->children = children;
