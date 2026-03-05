@@ -46,6 +46,7 @@ GStreamer's ``uridecodebin`` automatically selects the appropriate source elemen
 .. note::
 
    WebRTC streaming is supported via a dedicated WebRTC source factory (for example, ``webrtcsrc``) configured with a signalling URI (for example, ``signaller::uri``), and is not provided through :c:macro:`LV_GSTREAMER_FACTORY_URI_DECODE` / ``uridecodebin``.
+
 **Playback Control:**
 
 * Play, pause, and stop operations
