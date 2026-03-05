@@ -247,8 +247,10 @@ egl_make_current_context_err:
 egl_context_err:
     ctx->egl_surface = NULL;
 egl_surface_err:
-    ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
-    ctx->native_window = 0;
+    if(ctx->native_window && ctx->interface.destroy_window_cb) {
+        ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
+        ctx->native_window = 0;
+    }
 create_window_err:
     ctx->egl_config = NULL;
 egl_config_err:
