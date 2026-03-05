@@ -74,13 +74,16 @@ struct _lv_egl_interface {
     lv_egl_select_config_t select_config;
     void * driver_data;
     void * native_display;
-    uint16_t egl_platform;
+
     lv_egl_create_window_t create_window_cb;
     lv_egl_destroy_window_t destroy_window_cb;
 
     lv_egl_create_surface_t create_surface_cb;
     lv_egl_destroy_surface_t destroy_surface_cb;
+
     lv_egl_flip_t flip_cb;
+
+    uint16_t egl_platform;
 };
 
 
