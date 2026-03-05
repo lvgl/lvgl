@@ -29,6 +29,11 @@ from .lvgl import (
     create_cache_iterator,
     LVRedBlackTree,
     LVArray,
+    LVEvent,
+    LVEventDsc,
+    LVEventList,
+    event_code_name,
+    EVENT_CODE_NAMES,
 )
 from . import cmds as cmds
 
@@ -61,4 +66,9 @@ __all__ = [
     "LVImageHeaderCache",
     "create_cache_iterator",
     "LVArray",
+    "LVEvent",
+    "LVEventDsc",
+    "LVEventList",
+    "event_code_name",
+    "EVENT_CODE_NAMES",
 ]
