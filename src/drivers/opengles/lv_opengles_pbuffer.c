@@ -117,7 +117,6 @@ lv_display_t * lv_opengles_pbuffer_create(int32_t hor_res, int32_t ver_res)
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_add_event_cb(disp, pbuffer_event_cb, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
     lv_display_add_event_cb(disp, pbuffer_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
-    lv_display_add_event_cb(disp, pbuffer_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(disp, pbuffer_event_cb, LV_EVENT_DELETE, NULL);
 
     return disp;
