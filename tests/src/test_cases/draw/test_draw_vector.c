@@ -439,8 +439,8 @@ void test_draw_during_rendering(void)
 
 void test_draw_display_matrix_rotation(void)
 {
-#if !LV_DRAW_TRANSFORM_USE_MATRIX
-    TEST_IGNORE_MESSAGE("LV_DRAW_TRANSFORM_USE_MATRIX is not enabled");
+#if !LV_DRAW_TRANSFORM_USE_MATRIX || !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("One of LV_DRAW_TRANSFORM_USE_MATRIX or LV_USE_VECTOR_GRAPHIC is not enabled");
 #else
     lv_display_t * disp = lv_display_get_default();
     lv_display_set_matrix_rotation(disp, true);
