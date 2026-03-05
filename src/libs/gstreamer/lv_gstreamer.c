@@ -618,8 +618,8 @@ static bool gstreamer_set_child_proxy_string(GstElement * element, const char * 
         return false;
     }
 
-    GObject *target = NULL;
-    GParamSpec *pspec = NULL;
+    GObject * target = NULL;
+    GParamSpec * pspec = NULL;
     if(!gst_child_proxy_lookup(GST_CHILD_PROXY(element), property_name, &target, &pspec)) {
         LV_LOG_WARN("Property '%s' not found in child proxy", property_name);
         return false;
