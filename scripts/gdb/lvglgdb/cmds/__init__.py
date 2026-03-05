@@ -3,7 +3,7 @@ import gdb
 from .core import DumpObj
 from .display import DumpDisplayBuf
 from .draw import InfoDrawUnit
-from .misc import InfoStyle, DumpCache
+from .misc import InfoStyle, DumpCache, CheckPrefix, CheckCache
 from .debugger import Debugger
 from .drivers import Lvglobal
 
@@ -23,6 +23,8 @@ Debugger()
 DumpObj()
 DumpDisplayBuf()
 DumpCache()
+CheckPrefix()
+CheckCache()
 
 # Infos
 InfoStyle()
