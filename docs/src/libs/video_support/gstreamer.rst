@@ -358,7 +358,7 @@ So to be able to stream to an LVGL player application you will need to run a sig
     ./gst-webrtc-signalling-server &
     gst-launch-1.0 videotestsrc pattern=ball ! webrtcsink
 
-Then you can connect to the stream using the URI scheme "webrtc://localhost:8443/" 
+Then, in your LVGL application, configure WebRTC by passing the signalling server URI (for example, ``ws://localhost:8443``) to ``lv_gstreamer_set_src(..., LV_GSTREAMER_PROPERTY_WEBRTCSRC, ...)``.
 
 API
 ***

@@ -434,7 +434,14 @@ static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
                     GError * err;
                     gchar * debug;
                     gst_message_parse_error(msg, &err, &debug);
-                    const gchar * source_name = GST_OBJECT_NAME(msg->src) ? GST_OBJECT_NAME(msg->src) : "unknown";
+                    GstObject * src = GST_MESSAGE_SRC(msg);
+                    const gchar * source_name = "unknown";
+                    if(src != NULL) {
+                        const gchar * name = GST_OBJECT_NAME(src);
+                        if(name != NULL) {
+                            source_name = name;
+                        }
+                    }
                     LV_LOG_ERROR("GStreamer error from %s: %s", source_name, err->message);
                     if(debug && debug[0] != '\0') {
                         LV_LOG_ERROR("GStreamer error details: %s", debug);
