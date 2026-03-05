@@ -67,6 +67,14 @@ class LVGL:
         for anim in LVList(self.lv_global.anim_state.anim_ll, "lv_anim_t"):
             yield LVAnim(anim)
 
+    def timers(self):
+        from ..misc.lv_timer import LVTimer
+
+        for timer in LVList(self.lv_global.timer_state.timer_ll, "lv_timer_t"):
+            yield LVTimer(timer)
+
+
+
     def image_header_cache(self):
         from ..misc.lv_image_header_cache import LVImageHeaderCache
 
