@@ -1,4 +1,3 @@
-from typing import Union
 import gdb
 from prettytable import PrettyTable
 from lvglgdb.value import Value
@@ -15,45 +14,51 @@ class LVImageCache(object):
 
     def print_entries(self):
         """Print image cache entries using prettytable format"""
-        table = PrettyTable()
-        table.field_names = [
-            "entry",
-            "size",
-            "data_size",
-            "cf",
-            "rc",
-            "type",
-            "decoder",
-            "decoded",
-            "src",
-        ]
-        table.align = "r"  # Right align all columns by default
-        table.align["src"] = "l"  # Left align source column
-        table.align["type"] = "c"  # Center align type column
+        iterator = iter(self._cache)
+        extra_fields = iterator.extra_fields
 
-        for entry in self._cache:
+        table = PrettyTable()
+        fields = (
+            ["entry"]
+            + extra_fields
+            + ["size", "data_size", "cf", "rc", "type", "decoder", "decoded", "src"]
+        )
+        table.field_names = fields
+        table.align = "r"
+        table.align["src"] = "l"
+        table.align["type"] = "c"
+
+        for entry in iterator:
             entry: LVCacheEntry
 
             data_ptr = entry.get_data()
             if not data_ptr:
                 continue
 
-            decoded = data_ptr.decoded
+            ref_cnt = 0
+            decoded_ptr = 0
+            size_str = ""
+            data_size = 0
+            cf = 0
+            decoder_name = ""
+            type_str = "unkn"
+            src_str = ""
+
             try:
+                ref_cnt = entry.get_ref_count()
+                decoded = data_ptr.decoded
+                decoded_ptr = int(decoded) if decoded else 0
+                src_type = int(data_ptr.src_type)
+                src = data_ptr.src
+
                 header = decoded.header
                 w = int(header.w)
                 h = int(header.h)
                 cf = int(header.cf)
-
                 data_size = int(decoded.data_size) if decoded else 0
-                decoded_ptr = int(decoded) if decoded else 0
-                decoder_name = data_ptr.decoder.name.as_string()
-                src_type = int(data_ptr.src_type)
-                src = data_ptr.src
-
-                ref_cnt = entry.get_ref_count()
-
                 size_str = f"{w}x{h}"
+
+                decoder_name = data_ptr.decoder.name.as_string()
 
                 if src_type == 0:  # LV_IMAGE_SRC_VARIABLE
                     src_str = src.format_string(
@@ -65,26 +70,26 @@ class LVImageCache(object):
                         src.cast("char", ptr=True).as_string() if src else "(null)"
                     )
                     type_str = "file"
-                else:  # Unknown type
+                else:
                     src_str = f"{int(src):#x}" if src else "0x0"
-                    type_str = "unkn"
-
-                table.add_row(
-                    [
-                        f"{int(entry):#x}",
-                        size_str,
-                        f"{data_size}",
-                        f"{cf}",
-                        f"{ref_cnt}",
-                        type_str,
-                        decoder_name,
-                        f"{int(decoded_ptr):#x}",
-                        src_str,
-                    ]
-                )
 
             except gdb.error as e:
-                table.add_row(["ERROR", "", "", "", "", "", "", "", str(e)])
-                continue
+                src_str = src_str or str(e)
+
+            row = (
+                [f"{int(entry):#x}"]
+                + iterator.get_extra(entry)
+                + [
+                    size_str,
+                    f"{data_size}",
+                    f"{cf}",
+                    f"{ref_cnt}",
+                    type_str,
+                    decoder_name,
+                    f"{decoded_ptr:#x}",
+                    src_str,
+                ]
+            )
+            table.add_row(row)
 
         print(table)

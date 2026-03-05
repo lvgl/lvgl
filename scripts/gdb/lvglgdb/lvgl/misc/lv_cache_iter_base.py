@@ -34,3 +34,12 @@ class LVCacheIteratorBase:
     def _collect_entries(self):
         """To be implemented by subclasses"""
         raise NotImplementedError("Subclasses must implement _collect_entries")
+
+    @property
+    def extra_fields(self):
+        """Extra column names provided by this iterator, override in subclasses"""
+        return []
+
+    def get_extra(self, entry):
+        """Get extra column values for an entry, override in subclasses"""
+        return []

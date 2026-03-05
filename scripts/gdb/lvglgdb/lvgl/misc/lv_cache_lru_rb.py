@@ -2,40 +2,56 @@ import gdb
 
 from lvglgdb.value import Value, ValueInput
 from .lv_cache_iter_base import LVCacheIteratorBase
-from .lv_rb import LVRedBlackTree
 from .lv_cache_entry import LVCacheEntry
 from .lv_cache import LVCache
+from .lv_ll import LVList
 
 
 class LVCacheLRURBIterator(LVCacheIteratorBase):
-    """Iterator for LRU RB cache implementation - traverses linked list and red-black tree"""
+    """Iterator for LRU RB cache implementation - traverses linked list in LRU order"""
 
     def __init__(self, cache):
         super().__init__(cache)
 
     def _collect_entries(self):
-        """Collect entries from LRU RB cache by traversing the linked list"""
+        """Collect entries from LRU RB cache by traversing the linked list (MRU→LRU order)"""
         try:
-            # Cast cache to lv_lru_rb_t_ to access internal structures
             lru_cache = self.cache.cast("lv_lru_rb_t_", ptr=True)
             if not lru_cache:
                 return
 
-            # Access the linked list
-            rb = lru_cache.rb
-            if not rb or not rb.root:
-                return
+            rb_size = int(lru_cache.rb.size)
+            ptr_size = gdb.lookup_type("void").pointer().sizeof
+            rb_node_pp_t = gdb.lookup_type("lv_rb_node_t").pointer().pointer()
 
-            rb = LVRedBlackTree(rb)
-            for node in rb:
-                self._entries.append(
-                    LVCacheEntry.from_data_ptr(node, self.cache.datatype)
+            # ll stores lv_rb_node_t* per node
+            for ll_node in LVList(lru_cache.ll):
+                rb_node = Value(ll_node).cast(rb_node_pp_t)
+                data = rb_node.data
+
+                entry = LVCacheEntry.from_data_ptr(data, self.cache.datatype)
+
+                # Back-pointer to ll node: *(void**)(data + rb.size - sizeof(void*))
+                entry.extra = (
+                    Value(int(data) + rb_size - ptr_size)
+                    .cast(gdb.lookup_type("void").pointer().pointer())
+                    .dereference()
                 )
+
+                self._entries.append(entry)
+
         except Exception as e:
             print(f"Error in _collect_lru_entries: {e}")
             import traceback
 
             traceback.print_exc()
+
+    @property
+    def extra_fields(self):
+        return ["ll"]
+
+    def get_extra(self, entry):
+        return [f"{int(entry.extra):#x}" if entry.extra else "N/A"]
 
 
 class LVCacheLRURB(LVCache):
