@@ -73,7 +73,13 @@ class LVGL:
         for timer in LVList(self.lv_global.timer_state.timer_ll, "lv_timer_t"):
             yield LVTimer(timer)
 
+    def fs_drivers(self):
+        from ..misc.lv_fs import LVFsDrv
 
+        # fsdrv_ll stores lv_fs_drv_t* pointers (not inline structs)
+        pp_type = gdb.lookup_type("lv_fs_drv_t").pointer().pointer()
+        for drv_pp in LVList(self.lv_global.fsdrv_ll, pp_type):
+            yield LVFsDrv(drv_pp.dereference())
 
     def image_header_cache(self):
         from ..misc.lv_image_header_cache import LVImageHeaderCache
