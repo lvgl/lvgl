@@ -5,6 +5,43 @@ from .lv_cache import LVCache
 from .lv_cache_entry import LVCacheEntry
 
 
+class LVImageCacheData(Value):
+    """Wrapper for lv_image_cache_data_t with sanity check"""
+
+    def __init__(self, data_ptr):
+        super().__init__(Value.normalize(data_ptr, "lv_image_cache_data_t"))
+
+    def sanity_check(self, entry_addr):
+        """Validate image cache data fields"""
+        errors = []
+        prefix = f"entry {entry_addr:#x}"
+
+        decoded = self.decoded
+        if not decoded:
+            errors.append(f"{prefix}: null decoded pointer")
+            return errors
+
+        header = decoded.header
+        w = int(header.w)
+        h = int(header.h)
+        if w <= 0 or h <= 0:
+            errors.append(f"{prefix}: invalid size {w}x{h}")
+
+        data_size = int(decoded.data_size)
+        if data_size <= 0:
+            errors.append(f"{prefix}: invalid data_size {data_size}")
+
+        src_type = int(self.src_type)
+        if src_type not in (0, 1):
+            errors.append(f"{prefix}: unknown src_type {src_type}")
+
+        src = self.src
+        if not src or int(src) == 0:
+            errors.append(f"{prefix}: null src pointer")
+
+        return errors
+
+
 class LVImageCache(object):
     def __init__(self, cache: Value):
         self._cache = LVCache(cache, "lv_image_cache_data_t")
@@ -93,3 +130,18 @@ class LVImageCache(object):
             table.add_row(row)
 
         print(table)
+
+    @staticmethod
+    def _check_image_entry(entry):
+        """Delegate sanity check to LVImageCacheData"""
+        data_ptr = entry.get_data()
+        if not data_ptr:
+            return [f"entry {int(entry):#x}: null data pointer"]
+        try:
+            return LVImageCacheData(data_ptr).sanity_check(int(entry))
+        except gdb.error as e:
+            return [f"entry {int(entry):#x}: gdb error: {e}"]
+
+    def sanity_check(self):
+        """Run sanity check on image cache with image-specific entry validation"""
+        return self._cache.sanity_check(self._check_image_entry)

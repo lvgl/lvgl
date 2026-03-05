@@ -77,6 +77,29 @@ class LVCache(Value):
         elif count < int(cache_entries_cnt):
             print(f"  ... {cache_entries_cnt - count} more entries not shown")
 
+    def sanity_check(self, entry_checker=None):
+        """Run sanity check and print results as a table"""
+        from prettytable import PrettyTable
+
+        iterator = iter(self)
+        if iterator is None:
+            errors = [f"unsupported cache type: {self.name.as_string()}"]
+        else:
+            errors = iterator.sanity_check(entry_checker)
+
+        table = PrettyTable()
+        table.field_names = ["#", "status", "detail"]
+        table.align["detail"] = "l"
+
+        if errors:
+            for i, err in enumerate(errors):
+                table.add_row([i, "FAIL", err])
+        else:
+            table.add_row([0, "PASS", f"all {len(iterator)} entries OK"])
+
+        print(table)
+        return errors
+
 
 def dump_cache_info(cache: ValueInput, datatype: Union[gdb.Type, str]):
     """Dump cache information"""
