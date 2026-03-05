@@ -173,18 +173,15 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
         return;
     }
 
-    /* Update parent pointer */
-    lv_obj_t * old_parent = obj->parent;
-    obj->parent = parent;
-
     /*Remove the object from the old parent's child list
      * This should never fail, thus we do only do it after adding it to the new parent's list*/
-    lv_obj_remove_child(old_parent, obj);
+    lv_obj_remove_child(obj->parent, obj);
 
     /*Notify the original parent because one of its children is lost*/
-    lv_obj_scrollbar_invalidate(old_parent);
-    lv_obj_send_event(old_parent, LV_EVENT_CHILD_CHANGED, obj);
-    lv_obj_send_event(old_parent, LV_EVENT_CHILD_DELETED, NULL);
+    lv_obj_scrollbar_invalidate(obj->parent);
+    lv_obj_send_event(obj->parent, LV_EVENT_CHILD_CHANGED, obj);
+    lv_obj_send_event(obj->parent, LV_EVENT_CHILD_DELETED, NULL);
+    obj->parent = parent;
 
     /*Notify the new parent about the child*/
     lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
