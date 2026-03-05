@@ -17,6 +17,7 @@ py import lvglgdb
 dump obj
 dump cache image
 dump cache image_header
+dump draw_task <layer_expr>
 
 # Inspect a single lv_style_t variable
 info style my_style
