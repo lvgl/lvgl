@@ -38,32 +38,49 @@ void lv_example_span_1(void)
 
     lv_span_t * span = lv_spangroup_add_span(spans);
     lv_span_set_text(span, "China is a beautiful country.");
-    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_RED));
-    lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_UNDERLINE);
-    lv_style_set_text_opa(lv_span_get_style(span), LV_OPA_50);
+    lv_style_t span0_style;
+    lv_style_init(&span0_style);
+    lv_style_set_text_color(&span0_style, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_text_decor(&span0_style, LV_TEXT_DECOR_UNDERLINE);
+    lv_style_set_text_opa(&span0_style, LV_OPA_50);
+    lv_spangroup_set_span_style(
+        spans, span, &span0_style); // style will be copied into the span so all properties must be set first
 
     span = lv_spangroup_add_span(spans);
     lv_span_set_text_static(span, "good good study, day day up.");
-#if LV_FONT_MONTSERRAT_24
-    lv_style_set_text_font(lv_span_get_style(span),  &lv_font_montserrat_24);
-#endif
-    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_GREEN));
+    static lv_style_t span1_style;
+    lv_style_init(&span1_style);
+    lv_spangroup_set_span_style_static(
+        spans, span, &span1_style); // style pointer used so properties can be set after setting the style to the span
+#  if LV_FONT_MONTSERRAT_24
+    lv_style_set_text_font(&span1_style, &lv_font_montserrat_24);
+#  endif
+    lv_style_set_text_color(&span1_style, lv_palette_main(LV_PALETTE_GREEN));
 
     span = lv_spangroup_add_span(spans);
     lv_span_set_text_static(span, "LVGL is an open-source graphics library.");
-    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_t span2_style;
+    lv_style_init(&span2_style);
+    lv_style_set_text_color(&span2_style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_spangroup_set_span_style(spans, span, &span2_style);
 
     span = lv_spangroup_add_span(spans);
     lv_span_set_text_static(span, "the boy no name.");
-    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_GREEN));
-#if LV_FONT_MONTSERRAT_20
-    lv_style_set_text_font(lv_span_get_style(span), &lv_font_montserrat_20);
-#endif
-    lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_UNDERLINE);
+    lv_style_t span3_style;
+    lv_style_init(&span3_style);
+    lv_style_set_text_color(&span3_style, lv_palette_main(LV_PALETTE_GREEN));
+#  if LV_FONT_MONTSERRAT_20
+    lv_style_set_text_font(&span3_style, &lv_font_montserrat_20);
+#  endif
+    lv_style_set_text_decor(&span3_style, LV_TEXT_DECOR_UNDERLINE);
+    lv_spangroup_set_span_style(spans, span, &span3_style);
 
     span = lv_spangroup_add_span(spans);
     lv_span_set_text(span, "I have a dream that hope to come true.");
-    lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_STRIKETHROUGH);
+    static lv_style_t span4_style;
+    lv_style_init(&span4_style);
+    lv_style_set_text_decor(&span4_style, LV_TEXT_DECOR_STRIKETHROUGH);
+    lv_spangroup_set_span_style_static(spans, span, &span4_style);
 
     lv_spangroup_refresh(spans);
 
