@@ -15,6 +15,7 @@ from .lv_cache_iter_base import LVCacheIteratorBase
 from .lv_cache_iter_factory import create_cache_iterator
 from .lv_image_cache import LVImageCache
 from .lv_image_header_cache import LVImageHeaderCache
+from .lv_array import LVArray
 
 __all__ = [
     "LVList",
@@ -37,4 +38,5 @@ __all__ = [
     "LVImageCache",
     "LVImageHeaderCache",
     "create_cache_iterator",
+    "LVArray",
 ]
