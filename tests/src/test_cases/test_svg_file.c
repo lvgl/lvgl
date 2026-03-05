@@ -4,16 +4,6 @@
 
 #include "unity/unity.h"
 
-#ifndef NON_AMD64_BUILD
-    #define EXT_NAME ".lp64.png"
-#else
-    #define EXT_NAME ".lp32.png"
-#endif
-
-typedef struct {
-    lv_svg_render_obj_t * draw_list;
-    float scale;
-} svg_test_ctx_t;
 
 void setUp(void)
 {
@@ -25,6 +15,19 @@ void tearDown(void)
     /* Function run after every test */
     lv_obj_clean(lv_screen_active());
 }
+
+
+#ifndef NON_AMD64_BUILD
+    #define EXT_NAME ".lp64.png"
+#else
+    #define EXT_NAME ".lp32.png"
+#endif
+
+#if LV_USE_SVG
+typedef struct {
+    lv_svg_render_obj_t * draw_list;
+    float scale;
+} svg_test_ctx_t;
 
 static void load_image_cb(const char * image_url, lv_draw_image_dsc_t * img_dsc)
 {
@@ -71,8 +74,10 @@ static void on_draw_event(lv_event_t * e)
     lv_draw_vector_dsc_delete(dsc);
 }
 
-static void test_svg_draw(const char * svg_name, float scale)
+static void draw_svg(const char * svg_name, float scale)
 {
+    LV_UNUSED(svg_name);
+    LV_UNUSED(scale);
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_remove_style_all(obj);
     lv_obj_set_size(obj, lv_pct(100), lv_pct(100));
@@ -110,30 +115,35 @@ static void test_svg_draw(const char * svg_name, float scale)
     lv_svg_node_delete(svg_doc);
     lv_free(svg_data);
 }
+#endif
 
 void test_svg_file(void)
 {
-    test_svg_draw("bg_with_text", 1.0f);
-    test_svg_draw("tiger", 0.5f);
-    test_svg_draw("g_general_attributes", 1.0f);
-    test_svg_draw("g_exclusive_attributes", 1.0f);
-    test_svg_draw("use_general_attributes", 1.0f);
-    test_svg_draw("defs_exclusive_attributes", 1.0f);
-    test_svg_draw("rect_general_attributes", 1.0f);
-    test_svg_draw("circle_general_attributes", 1.0f);
-    test_svg_draw("ellipse_general_attributes", 1.0f);
-    test_svg_draw("line_general_attributes", 2.0f);
-    test_svg_draw("polygon_general_attributes", 0.5f);
-    test_svg_draw("path_general_attributes", 1.0f);
-    test_svg_draw("solidcolor_general_attributes", 1.0f);
-    test_svg_draw("linear_gradient_general_attributes", 1.0f);
-    test_svg_draw("radial_gradient_general_attributes", 2.0f);
-    test_svg_draw("text_general_attributes", 1.0f);
-    test_svg_draw("tspan_general_attributes", 1.0f);
-    test_svg_draw("image_general_attributes", 1.0f);
-    test_svg_draw("image_general_attributes1", 1.0f);
-    test_svg_draw("image_general_attributes2", 1.0f);
-    test_svg_draw("image_general_attributes3", 1.0f);
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("LV_USE_SVG is not enabled");
+#else
+    draw_svg("bg_with_text", 1.0f);
+    draw_svg("tiger", 0.5f);
+    draw_svg("g_general_attributes", 1.0f);
+    draw_svg("g_exclusive_attributes", 1.0f);
+    draw_svg("use_general_attributes", 1.0f);
+    draw_svg("defs_exclusive_attributes", 1.0f);
+    draw_svg("rect_general_attributes", 1.0f);
+    draw_svg("circle_general_attributes", 1.0f);
+    draw_svg("ellipse_general_attributes", 1.0f);
+    draw_svg("line_general_attributes", 2.0f);
+    draw_svg("polygon_general_attributes", 0.5f);
+    draw_svg("path_general_attributes", 1.0f);
+    draw_svg("solidcolor_general_attributes", 1.0f);
+    draw_svg("linear_gradient_general_attributes", 1.0f);
+    draw_svg("radial_gradient_general_attributes", 2.0f);
+    draw_svg("text_general_attributes", 1.0f);
+    draw_svg("tspan_general_attributes", 1.0f);
+    draw_svg("image_general_attributes", 1.0f);
+    draw_svg("image_general_attributes1", 1.0f);
+    draw_svg("image_general_attributes2", 1.0f);
+    draw_svg("image_general_attributes3", 1.0f);
+#endif
 }
 
 #endif

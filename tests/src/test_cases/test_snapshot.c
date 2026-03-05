@@ -1,9 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../lvgl_private.h"
-
-#if LV_USE_SNAPSHOT
-
 #include "unity/unity.h"
 
 #define NUM_SNAPSHOTS 10
@@ -26,6 +23,8 @@ static const lv_color_format_t supported_color_formats[] = {
 
 void setUp(void)
 {
+
+    LV_UNUSED(supported_color_formats);
     /* Function run before every test */
 }
 
@@ -34,6 +33,7 @@ void tearDown(void)
     /* Function run after every test */
     lv_obj_clean(lv_screen_active());
 }
+
 
 void test_snapshot_should_not_leak_memory(void)
 {
