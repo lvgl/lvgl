@@ -134,7 +134,6 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int
     }
 
     lv_display_set_flush_cb(display, flush_cb);
-    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
 
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
