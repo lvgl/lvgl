@@ -37,6 +37,7 @@ from .misc import (
     EVENT_CODE_NAMES,
     LVAnim,
     LVTimer,
+    LVImageDecoder,
     LVFsDrv,
 )
 
@@ -81,5 +82,6 @@ __all__ = [
     "EVENT_CODE_NAMES",
     "LVAnim",
     "LVTimer",
+    "LVImageDecoder",
     "LVFsDrv",
 ]
