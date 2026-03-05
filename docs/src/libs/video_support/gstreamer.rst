@@ -40,10 +40,12 @@ Using the URI factory (:c:macro:`LV_GSTREAMER_FACTORY_URI_DECODE`), you can spec
 * **Multicast**: ``multicast://239.255.12.42:1234``
 * **V4L2 cameras**: ``v4l2:///dev/video0``
 * **Audio devices**: ``alsa://hw:0,0``, ``pulse://default``
-* **WebRTC**: ``webrtc://signalserver/``
 
 GStreamer's ``uridecodebin`` automatically selects the appropriate source element and decoder based on the URI scheme and media format.
 
+.. note::
+
+   WebRTC streaming is supported via a dedicated WebRTC source factory (for example, ``webrtcsrc``) configured with a signalling URI (for example, ``signaller::uri``), and is not provided through :c:macro:`LV_GSTREAMER_FACTORY_URI_DECODE` / ``uridecodebin``.
 **Playback Control:**
 
 * Play, pause, and stop operations
@@ -257,13 +259,13 @@ The GStreamer widget supports various media sources through different factories:
                          "/path/to/video.mp4");
 
 
-** WebRTC Factory:**
+**WebRTC Factory:**
 
 .. code-block:: c
 
     /* WebRTC stream */
-    lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_WEBRTC,
-                         LV_GSTREAMER_PROPERTY_WEBRTC_SIGNAL_SERVER_URI,
+    lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_WEBRTCSRC,
+                         LV_GSTREAMER_PROPERTY_WEBRTCSRC,
                          "ws://signalserver:port/");
 
 Playback Control
@@ -349,7 +351,7 @@ Example
 WebRTC Notes
 ************
 WebRTC is using the Rust plugin "https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs"
-So to be able to stream to an LVGL plauer application you will need to run a signaller server and then a simpler pipeline like so:
+So to be able to stream to an LVGL player application you will need to run a signaller server and then a simpler pipeline like so:
 
 .. code-block:: bash
 

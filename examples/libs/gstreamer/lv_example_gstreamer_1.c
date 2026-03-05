@@ -41,8 +41,10 @@ void lv_example_gstreamer_1(void)
      * web streams (http://, https://), RTSP streams (rtsp://), UDP streams (udp://),
      * and many others. GStreamer's uridecodebin automatically selects the appropriate
      * source element and decoder based on the URI scheme and media format.
-     * A WebRTC stream is also achievable using the ws://[ipsignallerserver]:[port] URI scheme.
-     * */
+     * WebRTC streams, however, are provided via a dedicated WebRTC source (webrtcsrc)
+     * configured with a signalling server URI (e.g. ws://[ipsignallerserver]:[port])
+     * through its signaller-related properties, rather than via LV_GSTREAMER_FACTORY_URI_DECODE.
+     */
     lv_gstreamer_set_src(event_data.streamer, LV_GSTREAMER_FACTORY_URI_DECODE, LV_GSTREAMER_PROPERTY_URI_DECODE,
                          "https://gstreamer.freedesktop.org/data/media/sintel_trailer-480p.webm");
 
