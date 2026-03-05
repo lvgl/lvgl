@@ -10,6 +10,7 @@ from .misc import (
     CheckCache,
     DumpAnim,
     DumpTimer,
+    DumpImageDecoder,
     DumpFsDrv,
 )
 from .debugger import Debugger
@@ -35,6 +36,7 @@ CheckPrefix()
 CheckCache()
 DumpAnim()
 DumpTimer()
+DumpImageDecoder()
 DumpFsDrv()
 DumpDrawTask()
 
