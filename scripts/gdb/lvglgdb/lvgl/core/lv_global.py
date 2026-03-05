@@ -61,6 +61,12 @@ class LVGL:
 
         return LVImageCache(self.lv_global.img_cache)
 
+    def anims(self):
+        from ..misc.lv_anim import LVAnim
+
+        for anim in LVList(self.lv_global.anim_state.anim_ll, "lv_anim_t"):
+            yield LVAnim(anim)
+
     def image_header_cache(self):
         from ..misc.lv_image_header_cache import LVImageHeaderCache
 
