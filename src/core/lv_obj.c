@@ -411,9 +411,49 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj)
  * OTHER FUNCTIONS
  *------------------*/
 
+lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child)
+{
+    LV_ASSERT_OBJ(parent, MY_CLASS);
+
+    uint16_t new_child_cnt = parent->spec_attr->child_cnt + 1;
+
+    lv_obj_t ** children = lv_realloc(parent->spec_attr->children,
+                                      new_child_cnt * (sizeof(lv_obj_t *)));
+    if(!children) {
+        return LV_RESULT_INVALID;
+    }
+    children[lv_obj_get_child_count(parent) - 1] = child;
+
+    parent->spec_attr->child_cnt = new_child_cnt;
+    parent->spec_attr->children = children;
+    return LV_RESULT_OK;
+}
+
+void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
+{
+    int32_t i;
+    for(i = lv_obj_get_index(child); i <= parent->spec_attr->child_cnt - 2; i++) {
+        parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
+    }
+
+    /* No more children*/
+    if(parent->spec_attr->child_cnt == 1) {
+        lv_free(parent->spec_attr->children);
+        parent->spec_attr->children = NULL;
+        parent->spec_attr->child_cnt = 0;
+        return;
+    }
+
+    parent->spec_attr->child_cnt--;
+    parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
+                                             parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    /* Reallocating a smaller size should never fail, so assert it here*/
+    LV_ASSERT_MALLOC(parent->spec_attr->children);
+}
+
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     if(!obj->spec_attr) {
         obj->spec_attr = lv_obj_spec_attr_create();
     }

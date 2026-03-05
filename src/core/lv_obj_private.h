@@ -105,6 +105,8 @@ lv_obj_spec_attr_t * lv_obj_spec_attr_create(void);
  */
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj);
 
+lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child);
+void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child);
 
 /**********************
  *      MACROS

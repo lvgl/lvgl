@@ -167,31 +167,19 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
         return;
     }
 
-    lv_obj_invalidate(obj);
+    /*Add the object to the new parents list first*/
+    if(lv_obj_add_child(parent, obj) == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Failed to attach child to parent");
+        return;
+    }
 
+    /* Update parent pointer */
     lv_obj_t * old_parent = obj->parent;
-    /*Remove the object from the old parent's child list*/
-    int32_t i;
-    for(i = lv_obj_get_index(obj); i <= (int32_t)lv_obj_get_child_count(old_parent) - 2; i++) {
-        old_parent->spec_attr->children[i] = old_parent->spec_attr->children[i + 1];
-    }
-    old_parent->spec_attr->child_cnt--;
-    if(old_parent->spec_attr->child_cnt) {
-        old_parent->spec_attr->children = lv_realloc(old_parent->spec_attr->children,
-                                                     old_parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    }
-    else {
-        lv_free(old_parent->spec_attr->children);
-        old_parent->spec_attr->children = NULL;
-    }
-
-    /*Add the child to the new parent as the last (newest child)*/
-    parent->spec_attr->child_cnt++;
-    parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
-                                             parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    parent->spec_attr->children[lv_obj_get_child_count(parent) - 1] = obj;
-
     obj->parent = parent;
+
+    /*Remove the object from the old parent's child list
+     * This should never fail, thus we do only do it after adding it to the new parent's list*/
+    lv_obj_remove_child(old_parent, obj);
 
     /*Notify the original parent because one of its children is lost*/
     lv_obj_scrollbar_invalidate(old_parent);
