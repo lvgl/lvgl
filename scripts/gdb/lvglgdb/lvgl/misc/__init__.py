@@ -23,6 +23,7 @@ from .lv_event import (
     event_code_name,
     EVENT_CODE_NAMES,
 )
+from .lv_anim import LVAnim
 
 __all__ = [
     "LVList",
@@ -51,4 +52,5 @@ __all__ = [
     "LVEventList",
     "event_code_name",
     "EVENT_CODE_NAMES",
+    "LVAnim",
 ]
