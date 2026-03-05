@@ -35,6 +35,7 @@ from .lvgl import (
     event_code_name,
     EVENT_CODE_NAMES,
     LVAnim,
+    LVTimer,
 )
 from . import cmds as cmds
 
@@ -73,4 +74,5 @@ __all__ = [
     "event_code_name",
     "EVENT_CODE_NAMES",
     "LVAnim",
+    "LVTimer",
 ]
