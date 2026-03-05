@@ -50,12 +50,11 @@ class LVGL:
         return disp.act_scr if disp else None
 
     def draw_units(self):
-        unit = self.lv_global.draw_info.unit_head
+        from ..draw.lv_draw_unit import LVDrawUnit
 
-        # Iterate through all draw units
-        while unit:
-            yield unit
-            unit = unit.next
+        head = self.lv_global.draw_info.unit_head
+        if int(head):
+            yield from LVDrawUnit(head)
 
     def image_cache(self):
         from ..misc.lv_image_cache import LVImageCache

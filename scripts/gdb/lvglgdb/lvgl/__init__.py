@@ -1,6 +1,13 @@
 from .core import LVObject, ObjStyle, curr_inst, dump_obj_info, dump_obj_styles
 from .display import LVDisplay
-from .draw import LVDrawBuf
+from .draw import (
+    LVDrawBuf,
+    LVDrawTask,
+    LVDrawUnit,
+    DRAW_TASK_TYPE_NAMES,
+    DRAW_TASK_STATE_NAMES,
+    DRAW_UNIT_TYPE_NAMES,
+)
 from .misc import (
     LVList,
     LVStyle,
@@ -29,6 +36,11 @@ __all__ = [
     "ObjStyle",
     "LVDisplay",
     "LVDrawBuf",
+    "LVDrawTask",
+    "DRAW_TASK_TYPE_NAMES",
+    "DRAW_TASK_STATE_NAMES",
+    "DRAW_UNIT_TYPE_NAMES",
+    "LVDrawUnit",
     "curr_inst",
     "LVList",
     "LVStyle",
