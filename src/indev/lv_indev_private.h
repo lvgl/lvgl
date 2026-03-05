@@ -83,42 +83,43 @@ struct _lv_indev_t {
     /**< Rotary diff count will be multiplied by this value and divided by 256*/
     int32_t rotary_sensitivity;
 
-    struct {
-        /*Pointer and button data*/
-        lv_point_t act_point; /**< Current point of input device.*/
-        lv_point_t last_point; /**< Last point of input device.*/
-        lv_point_t last_raw_point; /**< Last point read from read_cb. */
-        lv_point_t vect; /**< Difference between `act_point` and `last_point`.*/
-        lv_point_t vect_hist[LV_INDEV_VECT_HIST_SIZE];
-        uint32_t   vect_hist_timestamp[LV_INDEV_VECT_HIST_SIZE];
-        uint8_t    vect_hist_index;
-        lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
-        lv_point_t scroll_throw_vect;
-        lv_point_t scroll_throw_vect_ori;
-        lv_obj_t * act_obj;      /*The object being pressed*/
-        lv_obj_t * scroll_obj;   /*The object being scrolled*/
-        lv_obj_t * last_pressed; /*The lastly pressed object*/
-        lv_obj_t * last_hovered; /*The lastly hovered object*/
-        lv_area_t scroll_area;
-        lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
-        int32_t diff;
-        /*Short click streaks*/
-        uint8_t short_click_streak;
-        lv_point_t last_short_click_point;
-        uint32_t last_short_click_timestamp;
-        /*Flags*/
-        uint8_t scroll_dir : 4;
-        uint8_t gesture_dir : 4;
-        uint8_t gesture_sent : 1;
-        uint8_t press_moved : 1;
-        uint8_t pressed : 1;
-    } pointer;
-    struct {
-        /*Keypad data*/
-        lv_indev_state_t last_state;
-        uint32_t last_key;
-    } keypad;
-
+    union {
+        struct {
+            /*Pointer and button data*/
+            lv_point_t act_point; /**< Current point of input device.*/
+            lv_point_t last_point; /**< Last point of input device.*/
+            lv_point_t last_raw_point; /**< Last point read from read_cb. */
+            lv_point_t vect; /**< Difference between `act_point` and `last_point`.*/
+            lv_point_t vect_hist[LV_INDEV_VECT_HIST_SIZE];
+            uint32_t   vect_hist_timestamp[LV_INDEV_VECT_HIST_SIZE];
+            uint8_t    vect_hist_index;
+            lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
+            lv_point_t scroll_throw_vect;
+            lv_point_t scroll_throw_vect_ori;
+            lv_obj_t * act_obj;      /*The object being pressed*/
+            lv_obj_t * scroll_obj;   /*The object being scrolled*/
+            lv_obj_t * last_pressed; /*The lastly pressed object*/
+            lv_obj_t * last_hovered; /*The lastly hovered object*/
+            lv_area_t scroll_area;
+            lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
+            int32_t diff;
+            /*Short click streaks*/
+            uint8_t short_click_streak;
+            lv_point_t last_short_click_point;
+            uint32_t last_short_click_timestamp;
+            /*Flags*/
+            uint8_t scroll_dir : 4;
+            uint8_t gesture_dir : 4;
+            uint8_t gesture_sent : 1;
+            uint8_t press_moved : 1;
+            uint8_t pressed : 1;
+        } pointer;
+        struct {
+            /*Keypad data*/
+            lv_indev_state_t last_state;
+            uint32_t last_key;
+        } keypad;
+    } data;
     lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
     lv_group_t * group;   /**< Keypad destination group*/
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
