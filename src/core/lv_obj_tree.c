@@ -168,7 +168,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     }
 
     /*Add the object to the new parents list first*/
-    if(lv_obj_add_child(parent, obj) == LV_RESULT_INVALID) {
+    if(lv_obj_add_child(parent, obj) != LV_RESULT_OK) {
         LV_LOG_WARN("Failed to attach child to parent");
         return;
     }
@@ -733,14 +733,7 @@ static void obj_delete_core(lv_obj_t * obj)
     }
     /*Remove the object from the child list of its parent*/
     else {
-        int32_t id = lv_obj_get_index(obj);
-        uint16_t i;
-        for(i = id; i < obj->parent->spec_attr->child_cnt - 1; i++) {
-            obj->parent->spec_attr->children[i] = obj->parent->spec_attr->children[i + 1];
-        }
-        obj->parent->spec_attr->child_cnt--;
-        obj->parent->spec_attr->children = lv_realloc(obj->parent->spec_attr->children,
-                                                      obj->parent->spec_attr->child_cnt * sizeof(lv_obj_t *));
+        lv_obj_remove_child(obj->parent, obj);
     }
 
     /*Free the object itself*/

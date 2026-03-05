@@ -431,8 +431,7 @@ lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child)
 
 void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
 {
-    int32_t i;
-    for(i = lv_obj_get_index(child); i <= parent->spec_attr->child_cnt - 2; i++) {
+    for(int32_t i = lv_obj_get_index(child); i < (int32_t)parent->spec_attr->child_cnt - 1; i++) {
         parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
     }
 
