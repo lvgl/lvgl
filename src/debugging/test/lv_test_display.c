@@ -58,13 +58,12 @@ lv_display_t * lv_test_display_create(int32_t hor_res, int32_t ver_res)
 
     lv_display_t * disp = create_display(hor_res, ver_res);
 
-    lv_display_add_event_cb(disp, delete_event_cb, LV_EVENT_DELETE, NULL);
-
     if(!disp) {
         lv_free(_state.draw_buf.unaligned_data);
         return NULL;
     }
 
+    lv_display_add_event_cb(disp, delete_event_cb, LV_EVENT_DELETE, NULL);
     lv_display_set_color_format(disp, cf);
 
     return disp;
