@@ -245,4 +245,80 @@ static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_
     return 0;
 }
 
+#if LV_USE_HARFBUZZ
+bool lv_freetype_get_glyph_dsc_by_gid(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t glyph_id)
+{
+    LV_ASSERT_NULL(font);
+    LV_ASSERT_NULL(g_dsc);
+
+    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
+    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
+
+    lv_mutex_lock(&dsc->cache_node->face_lock);
+    FT_Face face = dsc->cache_node->face;
+
+    FT_Error error;
+    if(FT_IS_SCALABLE(face)) {
+        error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+    }
+    else {
+        error = FT_Select_Size(face, 0);
+    }
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+        return false;
+    }
+
+    if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
+        error = FT_Load_Glyph(face, glyph_id, FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_BITMAP | FT_LOAD_NO_AUTOHINT);
+    }
+    else {
+        error = FT_Load_Glyph(face, glyph_id, FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_AUTOHINT);
+    }
+    if(error) {
+        FT_ERROR_MSG("FT_Load_Glyph", error);
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+        return false;
+    }
+
+    FT_GlyphSlot glyph = face->glyph;
+
+    if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
+        g_dsc->adv_w = FT_F26DOT6_TO_INT(glyph->metrics.horiAdvance);
+        g_dsc->box_h = FT_F26DOT6_TO_INT(glyph->metrics.height);
+        g_dsc->box_w = FT_F26DOT6_TO_INT(glyph->metrics.width);
+        g_dsc->ofs_x = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingX);
+        g_dsc->ofs_y = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingY - glyph->metrics.height);
+        g_dsc->format = LV_FONT_GLYPH_FORMAT_VECTOR;
+
+        if(dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) {
+            g_dsc->box_w = lv_freetype_italic_transform_on_pos((lv_point_t) {
+                g_dsc->box_w, g_dsc->box_h
+            });
+        }
+    }
+    else {
+        FT_Bitmap * glyph_bitmap = &face->glyph->bitmap;
+        g_dsc->adv_w = FT_F26DOT6_TO_INT(glyph->advance.x);
+        g_dsc->box_h = glyph_bitmap->rows;
+        g_dsc->box_w = glyph_bitmap->width;
+        g_dsc->ofs_x = glyph->bitmap_left;
+        g_dsc->ofs_y = glyph->bitmap_top - g_dsc->box_h;
+        if(glyph->format == FT_GLYPH_FORMAT_BITMAP)
+            g_dsc->format = LV_FONT_GLYPH_FORMAT_IMAGE;
+        else
+            g_dsc->format = LV_FONT_GLYPH_FORMAT_A8;
+    }
+
+    g_dsc->is_placeholder = (glyph_id == 0);
+    g_dsc->gid.index = glyph_id;
+    g_dsc->resolved_font = font;
+    g_dsc->entry = NULL;
+
+    lv_mutex_unlock(&dsc->cache_node->face_lock);
+    return true;
+}
+#endif /*LV_USE_HARFBUZZ*/
+
 #endif /*LV_USE_FREETYPE*/
