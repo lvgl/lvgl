@@ -42,7 +42,7 @@ static void scroll_y_anim(void * obj, int32_t v);
 static void scroll_end_cb(lv_anim_t * a);
 static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_point_t * scroll_value,
                                   lv_anim_enable_t anim_en);
-
+static int32_t scroll_anim_end_value(lv_anim_t * a, int32_t v);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -249,10 +249,10 @@ void lv_obj_get_scroll_end(lv_obj_t * obj, lv_point_t * end)
 {
     lv_anim_t * a;
     a = lv_anim_get(obj, scroll_x_anim);
-    end->x = a ? -a->end_value : lv_obj_get_scroll_x(obj);
+    end->x = scroll_anim_end_value(a, lv_obj_get_scroll_x(obj));
 
     a = lv_anim_get(obj, scroll_y_anim);
-    end->y = a ? -a->end_value : lv_obj_get_scroll_y(obj);
+    end->y = scroll_anim_end_value(a, lv_obj_get_scroll_y(obj));
 }
 
 /*=====================
@@ -814,4 +814,13 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     scroll_value->x += anim_en ? x_scroll : 0;
     scroll_value->y += anim_en ? y_scroll : 0;
     lv_obj_scroll_by(parent, x_scroll, y_scroll, anim_en);
+}
+
+static int32_t scroll_anim_end_value(lv_anim_t * a, int32_t v)
+{
+#if LV_USE_FLOAT
+    return a ? (int32_t)(-a->end_value) : v;
+#else
+    return a ? -a->end_value : v;
+#endif
 }
