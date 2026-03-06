@@ -27,8 +27,7 @@ class InfoDrawUnit(gdb.Command):
         except gdb.error:
             target_type = gdb.lookup_type("lv_draw_unit_t")
 
-        print(
-            unit.cast(target_type, ptr=True)
-            .dereference()
-            .format_string(pretty_structs=True, symbols=True)
-        )
+        casted = unit.cast(target_type, ptr=True)
+        if casted is None:
+            casted = unit.cast("lv_draw_unit_t", ptr=True)
+        print(casted.dereference().format_string(pretty_structs=True, symbols=True))

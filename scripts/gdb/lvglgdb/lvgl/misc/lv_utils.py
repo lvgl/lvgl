@@ -69,7 +69,10 @@ def build_global_field_map(field_type_name):
 
 # LVGL coordinate type constants (from lv_area.h)
 _COORD_TYPE_SHIFT = 29
+_COORD_TYPE_MASK = 3 << _COORD_TYPE_SHIFT
+_COORD_TYPE_PX = 0 << _COORD_TYPE_SHIFT
 _COORD_TYPE_SPEC = 1 << _COORD_TYPE_SHIFT
+_COORD_TYPE_PX_NEG = 3 << _COORD_TYPE_SHIFT
 _COORD_MAX = (1 << _COORD_TYPE_SHIFT) - 1
 _SIZE_CONTENT = _COORD_MAX | _COORD_TYPE_SPEC
 _PCT_POS_MAX = (_COORD_MAX - 1) // 2
@@ -79,16 +82,21 @@ def format_coord(val):
     """Format an lv_coord_t value into a human-readable string.
 
     Decodes special LVGL coordinate encodings:
-      - LV_SIZE_CONTENT -> "CONTENT"
-      - LV_PCT(x)       -> "x%"
-      - plain pixel      -> "123"
+      - LV_SIZE_CONTENT       -> "CONTENT"
+      - LV_PCT(x)             -> "x%"
+      - LV_COORD_TYPE_PX_NEG  -> negative pixel
+      - plain pixel            -> "123"
     """
     val = int(val)
     if val == _SIZE_CONTENT:
         return "CONTENT"
-    if val & _COORD_TYPE_SPEC:
-        plain = val & ~_COORD_TYPE_SPEC
+    coord_type = val & _COORD_TYPE_MASK
+    if coord_type == _COORD_TYPE_SPEC:
+        plain = val & ~_COORD_TYPE_MASK
         if plain <= _PCT_POS_MAX:
             return f"{plain}%"
         return f"{_PCT_POS_MAX - plain}%"
+    if coord_type == _COORD_TYPE_PX_NEG:
+        plain = val & ~_COORD_TYPE_MASK
+        return str(-plain) if plain else "0"
     return str(val)
