@@ -188,8 +188,6 @@ typedef struct _lv_hit_test_info_t lv_hit_test_info_t;
 
 typedef struct _lv_cover_check_info_t lv_cover_check_info_t;
 
-typedef struct _lv_obj_spec_attr_t lv_obj_spec_attr_t;
-
 typedef struct _lv_image_t lv_image_t;
 
 typedef struct _lv_animimg_t lv_animimg_t;
