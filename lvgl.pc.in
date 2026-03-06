@@ -6,6 +6,5 @@ Name: lvgl
 Description: Light and Versatile Graphics Library
 URL: https://lvgl.io/
 Version: @LVGL_VERSION@
-Requires.private: @LVGL_PC_REQUIRES@
 Cflags: -I${includedir}
 Libs: -L${libdir} -llvgl
