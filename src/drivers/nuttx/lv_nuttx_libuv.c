@@ -42,6 +42,8 @@ typedef struct {
     uv_timer_t uv_timer;
     lv_nuttx_uv_fb_ctx_t fb_ctx;
     lv_nuttx_uv_input_ctx_t input_ctx;
+    lv_nuttx_uv_input_ctx_t utouch_ctx;
+    lv_nuttx_uv_input_ctx_t mouse_ctx;
     int32_t ref_count;
 } lv_nuttx_uv_ctx_t;
 
@@ -60,6 +62,9 @@ static int  lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_
 static void lv_nuttx_uv_fb_deinit(lv_nuttx_uv_ctx_t * uv_ctx);
 
 static void lv_nuttx_uv_input_poll_cb(uv_poll_t * handle, int status, int events);
+static int lv_nuttx_uv_input_init_one(uv_loop_t * loop, lv_indev_t * indev,
+                                      lv_nuttx_uv_input_ctx_t * input_ctx, lv_nuttx_uv_ctx_t * uv_ctx);
+static void lv_nuttx_uv_input_deinit_one(lv_nuttx_uv_input_ctx_t * input_ctx);
 static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_ctx);
 static void lv_nuttx_uv_input_deinit(lv_nuttx_uv_ctx_t * uv_ctx);
 
@@ -295,37 +300,45 @@ static void lv_nuttx_uv_fb_deinit(lv_nuttx_uv_ctx_t * uv_ctx)
 
 static void lv_nuttx_uv_input_poll_cb(uv_poll_t * handle, int status, int events)
 {
-    lv_indev_t * indev = ((lv_nuttx_uv_ctx_t *)(handle->data))->input_ctx.indev;
+    lv_nuttx_uv_ctx_t * uv_ctx = (lv_nuttx_uv_ctx_t *)handle->data;
+    lv_indev_t * indev = NULL;
+
+    if(handle == &uv_ctx->input_ctx.input_poll) {
+        indev = uv_ctx->input_ctx.indev;
+    }
+    else if(handle == &uv_ctx->utouch_ctx.input_poll) {
+        indev = uv_ctx->utouch_ctx.indev;
+    }
+    else if(handle == &uv_ctx->mouse_ctx.input_poll) {
+        indev = uv_ctx->mouse_ctx.indev;
+    }
 
     if(status < 0) {
         LV_LOG_WARN("input poll error: %s ", uv_strerror(status));
         return;
     }
 
-    if(events & UV_READABLE) {
+    if(events & UV_READABLE && indev) {
         lv_indev_read(indev);
     }
 }
 
-static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_ctx)
+static int lv_nuttx_uv_input_init_one(uv_loop_t * loop, lv_indev_t * indev,
+                                      lv_nuttx_uv_input_ctx_t * input_ctx, lv_nuttx_uv_ctx_t * uv_ctx)
 {
-    uv_loop_t * loop = uv_info->loop;
-    lv_indev_t * indev = uv_info->indev;
-
     if(indev == NULL) {
-        LV_LOG_USER("skip uv input init.");
         return 0;
     }
 
-    LV_ASSERT_NULL(uv_ctx);
     LV_ASSERT_NULL(loop);
+    LV_ASSERT_NULL(input_ctx);
+    LV_ASSERT_NULL(uv_ctx);
 
     if(lv_indev_get_mode(indev) == LV_INDEV_MODE_EVENT) {
         LV_LOG_ERROR("input device has been running in event-driven mode");
         return -EINVAL;
     }
 
-    lv_nuttx_uv_input_ctx_t * input_ctx = &uv_ctx->input_ctx;
     input_ctx->fd = *(int *)lv_indev_get_driver_data(indev);
     if(input_ctx->fd <= 0) {
         LV_LOG_ERROR("can't get valid input fd");
@@ -345,12 +358,47 @@ static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * u
     return 0;
 }
 
-static void lv_nuttx_uv_input_deinit(lv_nuttx_uv_ctx_t * uv_ctx)
+static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_ctx)
 {
-    lv_nuttx_uv_input_ctx_t * input_ctx = &uv_ctx->input_ctx;
+    uv_loop_t * loop = uv_info->loop;
+    int ret;
+
+    LV_ASSERT_NULL(uv_ctx);
+    LV_ASSERT_NULL(loop);
+
+    ret = lv_nuttx_uv_input_init_one(loop, uv_info->indev, &uv_ctx->input_ctx, uv_ctx);
+    if(ret < 0) {
+        lv_nuttx_uv_input_deinit(uv_ctx);
+        return ret;
+    }
+
+    ret = lv_nuttx_uv_input_init_one(loop, uv_info->utouch_indev, &uv_ctx->utouch_ctx, uv_ctx);
+    if(ret < 0) {
+        lv_nuttx_uv_input_deinit(uv_ctx);
+        return ret;
+    }
+
+    ret = lv_nuttx_uv_input_init_one(loop, uv_info->mouse_indev, &uv_ctx->mouse_ctx, uv_ctx);
+    if(ret < 0) {
+        lv_nuttx_uv_input_deinit(uv_ctx);
+        return ret;
+    }
+
+    return 0;
+}
+
+static void lv_nuttx_uv_input_deinit_one(lv_nuttx_uv_input_ctx_t * input_ctx)
+{
     if(input_ctx->fd > 0) {
         uv_close((uv_handle_t *)&input_ctx->input_poll, lv_nuttx_uv_deinit_cb);
     }
+}
+
+static void lv_nuttx_uv_input_deinit(lv_nuttx_uv_ctx_t * uv_ctx)
+{
+    lv_nuttx_uv_input_deinit_one(&uv_ctx->input_ctx);
+    lv_nuttx_uv_input_deinit_one(&uv_ctx->utouch_ctx);
+    lv_nuttx_uv_input_deinit_one(&uv_ctx->mouse_ctx);
     LV_LOG_USER("Done");
 }
 

@@ -317,9 +317,8 @@ static void lv_nuttx_uv_loop(lv_nuttx_result_t * result)
     uv_info.loop = &loop;
     uv_info.disp = result->disp;
     uv_info.indev = result->indev;
-#ifdef CONFIG_UINPUT_TOUCH
-    uv_info.uindev = result->utouch_indev;
-#endif
+    uv_info.utouch_indev = result->utouch_indev;
+    uv_info.mouse_indev = result->mouse_indev;
 
     data = lv_nuttx_uv_init(&uv_info);
     uv_run(&loop, UV_RUN_DEFAULT);
