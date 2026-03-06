@@ -473,6 +473,24 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
  */
 void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb);
 
+/**
+ * Set Counter-Clock-Wise (CCW) rotation processing for an indev pointer
+ * @param indev         pointer to an indev
+ */
+void lv_indev_set_ccw_pointer(lv_indev_t * indev);
+
+/**
+ * Clear Counter-Clock-Wise (CCW) rotation processing for an indev pointer
+ * @param indev         pointer to an indev
+ */
+void lv_indev_clear_ccw_pointer(lv_indev_t * indev);
+
+/**
+ * Get Counter-Clock-Wise (CCW) rotation processing for an indev pointer
+ * @param indev         pointer to an indev
+ */
+uint8_t lv_indev_get_ccw_pointer(lv_indev_t * indev);
+
 #if LV_USE_EXT_DATA
 /**
  * @brief Attaches external user data and destructor callback to an indev

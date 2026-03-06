@@ -112,6 +112,7 @@ struct _lv_indev_t {
         uint8_t gesture_sent : 1;
         uint8_t press_moved : 1;
         uint8_t pressed : 1;
+        uint8_t ccw_rotation : 1;
     } pointer;
     struct {
         /*Keypad data*/
