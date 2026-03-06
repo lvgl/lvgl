@@ -43,6 +43,9 @@ from .lvgl import (
     INDEV_TYPE_NAMES,
     LVGroup,
     LVObjClass,
+    LVSubject,
+    LVObserver,
+    SUBJECT_TYPE_NAMES,
 )
 from . import cmds as cmds
 
@@ -89,4 +92,7 @@ __all__ = [
     "INDEV_TYPE_NAMES",
     "LVGroup",
     "LVObjClass",
+    "LVSubject",
+    "LVObserver",
+    "SUBJECT_TYPE_NAMES",
 ]
