@@ -8,6 +8,9 @@ from .core import (
     INDEV_TYPE_NAMES,
     LVGroup,
     LVObjClass,
+    LVSubject,
+    LVObserver,
+    SUBJECT_TYPE_NAMES,
 )
 from .display import LVDisplay
 from .draw import (
@@ -100,4 +103,7 @@ __all__ = [
     "INDEV_TYPE_NAMES",
     "LVGroup",
     "LVObjClass",
+    "LVSubject",
+    "LVObserver",
+    "SUBJECT_TYPE_NAMES",
 ]
