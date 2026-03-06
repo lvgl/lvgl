@@ -1,6 +1,6 @@
 import gdb
 
-from .core import DumpObj, DumpIndev, DumpGroup
+from .core import DumpObj, DumpIndev, DumpGroup, InfoObjClass
 from .display import DumpDisplayBuf
 from .draw import InfoDrawUnit, DumpDrawTask
 from .misc import (
@@ -45,6 +45,7 @@ DumpDrawTask()
 # Infos
 InfoStyle()
 InfoDrawUnit()
+InfoObjClass()
 
 # Drivers
 Lvglobal()
