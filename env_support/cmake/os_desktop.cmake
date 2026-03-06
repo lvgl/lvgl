@@ -61,6 +61,11 @@ get_directory_property(HAS_PARENT_SCOPE PARENT_DIRECTORY)
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c
                           ${LVGL_ROOT_DIR}/src/*.cpp
                           ${LVGL_ROOT_DIR}/src/*.S)
+# Helium (MVE) assembly is only valid on Cortex-M targets.
+# Desktop toolchains (macOS/Windows/Linux) can't assemble it.
+if(APPLE OR WIN32 OR (UNIX AND NOT CMAKE_SYSTEM_NAME STREQUAL "Generic"))
+    list(FILTER SOURCES EXCLUDE REGEX ".*/blend/helium/.*\\.S$")
+endif()
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp
