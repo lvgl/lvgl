@@ -437,14 +437,14 @@ static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
                     gchar * debug;
                     gst_message_parse_error(msg, &err, &debug);
                     GstObject * src = GST_MESSAGE_SRC(msg);
-                    const gchar * source_name = "unknown";
+                    const gchar * name = NULL;
                     if(src != NULL) {
-                        const gchar * name = GST_OBJECT_NAME(src);
-                        if(name != NULL) {
-                            source_name = name;
-                        }
+                        name = GST_OBJECT_NAME(src);
                     }
-                    LV_LOG_ERROR("GStreamer error from %s: %s", source_name, err->message);
+                    if(!name) {
+                        name = "unknown";
+                    }
+                    LV_LOG_ERROR("GStreamer error from %s: %s", name, err->message);
                     if(debug && debug[0] != '\0') {
                         LV_LOG_ERROR("GStreamer error details: %s", debug);
                     }
@@ -610,9 +610,9 @@ static bool gstreamer_element_has_property(GstElement * element, const char * pr
 
 static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value)
 {
-    if(!element || !property_name || !value) {
-        return false;
-    }
+    LV_ASSERT_NULL(element);
+    LV_ASSERT_NULL(property_name);
+    LV_ASSERT_NULL(value);
 
     if(!GST_IS_CHILD_PROXY(element)) {
         LV_LOG_WARN("Element does not support child proxy for property '%s'", property_name);
