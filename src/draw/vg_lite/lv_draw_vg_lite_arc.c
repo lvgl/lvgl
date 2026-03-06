@@ -188,7 +188,7 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
                 VG_LITE_PATTERN_COLOR,
                 0,
                 img_color,
-                VG_LITE_FILTER_BI_LINEAR);
+                lv_vg_lite_matrix_get_filter(&matrix));
 
             lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
         }

@@ -177,6 +177,26 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
 
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point);
 
+static inline bool lv_vg_lite_matrix_has_transform(const vg_lite_matrix_t * matrix)
+{
+    /**
+     * When the rotation angle is 0 or 180 degrees,
+     * it is considered that there is no transformation.
+     */
+    return !((matrix->m[0][0] == 1.0f || matrix->m[0][0] == -1.0f) &&
+             matrix->m[0][1] == 0.0f &&
+             matrix->m[1][0] == 0.0f &&
+             (matrix->m[1][1] == 1.0f || matrix->m[1][1] == -1.0f) &&
+             matrix->m[2][0] == 0.0f &&
+             matrix->m[2][1] == 0.0f &&
+             matrix->m[2][2] == 1.0f);
+}
+
+static inline vg_lite_filter_t lv_vg_lite_matrix_get_filter(const vg_lite_matrix_t * matrix)
+{
+    return lv_vg_lite_matrix_has_transform(matrix) ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+}
+
 void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area);
 
 void lv_vg_lite_disable_scissor(void);
