@@ -3,6 +3,8 @@ from .lv_global import curr_inst
 from .lv_indev import LVIndev, INDEV_TYPE_NAMES
 from .lv_group import LVGroup
 from .lv_obj_class import LVObjClass
+from .lv_observer import LVSubject, LVObserver
+from .lv_observer_consts import SUBJECT_TYPE_NAMES
 
 __all__ = [
     "LVObject",
@@ -14,4 +16,7 @@ __all__ = [
     "INDEV_TYPE_NAMES",
     "LVGroup",
     "LVObjClass",
+    "LVSubject",
+    "LVObserver",
+    "SUBJECT_TYPE_NAMES",
 ]
