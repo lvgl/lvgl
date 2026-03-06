@@ -62,6 +62,9 @@ extern "C" {
 #define LV_GSTREAMER_FACTORY_APP             "appsrc"
 #define LV_GSTREAMER_PROPERTY_APP             NULL
 
+#define LV_GSTREAMER_FACTORY_WEBRTCSRC       "webrtcsrc"
+#define LV_GSTREAMER_PROPERTY_WEBRTCSRC      "signaller::uri"
+
 /**********************
  *      TYPEDEFS
  **********************/
