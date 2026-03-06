@@ -41,7 +41,15 @@ class LVTimer(Value):
     def print_entries(timers):
         """Print timers as a PrettyTable."""
         table = PrettyTable()
-        table.field_names = ["#", "callback", "period", "freq", "last_run", "repeat", "paused"]
+        table.field_names = [
+            "#",
+            "callback",
+            "period",
+            "freq",
+            "last_run",
+            "repeat",
+            "paused",
+        ]
         table.align = "l"
 
         for i, timer in enumerate(timers):

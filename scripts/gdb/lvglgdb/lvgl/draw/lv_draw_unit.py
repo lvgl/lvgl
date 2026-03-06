@@ -36,12 +36,10 @@ class LVDrawUnit(Value):
         table.field_names = ["#", "name", "idx"]
         table.align = "l"
 
-        count = 0
         for i, unit in enumerate(units):
             table.add_row([i, unit.name, unit.idx])
-            count += 1
 
-        if count == 0:
+        if not table.rows:
             print("No draw units.")
         else:
             print(table)
