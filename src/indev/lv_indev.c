@@ -712,6 +712,38 @@ void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap
     indev->key_remap_cb = remap_cb;
 }
 
+void lv_indev_set_ccw_pointer(lv_indev_t * indev)
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't set CCW rotation processing on a NULL indev");
+        return;
+    }
+
+    indev->pointer.ccw_rotation = 1;
+}
+
+
+void lv_indev_clear_ccw_pointer(lv_indev_t * indev)
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't clear CCW rotation processing on a NULL indev");
+        return;
+    }
+
+    indev->pointer.ccw_rotation = 0;
+}
+
+
+uint8_t lv_indev_get_ccw_pointer(lv_indev_t * indev)
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't get CCW rotation setting for a NULL indev");
+        return 0;
+    }
+
+    return indev->pointer.ccw_rotation;
+}
+
 #if LV_USE_EXT_DATA
 void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data))
 {
@@ -740,7 +772,12 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    lv_display_rotate_point(i->disp, &data->point);
+    if(i->pointer.ccw_rotation)
+    {
+        lv_display_rotate_point_ccw(i->disp, &data->point);
+    } else {
+        lv_display_rotate_point(i->disp, &data->point);
+    }
 
     /*Simple sanity check*/
     if(data->point.x < 0) {
