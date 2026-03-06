@@ -129,7 +129,6 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 
     LV_LOG_TRACE("begin");
 
-
     if(!lv_obj_allocate_spec_attr(obj)) {
         return;
     }
