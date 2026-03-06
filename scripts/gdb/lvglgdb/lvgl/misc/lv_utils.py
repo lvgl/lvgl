@@ -65,3 +65,30 @@ def build_global_field_map(field_type_name):
         return result
     except gdb.error:
         return {}
+
+
+# LVGL coordinate type constants (from lv_area.h)
+_COORD_TYPE_SHIFT = 29
+_COORD_TYPE_SPEC = 1 << _COORD_TYPE_SHIFT
+_COORD_MAX = (1 << _COORD_TYPE_SHIFT) - 1
+_SIZE_CONTENT = _COORD_MAX | _COORD_TYPE_SPEC
+_PCT_POS_MAX = (_COORD_MAX - 1) // 2
+
+
+def format_coord(val):
+    """Format an lv_coord_t value into a human-readable string.
+
+    Decodes special LVGL coordinate encodings:
+      - LV_SIZE_CONTENT -> "CONTENT"
+      - LV_PCT(x)       -> "x%"
+      - plain pixel      -> "123"
+    """
+    val = int(val)
+    if val == _SIZE_CONTENT:
+        return "CONTENT"
+    if val & _COORD_TYPE_SPEC:
+        plain = val & ~_COORD_TYPE_SPEC
+        if plain <= _PCT_POS_MAX:
+            return f"{plain}%"
+        return f"{_PCT_POS_MAX - plain}%"
+    return str(val)

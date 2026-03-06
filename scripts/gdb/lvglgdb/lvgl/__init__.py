@@ -7,6 +7,7 @@ from .core import (
     LVIndev,
     INDEV_TYPE_NAMES,
     LVGroup,
+    LVObjClass,
 )
 from .display import LVDisplay
 from .draw import (
@@ -48,6 +49,7 @@ from .misc import (
     LVTimer,
     LVImageDecoder,
     LVFsDrv,
+    format_coord,
 )
 
 __all__ = [
@@ -93,7 +95,9 @@ __all__ = [
     "LVTimer",
     "LVImageDecoder",
     "LVFsDrv",
+    "format_coord",
     "LVIndev",
     "INDEV_TYPE_NAMES",
     "LVGroup",
+    "LVObjClass",
 ]
