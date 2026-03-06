@@ -1,6 +1,6 @@
 import gdb
 
-from .core import DumpObj, DumpIndev
+from .core import DumpObj, DumpIndev, DumpGroup
 from .display import DumpDisplayBuf
 from .draw import InfoDrawUnit, DumpDrawTask
 from .misc import (
@@ -39,6 +39,7 @@ DumpTimer()
 DumpImageDecoder()
 DumpFsDrv()
 DumpIndev()
+DumpGroup()
 DumpDrawTask()
 
 # Infos

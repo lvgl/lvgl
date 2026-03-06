@@ -6,6 +6,7 @@ from .core import (
     dump_obj_styles,
     LVIndev,
     INDEV_TYPE_NAMES,
+    LVGroup,
 )
 from .display import LVDisplay
 from .draw import (
@@ -94,4 +95,5 @@ __all__ = [
     "LVFsDrv",
     "LVIndev",
     "INDEV_TYPE_NAMES",
+    "LVGroup",
 ]

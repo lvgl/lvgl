@@ -40,6 +40,7 @@ from .lvgl import (
     LVFsDrv,
     LVIndev,
     INDEV_TYPE_NAMES,
+    LVGroup,
 )
 from . import cmds as cmds
 
@@ -83,4 +84,5 @@ __all__ = [
     "LVFsDrv",
     "LVIndev",
     "INDEV_TYPE_NAMES",
+    "LVGroup",
 ]

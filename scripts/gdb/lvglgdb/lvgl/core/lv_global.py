@@ -73,6 +73,12 @@ class LVGL:
         for timer in LVList(self.lv_global.timer_state.timer_ll, "lv_timer_t"):
             yield LVTimer(timer)
 
+    def groups(self):
+        from .lv_group import LVGroup
+
+        for group in LVList(self.lv_global.group_ll, "lv_group_t"):
+            yield LVGroup(group)
+
     def indevs(self):
         from .lv_indev import LVIndev
 
