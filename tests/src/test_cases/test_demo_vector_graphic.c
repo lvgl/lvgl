@@ -23,6 +23,9 @@ void tearDown(void)
 
 void test_demo_vector_graphic(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_demo_vector_graphic_buffered();
     TEST_ASSERT_EQUAL_SCREENSHOT("demo_vector_graphic_buffered" EXT_NAME);
 
@@ -30,6 +33,7 @@ void test_demo_vector_graphic(void)
 
     lv_demo_vector_graphic_not_buffered();
     TEST_ASSERT_EQUAL_SCREENSHOT("demo_vector_graphic_not_buffered" EXT_NAME);
+#endif
 }
 
 #endif

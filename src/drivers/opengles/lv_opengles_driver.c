@@ -247,7 +247,6 @@ void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
 }
-
 void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
 {
     /*TODO: Deprecate this function and make lv_opengles_render_display public instead*/
