@@ -139,7 +139,6 @@ class LVEventList(Value):
         table.field_names = ["#", "callback", "filter", "flags", "user_data"]
         table.align = "l"
 
-        count = 0
         for i, dsc in enumerate(event_dscs):
             cb_str = dsc.cb.format_string(symbols=True, address=True)
             flags = []
@@ -150,9 +149,8 @@ class LVEventList(Value):
             table.add_row(
                 [i, cb_str, dsc.filter_name, ",".join(flags) or "-", dsc.user_data]
             )
-            count += 1
 
-        if count == 0:
+        if not table.rows:
             print("No event descriptors.")
         else:
             print(table)

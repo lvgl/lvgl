@@ -39,8 +39,20 @@ Example of usage:
 The plugin provides the following commands.
 
 - ``dump obj``: Dump the object tree.
+- ``dump display``: Export display draw buffers to image files (BMP/PNG).
+- ``dump cache``: Dump image or image header cache entries.
+- ``check cache``: Run sanity check on image or image header cache.
+- ``dump anim``: List all active animations.
+- ``dump timer``: List all active timers.
+- ``dump indev``: List all input devices.
+- ``dump group``: List all focus groups with objects.
+- ``dump image_decoder``: List all registered image decoders.
+- ``dump fs_drv``: List all registered filesystem drivers.
+- ``dump draw_task <expr>``: List draw tasks from a layer.
 - ``info style``: Inspect style properties of an ``lv_style_t`` or an ``lv_obj_t``.
 - ``info draw_unit``: Display all current drawing unit information.
+- ``info obj_class <expr>``: Show object class hierarchy.
+- ``info subject <expr>``: Show subject and its observers.
 
 .. note::
 
@@ -57,7 +69,7 @@ Dump Obj Tree
 
 ``dump obj -L 2``: Dump the object tree with a depth of 2.
 
-``dump obj -a 0x60700000dd10``: Dump the object tree starting from the specified address.
+``dump obj <root_expr>``: Dump the object tree starting from the specified object.
 
 
 
@@ -107,3 +119,90 @@ Connect to ``PyCharm`` / ``VSCode`` / ``Eclipse (not supported yet)``
 
 Perform a web search for ``pydevd_pycharm`` or ``debugpy`` for details about how to
 use the debugger.
+
+
+Dump Display
+************
+
+``dump display``: Export the current display's draw buffers (buf_1, buf_2) to image files.
+
+.. code:: bash
+
+    (gdb) dump display
+    (gdb) dump display -p /tmp/ -f png
+
+
+Check Cache
+***********
+
+``check cache <type>``: Run sanity check on image or image header cache, validating
+cross-pointers between red-black tree and linked list, decoded pointers, image sizes,
+and source pointers. ``<type>`` is ``image`` or ``image_header``.
+
+
+Dump Animations
+***************
+
+``dump anim``: List all active animations in a table with exec_cb, value range,
+duration, repeat count, and status.
+
+``dump anim --detail``: Print detailed info for each animation.
+
+
+Dump Timers
+***********
+
+``dump timer``: List all active timers with callback, period, frequency, last_run,
+repeat count, and paused state.
+
+
+Dump Input Devices
+******************
+
+``dump indev``: List all registered input devices with type, state, read callback,
+and configuration (long_press_time, scroll_limit, group).
+
+
+Dump Focus Groups
+*****************
+
+``dump group``: List all focus groups with object count, frozen/editing/wrap state,
+and focused object.
+
+
+Dump Image Decoders
+*******************
+
+``dump image_decoder``: List all registered image decoders with name, info_cb,
+open_cb, and close_cb.
+
+
+Dump Filesystem Drivers
+***********************
+
+``dump fs_drv``: List all registered filesystem drivers with drive letter, driver type,
+cache size, and callbacks (open, read, write, close).
+
+
+Dump Draw Tasks
+***************
+
+``dump draw_task <layer_expr>``: Walk the draw task linked list from a layer expression
+and display each task's type, state, area, opacity, and preferred draw unit id.
+
+
+Inspect Object Class
+********************
+
+``info obj_class <expr>``: Show the class hierarchy chain for an ``lv_obj_class_t``.
+
+``info obj_class --all``: List all registered object classes in a table.
+
+Example:
+
+Inspect Subject
+***************
+
+``info subject <expr>``: Show a subject's type and all its observers.
+
+Example:

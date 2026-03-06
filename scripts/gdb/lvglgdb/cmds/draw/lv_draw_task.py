@@ -16,10 +16,10 @@ class DumpDrawTask(gdb.Command):
         if not args.strip():
             print("Usage: dump draw_task <layer_expression>")
             return
-        try:
-            val = gdb.parse_and_eval(args.strip())
-        except gdb.error as e:
-            print(f"Error: {e}")
-            return
 
-        LVDrawTask.print_entries(LVDrawTask(Value(val)))
+        layer = Value(gdb.parse_and_eval(args.strip()))
+        task_head = layer.draw_task_head
+        if not int(task_head):
+            print("No draw tasks on this layer.")
+            return
+        LVDrawTask.print_entries(LVDrawTask(task_head))

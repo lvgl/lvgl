@@ -9,7 +9,7 @@ class DumpTimer(gdb.Command):
 
     def __init__(self):
         super(DumpTimer, self).__init__(
-            "dump timers", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION
+            "dump timer", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION
         )
 
     def invoke(self, args, from_tty):
