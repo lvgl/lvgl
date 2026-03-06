@@ -163,6 +163,7 @@ static void x11_inp_event_handler(lv_timer_t * t)
                             case XK_KP_Delete:
                                 xd->kb_buffer[len] = LV_KEY_DEL;
                                 break;
+                            case XK_Return:
                             case XK_KP_Enter:
                                 xd->kb_buffer[len] = LV_KEY_ENTER;
                                 break;
