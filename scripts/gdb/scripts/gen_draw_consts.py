@@ -10,6 +10,7 @@ Usage:
 """
 
 import re
+import sys
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
@@ -19,6 +20,8 @@ OUTPUT = GDB_ROOT / "lvglgdb" / "lvgl" / "draw" / "lv_draw_consts.py"
 
 DRAW_H = LVGL_SRC / "draw" / "lv_draw.h"
 DRAW_DIR = LVGL_SRC / "draw"
+
+sys.path.insert(0, str(SCRIPT_DIR))
 
 
 def parse_enum(path: Path, enum_type: str, prefix: str) -> dict[int, str]:

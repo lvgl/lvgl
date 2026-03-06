@@ -103,7 +103,7 @@ class LVAnim(Value):
 
     def print_info(self):
         """Print detailed info for a single animation."""
-        print(f"Animation @{hex(int(self.address))}")
+        print(f"Animation @{hex(int(self))}")
         print(f"  var          = {self.var}")
         print(f"  exec_cb      = {_fmt_cb(self.exec_cb)}")
         print(f"  path_cb      = {_fmt_cb(self.path_cb)}")
@@ -115,7 +115,7 @@ class LVAnim(Value):
             f"  value        = {self.start_value} -> {self.current_value} -> {self.end_value}"
         )
         print(f"  duration     = {self.duration}ms  act_time={self.act_time}ms")
-        repeat = "inf" if self.repeat_cnt == 0xFFFF else str(self.repeat_cnt)
+        repeat = "inf" if self.repeat_cnt == 0xFFFFFFFF else str(self.repeat_cnt)
         print(f"  repeat       = {repeat}  repeat_delay={self.repeat_delay}ms")
         print(
             f"  reverse      = dur={self.reverse_duration}ms  delay={self.reverse_delay}ms"
@@ -140,7 +140,7 @@ class LVAnim(Value):
 
         for i, anim in enumerate(anims):
             cb_str = _fmt_cb(anim.exec_cb)
-            repeat = "inf" if anim.repeat_cnt == 0xFFFF else str(anim.repeat_cnt)
+            repeat = "inf" if anim.repeat_cnt == 0xFFFFFFFF else str(anim.repeat_cnt)
             value_str = f"{anim.start_value}/{anim.current_value}/{anim.end_value}"
             table.add_row(
                 [

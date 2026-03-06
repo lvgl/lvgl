@@ -200,9 +200,22 @@ Inspect Object Class
 
 Example:
 
+.. code-block:: none
+
+   (gdb) info obj_class lv_button_class
+   ObjClass: lv_button -> lv_obj -> lv_obj
+     size=... editable=0 group_def=2
+     default_size=(CONTENT, CONTENT) theme_inheritable=True
+
 Inspect Subject
 ***************
 
 ``info subject <expr>``: Show a subject's type and all its observers.
 
 Example:
+
+.. code-block:: none
+
+   (gdb) info subject &my_subject
+   Subject: type=INT subscribers=2
+     Observer: cb=0x... <my_cb> target=0x... for_obj=True

@@ -8,7 +8,6 @@ Usage:
     python3 scripts/gen_subject_consts.py
 """
 
-import re
 import sys
 from pathlib import Path
 
