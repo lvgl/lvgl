@@ -340,17 +340,9 @@ Once media is loaded (LV_EVENT_READY), you can access:
 - Current volume level via ``lv_gstreamer_get_volume()``
 - Current playback state via ``lv_gstreamer_get_state()``
 
-.. _gstreamer_example:
-
-Example
-*******
-
-.. include:: /examples/libs/gstreamer/index.rst
-
-.. _gstreamer_api:
-
 WebRTC Notes
 ************
+
 WebRTC is using the Rust plugin "https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs"
 So to be able to stream to an LVGL player application you will need to run a signaller server and then a simpler pipeline like so:
 
@@ -360,6 +352,16 @@ So to be able to stream to an LVGL player application you will need to run a sig
     gst-launch-1.0 videotestsrc pattern=ball ! webrtcsink
 
 Then, in your LVGL application, configure WebRTC by passing the signalling server URI (for example, ``ws://localhost:8443``) to ``lv_gstreamer_set_src(..., LV_GSTREAMER_PROPERTY_WEBRTCSRC, ...)``.
+
+
+.. _gstreamer_example:
+
+Example
+*******
+
+.. include:: /examples/libs/gstreamer/index.rst
+
+.. _gstreamer_api:
 
 API
 ***

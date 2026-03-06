@@ -387,6 +387,13 @@ install(
     RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
     PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
 
+# Build up the Requires: field for lvgl.pc so that pkg-config consumers
+# automatically pull in the correct link flags for public dependencies.
+set(LVGL_PC_REQUIRES "")
+if(LV_BUILD_ENABLE_GSTREAMER)
+    string(APPEND LVGL_PC_REQUIRES "gstreamer-1.0 gstreamer-video-1.0 gstreamer-app-1.0")
+endif()
+
 # TODO: if LVGL is linked with something else eg Freetype, Pkgconfig file must contain -lfreetype2
 configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" ${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc @ONLY)
 configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" ${CMAKE_CURRENT_BINARY_DIR}/lv_version.h @ONLY)

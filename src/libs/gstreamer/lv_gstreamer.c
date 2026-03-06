@@ -140,6 +140,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
         /* LV_GSTREAMER_PROPERTY_WEBRTCSRC is a child-proxy property path */
         if(lv_streq(property, LV_GSTREAMER_PROPERTY_WEBRTCSRC)) {
             if(!gstreamer_set_child_proxy_string(head, property, source)) {
+                gst_object_unref(pipeline);
                 LV_LOG_ERROR("Failed to set '%s' via child proxy", property);
                 return LV_RESULT_INVALID;
             }
