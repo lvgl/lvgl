@@ -44,9 +44,7 @@ def generate(subject_types: dict[int, str]) -> str:
 
 
 def main():
-    subject_types = parse_enum(
-        OBSERVER_H, "lv_subject_type_t", "LV_SUBJECT_TYPE_"
-    )
+    subject_types = parse_enum(OBSERVER_H, "lv_subject_type_t", "LV_SUBJECT_TYPE_")
     src = generate(subject_types)
     OUTPUT.write_text(src)
     print(f"Generated {OUTPUT} ({len(subject_types)} subject types)")

@@ -57,7 +57,6 @@ class LVDrawTask(Value):
         table.field_names = ["#", "type", "state", "area", "opa", "unit_id"]
         table.align = "l"
 
-        count = 0
         for i, t in enumerate(tasks):
             table.add_row(
                 [
@@ -69,9 +68,8 @@ class LVDrawTask(Value):
                     t.preferred_draw_unit_id,
                 ]
             )
-            count += 1
 
-        if count == 0:
+        if not table.rows:
             print("No draw tasks.")
         else:
             print(table)

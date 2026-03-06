@@ -111,11 +111,15 @@ class LVAnim(Value):
         print(f"  completed_cb = {_fmt_cb(self.completed_cb)}")
         print(f"  deleted_cb   = {_fmt_cb(self.deleted_cb)}")
         print(f"  user_data    = {self.user_data}")
-        print(f"  value        = {self.start_value} -> {self.current_value} -> {self.end_value}")
+        print(
+            f"  value        = {self.start_value} -> {self.current_value} -> {self.end_value}"
+        )
         print(f"  duration     = {self.duration}ms  act_time={self.act_time}ms")
         repeat = "inf" if self.repeat_cnt == 0xFFFF else str(self.repeat_cnt)
         print(f"  repeat       = {repeat}  repeat_delay={self.repeat_delay}ms")
-        print(f"  reverse      = dur={self.reverse_duration}ms  delay={self.reverse_delay}ms")
+        print(
+            f"  reverse      = dur={self.reverse_duration}ms  delay={self.reverse_delay}ms"
+        )
         print(f"  status       = {self._status_str()}  early_apply={self.early_apply}")
 
     @staticmethod
