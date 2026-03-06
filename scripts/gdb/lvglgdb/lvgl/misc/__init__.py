@@ -27,6 +27,7 @@ from .lv_anim import LVAnim
 from .lv_timer import LVTimer
 from .lv_image_decoder import LVImageDecoder
 from .lv_fs import LVFsDrv
+from .lv_utils import format_coord
 
 __all__ = [
     "LVList",
@@ -59,4 +60,5 @@ __all__ = [
     "LVTimer",
     "LVImageDecoder",
     "LVFsDrv",
+    "format_coord",
 ]
