@@ -1,8 +1,8 @@
 """
 Auto-generated style constants from LVGL headers.
 
-Do not edit manually. Regenerate with:
-    python3 scripts/gen_style_consts.py
+Do not edit manually. Regenerate from the GDB script root with:
+    python3 scripts/generate_all.py
 """
 
 STYLE_PROP_NAMES = {
