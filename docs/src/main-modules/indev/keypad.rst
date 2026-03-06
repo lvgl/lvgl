@@ -88,6 +88,9 @@ The most important special keys in your :cpp:func:`read_cb` function are:
 You should translate some of the read keys to these special keys to support navigation
 in a group and interact with selected widgets.
 
+If you want to use the raw keycode of your keypad input device, define :c:macro:`LV_EVDEV_RAW_KEYCODE`.
+It may be necessary to use the :ref:`indev_key_remapping`.
+
 
 Key Events
 **********
@@ -111,6 +114,7 @@ an indev event like this:
     lv_indev_add_event_cb(keyboard, key_event_cb, LV_EVENT_KEY, NULL);
 
 
+.. _indev_key_remapping:
 
 Key Remapping
 *************
