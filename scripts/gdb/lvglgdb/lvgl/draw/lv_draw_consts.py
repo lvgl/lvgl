@@ -1,8 +1,8 @@
 """
 Auto-generated draw constants from LVGL headers.
 
-Do not edit manually. Regenerate with:
-    python3 scripts/gen_draw_consts.py
+Do not edit manually. Regenerate from the GDB script root with:
+    python3 scripts/generate_all.py
 """
 
 DRAW_TASK_TYPE_NAMES = {
