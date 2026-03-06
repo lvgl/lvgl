@@ -13,7 +13,14 @@
     #define LV_USE_GLFW 0
 #endif
 
-#define LV_USE_OPENGLES 1
+#if defined(LV_USE_OPENGLES) && LV_USE_OPENGLES == 0
+    #undef LV_USE_OPENGLES
+#endif
+
+#ifndef LV_USE_OPENGLES
+    #define LV_USE_OPENGLES 1
+#endif
+
 #define LV_USE_DRAW_OPENGLES 1
 
 /* Snapshot is not supported with draw opengles */
