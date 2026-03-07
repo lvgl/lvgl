@@ -331,7 +331,8 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
     /*Search the line of the index letter*/;
     while(txt[new_line_start] != '\0') {
-        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
+        // Removed to fix cursor position calculation
+        // new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
         bool last_line = y + letter_height + line_space + letter_height > max_h;
         if(last_line && label->long_mode == LV_LABEL_LONG_DOT) flag |= LV_TEXT_FLAG_BREAK_ALL;
 
