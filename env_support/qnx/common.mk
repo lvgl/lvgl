@@ -93,6 +93,7 @@ $(SRC_ROOT)/widgets/arc \
 $(SRC_ROOT)/widgets/msgbox \
 $(SRC_ROOT)/widgets/property \
 $(SRC_ROOT)/widgets/chart \
+$(SRC_ROOT)/widgets/polarchart \
 $(SRC_ROOT)/widgets/table \
 $(SRC_ROOT)/widgets/list \
 $(SRC_ROOT)/widgets/button \

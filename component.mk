@@ -81,6 +81,7 @@ COMPONENT_SRCDIRS := . \
                   src/widgets/menu \
                   src/widgets/meter \
                   src/widgets/msgbox \
+                  src/widgets/polarchart \
                   src/widgets/roller \
                   src/widgets/scale \
                   src/widgets/slider \

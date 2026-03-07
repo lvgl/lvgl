@@ -766,6 +766,7 @@
                 <file category="sourceC"            name="src/widgets/menu/lv_menu.c" />
                 <file category="sourceC"            name="src/widgets/msgbox/lv_msgbox.c" />
                 <file category="sourceC"            name="src/widgets/objx_templ/lv_objx_templ.c" />
+                <file category="sourceC"            name="src/widgets/polarchart/lv_polarchart.c" />
                 <file category="sourceC"            name="src/widgets/roller/lv_roller.c" />
                 <file category="sourceC"            name="src/widgets/scale/lv_scale.c" />
                 <file category="sourceC"            name="src/widgets/slider/lv_slider.c" />
