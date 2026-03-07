@@ -637,4 +637,55 @@ void test_scale_properties(void)
 #endif
 }
 
+static lv_obj_t * create_self_size_scale(lv_obj_t * parent, lv_scale_mode_t mode)
+{
+
+    lv_obj_t * scale = lv_scale_create(parent);
+    switch(mode) {
+        case LV_SCALE_MODE_HORIZONTAL_TOP:
+        case LV_SCALE_MODE_HORIZONTAL_BOTTOM:
+            lv_obj_set_height(scale, LV_SIZE_CONTENT);
+            break;
+        case LV_SCALE_MODE_VERTICAL_LEFT:
+        case LV_SCALE_MODE_VERTICAL_RIGHT:
+            lv_obj_set_width(scale, LV_SIZE_CONTENT);
+            break;
+        default:
+            break;
+    }
+    lv_scale_set_mode(scale, mode);
+    lv_scale_set_label_show(scale, true);
+    lv_obj_set_style_outline_width(scale, 2, LV_PART_MAIN);
+
+    return scale;
+}
+
+static lv_obj_t * set_tick_length(lv_obj_t * scale, int32_t major_len, int32_t minor_len)
+{
+    lv_obj_set_style_length(scale, minor_len, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, major_len, LV_PART_INDICATOR);
+    return scale;
+}
+
+void test_scale_self_size(void)
+{
+
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+
+    create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_TOP);
+    create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_LEFT);
+    create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_RIGHT);
+
+    lv_obj_t * scale = set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_TOP), 30, 5);
+    lv_obj_set_flag(scale, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK, true);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_HORIZONTAL_BOTTOM), 30, 5);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_LEFT), 30, 5);
+    set_tick_length(create_self_size_scale(cont, LV_SCALE_MODE_VERTICAL_RIGHT), 30, 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_self_size.png");
+}
+
 #endif
