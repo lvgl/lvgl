@@ -11,6 +11,7 @@ on:
       - 'demos/**'
       - 'scripts/build_html_examples.sh'
       - 'scripts/find_version.sh'
+      - 'configs/ci/docs/lv_conf_docs.defaults'
   push:
     branches:
       - master
@@ -22,6 +23,7 @@ on:
       - 'demos/**'
       - 'scripts/build_html_examples.sh'
       - 'scripts/find_version.sh'
+      - 'configs/ci/docs/lv_conf_docs.defaults'
       - 'lv_conf_template.h'
       - 'lv_version.h'
       - 'lvgl.h'
