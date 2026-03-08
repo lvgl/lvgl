@@ -13,6 +13,7 @@ Prerequisites
 -------------
 
 Your system has a framebuffer device configured (usually under ``/dev/fb0``).
+Your display uses the following color formats: I1, L8, RGB565, RGB888, XRGB8888.
 
 Configuring the driver
 ----------------------
