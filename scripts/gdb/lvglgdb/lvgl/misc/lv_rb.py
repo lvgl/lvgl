@@ -7,6 +7,18 @@ from lvglgdb.value import Value, ValueInput
 class LVRedBlackTree(Value):
     """LVGL red-black tree iterator"""
 
+    _DISPLAY_SPEC = {
+        "info": [
+            ("_title", lambda d: "Red-Black Tree Info:"),
+            ("Address", "addr"),
+            ("Node Size", "size"),
+            ("Node Count", "node_count"),
+            ("_skip_if", "datatype", None, ("Data Type", "datatype")),
+        ],
+        "table": [],
+        "empty_msg": "",
+    }
+
     def __init__(self, rb: ValueInput, datatype: Union[gdb.Type, str] = None):
         super().__init__(Value.normalize(rb, "lv_rb_t"))
         self.lv_rb_node_t = gdb.lookup_type("lv_rb_node_t").pointer()
@@ -67,55 +79,16 @@ class LVRedBlackTree(Value):
             return data.cast(self.datatype)
         return data
 
-    def format_data(self, data):
-        """Format data for display - simple GDB style"""
-        if data is None:
-            return "None"
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
 
-        try:
-            ptr_addr = f"0x{int(data):x}"
-        except:
-            return str(data)
-
-        if self.datatype and data:
-            try:
-                struct_data = data.dereference()
-                return f"{ptr_addr} -> {struct_data}"
-            except:
-                pass
-
-        return ptr_addr
-
-    def print_info(self):
-        """Dump basic tree information"""
-        print(f"Red-Black Tree Info:")
-        print(f"  Size: {int(self.size)}")
-        print(f"  Node Count: {len(self)}")
-        print(f"  Root: {self.root}")
-        if self.root:
-            root_color = "Red" if int(self.root.color) == 0 else "Black"
-            print(f"  Root Color: {root_color}")
-        if self.datatype:
-            print(f"  Data Type: {self.datatype}")
-
-    def print_tree(self, max_items=10):
-        """Print tree data in a readable format"""
-        print(f"Red-Black Tree Contents ({len(self)} total items):")
-
-        count = 0
-        for i, data in enumerate(self):
-            if count >= max_items:
-                print(f"  ... showing first {max_items} of {len(self)} items")
-                break
-
-            formatted = self.format_data(data)
-            print(f"  [{i}] {formatted}")
-            count += 1
-
-        if count == 0:
-            print("  (empty)")
-        elif count < len(self):
-            print(f"  ... {len(self) - count} more items not shown")
+        d = {
+            "addr": hex(int(self)),
+            "size": int(self.size),
+            "node_count": len(self),
+            "datatype": str(self.datatype) if self.datatype else None,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
 
 
 class LVRedBlackTreeIterator:
@@ -162,7 +135,3 @@ class LVRedBlackTreeIterator:
         return f"LVRedBlackTreeIterator(current=0x{int(current):x})"
 
 
-def dump_rb_info(rb: ValueInput, datatype: Union[gdb.Type, str] = None):
-    """Dump red-black tree information"""
-    tree = LVRedBlackTree(rb, datatype=datatype)
-    tree.print_info()

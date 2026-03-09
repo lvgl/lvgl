@@ -3,6 +3,7 @@ import argparse
 import gdb
 
 from lvglgdb.lvgl.core.lv_obj_class import LVObjClass
+from lvglgdb.lvgl.formatter import print_info, print_spec_table
 
 
 class InfoObjClass(gdb.Command):
@@ -35,7 +36,11 @@ class InfoObjClass(gdb.Command):
 
         if args.all or not args.expr:
             classes = LVObjClass.collect_all()
-            LVObjClass.print_entries(classes)
+            snaps = LVObjClass.snapshots(classes)
+            if snaps:
+                print_spec_table(snaps)
+            else:
+                print(LVObjClass._DISPLAY_SPEC["empty_msg"])
             return
 
         try:
@@ -43,4 +48,4 @@ class InfoObjClass(gdb.Command):
         except gdb.error as e:
             print(f"Error: {e}")
             return
-        cls.print_info()
+        print_info(cls.snapshot())

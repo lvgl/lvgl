@@ -1,4 +1,4 @@
-from typing import Union, List, Optional, Dict
+from typing import Union
 import gdb
 
 from lvglgdb.value import Value, ValueInput
@@ -8,6 +8,21 @@ from .lv_cache_iter_factory import create_cache_iterator
 class LVCache(Value):
     """LVGL cache wrapper - focuses on cache-level operations"""
 
+    _DISPLAY_SPEC = {
+        "info": [
+            ("_title", lambda d: "Cache Info:"),
+            ("Name", "name"),
+            ("Node Size", "node_size"),
+            ("Max Size", "max_size"),
+            ("Current Size", "current_size"),
+            ("Free Size", lambda d: d["max_size"] - d["current_size"]),
+            ("Enabled", "enabled"),
+            ("_skip_if", "iterator_type", None, ("Iterator Type", "iterator_type")),
+        ],
+        "table": [],
+        "empty_msg": "",
+    }
+
     def __init__(self, cache: ValueInput, datatype: Union[gdb.Type, str]):
         super().__init__(Value.normalize(cache, "lv_cache_t"))
         self.datatype = (
@@ -16,23 +31,26 @@ class LVCache(Value):
             else datatype
         )
 
-    def print_info(self):
-        """Dump cache information"""
-        print(f"Cache Info:")
-        print(f"  Name: {self.name.as_string()}")
-        print(f"  Node Size: {int(self.node_size)}")
-        print(f"  Max Size: {int(self.max_size)}")
-        print(f"  Current Size: {int(self.size)}")
-        print(f"  Free Size: {int(self.max_size) - int(self.size)}")
-        print(f"  Enabled: {bool(int(self.max_size) > 0)}")
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
 
-        # Try to identify cache type
+        iter_type = None
         try:
             iterator = create_cache_iterator(self)
-            print(f"  Iterator Type: {iterator.__class__.__name__}")
-            iterator.cache.print_info()
-        except gdb.error:
+            iter_type = iterator.__class__.__name__
+        except Exception:
             pass
+
+        d = {
+            "addr": hex(int(self)),
+            "name": self.name.as_string(),
+            "node_size": int(self.node_size),
+            "max_size": int(self.max_size),
+            "current_size": int(self.size),
+            "enabled": bool(int(self.max_size) > 0),
+            "iterator_type": iter_type,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
 
     def is_enabled(self):
         """Check if cache is enabled"""
@@ -55,31 +73,9 @@ class LVCache(Value):
             entries.append(entry)
         return entries
 
-    def print_entries(self, max_entries=10):
-        """Print cache entries in readable format"""
-        cache_entries = self.items()
-        cache_entries_cnt = len(cache_entries)
-        print(f"Cache Entries ({cache_entries_cnt} total):")
-
-        count = 0
-        for i, entry in enumerate(cache_entries):
-            if count >= max_entries:
-                print(
-                    f"  ... showing first {max_entries} of {cache_entries_cnt} entries"
-                )
-                break
-
-            print(f"  [{i}] {entry}")
-            count += 1
-
-        if count == 0:
-            print("  (empty)")
-        elif count < int(cache_entries_cnt):
-            print(f"  ... {cache_entries_cnt - count} more entries not shown")
-
     def sanity_check(self, entry_checker=None):
         """Run sanity check and print results as a table"""
-        from prettytable import PrettyTable
+        from lvglgdb.lvgl.formatter import print_table
 
         iterator = iter(self)
         if iterator is None:
@@ -87,21 +83,14 @@ class LVCache(Value):
         else:
             errors = iterator.sanity_check(entry_checker)
 
-        table = PrettyTable()
-        table.field_names = ["#", "status", "detail"]
-        table.align["detail"] = "l"
-
         if errors:
-            for i, err in enumerate(errors):
-                table.add_row([i, "FAIL", err])
+            rows = [{"status": "FAIL", "detail": e} for e in errors]
         else:
-            table.add_row([0, "PASS", f"all {len(iterator)} entries OK"])
+            rows = [{"status": "PASS", "detail": f"all {len(iterator)} entries OK"}]
 
-        print(table)
+        print_table(rows, ["status", "detail"],
+                    lambda i, d: [d["status"], d["detail"]], "",
+                    col_align={"detail": "l"})
         return errors
 
 
-def dump_cache_info(cache: ValueInput, datatype: Union[gdb.Type, str]):
-    """Dump cache information"""
-    cache_obj = LVCache(cache, datatype)
-    cache_obj.print_info()

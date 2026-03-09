@@ -1,11 +1,23 @@
-from prettytable import PrettyTable
-
 from lvglgdb.value import Value, ValueInput
 from .lv_utils import resolve_source_name, build_global_field_map
 
 
 class LVFsDrv(Value):
     """LVGL filesystem driver wrapper"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("letter", lambda d: f"{d['letter']}:"),
+            ("type", "driver_name"),
+            ("cache_size", "cache_size"),
+            ("open_cb", "open_cb"),
+            ("read_cb", "read_cb"),
+            ("write_cb", "write_cb"),
+            ("close_cb", "close_cb"),
+        ],
+        "table": [],
+        "empty_msg": "No registered filesystem drivers.",
+    }
 
     def __init__(self, drv: ValueInput):
         super().__init__(Value.normalize(drv, "lv_fs_drv_t"))
@@ -80,45 +92,22 @@ class LVFsDrv(Value):
     def user_data(self) -> Value:
         return self.super_value("user_data")
 
-    @staticmethod
-    def _fmt_cb(cb: Value) -> str:
-        addr = int(cb)
-        if not addr:
-            return "-"
-        return cb.format_string(symbols=True).replace("\x00", "")
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import fmt_cb
+
+        d = {
+            "addr": hex(int(self)),
+            "letter": self.letter,
+            "driver_name": self.driver_name,
+            "cache_size": self.cache_size,
+            "open_cb": fmt_cb(self.open_cb),
+            "read_cb": fmt_cb(self.read_cb),
+            "write_cb": fmt_cb(self.write_cb),
+            "close_cb": fmt_cb(self.close_cb),
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
 
     @staticmethod
-    def print_entries(drivers):
-        """Print filesystem drivers as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = [
-            "#",
-            "letter",
-            "type",
-            "cache_size",
-            "open_cb",
-            "read_cb",
-            "write_cb",
-            "close_cb",
-        ]
-        table.align = "l"
-
-        fmt = LVFsDrv._fmt_cb
-        for i, drv in enumerate(drivers):
-            table.add_row(
-                [
-                    i,
-                    f"{drv.letter}:",
-                    drv.driver_name,
-                    drv.cache_size,
-                    fmt(drv.open_cb),
-                    fmt(drv.read_cb),
-                    fmt(drv.write_cb),
-                    fmt(drv.close_cb),
-                ]
-            )
-
-        if not table.rows:
-            print("No registered filesystem drivers.")
-        else:
-            print(str(table).replace("\x00", ""))
+    def snapshots(drivers):
+        return [drv.snapshot() for drv in drivers]

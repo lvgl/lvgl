@@ -2,6 +2,7 @@ import gdb
 
 from lvglgdb.value import Value
 from lvglgdb.lvgl.draw.lv_draw_task import LVDrawTask
+from lvglgdb.lvgl.formatter import print_spec_table
 
 
 class DumpDrawTask(gdb.Command):
@@ -22,4 +23,6 @@ class DumpDrawTask(gdb.Command):
         if not int(task_head):
             print("No draw tasks on this layer.")
             return
-        LVDrawTask.print_entries(LVDrawTask(task_head))
+        print_spec_table(
+            LVDrawTask.snapshots(LVDrawTask(task_head)),
+        )

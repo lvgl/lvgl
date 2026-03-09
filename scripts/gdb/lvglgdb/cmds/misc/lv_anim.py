@@ -2,6 +2,7 @@ import gdb
 
 from lvglgdb.lvgl import curr_inst
 from lvglgdb.lvgl.misc.lv_anim import LVAnim
+from lvglgdb.lvgl.formatter import print_info, print_spec_table
 
 
 class DumpAnim(gdb.Command):
@@ -20,7 +21,7 @@ class DumpAnim(gdb.Command):
 
         if args.strip() == "--detail":
             for anim in anims:
-                anim.print_info()
+                print_info(anim.snapshot())
                 print()
         else:
-            LVAnim.print_entries(anims)
+            print_spec_table(LVAnim.snapshots(anims))

@@ -37,7 +37,29 @@ class DumpCache(gdb.Command):
             print("Invalid cache: ", args.cache)
             return
 
-        cache.print_entries()
+        from lvglgdb.lvgl.formatter import print_info, print_spec_table
+
+        # Print cache-level info
+        snap = cache.snapshot()
+        print_info(snap)
+
+        # Print cache entries
+        snaps = cache.snapshots()
+        extra_fields = getattr(cache, "_last_extra_fields", [])
+
+        col_align = {"src": "l", "type": "c"}
+
+        extra_columns = ["entry"] + extra_fields if extra_fields else ["entry"]
+
+        def _extra_row(d):
+            extras = d.get("extra_fields", {})
+            extra_vals = [extras.get(f, "") for f in extra_fields]
+            return [d["entry_addr"]] + extra_vals
+
+        print_spec_table(snaps,
+                         align="r", numbered=False, col_align=col_align,
+                         extra_columns=extra_columns,
+                         extra_row_fn=_extra_row)
 
 
 class CheckPrefix(gdb.Command):

@@ -1,10 +1,24 @@
-from prettytable import PrettyTable
-
 from lvglgdb.value import Value, ValueInput
 
 
 class LVTimer(Value):
     """LVGL timer wrapper"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("callback", "timer_cb"),
+            ("period", "period"),
+            ("freq", "frequency"),
+            ("last_run", "last_run"),
+            ("repeat", lambda d: (
+                "inf" if d["repeat_count"] == -1
+                else str(d["repeat_count"])
+            )),
+            ("paused", "paused"),
+        ],
+        "table": [],
+        "empty_msg": "No active timers.",
+    }
 
     def __init__(self, timer: ValueInput):
         super().__init__(Value.normalize(timer, "lv_timer_t"))
@@ -37,38 +51,24 @@ class LVTimer(Value):
     def auto_delete(self) -> bool:
         return bool(int(self.super_value("auto_delete")))
 
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import fmt_cb, ptr_or_none
+
+        freq = f"{1000 / self.period:.1f}Hz" if self.period > 0 else "-"
+        d = {
+            "addr": hex(int(self)),
+            "timer_cb": fmt_cb(self.timer_cb),
+            "period": self.period,
+            "frequency": freq,
+            "last_run": self.last_run,
+            "repeat_count": self.repeat_count,
+            "paused": self.paused,
+            "user_data": str(self.user_data),
+            "user_data_addr": ptr_or_none(self.user_data),
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+
     @staticmethod
-    def print_entries(timers):
-        """Print timers as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = [
-            "#",
-            "callback",
-            "period",
-            "freq",
-            "last_run",
-            "repeat",
-            "paused",
-        ]
-        table.align = "l"
-
-        for i, timer in enumerate(timers):
-            cb_str = timer.timer_cb.format_string(symbols=True, address=True)
-            repeat = "inf" if timer.repeat_count == -1 else str(timer.repeat_count)
-            freq = f"{1000 / timer.period:.1f}Hz" if timer.period > 0 else "-"
-            table.add_row(
-                [
-                    i,
-                    cb_str,
-                    timer.period,
-                    freq,
-                    timer.last_run,
-                    repeat,
-                    timer.paused,
-                ]
-            )
-
-        if not table.rows:
-            print("No active timers.")
-        else:
-            print(table)
+    def snapshots(timers):
+        return [timer.snapshot() for timer in timers]

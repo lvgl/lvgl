@@ -27,22 +27,6 @@ class LVCacheEntry(Value):
         entry_ptr = int(data_ptr) + data_ptr.type.target().sizeof
         return cls(entry_ptr, datatype)
 
-    def print_info(self):
-        """Dump cache entry information"""
-        print(f"Cache Entry Info:")
-        print(f"  Reference Count: {int(self.ref_cnt)}")
-        print(f"  Node Size: {int(self.node_size)}")
-        print(f"  Flags: {int(self.flags)}")
-        print(f"  Invalid: {self.is_invalid()}")
-        print(f"  Disable Delete: {self.is_disabled_delete()}")
-
-        # Try to get cache info if available
-        try:
-            cache = self.cache
-            if cache:
-                print(f"  Cache: {cache}")
-        except:
-            pass
 
     def get_data(self):
         """Get entry data pointer"""
@@ -80,7 +64,3 @@ class LVCacheEntry(Value):
         return super().__str__()
 
 
-def dump_cache_entry_info(entry: ValueInput, datatype: Union[gdb.Type, str]):
-    """Dump cache entry information"""
-    entry_obj = LVCacheEntry(entry, datatype)
-    entry_obj.print_info()

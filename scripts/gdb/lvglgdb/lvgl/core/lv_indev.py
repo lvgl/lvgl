@@ -1,11 +1,23 @@
-from prettytable import PrettyTable
-
 from lvglgdb.value import Value, ValueInput
 from .lv_indev_consts import INDEV_TYPE_NAMES
 
 
 class LVIndev(Value):
     """LVGL input device wrapper"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("type", "type_name"),
+            ("enabled", "enabled"),
+            ("state", "state"),
+            ("read_cb", "read_cb"),
+            ("long_press_time", "long_press_time"),
+            ("scroll_limit", "scroll_limit"),
+            ("group", "group"),
+        ],
+        "table": [],
+        "empty_msg": "No input devices.",
+    }
 
     def __init__(self, indev: ValueInput):
         super().__init__(Value.normalize(indev, "lv_indev_t"))
@@ -70,40 +82,28 @@ class LVIndev(Value):
     def driver_data(self) -> Value:
         return self.super_value("driver_data")
 
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import fmt_cb, ptr_or_none
+
+        grp = int(self.group)
+        grp_str = f"0x{grp:x}" if grp else "-"
+        d = {
+            "addr": hex(int(self)),
+            "type": self.type,
+            "type_name": self.type_name,
+            "enabled": self.enabled,
+            "state": self.state,
+            "read_cb": fmt_cb(self.read_cb),
+            "long_press_time": self.long_press_time,
+            "scroll_limit": self.scroll_limit,
+            "group": grp_str,
+            "display_addr": ptr_or_none(self.disp),
+            "group_addr": ptr_or_none(self.group),
+            "read_timer_addr": ptr_or_none(self.read_timer),
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+
     @staticmethod
-    def print_entries(indevs):
-        """Print input devices as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = [
-            "#",
-            "type",
-            "enabled",
-            "state",
-            "read_cb",
-            "long_press_time",
-            "scroll_limit",
-            "group",
-        ]
-        table.align = "l"
-
-        for i, indev in enumerate(indevs):
-            cb_str = indev.read_cb.format_string(symbols=True)
-            grp = int(indev.group)
-            grp_str = f"0x{grp:x}" if grp else "-"
-            table.add_row(
-                [
-                    i,
-                    indev.type_name,
-                    indev.enabled,
-                    indev.state,
-                    cb_str,
-                    indev.long_press_time,
-                    indev.scroll_limit,
-                    grp_str,
-                ]
-            )
-
-        if not table.rows:
-            print("No input devices.")
-        else:
-            print(table)
+    def snapshots(indevs):
+        return [indev.snapshot() for indev in indevs]

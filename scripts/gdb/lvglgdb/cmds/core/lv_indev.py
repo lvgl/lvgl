@@ -2,6 +2,7 @@ import gdb
 
 from lvglgdb.lvgl import curr_inst
 from lvglgdb.lvgl.core.lv_indev import LVIndev
+from lvglgdb.lvgl.formatter import print_spec_table
 
 
 class DumpIndev(gdb.Command):
@@ -13,4 +14,9 @@ class DumpIndev(gdb.Command):
         )
 
     def invoke(self, args, from_tty):
-        LVIndev.print_entries(curr_inst().indevs())
+        indevs = curr_inst().indevs()
+        snaps = LVIndev.snapshots(indevs)
+        if snaps:
+            print_spec_table(snaps)
+        else:
+            print(LVIndev._DISPLAY_SPEC["empty_msg"])

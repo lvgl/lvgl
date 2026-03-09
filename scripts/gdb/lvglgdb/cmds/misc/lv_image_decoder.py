@@ -2,6 +2,7 @@ import gdb
 
 from lvglgdb.lvgl import curr_inst
 from lvglgdb.lvgl.misc.lv_image_decoder import LVImageDecoder
+from lvglgdb.lvgl.formatter import print_spec_table
 
 
 class DumpImageDecoder(gdb.Command):
@@ -13,4 +14,9 @@ class DumpImageDecoder(gdb.Command):
         )
 
     def invoke(self, args, from_tty):
-        LVImageDecoder.print_entries(curr_inst().image_decoders())
+        decoders = curr_inst().image_decoders()
+        snaps = LVImageDecoder.snapshots(decoders)
+        if snaps:
+            print_spec_table(snaps)
+        else:
+            print(LVImageDecoder._DISPLAY_SPEC["empty_msg"])

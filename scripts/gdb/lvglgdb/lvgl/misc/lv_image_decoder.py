@@ -1,10 +1,19 @@
-from prettytable import PrettyTable
-
 from lvglgdb.value import Value, ValueInput
 
 
 class LVImageDecoder(Value):
     """LVGL image decoder wrapper"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("name", "name"),
+            ("info_cb", "info_cb"),
+            ("open_cb", "open_cb"),
+            ("close_cb", "close_cb"),
+        ],
+        "table": [],
+        "empty_msg": "No registered image decoders.",
+    }
 
     def __init__(self, decoder: ValueInput):
         super().__init__(Value.normalize(decoder, "lv_image_decoder_t"))
@@ -38,25 +47,19 @@ class LVImageDecoder(Value):
     def user_data(self) -> Value:
         return self.super_value("user_data")
 
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import fmt_cb
+
+        d = {
+            "addr": hex(int(self)),
+            "name": self.name,
+            "info_cb": fmt_cb(self.info_cb),
+            "open_cb": fmt_cb(self.open_cb),
+            "close_cb": fmt_cb(self.close_cb),
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+
     @staticmethod
-    def print_entries(decoders):
-        """Print image decoders as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = ["#", "name", "info_cb", "open_cb", "close_cb"]
-        table.align = "l"
-
-        for i, dec in enumerate(decoders):
-            table.add_row(
-                [
-                    i,
-                    dec.name,
-                    dec.info_cb.format_string(symbols=True),
-                    dec.open_cb.format_string(symbols=True),
-                    dec.close_cb.format_string(symbols=True),
-                ]
-            )
-
-        if not table.rows:
-            print("No registered image decoders.")
-        else:
-            print(table)
+    def snapshots(decoders):
+        return [dec.snapshot() for dec in decoders]

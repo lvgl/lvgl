@@ -2,6 +2,25 @@ import argparse
 import gdb
 
 from lvglgdb.lvgl import LVStyle, dump_obj_styles
+from lvglgdb.lvgl.formatter import print_table
+
+
+def _style_row_fn(_i, d):
+    """Format a style property row with optional ANSI color block."""
+    value_str = d["value_str"]
+    color_rgb = d.get("color_rgb")
+    if color_rgb:
+        r, g, b = color_rgb["r"], color_rgb["g"], color_rgb["b"]
+        value_str = f"{value_str} \033[48;2;{r};{g};{b}m  \033[0m"
+    return [d["prop_name"], value_str]
+
+
+def print_style_props(entries):
+    """Print style properties as a 2-column table with optional ANSI color."""
+    print_table(
+        entries, ["prop", "value"], _style_row_fn,
+        "Empty style.", align="l", numbered=False,
+    )
 
 
 class InfoStyle(gdb.Command):
@@ -43,6 +62,6 @@ class InfoStyle(gdb.Command):
             if not style:
                 print("Invalid style:", args.style)
                 return
-            LVStyle(style).print_entries()
+            print_style_props(LVStyle(style).snapshots())
         else:
             print("Usage: info style <style_var> or info style --obj <obj_var>")

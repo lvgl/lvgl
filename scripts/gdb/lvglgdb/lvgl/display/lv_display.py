@@ -6,6 +6,17 @@ from lvglgdb.value import Value, ValueInput
 class LVDisplay(Value):
     """LVGL display"""
 
+    _DISPLAY_SPEC = {
+        "info": [
+            ("_title", lambda d: f"Display @{d['addr']}"),
+            ("hor_res", "hor_res"),
+            ("ver_res", "ver_res"),
+            ("screen_count", "screen_count"),
+        ],
+        "table": [],
+        "empty_msg": "No displays.",
+    }
+
     def __init__(self, disp: ValueInput):
         super().__init__(Value.normalize(disp, "lv_display_t"))
 
@@ -43,3 +54,14 @@ class LVDisplay(Value):
         """Get currently active draw buffer (may be None)"""
         buf_ptr = self.super_value("buf_act")
         return LVDrawBuf(buf_ptr) if buf_ptr else None
+
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+
+        d = {
+            "addr": hex(int(self)),
+            "hor_res": self.hor_res,
+            "ver_res": self.ver_res,
+            "screen_count": int(self.screen_cnt),
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
