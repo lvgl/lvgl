@@ -600,9 +600,8 @@ static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
 
 static bool gstreamer_element_has_property(GstElement * element, const char * property_name)
 {
-    if(!element || !property_name) {
-        return false;
-    }
+    LV_ASSERT_NULL(element);
+    LV_ASSERT_NULL(property_name);
 
     GObjectClass * klass = G_OBJECT_GET_CLASS(element);
     return g_object_class_find_property(klass, property_name) != NULL;
@@ -642,7 +641,7 @@ static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer use
 {
     LV_UNUSED(element);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
-    GstCaps * caps = gst_pad_get_current_caps(pad);
+    GstCaps * caps = gst_pad_query_caps(pad, NULL);
 
     GstStructure * structure = gst_caps_get_structure(caps, 0);
     const gchar * name = gst_structure_get_name(structure);
