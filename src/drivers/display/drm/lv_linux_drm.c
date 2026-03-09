@@ -549,11 +549,53 @@ out:
     return ret;
 }
 
+
+static uint32_t find_compatible_crtc(int fd, drmModeRes *resources, drmModeConnector *connector) {
+    drmModeEncoder *encoder = NULL;
+    uint32_t selected_crtc = 0;
+
+    if (!resources || !connector)
+        return 0;
+
+    if (connector->encoder_id) {
+        encoder = drmModeGetEncoder(fd, connector->encoder_id);
+    }
+
+    if (encoder) {
+        selected_crtc = encoder->crtc_id;
+        drmModeFreeEncoder(encoder);
+        encoder = NULL;
+
+        if (selected_crtc)
+            return selected_crtc;
+    }
+
+    for (int i = 0; i < connector->count_encoders; i++) {
+        encoder = drmModeGetEncoder(fd, connector->encoders[i]);
+        if (!encoder)
+            continue;
+
+        for (int j = 0; j < resources->count_crtcs; j++) {
+            if (encoder->possible_crtcs & (1u << j)) {
+                selected_crtc = resources->crtcs[j];
+                drmModeFreeEncoder(encoder);
+                encoder = NULL;
+                return selected_crtc;
+            }
+        }
+
+        drmModeFreeEncoder(encoder);
+        encoder = NULL;
+    }
+
+    return 0;
+}
+
 static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
 {
     drmModeConnector * conn = NULL;
     drmModeEncoder * enc = NULL;
-    drmModeRes * res;
+    drmModeRes * res = NULL;
     int i;
     int ret = -1;
 
@@ -575,6 +617,7 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
 
         if(connector_id >= 0 && conn->connector_id != connector_id) {
             drmModeFreeConnector(conn);
+            conn = NULL;
             continue;
         }
 
@@ -591,8 +634,16 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
             LV_LOG_TRACE("drm: connector %d: unknown", conn->connector_id);
         }
 
-        if(conn->connection == DRM_MODE_CONNECTED && conn->count_modes > 0)
-            break;
+        if(conn->connection == DRM_MODE_CONNECTED && conn->count_modes > 0) {
+            uint32_t candidate_crtc = find_compatible_crtc(drm_dev->fd, res, conn);
+            if(candidate_crtc) {
+                drm_dev->crtc_id = candidate_crtc;
+                break;
+            }
+            else {
+                LV_LOG_TRACE("drm: connector %d has no compatible crtc", conn->connector_id);
+            }
+        }
 
         drmModeFreeConnector(conn);
         conn = NULL;
@@ -619,71 +670,6 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
     drm_dev->width = conn->modes[0].hdisplay;
     drm_dev->height = conn->modes[0].vdisplay;
 
-    for(i = 0 ; i < res->count_encoders; i++) {
-        enc = drmModeGetEncoder(drm_dev->fd, res->encoders[i]);
-        if(!enc)
-            continue;
-
-        LV_LOG_TRACE("enc%d enc_id %d conn enc_id %d", i, enc->encoder_id, conn->encoder_id);
-
-        if(enc->encoder_id == conn->encoder_id)
-            break;
-
-        drmModeFreeEncoder(enc);
-        enc = NULL;
-    }
-
-    if(enc) {
-        drm_dev->enc_id = enc->encoder_id;
-        LV_LOG_TRACE("enc_id: %d", drm_dev->enc_id);
-        drm_dev->crtc_id = enc->crtc_id;
-        LV_LOG_TRACE("crtc_id: %d", drm_dev->crtc_id);
-        drmModeFreeEncoder(enc);
-        enc = NULL;
-    }
-    else {
-        /* Encoder hasn't been associated yet, look it up */
-        bool found = false;
-        for(i = 0; i < conn->count_encoders; i++) {
-            int crtc, crtc_id = -1;
-
-            enc = drmModeGetEncoder(drm_dev->fd, conn->encoders[i]);
-            if(!enc)
-                continue;
-
-            for(crtc = 0 ; crtc < res->count_crtcs; crtc++) {
-                uint32_t crtc_mask = 1 << crtc;
-
-                crtc_id = res->crtcs[crtc];
-
-                LV_LOG_TRACE("enc_id %d crtc%d id %d mask %x possible %x", enc->encoder_id, crtc, crtc_id, crtc_mask,
-                             enc->possible_crtcs);
-
-                if(enc->possible_crtcs & crtc_mask)
-                    break;
-            }
-
-            if(crtc_id > 0) {
-                drm_dev->enc_id = enc->encoder_id;
-                LV_LOG_TRACE("enc_id: %d", drm_dev->enc_id);
-                drm_dev->crtc_id = crtc_id;
-                LV_LOG_TRACE("crtc_id: %d", drm_dev->crtc_id);
-                drmModeFreeEncoder(enc);
-                enc = NULL;
-                found = true;
-                break;
-            }
-
-            drmModeFreeEncoder(enc);
-            enc = NULL;
-        }
-
-        if(!found) {
-            LV_LOG_ERROR("suitable encoder not found");
-            goto free_res;
-        }
-    }
-
     drm_dev->crtc_idx = UINT32_MAX;
 
     for(i = 0; i < res->count_crtcs; ++i) {
@@ -698,7 +684,9 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
         goto free_res;
     }
 
+    LV_LOG_TRACE("crtc_id: %d", drm_dev->crtc_id);
     LV_LOG_TRACE("crtc_idx: %d", drm_dev->crtc_idx);
+
     ret = 0;
 
 free_res:
