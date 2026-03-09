@@ -10,7 +10,7 @@
 
 #include "lv_wayland_private.h"
 
-#if LV_WAYLAND_USE_G2D
+#if LV_USE_WAYLAND && LV_USE_G2D
 
 #include "../../display/lv_display_private.h"
 #include <wayland_linux_dmabuf.h>
@@ -121,10 +121,13 @@ static lv_wl_buffer_t * get_next_buffer(lv_wl_g2d_display_data_t * ddata);
 
 static lv_wl_g2d_ctx_t ctx;
 
-const lv_wayland_backend_ops_t wl_backend_ops = {
+const lv_wayland_backend_ops_t wl_g2d_ops = {
     .init = wl_g2d_init,
     .deinit = wl_g2d_deinit,
     .global_handler = wl_g2d_global_handler,
+};
+
+const lv_wayland_backend_display_ops_t wl_g2d_display_ops = {
     .init_display =   wl_g2d_init_display,
     .deinit_display = wl_g2d_deinit_display,
     .resize_display = wl_g2d_resize_display,
@@ -644,4 +647,4 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     return;
 }
 
-#endif /*LV_USE_WAYLAND_G2D*/
+#endif /*LV_USE_WAYLAND && LV_USE_G2D*/
