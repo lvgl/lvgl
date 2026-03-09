@@ -26,4 +26,6 @@ jobs:
       - name: Regenerate GDB constants
         run: python3 scripts/gdb/scripts/generate_all.py
       - name: Check that repository is clean
-        run: git diff --exit-code >/dev/null 2>&1 || (echo "GDB constants are out of date. Please run: python3 scripts/gdb/scripts/generate_all.py"; false)
+        run: |
+          git diff --exit-code >/dev/null 2>&1 || \
+            (echo "GDB constants are out of date. Please run: python3 scripts/gdb/scripts/generate_all.py"; false)

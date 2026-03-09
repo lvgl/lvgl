@@ -9,7 +9,7 @@ Usage (from the GDB script root):
     python3 scripts/generate_all.py
 """
 
-import importlib
+import importlib.util
 import sys
 from pathlib import Path
 
