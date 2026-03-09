@@ -1,11 +1,10 @@
-
 /**
- * @file lv_wl_pointer.h
+ * @file lv_wayland_touch.h
  *
  */
 
-#ifndef LV_WL_POINTER_H
-#define LV_WL_POINTER_H
+#ifndef LV_WAYLAND_TOUCH_H
+#define LV_WAYLAND_TOUCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,15 +30,14 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_indev_t * lv_wayland_pointer_create(void);
+lv_indev_t * lv_wayland_touch_create(void);
 
 /**
- * Obtains the input device of the mouse pointer
- * @note It is used to create an input group on application start
- * @param disp Reference to the LVGL display associated to the window
- * @return The input device
+ * Get touchscreen input device for given LVGL display
+ * @param display LVGL display
+ * @return input device connected to touchscreen, or NULL on error
  */
-lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp);
+lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * display);
 
 /**********************
  *      MACROS
@@ -51,4 +49,4 @@ lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_WL_POINTER_H*/
+#endif /*LV_WAYLAND_TOUCH_H*/

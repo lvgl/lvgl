@@ -1,4 +1,4 @@
-/** @file lv_wl_egl_backend.c
+/** @file lv_wayland_backend_egl.c
  *
  */
 

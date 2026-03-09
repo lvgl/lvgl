@@ -1,12 +1,10 @@
-
-
 /**
- * @file lv_wl_touch.h
+ * @file lv_wayland_keyboard.h
  *
  */
 
-#ifndef LV_WL_TOUCH_H
-#define LV_WL_TOUCH_H
+#ifndef LV_WAYLAND_KEYBOARD_H
+#define LV_WAYLAND_KEYBOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,14 +30,14 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_indev_t * lv_wayland_touch_create(void);
+lv_indev_t * lv_wayland_keyboard_create(void);
 
 /**
- * Get touchscreen input device for given LVGL display
+ * Get keyboard input device for given LVGL display
  * @param display LVGL display
- * @return input device connected to touchscreen, or NULL on error
+ * @return input device connected to keyboard, or NULL on error
  */
-lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * display);
+lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display);
 
 /**********************
  *      MACROS
@@ -51,4 +49,4 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * display);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_WL_TOUCH_H*/
+#endif /*LV_WAYLAND_KEYBOARD_H*/

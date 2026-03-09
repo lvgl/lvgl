@@ -1,10 +1,11 @@
+
 /**
- * @file lv_wl_keyboard.h
+ * @file lv_wayland_pointer.h
  *
  */
 
-#ifndef LV_WL_KEYBOARD_H
-#define LV_WL_KEYBOARD_H
+#ifndef LV_WAYLAND_POINTER_H
+#define LV_WAYLAND_POINTER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,14 +31,15 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_indev_t * lv_wayland_keyboard_create(void);
+lv_indev_t * lv_wayland_pointer_create(void);
 
 /**
- * Get keyboard input device for given LVGL display
- * @param display LVGL display
- * @return input device connected to keyboard, or NULL on error
+ * Obtains the input device of the mouse pointer
+ * @note It is used to create an input group on application start
+ * @param disp Reference to the LVGL display associated to the window
+ * @return The input device
  */
-lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display);
+lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp);
 
 /**********************
  *      MACROS
@@ -49,4 +51,4 @@ lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_WL_KEYBOARD_H*/
+#endif /*LV_WAYLAND_POINTER_H*/

@@ -1,10 +1,10 @@
 /**
- * @file lv_wl_backend_private.h
+ * @file lv_wayland_backend_private.h
  *
  */
 
-#ifndef LV_WL_BACKEND_PRIVATE_H
-#define LV_WL_BACKEND_PRIVATE_H
+#ifndef LV_WAYLAND_BACKEND_PRIVATE_H
+#define LV_WAYLAND_BACKEND_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -214,4 +214,4 @@ struct wl_surface * lv_wayland_get_window_surface(lv_display_t * display);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_WL_BACKEND_PRIVATE_H*/
+#endif /*LV_WAYLAND_BACKEND_PRIVATE_H*/
