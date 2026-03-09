@@ -550,33 +550,34 @@ out:
 }
 
 
-static uint32_t find_compatible_crtc(int fd, drmModeRes *resources, drmModeConnector *connector) {
-    drmModeEncoder *encoder = NULL;
+static uint32_t find_compatible_crtc(int fd, drmModeRes * resources, drmModeConnector * connector)
+{
+    drmModeEncoder * encoder = NULL;
     uint32_t selected_crtc = 0;
 
-    if (!resources || !connector)
+    if(!resources || !connector)
         return 0;
 
-    if (connector->encoder_id) {
+    if(connector->encoder_id) {
         encoder = drmModeGetEncoder(fd, connector->encoder_id);
     }
 
-    if (encoder) {
+    if(encoder) {
         selected_crtc = encoder->crtc_id;
         drmModeFreeEncoder(encoder);
         encoder = NULL;
 
-        if (selected_crtc)
+        if(selected_crtc)
             return selected_crtc;
     }
 
-    for (int i = 0; i < connector->count_encoders; i++) {
+    for(int i = 0; i < connector->count_encoders; i++) {
         encoder = drmModeGetEncoder(fd, connector->encoders[i]);
-        if (!encoder)
+        if(!encoder)
             continue;
 
-        for (int j = 0; j < resources->count_crtcs; j++) {
-            if (encoder->possible_crtcs & (1u << j)) {
+        for(int j = 0; j < resources->count_crtcs; j++) {
+            if(encoder->possible_crtcs & (1u << j)) {
                 selected_crtc = resources->crtcs[j];
                 drmModeFreeEncoder(encoder);
                 encoder = NULL;
