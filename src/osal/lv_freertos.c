@@ -15,7 +15,11 @@
 #include "lv_os_private.h"
 #if LV_USE_OS == LV_OS_FREERTOS
 
-#include "atomic.h"
+#ifdef ESP_PLATFORM
+    #include "freertos/atomic.h"
+#else
+    #include "atomic.h"
+#endif
 
 #include "../tick/lv_tick.h"
 #include "../misc/lv_log.h"
