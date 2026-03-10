@@ -98,6 +98,7 @@ int lv_strncmp(const char * s1, const char * s2, size_t len)
 
 char * lv_strdup(const char * src)
 {
+    if(src == NULL) return NULL;
     /*strdup uses malloc, so use the lv_malloc when LV_USE_STDLIB_MALLOC is not LV_STDLIB_CLIB */
     size_t len = lv_strlen(src) + 1;
     char * dst = lv_malloc(len);
