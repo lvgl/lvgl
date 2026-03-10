@@ -98,7 +98,7 @@ static int drm_add_plane_property(drm_dev_t * drm_dev, const char * name, uint64
 static int drm_add_crtc_property(drm_dev_t * drm_dev, const char * name, uint64_t value);
 static int drm_add_conn_property(drm_dev_t * drm_dev, const char * name, uint64_t value);
 static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane_id, uint32_t crtc_id,
-                      uint32_t crtc_idx);
+                      uint32_t crtc_idx,  uint64_t want_type);
 static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id);
 static int drm_open(const char * path);
 static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t connector_id, unsigned int fourcc);
@@ -492,15 +492,41 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
     return 0;
 }
 
-static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane_id, uint32_t crtc_id,
-                      uint32_t crtc_idx)
+static uint64_t get_plane_type(int fd, uint32_t plane_id)
+{
+    drmModeObjectPropertiesPtr props;
+    uint64_t type = UINT64_MAX;
+
+    props = drmModeObjectGetProperties(fd, plane_id, DRM_MODE_OBJECT_PLANE);
+    if(!props)
+        return UINT64_MAX;
+
+    for(uint32_t i = 0; i < props->count_props; i++) {
+        drmModePropertyPtr prop = drmModeGetProperty(fd, props->props[i]);
+        if(!prop)
+            continue;
+
+        if(strcmp(prop->name, "type") == 0) {
+            type = props->prop_values[i];
+            drmModeFreeProperty(prop);
+            break;
+        }
+
+        drmModeFreeProperty(prop);
+    }
+
+    drmModeFreeObjectProperties(props);
+    return type;
+}
+
+static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane_id,
+                      uint32_t crtc_id, uint32_t crtc_idx, uint64_t want_type)
 {
     LV_UNUSED(crtc_id);
     drmModePlaneResPtr planes;
     drmModePlanePtr plane;
-    unsigned int i;
-    unsigned int j;
-    int ret = 0;
+    unsigned int i, j;
+    int ret = -1;
 
     planes = drmModeGetPlaneResources(drm_dev->fd);
     if(!planes) {
@@ -518,7 +544,14 @@ static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane
             break;
         }
 
-        if(!(plane->possible_crtcs & (1 << crtc_idx))) {
+        LV_LOG_TRACE("drm: plane %u possible crtcs %x", plane->plane_id, plane->possible_crtcs);
+
+        if(!(plane->possible_crtcs & (1u << crtc_idx))) {
+            drmModeFreePlane(plane);
+            continue;
+        }
+
+        if(get_plane_type(drm_dev->fd, plane->plane_id) != want_type) {
             drmModeFreePlane(plane);
             continue;
         }
@@ -535,40 +568,48 @@ static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane
 
         *plane_id = plane->plane_id;
         drmModeFreePlane(plane);
-
-        LV_LOG_TRACE("found plane %d", *plane_id);
-
-        /* Success */
-        goto out;
+        LV_LOG_TRACE("found plane %u", *plane_id);
+        ret = 0;
+        break;
     }
 
-    if(i == planes->count_planes)
-        ret = -1;
-out:
     drmModeFreePlaneResources(planes);
     return ret;
 }
 
 
-static uint32_t find_compatible_crtc(int fd, drmModeRes * resources, drmModeConnector * connector)
+static bool find_compatible_pipeline(int fd, drmModeRes * resources,
+                                     drmModeConnector * connector,
+                                     uint32_t * out_enc_id, uint32_t * out_crtc_id)
 {
     drmModeEncoder * encoder = NULL;
-    uint32_t selected_crtc = 0;
 
-    if(!resources || !connector)
-        return 0;
+    if(!resources || !connector || !out_enc_id || !out_crtc_id) {
+        LV_LOG_ERROR("Invalid argument in find_compatible_pipeline");
+        return false;
+    }
+
+    *out_enc_id = 0;
+    *out_crtc_id = 0;
 
     if(connector->encoder_id) {
         encoder = drmModeGetEncoder(fd, connector->encoder_id);
     }
 
     if(encoder) {
-        selected_crtc = encoder->crtc_id;
+        if(encoder->crtc_id) {
+            for(int j = 0; j < resources->count_crtcs; j++) {
+                if(resources->crtcs[j] == encoder->crtc_id) {
+                    *out_enc_id = encoder->encoder_id;
+                    *out_crtc_id = encoder->crtc_id;
+                    drmModeFreeEncoder(encoder);
+                    return true;
+                }
+            }
+        }
+
         drmModeFreeEncoder(encoder);
         encoder = NULL;
-
-        if(selected_crtc)
-            return selected_crtc;
     }
 
     for(int i = 0; i < connector->count_encoders; i++) {
@@ -578,10 +619,10 @@ static uint32_t find_compatible_crtc(int fd, drmModeRes * resources, drmModeConn
 
         for(int j = 0; j < resources->count_crtcs; j++) {
             if(encoder->possible_crtcs & (1u << j)) {
-                selected_crtc = resources->crtcs[j];
+                *out_enc_id = encoder->encoder_id;
+                *out_crtc_id = resources->crtcs[j];
                 drmModeFreeEncoder(encoder);
-                encoder = NULL;
-                return selected_crtc;
+                return true;
             }
         }
 
@@ -589,7 +630,7 @@ static uint32_t find_compatible_crtc(int fd, drmModeRes * resources, drmModeConn
         encoder = NULL;
     }
 
-    return 0;
+    return false;
 }
 
 static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
@@ -636,9 +677,8 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
         }
 
         if(conn->connection == DRM_MODE_CONNECTED && conn->count_modes > 0) {
-            uint32_t candidate_crtc = find_compatible_crtc(drm_dev->fd, res, conn);
-            if(candidate_crtc) {
-                drm_dev->crtc_id = candidate_crtc;
+            bool found = find_compatible_pipeline(drm_dev->fd, res, conn, &drm_dev->enc_id, &drm_dev->crtc_id);
+            if(found) {
                 break;
             }
             else {
@@ -759,11 +799,19 @@ static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t conn
         goto err;
     }
 
-    ret = find_plane(drm_dev, fourcc, &drm_dev->plane_id, drm_dev->crtc_id, drm_dev->crtc_idx);
+#if LV_USE_LINUX_DRM_PRIMARY_PRIORITY
+    LV_LOG_INFO("Trying to find a plane for primary usage");
+    ret = find_plane(drm_dev, fourcc, &drm_dev->plane_id, drm_dev->crtc_id, drm_dev->crtc_idx, DRM_PLANE_TYPE_PRIMARY);
     if(ret) {
-        LV_LOG_ERROR("Cannot find plane");
-        goto err;
+        LV_LOG_WARN("Cannot find primary plane, falling back to overlay");
     }
+#elif LV_USE_LINUX_DRM_OVERLAY_PRIORITY
+    LV_LOG_INFO("Trying to find a plane for overlay usage");
+    ret = find_plane(drm_dev, fourcc, &drm_dev->plane_id, drm_dev->crtc_id, drm_dev->crtc_idx, DRM_PLANE_TYPE_OVERLAY);
+    if(ret) {
+        LV_LOG_WARN("Cannot find overlay plane, falling back to primary");
+    }
+#endif
 
     drm_dev->plane = drmModeGetPlane(drm_dev->fd, drm_dev->plane_id);
     if(!drm_dev->plane) {
