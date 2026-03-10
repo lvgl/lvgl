@@ -251,10 +251,24 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
         }
 #if LV_USE_GESTURE_RECOGNITION
         else if(in.type == EV_SYN && in.code == SYN_REPORT) {
+            /* Protocol-A release: BTN_TOUCH=0 arrived without ABS_MT_TRACKING_ID=-1.
+             * Synthesise RELEASED for pressed slots so gesture recogniser and
+             * pointer output both observe the lift. Protocol-B is unaffected:
+             * TRACKING_ID=-1 already sets touch_data_changed=true. */
+            if(dsc->state == LV_INDEV_STATE_RELEASED && !dsc->touch_data_changed) {
+                for(int i = 0; i < dsc->touch_count; i++) {
+                    if(dsc->touch_data[i].state == LV_INDEV_STATE_PRESSED) {
+                        dsc->touch_data[i].state = LV_INDEV_STATE_RELEASED;
+                        dsc->touch_data_changed = true;
+                        LV_LOG_TRACE("evdev: Protocol-A release synthesised for slot %d", i);
+                    }
+                }
+            }
+
             /* Handle gesture recognition at sync event */
-            if(dsc->touch_count > 0 && dsc->touch_data_changed) {
+            if(dsc->touch_data_changed) {
                 LV_LOG_TRACE("=== SYN_REPORT: touch_count=%d ===", dsc->touch_count);
-                for(int i = 0; i < MAX_TOUCH_POINTS; i++) {
+                for(int i = 0; i < dsc->touch_count; i++) {
                     if(dsc->touch_data[i].state == LV_INDEV_STATE_PRESSED || dsc->touch_data[i].state == LV_INDEV_STATE_RELEASED) {
                         LV_LOG_TRACE("Slot %d: state=%s, raw(%d, %d)",
                                      i,
@@ -268,7 +282,7 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
                 int active_touches = 0;
 
-                for(int i = 0; i < MAX_TOUCH_POINTS; i++) {
+                for(int i = 0; i < dsc->touch_count; i++) {
                     if(dsc->touch_data[i].state == LV_INDEV_STATE_PRESSED || dsc->touch_data[i].state == LV_INDEV_STATE_RELEASED) {
                         calibrated_touch_data[active_touches] = dsc->touch_data[i];
 
@@ -288,18 +302,10 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                 lv_indev_gesture_recognizers_update(indev, calibrated_touch_data, active_touches);
                 lv_indev_gesture_recognizers_set_data(indev, data);
 
-                /* Clear RELEASED touch points after gesture recognition to prevent duplicate processing */
-                for(int i = 0; i < MAX_TOUCH_POINTS; i++) {
-                    if(dsc->touch_data[i].state == LV_INDEV_STATE_RELEASED) {
-                        /* Mark touch point as invalid by zeroing out the data */
-                        dsc->touch_data[i].point.x = 0;
-                        dsc->touch_data[i].point.y = 0;
-                        dsc->touch_data[i].id = -1; /* Mark as invalid */
-                        /* Note: We keep the RELEASED state for this frame, it will be naturally
-                         * cleared when new touch events come in or when all touches end */
-                        LV_LOG_TRACE("Cleared released touch point slot %d", i);
-                    }
-                }
+                /* NOTE: Do NOT clear touch_data[] coordinates here — the switch-case
+                 * below reads touch_data[0].point after this block and must receive the
+                 * correct release position.  Slot invalidation is deferred until after
+                 * the switch-case to avoid sending (0,0) to LVGL on Protocol-A release. */
 
                 dsc->touch_data_changed = false;
             }
@@ -342,6 +348,22 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
         default:
             break;
     }
+
+#if LV_USE_GESTURE_RECOGNITION
+    /* Invalidate RELEASED touch slots AFTER the switch-case has read the final
+     * coordinates.  This prevents stale RELEASED slots from being re-fed into
+     * the gesture recognizer on subsequent frames while preserving correct
+     * release coordinates for pointer output (fixes dropdown mis-selection on
+     * Protocol-A devices like GT9xx). */
+    for(int i = 0; i < dsc->touch_count; i++) {
+        if(dsc->touch_data[i].state == LV_INDEV_STATE_RELEASED) {
+            dsc->touch_data[i].point.x = 0;
+            dsc->touch_data[i].point.y = 0;
+            dsc->touch_data[i].id = -1;
+            LV_LOG_TRACE("Cleared released touch point slot %d", i);
+        }
+    }
+#endif
 }
 
 static void _evdev_indev_delete_cb(lv_event_t * e)
