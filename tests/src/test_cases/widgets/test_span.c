@@ -644,4 +644,87 @@ void test_span_properties(void)
 #endif
 }
 
+/*
+ * Ellipsis should not appear when all text fits horizontally but max-height is smaller than font line_height.
+ */
+#if LV_USE_FREETYPE && __WORDSIZE == 64
+
+void test_spangroup_ellipsis_not_shown_when_text_fits(void)
+{
+    lv_font_t * font = lv_freetype_font_create("src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
+                                               LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
+    if(!font) {
+        LV_LOG_ERROR("freetype font create failed.");
+        TEST_FAIL();
+    }
+
+    int32_t font_h = lv_font_get_line_height(font);
+    int32_t constrained_h = font_h - 2;  /* ensure max-height < line_height */
+
+    active_screen = lv_screen_active();
+
+    /* Case 1: width = text width, text fits — no ellipsis expected */
+    lv_obj_t * spangroup1 = lv_spangroup_create(active_screen);
+    lv_obj_set_style_text_font(spangroup1, font, 0);
+    lv_obj_set_style_outline_width(spangroup1, 1, 0);
+    lv_spangroup_set_overflow(spangroup1, LV_SPAN_OVERFLOW_ELLIPSIS);
+    lv_spangroup_set_mode(spangroup1, LV_SPAN_MODE_BREAK);
+
+    lv_span_t * span1 = lv_spangroup_add_span(spangroup1);
+    lv_span_set_text(span1, "消息免打扰");
+
+    /* Set width to exactly fit the text, like CSS width: fit-content */
+    uint32_t text_w1 = lv_spangroup_get_expand_width(spangroup1, UINT32_MAX);
+    lv_obj_set_width(spangroup1, text_w1);
+    lv_obj_set_style_max_height(spangroup1, constrained_h, 0);
+
+    /* Case 2: text overflows width — ellipsis expected */
+    lv_obj_t * spangroup2 = lv_spangroup_create(active_screen);
+    lv_obj_set_style_text_font(spangroup2, font, 0);
+    lv_obj_set_style_outline_width(spangroup2, 1, 0);
+    lv_spangroup_set_overflow(spangroup2, LV_SPAN_OVERFLOW_ELLIPSIS);
+    lv_spangroup_set_mode(spangroup2, LV_SPAN_MODE_BREAK);
+    lv_obj_set_y(spangroup2, 40);
+    lv_obj_set_width(spangroup2, 250);
+    lv_obj_set_style_max_height(spangroup2, constrained_h, 0);
+
+    lv_span_t * span2 = lv_spangroup_add_span(spangroup2);
+    lv_span_set_text(span2, "这是一段很长的中文文字用来测试文本溢出省略号的显示效果");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_16.png");
+
+    lv_obj_set_style_text_font(spangroup1, LV_FONT_DEFAULT, 0);
+    lv_obj_set_style_text_font(spangroup2, LV_FONT_DEFAULT, 0);
+    lv_freetype_font_delete(font);
+}
+
+#else
+
+void test_spangroup_ellipsis_not_shown_when_text_fits(void)
+{
+}
+
+#endif
+
+
+/* Text wraps to 3+ lines, max-height fits 2 — ellipsis on last visible line */
+void test_spangroup_ellipsis_multiline_truncated(void)
+{
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+
+    int32_t line_h = lv_font_get_line_height(LV_FONT_DEFAULT);
+
+    lv_obj_set_style_outline_width(spangroup, 1, 0);
+    lv_obj_set_width(spangroup, 100);
+    lv_obj_set_style_max_height(spangroup, line_h * 2, 0);
+    lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_ELLIPSIS);
+    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+
+    lv_span_t * span = lv_spangroup_add_span(spangroup);
+    lv_span_set_text(span, "This text is long enough to wrap into three or more lines in a 100px container");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_17.png");
+}
+
 #endif
