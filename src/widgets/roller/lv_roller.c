@@ -50,7 +50,7 @@ static void inf_normalize(lv_obj_t * obj_scrl);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 static int32_t get_selected_label_width(const lv_obj_t * obj);
 static void scroll_anim_completed_cb(lv_anim_t * a);
-static void set_y_anim(void * obj, int32_t v);
+static void set_y_anim(void * obj, lv_anim_value_t v);
 static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
 
 #if LV_USE_OBSERVER
@@ -909,7 +909,7 @@ static void scroll_anim_completed_cb(lv_anim_t * a)
     inf_normalize(obj);
 }
 
-static void set_y_anim(void * obj, int32_t v)
+static void set_y_anim(void * obj, lv_anim_value_t v)
 {
     lv_obj_set_y(obj, v);
 }

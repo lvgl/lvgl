@@ -641,6 +641,11 @@
 /** Use `float` as `lv_value_precise_t` */
 #define LV_USE_FLOAT            0
 
+/** Use `float` as `lv_anim_value_t` (the unified animation value type).
+ *  When enabled, all animation exec/get-value callbacks receive/return float.
+ *  Requires LV_USE_FLOAT. */
+#define LV_USE_ANIM_FLOAT      0
+
 /** Enable matrix support
  *  - Requires `LV_USE_FLOAT = 1` */
 #define LV_USE_MATRIX           0

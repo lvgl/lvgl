@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
 #if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
-static void ofs_y_anim(void * img, int32_t v)
+static void ofs_y_anim(void * img, lv_anim_value_t v)
 {
     lv_image_set_offset_y((lv_obj_t *)img, v);
 }

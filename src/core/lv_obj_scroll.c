@@ -37,8 +37,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void scroll_x_anim(void * obj, int32_t v);
-static void scroll_y_anim(void * obj, int32_t v);
+static void scroll_x_anim(void * obj, lv_anim_value_t v);
+static void scroll_y_anim(void * obj, lv_anim_value_t v);
 static void scroll_end_cb(lv_anim_t * a);
 static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_point_t * scroll_value,
                                   lv_anim_enable_t anim_en);
@@ -687,14 +687,14 @@ void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
  *   STATIC FUNCTIONS
  **********************/
 
-static void scroll_x_anim(void * obj, int32_t v)
+static void scroll_x_anim(void * obj, lv_anim_value_t v)
 {
-    lv_obj_scroll_by_raw(obj, v + lv_obj_get_scroll_x(obj), 0);
+    lv_obj_scroll_by_raw(obj, (int32_t)v + lv_obj_get_scroll_x(obj), 0);
 }
 
-static void scroll_y_anim(void * obj, int32_t v)
+static void scroll_y_anim(void * obj, lv_anim_value_t v)
 {
-    lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
+    lv_obj_scroll_by_raw(obj, 0, (int32_t)v + lv_obj_get_scroll_y(obj));
 }
 
 static void scroll_end_cb(lv_anim_t * a)
@@ -818,9 +818,5 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
 
 static int32_t scroll_anim_end_value(lv_anim_t * a, int32_t v)
 {
-#if LV_USE_FLOAT
     return a ? (int32_t)(-a->end_value) : v;
-#else
-    return a ? -a->end_value : v;
-#endif
 }

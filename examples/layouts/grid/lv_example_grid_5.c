@@ -1,12 +1,12 @@
 #include "../../lv_examples.h"
 #if LV_USE_GRID && LV_BUILD_EXAMPLES
 
-static void row_gap_anim(void * obj, int32_t v)
+static void row_gap_anim(void * obj, lv_anim_value_t v)
 {
     lv_obj_set_style_pad_row((lv_obj_t *) obj, v, 0);
 }
 
-static void column_gap_anim(void * obj, int32_t v)
+static void column_gap_anim(void * obj, lv_anim_value_t v)
 {
     lv_obj_set_style_pad_column((lv_obj_t *) obj, v, 0);
 }

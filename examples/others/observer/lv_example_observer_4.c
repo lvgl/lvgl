@@ -69,7 +69,7 @@ static int32_t anim_get_x_cb(lv_anim_t * a)
     return lv_obj_get_x_aligned((lv_obj_t *) a->var);
 }
 
-static void anim_set_x_cb(void * obj, int32_t v)
+static void anim_set_x_cb(void * obj, lv_anim_value_t v)
 {
     lv_obj_set_x((lv_obj_t *) obj, v);
 }

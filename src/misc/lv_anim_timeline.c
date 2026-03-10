@@ -26,10 +26,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void anim_timeline_exec_cb(void * var, int32_t v);
+static void anim_timeline_exec_cb(void * var, lv_anim_value_t v);
 static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_time);
-static lv_value_precise_t anim_timeline_path_cb(const lv_anim_t * a);
-static void exec_anim(lv_anim_t * a, lv_value_precise_t v);
+static lv_anim_value_t anim_timeline_path_cb(const lv_anim_t * a);
+static void exec_anim(lv_anim_t * a, lv_anim_value_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -235,7 +235,11 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
         lv_anim_t * a = &(anim_dsc->anim);
 
         uint32_t start_time = anim_dsc->start_time;
-        lv_value_precise_t value = 0;
+        lv_anim_value_t value = 0;
+
+        if(a->exec_cb == NULL && a->custom_exec_cb == NULL) {
+            continue;
+        }
 
         if(act_time < start_time && a->early_apply) {
             if(anim_timeline_is_started) {
@@ -315,35 +319,29 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
                     anim_dsc->is_completed = 1;
                 }
             }
-
         }
     }
 }
 
-static lv_value_precise_t anim_timeline_path_cb(const lv_anim_t * a)
+static lv_anim_value_t anim_timeline_path_cb(const lv_anim_t * a)
 {
     /* Directly map original timestamps to avoid loss of accuracy */
     return lv_map(a->act_time, 0, a->duration, (int32_t)a->start_value, (int32_t)a->end_value);
 }
 
-static void anim_timeline_exec_cb(void * var, int32_t v)
+static void anim_timeline_exec_cb(void * var, lv_anim_value_t v)
 {
     lv_anim_timeline_t * at = var;
     anim_timeline_set_act_time(at, v);
 }
 
-static void exec_anim(lv_anim_t * a, lv_value_precise_t v)
+static void exec_anim(lv_anim_t * a, lv_anim_value_t v)
 {
+
     if(a->exec_cb) {
-        a->exec_cb(a->var, (int32_t)v);
-    }
-    if(a->exec_precise_cb) {
-        a->exec_precise_cb(a->var, v);
+        a->exec_cb(a->var, v);
     }
     if(a->custom_exec_cb) {
-        a->custom_exec_cb(a, (int32_t)v);
-    }
-    if(a->custom_exec_precise_cb) {
-        a->custom_exec_precise_cb(a, v);
+        a->custom_exec_cb(a, v);
     }
 }

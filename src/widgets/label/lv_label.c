@@ -56,8 +56,8 @@ static void update_layout_completed_cb(lv_event_t * e);
 static void lv_label_revert_dots(lv_obj_t * label);
 static void lv_label_set_dots(lv_obj_t * label, uint32_t dot_begin);
 
-static void set_ofs_x_anim(void * obj, int32_t v);
-static void set_ofs_y_anim(void * obj, int32_t v);
+static void set_ofs_x_anim(void * obj, lv_anim_value_t v);
+static void set_ofs_y_anim(void * obj, lv_anim_value_t v);
 static size_t get_text_length(const char * text);
 static void copy_text_to_label(lv_label_t * label, const char * text);
 static lv_text_flag_t get_label_flags(lv_label_t * label);
@@ -1175,7 +1175,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(reverse_play_in_progress) {
                 a.reverse_play_in_progress = 1;
                 /*Swap the start and end values*/
-                lv_value_precise_t tmp;
+                lv_anim_value_t tmp;
                 tmp      = a.start_value;
                 a.start_value = a.end_value;
                 a.end_value   = tmp;
@@ -1215,7 +1215,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(reverse_play_in_progress) {
                 a.reverse_play_in_progress = 1;
                 /*Swap the start and end values*/
-                lv_value_precise_t tmp;
+                lv_anim_value_t tmp;
                 tmp      = a.start_value;
                 a.start_value = a.end_value;
                 a.end_value   = tmp;
@@ -1398,14 +1398,14 @@ static void lv_label_set_dots(lv_obj_t * obj, uint32_t dot_begin)
     }
 }
 
-static void set_ofs_x_anim(void * obj, int32_t v)
+static void set_ofs_x_anim(void * obj, lv_anim_value_t v)
 {
     lv_label_t * label = (lv_label_t *)obj;
     label->offset.x    = v;
     lv_obj_invalidate(obj);
 }
 
-static void set_ofs_y_anim(void * obj, int32_t v)
+static void set_ofs_y_anim(void * obj, lv_anim_value_t v)
 {
     lv_label_t * label = (lv_label_t *)obj;
     label->offset.y    = v;
