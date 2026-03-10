@@ -1044,6 +1044,12 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc)
                                                masked_area.x1 - mask_area.x1,
                                                masked_area.y1 - mask_area.y1);
 
+    if(img_start == NULL || mask_start == NULL) {
+        LV_LOG_WARN("lv_draw_sw_img: goto_xy returned NULL, skipping mask apply");
+        lv_image_decoder_close(&mask_decoder_dsc);
+        return true;
+    }
+
     int32_t h = lv_area_get_height(&masked_area);
     int32_t w = lv_area_get_width(&masked_area);
 

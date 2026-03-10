@@ -81,6 +81,20 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
 
     LV_PROFILER_DRAW_BEGIN;
     lv_layer_t * layer = t->target_layer;
+    if(layer == NULL || layer->draw_buf == NULL) {
+        LV_LOG_WARN("lv_draw_sw_blend: target layer or draw_buf is NULL, skipping");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
+    /*Clip blend_area to the layer's actual buffer bounds.
+     *The clip_area intersection above only clips to the draw task's clip region,
+     *which may extend beyond the buffer — causing out-of-bounds NEON writes.*/
+    if(!lv_area_intersect(&blend_area, &blend_area, &layer->buf_area)) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     uint32_t layer_stride_byte = layer->draw_buf->header.stride;
 
     lv_draw_sw_blend_handler_t handler = lv_draw_sw_get_blend_handler(layer->color_format);
@@ -108,6 +122,10 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
         lv_area_move(&fill_dsc.relative_area, -layer->buf_area.x1, -layer->buf_area.y1);
         fill_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                    blend_area.y1 - layer->buf_area.y1);
+        if(fill_dsc.dest_buf == NULL) {
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         if(fill_dsc.mask_buf) {
             fill_dsc.mask_stride = blend_dsc->mask_stride == 0  ? lv_area_get_width(blend_dsc->mask_area) : blend_dsc->mask_stride;
             fill_dsc.mask_buf += fill_dsc.mask_stride * (blend_area.y1 - blend_dsc->mask_area->y1) +
@@ -164,6 +182,10 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
 
         image_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                     blend_area.y1 - layer->buf_area.y1);
+        if(image_dsc.dest_buf == NULL) {
+            LV_PROFILER_DRAW_END;
+            return;
+        }
 
         lv_draw_sw_blend_image(layer->color_format, &image_dsc);
     }
