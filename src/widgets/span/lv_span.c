@@ -1230,15 +1230,17 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
         {
             lv_snippet_t * last_snippet = lv_get_snippet(item_cnt - 1);
             int32_t next_line_h = last_snippet->line_h;
-            if(last_snippet->txt[last_snippet->bytes] == '\0') {
+            bool has_more_content = last_snippet->txt[last_snippet->bytes] != '\0';
+            if(!has_more_content) {
                 next_line_h = 0;
                 lv_span_t * next_span = lv_ll_get_next(&spans->child_ll, last_snippet->span);
                 if(next_span && next_span->txt && next_span->txt[0]) { /* have the next line */
                     next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
+                    has_more_content = true;
                 }
             }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
-                ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
+                ellipsis_valid = has_more_content && spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
                 is_end_line = true;
             }
         }
