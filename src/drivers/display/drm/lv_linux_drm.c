@@ -483,12 +483,20 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
     drm_add_plane_property(drm_dev, "CRTC_H", drm_dev->height);
 
     ret = drmModeAtomicCommit(drm_dev->fd, drm_dev->req, flags, drm_dev);
+    static int commit_count = 0;
     if(ret) {
-        LV_LOG_ERROR("drmModeAtomicCommit failed: %s (%d)", strerror(errno), errno);
-        drmModeAtomicFree(drm_dev->req);
+        if(commit_count == 0) {
+            flags &= ~DRM_MODE_ATOMIC_NONBLOCK;
+            ret = drmModeAtomicCommit(drm_dev->fd, drm_dev->req, flags, drm_dev);
+            if(ret) {
+                LV_LOG_ERROR("Atomic commit succeeded without non-block flag, retrying with non-block");
+                drmModeAtomicFree(drm_dev->req);
+                commit_count ++;
+                return ret;
+            }
+        }
         return ret;
     }
-
     return 0;
 }
 
