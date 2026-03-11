@@ -812,12 +812,22 @@ static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t conn
     ret = find_plane(drm_dev, fourcc, &drm_dev->plane_id, drm_dev->crtc_id, drm_dev->crtc_idx, DRM_PLANE_TYPE_PRIMARY);
     if(ret) {
         LV_LOG_WARN("Cannot find primary plane, falling back to overlay");
+        ret = find_plane(drm_dev, fourcc, &drm_dev->plane_id, drm_dev->crtc_id, drm_dev->crtc_idx, DRM_PLANE_TYPE_OVERLAY);
+        if(ret) {
+            LV_LOG_ERROR("Cannot find a usable plane");
+            goto err;
+        }
     }
 #elif LV_USE_LINUX_DRM_OVERLAY_PRIORITY
     LV_LOG_INFO("Trying to find a plane for overlay usage");
     ret = find_plane(drm_dev, fourcc, &drm_dev->plane_id, drm_dev->crtc_id, drm_dev->crtc_idx, DRM_PLANE_TYPE_OVERLAY);
     if(ret) {
         LV_LOG_WARN("Cannot find overlay plane, falling back to primary");
+        ret = find_plane(drm_dev, fourcc, &drm_dev->plane_id, drm_dev->crtc_id, drm_dev->crtc_idx, DRM_PLANE_TYPE_PRIMARY);
+        if(ret) {
+            LV_LOG_ERROR("Cannot find a usable plane");
+            goto err;
+        }
     }
 #endif
 
