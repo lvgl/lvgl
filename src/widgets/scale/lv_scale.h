@@ -391,7 +391,8 @@ lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section
  * @param subject       pointer to a Subject
  * @return              pointer to newly-created Observer
  */
-lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length, lv_subject_t * subject);
+lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                                lv_subject_t * subject);
 
 /**
  * Bind an integer subject to a scales image needle value

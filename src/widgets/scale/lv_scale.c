@@ -617,7 +617,8 @@ lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section
     return observer;
 }
 
-lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length, lv_subject_t * subject)
+lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                                lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -1940,7 +1941,8 @@ static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_sub
 static void scale_line_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     bind_element_needle_t * bind_element = observer->user_data;
-    lv_scale_set_line_needle_value(observer->target, bind_element->needle_line, bind_element->needle_length, subject->value.num);
+    lv_scale_set_line_needle_value(observer->target, bind_element->needle_line, bind_element->needle_length,
+                                   subject->value.num);
 }
 
 static void scale_image_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
