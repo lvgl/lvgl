@@ -4365,6 +4365,10 @@
             #define LV_USE_LINUX_DRM_OVERLAY_PRIORITY (!LV_USE_LINUX_DRM_PRIMARY_PRIORITY)
         #endif
     #endif
+
+    #if LV_USE_LINUX_DRM_PRIMARY_PRIORITY && LV_USE_LINUX_DRM_OVERLAY_PRIORITY
+        #error "LV_USE_LINUX_DRM_PRIMARY_PRIORITY and LV_USE_LINUX_DRM_OVERLAY_PRIORITY cannot both be enabled."
+    #endif
 #endif
 
 /** Interface for TFT_eSPI */
