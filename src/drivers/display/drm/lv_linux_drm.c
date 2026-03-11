@@ -491,10 +491,13 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
             if(ret) {
                 LV_LOG_ERROR("Atomic commit succeeded without non-block flag, retrying with non-block");
                 drmModeAtomicFree(drm_dev->req);
+                drm_dev->req = NULL;
                 commit_count ++;
                 return ret;
             }
         }
+        drmModeAtomicFree(drm_dev->req);
+        drm_dev->req = NULL;
         return ret;
     }
     return 0;
