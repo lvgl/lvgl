@@ -4352,7 +4352,7 @@
             #ifdef CONFIG_LV_USE_LINUX_DRM_PRIMARY_PRIORITY
                 #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY CONFIG_LV_USE_LINUX_DRM_PRIMARY_PRIORITY
             #else
-                #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 1
+                #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 0
             #endif
         #else
             #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 1
@@ -4364,10 +4364,6 @@
         #else
             #define LV_USE_LINUX_DRM_OVERLAY_PRIORITY (!LV_USE_LINUX_DRM_PRIMARY_PRIORITY)
         #endif
-    #endif
-
-    #if LV_USE_LINUX_DRM_PRIMARY_PRIORITY && LV_USE_LINUX_DRM_OVERLAY_PRIORITY
-        #error "LV_USE_LINUX_DRM_PRIMARY_PRIORITY and LV_USE_LINUX_DRM_OVERLAY_PRIORITY cannot both be enabled."
     #endif
 #endif
 
