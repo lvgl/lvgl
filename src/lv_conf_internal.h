@@ -4352,7 +4352,7 @@
             #ifdef CONFIG_LV_USE_LINUX_DRM_PRIMARY_PRIORITY
                 #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY CONFIG_LV_USE_LINUX_DRM_PRIMARY_PRIORITY
             #else
-                #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 0
+                #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 1
             #endif
         #else
             #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 1
