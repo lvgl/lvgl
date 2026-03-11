@@ -640,7 +640,7 @@ lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needl
     user_data->needle_length = needle_length;
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_line_needle_value_observer_cb, obj, user_data);
-        if(observer == NULL) {
+    if(observer == NULL) {
         LV_LOG_WARN("Couldn't create observer");
         lv_free(user_data);
         return NULL;
