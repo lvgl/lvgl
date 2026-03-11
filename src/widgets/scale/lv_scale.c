@@ -84,6 +84,7 @@ static void needle_deleted_cb(lv_event_t * e);
     static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void scale_line_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+    static void scale_image_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif /*LV_USE_OBSERVER*/
 
 /**********************
