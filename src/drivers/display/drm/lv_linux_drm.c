@@ -489,7 +489,7 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
             flags &= ~DRM_MODE_ATOMIC_NONBLOCK;
             ret = drmModeAtomicCommit(drm_dev->fd, drm_dev->req, flags, drm_dev);
             if(ret) {
-                LV_LOG_ERROR("Atomic commit succeeded without non-block flag, retrying with non-block");
+                LV_LOG_ERROR("Atomic commit failed with non-block flag and also failed after retry without non-block flag");
                 drmModeAtomicFree(drm_dev->req);
                 drm_dev->req = NULL;
                 commit_count ++;
