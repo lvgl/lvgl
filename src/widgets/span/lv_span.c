@@ -1242,7 +1242,6 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                     has_more_content = true;
                 }
             }
-            }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
                 ellipsis_valid = has_more_content && spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
                 is_end_line = true;
