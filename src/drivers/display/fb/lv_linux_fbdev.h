@@ -50,7 +50,8 @@ void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled);
 /**
  * Enable red/blue channel swap in the flush callback.
  * Use for framebuffers with BGR pixel order (e.g., some Allwinner SoCs).
- * Auto-detected from fb_var_screeninfo if not called explicitly.
+ * On Linux (non-BSD) builds, auto-detected from fb_var_screeninfo if not called explicitly.
+ * When LV_LINUX_FBDEV_BSD is enabled, auto-detection is disabled and this must be set manually.
  * Must be called AFTER lv_linux_fbdev_set_file().
  */
 void lv_linux_fbdev_set_swap_rb(lv_display_t * disp, bool enabled);

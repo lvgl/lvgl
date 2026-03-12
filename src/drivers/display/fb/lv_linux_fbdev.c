@@ -214,8 +214,12 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
                     dsc->vinfo.bits_per_pixel, stride_bpp);
         dsc->vinfo.bits_per_pixel = stride_bpp;
     }
-    else {
+    else if(stride_bpp > 0 && stride_bpp == dsc->vinfo.bits_per_pixel) {
         LV_LOG_INFO("bits_per_pixel %d matches stride calculation", dsc->vinfo.bits_per_pixel);
+    }
+    else {
+        LV_LOG_INFO("bits_per_pixel %d retained; stride-derived bpp %u ignored (zero or non-standard)",
+                    dsc->vinfo.bits_per_pixel, stride_bpp);
     }
 
     /* Figure out the size of the screen in bytes*/
@@ -287,10 +291,22 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     /* Over-allocate to guarantee LV_DRAW_BUF_ALIGN alignment.
      * Store raw pointers in dsc for lv_free(), pass aligned pointers to LVGL. */
     dsc->draw_buf_1 = lv_malloc(draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
+    LV_ASSERT_MALLOC(dsc->draw_buf_1);
+    if(dsc->draw_buf_1 == NULL) {
+        LV_LOG_ERROR("Failed to allocate draw buffer 1 (%u bytes)", draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
+        return LV_RESULT_INVALID;
+    }
     draw_buf = lv_draw_buf_align(dsc->draw_buf_1, cf);
 
     if(LV_LINUX_FBDEV_BUFFER_COUNT == 2) {
         dsc->draw_buf_2 = lv_malloc(draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
+        LV_ASSERT_MALLOC(dsc->draw_buf_2);
+        if(dsc->draw_buf_2 == NULL) {
+            LV_LOG_ERROR("Failed to allocate draw buffer 2 (%u bytes)", draw_buf_size + LV_DRAW_BUF_ALIGN - 1);
+            lv_free(dsc->draw_buf_1);
+            dsc->draw_buf_1 = NULL;
+            return LV_RESULT_INVALID;
+        }
         draw_buf_2 = lv_draw_buf_align(dsc->draw_buf_2, cf);
     }
 
