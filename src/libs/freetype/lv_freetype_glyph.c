@@ -97,21 +97,35 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
-    lv_freetype_glyph_cache_data_t search_key = {
-        .unicode = unicode_letter,
-        .size = dsc->size,
-    };
+    lv_freetype_cache_node_t * cache_node = dsc->cache_node;
+    bool l1_hit = false;
 
-    lv_cache_t * glyph_cache = dsc->cache_node->glyph_cache;
+    /* L1 lookup: per cache_node, lock-free, 2-way set-associative */
+    l1_hit = lv_freetype_glyph_l1_lookup(cache_node, unicode_letter, dsc->size, g_dsc);
 
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
-    if(entry == NULL) {
-        LV_LOG_ERROR("glyph lookup failed for unicode = 0x%" LV_PRIx32, unicode_letter);
-        LV_PROFILER_FONT_END;
-        return false;
+    if(!l1_hit) {
+        /* L1 miss - fall through to L2 LRU RB-tree cache */
+        lv_freetype_glyph_cache_data_t search_key = {
+            .unicode = unicode_letter,
+            .size = dsc->size,
+        };
+
+        lv_cache_t * glyph_cache = cache_node->glyph_cache;
+
+        lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
+        if(entry == NULL) {
+            LV_LOG_ERROR("glyph lookup failed for unicode = 0x%" LV_PRIx32, unicode_letter);
+            LV_PROFILER_FONT_END;
+            return false;
+        }
+        lv_freetype_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);
+        *g_dsc = data->glyph_dsc;
+
+        /* Populate L1 for future hits */
+        lv_freetype_glyph_l1_fill(cache_node, unicode_letter, dsc->size, &data->glyph_dsc);
+
+        lv_cache_release(glyph_cache, entry, NULL);
     }
-    lv_freetype_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);
-    *g_dsc = data->glyph_dsc;
 
     if((dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) && (unicode_letter_next == '\0')) {
         g_dsc->adv_w = g_dsc->box_w + g_dsc->ofs_x;
@@ -140,7 +154,6 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 
     g_dsc->entry = NULL;
 
-    lv_cache_release(glyph_cache, entry, NULL);
     LV_PROFILER_FONT_END;
     return true;
 }

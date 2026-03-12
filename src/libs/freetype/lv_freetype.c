@@ -437,6 +437,8 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     node->face_has_kerning = FT_HAS_KERNING(face);
     lv_mutex_init(&node->face_lock);
 
+    lv_freetype_glyph_l1_init(node);
+
     return true;
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)

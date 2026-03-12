@@ -57,6 +57,16 @@ extern "C" {
 #define FT_INT_TO_F16DOT16(x) ((x) << 16)
 #define FT_F16DOT16_TO_INT(x) ((x) >> 16)
 
+/** Number of sets in the glyph L1 cache, reuse FreeType cache glyph count (must be power of 2) */
+#define LV_FREETYPE_GLYPH_L1_SETS      ((uint32_t)LV_FREETYPE_CACHE_FT_GLYPH_CNT)
+
+/** Associativity: ways per set (1 = direct-mapped, 2 = 2-way) */
+#ifndef LV_FREETYPE_GLYPH_L1_WAYS
+#define LV_FREETYPE_GLYPH_L1_WAYS      2u
+#endif
+
+#define LV_FREETYPE_GLYPH_L1_SET_MASK  (LV_FREETYPE_GLYPH_L1_SETS - 1u)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -80,6 +90,17 @@ struct _lv_freetype_outline_event_param_t {
     lv_freetype_outline_sizes_t sizes;
 };
 
+typedef struct {
+    uint32_t unicode;           /**< Primary key: unicode code point */
+    uint32_t size;              /**< Font size for multi-size sharing */
+    uint32_t generation;        /**< Must match cache_node->generation to be valid */
+    lv_font_glyph_dsc_t dsc;   /**< Cached glyph metrics (entry ptr always NULL) */
+} lv_freetype_glyph_l1_entry_t;
+
+typedef struct {
+    lv_freetype_glyph_l1_entry_t ways[LV_FREETYPE_GLYPH_L1_WAYS];
+    uint8_t lru_bits;           /**< Simple LRU: index of most-recently-used way */
+} lv_freetype_glyph_l1_set_t;
 
 typedef struct _lv_freetype_cache_node_t lv_freetype_cache_node_t;
 
@@ -99,6 +120,10 @@ struct _lv_freetype_cache_node_t {
 
     /*draw data cache*/
     lv_cache_t * draw_data_cache;
+
+    /* L1 glyph metrics cache (per cache_node, lock-free) */
+    uint32_t generation;        /**< Monotonically increasing; bump to invalidate all L1 entries */
+    lv_freetype_glyph_l1_set_t glyph_l1[LV_FREETYPE_GLYPH_L1_SETS];
 };
 
 typedef struct _lv_freetype_context_t {
@@ -124,6 +149,90 @@ typedef struct _lv_freetype_font_dsc_t {
     uint32_t outline_stroke_width;
     lv_font_kerning_t kerning;
 } lv_freetype_font_dsc_t;
+
+/*---------------------
+ * L1 Cache Helpers
+ *--------------------*/
+
+static inline uint32_t lv_freetype_l1_hash(uint32_t unicode, uint32_t size)
+{
+    uint32_t h = 2166136261u;
+    h ^= unicode;
+    h *= 16777619u;
+    h ^= size;
+    h *= 16777619u;
+    return h;
+}
+
+/**
+ * Look up glyph metrics in the per-node L1 cache.
+ * @return true on hit (out_dsc filled), false on miss.
+ */
+static inline bool lv_freetype_glyph_l1_lookup(
+    lv_freetype_cache_node_t * node,
+    uint32_t unicode,
+    uint32_t size,
+    lv_font_glyph_dsc_t * out_dsc)
+{
+    uint32_t set_idx = lv_freetype_l1_hash(unicode, size) & LV_FREETYPE_GLYPH_L1_SET_MASK;
+    lv_freetype_glyph_l1_set_t * set = &node->glyph_l1[set_idx];
+    uint32_t gen = node->generation;
+
+    for(uint32_t w = 0; w < LV_FREETYPE_GLYPH_L1_WAYS; w++) {
+        lv_freetype_glyph_l1_entry_t * e = &set->ways[w];
+        if(e->generation == gen && e->unicode == unicode && e->size == size) {
+            set->lru_bits = (uint8_t)w;
+            *out_dsc = e->dsc;
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Fill a glyph metrics entry into the per-node L1 cache (LRU eviction).
+ */
+static inline void lv_freetype_glyph_l1_fill(
+    lv_freetype_cache_node_t * node,
+    uint32_t unicode,
+    uint32_t size,
+    const lv_font_glyph_dsc_t * dsc)
+{
+    uint32_t set_idx = lv_freetype_l1_hash(unicode, size) & LV_FREETYPE_GLYPH_L1_SET_MASK;
+    lv_freetype_glyph_l1_set_t * set = &node->glyph_l1[set_idx];
+
+    /* Evict the least-recently-used way */
+    uint32_t victim = (set->lru_bits == 0) ? 1u : 0u;
+#if LV_FREETYPE_GLYPH_L1_WAYS > 2
+    victim = (set->lru_bits + 1u) % LV_FREETYPE_GLYPH_L1_WAYS;
+#endif
+
+    lv_freetype_glyph_l1_entry_t * e = &set->ways[victim];
+    e->unicode = unicode;
+    e->size = size;
+    e->generation = node->generation;
+    e->dsc = *dsc;
+    e->dsc.entry = NULL;
+
+    set->lru_bits = (uint8_t)victim;
+}
+
+/**
+ * Invalidate all L1 entries for this cache_node in O(1).
+ */
+static inline void lv_freetype_glyph_l1_invalidate(lv_freetype_cache_node_t * node)
+{
+    node->generation++;
+}
+
+/**
+ * Initialize L1 cache for a newly created cache_node.
+ */
+static inline void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
+{
+    node->generation = 1;
+    lv_memzero(node->glyph_l1, sizeof(node->glyph_l1));
+}
 
 /**********************
  * GLOBAL PROTOTYPES
