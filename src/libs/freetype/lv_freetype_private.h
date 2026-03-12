@@ -93,7 +93,7 @@ struct _lv_freetype_cache_node_t {
     const char * pathname;
     lv_freetype_font_style_t style;
     lv_freetype_font_render_mode_t render_mode;
-    int32_t weight;                     /**< Variable font weight (CSS-like: 100-900, 0 = default) */
+    int32_t weight;                     /**< Variable font weight (range 1-2000, 0 = default; values are clamped) */
 
     uint32_t ref_size;                  /**< Reference size for calculating outline glyph's real size.*/
 
