@@ -336,11 +336,12 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
         if(is_slider_horizontal(obj)) {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            /*Don't re-add perpendicular chain while actively dragging*/
+            if(!slider->dragging) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
             lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
         }
         else {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            if(!slider->dragging) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
             lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
         }
         lv_obj_refresh_ext_draw_size(obj);

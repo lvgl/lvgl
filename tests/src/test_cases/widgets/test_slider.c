@@ -690,15 +690,21 @@ void test_slider_scroll_chain_not_blocked_for_encoder_input(void)
     lv_group_set_editing(g, true);
 
     lv_slider_set_value(slider, 50, LV_ANIM_OFF);
+    int32_t initial_value = lv_slider_get_value(slider);
 
-    /* Simulate encoder interaction (non-pointer input) */
+    /* Enter edit mode, then turn encoder */
+    lv_test_encoder_click();
     lv_test_encoder_turn(5);
+
+    /* Verify encoder input was actually processed (value changed) */
+    int32_t new_value = lv_slider_get_value(slider);
+    TEST_ASSERT_NOT_EQUAL(initial_value, new_value);
 
     /* Encoder input should NOT remove scroll chain flags */
     TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
     TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
 
-    /* Release encoder */
+    /* Release encoder (exits edit mode) */
     lv_test_encoder_click();
 
     /* Flags should still be present after encoder release */
