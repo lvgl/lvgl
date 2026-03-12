@@ -171,7 +171,9 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
         .pathname = lv_freetype_req_face_id(ctx, pathname),
         .style = font_info->style,
         .render_mode = font_info->render_mode,
-        .weight = font_info->weight,
+        /* Normalize weight: 0 resolves to 700 (BOLD) or 400 (normal) to avoid duplicate cache nodes */
+        .weight = font_info->weight > 0 ? font_info->weight
+        : ((font_info->style & LV_FREETYPE_FONT_STYLE_BOLD) ? 700 : 400),
     };
 
     bool cache_hitting = true;
@@ -451,18 +453,12 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     lv_mutex_init(&node->face_lock);
 
     /* Apply variable font weight */
-    int target_weight;
-    if(node->weight > 0) {
-        target_weight = node->weight;
-    }
-    else if(node->style & LV_FREETYPE_FONT_STYLE_BOLD) {
-        target_weight = 700;
-    }
-    else {
-        target_weight = 400;
-    }
-    if(!lv_freetype_set_weight_if_variable(face, target_weight)) {
-        LV_LOG_INFO("font '%s' is not variable weight, weight setting ignored", node->pathname);
+    if(!lv_freetype_set_weight_if_variable(face, node->weight)) {
+        /* Only log when an explicit weight was requested, to avoid spamming logs
+         * for default 400/700 weights on non-variable fonts. */
+        if(node->weight != 400 && node->weight != 700) {
+            LV_LOG_INFO("font '%s' does not support variable weight, requested weight %d ignored", node->pathname, node->weight);
+        }
     }
 
     return true;
