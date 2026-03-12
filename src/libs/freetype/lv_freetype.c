@@ -472,12 +472,18 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
     if(!FT_HAS_MULTIPLE_MASTERS(face))
         return false;
 
-    lv_freetype_context_t * ctx = lv_freetype_get_context();
     FT_MM_Var * mm_var = NULL;
     FT_Error mm_err = FT_Get_MM_Var(face, &mm_var);
     if(mm_err != 0 || !mm_var || mm_var->num_axis == 0) {
         if(mm_err != 0) {
             FT_ERROR_MSG("FT_Get_MM_Var", mm_err);
+        }
+        else if(mm_var) {
+            /* FT_Get_MM_Var succeeded but no usable axes; free to avoid leak */
+            lv_freetype_context_t * ctx = lv_freetype_get_context();
+            if(ctx && ctx->library) {
+                FT_Done_MM_Var(ctx->library, mm_var);
+            }
         }
         return false;
     }
@@ -493,7 +499,10 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
         LV_ASSERT_MALLOC(coords);
         if(!coords) {
             LV_LOG_ERROR("failed to allocate memory for %u font axes", axis_count);
-            FT_Done_MM_Var(ctx->library, mm_var);
+            lv_freetype_context_t * ctx = lv_freetype_get_context();
+            if(ctx && ctx->library) {
+                FT_Done_MM_Var(ctx->library, mm_var);
+            }
             return false;
         }
         use_heap = true;
@@ -530,7 +539,11 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
 
     if(use_heap)
         lv_free(coords);
-    FT_Done_MM_Var(ctx->library, mm_var);
+
+    lv_freetype_context_t * ctx = lv_freetype_get_context();
+    if(ctx && ctx->library) {
+        FT_Done_MM_Var(ctx->library, mm_var);
+    }
     return applied;
 }
 
