@@ -145,6 +145,7 @@ void lv_freetype_init_font_info(lv_font_info_t * font_info)
     font_info->class_p = &lv_freetype_font_class;
     font_info->render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
     font_info->style = LV_FREETYPE_FONT_STYLE_NORMAL;
+    font_info->weight = 0; /* 0 = use default (400 normal, 700 if BOLD) */
     font_info->kerning = LV_FONT_KERNING_NONE;
 }
 
@@ -170,6 +171,7 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
         .pathname = lv_freetype_req_face_id(ctx, pathname),
         .style = font_info->style,
         .render_mode = font_info->render_mode,
+        .weight = font_info->weight,
     };
 
     bool cache_hitting = true;
@@ -217,18 +219,6 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
     if(error) {
         FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
         return NULL;
-    }
-
-    /* Apply variable weight from style if provided; fallback to 700 for legacy BOLD */
-    int style_weight = lv_freetype_font_style_get_weight(font_info->style);
-    if(style_weight > 0) {
-        (void)lv_freetype_set_weight_if_variable(face, style_weight);
-    }
-    else if(font_info->style & LV_FREETYPE_FONT_STYLE_BOLD) {
-        (void)lv_freetype_set_weight_if_variable(face, 700); // Standard bold weight
-    }
-    else {
-        (void)lv_freetype_set_weight_if_variable(face, 400); // Standard regular weight
     }
 
     if(dsc->kerning != LV_FONT_KERNING_NONE && !dsc->cache_node->face_has_kerning) {
@@ -460,6 +450,21 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     node->face_has_kerning = FT_HAS_KERNING(face);
     lv_mutex_init(&node->face_lock);
 
+    /* Apply variable font weight */
+    int target_weight;
+    if(node->weight > 0) {
+        target_weight = node->weight;
+    }
+    else if(node->style & LV_FREETYPE_FONT_STYLE_BOLD) {
+        target_weight = 700;
+    }
+    else {
+        target_weight = 400;
+    }
+    if(!lv_freetype_set_weight_if_variable(face, target_weight)) {
+        LV_LOG_INFO("font '%s' is not variable weight, weight setting ignored", node->pathname);
+    }
+
     return true;
 }
 
@@ -475,6 +480,9 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
     FT_MM_Var * mm_var = NULL;
     FT_Error mm_err = FT_Get_MM_Var(face, &mm_var);
     if(mm_err != 0 || !mm_var || mm_var->num_axis == 0) {
+        if(mm_err != 0) {
+            FT_ERROR_MSG("FT_Get_MM_Var", mm_err);
+        }
         return false;
     }
 
@@ -488,6 +496,7 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
         coords = (FT_Fixed *)lv_malloc(axis_count * sizeof(FT_Fixed));
         LV_ASSERT_MALLOC(coords);
         if(!coords) {
+            LV_LOG_ERROR("failed to allocate memory for %u font axes", axis_count);
             FT_Done_MM_Var(ctx->library, mm_var);
             return false;
         }
@@ -495,7 +504,10 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
     }
 
     FT_Error coord_err = FT_Get_Var_Design_Coordinates(face, axis_count, coords);
-    if(coord_err == 0) {
+    if(coord_err != 0) {
+        FT_ERROR_MSG("FT_Get_Var_Design_Coordinates", coord_err);
+    }
+    else {
         FT_ULong wght_tag = FT_MAKE_TAG('w', 'g', 'h', 't');
         int wght_index = -1;
         for(FT_UInt i = 0; i < axis_count; i++) {
@@ -507,17 +519,14 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
         if(wght_index >= 0) {
             FT_Fixed min_v = mm_var->axis[wght_index].minimum;
             FT_Fixed max_v = mm_var->axis[wght_index].maximum;
-            if(weight < LV_FREETYPE_VAR_WEIGHT_MIN)
-                weight = LV_FREETYPE_VAR_WEIGHT_MIN;
-            if(weight > LV_FREETYPE_VAR_WEIGHT_MAX)
-                weight = LV_FREETYPE_VAR_WEIGHT_MAX;
-            FT_Fixed target = FT_INT_TO_F16DOT16(weight);
-            if(target < min_v)
-                target = min_v;
-            if(target > max_v)
-                target = max_v;
+            weight = LV_CLAMP(LV_FREETYPE_VAR_WEIGHT_MIN, weight, LV_FREETYPE_VAR_WEIGHT_MAX);
+            FT_Fixed target = LV_CLAMP(min_v, FT_INT_TO_F16DOT16(weight), max_v);
             coords[wght_index] = target;
-            if(FT_Set_Var_Design_Coordinates(face, axis_count, coords) == 0) {
+            FT_Error set_err = FT_Set_Var_Design_Coordinates(face, axis_count, coords);
+            if(set_err != 0) {
+                FT_ERROR_MSG("FT_Set_Var_Design_Coordinates", set_err);
+            }
+            else {
                 applied = true;
             }
         }
@@ -551,6 +560,9 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
     }
     if(lhs->style != rhs->style) {
         return lhs->style > rhs->style ? 1 : -1;
+    }
+    if(lhs->weight != rhs->weight) {
+        return lhs->weight > rhs->weight ? 1 : -1;
     }
 
     int32_t cmp_res = lv_strcmp(lhs->pathname, rhs->pathname);

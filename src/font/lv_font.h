@@ -130,6 +130,7 @@ struct _lv_font_info_t {
     uint32_t size;                   /**< Font size in pixel*/
     uint32_t render_mode;            /**< Font rendering mode, see `lv_freetype_font_render_mode_t`*/
     uint32_t style;                  /**< Font style, see `lv_freetype_font_style_t`*/
+    int32_t weight;                  /**< Font weight for variable fonts (CSS-like: 100-900, 0 = use default) */
     lv_font_kerning_t kerning;       /**< Font kerning, see `lv_font_kerning_t`*/
 };
 

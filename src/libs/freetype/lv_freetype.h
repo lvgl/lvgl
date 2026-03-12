@@ -43,30 +43,6 @@ typedef enum {
     LV_FREETYPE_FONT_STYLE_BOLD = 1 << 1,
 } lv_freetype_font_style_t;
 
-/*
- * Optional variable font weight encoding in style.
- * Stores CSS-like weight (e.g., 100..900) in the upper bits.
- * Backwards compatible: BOLD bit still maps to 700 if no explicit weight.
- */
-#define LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT 16
-#define LV_FREETYPE_FONT_STYLE_WEIGHT_MASK ((lv_freetype_font_style_t)0xFFFF0000u)
-/**
- * Encode CSS-like font weight appropriate for `lv_freetype_font_style_t`.
- * See https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-weight for details.
- * @param  w   weight in range [1-2000] (typical: 100-950 with 400 = normal, 700 = bold, etc.)
- */
-#define LV_FREETYPE_FONT_STYLE_WEIGHT(w)                                                                             \
-    ((lv_freetype_font_style_t)((uint32_t)(w) << LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT))
-
-/**
- * Retrieve font weight from `style`.
- * @param  style   Freetype font style
- */
-static inline int lv_freetype_font_style_get_weight(lv_freetype_font_style_t style)
-{
-    return (int)(((uint32_t)style & LV_FREETYPE_FONT_STYLE_WEIGHT_MASK) >> LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT);
-}
-
 typedef lv_freetype_font_style_t LV_FT_FONT_STYLE;
 
 typedef enum {
