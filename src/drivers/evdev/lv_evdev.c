@@ -217,7 +217,8 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
                             dsc->touch_count = 0;
                             for(int i = 0; i < MAX_TOUCH_POINTS; i++) {
-                                if(dsc->touch_data[i].state == LV_INDEV_STATE_PRESSED) {
+                                if(dsc->touch_data[i].state == LV_INDEV_STATE_PRESSED ||
+                                   dsc->touch_data[i].state == LV_INDEV_STATE_RELEASED) {
                                     dsc->touch_count = i + 1;
                                 }
                             }
@@ -359,9 +360,21 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
         if(dsc->touch_data[i].state == LV_INDEV_STATE_RELEASED) {
             dsc->touch_data[i].point.x = 0;
             dsc->touch_data[i].point.y = 0;
-            dsc->touch_data[i].id = -1;
+            dsc->touch_data[i].id = UINT8_MAX;  /*invalid sentinel*/
             LV_LOG_TRACE("Cleared released touch point slot %d", i);
         }
+    }
+
+    /* Recompute touch_count so cleared slots are excluded from subsequent reads.
+     * Count any slot that is still active (PRESSED or RELEASED but not yet invalidated). */
+    {
+        int new_count = 0;
+        for(int i = 0; i < dsc->touch_count; i++) {
+            if(dsc->touch_data[i].id != UINT8_MAX) {
+                new_count = i + 1;
+            }
+        }
+        dsc->touch_count = new_count;
     }
 #endif
 }
