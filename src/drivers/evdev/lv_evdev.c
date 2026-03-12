@@ -360,7 +360,8 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
         if(dsc->touch_data[i].state == LV_INDEV_STATE_RELEASED) {
             dsc->touch_data[i].point.x = 0;
             dsc->touch_data[i].point.y = 0;
-            dsc->touch_data[i].id = UINT8_MAX;  /*invalid sentinel*/
+            dsc->touch_data[i].state = 0;        /*clear state so gesture loop skips this slot*/
+            dsc->touch_data[i].id = UINT8_MAX;   /*invalid sentinel*/
             LV_LOG_TRACE("Cleared released touch point slot %d", i);
         }
     }
