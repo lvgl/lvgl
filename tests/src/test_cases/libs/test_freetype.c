@@ -204,6 +204,7 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
 
     TEST_ASSERT_EQUAL_SCREENSHOT(screenshot_name);
 
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_clean(lv_screen_active());
     lv_style_reset(&style_italic);
     lv_style_reset(&style_normal_with_outline);
