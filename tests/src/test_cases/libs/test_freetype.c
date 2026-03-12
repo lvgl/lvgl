@@ -69,15 +69,24 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
                                          "./src/test_files/fonts/Montserrat-VariableFont.ttf", render_mode, 24, LV_FREETYPE_FONT_STYLE_BOLD);
     TEST_ASSERT_NOT_NULL(font_variable_bold);
 
-    lv_font_t * font_variable_thin =
-        lv_freetype_font_create("./src/test_files/fonts/Montserrat-VariableFont.ttf",
-                                render_mode,
-                                24,
-                                LV_FREETYPE_FONT_STYLE_ITALIC | LV_FREETYPE_FONT_STYLE_WEIGHT(100));
+    /* Use lv_font_info_t to set explicit weight */
+    lv_font_info_t info_thin;
+    lv_freetype_init_font_info(&info_thin);
+    info_thin.name = "./src/test_files/fonts/Montserrat-VariableFont.ttf";
+    info_thin.render_mode = render_mode;
+    info_thin.size = 24;
+    info_thin.style = LV_FREETYPE_FONT_STYLE_ITALIC;
+    info_thin.weight = 100;
+    lv_font_t * font_variable_thin = lv_freetype_font_create_with_info(&info_thin);
     TEST_ASSERT_NOT_NULL(font_variable_thin);
 
-    lv_font_t * font_variable_thick = lv_freetype_font_create(
-                                          "./src/test_files/fonts/Montserrat-VariableFont.ttf", render_mode, 24, LV_FREETYPE_FONT_STYLE_WEIGHT(1000));
+    lv_font_info_t info_thick;
+    lv_freetype_init_font_info(&info_thick);
+    info_thick.name = "./src/test_files/fonts/Montserrat-VariableFont.ttf";
+    info_thick.render_mode = render_mode;
+    info_thick.size = 24;
+    info_thick.weight = 1000;
+    lv_font_t * font_variable_thick = lv_freetype_font_create_with_info(&info_thick);
     TEST_ASSERT_NOT_NULL(font_variable_thick);
 
     /* Emoji is only supported in bitmap mode */
