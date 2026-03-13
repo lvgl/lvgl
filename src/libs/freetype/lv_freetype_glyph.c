@@ -18,6 +18,107 @@
 
 #define CACHE_NAME  "FREETYPE_GLYPH"
 
+/*---------------------
+ * L1 Cache Config
+ *--------------------*/
+
+#if LV_USE_OS == LV_OS_NONE
+
+/** Number of sets – reuse the FreeType glyph count (must be power of 2) */
+#define GLYPH_L1_SETS       ((uint32_t)LV_FREETYPE_CACHE_FT_GLYPH_CNT)
+
+/** Associativity – fixed at 2-way, do NOT change */
+#define GLYPH_L1_WAYS       2u
+
+#define GLYPH_L1_SET_MASK   (GLYPH_L1_SETS - 1u)
+
+typedef struct {
+    uint32_t unicode;
+    uint32_t size;
+    uint32_t generation;
+    lv_font_glyph_dsc_t dsc;
+} glyph_l1_entry_t;
+
+typedef struct {
+    glyph_l1_entry_t ways[GLYPH_L1_WAYS];
+    uint8_t lru_bits;
+} glyph_l1_set_t;
+
+static inline uint32_t glyph_l1_hash(uint32_t unicode, uint32_t size)
+{
+    uint32_t h = 2166136261u;   /* FNV-1a offset basis */
+    h ^= unicode;
+    h *= 16777619u;
+    h ^= size;
+    h *= 16777619u;
+    return h;
+}
+
+static bool glyph_l1_lookup(lv_freetype_cache_node_t * node,
+                            uint32_t unicode, uint32_t size,
+                            lv_font_glyph_dsc_t * out_dsc)
+{
+    glyph_l1_set_t * sets = (glyph_l1_set_t *)node->glyph_l1;
+    if(sets == NULL) return false;
+
+    uint32_t idx = glyph_l1_hash(unicode, size) & GLYPH_L1_SET_MASK;
+    glyph_l1_set_t * set = &sets[idx];
+    uint32_t gen = node->glyph_l1_generation;
+
+    for(uint32_t w = 0; w < GLYPH_L1_WAYS; w++) {
+        glyph_l1_entry_t * e = &set->ways[w];
+        if(e->generation == gen && e->unicode == unicode && e->size == size) {
+            set->lru_bits = (uint8_t)w;
+            *out_dsc = e->dsc;
+            return true;
+        }
+    }
+    return false;
+}
+
+static void glyph_l1_fill(lv_freetype_cache_node_t * node,
+                          uint32_t unicode, uint32_t size,
+                          const lv_font_glyph_dsc_t * dsc)
+{
+    glyph_l1_set_t * sets = (glyph_l1_set_t *)node->glyph_l1;
+    if(sets == NULL) return;
+
+    uint32_t idx = glyph_l1_hash(unicode, size) & GLYPH_L1_SET_MASK;
+    glyph_l1_set_t * set = &sets[idx];
+
+    uint32_t victim = (set->lru_bits == 0) ? 1u : 0u;
+
+    glyph_l1_entry_t * e = &set->ways[victim];
+    e->unicode    = unicode;
+    e->size       = size;
+    e->generation = node->glyph_l1_generation;
+    e->dsc        = *dsc;
+    e->dsc.entry  = NULL;
+
+    set->lru_bits = (uint8_t)victim;
+}
+
+void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
+{
+    LV_ASSERT_MSG((GLYPH_L1_SETS & (GLYPH_L1_SETS - 1u)) == 0,
+                  "LV_FREETYPE_CACHE_FT_GLYPH_CNT must be power of 2 for L1 cache");
+
+    size_t sz = sizeof(glyph_l1_set_t) * GLYPH_L1_SETS;
+    node->glyph_l1 = lv_malloc_zeroed(sz);
+    LV_ASSERT_MALLOC(node->glyph_l1);
+    node->glyph_l1_generation = 1;
+}
+
+void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node)
+{
+    if(node->glyph_l1) {
+        lv_free(node->glyph_l1);
+        node->glyph_l1 = NULL;
+    }
+}
+
+#endif /* LV_USE_OS == LV_OS_NONE */
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -98,13 +199,16 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
     lv_freetype_cache_node_t * cache_node = dsc->cache_node;
-    bool l1_hit = false;
 
-    /* L1 lookup: per cache_node, lock-free, 2-way set-associative */
-    l1_hit = lv_freetype_glyph_l1_lookup(cache_node, unicode_letter, dsc->size, g_dsc);
-
-    if(!l1_hit) {
-        /* L1 miss - fall through to L2 LRU RB-tree cache */
+#if LV_USE_OS == LV_OS_NONE
+    /* L1 lookup: per cache_node, 2-way set-associative (single-thread only) */
+    if(glyph_l1_lookup(cache_node, unicode_letter, dsc->size, g_dsc)) {
+        /* L1 hit – skip L2 entirely */
+    }
+    else
+#endif
+    {
+        /* L2 LRU RB-tree cache */
         lv_freetype_glyph_cache_data_t search_key = {
             .unicode = unicode_letter,
             .size = dsc->size,
@@ -121,8 +225,10 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
         lv_freetype_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);
         *g_dsc = data->glyph_dsc;
 
+#if LV_USE_OS == LV_OS_NONE
         /* Populate L1 for future hits */
-        lv_freetype_glyph_l1_fill(cache_node, unicode_letter, dsc->size, &data->glyph_dsc);
+        glyph_l1_fill(cache_node, unicode_letter, dsc->size, &data->glyph_dsc);
+#endif
 
         lv_cache_release(glyph_cache, entry, NULL);
     }
