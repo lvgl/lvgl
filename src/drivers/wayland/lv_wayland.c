@@ -160,9 +160,11 @@ void lv_wayland_deinit(void)
 
     lv_wl_window_t * window = NULL;
 
+#if LV_WAYLAND_DIRECT_EXIT
     LV_LL_READ(&lv_wl_ctx.window_ll, window) {
         lv_wayland_window_delete(window);
     }
+#endif
 
     lv_wayland_xdg_deinit();
 
