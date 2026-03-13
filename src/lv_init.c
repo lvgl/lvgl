@@ -265,10 +265,6 @@ void lv_init(void)
     lv_draw_dma2d_init();
 #endif
 
-#if LV_USE_DRAW_OPENGLES
-    lv_draw_opengles_init();
-#endif
-
 #if LV_USE_PPA
     lv_draw_ppa_init();
 #endif

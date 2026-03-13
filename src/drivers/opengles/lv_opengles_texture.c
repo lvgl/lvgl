@@ -153,8 +153,14 @@ static lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t
 
 void lv_opengles_texture_deinit(lv_opengles_texture_t * texture)
 {
+    if(!texture) {
+        return;
+    }
 #if !LV_USE_DRAW_OPENGLES
-    lv_free(texture->fb1);
+    if(texture->fb1) {
+        lv_free(texture->fb1);
+        texture->fb1 = NULL;
+    }
 #endif /*!LV_USE_DRAW_OPENGLES*/
 
     if(texture->is_texture_owner && texture->texture_id != 0) {
@@ -212,7 +218,6 @@ static lv_display_t * lv_opengles_texture_create_common(int32_t w, int32_t h)
     lv_display_set_driver_data(disp, texture);
     lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
 
-    lv_opengles_init();
     return disp;
 }
 

@@ -17,10 +17,12 @@
 #include "lv_opengles_private.h"
 
 #include "../../display/lv_display_private.h"
-#include "../../draw/nanovg/lv_draw_nanovg.h"
 #include "../../misc/lv_area_private.h"
 #include "opengl_shader/lv_opengl_shader_internal.h"
 #include "assets/lv_opengles_shader.h"
+
+#include "../../draw/nanovg/lv_draw_nanovg.h"
+#include "../../draw/opengles/lv_draw_opengles.h"
 
 /*********************
  *      DEFINES
@@ -38,31 +40,34 @@
 
 static void lv_opengles_enable_blending(bool blend_opt);
 static void lv_opengles_disable_blending(void);
-static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size);
-static void lv_opengles_vertex_buffer_deinit(void);
-static void lv_opengles_vertex_buffer_bind(void);
+static void lv_opengles_vertex_buffer_init(lv_opengles_gl_t * ctx, const void * data, unsigned int size);
+static void lv_opengles_vertex_buffer_deinit(lv_opengles_gl_t * ctx);
+static void lv_opengles_vertex_buffer_bind(lv_opengles_gl_t * ctx);
 static void lv_opengles_vertex_buffer_unbind(void);
-static void lv_opengles_vertex_array_init(void);
-static void lv_opengles_vertex_array_deinit(void);
-static void lv_opengles_vertex_array_bind(void);
+static void lv_opengles_vertex_array_init(lv_opengles_gl_t * ctx);
+static void lv_opengles_vertex_array_deinit(lv_opengles_gl_t * ctx);
+static void lv_opengles_vertex_array_bind(lv_opengles_gl_t * ctx);
 static void lv_opengles_vertex_array_unbind(void);
-static void lv_opengles_vertex_array_add_buffer(void);
-static void lv_opengles_index_buffer_init(const unsigned int * data, unsigned int count);
-static void lv_opengles_index_buffer_deinit(void);
-static unsigned int lv_opengles_index_buffer_get_count(void);
-static void lv_opengles_index_buffer_bind(void);
+static void lv_opengles_vertex_array_add_buffer(lv_opengles_gl_t * ctx);
+static void lv_opengles_index_buffer_init(lv_opengles_gl_t * ctx, const unsigned int * data,
+                                          unsigned int count);
+static void lv_opengles_index_buffer_deinit(lv_opengles_gl_t * ctx);
+static unsigned int lv_opengles_index_buffer_get_count(lv_opengles_gl_t * ctx);
+static void lv_opengles_index_buffer_bind(lv_opengles_gl_t * ctx);
 static void lv_opengles_index_buffer_unbind(void);
 static unsigned int lv_opengles_shader_manager_init(void);
-static lv_result_t lv_opengles_shader_init(void);
-static void lv_opengles_shader_deinit(void);
-static void lv_opengles_shader_bind(void);
+static lv_result_t lv_opengles_shader_init(lv_opengles_gl_t * ctx);
+static void lv_opengles_shader_deinit(lv_opengles_gl_t * ctx);
+static void lv_opengles_shader_bind(lv_opengles_gl_t * ctx);
 static void lv_opengles_shader_unbind(void);
-static int lv_opengles_shader_get_uniform_location(const char * name);
-static void lv_opengles_shader_set_uniform1i(const char * name, int value);
-static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, const float * values);
-static void lv_opengles_shader_set_uniform1f(const char * name, float value);
-static void lv_opengles_shader_set_uniform3f(const char * name, float value_0, float value_1, float value_2);
-static void lv_opengles_render_draw(void);
+static int lv_opengles_shader_get_uniform_location(lv_opengles_gl_t * ctx, const char * name);
+static void lv_opengles_shader_set_uniform1i(lv_opengles_gl_t * ctx, const char * name, int value);
+static void lv_opengles_shader_set_uniformmatrix3fv(lv_opengles_gl_t * ctx, const char * name, int count,
+                                                    const float * values);
+static void lv_opengles_shader_set_uniform1f(lv_opengles_gl_t * ctx, const char * name, float value);
+static void lv_opengles_shader_set_uniform3f(lv_opengles_gl_t * ctx, const char * name, float value_0,
+                                             float value_1, float value_2);
+static void lv_opengles_render_draw(lv_opengles_gl_t * ctx);
 static float lv_opengles_map_float(float x, float min_in, float max_in, float min_out, float max_out);
 static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN],
                                    lv_display_rotation_t rotation, bool * h_flip, bool * v_flip,
@@ -75,21 +80,24 @@ static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool is_init;
 
+static const char * shader_names[LV_OPENGLES_SHADER_NAMES_COUNT] = {
+    "u_Texture",
+    "u_ColorDepth",
+    "u_VertexTransform",
+    "u_Opa",
+    "u_IsFill",
+    "u_FillColor",
+    "u_SwapRB",
+    "u_Hue",
+    "u_Saturation",
+    "u_Value"
+};
+
+static bool global_init = false;
 static lv_opengl_shader_manager_t shader_manager;
+static lv_opengles_gl_t * bound_ctx; /* Used for backwards compatibility*/
 
-static unsigned int vertex_buffer_id = 0;
-
-static unsigned int vertex_array_id = 0;
-
-static unsigned int index_buffer_id = 0;
-static unsigned int index_buffer_count = 0;
-
-static unsigned int shader_id;
-
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_SwapRB", "u_Hue", "u_Saturation", "u_Value" };
-static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**********************
  *      MACROS
@@ -101,26 +109,47 @@ static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 void lv_opengles_init(void)
 {
-    if(is_init) return;
+    bound_ctx = lv_opengles_context_create();
+}
 
-    lv_opengles_enable_blending(false);
+void lv_opengles_deinit(void)
+{
+    lv_opengles_context_delete(bound_ctx);
+    bound_ctx = NULL;
+}
+
+void lv_opengles_context_bind(lv_opengles_gl_t * ctx)
+{
+    if(!ctx) {
+        return;
+    }
+    bound_ctx = ctx;
+}
+
+lv_opengles_gl_t * lv_opengles_context_create(void)
+{
+    lv_opengles_gl_t * ctx = lv_zalloc(sizeof(*ctx));
+    LV_ASSERT_MALLOC(ctx);
+    if(!ctx) {
+        return NULL;
+    }
 
     unsigned int indices[] = {
         0, 1, 2,
         2, 3, 0
     };
 
-    lv_opengles_vertex_buffer_init(NULL, sizeof(float) * LV_OPENGLES_VERTEX_BUFFER_LEN);
+    lv_opengles_vertex_buffer_init(ctx, NULL, sizeof(float) * LV_OPENGLES_VERTEX_BUFFER_LEN);
 
-    lv_opengles_vertex_array_init();
-    lv_opengles_vertex_array_add_buffer();
+    lv_opengles_vertex_array_init(ctx);
+    lv_opengles_vertex_array_add_buffer(ctx);
 
-    lv_opengles_index_buffer_init(indices, 6);
+    lv_opengles_index_buffer_init(ctx, indices, 6);
 
-    lv_result_t res = lv_opengles_shader_init();
+    lv_result_t res = lv_opengles_shader_init(ctx);
     LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to initialize shaders");
 
-    lv_opengles_shader_bind();
+    lv_opengles_shader_bind(ctx);
 
     /* unbind everything */
     lv_opengles_vertex_array_unbind();
@@ -128,23 +157,29 @@ void lv_opengles_init(void)
     lv_opengles_index_buffer_unbind();
     lv_opengles_shader_unbind();
 
+    if(!global_init) {
+        lv_opengles_enable_blending(false);
 #if LV_USE_DRAW_NANOVG
-    lv_draw_nanovg_init();
+        lv_draw_nanovg_init();
+#elif LV_USE_DRAW_OPENGLES
+        lv_draw_opengles_init();
 #endif /*LV_USE_DRAW_NANOVG*/
+        global_init = true;
+    }
 
-    is_init = true;
+    return ctx;
 }
 
-void lv_opengles_deinit(void)
+void lv_opengles_context_delete(lv_opengles_gl_t * ctx)
 {
-    if(!is_init) return;
-
-    lv_opengles_shader_deinit();
-    lv_opengles_index_buffer_deinit();
-    lv_opengles_vertex_buffer_deinit();
-    lv_opengles_vertex_array_deinit();
-
-    is_init = false;
+    if(!ctx) {
+        return;
+    }
+    lv_opengles_shader_deinit(ctx);
+    lv_opengles_index_buffer_deinit(ctx);
+    lv_opengles_vertex_buffer_deinit(ctx);
+    lv_opengles_vertex_array_deinit(ctx);
+    lv_free(ctx);
 }
 
 void lv_opengles_render_params_init(lv_opengles_render_params_t * params)
@@ -153,10 +188,16 @@ void lv_opengles_render_params_init(lv_opengles_render_params_t * params)
     lv_memzero(params, sizeof(lv_opengles_render_params_t));
 }
 
-void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
+void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area,
+                                lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
+    if(!bound_ctx) {
+        LV_LOG_WARN("Can't render texture without a bound OpenGL context");
+        return;
+    }
     LV_PROFILER_DRAW_BEGIN;
+
     lv_opengles_render_params_t params;
     lv_opengles_render_params_init(&params);
     params.texture = texture;
@@ -171,7 +212,8 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+void lv_opengles_render_texture_rbswap(unsigned int texture,
+                                       const lv_area_t * texture_area, lv_opa_t opa,
                                        int32_t disp_w,
                                        int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
@@ -191,7 +233,8 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
+void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa,
+                             int32_t disp_w, int32_t disp_h)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_params_t params;
@@ -209,6 +252,8 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
 
 void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render_params_t * params)
 {
+    LV_ASSERT_NULL(display);
+    LV_ASSERT_NULL(params);
     LV_PROFILER_DRAW_BEGIN;
     unsigned int texture = (lv_uintptr_t)display->layer_head->user_data;
     GL_CALL(glActiveTexture(GL_TEXTURE0));
@@ -220,7 +265,7 @@ void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render
 
     float vert_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN];
     populate_vertex_buffer(vert_buffer, rotation, &h_flip, &v_flip, 0.f, 0.f, 1.f, 1.f);
-    lv_opengles_vertex_buffer_init(vert_buffer, sizeof(vert_buffer));
+    lv_opengles_vertex_buffer_init(bound_ctx, vert_buffer, sizeof(vert_buffer));
 
     float hor_scale = 1.0f;
     float ver_scale = 1.0f;
@@ -235,20 +280,21 @@ void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render
         hor_translate, ver_translate, 1.0f
     };
 
-    lv_opengles_shader_bind();
-    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
-    lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
-    lv_opengles_shader_set_uniform1f("u_Opa", 1);
-    lv_opengles_shader_set_uniform1i("u_IsFill", 0);
-    lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
-    lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap);
+    lv_opengles_shader_bind(bound_ctx);
+    lv_opengles_shader_set_uniform1f(bound_ctx, "u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1i(bound_ctx, "u_Texture", 0);
+    lv_opengles_shader_set_uniformmatrix3fv(bound_ctx, "u_VertexTransform", 1, transposed_matrix);
+    lv_opengles_shader_set_uniform1f(bound_ctx, "u_Opa", 1);
+    lv_opengles_shader_set_uniform1i(bound_ctx, "u_IsFill", 0);
+    lv_opengles_shader_set_uniform3f(bound_ctx, "u_FillColor", 1.0f, 1.0f, 1.0f);
+    lv_opengles_shader_set_uniform1i(bound_ctx, "u_SwapRB", params->rb_swap);
 
-    lv_opengles_render_draw();
+    lv_opengles_render_draw(bound_ctx);
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
+void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip,
+                                        bool v_flip)
 {
     /*TODO: Deprecate this function and make lv_opengles_render_display public instead*/
 
@@ -279,9 +325,9 @@ void lv_opengles_reinit_state(void)
     LV_PROFILER_DRAW_BEGIN;
 
     /* Rebind VAO, VBO, IBO to restore state after NanoVG or other external GL operations */
-    lv_opengles_vertex_array_bind();
-    lv_opengles_vertex_buffer_bind();
-    lv_opengles_index_buffer_bind();
+    lv_opengles_vertex_array_bind(bound_ctx);
+    lv_opengles_vertex_buffer_bind(bound_ctx);
+    lv_opengles_index_buffer_bind(bound_ctx);
 
     /* Re-setup vertex attributes since NanoVG may have modified them */
     for(unsigned int i = 0; i < 2; i++) {
@@ -295,6 +341,10 @@ void lv_opengles_reinit_state(void)
 void lv_opengles_render(const lv_opengles_render_params_t * params)
 {
     LV_ASSERT_NULL(params);
+    if(!bound_ctx) {
+        LV_LOG_WARN("Can't render texture without a bound OpenGL context");
+        return;
+    }
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
     if(!lv_area_intersect(&intersection, params->texture_area, params->texture_clip_area)) {
@@ -352,7 +402,7 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
             1.0f, -1.0f, clip_x2, clip_y1,
             -1.f, -1.0f, clip_x1, clip_y1
         };
-        lv_opengles_vertex_buffer_init(positions, sizeof(positions));
+        lv_opengles_vertex_buffer_init(bound_ctx, positions, sizeof(positions));
     }
 
     lv_matrix_t matrix;
@@ -399,19 +449,19 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
     lv_matrix_t gl_matrix;
     lv_matrix_transpose(&matrix, &gl_matrix);
 
-    lv_opengles_shader_bind();
+    lv_opengles_shader_bind(bound_ctx);
     lv_opengles_enable_blending(params->blend_opt);
-    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
-    lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, (float *)&gl_matrix);
-    lv_opengles_shader_set_uniform1f("u_Opa", (float)params->opa / (float)LV_OPA_100);
-    lv_opengles_shader_set_uniform1i("u_IsFill", params->texture == 0);
-    lv_opengles_shader_set_uniform3f("u_FillColor", (float)params->fill_color.red / 255.0f,
+    lv_opengles_shader_set_uniform1f(bound_ctx, "u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1i(bound_ctx, "u_Texture", 0);
+    lv_opengles_shader_set_uniformmatrix3fv(bound_ctx, "u_VertexTransform", 1, (float *)&gl_matrix);
+    lv_opengles_shader_set_uniform1f(bound_ctx, "u_Opa", (float)params->opa / (float)LV_OPA_100);
+    lv_opengles_shader_set_uniform1i(bound_ctx, "u_IsFill", params->texture == 0);
+    lv_opengles_shader_set_uniform3f(bound_ctx, "u_FillColor", (float)params->fill_color.red / 255.0f,
                                      (float)params->fill_color.green / 255.0f,
                                      (float)params->fill_color.blue / 255.0f);
-    lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap ? 1 : 0);
+    lv_opengles_shader_set_uniform1i(bound_ctx, "u_SwapRB", params->rb_swap ? 1 : 0);
 
-    lv_opengles_render_draw();
+    lv_opengles_render_draw(bound_ctx);
     lv_opengles_disable_blending();
     LV_PROFILER_DRAW_END;
 }
@@ -431,23 +481,23 @@ static void lv_opengles_disable_blending(void)
     GL_CALL(glDisable(GL_BLEND));
 }
 
-static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size)
+static void lv_opengles_vertex_buffer_init(lv_opengles_gl_t * ctx, const void * data, unsigned int size)
 {
-    if(vertex_buffer_id == 0) GL_CALL(glGenBuffers(1, &vertex_buffer_id));
-    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id));
+    if(ctx->vertex_buffer_id == 0) GL_CALL(glGenBuffers(1, &ctx->vertex_buffer_id));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, ctx->vertex_buffer_id));
     GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW));
 }
 
-static void lv_opengles_vertex_buffer_deinit(void)
+static void lv_opengles_vertex_buffer_deinit(lv_opengles_gl_t * ctx)
 {
-    if(vertex_buffer_id == 0) return;
-    GL_CALL(glDeleteBuffers(1, &vertex_buffer_id));
-    vertex_buffer_id = 0;
+    if(ctx->vertex_buffer_id == 0) return;
+    GL_CALL(glDeleteBuffers(1, &ctx->vertex_buffer_id));
+    ctx->vertex_buffer_id = 0;
 }
 
-static void lv_opengles_vertex_buffer_bind(void)
+static void lv_opengles_vertex_buffer_bind(lv_opengles_gl_t * ctx)
 {
-    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, ctx->vertex_buffer_id));
 }
 
 static void lv_opengles_vertex_buffer_unbind(void)
@@ -455,21 +505,21 @@ static void lv_opengles_vertex_buffer_unbind(void)
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-static void lv_opengles_vertex_array_init(void)
+static void lv_opengles_vertex_array_init(lv_opengles_gl_t * ctx)
 {
-    if(vertex_array_id == 0) GL_CALL(glGenVertexArrays(1, &vertex_array_id));
+    if(ctx->vertex_array_id == 0) GL_CALL(glGenVertexArrays(1, &ctx->vertex_array_id));
 }
 
-static void lv_opengles_vertex_array_deinit(void)
+static void lv_opengles_vertex_array_deinit(lv_opengles_gl_t * ctx)
 {
-    if(vertex_array_id == 0) return;
-    GL_CALL(glDeleteVertexArrays(1, &vertex_array_id));
-    vertex_array_id = 0;
+    if(ctx->vertex_array_id == 0) return;
+    GL_CALL(glDeleteVertexArrays(1, &ctx->vertex_array_id));
+    ctx->vertex_array_id = 0;
 }
 
-static void lv_opengles_vertex_array_bind(void)
+static void lv_opengles_vertex_array_bind(lv_opengles_gl_t * ctx)
 {
-    GL_CALL(glBindVertexArray(vertex_array_id));
+    GL_CALL(glBindVertexArray(ctx->vertex_array_id));
 }
 
 static void lv_opengles_vertex_array_unbind(void)
@@ -477,44 +527,48 @@ static void lv_opengles_vertex_array_unbind(void)
     GL_CALL(glBindVertexArray(0));
 }
 
-static void lv_opengles_vertex_array_add_buffer(void)
+static void lv_opengles_vertex_array_add_buffer(lv_opengles_gl_t * ctx)
 {
-    lv_opengles_vertex_buffer_bind();
+    lv_opengles_vertex_buffer_bind(ctx);
     intptr_t offset = 0;
 
     for(unsigned int i = 0; i < 2; i++) {
-        lv_opengles_vertex_array_bind();
+        lv_opengles_vertex_array_bind(ctx);
         GL_CALL(glEnableVertexAttribArray(i));
         GL_CALL(glVertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, 16, (const void *)offset));
         offset += 2 * 4;
     }
 }
 
-static void lv_opengles_index_buffer_init(const unsigned int * data, unsigned int count)
+static void lv_opengles_index_buffer_init(lv_opengles_gl_t * ctx, const unsigned int * data,
+                                          unsigned int count)
 {
-    index_buffer_count = count;
-    if(index_buffer_id == 0) GL_CALL(glGenBuffers(1, &index_buffer_id));
+    LV_ASSERT_NULL(ctx);
+    ctx->index_buffer_count = count;
+    if(ctx->index_buffer_id == 0) GL_CALL(glGenBuffers(1, &ctx->index_buffer_id));
 
-    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_id));
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->index_buffer_id));
 
     GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, GL_STATIC_DRAW));
 }
 
-static void lv_opengles_index_buffer_deinit(void)
+static void lv_opengles_index_buffer_deinit(lv_opengles_gl_t * ctx)
 {
-    if(index_buffer_id == 0) return;
-    GL_CALL(glDeleteBuffers(1, &index_buffer_id));
-    index_buffer_id = 0;
+    LV_ASSERT_NULL(ctx);
+    if(ctx->index_buffer_id == 0) return;
+    GL_CALL(glDeleteBuffers(1, &ctx->index_buffer_id));
+    ctx->index_buffer_id = 0;
 }
 
-static unsigned int lv_opengles_index_buffer_get_count(void)
+static unsigned int lv_opengles_index_buffer_get_count(lv_opengles_gl_t * ctx)
 {
-    return index_buffer_count;
+    return ctx->index_buffer_count;
 }
 
-static void lv_opengles_index_buffer_bind(void)
+static void lv_opengles_index_buffer_bind(lv_opengles_gl_t * ctx)
 {
-    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_id));
+    LV_ASSERT_NULL(ctx);
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ctx->index_buffer_id));
 }
 
 static void lv_opengles_index_buffer_unbind(void)
@@ -551,26 +605,29 @@ static unsigned int lv_opengles_shader_manager_init(void)
     return 0;
 }
 
-static lv_result_t lv_opengles_shader_init(void)
+static lv_result_t lv_opengles_shader_init(lv_opengles_gl_t * ctx)
 {
-    if(shader_id != 0) {
+    LV_ASSERT_NULL(ctx);
+    if(ctx->shader_id != 0) {
         return LV_RESULT_OK;
     }
-    shader_id = lv_opengles_shader_manager_init();
-    return shader_id != 0 ? LV_RESULT_OK : LV_RESULT_INVALID;
+    ctx->shader_id = lv_opengles_shader_manager_init();
+    return ctx->shader_id != 0 ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-static void lv_opengles_shader_deinit(void)
+static void lv_opengles_shader_deinit(lv_opengles_gl_t * ctx)
 {
-    if(shader_id == 0) return;
+    LV_ASSERT_NULL(ctx);
+    if(ctx->shader_id == 0) return;
     /* The program is part of the manager and as such will be destroyed inside */
     lv_opengl_shader_manager_deinit(&shader_manager);
-    shader_id = 0;
+    ctx->shader_id = 0;
 }
 
-static void lv_opengles_shader_bind(void)
+static void lv_opengles_shader_bind(lv_opengles_gl_t * ctx)
 {
-    GL_CALL(glUseProgram(shader_id));
+    LV_ASSERT_NULL(ctx);
+    GL_CALL(glUseProgram(ctx->shader_id));
 }
 
 static void lv_opengles_shader_unbind(void)
@@ -578,10 +635,12 @@ static void lv_opengles_shader_unbind(void)
     GL_CALL(glUseProgram(0));
 }
 
-static int lv_opengles_shader_get_uniform_location(const char * name)
+static int lv_opengles_shader_get_uniform_location(lv_opengles_gl_t * ctx, const char * name)
 {
+    LV_ASSERT_NULL(ctx);
     int id = -1;
-    for(size_t i = 0; i < sizeof(shader_location) / sizeof(int); i++) {
+    const size_t shader_name_count = sizeof(shader_names) / sizeof(shader_names[0]);
+    for(size_t i = 0; i < shader_name_count; i++) {
         if(lv_strcmp(shader_names[i], name) == 0) {
             id = i;
         }
@@ -589,58 +648,61 @@ static int lv_opengles_shader_get_uniform_location(const char * name)
 
     LV_ASSERT_FORMAT_MSG(id > -1, "Uniform location doesn't exist for '%s'. Check `shader_location` array", name);
 
-    if(shader_location[id] != 0) {
-        return shader_location[id];
+    if(ctx->shader_location[id] != 0) {
+        return ctx->shader_location[id];
     }
 
     int location;
-    GL_CALL(location = glGetUniformLocation(shader_id, name));
+    GL_CALL(location = glGetUniformLocation(ctx->shader_id, name));
     if(location == -1)
         LV_LOG_WARN("Warning: uniform '%s' doesn't exist!", name);
 
-    shader_location[id] = location;
+    ctx->shader_location[id] = location;
     return location;
 }
 
-static void lv_opengles_shader_set_uniform1i(const char * name, int value)
+static void lv_opengles_shader_set_uniform1i(lv_opengles_gl_t * ctx, const char * name, int value)
 {
     LV_PROFILER_DRAW_BEGIN;
-    GL_CALL(glUniform1i(lv_opengles_shader_get_uniform_location(name), value));
+    GL_CALL(glUniform1i(lv_opengles_shader_get_uniform_location(ctx, name), value));
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, const float * values)
+static void lv_opengles_shader_set_uniformmatrix3fv(lv_opengles_gl_t * ctx, const char * name, int count,
+                                                    const float * values)
 {
     LV_PROFILER_DRAW_BEGIN;
     /*
      * GLES2.0 doesn't support transposing the matrix via glUniformMatrix3fv so this is the transposed matrix
      * https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf page 47
      */
-    GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(name), count, GL_FALSE, values));
+    GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(ctx, name), count, GL_FALSE, values));
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_opengles_shader_set_uniform1f(const char * name, float value)
+static void lv_opengles_shader_set_uniform1f(lv_opengles_gl_t * ctx, const char * name, float value)
 {
     LV_PROFILER_DRAW_BEGIN;
-    GL_CALL(glUniform1f(lv_opengles_shader_get_uniform_location(name), value));
+    GL_CALL(glUniform1f(lv_opengles_shader_get_uniform_location(ctx, name), value));
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_opengles_shader_set_uniform3f(const char * name, float value_0, float value_1, float value_2)
+static void lv_opengles_shader_set_uniform3f(lv_opengles_gl_t * ctx, const char * name, float value_0,
+                                             float value_1, float value_2)
 {
     LV_PROFILER_DRAW_BEGIN;
-    GL_CALL(glUniform3f(lv_opengles_shader_get_uniform_location(name), value_0, value_1, value_2));
+    GL_CALL(glUniform3f(lv_opengles_shader_get_uniform_location(ctx, name), value_0, value_1, value_2));
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_opengles_render_draw(void)
+static void lv_opengles_render_draw(lv_opengles_gl_t * ctx)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_shader_bind();
-    lv_opengles_vertex_array_bind();
-    lv_opengles_index_buffer_bind();
-    unsigned int count = lv_opengles_index_buffer_get_count();
+    LV_ASSERT_NULL(ctx);
+    lv_opengles_shader_bind(ctx);
+    lv_opengles_vertex_array_bind(ctx);
+    lv_opengles_index_buffer_bind(ctx);
+    unsigned int count = lv_opengles_index_buffer_get_count(ctx);
     GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL));
     LV_PROFILER_DRAW_END;
 }

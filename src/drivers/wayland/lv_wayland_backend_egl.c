@@ -26,6 +26,9 @@
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    lv_opengles_egl_t * shared_egl_ctx;
+} lv_wl_egl_ctx_t;
 
 typedef struct {
     lv_opengles_texture_t texture;
@@ -49,8 +52,9 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
 static void flush_wait_cb(lv_display_t * disp);
 static void frame_done(void * data, struct wl_callback * callback, uint32_t time);
 
-static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display,
+static lv_wl_egl_display_data_t * egl_create_display_data(lv_wl_egl_ctx_t * ctx, lv_display_t * display,
                                                           int32_t width, int32_t height);
+
 static void egl_destroy_display_data(lv_wl_egl_display_data_t * ddata);
 
 static lv_egl_interface_t wl_egl_get_interface(lv_display_t * display);
@@ -58,6 +62,8 @@ static void * wl_egl_create_window(void * driver_data, const lv_egl_native_windo
 static void wl_egl_destroy_window(void * driver_data, void * native_window);
 static size_t wl_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
 static void wl_egl_flip_cb(void * driver_data, bool vsync);
+
+static void refr_start_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -102,15 +108,15 @@ static void frame_done(void * data, struct wl_callback * callback, uint32_t time
 
 static void * wl_egl_init(void)
 {
-    return NULL;
+    return lv_zalloc(sizeof(lv_wl_egl_ctx_t));
 }
 
 static void wl_egl_deinit(void * backend_ctx)
 {
-    LV_UNUSED(backend_ctx);
+    lv_free(backend_ctx);
 }
 
-static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display,
+static lv_wl_egl_display_data_t * egl_create_display_data(lv_wl_egl_ctx_t * ctx, lv_display_t * display,
                                                           int32_t width, int32_t height)
 {
     lv_wl_egl_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
@@ -126,10 +132,16 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
 
     /* Create EGL context */
     lv_egl_interface_t egl_interface = wl_egl_get_interface(display);
+    /* In case this is not the first display, */
+    egl_interface.share_context = ctx->shared_egl_ctx;
     ddata->egl_ctx = lv_opengles_egl_context_create(&egl_interface);
     if(!ddata->egl_ctx) {
         LV_LOG_ERROR("Failed to create EGL context");
         goto egl_ctx_err;
+    }
+
+    if(!ctx->shared_egl_ctx) {
+        ctx->shared_egl_ctx = ddata->egl_ctx;
     }
 
     /* Let the opengles texture driver handle the texture lifetime */
@@ -275,12 +287,13 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
 static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height)
 {
     LV_UNUSED(backend_ctx);
-    lv_wl_egl_display_data_t * ddata = egl_create_display_data(display, width, height);
+    lv_wl_egl_display_data_t * ddata = egl_create_display_data(backend_ctx, display, width, height);
     if(!ddata) {
         LV_LOG_ERROR("Failed to create display data");
         return NULL;
     }
 
+    lv_display_add_event_cb(display, refr_start_event_cb, LV_EVENT_REFR_START, ddata);
     lv_display_set_flush_cb(display, egl_flush_cb);
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
     lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
@@ -421,6 +434,16 @@ static void wl_egl_flip_cb(void * driver_data, bool vsync)
 
     /* For Wayland, buffer swapping is handled by the compositor
      * through wl_surface_commit() which is called in the flush callback */
+}
+
+static void refr_start_event_cb(lv_event_t * e)
+{
+    lv_wl_egl_display_data_t * ddata = lv_event_get_user_data(e);
+    LV_ASSERT_NULL(ddata);
+    lv_result_t res = lv_opengles_egl_context_make_current(ddata->egl_ctx);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to bind egl context to refreshing display");
+    }
 }
 
 #endif /*LV_USE_WAYLAND && LV_USE_OPENGLES*/
