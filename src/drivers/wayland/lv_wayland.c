@@ -158,12 +158,6 @@ void lv_wayland_deinit(void)
         return;
     }
 
-    lv_wl_window_t * window = NULL;
-
-    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
-        lv_wayland_window_delete(window);
-    }
-
     lv_wayland_xdg_deinit();
 
     if(is_wayland_initialized) {
