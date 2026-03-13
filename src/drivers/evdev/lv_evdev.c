@@ -120,7 +120,7 @@ static int _evdev_process_key(uint16_t code)
         case KEY_END:
             return LV_KEY_END;
         default:
-            return 0;
+            return code + 0xFFFF;
     }
 }
 
@@ -241,11 +241,7 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                 else if(in.value == 1) dsc->state = LV_INDEV_STATE_PRESSED;
             }
             else {
-#if LV_EVDEV_RAW_KEYCODE
-                dsc->key = in.code;
-#else
                 dsc->key = _evdev_process_key(in.code);
-#endif
                 if(dsc->key) {
                     dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
                     data->continue_reading = true; /*Keep following events in buffer for now*/
@@ -670,6 +666,24 @@ void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_
     dsc->min_y = min_y;
     dsc->max_x = max_x;
     dsc->max_y = max_y;
+}
+
+bool lv_evdev_is_raw_key(lv_event_t * e)
+{
+    uint32_t key = lv_event_get_key(e);
+    return (key > 0xFFFF);
+}
+
+uint16_t lv_evdev_get_raw_key(lv_event_t * e)
+{
+    uint32_t key = lv_event_get_key(e);
+
+    if(key > 0xFFFF)
+    {
+        return (uint16_t)(key - 0xFFFF);
+    }
+
+    return 0;
 }
 
 void lv_evdev_delete(lv_indev_t * indev)
