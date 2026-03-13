@@ -173,8 +173,7 @@ void lv_wayland_window_close(lv_display_t * display)
         return;
     }
     window->close_cb = NULL;
-    lv_wayland_window_delete(window);
-    lv_wayland_deinit();
+    lv_display_delete(window->lv_disp);
 }
 
 bool lv_wayland_window_is_open(lv_display_t * disp)
