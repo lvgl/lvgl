@@ -362,7 +362,7 @@ static const char * check_solar_term(uint16_t year, uint8_t month, uint8_t day)
         6, 22, 6, 22, 6, 22, 7, 22, 6, 21, 6, 21
     };
 
-    if(year < 1901 || year > 2100) {
+    if(year < 1901 || year > 2099) {
         return NULL;
     }
 
