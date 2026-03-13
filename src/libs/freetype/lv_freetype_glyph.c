@@ -23,6 +23,10 @@
     /** Number of sets - reuse the FreeType glyph count (must be power of 2) */
     #define GLYPH_L1_SETS       ((uint32_t)LV_FREETYPE_CACHE_FT_GLYPH_CNT)
 
+    #if (LV_FREETYPE_CACHE_FT_GLYPH_CNT & (LV_FREETYPE_CACHE_FT_GLYPH_CNT - 1)) != 0
+        #error "LV_FREETYPE_CACHE_FT_GLYPH_CNT must be power of 2 for L1 cache"
+    #endif
+
     /** Associativity - fixed at 2-way, do NOT change */
     #define GLYPH_L1_WAYS       2u
 
@@ -112,12 +116,12 @@ void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc)
 
 void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
 {
-    LV_ASSERT_MSG((GLYPH_L1_SETS & (GLYPH_L1_SETS - 1u)) == 0,
-                  "LV_FREETYPE_CACHE_FT_GLYPH_CNT must be power of 2 for L1 cache");
-
     size_t sz = sizeof(glyph_l1_set_t) * GLYPH_L1_SETS;
     node->glyph_l1 = lv_malloc_zeroed(sz);
     LV_ASSERT_MALLOC(node->glyph_l1);
+    if(node->glyph_l1 == NULL) {
+        LV_LOG_WARN("Failed to allocate glyph L1 cache (%u bytes), L1 disabled for this node", (unsigned)sz);
+    }
 }
 
 void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node)
