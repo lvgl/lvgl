@@ -20,10 +20,10 @@
 
 #if LV_USE_OS == LV_OS_NONE
 
-    /** Number of sets – reuse the FreeType glyph count (must be power of 2) */
+    /** Number of sets - reuse the FreeType glyph count (must be power of 2) */
     #define GLYPH_L1_SETS       ((uint32_t)LV_FREETYPE_CACHE_FT_GLYPH_CNT)
 
-    /** Associativity – fixed at 2-way, do NOT change */
+    /** Associativity - fixed at 2-way, do NOT change */
     #define GLYPH_L1_WAYS       2u
 
     #define GLYPH_L1_SET_MASK   (GLYPH_L1_SETS - 1u)
@@ -39,7 +39,6 @@
 typedef struct {
     uint32_t unicode;
     uint32_t size;
-    uint32_t generation;
     lv_font_glyph_dsc_t dsc;
 } glyph_l1_entry_t;
 
@@ -119,7 +118,6 @@ void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
     size_t sz = sizeof(glyph_l1_set_t) * GLYPH_L1_SETS;
     node->glyph_l1 = lv_malloc_zeroed(sz);
     LV_ASSERT_MALLOC(node->glyph_l1);
-    node->glyph_l1_generation = 1;
 }
 
 void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node)
@@ -157,11 +155,10 @@ static bool glyph_l1_lookup(lv_freetype_cache_node_t * node,
 
     uint32_t idx = glyph_l1_hash(unicode, size) & GLYPH_L1_SET_MASK;
     glyph_l1_set_t * set = &sets[idx];
-    uint32_t gen = node->glyph_l1_generation;
 
     for(uint32_t w = 0; w < GLYPH_L1_WAYS; w++) {
         glyph_l1_entry_t * e = &set->ways[w];
-        if(e->generation == gen && e->unicode == unicode && e->size == size) {
+        if(e->unicode == unicode && e->size == size) {
             set->lru_bits = (uint8_t)w;
             *out_dsc = e->dsc;
             return true;
@@ -185,7 +182,6 @@ static void glyph_l1_fill(lv_freetype_cache_node_t * node,
     glyph_l1_entry_t * e = &set->ways[victim];
     e->unicode    = unicode;
     e->size       = size;
-    e->generation = node->glyph_l1_generation;
     e->dsc        = *dsc;
     e->dsc.entry  = NULL;
 

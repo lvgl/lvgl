@@ -101,7 +101,6 @@ struct _lv_freetype_cache_node_t {
 
 #if LV_USE_OS == LV_OS_NONE
     /* L1 glyph metrics cache (single-thread only, managed by lv_freetype_glyph.c) */
-    uint32_t glyph_l1_generation;
     void * glyph_l1;
 #endif
 };
