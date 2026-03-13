@@ -185,7 +185,7 @@ void lv_wayland_backend_init_all(void);
  */
 void lv_wayland_backend_deinit_all(void);
 
-/* @brief Deinitializes all backends
+/* @brief Dispatches a global handler call to all available backends
  *
  */
 void lv_wayland_backend_global_handler(struct wl_registry * registry, uint32_t name,
@@ -193,13 +193,14 @@ void lv_wayland_backend_global_handler(struct wl_registry * registry, uint32_t n
 
 /* @brief Loops through all available backends to find one capable of initializing a display
  *
- * The function loops through all available backends until it can initialize a display
+ * The function loops through all available backends until one can initialize a display
  *
- * @return Pointer to the initialize backend operations or NULL if no backend could be probed
- *
- * @note this function does not initialize the backend itself
- * */
-
+ * @param backend_ddata[out] Backend display data
+ * @param display[in] The display to initialize for
+ * @param width[in] the display width
+ * @param height[in] the display height
+ * @return LV_RESULT_OK if the display was initialized else LV_RESULT_INVALID
+ */
 lv_result_t lv_wayland_backend_init_display(lv_wayland_backend_display_data_t * backend_ddata,
                                             lv_display_t * display,
                                             int32_t width,
