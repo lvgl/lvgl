@@ -678,8 +678,7 @@ uint16_t lv_evdev_get_raw_key(lv_event_t * e)
 {
     uint32_t key = lv_event_get_key(e);
 
-    if(key > 0xFFFF)
-    {
+    if(key > 0xFFFF) {
         return (uint16_t)(key - 0xFFFF);
     }
 
