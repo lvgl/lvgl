@@ -134,6 +134,9 @@ void lv_gif_restart(lv_obj_t * obj)
 
     GIF_reset(&gifobj->gif);
     gifobj->loop_count = -1; /* match the behavior of the old library */
+
+    lv_draw_buf_clear(gifobj->draw_buf, NULL);
+
     lv_timer_resume(gifobj->timer);
     lv_timer_reset(gifobj->timer);
 
@@ -310,30 +313,12 @@ static inline void gif_blend_to_rgb565(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf
                                                                * 2));
 
     if(pDraw->ucHasTransparency) {
-        if(pDraw->ucDisposalMethod == 2) {
-            /* Disposal 2: Replace transparent pixels with background color */
-            while(src < end) {
-                pixel = *src++;
-                if(pixel == pDraw->ucTransparent) {
-                    pixel = pDraw->ucBackground;
-                }
-                *dst++ = pal[pixel];
+        while(src < end) {
+            pixel = *src++;
+            if(pixel != pDraw->ucTransparent) {
+                *dst = pal[pixel];
             }
-        }
-        else {
-            /* Disposal 0,1,3: Replace transparent pixels with background color to maintain position
-             * The gif_disposal_last_frame function handles the actual background clearing
-            */
-            uint16_t bg_color = pal[pDraw->ucBackground];
-            while(src < end) {
-                pixel = *src++;
-                if(pixel == pDraw->ucTransparent) {
-                    *dst++ = bg_color;
-                }
-                else {
-                    *dst++ = pal[pixel];
-                }
-            }
+            dst++;
         }
     }
     else {
@@ -357,38 +342,14 @@ static inline void gif_blend_to_rgb888(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf
     uint8_t * dst = (uint8_t *)draw_buf->data + ((pDraw->iY + pDraw->y) * draw_buf->header.stride + pDraw->iX * 3);
 
     if(pDraw->ucHasTransparency) {
-        if(pDraw->ucDisposalMethod == 2) {
-            /* Disposal 2: Replace transparent pixels with background color */
-            while(src < end) {
-                pixel = *src++;
-                if(pixel == pDraw->ucTransparent) {
-                    pixel = pDraw->ucBackground;
-                }
+        while(src < end) {
+            pixel = *src++;
+            if(pixel != pDraw->ucTransparent) {
                 dst[0] = pal[(pixel * 3) + 2];
                 dst[1] = pal[(pixel * 3) + 1];
                 dst[2] = pal[(pixel * 3) + 0];
-                dst += 3;
             }
-        }
-        else {
-            /* Disposal 0,1,3: Replace transparent pixels with background color to maintain position */
-            uint8_t bg_r = pal[(pDraw->ucBackground * 3) + 2];
-            uint8_t bg_g = pal[(pDraw->ucBackground * 3) + 1];
-            uint8_t bg_b = pal[(pDraw->ucBackground * 3) + 0];
-            while(src < end) {
-                pixel = *src++;
-                if(pixel == pDraw->ucTransparent) {
-                    dst[0] = bg_r;
-                    dst[1] = bg_g;
-                    dst[2] = bg_b;
-                }
-                else {
-                    dst[0] = pal[(pixel * 3) + 2];
-                    dst[1] = pal[(pixel * 3) + 1];
-                    dst[2] = pal[(pixel * 3) + 0];
-                }
-                dst += 3;
-            }
+            dst += 3;
         }
     }
     else {
@@ -415,37 +376,15 @@ static inline void gif_blend_to_argb8888(GIFDRAW * pDraw, lv_draw_buf_t * draw_b
     uint8_t * dst = (uint8_t *)draw_buf->data + ((pDraw->iY + pDraw->y) * draw_buf->header.stride + pDraw->iX * 4);
 
     if(pDraw->ucHasTransparency) {
-        if(pDraw->ucDisposalMethod == 2) {
-            /* Disposal 2: Transparent pixels get alpha=0, opaque pixels get alpha=255 */
-            while(src < end) {
-                pixel = *src++;
-                if(pixel != pDraw->ucTransparent) {
-                    dst[0] = pal[(pixel * 3) + 2];
-                    dst[1] = pal[(pixel * 3) + 1];
-                    dst[2] = pal[(pixel * 3) + 0];
-                    dst[3] = 0xFF;
-                }
-                else {
-                    dst[3] = 0x00;
-                }
-                dst += 4;
+        while(src < end) {
+            pixel = *src++;
+            if(pixel != pDraw->ucTransparent) {
+                dst[0] = pal[(pixel * 3) + 2];
+                dst[1] = pal[(pixel * 3) + 1];
+                dst[2] = pal[(pixel * 3) + 0];
+                dst[3] = 0xFF;
             }
-        }
-        else {
-            /* Disposal 0,1,3: Transparent pixels get alpha=0, opaque pixels get alpha=255 */
-            while(src < end) {
-                pixel = *src++;
-                if(pixel != pDraw->ucTransparent) {
-                    dst[0] = pal[(pixel * 3) + 2];
-                    dst[1] = pal[(pixel * 3) + 1];
-                    dst[2] = pal[(pixel * 3) + 0];
-                    dst[3] = 0xFF;
-                }
-                else {
-                    dst[3] = 0x00;
-                }
-                dst += 4;
-            }
+            dst += 4;
         }
     }
     else {
@@ -563,6 +502,8 @@ static void gif_initialize(lv_gif_t * gifobj)
         return;
     }
 
+    lv_draw_buf_clear(gifobj->draw_buf, NULL);
+
     lv_image_set_src((lv_obj_t *) gifobj, gifobj->draw_buf);
 
     gifobj->loop_count = GIF_getLoopCount(&gifobj->gif);
@@ -618,21 +559,35 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
             case GIF_PALETTE_RGB565_LE:
             case GIF_PALETTE_RGB565_BE: {
                     unsigned short * palette16 = (unsigned short *)palette;
+                    uint16_t color = palette16[bg];
+                    if(gif->ucGIFBits & 1) color = 0;
+
                     for(i = y; i < y + h; i++) {
                         uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
                         for(j = x; j < x + w; j++) {
-                            *(uint16_t *)(dst + 2 * j) = palette16[bg];
+                            *(uint16_t *)(dst + 2 * j) = color;
                         }
                     }
                 }
                 break;
             case GIF_PALETTE_RGB888:
                 for(i = y; i < y + h; i++) {
-                    uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
-                    for(j = x; j < x + w; j++) {
-                        dst[3 * j] = palette[(bg * 3) + 2];
-                        dst[3 * j + 1] = palette[(bg * 3) + 1];
-                        dst[3 * j + 2] = palette[(bg * 3) + 0];
+                    uint8_t r = palette[(bg * 3) + 2];
+                    uint8_t g = palette[(bg * 3) + 1];
+                    uint8_t b = palette[(bg * 3) + 0];
+                    if(gif->ucGIFBits & 1) {
+                        r = 0;
+                        g = 0;
+                        b = 0;
+                    }
+
+                    for(i = y; i < y + h; i++) {
+                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        for(j = x; j < x + w; j++) {
+                            dst[3 * j] = r;
+                            dst[3 * j + 1] = g;
+                            dst[3 * j + 2] = b;
+                        }
                     }
                 }
                 break;
