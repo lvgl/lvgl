@@ -172,8 +172,7 @@ void lv_wayland_window_close(lv_display_t * display)
         return;
     }
     window->close_cb = NULL;
-    lv_wayland_window_delete(window);
-    lv_wayland_deinit();
+    lv_display_delete(window->lv_disp);
 }
 
 bool lv_wayland_window_is_open(lv_display_t * disp)
@@ -292,13 +291,15 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
     wl_backend_ops.deinit_display(window->backend_display_data, window->lv_disp);
     window->backend_display_data = NULL;
 
+#if LV_WAYLAND_DIRECT_EXIT
     /* Set the driver data to NULL before calling display delete
      * so that the delete event doesn't do anything*/
     lv_display_set_driver_data(window->lv_disp, NULL);
     lv_display_delete(window->lv_disp);
-
+#endif
 
     lv_ll_remove(&lv_wl_ctx.window_ll, window);
+    lv_free(window);
 
     if(LV_WAYLAND_DIRECT_EXIT && lv_ll_is_empty(&lv_wl_ctx.window_ll)) {
         /* lv_deinit will deinit the wayland driver*/
