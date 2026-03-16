@@ -514,30 +514,33 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
     }
 
+
+    vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(outline);
     if(stroke_width_scaled > 0) {
         /*Set the stroke and update the path type */
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_stroke(lv_vg_lite_path_get_path(outline),
-                                                  VG_LITE_CAP_ROUND, VG_LITE_JOIN_MITER, stroke_width_scaled, 1.0,
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_stroke(vg_path,
+                                                  VG_LITE_CAP_ROUND, VG_LITE_JOIN_ROUND, stroke_width_scaled, 1.0,
                                                   NULL, 0, 0,
                                                   lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true)), {});
 
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_STROKE_PATH), {});
-        LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(lv_vg_lite_path_get_path(outline)), {});
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, VG_LITE_DRAW_STROKE_PATH), {});
+        LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(vg_path), {});
 
         /*Draw the stroke (transparent fill)*/
         lv_vg_lite_draw(
             &u->target_buffer,
-            lv_vg_lite_path_get_path(outline),
+            vg_path,
             VG_LITE_FILL_NON_ZERO,
             &draw_matrix,
             VG_LITE_BLEND_SRC_OVER,
             lv_vg_lite_color(dsc->color, 0, true));
 
         /*Restore the path to fill mode, it will release the local memory allocated for the stroke op */
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_PATH), {});
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_draw_path_type(vg_path, VG_LITE_DRAW_FILL_PATH), {});
 
     }
 
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(lv_vg_lite_path_get_path(outline), VG_LITE_DRAW_FILL_PATH), {});
     lv_vg_lite_draw(
         &u->target_buffer,
         lv_vg_lite_path_get_path(outline),
@@ -592,7 +595,7 @@ static void outline_iter_cb(void * user_data, uint8_t op_code, const float * dat
 static void vg_lite_outline_push(const lv_freetype_outline_event_param_t * param)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_vg_lite_path_t * path = param->outlines;
+    lv_vg_lite_path_t * path = param->outline;
     LV_ASSERT_NULL(path);
 
     lv_freetype_outline_type_t type = param->type;
@@ -635,11 +638,10 @@ static void freetype_outline_event_cb(lv_event_t * e)
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
     switch(code) {
         case LV_EVENT_CREATE:
-            param->outlines = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
-            LV_ASSERT_MALLOC(param->outlines);
+            param->outline = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
             break;
         case LV_EVENT_DELETE:
-            if(param->outlines) lv_vg_lite_path_destroy(param->outlines);
+            if(param->outline) lv_vg_lite_path_destroy(param->outline);
             break;
         case LV_EVENT_INSERT:
             vg_lite_outline_push(param);

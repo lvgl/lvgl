@@ -220,6 +220,8 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
 
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 
+
+#include "../../tests/unity/unity.h"
 /*
  * Renders the vectors paths representing a glyph with ThorVG
  * the result is then blended into the draw buffer
@@ -235,13 +237,12 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     lv_vector_path_t * paths = (lv_vector_path_t *) glyph_dsc->glyph_data;
     LV_ASSERT_NULL(paths);
 
-    int32_t cf = LV_COLOR_FORMAT_ARGB8888;
     int32_t w;
     int32_t h;
     uint32_t stride;
     lv_area_t buf_area;
 
-    float scale = 1.0;
+    float scale = 1.0f;
 #if LV_USE_FREETYPE
     if(lv_freetype_is_outline_font(glyph_dsc->g->resolved_font)) {
         scale = LV_FREETYPE_F26DOT6_TO_FLOAT(lv_freetype_outline_get_scale(glyph_dsc->g->resolved_font));
@@ -254,13 +255,13 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     lv_area_set_width(&buf_area, w);
     lv_area_set_height(&buf_area, h);
 
-    stride = lv_draw_buf_width_to_stride(w, cf);
-    draw_buf = lv_draw_buf_create(w, h, cf, stride);
+    stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888);
+    draw_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_ARGB8888, stride);
     lv_draw_buf_clear(draw_buf, NULL);
 
     lv_memzero(&layer, sizeof(lv_layer_t));
     layer.draw_buf = draw_buf;
-    layer.color_format = cf;
+    layer.color_format = LV_COLOR_FORMAT_ARGB8888;
     layer.buf_area = buf_area;
     layer.phy_clip_area = buf_area;
     layer._clip_area = buf_area;
@@ -283,25 +284,20 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     lv_matrix_scale(&matrix, scale, scale);
     lv_draw_vector_dsc_set_transform(vector_dsc, &matrix);
 
+
     /*Set attributes color, line width etc*/
-    if(cf == LV_COLOR_FORMAT_ARGB8888) {
-
-        if(glyph_dsc->outline_stroke_width > 0) {
-            lv_draw_vector_dsc_set_stroke_color(vector_dsc, glyph_dsc->outline_stroke_color);
-            lv_draw_vector_dsc_set_stroke_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
-            lv_draw_vector_dsc_set_stroke_width(vector_dsc, glyph_dsc->outline_stroke_width);
-            lv_draw_vector_dsc_add_path(vector_dsc, paths);
-            lv_draw_vector_dsc_set_stroke_opa(vector_dsc, 0);
-            lv_draw_vector_dsc_set_stroke_width(vector_dsc, 0);
-        }
-
-        lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->color);
-        lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->opa);
+    if(glyph_dsc->outline_stroke_width > 0) {
+        lv_draw_vector_dsc_set_stroke_color(vector_dsc, glyph_dsc->outline_stroke_color);
+        lv_draw_vector_dsc_set_stroke_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
+        lv_draw_vector_dsc_set_stroke_width(vector_dsc, glyph_dsc->outline_stroke_width);
         lv_draw_vector_dsc_add_path(vector_dsc, paths);
+        lv_draw_vector_dsc_set_stroke_opa(vector_dsc, 0);
+        lv_draw_vector_dsc_set_stroke_width(vector_dsc, 0);
     }
-    else {
-        LV_LOG_ERROR("Unsupported color format: %d", cf);
-    }
+
+    lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->color);
+    lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->opa);
+    lv_draw_vector_dsc_add_path(vector_dsc, paths);
 
     lv_area_t old_area;
     lv_area_t letter_coords;
@@ -323,7 +319,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
         dummy_t.clip_area = vector_dsc->base.layer->_clip_area;
         dummy_t.target_layer = vector_dsc->base.layer;
         dummy_t.type = LV_DRAW_TASK_TYPE_VECTOR;
-        dummy_t.opa = 255;
+        dummy_t.opa = LV_OPA_COVER;
         dummy_t.draw_dsc = vector_dsc;
         lv_draw_sw_vector(&dummy_t, dummy_t.draw_dsc);
     }
@@ -338,10 +334,6 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     lv_draw_image_dsc_t img_dsc;
 
     lv_draw_image_dsc_init(&img_dsc);
-    img_dsc.rotation = 0;
-    img_dsc.scale_x = LV_SCALE_NONE;
-    img_dsc.scale_y = LV_SCALE_NONE;
-    img_dsc.opa = LV_OPA_100;
     img_dsc.src = draw_buf;
     lv_draw_sw_image(t, &img_dsc, &letter_coords);
 
@@ -359,14 +351,13 @@ static void freetype_outline_event_cb(lv_event_t * e)
     switch(lv_event_get_code(e)) {
         case LV_EVENT_CREATE: {
                 /*Create the inside path*/
-                param->outlines = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
-                LV_ASSERT_MALLOC(param->outlines);
+                param->outline = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
                 break;
             }
 
         case LV_EVENT_DELETE: {
-                lv_vector_path_clear(param->outlines);
-                lv_vector_path_delete(param->outlines);
+                lv_vector_path_clear(param->outline);
+                lv_vector_path_delete(param->outline);
                 break;
             }
 
@@ -374,7 +365,7 @@ static void freetype_outline_event_cb(lv_event_t * e)
                 lv_fpoint_t pnt;
                 lv_fpoint_t ctrl_pnt1;
                 lv_fpoint_t ctrl_pnt2;
-                lv_vector_path_t * path = param->outlines;
+                lv_vector_path_t * path = param->outline;
 
                 switch(param->type) {
                     case LV_FREETYPE_OUTLINE_MOVE_TO:
