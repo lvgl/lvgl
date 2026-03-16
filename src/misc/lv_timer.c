@@ -98,11 +98,11 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         state_p->timer_deleted             = false;
         state_p->timer_created             = false;
 
-        timer_active = lv_ll_get_head(timer_head);
+        timer_active = lv_ll_get_tail(timer_head);
         while(timer_active) {
             /*The timer might be deleted if it runs only once ('repeat_count = 1')
              *So get next element until the current is surely valid*/
-            next = lv_ll_get_next(timer_head, timer_active);
+            next = lv_ll_get_prev(timer_head, timer_active);
 
             if(lv_timer_exec(timer_active)) {
                 /*If a timer was created or deleted then this or the next item might be corrupted*/
@@ -117,7 +117,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     } while(timer_active);
 
     uint32_t time_until_next = LV_NO_TIMER_READY;
-    next = lv_ll_get_head(timer_head);
+    next = lv_ll_get_tail(timer_head);
     while(next) {
         if(!next->paused) {
             uint32_t delay = lv_timer_time_remaining(next);
@@ -125,7 +125,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
                 time_until_next = delay;
         }
 
-        next = lv_ll_get_next(timer_head, next); /*Find the next timer*/
+        next = lv_ll_get_prev(timer_head, next); /*Find the next timer*/
     }
 
     state_p->busy_time += lv_tick_elaps(handler_start);
