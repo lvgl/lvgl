@@ -1,6 +1,11 @@
 /**
  * @file lv_draw_eve5.h
  *
+ * EVE5 (BT820) Draw Unit Public Header
+ *
+ * Copyright (C) 2025-2026  Bridgetek Pte Ltd
+ * Author: Jan Boon <jan.boon@kaetemi.be>
+ * SPDX-License-Identifier: MIT
  */
 
 #ifndef LV_DRAW_EVE5_H

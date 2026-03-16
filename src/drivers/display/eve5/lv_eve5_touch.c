@@ -22,6 +22,10 @@
  * Calibration (REG_TOUCH_TRANSFORM_A-F):
  *   16.16 fixed-point values, 0x10000 = 1.0
  *   Applies to both modes
+ *
+ * Copyright (C) 2025-2026  Bridgetek Pte Ltd
+ * Author: Jan Boon <jan.boon@kaetemi.be>
+ * SPDX-License-Identifier: MIT
  */
 
 /*********************
@@ -32,6 +36,9 @@
 #if LV_USE_EVE5
 
 #include "../../../stdlib/lv_mem.h"
+#if LV_USE_OS
+#include "../../../osal/lv_os.h"
+#endif
 
 /*********************
  * DEFINES
@@ -103,7 +110,13 @@ lv_indev_t *lv_eve5_touch_create(lv_display_t *disp)
     }
 
     /* Ensure we're in compatibility mode for single touch */
+#if LV_USE_OS
+    lv_eve5_hal_lock(disp);
+#endif
     EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, 1);
+#if LV_USE_OS
+    lv_eve5_hal_unlock(disp);
+#endif
 
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, touch_read_cb);
@@ -137,12 +150,18 @@ lv_eve5_multitouch_t *lv_eve5_multitouch_create(lv_display_t *disp, uint8_t num_
     mt->disp = disp;
     mt->num_points = num_points;
 
-    /* 
+    /*
      * Enable extended mode for multi-touch on BT820.
      * REG_CTOUCH_EXTENDED: 0 = extended (multi-touch), 1 = compatibility (single)
      * Note: Calibration should be done BEFORE this, in compatibility mode.
      */
+#if LV_USE_OS
+    lv_eve5_hal_lock(disp);
+#endif
     EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, 0);
+#if LV_USE_OS
+    lv_eve5_hal_unlock(disp);
+#endif
 
     for (uint8_t i = 0; i < num_points; i++)
     {
@@ -404,12 +423,21 @@ static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
         return;
     }
 
-    /* 
+#if LV_USE_OS
+    lv_eve5_hal_lock(touch_data->disp);
+#endif
+
+    /*
      * Read REG_TOUCH_SCREEN_XY directly for compatibility mode.
      * This is the same register as REG_CTOUCH_TOUCH0_XY but we use
      * the compatibility name for clarity.
      */
     uint32_t xy = EVE_Hal_rd32(phost, REG_TOUCH_SCREEN_XY);
+
+#if LV_USE_OS
+    lv_eve5_hal_unlock(touch_data->disp);
+#endif
+
     uint16_t x_raw = (xy >> 16) & 0xFFFF;
     uint16_t y_raw = xy & 0xFFFF;
 
@@ -458,7 +486,15 @@ static void multitouch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
 
     int16_t x, y;
 
-    if (read_touch_xy(phost, touch_data->touch_index, &x, &y))
+#if LV_USE_OS
+    lv_eve5_hal_lock(touch_data->disp);
+#endif
+    bool touched = read_touch_xy(phost, touch_data->touch_index, &x, &y);
+#if LV_USE_OS
+    lv_eve5_hal_unlock(touch_data->disp);
+#endif
+
+    if (touched)
     {
         /* Validate coordinates are within display bounds */
         if (x >= 0 && y >= 0 && x < phost->Width && y < phost->Height)

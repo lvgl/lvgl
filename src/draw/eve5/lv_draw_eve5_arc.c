@@ -14,6 +14,10 @@
  * - Full circle: skip stencil, just annulus + reveal
  * - Arc > 180°: "reverse trick" — stencil the complement sector (always <= 180°)
  *   and invert the selection via ClearStencil(1) + EQUAL(1)
+ *
+ * Copyright (C) 2025-2026  Bridgetek Pte Ltd
+ * Author: Jan Boon <jan.boon@kaetemi.be>
+ * SPDX-License-Identifier: MIT
  */
 
 #include "lv_draw_eve5_private.h"
@@ -72,7 +76,7 @@ static uint16_t degrees_to_furmans(int32_t degrees)
  */
 static void draw_arc_stencil(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
                              int32_t cx, int32_t cy, int32_t radius_out, int32_t radius_in,
-                             int32_t start_angle, int32_t end_angle)
+                             int32_t start_angle, int32_t end_angle, bool alpha_to_rgb)
 {
     EVE_HalContext *phost = u->hal;
     lv_draw_arc_dsc_t *dsc = t->draw_dsc;
@@ -303,16 +307,26 @@ static void draw_arc_stencil(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
 
 track_alpha:
     /* Alpha channel is used as scratch space; mark for repair. */
-    lv_draw_eve5_track_alpha_trashed(u,
-        cx - radius_out - 1, cy - radius_out - 1,
-        cx + radius_out + 1, cy + radius_out + 1);
+    if(!alpha_to_rgb) {
+        lv_draw_eve5_track_alpha_trashed(u,
+            cx - radius_out - 1, cy - radius_out - 1,
+            cx + radius_out + 1, cy + radius_out + 1);
+    }
 }
 
 /**********************
  * PUBLIC API
  **********************/
 
-void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+/* alpha_to_rgb=false: normal RGB pass. Draws arc with its configured color.
+ * Uses alpha-as-scratch masking: the alpha channel is trashed and tracked
+ * for repair by the alpha correction pass.
+ *
+ * alpha_to_rgb=true: renders the task's alpha contribution as grayscale luminance
+ * into RGB, for later copying into a layer's alpha channel. Requires the
+ * caller to use default blend mode: blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA)
+ * with colorMask(1,1,1,1). The A channel is scratch space in this mode. */
+void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb)
 {
     lv_layer_t *layer = t->target_layer;
     lv_draw_arc_dsc_t *dsc = t->draw_dsc;
@@ -333,7 +347,10 @@ void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
+    if(alpha_to_rgb)
+        EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
+    else
+        EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
 
 #if EVE_SUPPORT_CHIPID >= EVE_BT820 && LV_DRAW_EVE5_USE_CMD_ARC
     /*
@@ -346,7 +363,8 @@ void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
      * - Arc bbox must be fully inside clip area (CMD_ARC manages its own
      *   scissor internally, so external clipping doesn't work)
      */
-    if((EVE_CHIPID >= EVE_BT820) &&
+    if(!alpha_to_rgb &&
+       (EVE_CHIPID >= EVE_BT820) &&
        (radius_out <= 511) &&
        (radius_in >= 1) &&
        (dsc->rounded) &&
@@ -392,7 +410,164 @@ void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
     /* Stencil-based rendering: used for pre-BT820, non-rounded arcs, large
      * radii, or when LV_DRAW_EVE5_USE_CMD_ARC is disabled for testing.
      * Algorithm matches the CMD_ARC firmware implementation. */
-    draw_arc_stencil(u, t, cx, cy, radius_out, radius_in, start_angle, end_angle);
+    draw_arc_stencil(u, t, cx, cy, radius_out, radius_in, start_angle, end_angle, alpha_to_rgb);
+}
+
+/**********************
+ * ALPHA PASS
+ **********************/
+
+void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+{
+    EVE_HalContext *phost = u->hal;
+    lv_layer_t *layer = t->target_layer;
+    const lv_draw_arc_dsc_t *dsc = t->draw_dsc;
+
+    if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->width == 0) return;
+    if(dsc->start_angle == dsc->end_angle) return;
+
+    int32_t cx = dsc->center.x - layer->buf_area.x1;
+    int32_t cy = dsc->center.y - layer->buf_area.y1;
+    int32_t radius_out = dsc->radius;
+    int32_t radius_in = dsc->radius - dsc->width;
+    if(radius_in < 0) radius_in = 0;
+
+    int32_t start_angle = ((int32_t)dsc->start_angle) % 360;
+    int32_t end_angle = ((int32_t)dsc->end_angle) % 360;
+
+    int32_t arc_span;
+    if(end_angle > start_angle)
+        arc_span = end_angle - start_angle;
+    else if(end_angle < start_angle)
+        arc_span = 360 - start_angle + end_angle;
+    else
+        arc_span = 360;
+
+    /* Tighten scissor to arc bounding box */
+    const lv_area_t *layer_area = &layer->buf_area;
+    lv_area_t arc_bbox = {
+        cx - radius_out - 1 + layer_area->x1,
+        cy - radius_out - 1 + layer_area->y1,
+        cx + radius_out + 1 + layer_area->x1,
+        cy + radius_out + 1 + layer_area->y1
+    };
+    lv_area_t arc_scissor;
+    if(!lv_area_intersect(&arc_scissor, &arc_bbox, &t->clip_area)) return;
+    lv_draw_eve5_set_scissor(u, &arc_scissor, layer_area);
+
+    bool is_full = (arc_span >= 360);
+    bool reverse = (!is_full && arc_span > 180);
+
+    EVE_CoDl_vertexFormat(phost, 0);
+    EVE_CoDl_saveContext(phost);
+
+    /* Phase 1: Clear stencil within arc bbox.
+     * Full circle / reverse: clear to 0xFF (entire bbox is "in arc").
+     * Normal partial: clear to 0x00 (only wedge will be marked 0xFF). */
+    EVE_CoDl_clearStencil(phost, (is_full || reverse) ? 0xFF : 0x00);
+    EVE_CoDl_clear(phost, 0, 1, 0);
+
+    /* All stencil build phases: colorMask(0,0,0,0) to write stencil only. */
+    EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
+
+    /* Phase 2: Build angular wedge mask (partial arcs only).
+     * Uses EDGE_STRIP_R + INVERT for odd-even fill: arc sector flips
+     * to 0xFF (from 0x00) or complement flips to 0x00 (from 0xFF).
+     * Same vertex geometry as the RGB path. */
+    if(!is_full) {
+        int32_t sa = start_angle, ea = end_angle;
+        if(reverse) { sa = end_angle; ea = start_angle; }
+
+        int32_t wedge_span;
+        if(ea > sa) wedge_span = ea - sa;
+        else if(ea < sa) wedge_span = 360 - sa + ea;
+        else wedge_span = 0;
+
+        int32_t r2 = radius_out * 8 / 5;
+        if(r2 < radius_out + 4) r2 = radius_out + 4;
+
+        int32_t cx16 = cx * 16 - 8;
+        int32_t cy16 = cy * 16 - 8;
+
+        int32_t v_sa_x16 = cx16 + (((int32_t)lv_trigo_cos(sa) * r2) >> (LV_TRIGO_SHIFT - 4));
+        int32_t v_sa_y16 = cy16 + (((int32_t)lv_trigo_sin(sa) * r2) >> (LV_TRIGO_SHIFT - 4));
+        int32_t v_ea_x16 = cx16 + (((int32_t)lv_trigo_cos(ea) * r2) >> (LV_TRIGO_SHIFT - 4));
+        int32_t v_ea_y16 = cy16 + (((int32_t)lv_trigo_sin(ea) * r2) >> (LV_TRIGO_SHIFT - 4));
+
+        EVE_CoDl_stencilOp(phost, KEEP, INVERT);
+
+        EVE_CoDl_begin(phost, EDGE_STRIP_R);
+        EVE_CoDl_vertex2f_4(phost, v_sa_x16 + 16, v_sa_y16);
+        EVE_CoDl_vertex2f_4(phost, cx16 + 16, cy16);
+        EVE_CoDl_vertex2f_4(phost, v_ea_x16 + 16, v_ea_y16);
+        if(wedge_span > 90) {
+            int32_t mid_deg = (sa + 90) % 360;
+            int32_t v_mx16 = cx16 + (((int32_t)lv_trigo_cos(mid_deg) * r2) >> (LV_TRIGO_SHIFT - 4));
+            int32_t v_my16 = cy16 + (((int32_t)lv_trigo_sin(mid_deg) * r2) >> (LV_TRIGO_SHIFT - 4));
+            EVE_CoDl_vertex2f_4(phost, v_mx16 + 16, v_my16);
+        }
+        EVE_CoDl_vertex2f_4(phost, v_sa_x16 + 16, v_sa_y16);
+        EVE_CoDl_end(phost);
+    }
+
+    /* Phase 3: Mark arc body in stencil.
+     * After phase 2: arc sector = 0xFF, non-arc = 0x00.
+     * Outer circle DECR where 0xFF → 0xFE marks arc-inside-outer.
+     * Inner circle DECR where 0xFE → 0xFD marks inner exclusion.
+     * Result: arc annulus = 0xFE, inner = 0xFD, non-arc = 0x00/0xFF.
+     *
+     * Circle sizes use -8 (0.5px shrink) so the stencil boundary lands
+     * at the AA midpoint rather than the outermost AA fringe. DECR
+     * triggers on any non-zero coverage, and the fringe extends ~0.5px
+     * beyond geometric — the -8 compensates, matching the fill/border
+     * single-step stencil convention. */
+    EVE_CoDl_stencilFunc(phost, EQUAL, 0xFF, 0xFF);
+    EVE_CoDl_stencilOp(phost, KEEP, DECR);
+    draw_circle_subpx(u, cx * 2 - 1, cy * 2 - 1, radius_out * 16 - 8);
+
+    if(radius_in > 0) {
+        EVE_CoDl_stencilFunc(phost, EQUAL, 0xFE, 0xFF);
+        draw_circle_subpx(u, cx * 2 - 1, cy * 2 - 1, radius_in * 16 - 8);
+    }
+
+    /* Caps: REPLACE 0xFE so they pass the final stencil test.
+     * Drawn unconditionally (ALWAYS) — caps may extend slightly beyond
+     * the wedge, matching the RGB path's behavior. */
+    if(!is_full && dsc->rounded) {
+        int32_t stroke_width = radius_out - radius_in;
+        int32_t sum_radius = radius_in + radius_out;
+        int32_t cx16 = cx * 16 - 8;
+        int32_t cy16 = cy * 16 - 8;
+
+        int32_t cap0_x16 = cx16 + (((int32_t)lv_trigo_cos(start_angle) * sum_radius) >> (LV_TRIGO_SHIFT - 3));
+        int32_t cap0_y16 = cy16 + (((int32_t)lv_trigo_sin(start_angle) * sum_radius) >> (LV_TRIGO_SHIFT - 3));
+        int32_t cap1_x16 = cx16 + (((int32_t)lv_trigo_cos(end_angle) * sum_radius) >> (LV_TRIGO_SHIFT - 3));
+        int32_t cap1_y16 = cy16 + (((int32_t)lv_trigo_sin(end_angle) * sum_radius) >> (LV_TRIGO_SHIFT - 3));
+
+        EVE_CoDl_stencilFunc(phost, ALWAYS, 0xFE, 0xFF);
+        EVE_CoDl_stencilOp(phost, KEEP, REPLACE);
+        EVE_CoDl_pointSize(phost, stroke_width * 8 - 8);
+        EVE_CoDl_begin(phost, POINTS);
+        EVE_CoDl_vertex2f_4(phost, cap0_x16, cap0_y16);
+        EVE_CoDl_vertex2f_4(phost, cap1_x16, cap1_y16);
+        EVE_CoDl_end(phost);
+    }
+
+    /* Phase 4: Draw alpha through stencil.
+     * Only pixels with stencil == 0xFE (arc body + caps) are drawn.
+     * All edges are binary (single-step stencil). */
+    EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
+    EVE_CoDl_stencilFunc(phost, EQUAL, 0xFE, 0xFF);
+    EVE_CoDl_stencilOp(phost, KEEP, KEEP);
+    EVE_CoDl_colorA(phost, dsc->opa);
+    EVE_CoDl_lineWidth(phost, 16);
+    EVE_CoDl_begin(phost, RECTS);
+    EVE_CoDl_vertex2f_0(phost, 0, 0);
+    EVE_CoDl_vertex2f_0(phost, 2048, 2048);
+    EVE_CoDl_end(phost);
+
+    EVE_CoDl_restoreContext(phost);
 }
 
 #endif /* LV_USE_DRAW_EVE5 */

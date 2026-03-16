@@ -8,6 +8,10 @@
  * - Label drawing with LVGL character iteration
  * - Letter drawing with per-glyph transforms
  * - Alpha correction pass for text
+ *
+ * Copyright (C) 2025-2026  Bridgetek Pte Ltd
+ * Author: Jan Boon <jan.boon@kaetemi.be>
+ * SPDX-License-Identifier: MIT
  */
 
 #include "lv_draw_eve5_private.h"
@@ -39,7 +43,7 @@ static const lv_draw_letter_dsc_t *s_alpha_letter_dsc = NULL;
 static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
                                           const uint8_t *src, uint32_t width,
                                           uint32_t height, uint32_t eve_stride,
-                                          uint8_t src_stride_align);
+                                          uint8_t src_stride_align, uint8_t bpp);
 static uint32_t upload_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t *font_dsc,
                               uint32_t gid, uint16_t *out_stride);
 static void emit_glyph_vertex(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
@@ -177,7 +181,7 @@ static uint32_t upload_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t
 
     uint16_t g_w = glyph_dsc->box_w;
     uint16_t g_h = glyph_dsc->box_h;
-    uint8_t bpp = font_dsc->bpp;
+    uint8_t bpp = (uint8_t)font_dsc->bpp;
 
     /* Stride = ceil(width * bpp / 8), aligned to 4 bytes for optimal memory access */
     uint16_t g_stride_natural = (g_w * bpp + 7) / 8;
@@ -321,7 +325,7 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     }
 
     const lv_font_fmt_txt_dsc_t *font_dsc = font->dsc;
-    if(!is_bpp_supported(font_dsc->bpp)) {
+    if(!is_bpp_supported((uint8_t)font_dsc->bpp)) {
         LV_LOG_WARN("EVE5: Unsupported font bpp: %d", font_dsc->bpp);
         return;
     }
@@ -346,7 +350,7 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
 
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
-    EVE_CoDl_bitmapLayout(u->hal, bpp_to_eve_format(font_dsc->bpp), g_stride, g_h);
+    EVE_CoDl_bitmapLayout(u->hal, bpp_to_eve_format((uint8_t)font_dsc->bpp), g_stride, g_h);
 
     emit_glyph_vertex(u, layer, t, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
 }
@@ -364,7 +368,7 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
         const lv_font_fmt_txt_dsc_t *font_dsc = dsc->font->dsc;
-        if(is_bpp_supported(font_dsc->bpp)) {
+        if(is_bpp_supported((uint8_t)font_dsc->bpp)) {
             use_bitmap_font = true;
         }
     }
@@ -379,6 +383,9 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
          * Bitmap transform may be non-identity from a previous draw. */
         EVE_CoDl_bitmapTransform_identity(u->hal);
         EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+        /* BT820 L-format natively decodes as (255,255,255,L) — no swizzle needed.
+         * BITMAP_SWIZZLE only applies in GLFORMAT mode on BT820. */
+        /* EVE_CoDl_bitmapSwizzle(phost, ONE, ONE, ONE, ALPHA); */
         EVE_CoDl_begin(u->hal, BITMAPS);
 
         /* Store context for callback (LVGL is single-threaded) */
@@ -426,6 +433,8 @@ void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     /* Bitmap transform may be non-identity from a previous draw */
     EVE_CoDl_bitmapTransform_identity(u->hal);
     EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
+    /* BT820 L-format natively decodes as (255,255,255,L) — no swizzle needed. */
+    /* EVE_CoDl_bitmapSwizzle(u->hal, ONE, ONE, ONE, ALPHA); */
 
     if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
         EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE);
@@ -496,7 +505,7 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     if(font->get_glyph_bitmap != lv_font_get_bitmap_fmt_txt) return;
 
     const lv_font_fmt_txt_dsc_t *font_dsc = font->dsc;
-    if(!is_bpp_supported(font_dsc->bpp)) return;
+    if(!is_bpp_supported((uint8_t)font_dsc->bpp)) return;
 
     uint32_t gid = glyph_dsc->g->gid.index;
     const lv_font_fmt_txt_glyph_dsc_t *g_dsc = &font_dsc->glyph_dsc[gid];
@@ -517,7 +526,7 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
 
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
-    EVE_CoDl_bitmapLayout(u->hal, bpp_to_eve_format(font_dsc->bpp), g_stride, g_h);
+    EVE_CoDl_bitmapLayout(u->hal, bpp_to_eve_format((uint8_t)font_dsc->bpp), g_stride, g_h);
 
     emit_glyph_vertex(u, layer, t, glyph_dsc, s_alpha_letter_dsc, g_w, g_h, x, y);
 }
@@ -526,7 +535,14 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
  * ALPHA PASS — LABEL/LETTER
  **********************/
 
-void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
+/* alpha_to_rgb=false: alpha pass mode. Caller must set blend(ONE, ONE_MINUS_SRC_ALPHA)
+ * with colorMask(0,0,0,1) for Porter-Duff "over" alpha accumulation into A.
+ *
+ * alpha_to_rgb=true: renders the task's alpha contribution as grayscale luminance
+ * into RGB, for later copying into a layer's alpha channel. Requires the
+ * caller to use default blend mode: blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA)
+ * with colorMask(1,1,1,1). The A channel is scratch space in this mode. */
+void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, bool alpha_to_rgb)
 {
     lv_layer_t *layer = t->target_layer;
     lv_draw_label_dsc_t *dsc = t->draw_dsc;
@@ -538,7 +554,7 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
         const lv_font_fmt_txt_dsc_t *font_dsc = dsc->font->dsc;
-        if(is_bpp_supported(font_dsc->bpp)) {
+        if(is_bpp_supported((uint8_t)font_dsc->bpp)) {
             use_bitmap_font = true;
         }
     }
@@ -564,6 +580,7 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
             else eve_font = 31;
         }
 
+        if(alpha_to_rgb) EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
         EVE_CoDl_colorA(u->hal, dsc->opa);
         EVE_CoCmd_text(u->hal, x, y, eve_font, 0, dsc->text);
         return;
@@ -571,10 +588,13 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
+    if(alpha_to_rgb) EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
     EVE_CoDl_colorA(u->hal, dsc->opa);
     /* Bitmap transform may be non-identity from a previous draw */
     EVE_CoDl_bitmapTransform_identity(u->hal);
     EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
+    /* BT820 L-format natively decodes as (255,255,255,L) — no swizzle needed. */
+    /* EVE_CoDl_bitmapSwizzle(u->hal, ONE, ONE, ONE, ALPHA); */
     EVE_CoDl_begin(u->hal, BITMAPS);
 
     s_alpha_unit = u;
@@ -588,7 +608,14 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     EVE_CoDl_end(u->hal);
 }
 
-void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
+/* alpha_to_rgb=false: alpha pass mode. Caller must set blend(ONE, ONE_MINUS_SRC_ALPHA)
+ * with colorMask(0,0,0,1) for Porter-Duff "over" alpha accumulation into A.
+ *
+ * alpha_to_rgb=true: renders the task's alpha contribution as grayscale luminance
+ * into RGB, for later copying into a layer's alpha channel. Requires the
+ * caller to use default blend mode: blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA)
+ * with colorMask(1,1,1,1). The A channel is scratch space in this mode. */
+void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, bool alpha_to_rgb)
 {
     lv_layer_t *layer = t->target_layer;
     lv_draw_letter_dsc_t *dsc = t->draw_dsc;
@@ -597,10 +624,13 @@ void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
+    if(alpha_to_rgb) EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
     EVE_CoDl_colorA(u->hal, dsc->opa);
     /* Bitmap transform may be non-identity from a previous draw */
     EVE_CoDl_bitmapTransform_identity(u->hal);
     EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
+    /* BT820 L-format natively decodes as (255,255,255,L) — no swizzle needed. */
+    /* EVE_CoDl_bitmapSwizzle(u->hal, ONE, ONE, ONE, ALPHA); */
     EVE_CoDl_begin(u->hal, BITMAPS);
 
     s_alpha_unit = u;

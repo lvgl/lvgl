@@ -2,6 +2,10 @@
  * @file lv_eve5.c
  *
  * EVE5 (BT820) Display Driver for LVGL
+ *
+ * Copyright (C) 2025-2026  Bridgetek Pte Ltd
+ * Author: Jan Boon <jan.boon@kaetemi.be>
+ * SPDX-License-Identifier: MIT
  */
 
 /*********************
@@ -15,6 +19,9 @@
 #include "../../../stdlib/lv_mem.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../core/lv_refr_private.h"
+#if LV_USE_OS
+#include "../../../osal/lv_os_private.h"
+#endif
 
 /*********************
  * DEFINES
@@ -43,6 +50,9 @@ typedef struct
     rendered_region_t pending_regions[MAX_REGIONS];
     int pending_count;
     EVE_CmdSync last_frame_sync;
+#if LV_USE_OS
+    lv_mutex_t hal_mutex; // Serializes all SPI bus access (HAL reads/writes, coprocessor commands)
+#endif
 } lv_eve5_driver_t;
 
 /**********************
@@ -112,6 +122,9 @@ lv_display_t *lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     drvr->allocator = allocator;
     drvr->pending_count = 0;
     drvr->last_frame_sync = EVE_CMD_SYNC_INVALID;
+#if LV_USE_OS
+    lv_mutex_init(&drvr->hal_mutex);
+#endif
 
     lv_display_set_driver_data(disp, drvr);
     lv_display_set_flush_cb(disp, flush_cb);
@@ -146,6 +159,7 @@ lv_display_t *lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     /* Initialize allocator */
     allocator->TotalMemorySize = RAM_G_SIZE;
     allocator->TotalReserved = RAM_G_SIZE - RAM_G_AVAILABLE;
+    Esd_GpuAlloc_SetGen(allocator, EVE_GEN);
     Esd_GpuAlloc_Reset(allocator);
 
     // TODO: Maybe REG_SC0_RESET
@@ -201,6 +215,20 @@ Esd_GpuAlloc *lv_eve5_get_allocator(lv_display_t *disp)
     return drvr ? drvr->allocator : NULL;
 }
 
+#if LV_USE_OS
+void lv_eve5_hal_lock(lv_display_t *disp)
+{
+    lv_eve5_driver_t *drvr = lv_display_get_driver_data(disp);
+    if(drvr) lv_mutex_lock(&drvr->hal_mutex);
+}
+
+void lv_eve5_hal_unlock(lv_display_t *disp)
+{
+    lv_eve5_driver_t *drvr = lv_display_get_driver_data(disp);
+    if(drvr) lv_mutex_unlock(&drvr->hal_mutex);
+}
+#endif
+
 /**********************
  * STATIC FUNCTIONS
  **********************/
@@ -232,6 +260,10 @@ static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
         return;
     }
 
+#if LV_USE_OS
+    lv_mutex_lock(&drvr->hal_mutex);
+#endif
+
     EVE_HalContext *phost = drvr->hal;
     lv_display_t *disp_refr = lv_refr_get_disp_refreshing();
     lv_layer_t *layer = disp_refr ? disp_refr->layer_head : NULL;
@@ -247,6 +279,9 @@ static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
     if (drvr->pending_count >= MAX_REGIONS)
     {
         LV_LOG_WARN("EVE5: Max regions reached in flush, dropping frame segment");
+#if LV_USE_OS
+        lv_mutex_unlock(&drvr->hal_mutex);
+#endif
         lv_display_flush_ready(disp);
         return;
     }
@@ -281,6 +316,9 @@ static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
         else
         {
             LV_LOG_ERROR("EVE5: OOM in flush_cb SW path");
+#if LV_USE_OS
+            lv_mutex_unlock(&drvr->hal_mutex);
+#endif
             lv_display_flush_ready(disp);
             return;
         }
@@ -300,6 +338,10 @@ static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
     {
         composite_to_framebuffer(drvr);
     }
+
+#if LV_USE_OS
+    lv_mutex_unlock(&drvr->hal_mutex);
+#endif
 
     /* Tell LVGL we're done with this buffer slice */
     lv_display_flush_ready(disp);
@@ -401,8 +443,8 @@ static void composite_to_framebuffer(lv_eve5_driver_t *drvr)
     /* Queue all pending region textures for deferred free */
     for (int i = 0; i < drvr->pending_count; i++)
     {
-        Esd_GpuAlloc5_DeferredFree(drvr->allocator, 
-            drvr->pending_regions[i].handle, 
+        Esd_GpuAlloc_DeferredFree(drvr->allocator,
+            drvr->pending_regions[i].handle,
             sync);
     }
     drvr->pending_count = 0;
@@ -418,7 +460,7 @@ static void composite_to_framebuffer(lv_eve5_driver_t *drvr)
 
     /* Process completed deferred frees (frame end) */
 	EVE_CmdSync completed = EVE_Cmd_syncCompleted(phost); /* This triggers UpdateFree in the Idle callback if applicable */
-	Esd_GpuAlloc5_UpdateFree(drvr->allocator, completed); /* FIXME: Check why Idle in EVE_Cmd_syncCompleted is not calling this consistently */
+	Esd_GpuAlloc_UpdateFree(drvr->allocator, completed); /* FIXME: Check why Idle in EVE_Cmd_syncCompleted is not calling this consistently */
 }
 
 static void wait_cb(lv_display_t *disp)

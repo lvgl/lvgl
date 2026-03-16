@@ -6,6 +6,10 @@
  * Caches SW-rendered textures (box shadows, etc.) to avoid re-rendering
  * and re-uploading identical content. Uses coordinate normalization so
  * the same visual element at different positions shares a cached texture.
+ *
+ * Copyright (C) 2025-2026  Bridgetek Pte Ltd
+ * Author: Jan Boon <jan.boon@kaetemi.be>
+ * SPDX-License-Identifier: MIT
  */
 
 #include "lv_draw_eve5_private.h"

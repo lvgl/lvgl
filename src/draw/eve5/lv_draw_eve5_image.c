@@ -1,15 +1,22 @@
 /**
  * @file lv_draw_eve5_image.c
  *
- * EVE5 (BT820) Image and Layer Drawing
+ * EVE5 (BT820) Image Shared Helpers
  *
- * Image format conversion, upload, and rendering for:
- * - Regular images (variable sources)
- * - Child layer compositing (render targets)
- * - Bitmap mask support
- * - Colorkey stencil masking
- * - Affine transforms (rotation, scale, skew)
- * - Alpha correction pass
+ * Contains shared utilities used by image rendering, alpha correction,
+ * and text drawing:
+ * - Alpha accuracy predicate (lv_draw_eve5_image_needs_alpha_rendertarget)
+ * - Colorkey stencil mask builder (build_colorkey_stencil)
+ * - Affine transform computation (compute_image_skew)
+ * - Affine transform application (apply_image_skew)
+ *
+ * The main RGB draw function is in lv_draw_eve5_image_render.c.
+ * Alpha correction pass is in lv_draw_eve5_image_alpha.c.
+ * Image loading, format conversion, and upload are in lv_draw_eve5_image_load.c.
+ *
+ * Copyright (C) 2025-2026  Bridgetek Pte Ltd
+ * Author: Jan Boon <jan.boon@kaetemi.be>
+ * SPDX-License-Identifier: MIT
  */
 
 #include "lv_draw_eve5_private.h"
@@ -18,6 +25,13 @@
 
 #include "../lv_draw.h"
 #include "../lv_draw_image.h"
+#include "../lv_image_decoder_private.h"
+#if LV_USE_OS
+#include "../../drivers/display/eve5/lv_eve5.h"
+#endif
+#if LV_USE_FS_EVE5_SDCARD
+#include "../../drivers/display/eve5/lv_eve5_sdcard.h"
+#endif
 
 #if !LV_DRAW_EVE5_NO_FLOAT
 #include <math.h>
@@ -27,275 +41,77 @@
  * STATIC PROTOTYPES
  **********************/
 
-static void convert_rgb565a8_to_argb8(const uint8_t *rgb, const uint8_t *alpha,
-                                       uint8_t *dst, uint32_t w);
-static void convert_xrgb8888_to_rgb8(const uint8_t *src, uint8_t *dst, uint32_t w);
-static bool get_eve_format_info(lv_color_format_t src_cf,
-                                 uint8_t *eve_format,
-                                 uint8_t *bytes_per_pixel,
-                                 bool *needs_conversion);
-static uint32_t upload_image(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc,
-                              uint8_t *out_eve_format, int32_t *out_eve_stride);
-static void build_colorkey_stencil(EVE_HalContext *phost,
-                                    const lv_image_colorkey_t *colorkey,
-                                    int32_t vx, int32_t vy);
-
 /**********************
- * IMAGE FORMAT CONVERSION
+ * ALPHA ACCURACY PREDICATE
+ *
+ * See lv_draw_eve5_private.h for the full contract this function satisfies.
  **********************/
 
-static void convert_rgb565a8_to_argb8(const uint8_t *rgb, const uint8_t *alpha,
-                                       uint8_t *dst, uint32_t w)
+/**
+ * IMAGE / LAYER: returns true when clip_radius triggers the alpha-as-scratch
+ * clip masking path AND the source has per-pixel alpha (ARGB or mask bitmap).
+ *
+ * The RGB pass draws rounded-clip images via: (1a) clear bbox alpha=0,
+ * (1b) fill rounded rect alpha=255, (1c) multiply by bitmap alpha via
+ * blend(ZERO, SRC_ALPHA) when the source has alpha, (2) draw RGB through
+ * blend(DST_ALPHA, ONE_MINUS_DST_ALPHA).  This trashes the alpha channel.
+ * The direct alpha correction pass uses stencil to approximate recovery of
+ * the rounded-clip shape; no exact reconstruction is currently possible.
+ * When both an ARGB source and a bitmap mask are present, the stencil recovers
+ * the mask shape but the image's own per-pixel alpha is lost entirely.
+ *
+ * This does NOT cover:
+ *   - Colorkey stencil: uses stencil but doesn't trash alpha (6-pass INCR).
+ *     The alpha pass handles colorkey in both the standard path (rebuilds
+ *     stencil, gates bitmap draw) and the masking fallback paths (gates
+ *     clip shape / mask bitmap draw via alpha_pass_build_colorkey_gate).
+ *   - Recolor: trashes alpha but doesn't use stencil in the alpha pass.
+ *
+ * Mirrors: RGB pass in lv_draw_eve5_hal_draw_image (clip_radius masking path
+ *          with has_alpha_trashed, specifically the !colorkey + (mask||ARGB)
+ *          branch).
+ *          Direct alpha pass in lv_draw_eve5_hal_alpha_draw_image (stencil
+ *          approximation only — no exact recovery exists).
+ */
+bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t *t)
 {
-    for(uint32_t x = 0; x < w; x++) {
-        uint16_t rgb565 = ((const uint16_t *)rgb)[x];
+    const lv_draw_image_dsc_t *dsc = t->draw_dsc;
+    if(dsc->opa <= LV_OPA_MIN) return false;
 
-        /* Expand 5/6/5 bits to 8 bits with proper bit replication for accuracy */
-        uint8_t r5 = (rgb565 >> 11) & 0x1F;
-        uint8_t g6 = (rgb565 >> 5) & 0x3F;
-        uint8_t b5 = rgb565 & 0x1F;
-
-        uint8_t r = (r5 << 3) | (r5 >> 2);  /* 5-bit to 8-bit */
-        uint8_t g = (g6 << 2) | (g6 >> 4);  /* 6-bit to 8-bit */
-        uint8_t b = (b5 << 3) | (b5 >> 2);  /* 5-bit to 8-bit */
-
-        /* EVE ARGB8 is BGRA in memory (little-endian) */
-        dst[4 * x + 0] = b;
-        dst[4 * x + 1] = g;
-        dst[4 * x + 2] = r;
-        dst[4 * x + 3] = alpha[x];
-    }
-}
-
-static void convert_xrgb8888_to_rgb8(const uint8_t *src, uint8_t *dst, uint32_t w)
-{
-    for(uint32_t x = 0; x < w; x++) {
-        /* LVGL XRGB8888 is BGRX in memory */
-        dst[3 * x + 0] = src[4 * x + 0];  /* B */
-        dst[3 * x + 1] = src[4 * x + 1];  /* G */
-        dst[3 * x + 2] = src[4 * x + 2];  /* R */
-        /* Skip X (alpha) byte */
-    }
-}
-
-static bool get_eve_format_info(lv_color_format_t src_cf,
-                                 uint8_t *eve_format,
-                                 uint8_t *bytes_per_pixel,
-                                 bool *needs_conversion)
-{
-    *needs_conversion = false;
-
-    switch(src_cf) {
-        case LV_COLOR_FORMAT_L8:
-            *eve_format = L8;
-            *bytes_per_pixel = 1;
-            break;
-
-        case LV_COLOR_FORMAT_A8:
-            *eve_format = L8;
-            *bytes_per_pixel = 1;
-            break;
-
-        case LV_COLOR_FORMAT_RGB565:
-            *eve_format = RGB565;
-            *bytes_per_pixel = 2;
-            break;
-
-        case LV_COLOR_FORMAT_RGB888:
-            *eve_format = RGB8;
-            *bytes_per_pixel = 3;
-            break;
-
-        case LV_COLOR_FORMAT_XRGB8888:
-            *eve_format = RGB8;
-            *bytes_per_pixel = 3;
-            *needs_conversion = true;
-            break;
-
-        case LV_COLOR_FORMAT_ARGB8888:
-            *eve_format = ARGB8;
-            *bytes_per_pixel = 4;
-            break;
-
-        case LV_COLOR_FORMAT_RGB565A8:
-            *eve_format = ARGB8;
-            *bytes_per_pixel = 4;
-            *needs_conversion = true;
-            break;
-
-        default:
-            LV_LOG_WARN("EVE5: Unsupported image format %d", src_cf);
-            return false;
+    /* Clip stencil path: clip_radius + no colorkey + (mask bitmap OR ARGB source).
+     * RGB pass trashes alpha via alpha-as-scratch masking for clip_radius. */
+    if(dsc->clip_radius > 0 && dsc->colorkey == NULL) {
+        if(dsc->bitmap_mask_src != NULL) return true;
+        /* LAYER tasks always use ARGB8 render targets */
+        if(t->type == LV_DRAW_TASK_TYPE_LAYER) return true;
+        /* Check if source image format maps to ARGB8 */
+        if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
+            const lv_image_dsc_t *img_dsc = dsc->src;
+            if(img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888 ||
+               img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED)
+                return true;
+        }
     }
 
-    return true;
+    /* Bitmap mask + ARGB source (any clip_radius, any colorkey):
+     * The masking path trashes alpha. The alpha pass draws the mask shape
+     * at flat opa, losing the source's per-pixel alpha. Only ARGB sources
+     * are affected — opaque formats have no per-pixel alpha to lose. */
+    if(dsc->bitmap_mask_src != NULL) {
+        if(t->type == LV_DRAW_TASK_TYPE_LAYER) return true;
+        if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
+            const lv_image_dsc_t *img_dsc = dsc->src;
+            if(img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888 ||
+               img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 /**********************
- * IMAGE UPLOAD
- **********************/
-
-static uint32_t upload_image(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc,
-                              uint8_t *out_eve_format, int32_t *out_eve_stride)
-{
-    const uint8_t *src_buf = img_dsc->data;
-    int32_t src_w = img_dsc->header.w;
-    int32_t src_h = img_dsc->header.h;
-    int32_t src_stride = img_dsc->header.stride;
-    lv_color_format_t src_cf = img_dsc->header.cf;
-
-    if(src_stride == 0) {
-        src_stride = src_w * lv_color_format_get_size(src_cf);
-    }
-
-    uint8_t eve_format;
-    uint8_t bpp;
-    bool needs_conversion;
-
-    if(!get_eve_format_info(src_cf, &eve_format, &bpp, &needs_conversion)) {
-        return GA_INVALID;
-    }
-
-    int32_t eve_stride = ALIGN_UP(src_w * bpp, 4);
-    int32_t eve_size = eve_stride * src_h;
-
-    *out_eve_format = eve_format;
-    *out_eve_stride = eve_stride;
-
-    /* Check cache first */
-    uint32_t cached_addr = lv_draw_eve5_image_cache_lookup(u, img_dsc, out_eve_format, out_eve_stride);
-    if(cached_addr != GA_INVALID) {
-        return cached_addr;
-    }
-
-    /* Allocate RAM_G space */
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, eve_size, GA_ALIGN_4);
-    uint32_t ram_g_addr = Esd_GpuAlloc_Get(u->allocator, handle);
-
-    if(ram_g_addr == GA_INVALID) {
-        LV_LOG_WARN("EVE5: Failed to allocate image in RAM_G (%d bytes)", eve_size);
-        return GA_INVALID;
-    }
-
-    /* Upload based on format */
-    switch(src_cf) {
-        case LV_COLOR_FORMAT_L8:
-        case LV_COLOR_FORMAT_A8: {
-            /* 1 byte per pixel, simple copy */
-            if(eve_stride == src_stride) {
-                EVE_Hal_wrMem(u->hal, ram_g_addr, src_buf, eve_size);
-            }
-            else {
-                for(int32_t y = 0; y < src_h; y++) {
-                    EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                                  src_buf + y * src_stride, src_w);
-                }
-            }
-            break;
-        }
-
-        case LV_COLOR_FORMAT_RGB565: {
-            /* 2 bytes per pixel, direct copy */
-            int32_t row_bytes = src_w * 2;
-            if(eve_stride == src_stride) {
-                EVE_Hal_wrMem(u->hal, ram_g_addr, src_buf, eve_size);
-            }
-            else {
-                for(int32_t y = 0; y < src_h; y++) {
-                    EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                                  src_buf + y * src_stride, row_bytes);
-                }
-            }
-            break;
-        }
-
-        case LV_COLOR_FORMAT_RGB888: {
-            /* 3 bytes per pixel, direct copy */
-            int32_t row_bytes = src_w * 3;
-            if(eve_stride == src_stride) {
-                EVE_Hal_wrMem(u->hal, ram_g_addr, src_buf, eve_size);
-            }
-            else {
-                for(int32_t y = 0; y < src_h; y++) {
-                    EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                                  src_buf + y * src_stride, row_bytes);
-                }
-            }
-            break;
-        }
-
-        case LV_COLOR_FORMAT_ARGB8888: {
-            /* 4 bytes per pixel - DIRECT COPY, no conversion needed! */
-            int32_t row_bytes = src_w * 4;
-            if(eve_stride == src_stride) {
-                EVE_Hal_wrMem(u->hal, ram_g_addr, src_buf, eve_size);
-            }
-            else {
-                for(int32_t y = 0; y < src_h; y++) {
-                    EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                                  src_buf + y * src_stride, row_bytes);
-                }
-            }
-            break;
-        }
-
-        case LV_COLOR_FORMAT_XRGB8888: {
-            /* Convert XRGB8888 to RGB8 (strip alpha) */
-            uint8_t *tmp_buf = lv_malloc(eve_stride);
-            if(!tmp_buf) {
-                LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
-                Esd_GpuAlloc_Free(u->allocator, handle);
-                return GA_INVALID;
-            }
-
-            for(int32_t y = 0; y < src_h; y++) {
-                convert_xrgb8888_to_rgb8(src_buf + y * src_stride, tmp_buf, src_w);
-                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-            }
-            lv_free(tmp_buf);
-            break;
-        }
-
-        case LV_COLOR_FORMAT_RGB565A8: {
-            /* Convert RGB565+A8 to ARGB8 */
-            uint8_t *tmp_buf = lv_malloc(eve_stride);
-            if(!tmp_buf) {
-                LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
-                Esd_GpuAlloc_Free(u->allocator, handle);
-                return GA_INVALID;
-            }
-
-            /* Alpha plane follows RGB data */
-            const uint8_t *alpha_buf = src_buf + src_h * src_stride;
-            int32_t alpha_stride = src_stride / 2;  /* Alpha is 1 byte per pixel vs 2 for RGB565 */
-
-            for(int32_t y = 0; y < src_h; y++) {
-                convert_rgb565a8_to_argb8(src_buf + y * src_stride,
-                                           alpha_buf + y * alpha_stride,
-                                           tmp_buf, src_w);
-                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-            }
-            lv_free(tmp_buf);
-            break;
-        }
-
-        default:
-            /* Should not reach here due to earlier check */
-            Esd_GpuAlloc_Free(u->allocator, handle);
-            return GA_INVALID;
-    }
-
-    /* Insert into cache (allocator owns the memory, we just index it) */
-    lv_draw_eve5_image_cache_insert(u, img_dsc, handle, eve_format, eve_stride);
-
-    LV_LOG_TRACE("EVE5: Uploaded image %dx%d cf=%d as EVE format %d at 0x%08X",
-                 src_w, src_h, src_cf, eve_format, ram_g_addr);
-
-    return ram_g_addr;
-}
-
-/**********************
- * IMAGE DRAWING
+ * SHARED HELPERS
  **********************/
 
 /**
@@ -304,17 +120,27 @@ static uint32_t upload_image(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_d
  * ALPHA_FUNC for range testing. After 6 passes (2 per channel),
  * stencil == 6 at pixels matching the colorkey range.
  *
+ * BT820 note: BITMAP_SWIZZLE only takes effect in GLFORMAT mode.
+ * This function switches the bitmap layout to GLFORMAT + BITMAP_EXT_FORMAT
+ * for the stencil passes, then restores the original layout on return.
+ *
  * Caller must:
  * - Set up bitmap handle/source/layout/size and any transforms beforehand
  * - Clear stencil (CLEAR(0,1,0)) before calling
  * - Be inside a saveContext block
  *
- * On return: colorMask=(0,0,0,0), stencil accumulation state set.
+ * On return: colorMask=(0,0,0,0), stencil accumulation state set,
+ * bitmap layout restored to original format.
  */
-static void build_colorkey_stencil(EVE_HalContext *phost,
-                                    const lv_image_colorkey_t *colorkey,
-                                    int32_t vx, int32_t vy)
+void build_colorkey_stencil(EVE_HalContext *phost,
+                            const lv_image_colorkey_t *colorkey,
+                            uint16_t eve_format, int32_t eve_stride, int32_t layout_h,
+                            int32_t vx, int32_t vy)
 {
+    /* Switch to GLFORMAT mode so BITMAP_SWIZZLE takes effect on BT820 */
+    EVE_CoDl_bitmapLayout(phost, GLFORMAT, eve_stride, layout_h);
+    EVE_CoDl_bitmapExtFormat(phost, eve_format);
+
     /* Suppress pixel output, accumulate stencil on alpha-test pass */
     EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
     EVE_CoDl_stencilFunc(phost, ALWAYS, 0, 255);
@@ -354,6 +180,9 @@ static void build_colorkey_stencil(EVE_HalContext *phost,
     EVE_CoDl_begin(phost, BITMAPS);
     EVE_CoDl_vertex2f_0(phost, vx, vy);
     EVE_CoDl_end(phost);
+
+    /* Restore original bitmap layout (exits GLFORMAT mode, disables swizzle) */
+    EVE_CoDl_bitmapLayout(phost, (uint8_t)eve_format, eve_stride, layout_h);
 }
 
 /**
@@ -574,880 +403,7 @@ void apply_image_skew(EVE_HalContext *phost, const image_skew_t *skew,
 #endif
 }
 
-void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
-{
-    EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_image_dsc_t *dsc = t->draw_dsc;
-
-    uint32_t ram_g_addr;
-    uint8_t eve_format;
-    int32_t eve_stride;
-    int32_t src_w, src_h;
-    int32_t layout_h;  /* Height for bitmapLayout (may differ from src_h for render targets) */
-    Esd_GpuHandle child_handle = GA_HANDLE_INVALID;
-
-    /* Resolve bitmap source.
-     * LAYER: GPU-rendered child layer (ARGB8 render target in RAM_G).
-     * NOTE: Only GPU-rendered layers are supported (user_data holds GPU handle).
-     * CPU-rendered layers (draw_buf only) are filtered out by the dispatcher. */
-    if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-        lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
-        child_handle = Esd_GpuHandle_FromPtrType(child_layer->user_data);
-        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
-        if(ram_g_addr == GA_INVALID) {
-            LV_LOG_WARN("EVE5: Child layer %p texture invalid, handle id %i",
-                child_layer, (int)child_handle.Id);
-            return;
-        }
-        src_w = lv_area_get_width(&child_layer->buf_area);
-        src_h = lv_area_get_height(&child_layer->buf_area);
-        eve_format = ARGB8;
-        eve_stride = ALIGN_UP(src_w, 16) * 4;
-        layout_h = ALIGN_UP(src_h, 16);
-    }
-    else {
-        /* Regular image */
-        if(lv_image_src_get_type(dsc->src) != LV_IMAGE_SRC_VARIABLE) {
-            LV_LOG_WARN("EVE5: Only variable images supported");
-            return;
-        }
-        const lv_image_dsc_t *img_dsc = dsc->src;
-        src_w = img_dsc->header.w;
-        src_h = img_dsc->header.h;
-        ram_g_addr = upload_image(u, img_dsc, &eve_format, &eve_stride);
-        if(ram_g_addr == GA_INVALID)
-            return;
-        layout_h = src_h;
-    }
-
-    /* Upload bitmap mask if set (A8/L8 → EVE L8, cached in image cache) */
-    bool has_bitmap_mask = false;
-    uint32_t mask_ram_g_addr = GA_INVALID;
-    int32_t mask_w = 0, mask_h = 0;
-    int32_t mask_eve_stride = 0;
-    if(dsc->bitmap_mask_src != NULL) {
-        const lv_image_dsc_t *mask_dsc = dsc->bitmap_mask_src;
-        uint8_t mask_eve_format;
-        mask_w = mask_dsc->header.w;
-        mask_h = mask_dsc->header.h;
-        mask_ram_g_addr = upload_image(u, mask_dsc, &mask_eve_format, &mask_eve_stride);
-        if(mask_ram_g_addr != GA_INVALID) {
-            has_bitmap_mask = true;
-        }
-        else {
-            LV_LOG_WARN("EVE5: Failed to upload bitmap mask");
-        }
-    }
-
-    /* Calculate position in layer coordinates */
-    int32_t x = t->area.x1 - layer->buf_area.x1;
-    int32_t y = t->area.y1 - layer->buf_area.y1;
-
-    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
-
-    /* Layer content is premultiplied (from SRC_ALPHA blend during rendering):
-     * layer.rgb = actual_color * alpha, layer.a = alpha².
-     * For compositing, use blend(ONE, ONE_MINUS_SRC_ALPHA) to avoid
-     * double-applying alpha to RGB. Scale vertex color by opa so the
-     * premultiplied content is properly attenuated by layer opacity.
-     * Regular images use standard SRC_ALPHA blend with unscaled colors. */
-    bool is_layer = (t->type == LV_DRAW_TASK_TYPE_LAYER);
-
-    if(is_layer) {
-        uint8_t opa = dsc->opa;
-        if(dsc->recolor_opa > LV_OPA_MIN) {
-            lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-            EVE_CoDl_colorRgb(u->hal,
-                (uint8_t)(mixed.red * opa / 255),
-                (uint8_t)(mixed.green * opa / 255),
-                (uint8_t)(mixed.blue * opa / 255));
-        }
-        else {
-            EVE_CoDl_colorRgb(u->hal, opa, opa, opa);
-        }
-        EVE_CoDl_colorA(u->hal, opa);
-    }
-    else {
-        EVE_CoDl_colorA(u->hal, dsc->opa);
-        if(dsc->recolor_opa > LV_OPA_MIN) {
-            lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-            EVE_CoDl_colorRgb(u->hal, mixed.red, mixed.green, mixed.blue);
-        }
-        else {
-            EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
-        }
-    }
-
-    /* Set up bitmap */
-    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
-    EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
-    EVE_CoDl_bitmapLayout(u->hal, eve_format, eve_stride, layout_h);
-    uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
-    if(dsc->tile) {
-        int32_t tile_w = lv_area_get_width(&dsc->image_area);
-        int32_t tile_h = lv_area_get_height(&dsc->image_area);
-        EVE_CoDl_bitmapSize(u->hal, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
-    }
-    else {
-        EVE_CoDl_bitmapSize(u->hal, bmp_filter, BORDER, BORDER, src_w, src_h);
-    }
-
-    /* Alpha-channel masking for clip_radius and/or bitmap_mask_src.
-     * Uses the same multi-phase approach as gradient fill masking:
-     * Phase 1a: clear bbox alpha, 1b: write rounded rect mask (if clip_radius),
-     * 1b2: apply bitmap mask (if bitmap_mask_src),
-     * 1c: multiply mask by image alpha, 2: draw image through mask. */
-    if(dsc->clip_radius > 0 || has_bitmap_mask) {
-        /* Convert image_area from absolute to layer-local coordinates */
-        int32_t mask_x1 = dsc->image_area.x1 - layer->buf_area.x1;
-        int32_t mask_y1 = dsc->image_area.y1 - layer->buf_area.y1;
-        int32_t mask_x2 = dsc->image_area.x2 - layer->buf_area.x1;
-        int32_t mask_y2 = dsc->image_area.y2 - layer->buf_area.y1;
-
-        /* Bitmap transform may be non-identity from a previous draw —
-         * mask bitmap phases below need identity, so set it before save. */
-        EVE_CoDl_bitmapTransform_identity(phost);
-        EVE_CoDl_vertexFormat(phost, 0);
-        EVE_CoDl_saveContext(phost);
-
-        /* Phase 1a: Clear bbox alpha to 0 */
-        EVE_CoDl_colorArgb_ex(phost, 0x00000000);
-        EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
-        EVE_CoDl_blendFunc(phost, ONE, ZERO);
-        lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
-                                &t->clip_area, &layer->buf_area);
-
-        /* Phase 1b: Write rounded rect mask (alpha=255 inside) */
-        if(dsc->clip_radius > 0) {
-            EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
-            lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2,
-                                    dsc->clip_radius, &t->clip_area, &layer->buf_area);
-        }
-
-        /* Phase 1b2: Apply bitmap mask (A8/L8 texture as per-pixel alpha).
-         * Combined with clip_radius: multiplies existing rounded rect alpha.
-         * Standalone: overwrites alpha directly (ONE,ZERO carries from 1a). */
-        if(has_bitmap_mask) {
-            if(dsc->clip_radius > 0) {
-                EVE_CoDl_blendFunc(phost, ZERO, SRC_ALPHA);
-            }
-            /* else: ONE,ZERO from Phase 1a overwrites alpha with mask values */
-
-            /* Center-align mask on image_area */
-            int32_t img_w = lv_area_get_width(&dsc->image_area);
-            int32_t img_h = lv_area_get_height(&dsc->image_area);
-            int32_t mask_draw_x = mask_x1 + (img_w - mask_w) / 2;
-            int32_t mask_draw_y = mask_y1 + (img_h - mask_h) / 2;
-
-            /* Nested save/restore to preserve main image bitmap config */
-            EVE_CoDl_saveContext(phost);
-            EVE_CoDl_bitmapSource(phost, mask_ram_g_addr);
-            EVE_CoDl_bitmapLayout(phost, L8, mask_eve_stride, mask_h);
-            EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, mask_w, mask_h);
-            EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);  /* L8: route luminance→alpha */
-            EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
-            EVE_CoDl_begin(phost, BITMAPS);
-            EVE_CoDl_vertex2f_0(phost, mask_draw_x, mask_draw_y);
-            EVE_CoDl_end(phost);
-            EVE_CoDl_restoreContext(phost);
-        }
-
-        /* Set up image transform (if any) — stays active for phases 1c and 2.
-         * For tiled images, use image_area origin so tile pattern aligns. */
-        int32_t draw_x = dsc->tile ? (dsc->image_area.x1 - layer->buf_area.x1) : x;
-        int32_t draw_y = dsc->tile ? (dsc->image_area.y1 - layer->buf_area.y1) : y;
-        if(dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE
-           || dsc->skew_x != 0 || dsc->skew_y != 0) {
-            int32_t clip_x = t->clip_area.x1 - layer->buf_area.x1;
-            int32_t clip_y = t->clip_area.y1 - layer->buf_area.y1;
-            draw_x = clip_x;
-            draw_y = clip_y;
-
-            if(dsc->skew_x != 0 || dsc->skew_y != 0) {
-                image_skew_t skew;
-                if(!compute_image_skew(&skew, dsc->rotation, dsc->scale_x, dsc->scale_y,
-                                       dsc->skew_x, dsc->skew_y, dsc->pivot.x, dsc->pivot.y,
-                                       src_w, src_h, x, y, clip_x, clip_y)) {
-                    EVE_CoDl_restoreContext(phost);
-                    goto cleanup;
-                }
-                apply_image_skew(phost, &skew, bmp_filter,
-                    dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-                    dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
-            }
-            else {
-                /* Rotation and/or scaling only — CoCmd matrix pipeline */
-                EVE_CoCmd_loadIdentity(u->hal);
-                EVE_CoCmd_translate(u->hal, F16(x - clip_x + dsc->pivot.x), F16(y - clip_y + dsc->pivot.y));
-                if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
-                    EVE_CoCmd_scale(u->hal, F16_SCALE_DIV_256(dsc->scale_x), F16_SCALE_DIV_256(dsc->scale_y));
-                }
-                if(dsc->rotation != 0) {
-                    EVE_CoCmd_rotate(u->hal, DEGREES(dsc->rotation));
-                }
-                EVE_CoCmd_translate(u->hal, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
-                EVE_CoCmd_setMatrix(u->hal);
-                /* Expand bitmapSize to cover rotated/scaled output —
-                 * source dimensions would clip the transformed bounding box. */
-                EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                    LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                    LV_MIN(lv_area_get_height(&t->clip_area), 2048));
-            }
-        }
-
-        /* Colorkey + clip_radius: build stencil mask and punch alpha holes.
-         * After the 6-pass stencil (stencil==6 at colorkey pixels), zero the
-         * alpha mask at those positions so phases 1c and 2 naturally skip them. */
-        if(dsc->colorkey != NULL) {
-            /* clearStencil defaults to 0 and nothing changes it */
-            EVE_CoDl_clear(phost, 0, 1, 0);
-            build_colorkey_stencil(phost, dsc->colorkey, draw_x, draw_y);
-            /* Punch: zero alpha where stencil == 6 (colorkey match) */
-            EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ALPHA);
-            EVE_CoDl_alphaFunc(phost, ALWAYS, 0);
-            EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
-            EVE_CoDl_stencilFunc(phost, EQUAL, 6, 0xFF);
-            EVE_CoDl_stencilOp(phost, KEEP, KEEP);
-            EVE_CoDl_colorA(phost, 0);
-            EVE_CoDl_blendFunc(phost, ONE, ZERO);
-            EVE_CoDl_begin(phost, RECTS);
-            EVE_CoDl_lineWidth(phost, 16);
-            EVE_CoDl_vertex2f_0(phost, mask_x1, mask_y1);
-            EVE_CoDl_vertex2f_0(phost, mask_x2, mask_y2);
-            EVE_CoDl_end(phost);
-            /* Disable stencil for subsequent phases */
-            EVE_CoDl_stencilFunc(phost, ALWAYS, 0, 0);
-            EVE_CoDl_stencilOp(phost, KEEP, KEEP);
-        }
-
-        /* Phase 1c: Multiply mask by image alpha.
-         * colorA = opa so the mask includes opacity scaling.
-         * Unlike gradient fill (which bakes opa into bitmap pixels),
-         * image opa is applied via colorA during the alpha multiply. */
-        EVE_CoDl_colorA(phost, dsc->opa);
-        EVE_CoDl_blendFunc(phost, ZERO, SRC_ALPHA);
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
-        EVE_CoDl_end(phost);
-
-        /* Phase 2: Draw image RGB through the alpha mask.
-         * For regular images: DST_ALPHA multiplies by mask, standard compositing.
-         * For premultiplied layers: ONE avoids re-multiplying already-premultiplied
-         * RGB by the mask (which contains squared alpha from SRC_ALPHA rendering).
-         * Layer opa is applied via colorRgb scaling. */
-        EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
-        if(is_layer) {
-            if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
-                EVE_CoDl_blendFunc(phost, ONE, ONE);
-            else
-                EVE_CoDl_blendFunc(phost, ONE, ONE_MINUS_DST_ALPHA);
-            uint8_t opa = dsc->opa;
-            if(dsc->recolor_opa > LV_OPA_MIN) {
-                lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-                EVE_CoDl_colorRgb(phost,
-                    (uint8_t)(mixed.red * opa / 255),
-                    (uint8_t)(mixed.green * opa / 255),
-                    (uint8_t)(mixed.blue * opa / 255));
-            }
-            else {
-                EVE_CoDl_colorRgb(phost, opa, opa, opa);
-            }
-            EVE_CoDl_colorA(phost, opa);
-        }
-        else {
-            if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
-                EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE);
-            else
-                EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
-            if(dsc->recolor_opa > LV_OPA_MIN) {
-                lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-                EVE_CoDl_colorRgb(phost, mixed.red, mixed.green, mixed.blue);
-            }
-            else {
-                EVE_CoDl_colorRgb(phost, 255, 255, 255);
-            }
-            EVE_CoDl_colorA(phost, 255);
-        }
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
-        EVE_CoDl_end(phost);
-
-        EVE_CoDl_restoreContext(phost);
-
-        /* Image masking uses alpha-as-scratch */
-        lv_draw_eve5_track_alpha_trashed(u, mask_x1, mask_y1, mask_x2, mask_y2);
-    }
-    else if(!is_layer && dsc->recolor_opa >= LV_OPA_COVER) {
-        /* Full recolor via alpha-channel masking.
-         * The image's RGB may be black (alpha-only mask); EVE's color modulation
-         * (colorRgb * texel) gives black * recolor = black. Instead, use the
-         * image alpha to stamp a mask, then fill with the recolor through it.
-         * NOTE: Partial recolor (0 < recolor_opa < 255) is not yet implemented
-         * via this stencil path — it falls through to the standard draw below
-         * where colorRgb modulation handles it (works for white-RGB images only). */
-        int32_t mask_x1 = t->clip_area.x1 - layer->buf_area.x1;
-        int32_t mask_y1 = t->clip_area.y1 - layer->buf_area.y1;
-        int32_t mask_x2 = t->clip_area.x2 - layer->buf_area.x1;
-        int32_t mask_y2 = t->clip_area.y2 - layer->buf_area.y1;
-
-        int32_t draw_vx = x;
-        int32_t draw_vy = y;
-
-        EVE_CoDl_bitmapTransform_identity(phost);
-        EVE_CoDl_vertexFormat(phost, 0);
-        EVE_CoDl_saveContext(phost);
-
-        /* Phase 1a: Clear bbox alpha to 0 */
-        EVE_CoDl_colorArgb_ex(phost, 0x00000000);
-        EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
-        EVE_CoDl_blendFunc(phost, ONE, ZERO);
-        lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
-                                &t->clip_area, &layer->buf_area);
-
-        /* Phase 1b: Stamp image alpha into render target alpha.
-         * blend(ONE, ZERO) overwrites dest alpha with texel.a * colorA.
-         * Areas outside the image keep alpha=0 from Phase 1a. */
-        EVE_CoDl_colorA(phost, dsc->opa);
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
-        EVE_CoDl_end(phost);
-
-        /* Phase 2: Fill with recolor through the alpha mask */
-        EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
-        EVE_CoDl_colorRgb(phost, dsc->recolor.red, dsc->recolor.green, dsc->recolor.blue);
-        EVE_CoDl_colorA(phost, 255);
-        if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
-            EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE);
-        else
-            EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
-        lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
-                                &t->clip_area, &layer->buf_area);
-
-        EVE_CoDl_restoreContext(phost);
-
-        /* Alpha channel used as scratch — mark for repair */
-        lv_draw_eve5_track_alpha_trashed(u, mask_x1, mask_y1, mask_x2, mask_y2);
-    }
-    else {
-        /* No clip radius or bitmap mask — standard draw path.
-         * Structured as linear phases: compute → save → transform → colorkey → draw → restore.
-         * Colorkey uses stencil test directly (no alpha masking needed).
-         * NOTE: Partial recolor (0 < recolor_opa < 255) uses colorRgb modulation here,
-         * which only works correctly when the source image has white RGB channels.
-         * Images with black RGB (alpha-only masks) will appear darker than expected. */
-        bool has_colorkey = (dsc->colorkey != NULL);
-        bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
-                             || dsc->scale_y != LV_SCALE_NONE
-                             || dsc->skew_x != 0 || dsc->skew_y != 0);
-        bool has_skew = (dsc->skew_x != 0 || dsc->skew_y != 0);
-
-        /* Compute draw vertex position */
-        int32_t draw_vx, draw_vy;
-        if(has_transform) {
-            draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-            draw_vy = t->clip_area.y1 - layer->buf_area.y1;
-        }
-        else {
-            draw_vx = dsc->tile ? (dsc->image_area.x1 - layer->buf_area.x1) : x;
-            draw_vy = dsc->tile ? (dsc->image_area.y1 - layer->buf_area.y1) : y;
-        }
-
-        /* Skew: compute inverse affine transform.
-         * Done before saveContext so degenerate matrix can early-return cleanly. */
-        image_skew_t skew;
-        if(has_skew) {
-            if(!compute_image_skew(&skew, dsc->rotation, dsc->scale_x, dsc->scale_y,
-                                   dsc->skew_x, dsc->skew_y, dsc->pivot.x, dsc->pivot.y,
-                                   src_w, src_h, x, y, draw_vx, draw_vy))
-                goto cleanup;
-        }
-
-        /* Bitmap transform may be non-identity from a previous draw —
-         * when not applying our own transform, reset it before use. */
-        if(!has_skew && !has_transform) {
-            EVE_CoDl_bitmapTransform_identity(phost);
-        }
-
-        /* Save context for non-optimized state (transform, colorkey stencil) */
-        if(has_skew || has_colorkey || has_transform) {
-            EVE_CoDl_vertexFormat(phost, 0);
-            EVE_CoDl_saveContext(phost);
-        }
-
-        /* Apply bitmap transform */
-        if(has_skew) {
-            apply_image_skew(phost, &skew, bmp_filter,
-                dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-                dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
-        }
-        else if(has_transform) {
-            /* Rotation and/or scaling only — CoCmd matrix pipeline */
-            EVE_CoCmd_loadIdentity(u->hal);
-            EVE_CoCmd_translate(u->hal, F16(x - draw_vx + dsc->pivot.x), F16(y - draw_vy + dsc->pivot.y));
-            if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
-                EVE_CoCmd_scale(u->hal, F16_SCALE_DIV_256(dsc->scale_x), F16_SCALE_DIV_256(dsc->scale_y));
-            }
-            if(dsc->rotation != 0) {
-                EVE_CoCmd_rotate(u->hal, DEGREES(dsc->rotation));
-            }
-            EVE_CoCmd_translate(u->hal, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
-            EVE_CoCmd_setMatrix(u->hal);
-            EVE_CoCmd_loadIdentity(u->hal);
-            /* Expand bitmapSize to cover rotated/scaled output —
-             * source dimensions would clip the transformed bounding box. */
-            EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                LV_MIN(lv_area_get_height(&t->clip_area), 2048));
-        }
-
-        /* Build colorkey stencil mask (transform is active, stencil samples match draw) */
-        if(has_colorkey) {
-            /* clearStencil defaults to 0 and nothing changes it */
-            EVE_CoDl_clear(phost, 0, 1, 0);
-            build_colorkey_stencil(phost, dsc->colorkey, draw_vx, draw_vy);
-            /* Transition to draw: restore swizzle, alpha test, color mask */
-            EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ALPHA);
-            EVE_CoDl_alphaFunc(phost, ALWAYS, 0);
-            EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
-            EVE_CoDl_stencilFunc(phost, NOTEQUAL, 6, 0xFF);
-            EVE_CoDl_stencilOp(phost, KEEP, KEEP);
-            /* Restore colors overwritten by stencil passes */
-            if(is_layer) {
-                uint8_t opa = dsc->opa;
-                if(dsc->recolor_opa > LV_OPA_MIN) {
-                    lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-                    EVE_CoDl_colorRgb(phost,
-                        (uint8_t)(mixed.red * opa / 255),
-                        (uint8_t)(mixed.green * opa / 255),
-                        (uint8_t)(mixed.blue * opa / 255));
-                }
-                else {
-                    EVE_CoDl_colorRgb(phost, opa, opa, opa);
-                }
-                EVE_CoDl_colorA(phost, opa);
-            }
-            else {
-                EVE_CoDl_colorA(phost, dsc->opa);
-                if(dsc->recolor_opa > LV_OPA_MIN) {
-                    lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-                    EVE_CoDl_colorRgb(phost, mixed.red, mixed.green, mixed.blue);
-                }
-                else {
-                    EVE_CoDl_colorRgb(phost, 255, 255, 255);
-                }
-            }
-        }
-
-        /* Handle blend mode */
-        if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
-            EVE_CoDl_blendFunc(phost, is_layer ? ONE : SRC_ALPHA, ONE);
-        }
-        else if(is_layer) {
-            /* Premultiplied compositing: layer RGB already contains color*alpha,
-             * so source factor = ONE (don't re-multiply by alpha).
-             * Destination fades out via ONE_MINUS_SRC_ALPHA.
-             * Note: layer alpha is squared (alpha² from SRC_ALPHA rendering),
-             * causing slightly more parent bleed-through at AA edges. */
-            EVE_CoDl_blendFunc(phost, ONE, ONE_MINUS_SRC_ALPHA);
-        }
-
-        /* Draw bitmap */
-        EVE_CoDl_begin(u->hal, BITMAPS);
-        EVE_CoDl_vertex2f_0(u->hal, draw_vx, draw_vy);
-        EVE_CoDl_end(u->hal);
-
-        /* Restore state */
-        if(has_skew || has_colorkey || has_transform) {
-            EVE_CoDl_restoreContext(phost);
-        }
-        else if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE || is_layer) {
-            EVE_CoDl_blendFunc_default(phost);
-        }
-    }
-
-cleanup:
-    /* Layer-specific cleanup: track child texture for deferred free.
-     * Do NOT null user_data here — the alpha pass needs to re-access
-     * the child texture. user_data is nulled after the alpha pass
-     * in eve5_render_layer(). */
-    if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-        track_frame_alloc(u, child_handle);
-    }
-}
-
-/**********************
- * ALPHA PASS IMAGE/LAYER
- **********************/
-
-/**
- * Alpha correction pass for IMAGE and LAYER tasks.
- *
- * Re-draws the bitmap with correct transforms, colorkey, and tiling
- * into the alpha channel only. The outer context already has
- * colorMask(0,0,0,1) and blend(ONE, ONE_MINUS_SRC_ALPHA) set.
- *
- * For clip_radius or bitmap_mask_src, draws the clip shape at opa
- * (exact for opaque formats, approximate for ARGB with per-pixel alpha).
- * For the standard path, draws the actual bitmap — exact for all formats.
- */
-void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
-{
-    EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_image_dsc_t *dsc = t->draw_dsc;
-
-    if(dsc->opa <= LV_OPA_MIN) return;
-
-    uint32_t ram_g_addr;
-    uint8_t eve_format;
-    int32_t eve_stride;
-    int32_t src_w, src_h;
-    int32_t layout_h;
-
-    /* Resolve bitmap source (same as normal draw) */
-    if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-        lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
-        Esd_GpuHandle child_handle = Esd_GpuHandle_FromPtrType(child_layer->user_data);
-        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
-        if(ram_g_addr == GA_INVALID) return;
-        src_w = lv_area_get_width(&child_layer->buf_area);
-        src_h = lv_area_get_height(&child_layer->buf_area);
-        eve_format = ARGB8;
-        eve_stride = ALIGN_UP(src_w, 16) * 4;
-        layout_h = ALIGN_UP(src_h, 16);
-    }
-    else {
-        if(lv_image_src_get_type(dsc->src) != LV_IMAGE_SRC_VARIABLE) return;
-        const lv_image_dsc_t *img_dsc = dsc->src;
-        src_w = img_dsc->header.w;
-        src_h = img_dsc->header.h;
-        ram_g_addr = upload_image(u, img_dsc, &eve_format, &eve_stride);
-        if(ram_g_addr == GA_INVALID) return;
-        layout_h = src_h;
-    }
-
-    int32_t x = t->area.x1 - layer->buf_area.x1;
-    int32_t y = t->area.y1 - layer->buf_area.y1;
-
-    lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
-
-    /* Masking path: clip_radius or bitmap_mask — draw clip shape at opa.
-     * Exact for opaque formats, approximate for ARGB with per-pixel alpha. */
-    if(dsc->clip_radius > 0 || dsc->bitmap_mask_src != NULL) {
-#if EVE5_ALPHA_STENCIL_APPROX
-        /* Stencil-based clip: build clip shape in stencil, then draw through it.
-         * Handles two cases:
-         *   clip + mask: draw mask bitmap through stencil (exact for opaque, approx for ARGB)
-         *   clip + ARGB (no mask): draw source bitmap through stencil (per-pixel alpha)
-         * Colorkey excluded — its own 6-pass stencil would conflict. */
-        if(dsc->clip_radius > 0 && dsc->colorkey == NULL) {
-            /* Try to upload mask bitmap if present */
-            uint32_t mask_bmp_addr = GA_INVALID;
-            int32_t mask_bmp_stride = 0;
-            int32_t mask_bmp_w = 0, mask_bmp_h = 0;
-            if(dsc->bitmap_mask_src != NULL) {
-                const lv_image_dsc_t *mask_bmp_dsc = dsc->bitmap_mask_src;
-                if(lv_image_src_get_type(mask_bmp_dsc) == LV_IMAGE_SRC_VARIABLE) {
-                    uint8_t mf;
-                    mask_bmp_addr = upload_image(u, mask_bmp_dsc, &mf, &mask_bmp_stride);
-                    mask_bmp_w = mask_bmp_dsc->header.w;
-                    mask_bmp_h = mask_bmp_dsc->header.h;
-                }
-            }
-
-            if(mask_bmp_addr != GA_INVALID || eve_format == ARGB8) {
-                int32_t clip_x1 = dsc->image_area.x1 - layer->buf_area.x1;
-                int32_t clip_y1 = dsc->image_area.y1 - layer->buf_area.y1;
-                int32_t clip_x2 = dsc->image_area.x2 - layer->buf_area.x1;
-                int32_t clip_y2 = dsc->image_area.y2 - layer->buf_area.y1;
-                int32_t clip_w = clip_x2 - clip_x1 + 1;
-                int32_t clip_h = clip_y2 - clip_y1 + 1;
-                int32_t real_radius = LV_MIN3(clip_w / 2, clip_h / 2, (int32_t)dsc->clip_radius);
-
-                lv_draw_eve5_clear_stencil(u, clip_x1, clip_y1, clip_x2, clip_y2,
-                                            &t->clip_area, &layer->buf_area);
-
-                /* Bitmap transform may be non-identity from a previous draw —
-                 * bitmap draws inside this scope need identity, so set before save. */
-                EVE_CoDl_bitmapTransform_identity(phost);
-                EVE_CoDl_vertexFormat(phost, 0);
-                EVE_CoDl_saveContext(phost);
-
-                /* Phase 1: Draw clip shape into stencil (no color output) */
-                EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
-                EVE_CoDl_stencilOp(phost, KEEP, INCR);
-                if(clip_w == clip_h && real_radius >= clip_w / 2) {
-                    EVE_CoDl_pointSize(phost, clip_w * 8 - 8);
-                    EVE_CoDl_begin(phost, POINTS);
-                    EVE_CoDl_vertex2f_1(phost, clip_x1 * 2 + (clip_w - 1), clip_y1 * 2 + (clip_h - 1));
-                    EVE_CoDl_end(phost);
-                }
-                else {
-                    EVE_CoDl_lineWidth(phost, real_radius * 16);
-                    EVE_CoDl_begin(phost, RECTS);
-                    EVE_CoDl_vertex2f_0(phost, clip_x1 + real_radius, clip_y1 + real_radius);
-                    EVE_CoDl_vertex2f_0(phost, clip_x2 - real_radius, clip_y2 - real_radius);
-                    EVE_CoDl_end(phost);
-                }
-
-                /* Phase 2: Draw through stencil (alpha-only) */
-                EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
-                EVE_CoDl_stencilFunc(phost, NOTEQUAL, 0, 0xFF);
-                EVE_CoDl_stencilOp(phost, KEEP, KEEP);
-                EVE_CoDl_colorA(phost, dsc->opa);
-
-                if(mask_bmp_addr != GA_INVALID) {
-                    /* Draw mask bitmap through clip stencil.
-                     * Exact for opaque formats; for ARGB, preserves mask + clip shape
-                     * but loses source bitmap per-pixel alpha. */
-                    int32_t img_w = lv_area_get_width(&dsc->image_area);
-                    int32_t img_h = lv_area_get_height(&dsc->image_area);
-                    int32_t mask_draw_x = clip_x1 + (img_w - mask_bmp_w) / 2;
-                    int32_t mask_draw_y = clip_y1 + (img_h - mask_bmp_h) / 2;
-
-                    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
-                    EVE_CoDl_bitmapSource(phost, mask_bmp_addr);
-                    EVE_CoDl_bitmapLayout(phost, L8, mask_bmp_stride, mask_bmp_h);
-                    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, mask_bmp_w, mask_bmp_h);
-                    EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);  /* L8: luminance → alpha */
-                    EVE_CoDl_begin(phost, BITMAPS);
-                    EVE_CoDl_vertex2f_0(phost, mask_draw_x, mask_draw_y);
-                    EVE_CoDl_end(phost);
-                }
-                else {
-                    /* Draw ARGB source bitmap through clip stencil.
-                     * Reproduces per-pixel alpha inside the clip region. */
-                    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
-                    EVE_CoDl_bitmapSource(phost, ram_g_addr);
-                    EVE_CoDl_bitmapLayout(phost, eve_format, eve_stride, layout_h);
-                    uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
-                    if(dsc->tile) {
-                        int32_t tile_w = lv_area_get_width(&dsc->image_area);
-                        int32_t tile_h = lv_area_get_height(&dsc->image_area);
-                        EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
-                    }
-                    else {
-                        EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER, src_w, src_h);
-                    }
-
-                    /* Compute draw vertex and apply transforms (same as standard path) */
-                    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
-                                         || dsc->scale_y != LV_SCALE_NONE
-                                         || dsc->skew_x != 0 || dsc->skew_y != 0);
-                    bool has_skew = (dsc->skew_x != 0 || dsc->skew_y != 0);
-
-                    int32_t draw_vx, draw_vy;
-                    if(has_transform) {
-                        draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-                        draw_vy = t->clip_area.y1 - layer->buf_area.y1;
-                    }
-                    else {
-                        draw_vx = dsc->tile ? (dsc->image_area.x1 - layer->buf_area.x1) : x;
-                        draw_vy = dsc->tile ? (dsc->image_area.y1 - layer->buf_area.y1) : y;
-                    }
-
-                    if(has_skew) {
-                        image_skew_t skew;
-                        if(!compute_image_skew(&skew, dsc->rotation, dsc->scale_x, dsc->scale_y,
-                                               dsc->skew_x, dsc->skew_y, dsc->pivot.x, dsc->pivot.y,
-                                               src_w, src_h, x, y, draw_vx, draw_vy)) {
-                            EVE_CoDl_restoreContext(phost);
-                            return;
-                        }
-                        apply_image_skew(phost, &skew, bmp_filter,
-                            dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-                            dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
-                    }
-                    else if(has_transform) {
-                        EVE_CoCmd_loadIdentity(phost);
-                        EVE_CoCmd_translate(phost, F16(x - draw_vx + dsc->pivot.x),
-                                            F16(y - draw_vy + dsc->pivot.y));
-                        if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
-                            EVE_CoCmd_scale(phost, F16_SCALE_DIV_256(dsc->scale_x),
-                                            F16_SCALE_DIV_256(dsc->scale_y));
-                        }
-                        if(dsc->rotation != 0) {
-                            EVE_CoCmd_rotate(phost, DEGREES(dsc->rotation));
-                        }
-                        EVE_CoCmd_translate(phost, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
-                        EVE_CoCmd_setMatrix(phost);
-                        EVE_CoCmd_loadIdentity(phost);
-                        /* Expand bitmapSize to cover rotated/scaled output */
-                        EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
-                    }
-
-                    EVE_CoDl_begin(phost, BITMAPS);
-                    EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
-                    EVE_CoDl_end(phost);
-                }
-
-                EVE_CoDl_restoreContext(phost);
-                return;
-            }
-        }
-#endif
-        if(dsc->clip_radius > 0 && dsc->bitmap_mask_src == NULL) {
-            /* clip_radius only — draw rounded rect at opa (exact for all formats) */
-            int32_t mask_x1 = dsc->image_area.x1 - layer->buf_area.x1;
-            int32_t mask_y1 = dsc->image_area.y1 - layer->buf_area.y1;
-            int32_t mask_x2 = dsc->image_area.x2 - layer->buf_area.x1;
-            int32_t mask_y2 = dsc->image_area.y2 - layer->buf_area.y1;
-            EVE_CoDl_colorA(phost, dsc->opa);
-            lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2,
-                                    dsc->clip_radius, &t->clip_area, &layer->buf_area);
-        }
-        else {
-            /* bitmap_mask (with or without clip_radius) — draw mask bitmap at opa.
-             * For opaque formats without clip_radius: exact.
-             * For opaque + clip_radius (stencil unavailable): loses clip rounding.
-             * For ARGB: mask shape preserved, per-pixel bitmap alpha lost. */
-            const lv_image_dsc_t *mask_dsc = dsc->bitmap_mask_src;
-            if(mask_dsc != NULL && lv_image_src_get_type(mask_dsc) == LV_IMAGE_SRC_VARIABLE) {
-                uint8_t mask_eve_format;
-                int32_t mask_eve_stride;
-                uint32_t mask_addr = upload_image(u, mask_dsc, &mask_eve_format, &mask_eve_stride);
-                if(mask_addr != GA_INVALID) {
-                    int32_t mask_w = mask_dsc->header.w;
-                    int32_t mask_h = mask_dsc->header.h;
-
-                    /* Center-align mask on image_area (same as normal draw) */
-                    int32_t img_w = lv_area_get_width(&dsc->image_area);
-                    int32_t img_h = lv_area_get_height(&dsc->image_area);
-                    int32_t mask_x1 = dsc->image_area.x1 - layer->buf_area.x1;
-                    int32_t mask_y1 = dsc->image_area.y1 - layer->buf_area.y1;
-                    int32_t mask_draw_x = mask_x1 + (img_w - mask_w) / 2;
-                    int32_t mask_draw_y = mask_y1 + (img_h - mask_h) / 2;
-
-                    /* Bitmap transform may be non-identity from a previous draw —
-                     * mask bitmap draws at identity. */
-                    EVE_CoDl_bitmapTransform_identity(phost);
-                    EVE_CoDl_vertexFormat(phost, 0);
-                    EVE_CoDl_saveContext(phost);
-                    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
-                    EVE_CoDl_bitmapSource(phost, mask_addr);
-                    EVE_CoDl_bitmapLayout(phost, L8, mask_eve_stride, mask_h);
-                    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, mask_w, mask_h);
-                    EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);  /* L8: luminance → alpha */
-                    EVE_CoDl_colorA(phost, dsc->opa);
-                    EVE_CoDl_begin(phost, BITMAPS);
-                    EVE_CoDl_vertex2f_0(phost, mask_draw_x, mask_draw_y);
-                    EVE_CoDl_end(phost);
-                    EVE_CoDl_restoreContext(phost);
-                }
-            }
-        }
-        return;
-    }
-
-    /* Standard path: re-draw bitmap with transforms for exact per-pixel alpha.
-     * Mirrors the normal draw's standard path but skips color/blend setup
-     * since the outer context handles colorMask and blendFunc. */
-    bool has_colorkey = (dsc->colorkey != NULL);
-    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
-                         || dsc->scale_y != LV_SCALE_NONE
-                         || dsc->skew_x != 0 || dsc->skew_y != 0);
-    bool has_skew = (dsc->skew_x != 0 || dsc->skew_y != 0);
-
-    /* Set up bitmap (same as normal draw) */
-    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
-    EVE_CoDl_bitmapSource(phost, ram_g_addr);
-    EVE_CoDl_bitmapLayout(phost, eve_format, eve_stride, layout_h);
-    uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
-    if(dsc->tile) {
-        int32_t tile_w = lv_area_get_width(&dsc->image_area);
-        int32_t tile_h = lv_area_get_height(&dsc->image_area);
-        EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
-    }
-    else {
-        EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER, src_w, src_h);
-    }
-
-    /* Compute draw vertex position */
-    int32_t draw_vx, draw_vy;
-    if(has_transform) {
-        draw_vx = t->clip_area.x1 - layer->buf_area.x1;
-        draw_vy = t->clip_area.y1 - layer->buf_area.y1;
-    }
-    else {
-        draw_vx = dsc->tile ? (dsc->image_area.x1 - layer->buf_area.x1) : x;
-        draw_vy = dsc->tile ? (dsc->image_area.y1 - layer->buf_area.y1) : y;
-    }
-
-    /* Compute skew transform (before saveContext so degenerate can return) */
-    image_skew_t skew;
-    if(has_skew) {
-        if(!compute_image_skew(&skew, dsc->rotation, dsc->scale_x, dsc->scale_y,
-                               dsc->skew_x, dsc->skew_y, dsc->pivot.x, dsc->pivot.y,
-                               src_w, src_h, x, y, draw_vx, draw_vy))
-            return;
-    }
-
-    /* Bitmap transform may be non-identity from a previous draw —
-     * when not applying our own transform, reset it before use. */
-    if(!has_skew && !has_transform) {
-        EVE_CoDl_bitmapTransform_identity(phost);
-    }
-
-    /* Save context for non-optimized state (transform, colorkey stencil) */
-    if(has_skew || has_colorkey || has_transform) {
-        EVE_CoDl_vertexFormat(phost, 0);
-        EVE_CoDl_saveContext(phost);
-    }
-
-    /* Apply bitmap transform */
-    if(has_skew) {
-        apply_image_skew(phost, &skew, bmp_filter,
-            dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-            dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
-    }
-    else if(has_transform) {
-        EVE_CoCmd_loadIdentity(phost);
-        EVE_CoCmd_translate(phost, F16(x - draw_vx + dsc->pivot.x), F16(y - draw_vy + dsc->pivot.y));
-        if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) {
-            EVE_CoCmd_scale(phost, F16_SCALE_DIV_256(dsc->scale_x), F16_SCALE_DIV_256(dsc->scale_y));
-        }
-        if(dsc->rotation != 0) {
-            EVE_CoCmd_rotate(phost, DEGREES(dsc->rotation));
-        }
-        EVE_CoCmd_translate(phost, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
-        EVE_CoCmd_setMatrix(phost);
-        EVE_CoCmd_loadIdentity(phost);
-        /* Expand bitmapSize to cover rotated/scaled output —
-         * source dimensions would clip the transformed bounding box. */
-        EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
-    }
-
-    /* Build colorkey stencil mask */
-    if(has_colorkey) {
-        /* clearStencil defaults to 0 and nothing changes it */
-        EVE_CoDl_clear(phost, 0, 1, 0);
-        build_colorkey_stencil(phost, dsc->colorkey, draw_vx, draw_vy);
-        /* Restore drawing state after stencil passes.
-         * Only need swizzle, alphaFunc, stencilFunc — no colors since alpha-only. */
-        EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ALPHA);
-        EVE_CoDl_alphaFunc(phost, ALWAYS, 0);
-        EVE_CoDl_colorMask(phost, 0, 0, 0, 1);  /* Restore alpha-only from outer context */
-        EVE_CoDl_stencilFunc(phost, NOTEQUAL, 6, 0xFF);
-        EVE_CoDl_stencilOp(phost, KEEP, KEEP);
-    }
-
-    /* Set alpha — the only "color" setup needed for the alpha pass */
-    EVE_CoDl_colorA(phost, dsc->opa);
-
-    /* Draw bitmap */
-    EVE_CoDl_begin(phost, BITMAPS);
-    EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
-    EVE_CoDl_end(phost);
-
-    /* Restore state */
-    if(has_skew || has_colorkey || has_transform) {
-        EVE_CoDl_restoreContext(phost);
-    }
-}
+/* Main draw function (lv_draw_eve5_hal_draw_image) is in lv_draw_eve5_image_render.c */
+/* Alpha pass (lv_draw_eve5_hal_alpha_draw_image) is in lv_draw_eve5_image_alpha.c */
 
 #endif /* LV_USE_DRAW_EVE5 */

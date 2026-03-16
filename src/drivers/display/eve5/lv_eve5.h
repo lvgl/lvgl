@@ -2,6 +2,10 @@
  * @file lv_eve5.h
  *
  * EVE5 (BT820) Display and Touch Driver for LVGL
+ *
+ * Copyright (C) 2025-2026  Bridgetek Pte Ltd
+ * Author: Jan Boon <jan.boon@kaetemi.be>
+ * SPDX-License-Identifier: MIT
  */
 #ifndef LV_EVE5_H
 #define LV_EVE5_H
@@ -20,7 +24,7 @@ extern "C" {
 #include "../../../display/lv_display.h"
 #include "../../../indev/lv_indev.h"
 #include "EVE_Hal.h"
-#include "Esd_GpuAlloc5.h"
+#include "Esd_GpuAlloc.h"
 
 /*********************
  *      DEFINES
@@ -184,6 +188,35 @@ void lv_eve5_touch_set_mode(lv_display_t *disp, uint8_t mode);
 #define LV_EVE5_TOUCHMODE_ONESHOT    1
 #define LV_EVE5_TOUCHMODE_FRAME      2
 #define LV_EVE5_TOUCHMODE_CONTINUOUS 3
+
+/*--------------------
+ * HAL Thread Safety
+ *--------------------*/
+
+#if LV_USE_OS
+/**
+ * Lock the EVE HAL mutex.
+ * Must be held while accessing the EVE HAL from any LVGL thread.
+ * All EVE5 driver components (display, touch, draw unit, SD card)
+ * use this to serialize HAL access when multi-threading is enabled.
+ *
+ * @param disp pointer to the EVE5 display
+ */
+void lv_eve5_hal_lock(lv_display_t *disp);
+
+/**
+ * Unlock the EVE HAL mutex.
+ * @param disp pointer to the EVE5 display
+ */
+void lv_eve5_hal_unlock(lv_display_t *disp);
+#endif
+
+/*--------------------
+ * SD Card Filesystem
+ *--------------------*/
+
+/* Include the SD card filesystem driver header */
+#include "lv_eve5_sdcard.h"
 
 #endif /* LV_USE_EVE5 */
 
