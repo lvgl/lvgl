@@ -128,7 +128,7 @@ static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, 
                              dsc->cache_node->face,
                              node->glyph_index,
                              dsc->cache_node->ref_size,
-                             dsc->style & LV_FREETYPE_FONT_STYLE_BOLD ? 1 : 0,
+                             (dsc->style & LV_FREETYPE_FONT_STYLE_BOLD) && !FT_HAS_MULTIPLE_MASTERS(dsc->cache_node->face) ? 1 : 0,
                              dsc->outline_stroke_width);
     lv_mutex_unlock(&dsc->cache_node->face_lock);
 
