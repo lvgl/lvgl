@@ -32,17 +32,20 @@
 #define STBTT_STREAM_TYPE ttf_cb_stream_t *
 #define STBTT_STREAM_SEEK(s, x) ttf_cb_stream_seek(s, x);
 #define STBTT_STREAM_READ(s, x, y) ttf_cb_stream_read(s, x, y);
+#define STBTT_STREAM_SEEK_AND_READ(s, o, x, y) ttf_cb_stream_seek_and_read(s,o, x, y);
 
 /* a hydra stream that can be in memory or from a file*/
 typedef struct ttf_cb_stream {
     lv_fs_file_t * file;
     const void * data;
+    lv_mutex_t mutex;
     size_t size;
     size_t position;
 } ttf_cb_stream_t;
 
 static void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_read);
 static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position);
+static void ttf_cb_stream_seek_and_read(ttf_cb_stream_t * stream, size_t position, void * data, size_t to_read);
 #endif
 
 #include "stb_rect_pack.h"
@@ -188,9 +191,12 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
     if(font->dsc != NULL) {
         ttf_font_desc_t * ttf = (ttf_font_desc_t *)font->dsc;
 #if LV_TINY_TTF_FILE_SUPPORT != 0
+        lv_mutex_lock(&ttf->stream.mutex);
         if(ttf->stream.file != NULL) {
             lv_fs_close(&ttf->file);
         }
+        lv_mutex_unlock(&ttf->stream.mutex);
+        lv_mutex_delete(&ttf->stream.mutex);
 #endif
         lv_cache_destroy(ttf->glyph_cache, NULL);
         lv_cache_destroy(ttf->draw_data_cache, NULL);
@@ -234,6 +240,16 @@ static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position)
             stream->position = position;
         }
     }
+}
+
+static void ttf_cb_stream_seek_and_read(ttf_cb_stream_t * stream, size_t position, void * data, size_t to_read)
+{
+    lv_mutex_lock(&stream->mutex);
+
+    ttf_cb_stream_seek(stream, position);
+    ttf_cb_stream_read(stream, data, to_read);
+
+    lv_mutex_unlock(&stream->mutex);
 }
 #endif
 
@@ -446,6 +462,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
         return NULL;
     }
 #if LV_TINY_TTF_FILE_SUPPORT != 0
+    lv_mutex_init(&dsc->stream.mutex);
     if(path != NULL) {
         if(LV_FS_RES_OK != lv_fs_open(&dsc->file, path, LV_FS_MODE_RD)) {
             lv_free(dsc);
