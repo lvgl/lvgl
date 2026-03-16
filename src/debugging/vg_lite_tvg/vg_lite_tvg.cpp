@@ -934,7 +934,9 @@ extern "C" {
 
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_path(shape, path, matrix));
-        if(path->stroke) {
+        if(path->stroke &&
+           (path->path_type == VG_LITE_DRAW_STROKE_PATH || path->path_type == VG_LITE_DRAW_FILL_STROKE_PATH))
+        {
             TVG_CHECK_RETURN_VG_ERROR(shape->stroke(path->stroke->cap_style));
             TVG_CHECK_RETURN_VG_ERROR(shape->stroke(B(path->stroke_color), G(path->stroke_color), R(path->stroke_color),
                                                     A(path->stroke_color)));

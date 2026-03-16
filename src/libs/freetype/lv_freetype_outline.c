@@ -248,7 +248,7 @@ static lv_result_t outline_push_point(
 
     lv_freetype_outline_event_param_t param;
     lv_memzero(&param, sizeof(param));
-    param.outlines = outline;
+    param.outline = outline;
     param.type = type;
     ft_vector_to_lv_vector(&param.control1, control1);
     ft_vector_to_lv_vector(&param.control2, control2);
@@ -351,7 +351,7 @@ static lv_freetype_outline_t outline_create(
     lv_freetype_outline_t outline;
 
     res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
-    outline = param.outlines;
+    outline = param.outline;
 
     if(res != LV_RESULT_OK || !outline) {
         LV_LOG_ERROR("Outline object create failed");
@@ -425,7 +425,7 @@ static lv_result_t outline_delete(lv_freetype_context_t * ctx, lv_freetype_outli
 {
     lv_freetype_outline_event_param_t param;
     lv_memzero(&param, sizeof(param));
-    param.outlines = outline;
+    param.outline = outline;
 
     return outline_send_event(ctx, LV_EVENT_DELETE, &param);
 }
