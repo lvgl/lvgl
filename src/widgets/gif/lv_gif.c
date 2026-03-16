@@ -570,8 +570,7 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                     }
                 }
                 break;
-            case GIF_PALETTE_RGB888:
-                for(i = y; i < y + h; i++) {
+            case GIF_PALETTE_RGB888: {
                     uint8_t r = palette[(bg * 3) + 2];
                     uint8_t g = palette[(bg * 3) + 1];
                     uint8_t b = palette[(bg * 3) + 0];
