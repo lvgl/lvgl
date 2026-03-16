@@ -110,6 +110,16 @@ software, and can be set by using following values where style values are requir
 These values can be combined, e.g.
 :cpp:expr:`LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
 
+:cpp:enumerator:`LV_FREETYPE_FONT_STYLE_BOLD` is only supported with `LV_FREETYPE_FONT_RENDER_MODE_OUTLINE`,
+unless the font is variable weight.
+
+Variable weight fonts are supported. You can set the weight of the font using
+:c:macro:`LV_FREETYPE_FONT_STYLE_WEIGHT`\ (x) where ``x`` is the weight value between 1 and 2000.
+The default weight is 400. If :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_BOLD` is set and
+:c:macro:`LV_FREETYPE_FONT_STYLE_WEIGHT`\ (x) is not set, the weight will be set to 700.
+If both are set, the weight set by :c:macro:`LV_FREETYPE_FONT_STYLE_WEIGHT`\ (x) will be used.
+If the font is not variable weight then :c:macro:`LV_FREETYPE_FONT_STYLE_WEIGHT`\ (x) will have no effect.
+
 The FreeType extension also supports colored bitmap glyphs such as emojis. Note
 that only bitmaps are supported at this time. Colored vector graphics cannot be
 rendered. An example on how to draw a colored bitmap glyph is shown below.
