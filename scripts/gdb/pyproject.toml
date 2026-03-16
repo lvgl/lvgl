@@ -1,6 +1,6 @@
 [project]
 name = "lvglgdb"
-version = "0.3.0"
+version = "0.4.0"
 description = "LVGL GDB scripts"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -10,6 +10,9 @@ dependencies = [
     "Pillow~=11.3.0",
     "prettytable~=3.16.0",
 ]
+
+[tool.setuptools.package-data]
+lvglgdb = ["cmds/dashboard/static/*"]
 
 [project.urls]
 Homepage = "https://lvgl.io"

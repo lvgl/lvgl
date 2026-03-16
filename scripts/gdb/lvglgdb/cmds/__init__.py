@@ -13,6 +13,7 @@ from .misc import (
     DumpImageDecoder,
     DumpFsDrv,
 )
+from .dashboard import DumpDashboard
 from .debugger import Debugger
 from .drivers import Lvglobal
 
@@ -50,3 +51,6 @@ InfoSubject()
 
 # Drivers
 Lvglobal()
+
+# Dashboard
+DumpDashboard()
