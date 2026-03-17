@@ -9,6 +9,7 @@ on:
       - 'docs/**'
       - 'examples/**'
       - 'demos/**'
+      - 'configs/ci/docs/**'
       - 'scripts/build_html_examples.sh'
       - 'scripts/find_version.sh'
   push:
@@ -20,6 +21,7 @@ on:
       - 'src/**/lv*.h'
       - 'examples/**'
       - 'demos/**'
+      - 'configs/ci/docs/**'
       - 'scripts/build_html_examples.sh'
       - 'scripts/find_version.sh'
       - 'lv_conf_template.h'
