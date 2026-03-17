@@ -282,6 +282,8 @@ typedef struct _lv_gltf_t lv_gltf_t;
 
 typedef struct _lv_gltf_model_t lv_gltf_model_t;
 
+typedef struct _lv_gltf_model_node_t lv_gltf_model_node_t;
+
 typedef struct _lv_gltf_environment lv_gltf_environment_t;
 
 typedef struct _lv_gltf_ibl_sampler lv_gltf_ibl_sampler_t;
@@ -382,12 +384,6 @@ typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
 #endif /*LV_USE_SYSMON*/
 
 
-typedef struct _lv_xml_component_scope_t lv_xml_component_scope_t;
-
-typedef struct _lv_xml_parser_state_t lv_xml_parser_state_t;
-
-typedef struct _lv_xml_load_t lv_xml_load_t;
-
 #if LV_USE_EVDEV
 typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
 #endif
@@ -453,6 +449,10 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #define LV_UNREACHABLE() while(1)
 #endif
 #endif /* LV_UNREACHABLE not defined */
+
+#ifndef LV_ARRAYLEN
+#define LV_ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
+#endif /*LV_ARRAYLEN*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

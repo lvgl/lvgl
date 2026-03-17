@@ -155,6 +155,9 @@ void test_array_shrink(void)
 
 void test_array_remove(void)
 {
+    /* NULL array is handled properly */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_remove(NULL, 0));
+
     for(int32_t i = 0; i < 5; i++) {
         lv_array_push_back(&array, &i);
     }
@@ -180,6 +183,40 @@ void test_array_remove(void)
         int32_t * v = lv_array_at(&array, i);
         TEST_ASSERT_EQUAL_INT32(i + 1, *v);
     }
+}
+
+void test_array_remove_unordered(void)
+{
+    /* NULL array is handled properly */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_remove_unordered(NULL, 0));
+
+    for(int32_t i = 0; i < 5; i++) {
+        lv_array_push_back(&array, &i);
+    }
+    TEST_ASSERT_EQUAL_UINT32(5, lv_array_size(&array));
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_array_remove_unordered(&array, 4));
+    TEST_ASSERT_EQUAL_UINT32(4, lv_array_size(&array));
+
+    /* Test remove out of range, should fail */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_remove_unordered(&array, 4));
+    TEST_ASSERT_EQUAL_UINT32(4, lv_array_size(&array));
+
+    /* remove the last element */
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_array_remove_unordered(&array, 3));
+    TEST_ASSERT_EQUAL_UINT32(3, lv_array_size(&array));
+
+    /* remove the first element */
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_array_remove_unordered(&array, 0));
+    TEST_ASSERT_EQUAL_UINT32(2, lv_array_size(&array));
+
+    int32_t * v0 = lv_array_at(&array, 0);
+    int32_t * v1 = lv_array_at(&array, 1);
+
+    /* Removing the first element should have moved the last element
+     * to the first position*/
+    TEST_ASSERT_EQUAL_INT32(2, *v0);
+    TEST_ASSERT_EQUAL_INT32(1, *v1);
 }
 
 void test_array_erase(void)

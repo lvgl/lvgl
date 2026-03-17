@@ -13,4 +13,13 @@
 #    changelog-gen v5.7.0
 #    changelog-gen v6.0.0
 
-auto-changelog -t changelog-template.hbs -l false --latest-version $1 --unreleased-only  --tag-pattern ^v[0-9]+.[0-9]+.[0-9]+$ -o CHANGELOG_LAST.rst
+OUTPUT_NAME=CHANGELOG_LAST.rst
+auto-changelog -t changelog-template.hbs -l false --latest-version $1 --unreleased-only --tag-pattern ^v[0-9]+.[0-9]+.[0-9]+$ --merge-url "https://github.com/lvgl/lvgl/pull/{id}" -o $OUTPUT_NAME
+
+# Remove leading space from PR commit name
+# Eg "- ** PR TITLE" becomes "- **PR TITLE"
+sed -i 's/- \*\* */- \*\*/g' $OUTPUT_NAME
+
+# Remove trailing space from PR commit name
+# Eg "- **PR TITLE **" becomes "- **PR TITLE**"
+sed -i 's/ \*\* /\*\* /g' $OUTPUT_NAME

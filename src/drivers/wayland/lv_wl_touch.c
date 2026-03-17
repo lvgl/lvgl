@@ -28,7 +28,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data);
+static void touch_read(lv_indev_t * drv, lv_indev_data_t * data);
 
 static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t serial, uint32_t time,
                               struct wl_surface * surface, int32_t id, wl_fixed_t x_w, wl_fixed_t y_w);
@@ -67,14 +67,15 @@ lv_indev_t * lv_wayland_touch_create(void)
 
     lv_indev_t * indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(indev, _lv_wayland_touch_read);
+    lv_indev_set_read_cb(indev, touch_read);
+    lv_indev_set_driver_data(indev, lv_wl_ctx.seat.touch);
 
     return indev;
 }
 
 lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * display)
 {
-    struct window * window = lv_display_get_driver_data(display);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
     if(!window) {
         return NULL;
     }
@@ -85,176 +86,141 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * display)
  *   PRIVATE FUNCTIONS
  **********************/
 
-const struct wl_touch_listener * lv_wayland_touch_get_listener(void)
+lv_wl_seat_touch_t * lv_wayland_seat_touch_create(struct wl_seat * seat)
 {
-    return &touch_listener;
+
+    struct wl_touch * touch = wl_seat_get_touch(seat);
+    if(!touch) {
+        LV_LOG_WARN("Failed to get seat touch");
+        return NULL;
+    }
+    lv_wl_seat_touch_t * wl_seat_touch = lv_zalloc(sizeof(*wl_seat_touch));
+    LV_ASSERT_MALLOC(wl_seat_touch);
+    if(!wl_seat_touch) {
+        LV_LOG_WARN("Failed to allocate memory for wayland touch");
+        wl_touch_destroy(touch);
+        return NULL;
+    }
+    wl_touch_add_listener(touch, &touch_listener, NULL);
+    wl_touch_set_user_data(touch, wl_seat_touch);
+
+    wl_seat_touch->wl_touch = touch;
+    lv_wayland_update_indevs(touch_read, wl_seat_touch);
+
+    return wl_seat_touch;
+}
+void lv_wayland_seat_touch_delete(lv_wl_seat_touch_t * seat_touch)
+{
+    lv_wayland_update_indevs(touch_read, NULL);
+    wl_touch_destroy(seat_touch->wl_touch);
+    lv_free(seat_touch);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
+static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
 
-    struct window * window = lv_display_get_driver_data(lv_indev_get_display(drv));
+    lv_wl_seat_touch_t * tdata = lv_indev_get_driver_data(indev);
 
-    if(!window || window->closed) {
+    if(!tdata) {
         return;
     }
-
 #if LV_USE_GESTURE_RECOGNITION
     /* Collect touches if there are any - send them to the gesture recognizer */
-    lv_indev_gesture_recognizers_update(drv, &window->body->input.touches[0], window->body->input.touch_event_cnt);
+    lv_indev_gesture_recognizers_update(indev, tdata->touches, tdata->event_cnt);
 
-    LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
+    LV_LOG_TRACE("collected touch events: %d", tdata->event_cnt);
 
-    window->body->input.touch_event_cnt = 0;
-
-    /* Set the gesture information, before returning to LVGL */
-    lv_indev_gesture_recognizers_set_data(drv, data);
-
-    if(window->body->input.touch_event_cnt > 0) {
-        data->point.x = window->body->input.touches[0].point.x;
-        data->point.y = window->body->input.touches[0].point.y;
+    if(tdata->event_cnt > 0) {
+        data->point = tdata->touches[0].point;
     }
     else {
-        data->point.x = 0;
-        data->point.y = 0;
+        data->point.x = data->point.y = 0;
     }
+
+    tdata->event_cnt = 0;
+
+    /* Set the gesture information, before returning to LVGL */
+    lv_indev_gesture_recognizers_set_data(indev, data);
+
 #else
-    data->point.x = window->body->input.touch.point.x;
-    data->point.y = window->body->input.touch.point.y;
-    data->state = window->body->input.touch.state;
+    data->point = tdata->point;
+    data->state = tdata->state;
 #endif
 }
 
 static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t serial, uint32_t time,
                               struct wl_surface * surface, int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
 {
-    struct lv_wayland_context * app = data;
-#if LV_USE_GESTURE_RECOGNITION
-    uint8_t i;
-#endif
-
+    LV_UNUSED(data);
     LV_UNUSED(id);
     LV_UNUSED(time);
     LV_UNUSED(serial);
-    LV_UNUSED(wl_touch);
+
+    lv_wl_seat_touch_t * tdata = wl_touch_get_user_data(wl_touch);
 
     if(!surface) {
-        app->touch_obj = NULL;
         return;
     }
 
-    /* Create the touch down event */
-    app->touch_obj = wl_surface_get_user_data(surface);
-
 #if LV_USE_GESTURE_RECOGNITION
-    i              = app->touch_obj->input.touch_event_cnt;
+    uint8_t i = tdata->event_cnt;
 
-    app->touch_obj->input.touches[i].point.x   = wl_fixed_to_int(x_w);
-    app->touch_obj->input.touches[i].point.y   = wl_fixed_to_int(y_w);
-    app->touch_obj->input.touches[i].id        = id;
-    app->touch_obj->input.touches[i].timestamp = time;
-    app->touch_obj->input.touches[i].state     = LV_INDEV_STATE_PRESSED;
-    app->touch_obj->input.touch_event_cnt++;
+    tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
+    tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
+    tdata->touches[i].id        = id;
+    tdata->touches[i].timestamp = time;
+    tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
+    tdata->event_cnt++;
 #else
-    app->touch_obj->input.touch.point.x = wl_fixed_to_int(x_w);
-    app->touch_obj->input.touch.point.y = wl_fixed_to_int(y_w);
-    app->touch_obj->input.touch.state = LV_INDEV_STATE_PRESSED;
-#endif
-
-#if LV_WAYLAND_WINDOW_DECORATIONS
-    struct window * window = app->touch_obj->window;
-    switch(app->touch_obj->type) {
-        case OBJECT_TITLEBAR:
-            if(window->xdg_toplevel) {
-                xdg_toplevel_move(window->xdg_toplevel, app->wl_seat, serial);
-                window->flush_pending = true;
-            }
-            break;
-        default:
-            break;
-    }
+    tdata->point.x = wl_fixed_to_int(x_w);
+    tdata->point.y = wl_fixed_to_int(y_w);
+    tdata->state = LV_INDEV_STATE_PRESSED;
 #endif
 }
 
 static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t serial, uint32_t time, int32_t id)
 {
-    struct lv_wayland_context * app = data;
-#if LV_USE_GESTURE_RECOGNITION
-    uint8_t i;
-#endif
-
     LV_UNUSED(serial);
     LV_UNUSED(time);
     LV_UNUSED(id);
-    LV_UNUSED(wl_touch);
+    LV_UNUSED(data);
+    lv_wl_seat_touch_t * tdata = wl_touch_get_user_data(wl_touch);
 
     /* Create a released event */
 #if LV_USE_GESTURE_RECOGNITION
-    i = app->touch_obj->input.touch_event_cnt;
+    uint8_t i = tdata->event_cnt;
 
-    app->touch_obj->input.touches[i].point.x   = 0;
-    app->touch_obj->input.touches[i].point.y   = 0;
-    app->touch_obj->input.touches[i].id        = id;
-    app->touch_obj->input.touches[i].timestamp = time;
-    app->touch_obj->input.touches[i].state     = LV_INDEV_STATE_RELEASED;
+    tdata->touches[i].point.x   = 0;
+    tdata->touches[i].point.y   = 0;
+    tdata->touches[i].id        = id;
+    tdata->touches[i].timestamp = time;
+    tdata->touches[i].state     = LV_INDEV_STATE_RELEASED;
 
-    app->touch_obj->input.touch_event_cnt++;
+    tdata->event_cnt++;
 #else
-    app->touch_obj->input.touch.state = LV_INDEV_STATE_RELEASED;
+    tdata->state = LV_INDEV_STATE_RELEASED;
 #endif
-
-#if LV_WAYLAND_WINDOW_DECORATIONS
-    struct window * window = app->touch_obj->window;
-    switch(app->touch_obj->type) {
-        case OBJECT_BUTTON_CLOSE:
-            window->shall_close = true;
-            break;
-        case OBJECT_BUTTON_MAXIMIZE:
-            if(window->xdg_toplevel) {
-                if(window->maximized) {
-                    xdg_toplevel_unset_maximized(window->xdg_toplevel);
-                }
-                else {
-                    xdg_toplevel_set_maximized(window->xdg_toplevel);
-                }
-                window->maximized ^= true;
-            }
-            break;
-        case OBJECT_BUTTON_MINIMIZE:
-            if(window->xdg_toplevel) {
-                xdg_toplevel_set_minimized(window->xdg_toplevel);
-                window->flush_pending = true;
-            }
-        default:
-            break;
-    }
-#endif /* LV_WAYLAND_WINDOW_DECORATIONS */
 }
 
 static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_t time, int32_t id, wl_fixed_t x_w,
                                 wl_fixed_t y_w)
 {
-    struct lv_wayland_context * app = data;
-#if LV_USE_GESTURE_RECOGNITION
-    lv_indev_touch_data_t * touch;
-    lv_indev_touch_data_t * cur;
-    uint8_t i;
-#endif
 
-    LV_UNUSED(time);
     LV_UNUSED(id);
-    LV_UNUSED(wl_touch);
+    LV_UNUSED(time);
+    LV_UNUSED(data);
+    lv_wl_seat_touch_t * tdata = wl_touch_get_user_data(wl_touch);
 
 #if LV_USE_GESTURE_RECOGNITION
     /* Update the contact point of the corresponding id with the latest coordinate */
-    touch = &app->touch_obj->input.touches[0];
-    cur   = NULL;
+    lv_indev_touch_data_t * touch = &tdata->touches[0];
+    lv_indev_touch_data_t * cur = NULL;
 
-    for(i = 0; i < app->touch_obj->input.touch_event_cnt; i++) {
+    for(uint8_t i = 0; i < tdata->event_cnt; i++) {
         if(touch->id == id) {
             cur = touch;
         }
@@ -262,26 +228,23 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_
     }
 
     if(cur == NULL) {
-
-        i                                          = app->touch_obj->input.touch_event_cnt;
-        app->touch_obj->input.touches[i].point.x   = wl_fixed_to_int(x_w);
-        app->touch_obj->input.touches[i].point.y   = wl_fixed_to_int(y_w);
-        app->touch_obj->input.touches[i].id        = id;
-        app->touch_obj->input.touches[i].timestamp = time;
-        app->touch_obj->input.touches[i].state     = LV_INDEV_STATE_PRESSED;
-        app->touch_obj->input.touch_event_cnt++;
-
+        uint8_t i = tdata->event_cnt;
+        tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
+        tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
+        tdata->touches[i].id        = id;
+        tdata->touches[i].timestamp = time;
+        tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
+        tdata->event_cnt++;
     }
     else {
-
         cur->point.x   = wl_fixed_to_int(x_w);
         cur->point.y   = wl_fixed_to_int(y_w);
         cur->id        = id;
         cur->timestamp = time;
     }
 #else
-    app->touch_obj->input.touch.point.x = wl_fixed_to_int(x_w);
-    app->touch_obj->input.touch.point.y = wl_fixed_to_int(y_w);
+    tdata->point.x = wl_fixed_to_int(x_w);
+    tdata->point.y = wl_fixed_to_int(y_w);
 #endif
 }
 

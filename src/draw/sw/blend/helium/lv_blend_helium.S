@@ -7,7 +7,12 @@
 #define __ASSEMBLY__
 #endif
 
-#include "lv_blend_helium.h"
+#if defined(_RTE_)
+#include "Pre_Include_Global.h"
+#include "RTE_Components.h"
+#endif
+
+#include "../../../../lv_conf_internal.h"
 
 /*GCC Workaround: missing .note.GNU-stack section implies executable stack*/
 #ifdef __ELF__

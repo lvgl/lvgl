@@ -10,7 +10,7 @@
 #include "lv_obj_draw_private.h"
 #include "../misc/lv_area_private.h"
 #include "../draw/sw/lv_draw_sw_mask_private.h"
-#include "../draw/lv_draw_mask_private.h"
+#include "../draw/lv_draw_mask.h"
 #include "lv_obj_private.h"
 #include "lv_obj_event_private.h"
 #include "../display/lv_display.h"
@@ -48,6 +48,8 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 static void draw_buf_flush(lv_display_t * disp);
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void wait_for_flushing(lv_display_t * disp);
+static void call_sync_cb(lv_display_t * disp, const lv_area_t * area);
+static void wait_for_syncing(lv_display_t * disp);
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
                                   lv_area_t * layer_area_out, lv_area_t * obj_draw_size_out);
 static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area);
@@ -266,11 +268,11 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     LV_PROFILER_REFR_END;
 }
 
-void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
+lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
 {
     if(!disp) disp = lv_display_get_default();
-    if(!disp) return;
-    if(!lv_display_is_invalidation_enabled(disp)) return;
+    if(!disp) return LV_RESULT_INVALID;
+    if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
 
     /**
      * There are two reasons for this issue:
@@ -288,7 +290,7 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     /*Clear the invalidate buffer if the parameter is NULL*/
     if(area_p == NULL) {
         disp->inv_p = 0;
-        return;
+        return LV_RESULT_OK;
     }
 
     lv_area_t scr_area;
@@ -301,7 +303,7 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     bool suc;
 
     suc = lv_area_intersect(&com_area, area_p, &scr_area);
-    if(suc == false)  return; /*Out of the screen*/
+    if(suc == false)  return LV_RESULT_INVALID; /*Out of the screen*/
 
     if(disp->color_format == LV_COLOR_FORMAT_I1) {
         /*Make sure that the X coordinates start and end on byte boundary.
@@ -315,16 +317,16 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
         lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
-        return;
+        return LV_RESULT_OK;
     }
 
     lv_result_t res = lv_display_send_event(disp, LV_EVENT_INVALIDATE_AREA, &com_area);
-    if(res != LV_RESULT_OK) return;
+    if(res != LV_RESULT_OK) return LV_RESULT_INVALID;
 
     /*Save only if this area is not in one of the saved areas*/
     uint16_t i;
     for(i = 0; i < disp->inv_p; i++) {
-        if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
+        if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return LV_RESULT_OK;
     }
 
     /*Save the area*/
@@ -337,6 +339,8 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     disp->inv_p++;
 
     lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
+
+    return LV_RESULT_OK;
 }
 
 /**
@@ -417,9 +421,10 @@ void lv_display_refr_timer(lv_timer_t * tmr)
     refr_invalid_areas();
 
     if(disp_refr->inv_p == 0) goto refr_finish;
-    /*In double buffered direct mode save the updated areas.
+    /*In double buffered direct mode or if sync callback is set, save the updated areas.
      *They will be used on the next call to synchronize the buffers.*/
-    if(lv_display_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
+    if((lv_display_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) ||
+       disp_refr->sync_cb) {
         uint32_t i;
         for(i = 0; i < disp_refr->inv_p; i++) {
             if(disp_refr->inv_area_joined[i])
@@ -524,7 +529,11 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
         lv_area_t layer_area_full;
         lv_area_t obj_draw_size;
         lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full, &obj_draw_size);
-        if(res != LV_RESULT_OK) return;
+        if(res != LV_RESULT_OK) {
+            layer->opa = layer_opa_ori;
+            layer->recolor = layer_recolor;
+            return;
+        }
 
         /*Simple layers can be subdivided into smaller layers*/
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
@@ -650,11 +659,11 @@ static void lv_refr_join_area(void)
  */
 static void refr_sync_areas(void)
 {
-    /*Do not sync if not direct or double buffered*/
-    if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT) return;
-
-    /*Do not sync if not double buffered*/
-    if(!lv_display_is_double_buffered(disp_refr)) return;
+    /*Do not sync if not direct double buffered and no sync callback set*/
+    const bool auto_sync = disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT &&
+                           lv_display_is_double_buffered(disp_refr);
+    const bool user_sync = disp_refr->sync_cb != NULL;
+    if(!auto_sync && !user_sync) return;
 
     /*Do not sync if no sync areas*/
     if(lv_ll_is_empty(&disp_refr->sync_areas)) return;
@@ -663,29 +672,6 @@ static void refr_sync_areas(void)
     /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
     /*We need to wait for ready here to not mess up the active screen*/
     wait_for_flushing(disp_refr);
-
-    /*The buffers are already swapped.
-     *So the active buffer is the off screen buffer where LVGL will render*/
-    lv_draw_buf_t * off_screen = disp_refr->buf_act;
-    /*Triple buffer sync buffer for off-screen2 updates.*/
-    lv_draw_buf_t * off_screen2;
-    lv_draw_buf_t * on_screen;
-
-    if(disp_refr->buf_act == disp_refr->buf_1) {
-        off_screen2 = disp_refr->buf_2;
-        on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
-    }
-    else if(disp_refr->buf_act == disp_refr->buf_2) {
-        off_screen2 = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_1;
-        on_screen = disp_refr->buf_1;
-    }
-    else {
-        off_screen2 = disp_refr->buf_1;
-        on_screen = disp_refr->buf_2;
-    }
-
-    uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
-    uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
 
     /*Iterate through invalidated areas to see if sync area should be copied*/
     uint16_t i;
@@ -722,6 +708,33 @@ static void refr_sync_areas(void)
         }
     }
 
+    /*The buffers are already swapped.
+     *So the active buffer is the off screen buffer where LVGL will render*/
+    lv_draw_buf_t * off_screen = disp_refr->buf_act;
+    /*Triple buffer sync buffer for off-screen2 updates.*/
+    lv_draw_buf_t * off_screen2 = NULL;
+    lv_draw_buf_t * on_screen = NULL;
+
+    /* Only compute buffer relationships when auto_sync (direct double-buffered) is used.
+     * When only user_sync is active, these pointers are not needed. */
+    if(auto_sync) {
+        if(disp_refr->buf_act == disp_refr->buf_1) {
+            off_screen2 = disp_refr->buf_2;
+            on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
+        }
+        else if(disp_refr->buf_act == disp_refr->buf_2) {
+            off_screen2 = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_1;
+            on_screen = disp_refr->buf_1;
+        }
+        else {
+            off_screen2 = disp_refr->buf_1;
+            on_screen = disp_refr->buf_2;
+        }
+    }
+
+    uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
+    uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
+
     lv_area_t disp_area = {0, 0, (int32_t)hor_res - 1, (int32_t)ver_res - 1};
     /*Copy sync areas (if any remaining)*/
     for(sync_area = lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
@@ -737,9 +750,22 @@ static void refr_sync_areas(void)
             lv_display_rotate_area(disp_refr, sync_area);
         }
 #endif
-        lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
-        if(off_screen2 != on_screen)
-            lv_draw_buf_copy(off_screen2, sync_area, on_screen, sync_area);
+        /*Call sync callback (if set)*/
+        if(disp_refr->sync_cb) {
+            /*Set syncing flags*/
+            disp_refr->syncing = true;
+            disp_refr->syncing_last = lv_ll_get_tail(&disp_refr->sync_areas) == sync_area;
+
+            /*Call sync callback and wait for sync to complete*/
+            call_sync_cb(disp_refr, sync_area);
+            wait_for_syncing(disp_refr);
+        }
+        /*Fallback to internal double buffered direct mode sync*/
+        else {
+            lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
+            if(off_screen2 != on_screen)
+                lv_draw_buf_copy(off_screen2, sync_area, on_screen, sync_area);
+        }
     }
 
     /*Clear sync areas*/
@@ -857,6 +883,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     layer->_clip_area = *area_p;
     layer->phy_clip_area = *area_p;
     layer->partial_y_offset = y_offset;
+    layer->all_tasks_added = false;
 
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /*In partial mode render this area to the buffer*/
@@ -898,6 +925,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
 
     if(tile_cnt == 1) {
         refr_configured_layer(layer);
+        layer->all_tasks_added = true;
     }
     else {
         /* Don't draw to the layers buffer of the display but create smaller dummy layers which are using the
@@ -925,6 +953,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
             tile_layer->draw_buf = layer->draw_buf;
             refr_configured_layer(tile_layer);
+            tile_layer->all_tasks_added = true;
         }
 
 
@@ -945,9 +974,12 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
                 layer_i = layer_i->next;
             }
 
+            lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, tile_layer);
             if(disp_refr->layer_deinit) disp_refr->layer_deinit(disp_refr, tile_layer);
         }
         lv_free(tile_layers);
+
+        layer->all_tasks_added = true;
     }
 
     disp_refr->refreshed_area = *area_p;
@@ -1448,6 +1480,54 @@ static void wait_for_flushing(lv_display_t * disp)
     disp->flushing_last = 0;
 
     lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_FINISH, NULL);
+
+    LV_LOG_TRACE("end");
+    LV_PROFILER_REFR_END;
+}
+
+static void call_sync_cb(lv_display_t * disp, const lv_area_t * area)
+{
+    LV_PROFILER_REFR_BEGIN;
+
+    /* Apply display offsets to the sync area for consistency with flush_cb */
+    lv_area_t offset_area = *area;
+    offset_area.x1 += disp->offset_x;
+    offset_area.x2 += disp->offset_x;
+    offset_area.y1 += disp->offset_y;
+    offset_area.y2 += disp->offset_y;
+
+    LV_TRACE_REFR("Calling sync_cb on (%d;%d)(%d;%d) area",
+                  (int)offset_area.x1, (int)offset_area.y1,
+                  (int)offset_area.x2, (int)offset_area.y2);
+
+    lv_display_send_event(disp, LV_EVENT_SYNC_START, (void *)&offset_area);
+
+    disp->sync_cb(disp, &offset_area);
+
+    lv_display_send_event(disp, LV_EVENT_SYNC_FINISH, (void *)&offset_area);
+
+    LV_PROFILER_REFR_END;
+}
+
+static void wait_for_syncing(lv_display_t * disp)
+{
+    LV_PROFILER_REFR_BEGIN;
+    LV_LOG_TRACE("begin");
+
+    lv_display_send_event(disp, LV_EVENT_SYNC_WAIT_START, NULL);
+
+    if(disp->sync_wait_cb) {
+        if(disp->syncing) {
+            disp->sync_wait_cb(disp);
+            disp->syncing = 0;
+        }
+    }
+    else {
+        while(disp->syncing);
+    }
+    disp->syncing_last = 0;
+
+    lv_display_send_event(disp, LV_EVENT_SYNC_WAIT_FINISH, NULL);
 
     LV_LOG_TRACE("end");
     LV_PROFILER_REFR_END;

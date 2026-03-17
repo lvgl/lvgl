@@ -28,8 +28,12 @@
  * Note: enum value is the same in either case
  * See https://github.com/nxp-imx/imx-g2d-pxp/commit/d7af84b5c8ad161b6898ffabe23918cb59fe2fe9
  */
-#if (G2D_VERSION_MAJOR >= 2) && (G2D_VERSION_MINOR < 3)
-    #define G2D_HARDWARE_PXP_V1 G2D_HARDWARE_PXP
+#if defined(LV_USE_PXP)
+    #if (G2D_VERSION_MAJOR >= 2) && (G2D_VERSION_MINOR < 3)
+        #define G2D_HARDWARE_PXP_V1 G2D_HARDWARE_PXP
+    #endif
+#else
+    #define G2D_HARDWARE_PXP_V1 0
 #endif
 
 /**********************
@@ -197,6 +201,9 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 return 1;
             }
         case LV_DRAW_TASK_TYPE_IMAGE: {
+                /* TODO: Fix issue where images rendered to a different layer don't render in the final layer.*/
+                return 0;
+#if 0
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
 
                 if(!_g2d_src_cf_supported(draw_dsc->header.cf))
@@ -210,6 +217,7 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                     t->preferred_draw_unit_id = DRAW_UNIT_ID_G2D;
                 }
                 return 1;
+#endif
             }
         default:
             return 0;

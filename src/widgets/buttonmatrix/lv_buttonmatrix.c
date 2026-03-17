@@ -66,6 +66,21 @@ static void free_map(lv_buttonmatrix_t * btnm);
 static const char * const lv_buttonmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
 #endif
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_buttonmatrix_properties[] = {
+    {
+        .id = LV_PROPERTY_BUTTONMATRIX_SELECTED_BUTTON,
+        .setter = lv_buttonmatrix_set_selected_button,
+        .getter = lv_buttonmatrix_get_selected_button,
+    },
+    {
+        .id = LV_PROPERTY_BUTTONMATRIX_ONE_CHECKED,
+        .setter = lv_buttonmatrix_set_one_checked,
+        .getter = lv_buttonmatrix_get_one_checked,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_buttonmatrix_class = {
     .constructor_cb = lv_buttonmatrix_constructor,
     .destructor_cb = lv_buttonmatrix_destructor,
@@ -77,6 +92,7 @@ const lv_obj_class_t lv_buttonmatrix_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
     .name = "lv_buttonmatrix",
+    LV_PROPERTY_CLASS_FIELDS(buttonmatrix, BUTTONMATRIX)
 };
 
 /**********************
@@ -1020,8 +1036,8 @@ static void update_map(lv_obj_t * obj)
     const char * const * map_row = btnm->map_p;
 
     /*Count the units and the buttons in a line*/
-    uint32_t row;
-    for(row = 0; row < btnm->row_cnt; row++) {
+    int32_t row_cnt = (int32_t)btnm->row_cnt;
+    for(int32_t row = 0; row < row_cnt; row++) {
         uint32_t unit_cnt = 0;           /*Number of units in a row*/
         uint32_t btn_cnt = 0;            /*Number of buttons in a row*/
         /*Count the buttons and units in this row*/
@@ -1036,8 +1052,8 @@ static void update_map(lv_obj_t * obj)
             continue;
         }
 
-        int32_t row_y1 = stop + (max_h_no_gap * row) / btnm->row_cnt + row * prow;
-        int32_t row_y2 = stop + (max_h_no_gap * (row + 1)) / btnm->row_cnt + row * prow - 1;
+        int32_t row_y1 = stop + (max_h_no_gap * row) / row_cnt + row * prow;
+        int32_t row_y2 = stop + (max_h_no_gap * (row + 1)) / row_cnt + row * prow - 1;
 
         /*Set the button size and positions*/
         int32_t max_w_no_gap = max_w - (pcol * (btn_cnt - 1));

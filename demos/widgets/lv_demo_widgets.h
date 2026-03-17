@@ -41,6 +41,11 @@ extern "C" {
 void lv_demo_widgets(void);
 void lv_demo_widgets_start_slideshow(void);
 
+/**
+ * Create the widgets demo with custom arguments.
+ * @param args Pointer to demo arguments structure containing the parent widget and other options.
+ */
+void lv_demo_widgets_with_args(const lv_demo_args_t * args);
 /**********************
  *      MACROS
  **********************/

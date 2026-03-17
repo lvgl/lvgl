@@ -53,8 +53,6 @@ COMPONENT_SRCDIRS := . \
                   src/others/snapshot \
                   src/others/sysmon \
                   src/others/test \
-                  src/others/xml \
-                  src/others/xml/parsers \
                   src/themes \
                   src/themes/basic \
                   src/themes/default \
@@ -72,6 +70,7 @@ COMPONENT_SRCDIRS := . \
                   src/widgets/checkbox \
                   src/widgets/colorwheel \
                   src/widgets/dropdown \
+                  src/widgets/gif \
                   src/widgets/image \
                   src/widgets/imgbtn \
                   src/widgets/keyboard \

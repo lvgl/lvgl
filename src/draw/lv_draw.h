@@ -58,6 +58,7 @@ typedef enum {
     LV_DRAW_TASK_TYPE_TRIANGLE,
     LV_DRAW_TASK_TYPE_MASK_RECTANGLE,
     LV_DRAW_TASK_TYPE_MASK_BITMAP,
+    LV_DRAW_TASK_TYPE_BLUR,
 #if LV_USE_VECTOR_GRAPHIC
     LV_DRAW_TASK_TYPE_VECTOR,
 #endif
@@ -160,6 +161,26 @@ typedef struct {
 
     /**The target layer */
     lv_layer_t * layer;
+
+    /*Drop shadow is part of every draw dsc as anything can have drop shadow*/
+
+    /**Drop shadow offset in X*/
+    int16_t drop_shadow_ofs_x;
+
+    /**Drop shadow offset in Y*/
+    int16_t drop_shadow_ofs_y;
+
+    /**Drop shadow color*/
+    lv_color_t drop_shadow_color;
+
+    /**Drop shadow opacity*/
+    lv_opa_t drop_shadow_opa;
+
+    /**Drop shadow blur radius*/
+    int32_t drop_shadow_blur_radius: 20;
+
+    /**Drop shadow blur quality*/
+    lv_blur_quality_t drop_shadow_quality : 3;
 
     /**Size of the specific draw descriptor into which this base descriptor is embedded*/
     size_t dsc_size;
@@ -349,6 +370,14 @@ void * lv_draw_task_get_draw_dsc(const lv_draw_task_t * t);
  * @param area   the destination where the draw area will be stored
 */
 void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area);
+
+
+
+lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_base_t * base,
+                                              const lv_area_t * area);
+
+void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_base_t * base);
+
 
 /**********************
  *  GLOBAL VARIABLES

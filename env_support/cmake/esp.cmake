@@ -21,6 +21,10 @@ else()
     set_source_files_properties(${EXAMPLE_SOURCES} COMPILE_FLAGS "-Wno-unused-variable -Wno-format")
   endif()
 
+  if(CONFIG_LV_BUILD_DEMOS)
+    list(APPEND DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/lv_demos.c)
+  endif()
+
   if(CONFIG_LV_USE_DEMO_WIDGETS)
     file(GLOB_RECURSE DEMO_WIDGETS_SOURCES ${LVGL_ROOT_DIR}/demos/widgets/*.c)
     list(APPEND DEMO_SOURCES ${DEMO_WIDGETS_SOURCES})
@@ -51,11 +55,15 @@ else()
     set_source_files_properties(${DEMO_MUSIC_SOURCES} COMPILE_FLAGS "-Wno-format")
   endif()
 
-if(${target} STREQUAL "esp32p4")
-  set(IDF_COMPONENTS esp_driver_ppa esp_mm esp_timer log)
-else()
   set(IDF_COMPONENTS esp_timer log)
-endif()
+
+  if(${target} STREQUAL "esp32p4")
+    list(APPEND IDF_COMPONENTS esp_driver_ppa esp_mm)
+  endif()
+
+  if(CONFIG_LV_USE_FS_FATFS)
+    list(APPEND IDF_COMPONENTS fatfs)
+  endif()
 
   idf_component_register(SRCS ${SOURCES} ${EXAMPLE_SOURCES} ${DEMO_SOURCES}
       INCLUDE_DIRS ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/src ${LVGL_ROOT_DIR}/../

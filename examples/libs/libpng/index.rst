@@ -1,3 +1,6 @@
+.. example_heading: libpng
+
+
 Open a PNG image from file and variable
 ---------------------------------------
 

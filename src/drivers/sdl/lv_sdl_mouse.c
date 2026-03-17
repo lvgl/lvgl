@@ -128,6 +128,7 @@ void lv_sdl_mouse_handler(SDL_Event * event)
     }
 
     lv_display_t * disp = lv_sdl_get_disp_from_win_id(win_id);
+    if(disp == NULL) return;
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);

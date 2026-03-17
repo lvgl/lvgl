@@ -208,6 +208,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     player->imgdsc.data_size = data_size;
     player->imgdsc.header.cf = cf;
     player->imgdsc.header.stride = stride;
+    player->imgdsc.header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
     player->imgdsc.data = data;
 
     lv_image_set_src(&player->img.obj, &(player->imgdsc));
@@ -673,6 +674,7 @@ static int ffmpeg_get_image_header(lv_image_decoder_dsc_t * dsc,
         header->h = video_dec_ctx->height;
         header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
         header->stride = header->w * lv_color_format_get_size(header->cf);
+        header->flags = LV_IMAGE_FLAGS_MODIFIABLE;
 
         ret = 0;
     }

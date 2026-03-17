@@ -14,9 +14,9 @@
 
 #if LV_USE_GLTF
 
+#include "../math/lv_3dmath.h"
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_area.h"
-#include "../../../misc/lv_color.h"
 #include "../gltf_data/lv_gltf_model.h"
 
 #ifdef __cplusplus
@@ -26,8 +26,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
-#define LV_GLTF_DEFAULT_CAMERA 0
 
 /**********************
  *      TYPEDEFS
@@ -44,26 +42,6 @@ typedef enum {
     LV_GLTF_BG_MODE_ENVIRONMENT = 1, /** Environnement background*/
 } lv_gltf_bg_mode_t;
 
-typedef struct {
-    float x;
-    float y;
-    float z;
-} lv_3dpoint_t;
-
-typedef struct {
-    lv_3dpoint_t origin;
-    lv_3dpoint_t direction;
-} lv_3dplane_t;
-
-typedef lv_3dplane_t lv_3dray_t;
-
-#define LV_GLTF_ANIM_SPEED_TENTH 100
-#define LV_GLTF_ANIM_SPEED_QUARTER 250
-#define LV_GLTF_ANIM_SPEED_HALF 500
-#define LV_GLTF_ANIM_SPEED_NORMAL 1000
-#define LV_GLTF_ANIM_SPEED_2X 2000
-#define LV_GLTF_ANIM_SPEED_3X 3000
-#define LV_GLTF_ANIM_SPEED_4X 4000
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -95,6 +73,28 @@ void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * environment
 lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path);
 
 /**
+ * Load a glTF model from a byte array into the viewer
+ * @param obj pointer to a glTF viewer object
+ * @param bytes glTF raw data
+ * @param len glTF raw data length in bytes
+ * @return pointer to the loaded glTF model, or NULL on failure
+ */
+lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * bytes, size_t len);
+
+/**
+ * Add a glTF model to the viewer.
+ *
+ * Contrary to `lv_gltf_load_model_from_file` and `lv_gltf_load_model_from_bytes`, the model
+ * is owned by the caller of this function meaning that it's the caller's responsibility
+ * to delete the model when it is no longer needed, that is, the model must outlive the viewer's lifetime.
+ *
+ * @param obj pointer to a glTF viewer object
+ * @param model glTF model to add to the viewer
+ * @return LV_RESULT_OK if the model was added to the viewer or LV_RESULT_INVALID on failure
+ */
+lv_result_t lv_gltf_add_model(lv_obj_t * obj, lv_gltf_model_t * model);
+
+/**
  * Get the number of models loaded in the glTF viewer
  * @param obj pointer to a glTF viewer object
  * @return the total number of models in the viewer
@@ -107,7 +107,7 @@ size_t lv_gltf_get_model_count(lv_obj_t * obj);
  * @param id index of the model to retrieve (0-based)
  * @return pointer to the model at the specified index, or NULL if index is invalid
  */
-lv_gltf_model_t * lv_gltf_get_model_by_index(lv_obj_t * obj, size_t id);
+lv_gltf_model_t * lv_gltf_get_model_by_index(const lv_obj_t * obj, size_t id);
 
 /**
  * Get the primary model from the glTF viewer
@@ -116,7 +116,7 @@ lv_gltf_model_t * lv_gltf_get_model_by_index(lv_obj_t * obj, size_t id);
  * @param obj pointer to a glTF viewer object
  * @return pointer to the primary model, or NULL if no models are loaded
  */
-lv_gltf_model_t * lv_gltf_get_primary_model(lv_obj_t * obj);
+lv_gltf_model_t * lv_gltf_get_primary_model(const lv_obj_t * obj);
 
 /**
  * Set the yaw (horizontal rotation) of the camera
@@ -273,6 +273,8 @@ uint32_t lv_gltf_get_camera(const lv_obj_t * obj);
 uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj);
 
 /**
+ * DEPRECATED. See `lv_gltf_model_set_animation_speed`
+ *
  * Set the animation speed ratio
  *
  * The actual ratio is the value parameter / LV_GLTF_ANIM_SPEED_NORMAL
@@ -285,6 +287,8 @@ uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj);
 void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value);
 
 /**
+ * DEPRECATED. See `lv_gltf_model_get_animation_speed`
+ *
  * Get the animation speed ratio
  *
  * The actual ratio is the return value / LV_GLTF_ANIM_SPEED_NORMAL
@@ -376,20 +380,22 @@ lv_gltf_aa_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj);
  ***********************/
 
 /**
+ * Get the point that a given ray intersects with a specified plane at, if any
+ * @param ray the intersection test ray
+ * @param screen_y the plane to test ray intersection with
+ * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
+ * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
+ */
+lv_result_t lv_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
+                                        lv_3dpoint_t * collision_point);
+
+/**
  * Get a plane that faces the current view camera, centered some units in front of it
  * @param obj pointer to a GLTF viewer object
  * @param distance distance in front of the camera to set the plane, in world units. see lv_gltf_get_world_distance to get the auto-distance
  * @return camera facing plane
  */
 lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance);
-
-/**
- * Get a plane that faces upward, centered at a given height
- * @param obj pointer to a GLTF viewer object
- * @param elevation elevation of the ground plane, in world units. this is usually zero
- * @return ground plane
- */
-lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
 
 /**
  * Calculates a ray originating from the camera and passing through the specified mouse position on the screen.
@@ -399,15 +405,6 @@ lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
  */
 lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos);
 
-/**
- * Get the point that a given ray intersects with a specified plane at, if any
- * @param ray the intersection test ray
- * @param screen_y the plane to test ray intersection with
- * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
- * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
- */
-lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
-                                             lv_3dpoint_t * collision_point);
 
 /**
  * Get the screen position of a 3d point

@@ -6,13 +6,17 @@ on:
 
 name: Create Release
 
+# Permissions required to create a release and upload assets
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Create Release
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -25,3 +29,39 @@ jobs:
             See the [CHANGELOG](https://github.com/lvgl/lvgl/blob/master/docs/CHANGELOG.rst)
           draft: false
           prerelease: false
+
+
+      # Remove large folders and create a lite zip
+      - name: Prepare Lite Package
+        run: |
+          echo "Preparing lite package in a temporary directory..."
+          
+          # Create a temporary directory for the lite package contents
+          FOLDER_NAME="lvgl-${{ github.ref_name }}-lite"
+          ZIP_NAME="$FOLDER_NAME.zip"
+          mkdir -p $FOLDER_NAME
+          
+          echo "Copying files to lite directory (excluding large/unnecessary folders)..."
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='tests' \
+            --exclude='demos' \
+            --exclude='scripts' \
+            --exclude='docs' \
+            --exclude='examples' \
+            ./ $FOLDER_NAME
+          
+          # Create a zip with lvgl-lite directory as its root directory
+          zip -r "$ZIP_NAME" $FOLDER_NAME 
+          
+          # Export the variable for the next step
+          echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+
+      # Upload the lite zip to the release
+      - name: Upload Lite Asset
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ./${{ env.ZIP_NAME }}

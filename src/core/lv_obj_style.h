@@ -30,19 +30,22 @@ extern "C" {
  * OR-ed values are possible
  */
 typedef enum {
-    LV_STATE_DEFAULT     = 0x0000,
-    LV_STATE_CHECKED     = 0x0001,
-    LV_STATE_FOCUSED     = 0x0002,
-    LV_STATE_FOCUS_KEY   = 0x0004,
-    LV_STATE_EDITED      = 0x0008,
-    LV_STATE_HOVERED     = 0x0010,
-    LV_STATE_PRESSED     = 0x0020,
-    LV_STATE_SCROLLED    = 0x0040,
-    LV_STATE_DISABLED    = 0x0080,
-    LV_STATE_USER_1      = 0x1000,
-    LV_STATE_USER_2      = 0x2000,
-    LV_STATE_USER_3      = 0x4000,
-    LV_STATE_USER_4      = 0x8000,
+    LV_STATE_DEFAULT     = 0,
+    LV_STATE_ALT         = 1 << 0,
+    /*1 reserved*/
+    LV_STATE_CHECKED     = 1 << 2,
+    LV_STATE_FOCUSED     = 1 << 3,
+    LV_STATE_FOCUS_KEY   = 1 << 4,
+    LV_STATE_EDITED      = 1 << 5,
+    LV_STATE_HOVERED     = 1 << 6,
+    LV_STATE_PRESSED     = 1 << 7,
+    LV_STATE_SCROLLED    = 1 << 8,
+    LV_STATE_DISABLED    = 1 << 9,
+    /*2 reserved*/
+    LV_STATE_USER_1      = 1 << 12,
+    LV_STATE_USER_2      = 1 << 13,
+    LV_STATE_USER_3      = 1 << 14,
+    LV_STATE_USER_4      = 1 << 15,
 
     LV_STATE_ANY         = 0xFFFF,  /**< Special value can be used in some functions to target all states*/
 } lv_state_t;
@@ -136,6 +139,15 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
  * @endcode
  */
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
+
+
+/**
+ * Remove all styles added by a theme from a widget
+ * @param selector  OR-ed values of states and a part to remove only styles with matching selectors.
+ *                  LV_STATE_ANY and LV_PART_ANY can be used
+ * @param obj   pointer to a widget
+ */
+void lv_obj_remove_theme(lv_obj_t * obj, lv_style_selector_t selector);
 
 /**
  * Remove all styles from an object

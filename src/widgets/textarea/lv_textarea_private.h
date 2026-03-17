@@ -34,7 +34,7 @@ struct _lv_textarea_t {
     char * placeholder_txt;      /**< Place holder label. only visible if text is an empty string */
     char * pwd_tmp;              /**< Used to store the original text in password mode */
     char * pwd_bullet;           /**< Replacement characters displayed in password mode */
-    const char * accepted_chars; /**< Only these characters will be accepted. NULL: accept all */
+    char * accepted_chars;       /**< Only these characters will be accepted. NULL: accept all */
     uint32_t max_length;         /**< The max. number of characters. 0: no limit */
     uint32_t pwd_show_time;      /**< Time to show characters in password mode before change them to '*' */
     struct {
@@ -55,6 +55,7 @@ struct _lv_textarea_t {
 #endif
     uint8_t pwd_mode : 1;         /**< Replace characters with '*' */
     uint8_t one_line : 1;         /**< One line mode (ignore line breaks) */
+    uint8_t static_accepted_chars : 1; /**<1: Only a pointer is saved in `accepted_chars` */
 };
 
 

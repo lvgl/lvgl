@@ -7,8 +7,6 @@
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_area_private.h"
-#include "../lv_draw_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -17,6 +15,7 @@
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_math.h"
+#include "../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES

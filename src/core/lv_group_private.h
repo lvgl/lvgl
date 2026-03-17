@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
+#include "../misc/lv_ext_data.h"
 #include "lv_group.h"
 
 /*********************
@@ -29,6 +29,9 @@ extern "C" {
  * They are NOT for laying out objects on a screen (try layouts for that).
  */
 struct _lv_group_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     lv_ll_t obj_ll;        /**< Linked list to store the objects in the group*/
     lv_obj_t ** obj_focus; /**< The object in focus*/
 

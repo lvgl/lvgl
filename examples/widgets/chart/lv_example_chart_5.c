@@ -61,47 +61,63 @@ static void add_faded_area(lv_event_t * e)
     lv_color_t ser_color = lv_chart_get_series_color(obj, ser);
 
     /*Draw a triangle below the line witch some opacity gradient*/
-    lv_draw_line_dsc_t * draw_line_dsc = (lv_draw_line_dsc_t *)lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_line_dsc_t * draw_line_dsc = lv_draw_task_get_line_dsc(draw_task);
     lv_draw_triangle_dsc_t tri_dsc;
-
     lv_draw_triangle_dsc_init(&tri_dsc);
-    tri_dsc.p[0].x = draw_line_dsc->p1.x;
-    tri_dsc.p[0].y = draw_line_dsc->p1.y;
-    tri_dsc.p[1].x = draw_line_dsc->p2.x;
-    tri_dsc.p[1].y = draw_line_dsc->p2.y;
-    tri_dsc.p[2].x = draw_line_dsc->p1.y < draw_line_dsc->p2.y ? draw_line_dsc->p1.x : draw_line_dsc->p2.x;
-    tri_dsc.p[2].y = LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
-    tri_dsc.grad.dir = LV_GRAD_DIR_VER;
 
-    int32_t full_h = lv_obj_get_height(obj);
-    int32_t fract_uppter = (int32_t)(LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - coords.y1) * 255 / full_h;
-    int32_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - coords.y1) * 255 / full_h;
-    tri_dsc.grad.stops[0].color = ser_color;
-    tri_dsc.grad.stops[0].opa = (lv_opa_t)(255 - fract_uppter);
-    tri_dsc.grad.stops[0].frac = 0;
-    tri_dsc.grad.stops[1].color = ser_color;
-    tri_dsc.grad.stops[1].opa = (lv_opa_t)(255 - fract_lower);
-    tri_dsc.grad.stops[1].frac = 255;
+    lv_point_precise_t p1;
+    lv_point_precise_t p2;
+    int32_t i;
+    for(i = 0; i < draw_line_dsc->point_cnt - 1; i++) {
+        p1 = draw_line_dsc->points[i];
+        p2 = draw_line_dsc->points[i + 1];
+        if(p1.x == LV_DRAW_LINE_POINT_NONE ||
+           p1.y == LV_DRAW_LINE_POINT_NONE) {
+            continue;
+        }
+        if(p2.x == LV_DRAW_LINE_POINT_NONE ||
+           p2.y == LV_DRAW_LINE_POINT_NONE) {
+            continue;
+        }
 
-    lv_draw_triangle(base_dsc->layer, &tri_dsc);
+        tri_dsc.p[0].x = p1.x;
+        tri_dsc.p[0].y = p1.y;
+        tri_dsc.p[1].x = p2.x;
+        tri_dsc.p[1].y = p2.y;
+        tri_dsc.p[2].x = p1.y < p2.y ? p1.x : p2.x;
+        tri_dsc.p[2].y = LV_MAX(p1.y, p2.y);
+        tri_dsc.grad.dir = LV_GRAD_DIR_VER;
 
-    /*Draw rectangle below the triangle*/
-    lv_draw_rect_dsc_t rect_dsc;
-    lv_draw_rect_dsc_init(&rect_dsc);
-    rect_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
-    rect_dsc.bg_grad.stops[0].color = ser_color;
-    rect_dsc.bg_grad.stops[0].frac = 0;
-    rect_dsc.bg_grad.stops[0].opa = (lv_opa_t)(255 - fract_lower);
-    rect_dsc.bg_grad.stops[1].color = ser_color;
-    rect_dsc.bg_grad.stops[1].frac = 255;
-    rect_dsc.bg_grad.stops[1].opa = 0;
+        int32_t full_h = lv_obj_get_height(obj);
+        int32_t fract_upper = (int32_t)(LV_MIN(p1.y, p2.y) - coords.y1) * 255 / full_h;
+        int32_t fract_lower = (int32_t)(LV_MAX(p1.y, p2.y) - coords.y1) * 255 / full_h;
+        tri_dsc.grad.stops[0].color = ser_color;
+        tri_dsc.grad.stops[0].opa = (lv_opa_t)(255 - fract_upper);
+        tri_dsc.grad.stops[0].frac = 0;
+        tri_dsc.grad.stops[1].color = ser_color;
+        tri_dsc.grad.stops[1].opa = (lv_opa_t)(255 - fract_lower);
+        tri_dsc.grad.stops[1].frac = 255;
 
-    lv_area_t rect_area;
-    rect_area.x1 = (int32_t)draw_line_dsc->p1.x;
-    rect_area.x2 = (int32_t)draw_line_dsc->p2.x - 1;
-    rect_area.y1 = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
-    rect_area.y2 = (int32_t)coords.y2;
-    lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
+        lv_draw_triangle(base_dsc->layer, &tri_dsc);
+
+        /*Draw rectangle below the triangle*/
+        lv_draw_rect_dsc_t rect_dsc;
+        lv_draw_rect_dsc_init(&rect_dsc);
+        rect_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
+        rect_dsc.bg_grad.stops[0].color = ser_color;
+        rect_dsc.bg_grad.stops[0].frac = 0;
+        rect_dsc.bg_grad.stops[0].opa = (lv_opa_t)(255 - fract_lower);
+        rect_dsc.bg_grad.stops[1].color = ser_color;
+        rect_dsc.bg_grad.stops[1].frac = 255;
+        rect_dsc.bg_grad.stops[1].opa = 0;
+
+        lv_area_t rect_area;
+        rect_area.x1 = (int32_t)p1.x;
+        rect_area.x2 = (int32_t)p2.x - 1;
+        rect_area.y1 = (int32_t)LV_MAX(p1.y, p2.y);
+        rect_area.y2 = (int32_t)coords.y2;
+        lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
+    }
 }
 
 static void hook_division_lines(lv_event_t * e)

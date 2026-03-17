@@ -21,7 +21,7 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
-    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core);
+    lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, NULL);
 }
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,

@@ -79,11 +79,18 @@ typedef struct _lv_shader_program {
     uint32_t id;
 } lv_opengl_shader_program_t;
 
+typedef struct {
+    const char * name;
+    const lv_opengl_shader_define_t * permutations;
+    size_t permutations_len;
+} lv_opengl_shader_params_t;
+
 typedef enum {
     LV_OPENGL_GLSL_VERSION_300ES,
+    LV_OPENGL_GLSL_VERSION_330,
     LV_OPENGL_GLSL_VERSION_100,
     LV_OPENGL_GLSL_VERSION_LAST,
-} lv_opengl_glsl_version;
+} lv_opengl_glsl_version_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -105,12 +112,23 @@ GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager
 void lv_opengl_shader_manager_store_texture(lv_opengl_shader_manager_t * manager, uint32_t hash, GLuint id);
 lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * shader, const char * shader_identifier,
                                                    const lv_opengl_shader_define_t * permutations, size_t permutations_len,
-                                                   lv_opengl_glsl_version glsl_version, uint32_t * out_hash);
+                                                   lv_opengl_glsl_version_t glsl_version, uint32_t * out_hash);
 lv_opengl_shader_program_t * lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
                                                                   uint32_t fragment_shader_hash,
                                                                   uint32_t vertex_shader_hash);
 
-const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version version);
+const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version_t version);
+
+lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program(lv_opengl_shader_manager_t * manager,
+                                                                      const lv_opengl_shader_params_t * frag_shader,
+                                                                      const lv_opengl_shader_params_t * vert_shader,
+                                                                      lv_opengl_glsl_version_t version);
+
+lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program_best_version(
+    lv_opengl_shader_manager_t * manager,
+    const lv_opengl_shader_params_t * frag_shader,
+    const lv_opengl_shader_params_t * vert_shader,
+    const lv_opengl_glsl_version_t * versions, size_t version_count);
 
 /**********************
  *      MACROS

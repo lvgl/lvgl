@@ -1,16 +1,14 @@
 from typing import Union
 import gdb
 
-from lvglgdb.value import Value
+from lvglgdb.value import Value, ValueInput
 
 
 class LVList(Value):
     """LVGL linked list iterator"""
 
-    def __init__(self, ll: Value, nodetype: Union[gdb.Type, str] = None):
-        if not ll:
-            raise ValueError("Invalid linked list")
-        super().__init__(ll)
+    def __init__(self, ll: ValueInput, nodetype: Union[gdb.Type, str] = None):
+        super().__init__(Value.normalize(ll, "lv_ll_t"))
 
         self.nodetype = (
             gdb.lookup_type(nodetype).pointer()
