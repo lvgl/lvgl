@@ -20,6 +20,7 @@ extern "C" {
 
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
+#include "lv_opengles_driver.h"
 
 #if !LV_USE_MATRIX
 #error "LV_USE_OPENGLES requires LV_USE_MATRIX"
@@ -114,6 +115,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+#define LV_OPENGLES_SHADER_NAMES_COUNT 10
+
 typedef struct {
     unsigned int texture;
     const lv_area_t * texture_area;
@@ -128,6 +131,15 @@ typedef struct {
     bool blend_opt;
     const lv_matrix_t * matrix;
 } lv_opengles_render_params_t;
+
+struct _lv_opengles_gl_t {
+    GLuint vertex_buffer_id;
+    GLuint vertex_array_id;
+    GLuint index_buffer_id;
+    GLuint index_buffer_count;
+    GLuint shader_id;
+    GLint shader_location[LV_OPENGLES_SHADER_NAMES_COUNT];
+};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -155,7 +167,8 @@ void lv_opengles_render(const lv_opengles_render_params_t * params);
  * @param h_flip         horizontal flip
  * @param v_flip         vertical flip
  */
-void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+void lv_opengles_render_texture_rbswap(unsigned int texture,
+                                       const lv_area_t * texture_area, lv_opa_t opa,
                                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
                                        bool h_flip, bool v_flip);
 

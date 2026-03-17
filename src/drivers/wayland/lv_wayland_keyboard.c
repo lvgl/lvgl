@@ -1,9 +1,9 @@
 /**
- * @file lv_wl_keyboard.c
+ * @file lv_wayland_keyboard.c
  *
  */
 
-#include "lv_wl_keyboard.h"
+#include "lv_wayland_keyboard.h"
 
 #if LV_USE_WAYLAND
 

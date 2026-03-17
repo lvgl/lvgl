@@ -1,10 +1,10 @@
 /**
- * @file lv_wl_pointer_axis.h
+ * @file lv_wayland_pointer_axis.h
  *
  */
 
-#ifndef LV_WL_POINTER_AXIS_H
-#define LV_WL_POINTER_AXIS_H
+#ifndef LV_WAYLAND_POINTER_AXIS_H
+#define LV_WAYLAND_POINTER_AXIS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,4 +51,4 @@ lv_indev_t * lv_wayland_get_pointeraxis(lv_display_t * display);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_WL_POINTER_AXIS_H*/
+#endif /*LV_WAYLAND_POINTER_AXIS_H*/

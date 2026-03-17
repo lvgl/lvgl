@@ -78,7 +78,6 @@ lv_opengles_egl_t * lv_opengles_egl_context_create(const lv_egl_interface_t * in
         lv_free(ctx);
         return NULL;
     }
-    lv_opengles_init();
     return ctx;
 }
 
@@ -134,6 +133,17 @@ void lv_opengles_egl_update(lv_opengles_egl_t * ctx)
     ctx->interface.flip_cb(ctx->interface.driver_data, ctx->vsync);
 }
 
+lv_result_t lv_opengles_egl_context_make_current(lv_opengles_egl_t * ctx)
+{
+    bool res = eglMakeCurrent(ctx->egl_display, ctx->egl_surface, ctx->egl_surface,
+                              ctx->egl_context);
+    if(!res) {
+        return LV_RESULT_INVALID;
+    }
+    lv_opengles_context_bind(ctx->gl_ctx);
+    return LV_RESULT_OK;
+}
+
 
 /**********************
 *   STATIC FUNCTIONS
@@ -170,7 +180,11 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
         goto err;
     }
 
-    ctx->egl_display = create_egl_display(ctx);
+    static EGLDisplay egl_display = 0;
+    if(!egl_display) {
+        egl_display = create_egl_display(ctx);
+    }
+    ctx->egl_display = egl_display;
     if(!ctx->egl_display) {
         LV_LOG_ERROR("Failed to create egl display");
         goto egl_display_err;
@@ -229,9 +243,15 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
         LV_LOG_ERROR("Failed to load load OpenGL entry points");
         goto load_opengl_functions_err;
     }
+    ctx->gl_ctx = lv_opengles_context_create();
+    if(!ctx->gl_ctx) {
+        LV_LOG_ERROR("Failed to create an OpenGL context");
+        goto gl_context_err;
+    }
 
     return LV_RESULT_OK;
 
+gl_context_err:
 load_opengl_functions_err:
     eglMakeCurrent(ctx->egl_display, NULL, NULL, NULL);
     eglDestroyContext(ctx->egl_display, ctx->egl_context);
@@ -451,8 +471,9 @@ static EGLContext create_egl_context(lv_opengles_egl_t * ctx)
         EGL_CONTEXT_CLIENT_VERSION, 2,
         EGL_NONE
     };
+    EGLContext context = ctx->interface.share_context ? ctx->interface.share_context->egl_context : EGL_NO_CONTEXT;
     return eglCreateContext(ctx->egl_display, ctx->egl_config,
-                            EGL_NO_CONTEXT, context_attribs);
+                            context, context_attribs);
 }
 
 lv_color_format_t lv_opengles_egl_color_format_from_egl_config(const lv_egl_config_t * config)

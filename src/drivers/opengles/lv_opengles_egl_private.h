@@ -70,6 +70,7 @@ struct _lv_egl_interface {
     lv_create_window_t create_window_cb;
     lv_destroy_window_t destroy_window_cb;
     lv_egl_flip_t flip_cb;
+    lv_opengles_egl_t * share_context;
 };
 
 
@@ -81,6 +82,7 @@ struct _lv_opengles_egl {
     EGLSurface egl_surface;
     void * egl_lib_handle;
     void * opengl_lib_handle;
+    lv_opengles_gl_t * gl_ctx;
     lv_egl_interface_t interface;
     int32_t width;
     int32_t height;

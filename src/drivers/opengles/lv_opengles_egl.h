@@ -40,6 +40,8 @@ typedef struct _lv_egl_config lv_egl_config_t;
 lv_opengles_egl_t * lv_opengles_egl_context_create(const lv_egl_interface_t * interface);
 lv_color_format_t lv_opengles_egl_color_format_from_egl_config(const lv_egl_config_t * config);
 
+lv_result_t lv_opengles_egl_context_make_current(lv_opengles_egl_t * ctx);
+
 void lv_opengles_egl_update(lv_opengles_egl_t * ctx);
 void lv_opengles_egl_clear(lv_opengles_egl_t * ctx);
 void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx);

@@ -19,6 +19,7 @@ extern "C" {
 #if LV_USE_OPENGLES
 
 #include "lv_opengles_texture.h"
+#include "lv_opengles_driver.h"
 
 /*********************
  *      DEFINES
