@@ -27,6 +27,7 @@ LVGL's GStreamer implementation provides comprehensive media playback capabiliti
 * Video4Linux2 (V4L2) camera devices on Linux
 * Audio capture from ALSA and PulseAudio devices
 * Test sources for audio and video development
+* WebRTC streaming for real-time communication applications
 
 **URI Scheme Support:**
 
@@ -41,6 +42,10 @@ Using the URI factory (:c:macro:`LV_GSTREAMER_FACTORY_URI_DECODE`), you can spec
 * **Audio devices**: ``alsa://hw:0,0``, ``pulse://default``
 
 GStreamer's ``uridecodebin`` automatically selects the appropriate source element and decoder based on the URI scheme and media format.
+
+.. note::
+
+   WebRTC streaming is supported via a dedicated WebRTC source factory (for example, ``webrtcsrc``) configured with a signalling URI (for example, ``signaller::uri``), and is not provided through :c:macro:`LV_GSTREAMER_FACTORY_URI_DECODE` / ``uridecodebin``.
 
 **Playback Control:**
 
@@ -255,6 +260,15 @@ The GStreamer widget supports various media sources through different factories:
                          "/path/to/video.mp4");
 
 
+**WebRTC Factory:**
+
+.. code-block:: c
+
+    /* WebRTC stream */
+    lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_WEBRTCSRC,
+                         LV_GSTREAMER_PROPERTY_WEBRTCSRC,
+                         "ws://signalserver:port/");
+
 Playback Control
 ----------------
 
@@ -325,6 +339,20 @@ Once media is loaded (LV_EVENT_READY), you can access:
 - Current playback position via ``lv_gstreamer_get_position()``
 - Current volume level via ``lv_gstreamer_get_volume()``
 - Current playback state via ``lv_gstreamer_get_state()``
+
+WebRTC Notes
+************
+
+WebRTC is using the Rust plugin "https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs"
+So to be able to stream to an LVGL player application you will need to run a signaller server and then a simpler pipeline like so:
+
+.. code-block:: bash
+
+    ./gst-webrtc-signalling-server &
+    gst-launch-1.0 videotestsrc pattern=ball ! webrtcsink
+
+Then, in your LVGL application, configure WebRTC by passing the signalling server URI (for example, ``ws://localhost:8443``) to ``lv_gstreamer_set_src(..., LV_GSTREAMER_PROPERTY_WEBRTCSRC, ...)``.
+
 
 .. _gstreamer_example:
 
