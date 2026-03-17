@@ -14,7 +14,7 @@ The default color format of the display is set according to :c:macro:`LV_COLOR_D
 - :c:macro:`LV_COLOR_DEPTH` ``1``: I1 (1 bit/pixel) Only support for horizontal mapped buffers. See :ref:`display_monochrome` for more details:
 
 The ``color_format`` can be changed with
-:cpp:expr:`lv_display_set_color_depth(display, LV_COLOR_FORMAT_...)`.
+:cpp:expr:`lv_display_set_color_format(display, LV_COLOR_FORMAT_...)`.
 Besides the default value :c:macro:`LV_COLOR_FORMAT_ARGB8888`, other formats can be used as well.
 
 It's very important that draw buffer(s) should be large enough for the
