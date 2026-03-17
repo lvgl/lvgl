@@ -7,6 +7,18 @@ from lvglgdb.value import Value, ValueInput
 class LVList(Value):
     """LVGL linked list iterator"""
 
+    _DISPLAY_SPEC = {
+        "info": [
+            ("_title", lambda d: "Linked List Info:"),
+            ("Address", "addr"),
+            ("Node Size", "n_size"),
+            ("Node Count", "node_count"),
+            ("_skip_if", "nodetype", None, ("Node Type", "nodetype")),
+        ],
+        "table": [],
+        "empty_msg": "",
+    }
+
     def __init__(self, ll: ValueInput, nodetype: Union[gdb.Type, str] = None):
         super().__init__(Value.normalize(ll, "lv_ll_t"))
 
@@ -49,3 +61,15 @@ class LVList(Value):
             len += 1
             node = self._next(node)
         return len
+
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+
+        d = {
+            "addr": hex(int(self)),
+            "n_size": int(self.n_size),
+            "node_count": self.len,
+            "nodetype": str(self.nodetype) if self.nodetype else None,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+

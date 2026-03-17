@@ -2,6 +2,7 @@ import gdb
 
 from lvglgdb.lvgl import curr_inst
 from lvglgdb.lvgl.misc.lv_fs import LVFsDrv
+from lvglgdb.lvgl.formatter import print_spec_table
 
 
 class DumpFsDrv(gdb.Command):
@@ -13,4 +14,9 @@ class DumpFsDrv(gdb.Command):
         )
 
     def invoke(self, args, from_tty):
-        LVFsDrv.print_entries(curr_inst().fs_drivers())
+        drivers = curr_inst().fs_drivers()
+        snaps = LVFsDrv.snapshots(drivers)
+        if snaps:
+            print_spec_table(snaps)
+        else:
+            print(LVFsDrv._DISPLAY_SPEC["empty_msg"])

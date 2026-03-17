@@ -1,5 +1,4 @@
 import gdb
-from prettytable import PrettyTable
 from lvglgdb.value import Value
 from .lv_cache import LVCache
 from .lv_cache_entry import LVCacheEntry
@@ -34,29 +33,32 @@ class LVImageHeaderCacheData(Value):
 
 
 class LVImageHeaderCache(object):
+    _DISPLAY_SPEC = {
+        "info": [
+            ("size", "size"),
+            ("cf", lambda d: str(d["cf"])),
+            ("rc", lambda d: str(d["ref_count"])),
+            ("type", "src_type"),
+            ("decoder", "decoder_name"),
+            ("src", "src"),
+        ],
+        "table": [],
+        "empty_msg": "",
+    }
+
     def __init__(self, cache: Value):
         self._cache = LVCache(cache, "lv_image_header_cache_data_t")
 
-    def print_info(self):
-        self._cache.print_info()
+    def snapshot(self):
+        return self._cache.snapshot()
 
-    def print_entries(self):
-        """Print image header cache entries using prettytable format"""
+    def snapshots(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+
         iterator = iter(self._cache)
-        extra_fields = iterator.extra_fields
-
-        table = PrettyTable()
-        fields = (
-            ["entry"] + extra_fields + ["size", "cf", "rc", "type", "decoder", "src"]
-        )
-        table.field_names = fields
-        table.align = "r"
-        table.align["src"] = "l"
-        table.align["type"] = "c"
+        result = []
 
         for entry in iterator:
-            entry: LVCacheEntry
-
             data_ptr = entry.get_data()
             if not data_ptr:
                 continue
@@ -97,21 +99,22 @@ class LVImageHeaderCache(object):
             except gdb.error as e:
                 src_str = src_str or str(e)
 
-            row = (
-                [f"{int(entry):#x}"]
-                + iterator.get_extra(entry)
-                + [
-                    size_str,
-                    f"{cf}",
-                    f"{ref_cnt}",
-                    type_str,
-                    decoder_name,
-                    src_str,
-                ]
-            )
-            table.add_row(row)
+            extras = dict(zip(iterator.extra_fields, iterator.get_extra(entry)))
+            d = {
+                "entry_addr": f"{int(entry):#x}",
+                "extra_fields": extras,
+                "size": size_str,
+                "cf": cf,
+                "ref_count": ref_cnt,
+                "src_type": type_str,
+                "decoder_name": decoder_name,
+                "src": src_str,
+            }
+            result.append(Snapshot(d, source=entry,
+                                   display_spec=self._DISPLAY_SPEC))
 
-        print(table)
+        self._last_extra_fields = iterator.extra_fields
+        return result
 
     @staticmethod
     def _check_header_entry(entry):

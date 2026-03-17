@@ -144,20 +144,14 @@ class LVCacheLRURB(LVCache):
         super().__init__(cache, datatype)
         self.cache_base = Value(self)
 
-    def print_info(self):
-        """Dump LRU RB cache information"""
-        print(f"LRU RB Cache Info:")
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
 
-        # Try to get cache class info
-        try:
-            clz = self.clz
-            if clz:
-                print(f"  Cache Class: {clz}")
-                # Check if it's LRU RB based
-                if "lru_rb" in str(clz).lower():
-                    print(f"  Type: LRU with Red-Black Tree")
-        except:
-            pass
+        base = super().snapshot()
+        d = base.as_dict()
+        d["type"] = "lru_rb"
+        return Snapshot(d, source=self,
+                       display_spec=getattr(base, "_display_spec", None))
 
     def is_count_based(self):
         """Check if this is count-based LRU cache"""
@@ -185,9 +179,3 @@ class LVCacheLRURB(LVCache):
         for entry in self:
             entries.append(entry)
         return entries
-
-
-def dump_lru_rb_cache_info(cache: ValueInput):
-    """Dump LRU RB cache information"""
-    cache_obj = LVCacheLRURB(cache)
-    cache_obj.print_info()

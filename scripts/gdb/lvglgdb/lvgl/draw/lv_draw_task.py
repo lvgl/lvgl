@@ -1,11 +1,24 @@
-from prettytable import PrettyTable
-
 from lvglgdb.value import Value, ValueInput
 from .lv_draw_consts import DRAW_TASK_TYPE_NAMES, DRAW_TASK_STATE_NAMES
 
 
 class LVDrawTask(Value):
     """LVGL draw task wrapper"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("type", "type_name"),
+            ("state", "state_name"),
+            ("area", lambda d: (
+                f"({d['area']['x1']}, {d['area']['y1']}, "
+                f"{d['area']['x2']}, {d['area']['y2']})"
+            )),
+            ("opa", "opa"),
+            ("unit_id", "preferred_draw_unit_id"),
+        ],
+        "table": [],
+        "empty_msg": "No draw tasks.",
+    }
 
     def __init__(self, task: ValueInput):
         super().__init__(Value.normalize(task, "lv_draw_task_t"))
@@ -29,7 +42,7 @@ class LVDrawTask(Value):
     @property
     def area(self) -> tuple:
         a = self.super_value("area")
-        return (int(a["x1"]), int(a["y1"]), int(a["x2"]), int(a["y2"]))
+        return (int(a.x1), int(a.y1), int(a.x2), int(a.y2))
 
     @property
     def opa(self) -> int:
@@ -50,26 +63,22 @@ class LVDrawTask(Value):
     def preferred_draw_unit_id(self) -> int:
         return int(self.super_value("preferred_draw_unit_id"))
 
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+
+        x1, y1, x2, y2 = self.area
+        d = {
+            "addr": hex(int(self)),
+            "type": self.type,
+            "type_name": self.type_name,
+            "state": self.state,
+            "state_name": self.state_name,
+            "area": {"x1": x1, "y1": y1, "x2": x2, "y2": y2},
+            "opa": self.opa,
+            "preferred_draw_unit_id": self.preferred_draw_unit_id,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+
     @staticmethod
-    def print_entries(tasks):
-        """Print draw tasks as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = ["#", "type", "state", "area", "opa", "unit_id"]
-        table.align = "l"
-
-        for i, t in enumerate(tasks):
-            table.add_row(
-                [
-                    i,
-                    t.type_name,
-                    t.state_name,
-                    t.area,
-                    t.opa,
-                    t.preferred_draw_unit_id,
-                ]
-            )
-
-        if not table.rows:
-            print("No draw tasks.")
-        else:
-            print(table)
+    def snapshots(tasks):
+        return [t.snapshot() for t in tasks]

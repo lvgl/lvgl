@@ -2,6 +2,7 @@ import gdb
 
 from lvglgdb.lvgl import curr_inst
 from lvglgdb.lvgl.misc.lv_timer import LVTimer
+from lvglgdb.lvgl.formatter import print_spec_table
 
 
 class DumpTimer(gdb.Command):
@@ -13,4 +14,9 @@ class DumpTimer(gdb.Command):
         )
 
     def invoke(self, args, from_tty):
-        LVTimer.print_entries(curr_inst().timers())
+        timers = curr_inst().timers()
+        snaps = LVTimer.snapshots(timers)
+        if snaps:
+            print_spec_table(snaps)
+        else:
+            print(LVTimer._DISPLAY_SPEC["empty_msg"])

@@ -1,11 +1,21 @@
-from prettytable import PrettyTable
-
 from lvglgdb.value import Value, ValueInput
 from ..misc.lv_ll import LVList
 
 
 class LVGroup(Value):
     """LVGL focus group wrapper"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("objects", "obj_count"),
+            ("frozen", "frozen"),
+            ("editing", "editing"),
+            ("wrap", "wrap"),
+            ("focused", "focused"),
+        ],
+        "table": [],
+        "empty_msg": "No focus groups.",
+    }
 
     def __init__(self, group: ValueInput):
         super().__init__(Value.normalize(group, "lv_group_t"))
@@ -55,34 +65,38 @@ class LVGroup(Value):
         for obj_ptr in LVList(self.obj_ll, "lv_obj_t"):
             yield LVObject(obj_ptr)
 
-    @staticmethod
-    def print_entries(groups):
-        """Print focus groups as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = ["#", "objects", "frozen", "editing", "wrap", "focused"]
-        table.align = "l"
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
 
-        for i, group in enumerate(groups):
-            focus = group.obj_focus
-            if focus:
-                from .lv_obj import LVObject
+        focus = self.obj_focus
+        if focus:
+            from .lv_obj import LVObject
 
-                focus_obj = LVObject(focus)
-                focus_str = f"{focus_obj.class_name}@{int(focus):x}"
-            else:
-                focus_str = "(none)"
-            table.add_row(
-                [
-                    i,
-                    group.obj_count,
-                    group.frozen,
-                    group.editing,
-                    group.wrap,
-                    focus_str,
-                ]
-            )
-
-        if not table.rows:
-            print("No focus groups.")
+            focus_obj = LVObject(focus)
+            focus_str = f"{focus_obj.class_name}@{int(focus):x}"
+            focused_addr = hex(int(focus))
         else:
-            print(table)
+            focus_str = "(none)"
+            focused_addr = None
+
+        member_addrs = []
+        for obj_ptr in LVList(self.obj_ll, "lv_obj_t"):
+            addr = int(obj_ptr)
+            if addr:
+                member_addrs.append(hex(addr))
+
+        d = {
+            "addr": hex(int(self)),
+            "obj_count": self.obj_count,
+            "frozen": self.frozen,
+            "editing": self.editing,
+            "wrap": self.wrap,
+            "focused": focus_str,
+            "focused_addr": focused_addr,
+            "member_addrs": member_addrs,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+
+    @staticmethod
+    def snapshots(groups):
+        return [group.snapshot() for group in groups]

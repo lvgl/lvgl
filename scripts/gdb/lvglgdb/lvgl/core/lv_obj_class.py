@@ -1,5 +1,4 @@
 import gdb
-from prettytable import PrettyTable
 
 from lvglgdb.value import Value, ValueInput
 from ..misc.lv_utils import format_coord
@@ -7,6 +6,37 @@ from ..misc.lv_utils import format_coord
 
 class LVObjClass(Value):
     """LVGL object class wrapper"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("_title", lambda d: (
+                f"ObjClass: {' -> '.join(d.get('class_chain', [d['name']]))}"
+            )),
+            ("name", "name"),
+            ("base", "base_class"),
+            ("size", lambda d: (
+                f"{d['instance_size']} editable={d['editable']}"
+                f" group_def={d['group_def']}"
+            )),
+            ("editable", "editable"),
+            ("group_def", "group_def"),
+            ("default_size", lambda d: (
+                f"({d['width_def_str']}, {d['height_def_str']})"
+                f" theme_inheritable={d['theme_inheritable']}"
+            )),
+            ("theme_inh", "theme_inheritable"),
+            ("_skip_if", "constructor_cb", "-", "constructor_cb"),
+            ("_skip_if", "destructor_cb", "-", "destructor_cb"),
+            ("_skip_if", "event_cb", "-", "event_cb"),
+        ],
+        "table": [
+            ("size", "instance_size"),
+            ("default_size", lambda d: (
+                f"({d['width_def_str']}, {d['height_def_str']})"
+            )),
+        ],
+        "empty_msg": "No object classes found.",
+    }
 
     def __init__(self, cls: ValueInput):
         super().__init__(Value.normalize(cls, "lv_obj_class_t"))
@@ -87,63 +117,30 @@ class LVObjClass(Value):
                     pass
         return classes
 
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import fmt_cb
+
+        base = self.base_class
+        d = {
+            "addr": hex(int(self)),
+            "name": self.name,
+            "base_class": base.name if base else "-",
+            "instance_size": self.instance_size,
+            "editable": self.editable,
+            "group_def": self.group_def,
+            "width_def": self.width_def,
+            "height_def": self.height_def,
+            "width_def_str": format_coord(self.width_def),
+            "height_def_str": format_coord(self.height_def),
+            "theme_inheritable": self.theme_inheritable,
+            "constructor_cb": fmt_cb(self.constructor_cb),
+            "destructor_cb": fmt_cb(self.destructor_cb),
+            "event_cb": fmt_cb(self.event_cb),
+            "class_chain": [c.name for c in self.__iter__()],
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+
     @staticmethod
-    def print_entries(classes):
-        """Print object classes as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = [
-            "#",
-            "name",
-            "base",
-            "size",
-            "editable",
-            "group_def",
-            "default_size",
-            "theme_inh",
-        ]
-        table.align = "l"
-
-        for i, cls in enumerate(classes):
-            base = cls.base_class
-            base_name = base.name if base else "-"
-            table.add_row(
-                [
-                    i,
-                    cls.name,
-                    base_name,
-                    cls.instance_size,
-                    cls.editable,
-                    cls.group_def,
-                    f"({format_coord(cls.width_def)}, {format_coord(cls.height_def)})",
-                    cls.theme_inheritable,
-                ]
-            )
-
-        if not table.rows:
-            print("No object classes found.")
-        else:
-            print(table)
-
-    def print_info(self):
-        chain = list(self.__iter__())
-        names = [c.name for c in chain]
-        print(f"ObjClass: {' -> '.join(names)}")
-        print(
-            f"  size={self.instance_size} editable={self.editable} group_def={self.group_def}"
-        )
-        w = format_coord(self.width_def)
-        h = format_coord(self.height_def)
-        print(f"  default_size=({w}, {h}) theme_inheritable={self.theme_inheritable}")
-        ctor = int(self.constructor_cb)
-        dtor = int(self.destructor_cb)
-        evt = int(self.event_cb)
-        if ctor:
-            print(
-                f"  constructor_cb = {self.constructor_cb.format_string(symbols=True)}"
-            )
-        if dtor:
-            print(
-                f"  destructor_cb  = {self.destructor_cb.format_string(symbols=True)}"
-            )
-        if evt:
-            print(f"  event_cb       = {self.event_cb.format_string(symbols=True)}")
+    def snapshots(classes):
+        return [cls.snapshot() for cls in classes]

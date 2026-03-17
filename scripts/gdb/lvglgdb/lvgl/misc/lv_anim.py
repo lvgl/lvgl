@@ -1,18 +1,51 @@
-from prettytable import PrettyTable
-
 from lvglgdb.value import Value, ValueInput
-
-
-def _fmt_cb(cb: Value) -> str:
-    """Format a callback pointer as symbol or hex."""
-    addr = int(cb)
-    if not addr:
-        return "-"
-    return cb.format_string(symbols=True, address=True)
 
 
 class LVAnim(Value):
     """LVGL animation wrapper"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("_title", lambda d: f"Animation @{d['addr']}"),
+            "var",
+            "exec_cb",
+            "path_cb",
+            "start_cb",
+            "completed_cb",
+            "deleted_cb",
+            "user_data",
+            ("value", lambda d: (
+                f"{d['start_value']} -> {d['current_value']}"
+                f" -> {d['end_value']}"
+            )),
+            ("duration", lambda d: (
+                f"{d['duration']}ms  act_time={d['act_time']}ms"
+            )),
+            ("repeat", lambda d: (
+                f"{'inf' if d['repeat_cnt'] == 0xFFFFFFFF else d['repeat_cnt']}"
+                f"  repeat_delay={d['repeat_delay']}ms"
+            )),
+            ("reverse", lambda d: (
+                f"dur={d['reverse_duration']}ms"
+                f"  delay={d['reverse_delay']}ms"
+            )),
+            ("status", lambda d: (
+                f"{d['status']}  early_apply={d['early_apply']}"
+            )),
+        ],
+        "table": [
+            ("value(start/cur/end)", lambda d: (
+                f"{d['start_value']}/{d['current_value']}/{d['end_value']}"
+            )),
+            ("duration", lambda d: f"{d['duration']}ms"),
+            ("act_time", lambda d: f"{d['act_time']}ms"),
+            ("repeat", lambda d: (
+                "inf" if d["repeat_cnt"] == 0xFFFFFFFF
+                else str(d["repeat_cnt"])
+            )),
+        ],
+        "empty_msg": "No active animations.",
+    }
 
     def __init__(self, anim: ValueInput):
         super().__init__(Value.normalize(anim, "lv_anim_t"))
@@ -101,61 +134,34 @@ class LVAnim(Value):
             return "reverse"
         return "running"
 
-    def print_info(self):
-        """Print detailed info for a single animation."""
-        print(f"Animation @{hex(int(self))}")
-        print(f"  var          = {self.var}")
-        print(f"  exec_cb      = {_fmt_cb(self.exec_cb)}")
-        print(f"  path_cb      = {_fmt_cb(self.path_cb)}")
-        print(f"  start_cb     = {_fmt_cb(self.start_cb)}")
-        print(f"  completed_cb = {_fmt_cb(self.completed_cb)}")
-        print(f"  deleted_cb   = {_fmt_cb(self.deleted_cb)}")
-        print(f"  user_data    = {self.user_data}")
-        print(
-            f"  value        = {self.start_value} -> {self.current_value} -> {self.end_value}"
-        )
-        print(f"  duration     = {self.duration}ms  act_time={self.act_time}ms")
-        repeat = "inf" if self.repeat_cnt == 0xFFFFFFFF else str(self.repeat_cnt)
-        print(f"  repeat       = {repeat}  repeat_delay={self.repeat_delay}ms")
-        print(
-            f"  reverse      = dur={self.reverse_duration}ms  delay={self.reverse_delay}ms"
-        )
-        print(f"  status       = {self._status_str()}  early_apply={self.early_apply}")
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import fmt_cb, ptr_or_none
+
+        d = {
+            "addr": hex(int(self)),
+            "var": str(self.var),
+            "var_addr": ptr_or_none(self.var),
+            "exec_cb": fmt_cb(self.exec_cb),
+            "path_cb": fmt_cb(self.path_cb),
+            "start_cb": fmt_cb(self.start_cb),
+            "completed_cb": fmt_cb(self.completed_cb),
+            "deleted_cb": fmt_cb(self.deleted_cb),
+            "user_data": str(self.user_data),
+            "start_value": self.start_value,
+            "current_value": self.current_value,
+            "end_value": self.end_value,
+            "duration": self.duration,
+            "act_time": self.act_time,
+            "repeat_cnt": self.repeat_cnt,
+            "repeat_delay": self.repeat_delay,
+            "reverse_duration": self.reverse_duration,
+            "reverse_delay": self.reverse_delay,
+            "status": self._status_str(),
+            "early_apply": self.early_apply,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
 
     @staticmethod
-    def print_entries(anims):
-        """Print animations as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = [
-            "#",
-            "var",
-            "exec_cb",
-            "value(start/cur/end)",
-            "duration",
-            "act_time",
-            "repeat",
-            "status",
-        ]
-        table.align = "l"
-
-        for i, anim in enumerate(anims):
-            cb_str = _fmt_cb(anim.exec_cb)
-            repeat = "inf" if anim.repeat_cnt == 0xFFFFFFFF else str(anim.repeat_cnt)
-            value_str = f"{anim.start_value}/{anim.current_value}/{anim.end_value}"
-            table.add_row(
-                [
-                    i,
-                    anim.var,
-                    cb_str,
-                    value_str,
-                    f"{anim.duration}ms",
-                    f"{anim.act_time}ms",
-                    repeat,
-                    anim._status_str(),
-                ]
-            )
-
-        if not table.rows:
-            print("No active animations.")
-        else:
-            print(table)
+    def snapshots(anims):
+        return [anim.snapshot() for anim in anims]

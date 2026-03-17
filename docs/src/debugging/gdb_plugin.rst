@@ -25,15 +25,15 @@ Example of usage:
     (gdb) source lvgl/scripts/gdb/gdbinit.py
 
     (gdb) dump obj -L 2
-    obj@0x60700000dd10 (0,0,799,599)
-    tabview@0x608000204ca0 (0,0,799,599)
-        obj@0x607000025da0 (0,0,799,69)
-        obj@0x607000025e80 (0,70,799,599)
-        obj@0x60700002bd70 (743,543,791,591)
-        btn@0x60700002c7f0 (747,547,787,587)
-    keyboard@0x60d0000f7040 (0,300,799,599)
-    dropdown-list@0x608000205420 (0,0,129,129)
-        label@0x60d0000f7ba0 (22,22,56,39)
+    obj@0x60700000dd10 0,0,799,599
+    tabview@0x608000204ca0 0,0,799,599
+        obj@0x607000025da0 0,0,799,69
+        obj@0x607000025e80 0,70,799,599
+        obj@0x60700002bd70 743,543,791,591
+        btn@0x60700002c7f0 747,547,787,587
+    keyboard@0x60d0000f7040 0,300,799,599
+    dropdown-list@0x608000205420 0,0,129,129
+        label@0x60d0000f7ba0 22,22,56,39
     (gdb)
 
 The plugin provides the following commands.
@@ -50,9 +50,10 @@ The plugin provides the following commands.
 - ``dump fs_drv``: List all registered filesystem drivers.
 - ``dump draw_task <expr>``: List draw tasks from a layer.
 - ``info style``: Inspect style properties of an ``lv_style_t`` or an ``lv_obj_t``.
-- ``info draw_unit``: Display all current drawing unit information.
+- ``info draw_unit``: Print raw struct details for each drawing unit.
 - ``info obj_class <expr>``: Show object class hierarchy.
 - ``info subject <expr>``: Show subject and its observers.
+- ``lvglobal``: (NuttX only) Set which LVGL instance to inspect.
 
 .. note::
 
@@ -204,8 +205,13 @@ Example:
 
    (gdb) info obj_class lv_button_class
    ObjClass: lv_button -> lv_obj -> lv_obj
-     size=... editable=0 group_def=2
-     default_size=(CONTENT, CONTENT) theme_inheritable=True
+     name           = lv_button
+     base           = lv_obj
+     size           = 48 editable=0 group_def=2
+     editable       = 0
+     group_def      = 2
+     default_size   = (CONTENT, CONTENT) theme_inheritable=True
+     theme_inh      = True
 
 Inspect Subject
 ***************
@@ -218,4 +224,138 @@ Example:
 
    (gdb) info subject &my_subject
    Subject: type=INT subscribers=2
-     Observer: cb=0x... <my_cb> target=0x... for_obj=True
+     Observer: cb=<my_cb> target=0x... for_obj=True
+
+
+Set LVGL Instance (NuttX)
+*************************
+
+``lvglobal``: Set which LVGL instance to inspect by finding the ``lv_global``
+pointer. On single-instance systems, it auto-detects the global. On NuttX
+multi-process systems, use ``--pid`` to specify the target process.
+
+.. code:: bash
+
+    (gdb) lvglobal
+    (gdb) lvglobal --pid 3
+
+
+Data Export API
+***************
+
+Each wrapper class provides a ``snapshot()`` method that returns a ``Snapshot``
+object containing a pure Python dict (JSON-serializable) plus an optional
+reference to the original wrapper via ``_source``.
+
+.. code:: python
+
+    from lvglgdb import LVTimer, curr_inst
+
+    timers = list(curr_inst().timers())
+    snap = timers[0].snapshot()
+
+    # Dict-like access
+    print(snap["timer_cb"], snap["period"])
+
+    # JSON serialization
+    import json
+    print(json.dumps(snap.as_dict(), indent=2))
+
+    # Bulk export
+    snapshots = LVTimer.snapshots(timers)
+    data = [s.as_dict() for s in snapshots]
+
+The ``Snapshot`` class supports dict-like read access (``[]``, ``keys()``,
+``len()``, ``in``, iteration) and ``as_dict()`` for JSON serialization.
+All values in ``as_dict()`` are pure Python types (``str``, ``int``, ``float``,
+``bool``, ``None``, ``dict``, ``list``) with no ``gdb.Value`` references.
+
+Wrapper classes with ``snapshot()`` support: ``LVAnim``, ``LVTimer``,
+``LVIndev``, ``LVGroup``, ``LVObject``, ``LVObjClass``, ``LVObserver``,
+``LVSubject``, ``LVDrawTask``, ``LVDrawUnit``, ``LVFsDrv``,
+``LVImageDecoder``, ``LVCache``, ``LVDisplay``,
+``LVRedBlackTree``, ``LVEventDsc``, ``LVList``.
+
+``LVStyle`` provides ``snapshots()`` (plural) which returns a list of
+``Snapshot`` objects for each style property, but does not have a singular
+``snapshot()`` method.
+
+Most wrapper classes also provide a static ``snapshots(items)`` method for
+bulk export (e.g. ``LVAnim.snapshots(anims)``). Additionally,
+``LVImageCache`` and ``LVImageHeaderCache`` provide instance-level
+``snapshots()`` methods that export all cache entries.
+
+
+Architecture
+************
+
+The GDB plugin decouples data extraction from display through a snapshot
+abstraction. Each wrapper class (``LVAnim``, ``LVTimer``, ``LVObject``, etc.)
+declares a ``_DISPLAY_SPEC`` describing its fields and exports a ``snapshot()``
+method that returns a self-describing ``Snapshot`` object carrying both the
+data dict and the display spec. The ``cmds/`` layer simply passes snapshots to
+generic formatters (``print_info``, ``print_spec_table``) which read the
+embedded spec to render output — no command needs to know the internal
+structure of any wrapper.
+
+.. mermaid::
+   :zoom:
+
+   graph RL
+        subgraph "cmds/ layer"
+            CMD["GDB Commands<br/>(dump obj, info style, ...)"]
+        end
+
+        subgraph "formatter.py"
+            PI["print_info(snapshot)"]
+            PT["print_table()"]
+            PST["print_spec_table(snapshots)"]
+            RTC["resolve_table_columns(spec)"]
+            PST --> RTC
+            PST --> PT
+        end
+
+        subgraph "snapshot.py"
+            SNAP["Snapshot<br/>._data (pure dict)<br/>._display_spec<br/>._source"]
+        end
+
+        subgraph "data_utils.py"
+            DU["ptr_or_none()<br/>fmt_cb()<br/>..."]
+        end
+
+        subgraph "Wrapper classes"
+            direction TB
+            DS["_DISPLAY_SPEC<br/>{info, table, empty_msg}"]
+            SN["snapshot() → Snapshot"]
+            SNS["snapshots() → list[Snapshot]"]
+            SN --> SNAP
+            SN -. "display_spec=" .-> DS
+            SNS --> SN
+        end
+
+        subgraph "Wrappers"
+            direction LR
+            W1["LVAnim"]
+            W2["LVTimer"]
+            W3["LVCache"]
+            W4["LVObject"]
+            W5["LVGroup"]
+            W6["LVIndev"]
+            W7["...others"]
+        end
+
+        CMD -- "wrapper.snapshot()" --> SN
+        CMD -- "print_info(snap)" --> PI
+        CMD -- "print_spec_table(snaps)" --> PST
+        PI -- "reads _display_spec" --> SNAP
+        PST -- "reads _display_spec" --> SNAP
+        SN -- "uses" --> DU
+        W1 & W2 & W3 & W4 & W5 & W6 & W7 -. "each defines" .-> DS
+
+        style PI fill:#4CAF50,color:#fff
+        style PT fill:#4CAF50,color:#fff
+        style PST fill:#4CAF50,color:#fff
+        style RTC fill:#4CAF50,color:#fff
+        style SNAP fill:#2196F3,color:#fff
+        style DU fill:#FF9800,color:#fff
+        style DS fill:#9C27B0,color:#fff

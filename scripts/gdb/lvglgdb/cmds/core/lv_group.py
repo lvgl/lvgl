@@ -2,6 +2,7 @@ import gdb
 
 from lvglgdb.lvgl import curr_inst
 from lvglgdb.lvgl.core.lv_group import LVGroup
+from lvglgdb.lvgl.formatter import print_spec_table
 
 
 class DumpGroup(gdb.Command):
@@ -13,4 +14,9 @@ class DumpGroup(gdb.Command):
         )
 
     def invoke(self, args, from_tty):
-        LVGroup.print_entries(curr_inst().groups())
+        groups = curr_inst().groups()
+        snaps = LVGroup.snapshots(groups)
+        if snaps:
+            print_spec_table(snaps)
+        else:
+            print(LVGroup._DISPLAY_SPEC["empty_msg"])
