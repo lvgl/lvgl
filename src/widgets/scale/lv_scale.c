@@ -1947,9 +1947,6 @@ static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_sub
 static void scale_line_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     bind_element_needle_t * bind_element = observer->user_data;
-    if(bind_element == NULL || bind_element->needle_line == NULL || !lv_obj_is_valid(bind_element->needle_line)) {
-        return;
-    }
     lv_scale_set_line_needle_value(observer->target, bind_element->needle_line, bind_element->needle_length,
                                    subject->value.num);
 }
@@ -1957,9 +1954,6 @@ static void scale_line_needle_value_observer_cb(lv_observer_t * observer, lv_sub
 static void scale_image_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * needle_img = observer->user_data;
-    if(needle_img == NULL || !lv_obj_is_valid(needle_img)) {
-        return;
-    }
     lv_scale_set_image_needle_value(observer->target, needle_img, subject->value.num);
 }
 
