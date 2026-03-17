@@ -313,8 +313,8 @@ void test_image_contain(void)
 
         const int32_t scale = lv_image_get_scale(img);
         TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
-        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_transformed_width(img));
-        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
+        TEST_ASSERT_EQUAL_INT(((img_w * scale) >> 8) + 1, lv_image_get_transformed_width(img));
+        TEST_ASSERT_EQUAL_INT(((img_h * scale) >> 8) + 1, lv_image_get_transformed_height(img));
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_contain.png");
@@ -342,8 +342,8 @@ void test_image_cover(void)
 
         const int32_t scale = lv_image_get_scale(img);
         TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
-        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_transformed_width(img));
-        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
+        TEST_ASSERT_EQUAL_INT(((img_w * scale) >> 8) + 1, lv_image_get_transformed_width(img));
+        TEST_ASSERT_EQUAL_INT(((img_h * scale) >> 8) + 1, lv_image_get_transformed_height(img));
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_cover.png");
