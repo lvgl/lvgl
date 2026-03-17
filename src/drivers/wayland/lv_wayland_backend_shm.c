@@ -1,5 +1,5 @@
 /**
- * @file lv_wl_shm_backend.c
+ * @file lv_wayland_backend_shm.c
  *
  */
 

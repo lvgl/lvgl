@@ -1,5 +1,5 @@
 /**
- * @file lv_wl_xdg_shell.c
+ * @file lv_wayland_xdg_shell.c
  *
  */
 

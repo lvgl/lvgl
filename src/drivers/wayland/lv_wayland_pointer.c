@@ -1,9 +1,9 @@
 /**
- * @file lv_wl_pointer.c
+ * @file lv_wayland_pointer.c
  *
  */
 
-#include "lv_wl_pointer.h"
+#include "lv_wayland_pointer.h"
 
 #if LV_USE_WAYLAND
 

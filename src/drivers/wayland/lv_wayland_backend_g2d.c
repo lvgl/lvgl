@@ -1,6 +1,5 @@
-
 /**
- * @file lv_wl_g2d_backend.c
+ * @file lv_wayland_backend_g2d.c
  *
  */
 

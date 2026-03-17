@@ -1,5 +1,5 @@
 /**
- * @file lv_wl_seat.c
+ * @file lv_wayland_seat.c
  *
  */
 

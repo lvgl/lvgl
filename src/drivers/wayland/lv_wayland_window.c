@@ -1,12 +1,12 @@
 /**
- * @file lv_wl_window.c
+ * @file lv_wayland_window.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_wl_window.h"
+#include "lv_wayland_window.h"
 
 #if LV_USE_WAYLAND
 
@@ -16,10 +16,10 @@
 #include <string.h>
 #include "lv_wayland_private.h"
 #include "lv_wayland_private.h"
-#include "lv_wl_pointer.h"
-#include "lv_wl_pointer_axis.h"
-#include "lv_wl_touch.h"
-#include "lv_wl_keyboard.h"
+#include "lv_wayland_pointer.h"
+#include "lv_wayland_pointer_axis.h"
+#include "lv_wayland_touch.h"
+#include "lv_wayland_keyboard.h"
 
 /*********************
  *      DEFINES
