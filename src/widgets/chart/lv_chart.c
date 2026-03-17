@@ -1231,8 +1231,8 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
 
         lv_draw_vector_dsc_set_fill_opa(dsc, 0);
         lv_draw_vector_dsc_set_stroke_color(dsc, ser->color);
-        lv_draw_vector_dsc_set_stroke_opa(dsc, LV_OPA_COVER);
-        lv_draw_vector_dsc_set_stroke_width(dsc, 2.0f);
+        lv_draw_vector_dsc_set_stroke_opa(dsc, lv_obj_get_style_line_opa(obj, LV_PART_ITEMS));
+        lv_draw_vector_dsc_set_stroke_width(dsc, (float)lv_obj_get_style_line_width(obj, LV_PART_ITEMS));
         if(dashes[0]) lv_draw_vector_dsc_set_stroke_dash(dsc, dashes, 2);
 
         point_dsc_default.bg_color = ser->color;
