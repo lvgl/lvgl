@@ -221,7 +221,6 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 
 
-#include "../../tests/unity/unity.h"
 /*
  * Renders the vectors paths representing a glyph with ThorVG
  * the result is then blended into the draw buffer
