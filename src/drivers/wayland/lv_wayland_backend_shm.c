@@ -1,5 +1,5 @@
 /**
- * @file lv_wl_shm_backend.c
+ * @file lv_wayland_backend_shm.c
  *
  */
 
@@ -9,7 +9,7 @@
 
 #include "lv_wayland_private.h"
 
-#if LV_WAYLAND_USE_SHM
+#if LV_USE_WAYLAND
 
 #include "../../draw/sw/lv_draw_sw_utils.h"
 #include "../../display/lv_display_private.h"
@@ -87,10 +87,13 @@ static const struct wl_buffer_listener buffer_listener = {
     .release = buffer_release
 };
 
-const lv_wayland_backend_ops_t wl_backend_ops = {
+const lv_wayland_backend_ops_t wl_shm_ops = {
     .init = shm_init,
     .deinit = shm_deinit,
     .global_handler = shm_global_handler,
+};
+
+const lv_wayland_backend_display_ops_t wl_shm_display_ops = {
     .init_display = shm_init_display,
     .deinit_display = shm_deinit_display,
     .resize_display = shm_resize_display,
@@ -454,4 +457,4 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     ddata->curr_wl_buffer_idx = (ddata->curr_wl_buffer_idx + 1) % LV_WL_SHM_BUF_COUNT;
 }
 
-#endif /*LV_WAYLAND_USE_SHM*/
+#endif /*LV_USE_WAYLAND*/

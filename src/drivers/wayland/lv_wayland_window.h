@@ -1,11 +1,11 @@
 
 /**
- * @file lv_wl_window.h
+ * @file lv_wayland_window.h
  *
  */
 
-#ifndef LV_WL_WINDOW_H
-#define LV_WL_WINDOW_H
+#ifndef LV_WAYLAND_WINDOW_H
+#define LV_WAYLAND_WINDOW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,4 +101,4 @@ void lv_wayland_window_set_minimized(lv_display_t * disp);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_WL_WINDOW_H*/
+#endif /*LV_WAYLAND_WINDOW_H*/

@@ -1,9 +1,9 @@
 /**
- * @file lv_wl_touch.c
+ * @file lv_wayland_touch.c
  *
  */
 
-#include "lv_wl_touch.h"
+#include "lv_wayland_touch.h"
 
 #if LV_USE_WAYLAND
 

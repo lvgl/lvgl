@@ -1,4 +1,4 @@
-/** @file lv_wl_egl_backend.c
+/** @file lv_wayland_backend_egl.c
  *
  */
 
@@ -8,7 +8,7 @@
 
 #include "lv_wayland_private.h"
 
-#if LV_WAYLAND_USE_EGL
+#if LV_USE_WAYLAND && LV_USE_OPENGLES
 
 #include "../../display/lv_display_private.h"
 #include "../opengles/lv_opengles_driver.h"
@@ -68,10 +68,13 @@ static const struct wl_callback_listener frame_listener = {
     .done = frame_done,
 };
 
-const lv_wayland_backend_ops_t wl_backend_ops = {
+const lv_wayland_backend_ops_t wl_egl_ops = {
     .init = wl_egl_init,
     .deinit = wl_egl_deinit,
     .global_handler = wl_egl_global_handler,
+};
+
+const lv_wayland_backend_display_ops_t wl_egl_display_ops = {
     .init_display = wl_egl_init_display,
     .deinit_display = wl_egl_deinit_display,
     .resize_display = wl_egl_resize_display,
@@ -420,4 +423,4 @@ static void wl_egl_flip_cb(void * driver_data, bool vsync)
      * through wl_surface_commit() which is called in the flush callback */
 }
 
-#endif /*LV_WAYLAND_USE_EGL*/
+#endif /*LV_USE_WAYLAND && LV_USE_OPENGLES*/
