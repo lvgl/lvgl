@@ -243,7 +243,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
             JRESULT rc = jd_prepare(jd, input_func, jd->pool_original, (size_t)TJPGD_WORKBUFF_SIZE, jd->device);
             if(rc) {
                 LV_LOG_WARN("jd_prepare error: %d", rc);
-            	return LV_RESULT_INVALID;
+                return LV_RESULT_INVALID;
             }
         }
         decoded->data = jd->workbuf;
@@ -274,7 +274,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         rc = jd_restart(jd, jd->rsc++);
         if(rc != JDR_OK) {
             LV_LOG_WARN("jd_restart error: %d", rc);
-        	return LV_RESULT_INVALID;
+            return LV_RESULT_INVALID;
         }
         jd->rst = 1;
     }
@@ -283,14 +283,14 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     rc = jd_mcu_load(jd);
     if(rc != JDR_OK) {
         LV_LOG_WARN("jd_mcu_load error: %d", rc);
-    	return LV_RESULT_INVALID;
+        return LV_RESULT_INVALID;
     }
 
     /* Output the MCU (YCbCr to RGB, scaling and output) */
     rc = jd_mcu_output(jd, NULL, decoded_area->x1, decoded_area->y1);
     if(rc != JDR_OK) {
         LV_LOG_WARN("jd_mcu_output error: %d", rc);
-    	return LV_RESULT_INVALID;
+        return LV_RESULT_INVALID;
     }
 
     return LV_RESULT_OK;
