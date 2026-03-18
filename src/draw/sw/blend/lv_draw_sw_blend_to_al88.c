@@ -196,6 +196,10 @@ static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_color_16a_16a_mix(lv_color16a_
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_al88(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_color_to_al88: NULL dest_buf or invalid dimensions, skipping");
+        return;
+    }
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;

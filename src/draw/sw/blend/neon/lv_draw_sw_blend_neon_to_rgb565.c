@@ -158,6 +158,10 @@ static inline uint32_t lv_color_16_16_mix_2_with_opa_mask(const uint16_t * c1, c
 
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_neon_color_to_rgb565: NULL dest_buf or invalid dimensions, skipping");
+        return LV_RESULT_INVALID;
+    }
 
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -202,6 +206,10 @@ lv_result_t lv_draw_sw_blend_neon_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t * 
 }
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb565_with_opa(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_neon_color_to_rgb565_with_opa: NULL dest_buf or invalid dimensions, skipping");
+        return LV_RESULT_INVALID;
+    }
 
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -251,6 +259,10 @@ lv_result_t lv_draw_sw_blend_neon_color_to_rgb565_with_opa(lv_draw_sw_blend_fill
 }
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb565_with_mask(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_neon_color_to_rgb565_with_mask: NULL dest_buf or invalid dimensions, skipping");
+        return LV_RESULT_INVALID;
+    }
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
     const int32_t w              = dsc->dest_w;
@@ -304,6 +316,10 @@ lv_result_t lv_draw_sw_blend_neon_color_to_rgb565_with_mask(lv_draw_sw_blend_fil
 
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb565_with_opa_mask(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_neon_color_to_rgb565_with_opa_mask: NULL dest_buf or invalid dimensions, skipping");
+        return LV_RESULT_INVALID;
+    }
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
     const int32_t w              = dsc->dest_w;

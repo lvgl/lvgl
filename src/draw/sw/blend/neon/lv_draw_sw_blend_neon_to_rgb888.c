@@ -84,6 +84,10 @@ static inline uint8x8x3_t rgb_mix_4_internal(uint8x8x3_t src, uint8x8x3_t dst, u
 
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb888(lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_neon_color_to_rgb888: NULL dest_buf or invalid dimensions, skipping");
+        return LV_RESULT_INVALID;
+    }
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -149,6 +153,10 @@ lv_result_t lv_draw_sw_blend_neon_color_to_rgb888(lv_draw_sw_blend_fill_dsc_t * 
 }
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb888_with_opa(lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_neon_color_to_rgb888_with_opa: NULL dest_buf or invalid dimensions, skipping");
+        return LV_RESULT_INVALID;
+    }
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -213,6 +221,10 @@ lv_result_t lv_draw_sw_blend_neon_color_to_rgb888_with_opa(lv_draw_sw_blend_fill
 
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb888_with_mask(lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_neon_color_to_rgb888_with_mask: NULL dest_buf or invalid dimensions, skipping");
+        return LV_RESULT_INVALID;
+    }
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT_NULL(dsc->mask_buf);
@@ -281,6 +293,10 @@ lv_result_t lv_draw_sw_blend_neon_color_to_rgb888_with_mask(lv_draw_sw_blend_fil
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb888_with_opa_mask(lv_draw_sw_blend_fill_dsc_t * dsc,
                                                                 uint32_t dest_px_size)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_neon_color_to_rgb888_with_opa_mask: NULL dest_buf or invalid dimensions, skipping");
+        return LV_RESULT_INVALID;
+    }
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT_NULL(dsc->mask_buf);

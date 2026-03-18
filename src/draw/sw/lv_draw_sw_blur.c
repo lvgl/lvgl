@@ -136,6 +136,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         if(px_size == 1) {
             /*Compiler optimization might mishandle it, so add volatile*/
             uint8_t * buf_column_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
+            if(buf_column_start == NULL) continue;
             blur_1_bytes_init(sum, buf_column_start, sample_len_limited, stride_byte * skip_cnt);
 
             uint8_t buf_prev = buf_column_start[0] + 1; /*Make sure that it's not equal in the first round*/
@@ -148,18 +149,21 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             uint8_t * buf_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
-            blur_1_bytes_init(sum, buf_column_end, sample_len_limited, -stride_byte * skip_cnt);
-            buf_prev = buf_column_end[0] + 1; /*Make sure that it's not equal in the first round*/
-            for(y = y_start; y <= y_end; y += skip_cnt) {
-                if(buf_prev != *buf_column_end) {
-                    *buf_column_end = blur_1_bytes(sum, *buf_column_end, intensity);
-                    buf_prev = *buf_column_end;
+            if(buf_column_end != NULL) {
+                blur_1_bytes_init(sum, buf_column_end, sample_len_limited, -stride_byte * skip_cnt);
+                buf_prev = buf_column_end[0] + 1; /*Make sure that it's not equal in the first round*/
+                for(y = y_start; y <= y_end; y += skip_cnt) {
+                    if(buf_prev != *buf_column_end) {
+                        *buf_column_end = blur_1_bytes(sum, *buf_column_end, intensity);
+                        buf_prev = *buf_column_end;
+                    }
+                    buf_column_end -= stride_byte * skip_cnt;
                 }
-                buf_column_end -= stride_byte * skip_cnt;
             }
         }
         else if(px_size == 2) {
             uint16_t * buf16_column_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
+            if(buf16_column_start == NULL) continue;
             blur_2_bytes_init(sum, (lv_color16_t *)buf16_column_start, sample_len_limited, stride_px * skip_cnt, swapped);
             uint16_t buf16_prev = buf16_column_start[0] + 1; /*Make sure that it's not equal in the first round*/
 
@@ -172,20 +176,23 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             uint16_t * buf16_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column_end, sample_len_limited, -stride_px * skip_cnt, swapped);
-            buf16_prev = buf16_column_end[0] + 1; /*Make sure that it's not equal in the first round*/
+            if(buf16_column_end != NULL) {
+                blur_2_bytes_init(sum, (lv_color16_t *)buf16_column_end, sample_len_limited, -stride_px * skip_cnt, swapped);
+                buf16_prev = buf16_column_end[0] + 1; /*Make sure that it's not equal in the first round*/
 
-            for(y = y_start; y <= y_end; y += skip_cnt) {
-                if(buf16_prev != *buf16_column_end) {
-                    *buf16_column_end = blur_2_bytes(sum, *buf16_column_end, intensity, swapped);
-                    buf16_prev = *buf16_column_end;
+                for(y = y_start; y <= y_end; y += skip_cnt) {
+                    if(buf16_prev != *buf16_column_end) {
+                        *buf16_column_end = blur_2_bytes(sum, *buf16_column_end, intensity, swapped);
+                        buf16_prev = *buf16_column_end;
+                    }
+                    buf16_column_end -= stride_px * skip_cnt;
                 }
-                buf16_column_end -= stride_px * skip_cnt;
             }
         }
         else if(px_size >= 3) {
             /*Compiler optimization might mishandle it, so add volatile*/
             volatile uint8_t * buf_column_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
+            if(buf_column_start == NULL) continue;
             blur_3_bytes_init(sum, buf_column_start, sample_len_limited, stride_byte * skip_cnt);
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
@@ -194,10 +201,12 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             volatile uint8_t * buf_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
-            blur_3_bytes_init(sum, buf_column_end, sample_len_limited, -stride_byte * skip_cnt);
-            for(y = y_start; y <= y_end; y += skip_cnt) {
-                blur_3_bytes(sum, buf_column_end, intensity);
-                buf_column_end -= stride_byte * skip_cnt;
+            if(buf_column_end != NULL) {
+                blur_3_bytes_init(sum, buf_column_end, sample_len_limited, -stride_byte * skip_cnt);
+                for(y = y_start; y <= y_end; y += skip_cnt) {
+                    blur_3_bytes(sum, buf_column_end, intensity);
+                    buf_column_end -= stride_byte * skip_cnt;
+                }
             }
         }
     }
@@ -222,6 +231,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         if(px_size == 1) {
             /*Compiler optimization might mishandle it, so add volatile*/
             uint8_t * buf_line_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+            if(buf_line_start == NULL) continue;
 
             blur_1_bytes_init(sum, buf_line_start, sample_len_limited, px_size * skip_cnt);
 
@@ -235,39 +245,44 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             uint8_t * buf_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_1_bytes_init(sum, buf_line_end, sample_len_limited, -(int32_t)px_size * skip_cnt);
-            buf_prev = buf_line_end[0] + 1; /*Make sure that it's not equal in the first round*/
+            if(buf_line_end != NULL) {
+                blur_1_bytes_init(sum, buf_line_end, sample_len_limited, -(int32_t)px_size * skip_cnt);
+                buf_prev = buf_line_end[0] + 1; /*Make sure that it's not equal in the first round*/
 
-            for(x = x_start; x <= x_end; x += skip_cnt) {
-                if(buf_prev != *buf_line_end) {
-                    *buf_line_end = blur_1_bytes(sum, *buf_line_end, intensity);
-                    buf_prev = *buf_line_end;
-                }
-
-                /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
-                if(skip_cnt == 2) {
-                    buf_line_end[1] = buf_line_end[0];
-                }
-                else if(skip_cnt == 3) {
-                    buf_line_end[1] = buf_line_end[0];
-                    buf_line_end[2] = buf_line_end[0];
-                }
-
-                /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
-                if(skip_cnt > 1 && x + skip_cnt > x_end) {
-                    uint8_t * buf_copy_from = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-                    lv_memcpy(buf_copy_from + stride_byte, buf_copy_from, line_len_byte);
-                    if(skip_cnt == 3) {
-                        lv_memcpy(buf_copy_from + stride_byte * 2, buf_copy_from, line_len_byte);
+                for(x = x_start; x <= x_end; x += skip_cnt) {
+                    if(buf_prev != *buf_line_end) {
+                        *buf_line_end = blur_1_bytes(sum, *buf_line_end, intensity);
+                        buf_prev = *buf_line_end;
                     }
-                }
 
-                buf_line_end -= next_px_ofs_byte;
+                    /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
+                    if(skip_cnt == 2) {
+                        buf_line_end[1] = buf_line_end[0];
+                    }
+                    else if(skip_cnt == 3) {
+                        buf_line_end[1] = buf_line_end[0];
+                        buf_line_end[2] = buf_line_end[0];
+                    }
+
+                    /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
+                    if(skip_cnt > 1 && x + skip_cnt > x_end) {
+                        uint8_t * buf_copy_from = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+                        if(buf_copy_from != NULL) {
+                            lv_memcpy(buf_copy_from + stride_byte, buf_copy_from, line_len_byte);
+                            if(skip_cnt == 3) {
+                                lv_memcpy(buf_copy_from + stride_byte * 2, buf_copy_from, line_len_byte);
+                            }
+                        }
+                    }
+
+                    buf_line_end -= next_px_ofs_byte;
+                }
             }
 
         }
         else if(px_size == 2) {
             uint16_t * buf16_line_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+            if(buf16_line_start == NULL) continue;
             blur_2_bytes_init(sum, (lv_color16_t *)buf16_line_start, sample_len_limited,  skip_cnt, swapped);
 
             uint16_t buf16_prev = buf16_line_start[0] + 1; /*Make sure that it's not equal in the first round*/
@@ -281,41 +296,46 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             uint16_t * buf16_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line_end, sample_len_limited, - skip_cnt, swapped);
-            buf16_prev = buf16_line_end[0] + 1; /*Make sure that it's not equal in the first round*/
+            if(buf16_line_end != NULL) {
+                blur_2_bytes_init(sum, (lv_color16_t *)buf16_line_end, sample_len_limited, - skip_cnt, swapped);
+                buf16_prev = buf16_line_end[0] + 1; /*Make sure that it's not equal in the first round*/
 
-            for(x = x_start; x <= x_end; x += skip_cnt) {
-                if(buf16_prev != *buf16_line_end) {
-                    *buf16_line_end = blur_2_bytes(sum, *buf16_line_end, intensity, swapped);
-                    buf16_prev = *buf16_line_end;
-                }
-
-                /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
-                if(skip_cnt == 2) {
-                    /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
-                    buf16_line_end[1] = buf16_line_end[0];
-                }
-                else if(skip_cnt == 3) {
-                    /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
-                    buf16_line_end[1] = buf16_line_end[0];
-                    buf16_line_end[2] = buf16_line_end[0];
-                }
-
-                /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
-                if(skip_cnt > 1 && x + skip_cnt > x_end) {
-                    uint8_t * buf_copy_from = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-                    lv_memcpy(buf_copy_from + stride_byte, buf_copy_from, line_len_byte);
-                    if(skip_cnt == 3) {
-                        lv_memcpy(buf_copy_from + stride_byte * 2, buf_copy_from, line_len_byte);
+                for(x = x_start; x <= x_end; x += skip_cnt) {
+                    if(buf16_prev != *buf16_line_end) {
+                        *buf16_line_end = blur_2_bytes(sum, *buf16_line_end, intensity, swapped);
+                        buf16_prev = *buf16_line_end;
                     }
-                }
 
-                buf16_line_end -= skip_cnt;
+                    /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
+                    if(skip_cnt == 2) {
+                        /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
+                        buf16_line_end[1] = buf16_line_end[0];
+                    }
+                    else if(skip_cnt == 3) {
+                        /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
+                        buf16_line_end[1] = buf16_line_end[0];
+                        buf16_line_end[2] = buf16_line_end[0];
+                    }
+
+                    /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
+                    if(skip_cnt > 1 && x + skip_cnt > x_end) {
+                        uint8_t * buf_copy_from = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+                        if(buf_copy_from != NULL) {
+                            lv_memcpy(buf_copy_from + stride_byte, buf_copy_from, line_len_byte);
+                            if(skip_cnt == 3) {
+                                lv_memcpy(buf_copy_from + stride_byte * 2, buf_copy_from, line_len_byte);
+                            }
+                        }
+                    }
+
+                    buf16_line_end -= skip_cnt;
+                }
             }
         }
         else if(px_size >= 3) {
             /*Compiler optimization might mishandle it, so add volatile*/
             volatile uint8_t * buf_line_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+            if(buf_line_start == NULL) continue;
 
             blur_3_bytes_init(sum, buf_line_start, sample_len_limited, px_size * skip_cnt);
             for(x = x_start + skip_cnt; x <= x_end; x += skip_cnt) {
@@ -324,36 +344,40 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             volatile uint8_t * buf_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_3_bytes_init(sum, buf_line_end, sample_len_limited, -(int32_t)px_size * skip_cnt);
+            if(buf_line_end != NULL) {
+                blur_3_bytes_init(sum, buf_line_end, sample_len_limited, -(int32_t)px_size * skip_cnt);
 
-            for(x = x_start; x <= x_end; x += skip_cnt) {
-                blur_3_bytes(sum, buf_line_end, intensity);
+                for(x = x_start; x <= x_end; x += skip_cnt) {
+                    blur_3_bytes(sum, buf_line_end, intensity);
 
-                /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
-                if(skip_cnt == 2) {
-                    buf_line_end[px_size + 0] = buf_line_end[0];
-                    buf_line_end[px_size + 1] = buf_line_end[1];
-                    buf_line_end[px_size + 2] = buf_line_end[2];
-                }
-                else if(skip_cnt == 3) {
-                    buf_line_end[px_size + 0] = buf_line_end[0];
-                    buf_line_end[px_size + 1] = buf_line_end[1];
-                    buf_line_end[px_size + 2] = buf_line_end[2];
-                    buf_line_end[px_size * 2 + 0] = buf_line_end[0];
-                    buf_line_end[px_size * 2 + 1] = buf_line_end[1];
-                    buf_line_end[px_size * 2 + 2] = buf_line_end[2];
-                }
-
-                /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
-                if(skip_cnt > 1 && x + skip_cnt > x_end) {
-                    uint8_t * buf_copy_from = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-                    lv_memcpy(buf_copy_from + stride_byte, buf_copy_from, line_len_byte);
-                    if(skip_cnt == 3) {
-                        lv_memcpy(buf_copy_from + stride_byte * 2, buf_copy_from, line_len_byte);
+                    /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
+                    if(skip_cnt == 2) {
+                        buf_line_end[px_size + 0] = buf_line_end[0];
+                        buf_line_end[px_size + 1] = buf_line_end[1];
+                        buf_line_end[px_size + 2] = buf_line_end[2];
                     }
-                }
+                    else if(skip_cnt == 3) {
+                        buf_line_end[px_size + 0] = buf_line_end[0];
+                        buf_line_end[px_size + 1] = buf_line_end[1];
+                        buf_line_end[px_size + 2] = buf_line_end[2];
+                        buf_line_end[px_size * 2 + 0] = buf_line_end[0];
+                        buf_line_end[px_size * 2 + 1] = buf_line_end[1];
+                        buf_line_end[px_size * 2 + 2] = buf_line_end[2];
+                    }
 
-                buf_line_end -= next_px_ofs_byte;
+                    /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
+                    if(skip_cnt > 1 && x + skip_cnt > x_end) {
+                        uint8_t * buf_copy_from = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+                        if(buf_copy_from != NULL) {
+                            lv_memcpy(buf_copy_from + stride_byte, buf_copy_from, line_len_byte);
+                            if(skip_cnt == 3) {
+                                lv_memcpy(buf_copy_from + stride_byte * 2, buf_copy_from, line_len_byte);
+                            }
+                        }
+                    }
+
+                    buf_line_end -= next_px_ofs_byte;
+                }
             }
 
         }
