@@ -38,6 +38,7 @@ void tearDown(void)
     #define EXT_NAME ".lp32.png"
 #endif
 
+#if LV_USE_VECTOR_GRAPHIC
 static void draw_snapshot(const char * name)
 {
     char fn_buf[64];
@@ -53,9 +54,13 @@ static void draw_vector(lv_draw_vector_dsc_t * ctx)
     lv_draw_vector(ctx);
     lv_canvas_finish_layer(canvas, &layer);
 }
+#endif
 
 void test_draw_blend_modes_comparison(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(&layer);
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
@@ -133,10 +138,14 @@ void test_draw_blend_modes_comparison(void)
     /* Cleanup */
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(ctx);
+#endif
 }
 
 void test_draw_copy_path(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(&layer);
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
@@ -166,10 +175,14 @@ void test_draw_copy_path(void)
     /* Cleanup */
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(ctx);
+#endif
 }
 
 void test_draw_rect_path(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(&layer);
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
@@ -187,10 +200,14 @@ void test_draw_rect_path(void)
     /* Cleanup */
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(ctx);
+#endif
 }
 
 void test_draw_append_path(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(&layer);
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
@@ -223,10 +240,14 @@ void test_draw_append_path(void)
     lv_vector_path_delete(path);
     lv_vector_path_delete(path2);
     lv_draw_vector_dsc_delete(ctx);
+#endif
 }
 
 void test_draw_arc_path(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(&layer);
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
@@ -252,6 +273,7 @@ void test_draw_arc_path(void)
     /* Cleanup */
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(ctx);
+#endif
 }
 
 #endif

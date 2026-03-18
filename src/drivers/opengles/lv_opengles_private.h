@@ -70,6 +70,10 @@ extern "C" {
 #define glTexStorage2D glTexStorage2DEXT
 #endif
 
+#if !defined(glClearDepthf) && defined(glClearDepth)
+#define glClearDepthf glClearDepth
+#endif /*!defined(glClearDepthf) && defined(glClearDepth)*/
+
 #ifndef GL_RGBA32F
 #define GL_RGBA32F 0x8814
 #endif

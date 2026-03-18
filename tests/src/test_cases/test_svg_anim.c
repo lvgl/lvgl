@@ -15,6 +15,9 @@ void tearDown(void)
 
 void testAnimate(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_anim0 = \
                              "<svg><rect xml:id=\"RectElement\" x=\"300\" y=\"100\" width=\"300\" height=\"100\">"
                              "<animate attributeName=\"x\" dur=\"9s\" fill=\"freeze\" from=\"300\" to=\"0\"/>"
@@ -40,10 +43,14 @@ void testAnimate(void)
     TEST_ASSERT_EQUAL_FLOAT(to, 0.0f);
 
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testSet(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_anim0 = \
                              "<svg><rect xml:id=\"RectElement\" x=\"300\" y=\"100\" width=\"300\" height=\"100\">"
                              "<set attributeName=\"x\" to=\"500\" values=\"0\"/>"
@@ -60,10 +67,14 @@ void testSet(void)
     TEST_ASSERT_EQUAL_FLOAT(to, 500.0f);
 
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testAnimateMotion(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_anim0 = \
                              "<svg><path xml:id=\"path1\" d=\"M100,250 C 100,50 400,50 400,250\" "
                              "fill=\"none\" stroke=\"blue\" stroke-width=\"7.06\"/>"
@@ -181,10 +192,14 @@ void testAnimateMotion(void)
     TEST_ASSERT_EQUAL_FLOAT(ps[3].y, 1.5f);
 
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testAnimateTransform(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_anim0 = \
                              "<svg><rect transform=\"skewX(30)\" x=0 y=0 width=100 height=100>"
                              "<animateTransform attributeName=\"transform\" attributeType=\"XML\""
@@ -230,10 +245,14 @@ void testAnimateTransform(void)
     TEST_ASSERT_EQUAL_FLOAT(pt[1], 0.2f);
 
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testAnimateColor(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_anim0 = \
                              "<svg><rect color=\"yellow\" fill=\"black\">"
                              "<animateColor attributeName=\"fill\" from=\"red\" to=\"#DDF\" "
@@ -263,5 +282,6 @@ void testAnimateColor(void)
     TEST_ASSERT_EQUAL(pc[1], 0x000000);
 
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 #endif

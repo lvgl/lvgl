@@ -10,6 +10,10 @@
 
 #if LV_USE_DEMO_VECTOR_GRAPHIC
 
+#if !LV_USE_VECTOR_GRAPHIC
+    #error LV_USE_DEMO_VECTOR_GRAPHIC requires LV_USE_VECTOR_GRAPHIC
+#endif
+
 /*********************
  *      DEFINES
  *********************/

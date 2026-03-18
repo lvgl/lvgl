@@ -28,6 +28,10 @@ void tearDown(void)
 
 void test_lottie_simple(void)
 {
+#if !LV_USE_SVG
+    LV_UNUSED(buf);
+    TEST_IGNORE_MESSAGE("Lottie is disabled");
+#else
     lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
     lv_lottie_set_buffer(lottie, 100, 100, lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED));
     lv_lottie_set_src_data(lottie, test_lottie_approve, test_lottie_approve_size);
@@ -49,10 +53,14 @@ void test_lottie_simple(void)
     /*Should reset automatically*/
     lv_test_fast_forward(200);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_2.png");
+#endif
 }
 
 void test_lottie_load_from_file(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("Lottie is disabled");
+#else
     lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
     lv_lottie_set_buffer(lottie, 100, 100, lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED));
     lv_lottie_set_src_file(lottie, "src/test_assets/test_lottie_approve.json");
@@ -73,10 +81,14 @@ void test_lottie_load_from_file(void)
     /*Should reset automatically*/
     lv_test_fast_forward(200);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_2.png");
+#endif
 }
 
 void test_lottie_missing_settings(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("Lottie is disabled");
+#else
     uint32_t tmp_buf[LV_TEST_WIDTH_TO_STRIDE(100, 4) * 100 + LV_DRAW_BUF_ALIGN];
 
     lv_obj_t * lottie1 = lv_lottie_create(lv_screen_active());
@@ -97,10 +109,14 @@ void test_lottie_missing_settings(void)
     lv_obj_center(lottie2);
     lv_test_fast_forward(950);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_3.png");
+#endif
 }
 
 void test_lottie_rescale(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("Lottie is disabled");
+#else
     lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
     lv_lottie_set_buffer(lottie, 100, 100, lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED));
     lv_lottie_set_src_data(lottie, test_lottie_approve, test_lottie_approve_size);
@@ -116,11 +132,15 @@ void test_lottie_rescale(void)
     /*Should be the last frame*/
     lv_test_fast_forward(750);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_3_small.png");
+#endif
 }
 
 
 void test_lottie_non_uniform_shape(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("Lottie is disabled");
+#else
     lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
     lv_lottie_set_buffer(lottie, 50, 200, lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED));
     lv_lottie_set_src_data(lottie, test_lottie_approve, test_lottie_approve_size);
@@ -128,10 +148,14 @@ void test_lottie_non_uniform_shape(void)
 
     lv_test_fast_forward(950);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_4.png");
+#endif
 }
 
 void test_lottie_memory_leak(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("Lottie is disabled");
+#else
     size_t mem_before = lv_test_get_free_mem();
 
     uint32_t i;
@@ -145,10 +169,14 @@ void test_lottie_memory_leak(void)
         lv_obj_delete(lottie);
     }
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 16);
+#endif
 }
 
 void test_lottie_no_jump_when_visible_again(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("Lottie is disabled");
+#else
     lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
     lv_lottie_set_buffer(lottie, 100, 100, lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED));
     lv_lottie_set_src_data(lottie, test_lottie_approve, test_lottie_approve_size);
@@ -168,7 +196,7 @@ void test_lottie_no_jump_when_visible_again(void)
 
     lv_test_fast_forward(750);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_3.png");
-
+#endif
 }
 
 #endif
