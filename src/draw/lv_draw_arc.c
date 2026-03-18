@@ -89,6 +89,17 @@ void lv_draw_arc_get_area(int32_t x, int32_t y, uint16_t radius,  lv_value_preci
     int32_t start_angle_int = (int32_t) start_angle;
     int32_t end_angle_int = (int32_t) end_angle;
 
+    /*Guard: radius too small for stroke width — return outer-radius bounding box
+     *to avoid negative rin causing inverted trig calculations.
+     *The arc never draws outside its outer radius regardless of stroke width. */
+    if(radius <= w) {
+        area->x1 = x - rout;
+        area->y1 = y - rout;
+        area->x2 = x + rout;
+        area->y2 = y + rout;
+        return;
+    }
+
     /*Special case: full arc invalidation */
     if(end_angle_int == start_angle_int + 360) {
         area->x1 = x - rout;
