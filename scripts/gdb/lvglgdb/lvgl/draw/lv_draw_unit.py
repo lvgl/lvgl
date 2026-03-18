@@ -23,7 +23,7 @@ class LVDrawUnit(Value):
 
     @property
     def idx(self) -> int:
-        return int(self.super_value("idx"))
+        return self.safe_field("idx", -1, int)
 
     @property
     def next(self):

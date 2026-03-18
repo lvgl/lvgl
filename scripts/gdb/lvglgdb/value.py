@@ -38,15 +38,27 @@ class Value(gdb.Value):
             if typ.code == gdb.TYPE_CODE_PTR:
                 target = typ.target().strip_typedefs()
                 if target.code in (gdb.TYPE_CODE_STRUCT, gdb.TYPE_CODE_UNION):
-                    target_type = str(target)
+                    # Prefer .name or .tag over str() to avoid polluted
+                    # anonymous struct expansions like "const struct {...}".
+                    target_type = target.name or target.tag
 
         if target_type is not None:
+            # If val is already a pointer whose target matches target_type,
+            # keep the original type to avoid gdb.lookup_type() which may
+            # resolve to a different compilation unit's definition when
+            # macro-controlled fields cause multiple struct definitions.
+            typ = val.type.strip_typedefs()
+            if typ.code == gdb.TYPE_CODE_PTR:
+                target = typ.target()
+                tname = target.name or target.tag or ""
+                if tname == target_type:
+                    return val
+
             try:
                 gdb.lookup_type(target_type)
             except gdb.error:
                 raise ValueError(f"Type not found: {target_type}")
 
-            typ = val.type.strip_typedefs()
             if typ.code != gdb.TYPE_CODE_PTR:
                 if typ.code in (gdb.TYPE_CODE_INT, gdb.TYPE_CODE_ENUM):
                     val = Value(val.cast(gdb.lookup_type(target_type).pointer()))
@@ -61,11 +73,7 @@ class Value(gdb.Value):
         return val
 
     def __getitem__(self, key):
-        try:
-            value = super().__getitem__(key)
-        except gdb.error:
-            value = super().__getattr__(key)
-        return Value(value)
+        return Value(super().__getitem__(key))
 
     def __getattr__(self, key):
         if hasattr(super(), key):
@@ -87,6 +95,18 @@ class Value(gdb.Value):
 
     def super_value(self, attr: str) -> "Value":
         return self[attr]
+
+    def safe_field(self, attr: str, default=None, cast=None):
+        """Access a struct field that may not exist in older LVGL versions.
+
+        Returns the field value (optionally converted by *cast*), or
+        *default* when the field is missing.
+        """
+        try:
+            v = Value(gdb.Value.__getitem__(self, attr))
+            return cast(int(v)) if cast is not None else v
+        except (gdb.error, gdb.MemoryError):
+            return default
 
     def as_string(self):
         """Convert to string if possible"""

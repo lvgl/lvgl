@@ -17,6 +17,8 @@ class LVDisplay(Value):
         "empty_msg": "No displays.",
     }
 
+    _LAYER_NAMES = ("bottom_layer", "act_scr", "top_layer", "sys_layer")
+
     def __init__(self, disp: ValueInput):
         super().__init__(Value.normalize(disp, "lv_display_t"))
 
@@ -35,6 +37,19 @@ class LVDisplay(Value):
         screens = self.super_value("screens")
         for i in range(self.screen_cnt):
             yield LVObject(screens[i])
+
+    @property
+    def layer_addrs(self) -> dict:
+        """Map screen address -> layer name for known layer pointers."""
+        result = {}
+        for name in self._LAYER_NAMES:
+            try:
+                ptr = self.super_value(name)
+                if int(ptr):
+                    result[int(ptr)] = name
+            except Exception:
+                pass
+        return result
 
     # Buffer-related properties
     @property

@@ -25,15 +25,26 @@ class LVCacheLRURBIterator(LVCacheIteratorBase):
         return lru_cache, rb_size, ptr_size, rb_node_pp_t, void_pp_t
 
     def _iter_ll_nodes(self, lru_cache, rb_size, ptr_size, rb_node_pp_t, void_pp_t):
-        """Yield (ll_addr, data, back_ptr) for each ll node"""
+        """Yield (ll_addr, data, back_ptr) for each ll node.
+        Skips nodes with inaccessible memory (e.g. corrupted pointers).
+        """
+        inferior = gdb.selected_inferior()
         for ll_node in LVList(lru_cache.ll):
-            ll_addr = int(ll_node)
-            rb_node = Value(ll_node).cast(rb_node_pp_t)
-            data = rb_node.data
-            back_ptr = int(
-                Value(int(data) + rb_size - ptr_size).cast(void_pp_t).dereference()
-            )
-            yield ll_addr, data, back_ptr
+            try:
+                ll_addr = int(ll_node)
+                rb_node = Value(ll_node).cast(rb_node_pp_t)
+                data = rb_node.data
+                data_addr = int(data)
+                if data_addr == 0:
+                    continue
+                # Probe data pointer accessibility before dereferencing
+                inferior.read_memory(data_addr, 1)
+                back_ptr = int(
+                    Value(data_addr + rb_size - ptr_size).cast(void_pp_t).dereference()
+                )
+                yield ll_addr, data, back_ptr
+            except (gdb.MemoryError, gdb.error):
+                continue
 
     def _collect_entries(self):
         """Collect entries from LRU RB cache by traversing the linked list (MRU→LRU order)"""
@@ -46,10 +57,13 @@ class LVCacheLRURBIterator(LVCacheIteratorBase):
             for ll_addr, data, back_ptr in self._iter_ll_nodes(
                 lru_cache, rb_size, ptr_size, rb_node_pp_t, void_pp_t
             ):
-                entry = LVCacheEntry.from_data_ptr(data, self.cache.datatype)
-                entry.extra = Value(back_ptr)
-                entry.ll_addr = ll_addr
-                self._entries.append(entry)
+                try:
+                    entry = LVCacheEntry.from_data_ptr(data, self.cache.datatype)
+                    entry.extra = Value(back_ptr)
+                    entry.ll_addr = ll_addr
+                    self._entries.append(entry)
+                except Exception:
+                    continue
 
         except Exception as e:
             self._collect_error = f"_collect_entries failed: {e}"
@@ -158,7 +172,7 @@ class LVCacheLRURB(LVCache):
         try:
             name = str(self.name)
             return "count" in name.lower() or "lru_rb_count" in str(self.clz).lower()
-        except:
+        except Exception:
             return False
 
     def is_size_based(self):
@@ -166,7 +180,7 @@ class LVCacheLRURB(LVCache):
         try:
             name = str(self.name)
             return "size" in name.lower() or "lru_rb_size" in str(self.clz).lower()
-        except:
+        except Exception:
             return False
 
     def __iter__(self):

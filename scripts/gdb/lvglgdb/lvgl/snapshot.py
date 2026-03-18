@@ -1,4 +1,5 @@
-from typing import Any, Dict, Iterator, Optional
+import functools
+from typing import Any, Callable, Dict, Iterator, Optional
 
 
 class Snapshot:
@@ -7,6 +8,9 @@ class Snapshot:
     Holds a pure Python dict (JSON-serializable), an optional reference
     to the original wrapper (_source), and an optional display spec that
     describes how to format the data for terminal output.
+
+    A snapshot may be marked *corrupted* to indicate that the underlying
+    data could not be fully read (e.g. inaccessible target memory).
     """
 
     __slots__ = ("_data", "_source", "_display_spec")
@@ -16,6 +20,38 @@ class Snapshot:
         self._data = data
         self._source = source
         self._display_spec = display_spec
+
+    @classmethod
+    def fallback(cls, addr: Callable = lambda x: int(x), **extra_fns):
+        """Decorator: on exception, return a corrupted snapshot dict.
+
+        Each extra kwarg may be a callable (called with the first arg)
+        or a static value.
+        """
+        def decorator(fn):
+            @functools.wraps(fn)
+            def wrapper(item, *args, **kwargs):
+                try:
+                    return fn(item, *args, **kwargs)
+                except Exception as e:
+                    try:
+                        resolved_addr = hex(addr(item))
+                    except Exception:
+                        resolved_addr = "0x?"
+                    extra = {}
+                    for k, v in extra_fns.items():
+                        try:
+                            extra[k] = v(item) if callable(v) else v
+                        except Exception:
+                            extra[k] = None
+                    d = {"addr": resolved_addr,
+                         "class_name": "(corrupted)",
+                         "error": str(e)}
+                    if extra:
+                        d.update(extra)
+                    return d
+            return wrapper
+        return decorator
 
     # --- dict-like read access ---
 

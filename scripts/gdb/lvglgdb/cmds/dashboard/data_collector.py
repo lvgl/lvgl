@@ -1,22 +1,9 @@
 import base64
-import functools
 from datetime import datetime
 
 import gdb
 
-
-def safe_collect(subsystem: str):
-    """Decorator that wraps a collector function with try/except/warning."""
-    def decorator(fn):
-        @functools.wraps(fn)
-        def wrapper(*args, **kwargs):
-            try:
-                return fn(*args, **kwargs)
-            except Exception as e:
-                gdb.write(f"Warning: failed to collect {subsystem}: {e}\n")
-                return []
-        return wrapper
-    return decorator
+from lvglgdb.lvgl.data_utils import safe_collect
 
 
 # Registry of simple subsystems: (dict_key, lvgl_accessor_method, label)
@@ -39,14 +26,14 @@ def _collect_simple(lvgl, dict_key: str, accessor: str | None, label: str) -> li
     For entries with accessor != None: [x.snapshot().as_dict() for x in lvgl.<accessor>()]
     For entries with accessor == None: [s.as_dict() for s in lvgl.<dict_key>().snapshots()]
     """
-    try:
+
+    @safe_collect(label)
+    def _inner():
         if accessor is not None:
             return [x.snapshot().as_dict() for x in getattr(lvgl, accessor)()]
-        else:
-            return [s.as_dict() for s in getattr(lvgl, dict_key)().snapshots()]
-    except Exception as e:
-        gdb.write(f"Warning: failed to collect {label}: {e}\n")
-        return []
+        return [s.as_dict() for s in getattr(lvgl, dict_key)().snapshots()]
+
+    return _inner()
 
 
 def collect_all() -> dict:
@@ -126,31 +113,24 @@ def _collect_displays(lvgl) -> list:
 @safe_collect("object trees")
 def _collect_object_trees(lvgl) -> list:
     """Collect object trees for all displays with layer name annotations."""
+    from lvglgdb.lvgl.snapshot import Snapshot
+
     result = []
     for disp in lvgl.displays():
-        # Read special layer pointers for name annotation
-        layer_addrs = {}
-        for name in ("bottom_layer", "act_scr", "top_layer", "sys_layer"):
-            try:
-                ptr = disp.super_value(name)
-                if int(ptr):
-                    layer_addrs[int(ptr)] = name
-            except Exception:
-                pass
+        addrs = disp.layer_addrs
 
-        tree = {
-            "display_addr": hex(int(disp)),
-            "screens": [],
-        }
-        for screen in disp.screens:
+        @Snapshot.fallback(layer_name=lambda s: addrs.get(int(s)))
+        def _screen_snapshot(screen):
             snap = screen.snapshot(
-                include_children=True, include_styles=True
+                include_children=True, include_styles=True,
             ).as_dict()
-            # Annotate with layer name if this screen is a known layer
-            screen_addr = int(screen)
-            snap["layer_name"] = layer_addrs.get(screen_addr)
-            tree["screens"].append(snap)
-        result.append(tree)
+            snap["layer_name"] = addrs.get(int(screen))
+            return snap
+
+        result.append({
+            "display_addr": hex(int(disp)),
+            "screens": safe_collect(disp.screens, _screen_snapshot),
+        })
     return result
 
 
