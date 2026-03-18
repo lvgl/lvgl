@@ -17,6 +17,7 @@
 
 #include "lv_eve5_sdcard.h"
 #include "lv_eve5.h"
+#include "lv_eve5_image_private.h"
 #include "../../../core/lv_global.h"
 #include "../../../misc/lv_fs.h"
 #include "../../../stdlib/lv_mem.h"
@@ -746,101 +747,6 @@ bool lv_eve5_sdcard_is_path(const char *path)
 }
 
 /**
- * Check if a file extension matches (case-insensitive).
- */
-static bool has_extension(const char *path, const char *ext)
-{
-    size_t path_len = lv_strlen(path);
-    size_t ext_len = lv_strlen(ext);
-    if(path_len < ext_len + 1) return false;
-
-    const char *path_ext = path + path_len - ext_len;
-    for(size_t i = 0; i < ext_len; i++) {
-        char c1 = path_ext[i];
-        char c2 = ext[i];
-        if(c1 >= 'A' && c1 <= 'Z') c1 += ('a' - 'A');
-        if(c2 >= 'A' && c2 <= 'Z') c2 += ('a' - 'A');
-        if(c1 != c2) return false;
-    }
-    return true;
-}
-
-/**
- * Parse JPEG header to extract image dimensions.
- * Looks for SOF0 (0xFFC0) or SOF2 (0xFFC2) markers.
- * Returns true if dimensions were found.
- */
-static bool parse_jpeg_header(const uint8_t *data, uint32_t size, uint32_t *width, uint32_t *height)
-{
-    if(size < 11) return false;
-
-    /* Check JPEG magic */
-    if(data[0] != 0xFF || data[1] != 0xD8) return false;
-
-    uint32_t pos = 2;
-    while(pos + 4 < size) {
-        if(data[pos] != 0xFF) {
-            pos++;
-            continue;
-        }
-
-        uint8_t marker = data[pos + 1];
-
-        /* SOF0 (baseline) or SOF2 (progressive) */
-        if(marker == 0xC0 || marker == 0xC2) {
-            if(pos + 9 > size) return false;
-            /* SOF segment: length(2) + precision(1) + height(2) + width(2) */
-            *height = ((uint32_t)data[pos + 5] << 8) | data[pos + 6];
-            *width = ((uint32_t)data[pos + 7] << 8) | data[pos + 8];
-            return true;
-        }
-
-        /* Skip other markers */
-        if(marker == 0xD8 || marker == 0xD9 || (marker >= 0xD0 && marker <= 0xD7)) {
-            /* Standalone markers (no length) */
-            pos += 2;
-        }
-        else if(pos + 4 <= size) {
-            /* Markers with length */
-            uint32_t len = ((uint32_t)data[pos + 2] << 8) | data[pos + 3];
-            pos += 2 + len;
-        }
-        else {
-            break;
-        }
-    }
-    return false;
-}
-
-/**
- * Parse PNG header to extract image dimensions.
- * Dimensions are in the IHDR chunk immediately after the signature.
- * Returns true if dimensions were found.
- */
-static bool parse_png_header(const uint8_t *data, uint32_t size, uint32_t *width, uint32_t *height)
-{
-    /* PNG signature (8 bytes) + IHDR length (4) + "IHDR" (4) + width (4) + height (4) = 24 bytes minimum */
-    if(size < 24) return false;
-
-    /* Check PNG signature */
-    static const uint8_t png_sig[8] = {0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A};
-    for(int i = 0; i < 8; i++) {
-        if(data[i] != png_sig[i]) return false;
-    }
-
-    /* IHDR chunk should be first - check chunk type */
-    if(data[12] != 'I' || data[13] != 'H' || data[14] != 'D' || data[15] != 'R') return false;
-
-    /* Width and height are big-endian 32-bit values */
-    *width = ((uint32_t)data[16] << 24) | ((uint32_t)data[17] << 16) |
-             ((uint32_t)data[18] << 8) | data[19];
-    *height = ((uint32_t)data[20] << 24) | ((uint32_t)data[21] << 16) |
-              ((uint32_t)data[22] << 8) | data[23];
-
-    return true;
-}
-
-/**
  * Load and decode a JPEG/PNG image from the SD card directly to RAM_G.
  *
  * This provides a zero-copy decode path:
@@ -850,15 +756,18 @@ static bool parse_png_header(const uint8_t *data, uint32_t size, uint32_t *width
  * 4. Decode via CMD_LOADIMAGE with OPT_MEDIAFIFO (RAM_G to RAM_G)
  * 5. Free temporary allocation
  *
- * @param path      Full path including drive letter (e.g., "S:/image.jpg")
- * @param handle    Pointer to receive the GPU handle (caller must free via Esd_GpuAlloc_Free)
- * @param width     Pointer to receive image width
- * @param height    Pointer to receive image height
- * @param format    Pointer to receive EVE bitmap format (e.g., RGB565)
- * @return          true on success, false on failure
+ * @param path            Full path including drive letter (e.g., "S:/image.jpg")
+ * @param handle          Pointer to receive the GPU handle (caller must free via Esd_GpuAlloc_Free)
+ * @param width           Pointer to receive image width
+ * @param height          Pointer to receive image height
+ * @param format          Pointer to receive EVE bitmap format (e.g., RGB8, ARGB8, PALETTEDARGB8)
+ * @param image_offset    Pointer to receive bitmap data offset from handle base
+ * @param palette_offset  Pointer to receive palette LUT offset from handle base (GA_INVALID if non-paletted)
+ * @return                true on success, false on failure
  */
 bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
-                                uint32_t *width, uint32_t *height, uint32_t *format)
+                                uint32_t *width, uint32_t *height, uint32_t *format,
+                                uint32_t *image_offset, uint32_t *palette_offset)
 {
     if(path == NULL || handle == NULL || width == NULL || height == NULL || format == NULL) {
         return false;
@@ -870,8 +779,8 @@ bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
     }
 
     /* Check extension */
-    bool is_jpeg = has_extension(path, ".jpg") || has_extension(path, ".jpeg");
-    bool is_png = has_extension(path, ".png");
+    bool is_jpeg = eve5_has_extension(path, ".jpg") || eve5_has_extension(path, ".jpeg");
+    bool is_png = eve5_has_extension(path, ".png");
     if(!is_jpeg && !is_png) {
         LV_LOG_WARN("Unsupported image format (not JPEG/PNG): %s", path);
         return false;
@@ -944,10 +853,10 @@ bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
     uint32_t img_width = 0, img_height = 0;
     bool parsed;
     if(is_jpeg) {
-        parsed = parse_jpeg_header(header_buf, header_size, &img_width, &img_height);
+        parsed = eve5_parse_jpeg_dimensions(header_buf, header_size, &img_width, &img_height);
     }
     else {
-        parsed = parse_png_header(header_buf, header_size, &img_width, &img_height);
+        parsed = eve5_parse_png_dimensions(header_buf, header_size, &img_width, &img_height);
     }
 
     if(!parsed || img_width == 0 || img_height == 0) {
@@ -959,8 +868,8 @@ bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* Calculate decoded size - CMD_LOADIMAGE outputs RGB565 by default */
-    uint32_t decoded_stride = ((img_width * 2) + 3) & ~3U;  /* RGB565, 4-byte aligned */
+    /* Calculate decoded size - with OPT_TRUECOLOR, worst case is ARGB8 (4 bpp) */
+    uint32_t decoded_stride = ((img_width * 4) + 3) & ~3U;  /* ARGB8, 4-byte aligned */
     uint32_t decoded_size = decoded_stride * img_height;
 
     /* Allocate final buffer for decoded image */
@@ -996,8 +905,10 @@ bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
      * is already in RAM_G from CMD_FSREAD, so we just set the pointer. */
     EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
 
-    /* Decode image via CMD_LOADIMAGE with OPT_MEDIAFIFO */
-    EVE_CoCmd_loadImage(phost, final_addr, OPT_MEDIAFIFO | OPT_NODL);
+    /* Decode image via CMD_LOADIMAGE with OPT_MEDIAFIFO.
+     * OPT_TRUECOLOR: decode to full 8-bit formats (RGB8/ARGB8) instead of
+     * default RGB565/ARGB4 which cause visible banding on gradients. */
+    EVE_CoCmd_loadImage(phost, final_addr, OPT_MEDIAFIFO | OPT_NODL | OPT_TRUECOLOR);
     if(!EVE_Cmd_waitFlush(phost)) {
         LV_LOG_ERROR("CMD_LOADIMAGE failed");
         EVE_MediaFifo_close(phost);
@@ -1013,24 +924,48 @@ bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
     uint32_t out_source, out_fmt, out_w, out_h, out_palette;
     if(!EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette)) {
         LV_LOG_WARN("CMD_GETIMAGE failed, using parsed dimensions");
+        out_source = final_addr;
         out_w = img_width;
         out_h = img_height;
         out_fmt = RGB565;
+        out_palette = GA_INVALID;
     }
 
     /* Clean up */
     EVE_MediaFifo_close(phost);
     Esd_GpuAlloc_Free(alloc, temp_handle);
 
+    /* Compute offsets from allocation base for bitmap data and palette.
+     * CMD_LOADIMAGE may place them in either order. */
+    uint32_t alloc_base = Esd_GpuAlloc_Get(alloc, final_handle);
+    uint32_t img_ofs = (out_source >= alloc_base) ? (out_source - alloc_base) : 0;
+    uint32_t pal_ofs = GA_INVALID;
+    if(out_fmt == PALETTEDARGB8 && out_palette >= alloc_base) {
+        pal_ofs = out_palette - alloc_base;
+    }
+
+    /* Trim allocation to actual decoded size based on format from getImage. */
+    int32_t bpp = eve5_format_bpp(out_fmt);
+    uint32_t index_size = out_w * (uint32_t)bpp * out_h;
+    /* Total used = max extent of image data and palette data */
+    uint32_t img_end = img_ofs + index_size;
+    uint32_t pal_end = (pal_ofs != GA_INVALID) ? (pal_ofs + 256 * 4) : 0;
+    uint32_t actual_size = img_end > pal_end ? img_end : pal_end;
+    if(actual_size < decoded_size) {
+        Esd_GpuAlloc_Truncate(alloc, final_handle, actual_size);
+    }
+
 #if LV_USE_OS
     lv_eve5_hal_unlock(s_ctx.disp);
 #endif
 
-    /* Return results */
+    /* Return results as handle + offsets (defrag-safe) */
     *handle = final_handle;
     *width = out_w;
     *height = out_h;
     *format = out_fmt;
+    if(image_offset) *image_offset = img_ofs;
+    if(palette_offset) *palette_offset = pal_ofs;
 
     LV_LOG_INFO("Loaded image: %s (%ux%u, format=%u)", path, out_w, out_h, out_fmt);
     return true;

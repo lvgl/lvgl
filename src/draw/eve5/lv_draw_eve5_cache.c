@@ -19,7 +19,7 @@
 /**********************
  * STATIC PROTOTYPES
  **********************/
-static uint32_t hash_image_sample(const lv_image_dsc_t *img);
+static uint32_t hash_image_header(const lv_image_dsc_t *img);
 static void image_cache_compact(lv_draw_eve5_unit_t *u, lv_draw_eve5_image_cache_t *cache);
 static void glyph_cache_compact(lv_draw_eve5_unit_t *u, lv_draw_eve5_glyph_cache_t *cache);
 
@@ -45,35 +45,22 @@ void lv_draw_eve5_image_cache_deinit(lv_draw_eve5_image_cache_t *cache)
 }
 
 /**
- * Hash image data by sampling throughout the image.
- * Catches differences in any region while staying cheap.
+ * Hash image header fields only.
+ * Uses header metadata (w, h, cf, stride) as a quick fingerprint.
+ * Does NOT sample image data — that was causing performance issues
+ * by reading 128 bytes from potentially uncached memory on every lookup.
+ * For LVGL images, the data pointer + header is sufficient to identify
+ * unique images; content rarely changes at the same address.
  */
-static uint32_t hash_image_sample(const lv_image_dsc_t *img)
+static uint32_t hash_image_header(const lv_image_dsc_t *img)
 {
     uint32_t h = 2166136261u;
 
-    /* Mix in header */
+    /* Mix in header fields only — no data sampling */
     h = (h ^ img->header.w) * 16777619u;
     h = (h ^ img->header.h) * 16777619u;
     h = (h ^ img->header.cf) * 16777619u;
     h = (h ^ img->header.stride) * 16777619u;
-
-    uint32_t total_size = img->header.stride * img->header.h;
-    if(total_size == 0) return h;
-
-    /* Sample 16 bytes from 8 positions spread across the image */
-    const uint32_t num_samples = 8;
-    const uint32_t bytes_per_sample = 16;
-
-    for(uint32_t s = 0; s < num_samples; s++) {
-        /* Position: 0, 1/8, 2/8, ... 7/8 through the data */
-        uint32_t offset = (total_size * s) / num_samples;
-        uint32_t end = LV_MIN(offset + bytes_per_sample, total_size);
-
-        for(uint32_t i = offset; i < end; i++) {
-            h = (h ^ img->data[i]) * 16777619u;
-        }
-    }
 
     return h;
 }
@@ -99,11 +86,11 @@ uint32_t lv_draw_eve5_image_cache_lookup(lv_draw_eve5_unit_t *u,
                                           const lv_image_dsc_t *img_dsc,
                                           uint16_t *out_eve_format,
                                           int32_t *out_eve_stride,
-                                          uint16_t *out_palette_size)
+                                          uint32_t *out_palette_addr)
 {
     lv_draw_eve5_image_cache_t *cache = &u->image_cache;
     uintptr_t key = (uintptr_t)img_dsc->data;
-    uint32_t key_hash = hash_image_sample(img_dsc);
+    uint32_t key_hash = hash_image_header(img_dsc);
 
     for(uint32_t i = 0; i < cache->count; i++) {
         lv_draw_eve5_image_cache_entry_t *e = &cache->entries[i];
@@ -114,10 +101,13 @@ uint32_t lv_draw_eve5_image_cache_lookup(lv_draw_eve5_unit_t *u,
             if(addr != GA_INVALID) {
                 *out_eve_format = e->eve_format;
                 *out_eve_stride = e->eve_stride;
-                *out_palette_size = e->palette_size;
+                if(out_palette_addr) {
+                    *out_palette_addr = (e->palette_offset != GA_INVALID)
+                                        ? (addr + e->palette_offset) : GA_INVALID;
+                }
                 LV_LOG_TRACE("EVE5: Image cache hit for %p at 0x%08X",
-                             (void *)key, addr + e->palette_size);
-                return addr + e->palette_size;
+                             (void *)key, addr + e->image_offset);
+                return addr + e->image_offset;
             }
 
             /* Allocator evicted it - remove stale entry */
@@ -135,7 +125,7 @@ void lv_draw_eve5_image_cache_insert(lv_draw_eve5_unit_t *u,
                                       Esd_GpuHandle handle,
                                       uint16_t eve_format,
                                       int32_t eve_stride,
-                                      uint16_t palette_size)
+                                      uint32_t image_offset, uint32_t palette_offset)
 {
     lv_draw_eve5_image_cache_t *cache = &u->image_cache;
 
@@ -151,13 +141,14 @@ void lv_draw_eve5_image_cache_insert(lv_draw_eve5_unit_t *u,
 
     lv_draw_eve5_image_cache_entry_t *e = &cache->entries[cache->count++];
     e->key = (uintptr_t)img_dsc->data;
-    e->key_hash = hash_image_sample(img_dsc);
+    e->key_hash = hash_image_header(img_dsc);
     e->gpu_handle = handle;
     e->eve_format = eve_format;
     e->eve_stride = eve_stride;
     e->width = img_dsc->header.w;
     e->height = img_dsc->header.h;
-    e->palette_size = palette_size;
+    e->image_offset = image_offset;
+    e->palette_offset = palette_offset;
 
     LV_LOG_TRACE("EVE5: Image cached %p (%dx%d)",
                  (void *)e->key, e->width, e->height);
@@ -168,27 +159,34 @@ uint32_t lv_draw_eve5_image_cache_lookup_raw(lv_draw_eve5_unit_t *u,
                                               uint16_t *out_eve_format,
                                               int32_t *out_eve_stride,
                                               int32_t *out_width, int32_t *out_height,
-                                              uint16_t *out_palette_size)
+                                              uint32_t *out_palette_addr)
 {
     lv_draw_eve5_image_cache_t *cache = &u->image_cache;
+    LV_UNUSED(key);  /* FILE sources: LVGL copies path strings, so match by hash only */
 
     for(uint32_t i = 0; i < cache->count; i++) {
         lv_draw_eve5_image_cache_entry_t *e = &cache->entries[i];
 
-        if(e->key == key && e->key_hash == key_hash) {
+        /* Match by hash only for FILE sources. LVGL's lv_image_set_src() calls
+         * lv_strdup() for FILE paths, so each widget has its own copy at a
+         * different address. The hash (FNV-1a of path content) is the same. */
+        if(e->key_hash == key_hash) {
             uint32_t addr = Esd_GpuAlloc_Get(u->allocator, e->gpu_handle);
             if(addr != GA_INVALID) {
                 *out_eve_format = e->eve_format;
                 *out_eve_stride = e->eve_stride;
                 *out_width = e->width;
                 *out_height = e->height;
-                *out_palette_size = e->palette_size;
-                LV_LOG_TRACE("EVE5: Image cache hit (raw) for %p at 0x%08X",
-                             (void *)key, addr + e->palette_size);
-                return addr + e->palette_size;
+                if(out_palette_addr) {
+                    *out_palette_addr = (e->palette_offset != GA_INVALID)
+                                        ? (addr + e->palette_offset) : GA_INVALID;
+                }
+                LV_LOG_TRACE("EVE5: Image cache hit (raw) hash=0x%08X at 0x%08X",
+                             key_hash, addr + e->image_offset);
+                return addr + e->image_offset;
             }
 
-            LV_LOG_TRACE("EVE5: Image cache stale entry (raw) for %p", (void *)key);
+            LV_LOG_TRACE("EVE5: Image cache stale entry (raw) hash=0x%08X", key_hash);
             cache->entries[i] = cache->entries[--cache->count];
             break;
         }
@@ -203,9 +201,28 @@ void lv_draw_eve5_image_cache_insert_raw(lv_draw_eve5_unit_t *u,
                                           uint16_t eve_format,
                                           int32_t eve_stride,
                                           int16_t width, int16_t height,
-                                          uint16_t palette_size)
+                                          uint32_t image_offset, uint32_t palette_offset)
 {
     lv_draw_eve5_image_cache_t *cache = &u->image_cache;
+    LV_UNUSED(key);
+
+    /* Check for existing entry with same hash (avoid duplicates from multiple widgets) */
+    for(uint32_t i = 0; i < cache->count; i++) {
+        if(cache->entries[i].key_hash == key_hash) {
+            /* Already cached — update with new handle info */
+            lv_draw_eve5_image_cache_entry_t *e = &cache->entries[i];
+            e->gpu_handle = handle;
+            e->eve_format = eve_format;
+            e->eve_stride = eve_stride;
+            e->width = width;
+            e->height = height;
+            e->image_offset = image_offset;
+            e->palette_offset = palette_offset;
+            LV_LOG_TRACE("EVE5: Image cache updated hash=0x%08X (%dx%d)",
+                         key_hash, width, height);
+            return;
+        }
+    }
 
     if(cache->count >= cache->capacity) {
         image_cache_compact(u, cache);
@@ -217,17 +234,90 @@ void lv_draw_eve5_image_cache_insert_raw(lv_draw_eve5_unit_t *u,
     }
 
     lv_draw_eve5_image_cache_entry_t *e = &cache->entries[cache->count++];
-    e->key = key;
+    e->key = key_hash;  /* Store hash as key for consistency */
     e->key_hash = key_hash;
     e->gpu_handle = handle;
     e->eve_format = eve_format;
     e->eve_stride = eve_stride;
     e->width = width;
     e->height = height;
-    e->palette_size = palette_size;
+    e->image_offset = image_offset;
+    e->palette_offset = palette_offset;
 
-    LV_LOG_TRACE("EVE5: Image cached (raw) %p (%dx%d)",
-                 (void *)key, width, height);
+    LV_LOG_TRACE("EVE5: Image cached (raw) hash=0x%08X (%dx%d)",
+                 key_hash, width, height);
+}
+
+/**********************
+ * HANDLE-BASED CACHE LOOKUPS
+ **********************/
+
+/**
+ * Find image by img_dsc pointer — returns handle-based result.
+ */
+bool lv_draw_eve5_image_cache_find(lv_draw_eve5_unit_t *u,
+    const lv_image_dsc_t *img_dsc, eve5_gpu_image_t *out)
+{
+    lv_draw_eve5_image_cache_t *cache = &u->image_cache;
+    uintptr_t key = (uintptr_t)img_dsc->data;
+    uint32_t key_hash = hash_image_header(img_dsc);
+
+    for(uint32_t i = 0; i < cache->count; i++) {
+        lv_draw_eve5_image_cache_entry_t *e = &cache->entries[i];
+
+        if(e->key == key && e->key_hash == key_hash) {
+            uint32_t addr = Esd_GpuAlloc_Get(u->allocator, e->gpu_handle);
+            if(addr != GA_INVALID) {
+                out->gpu_handle = e->gpu_handle;
+                out->eve_format = e->eve_format;
+                out->eve_stride = e->eve_stride;
+                out->width = e->width;
+                out->height = e->height;
+                out->image_offset = e->image_offset;
+                out->palette_offset = e->palette_offset;
+                return true;
+            }
+
+            /* Stale entry */
+            cache->entries[i] = cache->entries[--cache->count];
+            break;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Find image by path hash — returns handle-based result.
+ */
+bool lv_draw_eve5_image_cache_find_by_hash(lv_draw_eve5_unit_t *u,
+    uint32_t key_hash, eve5_gpu_image_t *out)
+{
+    lv_draw_eve5_image_cache_t *cache = &u->image_cache;
+
+    for(uint32_t i = 0; i < cache->count; i++) {
+        lv_draw_eve5_image_cache_entry_t *e = &cache->entries[i];
+
+        if(e->key_hash == key_hash) {
+            uint32_t addr = Esd_GpuAlloc_Get(u->allocator, e->gpu_handle);
+            if(addr != GA_INVALID) {
+                out->gpu_handle = e->gpu_handle;
+                out->eve_format = e->eve_format;
+                out->eve_stride = e->eve_stride;
+                out->width = e->width;
+                out->height = e->height;
+                out->image_offset = e->image_offset;
+                out->palette_offset = e->palette_offset;
+                return true;
+            }
+
+            /* Stale entry */
+            cache->entries[i] = cache->entries[--cache->count];
+            break;
+        }
+    }
+
+    return false;
 }
 
 /**********************

@@ -271,8 +271,7 @@ bool lv_eve5_touch_calibrate(lv_display_t *disp)
     EVE_CoDl_colorRgb(phost, 255, 255, 255);
 
     /* CMD_CALIBRATE displays calibration UI and waits for user input */
-    uint32_t result = 0;
-    EVE_CoCmd_calibrate(phost);
+    (void)EVE_CoCmd_calibrate(phost);
 
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
@@ -452,7 +451,7 @@ static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
     int16_t y = (int16_t)y_raw;
 
     /* Validate coordinates are within display bounds */
-    if (x >= 0 && y >= 0 && x < phost->Width && y < phost->Height)
+    if (x >= 0 && y >= 0 && (uint32_t)x < phost->Width && (uint32_t)y < phost->Height)
     {
         data->state = LV_INDEV_STATE_PRESSED;
         data->point.x = x;
@@ -497,7 +496,7 @@ static void multitouch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
     if (touched)
     {
         /* Validate coordinates are within display bounds */
-        if (x >= 0 && y >= 0 && x < phost->Width && y < phost->Height)
+        if (x >= 0 && y >= 0 && (uint32_t)x < phost->Width && (uint32_t)y < phost->Height)
         {
             data->state = LV_INDEV_STATE_PRESSED;
             data->point.x = x;

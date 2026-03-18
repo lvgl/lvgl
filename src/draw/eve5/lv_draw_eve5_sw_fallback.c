@@ -122,6 +122,7 @@ uint8_t *lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t *u,
 
     int32_t ofs_x = t->_real_area.x1;
     int32_t ofs_y = t->_real_area.y1;
+    (void)ofs_x; (void)ofs_y;
 
     bool render_ok = false;
 

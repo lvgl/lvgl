@@ -218,6 +218,9 @@ void lv_eve5_hal_unlock(lv_display_t *disp);
 /* Include the SD card filesystem driver header */
 #include "lv_eve5_sdcard.h"
 
+/* Include the flash filesystem driver header */
+#include "lv_eve5_flash.h"
+
 #endif /* LV_USE_EVE5 */
 
 #ifdef __cplusplus

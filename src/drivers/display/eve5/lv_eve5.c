@@ -243,7 +243,7 @@ static void invalidate_area_cb(lv_event_t *e)
     if(area == NULL) return;
 
     /* Expand by 1px in each direction to cover EVE AA fringe */
-    lv_display_t *disp = lv_event_get_target_obj(e);
+    lv_display_t *disp = lv_event_get_target(e);
     area->x1 = LV_MAX(area->x1 - 1, 0);
     area->y1 = LV_MAX(area->y1 - 1, 0);
     area->x2 = LV_MIN(area->x2 + 1, lv_display_get_horizontal_resolution(disp) - 1);

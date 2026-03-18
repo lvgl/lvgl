@@ -24,6 +24,7 @@
 #if LV_USE_DRAW_EVE5
 
 #include "../lv_draw.h"
+#include "../lv_draw_image.h"
 #include "../lv_draw_mask_private.h"
 
 /**********************
@@ -734,6 +735,88 @@ void lv_draw_eve5_hal_draw_mask_rect(lv_draw_eve5_unit_t *u, const lv_draw_task_
     }
 
     EVE_CoDl_restoreContext(phost);
+}
+
+/**********************
+ * BITMAP MASK (LAYER)
+ *
+ * Applied at the end of a child layer's render (same point as mask_rect).
+ * Scales all premultiplied RGBA channels by the mask bitmap, producing
+ * correctly masked content that composites with standard premultiplied
+ * blend(ONE, ONE_MINUS_SRC_ALPHA) — no multi-phase masking needed.
+ *
+ * The caller clears bitmap_mask_src on the parent's LAYER task after
+ * calling this, so no draw unit double-applies the mask.
+ **********************/
+
+void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
+                                     const lv_draw_image_dsc_t *layer_dsc)
+{
+    EVE_HalContext *phost = u->hal;
+
+    int32_t layer_w = lv_area_get_width(&layer->buf_area);
+    int32_t layer_h = lv_area_get_height(&layer->buf_area);
+
+    /* Load mask bitmap */
+    eve5_gpu_image_t mask_img;
+    if(!lv_draw_eve5_resolve_to_gpu(u, layer_dsc->bitmap_mask_src, &mask_img)) {
+        LV_LOG_WARN("EVE5: Failed to load bitmap mask for layer %p", (void *)layer);
+        return;
+    }
+    uint32_t mask_addr, mask_palette;
+    eve5_gpu_image_resolve(u->allocator, &mask_img, &mask_addr, &mask_palette);
+    if(mask_addr == GA_INVALID) return;
+
+    /* Center-align mask on image_area (same convention as image draw) */
+    int32_t img_w = lv_area_get_width(&layer_dsc->image_area);
+    int32_t img_h = lv_area_get_height(&layer_dsc->image_area);
+    int32_t mask_x = (layer_dsc->image_area.x1 - layer->buf_area.x1) + (img_w - mask_img.width) / 2;
+    int32_t mask_y = (layer_dsc->image_area.y1 - layer->buf_area.y1) + (img_h - mask_img.height) / 2;
+
+    EVE_CoDl_scissorXY(phost, 0, 0);
+    EVE_CoDl_scissorSize(phost, layer_w, layer_h);
+    EVE_CoDl_bitmapTransform_identity(phost);
+    EVE_CoDl_vertexFormat(phost, 0);
+    EVE_CoDl_saveContext(phost);
+
+    /* Set up mask bitmap.
+     * For ARGB8/PALETTEDARGB8 masks (grayscale PNGs): use GLFORMAT + swizzle
+     * to route RED channel to ALPHA (R=G=B=gray, A=255 → we want gray as alpha).
+     * For L8/A8: BT820 natively decodes as (255,255,255,L) — alpha=L, no swizzle. */
+    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+    EVE_CoDl_bitmapSource(phost, mask_addr);
+    set_palette_if_needed(phost, mask_img.eve_format, mask_palette);
+    if(mask_img.eve_format == ARGB8 || mask_img.eve_format == PALETTEDARGB8) {
+        EVE_CoDl_bitmapLayout(phost, GLFORMAT, mask_img.eve_stride, mask_img.height);
+        EVE_CoDl_bitmapExtFormat(phost, mask_img.eve_format);
+        EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);
+    }
+    else {
+        EVE_CoDl_bitmapLayout(phost, (uint8_t)mask_img.eve_format,
+                              mask_img.eve_stride, mask_img.height);
+    }
+
+    /* Draw mask covering the full layer area. Use bitmap transform offset
+     * to position the mask at (mask_x, mask_y) within the layer.
+     * BORDER mode returns 0 for out-of-bounds texels, so:
+     *   - Inside mask bitmap: dst *= mask_value (scales RGBA by mask)
+     *   - Outside mask bitmap: dst *= 0 (zeroes premultiplied content) */
+    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, layer_w, layer_h);
+    EVE_CoDl_bitmapTransformC(phost, -mask_x * 256);
+    EVE_CoDl_bitmapTransformF(phost, -mask_y * 256);
+
+    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+    EVE_CoDl_blendFunc(phost, ZERO, SRC_ALPHA);
+
+    EVE_CoDl_begin(phost, BITMAPS);
+    EVE_CoDl_vertex2f_0(phost, 0, 0);
+    EVE_CoDl_end(phost);
+
+    EVE_CoDl_restoreContext(phost);
+
+    LV_LOG_INFO("EVE5: Applied bitmap mask to layer %p (%dx%d mask at (%d,%d))",
+                (void *)layer, (int)mask_img.width, (int)mask_img.height,
+                (int)mask_x, (int)mask_y);
 }
 
 #endif /* LV_USE_DRAW_EVE5 */

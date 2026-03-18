@@ -35,7 +35,6 @@
 
 /* Primitive helpers */
 void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t r16);
-static void draw_circle(lv_draw_eve5_unit_t *u, int32_t cx, int32_t cy, int32_t radius);
 /* Gradient bitmap helpers */
 bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
                             lv_opa_t opa, int32_t w, int32_t h, bool alpha_to_rgb);
@@ -59,13 +58,6 @@ void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t
     EVE_CoDl_begin(u->hal, POINTS);
     EVE_CoDl_vertex2f_1(u->hal, cx2, cy2);
     EVE_CoDl_end(u->hal);
-}
-
-/* Integer pixel circle (center in pixels, radius in pixels).
- * Adds +0.5px for anti-aliased edge coverage. */
-static void draw_circle(lv_draw_eve5_unit_t *u, int32_t cx, int32_t cy, int32_t radius)
-{
-    draw_circle_subpx(u, cx * 2, cy * 2, radius * 16 + 8);
 }
 
 void lv_draw_eve5_draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int32_t x2, int32_t y2,

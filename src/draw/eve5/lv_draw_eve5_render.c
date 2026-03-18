@@ -35,6 +35,23 @@
 
 #if 0
 #define EVE5_LOG(...) LV_LOG_INFO(__VA_ARGS__)
+static const char *task_type_str(lv_draw_task_type_t type)
+{
+    switch(type) {
+        case LV_DRAW_TASK_TYPE_FILL:       return "FILL";
+        case LV_DRAW_TASK_TYPE_BORDER:     return "BORDER";
+        case LV_DRAW_TASK_TYPE_LINE:       return "LINE";
+        case LV_DRAW_TASK_TYPE_TRIANGLE:   return "TRIANGLE";
+        case LV_DRAW_TASK_TYPE_LABEL:      return "LABEL";
+        case LV_DRAW_TASK_TYPE_LETTER:     return "LETTER";
+        case LV_DRAW_TASK_TYPE_IMAGE:      return "IMAGE";
+        case LV_DRAW_TASK_TYPE_ARC:        return "ARC";
+        case LV_DRAW_TASK_TYPE_LAYER:      return "LAYER";
+        case LV_DRAW_TASK_TYPE_BOX_SHADOW: return "BOX_SHADOW";
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE: return "MASK_RECT";
+        default:                           return "OTHER";
+    }
+}
 #else
 #define EVE5_LOG(...) do {} while(0)
 #endif
@@ -73,29 +90,9 @@
 /**********************
  * STATIC PROTOTYPES
  **********************/
-static const char *task_type_str(lv_draw_task_type_t type);
-
 /**********************
  * HELPER UTILITIES
  **********************/
-
-static const char *task_type_str(lv_draw_task_type_t type)
-{
-    switch(type) {
-        case LV_DRAW_TASK_TYPE_FILL:       return "FILL";
-        case LV_DRAW_TASK_TYPE_BORDER:     return "BORDER";
-        case LV_DRAW_TASK_TYPE_LINE:       return "LINE";
-        case LV_DRAW_TASK_TYPE_TRIANGLE:   return "TRIANGLE";
-        case LV_DRAW_TASK_TYPE_LABEL:      return "LABEL";
-        case LV_DRAW_TASK_TYPE_LETTER:     return "LETTER";
-        case LV_DRAW_TASK_TYPE_IMAGE:      return "IMAGE";
-        case LV_DRAW_TASK_TYPE_ARC:        return "ARC";
-        case LV_DRAW_TASK_TYPE_LAYER:      return "LAYER";
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW: return "BOX_SHADOW";
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE: return "MASK_RECT";
-        default:                           return "OTHER";
-    }
-}
 
 /**
  * Check if a task's visible area is fully inside the opaque region.
@@ -604,10 +601,14 @@ void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t *u, lv_layer_t *layer
  * With default blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA), the L8 luminance
  * accumulates Porter-Duff "over" alpha coverage.
  *
- * L8 has no alpha channel, so alpha-as-scratch masking (used by rounded
- * gradient fills, image clip_radius, border masking) has no effect — those
- * shapes render unmasked (rectangular instead of rounded). The RGB channel
- * retains correct rounding regardless.
+ * BT820's render engine processes all draw commands through internal ARGB
+ * line buffers, regardless of the output format. The L8 target format only
+ * affects what is stored to VRAM — the full alpha channel is available
+ * during rendering. This means alpha-as-scratch masking techniques (used
+ * by rounded gradient fills, image clip_radius, border masking, bitmap
+ * masks) work correctly in the L8 pass: the internal pipeline has alpha
+ * for all intermediate phases, and the final luminance output captures
+ * the correct alpha coverage.
  *
  * Returns a GpuHandle for the L8 texture (or GA_HANDLE_INVALID on failure).
  */

@@ -28,12 +28,8 @@
 
 #include "../lv_draw.h"
 #include "../lv_draw_image.h"
-#include "../lv_image_decoder_private.h"
 #if LV_USE_OS
 #include "../../drivers/display/eve5/lv_eve5.h"
-#endif
-#if LV_USE_FS_EVE5_SDCARD
-#include "../../drivers/display/eve5/lv_eve5_sdcard.h"
 #endif
 
 /**********************
@@ -57,7 +53,6 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     int32_t layout_h;  /* Height for bitmapLayout (may differ from src_h for render targets) */
     uint32_t palette_addr = GA_INVALID;  /* RAM_G address of palette LUT (GA_INVALID = non-paletted) */
     Esd_GpuHandle child_handle = GA_HANDLE_INVALID;
-    eve5_resolved_image_t resolved_src = {0};
 
     /* Resolve bitmap source.
      * LAYER: GPU-rendered child layer in RAM_G.
@@ -70,7 +65,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
         if(ram_g_addr == GA_INVALID) {
             LV_LOG_WARN("EVE5: Child layer %p texture invalid, handle id %i",
-                child_layer, (int)child_handle.Id);
+                (void *)child_layer, (int)child_handle.Id);
             return;
         }
         src_w = lv_area_get_width(&child_layer->buf_area);
@@ -131,107 +126,39 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         }
     }
     else {
-        /* Regular image — check GPU cache first, then try load paths. */
-        bool loaded = false;
-        Esd_GpuHandle file_handle = GA_HANDLE_INVALID;  /* For cache insert after file load */
-
-        /* Check GPU image cache for file sources (keyed by src pointer + path hash).
-         * The src pointer from the image widget is stable across frames. */
-        if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_FILE) {
-            uint16_t cached_palette_size = 0;
-            int32_t cached_w = 0, cached_h = 0;
-            ram_g_addr = lv_draw_eve5_image_cache_lookup_raw(u,
-                (uintptr_t)dsc->src, lv_draw_eve5_hash_path((const char *)dsc->src),
-                &eve_format, &eve_stride, &cached_w, &cached_h, &cached_palette_size);
-            if(ram_g_addr != GA_INVALID) {
-                src_w = cached_w;
-                src_h = cached_h;
-                palette_addr = (cached_palette_size > 0) ? (ram_g_addr - cached_palette_size) : GA_INVALID;
-                layout_h = src_h;
-                loaded = true;
-            }
-        }
-
-#if LV_USE_FS_EVE5_SDCARD
-        /* Try direct SD card JPEG/PNG decode path (zero-copy). */
-        if(!loaded) {
-            loaded = lv_draw_eve5_try_load_sdcard_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                            &eve_stride, &src_w, &src_h, &file_handle);
-            if(loaded) {
-                layout_h = src_h;
-            }
-        }
-#endif /* LV_USE_FS_EVE5_SDCARD */
-
-#if EVE5_HW_IMAGE_DECODE
-        /* Try STDIO hardware decode path (JPEG/PNG via CMD_LOADIMAGE). */
-        if(!loaded) {
-#if LV_USE_OS
-            lv_eve5_hal_unlock(lv_display_get_default());
-#endif
-            loaded = lv_draw_eve5_try_load_file_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                          &eve_stride, &src_w, &src_h, &file_handle, &palette_addr);
-#if LV_USE_OS
-            lv_eve5_hal_lock(lv_display_get_default());
-#endif
-            if(loaded) {
-                layout_h = src_h;
-            }
-        }
-#endif /* EVE5_HW_IMAGE_DECODE */
-
-        if(!loaded) {
-            /* Standard path: decode via LVGL decoder, upload to RAM_G.
-             * Unlock HAL mutex during decoder open: the image decoder may
-             * trigger filesystem access (e.g., SD card driver) which needs
-             * the HAL mutex, causing deadlock if we hold it here. */
-#if LV_USE_OS
-            lv_eve5_hal_unlock(lv_display_get_default());
-#endif
-            bool resolved = lv_draw_eve5_resolve_image_source(dsc->src, &resolved_src);
-#if LV_USE_OS
-            lv_eve5_hal_lock(lv_display_get_default());
-#endif
-            if(!resolved) {
-                return;
-            }
-            const lv_image_dsc_t *img_dsc = resolved_src.img_dsc;
-            src_w = img_dsc->header.w;
-            src_h = img_dsc->header.h;
-            ram_g_addr = lv_draw_eve5_upload_image(u, img_dsc, &eve_format, &eve_stride, &palette_addr);
-            if(ram_g_addr == GA_INVALID) {
-                lv_draw_eve5_release_image_source(&resolved_src);
-                return;
-            }
-            layout_h = src_h;
-        }
-
-        /* Cache file image results for next frame (SD card and HW decode paths).
-         * The SW decoder path caches via upload_image() internally. */
-        if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_FILE && file_handle.Id != GA_HANDLE_INVALID.Id) {
-            lv_draw_eve5_image_cache_insert_raw(u,
-                (uintptr_t)dsc->src, lv_draw_eve5_hash_path((const char *)dsc->src),
-                file_handle, eve_format, eve_stride,
-                (int16_t)src_w, (int16_t)src_h, 0);
-        }
+        /* Regular image — resolve to GPU via unified loading chain */
+        eve5_gpu_image_t img;
+        if(!lv_draw_eve5_resolve_to_gpu(u, dsc->src, &img)) return;
+        eve5_gpu_image_resolve(u->allocator, &img, &ram_g_addr, &palette_addr);
+        if(ram_g_addr == GA_INVALID) return;
+        eve_format = img.eve_format;
+        eve_stride = img.eve_stride;
+        src_w = img.width;
+        src_h = img.height;
+        layout_h = src_h;
     }
 
-    /* Upload bitmap mask if set (A8/L8 → EVE L8, cached in image cache) */
+    /* Load bitmap mask if set */
     bool has_bitmap_mask = false;
     uint32_t mask_ram_g_addr = GA_INVALID;
     int32_t mask_w = 0, mask_h = 0;
     int32_t mask_eve_stride = 0;
+    uint16_t mask_eve_format = L8;
+    uint32_t mask_palette_addr = GA_INVALID;
     if(dsc->bitmap_mask_src != NULL) {
-        const lv_image_dsc_t *mask_dsc = dsc->bitmap_mask_src;
-        uint16_t mask_eve_format;
-        mask_w = mask_dsc->header.w;
-        mask_h = mask_dsc->header.h;
-        mask_ram_g_addr = lv_draw_eve5_upload_image(u, mask_dsc, &mask_eve_format, &mask_eve_stride, NULL);
-        if(mask_ram_g_addr != GA_INVALID) {
-            has_bitmap_mask = true;
+        eve5_gpu_image_t mask_img;
+        if(lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src, &mask_img)) {
+            eve5_gpu_image_resolve(u->allocator, &mask_img, &mask_ram_g_addr, &mask_palette_addr);
+            if(mask_ram_g_addr != GA_INVALID) {
+                mask_eve_format = mask_img.eve_format;
+                mask_eve_stride = mask_img.eve_stride;
+                mask_w = mask_img.width;
+                mask_h = mask_img.height;
+                has_bitmap_mask = true;
+            }
         }
-        else {
-            LV_LOG_WARN("EVE5: Failed to upload bitmap mask");
+        if(!has_bitmap_mask) {
+            LV_LOG_WARN("EVE5: Failed to load bitmap mask");
         }
     }
 
@@ -249,7 +176,6 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
      * Regular images use standard SRC_ALPHA blend with unscaled colors. */
     bool is_layer = (t->type == LV_DRAW_TASK_TYPE_LAYER);
     bool is_premultiplied;
-    bool is_alpha_only = false;
     if(is_layer) {
         lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
         /* Check canvas cache for actual premultiplied state (canvas direct image is non-premultiplied).
@@ -266,8 +192,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
             is_premultiplied = (child_layer->color_format == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
         }
     }
-    else if(resolved_src.img_dsc != NULL) {
-        const lv_image_dsc_t *img_dsc = resolved_src.img_dsc;
+    else if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
+        const lv_image_dsc_t *img_dsc = (const lv_image_dsc_t *)dsc->src;
         /* Check if this image came from the canvas cache. Canvas GPU textures
          * may be premultiplied (rendered through EVE pipeline) or non-premultiplied
          * (direct image load optimization). Check the actual state from cache. */
@@ -278,16 +204,11 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         } else {
             is_premultiplied = (img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
         }
-        is_alpha_only = LV_COLOR_FORMAT_IS_ALPHA_ONLY(img_dsc->header.cf);
     }
     else {
-        /* SD card direct path — JPEG/PNG decoded to RGB565 */
+        /* FILE sources (SD card, flash, HW/SW decoded) are never premultiplied */
         is_premultiplied = false;
-        is_alpha_only = false;
     }
-
-    /* Release decoder session early — image data is in RAM_G now */
-    lv_draw_eve5_release_image_source(&resolved_src);
 
     if(is_premultiplied) {
         uint8_t opa = dsc->opa;
@@ -337,14 +258,17 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     else
         EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ALPHA); */
 
-    /* Alpha-channel masking for clip_radius, bitmap_mask_src, and/or alpha_to_rgb.
+    /* Alpha-channel masking for clip_radius, bitmap_mask_src, alpha_to_rgb,
+     * or colorkey+recolor (the non-premultiplied recolor path below doesn't
+     * handle colorkey stencil, so route it through here instead).
      * Uses the same multi-phase approach as gradient fill masking:
      * Phase 1a: clear bbox alpha, 1b: write rounded rect mask (if clip_radius),
      * 1b2: apply bitmap mask (if bitmap_mask_src),
      * 1c: multiply mask by image alpha, 2: draw image through mask.
      * alpha_to_rgb routes through this path to reuse the transform/colorkey
      * handling; phase 2 draws a white RECT instead of the image bitmap. */
-    if(dsc->clip_radius > 0 || has_bitmap_mask || alpha_to_rgb) {
+    if(dsc->clip_radius > 0 || has_bitmap_mask || alpha_to_rgb
+       || (dsc->colorkey != NULL && dsc->recolor_opa > LV_OPA_MIN)) {
         /* Convert image_area from absolute to layer-local coordinates */
         int32_t mask_x1 = dsc->image_area.x1 - layer->buf_area.x1;
         int32_t mask_y1 = dsc->image_area.y1 - layer->buf_area.y1;
@@ -377,6 +301,13 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
             lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
                                     &t->clip_area, &layer->buf_area);
         }
+        else if(dsc->colorkey != NULL && !has_bitmap_mask) {
+            /* Colorkey + recolor (no clip_radius): fill bbox A=255 so the
+             * colorkey punch and image alpha multiply produce correct mask. */
+            EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+            lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
+                                    &t->clip_area, &layer->buf_area);
+        }
 
         /* Phase 1b2: Apply bitmap mask (A8/L8 texture as per-pixel alpha).
          * Combined with clip_radius: multiplies existing rounded rect alpha.
@@ -395,21 +326,43 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
 
             /* Nested save/restore to preserve main image bitmap config */
             EVE_CoDl_saveContext(phost);
+            EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
             EVE_CoDl_bitmapSource(phost, mask_ram_g_addr);
-            EVE_CoDl_bitmapLayout(phost, L8, mask_eve_stride, mask_h);
+            set_palette_if_needed(phost, mask_eve_format, mask_palette_addr);
+            /* For ARGB8 or PALETTEDARGB8: use GLFORMAT + swizzle to extract RED channel as alpha
+             * (grayscale PNGs decode as ARGB8/PALETTEDARGB8 with R=G=B=gray, A=255).
+             * For L8/A8: BT820 natively decodes as (255,255,255,L) — no swizzle needed. */
+            if(mask_eve_format == ARGB8 || mask_eve_format == PALETTEDARGB8) {
+                EVE_CoDl_bitmapLayout(phost, GLFORMAT, mask_eve_stride, mask_h);
+                EVE_CoDl_bitmapExtFormat(phost, mask_eve_format);
+                EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);
+            }
+            else {
+                EVE_CoDl_bitmapLayout(phost, (uint8_t)mask_eve_format, mask_eve_stride, mask_h);
+            }
             EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, mask_w, mask_h);
-            /* BT820 L8 natively decodes as (255,255,255,L) — alpha=L, no swizzle needed. */
-            /* EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, ALPHA); */
             EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
             EVE_CoDl_begin(phost, BITMAPS);
             EVE_CoDl_vertex2f_0(phost, mask_draw_x, mask_draw_y);
             EVE_CoDl_end(phost);
             EVE_CoDl_restoreContext(phost);
-            /* BT820: BITMAP_SWIZZLE only applies in GLFORMAT mode — no restore needed. */
-            /* if(is_alpha_only)
-                EVE_CoDl_bitmapSwizzle(phost, ONE, ONE, ONE, ALPHA);
-            else
-                EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ALPHA); */
+
+            /* Re-setup main image bitmap — restoreContext doesn't restore per-handle
+             * bitmap state (source, layout, size), only graphics context. The scratch
+             * handle still has mask config after restoreContext; we must re-configure
+             * it with the main image before Phase 1c and Phase 2 draw. */
+            EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+            EVE_CoDl_bitmapSource(phost, ram_g_addr);
+            set_palette_if_needed(phost, eve_format, palette_addr);
+            EVE_CoDl_bitmapLayout(phost, (uint8_t)eve_format, eve_stride, layout_h);
+            if(dsc->tile) {
+                int32_t tile_w = lv_area_get_width(&dsc->image_area);
+                int32_t tile_h = lv_area_get_height(&dsc->image_area);
+                EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
+            }
+            else {
+                EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER, src_w, src_h);
+            }
         }
 
         /* Set up image transform (if any) — stays active for phases 1c and 2.
@@ -481,14 +434,34 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         }
 
         /* Phase 1c: Multiply mask by image alpha.
-         * colorA = opa so the mask includes opacity scaling.
-         * Unlike gradient fill (which bakes opa into bitmap pixels),
-         * image opa is applied via colorA during the alpha multiply. */
-        EVE_CoDl_colorA(phost, dsc->opa);
-        EVE_CoDl_blendFunc(phost, ZERO, SRC_ALPHA);
-        EVE_CoDl_begin(phost, BITMAPS);
-        EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
-        EVE_CoDl_end(phost);
+         *
+         * Non-premultiplied / alpha_to_rgb: multiply mask by bitmap alpha and opa.
+         * The bitmap's per-pixel alpha modulates the mask so transparent parts
+         * of the source don't contribute.
+         *
+         * Premultiplied: scale mask by opa only (full-coverage RECT, not bitmap).
+         * Premultiplied content has alpha baked into RGB — multiplying the mask
+         * by bitmap alpha would double-apply it. Phase 2 uses DST_ALPHA blend
+         * to gate the source by the mask, so the premultiplied alpha naturally
+         * modulates the result without an explicit mask multiply. */
+        if(is_premultiplied && !alpha_to_rgb) {
+            if(dsc->opa < LV_OPA_MAX) {
+                EVE_CoDl_colorA(phost, dsc->opa);
+                EVE_CoDl_blendFunc(phost, ZERO, SRC_ALPHA);
+                EVE_CoDl_lineWidth(phost, 16);
+                EVE_CoDl_begin(phost, RECTS);
+                EVE_CoDl_vertex2f_0(phost, mask_x1, mask_y1);
+                EVE_CoDl_vertex2f_0(phost, mask_x2, mask_y2);
+                EVE_CoDl_end(phost);
+            }
+        }
+        else {
+            EVE_CoDl_colorA(phost, dsc->opa);
+            EVE_CoDl_blendFunc(phost, ZERO, SRC_ALPHA);
+            EVE_CoDl_begin(phost, BITMAPS);
+            EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+            EVE_CoDl_end(phost);
+        }
 
         /* Phase 2: Draw through the alpha mask. */
         EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
@@ -505,24 +478,23 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
             EVE_CoDl_end(phost);
         }
         else if(is_premultiplied) {
-            /* For premultiplied content: ONE avoids re-multiplying already-premultiplied
-             * RGB by the mask. Opa is applied via colorRgb scaling. */
+            /* Premultiplied compositing through mask.
+             * DST_ALPHA = mask * opa (spatial mask scaled by opacity).
+             * blend(DST_ALPHA, ONE_MINUS_DST_ALPHA) gates the source by the mask
+             * and fades the destination. Opa is already in DST_ALPHA from phase 1c,
+             * so colorRgb carries only the recolor tint (or white = no tint). */
             if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
-                EVE_CoDl_blendFunc(phost, ONE, ONE);
+                EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE);
             else
-                EVE_CoDl_blendFunc(phost, ONE, ONE_MINUS_DST_ALPHA);
-            uint8_t opa = dsc->opa;
+                EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
             if(dsc->recolor_opa > LV_OPA_MIN) {
                 lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
-                EVE_CoDl_colorRgb(phost,
-                    (uint8_t)(mixed.red * opa / 255),
-                    (uint8_t)(mixed.green * opa / 255),
-                    (uint8_t)(mixed.blue * opa / 255));
+                EVE_CoDl_colorRgb(phost, mixed.red, mixed.green, mixed.blue);
             }
             else {
-                EVE_CoDl_colorRgb(phost, opa, opa, opa);
+                EVE_CoDl_colorRgb(phost, 255, 255, 255);
             }
-            EVE_CoDl_colorA(phost, opa);
+            EVE_CoDl_colorA(phost, 255);
             EVE_CoDl_begin(phost, BITMAPS);
             EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
             EVE_CoDl_end(phost);

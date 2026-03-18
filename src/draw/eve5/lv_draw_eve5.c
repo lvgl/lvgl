@@ -25,6 +25,7 @@
 
 #if LV_USE_DRAW_EVE5
 
+#include "../lv_draw_image.h"
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 #if LV_USE_OS
@@ -38,6 +39,34 @@
 
 #if 0
 #define EVE5_LOG(...) LV_LOG_INFO(__VA_ARGS__)
+static const char *task_state_str(lv_draw_task_state_t state)
+{
+    switch(state) {
+        case LV_DRAW_TASK_STATE_WAITING:     return "WAITING";
+        case LV_DRAW_TASK_STATE_QUEUED:      return "QUEUED";
+        case LV_DRAW_TASK_STATE_IN_PROGRESS: return "IN_PROGRESS";
+        case LV_DRAW_TASK_STATE_FINISHED:    return "FINISHED";
+        case LV_DRAW_TASK_STATE_BLOCKED:     return "BLOCKED";
+        default:                              return "UNKNOWN";
+    }
+}
+static const char *task_type_str(lv_draw_task_type_t type)
+{
+    switch(type) {
+        case LV_DRAW_TASK_TYPE_FILL:       return "FILL";
+        case LV_DRAW_TASK_TYPE_BORDER:     return "BORDER";
+        case LV_DRAW_TASK_TYPE_LINE:       return "LINE";
+        case LV_DRAW_TASK_TYPE_TRIANGLE:   return "TRIANGLE";
+        case LV_DRAW_TASK_TYPE_LABEL:      return "LABEL";
+        case LV_DRAW_TASK_TYPE_LETTER:     return "LETTER";
+        case LV_DRAW_TASK_TYPE_IMAGE:      return "IMAGE";
+        case LV_DRAW_TASK_TYPE_ARC:        return "ARC";
+        case LV_DRAW_TASK_TYPE_LAYER:      return "LAYER";
+        case LV_DRAW_TASK_TYPE_BOX_SHADOW: return "BOX_SHADOW";
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE: return "MASK_RECT";
+        default:                           return "OTHER";
+    }
+}
 #else
 #define EVE5_LOG(...) do {} while(0)
 #endif
@@ -85,8 +114,6 @@
 static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer);
 static int32_t evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task);
 static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer);
-static const char *task_state_str(lv_draw_task_state_t state);
-static const char *task_type_str(lv_draw_task_type_t type);
 
 /**********************
  * GLOBAL FUNCTIONS
@@ -128,40 +155,6 @@ void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
 void lv_draw_eve5_deinit(void)
 {
     LV_LOG_INFO("EVE5: Draw unit deinitialized");
-}
-
-/**********************
- * DEBUG HELPERS
- **********************/
-
-static const char *task_state_str(lv_draw_task_state_t state)
-{
-    switch(state) {
-        case LV_DRAW_TASK_STATE_WAITING:     return "WAITING";
-        case LV_DRAW_TASK_STATE_QUEUED:      return "QUEUED";
-        case LV_DRAW_TASK_STATE_IN_PROGRESS: return "IN_PROGRESS";
-        case LV_DRAW_TASK_STATE_FINISHED:    return "FINISHED";
-        case LV_DRAW_TASK_STATE_BLOCKED:     return "BLOCKED";
-        default:                              return "UNKNOWN";
-    }
-}
-
-static const char *task_type_str(lv_draw_task_type_t type)
-{
-    switch(type) {
-        case LV_DRAW_TASK_TYPE_FILL:       return "FILL";
-        case LV_DRAW_TASK_TYPE_BORDER:     return "BORDER";
-        case LV_DRAW_TASK_TYPE_LINE:       return "LINE";
-        case LV_DRAW_TASK_TYPE_TRIANGLE:   return "TRIANGLE";
-        case LV_DRAW_TASK_TYPE_LABEL:      return "LABEL";
-        case LV_DRAW_TASK_TYPE_LETTER:     return "LETTER";
-        case LV_DRAW_TASK_TYPE_IMAGE:      return "IMAGE";
-        case LV_DRAW_TASK_TYPE_ARC:        return "ARC";
-        case LV_DRAW_TASK_TYPE_LAYER:      return "LAYER";
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW: return "BOX_SHADOW";
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE: return "MASK_RECT";
-        default:                           return "OTHER";
-    }
 }
 
 /**********************
@@ -456,6 +449,30 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                 rendered_count++;
             }
             t = t->next;
+        }
+    }
+
+    /* Deferred bitmap mask: if this child layer's parent has a LAYER task
+     * referencing us with bitmap_mask_src, apply the mask here — same
+     * technique as mask_rect (scale all premultiplied RGBA uniformly).
+     * Then clear bitmap_mask_src on the parent's task so any draw unit
+     * compositing the LAYER task uses standard blend without double-masking.
+     *
+     * This must run after alpha correction so all channels are correct,
+     * and before hal_finish_layer so the DL is still open. */
+    if(!is_screen && !is_canvas && layer->parent != NULL) {
+        lv_draw_task_t *pt = layer->parent->draw_task_head;
+        while(pt) {
+            if(pt->type == LV_DRAW_TASK_TYPE_LAYER) {
+                lv_draw_image_dsc_t *layer_dsc = pt->draw_dsc;
+                lv_layer_t *child_ref = (lv_layer_t *)layer_dsc->src;
+                if(child_ref == layer && layer_dsc->bitmap_mask_src != NULL) {
+                    lv_draw_eve5_apply_bitmap_mask(u, layer, layer_dsc);
+                    layer_dsc->bitmap_mask_src = NULL;  /* Consumed — don't apply again */
+                    break;
+                }
+            }
+            pt = pt->next;
         }
     }
 

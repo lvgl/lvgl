@@ -22,6 +22,7 @@ extern "C" {
 #if LV_USE_DRAW_EVE5
 
 #include "../lv_draw_private.h"
+#include "../lv_draw_image.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_image_decoder_private.h"
 #include "../../misc/lv_area_private.h"
@@ -125,7 +126,8 @@ extern "C" {
  **********************/
 
 /**
- * Image cache entry - maps source pointer to GPU allocation
+ * Image cache entry - maps source pointer to GPU allocation.
+ * Offsets are relative to gpu_handle base (defrag-safe).
  */
 typedef struct
 {
@@ -136,7 +138,8 @@ typedef struct
     int32_t eve_stride; /* Cached stride */
     int16_t width;
     int16_t height;
-    uint16_t palette_size; /* Bytes of palette preceding index data (0 for non-paletted) */
+    uint32_t image_offset; /* Offset from alloc base to bitmap/index data */
+    uint32_t palette_offset; /* Offset from alloc base to palette LUT (GA_INVALID = non-paletted) */
 } lv_draw_eve5_image_cache_entry_t;
 
 /**
@@ -282,6 +285,40 @@ typedef struct
     int32_t canvas_orig_h;          /* Content height */
 } lv_draw_eve5_unit_t;
 
+/**
+ * Resolved GPU image — handle-based, defrag-safe.
+ * Offsets are relative to the allocation base (Esd_GpuAlloc_Get).
+ * Current RAM_G addresses must be computed fresh each time:
+ *   addr = Esd_GpuAlloc_Get(alloc, img.gpu_handle) + img.image_offset
+ * The handle is borrowed from the cache — callers must NOT free it.
+ */
+typedef struct {
+    Esd_GpuHandle gpu_handle;    /* Allocator handle (defrag-safe) */
+    uint16_t eve_format;         /* EVE bitmap format */
+    int32_t eve_stride;          /* Bytes per row */
+    int32_t width;
+    int32_t height;
+    uint32_t image_offset;       /* Offset from handle base to bitmap data */
+    uint32_t palette_offset;     /* Offset from handle base to palette LUT (GA_INVALID if none) */
+} eve5_gpu_image_t;
+
+/* Resolve current RAM_G addresses from a GPU image (single allocator lookup).
+ * Sets *out_addr to the bitmap address (GA_INVALID if allocation was reclaimed).
+ * Sets *out_palette_addr to the palette address (GA_INVALID if non-paletted or reclaimed). */
+static inline void eve5_gpu_image_resolve(Esd_GpuAlloc *alloc, const eve5_gpu_image_t *img,
+                                            uint32_t *out_addr, uint32_t *out_palette_addr)
+{
+    uint32_t base = Esd_GpuAlloc_Get(alloc, img->gpu_handle);
+    if(base != GA_INVALID) {
+        *out_addr = base + img->image_offset;
+        *out_palette_addr = (img->palette_offset != GA_INVALID) ? (base + img->palette_offset) : GA_INVALID;
+    }
+    else {
+        *out_addr = GA_INVALID;
+        *out_palette_addr = GA_INVALID;
+    }
+}
+
 /**********************
  * CACHE PROTOTYPES
  **********************/
@@ -293,13 +330,13 @@ uint32_t lv_draw_eve5_image_cache_lookup(lv_draw_eve5_unit_t *u,
     const lv_image_dsc_t *img_dsc,
     uint16_t *out_eve_format,
     int32_t *out_eve_stride,
-    uint16_t *out_palette_size);
+    uint32_t *out_palette_addr);
 void lv_draw_eve5_image_cache_insert(lv_draw_eve5_unit_t *u,
     const lv_image_dsc_t *img_dsc,
     Esd_GpuHandle handle,
     uint16_t eve_format,
     int32_t eve_stride,
-    uint16_t palette_size);
+    uint32_t image_offset, uint32_t palette_offset);
 
 /* Raw key-based image cache API (for file path caching) */
 uint32_t lv_draw_eve5_image_cache_lookup_raw(lv_draw_eve5_unit_t *u,
@@ -307,14 +344,20 @@ uint32_t lv_draw_eve5_image_cache_lookup_raw(lv_draw_eve5_unit_t *u,
     uint16_t *out_eve_format,
     int32_t *out_eve_stride,
     int32_t *out_width, int32_t *out_height,
-    uint16_t *out_palette_size);
+    uint32_t *out_palette_addr);
 void lv_draw_eve5_image_cache_insert_raw(lv_draw_eve5_unit_t *u,
     uintptr_t key, uint32_t key_hash,
     Esd_GpuHandle handle,
     uint16_t eve_format,
     int32_t eve_stride,
     int16_t width, int16_t height,
-    uint16_t palette_size);
+    uint32_t image_offset, uint32_t palette_offset);
+
+/* Handle-based image cache lookups — return eve5_gpu_image_t (defrag-safe) */
+bool lv_draw_eve5_image_cache_find(lv_draw_eve5_unit_t *u,
+    const lv_image_dsc_t *img_dsc, eve5_gpu_image_t *out);
+bool lv_draw_eve5_image_cache_find_by_hash(lv_draw_eve5_unit_t *u,
+    uint32_t key_hash, eve5_gpu_image_t *out);
 
 /* Glyph cache */
 void lv_draw_eve5_glyph_cache_init(lv_draw_eve5_glyph_cache_t *cache, uint32_t capacity);
@@ -565,16 +608,29 @@ typedef struct {
     bool decoder_open;
 } eve5_resolved_image_t;
 
-/* Image format mapping (defined in lv_draw_eve5_image_load.c) */
+/* Image format mapping (defined in lv_draw_eve5_image_upload.c) */
 bool lv_draw_eve5_get_eve_format_info(lv_color_format_t src_cf,
                                  uint16_t *eve_format,
                                  uint8_t *bits_per_pixel,
                                  bool *needs_conversion);
 
-/* Image upload — cached (defined in lv_draw_eve5_image_load.c) */
+/* Image upload — cached, returns handle-based result (defined in lv_draw_eve5_image_upload.c).
+ * Checks canvas cache and image cache before uploading.
+ * The returned handle is owned by the cache — caller must NOT free it. */
+bool lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
+                                       const lv_image_dsc_t *img_dsc,
+                                       eve5_gpu_image_t *out);
+
+/* Image upload — cached, returns raw address (legacy wrapper).
+ * Prefer lv_draw_eve5_upload_image_to_gpu for new code. */
 uint32_t lv_draw_eve5_upload_image(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc,
                               uint16_t *out_eve_format, int32_t *out_eve_stride,
                               uint32_t *out_palette_addr);
+
+/* Image upload — uncached (defined in lv_draw_eve5_image_upload.c) */
+uint32_t lv_draw_eve5_upload_image_uncached(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc,
+                                        uint16_t *out_eve_format, int32_t *out_eve_stride,
+                                        Esd_GpuHandle *out_handle);
 
 /* Image source resolution (defined in lv_draw_eve5_image_load.c) */
 bool lv_draw_eve5_resolve_image_source(const void *src, eve5_resolved_image_t *resolved);
@@ -591,11 +647,25 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t *u, const void *src,
 bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t *u, const void *src,
                                    uint32_t *ram_g_addr, uint16_t *eve_format,
                                    int32_t *eve_stride, int32_t *src_w, int32_t *src_h,
-                                   Esd_GpuHandle *out_handle);
+                                   Esd_GpuHandle *out_handle, uint32_t *out_palette_addr);
+#endif
+#if LV_USE_FS_EVE5_FLASH
+bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t *u, const void *src,
+                                   uint32_t *ram_g_addr, uint16_t *eve_format,
+                                   int32_t *eve_stride, int32_t *src_w, int32_t *src_h,
+                                   Esd_GpuHandle *out_handle, uint32_t *out_palette_addr);
 #endif
 
+/* Unified image resolution — loads any image source to GPU, returns handle-based result.
+ * Chains: file cache → SD card → flash → HW decode → SW decode + upload.
+ * Assumes HAL mutex is LOCKED on entry (unlocks internally for file I/O).
+ * The returned handle is owned by a cache — caller must NOT free it. */
+bool lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t *u, const void *src,
+                                   eve5_gpu_image_t *out);
+
 /* Image loading - loads image to GPU via best available path (HW decode, SD card, SW decode).
- * Returns GPU address on success, GA_INVALID on failure. Caller owns the handle. */
+ * Returns GPU address on success, GA_INVALID on failure. Caller owns the handle.
+ * Prefer lv_draw_eve5_resolve_to_gpu for new code. */
 uint32_t lv_draw_eve5_load_image(lv_draw_eve5_unit_t *u, const void *src,
                                    uint16_t *out_format, int32_t *out_stride,
                                    int32_t *out_w, int32_t *out_h,
@@ -653,6 +723,11 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *la
 
 /* Mask rectangle drawing */
 void lv_draw_eve5_hal_draw_mask_rect(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);
+
+/* Bitmap mask — applied at child layer finish, scales all premultiplied RGBA
+ * by the mask bitmap. Caller should clear dsc->bitmap_mask_src after calling. */
+void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
+                                     const lv_draw_image_dsc_t *layer_dsc);
 
 /* SW fallback helpers (defined in lv_draw_eve5_sw_fallback.c) */
 const void *lv_draw_eve5_sw_get_dsc_cache_data(const lv_draw_task_t *t, uint32_t *out_size);

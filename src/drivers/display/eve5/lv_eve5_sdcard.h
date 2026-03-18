@@ -124,15 +124,18 @@ bool lv_eve5_sdcard_is_path(const char *path);
  * The caller owns the returned GPU handle and must free it via
  * Esd_GpuAlloc_Free(lv_eve5_sdcard_get_allocator(), handle).
  *
- * @param path      Full path including drive letter (e.g., "S:/image.jpg")
- * @param handle    Pointer to receive the GPU handle
- * @param width     Pointer to receive image width
- * @param height    Pointer to receive image height
- * @param format    Pointer to receive EVE bitmap format (e.g., RGB565)
- * @return          true on success, false on failure
+ * @param path            Full path including drive letter (e.g., "S:/image.jpg")
+ * @param handle          Pointer to receive the GPU handle
+ * @param width           Pointer to receive image width
+ * @param height          Pointer to receive image height
+ * @param format          Pointer to receive EVE bitmap format (e.g., RGB8, ARGB8, PALETTEDARGB8)
+ * @param image_offset    Pointer to receive bitmap data offset from handle base
+ * @param palette_offset  Pointer to receive palette LUT offset from handle base (GA_INVALID if non-paletted)
+ * @return                true on success, false on failure
  */
 bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
-                                uint32_t *width, uint32_t *height, uint32_t *format);
+                                uint32_t *width, uint32_t *height, uint32_t *format,
+                                uint32_t *image_offset, uint32_t *palette_offset);
 
 /**
  * Get the GPU allocator used by the SD card driver.

@@ -23,12 +23,8 @@
 
 #include "../lv_draw.h"
 #include "../lv_draw_image.h"
-#include "../lv_image_decoder_private.h"
 #if LV_USE_OS
 #include "../../drivers/display/eve5/lv_eve5.h"
-#endif
-#if LV_USE_FS_EVE5_SDCARD
-#include "../../drivers/display/eve5/lv_eve5_sdcard.h"
 #endif
 
 /**********************
@@ -176,7 +172,6 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
     uint32_t palette_addr = GA_INVALID;
 
     /* Resolve bitmap source (same as normal draw) */
-    bool is_alpha_only = false;
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
         Esd_GpuHandle child_handle = Esd_GpuHandle_FromPtrType(child_layer->user_data);
@@ -233,75 +228,16 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
         }
     }
     else {
-        /* Regular image — check GPU cache first, then try load paths. */
-        bool loaded = false;
-
-        /* Check GPU image cache for file sources (same cache as image_render.c). */
-        if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_FILE) {
-            uint16_t cached_palette_size = 0;
-            int32_t cached_w = 0, cached_h = 0;
-            ram_g_addr = lv_draw_eve5_image_cache_lookup_raw(u,
-                (uintptr_t)dsc->src, lv_draw_eve5_hash_path((const char *)dsc->src),
-                &eve_format, &eve_stride, &cached_w, &cached_h, &cached_palette_size);
-            if(ram_g_addr != GA_INVALID) {
-                src_w = cached_w;
-                src_h = cached_h;
-                palette_addr = (cached_palette_size > 0) ? (ram_g_addr - cached_palette_size) : GA_INVALID;
-                layout_h = src_h;
-                is_alpha_only = false;
-                loaded = true;
-            }
-        }
-
-#if LV_USE_FS_EVE5_SDCARD
-        /* Try direct SD card JPEG/PNG decode path (zero-copy). */
-        if(!loaded) {
-            loaded = lv_draw_eve5_try_load_sdcard_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                            &eve_stride, &src_w, &src_h, NULL);
-            if(loaded) {
-                layout_h = src_h;
-                is_alpha_only = false;  /* JPEG/PNG are not alpha-only */
-            }
-        }
-#endif /* LV_USE_FS_EVE5_SDCARD */
-
-#if EVE5_HW_IMAGE_DECODE
-        /* Try STDIO hardware decode path (JPEG/PNG via CMD_LOADIMAGE). */
-        if(!loaded) {
-#if LV_USE_OS
-            lv_eve5_hal_unlock(lv_display_get_default());
-#endif
-            loaded = lv_draw_eve5_try_load_file_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                          &eve_stride, &src_w, &src_h, NULL, &palette_addr);
-#if LV_USE_OS
-            lv_eve5_hal_lock(lv_display_get_default());
-#endif
-            if(loaded) {
-                layout_h = src_h;
-                is_alpha_only = false;  /* JPEG/PNG are not alpha-only */
-            }
-        }
-#endif /* EVE5_HW_IMAGE_DECODE */
-
-        if(!loaded) {
-            eve5_resolved_image_t resolved_src = {0};
-#if LV_USE_OS
-            lv_eve5_hal_unlock(lv_display_get_default());
-#endif
-            bool src_ok = lv_draw_eve5_resolve_image_source(dsc->src, &resolved_src);
-#if LV_USE_OS
-            lv_eve5_hal_lock(lv_display_get_default());
-#endif
-            if(!src_ok) return;
-            const lv_image_dsc_t *img_dsc = resolved_src.img_dsc;
-            src_w = img_dsc->header.w;
-            src_h = img_dsc->header.h;
-            ram_g_addr = lv_draw_eve5_upload_image(u, img_dsc, &eve_format, &eve_stride, &palette_addr);
-            is_alpha_only = LV_COLOR_FORMAT_IS_ALPHA_ONLY(img_dsc->header.cf);
-            lv_draw_eve5_release_image_source(&resolved_src);
-            if(ram_g_addr == GA_INVALID) return;
-            layout_h = src_h;
-        }
+        /* Regular image — resolve to GPU via unified loading chain */
+        eve5_gpu_image_t img;
+        if(!lv_draw_eve5_resolve_to_gpu(u, dsc->src, &img)) return;
+        eve5_gpu_image_resolve(u->allocator, &img, &ram_g_addr, &palette_addr);
+        if(ram_g_addr == GA_INVALID) return;
+        eve_format = img.eve_format;
+        eve_stride = img.eve_stride;
+        src_w = img.width;
+        src_h = img.height;
+        layout_h = src_h;
     }
 
     int32_t x = t->area.x1 - layer->buf_area.x1;
@@ -319,17 +255,22 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
          *   clip + ARGB (no mask): draw source bitmap through stencil (per-pixel alpha)
          * Colorkey excluded — its own 6-pass stencil would conflict. */
         if(dsc->clip_radius > 0 && dsc->colorkey == NULL) {
-            /* Try to upload mask bitmap if present */
+            /* Try to load mask bitmap if present */
             uint32_t mask_bmp_addr = GA_INVALID;
             int32_t mask_bmp_stride = 0;
             int32_t mask_bmp_w = 0, mask_bmp_h = 0;
+            uint16_t mask_bmp_format = L8;
+            uint32_t mask_bmp_palette_addr = GA_INVALID;
             if(dsc->bitmap_mask_src != NULL) {
-                const lv_image_dsc_t *mask_bmp_dsc = dsc->bitmap_mask_src;
-                if(lv_image_src_get_type(mask_bmp_dsc) == LV_IMAGE_SRC_VARIABLE) {
-                    uint16_t mf;
-                    mask_bmp_addr = lv_draw_eve5_upload_image(u, mask_bmp_dsc, &mf, &mask_bmp_stride, NULL);
-                    mask_bmp_w = mask_bmp_dsc->header.w;
-                    mask_bmp_h = mask_bmp_dsc->header.h;
+                eve5_gpu_image_t mask_img;
+                if(lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src, &mask_img)) {
+                    eve5_gpu_image_resolve(u->allocator, &mask_img, &mask_bmp_addr, &mask_bmp_palette_addr);
+                    if(mask_bmp_addr != GA_INVALID) {
+                        mask_bmp_format = mask_img.eve_format;
+                        mask_bmp_stride = mask_img.eve_stride;
+                        mask_bmp_w = mask_img.width;
+                        mask_bmp_h = mask_img.height;
+                    }
                 }
             }
 
@@ -385,10 +326,19 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
 
                     EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
                     EVE_CoDl_bitmapSource(phost, mask_bmp_addr);
-                    EVE_CoDl_bitmapLayout(phost, L8, mask_bmp_stride, mask_bmp_h);
+                    set_palette_if_needed(phost, mask_bmp_format, mask_bmp_palette_addr);
+                    /* For ARGB8 or PALETTEDARGB8: use GLFORMAT + swizzle to extract RED channel as alpha
+                     * (grayscale PNGs decode as ARGB8/PALETTEDARGB8 with R=G=B=gray, A=255).
+                     * For L8/A8: BT820 natively decodes as (255,255,255,L) — no swizzle needed. */
+                    if(mask_bmp_format == ARGB8 || mask_bmp_format == PALETTEDARGB8) {
+                        EVE_CoDl_bitmapLayout(phost, GLFORMAT, mask_bmp_stride, mask_bmp_h);
+                        EVE_CoDl_bitmapExtFormat(phost, mask_bmp_format);
+                        EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);
+                    }
+                    else {
+                        EVE_CoDl_bitmapLayout(phost, (uint8_t)mask_bmp_format, mask_bmp_stride, mask_bmp_h);
+                    }
                     EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, mask_bmp_w, mask_bmp_h);
-                    /* BT820 L8 natively decodes as (255,255,255,L) — no swizzle needed. */
-                    /* EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, ALPHA); */
                     EVE_CoDl_begin(phost, BITMAPS);
                     EVE_CoDl_vertex2f_0(phost, mask_draw_x, mask_draw_y);
                     EVE_CoDl_end(phost);
@@ -507,15 +457,26 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
              * For opaque + clip_radius (stencil unavailable): loses clip rounding.
              * For ARGB: mask shape preserved, per-pixel bitmap alpha lost.
              * When colorkey gate is active, colorkey pixels are excluded. */
-            const lv_image_dsc_t *mask_dsc = dsc->bitmap_mask_src;
-            if(mask_dsc != NULL && lv_image_src_get_type(mask_dsc) == LV_IMAGE_SRC_VARIABLE) {
-                uint16_t mask_eve_format;
-                int32_t mask_eve_stride;
-                uint32_t mask_addr = lv_draw_eve5_upload_image(u, mask_dsc, &mask_eve_format, &mask_eve_stride, NULL);
-                if(mask_addr != GA_INVALID) {
-                    int32_t mask_w = mask_dsc->header.w;
-                    int32_t mask_h = mask_dsc->header.h;
+            if(dsc->bitmap_mask_src != NULL) {
+                uint16_t mask_eve_format = L8;
+                int32_t mask_eve_stride = 0;
+                int32_t mask_w = 0, mask_h = 0;
+                uint32_t mask_palette_addr = GA_INVALID;
+                uint32_t mask_addr = GA_INVALID;
 
+                {
+                    eve5_gpu_image_t mask_img;
+                    if(lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src, &mask_img)) {
+                        eve5_gpu_image_resolve(u->allocator, &mask_img, &mask_addr, &mask_palette_addr);
+                        if(mask_addr != GA_INVALID) {
+                            mask_eve_format = mask_img.eve_format;
+                            mask_eve_stride = mask_img.eve_stride;
+                            mask_w = mask_img.width;
+                            mask_h = mask_img.height;
+                        }
+                    }
+                }
+                if(mask_addr != GA_INVALID) {
                     /* Center-align mask on image_area (same as normal draw) */
                     int32_t img_w = lv_area_get_width(&dsc->image_area);
                     int32_t img_h = lv_area_get_height(&dsc->image_area);
@@ -531,10 +492,19 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
                     EVE_CoDl_saveContext(phost);
                     EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
                     EVE_CoDl_bitmapSource(phost, mask_addr);
-                    EVE_CoDl_bitmapLayout(phost, L8, mask_eve_stride, mask_h);
+                    set_palette_if_needed(phost, mask_eve_format, mask_palette_addr);
+                    /* For ARGB8 or PALETTEDARGB8: use GLFORMAT + swizzle to extract RED channel as alpha
+                     * (grayscale PNGs decode as ARGB8/PALETTEDARGB8 with R=G=B=gray, A=255).
+                     * For L8/A8: BT820 natively decodes as (255,255,255,L) — no swizzle needed. */
+                    if(mask_eve_format == ARGB8 || mask_eve_format == PALETTEDARGB8) {
+                        EVE_CoDl_bitmapLayout(phost, GLFORMAT, mask_eve_stride, mask_h);
+                        EVE_CoDl_bitmapExtFormat(phost, mask_eve_format);
+                        EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);
+                    }
+                    else {
+                        EVE_CoDl_bitmapLayout(phost, (uint8_t)mask_eve_format, mask_eve_stride, mask_h);
+                    }
                     EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, mask_w, mask_h);
-                    /* BT820 L8 natively decodes as (255,255,255,L) — no swizzle needed. */
-                    /* EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, ALPHA); */
                     EVE_CoDl_colorA(phost, dsc->opa);
                     EVE_CoDl_begin(phost, BITMAPS);
                     EVE_CoDl_vertex2f_0(phost, mask_draw_x, mask_draw_y);
