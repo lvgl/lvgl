@@ -189,8 +189,9 @@ class LVDrawBuf(Value):
                 return Image.fromarray(rgb_arr, "RGB")
 
             elif color_format == self._color_formats["ARGB8888"]:
+                # lv_color32_t memory layout: [blue, green, red, alpha]
                 arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(-1, 4)
-                rgba = np.column_stack((arr[:, 1:4], arr[:, 0]))  # ARGB -> RGBA
+                rgba = arr[:, [2, 1, 0, 3]]  # BGRA -> RGBA
                 return Image.frombytes("RGBA", (width, height), rgba.tobytes())
 
             elif color_format == self._color_formats["XRGB8888"]:
