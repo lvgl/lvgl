@@ -52,6 +52,7 @@ static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key);
  **********************/
 
 static struct xkb_context * xkb_context;
+static struct wl_surface *g_focused_surface = NULL;
 
 static const struct wl_keyboard_listener keyboard_listener = {
     .keymap    = keyboard_handle_keymap,
@@ -126,6 +127,8 @@ lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat
 void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard)
 {
     lv_wayland_update_indevs(keyboard_read, NULL);
+	xkb_keymap_unref(seat_keyboard->xkb_keymap);
+	xkb_state_unref(seat_keyboard->xkb_state);
     lv_free(seat_keyboard);
 }
 
@@ -139,6 +142,30 @@ static void keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
     if(!kbdata) {
         return;
     }
+	lv_display_t *disp = lv_indev_get_display(indev);
+	
+	if (!disp)
+	{
+		data->state = LV_INDEV_STATE_RELEASED;
+		return;
+	}
+	
+	lv_wl_window_t *window = lv_display_get_driver_data(disp);
+	if (!window)
+	{
+		data->state = LV_INDEV_STATE_RELEASED;
+		return;
+	}
+
+	if (window->body != g_focused_surface)
+	{
+		// This window is NOT focused. Force release state.
+		data->state = LV_INDEV_STATE_RELEASED;
+		// Optional: Clear key
+		data->key = 0;
+		return;
+	}
+	
     data->key = kbdata->key;
     data->state = kbdata->state;
 }
@@ -194,7 +221,8 @@ static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard, ui
     LV_UNUSED(keyboard);
     LV_UNUSED(serial);
     LV_UNUSED(keys);
-    LV_UNUSED(surface);
+
+	g_focused_surface = surface;
 }
 
 static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard, uint32_t serial,
@@ -203,7 +231,11 @@ static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard, ui
     LV_UNUSED(serial);
     LV_UNUSED(keyboard);
     LV_UNUSED(data);
-    LV_UNUSED(surface);
+    
+	if (g_focused_surface == surface)
+	{
+		g_focused_surface = NULL;
+	}
 }
 
 static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint32_t serial, uint32_t time,

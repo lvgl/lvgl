@@ -84,12 +84,16 @@ typedef struct {
 
 typedef struct {
     struct wl_output * wl_output;
+	struct zxdg_output_v1 *xdg_output;
     char name[64];
+	char description[256];
     int width;
     int height;
     int refresh;
     int scale;
     int flags;
+	uint32_t wl_name; /* registry name */
+	struct wl_list link;
 } lv_wl_output_info_t;
 
 typedef struct {
@@ -148,6 +152,14 @@ typedef struct _lv_wl_window_t {
 
 } lv_wl_window_t;
 
+typedef struct
+{
+	lv_ll_node_t node;			/* Mandatory: Must be the first member */
+	int32_t id;					/* Wayland Touch ID */
+	struct wl_surface *surface; /* The surface this touch belongs to */
+	lv_point_t last_point;		/* Last known coordinates */
+	lv_indev_state_t state;		/* CURRENT STATE: PRESSED or RELEASED */
+} lv_wl_touch_node_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -49,7 +49,7 @@ static void delete_event(lv_event_t * e);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
+bool config_input = false;
 lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
                                         lv_wayland_display_close_cb_t close_cb)
 {
@@ -100,34 +100,34 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_add_event_cb(window->lv_disp, delete_event, LV_EVENT_DELETE, NULL);
 
     /* Register input */
-    window->lv_indev_pointer = lv_wayland_pointer_create();
-    lv_indev_set_display(window->lv_indev_pointer, window->lv_disp);
+	window->lv_indev_pointer = lv_wayland_pointer_create();
+	lv_indev_set_display(window->lv_indev_pointer, window->lv_disp);
 
-    if(!window->lv_indev_pointer) {
-        LV_LOG_ERROR("failed to register pointer indev");
-    }
+	if (!window->lv_indev_pointer) {
+		LV_LOG_ERROR("failed to register pointer indev");
+	}
 
-    window->lv_indev_pointeraxis = lv_wayland_pointer_axis_create();
-    lv_indev_set_display(window->lv_indev_pointeraxis, window->lv_disp);
+	window->lv_indev_pointeraxis = lv_wayland_pointer_axis_create();
+	lv_indev_set_display(window->lv_indev_pointeraxis, window->lv_disp);
 
-    if(!window->lv_indev_pointeraxis) {
-        LV_LOG_ERROR("failed to register pointeraxis indev");
-    }
+	if (!window->lv_indev_pointeraxis) {
+		LV_LOG_ERROR("failed to register pointeraxis indev");
+	}
 
-    window->lv_indev_touch = lv_wayland_touch_create();
-    lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
+	window->lv_indev_touch = lv_wayland_touch_create();
+	lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
 
-    if(!window->lv_indev_touch) {
-        LV_LOG_ERROR("failed to register touch indev");
-    }
+	if (!window->lv_indev_touch) {
+		LV_LOG_ERROR("failed to register touch indev");
+	}
 
-    window->lv_indev_keyboard = lv_wayland_keyboard_create();
-    lv_indev_set_display(window->lv_indev_keyboard, window->lv_disp);
+	window->lv_indev_keyboard = lv_wayland_keyboard_create();
+	lv_indev_set_display(window->lv_indev_keyboard, window->lv_disp);
 
-    if(!window->lv_indev_keyboard) {
-        LV_LOG_ERROR("failed to register keyboard indev");
-    }
-    return window->lv_disp;
+	if (!window->lv_indev_keyboard) {
+		LV_LOG_ERROR("failed to register keyboard indev");
+	}
+	return window->lv_disp;
 
 create_window_err:
     wl_surface_destroy(window->body);
@@ -173,7 +173,6 @@ void lv_wayland_window_close(lv_display_t * display)
     }
     window->close_cb = NULL;
     lv_wayland_window_delete(window);
-    lv_wayland_deinit();
 }
 
 bool lv_wayland_window_is_open(lv_display_t * disp)
@@ -299,7 +298,8 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
 
 
     lv_ll_remove(&lv_wl_ctx.window_ll, window);
-
+	lv_free(window);
+	
     if(LV_WAYLAND_DIRECT_EXIT && lv_ll_is_empty(&lv_wl_ctx.window_ll)) {
         /* lv_deinit will deinit the wayland driver*/
         lv_deinit();
