@@ -17,3 +17,4 @@ LVGL Pro and XML
     assets/index
     features/index
     tools/index
+    best_practices
