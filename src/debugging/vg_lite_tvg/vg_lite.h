@@ -951,6 +951,9 @@ vg_lite_uint32_t vg_lite_get_product_info(vg_lite_char * name, vg_lite_uint32_t 
 /* Query if a specific feature is supported. */
 vg_lite_uint32_t vg_lite_query_feature(vg_lite_feature_t feature);
 
+/* Enable or disable a specific feature at runtime (for testing purposes). */
+vg_lite_error_t vg_lite_enable_feature(vg_lite_feature_t feature, vg_lite_uint32_t enable);
+
 /* Flush command buffer and wait for GPU to complete. */
 vg_lite_error_t vg_lite_finish(void);
 

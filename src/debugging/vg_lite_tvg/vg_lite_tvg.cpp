@@ -158,6 +158,8 @@ class vg_lite_ctx
         vg_lite_rectangle_t scissor_rect;
         bool scissor_is_set;
 
+        vg_lite_uint32_t feature_table[gcFEATURE_COUNT];
+
     public:
         vg_lite_ctx()
             : target_buffer { nullptr }
@@ -172,6 +174,33 @@ class vg_lite_ctx
             , clut_256colors { 0 }
         {
             canvas = SwCanvas::gen();
+            feature_table_init();
+        }
+
+        void feature_table_init(void)
+        {
+            lv_memzero(feature_table, sizeof(feature_table));
+
+            /* Always-on features (unconditionally supported by ThorVG emulator) */
+            feature_table[gcFEATURE_BIT_VG_IM_INDEX_FORMAT] = 1;
+            feature_table[gcFEATURE_BIT_VG_BORDER_CULLING] = 1;
+            feature_table[gcFEATURE_BIT_VG_RGBA2_FORMAT] = 1;
+            feature_table[gcFEATURE_BIT_VG_IM_FASTCLAER] = 1;
+            feature_table[gcFEATURE_BIT_VG_GLOBAL_ALPHA] = 1;
+            feature_table[gcFEATURE_BIT_VG_COLOR_KEY] = 1;
+            feature_table[gcFEATURE_BIT_VG_24BIT] = 1;
+            feature_table[gcFEATURE_BIT_VG_DITHER] = 1;
+            feature_table[gcFEATURE_BIT_VG_USE_DST] = 1;
+            feature_table[gcFEATURE_BIT_VG_RADIAL_GRADIENT] = 1;
+            feature_table[gcFEATURE_BIT_VG_IM_REPEAT_REFLECT] = 1;
+
+            /* Conditionally-on features (based on compile-time configuration) */
+            feature_table[gcFEATURE_BIT_VG_LVGL_SUPPORT] = LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT;
+            feature_table[gcFEATURE_BIT_VG_YUV_INPUT] = LV_VG_LITE_THORVG_YUV_SUPPORT;
+            feature_table[gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT] = LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT;
+            feature_table[gcFEATURE_BIT_VG_16PIXELS_ALIGN] = LV_VG_LITE_THORVG_16PIXELS_ALIGN;
+            /* Mask support is not available on this branch */
+            feature_table[gcFEATURE_BIT_VG_MASK] = 0;
         }
 
         vg_lite_uint32_t * get_image_buffer(vg_lite_uint32_t w, vg_lite_uint32_t h)
@@ -1028,39 +1057,21 @@ extern "C" {
 
     vg_lite_uint32_t vg_lite_query_feature(vg_lite_feature_t feature)
     {
-        switch(feature) {
-            case gcFEATURE_BIT_VG_IM_INDEX_FORMAT:
-            case gcFEATURE_BIT_VG_BORDER_CULLING:
-            case gcFEATURE_BIT_VG_RGBA2_FORMAT:
-            case gcFEATURE_BIT_VG_IM_FASTCLAER:
-            case gcFEATURE_BIT_VG_GLOBAL_ALPHA:
-            case gcFEATURE_BIT_VG_24BIT:
-            case gcFEATURE_BIT_VG_DITHER:
-            case gcFEATURE_BIT_VG_USE_DST:
-            case gcFEATURE_BIT_VG_RADIAL_GRADIENT:
-            case gcFEATURE_BIT_VG_IM_REPEAT_REFLECT:
-            case gcFEATURE_BIT_VG_SCISSOR:
-
-#if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-            case gcFEATURE_BIT_VG_LVGL_SUPPORT:
-#endif
-
-#if LV_VG_LITE_THORVG_YUV_SUPPORT
-            case gcFEATURE_BIT_VG_YUV_INPUT:
-#endif
-
-#if LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
-            case gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT:
-#endif
-
-#if LV_VG_LITE_THORVG_16PIXELS_ALIGN
-            case gcFEATURE_BIT_VG_16PIXELS_ALIGN:
-#endif
-                return 1;
-            default:
-                break;
+        auto ctx = vg_lite_ctx::get_instance();
+        if(feature < 0 || feature >= gcFEATURE_COUNT) {
+            return 0;
         }
-        return 0;
+        return ctx->feature_table[feature];
+    }
+
+    vg_lite_error_t vg_lite_enable_feature(vg_lite_feature_t feature, vg_lite_uint32_t enable)
+    {
+        auto ctx = vg_lite_ctx::get_instance();
+        if(feature < 0 || feature >= gcFEATURE_COUNT) {
+            return VG_LITE_INVALID_ARGUMENT;
+        }
+        ctx->feature_table[feature] = enable ? 1 : 0;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_init_path(vg_lite_path_t * path,
