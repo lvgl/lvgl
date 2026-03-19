@@ -283,6 +283,44 @@ The Style properties that are used during Scale drawing (and are thus useful) ar
   :LV_STYLE_TEXT_FONT:          :cpp:func:`lv_style_set_text_font`
 
 
+.. _lv_scale_needles:
+
+Needles
+-------
+
+Needles are used to indicate a specific value for ``..._ROUND_...`` Scales only.
+They can be lines or images and can be customized in terms of length, color, and
+other properties.
+
+
+.. _lv_scale_creating_needles:
+
+Creating Needles
+~~~~~~~~~~~~~~~~
+
+Create a :ref:`lv_line <lv_line>` or a :ref:`lv_image <lv_image>` Widget and then
+attach it to the Scale as a needle with the appropriate function:
+
+- :cpp:expr:`lv_scale_set_line_needle_value(scale, needle_line, needle_length, value)`
+- :cpp:expr:`lv_scale_set_image_needle_value(scale, needle_img, value)`
+
+
+Data binding
+~~~~~~~~~~~~
+
+To get familiar with observers, subjects, and data bindings in general, visit the
+:ref:`Observer <observer_how_to_use>` page.
+
+This method of subscribing to an integer Subject affects the needle value of a Scale
+Widget directly.  Note that this is a one-way binding (Subject ==> Widget) so when
+the subject changes, the Scale's needle will be updated too.
+
+
+It supports only integer subjects.
+
+- :cpp:expr:`lv_scale_bind_line_needle_value(scale, needle_line, needle_length, &subject)`
+- :cpp:expr:`lv_scale_bind_image_needle_value(scale, needle_img, &subject)`
+
 
 .. _lv_scale_events:
 
