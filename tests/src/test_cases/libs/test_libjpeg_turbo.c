@@ -8,6 +8,11 @@
 void setUp(void)
 {
     /* Function run before every test */
+    /* Temporarily remove other JPEG decoders to make sure libjpeg is used */
+    lv_tjpgd_deinit();
+#if LV_USE_FFMPEG
+    lv_ffmpeg_deinit();
+#endif
 }
 
 void tearDown(void)
@@ -59,9 +64,6 @@ static void create_images(void)
 
 void test_jpg_2(void)
 {
-    /* Temporarily remove tjpgd decoder */
-    lv_tjpgd_deinit();
-
     create_images();
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
@@ -77,25 +79,16 @@ void test_jpg_2(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
 
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 64);
-
-    /* Re-add tjpgd decoder */
-    lv_tjpgd_init();
 }
 
 void test_jpg_cmyk(void)
 {
-    /* Temporarily remove tjpgd decoder */
-    lv_tjpgd_deinit();
-
     lv_obj_clean(lv_screen_active());
     lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_cmyk.jpg");
     lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_cmyk.png");
-
-    /* Re-add tjpgd decoder */
-    lv_tjpgd_init();
 }
 
 void test_jpg_sign_error(void)
@@ -109,16 +102,10 @@ void test_jpg_sign_error(void)
     lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_sign_error.png");
-
-    /* Re-add tjpgd decoder */
-    lv_tjpgd_init();
 }
 
 void test_jpg_decode_failed(void)
 {
-    /* Temporarily remove tjpgd decoder */
-    lv_tjpgd_deinit();
-
     lv_image_decoder_dsc_t decoder_dsc;
     const char * image_path = "A:src/test_assets/test_img_lvgl_logo_with_decode_failed.jpg";
 
@@ -127,9 +114,6 @@ void test_jpg_decode_failed(void)
 
     /* Should fail when decoder is removed */
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
-
-    /* Re-add tjpgd decoder */
-    lv_tjpgd_init();
 }
 
 #endif

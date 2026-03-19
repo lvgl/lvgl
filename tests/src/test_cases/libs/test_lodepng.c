@@ -8,6 +8,11 @@
 void setUp(void)
 {
     /* Function run before every test */
+    /* Temporarily remove other PNG decoders to make sure lodepng is used */
+    lv_libpng_deinit();
+#if LV_USE_FFMPEG
+    lv_ffmpeg_deinit();
+#endif
 }
 
 void tearDown(void)
@@ -75,5 +80,15 @@ void test_lodepng_1(void)
     /* Re-add libpng decoder */
     lv_libpng_init();
 }
+
+void test_lodepng_no_crash_with_16bit(void)
+{
+    /*LodePNG should return a custom error code (116) as it's crash with 16 bit/channel images.
+     *(Consider upstreaming the changes)*/
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_assets/test_16bit_per_channel.png");
+    lv_refr_now(NULL);
+}
+
 
 #endif
