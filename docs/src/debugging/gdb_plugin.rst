@@ -49,6 +49,7 @@ The plugin provides the following commands.
 - ``dump image_decoder``: List all registered image decoders.
 - ``dump fs_drv``: List all registered filesystem drivers.
 - ``dump draw_task <expr>``: List draw tasks from a layer.
+- ``dump dashboard``: Generate an HTML dashboard of all LVGL runtime state.
 - ``info style``: Inspect style properties of an ``lv_style_t`` or an ``lv_obj_t``.
 - ``info draw_unit``: Print raw struct details for each drawing unit.
 - ``info obj_class <expr>``: Show object class hierarchy.
@@ -192,6 +193,42 @@ Dump Draw Tasks
 and display each task's type, state, area, opacity, and preferred draw unit id.
 
 
+Dump Dashboard
+**************
+
+``dump dashboard``: Collect all LVGL runtime state (displays, object trees,
+animations, timers, caches, input devices, groups, draw units/tasks,
+subjects/observers, image decoders, filesystem drivers) and generate a
+self-contained HTML file for offline browsing.
+
+The dashboard supports three output modes:
+
+- ``dump dashboard``: Generate ``lvgl_dashboard.html`` with all data embedded.
+- ``dump dashboard --json``: Export raw JSON data to ``lvgl_dashboard.json``.
+- ``dump dashboard --viewer``: Generate an empty HTML viewer (``lvgl_viewer.html``)
+  that can load JSON files via drag-and-drop.
+
+Use ``-o <path>`` to specify a custom output path.
+
+Example:
+
+.. code:: bash
+
+    (gdb) dump dashboard
+    Dashboard written to lvgl_dashboard.html (1.23s)
+
+    (gdb) dump dashboard --json -o /tmp/state.json
+    Dashboard written to /tmp/state.json (0.98s)
+
+    (gdb) dump dashboard --viewer
+    Viewer written to lvgl_viewer.html
+
+The generated HTML is fully self-contained (no external dependencies) and
+includes a sidebar for navigation, a search box for filtering, collapsible
+object trees with style details, framebuffer image previews, and cross-reference
+links between related objects.
+
+
 Inspect Object Class
 ********************
 
@@ -289,14 +326,58 @@ bulk export (e.g. ``LVAnim.snapshots(anims)``). Additionally,
 Architecture
 ************
 
-The GDB plugin decouples data extraction from display through a snapshot
-abstraction. Each wrapper class (``LVAnim``, ``LVTimer``, ``LVObject``, etc.)
-declares a ``_DISPLAY_SPEC`` describing its fields and exports a ``snapshot()``
-method that returns a self-describing ``Snapshot`` object carrying both the
-data dict and the display spec. The ``cmds/`` layer simply passes snapshots to
-generic formatters (``print_info``, ``print_spec_table``) which read the
-embedded spec to render output — no command needs to know the internal
-structure of any wrapper.
+The GDB plugin is organized into four layers. The overview below shows how
+terminal commands and the HTML dashboard both flow through the same snapshot
+abstraction down to raw GDB memory access:
+
+.. mermaid::
+   :zoom:
+
+   graph TD
+        subgraph "Rendering Layer"
+            CLI["GDB Terminal<br/>dump obj, info style, ..."]
+            DASH["HTML Dashboard<br/>dump dashboard"]
+        end
+
+        subgraph "Formatter / Renderer"
+            FMT["formatter.py<br/>print_info · print_spec_table"]
+            HR["html_renderer.py<br/>template + CSS + JS"]
+        end
+
+        subgraph "Data Collection"
+            DC["data_collector.py<br/>collect_all() → JSON dict"]
+            SNAP["Snapshot<br/>_data + _display_spec"]
+        end
+
+        subgraph "Value Wrappers (lvgl/)"
+            W["LVObject · LVDisplay · LVAnim<br/>LVCache · LVTimer · LVDrawBuf<br/>LVIndev · LVGroup · ..."]
+            GDB["gdb.Value (C struct memory)"]
+        end
+
+        CLI --> FMT
+        FMT --> SNAP
+        DASH --> HR
+        HR --> DC
+        DC --> SNAP
+        SNAP --> W
+        W --> GDB
+
+        style CLI fill:#4CAF50,color:#fff
+        style DASH fill:#4CAF50,color:#fff
+        style FMT fill:#FF9800,color:#fff
+        style HR fill:#FF9800,color:#fff
+        style DC fill:#2196F3,color:#fff
+        style SNAP fill:#2196F3,color:#fff
+        style W fill:#9C27B0,color:#fff
+        style GDB fill:#616161,color:#fff
+
+Each wrapper class declares a ``_DISPLAY_SPEC`` describing its fields and
+exports a ``snapshot()`` method that returns a self-describing ``Snapshot``
+object carrying both the data dict and the display spec. The ``cmds/`` layer
+simply passes snapshots to generic formatters (``print_info``,
+``print_spec_table``) which read the embedded spec to render output — no
+command needs to know the internal structure of any wrapper. The detailed
+snapshot flow is shown below:
 
 .. mermaid::
    :zoom:

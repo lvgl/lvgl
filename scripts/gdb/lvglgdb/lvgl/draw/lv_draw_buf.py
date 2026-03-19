@@ -75,9 +75,50 @@ class LVDrawBuf(Value):
         """Get the buffer data ptr"""
         return self.super_value("data")
 
-    def data_dump(self, filename: str, format: str = None) -> bool:
+    def _read_image(self, strict: bool = False) -> Optional[Image.Image]:
+        """Read buffer data and convert to PIL Image.
+
+        Args:
+            strict: If True, raise on any size mismatch instead of ignoring.
+
+        Returns:
+            PIL.Image or None on failure.
         """
-        Dump the buffer data to an image file.
+        header = self.super_value("header")
+        stride = int(header["stride"])
+        height = int(header["h"])
+        cf_info = self.color_format_info()
+        data_ptr = self.super_value("data")
+        data_size = int(self.super_value("data_size"))
+        width = (stride * 8) // cf_info["bpp"] if cf_info["bpp"] else 0
+        expected_data_size = stride * height
+
+        if not data_ptr or width <= 0 or height <= 0:
+            if strict:
+                raise ValueError(f"Invalid buffer: ptr={data_ptr}, {width}x{height}")
+            return None
+        if data_size < expected_data_size:
+            if strict:
+                raise ValueError(
+                    f"Data too small: expected at least {expected_data_size},"
+                    f" got {data_size}"
+                )
+            return None
+        if data_size > expected_data_size and strict:
+            gdb.write(
+                f"Warning: data_size {data_size} exceeds expected"
+                f" {expected_data_size}, extra bytes will be ignored\n"
+            )
+
+        pixel_data = (
+            gdb.selected_inferior()
+            .read_memory(int(data_ptr), expected_data_size)
+            .tobytes()
+        )
+        return self._convert_to_image(pixel_data, width, height, cf_info["value"])
+
+    def data_dump(self, filename: str, format: str = None) -> bool:
+        """Dump the buffer data to an image file.
 
         Args:
             filename: Output file path
@@ -87,57 +128,19 @@ class LVDrawBuf(Value):
             bool: True if successful, False otherwise
         """
         try:
-            # Validate input parameters
             if not filename:
                 raise ValueError("Output filename cannot be empty")
 
-            # Get buffer metadata
-            header = self.super_value("header")
-            stride = int(header["stride"])
-            height = int(header["h"])
-            cf_info = self.color_format_info()
-            data_ptr = self.super_value("data")
-            data_size = int(self.super_value("data_size"))
-            width = (stride * 8) // cf_info["bpp"] if cf_info["bpp"] else 0
-            expected_data_size = stride * height
-
-            # Validate buffer data
-            if not data_ptr:
-                raise ValueError("Data pointer is NULL")
-            if width <= 0 or height <= 0:
-                raise ValueError(f"Invalid dimensions: {width}x{height}")
-            if data_size <= 0:
-                raise ValueError(f"Invalid data size: {data_size}")
-            if data_size < expected_data_size:
-                raise ValueError(
-                    f"Data size mismatch: expected {expected_data_size}, got {data_size}"
-                )
-            elif data_size > expected_data_size:
-                gdb.write(
-                    f"\033[93mData size mismatch: expected {expected_data_size}, got {data_size}\033[0m\n"
-                )
-
-            # Read pixel data
-            pixel_data = (
-                gdb.selected_inferior()
-                .read_memory(int(data_ptr), expected_data_size)
-                .tobytes()
-            )
-            if not pixel_data:
-                raise ValueError("Failed to read pixel data")
-
-            # Process based on color format
-            img = self._convert_to_image(pixel_data, width, height, cf_info["value"])
+            img = self._read_image(strict=True)
             if img is None:
                 return False
 
-            # Determine output format
             output_format = (
                 format.upper() if format else Path(filename).suffix[1:].upper() or "BMP"
             )
-
-            # Save image
             img.save(filename, format=output_format)
+
+            cf_info = self.color_format_info()
             print(
                 f"Successfully saved {cf_info['name']} buffer as {output_format} to {filename}"
             )
@@ -152,6 +155,20 @@ class LVDrawBuf(Value):
         except Exception as e:
             print(f"Unexpected error: {str(e)}")
             return False
+
+    def to_png_bytes(self) -> Optional[bytes]:
+        """Convert buffer to PNG bytes in memory. Returns None on failure."""
+        import io
+
+        try:
+            img = self._read_image(strict=False)
+            if img is None:
+                return None
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+            return buf.getvalue()
+        except (gdb.MemoryError, Exception):
+            return None
 
     def _convert_to_image(
         self, pixel_data: bytes, width: int, height: int, color_format: int

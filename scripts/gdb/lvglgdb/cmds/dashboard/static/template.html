@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVGL Dashboard</title>
+<style>
+{{CSS}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="logo">LV</span> LVGL Dashboard
+  </div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-meta" id="header-meta"></div>
+  <nav class="topbar-nav" id="topbar-nav"></nav>
+  <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark theme"
+          aria-label="Toggle theme">🌙</button>
+  <input type="text" class="topbar-search" id="search"
+         placeholder="Filter..." aria-label="Search">
+</header>
+<main class="main">
+  <div class="bento" id="bento-grid">
+    <div id="drop-zone" style="display:none">
+      <div class="drop-icon">📂</div>
+      <p>Drag &amp; drop a JSON file here, or click to select</p>
+      <div class="drop-hint">Exported via <code>dump dashboard --json</code></div>
+      <input type="file" id="file-input" accept=".json" aria-label="Load JSON file">
+    </div>
+  </div>
+</main>
+<script type="application/json" id="lvgl-data">{{JSON_DATA}}</script>
+<script>
+{{JS}}
+</script>
+</body>
+</html>
