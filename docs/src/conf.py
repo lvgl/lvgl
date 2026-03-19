@@ -518,7 +518,7 @@ redirects = {
     "overview/renderers/arm2d":                   "../../integration/chip_vendors/arm/arm2d.html"           ,
     "overview/renderers/index":                   "../../integration/chip_vendors/index.html"               ,
     "overview/renderers/nema_gfx":                "../../integration/chip_vendors/stm32/neochrom.html"               ,
-    "overview/renderers/pxp":                     "../../integration/chip_vendors/nxp/index.html"           ,
+    "overview/renderers/pxp":                     "../../integration/chip_vendors/nxp/pxp_gpu.html"         ,
     "overview/renderers/sdl":                     "../../integration/pc/sdl.html"                           ,
     "overview/renderers/stm32_dma2d":             "../../integration/chip_vendors/stm32/dma2d_gpu.html"     ,
     "overview/renderers/sw":                      "../../main-modules/draw/index.html"                      ,
