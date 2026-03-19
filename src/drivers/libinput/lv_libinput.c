@@ -66,6 +66,7 @@ static int _open_restricted(const char * path, int flags, void * user_data);
 static void _close_restricted(int fd, void * user_data);
 
 static void _delete(lv_libinput_t * dsc);
+static void _indev_delete(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -131,6 +132,11 @@ size_t lv_libinput_find_devs(lv_libinput_capability capabilities, char ** found,
     return num_found;
 }
 
+void lv_libinput_find_clear(void)
+{
+    _reset_scanned_devices();
+}
+
 lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_path)
 {
     lv_libinput_t * dsc = lv_malloc_zeroed(sizeof(lv_libinput_t));
@@ -177,6 +183,7 @@ lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_pat
     lv_indev_set_type(indev, indev_type);
     lv_indev_set_read_cb(indev, _read);
     lv_indev_set_driver_data(indev, dsc);
+    lv_indev_add_event_cb(indev, _indev_delete, LV_EVENT_DELETE, NULL);
 
     /* Set up thread & lock */
     pthread_mutex_init(&dsc->event_lock, NULL);
@@ -187,7 +194,6 @@ lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_pat
 
 void lv_libinput_delete(lv_indev_t * indev)
 {
-    _delete(lv_indev_get_driver_data(indev));
     lv_indev_delete(indev);
 }
 
@@ -223,6 +229,7 @@ static bool _rescan_devices(void)
             perror("could not allocate memory for device node path");
             libinput_unref(context);
             _reset_scanned_devices();
+            closedir(dir);
             return false;
         }
         strcpy(path, "/dev/input/");
@@ -252,11 +259,13 @@ static bool _rescan_devices(void)
             free(path);
             libinput_unref(context);
             _reset_scanned_devices();
+            closedir(dir);
             return false;
         }
     }
 
     libinput_unref(context);
+    closedir(dir);
     return true;
 }
 
@@ -656,6 +665,8 @@ static void _delete(lv_libinput_t * dsc)
         pthread_cancel(dsc->worker_thread);
     }
 
+    pthread_join(dsc->worker_thread, NULL);
+
     if(dsc->libinput_device) {
         libinput_path_remove_device(dsc->libinput_device);
         libinput_device_unref(dsc->libinput_device);
@@ -670,6 +681,14 @@ static void _delete(lv_libinput_t * dsc)
 #endif /* LV_LIBINPUT_XKB */
 
     lv_free(dsc);
+}
+
+static void _indev_delete(lv_event_t * e)
+{
+    lv_indev_t * indev = lv_event_get_target(e);
+    lv_libinput_t * dsc = lv_indev_get_driver_data(indev);
+    LV_ASSERT_NULL(dsc);
+    _delete(dsc);
 }
 
 #endif /* LV_USE_LIBINPUT */
