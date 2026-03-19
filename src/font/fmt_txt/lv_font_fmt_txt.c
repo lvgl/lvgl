@@ -247,7 +247,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     uint32_t adv_w = gdsc->adv_w;
     if(is_tab) adv_w *= 2;
 
-    adv_w += kv;
+    adv_w = (uint32_t)LV_CLAMP(0, (int32_t)adv_w + kv, INT32_MAX);
     adv_w  = (adv_w + (1 << 3)) >> 4;
 
     dsc_out->adv_w = adv_w;
