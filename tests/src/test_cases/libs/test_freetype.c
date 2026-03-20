@@ -384,8 +384,6 @@ static const lv_freetype_outline_event_param_t outline_data_U9F98[] = {
     {NULL, 0, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
 };
 
-static void freetype_outline_event_cb(lv_event_t * e);
-
 #if OPTION_GENERATE_VECTOR_OPS_STRING
 static void vegravis_generate_vector_ops_string(lv_freetype_outline_event_param_t * param, char * buf,
                                                 uint32_t buf_len);
@@ -449,10 +447,13 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
     lv_style_set_text_font(&style_italic, font_italic);
     lv_style_set_text_align(&style_italic, LV_TEXT_ALIGN_CENTER);
 
-    static lv_style_t style_normal;
-    lv_style_init(&style_normal);
-    lv_style_set_text_font(&style_normal, font_normal);
-    lv_style_set_text_align(&style_normal, LV_TEXT_ALIGN_CENTER);
+    static lv_style_t style_normal_with_outline;
+    lv_style_init(&style_normal_with_outline);
+    lv_style_set_text_font(&style_normal_with_outline, font_normal);
+    lv_style_set_text_align(&style_normal_with_outline, LV_TEXT_ALIGN_CENTER);
+    lv_style_set_text_outline_stroke_color(&style_normal_with_outline, lv_color_hex(0xff0000));
+    lv_style_set_text_outline_stroke_width(&style_normal_with_outline, 4);
+    lv_style_set_text_outline_stroke_opa(&style_normal_with_outline, LV_OPA_50);
 
     static lv_style_t style_normal_small;
     lv_style_init(&style_normal_small);
@@ -471,7 +472,7 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
     lv_obj_align(label0,  LV_ALIGN_TOP_MID, 0, 10);
 
     lv_obj_t * label1 = lv_label_create(lv_screen_active());
-    lv_obj_add_style(label1, &style_normal, 0);
+    lv_obj_add_style(label1, &style_normal_with_outline, 0);
     lv_obj_set_width(label1, lv_obj_get_width(lv_screen_active()) - 20);
     lv_label_set_text(label1, UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_EN);
     lv_obj_align_to(label1, label0, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
@@ -496,7 +497,7 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
 
     lv_obj_clean(lv_screen_active());
     lv_style_reset(&style_italic);
-    lv_style_reset(&style_normal);
+    lv_style_reset(&style_normal_with_outline);
     lv_style_reset(&style_normal_small);
     lv_style_reset(&style_normal_emoji);
     lv_freetype_font_delete(font_italic);
@@ -512,82 +513,8 @@ void test_freetype_render_bitmap(void)
 
 void test_freetype_render_outline(void)
 {
-#if LV_USE_DRAW_VG_LITE
-    /* VG-Lite support rendering outline */
-    test_freetype_with_render_mode(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, "libs/freetype_render_outline.png");
+    test_freetype_with_render_mode(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, "libs/freetype_render_outline" EXT_NAME);
     LV_UNUSED(outline_data_U9F98);
-    LV_UNUSED(freetype_outline_event_cb);
-#else
-    /* Outline rendering not supported, compare outline data only */
-    /*Create a font*/
-    lv_font_t * font_italic = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
-                                                      LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
-                                                      24,
-                                                      LV_FREETYPE_FONT_STYLE_ITALIC);
-
-    TEST_ASSERT_NOT_NULL(font_italic);
-
-    /*Setup outline event for generating outline drawing data*/
-    lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_font_glyph_dsc_t g;
-    lv_font_get_glyph_dsc(font_italic, &g, 0x9F98, '\0');
-
-    const lv_ll_t * outline_data;
-    outline_data = (lv_ll_t *) lv_font_get_glyph_bitmap(&g, NULL);
-
-    uint32_t i = 0;
-    lv_freetype_outline_event_param_t * param;
-    LV_LL_READ(outline_data, param) {
-#if OPTION_GENERATE_OUTLINE_DATA
-        /*FOR Generate outline data*/
-#if OPTION_GENERATE_VECTOR_OPS_STRING
-        char buf[1024];
-        vegravis_generate_vector_ops_string(param, buf, sizeof(buf));
-        TEST_PRINTF("%s", buf);
-#else
-        TEST_PRINTF("{NULL, %d, {%d, %d}, {%d, %d}, {%d, %d}}, ", param->type, param->to.x, param->to.y, param->control1.x,
-                    param->control1.y, param->control2.x, param->control2.y);
-#endif
-#endif
-        TEST_ASSERT_EQUAL(param->type, outline_data_U9F98[i].type);
-        TEST_ASSERT_EQUAL(param->to.x, outline_data_U9F98[i].to.x);
-        TEST_ASSERT_EQUAL(param->to.y, outline_data_U9F98[i].to.y);
-        TEST_ASSERT_EQUAL(param->control1.x, outline_data_U9F98[i].control1.x);
-        TEST_ASSERT_EQUAL(param->control1.y, outline_data_U9F98[i].control1.y);
-        TEST_ASSERT_EQUAL(param->control2.x, outline_data_U9F98[i].control2.x);
-        TEST_ASSERT_EQUAL(param->control2.y, outline_data_U9F98[i].control2.y);
-        i++;
-    }
-
-    font_italic->release_glyph(font_italic, &g);
-
-    lv_freetype_font_delete(font_italic);
-#endif
-}
-
-static void freetype_outline_event_cb(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
-    switch(code) {
-        case LV_EVENT_CREATE:
-            param->outline = lv_malloc_zeroed(sizeof(lv_ll_t));
-            lv_ll_init(param->outline, sizeof(lv_freetype_outline_event_param_t));
-            break;
-        case LV_EVENT_DELETE:
-            lv_ll_clear(param->outline);
-            lv_free(param->outline);
-            break;
-        case LV_EVENT_INSERT: {
-                void * entry = lv_ll_ins_tail(param->outline);
-                lv_memcpy(entry, param, sizeof(lv_freetype_outline_event_param_t));
-                break;
-            }
-        default:
-            LV_LOG_WARN("unknown event code: %d", code);
-            break;
-    }
 }
 
 #if OPTION_GENERATE_VECTOR_OPS_STRING
