@@ -13,6 +13,11 @@ if(UNIX AND NOT PkgConfig_FOUND)
       "Install `pkg-config` to improve dependency detection.")
 endif()
 
+# ====== Drivers ====== #
+if(CONFIG_LV_USE_LINUX_DRM)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/drm.cmake)
+endif()
+
 if(CONFIG_LV_USE_GLTF)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/fastgltf.cmake)
 endif()
