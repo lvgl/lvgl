@@ -677,7 +677,11 @@ following fields:
 Vector Draw Descriptor
 **********************
 
-TODO
+Vector rendering works slightly differently than the other draw descriptors, because
+the data required to describe the operation doesn't have a fixed length.
+
+The key element of vector rendering is a "path" (:cpp:expr:`lv_vector_path_t`) that can be
+stroked (draw a line on the path) and filled ()
 
 
 
