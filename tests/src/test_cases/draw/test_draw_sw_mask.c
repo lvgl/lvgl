@@ -17,7 +17,7 @@ void test_radius_mask_overflow(void)
 {
     int width = 1280;
     int heigh = 1280;
-    lv_obj_t* obj = lv_obj_create(lv_screen_active());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, width * 2, heigh * 2);
     lv_obj_set_style_radius(obj, heigh, LV_PART_MAIN);
 
