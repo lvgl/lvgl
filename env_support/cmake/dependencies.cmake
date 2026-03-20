@@ -27,6 +27,10 @@ if(CONFIG_LV_USE_LINUX_DRM)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/drm.cmake)
 endif()
 
+if(CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS OR CONFIG_LV_LINUX_DRM_USE_EGL)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/gbm.cmake)
+endif()
+
 # ====== Indev ====== #
 if(CONFIG_LV_USE_EVDEV)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/evdev.cmake)
