@@ -1327,7 +1327,7 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
             valid_point_cnt++;
         }
 
-        lv_draw_vector_dsc_add_path(dsc, path); // draw a path
+        lv_draw_vector_dsc_add_path(dsc, path); /* Draw a path */
 
         if(dsc->base.id1 > 0) {
             point_dsc_default.base.id1--;

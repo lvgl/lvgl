@@ -677,9 +677,64 @@ following fields:
 Vector Draw Descriptor
 **********************
 
-TODO
+Vector rendering works slightly differently than the other draw descriptors, because
+the data required to describe the operation doesn't have a fixed length.
 
+The key element of vector rendering is a "path" (:cpp:expr:`lv_vector_path_t`) which describes
+the shape of the drawing using lines, arcs, and curves. The paths can be stroked
+(draw a line on the path) and filled (fill the path with a color, gradient, or image).
 
+A :cpp:expr:`lv_draw_vector_dsc_t` vector descriptor can hold multiple paths.
+
+The flow of creating a new vector descriptor is the following.
+
+1. Create a vector draw descriptor:
+
+.. code-block:: c
+
+    lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(layer);
+
+2. Create a path
+
+.. code-block:: c
+
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+
+3. Set the shape of the path. The following show a few simple functions for that:
+
+   - :cpp:expr:`lv_vector_path_clear`: Clear all lines, arcs, and curves from a path
+   - :cpp:expr:`lv_vector_path_move_to`: Move to a point without drawing any lines
+   - :cpp:expr:`lv_vector_path_line_to`: Add a line to the path from last point to the point
+   - :cpp:expr:`lv_vector_path_quad_to`: Add a quadratic bezier line to the path from last point to the point
+   - :cpp:expr:`lv_vector_path_cubic_to`: Add a cubic bezier line to the path from last point to the point
+   - :cpp:expr:`lv_vector_path_arc_to`: Add ellipse arc to the path from last point to the point
+   - :cpp:expr:`lv_vector_path_close`: Close the sub path by connecting the first and last point
+
+4. Set the stroke and fill settings on the draw descriptor for the given path. Use functions like:
+
+   - :cpp:expr:`lv_draw_vector_dsc_set_stroke_color`: Set stroke color for a descriptor.
+   - :cpp:expr:`lv_draw_vector_dsc_set_stroke_opa`: Set stroke opacity for a descriptor
+   - :cpp:expr:`lv_draw_vector_dsc_set_stroke_width`: Set stroke width for a descriptor.
+   - :cpp:expr:`lv_draw_vector_dsc_set_fill_color`: Set fill color for a descriptor.
+   - :cpp:expr:`lv_draw_vector_dsc_set_fill_opa`: Set fill opacity for a descriptor.
+
+5. Add the path to the descriptor. It will apply the stroke and fill settings for the path:
+
+.. code-block:: c
+
+    lv_draw_vector_dsc_add_path(dsc, path);
+
+6. If more paths are needed, clear the path or create a new one, and add it to the draw descriptor too.
+
+7. Start drawing and clean up:
+
+.. code-block:: c
+
+    lv_draw_vector(dsc);
+    lv_vector_path_delete(path);
+    lv_draw_vector_dsc_delete(dsc);
+
+To see all the path, stroke, and fill options, check out `lv_draw_vector.h <https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_vector.h>`__ .
 
 Masking Operation
 *****************
