@@ -491,13 +491,13 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
 
     int32_t col_span = get_col_span(item);
     if(col_span <= 0) {
-        LV_LOG_WARN("Column span was %" LV_PRId32 ", setting to %" LV_PRId32, col_span, 1);
+        LV_LOG_WARN("Column span was %" LV_PRId32 ", setting it to 1", col_span);
         col_span = 1;
     }
 
     int32_t row_span = get_row_span(item);
     if(row_span <= 0) {
-        LV_LOG_WARN("Row span was %" LV_PRId32 ", setting to %" LV_PRId32, row_span, 1);
+        LV_LOG_WARN("Row span was %" LV_PRId32 ", setting it to 1", row_span);
         row_span = 1;
     }
 
@@ -505,7 +505,7 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
 
     int32_t col_pos = get_col_pos(item);
     if(col_pos < 0) {
-        LV_LOG_WARN("Column position was %" LV_PRId32 ", setting to %" LV_PRId32, col_pos, 0);
+        LV_LOG_WARN("Column position was %" LV_PRId32 ", setting it to 0", col_pos);
         col_pos = 0;
     }
 
@@ -516,7 +516,7 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
 
     int32_t row_pos = get_row_pos(item);
     if(row_pos < 0) {
-        LV_LOG_WARN("Row position was %" LV_PRId32 ", setting to %" LV_PRId32, row_pos, 0);
+        LV_LOG_WARN("Row position was %" LV_PRId32 ", setting it to 0", row_pos);
         row_pos = 0;
     }
 
