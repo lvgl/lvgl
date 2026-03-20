@@ -233,8 +233,8 @@ static void grid_update(lv_obj_t * cont, void * user_data)
  */
 static lv_result_t calc(lv_obj_t * cont, lv_grid_calc_t * calc_out)
 {
+    lv_memzero(calc_out, sizeof(lv_grid_calc_t));
     if(lv_obj_get_child(cont, 0) == NULL) {
-        lv_memzero(calc_out, sizeof(lv_grid_calc_t));
         return LV_RESULT_INVALID;
     }
 
