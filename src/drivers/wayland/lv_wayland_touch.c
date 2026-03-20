@@ -4,7 +4,7 @@
  */
 
 #include "lv_wayland_touch.h"
-#include <stdio.h>
+
 #if LV_USE_WAYLAND
 
 #include "lv_wayland_private.h"
@@ -137,7 +137,29 @@ static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
     if(!tdata) {
         return;
     }
+	
+#if LV_USE_GESTURE_RECOGNITION
+	/* Collect touches if there are any - send them to the gesture recognizer */
+	lv_indev_gesture_recognizers_update(indev, tdata->touches, tdata->event_cnt);
 
+	LV_LOG_TRACE("collected touch events: %d", tdata->event_cnt);
+
+	if (tdata->event_cnt > 0)
+	{
+		data->point = tdata->touches[0].point;
+	}
+	else
+	{
+		data->point.x = data->point.y = 0;
+	}
+
+	tdata->event_cnt = 0;
+
+	/* Set the gesture information, before returning to LVGL */
+	lv_indev_gesture_recognizers_set_data(indev, data);
+
+#else
+	
 	lv_display_t *disp = lv_indev_get_display(indev);
 	lv_wl_window_t *window = lv_display_get_driver_data(disp);
 	if (!window)
@@ -188,28 +210,6 @@ static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
 		data->point.x = 0;
 		data->point.y = 0;
 	}
-
-#if LV_USE_GESTURE_RECOGNITION
-    /* Collect touches if there are any - send them to the gesture recognizer */
-    lv_indev_gesture_recognizers_update(indev, tdata->touches, tdata->event_cnt);
-
-    LV_LOG_TRACE("collected touch events: %d", tdata->event_cnt);
-
-    if(tdata->event_cnt > 0) {
-        data->point = tdata->touches[0].point;
-    }
-    else {
-        data->point.x = data->point.y = 0;
-    }
-
-    tdata->event_cnt = 0;
-
-    /* Set the gesture information, before returning to LVGL */
-    lv_indev_gesture_recognizers_set_data(indev, data);
-
-#else
-    //data->point = tdata->point;
-    //data->state = tdata->state;
 #endif
 }
 
@@ -221,11 +221,22 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t 
     LV_UNUSED(time);
     LV_UNUSED(serial);
 
-    lv_wl_seat_touch_t * tdata = wl_touch_get_user_data(wl_touch);
-
     if(!surface) {
         return;
     }
+	
+#if LV_USE_GESTURE_RECOGNITION
+	lv_wl_seat_touch_t *tdata = wl_touch_get_user_data(wl_touch);
+	
+	uint8_t i = tdata->event_cnt;
+
+	tdata->touches[i].point.x = wl_fixed_to_int(x_w);
+	tdata->touches[i].point.y = wl_fixed_to_int(y_w);
+	tdata->touches[i].id = id;
+	tdata->touches[i].timestamp = time;
+	tdata->touches[i].state = LV_INDEV_STATE_PRESSED;
+	tdata->event_cnt++;
+#else
 	lv_wl_touch_node_t *new_node = lv_ll_ins_tail(&g_touch_list);
 	if (!new_node) {
 		LV_LOG_ERROR("Failed to allocate touch node");
@@ -236,20 +247,6 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t 
 	new_node->last_point.x = wl_fixed_to_int(x_w);
 	new_node->last_point.y = wl_fixed_to_int(y_w);
 	new_node->state = LV_INDEV_STATE_PRESSED;
-
-	#if LV_USE_GESTURE_RECOGNITION
-    uint8_t i = tdata->event_cnt;
-
-    tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
-    tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
-    tdata->touches[i].id        = id;
-    tdata->touches[i].timestamp = time;
-    tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
-    tdata->event_cnt++;
-#else
-   // tdata->point.x = wl_fixed_to_int(x_w);
-   // tdata->point.y = wl_fixed_to_int(y_w);
-   // tdata->state = LV_INDEV_STATE_PRESSED;
 #endif
 }
 
@@ -274,7 +271,7 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t se
     tdata->event_cnt++;
 #else
     tdata->state = LV_INDEV_STATE_RELEASED;
-#endif
+
 	lv_wl_touch_node_t *node;
 
 	/* Iterate through the list to find the matching ID */
@@ -286,6 +283,7 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t se
 			return;
 		}
 	}
+#endif
 }
 
 static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_t time, int32_t id, wl_fixed_t x_w,
@@ -295,23 +293,11 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_
     LV_UNUSED(id);
     LV_UNUSED(time);
     LV_UNUSED(data);
-    lv_wl_seat_touch_t * tdata = wl_touch_get_user_data(wl_touch);
 
-	lv_wl_touch_node_t *node;
-
-	LV_LL_READ(&g_touch_list, node)
-	{
-		if (node->id == id)
-		{
-			node->last_point.x = wl_fixed_to_int(x_w);
-			node->last_point.y = wl_fixed_to_int(y_w);
-			node->state = LV_INDEV_STATE_PRESSED;
-			return;
-		}
-	}
-	
 #if LV_USE_GESTURE_RECOGNITION
-    /* Update the contact point of the corresponding id with the latest coordinate */
+	lv_wl_seat_touch_t *tdata = wl_touch_get_user_data(wl_touch);
+	
+	/* Update the contact point of the corresponding id with the latest coordinate */
     lv_indev_touch_data_t * touch = &tdata->touches[0];
     lv_indev_touch_data_t * cur = NULL;
 
@@ -338,8 +324,18 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_
         cur->timestamp = time;
     }
 #else
-    //tdata->point.x = wl_fixed_to_int(x_w);
-    //tdata->point.y = wl_fixed_to_int(y_w);
+	lv_wl_touch_node_t *node;
+
+	LV_LL_READ(&g_touch_list, node)
+	{
+		if (node->id == id)
+		{
+			node->last_point.x = wl_fixed_to_int(x_w);
+			node->last_point.y = wl_fixed_to_int(y_w);
+			node->state = LV_INDEV_STATE_PRESSED;
+			return;
+		}
+	}
 #endif
 }
 
