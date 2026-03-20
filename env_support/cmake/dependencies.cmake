@@ -40,6 +40,10 @@ if(CONFIG_LV_USE_EVDEV)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/evdev.cmake)
 endif()
 
+if(CONFIG_LV_USE_LIBINPUT)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/libinput.cmake)
+endif()
+
 # ====== Video ====== #
 if(CONFIG_LV_USE_GSTREAMER)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/gstreamer.cmake)
