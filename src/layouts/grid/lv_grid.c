@@ -192,7 +192,10 @@ static void grid_update(lv_obj_t * cont, void * user_data)
 
     lv_grid_calc_t c;
     lv_result_t res = calc(cont, &c);
-    if(res != LV_RESULT_OK) return;
+    if(res != LV_RESULT_OK) {
+        calc_free(&c);
+        return;
+    }
 
     item_repos_hint_t hint;
     lv_memzero(&hint, sizeof(hint));
@@ -501,7 +504,7 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
     bool rev = lv_obj_get_style_base_dir(lv_obj_get_parent(item), LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     int32_t col_pos = get_col_pos(item);
-    if(col_pos <= 0) {
+    if(col_pos < 0) {
         LV_LOG_WARN("Column position was %d, setting to %d", col_pos, 0);
         col_pos = 0;
     }
@@ -512,7 +515,7 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
     }
 
     int32_t row_pos = get_row_pos(item);
-    if(row_pos <= 0) {
+    if(row_pos < 0) {
         LV_LOG_WARN("Row position was %d, setting to %d", row_pos, 0);
         row_pos = 0;
     }
