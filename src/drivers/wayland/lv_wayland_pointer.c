@@ -55,7 +55,7 @@ static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer, uin
  **********************/
 
 static struct wl_cursor_theme * cursor_theme = NULL;
-static struct wl_surface *g_focused_surface = NULL;
+static struct wl_surface * g_focused_surface = NULL;
 
 static const struct wl_pointer_listener pointer_listener = {
     .enter  = pointer_handle_enter,
@@ -177,31 +177,28 @@ static void pointer_read(lv_indev_t * indev, lv_indev_data_t * data)
     if(!seat_pointer) {
         return;
     }
-	
-	lv_display_t *disp = lv_indev_get_display(indev);
-	if (!disp)
-	{
-		data->state = LV_INDEV_STATE_RELEASED;
-		return;
-	}
-	
-	lv_wl_window_t *window = lv_display_get_driver_data(disp);
-	if (!window)
-	{
-		data->state = LV_INDEV_STATE_RELEASED;
-		return;
-	}
-	
-	if (window->body != g_focused_surface)
-	{
-		// This window is NOT focused. Force release state.
-		data->state = LV_INDEV_STATE_RELEASED;
-		// Optional: Clear coordinates to prevent stray clicks
-		data->point.x = 0;
-		data->point.y = 0;
-		return;
-	}
-	
+
+    lv_display_t * disp = lv_indev_get_display(indev);
+    if(!disp) {
+        data->state = LV_INDEV_STATE_RELEASED;
+        return;
+    }
+
+    lv_wl_window_t * window = lv_display_get_driver_data(disp);
+    if(!window) {
+        data->state = LV_INDEV_STATE_RELEASED;
+        return;
+    }
+
+    if(window->body != g_focused_surface) {
+        // This window is NOT focused. Force release state.
+        data->state = LV_INDEV_STATE_RELEASED;
+        // Optional: Clear coordinates to prevent stray clicks
+        data->point.x = 0;
+        data->point.y = 0;
+        return;
+    }
+
     data->point = seat_pointer->point;
     data->state = seat_pointer->left_btn_state;
 }
@@ -211,7 +208,7 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
 {
     LV_UNUSED(data);
     LV_UNUSED(surface);
-	g_focused_surface = surface;
+    g_focused_surface = surface;
     lv_wl_seat_pointer_t * seat_pointer = wl_pointer_get_user_data(pointer);
     int pos_x = wl_fixed_to_int(sx);
     int pos_y = wl_fixed_to_int(sy);
@@ -236,10 +233,9 @@ static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint3
     LV_UNUSED(serial);
     LV_UNUSED(pointer);
 
-	if (g_focused_surface == surface)
-	{
-		g_focused_surface = NULL;
-	}
+    if(g_focused_surface == surface) {
+        g_focused_surface = NULL;
+    }
 }
 
 static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
