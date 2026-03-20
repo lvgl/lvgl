@@ -23,7 +23,7 @@ if(ESP_PLATFORM)
 elseif(MICROPY_DIR)
   include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/micropython.cmake)
 else()
-  include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/os_desktop.cmake)
+  include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/main.cmake)
 endif()
 
 #[[

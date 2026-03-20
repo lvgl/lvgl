@@ -23,6 +23,8 @@ option(LV_BUILD_LVGL_H_SYSTEM_INCLUDE
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
+option(LV_BUILD_TESTS "Build LVGL tests" OFF)
+
 ### LVGL configuration options always use the prefix CONFIG_
 ### They can be set using the -D argument or cmake-gui(1) and are kept in cache
 ### The option names are the same as the defines in lv_conf.h - so check it for a description
@@ -284,6 +286,10 @@ if(CONFIG_LV_BUILD_DEMOS)
         # During dynamic linking, the linker is able to resolve everything
         target_link_libraries(lvgl_demos PRIVATE lvgl)
     endif()
+
+endif()
+
+if(LV_BUILD_TESTS)
 
 endif()
 
