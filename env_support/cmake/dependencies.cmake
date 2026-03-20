@@ -74,6 +74,10 @@ if(CONFIG_LV_USE_LIBPNG)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/png.cmake)
 endif()
 
+if(CONFIG_LV_USE_LIBWEBP OR CONFIG_LV_USE_GLTF)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/webp.cmake)
+endif()
+
 # ====== Font ====== #
 if(CONFIG_LV_USE_FREETYPE)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/freetype.cmake)
@@ -83,8 +87,6 @@ if(CONFIG_LV_USE_GLTF)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/fastgltf.cmake)
 endif()
 
-if(CONFIG_LV_USE_GLTF OR LV_USE_LIBWEBP)
-  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/webp.cmake)
 # ====== External Demos  ====== #
 if(CONFIG_LV_USE_DEMO_FLEX_LAYOUT
    OR CONFIG_LV_USE_DEMO_MULTILANG
