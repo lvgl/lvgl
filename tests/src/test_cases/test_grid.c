@@ -173,6 +173,7 @@ void test_grid_no_crash_on_invalid_settings(void)
     /*Valid settings*/
     lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 1, 2, LV_GRID_ALIGN_CENTER, 0, 1);
     lv_refr_now(NULL);
+    TEST_PASS();
 }
 
 

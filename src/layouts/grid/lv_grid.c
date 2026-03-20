@@ -491,13 +491,13 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
 
     int32_t col_span = get_col_span(item);
     if(col_span <= 0) {
-        LV_LOG_WARN("Column span was %d, setting to", col_span);
+        LV_LOG_WARN("Column span was %" LV_PRId32 ", setting to %" LV_PRId32, col_span, 1);
         col_span = 1;
     }
 
     int32_t row_span = get_row_span(item);
     if(row_span <= 0) {
-        LV_LOG_WARN("Row span was %d, setting to", row_span);
+        LV_LOG_WARN("Row span was %" LV_PRId32 ", setting to %" LV_PRId32, row_span, 1);
         row_span = 1;
     }
 
@@ -505,34 +505,34 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
 
     int32_t col_pos = get_col_pos(item);
     if(col_pos < 0) {
-        LV_LOG_WARN("Column position was %d, setting to %d", col_pos, 0);
+        LV_LOG_WARN("Column position was %" LV_PRId32 ", setting to %" LV_PRId32, col_pos, 0);
         col_pos = 0;
     }
 
     if(col_pos >= (int32_t)c->col_num) {
-        LV_LOG_WARN("Column position was %d, setting to %d", col_pos, c->col_num - 1);
+        LV_LOG_WARN("Column position was %" LV_PRId32 ", setting to %" LV_PRId32, col_pos, c->col_num - 1);
         col_pos = c->col_num - 1;
     }
 
     int32_t row_pos = get_row_pos(item);
     if(row_pos < 0) {
-        LV_LOG_WARN("Row position was %d, setting to %d", row_pos, 0);
+        LV_LOG_WARN("Row position was %" LV_PRId32 ", setting to %" LV_PRId32, row_pos, 0);
         row_pos = 0;
     }
 
     if(row_pos >= (int32_t)c->row_num) {
-        LV_LOG_WARN("Row position was %d, setting to %d", row_pos, c->row_num - 1);
+        LV_LOG_WARN("Row position was %" LV_PRId32 ", setting to %" LV_PRId32, row_pos, c->row_num - 1);
         row_pos = c->row_num - 1;
     }
 
     if(col_pos + col_span > (int32_t)c->col_num) {
         col_span = c->col_num - col_pos;
-        LV_LOG_WARN("Column span is too large, limiting it to the %d", col_span);
+        LV_LOG_WARN("Column span is too large, limiting it to %" LV_PRId32, col_span);
     }
 
     if(row_pos + row_span > (int32_t)c->row_num) {
         row_span = c->row_num - row_pos;
-        LV_LOG_WARN("Row span is too large, limiting it to %d", row_span);
+        LV_LOG_WARN("Row span is too large, limiting it to %" LV_PRId32, row_span);
     }
 
     lv_grid_align_t col_align = get_cell_col_align(item);
