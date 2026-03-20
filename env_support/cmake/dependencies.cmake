@@ -27,6 +27,11 @@ if(CONFIG_LV_USE_LINUX_DRM)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/drm.cmake)
 endif()
 
+# ====== Indev ====== #
+if(CONFIG_LV_USE_EVDEV)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/evdev.cmake)
+endif()
+
 if(CONFIG_LV_USE_GLTF)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/fastgltf.cmake)
 endif()
