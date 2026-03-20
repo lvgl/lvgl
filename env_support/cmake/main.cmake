@@ -25,6 +25,8 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 option(LV_BUILD_TESTS "Build LVGL tests" OFF)
 
+option(LV_FETCH_DEPENDENCIES "Automatically fetch missing dependencies. Requires setting config variables or to enable `LV_BUILD_SET_CONFIG_OPTS`" ON)
+
 ### LVGL configuration options always use the prefix CONFIG_
 ### They can be set using the -D argument or cmake-gui(1) and are kept in cache
 ### The option names are the same as the defines in lv_conf.h - so check it for a description
@@ -210,6 +212,8 @@ if (LV_BUILD_SET_CONFIG_OPTS)
     # This will set all CONFIG_LV_USE_* or CONFIG_LV_BUILD_* variables in cmake
     include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
 endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/dependencies.cmake)
 
 # Set the configuration inc dir for all targets created in this CMakeLists.txt
 # CMAKE_CURRENT_SOURCE_DIR is necessary because the assets include lvgl/lvgl.h ...
