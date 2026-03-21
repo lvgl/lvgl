@@ -80,7 +80,6 @@ struct _lv_freetype_outline_event_param_t {
     lv_freetype_outline_sizes_t sizes;
 };
 
-
 typedef struct _lv_freetype_cache_node_t lv_freetype_cache_node_t;
 
 struct _lv_freetype_cache_node_t {
@@ -99,6 +98,11 @@ struct _lv_freetype_cache_node_t {
 
     /*draw data cache*/
     lv_cache_t * draw_data_cache;
+
+#if LV_USE_OS == LV_OS_NONE
+    /* L1 glyph metrics cache (single-thread only, managed by lv_freetype_glyph.c) */
+    void * glyph_l1;
+#endif
 };
 
 typedef struct _lv_freetype_context_t {
@@ -141,6 +145,11 @@ int32_t lv_freetype_italic_transform_on_pos(lv_point_t point);
 
 lv_cache_t * lv_freetype_create_glyph_cache(uint32_t cache_size);
 void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc);
+
+#if LV_USE_OS == LV_OS_NONE
+void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node);
+void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node);
+#endif
 
 lv_cache_t * lv_freetype_create_draw_data_image(uint32_t cache_size);
 void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc);
