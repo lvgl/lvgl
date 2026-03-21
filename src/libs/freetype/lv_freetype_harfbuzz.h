@@ -59,7 +59,7 @@ typedef struct {
  * @return pointer to shaped text result, or NULL on failure
  */
 lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text, uint32_t byte_len,
-                                        lv_base_dir_t dir_hint);
+                                       lv_base_dir_t dir_hint);
 
 /**
  * Free shaped text result.
@@ -70,9 +70,18 @@ void lv_hb_shaped_text_destroy(lv_hb_shaped_text_t * shaped);
 /**
  * Check if a font is a FreeType font that can use HarfBuzz shaping.
  * @param font pointer to an LVGL font
- * @return true if the font is a FreeType font
+ * @return true if the font is a FreeType font with HarfBuzz enabled
  */
 bool lv_freetype_is_harfbuzz_font(const lv_font_t * font);
+
+/**
+ * Enable or disable HarfBuzz shaping for a specific FreeType font instance.
+ * When disabled, the font uses LVGL's standard character-by-character rendering
+ * (compatible with LV_USE_ARABIC_PERSIAN_CHARS and LV_USE_BIDI).
+ * @param font pointer to an LVGL font (must be a FreeType font)
+ * @param enabled true to enable HarfBuzz (default), false to disable
+ */
+void lv_freetype_font_set_harfbuzz(lv_font_t * font, bool enabled);
 
 /**
  * Get the width of a shaped text string in pixels.

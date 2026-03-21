@@ -45,11 +45,20 @@ bool lv_freetype_is_harfbuzz_font(const lv_font_t * font)
 {
     if(font == NULL || font->dsc == NULL) return false;
     const lv_freetype_font_dsc_t * dsc = (const lv_freetype_font_dsc_t *)font->dsc;
-    return LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc);
+    if(!LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc)) return false;
+    return !dsc->skip_harfbuzz;
+}
+
+void lv_freetype_font_set_harfbuzz(lv_font_t * font, bool enabled)
+{
+    if(font == NULL || font->dsc == NULL) return;
+    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
+    if(!LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc)) return;
+    dsc->skip_harfbuzz = !enabled;
 }
 
 lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text, uint32_t byte_len,
-                                        lv_base_dir_t dir_hint)
+                                       lv_base_dir_t dir_hint)
 {
     if(font == NULL || text == NULL || byte_len == 0) return NULL;
 
@@ -65,11 +74,14 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     FT_Face face = cache_node->face;
 
     /* Set pixel size before creating/using HarfBuzz font */
-    FT_Error error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
-    if(error) {
-        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
-        lv_mutex_unlock(&cache_node->face_lock);
-        return NULL;
+    if(cache_node->last_pixel_size != dsc->size) {
+        FT_Error error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+        if(error) {
+            FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+            lv_mutex_unlock(&cache_node->face_lock);
+            return NULL;
+        }
+        cache_node->last_pixel_size = dsc->size;
     }
 
     /* Get or create cached HarfBuzz font.
@@ -90,13 +102,20 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
         cache_node->hb_font_size = dsc->size;
     }
 
-    /* Create and configure HarfBuzz buffer */
-    hb_buffer_t * hb_buf = hb_buffer_create();
-    if(!hb_buffer_allocation_successful(hb_buf)) {
-        LV_LOG_ERROR("hb_buffer_create failed");
-        hb_buffer_destroy(hb_buf);
-        lv_mutex_unlock(&cache_node->face_lock);
-        return NULL;
+    /* Get or create reusable HarfBuzz buffer from cache_node */
+    hb_buffer_t * hb_buf = (hb_buffer_t *)cache_node->hb_buf;
+    if(hb_buf == NULL) {
+        hb_buf = hb_buffer_create();
+        if(!hb_buffer_allocation_successful(hb_buf)) {
+            LV_LOG_ERROR("hb_buffer_create failed");
+            hb_buffer_destroy(hb_buf);
+            lv_mutex_unlock(&cache_node->face_lock);
+            return NULL;
+        }
+        cache_node->hb_buf = hb_buf;
+    }
+    else {
+        hb_buffer_reset(hb_buf);
     }
 
     hb_buffer_add_utf8(hb_buf, text, (int)byte_len, 0, (int)byte_len);
@@ -127,7 +146,7 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     hb_glyph_position_t * hb_glyph_positions = hb_buffer_get_glyph_positions(hb_buf, &glyph_count);
 
     if(glyph_count == 0) {
-        hb_buffer_destroy(hb_buf);
+        /* Buffer stays cached for reuse — no destroy */
         lv_mutex_unlock(&cache_node->face_lock);
         return NULL;
     }
@@ -136,7 +155,6 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     lv_hb_shaped_text_t * result = lv_malloc(sizeof(lv_hb_shaped_text_t));
     LV_ASSERT_MALLOC(result);
     if(result == NULL) {
-        hb_buffer_destroy(hb_buf);
         lv_mutex_unlock(&cache_node->face_lock);
         return NULL;
     }
@@ -145,24 +163,26 @@ lv_hb_shaped_text_t * lv_hb_shape_text(const lv_font_t * font, const char * text
     LV_ASSERT_MALLOC(result->glyphs);
     if(result->glyphs == NULL) {
         lv_free(result);
-        hb_buffer_destroy(hb_buf);
         lv_mutex_unlock(&cache_node->face_lock);
         return NULL;
     }
 
     result->count = glyph_count;
 
-    /* Convert HarfBuzz results (26.6 fixed-point) to pixels */
+    /* Convert HarfBuzz results (26.6 fixed-point) to pixels.
+     * Use >> 6 (arithmetic shift) instead of / 64 to correctly handle
+     * negative values (e.g. kerning, mark offsets). / 64 truncates
+     * toward zero, while >> 6 floors toward negative infinity. */
     for(unsigned int i = 0; i < glyph_count; i++) {
         result->glyphs[i].glyph_id = hb_glyph_infos[i].codepoint;
-        result->glyphs[i].x_offset = hb_glyph_positions[i].x_offset / 64;
-        result->glyphs[i].y_offset = hb_glyph_positions[i].y_offset / 64;
-        result->glyphs[i].x_advance = hb_glyph_positions[i].x_advance / 64;
-        result->glyphs[i].y_advance = hb_glyph_positions[i].y_advance / 64;
+        result->glyphs[i].x_offset = hb_glyph_positions[i].x_offset >> 6;
+        result->glyphs[i].y_offset = hb_glyph_positions[i].y_offset >> 6;
+        result->glyphs[i].x_advance = hb_glyph_positions[i].x_advance >> 6;
+        result->glyphs[i].y_advance = hb_glyph_positions[i].y_advance >> 6;
         result->glyphs[i].cluster = hb_glyph_infos[i].cluster;
     }
 
-    hb_buffer_destroy(hb_buf);
+    /* Buffer stays cached in cache_node for reuse — no destroy */
     lv_mutex_unlock(&cache_node->face_lock);
 
     return result;
