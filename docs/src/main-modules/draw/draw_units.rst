@@ -42,7 +42,7 @@ Multi-Core Rendering
 --------------------
 
 In case of a multi-core system, each core can perform software rendering in parallel by setting
-:cpp:enum:`LV_DRAW_SW_DRAW_UNIT_CNT` to greater than ``1``, and setting :cpp:enum:`LV_USE_OS`
+:cpp:macro:`LV_DRAW_SW_DRAW_UNIT_CNT` to greater than ``1``, and setting :cpp:macro:`LV_USE_OS`
 to something other than ``LV_OS_NONE``.
 
 Assembly Acceleration
@@ -68,7 +68,7 @@ To render vector graphics (e.g. SVG), LVGL uses a third-party library called
 - fill with color, image, or gradient
 - and many more
 
-To use it, enable :cpp:enum:`LV_USE_THORVG_INTERNAL` and :cpp:enum:`LV_USE_VECTOR_GRAPHIC`.
+To use it, enable :c:macro:`LV_USE_THORVG_INTERNAL` and :c:macro:`LV_USE_VECTOR_GRAPHIC`.
 
 VG-Lite
 *******
@@ -116,8 +116,8 @@ Dave2D
 Dave2D is a 2D graphics accelerator developed by TES and widely used on
 Renesas and Alif MCUs.
 
-In Renesas FSP, the DRW peripheral is provided as a port of D/AVE 2D, which the driver
-that LVGL DAVED draw unit is using.
+In Renesas FSP, the DRW peripheral is provided as a port of D/AVE 2D, which is the driver
+used by the LVGL Dave2D draw unit.
 
 Key Features
 ------------
