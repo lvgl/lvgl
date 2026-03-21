@@ -131,21 +131,67 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
 
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)user_data;
 
-    FT_Error error;
-
     lv_mutex_lock(&dsc->cache_node->face_lock);
 
+    /* Check prerender cache — the glyph descriptor callback may have already
+     * rendered this bitmap, saving a second FT_Load_Glyph call. */
+    lv_freetype_cache_node_t * cn = dsc->cache_node;
+    if(cn->prerender.buffer != NULL &&
+       cn->prerender.glyph_index == data->glyph_index &&
+       cn->prerender.size == dsc->size) {
+        uint16_t box_h = cn->prerender.rows;
+        uint16_t box_w = cn->prerender.width;
+        uint32_t pitch = (uint32_t)LV_ABS(cn->prerender.pitch);
+
+        lv_color_format_t col_format;
+        if(cn->prerender.pixel_mode == FT_PIXEL_MODE_BGRA) {
+            col_format = LV_COLOR_FORMAT_ARGB8888;
+        }
+        else {
+            col_format = LV_COLOR_FORMAT_A8;
+        }
+        uint32_t stride = lv_draw_buf_width_to_stride(box_w, col_format);
+        data->draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, box_w, box_h, col_format, stride);
+        if(data->draw_buf) {
+            lv_draw_buf_clear(data->draw_buf, NULL);
+            for(int y = 0; y < box_h; ++y) {
+                lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride,
+                          cn->prerender.buffer + y * pitch, pitch);
+            }
+            lv_draw_buf_flush_cache(data->draw_buf, NULL);
+            /* Consume the prerender entry */
+            lv_free(cn->prerender.buffer);
+            cn->prerender.buffer = NULL;
+            lv_mutex_unlock(&dsc->cache_node->face_lock);
+            LV_PROFILER_FONT_END;
+            return true;
+        }
+        /* draw_buf create failed — fall through to normal path */
+        lv_free(cn->prerender.buffer);
+        cn->prerender.buffer = NULL;
+    }
+
+    /* Normal path: load and render the glyph from scratch */
+    FT_Error error;
     FT_Face face = dsc->cache_node->face;
     if(FT_IS_SCALABLE(face)) {
-        error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+        if(dsc->cache_node->last_pixel_size != dsc->size) {
+            error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+            if(error) {
+                FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+                lv_mutex_unlock(&dsc->cache_node->face_lock);
+                return false;
+            }
+            dsc->cache_node->last_pixel_size = dsc->size;
+        }
     }
     else {
         error = FT_Select_Size(face, 0);
-    }
-    if(error) {
-        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
-        lv_mutex_unlock(&dsc->cache_node->face_lock);
-        return false;
+        if(error) {
+            FT_ERROR_MSG("FT_Select_Size", error);
+            lv_mutex_unlock(&dsc->cache_node->face_lock);
+            return false;
+        }
     }
     error = FT_Load_Glyph(face, data->glyph_index,
                           FT_LOAD_COLOR | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT);
@@ -210,7 +256,9 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * data, void * user_data)
 {
     LV_UNUSED(user_data);
-    lv_draw_buf_destroy(data->draw_buf);
+    if(data->draw_buf) {
+        lv_draw_buf_destroy(data->draw_buf);
+    }
 }
 static lv_cache_compare_res_t freetype_image_compare_cb(const lv_freetype_image_cache_data_t * lhs,
                                                         const lv_freetype_image_cache_data_t * rhs)
