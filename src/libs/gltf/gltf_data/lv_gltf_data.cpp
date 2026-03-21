@@ -21,6 +21,7 @@
  *      DEFINES
  *********************/
 
+#define LV_GLTF_ANIMATION_RESET_TIME 50
 
 /**********************
  *      TYPEDEFS
@@ -316,6 +317,25 @@ void lv_gltf_model_invalidate(lv_gltf_model_t * model)
     }
 }
 
+void lv_gltf_model_set_animation_time(lv_gltf_model_t * model, uint32_t raw_millis)
+{
+
+    if((raw_millis >= model->current_animation_max_time) || (raw_millis < LV_GLTF_ANIMATION_RESET_TIME)) {
+        raw_millis = LV_GLTF_ANIMATION_RESET_TIME;
+    }
+    model->local_timestamp = raw_millis;
+    lv_gltf_model_invalidate(model);
+}
+
+void lv_gltf_model_set_animation_ratio(lv_gltf_model_t * model, uint32_t ratio_100k)
+{
+
+    float f_ratio = (float)ratio_100k / 100000.f;
+
+    uint32_t raw_millis = model->current_animation_max_time * f_ratio;
+    lv_gltf_model_set_animation_time(model, raw_millis);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -328,12 +348,8 @@ static void update_animation_cb(lv_timer_t * timer)
     const uint32_t delta = lv_tick_diff(current_tick, model->last_tick);
 
     model->last_tick = current_tick;
-    model->local_timestamp += (delta * model->animation_speed_ratio) / 1000;
+    lv_gltf_model_set_animation_time(model, model->local_timestamp + ((delta * model->animation_speed_ratio) / 1000));
 
-    if(model->local_timestamp >= model->current_animation_max_time) {
-        model->local_timestamp = 50;
-    }
-    lv_gltf_model_invalidate(model);
 }
 
 

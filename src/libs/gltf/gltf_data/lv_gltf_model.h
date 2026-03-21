@@ -170,6 +170,24 @@ void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value);
  */
 uint32_t lv_gltf_model_get_animation_speed(const lv_gltf_model_t * model);
 
+/**
+ * Set the animation current time
+ *
+ * The time is in milliseconds with the animation speed ratio applied
+ *
+ * @param model pointer to a glTF model
+ */
+void lv_gltf_model_set_animation_time(lv_gltf_model_t * model, uint32_t millis);
+
+/**
+ * Set the animation current playback ratio
+ *
+ * Ratio is expressed as a 0 to 99999 integer
+ *
+ * @param model pointer to a glTF model
+ */
+void lv_gltf_model_set_animation_ratio(lv_gltf_model_t * model, uint32_t ratio_100k);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
