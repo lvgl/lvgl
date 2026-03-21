@@ -289,6 +289,12 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_transform_point(obj, &slider->pressed_point, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE_RECURSIVE);
     }
     else if(code == LV_EVENT_PRESSING) {
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
+        if(indev_type == LV_INDEV_TYPE_POINTER) {
+            /* Block perpendicular scroll chain while dragging (better touchscreen UX) */
+            if(is_slider_horizontal(obj)) lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            else  lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+        }
         update_knob_pos(obj, true);
     }
     else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
@@ -317,6 +323,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
         else if(indev_type == LV_INDEV_TYPE_POINTER) {
+            /* Restore perpendicular scroll chain after drag ends */
             if(is_slider_horizontal(obj)) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
             else  lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
         }
@@ -329,11 +336,12 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
         if(is_slider_horizontal(obj)) {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            /*Don't re-add perpendicular chain while actively dragging*/
+            if(!slider->dragging) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
             lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
         }
         else {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            if(!slider->dragging) lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
             lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
         }
         lv_obj_refresh_ext_draw_size(obj);
