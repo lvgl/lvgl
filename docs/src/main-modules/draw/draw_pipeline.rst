@@ -87,6 +87,7 @@ capable of performing rendering.
 For a reference implementation of a draw unit, see
 `lv_draw_sw.c <https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c>`_.
 
+Learn more about :ref:`draw units`
 
 Creating Draw Units
 -------------------
