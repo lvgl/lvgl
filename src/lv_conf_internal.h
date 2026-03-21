@@ -3222,10 +3222,6 @@
         #endif
     #endif
 #endif
-/* Ensure LV_USE_HARFBUZZ is defined even when LV_USE_FREETYPE is disabled */
-#ifndef LV_USE_HARFBUZZ
-    #define LV_USE_HARFBUZZ 0
-#endif
 
 /** Built-in TTF decoder */
 #ifndef LV_USE_TINY_TTF
