@@ -1,3 +1,5 @@
+import gdb
+
 from lvglgdb.value import Value, ValueInput
 from lvglgdb.lvgl.misc.lv_style import LVStyle, decode_selector
 
@@ -99,7 +101,10 @@ class LVObject(Value):
         if not self.spec_attr:
             return
         for i in range(self.child_count):
-            yield LVObject(self.spec_attr.children[i])
+            try:
+                yield LVObject(self.spec_attr.children[i])
+            except Exception:
+                continue
 
     @property
     def obj_styles(self):
@@ -109,17 +114,16 @@ class LVObject(Value):
             return
         styles_arr = self.super_value("styles")
         for i in range(count):
-            raw = styles_arr[i]
-            flags = []
-            if int(raw.is_local):
-                flags.append("local")
-            if int(raw.is_trans):
-                flags.append("trans")
-            if int(raw.is_theme):
-                flags.append("theme")
-            if int(raw.is_disabled):
-                flags.append("disabled")
-            yield ObjStyle(i, int(raw.selector), flags, LVStyle(raw.style))
+            try:
+                raw = styles_arr[i]
+                flags = []
+                raw_val = Value(raw)
+                for flag_name in ("is_local", "is_trans", "is_theme", "is_disabled"):
+                    if raw_val.safe_field(flag_name, False, bool):
+                        flags.append(flag_name.replace("is_", ""))
+                yield ObjStyle(i, int(raw.selector), flags, LVStyle(raw.style))
+            except (gdb.MemoryError, gdb.error):
+                continue
 
     @property
     def styles(self):
@@ -149,13 +153,34 @@ class LVObject(Value):
             "group_addr": self._get_group_addr(),
         }
         if include_children:
-            d["children"] = [
-                c.snapshot(include_children=True, include_styles=include_styles).as_dict()
-                for c in self.children
-            ]
+            d["children"] = self._collect_children(include_styles)
         if include_styles:
-            d["styles"] = [s.snapshot().as_dict() for s in self.obj_styles]
+            d["styles"] = self._collect_styles()
         return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+
+    def _collect_children(self, include_styles):
+        """Collect child snapshots, substituting corrupted snapshots on error."""
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import safe_collect
+
+        @Snapshot.fallback()
+        def _snap(c):
+            return c.snapshot(
+                include_children=True, include_styles=include_styles,
+            ).as_dict()
+
+        return safe_collect(self.children, _snap)
+
+    def _collect_styles(self):
+        """Collect style snapshots, substituting corrupted entries on error."""
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import safe_collect
+
+        @Snapshot.fallback()
+        def _snap(s):
+            return s.snapshot().as_dict()
+
+        return safe_collect(self.obj_styles, _snap)
 
     def _get_group_addr(self):
         """Get group address from spec_attr, or None."""
@@ -195,6 +220,9 @@ def dump_obj_styles(obj: ValueInput):
         return [entry["prop_name"], value_str]
 
     for s in styles:
+        if "error" in s:
+            print(f"(corrupted) {s.get('addr', '?')} — {s['error']}")
+            continue
         print(f"[{s['index']}] {s['selector_str']}  {s['flags_str']}")
         print_table(
             s.get("properties", []), ["prop", "value"], _style_row,

@@ -105,18 +105,26 @@ class LVRedBlackTreeIterator:
         if not self.current:
             raise StopIteration
 
-        data = self.tree.get_data(self.current)
+        try:
+            data = self.tree.get_data(self.current)
+        except (gdb.MemoryError, gdb.error):
+            data = None
 
-        # Move to next node (in-order traversal)
-        if self.current.right:
-            self.current = self.tree.minimum_from(self.current.right)
-        else:
-            parent = self.current.parent
-            while parent and self.current == parent.right:
+        # Advance to next node (in-order traversal)
+        try:
+            if self.current.right:
+                self.current = self.tree.minimum_from(self.current.right)
+            else:
+                parent = self.current.parent
+                while parent and self.current == parent.right:
+                    self.current = parent
+                    parent = parent.parent
                 self.current = parent
-                parent = parent.parent
-            self.current = parent
+        except (gdb.MemoryError, gdb.error):
+            self.current = None
 
+        if data is None:
+            return self.__next__()
         return data
 
     def __str__(self):

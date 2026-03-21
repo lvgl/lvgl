@@ -113,12 +113,15 @@ class LVStyle(Value):
                 yield StyleEntry(prop_id, const_props[j].value)
                 j += 1
         elif prop_cnt > 0:
-            # Normal style: values[prop_cnt] then props[prop_cnt] (uint8_t)
+            # Normal style: values[prop_cnt] then props[prop_cnt]
+            # C code: (lv_style_prop_t*)vp + prop_cnt * sizeof(lv_style_value_t)
+            # The pointer arithmetic uses lv_style_prop_t element size as stride.
             base = self.values_and_props
             value_t = gdb.lookup_type("lv_style_value_t")
+            prop_t = gdb.lookup_type("lv_style_prop_t")
             values_ptr = base.cast(value_t, ptr=True)
-            props_offset = prop_cnt * value_t.sizeof
-            props_ptr = Value(int(base) + props_offset).cast("uint8_t", ptr=True)
+            props_offset = prop_cnt * value_t.sizeof * prop_t.sizeof
+            props_ptr = Value(int(base) + props_offset).cast(prop_t, ptr=True)
 
             for j in range(prop_cnt):
                 prop_id = int(props_ptr[j])

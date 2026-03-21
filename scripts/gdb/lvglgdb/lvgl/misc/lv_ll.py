@@ -50,17 +50,23 @@ class LVList(Value):
         nodetype = self.nodetype if self.nodetype else self.lv_ll_node_t
         node = self.current.cast(nodetype)
 
-        self.current = self._next(self.current)
+        try:
+            self.current = self._next(self.current)
+        except (gdb.MemoryError, gdb.error):
+            self.current = None
         return node
 
     @property
     def len(self):
-        len = 0
+        count = 0
         node = self.head
         while node:
-            len += 1
-            node = self._next(node)
-        return len
+            count += 1
+            try:
+                node = self._next(node)
+            except (gdb.MemoryError, gdb.error):
+                break
+        return count
 
     def snapshot(self):
         from lvglgdb.lvgl.snapshot import Snapshot
@@ -72,4 +78,3 @@ class LVList(Value):
             "nodetype": str(self.nodetype) if self.nodetype else None,
         }
         return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
-

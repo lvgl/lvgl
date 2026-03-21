@@ -100,11 +100,11 @@ class LVAnim(Value):
 
     @property
     def reverse_duration(self) -> int:
-        return int(self.super_value("reverse_duration"))
+        return self.safe_field("reverse_duration", 0, int)
 
     @property
     def reverse_delay(self) -> int:
-        return int(self.super_value("reverse_delay"))
+        return self.safe_field("reverse_delay", 0, int)
 
     @property
     def repeat_delay(self) -> int:
@@ -116,15 +116,15 @@ class LVAnim(Value):
 
     @property
     def is_paused(self) -> bool:
-        return bool(int(self.super_value("is_paused")))
+        return self.safe_field("is_paused", False, bool)
 
     @property
     def reverse_play_in_progress(self) -> bool:
-        return bool(int(self.super_value("reverse_play_in_progress")))
+        return self.safe_field("reverse_play_in_progress", False, bool)
 
     @property
     def early_apply(self) -> bool:
-        return bool(int(self.super_value("early_apply")))
+        return self.safe_field("early_apply", False, bool)
 
     def _status_str(self) -> str:
         """Short status string for table display."""
