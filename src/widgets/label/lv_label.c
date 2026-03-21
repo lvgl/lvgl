@@ -27,7 +27,7 @@
 #include "../../core/lv_observer_private.h"
 #include "../../others/translation/lv_translation.h"
 
-#if LV_USE_HARFBUZZ
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
     #include "../../libs/freetype/lv_freetype_harfbuzz.h"
 #endif
 
@@ -483,7 +483,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     uint32_t i = 0;
     uint32_t i_act = i;
 
-#if LV_USE_HARFBUZZ
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
     /* HarfBuzz path: shape the line and walk shaped glyphs to find the character at pos.x */
     if(lv_freetype_is_harfbuzz_font(font) && new_line_start > 0) {
         uint32_t line_byte_len = new_line_start - line_start;
@@ -491,10 +491,10 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
         while(line_byte_len > 0 && (bidi_txt[line_byte_len - 1] == '\n' || bidi_txt[line_byte_len - 1] == '\r')) {
             line_byte_len--;
         }
-        /* When BIDI is enabled, text has been reordered to visual order.
-         * Force LTR direction in HarfBuzz to prevent double-reordering. */
+        /* If BIDI processing was applied, text is in visual order — force LTR
+         * in HarfBuzz to prevent double-reordering. Otherwise let HB auto-detect. */
 #if LV_USE_BIDI
-        lv_base_dir_t hb_dir = LV_BASE_DIR_LTR;
+        lv_base_dir_t hb_dir = bidi ? LV_BASE_DIR_LTR : LV_BASE_DIR_AUTO;
 #else
         lv_base_dir_t hb_dir = LV_BASE_DIR_AUTO;
 #endif
@@ -507,7 +507,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
                     best_cluster = shaped->glyphs[si].cluster;
                     break;
                 }
-                x += gw + attributes.letter_space;
+                x += gw + (gw > 0 ? attributes.letter_space : 0);
             }
             lv_hb_shaped_text_destroy(shaped);
             i = best_cluster;
@@ -517,7 +517,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
             if(bidi) {
                 uint32_t cid = lv_text_encoded_get_char_id(bidi_txt, i);
                 if(txt[line_start + i] == '\0') {
-                    logical_pos = i;
+                    logical_pos = lv_text_encoded_get_char_id(txt + line_start, i);
                 }
                 else {
                     bool is_rtl;
