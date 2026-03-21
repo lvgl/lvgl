@@ -1362,6 +1362,10 @@
      * The GBM library aims to provide a platform independent memory management system
      * it supports the major GPU vendors - This option requires linking with libgbm */
     #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
+
+
+    #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 1
+    #define LV_USE_LINUX_DRM_OVERLAY_PRIORITY (!LV_USE_LINUX_DRM_PRIMARY_PRIORITY)
 #endif
 
 /** Interface for TFT_eSPI */
