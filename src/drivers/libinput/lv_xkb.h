@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../../lv_conf_internal.h"
 
-#if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
+#if (defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB) || (defined(LV_EVDEV_XKB) && LV_EVDEV_XKB)
 
 #include "../../misc/lv_types.h"
 #include <stdbool.h>
@@ -55,7 +55,7 @@ uint32_t lv_xkb_process_key(lv_xkb_t * dsc, uint32_t scancode, bool down);
  *      MACROS
  **********************/
 
-#endif /* defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB */
+#endif /* (defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB) || (defined(LV_EVDEV_XKB) && LV_EVDEV_XKB) */
 
 #ifdef __cplusplus
 } /* extern "C" */
