@@ -42,7 +42,7 @@ Multi-Core Rendering
 --------------------
 
 In case of a multi-core system, each core can perform software rendering in parallel by setting
-:cpp:macro:`LV_DRAW_SW_DRAW_UNIT_CNT` to greater than ``1``, and setting :cpp:macro:`LV_USE_OS`
+``LV_DRAW_SW_DRAW_UNIT_CNT`` to greater than ``1``, and setting ``LV_USE_OS``
 to something other than ``LV_OS_NONE``.
 
 Assembly Acceleration
@@ -68,7 +68,7 @@ To render vector graphics (e.g. SVG), LVGL uses a third-party library called
 - fill with color, image, or gradient
 - and many more
 
-To use it, enable :c:macro:`LV_USE_THORVG_INTERNAL` and :c:macro:`LV_USE_VECTOR_GRAPHIC`.
+To use it, enable ``LV_USE_THORVG_INTERNAL`` and ``LV_USE_VECTOR_GRAPHIC``.
 
 VG-Lite
 *******
