@@ -203,6 +203,9 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
     FT_Error error;
     if(FT_IS_SCALABLE(face)) {
         error = FT_Set_Pixel_Sizes(face, 0, font_info->size);
+        if(!error) {
+            dsc->cache_node->last_pixel_size = font_info->size;
+        }
     }
     else {
         LV_LOG_WARN("font is not scalable, selecting available size");
@@ -442,7 +445,16 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
+    /* Free prerender cache */
+    if(node->prerender.buffer) {
+        lv_free(node->prerender.buffer);
+        node->prerender.buffer = NULL;
+    }
 #if LV_USE_HARFBUZZ
+    if(node->hb_buf) {
+        hb_buffer_destroy((hb_buffer_t *)node->hb_buf);
+        node->hb_buf = NULL;
+    }
     if(node->hb_font) {
         hb_font_destroy((hb_font_t *)node->hb_font);
         node->hb_font = NULL;

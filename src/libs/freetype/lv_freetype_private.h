@@ -93,6 +93,7 @@ struct _lv_freetype_cache_node_t {
     FT_Face face;
     lv_mutex_t face_lock;
     bool face_has_kerning;
+    uint32_t last_pixel_size;           /**< Last pixel size set on face, to skip redundant FT_Set_Pixel_Sizes calls. */
 
     /*glyph cache*/
     lv_cache_t * glyph_cache;
@@ -100,9 +101,22 @@ struct _lv_freetype_cache_node_t {
     /*draw data cache*/
     lv_cache_t * draw_data_cache;
 
+    /** Single-entry prerender cache: glyph descriptor callback renders bitmap
+     *  and stores it here so the image callback can reuse it without a second FT_Load_Glyph. */
+    struct {
+        FT_UInt glyph_index;
+        uint32_t size;
+        uint8_t * buffer;               /**< Heap copy of FT_Bitmap buffer, NULL if empty. */
+        uint16_t rows;
+        uint16_t width;
+        int32_t pitch;
+        uint8_t pixel_mode;             /**< FT_PIXEL_MODE_GRAY, FT_PIXEL_MODE_BGRA, etc. */
+    } prerender;
+
 #if LV_USE_HARFBUZZ
     void * hb_font;                     /**< Cached HarfBuzz font (hb_font_t *), NULL until first use.*/
     uint32_t hb_font_size;              /**< The pixel size for which hb_font was created.*/
+    void * hb_buf;                      /**< Reusable HarfBuzz buffer (hb_buffer_t *), reset between uses.*/
 #endif
 };
 
@@ -128,6 +142,9 @@ typedef struct _lv_freetype_font_dsc_t {
     FTC_FaceID face_id;
     uint32_t outline_stroke_width;
     lv_font_kerning_t kerning;
+#if LV_USE_HARFBUZZ
+    bool skip_harfbuzz;             /**< If true, bypass HarfBuzz shaping for this font instance. */
+#endif
 } lv_freetype_font_dsc_t;
 
 /**********************
