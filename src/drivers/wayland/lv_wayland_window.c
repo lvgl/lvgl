@@ -49,7 +49,7 @@ static void delete_event(lv_event_t * e);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
+bool config_input = false;
 lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
                                         lv_wayland_display_close_cb_t close_cb)
 {
@@ -173,7 +173,6 @@ void lv_wayland_window_close(lv_display_t * display)
     }
     window->close_cb = NULL;
     lv_wayland_window_delete(window);
-    lv_wayland_deinit();
 }
 
 bool lv_wayland_window_is_open(lv_display_t * disp)
@@ -299,6 +298,7 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
 
 
     lv_ll_remove(&lv_wl_ctx.window_ll, window);
+    lv_free(window);
 
     if(LV_WAYLAND_DIRECT_EXIT && lv_ll_is_empty(&lv_wl_ctx.window_ll)) {
         /* lv_deinit will deinit the wayland driver*/
