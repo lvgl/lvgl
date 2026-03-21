@@ -52,9 +52,9 @@ static void update_resolution(lv_display_t * disp);
 static void screen_event_delete_cb(lv_event_t * e);
 static lv_load_screen_result_t load_new_screen(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
-static void opa_scale_anim(void * obj, int32_t v);
-static void set_x_anim(void * obj, int32_t v);
-static void set_y_anim(void * obj, int32_t v);
+static void opa_scale_anim(void * obj, lv_anim_value_t v);
+static void set_x_anim(void * obj, lv_anim_value_t v);
+static void set_y_anim(void * obj, lv_anim_value_t v);
 static void scr_anim_completed(lv_anim_t * a);
 static bool is_out_anim(lv_screen_load_anim_t a);
 static void disp_event_cb(lv_event_t * e);
@@ -1527,17 +1527,17 @@ static void scr_load_anim_start(lv_anim_t * a)
     lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOAD_START, NULL);
 }
 
-static void opa_scale_anim(void * obj, int32_t v)
+static void opa_scale_anim(void * obj, lv_anim_value_t v)
 {
     lv_obj_set_style_opa(obj, v, 0);
 }
 
-static void set_x_anim(void * obj, int32_t v)
+static void set_x_anim(void * obj, lv_anim_value_t v)
 {
     lv_obj_set_x(obj, v);
 }
 
-static void set_y_anim(void * obj, int32_t v)
+static void set_y_anim(void * obj, lv_anim_value_t v)
 {
     lv_obj_set_y(obj, v);
 }

@@ -84,7 +84,7 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
 static lv_result_t send_event(lv_event_code_t code, void * param);
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
-static void indev_scroll_throw_anim_cb(void * var, int32_t v);
+static void indev_scroll_throw_anim_cb(void * var, lv_anim_value_t v);
 static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim);
 static inline void indev_scroll_throw_anim_reset(lv_indev_t * indev)
 {
@@ -1913,7 +1913,7 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
     return LV_RESULT_OK;
 }
 
-static void indev_scroll_throw_anim_cb(void * var, int32_t v)
+static void indev_scroll_throw_anim_cb(void * var, lv_anim_value_t v)
 {
     LV_ASSERT_NULL(var);
     LV_UNUSED(v);

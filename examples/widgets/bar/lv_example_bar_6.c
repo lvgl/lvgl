@@ -4,7 +4,7 @@
 #define MAX_VALUE 100
 #define MIN_VALUE 0
 
-static void set_value(void * bar, int32_t v)
+static void set_value(void * bar, lv_anim_value_t v)
 {
     lv_bar_set_value((lv_obj_t *)bar, v, LV_ANIM_OFF);
 }

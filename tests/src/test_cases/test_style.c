@@ -5,7 +5,7 @@
 #include "unity/unity.h"
 #include <unistd.h>
 
-static void obj_set_height_helper(void * obj, int32_t height)
+static void obj_set_height_helper(void * obj, lv_anim_value_t height)
 {
     lv_obj_set_height((lv_obj_t *)obj, (int32_t)height);
 }
