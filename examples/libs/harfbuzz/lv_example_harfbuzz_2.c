@@ -48,17 +48,20 @@ void lv_example_harfbuzz_2(void)
                                    LV_FREETYPE_FONT_STYLE_NORMAL);
 
     lv_font_t * font_telugu = lv_freetype_font_create(
-                                   PATH_PREFIX "NotoSansTelugu-Regular.ttf",
-                                   LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 30,
-                                   LV_FREETYPE_FONT_STYLE_NORMAL);
+                                  PATH_PREFIX "NotoSansTelugu-Regular.ttf",
+                                  LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 30,
+                                  LV_FREETYPE_FONT_STYLE_NORMAL);
 
     lv_font_t * font_thai = lv_freetype_font_create(
-                                 PATH_PREFIX "NotoSansThai-Regular.ttf",
-                                 LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 30,
-                                 LV_FREETYPE_FONT_STYLE_NORMAL);
+                                PATH_PREFIX "NotoSansThai-Regular.ttf",
+                                LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 30,
+                                LV_FREETYPE_FONT_STYLE_NORMAL);
 
     if(!font_bengali || !font_telugu || !font_thai) {
         LV_LOG_ERROR("failed to create one or more fonts");
+        if(font_bengali) lv_freetype_font_delete(font_bengali);
+        if(font_telugu)  lv_freetype_font_delete(font_telugu);
+        if(font_thai)    lv_freetype_font_delete(font_thai);
         lv_obj_t * lbl = lv_label_create(lv_screen_active());
         lv_label_set_text(lbl, "Font file(s) not found.\n"
                           "Download NotoSansBengali, NotoSansTelugu,\n"

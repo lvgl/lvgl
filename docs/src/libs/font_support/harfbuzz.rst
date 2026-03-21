@@ -385,7 +385,7 @@ Known Limitations
 Examples
 ********
 
-.. include:: ../../examples/libs/harfbuzz/index.rst
+.. include:: /examples/libs/harfbuzz/index.rst
 
 
 
