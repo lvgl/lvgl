@@ -199,12 +199,8 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
         data->point.y = indev->pointer.last_raw_point.y;
     }
     /*Similarly set at least the last key in case of the user doesn't set it on release*/
-    else if(indev->type == LV_INDEV_TYPE_KEYPAD) {
+    else if(indev->type == LV_INDEV_TYPE_KEYPAD || indev->type == LV_INDEV_TYPE_ENCODER) {
         data->key = indev->keypad.last_key;
-    }
-    /*For compatibility assume that used button was enter (encoder push)*/
-    else if(indev->type == LV_INDEV_TYPE_ENCODER) {
-        data->key = LV_KEY_ENTER;
     }
 
     if(indev->read_cb) {
@@ -1698,6 +1694,16 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->pointer.gesture_sum.x     = 0;
         indev->pointer.gesture_sum.y     = 0;
         indev->reset_query                     = 0;
+        if(indev->type == LV_INDEV_TYPE_ENCODER) {
+            /* Before v9.6, LV_INDEV_TYPE_ENCODER set LV_KEY_ENTER as the last key on EVERY frame.
+             * This required users to store and re-feed the last key to LVGL each frame.
+             * From v9.6 onward, we no longer reset the key every frame to simplify the user's
+             * implementation. However, this can cause compatibility issues for users who never
+             * explicitly set the key, as it was previously always defaulting to LV_KEY_ENTER.
+             * To maintain compatibility, we initialize the key to LV_KEY_ENTER here.
+             */
+            indev->keypad.last_key = LV_KEY_ENTER;
+        }
         indev->stop_processing_query           = 0;
         indev_obj_act                               = NULL;
     }
