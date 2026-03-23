@@ -146,7 +146,7 @@ void lv_wayland_xdg_configure_surface(lv_wl_window_t * window)
      * configure event */
     wl_surface_commit(window->body);
     wl_display_roundtrip(lv_wl_ctx.wl_display);
-    LV_ASSERT_MSG(window->resize_event.pending, "Failed to receive the xdg_surface configuration event");
+    LV_ASSERT_MSG(window->xdg.configured, "Failed to receive the xdg_surface configuration event");
 }
 bool lv_wayland_xdg_is_resize_pending(lv_wl_window_t * window)
 {

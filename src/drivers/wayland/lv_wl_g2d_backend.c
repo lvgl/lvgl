@@ -51,8 +51,7 @@ typedef struct {
     lv_wl_buffer_t rotate_buffer;
 #endif
     uint32_t drm_cf;
-    uint8_t last_used;
-    bool flushing;
+    uint8_t act_buf_idx;
 } lv_wl_g2d_display_data_t;
 
 typedef struct {
@@ -573,14 +572,14 @@ static void dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dm
     }
 }
 
-static lv_wl_buffer_t * get_next_buffer(lv_wl_g2d_display_data_t * ddata)
+static lv_wl_buffer_t * get_active_buffer(lv_wl_g2d_display_data_t * ddata)
 {
-    lv_wl_buffer_t * ret =  &ddata->buffers[ddata->last_used];
+    lv_wl_buffer_t * ret = &ddata->buffers[ddata->act_buf_idx];
     if(ret->busy) {
         /* In theory this should never happen, log a warning in case it does */
         LV_LOG_WARN("Failed to acquire a non-busy buffer");
     }
-    ddata->last_used = (ddata->last_used + 1) % (LV_WL_G2D_BUF_COUNT);
+    ddata->act_buf_idx = (ddata->act_buf_idx + 1) % (LV_WL_G2D_BUF_COUNT);
     return ret;
 }
 
@@ -612,12 +611,14 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
         return;
     }
 
-    lv_wl_buffer_t * buf = get_next_buffer(ddata);
+    lv_wl_buffer_t * buf = get_active_buffer(ddata);
 
     if(!buf) {
         LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
         return;
     }
+
+    buf->busy = true;
 
     lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
     /*Rerender the whole surface if we're using rotation*/
@@ -641,7 +642,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     wl_surface_attach(surface, buf->wl_buffer, 0, 0);
     wl_surface_commit(surface);
 
-    buf->busy = true;
+    /* Wait for the compositor to release the next active buffer before returning,
+       so it is safe to render into it on the next frame */
+    lv_wl_buffer_t * next_act_buf = &ddata->buffers[ddata->act_buf_idx];
+    while(next_act_buf->busy) {
+        wl_display_dispatch(lv_wl_ctx.wl_display);
+    }
+
     return;
 }
 
