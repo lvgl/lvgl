@@ -226,6 +226,10 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
         pos_conv_rd--;
     }
 
+    /*Clamp rd to len in case lv_text_encoded_next advanced past len
+     *on a multi-byte character boundary.*/
+    if(rd > len) rd = len;
+
     if(rd) {
         if(base_dir == LV_BASE_DIR_LTR) {
             if(str_out) {
@@ -249,6 +253,9 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
 
     while(rd < len && str_in[rd]) {
         run_dir = get_next_run(&ctx, &str_in[rd], base_dir, len - rd, &run_len, &pos_conv_run_len);
+
+        /*Safety clamp: run_len must not exceed remaining length*/
+        if(run_len > len - rd) run_len = len - rd;
 
         if(base_dir == LV_BASE_DIR_LTR) {
             if(run_dir == LV_BASE_DIR_LTR) {
@@ -432,7 +439,7 @@ static lv_base_dir_t get_next_run(lv_bidi_ctx_t * ctx, const char * txt, lv_base
         if(dir == LV_BASE_DIR_LTR || dir == LV_BASE_DIR_RTL)  break;
 
         if(i >= max_len || txt[i] == '\0' || txt[i] == '\n' || txt[i] == '\r') {
-            *len = i;
+            *len = i > max_len ? max_len : i;
             *pos_conv_len = pos_conv_i;
             return base_dir;
         }
@@ -465,12 +472,12 @@ static lv_base_dir_t get_next_run(lv_bidi_ctx_t * ctx, const char * txt, lv_base
         if((next_dir == LV_BASE_DIR_RTL || next_dir == LV_BASE_DIR_LTR) && next_dir != run_dir) {
             /*Include neutrals if `run_dir == base_dir`*/
             if(run_dir == base_dir) {
-                *len = i_prev;
+                *len = i_prev > max_len ? max_len : i_prev;
                 *pos_conv_len = pos_conv_i_prev;
             }
             /*Exclude neutrals if `run_dir != base_dir`*/
             else {
-                *len = i_last_strong;
+                *len = i_last_strong > max_len ? max_len : i_last_strong;
                 *pos_conv_len = pos_conv_i_last_strong;
             }
 
@@ -498,6 +505,10 @@ static lv_base_dir_t get_next_run(lv_bidi_ctx_t * ctx, const char * txt, lv_base
         *len = i_last_strong;
         *pos_conv_len = pos_conv_i_last_strong;
     }
+
+    /*Clamp to max_len to prevent overflow when lv_text_encoded_next
+     *advances past max_len on a multi-byte character boundary.*/
+    if(*len > max_len) *len = max_len;
 
     return run_dir;
 }
@@ -541,16 +552,23 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
                 pos_conv_first_weak = 0;
             }
 
-            if(dest) lv_memcpy(&dest[wr], &src[first_weak], last_weak - first_weak + 1);
+            uint32_t weak_copy_len = last_weak - first_weak + 1;
+            if(wr + weak_copy_len > len) weak_copy_len = len - wr;
+            if(dest && weak_copy_len) lv_memcpy(&dest[wr], &src[first_weak], weak_copy_len);
             if(pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_last_weak - pos_conv_first_weak + 1,
                                                pos_conv_rd_base + pos_conv_first_weak);
-            wr += last_weak - first_weak + 1;
+            wr += weak_copy_len;
             pos_conv_wr += pos_conv_last_weak - pos_conv_first_weak + 1;
         }
 
         /*Simply store in reversed order*/
         else {
             uint32_t letter_size = lv_text_encoded_size((const char *)&src[i]);
+
+            /*Stop if the character doesn't fit in the remaining buffer space.
+             *This happens when len is not aligned to a multi-byte character boundary.*/
+            if(wr + letter_size > len) break;
+
             /*Swap arithmetical symbols*/
             if(letter_size == 1) {
                 uint32_t new_letter = letter = char_change_to_pair(letter);
