@@ -23,12 +23,17 @@ option(LV_BUILD_LVGL_H_SYSTEM_INCLUDE
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-### LVGL configuration options always use the prefix CONFIG_
-### They can be set using the -D argument or cmake-gui(1) and are kept in cache
-### The option names are the same as the defines in lv_conf.h - so check it for a description
+# These control how LVGL resolves its optional dependencies.
+# All three strategies are tried in order: find_package -> pkg-config -> FetchContent.
+# Individual dependencies can be further controlled with LV_USE_FIND_PACKAGE_<DEP>,
+# LV_USE_PKG_CONFIG_<DEP>, and LV_FETCH_<DEP> options.
 
-### INFO: When LV_BUILD_SET_CONFIG_OPTS is enabled - these options are set automatically
-### based on lv_conf.h or Kconfig
+# Dependency management require CONFIG_LV_* variables to be set (e.g. CONFIG_LV_USE_WAYLAND).
+# CONFIG_LV_* variables can be set manually using the -D argument or cmake-gui and are kept in cache  
+# or generated automatically by enabling LV_BUILD_SET_CONFIG_OPTS, which parses lv_conf_internal.h to derive them.
+option(LV_USE_FIND_PACKAGE "Resolve dependencies via find_package" ON)
+option(LV_USE_PKG_CONFIG "Resolve dependencies via pkg-config (requires pkg-config to be installed)" ON)
+option(LV_FETCH_DEPENDENCIES "Fetch dependencies from source if not found on the system" ON)
 
 option(CONFIG_LV_BUILD_DEMOS "Build demos" ON)
 option(CONFIG_LV_BUILD_EXAMPLES "Build examples" ON)
@@ -208,6 +213,8 @@ if (LV_BUILD_SET_CONFIG_OPTS)
     # This will set all CONFIG_LV_USE_* or CONFIG_LV_BUILD_* variables in cmake
     include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
 endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/dependencies.cmake)
 
 # Set the configuration inc dir for all targets created in this CMakeLists.txt
 # CMAKE_CURRENT_SOURCE_DIR is necessary because the assets include lvgl/lvgl.h ...
