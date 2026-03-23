@@ -88,3 +88,14 @@ endif()
 if(CONFIG_LV_USE_GLTF)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/fastgltf.cmake)
 endif()
+
+# ====== External Demos  ====== #
+if(CONFIG_LV_USE_DEMO_FLEX_LAYOUT
+   OR CONFIG_LV_USE_DEMO_MULTILANG
+   OR CONFIG_LV_USE_DEMO_TRANSFORM
+   OR CONFIG_LV_USE_DEMO_SCROLL
+   OR CONFIG_LV_USE_DEMO_EBIKE
+   OR CONFIG_LV_USE_DEMO_HIGH_RES
+   OR CONFIG_LV_USE_DEMO_SMARTWATCH)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/lv_demos_ext.cmake)
+endif()
