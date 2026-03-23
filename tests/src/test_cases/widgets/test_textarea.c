@@ -233,4 +233,85 @@ void test_textarea_properties(void)
 #endif
 }
 
+static uint32_t event_count;
+static void event_counter_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    event_count++;
+}
+
+void test_textarea_set_text_should_emit_value_changed_event_only_once(void)
+{
+
+    const char * accepted_list = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ!,";
+    const char * text = "Hello, World!";
+    const uint32_t text_len = 13U; /* strlen("Hello, World!") */
+
+    /* Test 1: with accepted_chars set */
+    event_count = 0;
+    lv_textarea_set_accepted_chars(textarea, accepted_list);
+    lv_obj_add_event_cb(textarea, event_counter_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_textarea_set_text(textarea, text);
+
+    TEST_ASSERT_EQUAL_STRING(text, lv_textarea_get_text(textarea));
+    TEST_ASSERT_EQUAL_UINT32(1U, event_count);
+
+    /* Test 2: with max_length set to exactly the text length — if set_text
+     * doesn't clear before re-adding chars, char_is_accepted sees the buffer
+     * as already full and rejects every character, leaving the textarea empty */
+    lv_obj_clean(active_screen);
+    textarea = lv_textarea_create(active_screen);
+
+    event_count = 0;
+    lv_textarea_set_max_length(textarea, text_len);
+    lv_obj_add_event_cb(textarea, event_counter_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_textarea_set_text(textarea, text);
+
+    TEST_ASSERT_EQUAL_STRING(text, lv_textarea_get_text(textarea));
+    TEST_ASSERT_EQUAL_UINT32(1U, event_count);
+
+    /* Test 3: with both accepted_chars and max_length set */
+    lv_obj_clean(active_screen);
+    textarea = lv_textarea_create(active_screen);
+
+    event_count = 0;
+    lv_textarea_set_accepted_chars(textarea, accepted_list);
+    lv_textarea_set_max_length(textarea, text_len);
+    lv_obj_add_event_cb(textarea, event_counter_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_textarea_set_text(textarea, text);
+
+    TEST_ASSERT_EQUAL_STRING(text, lv_textarea_get_text(textarea));
+    TEST_ASSERT_EQUAL_UINT32(1U, event_count);
+
+    /* Test 4: empty string — no characters to add, no event */
+    lv_obj_clean(active_screen);
+    textarea = lv_textarea_create(active_screen);
+
+    event_count = 0;
+    lv_textarea_set_accepted_chars(textarea, accepted_list);
+    lv_textarea_set_max_length(textarea, text_len);
+    lv_obj_add_event_cb(textarea, event_counter_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_textarea_set_text(textarea, "");
+
+    TEST_ASSERT_EQUAL_STRING("", lv_textarea_get_text(textarea));
+    TEST_ASSERT_EQUAL_UINT32(0U, event_count);
+
+    /* Test 5: all characters rejected by accepted_chars — no characters added, no event */
+    lv_obj_clean(active_screen);
+    textarea = lv_textarea_create(active_screen);
+
+    event_count = 0;
+    lv_textarea_set_accepted_chars(textarea, accepted_list);
+    lv_obj_add_event_cb(textarea, event_counter_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_textarea_set_text(textarea, "123"); /* digits not in accepted_list */
+
+    TEST_ASSERT_EQUAL_STRING("", lv_textarea_get_text(textarea));
+    TEST_ASSERT_EQUAL_UINT32(0U, event_count);
+}
+
 #endif
