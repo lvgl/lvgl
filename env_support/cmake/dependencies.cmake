@@ -60,3 +60,8 @@ endif()
 if(CONFIG_LV_USE_LIBWEBP OR CONFIG_LV_USE_GLTF)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/webp.cmake)
 endif()
+
+# ====== Libraries ====== #
+if(CONFIG_LV_USE_GLTF)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/fastgltf.cmake)
+endif()
