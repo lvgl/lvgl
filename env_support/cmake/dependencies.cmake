@@ -43,6 +43,10 @@ if(CONFIG_LV_USE_X11)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/x11.cmake)
 endif()
 
+if(CONFIG_LV_USE_GLFW)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw.cmake)
+endif()
+
 # ====== Indev ====== #
 if(CONFIG_LV_USE_WAYLAND OR CONFIG_LV_USE_LIBINPUT)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/xkbcommon.cmake)
