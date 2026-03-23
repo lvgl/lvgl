@@ -79,6 +79,10 @@ if(CONFIG_LV_USE_LIBJPEG_TURBO)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/jpeg.cmake)
 endif()
 
+if(CONFIG_LV_USE_LIBPNG)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/png.cmake)
+endif()
+
 # ====== Font ====== #
 if(CONFIG_LV_USE_FREETYPE)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/freetype.cmake)
