@@ -15,8 +15,8 @@ void lv_example_freetype_1(void)
 {
     /*Create a font*/
     lv_font_t * font = lv_freetype_font_create(PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
-                                               LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
-                                               80,
+                                               LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                               24,
                                                LV_FREETYPE_FONT_STYLE_NORMAL);
 
     if(!font) {
@@ -29,11 +29,6 @@ void lv_example_freetype_1(void)
     lv_style_init(&style);
     lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
-    lv_style_set_text_color(&style, lv_color_hex(0x0000ff));
-    lv_style_set_text_outline_stroke_width(&style, 6);
-    lv_style_set_text_outline_stroke_opa(&style, LV_OPA_50);
-    lv_style_set_text_outline_stroke_color(&style, lv_color_hex(0xff0000));
-
 
     /*Create a label with the new style*/
     lv_obj_t * label = lv_label_create(lv_screen_active());
