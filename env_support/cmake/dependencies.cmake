@@ -26,3 +26,7 @@ endif()
 if(CONFIG_LV_USE_SDL)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/sdl2.cmake)
 endif()
+
+if(CONFIG_LV_USE_LINUX_DRM)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/drm.cmake)
+endif()
