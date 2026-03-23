@@ -131,7 +131,7 @@ static void frame_done(void * data, struct wl_callback * callback, uint32_t time
     lv_display_flush_ready(display);
 }
 
-static uint32_t lv_cf_to_shm_cf(lv_color_format_t cf)
+static int32_t lv_cf_to_shm_cf(lv_color_format_t cf)
 {
     switch(cf) {
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
@@ -142,7 +142,7 @@ static uint32_t lv_cf_to_shm_cf(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
             return WL_SHM_FORMAT_RGB565;
         default:
-            return 0;
+            return -1;
     }
 }
 
@@ -173,14 +173,16 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
 
     const lv_display_rotation_t rotation = lv_display_get_rotation(display);
     lv_color_format_t cf = lv_display_get_color_format(display);
-    ddata->shm_cf = lv_cf_to_shm_cf(cf);
+    int32_t shm_cf = lv_cf_to_shm_cf(cf);
 
-    if(!ddata->shm_cf) {
+    if(shm_cf < 0) {
         LV_LOG_WARN("Unsupported color format %d. Falling back to XRGB8888", cf);
         cf = LV_COLOR_FORMAT_XRGB8888;
         lv_display_set_color_format(display, cf);
-        ddata->shm_cf = WL_SHM_FORMAT_XRGB8888;
+        shm_cf = WL_SHM_FORMAT_XRGB8888;
     }
+    /* safe cast as per check above*/
+    ddata->shm_cf = (uint32_t)shm_cf;
 
     const bool needs_rotation = rotation != LV_DISPLAY_ROTATION_0;
     const int32_t phy_width = lv_display_get_original_horizontal_resolution(display);
