@@ -79,7 +79,7 @@ extern "C" {
 
 /**
  * Verify a condition; on failure only log a warning (no return or other action).
- * Unlike LV_VERIFY_OR_LOG, the message is a plain string, not a format string.
+ * Unlike LV_VERIFY_OR_LOG, the message is not a format string literal, but a plain string and can be a variable as well.
  *
  * Example:
  * @code
@@ -93,7 +93,7 @@ extern "C" {
 
 /**
  * Verify a condition; on failure log a message string and execute `action_on_fail`.
- * Unlike LV_VERIFY, the message is a plain string, not a format string.
+ * Unlike LV_VERIFY, the message is not a format string literal, but a plain string and can be a variable as well.
  *
  * Example:
  * @code
