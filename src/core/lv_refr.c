@@ -590,8 +590,8 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, LV_PART_MAIN);
             while(layer_draw_dsc.rotation > 3600) layer_draw_dsc.rotation -= 3600;
             while(layer_draw_dsc.rotation < 0) layer_draw_dsc.rotation += 3600;
-            layer_draw_dsc.scale_x = lv_obj_get_style_transform_scale_x(obj, LV_PART_MAIN);
-            layer_draw_dsc.scale_y = lv_obj_get_style_transform_scale_y(obj, LV_PART_MAIN);
+            layer_draw_dsc.scale_x = lv_obj_get_style_transform_scale_x_safe(obj, LV_PART_MAIN);
+            layer_draw_dsc.scale_y = lv_obj_get_style_transform_scale_y_safe(obj, LV_PART_MAIN);
             layer_draw_dsc.skew_x = lv_obj_get_style_transform_skew_x(obj, LV_PART_MAIN);
             layer_draw_dsc.skew_y = lv_obj_get_style_transform_skew_y(obj, LV_PART_MAIN);
             layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, LV_PART_MAIN);
