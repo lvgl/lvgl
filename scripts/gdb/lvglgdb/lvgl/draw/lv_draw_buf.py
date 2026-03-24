@@ -167,7 +167,7 @@ class LVDrawBuf(Value):
             buf = io.BytesIO()
             img.save(buf, format="PNG")
             return buf.getvalue()
-        except (gdb.MemoryError, Exception):
+        except Exception:
             return None
 
     def _convert_to_image(

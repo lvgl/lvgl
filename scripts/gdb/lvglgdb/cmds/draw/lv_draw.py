@@ -22,12 +22,14 @@ class InfoDrawUnit(gdb.Command):
         print(f"Draw Unit: {unit}, Name: {name}")
 
         type_name = DRAW_UNIT_TYPE_NAMES.get(name, "lv_draw_unit_t")
-        try:
-            target_type = gdb.lookup_type(type_name)
-        except gdb.error:
-            target_type = gdb.lookup_type("lv_draw_unit_t")
-
-        casted = unit.cast(target_type, ptr=True)
-        if casted is None:
+        casted = unit.cast(type_name, ptr=True)
+        if casted is None or not casted.is_ok:
             casted = unit.cast("lv_draw_unit_t", ptr=True)
-        print(casted.dereference().format_string(pretty_structs=True, symbols=True))
+            if casted is None or not casted.is_ok:
+                print(f"  (corrupted: {casted})")
+                return
+        deref = casted.dereference()
+        if not deref.is_ok:
+            print(f"  (corrupted: {deref})")
+            return
+        print(deref.format_string(pretty_structs=True, symbols=True))

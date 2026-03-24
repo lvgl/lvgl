@@ -1,4 +1,4 @@
-from .value import Value, ValueInput
+from .value import Value, ValueInput, CorruptedValue, CorruptedError
 from .lvgl import (
     curr_inst,
     LVDisplay,
@@ -68,6 +68,8 @@ __all__ = [
     "format_style_value",
     "Value",
     "ValueInput",
+    "CorruptedValue",
+    "CorruptedError",
     "LVCacheEntry",
     "LVCacheLRURB",
     "LVCacheLRURBIterator",

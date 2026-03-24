@@ -4,6 +4,7 @@ from datetime import datetime
 import gdb
 
 from lvglgdb.lvgl.data_utils import safe_collect
+from lvglgdb.value import CorruptedError
 
 
 # Registry of simple subsystems: (dict_key, lvgl_accessor_method, label)
@@ -181,7 +182,6 @@ def _collect_subjects(lvgl) -> list:
     """Collect subjects from object event lists across all displays."""
     seen = set()
     result = []
-    from lvglgdb.lvgl.core.lv_observer import LVSubject
     for disp in lvgl.displays():
         for screen in disp.screens:
             _collect_subjects_from_obj(screen, seen, result)
@@ -199,14 +199,22 @@ def _collect_subjects_from_obj(obj, seen, result):
                 user_data = dsc.user_data
                 if not int(user_data):
                     continue
-                # Check if this looks like a subject (has subs_ll field)
                 subject = LVSubject(user_data)
                 addr = int(subject)
                 if addr not in seen:
                     seen.add(addr)
                     result.append(subject.snapshot().as_dict())
             except Exception:
+                # Per-dsc failure: skip this descriptor, continue others
                 continue
 
-    for child in obj.children:
-        _collect_subjects_from_obj(child, seen, result)
+    try:
+        for child in obj.children:
+            try:
+                _collect_subjects_from_obj(child, seen, result)
+            except Exception:
+                # Per-child failure: skip this child, continue siblings
+                continue
+    except CorruptedError:
+        # Children pointer unreadable: stop traversal for this subtree
+        pass

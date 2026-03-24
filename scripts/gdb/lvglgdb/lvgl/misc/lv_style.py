@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Iterator
 
 import gdb
-from lvglgdb.value import Value, ValueInput
+from lvglgdb.value import CorruptedError, Value, ValueInput
 from .lv_style_consts import (
     STYLE_PROP_NAMES,
     PART_NAMES,
@@ -50,7 +50,7 @@ def format_style_value(prop_id: int, value: Value) -> str:
             return f"{ptr:#x}" if ptr else "NULL"
         else:
             return str(int(value.num))
-    except gdb.error:
+    except CorruptedError:
         return str(value)
 
 
@@ -74,7 +74,7 @@ def _style_value_data(prop_id: int, value: Value) -> dict:
             return {"value_str": f"{ptr:#x}" if ptr else "NULL"}
         else:
             return {"value_str": str(int(value.num))}
-    except gdb.error:
+    except CorruptedError:
         return {"value_str": str(value)}
 
 

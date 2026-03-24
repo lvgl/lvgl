@@ -1,7 +1,7 @@
 from typing import Union
 import gdb
 
-from lvglgdb.value import Value, ValueInput
+from lvglgdb.value import CorruptedError, Value, ValueInput
 
 
 class LVRedBlackTree(Value):
@@ -105,23 +105,17 @@ class LVRedBlackTreeIterator:
         if not self.current:
             raise StopIteration
 
-        try:
-            data = self.tree.get_data(self.current)
-        except (gdb.MemoryError, gdb.error):
-            data = None
+        data = self.tree.get_data(self.current)
 
         # Advance to next node (in-order traversal)
-        try:
-            if self.current.right:
-                self.current = self.tree.minimum_from(self.current.right)
-            else:
-                parent = self.current.parent
-                while parent and self.current == parent.right:
-                    self.current = parent
-                    parent = parent.parent
+        if self.current.right:
+            self.current = self.tree.minimum_from(self.current.right)
+        else:
+            parent = self.current.parent
+            while parent and self.current == parent.right:
                 self.current = parent
-        except (gdb.MemoryError, gdb.error):
-            self.current = None
+                parent = parent.parent
+            self.current = parent
 
         if data is None:
             return self.__next__()
@@ -137,7 +131,7 @@ class LVRedBlackTreeIterator:
             data = self.tree.get_data(current)
             if data:
                 return f"LVRedBlackTreeIterator(current={data})"
-        except:
+        except CorruptedError:
             pass
 
         return f"LVRedBlackTreeIterator(current=0x{int(current):x})"

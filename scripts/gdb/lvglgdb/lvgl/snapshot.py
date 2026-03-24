@@ -23,7 +23,7 @@ class Snapshot:
 
     @classmethod
     def fallback(cls, addr: Callable = lambda x: int(x), **extra_fns):
-        """Decorator: on exception, return a corrupted snapshot dict.
+        """Decorator: on CorruptedError, return a corrupted snapshot dict.
 
         Each extra kwarg may be a callable (called with the first arg)
         or a static value.
@@ -31,9 +31,10 @@ class Snapshot:
         def decorator(fn):
             @functools.wraps(fn)
             def wrapper(item, *args, **kwargs):
+                from ..value import CorruptedError
                 try:
                     return fn(item, *args, **kwargs)
-                except Exception as e:
+                except CorruptedError as e:
                     try:
                         resolved_addr = hex(addr(item))
                     except Exception:
@@ -52,6 +53,24 @@ class Snapshot:
                     return d
             return wrapper
         return decorator
+
+    @staticmethod
+    def safe_fields(source, field_specs: list) -> dict:
+        """Collect fields with per-field CorruptedError handling.
+
+        field_specs: list of (key, callable) or (key, callable, default)
+        """
+        from ..value import CorruptedError
+
+        d = {}
+        for spec in field_specs:
+            key, fn = spec[0], spec[1]
+            default = spec[2] if len(spec) > 2 else None
+            try:
+                d[key] = fn(source)
+            except CorruptedError:
+                d[key] = default
+        return d
 
     # --- dict-like read access ---
 

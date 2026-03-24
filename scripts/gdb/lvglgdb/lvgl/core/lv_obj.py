@@ -1,5 +1,3 @@
-import gdb
-
 from lvglgdb.value import Value, ValueInput
 from lvglgdb.lvgl.misc.lv_style import LVStyle, decode_selector
 
@@ -60,11 +58,20 @@ class LVObject(Value):
         super().__init__(Value.normalize(obj, "lv_obj_t"))
 
     @property
+    def obj_class(self):
+        from .lv_obj_class import LVObjClass
+
+        class_p = self.super_value("class_p")
+        if not class_p:
+            return None
+        return LVObjClass(class_p)
+
+    @property
     def class_name(self):
-        name = self.class_p.name
-        if name:
-            return name.string()
-        return self.class_p.format_string(symbols=True, address=True, styling=True)
+        cls = self.obj_class
+        if not cls:
+            return "(no class)"
+        return cls.name
 
     @property
     def x1(self):
@@ -83,8 +90,14 @@ class LVObject(Value):
         return int(self.coords.y2)
 
     @property
-    def child_count(self):
-        return self.spec_attr.child_cnt if self.spec_attr else 0
+    def child_cnt(self) -> int:
+        """Return child count, 0 if corrupted."""
+        if not self.spec_attr:
+            return 0
+        cnt = self.spec_attr.super_value("child_cnt")
+        if not cnt.is_ok:
+            return 0
+        return int(cnt)
 
     @property
     def event_list(self):
@@ -100,11 +113,8 @@ class LVObject(Value):
     def children(self):
         if not self.spec_attr:
             return
-        for i in range(self.child_count):
-            try:
-                yield LVObject(self.spec_attr.children[i])
-            except Exception:
-                continue
+        for i in range(self.child_cnt):
+            yield LVObject(self.spec_attr.children[i].read_value())
 
     @property
     def obj_styles(self):
@@ -114,16 +124,13 @@ class LVObject(Value):
             return
         styles_arr = self.super_value("styles")
         for i in range(count):
-            try:
-                raw = styles_arr[i]
-                flags = []
-                raw_val = Value(raw)
-                for flag_name in ("is_local", "is_trans", "is_theme", "is_disabled"):
-                    if raw_val.safe_field(flag_name, False, bool):
-                        flags.append(flag_name.replace("is_", ""))
-                yield ObjStyle(i, int(raw.selector), flags, LVStyle(raw.style))
-            except (gdb.MemoryError, gdb.error):
-                continue
+            raw = styles_arr[i]
+            flags = []
+            raw_val = Value(raw)
+            for flag_name in ("is_local", "is_trans", "is_theme", "is_disabled"):
+                if raw_val.safe_field(flag_name, False, bool):
+                    flags.append(flag_name.replace("is_", ""))
+            yield ObjStyle(i, int(raw.selector), flags, LVStyle(raw.style))
 
     @property
     def styles(self):
@@ -138,20 +145,17 @@ class LVObject(Value):
         from lvglgdb.lvgl.snapshot import Snapshot
         from lvglgdb.lvgl.data_utils import ptr_or_none
 
-        d = {
-            "addr": hex(int(self)),
-            "class_name": self.class_name,
-            "coords": {
-                "x1": self.x1,
-                "y1": self.y1,
-                "x2": self.x2,
-                "y2": self.y2,
-            },
-            "child_count": int(self.child_count),
-            "style_count": int(self.style_cnt),
-            "parent_addr": ptr_or_none(self.super_value("parent")),
-            "group_addr": self._get_group_addr(),
-        }
+        d = Snapshot.safe_fields(self, [
+            ("addr", lambda s: hex(int(s))),
+            ("class_name", lambda s: s.class_name, "(corrupted)"),
+            ("coords", lambda s: {
+                "x1": s.x1, "y1": s.y1, "x2": s.x2, "y2": s.y2,
+            }, {"x1": 0, "y1": 0, "x2": 0, "y2": 0}),
+            ("child_count", lambda s: s.child_cnt, 0),
+            ("style_count", lambda s: int(s.style_cnt), 0),
+            ("parent_addr", lambda s: ptr_or_none(s.super_value("parent"))),
+            ("group_addr", lambda s: s._get_group_addr()),
+        ])
         if include_children:
             d["children"] = self._collect_children(include_styles)
         if include_styles:
@@ -187,12 +191,11 @@ class LVObject(Value):
         spec = self.spec_attr
         if not spec or not int(spec):
             return None
-        try:
-            grp = spec.group
-            addr = int(grp)
-            return hex(addr) if addr else None
-        except Exception:
+        grp = spec.safe_field("group")
+        if grp is None:
             return None
+        addr = int(grp)
+        return hex(addr) if addr else None
 
 
 def dump_obj_info(obj: LVObject):

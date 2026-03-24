@@ -28,23 +28,24 @@ class LVCacheLRURBIterator(LVCacheIteratorBase):
         """Yield (ll_addr, data, back_ptr) for each ll node.
         Skips nodes with inaccessible memory (e.g. corrupted pointers).
         """
-        inferior = gdb.selected_inferior()
         for ll_node in LVList(lru_cache.ll):
-            try:
-                ll_addr = int(ll_node)
-                rb_node = Value(ll_node).cast(rb_node_pp_t)
-                data = rb_node.data
-                data_addr = int(data)
-                if data_addr == 0:
-                    continue
-                # Probe data pointer accessibility before dereferencing
-                inferior.read_memory(data_addr, 1)
-                back_ptr = int(
-                    Value(data_addr + rb_size - ptr_size).cast(void_pp_t).dereference()
-                )
-                yield ll_addr, data, back_ptr
-            except (gdb.MemoryError, gdb.error):
+            ll_addr = int(ll_node)
+            rb_node = Value(ll_node).cast(rb_node_pp_t)
+            if not rb_node:
                 continue
+            data = rb_node.data
+            if not data:
+                continue
+            data = data.read_value()
+            if not data.is_ok:
+                continue
+            data_addr = int(data)
+            if data_addr == 0:
+                continue
+            back_ptr = int(
+                Value(data_addr + rb_size - ptr_size).cast(void_pp_t).dereference()
+            )
+            yield ll_addr, data, back_ptr
 
     def _collect_entries(self):
         """Collect entries from LRU RB cache by traversing the linked list (MRU→LRU order)"""
@@ -169,19 +170,13 @@ class LVCacheLRURB(LVCache):
 
     def is_count_based(self):
         """Check if this is count-based LRU cache"""
-        try:
-            name = str(self.name)
-            return "count" in name.lower() or "lru_rb_count" in str(self.clz).lower()
-        except Exception:
-            return False
+        name = self.name
+        return "count" in name.lower() or "lru_rb_count" in str(self.clz).lower()
 
     def is_size_based(self):
         """Check if this is size-based LRU cache"""
-        try:
-            name = str(self.name)
-            return "size" in name.lower() or "lru_rb_size" in str(self.clz).lower()
-        except Exception:
-            return False
+        name = self.name
+        return "size" in name.lower() or "lru_rb_size" in str(self.clz).lower()
 
     def __iter__(self):
         """Create iterator for this LRU RB cache"""

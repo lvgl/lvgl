@@ -1,22 +1,24 @@
 import functools
-from typing import Callable, Iterable, Optional
+from typing import Callable, Optional
 
 import gdb
 
-from lvglgdb.value import Value
 
-
-def fmt_cb(cb: Value) -> str:
+def fmt_cb(cb) -> str:
     """Format callback pointer as resolved symbol string or '-' for NULL.
     Strips null bytes that may appear in some GDB output."""
+    if not cb.is_ok:
+        return str(cb)
     addr = int(cb)
     if not addr:
         return "-"
     return cb.format_string(symbols=True, address=True).replace("\x00", "")
 
 
-def ptr_or_none(val: Value) -> Optional[str]:
+def ptr_or_none(val) -> Optional[str]:
     """Convert pointer to hex string or None if NULL."""
+    if not val.is_ok:
+        return None
     addr = int(val)
     return hex(addr) if addr else None
 
@@ -24,20 +26,18 @@ def ptr_or_none(val: Value) -> Optional[str]:
 def safe_collect(
     items_or_label,
     transform: Callable = None,
-    on_mem_error: Callable = None,
 ):
     """Unified safe collection with two usage modes.
 
     Iteration mode — collect items, skipping failures:
-        safe_collect(items, transform, on_mem_error=None)
+        safe_collect(items, transform)
 
     Decorator mode — wrap an entire collector function:
         @safe_collect("subsystem name")
         def collect_xxx(): ...
 
     In decorator mode, exceptions cause a gdb warning and return [].
-    In iteration mode, gdb.MemoryError/gdb.error calls on_mem_error
-    (or skips), other exceptions skip silently.
+    In iteration mode, per-item exceptions are skipped silently.
     """
     if isinstance(items_or_label, str):
         label = items_or_label
@@ -60,9 +60,6 @@ def safe_collect(
         for item in items_or_label:
             try:
                 result.append(transform(item))
-            except (gdb.MemoryError, gdb.error) as e:
-                if on_mem_error is not None:
-                    result.append(on_mem_error(item, e))
             except Exception:
                 continue
     except Exception:

@@ -47,13 +47,8 @@ class LVList(Value):
         if not self.current:
             raise StopIteration
 
-        nodetype = self.nodetype if self.nodetype else self.lv_ll_node_t
-        node = self.current.cast(nodetype)
-
-        try:
-            self.current = self._next(self.current)
-        except (gdb.MemoryError, gdb.error):
-            self.current = None
+        node = self.current.cast(self.nodetype or self.lv_ll_node_t)
+        self.current = self._next(self.current)
         return node
 
     @property
@@ -62,10 +57,7 @@ class LVList(Value):
         node = self.head
         while node:
             count += 1
-            try:
-                node = self._next(node)
-            except (gdb.MemoryError, gdb.error):
-                break
+            node = self._next(node)
         return count
 
     def snapshot(self):
