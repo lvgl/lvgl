@@ -42,7 +42,7 @@ extern "C" {
     if(!(cond)) {                                                                           \
         LV_LOG_WARN("Verification failed: " cond_str __VA_ARGS__);                          \
         action_on_fail;                                                                     \
-    }
+    } else {}
 
 /**
  * Verify that a condition is true. If the condition is false, log a warning
@@ -56,7 +56,7 @@ extern "C" {
  * @endcode
  *
  * @param cond              condition to verify
- * @param action_on_fail    statement to execute on failure (e.g. `return`, `return 0`, `break)
+ * @param action_on_fail    statement to execute on failure (e.g. `return`, `return 0`, `break`)
  * @param ...               optional printf-style format string and arguments appended to the log
  */
 #define LV_VERIFY(cond, action_on_fail, ...)                                                \

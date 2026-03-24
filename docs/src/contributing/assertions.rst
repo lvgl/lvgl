@@ -145,7 +145,7 @@ Basic Verification
       }
 
       int get_deviation(int** data, size_t len)
-
+      {
           /* Return -1 if len is invalid, logging the actual value */
           LV_VERIFY(len % 2 == 0, return -1, ": need an even number of data points, but got %d", (int)len);
 
