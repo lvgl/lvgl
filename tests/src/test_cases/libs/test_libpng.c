@@ -8,7 +8,7 @@
 void setUp(void)
 {
     /* Function run before every test */
-    /* Temporarily remove other JPEG decoders to make sure libpng is used */
+    /* Temporarily remove other PNG-capable decoders (lodepng/ffmpeg) to make sure libpng is used */
     lv_lodepng_deinit();
 #if LV_USE_FFMPEG
     lv_ffmpeg_deinit();
