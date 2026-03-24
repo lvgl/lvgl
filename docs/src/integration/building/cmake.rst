@@ -171,6 +171,54 @@ To enable the demos and examples set these options:
     set(CONFIG_LV_BUILD_DEMOS ON)
     add_subdirectory(lvgl)
 
+
+.. _dependency_management_cmake:
+
+Dependency Management
+---------------------
+
+When ``LV_BUILD_SET_CONFIG_OPTS`` is enabled, LVGL can automatically resolve, and optionally fetch,
+the dependencies required by the features enabled in ``lv_conf.h``. For example, enabling
+``LV_USE_WAYLAND`` in ``lv_conf.h`` will cause LVGL to find or fetch the Wayland libraries
+automatically.
+
+Dependency resolution is attempted in this order:
+
+1. ``find_package`` — uses CMake's built-in package discovery
+2. ``pkg-config`` — uses the system's pkg-config tool (Linux/macOS)
+3. ``FetchContent`` — fetches and builds the dependency from source
+
+Each strategy can be disabled globally or per dependency. This is particularly useful for
+cross-compilation environments where system libraries should not be used.
+
+Disabling system resolution globally (e.g. for cross-compilation):
+
+.. code-block:: bash
+
+    cmake -DLV_USE_FIND_PACKAGE=OFF -DLV_USE_PKG_CONFIG=OFF ..
+
+Disabling system resolution for a specific dependency only:
+
+.. code-block:: bash
+
+    cmake -DLV_USE_FIND_PACKAGE_FREETYPE=OFF -DLV_USE_PKG_CONFIG_FREETYPE=OFF ..
+
+Disabling automatic fetching from source:
+
+.. code-block:: bash
+
+    cmake -DLV_FETCH_DEPENDENCIES=OFF ..
+
+Fetched dependency sources are cached in the ``.deps`` directory at the root of your project,
+so they are not re-downloaded between builds.
+
+.. note::
+
+    Dependency management requires ``CONFIG_LV_*`` variables to be set (e.g. ``CONFIG_LV_USE_WAYLAND``).
+    These can be set manually via ``-D`` arguments or generated automatically by enabling
+    ``LV_BUILD_SET_CONFIG_OPTS``, which parses ``lv_conf_internal.h`` to derive them.
+
+
 Below is a list of the available options/variables
 
 .. list-table::
@@ -209,6 +257,27 @@ Below is a list of the available options/variables
        ``CONFIG_LV_BUILD_*`` CMake variables based on the contents of ``lv_conf_internal.h``.
        This requires python3 with ``venv`` and ``pip`` or access to a working ``pcpp``.
        If KConfig is used, this is enabled automatically.
+   * - LV_USE_FIND_PACKAGE
+     - BOOLEAN
+     - Allow resolving dependencies via ``find_package``. Enabled by default.
+   * - LV_USE_PKG_CONFIG
+     - BOOLEAN
+     - Allow resolving dependencies via ``pkg-config``. Enabled by default. Requires pkg-config to be installed.
+   * - LV_FETCH_DEPENDENCIES
+     - BOOLEAN
+     - Fetch dependencies from source if not found on the system. Enabled by default.
+   * - LV_USE_FIND_PACKAGE_<DEP>
+     - BOOLEAN
+     - Allow resolving a specific dependency via ``find_package``. Defaults to ``LV_USE_FIND_PACKAGE``.
+       Example: ``LV_USE_FIND_PACKAGE_FREETYPE``.
+   * - LV_USE_PKG_CONFIG_<DEP>
+     - BOOLEAN
+     - Allow resolving a specific dependency via ``pkg-config``. Defaults to ``LV_USE_PKG_CONFIG``.
+       Example: ``LV_USE_PKG_CONFIG_FREETYPE``.
+   * - LV_FETCH_<DEP>
+     - BOOLEAN
+     - Fetch a specific dependency from source. Defaults to ``LV_FETCH_DEPENDENCIES``.
+       Example: ``LV_FETCH_FREETYPE``.
    * - CONFIG_LV_BUILD_DEMOS
      - BOOLEAN
      - When enabled builds the demos
