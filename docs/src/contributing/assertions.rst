@@ -224,7 +224,7 @@ When a condition is critical and should halt the program (be careful to have you
 
    .. code-block:: c
 
-      LV_VERIFY_OR_ASSERT(len % 2 == 0, "data must come in pairs, but god %d data points", len);
+      LV_VERIFY_OR_ASSERT(len % 2 == 0, "data must come in pairs, but got %d data points", len);
 
 :c:macro:`LV_VERIFY_OR_ASSERT_MSG`
    Same as above, but with a plain string message:
