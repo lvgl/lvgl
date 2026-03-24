@@ -559,7 +559,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
     lv_indev_t * indev = lv_indev_active();
     if(lv_indev_get_type(indev) != LV_INDEV_TYPE_POINTER)
         return;
-    if(lv_indev_get_scroll_obj(indev) != NULL)
+    if(lv_indev_get_scroll_obj(indev) != NULL && !slider->dragging)
         return;
 
     lv_point_t p;
