@@ -10,7 +10,12 @@
 
 /** Assert that `last_log_buf` contains the given substring */
 #define TEST_ASSERT_LOG_CONTAINS(substr) \
-    TEST_ASSERT_NOT_NULL_MESSAGE(strstr(last_log_buf, substr), "Expected log to contain: " substr)
+    do { \
+        if(strstr(last_log_buf, substr) == NULL) { \
+            TEST_PRINTF("Expected log to contain: '%s'. Actual log: '%s'", substr, last_log_buf); \
+            TEST_FAIL(); \
+        } \
+    } while(0)
 
 /**********************
  *  STATIC VARIABLES

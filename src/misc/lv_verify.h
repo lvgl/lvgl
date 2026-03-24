@@ -34,6 +34,17 @@ extern "C" {
  **********************/
 
 /**
+ * Internal macro: stringify condition at the point of use to prevent recursive macro expansion.
+ * Do not use directly; use LV_VERIFY or one of its wrappers instead.
+ *
+ */
+#define LV_VERIFY_INTERNAL_(cond, cond_str, action_on_fail, ...)                            \
+    if(!(cond)) {                                                                           \
+        LV_LOG_WARN("Verification failed: " cond_str __VA_ARGS__);                          \
+        action_on_fail;                                                                     \
+    }
+
+/**
  * Verify that a condition is true. If the condition is false, log a warning
  * and execute `action_on_fail` (e.g. `return`, `return val`, `break`).
  * Additional printf-style arguments are appended to the log message.
@@ -49,12 +60,7 @@ extern "C" {
  * @param ...               optional printf-style format string and arguments appended to the log
  */
 #define LV_VERIFY(cond, action_on_fail, ...)                                                \
-    do {                                                                                    \
-        if(!(cond)) {                                                                       \
-            LV_LOG_WARN("Verification failed: " #cond __VA_ARGS__);                         \
-            action_on_fail;                                                                 \
-        }                                                                                   \
-    } while(0)
+    LV_VERIFY_INTERNAL_(cond, #cond, action_on_fail, __VA_ARGS__)
 
 /**
  * Verify a condition; on failure only log a warning (no return or other action).
@@ -69,7 +75,7 @@ extern "C" {
  * @param cond  condition to verify
  * @param ...   optional printf-style format string and arguments appended to the log
  */
-#define LV_VERIFY_OR_LOG(cond, ...) LV_VERIFY(cond, LV_UNUSED(0), __VA_ARGS__)
+#define LV_VERIFY_OR_LOG(cond, ...) LV_VERIFY_INTERNAL_(cond, #cond, LV_UNUSED(0), __VA_ARGS__)
 
 /**
  * Verify a condition; on failure only log a warning (no return or other action).
@@ -83,7 +89,7 @@ extern "C" {
  * @param cond  condition to verify
  * @param msg   plain string message to log on failure
  */
-#define LV_VERIFY_OR_LOG_MSG(cond, msg) LV_VERIFY(cond, LV_UNUSED(0), ": %s", (msg))
+#define LV_VERIFY_OR_LOG_MSG(cond, msg) LV_VERIFY_INTERNAL_(cond, #cond, LV_UNUSED(0), ": %s", (msg))
 
 /**
  * Verify a condition; on failure log a message string and execute `action_on_fail`.
@@ -98,7 +104,7 @@ extern "C" {
  * @param action_on_fail    statement to execute on failure
  * @param msg               plain string message to log on failure
  */
-#define LV_VERIFY_MSG(cond, action_on_fail, msg) LV_VERIFY(cond, action_on_fail, ": %s", (msg))
+#define LV_VERIFY_MSG(cond, action_on_fail, msg) LV_VERIFY_INTERNAL_(cond, #cond, action_on_fail, ": %s", (msg))
 
 /**
  * Verify a condition; on failure log a warning and return from the current (void) function.
@@ -113,7 +119,7 @@ extern "C" {
  * @param cond  condition to verify
  * @param msg   plain string message to log on failure
  */
-#define LV_VERIFY_OR_RETURN(cond, msg) LV_VERIFY(cond, return, ": %s", (msg))
+#define LV_VERIFY_OR_RETURN(cond, msg) LV_VERIFY_INTERNAL_(cond, #cond, return, ": %s", (msg))
 
 /**
  * Verify a condition; on failure log a warning and return `error_val` from the current function.
@@ -130,7 +136,7 @@ extern "C" {
  * @param error_val     value to return on failure
  * @param msg           plain string message to log on failure
  */
-#define LV_VERIFY_OR_RETURN_VAL(cond, error_val, msg) LV_VERIFY(cond, return (error_val), ": %s", (msg))
+#define LV_VERIFY_OR_RETURN_VAL(cond, error_val, msg) LV_VERIFY_INTERNAL_(cond, #cond, return (error_val), ": %s", (msg))
 
 /**
  * Verify a condition; on failure log a warning and invoke `LV_ASSERT_HANDLER` (typically halts).
@@ -145,7 +151,7 @@ extern "C" {
  * @param cond  condition to verify
  * @param ...   optional printf-style format string and arguments appended to the log
  */
-#define LV_VERIFY_OR_ASSERT(cond, ...) LV_VERIFY(cond, LV_ASSERT_HANDLER, __VA_ARGS__)
+#define LV_VERIFY_OR_ASSERT(cond, ...) LV_VERIFY_INTERNAL_(cond, #cond, LV_ASSERT_HANDLER, __VA_ARGS__)
 
 /**
  * Verify a condition; on failure log a plain message and invoke `LV_ASSERT_HANDLER`.
@@ -158,7 +164,7 @@ extern "C" {
  * @param cond  condition to verify
  * @param msg   plain string message to log on failure
  */
-#define LV_VERIFY_OR_ASSERT_MSG(cond, msg) LV_VERIFY(cond, LV_ASSERT_HANDLER, ": %s", (msg))
+#define LV_VERIFY_OR_ASSERT_MSG(cond, msg) LV_VERIFY_INTERNAL_(cond, #cond, LV_ASSERT_HANDLER, ": %s", (msg))
 
 #ifdef __cplusplus
 } /*extern "C"*/
