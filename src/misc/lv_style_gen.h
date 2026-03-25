@@ -781,7 +781,7 @@ void lv_style_set_text_outline_stroke_opa(lv_style_t * style, lv_opa_t value);
 /**
  * Set the text leading trim mode. Removes empty space above and/or below text based
  * on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
- * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`.
+ * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAPITAL_BASELINE/LOWER_BASELINE/CAPITAL/LOWER`.
  * Default: `LV_TEXT_LEADING_TRIM_NONE`, inherited: Yes, layout: Yes, ext. draw: No.
  * @param  style   Pointer to style
  * @param  value   Value to submit
@@ -2089,7 +2089,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 /**
  * Set the text leading trim mode. Removes empty space above and/or below text based
  * on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
- * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`.
+ * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAPITAL_BASELINE/LOWER_BASELINE/CAPITAL/LOWER`.
  * Default: `LV_TEXT_LEADING_TRIM_NONE`, inherited: Yes, layout: Yes, ext. draw: No.
  * @param  val   Value to submit
  */

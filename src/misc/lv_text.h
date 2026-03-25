@@ -33,16 +33,16 @@ extern "C" {
 typedef enum {
     LV_TEXT_FLAG_NONE      = 0x00,
 
-    /*Ignore max-width to avoid automatic word wrapping*/
+    /** Ignore max-width to avoid automatic word wrapping*/
     LV_TEXT_FLAG_EXPAND    = 0x01,
 
-    /**Max-width is already equal to the longest line. (Used to skip some calculation)*/
+    /** Max-width is already equal to the longest line. (Used to skip some calculation)*/
     LV_TEXT_FLAG_FIT       = 0x02,
 
-    /**To prevent overflow, insert breaks between any two characters.
-    Otherwise breaks are inserted at word boundaries, as configured via LV_TXT_BREAK_CHARS
-    or according to LV_TXT_LINE_BREAK_LONG_LEN, LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN,
-    and LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN.*/
+    /** To prevent overflow, insert breaks between any two characters.
+     *  Otherwise breaks are inserted at word boundaries, as configured via LV_TXT_BREAK_CHARS
+     *  or according to LV_TXT_LINE_BREAK_LONG_LEN, LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN,
+     *  and LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN.*/
     LV_TEXT_FLAG_BREAK_ALL = 0x04,
 
     /**Enable parsing of recolor command*/
@@ -58,15 +58,28 @@ typedef enum {
     LV_TEXT_ALIGN_RIGHT, /**< Align text to right*/
 } lv_text_align_t;
 
-/** Text leading trim mode (similar to CSS text-box-trim / text-box-edge) */
+/**Text leading trim mode (similar to CSS text-box-trim / text-box-edge)
+ * using more intuitive naming.
+ * See https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-box-edge*/
 typedef enum {
-  LV_TEXT_LEADING_TRIM_NONE = 0,       /**< No trimming (default behavior)*/
-  LV_TEXT_LEADING_TRIM_CAP_ALPHABETIC, /**< Trim top to cap-height, bottom to
-                                          alphabetic baseline*/
-  LV_TEXT_LEADING_TRIM_EX_ALPHABETIC,  /**< Trim top to x-height, bottom to
-                                          alphabetic baseline*/
-  LV_TEXT_LEADING_TRIM_CAP_ONLY,       /**< Trim top to cap-height only*/
-  LV_TEXT_LEADING_TRIM_EX_ONLY,        /**< Trim top to x-height only*/
+
+    /** No trimming (default behavior)*/
+    LV_TEXT_LEADING_TRIM_NONE = 0,
+
+    /** Trim to the top of the capital letters (cap height)
+     * and the bottom to the (alphabetic) baseline*/
+    LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE,
+
+    /** Trim to the top of the lower case letters (x-height)
+     * and the bottom to the (alphabetic) baseline*/
+    LV_TEXT_LEADING_TRIM_LOWER_BASELINE,
+
+    /**< Trim only the top to the height of the capital letters (cap-height)*/
+    LV_TEXT_LEADING_TRIM_CAPITAL,
+
+    /**< Trim only the top to the height of the lower case letters (x-height)*/
+    LV_TEXT_LEADING_TRIM_LOWER,
+
 } lv_text_leading_trim_t;
 
 /**********************
@@ -80,18 +93,19 @@ typedef enum {
  * @param trim  leading-trim mode
  * @return      pixels to trim from the top (0 if no trimming)
  */
-static inline int32_t lv_font_get_top_trim(const lv_font_t *font,
-                                           lv_text_leading_trim_t trim) {
-  switch (trim) {
-  case LV_TEXT_LEADING_TRIM_CAP_ALPHABETIC:
-  case LV_TEXT_LEADING_TRIM_CAP_ONLY:
-    return (font->line_height - font->base_line) - font->cap_height;
-  case LV_TEXT_LEADING_TRIM_EX_ALPHABETIC:
-  case LV_TEXT_LEADING_TRIM_EX_ONLY:
-    return (font->line_height - font->base_line) - font->x_height;
-  default:
-    return 0;
-  }
+static inline int32_t lv_font_get_top_trim(const lv_font_t * font,
+                                           lv_text_leading_trim_t trim)
+{
+    switch(trim) {
+        case LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE:
+        case LV_TEXT_LEADING_TRIM_CAPITAL:
+            return (font->line_height - font->base_line) - font->cap_height;
+        case LV_TEXT_LEADING_TRIM_LOWER_BASELINE:
+        case LV_TEXT_LEADING_TRIM_LOWER:
+            return (font->line_height - font->base_line) - font->x_height;
+        default:
+            return 0;
+    }
 }
 
 /**
@@ -101,15 +115,16 @@ static inline int32_t lv_font_get_top_trim(const lv_font_t *font,
  * @param trim  leading-trim mode
  * @return      pixels to trim from the bottom (0 if no trimming)
  */
-static inline int32_t lv_font_get_bottom_trim(const lv_font_t *font,
-                                              lv_text_leading_trim_t trim) {
-  switch (trim) {
-  case LV_TEXT_LEADING_TRIM_CAP_ALPHABETIC:
-  case LV_TEXT_LEADING_TRIM_EX_ALPHABETIC:
-    return font->base_line;
-  default:
-    return 0;
-  }
+static inline int32_t lv_font_get_bottom_trim(const lv_font_t * font,
+                                              lv_text_leading_trim_t trim)
+{
+    switch(trim) {
+        case LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE:
+        case LV_TEXT_LEADING_TRIM_LOWER_BASELINE:
+            return font->base_line;
+        default:
+            return 0;
+    }
 }
 
 /**
