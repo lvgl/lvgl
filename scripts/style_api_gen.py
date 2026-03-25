@@ -379,7 +379,7 @@ props = [
 
 {'name': 'TEXT_LEADING_TRIM',
  'style_type': 'num',  'var_type': 'lv_text_leading_trim_t',  'default':'`LV_TEXT_LEADING_TRIM_NONE`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the text leading trim mode. Removes empty space above and/or below text based on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`. Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`."},
+ 'dsc': "Set the text leading trim mode. Removes empty space above and/or below text based on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`. Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAPITAL_BASELINE/LOWER_BASELINE/CAPITAL/LOWER`."},
 
 {'section': 'Blur', 'dsc':'Blur the widget or its background' },
 {'name': 'BLUR_RADIUS',

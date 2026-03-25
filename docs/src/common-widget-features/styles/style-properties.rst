@@ -1351,7 +1351,7 @@ text_leading_trim
 
 Set the text leading trim mode. Removes empty space above and/or below text based
 on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
-Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAP_ALPHABETIC/EX_ALPHABETIC/CAP_ONLY/EX_ONLY`.
+Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAPITAL_BASELINE/LOWER_BASELINE/CAPITAL/LOWER`.
 
 .. raw:: html
 
