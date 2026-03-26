@@ -306,6 +306,14 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
     if(cache_data != NULL) {
         lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
         cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
+        LV_ASSERT_MALLOC(cache_data->draw_dsc);
+        if(cache_data->draw_dsc == NULL) {
+            if(obj) {
+                lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+            }
+            LV_PROFILER_DRAW_END;
+            return 0;
+        }
         lv_memcpy((void *)cache_data->draw_dsc, base_dsc, base_dsc->dsc_size);
     }
 
@@ -390,8 +398,10 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
         default:
             /*The malloced cache_data->draw_dsc will be freed automatically on failure
             *in opengles_texture_cache_free_cb*/
-            LV_LOG_ERROR("Unsupported draw task type: %d", task->type);
             LV_ASSERT(false);
+            if(obj) {
+                lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+            }
             LV_PROFILER_DRAW_END;
             return 0;
     }
@@ -510,6 +520,10 @@ static void draw_texture_to_framebuffer(lv_draw_opengles_unit_t * u, unsigned in
 static void draw_to_framebuffer(lv_draw_opengles_unit_t * u)
 {
     unsigned int texture = draw_to_texture(u, NULL);
+    if(texture == 0) {
+        /*Texture creation failed; nothing to render to the framebuffer.*/
+        return;
+    }
     draw_texture_to_framebuffer(u, texture);
     GL_CALL(glDeleteTextures(1, &texture));
 }
