@@ -206,7 +206,6 @@ static inline int letter_get_image_handle(lv_draw_nanovg_unit_t * u, lv_font_gly
     letter_item_t search_key = { 0 };
     search_key.u = u;
     search_key.g_dsc = *g_dsc;
-    search_key.g_dsc.entry = NULL; /* Exclude the cache entry from the key */
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->letter_cache, &search_key, NULL);
     if(cache_node_entry == NULL) {
@@ -282,11 +281,27 @@ static void letter_free_cb(letter_item_t * item, void * user_data)
 
 static lv_cache_compare_res_t letter_compare_cb(const letter_item_t * lhs, const letter_item_t * rhs)
 {
-    int cmp_res = lv_memcmp(&lhs->g_dsc, &rhs->g_dsc, sizeof(lv_font_glyph_dsc_t));
-    if(cmp_res != 0) {
-        return cmp_res > 0 ? 1 : -1;
+    if(lhs->g_dsc.resolved_font != rhs->g_dsc.resolved_font) {
+        return lhs->g_dsc.resolved_font > rhs->g_dsc.resolved_font ? 1 : -1;
     }
 
+    lv_cache_compare_res_t ret = lhs->g_dsc.format - rhs->g_dsc.format;
+    if(ret != 0) {
+        return ret;
+    }
+
+    if(lhs->g_dsc.format == LV_FONT_GLYPH_FORMAT_IMAGE) {
+        if(lhs->g_dsc.gid.src == rhs->g_dsc.gid.src) {
+            return 0;
+        }
+        return lhs->g_dsc.gid.src > rhs->g_dsc.gid.src ? 1 : -1;
+    }
+    else {
+        if(lhs->g_dsc.gid.index == rhs->g_dsc.gid.index) {
+            return 0;
+        }
+        return lhs->g_dsc.gid.index > rhs->g_dsc.gid.index ? 1 : -1;
+    }
     return 0;
 }
 
