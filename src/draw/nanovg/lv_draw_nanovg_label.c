@@ -18,6 +18,7 @@
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_pending.h"
 #include "../../libs/freetype/lv_freetype.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
 *      DEFINES
@@ -285,28 +286,7 @@ static void letter_free_cb(letter_item_t * item, void * user_data)
 
 static lv_cache_compare_res_t letter_compare_cb(const letter_item_t * lhs, const letter_item_t * rhs)
 {
-    if(lhs->g_dsc.resolved_font != rhs->g_dsc.resolved_font) {
-        return lhs->g_dsc.resolved_font > rhs->g_dsc.resolved_font ? 1 : -1;
-    }
-
-    lv_cache_compare_res_t ret = lhs->g_dsc.format - rhs->g_dsc.format;
-    if(ret != 0) {
-        return ret;
-    }
-
-    if(lhs->g_dsc.format == LV_FONT_GLYPH_FORMAT_IMAGE) {
-        if(lhs->g_dsc.gid.src == rhs->g_dsc.gid.src) {
-            return 0;
-        }
-        return lhs->g_dsc.gid.src > rhs->g_dsc.gid.src ? 1 : -1;
-    }
-    else {
-        if(lhs->g_dsc.gid.index == rhs->g_dsc.gid.index) {
-            return 0;
-        }
-        return lhs->g_dsc.gid.index > rhs->g_dsc.gid.index ? 1 : -1;
-    }
-    return 0;
+    return lv_font_glyph_dsc_compare(&lhs->g_dsc, &rhs->g_dsc);
 }
 
 
