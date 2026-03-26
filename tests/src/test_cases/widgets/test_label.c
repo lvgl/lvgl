@@ -943,4 +943,46 @@ void test_label_preserve_spaces_after_explicit_newline(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_preserve_indent_after_newline.png");
 }
 
+void test_label_text_trim(void)
+{
+    lv_obj_t * parent = lv_screen_active();
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(parent, 32, 0);
+    lv_obj_set_style_pad_all(parent, 32, 0);
+    lv_obj_set_style_text_font(parent, &lv_font_montserrat_40, 0);
+
+    lv_obj_t * label1 = lv_label_create(parent);
+    lv_label_set_text(label1, "Text Leading Trim None");
+    lv_obj_set_style_bg_color(label1, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label1, LV_OPA_50, 0);
+
+    lv_obj_t * label2 = lv_label_create(parent);
+    lv_label_set_text(label2, "Text Leading Trim Capital");
+    lv_obj_set_style_bg_color(label2, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label2, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label2, LV_TEXT_LEADING_TRIM_CAPITAL,
+                                       LV_PART_MAIN);
+
+    lv_obj_t * label3 = lv_label_create(parent);
+    lv_label_set_text(label3, "Text Leading Trim Lower");
+    lv_obj_set_style_bg_color(label3, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label3, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label3, LV_TEXT_LEADING_TRIM_LOWER,
+                                       LV_PART_MAIN);
+
+    lv_obj_t * label4 = lv_label_create(parent);
+    lv_label_set_text(label4, "Text Leading Trim Capital Baseline");
+    lv_obj_set_style_bg_color(label4, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label4, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(
+        label4, LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE, LV_PART_MAIN);
+
+    lv_obj_t * label5 = lv_label_create(parent);
+    lv_label_set_text(label5, "Text Leading Trim Lower Baseline");
+    lv_obj_set_style_bg_color(label5, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label5, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label5, LV_TEXT_LEADING_TRIM_LOWER_BASELINE,
+                                       LV_PART_MAIN);
+}
+
 #endif
