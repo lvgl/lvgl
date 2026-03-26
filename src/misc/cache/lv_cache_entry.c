@@ -10,10 +10,21 @@
 #include "../../stdlib/lv_sprintf.h"
 #include "../lv_assert.h"
 #include "lv_cache_entry_private.h"
+#include "../../misc/lv_math.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+/*
+ * Aligning to 8 bytes works for both 32 and 64-bit machines
+ * with the cost of a certain amount of overhead
+ */
+#ifndef LV_CACHE_ENTRY_NODE_ALIGN
+    #define LV_CACHE_ENTRY_NODE_ALIGN 8
+#endif /* LV_CACHE_ENTRY_NODE_ALIGN */
+
+#define LV_CACHE_ENTRY_ALIGN_NODE_SIZE(size) (LV_ALIGN_UP(size, LV_CACHE_ENTRY_NODE_ALIGN))
 
 /**********************
  *      TYPEDEFS
@@ -87,7 +98,8 @@ bool lv_cache_entry_is_invalid(lv_cache_entry_t * entry)
 void * lv_cache_entry_get_data(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
-    return (uint8_t *)entry - entry->node_size;
+
+    return (uint8_t *)entry - LV_CACHE_ENTRY_ALIGN_NODE_SIZE(entry->node_size);
 }
 
 void * lv_cache_entry_acquire_data(lv_cache_entry_t * entry)
@@ -114,7 +126,7 @@ void lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data)
 lv_cache_entry_t * lv_cache_entry_get_entry(void * data, const uint32_t node_size)
 {
     LV_ASSERT_NULL(data);
-    return (lv_cache_entry_t *)((uint8_t *)data + node_size);
+    return (lv_cache_entry_t *)((uint8_t *)data + LV_CACHE_ENTRY_ALIGN_NODE_SIZE(node_size));
 }
 
 void lv_cache_entry_set_cache(lv_cache_entry_t * entry, const lv_cache_t * cache)
@@ -131,23 +143,24 @@ const lv_cache_t * lv_cache_entry_get_cache(const lv_cache_entry_t * entry)
 
 uint32_t lv_cache_entry_get_size(const uint32_t node_size)
 {
-    return node_size + sizeof(lv_cache_entry_t);
+    return LV_CACHE_ENTRY_ALIGN_NODE_SIZE(node_size) + sizeof(lv_cache_entry_t);
 }
 
-lv_cache_entry_t * lv_cache_entry_alloc(const uint32_t node_size, const lv_cache_t * cache)
+lv_cache_entry_t * lv_cache_entry_alloc(uint32_t node_size, const lv_cache_t * cache)
 {
+    /* Align node_size so that accessing the entry data afterwards is done on an aligned byte address */
     void * res = lv_malloc_zeroed(lv_cache_entry_get_size(node_size));
     LV_ASSERT_MALLOC(res)
-    if(res == NULL) {
+    if(!res) {
         LV_LOG_ERROR("malloc failed");
         return NULL;
     }
-    lv_cache_entry_t * entry = (lv_cache_entry_t *)((uint8_t *)res + node_size);
+    lv_cache_entry_t * entry = (lv_cache_entry_t *)((uint8_t *)res + LV_CACHE_ENTRY_ALIGN_NODE_SIZE(node_size));
     lv_cache_entry_init(entry, cache, node_size);
     return entry;
 }
 
-void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, const uint32_t node_size)
+void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, uint32_t node_size)
 {
     LV_ASSERT_NULL(entry);
     LV_ASSERT_NULL(cache);
