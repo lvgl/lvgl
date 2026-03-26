@@ -93,14 +93,59 @@ typedef enum {
 
 /** Describe the properties of a font*/
 struct _lv_font_t {
-    /** Get a glyph's descriptor from a font*/
-    bool (*get_glyph_dsc)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
+    /** Get a glyph's descriptor from a font.
+     *
+     * Fills `dsc_out` with metrics for the glyph corresponding to `letter` in `font`.
+     * `letter_next` is provided for kerning. The implementation may adjust `dsc_out->adv_w`
+     * based on the following character. Pass 0 if there is no next character.
+     *
+     * On success, `dsc_out->entry` may be set by the implementation to track an internal
+     * cache entry. It must be released by calling `release_glyph` when the glyph is no
+     * longer needed.
+     *
+     * @param font          the font to query
+     * @param dsc_out       output descriptor to fill
+     * @param letter        Unicode codepoint of the glyph to look up
+     * @param letter_next   Unicode codepoint of the following glyph, or 0 if none
+     * @return              true if the glyph was found, false otherwise
+     */
+    bool (*get_glyph_dsc)(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out,
+                          uint32_t letter, uint32_t letter_next);
 
-    /** Get a glyph's bitmap from a font*/
-    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, lv_draw_buf_t *);
+    /** Get a glyph's bitmap from a font.
+     *
+     * Returns a pointer to the glyph's alpha bitmap. The bitmap dimensions and format
+     * are described by the `lv_font_glyph_dsc_t` previously filled by `get_glyph_dsc`.
+     *
+     * `draw_buf` is a caller-provided scratch buffer. Font implementations that decode
+     * or decompress glyphs on the fly (e.g. packed bpp formats) will write the result
+     * into `draw_buf` and return a pointer to its data. Font implementations that
+     * maintain their own internal bitmap cache may ignore `draw_buf` entirely and return
+     * a pointer into their own storage instead.
+     *
+     * The caller must therefore always use the *return value* as the bitmap pointer,
+     * never assume the data was written into `draw_buf`. The returned pointer is only
+     * valid until `release_glyph` is called.
+     *
+     * @param g_dsc         glyph descriptor previously filled by `get_glyph_dsc`.
+     *                      `g_dsc->entry` may be set by this call to track an internal
+     *                      cache entry that must later be released via `release_glyph`.
+     * @param draw_buf      caller-provided scratch buffer offered to the implementation
+     *                      as a decode target. May be ignored by the implementation.
+     * @return              pointer to the glyph's alpha bitmap, or NULL on failure
+     */
+    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
-    /** Release a glyph*/
-    void (*release_glyph)(const lv_font_t *, lv_font_glyph_dsc_t *);
+    /** Release a glyph and any resources acquired during `get_glyph_dsc` or `get_glyph_bitmap`.
+     *
+     * Must be called after the glyph bitmap is no longer needed. Releases any internal
+     * cache entry stored in `g_dsc->entry` by the font implementation.
+     * Calling this with a `g_dsc` whose `entry` is NULL is a no-op.
+     *
+     * @param font          the font that owns the glyph
+     * @param g_dsc         glyph descriptor to release
+     */
+    void (*release_glyph)(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
     int32_t line_height;         /**< The real line height where any text fits*/
