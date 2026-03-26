@@ -255,14 +255,18 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
         return false;
     }
 
-    if(!lv_font_get_glyph_bitmap(g_dsc, image_buf)) {
+    const lv_draw_buf_t * bitmap_draw_buf = (const lv_draw_buf_t *)lv_font_get_glyph_bitmap(g_dsc, image_buf);
+    if(!bitmap_draw_buf) {
         LV_PROFILER_DRAW_END;
         return false;
     }
 
     LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImage");
-    item->image_handle = nvgCreateImage(item->u->vg, w, h, 0, NVG_TEXTURE_ALPHA, lv_draw_buf_goto_xy(image_buf, 0, 0));
+    item->image_handle = nvgCreateImage(item->u->vg, w, h, 0, NVG_TEXTURE_ALPHA, lv_draw_buf_goto_xy(bitmap_draw_buf, 0,
+                                                                                                     0));
     LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
+
+    lv_font_glyph_release_draw_data(g_dsc);
 
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
     LV_PROFILER_DRAW_END;
