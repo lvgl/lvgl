@@ -946,6 +946,7 @@ void test_label_preserve_spaces_after_explicit_newline(void)
 void test_label_text_trim(void)
 {
     lv_obj_t * parent = lv_screen_active();
+    lv_obj_clean(parent);
     lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(parent, 32, 0);
     lv_obj_set_style_pad_all(parent, 32, 0);
@@ -983,6 +984,8 @@ void test_label_text_trim(void)
     lv_obj_set_style_bg_opa(label5, LV_OPA_50, 0);
     lv_obj_set_style_text_leading_trim(label5, LV_TEXT_LEADING_TRIM_LOWER_BASELINE,
                                        LV_PART_MAIN);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_text_trim.png");
 }
 
 #endif

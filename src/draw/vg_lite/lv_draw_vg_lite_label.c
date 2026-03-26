@@ -141,27 +141,6 @@ void lv_draw_vg_lite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
  *   STATIC FUNCTIONS
  **********************/
 
-static inline bool init_buffer_from_glyph_dsc(vg_lite_buffer_t * buffer, lv_font_glyph_dsc_t * g_dsc)
-{
-    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap(g_dsc);
-    if(!glyph_bitmap) {
-        return false;
-    }
-
-    if(!LV_VG_LITE_IS_ALIGNED(glyph_bitmap, 16)) {
-        LV_LOG_WARN("Glyph data %p is not aligned to 16 bytes", glyph_bitmap);
-        return false;
-    }
-
-    if(!LV_VG_LITE_IS_ALIGNED(g_dsc->stride, 16)) {
-        LV_LOG_WARN("Glyph stride %" LV_PRIu32 " is not aligned to 16 bytes", g_dsc->stride);
-        return false;
-    }
-
-    lv_vg_lite_buffer_init(buffer, glyph_bitmap, g_dsc->box_w, g_dsc->box_h, g_dsc->stride, VG_LITE_A8, false);
-    return true;
-}
-
 static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                            lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
@@ -175,10 +154,12 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A8: {
                     const lv_font_t * resolved_font = glyph_draw_dsc->g->resolved_font;
                     vg_lite_buffer_t src_buf;
-                    if(lv_font_has_static_bitmap(resolved_font)) {
-                        if(!init_buffer_from_glyph_dsc(&src_buf, glyph_draw_dsc->g)) {
-                            return;
-                        }
+                    lv_font_glyph_dsc_t * g_dsc = glyph_draw_dsc->g;
+                    const void * glyph_bitmap = resolved_font->static_bitmap ? lv_font_get_glyph_static_bitmap(g_dsc) : NULL;
+                    if(glyph_bitmap &&
+                       LV_VG_LITE_IS_ALIGNED(glyph_bitmap, 16) &&
+                       g_dsc->stride != 0 && LV_VG_LITE_IS_ALIGNED(g_dsc->stride, 16)) {
+                        lv_vg_lite_buffer_init(&src_buf, glyph_bitmap, g_dsc->box_w, g_dsc->box_h, g_dsc->stride, VG_LITE_A8, false);
                     }
                     else {
                         if(resolved_font->release_glyph) {
