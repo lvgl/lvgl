@@ -203,7 +203,7 @@ bool lv_font_has_static_bitmap(const lv_font_t * font)
 int32_t lv_font_glyph_dsc_compare(const lv_font_glyph_dsc_t * lhs, const lv_font_glyph_dsc_t * rhs)
 {
     if(lhs->resolved_font != rhs->resolved_font) {
-        return lhs->resolved_font > rhs->resolved_font ? 1 : -1;
+        return (lv_uintptr_t)lhs->resolved_font > (lv_uintptr_t)rhs->resolved_font ? 1 : -1;
     }
 
     int32_t ret = lhs->format - rhs->format;
@@ -215,15 +215,13 @@ int32_t lv_font_glyph_dsc_compare(const lv_font_glyph_dsc_t * lhs, const lv_font
         if(lhs->gid.src == rhs->gid.src) {
             return 0;
         }
-        return lhs->gid.src > rhs->gid.src ? 1 : -1;
+        return (lv_uintptr_t)lhs->gid.src > (lv_uintptr_t)rhs->gid.src ? 1 : -1;
     }
-    else {
-        if(lhs->gid.index == rhs->gid.index) {
-            return 0;
-        }
-        return lhs->gid.index > rhs->gid.index ? 1 : -1;
+
+    if(lhs->gid.index == rhs->gid.index) {
+        return 0;
     }
-    return 0;
+    return lhs->gid.index > rhs->gid.index ? 1 : -1;
 }
 
 /**********************
