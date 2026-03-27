@@ -16,15 +16,7 @@
  *      DEFINES
  *********************/
 
-/*
- * Aligning to 8 bytes works for both 32 and 64-bit machines
- * with the cost of a certain amount of overhead
- */
-#ifndef LV_CACHE_ENTRY_NODE_ALIGN
-    #define LV_CACHE_ENTRY_NODE_ALIGN 8
-#endif /* LV_CACHE_ENTRY_NODE_ALIGN */
-
-#define LV_CACHE_ENTRY_ALIGN_NODE_SIZE(size) (LV_ALIGN_UP(size, LV_CACHE_ENTRY_NODE_ALIGN))
+#define LV_CACHE_ENTRY_ALIGN_NODE_SIZE(size) (LV_ALIGN_UP(size, sizeof(void *)))
 
 /**********************
  *      TYPEDEFS
