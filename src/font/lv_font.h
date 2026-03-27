@@ -53,28 +53,25 @@ typedef enum {
 
 /** Describes the properties of a glyph.*/
 typedef struct {
-    const lv_font_t *
-    resolved_font;  /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
+    const lv_font_t * resolved_font;  /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
+    lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
+    union {
+        uint32_t index;       /**< Glyph descriptor index*/
+        const void * src;     /**< Pointer to the source data used by image fonts*/
+    } gid;                    /**< The index of the glyph in the font file. Used by the font cache*/
+    lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
+    int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter border */
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
     uint16_t box_w; /**< Width of the glyph's bounding box*/
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
     uint16_t stride;/**< Bytes in each line. If 0 than there is no padding at the end of the line. */
-    lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
     uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
 
     /** 0: Get bitmap should return an A8 or ARGB8888 image.
       * 1: return the bitmap as it is (Maybe A1/2/4 or any proprietary formats). */
     uint8_t req_raw_bitmap: 1;
-
-    int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter border */
-
-    union {
-        uint32_t index;       /**< Glyph descriptor index*/
-        const void * src;     /**< Pointer to the source data used by image fonts*/
-    } gid;                    /**< The index of the glyph in the font file. Used by the font cache*/
-    lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
 } lv_font_glyph_dsc_t;
 
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
