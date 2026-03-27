@@ -1,7 +1,7 @@
 from typing import Union
 import gdb
 
-from lvglgdb.value import Value, ValueInput
+from lvglgdb.value import CorruptedError, Value, ValueInput
 
 
 class LVCacheEntry(Value):
@@ -58,7 +58,7 @@ class LVCacheEntry(Value):
         try:
             data = self.get_data()
             return f"CacheEntry(ref_cnt={self.get_ref_count()}, valid={not self.is_invalid()}, data={data.dereference()})"
-        except gdb.error:
+        except CorruptedError:
             pass
 
         return super().__str__()

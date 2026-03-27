@@ -35,7 +35,7 @@ class LVGroup(Value):
     @property
     def obj_focus(self) -> Value:
         focus_pp = self.super_value("obj_focus")
-        if not int(focus_pp):
+        if not focus_pp:
             return None
         return focus_pp.dereference()
 

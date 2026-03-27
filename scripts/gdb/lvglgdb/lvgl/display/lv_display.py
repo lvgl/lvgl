@@ -33,22 +33,26 @@ class LVDisplay(Value):
         return int(self.super_value("ver_res"))
 
     @property
+    def screen_cnt(self) -> int:
+        """Return screen count, 0 if corrupted."""
+        cnt = self.super_value("screen_cnt")
+        if not cnt.is_ok:
+            return 0
+        return int(cnt)
+
+    @property
     def screens(self):
-        screens = self.super_value("screens")
         for i in range(self.screen_cnt):
-            yield LVObject(screens[i])
+            yield LVObject(self.super_value("screens")[i].read_value())
 
     @property
     def layer_addrs(self) -> dict:
         """Map screen address -> layer name for known layer pointers."""
         result = {}
         for name in self._LAYER_NAMES:
-            try:
-                ptr = self.super_value(name)
-                if int(ptr):
-                    result[int(ptr)] = name
-            except Exception:
-                pass
+            ptr = self.super_value(name)
+            if ptr.is_ok and int(ptr):
+                result[int(ptr)] = name
         return result
 
     # Buffer-related properties
@@ -77,6 +81,6 @@ class LVDisplay(Value):
             "addr": hex(int(self)),
             "hor_res": self.hor_res,
             "ver_res": self.ver_res,
-            "screen_count": int(self.screen_cnt),
+            "screen_count": self.screen_cnt,
         }
         return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)

@@ -18,8 +18,7 @@ class LVDrawUnit(Value):
 
     @property
     def name(self) -> str:
-        n = self.super_value("name")
-        return n.string() if int(n) else "(unnamed)"
+        return self.super_value("name").string(fallback="(unnamed)")
 
     @property
     def idx(self) -> int:

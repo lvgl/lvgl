@@ -1,5 +1,4 @@
-import gdb
-from lvglgdb.value import Value
+from lvglgdb.value import CorruptedError, Value
 from .lv_cache import LVCache
 from .lv_cache_entry import LVCacheEntry
 
@@ -97,7 +96,7 @@ class LVImageCache(object):
                 data_size = int(decoded.data_size) if decoded else 0
                 size_str = f"{w}x{h}"
 
-                decoder_name = data_ptr.decoder.name.as_string()
+                decoder_name = data_ptr.decoder.name.string()
 
                 if src_type == 0:  # LV_IMAGE_SRC_VARIABLE
                     src_str = src.format_string(
@@ -106,13 +105,13 @@ class LVImageCache(object):
                     type_str = "var"
                 elif src_type == 1:  # LV_IMAGE_SRC_FILE
                     src_str = (
-                        src.cast("char", ptr=True).as_string() if src else "(null)"
+                        src.cast("char", ptr=True).string() if src else "(null)"
                     )
                     type_str = "file"
                 else:
                     src_str = f"{int(src):#x}" if src else "0x0"
 
-            except gdb.error as e:
+            except CorruptedError as e:
                 src_str = src_str or str(e)
 
             extras = dict(zip(iterator.extra_fields, iterator.get_extra(entry)))
@@ -142,8 +141,8 @@ class LVImageCache(object):
             return [f"entry {int(entry):#x}: null data pointer"]
         try:
             return LVImageCacheData(data_ptr).sanity_check(int(entry))
-        except gdb.error as e:
-            return [f"entry {int(entry):#x}: gdb error: {e}"]
+        except Exception as e:
+            return [f"entry {int(entry):#x}: error: {e}"]
 
     def sanity_check(self):
         """Run sanity check on image cache with image-specific entry validation"""

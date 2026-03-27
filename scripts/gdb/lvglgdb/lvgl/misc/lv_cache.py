@@ -31,6 +31,10 @@ class LVCache(Value):
             else datatype
         )
 
+    @property
+    def name(self) -> str:
+        return self.super_value("name").string(fallback="(unnamed)")
+
     def snapshot(self):
         from lvglgdb.lvgl.snapshot import Snapshot
 
@@ -43,7 +47,7 @@ class LVCache(Value):
 
         d = {
             "addr": hex(int(self)),
-            "name": self.name.as_string(),
+            "name": self.name,
             "node_size": int(self.node_size),
             "max_size": int(self.max_size),
             "current_size": int(self.size),
@@ -79,7 +83,7 @@ class LVCache(Value):
 
         iterator = iter(self)
         if iterator is None:
-            errors = [f"unsupported cache type: {self.name.as_string()}"]
+            errors = [f"unsupported cache type: {self.name}"]
         else:
             errors = iterator.sanity_check(entry_checker)
 
