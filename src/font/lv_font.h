@@ -143,7 +143,7 @@ struct _lv_font_t {
      *
      * Must be called after the glyph bitmap is no longer needed. Releases any internal
      * cache entry stored in `g_dsc->entry` by the font implementation.
-     * Calling this with a `g_dsc` whose `entry` is NULL is a no-op.
+     * Calling this with a `g_dsc` whose `entry` is NULL must be treated as a no-op.
      *
      * @param font          the font that owns the glyph
      * @param g_dsc         glyph descriptor to release
