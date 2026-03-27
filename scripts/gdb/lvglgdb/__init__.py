@@ -1,3 +1,5 @@
+from ._version import __version__
+
 from .value import Value, ValueInput, CorruptedValue, CorruptedError
 from .lvgl import (
     curr_inst,
@@ -49,6 +51,7 @@ from .lvgl import (
 from . import cmds as cmds
 
 __all__ = [
+    "__version__",
     "curr_inst",
     "LVDisplay",
     "LVDrawBuf",
