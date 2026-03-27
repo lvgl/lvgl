@@ -661,7 +661,7 @@ static bool lv_windows_window_message_callback_nolock(
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(lv_windows_get_window_context(hWnd));
                 if(context && context->display_device_object) {
                     HDC hdc = BeginPaint(hWnd, &ps);
-                    lv_obj_invalidate(lv_screen_active());
+                    lv_obj_invalidate(lv_display_get_screen_active(context->display_device_object));
                     EndPaint(hWnd, &ps);
                 }
 
