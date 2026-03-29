@@ -405,6 +405,9 @@ static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw
 static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
 {
     LV_ASSERT_NULL(font);
+    if(!g_dsc) {
+        return;
+    }
 
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
     if(!dsc->cache_size) {  /* no cache, do everything directly */
