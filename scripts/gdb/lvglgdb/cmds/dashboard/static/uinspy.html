@@ -1,0 +1,3091 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>LVGL Dashboard</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzdjM2FlZCIvPgogIDxwYXRoIGQ9Ik05IDExaDZ2Mkg5em0wIDRoMTB2Mkg5em0wIDRoOHYySDl6bTE2LThsLTQgNiA0IDZoLTNsLTQtNiA0LTZ6IiBmaWxsPSIjZmZmIi8+Cjwvc3ZnPgo="/>
+<style>/*! tailwindcss v4.2.1 | MIT License | https://tailwindcss.com */
+@layer properties;
+@layer theme, base, components, utilities;
+@layer theme {
+  :root, :host {
+    --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --spacing: 0.25rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
+    --text-sm: 0.875rem;
+    --text-sm--line-height: calc(1.25 / 0.875);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: calc(2.5 / 2.25);
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --leading-tight: 1.25;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --default-font-family: var(--font-sans);
+    --default-mono-font-family: var(--font-mono);
+    --color-crust: var(--crust);
+    --color-mantle: var(--mantle);
+    --color-base: var(--base);
+    --color-surface0: var(--surface0);
+    --color-overlay0: var(--overlay0);
+    --color-overlay1: var(--overlay1);
+    --color-txt: var(--text);
+    --color-subtext0: var(--subtext0);
+    --color-subtext1: var(--subtext1);
+    --color-blue: var(--blue);
+    --color-sapphire: var(--sapphire);
+    --color-green: var(--green);
+    --color-peach: var(--peach);
+    --color-mauve: var(--mauve);
+    --color-teal: var(--teal);
+    --color-panel-bg: var(--panel-bg);
+    --color-hover-row: var(--hover-row);
+    --color-hover-summary: var(--hover-summary);
+    --color-glow-blue: var(--glow-blue);
+    --color-nav-active-bg: var(--nav-active-bg);
+    --color-version-bg: var(--version-bg);
+    --color-icon-bg-blue: var(--icon-bg-blue);
+    --color-icon-bg-green: var(--icon-bg-green);
+    --color-icon-bg-mauve: var(--icon-bg-mauve);
+    --color-icon-bg-peach: var(--icon-bg-peach);
+    --color-icon-bg-teal: var(--icon-bg-teal);
+    --color-icon-bg-pink: var(--icon-bg-pink);
+  }
+}
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+  html, :host {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+    font-feature-settings: var(--default-font-feature-settings, normal);
+    font-variation-settings: var(--default-font-variation-settings, normal);
+    -webkit-tap-highlight-color: transparent;
+  }
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+  b, strong {
+    font-weight: bolder;
+  }
+  code, kbd, samp, pre {
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
+    font-size: 1em;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  :-moz-focusring {
+    outline: auto;
+  }
+  progress {
+    vertical-align: baseline;
+  }
+  summary {
+    display: list-item;
+  }
+  ol, ul, menu {
+    list-style: none;
+  }
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  button, input, select, optgroup, textarea, ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+  :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+  ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+  ::placeholder {
+    opacity: 1;
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: currentcolor;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, currentcolor 50%, transparent);
+      }
+    }
+  }
+  textarea {
+    resize: vertical;
+  }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+  ::-webkit-datetime-edit {
+    display: inline-flex;
+  }
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+  ::-webkit-calendar-picker-indicator {
+    line-height: 1;
+  }
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  button, input:where([type="button"], [type="reset"], [type="submit"]), ::file-selector-button {
+    appearance: button;
+  }
+  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
+@layer utilities;
+@layer base {
+  * {
+    margin: calc(var(--spacing) * 0);
+    box-sizing: border-box;
+    padding: calc(var(--spacing) * 0);
+  }
+  body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background-color: var(--color-crust);
+    color: var(--color-txt);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    transition: background .3s, color .3s;
+  }
+  body::after {
+    content: var(--body-after-content);
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: var(--body-after-bg);
+    opacity: .5;
+  }
+}
+@layer components {
+  .panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--color-panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--ui-radius);
+    box-shadow: var(--panel-glow);
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+  }
+  .panel:hover {
+    border-color: var(--surface1);
+    box-shadow: 0 0 0 1px var(--surface1), var(--shadow-hover), var(--panel-hover-glow);
+  }
+  .panel-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
+    border-bottom: 1px solid var(--panel-border);
+    background: var(--panel-header-bg), var(--panel-header-gradient);
+  }
+  .panel-icon {
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+  .panel-title {
+    font-size: 11px;
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-subtext1);
+    text-transform: uppercase;
+    letter-spacing: var(--title-letter-spacing);
+    text-shadow: var(--title-text-shadow);
+  }
+  .panel-badge {
+    margin-left: auto;
+    min-width: calc(var(--spacing) * 5);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface0);
+    padding-inline: 7px;
+    padding-block: 1px;
+    text-align: center;
+    font-size: 10px;
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-subtext0);
+    border: var(--badge-border);
+  }
+  .panel-body {
+    flex: 1;
+    overflow: auto;
+    padding: 10px 12px;
+  }
+  .panel-body::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .panel-body::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+  }
+  .panel-body::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+  .stat-mini {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2.5);
+    padding: 12px 14px;
+  }
+  .stat-mini .stat-icon-wrap {
+    display: flex;
+    height: calc(var(--spacing) * 9);
+    width: calc(var(--spacing) * 9);
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    color: var(--color-base);
+  }
+  .stat-mini .stat-icon-wrap.blue {
+    background-color: var(--color-icon-bg-blue);
+  }
+  .stat-mini .stat-icon-wrap.green {
+    background-color: var(--color-icon-bg-green);
+  }
+  .stat-mini .stat-icon-wrap.mauve {
+    background-color: var(--color-icon-bg-mauve);
+  }
+  .stat-mini .stat-icon-wrap.peach {
+    background-color: var(--color-icon-bg-peach);
+  }
+  .stat-mini .stat-icon-wrap.teal {
+    background-color: var(--color-icon-bg-teal);
+  }
+  .stat-mini .stat-icon-wrap.pink {
+    background-color: var(--color-icon-bg-pink);
+  }
+  .stat-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .stat-value {
+    font-size: 22px;
+    --tw-leading: var(--leading-tight);
+    line-height: var(--leading-tight);
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+    text-shadow: var(--stat-value-shadow);
+  }
+  .stat-label {
+    font-size: 10px;
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    color: var(--stat-label-color);
+    letter-spacing: var(--stat-label-spacing);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  thead {
+    position: sticky;
+    top: calc(var(--spacing) * 0);
+    z-index: 1;
+  }
+  th {
+    background-color: var(--color-base);
+    padding: 6px 8px;
+    text-align: left;
+    font-size: 10px;
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-overlay1);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    border-bottom: 1px solid var(--surface0);
+    text-shadow: var(--th-text-shadow);
+  }
+  td {
+    max-width: 260px;
+    overflow: hidden;
+    padding: 5px 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-subtext1);
+    border-bottom: 1px solid var(--td-border);
+  }
+  tr:hover td {
+    background-color: var(--color-hover-row);
+  }
+  .table-wrap {
+    max-height: 400px;
+    overflow: auto;
+  }
+  a.xref {
+    color: var(--color-sapphire);
+    text-decoration-line: none;
+    border-bottom: 1px dotted #74c7ec4d;
+    transition: all var(--transition);
+  }
+  a.xref:hover {
+    color: var(--color-blue);
+    border-bottom-color: var(--blue);
+  }
+  .badge {
+    display: inline-block;
+    border-radius: var(--radius-md);
+    padding-inline: 7px;
+    padding-block: 1px;
+    font-size: 10px;
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+    white-space: nowrap;
+    border: var(--badge-border);
+    text-shadow: var(--badge-text-shadow);
+  }
+  .badge-green {
+    background-color: var(--color-icon-bg-green);
+    color: var(--color-green);
+  }
+  .badge-yellow {
+    color: var(--yellow);
+    background: #f9e2af1f;
+  }
+  .badge-red {
+    color: var(--red);
+    background: #f38ba81f;
+  }
+  .badge-blue {
+    background-color: var(--color-icon-bg-blue);
+    color: var(--color-blue);
+  }
+  .badge-mauve {
+    background-color: var(--color-icon-bg-mauve);
+    color: var(--color-mauve);
+  }
+  .badge-peach {
+    background-color: var(--color-icon-bg-peach);
+    color: var(--color-peach);
+  }
+  .badge-teal {
+    background-color: var(--color-icon-bg-teal);
+    color: var(--color-teal);
+  }
+  .mono-addr {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-sapphire);
+  }
+  .kv-row {
+    display: flex;
+    align-items: baseline;
+    gap: calc(var(--spacing) * 2);
+    padding-block: 1px;
+    font-size: 11px;
+  }
+  .kv-label {
+    min-width: 70px;
+    flex-shrink: 0;
+    font-size: 10px;
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-overlay1);
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  .kv-value {
+    overflow: hidden;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-subtext1);
+  }
+  .progress-bar {
+    height: calc(var(--spacing) * 1.5);
+    flex: 1;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface0);
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    transition: width .3s;
+  }
+  .progress-fill.blue {
+    background-color: var(--color-blue);
+  }
+  .progress-fill.green {
+    background-color: var(--color-green);
+  }
+  .empty {
+    padding-block: calc(var(--spacing) * 3);
+    text-align: center;
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    color: var(--color-overlay0);
+    font-style: italic;
+  }
+  .hidden {
+    display: none !important;
+  }
+  .panel-about {
+    margin-inline: calc(var(--spacing) * 4);
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+  .panel-about .panel-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 1.5);
+    font-size: 11px;
+    color: var(--color-overlay0);
+  }
+  .panel-about a {
+    color: var(--color-blue);
+    text-decoration-line: none;
+  }
+  .panel-about a:hover {
+    text-decoration-line: underline;
+  }
+}
+:root {
+  --crust: #11111b;
+  --mantle: #181825;
+  --base: #1e1e2e;
+  --surface0: #313244;
+  --surface1: #45475a;
+  --surface2: #585b70;
+  --overlay0: #6c7086;
+  --overlay1: #7f849c;
+  --text: #cdd6f4;
+  --subtext0: #a6adc8;
+  --subtext1: #bac2de;
+  --blue: #89b4fa;
+  --sapphire: #74c7ec;
+  --lavender: #b4befe;
+  --green: #a6e3a1;
+  --yellow: #f9e2af;
+  --peach: #fab387;
+  --red: #f38ba8;
+  --mauve: #cba6f7;
+  --pink: #f5c2e7;
+  --teal: #94e2d5;
+  --flamingo: #f2cdcd;
+  --ui-radius: 12px;
+  --ui-radius-sm: 8px;
+  --gap: 8px;
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --panel-bg: #1e1e2eb3;
+  --panel-border: #31324499;
+  --glow-blue: #89b4fa14;
+  --topbar-bg: #11111bd9;
+  --panel-header-bg: #18182580;
+  --hover-row: #89b4fa0a;
+  --hover-summary: #89b4fa0f;
+  --td-border: #3132444d;
+  --shadow-hover: 0 4px 24px #0003;
+  --icon-bg-blue: #89b4fa1f;
+  --icon-bg-green: #a6e3a11f;
+  --icon-bg-mauve: #cba6f71f;
+  --icon-bg-peach: #fab3871f;
+  --icon-bg-teal: #94e2d51f;
+  --icon-bg-pink: #f5c2e71f;
+  --version-bg: #a6e3a11f;
+  --nav-active-bg: #89b4fa1f;
+  --search-icon-fill: %236c7086;
+  --panel-glow: none;
+  --panel-hover-glow: none;
+  --panel-header-gradient: none;
+  --title-text-shadow: none;
+  --title-letter-spacing: 0.5px;
+  --badge-border: none;
+  --badge-text-shadow: none;
+  --topbar-shadow: none;
+  --brand-text-shadow: none;
+  --brand-logo-shadow: none;
+  --stat-value-shadow: none;
+  --stat-label-color: var(--overlay1);
+  --stat-label-spacing: 0.3px;
+  --th-text-shadow: none;
+  --scene-layer-bg: #89b4fa0f;
+  --scene-layer-hover-bg: #89b4fa33;
+  --scene-layer-hover-shadow: 0 0 8px #89b4fa66;
+  --scrollbar-thumb: var(--surface1);
+  --scrollbar-track: transparent;
+  --body-after-content: none;
+  --body-after-bg: none;
+  --version-border: none;
+  --version-text-shadow: none;
+}
+[data-theme="light"] {
+  --crust: #dce0e8;
+  --mantle: #e6e9ef;
+  --base: #eff1f5;
+  --surface0: #ccd0da;
+  --surface1: #bcc0cc;
+  --surface2: #acb0be;
+  --overlay0: #9ca0b0;
+  --overlay1: #8c8fa1;
+  --text: #4c4f69;
+  --subtext0: #6c6f85;
+  --subtext1: #5c5f77;
+  --blue: #1e66f5;
+  --sapphire: #209fb5;
+  --lavender: #7287fd;
+  --green: #40a02b;
+  --yellow: #df8e1d;
+  --peach: #fe640b;
+  --red: #d20f39;
+  --mauve: #8839ef;
+  --pink: #ea76cb;
+  --teal: #179299;
+  --flamingo: #dd7878;
+  --panel-bg: #eff1f5d9;
+  --panel-border: #ccd0dab3;
+  --glow-blue: #1e66f50f;
+  --topbar-bg: #e6e9efe6;
+  --panel-header-bg: #dce0e899;
+  --hover-row: #1e66f50a;
+  --hover-summary: #1e66f50f;
+  --td-border: #ccd0da80;
+  --shadow-hover: 0 4px 24px #0000000f;
+  --icon-bg-blue: #1e66f51a;
+  --icon-bg-green: #40a02b1a;
+  --icon-bg-mauve: #8839ef1a;
+  --icon-bg-peach: #fe640b1a;
+  --icon-bg-teal: #1792991a;
+  --icon-bg-pink: #ea76cb1a;
+  --version-bg: #40a02b1a;
+  --nav-active-bg: #1e66f51a;
+  --search-icon-fill: %239ca0b0;
+  --scene-layer-bg: #1e66f50f;
+  --scene-layer-hover-bg: #1e66f533;
+  --scene-layer-hover-shadow: 0 0 8px #1e66f566;
+}
+[data-theme="cyber"] {
+  --crust: #05080a;
+  --mantle: #0a0e14;
+  --base: #0d1117;
+  --surface0: #1a1f2e;
+  --surface1: #252b3b;
+  --surface2: #2f3649;
+  --overlay0: #4a5568;
+  --overlay1: #718096;
+  --text: #e0f0ff;
+  --subtext0: #8ba4c0;
+  --subtext1: #a0c4e8;
+  --blue: #00e5ff;
+  --sapphire: #00bcd4;
+  --lavender: #b388ff;
+  --green: #00ff9f;
+  --yellow: #ffea00;
+  --peach: #ff6e40;
+  --red: #ff1744;
+  --mauve: #e040fb;
+  --pink: #ff4081;
+  --teal: #1de9b6;
+  --flamingo: #ff80ab;
+  --ui-radius: 4px;
+  --ui-radius-sm: 2px;
+  --panel-bg: #0d1117d9;
+  --panel-border: #00e5ff26;
+  --glow-blue: #00e5ff0f;
+  --topbar-bg: #05080aeb;
+  --panel-header-bg: #0a0e14b3;
+  --hover-row: #00e5ff0f;
+  --hover-summary: #00e5ff14;
+  --td-border: #00e5ff14;
+  --shadow-hover: 0 0 20px #00e5ff1f, 0 0 40px #00e5ff0a;
+  --icon-bg-blue: #00e5ff1a;
+  --icon-bg-green: #00ff9f1a;
+  --icon-bg-mauve: #e040fb1a;
+  --icon-bg-peach: #ff6e401a;
+  --icon-bg-teal: #1de9b61a;
+  --icon-bg-pink: #ff40811a;
+  --version-bg: #00ff9f1a;
+  --nav-active-bg: #00e5ff1f;
+  --search-icon-fill: %234a5568;
+  --panel-glow: inset 0 0 30px #00e5ff05;
+  --panel-hover-glow: inset 0 0 30px #00e5ff08;
+  --panel-header-gradient: linear-gradient(90deg, #00e5ff0d 0%, transparent 100%);
+  --title-text-shadow: 0 0 6px #00e5ff4d;
+  --title-letter-spacing: 1.5px;
+  --badge-border: 1px solid currentColor;
+  --badge-text-shadow: 0 0 4px currentColor;
+  --topbar-shadow: 0 1px 12px #00e5ff14;
+  --brand-text-shadow: 0 0 8px #00e5ff66;
+  --brand-logo-shadow: 0 0 10px #00e5ff80;
+  --stat-value-shadow: 0 0 8px #00e5ff4d;
+  --stat-label-color: #00e5ff80;
+  --stat-label-spacing: 1px;
+  --th-text-shadow: 0 0 4px #00e5ff33;
+  --scene-layer-bg: #00e5ff0a;
+  --scene-layer-hover-bg: #00e5ff26;
+  --scene-layer-hover-shadow: 0 0 12px #00e5ff66;
+  --scrollbar-thumb: #00e5ff33;
+  --scrollbar-track: #00e5ff05;
+  --body-after-content: "";
+  --body-after-bg: repeating-linear-gradient(0deg, transparent, transparent 2px, #00e5ff04 2px, #00e5ff04 4px);
+  --version-border: 1px solid #00ff9f4d;
+  --version-text-shadow: 0 0 4px #00ff9f4d;
+}
+ui-dashboard .main {
+  margin-inline: auto;
+  max-width: 1800px;
+  padding-inline: calc(var(--spacing) * 4);
+  padding-block: calc(var(--spacing) * 3);
+  padding-bottom: calc(var(--spacing) * 6);
+}
+ui-dashboard .bento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--gap);
+  grid-auto-rows: minmax(40px, auto);
+}
+ui-dashboard .panel-stat {
+  grid-column: span 2;
+}
+ui-dashboard .panel-disp-trees {
+  grid-column: span 12;
+}
+ui-dashboard .panel-disp-trees > .panel-body {
+  overflow: auto;
+}
+ui-dashboard .panel-img-cache, ui-dashboard .panel-hdr-cache, ui-dashboard .panel-decoders, ui-dashboard .panel-animations, ui-dashboard .panel-timers, ui-dashboard .panel-indevs, ui-dashboard .panel-groups, ui-dashboard .panel-draw-units, ui-dashboard .panel-draw-tasks, ui-dashboard .panel-subjects, ui-dashboard .panel-fs-drivers {
+  grid-column: span 4;
+}
+ui-dashboard .panel-img-cache > .panel-body, ui-dashboard .panel-hdr-cache > .panel-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+ui-dashboard .panel-hdr-cache .table-wrap {
+  overflow-x: auto;
+}
+ui-dashboard .panel-hdr-cache table {
+  font-size: 11px;
+}
+ui-dashboard .panel-animations, ui-dashboard .panel-timers, ui-dashboard .panel-indevs, ui-dashboard .panel-groups, ui-dashboard .panel-draw-units, ui-dashboard .panel-draw-tasks, ui-dashboard .panel-subjects, ui-dashboard .panel-fs-drivers, ui-dashboard .panel-decoders {
+  max-height: 360px;
+}
+ui-dashboard .panel-animations > .panel-body, ui-dashboard .panel-timers > .panel-body, ui-dashboard .panel-indevs > .panel-body, ui-dashboard .panel-groups > .panel-body, ui-dashboard .panel-draw-units > .panel-body, ui-dashboard .panel-draw-tasks > .panel-body, ui-dashboard .panel-subjects > .panel-body, ui-dashboard .panel-fs-drivers > .panel-body, ui-dashboard .panel-decoders > .panel-body {
+  overflow-y: auto;
+}
+@media (max-width: 1200px) {
+  ui-dashboard .bento {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  ui-dashboard .panel-stat {
+    grid-column: span 2;
+  }
+  ui-dashboard .panel-disp-trees {
+    grid-column: span 6;
+  }
+  ui-dashboard .panel-disp-trees .obj-split {
+    height: auto;
+    flex-direction: column;
+  }
+  ui-dashboard .panel-disp-trees .obj-split > .obj-tree-view, ui-dashboard .panel-disp-trees .obj-split > .obj-detail-view {
+    max-height: 300px;
+    flex: none;
+  }
+  ui-dashboard .panel-img-cache, ui-dashboard .panel-hdr-cache, ui-dashboard .panel-decoders {
+    grid-column: span 6;
+  }
+  ui-dashboard .panel-animations, ui-dashboard .panel-timers, ui-dashboard .panel-indevs, ui-dashboard .panel-groups, ui-dashboard .panel-draw-units, ui-dashboard .panel-draw-tasks, ui-dashboard .panel-subjects, ui-dashboard .panel-fs-drivers {
+    grid-column: span 3;
+  }
+}
+@media (max-width: 768px) {
+  ui-dashboard .bento {
+    grid-template-columns: 1fr;
+  }
+  ui-dashboard .bento > * {
+    grid-column: span 1;
+  }
+}
+ui-drop-zone #drop-zone {
+  margin-inline: calc(var(--spacing) * 4);
+  margin-block: calc(var(--spacing) * 3);
+  display: none;
+  flex: 1;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xl);
+  padding: calc(var(--spacing) * 12);
+  text-align: center;
+  color: var(--color-overlay1);
+  border: 2px dashed var(--surface1);
+  transition: all var(--transition);
+}
+ui-drop-zone #drop-zone:hover, ui-drop-zone #drop-zone.dragover {
+  border-color: var(--color-blue);
+  background-color: var(--color-glow-blue);
+}
+ui-drop-zone .drop-icon {
+  margin-bottom: calc(var(--spacing) * 2);
+  font-size: var(--text-4xl);
+  line-height: var(--tw-leading, var(--text-4xl--line-height));
+}
+ui-drop-zone .drop-hint {
+  margin-top: calc(var(--spacing) * 1.5);
+  font-size: 11px;
+  color: var(--color-overlay0);
+}
+ui-drop-zone .drop-hint code {
+  border-radius: 0.25rem;
+  background-color: var(--color-surface0);
+  padding-inline: calc(var(--spacing) * 1.5);
+  padding-block: calc(var(--spacing) * 0.5);
+}
+ui-drop-zone #file-input {
+  display: none;
+}
+ui-theme-toggle .theme-toggle {
+  display: flex;
+  height: calc(var(--spacing) * 8);
+  width: calc(var(--spacing) * 8);
+  flex-shrink: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-base);
+  font-size: 15px;
+  color: var(--color-overlay1);
+  border: 1px solid var(--surface0);
+  transition: all var(--transition);
+}
+ui-theme-toggle .theme-toggle:hover {
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+ui-topbar .topbar {
+  position: sticky;
+  top: calc(var(--spacing) * 0);
+  z-index: 50;
+  display: flex;
+  height: calc(var(--spacing) * 11);
+  align-items: center;
+  gap: calc(var(--spacing) * 4);
+  padding-inline: calc(var(--spacing) * 5);
+  background: var(--topbar-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--panel-border);
+  box-shadow: var(--topbar-shadow);
+}
+ui-topbar .topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  font-size: 13px;
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  color: var(--color-blue);
+  text-shadow: var(--brand-text-shadow);
+}
+ui-topbar .topbar-brand .logo {
+  display: flex;
+  height: 22px;
+  width: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background-color: var(--color-blue);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-crust);
+  box-shadow: var(--brand-logo-shadow);
+}
+ui-topbar .topbar-sep {
+  height: calc(var(--spacing) * 5);
+  width: 1px;
+  background-color: var(--color-surface0);
+}
+ui-topbar .topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2.5);
+  font-size: 11px;
+  color: var(--color-overlay1);
+}
+ui-topbar .version-tag {
+  border-radius: 5px;
+  background-color: var(--color-version-bg);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 0.5);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-green);
+  border: var(--version-border);
+  text-shadow: var(--version-text-shadow);
+}
+ui-topbar .topbar-nav {
+  margin-left: auto;
+  display: flex;
+  gap: calc(var(--spacing) * 0.5);
+}
+ui-topbar .topbar-nav a {
+  border-radius: var(--radius-md);
+  padding-inline: calc(var(--spacing) * 2.5);
+  padding-block: calc(var(--spacing) * 1);
+  font-size: 11px;
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  color: var(--color-subtext0);
+  text-decoration-line: none;
+  transition: all var(--transition);
+}
+ui-topbar .topbar-nav a:hover {
+  background-color: var(--color-surface0);
+  color: var(--color-txt);
+}
+ui-topbar .topbar-nav a.active {
+  background-color: var(--color-nav-active-bg);
+  color: var(--color-blue);
+}
+ui-topbar .topbar-search {
+  margin-left: calc(var(--spacing) * 2);
+  width: calc(var(--spacing) * 40);
+  border-radius: var(--radius-md);
+  background-color: var(--color-base);
+  padding-block: calc(var(--spacing) * 1);
+  padding-right: calc(var(--spacing) * 2.5);
+  padding-left: calc(var(--spacing) * 7);
+  font-size: 11px;
+  color: var(--color-txt);
+  --tw-outline-style: none;
+  outline-style: none;
+  border: 1px solid var(--surface0);
+  transition: all var(--transition);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='var(--search-icon-fill)' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 8px center;
+}
+ui-topbar .topbar-search:focus {
+  width: 220px;
+  border-color: var(--color-blue);
+}
+ui-topbar .topbar-search::placeholder {
+  color: var(--color-overlay0);
+}
+@media (max-width: 768px) {
+  ui-topbar .topbar-nav {
+    display: none;
+  }
+}
+.disp-tab-bar {
+  margin-bottom: calc(var(--spacing) * 2);
+  display: flex;
+  gap: calc(var(--spacing) * 1);
+  padding-bottom: calc(var(--spacing) * 2);
+  border-bottom: 1px solid var(--surface0);
+}
+.disp-tab-btn {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: calc(var(--spacing) * 1.5);
+  background-color: var(--color-mantle);
+  padding-inline: calc(var(--spacing) * 3);
+  padding-block: calc(var(--spacing) * 1);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-subtext0);
+  border: 1px solid var(--surface0);
+  border-bottom: none;
+  border-radius: var(--ui-radius-sm) var(--ui-radius-sm) 0 0;
+  transition: background var(--transition), color var(--transition);
+}
+.disp-tab-btn:hover {
+  background-color: var(--color-surface0);
+}
+.disp-tab-btn.active {
+  background-color: var(--color-base);
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-blue);
+  border-color: var(--blue);
+  border-bottom: 2px solid var(--base);
+}
+.disp-tab-thumb {
+  height: calc(var(--spacing) * 12);
+  width: calc(var(--spacing) * 12);
+  border-radius: 0.25rem;
+  background-color: var(--color-crust);
+  object-fit: contain;
+  border: 1px solid var(--surface0);
+  image-rendering: pixelated;
+}
+.disp-info-bar {
+  margin-bottom: calc(var(--spacing) * 1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 1.5);
+  padding-bottom: calc(var(--spacing) * 2);
+  border-bottom: 1px solid var(--surface0);
+}
+.disp-chip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--spacing) * 1.5);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-base);
+  padding-inline: calc(var(--spacing) * 2.5);
+  padding-block: 5px;
+  font-size: 11px;
+  border: 1px solid var(--surface0);
+}
+.disp-addr {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-sapphire);
+}
+.disp-res {
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-txt);
+}
+.disp-screens {
+  font-size: 11px;
+  color: var(--color-overlay1);
+}
+.obj-tree-header {
+  margin-bottom: calc(var(--spacing) * 1);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1);
+  font-size: .75rem;
+  color: var(--color-overlay1);
+  border-bottom: 1px solid var(--surface0);
+}
+.obj-tree-expand-btn {
+  margin-left: auto;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  background-color: var(--color-base);
+  padding-inline: calc(var(--spacing) * 1.5);
+  padding-block: calc(var(--spacing) * 0.5);
+  font-size: 10px;
+  color: var(--color-overlay0);
+  border: 1px solid var(--surface0);
+  transition: all var(--transition);
+}
+.obj-tree-expand-btn:hover {
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+.obj-split {
+  display: flex;
+  height: 700px;
+  align-items: stretch;
+  gap: calc(var(--spacing) * 2);
+}
+.obj-split > .obj-tree-view {
+  min-width: calc(var(--spacing) * 0);
+  flex: 0 0 220px;
+  overflow: auto;
+  font-size: 11px;
+}
+.obj-split > .obj-3d-view {
+  position: relative;
+  display: flex;
+  min-width: calc(var(--spacing) * 0);
+  flex: 1;
+  flex-direction: column;
+}
+.obj-split > .obj-detail-view {
+  min-width: calc(var(--spacing) * 0);
+  flex: 0 0 280px;
+  overflow: auto;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-base);
+  padding: calc(var(--spacing) * 2.5);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  border: 1px solid var(--surface0);
+}
+.obj-node {
+  margin-left: calc(var(--spacing) * 3);
+}
+.obj-node > summary {
+  cursor: pointer;
+  list-style-type: none;
+  border-radius: 0.25rem;
+  padding-inline: 6px;
+  padding-block: 3px;
+  padding-left: calc(var(--spacing) * 1);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-subtext1);
+  transition: background var(--transition);
+}
+.obj-node > summary::-webkit-details-marker {
+  display: none;
+}
+.obj-node > summary::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 5px;
+  flex-shrink: 0;
+  background: var(--depth-color, var(--overlay0));
+}
+.obj-node[open] > summary::before {
+  border-radius: 2px;
+}
+.obj-node > summary:hover {
+  background-color: var(--color-hover-summary);
+}
+.obj-node.obj-selected > summary {
+  background-color: var(--color-nav-active-bg);
+  outline: 1px solid var(--blue);
+}
+.detail-header {
+  margin-bottom: calc(var(--spacing) * 2.5);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding-bottom: calc(var(--spacing) * 2);
+  border-bottom: 1px solid var(--surface0);
+}
+.detail-class {
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue);
+}
+.detail-section {
+  margin-bottom: calc(var(--spacing) * 2.5);
+}
+.detail-section-title {
+  margin-bottom: calc(var(--spacing) * 1);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-overlay0);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.detail-coord-grid {
+  display: flex;
+  gap: calc(var(--spacing) * 3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.detail-coord-group {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 1.5);
+  border-radius: 0.25rem;
+  background-color: var(--color-mantle);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1);
+  border: 1px solid var(--surface0);
+}
+.detail-coord-label {
+  font-size: 9px;
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-overlay1);
+  text-transform: uppercase;
+}
+.detail-coord-val {
+  color: var(--color-txt);
+}
+.detail-style-card {
+  margin-bottom: calc(var(--spacing) * 1);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-mantle);
+  padding: 6px 8px;
+  border: 1px solid var(--surface0);
+}
+.detail-style-hdr {
+  margin-bottom: calc(var(--spacing) * 1);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-mauve);
+}
+.detail-style-table {
+  width: 100%;
+  font-size: 11px;
+}
+.detail-style-table th {
+  padding: 1px 4px;
+  text-align: left;
+  font-size: 9px;
+}
+.detail-style-table td {
+  padding: 1px 4px;
+}
+.scene-controls {
+  margin-bottom: calc(var(--spacing) * 1);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1.5);
+}
+.scene-label {
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-overlay1);
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.scene-slider {
+  height: calc(var(--spacing) * 1);
+  width: calc(var(--spacing) * 30);
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+.scene-reset-btn, .scene-toggle-btn, .scene-fullscreen-btn {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: calc(var(--spacing) * 1);
+  border-radius: 0.25rem;
+  background-color: var(--color-base);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 0.5);
+  font-size: 10px;
+  color: var(--color-overlay1);
+  border: 1px solid var(--surface0);
+  transition: all var(--transition);
+}
+.scene-reset-btn:hover, .scene-toggle-btn:hover, .scene-fullscreen-btn:hover {
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+.scene-spacer {
+  flex: 1;
+}
+.obj-3d-view.screensaver .scene-controls, .obj-3d-view.screensaver .scene-layer-bar, .obj-3d-view.screensaver .scene-tooltip {
+  display: none !important;
+}
+.obj-3d-view.screensaver .scene-viewport {
+  min-height: calc(var(--spacing) * 0);
+  border-radius: 0;
+  border-style: var(--tw-border-style);
+  border-width: 0px;
+}
+.scene-toggle-btn {
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+}
+.scene-toggle-btn.active {
+  border-color: var(--color-blue);
+  background-color: var(--color-icon-bg-blue);
+  color: var(--color-blue);
+}
+.scene-layer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 1);
+  padding-block: calc(var(--spacing) * 1);
+}
+.scene-layer-btn {
+  cursor: pointer;
+  border-radius: 0.25rem;
+  background-color: var(--color-base);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 0.5);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-overlay0);
+  -webkit-user-select: none;
+  user-select: none;
+  border: 1px solid var(--surface0);
+  border-bottom: 2px solid var(--surface1);
+  transition: all var(--transition);
+}
+.scene-layer-btn:hover {
+  border-color: var(--color-blue);
+  color: var(--color-txt);
+}
+.scene-layer-btn.active {
+  border-color: var(--color-blue);
+  background-color: var(--color-icon-bg-blue);
+  color: var(--color-txt);
+}
+.scene-viewport {
+  position: relative;
+  min-height: 400px;
+  width: 100%;
+  flex: 1;
+  cursor: grab;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-crust);
+  border: 1px solid var(--surface0);
+}
+.obj-3d-view:fullscreen {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-crust);
+  padding: calc(var(--spacing) * 2);
+}
+.obj-3d-view:fullscreen .scene-viewport {
+  min-height: calc(var(--spacing) * 0);
+}
+.scene-canvas {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.scene-tooltip {
+  pointer-events: none;
+  position: absolute;
+  z-index: 50;
+  display: none;
+  border-radius: var(--radius-md);
+  background-color: var(--color-base);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--color-txt);
+  border: 1px solid var(--surface0);
+  box-shadow: 0 4px 12px #0000004d;
+}
+.viewcube-wrap {
+  position: absolute;
+  z-index: 40;
+  perspective: 250px;
+}
+.obj-3d-view.screensaver .viewcube-wrap {
+  display: none !important;
+}
+.viewcube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.01s;
+}
+.vc-face, .vc-edge, .vc-corner {
+  position: absolute;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 8px/1 system-ui;
+  color: var(--overlay1);
+  backface-visibility: visible;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+}
+.vc-face {
+  background: var(--surface0);
+  border: 1px solid var(--surface1);
+  opacity: 0.85;
+}
+.vc-face:hover {
+  background: var(--blue);
+  color: var(--base);
+  opacity: 1;
+}
+.vc-edge {
+  background: var(--surface1);
+  opacity: 0.6;
+}
+.vc-edge:hover {
+  background: var(--blue);
+  opacity: 1;
+}
+.vc-corner {
+  width: 15px;
+  height: 15px;
+  background: var(--surface1);
+  opacity: 0.5;
+  border-radius: 2px;
+}
+.vc-corner:hover {
+  background: var(--blue);
+  opacity: 1;
+}
+.subject-card {
+  margin-bottom: calc(var(--spacing) * 1.5);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-base);
+  border: 1px solid var(--surface0);
+  &:last-child {
+    margin-bottom: calc(var(--spacing) * 0);
+  }
+}
+.subject-header {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding: 6px 10px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--surface0);
+}
+.subject-addr {
+  font-family: var(--font-mono);
+  color: var(--color-sapphire);
+}
+.subject-type {
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-mauve);
+}
+.subject-card table {
+  font-size: 11px;
+}
+.timer-card, .anim-card, .indev-card, .group-card, .dtask-card {
+  margin-bottom: calc(var(--spacing) * 1.5);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-base);
+  border: 1px solid var(--surface0);
+  &:last-child {
+    margin-bottom: calc(var(--spacing) * 0);
+  }
+}
+.timer-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+.anim-header, .timer-header, .indev-header, .group-header, .dtask-header {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--surface0);
+}
+.anim-info, .timer-info, .indev-info, .group-info, .dtask-info {
+  padding: 6px 10px;
+}
+.anim-value-row {
+  margin-block: calc(var(--spacing) * 1);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+}
+.anim-val-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--color-overlay1);
+}
+.anim-cur-val {
+  text-align: right;
+  font-size: 10px;
+  color: var(--color-overlay1);
+}
+.indev-type-icon {
+  font-size: var(--text-lg);
+  line-height: var(--tw-leading, var(--text-lg--line-height));
+}
+.indev-type-name {
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-txt);
+}
+.group-members {
+  margin-top: calc(var(--spacing) * 1);
+}
+.member-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 1);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.cache-grid {
+  display: grid;
+  gap: calc(var(--spacing) * 1.5);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+.cache-entry {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-base);
+  border: 1px solid var(--surface0);
+}
+.cache-thumb {
+  margin: calc(var(--spacing) * 1.5);
+  height: calc(var(--spacing) * 9);
+  width: calc(var(--spacing) * 9);
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  background-color: var(--color-surface0);
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.cache-info {
+  min-width: calc(var(--spacing) * 0);
+  flex: 1;
+  padding: 4px 8px;
+}
+.cache-src {
+  margin-bottom: calc(var(--spacing) * 0.5);
+  overflow: hidden;
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-txt);
+}
+.cache-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+}
+.cache-size-label {
+  font-size: 10px;
+  color: var(--color-overlay1);
+}
+.cache-decoder-label {
+  margin-top: calc(var(--spacing) * 0.5);
+  font-size: 10px;
+  color: var(--color-overlay0);
+}
+.unit-grid, .decoder-grid, .fs-grid {
+  display: grid;
+  gap: calc(var(--spacing) * 1.5);
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+.unit-card, .decoder-card, .fs-card {
+  border-radius: var(--radius-lg);
+  background-color: var(--color-base);
+  padding: calc(var(--spacing) * 2.5);
+  text-align: center;
+  border: 1px solid var(--surface0);
+}
+.unit-name, .decoder-name {
+  margin-bottom: calc(var(--spacing) * 0.5);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-txt);
+}
+.unit-idx {
+  font-size: var(--text-lg);
+  line-height: var(--tw-leading, var(--text-lg--line-height));
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue);
+}
+.decoder-cbs {
+  margin-block: calc(var(--spacing) * 1.5);
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--spacing) * 1);
+}
+.fs-letter {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  line-height: var(--tw-leading, var(--text-2xl--line-height));
+  --tw-font-weight: var(--font-weight-extrabold);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-blue);
+}
+.fs-driver-name {
+  margin-bottom: calc(var(--spacing) * 1);
+  font-size: 11px;
+  color: var(--color-subtext0);
+}
+.fs-info {
+  font-size: 11px;
+}
+.fs-cbs {
+  margin-top: calc(var(--spacing) * 1);
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-leading {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-font-weight: initial;
+      --tw-leading: initial;
+      --tw-border-style: solid;
+    }
+  }
+}
+</style>
+</head>
+<body>
+<ui-topbar></ui-topbar>
+  <ui-drop-zone></ui-drop-zone>
+  <ui-dashboard></ui-dashboard>
+  <footer class="panel panel-about"><div class="panel-body" id="about"></div></footer>
+  <script id="lvgl-data" type="application/json">{{JSON_DATA}}</script>
+<script>// framework/base.ts
+class BaseComponent extends HTMLElement {
+  el;
+  static __injected = /* @__PURE__ */ new Set;
+  connectedCallback() {
+    let ctor = this.constructor, tag = this.tagName.toLowerCase();
+    if (ctor.__style && !BaseComponent.__injected.has(tag)) {
+      BaseComponent.__injected.add(tag);
+      let s = document.createElement("style");
+      s.textContent = ctor.__style, document.head.appendChild(s);
+    }
+    if (ctor.__template)
+      this.el = ctor.__template(), this.appendChild(this.el);
+    this.render();
+  }
+  html(strings, ...values) {
+    let t = document.createElement("template");
+    return t.innerHTML = String.raw(strings, ...values), t.content.firstElementChild;
+  }
+  update() {
+    this.innerHTML = "";
+    let ctor = this.constructor;
+    if (ctor.__template)
+      this.el = ctor.__template(), this.appendChild(this.el);
+    this.render();
+  }
+  $(selector) {
+    return this.querySelector(selector);
+  }
+}
+
+// src/components/ui-theme-toggle.ui.ts
+class UiThemeToggle extends BaseComponent {
+  static __style = "";
+  static __template = () => {
+    let _e = document.createElement("button");
+    return _e.setAttribute("class", "theme-toggle"), _e.setAttribute("title", "Toggle theme"), _e.append("\uD83C\uDF19"), _e;
+  };
+  render() {
+    let THEMES = ["dark", "light", "cyber"], ICONS = { dark: "\uD83C\uDF19", light: "☀️", cyber: "⚡" }, root = document.documentElement, apply = (theme) => {
+      root.setAttribute("data-theme", theme), this.el.textContent = ICONS[theme] || "\uD83C\uDF19";
+    }, saved = localStorage.getItem("lvgl-dash-theme");
+    if (saved && THEMES.includes(saved))
+      apply(saved);
+    else if (matchMedia("(prefers-color-scheme: light)").matches)
+      apply("light");
+    this.el.onclick = () => {
+      let cur = root.getAttribute("data-theme") || "dark", next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+      apply(next), localStorage.setItem("lvgl-dash-theme", next);
+    };
+  }
+}
+customElements.define("ui-theme-toggle", UiThemeToggle);
+// framework/signal.ts
+function signal(initial) {
+  let value = initial, listeners = /* @__PURE__ */ new Set;
+  return {
+    get val() {
+      return value;
+    },
+    set val(v) {
+      if (v === value)
+        return;
+      value = v, listeners.forEach((fn) => fn());
+    },
+    sub(fn) {
+      return listeners.add(fn), fn(), () => listeners.delete(fn);
+    }
+  };
+}
+// src/state.ts
+var hlAddr = signal(null), hlRegistry = {}, hlOverlays = {};
+function registerHL(addr, el) {
+  if (!addr)
+    return;
+  if (!hlRegistry[addr])
+    hlRegistry[addr] = [];
+  hlRegistry[addr].push(el);
+}
+function onHL(fn) {
+  hlAddr.sub(() => fn(hlAddr.val));
+}
+var focusAddr = signal(null);
+function onFocus(fn) {
+  focusAddr.sub(() => {
+    if (focusAddr.val)
+      fn(focusAddr.val);
+  });
+}
+function focusObj(addr) {
+  focusAddr.val = null, focusAddr.val = addr;
+}
+function highlightObj(addr) {
+  if (hlAddr.val === addr)
+    return;
+  if (clearHighlight(), hlAddr.val = addr, !addr)
+    return;
+  hlRegistry[addr]?.forEach((e) => e.classList.add("hl-active")), Object.values(hlOverlays).forEach((ov) => {
+    let ctx = ov.canvas.getContext("2d");
+    ctx.clearRect(0, 0, ov.canvas.width, ov.canvas.height);
+    let obj = ov.objs.find((o) => o.addr === addr);
+    if (obj) {
+      let sx = ov.canvas.width / ov.w, sy = ov.canvas.height / ov.h, x = obj.x1 * sx, y = obj.y1 * sy, w = (obj.x2 - obj.x1) * sx, h = (obj.y2 - obj.y1) * sy;
+      ctx.strokeStyle = "rgba(137, 180, 250, 0.9)", ctx.lineWidth = 2, ctx.setLineDash([4, 2]), ctx.strokeRect(x, y, w, h), ctx.fillStyle = "rgba(137, 180, 250, 0.15)", ctx.fillRect(x, y, w, h);
+    }
+  });
+}
+function clearHighlight() {
+  if (!hlAddr.val)
+    return;
+  hlRegistry[hlAddr.val]?.forEach((e) => e.classList.remove("hl-active")), Object.values(hlOverlays).forEach((ov) => {
+    ov.canvas.getContext("2d").clearRect(0, 0, ov.canvas.width, ov.canvas.height);
+  }), hlAddr.val = null;
+}
+function resetHL() {
+  clearHighlight();
+  for (let k in hlRegistry)
+    delete hlRegistry[k];
+  for (let k in hlOverlays)
+    delete hlOverlays[k];
+}
+var selectedAddr = signal(null), objDataMap = {};
+function selectObj(addr) {
+  let prev = selectedAddr.val;
+  if (prev)
+    document.getElementById("obj-" + prev)?.classList.remove("obj-selected");
+  selectedAddr.val = addr, document.getElementById("obj-" + addr)?.classList.add("obj-selected");
+}
+var dashData = signal(null);
+function countObjects(trees) {
+  let n = 0;
+  function walk(obj) {
+    n++, obj.children?.forEach(walk);
+  }
+  return trees.forEach((t) => t.screens.forEach(walk)), n;
+}
+
+// src/constants.ts
+var XREF_TARGET = {
+  parent_addr: "obj",
+  group_addr: "group",
+  display_addr: "disp",
+  read_timer_addr: "timer",
+  focused_addr: "obj",
+  var_addr: "obj",
+  user_data_addr: "obj",
+  subject_addr: "subject",
+  target_addr: "obj",
+  decoded_addr: "imgcache"
+}, SECTIONS = [
+  { key: "displays", icon: "\uD83D\uDDA5", title: "Displays & Objects", cls: "panel-disp-trees" },
+  { key: "animations", icon: "\uD83C\uDFAC", title: "Animations", cls: "panel-animations" },
+  { key: "timers", icon: "⏱", title: "Timers", cls: "panel-timers" },
+  { key: "image_cache", icon: "\uD83D\uDDBC", title: "Image Cache", cls: "panel-img-cache" },
+  { key: "image_header_cache", icon: "\uD83D\uDCCB", title: "Header Cache", cls: "panel-hdr-cache" },
+  { key: "indevs", icon: "\uD83D\uDD79", title: "Input Devices", cls: "panel-indevs" },
+  { key: "groups", icon: "\uD83D\uDC65", title: "Groups", cls: "panel-groups" },
+  { key: "draw_units", icon: "\uD83C\uDFA8", title: "Draw Units", cls: "panel-draw-units" },
+  { key: "draw_tasks", icon: "\uD83D\uDCDD", title: "Draw Tasks", cls: "panel-draw-tasks" },
+  { key: "subjects", icon: "\uD83D\uDCE1", title: "Subjects", cls: "panel-subjects" },
+  { key: "image_decoders", icon: "\uD83D\uDD13", title: "Decoders", cls: "panel-decoders" },
+  { key: "fs_drivers", icon: "\uD83D\uDCBE", title: "FS Drivers", cls: "panel-fs-drivers" }
+], STAT_DEFS = [
+  { label: "Displays", key: "displays", icon: "\uD83D\uDDA5", color: "blue", section: "disp-trees" },
+  { label: "Objects", key: "_objects", icon: "\uD83C\uDF33", color: "green", section: "disp-trees" },
+  { label: "Animations", key: "animations", icon: "\uD83C\uDFAC", color: "mauve", section: "animations" },
+  { label: "Timers", key: "timers", icon: "⏱", color: "peach", section: "timers" },
+  { label: "Img Cache", key: "image_cache", icon: "\uD83D\uDDBC", color: "teal", section: "img-cache" },
+  { label: "Input Devs", key: "indevs", icon: "\uD83D\uDD79", color: "pink", section: "indevs" }
+], DEPTH_COLORS = [
+  "var(--blue)",
+  "var(--green)",
+  "var(--mauve)",
+  "var(--peach)",
+  "var(--teal)",
+  "var(--pink)",
+  "var(--yellow)",
+  "var(--red)",
+  "var(--sapphire)",
+  "var(--lavender)",
+  "var(--flamingo)"
+], C = {
+  INFINITE_REPEAT: 4294967295,
+  VIEWPORT_SIZE: 520,
+  PERSPECTIVE_DISTANCE: 1200,
+  DEFAULT_ROT_X: -30,
+  DEFAULT_ROT_Y: 30,
+  MIN_ZOOM: 0.2,
+  MAX_ZOOM: 10,
+  ZOOM_SENSITIVITY: 0.01,
+  ROTATION_SENSITIVITY: 0.4,
+  SCREEN_GAP: 2,
+  ANIM_DURATION: 500,
+  CAM_DIR: -1,
+  VC_SIZE: 100,
+  VC_FACE: 50,
+  VC_EDGE: 8,
+  VC_CORNER: 15,
+  VC_TOP: 8,
+  VC_RIGHT: 8,
+  KB_ACCEL: 0.4,
+  KB_FRICTION: 0.85,
+  KB_PAN_ACCEL: 0.8,
+  KB_PAN_FRICTION: 0.92,
+  KB_ZOOM_ACCEL: 0.005,
+  KB_ZOOM_FRICTION: 0.85,
+  KB_SPREAD_ACCEL: 0.5
+}, INDEV_ICONS = {
+  pointer: "\uD83D\uDC46",
+  keypad: "⌨️",
+  button: "\uD83D\uDD18",
+  encoder: "\uD83C\uDF9B️",
+  none: "❓"
+};
+
+// src/components/ui-topbar.ui.ts
+class UiTopbar extends BaseComponent {
+  static __style = "";
+  static __template = () => {
+    let _e = document.createElement("header");
+    _e.setAttribute("class", "topbar");
+    let _e1 = document.createElement("div");
+    _e1.setAttribute("class", "topbar-brand");
+    let _e2 = document.createElement("span");
+    _e2.setAttribute("class", "logo"), _e2.append("LD"), _e1.append(_e2, "LVGL Dashboard");
+    let _e3 = document.createElement("div");
+    _e3.setAttribute("class", "topbar-sep");
+    let _e4 = document.createElement("div");
+    _e4.setAttribute("class", "topbar-meta"), _e4.setAttribute("id", "header-meta");
+    let _e5 = document.createElement("nav");
+    _e5.setAttribute("class", "topbar-nav"), _e5.setAttribute("id", "topbar-nav");
+    let _e6 = document.createElement("ui-theme-toggle"), _e7 = document.createElement("input");
+    return _e7.setAttribute("type", "text"), _e7.setAttribute("class", "topbar-search"), _e7.setAttribute("id", "search"), _e7.setAttribute("placeholder", "Filter..."), _e7.setAttribute("aria-label", "Search"), _e.append(_e1, _e3, _e4, _e5, _e6, _e7), _e;
+  };
+  render() {
+    let meta = this.$("#header-meta"), nav = this.$("#topbar-nav"), search = this.$("#search");
+    dashData.sub(() => {
+      let data = dashData.val;
+      if (!data)
+        return;
+      if (meta.innerHTML = "", meta.appendChild(document.createTextNode(data.meta?.timestamp || "")), data.meta?.lvgl_version) {
+        let tag = document.createElement("span");
+        tag.className = "version-tag", tag.textContent = "LVGL " + data.meta.lvgl_version, meta.appendChild(tag);
+      }
+      nav.innerHTML = "", SECTIONS.forEach((s) => {
+        let count = data[s.key]?.length || 0;
+        if (count === 0)
+          return;
+        let a = document.createElement("a");
+        a.textContent = s.icon + " " + count;
+        let targetId = "sec-" + s.cls.replace("panel-", "");
+        a.href = "#" + targetId, a.title = s.title + " (" + count + ")", a.addEventListener("click", (e) => {
+          e.preventDefault(), document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }), nav.appendChild(a);
+      });
+    }), search.addEventListener("input", () => {
+      let q = search.value.toLowerCase();
+      document.querySelectorAll(".panel").forEach((p) => {
+        if (p.classList.contains("panel-stat"))
+          return;
+        if (!q) {
+          p.classList.remove("hidden");
+          return;
+        }
+        p.classList.toggle("hidden", !p.textContent.toLowerCase().includes(q));
+      });
+    });
+  }
+}
+customElements.define("ui-topbar", UiTopbar);
+
+// src/components/ui-drop-zone.ui.ts
+class UiDropZone extends BaseComponent {
+  static __style = "";
+  static __template = () => {
+    let _e = document.createElement("div");
+    _e.setAttribute("id", "drop-zone"), _e.setAttribute("style", "display:none");
+    let _e1 = document.createElement("div");
+    _e1.setAttribute("class", "drop-icon"), _e1.append("\uD83D\uDCC2");
+    let _e2 = document.createElement("p");
+    _e2.append("Drag &amp; drop a JSON file here, or click to select");
+    let _e3 = document.createElement("div");
+    _e3.setAttribute("class", "drop-hint");
+    let _e4 = document.createElement("code");
+    _e4.append("dump dashboard --json"), _e3.append("Exported via ", _e4);
+    let _e5 = document.createElement("input");
+    return _e5.setAttribute("type", "file"), _e5.setAttribute("id", "file-input"), _e5.setAttribute("accept", ".json"), _e5.setAttribute("aria-label", "Load JSON file"), _e.append(_e1, _e2, _e3, _e5), _e;
+  };
+  render() {
+    let zone = this.el, input = this.$("#file-input"), raw = document.getElementById("lvgl-data")?.textContent?.trim();
+    if (raw)
+      try {
+        dashData.val = JSON.parse(raw);
+        return;
+      } catch (e) {}
+    zone.style.display = "flex", this.style.display = "flex", this.style.flexDirection = "column", this.style.flex = "1";
+    let load = (file) => {
+      let reader = new FileReader;
+      reader.onload = () => {
+        try {
+          dashData.val = JSON.parse(reader.result), zone.style.display = "none", this.style.display = "none";
+        } catch (e) {
+          alert("Invalid JSON: " + e.message);
+        }
+      }, reader.readAsText(file);
+    };
+    zone.addEventListener("dragover", (e) => {
+      e.preventDefault(), zone.classList.add("dragover");
+    }), zone.addEventListener("dragleave", () => zone.classList.remove("dragover")), zone.addEventListener("drop", (e) => {
+      if (e.preventDefault(), zone.classList.remove("dragover"), e.dataTransfer?.files[0])
+        load(e.dataTransfer.files[0]);
+    }), zone.addEventListener("click", () => input.click()), input.addEventListener("change", () => {
+      if (input.files?.[0])
+        load(input.files[0]);
+    });
+  }
+}
+customElements.define("ui-drop-zone", UiDropZone);
+
+// src/helpers.ts
+function el(tag, cls, text) {
+  let e = document.createElement(tag);
+  if (cls)
+    e.className = cls;
+  if (text !== void 0)
+    e.textContent = text;
+  return e;
+}
+function xref(addr, prefix) {
+  if (!addr || addr === "None" || addr === "0x0")
+    return document.createTextNode(addr || "-");
+  let a = el("a", "xref", addr);
+  return a.href = "#" + prefix + "-" + addr, a;
+}
+function xrefCell(td, key, val) {
+  let prefix = XREF_TARGET[key];
+  if (prefix && val && val !== "None" && val !== "0x0")
+    td.appendChild(xref(val, prefix));
+  else
+    td.textContent = val != null ? String(val) : "-";
+}
+function badge(text, color) {
+  return el("span", "badge badge-" + color, text);
+}
+function kvPair(label, value) {
+  let row = el("div", "kv-row");
+  return row.appendChild(el("span", "kv-label", label)), row.appendChild(el("span", "kv-value", String(value))), row;
+}
+function progressBar(ratio, color) {
+  let wrap = el("div", "progress-bar"), fill = el("div", "progress-fill " + color);
+  return fill.style.width = Math.max(0, Math.min(100, ratio * 100)) + "%", wrap.appendChild(fill), wrap;
+}
+function makeTable(headers, rows, anchorPrefix) {
+  if (!rows || rows.length === 0)
+    return el("p", "empty", "No entries.");
+  let wrap = el("div", "table-wrap"), tbl = document.createElement("table"), hr = tbl.createTHead().insertRow();
+  headers.forEach((h) => {
+    let th = document.createElement("th");
+    th.textContent = h, hr.appendChild(th);
+  });
+  let tbody = tbl.createTBody();
+  return rows.forEach((row) => {
+    let tr = tbody.insertRow(), addr = row.addr;
+    if (anchorPrefix && addr)
+      tr.id = anchorPrefix + "-" + addr;
+    headers.forEach((h) => {
+      let key = h.toLowerCase().replace(/ /g, "_"), td = tr.insertCell(), val = row[key];
+      if (key === "area" && typeof val === "object") {
+        let a = val;
+        td.textContent = "(" + a.x1 + "," + a.y1 + "," + a.x2 + "," + a.y2 + ")";
+      } else if ((key === "member_addrs" || key === "observer_addrs") && Array.isArray(val))
+        val.forEach((a, i) => {
+          if (i > 0)
+            td.appendChild(document.createTextNode(", "));
+          td.appendChild(xref(a, key === "member_addrs" ? "obj" : "observer"));
+        });
+      else
+        xrefCell(td, key, val != null ? String(val) : "-");
+    });
+  }), wrap.appendChild(tbl), wrap;
+}
+function makeStatPanel(icon, label, value, color, section) {
+  let panel = el("div", "panel panel-stat");
+  if (section)
+    panel.style.cursor = "pointer", panel.addEventListener("click", () => {
+      document.getElementById("sec-" + section)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  let body = el("div", "stat-mini");
+  body.appendChild(el("div", "stat-icon-wrap " + color, icon));
+  let info = el("div", "stat-info");
+  return info.appendChild(el("div", "stat-value", String(value))), info.appendChild(el("div", "stat-label", label)), body.appendChild(info), panel.appendChild(body), panel;
+}
+function makePanel(cls, icon, title, count) {
+  let panel = el("div", "panel " + cls);
+  panel.id = "sec-" + cls.replace("panel-", "");
+  let hdr = el("div", "panel-header");
+  if (hdr.appendChild(el("span", "panel-icon", icon)), hdr.appendChild(el("span", "panel-title", title)), count !== void 0)
+    hdr.appendChild(el("span", "panel-badge", String(count)));
+  panel.appendChild(hdr);
+  let body = el("div", "panel-body");
+  return panel.appendChild(body), { panel, body };
+}
+function buildCard(item, config) {
+  let card = el("div", config.cardClass);
+  if (config.anchorPrefix && item.addr)
+    card.id = config.anchorPrefix + "-" + item.addr;
+  let hdr = el("div", config.cardClass.replace("-card", "-header"));
+  hdr.appendChild(el("span", "mono-addr", item.addr || "")), config.badges?.forEach((b) => hdr.appendChild(badge(b.text, b.color))), card.appendChild(hdr);
+  let info = el("div", config.cardClass.replace("-card", "-info"));
+  return config.content?.(info, item), card.appendChild(info), card;
+}
+
+// src/builders/obj-tree.ui.ts
+function renderObjTree(obj, depth = 0) {
+  let det = document.createElement("details");
+  if (det.className = "obj-node", obj.addr)
+    det.id = "obj-" + obj.addr;
+  let sum = document.createElement("summary");
+  if (sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]), sum.textContent = obj.class_name || "obj", det.appendChild(sum), obj.addr)
+    objDataMap[obj.addr] = obj, registerHL(obj.addr, det), sum.addEventListener("mouseenter", () => highlightObj(obj.addr)), sum.addEventListener("mouseleave", () => clearHighlight()), sum.addEventListener("click", (e) => {
+      e.stopPropagation(), selectObj(obj.addr);
+    }), sum.addEventListener("dblclick", (e) => {
+      e.stopPropagation(), focusObj(obj.addr);
+    });
+  return obj.children?.forEach((ch) => det.appendChild(renderObjTree(ch, depth + 1))), det;
+}
+function renderObjDetail(addr, panel) {
+  panel.innerHTML = "";
+  let obj = objDataMap[addr];
+  if (!obj) {
+    panel.appendChild(el("p", "empty", "Select an object to inspect."));
+    return;
+  }
+  let hdr = (() => {
+    let _e = document.createElement("div");
+    _e.setAttribute("class", "detail-header");
+    let _e1 = document.createElement("span");
+    _e1.setAttribute("class", "detail-class"), _e1.append(obj.class_name || "obj");
+    let _e2 = document.createElement("span");
+    return _e2.setAttribute("class", "mono-addr"), _e2.append(obj.addr), _e.append(_e1, _e2), _e;
+  })();
+  panel.appendChild(hdr);
+  let c = obj.coords || { x1: 0, y1: 0, x2: 0, y2: 0 }, w = (c.x2 || 0) - (c.x1 || 0), h = (c.y2 || 0) - (c.y1 || 0), coordSec = (() => {
+    let _e = document.createElement("div");
+    _e.setAttribute("class", "detail-section");
+    let _e1 = document.createElement("div");
+    _e1.setAttribute("class", "detail-section-title"), _e1.append("Coordinates");
+    let _e2 = document.createElement("div");
+    _e2.setAttribute("class", "detail-coord-grid");
+    let _e3 = document.createElement("div");
+    _e3.setAttribute("class", "detail-coord-group");
+    let _e4 = document.createElement("span");
+    _e4.setAttribute("class", "detail-coord-label"), _e4.append("pos");
+    let _e5 = document.createElement("span");
+    _e5.setAttribute("class", "detail-coord-val"), _e5.append(String(c.x1 || 0), ", ", String(c.y1 || 0));
+    let _e6 = document.createElement("span");
+    _e6.setAttribute("class", "detail-coord-label"), _e6.append("→");
+    let _e7 = document.createElement("span");
+    _e7.setAttribute("class", "detail-coord-val"), _e7.append(String(c.x2 || 0), ", ", String(c.y2 || 0)), _e3.append(_e4, _e5, _e6, _e7);
+    let _e8 = document.createElement("div");
+    _e8.setAttribute("class", "detail-coord-group");
+    let _e9 = document.createElement("span");
+    _e9.setAttribute("class", "detail-coord-label"), _e9.append("size");
+    let _e10 = document.createElement("span");
+    return _e10.setAttribute("class", "detail-coord-val"), _e10.append(String(w), " × ", String(h)), _e8.append(_e9, _e10), _e2.append(_e3, _e8), _e.append(_e1, _e2), _e;
+  })();
+  panel.appendChild(coordSec);
+  let refSec = el("div", "detail-section");
+  if (refSec.appendChild(el("div", "detail-section-title", "References")), obj.parent_addr) {
+    let row = el("div", "kv-row");
+    row.appendChild(el("span", "kv-label", "parent")), row.appendChild(xref(obj.parent_addr, "obj")), refSec.appendChild(row);
+  }
+  if (obj.group_addr) {
+    let row = el("div", "kv-row");
+    row.appendChild(el("span", "kv-label", "group")), row.appendChild(xref(obj.group_addr, "group")), refSec.appendChild(row);
+  }
+  if (refSec.appendChild(kvPair("children", String(obj.child_count || 0))), refSec.appendChild(kvPair("styles", String(obj.style_count || 0))), panel.appendChild(refSec), obj.styles?.length) {
+    let styleSec = el("div", "detail-section");
+    styleSec.appendChild(el("div", "detail-section-title", "Styles (" + obj.styles.length + ")")), obj.styles.forEach((s) => {
+      let card = el("div", "detail-style-card");
+      if (card.appendChild(el("div", "detail-style-hdr", "[" + s.index + "] " + s.selector_str + "  " + s.flags_str)), s.properties?.length) {
+        let tbl = document.createElement("table");
+        tbl.className = "detail-style-table";
+        let thead = tbl.createTHead().insertRow();
+        ["prop", "value"].forEach((h2) => {
+          let th = document.createElement("th");
+          th.textContent = h2, thead.appendChild(th);
+        });
+        let tbody = tbl.createTBody();
+        s.properties.forEach((p) => {
+          let r = tbody.insertRow();
+          r.insertCell().textContent = p.prop_name, r.insertCell().textContent = p.value_str;
+        }), card.appendChild(tbl);
+      }
+      styleSec.appendChild(card);
+    }), panel.appendChild(styleSec);
+  }
+}
+
+// src/builders/canvas2d-renderer.ts
+class Canvas2DRenderer {
+  canvas;
+  ctx;
+  layers = [];
+  bufs = [];
+  cam;
+  sceneW = 0;
+  sceneH = 0;
+  hlAddr = null;
+  dirty = !0;
+  rafId = null;
+  projected = [];
+  constructor(canvas, cam) {
+    this.canvas = canvas, this.ctx = canvas.getContext("2d"), this.cam = cam, this.startLoop();
+  }
+  setSceneSize(w, h) {
+    this.sceneW = w, this.sceneH = h, this.dirty = !0;
+  }
+  setLayers(layers) {
+    this.layers = layers, this.dirty = !0;
+  }
+  addBuf(buf) {
+    this.bufs.push(buf), this.dirty = !0;
+  }
+  setHighlight(addr) {
+    this.hlAddr = addr, this.dirty = !0;
+  }
+  markDirty() {
+    this.dirty = !0;
+  }
+  project(px, py, pz) {
+    let { rotX, rotY, zoom, panX, panY, persp } = this.cam, rx = -rotX * Math.PI / 180, ry = -rotY * Math.PI / 180, cx = Math.cos(rx), sx = Math.sin(rx), cy = Math.cos(ry), sy = Math.sin(ry), ox = px - this.sceneW / 2, oy = py - this.sceneH / 2, oz = -pz, x = ox * cy + oz * sy, z = -ox * sy + oz * cy, y = oy * cx - z * sx;
+    z = oy * sx + z * cx;
+    let p = C.PERSPECTIVE_DISTANCE;
+    if (persp > 0 && z < -p * 0.95)
+      return null;
+    let rect = this.canvas.getBoundingClientRect(), cw = rect.width, ch = rect.height, perspScale = p / (p + z) * zoom, orthoScale = zoom, scale = orthoScale + (perspScale - orthoScale) * persp;
+    return [
+      cw / 2 + (x + panX) * scale,
+      ch / 2 + (y + panY) * scale,
+      z
+    ];
+  }
+  pointInQuad(px, py, q) {
+    for (let i = 0;i < 4; i++) {
+      let [ax, ay] = q[i], [bx, by] = q[(i + 1) % 4];
+      if ((bx - ax) * (py - ay) - (by - ay) * (px - ax) < 0)
+        return !1;
+    }
+    return !0;
+  }
+  pick(mx, my) {
+    for (let i = this.projected.length - 1;i >= 0; i--) {
+      let p = this.projected[i];
+      if (!p.layer.visible)
+        continue;
+      if (this.pointInQuad(mx, my, p.quad))
+        return { layer: p.layer, index: i };
+    }
+    return null;
+  }
+  render() {
+    let ctx = this.ctx, cw = this.canvas.width, ch = this.canvas.height;
+    ctx.clearRect(0, 0, cw, ch);
+    let items = [];
+    this.bufs.forEach((buf) => {
+      if (!buf.visible)
+        return;
+      let d = buf.depth, pts = [this.project(0, 0, d), this.project(this.sceneW, 0, d), this.project(this.sceneW, this.sceneH, d), this.project(0, this.sceneH, d)];
+      if (pts.some((p) => !p))
+        return;
+      let [p0, p1, p2, p3] = pts, avgZ = (p0[2] + p1[2] + p2[2] + p3[2]) / 4;
+      items.push({ quad: [[p0[0], p0[1]], [p1[0], p1[1]], [p2[0], p2[1]], [p3[0], p3[1]]], z: avgZ, type: "buf", buf });
+    }), this.layers.forEach((l) => {
+      if (!l.visible)
+        return;
+      let pts = [this.project(l.x, l.y, l.depth), this.project(l.x + l.w, l.y, l.depth), this.project(l.x + l.w, l.y + l.h, l.depth), this.project(l.x, l.y + l.h, l.depth)];
+      if (pts.some((p) => !p))
+        return;
+      let [p0, p1, p2, p3] = pts, avgZ = (p0[2] + p1[2] + p2[2] + p3[2]) / 4;
+      items.push({ quad: [[p0[0], p0[1]], [p1[0], p1[1]], [p2[0], p2[1]], [p3[0], p3[1]]], z: avgZ, type: "layer", layer: l });
+    }), items.sort((a, b) => b.z - a.z), this.projected = items.filter((i) => i.type === "layer").map((i) => ({ quad: i.quad, layer: i.layer, z: i.z }));
+    let SUBDIVS = 16;
+    items.forEach((item) => {
+      let q = item.quad;
+      if (item.type === "buf" && item.buf) {
+        let N = SUBDIVS, sw = this.sceneW, sh = this.sceneH, dpr = window.devicePixelRatio || 1, margin = 1 / N;
+        for (let iy = 0;iy < N; iy++)
+          for (let ix = 0;ix < N; ix++) {
+            let u0 = ix / N, v0 = iy / N, u0e = Math.max(0, u0 - margin * 0.5), v0e = Math.max(0, v0 - margin * 0.5), u1e = Math.min(1, (ix + 1) / N + margin * 0.5), v1e = Math.min(1, (iy + 1) / N + margin * 0.5), p00 = this.project(sw * u0e, sh * v0e, item.buf.depth), p10 = this.project(sw * u1e, sh * v0e, item.buf.depth), p01 = this.project(sw * u0e, sh * v1e, item.buf.depth);
+            if (!p00 || !p10 || !p01)
+              continue;
+            ctx.save(), ctx.globalAlpha = 0.85;
+            let dx = p10[0] - p00[0], dy = p10[1] - p00[1], ex = p01[0] - p00[0], ey = p01[1] - p00[1], srcW = (u1e - u0e) * sw, srcH = (v1e - v0e) * sh;
+            ctx.setTransform(dx / srcW * dpr, dy / srcW * dpr, ex / srcH * dpr, ey / srcH * dpr, p00[0] * dpr, p00[1] * dpr), ctx.drawImage(item.buf.img, u0e * sw, v0e * sh, srcW, srcH, 0, 0, srcW, srcH), ctx.restore();
+          }
+        if (this.hlAddr) {
+          let hl = this.layers.find((l2) => l2.addr === this.hlAddr);
+          if (hl) {
+            let d = item.buf.depth, hp = [this.project(hl.x, hl.y, d), this.project(hl.x + hl.w, hl.y, d), this.project(hl.x + hl.w, hl.y + hl.h, d), this.project(hl.x, hl.y + hl.h, d)];
+            if (hp.every(Boolean)) {
+              let [h0, h1, h2, h3] = hp;
+              ctx.beginPath(), ctx.moveTo(h0[0], h0[1]), ctx.lineTo(h1[0], h1[1]), ctx.lineTo(h2[0], h2[1]), ctx.lineTo(h3[0], h3[1]), ctx.closePath(), ctx.fillStyle = "rgba(137, 180, 250, 0.18)", ctx.fill(), ctx.setLineDash([4, 3]), ctx.strokeStyle = "rgba(137, 180, 250, 0.6)", ctx.lineWidth = 1.5, ctx.stroke(), ctx.setLineDash([]);
+            }
+          }
+        }
+        return;
+      }
+      let l = item.layer, isHl = l.addr === this.hlAddr;
+      ctx.beginPath(), ctx.moveTo(q[0][0], q[0][1]);
+      for (let i = 1;i < 4; i++)
+        ctx.lineTo(q[i][0], q[i][1]);
+      ctx.closePath(), ctx.fillStyle = isHl ? "rgba(137, 180, 250, 0.25)" : "rgba(137, 180, 250, 0.06)", ctx.fill(), ctx.strokeStyle = isHl ? "rgba(137, 180, 250, 0.9)" : l.borderColor, ctx.lineWidth = isHl ? 2 : 1, ctx.stroke();
+    });
+  }
+  startLoop() {
+    let tick = () => {
+      if (this.dirty)
+        this.dirty = !1, this.resizeCanvas(), this.render();
+      this.rafId = requestAnimationFrame(tick);
+    };
+    this.rafId = requestAnimationFrame(tick);
+  }
+  resizeCanvas() {
+    let rect = this.canvas.parentElement.getBoundingClientRect(), dpr = window.devicePixelRatio || 1, w = Math.round(rect.width * dpr), h = Math.round(rect.height * dpr);
+    if (this.canvas.width !== w || this.canvas.height !== h)
+      this.canvas.width = w, this.canvas.height = h, this.canvas.style.width = rect.width + "px", this.canvas.style.height = rect.height + "px", this.ctx.scale(dpr, dpr);
+  }
+  destroy() {
+    if (this.rafId)
+      cancelAnimationFrame(this.rafId);
+  }
+}
+
+// src/builders/scene-3d.ui.ts
+function flattenLayers(trees) {
+  let layers = [], screenNames = [], screenMaxLocal = {}, globalOffset = 0, sIdx = 0;
+  return trees.forEach((t) => (t.screens || []).forEach((s) => {
+    let idx = sIdx++;
+    screenNames.push(s.layer_name || s.class_name || "screen_" + idx);
+    let maxLocal = 0;
+    function walk(obj, ld) {
+      let c = obj.coords || { x1: 0, y1: 0, x2: 0, y2: 0 };
+      layers.push({
+        addr: obj.addr,
+        class_name: obj.class_name || "obj",
+        x1: c.x1 || 0,
+        y1: c.y1 || 0,
+        x2: c.x2 || 0,
+        y2: c.y2 || 0,
+        depth: globalOffset + ld,
+        localDepth: ld,
+        child_count: obj.child_count || 0,
+        style_count: obj.style_count || 0,
+        screenIdx: idx
+      }), maxLocal = Math.max(maxLocal, ld), obj.children?.forEach((ch) => walk(ch, ld + 1));
+    }
+    walk(s, 0), screenMaxLocal[idx] = maxLocal, globalOffset += maxLocal + C.SCREEN_GAP;
+  })), { layers, screenNames, screenMaxLocal };
+}
+function resolveCSSColor(cssVar) {
+  if (!cssVar.startsWith("var("))
+    return cssVar;
+  let name = cssVar.slice(4, -1);
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#89b4fa";
+}
+function build3DScene(container, trees, displays, dispObjs) {
+  let { layers, screenNames, screenMaxLocal } = flattenLayers(trees);
+  if (!layers.length) {
+    container.appendChild(el("p", "empty", "No objects."));
+    return;
+  }
+  let alive = !0, maxX = 0, maxY = 0, maxDepth = 0;
+  displays.forEach((d) => {
+    maxX = Math.max(maxX, d.hor_res || 0), maxY = Math.max(maxY, d.ver_res || 0);
+  }), layers.forEach((l) => {
+    maxDepth = Math.max(maxDepth, l.depth);
+  });
+  let sceneW = maxX || 1, sceneH = maxY || 1, bufImages = [];
+  displays.forEach((d) => {
+    [d.buf_1, d.buf_2].forEach((b, i) => {
+      if (!b?.image_base64)
+        return;
+      let img = new Image;
+      img.src = "data:image/png;base64," + b.image_base64, bufImages.push({ img, label: "Buf" + (i + 1), base64: b.image_base64 });
+    });
+  });
+  let cam = {
+    rotX: C.DEFAULT_ROT_X,
+    rotY: C.DEFAULT_ROT_Y,
+    zoom: 1,
+    panX: 0,
+    panY: 0,
+    persp: 1
+  }, makeToggle = (label, on) => {
+    let btn = el("button", "scene-toggle-btn" + (on ? " active" : ""), label);
+    return btn.dataset.on = on ? "1" : "0", btn.onclick = () => {
+      let v = btn.dataset.on === "1";
+      btn.dataset.on = v ? "0" : "1", btn.classList.toggle("active", !v);
+    }, btn;
+  }, controls = el("div", "scene-controls"), toggle3d = makeToggle("3D", !0), toggleBorders = makeToggle("Borders", !0), bufToggles = [], toggleOrtho = makeToggle("Ortho", !1);
+  controls.append(toggle3d, toggleBorders), bufImages.forEach((bi) => {
+    let btn = makeToggle(bi.label, !0), thumb = (() => {
+      let _e = document.createElement("img");
+      return _e.setAttribute("draggable", "false"), _e.setAttribute("style", "height:1.2em;border-radius:2px;vertical-align:middle;image-rendering:pixelated"), _e;
+    })();
+    thumb.src = "data:image/png;base64," + bi.base64, btn.appendChild(thumb), bufToggles.push(btn), controls.appendChild(btn);
+  }), controls.appendChild(toggleOrtho);
+  let defaultSpread = maxDepth > 0 ? Math.round(300 / maxDepth) : 30, spreadMax = Math.max(500, defaultSpread * 5), spreadSlider = (() => {
+    let _e = document.createElement("input");
+    return _e.setAttribute("type", "range"), _e.setAttribute("min", "0"), _e.setAttribute("max", `${spreadMax}`), _e.setAttribute("value", `${defaultSpread}`), _e.setAttribute("class", "scene-slider"), _e;
+  })();
+  controls.appendChild(el("label", "scene-label", "Z Spread")), controls.appendChild(spreadSlider);
+  let depthRange = { min: 0, max: maxDepth }, depthMinSlider = (() => {
+    let _e = document.createElement("input");
+    return _e.setAttribute("type", "range"), _e.setAttribute("min", "0"), _e.setAttribute("max", `${maxDepth}`), _e.setAttribute("value", "0"), _e.setAttribute("class", "scene-slider"), _e;
+  })(), depthMaxSlider = (() => {
+    let _e = document.createElement("input");
+    return _e.setAttribute("type", "range"), _e.setAttribute("min", "0"), _e.setAttribute("max", `${maxDepth}`), _e.setAttribute("value", `${maxDepth}`), _e.setAttribute("class", "scene-slider"), _e;
+  })();
+  controls.appendChild(el("label", "scene-label", "Depth")), controls.appendChild(depthMinSlider), controls.appendChild(depthMaxSlider);
+  let resetBtn = el("button", "scene-reset-btn", "Reset"), spacer = el("span", "scene-spacer"), fsBtn = el("button", "scene-fullscreen-btn", "⛶");
+  fsBtn.title = "Fullscreen", fsBtn.onclick = () => {
+    if (document.fullscreenElement)
+      document.exitFullscreen();
+    else
+      container.requestFullscreen();
+  }, controls.append(resetBtn, spacer);
+  let inScreensaver = !1;
+  controls.appendChild(fsBtn), container.appendChild(controls);
+  let layerVisible = [], layerBtns = [];
+  if (screenNames.length > 0) {
+    let bar = el("div", "scene-layer-bar");
+    screenNames.forEach((name, i) => {
+      let on = name === "act_scr" || screenNames.length === 1;
+      layerVisible.push(on);
+      let btn = el("button", "scene-layer-btn" + (on ? " active" : ""), name);
+      btn.style.borderBottomColor = DEPTH_COLORS[i % DEPTH_COLORS.length], btn.onclick = () => {
+        layerVisible[i] = !layerVisible[i], btn.classList.toggle("active", layerVisible[i]), updateDepthSliderRange(), updateVisibility();
+      }, btn.ondblclick = (e) => {
+        if (e.preventDefault(), layerVisible.every((v, j) => j === i ? v : !v))
+          layerVisible.fill(!0);
+        else
+          layerVisible.fill(!1), layerVisible[i] = !0;
+        layerBtns.forEach((b, j) => b.classList.toggle("active", layerVisible[j])), updateDepthSliderRange(), updateVisibility();
+      }, layerBtns.push(btn), bar.appendChild(btn);
+    }), container.appendChild(bar);
+  }
+  let tooltip = el("div", "scene-tooltip");
+  container.appendChild(tooltip);
+  let viewport = el("div", "scene-viewport"), canvas = (() => {
+    let _e = document.createElement("canvas");
+    return _e.setAttribute("class", "scene-canvas"), _e;
+  })();
+  viewport.appendChild(canvas);
+  let S = C.VC_FACE / 2, vcItems = [
+    ...[
+      [`translateZ(${S}px)`, 0, 0, "Front"],
+      [`rotateY(180deg) translateZ(${S}px)`, 0, 180, "Back"],
+      [`rotateY(90deg) translateZ(${S}px)`, 0, -90, "Right"],
+      [`rotateY(-90deg) translateZ(${S}px)`, 0, 90, "Left"],
+      [`rotateX(90deg) translateZ(${S}px)`, -90, 0, "Top"],
+      [`rotateX(-90deg) translateZ(${S}px)`, 90, 0, "Bot"]
+    ].map(([t, rx, ry, l]) => ({ transform: t, preset: { rotX: rx, rotY: ry }, w: C.VC_FACE, h: C.VC_FACE, label: l, cls: "vc-face" })),
+    ...[
+      [`translateY(-${S}px) translateZ(${S}px)`, -45, 0, C.VC_FACE, C.VC_EDGE],
+      [`translateY(${S}px) translateZ(${S}px)`, 45, 0, C.VC_FACE, C.VC_EDGE],
+      [`translateX(-${S}px) translateZ(${S}px)`, 0, 45, C.VC_EDGE, C.VC_FACE],
+      [`translateX(${S}px) translateZ(${S}px)`, 0, -45, C.VC_EDGE, C.VC_FACE],
+      [`translateY(-${S}px) translateZ(-${S}px) rotateY(180deg)`, -45, 180, C.VC_FACE, C.VC_EDGE],
+      [`translateY(${S}px) translateZ(-${S}px) rotateY(180deg)`, 45, 180, C.VC_FACE, C.VC_EDGE],
+      [`translateX(-${S}px) translateZ(-${S}px) rotateY(180deg)`, 0, 135, C.VC_EDGE, C.VC_FACE],
+      [`translateX(${S}px) translateZ(-${S}px) rotateY(180deg)`, 0, -135, C.VC_EDGE, C.VC_FACE],
+      [`translateX(-${S}px) translateY(-${S}px) rotateY(90deg)`, -45, 90, C.VC_FACE, C.VC_EDGE],
+      [`translateX(${S}px) translateY(-${S}px) rotateY(90deg)`, -45, -90, C.VC_FACE, C.VC_EDGE],
+      [`translateX(-${S}px) translateY(${S}px) rotateY(90deg)`, 45, 90, C.VC_FACE, C.VC_EDGE],
+      [`translateX(${S}px) translateY(${S}px) rotateY(90deg)`, 45, -90, C.VC_FACE, C.VC_EDGE]
+    ].map(([t, rx, ry, w, h]) => ({ transform: t, preset: { rotX: rx, rotY: ry }, w, h, cls: "vc-edge" })),
+    ...[[-1, -1, 1, 45], [1, -1, 1, -45], [-1, 1, 1, 45], [1, 1, 1, -45], [-1, -1, -1, 135], [1, -1, -1, -135], [-1, 1, -1, 135], [1, 1, -1, -135]].map(([sx, sy, sz, ry]) => ({ transform: `translate3d(${sx * S}px,${sy * S}px,${sz * S}px)`, preset: { rotX: sy * 45, rotY: ry }, w: C.VC_CORNER, h: C.VC_CORNER, cls: "vc-corner" }))
+  ], vcWrap = el("div", "viewcube-wrap");
+  vcWrap.style.cssText = `top:${C.VC_TOP}px;right:${C.VC_RIGHT}px;width:${C.VC_SIZE}px;height:${C.VC_SIZE}px`;
+  let vcCube = el("div", "viewcube"), C2 = C.VC_SIZE / 2;
+  for (let item of vcItems) {
+    let d = el("div", item.cls, item.label);
+    d.style.cssText = `transform:${item.transform};width:${item.w}px;height:${item.h}px;left:${(C.VC_SIZE - item.w) / 2}px;top:${(C.VC_SIZE - item.h) / 2}px`, d.onclick = () => animateTo({ rotX: item.preset.rotX, rotY: item.preset.rotY }), vcCube.appendChild(d);
+  }
+  vcWrap.appendChild(vcCube), viewport.appendChild(vcWrap);
+  function updateViewCube() {
+    vcCube.style.transform = `rotateX(${cam.rotX}deg) rotateY(${cam.rotY}deg)`;
+    let p = 250 + (1 - cam.persp) * 2000;
+    vcWrap.style.perspective = `${p}px`;
+  }
+  container.appendChild(viewport);
+  let renderer;
+  renderer = new Canvas2DRenderer(canvas, cam), renderer.setSceneSize(sceneW, sceneH);
+  let _origMarkDirty = renderer.markDirty.bind(renderer);
+  renderer.markDirty = () => {
+    _origMarkDirty(), updateViewCube();
+  }, updateViewCube();
+  let sceneLayers = layers.map((l) => ({
+    x: l.x1,
+    y: l.y1,
+    w: Math.max(2, l.x2 - l.x1),
+    h: Math.max(2, l.y2 - l.y1),
+    depth: 0,
+    borderColor: resolveCSSColor(DEPTH_COLORS[l.depth % DEPTH_COLORS.length]),
+    addr: l.addr,
+    info: l.class_name + "@" + (l.addr || "?") + " [" + l.x1 + "," + l.y1 + "," + l.x2 + "," + l.y2 + "] children=" + l.child_count + " styles=" + l.style_count,
+    screenIdx: l.screenIdx,
+    visible: !0
+  })), sceneBufs = bufImages.map((bi) => ({ img: bi.img, depth: 0, visible: !0 }));
+  sceneBufs.forEach((b) => renderer.addBuf(b)), renderer.setLayers(sceneLayers), onHL((addr) => renderer.setHighlight(addr)), onFocus((addr) => focusLayer(addr));
+  let currentSpread = 0;
+  function computeScreenOffsets() {
+    let o = {}, off = 0;
+    for (let i = 0;i < screenNames.length; i++)
+      if (layerVisible[i])
+        o[i] = off, off += (screenMaxLocal[i] || 0) + C.SCREEN_GAP;
+    return o;
+  }
+  function updateDepthSliderRange() {
+    let so = computeScreenOffsets(), visMax = 0;
+    layers.forEach((l) => {
+      if (so[l.screenIdx] !== void 0)
+        visMax = Math.max(visMax, so[l.screenIdx] + l.localDepth);
+    });
+    let prevMax = Number(depthMaxSlider.max);
+    if (depthMinSlider.max = String(visMax), depthMaxSlider.max = String(visMax), depthRange.max >= prevMax)
+      depthRange.max = visMax, depthMaxSlider.value = String(visMax);
+    else if (depthRange.max > visMax)
+      depthRange.max = visMax, depthMaxSlider.value = String(visMax);
+    if (depthRange.min > visMax)
+      depthRange.min = visMax, depthMinSlider.value = String(visMax);
+  }
+  function updateDepths(spreadOv, rangeOv) {
+    let bordersOn = toggleBorders.dataset.on === "1", range = rangeOv ?? depthRange, screenOffset = computeScreenOffsets();
+    currentSpread = spreadOv ?? (is3d ? Number(spreadSlider.value) : 0.1);
+    let compressedIdx = 0, compressedDepth = {}, seenDepths = /* @__PURE__ */ new Set;
+    layers.forEach((l) => {
+      let gd = screenOffset[l.screenIdx] !== void 0 ? screenOffset[l.screenIdx] + l.localDepth : -1;
+      if (gd >= Math.round(range.min) && gd <= Math.round(range.max) && !seenDepths.has(gd))
+        seenDepths.add(gd), compressedDepth[gd] = compressedIdx++;
+    }), layers.forEach((l, idx) => {
+      let sl = sceneLayers[idx], gd = screenOffset[l.screenIdx] !== void 0 ? screenOffset[l.screenIdx] + l.localDepth : -1, inRange = gd >= Math.round(range.min) && gd <= Math.round(range.max);
+      sl.visible = bordersOn && layerVisible[l.screenIdx] && inRange, sl.depth = (compressedDepth[gd] ?? 0) * currentSpread;
+    }), sceneBufs.forEach((b) => {
+      b.depth = -currentSpread * 0.5;
+    }), renderer.markDirty();
+  }
+  function updateVisibility() {
+    bufToggles.forEach((btn, i) => {
+      sceneBufs[i].visible = btn.dataset.on === "1";
+    }), updateDepths();
+  }
+  let is3d = !0, savedRotX = C.DEFAULT_ROT_X, savedRotY = C.DEFAULT_ROT_Y, animId = null;
+  function ease(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+  function animateTo(target, done) {
+    if (animId)
+      cancelAnimationFrame(animId), animId = null;
+    let t = { rotX: cam.rotX, rotY: cam.rotY, zoom: cam.zoom, panX: cam.panX, panY: cam.panY, spread: currentSpread, persp: cam.persp, depthMin: depthRange.min, depthMax: depthRange.max, ...target }, from = { rotX: cam.rotX, rotY: cam.rotY, zoom: cam.zoom, panX: cam.panX, panY: cam.panY, spread: currentSpread, persp: cam.persp, depthMin: depthRange.min, depthMax: depthRange.max }, t0 = performance.now(), lerp = (a, b, p) => a + (b - a) * p;
+    function tick(now) {
+      let p = ease(Math.min((now - t0) / C.ANIM_DURATION, 1));
+      if (cam.rotX = lerp(from.rotX, t.rotX, p), cam.rotY = lerp(from.rotY, t.rotY, p), cam.zoom = lerp(from.zoom, t.zoom, p), cam.panX = lerp(from.panX, t.panX, p), cam.panY = lerp(from.panY, t.panY, p), cam.persp = lerp(from.persp, t.persp, p), updateDepths(lerp(from.spread, t.spread, p), { min: lerp(from.depthMin, t.depthMin, p), max: lerp(from.depthMax, t.depthMax, p) }), now - t0 < C.ANIM_DURATION)
+        animId = requestAnimationFrame(tick);
+      else
+        animId = null, cam.rotX = t.rotX, cam.rotY = t.rotY, cam.zoom = t.zoom, cam.panX = t.panX, cam.panY = t.panY, cam.persp = t.persp, depthRange = { min: t.depthMin, max: t.depthMax }, depthMinSlider.value = String(Math.round(t.depthMin)), depthMaxSlider.value = String(Math.round(t.depthMax)), spreadSlider.value = String(t.spread), updateDepths(), done?.();
+    }
+    animId = requestAnimationFrame(tick);
+  }
+  let savedSpread = defaultSpread, savedDepthRange = { min: 0, max: maxDepth }, savedFocusCam = { rotX: 0, rotY: 0, panX: 0, panY: 0, persp: 1 }, focusedAddr = null;
+  function exitFocus() {
+    if (!focusedAddr)
+      return;
+    focusedAddr = null, animateTo({ ...savedFocusCam, depthMin: savedDepthRange.min, depthMax: savedDepthRange.max });
+  }
+  function focusLayer(addr) {
+    let l = layers.find((la) => la.addr === addr);
+    if (!l)
+      return;
+    if (focusedAddr === addr) {
+      exitFocus();
+      return;
+    }
+    if (!focusedAddr)
+      savedDepthRange = { ...depthRange }, savedFocusCam = { rotX: cam.rotX, rotY: cam.rotY, panX: cam.panX, panY: cam.panY, persp: cam.persp };
+    focusedAddr = addr;
+    let cx = l.x1 + (l.x2 - l.x1) / 2 - sceneW / 2, cy = l.y1 + (l.y2 - l.y1) / 2 - sceneH / 2, gd = (computeScreenOffsets()[l.screenIdx] ?? 0) + l.localDepth;
+    animateTo({ rotX: 0, rotY: 0, panX: -cx, panY: -cy, persp: 0, depthMin: gd, depthMax: gd });
+  }
+  let savedPersp = cam.persp;
+  function animateToggle(entering) {
+    if (!entering)
+      savedRotX = cam.rotX, savedRotY = cam.rotY, savedSpread = Number(spreadSlider.value) || defaultSpread, savedPersp = cam.persp;
+    animateTo({ rotX: entering ? savedRotX : 0, rotY: entering ? savedRotY : 0, spread: entering ? savedSpread : 0, persp: entering ? savedPersp : 0 }, () => {
+      spreadSlider.value = String(savedSpread);
+    });
+  }
+  updateDepthSliderRange(), updateDepths(), spreadSlider.oninput = () => updateDepths(), depthMinSlider.oninput = () => {
+    if (depthRange.min = Number(depthMinSlider.value), depthRange.min > depthRange.max)
+      depthRange.max = depthRange.min, depthMaxSlider.value = depthMinSlider.value;
+    updateDepths();
+  }, depthMaxSlider.oninput = () => {
+    if (depthRange.max = Number(depthMaxSlider.value), depthRange.max < depthRange.min)
+      depthRange.min = depthRange.max, depthMinSlider.value = depthMaxSlider.value;
+    updateDepths();
+  }, toggle3d.addEventListener("click", () => {
+    is3d = toggle3d.dataset.on === "1", spreadSlider.disabled = !is3d, animateToggle(is3d);
+  }), toggleOrtho.addEventListener("click", () => {
+    let ortho = toggleOrtho.dataset.on === "1";
+    animateTo({ persp: ortho ? 0 : 1 });
+  }), toggleBorders.addEventListener("click", () => updateVisibility()), bufToggles.forEach((btn) => btn.addEventListener("click", () => updateVisibility()));
+  let dragging = !1, lastX = 0, lastY = 0;
+  viewport.onmousedown = (e) => {
+    if (inScreensaver)
+      return;
+    if (e.button === 1 || e.button === 0 && e.shiftKey)
+      e.preventDefault(), dragging = "pan", lastX = e.clientX, lastY = e.clientY, viewport.style.cursor = "move";
+    else if (e.button === 0 && is3d)
+      dragging = "rotate", lastX = e.clientX, lastY = e.clientY, viewport.style.cursor = "grabbing";
+  };
+  let onMouseMove = (e) => {
+    if (!dragging) {
+      let rect = canvas.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      if (mx < 0 || my < 0 || mx > rect.width || my > rect.height)
+        return;
+      let hit = renderer.pick(mx, my);
+      if (hit) {
+        tooltip.textContent = hit.layer.info, tooltip.style.display = "block";
+        let cr = container.getBoundingClientRect();
+        if (tooltip.style.left = e.clientX - cr.left + 12 + "px", tooltip.style.top = e.clientY - cr.top - 8 + "px", renderer.setHighlight(hit.layer.addr), hit.layer.addr)
+          highlightObj(hit.layer.addr);
+      } else
+        tooltip.style.display = "none", renderer.setHighlight(null), clearHighlight();
+      return;
+    }
+    let dx = e.clientX - lastX, dy = e.clientY - lastY;
+    if (lastX = e.clientX, lastY = e.clientY, dragging === "rotate")
+      exitFocus(), cam.rotY += dx * C.ROTATION_SENSITIVITY, cam.rotX = Math.max(-90, Math.min(90, cam.rotX - dy * C.ROTATION_SENSITIVITY));
+    else
+      cam.panX += dx / cam.zoom, cam.panY += dy / cam.zoom;
+    renderer.markDirty();
+  }, onMouseUp = () => {
+    dragging = !1, viewport.style.cursor = "grab";
+  };
+  window.addEventListener("mousemove", onMouseMove), window.addEventListener("mouseup", onMouseUp), viewport.addEventListener("wheel", (e) => {
+    if (e.preventDefault(), inScreensaver)
+      return;
+    if (e.ctrlKey)
+      cam.zoom = Math.max(C.MIN_ZOOM, Math.min(C.MAX_ZOOM, cam.zoom * (1 - e.deltaY * C.ZOOM_SENSITIVITY)));
+    else
+      cam.panX -= e.deltaX / cam.zoom, cam.panY -= e.deltaY / cam.zoom;
+    renderer.markDirty();
+  }, { passive: !1 }), container.tabIndex = 0;
+  let keysDown = /* @__PURE__ */ new Set;
+  container.addEventListener("keydown", (e) => {
+    if (inScreensaver)
+      return;
+    if (e.key === "Shift") {
+      keysDown.add("shift");
+      return;
+    }
+    switch (e.key) {
+      case "ArrowUp":
+      case "ArrowDown":
+      case "ArrowLeft":
+      case "ArrowRight":
+      case "w":
+      case "W":
+      case "s":
+      case "S":
+      case "a":
+      case "A":
+      case "d":
+      case "D":
+      case "=":
+      case "+":
+      case "-":
+      case "_":
+      case "q":
+      case "Q":
+      case "e":
+      case "E":
+        e.preventDefault(), keysDown.add(e.key.toLowerCase());
+        return;
+      case "r":
+      case "R":
+        resetBtn.click();
+        return;
+      case " ":
+        e.preventDefault(), toggle3d.click();
+        return;
+      case "o":
+      case "O":
+        toggleOrtho.click();
+        return;
+      case "b":
+      case "B":
+        toggleBorders.click();
+        return;
+      default: {
+        let n = parseInt(e.key);
+        if (n >= 1 && n <= layerBtns.length)
+          layerBtns[n - 1].click();
+      }
+    }
+  }), container.addEventListener("keyup", (e) => keysDown.delete(e.key.toLowerCase())), container.addEventListener("blur", () => keysDown.clear());
+  let vel = { rotX: 0, rotY: 0, panX: 0, panY: 0, zoom: 0, spread: 0 };
+  function tickKeys() {
+    let s = keysDown.has("shift") ? 3 : 1;
+    if (keysDown.has("arrowup") || keysDown.has("arrowdown") || keysDown.has("arrowleft") || keysDown.has("arrowright"))
+      exitFocus();
+    let d = C.CAM_DIR;
+    if (keysDown.has("arrowup"))
+      vel.rotX -= C.KB_ACCEL * s * d;
+    if (keysDown.has("arrowdown"))
+      vel.rotX += C.KB_ACCEL * s * d;
+    if (keysDown.has("arrowleft"))
+      vel.rotY += C.KB_ACCEL * s * d;
+    if (keysDown.has("arrowright"))
+      vel.rotY -= C.KB_ACCEL * s * d;
+    if (keysDown.has("w"))
+      vel.panY += C.KB_PAN_ACCEL * s * d / cam.zoom;
+    if (keysDown.has("s"))
+      vel.panY -= C.KB_PAN_ACCEL * s * d / cam.zoom;
+    if (keysDown.has("a"))
+      vel.panX += C.KB_PAN_ACCEL * s * d / cam.zoom;
+    if (keysDown.has("d"))
+      vel.panX -= C.KB_PAN_ACCEL * s * d / cam.zoom;
+    if (keysDown.has("=") || keysDown.has("+"))
+      vel.zoom += C.KB_ZOOM_ACCEL * s;
+    if (keysDown.has("-") || keysDown.has("_"))
+      vel.zoom -= C.KB_ZOOM_ACCEL * s;
+    if (keysDown.has("e"))
+      vel.spread += C.KB_SPREAD_ACCEL * s;
+    if (keysDown.has("q"))
+      vel.spread -= C.KB_SPREAD_ACCEL * s;
+    if (cam.rotX = Math.max(-90, Math.min(90, cam.rotX + vel.rotX)), cam.rotY += vel.rotY, cam.panX += vel.panX, cam.panY += vel.panY, cam.zoom = Math.max(C.MIN_ZOOM, Math.min(C.MAX_ZOOM, cam.zoom * (1 + vel.zoom))), Math.abs(vel.spread) > 0.01) {
+      let nv = Math.max(0, Math.min(spreadMax, Number(spreadSlider.value) + vel.spread));
+      spreadSlider.value = String(nv), updateDepths();
+    }
+    if (vel.rotX *= C.KB_FRICTION, vel.rotY *= C.KB_FRICTION, vel.panX *= C.KB_PAN_FRICTION, vel.panY *= C.KB_PAN_FRICTION, vel.zoom *= C.KB_ZOOM_FRICTION, vel.spread *= C.KB_FRICTION, Math.abs(vel.rotX) + Math.abs(vel.rotY) + Math.abs(vel.panX) + Math.abs(vel.panY) + Math.abs(vel.zoom) + Math.abs(vel.spread) > 0.001 || keysDown.size > 0)
+      renderer.markDirty();
+  }
+  (function keyLoop() {
+    if (!alive)
+      return;
+    tickKeys(), requestAnimationFrame(keyLoop);
+  })();
+  let pickAt = (e) => {
+    let r = canvas.getBoundingClientRect();
+    return renderer.pick(e.clientX - r.left, e.clientY - r.top);
+  };
+  canvas.addEventListener("click", (e) => {
+    if (inScreensaver)
+      return;
+    let hit = pickAt(e);
+    if (hit?.layer.addr) {
+      selectObj(hit.layer.addr);
+      let el2 = document.getElementById("obj-" + hit.layer.addr);
+      if (el2) {
+        let p = el2.parentElement;
+        while (p) {
+          if (p.tagName === "DETAILS")
+            p.open = !0;
+          p = p.parentElement;
+        }
+        el2.open = !0, el2.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+  }), canvas.addEventListener("dblclick", (e) => {
+    if (inScreensaver)
+      return;
+    let hit = pickAt(e);
+    if (hit?.layer.addr)
+      focusLayer(hit.layer.addr);
+  });
+  let setToggle = (btn, on) => {
+    btn.dataset.on = on ? "1" : "0", btn.classList.toggle("active", on);
+  };
+  return resetBtn.onclick = () => {
+    is3d = !0, setToggle(toggle3d, !0), setToggle(toggleBorders, !0), setToggle(toggleOrtho, !1), bufToggles.forEach((btn) => setToggle(btn, !0)), screenNames.forEach((name, i) => {
+      layerVisible[i] = name === "act_scr" || screenNames.length === 1;
+    }), layerBtns.forEach((b, i) => b.classList.toggle("active", layerVisible[i])), spreadSlider.disabled = !1, focusedAddr = null, updateDepthSliderRange(), updateVisibility();
+    let visMax = Number(depthMaxSlider.max);
+    animateTo({ rotX: C.DEFAULT_ROT_X, rotY: C.DEFAULT_ROT_Y, zoom: 1, panX: 0, panY: 0, spread: defaultSpread, persp: 1, depthMin: 0, depthMax: visMax });
+  }, () => {
+    if (alive = !1, animId)
+      cancelAnimationFrame(animId);
+    renderer.destroy(), window.removeEventListener("mousemove", onMouseMove), window.removeEventListener("mouseup", onMouseUp);
+  };
+}
+
+// src/builders/display.ui.ts
+function buildDisplayAndTrees(data) {
+  let displays = data.displays || [], trees = data.object_trees || [], objCount = countObjects(trees), { panel, body } = makePanel("panel-disp-trees", "\uD83D\uDDA5", "Displays & Objects", displays.length + " disp / " + objCount + " obj");
+  if (!displays.length && !trees.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  let entries = displays.map((d, i) => {
+    let tree = trees.find((t) => t.display_addr === d.addr) || { display_addr: d.addr, screens: [] }, objs = [];
+    function walk(obj) {
+      let c = obj.coords || { x1: 0, y1: 0, x2: 0, y2: 0 };
+      objs.push({ addr: obj.addr, x1: c.x1 || 0, y1: c.y1 || 0, x2: c.x2 || 0, y2: c.y2 || 0 }), obj.children?.forEach(walk);
+    }
+    return tree.screens.forEach(walk), { disp: d, tree, dispObjs: { [d.addr]: objs }, idx: i };
+  }), tabBar = el("div", "disp-tab-bar"), contentArea = el("div", "disp-content-area"), tabBtns = [], detailPanel = null, cleanupScene;
+  function showDisplay(idx) {
+    if (tabBtns.forEach((b, j) => b.classList.toggle("active", j === idx)), cleanupScene)
+      cleanupScene();
+    resetHL(), contentArea.innerHTML = "", Object.keys(objDataMap).forEach((k) => delete objDataMap[k]);
+    let entry = entries[idx], d = entry.disp, chip = (() => {
+      let _e = document.createElement("div");
+      _e.setAttribute("class", "disp-chip");
+      let _e1 = document.createElement("span");
+      _e1.setAttribute("class", "disp-addr"), _e1.append(d.addr || "");
+      let _e2 = document.createElement("span");
+      _e2.setAttribute("class", "disp-res"), _e2.append(d.hor_res + " × " + d.ver_res);
+      let _e3 = document.createElement("span");
+      return _e3.setAttribute("class", "disp-screens"), _e3.append(d.screen_count + " screens"), _e.append(_e1, _e2, _e3), _e;
+    })();
+    [d.buf_1, d.buf_2].forEach((b, i) => {
+      if (!b)
+        return;
+      chip.appendChild(badge("buf " + (i + 1) + " " + b.width + "×" + b.height + " " + b.color_format, "blue"));
+    });
+    let infoBar = el("div", "disp-info-bar");
+    infoBar.appendChild(chip), contentArea.appendChild(infoBar);
+    let treeView = el("div", "obj-tree-view");
+    treeView.appendChild(el("div", "obj-tree-header", "\uD83C\uDF33 " + entry.dispObjs[d.addr].length + " objects")), entry.tree.screens.forEach((s) => treeView.appendChild(renderObjTree(s)));
+    let view3d = el("div", "obj-3d-view");
+    cleanupScene = build3DScene(view3d, [entry.tree], [d], entry.dispObjs), detailPanel = (() => {
+      let _e = document.createElement("div");
+      _e.setAttribute("class", "obj-detail-view");
+      let _e1 = document.createElement("p");
+      return _e1.setAttribute("class", "empty"), _e1.append("Select an object to inspect."), _e.append(_e1), _e;
+    })();
+    let split = (() => {
+      let _e = document.createElement("div");
+      return _e.setAttribute("class", "obj-split"), _e;
+    })();
+    split.append(treeView, view3d, detailPanel), contentArea.appendChild(split);
+  }
+  if (selectedAddr.sub(() => {
+    if (selectedAddr.val && detailPanel)
+      renderObjDetail(selectedAddr.val, detailPanel);
+  }), entries.forEach((entry, i) => {
+    let d = entry.disp, btn = el("button", "disp-tab-btn");
+    [d.buf_1, d.buf_2].forEach((b) => {
+      if (!b?.image_base64)
+        return;
+      let thumb = (() => {
+        let _e = document.createElement("img");
+        return _e.setAttribute("class", "disp-tab-thumb"), _e.setAttribute("draggable", "false"), _e;
+      })();
+      thumb.src = "data:image/png;base64," + b.image_base64, btn.appendChild(thumb);
+    }), btn.appendChild(document.createTextNode(d.hor_res + "×" + d.ver_res)), btn.addEventListener("click", () => showDisplay(i)), tabBtns.push(btn), tabBar.appendChild(btn);
+  }), body.appendChild(tabBar), body.appendChild(contentArea), entries.length > 0)
+    showDisplay(0);
+  return panel;
+}
+
+// src/builders/sections.ui.ts
+function buildSimpleTable(data, key, cls, icon, title, headers, prefix) {
+  let items = data[key] || [], { panel, body } = makePanel(cls, icon, title, items.length);
+  return body.appendChild(makeTable(headers, items, prefix)), panel;
+}
+function buildAnimations(data) {
+  let items = data.animations || [], { panel, body } = makePanel("panel-animations", "\uD83C\uDFAC", "Animations", items.length);
+  if (!items.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  return items.forEach((a) => {
+    let statusColor = a.status === "paused" ? "yellow" : a.status === "reverse" ? "mauve" : "green", range = a.end_value - a.start_value, ratio = range !== 0 ? (a.current_value - a.start_value) / range : 0;
+    body.appendChild(buildCard(a, {
+      cardClass: "anim-card",
+      anchorPrefix: "anim",
+      badges: [{ text: a.status || "running", color: statusColor }],
+      content: (info) => {
+        info.appendChild(kvPair("callback", a.exec_cb || "-")), info.appendChild(kvPair("duration", a.duration + "ms"));
+        let valRow = (() => {
+          let _e = document.createElement("div");
+          _e.setAttribute("class", "anim-value-row");
+          let _e1 = document.createElement("span");
+          _e1.setAttribute("class", "anim-val-label"), _e1.append(String(a.start_value));
+          let _e2 = document.createElement("span");
+          return _e2.setAttribute("class", "anim-val-label"), _e2.append(String(a.end_value)), _e.append(_e1, _e2), _e;
+        })();
+        valRow.insertBefore(progressBar(ratio, "blue"), valRow.lastChild), info.appendChild(valRow), info.appendChild(el("div", "anim-cur-val", "current: " + a.current_value + "  (" + Math.round(ratio * 100) + "%)")), info.appendChild(kvPair("repeat", a.repeat_cnt === C.INFINITE_REPEAT ? "∞" : String(a.repeat_cnt))), info.appendChild(kvPair("act_time", a.act_time + "ms"));
+      }
+    }));
+  }), panel;
+}
+function buildTimers(data) {
+  let items = data.timers || [], { panel, body } = makePanel("panel-timers", "⏱", "Timers", items.length);
+  if (!items.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  return items.forEach((t) => {
+    body.appendChild(buildCard(t, {
+      cardClass: "timer-card",
+      anchorPrefix: "timer",
+      badges: [{ text: t.paused ? "paused" : "active", color: t.paused ? "yellow" : "green" }],
+      content: (info) => {
+        info.classList.add("timer-info-row"), info.appendChild(kvPair("callback", t.timer_cb || "-")), info.appendChild(kvPair("period", t.period + "ms")), info.appendChild(kvPair("frequency", t.frequency || "-")), info.appendChild(kvPair("repeat", t.repeat_count === -1 ? "∞" : String(t.repeat_count))), info.appendChild(kvPair("last_run", String(t.last_run)));
+      }
+    }));
+  }), panel;
+}
+function buildIndevs(data) {
+  let items = data.indevs || [], { panel, body } = makePanel("panel-indevs", "\uD83D\uDD79", "Input Devices", items.length);
+  if (!items.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  return items.forEach((d) => {
+    let card = buildCard(d, {
+      cardClass: "indev-card",
+      anchorPrefix: "indev",
+      badges: [{ text: d.enabled ? "enabled" : "disabled", color: d.enabled ? "green" : "red" }],
+      content: (info) => {
+        if (info.appendChild(kvPair("read_cb", d.read_cb || "-")), info.appendChild(kvPair("long_press", d.long_press_time + "ms")), info.appendChild(kvPair("scroll_limit", String(d.scroll_limit))), d.display_addr) {
+          let row = el("div", "kv-row");
+          row.appendChild(el("span", "kv-label", "display")), row.appendChild(xref(d.display_addr, "disp")), info.appendChild(row);
+        }
+        if (d.group_addr) {
+          let row = el("div", "kv-row");
+          row.appendChild(el("span", "kv-label", "group")), row.appendChild(xref(d.group_addr, "group")), info.appendChild(row);
+        }
+      }
+    }), hdr = card.querySelector(".indev-header"), addrSpan = hdr.firstChild;
+    hdr.insertBefore(el("span", "indev-type-name", d.type_name || "unknown"), addrSpan), hdr.insertBefore(el("span", "indev-type-icon", INDEV_ICONS[d.type_name] || "\uD83D\uDD79"), hdr.firstChild), body.appendChild(card);
+  }), panel;
+}
+function buildImageCache(data) {
+  let entries = data.image_cache || [], { panel, body } = makePanel("panel-img-cache", "\uD83D\uDDBC", "Image Cache", entries.length);
+  if (!entries.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  let grid = el("div", "cache-grid");
+  return entries.forEach((e) => {
+    let card = el("div", "cache-entry");
+    if (e.entry_addr)
+      card.id = "imgcache-" + e.entry_addr;
+    if (e.preview_base64) {
+      let img = document.createElement("img");
+      img.className = "cache-thumb", img.src = "data:image/png;base64," + e.preview_base64, img.alt = "preview", card.appendChild(img);
+    }
+    let info = (() => {
+      let _e = document.createElement("div");
+      _e.setAttribute("class", "cache-info");
+      let _e1 = document.createElement("div");
+      _e1.setAttribute("class", "cache-src"), _e1.append(e.src || "-");
+      let _e2 = document.createElement("div");
+      return _e2.setAttribute("class", "cache-meta-row"), _e.append(_e1, _e2), _e;
+    })();
+    if (info.querySelector(".cache-meta-row").append(badge(e.cf || "?", "blue"), el("span", "cache-size-label", e.size || ""), badge("rc=" + e.ref_count, "teal")), e.decoder_name)
+      info.appendChild(el("div", "cache-decoder-label", e.decoder_name));
+    card.appendChild(info), grid.appendChild(card);
+  }), body.appendChild(grid), panel;
+}
+function buildSubjects(data) {
+  let subjects = data.subjects || [], { panel, body } = makePanel("panel-subjects", "\uD83D\uDCE1", "Subjects", subjects.length);
+  if (!subjects.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  return subjects.forEach((s) => {
+    let card = el("div", "subject-card");
+    if (s.addr)
+      card.id = "subject-" + s.addr;
+    let hdr = (() => {
+      let _e = document.createElement("div");
+      _e.setAttribute("class", "subject-header");
+      let _e1 = document.createElement("span");
+      _e1.setAttribute("class", "subject-addr"), _e1.append(s.addr || "");
+      let _e2 = document.createElement("span");
+      return _e2.setAttribute("class", "subject-type"), _e2.append(s.type_name), _e.append(_e1, _e2), _e;
+    })();
+    if (hdr.appendChild(document.createTextNode("  " + (s.observers?.length || 0) + " observers")), card.appendChild(hdr), s.observers?.length) {
+      let t = document.createElement("table"), th = t.createTHead().insertRow();
+      ["addr", "cb", "target_addr", "for_obj"].forEach((h) => {
+        let c = document.createElement("th");
+        c.textContent = h, th.appendChild(c);
+      });
+      let tb = t.createTBody();
+      s.observers.forEach((o) => {
+        let r = tb.insertRow();
+        if (o.addr)
+          r.id = "observer-" + o.addr;
+        r.insertCell().textContent = o.addr || "-", r.insertCell().textContent = o.cb || "-", xrefCell(r.insertCell(), "target_addr", o.target_addr), r.insertCell().textContent = String(o.for_obj);
+      }), card.appendChild(t);
+    }
+    body.appendChild(card);
+  }), panel;
+}
+function buildGroups(data) {
+  let items = data.groups || [], { panel, body } = makePanel("panel-groups", "\uD83D\uDC65", "Groups", items.length);
+  if (!items.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  return items.forEach((g) => {
+    let badges = [{ text: g.obj_count + " objects", color: "blue" }];
+    if (g.frozen)
+      badges.push({ text: "frozen", color: "yellow" });
+    if (g.editing)
+      badges.push({ text: "editing", color: "peach" });
+    body.appendChild(buildCard(g, {
+      cardClass: "group-card",
+      anchorPrefix: "group",
+      badges,
+      content: (info) => {
+        if (info.appendChild(kvPair("wrap", String(g.wrap))), g.focused_addr) {
+          let row = el("div", "kv-row");
+          row.appendChild(el("span", "kv-label", "focused")), row.appendChild(xref(g.focused_addr, "obj")), info.appendChild(row);
+        }
+        if (g.member_addrs?.length) {
+          let mRow = el("div", "group-members");
+          mRow.appendChild(el("span", "kv-label", "members"));
+          let mList = el("div", "member-list");
+          g.member_addrs.forEach((a) => mList.appendChild(xref(a, "obj"))), mRow.appendChild(mList), info.appendChild(mRow);
+        }
+      }
+    }));
+  }), panel;
+}
+function buildDrawTasks(data) {
+  let items = data.draw_tasks || [], { panel, body } = makePanel("panel-draw-tasks", "\uD83D\uDCDD", "Draw Tasks", items.length);
+  if (!items.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  return items.forEach((t) => {
+    let stateColor = t.state_name === "ready" ? "green" : t.state_name === "queued" ? "yellow" : "mauve";
+    body.appendChild(buildCard(t, {
+      cardClass: "dtask-card",
+      anchorPrefix: "drawtask",
+      badges: [{ text: t.type_name || "?", color: "blue" }, { text: t.state_name || "?", color: stateColor }],
+      content: (info) => {
+        if (t.area)
+          info.appendChild(kvPair("area", "(" + t.area.x1 + "," + t.area.y1 + ") → (" + t.area.x2 + "," + t.area.y2 + ")")), info.appendChild(kvPair("size", t.area.x2 - t.area.x1 + " × " + (t.area.y2 - t.area.y1)));
+        if (info.appendChild(kvPair("opacity", String(t.opa))), t.preferred_draw_unit_id !== void 0)
+          info.appendChild(kvPair("unit_id", String(t.preferred_draw_unit_id)));
+      }
+    }));
+  }), panel;
+}
+function buildDrawUnits(data) {
+  let items = data.draw_units || [], { panel, body } = makePanel("panel-draw-units", "\uD83C\uDFA8", "Draw Units", items.length);
+  if (!items.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  let grid = el("div", "unit-grid");
+  return items.forEach((u) => {
+    let card = (() => {
+      let _e = document.createElement("div");
+      _e.setAttribute("class", "unit-card");
+      let _e1 = document.createElement("div");
+      _e1.setAttribute("class", "unit-name"), _e1.append(u.name || "(unnamed)");
+      let _e2 = document.createElement("div");
+      _e2.setAttribute("class", "unit-idx"), _e2.append("#" + u.idx);
+      let _e3 = document.createElement("div");
+      return _e3.setAttribute("class", "mono-addr"), _e3.append(u.addr), _e.append(_e1, _e2, _e3), _e;
+    })();
+    if (u.addr)
+      card.id = "drawunit-" + u.addr;
+    grid.appendChild(card);
+  }), body.appendChild(grid), panel;
+}
+function buildDecoders(data) {
+  let items = data.image_decoders || [], { panel, body } = makePanel("panel-decoders", "\uD83D\uDD13", "Decoders", items.length);
+  if (!items.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  let grid = el("div", "decoder-grid");
+  return items.forEach((d) => {
+    let card = (() => {
+      let _e = document.createElement("div");
+      _e.setAttribute("class", "decoder-card");
+      let _e1 = document.createElement("div");
+      _e1.setAttribute("class", "decoder-name"), _e1.append(d.name || "(unnamed)");
+      let _e2 = document.createElement("div");
+      _e2.setAttribute("class", "decoder-cbs");
+      let _e3 = document.createElement("div");
+      return _e3.setAttribute("class", "mono-addr"), _e3.append(d.addr), _e.append(_e1, _e2, _e3), _e;
+    })();
+    if (d.addr)
+      card.id = "decoder-" + d.addr;
+    let cbs = card.querySelector(".decoder-cbs");
+    if (d.info_cb && d.info_cb !== "-")
+      cbs.appendChild(badge("info", "blue"));
+    if (d.open_cb && d.open_cb !== "-")
+      cbs.appendChild(badge("open", "green"));
+    if (d.close_cb && d.close_cb !== "-")
+      cbs.appendChild(badge("close", "peach"));
+    grid.appendChild(card);
+  }), body.appendChild(grid), panel;
+}
+function buildFsDrivers(data) {
+  let items = data.fs_drivers || [], { panel, body } = makePanel("panel-fs-drivers", "\uD83D\uDCBE", "FS Drivers", items.length);
+  if (!items.length)
+    return body.appendChild(el("p", "empty", "No entries.")), panel;
+  let grid = el("div", "fs-grid");
+  return items.forEach((d) => {
+    let card = (() => {
+      let _e = document.createElement("div");
+      _e.setAttribute("class", "fs-card");
+      let _e1 = document.createElement("div");
+      _e1.setAttribute("class", "fs-letter"), _e1.append(d.letter + ":");
+      let _e2 = document.createElement("div");
+      _e2.setAttribute("class", "fs-driver-name"), _e2.append(d.driver_name || "(unnamed)");
+      let _e3 = document.createElement("div");
+      _e3.setAttribute("class", "fs-info");
+      let _e4 = document.createElement("div");
+      return _e4.setAttribute("class", "fs-cbs"), _e3.append(_e4), _e.append(_e1, _e2, _e3), _e;
+    })();
+    if (d.addr)
+      card.id = "fsdrv-" + d.addr;
+    let info = card.querySelector(".fs-info");
+    info.insertBefore(kvPair("cache", String(d.cache_size)), info.firstChild);
+    let cbs = card.querySelector(".fs-cbs");
+    if (d.open_cb && d.open_cb !== "-")
+      cbs.appendChild(badge("open", "green"));
+    if (d.read_cb && d.read_cb !== "-")
+      cbs.appendChild(badge("read", "blue"));
+    if (d.write_cb && d.write_cb !== "-")
+      cbs.appendChild(badge("write", "peach"));
+    if (d.close_cb && d.close_cb !== "-")
+      cbs.appendChild(badge("close", "mauve"));
+    grid.appendChild(card);
+  }), body.appendChild(grid), panel;
+}
+
+// src/components/ui-dashboard.ui.ts
+class UiDashboard extends BaseComponent {
+  static __style = "";
+  static __template = () => {
+    let _e = document.createElement("div");
+    return _e.setAttribute("class", "main"), _e.setAttribute("id", "bento-grid"), _e;
+  };
+  render() {
+    let grid = this.el;
+    dashData.sub(() => {
+      let data = dashData.val;
+      if (!data)
+        return;
+      grid.innerHTML = "";
+      let bento = el("div", "bento"), objCount = countObjects(data.object_trees || []);
+      STAT_DEFS.forEach((s) => {
+        let val = s.key === "_objects" ? objCount : data[s.key]?.length || 0;
+        bento.appendChild(makeStatPanel(s.icon, s.label, val, s.color, s.section));
+      }), bento.appendChild(buildDisplayAndTrees(data)), bento.appendChild(buildImageCache(data)), bento.appendChild(buildSimpleTable(data, "image_header_cache", "panel-hdr-cache", "\uD83D\uDCCB", "Header Cache", ["entry_addr", "src", "size", "cf", "ref_count", "src_type", "decoder_name"], "imghdr")), bento.appendChild(buildDecoders(data)), bento.appendChild(buildAnimations(data)), bento.appendChild(buildTimers(data)), bento.appendChild(buildIndevs(data)), bento.appendChild(buildGroups(data)), bento.appendChild(buildDrawUnits(data)), bento.appendChild(buildDrawTasks(data)), bento.appendChild(buildSubjects(data)), bento.appendChild(buildFsDrivers(data)), grid.appendChild(bento);
+    });
+  }
+}
+customElements.define("ui-dashboard", UiDashboard);
+
+// src/app.ts
+document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-03-27 20:04 GMT+8"}</span><span>·</span><span>${"14ea6ea"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
+</script>
+</body>
+</html>

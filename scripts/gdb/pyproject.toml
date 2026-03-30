@@ -1,6 +1,6 @@
 [project]
 name = "lvglgdb"
-version = "0.4.1"
+dynamic = ["version"]
 description = "LVGL GDB scripts"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -18,3 +18,6 @@ lvglgdb = ["cmds/dashboard/static/*"]
 Homepage = "https://lvgl.io"
 Documentation = "https://docs.lvgl.io/master/debugging/gdb_plugin.html"
 Repository = "https://github.com/lvgl/lvgl"
+
+[tool.setuptools.dynamic]
+version = {attr = "lvglgdb._version.__version__"}

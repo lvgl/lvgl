@@ -33,15 +33,5 @@ def _read_static(filename: str) -> str:
 
 def _build_html(json_content: str) -> str:
     """Build the complete HTML page with embedded or empty JSON."""
-    template = _read_static("template.html")
-    css = _read_static("style.css")
-    js = _read_static("dashboard.js")
-    # Deterministic single-replacement order: CSS → JS → JSON_DATA.
-    # Each placeholder is replaced exactly once (count=1) so that content
-    # injected in an earlier step cannot be mis-interpreted as a later placeholder.
-    return (
-        template
-        .replace("{{CSS}}", css, 1)
-        .replace("{{JS}}", js, 1)
-        .replace("{{JSON_DATA}}", json_content, 1)
-    )
+    html = _read_static("uinspy.html")
+    return html.replace("{{JSON_DATA}}", json_content, 1)
