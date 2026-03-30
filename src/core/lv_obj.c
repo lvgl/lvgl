@@ -455,14 +455,10 @@ void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(!obj->spec_attr) {
-        obj->spec_attr = lv_obj_spec_attr_create();
+    if(obj->spec_attr) {
+        return obj->spec_attr;
     }
-    return obj->spec_attr;
-}
 
-lv_obj_spec_attr_t * lv_obj_spec_attr_create(void)
-{
     lv_obj_spec_attr_t * spec_attr = lv_malloc_zeroed(sizeof(lv_obj_spec_attr_t));
     LV_ASSERT_MALLOC(spec_attr);
     if(!spec_attr) {
@@ -471,8 +467,10 @@ lv_obj_spec_attr_t * lv_obj_spec_attr_create(void)
 
     spec_attr->scroll_dir = LV_DIR_ALL;
     spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
+    obj->spec_attr = spec_attr;
     return spec_attr;
 }
+
 
 bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {

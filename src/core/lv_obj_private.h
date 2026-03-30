@@ -95,13 +95,9 @@ struct _lv_obj_t {
  **********************/
 
 /**
- * Create special data for an object.
- */
-lv_obj_spec_attr_t * lv_obj_spec_attr_create(void);
-
-/**
  * Allocate special data for an object if not allocated yet.
  * @param obj   pointer to an object
+ * @return the spec_attr created or NULL if something went wrong
  */
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj);
 
