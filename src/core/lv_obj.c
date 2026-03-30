@@ -95,12 +95,12 @@ static const lv_property_ops_t lv_obj_properties[] = {
     {
         .id = LV_PROPERTY_OBJ_X,
         .setter = lv_obj_set_x,
-        .getter = lv_obj_get_x,
+        .getter = lv_obj_get_x_aligned,
     },
     {
         .id = LV_PROPERTY_OBJ_Y,
         .setter = lv_obj_set_y,
-        .getter = lv_obj_get_y,
+        .getter = lv_obj_get_y_aligned,
     },
     {
         .id = LV_PROPERTY_OBJ_W,
