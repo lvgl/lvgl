@@ -536,7 +536,7 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index);
  * @param index         the index of the event to remove
  * @return              true: and event was removed; false: no event was removed
  */
-bool lv_display_delete_event(lv_display_t * disp, uint32_t index);
+bool lv_display_remove_event(lv_display_t * disp, uint32_t index);
 
 /**
  * Remove an event_cb with user_data

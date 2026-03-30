@@ -952,7 +952,7 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 
 }
 
-bool lv_display_delete_event(lv_display_t * disp, uint32_t index)
+bool lv_display_remove_event(lv_display_t * disp, uint32_t index)
 {
     LV_ASSERT_NULL(disp);
 
@@ -970,7 +970,7 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
     for(i = event_cnt - 1; i >= 0; i--) {
         lv_event_dsc_t * dsc = lv_display_get_event_dsc(disp, i);
         if(dsc && dsc->cb == event_cb && dsc->user_data == user_data) {
-            lv_display_delete_event(disp, i);
+            lv_display_remove_event(disp, i);
             removed_count ++;
         }
     }
