@@ -76,7 +76,7 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
     info_thin.render_mode = render_mode;
     info_thin.size = 24;
     info_thin.style = LV_FREETYPE_FONT_STYLE_ITALIC;
-    info_thin.weight = 100;
+    info_thin.weight = 300;
     lv_font_t * font_variable_thin = lv_freetype_font_create_with_info(&info_thin);
     TEST_ASSERT_NOT_NULL(font_variable_thin);
 
@@ -186,7 +186,7 @@ static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render
     lv_obj_t * label5 = lv_label_create(lv_screen_active());
     lv_obj_add_style(label5, &style_variable_thin, 0);
     lv_obj_set_width(label5, lv_obj_get_width(lv_screen_active()) - 20);
-    lv_label_set_text(label5, "Variable Font 100 Weight");
+    lv_label_set_text(label5, "Variable Font 300 Weight");
 
     lv_obj_t * label6 = lv_label_create(lv_screen_active());
     lv_obj_add_style(label6, &style_variable_thick, 0);
