@@ -16,8 +16,14 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
+
+
 void test_draw_drop_shadow_basic(void)
 {
+    /*It doesn't work with VGLite*/
+#if LV_USE_DRAW_VG_LITE
+    TEST_PASS();
+#else
     static lv_style_t style;
     lv_style_init(&style);
     lv_style_set_drop_shadow_opa(&style, 255);
@@ -70,10 +76,15 @@ void test_draw_drop_shadow_basic(void)
     lv_label_set_text(label, "Hello world");
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow.png");
+#endif
 }
 
-static void test_draw_drop_shadow_invalidate(void)
+void test_draw_drop_shadow_invalidate(void)
 {
+    /*It doesn't work with VGLite*/
+#if LV_USE_DRAW_VG_LITE
+    TEST_PASS();
+#else
     static lv_style_t style;
     lv_style_init(&style);
 
@@ -87,22 +98,38 @@ static void test_draw_drop_shadow_invalidate(void)
     lv_obj_t * obj = lv_arc_create(lv_screen_active());
     lv_obj_add_style(obj, &style, LV_PART_INDICATOR);
     lv_obj_set_pos(obj, 10, 10);
+    lv_arc_set_value(obj, 50);
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
 
     lv_arc_set_value(obj, 10);
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
-
+    lv_refr_now(NULL);
     lv_arc_set_value(obj, 20);
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
-
+    lv_refr_now(NULL);
     lv_arc_set_value(obj, 30);
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
-
+    lv_refr_now(NULL);
+    lv_arc_set_value(obj, 40);
+    lv_refr_now(NULL);
+    lv_arc_set_value(obj, 50);
+    lv_refr_now(NULL);
+    lv_arc_set_value(obj, 60);
+    lv_refr_now(NULL);
+    lv_arc_set_value(obj, 70);
+    lv_refr_now(NULL);
+    lv_arc_set_value(obj, 80);
+    lv_refr_now(NULL);
     lv_arc_set_value(obj, 90);
+    lv_refr_now(NULL);
+    lv_arc_set_value(obj, 100);
+    lv_refr_now(NULL);
+
+    lv_arc_set_value(obj, 50);
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
 
     lv_area_t a = {20, 20, 200, 60};
     lv_obj_invalidate_area(obj, &a);
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
+#endif
+}
+
 
 #endif

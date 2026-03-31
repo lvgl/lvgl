@@ -1656,7 +1656,6 @@ static bool has_blur(const lv_obj_t * obj)
         lv_state_t state_style = lv_obj_style_get_selector_state(obj->styles[i].selector);
         if((state_style & state_inv)) continue;
 
-        bool invalidation_needed = false;
         if((obj_style->style->has_group & group_blur) &&
            lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
             return true;
