@@ -241,7 +241,9 @@ static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_G2D)
         return LV_DRAW_UNIT_IDLE;
 
-    if(lv_draw_layer_alloc_buf(layer) == NULL)
+    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) return LV_DRAW_UNIT_IDLE;
+
+    if(lv_draw_layer_alloc_buf(layer, draw_unit) == NULL)
         return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;

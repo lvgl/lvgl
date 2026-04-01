@@ -396,8 +396,9 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 
     if((t->preferred_draw_unit_id != DRAW_UNIT_ID_DAVE2D)) return LV_DRAW_UNIT_IDLE;
     if(!lv_draw_dave2d_is_dest_cf_supported(layer->color_format)) return LV_DRAW_UNIT_IDLE;
+    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) return LV_DRAW_UNIT_IDLE;
 
-    void * buf = lv_draw_layer_alloc_buf(layer);
+    void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
     if(buf == NULL) return LV_DRAW_UNIT_IDLE;
 
     deps = lv_draw_get_dependent_count(t);

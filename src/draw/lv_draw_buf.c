@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_buf_private.h"
+#include "lv_draw_private.h"
 #include "../misc/lv_types.h"
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
@@ -307,6 +308,9 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
 
     new_buf->header.flags = draw_buf->header.flags;
     new_buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+#if LV_USE_DRAW_VRAM
+    new_buf->header.flags &= ~LV_IMAGE_FLAGS_VRAM_RESIDENT;
+#endif
 
     /*Choose the smaller size to copy*/
     uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);
@@ -349,6 +353,16 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
     LV_ASSERT_NULL(draw_buf);
     if(draw_buf == NULL) return;
     LV_PROFILER_DRAW_BEGIN;
+
+#if LV_USE_DRAW_VRAM
+    if(draw_buf->vram_res != NULL) {
+        lv_draw_unit_t * unit = draw_buf->vram_res->unit;
+        if(unit && unit->vram_free_cb) {
+            unit->vram_free_cb(unit, draw_buf);
+            /* vram_free_cb NULLs draw_buf->vram_res and clears the flag */
+        }
+    }
+#endif
 
     if(draw_buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
         LV_ASSERT_NULL(draw_buf->handlers);
@@ -525,6 +539,9 @@ lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * i
     }
 
     buf->header.flags = img->header.flags;
+#if LV_USE_DRAW_VRAM
+    buf->vram_res = img->vram_res;
+#endif
     return res;
 }
 
@@ -549,6 +566,141 @@ void lv_image_buf_free(lv_image_dsc_t * dsc)
         lv_free((void *)dsc);
     }
 }
+
+#if LV_USE_DRAW_VRAM
+bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
+{
+    LV_ASSERT_NULL(buf);
+    if(buf == NULL) return false;
+
+    bool has_cpu = (buf->data != NULL);
+    bool has_vram = (buf->vram_res != NULL);
+    bool unit_has_vram = (unit != NULL && unit->vram_alloc_cb != NULL);
+
+    /* Already resident on this unit */
+    if(has_vram && buf->vram_res->unit == unit) {
+        return true;
+    }
+
+    /* Buffer is in a different unit's VRAM */
+    if(has_vram) {
+        lv_draw_unit_t * old_unit = buf->vram_res->unit;
+
+        /* Download to CPU first if no CPU copy exists */
+        if(!has_cpu) {
+            uint32_t w = buf->header.w;
+            uint32_t h = buf->header.h;
+            lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
+            uint32_t stride = buf->header.stride;
+            if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+            uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+            void * data = draw_buf_malloc(buf->handlers ? buf->handlers : &default_handlers, size, cf);
+            if(data == NULL) {
+                LV_LOG_WARN("VRAM download: CPU alloc failed");
+                return false;
+            }
+
+            buf->unaligned_data = data;
+            buf->data = lv_draw_buf_align(data, cf);
+            buf->data_size = size;
+            buf->header.flags |= LV_IMAGE_FLAGS_ALLOCATED;
+
+            if(old_unit->vram_download_cb) {
+                if(!old_unit->vram_download_cb(old_unit, buf)) {
+                    draw_buf_free(buf->handlers ? buf->handlers : &default_handlers, data);
+                    buf->unaligned_data = NULL;
+                    buf->data = NULL;
+                    buf->data_size = 0;
+                    return false;
+                }
+            }
+            has_cpu = true;
+        }
+
+        /* Free old VRAM */
+        if(old_unit->vram_free_cb) {
+            old_unit->vram_free_cb(old_unit, buf);
+            /* vram_free_cb NULLs buf->vram_res and clears the flag */
+        }
+
+        /* Upload to new unit if it has VRAM */
+        if(unit_has_vram) {
+            if(!unit->vram_upload_cb(unit, buf)) return false;
+            /* Free CPU data after successful upload if LVGL owns it */
+            if((buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) && buf->unaligned_data != NULL) {
+                draw_buf_free(buf->handlers ? buf->handlers : &default_handlers, buf->unaligned_data);
+                buf->unaligned_data = NULL;
+                buf->data = NULL;
+                buf->data_size = 0;
+            }
+            return true;
+        }
+        return true;
+    }
+
+    /* CPU data only, no VRAM */
+    if(has_cpu) {
+        if(unit_has_vram) {
+            /* Read-only image descriptors (const lv_image_dsc_t in .rodata) cannot
+             * have vram_res written to them. When cast to lv_draw_buf_t, the
+             * handlers field (which maps to reserved_2 in lv_image_dsc_t) is NULL.
+             * Real lv_draw_buf_t objects always have handlers set.
+             * The draw unit handles const images via its own image cache.
+             * Return true — the CPU data is accessible for the draw unit to read. */
+            if(buf->handlers == NULL) {
+                return true;
+            }
+            if(!unit->vram_upload_cb(unit, buf)) return false;
+            /* Free CPU data after successful upload if LVGL owns it */
+            if((buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) && buf->unaligned_data != NULL) {
+                draw_buf_free(buf->handlers ? buf->handlers : &default_handlers, buf->unaligned_data);
+                buf->unaligned_data = NULL;
+                buf->data = NULL;
+                buf->data_size = 0;
+            }
+            return true;
+        }
+        /* Unit uses CPU, buffer is already in CPU. Done. */
+        return true;
+    }
+
+    /* No backing at all (lazy/header-only) */
+    if(unit_has_vram) {
+        if(!unit->vram_alloc_cb(unit, buf)) return false;
+    }
+    else {
+        /* Allocate CPU buffer */
+        uint32_t w = buf->header.w;
+        uint32_t h = buf->header.h;
+        lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
+        uint32_t stride = buf->header.stride;
+        if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+        uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+        const lv_draw_buf_handlers_t * handlers = buf->handlers ? buf->handlers : &default_handlers;
+        void * data = draw_buf_malloc(handlers, size, cf);
+        if(data == NULL) {
+            LV_LOG_WARN("Lazy alloc failed");
+            return false;
+        }
+
+        buf->unaligned_data = data;
+        buf->data = lv_draw_buf_align(data, cf);
+        buf->data_size = size;
+        buf->header.stride = stride;
+        buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+    }
+
+    /* Clear alpha-format buffers after allocation */
+    if(lv_color_format_has_alpha((lv_color_format_t)buf->header.cf)) {
+        if(buf->data != NULL) {
+            lv_draw_buf_clear(buf, NULL);
+        }
+    }
+    return true;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

@@ -277,7 +277,9 @@ static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_NEMA_GFX)
         return LV_DRAW_UNIT_IDLE;
 
-    void * buf = lv_draw_layer_alloc_buf(layer);
+    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) return LV_DRAW_UNIT_IDLE;
+
+    void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
     if(buf == NULL)
         return LV_DRAW_UNIT_IDLE;
 

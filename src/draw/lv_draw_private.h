@@ -180,6 +180,36 @@ struct _lv_draw_unit_t {
      * @param event pointer to the event descriptor
      */
     void (*event_cb)(lv_event_t * event);
+
+#if LV_USE_DRAW_VRAM
+    /**
+     * Allocate VRAM backing for a draw buffer.
+     * The draw unit allocates its extended vram_res struct and the VRAM,
+     * then sets buf->vram_res and the LV_IMAGE_FLAGS_VRAM_RESIDENT flag.
+     * @return true on success
+     */
+    bool (*vram_alloc_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
+
+    /**
+     * Free VRAM backing. The draw unit frees its VRAM and extended vram_res,
+     * NULLs buf->vram_res, and clears LV_IMAGE_FLAGS_VRAM_RESIDENT.
+     */
+    void (*vram_free_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
+
+    /**
+     * Upload CPU pixel data to VRAM. The draw unit allocates VRAM,
+     * copies/converts data from buf->data, sets buf->vram_res and the
+     * LV_IMAGE_FLAGS_VRAM_RESIDENT flag. @return true on success
+     */
+    bool (*vram_upload_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
+
+    /**
+     * Download VRAM data to CPU memory. LVGL allocates buf->data first.
+     * The draw unit reads back VRAM into buf->data.
+     * @return true on success
+     */
+    bool (*vram_download_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
+#endif
 };
 
 typedef struct {

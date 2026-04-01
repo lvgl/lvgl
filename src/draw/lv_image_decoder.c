@@ -370,10 +370,18 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
 
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
+#if LV_USE_DRAW_VRAM
+        /* VRAM-resident buffers have data==NULL but valid headers */
+        if(img_dsc->data == NULL && !(img_dsc->header.flags & LV_IMAGE_FLAGS_VRAM_RESIDENT)) {
+            LV_PROFILER_DECODER_END;
+            return NULL;
+        }
+#else
         if(img_dsc->data == NULL) {
             LV_PROFILER_DECODER_END;
             return NULL;
         }
+#endif
     }
 
     if(src_type == LV_IMAGE_SRC_FILE) LV_LOG_TRACE("Try to find decoder for %s", (const char *)src);

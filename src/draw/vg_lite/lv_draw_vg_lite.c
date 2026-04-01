@@ -209,12 +209,14 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
     }
 
+    if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) return LV_DRAW_UNIT_IDLE;
+
     /* Return if target buffer format is not supported. */
     if(!lv_vg_lite_is_dest_cf_supported(layer->color_format)) {
         return LV_DRAW_UNIT_IDLE;
     }
 
-    void * buf = lv_draw_layer_alloc_buf(layer);
+    void * buf = lv_draw_layer_alloc_buf(layer, draw_unit);
     if(!buf) {
         return LV_DRAW_UNIT_IDLE;
     }

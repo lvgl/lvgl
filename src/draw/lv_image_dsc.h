@@ -66,6 +66,12 @@ typedef enum _lvimage_flags_t {
     LV_IMAGE_FLAGS_CUSTOM_DRAW      = 0x0040,
 
     /**
+     * The buffer has VRAM backing managed by a draw unit.
+     * Only meaningful when LV_USE_DRAW_VRAM is enabled.
+     */
+    LV_IMAGE_FLAGS_VRAM_RESIDENT    = 0x0080,
+
+    /**
      * Flags reserved for user, lvgl won't use these bits.
      */
     LV_IMAGE_FLAGS_USER1            = 0x0100,
@@ -125,6 +131,10 @@ typedef union {
     } semi_planar;              /**< planar format with 2 plane*/
 } lv_yuv_buf_t;
 
+#if LV_USE_DRAW_VRAM
+struct _lv_draw_buf_vram_res_t;
+#endif
+
 /**
  * Struct to describe a constant image resource.
  * It's similar to lv_draw_buf_t, but the data is constant.
@@ -134,6 +144,9 @@ typedef struct {
     uint32_t data_size;         /**< Size of the image in bytes*/
     const uint8_t * data;       /**< Pointer to the data of the image*/
     const void * reserved;      /**< A reserved field to make it has same size as lv_draw_buf_t*/
+#if LV_USE_DRAW_VRAM
+    struct _lv_draw_buf_vram_res_t * vram_res; /**< VRAM residency descriptor, NULL if CPU-only */
+#endif
     const void * reserved_2;    /**< A reserved field to make it has same size as lv_draw_buf_t*/
 } lv_image_dsc_t;
 

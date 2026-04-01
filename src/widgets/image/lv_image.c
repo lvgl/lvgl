@@ -205,7 +205,12 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         if(header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
             lv_draw_buf_t * buf = (lv_draw_buf_t *)src;
+#if LV_USE_DRAW_VRAM
+            /* VRAM-resident buffers have unaligned_data==NULL after CPU data is freed */
+            if(!buf->handlers || (!(header.flags & LV_IMAGE_FLAGS_VRAM_RESIDENT) && !buf->unaligned_data)) {
+#else
             if(!buf->unaligned_data || !buf->handlers) {
+#endif
                 LV_LOG_ERROR("Invalid draw buffer, unaligned_data: %p, handlers: %p",
                              buf->unaligned_data, (void *)buf->handlers);
                 return;

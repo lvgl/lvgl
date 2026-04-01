@@ -116,6 +116,10 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_draw_buf_t * draw_buf = canvas->draw_buf;
 
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_ensure_resident(draw_buf, NULL);
+#endif
+
     lv_color_format_t cf = draw_buf->header.cf;
     uint8_t * data = lv_draw_buf_goto_xy(draw_buf, x, y);
 
@@ -189,6 +193,10 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_ensure_resident(canvas->draw_buf, NULL);
+#endif
+
     lv_draw_buf_set_palette(canvas->draw_buf, index, color);
     lv_obj_invalidate(obj);
 }
@@ -212,6 +220,10 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
     lv_color32_t ret = { 0 };
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return ret;
+
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_ensure_resident(canvas->draw_buf, NULL);
+#endif
 
     lv_image_header_t * header = &canvas->draw_buf->header;
     const uint8_t * px = lv_draw_buf_goto_xy(canvas->draw_buf, x, y);
@@ -271,8 +283,12 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    if(canvas->draw_buf)
+    if(canvas->draw_buf) {
+#if LV_USE_DRAW_VRAM
+        lv_draw_buf_ensure_resident(canvas->draw_buf, NULL);
+#endif
         return canvas->draw_buf->unaligned_data;
+    }
 
     return NULL;
 }
@@ -290,6 +306,11 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_ensure_resident(canvas->draw_buf, NULL);
+    lv_draw_buf_ensure_resident(dest_buf, NULL);
+#endif
+
     LV_ASSERT_MSG(canvas->draw_buf->header.cf == dest_buf->header.cf, "Color formats must be the same");
 
     lv_draw_buf_copy(canvas->draw_buf, canvas_area, dest_buf, dest_area);
@@ -302,6 +323,10 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_draw_buf_t * draw_buf = canvas->draw_buf;
     if(draw_buf == NULL) return;
+
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_ensure_resident(draw_buf, NULL);
+#endif
 
     lv_image_header_t * header = &draw_buf->header;
     uint32_t x;

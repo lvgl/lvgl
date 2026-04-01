@@ -64,7 +64,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     /* if not support blend normal, premultiply alpha */
     bool premultiply = !lv_vg_lite_support_blend_normal();
-    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache, premultiply)) {
+    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache, premultiply, t->draw_unit)) {
         LV_PROFILER_DRAW_END;
         return;
     }

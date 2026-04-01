@@ -1134,6 +1134,15 @@
     #endif
 #endif
 
+/* VRAM buffer residency support for hardware draw units. */
+#ifndef LV_USE_DRAW_VRAM
+    #ifdef CONFIG_LV_USE_DRAW_VRAM
+        #define LV_USE_DRAW_VRAM CONFIG_LV_USE_DRAW_VRAM
+    #else
+        #define LV_USE_DRAW_VRAM 0
+    #endif
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

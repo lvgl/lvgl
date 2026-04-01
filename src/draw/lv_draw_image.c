@@ -239,6 +239,10 @@ void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         return;
     }
 
+    if(decoder_dsc.decoded != NULL && t->draw_unit != NULL) {
+        lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit);
+    }
+
     img_decode_and_draw(t, draw_dsc, &decoder_dsc, NULL, coords, &clipped_img_area, draw_core_cb);
 
     lv_image_decoder_close(&decoder_dsc);
@@ -257,6 +261,10 @@ void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;
+    }
+
+    if(decoder_dsc.decoded != NULL && t->draw_unit != NULL) {
+        lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit);
     }
 
     int32_t img_w = draw_dsc->header.w;
