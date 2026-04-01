@@ -1219,6 +1219,24 @@ ui-topbar .topbar-search::placeholder {
 .detail-style-table td {
   padding: 1px 4px;
 }
+.detail-flags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 1);
+}
+.detail-flag-badge {
+  display: inline-block;
+  border-radius: 0.25rem;
+  background-color: var(--color-surface0);
+  padding-inline: calc(var(--spacing) * 1.5);
+  padding-block: 1px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-overlay1);
+  border: 1px solid var(--surface0);
+}
 .scene-controls {
   margin-bottom: calc(var(--spacing) * 1);
   display: flex;
@@ -2057,7 +2075,9 @@ function renderObjTree(obj, depth = 0) {
   if (det.className = "obj-node", obj.addr)
     det.id = "obj-" + obj.addr;
   let sum = document.createElement("summary");
-  if (sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]), sum.textContent = obj.class_name || "obj", det.appendChild(sum), obj.addr)
+  if (sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]), sum.textContent = obj.class_name || "obj", obj.flags_list?.includes("HIDDEN"))
+    sum.textContent += " \uD83D\uDC41‍\uD83D\uDDE8";
+  if (det.appendChild(sum), obj.addr)
     objDataMap[obj.addr] = obj, registerHL(obj.addr, det), sum.addEventListener("mouseenter", () => highlightObj(obj.addr)), sum.addEventListener("mouseleave", () => clearHighlight()), sum.addEventListener("click", (e) => {
       e.stopPropagation(), selectObj(obj.addr);
     }), sum.addEventListener("dblclick", (e) => {
@@ -2105,7 +2125,12 @@ function renderObjDetail(addr, panel) {
     let _e10 = document.createElement("span");
     return _e10.setAttribute("class", "detail-coord-val"), _e10.append(String(w), " × ", String(h)), _e8.append(_e9, _e10), _e2.append(_e3, _e8), _e.append(_e1, _e2), _e;
   })();
-  panel.appendChild(coordSec);
+  if (panel.appendChild(coordSec), obj.flags_list?.length) {
+    let flagSec = el("div", "detail-section");
+    flagSec.appendChild(el("div", "detail-section-title", "Flags"));
+    let wrap = el("div", "detail-flags-wrap");
+    obj.flags_list.forEach((f) => wrap.appendChild(el("span", "detail-flag-badge", f))), flagSec.appendChild(wrap), panel.appendChild(flagSec);
+  }
   let refSec = el("div", "detail-section");
   if (refSec.appendChild(el("div", "detail-section-title", "References")), obj.parent_addr) {
     let row = el("div", "kv-row");
@@ -2280,8 +2305,8 @@ function flattenLayers(trees) {
     let idx = sIdx++;
     screenNames.push(s.layer_name || s.class_name || "screen_" + idx);
     let maxLocal = 0;
-    function walk(obj, ld) {
-      let c = obj.coords || { x1: 0, y1: 0, x2: 0, y2: 0 };
+    function walk(obj, ld, parentHidden) {
+      let c = obj.coords || { x1: 0, y1: 0, x2: 0, y2: 0 }, hidden = parentHidden || (obj.flags_list?.includes("HIDDEN") ?? !1);
       layers.push({
         addr: obj.addr,
         class_name: obj.class_name || "obj",
@@ -2293,10 +2318,11 @@ function flattenLayers(trees) {
         localDepth: ld,
         child_count: obj.child_count || 0,
         style_count: obj.style_count || 0,
-        screenIdx: idx
-      }), maxLocal = Math.max(maxLocal, ld), obj.children?.forEach((ch) => walk(ch, ld + 1));
+        screenIdx: idx,
+        hidden
+      }), maxLocal = Math.max(maxLocal, ld), obj.children?.forEach((ch) => walk(ch, ld + 1, hidden));
     }
-    walk(s, 0), screenMaxLocal[idx] = maxLocal, globalOffset += maxLocal + C.SCREEN_GAP;
+    walk(s, 0, !1), screenMaxLocal[idx] = maxLocal, globalOffset += maxLocal + C.SCREEN_GAP;
   })), { layers, screenNames, screenMaxLocal };
 }
 function resolveCSSColor(cssVar) {
@@ -2340,7 +2366,9 @@ function build3DScene(container, trees, displays, dispObjs) {
       btn.dataset.on = v ? "0" : "1", btn.classList.toggle("active", !v);
     }, btn;
   }, controls = el("div", "scene-controls"), toggle3d = makeToggle("3D", !0), toggleBorders = makeToggle("Borders", !0), bufToggles = [], toggleOrtho = makeToggle("Ortho", !1);
-  controls.append(toggle3d, toggleBorders), bufImages.forEach((bi) => {
+  controls.append(toggle3d, toggleBorders);
+  let toggleHidden = makeToggle("Hidden", !1);
+  controls.appendChild(toggleHidden), bufImages.forEach((bi) => {
     let btn = makeToggle(bi.label, !0), thumb = (() => {
       let _e = document.createElement("img");
       return _e.setAttribute("draggable", "false"), _e.setAttribute("style", "height:1.2em;border-radius:2px;vertical-align:middle;image-rendering:pixelated"), _e;
@@ -2474,7 +2502,7 @@ function build3DScene(container, trees, displays, dispObjs) {
       depthRange.min = visMax, depthMinSlider.value = String(visMax);
   }
   function updateDepths(spreadOv, rangeOv) {
-    let bordersOn = toggleBorders.dataset.on === "1", range = rangeOv ?? depthRange, screenOffset = computeScreenOffsets();
+    let bordersOn = toggleBorders.dataset.on === "1", showHidden = toggleHidden.dataset.on === "1", range = rangeOv ?? depthRange, screenOffset = computeScreenOffsets();
     currentSpread = spreadOv ?? (is3d ? Number(spreadSlider.value) : 0.1);
     let compressedIdx = 0, compressedDepth = {}, seenDepths = /* @__PURE__ */ new Set;
     layers.forEach((l) => {
@@ -2483,7 +2511,7 @@ function build3DScene(container, trees, displays, dispObjs) {
         seenDepths.add(gd), compressedDepth[gd] = compressedIdx++;
     }), layers.forEach((l, idx) => {
       let sl = sceneLayers[idx], gd = screenOffset[l.screenIdx] !== void 0 ? screenOffset[l.screenIdx] + l.localDepth : -1, inRange = gd >= Math.round(range.min) && gd <= Math.round(range.max);
-      sl.visible = bordersOn && layerVisible[l.screenIdx] && inRange, sl.depth = (compressedDepth[gd] ?? 0) * currentSpread;
+      sl.visible = bordersOn && layerVisible[l.screenIdx] && inRange && (!l.hidden || showHidden), sl.depth = (compressedDepth[gd] ?? 0) * currentSpread;
     }), sceneBufs.forEach((b) => {
       b.depth = -currentSpread * 0.5;
     }), renderer.markDirty();
@@ -2551,7 +2579,7 @@ function build3DScene(container, trees, displays, dispObjs) {
   }), toggleOrtho.addEventListener("click", () => {
     let ortho = toggleOrtho.dataset.on === "1";
     animateTo({ persp: ortho ? 0 : 1 });
-  }), toggleBorders.addEventListener("click", () => updateVisibility()), bufToggles.forEach((btn) => btn.addEventListener("click", () => updateVisibility()));
+  }), toggleBorders.addEventListener("click", () => updateVisibility()), toggleHidden.addEventListener("click", () => updateVisibility()), bufToggles.forEach((btn) => btn.addEventListener("click", () => updateVisibility()));
   let dragging = !1, lastX = 0, lastY = 0;
   viewport.onmousedown = (e) => {
     if (inScreensaver)
@@ -2721,7 +2749,7 @@ function build3DScene(container, trees, displays, dispObjs) {
     btn.dataset.on = on ? "1" : "0", btn.classList.toggle("active", on);
   };
   return resetBtn.onclick = () => {
-    is3d = !0, setToggle(toggle3d, !0), setToggle(toggleBorders, !0), setToggle(toggleOrtho, !1), bufToggles.forEach((btn) => setToggle(btn, !0)), screenNames.forEach((name, i) => {
+    is3d = !0, setToggle(toggle3d, !0), setToggle(toggleBorders, !0), setToggle(toggleOrtho, !1), setToggle(toggleHidden, !1), bufToggles.forEach((btn) => setToggle(btn, !0)), screenNames.forEach((name, i) => {
       layerVisible[i] = name === "act_scr" || screenNames.length === 1;
     }), layerBtns.forEach((b, i) => b.classList.toggle("active", layerVisible[i])), spreadSlider.disabled = !1, focusedAddr = null, updateDepthSliderRange(), updateVisibility();
     let visMax = Number(depthMaxSlider.max);
@@ -3085,7 +3113,7 @@ class UiDashboard extends BaseComponent {
 customElements.define("ui-dashboard", UiDashboard);
 
 // src/app.ts
-document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-03-27 20:04 GMT+8"}</span><span>·</span><span>${"14ea6ea"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
+document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-01 13:27 GMT+8"}</span><span>·</span><span>${"8f35af9"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
 </script>
 </body>
 </html>
