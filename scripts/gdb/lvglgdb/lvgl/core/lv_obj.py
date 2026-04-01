@@ -90,6 +90,18 @@ class LVObject(Value):
         return int(self.coords.y2)
 
     @property
+    def flags_raw(self) -> int:
+        """Return raw flags bitmask, 0 if corrupted."""
+        raw = self.safe_field("flags", 0)
+        return int(raw)
+
+    @property
+    def flags_list(self) -> list[str]:
+        """Return decoded flag names."""
+        from .lv_obj_flag_consts import decode_obj_flags
+        return decode_obj_flags(self.flags_raw)
+
+    @property
     def child_cnt(self) -> int:
         """Return child count, 0 if corrupted."""
         if not self.spec_attr:
@@ -153,6 +165,8 @@ class LVObject(Value):
             }, {"x1": 0, "y1": 0, "x2": 0, "y2": 0}),
             ("child_count", lambda s: s.child_cnt, 0),
             ("style_count", lambda s: int(s.style_cnt), 0),
+            ("flags", lambda s: s.flags_raw, 0),
+            ("flags_list", lambda s: s.flags_list, []),
             ("parent_addr", lambda s: ptr_or_none(s.super_value("parent"))),
             ("group_addr", lambda s: s._get_group_addr()),
         ])
