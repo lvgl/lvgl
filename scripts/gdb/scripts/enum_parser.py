@@ -105,9 +105,9 @@ def parse_bitmask_enum(path: Path, enum_type: str, prefix: str,
         ):
             continue
 
-        # Match: NAME = (1u << N) or NAME = (1 << N)
+        # Match: NAME = (1u << N) or NAME = 1 << N (parens optional)
         match = re.match(
-            rf"({re.escape(prefix)}\w+)\s*=\s*\(1u?\s*<<\s*(\d+)\)", line
+            rf"({re.escape(prefix)}\w+)\s*=\s*\(?1u?\s*<<\s*(\d+)\)?", line
         )
         if not match:
             continue
