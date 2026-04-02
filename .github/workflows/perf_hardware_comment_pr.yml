@@ -23,7 +23,7 @@ jobs:
     name: Comment PR with HW Performance tests results
     steps:
       - name: Download Results from PR
-        uses: dawidd6/action-download-artifact@v16
+        uses: dawidd6/action-download-artifact@v19
         with:
           workflow: perf_hardware.yml
           path: artifacts
