@@ -47,6 +47,7 @@
     --color-blue: var(--blue);
     --color-sapphire: var(--sapphire);
     --color-green: var(--green);
+    --color-yellow: var(--yellow);
     --color-peach: var(--peach);
     --color-mauve: var(--mauve);
     --color-teal: var(--teal);
@@ -1237,6 +1238,17 @@ ui-topbar .topbar-search::placeholder {
   color: var(--color-overlay1);
   border: 1px solid var(--surface0);
 }
+.detail-state-active {
+  border-color: var(--color-yellow);
+  @supports (color: color-mix(in lab, red, red)) {
+    border-color: color-mix(in oklab, var(--color-yellow) 30%, transparent);
+  }
+  background-color: var(--color-yellow);
+  @supports (color: color-mix(in lab, red, red)) {
+    background-color: color-mix(in oklab, var(--color-yellow) 10%, transparent);
+  }
+  color: var(--color-yellow);
+}
 .scene-controls {
   margin-bottom: calc(var(--spacing) * 1);
   display: flex;
@@ -2075,7 +2087,7 @@ function renderObjTree(obj, depth = 0) {
   if (det.className = "obj-node", obj.addr)
     det.id = "obj-" + obj.addr;
   let sum = document.createElement("summary");
-  if (sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]), sum.textContent = obj.class_name || "obj", obj.flags_list?.includes("HIDDEN"))
+  if (sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]), sum.textContent = (obj.name ? obj.name + " " : "") + (obj.class_name || "obj"), obj.flags_list?.includes("HIDDEN"))
     sum.textContent += " \uD83D\uDC41‍\uD83D\uDDE8";
   if (det.appendChild(sum), obj.addr)
     objDataMap[obj.addr] = obj, registerHL(obj.addr, det), sum.addEventListener("mouseenter", () => highlightObj(obj.addr)), sum.addEventListener("mouseleave", () => clearHighlight()), sum.addEventListener("click", (e) => {
@@ -2131,6 +2143,12 @@ function renderObjDetail(addr, panel) {
     let wrap = el("div", "detail-flags-wrap");
     obj.flags_list.forEach((f) => wrap.appendChild(el("span", "detail-flag-badge", f))), flagSec.appendChild(wrap), panel.appendChild(flagSec);
   }
+  if (obj.state_list?.length) {
+    let stateSec = el("div", "detail-section");
+    stateSec.appendChild(el("div", "detail-section-title", "State"));
+    let wrap = el("div", "detail-flags-wrap");
+    obj.state_list.forEach((s) => wrap.appendChild(el("span", "detail-flag-badge" + (s === "DEFAULT" ? "" : " detail-state-active"), s))), stateSec.appendChild(wrap), panel.appendChild(stateSec);
+  }
   let refSec = el("div", "detail-section");
   if (refSec.appendChild(el("div", "detail-section-title", "References")), obj.parent_addr) {
     let row = el("div", "kv-row");
@@ -2140,7 +2158,49 @@ function renderObjDetail(addr, panel) {
     let row = el("div", "kv-row");
     row.appendChild(el("span", "kv-label", "group")), row.appendChild(xref(obj.group_addr, "group")), refSec.appendChild(row);
   }
-  if (refSec.appendChild(kvPair("children", String(obj.child_count || 0))), refSec.appendChild(kvPair("styles", String(obj.style_count || 0))), panel.appendChild(refSec), obj.styles?.length) {
+  if (obj.user_data)
+    refSec.appendChild(kvPair("user_data", obj.user_data));
+  if (obj.name)
+    refSec.appendChild(kvPair("name", obj.name));
+  if (refSec.appendChild(kvPair("children", String(obj.child_count || 0))), refSec.appendChild(kvPair("styles", String(obj.style_count || 0))), panel.appendChild(refSec), obj.scroll || obj.ext_click_pad || obj.ext_draw_size || obj.scrollbar_mode || obj.layer_type || obj.w_layout || obj.h_layout) {
+    let layoutSec = el("div", "detail-section");
+    if (layoutSec.appendChild(el("div", "detail-section-title", "Layout & Scroll")), obj.scroll)
+      layoutSec.appendChild(kvPair("scroll", `${obj.scroll.x}, ${obj.scroll.y}`));
+    if (obj.ext_click_pad)
+      layoutSec.appendChild(kvPair("ext_click_pad", String(obj.ext_click_pad)));
+    if (obj.ext_draw_size)
+      layoutSec.appendChild(kvPair("ext_draw_size", String(obj.ext_draw_size)));
+    if (obj.scrollbar_mode != null)
+      layoutSec.appendChild(kvPair("scrollbar_mode", String(obj.scrollbar_mode)));
+    if (obj.scroll_dir != null)
+      layoutSec.appendChild(kvPair("scroll_dir", String(obj.scroll_dir)));
+    if (obj.scroll_snap_x)
+      layoutSec.appendChild(kvPair("scroll_snap_x", String(obj.scroll_snap_x)));
+    if (obj.scroll_snap_y)
+      layoutSec.appendChild(kvPair("scroll_snap_y", String(obj.scroll_snap_y)));
+    if (obj.layer_type)
+      layoutSec.appendChild(kvPair("layer_type", String(obj.layer_type)));
+    if (obj.w_layout)
+      layoutSec.appendChild(kvPair("w_layout", "true"));
+    if (obj.h_layout)
+      layoutSec.appendChild(kvPair("h_layout", "true"));
+    panel.appendChild(layoutSec);
+  }
+  if (obj.layout_inv || obj.is_deleting || obj.rendered || obj.skip_trans) {
+    let intSec = el("div", "detail-section");
+    intSec.appendChild(el("div", "detail-section-title", "Internal"));
+    let wrap = el("div", "detail-flags-wrap");
+    if (obj.layout_inv)
+      wrap.appendChild(el("span", "detail-flag-badge detail-state-active", "layout_inv"));
+    if (obj.is_deleting)
+      wrap.appendChild(el("span", "detail-flag-badge detail-state-active", "is_deleting"));
+    if (obj.rendered)
+      wrap.appendChild(el("span", "detail-flag-badge", "rendered"));
+    if (obj.skip_trans)
+      wrap.appendChild(el("span", "detail-flag-badge", "skip_trans"));
+    intSec.appendChild(wrap), panel.appendChild(intSec);
+  }
+  if (obj.styles?.length) {
     let styleSec = el("div", "detail-section");
     styleSec.appendChild(el("div", "detail-section-title", "Styles (" + obj.styles.length + ")")), obj.styles.forEach((s) => {
       let card = el("div", "detail-style-card");
@@ -3113,7 +3173,7 @@ class UiDashboard extends BaseComponent {
 customElements.define("ui-dashboard", UiDashboard);
 
 // src/app.ts
-document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-01 13:27 GMT+8"}</span><span>·</span><span>${"8f35af9"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
+document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-02 03:55 GMT+8"}</span><span>·</span><span>${"be336ae"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
 </script>
 </body>
 </html>
