@@ -246,6 +246,7 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
     /*Decode the image in ARGB8888 */
     unsigned error = lodepng_decode32((unsigned char **)&decoded, &png_width, &png_height, png_data, png_data_size);
     if(error) {
+        LV_LOG_WARN("error %u: %s", error, lodepng_error_text(error));
         if(decoded != NULL)  lv_draw_buf_destroy(decoded);
         return NULL;
     }

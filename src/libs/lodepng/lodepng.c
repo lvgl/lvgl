@@ -4668,6 +4668,8 @@ unsigned lodepng_inspect(unsigned * w, unsigned * h, LodePNGState * state,
     if(info->filter_method != 0) CERROR_RETURN_ERROR(state->error, 33);
     /*error: only interlace methods 0 and 1 exist in the specification*/
     if(info->interlace_method > 1) CERROR_RETURN_ERROR(state->error, 34);
+    /*error: bitdepths > 8 bits per channel are not supported*/
+    if(info->color.bitdepth > 8) CERROR_RETURN_ERROR(state->error, 116);
 
     if(!state->decoder.ignore_crc) {
         unsigned CRC = lodepng_read32bitInt(&in[29]);
@@ -7432,6 +7434,8 @@ const char * lodepng_error_text(unsigned code)
             return "sBIT chunk has wrong size for the color type of the image";
         case 115:
             return "sBIT value out of range";
+        case 116:
+            return "bitdepths > 8 bits per channel are not supported";
     }
     return "unknown error code";
 }
