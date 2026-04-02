@@ -94,8 +94,8 @@ only need to call this function to set up and use your dictionary:
 
 .. code-block:: c
 
-       lv_obj_t * pinyin_ime = lv_pinyin_ime_create(lv_screen_active());
-       lv_pinyin_ime_set_dict(pinyin_ime, your_pinyin_dict);
+       lv_obj_t * pinyin_ime = lv_ime_pinyin_create(lv_screen_active());
+       lv_ime_pinyin_set_dict(pinyin_ime, your_pinyin_dict);
 
 
 
