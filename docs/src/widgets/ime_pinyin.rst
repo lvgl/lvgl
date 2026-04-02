@@ -33,8 +33,8 @@ which can save a lot of memory space.
 
 The built-in dictionary is customized based on the characters in the
 **LV_FONT_SOURCE_HAN_SANS_SC_16_CJK** font library, which currently has only
-~1,000 common CJK characters, so it is recommended to use a custom font and
-a custom dictionary.
+1,000 of the most common CJK radicals, so it is recommended to use a custom font
+and a custom dictionary.
 
 In the process of using the Pinyin input method plug-in, you can change
 the Keyboard and dictionary at any time.
