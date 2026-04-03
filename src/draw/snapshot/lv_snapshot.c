@@ -58,7 +58,9 @@ lv_draw_buf_t * lv_snapshot_create_draw_buf(lv_obj_t * obj, lv_color_format_t cf
 {
     LV_CHECK_OBJ(obj, &lv_obj_class, return NULL);
 
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
+
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);
@@ -74,7 +76,9 @@ lv_result_t lv_snapshot_reshape_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_bu
     LV_CHECK_OBJ(obj, &lv_obj_class, return LV_RESULT_INVALID);
     LV_CHECK_ARG(draw_buf != NULL, return LV_RESULT_INVALID);
 
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
+
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);

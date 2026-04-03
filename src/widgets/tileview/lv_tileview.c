@@ -106,6 +106,7 @@ void lv_tileview_set_tile_by_index(lv_obj_t * tv, uint32_t col_id, uint32_t row_
 {
     LV_CHECK_OBJ(tv, &lv_tileview_class, return);
 
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(tv);
 
     int32_t w = lv_obj_get_content_width(tv);
@@ -155,7 +156,8 @@ static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_
 
     LV_UNUSED(class_p);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
-    lv_obj_update_layout(obj);  /*Be sure the size is correct*/
+    /*Fails inside a layout update, but the sizes are already final there*/
+    lv_obj_update_layout(obj);
 }
 
 static void tileview_event_cb(lv_event_t * e)

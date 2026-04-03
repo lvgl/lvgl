@@ -490,6 +490,7 @@ void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, in
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_OBJ(obj_to_align, &lv_obj_class, return);
 
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
 
     lv_point_t center;
@@ -511,6 +512,7 @@ void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, 
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_OBJ(obj_to_rotate, &lv_obj_class, return);
 
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
 
     lv_point_t center;
@@ -523,6 +525,7 @@ void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, 
     arc_r += r_offset;
     lv_obj_align_to(obj_to_rotate, obj, LV_ALIGN_CENTER, 0, -arc_r);
 
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
 
     int32_t angle = (int32_t)get_angle(obj);

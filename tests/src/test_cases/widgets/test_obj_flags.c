@@ -64,6 +64,8 @@ void test_obj_flag_overflow_visible_1(void)
     lv_label_set_text(label_2, "Button 2");
     lv_obj_center(label_2);
 
+    lv_obj_update_layout(obj_main);
+
     cnt_1 = 0;
     cnt_2 = 0;
 

@@ -294,7 +294,9 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
 
     if((uint32_t)angle == img->rotation) return;
 
-    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
+    /*Fails inside a layout update, but the sizes are already final there*/
+    lv_obj_update_layout(obj);
+
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
@@ -336,7 +338,8 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
 
     if(img->pivot.x == x && img->pivot.y == y) return;
 
-    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
+    /*Fails inside a layout update, but the sizes are already final there*/
+    lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
@@ -967,7 +970,8 @@ static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
     LV_ASSERT(obj != NULL);
     lv_image_t * img = (lv_image_t *)obj;
 
-    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
+    /*Fails inside a layout update, but the sizes are already final there*/
+    lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
@@ -1006,6 +1010,7 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         if(img->w != 0 && img->h != 0) {
+            /*Fails inside a layout update, but the sizes are already final there*/
             lv_obj_update_layout(obj);
             int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
             int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
@@ -1016,6 +1021,7 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         if(img->w != 0 && img->h != 0) {
+            /*Fails inside a layout update, but the sizes are already final there*/
             lv_obj_update_layout(obj);
             int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
             int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
@@ -1030,6 +1036,7 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         if(img->w != 0 && img->h != 0) {
+            /*Fails inside a layout update, but the sizes are already final there*/
             lv_obj_update_layout(obj);
             int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
             int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;

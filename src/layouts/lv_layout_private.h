@@ -33,21 +33,22 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
-
 void lv_layout_init(void);
 
 void lv_layout_deinit(void);
-
-bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width);
 
 /**
  * Update the layout of a widget
  * @param obj   pointer to a widget
  */
-void lv_layout_apply(lv_obj_t * obj);
+void lv_layout_update_children_positions(lv_obj_t * obj);
+
+/**
+ * Set the sizes of a widget's layout controlled children
+ * @param obj   pointer to a widget
+ */
+void lv_layout_update_children_sizes(lv_obj_t * obj);
+
 
 /**********************
  *      MACROS

@@ -77,6 +77,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_t * mo_prev = lv_button_create(obj);
     lv_obj_set_style_bg_image_src(mo_prev, LV_SYMBOL_LEFT, 0);
     lv_obj_set_height(mo_prev, lv_pct(100));
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(mo_prev);
     int32_t btn_size = lv_obj_get_height(mo_prev);
     lv_obj_set_width(mo_prev, btn_size);
