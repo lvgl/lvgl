@@ -288,11 +288,7 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
      */
     LV_ASSERT_MSG(!disp->rendering_in_progress, "Invalidate area is not allowed during rendering.");
 
-    /*Clear the invalidate buffer if the parameter is NULL*/
-    if(area_p == NULL) {
-        disp->inv_p = 0;
-        return LV_RESULT_OK;
-    }
+    LV_CHECK_ARG(area_p != NULL, return LV_RESULT_INVALID);
 
     lv_area_t scr_area;
     scr_area.x1 = 0;
@@ -339,9 +335,20 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     disp->inv_areas[disp->inv_p] = *tmp_area_p;
     disp->inv_p++;
 
-    lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
+    /*Tell the display that there will be something to refresh*/
+    if(disp->inv_p == 1) {
+        lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
+    }
 
     return LV_RESULT_OK;
+}
+
+void lv_refr_clear_invalid_areas(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->inv_p = 0;
 }
 
 /**

@@ -27,7 +27,7 @@ void test_refr_sync_areas_of_double_buffered_direct_mode(void)
     refr_rect_create(refr_screen(), 0, 0, 20, 20, REFR_COLOR_RED);
     lv_obj_update_layout(refr_screen());
     lv_area_t obj_area = {0, 0, 19, 19};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &obj_area);
     refr_frame();
     ASSERT_PX_EQ(REFR_COLOR_RED, refr_buf_px(rendered_buf, 10, 10));
@@ -39,7 +39,7 @@ void test_refr_sync_areas_of_double_buffered_direct_mode(void)
     /*Refresh a different area. Before rendering, the area updated in the previous
      *frame is copied to the buffer that is now being rendered.*/
     lv_area_t other = {40, 40, 59, 59};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &other);
     refr_frame();
 
@@ -58,7 +58,7 @@ void test_refr_sync_area_is_dropped_when_redrawn(void)
     /*The previous frame covered the whole screen. Everything around the newly
      *rendered area still has to be synchronized.*/
     lv_area_t area = {10, 10, 29, 29};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &area);
     refr_frame();
     TEST_ASSERT_EQUAL_UINT32(4, refr_ctx.sync_cnt);
@@ -70,7 +70,7 @@ void test_refr_sync_area_is_dropped_when_redrawn(void)
 
     refr_log_reset();
     /*Redraw exactly the same area: nothing is left to synchronize*/
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &area);
     refr_frame();
     TEST_ASSERT_EQUAL_UINT32(0, refr_ctx.sync_cnt);
@@ -83,14 +83,14 @@ void test_refr_sync_area_is_split_when_partially_redrawn(void)
     refr_screen_set_color(REFR_COLOR_BLACK);
 
     lv_area_t big = {10, 10, 49, 49};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &big);
     refr_frame();
     refr_log_reset();
 
     /*Cut a stripe out of the previous area, the rest still has to be synchronized*/
     lv_area_t stripe = {10, 20, 49, 29};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &stripe);
     refr_frame();
 
@@ -117,14 +117,14 @@ void test_refr_joined_areas_are_synced_once(void)
     lv_area_t a1 = {10, 10, 39, 39};
     lv_area_t a2 = {20, 20, 49, 49};
     lv_area_t joined = {10, 10, 49, 49};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &a1);
     lv_inv_area(refr_ctx.disp, &a2);
     refr_frame();
     refr_log_reset();
 
     lv_area_t far_area = {55, 0, 63, 5};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &far_area);
     refr_frame();
 
@@ -141,7 +141,7 @@ void test_refr_sync_area_outside_the_display_is_skipped(void)
     refr_log_reset();
 
     lv_area_t area = {40, 40, 59, 59};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &area);
     refr_frame();
     refr_log_reset();
@@ -152,7 +152,7 @@ void test_refr_sync_area_outside_the_display_is_skipped(void)
     refr_ctx.ver_res = 32;
 
     lv_area_t small = {0, 0, 9, 9};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &small);
     refr_frame();
 
@@ -170,13 +170,13 @@ void test_refr_sync_cb_with_single_buffer(void)
     refr_screen_set_color(REFR_COLOR_BLACK);
 
     lv_area_t a1 = {0, 0, 9, 9};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &a1);
     refr_frame();
     refr_log_reset();
 
     lv_area_t a2 = {40, 40, 49, 49};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &a2);
     refr_frame();
 
@@ -195,13 +195,13 @@ void test_refr_sync_events_and_offset(void)
     refr_log_events(refr_ctx.disp);
 
     lv_area_t a1 = {0, 0, 9, 9};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &a1);
     refr_frame();
     refr_log_reset();
 
     lv_area_t a2 = {40, 40, 49, 49};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &a2);
     refr_frame();
 
@@ -221,13 +221,13 @@ void test_refr_no_sync_without_double_buffer_or_sync_cb(void)
     refr_screen_set_color(REFR_COLOR_BLACK);
 
     lv_area_t a1 = {0, 0, 9, 9};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &a1);
     refr_frame();
     refr_log_reset();
 
     lv_area_t a2 = {40, 40, 49, 49};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &a2);
     refr_frame();
 
@@ -246,7 +246,7 @@ void test_refr_triple_buffer_sync(void)
     refr_rect_create(refr_screen(), 0, 0, 20, 20, REFR_COLOR_RED);
     lv_obj_update_layout(refr_screen());
     lv_area_t obj_area = {0, 0, 19, 19};
-    refr_ctx.disp->inv_p = 0;
+    lv_refr_clear_invalid_areas(refr_ctx.disp);
     lv_inv_area(refr_ctx.disp, &obj_area);
     refr_frame();
 
@@ -255,7 +255,7 @@ void test_refr_triple_buffer_sync(void)
     uint32_t i;
     for(i = 0; i < 2; i++) {
         lv_area_t other = {40, 40, 59, 59};
-        refr_ctx.disp->inv_p = 0;
+        lv_refr_clear_invalid_areas(refr_ctx.disp);
         lv_inv_area(refr_ctx.disp, &other);
         refr_frame();
     }

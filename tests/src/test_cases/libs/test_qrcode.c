@@ -36,6 +36,30 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
+void test_qrcode_get_data_returns_the_stored_copy(void)
+{
+    lv_obj_t * qr = lv_qrcode_create(active_screen);
+    TEST_ASSERT_NOT_NULL(qr);
+
+    /*Nothing set yet*/
+    uint32_t data_len = 123;
+    TEST_ASSERT_NULL(lv_qrcode_get_data(qr, &data_len));
+    TEST_ASSERT_EQUAL(0, data_len);
+
+    /*The payload is binary, so the length is what says where it ends*/
+    const uint8_t payload[] = {0x00, 0x4C, 0x56, 0x00, 0x47, 0x4C};
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr, payload, sizeof(payload)));
+
+    const void * stored = lv_qrcode_get_data(qr, &data_len);
+    TEST_ASSERT_NOT_NULL(stored);
+    TEST_ASSERT_NOT_EQUAL(payload, stored);
+    TEST_ASSERT_EQUAL(sizeof(payload), data_len);
+    TEST_ASSERT_EQUAL_MEMORY(payload, stored, sizeof(payload));
+
+    /*The length is optional*/
+    TEST_ASSERT_EQUAL_PTR(stored, lv_qrcode_get_data(qr, NULL));
+}
+
 void test_qrcode_normal(void)
 {
     lv_color_t bg_color = lv_palette_lighten(LV_PALETTE_LIGHT_BLUE, 5);

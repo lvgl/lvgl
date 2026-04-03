@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../core/lv_global.h"
 #include "lv_image_private.h"
 
 #if LV_USE_IMAGE != 0
@@ -294,7 +295,9 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
 
     if((uint32_t)angle == img->rotation) return;
 
-    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
+    /*Be sure the object's size is calculated. */
+    if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
+
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
@@ -336,7 +339,8 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
 
     if(img->pivot.x == x && img->pivot.y == y) return;
 
-    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
+    /*Be sure the object's size is calculated. */
+    if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
@@ -967,7 +971,8 @@ static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
     LV_ASSERT(obj != NULL);
     lv_image_t * img = (lv_image_t *)obj;
 
-    lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
+    /*Be sure the object's size is calculated. */
+    if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     lv_area_t a;
@@ -1006,7 +1011,7 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         if(img->w != 0 && img->h != 0) {
-            lv_obj_update_layout(obj);
+            if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
             int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
             int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
             scale_update(obj, scale_x, scale_y);
@@ -1016,7 +1021,7 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         if(img->w != 0 && img->h != 0) {
-            lv_obj_update_layout(obj);
+            if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
             int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
             int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
             int32_t scale = LV_MIN(scale_x, scale_y);
@@ -1030,7 +1035,7 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         if(img->w != 0 && img->h != 0) {
-            lv_obj_update_layout(obj);
+            if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
             int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
             int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
             int32_t scale = LV_MAX(scale_x, scale_y);

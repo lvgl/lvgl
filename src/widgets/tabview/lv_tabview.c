@@ -30,6 +30,9 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void button_clicked_event_cb(lv_event_t * e);
 static void cont_scroll_end_event_cb(lv_event_t * e);
+static void cont_size_changed_event_cb(lv_event_t * e);
+static void set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en);
+static void scroll_to_tab(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en);
 
 #if LV_USE_OBJ_PROPERTY
 static void lv_tabview_set_tab_active_property(lv_obj_t * obj, uint32_t idx)
@@ -150,46 +153,11 @@ lv_obj_t * lv_tabview_set_tab_translation_tag(lv_obj_t * obj, const char * tag)
 void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
-    tabview->tab_cur = idx;
-
-    lv_obj_t * cont = lv_tabview_get_content(obj);
-    lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
-
-    uint32_t tab_cnt = lv_tabview_get_tab_count(obj);
-    if(idx >= tab_cnt) return;
-
-    /*To be sure lv_obj_get_content_width will return valid value*/
-    if(cont == NULL) return;
-
+    /*The sizes have to be final to know where the tab starts*/
     lv_obj_update_layout(obj);
 
-    if((tabview->tab_pos & LV_DIR_VER) != 0) {
-        int32_t gap = lv_obj_get_style_pad_column_internal(cont, LV_PART_MAIN);
-        int32_t w = lv_obj_get_content_width(cont);
-        if(lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
-            lv_obj_scroll_to_x(cont, idx * (gap + w), anim_en);
-        }
-        else {
-            int32_t id_rtl = -(int32_t)idx;
-            lv_obj_scroll_to_x(cont, (gap + w) * id_rtl, anim_en);
-        }
-    }
-    else {
-        int32_t gap = lv_obj_get_style_pad_row_internal(cont, LV_PART_MAIN);
-        int32_t h = lv_obj_get_content_height(cont);
-        lv_obj_scroll_to_y(cont, idx * (gap + h), anim_en);
-    }
-
-    uint32_t i = 0;
-    lv_obj_t * button = lv_obj_get_child_by_type(tab_bar, i, &lv_button_class);
-    while(button) {
-        lv_obj_set_state(button, LV_STATE_CHECKED, i == idx);
-        i++;
-        button = lv_obj_get_child_by_type(tab_bar, (int32_t)i, &lv_button_class);
-    }
-
+    set_active(obj, idx, anim_en);
 }
 
 void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir)
@@ -337,8 +305,8 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     cont = lv_obj_create(obj);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
 
-    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_LAYOUT_CHANGED, NULL);
     lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_SCROLL_END, NULL);
+    lv_obj_add_event_cb(cont, cont_size_changed_event_cb, LV_EVENT_SIZE_CHANGED, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
     const lv_dir_t default_direction = LV_DIR_TOP;
@@ -355,18 +323,77 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_obj_set_scroll_on_focus(cont, false);
 }
 
+/*The part of `lv_tabview_set_active()` that assumes the sizes are final. The scroll end
+ *event can come from inside the layout pass, where updating the layout is not allowed.*/
+static void set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en)
+{
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
+
+    tabview->tab_cur = idx;
+
+    lv_obj_t * cont = lv_tabview_get_content(obj);
+    lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
+
+    uint32_t tab_cnt = lv_tabview_get_tab_count(obj);
+    if(idx >= tab_cnt) return;
+
+    /*To be sure lv_obj_get_content_width will return valid value*/
+    if(cont == NULL) return;
+
+    scroll_to_tab(obj, idx, anim_en);
+
+    uint32_t i = 0;
+    lv_obj_t * button = lv_obj_get_child_by_type(tab_bar, i, &lv_button_class);
+    while(button) {
+        lv_obj_set_state(button, LV_STATE_CHECKED, i == idx);
+        i++;
+        button = lv_obj_get_child_by_type(tab_bar, (int32_t)i, &lv_button_class);
+    }
+}
+
+/**
+ * Scroll the content so that a tab is in view. It reads the current sizes and doesn't
+ * resolve the layout, so it is safe to call from a layout driven event.
+ * @param obj       pointer to a tabview
+ * @param idx       index of the tab to scroll to
+ * @param anim_en   LV_ANIM_ON to scroll there with an animation
+ */
+static void scroll_to_tab(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en)
+{
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
+    lv_obj_t * cont = lv_tabview_get_content(obj);
+    if(cont == NULL) return;
+
+    if((tabview->tab_pos & LV_DIR_VER) != 0) {
+        int32_t gap = lv_obj_get_style_pad_column_internal(cont, LV_PART_MAIN);
+        int32_t w = lv_obj_get_content_width(cont);
+        if(lv_obj_get_style_base_dir_internal(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
+            lv_obj_scroll_to_x(cont, idx * (gap + w), anim_en);
+        }
+        else {
+            int32_t id_rtl = -(int32_t)idx;
+            lv_obj_scroll_to_x(cont, (gap + w) * id_rtl, anim_en);
+        }
+    }
+    else {
+        int32_t gap = lv_obj_get_style_pad_row_internal(cont, LV_PART_MAIN);
+        int32_t h = lv_obj_get_content_height(cont);
+        lv_obj_scroll_to_y(cont, idx * (gap + h), anim_en);
+    }
+}
+
 static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
-    lv_result_t res = lv_obj_event_base(&lv_tabview_class, e);
-    if(res != LV_RESULT_OK) return;
+    lv_obj_event_base(&lv_tabview_class, e);
+}
 
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_current_target(e);
-
-    if(code == LV_EVENT_SIZE_CHANGED) {
-        lv_tabview_set_active(target, lv_tabview_get_tab_active(target), LV_ANIM_OFF);
-    }
+/*The content, not the tabview, is what scrolls. Moving or resizing the tab bar resizes
+ *only the content, so listen to that. The new size is already applied here.*/
+static void cont_size_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * tv = lv_obj_get_parent(lv_event_get_current_target(e));
+    scroll_to_tab(tv, lv_tabview_get_tab_active(tv), LV_ANIM_OFF);
 }
 
 static void button_clicked_event_cb(lv_event_t * e)
@@ -400,10 +427,7 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
 
     lv_obj_t * tv = lv_obj_get_parent(cont);
     lv_tabview_t * tv_obj = (lv_tabview_t *)tv;
-    if(code == LV_EVENT_LAYOUT_CHANGED) {
-        lv_tabview_set_active(tv, lv_tabview_get_tab_active(tv), LV_ANIM_OFF);
-    }
-    else if(code == LV_EVENT_SCROLL_END) {
+    if(code == LV_EVENT_SCROLL_END) {
         lv_indev_t * indev = lv_indev_active();
         if(indev && indev->state == LV_INDEV_STATE_PRESSED) {
             return;
@@ -429,10 +453,10 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
 
         /*If not scrolled by an indev set the tab immediately*/
         if(lv_indev_active()) {
-            lv_tabview_set_active(tv, t, LV_ANIM_ON);
+            set_active(tv, t, LV_ANIM_ON);
         }
         else {
-            lv_tabview_set_active(tv, t, LV_ANIM_OFF);
+            set_active(tv, t, LV_ANIM_OFF);
         }
 
         if(new_tab) lv_obj_send_event(tv, LV_EVENT_VALUE_CHANGED, NULL);

@@ -150,6 +150,15 @@ void lv_qrcode_set_data(lv_obj_t * obj, const char * data)
     lv_qrcode_update(obj, data, lv_strlen(data));
 }
 
+const void * lv_qrcode_get_data(lv_obj_t * obj, uint32_t * data_len)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
+
+    if(data_len) *data_len = qrcode->data_len;
+    return qrcode->data;
+}
+
 lv_result_t lv_qrcode_render(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);

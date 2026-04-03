@@ -169,6 +169,20 @@ void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index);
  */
 void lv_label_set_recolor(lv_obj_t * obj, bool en);
 
+/**
+ * Shift the text horizontally inside the label
+ * @param obj           pointer to a label object
+ * @param x             offset in pixels, negative moves the text to the left
+ */
+void lv_label_set_offset_x(lv_obj_t * obj, int32_t x);
+
+/**
+ * Shift the text vertically inside the label
+ * @param obj           pointer to a label object
+ * @param y             offset in pixels, negative moves the text up
+ */
+void lv_label_set_offset_y(lv_obj_t * obj, int32_t y);
+
 #if LV_USE_TRANSLATION
 
 /**
@@ -254,6 +268,20 @@ uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj);
  * @return          true: recoloring is enabled, false: recoloring is disabled
  */
 bool lv_label_get_recolor(const lv_obj_t * obj);
+
+/**
+ * Get the horizontal shift of the text inside the label
+ * @param obj       pointer to a label object.
+ * @return          offset in pixels
+ */
+int32_t lv_label_get_offset_x(lv_obj_t * obj);
+
+/**
+ * Get the vertical shift of the text inside the label
+ * @param obj       pointer to a label object.
+ * @return          offset in pixels
+ */
+int32_t lv_label_get_offset_y(lv_obj_t * obj);
 
 /*=====================
  * Other functions

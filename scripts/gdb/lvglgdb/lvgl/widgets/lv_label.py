@@ -43,9 +43,9 @@ class LVLabel(LVObject):
         return int(self._wv_lv_label_t.safe_field("sel_end", 0))
 
     @property
-    def size_cache(self):
-        """Text size cache"""
-        return safe_point(self._wv_lv_label_t, "size_cache")
+    def text_size_width(self):
+        """Width `text_size` was measured at"""
+        return int(self._wv_lv_label_t.safe_field("text_size_width", 0))
 
     @property
     def offset(self):
@@ -73,14 +73,13 @@ class LVLabel(LVObject):
         return int(self._wv_lv_label_t.safe_field("expand", 0))
 
     @property
-    def invalid_size_cache(self):
-        """1: Recalculate size and update cache"""
-        return int(self._wv_lv_label_t.safe_field("invalid_size_cache", 0))
+    def text_flow_invalid(self):
+        return int(self._wv_lv_label_t.safe_field("text_flow_invalid", 0))
 
     @property
-    def need_refr_text(self):
-        """1: Refresh text after layout update completion"""
-        return int(self._wv_lv_label_t.safe_field("need_refr_text", 0))
+    def self_size_invalid(self):
+        """1: `text_size` needs to be measured again"""
+        return int(self._wv_lv_label_t.safe_field("self_size_invalid", 0))
 
     @property
     def text_size(self):
@@ -96,14 +95,14 @@ class LVLabel(LVObject):
         d["max_lines"] = self.max_lines
         d["sel_start"] = self.sel_start
         d["sel_end"] = self.sel_end
-        d["size_cache"] = self.size_cache
+        d["text_size_width"] = self.text_size_width
         d["offset"] = self.offset
         d["long_mode"] = self.long_mode
         d["static_txt"] = self.static_txt
         d["recolor"] = self.recolor
         d["expand"] = self.expand
-        d["invalid_size_cache"] = self.invalid_size_cache
-        d["need_refr_text"] = self.need_refr_text
+        d["text_flow_invalid"] = self.text_flow_invalid
+        d["self_size_invalid"] = self.self_size_invalid
         d["text_size"] = self.text_size
         s['widget_data'] = d
         return s
