@@ -248,4 +248,14 @@ void test_theme_simple(void)
 
 LV_DEPRECATIONS_IGNORE_END
 
+void test_theme_user_data(void)
+{
+    lv_theme_t theme;
+    lv_memzero(&theme, sizeof(theme));
+
+    int dummy = 42;
+    lv_theme_set_user_data(&theme, &dummy);
+
+    TEST_ASSERT_EQUAL_PTR(&dummy, lv_theme_get_user_data(&theme));
+}
 #endif
