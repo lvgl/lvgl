@@ -647,11 +647,12 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     else return NULL;
 }
 
-void lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+lv_event_dsc_t * lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter,
+                                       void * user_data)
 {
     LV_ASSERT_NULL(indev);
 
-    lv_event_add(&indev->event_list, event_cb, filter, user_data);
+    return lv_event_add(&indev->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_indev_get_event_count(lv_indev_t * indev)

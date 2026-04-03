@@ -422,8 +422,10 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point);
  * @param event_cb      an event callback
  * @param filter        event code to react or `LV_EVENT_ALL`
  * @param user_data     optional user_data
+ * @return the event descriptor or NULL if the event couldn't be created
  */
-void lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+lv_event_dsc_t * lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter,
+                                       void * user_data);
 
 /**
  * Get the number of event attached to an indev
