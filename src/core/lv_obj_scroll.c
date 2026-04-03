@@ -63,7 +63,9 @@ void lv_obj_set_scrollbar_mode(lv_obj_t * obj, lv_scrollbar_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_allocate_spec_attr(obj);
+    if(!lv_obj_allocate_spec_attr(obj)) {
+        return;
+    }
 
     if(obj->spec_attr->scrollbar_mode == mode) return;
     obj->spec_attr->scrollbar_mode = mode;
@@ -72,7 +74,9 @@ void lv_obj_set_scrollbar_mode(lv_obj_t * obj, lv_scrollbar_mode_t mode)
 
 void lv_obj_set_scroll_dir(lv_obj_t * obj, lv_dir_t dir)
 {
-    lv_obj_allocate_spec_attr(obj);
+    if(!lv_obj_allocate_spec_attr(obj)) {
+        return;
+    }
 
     if(dir != obj->spec_attr->scroll_dir) {
         obj->spec_attr->scroll_dir = dir;
@@ -81,13 +85,17 @@ void lv_obj_set_scroll_dir(lv_obj_t * obj, lv_dir_t dir)
 
 void lv_obj_set_scroll_snap_x(lv_obj_t * obj, lv_scroll_snap_t align)
 {
-    lv_obj_allocate_spec_attr(obj);
+    if(!lv_obj_allocate_spec_attr(obj)) {
+        return;
+    }
     obj->spec_attr->scroll_snap_x = align;
 }
 
 void lv_obj_set_scroll_snap_y(lv_obj_t * obj, lv_scroll_snap_t align)
 {
-    lv_obj_allocate_spec_attr(obj);
+    if(!lv_obj_allocate_spec_attr(obj)) {
+        return;
+    }
     obj->spec_attr->scroll_snap_y = align;
 }
 
@@ -418,7 +426,9 @@ lv_result_t lv_obj_scroll_by_raw(lv_obj_t * obj, int32_t x, int32_t y)
 {
     if(x == 0 && y == 0) return LV_RESULT_OK;
 
-    lv_obj_allocate_spec_attr(obj);
+    if(!lv_obj_allocate_spec_attr(obj)) {
+        return LV_RESULT_INVALID;
+    }
 
     obj->spec_attr->scroll.x += x;
     obj->spec_attr->scroll.y += y;
