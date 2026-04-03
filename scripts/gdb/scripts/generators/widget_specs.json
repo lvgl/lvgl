@@ -137,16 +137,13 @@
         "dark_color": "color",
         "light_color": "color",
         "data": "string",
-        "pattern": "pointer",
-        "bar_count": "int",
+        "size": "int",
         "scale": "int",
         "direction": "int",
         "encoding": "int",
-        "tiled": "bool",
         "update_mode": "bool",
         "needs_update": "bool",
-        "render_valid": "bool",
-        "fitting": "bool"
+        "render_valid": "bool"
       }
     }
   },
@@ -430,14 +427,14 @@
         "max_lines": "int",
         "sel_start": "int",
         "sel_end": "int",
-        "size_cache": "point",
+        "text_size_width": "int",
         "offset": "point",
         "long_mode": "enum:4",
         "static_txt": "bool",
         "recolor": "bool",
         "expand": "bool",
-        "invalid_size_cache": "bool",
-        "need_refr_text": "bool",
+        "text_flow_invalid": "bool",
+        "self_size_invalid": "bool",
         "text_size": "point"
       }
     },

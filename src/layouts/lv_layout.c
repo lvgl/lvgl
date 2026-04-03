@@ -67,27 +67,25 @@ uint32_t lv_layout_create(lv_layout_callbacks_t callbacks, void * user_data)
     return layout_cnt++;
 }
 
-bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
-{
-    LV_ASSERT(obj != NULL);
-    LV_ASSERT(size != NULL);
-    lv_layout_t layout_id = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
-    if(layout_id > 0 && layout_id < layout_cnt) {
-        void * user_data = layout_list_def[layout_id].user_data;
-        if(layout_list_def[layout_id].callbacks.get_min_size_cb) {
-            return layout_list_def[layout_id].callbacks.get_min_size_cb(obj, size, width, user_data);
-        }
-    }
-    return false;
-}
-
-void lv_layout_apply(lv_obj_t * obj)
+void lv_layout_update_children_positions(lv_obj_t * obj)
 {
     LV_ASSERT(obj != NULL);
     lv_layout_t layout_id = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id < layout_cnt) {
         void  * user_data = layout_list_def[layout_id].user_data;
-        layout_list_def[layout_id].callbacks.layout_update_cb(obj, user_data);
+        lv_layout_update_position_cb_t cb = layout_list_def[layout_id].callbacks.update_positions_cb;
+        if(cb) cb(obj, user_data);
+    }
+}
+
+void lv_layout_update_children_sizes(lv_obj_t * obj, int32_t iteration)
+{
+    LV_ASSERT(obj != NULL);
+    lv_layout_t layout_id = lv_obj_get_style_layout_internal(obj, LV_PART_MAIN);
+    if(layout_id > 0 && layout_id < layout_cnt) {
+        void  * user_data = layout_list_def[layout_id].user_data;
+        lv_layout_update_sizes_cb_t cb = layout_list_def[layout_id].callbacks.update_sizes_cb;
+        if(cb) cb(obj, iteration, user_data);
     }
 }
 

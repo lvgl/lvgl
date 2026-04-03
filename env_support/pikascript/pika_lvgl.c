@@ -113,7 +113,6 @@ void pika_lvgl_EVENT___init__(PikaObj* self) {
     obj_setInt(self, "SCREEN_UNLOADED", LV_EVENT_SCREEN_UNLOADED);
     obj_setInt(self, "SIZE_CHANGED", LV_EVENT_SIZE_CHANGED);
     obj_setInt(self, "STYLE_CHANGED", LV_EVENT_STYLE_CHANGED);
-    obj_setInt(self, "LAYOUT_CHANGED", LV_EVENT_LAYOUT_CHANGED);
     obj_setInt(self, "GET_SELF_SIZE", LV_EVENT_GET_SELF_SIZE);
     obj_setInt(self, "PREPROCESS", LV_EVENT_PREPROCESS);
 }

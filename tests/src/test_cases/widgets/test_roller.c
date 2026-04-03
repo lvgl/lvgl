@@ -484,4 +484,44 @@ void test_roller_setting_options_disables_translation(void)
 }
 #endif /*LV_USE_TRANSLATION*/
 
+/*A content sized roller is as wide as its wider part, so a larger selected font widens it*/
+void test_roller_selected_font_change_updates_the_width(void)
+{
+    lv_obj_update_layout(roller);
+    int32_t w_ori = lv_obj_get_width(roller);
+
+    lv_obj_set_style_text_font(roller, &lv_font_montserrat_24, LV_PART_SELECTED);
+    lv_obj_update_layout(roller);
+
+    lv_obj_t * ref = lv_roller_create(active_screen);
+    lv_roller_set_options(ref, default_roller_options, LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_style_text_font(ref, &lv_font_montserrat_24, LV_PART_SELECTED);
+    lv_obj_update_layout(ref);
+
+    TEST_ASSERT_GREATER_THAN(w_ori, lv_obj_get_width(ref));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(ref), lv_obj_get_width(roller));
+}
+
+/*The selected option has to stay centered when the main font changes after creation*/
+void test_roller_main_font_change_keeps_the_selected_option_centered(void)
+{
+    lv_roller_set_selected(roller, 1, LV_ANIM_OFF);
+    lv_obj_update_layout(roller);
+
+    lv_obj_set_style_text_font(roller, &lv_font_montserrat_24, LV_PART_MAIN);
+    lv_obj_set_style_text_line_space(roller, 20, LV_PART_MAIN);
+    lv_obj_update_layout(roller);
+
+    lv_obj_t * ref = lv_roller_create(active_screen);
+    lv_roller_set_options(ref, default_roller_options, LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_style_text_font(ref, &lv_font_montserrat_24, LV_PART_MAIN);
+    lv_obj_set_style_text_line_space(ref, 20, LV_PART_MAIN);
+    lv_roller_set_selected(ref, 1, LV_ANIM_OFF);
+    lv_obj_update_layout(ref);
+
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_height(ref), lv_obj_get_height(roller));
+    TEST_ASSERT_EQUAL_INT32(lv_label_get_offset_y(lv_obj_get_child(ref, 0)),
+                            lv_label_get_offset_y(lv_obj_get_child(roller, 0)));
+}
+
 #endif

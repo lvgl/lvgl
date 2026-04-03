@@ -23,6 +23,7 @@ void test_tabview_set_act_non_existent(void);
 void test_tabview_tab2_selected_event(void);
 void test_tabview_update_on_external_scroll(void);
 void test_tabview_translation_tag(void);
+void test_tabview_tab_bar_position_change_keeps_the_active_tab(void);
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * tabview = NULL;
@@ -364,6 +365,28 @@ void test_tabview_properties(void)
 
     lv_obj_delete(tv);
 #endif
+}
+
+/*Moving the tab bar resizes only the content, not the tabview, and turns the tabs from side by
+ *side to stacked. The content still has to scroll to the active tab.*/
+void test_tabview_tab_bar_position_change_keeps_the_active_tab(void)
+{
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_add_tab(tabview, "1");
+    lv_tabview_add_tab(tabview, "2");
+    lv_tabview_add_tab(tabview, "3");
+    lv_tabview_set_active(tabview, 2, LV_ANIM_OFF);
+    lv_obj_update_layout(tabview);
+
+    lv_obj_t * cont = lv_tabview_get_content(tabview);
+    int32_t gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_INT32(2 * (gap + lv_obj_get_content_width(cont)), lv_obj_get_scroll_x(cont));
+
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
+    lv_obj_update_layout(tabview);
+    gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_scroll_x(cont));
+    TEST_ASSERT_EQUAL_INT32(2 * (gap + lv_obj_get_content_height(cont)), lv_obj_get_scroll_y(cont));
 }
 
 #endif
