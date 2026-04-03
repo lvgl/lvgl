@@ -198,4 +198,34 @@ void test_msgbox_content_auto_height(void)
     TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
 }
 
+static void msgbox_height_theme_apply(lv_theme_t * th, lv_obj_t * obj)
+{
+    LV_UNUSED(th);
+    if(lv_obj_check_type(obj, &lv_msgbox_class)) lv_obj_set_style_height(obj, 300, LV_PART_MAIN);
+}
+
+/*The theme sets the height while the msgbox is created, before the msgbox can react to it*/
+void test_msgbox_content_fills_a_theme_sized_msgbox(void)
+{
+    lv_display_t * disp = lv_display_get_default();
+    lv_theme_t * theme_ori = lv_display_get_theme(disp);
+    static lv_theme_t theme;
+    theme = *theme_ori;
+    lv_theme_set_parent(&theme, theme_ori);
+    lv_theme_set_apply_cb(&theme, msgbox_height_theme_apply);
+    lv_display_set_theme(disp, &theme);
+
+    msgbox = lv_msgbox_create(active_screen);
+    lv_msgbox_add_text(msgbox, "The text");
+    lv_obj_update_layout(msgbox);
+
+    int32_t h_content = lv_obj_get_height(lv_msgbox_get_content(msgbox));
+    int32_t h_obj_content = lv_obj_get_content_height(msgbox);
+
+    lv_obj_clean(active_screen);
+    lv_display_set_theme(disp, theme_ori);
+
+    TEST_ASSERT_EQUAL_INT32(h_obj_content, h_content);
+}
+
 #endif

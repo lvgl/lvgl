@@ -143,7 +143,6 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
             int32_t v_ofs = new_anim->get_value_cb(new_anim);
             new_anim->start_value += v_ofs;
             new_anim->end_value += v_ofs;
-
         }
 
         resolve_time(new_anim);

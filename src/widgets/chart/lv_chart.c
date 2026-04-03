@@ -841,6 +841,7 @@ int32_t lv_chart_get_first_point_center_offset(lv_obj_t * obj)
 
     int32_t x_ofs = lv_obj_get_style_pad_left_internal(obj, LV_PART_MAIN);
     if(chart->type == LV_CHART_TYPE_BAR || chart->type == LV_CHART_TYPE_STACKED) {
+        /*Fails inside a layout update, but the sizes are already final there*/
         lv_obj_update_layout(obj);
         /*Gap between the columns on ~adjacent X*/
         int32_t block_gap = lv_obj_get_style_pad_column_internal(obj, LV_PART_MAIN);

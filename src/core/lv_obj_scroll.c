@@ -296,7 +296,7 @@ void lv_obj_scroll_by_bounded(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_en
 
     if(dx == 0 && dy == 0) return;
 
-    /*We need to know the final sizes for bound check*/
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
 
     /*Don't let scroll more than naturally possible by the size of the content*/
@@ -435,7 +435,7 @@ void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    /*Be sure the screens layout is correct*/
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
 
     lv_point_t p = {0, 0};
@@ -446,8 +446,9 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    /*Be sure the screens layout is correct*/
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
+
 
     lv_point_t p = {0, 0};
     lv_obj_t * child = obj;
@@ -508,8 +509,9 @@ void lv_obj_stop_scroll_anim(const lv_obj_t * obj)
 void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-
+    /*Fails inside a layout update, but the sizes are already final there*/
     lv_obj_update_layout(obj);
+
     lv_point_t p;
     lv_indev_scroll_get_snap_dist(obj, &p);
     if(p.x == LV_COORD_MAX || p.x == LV_COORD_MIN) p.x = 0;
@@ -714,6 +716,11 @@ void lv_obj_scrollbar_invalidate(lv_obj_t * obj)
 void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    /*TODO update layout is not being updated
+     * check only the child areas instead of lv_obj_get_scroll_*
+     * as after a layout update the areas are calculated and
+     * no need to get the self size in obj_get_scroll_* */
 
     /*Be sure the bottom side is not remains scrolled in*/
     /*With snapping the content can't be scrolled in*/

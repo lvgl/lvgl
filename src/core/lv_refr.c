@@ -285,11 +285,7 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
      */
     LV_ASSERT_MSG(!disp->rendering_in_progress, "Invalidate area is not allowed during rendering.");
 
-    /*Clear the invalidate buffer if the parameter is NULL*/
-    if(area_p == NULL) {
-        disp->inv_p = 0;
-        return LV_RESULT_OK;
-    }
+    LV_CHECK_ARG(area_p != NULL, return LV_RESULT_INVALID);
 
     lv_area_t scr_area;
     scr_area.x1 = 0;
@@ -336,9 +332,19 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     disp->inv_areas[disp->inv_p] = *tmp_area_p;
     disp->inv_p++;
 
-    lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
+    /*Tell the display that there will be something to refresh*/
+    if(disp->inv_p == 1) {
+        lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
+    }
 
     return LV_RESULT_OK;
+}
+
+void lv_refr_clear_invalid_areas(lv_display_t * disp)
+{
+    LV_CHECK_ARG(disp != NULL, return);
+
+    disp->inv_p = 0;
 }
 
 /**
@@ -400,14 +406,29 @@ void lv_display_refr_timer(lv_timer_t * timer)
         return;
     }
 
-    /*Refresh the screen's layout if required*/
+    /*Refresh the screen's layout if required. Don't return on error to render what can be rendered*/
     LV_PROFILER_LAYOUT_BEGIN_TAG("layout");
-    if(disp_refr->act_scr) lv_obj_update_layout(disp_refr->act_scr);
-    if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
+    if(disp_refr->act_scr) {
+        res = lv_obj_update_layout(disp_refr->act_scr);
+        if(res != LV_RESULT_OK) LV_LOG_WARN("Failed to update the layout of the active screen %p", (void *)disp_refr->act_scr);
+    }
 
-    lv_obj_update_layout(disp_refr->bottom_layer);
-    lv_obj_update_layout(disp_refr->top_layer);
-    lv_obj_update_layout(disp_refr->sys_layer);
+    if(disp_refr->prev_scr) {
+        res = lv_obj_update_layout(disp_refr->prev_scr);
+        if(res != LV_RESULT_OK) LV_LOG_WARN("Failed to update the layout of the previous screen %p",
+                                                (void *)disp_refr->prev_scr);
+    }
+
+    res = lv_obj_update_layout(disp_refr->bottom_layer);
+    if(res != LV_RESULT_OK) LV_LOG_WARN("Failed to update the layout of the bottom layer %p",
+                                            (void *)disp_refr->bottom_layer);
+
+    res = lv_obj_update_layout(disp_refr->top_layer);
+    if(res != LV_RESULT_OK) LV_LOG_WARN("Failed to update the layout of the top layer %p", (void *)disp_refr->top_layer);
+
+    res = lv_obj_update_layout(disp_refr->sys_layer);
+    if(res != LV_RESULT_OK) LV_LOG_WARN("Failed to update the layout of the system layer %p", (void *)disp_refr->sys_layer);
+
     LV_PROFILER_LAYOUT_END_TAG("layout");
 
     /*Do nothing if there is no active screen*/

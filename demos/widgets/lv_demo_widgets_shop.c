@@ -215,7 +215,7 @@ static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, cons
                                    const char * price)
 {
     static int32_t grid_col_dsc[] = {LV_GRID_CONTENT, 5, LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static int32_t grid_row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static int32_t grid_row_dsc[] = {28, 28, LV_GRID_TEMPLATE_LAST};
 
     lv_obj_t * cont = lv_obj_create(parent);
     lv_obj_remove_style_all(cont);
