@@ -375,6 +375,8 @@ void lv_obj_set_ext_draw_size(lv_obj_t * obj, int32_t size)
     lv_obj_add_event_cb(obj, set_ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, (void *)(lv_uintptr_t)size);
 
     lv_obj_invalidate(obj);
+
+    /*Nothing else asks for the new size, so store it right away*/
     lv_obj_refresh_ext_draw_size(obj);
 }
 

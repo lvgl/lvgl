@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_scroll_private.h"
+#include "lv_global.h"
 #include "../lvgl_public.h"
 #include "../misc/lv_anim_private.h"
 #include "lv_obj_private.h"
@@ -296,8 +297,9 @@ void lv_obj_scroll_by_bounded(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_en
 
     if(dx == 0 && dy == 0) return;
 
-    /*We need to know the final sizes for bound check*/
-    lv_obj_update_layout(obj);
+    /*We need to know the final sizes for bound check. Inside a layout pass they are
+     *already final, and resolving again from there would be re-entrant.*/
+    if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
 
     /*Don't let scroll more than naturally possible by the size of the content*/
     int32_t x_current = -lv_obj_get_scroll_x(obj);
@@ -435,8 +437,8 @@ void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    /*Be sure the screens layout is correct*/
-    lv_obj_update_layout(obj);
+    /*Be sure the screens layout is correct. Inside a layout pass it already is.*/
+    if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
 
     lv_point_t p = {0, 0};
     scroll_area_into_view(&obj->coords, obj, &p, anim_en);
@@ -446,8 +448,8 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    /*Be sure the screens layout is correct*/
-    lv_obj_update_layout(obj);
+    /*Be sure the screens layout is correct. Inside a layout pass it already is.*/
+    if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
 
     lv_point_t p = {0, 0};
     lv_obj_t * child = obj;
@@ -509,7 +511,7 @@ void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    lv_obj_update_layout(obj);
+    if(!LV_GLOBAL_DEFAULT()->layout_update_mutex) lv_obj_update_layout(obj);
     lv_point_t p;
     lv_indev_scroll_get_snap_dist(obj, &p);
     if(p.x == LV_COORD_MAX || p.x == LV_COORD_MIN) p.x = 0;
@@ -714,6 +716,11 @@ void lv_obj_scrollbar_invalidate(lv_obj_t * obj)
 void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    /*TODO update layout is not being updated
+     * check only the child areas instead of lv_obj_get_scroll_*
+     * as after a layout update the areas are calculated and
+     * no need to get the self size in obj_get_scroll_* */
 
     /*Be sure the bottom side is not remains scrolled in*/
     /*With snapping the content can't be scrolled in*/
