@@ -209,4 +209,14 @@ void test_theme_simple(void)
     TEST_ASSERT_NULL(lv_theme_simple_get());
 }
 
+void test_theme_user_data(void)
+{
+    lv_theme_t theme;
+    lv_memzero(&theme, sizeof(theme));
+
+    int dummy = 42;
+    lv_theme_set_user_data(&theme, &dummy);
+
+    TEST_ASSERT_EQUAL_PTR(&dummy, lv_theme_get_user_data(&theme));
+}
 #endif
