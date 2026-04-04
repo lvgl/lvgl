@@ -673,8 +673,7 @@ static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format
         size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
     }
 
-    size = LV_ROUND_UP(size, LV_DRAW_BUF_ALIGN);
-    return size;
+    return LV_ROUND_UP(size, LV_DRAW_BUF_ALIGN);
 }
 
 static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * full_area)
