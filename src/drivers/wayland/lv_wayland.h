@@ -17,11 +17,11 @@ extern "C" {
 
 #if LV_USE_WAYLAND
 
-#include "lv_wl_keyboard.h"
-#include "lv_wl_pointer.h"
-#include "lv_wl_touch.h"
-#include "lv_wl_window.h"
-#include "lv_wl_pointer_axis.h"
+#include "lv_wayland_keyboard.h"
+#include "lv_wayland_pointer.h"
+#include "lv_wayland_touch.h"
+#include "lv_wayland_window.h"
+#include "lv_wayland_pointer_axis.h"
 
 /*********************
  *      DEFINES
@@ -34,14 +34,6 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Wrapper around lv_timer_handler
- * @note Must be called in the application run loop instead of the
- * regular lv_timer_handler provided by LVGL
- * @return time till it needs to be run next (in ms)
- */
-uint32_t lv_wayland_timer_handler(void);
 
 /**
  * Retrieves the file descriptor of the wayland socket

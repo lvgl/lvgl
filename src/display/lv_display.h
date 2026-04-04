@@ -549,8 +549,10 @@ lv_obj_t * lv_layer_bottom(void);
  * @param event_cb      an event callback
  * @param filter        event code to react or `LV_EVENT_ALL`
  * @param user_data     optional user_data
+ * @return the event descriptor or NULL if the event couldn't be created
  */
-void lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+lv_event_dsc_t * lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter,
+                                         void * user_data);
 
 /**
  * Get the number of event attached to a display
@@ -573,7 +575,7 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index);
  * @param index         the index of the event to remove
  * @return              true: and event was removed; false: no event was removed
  */
-bool lv_display_delete_event(lv_display_t * disp, uint32_t index);
+bool lv_display_remove_event(lv_display_t * disp, uint32_t index);
 
 /**
  * Remove an event_cb with user_data

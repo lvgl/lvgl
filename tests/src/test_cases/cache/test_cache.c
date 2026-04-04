@@ -320,5 +320,45 @@ void test_cache_entry_alloc(void)
     lv_cache_entry_delete(entry);
     lv_cache_destroy(cache, NULL);
 }
+void test_cache_entry_alloc_unaligned_node_size(void)
+{
+    const uint32_t unaligned_sizes[] = { 3, 13 };
 
+    for(size_t s = 0; s < sizeof(unaligned_sizes) / sizeof(unaligned_sizes[0]); ++s) {
+        uint32_t node_size = unaligned_sizes[s];
+
+        lv_cache_t * cache = create_cache(&lv_cache_class_lru_rb_size, CACHE_SIZE_BYTES);
+        TEST_ASSERT_NOT_NULL(cache);
+
+        lv_cache_entry_t * entry = lv_cache_entry_alloc(node_size, cache);
+        TEST_ASSERT_NOT_NULL(entry);
+
+        TEST_ASSERT_EQUAL_MESSAGE(
+            0, ((uintptr_t)entry) % sizeof(void *),
+            "lv_cache_entry_t * must be pointer-aligned regardless of node_size");
+
+        void * data = lv_cache_entry_get_data(entry);
+        TEST_ASSERT_NOT_NULL(data);
+        TEST_ASSERT_EQUAL_MESSAGE(
+            0, ((uintptr_t)data) % sizeof(void *),
+            "lv_cache_entry_get_data() must be pointer-aligned regardless of node_size");
+
+        lv_cache_entry_t * roundtripped = lv_cache_entry_get_entry(data, node_size);
+        TEST_ASSERT_EQUAL_PTR_MESSAGE(
+            entry, roundtripped,
+            "lv_cache_entry_get_entry(lv_cache_entry_get_data(e), node_size) "
+            "must recover the original entry pointer");
+
+        TEST_ASSERT_EQUAL_UINT32_MESSAGE(
+            node_size, lv_cache_entry_get_node_size(entry),
+            "get_node_size() must return the original unaligned node_size");
+
+        TEST_ASSERT_TRUE_MESSAGE(
+            (uintptr_t)data < (uintptr_t)entry,
+            "data pointer must lie before the entry header in the allocation block");
+
+        lv_cache_entry_delete(entry);
+        lv_cache_destroy(cache, NULL);
+    }
+}
 #endif

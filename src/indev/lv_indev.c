@@ -199,12 +199,8 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
         data->point.y = indev->pointer.last_raw_point.y;
     }
     /*Similarly set at least the last key in case of the user doesn't set it on release*/
-    else if(indev->type == LV_INDEV_TYPE_KEYPAD) {
+    else if(indev->type == LV_INDEV_TYPE_KEYPAD || indev->type == LV_INDEV_TYPE_ENCODER) {
         data->key = indev->keypad.last_key;
-    }
-    /*For compatibility assume that used button was enter (encoder push)*/
-    else if(indev->type == LV_INDEV_TYPE_ENCODER) {
-        data->key = LV_KEY_ENTER;
     }
 
     if(indev->read_cb) {
@@ -651,11 +647,12 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     else return NULL;
 }
 
-void lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+lv_event_dsc_t * lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter,
+                                       void * user_data)
 {
     LV_ASSERT_NULL(indev);
 
-    lv_event_add(&indev->event_list, event_cb, filter, user_data);
+    return lv_event_add(&indev->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_indev_get_event_count(lv_indev_t * indev)
@@ -813,7 +810,18 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     uint32_t prev_key = i->keypad.last_key;
     i->keypad.last_key = data->key;
 
-    lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL);
+    /*Save the previous state so we can detect state changes below and also set the last state now
+     *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
+     *for the next time*/
+    lv_indev_state_t prev_state = i->keypad.last_state;
+    i->keypad.last_state = data->state;
+
+
+    if(prev_key != data->key ||  prev_state != data->state) {
+        if(lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL) == LV_RESULT_INVALID) {
+            return;
+        }
+    }
 
     lv_group_t * g = i->group;
 
@@ -826,12 +834,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
 
     const bool is_enabled = (g == NULL) || !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-
-    /*Save the previous state so we can detect state changes below and also set the last state now
-     *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
-     *for the next time*/
-    uint32_t prev_state             = i->keypad.last_state;
-    i->keypad.last_state = data->state;
 
     /*Key press happened*/
     if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_RELEASED) {
@@ -1693,6 +1695,16 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->pointer.gesture_sum.x     = 0;
         indev->pointer.gesture_sum.y     = 0;
         indev->reset_query                     = 0;
+        if(indev->type == LV_INDEV_TYPE_ENCODER) {
+            /* Before v9.6, LV_INDEV_TYPE_ENCODER set LV_KEY_ENTER as the last key on EVERY frame.
+             * This required users to store and re-feed the last key to LVGL each frame.
+             * From v9.6 onward, we no longer reset the key every frame to simplify the user's
+             * implementation. However, this can cause compatibility issues for users who never
+             * explicitly set the key, as it was previously always defaulting to LV_KEY_ENTER.
+             * To maintain compatibility, we initialize the key to LV_KEY_ENTER here.
+             */
+            indev->keypad.last_key = LV_KEY_ENTER;
+        }
         indev->stop_processing_query           = 0;
         indev_obj_act                               = NULL;
     }

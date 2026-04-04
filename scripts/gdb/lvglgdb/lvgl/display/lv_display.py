@@ -6,6 +6,19 @@ from lvglgdb.value import Value, ValueInput
 class LVDisplay(Value):
     """LVGL display"""
 
+    _DISPLAY_SPEC = {
+        "info": [
+            ("_title", lambda d: f"Display @{d['addr']}"),
+            ("hor_res", "hor_res"),
+            ("ver_res", "ver_res"),
+            ("screen_count", "screen_count"),
+        ],
+        "table": [],
+        "empty_msg": "No displays.",
+    }
+
+    _LAYER_NAMES = ("bottom_layer", "act_scr", "top_layer", "sys_layer")
+
     def __init__(self, disp: ValueInput):
         super().__init__(Value.normalize(disp, "lv_display_t"))
 
@@ -20,10 +33,27 @@ class LVDisplay(Value):
         return int(self.super_value("ver_res"))
 
     @property
+    def screen_cnt(self) -> int:
+        """Return screen count, 0 if corrupted."""
+        cnt = self.super_value("screen_cnt")
+        if not cnt.is_ok:
+            return 0
+        return int(cnt)
+
+    @property
     def screens(self):
-        screens = self.super_value("screens")
         for i in range(self.screen_cnt):
-            yield LVObject(screens[i])
+            yield LVObject(self.super_value("screens")[i].read_value())
+
+    @property
+    def layer_addrs(self) -> dict:
+        """Map screen address -> layer name for known layer pointers."""
+        result = {}
+        for name in self._LAYER_NAMES:
+            ptr = self.super_value(name)
+            if ptr.is_ok and int(ptr):
+                result[int(ptr)] = name
+        return result
 
     # Buffer-related properties
     @property
@@ -43,3 +73,14 @@ class LVDisplay(Value):
         """Get currently active draw buffer (may be None)"""
         buf_ptr = self.super_value("buf_act")
         return LVDrawBuf(buf_ptr) if buf_ptr else None
+
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+
+        d = {
+            "addr": hex(int(self)),
+            "hor_res": self.hor_res,
+            "ver_res": self.ver_res,
+            "screen_count": self.screen_cnt,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)

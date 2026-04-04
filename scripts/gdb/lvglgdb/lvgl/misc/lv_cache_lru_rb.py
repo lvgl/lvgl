@@ -25,13 +25,25 @@ class LVCacheLRURBIterator(LVCacheIteratorBase):
         return lru_cache, rb_size, ptr_size, rb_node_pp_t, void_pp_t
 
     def _iter_ll_nodes(self, lru_cache, rb_size, ptr_size, rb_node_pp_t, void_pp_t):
-        """Yield (ll_addr, data, back_ptr) for each ll node"""
+        """Yield (ll_addr, data, back_ptr) for each ll node.
+        Skips nodes with inaccessible memory (e.g. corrupted pointers).
+        """
         for ll_node in LVList(lru_cache.ll):
             ll_addr = int(ll_node)
             rb_node = Value(ll_node).cast(rb_node_pp_t)
+            if not rb_node:
+                continue
             data = rb_node.data
+            if not data:
+                continue
+            data = data.read_value()
+            if not data.is_ok:
+                continue
+            data_addr = int(data)
+            if data_addr == 0:
+                continue
             back_ptr = int(
-                Value(int(data) + rb_size - ptr_size).cast(void_pp_t).dereference()
+                Value(data_addr + rb_size - ptr_size).cast(void_pp_t).dereference()
             )
             yield ll_addr, data, back_ptr
 
@@ -46,10 +58,13 @@ class LVCacheLRURBIterator(LVCacheIteratorBase):
             for ll_addr, data, back_ptr in self._iter_ll_nodes(
                 lru_cache, rb_size, ptr_size, rb_node_pp_t, void_pp_t
             ):
-                entry = LVCacheEntry.from_data_ptr(data, self.cache.datatype)
-                entry.extra = Value(back_ptr)
-                entry.ll_addr = ll_addr
-                self._entries.append(entry)
+                try:
+                    entry = LVCacheEntry.from_data_ptr(data, self.cache.datatype)
+                    entry.extra = Value(back_ptr)
+                    entry.ll_addr = ll_addr
+                    self._entries.append(entry)
+                except Exception:
+                    continue
 
         except Exception as e:
             self._collect_error = f"_collect_entries failed: {e}"
@@ -144,36 +159,24 @@ class LVCacheLRURB(LVCache):
         super().__init__(cache, datatype)
         self.cache_base = Value(self)
 
-    def print_info(self):
-        """Dump LRU RB cache information"""
-        print(f"LRU RB Cache Info:")
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
 
-        # Try to get cache class info
-        try:
-            clz = self.clz
-            if clz:
-                print(f"  Cache Class: {clz}")
-                # Check if it's LRU RB based
-                if "lru_rb" in str(clz).lower():
-                    print(f"  Type: LRU with Red-Black Tree")
-        except:
-            pass
+        base = super().snapshot()
+        d = base.as_dict()
+        d["type"] = "lru_rb"
+        return Snapshot(d, source=self,
+                       display_spec=getattr(base, "_display_spec", None))
 
     def is_count_based(self):
         """Check if this is count-based LRU cache"""
-        try:
-            name = str(self.name)
-            return "count" in name.lower() or "lru_rb_count" in str(self.clz).lower()
-        except:
-            return False
+        name = self.name
+        return "count" in name.lower() or "lru_rb_count" in str(self.clz).lower()
 
     def is_size_based(self):
         """Check if this is size-based LRU cache"""
-        try:
-            name = str(self.name)
-            return "size" in name.lower() or "lru_rb_size" in str(self.clz).lower()
-        except:
-            return False
+        name = self.name
+        return "size" in name.lower() or "lru_rb_size" in str(self.clz).lower()
 
     def __iter__(self):
         """Create iterator for this LRU RB cache"""
@@ -185,9 +188,3 @@ class LVCacheLRURB(LVCache):
         for entry in self:
             entries.append(entry)
         return entries
-
-
-def dump_lru_rb_cache_info(cache: ValueInput):
-    """Dump LRU RB cache information"""
-    cache_obj = LVCacheLRURB(cache)
-    cache_obj.print_info()

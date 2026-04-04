@@ -480,6 +480,7 @@ static void render_materials(lv_gltf_t * viewer, lv_gltf_model_data_t * modeld, 
 
 static void render_skins(lv_gltf_t * viewer, lv_gltf_model_data_t * modeld)
 {
+    LV_UNUSED(viewer);
     size_t skin_count = lv_gltf_data_get_skins_size(modeld->model);
     if(skin_count == 0) {
         return;

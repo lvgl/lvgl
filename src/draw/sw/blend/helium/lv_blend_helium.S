@@ -7,20 +7,19 @@
 #define __ASSEMBLY__
 #endif
 
+#include "../../../../lv_conf_internal.h"
+
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE && LV_USE_NATIVE_HELIUM_ASM
+
 #if defined(_RTE_)
 #include "Pre_Include_Global.h"
 #include "RTE_Components.h"
 #endif
 
-#include "../../../../lv_conf_internal.h"
-
 /*GCC Workaround: missing .note.GNU-stack section implies executable stack*/
 #ifdef __ELF__
 .section .note.GNU-stack,"",%progbits
 #endif /* __ELF__ */
-
-
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE && LV_USE_NATIVE_HELIUM_ASM
 
 .data
 reciprocal:

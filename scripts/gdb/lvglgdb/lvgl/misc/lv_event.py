@@ -49,11 +49,6 @@ class LVEvent(Value):
     def stop_processing(self) -> bool:
         return bool(int(self.super_value("stop_processing")))
 
-    def print_info(self):
-        print(f"Event: code={self.code_name}({self.code})")
-        print(f"  current_target={self.current_target}")
-        print(f"  original_target={self.original_target}")
-        print(f"  deleted={self.deleted} stop_processing={self.stop_processing}")
 
 
 class LVEventDsc(Value):
@@ -91,19 +86,40 @@ class LVEventDsc(Value):
     def is_marked_deleting(self) -> bool:
         return bool(self.filter & 0x10000)
 
-    def print_info(self):
-        cb_str = self.cb.format_string(symbols=True, address=True)
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+        from lvglgdb.lvgl.data_utils import fmt_cb
+
         flags = []
         if self.is_preprocess:
             flags.append("PRE")
         if self.is_marked_deleting:
             flags.append("DEL")
-        flag_str = f" [{','.join(flags)}]" if flags else ""
-        print(f"  cb={cb_str} filter={self.filter_name}({self.filter_code}){flag_str}")
+        d = {
+            "cb": fmt_cb(self.cb),
+            "filter": self.filter_code,
+            "filter_name": self.filter_name,
+            "is_preprocess": self.is_preprocess,
+            "is_marked_deleting": self.is_marked_deleting,
+            "flags_str": ",".join(flags) or "-",
+            "user_data": str(self.user_data),
+        }
+        return Snapshot(d, source=self, display_spec=LVEventList._DISPLAY_SPEC)
 
 
 class LVEventList(Value):
     """LVGL event list wrapper (lv_event_list_t contains lv_array_t)"""
+
+    _DISPLAY_SPEC = {
+        "info": [
+            ("callback", "cb"),
+            ("filter", "filter_name"),
+            ("flags", lambda d: d.get("flags_str", "-")),
+            ("user_data", "user_data"),
+        ],
+        "table": [],
+        "empty_msg": "No event descriptors.",
+    }
 
     def __init__(self, event_list: ValueInput):
         super().__init__(Value.normalize(event_list, "lv_event_list_t"))
@@ -131,26 +147,5 @@ class LVEventList(Value):
         return len(self.array)
 
     @staticmethod
-    def print_entries(event_dscs):
-        """Print event descriptors as a PrettyTable."""
-        from prettytable import PrettyTable
-
-        table = PrettyTable()
-        table.field_names = ["#", "callback", "filter", "flags", "user_data"]
-        table.align = "l"
-
-        for i, dsc in enumerate(event_dscs):
-            cb_str = dsc.cb.format_string(symbols=True, address=True)
-            flags = []
-            if dsc.is_preprocess:
-                flags.append("PRE")
-            if dsc.is_marked_deleting:
-                flags.append("DEL")
-            table.add_row(
-                [i, cb_str, dsc.filter_name, ",".join(flags) or "-", dsc.user_data]
-            )
-
-        if not table.rows:
-            print("No event descriptors.")
-        else:
-            print(table)
+    def snapshots(event_dscs):
+        return [dsc.snapshot() for dsc in event_dscs]

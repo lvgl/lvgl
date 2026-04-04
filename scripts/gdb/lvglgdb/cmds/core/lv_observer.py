@@ -1,6 +1,7 @@
 import gdb
 
 from lvglgdb.lvgl.core.lv_observer import LVSubject
+from lvglgdb.lvgl.formatter import print_info
 
 
 class InfoSubject(gdb.Command):
@@ -20,4 +21,4 @@ class InfoSubject(gdb.Command):
         except gdb.error as e:
             print(f"Error: {e}")
             return
-        subject.print_info()
+        print_info(subject.snapshot())

@@ -53,7 +53,7 @@ class LVGL:
         from ..draw.lv_draw_unit import LVDrawUnit
 
         head = self.lv_global.draw_info.unit_head
-        if int(head):
+        if head:
             yield from LVDrawUnit(head)
 
     def image_cache(self):

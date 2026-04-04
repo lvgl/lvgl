@@ -23,7 +23,7 @@ extern "C" {
 #include <wayland-client-protocol.h>
 #include <wayland_xdg_shell.h>
 #include "../../misc/lv_types.h"
-#include "lv_wl_backend_private.h"
+#include "lv_wayland_backend_private.h"
 
 /*********************
  *      DEFINES

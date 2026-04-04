@@ -383,6 +383,26 @@ lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section
  */
 lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
 
+/**
+ * Bind an integer subject to a scale's line needle value
+ * @param obj           pointer to a Scale
+ * @param needle_line   pointer to a line needle
+ * @param needle_length length of the needle
+ * @param subject       pointer to a Subject
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                                lv_subject_t * subject);
+
+/**
+ * Bind an integer subject to a scale's image needle value
+ * @param obj           pointer to a Scale
+ * @param needle_img    pointer to an image needle
+ * @param subject       pointer to a Subject
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, lv_subject_t * subject);
+
 #endif
 
 /**********************

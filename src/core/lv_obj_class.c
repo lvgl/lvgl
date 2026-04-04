@@ -88,14 +88,15 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     else {
         LV_TRACE_OBJ_CREATE("creating normal object");
         LV_ASSERT_OBJ(parent, MY_CLASS);
-        if(parent->spec_attr == NULL) {
-            lv_obj_allocate_spec_attr(parent);
-        }
 
-        parent->spec_attr->child_cnt++;
-        parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
-                                                 sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
-        parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
+        if(!lv_obj_allocate_spec_attr(parent)) {
+            lv_free(obj);
+            return NULL;
+        }
+        if(lv_obj_add_child(parent, obj) != LV_RESULT_OK) {
+            lv_free(obj);
+            return NULL;
+        }
     }
 
     return obj;

@@ -107,8 +107,10 @@ const ap_chars_map_t ap_chars_map[] = {
 /**********************
 *   GLOBAL FUNCTIONS
 **********************/
-uint32_t lv_text_ap_calc_bytes_count(const char * txt)
+
+size_t lv_text_ap_strlen(const char * txt)
 {
+    LV_ASSERT_NULL(txt);
     uint32_t txt_length = 0;
     uint32_t chars_cnt = 0;
     uint32_t current_ap_idx = 0;
@@ -138,7 +140,7 @@ uint32_t lv_text_ap_calc_bytes_count(const char * txt)
         i++;
     }
 
-    return chars_cnt + 1;
+    return chars_cnt;
 }
 
 void lv_text_ap_proc(const char * txt, char * txt_out)
@@ -148,6 +150,9 @@ void lv_text_ap_proc(const char * txt, char * txt_out)
     uint32_t * ch_enc;
     uint32_t * ch_fin;
     char * txt_out_temp;
+    if(!txt || !txt_out) {
+        return;
+    }
 
     txt_length = lv_text_get_encoded_length(txt);
 

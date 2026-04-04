@@ -2,8 +2,7 @@ from dataclasses import dataclass
 from typing import Iterator
 
 import gdb
-from prettytable import PrettyTable
-from lvglgdb.value import Value, ValueInput
+from lvglgdb.value import CorruptedError, Value, ValueInput
 from .lv_style_consts import (
     STYLE_PROP_NAMES,
     PART_NAMES,
@@ -37,7 +36,7 @@ def decode_selector(selector: int) -> str:
 
 
 def format_style_value(prop_id: int, value: Value) -> str:
-    """Format a style value based on property type."""
+    """Format a style value based on property type (with ANSI color block)."""
     try:
         if prop_id in COLOR_PROPS:
             color = value.color
@@ -51,8 +50,32 @@ def format_style_value(prop_id: int, value: Value) -> str:
             return f"{ptr:#x}" if ptr else "NULL"
         else:
             return str(int(value.num))
-    except gdb.error:
+    except CorruptedError:
         return str(value)
+
+
+def _style_value_data(prop_id: int, value: Value) -> dict:
+    """Extract style value as pure data dict (no ANSI codes).
+
+    Returns dict with 'value_str' and optional 'color_rgb'.
+    """
+    try:
+        if prop_id in COLOR_PROPS:
+            color = value.color
+            r = int(color.red) & 0xFF
+            g = int(color.green) & 0xFF
+            b = int(color.blue) & 0xFF
+            return {
+                "value_str": f"#{r:02x}{g:02x}{b:02x}",
+                "color_rgb": {"r": r, "g": g, "b": b},
+            }
+        elif prop_id in POINTER_PROPS:
+            ptr = int(value.ptr)
+            return {"value_str": f"{ptr:#x}" if ptr else "NULL"}
+        else:
+            return {"value_str": str(int(value.num))}
+    except CorruptedError:
+        return {"value_str": str(value)}
 
 
 @dataclass
@@ -90,12 +113,15 @@ class LVStyle(Value):
                 yield StyleEntry(prop_id, const_props[j].value)
                 j += 1
         elif prop_cnt > 0:
-            # Normal style: values[prop_cnt] then props[prop_cnt] (uint8_t)
+            # Normal style: values[prop_cnt] then props[prop_cnt]
+            # C code: (lv_style_prop_t*)vp + prop_cnt * sizeof(lv_style_value_t)
+            # The pointer arithmetic uses lv_style_prop_t element size as stride.
             base = self.values_and_props
             value_t = gdb.lookup_type("lv_style_value_t")
+            prop_t = gdb.lookup_type("lv_style_prop_t")
             values_ptr = base.cast(value_t, ptr=True)
-            props_offset = prop_cnt * value_t.sizeof
-            props_ptr = Value(int(base) + props_offset).cast("uint8_t", ptr=True)
+            props_offset = prop_cnt * value_t.sizeof * prop_t.sizeof
+            props_ptr = Value(int(base) + props_offset).cast(prop_t, ptr=True)
 
             for j in range(prop_cnt):
                 prop_id = int(props_ptr[j])
@@ -103,21 +129,18 @@ class LVStyle(Value):
                     continue
                 yield StyleEntry(prop_id, values_ptr[j])
 
-    def print_entries(self):
-        """Print style properties as a table."""
-        entries = list(self.__iter__())
-        if not entries:
-            print("Empty style.")
-            return
+    def snapshots(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
 
-        table = PrettyTable()
-        table.field_names = ["prop", "value"]
-        table.align = "l"
-        for e in entries:
-            table.add_row([e.prop_name, e.value_str])
-        print(table)
+        result = []
+        for entry in self.__iter__():
+            vdata = _style_value_data(entry.prop_id, entry.value)
+            d = {
+                "prop_id": entry.prop_id,
+                "prop_name": entry.prop_name,
+                **vdata,
+            }
+            result.append(Snapshot(d, source=entry))
+        return result
 
 
-def dump_style_info(entry: StyleEntry):
-    """Print a single style property."""
-    print(f"{entry.prop_name}({entry.prop_id}) = {entry.value_str}")

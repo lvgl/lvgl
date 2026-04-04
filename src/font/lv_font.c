@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_font.h"
+#include "lv_font_private.h"
 #include "../misc/lv_text_private.h"
 #include "../misc/lv_utils.h"
 #include "../misc/lv_log.h"
@@ -197,6 +198,30 @@ bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_
 bool lv_font_has_static_bitmap(const lv_font_t * font)
 {
     return font->static_bitmap;
+}
+
+int32_t lv_font_glyph_dsc_compare(const lv_font_glyph_dsc_t * lhs, const lv_font_glyph_dsc_t * rhs)
+{
+    if(lhs->resolved_font != rhs->resolved_font) {
+        return (lv_uintptr_t)lhs->resolved_font > (lv_uintptr_t)rhs->resolved_font ? 1 : -1;
+    }
+
+    int32_t ret = lhs->format - rhs->format;
+    if(ret != 0) {
+        return ret;
+    }
+
+    if(lhs->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
+        if(lhs->gid.src == rhs->gid.src) {
+            return 0;
+        }
+        return (lv_uintptr_t)lhs->gid.src > (lv_uintptr_t)rhs->gid.src ? 1 : -1;
+    }
+
+    if(lhs->gid.index == rhs->gid.index) {
+        return 0;
+    }
+    return lhs->gid.index > rhs->gid.index ? 1 : -1;
 }
 
 /**********************

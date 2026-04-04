@@ -40,7 +40,7 @@ Visual Studio
 containing all the tools required for development out of the box.
 
 To use LVGL in Visual Studio, visit the
-`lvgl/lv_port_pc_visual_studio <https://github.com/lvgl/lv_port_pc_visual_studio>`__ repository.
+`lvgl/lv_port_pc_visual_studio_cmake <https://github.com/lvgl/lv_port_pc_visual_studio_cmake>`__ repository.
 
 It uses LVGL's built-in Windows drivers to open a window where you can see the LVGL-rendered UI,
 and use your mouse as a touch input replacement.

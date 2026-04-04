@@ -1,22 +1,28 @@
-from prettytable import PrettyTable
-
 from lvglgdb.value import Value, ValueInput
 
 
 class LVDrawUnit(Value):
     """LVGL draw unit wrapper"""
 
+    _DISPLAY_SPEC = {
+        "info": [
+            ("name", "name"),
+            ("idx", "idx"),
+        ],
+        "table": [],
+        "empty_msg": "No draw units.",
+    }
+
     def __init__(self, unit: ValueInput):
         super().__init__(Value.normalize(unit, "lv_draw_unit_t"))
 
     @property
     def name(self) -> str:
-        n = self.super_value("name")
-        return n.string() if int(n) else "(unnamed)"
+        return self.super_value("name").string(fallback="(unnamed)")
 
     @property
     def idx(self) -> int:
-        return int(self.super_value("idx"))
+        return self.safe_field("idx", -1, int)
 
     @property
     def next(self):
@@ -29,17 +35,16 @@ class LVDrawUnit(Value):
             yield node
             node = node.next
 
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
+
+        d = {
+            "addr": hex(int(self)),
+            "name": self.name,
+            "idx": self.idx,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
+
     @staticmethod
-    def print_entries(units):
-        """Print draw units as a PrettyTable."""
-        table = PrettyTable()
-        table.field_names = ["#", "name", "idx"]
-        table.align = "l"
-
-        for i, unit in enumerate(units):
-            table.add_row([i, unit.name, unit.idx])
-
-        if not table.rows:
-            print("No draw units.")
-        else:
-            print(table)
+    def snapshots(units):
+        return [unit.snapshot() for unit in units]

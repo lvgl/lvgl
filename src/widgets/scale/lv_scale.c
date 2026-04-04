@@ -32,6 +32,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
+#if LV_USE_OBSERVER
+typedef struct {
+    lv_obj_t * needle_line;
+    int32_t needle_length;
+} bind_element_needle_t;
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -77,6 +83,8 @@ static void needle_deleted_cb(lv_event_t * e);
 #if LV_USE_OBSERVER
     static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+    static void scale_line_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+    static void scale_image_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif /*LV_USE_OBSERVER*/
 
 /**********************
@@ -605,6 +613,55 @@ lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section
     }
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_max_value_observer_cb, obj, section);
+
+    return observer;
+}
+
+lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                                lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(needle_line);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    bind_element_needle_t * user_data = lv_zalloc(sizeof(bind_element_needle_t));
+    if(user_data == NULL) {
+        LV_LOG_WARN("Couldn't allocate user_data");
+        LV_ASSERT_MALLOC(user_data);
+        return NULL;
+    }
+
+    user_data->needle_line = needle_line;
+    user_data->needle_length = needle_length;
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_line_needle_value_observer_cb, obj, user_data);
+    if(observer == NULL) {
+        LV_LOG_WARN("Couldn't create observer");
+        lv_free(user_data);
+        return NULL;
+    }
+    observer->auto_free_user_data = 1;
+
+    return observer;
+}
+
+lv_observer_t * lv_scale_bind_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(needle_img);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_image_needle_value_observer_cb, obj, needle_img);
 
     return observer;
 }
@@ -1885,6 +1942,19 @@ static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_sub
 {
     lv_scale_section_t * section = observer->user_data;
     lv_scale_set_section_max_value(observer->target, section, subject->value.num);
+}
+
+static void scale_line_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    bind_element_needle_t * bind_element = observer->user_data;
+    lv_scale_set_line_needle_value(observer->target, bind_element->needle_line, bind_element->needle_length,
+                                   subject->value.num);
+}
+
+static void scale_image_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * needle_img = observer->user_data;
+    lv_scale_set_image_needle_value(observer->target, needle_img, subject->value.num);
 }
 
 #endif /*LV_USE_OBSERVER*/

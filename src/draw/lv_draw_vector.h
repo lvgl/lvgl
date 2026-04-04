@@ -346,7 +346,6 @@ void lv_draw_vector_dsc_set_fill_image(lv_draw_vector_dsc_t * dsc, const lv_draw
 void lv_draw_vector_dsc_set_fill_linear_gradient(lv_draw_vector_dsc_t * dsc, float x1, float y1, float x2, float y2);
 
 /**
-
  * Set fill radial gradient radius for descriptor
  * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this gradient.
  * @param dsc pointer to a vector graphic descriptor
