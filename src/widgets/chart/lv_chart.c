@@ -1224,9 +1224,9 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             }
         }
 
-        lv_value_precise_t active_norm = -1.f;
-        lv_value_precise_t next_none_norm_dist = -1.f;
-        lv_value_precise_t next_none_norm = -1.f;
+        lv_value_precise_t active_norm = (lv_value_precise_t)(-1.0);
+        lv_value_precise_t next_none_norm_dist = (lv_value_precise_t)(-1.0);
+        lv_value_precise_t next_none_norm = (lv_value_precise_t)(-1.0);
 
 #if LV_USE_CHART_SCISSOR_FILL_MODE
         lv_value_precise_t head_norm = 0.f;
@@ -1241,8 +1241,9 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         for(i = 0; i < chart->point_cnt; i++) {
             if(next_none > -1) {
                 active_norm = (lv_value_precise_t)p_act / (lv_value_precise_t)(chart->point_cnt);
-                next_none_norm_dist = ((LV_ABS((next_none_norm - 1.f) - active_norm) < LV_ABS(next_none_norm - active_norm)) ?
-                                       (next_none_norm - 1.f) : next_none_norm) - active_norm;
+                next_none_norm_dist = ((LV_ABS((next_none_norm - (lv_value_precise_t)(1.0)) - active_norm) < LV_ABS(
+                                            next_none_norm - active_norm)) ?
+                                       (next_none_norm - (lv_value_precise_t)(1.0)) : next_none_norm) - active_norm;
             }
             lv_value_precise_t p_x = (int32_t)((w * i) / (chart->point_cnt - 1)) + x_ofs;
             if(p_x > layer->_clip_area.x2 + extra_space_x + 1) break;
@@ -1286,14 +1287,15 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
 #if LV_USE_CHART_SCISSOR_FILL_MODE
                             in_head = ((next_none_norm_dist < head_norm) && (next_none_norm_dist > 0.f));
-                            in_tail = ((next_none_norm_dist > -tail_norm) && (next_none_norm_dist > -1.f) && (next_none_norm_dist < 0.f));
+                            in_tail = ((next_none_norm_dist > -tail_norm) && (next_none_norm_dist > (lv_value_precise_t)(-1.0)) &&
+                                       (next_none_norm_dist < 0.f));
                             if(in_head) {
-                                norm_edge_effect = 1.f - (next_none_norm_dist / head_norm);
+                                norm_edge_effect = (lv_value_precise_t)(1.0) - (next_none_norm_dist / head_norm);
                                 norm_edge_effect *= norm_edge_effect;
                                 ex_size += (int32_t)(norm_edge_effect * (lv_value_precise_t)chart->head_size_offset);
                             }
                             else if(in_tail) {
-                                norm_edge_effect = 1.f - (-next_none_norm_dist / tail_norm);
+                                norm_edge_effect = (lv_value_precise_t)(1.0) - (-next_none_norm_dist / tail_norm);
                                 norm_edge_effect *= norm_edge_effect;
                                 ex_size += (int32_t)(norm_edge_effect * (lv_value_precise_t)chart->tail_size_offset);
                             }
