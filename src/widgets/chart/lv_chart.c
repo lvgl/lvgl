@@ -1229,8 +1229,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         lv_value_precise_t next_none_norm = (lv_value_precise_t)(-1.0);
 
 #if LV_USE_CHART_SCISSOR_FILL_MODE
-        lv_value_precise_t head_norm = 0.f;
-        lv_value_precise_t tail_norm = 0.f;
+        lv_value_precise_t head_norm = (lv_value_precise_t)(0.0);
+        lv_value_precise_t tail_norm = (lv_value_precise_t)(0.0);
         if(next_none > -1) {
             head_norm = (lv_value_precise_t)chart->head_percent / (lv_value_precise_t)1024.f;
             tail_norm = ((lv_value_precise_t)chart->tail_percent / (lv_value_precise_t)1024.f);
@@ -1280,15 +1280,15 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                         if(crowded_scissor_fill_mode) {
                             /*Draw the line from the accumulated points*/
                             lv_area_t coords;
-                            lv_value_precise_t norm_edge_effect = 0.f;
+                            lv_value_precise_t norm_edge_effect = (lv_value_precise_t)(0.0);
                             bool in_head = false;
                             bool in_tail = false;
                             int32_t ex_size = 1;
 
 #if LV_USE_CHART_SCISSOR_FILL_MODE
-                            in_head = ((next_none_norm_dist < head_norm) && (next_none_norm_dist > 0.f));
+                            in_head = ((next_none_norm_dist < head_norm) && (next_none_norm_dist > (lv_value_precise_t)(0.0)));
                             in_tail = ((next_none_norm_dist > -tail_norm) && (next_none_norm_dist > (lv_value_precise_t)(-1.0)) &&
-                                       (next_none_norm_dist < 0.f));
+                                       (next_none_norm_dist < (lv_value_precise_t)(0.0)));
                             if(in_head) {
                                 norm_edge_effect = (lv_value_precise_t)(1.0) - (next_none_norm_dist / head_norm);
                                 norm_edge_effect *= norm_edge_effect;
