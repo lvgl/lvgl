@@ -234,6 +234,120 @@ void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, 
     lv_chart_set_axis_max_value(obj, axis, max);
 }
 
+#if LV_USE_CHART_SCISSOR_FILL_MODE
+
+void lv_chart_set_head_percent(lv_obj_t * obj, uint32_t norm)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    if(chart->head_percent == norm) return;
+
+    chart->head_percent = norm;
+    lv_obj_invalidate(obj);
+}
+
+void lv_chart_set_head_size_offset(lv_obj_t * obj, int32_t pixels)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    if(chart->head_size_offset == pixels) return;
+
+    chart->head_size_offset = pixels;
+    lv_obj_invalidate(obj);
+}
+
+void lv_chart_set_head_color(lv_obj_t * obj, lv_color_t color)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+
+    chart->head_color = color;
+    lv_obj_invalidate(obj);
+}
+
+uint32_t lv_chart_get_head_percent(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->head_percent;
+}
+int32_t lv_chart_get_head_size_offset(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->head_size_offset;
+}
+
+lv_color_t lv_chart_get_head_color(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->head_color;
+}
+
+void lv_chart_set_tail_percent(lv_obj_t * obj, uint32_t norm)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    if(chart->tail_percent == norm) return;
+
+    chart->tail_percent = norm;
+    lv_obj_invalidate(obj);
+}
+
+void lv_chart_set_tail_size_offset(lv_obj_t * obj, int32_t pixels)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    if(chart->tail_size_offset == pixels) return;
+
+    chart->tail_size_offset = pixels;
+    lv_obj_invalidate(obj);
+}
+
+void lv_chart_set_tail_color(lv_obj_t * obj, lv_color_t color)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+
+    chart->tail_color = color;
+    lv_obj_invalidate(obj);
+}
+
+uint32_t lv_chart_get_tail_percent(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->tail_percent;
+}
+
+int32_t lv_chart_get_tail_size_offset(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->tail_size_offset;
+}
+
+lv_color_t lv_chart_get_tail_color(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->tail_color;
+}
+#endif
+
 void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -1041,12 +1155,20 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
     /*If there are at least as many points as pixels then draw only vertical lines*/
     bool crowded_mode = (int32_t)chart->point_cnt >= w;
+    bool crowded_scissor_fill_mode = false;
 
     int32_t bullet_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
     int32_t bullet_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
     int32_t extra_space_x;
     if(chart->point_cnt <= 1) extra_space_x = 0;
     else extra_space_x = w  / (chart->point_cnt - 1) + bullet_w + line_dsc.width;
+
+    /* For OpenGLES rendering, force crowded mode with no extra space allocation */
+#if LV_USE_CHART_SCISSOR_FILL_MODE
+    crowded_mode = true;
+    crowded_scissor_fill_mode = true;
+    extra_space_x = 0;
+#endif
 
     lv_draw_rect_dsc_t point_draw_dsc;
     if(crowded_mode == false) {
@@ -1093,7 +1215,35 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.point_cnt = 0;
 
         uint32_t i;
+        int32_t next_none = -1;
+        for(uint32_t ii = 0; ii < chart->point_cnt; ii++) {
+            uint32_t p_test = (start_point + ii) % chart->point_cnt;
+            if(ser->y_points[p_test] == LV_CHART_POINT_NONE) {
+                next_none = p_test;
+                break;
+            }
+        }
+
+        float active_norm = -1.f;
+        float next_none_norm_dist = -1.f;
+        float next_none_norm = -1.f;
+
+#if LV_USE_CHART_SCISSOR_FILL_MODE
+        float head_norm = 0.f;
+        float tail_norm = 0.f;
+        if(next_none > -1) {
+            head_norm = (float)chart->head_percent / (float)1024.f;
+            tail_norm = ((float)chart->tail_percent / (float)1024.f);
+            next_none_norm = ((float)(next_none) / (float)(chart->point_cnt));
+        }
+#endif
+
         for(i = 0; i < chart->point_cnt; i++) {
+            if(next_none > -1) {
+                active_norm = (float)p_act / (float)(chart->point_cnt);
+                next_none_norm_dist = ((LV_ABS((next_none_norm - 1.f) - active_norm) < LV_ABS(next_none_norm - active_norm)) ?
+                                       (next_none_norm - 1.f) : next_none_norm) - active_norm;
+            }
             lv_value_precise_t p_x = (int32_t)((w * i) / (chart->point_cnt - 1)) + x_ofs;
             if(p_x > layer->_clip_area.x2 + extra_space_x + 1) break;
             if(p_x < layer->_clip_area.x1 - extra_space_x - 1) {
@@ -1126,21 +1276,73 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                     y_max = LV_MAX(y_max, p_y);
                     y_min = LV_MIN(y_min, p_y);
                     if(x_prev != p_x) {
-                        line_dsc.points[line_dsc.point_cnt].y = y_min;
-                        line_dsc.points[line_dsc.point_cnt].x = p_x;
-                        line_dsc.points[line_dsc.point_cnt + 1].y = y_max;
-                        line_dsc.points[line_dsc.point_cnt + 1].x = p_x;
-                        line_dsc.points[line_dsc.point_cnt + 2].y = LV_DRAW_LINE_POINT_NONE;
-                        line_dsc.points[line_dsc.point_cnt + 2].x = p_x;
+                        if(crowded_scissor_fill_mode) {
+                            /*Draw the line from the accumulated points*/
+                            lv_area_t coords;
+                            float norm_edge_effect = 0.f;
+                            bool in_head = false;
+                            bool in_tail = false;
+                            int32_t ex_size = 1;
 
-                        /*If they are the same no line would be drawn*/
-                        if(line_dsc.points[line_dsc.point_cnt].y == line_dsc.points[line_dsc.point_cnt + 1].y) {
-                            line_dsc.points[line_dsc.point_cnt + 1].y++;
+#if LV_USE_CHART_SCISSOR_FILL_MODE
+                            in_head = ((next_none_norm_dist < head_norm) && (next_none_norm_dist > 0.f));
+                            in_tail = ((next_none_norm_dist > -tail_norm) && (next_none_norm_dist > -1.f) && (next_none_norm_dist < 0.f));
+                            if(in_head) {
+                                norm_edge_effect = 1.f - (next_none_norm_dist / head_norm);
+                                norm_edge_effect *= norm_edge_effect;
+                                ex_size += (norm_edge_effect * chart->head_size_offset);
+                            }
+                            else if(in_tail) {
+                                norm_edge_effect = 1.f - (-next_none_norm_dist / tail_norm);
+                                norm_edge_effect *= norm_edge_effect;
+                                ex_size += (norm_edge_effect * chart->tail_size_offset);
+                            }
+#endif
+                            coords.x1 = p_x;
+                            coords.x2 = p_x + ex_size;
+                            coords.y1 = y_min;
+                            coords.y2 = y_max + ex_size;
+                            if(y_min == y_max) {
+                                coords.y2 = y_min + 1;
+                            }
+
+                            lv_draw_task_t * t;
+                            t = lv_draw_add_task(layer, &coords, LV_DRAW_TASK_TYPE_FILL);
+                            lv_draw_fill_dsc_t * bg_dsc = t->draw_dsc;
+                            lv_draw_fill_dsc_init(bg_dsc);
+                            bg_dsc->radius = 0;
+                            lv_color_t outcol = ser->color;
+#if LV_USE_CHART_SCISSOR_FILL_MODE
+                            if(in_head) {
+                                outcol = lv_color_mix(chart->head_color, outcol, (int8_t)(norm_edge_effect * 255.f));
+                            }
+                            else if(in_tail) {
+                                outcol = lv_color_mix(chart->tail_color, outcol, (int8_t)(norm_edge_effect * 255.f));
+
+                            }
+#endif
+                            bg_dsc->color = outcol;
+                            bg_dsc->opa = LV_OPA_COVER;
+
+                            lv_draw_finalize_task_creation(layer, t);
+                        }
+                        else {
+                            line_dsc.points[line_dsc.point_cnt].y = y_min;
+                            line_dsc.points[line_dsc.point_cnt].x = p_x;
+                            line_dsc.points[line_dsc.point_cnt + 1].y = y_max;
+                            line_dsc.points[line_dsc.point_cnt + 1].x = p_x;
+                            line_dsc.points[line_dsc.point_cnt + 2].y = LV_DRAW_LINE_POINT_NONE;
+                            line_dsc.points[line_dsc.point_cnt + 2].x = p_x;
+
+                            /*If they are the same no line would be drawn*/
+                            if(line_dsc.points[line_dsc.point_cnt].y == line_dsc.points[line_dsc.point_cnt + 1].y) {
+                                line_dsc.points[line_dsc.point_cnt + 1].y++;
+                            }
+                            line_dsc.point_cnt += 3;
                         }
                         y_min = p_y;  /*Start the line of the next x from the current last y*/
                         y_max = p_y;
                         x_prev = p_x;
-                        line_dsc.point_cnt += 3;
                     }
                 }
             }
@@ -1149,25 +1351,27 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         }
 
         /*Draw the line from the accumulated points*/
-        lv_draw_line(layer, &line_dsc);
-        if(!crowded_mode) {
-            point_draw_dsc.bg_color = ser->color;
-            point_draw_dsc.base.id1 = line_dsc.base.id1;
-            /*Add the bullets too*/
-            if(bullet_w > 0 && bullet_h > 0) {
-                point_draw_dsc.base.id2 = i - 1; /*Start from the last rendered point*/
-                int32_t j;
-                for(j = line_dsc.point_cnt - 1; j >= 0; j--) {
-                    if(points[j].y == LV_DRAW_LINE_POINT_NONE) continue;
+        if(!crowded_scissor_fill_mode) {
+            lv_draw_line(layer, &line_dsc);
+            if(!crowded_mode) {
+                point_draw_dsc.bg_color = ser->color;
+                point_draw_dsc.base.id1 = line_dsc.base.id1;
+                /*Add the bullets too*/
+                if(bullet_w > 0 && bullet_h > 0) {
+                    point_draw_dsc.base.id2 = i - 1; /*Start from the last rendered point*/
+                    int32_t j;
+                    for(j = line_dsc.point_cnt - 1; j >= 0; j--) {
+                        if(points[j].y == LV_DRAW_LINE_POINT_NONE) continue;
 
-                    lv_area_t point_area;
-                    point_area.x1 = (int32_t)points[j].x - bullet_w;
-                    point_area.x2 = (int32_t)points[j].x + bullet_w;
-                    point_area.y1 = (int32_t)points[j].y - bullet_h;
-                    point_area.y2 = (int32_t)points[j].y + bullet_h;
+                        lv_area_t point_area;
+                        point_area.x1 = (int32_t)points[j].x - bullet_w;
+                        point_area.x2 = (int32_t)points[j].x + bullet_w;
+                        point_area.y1 = (int32_t)points[j].y - bullet_h;
+                        point_area.y2 = (int32_t)points[j].y + bullet_h;
 
-                    lv_draw_rect(layer, &point_draw_dsc, &point_area);
-                    point_draw_dsc.base.id2--;
+                        lv_draw_rect(layer, &point_draw_dsc, &point_area);
+                        point_draw_dsc.base.id2--;
+                    }
                 }
             }
         }
