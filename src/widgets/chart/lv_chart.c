@@ -1290,12 +1290,12 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                             if(in_head) {
                                 norm_edge_effect = 1.f - (next_none_norm_dist / head_norm);
                                 norm_edge_effect *= norm_edge_effect;
-                                ex_size += (norm_edge_effect * chart->head_size_offset);
+                                ex_size += (int32_t)(norm_edge_effect * (float)chart->head_size_offset);
                             }
                             else if(in_tail) {
                                 norm_edge_effect = 1.f - (-next_none_norm_dist / tail_norm);
                                 norm_edge_effect *= norm_edge_effect;
-                                ex_size += (norm_edge_effect * chart->tail_size_offset);
+                                ex_size += (int32_t)(norm_edge_effect * (float)chart->tail_size_offset);
                             }
 #endif
                             coords.x1 = p_x;
