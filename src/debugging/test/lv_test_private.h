@@ -19,6 +19,8 @@ extern "C" {
 #include "../../misc/lv_types.h"
 #include "../../indev/lv_indev_gesture.h"
 
+#include "../../drivers/opengles/lv_opengles_private.h"
+
 /*********************
  *      DEFINES
  *********************/

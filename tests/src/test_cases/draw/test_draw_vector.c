@@ -37,6 +37,11 @@ void tearDown(void)
 
 static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
 {
+    LV_UNUSED(layer);
+    LV_UNUSED(transform);
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(layer);
     lv_draw_vector_dsc_set_transform(ctx, transform);
 
@@ -194,10 +199,16 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_draw_vector(ctx);
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(ctx);
+#endif
 }
 
 static void draw_lines(lv_layer_t * layer, const lv_matrix_t * transform)
 {
+    LV_UNUSED(layer);
+    LV_UNUSED(transform);
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(layer);
     lv_draw_vector_dsc_set_transform(ctx, transform);
 
@@ -298,6 +309,7 @@ static void draw_lines(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_draw_vector(ctx);
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(ctx);
+#endif
 }
 
 static void canvas_draw(const char * name, draw_cb_t draw_cb)
@@ -331,6 +343,9 @@ static void canvas_draw(const char * name, draw_cb_t draw_cb)
 
 void test_transform(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#else
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
     lv_matrix_translate(&matrix, 100, 100);
@@ -356,15 +371,22 @@ void test_transform(void)
     TEST_ASSERT_EQUAL_FLOAT(120.0f, pt[1].y);
 
     lv_vector_path_delete(path);
+#endif
 }
 
 void test_draw_lines(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#endif
     canvas_draw("draw_lines", draw_lines);
 }
 
 void test_draw_shapes(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#endif
     canvas_draw("draw_shapes", draw_shapes);
 }
 
@@ -399,6 +421,9 @@ static void draw_during_rendering(const char * name, draw_cb_t draw_cb, lv_opa_t
 
 void test_draw_during_rendering(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#endif
     /* Enable the Draw Unit dump parameters */
     lv_draw_unit_send_event(NULL, LV_EVENT_FOCUSED, NULL);
 
@@ -414,7 +439,9 @@ void test_draw_during_rendering(void)
 
 void test_draw_display_matrix_rotation(void)
 {
-#if LV_DRAW_TRANSFORM_USE_MATRIX
+#if !LV_DRAW_TRANSFORM_USE_MATRIX || !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("One of LV_DRAW_TRANSFORM_USE_MATRIX or LV_USE_VECTOR_GRAPHIC is not enabled");
+#else
     lv_display_t * disp = lv_display_get_default();
     lv_display_set_matrix_rotation(disp, true);
     TEST_ASSERT_TRUE(lv_display_get_matrix_rotation(disp));
@@ -440,8 +467,6 @@ void test_draw_display_matrix_rotation(void)
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
     draw_during_rendering("shapes_disp_rotation_0", draw_shapes, LV_OPA_COVER);
     draw_during_rendering("lines_disp_rotation_0", draw_lines, LV_OPA_COVER);
-#else
-    TEST_PASS();
 #endif
 }
 

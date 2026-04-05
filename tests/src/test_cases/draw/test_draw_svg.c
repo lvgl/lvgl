@@ -6,10 +6,10 @@
 
 #include "unity/unity.h"
 
+
 static lv_layer_t layer;
 static lv_obj_t * canvas;
 static lv_draw_buf_t * canvas_buf;
-
 void setUp(void)
 {
     canvas = lv_canvas_create(lv_screen_active());
@@ -27,8 +27,7 @@ void tearDown(void)
     lv_obj_delete(canvas);
 }
 
-#if LV_USE_VECTOR_GRAPHIC && LV_USE_SVG
-
+#if LV_USE_SVG
 #define SNAPSHOT_NAME(n) (#n)
 
 static void draw_snapshot(const char * name)
@@ -47,6 +46,7 @@ static void draw_snapshot(const char * name)
 
 static void draw_svg(lv_svg_node_t * svg)
 {
+
     lv_image_cache_drop(canvas_buf);
     lv_canvas_set_draw_buf(canvas, canvas_buf);
     lv_canvas_fill_bg(canvas, lv_color_make(0xff, 0xff, 0xff), 255);
@@ -54,8 +54,37 @@ static void draw_svg(lv_svg_node_t * svg)
     lv_canvas_finish_layer(canvas, &layer);
 }
 
+static const char * get_font_path(const char * font_family)
+{
+    LV_UNUSED(font_family);
+#ifndef TEST_FONT_PATH
+    return "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+#else
+    return TEST_FONT_PATH;
+#endif
+}
+
+static void load_image(const char * image_url, lv_draw_image_dsc_t * img_dsc)
+{
+    if(strcmp(image_url, "cogwheel.bin") == 0) {
+        LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
+        img_dsc->header = test_image_cogwheel_argb8888.header;
+        img_dsc->src = &test_image_cogwheel_argb8888;
+    }
+}
+
+const lv_svg_render_hal_t hal = {
+    .load_image = load_image,
+    .get_font_path = get_font_path,
+};
+
+#endif /*LV_USE_SVG*/
+
 void test_draw_group(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_group_1 = \
                                "<svg><g fill=\"#FF0000\">"
                                "<rect x=\"0\" y=\"0\" width=\"100\" height=\"100\"/>"
@@ -111,35 +140,14 @@ void test_draw_group(void)
     draw_svg(svg);
     draw_snapshot(SNAPSHOT_NAME(svg_group_4));
     lv_svg_node_delete(svg);
-
-}
-
-static void load_image(const char * image_url, lv_draw_image_dsc_t * img_dsc)
-{
-    if(strcmp(image_url, "cogwheel.bin") == 0) {
-        LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
-        img_dsc->header = test_image_cogwheel_argb8888.header;
-        img_dsc->src = &test_image_cogwheel_argb8888;
-    }
-}
-
-static const char * get_font_path(const char * font_family)
-{
-    LV_UNUSED(font_family);
-#ifndef TEST_FONT_PATH
-    return "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
-#else
-    return TEST_FONT_PATH;
 #endif
 }
 
-const lv_svg_render_hal_t hal = {
-    .load_image = load_image,
-    .get_font_path = get_font_path,
-};
-
 void test_draw_shapes(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     lv_svg_render_init(&hal);
     const char * svg_shapes_1 = \
                                 "<svg><rect fill=\"red\" x=\"0\" y=\"0\" width=\"100\" height=\"100\"/>"
@@ -328,10 +336,14 @@ void test_draw_shapes(void)
     draw_svg(svg);
     draw_snapshot(SNAPSHOT_NAME(svg_shapes_12));
     lv_svg_node_delete(svg);
+#endif
 }
 
 void test_draw_image(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     lv_svg_render_init(&hal);
 
     const char * svg_image_0 = \
@@ -489,10 +501,14 @@ void test_draw_image(void)
     draw_svg(svg);
     draw_snapshot(SNAPSHOT_NAME(svg_image_12));
     lv_svg_node_delete(svg);
+#endif
 }
 
 void test_draw_text(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     lv_svg_render_init(&hal);
 
     const char * svg_text_1 = \
@@ -520,10 +536,14 @@ void test_draw_text(void)
     draw_svg(svg);
     draw_snapshot(SNAPSHOT_NAME(svg_text_2));
     lv_svg_node_delete(svg);
+#endif
 }
 
 void test_draw_complex(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     lv_svg_render_init(&hal);
 
     const char * svg_com_1 = \
@@ -677,11 +697,14 @@ void test_draw_complex(void)
     draw_svg(svg);
     draw_snapshot(SNAPSHOT_NAME(svg_com_8));
     lv_svg_node_delete(svg);
-
+#endif
 }
 
 void test_draw_svg(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_viewport_1 = \
                                   "<svg width=\"300px\" height=\"300px\" viewport-fill-opacity=\"0.5\" viewport-fill=\"blue\"></svg>";
 
@@ -715,12 +738,6 @@ void test_draw_svg(void)
     draw_svg(svg);
     draw_snapshot(SNAPSHOT_NAME(svg_viewport_3));
     lv_svg_node_delete(svg);
-}
-#else
-
-void test_draw_svg(void)
-{
-    ;
-}
 #endif
+}
 #endif

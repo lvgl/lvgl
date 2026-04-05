@@ -1,3 +1,4 @@
+#include "src/core/lv_global.h"
 #if LV_BUILD_TEST || LV_BUILD_TEST_PERF
 #include "lv_test_init.h"
 #include <stdio.h>

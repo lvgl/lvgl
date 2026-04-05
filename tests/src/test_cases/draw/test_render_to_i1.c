@@ -17,7 +17,16 @@ void tearDown(void)
 
 void test_render_to_i1(void)
 {
-#if LV_BIN_DECODER_RAM_LOAD && LV_USE_DRAW_VG_LITE == 0
+#if !LV_BIN_DECODER_RAM_LOAD
+    TEST_IGNORE_MESSAGE("Can't test rotated images with LV_BIN_DECODER_RAM_LOAD=0");
+#endif
+#if LV_USE_DRAW_VG_LITE
+    TEST_IGNORE_MESSAGE("LV_USE_DRAW_VG_LITE doesn't support i1");
+#endif
+#if LV_USE_DRAW_OPENGLES
+    TEST_IGNORE_MESSAGE("LV_USE_DRAW_OPENGLES doesn't support i1");
+#endif
+
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_I1);
 
     lv_opa_t opa_values[2] = {0xff, 0xc0};
@@ -33,10 +42,6 @@ void test_render_to_i1(void)
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
         }
     }
-#else
-    /*Without LV_BIN_DECODER_RAM_LOAD can't test rotated images*/
-    TEST_PASS();
-#endif
 }
 
 #endif

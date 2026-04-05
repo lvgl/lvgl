@@ -16,6 +16,7 @@ endif()
 project(lvgl_tests LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address -Werror)
 
@@ -62,6 +63,10 @@ set(SANITIZE_AND_COVERAGE_OPTIONS
     -fsanitize=leak
     -fsanitize=undefined
     --coverage
+)
+
+set(LVGL_TEST_OPTIONS_OPENGLES 
+    -DLV_TEST_OPTION=8
 )
 
 set(LVGL_TEST_OPTIONS_VG_LITE
@@ -114,6 +119,8 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
 
+set(EXTERNAL_LIBS)
+
 if (OPTIONS_SDL)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_SDL})
 elseif (OPTIONS_NORMAL_8BIT)
@@ -162,6 +169,12 @@ elseif (OPTIONS_TEST_RISCV_V)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs/")
     message(STATUS "RISC-V Vector (RVV) software emulation test enabled")
+elseif (OPTIONS_TEST_OPENGLES)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_OPENGLES} -DLVGL_CI_USING_SYS_HEAP ${SANITIZE_AND_COVERAGE_OPTIONS})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs_opengl/")
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
@@ -365,12 +378,15 @@ if(NOT WIN32)
     # libjpeg is required for the jpeg test case
     find_package(JPEG REQUIRED)
     include_directories(${JPEG_INCLUDE_DIR})
+    list(APPEND EXTERNAL_LIBS ${JPEG_LIBRARIES})
+            
 
     find_package(PkgConfig)
     pkg_check_modules(WebP libwebp)
 
     if (WebP_FOUND)
         include_directories(${WebP_INCLUDEDIR})
+        list(APPEND EXTERNAL_LIBS ${WebP_LINK_LIBRARIES})
     else()
         message("WebP not found, defaulting to 0")
         add_definitions(-DLV_USE_LIBWEBP=0)
@@ -395,6 +411,7 @@ endif()
 # libpng is required for the png test case
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
+list(APPEND EXTERNAL_LIBS ${PNG_LIBRARIES})
 
 if(NOT WIN32)
     # FFmpeg is optional for the image and video test cases
@@ -408,6 +425,7 @@ if(NOT WIN32)
 
     if(FFMPEG_FOUND)
         include_directories(${FFMPEG_INCLUDE_DIRS})
+        list(APPEND EXTERNAL_LIBS PkgConfig::FFMPEG)
     else()
         message("FFmpeg not found, defaulting to 0")
         add_definitions(-DLV_USE_FFMPEG=0)
@@ -421,6 +439,8 @@ endif()
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
+list(APPEND EXTERNAL_LIBS ${FREETYPE_LIBRARIES})
+
 if(OPTIONS_SDL)
     find_package(SDL2 REQUIRED)
     include_directories(${SDL2_INCLUDE_DIRS})
@@ -430,6 +450,7 @@ endif()
 find_package(Libinput OPTIONAL_COMPONENTS)
 if ($ENV{NON_AMD64_BUILD})
     include_directories(${LIBINPUT_INCLUDE_DIRS})
+    list(APPEND EXTERNAL_LIBS ${LIBINPUT_LIBRARIES})
 endif()
 
 # OpenGL ES is required for its driver
@@ -437,17 +458,23 @@ if ($ENV{NON_AMD64_BUILD})
     message("Disable OpenGL, glfw3 for non-amd64 build")
     add_definitions(-DLV_USE_OPENGLES=0)
 else()
-    find_package(OpenGL)
-    find_package(glfw3)
-
-    if(OpenGL_FOUND AND glfw3_FOUND)
-        # Include directories
-        include_directories(${OPENGL_INCLUDE_DIR})
-        include_directories(${GLFW_INCLUDE_DIRS})
-        message("Enable LV_USE_OPENGLES")
+    if(OPTIONS_TEST_OPENGLES)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(GLFW3 REQUIRED glfw3)
+	list(APPEND EXTERNAL_LIBS ${GLFW3_LIBRARIES})
     else()
-        message("OpenGL, glfw3 not found, defaulting to 0")
-        add_definitions(-DLV_USE_OPENGLES=0)
+        find_package(OpenGL)
+        find_package(glfw3)
+
+        if(OpenGL_FOUND AND glfw3_FOUND)
+            # Include directories
+            include_directories(${OPENGL_INCLUDE_DIR})
+            include_directories(${GLFW_INCLUDE_DIRS})
+            message("Enable LV_USE_OPENGLES")
+        else()
+            message("OpenGL, glfw3 not found, defaulting to 0")
+            add_definitions(-DLV_USE_OPENGLES=0)
+        endif()
     endif()
 endif()
 
@@ -468,6 +495,7 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/FindLibDRM.cmake)
 if(Libdrm_FOUND)
     include_directories(${Libdrm_INCLUDE_DIRS})
+    list(APPEND EXTERNAL_LIBS ${LIBDRM_LIBRARIES})
 else()
     message("libdrm not found, defaulting to 0")
     add_definitions(-DLV_USE_LINUX_DRM=0)
@@ -533,13 +561,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             lvgl_demos
             lvgl
             lvgl_thorvg
-            ${PNG_LIBRARIES}
-            ${FREETYPE_LIBRARIES}
-            ${LIBDRM_LIBRARIES}
-            ${LIBINPUT_LIBRARIES}
-            ${JPEG_LIBRARIES}
-            ${WebP_LINK_LIBRARIES}
-            PkgConfig::FFMPEG
+	    ${EXTERNAL_LIBS}
             m
             pthread
             ${TEST_LIBS})

@@ -35,6 +35,7 @@ test_options = {
     'OPTIONS_TEST_DEFHEAP': 'Test config, LVGL heap, 32 bit color depth',
     'OPTIONS_TEST_VG_LITE': 'VG-Lite simulator with full config, 32 bit color depth',
     'OPTIONS_TEST_RISCV_V': 'RISC-V Vector emulation with full config, 32 bit color depth',
+    'OPTIONS_TEST_OPENGLES': 'OpengGL draw unit tests, 32 bit color depth',
 }
 
 
@@ -148,6 +149,14 @@ def run_tests(options_name, test_suite):
     print('=' * len(label))
     print(label)
     print('=' * len(label), flush=True)
+
+    if options_name == 'OPTIONS_TEST_OPENGLES':
+        supp_file = os.path.abspath(
+            os.path.join(lvgl_test_dir, "lsan-egl.supp")
+        )
+        existing = os.environ.get("LSAN_OPTIONS")
+        prefix = f"{existing}:" if existing else ""
+        os.environ["LSAN_OPTIONS"] = f"{prefix}suppressions={supp_file}"
 
     os.chdir(get_build_dir(options_name))
     args = [
