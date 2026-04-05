@@ -1165,9 +1165,10 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
     /* For OpenGLES rendering, force crowded mode with no extra space allocation */
 #if LV_USE_CHART_SCISSOR_FILL_MODE
-    crowded_mode = true;
-    crowded_scissor_fill_mode = true;
-    extra_space_x = 0;
+    if(crowded_mode == true) {
+        crowded_scissor_fill_mode = true;
+        extra_space_x = 0;
+    }
 #endif
 
     lv_draw_rect_dsc_t point_draw_dsc;
