@@ -67,7 +67,7 @@ Then, write your own dictionary according to the following format:
 
 .. code-block:: c
 
-   lv_100ask_pinyin_dict_t your_pinyin_dict[] = {
+   lv_pinyin_dict_t your_pinyin_dict[] = {
                { "a", "啊阿呵吖" },
                { "ai", "埃挨哎唉哀皑蔼矮碍爱隘癌艾" },
                { "an", "按安暗岸俺案鞍氨胺厂广庵揞犴铵桉谙鹌埯黯" },
