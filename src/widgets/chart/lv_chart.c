@@ -1256,9 +1256,9 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         lv_value_precise_t head_norm = (lv_value_precise_t)(0.0);
         lv_value_precise_t tail_norm = (lv_value_precise_t)(0.0);
         if(next_none > -1) {
-            head_norm = (lv_value_precise_t)chart->head_percent / (lv_value_precise_t)1024.f;
-            tail_norm = ((lv_value_precise_t)chart->tail_percent / (lv_value_precise_t)1024.f);
-            next_none_norm = ((lv_value_precise_t)(next_none) / (lv_value_precise_t)(chart->point_cnt));
+            head_norm = (lv_value_precise_t)chart->head_percent / (lv_value_precise_t)(1024.0);
+            tail_norm = ((lv_value_precise_t)chart->tail_percent / (lv_value_precise_t)(1024.0);
+                         next_none_norm = ((lv_value_precise_t)(next_none) / (lv_value_precise_t)(chart->point_cnt));
         }
 #endif
 
@@ -1340,10 +1340,10 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                             lv_color_t outcol = ser->color;
 #if LV_USE_CHART_SCISSOR_FILL_MODE
                             if(in_head) {
-                                outcol = lv_color_mix(chart->head_color, outcol, (int8_t)(norm_edge_effect * 255.f));
+                                outcol = lv_color_mix(chart->head_color, outcol, (int8_t)(norm_edge_effect * 255.0));
                             }
                             else if(in_tail) {
-                                outcol = lv_color_mix(chart->tail_color, outcol, (int8_t)(norm_edge_effect * 255.f));
+                                outcol = lv_color_mix(chart->tail_color, outcol, (int8_t)(norm_edge_effect * 255.0));
 
                             }
 #endif
