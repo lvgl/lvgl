@@ -1257,8 +1257,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         lv_value_precise_t tail_norm = (lv_value_precise_t)(0.0);
         if(next_none > -1) {
             head_norm = (lv_value_precise_t)chart->head_percent / (lv_value_precise_t)(1024.0);
-            tail_norm = ((lv_value_precise_t)chart->tail_percent / (lv_value_precise_t)(1024.0);
-                         next_none_norm = ((lv_value_precise_t)(next_none) / (lv_value_precise_t)(chart->point_cnt));
+            tail_norm = (lv_value_precise_t)chart->tail_percent / (lv_value_precise_t)(1024.0);
+            next_none_norm = ((lv_value_precise_t)(next_none) / (lv_value_precise_t)(chart->point_cnt));
         }
 #endif
 
