@@ -115,7 +115,7 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      && dsc->tile == 0
                      && dsc->blend_mode == LV_BLEND_MODE_NORMAL
                      && dsc->recolor_opa <= LV_OPA_MIN
-                     && dsc->opa <= (lv_opa_t)LV_OPA_MAX
+                     && dsc->opa >= (lv_opa_t)LV_OPA_MAX
                      && dsc->skew_y == 0
                      && dsc->skew_x == 0
                      && dsc->scale_x == 256
