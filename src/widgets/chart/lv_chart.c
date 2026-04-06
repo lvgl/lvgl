@@ -236,6 +236,26 @@ void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, 
 
 #if LV_USE_CHART_SCISSOR_FILL_MODE
 
+void lv_chart_set_force_crowded(lv_obj_t * obj, bool force_enable)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    if(chart->force_crowded_mode == force_enable) return;
+
+    chart->force_crowded_mode = force_enable;
+    lv_obj_invalidate(obj);
+}
+
+bool lv_chart_get_force_crowded(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+
+    return chart->force_crowded_mode;
+}
+
 void lv_chart_set_head_percent(lv_obj_t * obj, uint32_t norm)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -1165,6 +1185,9 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
     /* For OpenGLES rendering, force crowded mode with no extra space allocation */
 #if LV_USE_CHART_SCISSOR_FILL_MODE
+    if(lv_chart_get_force_crowded(obj)) {
+        crowded_mode = true;
+    }
     if(crowded_mode == true) {
         crowded_scissor_fill_mode = true;
         extra_space_x = 0;

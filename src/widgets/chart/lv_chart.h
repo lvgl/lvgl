@@ -129,6 +129,19 @@ void lv_chart_set_axis_max_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t m
 
 #if LV_USE_CHART_SCISSOR_FILL_MODE
 /**
+ * Force crowded mode chart rendering
+ * @param obj           pointer to a chart object
+ * @param force_enable  true to force crowded mode rendering, false to only enable if needed
+ */
+void lv_chart_set_force_crowded(lv_obj_t * obj, bool force_enable);
+
+/**
+ * Get the force crowded mode chart rendering flag state
+ * @param obj           pointer to a chart object
+ */
+bool lv_chart_get_force_crowded(lv_obj_t * obj);
+
+/**
  * Set the head percentage
  * @param obj       pointer to a chart object
  * @param norm      set a 0 to 1024 value representing what portion of the chart should be the head
