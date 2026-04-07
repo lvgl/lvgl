@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_obj_property_names[76] = {
+const lv_property_name_t lv_obj_property_names[77] = {
     {"align",                  LV_PROPERTY_OBJ_ALIGN,},
     {"child_count",            LV_PROPERTY_OBJ_CHILD_COUNT,},
     {"content_height",         LV_PROPERTY_OBJ_CONTENT_HEIGHT,},
@@ -59,6 +59,7 @@ const lv_property_name_t lv_obj_property_names[76] = {
     {"h",                      LV_PROPERTY_OBJ_H,},
     {"index",                  LV_PROPERTY_OBJ_INDEX,},
     {"layout",                 LV_PROPERTY_OBJ_LAYOUT,},
+    {"name",                   LV_PROPERTY_OBJ_NAME,},
     {"parent",                 LV_PROPERTY_OBJ_PARENT,},
     {"screen",                 LV_PROPERTY_OBJ_SCREEN,},
     {"scroll_bottom",          LV_PROPERTY_OBJ_SCROLL_BOTTOM,},
