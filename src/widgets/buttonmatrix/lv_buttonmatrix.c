@@ -653,6 +653,17 @@ static void draw_main(lv_event_t * e)
     int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     int32_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
+    /*Clip margin for the early skip check in the draw loop below.
+     *Buttons can render outside their base area due to outline and shadow.
+     *Use the maximum of row and column gaps (with a dpi/10 floor) as a
+     *conservative uniform margin on all sides.*/
+    int32_t row_gap = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
+    int32_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+    int32_t dpi_margin = lv_display_get_dpi(lv_obj_get_display(obj)) / 10;
+    row_gap = LV_MAX(row_gap, dpi_margin);
+    col_gap = LV_MAX(col_gap, dpi_margin);
+    int32_t clip_margin = LV_MAX(row_gap, col_gap);
+
 #if LV_USE_ARABIC_PERSIAN_CHARS
     char txt_ap[256];
 #endif
@@ -684,6 +695,23 @@ static void draw_main(lv_event_t * e)
         btn_area.y1 += area_obj.y1;
         btn_area.x2 += area_obj.x1;
         btn_area.y2 += area_obj.y1;
+
+        /*Skip buttons outside the clip area.  Extend the test area by
+         *clip_margin (shadow/outline) and popover height when applicable.*/
+        lv_area_t clip_test = btn_area;
+        clip_test.x1 -= clip_margin;
+        clip_test.y1 -= clip_margin;
+        clip_test.x2 += clip_margin;
+        clip_test.y2 += clip_margin;
+        if(button_is_popover(btnm->ctrl_bits[btn_i])) {
+            clip_test.y1 -= lv_area_get_height(&btn_area);
+        }
+        if(!lv_area_is_on(&clip_test, &layer->_clip_area)) {
+            /*Buttons are laid out top to bottom.  Once a button's top edge
+             *is below the clip area, all remaining buttons are too.*/
+            if(btn_area.y1 > layer->_clip_area.y2 + clip_margin) break;
+            continue;
+        }
 
         /*Set up the draw descriptors*/
         if(btn_state == LV_STATE_DEFAULT) {
