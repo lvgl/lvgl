@@ -305,22 +305,24 @@ static uint32_t _key_from_uefi_key(const EFI_KEY_DATA * key)
     LV_ASSERT_NULL(key);
 
     switch(key->Key.ScanCode) {
-        case 0x01:
+        case SCAN_UP:
             return LV_KEY_UP;
-        case 0x02:
+        case SCAN_DOWN:
             return LV_KEY_DOWN;
-        case 0x04:
+        case SCAN_LEFT:
             return LV_KEY_LEFT;
-        case 0x03:
+        case SCAN_RIGHT:
             return LV_KEY_RIGHT;
-        case 0x08:
+        case SCAN_DELETE:
             return LV_KEY_DEL;
-        case 0x05:
+        case SCAN_HOME:
             return LV_KEY_HOME;
-        case 0x06:
+        case SCAN_END:
             return LV_KEY_END;
-        case 0x17:
+        case SCAN_ESC:
             return LV_KEY_ESC;
+        case SCAN_SUSPEND:
+            return LV_KEY_ENTER;
         /* ignore all other scan codes */
         default:
             break;
