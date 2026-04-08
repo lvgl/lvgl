@@ -594,33 +594,33 @@ bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_IMAGE: {
-            lv_draw_image_dsc_t * dsc = t->draw_dsc;
-            if(dsc->src && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
-                if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->src, unit)) return false;
+                lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                if(dsc->src && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
+                    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->src, unit)) return false;
+                }
+                if(dsc->bitmap_mask_src && lv_image_src_get_type(dsc->bitmap_mask_src) == LV_IMAGE_SRC_VARIABLE) {
+                    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->bitmap_mask_src, unit)) return false;
+                }
+                break;
             }
-            if(dsc->bitmap_mask_src && lv_image_src_get_type(dsc->bitmap_mask_src) == LV_IMAGE_SRC_VARIABLE) {
-                if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->bitmap_mask_src, unit)) return false;
-            }
-            break;
-        }
         case LV_DRAW_TASK_TYPE_LAYER: {
-            lv_draw_image_dsc_t * dsc = t->draw_dsc;
-            lv_layer_t * src_layer = (lv_layer_t *)dsc->src;
-            if(src_layer && src_layer->draw_buf) {
-                if(!lv_draw_buf_ensure_resident(src_layer->draw_buf, unit)) return false;
+                lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                lv_layer_t * src_layer = (lv_layer_t *)dsc->src;
+                if(src_layer && src_layer->draw_buf) {
+                    if(!lv_draw_buf_ensure_resident(src_layer->draw_buf, unit)) return false;
+                }
+                if(dsc->bitmap_mask_src && lv_image_src_get_type(dsc->bitmap_mask_src) == LV_IMAGE_SRC_VARIABLE) {
+                    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->bitmap_mask_src, unit)) return false;
+                }
+                break;
             }
-            if(dsc->bitmap_mask_src && lv_image_src_get_type(dsc->bitmap_mask_src) == LV_IMAGE_SRC_VARIABLE) {
-                if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->bitmap_mask_src, unit)) return false;
-            }
-            break;
-        }
         case LV_DRAW_TASK_TYPE_ARC: {
-            lv_draw_arc_dsc_t * dsc = t->draw_dsc;
-            if(dsc->img_src && lv_image_src_get_type(dsc->img_src) == LV_IMAGE_SRC_VARIABLE) {
-                if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->img_src, unit)) return false;
+                lv_draw_arc_dsc_t * dsc = t->draw_dsc;
+                if(dsc->img_src && lv_image_src_get_type(dsc->img_src) == LV_IMAGE_SRC_VARIABLE) {
+                    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->img_src, unit)) return false;
+                }
+                break;
             }
-            break;
-        }
         default:
             break;
     }

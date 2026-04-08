@@ -356,11 +356,11 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
     }
     else
 #endif
-    if(size > draw_buf->data_size) {
-        LV_LOG_TRACE("Draw buf too small for new shape");
-        LV_PROFILER_DRAW_END;
-        return NULL;
-    }
+        if(size > draw_buf->data_size) {
+            LV_LOG_TRACE("Draw buf too small for new shape");
+            LV_PROFILER_DRAW_END;
+            return NULL;
+        }
 
     draw_buf->header.cf = cf;
     draw_buf->header.w = w;
@@ -713,7 +713,7 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
          * Discard: just allocate, don't upload stale content. */
         if(unit_has_vram) {
             bool ok = discard ? unit->vram_alloc_cb(unit, buf)
-                              : unit->vram_upload_cb(unit, buf);
+                      : unit->vram_upload_cb(unit, buf);
             if(!ok) return false;
             /* Free CPU data after successful VRAM alloc/upload if LVGL owns it.
              * Keep data_size — it's the logical buffer capacity used by tiling math. */
@@ -737,7 +737,7 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
              * since the CPU data is ROM and always valid. */
             bool is_image_dsc = (buf->handlers == NULL);
             bool ok = (discard && !is_image_dsc) ? unit->vram_alloc_cb(unit, buf)
-                                                 : unit->vram_upload_cb(unit, buf);
+                      : unit->vram_upload_cb(unit, buf);
             if(!ok) return false;
             /* Free CPU data after successful VRAM alloc/upload if LVGL owns it.
              * Keep data_size — it's the logical buffer capacity used by tiling math.
