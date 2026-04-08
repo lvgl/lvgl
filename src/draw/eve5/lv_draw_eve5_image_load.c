@@ -47,7 +47,10 @@ bool lv_draw_eve5_resolve_image_source(LV_IMAGE_DSC_CONST void *src, eve5_resolv
         resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)src;
         resolved->decoder_open = false;
         if(draw_unit != NULL) {
-            lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit);
+            if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit)) {
+                LV_LOG_WARN("EVE5: Failed to ensure variable image residency");
+                return false;
+            }
         }
         return true;
     }
@@ -67,7 +70,13 @@ bool lv_draw_eve5_resolve_image_source(LV_IMAGE_DSC_CONST void *src, eve5_resolv
         resolved->img_dsc = (LV_IMAGE_DSC_CONST lv_image_dsc_t *)resolved->decoder_dsc.decoded;
         resolved->decoder_open = true;
         if(draw_unit != NULL) {
-            lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit);
+            if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit)) {
+                LV_LOG_WARN("EVE5: Failed to ensure file image residency");
+                lv_image_decoder_close(&resolved->decoder_dsc);
+                resolved->decoder_open = false;
+                resolved->img_dsc = NULL;
+                return false;
+            }
         }
         return true;
     }

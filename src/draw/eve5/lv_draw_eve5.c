@@ -283,7 +283,10 @@ static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
         while(t) {
             if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
                t->state == LV_DRAW_TASK_STATE_QUEUED) {
-                lv_draw_buf_ensure_task_sources_resident(t, draw_unit);
+                if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+                    LV_LOG_WARN("EVE5: Failed to ensure task sources resident, skipping task type %d", t->type);
+                    t->state = LV_DRAW_TASK_STATE_FINISHED;
+                }
             }
             t = t->next;
         }
