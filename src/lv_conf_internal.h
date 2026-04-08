@@ -1134,6 +1134,21 @@
     #endif
 #endif
 
+/* Use EVE BT820 GPU through EVE HAL. */
+#ifndef LV_USE_DRAW_EVE5
+    #ifdef CONFIG_LV_USE_DRAW_EVE5
+        #define LV_USE_DRAW_EVE5 CONFIG_LV_USE_DRAW_EVE5
+    #else
+        #define LV_USE_DRAW_EVE5 0
+    #endif
+#endif
+
+/* LV_USE_DRAW_EVE5 requires LV_USE_DRAW_VRAM */
+#if LV_USE_DRAW_EVE5 && !LV_USE_DRAW_VRAM
+    #undef LV_USE_DRAW_VRAM
+    #define LV_USE_DRAW_VRAM 1
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

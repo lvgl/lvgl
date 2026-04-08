@@ -146,31 +146,217 @@ bool lv_draw_eve5_get_render_target_format(lv_color_format_t lv_cf, uint16_t *ev
 }
 
 /**********************
+ * VRAM CALLBACKS
+ **********************/
+
+static bool eve5_vram_alloc_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+{
+    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
+
+    uint32_t w = buf->header.w;
+    uint32_t h = buf->header.h;
+    lv_color_format_t cf = (lv_color_format_t)buf->header.cf;
+
+    uint16_t eve_fmt;
+    uint8_t bpp;
+    lv_draw_eve5_get_render_target_format(cf, &eve_fmt, &bpp);
+
+#if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
+    if(!lv_color_format_has_alpha(cf) && eve_fmt != ARGB8) {
+        eve_fmt = RGB8;
+        bpp = 3;
+    }
+#endif
+
+    uint32_t aligned_w = ALIGN_UP(w, 16);
+    uint32_t aligned_h = ALIGN_UP(h, 16);
+    uint32_t size = aligned_w * aligned_h * bpp;
+
+    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
+    if(Esd_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
+        LV_LOG_WARN("EVE5 VRAM alloc failed (%ux%u fmt=%d, %u bytes)", w, h, eve_fmt, size);
+        return false;
+    }
+
+    lv_draw_eve5_vram_res_t *vr = lv_malloc(sizeof(lv_draw_eve5_vram_res_t));
+    if(vr == NULL) {
+        Esd_GpuAlloc_Free(u->allocator, handle);
+        return false;
+    }
+
+    vr->base.unit = draw_unit;
+    vr->base.size = size;
+    vr->gpu_handle = handle;
+    vr->eve_format = eve_fmt;
+    vr->stride = aligned_w * bpp;
+    vr->source_offset = 0;
+    vr->palette_offset = GA_INVALID;
+    vr->is_premultiplied = false;
+    vr->has_content = false;
+
+    buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
+    buf->header.flags |= LV_IMAGE_FLAGS_VRAM_RESIDENT;
+
+    LV_LOG_INFO("EVE5 VRAM alloc: %ux%u fmt=%d stride=%u -> handle %d",
+                w, h, eve_fmt, vr->stride, handle.Id);
+    return true;
+}
+
+static void eve5_vram_free_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+{
+    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_draw_eve5_vram_res_t *vr = (lv_draw_eve5_vram_res_t *)buf->vram_res;
+
+    if(vr == NULL) return;
+
+    Esd_GpuAlloc_Free(u->allocator, vr->gpu_handle);
+    lv_free(vr);
+
+    buf->vram_res = NULL;
+    buf->header.flags &= ~LV_IMAGE_FLAGS_VRAM_RESIDENT;
+}
+
+static bool eve5_vram_upload_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+{
+    /* Non-ALLOCATED buffers (e.g., display buf_act from lv_draw_buf_init)
+     * are render target placeholders with stale CPU data — just allocate
+     * fresh VRAM at render-target alignment without uploading. */
+    if(!(buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED)) {
+        return eve5_vram_alloc_cb(draw_unit, buf);
+    }
+
+    /* MODIFIABLE + ALLOCATED: render-target-capable buffer with real pixel data
+     * (e.g., canvas with SW-rendered content). Allocate with render-target
+     * alignment, then upload the CPU data preserving content. */
+    if(buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) {
+        if(!eve5_vram_alloc_cb(draw_unit, buf)) return false;
+
+        lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
+        lv_draw_eve5_vram_res_t *vr = (lv_draw_eve5_vram_res_t *)buf->vram_res;
+        uint32_t gpu_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle);
+        if(gpu_addr == GA_INVALID) return false;
+
+        /* Upload CPU pixel data row by row, handling stride mismatch between
+         * LVGL's draw_buf stride and the render-target-aligned VRAM stride. */
+        uint32_t cpu_stride = buf->header.stride;
+        if(cpu_stride == 0) cpu_stride = lv_draw_buf_width_to_stride(buf->header.w, buf->header.cf);
+        uint32_t gpu_stride = vr->stride;
+        uint32_t row_bytes = LV_MIN(cpu_stride, gpu_stride);
+        uint8_t *src = buf->data;
+
+        if(src != NULL) {
+            /* Check if the entire buffer is transparent (all zeros).
+             * A fully transparent buffer is equivalent to a fresh clear —
+             * skip the upload and leave has_content=false so hal_init_layer
+             * clears instead of blitting, and try_canvas_direct_image can
+             * replace it with a direct GPU load. */
+            bool all_zero = true;
+            {
+                const uint32_t *p = (const uint32_t *)src;
+                uint32_t total_bytes = cpu_stride * buf->header.h;
+                uint32_t dwords = total_bytes / 4;
+                for(uint32_t i = 0; i < dwords; i++) {
+                    if(p[i] != 0) { all_zero = false; break; }
+                }
+                if(all_zero) {
+                    /* Check trailing bytes */
+                    uint32_t remainder = total_bytes % 4;
+                    const uint8_t *tail = (const uint8_t *)src + dwords * 4;
+                    for(uint32_t i = 0; i < remainder; i++) {
+                        if(tail[i] != 0) { all_zero = false; break; }
+                    }
+                }
+            }
+
+            if(!all_zero) {
+                for(int32_t y = 0; y < buf->header.h; y++) {
+                    EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, src + y * cpu_stride, row_bytes);
+                }
+                vr->is_premultiplied = lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED)
+                                     || buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+                vr->has_content = true;
+            }
+        }
+        return true;
+    }
+
+    /* Read-only image data — upload to VRAM with image alignment */
+    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
+
+    eve5_gpu_image_t img;
+    if(!lv_draw_eve5_upload_image_to_gpu(u, (const lv_image_dsc_t *)buf, &img)) {
+        return false;
+    }
+
+    lv_draw_eve5_vram_res_t *vr = lv_malloc(sizeof(lv_draw_eve5_vram_res_t));
+    if(vr == NULL) return false;
+
+    vr->base.unit = draw_unit;
+    vr->base.size = img.eve_stride * img.height;
+    vr->gpu_handle = img.gpu_handle;
+    vr->eve_format = img.eve_format;
+    vr->stride = (uint32_t)img.eve_stride;
+    vr->source_offset = img.image_offset;
+    vr->palette_offset = img.palette_offset;
+    vr->is_premultiplied = lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED)
+                         || buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+    vr->has_content = true;
+
+    buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
+    buf->header.flags |= LV_IMAGE_FLAGS_VRAM_RESIDENT;
+
+    return true;
+}
+
+static bool eve5_vram_download_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+{
+    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_draw_eve5_vram_res_t *vr = (lv_draw_eve5_vram_res_t *)buf->vram_res;
+
+    if(vr == NULL || buf->data == NULL) return false;
+
+    return lv_draw_eve5_download_image(u, buf, vr);
+}
+
+void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t *u)
+{
+    u->base_unit.vram_alloc_cb    = eve5_vram_alloc_cb;
+    u->base_unit.vram_free_cb     = eve5_vram_free_cb;
+    u->base_unit.vram_upload_cb   = eve5_vram_upload_cb;
+    u->base_unit.vram_download_cb = eve5_vram_download_cb;
+}
+
+bool lv_draw_eve5_detach_gpu_handle(lv_draw_buf_t *buf, Esd_GpuHandle *out_handle)
+{
+    if(buf == NULL || buf->vram_res == NULL) return false;
+    lv_draw_eve5_vram_res_t *vr = (lv_draw_eve5_vram_res_t *)buf->vram_res;
+    *out_handle = vr->gpu_handle;
+    lv_free(vr);
+    buf->vram_res = NULL;
+    buf->header.flags &= ~LV_IMAGE_FLAGS_VRAM_RESIDENT;
+    return true;
+}
+
+/**********************
  * LAYER MANAGEMENT
  **********************/
 
 void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
                                   bool is_screen, bool is_canvas)
 {
-    Esd_GpuHandle handle = { 0 };
     uint32_t ram_g_addr = GA_INVALID;
-    bool canvas_has_content = false;  /* True if canvas has existing GPU content to preserve */
-    bool canvas_is_premultiplied = false;  /* True if existing canvas content is premultiplied */
-    uint16_t canvas_format = ARGB8;  /* EVE format of existing canvas content */
-    uint32_t canvas_stride = 0;  /* Stride of existing canvas content */
-    bool canvas_needs_conversion = false;  /* True if existing content needs format upgrade */
+    bool canvas_has_content = false;
+    bool canvas_is_premultiplied = false;
+    uint16_t canvas_format = ARGB8;
+    uint32_t canvas_stride = 0;
+    bool canvas_needs_conversion = false;
 
     int32_t w = lv_area_get_width(&layer->buf_area);
     int32_t h = lv_area_get_height(&layer->buf_area);
     int32_t aligned_w = ALIGN_UP(w, 16);
     int32_t aligned_h = ALIGN_UP(h, 16);
 
-    /* Determine the target render format based on layer type:
-     * - Screen layer: ALWAYS ARGB8 (display driver expects HW_BITMAP_FORMAT=ARGB8)
-     * - Canvas layers: use draw_buf->header.cf (what user requested)
-     * - Child layers: use color_format (set by LVGL for compositing - typically ARGB8888)
-     * Alpha formats → ARGB8 (need proper alpha for compositing).
-     * Non-alpha formats → native format (RGB565, RGB8) for efficiency. */
+    /* Determine the target render format */
     uint16_t target_eve_fmt = ARGB8;
     uint8_t target_bpp = 4;
     if(!is_screen) {
@@ -184,104 +370,70 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
         lv_draw_eve5_get_render_target_format(target_lv_cf, &target_eve_fmt, &target_bpp);
 
 #if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
-        /* Force RGB8 for opaque layers (non-alpha formats like RGB565) */
         if(!lv_color_format_has_alpha(target_lv_cf) && target_eve_fmt != ARGB8) {
             target_eve_fmt = RGB8;
             target_bpp = 3;
         }
 #endif
     }
-    /* Screen layer: keep default ARGB8/4bpp - display driver expects this */
 
-    /* Canvas layers use the persistent canvas cache instead of layer->user_data.
-     * This allows the GPU allocation to persist after the stack-allocated lv_layer_t
-     * is destroyed, and to be reused when the draw_buf is displayed as an image.
-     * However, user_data MUST also be set so parent LAYER tasks can find the texture
-     * (the LAYER dispatch checks user_data != NULL to decide whether to composite). */
-    if(is_canvas) {
-        uint32_t cached_aw;
-        bool is_new;
-        ram_g_addr = lv_draw_eve5_canvas_cache_get_or_create(u, layer,
-                                                               target_eve_fmt, target_bpp,
-                                                               &cached_aw,
-                                                               &canvas_format, &canvas_stride,
-                                                               &is_new, &canvas_is_premultiplied);
+    /* VRAM path: allocation was done by vram_alloc_cb via ensure_resident.
+     * Read the existing vram_res to get the GPU address. */
+    lv_draw_eve5_vram_res_t *vr = eve5_get_vram_res(layer);
+    if(vr != NULL) {
+        /* If the existing VRAM format doesn't match the target render format
+         * (e.g., display buffer allocated as RGB565 but screen layer renders
+         * as ARGB8), reallocate with the correct format and alignment. */
+        if(vr->eve_format != target_eve_fmt) {
+            Esd_GpuAlloc_Free(u->allocator, vr->gpu_handle);
+            uint32_t new_aw = ALIGN_UP(w, 16);
+            uint32_t new_ah = ALIGN_UP(h, 16);
+            uint32_t new_size = new_aw * new_ah * target_bpp;
+            vr->gpu_handle = Esd_GpuAlloc_Alloc(u->allocator, new_size, GA_ALIGN_128);
+            vr->eve_format = target_eve_fmt;
+            vr->stride = new_aw * target_bpp;
+            vr->source_offset = 0;
+            vr->palette_offset = GA_INVALID;
+            vr->base.size = new_size;
+            vr->has_content = false;
+        }
+
+        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle);
         if(ram_g_addr != GA_INVALID) {
-            aligned_w = cached_aw;
-            canvas_has_content = !is_new;  /* Existing allocation = has content to preserve */
-
-            /* Set user_data to the canvas cache handle so parent LAYER tasks can
-             * find this texture. user_data is nulled after each LAYER composite,
-             * so it must be re-set each time the canvas is rendered. */
-            lv_draw_eve5_canvas_cache_t *cache = &u->canvas_cache;
-            for(uint32_t i = 0; i < EVE5_CANVAS_CACHE_CAPACITY; i++) {
-                lv_draw_eve5_canvas_cache_entry_t *e = &cache->entries[i];
-                if(e->valid && e->data_ptr == layer->draw_buf->data) {
-                    layer->user_data = Esd_GpuHandle_ToPtrType(e->gpu_handle);
-                    break;
+            aligned_w = vr->stride / target_bpp;
+            if(is_canvas && vr->has_content) {
+                canvas_has_content = true;
+                canvas_is_premultiplied = vr->is_premultiplied;
+                canvas_format = vr->eve_format;
+                canvas_stride = vr->stride;
+                if(canvas_format != target_eve_fmt) {
+                    canvas_needs_conversion = true;
                 }
             }
-
-            /* If existing content format differs from target format, we need conversion.
-             * E.g., RGB565 canvas drawn to with ARGB8 content, or vice versa. */
-            if(canvas_has_content && canvas_format != target_eve_fmt) {
-                canvas_needs_conversion = true;
-                LV_LOG_INFO("EVE5: Canvas %p needs format conversion from %d to %d",
-                            (void *)layer, canvas_format, target_eve_fmt);
-            }
-
-            LV_LOG_INFO("EVE5: Using canvas cache for layer %p at RAM_G 0x%08X (%s, %s, fmt=%d target=%d)",
-                        (void *)layer, ram_g_addr, is_new ? "new" : "existing",
-                        canvas_is_premultiplied ? "premul" : "straight", canvas_format, target_eve_fmt);
+        }
+        else {
+            LV_LOG_ERROR("EVE5: VRAM handle invalid for layer %p", (void *)layer);
+            return;
         }
     }
     else {
-        /* Check if layer already has allocation */
-        if(layer->user_data != NULL) {
-            handle = Esd_GpuHandle_FromPtrType(layer->user_data);
-            ram_g_addr = Esd_GpuAlloc_Get(u->allocator, handle);
-        }
-    }
-
-    /* Allocate texture if needed (non-canvas path) */
-    if(ram_g_addr == GA_INVALID && !is_canvas) {
-        uint32_t size = aligned_w * aligned_h * target_bpp;
-        handle = Esd_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
-        layer->user_data = Esd_GpuHandle_ToPtrType(handle);
-
-        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, handle);
-        if(ram_g_addr == GA_INVALID) {
-            LV_LOG_ERROR("EVE5: Failed to allocate layer texture (%"PRId32"x%"PRId32" fmt=%d)",
-                         aligned_w, aligned_h, target_eve_fmt);
-            layer->user_data = NULL;
-            return;
-        }
-
-        LV_LOG_INFO("EVE5: Allocated layer %p at RAM_G 0x%08X (%"PRId32"x%"PRId32" fmt=%d)",
-                    (void *)layer, ram_g_addr, aligned_w, aligned_h, target_eve_fmt);
-    }
-
-    if(ram_g_addr == GA_INVALID) {
-        LV_LOG_ERROR("EVE5: Failed to get layer texture");
+        LV_LOG_ERROR("EVE5: No vram_res on layer %p", (void *)layer);
         return;
     }
 
-    /* Tag non-screen alpha layers as premultiplied ARGB8888 — EVE5 always
-     * renders to ARGB8 render targets with SRC_ALPHA blending, producing
-     * premultiplied content. Any alpha format (ARGB8888, ARGB4444, ARGB1555,
-     * etc.) becomes ARGB8 premultiplied in GPU memory.
-     * Don't tag the screen layer — its color_format is used by refr_area
-     * to size the partial CPU buffer. Don't tag non-alpha formats (RGB565,
-     * etc.) — they get alpha=255 fill and don't need premultiplied handling. */
-    if(lv_color_format_has_alpha(layer->color_format) &&
-       layer->color_format != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
-        layer->color_format = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+    /* Mark alpha layers as premultiplied — EVE5 always renders to ARGB8
+     * render targets with SRC_ALPHA blending, producing premultiplied content.
+     * Use the vram_res flag and draw_buf header flag instead of retagging
+     * layer->color_format (which would break buffer sizing in refr_area). */
+    if(lv_color_format_has_alpha(layer->color_format)) {
+        if(vr != NULL) vr->is_premultiplied = true;
+        if(layer->draw_buf != NULL) {
+            lv_draw_buf_set_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+        }
     }
 
     /* Set render target with appropriate format */
     EVE_CoCmd_renderTarget(u->hal, ram_g_addr, target_eve_fmt, aligned_w, aligned_h);
-    LV_LOG_INFO("EVE5: Set render target for layer %p at RAM_G 0x%08X (%"PRId32"x%"PRId32" fmt=%d)",
-                (void *)layer, ram_g_addr, aligned_w, aligned_h, target_eve_fmt);
 
     /* Start display list */
     EVE_CoCmd_dlStart(u->hal);
@@ -318,33 +470,27 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
 
         if(new_addr == GA_INVALID) {
             LV_LOG_ERROR("EVE5: Failed to allocate buffer for canvas incremental render");
-            /* Fall back to clearing without preserving content */
             EVE_CoDl_clearColorRgb(u->hal, 0, 0, 0);
             EVE_CoDl_clearColorA(u->hal, 0);
             EVE_CoDl_clear(u->hal, 1, 1, 1);
             goto canvas_cleared;
         }
 
-        /* Get the old handle, capture palette, and update cache to point to new buffer */
+        /* Capture old handle and palette from vram_res, then update to new buffer */
         uint32_t src_palette = GA_INVALID;
-        lv_draw_eve5_canvas_cache_t *cache = &u->canvas_cache;
-        for(uint32_t i = 0; i < EVE5_CANVAS_CACHE_CAPACITY; i++) {
-            lv_draw_eve5_canvas_cache_entry_t *e = &cache->entries[i];
-            if(e->valid && e->data_ptr == layer->draw_buf->data) {
-                old_handle = e->gpu_handle;
-                have_old_handle = true;
-                /* Capture palette address BEFORE zeroing it */
-                src_palette = e->palette_addr;
-                /* Update cache entry to new buffer with target format */
-                e->gpu_handle = new_handle;
-                e->eve_format = target_eve_fmt;
-                e->stride = aligned_w * target_bpp;
-                e->palette_addr = GA_INVALID;
-                e->source_offset = 0;
-                /* Update user_data to the new handle */
-                layer->user_data = Esd_GpuHandle_ToPtrType(new_handle);
-                break;
+        {
+            old_handle = vr->gpu_handle;
+            have_old_handle = true;
+            if(vr->palette_offset != GA_INVALID) {
+                uint32_t old_base = Esd_GpuAlloc_Get(u->allocator, old_handle);
+                if(old_base != GA_INVALID) src_palette = old_base + vr->palette_offset;
             }
+            vr->gpu_handle = new_handle;
+            vr->eve_format = target_eve_fmt;
+            vr->stride = aligned_w * target_bpp;
+            vr->palette_offset = GA_INVALID;
+            vr->source_offset = 0;
+            vr->base.size = new_size;
         }
 
         /* Store original content reference for alpha pass.
@@ -382,8 +528,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
              * After this blit, the render target contains premultiplied content.
              * Mark the canvas as premultiplied so subsequent renders know. */
             EVE_CoDl_blendFunc_default(u->hal);  /* SRC_ALPHA, ONE_MINUS_SRC_ALPHA */
-            if(layer->draw_buf && layer->draw_buf->data) {
-                lv_draw_eve5_canvas_cache_set_premultiplied(u, layer->draw_buf->data, true);
+            if(vr != NULL) {
+                vr->is_premultiplied = true;
             }
             LV_LOG_INFO("EVE5: Converting canvas to premultiplied alpha");
         }
@@ -438,8 +584,12 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
 {
     /* Canvas layers rendered through the pipeline are now premultiplied.
      * Mark them as such so the image display path uses correct blending. */
-    if(is_canvas && layer->draw_buf && layer->draw_buf->data) {
-        lv_draw_eve5_canvas_cache_set_premultiplied(u, layer->draw_buf->data, true);
+    if(is_canvas) {
+        lv_draw_eve5_vram_res_t *finish_vr = eve5_get_vram_res(layer);
+        if(finish_vr != NULL) {
+            finish_vr->is_premultiplied = true;
+            finish_vr->has_content = true;
+        }
     }
 
     EVE_CoDl_display(u->hal);

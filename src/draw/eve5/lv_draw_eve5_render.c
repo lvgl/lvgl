@@ -349,21 +349,15 @@ case LV_DRAW_TASK_TYPE_FILL: {
                 lv_draw_image_dsc_t *dsc = t->draw_dsc;
                 lv_layer_t *child = (lv_layer_t *)dsc->src;
 
-                if(child->user_data == NULL) {
+                if(eve5_get_vram_res(child) == NULL) {
                     if(child->draw_buf == NULL) {
-                        /* Layer was never rendered (empty or clipped out) */
                         break;
                     }
-
-                    /* TODO: Child has a CPU buffer but no GPU texture — upload to RAM_G.
-                     * Currently can't happen (EVE5 claims all draw tasks). */
                     LV_LOG_WARN("EVE5: CPU-rendered layer not supported, skipping child %p", (void *)child);
                     break;
                 }
 
-                if(child->user_data != NULL) {
-                    lv_draw_eve5_hal_draw_image(u, t, false);
-                }
+                lv_draw_eve5_hal_draw_image(u, t, false);
                 break;
             }
 

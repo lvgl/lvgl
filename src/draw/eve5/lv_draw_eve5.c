@@ -9,8 +9,8 @@
  * - LVGL's dispatch-all-layers behavior ensures children complete before parents
  * - Each layer has its own complete display list cycle:
  *   dlStart -> commands -> display -> swap -> graphicsFinish
- * - Screen partial textures are handed to the display driver via layer->user_data
- * - Child layer textures are freed after compositing into their parent
+ * - Screen partial textures are handed to the display driver via draw_buf->vram_res
+ * - Child layer textures are freed via lv_draw_buf_destroy -> vram_free_cb
  *
  * Contains LVGL entry points (init, evaluate, dispatch) and the top-level
  * layer rendering orchestrator. Render processing loops are in
@@ -134,7 +134,8 @@ void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     lv_draw_eve5_image_cache_init(&unit->image_cache, EVE5_IMAGE_CACHE_CAPACITY);
     lv_draw_eve5_glyph_cache_init(&unit->glyph_cache, EVE5_GLYPH_CACHE_CAPACITY);
     lv_draw_eve5_sw_cache_init(unit);
-    lv_draw_eve5_canvas_cache_init(unit);
+
+    lv_draw_eve5_register_vram_callbacks(unit);
 
     /* Register lightweight image decoder for JPEG/PNG header parsing.
      * This allows lv_image_set_src("path.jpg") to succeed without a
@@ -266,6 +267,20 @@ static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
     /* Case 2: No new tasks, but we have queued work - render! */
     if (queued_count > 0 && layer->all_tasks_added && blocked_count == 0 && waiting_count == 0) {
         EVE5_LOG("EVE5: -> Rendering %d queued tasks atomically", queued_count);
+
+        /* Allocate/migrate the layer target buffer for this draw unit */
+        lv_draw_layer_alloc_buf(layer, draw_unit);
+
+        /* Ensure all queued tasks' source buffers are resident */
+        t = layer->draw_task_head;
+        while(t) {
+            if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+               t->state == LV_DRAW_TASK_STATE_QUEUED) {
+                lv_draw_buf_ensure_task_sources_resident(t, draw_unit);
+            }
+            t = t->next;
+        }
+
         eve5_render_layer(u, layer);
         lv_draw_dispatch_request();
         return 1;
@@ -328,11 +343,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
         return;
     }
 
-    /* Advance canvas cache frame counter on screen layer (once per display frame).
-     * This triggers LRU eviction of stale canvas entries. */
-    if(is_screen) {
-        lv_draw_eve5_canvas_cache_new_frame(u);
-    }
+    /* Canvas cache removed — VRAM lifecycle is managed by vram_res on draw_buf */
 
     /* Reset alpha repair tracking for this layer */
     u->has_alpha_opaque = false;
@@ -375,9 +386,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
     /* Initialize the layer (allocate ARGB8 texture, start display list) */
     lv_draw_eve5_hal_init_layer(u, layer, is_screen, is_canvas);
 
-    /* Check for allocation failure. Canvas layers set user_data from the canvas
-     * cache in init_layer, so check both canvas and non-canvas paths. */
-    if(!is_canvas && layer->user_data == NULL) {
+    /* Check for allocation failure */
+    if(eve5_get_vram_res(layer) == NULL) {
         LV_LOG_ERROR("EVE5: Layer allocation failed!");
 
         t = layer->draw_task_head;
@@ -476,19 +486,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
         }
     }
 
-    /* Null child layer user_data for LAYER tasks — deferred from normal draw
-     * so the alpha pass can re-access child textures for alpha correction. */
-    t = layer->draw_task_head;
-    while(t) {
-        if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-           t->type == LV_DRAW_TASK_TYPE_LAYER &&
-           t->state == LV_DRAW_TASK_STATE_FINISHED) {
-            lv_draw_image_dsc_t *layer_dsc = t->draw_dsc;
-            lv_layer_t *child = (lv_layer_t *)layer_dsc->src;
-            child->user_data = NULL;
-        }
-        t = t->next;
-    }
+    /* Child layer GPU memory lifecycle is managed by lv_draw_buf_destroy
+     * via vram_free_cb — no manual cleanup needed here. */
 
     EVE5_LOG("EVE5: Finishing layer, rendered %d tasks", rendered_count);
     lv_draw_eve5_hal_finish_layer(u, layer, is_screen, is_canvas);

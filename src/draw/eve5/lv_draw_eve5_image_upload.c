@@ -185,7 +185,10 @@ bool lv_draw_eve5_get_eve_format_info(lv_color_format_t src_cf,
 }
 
 /**********************
- * IMAGE UPLOAD (CACHED) — HANDLE-BASED
+ * IMAGE UPLOAD — HANDLE-BASED
+ *
+ * Checks vram_res first (set by ensure_resident for decoded images),
+ * then the image cache (for const ROM images), then uploads.
  **********************/
 
 bool lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
@@ -223,31 +226,24 @@ bool lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
         palette_size = 256 * sizeof(lv_color32_t); /* 1024 bytes */
     }
 
-    /* Check canvas cache first — if this draw_buf was rendered to by EVE5,
-     * use the GPU texture directly without re-uploading stale CPU data.
-     * The canvas may be in native format (e.g., RGB565 from direct image load)
-     * or ARGB8 (from rendered content). */
+    /* Check vram_res first — if this draw_buf has VRAM backing (e.g., canvas
+     * rendered by EVE5), use the GPU texture directly without re-uploading. */
     {
-        lv_draw_eve5_canvas_cache_t *ccache = &u->canvas_cache;
-        for(uint32_t i = 0; i < EVE5_CANVAS_CACHE_CAPACITY; i++) {
-            lv_draw_eve5_canvas_cache_entry_t *e = &ccache->entries[i];
-            if(!e->valid || e->data_ptr != src_buf) continue;
-            uint32_t addr = Esd_GpuAlloc_Get(u->allocator, e->gpu_handle);
-            if(addr == GA_INVALID) { e->valid = false; continue; }
-            out->gpu_handle = e->gpu_handle;
-            out->eve_format = e->eve_format;
-            out->eve_stride = (int32_t)e->stride;
-            out->width = (int32_t)e->width;
-            out->height = (int32_t)e->height;
-            out->image_offset = e->source_offset;
-            /* palette_addr in canvas cache is a raw address — compute offset
-             * from allocation base. Safe as long as no defrag occurs between
-             * insertion and lookup (which doesn't happen in practice). */
-            out->palette_offset = (e->palette_addr != 0 && e->palette_addr != GA_INVALID)
-                                  ? (e->palette_addr - addr) : GA_INVALID;
-            LV_LOG_TRACE("EVE5: Canvas GPU texture for image at 0x%08X (fmt=%d)",
-                         addr + e->source_offset, e->eve_format);
-            return true;
+        lv_draw_eve5_vram_res_t *ivr = eve5_get_image_vram_res(img_dsc);
+        if(ivr != NULL) {
+            uint32_t addr = Esd_GpuAlloc_Get(u->allocator, ivr->gpu_handle);
+            if(addr != GA_INVALID) {
+                out->gpu_handle = ivr->gpu_handle;
+                out->eve_format = ivr->eve_format;
+                out->eve_stride = (int32_t)ivr->stride;
+                out->width = img_dsc->header.w;
+                out->height = img_dsc->header.h;
+                out->image_offset = ivr->source_offset;
+                out->palette_offset = ivr->palette_offset;
+                LV_LOG_TRACE("EVE5: VRAM-resident image at 0x%08X (fmt=%d)",
+                             addr + ivr->source_offset, ivr->eve_format);
+                return true;
+            }
         }
     }
 
@@ -442,121 +438,6 @@ bool lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
                  src_w, src_h, src_cf, eve_format, ram_g_addr, palette_size);
 
     return true;
-}
-
-/**********************
- * IMAGE UPLOAD (CACHED) — LEGACY WRAPPER
- **********************/
-
-uint32_t lv_draw_eve5_upload_image(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc,
-                              uint16_t *out_eve_format, int32_t *out_eve_stride,
-                              uint32_t *out_palette_addr)
-{
-    eve5_gpu_image_t img;
-    if(!lv_draw_eve5_upload_image_to_gpu(u, img_dsc, &img)) return GA_INVALID;
-
-    uint32_t addr, pal_addr;
-    eve5_gpu_image_resolve(u->allocator, &img, &addr, &pal_addr);
-
-    *out_eve_format = img.eve_format;
-    *out_eve_stride = img.eve_stride;
-    if(out_palette_addr) *out_palette_addr = pal_addr;
-
-    return addr;
-}
-
-/**********************
- * IMAGE UPLOAD (UNCACHED)
- **********************/
-
-uint32_t lv_draw_eve5_upload_image_uncached(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc,
-                                        uint16_t *out_eve_format, int32_t *out_eve_stride,
-                                        Esd_GpuHandle *out_handle)
-{
-    const uint8_t *src_buf = img_dsc->data;
-    int32_t src_w = img_dsc->header.w;
-    int32_t src_h = img_dsc->header.h;
-    int32_t src_stride = img_dsc->header.stride;
-    lv_color_format_t src_cf = img_dsc->header.cf;
-
-    uint16_t eve_format;
-    uint8_t bpp;
-    bool needs_conversion;
-
-    if(!lv_draw_eve5_get_eve_format_info(src_cf, &eve_format, &bpp, &needs_conversion)) {
-        *out_handle = GA_HANDLE_INVALID;
-        return GA_INVALID;
-    }
-
-    if(src_stride == 0) {
-        uint32_t src_bpp = lv_color_format_get_bpp(src_cf);
-        src_stride = (src_w * src_bpp + 7) / 8;
-    }
-
-    int32_t eve_stride = ALIGN_UP((src_w * bpp + 7) / 8, 4);
-    int32_t eve_size = eve_stride * src_h;
-
-    /* For simplicity, don't support paletted formats in uncached path */
-    if(LV_COLOR_FORMAT_IS_INDEXED(src_cf)) {
-        *out_handle = GA_HANDLE_INVALID;
-        return GA_INVALID;
-    }
-
-    *out_eve_format = eve_format;
-    *out_eve_stride = eve_stride;
-
-    /* Allocate RAM_G space */
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, eve_size, GA_ALIGN_128);
-    uint32_t ram_g_addr = Esd_GpuAlloc_Get(u->allocator, handle);
-
-    if(ram_g_addr == GA_INVALID) {
-        *out_handle = GA_HANDLE_INVALID;
-        return GA_INVALID;
-    }
-
-    *out_handle = handle;
-
-    /* Upload based on format */
-    if(!needs_conversion) {
-        int32_t row_bytes = (src_w * bpp + 7) / 8;
-        if(eve_stride == src_stride) {
-            EVE_Hal_wrMem(u->hal, ram_g_addr, src_buf, eve_size);
-        }
-        else {
-            for(int32_t y = 0; y < src_h; y++) {
-                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                              src_buf + y * src_stride, row_bytes);
-            }
-        }
-    }
-    else {
-        /* Handle conversions - simplified for common cases */
-        uint8_t *row_buf = lv_malloc(eve_stride);
-        if(!row_buf) {
-            Esd_GpuAlloc_Free(u->allocator, handle);
-            *out_handle = GA_HANDLE_INVALID;
-            return GA_INVALID;
-        }
-
-        for(int32_t y = 0; y < src_h; y++) {
-            const uint8_t *src_row = src_buf + y * src_stride;
-            switch(src_cf) {
-                case LV_COLOR_FORMAT_RGB565_SWAPPED:
-                    convert_rgb565_byteswap(src_row, row_buf, src_w);
-                    break;
-                case LV_COLOR_FORMAT_XRGB8888:
-                    convert_xrgb8888_to_rgb8(src_row, row_buf, src_w);
-                    break;
-                default:
-                    lv_memcpy(row_buf, src_row, (src_w * bpp + 7) / 8);
-                    break;
-            }
-            EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, row_buf, eve_stride);
-        }
-        lv_free(row_buf);
-    }
-
-    return ram_g_addr;
 }
 
 #endif /* LV_USE_DRAW_EVE5 */

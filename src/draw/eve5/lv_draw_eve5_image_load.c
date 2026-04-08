@@ -47,7 +47,7 @@
  * so indexed formats are preserved (not converted to ARGB8888).
  * Returns true on success, false if the source cannot be resolved.
  */
-bool lv_draw_eve5_resolve_image_source(const void *src, eve5_resolved_image_t *resolved)
+bool lv_draw_eve5_resolve_image_source(const void *src, eve5_resolved_image_t *resolved, lv_draw_unit_t *draw_unit)
 {
     lv_memzero(resolved, sizeof(*resolved));
 
@@ -55,6 +55,9 @@ bool lv_draw_eve5_resolve_image_source(const void *src, eve5_resolved_image_t *r
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         resolved->img_dsc = (const lv_image_dsc_t *)src;
         resolved->decoder_open = false;
+        if(draw_unit != NULL) {
+            lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit);
+        }
         return true;
     }
 
@@ -72,6 +75,9 @@ bool lv_draw_eve5_resolve_image_source(const void *src, eve5_resolved_image_t *r
 
         resolved->img_dsc = (const lv_image_dsc_t *)resolved->decoder_dsc.decoded;
         resolved->decoder_open = true;
+        if(draw_unit != NULL) {
+            lv_draw_buf_ensure_resident((lv_draw_buf_t *)resolved->img_dsc, draw_unit);
+        }
         return true;
     }
 
@@ -619,7 +625,7 @@ bool lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t *u, const void *src,
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_display_get_default());
 #endif
-        bool ok = lv_draw_eve5_resolve_image_source(src, &resolved);
+        bool ok = lv_draw_eve5_resolve_image_source(src, &resolved, &u->base_unit);
 #if LV_USE_OS
         lv_eve5_hal_lock(lv_display_get_default());
 #endif
@@ -632,7 +638,29 @@ bool lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t *u, const void *src,
 
     /* ===== VARIABLE sources ===== */
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
-        return lv_draw_eve5_upload_image_to_gpu(u, (const lv_image_dsc_t *)src, out);
+        const lv_image_dsc_t *img_dsc = (const lv_image_dsc_t *)src;
+
+        /* Check vram_res first — set by ensure_resident → vram_upload_cb for
+         * decoded images from LVGL's cache. Skips the image cache entirely. */
+        lv_draw_eve5_vram_res_t *vr = eve5_get_image_vram_res(img_dsc);
+        if(vr != NULL) {
+            uint32_t base = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle);
+            if(base != GA_INVALID) {
+                out->gpu_handle = vr->gpu_handle;
+                out->eve_format = vr->eve_format;
+                out->eve_stride = (int32_t)vr->stride;
+                out->width = img_dsc->header.w;
+                out->height = img_dsc->header.h;
+                out->image_offset = vr->source_offset;
+                out->palette_offset = vr->palette_offset;
+                return true;
+            }
+            /* GPU allocation evicted — fall through to re-upload */
+        }
+
+        /* Const ROM images (no vram_res) and eviction recovery:
+         * upload_image_to_gpu checks its own image cache, then uploads. */
+        return lv_draw_eve5_upload_image_to_gpu(u, img_dsc, out);
     }
 
     LV_LOG_WARN("EVE5: Unsupported image source type %d", src_type);

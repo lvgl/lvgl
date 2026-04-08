@@ -46,8 +46,9 @@ extern "C" {
 /* Frame allocation tracking for deferred free */
 #define EVE5_MAX_FRAME_ALLOCS 256
 
-/* Image cache configuration */
-#define EVE5_IMAGE_CACHE_CAPACITY 128
+/* Image cache configuration — only serves const ROM images and HW-decoded
+ * file sources. Decoded images from LVGL's cache use vram_res instead. */
+#define EVE5_IMAGE_CACHE_CAPACITY 32
 
 /* Glyph cache configuration */
 #define EVE5_GLYPH_CACHE_CAPACITY 256
@@ -60,19 +61,9 @@ extern "C" {
 /* Shadow texture configuration */
 #define EVE5_SHADOW_TEX_SIZE 64
 
-/* Canvas cache configuration - stores persistent GPU textures for canvas layers.
- * When a canvas is rendered, the GPU texture is cached by draw_buf->data pointer.
- * When the draw_buf is later displayed as an image, the cached GPU texture is used
- * directly without re-uploading.
- *
- * NOTE: Currently canvas entries are treated as permanent (no LRU eviction).
- * Proper lifecycle management requires LVGL buffer management hooks to notify
- * the draw unit when a draw_buf is destroyed, so the corresponding GPU allocation
- * can be freed. Until then, canvas GPU memory may leak if canvases are created
- * and destroyed dynamically. */
-#ifndef EVE5_CANVAS_CACHE_CAPACITY
-#define EVE5_CANVAS_CACHE_CAPACITY 128
-#endif
+/* Canvas cache removed — canvas GPU allocations now use the VRAM residency
+ * system (lv_draw_eve5_vram_res_t on draw_buf->vram_res). Lifecycle is managed
+ * automatically by LVGL via vram_alloc_cb/vram_free_cb. */
 
 /* Hardware image decode configuration — when enabled, JPEG/PNG files are
  * decoded via CMD_LOADIMAGE using EVE's hardware decoder instead of CPU
@@ -126,13 +117,15 @@ extern "C" {
  **********************/
 
 /**
- * Image cache entry - maps source pointer to GPU allocation.
+ * Image cache entry - maps source identity to GPU allocation.
+ * Used for const ROM images (key = data pointer) and
+ * HW-decoded files (key_hash = FNV-1a path hash).
  * Offsets are relative to gpu_handle base (defrag-safe).
  */
 typedef struct
 {
-    uintptr_t key; /* Source buffer pointer */
-    uint32_t key_hash; /* Hash of image data for stale detection */
+    uintptr_t key; /* Data pointer (const images) or hash (file sources) */
+    uint32_t key_hash; /* FNV-1a path hash (file sources) or 0 (const images) */
     Esd_GpuHandle gpu_handle; /* RAM_G allocation */
     uint16_t eve_format; /* Cached EVE format */
     int32_t eve_stride; /* Cached stride */
@@ -207,33 +200,19 @@ typedef struct {
 } lv_draw_eve5_shadow_slot_t;
 
 /**
- * Canvas cache entry - maps draw_buf->data to persistent GPU allocation.
- * Used for canvas layers rendered by EVE5. When a draw_buf is later displayed
- * as an image, the cached GPU texture is used directly.
+ * EVE5 VRAM residency descriptor — extends the base `lv_draw_buf_vram_res_t`
+ * with GPU handle and EVE-specific metadata.
  */
 typedef struct {
-    void *data_ptr;             /* Key: draw_buf->data pointer */
-    Esd_GpuHandle gpu_handle;   /* Persistent GPU allocation */
-    uint32_t width;
-    uint32_t height;
-    uint32_t aligned_width;     /* 16-byte aligned width for render target */
-    uint32_t stride;            /* Bytes per row (format-dependent) */
-    uint32_t last_used_frame;   /* For LRU eviction */
-    uint32_t palette_addr;      /* RAM_G address of palette LUT (0 = non-paletted) */
-    uint32_t source_offset;     /* Offset from allocation base to bitmap source data (0 for non-paletted) */
-    uint16_t eve_format;        /* EVE bitmap format (ARGB8, RGB565, ASTC, etc.) */
-    bool valid;
-    bool is_premultiplied;      /* True if GPU content is premultiplied alpha */
-} lv_draw_eve5_canvas_cache_entry_t;
-
-/**
- * Canvas cache - indexes persistent GPU textures for canvas layers
- */
-typedef struct {
-    lv_draw_eve5_canvas_cache_entry_t entries[EVE5_CANVAS_CACHE_CAPACITY];
-    uint32_t frame;             /* Current frame counter */
-    bool initialized;
-} lv_draw_eve5_canvas_cache_t;
+    lv_draw_buf_vram_res_t base;       /**< Must be first member */
+    Esd_GpuHandle gpu_handle;          /**< RAM_G allocation handle */
+    uint16_t eve_format;               /**< EVE bitmap format (ARGB8, RGB565, etc.) */
+    uint32_t stride;                   /**< Bytes per row in RAM_G */
+    uint32_t source_offset;            /**< Offset from alloc base to bitmap data */
+    uint32_t palette_offset;           /**< Offset from alloc base to palette LUT (GA_INVALID = none) */
+    bool is_premultiplied;             /**< True if GPU content is premultiplied alpha */
+    bool has_content;                  /**< True after first render — incremental renders must preserve existing content */
+} lv_draw_eve5_vram_res_t;
 
 /**
  * EVE5 draw unit
@@ -248,7 +227,6 @@ typedef struct
     lv_draw_eve5_image_cache_t image_cache;
     lv_draw_eve5_glyph_cache_t glyph_cache;
     lv_draw_eve5_sw_cache_t sw_cache;
-    lv_draw_eve5_canvas_cache_t canvas_cache;
 
     /* Re-entrancy guard for SW fallback */
     bool rendering_in_progress;
@@ -284,6 +262,16 @@ typedef struct
     int32_t canvas_orig_w;          /* Content width */
     int32_t canvas_orig_h;          /* Content height */
 } lv_draw_eve5_unit_t;
+
+/**
+ * Get the EVE5 VRAM residency descriptor from a layer's draw_buf.
+ * Returns NULL if the layer has no VRAM backing.
+ */
+static inline lv_draw_eve5_vram_res_t * eve5_get_vram_res(lv_layer_t *layer)
+{
+    if(layer == NULL || layer->draw_buf == NULL || layer->draw_buf->vram_res == NULL) return NULL;
+    return (lv_draw_eve5_vram_res_t *)layer->draw_buf->vram_res;
+}
 
 /**
  * Resolved GPU image — handle-based, defrag-safe.
@@ -323,14 +311,14 @@ static inline void eve5_gpu_image_resolve(Esd_GpuAlloc *alloc, const eve5_gpu_im
  * CACHE PROTOTYPES
  **********************/
 
-/* Image cache */
+/* Image cache — only for const ROM images and HW-decoded file sources.
+ * Decoded images from LVGL's image cache use vram_res on draw_buf instead. */
 void lv_draw_eve5_image_cache_init(lv_draw_eve5_image_cache_t *cache, uint32_t capacity);
 void lv_draw_eve5_image_cache_deinit(lv_draw_eve5_image_cache_t *cache);
-uint32_t lv_draw_eve5_image_cache_lookup(lv_draw_eve5_unit_t *u,
-    const lv_image_dsc_t *img_dsc,
-    uint16_t *out_eve_format,
-    int32_t *out_eve_stride,
-    uint32_t *out_palette_addr);
+
+/* Pointer-based lookup — for const lv_image_dsc_t in ROM (no vram_res) */
+bool lv_draw_eve5_image_cache_find(lv_draw_eve5_unit_t *u,
+    const lv_image_dsc_t *img_dsc, eve5_gpu_image_t *out);
 void lv_draw_eve5_image_cache_insert(lv_draw_eve5_unit_t *u,
     const lv_image_dsc_t *img_dsc,
     Esd_GpuHandle handle,
@@ -338,13 +326,9 @@ void lv_draw_eve5_image_cache_insert(lv_draw_eve5_unit_t *u,
     int32_t eve_stride,
     uint32_t image_offset, uint32_t palette_offset);
 
-/* Raw key-based image cache API (for file path caching) */
-uint32_t lv_draw_eve5_image_cache_lookup_raw(lv_draw_eve5_unit_t *u,
-    uintptr_t key, uint32_t key_hash,
-    uint16_t *out_eve_format,
-    int32_t *out_eve_stride,
-    int32_t *out_width, int32_t *out_height,
-    uint32_t *out_palette_addr);
+/* Hash-based lookup — for HW-decoded file sources */
+bool lv_draw_eve5_image_cache_find_by_hash(lv_draw_eve5_unit_t *u,
+    uint32_t key_hash, eve5_gpu_image_t *out);
 void lv_draw_eve5_image_cache_insert_raw(lv_draw_eve5_unit_t *u,
     uintptr_t key, uint32_t key_hash,
     Esd_GpuHandle handle,
@@ -352,12 +336,6 @@ void lv_draw_eve5_image_cache_insert_raw(lv_draw_eve5_unit_t *u,
     int32_t eve_stride,
     int16_t width, int16_t height,
     uint32_t image_offset, uint32_t palette_offset);
-
-/* Handle-based image cache lookups — return eve5_gpu_image_t (defrag-safe) */
-bool lv_draw_eve5_image_cache_find(lv_draw_eve5_unit_t *u,
-    const lv_image_dsc_t *img_dsc, eve5_gpu_image_t *out);
-bool lv_draw_eve5_image_cache_find_by_hash(lv_draw_eve5_unit_t *u,
-    uint32_t key_hash, eve5_gpu_image_t *out);
 
 /* Glyph cache */
 void lv_draw_eve5_glyph_cache_init(lv_draw_eve5_glyph_cache_t *cache, uint32_t capacity);
@@ -400,92 +378,10 @@ void lv_draw_eve5_sw_cache_drop(lv_draw_eve5_unit_t *u,
                                  const void *dsc_data, uint32_t dsc_size);
 
 /**********************
- * CANVAS CACHE API
+ * VRAM CALLBACKS
  **********************/
 
-void lv_draw_eve5_canvas_cache_init(lv_draw_eve5_unit_t *u);
-void lv_draw_eve5_canvas_cache_new_frame(lv_draw_eve5_unit_t *u);
-
-/**
- * Look up a canvas GPU texture by draw_buf->data pointer.
- * Returns GPU address if found, GA_INVALID otherwise.
- * Updates last_used_frame on hit.
- */
-uint32_t lv_draw_eve5_canvas_cache_lookup(lv_draw_eve5_unit_t *u,
-                                           const void *data_ptr,
-                                           uint32_t *out_width,
-                                           uint32_t *out_height,
-                                           uint32_t *out_aligned_width,
-                                           uint16_t *out_eve_format,
-                                           uint32_t *out_stride,
-                                           uint32_t *out_palette_addr);
-
-/**
- * Insert or update a canvas cache entry.
- * If an entry for data_ptr already exists, updates it.
- * If cache is full, evicts the oldest entry.
- */
-void lv_draw_eve5_canvas_cache_insert(lv_draw_eve5_unit_t *u,
-                                       const void *data_ptr,
-                                       Esd_GpuHandle handle,
-                                       uint32_t width, uint32_t height,
-                                       uint32_t aligned_width,
-                                       uint16_t eve_format,
-                                       uint32_t stride,
-                                       uint32_t palette_addr,
-                                       uint32_t source_offset);
-
-/**
- * Get or create a canvas GPU allocation for the given layer.
- * If cached, returns existing allocation. Otherwise allocates new and caches.
- * Returns GPU address, or GA_INVALID on allocation failure.
- * @param target_eve_format  Target EVE format for new allocations (ARGB8, RGB565, etc.)
- * @param target_bpp         Target bytes per pixel for new allocations
- * @param out_aligned_width  Output: 16-byte aligned width
- * @param out_eve_format     Output: EVE bitmap format (may differ from target if cached)
- * @param out_stride         Output: Bytes per row
- * @param out_is_new         Set to true if this is a new allocation (first render),
- *                           false if reusing existing cached allocation (subsequent render).
- * @param out_is_premultiplied  Set to true if the cached content is premultiplied alpha.
- */
-uint32_t lv_draw_eve5_canvas_cache_get_or_create(lv_draw_eve5_unit_t *u,
-                                                   lv_layer_t *layer,
-                                                   uint16_t target_eve_format,
-                                                   uint8_t target_bpp,
-                                                   uint32_t *out_aligned_width,
-                                                   uint16_t *out_eve_format,
-                                                   uint32_t *out_stride,
-                                                   bool *out_is_new,
-                                                   bool *out_is_premultiplied);
-
-/**
- * Set the premultiplied state of a canvas cache entry.
- */
-void lv_draw_eve5_canvas_cache_set_premultiplied(lv_draw_eve5_unit_t *u,
-                                                   const void *data_ptr,
-                                                   bool is_premultiplied);
-
-/**
- * Check if a canvas cache entry is premultiplied.
- */
-bool lv_draw_eve5_canvas_cache_is_premultiplied(lv_draw_eve5_unit_t *u,
-                                                  const void *data_ptr);
-
-/**
- * Get the EVE format of a canvas cache entry.
- */
-uint16_t lv_draw_eve5_canvas_cache_get_format(lv_draw_eve5_unit_t *u,
-                                               const void *data_ptr);
-
-/**
- * Update the format, handle, and stride of a canvas cache entry.
- * Used when a direct image load stores a native format instead of ARGB8.
- */
-void lv_draw_eve5_canvas_cache_set_format(lv_draw_eve5_unit_t *u,
-                                            const void *data_ptr,
-                                            Esd_GpuHandle new_handle,
-                                            uint16_t eve_format,
-                                            uint32_t stride);
+void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t *u);
 
 /**********************
  * HAL RENDER TARGET
@@ -614,26 +510,20 @@ bool lv_draw_eve5_get_eve_format_info(lv_color_format_t src_cf,
                                  uint8_t *bits_per_pixel,
                                  bool *needs_conversion);
 
-/* Image upload — cached, returns handle-based result (defined in lv_draw_eve5_image_upload.c).
- * Checks canvas cache and image cache before uploading.
- * The returned handle is owned by the cache — caller must NOT free it. */
+/* Image download with format conversion (defined in lv_draw_eve5_image_download.c) */
+bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
+                                  lv_draw_buf_t *buf,
+                                  const lv_draw_eve5_vram_res_t *vr);
+
+/* Image upload — returns handle-based result (defined in lv_draw_eve5_image_upload.c).
+ * Checks vram_res first, then image cache (for const ROM images), then uploads.
+ * The returned handle is owned by vram_res or the cache — caller must NOT free it. */
 bool lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
                                        const lv_image_dsc_t *img_dsc,
                                        eve5_gpu_image_t *out);
 
-/* Image upload — cached, returns raw address (legacy wrapper).
- * Prefer lv_draw_eve5_upload_image_to_gpu for new code. */
-uint32_t lv_draw_eve5_upload_image(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc,
-                              uint16_t *out_eve_format, int32_t *out_eve_stride,
-                              uint32_t *out_palette_addr);
-
-/* Image upload — uncached (defined in lv_draw_eve5_image_upload.c) */
-uint32_t lv_draw_eve5_upload_image_uncached(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc,
-                                        uint16_t *out_eve_format, int32_t *out_eve_stride,
-                                        Esd_GpuHandle *out_handle);
-
 /* Image source resolution (defined in lv_draw_eve5_image_load.c) */
-bool lv_draw_eve5_resolve_image_source(const void *src, eve5_resolved_image_t *resolved);
+bool lv_draw_eve5_resolve_image_source(const void *src, eve5_resolved_image_t *resolved, lv_draw_unit_t *draw_unit);
 void lv_draw_eve5_release_image_source(eve5_resolved_image_t *resolved);
 
 /* Hardware image decode paths (defined in lv_draw_eve5_image_load.c) */
@@ -720,6 +610,13 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task
 
 /* Canvas layer optimization (defined in lv_draw_eve5_canvas.c) */
 bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *layer);
+
+/* Get VRAM res from an image descriptor (for canvas/VRAM-backed images) */
+static inline lv_draw_eve5_vram_res_t * eve5_get_image_vram_res(const lv_image_dsc_t *img)
+{
+    if(img == NULL || img->vram_res == NULL) return NULL;
+    return (lv_draw_eve5_vram_res_t *)img->vram_res;
+}
 
 /* Mask rectangle drawing */
 void lv_draw_eve5_hal_draw_mask_rect(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t);

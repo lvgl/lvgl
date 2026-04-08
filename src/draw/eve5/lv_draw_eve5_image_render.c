@@ -57,72 +57,32 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     /* Resolve bitmap source.
      * LAYER: GPU-rendered child layer in RAM_G.
      * May be ARGB8 render target or native format from canvas direct image optimization.
-     * NOTE: Only GPU-rendered layers are supported (user_data holds GPU handle).
+     * NOTE: Only GPU-rendered layers are supported (vram_res holds GPU handle).
      * CPU-rendered layers (draw_buf only) are filtered out by the dispatcher. */
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
-        child_handle = Esd_GpuHandle_FromPtrType(child_layer->user_data);
-        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
-        if(ram_g_addr == GA_INVALID) {
-            LV_LOG_WARN("EVE5: Child layer %p texture invalid, handle id %i",
-                (void *)child_layer, (int)child_handle.Id);
-            return;
-        }
         src_w = lv_area_get_width(&child_layer->buf_area);
         src_h = lv_area_get_height(&child_layer->buf_area);
 
-        /* Check canvas cache for actual format (canvas direct image may use RGB565).
-         * Validate that the cached address matches ram_g_addr to avoid false hits
-         * from draw_buf->data address reuse (regular layers can get the same address
-         * as a previously freed canvas buffer). */
-        uint16_t cached_format;
-        uint32_t cached_stride;
-        uint32_t cached_palette_addr;
-        uint32_t cached_addr = GA_INVALID;
-        if(child_layer->draw_buf && child_layer->draw_buf->data) {
-            cached_addr = lv_draw_eve5_canvas_cache_lookup(u, child_layer->draw_buf->data,
-                                                            NULL, NULL, NULL, &cached_format, &cached_stride,
-                                                            &cached_palette_addr);
+        /* Read GPU handle and format directly from vram_res */
+        lv_draw_eve5_vram_res_t *child_vr = eve5_get_vram_res(child_layer);
+        if(child_vr == NULL) {
+            LV_LOG_WARN("EVE5: Child layer %p has no vram_res", (void *)child_layer);
+            return;
         }
-        if(cached_addr != GA_INVALID) {
-            ram_g_addr = cached_addr;  /* Use bitmap source address (includes source_offset for paletted) */
-            eve_format = cached_format;
-            eve_stride = (int32_t)cached_stride;
-            palette_addr = cached_palette_addr;
-            layout_h = src_h;  /* Non-aligned for native format images */
-            LV_LOG_INFO("EVE5: LAYER %p canvas cache hit: fmt=%d stride=%d %dx%d",
-                        (void *)child_layer, eve_format, eve_stride, src_w, src_h);
+        child_handle = child_vr->gpu_handle;
+        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
+        if(ram_g_addr == GA_INVALID) {
+            LV_LOG_WARN("EVE5: Child layer %p texture invalid", (void *)child_layer);
+            return;
         }
-        else {
-            /* Standard render target - format derived from layer's actual format.
-             * Canvas layers (draw_buf != NULL, parent == NULL): use draw_buf->header.cf
-             * to match the format used by hal_init_layer when creating the render target.
-             * Child layers (parent != NULL): use color_format set by LVGL.
-             * Alpha formats render to ARGB8, non-alpha to RGB565/RGB8. */
-            uint8_t bpp;
-            bool is_child_canvas = (child_layer->draw_buf != NULL && child_layer->parent == NULL);
-            lv_color_format_t layer_cf;
-            if(is_child_canvas) {
-                layer_cf = child_layer->draw_buf->header.cf;
-            }
-            else {
-                layer_cf = child_layer->color_format;
-            }
-            /* Map PREMULTIPLIED back to ARGB8888 for format lookup */
-            if(layer_cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
-                layer_cf = LV_COLOR_FORMAT_ARGB8888;
-            }
-            /* Function sets appropriate fallback even if unsupported */
-            lv_draw_eve5_get_render_target_format(layer_cf, &eve_format, &bpp);
-#if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
-            /* Force RGB8 for opaque layers (must match hal_init_layer) */
-            if(!lv_color_format_has_alpha(layer_cf) && eve_format != ARGB8) {
-                eve_format = RGB8;
-                bpp = 3;
-            }
-#endif
-            eve_stride = ALIGN_UP(src_w, 16) * bpp;
-            layout_h = ALIGN_UP(src_h, 16);
+        ram_g_addr += child_vr->source_offset;
+        eve_format = child_vr->eve_format;
+        eve_stride = (int32_t)child_vr->stride;
+        layout_h = src_h;
+        if(child_vr->palette_offset != GA_INVALID) {
+            uint32_t base = Esd_GpuAlloc_Get(u->allocator, child_handle);
+            palette_addr = base + child_vr->palette_offset;
         }
     }
     else {
@@ -178,35 +138,29 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     bool is_premultiplied;
     if(is_layer) {
         lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
-        /* Check canvas cache for actual premultiplied state (canvas direct image is non-premultiplied).
-         * Validate address match to avoid false hits from draw_buf->data reuse. */
-        uint32_t premul_cached_addr = GA_INVALID;
-        if(child_layer->draw_buf && child_layer->draw_buf->data) {
-            premul_cached_addr = lv_draw_eve5_canvas_cache_lookup(u, child_layer->draw_buf->data,
-                                                                    NULL, NULL, NULL, NULL, NULL, NULL);
+        lv_draw_eve5_vram_res_t *pvr = eve5_get_vram_res(child_layer);
+        if(pvr != NULL) {
+            is_premultiplied = pvr->is_premultiplied;
         }
-        if(premul_cached_addr != GA_INVALID) {
-            is_premultiplied = lv_draw_eve5_canvas_cache_is_premultiplied(u, child_layer->draw_buf->data);
+        else if(child_layer->draw_buf != NULL) {
+            is_premultiplied = lv_draw_buf_has_flag(child_layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
         }
         else {
-            is_premultiplied = (child_layer->color_format == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
+            is_premultiplied = false;
         }
     }
     else if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t *img_dsc = (const lv_image_dsc_t *)dsc->src;
-        /* Check if this image came from the canvas cache. Canvas GPU textures
-         * may be premultiplied (rendered through EVE pipeline) or non-premultiplied
-         * (direct image load optimization). Check the actual state from cache. */
-        bool from_canvas = (lv_draw_eve5_canvas_cache_lookup(u, (const void *)img_dsc->data,
-                                                              NULL, NULL, NULL, NULL, NULL, NULL) != GA_INVALID);
-        if(from_canvas) {
-            is_premultiplied = lv_draw_eve5_canvas_cache_is_premultiplied(u, (const void *)img_dsc->data);
-        } else {
-            is_premultiplied = (img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
+        lv_draw_eve5_vram_res_t *ivr = eve5_get_image_vram_res(img_dsc);
+        if(ivr != NULL) {
+            is_premultiplied = ivr->is_premultiplied;
+        }
+        else {
+            is_premultiplied = (img_dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) != 0
+                            || img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
         }
     }
     else {
-        /* FILE sources (SD card, flash, HW/SW decoded) are never premultiplied */
         is_premultiplied = false;
     }
 
@@ -770,13 +724,9 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     }
 
 cleanup:
-    /* Layer-specific cleanup: track child texture for deferred free.
-     * Do NOT null user_data here — the alpha pass needs to re-access
-     * the child texture. user_data is nulled after the alpha pass
-     * in eve5_render_layer(). */
-    if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-        track_frame_alloc(u, child_handle);
-    }
+    /* Child layer GPU memory lifecycle is managed by lv_draw_buf_destroy
+     * via vram_free_cb — do NOT track_frame_alloc here (would double-free). */
+    LV_UNUSED(child_handle);
 }
 
 #endif /* LV_USE_DRAW_EVE5 */

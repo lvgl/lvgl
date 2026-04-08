@@ -79,15 +79,15 @@ static bool is_simple_image_draw(const lv_draw_image_dsc_t *dsc, const lv_draw_t
  */
 bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
 {
-    if(!layer->draw_buf || !layer->draw_buf->data) return false;
+    if(!layer->draw_buf) return false;
 
-    /* Only do direct load for canvases that don't already have GPU content.
-     * If the canvas already has an allocation, use the normal render path
-     * which will preserve existing content and render on top. */
-    uint32_t existing_addr = lv_draw_eve5_canvas_cache_lookup(
-        u, layer->draw_buf->data, NULL, NULL, NULL, NULL, NULL, NULL);
-    if(existing_addr != GA_INVALID) {
-        return false;  /* Canvas already has content - use normal path */
+    /* Skip direct load for canvases that already have GPU content.
+     * The full render path handles incremental canvas updates correctly
+     * (blit existing content, render new tasks on top). The direct load
+     * path does not support incremental updates — it replaces everything. */
+    lv_draw_eve5_vram_res_t *existing_vr = eve5_get_vram_res(layer);
+    if(existing_vr != NULL && existing_vr->has_content) {
+        return false;
     }
 
     /* Count tasks and find the single image task */
@@ -149,22 +149,38 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *la
         return false;
     }
 
-    /* Insert or update the canvas cache with the loaded image.
-     * For paletted formats, source_offset = distance from alloc base to index data. */
-    uint32_t aligned_w = ALIGN_UP(layer_w, 16);
+    /* Store GPU allocation in vram_res on the draw_buf */
     uint32_t alloc_base = Esd_GpuAlloc_Get(u->allocator, handle);
     uint32_t source_offset = (alloc_base != GA_INVALID) ? (addr - alloc_base) : 0;
-    lv_draw_eve5_canvas_cache_insert(u, layer->draw_buf->data, handle,
-                                       layer_w, layer_h, aligned_w,
-                                       eve_format, stride, palette_addr,
-                                       source_offset);
 
-    /* Set layer->user_data so LAYER tasks can find the GPU texture */
-    layer->user_data = Esd_GpuHandle_ToPtrType(handle);
-
-    /* Mark as non-premultiplied since this is raw image data (not rendered through EVE).
-     * RGB formats don't have alpha to premultiply, but ARGB8 sources are assumed straight. */
-    lv_draw_eve5_canvas_cache_set_premultiplied(u, layer->draw_buf->data, false);
+    {
+        /* Create or update vram_res with the loaded image info */
+        lv_draw_eve5_vram_res_t *vr = (lv_draw_eve5_vram_res_t *)layer->draw_buf->vram_res;
+        if(vr == NULL) {
+            vr = lv_malloc(sizeof(lv_draw_eve5_vram_res_t));
+            if(vr == NULL) {
+                track_frame_alloc(u, handle);
+                return false;
+            }
+            vr->base.unit = (lv_draw_unit_t *)u;
+            layer->draw_buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
+            layer->draw_buf->header.flags |= LV_IMAGE_FLAGS_VRAM_RESIDENT;
+        }
+        else {
+            /* Free old GPU allocation if present */
+            Esd_GpuAlloc_Free(u->allocator, vr->gpu_handle);
+        }
+        vr->base.size = Esd_GpuAlloc_Get(u->allocator, handle) != GA_INVALID
+                       ? (uint32_t)(stride * layer_h) : 0;
+        vr->gpu_handle = handle;
+        vr->eve_format = eve_format;
+        vr->stride = (uint32_t)stride;
+        vr->source_offset = source_offset;
+        vr->palette_offset = (palette_addr != GA_INVALID && alloc_base != GA_INVALID)
+                            ? (palette_addr - alloc_base) : GA_INVALID;
+        vr->is_premultiplied = false;
+        vr->has_content = true;
+    }
 
     LV_LOG_INFO("EVE5: Canvas direct image %p: addr=0x%08x fmt=%d stride=%d %dx%d handle=%d buf=%p",
                 (void *)layer, addr, eve_format, (int)stride,

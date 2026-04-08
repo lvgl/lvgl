@@ -33,12 +33,20 @@ extern "C" {
  * TYPEDEFS
  **********************/
 
+typedef struct _lv_draw_buf_t lv_draw_buf_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator);
 void lv_draw_eve5_deinit(void);
+
+/**
+ * Detach the GPU handle from a draw_buf's vram_res, transferring ownership
+ * to the caller. Used by the display driver to take screen texture ownership.
+ */
+bool lv_draw_eve5_detach_gpu_handle(lv_draw_buf_t *buf, Esd_GpuHandle *out_handle);
 
 #endif /* LV_USE_DRAW_EVE5 */
 

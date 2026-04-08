@@ -174,57 +174,21 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
     /* Resolve bitmap source (same as normal draw) */
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
-        Esd_GpuHandle child_handle = Esd_GpuHandle_FromPtrType(child_layer->user_data);
-        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
-        if(ram_g_addr == GA_INVALID) return;
         src_w = lv_area_get_width(&child_layer->buf_area);
         src_h = lv_area_get_height(&child_layer->buf_area);
 
-        /* Check canvas cache for actual format (canvas direct image may use RGB565).
-         * Validate address match to avoid false hits from draw_buf->data reuse. */
-        uint16_t cached_format;
-        uint32_t cached_stride;
-        uint32_t cached_palette_addr;
-        uint32_t cached_addr = GA_INVALID;
-        if(child_layer->draw_buf && child_layer->draw_buf->data) {
-            cached_addr = lv_draw_eve5_canvas_cache_lookup(u, child_layer->draw_buf->data,
-                                                            NULL, NULL, NULL, &cached_format, &cached_stride,
-                                                            &cached_palette_addr);
-        }
-        if(cached_addr != GA_INVALID) {
-            ram_g_addr = cached_addr;
-            eve_format = cached_format;
-            eve_stride = (int32_t)cached_stride;
-            palette_addr = cached_palette_addr;
-            layout_h = src_h;
-        }
-        else {
-            /* Standard render target - format derived from layer's actual format.
-             * Canvas layers (draw_buf != NULL, parent == NULL): use draw_buf->header.cf.
-             * Child layers (parent != NULL): use color_format set by LVGL. */
-            uint8_t bpp;
-            bool is_child_canvas = (child_layer->draw_buf != NULL && child_layer->parent == NULL);
-            lv_color_format_t layer_cf;
-            if(is_child_canvas) {
-                layer_cf = child_layer->draw_buf->header.cf;
-            }
-            else {
-                layer_cf = child_layer->color_format;
-            }
-            if(layer_cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
-                layer_cf = LV_COLOR_FORMAT_ARGB8888;
-            }
-            /* Function sets appropriate fallback even if unsupported */
-            lv_draw_eve5_get_render_target_format(layer_cf, &eve_format, &bpp);
-#if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
-            /* Force RGB8 for opaque layers (must match hal_init_layer) */
-            if(!lv_color_format_has_alpha(layer_cf) && eve_format != ARGB8) {
-                eve_format = RGB8;
-                bpp = 3;
-            }
-#endif
-            eve_stride = ALIGN_UP(src_w, 16) * bpp;
-            layout_h = ALIGN_UP(src_h, 16);
+        lv_draw_eve5_vram_res_t *child_vr = eve5_get_vram_res(child_layer);
+        if(child_vr == NULL) return;
+        Esd_GpuHandle child_handle = child_vr->gpu_handle;
+        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
+        if(ram_g_addr == GA_INVALID) return;
+        ram_g_addr += child_vr->source_offset;
+        eve_format = child_vr->eve_format;
+        eve_stride = (int32_t)child_vr->stride;
+        layout_h = src_h;
+        if(child_vr->palette_offset != GA_INVALID) {
+            uint32_t base = Esd_GpuAlloc_Get(u->allocator, child_handle);
+            palette_addr = base + child_vr->palette_offset;
         }
     }
     else {

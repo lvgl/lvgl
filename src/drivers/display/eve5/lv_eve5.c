@@ -22,6 +22,9 @@
 #if LV_USE_OS
 #include "../../../osal/lv_os_private.h"
 #endif
+#if LV_USE_DRAW_EVE5
+#include "../../../draw/eve5/lv_draw_eve5.h"
+#endif
 
 /*********************
  * DEFINES
@@ -286,20 +289,18 @@ static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
         return;
     }
 
-    /* * TRANSFER OF OWNERSHIP:
-     * If layer->user_data is set, the Draw Unit produced a GPU texture for this slice.
-     * We convert it to a handle, and NULL out the layer's pointer.
-     * This signals the Draw Unit to allocate a FRESH handle for the next partial slice.
+    /* TRANSFER OF OWNERSHIP:
+     * If the layer's draw_buf has VRAM backing, the Draw Unit produced a GPU texture.
+     * Detach the handle so lv_draw_buf_destroy doesn't double-free.
      */
-    bool is_gpu_rendered = (layer && layer->user_data != NULL);
     Esd_GpuHandle handle = GA_HANDLE_INVALID;
+    bool is_gpu_rendered = false;
 
-    if (is_gpu_rendered)
-    {
-        /* Hardware path: texture already in VRAM (RAM_G) */
-        handle = Esd_GpuHandle_FromPtrType(layer->user_data);
-        layer->user_data = NULL; 
+#if LV_USE_DRAW_EVE5
+    if(layer && layer->draw_buf) {
+        is_gpu_rendered = lv_draw_eve5_detach_gpu_handle(layer->draw_buf, &handle);
     }
+#endif
     else
     {
         /* Software path: LVGL rendered to px_map (System RAM), copy to VRAM */
