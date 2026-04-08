@@ -248,7 +248,7 @@ uint32_t lv_draw_get_unit_count(void);
  * If there are multiple draw units call `lv_draw_get_next_available_task` to find a task.
  * @param layer             the draw layer to search in
  * @param t_prev            continue searching from this task
- * @param draw_unit_id      the ID of the draw unit requesting a task
+ * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
  * @return                  an available draw task or NULL if there is not any
  */
 lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
@@ -257,11 +257,10 @@ lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t *
  * Find an available draw task
  * @param layer             the draw layer to search in
  * @param t_prev            continue searching from this task
- * @param draw_unit_id      the ID of the draw unit requesting a task
+ * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
  * @return                  an available draw task or NULL if there is not any
  */
-lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev,
-                                                 uint8_t draw_unit_id);
+lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
 
 /**
  * Tell how many draw task are waiting to be drawn on the area of `t_check`.
