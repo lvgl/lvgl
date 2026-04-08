@@ -53,6 +53,7 @@ static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position);
  **********************/
 
 typedef struct ttf_font_desc {
+    lv_font_dsc_base_t base;        /**< Common base — must be first member */
     lv_cache_t * glyph_cache;
     lv_cache_t * draw_data_cache;
     lv_cache_t * kerning_cache;

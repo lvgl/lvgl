@@ -185,21 +185,20 @@ struct _lv_draw_unit_t {
     /**
      * Allocate VRAM backing for a draw buffer.
      * The draw unit allocates its extended vram_res struct and the VRAM,
-     * then sets buf->vram_res and the LV_IMAGE_FLAGS_VRAM_RESIDENT flag.
-     * @return true on success
+     * then sets buf->vram_res. @return true on success
      */
     bool (*vram_alloc_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
 
     /**
      * Free VRAM backing. The draw unit frees its VRAM and extended vram_res,
-     * NULLs buf->vram_res, and clears LV_IMAGE_FLAGS_VRAM_RESIDENT.
+     * then NULLs buf->vram_res.
      */
     void (*vram_free_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
 
     /**
      * Upload CPU pixel data to VRAM. The draw unit allocates VRAM,
-     * copies/converts data from buf->data, sets buf->vram_res and the
-     * LV_IMAGE_FLAGS_VRAM_RESIDENT flag. @return true on success
+     * copies/converts data from buf->data, and sets buf->vram_res.
+     * @return true on success
      */
     bool (*vram_upload_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
 
@@ -209,6 +208,22 @@ struct _lv_draw_unit_t {
      * @return true on success
      */
     bool (*vram_download_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
+
+    /**
+     * Check if a VRAM residency is still valid (backed by live VRAM).
+     * Returns false if the VRAM was reclaimed, stolen, or otherwise lost.
+     * When false, callers should free the stale vram_res and re-upload.
+     */
+    bool (*vram_check_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
+
+    /**
+     * Free font VRAM residency. Called when a different draw unit encounters
+     * a font with vram_res owned by this unit. The callback must free GPU
+     * resources, unlink from internal tracking, free the vram_res struct,
+     * and NULL out font->vram_res.
+     * @param font  pointer to lv_font_t whose vram_res is being released
+     */
+    void (*vram_font_free_cb)(lv_draw_unit_t * draw_unit, void * font);
 #endif
 };
 

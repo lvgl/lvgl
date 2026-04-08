@@ -596,7 +596,7 @@ bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t
             if(dsc->src && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
                 if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->src, unit)) return false;
             }
-            if(dsc->bitmap_mask_src) {
+            if(dsc->bitmap_mask_src && lv_image_src_get_type(dsc->bitmap_mask_src) == LV_IMAGE_SRC_VARIABLE) {
                 if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->bitmap_mask_src, unit)) return false;
             }
             break;
@@ -607,7 +607,7 @@ bool lv_draw_buf_ensure_task_sources_resident(lv_draw_task_t * t, lv_draw_unit_t
             if(src_layer && src_layer->draw_buf) {
                 if(!lv_draw_buf_ensure_resident(src_layer->draw_buf, unit)) return false;
             }
-            if(dsc->bitmap_mask_src) {
+            if(dsc->bitmap_mask_src && lv_image_src_get_type(dsc->bitmap_mask_src) == LV_IMAGE_SRC_VARIABLE) {
                 if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)dsc->bitmap_mask_src, unit)) return false;
             }
             break;

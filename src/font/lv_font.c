@@ -77,6 +77,16 @@ const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
     return bitmap;
 }
 
+#if LV_USE_DRAW_VRAM
+void lv_font_release_vram(const lv_font_t * font)
+{
+    if(font == NULL || font->dsc == NULL) return;
+    lv_font_dsc_base_t * base = (lv_font_dsc_base_t *)font->dsc;
+    if(base->vram_res == NULL) return;
+    lv_draw_buf_vram_font_release(&base->vram_res, (void *)font);
+}
+#endif
+
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 {
     LV_ASSERT_NULL(g_dsc);

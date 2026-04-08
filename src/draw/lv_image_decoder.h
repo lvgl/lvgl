@@ -113,7 +113,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  * @return LV_RESULT_OK: opened the image. `dsc->decoded` and `dsc->header` are set.
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
-lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args);
+lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, LV_IMAGE_DSC_CONST void * src, const lv_image_decoder_args_t * args);
 
 /**
  * Decode `full_area` pixels incrementally by calling in a loop. Set `decoded_area` to `LV_COORD_MIN` on first call.
@@ -181,7 +181,7 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
 
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
-                                                 const lv_draw_buf_t * decoded, void * user_data);
+                                                 LV_IMAGE_DSC_CONST lv_draw_buf_t * decoded, void * user_data);
 
 /**
  * Check the decoded image, make any modification if decoder `args` requires.

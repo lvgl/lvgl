@@ -18,6 +18,7 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
+    lv_font_dsc_base_t base;        /**< Common base — must be first member */
     lv_font_t font;
     lv_imgfont_get_path_cb_t path_cb;
     void * user_data;

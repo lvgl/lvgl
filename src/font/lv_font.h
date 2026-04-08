@@ -24,6 +24,27 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * When VRAM residency is enabled, font descriptor structs must be writable
+ * so that vram_res can be attached at runtime. Use LV_FONT_DSC_CONST
+ * instead of plain `const` when declaring font descriptor variables
+ * (lv_font_fmt_txt_dsc_t, etc.). The lv_font_t itself remains truly const.
+ */
+#if LV_USE_DRAW_VRAM
+#define LV_FONT_DSC_CONST  /* non-const: allow vram_res to be written */
+#else
+#define LV_FONT_DSC_CONST const
+#endif
+
+/**
+ * Common base for all font descriptor types.
+ * Must be the first member of every font dsc struct so that the draw unit
+ * can access vram_res generically via ((lv_font_dsc_base_t *)font->dsc)->vram_res.
+ */
+typedef struct {
+    struct _lv_draw_buf_vram_res_t * vram_res;  /**< GPU residency, NULL if CPU-only */
+} lv_font_dsc_base_t;
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -112,7 +133,7 @@ struct _lv_font_t {
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
 
-    const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
+    LV_FONT_DSC_CONST void * dsc;   /**< Store implementation specific or run_time data or caching here*/
     const lv_font_t * fallback;     /**< Fallback font for missing glyph. Resolved recursively */
     void * user_data;               /**< Custom user data for font.*/
 };
@@ -222,6 +243,16 @@ bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_
  * @return return true if the font has a bitmap generated for static rendering.
  */
 bool lv_font_has_static_bitmap(const lv_font_t * font);
+
+#if LV_USE_DRAW_VRAM
+/**
+ * Release VRAM residency for a font.
+ * Calls the owning draw unit's vram_font_free_cb to free GPU resources,
+ * then NULLs vram_res on the font's dsc base. Safe to call if dsc or vram_res is NULL.
+ * @param font pointer to font
+ */
+void lv_font_release_vram(const lv_font_t * font);
+#endif
 
 /**********************
  *      MACROS

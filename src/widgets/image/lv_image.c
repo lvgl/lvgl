@@ -156,7 +156,7 @@ lv_obj_t * lv_image_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_image_set_src(lv_obj_t * obj, const void * src)
+void lv_image_set_src(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -206,8 +206,9 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
         if(header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
             lv_draw_buf_t * buf = (lv_draw_buf_t *)src;
 #if LV_USE_DRAW_VRAM
-            /* VRAM-resident buffers have unaligned_data==NULL after CPU data is freed */
-            if(!buf->handlers || (!(header.flags & LV_IMAGE_FLAGS_VRAM_RESIDENT) && !buf->unaligned_data)) {
+            /* VRAM-resident and lazy-allocated buffers have unaligned_data==NULL */
+            if(!buf->handlers || (buf->vram_res == NULL && !buf->unaligned_data
+                                  && buf->header.magic != LV_IMAGE_HEADER_MAGIC)) {
 #else
             if(!buf->unaligned_data || !buf->handlers) {
 #endif
@@ -503,7 +504,7 @@ void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src)
  * Getter functions
  *====================*/
 
-const void * lv_image_get_src(lv_obj_t * obj)
+LV_IMAGE_DSC_CONST void * lv_image_get_src(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -655,7 +656,7 @@ lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj)
     return img->align;
 }
 
-const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
+LV_IMAGE_DSC_CONST lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

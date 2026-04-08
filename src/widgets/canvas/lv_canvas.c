@@ -325,6 +325,25 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     if(draw_buf == NULL) return;
 
 #if LV_USE_DRAW_VRAM
+    {
+        bool is_zero_fill = false;
+        if(lv_color_format_has_alpha(draw_buf->header.cf)) {
+            is_zero_fill = (opa <= LV_OPA_MIN);
+        }
+        else {
+            is_zero_fill = (opa >= LV_OPA_MAX && color.red == 0 && color.green == 0 && color.blue == 0);
+        }
+        if(is_zero_fill) {
+            /* Zero the CPU data if present, then mark CLEARZERO so
+             * ensure_resident skips uploading zeroed content to VRAM.
+             * If data is NULL (lazy/VRAM-only), just set the flag. */
+            if(draw_buf->data != NULL) {
+                lv_memzero(draw_buf->data, draw_buf->header.stride * draw_buf->header.h);
+            }
+            lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_CLEARZERO);
+            return;
+        }
+    }
     lv_draw_buf_ensure_resident(draw_buf, NULL);
 #endif
 

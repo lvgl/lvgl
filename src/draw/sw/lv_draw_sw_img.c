@@ -967,9 +967,7 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc, lv_draw_unit_t * dr
         return true;
     }
 
-    if(draw_unit != NULL) {
-        lv_draw_buf_ensure_resident((lv_draw_buf_t *)mask_decoder_dsc.decoded, draw_unit);
-    }
+    lv_draw_buf_ensure_resident((lv_draw_buf_t *)mask_decoder_dsc.decoded, draw_unit);
 
     if(mask_decoder_dsc.decoded->header.cf != LV_COLOR_FORMAT_A8 &&
        mask_decoder_dsc.decoded->header.cf != LV_COLOR_FORMAT_L8) {

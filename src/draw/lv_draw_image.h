@@ -30,7 +30,7 @@ struct _lv_draw_image_dsc_t {
     lv_draw_dsc_base_t base;
 
     /**The image source: pointer to `lv_image_dsc_t` or a path to a file*/
-    const void * src;
+    LV_IMAGE_DSC_CONST void * src;
 
     /**The header of the image. Initialized internally in `lv_draw_image` */
     lv_image_header_t header;
@@ -96,7 +96,7 @@ struct _lv_draw_image_dsc_t {
 
     /**Pointer to an A8 or L8 image descriptor to mask the image with.
      * The mask is always center aligned. */
-    const lv_image_dsc_t * bitmap_mask_src;
+    LV_IMAGE_DSC_CONST lv_image_dsc_t * bitmap_mask_src;
 };
 
 /**
@@ -158,7 +158,7 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
  *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
  * @return type of the image source LV_IMAGE_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
  */
-lv_image_src_t lv_image_src_get_type(const void * src);
+lv_image_src_t lv_image_src_get_type(LV_IMAGE_DSC_CONST void * src);
 
 #ifdef __cplusplus
 } /*extern "C"*/

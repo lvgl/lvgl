@@ -149,6 +149,8 @@ typedef enum {
 
 /** Describe store for additional data for fonts */
 typedef struct {
+    lv_font_dsc_base_t base;        /**< Common base — must be first member */
+
     /** The bitmaps of all glyphs */
     const uint8_t * glyph_bitmap;
 
@@ -223,6 +225,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
  */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next);
+
 
 /**********************
  *      MACROS

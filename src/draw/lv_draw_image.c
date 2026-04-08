@@ -187,7 +187,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     LV_PROFILER_DRAW_END;
 }
 
-lv_image_src_t lv_image_src_get_type(const void * src)
+lv_image_src_t lv_image_src_get_type(LV_IMAGE_DSC_CONST void * src)
 {
     if(src == NULL) return LV_IMAGE_SRC_UNKNOWN;
     const uint8_t * u8_p = src;
@@ -239,7 +239,7 @@ void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t *
         return;
     }
 
-    if(decoder_dsc.decoded != NULL && t->draw_unit != NULL) {
+    if(decoder_dsc.decoded != NULL) {
         lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit);
     }
 
@@ -263,7 +263,7 @@ void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
         return;
     }
 
-    if(decoder_dsc.decoded != NULL && t->draw_unit != NULL) {
+    if(decoder_dsc.decoded != NULL) {
         lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit);
     }
 
