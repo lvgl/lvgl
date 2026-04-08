@@ -94,6 +94,21 @@ void lv_image_decoder_deinit(void)
 lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
 {
     LV_PROFILER_DECODER_BEGIN;
+
+#if LV_USE_DRAW_VRAM
+    /* VRAM-resident and lazy-allocated buffers have data==NULL but valid
+     * headers. Return the header directly without iterating decoders,
+     * which may reject or dereference the NULL data pointer. */
+    if(lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
+        const lv_image_dsc_t * img_dsc = src;
+        if(img_dsc->data == NULL && img_dsc->header.magic == LV_IMAGE_HEADER_MAGIC) {
+            *header = img_dsc->header;
+            LV_PROFILER_DECODER_END;
+            return LV_RESULT_OK;
+        }
+    }
+#endif
+
     lv_image_decoder_dsc_t dsc;
     lv_memzero(&dsc, sizeof(lv_image_decoder_dsc_t));
     dsc.src = src;
@@ -377,16 +392,6 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
         if(img_dsc->data == NULL) {
-#if LV_USE_DRAW_VRAM
-            /* Lazy-allocated and VRAM-resident buffers have data==NULL but valid
-             * headers. Return the header directly — don't iterate decoders since
-             * they may dereference data (e.g., PNG magic check). */
-            if(img_dsc->header.magic == LV_IMAGE_HEADER_MAGIC) {
-                *header = img_dsc->header;
-                LV_PROFILER_DECODER_END;
-                return lv_ll_get_head(img_decoder_ll_p);
-            }
-#endif
             LV_PROFILER_DECODER_END;
             return NULL;
         }
