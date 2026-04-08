@@ -123,7 +123,7 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                 /* draw image */
                 vg_lite_buffer_t image_buffer;
                 lv_image_decoder_dsc_t decoder_dsc;
-                if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, ctx->fill_dsc.img_dsc.src, false, true, t->draw_unit)) {
+                if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, ctx->fill_dsc.img_dsc.src, false, true, &u->base_unit)) {
                     /* Calculate pattern matrix. Should start from path bond box, and also apply fill matrix. */
                     vg_lite_matrix_t pattern_matrix = *matrix;
 
