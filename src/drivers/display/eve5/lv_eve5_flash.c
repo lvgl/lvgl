@@ -37,14 +37,12 @@
  *      TYPEDEFS
  **********************/
 
-/** File handle — tracks position within a flash address range */
 typedef struct {
     uint32_t flash_addr;   /**< Base flash byte address */
     uint32_t size;         /**< Remaining flash from base address */
-    uint32_t pos;          /**< Current read position (offset from flash_addr) */
+    uint32_t pos;          /**< Current read position */
 } eve5_flash_file_t;
 
-/** Driver context */
 typedef struct {
     lv_display_t *disp;
     EVE_HalContext *hal;
@@ -109,14 +107,13 @@ void lv_fs_eve5_flash_init(lv_display_t *disp)
     s_ctx.fs_drv.seek_cb = fs_seek;
     s_ctx.fs_drv.tell_cb = fs_tell;
 
-    /* No directory support for raw flash */
     s_ctx.fs_drv.dir_open_cb = NULL;
     s_ctx.fs_drv.dir_read_cb = NULL;
     s_ctx.fs_drv.dir_close_cb = NULL;
 
     lv_fs_drv_register(&s_ctx.fs_drv);
 
-    LV_LOG_INFO("EVE5 flash filesystem driver registered with letter '%c'", LV_FS_EVE5_FLASH_LETTER);
+    LV_LOG_INFO("EVE5 flash filesystem registered with letter '%c'", LV_FS_EVE5_FLASH_LETTER);
 }
 
 bool lv_eve5_flash_ready(void)
@@ -141,13 +138,11 @@ void lv_fs_eve5_flash_deinit(void)
  **********************/
 
 /**
- * Parse flash address from path.
- * Path format after drive letter removal: "/123456" or "123456"
- * Returns the decimal address, or UINT32_MAX on parse failure.
+ * Parse flash address from path. Format: "/123456" or "123456"
+ * Returns UINT32_MAX on parse failure.
  */
 static uint32_t parse_flash_addr(const char *path)
 {
-    /* Skip leading slash(es) */
     while(*path == '/' || *path == '\\') path++;
 
     if(*path == '\0') return UINT32_MAX;
@@ -156,11 +151,10 @@ static uint32_t parse_flash_addr(const char *path)
     while(*path >= '0' && *path <= '9') {
         uint32_t prev = addr;
         addr = addr * 10 + (*path - '0');
-        if(addr < prev) return UINT32_MAX;  /* Overflow */
+        if(addr < prev) return UINT32_MAX;
         path++;
     }
 
-    /* Allow trailing characters (e.g., extension) to be ignored */
     return addr;
 }
 
@@ -176,10 +170,8 @@ static bool ensure_flash_ready(eve5_flash_ctx_t *ctx)
 #if (EVE_SUPPORT_CHIPID >= EVE_BT815)
     EVE_HalContext *phost = ctx->hal;
 
-    /* Check current status */
     uint32_t status = EVE_Hal_rd32(phost, REG_FLASH_STATUS);
 
-    /* Try to attach if detached */
     if(status == FLASH_STATUS_DETACHED) {
         status = EVE_CoCmd_flashAttach(phost);
     }
@@ -189,14 +181,13 @@ static bool ensure_flash_ready(eve5_flash_ctx_t *ctx)
         return false;
     }
 
-    /* Try fast mode for CMD_LOADIMAGE with OPT_FLASH */
+    /* Fast mode required for CMD_LOADIMAGE with OPT_FLASH */
     if(status < FLASH_STATUS_FULL) {
         uint32_t result = 0;
         status = EVE_CoCmd_flashFast(phost, &result);
         if(status < FLASH_STATUS_FULL) {
             LV_LOG_WARN("Flash fast mode failed (status=%u, result=%u)", status, result);
-            /* Continue anyway — CMD_FLASHREAD works in basic mode,
-             * but CMD_LOADIMAGE with OPT_FLASH may not. */
+            /* CMD_FLASHREAD still works in basic mode */
         }
     }
 
@@ -219,6 +210,10 @@ static bool fs_ready(lv_fs_drv_t *drv)
     eve5_flash_ctx_t *ctx = (eve5_flash_ctx_t *)drv->user_data;
     if(ctx == NULL || ctx->hal == NULL) return false;
 
+    /* Fast path: lv_fs_open probes ALL registered drivers via ready_cb.
+     * Avoid HAL lock when already ready to reduce unnecessary lock contention. */
+    if(ctx->flash_ready) return true;
+
 #if LV_USE_OS
     lv_eve5_hal_lock(ctx->disp);
 #endif
@@ -229,9 +224,6 @@ static bool fs_ready(lv_fs_drv_t *drv)
     return ready;
 }
 
-/**
- * Open a flash "file" — parse address, validate range, no I/O.
- */
 static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode)
 {
     eve5_flash_ctx_t *ctx = (eve5_flash_ctx_t *)drv->user_data;
@@ -282,12 +274,9 @@ static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p)
 }
 
 /**
- * Read from flash via CMD_FLASHREAD with alignment handling.
- *
- * CMD_FLASHREAD constraints:
- * - dest (RAM_G): 4-byte aligned
- * - src (flash): 64-byte aligned
- * - num: multiple of 4
+ * Read from flash via CMD_FLASHREAD.
+ * Handles alignment: dest must be 4-byte aligned, src must be 64-byte aligned,
+ * size must be multiple of 4.
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t btr, uint32_t *br)
 {
@@ -299,7 +288,6 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
         return LV_FS_RES_INV_PARAM;
     }
 
-    /* Clamp to available data */
     uint32_t available = file->size - file->pos;
     uint32_t to_read = btr < available ? btr : available;
 
@@ -308,7 +296,6 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
         return LV_FS_RES_OK;
     }
 
-    /* Compute aligned flash read parameters */
     uint32_t abs_addr = file->flash_addr + file->pos;
     uint32_t aligned_src = ALIGN_DOWN(abs_addr, 64);
     uint32_t head_pad = abs_addr - aligned_src;
@@ -318,7 +305,6 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
     lv_eve5_hal_lock(ctx->disp);
 #endif
 
-    /* Allocate temporary RAM_G buffer (4-byte aligned is sufficient for dest) */
     Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(ctx->alloc, aligned_num, GA_ALIGN_4);
     uint32_t ramg_addr = Esd_GpuAlloc_Get(ctx->alloc, handle);
 
@@ -331,7 +317,6 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
         return LV_FS_RES_FS_ERR;
     }
 
-    /* Read from flash to RAM_G */
     EVE_CoCmd_flashRead(ctx->hal, ramg_addr, aligned_src, aligned_num);
     if(!EVE_Cmd_waitFlush(ctx->hal)) {
         LV_LOG_ERROR("CMD_FLASHREAD failed (src=0x%08X, num=%u)", aligned_src, aligned_num);
@@ -343,10 +328,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
         return LV_FS_RES_FS_ERR;
     }
 
-    /* Copy from RAM_G to host buffer (skip head padding) */
     EVE_Hal_rdMem(ctx->hal, buf, ramg_addr + head_pad, to_read);
-
-    /* Free temporary allocation */
     Esd_GpuAlloc_Free(ctx->alloc, handle);
 
 #if LV_USE_OS
@@ -443,7 +425,6 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* Skip drive letter prefix to get the address string */
     const char *addr_str = path;
     if(path[1] == ':' && (path[2] == '/' || path[2] == '\\')) {
         addr_str = path + 2;
@@ -455,13 +436,11 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* CMD_FLASHSOURCE requires 64-byte alignment */
     if((flash_addr & 63) != 0) {
-        LV_LOG_ERROR("Flash address 0x%08X is not 64-byte aligned (required for image decode)", flash_addr);
+        LV_LOG_ERROR("Flash address 0x%08X not 64-byte aligned (required for CMD_FLASHSOURCE)", flash_addr);
         return false;
     }
 
-    /* Check extension for format detection */
     bool is_jpeg = eve5_has_extension(path, ".jpg") || eve5_has_extension(path, ".jpeg");
     bool is_png = eve5_has_extension(path, ".png");
     if(!is_jpeg && !is_png) {
@@ -492,9 +471,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* Step 1: Read header bytes for dimension parsing.
-     * flash_addr is 64-byte aligned, so CMD_FLASHREAD src alignment is satisfied.
-     * Read 1024 bytes (already multiple of 4). */
+    /* Read header for dimension parsing */
     uint32_t header_read_size = 1024;
     if(flash_addr + header_read_size > s_ctx.flash_size_bytes) {
         header_read_size = ALIGN_DOWN(s_ctx.flash_size_bytes - flash_addr, 4);
@@ -520,13 +497,11 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* Copy header to host for parsing */
     uint8_t header_buf[1024];
     uint32_t header_size = header_read_size < sizeof(header_buf) ? header_read_size : sizeof(header_buf);
     EVE_Hal_rdMem(phost, header_buf, temp_addr, header_size);
     Esd_GpuAlloc_Free(alloc, temp_handle);
 
-    /* Parse dimensions */
     uint32_t img_w = 0, img_h = 0;
     bool parsed;
     if(is_jpeg) {
@@ -537,13 +512,11 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
     }
 
     if(is_png && header_size >= 26) {
-        uint8_t bit_depth = header_buf[24];
-        uint8_t color_type = header_buf[25];
-        LV_LOG_INFO("EVE5 FLASH: PNG %s: %ux%u depth=%u color_type=%u",
-                     path, img_w, img_h, bit_depth, color_type);
+        LV_LOG_INFO("PNG %s: %ux%u depth=%u color_type=%u",
+                     path, img_w, img_h, header_buf[24], header_buf[25]);
     }
     else if(is_jpeg) {
-        LV_LOG_INFO("EVE5 FLASH: JPEG %s: %ux%u", path, img_w, img_h);
+        LV_LOG_INFO("JPEG %s: %ux%u", path, img_w, img_h);
     }
 
     if(!parsed || img_w == 0 || img_h == 0) {
@@ -554,7 +527,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* Step 2: Allocate decoded image buffer (worst case ARGB8 = 4 bpp) */
+    /* Allocate decoded image buffer (worst case ARGB8) */
     int32_t decoded_stride = ALIGN_UP((int32_t)(img_w * 4), 4);
     uint32_t decoded_size = (uint32_t)(decoded_stride * (int32_t)img_h);
 
@@ -568,9 +541,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* Step 3: Decode image from flash via CMD_FLASHSOURCE + CMD_LOADIMAGE.
-     * Issue commands manually to add OPT_TRUECOLOR (the HAL wrapper
-     * EVE_CoCmd_loadImage_flash does not include it). */
+    /* Decode via CMD_FLASHSOURCE + CMD_LOADIMAGE */
     if(phost->CmdFault) {
         LV_LOG_ERROR("Coprocessor fault before flash image decode");
         Esd_GpuAlloc_Free(alloc, final_handle);
@@ -588,7 +559,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
     EVE_Cmd_wr32(phost, OPT_FLASH | OPT_NODL | OPT_TRUECOLOR);
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     if(EVE_CHIPID == EVE_BT820) {
-        EVE_Cmd_wr32(phost, CMD_NOP);  /* BT820 workaround: early return without data */
+        EVE_Cmd_wr32(phost, CMD_NOP);  /* BT820: early return without data */
     }
 #endif
     EVE_Cmd_endFunc(phost);
@@ -602,15 +573,14 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* Step 4: Get actual format from coprocessor */
     uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
     bool got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
 
-    LV_LOG_INFO("EVE5 FLASH: getImage: source=0x%08x fmt=%u w=%u h=%u palette=0x%08x (alloc=0x%08x)",
-                out_source, out_fmt, out_w, out_h, out_palette, final_addr);
+    LV_LOG_INFO("getImage: source=0x%08x fmt=%u w=%u h=%u palette=0x%08x",
+                out_source, out_fmt, out_w, out_h, out_palette);
 
     if(!got_image) {
-        LV_LOG_WARN("EVE5 FLASH: getImage failed, assuming RGB565 %ux%u", img_w, img_h);
+        LV_LOG_WARN("getImage failed, assuming RGB565 %ux%u", img_w, img_h);
         out_source = final_addr;
         out_w = img_w;
         out_h = img_h;
@@ -618,7 +588,6 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         out_palette = GA_INVALID;
     }
 
-    /* Compute offsets from allocation base */
     uint32_t alloc_base = Esd_GpuAlloc_Get(alloc, final_handle);
     uint32_t img_ofs = (out_source >= alloc_base) ? (out_source - alloc_base) : 0;
     uint32_t pal_ofs = GA_INVALID;
@@ -626,7 +595,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         pal_ofs = out_palette - alloc_base;
     }
 
-    /* Trim allocation to actual size */
+    /* Trim allocation to actual decoded size */
     int32_t bpp = eve5_format_bpp(out_fmt);
     uint32_t index_size = out_w * (uint32_t)bpp * out_h;
     uint32_t img_end = img_ofs + index_size;
@@ -647,7 +616,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
     if(image_offset) *image_offset = img_ofs;
     if(palette_offset) *palette_offset = pal_ofs;
 
-    LV_LOG_INFO("EVE5: Loaded flash image %s (%ux%u, format=%u)", path, out_w, out_h, out_fmt);
+    LV_LOG_INFO("Loaded flash image %s (%ux%u, format=%u)", path, out_w, out_h, out_fmt);
     return true;
 }
 

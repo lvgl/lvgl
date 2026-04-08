@@ -1,23 +1,16 @@
 /**
  * @file lv_draw_eve5_alpha_pass.c
  *
- * Alpha Correction Second Pass for EVE5 (BT820) Draw Unit
+ * Direct-to-Alpha Correction Pass for EVE5 (BT820) Draw Unit
  *
- * EVE hardware applies blend factors uniformly to all 4 RGBA channels.
- * With blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA) on a cleared layer (alpha=0),
- * the alpha channel gets squared: result.a = src.a * src.a / 255.
- * Anti-aliased edges retain this squared alpha, causing incorrect
- * compositing when the layer is blitted onto its parent.
+ * Implements the direct-to-alpha recovery method: re-iterates tasks after
+ * RGB rendering and writes correct Porter-Duff alpha using blend(ONE,
+ * ONE_MINUS_SRC_ALPHA) with colorMask(0,0,0,1).
  *
- * This pass corrects the alpha channel after all RGB-producing tasks have
- * finished. It clears the layer alpha to 0, then re-iterates the task list
- * calling alpha-only draw functions with blend(ONE, ONE_MINUS_SRC_ALPHA)
- * and colorMask(0,0,0,1). This produces correct alpha coverage:
- *   result.a = src.a + dst.a * (1 - src.a/255)
- * which is the standard Porter-Duff "over" operator for alpha.
+ * Also contains the alpha accuracy predicates that determine whether a task
+ * can use this pass or requires L8 render-target recovery instead.
  *
- * An opaque-area skip optimization avoids redundant alpha draws for tasks
- * that are fully inside the largest opaque fill's interior.
+ * See lv_draw_eve5.c header for full alpha recovery architecture.
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
@@ -43,23 +36,18 @@
 /**********************
  * ALPHA ACCURACY PREDICATES
  *
- * See lv_draw_eve5_private.h for the full contract these functions satisfy.
- * In short: each predicate returns true when (1) the task requires alpha
- * recovery, AND (2) the direct-to-alpha pass cannot accurately reconstruct
- * it — requiring the L8 render-target alpha path for exact results.
+ * Each predicate returns true when the task uses alpha-as-scratch masking
+ * during RGB rendering, making direct-to-alpha replay impossible. These
+ * tasks require L8 render-target recovery for accurate alpha.
+ *
+ * Tasks that only suffer from squared-alpha (standard blending) return
+ * false, since direct-to-alpha replay can correct them accurately.
  **********************/
 
 /**
- * FILL: returns true when rounded-corner + HOR/VER gradient with semi-transparent
- * stop(s).  This is the only FILL path that uses alpha-as-scratch masking
- * (clear alpha → stamp rounded rect → multiply gradient bitmap alpha → draw
- * through blend(DST_ALPHA, ONE_MINUS_DST_ALPHA)).  Solid fills and fully-opaque
- * gradients use simpler paths that don't trash alpha.
- *
- * Mirrors: RGB pass in lv_draw_eve5_hal_draw_fill (gradient + real_radius > 0
- *          + varying stop opa → mask_rect path that sets has_alpha_trashed).
- *          Direct alpha pass in lv_draw_eve5_alpha_draw_fill (stencil
- *          approximation only — no exact recovery exists).
+ * FILL: true when rounded-corner + gradient with semi-transparent stops.
+ * This path uses alpha-as-scratch masking (clear alpha, stamp rounded rect,
+ * multiply gradient bitmap, draw through DST_ALPHA blend).
  */
 bool lv_draw_eve5_fill_needs_alpha_rendertarget(const lv_draw_task_t *t)
 {
@@ -71,7 +59,6 @@ bool lv_draw_eve5_fill_needs_alpha_rendertarget(const lv_draw_task_t *t)
     int32_t real_radius = LV_MIN3((w - 1) / 2, (h - 1) / 2, dsc->radius);
     if(real_radius == 0) return false;
 
-    /* Only HOR/VER gradients use the alpha-as-scratch masking path */
     if(dsc->grad.dir != LV_GRAD_DIR_HOR && dsc->grad.dir != LV_GRAD_DIR_VER) return false;
     if(dsc->grad.stops_count < 2) return false;
 
@@ -82,18 +69,10 @@ bool lv_draw_eve5_fill_needs_alpha_rendertarget(const lv_draw_task_t *t)
 }
 
 /**
- * BORDER: returns true when the border uses the alpha-as-scratch masking path.
- * The RGB pass has two rendering paths:
- *   - LINES path (4 straight LINE_STRIP segments): used when rout==0 + full opa,
- *     or when all 4 corners are clipped away.  Does NOT trash alpha.
- *   - Masking path (outer rounded rect minus inner rounded rect via alpha channel):
- *     used otherwise.  Trashes alpha.
- * The direct alpha correction pass uses stencil for exactly the masking-path
- * cases, but can only approximate the result (binary in/out).
- *
- * Mirrors: RGB pass in lv_draw_eve5_hal_draw_border (LINES vs masking split).
- *          Direct alpha pass in lv_draw_eve5_alpha_draw_border (stencil
- *          approximation only — no exact recovery exists).
+ * BORDER: true when using the alpha-as-scratch masking path.
+ * Two RGB paths exist:
+ *   - LINES path (rout==0 + full opa, or all corners clipped): no alpha trashing
+ *   - Masking path (outer rect minus inner rect via alpha): trashes alpha
  */
 bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t *t)
 {
@@ -116,10 +95,10 @@ bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t *t)
     int32_t max_r = (LV_MIN(w, h) - 1) / 2;
     if(rout > max_r) rout = max_r;
 
-    /* LINES path: no alpha trashing, no stencil needed */
+    /* LINES path: no alpha trashing */
     if(rout == 0 && dsc->opa >= LV_OPA_MAX) return false;
 
-    /* Check if all corners are clipped away — falls back to LINES path */
+    /* Check if all corners are clipped away (falls back to LINES path) */
     int32_t clip_x1 = t->clip_area.x1 - layer_area->x1;
     int32_t clip_y1 = t->clip_area.y1 - layer_area->y1;
     int32_t clip_x2 = t->clip_area.x2 - layer_area->x1;
@@ -139,16 +118,8 @@ bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t *t)
 /* Line alpha accuracy predicate is in lv_draw_eve5_line.c */
 
 /**
- * ARC: always returns true for visible arcs.
- * The RGB pass uses multi-phase stencil (EDGE_STRIP_R wedge mask, DECR for
- * annulus, REPLACE for round/flat caps) or CMD_ARC — both trash the alpha
- * channel.  The direct alpha correction pass uses stencil to approximate
- * recovery, and there is currently no means to reconstruct the exact alpha.
- *
- * Mirrors: RGB pass in lv_draw_eve5_hal_draw_arc (stencil + CMD_ARC paths,
- *          both set has_alpha_trashed).
- *          Direct alpha pass in lv_draw_eve5_alpha_draw_arc (stencil
- *          approximation only — no exact recovery exists).
+ * ARC: always true for visible arcs.
+ * RGB pass uses multi-phase stencil or CMD_ARC, both of which trash the alpha channel.
  */
 bool lv_draw_eve5_arc_needs_alpha_rendertarget(const lv_draw_task_t *t)
 {
@@ -160,7 +131,7 @@ bool lv_draw_eve5_arc_needs_alpha_rendertarget(const lv_draw_task_t *t)
 }
 
 /**********************
- * ALPHA-ONLY FUNCTIONS
+ * ALPHA-ONLY DRAW FUNCTIONS
  **********************/
 
 void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
@@ -183,10 +154,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     uint8_t opa = dsc->opa;
 
     /* Gradient with per-stop opacity and no rounded corners:
-     * re-draw gradient ARGB8 strip for exact per-pixel alpha correction.
-     * The strip's per-pixel alpha (LV_OPA_MIX2(opa, stop_opa)) is drawn
-     * through the alpha pass blend, producing correct Porter-Duff coverage.
-     * Rounded gradient fills are handled separately below. */
+     * re-draw gradient ARGB8 strip for exact per-pixel alpha. */
     if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count >= 2 && real_radius == 0) {
         bool has_varying_opa = false;
         for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
@@ -204,14 +172,11 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 return;
             }
             EVE_CoDl_restoreContext(u->hal);
-            /* Fall through to uniform opa shape */
         }
     }
 
     /* Gradient with per-stop opacity and rounded corners:
-     * With stencil: build rounded rect stencil, draw gradient strip through it
-     * for per-stop alpha with binary edges at the rounded corners.
-     * Without stencil: compute weighted average stop opacity for the uniform shape. */
+     * Use stencil approximation or weighted average opacity. */
     if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count >= 2 && real_radius > 0) {
         bool has_varying_opa = false;
         for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
@@ -227,21 +192,14 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                                         &t->clip_area, &layer->buf_area);
 
 #if EVE5_ALPHA_STENCIL_MULTISTEP
-            /* Multi-step stencil AA: 4 concentric stencil boundaries spread
-             * across the ~1px AA transition, creating 4 zones with discrete
-             * coverage levels (1/4, 2/4, 3/4, full interior). Draws the
-             * gradient bitmap once per zone with colorA modulation.
-             * Stencil build uses INCR from outermost to innermost. */
+            /* Multi-step stencil AA: 4 concentric boundaries creating discrete
+             * coverage zones. Draw gradient once per zone with colorA modulation.
+             * Coverage values derived from hardware AA coverage table (s_CovTab). */
             EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
             EVE_CoDl_stencilOp(u->hal, KEEP, INCR);
             if(w == h && radius == LV_RADIUS_CIRCLE && w >= 4) {
                 int32_t cx2 = x1 * 2 + (w - 1);
                 int32_t cy2 = y1 * 2 + (h - 1);
-                /* pointSize steps: -4, -8, -12, -16 relative to w*8 (RGB path).
-                 * Each step is 0.25px smaller. The outermost INCR boundary
-                 * lands ~0.25px inside the RGB path's outer AA extent — the
-                 * very outermost fringe pixels have too little coverage for
-                 * even the 1/4 discrete level, so truncating avoids haloing. */
                 int32_t ps[4] = { w * 8 - 4, w * 8 - 8, w * 8 - 12, w * 8 - 16 };
                 for(int i = 0; i < 4; i++) {
                     if(ps[i] > 0) {
@@ -253,12 +211,6 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 }
             }
             else {
-                /* lineWidth steps: +4, 0, -4, -8 relative to real_radius*16.
-                 * RGB path uses real_radius*16+8. Outermost step is 0.25px
-                 * inside the RGB edge — matching the RGB size would over-
-                 * estimate the barely-covered outermost pixels at 1/4 alpha,
-                 * causing a visible dark halo. Truncating the outermost
-                 * ~0.25px of the AA transition avoids this artifact. */
                 int32_t lw[4] = { real_radius * 16 + 4, real_radius * 16,
                                    real_radius * 16 - 4, real_radius * 16 - 8 };
                 for(int i = 0; i < 4; i++) {
@@ -272,15 +224,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 }
             }
 
-            /* Draw gradient through stencil at 4 coverage levels.
-             * colorA values derived from the hardware AA coverage table
-             * (s_CovTab): average coverage in each 4-sub-pixel zone,
-             * measured at d_rgb from the RGB geometric edge.
-             * Cross-radius average of rows 16/32/64:
-             *   Zone 1 (d_rgb 7-10):  ~26  (cols 23-26)
-             *   Zone 2 (d_rgb 3-6):   ~65  (cols 19-22)
-             *   Zone 3 (d_rgb -1..2): ~120 (cols 15-18)
-             *   Zone 4 (d_rgb <= -2):  255  (interior) */
+            /* Draw gradient through stencil at 4 coverage levels */
             EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
             EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
             if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h, false)) {
@@ -291,21 +235,21 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 EVE_CoDl_vertex2f_0(u->hal, x1, y1);
                 EVE_CoDl_end(u->hal);
 
-                /* Inner fringe: stencil == 3, avg coverage ~120 */
+                /* Inner fringe: stencil == 3, coverage ~120/255 */
                 EVE_CoDl_colorA(u->hal, 120);
                 EVE_CoDl_stencilFunc(u->hal, EQUAL, 3, 255);
                 EVE_CoDl_begin(u->hal, BITMAPS);
                 EVE_CoDl_vertex2f_0(u->hal, x1, y1);
                 EVE_CoDl_end(u->hal);
 
-                /* Middle fringe: stencil == 2, avg coverage ~65 */
+                /* Middle fringe: stencil == 2, coverage ~65/255 */
                 EVE_CoDl_colorA(u->hal, 65);
                 EVE_CoDl_stencilFunc(u->hal, EQUAL, 2, 255);
                 EVE_CoDl_begin(u->hal, BITMAPS);
                 EVE_CoDl_vertex2f_0(u->hal, x1, y1);
                 EVE_CoDl_end(u->hal);
 
-                /* Outer fringe: stencil == 1, avg coverage ~26 */
+                /* Outer fringe: stencil == 1, coverage ~26/255 */
                 EVE_CoDl_colorA(u->hal, 26);
                 EVE_CoDl_stencilFunc(u->hal, EQUAL, 1, 255);
                 EVE_CoDl_begin(u->hal, BITMAPS);
@@ -323,9 +267,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 EVE_CoDl_end(u->hal);
             }
 #else
-            /* Single-step stencil: binary threshold at AA midpoint.
-             * Uses real_radius * 16 (no +8) for 0.5px AA midpoint alignment.
-             * colorMask(0,0,0,0) prevents stencil build from polluting alpha. */
+            /* Single-step stencil: binary threshold at AA midpoint */
             EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
             EVE_CoDl_stencilOp(u->hal, KEEP, INCR);
             if(w == h && radius == LV_RADIUS_CIRCLE && w >= 4) {
@@ -342,7 +284,6 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 EVE_CoDl_end(u->hal);
             }
 
-            /* Draw gradient strip through stencil */
             EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
             EVE_CoDl_stencilFunc(u->hal, NOTEQUAL, 0, 255);
             EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
@@ -352,7 +293,6 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 EVE_CoDl_end(u->hal);
             }
             else {
-                /* Gradient allocation failed; uniform opa through stencil */
                 EVE_CoDl_colorA(u->hal, opa);
                 EVE_CoDl_lineWidth(u->hal, 16);
                 EVE_CoDl_begin(u->hal, RECTS);
@@ -365,9 +305,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
             EVE_CoDl_restoreContext(u->hal);
             return;
 #else
-            /* Compute weighted average stop opacity for better approximation.
-             * Integrates the piecewise-linear opacity over the gradient span:
-             * avg = sum(span_i * (opa_i + opa_{i+1})) / (2 * total_span) */
+            /* Compute weighted average stop opacity as approximation */
             {
                 int32_t sum = 0;
                 for(uint8_t i = 0; i + 1 < dsc->grad.stops_count; i++) {
@@ -380,11 +318,11 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                     opa = LV_OPA_MIX2(dsc->opa, (uint8_t)(sum / (2 * total_span)));
                 }
             }
-            /* Fall through to uniform opa shape */
 #endif
         }
     }
 
+    /* Uniform opacity shape */
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
     EVE_CoDl_colorA(u->hal, opa);
 
@@ -407,7 +345,7 @@ void lv_draw_eve5_alpha_draw_fill_with_border(lv_draw_eve5_unit_t *u,
     lv_layer_t *layer = fill_task->target_layer;
     const lv_draw_border_dsc_t *border_dsc = border_task->draw_dsc;
 
-    /* One shape at alpha=255 covering the border's outer area */
+    /* Single shape at alpha=255 covering the border's outer area */
     int32_t x1 = border_task->area.x1 - layer->buf_area.x1;
     int32_t y1 = border_task->area.y1 - layer->buf_area.y1;
     int32_t x2 = border_task->area.x2 - layer->buf_area.x1;
@@ -451,13 +389,11 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
     const lv_area_t *clip = &t->clip_area;
     const lv_area_t *layer_area = &layer->buf_area;
 
-    /* Convert clip to layer coordinates */
     int32_t clip_x1 = clip->x1 - layer_area->x1;
     int32_t clip_y1 = clip->y1 - layer_area->y1;
     int32_t clip_x2 = clip->x2 - layer_area->x1;
     int32_t clip_y2 = clip->y2 - layer_area->y1;
 
-    /* Check if corners are clipped (same logic as normal draw) */
     bool corners_clipped = (rout > 0) &&
                            (clip_x1 > x1 + rout || clip_x2 < x1 + rout ||
                             clip_y1 > y1 + rout) &&
@@ -505,13 +441,7 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
     }
     else {
 #if EVE5_ALPHA_STENCIL_APPROX
-        /* Stencil-based interior mask: marks the inner area in the stencil,
-         * then draws the outer shape excluding it. This limits alpha
-         * writes to the border ring only, preventing interior over-coverage
-         * for semi-transparent borders. The outer edge preserves the stamp's
-         * AA. The inner edge is binary. INCR saturates at 255, so areas
-         * where the inner rect extends beyond the outer (disabled sides)
-         * are harmless — phase 3 draws through stencil == 0 only. */
+        /* Stencil-based interior mask: mark inner area, draw outer excluding it */
         int32_t inner_x1 = x1 + ((dsc->side & LV_BORDER_SIDE_LEFT)   ? dsc->width : -dsc->width);
         int32_t inner_x2 = x2 - ((dsc->side & LV_BORDER_SIDE_RIGHT)  ? dsc->width : -dsc->width);
         int32_t inner_y1 = y1 + ((dsc->side & LV_BORDER_SIDE_TOP)    ? dsc->width : -dsc->width);
@@ -534,16 +464,11 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
                                     &t->clip_area, &layer->buf_area);
 
 #if EVE5_ALPHA_STENCIL_MULTISTEP
-        /* Multi-step inner edge: 4 concentric INCR passes for the inner
-         * shape (circle / rounded rect), creating a 4-zone transition at
-         * the inner boundary. rin == 0 has no AA, so single INCR suffices.
-         * colorMask(0,0,0,0) prevents stencil build from polluting alpha. */
+        /* Multi-step inner edge: 4 concentric INCR passes */
         EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
         EVE_CoDl_stencilOp(u->hal, KEEP, INCR);
         if(is_circle) {
             int32_t inner_d = w - 2 * dsc->width;
-            /* pointSize steps: -4, -8, -12, -16 relative to inner_d*8 (RGB).
-             * Same zone layout as fill multi-step. */
             int32_t ps[4] = { inner_d * 8 - 4, inner_d * 8 - 8,
                                inner_d * 8 - 12, inner_d * 8 - 16 };
             for(int i = 0; i < 4; i++) {
@@ -552,8 +477,6 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
             }
         }
         else if(rin > 0) {
-            /* lineWidth steps: +4, 0, -4, -8 relative to rin*16.
-             * Same zone layout as fill multi-step. */
             int32_t lw[4] = { rin * 16 + 4, rin * 16,
                                rin * 16 - 4, rin * 16 - 8 };
             for(int i = 0; i < 4; i++) {
@@ -567,7 +490,7 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
             }
         }
         else {
-            /* rin == 0: sharp inner edge, no AA fringe. Single INCR. */
+            /* rin == 0: sharp inner edge, single INCR */
             EVE_CoDl_begin(u->hal, RECTS);
             EVE_CoDl_vertex2f_0(u->hal, inner_x1, inner_y1);
             EVE_CoDl_vertex2f_0(u->hal, inner_x2, inner_y2);
@@ -575,14 +498,11 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
         }
 
         /* Draw outer shape at inverted coverage levels.
-         * Stencil zones represent inner shape coverage from s_CovTab:
-         * {26, 65, 120, 255}. Border remaining = 255 - inner = {229, 190, 135, 0}.
-         * colorA = dsc->opa * remaining / 255 for each zone.
-         * Stencil >= 4 (deep inside inner) is not drawn (fully excluded). */
+         * Border remaining = 255 - inner coverage. */
         EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
         EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
 
-        /* Stencil 0: full border — no inner coverage */
+        /* Stencil 0: full border */
         EVE_CoDl_colorA(u->hal, dsc->opa);
         EVE_CoDl_stencilFunc(u->hal, EQUAL, 0, 255);
         if(is_circle)
@@ -591,36 +511,31 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
             lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
 
         if(is_circle || rin > 0) {
-            /* Stencil 1: outer inner fringe, border coverage ~229/255 */
+            /* Stencil 1: coverage ~229/255 */
             EVE_CoDl_colorA(u->hal, (uint8_t)((uint16_t)dsc->opa * 229 / 255));
             EVE_CoDl_stencilFunc(u->hal, EQUAL, 1, 255);
             if(is_circle) draw_circle_subpx(u, bcx2, bcy2, w * 8);
             else lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
 
-            /* Stencil 2: middle inner fringe, border coverage ~190/255 */
+            /* Stencil 2: coverage ~190/255 */
             EVE_CoDl_colorA(u->hal, (uint8_t)((uint16_t)dsc->opa * 190 / 255));
             EVE_CoDl_stencilFunc(u->hal, EQUAL, 2, 255);
             if(is_circle) draw_circle_subpx(u, bcx2, bcy2, w * 8);
             else lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
 
-            /* Stencil 3: inner fringe, border coverage ~135/255 */
+            /* Stencil 3: coverage ~135/255 */
             EVE_CoDl_colorA(u->hal, (uint8_t)((uint16_t)dsc->opa * 135 / 255));
             EVE_CoDl_stencilFunc(u->hal, EQUAL, 3, 255);
             if(is_circle) draw_circle_subpx(u, bcx2, bcy2, w * 8);
             else lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
         }
 #else
-        /* Single-step stencil: binary inner edge at AA midpoint.
-         * Uses rin * 16 / (inner_d * 8 - 8) — 0.5px smaller than the normal
-         * draw's inner shape — so the stencil boundary aligns with the
-         * geometric edge (midpoint of the AA transition) rather than the
-         * outer AA fringe. colorMask(0,0,0,0) prevents stencil build from
-         * polluting alpha. */
+        /* Single-step stencil: binary inner edge at AA midpoint */
         EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
         EVE_CoDl_stencilOp(u->hal, KEEP, INCR);
         if(is_circle) {
             int32_t inner_d = w - 2 * dsc->width;
-            int32_t stencil_r16 = inner_d * 8 - 8;  /* 0.5px smaller for AA midpoint */
+            int32_t stencil_r16 = inner_d * 8 - 8;
             if(stencil_r16 > 0)
                 draw_circle_subpx(u, bcx2, bcy2, stencil_r16);
         }
@@ -638,8 +553,6 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
             EVE_CoDl_end(u->hal);
         }
 
-        /* Draw outer shape at border_opa, excluding interior.
-         * The stamp's AA provides smooth outer edges; the inner edge is binary. */
         EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
         EVE_CoDl_stencilFunc(u->hal, EQUAL, 0, 255);
         EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
@@ -652,12 +565,7 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
 
         EVE_CoDl_restoreContext(u->hal);
 #else
-        /* Without stencil, skip the border alpha draw entirely. Drawing the
-         * full outer rounded rect would over-cover the interior, adding
-         * unwanted alpha on top of the fill's correct values. Doing nothing
-         * preserves the interior; the border ring's alpha contribution is
-         * lost, but the opaque fill step (alpha=255) covers it in the
-         * common case. */
+        /* Without stencil: skip border alpha draw to avoid over-covering interior */
 #endif
     }
 }
@@ -700,8 +608,7 @@ void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    /* Gradient with per-stop opacity: re-draw gradient bitmap through
-     * triangle stencil for exact per-pixel alpha correction. */
+    /* Gradient with per-stop opacity: draw through triangle stencil */
     if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count >= 2) {
         bool has_varying_opa = false;
         for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
@@ -735,7 +642,7 @@ void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task
         }
     }
 
-    /* Uniform opacity: draw flat alpha through triangle stencil. */
+    /* Uniform opacity: flat alpha through triangle stencil */
     EVE_CoDl_saveContext(u->hal);
 
     lv_draw_eve5_clear_stencil(u, xmin, ymin, xmax, ymax,
@@ -747,8 +654,6 @@ void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task
 
     build_triangle_stencil(u->hal, p);
 
-    /* Draw where stencil was inverted. Restore colorMask to alpha-only
-     * (the outer context already has colorMask(0,0,0,1)). */
     EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
     EVE_CoDl_stencilFunc(u->hal, EQUAL, 255, 255);
     EVE_CoDl_lineWidth(u->hal, 16);

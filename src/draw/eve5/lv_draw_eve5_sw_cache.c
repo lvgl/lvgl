@@ -14,7 +14,7 @@
 
 #include "lv_draw_eve5_private.h"
 
-#if LV_USE_DRAW_EVE5
+#if LV_USE_DRAW_EVE5 && LV_DRAW_EVE5_SW_FALLBACK
 
 /**********************
  * STATIC PROTOTYPES
@@ -224,17 +224,18 @@ static lv_draw_eve5_sw_cache_entry_t *find_lru_entry(lv_draw_eve5_sw_cache_t *ca
 static void free_entry(lv_draw_eve5_unit_t *u, lv_draw_eve5_sw_cache_entry_t *entry)
 {
     if(!entry->valid) return;
-    
+
     if(entry->dsc_data) {
         lv_free(entry->dsc_data);
         entry->dsc_data = NULL;
     }
-    
-    if(entry->handle.Id != GA_HANDLE_INVALID.Id) {
-        Esd_GpuAlloc_Free(u->allocator, entry->handle);
+
+    if(Esd_GpuAlloc_Get(u->allocator, entry->handle) != GA_INVALID) {
+        /* PendingFree: evicted texture may still be in an in-flight display list */
+        Esd_GpuAlloc_PendingFree(u->allocator, entry->handle);
     }
-    
+
     entry->valid = false;
 }
 
-#endif /* LV_USE_DRAW_EVE5 */
+#endif /* LV_USE_DRAW_EVE5 && LV_DRAW_EVE5_SW_FALLBACK */

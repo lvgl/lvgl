@@ -8,7 +8,7 @@
  * to read data and decode images from flash memory.
  *
  * Architecture:
- * - Flash is a raw byte array — no filesystem, no directories
+ * - Flash is a raw byte array with no filesystem and no directories
  * - Path format: "F:/123456" where 123456 is the decimal flash byte address
  * - Reads use CMD_FLASHREAD with temporary RAM_G allocations (freed after copy to host)
  * - Image loading uses CMD_FLASHSOURCE + CMD_LOADIMAGE with OPT_FLASH for zero-copy decode

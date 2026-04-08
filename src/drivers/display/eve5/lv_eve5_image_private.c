@@ -19,7 +19,7 @@
  **********************/
 
 bool eve5_parse_jpeg_dimensions(const uint8_t *data, uint32_t size,
-                                 uint32_t *width, uint32_t *height)
+                                uint32_t *width, uint32_t *height)
 {
     if(size < 11) return false;
     if(data[0] != 0xFF || data[1] != 0xD8) return false;
@@ -33,7 +33,7 @@ bool eve5_parse_jpeg_dimensions(const uint8_t *data, uint32_t size,
 
         uint8_t marker = data[pos + 1];
 
-        /* SOF0 (baseline) or SOF2 (progressive) */
+        /* SOF0 (baseline) or SOF2 (progressive) contain dimensions */
         if(marker == 0xC0 || marker == 0xC2) {
             if(pos + 9 > size) return false;
             *height = ((uint32_t)data[pos + 5] << 8) | data[pos + 6];
@@ -41,7 +41,7 @@ bool eve5_parse_jpeg_dimensions(const uint8_t *data, uint32_t size,
             return true;
         }
 
-        /* Skip other markers */
+        /* Skip standalone markers vs length-prefixed segments */
         if(marker == 0xD8 || marker == 0xD9 || (marker >= 0xD0 && marker <= 0xD7)) {
             pos += 2;
         }
@@ -53,11 +53,12 @@ bool eve5_parse_jpeg_dimensions(const uint8_t *data, uint32_t size,
             break;
         }
     }
+
     return false;
 }
 
 bool eve5_parse_png_dimensions(const uint8_t *data, uint32_t size,
-                                uint32_t *width, uint32_t *height)
+                               uint32_t *width, uint32_t *height)
 {
     if(size < 24) return false;
 
@@ -66,6 +67,7 @@ bool eve5_parse_png_dimensions(const uint8_t *data, uint32_t size,
         if(data[i] != png_sig[i]) return false;
     }
 
+    /* IHDR chunk must be first */
     if(data[12] != 'I' || data[13] != 'H' || data[14] != 'D' || data[15] != 'R') return false;
 
     *width = ((uint32_t)data[16] << 24) | ((uint32_t)data[17] << 16) |
@@ -94,6 +96,7 @@ bool eve5_has_extension(const char *path, const char *ext)
         if(c2 >= 'A' && c2 <= 'Z') c2 += ('a' - 'A');
         if(c1 != c2) return false;
     }
+
     return true;
 }
 

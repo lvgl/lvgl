@@ -9,13 +9,6 @@
  * - Dashed lines with configurable dash/gap widths
  * - H/V scissor optimization for axis-aligned flat-cap lines
  *
- * Contains:
- * - RGB line draw (lv_draw_eve5_hal_draw_line)
- * - Alpha accuracy predicate (lv_draw_eve5_line_needs_alpha_rendertarget)
- * - Alpha correction pass (lv_draw_eve5_alpha_draw_line)
- *
- * Separated from lv_draw_eve5_primitives.c and lv_draw_eve5_alpha_pass.c.
- *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
  * SPDX-License-Identifier: MIT
@@ -33,25 +26,14 @@
 
 /**********************
  * ALPHA ACCURACY PREDICATE
- *
- * See lv_draw_eve5_private.h for the full contract this function satisfies.
  **********************/
 
 /**
- * LINE: returns true when diagonal flat caps or dashes are present.
+ * Returns true when the line requires L8 render-target alpha recovery.
  *
- * The RGB pass uses alpha-as-scratch masking for flat cap erasure and dash gaps
- * (perpendicular masking lines with blend(ZERO, ONE_MINUS_SRC_ALPHA)).
- * The direct alpha correction pass uses stencil to approximate recovery,
- * producing binary edges at stencil boundaries instead of smooth AA.
- *
- * H/V flat caps use the scissor optimization (sharp edges without masking),
- * so they don't need the render-target path.
- *
- * Mirrors: RGB pass in lv_draw_eve5_hal_draw_line (masking path with
- *          is_hv_flat check and track_alpha_trashed).
- *          Direct alpha pass in lv_draw_eve5_alpha_draw_line (stencil
- *          approximation only — binary edges at cap/dash boundaries).
+ * Diagonal flat caps and dashes use alpha-as-scratch masking in the RGB pass,
+ * which cannot be recovered by the direct-to-alpha replay. H/V flat caps use
+ * the scissor optimization (sharp edges without masking) and don't need this.
  */
 bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t *t)
 {
@@ -63,7 +45,6 @@ bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t *t)
     int32_t dx = dsc->p2.x - dsc->p1.x;
     int32_t dy = dsc->p2.y - dsc->p1.y;
 
-    /* H/V flat caps use scissor optimization, not stencil */
     bool is_hv = (dx == 0 || dy == 0);
     bool is_hv_flat = is_hv && (dsc->raw_end || (!dsc->round_start && !dsc->round_end));
 
@@ -78,10 +59,13 @@ bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t *t)
  * LINE DRAWING
  **********************/
 
-/* alpha_to_rgb: renders the task's alpha contribution as grayscale luminance
- * into RGB, for later copying into a layer's alpha channel. Requires the
- * caller to use default blend mode: blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA)
- * with colorMask(1,1,1,1). The A channel is scratch space in this mode. */
+/**
+ * Draw a line with hardware acceleration.
+ *
+ * @param alpha_to_rgb  When true, renders the line's alpha contribution as white
+ *                      luminance for L8 render-target alpha recovery.
+ * @param use_hv_opt    Enable H/V scissor optimization for axis-aligned lines.
+ */
 void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb, bool use_hv_opt)
 {
     lv_layer_t *layer = t->target_layer;
@@ -100,8 +84,7 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
 
     uint32_t line_w = dsc->width * 8; /* EVE LINE_WIDTH is half-width in 1/16 pixel units */
 
-    /* Half-pixel alignment: SW uses asymmetric w_half0/w_half1 for odd widths,
-     * shifting the line center by 0.5px. Even widths are symmetric. */
+    /* Half-pixel alignment: SW uses asymmetric w_half0/w_half1 for odd widths */
     int32_t off = (dsc->width & 1) ? 0 : -1;
 
     bool need_flat_start = !dsc->round_start && !dsc->raw_end;
@@ -111,9 +94,7 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
     int32_t dy = y2 - y1;
 
     /* H/V scissor optimization: for axis-aligned lines without round caps,
-     * draw an oversized line (+2px width, +1px length each end) and let the
-     * scissor clip to the exact pixel rectangle. Gives sharp edges and
-     * bypasses cap masking. Can be disabled via use_hv_opt flag. */
+     * draw an oversized line and let the scissor clip to exact pixels. */
     bool is_hv_flat = use_hv_opt && (dx == 0 || dy == 0) && (dsc->raw_end || (!dsc->round_start && !dsc->round_end));
     if(is_hv_flat) {
         int32_t wm = dsc->width - 1;
@@ -134,7 +115,7 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
         if(!lv_area_intersect(&line_scissor, &line_screen, &t->clip_area)) return;
         lv_draw_eve5_set_scissor(u, &line_scissor, &layer->buf_area);
 
-        line_w += 16; /* +2px full width */
+        line_w += 16;
         off = 0;
     }
 
@@ -144,21 +125,15 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
          * EVE LINES always draws round caps. To create flat ends or dash gaps:
          * 1) Draw line (with round caps) into alpha channel
          * 2) Erase unwanted regions with perpendicular masking lines
-         * 3) Draw color through the resulting alpha mask
-         *
-         * For H/V scissored lines, the scissor already clips caps flat,
-         * so only dash gap masks are needed. */
+         * 3) Draw color through the resulting alpha mask */
         EVE_HalContext *phost = u->hal;
 #if LV_DRAW_EVE5_NO_FLOAT
-        /* Integer direction: keep (dx, dy, len) and compute vertex positions
-         * as endpoint + dx * offset / len. Uses int64_t intermediates. */
         int32_t len = lv_sqrt32((uint32_t)((int64_t)dx * dx + (int64_t)dy * dy));
         if(len == 0) len = 1;
-        /* Perpendicular offset in 1/16 px: (-dy/len)*width*16, (dx/len)*width*16 */
         int32_t perp_off_x_16 = (int32_t)(-(int64_t)dy * dsc->width * 16 / len);
         int32_t perp_off_y_16 = (int32_t)((int64_t)dx * dsc->width * 16 / len);
 #else
-        float off_px = -0.5f; /* Masking lines are consistently 0.5px bottom-right */
+        float off_px = -0.5f;
         float fx1 = x1 + off_px;
         float fy1 = y1 + off_px;
         float fx2 = x2 + off_px;
@@ -169,19 +144,16 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
         float dir_y = dy * inv_len;
         float perp_x = -dir_y;
         float perp_y = dir_x;
-        float perp_ext = (float)dsc->width; /* Perpendicular extent for masking lines */
+        float perp_ext = (float)dsc->width;
 #endif
 
-        /* Bounding box for alpha clear and color draw (covers the line itself). */
         int32_t margin = dsc->width;
         int32_t bx1 = LV_MIN(x1, x2) - margin;
         int32_t by1 = LV_MIN(y1, y2) - margin;
         int32_t bx2 = LV_MAX(x1, x2) + margin;
         int32_t by2 = LV_MAX(y1, y2) + margin;
 
-        /* Tracking margin: cap/dash masking lines erase alpha beyond the
-         * clear bbox via blend(ZERO, ONE_MINUS_SRC_ALPHA). They don't need
-         * the area pre-cleared, but the trashed extent must be tracked. */
+        /* Track extended alpha trashing from masking lines beyond the clear bbox */
         int32_t track_margin = margin;
         if(!is_hv_flat && (need_flat_start || need_flat_end)) {
             uint32_t chw16 = LV_MAX(dsc->width * 4 + 24, 16);
@@ -195,8 +167,7 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
 
         EVE_CoDl_saveContext(phost);
 
-        /* Phase 1a: Clear bbox alpha to 0.
-         * +1px oversize so phase 2's RECTS AA feather lands on fully cleared pixels. */
+        /* Phase 1a: Clear bbox alpha to 0 (+1px for RECTS AA feather) */
         EVE_CoDl_colorArgb_ex(phost, 0x00000000);
         EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
         EVE_CoDl_blendFunc(phost, ONE, ZERO);
@@ -214,24 +185,19 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
         EVE_CoDl_vertex2f_1(phost, x2 * 2 + off, y2 * 2 + off);
         EVE_CoDl_end(phost);
 
-        /* Phase 1c: Erase unwanted regions.
-         * Perpendicular masking lines with blend(ZERO, ONE_MINUS_SRC_ALPHA)
-         * multiply existing alpha toward 0. */
+        /* Phase 1c: Erase unwanted regions with blend(ZERO, ONE_MINUS_SRC_ALPHA) */
         EVE_CoDl_colorA(phost, 255);
         EVE_CoDl_blendFunc(phost, ZERO, ONE_MINUS_SRC_ALPHA);
 
-        /* Flat end cap masks (skipped for H/V scissored lines) */
+        /* Flat end cap masks */
         if(!is_hv_flat && (need_flat_start || need_flat_end)) {
-            /* Half-width = W/4 + 1.5px to cover round cap AA fringe.
-             * Center offset = half-width (keeps inner edge at endpoint). */
+            /* Half-width = W/4 + 1.5px to cover round cap AA fringe */
             uint32_t cap_hw_16 = LV_MAX(dsc->width * 4 + 24, 16);
 
             EVE_CoDl_lineWidth(phost, cap_hw_16);
             EVE_CoDl_begin(phost, LINES);
 
 #if LV_DRAW_EVE5_NO_FLOAT
-            /* Cap center: endpoint ± (dx,dy)/len * cap_hw_16, in 1/16 px.
-             * -8 is the -0.5px offset in 1/16 units. */
             if(need_flat_start) {
                 int32_t cx_16 = x1 * 16 - 8 - (int32_t)((int64_t)dx * (int32_t)cap_hw_16 / len);
                 int32_t cy_16 = y1 * 16 - 8 - (int32_t)((int64_t)dy * (int32_t)cap_hw_16 / len);
@@ -274,25 +240,17 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
 
         /* Dash gap masks */
         if(has_dashes) {
-            /* SW dash pattern has an off-by-one: dash is dash_width+1 pixels,
-             * gap is dash_gap pixels, actual period = dash_width+1+dash_gap.
-             * SW aligns to absolute coordinates via modulo (dash_gap+dash_width). */
-            uint32_t gap_hw_16 = dsc->dash_gap * 8; /* Half-width in 1/16 px */
+            /* SW dash pattern: dash is dash_width+1 pixels, gap is dash_gap pixels,
+             * period = dash_width+1+dash_gap. Aligns to absolute coordinates. */
+            uint32_t gap_hw_16 = dsc->dash_gap * 8;
             int32_t period_sw = dsc->dash_gap + dsc->dash_width;
 
 #if LV_DRAW_EVE5_NO_FLOAT
-            /* Phase from absolute coordinate alignment (integer).
-             * abs_proj = min_coord_x * |dx|/len + min_coord_y * |dy|/len.
-             * Integer division truncates toward zero; since all terms are
-             * non-negative, this equals floor. */
             int32_t abs_proj = (int32_t)(((int64_t)LV_MIN(dsc->p1.x, dsc->p2.x) * LV_ABS(dx)
                               + (int64_t)LV_MIN(dsc->p1.y, dsc->p2.y) * LV_ABS(dy)) / len);
             int32_t phase = abs_proj % period_sw;
             if(phase < 0) phase += period_sw;
 
-            /* Work in x2 (half-pixel) units to handle 0.5px offsets.
-             * gap_center_pat = dash_width + 0.5 + dash_gap/2
-             *   → gap_center_pat_x2 = 2*dash_width + 1 + dash_gap */
             int32_t period_x2 = 2 * (dsc->dash_width + dsc->dash_gap);
             int32_t gap_center_x2 = 2 * dsc->dash_width + 1 + dsc->dash_gap - 2 * phase;
             while(gap_center_x2 < -(int32_t)dsc->dash_gap) gap_center_x2 += period_x2;
@@ -300,8 +258,6 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
             EVE_CoDl_lineWidth(phost, gap_hw_16);
             EVE_CoDl_begin(phost, LINES);
 
-            /* Walk gap centers along the line. Vertex positions in 1/16 px:
-             * cx_16 = x1*16 + dx * gap_center_x2 * 8 / len */
             while(gap_center_x2 < 2 * len + (int32_t)dsc->dash_gap) {
                 int32_t cx_16 = x1 * 16 + (int32_t)((int64_t)dx * gap_center_x2 * 8 / len);
                 int32_t cy_16 = y1 * 16 + (int32_t)((int64_t)dy * gap_center_x2 * 8 / len);
@@ -312,23 +268,16 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
 #else
             float period = (float)(dsc->dash_width + dsc->dash_gap);
 
-            /* Phase from absolute coordinate alignment.
-             * min coords + |dir| is endpoint-swap invariant, matches SW for
-             * H/V, and varies continuously during rotation (no phase jumps). */
             float abs_proj = (float)LV_MIN(dsc->p1.x, dsc->p2.x) * fabsf(dir_x)
                            + (float)LV_MIN(dsc->p1.y, dsc->p2.y) * fabsf(dir_y);
             int32_t phase = ((int32_t)floorf(abs_proj)) % period_sw;
             if(phase < 0) phase += period_sw;
 
-            /* Gap center in pattern: dash_width + 0.5 + dash_gap/2 */
             float gap_center_pat = (float)(dsc->dash_width) + 0.5f + (float)(dsc->dash_gap) * 0.5f;
 
             EVE_CoDl_lineWidth(phost, gap_hw_16);
             EVE_CoDl_begin(phost, LINES);
 
-            /* First gap center relative to p1, then walk with period.
-             * Use unshifted x1/y1 — gap positions are absolute pattern positions,
-             * not relative to the -0.5px shifted line endpoints. */
             float gap_center = gap_center_pat - (float)phase;
             while(gap_center < -(float)(dsc->dash_gap) * 0.5f) gap_center += period;
             float gap_hw_px = (float)(dsc->dash_gap) * 0.5f;
@@ -365,8 +314,6 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
         EVE_CoDl_restoreContext(phost);
 
         if(!alpha_to_rgb) {
-            /* Line masking trashes alpha in the clear bbox (+1px for RECTS AA feather)
-             * plus the cap/dash masking lines' extended reach. */
             int32_t tx1 = LV_MIN(x1, x2) - track_margin - 1;
             int32_t ty1 = LV_MIN(y1, y2) - track_margin - 1;
             int32_t tx2 = LV_MAX(x1, x2) + track_margin + 1;
@@ -375,7 +322,7 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
         }
     }
     else {
-        /* Both ends rounded (or raw_end), no dashes — simple direct draw */
+        /* Both ends rounded (or raw_end), no dashes: simple direct draw */
         if(alpha_to_rgb)
             EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
         else
@@ -388,16 +335,22 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
         EVE_CoDl_end(u->hal);
     }
 
-    /* Restore original scissor after H/V optimization */
     if(is_hv_flat) {
         lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
     }
 }
 
 /**********************
- * ALPHA PASS — LINE
+ * ALPHA PASS: LINE
  **********************/
 
+/**
+ * Direct-to-alpha pass for lines.
+ *
+ * For diagonal flat caps and dashes, uses stencil-based approximation which
+ * produces binary edges at cap/dash boundaries instead of smooth AA. For
+ * accurate alpha in these cases, use the L8 render-target path instead.
+ */
 void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool use_hv_opt)
 {
     lv_layer_t *layer = t->target_layer;
@@ -418,7 +371,6 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     int32_t dx = x2 - x1;
     int32_t dy = y2 - y1;
 
-    /* H/V scissor optimization (same as normal draw, controlled by use_hv_opt) */
     bool is_hv_flat = use_hv_opt && (dx == 0 || dy == 0) && (dsc->raw_end || (!dsc->round_start && !dsc->round_end));
     lv_area_t hv_scissor;
 
@@ -449,9 +401,7 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
 
 #if EVE5_ALPHA_STENCIL_APPROX
     /* Stencil-based masking for diagonal flat caps and/or dashes.
-     * Build the line body shape in stencil (draw line, erase caps/gaps),
-     * then draw the round-cap line through the stencil at opa.
-     * H/V flat caps are already handled by scissor optimization above. */
+     * Produces binary edges at stencil boundaries (not smooth AA). */
     {
         bool need_flat_start = !dsc->round_start && !dsc->raw_end && !is_hv_flat;
         bool need_flat_end = !dsc->round_end && !dsc->raw_end && !is_hv_flat;
@@ -460,7 +410,6 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
         if(need_flat_start || need_flat_end || has_dashes) {
             EVE_HalContext *phost = u->hal;
 
-            /* Direction vectors for masking geometry (same as normal draw) */
 #if LV_DRAW_EVE5_NO_FLOAT
             int32_t len = lv_sqrt32((uint32_t)((int64_t)dx * dx + (int64_t)dy * dy));
             if(len == 0) len = 1;
@@ -489,17 +438,13 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                     &t->clip_area, &layer->buf_area);
             }
 
-            /* clear_stencil restores scissor to t->clip_area; re-apply the
-             * tight H/V scissor so the stencil build and final draw clip
-             * the round caps correctly. */
             if(is_hv_flat) {
                 lv_draw_eve5_set_scissor(u, &hv_scissor, &layer->buf_area);
             }
 
             EVE_CoDl_saveContext(phost);
 
-            /* Draw round-cap line into stencil (INCR).
-             * colorMask(0,0,0,0) prevents stencil build from polluting alpha. */
+            /* Draw round-cap line into stencil */
             EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
             EVE_CoDl_stencilOp(phost, KEEP, INCR);
             EVE_CoDl_lineWidth(phost, line_w);
@@ -508,15 +453,11 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
             EVE_CoDl_vertex2f_1(phost, x2 * 2 + off, y2 * 2 + off);
             EVE_CoDl_end(phost);
 
-            /* Phase 3: Erase flat caps and/or dash gaps from stencil (ZERO).
-             * Uses the same perpendicular masking line geometry as the normal draw. */
+            /* Erase flat caps and/or dash gaps from stencil */
             EVE_CoDl_stencilOp(phost, KEEP, ZERO);
 
             if(need_flat_start || need_flat_end) {
-                /* Vertex positions use the same center offset as the RGB path.
-                 * lineWidth is 0.5px smaller because the stencil ZERO's AA fringe
-                 * extends ~0.5px beyond geometric, so shrinking aligns the
-                 * effective stencil boundary with the RGB path's smooth edge. */
+                /* 0.5px smaller line width to align stencil boundary with RGB path */
                 uint32_t cap_hw_16 = LV_MAX(dsc->width * 4 + 24, 16);
                 uint32_t cap_lw_16 = cap_hw_16 > 8 ? cap_hw_16 - 8 : cap_hw_16;
 
@@ -565,8 +506,6 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
             }
 
             if(has_dashes) {
-                /* 0.5px smaller than the RGB path because the stencil ZERO
-                 * extends ~0.5px beyond geometric due to AA fringe. */
                 uint32_t gap_hw_16 = dsc->dash_gap > 1 ? dsc->dash_gap * 8 - 8 : dsc->dash_gap * 8;
                 int32_t period_sw = dsc->dash_gap + dsc->dash_width;
 
@@ -622,7 +561,7 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 EVE_CoDl_end(phost);
             }
 
-            /* Phase 4: Draw round-cap line through stencil at opa (alpha-only) */
+            /* Draw round-cap line through stencil at opa */
             EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
             EVE_CoDl_stencilFunc(phost, NOTEQUAL, 0, 255);
             EVE_CoDl_stencilOp(phost, KEEP, KEEP);
@@ -643,7 +582,7 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     }
 #endif
 
-    /* Draw the line with round caps at opa */
+    /* Simple round-cap line */
     EVE_CoDl_colorA(u->hal, dsc->opa);
     EVE_CoDl_lineWidth(u->hal, line_w);
     EVE_CoDl_begin(u->hal, LINES);
@@ -651,7 +590,6 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     EVE_CoDl_vertex2f_1(u->hal, x2 * 2 + off, y2 * 2 + off);
     EVE_CoDl_end(u->hal);
 
-    /* Restore scissor if H/V optimization was used */
     if(is_hv_flat) {
         lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
     }

@@ -8,9 +8,8 @@
  * in the draw_buf header. Mirrors the upload conversions in
  * lv_draw_eve5_image_upload.c.
  *
- * Primary use case: `vram_download_cb` called by `lv_draw_buf_ensure_resident`
- * when migrating a buffer from VRAM to CPU (e.g., cross-unit transfer or
- * snapshot readback).
+ * Primary use case: vram_download_cb called by lv_draw_buf_ensure_resident
+ * when migrating a buffer from VRAM to CPU.
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
@@ -34,24 +33,18 @@ static void convert_rgb565_to_swapped(const uint8_t *src, uint8_t *dst, uint32_t
  * FORMAT CONVERSIONS
  **********************/
 
-/**
- * Convert RGB8 (3 bytes/pixel, BGR in memory) to XRGB8888 (4 bytes/pixel, BGRX).
- * Inserts alpha=0xFF as the X byte.
- */
+/** Convert RGB8 (BGR, 3 bpp) to XRGB8888 (BGRX, 4 bpp). Inserts alpha=0xFF. */
 static void convert_rgb8_to_xrgb8888(const uint8_t *src, uint8_t *dst, uint32_t w)
 {
     for(uint32_t x = 0; x < w; x++) {
         dst[4 * x + 0] = src[3 * x + 0];  /* B */
         dst[4 * x + 1] = src[3 * x + 1];  /* G */
         dst[4 * x + 2] = src[3 * x + 2];  /* R */
-        dst[4 * x + 3] = 0xFF;            /* X (ignored alpha) */
+        dst[4 * x + 3] = 0xFF;            /* X */
     }
 }
 
-/**
- * Convert ARGB8 (4 bytes/pixel, BGRA in memory) to RGB565 + separate A8 plane.
- * Truncates 8-bit channels to 5/6/5 bits.
- */
+/** Convert ARGB8 (BGRA, 4 bpp) to RGB565 + separate A8 plane. */
 static void convert_argb8_to_rgb565a8(const uint8_t *src, uint8_t *rgb_dst, uint8_t *alpha_dst, uint32_t w)
 {
     for(uint32_t x = 0; x < w; x++) {
@@ -68,10 +61,7 @@ static void convert_argb8_to_rgb565a8(const uint8_t *src, uint8_t *rgb_dst, uint
     }
 }
 
-/**
- * Convert native RGB565 to byte-swapped RGB565.
- * Swaps high and low bytes of each 16-bit pixel.
- */
+/** Byte-swap RGB565 pixels. */
 static void convert_rgb565_to_swapped(const uint8_t *src, uint8_t *dst, uint32_t w)
 {
     const uint16_t *s = (const uint16_t *)src;
@@ -94,15 +84,10 @@ static void convert_rgb565_to_swapped(const uint8_t *src, uint8_t *dst, uint32_t
  * conversions that were applied during upload (in reverse).
  *
  * LVGL pre-allocates `buf->data` with sufficient size before calling this.
- *
- * @param u     EVE5 draw unit
- * @param buf   Draw buffer with pre-allocated `data` and valid `header`
- * @param vr    VRAM residency descriptor with GPU handle and format info
- * @return      true on success, false on failure
  */
 bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
                                   lv_draw_buf_t *buf,
-                                  const lv_draw_eve5_vram_res_t *vr)
+                                  const lv_eve5_vram_res_t *vr)
 {
     if(buf->data == NULL) return false;
 
@@ -118,8 +103,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
     uint32_t lv_stride = buf->header.stride;
     if(lv_stride == 0) lv_stride = lv_draw_buf_width_to_stride(w, lv_cf);
 
-    /* Determine if format conversion is needed.
-     * Use the same mapping as lv_draw_eve5_get_eve_format_info (upload path). */
+    /* Check if format conversion is needed */
     bool needs_conversion = false;
     switch(lv_cf) {
         case LV_COLOR_FORMAT_RGB565_SWAPPED:
@@ -132,8 +116,6 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
             needs_conversion = true;
             break;
         default:
-            /* Also need conversion if EVE format doesn't match LVGL format
-             * (e.g., render target mapped ARGB1555 → ARGB8, XRGB → RGB8) */
             {
                 uint16_t expected_eve_fmt;
                 uint8_t expected_bpp;
@@ -147,16 +129,13 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
     }
 
     if(!needs_conversion) {
-        /* Direct copy — EVE format matches LVGL format, just handle stride difference */
         uint32_t lv_bpp = lv_color_format_get_bpp(lv_cf);
         uint32_t row_bytes = (w * lv_bpp + 7) / 8;
 
         if(eve_stride == lv_stride) {
-            /* Stride matches — single bulk read */
             EVE_Hal_rdMem(u->hal, buf->data, gpu_addr, lv_stride * h);
         }
         else {
-            /* Stride differs — read row by row */
             for(int32_t y = 0; y < h; y++) {
                 EVE_Hal_rdMem(u->hal, buf->data + y * lv_stride,
                               gpu_addr + y * eve_stride, row_bytes);
@@ -165,7 +144,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
         return true;
     }
 
-    /* Conversion path — read from GPU into temporary buffer, convert per row */
+    /* Conversion path: read into temp buffer, convert per row */
     uint8_t *row_buf = lv_malloc(eve_stride);
     if(row_buf == NULL) {
         LV_LOG_ERROR("EVE5: Failed to allocate download conversion buffer");
@@ -174,7 +153,6 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
 
     switch(lv_cf) {
         case LV_COLOR_FORMAT_RGB565_SWAPPED:
-            /* EVE stores native RGB565 → byte-swap to LVGL's swapped format */
             for(int32_t y = 0; y < h; y++) {
                 EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w * 2);
                 convert_rgb565_to_swapped(row_buf, buf->data + y * lv_stride, w);
@@ -190,12 +168,12 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
             break;
 
         case LV_COLOR_FORMAT_RGB565A8:
-            /* EVE stores ARGB8 (4 bpp) → split into RGB565 plane + A8 plane.
-             * LVGL layout: [RGB565 rows][A8 rows] with alpha plane after all RGB rows. */
+            /* EVE stores ARGB8 → split into RGB565 plane + A8 plane.
+             * LVGL layout: [RGB565 rows][A8 rows] */
         {
-            uint32_t rgb_stride = (w * 16 + 7) / 8;  /* RGB565 stride */
-            if(lv_stride > 0) rgb_stride = lv_stride; /* Use configured stride if set */
-            uint32_t alpha_stride = rgb_stride / 2;   /* A8 stride (1 byte per pixel vs 2 for RGB565) */
+            uint32_t rgb_stride = (w * 16 + 7) / 8;
+            if(lv_stride > 0) rgb_stride = lv_stride;
+            uint32_t alpha_stride = rgb_stride / 2;
             uint8_t *alpha_plane = buf->data + rgb_stride * h;
 
             for(int32_t y = 0; y < h; y++) {
@@ -212,15 +190,19 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
         case LV_COLOR_FORMAT_I4:
         {
             /* EVE stores PALETTEDARGB8 (8-bit indices + 256-entry palette).
-             * LVGL layout: [palette N×ARGB8888][packed sub-byte index data]
-             * Pack 8-bit indices back to sub-byte and copy palette. */
+             * LVGL layout: [palette N×ARGB8888][packed sub-byte index data] */
+            if(eve_fmt != PALETTEDARGB8) {
+                LV_LOG_WARN("EVE5: Cannot download %d format to indexed I%d (no quantization)",
+                            eve_fmt, lv_color_format_get_bpp(lv_cf));
+                lv_free(row_buf);
+                return false;
+            }
             uint32_t src_palette_entries = LV_COLOR_INDEXED_PALETTE_SIZE(lv_cf);
             uint32_t src_palette_bytes = src_palette_entries * sizeof(lv_color32_t);
             uint32_t bpp = lv_color_format_get_bpp(lv_cf);
             uint32_t pixels_per_byte = 8 / bpp;
 
-            /* Download palette (first 256 entries from GPU, copy only needed entries).
-             * Palette is at vr->palette_offset from allocation base. */
+            /* Download palette */
             if(vr->palette_offset != GA_INVALID) {
                 uint32_t pal_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) + vr->palette_offset;
                 EVE_Hal_rdMem(u->hal, buf->data, pal_addr, src_palette_bytes);
@@ -236,7 +218,6 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
             for(int32_t y = 0; y < h; y++) {
                 EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w);
 
-                /* Pack to sub-byte indices */
                 uint8_t *dst_row = index_dst + y * lv_stride;
                 lv_memzero(dst_row, dst_row_bytes);
                 for(int32_t x = 0; x < w; x++) {
@@ -253,9 +234,14 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
         {
             /* EVE stores PALETTEDARGB8 (8-bit indices + 256-entry palette).
              * LVGL layout: [palette 256×ARGB8888][8-bit index data] */
+            if(eve_fmt != PALETTEDARGB8) {
+                LV_LOG_WARN("EVE5: Cannot download %d format to indexed I8 (no quantization)",
+                            eve_fmt);
+                lv_free(row_buf);
+                return false;
+            }
             uint32_t palette_bytes = 256 * sizeof(lv_color32_t);
 
-            /* Download palette */
             if(vr->palette_offset != GA_INVALID) {
                 uint32_t pal_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) + vr->palette_offset;
                 EVE_Hal_rdMem(u->hal, buf->data, pal_addr, palette_bytes);
@@ -264,7 +250,6 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
                 lv_memzero(buf->data, palette_bytes);
             }
 
-            /* Download index data */
             uint8_t *index_dst = buf->data + palette_bytes;
             for(int32_t y = 0; y < h; y++) {
                 EVE_Hal_rdMem(u->hal, index_dst + y * lv_stride,
@@ -275,14 +260,10 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
 
         default:
         {
-            /* Generic mismatch: EVE format differs from LVGL format.
-             * Two-step conversion: expand EVE pixels to ARGB8, then pack to LVGL format.
-             * This handles all combinations (render target promotion, format mismatch
-             * from uploaded bitmaps, etc.) without per-pair converters. */
+            /* Generic mismatch: expand EVE pixels to ARGB8, then pack to LVGL format */
             int32_t eve_bpp = eve5_format_bpp(eve_fmt);
             uint32_t eve_row_bytes = (uint32_t)(w * eve_bpp);
 
-            /* Temporary ARGB8 row buffer for intermediate conversion */
             uint8_t *argb_row = lv_malloc(w * 4);
             if(argb_row == NULL) {
                 LV_LOG_ERROR("EVE5: Failed to allocate ARGB8 conversion buffer");
@@ -293,7 +274,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
             for(int32_t y = 0; y < h; y++) {
                 EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, eve_row_bytes);
 
-                /* Step 1: Expand EVE format to ARGB8 (B,G,R,A in memory) */
+                /* Expand EVE format to ARGB8 (B,G,R,A in memory) */
                 for(int32_t x = 0; x < w; x++) {
                     uint8_t r = 0, g = 0, b = 0, a = 255;
                     switch(eve_fmt) {
@@ -357,7 +338,6 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
                             break;
                         }
                         default:
-                            /* Unknown EVE format — zero pixel */
                             break;
                     }
                     argb_row[4 * x + 0] = b;
@@ -366,7 +346,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
                     argb_row[4 * x + 3] = a;
                 }
 
-                /* Step 2: Pack ARGB8 to target LVGL format */
+                /* Pack ARGB8 to target LVGL format */
                 uint8_t *dst_row = buf->data + y * lv_stride;
                 switch(lv_cf) {
                     case LV_COLOR_FORMAT_ARGB8888:
@@ -420,11 +400,11 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t *u,
                     case LV_COLOR_FORMAT_L8:
                     case LV_COLOR_FORMAT_A8:
                         for(int32_t x = 0; x < w; x++) {
-                            dst_row[x] = argb_row[4 * x + 3];  /* A channel for A8, luminance approx for L8 */
+                            dst_row[x] = argb_row[4 * x + 3];
                         }
                         break;
                     default:
-                        LV_LOG_WARN("EVE5: Download unsupported target format %d, raw copy", lv_cf);
+                        LV_LOG_WARN("EVE5: Download unsupported target format %d", lv_cf);
                         lv_memcpy(dst_row, argb_row, LV_MIN(lv_stride, (uint32_t)(w * 4)));
                         break;
                 }
