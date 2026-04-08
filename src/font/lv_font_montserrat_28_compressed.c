@@ -3225,9 +3225,11 @@ static const lv_font_fmt_txt_kern_classes_t kern_classes = {
  *  ALL CUSTOM DATA
  *--------------------*/
 
-#if LVGL_VERSION_MAJOR >= 8
+#ifdef LV_FONT_DSC_CONST
 /*Store all the custom data of the font*/
 
+static LV_FONT_DSC_CONST lv_font_fmt_txt_dsc_t font_dsc = {
+#elif LVGL_VERSION_MAJOR >= 8
 static const lv_font_fmt_txt_dsc_t font_dsc = {
 #else
 static lv_font_fmt_txt_dsc_t font_dsc = {
