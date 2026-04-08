@@ -308,7 +308,7 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
     }
 }
 
-bool lv_wayland_exit_ready()
+bool lv_wayland_exit_ready(void)
 {
     if(lv_ll_is_empty(&lv_wl_ctx.window_ll)) {
         return true;

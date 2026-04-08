@@ -94,7 +94,7 @@ void lv_wayland_window_set_minimized(lv_display_t * disp);
 /**
  * True if all wayland windows are closed, false if any still open
  */
-bool lv_wayland_exit_ready();
+bool lv_wayland_exit_ready(void);
 
 /**********************
  *      MACROS
