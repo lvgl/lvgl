@@ -485,4 +485,28 @@ void test_buttonmatrix_properties(void)
 #endif
 }
 
+void test_button_matrix_partial_clip_render(void)
+{
+    /*Create a small container that clips its content*/
+    lv_obj_t * cont = lv_obj_create(active_screen);
+    lv_obj_set_size(cont, 300, 120);
+    lv_obj_center(cont);
+    lv_obj_set_style_pad_all(cont, 0, 0);
+
+    /*Create a buttonmatrix taller than the container*/
+    static const char * map[] = {"A", "B", "C", "\n",
+                                 "D", "E", "F", "\n",
+                                 "G", "H", "I", "\n",
+                                 "J", "K", "L", ""
+                                };
+    lv_obj_t * btnm_clip = lv_buttonmatrix_create(cont);
+    lv_buttonmatrix_set_map(btnm_clip, map);
+    lv_obj_set_size(btnm_clip, 280, 300);
+
+    /*Scroll so the middle rows are visible — top and bottom rows clipped*/
+    lv_obj_scroll_to_y(cont, 80, LV_ANIM_OFF);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/btnm_partial_clip.png");
+}
+
 #endif
