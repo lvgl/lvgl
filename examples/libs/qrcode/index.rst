@@ -1,3 +1,6 @@
+.. example_heading: QR-Code Generator
+
+
 Create a QR Code
 ----------------
 

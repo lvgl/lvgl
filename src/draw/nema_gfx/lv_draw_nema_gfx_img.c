@@ -220,12 +220,15 @@ static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf)
  **********************/
 void lv_draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
+    const lv_image_decoder_args_t args = {
+        .use_indexed = true,
+    };
 
     if(!dsc->tile) {
-        lv_draw_image_normal_helper(t, dsc, coords, _draw_nema_gfx_img);
+        lv_draw_image_normal_helper(t, dsc, coords, _draw_nema_gfx_img, &args);
     }
     else {
-        lv_draw_image_tiled_helper(t, dsc, coords, _draw_nema_gfx_img);
+        lv_draw_image_tiled_helper(t, dsc, coords, _draw_nema_gfx_img, &args);
     }
 
 }

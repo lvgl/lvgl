@@ -1,10 +1,32 @@
 name: Build docs
 on:
   pull_request:
+    paths:
+      # '**/lv*.h' is not included for pull requests because files in this path
+      # cannot break the doc build, and the purpose of having the docs build for
+      # pull requests is to catch when something breaks the build.  No input files
+      # in that path have the capacity to break the doc build.
+      - 'docs/**'
+      - 'examples/**'
+      - 'demos/**'
+      - 'configs/ci/docs/**'
+      - 'scripts/build_html_examples.sh'
+      - 'scripts/find_version.sh'
   push:
     branches:
-    - master
-    - 'release/*'
+      - master
+      - 'release/*'
+    paths:
+      - 'docs/**'
+      - 'src/**/lv*.h'
+      - 'examples/**'
+      - 'demos/**'
+      - 'configs/ci/docs/**'
+      - 'scripts/build_html_examples.sh'
+      - 'scripts/find_version.sh'
+      - 'lv_conf_template.h'
+      - 'lv_version.h'
+      - 'lvgl.h'
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each PR
@@ -21,7 +43,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -30,7 +52,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Cache Python packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           # Cache the Python package environment, excluding pip and setuptools installed by setup-python
           path: |
@@ -42,16 +64,18 @@ jobs:
             !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
           key: ${{ env.pythonLocation }}-${{ hashFiles('docs/requirements.txt') }}
-      - name: Install Doxygen and Latex dependencies
+      - name: Install Doxygen
         run: |
           sudo apt-get update
-          sudo apt-get install doxygen texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
-      - name: Install requirements
+          sudo apt-get install -y --no-install-recommends doxygen
+          # Remember these for possible future use.
+          # texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
+      - name: Install Requirements
         run: |
           pip install -r docs/requirements.txt
       - name: Setup Emscripten cache
         id: cache-system-libraries
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{env.EM_CACHE_FOLDER}}
           key: ${{env.EM_VERSION}}-${{ runner.os }}
@@ -75,11 +99,11 @@ jobs:
         run: rm -rf docs/build/html/.doctrees
       - name: Retrieve version
         run: |
-          echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
+          echo "VERSION_NAME=$(scripts/find_version.sh)" >> "$GITHUB_OUTPUT"
         id: version
       - name: Deploy to subfolder
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@v4.7.3
+        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
+        uses: JamesIves/github-pages-deploy-action@v4.8.0
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
@@ -91,7 +115,7 @@ jobs:
           single-commit: true
       - name: Deploy to master
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@v4.7.3
+        uses: JamesIves/github-pages-deploy-action@v4.8.0
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs

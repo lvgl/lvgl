@@ -1,3 +1,5 @@
+.. example_heading:  Animations
+
 
 Start animation on an event
 ---------------------------

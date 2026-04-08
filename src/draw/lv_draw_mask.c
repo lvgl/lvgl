@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_mask_private.h"
+#include "lv_draw_mask.h"
 #include "lv_draw_private.h"
 #include "../core/lv_refr.h"
 #include "../misc/lv_math.h"
@@ -40,6 +40,7 @@
 void LV_ATTRIBUTE_FAST_MEM lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_mask_rect_dsc_t));
+    dsc->base.dsc_size = sizeof(lv_draw_mask_rect_dsc_t);
 }
 
 lv_draw_mask_rect_dsc_t * lv_draw_task_get_mask_rect_dsc(lv_draw_task_t * task)

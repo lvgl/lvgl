@@ -44,11 +44,13 @@ struct _snippet_stack {
     uint32_t        index;
 };
 
+#if LV_USE_OBSERVER
 typedef struct {
     lv_subject_t * subject;
     void * element; /**< span of a span group*/
     const char * fmt;
 } bind_element_string_t;
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -86,6 +88,36 @@ static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_s
  *  STATIC VARIABLES
  **********************/
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_span_properties[] = {
+    {
+        .id = LV_PROPERTY_SPAN_ALIGN,
+        .setter = lv_spangroup_set_align,
+        .getter = lv_spangroup_get_align,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_OVERFLOW,
+        .setter = lv_spangroup_set_overflow,
+        .getter = lv_spangroup_get_overflow,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_INDENT,
+        .setter = lv_spangroup_set_indent,
+        .getter = lv_spangroup_get_indent,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_MODE,
+        .setter = lv_spangroup_set_mode,
+        .getter = lv_spangroup_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_MAX_LINES,
+        .setter = lv_spangroup_set_max_lines,
+        .getter = lv_spangroup_get_max_lines,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_spangroup_class  = {
     .base_class = &lv_obj_class,
     .constructor_cb = lv_spangroup_constructor,
@@ -95,6 +127,7 @@ const lv_obj_class_t lv_spangroup_class  = {
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
     .name = "lv_span",
+    LV_PROPERTY_CLASS_FIELDS(span, SPAN)
 };
 
 /**********************
@@ -184,7 +217,7 @@ void lv_span_set_text(lv_span_t * span, const char * text)
     size_t text_alloc_len = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    text_alloc_len = lv_text_ap_calc_bytes_count(text);
+    text_alloc_len = lv_text_ap_strlen(text) + 1;
 #else
     text_alloc_len = lv_strlen(text) + 1;
 #endif
@@ -254,7 +287,7 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
     span->static_flag = 1;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    size_t text_alloc_len = lv_text_ap_calc_bytes_count(text);
+    size_t text_alloc_len = lv_text_ap_strlen(text) + 1;
     span->txt = lv_malloc(text_alloc_len);
     LV_ASSERT_MALLOC(span->txt)
     lv_text_ap_proc(text, span->txt);
@@ -1197,15 +1230,20 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
         {
             lv_snippet_t * last_snippet = lv_get_snippet(item_cnt - 1);
             int32_t next_line_h = last_snippet->line_h;
-            if(last_snippet->txt[last_snippet->bytes] == '\0') {
+            bool has_more_content = last_snippet->txt[last_snippet->bytes] != '\0';
+            if(!has_more_content) {
                 next_line_h = 0;
                 lv_span_t * next_span = lv_ll_get_next(&spans->child_ll, last_snippet->span);
+                while(next_span && (!next_span->txt || next_span->txt[0] == '\0')) {
+                    next_span = lv_ll_get_next(&spans->child_ll, next_span);
+                }
                 if(next_span && next_span->txt && next_span->txt[0]) { /* have the next line */
                     next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
+                    has_more_content = true;
                 }
             }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
-                ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
+                ellipsis_valid = has_more_content && spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
                 is_end_line = true;
             }
         }

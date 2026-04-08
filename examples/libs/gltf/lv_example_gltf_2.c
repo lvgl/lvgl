@@ -14,6 +14,7 @@ static uint32_t current_speed = LV_GLTF_ANIM_SPEED_HALF;
 static void timer_cb(lv_timer_t * timer)
 {
     lv_obj_t * gltf = (lv_obj_t *) lv_timer_get_user_data(timer);
+    lv_gltf_model_t * model = lv_gltf_get_primary_model(gltf);
     current_camera = (current_camera + 1) % (camera_count + 1);
     current_speed *= 2;
 
@@ -23,7 +24,7 @@ static void timer_cb(lv_timer_t * timer)
 
     LV_LOG_USER("Setting camera %zu and animation speed %" PRIu32, current_camera, current_speed);
     lv_gltf_set_camera(gltf, current_camera);
-    lv_gltf_set_animation_speed(gltf, current_speed);
+    lv_gltf_model_set_animation_speed(model, current_speed);
 }
 
 /**
@@ -36,7 +37,7 @@ void lv_example_gltf_2(void)
                                                            "A:lvgl/examples/libs/gltf/webp_diffuse_transmission_plant.glb");
 
 
-    lv_gltf_set_animation_speed(gltf, current_speed);
+    lv_gltf_model_set_animation_speed(model, current_speed);
     lv_gltf_model_play_animation(model, 0);
     lv_obj_set_size(gltf, LV_PCT(100), LV_PCT(100));
     camera_count = lv_gltf_get_camera_count(gltf);

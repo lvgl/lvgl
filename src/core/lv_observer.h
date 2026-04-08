@@ -14,7 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "../misc/lv_ext_data.h"
 #include "lv_obj.h"
+
 #if LV_USE_OBSERVER
 
 /*********************
@@ -54,7 +56,10 @@ typedef union {
 /**
  * The Subject (an observable value)
  */
-typedef struct {
+struct _lv_subject_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     lv_ll_t subs_ll;                     /**< Subscribers */
     lv_subject_value_t value;            /**< Current value */
     lv_subject_value_t prev_value;       /**< Previous value */
@@ -65,7 +70,7 @@ typedef struct {
     uint32_t size                 : 24;  /**< String buffer size or group length */
     uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notification,
                                           * start notifying from the beginning. */
-} lv_subject_t;
+};
 
 /**
   * Callback called to notify Observer that Subject's value has changed
@@ -77,6 +82,27 @@ typedef void (*lv_observer_cb_t)(lv_observer_t * observer, lv_subject_t * subjec
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+#if LV_USE_EXT_DATA
+/**
+ * @brief Attaches external user data to an integer Subject with lifecycle management
+ *
+ * Associates arbitrary user-defined data with an LVGL observer and registers a destructor
+ * callback that will be automatically invoked when the observer is deleted. This enables:
+ * - Safe resource cleanup through the destructor mechanism
+ * - Contextual data storage for observer callbacks
+ * - Proper memory management for observer-related resources
+ *
+ * @param subject    pointer to Subject
+ * @param data       User-defined data pointer to associate
+ * @param free_cb    Cleanup function called when:
+ *                   - Observer is explicitly deleted
+ *                   - Observed object is deleted
+ *                   - New data replaces current association
+ *                   NULL indicates no cleanup required
+ */
+void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data));
+#endif
 
 /**
  * Initialize an integer-type Subject.
@@ -448,18 +474,6 @@ void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, 
  */
 void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
                                          const char * value);
-
-/**
- * Disable a style if a subject's value is not equal to a reference value
- * @param obj           pointer to Widget
- * @param style         pointer to a style
- * @param selector      pointer to a selector
- * @param subject       pointer to Subject
- * @param ref_value     reference value to compare Subject's value with
- * @return              pointer to newly-created Observer
- */
-lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector,
-                                  lv_subject_t * subject, int32_t ref_value);
 
 /**
  * Set Widget's flag(s) if an integer Subject's value is equal to a reference value, clear flag otherwise.

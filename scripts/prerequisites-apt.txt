@@ -5,12 +5,13 @@ g++-multilib
 ninja-build
 libpng-dev
 libjpeg-turbo8-dev
+libwebp-dev
 libfreetype-dev
-libglew-dev
 libglfw3-dev
 libsdl2-dev
 libpng-dev:i386
 libjpeg-dev:i386
+libwebp-dev:i386
 libfreetype-dev:i386
 libsdl2-dev:i386
 ruby-full
@@ -36,3 +37,5 @@ libavformat-dev:i386
 libavcodec-dev:i386
 libswscale-dev:i386
 libavutil-dev:i386
+libuv1-dev
+libuv1-dev:i386

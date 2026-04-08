@@ -352,7 +352,7 @@ static inline bool lv_color_is_in_range(lv_color_t color, lv_color_t l_color, lv
  */
 static inline lv_color_t lv_color16_to_color(lv_color16_t c)
 {
-    return lv_color_make(c.red << 3, c.green << 2, c.blue << 3);
+    return lv_color_make((uint8_t)(c.red << 3), (uint8_t)(c.green << 2), (uint8_t)(c.blue << 3));
 }
 
 /**

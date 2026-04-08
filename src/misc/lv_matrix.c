@@ -243,6 +243,41 @@ bool lv_matrix_is_identity_or_translation(const lv_matrix_t * matrix)
             matrix->m[2][2] == 1.0f);
 }
 
+void lv_matrix_transpose(const lv_matrix_t * src, lv_matrix_t * dst)
+{
+    if(src == NULL || dst == NULL) return;
+
+    if(src == dst) {
+        /* In-place transposition: 3 swaps, minimal stack usage */
+        float tmp;
+
+        tmp = dst->m[0][1];
+        dst->m[0][1] = dst->m[1][0];
+        dst->m[1][0] = tmp;
+
+        tmp = dst->m[0][2];
+        dst->m[0][2] = dst->m[2][0];
+        dst->m[2][0] = tmp;
+
+        tmp = dst->m[1][2];
+        dst->m[1][2] = dst->m[2][1];
+        dst->m[2][1] = tmp;
+    }
+    else {
+        dst->m[0][0] = src->m[0][0];
+        dst->m[0][1] = src->m[1][0];
+        dst->m[0][2] = src->m[2][0];
+
+        dst->m[1][0] = src->m[0][1];
+        dst->m[1][1] = src->m[1][1];
+        dst->m[1][2] = src->m[2][1];
+
+        dst->m[2][0] = src->m[0][2];
+        dst->m[2][1] = src->m[1][2];
+        dst->m[2][2] = src->m[2][2];
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

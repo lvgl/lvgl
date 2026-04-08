@@ -7,9 +7,6 @@
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_area_private.h"
-#include "../lv_image_decoder_private.h"
-#include "../lv_draw_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -19,7 +16,8 @@
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_utils.h"
-#include <math.h>
+#include "../../misc/lv_area_private.h"
+#include "../lv_image_decoder_private.h"
 
 /*********************
  *      DEFINES
@@ -190,7 +188,7 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
                 VG_LITE_PATTERN_COLOR,
                 0,
                 img_color,
-                VG_LITE_FILTER_BI_LINEAR);
+                lv_vg_lite_matrix_get_filter(&matrix));
 
             lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
         }

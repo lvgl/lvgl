@@ -42,7 +42,7 @@ struct _lv_cache_entry_t;
 typedef struct _lv_cache_ops_t lv_cache_ops_t;
 typedef struct _lv_cache_class_t lv_cache_class_t;
 
-typedef int8_t lv_cache_compare_res_t;
+typedef int32_t lv_cache_compare_res_t;
 typedef bool (*lv_cache_create_cb_t)(void * node, void * user_data);
 typedef void (*lv_cache_free_cb_t)(void * node, void * user_data);
 typedef lv_cache_compare_res_t (*lv_cache_compare_cb_t)(const void * a, const void * b);

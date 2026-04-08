@@ -1,3 +1,5 @@
+.. example_heading: Image Button
+
 
 Simple Image button
 -------------------

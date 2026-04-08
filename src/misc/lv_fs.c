@@ -551,6 +551,20 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
     *new_drv = drv_p;
 }
 
+void lv_fs_remove_drive(char letter)
+{
+    lv_fs_drv_t ** drv;
+    LV_LL_READ(fsdrv_ll_p, drv) {
+        if((*drv)->letter == letter) {
+            lv_ll_remove(fsdrv_ll_p, drv); /* remove the drive from the list of registered drives */
+            if((*drv)->remove_cb) {
+                (*drv)->remove_cb(*drv); /* call the remove callback if available */
+            }
+            lv_free(drv); /* free the list node*/
+        }
+    }
+}
+
 lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t ** drv;

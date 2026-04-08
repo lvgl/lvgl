@@ -1,3 +1,6 @@
+.. example_heading: rlottie
+
+
 Load a Lottie animation from raw data
 -------------------------------------
 

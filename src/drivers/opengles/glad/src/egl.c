@@ -2,10 +2,8 @@
  * SPDX-License-Identifier: (WTFPL OR CC0-1.0) AND Apache-2.0
  */
 
- #include "../../lv_opengles_egl.h"
-
+#include "../../lv_opengles_private.h"
 #if LV_USE_EGL
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +41,6 @@ int GLAD_EGL_KHR_fence_sync = 0;
 int GLAD_EGL_KHR_image = 0;
 int GLAD_EGL_KHR_image_base = 0;
 int GLAD_EGL_KHR_platform_gbm = 0;
-int GLAD_EGL_KHR_platform_wayland = 0;
 int GLAD_EGL_KHR_reusable_sync = 0;
 
 
@@ -262,7 +259,6 @@ static int glad_egl_find_extensions_egl(EGLDisplay display) {
     GLAD_EGL_KHR_image = glad_egl_has_extension(extensions, "EGL_KHR_image");
     GLAD_EGL_KHR_image_base = glad_egl_has_extension(extensions, "EGL_KHR_image_base");
     GLAD_EGL_KHR_platform_gbm = glad_egl_has_extension(extensions, "EGL_KHR_platform_gbm");
-    GLAD_EGL_KHR_platform_wayland = glad_egl_has_extension(extensions, "EGL_KHR_platform_wayland");
     GLAD_EGL_KHR_reusable_sync = glad_egl_has_extension(extensions, "EGL_KHR_reusable_sync");
 
     return 1;
@@ -343,7 +339,7 @@ int gladLoadEGL(EGLDisplay display, GLADloadfunc load) {
     return gladLoadEGLUserPtr(display, glad_egl_get_proc_from_userptr, GLAD_GNUC_EXTENSION (void*) load);
 }
 
- 
+
 
 
 #ifdef __cplusplus

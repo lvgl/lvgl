@@ -1,3 +1,6 @@
+.. example_heading: BMP
+
+
 Open a BMP image from file
 --------------------------
 

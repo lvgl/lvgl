@@ -25,22 +25,23 @@
 #include "libs/ffmpeg/lv_ffmpeg.h"
 #include "libs/freetype/lv_freetype.h"
 #include "libs/fsdrv/lv_fsdrv.h"
-#include "libs/gif/lv_gif.h"
 #include "libs/tjpgd/lv_tjpgd.h"
 #include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
+#include "libs/libwebp/lv_libwebp.h"
 #include "libs/tiny_ttf/lv_tiny_ttf.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs_private.h"
+#include "widgets/gif/lv_gif.h"
 #include "widgets/span/lv_span.h"
 #include "themes/simple/lv_theme_simple.h"
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
 #include "debugging/sysmon/lv_sysmon_private.h"
 #include "others/translation/lv_translation.h"
-#include "xml/lv_xml.h"
+#include "drivers/wayland/lv_wayland_private.h"
 
 #if LV_USE_SVG
     #include "libs/svg/lv_svg_decoder.h"
@@ -55,7 +56,7 @@
     #endif
 #endif
 #if LV_USE_G2D
-    #if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
+    #if LV_USE_DRAW_G2D
         #include "draw/nxp/g2d/lv_draw_g2d.h"
     #endif
 #endif
@@ -247,7 +248,7 @@ void lv_init(void)
 #endif
 
 #if LV_USE_G2D
-#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
+#if LV_USE_DRAW_G2D
     lv_draw_g2d_init();
 #endif
 #endif
@@ -398,6 +399,10 @@ void lv_init(void)
     lv_libjpeg_turbo_init();
 #endif
 
+#if LV_USE_LIBWEBP
+    lv_libwebp_init();
+#endif
+
 #if LV_USE_BMP
     lv_bmp_init();
 #endif
@@ -408,10 +413,6 @@ void lv_init(void)
 
 #if LV_USE_TRANSLATION
     lv_translation_init();
-#endif
-
-#if LV_USE_XML
-    lv_xml_init();
 #endif
 
     lv_initialized = true;
@@ -479,8 +480,11 @@ void lv_deinit(void)
 #endif
 #endif
 
+#if LV_USE_WAYLAND
+    lv_wayland_deinit();
+#endif
 #if LV_USE_G2D
-#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
+#if LV_USE_DRAW_G2D
     lv_draw_g2d_deinit();
 #endif
 #endif
@@ -517,10 +521,6 @@ void lv_deinit(void)
 
 #if LV_USE_OBJ_ID && LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
-#endif
-
-#if LV_USE_XML
-    lv_xml_deinit();
 #endif
 
 #if LV_USE_TRANSLATION

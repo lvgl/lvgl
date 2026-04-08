@@ -30,7 +30,7 @@ typedef enum {
     LV_RB_COLOR_BLACK
 } lv_rb_color_t;
 
-typedef int8_t lv_rb_compare_res_t;
+typedef int32_t lv_rb_compare_res_t;
 
 typedef lv_rb_compare_res_t (*lv_rb_compare_t)(const void * a, const void * b);
 

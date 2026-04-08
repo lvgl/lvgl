@@ -228,7 +228,7 @@ static void _display_flush_cb(lv_display_t * display, const lv_area_t * area, ui
         goto error;
     }
 
-    if((uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
+    if((uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->VerticalResolution) {
         LV_LOG_ERROR("[lv_uefi] Invalid lv_display_flush_cb call (invalid height).");
         goto error;
     }

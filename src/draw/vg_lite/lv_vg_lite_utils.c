@@ -7,18 +7,19 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_image_decoder_private.h"
 #include "lv_vg_lite_utils.h"
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_grad.h"
-#include "lv_draw_vg_lite_type.h"
 #include "../../misc/lv_area_private.h"
-#include <string.h>
+#include "../../display/lv_display.h"
+#include "../../draw/lv_draw_image.h"
+#include "../lv_image_decoder_private.h"
 #include <math.h>
 
 /*********************
@@ -362,7 +363,12 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
     LV_LOG_USER("type: %d", (int)path->path_type);
     LV_LOG_USER("add_end: %d", (int)path->add_end);
 
-    lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
+    if(len <= LV_VG_LITE_PATH_DUMP_MAX_LEN) {
+        lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
+    }
+    else {
+        LV_LOG_WARN("path length over %d, skip print", LV_VG_LITE_PATH_DUMP_MAX_LEN);
+    }
 
     if(path->stroke) {
         LV_LOG_USER("stroke_path: %p", (void *)path->stroke_path);
@@ -578,9 +584,6 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_RGB565:
             return VG_LITE_BGR565;
-
-        case LV_COLOR_FORMAT_RGB565_SWAPPED:
-            return VG_LITE_RGB565;
 
         case LV_COLOR_FORMAT_ARGB8565:
             return VG_LITE_BGRA5658;
@@ -1395,6 +1398,7 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
     lv_vg_lite_pending_swap(u->image_dsc_pending);
 
     lv_vg_lite_pending_swap(u->bitmap_font_pending);
+    lv_vg_lite_pending_swap(u->letter_pending);
 
     u->flush_count = 0;
     LV_PROFILER_DRAW_END;
@@ -1417,6 +1421,7 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 
     /* Clear bitmap font dsc reference */
     lv_vg_lite_pending_remove_all(u->bitmap_font_pending);
+    lv_vg_lite_pending_remove_all(u->letter_pending);
 
     /* Reset scissor area */
     lv_memzero(&u->current_scissor_area, sizeof(u->current_scissor_area));

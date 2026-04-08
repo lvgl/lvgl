@@ -1,0 +1,23 @@
+{% extends "furo/components/view-this-page.html" %}
+{% from "basic-ng/components/view-this-page.html" import determine_page_view_link with context %}
+
+{#- Only this block is redefined (overridden) from furo/components/view-this-page.html.
+   All else remains intact. -#}
+{% block link_available -%}
+{#- Ensure `page_source_suffix` exists, else `determine_page_view_link()` fails
+    during generation of the `genindex` page at the end. -#}
+{%- if page_source_suffix -%}
+  {%- set page_link = determine_page_view_link() -%}
+  {%- if "docs/src/API/" in page_link -%}
+    {#- Adjust page_link from fictional API pages to point to real .h files. -#}
+    {%- set page_link = page_link.replace("docs/src/API/", "src/") -%}
+    {%- set page_link = page_link.replace("_h.rst", ".h") -%}
+    {%- set page_link = page_link.replace("?plain=true", "") -%}
+    {#- Redirect "src/lv_conf.h" => "lv_conf_template.h" -#}
+    {%- if page_link.endswith("/src/lv_conf.h") -%}
+      {%- set page_link = page_link.replace("/src/lv_conf.h", "/lv_conf_template.h") -%}
+    {%- endif -%}
+  {%- endif -%}
+  {{ furo_view_button(page_link) }}
+{%- endif -%}
+{%- endblock %}

@@ -242,6 +242,10 @@ void lv_freetype_font_delete(lv_font_t * font)
 {
     LV_ASSERT_NULL(font);
     lv_freetype_context_t * ctx = lv_freetype_get_context();
+    if(!ctx) {
+        /* Freetype already torn down (e.g. static destruction order). Nothing to release. */
+        return;
+    }
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)(font->dsc);
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 

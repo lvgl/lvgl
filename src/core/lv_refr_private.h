@@ -43,8 +43,9 @@ void lv_refr_deinit(void);
  * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
  * @param disp pointer to display where the area should be invalidated (NULL can be used if there is
  * only one display)
+ * @return LV_RESULT_OK: the area is invalidated; LV_RESULT_INVALID: the area wasn't invalidated.
  */
-void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p);
+lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p);
 
 /**
  * Get the display which is being refreshed

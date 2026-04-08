@@ -11,9 +11,8 @@
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
 
-#include "lv_vg_lite_path.h"
 #include "lv_draw_vg_lite_type.h"
-#include "lv_vg_lite_math.h"
+#include "lv_vg_lite_path.h"
 #include "../lv_draw_vector_private.h"
 
 /*********************

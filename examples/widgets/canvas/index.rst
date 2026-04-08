@@ -57,14 +57,22 @@ Draw a triangle to the canvas
 .. lv_example:: widgets/canvas/lv_example_canvas_9
   :language: c
 
-Draw Fancy Letter Effects
--------------------------
+Blur an area on the canvas
+-----------------------------
 
 .. lv_example:: widgets/canvas/lv_example_canvas_10
   :language: c
 
 
-Draw Fancy Letter Effects 2
----------------------------
+Draw Fancy Letter Effects
+-------------------------
+
 .. lv_example:: widgets/canvas/lv_example_canvas_11
   :language: c
+
+
+Draw Fancy Letter Effects 2
+---------------------------
+.. lv_example:: widgets/canvas/lv_example_canvas_12
+  :language: c
+

@@ -374,6 +374,7 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
 
     uint32_t i = 0;                                        /*Iterating index into txt*/
     uint32_t max_width = attributes->max_width;
+    bool explicit_new_line = false;
 
     while(i < len && txt[i] != '\0' && max_width > 0) {
         lv_text_flag_t word_flag = attributes->text_flags;
@@ -392,10 +393,14 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
 
         i += advance;
 
-        if(txt[0] == '\n' || txt[0] == '\r') break;
+        if(txt[0] == '\n' || txt[0] == '\r') {
+            explicit_new_line = true;
+            break;
+        }
 
         if(txt[i] == '\n' || txt[i] == '\r') {
             i++;  /*Include the following newline in the current line*/
+            explicit_new_line = true;
             break;
         }
     }
@@ -410,6 +415,13 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
 
     if(used_width != NULL) {
         *used_width = line_w;
+    }
+
+    /*Skip leading spaces of the next line only for automatic word wrapping*/
+    if(!explicit_new_line) {
+        while(i < len && txt[i] == ' ') {
+            i++;
+        }
     }
 
     return i;
@@ -513,7 +525,7 @@ char * lv_text_set_text_vfmt(const char * fmt, va_list ap)
     lv_vsnprintf(raw_txt, len + 1, fmt, ap);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = lv_text_ap_calc_bytes_count(raw_txt);
+    size_t len_ap = lv_text_ap_strlen(raw_txt);
     text = lv_malloc(len_ap + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {

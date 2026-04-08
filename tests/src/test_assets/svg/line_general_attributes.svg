@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width='400' height='400'>
+    <defs>
+        <linearGradient id='ggg1' x1='0%' y1='0%' x2='100%' y2='0%'>
+            <stop offset='0' stop-color='red' />
+            <stop offset='0.5' stop-color='green' />
+            <stop offset='1' stop-color='blue' />
+        </linearGradient>
+    </defs>
+
+    <line x1='0' y1='10' x2='180' y2='10' fill='red'/>
+    <line x1='0' y1='20' x2='180' y2='20' fill='#ff0000'/>
+    <line x1='0' y1='30' x2='180' y2='30' fill='rgb(255,0,0)'/>
+    <line x1='0' y1='40' x2='180' y2='40' fill='rgba(255,0,0,0.5)'/>
+    <line x1='0' y1='50' x2='180' y2='50' fill='none'/>
+    <line x1='0' y1='60' x2='180' y2='60' fill='url(#ggg1)'/>
+
+    <line x1='0' y1='10' x2='280' y2='10' stroke='green'/>
+    <line x1='0' y1='20' x2='280' y2='25' stroke='url(#ggg1)'/>
+
+    <line x1='0' y1='20' x2='60' y2='25' stroke='green' transform='translate(0, 50)'/>
+    <line x1='0' y1='20' x2='60' y2='25' stroke='green' transform='rotate(270, 100, 100)'/>
+    <line x1='0' y1='20' x2='60' y2='25' stroke='green' transform='scale(5, 5)'/>
+    <line x1='0' y1='100' x2='60' y2='25' stroke='green' transform='scale(1, 1)' transform='skewX(10)'/>
+    <line x1='0' y1='20' x2='100' y2='25' stroke='green' transform='skewY(20)'/>
+    <line x1='0' y1='40' x2='120' y2='25' stroke='green' transform='matrix(1, 0, 0.3640, 1, 0, 0)'/>
+</svg>

@@ -212,6 +212,8 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
 
     if(entry == NULL) {
+        lv_draw_buf_destroy(decoded);
+        dsc->decoded = NULL;
         LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
         return LV_RESULT_INVALID;
     }
@@ -244,6 +246,7 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
     /*Decode the image in ARGB8888 */
     unsigned error = lodepng_decode32((unsigned char **)&decoded, &png_width, &png_height, png_data, png_data_size);
     if(error) {
+        LV_LOG_WARN("error %u: %s", error, lodepng_error_text(error));
         if(decoded != NULL)  lv_draw_buf_destroy(decoded);
         return NULL;
     }

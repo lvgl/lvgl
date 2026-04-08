@@ -12,8 +12,8 @@
 
 #if LV_USE_VECTOR_GRAPHIC
 
-#if !((LV_USE_DRAW_SW && LV_USE_THORVG) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_GFX && LV_USE_NEMA_VG))
-    #error "LV_USE_VECTOR_GRAPHIC requires (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE or (LV_USE_NEMA_GFX and LV_USE_NEMA_VG)"
+#if !((LV_USE_DRAW_SW && LV_USE_THORVG) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_GFX && LV_USE_NEMA_VG) || LV_USE_DRAW_NANOVG)
+    #error "LV_USE_VECTOR_GRAPHIC requires (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE or (LV_USE_NEMA_GFX and LV_USE_NEMA_VG) or LV_USE_DRAW_NANOVG"
 #endif
 
 #include "../misc/lv_ll.h"
@@ -389,8 +389,6 @@ void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area
 
 void lv_vector_path_append_rectangle(lv_vector_path_t * path, float x, float y, float w, float h, float rx, float ry)
 {
-    if(w <= 0.0f || h <= 0.0f) return;
-
     float hw = w * 0.5f;
     float hh = h * 0.5f;
 

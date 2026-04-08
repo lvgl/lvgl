@@ -185,6 +185,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
         header->cf = LV_COLOR_FORMAT_ARGB8888;
         header->w = width;
         header->h = height;
+        header->stride = width * 4;
         header->flags |= LV_IMAGE_FLAGS_CUSTOM_DRAW;
 
         decoder->custom_draw_cb = svg_draw;

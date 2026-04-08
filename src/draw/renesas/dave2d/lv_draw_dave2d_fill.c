@@ -34,6 +34,7 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
     lv_area_move(&draw_area, x, y);
     lv_area_move(&coordinates, x, y);
 
+    d2_u8 current_alpha = d2_getalpha(u->d2_handle);
     d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
 
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
@@ -268,7 +269,7 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
             LV_ASSERT(D2_OK == result);
 
             result = d2_renderbox(u->d2_handle,
-                                  (d2_width)D2_FIX4(coordinates.x2 - radius),
+                                  (d2_width)D2_FIX4(coordinates.x2 - radius + 1),
                                   (d2_width)D2_FIX4(coordinates.y1 + radius),
                                   (d2_width)D2_FIX4(radius),
                                   (d2_width)D2_FIX4(lv_area_get_height(&coordinates) - (2 * radius)));
@@ -279,6 +280,9 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
         d2_setalphamode(u->d2_handle, current_alpha_mode);
         d2_setfillmode(u->d2_handle, d2_fm_color); //default
+    }
+    else {
+        d2_setalpha(u->d2_handle, current_alpha);
     }
 
 #if LV_USE_OS

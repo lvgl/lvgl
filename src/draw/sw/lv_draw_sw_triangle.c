@@ -135,6 +135,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
     blend_dsc.mask_area = &blend_area;
     blend_dsc.mask_stride = 0;
     blend_dsc.blend_mode = LV_BLEND_MODE_NORMAL;
+    blend_dsc.src_stride = 0;
     blend_dsc.src_buf = NULL;
 
     lv_grad_dir_t grad_dir = dsc->grad.dir;

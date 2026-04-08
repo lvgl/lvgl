@@ -68,7 +68,6 @@ void lv_example_fragment_2(void)
 
 static void sample_fragment_ctor(lv_fragment_t * self, void * args)
 {
-    LV_UNUSED(args);
     ((sample_fragment_t *) self)->depth = *((int *) args);
     ((sample_fragment_t *) self)->counter = 0;
 }

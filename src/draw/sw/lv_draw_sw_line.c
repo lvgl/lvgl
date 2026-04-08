@@ -151,17 +151,19 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_hor(lv_draw_task_t * t, const lv_dra
 
             int32_t dash_cnt = dash_start;
             int32_t i;
-            for(i = 0; i < blend_area_w; i++, dash_cnt++) {
-                if(dash_cnt <= dsc->dash_width) {
+            for(i = 0; i < blend_area_w;) {
+                if(dash_cnt < dsc->dash_width) {
                     int16_t diff = dsc->dash_width - dash_cnt;
                     i += diff;
                     dash_cnt += diff;
                 }
-                else if(dash_cnt > dsc->dash_gap + dsc->dash_width) {
-                    dash_cnt = 0;
-                }
                 else {
                     mask_buf[i] = 0x00;
+                    i++;
+                    dash_cnt++;
+                }
+                if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
+                    dash_cnt = 0;
                 }
 
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
@@ -336,16 +338,16 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_skew(lv_draw_task_t * t, const lv_dr
         masks[3] = &mask_bottom_param;
     }
 
-    /*The real draw area is around the line.
-     *It's easy to calculate with steep lines, but the area can be very wide with very flat lines.
-     *So deal with it only with steep lines.*/
-    int32_t draw_area_w = lv_area_get_width(&blend_area);
 
     /*Draw the background line by line*/
     int32_t h;
-    uint32_t hor_res = (uint32_t)lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing());
-    size_t mask_buf_size = LV_MIN(lv_area_get_size(&blend_area), hor_res);
+    size_t mask_buf_size = LV_MIN((int32_t)lv_area_get_size(&blend_area), lv_area_get_width(&blend_area));
     lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
+
+    /*The real draw area is around the line.
+     *It's easy to calculate with steep lines, but the area can be very wide with very flat lines.
+     *So deal with it only with steep lines.*/
+    size_t draw_area_w = LV_MIN((size_t)lv_area_get_width(&blend_area), mask_buf_size);
 
     int32_t y2 = blend_area.y2;
     blend_area.y2 = blend_area.y1;

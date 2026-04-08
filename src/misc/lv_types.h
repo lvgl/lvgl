@@ -188,8 +188,6 @@ typedef struct _lv_hit_test_info_t lv_hit_test_info_t;
 
 typedef struct _lv_cover_check_info_t lv_cover_check_info_t;
 
-typedef struct _lv_obj_spec_attr_t lv_obj_spec_attr_t;
-
 typedef struct _lv_image_t lv_image_t;
 
 typedef struct _lv_animimg_t lv_animimg_t;
@@ -281,6 +279,14 @@ typedef struct _lv_3dtexture_t lv_3dtexture_t;
 typedef struct _lv_gltf_t lv_gltf_t;
 
 typedef struct _lv_gltf_model_t lv_gltf_model_t;
+
+typedef struct _lv_gltf_model_node_t lv_gltf_model_node_t;
+
+typedef struct _lv_gltf_environment lv_gltf_environment_t;
+
+typedef struct _lv_gltf_ibl_sampler lv_gltf_ibl_sampler_t;
+
+typedef struct _lv_subject_t lv_subject_t;
 
 typedef struct _lv_observer_t lv_observer_t;
 
@@ -376,12 +382,6 @@ typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
 #endif /*LV_USE_SYSMON*/
 
 
-typedef struct _lv_xml_component_scope_t lv_xml_component_scope_t;
-
-typedef struct _lv_xml_parser_state_t lv_xml_parser_state_t;
-
-typedef struct _lv_xml_load_t lv_xml_load_t;
-
 #if LV_USE_EVDEV
 typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
 #endif
@@ -451,6 +451,10 @@ typedef struct _lv_draw_buf_vram_res_t lv_draw_buf_vram_res_t;
 #define LV_UNREACHABLE() while(1)
 #endif
 #endif /* LV_UNREACHABLE not defined */
+
+#ifndef LV_ARRAYLEN
+#define LV_ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
+#endif /*LV_ARRAYLEN*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

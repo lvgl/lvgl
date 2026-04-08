@@ -21,18 +21,35 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_FLOAT
+#include <float.h>
+#define LV_DRAW_LINE_POINT_NONE     FLT_MAX
+#else
+#define LV_DRAW_LINE_POINT_NONE     INT32_MAX
+#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
+
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    /**The first point of the line. If `LV_USE_FLOAT` is enabled float number can be also used*/
+    /**The first point of the line. If `LV_USE_FLOAT` is enabled float number can be also used.
+     *Ignored if `points` are set*/
     lv_point_precise_t p1;
 
-    /**The second point of the line. If `LV_USE_FLOAT` is enabled float number can be also used*/
+    /**The second point of the line. If `LV_USE_FLOAT` is enabled float number can be also used
+     * Ignored if `points` are set*/
     lv_point_precise_t p2;
+
+    /**Array of points to draw. If `LV_USE_FLOAT` is enabled, float numbers can also be used.*/
+    lv_point_precise_t * points;
+
+    /**
+     * Number of points in the `points`
+     */
+    int32_t point_cnt;
 
     /**The color of the line*/
     lv_color_t color;
@@ -83,6 +100,17 @@ lv_draw_line_dsc_t * lv_draw_task_get_line_dsc(lv_draw_task_t * task);
  * @param dsc       pointer to an initialized `lv_draw_line_dsc_t` variable
  */
 void lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
+
+/**
+ * A helper function to call a callback which draws a line between two points.
+ * This way it doesn't matter if ``p1, p2`` or ``points`` were used as it calls the
+ * ``callback`` as needed.
+ * @param t             draw task
+ * @param dsc           pointer to a draw descriptor
+ * @param draw_line_cb  a callback that draws a line between ``dsc->p1`` and ``dsc->p2``
+ */
+void lv_draw_line_iterate(lv_draw_task_t * t, lv_draw_line_dsc_t * dsc,
+                          void (*draw_line_cb)(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc));
 
 /**********************
  *      MACROS

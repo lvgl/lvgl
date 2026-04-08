@@ -50,8 +50,6 @@ done
 
 if [ $missing_packages_count -gt 0 ]; then
     echo "Missing $missing_packages_count packages detected. Please run 'scripts/install-prerequisites.sh' to install them."
-    echo "Current packages installed:"
-    apt list --installed
     exit 1
 else
     echo "All required packages are installed."
@@ -72,18 +70,40 @@ fi
 # Get versions of g++, gcc, and gcov
 gpp_version=$(g++ -dumpversion)
 gcc_version=$(gcc -dumpversion)
-gcov_version=$(gcov -dumpversion | grep -oP '\d+\.\d+.\d+' | head -n 1 | cut -d'.' -f1) # only major version
 
-# Check if g++, gcc, and gcov versions are the same
-if [ "$gpp_version" != "$gcc_version" ] || [ "$gcc_version" != "$gcov_version" ]; then
+# Prefer the gcov that matches the active gcc major version (e.g. gcov-13)
+gcc_major=$(echo "$gcc_version" | cut -d'.' -f1)
+gcov_cmd="gcov"
+if command -v "gcov-${gcc_major}" >/dev/null 2>&1; then
+    gcov_cmd="gcov-${gcc_major}"
+fi
+
+# Export for downstream scripts/tools (gcovr respects GCOV)
+export GCOV="$gcov_cmd"
+
+# Determine gcov major version (robust against different output formats)
+# - Some distros print just "13" for -dumpversion
+# - Others may print a banner like "gcov (Ubuntu 13.2.0-...) 13.2.0"
+gcov_version=$($gcov_cmd -dumpversion 2>&1 | head -n 1 | grep -oE '[0-9]+' | head -n 1)
+
+if [ -z "$gcov_version" ]; then
+    echo "gcov not found or not working (tried: $gcov_cmd)."
+    echo "Install a matching gcov (e.g. gcc-$gcc_major package) or ensure it is in PATH."
+    exit 1
+fi
+
+# Check if g++, gcc, and gcov versions are the same (major version match)
+gpp_major=$(echo "$gpp_version" | cut -d'.' -f1)
+if [ "$gpp_major" != "$gcc_major" ] || [ "$gcc_major" != "$gcov_version" ]; then
     echo "Versions mismatch detected:"
     echo "g++ version: $gpp_version"
     echo "gcc version: $gcc_version"
+    echo "gcov command: $gcov_cmd"
     echo "gcov version: $gcov_version"
-    echo "g++, gcc, and gcov must have the same version."
+    echo "g++, gcc, and gcov must have the same major version."
     exit 1
 else
-    echo "g++, gcc, and gcov versions match: $gpp_version"
+    echo "g++, gcc, and gcov versions match (major): $gcc_major (gcov: $gcov_cmd)"
 fi
 
 if [ "$skip_tests" = true ]; then
@@ -120,6 +140,13 @@ if [ $? -eq 0 ]; then
     mv ./tests/report ./tests/report-64bit
 else
     echo "64-bit tests failed!"
+    exit 1
+fi
+
+echo "Checking gcov coverage..."
+./scripts/check_gcov_coverage.py
+if [ $? -ne 0 ]; then
+    echo "Gcov coverage check failed!"
     exit 1
 fi
 

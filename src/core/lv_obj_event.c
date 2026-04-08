@@ -102,7 +102,9 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_obj_allocate_spec_attr(obj);
+    if(!lv_obj_allocate_spec_attr(obj)) {
+        return NULL;
+    }
 
     return lv_event_add(&obj->spec_attr->event_list, event_cb, filter, user_data);
 }
@@ -346,7 +348,18 @@ lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
         LV_LOG_WARN("Not interpreted with this event code");
         return NULL;
     }
+}
 
+lv_state_t lv_event_get_prev_state(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_STATE_CHANGED) {
+        lv_state_t * state = lv_event_get_param(e);
+        return state ? *state : 0;
+    }
+    else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
 }
 
 /**********************

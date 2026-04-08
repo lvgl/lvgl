@@ -446,7 +446,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_rgb565_swapped(lv_draw_sw_b
             break;
 #endif
         default:
-            LV_LOG_WARN("Not supported source color format");
+            LV_LOG_WARN("Not supported source color format 0x%02X", dsc->src_color_format);
             break;
     }
 }

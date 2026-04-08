@@ -36,6 +36,7 @@ LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 typedef enum {
     LV_CHART_TYPE_NONE,     /**< Don't draw the series*/
     LV_CHART_TYPE_LINE,     /**< Connect the points with lines*/
+    LV_CHART_TYPE_CURVE,    /**< Connect the points with curves*/
     LV_CHART_TYPE_BAR,      /**< Draw bars for each series*/
     LV_CHART_TYPE_STACKED,  /**< Draw a single stacked bar for each data point. Supports only positive values*/
     LV_CHART_TYPE_SCATTER,  /**< Draw points and lines in 2D (x,y coordinates)*/
@@ -61,6 +62,17 @@ typedef enum {
 } lv_chart_axis_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_chart_class;
+
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_chart_id_t {
+    LV_PROPERTY_ID(CHART, TYPE,               LV_PROPERTY_TYPE_INT,   0),
+    LV_PROPERTY_ID(CHART, POINT_COUNT,        LV_PROPERTY_TYPE_INT,   1),
+    LV_PROPERTY_ID(CHART, UPDATE_MODE,        LV_PROPERTY_TYPE_INT,   2),
+    LV_PROPERTY_ID(CHART, HOR_DIV_LINE_COUNT, LV_PROPERTY_TYPE_INT,   3),
+    LV_PROPERTY_ID(CHART, VER_DIV_LINE_COUNT, LV_PROPERTY_TYPE_INT,   4),
+    LV_PROPERTY_CHART_END,
+};
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -154,6 +166,27 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * obj);
  * @return          point number on each data line
  */
 uint32_t lv_chart_get_point_count(const lv_obj_t * obj);
+
+/**
+ * Get the update mode of a chart
+ * @param obj       pointer to a chart object
+ * @return          the update mode
+ */
+lv_chart_update_mode_t lv_chart_get_update_mode(const lv_obj_t * obj);
+
+/**
+ * Get the number of horizontal division lines
+ * @param obj       pointer to a chart object
+ * @return          the number of horizontal division lines
+ */
+uint32_t lv_chart_get_hor_div_line_count(const lv_obj_t * obj);
+
+/**
+ * Get the number of vertical division lines
+ * @param obj       pointer to a chart object
+ * @return          the number of vertical division lines
+ */
+uint32_t lv_chart_get_ver_div_line_count(const lv_obj_t * obj);
 
 /**
  * Get the current index of the x-axis start point in the data array

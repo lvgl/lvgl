@@ -1,11 +1,24 @@
 #!/usr/bin/env python3
+""" Generate these 5 files:
 
+- lvgl/src/core/lv_obj_style_gen.h
+- lvgl/src/core/lv_obj_style_gen.c
+- lvgl/src/misc/lv_style_gen.c
+- lvgl/src/misc/lv_style_gen.h
+- lvgl/docs/src/common-widget-features/styles/style-properties.rst
+
+This script effectively "factors out" what would be duplicate code and
+documentation in all 5 of the above files, into 1 place:  below.
+"""
 import os
-import re
 import sys
 
+# =========================================================================
+# Style Property Database
+# =========================================================================
+
 props = [
-{'section': 'Size and position', 'dsc':'Properties related to size, position, alignment and layout of Widgets.' },
+{'section': 'Size and Position', 'dsc':'Properties related to size, position, alignment and layout of Widgets.' },
 {'name': 'WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':'Widget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets width of Widget. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area."},
@@ -24,7 +37,7 @@ props = [
 
 {'name': 'MIN_HEIGHT',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets a minimal height. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
+ 'dsc': "Sets a minimal height. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area."},
 
 {'name': 'MAX_HEIGHT',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':'LV_COORD_MAX', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
@@ -64,15 +77,15 @@ props = [
 
 {'name': 'TRANSLATE_RADIAL',
 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Move object around the centre of the parent object (e.g. around the circumference of a scale)"},
+ 'dsc': "Move object around the centre of the parent object (e.g. around the circumference of a scale)."},
 
 {'name': 'TRANSFORM_SCALE_X',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom Widget horizontally. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom Widget horizontally. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on." },
 
 {'name': 'TRANSFORM_SCALE_Y',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom Widget vertically. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom Widget vertically. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on." },
 
 {'name': 'TRANSFORM_ROTATION',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
@@ -80,11 +93,11 @@ props = [
 
 {'name': 'TRANSFORM_PIVOT_X',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set pivot point's X coordinate for transformations. Relative to Widget's top left corner'"},
+ 'dsc': "Set pivot point's X coordinate for transformations. Relative to Widget's top left corner."},
 
 {'name': 'TRANSFORM_PIVOT_Y',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set pivot point's Y coordinate for transformations. Relative to Widget's top left corner'"},
+ 'dsc': "Set pivot point's Y coordinate for transformations. Relative to Widget's top left corner."},
 
 {'name': 'TRANSFORM_SKEW_X',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
@@ -121,7 +134,7 @@ props = [
 
 {'name': 'PAD_RADIAL',
 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Pad text labels away from the scale ticks/remainder of the ``LV_PART_``"},
+ 'dsc': "Pad text labels away from the scale ticks/remainder of the ``LV_PART_``."},
 
 {'section': 'Margin', 'dsc' : "Properties to describe spacing around a Widget. Very similar to the margin properties in HTML."},
 {'name': 'MARGIN_TOP',
@@ -151,7 +164,7 @@ props = [
 
 {'name': 'BG_GRAD_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set gradient color of the background. Used only if `grad_dir` is not `LV_GRAD_DIR_NONE`"},
+ 'dsc': "Set gradient color of the background. Used only if `grad_dir` is not `LV_GRAD_DIR_NONE`."},
 
 {'name': 'BG_GRAD_DIR',
  'style_type': 'num',   'var_type': 'lv_grad_dir_t',  'default':'`LV_GRAD_DIR_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -159,27 +172,27 @@ props = [
 
 {'name': 'BG_MAIN_STOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set point from which background color should start for gradients. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
+ 'dsc': "Set point from which background color should start for gradients. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on."},
 
 {'name': 'BG_GRAD_STOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set point from which background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
+ 'dsc': "Set point from which background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on."},
 
 {'name': 'BG_MAIN_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set opacity of the first gradient color"},
+ 'dsc': "Set opacity of the first gradient color."},
 
 {'name': 'BG_GRAD_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set opacity of the second gradient color"},
+ 'dsc': "Set opacity of the second gradient color."},
 
 {'name': 'BG_GRAD',
  'style_type': 'ptr',   'var_type': 'const lv_grad_dsc_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set gradient definition. The pointed instance must exist while Widget is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors as well. If it's set other gradient related properties will be ignored'"},
+ 'dsc': "Set gradient definition. The pointed instance must exist while Widget is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors as well. If it's set other gradient related properties will be ignored."},
 
 {'name': 'BG_IMAGE_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set a background image. Can be a pointer to `lv_image_dsc_t`, a path to a file or an `LV_SYMBOL_...`"},
+ 'dsc': "Set a background image. Can be a pointer to `lv_image_dsc_t`, a path to a file or an `LV_SYMBOL_...`."},
 
 {'name': 'BG_IMAGE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -200,7 +213,7 @@ props = [
 {'section': 'Border', 'dsc':'Properties to describe the borders' },
 {'name': 'BORDER_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set color of the border"},
+ 'dsc': "Set color of the border."},
 
 {'name': 'BORDER_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -211,12 +224,12 @@ props = [
  'dsc': "Set width of the border. Only pixel values can be used."},
 
 {'name': 'BORDER_SIDE',
- 'style_type': 'num',   'var_type': 'lv_border_side_t',  'default':'`LV_BORDER_SIDE_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'lv_border_side_t',  'default':'`LV_BORDER_SIDE_FULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set only which side(s) the border should be drawn. Possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`."},
 
 {'name': 'BORDER_POST',
 'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets whether the border should be drawn before or after the children are drawn. `true`: after children, `false`: before children"},
+ 'dsc': "Sets whether the border should be drawn before or after the children are drawn. `true`: after children, `false`: before children."},
 
 {'section': 'Outline', 'dsc':'Properties to describe the outline. It\'s like a border but drawn outside of the rectangles.' },
 {'name': 'OUTLINE_WIDTH',
@@ -250,11 +263,11 @@ props = [
 
 {'name': 'SHADOW_SPREAD',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Make shadow calculation to use a larger or smaller rectangle as base. The value can be in pixels to make the area larger/smaller"},
+ 'dsc': "Make shadow calculation to use a larger or smaller rectangle as base. The value can be in pixels to make the area larger/smaller."},
 
 {'name': 'SHADOW_COLOR',
   'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set color of shadow"},
+ 'dsc': "Set color of shadow."},
 
 {'name': 'SHADOW_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
@@ -284,15 +297,15 @@ props = [
 
 {'name': 'LINE_DASH_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set width of dashes in pixels. Note that dash works only on horizontal and vertical lines"},
+ 'dsc': "Set width of dashes in pixels. Note that dash works only on horizontal and vertical lines."},
 
 {'name': 'LINE_DASH_GAP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set gap between dashes in pixels. Note that dash works only on horizontal and vertical lines"},
+ 'dsc': "Set gap between dashes in pixels. Note that dash works only on horizontal and vertical lines."},
 
 {'name': 'LINE_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending"},
+ 'dsc': "Make end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending."},
 
 {'name': 'LINE_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -309,7 +322,7 @@ props = [
 
 {'name': 'ARC_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make end points of arcs rounded. `true`: rounded, `false`: perpendicular line ending"},
+ 'dsc': "Make end points of arcs rounded. `true`: rounded, `false`: perpendicular line ending."},
 
 {'name': 'ARC_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -321,7 +334,7 @@ props = [
 
 {'name': 'ARC_IMAGE_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set an image from which arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file"},
+ 'dsc': "Set an image from which arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file."},
 
 {'section': 'Text', 'dsc':'Properties to describe the properties of text. All these properties are inherited.' },
 {'name': 'TEXT_COLOR',
@@ -338,7 +351,7 @@ props = [
 
 {'name': 'TEXT_LETTER_SPACE',
 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set letter space in pixels"},
+ 'dsc': "Set letter space in pixels."},
 
 {'name': 'TEXT_LINE_SPACE',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
@@ -350,7 +363,7 @@ props = [
 
 {'name': 'TEXT_ALIGN',
 'style_type': 'num',   'var_type': 'lv_text_align_t' ,  'default':'`LV_TEXT_ALIGN_AUTO`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set how to align the lines of the text. Note that it doesn't align the Widget itself, only the lines inside the Widget. Possible values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly"},
+ 'dsc': "Set how to align the lines of the text. Note that it doesn't align the Widget itself, only the lines inside the Widget. Possible values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly."},
 
 {'name': 'TEXT_OUTLINE_STROKE_COLOR',
 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 1, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -364,14 +377,54 @@ props = [
  'style_type': 'num',  'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of the letter outline stroke. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
+{'section': 'Blur', 'dsc':'Blur the widget or its background' },
+{'name': 'BLUR_RADIUS',
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Sets the intensity of blurring. Applied on each lv_part separately before the children are rendered."},
+
+{'name': 'BLUR_BACKDROP',
+ 'style_type': 'num',   'var_type': 'bool',  'default':'`false`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "If `true` the background of the widget will be blurred. The part should have < 100% opacity to make it visible. If `false` the given part will be blurred when it's rendered but before drawing the children."},
+
+{'name': 'BLUR_QUALITY',
+ 'style_type': 'num',   'var_type': 'lv_blur_quality_t',  'default':'`LV_BLUR_QUALITY_AUTO`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically."},
+
+{'section': 'Drop Shadow', 'dsc':'Take an A8 snapshot of the given part and blur it.' },
+
+{'name': 'DROP_SHADOW_RADIUS',
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'dsc': "Sets the intensity of blurring. Applied on each lv_part separately before the children are rendered."},
+
+{'name': 'DROP_SHADOW_OFFSET_X',
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'dsc': "Set an offset on the shadow in pixels in X direction."},
+
+{'name': 'DROP_SHADOW_OFFSET_Y',
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'dsc': "Set an offset on the shadow in pixels in Y direction."},
+
+{'name': 'DROP_SHADOW_COLOR',
+ 'style_type': 'color',   'var_type': 'lv_color_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,  'filtered': 1,
+ 'dsc': "Set the color of the shadow."},
+
+{'name': 'DROP_SHADOW_OPA',
+ 'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the opacity of the shadow."},
+
+{'name': 'DROP_SHADOW_QUALITY',
+ 'style_type': 'num',   'var_type': 'lv_blur_quality_t',  'default':'`LV_BLUR_QUALITY_PRECISION`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically."},
+
 {'section': 'Miscellaneous', 'dsc':'Mixed properties for various purposes.' },
+
 {'name': 'RADIUS',
  'style_type': 'num', 'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set radius on every corner. The value is interpreted in pixels (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"},
+ 'dsc': "Set radius on every corner. The value is interpreted in pixels (>= 0) or `LV_RADIUS_CIRCLE` for max radius."},
 
 {'name': 'RADIAL_OFFSET',
 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Move start point of object (e.g. scale tick) radially"},
+ 'dsc': "Move start point of object (e.g. scale tick) radially."},
 
 {'name': 'CLIP_CORNER',
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -401,6 +454,7 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets the intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent. A value of  255, `LV_OPA_100` or `LV_OPA_COVER` means fully opaque. Intermediate values like LV_OPA_10, LV_OPA_20, etc result in semi-transparency."},
 
+
  {'name': 'ANIM',
  'style_type': 'ptr',   'var_type': 'const lv_anim_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Animation template for Widget's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the Text Area or scroll time of a roller. See Widgets' documentation to learn more."},
@@ -415,7 +469,7 @@ props = [
 
 {'name': 'BLEND_MODE',
  'style_type': 'num',   'var_type': 'lv_blend_mode_t' ,  'default':'`LV_BLEND_MODE_NORMAL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Describes how to blend the colors to the background. Possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY/DIFFERENCE`"},
+ 'dsc': "Describes how to blend the colors to the background. Possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY/DIFFERENCE`."},
 
 {'name': 'LAYOUT',
  'style_type': 'num',   'var_type': 'uint16_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
@@ -431,33 +485,33 @@ props = [
 
 {'name': 'ROTARY_SENSITIVITY',
  'style_type': 'num',   'var_type': 'uint32_t', 'default':'`256`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Adjust sensitivity for rotary encoders in 1/256 unit. It means, 128: slow down the rotary to half, 512: speeds up to double, 256: no change"},
+ 'dsc': "Adjust sensitivity for rotary encoders in 1/256 unit. It means, 128: slow down the rotary to half, 512: speeds up to double, 256: no change."},
 
 {'section': 'Flex', 'dsc':'Flex layout properties.',  'guard':'LV_USE_FLEX'},
 
 
 {'name': 'FLEX_FLOW',
  'style_type': 'num',   'var_type': 'lv_flex_flow_t', 'default':'`LV_FLEX_FLOW_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines in which direct the flex layout should arrange the children"},
+ 'dsc': "Defines in which direction the flex layout should arrange the children."},
 
 
 {'name': 'FLEX_MAIN_PLACE',
  'style_type': 'num',   'var_type': 'lv_flex_align_t', 'default':'`LV_FLEX_ALIGN_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how to align the children in the direction of flex flow"},
+ 'dsc': "Defines how to align the children in the direction of flex flow."},
 
 
 {'name': 'FLEX_CROSS_PLACE',
  'style_type': 'num',   'var_type': 'lv_flex_align_t', 'default':'`LV_FLEX_ALIGN_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how to align the children perpendicular to the direction of flex flow"},
+ 'dsc': "Defines how to align the children perpendicular to the direction of flex flow."},
 
 
 {'name': 'FLEX_TRACK_PLACE',
  'style_type': 'num',   'var_type': 'lv_flex_align_t', 'default':'`LV_FLEX_ALIGN_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how to align the tracks of the flow"},
+ 'dsc': "Defines how to align the tracks of the flow."},
 
 {'name': 'FLEX_GROW',
- 'style_type': 'num',   'var_type': 'uint8_t', 'default':'`LV_FLEX_ALIGN_ROW`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how much space to take proportionally from the free space of the Widget's track"},
+ 'style_type': 'num',   'var_type': 'uint8_t', 'default':'`0`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Defines how much space to take proportionally from the free space of the Widget's track."},
 
 
 
@@ -466,16 +520,16 @@ props = [
 
 {'name': 'GRID_COLUMN_DSC_ARRAY',
  'style_type': 'ptr',   'var_type': 'const int32_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "An array to describe the columns of the grid. Should be LV_GRID_TEMPLATE_LAST terminated"},
+ 'dsc': "An array to describe the columns of the grid. Should be LV_GRID_TEMPLATE_LAST terminated."},
 
 {'name': 'GRID_COLUMN_ALIGN',
  'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how to distribute the columns"},
+ 'dsc': "Defines how to distribute the columns."},
 
 
 {'name': 'GRID_ROW_DSC_ARRAY',
  'style_type': 'ptr',   'var_type': 'const int32_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "An array to describe the rows of the grid. Should be LV_GRID_TEMPLATE_LAST terminated"},
+ 'dsc': "An array to describe the rows of the grid. Should be LV_GRID_TEMPLATE_LAST terminated."},
 
 {'name': 'GRID_ROW_ALIGN',
  'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
@@ -507,162 +561,381 @@ props = [
 ]
 
 
-def style_get_cast(style_type, var_type):
-  cast = ""
-  if style_type != 'color':
-    cast = "(" + var_type + ")"
-  return cast
+# =========================================================================
+# Data
+# =========================================================================
 
+_cfg_this_script = os.path.split(__file__)[-1]
+_cfg_word_wrap_col = 84
+_total_func_count = 0
 
-def obj_style_get(p):
-  if 'section' in p: return
-
-  cast = style_get_cast(p['style_type'], p['var_type'])
-  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const lv_obj_t * obj, lv_part_t part)")
-  print("{")
-  print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
-  print("    return " + cast + "v." + p['style_type'] + ";")
-  print("}")
-  print("")
-
-  if 'filtered' in p and p['filtered']:
-    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const lv_obj_t * obj, lv_part_t part)")
-    print("{")
-    print("    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
-    print("    return " + cast + "v." + p['style_type'] + ";")
-    print("}")
-    print("")
-
-
-
-def style_set_cast(style_type):
-  cast = ""
-  if style_type == 'num':
-    cast = "(int32_t)"
-  return cast
-
-
-def style_set_c(p):
-  if 'section' in p: return
-
-  cast = style_set_cast(p['style_type'])
-  print("")
-  print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value)")
-  print("{")
-  print("    lv_style_value_t v = {")
-  print("        ." + p['style_type'] +" = " + cast + "value")
-  print("    };")
-  print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
-  print("}")
-
-
-def style_set_h(p):
-  if 'section' in p: return
-
-  print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
-
-
-def local_style_set_c(p):
-  if 'section' in p: return
-
-  cast = style_set_cast(p['style_type'])
-  print("")
-  print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
-  print("{")
-  print("    lv_style_value_t v = {")
-  print("        ." + p['style_type'] +" = " + cast + "value")
-  print("    };")
-  print("    lv_obj_set_local_style_prop(obj, LV_STYLE_" + p['name'] +", v, selector);")
-  print("}")
-
-
-def local_style_set_h(p):
-  if 'section' in p: return
-  print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector);")
-
-
-def style_const_set(p):
-  if 'section' in p: return
-
-  cast = style_set_cast(p['style_type'])
-  print("")
-  print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
-  print("    { \\")
-  print("        .prop = LV_STYLE_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
-  print("    }")
-
-
-def docs(p):
-  if "section" in p:
-    print("")
-    print(p['section'])
-    print("-" * len(p['section']))
-    print("")
-    print(p['dsc'])
-    return
-
-  if "default" not in p: return
-
-  d = str(p["default"])
-
-  i = "No"
-  if p["inherited"]: i = "Yes"
-
-  l = "No"
-  if p["layout"]: l = "Yes"
-
-  e = "No"
-  if p["ext_draw"]: e = "Yes"
-
-  li_style = "style='display:inline-block; margin-right: 20px; margin-left: 0px"
-
-  dsc = p['dsc']
-
-  print("")
-  print(p["name"].lower())
-  print("~" * len(p["name"].lower()))
-  print("")
-  print(dsc)
-
-
-  print("")
-  print(".. raw:: html")
-  print("")
-  print("  <ul>")
-  print("  <li " + li_style + "'><strong>Default</strong> " + d + "</li>")
-  print("  <li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
-  print("  <li " + li_style + "'><strong>Layout</strong> " + l + "</li>")
-  print("  <li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
-  print("  </ul>")
-
-def guard_proc(p):
-  global guard
-  if 'section' in p:
-    if guard:
-      guard_close()
-    if 'guard' in p:
-      guard = p['guard']
-      print(f"#if {guard}")
-
-def guard_close():
-  global guard
-  if guard:
-    print(f"#endif /*{guard}*/\n")
-  guard = ""
-
-base_dir = os.path.abspath(os.path.dirname(__file__))
-sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
-
-
-HEADING = f'''
+HEADING = f'''\
 /*
+ * @file
+ *
  **********************************************************************
  *                            DO NOT EDIT
- * This file is automatically generated by "{os.path.split(__file__)[-1]}"
+ * This file is automatically generated by "{_cfg_this_script}"
  **********************************************************************
  */
 
 '''
+
+RST_HEADING = f'''\
+.. **********************************************************************
+..                            DO NOT EDIT
+.. This file is automatically generated by "{_cfg_this_script}"
+.. **********************************************************************'''
+
+
+# =========================================================================
+# Utility Routines
+# =========================================================================
+
+def extra_info(p):
+    result = ('', '', '', '')
+
+    if "default" in p:
+        default = str(p["default"])
+
+        inherited = "No"
+        if p["inherited"]: inherited = "Yes"
+
+        layout = "No"
+        if p["layout"]: layout = "Yes"
+
+        ext_draw = "No"
+        if p["ext_draw"]: ext_draw = "Yes"
+
+        result = (default, inherited, layout, ext_draw)
+
+    return result
+
+
+def word_wrapped_description(desc, in_a_comment=False):
+    """
+    Return word-wrapped `dsc` in a format appropriate based on `in_a_comment`.
+
+    :param desc:          Description string (sometimes long)
+    :param in_a_comment:  (optional) Is description in a comment?
+    :return:
+    """
+    if in_a_comment:
+        extra = 6
+    else:
+        extra = 9
+
+    if '\n' in desc:
+        # Newlines are embedded in description.  We assume that the
+        # word wrapping was done by the writer.  Keep default.
+        if not in_a_comment:
+            result = desc
+        else:
+            lines = desc.split('\n')
+            for i, line in enumerate(lines):
+                lines[i] = ' * ' + line
+            result = '\n'.join(lines)
+
+    elif len(desc) <= _cfg_word_wrap_col + extra:
+        # No word-wrapping needed.  Keep default.
+        if not in_a_comment:
+            result = desc
+        else:
+            result = ' * ' + desc
+
+    else:
+        # Word wrapping is needed.
+        lines = []
+        working_desc = desc
+        one_third_width = _cfg_word_wrap_col // 3
+
+        while len(working_desc) > _cfg_word_wrap_col:
+            # Identify word-wrap column if a reasonable one is available.
+            i = working_desc.rfind(' ', 0, _cfg_word_wrap_col)
+            if i >= one_third_width:
+                lines.append(working_desc[0:i])  # Excludes space.
+                working_desc = working_desc[i + 1:]  # Skips space.
+            else:
+                # Reasonable word-wrap location not found before `one_third_width`.
+                # Keep what we have and exit loop.
+                lines.append(working_desc)
+                working_desc = ''
+                break
+
+        # Any more left?  Add it as last line.
+        if working_desc:
+            lines.append(working_desc)
+
+        if in_a_comment:
+            # Prepend comment prefix.
+            for i, line in enumerate(lines):
+                lines[i] = ' * ' + line
+
+        result = '\n'.join(lines)
+
+    return result
+
+
+def optionally_append_extra_info(p, dsc):
+    d, i, L, e = extra_info(p)
+    if d:
+        dsc += f'\n * Default: {d}, inherited: {i}, layout: {L}, ext. draw: {e}.'
+
+    return dsc
+
+
+def print_value_param(p, indent='', is_for_const=False):
+    # Compute correct wording for description of `value` argument.
+    style_type = p['style_type']
+    if is_for_const:
+        arg_name = 'val'
+    else:
+        arg_name = 'value'
+
+    if style_type == 'num':
+        # Keep default.  Nothing to do.
+        print(f' * @param  {arg_name}   {indent}Value to submit')
+    elif style_type == 'color':
+        print(f' * @param  {arg_name}   {indent}Color to submit')
+    elif style_type == 'ptr':
+        type_prefix = 'Pointer to'
+        spelled_out_type = 'value'
+        name = p['name']
+
+        if name == 'BG_GRAD':
+            spelled_out_type = 'gradient descriptor'
+        elif 'IMAGE_SRC' in name:
+            spelled_out_type = 'image source'
+        elif name == 'IMAGE_COLORKEY':
+            spelled_out_type = 'image color key'
+        elif name == 'TEXT_FONT':
+            spelled_out_type = 'font'
+        elif name == 'COLOR_FILTER_DSC':
+            spelled_out_type = 'color-filter descriptor'
+        elif name == 'ANIM':
+            spelled_out_type = 'animation descriptor'
+        elif name == 'TRANSITION':
+            spelled_out_type = 'transition descriptor'
+        elif name == 'BITMAP_MASK_SRC':
+            spelled_out_type = 'A8 bitmap mask'
+        elif name == 'GRID_COLUMN_DSC_ARRAY':
+            spelled_out_type = 'grid-column descriptor array'
+        elif name == 'GRID_ROW_DSC_ARRAY':
+            spelled_out_type = 'grid-row descriptor array'
+
+        print(f' * @param  {arg_name}   {indent}{type_prefix} {spelled_out_type}')
+
+
+def style_set_doxygen_comment(p):
+    dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
+    dsc = optionally_append_extra_info(p, dsc)
+    print('/**')
+    print(dsc)
+    print(f' * @param  style   Pointer to style')
+    print_value_param(p)
+    print(' */')
+
+
+def style_const_set_doxygen_comment(p):
+    print('/**')
+    dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
+    dsc = optionally_append_extra_info(p, dsc)
+    print(dsc)
+    print_value_param(p, is_for_const=True)
+    print(' */')
+
+
+def style_get_cast(style_type, var_type):
+    cast = ""
+    if style_type != 'color':
+        cast = "(" + var_type + ")"
+    return cast
+
+
+def style_set_cast(style_type):
+    cast = ""
+    if style_type == 'num':
+        cast = "(int32_t)"
+    return cast
+
+
+def style_set_c(p):
+    if 'section' in p: return
+
+    cast = style_set_cast(p['style_type'])
+    print()
+    print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + p['var_type'] + " value)")
+    print("{")
+    print("    lv_style_value_t v = {")
+    print("        ." + p['style_type'] + " = " + cast + "value")
+    print("    };")
+    print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] + ", v);")
+    print("}")
+
+
+def style_set_h(p):
+    if 'section' in p: return
+
+    style_set_doxygen_comment(p)
+    print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + p['var_type'] + " value);")
+    print()
+
+
+def style_const_set(p):
+    if 'section' in p: return
+
+    style_const_set_doxygen_comment(p)
+    cast = style_set_cast(p['style_type'])
+    print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
+    print("    { \\")
+    print("        .prop = LV_STYLE_" + p['name'] + ", .value = { ." + p['style_type'] + " = " + cast + "val } \\")
+    print("    }")
+    print()
+
+
+def local_style_set_doxygen_comment(p):
+    dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
+    dsc = optionally_append_extra_info(p, dsc)
+    print('/**')
+    print(dsc)
+    print(' * @param  obj        Pointer to Widget')
+    print_value_param(p, indent='   ')
+    print(' * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:')
+    print(' *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`')
+    print(' *                        - `LV_STATE_PRESSED`')
+    print(' *                        - `LV_PART_KNOB`')
+    print(' *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`')
+    print(' */')
+
+
+def local_style_get_doxygen_comment(p):
+    dsc = p['dsc']
+
+    if dsc.startswith('Set '):
+        dsc = dsc.replace('Set ', 'Get ', 1)
+    elif dsc.startswith('Sets '):
+        dsc = dsc.replace('Sets ', 'Gets ', 1)
+
+    dsc = word_wrapped_description(dsc, in_a_comment=True)
+    dsc = optionally_append_extra_info(p, dsc)
+
+    print('/**')
+    print(dsc)
+    print(f' * @param  obj    Pointer to Widget')
+    print(f' * @param  part   One of the `LV_PART_...` enum values')
+    print(' */')
+
+
+def local_style_get_h(p):
+    if 'section' in p: return
+
+    local_style_get_doxygen_comment(p)
+    cast = style_get_cast(p['style_type'], p['var_type'])
+    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p[
+        'name'].lower() + "(const lv_obj_t * obj, lv_part_t part)")
+    print("{")
+    print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
+    print("    return " + cast + "v." + p['style_type'] + ";")
+    print("}")
+    print()
+
+    if 'filtered' in p and p['filtered']:
+        local_style_get_doxygen_comment(p)
+        print("static inline " + p['var_type'] + " lv_obj_get_style_" + p[
+            'name'].lower() + "_filtered(const lv_obj_t * obj, lv_part_t part)")
+        print("{")
+        print(
+            "    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" +
+            p['name'] + "));")
+        print("    return " + cast + "v." + p['style_type'] + ";")
+        print("}")
+        print()
+
+
+def local_style_set_c(p):
+    if 'section' in p: return
+
+    cast = style_set_cast(p['style_type'])
+    print()
+    print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p[
+        'var_type'] + " value, lv_style_selector_t selector)")
+    print("{")
+    print("    lv_style_value_t v = {")
+    print("        ." + p['style_type'] + " = " + cast + "value")
+    print("    };")
+    print("    lv_obj_set_local_style_prop(obj, LV_STYLE_" + p['name'] + ", v, selector);")
+    print("}")
+
+
+def local_style_set_h(p):
+    if 'section' in p: return
+
+    local_style_set_doxygen_comment(p)
+    print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p[
+        'var_type'] + " value, lv_style_selector_t selector);")
+    print()
+
+
+def docs(p):
+    if "section" in p:
+        print()
+        print(p['section'])
+        print("-" * len(p['section']))
+        print()
+        print(p['dsc'])
+        return
+
+    li_style = "style='display:inline-block; margin-right: 20px; margin-left: 0px"
+
+    dsc = word_wrapped_description(p['dsc'], in_a_comment=False)
+
+    print()
+    name = p["name"].lower()
+    print(name)
+    print("~" * len(name))
+    print()
+    print(dsc)
+
+    if 'default' in p:
+        d, i, L, e = extra_info(p)
+        print()
+        print(".. raw:: html")
+        print()
+        print("  <ul>")
+        print("  <li " + li_style + "'><strong>Default</strong> " + d + "</li>")
+        print("  <li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
+        print("  <li " + li_style + "'><strong>Layout</strong> " + L + "</li>")
+        print("  <li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
+        print("  </ul>")
+
+
+def guard_proc(p):
+    global guard
+    if 'section' in p:
+        if guard:
+            guard_close()
+        if 'guard' in p:
+            guard = p['guard']
+            print(f"#if {guard}")
+
+
+def guard_close():
+    global guard
+    if guard:
+        print(f"#endif /* {guard} */\n")
+    guard = ""
+
+
+# =========================================================================
+# Actions
+# =========================================================================
+
+# -------------------------------------------------------------------------
+# lv_obj_style_gen.h
+# -------------------------------------------------------------------------
+base_dir = os.path.abspath(os.path.dirname(__file__))
+orig_stdout = sys.stdout
+sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
 
 print(HEADING)
 print('#ifndef LV_OBJ_STYLE_GEN_H')
@@ -673,21 +946,23 @@ print('''\
 extern "C" {
 #endif
 ''')
-print("#include \"../misc/lv_area.h\"")
-print("#include \"../misc/lv_style.h\"")
-print("#include \"../core/lv_obj_style.h\"")
-print("#include \"../misc/lv_types.h\"")
+print('#include "../misc/lv_area.h"')
+print('#include "../misc/lv_style.h"')
+print('#include "../core/lv_obj_style.h"')
+print('#include "../misc/lv_types.h"')
 print()
 
 guard = ""
-for p in props:
-  guard_proc(p)
-  obj_style_get(p)
+for prop in props:
+    guard_proc(prop)
+    local_style_get_h(prop)
+    _total_func_count += 1
 guard_close()
 
-for p in props:
-  guard_proc(p)
-  local_style_set_h(p)
+for prop in props:
+    guard_proc(prop)
+    local_style_set_h(prop)
+    _total_func_count += 1
 guard_close()
 
 print()
@@ -699,28 +974,37 @@ print('''\
 
 print('#endif /* LV_OBJ_STYLE_GEN_H */')
 
+# -------------------------------------------------------------------------
+# lv_obj_style_gen.c
+# -------------------------------------------------------------------------
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
 
 print(HEADING)
-print("#include \"lv_obj.h\"")
+print('#include "lv_obj.h"')
 print()
 
-for p in props:
-  guard_proc(p)
-  local_style_set_c(p)
+for prop in props:
+    guard_proc(prop)
+    local_style_set_c(prop)
 guard_close()
 
+# -------------------------------------------------------------------------
+# lv_style_gen.c
+# -------------------------------------------------------------------------
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.c', 'w')
 
 print(HEADING)
-print("#include \"lv_style.h\"")
+print('#include "lv_style.h"')
 print()
 
-for p in props:
-  guard_proc(p)
-  style_set_c(p)
+for prop in props:
+    guard_proc(prop)
+    style_set_c(prop)
 guard_close()
 
+# -------------------------------------------------------------------------
+# lv_style_gen.h
+# -------------------------------------------------------------------------
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.h', 'w')
 
 print(HEADING)
@@ -733,14 +1017,16 @@ extern "C" {
 #endif
 ''')
 
-for p in props:
-  guard_proc(p)
-  style_set_h(p)
+for prop in props:
+    guard_proc(prop)
+    style_set_h(prop)
+    _total_func_count += 1
 guard_close()
 
-for p in props:
-  guard_proc(p)
-  style_const_set(p)
+for prop in props:
+    guard_proc(prop)
+    style_const_set(prop)
+    _total_func_count += 1
 guard_close()
 
 print()
@@ -751,13 +1037,38 @@ print('''\
 ''')
 print('#endif /* LV_STYLE_GEN_H */')
 
-sys.stdout = open(base_dir + '/../docs/src/details/common-widget-features/styles/style-properties.rst', 'w')
+# -------------------------------------------------------------------------
+# style-properties.rst
+# -------------------------------------------------------------------------
+sys.stdout = open(base_dir + '/../docs/src/common-widget-features/styles/style-properties.rst', 'w')
 
+print(RST_HEADING)
 print('.. _style_properties:')
 print()
 print('================')
 print('Style Properties')
 print('================')
 
-for p in props:
-  docs(p)
+for prop in props:
+    docs(prop)
+
+# -------------------------------------------------------------------------
+# Report
+# -------------------------------------------------------------------------
+sys.stdout = orig_stdout
+print(f'Total functions commented:  {_total_func_count}.')
+print('Checking for problems... ')
+explain = False
+for prop in props:
+    if not 'section' in prop:
+        if not prop['dsc'].endswith('.'):
+            print(f'dsc does not end with "." for: [{prop["name"]}]')
+            explain = True
+
+if explain:
+    print()
+    print('A "." is needed at the end of "dsc" values so that it separates the end')
+    print('of the description in the function API documentation from the extra info')
+    print('at the end:  default, inherited, layout and ext draw information.')
+else:
+    print('OK.')

@@ -78,6 +78,7 @@ static void scroll_anim_y_cb(void * var, int32_t v);
 static void color_anim_cb(void * var, int32_t v);
 static void color_anim(lv_obj_t * obj);
 static void arc_anim(lv_obj_t * obj);
+static void add_warnings(void);
 
 static lv_obj_t * card_create(void);
 
@@ -541,6 +542,10 @@ void lv_demo_benchmark_summary_display(const lv_demo_benchmark_summary_t * summa
     LV_ASSERT_NULL(summary)
     lv_obj_clean(lv_screen_active());
     lv_obj_set_style_pad_hor(lv_screen_active(), 0, 0);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_COLUMN);
+
+    add_warnings();
+
     lv_obj_t * table = lv_table_create(lv_screen_active());
     lv_obj_set_width(table, lv_pct(100));
     lv_obj_set_style_max_height(table, lv_pct(100), 0);
@@ -653,8 +658,6 @@ static void load_scene(uint32_t scene)
 
 static void next_scene_timer_cb(lv_timer_t * timer)
 {
-    LV_UNUSED(timer);
-
     scene_act++;
 
     load_scene(scene_act);
@@ -962,6 +965,107 @@ static int32_t rnd_next(int32_t min, int32_t max)
 static lv_color_t rnd_color(void)
 {
     return lv_palette_main(rnd_next(0, LV_PALETTE_LAST - 1));
+}
+
+static uint32_t loop_optimizable(void)
+{
+    /*Easy to optimize as only local variables change*/
+    uint32_t i;
+    uint32_t c = 0;
+    for(i = 0; i < 100000; i++) {
+        c++;
+    }
+
+    LV_UNUSED(c);
+    return 0;
+}
+static uint32_t loop_not_optimizable(void)
+{
+    volatile uint32_t i;
+    volatile uint32_t c = lv_rand(0, 1000);
+    for(i = 0; i < 100000; i++) {
+        c++;
+    }
+    return c;
+}
+
+static bool is_optimization_enabled(void)
+{
+    uint32_t i;
+    uint32_t t;
+    uint32_t t_unoptimized;
+    uint32_t t_optimized;
+    uint32_t max_cnt = 1;
+    /*Run the unoptimizable loop as many times as needed
+     *to make the execution time at least 50ms  */
+    do {
+        max_cnt *= 2;
+        t = lv_tick_get();
+        for(i = 0; i < max_cnt; i++) {
+            loop_not_optimizable();
+        }
+        t_unoptimized = lv_tick_elaps(t);
+    } while(t_unoptimized < 50);
+
+    /*Run the optimizable loop the same amount of times*/
+    t = lv_tick_get();
+    for(i = 0; i < max_cnt; i++) {
+        loop_optimizable();
+    }
+    t_optimized = lv_tick_elaps(t);
+
+    /*If the optimized loop was at least 5 times faster
+     *the compiler optimization is probably enabled*/
+    return t_optimized * 5 < t_unoptimized;
+}
+
+static lv_obj_t * add_warning_label(const char * text)
+{
+    LV_LOG("%s\n", text);
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_recolor(label, true);
+    lv_label_set_text_fmt(label, "#ffc000 " LV_SYMBOL_WARNING "# %s", text);
+    lv_obj_set_style_pad_left(label, 12, 0);
+    lv_obj_set_width(label, lv_pct(100));
+
+    return label;
+}
+
+static void add_warnings(void)
+{
+#if LV_USE_ASSERT_OBJ
+    add_warning_label("LV_USE_ASSERT_OBJ is enabled making rendering slower");
+#endif
+
+#if LV_USE_ASSERT_MEM_INTEGRITY
+    add_warning_label("LV_USE_ASSERT_MEM_INTEGRITY is enabled making rendering slower");
+#endif
+
+    lv_color_format_t cf = lv_display_get_color_format(NULL);
+    uint32_t screen_size_byte = LV_HOR_RES * LV_VER_RES * lv_color_format_get_size(cf);
+    uint32_t draw_buf_size = lv_display_get_draw_buf_size(NULL);
+    if(draw_buf_size < screen_size_byte / 10) {
+        add_warning_label("The draw buffer's size is smaller than 1/10 screen size making rendering slower");
+    }
+
+    uint32_t ideal_layer_size = screen_size_byte / 20;
+    if(LV_DRAW_LAYER_SIMPLE_BUF_SIZE < ideal_layer_size) {
+        char buf[128];
+        lv_snprintf(buf, sizeof(buf),
+                    "LV_DRAW_LAYER_SIMPLE_BUF_SIZE is small making opa_layered slow. Consider 1/20 screen size for it (> %"LV_PRIu32"kB)",
+                    LV_ALIGN_UP(ideal_layer_size, 1024) / 1024);
+        add_warning_label(buf);
+    }
+
+    if(LV_USE_LOG && LV_LOG_LEVEL < LV_LOG_LEVEL_WARN) {
+        add_warning_label("Set LV_LOG_LEVEL at least to LV_LOG_LEVEL_WARN");
+    }
+
+    if(is_optimization_enabled() == false) {
+        add_warning_label("Compiler optimization is not enabled.");
+    }
+
 }
 
 #endif

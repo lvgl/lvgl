@@ -35,7 +35,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_gltf_primitive_t * lv_gltf_data_get_primitive_from_mesh(lv_gltf_mesh_data_t * mesh, uint64_t index)
+lv_gltf_primitive_t * lv_gltf_data_get_primitive_from_mesh(lv_gltf_mesh_data_t * mesh, size_t index)
 {
     return &(mesh->primitives[index]);
 }
