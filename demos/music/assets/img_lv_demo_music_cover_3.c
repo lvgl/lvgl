@@ -185,7 +185,12 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_cover_3_map[] = {
 
 };
 
-const lv_image_dsc_t img_lv_demo_music_cover_3 = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t img_lv_demo_music_cover_3 = {
     .header.w = 176,
     .header.h = 175,
     .header.stride = 704,

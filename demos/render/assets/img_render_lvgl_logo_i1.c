@@ -60,7 +60,12 @@ uint8_t img_render_lvgl_logo_i1_map[] = {
 
 };
 
-const lv_image_dsc_t img_render_lvgl_logo_i1 = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t img_render_lvgl_logo_i1 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_I1,
   .header.flags = 0,

@@ -183,7 +183,12 @@ uint8_t img_demo_widgets_avatar_map[] = {
 
 };
 
-const lv_image_dsc_t img_demo_widgets_avatar = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t img_demo_widgets_avatar = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_ARGB8888,
   .header.flags = 0,

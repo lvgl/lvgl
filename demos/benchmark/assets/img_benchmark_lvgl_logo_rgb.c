@@ -329,7 +329,12 @@ uint8_t img_benchmark_lvgl_logo_rgb_map[] = {
 #endif
 };
 
-const lv_image_dsc_t img_benchmark_lvgl_logo_rgb = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t img_benchmark_lvgl_logo_rgb = {
     .header.magic = LV_IMAGE_HEADER_MAGIC,
 #if LV_COLOR_DEPTH == 16
     .header.cf = LV_COLOR_FORMAT_RGB565,

@@ -477,7 +477,12 @@ uint8_t test_RGB565A8_RLE_align1_map[] = {
 
 };
 
-const lv_image_dsc_t test_RGB565A8_RLE_align1 = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t test_RGB565A8_RLE_align1 = {
   .header = {
     .magic = LV_IMAGE_HEADER_MAGIC,
     .cf = LV_COLOR_FORMAT_RGB565A8,

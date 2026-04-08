@@ -443,7 +443,12 @@ test_img_lvgl_logo_png_map[] = {
     0x4e,0x59,0x00,0x00,0x00,0x00,0x49,0x45,0x4e,0x44,0xae,0x42,0x60,0x82,
 };
 
-const lv_image_dsc_t test_img_lvgl_logo_png = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t test_img_lvgl_logo_png = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_RAW_ALPHA,
   .header.flags = 0,

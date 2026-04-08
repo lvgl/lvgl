@@ -238,7 +238,12 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_1F617 uint8_t emoji_F617_map[] =
 #endif
 };
 
-const lv_image_dsc_t emoji_F617 = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t emoji_F617 = {
     .header = {
         .cf = LV_COLOR_FORMAT_NATIVE,
         .w = 72,

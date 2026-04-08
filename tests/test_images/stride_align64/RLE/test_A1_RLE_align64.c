@@ -86,7 +86,12 @@ uint8_t test_A1_RLE_align64_map[] = {
 
 };
 
-const lv_image_dsc_t test_A1_RLE_align64 = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t test_A1_RLE_align64 = {
   .header = {
     .magic = LV_IMAGE_HEADER_MAGIC,
     .cf = LV_COLOR_FORMAT_A1,

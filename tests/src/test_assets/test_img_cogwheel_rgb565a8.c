@@ -215,7 +215,12 @@ test_image_cogwheel_rgb565a8_map[] = {
 
 };
 
-const lv_image_dsc_t test_image_cogwheel_rgb565a8 = {
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST
+#else
+const
+#endif
+lv_image_dsc_t test_image_cogwheel_rgb565a8 = {
     .header.cf = LV_COLOR_FORMAT_RGB565A8,
     .header.w = 100,
     .header.h = 100,
