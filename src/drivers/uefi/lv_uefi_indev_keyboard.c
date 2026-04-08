@@ -22,6 +22,19 @@
  *********************/
 
 #define SIMPLE_TEXT_INPUT_INDEV_SIGNATURE 0x53495449
+#ifndef SCAN_UP
+    #define SCAN_UP         0x0001
+    #define SCAN_DOWN       0x0002
+    #define SCAN_RIGHT      0x0003
+    #define SCAN_LEFT       0x0004
+    #define SCAN_HOME       0x0005
+    #define SCAN_END        0x0006
+    #define SCAN_DELETE     0x0008
+    #define SCAN_ESC        0x0017
+#endif
+#ifndef SCAN_SUSPEND
+    #define SCAN_SUSPEND    0x0102
+#endif
 
 /**********************
  *      TYPEDEFS
