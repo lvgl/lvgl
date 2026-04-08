@@ -240,7 +240,11 @@ void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     }
 
     if(decoder_dsc.decoded != NULL) {
-        lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit);
+        if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit)) {
+            LV_LOG_WARN("Failed to ensure image residency");
+            lv_image_decoder_close(&decoder_dsc);
+            return;
+        }
     }
 
     img_decode_and_draw(t, draw_dsc, &decoder_dsc, NULL, coords, &clipped_img_area, draw_core_cb);
@@ -264,7 +268,11 @@ void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
     }
 
     if(decoder_dsc.decoded != NULL) {
-        lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit);
+        if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit)) {
+            LV_LOG_WARN("Failed to ensure image residency");
+            lv_image_decoder_close(&decoder_dsc);
+            return;
+        }
     }
 
     int32_t img_w = draw_dsc->header.w;

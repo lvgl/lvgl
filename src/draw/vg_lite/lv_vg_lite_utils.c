@@ -891,7 +891,11 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     }
 
     if(draw_unit != NULL) {
-        lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoded, draw_unit);
+        if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoded, draw_unit)) {
+            lv_image_decoder_close(decoder_dsc);
+            LV_LOG_ERROR("Failed to ensure image residency");
+            return false;
+        }
     }
 
     if(decoded->data == NULL) {

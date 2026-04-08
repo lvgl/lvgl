@@ -117,7 +117,7 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     lv_draw_buf_t * draw_buf = canvas->draw_buf;
 
 #if LV_USE_DRAW_VRAM
-    lv_draw_buf_ensure_resident(draw_buf, NULL);
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return;
 #endif
 
     lv_color_format_t cf = draw_buf->header.cf;
@@ -194,7 +194,7 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
 #if LV_USE_DRAW_VRAM
-    lv_draw_buf_ensure_resident(canvas->draw_buf, NULL);
+    if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return;
 #endif
 
     lv_draw_buf_set_palette(canvas->draw_buf, index, color);
@@ -222,7 +222,7 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
     if(canvas->draw_buf == NULL) return ret;
 
 #if LV_USE_DRAW_VRAM
-    lv_draw_buf_ensure_resident(canvas->draw_buf, NULL);
+    if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return ret;
 #endif
 
     lv_image_header_t * header = &canvas->draw_buf->header;
@@ -285,7 +285,7 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf) {
 #if LV_USE_DRAW_VRAM
-        lv_draw_buf_ensure_resident(canvas->draw_buf, NULL);
+        if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return NULL;
 #endif
         return canvas->draw_buf->unaligned_data;
     }
@@ -307,8 +307,8 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
     if(canvas->draw_buf == NULL) return;
 
 #if LV_USE_DRAW_VRAM
-    lv_draw_buf_ensure_resident(canvas->draw_buf, NULL);
-    lv_draw_buf_ensure_resident(dest_buf, NULL);
+    if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return;
+    if(!lv_draw_buf_ensure_resident(dest_buf, NULL)) return;
 #endif
 
     LV_ASSERT_MSG(canvas->draw_buf->header.cf == dest_buf->header.cf, "Color formats must be the same");
@@ -344,7 +344,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
             return;
         }
     }
-    lv_draw_buf_ensure_resident(draw_buf, NULL);
+    if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return;
 #endif
 
     lv_image_header_t * header = &draw_buf->header;
