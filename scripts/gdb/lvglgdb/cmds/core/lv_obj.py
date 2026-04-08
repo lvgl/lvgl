@@ -3,6 +3,7 @@ import gdb
 
 from lvglgdb.lvgl import curr_inst
 from lvglgdb.lvgl import LVObject, dump_obj_info
+from lvglgdb.value import CorruptedError
 
 
 class DumpObj(gdb.Command):
@@ -25,8 +26,11 @@ class DumpObj(gdb.Command):
             return
 
         # dump children
-        for child in obj.children:
-            self.dump_obj(child, depth + 1, limit=limit)
+        try:
+            for child in obj.children:
+                self.dump_obj(child, depth + 1, limit=limit)
+        except CorruptedError:
+            print("  " * (depth + 1) + "(corrupted children)")
 
     def invoke(self, args, from_tty):
         parser = argparse.ArgumentParser(description="Dump lvgl obj tree.")
@@ -58,6 +62,9 @@ class DumpObj(gdb.Command):
             depth = 0
             for disp in curr_inst().displays():
                 print(f"Display {hex(disp)}")
-                for screen in disp.screens:
-                    print(f'{"  " * (depth + 1)}Screen@{hex(screen)}')
-                    self.dump_obj(screen, depth=depth + 1, limit=args.level)
+                try:
+                    for screen in disp.screens:
+                        print(f"{'  ' * (depth + 1)}Screen@{hex(screen)}")
+                        self.dump_obj(screen, depth=depth + 1, limit=args.level)
+                except CorruptedError:
+                    print(f"{'  ' * (depth + 1)}(corrupted screens)")

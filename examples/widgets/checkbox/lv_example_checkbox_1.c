@@ -5,8 +5,8 @@ static void event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target_obj(e);
+    LV_UNUSED(obj);
     if(code == LV_EVENT_VALUE_CHANGED) {
-        LV_UNUSED(obj);
         const char * txt = lv_checkbox_get_text(obj);
         const char * state = lv_obj_get_state(obj) & LV_STATE_CHECKED ? "Checked" : "Unchecked";
         LV_UNUSED(txt);

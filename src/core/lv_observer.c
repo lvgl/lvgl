@@ -39,12 +39,6 @@ typedef struct {
 } flag_and_cond_t;
 
 typedef struct {
-    const lv_style_t * style;
-    lv_style_selector_t selector;
-    int32_t value;
-} bind_style_t;
-
-typedef struct {
     lv_subject_t * subject;
     int32_t value;
 } subject_set_int_user_data_t;
@@ -77,7 +71,6 @@ static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv, flag_cond_t cond);
 
-static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_value_changed_event_cb(lv_event_t * e);
@@ -97,6 +90,19 @@ static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+#if LV_USE_EXT_DATA
+void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
+{
+    if(!subject) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL subject");
+        return;
+    }
+
+    subject->ext_data.data = data;
+    subject->ext_data.free_cb = free_cb;
+}
+#endif
 
 void lv_subject_init_int(lv_subject_t * subject, int32_t value)
 {
@@ -505,6 +511,13 @@ void lv_observer_remove(lv_observer_t * observer)
 
     observer->subject->notify_restart_query = 1;
 
+#if LV_USE_EXT_DATA
+    if(observer->subject->ext_data.free_cb) {
+        observer->subject->ext_data.free_cb(observer->subject->ext_data.data);
+        observer->subject->ext_data.data = NULL;
+    }
+#endif
+
     lv_ll_remove(&(observer->subject->subs_ll), observer);
 
     if(observer->auto_free_user_data) {
@@ -734,34 +747,6 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
     lv_obj_add_event_cb(obj, subject_set_string_free_user_data_event_cb, LV_EVENT_DELETE, user_data);
 }
 
-lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector,
-                                  lv_subject_t * subject, int32_t ref_value)
-{
-    LV_ASSERT_NULL(subject);
-    LV_ASSERT_NULL(obj);
-
-    if(subject->type != LV_SUBJECT_TYPE_INT) {
-        LV_LOG_WARN("Subject type must be `int` (was %d)", subject->type);
-        return NULL;
-    }
-
-    lv_obj_add_style(obj, style, selector);
-
-    bind_style_t * p = lv_malloc(sizeof(bind_style_t));
-    LV_ASSERT_MALLOC(p);
-    if(p == NULL) {
-        LV_LOG_WARN("Out of memory");
-        return NULL;
-    }
-
-    p->style = style;
-    p->selector = selector;
-    p->value = ref_value;
-
-    lv_observer_t * observable = lv_subject_add_observer_obj(subject, bind_style_observer_cb, obj, p);
-    observable->auto_free_user_data = 1;
-    return observable;
-}
 
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
@@ -856,7 +841,9 @@ lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 0, true,
                                                   FLAG_COND_EQ);
+
     lv_obj_add_event_cb(obj, obj_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+
     return observable;
 }
 
@@ -996,16 +983,8 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
 
     lv_observer_t * observable = lv_subject_add_observer_obj(subject, cb, obj, p);
     observable->auto_free_user_data = 1;
+
     return observable;
-}
-
-static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
-{
-    bind_style_t * p = observer->user_data;
-
-    int32_t current_v = lv_subject_get_int(subject);
-    bool dis = current_v != p->value;
-    lv_obj_style_set_disabled(observer->target, p->style, p->selector, dis);
 }
 
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject)

@@ -450,6 +450,12 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
     #define STBTT_STREAM_TYPE FILE*
     #define STBTT_STREAM_READ(s,x,y) fread(x,1,y,s);
     #define STBTT_STREAM_SEEK(s,x)  fseek(s,x,SEEK_SET);
+    #define STBTT_STREAM_SEEK_AND_READ(s,o,x,y) (fseek(s,o,SEEK_SET), fread(x,1,y,s))
+#endif
+
+#ifndef STBTT_STREAM_SEEK_AND_READ
+#define STBTT_STREAM_SEEK_AND_READ(s,o,x,y) \
+    do { STBTT_STREAM_SEEK(s,o); STBTT_STREAM_READ(s,x,y); } while(0)
 #endif
 
 // heap factor sizes for various counts of objects
@@ -1190,9 +1196,8 @@ static stbtt_uint8 stbtt__buf_get8(stbtt__buf * b)
         return 0;
 #ifdef STBTT_STREAM_TYPE
     long pos = (long)(b->cursor + b->offset);
-    STBTT_STREAM_SEEK(b->data, pos);
     stbtt_uint8 result;
-    STBTT_STREAM_READ(b->data, &result, 1);
+    STBTT_STREAM_SEEK_AND_READ(b->data, pos, &result, 1);
     ++b->cursor;
     return result;
 #else
@@ -1207,9 +1212,8 @@ static stbtt_uint8 stbtt__buf_peek8(stbtt__buf * b)
         return 0;
 #ifdef STBTT_STREAM_TYPE
     long pos = (long)(b->cursor + b->offset);
-    STBTT_STREAM_SEEK(b->data, pos);
     stbtt_uint8 result;
-    STBTT_STREAM_READ(b->data, &result, 1);
+    STBTT_STREAM_SEEK_AND_READ(b->data, pos, &result, 1);
     return result;
 #else
     return b->data[b->cursor];
@@ -1370,38 +1374,33 @@ static stbtt__buf stbtt__cff_index_get(stbtt__buf b, int i)
 #ifdef STBTT_STREAM_TYPE
 static stbtt_uint8 ttBYTE(STBTT_STREAM_TYPE s, stbtt_uint32 offset)
 {
-    STBTT_STREAM_SEEK(s, offset);
     stbtt_uint8 r;
-    STBTT_STREAM_READ(s, &r, 1);
+    STBTT_STREAM_SEEK_AND_READ(s, offset, &r, 1);
     return r;
 }
 #define ttCHAR(s, offset)     ((stbtt_int8)ttBYTE(s,offset))
 static stbtt_uint16 ttUSHORT(STBTT_STREAM_TYPE s, stbtt_uint32 offset)
 {
-    STBTT_STREAM_SEEK(s, offset);
     stbtt_uint8 r[2];
-    STBTT_STREAM_READ(s, &r, 2);
+    STBTT_STREAM_SEEK_AND_READ(s, offset, r, 2);
     return r[0] * 256 + r[1];
 }
 static stbtt_int16 ttSHORT(STBTT_STREAM_TYPE s, stbtt_uint32 offset)
 {
-    STBTT_STREAM_SEEK(s, offset);
     stbtt_uint8 r[2];
-    STBTT_STREAM_READ(s, &r, 2);
+    STBTT_STREAM_SEEK_AND_READ(s, offset, r, 2);
     return r[0] * 256 + r[1];
 }
 static stbtt_uint32 ttULONG(STBTT_STREAM_TYPE s, stbtt_uint32 offset)
 {
-    STBTT_STREAM_SEEK(s, offset);
     stbtt_uint8 r[4];
-    STBTT_STREAM_READ(s, &r, 4);
+    STBTT_STREAM_SEEK_AND_READ(s, offset, r, 4);
     return (r[0] << 24) + (r[1] << 16) + (r[2] << 8) + r[3];
 }
 static stbtt_int32 ttLONG(STBTT_STREAM_TYPE s, stbtt_uint32 offset)
 {
-    STBTT_STREAM_SEEK(s, offset);
     stbtt_uint8 r[4];
-    STBTT_STREAM_READ(s, &r, 4);
+    STBTT_STREAM_SEEK_AND_READ(s, offset, r, 4);
     return (r[0] << 24) + (r[1] << 16) + (r[2] << 8) + r[3];
 }
 #else
@@ -1436,8 +1435,7 @@ static stbtt_int32 ttLONG(const stbtt_uint8 * p, stbtt_uint32 offset)
 {
 #ifdef STBTT_STREAM_TYPE
     stbtt_uint8 font[4];
-    STBTT_STREAM_SEEK(stream, offs);
-    STBTT_STREAM_READ(stream, font, 4);
+    STBTT_STREAM_SEEK_AND_READ(stream, offs, font, 4);
 #else
     font += offs;
 #endif
@@ -1464,8 +1462,7 @@ static stbtt_int32 ttLONG(const stbtt_uint8 * p, stbtt_uint32 offset)
         stbtt_uint32 loc = tabledir + 16 * i;
 #ifdef STBTT_STREAM_TYPE
         stbtt_uint8 buf[4];
-        STBTT_STREAM_SEEK(data, loc + 0);
-        STBTT_STREAM_READ(data, buf, 4);
+        STBTT_STREAM_SEEK_AND_READ(data, loc, buf, 4);
         if(stbtt_tag(buf, tag))
             return ttULONG(data, loc + 8);
 #else
@@ -1488,8 +1485,7 @@ static stbtt_int32 ttLONG(const stbtt_uint8 * p, stbtt_uint32 offset)
     // check if it's a TTC
 #ifdef STBTT_STREAM_TYPE
     stbtt_uint8 buf[4];
-    STBTT_STREAM_SEEK(font_collection, 0);
-    STBTT_STREAM_READ(font_collection, buf, 4);
+    STBTT_STREAM_SEEK_AND_READ(font_collection, 0, buf, 4);
     if(stbtt_tag(buf, "ttcf")) {
 #else
     if(stbtt_tag(font_collection, "ttcf")) {
@@ -1517,8 +1513,7 @@ static stbtt_int32 ttLONG(const stbtt_uint8 * p, stbtt_uint32 offset)
     // check if it's a TTC
 #ifdef STBTT_STREAM_TYPE
     stbtt_uint8 buf[4];
-    STBTT_STREAM_SEEK(font_collection, 0);
-    STBTT_STREAM_READ(font_collection, buf, 4);
+    STBTT_STREAM_SEEK_AND_READ(font_collection, 0, buf, 4);
     if(stbtt_tag(buf, "ttcf")) {
 #else
     if(stbtt_tag(font_collection, "ttcf")) {

@@ -66,6 +66,20 @@ LV_EXPORT_CONST_INT(LV_SCALE_ROTATION_ANGLE_MASK);
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_scale_class;
 
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_scale_id_t {
+    LV_PROPERTY_ID(SCALE, MODE,               LV_PROPERTY_TYPE_INT,   0),
+    LV_PROPERTY_ID(SCALE, TOTAL_TICK_COUNT,   LV_PROPERTY_TYPE_INT,   1),
+    LV_PROPERTY_ID(SCALE, MAJOR_TICK_EVERY,   LV_PROPERTY_TYPE_INT,   2),
+    LV_PROPERTY_ID(SCALE, LABEL_SHOW,         LV_PROPERTY_TYPE_BOOL,  3),
+    LV_PROPERTY_ID(SCALE, ANGLE_RANGE,        LV_PROPERTY_TYPE_INT,   4),
+    LV_PROPERTY_ID(SCALE, ROTATION,           LV_PROPERTY_TYPE_INT,   5),
+    LV_PROPERTY_ID(SCALE, RANGE_MIN_VALUE,    LV_PROPERTY_TYPE_INT,   6),
+    LV_PROPERTY_ID(SCALE, RANGE_MAX_VALUE,    LV_PROPERTY_TYPE_INT,   7),
+    LV_PROPERTY_SCALE_END,
+};
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -368,6 +382,26 @@ lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section
  * @return          pointer to newly-created Observer
  */
 lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
+
+/**
+ * Bind an integer subject to a scale's line needle value
+ * @param obj           pointer to a Scale
+ * @param needle_line   pointer to a line needle
+ * @param needle_length length of the needle
+ * @param subject       pointer to a Subject
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                                lv_subject_t * subject);
+
+/**
+ * Bind an integer subject to a scale's image needle value
+ * @param obj           pointer to a Scale
+ * @param needle_img    pointer to an image needle
+ * @param subject       pointer to a Subject
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, lv_subject_t * subject);
 
 #endif
 

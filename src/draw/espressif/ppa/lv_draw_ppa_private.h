@@ -37,8 +37,8 @@ extern "C" {
 /* The ppa driver depends heavily on the esp-idf headers*/
 #include "sdkconfig.h"
 
-#if CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE != CONFIG_CACHE_L1_CACHE_LINE_SIZE || CONFIG_LV_DRAW_BUF_ALIGN != CONFIG_CACHE_L1_CACHE_LINE_SIZE
-#error "For using PPA buffers need to be aligned to 64-byte boundary!"
+#if (CONFIG_LV_DRAW_BUF_ALIGN != CONFIG_CACHE_L2_CACHE_LINE_SIZE)
+#error "CONFIG_LV_DRAW_BUF_ALIGN must be equal to CONFIG_CACHE_L2_CACHE_LINE_SIZE!"
 #endif
 
 
@@ -66,10 +66,6 @@ typedef struct lv_draw_ppa_unit {
     ppa_client_handle_t fill_client;
     ppa_client_handle_t blend_client;
     uint8_t * buf;
-#if LV_PPA_NONBLOCKING_OPS
-    lv_thread_t thread;
-    lv_thread_sync_t interrupt_signal;
-#endif
 } lv_draw_ppa_unit_t;
 
 /**********************
@@ -113,7 +109,6 @@ static inline bool ppa_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
             is_cf_supported = true;
             break;
         default:
@@ -131,7 +126,6 @@ static inline ppa_fill_color_mode_t lv_color_format_to_ppa_fill(lv_color_format_
         case LV_COLOR_FORMAT_RGB888:
             return PPA_FILL_COLOR_MODE_RGB888;
         case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
             return PPA_FILL_COLOR_MODE_ARGB8888;
         default:
             return PPA_FILL_COLOR_MODE_RGB565;
@@ -146,7 +140,6 @@ static inline ppa_blend_color_mode_t lv_color_format_to_ppa_blend(lv_color_forma
         case LV_COLOR_FORMAT_RGB888:
             return PPA_BLEND_COLOR_MODE_RGB888;
         case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
             return PPA_BLEND_COLOR_MODE_ARGB8888;
         default:
             return PPA_BLEND_COLOR_MODE_RGB565;
@@ -161,7 +154,6 @@ static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t 
         case LV_COLOR_FORMAT_RGB888:
             return PPA_SRM_COLOR_MODE_RGB888;
         case LV_COLOR_FORMAT_XRGB8888:
-        case LV_COLOR_FORMAT_ARGB8888:
             return PPA_SRM_COLOR_MODE_ARGB8888;
         default:
             return PPA_SRM_COLOR_MODE_RGB565;

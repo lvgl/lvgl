@@ -56,6 +56,22 @@ static inline bool is_cell_empty(void * cell)
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_table_properties[] = {
+    {
+        .id = LV_PROPERTY_TABLE_ROW_COUNT,
+        .setter = lv_table_set_row_count,
+        .getter = lv_table_get_row_count,
+    },
+    {
+        .id = LV_PROPERTY_TABLE_COLUMN_COUNT,
+        .setter = lv_table_set_column_count,
+        .getter = lv_table_get_column_count,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_table_class  = {
     .constructor_cb = lv_table_constructor,
     .destructor_cb = lv_table_destructor,
@@ -67,6 +83,7 @@ const lv_obj_class_t lv_table_class  = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_table_t),
     .name = "lv_table",
+    LV_PROPERTY_CLASS_FIELDS(table, TABLE)
 };
 /**********************
  *      MACROS
@@ -169,13 +186,14 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
     lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = lv_text_ap_calc_bytes_count(raw_txt);
-    table->cell_data[cell] = lv_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len_ap + 1);
-    LV_ASSERT_MALLOC(table->cell_data[cell]);
-    if(table->cell_data[cell] == NULL) {
+    size_t len_ap = lv_text_ap_strlen(raw_txt) + 1;
+    lv_table_cell_t * cell_data = lv_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len_ap);
+    LV_ASSERT_MALLOC(cell_data);
+    if(!cell_data) {
         va_end(ap2);
         return;
     }
+    table->cell_data[cell] = cell_data;
     lv_text_ap_proc(raw_txt, table->cell_data[cell]->txt);
 
     lv_free(raw_txt);
@@ -1057,7 +1075,7 @@ static size_t get_cell_txt_len(const char * txt)
     size_t retval = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    retval = sizeof(lv_table_cell_t) + lv_text_ap_calc_bytes_count(txt) + 1;
+    retval = sizeof(lv_table_cell_t) + lv_text_ap_strlen(txt) + 1;
 #else
     retval = sizeof(lv_table_cell_t) + lv_strlen(txt) + 1;
 #endif

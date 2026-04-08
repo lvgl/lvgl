@@ -49,6 +49,7 @@ struct _lv_file_explorer_t {
     const char * sel_fn;
     char   current_path[LV_FILE_EXPLORER_PATH_MAX_LEN];
     lv_file_explorer_sort_t sort;
+    bool show_back_button;
 };
 
 typedef enum {

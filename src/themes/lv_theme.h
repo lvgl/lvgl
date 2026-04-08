@@ -30,6 +30,19 @@ typedef void (*lv_theme_apply_cb_t)(lv_theme_t *, lv_obj_t *);
  **********************/
 
 /**
+ * Creates a new theme
+ * @return  the new theme or NULL if allocation failed
+ */
+lv_theme_t * lv_theme_create(void);
+
+/**
+ * Copy 'src' theme into 'dst'
+ * @param dst   pointer to the destination theme
+ * @param src   pointer to the source theme
+ */
+void lv_theme_copy(lv_theme_t * dst, const lv_theme_t * src);
+
+/**
  * Get the theme assigned to the display of the object
  * @param obj       pointer to a theme object
  * @return          the theme of the object's display (can be NULL)
@@ -46,10 +59,10 @@ void lv_theme_apply(lv_obj_t * obj);
  * Set a base theme for a theme.
  * The styles from the base them will be added before the styles of the current theme.
  * Arbitrary long chain of themes can be created by setting base themes.
- * @param new_theme pointer to theme which base should be set
+ * @param theme pointer to theme which base should be set
  * @param parent pointer to the base theme
  */
-void lv_theme_set_parent(lv_theme_t * new_theme, lv_theme_t * parent);
+void lv_theme_set_parent(lv_theme_t * theme, lv_theme_t * parent);
 
 /**
  * Set an apply callback for a theme.
@@ -92,6 +105,29 @@ lv_color_t lv_theme_get_color_primary(lv_obj_t * obj);
  * @return the color
  */
 lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
+
+
+/**
+ * Delete a theme
+ * @param   theme the theme to destroy
+ */
+void lv_theme_delete(lv_theme_t * theme);
+
+#if LV_USE_EXT_DATA
+/**
+ * @brief Attaches external user data and destructor callback to the theme
+ *
+ * Associates custom user data with an LVGL theme and specifies a destructor function
+ * that will be automatically invoked when the theme is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param theme      Pointer to theme which callback should be set
+ * @param data       User-defined data pointer to associate with the theme
+ * @param free_cb    Callback function for cleaning up ext_data when theme is deleted.
+ *                   Receives ext_data as parameter. NULL means no cleanup required.
+ */
+void lv_theme_set_external_data(lv_theme_t * theme, void * data, void (* free_cb)(void * data));
+#endif
 
 /**********************
  *    MACROS

@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
           fetch-depth: 0
       - name: Checkout astyle
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: lvgl/astyle
           path: astyle

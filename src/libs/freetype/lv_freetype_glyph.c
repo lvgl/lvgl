@@ -120,6 +120,12 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     if(dsc->kerning == LV_FONT_KERNING_NORMAL && dsc->cache_node->face_has_kerning && unicode_letter_next != '\0') {
         lv_mutex_lock(&dsc->cache_node->face_lock);
         FT_Face face = dsc->cache_node->face;
+        if(FT_IS_SCALABLE(face)) {
+            FT_Error set_size_error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+            if(set_size_error) {
+                FT_ERROR_MSG("FT_Set_Pixel_Sizes", set_size_error);
+            }
+        }
         FT_UInt glyph_index_next = FT_Get_Char_Index(face, unicode_letter_next);
         FT_Vector kerning;
         FT_Error error = FT_Get_Kerning(face, g_dsc->gid.index, glyph_index_next, FT_KERNING_DEFAULT, &kerning);

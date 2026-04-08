@@ -82,9 +82,9 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     bool is_tiled = (dsc->tile != 0);
 
     if(is_tiled)
-        lv_draw_image_tiled_helper(t, dsc, coords, _g2d_draw_core_cb);
+        lv_draw_image_tiled_helper(t, dsc, coords, _g2d_draw_core_cb, NULL);
     else
-        lv_draw_image_normal_helper(t, dsc, coords, _g2d_draw_core_cb);
+        lv_draw_image_normal_helper(t, dsc, coords, _g2d_draw_core_cb, NULL);
 }
 
 /**********************

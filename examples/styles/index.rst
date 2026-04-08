@@ -53,62 +53,74 @@ Line styles
 .. lv_example:: styles/lv_example_style_9
   :language: c
 
+Drop shadow styles
+------------------
+
+.. lv_example:: styles/lv_example_style_10
+  :language: c
+
 Transition
 ----------
 
-.. lv_example:: styles/lv_example_style_10
+.. lv_example:: styles/lv_example_style_11
   :language: c
 
 Using multiple styles
 ---------------------
 
-.. lv_example:: styles/lv_example_style_11
+.. lv_example:: styles/lv_example_style_12
   :language: c
 
 Local styles
 ------------
 
-.. lv_example:: styles/lv_example_style_12
+.. lv_example:: styles/lv_example_style_13
   :language: c
 
 Add styles to parts and states
 ------------------------------
 
-.. lv_example:: styles/lv_example_style_13
+.. lv_example:: styles/lv_example_style_14
   :language: c
 
 Extending the current theme
 ---------------------------
 
-.. lv_example:: styles/lv_example_style_14
+.. lv_example:: styles/lv_example_style_15
   :language: c
 
 Opacity and Transformations
 ---------------------------
 
-.. lv_example:: styles/lv_example_style_15
+.. lv_example:: styles/lv_example_style_16
   :language: c
 
 Metallic knob with conic gradient
 ---------------------------------
 
-.. lv_example:: styles/lv_example_style_16
+.. lv_example:: styles/lv_example_style_17
   :language: c
 
 Radial gradient as background
 -----------------------------
 
-.. lv_example:: styles/lv_example_style_17
+.. lv_example:: styles/lv_example_style_18
   :language: c
 
 Gradients for button background
 -------------------------------
 
-.. lv_example:: styles/lv_example_style_18
+.. lv_example:: styles/lv_example_style_19
   :language: c
 
 Test between recolor style or full background modal
 ---------------------------------------------------
 
-.. lv_example:: styles/lv_example_style_19
+.. lv_example:: styles/lv_example_style_20
+  :language: c
+
+Transform style
+---------------
+
+.. lv_example:: styles/lv_example_style_21
   :language: c

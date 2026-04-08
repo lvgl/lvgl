@@ -143,7 +143,8 @@ static inline int32_t lv_div_round_closest(int32_t dividend, int32_t divisor)
 
 void lv_grid_init(void)
 {
-    layout_list_def[LV_LAYOUT_GRID].cb = grid_update;
+    layout_list_def[LV_LAYOUT_GRID].callbacks.layout_update_cb = grid_update;
+    layout_list_def[LV_LAYOUT_GRID].callbacks.get_min_size_cb = NULL;
     layout_list_def[LV_LAYOUT_GRID].user_data = NULL;
 }
 
@@ -191,7 +192,10 @@ static void grid_update(lv_obj_t * cont, void * user_data)
 
     lv_grid_calc_t c;
     lv_result_t res = calc(cont, &c);
-    if(res != LV_RESULT_OK) return;
+    if(res != LV_RESULT_OK) {
+        calc_free(&c);
+        return;
+    }
 
     item_repos_hint_t hint;
     lv_memzero(&hint, sizeof(hint));
@@ -229,8 +233,8 @@ static void grid_update(lv_obj_t * cont, void * user_data)
  */
 static lv_result_t calc(lv_obj_t * cont, lv_grid_calc_t * calc_out)
 {
+    lv_memzero(calc_out, sizeof(lv_grid_calc_t));
     if(lv_obj_get_child(cont, 0) == NULL) {
-        lv_memzero(calc_out, sizeof(lv_grid_calc_t));
         return LV_RESULT_INVALID;
     }
 
@@ -281,12 +285,19 @@ static lv_result_t calc_cols(lv_obj_t * cont, lv_grid_calc_t * c)
 
     const int32_t * col_templ;
     col_templ = get_col_dsc(cont);
+
+    /*If there is no descriptor check if it's a subgrid*/
     bool subgrid = false;
     if(col_templ == NULL) {
         lv_obj_t * parent = lv_obj_get_parent(cont);
+        if(parent == NULL) {
+            LV_LOG_WARN("No column descriptor, and there is no parent for a screen to process subgrid");
+            return LV_RESULT_INVALID;
+        }
+
         col_templ = get_col_dsc(parent);
         if(col_templ == NULL) {
-            LV_LOG_WARN("No col descriptor found even on the parent");
+            LV_LOG_WARN("No column descriptor found even on the parent");
             return LV_RESULT_INVALID;
         }
 
@@ -374,9 +385,16 @@ static lv_result_t calc_rows(lv_obj_t * cont, lv_grid_calc_t * c)
 {
     const int32_t * row_templ;
     row_templ = get_row_dsc(cont);
+
+    /*If there is no descriptor check if it's a subgrid*/
     bool subgrid = false;
     if(row_templ == NULL) {
         lv_obj_t * parent = lv_obj_get_parent(cont);
+        if(parent == NULL) {
+            LV_LOG_WARN("No row descriptor, and there is no parent for a screen to process subgrid");
+            return LV_RESULT_INVALID;
+        }
+
         row_templ = get_row_dsc(parent);
         if(row_templ == NULL) {
             LV_LOG_WARN("No row descriptor found even on the parent");
@@ -470,18 +488,70 @@ static lv_result_t calc_rows(lv_obj_t * cont, lv_grid_calc_t * c)
 static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * hint)
 {
     if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) return;
-    uint32_t col_span = get_col_span(item);
-    uint32_t row_span = get_row_span(item);
-    if(row_span == 0 || col_span == 0) return;
 
-    uint32_t col_pos = get_col_pos(item);
-    uint32_t row_pos = get_row_pos(item);
+    int32_t col_span = get_col_span(item);
+    if(col_span <= 0) {
+        LV_LOG_WARN("Column span was %" LV_PRId32 ", setting it to 1", col_span);
+        col_span = 1;
+    }
+
+    int32_t row_span = get_row_span(item);
+    if(row_span <= 0) {
+        LV_LOG_WARN("Row span was %" LV_PRId32 ", setting it to 1", row_span);
+        row_span = 1;
+    }
+
+    bool rev = lv_obj_get_style_base_dir(lv_obj_get_parent(item), LV_PART_MAIN) == LV_BASE_DIR_RTL;
+
+    int32_t col_pos = get_col_pos(item);
+    if(col_pos < 0) {
+        LV_LOG_WARN("Column position was %" LV_PRId32 ", setting it to 0", col_pos);
+        col_pos = 0;
+    }
+
+    if(col_pos >= (int32_t)c->col_num) {
+        LV_LOG_WARN("Column position was %" LV_PRId32 ", setting to %" LV_PRId32, col_pos, c->col_num - 1);
+        col_pos = c->col_num - 1;
+    }
+
+    int32_t row_pos = get_row_pos(item);
+    if(row_pos < 0) {
+        LV_LOG_WARN("Row position was %" LV_PRId32 ", setting it to 0", row_pos);
+        row_pos = 0;
+    }
+
+    if(row_pos >= (int32_t)c->row_num) {
+        LV_LOG_WARN("Row position was %" LV_PRId32 ", setting to %" LV_PRId32, row_pos, c->row_num - 1);
+        row_pos = c->row_num - 1;
+    }
+
+    if(col_pos + col_span > (int32_t)c->col_num) {
+        col_span = c->col_num - col_pos;
+        LV_LOG_WARN("Column span is too large, limiting it to %" LV_PRId32, col_span);
+    }
+
+    if(row_pos + row_span > (int32_t)c->row_num) {
+        row_span = c->row_num - row_pos;
+        LV_LOG_WARN("Row span is too large, limiting it to %" LV_PRId32, row_span);
+    }
+
     lv_grid_align_t col_align = get_cell_col_align(item);
     lv_grid_align_t row_align = get_cell_row_align(item);
 
-    int32_t col_x1 = c->x[col_pos];
-    int32_t col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];
-    int32_t col_w = col_x2 - col_x1;
+    int32_t col_x1 = 0;
+    int32_t col_x2 = 0;
+    int32_t col_w = 0;
+
+    if(rev && col_span > 1) {
+        col_x1 = c->x[col_pos + col_span - 1];
+        col_x2 = c->x[col_pos] + c->w[col_pos];
+        col_w = col_x2 - col_x1;
+    }
+    else {
+        col_x1 = c->x[col_pos];
+        col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];
+        col_w = col_x2 - col_x1;
+    }
 
     int32_t row_y1 = c->y[row_pos];
     int32_t row_y2 = c->y[row_pos + row_span - 1] + c->h[row_pos + row_span - 1];
@@ -497,6 +567,8 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
     int32_t y;
     int32_t item_w = lv_area_get_width(&item->coords);
     int32_t item_h = lv_area_get_height(&item->coords);
+
+    col_pos = rev && col_span > 1 ? col_pos + col_span - 1 : col_pos;
 
     switch(col_align) {
         default:

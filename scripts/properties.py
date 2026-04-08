@@ -6,19 +6,31 @@ from collections import defaultdict
 
 
 style_properties_type = {
+    "LV_STYLE_ANIM": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_ARC_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_ARC_IMAGE_SRC": "LV_PROPERTY_TYPE_IMGSRC",
     "LV_STYLE_BG_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_BG_GRAD": "LV_PROPERTY_TYPE_POINTER",
     "LV_STYLE_BG_GRAD_COLOR": "LV_PROPERTY_TYPE_COLOR",
-    "LV_STYLE_BG_IMAGE_SRC": "LV_PROPERTY_TYPE_IMGSRC",
     "LV_STYLE_BG_IMAGE_RECOLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_BG_IMAGE_SRC": "LV_PROPERTY_TYPE_IMGSRC",
+    "LV_STYLE_BITMAP_MASK_SRC": "LV_PROPERTY_TYPE_POINTER",
     "LV_STYLE_BORDER_COLOR": "LV_PROPERTY_TYPE_COLOR",
-    "LV_STYLE_OUTLINE_COLOR": "LV_PROPERTY_TYPE_COLOR",
-    "LV_STYLE_SHADOW_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_COLOR_FILTER_DSC": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_GRID_COLUMN_DSC_ARRAY": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_GRID_ROW_DSC_ARRAY": "LV_PROPERTY_TYPE_POINTER",
     "LV_STYLE_IMAGE_RECOLOR": "LV_PROPERTY_TYPE_COLOR",
-    "LV_STYLE_ARCH_IMAGE_SRC": "LV_PROPERTY_TYPE_IMGSRC",
-    "LV_STYLE_ARCH_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_LAST_BUILT_IN_PROP": "LV_PROPERTY_TYPE_INVALID",
+    "LV_STYLE_LINE_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_OUTLINE_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_PROP_INV": "LV_PROPERTY_TYPE_INVALID",
+    "LV_STYLE_RECOLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_SHADOW_COLOR": "LV_PROPERTY_TYPE_COLOR",
     "LV_STYLE_TEXT_COLOR": "LV_PROPERTY_TYPE_COLOR",
     "LV_STYLE_TEXT_FONT": "LV_PROPERTY_TYPE_FONT",
-    "LV_STYLE_LINE_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_TEXT_OUTLINE_STROKE_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_TRANSITION": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_DROP_SHADOW_COLOR": "LV_PROPERTY_TYPE_COLOR",
 }
 
 
@@ -57,16 +69,35 @@ def read_widget_properties(directory):
                         id)
 
     def match_styles(file_path):
-        pattern = r'^\s+LV_STYLE_(\w+)\s*=\s*(\d+),'
+        pattern_with_value = r'^\s+LV_STYLE_(\w+)\s*=\s*(\d+),'
+        pattern_name_only = r'^\s+LV_STYLE_(\w+)\s*,'
+        last_value = 0
+        process = False
         with open(file_path, 'r', encoding='utf-8') as file:
             for line in file.readlines():
-                match = re.match(pattern, line)
+                if re.match("enum _lv_style_id_t", line):
+                    process = True
+                    continue
+
+                if process and re.match("};", line):
+                    return
+
+                if process == False: continue
+                match = re.match(pattern_with_value, line)
+                name = ""
                 if match:
                     name = match.group(1).upper()
+                    last_value = int(match.group(2))
+                else:
+                    match = re.match(pattern_name_only, line)
+                    if match:
+                        name = match.group(1).upper()
+                        last_value += 1
+                if name:
                     id = f"LV_PROPERTY_STYLE_{name}"
                     yield Property("style",
                                    match.group(1).lower(), "style",
-                                   match.group(2), id)
+                                   last_value, id)
 
     properties_by_widget = defaultdict(list)
     for file_path in find_headers(directory):

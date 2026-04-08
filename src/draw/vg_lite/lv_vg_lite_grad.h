@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
 

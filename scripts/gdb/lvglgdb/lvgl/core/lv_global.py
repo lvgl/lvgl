@@ -50,17 +50,54 @@ class LVGL:
         return disp.act_scr if disp else None
 
     def draw_units(self):
-        unit = self.lv_global.draw_info.unit_head
+        from ..draw.lv_draw_unit import LVDrawUnit
 
-        # Iterate through all draw units
-        while unit:
-            yield unit
-            unit = unit.next
+        head = self.lv_global.draw_info.unit_head
+        if head:
+            yield from LVDrawUnit(head)
 
     def image_cache(self):
         from ..misc.lv_image_cache import LVImageCache
 
         return LVImageCache(self.lv_global.img_cache)
+
+    def anims(self):
+        from ..misc.lv_anim import LVAnim
+
+        for anim in LVList(self.lv_global.anim_state.anim_ll, "lv_anim_t"):
+            yield LVAnim(anim)
+
+    def timers(self):
+        from ..misc.lv_timer import LVTimer
+
+        for timer in LVList(self.lv_global.timer_state.timer_ll, "lv_timer_t"):
+            yield LVTimer(timer)
+
+    def groups(self):
+        from .lv_group import LVGroup
+
+        for group in LVList(self.lv_global.group_ll, "lv_group_t"):
+            yield LVGroup(group)
+
+    def indevs(self):
+        from .lv_indev import LVIndev
+
+        for indev in LVList(self.lv_global.indev_ll, "lv_indev_t"):
+            yield LVIndev(indev)
+
+    def image_decoders(self):
+        from ..misc.lv_image_decoder import LVImageDecoder
+
+        for dec in LVList(self.lv_global.img_decoder_ll, "lv_image_decoder_t"):
+            yield LVImageDecoder(dec)
+
+    def fs_drivers(self):
+        from ..misc.lv_fs import LVFsDrv
+
+        # fsdrv_ll stores lv_fs_drv_t* pointers (not inline structs)
+        pp_type = gdb.lookup_type("lv_fs_drv_t").pointer().pointer()
+        for drv_pp in LVList(self.lv_global.fsdrv_ll, pp_type):
+            yield LVFsDrv(drv_pp.dereference())
 
     def image_header_cache(self):
         from ..misc.lv_image_header_cache import LVImageHeaderCache

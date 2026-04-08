@@ -64,7 +64,11 @@ def parse_defaults(path: str):
         for line in file.readlines():
             if len(line.strip()) == 0 or line.startswith('#'):
                 continue
-            groups = re.search(r'([A-Z0-9_]+)\s+(.+)', line).groups()
+            search_result = re.search(r'([A-Z0-9_]+)\s+(.+)', line)
+            if not search_result:
+                print(f"WARNING: Ignoring line {line}")
+                continue
+            groups = search_result.groups()
             defaults[groups[0]] = groups[1]
 
     return defaults
@@ -78,17 +82,15 @@ def generate_config(path_destination: str, path_source: str, defaults: dict):
     dst_lines = []
 
     for src_line in src_lines:
-        res = re.search(r'#define\s+([A-Z0-9_]+)\s+(.+)', src_line)
+        res = re.search(r'#define\s+([A-Z0-9_]+)', src_line)
         key = res.groups()[0] if res else None
 
         if key in defaults.keys():
             value = defaults[key]
-            pattern = r'(#define\s+[A-Z0-9_]+\s+)(.+)'
-            repl = r'\g<1>' + value
+            pattern = r'(#define\s+[A-Z0-9_]+[^\S\r\n]*)[^\n]*'
+            has_space = re.search(pattern, src_line).groups()[0][-1].isspace()
+            repl = r'\g<1>' + value if has_space else r'\g<1> ' + value
             dst_line, _ = re.subn(pattern, repl, src_line)
-
-            if not dst_line:
-                fatal(f"Failed to apply key '{key}' to line '{src_line}'")
 
             print(f"Applying: {key} = {value}")
             keys_used.add(key)

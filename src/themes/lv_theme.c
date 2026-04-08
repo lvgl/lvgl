@@ -8,6 +8,7 @@
  *********************/
 #include "lv_theme_private.h"
 #include "../core/lv_obj_private.h"
+#include "../core/lv_obj_style_private.h"
 #include "../core/lv_obj_class_private.h"
 #include "../../lvgl.h"
 
@@ -43,6 +44,26 @@ lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj)
     return lv_display_get_theme(disp);
 }
 
+lv_theme_t * lv_theme_create(void)
+{
+    lv_theme_t * theme = lv_zalloc(sizeof(*theme));
+    LV_ASSERT_MALLOC(theme);
+    return theme;
+}
+void lv_theme_delete(lv_theme_t * theme)
+{
+    lv_free(theme);
+}
+
+void lv_theme_copy(lv_theme_t * dst, const lv_theme_t * src)
+{
+    if(!dst || !src) {
+        LV_LOG_WARN("Refusing to copy null themes");
+        return;
+    }
+    lv_memcpy(dst, src, sizeof(*src));
+}
+
 void lv_theme_apply(lv_obj_t * obj)
 {
     lv_theme_t * th = lv_theme_get_from_obj(obj);
@@ -53,9 +74,9 @@ void lv_theme_apply(lv_obj_t * obj)
     apply_theme_recursion(th, obj);    /*Apply the theme including the base theme(s)*/
 }
 
-void lv_theme_set_parent(lv_theme_t * new_theme, lv_theme_t * base)
+void lv_theme_set_parent(lv_theme_t * theme, lv_theme_t * parent)
 {
-    new_theme->parent = base;
+    theme->parent = parent;
 }
 
 void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb)
@@ -93,6 +114,19 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
     return th ? th->color_secondary : lv_palette_main(LV_PALETTE_BLUE);
 }
 
+#if LV_USE_EXT_DATA
+void lv_theme_set_external_data(lv_theme_t * theme, void * data, void (* free_cb)(void * data))
+{
+    if(!theme) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL theme");
+        return;
+    }
+
+    theme->ext_data.data = data;
+    theme->ext_data.free_cb = free_cb;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -100,7 +134,12 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
 static void apply_theme(lv_theme_t * th, lv_obj_t * obj)
 {
     if(th->parent) apply_theme(th->parent, obj);
-    if(th->apply_cb) th->apply_cb(th, obj);
+    if(th->apply_cb) {
+        th->apply_cb(th, obj);
+        for(uint32_t i = 0; i < obj->style_cnt; i++) {
+            obj->styles[i].is_theme = 1;
+        }
+    }
 }
 
 static void apply_theme_recursion(lv_theme_t * th, lv_obj_t * obj)

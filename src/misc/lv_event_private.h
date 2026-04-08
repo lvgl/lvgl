@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "lv_ext_data.h"
 #include "lv_event.h"
 
 /*********************
@@ -25,6 +26,9 @@ extern "C" {
  **********************/
 
 struct _lv_event_dsc_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     lv_event_cb_t cb;
     void * user_data;
     uint32_t filter;
@@ -41,6 +45,9 @@ struct _lv_event_t {
     uint8_t stop_processing : 1;
     uint8_t stop_bubbling : 1;
     uint8_t stop_trickling : 1;
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
 };
 
 

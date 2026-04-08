@@ -114,6 +114,8 @@ void test_style_replacement(void)
     TEST_ASSERT_EQUAL(false, replaced);
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0x0000ff), lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
 
+    lv_obj_delete(obj);
+
     lv_style_reset(&style_red);
     lv_style_reset(&style_blue);
 }
@@ -206,7 +208,8 @@ void test_style_has_prop(void)
     lv_style_set_outline_color(&style, lv_color_white());
 
     /*Create object with style*/
-    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_t * obj =
+        lv_obj_create(lv_screen_active());
 
     TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_COLOR));
     TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_WIDTH));
@@ -219,7 +222,31 @@ void test_style_has_prop(void)
     TEST_ASSERT_EQUAL(true, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_WIDTH));
     TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_INDICATOR, LV_STYLE_OUTLINE_COLOR));
 
+    lv_obj_delete(obj);
     lv_style_reset(&style);
+}
+
+void test_style_remove_theme(void)
+{
+    lv_obj_t * sw = lv_switch_create(lv_screen_active());
+    lv_obj_set_size(sw, 100, 50);
+    lv_obj_set_style_bg_color(sw, lv_color_hex(0xff0000), LV_PART_KNOB);
+
+    TEST_ASSERT_NOT_EQUAL(0, lv_obj_get_style_bg_opa(sw, LV_PART_KNOB));
+
+    lv_obj_remove_theme(sw, LV_PART_KNOB);
+
+    lv_obj_update_layout(sw);
+
+    /*Local style props are kept on main*/
+    TEST_ASSERT_EQUAL(100, lv_obj_get_width(sw));
+    TEST_ASSERT_EQUAL(50, lv_obj_get_height(sw));
+
+    /*Local style is kept on the knob*/
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(sw, LV_PART_KNOB));
+
+    /*Bg. opa is back to the default 0*/
+    TEST_ASSERT_EQUAL(0, lv_obj_get_style_bg_opa(sw, LV_PART_KNOB));
 }
 
 #endif

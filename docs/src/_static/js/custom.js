@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   <div class="page">
     ...page content...
    *---------------------------------------------------------------------*/
-  let bannerJsonUrl = "https://lvgl.io/data/banner.json";
+  let bannerJsonUrl = "https://static.lvgl.io/data/banner.json";
   let bannerContainerClass = "lv-custom-banner-list";
   let bannerClass = "lv-custom-banner";
   /* Note:  banner priority property can have only one of these values:

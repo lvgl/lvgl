@@ -3,6 +3,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.cpp)
 
 idf_build_get_property(LV_MICROPYTHON LV_MICROPYTHON)
+idf_build_get_property(target IDF_TARGET)
 
 if(LV_MICROPYTHON)
   idf_component_register(
@@ -18,6 +19,10 @@ else()
   if(CONFIG_LV_BUILD_EXAMPLES)
     file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
     set_source_files_properties(${EXAMPLE_SOURCES} COMPILE_FLAGS "-Wno-unused-variable -Wno-format")
+  endif()
+
+  if(CONFIG_LV_BUILD_DEMOS)
+    list(APPEND DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/lv_demos.c)
   endif()
 
   if(CONFIG_LV_USE_DEMO_WIDGETS)
@@ -36,10 +41,6 @@ else()
     file(GLOB_RECURSE DEMO_STRESS_SOURCES ${LVGL_ROOT_DIR}/demos/stress/*.c)
     list(APPEND DEMO_SOURCES ${DEMO_STRESS_SOURCES})
   endif()
-  if(CONFIG_LV_USE_DEMO_TRANSFORM)
-    file(GLOB_RECURSE DEMO_TRANSFORM_SOURCES ${LVGL_ROOT_DIR}/demos/transform/*.c)
-    list(APPEND DEMO_SOURCES ${DEMO_TRANSFORM_SOURCES})
-  endif()
   if(CONFIG_LV_USE_DEMO_MULTILANG)
     file(GLOB_RECURSE DEMO_MULTILANG_SOURCES ${LVGL_ROOT_DIR}/demos/multilang/*.c)
     list(APPEND DEMO_SOURCES ${DEMO_MULTILANG_SOURCES})
@@ -54,10 +55,14 @@ else()
     set_source_files_properties(${DEMO_MUSIC_SOURCES} COMPILE_FLAGS "-Wno-format")
   endif()
 
-  if(CONFIG_LV_USE_PPA)
-    set(IDF_COMPONENTS esp_driver_ppa esp_mm esp_timer log)
-  else()
-    set(IDF_COMPONENTS esp_timer log)
+  set(IDF_COMPONENTS esp_timer log)
+
+  if(${target} STREQUAL "esp32p4")
+    list(APPEND IDF_COMPONENTS esp_driver_ppa esp_mm)
+  endif()
+
+  if(CONFIG_LV_USE_FS_FATFS)
+    list(APPEND IDF_COMPONENTS fatfs)
   endif()
 
   idf_component_register(SRCS ${SOURCES} ${EXAMPLE_SOURCES} ${DEMO_SOURCES}

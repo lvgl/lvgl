@@ -1,3 +1,6 @@
+.. example_heading: GIF
+
+
 Open a GIF image from file and variable
 ---------------------------------------
 

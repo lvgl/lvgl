@@ -242,7 +242,7 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
     draw_buf->handlers = &default_handlers;
     draw_buf->data_size = data_size;
     if(lv_draw_buf_align(data, cf) != draw_buf->unaligned_data) {
-        LV_LOG_WARN("Data is not aligned, ignored");
+        LV_LOG_INFO("Data is not aligned, ignored");
     }
     return LV_RESULT_OK;
 }
@@ -305,8 +305,7 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
         return NULL;
     }
 
-    new_buf->header.flags = draw_buf->header.flags;
-    new_buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+    lv_draw_buf_set_flag(new_buf, draw_buf->header.flags | LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED);
 
     /*Choose the smaller size to copy*/
     uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);
@@ -349,8 +348,7 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
     LV_ASSERT_NULL(draw_buf);
     if(draw_buf == NULL) return;
     LV_PROFILER_DRAW_BEGIN;
-
-    if(draw_buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
+    if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_ALLOCATED)) {
         LV_ASSERT_NULL(draw_buf->handlers);
 
         const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
@@ -472,19 +470,32 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
     LV_ASSERT_NULL(draw_buf);
     if(draw_buf == NULL) return LV_RESULT_INVALID;
 
-    if(draw_buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) return LV_RESULT_INVALID;
-    if((draw_buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) == 0) {
+    if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED)) return LV_RESULT_INVALID;
+
+    if(!lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_MODIFIABLE)) {
         LV_LOG_WARN("draw buf is not modifiable: 0x%04x", draw_buf->header.flags);
         return LV_RESULT_INVALID;
     }
+
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_buf_convert_premultiply(draw_buf);
+    lv_result_t res = lv_draw_buf_convert_premultiply(draw_buf);
+    if(res == LV_RESULT_OK) {
+        lv_area_t area = {0, 0, draw_buf->header.w - 1, draw_buf->header.h - 1};
+        if(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
+            /**
+             * We only need to flush the palette table, so we set y2 equal to y1 to improve performance
+             * and reduce cache flush overhead.
+             */
+            area.y2 = 0;
+        }
 
-    draw_buf->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
+        lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+        lv_draw_buf_flush_cache(draw_buf, &area);
+    }
 
     LV_PROFILER_DRAW_END;
-    return LV_RESULT_OK;
+    return res;
 }
 
 void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color)
@@ -499,21 +510,6 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
 
     lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
     palette[index] = color;
-}
-
-bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    return draw_buf->header.flags & flag;
-}
-
-void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    draw_buf->header.flags |= flag;
-}
-
-void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    draw_buf->header.flags &= ~flag;
 }
 
 lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)

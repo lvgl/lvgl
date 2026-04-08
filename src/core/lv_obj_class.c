@@ -88,14 +88,15 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     else {
         LV_TRACE_OBJ_CREATE("creating normal object");
         LV_ASSERT_OBJ(parent, MY_CLASS);
-        if(parent->spec_attr == NULL) {
-            lv_obj_allocate_spec_attr(parent);
-        }
 
-        parent->spec_attr->child_cnt++;
-        parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
-                                                 sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
-        parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
+        if(!lv_obj_allocate_spec_attr(parent)) {
+            lv_free(obj);
+            return NULL;
+        }
+        if(lv_obj_add_child(parent, obj) != LV_RESULT_OK) {
+            lv_free(obj);
+            return NULL;
+        }
     }
 
     return obj;
@@ -135,6 +136,13 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
 
 void lv_obj_destruct(lv_obj_t * obj)
 {
+#if LV_USE_EXT_DATA
+    if(obj->ext_data.free_cb) {
+        obj->ext_data.free_cb(obj->ext_data.data);
+        obj->ext_data.data = NULL;
+    }
+#endif
+
     if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj->class_p, obj);
 
     if(obj->class_p->base_class) {
@@ -170,13 +178,34 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
     return class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_TRUE;
 }
 
+#if LV_USE_EXT_DATA
+void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void * data))
+{
+    if(!obj) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL object");
+        return;
+    }
+
+    obj->ext_data.data = data;
+    obj->ext_data.free_cb = free_cb;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(class_p->name);
+    if(LV_USE_OBJ_NAME) {
+        LV_ASSERT_NULL(class_p->name);
+    }
+
+#if LV_USE_EXT_DATA
+    obj->ext_data.free_cb = NULL;
+    obj->ext_data.data = NULL;
+#endif
+
     if(obj->class_p->base_class) {
         const lv_obj_class_t * original_class_p = obj->class_p;
 
