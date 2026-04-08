@@ -27,27 +27,37 @@
  * HELPER FUNCTIONS
  **********************/
 
-void lv_draw_eve5_set_scissor(lv_draw_eve5_unit_t *u, const lv_area_t *clip, const lv_area_t *layer_area)
+void lv_draw_eve5_set_scissor(lv_draw_eve5_unit_t * u, const lv_area_t * clip, const lv_area_t * layer_area)
 {
     int32_t x = clip->x1 - layer_area->x1;
     int32_t y = clip->y1 - layer_area->y1;
     int32_t w = lv_area_get_width(clip);
     int32_t h = lv_area_get_height(clip);
 
-    if(x < 0) { w += x; x = 0; }
-    if(y < 0) { h += y; y = 0; }
-    if(w <= 0 || h <= 0) { w = 0; h = 0; }
+    if(x < 0) {
+        w += x;
+        x = 0;
+    }
+    if(y < 0) {
+        h += y;
+        y = 0;
+    }
+    if(w <= 0 || h <= 0) {
+        w = 0;
+        h = 0;
+    }
 
     EVE_CoDl_scissorXY(u->hal, x, y);
     EVE_CoDl_scissorSize(u->hal, w, h);
 }
 
-void lv_draw_eve5_clear_stencil(lv_draw_eve5_unit_t *u,
-                                 int32_t x1, int32_t y1, int32_t x2, int32_t y2,
-                                 const lv_area_t *clip, const lv_area_t *layer_area)
+void lv_draw_eve5_clear_stencil(lv_draw_eve5_unit_t * u,
+                                int32_t x1, int32_t y1, int32_t x2, int32_t y2,
+                                const lv_area_t * clip, const lv_area_t * layer_area)
 {
     lv_area_t bbox = { x1 + layer_area->x1, y1 + layer_area->y1,
-                       x2 + layer_area->x1, y2 + layer_area->y1 };
+                       x2 + layer_area->x1, y2 + layer_area->y1
+                     };
     lv_area_t clear_area;
     if(!lv_area_intersect(&clear_area, &bbox, clip)) return;
     lv_draw_eve5_set_scissor(u, &clear_area, layer_area);
@@ -61,7 +71,7 @@ void lv_draw_eve5_clear_stencil(lv_draw_eve5_unit_t *u,
  * Map LVGL color format to EVE render target format and bytes per pixel.
  * Returns true if the format is directly supported.
  */
-bool lv_draw_eve5_get_render_target_format(lv_color_format_t lv_cf, uint16_t *eve_fmt, uint8_t *bpp)
+bool lv_draw_eve5_get_render_target_format(lv_color_format_t lv_cf, uint16_t * eve_fmt, uint8_t * bpp)
 {
     switch(lv_cf) {
         case LV_COLOR_FORMAT_RGB565:
@@ -114,9 +124,9 @@ bool lv_draw_eve5_get_render_target_format(lv_color_format_t lv_cf, uint16_t *ev
  * VRAM CALLBACKS
  **********************/
 
-static bool eve5_vram_alloc_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 {
-    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
 
     uint32_t w = buf->header.w;
     uint32_t h = buf->header.h;
@@ -150,7 +160,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
         return false;
     }
 
-    lv_eve5_vram_res_t *vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
+    lv_eve5_vram_res_t * vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
         Esd_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
@@ -180,10 +190,10 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
     return true;
 }
 
-static void eve5_vram_free_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+static void eve5_vram_free_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 {
-    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
-    lv_eve5_vram_res_t *vr = (lv_eve5_vram_res_t *)buf->vram_res;
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
 
     if(vr == NULL) return;
 
@@ -204,7 +214,7 @@ static void eve5_vram_free_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
     buf->vram_res = NULL;
 }
 
-static bool eve5_vram_upload_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 {
     /* Non-ALLOCATED buffers with no data are render target placeholders; just allocate VRAM.
      * Image descriptors (handlers == NULL) also lack ALLOCATED but have data to upload. */
@@ -218,8 +228,8 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
        && !LV_COLOR_FORMAT_IS_INDEXED(buf->header.cf)) {
         if(!eve5_vram_alloc_cb(draw_unit, buf)) return false;
 
-        lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
-        lv_eve5_vram_res_t *vr = (lv_eve5_vram_res_t *)buf->vram_res;
+        lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+        lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
 
 #if LV_USE_OS
         lv_eve5_hal_lock(lv_display_get_default());
@@ -237,7 +247,7 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
         if(cpu_stride == 0) cpu_stride = lv_draw_buf_width_to_stride(buf->header.w, buf->header.cf);
         uint32_t gpu_stride = vr->stride;
         uint32_t row_bytes = LV_MIN(cpu_stride, gpu_stride);
-        uint8_t *src = buf->data;
+        uint8_t * src = buf->data;
 
         if(src != NULL) {
             if(gpu_stride == row_bytes) {
@@ -247,7 +257,7 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
             }
             else {
                 /* GPU stride wider than source — zero-pad each row */
-                uint8_t *row_buf = lv_malloc(gpu_stride);
+                uint8_t * row_buf = lv_malloc(gpu_stride);
                 if(row_buf != NULL) {
                     for(int32_t y = 0; y < buf->header.h; y++) {
                         lv_memzero(row_buf, gpu_stride);
@@ -263,7 +273,7 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
                 }
             }
             vr->is_premultiplied = lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED)
-                                 || buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+                                   || buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
             vr->has_content = true;
         }
 
@@ -276,13 +286,13 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
     /* Read-only image data: upload with image alignment.
      * upload_image_to_gpu checks existing vram_res, uploads if needed,
      * and attaches vram_res directly to the image descriptor. */
-    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
 
 #if LV_USE_OS
     lv_eve5_hal_lock(lv_display_get_default());
 #endif
 
-    lv_eve5_vram_res_t *vr = lv_draw_eve5_upload_image_to_gpu(u, (LV_IMAGE_DSC_CONST lv_image_dsc_t *)buf);
+    lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu(u, (LV_IMAGE_DSC_CONST lv_image_dsc_t *)buf);
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(lv_display_get_default());
@@ -291,10 +301,10 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
     return vr != NULL;
 }
 
-static bool eve5_vram_download_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+static bool eve5_vram_download_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 {
-    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
-    lv_eve5_vram_res_t *vr = (lv_eve5_vram_res_t *)buf->vram_res;
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
 
     if(vr == NULL || buf->data == NULL) return false;
 
@@ -315,17 +325,17 @@ static bool eve5_vram_download_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
     return ok;
 }
 
-static bool eve5_vram_check_cb(lv_draw_unit_t *draw_unit, lv_draw_buf_t *buf)
+static bool eve5_vram_check_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 {
-    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
-    lv_eve5_vram_res_t *vr = (lv_eve5_vram_res_t *)buf->vram_res;
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
 
     if(vr == NULL) return false;
 
     return Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID;
 }
 
-void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t *u)
+void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
 {
     u->base_unit.vram_alloc_cb    = eve5_vram_alloc_cb;
     u->base_unit.vram_free_cb     = eve5_vram_free_cb;
@@ -338,9 +348,9 @@ void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t *u)
  * LAYER MANAGEMENT
  **********************/
 
-void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
-                                  bool is_screen,
-                                  const lv_draw_eve5_slice_t *slice)
+void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                 bool is_screen,
+                                 const lv_draw_eve5_slice_t * slice)
 {
     uint32_t ram_g_addr = GA_INVALID;
     bool existing_has_content = false;
@@ -375,7 +385,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
 #endif
     }
 
-    lv_eve5_vram_res_t *vr = eve5_get_vram_res(layer);
+    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
     if(vr != NULL) {
         /* Reallocate if format or dimensions don't match current layer needs.
          * Format mismatch: e.g., display buffer format vs render target format.
@@ -386,8 +396,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
          * Any reallocation is an implicit discard (has_content = false). */
         uint32_t needed_stride = (uint32_t)aligned_w * target_bpp;
         bool realloc_needed = (vr->eve_format != target_eve_fmt)
-                           || (vr->stride < needed_stride)
-                           || (vr->stride * (uint32_t)aligned_h > vr->base.size);
+                              || (vr->stride < needed_stride)
+                              || (vr->stride * (uint32_t)aligned_h > vr->base.size);
         if(realloc_needed) {
             uint32_t needed_size = needed_stride * (uint32_t)aligned_h;
             /* PendingFree: previous buffer may be referenced by a prior frame's compositing DL */
@@ -405,9 +415,9 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
         if(ram_g_addr != GA_INVALID) {
             aligned_w = vr->stride / target_bpp;
             if(layer->draw_buf && lv_draw_buf_has_flag(layer->draw_buf,
-                    LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE)) {
+                                                       LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE)) {
                 lv_draw_buf_clear_flag(layer->draw_buf,
-                    LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
+                                       LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE);
                 vr->has_content = false;
             }
             if(vr->has_content) {
@@ -585,7 +595,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
         if(is_screen) {
             /* EVE_CoDl_clearColorRgb(u->hal, 0, 128, 0); */ /* TEST COLOR */
             EVE_CoDl_clearColorA(u->hal, 255);
-        } else {
+        }
+        else {
             /* EVE_CoDl_clearColorRgb(u->hal, 0, 0, 128); */ /* TEST COLOR */
             EVE_CoDl_clearColorA(u->hal, 0);
         }
@@ -599,11 +610,11 @@ canvas_cleared:
     EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 }
 
-void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
-                                    bool is_screen, int rendered_count)
+void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                   bool is_screen, int rendered_count)
 {
     {
-        lv_eve5_vram_res_t *finish_vr = eve5_get_vram_res(layer);
+        lv_eve5_vram_res_t * finish_vr = eve5_get_vram_res(layer);
         if(finish_vr != NULL) {
             /* Only update state when tasks actually rendered.
              * A discarded/fresh layer that ran zero tasks should retain
@@ -632,9 +643,9 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
  * Allocate L8 texture and start DL cycle for alpha rendering.
  * Returns GpuHandle (GA_HANDLE_INVALID on failure).
  */
-Esd_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t *u,
-                                                      int32_t aligned_w, int32_t aligned_h,
-                                                      int32_t w, int32_t h)
+Esd_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
+                                                    int32_t aligned_w, int32_t aligned_h,
+                                                    int32_t w, int32_t h)
 {
     EVE_HalContext *phost = u->hal;
 
@@ -690,7 +701,7 @@ Esd_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t *u,
     return l8_handle;
 }
 
-void lv_draw_eve5_hal_finish_l8_rendertarget(lv_draw_eve5_unit_t *u)
+void lv_draw_eve5_hal_finish_l8_rendertarget(lv_draw_eve5_unit_t * u)
 {
     EVE_CoDl_display(u->hal);
     EVE_CoCmd_swap(u->hal);
@@ -704,9 +715,9 @@ void lv_draw_eve5_hal_finish_l8_rendertarget(lv_draw_eve5_unit_t *u)
  * Blit L8 luminance into the current ARGB8 layer's alpha channel.
  * BT820 L-format decodes as (R=255, G=255, B=255, A=L), so luminance is in alpha.
  */
-void lv_draw_eve5_hal_blit_l8_to_alpha(lv_draw_eve5_unit_t *u, uint32_t l8_addr,
-                                        int32_t aligned_w, int32_t aligned_h,
-                                        int32_t w, int32_t h)
+void lv_draw_eve5_hal_blit_l8_to_alpha(lv_draw_eve5_unit_t * u, uint32_t l8_addr,
+                                       int32_t aligned_w, int32_t aligned_h,
+                                       int32_t w, int32_t h)
 {
     EVE_HalContext *phost = u->hal;
 
@@ -737,10 +748,10 @@ void lv_draw_eve5_hal_blit_l8_to_alpha(lv_draw_eve5_unit_t *u, uint32_t l8_addr,
  * TEXTURE DRAWING (SW fallback compositing)
  **********************/
 
-Esd_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t *u,
-                                               const uint8_t *buf_data,
-                                               int32_t buf_w, int32_t buf_h,
-                                               uint32_t *out_stride)
+Esd_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u,
+                                              const uint8_t * buf_data,
+                                              int32_t buf_w, int32_t buf_h,
+                                              uint32_t * out_stride)
 {
     uint32_t eve_stride = ALIGN_UP(buf_w * 4, 4);
     uint32_t eve_size = eve_stride * buf_h;
@@ -758,7 +769,7 @@ Esd_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t *u,
         EVE_Hal_wrMem(u->hal, ram_g_addr, buf_data, eve_size);
     }
     else {
-        uint8_t *row_buf = lv_malloc(eve_stride);
+        uint8_t * row_buf = lv_malloc(eve_stride);
         if(row_buf != NULL) {
             for(int32_t y = 0; y < buf_h; y++) {
                 lv_memzero(row_buf, eve_stride);
@@ -783,14 +794,14 @@ Esd_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t *u,
     return handle;
 }
 
-void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t *u,
-                                    const lv_draw_task_t *t,
-                                    uint32_t ram_g_addr,
-                                    int32_t tex_w, int32_t tex_h,
-                                    uint32_t eve_stride,
-                                    const lv_area_t *draw_area)
+void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u,
+                                   const lv_draw_task_t * t,
+                                   uint32_t ram_g_addr,
+                                   int32_t tex_w, int32_t tex_h,
+                                   uint32_t eve_stride,
+                                   const lv_area_t * draw_area)
 {
-    lv_layer_t *layer = t->target_layer;
+    lv_layer_t * layer = t->target_layer;
 
     if(ram_g_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Invalid RAM_G address for texture draw");
@@ -815,7 +826,7 @@ void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t *u,
     EVE_CoDl_end(u->hal);
 }
 
-bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t *u, Esd_GpuHandle handle)
+bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t * u, Esd_GpuHandle handle)
 {
     return (Esd_GpuAlloc_Get(u->allocator, handle) != GA_INVALID);
 }
@@ -833,11 +844,11 @@ bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t *u, Esd_GpuHandle handle
  * premultiplied content requires RGB to scale with alpha to avoid white
  * fringing at partially masked edges.
  */
-void lv_draw_eve5_hal_draw_mask_rect(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_hal_draw_mask_rect(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
     EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_mask_rect_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    const lv_draw_mask_rect_dsc_t * dsc = t->draw_dsc;
 
     int32_t mask_x1 = dsc->area.x1 - layer->buf_area.x1;
     int32_t mask_y1 = dsc->area.y1 - layer->buf_area.y1;
@@ -863,7 +874,7 @@ void lv_draw_eve5_hal_draw_mask_rect(lv_draw_eve5_unit_t *u, const lv_draw_task_
     EVE_CoDl_stencilOp(phost, KEEP, INCR);
 
     lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2,
-                            dsc->radius, &t->clip_area, &layer->buf_area);
+                           dsc->radius, &t->clip_area, &layer->buf_area);
 
     /* Zero RGBA outside mask (stencil still 0).
      * blend(ZERO, ZERO): clears all channels (correct for premultiplied) */
@@ -893,15 +904,15 @@ void lv_draw_eve5_hal_draw_mask_rect(lv_draw_eve5_unit_t *u, const lv_draw_task_
  * masked content for compositing with blend(ONE, ONE_MINUS_SRC_ALPHA).
  * Caller clears bitmap_mask_src afterward to prevent double-application.
  */
-void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
-                                     const lv_draw_image_dsc_t *layer_dsc)
+void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                    const lv_draw_image_dsc_t * layer_dsc)
 {
     EVE_HalContext *phost = u->hal;
 
     int32_t layer_w = lv_area_get_width(&layer->buf_area);
     int32_t layer_h = lv_area_get_height(&layer->buf_area);
 
-    lv_eve5_vram_res_t *mask_img = lv_draw_eve5_resolve_to_gpu(u, layer_dsc->bitmap_mask_src);
+    lv_eve5_vram_res_t * mask_img = lv_draw_eve5_resolve_to_gpu(u, layer_dsc->bitmap_mask_src);
     if(!mask_img) {
         LV_LOG_WARN("EVE5: Failed to load bitmap mask for layer %p", (void *)layer);
         return;

@@ -41,11 +41,11 @@
  *                      use default blend mode with colorMask(1,1,1,1). The A channel
  *                      is scratch space in this mode.
  */
-void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb)
+void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
     EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_image_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_image_dsc_t * dsc = t->draw_dsc;
 
     uint32_t ram_g_addr;
     uint16_t eve_format;
@@ -57,11 +57,11 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
 
     /* Resolve bitmap source */
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-        lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
+        lv_layer_t * child_layer = (lv_layer_t *)dsc->src;
         src_w = lv_area_get_width(&child_layer->buf_area);
         src_h = lv_area_get_height(&child_layer->buf_area);
 
-        lv_eve5_vram_res_t *child_vr = eve5_get_vram_res(child_layer);
+        lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(child_layer);
         if(child_vr == NULL) {
             LV_LOG_WARN("EVE5: Child layer %p has no vram_res", (void *)child_layer);
             return;
@@ -87,7 +87,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         }
     }
     else {
-        lv_eve5_vram_res_t *img = lv_draw_eve5_resolve_to_gpu(u, dsc->src);
+        lv_eve5_vram_res_t * img = lv_draw_eve5_resolve_to_gpu(u, dsc->src);
         if(!img) return;
         eve5_vram_res_resolve(u->allocator, img, &ram_g_addr, &palette_addr);
         if(ram_g_addr == GA_INVALID) return;
@@ -106,7 +106,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     uint16_t mask_eve_format = L8;
     uint32_t mask_palette_addr = GA_INVALID;
     if(dsc->bitmap_mask_src != NULL) {
-        lv_eve5_vram_res_t *mask_img = lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src);
+        lv_eve5_vram_res_t * mask_img = lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src);
         if(mask_img) {
             eve5_vram_res_resolve(u->allocator, mask_img, &mask_ram_g_addr, &mask_palette_addr);
             if(mask_ram_g_addr != GA_INVALID) {
@@ -133,8 +133,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     bool is_layer = (t->type == LV_DRAW_TASK_TYPE_LAYER);
     bool is_premultiplied;
     if(is_layer) {
-        lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
-        lv_eve5_vram_res_t *pvr = eve5_get_vram_res(child_layer);
+        lv_layer_t * child_layer = (lv_layer_t *)dsc->src;
+        lv_eve5_vram_res_t * pvr = eve5_get_vram_res(child_layer);
         if(pvr != NULL) {
             is_premultiplied = pvr->is_premultiplied;
         }
@@ -146,14 +146,14 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         }
     }
     else if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
-        const lv_image_dsc_t *img_dsc = (const lv_image_dsc_t *)dsc->src;
-        lv_eve5_vram_res_t *ivr = eve5_get_image_vram_res(img_dsc);
+        const lv_image_dsc_t * img_dsc = (const lv_image_dsc_t *)dsc->src;
+        lv_eve5_vram_res_t * ivr = eve5_get_image_vram_res(img_dsc);
         if(ivr != NULL) {
             is_premultiplied = ivr->is_premultiplied;
         }
         else {
             is_premultiplied = (img_dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) != 0
-                            || img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+                               || img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
         }
     }
     else {
@@ -165,9 +165,9 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         if(dsc->recolor_opa > LV_OPA_MIN) {
             lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
             EVE_CoDl_colorRgb(u->hal,
-                (uint8_t)(mixed.red * opa / 255),
-                (uint8_t)(mixed.green * opa / 255),
-                (uint8_t)(mixed.blue * opa / 255));
+                              (uint8_t)(mixed.red * opa / 255),
+                              (uint8_t)(mixed.green * opa / 255),
+                              (uint8_t)(mixed.blue * opa / 255));
         }
         else {
             EVE_CoDl_colorRgb(u->hal, opa, opa, opa);
@@ -223,19 +223,19 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
         EVE_CoDl_blendFunc(phost, ONE, ZERO);
         lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
-                                &t->clip_area, &layer->buf_area);
+                               &t->clip_area, &layer->buf_area);
 
         /* Phase 1b: Write rounded rect mask (alpha=255 inside) */
         if(dsc->clip_radius > 0) {
             EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
             lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2,
-                                    dsc->clip_radius, &t->clip_area, &layer->buf_area);
+                                   dsc->clip_radius, &t->clip_area, &layer->buf_area);
         }
         else if((alpha_to_rgb || dsc->colorkey != NULL) && !has_bitmap_mask) {
             /* No clip or mask: fill bbox A=255 so phase 1c multiply works */
             EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
             lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
-                                    &t->clip_area, &layer->buf_area);
+                                   &t->clip_area, &layer->buf_area);
         }
 
         /* Phase 1b2: Apply bitmap mask */
@@ -303,8 +303,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
                     goto cleanup;
                 }
                 apply_image_skew(phost, &skew, bmp_filter,
-                    dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-                    dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
+                                 dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
+                                 dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
             }
             else {
                 EVE_CoCmd_loadIdentity(u->hal);
@@ -318,8 +318,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
                 EVE_CoCmd_translate(u->hal, -F16(dsc->pivot.x), -F16(dsc->pivot.y));
                 EVE_CoCmd_setMatrix(u->hal);
                 EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                    LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                    LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                                    LV_MIN(lv_area_get_width(&t->clip_area), 2048),
+                                    LV_MIN(lv_area_get_height(&t->clip_area), 2048));
             }
         }
 
@@ -416,9 +416,9 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
             /* Phase 2b: Add recolor*mix */
             EVE_CoDl_colorMask(phost, 1, 1, 1, 0);
             EVE_CoDl_colorRgb(phost,
-                (uint8_t)((uint32_t)dsc->recolor.red * mix / 255),
-                (uint8_t)((uint32_t)dsc->recolor.green * mix / 255),
-                (uint8_t)((uint32_t)dsc->recolor.blue * mix / 255));
+                              (uint8_t)((uint32_t)dsc->recolor.red * mix / 255),
+                              (uint8_t)((uint32_t)dsc->recolor.green * mix / 255),
+                              (uint8_t)((uint32_t)dsc->recolor.blue * mix / 255));
             EVE_CoDl_colorA(phost, 255);
             if(mix < LV_OPA_COVER || dsc->blend_mode == LV_BLEND_MODE_ADDITIVE)
                 EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE);
@@ -485,10 +485,10 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         EVE_CoDl_colorMask(phost, 0, 0, 0, 1);
         EVE_CoDl_blendFunc(phost, ONE, ZERO);
         lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
-                                &t->clip_area, &layer->buf_area);
+                               &t->clip_area, &layer->buf_area);
 
         EVE_CoDl_colorA(phost, (uint8_t)(mix < LV_OPA_COVER
-            ? ((uint32_t)mix * dsc->opa / 255) : dsc->opa));
+                                         ? ((uint32_t)mix * dsc->opa / 255) : dsc->opa));
         EVE_CoDl_begin(phost, BITMAPS);
         EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
         EVE_CoDl_end(phost);
@@ -501,7 +501,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         else
             EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
         lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2, 0,
-                                &t->clip_area, &layer->buf_area);
+                               &t->clip_area, &layer->buf_area);
 
         EVE_CoDl_restoreContext(phost);
 
@@ -511,8 +511,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
         /* Standard draw path: no clip radius, bitmap mask, or recolor */
         bool has_colorkey = (dsc->colorkey != NULL);
         bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
-                             || dsc->scale_y != LV_SCALE_NONE
-                             || dsc->skew_x != 0 || dsc->skew_y != 0);
+                              || dsc->scale_y != LV_SCALE_NONE
+                              || dsc->skew_x != 0 || dsc->skew_y != 0);
         bool has_skew = (dsc->skew_x != 0 || dsc->skew_y != 0);
 
         int32_t draw_vx, draw_vy;
@@ -544,8 +544,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
 
         if(has_skew) {
             apply_image_skew(phost, &skew, bmp_filter,
-                dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-                dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
+                             dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
+                             dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
         }
         else if(has_transform) {
             EVE_CoCmd_loadIdentity(u->hal);
@@ -560,8 +560,8 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
             EVE_CoCmd_setMatrix(u->hal);
             EVE_CoCmd_loadIdentity(u->hal);
             EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                                LV_MIN(lv_area_get_width(&t->clip_area), 2048),
+                                LV_MIN(lv_area_get_height(&t->clip_area), 2048));
         }
 
         if(has_colorkey) {
@@ -577,9 +577,9 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
                 if(dsc->recolor_opa > LV_OPA_MIN) {
                     lv_color_t mixed = lv_color_mix(dsc->recolor, lv_color_white(), dsc->recolor_opa);
                     EVE_CoDl_colorRgb(phost,
-                        (uint8_t)(mixed.red * opa / 255),
-                        (uint8_t)(mixed.green * opa / 255),
-                        (uint8_t)(mixed.blue * opa / 255));
+                                      (uint8_t)(mixed.red * opa / 255),
+                                      (uint8_t)(mixed.green * opa / 255),
+                                      (uint8_t)(mixed.blue * opa / 255));
                 }
                 else {
                     EVE_CoDl_colorRgb(phost, opa, opa, opa);

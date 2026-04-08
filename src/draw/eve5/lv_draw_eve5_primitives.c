@@ -22,7 +22,7 @@
 #if LV_USE_DRAW_EVE5
 
 #if !LV_DRAW_EVE5_NO_FLOAT
-#include <math.h>
+    #include <math.h>
 #endif
 #include "../lv_draw.h"
 #include "../lv_draw_rect.h"
@@ -33,12 +33,12 @@
  * STATIC PROTOTYPES
  **********************/
 
-void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t r16);
-bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
-                            lv_opa_t opa, int32_t w, int32_t h, bool alpha_to_rgb);
-static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t *dsc,
+void draw_circle_subpx(lv_draw_eve5_unit_t * u, int32_t cx2, int32_t cy2, int32_t r16);
+bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
+                           lv_opa_t opa, int32_t w, int32_t h, bool alpha_to_rgb);
+static bool draw_gradient_fill(lv_draw_eve5_unit_t * u, const lv_draw_fill_dsc_t * dsc,
                                int32_t x, int32_t y, int32_t w, int32_t h,
-                               int32_t radius, const lv_area_t *clip, const lv_area_t *layer_area,
+                               int32_t radius, const lv_area_t * clip, const lv_area_t * layer_area,
                                bool alpha_to_rgb);
 
 /**********************
@@ -51,7 +51,7 @@ static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t 
  * @param cy2 Center Y in 1/2 pixel units
  * @param r16 Radius in 1/16 pixel units
  */
-void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t r16)
+void draw_circle_subpx(lv_draw_eve5_unit_t * u, int32_t cx2, int32_t cy2, int32_t r16)
 {
     if(r16 <= 0) return;
 
@@ -61,8 +61,8 @@ void draw_circle_subpx(lv_draw_eve5_unit_t *u, int32_t cx2, int32_t cy2, int32_t
     EVE_CoDl_end(u->hal);
 }
 
-void lv_draw_eve5_draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int32_t x2, int32_t y2,
-                             int32_t radius, const lv_area_t *clip_area, const lv_area_t *layer_area)
+void lv_draw_eve5_draw_rect(lv_draw_eve5_unit_t * u, int32_t x1, int32_t y1, int32_t x2, int32_t y2,
+                            int32_t radius, const lv_area_t * clip_area, const lv_area_t * layer_area)
 {
     int32_t w = x2 - x1;
     int32_t h = y2 - y1;
@@ -101,7 +101,8 @@ void lv_draw_eve5_draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int3
             }
 
             lv_draw_eve5_set_scissor(u, &scissor_area, layer_area);
-        } else {
+        }
+        else {
             EVE_CoDl_scissorXY(u->hal, x1, y1);
             EVE_CoDl_scissorSize(u->hal, w, h);
         }
@@ -110,7 +111,8 @@ void lv_draw_eve5_draw_rect(lv_draw_eve5_unit_t *u, int32_t x1, int32_t y1, int3
         EVE_CoDl_vertex2f_0(u->hal, x1 - 2, y1 - 2);
         EVE_CoDl_vertex2f_0(u->hal, x2 + 2, y2 + 2);
         EVE_CoDl_end(u->hal);
-    } else {
+    }
+    else {
         EVE_CoDl_lineWidth(u->hal, radius * 16 + 8);
         EVE_CoDl_begin(u->hal, RECTS);
         EVE_CoDl_vertex2f_0(u->hal, x1 + radius, y1 + radius);
@@ -158,7 +160,7 @@ static inline uint32_t lerp_argb8(uint32_t c0, uint32_t c1, uint8_t t)
  *
  * Returns true if gradient was set up, false if not a supported type.
  */
-bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
+bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
                            lv_opa_t opa, int32_t w, int32_t h, bool alpha_to_rgb)
 {
     EVE_HalContext *phost = u->hal;
@@ -178,9 +180,9 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
     if(simple) {
         lv_color_t white = { .red = 255, .green = 255, .blue = 255 };
         uint32_t c0 = pack_argb8(alpha_to_rgb ? white : grad->stops[0].color,
-                                  LV_OPA_MIX2(opa, grad->stops[0].opa));
+                                 LV_OPA_MIX2(opa, grad->stops[0].opa));
         uint32_t c1 = pack_argb8(alpha_to_rgb ? white : grad->stops[1].color,
-                                  LV_OPA_MIX2(opa, grad->stops[1].opa));
+                                 LV_OPA_MIX2(opa, grad->stops[1].opa));
 
         if(is_ver || w < 16) {
             pixel_count = 2;
@@ -282,9 +284,9 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t *u, const lv_grad_dsc_t *grad,
  * Draw a gradient fill, optionally masked to a rounded rect.
  * Returns true if gradient was drawn, false if not a supported gradient type.
  */
-static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t *dsc,
+static bool draw_gradient_fill(lv_draw_eve5_unit_t * u, const lv_draw_fill_dsc_t * dsc,
                                int32_t x, int32_t y, int32_t w, int32_t h,
-                               int32_t radius, const lv_area_t *clip, const lv_area_t *layer_area,
+                               int32_t radius, const lv_area_t * clip, const lv_area_t * layer_area,
                                bool alpha_to_rgb)
 {
     EVE_HalContext *phost = u->hal;
@@ -301,7 +303,10 @@ static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t 
         bool grad_has_alpha = (dsc->opa < LV_OPA_MAX);
         if(!grad_has_alpha) {
             for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
-                if(dsc->grad.stops[i].opa < LV_OPA_MAX) { grad_has_alpha = true; break; }
+                if(dsc->grad.stops[i].opa < LV_OPA_MAX) {
+                    grad_has_alpha = true;
+                    break;
+                }
             }
         }
 
@@ -356,10 +361,10 @@ static bool draw_gradient_fill(lv_draw_eve5_unit_t *u, const lv_draw_fill_dsc_t 
  *                     When true, renders alpha contribution as grayscale luminance
  *                     for L8 render-target path. Caller must use default blend mode.
  */
-void lv_draw_eve5_hal_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb)
+void lv_draw_eve5_hal_draw_fill(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_fill_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_fill_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -370,8 +375,8 @@ void lv_draw_eve5_hal_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
     int32_t w = x2 - x1 + 1;
     int32_t h = y2 - y1 + 1;
 
-    const lv_area_t *clip = &t->clip_area;
-    const lv_area_t *layer_area = &layer->buf_area;
+    const lv_area_t * clip = &t->clip_area;
+    const lv_area_t * layer_area = &layer->buf_area;
 
     lv_draw_eve5_set_scissor(u, clip, layer_area);
 
@@ -442,10 +447,10 @@ void lv_draw_eve5_hal_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
  *
  * @param alpha_to_rgb See lv_draw_eve5_hal_draw_fill.
  */
-void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb)
+void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_border_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_border_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
@@ -462,8 +467,8 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     int32_t max_r = (LV_MIN(w, h) - 1) / 2;
     if(rout > max_r) rout = max_r;
 
-    const lv_area_t *clip = &t->clip_area;
-    const lv_area_t *layer_area = &layer->buf_area;
+    const lv_area_t * clip = &t->clip_area;
+    const lv_area_t * layer_area = &layer->buf_area;
 
     int32_t clip_x1 = clip->x1 - layer_area->x1;
     int32_t clip_y1 = clip->y1 - layer_area->y1;
@@ -472,13 +477,13 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
 
     /* Fast path: if all corners are outside clip, draw simple lines */
     bool corners_clipped = (rout > 0) &&
-                           (clip_x1 > x1 + rout || clip_x2 < x1 + rout || 
+                           (clip_x1 > x1 + rout || clip_x2 < x1 + rout ||
                             clip_y1 > y1 + rout) &&
-                           (clip_x1 > x2 - rout || clip_x2 < x2 - rout || 
+                           (clip_x1 > x2 - rout || clip_x2 < x2 - rout ||
                             clip_y1 > y1 + rout) &&
-                           (clip_x1 > x1 + rout || clip_x2 < x1 + rout || 
+                           (clip_x1 > x1 + rout || clip_x2 < x1 + rout ||
                             clip_y2 < y2 - rout) &&
-                           (clip_x1 > x2 - rout || clip_x2 < x2 - rout || 
+                           (clip_x1 > x2 - rout || clip_x2 < x2 - rout ||
                             clip_y2 < y2 - rout);
 
     if(corners_clipped || (rout == 0 && dsc->opa >= LV_OPA_MAX)) {
@@ -599,21 +604,21 @@ void lv_draw_eve5_hal_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
  * outer rect (blended border color) + inner rect (fill color) instead of
  * using the expensive alpha masking path.
  */
-void lv_draw_eve5_hal_draw_fill_with_border(lv_draw_eve5_unit_t *u,
-                                             const lv_draw_task_t *fill_task,
-                                             const lv_draw_task_t *border_task)
+void lv_draw_eve5_hal_draw_fill_with_border(lv_draw_eve5_unit_t * u,
+                                            const lv_draw_task_t * fill_task,
+                                            const lv_draw_task_t * border_task)
 {
-    const lv_draw_fill_dsc_t *fill_dsc = fill_task->draw_dsc;
-    const lv_draw_border_dsc_t *border_dsc = border_task->draw_dsc;
+    const lv_draw_fill_dsc_t * fill_dsc = fill_task->draw_dsc;
+    const lv_draw_border_dsc_t * border_dsc = border_task->draw_dsc;
 
-    if (fill_dsc->opa <= LV_OPA_MIN) {
-        if (border_dsc->opa <= LV_OPA_MIN) {
+    if(fill_dsc->opa <= LV_OPA_MIN) {
+        if(border_dsc->opa <= LV_OPA_MIN) {
             return;
         }
         lv_draw_eve5_hal_draw_border(u, border_task, false);
         return;
     }
-    if (border_dsc->opa <= LV_OPA_MIN) {
+    if(border_dsc->opa <= LV_OPA_MIN) {
         lv_draw_eve5_hal_draw_fill(u, fill_task, false);
         return;
     }
@@ -629,8 +634,8 @@ void lv_draw_eve5_hal_draw_fill_with_border(lv_draw_eve5_unit_t *u,
         return;
     }
 
-    lv_layer_t *layer = border_task->target_layer;
-    const lv_area_t *layer_area = &layer->buf_area;
+    lv_layer_t * layer = border_task->target_layer;
+    const lv_area_t * layer_area = &layer->buf_area;
 
     int32_t x1 = border_task->area.x1 - layer_area->x1;
     int32_t y1 = border_task->area.y1 - layer_area->y1;
@@ -720,8 +725,8 @@ void build_triangle_stencil(EVE_HalContext *phost, const lv_point_t p[3])
     EVE_CoDl_end(phost);
 }
 
-static bool draw_gradient_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
-                                   const lv_draw_triangle_dsc_t *dsc,
+static bool draw_gradient_triangle(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
+                                   const lv_draw_triangle_dsc_t * dsc,
                                    const lv_point_t p[3],
                                    int32_t xmin, int32_t ymin, int32_t xmax, int32_t ymax,
                                    bool alpha_to_rgb)
@@ -736,7 +741,7 @@ static bool draw_gradient_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t 
     EVE_CoDl_saveContext(phost);
 
     lv_draw_eve5_clear_stencil(u, xmin, ymin, xmax, ymax,
-                                &t->clip_area, &t->target_layer->buf_area);
+                               &t->clip_area, &t->target_layer->buf_area);
 
     EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
     EVE_CoDl_stencilOp(phost, KEEP, INVERT);
@@ -765,10 +770,10 @@ static bool draw_gradient_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t 
  * Draw a filled triangle.
  * @param alpha_to_rgb See lv_draw_eve5_hal_draw_fill.
  */
-void lv_draw_eve5_hal_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb)
+void lv_draw_eve5_hal_draw_triangle(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_triangle_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_triangle_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -838,7 +843,7 @@ void lv_draw_eve5_hal_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t
     EVE_CoDl_saveContext(u->hal);
 
     lv_draw_eve5_clear_stencil(u, xmin, ymin, xmax, ymax,
-                                &t->clip_area, &layer->buf_area);
+                               &t->clip_area, &layer->buf_area);
 
     EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
     EVE_CoDl_stencilOp(u->hal, KEEP, INVERT);

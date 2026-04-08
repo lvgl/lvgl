@@ -60,7 +60,7 @@
 #if LV_USE_DRAW_EVE5
 
 #if !LV_DRAW_EVE5_NO_FLOAT
-#include <math.h>
+    #include <math.h>
 #endif
 
 /*********************
@@ -73,9 +73,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void generate_corner_texture(uint8_t *buf, int32_t tex_size, int32_t solid_radius_idx);
-static void generate_edge_texture(uint8_t *buf, int32_t tex_size, int32_t solid_radius_idx);
-static bool ensure_shadow_textures(lv_draw_eve5_unit_t *u, int32_t ratio_idx);
+static void generate_corner_texture(uint8_t * buf, int32_t tex_size, int32_t solid_radius_idx);
+static void generate_edge_texture(uint8_t * buf, int32_t tex_size, int32_t solid_radius_idx);
+static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx);
 static int32_t calc_ratio_index(int32_t radius, int32_t corner_size);
 
 /**********************
@@ -108,13 +108,13 @@ static const uint8_t s_gauss_cdf[256] = {
     235, 233, 231, 230, 227, 225, 223, 221, 218, 216, 213, 210, 207, 204, 201, 197,
     194, 190, 187, 183, 179, 175, 171, 167, 163, 158, 154, 150, 145, 141, 136, 132,
     128, 123, 119, 114, 110, 105, 101,  97,  92,  88,  84,  80,  76,  72,  68,  65,
-     61,  58,  54,  51,  48,  45,  42,  39,  37,  34,  32,  30,  28,  25,  24,  22,
-     20,  18,  17,  16,  14,  13,  12,  11,  10,   9,   8,   7,   7,   6,   5,   5,
-      4,   4,   3,   3,   3,   2,   2,   2,   2,   2,   1,   1,   1,   1,   1,   1,
-      1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+    61,  58,  54,  51,  48,  45,  42,  39,  37,  34,  32,  30,  28,  25,  24,  22,
+    20,  18,  17,  16,  14,  13,  12,  11,  10,   9,   8,   7,   7,   6,   5,   5,
+    4,   4,   3,   3,   3,   2,   2,   2,   2,   2,   1,   1,   1,   1,   1,   1,
+    1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
 };
 
 static inline uint8_t gauss_cdf_lookup(int32_t signed_dist_256, int32_t sigma_sqrt2_256)
@@ -155,11 +155,11 @@ static float fast_erf(float x)
  * Generate 2D corner texture for Gaussian shadow falloff.
  * Solid quarter-circle at (tex_size-1, tex_size-1), blur toward (0, 0).
  */
-static void generate_corner_texture(uint8_t *buf, int32_t tex_size, int32_t solid_radius_idx)
+static void generate_corner_texture(uint8_t * buf, int32_t tex_size, int32_t solid_radius_idx)
 {
 #if LV_DRAW_EVE5_NO_FLOAT
     int32_t solid_radius_256 = (int32_t)((int64_t)solid_radius_idx * tex_size * 256 / (SHADOW_TEX_SIZE - 1));
-    
+
     int32_t blur_region_256 = tex_size * 256 - solid_radius_256;
     if(blur_region_256 < 256) blur_region_256 = 256;
 
@@ -208,7 +208,7 @@ static void generate_corner_texture(uint8_t *buf, int32_t tex_size, int32_t soli
  * Generate 1D edge texture for straight shadow edges.
  * Solid at x = tex_size-1, transparent at x = 0.
  */
-static void generate_edge_texture(uint8_t *buf, int32_t tex_size, int32_t solid_radius_idx)
+static void generate_edge_texture(uint8_t * buf, int32_t tex_size, int32_t solid_radius_idx)
 {
 #if LV_DRAW_EVE5_NO_FLOAT
     int32_t solid_width_256 = (int32_t)((int64_t)solid_radius_idx * tex_size * 256 / (SHADOW_TEX_SIZE - 1));
@@ -250,14 +250,14 @@ static void generate_edge_texture(uint8_t *buf, int32_t tex_size, int32_t solid_
  * Ensure shadow textures exist for the given ratio index.
  * Generates and uploads if not present or if evicted by GPU allocator.
  */
-static bool ensure_shadow_textures(lv_draw_eve5_unit_t *u, int32_t ratio_idx)
+static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
 {
     if(ratio_idx < 0 || ratio_idx >= SHADOW_TEX_SIZE) {
         LV_LOG_ERROR("EVE5: Invalid shadow ratio index %"PRId32, ratio_idx);
         return false;
     }
 
-    lv_draw_eve5_shadow_slot_t *slot = &u->shadow_slots[ratio_idx];
+    lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
 
     /* Corner texture (64×64 L8 = 4KB) */
     uint32_t corner_addr = Esd_GpuAlloc_Get(u->allocator, slot->corner_handle);
@@ -272,7 +272,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t *u, int32_t ratio_idx)
             return false;
         }
 
-        uint8_t *buf = lv_malloc(corner_bytes);
+        uint8_t * buf = lv_malloc(corner_bytes);
         if(!buf) {
             LV_LOG_ERROR("EVE5: Failed to allocate corner generation buffer");
             Esd_GpuAlloc_Free(u->allocator, slot->corner_handle);
@@ -301,7 +301,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t *u, int32_t ratio_idx)
             return false;
         }
 
-        uint8_t *buf = lv_malloc(edge_bytes);
+        uint8_t * buf = lv_malloc(edge_bytes);
         if(!buf) {
             LV_LOG_ERROR("EVE5: Failed to allocate edge generation buffer");
             Esd_GpuAlloc_Free(u->allocator, slot->edge_handle);
@@ -325,7 +325,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t *u, int32_t ratio_idx)
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_eve5_box_shadow_init(lv_draw_eve5_unit_t *u)
+void lv_draw_eve5_box_shadow_init(lv_draw_eve5_unit_t * u)
 {
     for(int32_t i = 0; i < SHADOW_TEX_SIZE; i++) {
         u->shadow_slots[i].corner_handle = GA_HANDLE_INVALID;
@@ -336,17 +336,17 @@ void lv_draw_eve5_box_shadow_init(lv_draw_eve5_unit_t *u)
 /**
  * Render box shadow using 9-slice Gaussian textures.
  */
-void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
     EVE_HalContext *phost = u->hal;
 
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_box_shadow_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width <= 0) return;
 
-    const lv_area_t *coords = &t->area;
+    const lv_area_t * coords = &t->area;
 
     /* Core area: widget bounds with offset and spread applied */
     lv_area_t core_area;
@@ -369,7 +369,7 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task
         return;
     }
 
-    lv_draw_eve5_shadow_slot_t *slot = &u->shadow_slots[ratio_idx];
+    lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
     uint32_t corner_addr = Esd_GpuAlloc_Get(u->allocator, slot->corner_handle);
     uint32_t edge_addr = Esd_GpuAlloc_Get(u->allocator, slot->edge_handle);
 
@@ -560,16 +560,16 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task
  * For direct-to-alpha: redraw 9-slice with L8 textures. Since A=L, the
  * Gaussian gradient is captured as varying alpha, modulated by colorA(dsc->opa).
  */
-void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb)
+void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
     EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_box_shadow_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    const lv_draw_box_shadow_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width <= 0) return;
 
-    const lv_area_t *coords = &t->area;
+    const lv_area_t * coords = &t->area;
     lv_area_t core_area;
     core_area.x1 = coords->x1 + dsc->ofs_x - dsc->spread;
     core_area.x2 = coords->x2 + dsc->ofs_x + dsc->spread;
@@ -608,7 +608,7 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t *u, const lv_draw_ta
     if(ratio_idx < 0) ratio_idx = 0;
     if(ratio_idx >= EVE5_SHADOW_TEX_SIZE) ratio_idx = EVE5_SHADOW_TEX_SIZE - 1;
 
-    lv_draw_eve5_shadow_slot_t *slot = &u->shadow_slots[ratio_idx];
+    lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
     uint32_t corner_addr = Esd_GpuAlloc_Get(u->allocator, slot->corner_handle);
     uint32_t edge_addr = Esd_GpuAlloc_Get(u->allocator, slot->edge_handle);
 

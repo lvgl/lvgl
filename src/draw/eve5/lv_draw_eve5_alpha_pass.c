@@ -30,7 +30,7 @@
 #include "../lv_draw_mask_private.h"
 
 #if !LV_DRAW_EVE5_NO_FLOAT
-#include <math.h>
+    #include <math.h>
 #endif
 
 /**********************
@@ -49,9 +49,9 @@
  * This path uses alpha-as-scratch masking (clear alpha, stamp rounded rect,
  * multiply gradient bitmap, draw through DST_ALPHA blend).
  */
-bool lv_draw_eve5_fill_needs_alpha_rendertarget(const lv_draw_task_t *t)
+bool lv_draw_eve5_fill_needs_alpha_rendertarget(const lv_draw_task_t * t)
 {
-    const lv_draw_fill_dsc_t *dsc = t->draw_dsc;
+    const lv_draw_fill_dsc_t * dsc = t->draw_dsc;
     if(dsc->opa <= LV_OPA_MIN) return false;
 
     int32_t w = lv_area_get_width(&t->area);
@@ -74,15 +74,15 @@ bool lv_draw_eve5_fill_needs_alpha_rendertarget(const lv_draw_task_t *t)
  *   - LINES path (rout==0 + full opa, or all corners clipped): no alpha trashing
  *   - Masking path (outer rect minus inner rect via alpha): trashes alpha
  */
-bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t *t)
+bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t * t)
 {
-    const lv_draw_border_dsc_t *dsc = t->draw_dsc;
+    const lv_draw_border_dsc_t * dsc = t->draw_dsc;
     if(dsc->opa <= LV_OPA_MIN) return false;
     if(dsc->width == 0) return false;
     if(dsc->side == LV_BORDER_SIDE_NONE) return false;
 
-    lv_layer_t *layer = t->target_layer;
-    const lv_area_t *layer_area = &layer->buf_area;
+    lv_layer_t * layer = t->target_layer;
+    const lv_area_t * layer_area = &layer->buf_area;
 
     int32_t x1 = t->area.x1 - layer_area->x1;
     int32_t y1 = t->area.y1 - layer_area->y1;
@@ -105,10 +105,10 @@ bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t *t)
     int32_t clip_y2 = t->clip_area.y2 - layer_area->y1;
 
     bool corners_clipped = (rout > 0) &&
-        (clip_x1 > x1 + rout || clip_x2 < x1 + rout || clip_y1 > y1 + rout) &&
-        (clip_x1 > x2 - rout || clip_x2 < x2 - rout || clip_y1 > y1 + rout) &&
-        (clip_x1 > x1 + rout || clip_x2 < x1 + rout || clip_y2 < y2 - rout) &&
-        (clip_x1 > x2 - rout || clip_x2 < x2 - rout || clip_y2 < y2 - rout);
+                           (clip_x1 > x1 + rout || clip_x2 < x1 + rout || clip_y1 > y1 + rout) &&
+                           (clip_x1 > x2 - rout || clip_x2 < x2 - rout || clip_y1 > y1 + rout) &&
+                           (clip_x1 > x1 + rout || clip_x2 < x1 + rout || clip_y2 < y2 - rout) &&
+                           (clip_x1 > x2 - rout || clip_x2 < x2 - rout || clip_y2 < y2 - rout);
 
     if(corners_clipped) return false;
 
@@ -121,9 +121,9 @@ bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t *t)
  * ARC: always true for visible arcs.
  * RGB pass uses multi-phase stencil or CMD_ARC, both of which trash the alpha channel.
  */
-bool lv_draw_eve5_arc_needs_alpha_rendertarget(const lv_draw_task_t *t)
+bool lv_draw_eve5_arc_needs_alpha_rendertarget(const lv_draw_task_t * t)
 {
-    const lv_draw_arc_dsc_t *dsc = t->draw_dsc;
+    const lv_draw_arc_dsc_t * dsc = t->draw_dsc;
     if(dsc->opa <= LV_OPA_MIN) return false;
     if(dsc->width == 0) return false;
     if(dsc->start_angle == dsc->end_angle) return false;
@@ -134,10 +134,10 @@ bool lv_draw_eve5_arc_needs_alpha_rendertarget(const lv_draw_task_t *t)
  * ALPHA-ONLY DRAW FUNCTIONS
  **********************/
 
-void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_fill_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    const lv_draw_fill_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -158,7 +158,10 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count >= 2 && real_radius == 0) {
         bool has_varying_opa = false;
         for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
-            if(dsc->grad.stops[i].opa < LV_OPA_MAX) { has_varying_opa = true; break; }
+            if(dsc->grad.stops[i].opa < LV_OPA_MAX) {
+                has_varying_opa = true;
+                break;
+            }
         }
         if(has_varying_opa) {
             lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
@@ -180,7 +183,10 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count >= 2 && real_radius > 0) {
         bool has_varying_opa = false;
         for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
-            if(dsc->grad.stops[i].opa < LV_OPA_MAX) { has_varying_opa = true; break; }
+            if(dsc->grad.stops[i].opa < LV_OPA_MAX) {
+                has_varying_opa = true;
+                break;
+            }
         }
         if(has_varying_opa) {
 #if EVE5_ALPHA_STENCIL_APPROX
@@ -189,7 +195,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
             EVE_CoDl_saveContext(u->hal);
 
             lv_draw_eve5_clear_stencil(u, x1, y1, x2, y2,
-                                        &t->clip_area, &layer->buf_area);
+                                       &t->clip_area, &layer->buf_area);
 
 #if EVE5_ALPHA_STENCIL_MULTISTEP
             /* Multi-step stencil AA: 4 concentric boundaries creating discrete
@@ -212,7 +218,8 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
             }
             else {
                 int32_t lw[4] = { real_radius * 16 + 4, real_radius * 16,
-                                   real_radius * 16 - 4, real_radius * 16 - 8 };
+                                  real_radius * 16 - 4, real_radius * 16 - 8
+                                };
                 for(int i = 0; i < 4; i++) {
                     if(lw[i] > 0) {
                         EVE_CoDl_lineWidth(u->hal, lw[i]);
@@ -313,7 +320,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                     sum += span * ((int32_t)dsc->grad.stops[i].opa + dsc->grad.stops[i + 1].opa);
                 }
                 int32_t total_span = dsc->grad.stops[dsc->grad.stops_count - 1].frac
-                                   - dsc->grad.stops[0].frac;
+                                     - dsc->grad.stops[0].frac;
                 if(total_span > 0) {
                     opa = LV_OPA_MIX2(dsc->opa, (uint8_t)(sum / (2 * total_span)));
                 }
@@ -334,16 +341,16 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
     }
     else {
         lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, real_radius,
-                                &t->clip_area, &layer->buf_area);
+                               &t->clip_area, &layer->buf_area);
     }
 }
 
-void lv_draw_eve5_alpha_draw_fill_with_border(lv_draw_eve5_unit_t *u,
-                                               const lv_draw_task_t *fill_task,
-                                               const lv_draw_task_t *border_task)
+void lv_draw_eve5_alpha_draw_fill_with_border(lv_draw_eve5_unit_t * u,
+                                              const lv_draw_task_t * fill_task,
+                                              const lv_draw_task_t * border_task)
 {
-    lv_layer_t *layer = fill_task->target_layer;
-    const lv_draw_border_dsc_t *border_dsc = border_task->draw_dsc;
+    lv_layer_t * layer = fill_task->target_layer;
+    const lv_draw_border_dsc_t * border_dsc = border_task->draw_dsc;
 
     /* Single shape at alpha=255 covering the border's outer area */
     int32_t x1 = border_task->area.x1 - layer->buf_area.x1;
@@ -362,14 +369,14 @@ void lv_draw_eve5_alpha_draw_fill_with_border(lv_draw_eve5_unit_t *u,
     else {
         int32_t r = LV_MIN3((w - 1) / 2, (h - 1) / 2, (int32_t)border_dsc->radius);
         lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, r,
-                                &border_task->clip_area, &layer->buf_area);
+                               &border_task->clip_area, &layer->buf_area);
     }
 }
 
-void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_border_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    const lv_draw_border_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
@@ -386,8 +393,8 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
     int32_t max_r = (LV_MIN(w, h) - 1) / 2;
     if(rout > max_r) rout = max_r;
 
-    const lv_area_t *clip = &t->clip_area;
-    const lv_area_t *layer_area = &layer->buf_area;
+    const lv_area_t * clip = &t->clip_area;
+    const lv_area_t * layer_area = &layer->buf_area;
 
     int32_t clip_x1 = clip->x1 - layer_area->x1;
     int32_t clip_y1 = clip->y1 - layer_area->y1;
@@ -461,7 +468,7 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
         EVE_CoDl_saveContext(u->hal);
 
         lv_draw_eve5_clear_stencil(u, x1, y1, x2, y2,
-                                    &t->clip_area, &layer->buf_area);
+                                   &t->clip_area, &layer->buf_area);
 
 #if EVE5_ALPHA_STENCIL_MULTISTEP
         /* Multi-step inner edge: 4 concentric INCR passes */
@@ -470,7 +477,8 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
         if(is_circle) {
             int32_t inner_d = w - 2 * dsc->width;
             int32_t ps[4] = { inner_d * 8 - 4, inner_d * 8 - 8,
-                               inner_d * 8 - 12, inner_d * 8 - 16 };
+                              inner_d * 8 - 12, inner_d * 8 - 16
+                            };
             for(int i = 0; i < 4; i++) {
                 if(ps[i] > 0)
                     draw_circle_subpx(u, bcx2, bcy2, ps[i]);
@@ -478,7 +486,8 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
         }
         else if(rin > 0) {
             int32_t lw[4] = { rin * 16 + 4, rin * 16,
-                               rin * 16 - 4, rin * 16 - 8 };
+                              rin * 16 - 4, rin * 16 - 8
+                            };
             for(int i = 0; i < 4; i++) {
                 if(lw[i] > 0) {
                     EVE_CoDl_lineWidth(u->hal, lw[i]);
@@ -572,10 +581,10 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t *u, const lv_draw_task_t
 
 /* Alpha pass for LINE is in lv_draw_eve5_line.c */
 
-void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_triangle_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    const lv_draw_triangle_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -612,14 +621,17 @@ void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task
     if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count >= 2) {
         bool has_varying_opa = false;
         for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
-            if(dsc->grad.stops[i].opa < LV_OPA_MAX) { has_varying_opa = true; break; }
+            if(dsc->grad.stops[i].opa < LV_OPA_MAX) {
+                has_varying_opa = true;
+                break;
+            }
         }
         if(has_varying_opa) {
             EVE_CoDl_vertexFormat(u->hal, 0);
             EVE_CoDl_saveContext(u->hal);
 
             lv_draw_eve5_clear_stencil(u, xmin, ymin, xmax, ymax,
-                                        &t->clip_area, &layer->buf_area);
+                                       &t->clip_area, &layer->buf_area);
 
             EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
             EVE_CoDl_stencilOp(u->hal, KEEP, INVERT);
@@ -646,7 +658,7 @@ void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t *u, const lv_draw_task
     EVE_CoDl_saveContext(u->hal);
 
     lv_draw_eve5_clear_stencil(u, xmin, ymin, xmax, ymax,
-                                &t->clip_area, &layer->buf_area);
+                               &t->clip_area, &layer->buf_area);
 
     EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
     EVE_CoDl_stencilOp(u->hal, KEEP, INVERT);

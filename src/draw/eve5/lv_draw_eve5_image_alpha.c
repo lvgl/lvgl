@@ -43,23 +43,23 @@
  *
  * Returns false if skew computation fails (caller should restoreContext).
  */
-static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t *u,
-                                            const lv_draw_task_t *t,
-                                            const lv_draw_image_dsc_t *dsc,
-                                            uint32_t ram_g_addr,
-                                            uint16_t eve_format,
-                                            int32_t eve_stride,
-                                            int32_t layout_h,
-                                            int32_t src_w, int32_t src_h,
-                                            int32_t img_x, int32_t img_y,
-                                            uint32_t palette_addr)
+static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t * u,
+                                           const lv_draw_task_t * t,
+                                           const lv_draw_image_dsc_t * dsc,
+                                           uint32_t ram_g_addr,
+                                           uint16_t eve_format,
+                                           int32_t eve_stride,
+                                           int32_t layout_h,
+                                           int32_t src_w, int32_t src_h,
+                                           int32_t img_x, int32_t img_y,
+                                           uint32_t palette_addr)
 {
     EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
+    lv_layer_t * layer = t->target_layer;
 
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
-                         || dsc->scale_y != LV_SCALE_NONE
-                         || dsc->skew_x != 0 || dsc->skew_y != 0);
+                          || dsc->scale_y != LV_SCALE_NONE
+                          || dsc->skew_x != 0 || dsc->skew_y != 0);
     bool has_skew = (dsc->skew_x != 0 || dsc->skew_y != 0);
 
     int32_t draw_vx, draw_vy;
@@ -101,8 +101,8 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t *u,
     /* Apply bitmap transform */
     if(has_skew) {
         apply_image_skew(phost, &skew, bmp_filter,
-            dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-            dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
+                         dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
+                         dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
     }
     else if(has_transform) {
         EVE_CoCmd_loadIdentity(phost);
@@ -119,8 +119,8 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t *u,
         EVE_CoCmd_setMatrix(phost);
         EVE_CoCmd_loadIdentity(phost);
         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
+                            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
     }
 
     /* Build 6-pass colorkey stencil */
@@ -148,11 +148,11 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t *u,
  * (exact for opaque formats, approximate for ARGB with per-pixel alpha).
  * For the standard path, draws the actual bitmap, which is exact for all formats.
  */
-void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
     EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_image_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    const lv_draw_image_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -165,11 +165,11 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
 
     /* Resolve bitmap source */
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-        lv_layer_t *child_layer = (lv_layer_t *)dsc->src;
+        lv_layer_t * child_layer = (lv_layer_t *)dsc->src;
         src_w = lv_area_get_width(&child_layer->buf_area);
         src_h = lv_area_get_height(&child_layer->buf_area);
 
-        lv_eve5_vram_res_t *child_vr = eve5_get_vram_res(child_layer);
+        lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(child_layer);
         if(child_vr == NULL) return;
         if(!child_vr->has_content) return;
         Esd_GpuHandle child_handle = child_vr->gpu_handle;
@@ -185,7 +185,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
         }
     }
     else {
-        lv_eve5_vram_res_t *img = lv_draw_eve5_resolve_to_gpu(u, dsc->src);
+        lv_eve5_vram_res_t * img = lv_draw_eve5_resolve_to_gpu(u, dsc->src);
         if(!img) return;
         eve5_vram_res_resolve(u->allocator, img, &ram_g_addr, &palette_addr);
         if(ram_g_addr == GA_INVALID) return;
@@ -216,7 +216,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
             uint16_t mask_bmp_format = L8;
             uint32_t mask_bmp_palette_addr = GA_INVALID;
             if(dsc->bitmap_mask_src != NULL) {
-                lv_eve5_vram_res_t *mask_img = lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src);
+                lv_eve5_vram_res_t * mask_img = lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src);
                 if(mask_img) {
                     eve5_vram_res_resolve(u->allocator, mask_img, &mask_bmp_addr, &mask_bmp_palette_addr);
                     if(mask_bmp_addr != GA_INVALID) {
@@ -238,7 +238,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
                 int32_t real_radius = LV_MIN3(clip_w / 2, clip_h / 2, (int32_t)dsc->clip_radius);
 
                 lv_draw_eve5_clear_stencil(u, clip_x1, clip_y1, clip_x2, clip_y2,
-                                            &t->clip_area, &layer->buf_area);
+                                           &t->clip_area, &layer->buf_area);
 
                 /* Reset bitmap transform before save since it may be non-identity from previous draw */
                 EVE_CoDl_bitmapTransform_identity(phost);
@@ -311,8 +311,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
                     }
 
                     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
-                                         || dsc->scale_y != LV_SCALE_NONE
-                                         || dsc->skew_x != 0 || dsc->skew_y != 0);
+                                          || dsc->scale_y != LV_SCALE_NONE
+                                          || dsc->skew_x != 0 || dsc->skew_y != 0);
                     bool has_skew = (dsc->skew_x != 0 || dsc->skew_y != 0);
 
                     int32_t draw_vx, draw_vy;
@@ -334,8 +334,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
                             return;
                         }
                         apply_image_skew(phost, &skew, bmp_filter,
-                            dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-                            dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
+                                         dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
+                                         dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
                     }
                     else if(has_transform) {
                         EVE_CoCmd_loadIdentity(phost);
@@ -352,8 +352,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
                         EVE_CoCmd_setMatrix(phost);
                         EVE_CoCmd_loadIdentity(phost);
                         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-                            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-                            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                                            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
+                                            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
                     }
 
                     EVE_CoDl_begin(phost, BITMAPS);
@@ -372,8 +372,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
             EVE_CoDl_vertexFormat(phost, 0);
             EVE_CoDl_saveContext(phost);
             has_colorkey_gate = alpha_pass_build_colorkey_gate(
-                u, t, dsc, ram_g_addr, eve_format, eve_stride,
-                layout_h, src_w, src_h, x, y, palette_addr);
+                                    u, t, dsc, ram_g_addr, eve_format, eve_stride,
+                                    layout_h, src_w, src_h, x, y, palette_addr);
             if(!has_colorkey_gate) {
                 EVE_CoDl_restoreContext(phost);
                 return;
@@ -388,7 +388,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
             int32_t mask_y2 = dsc->image_area.y2 - layer->buf_area.y1;
             EVE_CoDl_colorA(phost, dsc->opa);
             lv_draw_eve5_draw_rect(u, mask_x1, mask_y1, mask_x2, mask_y2,
-                                    dsc->clip_radius, &t->clip_area, &layer->buf_area);
+                                   dsc->clip_radius, &t->clip_area, &layer->buf_area);
         }
         else {
             /* bitmap_mask (with or without clip_radius): draw mask bitmap at opa */
@@ -400,7 +400,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
                 uint32_t mask_addr = GA_INVALID;
 
                 {
-                    lv_eve5_vram_res_t *mask_img = lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src);
+                    lv_eve5_vram_res_t * mask_img = lv_draw_eve5_resolve_to_gpu(u, dsc->bitmap_mask_src);
                     if(mask_img) {
                         eve5_vram_res_resolve(u->allocator, mask_img, &mask_addr, &mask_palette_addr);
                         if(mask_addr != GA_INVALID) {
@@ -455,8 +455,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
     /* Standard path: re-draw bitmap with transforms for exact per-pixel alpha */
     bool has_colorkey = (dsc->colorkey != NULL);
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
-                         || dsc->scale_y != LV_SCALE_NONE
-                         || dsc->skew_x != 0 || dsc->skew_y != 0);
+                          || dsc->scale_y != LV_SCALE_NONE
+                          || dsc->skew_x != 0 || dsc->skew_y != 0);
     bool has_skew = (dsc->skew_x != 0 || dsc->skew_y != 0);
 
     EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
@@ -504,8 +504,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
 
     if(has_skew) {
         apply_image_skew(phost, &skew, bmp_filter,
-            dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
-            dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
+                         dsc->tile ? lv_area_get_width(&dsc->image_area) : 0,
+                         dsc->tile ? lv_area_get_height(&dsc->image_area) : 0);
     }
     else if(has_transform) {
         EVE_CoCmd_loadIdentity(phost);
@@ -521,8 +521,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t *u, const lv_draw_tas
         EVE_CoCmd_loadIdentity(phost);
         /* Expand bitmapSize to cover rotated/scaled output */
         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER,
-            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
-            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
+                            LV_MIN(lv_area_get_width(&t->clip_area), 2048),
+                            LV_MIN(lv_area_get_height(&t->clip_area), 2048));
     }
 
     if(has_colorkey) {

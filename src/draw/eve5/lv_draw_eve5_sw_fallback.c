@@ -27,9 +27,9 @@
  * Get descriptor data pointer and size for cache comparison.
  * Returns pointer to data AFTER the base descriptor.
  */
-const void *lv_draw_eve5_sw_get_dsc_cache_data(const lv_draw_task_t *t, uint32_t *out_size)
+const void * lv_draw_eve5_sw_get_dsc_cache_data(const lv_draw_task_t * t, uint32_t * out_size)
 {
-    const lv_draw_dsc_base_t *base = t->draw_dsc;
+    const lv_draw_dsc_base_t * base = t->draw_dsc;
     uint32_t full_size = (uint32_t)base->dsc_size;
     uint32_t base_size = sizeof(lv_draw_dsc_base_t);
 
@@ -45,15 +45,15 @@ const void *lv_draw_eve5_sw_get_dsc_cache_data(const lv_draw_task_t *t, uint32_t
 /**
  * Render task to a CPU buffer using SW fallback. Caller must free returned buffer.
  */
-uint8_t *lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t *u,
-                                     const lv_draw_task_t *t,
-                                     int32_t buf_w, int32_t buf_h)
+uint8_t * lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t * u,
+                                           const lv_draw_task_t * t,
+                                           int32_t buf_w, int32_t buf_h)
 {
     LV_UNUSED(u);
 
     uint32_t buf_stride = buf_w * 4;
     uint32_t buf_size = buf_stride * buf_h;
-    uint8_t *buf_data = lv_malloc(buf_size);
+    uint8_t * buf_data = lv_malloc(buf_size);
 
     if(!buf_data) {
         LV_LOG_ERROR("EVE5: Failed to allocate SW buffer (%"PRIu32" bytes)", buf_size);
@@ -79,7 +79,8 @@ uint8_t *lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t *u,
 
     int32_t ofs_x = t->_real_area.x1;
     int32_t ofs_y = t->_real_area.y1;
-    (void)ofs_x; (void)ofs_y;
+    (void)ofs_x;
+    (void)ofs_y;
 
     bool render_ok = false;
 
@@ -87,149 +88,149 @@ uint8_t *lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t *u,
     switch(t->type) {
 #if LV_DRAW_EVE5_SW_FILL
         case LV_DRAW_TASK_TYPE_FILL: {
-            lv_draw_fill_dsc_t *src_dsc = t->draw_dsc;
+                lv_draw_fill_dsc_t * src_dsc = t->draw_dsc;
 
-            lv_area_t norm_task_area;
-            norm_task_area.x1 = t->area.x1 - ofs_x;
-            norm_task_area.y1 = t->area.y1 - ofs_y;
-            norm_task_area.x2 = t->area.x2 - ofs_x;
-            norm_task_area.y2 = t->area.y2 - ofs_y;
+                lv_area_t norm_task_area;
+                norm_task_area.x1 = t->area.x1 - ofs_x;
+                norm_task_area.y1 = t->area.y1 - ofs_y;
+                norm_task_area.x2 = t->area.x2 - ofs_x;
+                norm_task_area.y2 = t->area.y2 - ofs_y;
 
-            lv_draw_rect_dsc_t rect_dsc;
-            lv_draw_rect_dsc_init(&rect_dsc);
-            rect_dsc.base.user_data = (void *)1;
-            rect_dsc.bg_color = src_dsc->color;
-            rect_dsc.bg_grad = src_dsc->grad;
-            rect_dsc.radius = src_dsc->radius;
-            rect_dsc.bg_opa = src_dsc->opa;
+                lv_draw_rect_dsc_t rect_dsc;
+                lv_draw_rect_dsc_init(&rect_dsc);
+                rect_dsc.base.user_data = (void *)1;
+                rect_dsc.bg_color = src_dsc->color;
+                rect_dsc.bg_grad = src_dsc->grad;
+                rect_dsc.radius = src_dsc->radius;
+                rect_dsc.bg_opa = src_dsc->opa;
 
-            lv_draw_rect(&temp_layer, &rect_dsc, &norm_task_area);
-            render_ok = true;
-            break;
-        }
+                lv_draw_rect(&temp_layer, &rect_dsc, &norm_task_area);
+                render_ok = true;
+                break;
+            }
 #endif
 
 #if LV_DRAW_EVE5_SW_BORDER
         case LV_DRAW_TASK_TYPE_BORDER: {
-            lv_draw_border_dsc_t *src_dsc = t->draw_dsc;
+                lv_draw_border_dsc_t * src_dsc = t->draw_dsc;
 
-            lv_area_t norm_task_area;
-            norm_task_area.x1 = t->area.x1 - ofs_x;
-            norm_task_area.y1 = t->area.y1 - ofs_y;
-            norm_task_area.x2 = t->area.x2 - ofs_x;
-            norm_task_area.y2 = t->area.y2 - ofs_y;
+                lv_area_t norm_task_area;
+                norm_task_area.x1 = t->area.x1 - ofs_x;
+                norm_task_area.y1 = t->area.y1 - ofs_y;
+                norm_task_area.x2 = t->area.x2 - ofs_x;
+                norm_task_area.y2 = t->area.y2 - ofs_y;
 
-            lv_draw_rect_dsc_t rect_dsc;
-            lv_draw_rect_dsc_init(&rect_dsc);
-            rect_dsc.base.user_data = (void *)1;
-            rect_dsc.bg_opa = LV_OPA_TRANSP;
-            rect_dsc.radius = src_dsc->radius;
-            rect_dsc.border_color = src_dsc->color;
-            rect_dsc.border_opa = src_dsc->opa;
-            rect_dsc.border_side = src_dsc->side;
-            rect_dsc.border_width = src_dsc->width;
+                lv_draw_rect_dsc_t rect_dsc;
+                lv_draw_rect_dsc_init(&rect_dsc);
+                rect_dsc.base.user_data = (void *)1;
+                rect_dsc.bg_opa = LV_OPA_TRANSP;
+                rect_dsc.radius = src_dsc->radius;
+                rect_dsc.border_color = src_dsc->color;
+                rect_dsc.border_opa = src_dsc->opa;
+                rect_dsc.border_side = src_dsc->side;
+                rect_dsc.border_width = src_dsc->width;
 
-            lv_draw_rect(&temp_layer, &rect_dsc, &norm_task_area);
-            render_ok = true;
-            break;
-        }
+                lv_draw_rect(&temp_layer, &rect_dsc, &norm_task_area);
+                render_ok = true;
+                break;
+            }
 #endif
 
 #if LV_DRAW_EVE5_SW_LINE
         case LV_DRAW_TASK_TYPE_LINE: {
-            lv_draw_line_dsc_t line_dsc;
-            lv_memcpy(&line_dsc, t->draw_dsc, sizeof(line_dsc));
-            line_dsc.base.user_data = (void *)1;
+                lv_draw_line_dsc_t line_dsc;
+                lv_memcpy(&line_dsc, t->draw_dsc, sizeof(line_dsc));
+                line_dsc.base.user_data = (void *)1;
 
-            line_dsc.p1.x -= ofs_x;
-            line_dsc.p1.y -= ofs_y;
-            line_dsc.p2.x -= ofs_x;
-            line_dsc.p2.y -= ofs_y;
+                line_dsc.p1.x -= ofs_x;
+                line_dsc.p1.y -= ofs_y;
+                line_dsc.p2.x -= ofs_x;
+                line_dsc.p2.y -= ofs_y;
 
-            lv_draw_line(&temp_layer, &line_dsc);
-            render_ok = true;
-            break;
-        }
+                lv_draw_line(&temp_layer, &line_dsc);
+                render_ok = true;
+                break;
+            }
 #endif
 
 #if LV_DRAW_EVE5_SW_TRIANGLE
         case LV_DRAW_TASK_TYPE_TRIANGLE: {
-            lv_draw_triangle_dsc_t tri_dsc;
-            lv_memcpy(&tri_dsc, t->draw_dsc, sizeof(tri_dsc));
-            tri_dsc.base.user_data = (void *)1;
+                lv_draw_triangle_dsc_t tri_dsc;
+                lv_memcpy(&tri_dsc, t->draw_dsc, sizeof(tri_dsc));
+                tri_dsc.base.user_data = (void *)1;
 
-            tri_dsc.p[0].x -= ofs_x;
-            tri_dsc.p[0].y -= ofs_y;
-            tri_dsc.p[1].x -= ofs_x;
-            tri_dsc.p[1].y -= ofs_y;
-            tri_dsc.p[2].x -= ofs_x;
-            tri_dsc.p[2].y -= ofs_y;
+                tri_dsc.p[0].x -= ofs_x;
+                tri_dsc.p[0].y -= ofs_y;
+                tri_dsc.p[1].x -= ofs_x;
+                tri_dsc.p[1].y -= ofs_y;
+                tri_dsc.p[2].x -= ofs_x;
+                tri_dsc.p[2].y -= ofs_y;
 
-            lv_draw_triangle(&temp_layer, &tri_dsc);
-            render_ok = true;
-            break;
-        }
+                lv_draw_triangle(&temp_layer, &tri_dsc);
+                render_ok = true;
+                break;
+            }
 #endif
 
 #if LV_DRAW_EVE5_SW_LABEL
         case LV_DRAW_TASK_TYPE_LABEL: {
-            lv_draw_label_dsc_t label_dsc;
-            lv_memcpy(&label_dsc, t->draw_dsc, sizeof(label_dsc));
-            label_dsc.base.user_data = (void *)1;
+                lv_draw_label_dsc_t label_dsc;
+                lv_memcpy(&label_dsc, t->draw_dsc, sizeof(label_dsc));
+                label_dsc.base.user_data = (void *)1;
 
-            lv_area_t norm_task_area;
-            norm_task_area.x1 = t->area.x1 - ofs_x;
-            norm_task_area.y1 = t->area.y1 - ofs_y;
-            norm_task_area.x2 = t->area.x2 - ofs_x;
-            norm_task_area.y2 = t->area.y2 - ofs_y;
+                lv_area_t norm_task_area;
+                norm_task_area.x1 = t->area.x1 - ofs_x;
+                norm_task_area.y1 = t->area.y1 - ofs_y;
+                norm_task_area.x2 = t->area.x2 - ofs_x;
+                norm_task_area.y2 = t->area.y2 - ofs_y;
 
-            lv_draw_label(&temp_layer, &label_dsc, &norm_task_area);
-            render_ok = true;
-            break;
-        }
+                lv_draw_label(&temp_layer, &label_dsc, &norm_task_area);
+                render_ok = true;
+                break;
+            }
 #endif
 
 #if LV_DRAW_EVE5_SW_ARC
         case LV_DRAW_TASK_TYPE_ARC: {
-            lv_draw_arc_dsc_t arc_dsc;
-            lv_memcpy(&arc_dsc, t->draw_dsc, sizeof(arc_dsc));
-            arc_dsc.base.user_data = (void *)1;
+                lv_draw_arc_dsc_t arc_dsc;
+                lv_memcpy(&arc_dsc, t->draw_dsc, sizeof(arc_dsc));
+                arc_dsc.base.user_data = (void *)1;
 
-            arc_dsc.center.x -= ofs_x;
-            arc_dsc.center.y -= ofs_y;
+                arc_dsc.center.x -= ofs_x;
+                arc_dsc.center.y -= ofs_y;
 
-            lv_draw_arc(&temp_layer, &arc_dsc);
-            render_ok = true;
-            break;
-        }
+                lv_draw_arc(&temp_layer, &arc_dsc);
+                render_ok = true;
+                break;
+            }
 #endif
 
 #if LV_DRAW_EVE5_SW_BOX_SHADOW
         case LV_DRAW_TASK_TYPE_BOX_SHADOW: {
-            lv_draw_box_shadow_dsc_t *src_dsc = t->draw_dsc;
+                lv_draw_box_shadow_dsc_t * src_dsc = t->draw_dsc;
 
-            lv_area_t norm_task_area;
-            norm_task_area.x1 = t->area.x1 - ofs_x;
-            norm_task_area.y1 = t->area.y1 - ofs_y;
-            norm_task_area.x2 = t->area.x2 - ofs_x;
-            norm_task_area.y2 = t->area.y2 - ofs_y;
+                lv_area_t norm_task_area;
+                norm_task_area.x1 = t->area.x1 - ofs_x;
+                norm_task_area.y1 = t->area.y1 - ofs_y;
+                norm_task_area.x2 = t->area.x2 - ofs_x;
+                norm_task_area.y2 = t->area.y2 - ofs_y;
 
-            lv_draw_rect_dsc_t rect_dsc;
-            lv_draw_rect_dsc_init(&rect_dsc);
-            rect_dsc.base.user_data = (void *)1;
-            rect_dsc.bg_opa = LV_OPA_TRANSP;
-            rect_dsc.radius = src_dsc->radius;
-            rect_dsc.shadow_color = src_dsc->color;
-            rect_dsc.shadow_opa = src_dsc->opa;
-            rect_dsc.shadow_width = src_dsc->width;
-            rect_dsc.shadow_spread = src_dsc->spread;
-            rect_dsc.shadow_offset_x = src_dsc->ofs_x;
-            rect_dsc.shadow_offset_y = src_dsc->ofs_y;
+                lv_draw_rect_dsc_t rect_dsc;
+                lv_draw_rect_dsc_init(&rect_dsc);
+                rect_dsc.base.user_data = (void *)1;
+                rect_dsc.bg_opa = LV_OPA_TRANSP;
+                rect_dsc.radius = src_dsc->radius;
+                rect_dsc.shadow_color = src_dsc->color;
+                rect_dsc.shadow_opa = src_dsc->opa;
+                rect_dsc.shadow_width = src_dsc->width;
+                rect_dsc.shadow_spread = src_dsc->spread;
+                rect_dsc.shadow_offset_x = src_dsc->ofs_x;
+                rect_dsc.shadow_offset_y = src_dsc->ofs_y;
 
-            lv_draw_rect(&temp_layer, &rect_dsc, &norm_task_area);
-            render_ok = true;
-            break;
-        }
+                lv_draw_rect(&temp_layer, &rect_dsc, &norm_task_area);
+                render_ok = true;
+                break;
+            }
 #endif
 
         default:
@@ -245,7 +246,7 @@ uint8_t *lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t *u,
     /* Dispatch to SW renderer.
      * Unlock HAL mutex while SW threads run, as they may trigger image
      * decoders or filesystem access that needs the HAL mutex. */
-    lv_display_t *disp = lv_refr_get_disp_refreshing();
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
 #if LV_USE_OS
     lv_eve5_hal_unlock(disp);
 #endif
@@ -265,10 +266,10 @@ uint8_t *lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t *u,
 /**
  * Render a task via SW fallback with caching.
  */
-Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t *u,
-                                            const lv_draw_task_t *t,
-                                            int32_t *out_w, int32_t *out_h,
-                                            uint32_t *out_stride,
+Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u,
+                                            const lv_draw_task_t * t,
+                                            int32_t * out_w, int32_t * out_h,
+                                            uint32_t * out_stride,
                                             bool *out_from_cache)
 {
     *out_from_cache = false;
@@ -281,14 +282,14 @@ Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t *u,
     }
 
     uint32_t dsc_size;
-    const void *dsc_data = lv_draw_eve5_sw_get_dsc_cache_data(t, &dsc_size);
+    const void * dsc_data = lv_draw_eve5_sw_get_dsc_cache_data(t, &dsc_size);
 
     Esd_GpuHandle cached_handle;
     uint32_t cached_stride;
 
     if(lv_draw_eve5_sw_cache_lookup(u, t->type, buf_w, buf_h,
-                                     dsc_data, dsc_size,
-                                     &cached_handle, &cached_stride)) {
+                                    dsc_data, dsc_size,
+                                    &cached_handle, &cached_stride)) {
         *out_w = buf_w;
         *out_h = buf_h;
         *out_stride = cached_stride;
@@ -296,7 +297,7 @@ Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t *u,
         return cached_handle;
     }
 
-    uint8_t *buf_data = lv_draw_eve5_sw_render_to_buffer(u, t, buf_w, buf_h);
+    uint8_t * buf_data = lv_draw_eve5_sw_render_to_buffer(u, t, buf_w, buf_h);
     if(!buf_data) {
         return GA_HANDLE_INVALID;
     }
@@ -312,7 +313,7 @@ Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t *u,
     }
 
     lv_draw_eve5_sw_cache_insert(u, t->type, buf_w, buf_h,
-                                  dsc_data, dsc_size, handle, eve_stride);
+                                 dsc_data, dsc_size, handle, eve_stride);
 
     *out_w = buf_w;
     *out_h = buf_h;
@@ -328,7 +329,7 @@ Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t *u,
 /**
  * Render a task via SW fallback and blit to current layer.
  */
-void lv_draw_eve5_sw_render_task(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_sw_render_task(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
     int32_t tex_w, tex_h;
     uint32_t tex_stride;

@@ -56,8 +56,8 @@ typedef struct {
 } lv_eve5_vram_res_t;
 
 typedef struct {
-    lv_indev_t *indev[LV_EVE5_TOUCH_POINTS_MAX];
-    lv_display_t *disp;
+    lv_indev_t * indev[LV_EVE5_TOUCH_POINTS_MAX];
+    lv_display_t * disp;
     uint8_t num_points;
 } lv_eve5_multitouch_t;
 
@@ -75,21 +75,21 @@ typedef struct {
  * @param allocator pointer to GPU memory allocator
  * @return          pointer to the created display, or NULL on failure
  */
-lv_display_t *lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator);
+lv_display_t * lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator);
 
 /**
  * Get the EVE HAL context from the display
  * @param disp pointer to an EVE5 display
  * @return     pointer to EVE HAL context, or NULL if invalid
  */
-EVE_HalContext *lv_eve5_get_hal(lv_display_t *disp);
+EVE_HalContext * lv_eve5_get_hal(lv_display_t * disp);
 
 /**
  * Get the GPU allocator from the display
  * @param disp pointer to an EVE5 display
  * @return     pointer to GPU allocator, or NULL if invalid
  */
-Esd_GpuAlloc *lv_eve5_get_allocator(lv_display_t *disp);
+Esd_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp);
 
 /**
  * Detach the GPU handle from a draw_buf's vram_res, transferring ownership
@@ -98,7 +98,7 @@ Esd_GpuAlloc *lv_eve5_get_allocator(lv_display_t *disp);
  * @param out_handle receives the GPU allocation handle
  * @return           true if a handle was detached, false if no VRAM residency
  */
-bool lv_eve5_detach_gpu_handle(lv_draw_buf_t *buf, Esd_GpuHandle *out_handle);
+bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, Esd_GpuHandle *out_handle);
 
 /*--------------------
  * Single Touch
@@ -112,7 +112,7 @@ bool lv_eve5_detach_gpu_handle(lv_draw_buf_t *buf, Esd_GpuHandle *out_handle);
  * @param disp pointer to the EVE5 display
  * @return     pointer to the created input device, or NULL on failure
  */
-lv_indev_t *lv_eve5_touch_create(lv_display_t *disp);
+lv_indev_t * lv_eve5_touch_create(lv_display_t * disp);
 
 /*--------------------
  * Multi-Touch
@@ -120,7 +120,7 @@ lv_indev_t *lv_eve5_touch_create(lv_display_t *disp);
 
 /**
  * Create multi-touch input devices for capacitive touch panels.
- * Enables extended mode (REG_CTOUCH_EXTENDED=0) and creates up to 5 
+ * Enables extended mode (REG_CTOUCH_EXTENDED=0) and creates up to 5
  * separate input devices.
  *
  * Touch calibration must be performed BEFORE calling this function,
@@ -131,13 +131,13 @@ lv_indev_t *lv_eve5_touch_create(lv_display_t *disp);
  * @param num_points number of touch points to support (1-5)
  * @return           multi-touch context (caller must pass to lv_eve5_multitouch_delete)
  */
-lv_eve5_multitouch_t *lv_eve5_multitouch_create(lv_display_t *disp, uint8_t num_points);
+lv_eve5_multitouch_t * lv_eve5_multitouch_create(lv_display_t * disp, uint8_t num_points);
 
 /**
  * Delete multi-touch input devices and restore single-touch mode.
  * @param mt pointer to multi-touch context
  */
-void lv_eve5_multitouch_delete(lv_eve5_multitouch_t *mt);
+void lv_eve5_multitouch_delete(lv_eve5_multitouch_t * mt);
 
 /**
  * Get a specific touch point input device
@@ -145,7 +145,7 @@ void lv_eve5_multitouch_delete(lv_eve5_multitouch_t *mt);
  * @param index touch point index (0 to num_points-1)
  * @return      pointer to the input device, or NULL if invalid
  */
-lv_indev_t *lv_eve5_multitouch_get_indev(lv_eve5_multitouch_t *mt, uint8_t index);
+lv_indev_t * lv_eve5_multitouch_get_indev(lv_eve5_multitouch_t * mt, uint8_t index);
 
 /*--------------------
  * Touch Calibration
@@ -161,7 +161,7 @@ lv_indev_t *lv_eve5_multitouch_get_indev(lv_eve5_multitouch_t *mt, uint8_t index
  * @param disp pointer to the EVE5 display
  * @return     true if calibration completed successfully
  */
-bool lv_eve5_touch_calibrate(lv_display_t *disp);
+bool lv_eve5_touch_calibrate(lv_display_t * disp);
 
 /**
  * Set touch calibration matrix directly (restore saved calibration).
@@ -170,7 +170,7 @@ bool lv_eve5_touch_calibrate(lv_display_t *disp);
  * @param disp   pointer to the EVE5 display
  * @param matrix array of 6 calibration values (A, B, C, D, E, F)
  */
-void lv_eve5_touch_set_calibration(lv_display_t *disp, const int32_t matrix[6]);
+void lv_eve5_touch_set_calibration(lv_display_t * disp, const int32_t matrix[6]);
 
 /**
  * Get current touch calibration matrix (save for later restoration).
@@ -179,14 +179,14 @@ void lv_eve5_touch_set_calibration(lv_display_t *disp, const int32_t matrix[6]);
  * @param disp   pointer to the EVE5 display
  * @param matrix array to receive 6 calibration values (A, B, C, D, E, F)
  */
-void lv_eve5_touch_get_calibration(lv_display_t *disp, int32_t matrix[6]);
+void lv_eve5_touch_get_calibration(lv_display_t * disp, int32_t matrix[6]);
 
 /**
  * Set touch sampling mode
  * @param disp pointer to the EVE5 display
  * @param mode LV_EVE5_TOUCHMODE_OFF (0), _ONESHOT (1), _FRAME (2), or _CONTINUOUS (3, default)
  */
-void lv_eve5_touch_set_mode(lv_display_t *disp, uint8_t mode);
+void lv_eve5_touch_set_mode(lv_display_t * disp, uint8_t mode);
 
 /**********************
  *      MACROS
@@ -207,13 +207,13 @@ void lv_eve5_touch_set_mode(lv_display_t *disp, uint8_t mode);
  * All EVE5 driver components use this to serialize HAL access.
  * @param disp pointer to the EVE5 display
  */
-void lv_eve5_hal_lock(lv_display_t *disp);
+void lv_eve5_hal_lock(lv_display_t * disp);
 
 /**
  * Unlock the EVE HAL mutex.
  * @param disp pointer to the EVE5 display
  */
-void lv_eve5_hal_unlock(lv_display_t *disp);
+void lv_eve5_hal_unlock(lv_display_t * disp);
 #endif
 
 /*--------------------

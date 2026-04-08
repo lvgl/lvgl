@@ -19,7 +19,7 @@
 #if LV_USE_DRAW_EVE5
 
 #if !LV_DRAW_EVE5_NO_FLOAT
-#include <math.h>
+    #include <math.h>
 #endif
 #include "../lv_draw.h"
 #include "../lv_draw_line.h"
@@ -35,9 +35,9 @@
  * which cannot be recovered by the direct-to-alpha replay. H/V flat caps use
  * the scissor optimization (sharp edges without masking) and don't need this.
  */
-bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t *t)
+bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t * t)
 {
-    const lv_draw_line_dsc_t *dsc = t->draw_dsc;
+    const lv_draw_line_dsc_t * dsc = t->draw_dsc;
     if(dsc->width == 0) return false;
     if(dsc->opa <= LV_OPA_MIN) return false;
     if(dsc->p1.x == dsc->p2.x && dsc->p1.y == dsc->p2.y) return false;
@@ -66,10 +66,10 @@ bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t *t)
  *                      luminance for L8 render-target alpha recovery.
  * @param use_hv_opt    Enable H/V scissor optimization for axis-aligned lines.
  */
-void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb, bool use_hv_opt)
+void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb, bool use_hv_opt)
 {
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_line_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_line_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -102,15 +102,20 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
         int32_t w_half1 = w_half0 + (wm & 1);
         int32_t rx1, ry1, rx2, ry2;
         if(dy == 0) {
-            rx1 = LV_MIN(x1, x2);      rx2 = LV_MAX(x1, x2) - 1;
-            ry1 = y1 - w_half1;         ry2 = y1 + w_half0;
+            rx1 = LV_MIN(x1, x2);
+            rx2 = LV_MAX(x1, x2) - 1;
+            ry1 = y1 - w_half1;
+            ry2 = y1 + w_half0;
         }
         else {
-            rx1 = x1 - w_half1;         rx2 = x1 + w_half0;
-            ry1 = LV_MIN(y1, y2);       ry2 = LV_MAX(y1, y2) - 1;
+            rx1 = x1 - w_half1;
+            rx2 = x1 + w_half0;
+            ry1 = LV_MIN(y1, y2);
+            ry2 = LV_MAX(y1, y2) - 1;
         }
         lv_area_t line_screen = { rx1 + layer->buf_area.x1, ry1 + layer->buf_area.y1,
-                                   rx2 + layer->buf_area.x1, ry2 + layer->buf_area.y1 };
+                                  rx2 + layer->buf_area.x1, ry2 + layer->buf_area.y1
+                                };
         lv_area_t line_scissor;
         if(!lv_area_intersect(&line_scissor, &line_screen, &t->clip_area)) return;
         lv_draw_eve5_set_scissor(u, &line_scissor, &layer->buf_area);
@@ -119,7 +124,7 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
         off = 0;
     }
 
-    if ((!is_hv_flat && (need_flat_start || need_flat_end)) || has_dashes) {
+    if((!is_hv_flat && (need_flat_start || need_flat_end)) || has_dashes) {
         /* Alpha-channel masking for flat end caps and/or dashed lines.
          *
          * EVE LINES always draws round caps. To create flat ends or dash gaps:
@@ -217,21 +222,21 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
                 float cx = fx1 - dir_x * cap_hw_px;
                 float cy = fy1 - dir_y * cap_hw_px;
                 EVE_CoDl_vertex2f_4(phost,
-                    (int32_t)((cx + perp_x * perp_ext) * 16),
-                    (int32_t)((cy + perp_y * perp_ext) * 16));
+                                    (int32_t)((cx + perp_x * perp_ext) * 16),
+                                    (int32_t)((cy + perp_y * perp_ext) * 16));
                 EVE_CoDl_vertex2f_4(phost,
-                    (int32_t)((cx - perp_x * perp_ext) * 16),
-                    (int32_t)((cy - perp_y * perp_ext) * 16));
+                                    (int32_t)((cx - perp_x * perp_ext) * 16),
+                                    (int32_t)((cy - perp_y * perp_ext) * 16));
             }
             if(need_flat_end) {
                 float cx = fx2 + dir_x * cap_hw_px;
                 float cy = fy2 + dir_y * cap_hw_px;
                 EVE_CoDl_vertex2f_4(phost,
-                    (int32_t)((cx + perp_x * perp_ext) * 16),
-                    (int32_t)((cy + perp_y * perp_ext) * 16));
+                                    (int32_t)((cx + perp_x * perp_ext) * 16),
+                                    (int32_t)((cy + perp_y * perp_ext) * 16));
                 EVE_CoDl_vertex2f_4(phost,
-                    (int32_t)((cx - perp_x * perp_ext) * 16),
-                    (int32_t)((cy - perp_y * perp_ext) * 16));
+                                    (int32_t)((cx - perp_x * perp_ext) * 16),
+                                    (int32_t)((cy - perp_y * perp_ext) * 16));
             }
 #endif
 
@@ -247,7 +252,7 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
 
 #if LV_DRAW_EVE5_NO_FLOAT
             int32_t abs_proj = (int32_t)(((int64_t)LV_MIN(dsc->p1.x, dsc->p2.x) * LV_ABS(dx)
-                              + (int64_t)LV_MIN(dsc->p1.y, dsc->p2.y) * LV_ABS(dy)) / len);
+                                          + (int64_t)LV_MIN(dsc->p1.y, dsc->p2.y) * LV_ABS(dy)) / len);
             int32_t phase = abs_proj % period_sw;
             if(phase < 0) phase += period_sw;
 
@@ -269,7 +274,7 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
             float period = (float)(dsc->dash_width + dsc->dash_gap);
 
             float abs_proj = (float)LV_MIN(dsc->p1.x, dsc->p2.x) * fabsf(dir_x)
-                           + (float)LV_MIN(dsc->p1.y, dsc->p2.y) * fabsf(dir_y);
+                             + (float)LV_MIN(dsc->p1.y, dsc->p2.y) * fabsf(dir_y);
             int32_t phase = ((int32_t)floorf(abs_proj)) % period_sw;
             if(phase < 0) phase += period_sw;
 
@@ -285,11 +290,11 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
                 float cx = (float)x1 + dir_x * gap_center;
                 float cy = (float)y1 + dir_y * gap_center;
                 EVE_CoDl_vertex2f_4(phost,
-                    (int32_t)((cx + perp_x * perp_ext) * 16),
-                    (int32_t)((cy + perp_y * perp_ext) * 16));
+                                    (int32_t)((cx + perp_x * perp_ext) * 16),
+                                    (int32_t)((cy + perp_y * perp_ext) * 16));
                 EVE_CoDl_vertex2f_4(phost,
-                    (int32_t)((cx - perp_x * perp_ext) * 16),
-                    (int32_t)((cy - perp_y * perp_ext) * 16));
+                                    (int32_t)((cx - perp_x * perp_ext) * 16),
+                                    (int32_t)((cy - perp_y * perp_ext) * 16));
                 gap_center += period;
             }
 #endif
@@ -351,10 +356,10 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
  * produces binary edges at cap/dash boundaries instead of smooth AA. For
  * accurate alpha in these cases, use the L8 render-target path instead.
  */
-void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool use_hv_opt)
+void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool use_hv_opt)
 {
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_line_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    const lv_draw_line_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -380,15 +385,20 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
         int32_t w_half1 = w_half0 + (wm & 1);
         int32_t rx1, ry1, rx2, ry2;
         if(dy == 0) {
-            rx1 = LV_MIN(x1, x2);      rx2 = LV_MAX(x1, x2) - 1;
-            ry1 = y1 - w_half1;         ry2 = y1 + w_half0;
+            rx1 = LV_MIN(x1, x2);
+            rx2 = LV_MAX(x1, x2) - 1;
+            ry1 = y1 - w_half1;
+            ry2 = y1 + w_half0;
         }
         else {
-            rx1 = x1 - w_half1;         rx2 = x1 + w_half0;
-            ry1 = LV_MIN(y1, y2);       ry2 = LV_MAX(y1, y2) - 1;
+            rx1 = x1 - w_half1;
+            rx2 = x1 + w_half0;
+            ry1 = LV_MIN(y1, y2);
+            ry2 = LV_MAX(y1, y2) - 1;
         }
         lv_area_t line_screen = { rx1 + layer->buf_area.x1, ry1 + layer->buf_area.y1,
-                                   rx2 + layer->buf_area.x1, ry2 + layer->buf_area.y1 };
+                                  rx2 + layer->buf_area.x1, ry2 + layer->buf_area.y1
+                                };
         if(!lv_area_intersect(&hv_scissor, &line_screen, &t->clip_area)) return;
         lv_draw_eve5_set_scissor(u, &hv_scissor, &layer->buf_area);
 
@@ -433,9 +443,9 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
             {
                 int32_t margin = dsc->width;
                 lv_draw_eve5_clear_stencil(u,
-                    LV_MIN(x1, x2) - margin, LV_MIN(y1, y2) - margin,
-                    LV_MAX(x1, x2) + margin, LV_MAX(y1, y2) + margin,
-                    &t->clip_area, &layer->buf_area);
+                                           LV_MIN(x1, x2) - margin, LV_MIN(y1, y2) - margin,
+                                           LV_MAX(x1, x2) + margin, LV_MAX(y1, y2) + margin,
+                                           &t->clip_area, &layer->buf_area);
             }
 
             if(is_hv_flat) {
@@ -484,21 +494,21 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                     float cx = fx1f - dir_x * cap_hw_px;
                     float cy = fy1f - dir_y * cap_hw_px;
                     EVE_CoDl_vertex2f_4(phost,
-                        (int32_t)((cx + perp_x * perp_ext) * 16),
-                        (int32_t)((cy + perp_y * perp_ext) * 16));
+                                        (int32_t)((cx + perp_x * perp_ext) * 16),
+                                        (int32_t)((cy + perp_y * perp_ext) * 16));
                     EVE_CoDl_vertex2f_4(phost,
-                        (int32_t)((cx - perp_x * perp_ext) * 16),
-                        (int32_t)((cy - perp_y * perp_ext) * 16));
+                                        (int32_t)((cx - perp_x * perp_ext) * 16),
+                                        (int32_t)((cy - perp_y * perp_ext) * 16));
                 }
                 if(need_flat_end) {
                     float cx = fx2f + dir_x * cap_hw_px;
                     float cy = fy2f + dir_y * cap_hw_px;
                     EVE_CoDl_vertex2f_4(phost,
-                        (int32_t)((cx + perp_x * perp_ext) * 16),
-                        (int32_t)((cy + perp_y * perp_ext) * 16));
+                                        (int32_t)((cx + perp_x * perp_ext) * 16),
+                                        (int32_t)((cy + perp_y * perp_ext) * 16));
                     EVE_CoDl_vertex2f_4(phost,
-                        (int32_t)((cx - perp_x * perp_ext) * 16),
-                        (int32_t)((cy - perp_y * perp_ext) * 16));
+                                        (int32_t)((cx - perp_x * perp_ext) * 16),
+                                        (int32_t)((cy - perp_y * perp_ext) * 16));
                 }
 #endif
 
@@ -511,7 +521,7 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
 
 #if LV_DRAW_EVE5_NO_FLOAT
                 int32_t abs_proj = (int32_t)(((int64_t)LV_MIN(dsc->p1.x, dsc->p2.x) * LV_ABS(dx)
-                                  + (int64_t)LV_MIN(dsc->p1.y, dsc->p2.y) * LV_ABS(dy)) / len);
+                                              + (int64_t)LV_MIN(dsc->p1.y, dsc->p2.y) * LV_ABS(dy)) / len);
                 int32_t phase = abs_proj % period_sw;
                 if(phase < 0) phase += period_sw;
 
@@ -533,7 +543,7 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                 float period = (float)(dsc->dash_width + dsc->dash_gap);
 
                 float abs_proj = (float)LV_MIN(dsc->p1.x, dsc->p2.x) * fabsf(dir_x)
-                               + (float)LV_MIN(dsc->p1.y, dsc->p2.y) * fabsf(dir_y);
+                                 + (float)LV_MIN(dsc->p1.y, dsc->p2.y) * fabsf(dir_y);
                 int32_t phase = ((int32_t)floorf(abs_proj)) % period_sw;
                 if(phase < 0) phase += period_sw;
 
@@ -549,11 +559,11 @@ void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t *u, const lv_draw_task_t *
                     float cx = (float)x1 + dir_x * gap_center;
                     float cy = (float)y1 + dir_y * gap_center;
                     EVE_CoDl_vertex2f_4(phost,
-                        (int32_t)((cx + perp_x * perp_ext) * 16),
-                        (int32_t)((cy + perp_y * perp_ext) * 16));
+                                        (int32_t)((cx + perp_x * perp_ext) * 16),
+                                        (int32_t)((cy + perp_y * perp_ext) * 16));
                     EVE_CoDl_vertex2f_4(phost,
-                        (int32_t)((cx - perp_x * perp_ext) * 16),
-                        (int32_t)((cy - perp_y * perp_ext) * 16));
+                                        (int32_t)((cx - perp_x * perp_ext) * 16),
+                                        (int32_t)((cy - perp_y * perp_ext) * 16));
                     gap_center += period;
                 }
 #endif

@@ -28,36 +28,36 @@
  **********************/
 
 /* Glyph callback context (LVGL is single-threaded) */
-static lv_draw_eve5_unit_t *s_current_unit = NULL;
-static lv_layer_t *s_current_layer = NULL;
-static const lv_draw_letter_dsc_t *s_current_letter_dsc = NULL;
+static lv_draw_eve5_unit_t * s_current_unit = NULL;
+static lv_layer_t * s_current_layer = NULL;
+static const lv_draw_letter_dsc_t * s_current_letter_dsc = NULL;
 
-static lv_draw_eve5_unit_t *s_alpha_unit = NULL;
-static lv_layer_t *s_alpha_layer = NULL;
-static const lv_draw_letter_dsc_t *s_alpha_letter_dsc = NULL;
+static lv_draw_eve5_unit_t * s_alpha_unit = NULL;
+static lv_layer_t * s_alpha_layer = NULL;
+static const lv_draw_letter_dsc_t * s_alpha_letter_dsc = NULL;
 
 /**********************
  * STATIC PROTOTYPES
  **********************/
 
-static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
-                                          const uint8_t *src, uint32_t width,
-                                          uint32_t height, uint32_t eve_stride,
-                                          uint8_t src_stride_align, uint8_t bpp);
-static uint32_t compute_glyph_count(const lv_font_fmt_txt_dsc_t *font_dsc);
-static bool upload_whole_font(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t *font_dsc,
-                              lv_draw_eve5_font_vram_t *fv);
-static bool upload_single_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t *font_dsc,
-                                lv_draw_eve5_font_vram_t *fv, uint32_t gid);
-static void emit_glyph_vertex(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
-                               lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
-                               const lv_draw_letter_dsc_t *letter_dsc,
-                               uint16_t g_w, uint16_t g_h,
-                               int32_t x, int32_t y);
-static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
-                          lv_draw_fill_dsc_t *fill_dsc, const lv_area_t *fill_area);
-static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
-                            lv_draw_fill_dsc_t *fill_dsc, const lv_area_t *fill_area);
+static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t * u, uint32_t addr,
+                                         const uint8_t * src, uint32_t width,
+                                         uint32_t height, uint32_t eve_stride,
+                                         uint8_t src_stride_align, uint8_t bpp);
+static uint32_t compute_glyph_count(const lv_font_fmt_txt_dsc_t * font_dsc);
+static bool upload_whole_font(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc_t * font_dsc,
+                              lv_draw_eve5_font_vram_t * fv);
+static bool upload_single_glyph(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc_t * font_dsc,
+                                lv_draw_eve5_font_vram_t * fv, uint32_t gid);
+static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                              lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+                              const lv_draw_letter_dsc_t * letter_dsc,
+                              uint16_t g_w, uint16_t g_h,
+                              int32_t x, int32_t y);
+static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+                          lv_draw_fill_dsc_t * fill_dsc, const lv_area_t * fill_area);
+static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+                           lv_draw_fill_dsc_t * fill_dsc, const lv_area_t * fill_area);
 
 /**********************
  * HELPERS
@@ -66,11 +66,16 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
 static uint32_t bpp_to_eve_format(uint8_t bpp)
 {
     switch(bpp) {
-        case 1: return L1;
-        case 2: return L2;
-        case 4: return L4;
-        case 8: return L8;
-        default: return L4;
+        case 1:
+            return L1;
+        case 2:
+            return L2;
+        case 4:
+            return L4;
+        case 8:
+            return L8;
+        default:
+            return L4;
     }
 }
 
@@ -83,22 +88,22 @@ static bool is_bpp_supported(uint8_t bpp)
  * Upload glyph bitmap to RAM_G with EVE-aligned stride.
  * Handles stride differences between LVGL font formats and EVE requirements.
  */
-static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
-                                          const uint8_t *src, uint32_t width,
-                                          uint32_t height, uint32_t eve_stride,
-                                          uint8_t src_stride_align, uint8_t bpp)
+static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t * u, uint32_t addr,
+                                         const uint8_t * src, uint32_t width,
+                                         uint32_t height, uint32_t eve_stride,
+                                         uint8_t src_stride_align, uint8_t bpp)
 {
     uint32_t natural_stride = (width * bpp + 7) / 8;
 
-    uint8_t *row_buf = lv_malloc(eve_stride);
+    uint8_t * row_buf = lv_malloc(eve_stride);
     if(!row_buf) {
         LV_LOG_ERROR("EVE5: Failed to allocate glyph row buffer");
         return false;
     }
 
     bool simple_copy = (bpp == 8)
-        || (src_stride_align == 1)
-        || (src_stride_align == 0 && (width * bpp) % 8 == 0);
+                       || (src_stride_align == 1)
+                       || (src_stride_align == 0 && (width * bpp) % 8 == 0);
 
     if(simple_copy) {
         for(uint32_t y = 0; y < height; y++) {
@@ -179,11 +184,11 @@ static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t *u, uint32_t addr,
  * Compute glyph count from cmap tables (max_gid + 1).
  * Sparse cmaps use list_length to avoid over-allocation for CJK ranges.
  */
-static uint32_t compute_glyph_count(const lv_font_fmt_txt_dsc_t *font_dsc)
+static uint32_t compute_glyph_count(const lv_font_fmt_txt_dsc_t * font_dsc)
 {
     uint32_t max_gid = 0;
     for(uint16_t i = 0; i < font_dsc->cmap_num; i++) {
-        const lv_font_fmt_txt_cmap_t *cmap = &font_dsc->cmaps[i];
+        const lv_font_fmt_txt_cmap_t * cmap = &font_dsc->cmaps[i];
         uint32_t end_gid;
         if(cmap->type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY ||
            cmap->type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
@@ -200,15 +205,15 @@ static uint32_t compute_glyph_count(const lv_font_fmt_txt_dsc_t *font_dsc)
 /**
  * Upload entire font as a single GPU allocation with offset table.
  */
-static bool upload_whole_font(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t *font_dsc,
-                              lv_draw_eve5_font_vram_t *fv)
+static bool upload_whole_font(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc_t * font_dsc,
+                              lv_draw_eve5_font_vram_t * fv)
 {
     uint8_t bpp = (uint8_t)font_dsc->bpp;
     uint32_t glyph_count = fv->glyph_count;
 
     uint32_t total_size = 0;
     for(uint32_t gid = 0; gid < glyph_count; gid++) {
-        const lv_font_fmt_txt_glyph_dsc_t *g = &font_dsc->glyph_dsc[gid];
+        const lv_font_fmt_txt_glyph_dsc_t * g = &font_dsc->glyph_dsc[gid];
         if(g->box_w == 0 || g->box_h == 0) continue;
         uint32_t stride = ALIGN_UP((g->box_w * bpp + 7) / 8, 4);
         total_size += stride * g->box_h;
@@ -224,7 +229,7 @@ static bool upload_whole_font(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_
         return false;
     }
 
-    uint32_t *offsets = lv_malloc(glyph_count * sizeof(uint32_t));
+    uint32_t * offsets = lv_malloc(glyph_count * sizeof(uint32_t));
     if(!offsets) {
         Esd_GpuAlloc_Free(u->allocator, handle);
         return false;
@@ -232,7 +237,7 @@ static bool upload_whole_font(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_
 
     uint32_t offset = 0;
     for(uint32_t gid = 0; gid < glyph_count; gid++) {
-        const lv_font_fmt_txt_glyph_dsc_t *g = &font_dsc->glyph_dsc[gid];
+        const lv_font_fmt_txt_glyph_dsc_t * g = &font_dsc->glyph_dsc[gid];
         if(g->box_w == 0 || g->box_h == 0) {
             offsets[gid] = GA_INVALID;
             continue;
@@ -241,10 +246,10 @@ static bool upload_whole_font(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_
         uint32_t stride = ALIGN_UP((g->box_w * bpp + 7) / 8, 4);
         offsets[gid] = offset;
 
-        const uint8_t *glyph_bitmap = &font_dsc->glyph_bitmap[g->bitmap_index];
+        const uint8_t * glyph_bitmap = &font_dsc->glyph_bitmap[g->bitmap_index];
         glyph_bitmap_to_ramg_aligned(u, base_addr + offset,
-                                      glyph_bitmap, g->box_w, g->box_h,
-                                      stride, font_dsc->stride, bpp);
+                                     glyph_bitmap, g->box_w, g->box_h,
+                                     stride, font_dsc->stride, bpp);
         offset += stride * g->box_h;
     }
 
@@ -260,12 +265,12 @@ static bool upload_whole_font(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_
 /**
  * Upload a single glyph on demand (per-glyph mode).
  */
-static bool upload_single_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t *font_dsc,
-                                lv_draw_eve5_font_vram_t *fv, uint32_t gid)
+static bool upload_single_glyph(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc_t * font_dsc,
+                                lv_draw_eve5_font_vram_t * fv, uint32_t gid)
 {
     if(gid >= fv->glyph_count) return false;
 
-    const lv_font_fmt_txt_glyph_dsc_t *g = &font_dsc->glyph_dsc[gid];
+    const lv_font_fmt_txt_glyph_dsc_t * g = &font_dsc->glyph_dsc[gid];
     if(g->box_w == 0 || g->box_h == 0) return false;
 
     uint8_t bpp = fv->bpp;
@@ -276,9 +281,9 @@ static bool upload_single_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_ds
     uint32_t addr = Esd_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) return false;
 
-    const uint8_t *glyph_bitmap = &font_dsc->glyph_bitmap[g->bitmap_index];
+    const uint8_t * glyph_bitmap = &font_dsc->glyph_bitmap[g->bitmap_index];
     if(!glyph_bitmap_to_ramg_aligned(u, addr, glyph_bitmap, g->box_w, g->box_h,
-                                      stride, font_dsc->stride, bpp)) {
+                                     stride, font_dsc->stride, bpp)) {
         Esd_GpuAlloc_Free(u->allocator, handle);
         return false;
     }
@@ -287,7 +292,7 @@ static bool upload_single_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_ds
     return true;
 }
 
-static void font_list_remove(lv_draw_eve5_unit_t *u, lv_draw_eve5_font_vram_t *fv)
+static void font_list_remove(lv_draw_eve5_unit_t * u, lv_draw_eve5_font_vram_t * fv)
 {
     if(fv->prev) fv->prev->next = fv->next;
     else u->font_list = fv->next;
@@ -295,7 +300,7 @@ static void font_list_remove(lv_draw_eve5_unit_t *u, lv_draw_eve5_font_vram_t *f
     fv->prev = fv->next = NULL;
 }
 
-static void font_list_insert(lv_draw_eve5_unit_t *u, lv_draw_eve5_font_vram_t *fv)
+static void font_list_insert(lv_draw_eve5_unit_t * u, lv_draw_eve5_font_vram_t * fv)
 {
     fv->prev = NULL;
     fv->next = u->font_list;
@@ -303,12 +308,12 @@ static void font_list_insert(lv_draw_eve5_unit_t *u, lv_draw_eve5_font_vram_t *f
     u->font_list = fv;
 }
 
-void lv_draw_eve5_vram_font_free(lv_draw_unit_t *draw_unit, void *font_ptr)
+void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, void * font_ptr)
 {
-    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
-    lv_font_t *font = (lv_font_t *)font_ptr;
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_font_t * font = (lv_font_t *)font_ptr;
 
-    lv_draw_eve5_font_vram_t *fv = eve5_get_font_vram(font);
+    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(font);
     if(fv == NULL) return;
 
     font_list_remove(u, fv);
@@ -338,15 +343,15 @@ void lv_draw_eve5_vram_font_free(lv_draw_unit_t *draw_unit, void *font_ptr)
  * Small plain fonts use whole-font mode (single allocation, offset table).
  * Large or compressed fonts use per-glyph mode (demand-loaded handles).
  */
-lv_draw_eve5_font_vram_t *lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t *u,
-                                                    const lv_font_t *font)
+lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
+                                                    const lv_font_t * font)
 {
-    const lv_font_fmt_txt_dsc_t *font_dsc = (const lv_font_fmt_txt_dsc_t *)font->dsc;
+    const lv_font_fmt_txt_dsc_t * font_dsc = (const lv_font_fmt_txt_dsc_t *)font->dsc;
 
-    lv_draw_eve5_font_vram_t *fv = eve5_get_font_vram(font);
+    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(font);
     if(fv != NULL) {
         if(fv->base.unit != (lv_draw_unit_t *)u) {
-            lv_draw_unit_t *old_unit = fv->base.unit;
+            lv_draw_unit_t * old_unit = fv->base.unit;
             if(old_unit && old_unit->vram_font_free_cb) {
                 old_unit->vram_font_free_cb(old_unit, font);
             }
@@ -386,7 +391,7 @@ lv_draw_eve5_font_vram_t *lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t *u,
 
     /* Whole-font for small plain fonts, per-glyph otherwise */
     bool use_whole = (fv->glyph_count <= EVE5_FONT_WHOLE_THRESHOLD)
-                  && (font_dsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN);
+                     && (font_dsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN);
 
     if(use_whole) {
         if(font_dsc->glyph_dsc[fv->glyph_count - 1].bitmap_index > EVE5_FONT_WHOLE_MAX_BYTES) {
@@ -398,7 +403,7 @@ lv_draw_eve5_font_vram_t *lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t *u,
         uint32_t total_size = 0;
         uint8_t bpp = fv->bpp;
         for(uint32_t gid = 0; gid < fv->glyph_count; gid++) {
-            const lv_font_fmt_txt_glyph_dsc_t *g = &font_dsc->glyph_dsc[gid];
+            const lv_font_fmt_txt_glyph_dsc_t * g = &font_dsc->glyph_dsc[gid];
             if(g->box_w == 0 || g->box_h == 0) continue;
             total_size += ALIGN_UP((g->box_w * bpp + 7) / 8, 4) * g->box_h;
         }
@@ -435,16 +440,16 @@ lv_draw_eve5_font_vram_t *lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t *u,
 /**
  * Get GPU address for a glyph. Uploads on demand for per-glyph mode.
  */
-uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t *u,
-                                     lv_draw_eve5_font_vram_t *fv,
-                                     const lv_font_t *font,
-                                     uint32_t gid, uint16_t *out_stride)
+uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t * u,
+                                     lv_draw_eve5_font_vram_t * fv,
+                                     const lv_font_t * font,
+                                     uint32_t gid, uint16_t * out_stride)
 {
-    const lv_font_fmt_txt_dsc_t *font_dsc = (const lv_font_fmt_txt_dsc_t *)font->dsc;
+    const lv_font_fmt_txt_dsc_t * font_dsc = (const lv_font_fmt_txt_dsc_t *)font->dsc;
 
     if(gid >= fv->glyph_count) return GA_INVALID;
 
-    const lv_font_fmt_txt_glyph_dsc_t *g = &font_dsc->glyph_dsc[gid];
+    const lv_font_fmt_txt_glyph_dsc_t * g = &font_dsc->glyph_dsc[gid];
     if(g->box_w == 0 || g->box_h == 0) return GA_INVALID;
 
     *out_stride = ALIGN_UP((g->box_w * fv->bpp + 7) / 8, 4);
@@ -472,12 +477,12 @@ uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t *u,
  * Ensure generic (non-fmt_txt) font VRAM residency.
  * Generic fonts render glyphs to A8 on demand via get_glyph_bitmap.
  */
-static lv_draw_eve5_font_vram_t *font_ensure_generic(lv_draw_eve5_unit_t *u, const lv_font_t *font)
+static lv_draw_eve5_font_vram_t * font_ensure_generic(lv_draw_eve5_unit_t * u, const lv_font_t * font)
 {
-    lv_draw_eve5_font_vram_t *fv = eve5_get_font_vram(font);
+    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(font);
     if(fv != NULL) {
         if(fv->base.unit != (lv_draw_unit_t *)u) {
-            lv_draw_unit_t *old_unit = fv->base.unit;
+            lv_draw_unit_t * old_unit = fv->base.unit;
             if(old_unit && old_unit->vram_font_free_cb) {
                 old_unit->vram_font_free_cb(old_unit, font);
             }
@@ -511,7 +516,7 @@ static lv_draw_eve5_font_vram_t *font_ensure_generic(lv_draw_eve5_unit_t *u, con
 /**
  * Grow glyph handle array to accommodate gid.
  */
-static bool font_generic_grow(lv_draw_eve5_font_vram_t *fv, uint32_t gid)
+static bool font_generic_grow(lv_draw_eve5_font_vram_t * fv, uint32_t gid)
 {
     uint32_t needed = gid + 1;
     if(needed <= fv->glyph_count) return true;
@@ -531,10 +536,10 @@ static bool font_generic_grow(lv_draw_eve5_font_vram_t *fv, uint32_t gid)
 /**
  * Get or upload a generic font glyph from A8 draw_buf.
  */
-static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t *u,
-                                        lv_draw_eve5_font_vram_t *fv,
-                                        lv_draw_glyph_dsc_t *glyph_dsc,
-                                        uint16_t *out_stride)
+static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
+                                       lv_draw_eve5_font_vram_t * fv,
+                                       lv_draw_glyph_dsc_t * glyph_dsc,
+                                       uint16_t * out_stride)
 {
     uint32_t gid = glyph_dsc->g->gid.index;
     uint16_t g_w = glyph_dsc->g->box_w;
@@ -550,7 +555,7 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t *u,
     uint32_t addr = Esd_GpuAlloc_Get(u->allocator, fv->glyph_handles[gid]);
     if(addr != GA_INVALID) return addr;
 
-    const lv_draw_buf_t *glyph_data = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
+    const lv_draw_buf_t * glyph_data = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
     if(glyph_data == NULL || glyph_data->data == NULL) return GA_INVALID;
 
     uint32_t glyph_size = eve_stride * g_h;
@@ -566,7 +571,7 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t *u,
     }
     else {
         /* Zero-pad each row to EVE stride alignment */
-        uint8_t *row_buf = lv_malloc(eve_stride);
+        uint8_t * row_buf = lv_malloc(eve_stride);
         if(row_buf == NULL) {
             Esd_GpuAlloc_Free(u->allocator, handle);
             return GA_INVALID;
@@ -590,20 +595,20 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t *u,
 /**
  * Emit a glyph vertex with optional affine transform.
  */
-static void emit_glyph_vertex(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
-                               lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
-                               const lv_draw_letter_dsc_t *letter_dsc,
-                               uint16_t g_w, uint16_t g_h,
-                               int32_t x, int32_t y)
+static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                              lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+                              const lv_draw_letter_dsc_t * letter_dsc,
+                              uint16_t g_w, uint16_t g_h,
+                              int32_t x, int32_t y)
 {
     bool has_letter_transform = (letter_dsc != NULL)
-        && (letter_dsc->rotation != 0
-            || letter_dsc->scale_x != LV_SCALE_NONE
-            || letter_dsc->scale_y != LV_SCALE_NONE
-            || letter_dsc->skew_x != 0
-            || letter_dsc->skew_y != 0);
+                                && (letter_dsc->rotation != 0
+                                    || letter_dsc->scale_x != LV_SCALE_NONE
+                                    || letter_dsc->scale_y != LV_SCALE_NONE
+                                    || letter_dsc->skew_x != 0
+                                    || letter_dsc->skew_y != 0);
     bool has_label_rotation = (letter_dsc == NULL)
-        && (glyph_dsc->rotation % 3600 != 0);
+                              && (glyph_dsc->rotation % 3600 != 0);
 
     if(has_letter_transform) {
         int32_t draw_vx = t->clip_area.x1 - layer->buf_area.x1;
@@ -651,11 +656,11 @@ static void emit_glyph_vertex(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
  * GLYPH CALLBACKS
  **********************/
 
-static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
-                          lv_draw_fill_dsc_t *fill_dsc, const lv_area_t *fill_area)
+static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+                          lv_draw_fill_dsc_t * fill_dsc, const lv_area_t * fill_area)
 {
-    lv_draw_eve5_unit_t *u = s_current_unit;
-    lv_layer_t *layer = s_current_layer;
+    lv_draw_eve5_unit_t * u = s_current_unit;
+    lv_layer_t * layer = s_current_layer;
 
     if(u == NULL || layer == NULL) return;
 
@@ -674,7 +679,7 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
 
     if(glyph_dsc == NULL) return;
 
-    const lv_font_t *font = glyph_dsc->g->resolved_font;
+    const lv_font_t * font = glyph_dsc->g->resolved_font;
 
     if(!font) {
         LV_LOG_WARN("EVE5: Font not resolved");
@@ -685,7 +690,7 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
 
     /* Image glyph (e.g., emoji): draw as full-color image */
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
-        const void *img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
+        const void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
         if(img_src == NULL) return;
 
         int32_t x = glyph_dsc->letter_coords->x1 - layer->buf_area.x1;
@@ -693,7 +698,7 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
         uint16_t g_w = glyph_dsc->g->box_w;
         uint16_t g_h = glyph_dsc->g->box_h;
 
-        lv_eve5_vram_res_t *vr = lv_draw_eve5_resolve_to_gpu(u, img_src);
+        lv_eve5_vram_res_t * vr = lv_draw_eve5_resolve_to_gpu(u, img_src);
         if(vr == NULL) return;
 
         uint32_t addr, palette_addr;
@@ -726,17 +731,17 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     uint32_t eve_format;
 
     if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
-        lv_font_fmt_txt_dsc_t *font_dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+        lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
         if(!is_bpp_supported((uint8_t)font_dsc->bpp)) {
             LV_LOG_WARN("EVE5: Unsupported font bpp: %d", font_dsc->bpp);
             return;
         }
 
-        lv_draw_eve5_font_vram_t *fv = lv_draw_eve5_font_ensure(u, font);
+        lv_draw_eve5_font_vram_t * fv = lv_draw_eve5_font_ensure(u, font);
         if(!fv) return;
 
         uint32_t gid = glyph_dsc->g->gid.index;
-        const lv_font_fmt_txt_glyph_dsc_t *g_dsc = &font_dsc->glyph_dsc[gid];
+        const lv_font_fmt_txt_glyph_dsc_t * g_dsc = &font_dsc->glyph_dsc[gid];
 
         g_w = g_dsc->box_w;
         g_h = g_dsc->box_h;
@@ -744,7 +749,7 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
         eve_format = bpp_to_eve_format((uint8_t)font_dsc->bpp);
     }
     else {
-        lv_draw_eve5_font_vram_t *fv = font_ensure_generic(u, font);
+        lv_draw_eve5_font_vram_t * fv = font_ensure_generic(u, font);
         if(!fv) return;
 
         g_w = glyph_dsc->g->box_w;
@@ -767,11 +772,11 @@ static void draw_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     emit_glyph_vertex(u, layer, t, glyph_dsc, s_current_letter_dsc, g_w, g_h, x, y);
 }
 
-static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
-                            lv_draw_fill_dsc_t *fill_dsc, const lv_area_t *fill_area)
+static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+                           lv_draw_fill_dsc_t * fill_dsc, const lv_area_t * fill_area)
 {
-    lv_draw_eve5_unit_t *u = s_alpha_unit;
-    lv_layer_t *layer = s_alpha_layer;
+    lv_draw_eve5_unit_t * u = s_alpha_unit;
+    lv_layer_t * layer = s_alpha_layer;
 
     if(u == NULL || layer == NULL) return;
 
@@ -792,7 +797,7 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_NONE) return;
 
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
-        const void *img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
+        const void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
         if(img_src == NULL) return;
 
         int32_t x = glyph_dsc->letter_coords->x1 - layer->buf_area.x1;
@@ -800,7 +805,7 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
         uint16_t g_w = glyph_dsc->g->box_w;
         uint16_t g_h = glyph_dsc->g->box_h;
 
-        lv_eve5_vram_res_t *vr = lv_draw_eve5_resolve_to_gpu(u, img_src);
+        lv_eve5_vram_res_t * vr = lv_draw_eve5_resolve_to_gpu(u, img_src);
         if(vr == NULL) return;
 
         uint32_t addr, palette_addr;
@@ -827,21 +832,21 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
 
     if(glyph_dsc->format > LV_FONT_GLYPH_FORMAT_IMAGE) return;
 
-    const lv_font_t *font = glyph_dsc->g->resolved_font;
+    const lv_font_t * font = glyph_dsc->g->resolved_font;
 
     uint16_t g_w, g_h, g_stride;
     uint32_t ram_g_addr;
     uint32_t eve_format;
 
     if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
-        lv_font_fmt_txt_dsc_t *font_dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+        lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
         if(!is_bpp_supported((uint8_t)font_dsc->bpp)) return;
 
-        lv_draw_eve5_font_vram_t *fv = lv_draw_eve5_font_ensure(u, font);
+        lv_draw_eve5_font_vram_t * fv = lv_draw_eve5_font_ensure(u, font);
         if(!fv) return;
 
         uint32_t gid = glyph_dsc->g->gid.index;
-        const lv_font_fmt_txt_glyph_dsc_t *g_dsc = &font_dsc->glyph_dsc[gid];
+        const lv_font_fmt_txt_glyph_dsc_t * g_dsc = &font_dsc->glyph_dsc[gid];
 
         g_w = g_dsc->box_w;
         g_h = g_dsc->box_h;
@@ -849,7 +854,7 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
         eve_format = bpp_to_eve_format((uint8_t)font_dsc->bpp);
     }
     else {
-        lv_draw_eve5_font_vram_t *fv = font_ensure_generic(u, font);
+        lv_draw_eve5_font_vram_t * fv = font_ensure_generic(u, font);
         if(!fv) return;
 
         g_w = glyph_dsc->g->box_w;
@@ -875,11 +880,11 @@ static void alpha_glyph_cb(lv_draw_task_t *t, lv_draw_glyph_dsc_t *glyph_dsc,
  * LABEL DRAWING
  **********************/
 
-void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
+void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
 {
     EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_label_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_label_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
@@ -887,7 +892,7 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap != NULL) {
         if(dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
-            const lv_font_fmt_txt_dsc_t *font_dsc = dsc->font->dsc;
+            const lv_font_fmt_txt_dsc_t * font_dsc = dsc->font->dsc;
             use_bitmap_font = is_bpp_supported((uint8_t)font_dsc->bpp);
         }
         else {
@@ -901,7 +906,7 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     EVE_CoDl_colorA(u->hal, dsc->opa);
 
     if(use_bitmap_font) {
-		/* BT820 L-format decodes as (255,255,255,L) on hardware */
+        /* BT820 L-format decodes as (255,255,255,L) on hardware */
         EVE_CoDl_bitmapTransform_identity(u->hal);
         EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
         EVE_CoDl_begin(u->hal, BITMAPS);
@@ -936,10 +941,10 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
     }
 }
 
-void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
+void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
 {
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_letter_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_letter_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -995,10 +1000,10 @@ void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t *u, lv_draw_task_t *t)
 /**
  * @param alpha_to_rgb false: direct-to-alpha pass, true: L8 render-target pass
  */
-void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, bool alpha_to_rgb)
+void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, bool alpha_to_rgb)
 {
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_label_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_label_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
@@ -1006,7 +1011,7 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, bo
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap != NULL) {
         if(dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
-            const lv_font_fmt_txt_dsc_t *font_dsc = dsc->font->dsc;
+            const lv_font_fmt_txt_dsc_t * font_dsc = dsc->font->dsc;
             use_bitmap_font = is_bpp_supported((uint8_t)font_dsc->bpp);
         }
         else {
@@ -1059,10 +1064,10 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, bo
 /**
  * @param alpha_to_rgb false: direct-to-alpha pass, true: L8 render-target pass
  */
-void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, bool alpha_to_rgb)
+void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, bool alpha_to_rgb)
 {
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_letter_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_letter_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
 

@@ -44,9 +44,9 @@ typedef struct {
 } eve5_flash_file_t;
 
 typedef struct {
-    lv_display_t *disp;
-    EVE_HalContext *hal;
-    Esd_GpuAlloc *alloc;
+    lv_display_t * disp;
+    EVE_HalContext * hal;
+    Esd_GpuAlloc * alloc;
     bool flash_ready;
     uint32_t flash_size_bytes;
     lv_fs_drv_t fs_drv;
@@ -55,16 +55,16 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool fs_ready(lv_fs_drv_t *drv);
-static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode);
-static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p);
-static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t btr, uint32_t *br);
-static lv_fs_res_t fs_write(lv_fs_drv_t *drv, void *file_p, const void *buf, uint32_t btw, uint32_t *bw);
-static lv_fs_res_t fs_seek(lv_fs_drv_t *drv, void *file_p, uint32_t pos, lv_fs_whence_t whence);
-static lv_fs_res_t fs_tell(lv_fs_drv_t *drv, void *file_p, uint32_t *pos_p);
+static bool fs_ready(lv_fs_drv_t * drv);
+static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
+static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
+static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
+static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
+static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
+static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 
-static bool ensure_flash_ready(eve5_flash_ctx_t *ctx);
-static uint32_t parse_flash_addr(const char *path);
+static bool ensure_flash_ready(eve5_flash_ctx_t * ctx);
+static uint32_t parse_flash_addr(const char * path);
 
 /**********************
  *  STATIC VARIABLES
@@ -75,7 +75,7 @@ static eve5_flash_ctx_t s_ctx;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_fs_eve5_flash_init(lv_display_t *disp)
+void lv_fs_eve5_flash_init(lv_display_t * disp)
 {
     if(disp == NULL) return;
 
@@ -141,7 +141,7 @@ void lv_fs_eve5_flash_deinit(void)
  * Parse flash address from path. Format: "/123456" or "123456"
  * Returns UINT32_MAX on parse failure.
  */
-static uint32_t parse_flash_addr(const char *path)
+static uint32_t parse_flash_addr(const char * path)
 {
     while(*path == '/' || *path == '\\') path++;
 
@@ -162,7 +162,7 @@ static uint32_t parse_flash_addr(const char *path)
  * Ensure flash is attached and in fast mode.
  * Caller must hold HAL mutex if LV_USE_OS.
  */
-static bool ensure_flash_ready(eve5_flash_ctx_t *ctx)
+static bool ensure_flash_ready(eve5_flash_ctx_t * ctx)
 {
     if(ctx == NULL || ctx->hal == NULL) return false;
     if(ctx->flash_ready) return true;
@@ -205,9 +205,9 @@ static bool ensure_flash_ready(eve5_flash_ctx_t *ctx)
 #endif
 }
 
-static bool fs_ready(lv_fs_drv_t *drv)
+static bool fs_ready(lv_fs_drv_t * drv)
 {
-    eve5_flash_ctx_t *ctx = (eve5_flash_ctx_t *)drv->user_data;
+    eve5_flash_ctx_t * ctx = (eve5_flash_ctx_t *)drv->user_data;
     if(ctx == NULL || ctx->hal == NULL) return false;
 
     /* Fast path: lv_fs_open probes ALL registered drivers via ready_cb.
@@ -224,9 +224,9 @@ static bool fs_ready(lv_fs_drv_t *drv)
     return ready;
 }
 
-static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode)
+static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
-    eve5_flash_ctx_t *ctx = (eve5_flash_ctx_t *)drv->user_data;
+    eve5_flash_ctx_t * ctx = (eve5_flash_ctx_t *)drv->user_data;
     if(ctx == NULL || ctx->hal == NULL) return NULL;
 
     if(mode != LV_FS_MODE_RD) {
@@ -253,7 +253,7 @@ static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode)
         return NULL;
     }
 
-    eve5_flash_file_t *file = lv_malloc(sizeof(eve5_flash_file_t));
+    eve5_flash_file_t * file = lv_malloc(sizeof(eve5_flash_file_t));
     if(file == NULL) return NULL;
 
     file->flash_addr = addr;
@@ -264,7 +264,7 @@ static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode)
     return file;
 }
 
-static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p)
+static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
     LV_UNUSED(drv);
     if(file_p != NULL) {
@@ -278,10 +278,10 @@ static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p)
  * Handles alignment: dest must be 4-byte aligned, src must be 64-byte aligned,
  * size must be multiple of 4.
  */
-static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t btr, uint32_t *br)
+static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
-    eve5_flash_ctx_t *ctx = (eve5_flash_ctx_t *)drv->user_data;
-    eve5_flash_file_t *file = (eve5_flash_file_t *)file_p;
+    eve5_flash_ctx_t * ctx = (eve5_flash_ctx_t *)drv->user_data;
+    eve5_flash_file_t * file = (eve5_flash_file_t *)file_p;
 
     if(file == NULL || ctx == NULL || ctx->hal == NULL || ctx->alloc == NULL) {
         if(br) *br = 0;
@@ -341,7 +341,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
     return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t fs_write(lv_fs_drv_t *drv, void *file_p, const void *buf, uint32_t btw, uint32_t *bw)
+static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     LV_UNUSED(drv);
     LV_UNUSED(file_p);
@@ -351,10 +351,10 @@ static lv_fs_res_t fs_write(lv_fs_drv_t *drv, void *file_p, const void *buf, uin
     return LV_FS_RES_NOT_IMP;
 }
 
-static lv_fs_res_t fs_seek(lv_fs_drv_t *drv, void *file_p, uint32_t pos, lv_fs_whence_t whence)
+static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
     LV_UNUSED(drv);
-    eve5_flash_file_t *file = (eve5_flash_file_t *)file_p;
+    eve5_flash_file_t * file = (eve5_flash_file_t *)file_p;
     if(file == NULL) return LV_FS_RES_INV_PARAM;
 
     int32_t new_pos;
@@ -379,10 +379,10 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t *drv, void *file_p, uint32_t pos, lv_fs_w
     return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t fs_tell(lv_fs_drv_t *drv, void *file_p, uint32_t *pos_p)
+static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    eve5_flash_file_t *file = (eve5_flash_file_t *)file_p;
+    eve5_flash_file_t * file = (eve5_flash_file_t *)file_p;
     if(file == NULL || pos_p == NULL) return LV_FS_RES_INV_PARAM;
 
     *pos_p = file->pos;
@@ -393,7 +393,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t *drv, void *file_p, uint32_t *pos_p)
  * PATH CHECKING
  **********************/
 
-bool lv_eve5_flash_is_path(const char *path)
+bool lv_eve5_flash_is_path(const char * path)
 {
     if(path == NULL || path[0] == '\0') return false;
     if(s_ctx.hal == NULL) return false;
@@ -412,9 +412,9 @@ bool lv_eve5_flash_is_path(const char *path)
  * IMAGE LOADING
  **********************/
 
-bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
-                               uint32_t *width, uint32_t *height, uint32_t *format,
-                               uint32_t *image_offset, uint32_t *palette_offset)
+bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
+                              uint32_t * width, uint32_t * height, uint32_t * format,
+                              uint32_t * image_offset, uint32_t * palette_offset)
 {
     if(path == NULL || handle == NULL || width == NULL || height == NULL || format == NULL) {
         return false;
@@ -425,7 +425,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
         return false;
     }
 
-    const char *addr_str = path;
+    const char * addr_str = path;
     if(path[1] == ':' && (path[2] == '/' || path[2] == '\\')) {
         addr_str = path + 2;
     }
@@ -513,7 +513,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
 
     if(is_png && header_size >= 26) {
         LV_LOG_INFO("PNG %s: %ux%u depth=%u color_type=%u",
-                     path, img_w, img_h, header_buf[24], header_buf[25]);
+                    path, img_w, img_h, header_buf[24], header_buf[25]);
     }
     else if(is_jpeg) {
         LV_LOG_INFO("JPEG %s: %ux%u", path, img_w, img_h);
@@ -620,7 +620,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
     return true;
 }
 
-Esd_GpuAlloc *lv_eve5_flash_get_allocator(void)
+Esd_GpuAlloc * lv_eve5_flash_get_allocator(void)
 {
     return s_ctx.alloc;
 }

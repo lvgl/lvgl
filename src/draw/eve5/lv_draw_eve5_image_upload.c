@@ -27,17 +27,17 @@
  * STATIC PROTOTYPES
  **********************/
 
-static void convert_rgb565a8_to_argb8(const uint8_t *rgb, const uint8_t *alpha,
-                                       uint8_t *dst, uint32_t w);
-static void convert_xrgb8888_to_rgb8(const uint8_t *src, uint8_t *dst, uint32_t w);
-static void convert_rgb565_byteswap(const uint8_t *src, uint8_t *dst, uint32_t w);
+static void convert_rgb565a8_to_argb8(const uint8_t * rgb, const uint8_t * alpha,
+                                      uint8_t * dst, uint32_t w);
+static void convert_xrgb8888_to_rgb8(const uint8_t * src, uint8_t * dst, uint32_t w);
+static void convert_rgb565_byteswap(const uint8_t * src, uint8_t * dst, uint32_t w);
 
 /**********************
  * IMAGE FORMAT CONVERSION
  **********************/
 
-static void convert_rgb565a8_to_argb8(const uint8_t *rgb, const uint8_t *alpha,
-                                       uint8_t *dst, uint32_t w)
+static void convert_rgb565a8_to_argb8(const uint8_t * rgb, const uint8_t * alpha,
+                                      uint8_t * dst, uint32_t w)
 {
     for(uint32_t x = 0; x < w; x++) {
         uint16_t rgb565 = ((const uint16_t *)rgb)[x];
@@ -59,7 +59,7 @@ static void convert_rgb565a8_to_argb8(const uint8_t *rgb, const uint8_t *alpha,
     }
 }
 
-static void convert_xrgb8888_to_rgb8(const uint8_t *src, uint8_t *dst, uint32_t w)
+static void convert_xrgb8888_to_rgb8(const uint8_t * src, uint8_t * dst, uint32_t w)
 {
     for(uint32_t x = 0; x < w; x++) {
         /* LVGL XRGB8888 is BGRX in memory */
@@ -69,10 +69,10 @@ static void convert_xrgb8888_to_rgb8(const uint8_t *src, uint8_t *dst, uint32_t 
     }
 }
 
-static void convert_rgb565_byteswap(const uint8_t *src, uint8_t *dst, uint32_t w)
+static void convert_rgb565_byteswap(const uint8_t * src, uint8_t * dst, uint32_t w)
 {
-    const uint16_t *s = (const uint16_t *)src;
-    uint16_t *d = (uint16_t *)dst;
+    const uint16_t * s = (const uint16_t *)src;
+    uint16_t * d = (uint16_t *)dst;
     for(uint32_t x = 0; x < w; x++) {
         uint16_t v = s[x];
         d[x] = (v >> 8) | (v << 8);
@@ -84,9 +84,9 @@ static void convert_rgb565_byteswap(const uint8_t *src, uint8_t *dst, uint32_t w
  **********************/
 
 bool lv_draw_eve5_get_eve_format_info(lv_color_format_t src_cf,
-                                 uint16_t *eve_format,
-                                 uint8_t *bits_per_pixel,
-                                 bool *needs_conversion)
+                                      uint16_t * eve_format,
+                                      uint8_t * bits_per_pixel,
+                                      bool *needs_conversion)
 {
     *needs_conversion = false;
 
@@ -192,11 +192,11 @@ bool lv_draw_eve5_get_eve_format_info(lv_color_format_t src_cf,
  * Returns pointer to the attached vram_res, or NULL on failure.
  * If vram_res already exists and is valid, returns it without re-uploading.
  */
-lv_eve5_vram_res_t *lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
-                                                      LV_IMAGE_DSC_CONST lv_image_dsc_t *img_dsc)
+lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
+                                                      LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc)
 {
     /* Check vram_res for image already uploaded to GPU */
-    lv_eve5_vram_res_t *existing = eve5_get_image_vram_res(img_dsc);
+    lv_eve5_vram_res_t * existing = eve5_get_image_vram_res(img_dsc);
     if(existing != NULL) {
         uint32_t addr = Esd_GpuAlloc_Get(u->allocator, existing->gpu_handle);
         if(addr != GA_INVALID) {
@@ -209,7 +209,7 @@ lv_eve5_vram_res_t *lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
         img_dsc->vram_res = NULL;
     }
 
-    const uint8_t *src_buf = img_dsc->data;
+    const uint8_t * src_buf = img_dsc->data;
     int32_t src_w = img_dsc->header.w;
     int32_t src_h = img_dsc->header.h;
     int32_t src_stride = img_dsc->header.stride;
@@ -263,7 +263,7 @@ lv_eve5_vram_res_t *lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
         }
         else {
             /* EVE stride wider than pixel data — zero-pad each row */
-            uint8_t *row_buf = lv_malloc(eve_stride);
+            uint8_t * row_buf = lv_malloc(eve_stride);
             if(row_buf != NULL) {
                 for(int32_t y = 0; y < src_h; y++) {
                     lv_memzero(row_buf, eve_stride);
@@ -282,148 +282,148 @@ lv_eve5_vram_res_t *lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
         }
     }
     else switch(src_cf) {
-        case LV_COLOR_FORMAT_I1:
-        case LV_COLOR_FORMAT_I2:
-        case LV_COLOR_FORMAT_I4: {
-            /* LVGL I1/I2/I4: [palette N×ARGB8888][packed indices]
-             * EVE PALETTEDARGB8: [256×ARGB8888 palette][8-bit indices]
-             * Expand palette and unpack sub-byte indices. */
-            uint32_t src_palette_entries = LV_COLOR_INDEXED_PALETTE_SIZE(src_cf);
-            uint32_t src_palette_bytes = src_palette_entries * sizeof(lv_color32_t);
-            const uint8_t *palette_data = src_buf;
-            const uint8_t *index_data = src_buf + src_palette_bytes;
+            case LV_COLOR_FORMAT_I1:
+            case LV_COLOR_FORMAT_I2:
+            case LV_COLOR_FORMAT_I4: {
+                    /* LVGL I1/I2/I4: [palette N×ARGB8888][packed indices]
+                     * EVE PALETTEDARGB8: [256×ARGB8888 palette][8-bit indices]
+                     * Expand palette and unpack sub-byte indices. */
+                    uint32_t src_palette_entries = LV_COLOR_INDEXED_PALETTE_SIZE(src_cf);
+                    uint32_t src_palette_bytes = src_palette_entries * sizeof(lv_color32_t);
+                    const uint8_t * palette_data = src_buf;
+                    const uint8_t * index_data = src_buf + src_palette_bytes;
 
-            EVE_Hal_wrMem(u->hal, base_addr, palette_data, src_palette_bytes);
-            if(src_palette_entries < 256) {
-                uint32_t pad_bytes = (256 - src_palette_entries) * sizeof(lv_color32_t);
-                uint8_t *zeros = lv_calloc(1, pad_bytes);
-                if(zeros) {
-                    EVE_Hal_wrMem(u->hal, base_addr + src_palette_bytes, zeros, pad_bytes);
-                    lv_free(zeros);
-                }
-            }
-
-            uint8_t *tmp_buf = lv_malloc(eve_stride);
-            if(!tmp_buf) {
-                LV_LOG_ERROR("EVE5: Failed to allocate index expansion buffer");
-                Esd_GpuAlloc_Free(u->allocator, handle);
-                return NULL;
-            }
-
-            uint32_t src_bpp_val = lv_color_format_get_bpp(src_cf);
-            uint32_t pixels_per_byte = 8 / src_bpp_val;
-            uint32_t index_mask = (1u << src_bpp_val) - 1u;
-
-            for(int32_t y = 0; y < src_h; y++) {
-                const uint8_t *src_row = index_data + y * src_stride;
-                lv_memzero(tmp_buf, eve_stride);
-                for(int32_t x = 0; x < src_w; x++) {
-                    uint32_t byte_idx = x / pixels_per_byte;
-                    /* MSB-first packing */
-                    uint32_t bit_shift = (pixels_per_byte - 1 - (x % pixels_per_byte)) * src_bpp_val;
-                    tmp_buf[x] = (src_row[byte_idx] >> bit_shift) & index_mask;
-                }
-                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-            }
-            lv_free(tmp_buf);
-            break;
-        }
-
-        case LV_COLOR_FORMAT_I8: {
-            /* LVGL I8: [256×ARGB8888 palette][8-bit indices]
-             * EVE PALETTEDARGB8: same layout, upload contiguously. */
-            const uint8_t *palette_data = src_buf;
-            const uint8_t *index_data = src_buf + palette_size;
-
-            EVE_Hal_wrMem(u->hal, base_addr, palette_data, palette_size);
-
-            int32_t row_bytes = (src_w * bpp + 7) / 8;
-            if(eve_stride == src_stride) {
-                EVE_Hal_wrMem(u->hal, ram_g_addr, index_data, eve_size);
-            }
-            else {
-                uint8_t *row_buf = lv_malloc(eve_stride);
-                if(row_buf != NULL) {
-                    for(int32_t y = 0; y < src_h; y++) {
-                        lv_memzero(row_buf, eve_stride);
-                        lv_memcpy(row_buf, index_data + y * src_stride, row_bytes);
-                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, row_buf, eve_stride);
+                    EVE_Hal_wrMem(u->hal, base_addr, palette_data, src_palette_bytes);
+                    if(src_palette_entries < 256) {
+                        uint32_t pad_bytes = (256 - src_palette_entries) * sizeof(lv_color32_t);
+                        uint8_t * zeros = lv_calloc(1, pad_bytes);
+                        if(zeros) {
+                            EVE_Hal_wrMem(u->hal, base_addr + src_palette_bytes, zeros, pad_bytes);
+                            lv_free(zeros);
+                        }
                     }
-                    lv_free(row_buf);
-                }
-                else {
-                    for(int32_t y = 0; y < src_h; y++) {
-                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                                      index_data + y * src_stride, row_bytes);
+
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    if(!tmp_buf) {
+                        LV_LOG_ERROR("EVE5: Failed to allocate index expansion buffer");
+                        Esd_GpuAlloc_Free(u->allocator, handle);
+                        return NULL;
                     }
+
+                    uint32_t src_bpp_val = lv_color_format_get_bpp(src_cf);
+                    uint32_t pixels_per_byte = 8 / src_bpp_val;
+                    uint32_t index_mask = (1u << src_bpp_val) - 1u;
+
+                    for(int32_t y = 0; y < src_h; y++) {
+                        const uint8_t * src_row = index_data + y * src_stride;
+                        lv_memzero(tmp_buf, eve_stride);
+                        for(int32_t x = 0; x < src_w; x++) {
+                            uint32_t byte_idx = x / pixels_per_byte;
+                            /* MSB-first packing */
+                            uint32_t bit_shift = (pixels_per_byte - 1 - (x % pixels_per_byte)) * src_bpp_val;
+                            tmp_buf[x] = (src_row[byte_idx] >> bit_shift) & index_mask;
+                        }
+                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
                 }
-            }
-            break;
-        }
 
-        case LV_COLOR_FORMAT_RGB565_SWAPPED: {
-            uint8_t *tmp_buf = lv_malloc(eve_stride);
-            if(!tmp_buf) {
-                LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
+            case LV_COLOR_FORMAT_I8: {
+                    /* LVGL I8: [256×ARGB8888 palette][8-bit indices]
+                     * EVE PALETTEDARGB8: same layout, upload contiguously. */
+                    const uint8_t * palette_data = src_buf;
+                    const uint8_t * index_data = src_buf + palette_size;
+
+                    EVE_Hal_wrMem(u->hal, base_addr, palette_data, palette_size);
+
+                    int32_t row_bytes = (src_w * bpp + 7) / 8;
+                    if(eve_stride == src_stride) {
+                        EVE_Hal_wrMem(u->hal, ram_g_addr, index_data, eve_size);
+                    }
+                    else {
+                        uint8_t * row_buf = lv_malloc(eve_stride);
+                        if(row_buf != NULL) {
+                            for(int32_t y = 0; y < src_h; y++) {
+                                lv_memzero(row_buf, eve_stride);
+                                lv_memcpy(row_buf, index_data + y * src_stride, row_bytes);
+                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, row_buf, eve_stride);
+                            }
+                            lv_free(row_buf);
+                        }
+                        else {
+                            for(int32_t y = 0; y < src_h; y++) {
+                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
+                                              index_data + y * src_stride, row_bytes);
+                            }
+                        }
+                    }
+                    break;
+                }
+
+            case LV_COLOR_FORMAT_RGB565_SWAPPED: {
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    if(!tmp_buf) {
+                        LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
+                        Esd_GpuAlloc_Free(u->allocator, handle);
+                        return NULL;
+                    }
+
+                    for(int32_t y = 0; y < src_h; y++) {
+                        lv_memzero(tmp_buf, eve_stride);
+                        convert_rgb565_byteswap(src_buf + y * src_stride, tmp_buf, src_w);
+                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
+                }
+
+            case LV_COLOR_FORMAT_XRGB8888: {
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    if(!tmp_buf) {
+                        LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
+                        Esd_GpuAlloc_Free(u->allocator, handle);
+                        return NULL;
+                    }
+
+                    for(int32_t y = 0; y < src_h; y++) {
+                        lv_memzero(tmp_buf, eve_stride);
+                        convert_xrgb8888_to_rgb8(src_buf + y * src_stride, tmp_buf, src_w);
+                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
+                }
+
+            case LV_COLOR_FORMAT_RGB565A8: {
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    if(!tmp_buf) {
+                        LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
+                        Esd_GpuAlloc_Free(u->allocator, handle);
+                        return NULL;
+                    }
+
+                    /* Alpha plane follows RGB data */
+                    const uint8_t * alpha_buf = src_buf + src_h * src_stride;
+                    int32_t alpha_stride = src_stride / 2;
+
+                    for(int32_t y = 0; y < src_h; y++) {
+                        convert_rgb565a8_to_argb8(src_buf + y * src_stride,
+                                                  alpha_buf + y * alpha_stride,
+                                                  tmp_buf, src_w);
+                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
+                }
+
+            default:
                 Esd_GpuAlloc_Free(u->allocator, handle);
                 return NULL;
-            }
-
-            for(int32_t y = 0; y < src_h; y++) {
-                lv_memzero(tmp_buf, eve_stride);
-                convert_rgb565_byteswap(src_buf + y * src_stride, tmp_buf, src_w);
-                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-            }
-            lv_free(tmp_buf);
-            break;
         }
-
-        case LV_COLOR_FORMAT_XRGB8888: {
-            uint8_t *tmp_buf = lv_malloc(eve_stride);
-            if(!tmp_buf) {
-                LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
-                Esd_GpuAlloc_Free(u->allocator, handle);
-                return NULL;
-            }
-
-            for(int32_t y = 0; y < src_h; y++) {
-                lv_memzero(tmp_buf, eve_stride);
-                convert_xrgb8888_to_rgb8(src_buf + y * src_stride, tmp_buf, src_w);
-                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-            }
-            lv_free(tmp_buf);
-            break;
-        }
-
-        case LV_COLOR_FORMAT_RGB565A8: {
-            uint8_t *tmp_buf = lv_malloc(eve_stride);
-            if(!tmp_buf) {
-                LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
-                Esd_GpuAlloc_Free(u->allocator, handle);
-                return NULL;
-            }
-
-            /* Alpha plane follows RGB data */
-            const uint8_t *alpha_buf = src_buf + src_h * src_stride;
-            int32_t alpha_stride = src_stride / 2;
-
-            for(int32_t y = 0; y < src_h; y++) {
-                convert_rgb565a8_to_argb8(src_buf + y * src_stride,
-                                           alpha_buf + y * alpha_stride,
-                                           tmp_buf, src_w);
-                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-            }
-            lv_free(tmp_buf);
-            break;
-        }
-
-        default:
-            Esd_GpuAlloc_Free(u->allocator, handle);
-            return NULL;
-    }
 
     /* Allocate and attach vram_res to the image descriptor */
-    lv_eve5_vram_res_t *vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
+    lv_eve5_vram_res_t * vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
         Esd_GpuAlloc_PendingFree(u->allocator, handle);
         return NULL;
@@ -441,7 +441,7 @@ lv_eve5_vram_res_t *lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t *u,
     vr->palette_offset = (palette_size > 0) ? 0 : GA_INVALID;
     vr->has_content = true;
 
-	/* If the application crashes here, it's likely that img_dsc is declared const */
+    /* If the application crashes here, it's likely that img_dsc is declared const */
     img_dsc->vram_res = (struct _lv_draw_buf_vram_res_t *)vr;
 
     LV_LOG_TRACE("EVE5: Uploaded image %dx%d cf=%d as EVE format %d at 0x%08X (palette %u)",

@@ -30,7 +30,7 @@
 /* CMD_ARC (BT820+) has slight rendering alignment issues.
  * Set to 1 to use CMD_ARC anyway for testing or if firmware is fixed. */
 #ifndef LV_DRAW_EVE5_USE_CMD_ARC
-#define LV_DRAW_EVE5_USE_CMD_ARC 0
+    #define LV_DRAW_EVE5_USE_CMD_ARC 0
 #endif
 
 /**********************
@@ -38,7 +38,7 @@
  **********************/
 
 /* Center offset by -0.5px to match LVGL's pixel grid convention. */
-static void draw_circle(lv_draw_eve5_unit_t *u, int32_t cx, int32_t cy, int32_t radius)
+static void draw_circle(lv_draw_eve5_unit_t * u, int32_t cx, int32_t cy, int32_t radius)
 {
     draw_circle_subpx(u, cx * 2 - 1, cy * 2 - 1, radius * 16);
 }
@@ -87,14 +87,14 @@ static void setup_arc_image(EVE_HalContext *phost, uint32_t addr, uint16_t eve_f
  *
  * Alpha channel is used as scratch space, tracked for repair by the alpha pass.
  */
-static void draw_arc_stencil(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
+static void draw_arc_stencil(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                              int32_t cx, int32_t cy, int32_t radius_out, int32_t radius_in,
                              int32_t start_angle, int32_t end_angle, bool alpha_to_rgb)
 {
     EVE_HalContext *phost = u->hal;
-    lv_draw_arc_dsc_t *dsc = t->draw_dsc;
-    const lv_area_t *clip = &t->clip_area;
-    const lv_area_t *layer_area = &t->target_layer->buf_area;
+    lv_draw_arc_dsc_t * dsc = t->draw_dsc;
+    const lv_area_t * clip = &t->clip_area;
+    const lv_area_t * layer_area = &t->target_layer->buf_area;
 
     /* Resolve image source if set */
     uint32_t img_addr = GA_INVALID;
@@ -106,7 +106,7 @@ static void draw_arc_stencil(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
     bool img_has_alpha = false;
 
     if(dsc->img_src != NULL) {
-        lv_eve5_vram_res_t *img_vr = lv_draw_eve5_resolve_to_gpu(u, dsc->img_src);
+        lv_eve5_vram_res_t * img_vr = lv_draw_eve5_resolve_to_gpu(u, dsc->img_src);
         if(img_vr != NULL) {
             eve5_vram_res_resolve(u->allocator, img_vr, &img_addr, &img_palette_addr);
             if(img_addr != GA_INVALID) {
@@ -352,8 +352,8 @@ static void draw_arc_stencil(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t,
 track_alpha:
     if(!alpha_to_rgb) {
         lv_draw_eve5_track_alpha_trashed(u,
-            cx - radius_out - 1, cy - radius_out - 1,
-            cx + radius_out + 1, cy + radius_out + 1);
+                                         cx - radius_out - 1, cy - radius_out - 1,
+                                         cx + radius_out + 1, cy + radius_out + 1);
     }
 }
 
@@ -367,10 +367,10 @@ track_alpha:
  * alpha_to_rgb=false: normal RGB pass with alpha-as-scratch masking.
  * alpha_to_rgb=true: renders alpha contribution as grayscale luminance.
  */
-void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, bool alpha_to_rgb)
+void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb)
 {
-    lv_layer_t *layer = t->target_layer;
-    lv_draw_arc_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    lv_draw_arc_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
@@ -412,7 +412,8 @@ void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, 
         if(start_angle == end_angle) {
             a0 = 0;
             a1 = 0xFFFF;
-        } else {
+        }
+        else {
             a0 = degrees_to_furmans(start_angle);
             a1 = degrees_to_furmans(end_angle);
         }
@@ -427,8 +428,8 @@ void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, 
         EVE_CoDl_vertexTranslateY(u->hal, 0);
 
         lv_draw_eve5_track_alpha_trashed(u,
-            cx - radius_out - 1, cy - radius_out - 1,
-            cx + radius_out + 1, cy + radius_out + 1);
+                                         cx - radius_out - 1, cy - radius_out - 1,
+                                         cx + radius_out + 1, cy + radius_out + 1);
         return;
     }
 #endif
@@ -444,11 +445,11 @@ void lv_draw_eve5_hal_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t, 
  * Alpha correction pass for arcs.
  * Uses stencil to build arc shape mask, then draws alpha through it.
  */
-void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t)
+void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
 {
     EVE_HalContext *phost = u->hal;
-    lv_layer_t *layer = t->target_layer;
-    const lv_draw_arc_dsc_t *dsc = t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    const lv_draw_arc_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
@@ -469,7 +470,7 @@ void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     bool img_has_alpha = false;
 
     if(dsc->img_src != NULL) {
-        lv_eve5_vram_res_t *img_vr = lv_draw_eve5_resolve_to_gpu(u, dsc->img_src);
+        lv_eve5_vram_res_t * img_vr = lv_draw_eve5_resolve_to_gpu(u, dsc->img_src);
         if(img_vr != NULL) {
             eve5_vram_res_resolve(u->allocator, img_vr, &img_addr, &img_palette_addr);
             if(img_addr != GA_INVALID) {
@@ -496,7 +497,7 @@ void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     else
         arc_span = 360;
 
-    const lv_area_t *layer_area = &layer->buf_area;
+    const lv_area_t * layer_area = &layer->buf_area;
     lv_area_t arc_bbox = {
         cx - radius_out - 1 + layer_area->x1,
         cy - radius_out - 1 + layer_area->y1,
@@ -522,7 +523,10 @@ void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t *u, const lv_draw_task_t *t
     /* Phase 2: Build angular wedge mask (partial arcs only) */
     if(!is_full) {
         int32_t sa = start_angle, ea = end_angle;
-        if(reverse) { sa = end_angle; ea = start_angle; }
+        if(reverse) {
+            sa = end_angle;
+            ea = start_angle;
+        }
 
         int32_t wedge_span;
         if(ea > sa) wedge_span = ea - sa;

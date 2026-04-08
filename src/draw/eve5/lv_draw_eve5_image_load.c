@@ -24,10 +24,10 @@
 #include "../lv_draw_image.h"
 #include "../lv_image_decoder_private.h"
 #if LV_USE_FS_EVE5_SDCARD
-#include "../../drivers/display/eve5/lv_eve5_sdcard.h"
+    #include "../../drivers/display/eve5/lv_eve5_sdcard.h"
 #endif
 #if LV_USE_FS_EVE5_FLASH
-#include "../../drivers/display/eve5/lv_eve5_flash.h"
+    #include "../../drivers/display/eve5/lv_eve5_flash.h"
 #endif
 
 /**********************
@@ -38,7 +38,8 @@
  * Resolve an image source to an lv_image_dsc_t.
  * For files, opens with use_indexed=true to preserve indexed formats.
  */
-bool lv_draw_eve5_resolve_image_source(LV_IMAGE_DSC_CONST void *src, eve5_resolved_image_t *resolved, lv_draw_unit_t *draw_unit)
+bool lv_draw_eve5_resolve_image_source(LV_IMAGE_DSC_CONST void * src, eve5_resolved_image_t * resolved,
+                                       lv_draw_unit_t * draw_unit)
 {
     lv_memzero(resolved, sizeof(*resolved));
 
@@ -85,7 +86,7 @@ bool lv_draw_eve5_resolve_image_source(LV_IMAGE_DSC_CONST void *src, eve5_resolv
     return false;
 }
 
-void lv_draw_eve5_release_image_source(eve5_resolved_image_t *resolved)
+void lv_draw_eve5_release_image_source(eve5_resolved_image_t * resolved)
 {
     if(resolved->decoder_open) {
         lv_image_decoder_close(&resolved->decoder_dsc);
@@ -105,16 +106,16 @@ void lv_draw_eve5_release_image_source(eve5_resolved_image_t *resolved)
  * HAL mutex: expects UNLOCKED on entry (file I/O may need it), locks internally
  * for EVE commands, returns with HAL UNLOCKED.
  */
-bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t *u, const void *src,
-                                 uint32_t *ram_g_addr, uint16_t *eve_format,
-                                 int32_t *eve_stride, int32_t *src_w, int32_t *src_h,
-                                 Esd_GpuHandle *out_handle, uint32_t *out_palette_addr)
+bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
+                                      uint32_t * ram_g_addr, uint16_t * eve_format,
+                                      int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
+                                      Esd_GpuHandle *out_handle, uint32_t * out_palette_addr)
 {
     if(lv_image_src_get_type(src) != LV_IMAGE_SRC_FILE) {
         return false;
     }
 
-    const char *path = (const char *)src;
+    const char * path = (const char *)src;
 
 #if LV_USE_FS_EVE5_SDCARD
     if(lv_eve5_sdcard_is_path(path)) {
@@ -163,15 +164,16 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t *u, const void *src,
     if(is_png && header_read >= 26) {
         uint8_t bit_depth = header_buf[24];
         uint8_t color_type = header_buf[25];
-        const char *ct_str = "unknown";
+        const char * ct_str = "unknown";
         if(color_type == 0) ct_str = "grayscale";
         else if(color_type == 2) ct_str = "RGB";
         else if(color_type == 3) ct_str = "indexed";
         else if(color_type == 4) ct_str = "gray+alpha";
         else if(color_type == 6) ct_str = "RGBA";
-        (void)bit_depth; (void)ct_str;
+        (void)bit_depth;
+        (void)ct_str;
         LV_LOG_INFO("EVE5 HW_DECODE: PNG %s: %ux%u depth=%u color_type=%u(%s)",
-                     path, img_w, img_h, bit_depth, color_type, ct_str);
+                    path, img_w, img_h, bit_depth, color_type, ct_str);
     }
     else if(is_jpeg) {
         LV_LOG_INFO("EVE5 HW_DECODE: JPEG %s: %ux%u", path, img_w, img_h);
@@ -362,16 +364,16 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t *u, const void *src,
  * Load JPEG/PNG directly from EVE5 SD card (zero-copy HW decode).
  * HAL mutex: expects UNLOCKED (lv_eve5_sdcard_load_image locks internally).
  */
-bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t *u, const void *src,
-                                   uint32_t *ram_g_addr, uint16_t *eve_format,
-                                   int32_t *eve_stride, int32_t *src_w, int32_t *src_h,
-                                   Esd_GpuHandle *out_handle, uint32_t *out_palette_addr)
+bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * src,
+                                        uint32_t * ram_g_addr, uint16_t * eve_format,
+                                        int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
+                                        Esd_GpuHandle *out_handle, uint32_t * out_palette_addr)
 {
     if(lv_image_src_get_type(src) != LV_IMAGE_SRC_FILE) {
         return false;
     }
 
-    const char *path = (const char *)src;
+    const char * path = (const char *)src;
     if(!lv_eve5_sdcard_is_path(path)) {
         return false;
     }
@@ -416,16 +418,16 @@ bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t *u, const void *src,
  * Load JPEG/PNG directly from EVE flash (zero-copy HW decode).
  * HAL mutex: expects UNLOCKED (lv_eve5_flash_load_image locks internally).
  */
-bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t *u, const void *src,
-                                   uint32_t *ram_g_addr, uint16_t *eve_format,
-                                   int32_t *eve_stride, int32_t *src_w, int32_t *src_h,
-                                   Esd_GpuHandle *out_handle, uint32_t *out_palette_addr)
+bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src,
+                                       uint32_t * ram_g_addr, uint16_t * eve_format,
+                                       int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
+                                       Esd_GpuHandle *out_handle, uint32_t * out_palette_addr)
 {
     if(lv_image_src_get_type(src) != LV_IMAGE_SRC_FILE) {
         return false;
     }
 
-    const char *path = (const char *)src;
+    const char * path = (const char *)src;
     if(!lv_eve5_flash_is_path(path)) {
         return false;
     }
@@ -480,7 +482,7 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t *u, const void *src,
  *
  * Returns NULL on failure.
  */
-lv_eve5_vram_res_t *lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t *u, LV_IMAGE_DSC_CONST void *src)
+lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, LV_IMAGE_DSC_CONST void * src)
 {
     lv_image_src_t src_type = lv_image_src_get_type(src);
 
@@ -497,7 +499,7 @@ lv_eve5_vram_res_t *lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t *u, LV_IMAGE
 
         /* upload_image_to_gpu checks existing vram_res, uploads if needed,
          * and attaches vram_res to the image descriptor. */
-        lv_eve5_vram_res_t *vr = lv_draw_eve5_upload_image_to_gpu(u, resolved.img_dsc);
+        lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu(u, resolved.img_dsc);
         lv_draw_eve5_release_image_source(&resolved);
         return vr;
     }
@@ -519,30 +521,36 @@ lv_eve5_vram_res_t *lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t *u, LV_IMAGE
 
 #if EVE5_HW_IMAGE_DECODE
 
-static lv_draw_eve5_unit_t *s_decoder_unit;
+static lv_draw_eve5_unit_t * s_decoder_unit;
 
 static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt)
 {
     switch(eve_fmt) {
-        case ARGB8:         return LV_COLOR_FORMAT_ARGB8888;
-        case RGB8:          return LV_COLOR_FORMAT_RGB888;
-        case RGB565:        return LV_COLOR_FORMAT_RGB565;
-        case PALETTEDARGB8: return LV_COLOR_FORMAT_I8;
-        case L8:            return LV_COLOR_FORMAT_L8;
-        default:            return LV_COLOR_FORMAT_ARGB8888;
+        case ARGB8:
+            return LV_COLOR_FORMAT_ARGB8888;
+        case RGB8:
+            return LV_COLOR_FORMAT_RGB888;
+        case RGB565:
+            return LV_COLOR_FORMAT_RGB565;
+        case PALETTEDARGB8:
+            return LV_COLOR_FORMAT_I8;
+        case L8:
+            return LV_COLOR_FORMAT_L8;
+        default:
+            return LV_COLOR_FORMAT_ARGB8888;
     }
 }
 
-static lv_result_t eve5_decoder_info(lv_image_decoder_t *decoder,
-                                      lv_image_decoder_dsc_t *dsc,
-                                      lv_image_header_t *header)
+static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
+                                     lv_image_decoder_dsc_t * dsc,
+                                     lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
     if(dsc->src_type != LV_IMAGE_SRC_FILE) return LV_RESULT_INVALID;
 
-    const char *fn = dsc->src;
-    const char *ext = lv_fs_get_ext(fn);
+    const char * fn = dsc->src;
+    const char * ext = lv_fs_get_ext(fn);
 
     bool is_jpeg = (lv_strcmp(ext, "jpg") == 0) || (lv_strcmp(ext, "jpeg") == 0);
     bool is_png = (lv_strcmp(ext, "png") == 0);
@@ -572,14 +580,14 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t *decoder,
     return LV_RESULT_OK;
 }
 
-static lv_result_t eve5_decoder_open(lv_image_decoder_t *decoder,
-                                      lv_image_decoder_dsc_t *dsc)
+static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
+                                     lv_image_decoder_dsc_t * dsc)
 {
     if(dsc->src_type != LV_IMAGE_SRC_FILE) return LV_RESULT_INVALID;
     if(s_decoder_unit == NULL) return LV_RESULT_INVALID;
 
-    lv_draw_eve5_unit_t *u = s_decoder_unit;
-    const char *path = (const char *)dsc->src;
+    lv_draw_eve5_unit_t * u = s_decoder_unit;
+    const char * path = (const char *)dsc->src;
 
     bool is_jpeg, is_png;
     if(!eve5_is_jpeg_or_png(path, &is_jpeg, &is_png)) {
@@ -595,20 +603,20 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t *decoder,
 #if LV_USE_FS_EVE5_SDCARD
     if(!loaded) {
         loaded = lv_draw_eve5_try_load_sdcard_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                            &eve_stride, &src_w, &src_h, &handle, &palette_addr);
+                                                    &eve_stride, &src_w, &src_h, &handle, &palette_addr);
     }
 #endif
 
 #if LV_USE_FS_EVE5_FLASH
     if(!loaded) {
         loaded = lv_draw_eve5_try_load_flash_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                            &eve_stride, &src_w, &src_h, &handle, &palette_addr);
+                                                   &eve_stride, &src_w, &src_h, &handle, &palette_addr);
     }
 #endif
 
     if(!loaded) {
         loaded = lv_draw_eve5_try_load_file_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                            &eve_stride, &src_w, &src_h, &handle, &palette_addr);
+                                                  &eve_stride, &src_w, &src_h, &handle, &palette_addr);
     }
 
     if(!loaded) {
@@ -649,13 +657,13 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t *decoder,
     /* Compute handle-relative offsets (defrag-safe) */
     uint32_t alloc_base = Esd_GpuAlloc_Get(u->allocator, handle);
     uint32_t source_offset = (alloc_base != GA_INVALID && ram_g_addr >= alloc_base)
-                            ? (ram_g_addr - alloc_base) : 0;
+                             ? (ram_g_addr - alloc_base) : 0;
     uint32_t pal_offset = (palette_addr != GA_INVALID && alloc_base != GA_INVALID && palette_addr >= alloc_base)
                           ? (palette_addr - alloc_base) : GA_INVALID;
     uint32_t alloc_size = (uint32_t)(eve_stride * src_h);
     if(pal_offset != GA_INVALID) alloc_size += 256 * 4;
 
-    lv_eve5_vram_res_t *vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
+    lv_eve5_vram_res_t * vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
         Esd_GpuAlloc_Free(u->allocator, handle);
         return LV_RESULT_INVALID;
@@ -671,7 +679,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t *decoder,
     vr->has_content = true;
 
     lv_color_format_t lv_cf = eve_format_to_lv_cf(eve_format);
-    lv_draw_buf_t *decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+    lv_draw_buf_t * decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     if(decoded == NULL) {
         lv_free(vr);
         Esd_GpuAlloc_Free(u->allocator, handle);
@@ -711,11 +719,11 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t *decoder,
     return LV_RESULT_OK;
 }
 
-void lv_draw_eve5_register_image_decoder(lv_draw_eve5_unit_t *unit)
+void lv_draw_eve5_register_image_decoder(lv_draw_eve5_unit_t * unit)
 {
     s_decoder_unit = unit;
 
-    lv_image_decoder_t *dec = lv_image_decoder_create();
+    lv_image_decoder_t * dec = lv_image_decoder_create();
     lv_image_decoder_set_info_cb(dec, eve5_decoder_info);
     lv_image_decoder_set_open_cb(dec, eve5_decoder_open);
     dec->name = "EVE5_HW";

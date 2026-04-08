@@ -27,11 +27,11 @@
 #include "../lv_draw_image.h"
 #include "../lv_image_decoder_private.h"
 #if LV_USE_FS_EVE5_SDCARD
-#include "../../drivers/display/eve5/lv_eve5_sdcard.h"
+    #include "../../drivers/display/eve5/lv_eve5_sdcard.h"
 #endif
 
 #if !LV_DRAW_EVE5_NO_FLOAT
-#include <math.h>
+    #include <math.h>
 #endif
 
 /**********************
@@ -56,9 +56,9 @@
  * - Colorkey stencil: uses 6-pass INCR, doesn't trash alpha
  * - Recolor: trashes alpha but doesn't use stencil in alpha pass
  */
-bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t *t)
+bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t * t)
 {
-    const lv_draw_image_dsc_t *dsc = t->draw_dsc;
+    const lv_draw_image_dsc_t * dsc = t->draw_dsc;
     if(dsc->opa <= LV_OPA_MIN) return false;
 
     /* Clip stencil path: clip_radius + no colorkey + (mask bitmap OR ARGB source) */
@@ -66,7 +66,7 @@ bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t *t)
         if(dsc->bitmap_mask_src != NULL) return true;
         if(t->type == LV_DRAW_TASK_TYPE_LAYER) return true;
         if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
-            const lv_image_dsc_t *img_dsc = dsc->src;
+            const lv_image_dsc_t * img_dsc = dsc->src;
             if(img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888 ||
                img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED)
                 return true;
@@ -78,7 +78,7 @@ bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t *t)
     if(dsc->bitmap_mask_src != NULL) {
         if(t->type == LV_DRAW_TASK_TYPE_LAYER) return true;
         if(lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE) {
-            const lv_image_dsc_t *img_dsc = dsc->src;
+            const lv_image_dsc_t * img_dsc = dsc->src;
             if(img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888 ||
                img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED)
                 return true;
@@ -109,7 +109,7 @@ bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t *t)
  * bitmap layout restored to original format.
  */
 void build_colorkey_stencil(EVE_HalContext *phost,
-                            const lv_image_colorkey_t *colorkey,
+                            const lv_image_colorkey_t * colorkey,
                             uint16_t eve_format, int32_t eve_stride, int32_t layout_h,
                             int32_t vx, int32_t vy)
 {
@@ -165,7 +165,8 @@ void build_colorkey_stencil(EVE_HalContext *phost,
      * but need identity swizzle restored. Legacy formats exit GLFORMAT. */
     if(extended) {
         EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ALPHA);
-    } else {
+    }
+    else {
         EVE_CoDl_bitmapLayout(phost, (uint8_t)eve_format, eve_stride, layout_h);
     }
 }
@@ -180,7 +181,7 @@ void build_colorkey_stencil(EVE_HalContext *phost,
  * transformed bounding box needed for BITMAP_SIZE.
  * Returns false if the transform matrix is degenerate.
  */
-bool compute_image_skew(image_skew_t *out,
+bool compute_image_skew(image_skew_t * out,
                         int32_t rotation, int32_t scale_x, int32_t scale_y,
                         int32_t skew_x, int32_t skew_y,
                         int32_t pivot_x, int32_t pivot_y,
@@ -223,7 +224,7 @@ bool compute_image_skew(image_skew_t *out,
     int32_t fsx = (int32_t)scale_x << 8;
     int32_t fsy = (int32_t)scale_y << 8;
 
-    #define FP_MUL(a, b) ((int32_t)(((int64_t)(a) * (b)) >> 16))
+#define FP_MUL(a, b) ((int32_t)(((int64_t)(a) * (b)) >> 16))
 
     /* Forward matrix M = Scale * Skew * Rotation */
     int32_t ma = FP_MUL(fsx, cos_r) + FP_MUL(FP_MUL(tan_skx, fsy), sin_r);
@@ -257,15 +258,22 @@ bool compute_image_skew(image_skew_t *out,
 
     /* Bounding box from transformed corners */
     int32_t cx[4], cy[4];
-    cx[0] = -(pivot_x << 16);              cy[0] = -(pivot_y << 16);
-    cx[1] = (src_w - pivot_x) << 16;       cy[1] = -(pivot_y << 16);
-    cx[2] = -(pivot_x << 16);              cy[2] = (src_h - pivot_y) << 16;
-    cx[3] = (src_w - pivot_x) << 16;       cy[3] = (src_h - pivot_y) << 16;
+    cx[0] = -(pivot_x << 16);
+    cy[0] = -(pivot_y << 16);
+    cx[1] = (src_w - pivot_x) << 16;
+    cy[1] = -(pivot_y << 16);
+    cx[2] = -(pivot_x << 16);
+    cy[2] = (src_h - pivot_y) << 16;
+    cx[3] = (src_w - pivot_x) << 16;
+    cy[3] = (src_h - pivot_y) << 16;
     int32_t bx_min = 0, bx_max = 0, by_min = 0, by_max = 0;
     for(int i = 0; i < 4; i++) {
         int32_t sx = FP_MUL(ma, cx[i]) + FP_MUL(mb, cy[i]);
         int32_t sy = FP_MUL(md, cx[i]) + FP_MUL(me, cy[i]);
-        if(i == 0) { bx_min = bx_max = sx; by_min = by_max = sy; }
+        if(i == 0) {
+            bx_min = bx_max = sx;
+            by_min = by_max = sy;
+        }
         else {
             if(sx < bx_min) bx_min = sx;
             if(sx > bx_max) bx_max = sx;
@@ -278,7 +286,7 @@ bool compute_image_skew(image_skew_t *out,
     if(out->bmp_w > 2048) out->bmp_w = 2048;
     if(out->bmp_h > 2048) out->bmp_h = 2048;
 
-    #undef FP_MUL
+#undef FP_MUL
 #else
     float px = (float)pivot_x;
     float py = (float)pivot_y;
@@ -321,15 +329,22 @@ bool compute_image_skew(image_skew_t *out,
 
     /* Bounding box from transformed corners */
     float corners_x[4], corners_y[4];
-    corners_x[0] = -px;             corners_y[0] = -py;
-    corners_x[1] = src_w - px;      corners_y[1] = -py;
-    corners_x[2] = -px;             corners_y[2] = src_h - py;
-    corners_x[3] = src_w - px;      corners_y[3] = src_h - py;
+    corners_x[0] = -px;
+    corners_y[0] = -py;
+    corners_x[1] = src_w - px;
+    corners_y[1] = -py;
+    corners_x[2] = -px;
+    corners_y[2] = src_h - py;
+    corners_x[3] = src_w - px;
+    corners_y[3] = src_h - py;
     float bx_min = 0, bx_max = 0, by_min = 0, by_max = 0;
     for(int i = 0; i < 4; i++) {
         float sx2 = ma * corners_x[i] + mb * corners_y[i];
         float sy2 = md * corners_x[i] + me * corners_y[i];
-        if(i == 0) { bx_min = bx_max = sx2; by_min = by_max = sy2; }
+        if(i == 0) {
+            bx_min = bx_max = sx2;
+            by_min = by_max = sy2;
+        }
         else {
             if(sx2 < bx_min) bx_min = sx2;
             if(sx2 > bx_max) bx_max = sx2;
@@ -350,7 +365,7 @@ bool compute_image_skew(image_skew_t *out,
  * Apply computed skew transform: set BITMAP_SIZE for the transformed
  * bounding box (or tile extent) and BITMAP_TRANSFORM A-F coefficients.
  */
-void apply_image_skew(EVE_HalContext *phost, const image_skew_t *skew,
+void apply_image_skew(EVE_HalContext *phost, const image_skew_t * skew,
                       uint8_t bmp_filter, int32_t tile_w, int32_t tile_h)
 {
     if(tile_w > 0 && tile_h > 0) {

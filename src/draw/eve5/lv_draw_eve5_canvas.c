@@ -26,7 +26,7 @@
 /**********************
  * STATIC PROTOTYPES
  **********************/
-static bool is_simple_image_draw(const lv_draw_image_dsc_t *dsc, const lv_draw_task_t *t);
+static bool is_simple_image_draw(const lv_draw_image_dsc_t * dsc, const lv_draw_task_t * t);
 
 /**********************
  * STATIC FUNCTIONS
@@ -36,7 +36,7 @@ static bool is_simple_image_draw(const lv_draw_image_dsc_t *dsc, const lv_draw_t
  * Check if an image draw task is "simple", with no options requiring the render pipeline.
  * Simple images can be loaded directly to canvas GPU allocation.
  */
-static bool is_simple_image_draw(const lv_draw_image_dsc_t *dsc, const lv_draw_task_t *t)
+static bool is_simple_image_draw(const lv_draw_image_dsc_t * dsc, const lv_draw_task_t * t)
 {
     if(dsc == NULL) return false;
 
@@ -72,13 +72,13 @@ static bool is_simple_image_draw(const lv_draw_image_dsc_t *dsc, const lv_draw_t
  *
  * Returns true if handled (task marked finished), false to continue with normal render.
  */
-bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
+bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 {
     if(!layer->draw_buf) return false;
 
     /* Skip direct load for canvases with existing GPU content.
      * The render path handles incremental updates; direct load replaces everything. */
-    lv_eve5_vram_res_t *existing_vr = eve5_get_vram_res(layer);
+    lv_eve5_vram_res_t * existing_vr = eve5_get_vram_res(layer);
     if(existing_vr != NULL && layer->draw_buf != NULL) {
         if(lv_draw_buf_has_flag(layer->draw_buf, LV_IMAGE_FLAGS_CLEARZERO | LV_IMAGE_FLAGS_DISCARDABLE)) {
             existing_vr->has_content = false;
@@ -90,10 +90,10 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *la
     }
 
     /* Find exactly one simple image task */
-    lv_draw_task_t *image_task = NULL;
+    lv_draw_task_t * image_task = NULL;
     int task_count = 0;
 
-    for(lv_draw_task_t *t = layer->draw_task_head; t != NULL; t = t->next) {
+    for(lv_draw_task_t * t = layer->draw_task_head; t != NULL; t = t->next) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5) continue;
         if(t->state != LV_DRAW_TASK_STATE_QUEUED) continue;
 
@@ -107,7 +107,7 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *la
 
     if(task_count != 1 || image_task == NULL) return false;
 
-    const lv_draw_image_dsc_t *dsc = image_task->draw_dsc;
+    const lv_draw_image_dsc_t * dsc = image_task->draw_dsc;
     if(!is_simple_image_draw(dsc, image_task)) return false;
 
     /* Require image at canvas origin with exact size match */
@@ -124,7 +124,7 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *la
     if(img_w != layer_w || img_h != layer_h) return false;
 
     /* Resolve image to GPU */
-    lv_eve5_vram_res_t *src_vr = lv_draw_eve5_resolve_to_gpu(u, dsc->src);
+    lv_eve5_vram_res_t * src_vr = lv_draw_eve5_resolve_to_gpu(u, dsc->src);
     if(!src_vr) return false;
 
     if(src_vr->width != layer_w || src_vr->height != layer_h) {
@@ -136,7 +136,7 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t *u, lv_layer_t *la
      * This is safe: if either side frees via PendingFree, the other detects
      * the dead handle via vram_check_cb and self-heals. */
     {
-        lv_eve5_vram_res_t *vr = eve5_get_vram_res(layer);
+        lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
         if(vr == NULL) {
             vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
             if(vr == NULL) {

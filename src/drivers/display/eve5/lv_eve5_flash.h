@@ -71,7 +71,7 @@ extern "C" {
  *
  * @param disp pointer to the EVE5 display created by lv_eve5_create()
  */
-void lv_fs_eve5_flash_init(lv_display_t *disp);
+void lv_fs_eve5_flash_init(lv_display_t * disp);
 
 /**
  * Check if flash is attached and ready.
@@ -93,7 +93,7 @@ void lv_fs_eve5_flash_deinit(void);
  * @param path      Path to check
  * @return          true if path uses the EVE5 flash driver
  */
-bool lv_eve5_flash_is_path(const char *path);
+bool lv_eve5_flash_is_path(const char * path);
 
 /**
  * Load and decode a JPEG/PNG image from flash directly to RAM_G.
@@ -113,9 +113,9 @@ bool lv_eve5_flash_is_path(const char *path);
  * @param palette_offset  Pointer to receive palette LUT offset from handle base (GA_INVALID if non-paletted)
  * @return                true on success, false on failure
  */
-bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
-                               uint32_t *width, uint32_t *height, uint32_t *format,
-                               uint32_t *image_offset, uint32_t *palette_offset);
+bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
+                              uint32_t * width, uint32_t * height, uint32_t * format,
+                              uint32_t * image_offset, uint32_t * palette_offset);
 
 /**
  * Get the GPU allocator used by the flash driver.
@@ -123,7 +123,7 @@ bool lv_eve5_flash_load_image(const char *path, Esd_GpuHandle *handle,
  *
  * @return          Pointer to the GPU allocator, or NULL if not initialized
  */
-Esd_GpuAlloc *lv_eve5_flash_get_allocator(void);
+Esd_GpuAlloc * lv_eve5_flash_get_allocator(void);
 
 /**********************
  *      MACROS

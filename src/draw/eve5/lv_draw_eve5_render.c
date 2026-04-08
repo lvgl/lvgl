@@ -31,21 +31,33 @@
 
 #if 0
 #define EVE5_LOG(...) LV_LOG_INFO(__VA_ARGS__)
-static const char *task_type_str(lv_draw_task_type_t type)
+static const char * task_type_str(lv_draw_task_type_t type)
 {
     switch(type) {
-        case LV_DRAW_TASK_TYPE_FILL:       return "FILL";
-        case LV_DRAW_TASK_TYPE_BORDER:     return "BORDER";
-        case LV_DRAW_TASK_TYPE_LINE:       return "LINE";
-        case LV_DRAW_TASK_TYPE_TRIANGLE:   return "TRIANGLE";
-        case LV_DRAW_TASK_TYPE_LABEL:      return "LABEL";
-        case LV_DRAW_TASK_TYPE_LETTER:     return "LETTER";
-        case LV_DRAW_TASK_TYPE_IMAGE:      return "IMAGE";
-        case LV_DRAW_TASK_TYPE_ARC:        return "ARC";
-        case LV_DRAW_TASK_TYPE_LAYER:      return "LAYER";
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW: return "BOX_SHADOW";
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE: return "MASK_RECT";
-        default:                           return "OTHER";
+        case LV_DRAW_TASK_TYPE_FILL:
+            return "FILL";
+        case LV_DRAW_TASK_TYPE_BORDER:
+            return "BORDER";
+        case LV_DRAW_TASK_TYPE_LINE:
+            return "LINE";
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
+            return "TRIANGLE";
+        case LV_DRAW_TASK_TYPE_LABEL:
+            return "LABEL";
+        case LV_DRAW_TASK_TYPE_LETTER:
+            return "LETTER";
+        case LV_DRAW_TASK_TYPE_IMAGE:
+            return "IMAGE";
+        case LV_DRAW_TASK_TYPE_ARC:
+            return "ARC";
+        case LV_DRAW_TASK_TYPE_LAYER:
+            return "LAYER";
+        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+            return "BOX_SHADOW";
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+            return "MASK_RECT";
+        default:
+            return "OTHER";
     }
 }
 #else
@@ -61,8 +73,8 @@ static const char *task_type_str(lv_draw_task_type_t type)
  * Uses conservative cross-shaped containment (rect minus 4 corner r*r squares).
  * Insets the opaque boundary by 1px to account for EVE's ~1px AA feathering.
  */
-bool lv_draw_eve5_is_fully_inside_opaque(lv_draw_eve5_unit_t *u, const lv_area_t *task_area,
-                                    const lv_area_t *clip_area, const lv_area_t *layer_area)
+bool lv_draw_eve5_is_fully_inside_opaque(lv_draw_eve5_unit_t * u, const lv_area_t * task_area,
+                                         const lv_area_t * clip_area, const lv_area_t * layer_area)
 {
     if(!u->has_alpha_opaque) return false;
 
@@ -74,7 +86,7 @@ bool lv_draw_eve5_is_fully_inside_opaque(lv_draw_eve5_unit_t *u, const lv_area_t
     int32_t vx2 = visible.x2 - layer_area->x1;
     int32_t vy2 = visible.y2 - layer_area->y1;
 
-    const lv_area_t *oa = &u->alpha_opaque_area;
+    const lv_area_t * oa = &u->alpha_opaque_area;
     int32_t r = u->alpha_opaque_radius;
 
     /* Inset by 1px for AA feathering at edges */
@@ -104,9 +116,9 @@ bool lv_draw_eve5_is_fully_inside_opaque(lv_draw_eve5_unit_t *u, const lv_area_t
  * preventing visual inconsistency where some segments get sharp edges
  * while others don't.
  */
-bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t *t, const lv_draw_task_t *prev)
+bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t * t, const lv_draw_task_t * prev)
 {
-    const lv_draw_line_dsc_t *dsc = t->draw_dsc;
+    const lv_draw_line_dsc_t * dsc = t->draw_dsc;
 
     int32_t dx = dsc->p2.x - dsc->p1.x;
     int32_t dy = dsc->p2.y - dsc->p1.y;
@@ -115,7 +127,7 @@ bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t *t, const lv_draw_
 
     /* Check previous task */
     if(prev && prev->type == LV_DRAW_TASK_TYPE_LINE) {
-        const lv_draw_line_dsc_t *prev_dsc = prev->draw_dsc;
+        const lv_draw_line_dsc_t * prev_dsc = prev->draw_dsc;
         bool connects = (prev_dsc->p1.x == dsc->p1.x && prev_dsc->p1.y == dsc->p1.y) ||
                         (prev_dsc->p1.x == dsc->p2.x && prev_dsc->p1.y == dsc->p2.y) ||
                         (prev_dsc->p2.x == dsc->p1.x && prev_dsc->p2.y == dsc->p1.y) ||
@@ -130,9 +142,9 @@ bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t *t, const lv_draw_
     }
 
     /* Check next task */
-    const lv_draw_task_t *next = t->next;
+    const lv_draw_task_t * next = t->next;
     if(next && next->type == LV_DRAW_TASK_TYPE_LINE) {
-        const lv_draw_line_dsc_t *next_dsc = next->draw_dsc;
+        const lv_draw_line_dsc_t * next_dsc = next->draw_dsc;
         bool connects = (next_dsc->p1.x == dsc->p1.x && next_dsc->p1.y == dsc->p1.y) ||
                         (next_dsc->p1.x == dsc->p2.x && next_dsc->p1.y == dsc->p2.y) ||
                         (next_dsc->p2.x == dsc->p1.x && next_dsc->p2.y == dsc->p1.y) ||
@@ -160,11 +172,11 @@ bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t *t, const lv_draw_
  * correction; they scale all premultiplied RGBA channels and must run after
  * alpha is corrected. Tasks are left IN_PROGRESS so the alpha pass can find them.
  */
-int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool is_screen, bool finish_tasks,
-                              const lv_draw_eve5_slice_t *slice)
+int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t * u, lv_layer_t * layer, bool is_screen, bool finish_tasks,
+                              const lv_draw_eve5_slice_t * slice)
 {
-    lv_draw_task_t *t = eve5_slice_first(slice, layer);
-    lv_draw_task_t *prev_task = NULL;
+    lv_draw_task_t * t = eve5_slice_first(slice, layer);
+    lv_draw_task_t * prev_task = NULL;
     int rendered_count = 0;
 
     while(t && t != slice->end) {
@@ -189,46 +201,46 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool is
 
         switch(t->type) {
             case LV_DRAW_TASK_TYPE_FILL: {
-                /* Check for matching BORDER from same lv_draw_rect() for unified rendering */
-                lv_draw_task_t *next = t->next;
-                bool has_matching_border = false;
+                    /* Check for matching BORDER from same lv_draw_rect() for unified rendering */
+                    lv_draw_task_t * next = t->next;
+                    bool has_matching_border = false;
 
-                if(next &&
-                   next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-                   next->state == LV_DRAW_TASK_STATE_QUEUED &&
-                   next->type == LV_DRAW_TASK_TYPE_BORDER &&
-                   next->target_layer == t->target_layer) {
+                    if(next &&
+                       next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+                       next->state == LV_DRAW_TASK_STATE_QUEUED &&
+                       next->type == LV_DRAW_TASK_TYPE_BORDER &&
+                       next->target_layer == t->target_layer) {
 
-                    const lv_draw_fill_dsc_t *fill_dsc = t->draw_dsc;
-                    const lv_draw_border_dsc_t *border_dsc = next->draw_dsc;
+                        const lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
+                        const lv_draw_border_dsc_t * border_dsc = next->draw_dsc;
 
-                    has_matching_border = eve5_fill_border_area_match(&t->area, &next->area) &&
-                                          (fill_dsc->radius == border_dsc->radius);
-                }
+                        has_matching_border = eve5_fill_border_area_match(&t->area, &next->area) &&
+                                              (fill_dsc->radius == border_dsc->radius);
+                    }
 
-                if(has_matching_border) {
-                    EVE5_LOG("EVE5: Unified FILL+BORDER rendering");
+                    if(has_matching_border) {
+                        EVE5_LOG("EVE5: Unified FILL+BORDER rendering");
 
-                    next->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
+                        next->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
 
 #if LV_DRAW_EVE5_SW_FILL || LV_DRAW_EVE5_SW_BORDER
-                    lv_draw_eve5_sw_render_task(u, t);
-                    lv_draw_eve5_sw_render_task(u, next);
+                        lv_draw_eve5_sw_render_task(u, t);
+                        lv_draw_eve5_sw_render_task(u, next);
 #else
-                    lv_draw_eve5_hal_draw_fill_with_border(u, t, next);
+                        lv_draw_eve5_hal_draw_fill_with_border(u, t, next);
 #endif
-                    if(finish_tasks) next->state = LV_DRAW_TASK_STATE_FINISHED;
-                    rendered_count++;
-                }
-                else {
+                        if(finish_tasks) next->state = LV_DRAW_TASK_STATE_FINISHED;
+                        rendered_count++;
+                    }
+                    else {
 #if LV_DRAW_EVE5_SW_FILL
-                    lv_draw_eve5_sw_render_task(u, t);
+                        lv_draw_eve5_sw_render_task(u, t);
 #else
-                    lv_draw_eve5_hal_draw_fill(u, t, false);
+                        lv_draw_eve5_hal_draw_fill(u, t, false);
 #endif
+                    }
+                    break;
                 }
-                break;
-            }
 
             case LV_DRAW_TASK_TYPE_BORDER:
 #if LV_DRAW_EVE5_SW_BORDER
@@ -283,20 +295,20 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool is
                 break;
 
             case LV_DRAW_TASK_TYPE_LAYER: {
-                lv_draw_image_dsc_t *dsc = t->draw_dsc;
-                lv_layer_t *child = (lv_layer_t *)dsc->src;
+                    lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                    lv_layer_t * child = (lv_layer_t *)dsc->src;
 
-                if(eve5_get_vram_res(child) == NULL) {
-                    if(child->draw_buf == NULL) {
+                    if(eve5_get_vram_res(child) == NULL) {
+                        if(child->draw_buf == NULL) {
+                            break;
+                        }
+                        LV_LOG_WARN("EVE5: CPU-rendered layer not supported, skipping child %p", (void *)child);
                         break;
                     }
-                    LV_LOG_WARN("EVE5: CPU-rendered layer not supported, skipping child %p", (void *)child);
+
+                    lv_draw_eve5_hal_draw_image(u, t, false);
                     break;
                 }
-
-                lv_draw_eve5_hal_draw_image(u, t, false);
-                break;
-            }
 
             case LV_DRAW_TASK_TYPE_BOX_SHADOW:
 #if LV_DRAW_EVE5_SW_BOX_SHADOW
@@ -333,10 +345,10 @@ int lv_draw_eve5_render_tasks(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool is
  * Tasks fully inside this area can skip individual alpha correction since the
  * opaque fill will overwrite their alpha to 255 anyway.
  */
-void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t *u, lv_layer_t *layer, const lv_draw_eve5_slice_t *slice)
+void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, const lv_draw_eve5_slice_t * slice)
 {
-    const lv_area_t *layer_area = &layer->buf_area;
-    lv_draw_task_t *t = eve5_slice_first(slice, layer);
+    const lv_area_t * layer_area = &layer->buf_area;
+    lv_draw_task_t * t = eve5_slice_first(slice, layer);
 
     while(t && t != slice->end) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
@@ -347,88 +359,88 @@ void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t *u, lv_layer_t *layer, cons
 
         switch(t->type) {
             case LV_DRAW_TASK_TYPE_FILL: {
-                const lv_draw_fill_dsc_t *dsc = t->draw_dsc;
-                if(dsc->opa <= LV_OPA_MIN) break;
+                    const lv_draw_fill_dsc_t * dsc = t->draw_dsc;
+                    if(dsc->opa <= LV_OPA_MIN) break;
 
-                int32_t x1 = t->area.x1 - layer_area->x1;
-                int32_t y1 = t->area.y1 - layer_area->y1;
-                int32_t x2 = t->area.x2 - layer_area->x1;
-                int32_t y2 = t->area.y2 - layer_area->y1;
-                int32_t w = x2 - x1 + 1;
-                int32_t h = y2 - y1 + 1;
-                int32_t real_radius = LV_MIN3((w - 1) / 2, (h - 1) / 2, dsc->radius);
-
-                /* Determine if fill is fully opaque (gradients need all stops opaque) */
-                uint8_t fill_opa = dsc->opa;
-                if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count > 0) {
-                    if(dsc->opa >= LV_OPA_MAX) {
-                        for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
-                            if(dsc->grad.stops[i].opa < LV_OPA_MAX) {
-                                fill_opa = 0;
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        fill_opa = 0;
-                    }
-                }
-
-                /* Fill+border pairing: use border's outer area when matched */
-                lv_draw_task_t *next = t->next;
-                if(next &&
-                   next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-                   next->state == LV_DRAW_TASK_STATE_QUEUED &&
-                   next->type == LV_DRAW_TASK_TYPE_BORDER &&
-                   next->target_layer == t->target_layer) {
-
-                    const lv_draw_border_dsc_t *border_dsc = next->draw_dsc;
-
-                    if(eve5_fill_border_area_match(&t->area, &next->area) &&
-                       dsc->radius == border_dsc->radius) {
-                        if(fill_opa >= LV_OPA_MAX) {
-                            int32_t bx1 = next->area.x1 - layer_area->x1;
-                            int32_t by1 = next->area.y1 - layer_area->y1;
-                            int32_t bx2 = next->area.x2 - layer_area->x1;
-                            int32_t by2 = next->area.y2 - layer_area->y1;
-                            int32_t bw = bx2 - bx1 + 1;
-                            int32_t bh = by2 - by1 + 1;
-                            int32_t rout = LV_MIN3((bw - 1) / 2, (bh - 1) / 2,
-                                                   border_dsc->radius);
-                            lv_draw_eve5_track_alpha_opaque(u, bx1, by1, bx2, by2, rout);
-                        }
-                        t = next->next;
-                        continue;
-                    }
-                }
-
-                if(fill_opa >= LV_OPA_MAX) {
-                    lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, real_radius);
-                }
-                break;
-            }
-
-            case LV_DRAW_TASK_TYPE_BORDER: {
-                /* Standalone border can upgrade an existing opaque area */
-                const lv_draw_border_dsc_t *dsc = t->draw_dsc;
-                if(dsc->opa >= LV_OPA_MAX &&
-                   dsc->side == LV_BORDER_SIDE_FULL &&
-                   u->has_alpha_opaque) {
                     int32_t x1 = t->area.x1 - layer_area->x1;
                     int32_t y1 = t->area.y1 - layer_area->y1;
                     int32_t x2 = t->area.x2 - layer_area->x1;
                     int32_t y2 = t->area.y2 - layer_area->y1;
                     int32_t w = x2 - x1 + 1;
                     int32_t h = y2 - y1 + 1;
-                    int32_t rout = LV_MIN3((w - 1) / 2, (h - 1) / 2, dsc->radius);
+                    int32_t real_radius = LV_MIN3((w - 1) / 2, (h - 1) / 2, dsc->radius);
 
-                    lv_area_t border_local = { x1, y1, x2, y2 };
-                    if(eve5_fill_border_area_match(&u->alpha_opaque_area, &border_local)) {
-                        lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, rout);
+                    /* Determine if fill is fully opaque (gradients need all stops opaque) */
+                    uint8_t fill_opa = dsc->opa;
+                    if(dsc->grad.dir != LV_GRAD_DIR_NONE && dsc->grad.stops_count > 0) {
+                        if(dsc->opa >= LV_OPA_MAX) {
+                            for(uint8_t i = 0; i < dsc->grad.stops_count; i++) {
+                                if(dsc->grad.stops[i].opa < LV_OPA_MAX) {
+                                    fill_opa = 0;
+                                    break;
+                                }
+                            }
+                        }
+                        else {
+                            fill_opa = 0;
+                        }
                     }
+
+                    /* Fill+border pairing: use border's outer area when matched */
+                    lv_draw_task_t * next = t->next;
+                    if(next &&
+                       next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+                       next->state == LV_DRAW_TASK_STATE_QUEUED &&
+                       next->type == LV_DRAW_TASK_TYPE_BORDER &&
+                       next->target_layer == t->target_layer) {
+
+                        const lv_draw_border_dsc_t * border_dsc = next->draw_dsc;
+
+                        if(eve5_fill_border_area_match(&t->area, &next->area) &&
+                           dsc->radius == border_dsc->radius) {
+                            if(fill_opa >= LV_OPA_MAX) {
+                                int32_t bx1 = next->area.x1 - layer_area->x1;
+                                int32_t by1 = next->area.y1 - layer_area->y1;
+                                int32_t bx2 = next->area.x2 - layer_area->x1;
+                                int32_t by2 = next->area.y2 - layer_area->y1;
+                                int32_t bw = bx2 - bx1 + 1;
+                                int32_t bh = by2 - by1 + 1;
+                                int32_t rout = LV_MIN3((bw - 1) / 2, (bh - 1) / 2,
+                                                       border_dsc->radius);
+                                lv_draw_eve5_track_alpha_opaque(u, bx1, by1, bx2, by2, rout);
+                            }
+                            t = next->next;
+                            continue;
+                        }
+                    }
+
+                    if(fill_opa >= LV_OPA_MAX) {
+                        lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, real_radius);
+                    }
+                    break;
                 }
-                break;
-            }
+
+            case LV_DRAW_TASK_TYPE_BORDER: {
+                    /* Standalone border can upgrade an existing opaque area */
+                    const lv_draw_border_dsc_t * dsc = t->draw_dsc;
+                    if(dsc->opa >= LV_OPA_MAX &&
+                       dsc->side == LV_BORDER_SIDE_FULL &&
+                       u->has_alpha_opaque) {
+                        int32_t x1 = t->area.x1 - layer_area->x1;
+                        int32_t y1 = t->area.y1 - layer_area->y1;
+                        int32_t x2 = t->area.x2 - layer_area->x1;
+                        int32_t y2 = t->area.y2 - layer_area->y1;
+                        int32_t w = x2 - x1 + 1;
+                        int32_t h = y2 - y1 + 1;
+                        int32_t rout = LV_MIN3((w - 1) / 2, (h - 1) / 2, dsc->radius);
+
+                        lv_area_t border_local = { x1, y1, x2, y2 };
+                        if(eve5_fill_border_area_match(&u->alpha_opaque_area, &border_local)) {
+                            lv_draw_eve5_track_alpha_opaque(u, x1, y1, x2, y2, rout);
+                        }
+                    }
+                    break;
+                }
 
             default:
                 break;
@@ -448,11 +460,11 @@ void lv_draw_eve5_opaque_prepass(lv_draw_eve5_unit_t *u, lv_layer_t *layer, cons
  * direct-to-alpha replay cannot recover correct alpha because the values are
  * irrecoverably trashed. Sets u->alpha_needs_rendertarget when found.
  */
-void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
-                                       const lv_draw_eve5_slice_t *slice)
+void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                       const lv_draw_eve5_slice_t * slice)
 {
-    const lv_area_t *layer_area = &layer->buf_area;
-    lv_draw_task_t *t = eve5_slice_first(slice, layer);
+    const lv_area_t * layer_area = &layer->buf_area;
+    lv_draw_task_t * t = eve5_slice_first(slice, layer);
 
     while(t && t != slice->end) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
@@ -518,20 +530,20 @@ void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t *u, lv_layer_t *layer
  *
  * Returns GpuHandle for the L8 texture (or GA_HANDLE_INVALID on failure).
  */
-Esd_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
+Esd_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                               int32_t aligned_w, int32_t aligned_h,
                                               int32_t w, int32_t h,
-                                              const lv_draw_eve5_slice_t *slice)
+                                              const lv_draw_eve5_slice_t * slice)
 {
     Esd_GpuHandle l8_handle = lv_draw_eve5_hal_init_l8_rendertarget(u,
-                                  aligned_w, aligned_h, w, h);
+                                                                    aligned_w, aligned_h, w, h);
     if(Esd_GpuAlloc_Get(u->allocator, l8_handle) == GA_INVALID) {
         return GA_HANDLE_INVALID;
     }
 
-    const lv_area_t *layer_area = &layer->buf_area;
-    lv_draw_task_t *t = eve5_slice_first(slice, layer);
-    lv_draw_task_t *prev_task = NULL;
+    const lv_area_t * layer_area = &layer->buf_area;
+    lv_draw_task_t * t = eve5_slice_first(slice, layer);
+    lv_draw_task_t * prev_task = NULL;
 
     while(t && t != slice->end) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
@@ -621,10 +633,10 @@ Esd_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t *u, lv_layer_t
  * This corrects the squared-alpha from the RGB pass, but cannot recover
  * alpha that was used as scratch space by masking operations.
  */
-void lv_draw_eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer, const lv_draw_eve5_slice_t *slice)
+void lv_draw_eve5_alpha_pass(lv_draw_eve5_unit_t * u, lv_layer_t * layer, const lv_draw_eve5_slice_t * slice)
 {
     EVE_HalContext *phost = u->hal;
-    const lv_area_t *layer_area = &layer->buf_area;
+    const lv_area_t * layer_area = &layer->buf_area;
     int32_t layer_w = lv_area_get_width(layer_area);
     int32_t layer_h = lv_area_get_height(layer_area);
 
@@ -665,8 +677,8 @@ void lv_draw_eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer, const lv
     /* Set alpha pass blend mode: Porter-Duff "over" for alpha accumulation */
     EVE_CoDl_blendFunc(phost, ONE, ONE_MINUS_SRC_ALPHA);
 
-    lv_draw_task_t *t = eve5_slice_first(slice, layer);
-    lv_draw_task_t *prev_task = NULL;
+    lv_draw_task_t * t = eve5_slice_first(slice, layer);
+    lv_draw_task_t * prev_task = NULL;
 
     while(t && t != slice->end) {
         if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5 ||
@@ -685,32 +697,32 @@ void lv_draw_eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer, const lv
 
         switch(t->type) {
             case LV_DRAW_TASK_TYPE_FILL: {
-                const lv_draw_fill_dsc_t *fill_dsc = t->draw_dsc;
+                    const lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
 
-                /* Opaque fill+border pair: draw single rect at alpha=255 */
-                lv_draw_task_t *next = t->next;
-                if(fill_dsc->opa >= LV_OPA_MAX &&
-                   fill_dsc->grad.dir == LV_GRAD_DIR_NONE &&
-                   next &&
-                   next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-                   next->state == LV_DRAW_TASK_STATE_IN_PROGRESS &&
-                   next->type == LV_DRAW_TASK_TYPE_BORDER &&
-                   next->target_layer == t->target_layer) {
+                    /* Opaque fill+border pair: draw single rect at alpha=255 */
+                    lv_draw_task_t * next = t->next;
+                    if(fill_dsc->opa >= LV_OPA_MAX &&
+                       fill_dsc->grad.dir == LV_GRAD_DIR_NONE &&
+                       next &&
+                       next->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+                       next->state == LV_DRAW_TASK_STATE_IN_PROGRESS &&
+                       next->type == LV_DRAW_TASK_TYPE_BORDER &&
+                       next->target_layer == t->target_layer) {
 
-                    const lv_draw_border_dsc_t *border_dsc = next->draw_dsc;
+                        const lv_draw_border_dsc_t * border_dsc = next->draw_dsc;
 
-                    if(eve5_fill_border_area_match(&t->area, &next->area) &&
-                       fill_dsc->radius == border_dsc->radius) {
-                        lv_draw_eve5_alpha_draw_fill_with_border(u, t, next);
-                        t->state = LV_DRAW_TASK_STATE_FINISHED;
-                        t = next;
-                        break;
+                        if(eve5_fill_border_area_match(&t->area, &next->area) &&
+                           fill_dsc->radius == border_dsc->radius) {
+                            lv_draw_eve5_alpha_draw_fill_with_border(u, t, next);
+                            t->state = LV_DRAW_TASK_STATE_FINISHED;
+                            t = next;
+                            break;
+                        }
                     }
-                }
 
-                lv_draw_eve5_alpha_draw_fill(u, t);
-                break;
-            }
+                    lv_draw_eve5_alpha_draw_fill(u, t);
+                    break;
+                }
 
             case LV_DRAW_TASK_TYPE_BORDER:
                 lv_draw_eve5_alpha_draw_border(u, t);
@@ -762,22 +774,22 @@ void lv_draw_eve5_alpha_pass(lv_draw_eve5_unit_t *u, lv_layer_t *layer, const lv
     if(u->has_alpha_opaque) {
         EVE_CoDl_colorA(phost, 255);
         EVE_CoDl_blendFunc(phost, ONE, ZERO);
-        lv_draw_eve5_set_scissor(u, &(lv_area_t){
+        lv_draw_eve5_set_scissor(u, &(lv_area_t) {
             u->alpha_opaque_area.x1 + layer_area->x1,
             u->alpha_opaque_area.y1 + layer_area->y1,
             u->alpha_opaque_area.x2 + layer_area->x1,
             u->alpha_opaque_area.y2 + layer_area->y1
         }, layer_area);
         lv_draw_eve5_draw_rect(u,
-            u->alpha_opaque_area.x1, u->alpha_opaque_area.y1,
-            u->alpha_opaque_area.x2, u->alpha_opaque_area.y2,
-            u->alpha_opaque_radius,
-            &(lv_area_t){
-                u->alpha_opaque_area.x1 + layer_area->x1,
-                u->alpha_opaque_area.y1 + layer_area->y1,
-                u->alpha_opaque_area.x2 + layer_area->x1,
-                u->alpha_opaque_area.y2 + layer_area->y1
-            }, layer_area);
+                               u->alpha_opaque_area.x1, u->alpha_opaque_area.y1,
+                               u->alpha_opaque_area.x2, u->alpha_opaque_area.y2,
+                               u->alpha_opaque_radius,
+        &(lv_area_t) {
+            u->alpha_opaque_area.x1 + layer_area->x1,
+            u->alpha_opaque_area.y1 + layer_area->y1,
+            u->alpha_opaque_area.x2 + layer_area->x1,
+            u->alpha_opaque_area.y2 + layer_area->y1
+        }, layer_area);
     }
 
     EVE_CoDl_blendFunc_default(phost);

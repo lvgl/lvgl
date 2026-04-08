@@ -33,7 +33,7 @@
  *********************/
 
 #ifndef LV_EVE5_SDCARD_MAX_FILE_SIZE
-#define LV_EVE5_SDCARD_MAX_FILE_SIZE (16 * 1024 * 1024)
+    #define LV_EVE5_SDCARD_MAX_FILE_SIZE (16 * 1024 * 1024)
 #endif
 
 /**********************
@@ -44,19 +44,19 @@ typedef struct {
     Esd_GpuHandle gpu_handle;  /**< RAM_G handle (GA_HANDLE_INVALID if not loaded or stolen) */
     uint32_t size;
     uint32_t pos;
-    char *path;                /**< Non-NULL = deferred load pending */
+    char * path;               /**< Non-NULL = deferred load pending */
 } eve5_file_t;
 
 typedef struct {
-    uint8_t *listing;
+    uint8_t * listing;
     uint32_t size;
     uint32_t pos;
 } eve5_dir_t;
 
 typedef struct {
-    lv_display_t *disp;
-    EVE_HalContext *hal;
-    Esd_GpuAlloc *alloc;
+    lv_display_t * disp;
+    EVE_HalContext * hal;
+    Esd_GpuAlloc * alloc;
     bool sd_attached;
     lv_fs_drv_t fs_drv;
 } eve5_sdcard_ctx_t;
@@ -64,19 +64,19 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool fs_ready(lv_fs_drv_t *drv);
-static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode);
-static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p);
-static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t btr, uint32_t *br);
-static lv_fs_res_t fs_write(lv_fs_drv_t *drv, void *file_p, const void *buf, uint32_t btw, uint32_t *bw);
-static lv_fs_res_t fs_seek(lv_fs_drv_t *drv, void *file_p, uint32_t pos, lv_fs_whence_t whence);
-static lv_fs_res_t fs_tell(lv_fs_drv_t *drv, void *file_p, uint32_t *pos_p);
-static void *fs_dir_open(lv_fs_drv_t *drv, const char *path);
-static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *dir_p, char *fn, uint32_t fn_len);
-static lv_fs_res_t fs_dir_close(lv_fs_drv_t *drv, void *dir_p);
+static bool fs_ready(lv_fs_drv_t * drv);
+static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
+static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
+static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
+static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
+static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
+static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
+static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
+static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len);
+static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 
-static bool ensure_sd_attached(eve5_sdcard_ctx_t *ctx);
-static bool ensure_file_loaded(eve5_sdcard_ctx_t *ctx, eve5_file_t *file);
+static bool ensure_sd_attached(eve5_sdcard_ctx_t * ctx);
+static bool ensure_file_loaded(eve5_sdcard_ctx_t * ctx, eve5_file_t * file);
 
 /**********************
  *  STATIC VARIABLES
@@ -87,7 +87,7 @@ static eve5_sdcard_ctx_t s_ctx;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_fs_eve5_sdcard_init(lv_display_t *disp)
+void lv_fs_eve5_sdcard_init(lv_display_t * disp)
 {
     if(disp == NULL) return;
 
@@ -150,9 +150,9 @@ void lv_fs_eve5_sdcard_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static bool fs_ready(lv_fs_drv_t *drv)
+static bool fs_ready(lv_fs_drv_t * drv)
 {
-    eve5_sdcard_ctx_t *ctx = (eve5_sdcard_ctx_t *)drv->user_data;
+    eve5_sdcard_ctx_t * ctx = (eve5_sdcard_ctx_t *)drv->user_data;
     if(ctx == NULL || ctx->hal == NULL) return false;
 
     /* Fast path: lv_fs_open probes ALL registered drivers via ready_cb.
@@ -169,9 +169,9 @@ static bool fs_ready(lv_fs_drv_t *drv)
     return ready;
 }
 
-static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode)
+static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
-    eve5_sdcard_ctx_t *ctx = (eve5_sdcard_ctx_t *)drv->user_data;
+    eve5_sdcard_ctx_t * ctx = (eve5_sdcard_ctx_t *)drv->user_data;
     if(ctx == NULL || ctx->hal == NULL) return NULL;
 
     if(mode != LV_FS_MODE_RD) {
@@ -215,7 +215,7 @@ static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode)
 #endif
 
     size_t path_len = lv_strlen(path);
-    eve5_file_t *file = lv_malloc(sizeof(eve5_file_t));
+    eve5_file_t * file = lv_malloc(sizeof(eve5_file_t));
     if(file == NULL) {
         LV_LOG_ERROR("Failed to allocate file handle");
         return NULL;
@@ -237,10 +237,10 @@ static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode)
     return file;
 }
 
-static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p)
+static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
-    eve5_sdcard_ctx_t *ctx = (eve5_sdcard_ctx_t *)drv->user_data;
-    eve5_file_t *file = (eve5_file_t *)file_p;
+    eve5_sdcard_ctx_t * ctx = (eve5_sdcard_ctx_t *)drv->user_data;
+    eve5_file_t * file = (eve5_file_t *)file_p;
 
     if(file != NULL) {
         if(ctx != NULL && ctx->alloc != NULL
@@ -256,10 +256,10 @@ static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p)
     return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t btr, uint32_t *br)
+static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
-    eve5_sdcard_ctx_t *ctx = (eve5_sdcard_ctx_t *)drv->user_data;
-    eve5_file_t *file = (eve5_file_t *)file_p;
+    eve5_sdcard_ctx_t * ctx = (eve5_sdcard_ctx_t *)drv->user_data;
+    eve5_file_t * file = (eve5_file_t *)file_p;
 
     if(file == NULL || ctx == NULL || ctx->hal == NULL || ctx->alloc == NULL) {
         if(br) *br = 0;
@@ -299,7 +299,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
     return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t fs_write(lv_fs_drv_t *drv, void *file_p, const void *buf, uint32_t btw, uint32_t *bw)
+static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     LV_UNUSED(drv);
     LV_UNUSED(file_p);
@@ -310,10 +310,10 @@ static lv_fs_res_t fs_write(lv_fs_drv_t *drv, void *file_p, const void *buf, uin
     return LV_FS_RES_NOT_IMP;
 }
 
-static lv_fs_res_t fs_seek(lv_fs_drv_t *drv, void *file_p, uint32_t pos, lv_fs_whence_t whence)
+static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
     LV_UNUSED(drv);
-    eve5_file_t *file = (eve5_file_t *)file_p;
+    eve5_file_t * file = (eve5_file_t *)file_p;
 
     if(file == NULL) return LV_FS_RES_INV_PARAM;
 
@@ -339,10 +339,10 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t *drv, void *file_p, uint32_t pos, lv_fs_w
     return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t fs_tell(lv_fs_drv_t *drv, void *file_p, uint32_t *pos_p)
+static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    eve5_file_t *file = (eve5_file_t *)file_p;
+    eve5_file_t * file = (eve5_file_t *)file_p;
 
     if(file == NULL || pos_p == NULL) return LV_FS_RES_INV_PARAM;
 
@@ -350,12 +350,12 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t *drv, void *file_p, uint32_t *pos_p)
     return LV_FS_RES_OK;
 }
 
-static void *fs_dir_open(lv_fs_drv_t *drv, const char *path)
+static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
-    eve5_sdcard_ctx_t *ctx = (eve5_sdcard_ctx_t *)drv->user_data;
+    eve5_sdcard_ctx_t * ctx = (eve5_sdcard_ctx_t *)drv->user_data;
     if(ctx == NULL || ctx->hal == NULL) return NULL;
 
-    eve5_dir_t *dir = lv_malloc(sizeof(eve5_dir_t));
+    eve5_dir_t * dir = lv_malloc(sizeof(eve5_dir_t));
     if(dir == NULL) {
         LV_LOG_ERROR("Failed to allocate directory handle");
         return NULL;
@@ -461,10 +461,10 @@ static void *fs_dir_open(lv_fs_drv_t *drv, const char *path)
  * BT820 marks directories with trailing '/' or '\'.
  * LVGL expects directories to start with '/'.
  */
-static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *dir_p, char *fn, uint32_t fn_len)
+static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
 {
     LV_UNUSED(drv);
-    eve5_dir_t *dir = (eve5_dir_t *)dir_p;
+    eve5_dir_t * dir = (eve5_dir_t *)dir_p;
 
     if(dir == NULL || fn == NULL || fn_len == 0) return LV_FS_RES_INV_PARAM;
 
@@ -474,7 +474,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *dir_p, char *fn, uint32_t
         return LV_FS_RES_OK;
     }
 
-    const char *entry = (const char *)(dir->listing + dir->pos);
+    const char * entry = (const char *)(dir->listing + dir->pos);
     size_t entry_len = lv_strlen(entry);
 
     if(entry_len == 0) {
@@ -513,10 +513,10 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *dir_p, char *fn, uint32_t
     return LV_FS_RES_OK;
 }
 
-static lv_fs_res_t fs_dir_close(lv_fs_drv_t *drv, void *dir_p)
+static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
     LV_UNUSED(drv);
-    eve5_dir_t *dir = (eve5_dir_t *)dir_p;
+    eve5_dir_t * dir = (eve5_dir_t *)dir_p;
 
     if(dir != NULL) {
         if(dir->listing != NULL) {
@@ -532,7 +532,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t *drv, void *dir_p)
  * Load file from SD card into RAM_G.
  * Caller must NOT hold the HAL mutex.
  */
-static bool ensure_file_loaded(eve5_sdcard_ctx_t *ctx, eve5_file_t *file)
+static bool ensure_file_loaded(eve5_sdcard_ctx_t * ctx, eve5_file_t * file)
 {
     if(file->path == NULL) return true;
 
@@ -585,7 +585,7 @@ static bool ensure_file_loaded(eve5_sdcard_ctx_t *ctx, eve5_file_t *file)
     return true;
 }
 
-static bool ensure_sd_attached(eve5_sdcard_ctx_t *ctx)
+static bool ensure_sd_attached(eve5_sdcard_ctx_t * ctx)
 {
     if(ctx == NULL || ctx->hal == NULL) return false;
 
@@ -614,9 +614,9 @@ static bool ensure_sd_attached(eve5_sdcard_ctx_t *ctx)
  * After this call, the caller owns the GPU handle and must free it.
  * The file handle should be closed afterward (no further reads possible).
  */
-bool lv_eve5_sdcard_steal_ramg(void *file_p, Esd_GpuAlloc **alloc, Esd_GpuHandle *handle, uint32_t *size)
+bool lv_eve5_sdcard_steal_ramg(void * file_p, Esd_GpuAlloc ** alloc, Esd_GpuHandle *handle, uint32_t * size)
 {
-    eve5_file_t *file = (eve5_file_t *)file_p;
+    eve5_file_t * file = (eve5_file_t *)file_p;
 
     if(file == NULL || alloc == NULL || handle == NULL || size == NULL) return false;
     if(s_ctx.alloc == NULL) return false;
@@ -646,7 +646,7 @@ bool lv_eve5_sdcard_steal_ramg(void *file_p, Esd_GpuAlloc **alloc, Esd_GpuHandle
  * IMAGE LOADING
  **********************/
 
-bool lv_eve5_sdcard_is_path(const char *path)
+bool lv_eve5_sdcard_is_path(const char * path)
 {
     if(path == NULL || path[0] == '\0') return false;
     if(s_ctx.hal == NULL) return false;
@@ -671,9 +671,9 @@ bool lv_eve5_sdcard_is_path(const char *path)
  * 4. CMD_LOADIMAGE with OPT_MEDIAFIFO (RAM_G to RAM_G decode)
  * 5. Free temporary allocation
  */
-bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
-                                uint32_t *width, uint32_t *height, uint32_t *format,
-                                uint32_t *image_offset, uint32_t *palette_offset)
+bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
+                               uint32_t * width, uint32_t * height, uint32_t * format,
+                               uint32_t * image_offset, uint32_t * palette_offset)
 {
     if(path == NULL || handle == NULL || width == NULL || height == NULL || format == NULL) {
         return false;
@@ -692,7 +692,7 @@ bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
     }
 
     /* Skip drive letter prefix for SD card commands */
-    const char *sd_path = path;
+    const char * sd_path = path;
     if(path[1] == ':' && (path[2] == '/' || path[2] == '\\')) {
         sd_path = path + 2;
     }
@@ -858,7 +858,7 @@ bool lv_eve5_sdcard_load_image(const char *path, Esd_GpuHandle *handle,
     return true;
 }
 
-Esd_GpuAlloc *lv_eve5_sdcard_get_allocator(void)
+Esd_GpuAlloc * lv_eve5_sdcard_get_allocator(void)
 {
     return s_ctx.alloc;
 }

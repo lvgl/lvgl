@@ -18,8 +18,8 @@
  * IMAGE HEADER PARSING
  **********************/
 
-bool eve5_parse_jpeg_dimensions(const uint8_t *data, uint32_t size,
-                                uint32_t *width, uint32_t *height)
+bool eve5_parse_jpeg_dimensions(const uint8_t * data, uint32_t size,
+                                uint32_t * width, uint32_t * height)
 {
     if(size < 11) return false;
     if(data[0] != 0xFF || data[1] != 0xD8) return false;
@@ -57,8 +57,8 @@ bool eve5_parse_jpeg_dimensions(const uint8_t *data, uint32_t size,
     return false;
 }
 
-bool eve5_parse_png_dimensions(const uint8_t *data, uint32_t size,
-                               uint32_t *width, uint32_t *height)
+bool eve5_parse_png_dimensions(const uint8_t * data, uint32_t size,
+                               uint32_t * width, uint32_t * height)
 {
     if(size < 24) return false;
 
@@ -82,13 +82,13 @@ bool eve5_parse_png_dimensions(const uint8_t *data, uint32_t size,
  * FILE EXTENSION CHECK
  **********************/
 
-bool eve5_has_extension(const char *path, const char *ext)
+bool eve5_has_extension(const char * path, const char * ext)
 {
     size_t path_len = lv_strlen(path);
     size_t ext_len = lv_strlen(ext);
     if(path_len < ext_len + 1) return false;
 
-    const char *path_ext = path + path_len - ext_len;
+    const char * path_ext = path + path_len - ext_len;
     for(size_t i = 0; i < ext_len; i++) {
         char c1 = path_ext[i];
         char c2 = ext[i];
@@ -100,7 +100,7 @@ bool eve5_has_extension(const char *path, const char *ext)
     return true;
 }
 
-bool eve5_is_jpeg_or_png(const char *path, bool *is_jpeg, bool *is_png)
+bool eve5_is_jpeg_or_png(const char * path, bool *is_jpeg, bool *is_png)
 {
     *is_jpeg = eve5_has_extension(path, ".jpg") || eve5_has_extension(path, ".jpeg");
     *is_png = eve5_has_extension(path, ".png");

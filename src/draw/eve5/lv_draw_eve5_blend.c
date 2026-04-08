@@ -48,7 +48,7 @@ static void copy_src_alpha(EVE_HalContext *phost, uint32_t src_addr,
                            uint32_t stride, int32_t w, int32_t h);
 static void splat_alpha_to_channel(EVE_HalContext *phost, int32_t w, int32_t h,
                                    uint8_t r_mask, uint8_t g_mask, uint8_t b_mask);
-static bool composite_over_dst(lv_draw_eve5_unit_t *u, Esd_GpuHandle *out_result,
+static bool composite_over_dst(lv_draw_eve5_unit_t * u, Esd_GpuHandle *out_result,
                                uint32_t dst_addr, Esd_GpuHandle temp_handle,
                                bool temp_is_premultiplied,
                                int32_t aligned_w, int32_t aligned_h,
@@ -139,7 +139,7 @@ static void splat_alpha_to_channel(EVE_HalContext *phost, int32_t w, int32_t h,
  *   produces raw values, alpha copied separately).
  *   Uses blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA) to apply coverage.
  */
-static bool composite_over_dst(lv_draw_eve5_unit_t *u, Esd_GpuHandle *out_result,
+static bool composite_over_dst(lv_draw_eve5_unit_t * u, Esd_GpuHandle *out_result,
                                uint32_t dst_addr, Esd_GpuHandle temp_handle,
                                bool temp_is_premultiplied,
                                int32_t aligned_w, int32_t aligned_h,
@@ -304,7 +304,7 @@ static bool composite_over_dst(lv_draw_eve5_unit_t *u, Esd_GpuHandle *out_result
  * MULTIPLY: result.c = dst.c * src.c / 255
  * 2 DL cycles: channel math + composite.
  */
-bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
+bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
                                  Esd_GpuHandle *out_result)
 {
@@ -342,7 +342,7 @@ bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
  * SUBTRACTIVE: result.c = max(dst.c - src.c, 0)
  * 2 DL cycles: channel math + composite.
  */
-bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
+bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                     Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
                                     Esd_GpuHandle *out_result)
 {
@@ -382,7 +382,7 @@ bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
  *
  * 4 DL cycles: subtract(dst,src) + subtract(src,dst) + add + composite.
  */
-bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
+bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                    Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
                                    Esd_GpuHandle *out_result)
 {
@@ -418,7 +418,7 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
     Esd_GpuHandle temp2 = Esd_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
     uint32_t temp2_addr = Esd_GpuAlloc_Get(u->allocator, temp2);
     if(temp2_addr == GA_INVALID) {
-        Esd_GpuAlloc_PendingFree(u->allocator,temp1);
+        Esd_GpuAlloc_PendingFree(u->allocator, temp1);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -432,8 +432,8 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
     temp1_addr = Esd_GpuAlloc_Get(u->allocator, temp1);
     temp2_addr = Esd_GpuAlloc_Get(u->allocator, temp2);
     if(temp1_addr == GA_INVALID || temp2_addr == GA_INVALID) {
-        Esd_GpuAlloc_PendingFree(u->allocator,temp1);
-        Esd_GpuAlloc_PendingFree(u->allocator,temp2);
+        Esd_GpuAlloc_PendingFree(u->allocator, temp1);
+        Esd_GpuAlloc_PendingFree(u->allocator, temp2);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -442,8 +442,8 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
     Esd_GpuHandle temp3 = Esd_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
     uint32_t temp3_addr = Esd_GpuAlloc_Get(u->allocator, temp3);
     if(temp3_addr == GA_INVALID) {
-        Esd_GpuAlloc_PendingFree(u->allocator,temp1);
-        Esd_GpuAlloc_PendingFree(u->allocator,temp2);
+        Esd_GpuAlloc_PendingFree(u->allocator, temp1);
+        Esd_GpuAlloc_PendingFree(u->allocator, temp2);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }

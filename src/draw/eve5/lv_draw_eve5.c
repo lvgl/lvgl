@@ -69,32 +69,50 @@
 
 #if 0
 #define EVE5_LOG(...) LV_LOG_INFO(__VA_ARGS__)
-static const char *task_state_str(lv_draw_task_state_t state)
+static const char * task_state_str(lv_draw_task_state_t state)
 {
     switch(state) {
-        case LV_DRAW_TASK_STATE_WAITING:     return "WAITING";
-        case LV_DRAW_TASK_STATE_QUEUED:      return "QUEUED";
-        case LV_DRAW_TASK_STATE_IN_PROGRESS: return "IN_PROGRESS";
-        case LV_DRAW_TASK_STATE_FINISHED:    return "FINISHED";
-        case LV_DRAW_TASK_STATE_BLOCKED:     return "BLOCKED";
-        default:                              return "UNKNOWN";
+        case LV_DRAW_TASK_STATE_WAITING:
+            return "WAITING";
+        case LV_DRAW_TASK_STATE_QUEUED:
+            return "QUEUED";
+        case LV_DRAW_TASK_STATE_IN_PROGRESS:
+            return "IN_PROGRESS";
+        case LV_DRAW_TASK_STATE_FINISHED:
+            return "FINISHED";
+        case LV_DRAW_TASK_STATE_BLOCKED:
+            return "BLOCKED";
+        default:
+            return "UNKNOWN";
     }
 }
-static const char *task_type_str(lv_draw_task_type_t type)
+static const char * task_type_str(lv_draw_task_type_t type)
 {
     switch(type) {
-        case LV_DRAW_TASK_TYPE_FILL:       return "FILL";
-        case LV_DRAW_TASK_TYPE_BORDER:     return "BORDER";
-        case LV_DRAW_TASK_TYPE_LINE:       return "LINE";
-        case LV_DRAW_TASK_TYPE_TRIANGLE:   return "TRIANGLE";
-        case LV_DRAW_TASK_TYPE_LABEL:      return "LABEL";
-        case LV_DRAW_TASK_TYPE_LETTER:     return "LETTER";
-        case LV_DRAW_TASK_TYPE_IMAGE:      return "IMAGE";
-        case LV_DRAW_TASK_TYPE_ARC:        return "ARC";
-        case LV_DRAW_TASK_TYPE_LAYER:      return "LAYER";
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW: return "BOX_SHADOW";
-        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE: return "MASK_RECT";
-        default:                           return "OTHER";
+        case LV_DRAW_TASK_TYPE_FILL:
+            return "FILL";
+        case LV_DRAW_TASK_TYPE_BORDER:
+            return "BORDER";
+        case LV_DRAW_TASK_TYPE_LINE:
+            return "LINE";
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
+            return "TRIANGLE";
+        case LV_DRAW_TASK_TYPE_LABEL:
+            return "LABEL";
+        case LV_DRAW_TASK_TYPE_LETTER:
+            return "LETTER";
+        case LV_DRAW_TASK_TYPE_IMAGE:
+            return "IMAGE";
+        case LV_DRAW_TASK_TYPE_ARC:
+            return "ARC";
+        case LV_DRAW_TASK_TYPE_LAYER:
+            return "LAYER";
+        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+            return "BOX_SHADOW";
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+            return "MASK_RECT";
+        default:
+            return "OTHER";
     }
 }
 #else
@@ -104,12 +122,12 @@ static const char *task_type_str(lv_draw_task_type_t type)
 /**********************
  * STATIC PROTOTYPES
  **********************/
-static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer);
-static int32_t evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task);
-static void eve5_render_slice(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
+static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static void eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                               bool is_screen, bool layer_has_alpha,
-                              const lv_draw_eve5_slice_t *slice, bool apply_bitmap_mask);
-static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer);
+                              const lv_draw_eve5_slice_t * slice, bool apply_bitmap_mask);
+static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
 
 static bool s_eve5_enabled = true;
 
@@ -120,7 +138,7 @@ static bool s_eve5_enabled = true;
 
 void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
 {
-    lv_draw_eve5_unit_t *unit = lv_draw_create_unit(sizeof(lv_draw_eve5_unit_t));
+    lv_draw_eve5_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_eve5_unit_t));
     unit->base_unit.dispatch_cb = dispatch;
     unit->base_unit.evaluate_cb = evaluate;
     unit->base_unit.name = "EVE5_BT820";
@@ -172,7 +190,7 @@ bool lv_draw_eve5_get_enabled(void)
  * DISPATCH/EVALUATE
  **********************/
 
-static int32_t evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
+static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
@@ -186,9 +204,9 @@ static int32_t evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
 
 #if LV_DRAW_EVE5_SW_CANVAS
     /* Decline tasks on canvas layers (draw_buf != NULL, parent == NULL, not screen) */
-    lv_layer_t *target = task->target_layer;
+    lv_layer_t * target = task->target_layer;
     if(target != NULL && target->draw_buf != NULL && target->parent == NULL) {
-        lv_display_t *disp = lv_display_get_default();
+        lv_display_t * disp = lv_display_get_default();
         if(!disp || target != disp->layer_head) {
             EVE5_LOG("EVE5: Evaluate: type=%s -> declined (canvas layer)", task_type_str(task->type));
             return 0;
@@ -204,10 +222,10 @@ static int32_t evaluate(lv_draw_unit_t *draw_unit, lv_draw_task_t *task)
     return 0;
 }
 
-static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
+static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
-    lv_draw_eve5_unit_t *u = (lv_draw_eve5_unit_t *)draw_unit;
-    lv_draw_task_t *t;
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_draw_task_t * t;
 
     if(u->rendering_in_progress) {
         EVE5_LOG("EVE5: Dispatch skipped - render in progress");
@@ -224,11 +242,21 @@ static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
     while(t) {
         if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5) {
             switch(t->state) {
-                case LV_DRAW_TASK_STATE_WAITING:     waiting_count++;     break;
-                case LV_DRAW_TASK_STATE_QUEUED:      queued_count++;      break;
-                case LV_DRAW_TASK_STATE_BLOCKED:     blocked_count++;     break;
-                case LV_DRAW_TASK_STATE_FINISHED:    finished_count++;    break;
-                case LV_DRAW_TASK_STATE_IN_PROGRESS: in_progress_count++; break;
+                case LV_DRAW_TASK_STATE_WAITING:
+                    waiting_count++;
+                    break;
+                case LV_DRAW_TASK_STATE_QUEUED:
+                    queued_count++;
+                    break;
+                case LV_DRAW_TASK_STATE_BLOCKED:
+                    blocked_count++;
+                    break;
+                case LV_DRAW_TASK_STATE_FINISHED:
+                    finished_count++;
+                    break;
+                case LV_DRAW_TASK_STATE_IN_PROGRESS:
+                    in_progress_count++;
+                    break;
             }
         }
         t = t->next;
@@ -243,10 +271,10 @@ static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
     while(t) {
         if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5) {
             EVE5_LOG("  [%d] type=%-10s state=%-11s area=(%d,%d)-(%d,%d)",
-                   task_idx,
-                   task_type_str(t->type),
-                   task_state_str(t->state),
-                   t->area.x1, t->area.y1, t->area.x2, t->area.y2);
+                     task_idx,
+                     task_type_str(t->type),
+                     task_state_str(t->state),
+                     t->area.x1, t->area.y1, t->area.x2, t->area.y2);
         }
         task_idx++;
         t = t->next;
@@ -261,10 +289,11 @@ static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
             if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
                t->state == LV_DRAW_TASK_STATE_WAITING) {
                 t->state = LV_DRAW_TASK_STATE_QUEUED;
-            } else if (t->state != LV_DRAW_TASK_STATE_QUEUED) {
-              EVE5_LOG("EVE5: -> Skipping task type=%s state=%s",
-                      task_type_str(t->type),
-                    task_state_str(t->state));
+            }
+            else if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
+                EVE5_LOG("EVE5: -> Skipping task type=%s state=%s",
+                         task_type_str(t->type),
+                         task_state_str(t->state));
             }
             t = t->next;
         }
@@ -274,7 +303,7 @@ static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
     }
 
     /* All tasks queued and ready - render atomically */
-    if (queued_count > 0 && layer->all_tasks_added && blocked_count == 0 && waiting_count == 0) {
+    if(queued_count > 0 && layer->all_tasks_added && blocked_count == 0 && waiting_count == 0) {
         EVE5_LOG("EVE5: -> Rendering %d queued tasks atomically", queued_count);
 
         lv_draw_layer_alloc_buf(layer, draw_unit);
@@ -310,11 +339,11 @@ static int32_t dispatch(lv_draw_unit_t *draw_unit, lv_layer_t *layer)
  *
  * @param apply_bitmap_mask  true for the last slice only (applies parent's bitmap mask)
  */
-static void eve5_render_slice(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
+static void eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                               bool is_screen, bool layer_has_alpha,
-                              const lv_draw_eve5_slice_t *slice, bool apply_bitmap_mask)
+                              const lv_draw_eve5_slice_t * slice, bool apply_bitmap_mask)
 {
-    lv_draw_task_t *t;
+    lv_draw_task_t * t;
 
     /* Pre-pass: check if any task in the slice would produce visible output.
      * If all tasks are no-ops (e.g., all LAYER tasks with empty children),
@@ -327,9 +356,9 @@ static void eve5_render_slice(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
             if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
                t->state == LV_DRAW_TASK_STATE_QUEUED) {
                 if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-                    lv_draw_image_dsc_t *dsc = t->draw_dsc;
-                    lv_layer_t *child = (lv_layer_t *)dsc->src;
-                    lv_eve5_vram_res_t *child_vr = eve5_get_vram_res(child);
+                    lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                    lv_layer_t * child = (lv_layer_t *)dsc->src;
+                    lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(child);
                     if(child_vr != NULL && child_vr->has_content) {
                         has_visible_tasks = true;
                         break;
@@ -372,18 +401,20 @@ static void eve5_render_slice(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
     else if(slice->prev_handle.Id != GA_HANDLE_INVALID.Id) {
         uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, slice->prev_handle);
         if(prev_addr != GA_INVALID) {
-            lv_eve5_vram_res_t *vr = eve5_get_vram_res(layer);
+            lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
             u->canvas_orig_addr = prev_addr;
             u->canvas_orig_format = vr ? vr->eve_format : ARGB8;
             u->canvas_orig_stride = vr ? vr->stride : 0;
             u->canvas_orig_palette = GA_INVALID;
             u->canvas_orig_w = lv_area_get_width(&layer->buf_area);
             u->canvas_orig_h = lv_area_get_height(&layer->buf_area);
-        } else {
+        }
+        else {
             u->canvas_orig_addr = GA_INVALID;
             u->canvas_orig_palette = GA_INVALID;
         }
-    } else {
+    }
+    else {
         u->canvas_orig_addr = GA_INVALID;
         u->canvas_orig_palette = GA_INVALID;
     }
@@ -412,7 +443,7 @@ static void eve5_render_slice(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
         alpha_rt_aw = ALIGN_UP(alpha_rt_w, 16);
         alpha_rt_ah = ALIGN_UP(alpha_rt_h, 16);
         alpha_rt_handle = lv_draw_eve5_render_alpha_to_l8(u, layer,
-                              alpha_rt_aw, alpha_rt_ah, alpha_rt_w, alpha_rt_h, slice);
+                                                          alpha_rt_aw, alpha_rt_ah, alpha_rt_w, alpha_rt_h, slice);
         alpha_rt_addr = Esd_GpuAlloc_Get(u->allocator, alpha_rt_handle);
         if(alpha_rt_addr == GA_INVALID) {
             u->alpha_needs_rendertarget = false;
@@ -454,10 +485,11 @@ static void eve5_render_slice(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
 #if EVE5_USE_RENDERTARGET_ALPHA
             if(u->alpha_needs_rendertarget && alpha_rt_addr != GA_INVALID) {
                 lv_draw_eve5_hal_blit_l8_to_alpha(u, alpha_rt_addr,
-                                                   alpha_rt_aw, alpha_rt_ah,
-                                                   alpha_rt_w, alpha_rt_h);
+                                                  alpha_rt_aw, alpha_rt_ah,
+                                                  alpha_rt_w, alpha_rt_h);
                 Esd_GpuAlloc_PendingFree(u->allocator, alpha_rt_handle);
-            } else
+            }
+            else
 #endif
             {
                 lv_draw_eve5_alpha_pass(u, layer, slice);
@@ -488,11 +520,11 @@ static void eve5_render_slice(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
      * to prevent double-masking during compositing. Must run after alpha correction.
      * Only applied on the last slice to avoid double-masking across slices. */
     if(apply_bitmap_mask && !is_screen && layer->parent != NULL) {
-        lv_draw_task_t *pt = layer->parent->draw_task_head;
+        lv_draw_task_t * pt = layer->parent->draw_task_head;
         while(pt) {
             if(pt->type == LV_DRAW_TASK_TYPE_LAYER) {
-                lv_draw_image_dsc_t *layer_dsc = pt->draw_dsc;
-                lv_layer_t *child_ref = (lv_layer_t *)layer_dsc->src;
+                lv_draw_image_dsc_t * layer_dsc = pt->draw_dsc;
+                lv_layer_t * child_ref = (lv_layer_t *)layer_dsc->src;
                 if(child_ref == layer && layer_dsc->bitmap_mask_src != NULL) {
                     lv_draw_eve5_apply_bitmap_mask(u, layer, layer_dsc);
                     layer_dsc->bitmap_mask_src = NULL;
@@ -511,9 +543,9 @@ static void eve5_render_slice(lv_draw_eve5_unit_t *u, lv_layer_t *layer,
  * LAYER RENDERING
  **********************/
 
-static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
+static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 {
-    lv_display_t *disp = lv_display_get_default();
+    lv_display_t * disp = lv_display_get_default();
     bool is_screen = (layer->parent == NULL && disp && layer == disp->layer_head);
 
     u->rendering_in_progress = true;
@@ -556,13 +588,13 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
      * blend math produces the composited result, which becomes prev_handle for the
      * next slice. */
     {
-        lv_draw_task_t *blend_task = NULL;
-        lv_draw_task_t *t = layer->draw_task_head;
+        lv_draw_task_t * blend_task = NULL;
+        lv_draw_task_t * t = layer->draw_task_head;
         while(t) {
             if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
                t->state == LV_DRAW_TASK_STATE_QUEUED &&
                (t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER)) {
-                const lv_draw_image_dsc_t *dsc = t->draw_dsc;
+                const lv_draw_image_dsc_t * dsc = t->draw_dsc;
                 if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
                    dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
                     blend_task = t;
@@ -577,7 +609,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                      ((const lv_draw_image_dsc_t *)blend_task->draw_dsc)->blend_mode);
 
             Esd_GpuHandle prev = GA_HANDLE_INVALID;
-            lv_draw_task_t *cursor = layer->draw_task_head;
+            lv_draw_task_t * cursor = layer->draw_task_head;
 
             while(cursor) {
                 /* Find next blend-mode task from cursor */
@@ -587,7 +619,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                     if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
                        t->state == LV_DRAW_TASK_STATE_QUEUED &&
                        (t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER)) {
-                        const lv_draw_image_dsc_t *dsc = t->draw_dsc;
+                        const lv_draw_image_dsc_t * dsc = t->draw_dsc;
                         if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
                            dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
                             blend_task = t;
@@ -634,7 +666,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                      * If the slice produced no content (all tasks were no-ops, e.g. empty
                      * child layers), treat it as if has_pre_tasks was false — prev stays
                      * unchanged and no buffer swap is needed. */
-                    lv_eve5_vram_res_t *vr = eve5_get_vram_res(layer);
+                    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
                     if(vr != NULL && vr->has_content) {
                         Esd_GpuHandle dst_handle = vr->gpu_handle;
                         Esd_GpuHandle new_handle = Esd_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
@@ -642,7 +674,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                             vr->gpu_handle = new_handle;
                             vr->has_content = false;
                             prev = dst_handle;
-                        } else {
+                        }
+                        else {
                             LV_LOG_ERROR("EVE5: Failed to allocate buffer after pre-blend slice");
                             prev = GA_HANDLE_INVALID;
                         }
@@ -687,7 +720,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                  * GA_HANDLE_INVALID and the blend math is skipped below. */
                 Esd_GpuHandle src_handle = GA_HANDLE_INVALID;
                 {
-                    lv_eve5_vram_res_t *vr = eve5_get_vram_res(layer);
+                    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
                     if(vr != NULL && vr->has_content) {
                         src_handle = vr->gpu_handle;
                         /* Allocate fresh buffer for the next phase */
@@ -695,7 +728,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                         if(Esd_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
                             vr->gpu_handle = new_handle;
                             vr->has_content = false;
-                        } else {
+                        }
+                        else {
                             LV_LOG_ERROR("EVE5: Failed to allocate buffer after isolated slice");
                             src_handle = GA_HANDLE_INVALID;
                         }
@@ -705,7 +739,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                 /* Blend math: per-channel blend between dst and src */
                 if(Esd_GpuAlloc_Get(u->allocator, prev) != GA_INVALID &&
                    Esd_GpuAlloc_Get(u->allocator, src_handle) != GA_INVALID) {
-                    const lv_draw_image_dsc_t *dsc = blend_task->draw_dsc;
+                    const lv_draw_image_dsc_t * dsc = blend_task->draw_dsc;
                     Esd_GpuHandle result = GA_HANDLE_INVALID;
                     bool blend_attempted = false;
 
@@ -772,7 +806,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                             EVE_CoDl_display(u->hal);
                             EVE_CoCmd_swap(u->hal);
                             EVE_CoCmd_graphicsFinish(u->hal);
-                        } else {
+                        }
+                        else {
                             result = GA_HANDLE_INVALID;
                         }
                     }
@@ -783,11 +818,13 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
                     /* Sentinel: result is specifically GA_HANDLE_INVALID when blend was not attempted or failed */
                     if(result.Id != GA_HANDLE_INVALID.Id) {
                         prev = result;
-                    } else {
+                    }
+                    else {
                         LV_LOG_WARN("EVE5: Blend operation failed");
                         prev = GA_HANDLE_INVALID;
                     }
-                } else {
+                }
+                else {
                     Esd_GpuAlloc_PendingFree(u->allocator, prev);
                     Esd_GpuAlloc_PendingFree(u->allocator, src_handle);
                     prev = GA_HANDLE_INVALID;
@@ -801,7 +838,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
              * was the last task), no tail slice runs so we must swap directly. */
             /* Sentinel: prev is specifically GA_HANDLE_INVALID when no blend result was produced */
             if(cursor == NULL && prev.Id != GA_HANDLE_INVALID.Id) {
-                lv_eve5_vram_res_t *vr = eve5_get_vram_res(layer);
+                lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
                 if(vr != NULL) {
                     Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
                     vr->gpu_handle = prev;
@@ -818,7 +855,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
      * Exercises the slice pipeline and prev_handle blit for correctness testing. */
     {
         int total = 0;
-        lv_draw_task_t *t = layer->draw_task_head;
+        lv_draw_task_t * t = layer->draw_task_head;
         while(t) {
             if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
                t->state == LV_DRAW_TASK_STATE_QUEUED)
@@ -826,7 +863,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
             t = t->next;
         }
 
-        lv_draw_task_t *split = NULL;
+        lv_draw_task_t * split = NULL;
         if(total >= 2) {
             static uint32_t s_split_counter = 0;
             int split_idx = 1 + (s_split_counter % (uint32_t)(total - 1));
@@ -837,7 +874,10 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
             while(t) {
                 if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
                    t->state == LV_DRAW_TASK_STATE_QUEUED) {
-                    if(count == split_idx) { split = t; break; }
+                    if(count == split_idx) {
+                        split = t;
+                        break;
+                    }
                     count++;
                 }
                 t = t->next;
@@ -858,14 +898,15 @@ static void eve5_render_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer)
             /* Prepare slice 2: allocate new render target, pass slice 1 output as prev_handle.
              * init_layer will blit prev_handle into the new buffer before rendering. */
             Esd_GpuHandle slice1_output = GA_HANDLE_INVALID;
-            lv_eve5_vram_res_t *vr = eve5_get_vram_res(layer);
+            lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
             if(vr != NULL) {
                 slice1_output = vr->gpu_handle;
                 Esd_GpuHandle new_handle = Esd_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
                 if(Esd_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
                     vr->gpu_handle = new_handle;
                     vr->has_content = false;
-                } else {
+                }
+                else {
                     LV_LOG_ERROR("EVE5: TEST SLICE: Failed to allocate slice 2 buffer");
                     slice1_output = GA_HANDLE_INVALID;
                 }

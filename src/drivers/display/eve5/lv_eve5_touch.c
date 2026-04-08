@@ -24,7 +24,7 @@
 
 #include "../../../stdlib/lv_mem.h"
 #if LV_USE_OS
-#include "../../../osal/lv_os.h"
+    #include "../../../osal/lv_os.h"
 #endif
 
 /*********************
@@ -39,7 +39,7 @@
  **********************/
 
 typedef struct {
-    lv_display_t *disp;
+    lv_display_t * disp;
     uint8_t touch_index;
 } lv_eve5_touch_data_t;
 
@@ -47,29 +47,29 @@ typedef struct {
  * STATIC PROTOTYPES
  **********************/
 
-static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data);
-static void multitouch_read_cb(lv_indev_t *indev, lv_indev_data_t *data);
+static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
+static void multitouch_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 static uint32_t get_touch_register(EVE_HalContext *phost, uint8_t index);
-static bool read_touch_xy(EVE_HalContext *phost, uint8_t index, int16_t *x, int16_t *y);
+static bool read_touch_xy(EVE_HalContext *phost, uint8_t index, int16_t * x, int16_t * y);
 
 /**********************
  * GLOBAL FUNCTIONS
  **********************/
 
-lv_indev_t *lv_eve5_touch_create(lv_display_t *disp)
+lv_indev_t * lv_eve5_touch_create(lv_display_t * disp)
 {
     if(disp == NULL) return NULL;
 
     EVE_HalContext *phost = lv_eve5_get_hal(disp);
     if(phost == NULL) return NULL;
 
-    lv_eve5_touch_data_t *touch_data = lv_malloc_zeroed(sizeof(lv_eve5_touch_data_t));
+    lv_eve5_touch_data_t * touch_data = lv_malloc_zeroed(sizeof(lv_eve5_touch_data_t));
     if(touch_data == NULL) return NULL;
 
     touch_data->disp = disp;
     touch_data->touch_index = 0;
 
-    lv_indev_t *indev = lv_indev_create();
+    lv_indev_t * indev = lv_indev_create();
     if(indev == NULL) {
         lv_free(touch_data);
         return NULL;
@@ -92,7 +92,7 @@ lv_indev_t *lv_eve5_touch_create(lv_display_t *disp)
     return indev;
 }
 
-lv_eve5_multitouch_t *lv_eve5_multitouch_create(lv_display_t *disp, uint8_t num_points)
+lv_eve5_multitouch_t * lv_eve5_multitouch_create(lv_display_t * disp, uint8_t num_points)
 {
     if(disp == NULL) return NULL;
     if(num_points == 0 || num_points > LV_EVE5_TOUCH_POINTS_MAX) {
@@ -104,7 +104,7 @@ lv_eve5_multitouch_t *lv_eve5_multitouch_create(lv_display_t *disp, uint8_t num_
     EVE_HalContext *phost = lv_eve5_get_hal(disp);
     if(phost == NULL) return NULL;
 
-    lv_eve5_multitouch_t *mt = lv_malloc_zeroed(sizeof(lv_eve5_multitouch_t));
+    lv_eve5_multitouch_t * mt = lv_malloc_zeroed(sizeof(lv_eve5_multitouch_t));
     if(mt == NULL) return NULL;
 
     mt->disp = disp;
@@ -119,7 +119,7 @@ lv_eve5_multitouch_t *lv_eve5_multitouch_create(lv_display_t *disp, uint8_t num_
 #endif
 
     for(uint8_t i = 0; i < num_points; i++) {
-        lv_eve5_touch_data_t *touch_data = lv_malloc_zeroed(sizeof(lv_eve5_touch_data_t));
+        lv_eve5_touch_data_t * touch_data = lv_malloc_zeroed(sizeof(lv_eve5_touch_data_t));
         if(touch_data == NULL) {
             for(uint8_t j = 0; j < i; j++) {
                 lv_free(lv_indev_get_user_data(mt->indev[j]));
@@ -133,7 +133,7 @@ lv_eve5_multitouch_t *lv_eve5_multitouch_create(lv_display_t *disp, uint8_t num_
         touch_data->disp = disp;
         touch_data->touch_index = i;
 
-        lv_indev_t *indev = lv_indev_create();
+        lv_indev_t * indev = lv_indev_create();
         if(indev == NULL) {
             lv_free(touch_data);
             for(uint8_t j = 0; j < i; j++) {
@@ -157,7 +157,7 @@ lv_eve5_multitouch_t *lv_eve5_multitouch_create(lv_display_t *disp, uint8_t num_
     return mt;
 }
 
-void lv_eve5_multitouch_delete(lv_eve5_multitouch_t *mt)
+void lv_eve5_multitouch_delete(lv_eve5_multitouch_t * mt)
 {
     if(mt == NULL) return;
 
@@ -168,7 +168,7 @@ void lv_eve5_multitouch_delete(lv_eve5_multitouch_t *mt)
 
     for(uint8_t i = 0; i < mt->num_points; i++) {
         if(mt->indev[i] != NULL) {
-            lv_eve5_touch_data_t *touch_data = lv_indev_get_user_data(mt->indev[i]);
+            lv_eve5_touch_data_t * touch_data = lv_indev_get_user_data(mt->indev[i]);
             if(touch_data != NULL) {
                 lv_free(touch_data);
             }
@@ -180,13 +180,13 @@ void lv_eve5_multitouch_delete(lv_eve5_multitouch_t *mt)
     LV_LOG_INFO("EVE5: Multi-touch deleted, restored compatibility mode");
 }
 
-lv_indev_t *lv_eve5_multitouch_get_indev(lv_eve5_multitouch_t *mt, uint8_t index)
+lv_indev_t * lv_eve5_multitouch_get_indev(lv_eve5_multitouch_t * mt, uint8_t index)
 {
     if(mt == NULL || index >= mt->num_points) return NULL;
     return mt->indev[index];
 }
 
-bool lv_eve5_touch_calibrate(lv_display_t *disp)
+bool lv_eve5_touch_calibrate(lv_display_t * disp)
 {
     if(disp == NULL) return false;
 
@@ -222,7 +222,7 @@ bool lv_eve5_touch_calibrate(lv_display_t *disp)
     return success;
 }
 
-void lv_eve5_touch_set_calibration(lv_display_t *disp, const int32_t matrix[6])
+void lv_eve5_touch_set_calibration(lv_display_t * disp, const int32_t matrix[6])
 {
     if(disp == NULL || matrix == NULL) return;
 
@@ -239,7 +239,7 @@ void lv_eve5_touch_set_calibration(lv_display_t *disp, const int32_t matrix[6])
     LV_LOG_INFO("EVE5: Touch calibration matrix set");
 }
 
-void lv_eve5_touch_get_calibration(lv_display_t *disp, int32_t matrix[6])
+void lv_eve5_touch_get_calibration(lv_display_t * disp, int32_t matrix[6])
 {
     if(disp == NULL || matrix == NULL) return;
 
@@ -254,7 +254,7 @@ void lv_eve5_touch_get_calibration(lv_display_t *disp, int32_t matrix[6])
     matrix[5] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_F);
 }
 
-void lv_eve5_touch_set_mode(lv_display_t *disp, uint8_t mode)
+void lv_eve5_touch_set_mode(lv_display_t * disp, uint8_t mode)
 {
     if(disp == NULL) return;
     if(mode > 3) return;
@@ -277,12 +277,18 @@ static uint32_t get_touch_register(EVE_HalContext *phost, uint8_t index)
 {
     LV_UNUSED(phost);
     switch(index) {
-        case 0: return REG_CTOUCH_TOUCH0_XY;
-        case 1: return REG_CTOUCH_TOUCHA_XY;
-        case 2: return REG_CTOUCH_TOUCHB_XY;
-        case 3: return REG_CTOUCH_TOUCHC_XY;
-        case 4: return REG_CTOUCH_TOUCH4_XY;
-        default: return REG_CTOUCH_TOUCH0_XY;
+        case 0:
+            return REG_CTOUCH_TOUCH0_XY;
+        case 1:
+            return REG_CTOUCH_TOUCHA_XY;
+        case 2:
+            return REG_CTOUCH_TOUCHB_XY;
+        case 3:
+            return REG_CTOUCH_TOUCHC_XY;
+        case 4:
+            return REG_CTOUCH_TOUCH4_XY;
+        default:
+            return REG_CTOUCH_TOUCH0_XY;
     }
 }
 
@@ -290,7 +296,7 @@ static uint32_t get_touch_register(EVE_HalContext *phost, uint8_t index)
  * Read touch coordinates. All touch registers are 32-bit: X in upper 16, Y in lower 16.
  * Returns false if no touch (both coordinates read 0x8000).
  */
-static bool read_touch_xy(EVE_HalContext *phost, uint8_t index, int16_t *x, int16_t *y)
+static bool read_touch_xy(EVE_HalContext *phost, uint8_t index, int16_t * x, int16_t * y)
 {
     uint32_t reg = get_touch_register(phost, index);
     uint32_t xy = EVE_Hal_rd32(phost, reg);
@@ -305,9 +311,9 @@ static bool read_touch_xy(EVE_HalContext *phost, uint8_t index, int16_t *x, int1
     return true;
 }
 
-static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
+static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_eve5_touch_data_t *touch_data = lv_indev_get_user_data(indev);
+    lv_eve5_touch_data_t * touch_data = lv_indev_get_user_data(indev);
     if(touch_data == NULL || touch_data->disp == NULL) {
         data->state = LV_INDEV_STATE_RELEASED;
         return;
@@ -348,9 +354,9 @@ static void touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
     }
 }
 
-static void multitouch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
+static void multitouch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_eve5_touch_data_t *touch_data = lv_indev_get_user_data(indev);
+    lv_eve5_touch_data_t * touch_data = lv_indev_get_user_data(indev);
     if(touch_data == NULL || touch_data->disp == NULL) {
         data->state = LV_INDEV_STATE_RELEASED;
         return;
