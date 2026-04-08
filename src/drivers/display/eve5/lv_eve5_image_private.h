@@ -17,6 +17,10 @@
 extern "C" {
 #endif
 
+#include "../../../lv_conf_internal.h"
+
+#if LV_USE_EVE5
+
 #include "../../../misc/lv_types.h"
 #include "../../../stdlib/lv_string.h"
 
@@ -70,6 +74,8 @@ static inline int32_t eve5_format_bpp(uint32_t eve_format)
             return 2;
     }
 }
+
+#endif /* LV_USE_EVE5 */
 
 #ifdef __cplusplus
 } /*extern "C"*/
