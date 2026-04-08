@@ -197,10 +197,10 @@ void lv_eve_draw_rect_simple(int16_t coord_x1, int16_t coord_y1, int16_t coord_x
         lv_eve_line_width(radius * 16);
     }
     if(radius > 0) {
-        // With radius 1, the EVE engine draws one half-opacity
-        // pixel outline around the rectangle. Subtracting one
-        // here ensures that the full-opacity rectangle reaches
-        // the coordinate pixels we were passed in.
+        /* With radius 1, the EVE engine draws one half-opacity
+         * pixel outline around the rectangle. Subtracting one
+         * here ensures that the full-opacity rectangle reaches
+         * the coordinate pixels we were passed in. */
         radius--;
     }
 
