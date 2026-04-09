@@ -39,10 +39,12 @@ typedef struct {
     int upload_count;
     int download_count;
     int check_count;
+    int dup_count;
     int font_free_count;
     bool fail_alloc;               /**< If true, vram_alloc_cb returns false */
     bool fail_upload;
     bool fail_download;
+    bool fail_dup;
 } fake_vram_stats_t;
 
 static lv_draw_unit_t s_fake_unit_a;
@@ -167,6 +169,27 @@ static void fake_vram_font_free_cb(lv_draw_unit_t * unit, void * font)
     }
 }
 
+static bool fake_vram_dup_cb(lv_draw_unit_t * unit, lv_draw_buf_t * dest, const lv_draw_buf_t * src)
+{
+    fake_vram_stats_t * stats = get_stats(unit);
+    stats->dup_count++;
+    if(stats->fail_dup) return false;
+
+    if(src->vram_res == NULL) return false;
+    fake_vram_res_t * src_vr = (fake_vram_res_t *)src->vram_res;
+    if(src_vr->fake_vram == NULL) return false;
+
+    /* Allocate VRAM for dest */
+    if(!fake_vram_alloc_cb(unit, dest)) return false;
+    stats->alloc_count--;  /* Don't double-count the alloc inside dup */
+
+    /* Copy VRAM to VRAM */
+    fake_vram_res_t * dest_vr = (fake_vram_res_t *)dest->vram_res;
+    uint32_t copy_size = LV_MIN(src_vr->alloc_size, dest_vr->alloc_size);
+    lv_memcpy(dest_vr->fake_vram, src_vr->fake_vram, copy_size);
+    return true;
+}
+
 static void init_fake_unit(lv_draw_unit_t * unit, fake_vram_stats_t * stats)
 {
     lv_memzero(unit, sizeof(lv_draw_unit_t));
@@ -176,6 +199,7 @@ static void init_fake_unit(lv_draw_unit_t * unit, fake_vram_stats_t * stats)
     unit->vram_upload_cb = fake_vram_upload_cb;
     unit->vram_download_cb = fake_vram_download_cb;
     unit->vram_check_cb = fake_vram_check_cb;
+    unit->vram_dup_cb = fake_vram_dup_cb;
     unit->vram_font_free_cb = fake_vram_font_free_cb;
 }
 
@@ -1085,6 +1109,186 @@ void test_vram_multiple_formats(void)
 
         lv_draw_buf_destroy(buf);
     }
+}
+
+/** lv_draw_buf_clear on a lazy buffer sets CLEARZERO without crash */
+void test_vram_clear_lazy_buffer_sets_clearzero(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    TEST_ASSERT_NULL(buf->data);
+
+    /* Clear on a lazy (header-only) buffer should not crash and should set CLEARZERO */
+    lv_draw_buf_clear(buf, NULL);
+    TEST_ASSERT_TRUE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_CLEARZERO));
+    TEST_ASSERT_NULL(buf->data);  /* Still lazy — no CPU allocation */
+
+    /* Subsequent ensure_resident to CPU should produce a zeroed buffer */
+    bool ok = lv_draw_buf_ensure_resident(buf, NULL);
+    TEST_ASSERT_TRUE(ok);
+    TEST_ASSERT_NOT_NULL(buf->data);
+    TEST_ASSERT_FALSE(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_CLEARZERO));
+
+    uint8_t * p = buf->data;
+    uint32_t total = buf->header.stride * buf->header.h;
+    for(uint32_t i = 0; i < total; i++) {
+        if(p[i] != 0) {
+            TEST_FAIL_MESSAGE("Buffer not zeroed after lazy clear + ensure_resident");
+            break;
+        }
+    }
+
+    lv_draw_buf_destroy(buf);
+}
+
+/** lv_draw_buf_dup on a lazy buffer ensures both src and dest are resident */
+void test_vram_dup_lazy_buffer(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+    TEST_ASSERT_NULL(buf->data);
+
+    /* dup on a lazy buffer should succeed — both buffers become CPU-resident */
+    lv_draw_buf_t * dup = lv_draw_buf_dup(buf);
+    TEST_ASSERT_NOT_NULL(dup);
+    TEST_ASSERT_NOT_NULL(dup->data);
+    TEST_ASSERT_NOT_NULL(buf->data);  /* Source also ensured resident */
+
+    lv_draw_buf_destroy(dup);
+    lv_draw_buf_destroy(buf);
+}
+
+/** lv_draw_buf_dup on a CPU-resident buffer works normally */
+void test_vram_dup_cpu_buffer(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    lv_draw_buf_ensure_resident(buf, NULL);
+    fill_pattern(buf, 0xAB);
+
+    lv_draw_buf_t * dup = lv_draw_buf_dup(buf);
+    TEST_ASSERT_NOT_NULL(dup);
+    TEST_ASSERT_NOT_NULL(dup->data);
+
+    /* Content should match */
+    uint8_t * p = dup->data;
+    uint32_t total = dup->header.stride * dup->header.h;
+    for(uint32_t i = 0; i < total; i++) {
+        if(p[i] != 0xAB) {
+            TEST_FAIL_MESSAGE("dup content mismatch");
+            break;
+        }
+    }
+
+    lv_draw_buf_destroy(dup);
+    lv_draw_buf_destroy(buf);
+}
+
+/** lv_draw_buf_dup on VRAM-resident buffer uses vram_dup_cb fast path */
+void test_vram_dup_vram_resident_uses_callback(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    /* Get CPU resident, write pattern, upload to VRAM */
+    lv_draw_buf_ensure_resident(buf, NULL);
+    fill_pattern(buf, 0xCD);
+    lv_draw_buf_ensure_resident(buf, &s_fake_unit_a);
+    TEST_ASSERT_NOT_NULL(buf->vram_res);
+    TEST_ASSERT_NULL(buf->data);  /* CPU freed after upload */
+
+    /* dup should use vram_dup_cb — no download, no CPU allocation on source */
+    lv_draw_buf_t * dup = lv_draw_buf_dup(buf);
+    TEST_ASSERT_NOT_NULL(dup);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.dup_count);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.download_count);
+
+    /* Dup should be VRAM-resident on the same unit */
+    TEST_ASSERT_NOT_NULL(dup->vram_res);
+    TEST_ASSERT_EQUAL_PTR(&s_fake_unit_a, dup->vram_res->unit);
+
+    /* Source should remain untouched in VRAM */
+    TEST_ASSERT_NULL(buf->data);
+    TEST_ASSERT_NOT_NULL(buf->vram_res);
+
+    /* VRAM content should match the original pattern */
+    TEST_ASSERT_TRUE(vram_contains_pattern(dup, 0xCD));
+
+    lv_draw_buf_destroy(dup);
+    lv_draw_buf_destroy(buf);
+}
+
+/** vram_dup_cb failure falls back to CPU copy */
+void test_vram_dup_vram_fallback_on_failure(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    lv_draw_buf_ensure_resident(buf, NULL);
+    fill_pattern(buf, 0xEF);
+    lv_draw_buf_ensure_resident(buf, &s_fake_unit_a);
+
+    /* Force vram_dup_cb to fail */
+    s_stats_a.fail_dup = true;
+
+    lv_draw_buf_t * dup = lv_draw_buf_dup(buf);
+    TEST_ASSERT_NOT_NULL(dup);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.dup_count);  /* Attempted */
+
+    /* Should have fallen back to CPU: source downloaded, dup is CPU-resident */
+    TEST_ASSERT_NOT_NULL(dup->data);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.download_count);
+
+    /* Content should still be correct via the CPU fallback */
+    uint8_t * p = dup->data;
+    uint32_t total = dup->header.stride * dup->header.h;
+    for(uint32_t i = 0; i < total; i++) {
+        if(p[i] != 0xEF) {
+            TEST_FAIL_MESSAGE("dup content mismatch after vram_dup_cb fallback");
+            break;
+        }
+    }
+
+    lv_draw_buf_destroy(dup);
+    lv_draw_buf_destroy(buf);
+}
+
+/** dup without vram_dup_cb falls back to CPU copy */
+void test_vram_dup_no_callback_falls_back(void)
+{
+    lv_draw_buf_t * buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    lv_draw_buf_ensure_resident(buf, NULL);
+    fill_pattern(buf, 0x33);
+    lv_draw_buf_ensure_resident(buf, &s_fake_unit_a);
+
+    /* Remove vram_dup_cb to simulate a unit that doesn't support it */
+    s_fake_unit_a.vram_dup_cb = NULL;
+
+    lv_draw_buf_t * dup = lv_draw_buf_dup(buf);
+    TEST_ASSERT_NOT_NULL(dup);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.dup_count);  /* Not attempted */
+
+    /* Should have used CPU fallback: download + CPU copy */
+    TEST_ASSERT_NOT_NULL(dup->data);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.download_count);
+
+    uint8_t * p = dup->data;
+    uint32_t total = dup->header.stride * dup->header.h;
+    for(uint32_t i = 0; i < total; i++) {
+        if(p[i] != 0x33) {
+            TEST_FAIL_MESSAGE("dup content mismatch without vram_dup_cb");
+            break;
+        }
+    }
+
+    /* Restore for teardown */
+    s_fake_unit_a.vram_dup_cb = fake_vram_dup_cb;
+
+    lv_draw_buf_destroy(dup);
+    lv_draw_buf_destroy(buf);
 }
 
 /** Alpha format lazy alloc to CPU is zero-filled */

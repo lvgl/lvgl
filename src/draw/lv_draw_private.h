@@ -217,6 +217,15 @@ struct _lv_draw_unit_t {
     bool (*vram_check_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf);
 
     /**
+     * Duplicate VRAM contents from src into dest entirely within VRAM.
+     * The draw unit allocates VRAM for dest, copies src's VRAM data,
+     * and sets dest->vram_res. Both buffers end up on the same unit.
+     * @return true on success. If NULL or returns false, the caller
+     *         falls back to CPU-side copy.
+     */
+    bool (*vram_dup_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * dest, const lv_draw_buf_t * src);
+
+    /**
      * Free font VRAM residency. Called when a different draw unit encounters
      * a font with vram_res owned by this unit. The callback must free GPU
      * resources, unlink from internal tracking, free the vram_res struct,

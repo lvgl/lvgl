@@ -336,6 +336,20 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
 
     lv_draw_buf_set_flag(new_buf, draw_buf->header.flags | LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED);
 
+#if LV_USE_DRAW_VRAM
+    /*If source is VRAM-resident, try a VRAM-side duplicate to avoid a CPU round trip*/
+    if(draw_buf->vram_res != NULL) {
+        lv_draw_unit_t * unit = draw_buf->vram_res->unit;
+        if(unit != NULL && unit->vram_dup_cb != NULL) {
+            if(unit->vram_dup_cb(unit, new_buf, draw_buf)) {
+                LV_PROFILER_DRAW_END;
+                return new_buf;
+            }
+            /*vram_dup_cb failed — fall through to CPU copy*/
+        }
+    }
+#endif
+
     /*Ensure both source and destination have CPU-resident data*/
     if(!lv_draw_buf_ensure_resident(new_buf, NULL) ||
        !lv_draw_buf_ensure_resident((lv_draw_buf_t *)draw_buf, NULL)) {
