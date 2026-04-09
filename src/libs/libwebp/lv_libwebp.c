@@ -206,8 +206,9 @@ static lv_draw_buf_t * decode_webp_file(lv_image_decoder_dsc_t * dsc, const char
     lv_draw_buf_t * decoded;
     decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, dsc->header.cf,
                                     LV_STRIDE_AUTO);
-    if(decoded == NULL) {
+    if(decoded == NULL || !lv_draw_buf_ensure_resident(decoded, NULL)) {
         LV_LOG_ERROR("alloc draw buffer failed: %s", filename);
+        if(decoded) lv_draw_buf_destroy(decoded);
         lv_free(data);
         LV_PROFILER_DECODER_END;
         return NULL;

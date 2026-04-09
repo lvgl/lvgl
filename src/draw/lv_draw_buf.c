@@ -175,6 +175,15 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
     uint32_t stride = header->stride;
 
     if(a == NULL) {
+#if LV_USE_DRAW_VRAM
+        if(draw_buf->data == NULL) {
+            /* Lazy buffer: no backing memory yet. Just mark CLEARZERO so that
+             * ensure_resident will zero the buffer when it actually allocates. */
+            lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_CLEARZERO);
+            LV_PROFILER_DRAW_END;
+            return;
+        }
+#endif
         uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, 0, 0);
         lv_memzero(buf, header->h * stride);
         lv_draw_buf_flush_cache(draw_buf, a);
@@ -326,6 +335,14 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
     }
 
     lv_draw_buf_set_flag(new_buf, draw_buf->header.flags | LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED);
+
+    /*Ensure both source and destination have CPU-resident data*/
+    if(!lv_draw_buf_ensure_resident(new_buf, NULL) ||
+       !lv_draw_buf_ensure_resident((lv_draw_buf_t *)draw_buf, NULL)) {
+        lv_draw_buf_destroy(new_buf);
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
 
     /*Choose the smaller size to copy*/
     uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);

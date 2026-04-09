@@ -618,8 +618,9 @@ static bool tiny_ttf_draw_data_cache_create_cb(tiny_ttf_cache_data_t * node, voi
     h = y2 - y1 + 1;
 
     lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
-    if(NULL == draw_buf) {
+    if(NULL == draw_buf || !lv_draw_buf_ensure_resident(draw_buf, NULL)) {
         LV_LOG_ERROR("tiny_ttf: out of memory");
+        if(draw_buf) lv_draw_buf_destroy(draw_buf);
         return false;
     }
 

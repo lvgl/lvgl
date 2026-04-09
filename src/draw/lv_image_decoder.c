@@ -338,8 +338,9 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             if(res != LV_RESULT_OK) {
                 lv_draw_buf_t * aligned = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, decoded->header.w, decoded->header.h,
                                                                 decoded->header.cf, stride_expect);
-                if(aligned == NULL) {
+                if(aligned == NULL || !lv_draw_buf_ensure_resident(aligned, NULL)) {
                     LV_LOG_ERROR("No memory for Stride adjust.");
+                    if(aligned) lv_draw_buf_destroy(aligned);
                     LV_PROFILER_DECODER_END;
                     return NULL;
                 }

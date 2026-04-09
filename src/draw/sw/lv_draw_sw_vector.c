@@ -502,6 +502,7 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
        cf != LV_COLOR_FORMAT_XRGB8888) {
         allow_buffer = true;
         new_buf = lv_draw_buf_create(width, height, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+        if(new_buf) lv_draw_buf_ensure_resident(new_buf, NULL);
         lv_draw_buf_clear(new_buf, NULL);
         buf = new_buf->data;
         stride = new_buf->header.stride;
