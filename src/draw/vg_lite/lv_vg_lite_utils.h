@@ -139,7 +139,7 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
 
 vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_draw_image_dsc_t * dsc);
 
-bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
+bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, LV_IMAGE_DSC_CONST void * src,
                                   bool no_cache, bool premultiply, lv_draw_unit_t * draw_unit);
 
 void lv_vg_lite_image_dsc_init(struct _lv_draw_vg_lite_unit_t * unit);

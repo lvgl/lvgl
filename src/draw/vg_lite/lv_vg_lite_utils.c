@@ -862,7 +862,7 @@ vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_dra
     return 0;
 }
 
-bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
+bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, LV_IMAGE_DSC_CONST void * src,
                                   bool no_cache, bool premultiply, lv_draw_unit_t * draw_unit)
 {
     LV_ASSERT_NULL(buffer);
