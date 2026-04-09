@@ -313,7 +313,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
 
 #if LV_USE_DRAW_VRAM
     if(!lv_draw_buf_ensure_resident(canvas->draw_buf, NULL)) return;
-    if(!lv_draw_buf_ensure_resident(dest_buf, NULL)) return;
+    if(!lv_draw_buf_ensure_resident(src_buf, NULL)) return;
 #endif
 
     LV_ASSERT_MSG(canvas->draw_buf->header.cf == src_buf->header.cf, "Color formats must be the same");

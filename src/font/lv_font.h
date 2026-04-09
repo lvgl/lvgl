@@ -78,7 +78,7 @@ typedef struct {
     lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
     union {
         uint32_t index;       /**< Glyph descriptor index*/
-        const void * src;     /**< Pointer to the source data used by image fonts*/
+        LV_IMAGE_DSC_CONST void * src;     /**< Pointer to the source data used by image fonts*/
     } gid;                    /**< The index of the glyph in the font file. Used by the font cache*/
     lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
     int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter border */
@@ -155,7 +155,7 @@ struct _lv_font_t {
       * @return              pointer to glyph draw data appropriate for `g_dsc->format`,
       *                      or NULL on failure
       */
-    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+    LV_IMAGE_DSC_CONST void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
     /** Release a glyph and any resources acquired during `get_glyph_dsc` or `get_glyph_bitmap`.
      *
@@ -215,7 +215,7 @@ struct _lv_font_info_t {
  * @return              pointer to the glyph's data.
  *                      It can be a draw buffer for bitmap fonts or an image source for imgfonts.
  */
-const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 
 /**
@@ -225,7 +225,7 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
  *                      and the format.
  * @return              the bitmap as it is
  */
-const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc);
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc);
 
 /**
  * Get the descriptor of a glyph

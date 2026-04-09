@@ -20,7 +20,7 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-static void create_image_unit(const char * img_src, uint32_t image_pos_x, uint32_t image_pos_y, const char * label_text,
+static void create_image_unit(LV_IMAGE_DSC_CONST char * img_src, uint32_t image_pos_x, uint32_t image_pos_y, const char * label_text,
                               uint32_t label_pos_x, uint32_t label_pos_y)
 {
     lv_obj_t * img = lv_image_create(lv_screen_active());
@@ -107,7 +107,7 @@ void test_jpg_sign_error(void)
 void test_jpg_decode_failed(void)
 {
     lv_image_decoder_dsc_t decoder_dsc;
-    const char * image_path = "A:src/test_assets/test_img_lvgl_logo_with_decode_failed.jpg";
+    LV_IMAGE_DSC_CONST char * image_path = "A:src/test_assets/test_img_lvgl_logo_with_decode_failed.jpg";
 
     /* Try to decode the image */
     lv_result_t res = lv_image_decoder_open(&decoder_dsc, image_path, NULL);

@@ -87,7 +87,7 @@ const lv_font_class_t lv_builtin_font_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+LV_IMAGE_DSC_CONST void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     const lv_font_t * font = g_dsc->resolved_font;
 
@@ -97,7 +97,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    if(g_dsc->req_raw_bitmap) return (LV_IMAGE_DSC_CONST void *)&fdsc->glyph_bitmap[gdsc->bitmap_index];
 
 #if LV_USE_DRAW_VRAM
     lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_DISCARDABLE);

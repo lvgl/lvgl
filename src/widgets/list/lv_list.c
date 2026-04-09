@@ -82,7 +82,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
     return obj;
 }
 
-lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
+lv_obj_t * lv_list_add_button(lv_obj_t * list, LV_IMAGE_DSC_CONST void * icon, const char * txt)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS_BUTTON, list);
@@ -145,7 +145,7 @@ lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag)
     return obj;
 }
 
-lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon, const char * tag)
+lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, LV_IMAGE_DSC_CONST void * icon, const char * tag)
 {
     LV_LOG_INFO("begin");
 

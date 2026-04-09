@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 struct _lv_imagebutton_src_info_t {
-    const void * img_src;
+    LV_IMAGE_DSC_CONST void * img_src;
     lv_image_header_t header;
 };
 

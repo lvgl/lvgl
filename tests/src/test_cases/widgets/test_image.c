@@ -513,7 +513,7 @@ static void create_test_images(int32_t radius, int32_t scale, int32_t angle)
     LV_IMAGE_DECLARE(test_XRGB8888_NONE_align64);
     LV_IMAGE_DECLARE(test_ARGB8888_NONE_align64);
 
-    const lv_image_dsc_t * img_dscs[] = {
+    LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dscs[] = {
         &test_I1_NONE_align64,
         &test_I2_NONE_align64,
         &test_I4_NONE_align64,
@@ -759,7 +759,7 @@ void test_image_raw_data_as_file(void)
     lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, img_bin, sizeof(img_bin), "bin");
 
     lv_obj_t * img_1 = lv_image_create(lv_screen_active());
-    lv_image_set_src(img_1, (const char *)&mempath);
+    lv_image_set_src(img_1, (LV_IMAGE_DSC_CONST char *)&mempath);
     lv_obj_center(img_1);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_raw_data_as_file.png");

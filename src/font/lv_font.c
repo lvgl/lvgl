@@ -47,20 +47,20 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
 
     const uint8_t save_req = g_dsc->req_raw_bitmap;
     g_dsc->req_raw_bitmap = 0;
-    const void * bitmap = font_p->get_glyph_bitmap(g_dsc, draw_buf);
+    LV_IMAGE_DSC_CONST void * bitmap = font_p->get_glyph_bitmap(g_dsc, draw_buf);
     g_dsc->req_raw_bitmap = save_req;
 
     return bitmap;
 }
 
-const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
+LV_IMAGE_DSC_CONST void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
 {
     const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
@@ -72,7 +72,7 @@ const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
 
     const uint8_t save_req = g_dsc->req_raw_bitmap;
     g_dsc->req_raw_bitmap = 1;
-    const void * bitmap = font_p->get_glyph_bitmap(g_dsc, NULL);
+    LV_IMAGE_DSC_CONST void * bitmap = font_p->get_glyph_bitmap(g_dsc, NULL);
     g_dsc->req_raw_bitmap = save_req;
 
     return bitmap;

@@ -218,7 +218,7 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align);
  * @param obj       pointer to an image object
  * @param src       an lv_image_dsc_t bitmap mask source.
  */
-void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src);
+void lv_image_set_bitmap_map_src(lv_obj_t * obj, LV_IMAGE_DSC_CONST lv_image_dsc_t * src);
 
 /*=====================
  * Getter functions

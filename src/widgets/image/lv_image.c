@@ -481,7 +481,7 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align)
     lv_obj_invalidate(obj);
 }
 
-void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src)
+void lv_image_set_bitmap_map_src(lv_obj_t * obj, LV_IMAGE_DSC_CONST lv_image_dsc_t * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_image_t * img = (lv_image_t *)obj;
@@ -1060,7 +1060,7 @@ static void reset_image_attributes(lv_obj_t * obj)
 static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     if(subject->type == LV_SUBJECT_TYPE_POINTER) {
-        lv_image_set_src(observer->target, subject->value.pointer);
+        lv_image_set_src(observer->target, (LV_IMAGE_DSC_CONST void *)subject->value.pointer);
     }
 }
 

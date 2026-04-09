@@ -27,7 +27,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+static LV_IMAGE_DSC_CONST void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out,
                                   uint32_t unicode, uint32_t unicode_next);
 
@@ -80,12 +80,11 @@ void lv_imgfont_destroy(lv_font_t * font)
  *   STATIC FUNCTIONS
  **********************/
 
-static const void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+static LV_IMAGE_DSC_CONST void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(draw_buf);
 
-    const void * img_src = g_dsc->gid.src;
-    return img_src;
+    return g_dsc->gid.src;
 }
 
 static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out,
@@ -114,7 +113,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
     dsc_out->ofs_x  = 0;
     dsc_out->ofs_y  = offset_y;
     dsc_out->format = LV_FONT_GLYPH_FORMAT_IMAGE;   /* is image identifier */
-    dsc_out->gid.src = img_src;
+    dsc_out->gid.src = (LV_IMAGE_DSC_CONST void *)img_src;
 
     return true;
 }

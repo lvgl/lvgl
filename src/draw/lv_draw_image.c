@@ -196,7 +196,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     LV_PROFILER_DRAW_END;
 }
 
-lv_image_src_t lv_image_src_get_type(LV_IMAGE_DSC_CONST void * src)
+lv_image_src_t lv_image_src_get_type(const void * src)
 {
     if(src == NULL) return LV_IMAGE_SRC_UNKNOWN;
     const uint8_t * u8_p = src;

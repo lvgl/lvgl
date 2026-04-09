@@ -111,7 +111,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
 
     lv_image_decoder_dsc_t dsc;
     lv_memzero(&dsc, sizeof(lv_image_decoder_dsc_t));
-    dsc.src = src;
+    dsc.src = (LV_IMAGE_DSC_CONST void *)src;
     dsc.src_type = lv_image_src_get_type(src);
 
     lv_mutex_lock(img_decoder_info_lock_p);
