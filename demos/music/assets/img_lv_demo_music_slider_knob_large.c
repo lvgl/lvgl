@@ -82,11 +82,10 @@ img_lv_demo_music_slider_knob_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_slider_knob = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_slider_knob = {
 #endif
-lv_image_dsc_t img_lv_demo_music_slider_knob = {
     .header.w = 66,
     .header.h = 66,
     .header.stride = 264,

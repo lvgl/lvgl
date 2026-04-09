@@ -71,11 +71,10 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_btn_next_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_btn_next = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_btn_next = {
 #endif
-lv_image_dsc_t img_lv_demo_music_btn_next = {
     .header.w = 62,
     .header.h = 62,
     .header.stride = 248,

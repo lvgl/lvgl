@@ -1305,11 +1305,10 @@ uint8_t img_png_demo_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_png_demo = {
 #else
-const
+const lv_image_dsc_t img_png_demo = {
 #endif
-lv_image_dsc_t img_png_demo = {
     .header = {
         .magic = LV_IMAGE_HEADER_MAGIC,
         .cf = LV_COLOR_FORMAT_RAW_ALPHA,

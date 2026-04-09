@@ -446,11 +446,10 @@ img_lv_demo_music_cover_1_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_cover_1 = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_cover_1 = {
 #endif
-lv_image_dsc_t img_lv_demo_music_cover_1 = {
     .header.w = 428,
     .header.h = 428,
     .header.stride = 1712,

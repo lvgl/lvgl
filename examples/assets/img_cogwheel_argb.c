@@ -115,11 +115,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_ARGB uint8_t img_co
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_cogwheel_argb = {
 #else
-const
+const lv_image_dsc_t img_cogwheel_argb = {
 #endif
-lv_image_dsc_t img_cogwheel_argb = {
     .header = {
         .cf = LV_COLOR_FORMAT_ARGB8888,
         .w = 100,

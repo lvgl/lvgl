@@ -25,11 +25,10 @@ test_image_caret_down_map[]
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t test_image_caret_down = {
 #else
-const
+const lv_image_dsc_t test_image_caret_down = {
 #endif
-lv_image_dsc_t test_image_caret_down = {
     .header.w = 13,
     .header.h = 8,
     .header.stride = 52,

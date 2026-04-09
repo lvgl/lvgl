@@ -57,11 +57,10 @@ img_render_lvgl_logo_rgb565_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_render_lvgl_logo_rgb565 = {
 #else
-const
+const lv_image_dsc_t img_render_lvgl_logo_rgb565 = {
 #endif
-lv_image_dsc_t img_render_lvgl_logo_rgb565 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_RGB565,
   .header.flags = 0,

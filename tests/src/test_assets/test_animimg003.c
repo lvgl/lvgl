@@ -185,11 +185,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_ANIMIMG
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t test_animimg003 = {
 #else
-const
+const lv_image_dsc_t test_animimg003 = {
 #endif
-lv_image_dsc_t test_animimg003 = {
     .header.w = 130,
     .header.h = 170,
     .header.stride = 520,

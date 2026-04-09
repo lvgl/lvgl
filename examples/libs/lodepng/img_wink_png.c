@@ -336,11 +336,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_PNG_DEC
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_wink_png = {
 #else
-const
+const lv_image_dsc_t img_wink_png = {
 #endif
-lv_image_dsc_t img_wink_png = {
     .header = {
         .cf = LV_COLOR_FORMAT_RAW_ALPHA,
         .w = 50,

@@ -193,11 +193,10 @@ test_img_lvgl_logo_jpg_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t test_img_lvgl_logo_jpg = {
 #else
-const
+const lv_image_dsc_t test_img_lvgl_logo_jpg = {
 #endif
-lv_image_dsc_t test_img_lvgl_logo_jpg = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_RAW,
   .header.flags = 0,

@@ -128,11 +128,10 @@ uint8_t img_benchmark_lvgl_logo_argb_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_benchmark_lvgl_logo_argb = {
 #else
-const
+const lv_image_dsc_t img_benchmark_lvgl_logo_argb = {
 #endif
-lv_image_dsc_t img_benchmark_lvgl_logo_argb = {
     .header.magic = LV_IMAGE_HEADER_MAGIC,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .header.flags = 0,

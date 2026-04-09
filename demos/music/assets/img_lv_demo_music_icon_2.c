@@ -34,11 +34,10 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_icon_2_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_icon_2 = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_icon_2 = {
 #endif
-lv_image_dsc_t img_lv_demo_music_icon_2 = {
     .header.w = 24,
     .header.h = 24,
     .header.stride = 96,

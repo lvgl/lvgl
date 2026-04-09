@@ -125,11 +125,10 @@ img_lv_demo_music_btn_next_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_btn_next = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_btn_next = {
 #endif
-lv_image_dsc_t img_lv_demo_music_btn_next = {
     .header.w = 110,
     .header.h = 110,
     .header.stride = 440,

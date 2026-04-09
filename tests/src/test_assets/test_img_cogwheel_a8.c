@@ -114,11 +114,10 @@ test_image_cogwheel_a8_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t test_image_cogwheel_a8 = {
 #else
-const
+const lv_image_dsc_t test_image_cogwheel_a8 = {
 #endif
-lv_image_dsc_t test_image_cogwheel_a8 = {
     .header.cf = LV_COLOR_FORMAT_A8,
     .header.w = 100,
     .header.h = 100,

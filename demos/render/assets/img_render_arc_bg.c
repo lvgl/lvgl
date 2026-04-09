@@ -113,11 +113,10 @@ img_render_arc_bg_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_render_arc_bg = {
 #else
-const
+const lv_image_dsc_t img_render_arc_bg = {
 #endif
-lv_image_dsc_t img_render_arc_bg = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .header.w = 100,
     .header.h = 100,

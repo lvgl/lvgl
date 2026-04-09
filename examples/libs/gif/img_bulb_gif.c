@@ -1118,11 +1118,10 @@ static const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_bulb_gif = {
 #else
-const
+const lv_image_dsc_t img_bulb_gif = {
 #endif
-lv_image_dsc_t img_bulb_gif = {
     .header = {
         .cf = LV_COLOR_FORMAT_RAW,
         .w = 0,

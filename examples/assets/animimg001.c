@@ -184,11 +184,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_ANIMIMG
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t animimg001 = {
 #else
-const
+const lv_image_dsc_t animimg001 = {
 #endif
-lv_image_dsc_t animimg001 = {
     .header = {
         .cf = LV_COLOR_FORMAT_ARGB8888,
         .w = 130,

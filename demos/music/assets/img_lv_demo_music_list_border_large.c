@@ -24,11 +24,10 @@ img_lv_demo_music_list_border_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_list_border = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_list_border = {
 #endif
-lv_image_dsc_t img_lv_demo_music_list_border = {
     .header.w = 479,
     .header.h = 7,
     .header.stride = 1916,

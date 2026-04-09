@@ -33,11 +33,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_DEMO_WIDGETS_NEEDLE uint8_t 
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_demo_widgets_needle = {
 #else
-const
+const lv_image_dsc_t img_demo_widgets_needle = {
 #endif
-lv_image_dsc_t img_demo_widgets_needle = {
     .header.w = 100,
     .header.h = 9,
     .header.stride = 400,

@@ -131,11 +131,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_INDEXED16 uint8_t i
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_cogwheel_indexed16 = {
 #else
-const
+const lv_image_dsc_t img_cogwheel_indexed16 = {
 #endif
-lv_image_dsc_t img_cogwheel_indexed16 = {
     .header = {
         .cf = LV_COLOR_FORMAT_I4,
         .w = 100,

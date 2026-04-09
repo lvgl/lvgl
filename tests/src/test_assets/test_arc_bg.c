@@ -321,11 +321,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_TEST_AR
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t test_arc_bg = {
 #else
-const
+const lv_image_dsc_t test_arc_bg = {
 #endif
-lv_image_dsc_t test_arc_bg = {
     .header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
     .header.w = 100,
     .header.h = 100,

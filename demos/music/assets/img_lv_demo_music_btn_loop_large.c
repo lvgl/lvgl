@@ -51,11 +51,10 @@ img_lv_demo_music_btn_loop_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_btn_loop = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_btn_loop = {
 #endif
-lv_image_dsc_t img_lv_demo_music_btn_loop = {
     .header.w = 37,
     .header.h = 36,
     .header.stride = 148,

@@ -63,11 +63,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMGBTN_
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t imagebutton_mid = {
 #else
-const
+const lv_image_dsc_t imagebutton_mid = {
 #endif
-lv_image_dsc_t imagebutton_mid = {
     .header.w = 5,
     .header.h = 49,
     .header.stride = 20,

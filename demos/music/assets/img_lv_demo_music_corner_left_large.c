@@ -49,11 +49,10 @@ img_lv_demo_music_corner_left_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_corner_left = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_corner_left = {
 #endif
-lv_image_dsc_t img_lv_demo_music_corner_left = {
     .header.w = 32,
     .header.h = 32,
     .header.stride = 128,

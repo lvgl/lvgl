@@ -86,11 +86,10 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t music_button_play_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t music_button_play = {
 #else
-const
+const lv_image_dsc_t music_button_play = {
 #endif
-lv_image_dsc_t music_button_play = {
     .header.w = 79,
     .header.h = 77,
     .header.stride = 316,

@@ -90,11 +90,10 @@ img_lv_demo_music_wave_bottom_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_wave_bottom = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_wave_bottom = {
 #endif
-lv_image_dsc_t img_lv_demo_music_wave_bottom = {
     .header.w = 479,
     .header.h = 74,
     .header.stride = 1916,

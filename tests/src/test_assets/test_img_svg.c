@@ -14,11 +14,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_TEST_IM
                              "<rect x=\"350\" y=\"100\" width=\"200\" height=\"200\" fill=\"red\" stroke=\"blue\" stroke-width=\"10\"/></svg>";
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t test_image_svg = {
 #else
-const
+const lv_image_dsc_t test_image_svg = {
 #endif
-lv_image_dsc_t test_image_svg = {
     .header.w = 250,
     .header.h = 250,
     .header.stride = 0,

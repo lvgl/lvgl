@@ -69,11 +69,10 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_btn_list_pause_map[] = {
 };
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_lv_demo_music_btn_list_pause = {
 #else
-const
+const lv_image_dsc_t img_lv_demo_music_btn_list_pause = {
 #endif
-lv_image_dsc_t img_lv_demo_music_btn_list_pause = {
     .header.w = 58,
     .header.h = 60,
     .header.stride = 232,
