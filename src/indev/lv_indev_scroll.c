@@ -317,11 +317,16 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
             lv_point_transform(&obj_scroll_sum, angle, scale_x, scale_y, &pivot, false);
         }
 
+        /*Determine scroll direction in current object's coordinate system.
+         *Reset both flags each iteration so that a child's transform rotation
+         *does not pollute the direction judgment of its ancestors.*/
         if(LV_ABS(obj_scroll_sum.x) > LV_ABS(obj_scroll_sum.y)) {
             hor_en = true;
+            ver_en = false;
         }
         else {
             ver_en = true;
+            hor_en = false;
         }
 
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
