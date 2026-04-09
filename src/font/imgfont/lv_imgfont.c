@@ -98,7 +98,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
 
     int32_t offset_y = 0;
 
-    LV_IMAGE_DSC_CONST void * img_src = dsc->path_cb(font, unicode, unicode_next, &offset_y, dsc->user_data);
+    const void * img_src = dsc->path_cb(font, unicode, unicode_next, &offset_y, dsc->user_data);
     if(img_src == NULL) return false;
 
     lv_image_header_t header;
@@ -113,7 +113,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
     dsc_out->ofs_x  = 0;
     dsc_out->ofs_y  = offset_y;
     dsc_out->format = LV_FONT_GLYPH_FORMAT_IMAGE;   /* is image identifier */
-    dsc_out->gid.src = img_src;
+    dsc_out->gid.src = (LV_IMAGE_DSC_CONST void *)img_src;
 
     return true;
 }

@@ -15,8 +15,8 @@ typedef struct {
 
 static lv_font_manager_t * g_font_manager = NULL;
 
-static LV_IMAGE_DSC_CONST void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, uint32_t unicode_next,
-                                                  int32_t * offset_y, void * user_data)
+static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, uint32_t unicode_next,
+                                     int32_t * offset_y, void * user_data)
 {
     LV_UNUSED(font);
     LV_UNUSED(unicode_next);

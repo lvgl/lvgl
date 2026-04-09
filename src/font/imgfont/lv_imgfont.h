@@ -27,9 +27,9 @@ extern "C" {
  **********************/
 
 /* gets the image path name of this character */
-typedef LV_IMAGE_DSC_CONST void * (*lv_imgfont_get_path_cb_t)(const lv_font_t * font,
-                                                              uint32_t unicode, uint32_t unicode_next,
-                                                              int32_t * offset_y, void * user_data);
+typedef const void * (*lv_imgfont_get_path_cb_t)(const lv_font_t * font,
+                                                 uint32_t unicode, uint32_t unicode_next,
+                                                 int32_t * offset_y, void * user_data);
 
 /**********************
  * GLOBAL PROTOTYPES
