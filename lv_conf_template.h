@@ -1006,6 +1006,14 @@
 #if LV_USE_GIF
     /** GIF decoder accelerate */
     #define LV_GIF_CACHE_DECODE_DATA 0
+    /** Maximum GIF canvas width in pixels.
+     *  GIFs wider than this value will be rejected with GIF_TOO_LARGE.
+     *  Decrease this value to save RAM. */
+    #define LV_GIF_MAX_WIDTH 32768
+    /** Maximum GIF canvas height in pixels.
+     *  GIFs taller than this value will be rejected with GIF_TOO_LARGE.
+     *  Decrease this value to save RAM. */
+    #define LV_GIF_MAX_HEIGHT 32768
 #endif
 
 /** GStreamer library */

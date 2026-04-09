@@ -1527,6 +1527,16 @@ menu "LVGL configuration"
 			bool "Use extra 16KB RAM to cache decoded data to accelerate"
 			depends on LV_USE_GIF
 
+		config LV_GIF_MAX_WIDTH
+			int "Maximum GIF canvas width in pixels (GIFs wider than this are rejected)"
+			depends on LV_USE_GIF
+			default 32768
+
+		config LV_GIF_MAX_HEIGHT
+			int "Maximum GIF canvas height in pixels (GIFs taller than this are rejected)"
+			depends on LV_USE_GIF
+			default 32768
+
 		config LV_BIN_DECODER_RAM_LOAD
 			bool "Decode whole image to RAM for bin decoder"
 			default n
