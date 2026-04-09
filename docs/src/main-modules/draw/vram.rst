@@ -1,8 +1,8 @@
 .. _vram:
 
-=======================
+========================
 VRAM Resource Management
-=======================
+========================
 
 Overview
 ********
@@ -238,33 +238,33 @@ registered as function pointers on the :cpp:type:`lv_draw_unit_t` struct.
 
 .. container:: tighter-table-3
 
-    +---------------------+----------+------------------------------------------------------+
-    | Callback            | Required | Description                                          |
-    +=====================+==========+======================================================+
-    | ``vram_alloc_cb``   | Yes      | Allocate VRAM backing for a draw buffer.             |
-    |                     |          | Set ``buf->vram_res``.  Return ``true`` on success.  |
-    +---------------------+----------+------------------------------------------------------+
-    | ``vram_free_cb``    | Yes      | Free VRAM backing and NULL ``buf->vram_res``.        |
-    +---------------------+----------+------------------------------------------------------+
-    | ``vram_upload_cb``  | Yes      | Upload CPU pixel data to VRAM.  Allocate VRAM,       |
-    |                     |          | copy/convert data from ``buf->data``, and set        |
-    |                     |          | ``buf->vram_res``.  Return ``true`` on success.      |
-    +---------------------+----------+------------------------------------------------------+
-    | ``vram_download_cb``| Yes      | Download VRAM data to ``buf->data`` in CPU memory.   |
-    |                     |          | Return ``true`` on success.                          |
-    +---------------------+----------+------------------------------------------------------+
-    | ``vram_check_cb``   | Yes      | Check if a VRAM allocation is still valid.           |
-    |                     |          | Return ``false`` if VRAM was reclaimed or lost.      |
-    +---------------------+----------+------------------------------------------------------+
-    | ``vram_font_free_cb``| No      | Free font VRAM residency.  Called when a different   |
-    |                     |          | draw unit encounters a font owned by this unit.      |
-    +---------------------+----------+------------------------------------------------------+
-    | ``vram_dup_cb``     | No       | Duplicate a buffer entirely within VRAM.             |
-    |                     |          | Falls back to CPU-side copy if NULL or fails.        |
-    +---------------------+----------+------------------------------------------------------+
-    | ``vram_copy_cb``    | No       | Copy a region between buffers within VRAM.           |
-    |                     |          | Falls back to CPU-side copy if NULL or fails.        |
-    +---------------------+----------+------------------------------------------------------+
+    +------------------------+----------+-----------------------------------------------------+
+    | Callback               | Required | Description                                         |
+    +========================+==========+=====================================================+
+    | ``vram_alloc_cb``      | Yes      | Allocate VRAM backing for a draw buffer.            |
+    |                        |          | Set ``buf->vram_res``. Return ``true`` on success.  |
+    +------------------------+----------+-----------------------------------------------------+
+    | ``vram_free_cb``       | Yes      | Free VRAM backing and NULL ``buf->vram_res``.       |
+    +------------------------+----------+-----------------------------------------------------+
+    | ``vram_upload_cb``     | Yes      | Upload CPU pixel data to VRAM. Allocate VRAM,       |
+    |                        |          | copy/convert from ``buf->data``, set                |
+    |                        |          | ``buf->vram_res``. Return ``true`` on success.      |
+    +------------------------+----------+-----------------------------------------------------+
+    | ``vram_download_cb``   | Yes      | Download VRAM data to ``buf->data`` in CPU memory.  |
+    |                        |          | Return ``true`` on success.                         |
+    +------------------------+----------+-----------------------------------------------------+
+    | ``vram_check_cb``      | Yes      | Check if a VRAM allocation is still valid.          |
+    |                        |          | Return ``false`` if VRAM was reclaimed or lost.     |
+    +------------------------+----------+-----------------------------------------------------+
+    | ``vram_font_free_cb``  | No       | Free font VRAM residency. Called when a different   |
+    |                        |          | draw unit encounters a font owned by this unit.     |
+    +------------------------+----------+-----------------------------------------------------+
+    | ``vram_dup_cb``        | No       | Duplicate a buffer entirely within VRAM.            |
+    |                        |          | Falls back to CPU-side copy if NULL or fails.       |
+    +------------------------+----------+-----------------------------------------------------+
+    | ``vram_copy_cb``       | No       | Copy a region between buffers within VRAM.          |
+    |                        |          | Falls back to CPU-side copy if NULL or fails.       |
+    +------------------------+----------+-----------------------------------------------------+
 
 
 
