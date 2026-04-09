@@ -109,8 +109,8 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
     lv_obj_mark_layout_as_dirty(obj);
     lv_obj_enable_style_refresh(false);
 
-    lv_theme_apply(obj);
     lv_obj_construct(obj->class_p, obj);
+    lv_theme_apply(obj);
 
     lv_obj_enable_style_refresh(true);
     lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
