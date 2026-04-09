@@ -101,7 +101,8 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
      * which may reject or dereference the NULL data pointer. */
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
-        if(img_dsc->data == NULL && img_dsc->header.magic == LV_IMAGE_HEADER_MAGIC) {
+        if(img_dsc->data == NULL && img_dsc->header.magic == LV_IMAGE_HEADER_MAGIC
+           && (img_dsc->header.flags & LV_IMAGE_FLAGS_ALLOCATED)) {
             *header = img_dsc->header;
             LV_PROFILER_DECODER_END;
             return LV_RESULT_OK;
