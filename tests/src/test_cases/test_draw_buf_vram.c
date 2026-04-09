@@ -10,9 +10,10 @@
  */
 
 #if LV_BUILD_TEST
-#if LV_USE_DRAW_VRAM
 
 #include "../lvgl.h"
+
+#if LV_USE_DRAW_VRAM
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
@@ -718,9 +719,8 @@ void test_vram_canvas_get_px_pulls_to_cpu(void)
     lv_draw_buf_ensure_resident(buf, &s_fake_unit_a);
     lv_canvas_set_draw_buf(canvas_obj, buf);
 
-    lv_color_t color;
-    lv_opa_t opa;
-    lv_canvas_get_px(canvas_obj, 0, 0, &color, &opa);
+    lv_color32_t color32 = lv_canvas_get_px(canvas_obj, 0, 0);
+    LV_UNUSED(color32);
 
     TEST_ASSERT_NOT_NULL(buf->data);
     TEST_ASSERT_NULL(buf->vram_res);
@@ -1109,4 +1109,7 @@ void test_vram_alpha_format_lazy_zeroed(void)
 }
 
 #endif /* LV_USE_DRAW_VRAM */
+
+typedef int _keep_pedantic_happy; /* avoid empty translation unit when VRAM is disabled */
+
 #endif /* LV_BUILD_TEST */
