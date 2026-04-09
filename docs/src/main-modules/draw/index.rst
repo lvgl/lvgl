@@ -12,3 +12,4 @@ Drawing
     draw_layers
     draw_descriptors
     snapshot
+    vram
