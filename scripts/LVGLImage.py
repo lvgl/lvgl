@@ -384,11 +384,10 @@ uint8_t {varname}_map[] = {{
 }};
 
 #ifdef LV_IMAGE_DSC_CONST
-LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t {varname} = {{
 #else
-const
+const lv_image_dsc_t {varname} = {{
 #endif
-lv_image_dsc_t {varname} = {{
   .header = {{
     .magic = LV_IMAGE_HEADER_MAGIC,
     .cf = LV_COLOR_FORMAT_{cf.name},
