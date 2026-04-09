@@ -1519,7 +1519,10 @@ void test_vram_alpha_format_lazy_zeroed(void)
     uint32_t total = buf->header.stride * buf->header.h;
     bool all_zero = true;
     for(uint32_t i = 0; i < total; i++) {
-        if(p[i] != 0) { all_zero = false; break; }
+        if(p[i] != 0) {
+            all_zero = false;
+            break;
+        }
     }
     TEST_ASSERT_TRUE(all_zero);
 

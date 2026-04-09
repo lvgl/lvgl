@@ -187,7 +187,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, LV_IMAGE_DSC_CON
             /* Lazy-allocated buffers (created by lv_draw_buf_create_ex) have the ALLOCATED flag,
              * handlers set, and data_size > 0, but no backing data yet */
             has_data = has_data || (dsc->decoded->data_size > 0 && dsc->decoded->handlers != NULL
-                                   && (dsc->decoded->header.flags & LV_IMAGE_FLAGS_ALLOCATED));
+                                    && (dsc->decoded->header.flags & LV_IMAGE_FLAGS_ALLOCATED));
 #endif
             LV_ASSERT_MSG(has_data && dsc->decoded->handlers, "Invalid draw buffer");
         }
