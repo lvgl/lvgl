@@ -619,7 +619,6 @@ static void draw_buf_validate_vram(lv_draw_buf_t * buf)
 
 bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
 {
-    LV_ASSERT_NULL(buf);
     if(buf == NULL) return false;
 
     /* Drop stale VRAM residency before checking */
