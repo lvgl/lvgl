@@ -379,19 +379,11 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
 
     uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
 
-#if LV_USE_DRAW_VRAM
-    /* Buffers without CPU pixel data (lazy-allocated or VRAM-only after upload)
-     * can be reshaped freely — ensure_resident handles allocation later. */
-    if(draw_buf->data == NULL) {
-        /* OK — just update header below */
+    if(size > draw_buf->data_size) {
+        LV_LOG_TRACE("Draw buf too small for new shape");
+        LV_PROFILER_DRAW_END;
+        return NULL;
     }
-    else
-#endif
-        if(size > draw_buf->data_size) {
-            LV_LOG_TRACE("Draw buf too small for new shape");
-            LV_PROFILER_DRAW_END;
-            return NULL;
-        }
 
     draw_buf->header.cf = cf;
     draw_buf->header.w = w;
@@ -438,6 +430,16 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     LV_ASSERT_NULL(dest->handlers);
     LV_ASSERT_NULL(dest->handlers->buf_copy_cb);
     LV_ASSERT_NULL(src);
+
+#if LV_USE_DRAW_VRAM
+    /*Ensure both buffers have CPU-resident data before copying*/
+    if(dest->data == NULL) {
+        if(!lv_draw_buf_ensure_resident(dest, NULL)) return;
+    }
+    if(src->data == NULL) {
+        if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)src, NULL)) return;
+    }
+#endif
 
     dest->handlers->buf_copy_cb(dest, dest_area, src, src_area);
 }
