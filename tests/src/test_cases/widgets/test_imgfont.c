@@ -16,8 +16,8 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
-static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, uint32_t unicode_next,
-                                     int32_t * offset_y, void * user_data)
+static LV_IMAGE_DSC_CONST void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, uint32_t unicode_next,
+                                                   int32_t * offset_y, void * user_data)
 {
     LV_UNUSED(font);
     LV_UNUSED(unicode_next);
@@ -30,7 +30,7 @@ static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, u
         return &emoji_F617;
     }
     else if(unicode == 0xF600) {
-        return "A:src/test_assets/test_img_emoji_F600.png";
+        return (LV_IMAGE_DSC_CONST void *)"A:src/test_assets/test_img_emoji_F600.png";
     }
 
     return NULL;

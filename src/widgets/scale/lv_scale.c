@@ -1606,7 +1606,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
             arc_dsc->img_src = (LV_IMAGE_DSC_CONST void *)value.ptr;
         }
         else {
-            arc_dsc->img_src = (LV_IMAGE_DSC_CONST void *)lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
+            arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
         }
     }
     else {
@@ -1614,7 +1614,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
         arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
         arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
-        arc_dsc->img_src = (LV_IMAGE_DSC_CONST void *)lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
+        arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
     }
 }
 

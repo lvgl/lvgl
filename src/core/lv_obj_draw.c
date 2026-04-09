@@ -116,7 +116,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
     }
 
     if(draw_dsc->bg_image_opa != LV_OPA_TRANSP) {
-        draw_dsc->bg_image_src = (LV_IMAGE_DSC_CONST void *)lv_obj_get_style_bg_image_src(obj, part);
+        draw_dsc->bg_image_src = lv_obj_get_style_bg_image_src(obj, part);
         if(draw_dsc->bg_image_src) {
             draw_dsc->bg_image_opa = lv_obj_get_style_bg_image_opa(obj, part);
             if(draw_dsc->bg_image_opa > LV_OPA_MIN) {
@@ -323,7 +323,7 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
 
     lv_color_t arc_color = lv_obj_get_style_arc_color_filtered(obj, part);
     draw_dsc->color = normal_apply_layer_recolor(obj, part, &draw_dsc->base, arc_color);
-    draw_dsc->img_src = (LV_IMAGE_DSC_CONST void *)lv_obj_get_style_arc_image_src(obj, part);
+    draw_dsc->img_src = lv_obj_get_style_arc_image_src(obj, part);
 
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
 
