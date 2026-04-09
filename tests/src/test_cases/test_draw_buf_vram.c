@@ -40,11 +40,13 @@ typedef struct {
     int download_count;
     int check_count;
     int dup_count;
+    int copy_count;
     int font_free_count;
     bool fail_alloc;               /**< If true, vram_alloc_cb returns false */
     bool fail_upload;
     bool fail_download;
     bool fail_dup;
+    bool fail_copy;
 } fake_vram_stats_t;
 
 static lv_draw_unit_t s_fake_unit_a;
@@ -190,6 +192,49 @@ static bool fake_vram_dup_cb(lv_draw_unit_t * unit, lv_draw_buf_t * dest, const 
     return true;
 }
 
+static bool fake_vram_copy_cb(lv_draw_unit_t * unit, lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                              const lv_draw_buf_t * src, const lv_area_t * src_area)
+{
+    fake_vram_stats_t * stats = get_stats(unit);
+    stats->copy_count++;
+    if(stats->fail_copy) return false;
+
+    if(dest->vram_res == NULL || src->vram_res == NULL) return false;
+    fake_vram_res_t * dest_vr = (fake_vram_res_t *)dest->vram_res;
+    fake_vram_res_t * src_vr = (fake_vram_res_t *)src->vram_res;
+    if(dest_vr->fake_vram == NULL || src_vr->fake_vram == NULL) return false;
+
+    if(dest_area == NULL && src_area == NULL) {
+        /* Full buffer copy */
+        uint32_t copy_size = LV_MIN(src_vr->alloc_size, dest_vr->alloc_size);
+        lv_memcpy(dest_vr->fake_vram, src_vr->fake_vram, copy_size);
+    }
+    else {
+        /* Region copy: simplified row-by-row for the fake unit.
+         * Real GPU units would use hardware blit here. */
+        uint32_t src_stride = src->header.stride;
+        uint32_t dest_stride = dest->header.stride;
+        uint32_t bpp = lv_color_format_get_size(src->header.cf);
+
+        lv_area_t sa = src_area ? *src_area : (lv_area_t) {
+            0, 0, (int32_t)src->header.w - 1, (int32_t)src->header.h - 1
+        };
+        lv_area_t da = dest_area ? *dest_area : (lv_area_t) {
+            0, 0, (int32_t)dest->header.w - 1, (int32_t)dest->header.h - 1
+        };
+
+        int32_t copy_w = LV_MIN(lv_area_get_width(&sa), lv_area_get_width(&da));
+        int32_t copy_h = LV_MIN(lv_area_get_height(&sa), lv_area_get_height(&da));
+
+        for(int32_t y = 0; y < copy_h; y++) {
+            uint8_t * dst_row = (uint8_t *)dest_vr->fake_vram + (da.y1 + y) * dest_stride + da.x1 * bpp;
+            const uint8_t * src_row = (const uint8_t *)src_vr->fake_vram + (sa.y1 + y) * src_stride + sa.x1 * bpp;
+            lv_memcpy(dst_row, src_row, copy_w * bpp);
+        }
+    }
+    return true;
+}
+
 static void init_fake_unit(lv_draw_unit_t * unit, fake_vram_stats_t * stats)
 {
     lv_memzero(unit, sizeof(lv_draw_unit_t));
@@ -200,6 +245,7 @@ static void init_fake_unit(lv_draw_unit_t * unit, fake_vram_stats_t * stats)
     unit->vram_download_cb = fake_vram_download_cb;
     unit->vram_check_cb = fake_vram_check_cb;
     unit->vram_dup_cb = fake_vram_dup_cb;
+    unit->vram_copy_cb = fake_vram_copy_cb;
     unit->vram_font_free_cb = fake_vram_font_free_cb;
 }
 
@@ -1289,6 +1335,174 @@ void test_vram_dup_no_callback_falls_back(void)
 
     lv_draw_buf_destroy(dup);
     lv_draw_buf_destroy(buf);
+}
+
+/*----------------------------------------------------------------------
+ * 16. VRAM buffer copy (vram_copy_cb)
+ *----------------------------------------------------------------------*/
+
+/** Full buffer copy between two VRAM-resident buffers on the same unit */
+void test_vram_copy_full_same_unit(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(src);
+    TEST_ASSERT_NOT_NULL(dest);
+
+    /* Write pattern to src via CPU, then upload to VRAM */
+    lv_draw_buf_ensure_resident(src, NULL);
+    fill_pattern(src, 0xAA);
+    lv_draw_buf_ensure_resident(src, &s_fake_unit_a);
+    TEST_ASSERT_NOT_NULL(src->vram_res);
+
+    /* Allocate dest in same unit's VRAM */
+    lv_draw_buf_ensure_resident(dest, &s_fake_unit_a);
+    TEST_ASSERT_NOT_NULL(dest->vram_res);
+
+    /* Full copy: should use vram_copy_cb, no CPU involved */
+    lv_draw_buf_copy(dest, NULL, src, NULL);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.copy_count);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.download_count);
+
+    /* Verify content by downloading dest to CPU */
+    lv_draw_buf_ensure_resident(dest, NULL);
+    TEST_ASSERT_NOT_NULL(dest->data);
+    uint8_t * p = dest->data;
+    uint32_t total = dest->header.stride * dest->header.h;
+    for(uint32_t i = 0; i < total; i++) {
+        if(p[i] != 0xAA) {
+            TEST_FAIL_MESSAGE("VRAM copy content mismatch");
+            break;
+        }
+    }
+
+    lv_draw_buf_destroy(dest);
+    lv_draw_buf_destroy(src);
+}
+
+/** Copy between buffers on different units falls back to CPU */
+void test_vram_copy_cross_unit_falls_back(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(src);
+    TEST_ASSERT_NOT_NULL(dest);
+
+    lv_draw_buf_ensure_resident(src, NULL);
+    fill_pattern(src, 0xBB);
+    lv_draw_buf_ensure_resident(src, &s_fake_unit_a);
+
+    lv_draw_buf_ensure_resident(dest, &s_fake_unit_b);
+
+    /* Different units — vram_copy_cb should NOT be called */
+    lv_draw_buf_copy(dest, NULL, src, NULL);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.copy_count);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_b.copy_count);
+
+    /* Both should have been downloaded to CPU for the copy */
+    TEST_ASSERT_NOT_NULL(dest->data);
+    TEST_ASSERT_NOT_NULL(src->data);
+
+    lv_draw_buf_destroy(dest);
+    lv_draw_buf_destroy(src);
+}
+
+/** vram_copy_cb failure falls back to CPU copy */
+void test_vram_copy_fallback_on_failure(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(src);
+    TEST_ASSERT_NOT_NULL(dest);
+
+    lv_draw_buf_ensure_resident(src, NULL);
+    fill_pattern(src, 0xCC);
+    lv_draw_buf_ensure_resident(src, &s_fake_unit_a);
+    lv_draw_buf_ensure_resident(dest, &s_fake_unit_a);
+
+    s_stats_a.fail_copy = true;
+
+    lv_draw_buf_copy(dest, NULL, src, NULL);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.copy_count);  /* Attempted */
+
+    /* Should have fallen back to CPU */
+    TEST_ASSERT_NOT_NULL(dest->data);
+    TEST_ASSERT_NOT_NULL(src->data);
+
+    /* Source should have the original pattern after download */
+    TEST_ASSERT_EQUAL_UINT8(0xCC, src->data[0]);
+
+    /* Check dest has the copied data (only pixel area, not stride padding) */
+    TEST_ASSERT_EQUAL_UINT8(0xCC, dest->data[0]);
+
+    uint32_t bpp = lv_color_format_get_size(LV_COLOR_FORMAT_ARGB8888);
+    uint32_t dest_stride = dest->header.stride;
+    uint8_t * p = dest->data;
+    for(uint32_t y = 0; y < dest->header.h; y++) {
+        for(uint32_t x = 0; x < dest->header.w * bpp; x++) {
+            if(p[y * dest_stride + x] != 0xCC) {
+                TEST_FAIL_MESSAGE("Copy content mismatch after vram_copy_cb fallback");
+                break;
+            }
+        }
+    }
+
+    lv_draw_buf_destroy(dest);
+    lv_draw_buf_destroy(src);
+}
+
+/** Copy without vram_copy_cb falls back to CPU */
+void test_vram_copy_no_callback_falls_back(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(src);
+    TEST_ASSERT_NOT_NULL(dest);
+
+    lv_draw_buf_ensure_resident(src, NULL);
+    fill_pattern(src, 0xDD);
+    lv_draw_buf_ensure_resident(src, &s_fake_unit_a);
+    lv_draw_buf_ensure_resident(dest, &s_fake_unit_a);
+
+    s_fake_unit_a.vram_copy_cb = NULL;
+
+    lv_draw_buf_copy(dest, NULL, src, NULL);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.copy_count);
+
+    /* Should have used CPU fallback */
+    TEST_ASSERT_NOT_NULL(dest->data);
+
+    /* Restore for teardown */
+    s_fake_unit_a.vram_copy_cb = fake_vram_copy_cb;
+
+    lv_draw_buf_destroy(dest);
+    lv_draw_buf_destroy(src);
+}
+
+/** Region copy within VRAM uses vram_copy_cb */
+void test_vram_copy_region_same_unit(void)
+{
+    lv_draw_buf_t * src = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    lv_draw_buf_t * dest = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_ARGB8888, 0);
+    TEST_ASSERT_NOT_NULL(src);
+    TEST_ASSERT_NOT_NULL(dest);
+
+    /* Fill src with a pattern via CPU, then upload */
+    lv_draw_buf_ensure_resident(src, NULL);
+    fill_pattern(src, 0xEE);
+    lv_draw_buf_ensure_resident(src, &s_fake_unit_a);
+
+    /* Alloc and zero dest in VRAM */
+    lv_draw_buf_ensure_resident(dest, &s_fake_unit_a);
+
+    /* Copy a sub-region */
+    lv_area_t region = {2, 2, 5, 5};
+    lv_draw_buf_copy(dest, &region, src, &region);
+    TEST_ASSERT_EQUAL_INT(1, s_stats_a.copy_count);
+    TEST_ASSERT_EQUAL_INT(0, s_stats_a.download_count);
+
+    lv_draw_buf_destroy(dest);
+    lv_draw_buf_destroy(src);
 }
 
 /** Alpha format lazy alloc to CPU is zero-filled */

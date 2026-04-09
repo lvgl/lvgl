@@ -432,6 +432,17 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     LV_ASSERT_NULL(src);
 
 #if LV_USE_DRAW_VRAM
+    /*If both buffers are VRAM-resident on the same unit, try a VRAM-side copy*/
+    if(dest->vram_res != NULL && src->vram_res != NULL) {
+        lv_draw_unit_t * unit = dest->vram_res->unit;
+        if(unit == src->vram_res->unit && unit->vram_copy_cb != NULL) {
+            if(unit->vram_copy_cb(unit, dest, dest_area, src, src_area)) {
+                return;
+            }
+            /*vram_copy_cb failed — fall through to CPU copy*/
+        }
+    }
+
     /*Ensure both buffers have CPU-resident data before copying*/
     if(dest->data == NULL) {
         if(!lv_draw_buf_ensure_resident(dest, NULL)) return;

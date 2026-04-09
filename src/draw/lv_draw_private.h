@@ -226,6 +226,20 @@ struct _lv_draw_unit_t {
     bool (*vram_dup_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * dest, const lv_draw_buf_t * src);
 
     /**
+     * Copy a region from one VRAM buffer to another entirely within VRAM.
+     * Both buffers must be resident on this unit. The draw unit copies the
+     * pixel data from the src region to the dest region in VRAM.
+     * @param dest       destination buffer (must have vram_res on this unit)
+     * @param dest_area  destination region (NULL = full buffer)
+     * @param src        source buffer (must have vram_res on this unit)
+     * @param src_area   source region (NULL = full buffer)
+     * @return true on success. If NULL or returns false, the caller
+     *         falls back to CPU-side copy.
+     */
+    bool (*vram_copy_cb)(lv_draw_unit_t * draw_unit, lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                         const lv_draw_buf_t * src, const lv_area_t * src_area);
+
+    /**
      * Free font VRAM residency. Called when a different draw unit encounters
      * a font with vram_res owned by this unit. The callback must free GPU
      * resources, unlink from internal tracking, free the vram_res struct,
