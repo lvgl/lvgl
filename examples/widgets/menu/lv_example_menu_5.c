@@ -155,7 +155,7 @@ static lv_obj_t * create_text(lv_obj_t * parent, const char * icon, const char *
 
     if(icon) {
         img = lv_image_create(obj);
-        lv_image_set_src(img, icon);
+        lv_image_set_src(img, (LV_IMAGE_DSC_CONST void *)icon);
     }
 
     if(txt) {
