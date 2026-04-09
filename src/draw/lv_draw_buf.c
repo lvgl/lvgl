@@ -833,9 +833,10 @@ bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
         buf->header.stride = stride;
         buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
 
-        /* CLEARZERO or alpha-format: clear the freshly allocated buffer */
+        /* CLEARZERO or alpha-format: clear the freshly allocated buffer.
+         * Use data_size (not stride*h) so indexed-format palette bytes are included. */
         if(clearzero || lv_color_format_has_alpha(cf)) {
-            lv_memzero(buf->data, stride * h);
+            lv_memzero(buf->data, size);
             buf->header.flags &= ~LV_IMAGE_FLAGS_CLEARZERO;
         }
     }
