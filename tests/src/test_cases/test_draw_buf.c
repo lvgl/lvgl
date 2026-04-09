@@ -136,6 +136,7 @@ void test_draw_buf_premultiply(void)
     /* Test ARGB8888 format */
     {
         draw_buf = lv_draw_buf_create(2, 2, LV_COLOR_FORMAT_ARGB8888, 2 * 4);
+        lv_draw_buf_ensure_resident(draw_buf, NULL);
 
         /* Fill with test data: white with 50% alpha */
         lv_color32_t * pixel = (lv_color32_t *)draw_buf->data;
@@ -163,6 +164,7 @@ void test_draw_buf_premultiply(void)
     /* Test XRGB8888 format */
     {
         draw_buf = lv_draw_buf_create(2, 2, LV_COLOR_FORMAT_XRGB8888, 2 * 4);
+        lv_draw_buf_ensure_resident(draw_buf, NULL);
 
         /* Fill with test data: white with 50% alpha */
         lv_color32_t * pixel = (lv_color32_t *)draw_buf->data;
@@ -181,6 +183,7 @@ void test_draw_buf_premultiply(void)
     /* Test RGB565A8 format */
     {
         draw_buf = lv_draw_buf_create(2, 2, LV_COLOR_FORMAT_RGB565A8, 2 * 2);
+        lv_draw_buf_ensure_resident(draw_buf, NULL);
 
         /* Fill with test data */
         uint16_t * pixel = (uint16_t *)draw_buf->data;
@@ -206,6 +209,7 @@ void test_draw_buf_premultiply(void)
     /* Test ARGB8565 format */
     {
         draw_buf = lv_draw_buf_create(2, 2, LV_COLOR_FORMAT_ARGB8565, 2 * 3);
+        lv_draw_buf_ensure_resident(draw_buf, NULL);
 
         /* Fill with test data */
         uint8_t * pixel = draw_buf->data;
@@ -244,6 +248,7 @@ void test_draw_buf_premultiply(void)
 
     for(unsigned int fmt_i = 0; fmt_i < sizeof(color_formats) / sizeof(color_formats[0]); fmt_i++) {
         draw_buf = lv_draw_buf_create(2, 2, color_formats[fmt_i], 0);
+        lv_draw_buf_ensure_resident(draw_buf, NULL);
 
         /* Fill palette with test data */
         lv_color32_t * palette = (lv_color32_t *)draw_buf->data;

@@ -60,9 +60,11 @@ void * lv_utils_bsearch(const void * key, const void * base, size_t n, size_t si
 
 lv_result_t lv_draw_buf_save_to_file(const lv_draw_buf_t * draw_buf, const char * path)
 {
-    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)draw_buf, NULL)) {
-        LV_LOG_ERROR("ensure_resident failed for save_to_file");
-        return LV_RESULT_INVALID;
+    if(draw_buf->data == NULL && draw_buf->data_size > 0) {
+        if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)draw_buf, NULL)) {
+            LV_LOG_ERROR("ensure_resident failed for save_to_file");
+            return LV_RESULT_INVALID;
+        }
     }
 
     lv_fs_file_t file;

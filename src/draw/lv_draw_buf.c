@@ -455,6 +455,12 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
         return NULL;
     }
 
+#if LV_USE_DRAW_VRAM
+    if(buf->data == NULL) {
+        if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)buf, NULL)) return NULL;
+    }
+#endif
+
     uint8_t * data = buf->data;
 
     /*Skip palette*/
