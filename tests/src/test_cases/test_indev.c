@@ -200,4 +200,20 @@ void test_indev_scroll_between_two_buttons_with_and_without_press_lock(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("scroll_initial.png");
 }
 
+void test_indev_ccw_pointer(void)
+{
+    lv_indev_t * indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+
+    TEST_ASSERT_FALSE(lv_indev_get_ccw_pointer(indev));
+
+    lv_indev_set_ccw_pointer(indev);
+
+    TEST_ASSERT_TRUE(lv_indev_get_ccw_pointer(indev));
+
+    lv_indev_clear_ccw_pointer(indev);
+
+    TEST_ASSERT_FALSE(lv_indev_get_ccw_pointer(indev));
+}
+
 #endif

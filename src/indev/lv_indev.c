@@ -734,14 +734,14 @@ void lv_indev_clear_ccw_pointer(lv_indev_t * indev)
 }
 
 
-uint8_t lv_indev_get_ccw_pointer(lv_indev_t * indev)
+bool lv_indev_get_ccw_pointer(const lv_indev_t * indev)
 {
     if(!indev) {
         LV_LOG_WARN("Can't get CCW rotation setting for a NULL indev");
-        return 0;
+        return false;
     }
 
-    return indev->pointer.ccw_rotation;
+    return (indev->pointer.ccw_rotation != 0);
 }
 
 #if LV_USE_EXT_DATA
@@ -772,7 +772,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    if(i->pointer.ccw_rotation) {
+    if(lv_indev_get_ccw_pointer(i)) {
         lv_display_rotate_point_ccw(i->disp, &data->point);
     }
     else {

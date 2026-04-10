@@ -488,8 +488,10 @@ void lv_indev_clear_ccw_pointer(lv_indev_t * indev);
 /**
  * Get Counter-Clock-Wise (CCW) rotation processing for an indev pointer
  * @param indev         pointer to an indev
+ * @return              True if CCW processing is set for an indev pointer, 
+ *                      false if indev pointer is NULL or CCW processing is not set.
  */
-uint8_t lv_indev_get_ccw_pointer(lv_indev_t * indev);
+bool lv_indev_get_ccw_pointer(const lv_indev_t * indev);
 
 #if LV_USE_EXT_DATA
 /**
