@@ -164,16 +164,36 @@ static void * create_window_cb(void * driver_data, const lv_egl_native_window_pr
     SDL_GetWindowWMInfo(lv_sdl_window_get_window(display), &wmInfo);
 
     EGLNativeWindowType native_window;
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
-    native_window = wmInfo.info.win.window;
-#elif defined(SDL_VIDEO_DRIVER_X11)
-    native_window = wmInfo.info.x11.window;
-#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
-    native_window = wmInfo.info.wl.surface;
+    const char * driver = SDL_GetCurrentVideoDriver();
+
+    if(driver && strcmp(driver, "wayland") == 0) {
+#if defined(SDL_VIDEO_DRIVER_WAYLAND)
+        native_window = (EGLNativeWindowType)wmInfo.info.wl.egl_window;
 #else
-    LV_LOG_ERROR("Unsupported platform for EGL");
-    return NULL;
+        LV_LOG_ERROR("SDL built without Wayland support");
+        return NULL;
 #endif
+    }
+    else if(driver && strcmp(driver, "x11") == 0) {
+#if defined(SDL_VIDEO_DRIVER_X11)
+        native_window = (EGLNativeWindowType)wmInfo.info.x11.window;
+#else
+        LV_LOG_ERROR("SDL built without X11 support");
+        return NULL;
+#endif
+    }
+    else if(driver && strcmp(driver, "windows") == 0) {
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+        native_window = (EGLNativeWindowType)wmInfo.info.win.window;
+#else
+        LV_LOG_ERROR("SDL built without Windows support");
+        return NULL;
+#endif
+    }
+    else {
+        LV_LOG_ERROR("Unsupported SDL video driver: (%s)", driver);
+        return NULL;
+    }
     return (void *)native_window;
 }
 
