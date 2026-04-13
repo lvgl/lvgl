@@ -17,6 +17,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include "../../core/lv_obj_pos.h"
+#include "../../core/lv_refr.h"
 
 /*********************
  *      DEFINES
@@ -103,6 +104,14 @@ static inline lv_color32_t get_px(color_t p)
 #error ("Unsupported LV_COLOR_DEPTH")
 #endif
 
+static void x11_reset_flush_area(x11_disp_data_t * xd)
+{
+    xd->flush_area.x1 = 0xFFFF;
+    xd->flush_area.x2 = 0;
+    xd->flush_area.y1 = 0xFFFF;
+    xd->flush_area.y2 = 0;
+}
+
 /**
  * Flush the content of the internal buffer the specific area on the display.
  * @param[in] disp    the created X11 display object from @lv_x11_window_create
@@ -114,12 +123,6 @@ static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
 {
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
     LV_ASSERT_NULL(xd);
-
-    static const lv_area_t inv_area = { .x1 = 0xFFFF,
-                                        .x2 = 0,
-                                        .y1 = 0xFFFF,
-                                        .y2 = 0
-                                      };
 
     /* build display update area until lv_display_flush_is_last */
     xd->flush_area.x1 = MIN(xd->flush_area.x1, area->x1);
@@ -153,7 +156,7 @@ static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
                   xd->flush_area.y1, upd_w, upd_h);
 
         /* invalidate collected area */
-        xd->flush_area = inv_area;
+        x11_reset_flush_area(xd);
     }
     /* Inform the graphics library that you are ready with the flushing */
     lv_display_flush_ready(disp);
@@ -183,9 +186,10 @@ static void x11_resolution_evt_cb(lv_event_t * e)
     /* re-create cache image with new size */
     XDestroyImage(xd->ximage);
     size_t sz_buffers = hor_res * ver_res * sizeof(lv_color32_t);
-    xd->xdata = malloc(sz_buffers); /* use clib method here, x11 memory not part of device footprint */
+    xd->xdata = calloc(1, sz_buffers); /* use clib method here, x11 memory not part of device footprint */
     xd->ximage = XCreateImage(xd->hdr.display, xd->visual, xd->dplanes, ZPixmap, 0, xd->xdata,
                               hor_res, ver_res, lv_color_format_get_bpp(LV_COLOR_FORMAT_ARGB8888), 0);
+    x11_reset_flush_area(xd);
 }
 
 /**
@@ -266,6 +270,7 @@ static void x11_event_handler(lv_timer_t * t)
                 if(event.xconfigure.width  != lv_display_get_horizontal_resolution(disp)
                    ||  event.xconfigure.height != lv_display_get_vertical_resolution(disp)) {
                     lv_display_set_resolution(disp, event.xconfigure.width, event.xconfigure.height);
+                    lv_refr_now(disp);
                 }
                 break;
             case ClientMessage:
@@ -341,9 +346,10 @@ static void x11_window_create(lv_display_t * disp, char const * title)
     /* create cache XImage */
     size_t sz_buffers = hor_res * ver_res * sizeof(lv_color32_t);
     xd->dplanes = XDisplayPlanes(xd->hdr.display, screen);
-    xd->xdata = malloc(sz_buffers); /* use clib method here, x11 memory not part of device footprint */
+    xd->xdata = calloc(1, sz_buffers); /* use clib method here, x11 memory not part of device footprint */
     xd->ximage = XCreateImage(xd->hdr.display, xd->visual, xd->dplanes, ZPixmap, 0, xd->xdata,
                               hor_res, ver_res, lv_color_format_get_bpp(LV_COLOR_FORMAT_ARGB8888), 0);
+    x11_reset_flush_area(xd);
 
     /* finally bring window on top of the other windows */
     XMapRaised(xd->hdr.display, xd->window);
