@@ -108,7 +108,7 @@ lv_result_t lv_thread_delete(lv_thread_t * thread)
 {
     lv_result_t result = LV_RESULT_OK;
     if(!thread) {
-        return LV_RESULT_INVALID;
+        return LV_RESULT_OK;
     }
 
     if(!TerminateThread(*thread, 0)) {
