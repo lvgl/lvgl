@@ -216,6 +216,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
     lv_freetype_cache_node_t * cache_node = dsc->cache_node;
+    LV_ASSERT_NULL(cache_node);
 
 #if LV_USE_OS == LV_OS_NONE
     /* L1 lookup: per cache_node, 2-way set-associative (single-thread only) */
