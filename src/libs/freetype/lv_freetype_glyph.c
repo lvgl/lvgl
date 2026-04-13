@@ -217,16 +217,17 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 
     lv_freetype_cache_node_t * cache_node = dsc->cache_node;
     LV_ASSERT_NULL(cache_node);
+    LV_LOG_TRACE("Getting glyph for unicode = 0x%" LV_PRIx32 ", size = %" LV_PRIu32, unicode_letter, dsc->size);
 
 #if LV_USE_OS == LV_OS_NONE
     /* L1 lookup: per cache_node, 2-way set-associative (single-thread only) */
     if(glyph_l1_lookup(cache_node, unicode_letter, dsc->size, g_dsc)) {
-        /* L1 hit – skip L2 entirely */
+        LV_LOG_TRACE("L1 cache hit");
     }
     else
 #endif
     {
-        /* L2 LRU RB-tree cache */
+        LV_LOG_TRACE("L1 cache miss, looking up L2");
         lv_freetype_glyph_cache_data_t search_key = {
             .unicode = unicode_letter,
             .size = dsc->size,
