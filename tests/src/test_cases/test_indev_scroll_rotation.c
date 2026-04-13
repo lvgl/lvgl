@@ -1,8 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "unity/unity.h"
-#include "../src/lv_test_indev.h"
-#include "../src/lv_test_init.h"
 
 /*
  * Test: find_scroll_obj should not be affected by child object's
