@@ -468,6 +468,17 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     return true;
 }
 
+static void lv_freetype_done_mm_var(FT_MM_Var * mm_var)
+{
+    lv_freetype_context_t * ctx = lv_freetype_get_context();
+    LV_ASSERT_NULL(ctx);
+    LV_ASSERT_NULL(ctx->library);
+    FT_Error err = FT_Done_MM_Var(ctx->library, mm_var);
+    if(err != 0) {
+        FT_ERROR_MSG("FT_Done_MM_Var", err);
+    }
+}
+
 /* If the font is variable, set the 'wght' axis to the requested value. Returns true if applied. */
 static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
 {
@@ -484,11 +495,9 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
         }
         else if(mm_var) {
             /* FT_Get_MM_Var succeeded but no usable axes; free to avoid leak */
-            lv_freetype_context_t * ctx = lv_freetype_get_context();
-            if(ctx && ctx->library) {
-                FT_Done_MM_Var(ctx->library, mm_var);
-            }
+            lv_freetype_done_mm_var(mm_var);
         }
+
         return false;
     }
 
@@ -503,12 +512,10 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
         LV_ASSERT_MALLOC(coords);
         if(!coords) {
             LV_LOG_ERROR("failed to allocate memory for %u font axes", axis_count);
-            lv_freetype_context_t * ctx = lv_freetype_get_context();
-            if(ctx && ctx->library) {
-                FT_Done_MM_Var(ctx->library, mm_var);
-            }
+            lv_freetype_done_mm_var(mm_var);
             return false;
         }
+
         use_heap = true;
     }
 
@@ -525,6 +532,7 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
                 break;
             }
         }
+
         if(wght_index >= 0) {
             FT_Fixed min_v = mm_var->axis[wght_index].minimum;
             FT_Fixed max_v = mm_var->axis[wght_index].maximum;
@@ -541,13 +549,11 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
         }
     }
 
-    if(use_heap)
+    if(use_heap) {
         lv_free(coords);
-
-    lv_freetype_context_t * ctx = lv_freetype_get_context();
-    if(ctx && ctx->library) {
-        FT_Done_MM_Var(ctx->library, mm_var);
     }
+
+    lv_freetype_done_mm_var(mm_var);
     return applied;
 }
 
@@ -592,6 +598,7 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
 
 static lv_font_t * freetype_font_create_cb(const lv_font_info_t * info, const void * src)
 {
+    LV_ASSERT_NULL(info);
     lv_font_info_t font_info = *info;
     font_info.name = src;
     return lv_freetype_font_create_with_info(&font_info);
