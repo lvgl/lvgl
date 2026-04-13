@@ -462,6 +462,7 @@ static void draw_indic(lv_event_t * e)
     draw_rect_dsc.border_opa = LV_OPA_TRANSP;
     draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
 
+#if LV_DRAW_COMPLEX
     /*Get the max possible indicator area. The gradient should be applied on this*/
     lv_area_t mask_indic_max_area;
     lv_area_copy(&mask_indic_max_area, &bar_coords);
@@ -478,14 +479,15 @@ static void draw_indic(lv_event_t * e)
         mask_indic_max_area.x2 = mask_indic_max_area.x1 + LV_BAR_SIZE_MIN;
     }
 
-#if LV_DRAW_COMPLEX
     /*Create a mask to the current indicator area to see only this part from the whole gradient.*/
     lv_draw_mask_radius_param_t mask_indic_param;
     lv_draw_mask_radius_init(&mask_indic_param, &bar->indic_area, draw_rect_dsc.radius, false);
     int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
-#endif
 
     lv_draw_rect(draw_ctx, &draw_rect_dsc, &mask_indic_max_area);
+#else
+    lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
+#endif
     draw_rect_dsc.border_opa = border_opa;
     draw_rect_dsc.shadow_opa = shadow_opa;
 
