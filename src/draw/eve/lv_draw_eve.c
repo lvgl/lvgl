@@ -116,6 +116,9 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    if(lv_draw_eve_unit_g == NULL || lv_draw_eve_unit_g->disp == NULL)
+        return 0;
+
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_EVE;

@@ -12,3 +12,4 @@ Contributing
     pull_requests
     dco
     coding_style
+    assertions

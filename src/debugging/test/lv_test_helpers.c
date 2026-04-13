@@ -43,6 +43,10 @@ void lv_test_wait(uint32_t ms)
         lv_timer_handler();
         ms--;
     }
+
+    lv_indev_read(lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER));
+    lv_indev_read(lv_test_indev_get_indev(LV_INDEV_TYPE_ENCODER));
+    lv_indev_read(lv_test_indev_get_indev(LV_INDEV_TYPE_KEYPAD));
     lv_refr_now(NULL);
 }
 
@@ -50,6 +54,9 @@ void lv_test_fast_forward(uint32_t ms)
 {
     lv_tick_inc(ms);
     lv_timer_handler();
+    lv_indev_read(lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER));
+    lv_indev_read(lv_test_indev_get_indev(LV_INDEV_TYPE_ENCODER));
+    lv_indev_read(lv_test_indev_get_indev(LV_INDEV_TYPE_KEYPAD));
     lv_refr_now(NULL);
 }
 

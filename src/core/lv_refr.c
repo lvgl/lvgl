@@ -1336,7 +1336,7 @@ static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
 
     lv_area_t clip_coords_for_obj;
     if(!lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords)) {
-        return false;
+        return true;
     }
 
     bool has_clip = lv_memcmp(&clip_coords_for_obj, &obj_coords, sizeof(lv_area_t)) != 0;

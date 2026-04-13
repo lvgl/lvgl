@@ -737,6 +737,24 @@ menu "LVGL configuration"
 					Add a custom handler when assert happens e.g. to restart the MCU
 		endmenu
 
+		menu "Check arg"
+			config LV_USE_CHECK_ARG
+				bool "Enable LV_CHECK_ARG macro for runtime argument validation"
+				default y if !LV_CONF_MINIMAL
+				help
+					When enabled, LV_CHECK_ARG checks validate function arguments
+					at runtime. Failed checks log a warning and execute the specified
+					action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+
+			config LV_CHECK_ARG_ASSERT_ON_FAIL
+				bool "Call assert handler on LV_CHECK_ARG failure"
+				default n
+				depends on LV_USE_CHECK_ARG
+				help
+					When enabled, LV_ASSERT_HANDLER is also invoked when an
+					LV_CHECK_ARG check fails, before the action is executed.
+		endmenu
+
 		menu "Debug"
 			config LV_USE_REFR_DEBUG
 				bool "Draw random colored rectangles over the redrawn areas"

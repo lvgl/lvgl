@@ -283,9 +283,9 @@ static void style_init(my_theme_t * theme)
     lv_style_set_bg_color(&theme->styles.btn, theme->color_grey);
     if(!(theme->base.flags & MODE_DARK)) {
         lv_style_set_shadow_color(&theme->styles.btn, lv_palette_main(LV_PALETTE_GREY));
-        lv_style_set_shadow_width(&theme->styles.btn, LV_DPX(3));
+        lv_style_set_shadow_width(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, 3));
         lv_style_set_shadow_opa(&theme->styles.btn, LV_OPA_50);
-        lv_style_set_shadow_offset_y(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, LV_DPX(4)));
+        lv_style_set_shadow_offset_y(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, 3));
     }
     lv_style_set_text_color(&theme->styles.btn, theme->color_text);
     lv_style_set_pad_hor(&theme->styles.btn, PAD_DEF);
@@ -611,10 +611,10 @@ static void style_init(my_theme_t * theme)
 #if LV_USE_SCALE
     style_init_reset(&theme->styles.scale);
     lv_style_set_line_color(&theme->styles.scale, theme->color_text);
-    lv_style_set_line_width(&theme->styles.scale, LV_DPX(2));
+    lv_style_set_line_width(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 2));
     lv_style_set_arc_color(&theme->styles.scale, theme->color_text);
-    lv_style_set_arc_width(&theme->styles.scale, LV_DPX(2));
-    lv_style_set_length(&theme->styles.scale, LV_DPX(6));
+    lv_style_set_arc_width(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 2));
+    lv_style_set_length(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 6));
 #endif
 }
 
