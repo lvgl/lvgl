@@ -35,7 +35,7 @@ The input looks something like:
 {"log":"LVGL Benchmark Over\r\n","stream":"stdout","time":"2025-03-14T20:33:57.933458479Z"}
 ````
 
-Outpus a json file with the format:
+Outputs a json file with the format:
 ```json
 [
     {

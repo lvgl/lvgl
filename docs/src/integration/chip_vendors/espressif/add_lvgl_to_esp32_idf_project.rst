@@ -69,11 +69,11 @@ Configuration
 
 To configure LVGL, launch the configuration menu with ``idf.py menuconfig`` in your project root directory. Navigate to ``Component config`` and then ``LVGL configuration``.
 
-Addtionally the user can make the current LVGL settings permanent, or default, for the current
+Additionally the user can make the current LVGL settings permanent, or default, for the current
 project, all that is needed is to create a file on the project root called 
 `sdkconfig.defaults` and move the `CONFIG_LV_` symbols to that file.
 
-It is possible to create a per-chip default confiuration files by creating A
+It is possible to create a per-chip default configuration files by creating a
 configuration default files which starts to the chip variant, for example
 `sdkconfig.esp32p4` will only apply the default configuration for an ESP32-P4
 IDF project.

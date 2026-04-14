@@ -95,7 +95,7 @@ Notes
 - DRM requires proper modesetting. By default, LVGL will select a preferred display mode.
 
 
-In order to avoid hard codding the device card path, you can ask LVGL to find a connected one for you using :cpp:func:`lv_linux_drm_find_device_path`.
+In order to avoid hard coding the device card path, you can ask LVGL to find a connected one for you using :cpp:func:`lv_linux_drm_find_device_path`.
 It will return the first connected card it can find.
 
 .. code-block:: c
