@@ -157,6 +157,7 @@ static void shm_deinit(void * backend_ctx)
     lv_wl_shm_ctx_t * ctx = backend_ctx;
     if(ctx->shm) {
         wl_shm_destroy(ctx->shm);
+        ctx->shm = NULL;
     }
 }
 
