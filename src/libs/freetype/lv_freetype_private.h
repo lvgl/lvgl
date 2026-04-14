@@ -34,6 +34,12 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/* L1 glyph cache is not thread-safe — force-disable when an OS is configured */
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1 && LV_USE_OS != LV_OS_NONE
+#undef LV_FREETYPE_CACHE_FT_GLYPH_L1
+#define LV_FREETYPE_CACHE_FT_GLYPH_L1 0
+#endif
+
 #ifdef FT_CONFIG_OPTION_ERROR_STRINGS
 #define FT_ERROR_MSG(msg, error_code) \
     LV_LOG_ERROR(msg " error(0x%x): %s", (int)error_code, FT_Error_String(error_code))
@@ -99,7 +105,7 @@ struct _lv_freetype_cache_node_t {
     /*draw data cache*/
     lv_cache_t * draw_data_cache;
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
     /* L1 glyph metrics cache (single-thread only, managed by lv_freetype_glyph.c) */
     void * glyph_l1;
 #endif
@@ -146,7 +152,7 @@ int32_t lv_freetype_italic_transform_on_pos(lv_point_t point);
 lv_cache_t * lv_freetype_create_glyph_cache(uint32_t cache_size);
 void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc);
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
 void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node);
 void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node);
 #endif

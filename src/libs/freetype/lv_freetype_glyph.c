@@ -18,7 +18,7 @@
 
 #define CACHE_NAME  "FREETYPE_GLYPH"
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
 
     /** Number of sets - reuse the FreeType glyph count (must be power of 2) */
     #define GLYPH_L1_SETS       ((uint32_t)LV_FREETYPE_CACHE_FT_GLYPH_CNT)
@@ -32,13 +32,13 @@
 
     #define GLYPH_L1_SET_MASK   (GLYPH_L1_SETS - 1u)
 
-#endif /* LV_USE_OS == LV_OS_NONE */
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
 
 typedef struct {
     uint32_t unicode;
@@ -51,7 +51,7 @@ typedef struct {
     uint8_t lru_bits;
 } glyph_l1_set_t;
 
-#endif /* LV_USE_OS == LV_OS_NONE */
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
 
 typedef struct _lv_freetype_glyph_cache_data_t {
     uint32_t unicode;
@@ -72,13 +72,13 @@ static void freetype_glyph_free_cb(lv_freetype_glyph_cache_data_t * data, void *
 static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_cache_data_t * lhs,
                                                         const lv_freetype_glyph_cache_data_t * rhs);
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
 static inline uint32_t glyph_l1_hash(uint32_t unicode, uint32_t size);
 static bool glyph_l1_lookup(lv_freetype_cache_node_t * node, uint32_t unicode, uint32_t size,
                             lv_font_glyph_dsc_t * out_dsc);
 static void glyph_l1_fill(lv_freetype_cache_node_t * node, uint32_t unicode, uint32_t size,
                           const lv_font_glyph_dsc_t * dsc);
-#endif /* LV_USE_OS == LV_OS_NONE */
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -112,7 +112,7 @@ void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc)
     dsc->font.get_glyph_dsc = freetype_get_glyph_dsc_cb;
 }
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
 
 void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
 {
@@ -132,13 +132,13 @@ void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node)
     }
 }
 
-#endif /* LV_USE_OS == LV_OS_NONE */
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
 
 static inline uint32_t glyph_l1_hash(uint32_t unicode, uint32_t size)
 {
@@ -192,7 +192,7 @@ static void glyph_l1_fill(lv_freetype_cache_node_t * node,
     set->lru_bits = (uint8_t)victim;
 }
 
-#endif /* LV_USE_OS == LV_OS_NONE */
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
 
 static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
                                       uint32_t unicode_letter_next)
@@ -219,7 +219,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     LV_ASSERT_NULL(cache_node);
     LV_LOG_TRACE("Getting glyph for unicode = 0x%" LV_PRIx32 ", size = %" LV_PRIu32, unicode_letter, dsc->size);
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
     /* L1 lookup: per cache_node, 2-way set-associative (single-thread only) */
     if(glyph_l1_lookup(cache_node, unicode_letter, dsc->size, g_dsc)) {
         LV_LOG_TRACE("L1 cache hit");
@@ -244,7 +244,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
         lv_freetype_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);
         *g_dsc = data->glyph_dsc;
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
         /* Populate L1 for future hits */
         glyph_l1_fill(cache_node, unicode_letter, dsc->size, &data->glyph_dsc);
 #endif

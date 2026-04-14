@@ -437,7 +437,7 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     node->face_has_kerning = FT_HAS_KERNING(face);
     lv_mutex_init(&node->face_lock);
 
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
     lv_freetype_glyph_l1_init(node);
 #endif
 
@@ -445,7 +445,7 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
-#if LV_USE_OS == LV_OS_NONE
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
     lv_freetype_glyph_l1_deinit(node);
 #endif
 
