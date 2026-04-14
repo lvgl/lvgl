@@ -41,6 +41,7 @@ struct _lv_wl_window_t;
 typedef struct {
     struct wl_pointer * wl_pointer;
     struct wl_surface * cursor_surface;
+    struct wl_cursor_theme * cursor_theme;
     lv_point_t point;
     lv_indev_state_t left_btn_state;
     lv_indev_state_t right_btn_state;
