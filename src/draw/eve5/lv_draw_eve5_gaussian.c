@@ -57,9 +57,9 @@
 /* Maximum sigma^2_local the final pass can handle.
  * Pyramid stops when remaining fits within this range. */
 #if EVE5_GAUSSIAN_FINAL_7TAP
-#define FINAL_MAX_LOCAL_SIGMA_SQ 3
+#define FINAL_MAX_LOCAL_SIGMA_SQ 18 /* ~2.25 */
 #else
-#define FINAL_MAX_LOCAL_SIGMA_SQ 1
+#define FINAL_MAX_LOCAL_SIGMA_SQ 8 /* 1.0 */
 #endif
 
 /**********************
@@ -456,7 +456,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             test_w = (test_w + 1) / 2;
             test_h = (test_h + 1) / 2;
             if(test_w < 4 || test_h < 4) break;
-            if(sigma_sq_target - acc <= FINAL_MAX_LOCAL_SIGMA_SQ * p4 * 8) break;
+            if(sigma_sq_target - acc <= FINAL_MAX_LOCAL_SIGMA_SQ * p4) break;
             acc += p4 * 8;
             p4 *= 4;
             n_tiers_est++;
@@ -580,7 +580,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
          * With 7-tap (MAX=3) this stops earlier than 5-tap (MAX=1), keeping
          * higher resolution for the final pass — no raw pyramid at boundaries. */
         int32_t remaining_before = sigma_sq_target - levels[n_levels - 1].sigma_sq;
-        if(remaining_before <= FINAL_MAX_LOCAL_SIGMA_SQ * pow4 * 8) break;
+        if(remaining_before <= FINAL_MAX_LOCAL_SIGMA_SQ * pow4) break;
 
         gauss_level_t * prev = &levels[n_levels - 1];
 
