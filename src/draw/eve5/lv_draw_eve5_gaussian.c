@@ -425,19 +425,22 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     /* Match the LVGL SW renderer's effective blur strength.
      *
-     * The SW blur is a 4-direction IIR exponential filter (not Gaussian):
+     * The SW blur is a 4-direction IIR exponential filter:
      *   alpha = R / (R + 4), applied forward+backward per axis.
-     *   Per-axis variance: sigma^2 = R * (R + 4) / 8.
+     *   Per-axis sigma^2 = R * (R + 4) / 8.
      *
-     * With default LV_BLUR_QUALITY_AUTO, it also applies skip_cnt = 2 for
-     * blur_radius >= 8, halving the effective radius before blurring:
-     *   effective_r = R / skip_cnt
+     * With LV_BLUR_QUALITY_AUTO, the SW renderer also halves R for R >= 8
+     * (skip_cnt = 2) as a speed optimization. This creates a visible
+     * discontinuity at R=8 where the blur suddenly weakens. Our GPU
+     * implementation doesn't need this hack, so we model the underlying
+     * IIR filter smoothly across all radii using the skip_cnt=2 formula
+     * (which is what most users see) but without the hard threshold:
+     *   effective_r = R / 2  (continuous, matches AUTO quality behavior)
      *   sigma^2 = effective_r * (effective_r + 4) / 8
      *
-     * All sigma^2 values are stored 8x-scaled to avoid integer truncation
-     * on small radii. Target = eff_r * (eff_r + 4), without the /8. */
-    int32_t eff_r = (blur_radius >= 8) ? blur_radius / 2 : blur_radius;
-    int32_t sigma_sq_target = eff_r * (eff_r + 4);
+     * All sigma^2 values are stored 8x-scaled to preserve precision on
+     * small radii: target = (R/2) * (R/2 + 4) = R*(R+8)/4. */
+    int32_t sigma_sq_target = blur_radius * (blur_radius + 8) / 4;
     if(sigma_sq_target < 1) sigma_sq_target = 1;
 
     /* Pre-estimate pyramid depth for padding computation.
@@ -545,7 +548,10 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
     /* ========== Allocate reusable H-pass temp buffer ========== */
-    int32_t temp_aw = ALIGN_UP((pw + 1) / 2, 16);
+    /* Must hold the largest intermediate: either the pyramid tier 0 H output
+     * (pw/2 x ph) or the final pass H output at full resolution (pw x ph)
+     * when no pyramid tiers are built. */
+    int32_t temp_aw = (n_tiers_est > 0) ? ALIGN_UP((pw + 1) / 2, 16) : paw;
     int32_t temp_ah = ALIGN_UP(ph, 16);
     uint32_t temp_size = (uint32_t)temp_aw * 4 * (uint32_t)temp_ah;
     Esd_GpuHandle temp_handle = Esd_GpuAlloc_Alloc(u->allocator, temp_size, GA_ALIGN_128);
