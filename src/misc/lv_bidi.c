@@ -101,7 +101,10 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_base_dir_t base_dir
 }
 
 /**
- * Auto-detect the direction of a text based on the first strong character
+ * Auto-detect the base direction of a text by scanning all strong characters.
+ * RTL takes priority: if any RTL strong character is found, `LV_BASE_DIR_RTL` is returned
+ * immediately. Otherwise, `LV_BASE_DIR_LTR` is returned if any LTR strong character is found.
+ * If no strong character is present, falls back to `LV_BIDI_BASE_DIR_DEF`.
  * @param txt the text to process
  * @return `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL`
  */
