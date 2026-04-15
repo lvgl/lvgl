@@ -254,12 +254,17 @@ static inline lv_eve5_vram_res_t * eve5_get_vram_res(lv_layer_t * layer)
     return (lv_eve5_vram_res_t *)layer->draw_buf->vram_res;
 }
 
+static inline lv_draw_eve5_font_vram_t * eve5_get_font_vram_from_dsc(lv_font_dsc_base_t * font_dsc)
+{
+    if(font_dsc == NULL) return NULL;
+    if(font_dsc->vram_res == NULL) return NULL;
+    return (lv_draw_eve5_font_vram_t *)font_dsc->vram_res;
+}
+
 static inline lv_draw_eve5_font_vram_t * eve5_get_font_vram(const lv_font_t * font)
 {
     if(font == NULL || font->dsc == NULL) return NULL;
-    lv_font_dsc_base_t * base = (lv_font_dsc_base_t *)font->dsc;
-    if(base->vram_res == NULL) return NULL;
-    return (lv_draw_eve5_font_vram_t *)base->vram_res;
+    return eve5_get_font_vram_from_dsc((lv_font_dsc_base_t *)font->dsc);
 }
 
 static inline lv_eve5_vram_res_t * eve5_get_image_vram_res(const lv_image_dsc_t * img)
@@ -385,7 +390,7 @@ static inline lv_draw_task_t * eve5_slice_first(const lv_draw_eve5_slice_t * sli
 
 /* Font VRAM residency — stored on font->vram_res.
  * vram_font_free_cb implementation registered on the draw unit. */
-void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, void * font);
+void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t * font_dsc);
 lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
                                                     const lv_font_t * font);
 uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t * u,

@@ -308,12 +308,11 @@ static void font_list_insert(lv_draw_eve5_unit_t * u, lv_draw_eve5_font_vram_t *
     u->font_list = fv;
 }
 
-void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, void * font_ptr)
+void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t * font_dsc)
 {
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
-    lv_font_t * font = (lv_font_t *)font_ptr;
 
-    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(font);
+    lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram_from_dsc(font_dsc);
     if(fv == NULL) return;
 
     font_list_remove(u, fv);
@@ -334,7 +333,7 @@ void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, void * font_ptr)
     if(fv->glyph_offsets) lv_free(fv->glyph_offsets);
     if(fv->glyph_handles) lv_free(fv->glyph_handles);
     lv_free(fv);
-    ((lv_font_dsc_base_t *)font->dsc)->vram_res = NULL;
+    font_dsc->vram_res = NULL;
 }
 
 /**
@@ -353,7 +352,7 @@ lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
         if(fv->base.unit != (lv_draw_unit_t *)u) {
             lv_draw_unit_t * old_unit = fv->base.unit;
             if(old_unit && old_unit->vram_font_free_cb) {
-                old_unit->vram_font_free_cb(old_unit, font);
+                old_unit->vram_font_free_cb(old_unit, (lv_font_dsc_base_t *)font->dsc);
             }
             else {
                 if(fv->glyph_offsets) lv_free(fv->glyph_offsets);
@@ -484,7 +483,7 @@ static lv_draw_eve5_font_vram_t * font_ensure_generic(lv_draw_eve5_unit_t * u, c
         if(fv->base.unit != (lv_draw_unit_t *)u) {
             lv_draw_unit_t * old_unit = fv->base.unit;
             if(old_unit && old_unit->vram_font_free_cb) {
-                old_unit->vram_font_free_cb(old_unit, font);
+                old_unit->vram_font_free_cb(old_unit, (lv_font_dsc_base_t *)font->dsc);
             }
             else {
                 if(fv->glyph_handles) lv_free(fv->glyph_handles);
