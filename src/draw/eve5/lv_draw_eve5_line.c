@@ -35,16 +35,38 @@
  * which cannot be recovered by the direct-to-alpha replay. H/V flat caps use
  * the scissor optimization (sharp edges without masking) and don't need this.
  */
+static bool line_segment_needs_alpha_rendertarget(const lv_draw_line_dsc_t * dsc, int32_t dx, int32_t dy);
+
 bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t * t)
 {
     const lv_draw_line_dsc_t * dsc = t->draw_dsc;
     if(dsc->width == 0) return false;
     if(dsc->opa <= LV_OPA_MIN) return false;
+
+    /* Polyline: check each segment */
+    if(dsc->points != NULL) {
+        for(int32_t i = 0; i < dsc->point_cnt - 1; i++) {
+            if(dsc->points[i].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i].y == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].y == LV_DRAW_LINE_POINT_NONE) {
+                continue;
+            }
+            int32_t dx = (int32_t)(dsc->points[i + 1].x - dsc->points[i].x);
+            int32_t dy = (int32_t)(dsc->points[i + 1].y - dsc->points[i].y);
+            if(dx == 0 && dy == 0) continue;
+            if(line_segment_needs_alpha_rendertarget(dsc, dx, dy)) return true;
+        }
+        return false;
+    }
+
     if(dsc->p1.x == dsc->p2.x && dsc->p1.y == dsc->p2.y) return false;
 
-    int32_t dx = dsc->p2.x - dsc->p1.x;
-    int32_t dy = dsc->p2.y - dsc->p1.y;
+    return line_segment_needs_alpha_rendertarget(dsc, dsc->p2.x - dsc->p1.x, dsc->p2.y - dsc->p1.y);
+}
 
+static bool line_segment_needs_alpha_rendertarget(const lv_draw_line_dsc_t * dsc, int32_t dx, int32_t dy)
+{
     bool is_hv = (dx == 0 || dy == 0);
     bool is_hv_flat = is_hv && (dsc->raw_end || (!dsc->round_start && !dsc->round_end));
 
@@ -66,14 +88,59 @@ bool lv_draw_eve5_line_needs_alpha_rendertarget(const lv_draw_task_t * t)
  *                      luminance for L8 render-target alpha recovery.
  * @param use_hv_opt    Enable H/V scissor optimization for axis-aligned lines.
  */
+static void draw_line_segment(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
+                              const lv_draw_line_dsc_t * dsc, bool alpha_to_rgb, bool use_hv_opt);
+
 void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool alpha_to_rgb, bool use_hv_opt)
 {
-    lv_layer_t * layer = t->target_layer;
     lv_draw_line_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
+
+    /* Polyline: iterate segments */
+    if(dsc->points != NULL) {
+        /* Disable H/V optimization if any segment is diagonal */
+        bool poly_hv_opt = true;
+        for(int32_t i = 0; i < dsc->point_cnt - 1; i++) {
+            if(dsc->points[i].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i].y == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].y == LV_DRAW_LINE_POINT_NONE) {
+                continue;
+            }
+            int32_t sdx = (int32_t)(dsc->points[i + 1].x - dsc->points[i].x);
+            int32_t sdy = (int32_t)(dsc->points[i + 1].y - dsc->points[i].y);
+            if(sdx != 0 && sdy != 0) {
+                poly_hv_opt = false;
+                break;
+            }
+        }
+        lv_draw_line_dsc_t seg = *dsc;
+        seg.points = NULL;
+        seg.point_cnt = 0;
+        for(int32_t i = 0; i < dsc->point_cnt - 1; i++) {
+            if(dsc->points[i].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i].y == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].y == LV_DRAW_LINE_POINT_NONE) {
+                continue;
+            }
+            seg.p1 = dsc->points[i];
+            seg.p2 = dsc->points[i + 1];
+            draw_line_segment(u, t, &seg, alpha_to_rgb, poly_hv_opt);
+        }
+        return;
+    }
+
     if(dsc->p1.x == dsc->p2.x && dsc->p1.y == dsc->p2.y) return;
+    draw_line_segment(u, t, dsc, alpha_to_rgb, use_hv_opt);
+}
+
+static void draw_line_segment(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
+                              const lv_draw_line_dsc_t * dsc, bool alpha_to_rgb, bool use_hv_opt)
+{
+    lv_layer_t * layer = t->target_layer;
 
     int32_t x1 = dsc->p1.x - layer->buf_area.x1;
     int32_t y1 = dsc->p1.y - layer->buf_area.y1;
@@ -356,14 +423,59 @@ void lv_draw_eve5_hal_draw_line(lv_draw_eve5_unit_t * u, const lv_draw_task_t * 
  * produces binary edges at cap/dash boundaries instead of smooth AA. For
  * accurate alpha in these cases, use the L8 render-target path instead.
  */
+static void alpha_draw_line_segment(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
+                                    const lv_draw_line_dsc_t * dsc, bool use_hv_opt);
+
 void lv_draw_eve5_alpha_draw_line(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t, bool use_hv_opt)
 {
-    lv_layer_t * layer = t->target_layer;
     const lv_draw_line_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
+
+    /* Polyline: iterate segments */
+    if(dsc->points != NULL) {
+        /* Disable H/V optimization if any segment is diagonal */
+        bool poly_hv_opt = true;
+        for(int32_t i = 0; i < dsc->point_cnt - 1; i++) {
+            if(dsc->points[i].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i].y == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].y == LV_DRAW_LINE_POINT_NONE) {
+                continue;
+            }
+            int32_t sdx = (int32_t)(dsc->points[i + 1].x - dsc->points[i].x);
+            int32_t sdy = (int32_t)(dsc->points[i + 1].y - dsc->points[i].y);
+            if(sdx != 0 && sdy != 0) {
+                poly_hv_opt = false;
+                break;
+            }
+        }
+        lv_draw_line_dsc_t seg = *dsc;
+        seg.points = NULL;
+        seg.point_cnt = 0;
+        for(int32_t i = 0; i < dsc->point_cnt - 1; i++) {
+            if(dsc->points[i].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i].y == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].x == LV_DRAW_LINE_POINT_NONE ||
+               dsc->points[i + 1].y == LV_DRAW_LINE_POINT_NONE) {
+                continue;
+            }
+            seg.p1 = dsc->points[i];
+            seg.p2 = dsc->points[i + 1];
+            alpha_draw_line_segment(u, t, &seg, poly_hv_opt);
+        }
+        return;
+    }
+
     if(dsc->p1.x == dsc->p2.x && dsc->p1.y == dsc->p2.y) return;
+    alpha_draw_line_segment(u, t, dsc, use_hv_opt);
+}
+
+static void alpha_draw_line_segment(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
+                                    const lv_draw_line_dsc_t * dsc, bool use_hv_opt)
+{
+    lv_layer_t * layer = t->target_layer;
 
     int32_t x1 = dsc->p1.x - layer->buf_area.x1;
     int32_t y1 = dsc->p1.y - layer->buf_area.y1;
