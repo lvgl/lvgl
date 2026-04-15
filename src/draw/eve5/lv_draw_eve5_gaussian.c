@@ -47,16 +47,30 @@
 #define BINOM_W_CENTER 96
 
 /* 7-tap final pass: uses taps at [-3..+3] instead of [-2..+2].
- * Covers sigma^2_local up to ~3 vs ~1 for 5-tap, so the pyramid stops
- * earlier and the final pass always handles a meaningful blur — no raw
- * pyramid artifacts at tier boundaries. 7 nearest draws vs 5 per axis. */
+ * Covers sigma^2_local up to ~2.25 vs ~1 for 5-tap. */
 #ifndef EVE5_GAUSSIAN_FINAL_7TAP
+#define EVE5_GAUSSIAN_FINAL_7TAP 1
+#endif
+
+/* 9-tap final pass: uses taps at [-4..+4] for sigma^2_local up to 3.0.
+ * Properly captures the ~3% tail energy that 7-tap truncates at sigma^2=3,
+ * allowing FINAL_MAX_LOCAL_SIGMA_SQ=24 and pushing the 1->2 tier crossing
+ * from blur_radius ~15 to ~17. The +-4 taps are naturally zero for small
+ * sigma, so only 9 draws happen when the extra reach is needed. */
+#ifndef EVE5_GAUSSIAN_FINAL_9TAP
+#define EVE5_GAUSSIAN_FINAL_9TAP 1
+#endif
+
+#if EVE5_GAUSSIAN_FINAL_9TAP && !EVE5_GAUSSIAN_FINAL_7TAP
+#undef EVE5_GAUSSIAN_FINAL_7TAP
 #define EVE5_GAUSSIAN_FINAL_7TAP 1
 #endif
 
 /* Maximum sigma^2_local the final pass can handle.
  * Pyramid stops when remaining fits within this range. */
-#if EVE5_GAUSSIAN_FINAL_7TAP
+#if EVE5_GAUSSIAN_FINAL_9TAP
+#define FINAL_MAX_LOCAL_SIGMA_SQ 24 /* 3.0 */
+#elif EVE5_GAUSSIAN_FINAL_7TAP
 #define FINAL_MAX_LOCAL_SIGMA_SQ 18 /* ~2.25 */
 #else
 #define FINAL_MAX_LOCAL_SIGMA_SQ 8 /* 1.0 */
@@ -115,7 +129,7 @@ static const uint8_t s_gauss_weights[33][2] = {
     /* k=28 sigma^2=0.875 */ { 11,  62 },
     /* k=29 sigma^2=0.906 */ { 12,  62 },
     /* k=30 sigma^2=0.938 */ { 13,  62 },
-    /* k=31 sigma^2=0.969 */ { 13,  63 },
+    /* k=31 sigma^2=0.969 */ { 13,  62 },
     /* k=32 sigma^2=1.000 */ { 14,  63 },
 };
 
@@ -152,7 +166,7 @@ static const uint8_t s_gauss7_weights[49][3] = {
     /* k=17 sigma^2=1.063 */ {  1,  15,  62 },
     /* k=18 sigma^2=1.125 */ {  2,  16,  62 },
     /* k=19 sigma^2=1.188 */ {  2,  17,  62 },
-    /* k=20 sigma^2=1.250 */ {  3,  18,  61 },
+    /* k=20 sigma^2=1.250 */ {  2,  18,  61 },
     /* k=21 sigma^2=1.313 */ {  3,  19,  61 },
     /* k=22 sigma^2=1.375 */ {  3,  20,  61 },
     /* k=23 sigma^2=1.438 */ {  4,  21,  60 },
@@ -168,21 +182,86 @@ static const uint8_t s_gauss7_weights[49][3] = {
     /* k=33 sigma^2=2.063 */ {  8,  27,  57 },
     /* k=34 sigma^2=2.125 */ {  9,  28,  56 },
     /* k=35 sigma^2=2.188 */ {  9,  28,  56 },
-    /* k=36 sigma^2=2.250 */ {  9,  29,  56 },
+    /* k=36 sigma^2=2.250 */ {  9,  28,  55 },
     /* k=37 sigma^2=2.313 */ { 10,  29,  55 },
-    /* k=38 sigma^2=2.375 */ { 10,  30,  55 },
-    /* k=39 sigma^2=2.438 */ { 11,  30,  54 },
+    /* k=38 sigma^2=2.375 */ { 10,  29,  55 },
+    /* k=39 sigma^2=2.438 */ { 11,  29,  55 },
     /* k=40 sigma^2=2.500 */ { 11,  30,  54 },
-    /* k=41 sigma^2=2.563 */ { 11,  31,  54 },
-    /* k=42 sigma^2=2.625 */ { 12,  31,  53 },
+    /* k=41 sigma^2=2.563 */ { 11,  30,  54 },
+    /* k=42 sigma^2=2.625 */ { 12,  30,  54 },
     /* k=43 sigma^2=2.688 */ { 12,  31,  53 },
     /* k=44 sigma^2=2.750 */ { 12,  31,  53 },
-    /* k=45 sigma^2=2.813 */ { 13,  32,  52 },
-    /* k=46 sigma^2=2.875 */ { 13,  32,  52 },
-    /* k=47 sigma^2=2.938 */ { 13,  32,  52 },
+    /* k=45 sigma^2=2.813 */ { 13,  31,  53 },
+    /* k=46 sigma^2=2.875 */ { 13,  31,  53 },
+    /* k=47 sigma^2=2.938 */ { 13,  31,  52 },
     /* k=48 sigma^2=3.000 */ { 14,  32,  52 },
 };
 #endif /* EVE5_GAUSSIAN_FINAL_7TAP */
+
+#if EVE5_GAUSSIAN_FINAL_9TAP
+/**********************
+ * 9-TAP GAUSSIAN WEIGHT TABLE
+ *
+ * Precomputed weights for 9 taps at positions [-4,-3,-2,-1,0,+1,+2,+3,+4]
+ * indexed by sigma^2 in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
+ *
+ * For each entry: {w_outer4, w_middle3, w_inner2, w_inner1}.
+ * w_center = 256 - 2*(w_outer4 + w_middle3 + w_inner2 + w_inner1).
+ *
+ * Computed from: w(x) = exp(-x^2 / (2*sigma^2)), normalized over 9 taps.
+ **********************/
+static const uint8_t s_gauss9_weights[49][4] = {
+    /* k=0  sigma^2=0.000 */ {  0,   0,   0,   0 },  /* passthrough */
+    /* k=1  sigma^2=0.062 */ {  0,   0,   0,   0 },
+    /* k=2  sigma^2=0.125 */ {  0,   0,   0,   5 },
+    /* k=3  sigma^2=0.188 */ {  0,   0,   0,  16 },
+    /* k=4  sigma^2=0.250 */ {  0,   0,   0,  27 },
+    /* k=5  sigma^2=0.312 */ {  0,   0,   0,  37 },
+    /* k=6  sigma^2=0.375 */ {  0,   0,   1,  44 },
+    /* k=7  sigma^2=0.438 */ {  0,   0,   2,  49 },
+    /* k=8  sigma^2=0.500 */ {  0,   0,   3,  53 },
+    /* k=9  sigma^2=0.562 */ {  0,   0,   4,  56 },
+    /* k=10 sigma^2=0.625 */ {  0,   0,   5,  58 },
+    /* k=11 sigma^2=0.688 */ {  0,   0,   7,  60 },
+    /* k=12 sigma^2=0.750 */ {  0,   0,   8,  61 },
+    /* k=13 sigma^2=0.812 */ {  0,   0,  10,  61 },
+    /* k=14 sigma^2=0.875 */ {  0,   1,  11,  62 },
+    /* k=15 sigma^2=0.938 */ {  0,   1,  12,  62 },
+    /* k=16 sigma^2=1.000 */ {  0,   1,  14,  62 },
+    /* k=17 sigma^2=1.062 */ {  0,   1,  15,  62 },
+    /* k=18 sigma^2=1.125 */ {  0,   2,  16,  62 },
+    /* k=19 sigma^2=1.188 */ {  0,   2,  17,  62 },
+    /* k=20 sigma^2=1.250 */ {  0,   2,  18,  61 },
+    /* k=21 sigma^2=1.312 */ {  0,   3,  19,  61 },
+    /* k=22 sigma^2=1.375 */ {  0,   3,  20,  61 },
+    /* k=23 sigma^2=1.438 */ {  0,   4,  21,  60 },
+    /* k=24 sigma^2=1.500 */ {  0,   4,  22,  60 },
+    /* k=25 sigma^2=1.562 */ {  0,   5,  23,  59 },
+    /* k=26 sigma^2=1.625 */ {  1,   5,  23,  59 },
+    /* k=27 sigma^2=1.688 */ {  1,   5,  24,  58 },
+    /* k=28 sigma^2=1.750 */ {  1,   6,  25,  58 },
+    /* k=29 sigma^2=1.812 */ {  1,   6,  25,  58 },
+    /* k=30 sigma^2=1.875 */ {  1,   7,  26,  57 },
+    /* k=31 sigma^2=1.938 */ {  1,   7,  26,  57 },
+    /* k=32 sigma^2=2.000 */ {  1,   8,  27,  56 },
+    /* k=33 sigma^2=2.062 */ {  1,   8,  27,  56 },
+    /* k=34 sigma^2=2.125 */ {  2,   8,  27,  55 },
+    /* k=35 sigma^2=2.188 */ {  2,   9,  28,  55 },
+    /* k=36 sigma^2=2.250 */ {  2,   9,  28,  55 },
+    /* k=37 sigma^2=2.312 */ {  2,  10,  28,  54 },
+    /* k=38 sigma^2=2.375 */ {  2,  10,  29,  54 },
+    /* k=39 sigma^2=2.438 */ {  2,  10,  29,  53 },
+    /* k=40 sigma^2=2.500 */ {  3,  11,  29,  53 },
+    /* k=41 sigma^2=2.562 */ {  3,  11,  29,  53 },
+    /* k=42 sigma^2=2.625 */ {  3,  11,  30,  52 },
+    /* k=43 sigma^2=2.688 */ {  3,  12,  30,  52 },
+    /* k=44 sigma^2=2.750 */ {  3,  12,  30,  52 },
+    /* k=45 sigma^2=2.812 */ {  4,  12,  30,  51 },
+    /* k=46 sigma^2=2.875 */ {  4,  13,  30,  51 },
+    /* k=47 sigma^2=2.938 */ {  4,  13,  30,  51 },
+    /* k=48 sigma^2=3.000 */ {  4,  13,  31,  50 },
+};
+#endif /* EVE5_GAUSSIAN_FINAL_9TAP */
 
 /**********************
  * STATIC PROTOTYPES
@@ -201,6 +280,15 @@ static bool gaussian_7tap_pass(lv_draw_eve5_unit_t * u,
                                int32_t dst_w, int32_t dst_h,
                                bool horizontal,
                                uint8_t w_outer, uint8_t w_middle, uint8_t w_inner, uint8_t w_center);
+#endif
+
+#if EVE5_GAUSSIAN_FINAL_9TAP
+static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
+                               uint32_t src_addr, int32_t src_stride, int32_t src_h,
+                               uint32_t dst_addr, int32_t dst_aw, int32_t dst_ah,
+                               int32_t dst_w, int32_t dst_h,
+                               bool horizontal,
+                               uint8_t w_o4, uint8_t w_o3, uint8_t w_i2, uint8_t w_i1, uint8_t w_center);
 #endif
 
 /**********************
@@ -362,6 +450,80 @@ static bool gaussian_7tap_pass(lv_draw_eve5_unit_t * u,
 }
 #endif /* EVE5_GAUSSIAN_FINAL_7TAP */
 
+#if EVE5_GAUSSIAN_FINAL_9TAP
+/**********************
+ * 9-TAP GAUSSIAN PASS
+ **********************/
+
+/**
+ * One separable 9-tap Gaussian blur pass (no downsample, same resolution).
+ * Used for the final pass when sigma^2_local requires the extra +-4 reach.
+ * 9 nearest-sampled draws at [-4..+4]; zero-weight taps are skipped.
+ */
+static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
+                               uint32_t src_addr, int32_t src_stride, int32_t src_h,
+                               uint32_t dst_addr, int32_t dst_aw, int32_t dst_ah,
+                               int32_t dst_w, int32_t dst_h,
+                               bool horizontal,
+                               uint8_t w_o4, uint8_t w_o3, uint8_t w_i2, uint8_t w_i1, uint8_t w_center)
+{
+    EVE_HalContext *phost = u->hal;
+
+    EVE_CoCmd_renderTarget(phost, dst_addr, ARGB8, dst_aw, dst_ah);
+    EVE_CoCmd_dlStart(phost);
+
+    EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+    EVE_CoDl_clearColorA(phost, 0);
+    EVE_CoDl_clear(phost, 1, 1, 1);
+
+    EVE_CoDl_scissorXY(phost, 0, 0);
+    EVE_CoDl_scissorSize(phost, dst_w, dst_h);
+    EVE_CoDl_vertexFormat(phost, 0);
+
+    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+    EVE_CoDl_bitmapSource(phost, src_addr);
+    EVE_CoDl_bitmapLayout(phost, ARGB8, src_stride, src_h);
+    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, dst_w, dst_h);
+
+    EVE_CoDl_bitmapTransform_identity(phost);
+
+    EVE_CoDl_blendFunc(phost, ONE, ONE);
+
+    const int32_t offsets[9] = { -4, -3, -2, -1, 0, 1, 2, 3, 4 };
+    const uint8_t weights[9] = { w_o4, w_o3, w_i2, w_i1, w_center,
+                                  w_i1, w_i2, w_o3, w_o4
+                                };
+
+    EVE_CoDl_begin(phost, BITMAPS);
+
+    for(int i = 0; i < 9; i++) {
+        if(weights[i] == 0) continue;
+
+        EVE_CoDl_colorRgb(phost, weights[i], weights[i], weights[i]);
+        EVE_CoDl_colorA(phost, weights[i]);
+
+        int32_t ofs = offsets[i] * 256;
+
+        if(horizontal) {
+            EVE_CoDl_bitmapTransformC(phost, ofs);
+        }
+        else {
+            EVE_CoDl_bitmapTransformF(phost, ofs);
+        }
+
+        EVE_CoDl_vertex2f_0(phost, 0, 0);
+    }
+
+    EVE_CoDl_end(phost);
+
+    EVE_CoDl_display(phost);
+    EVE_CoCmd_swap(phost);
+    EVE_CoCmd_graphicsFinish(phost);
+
+    return true;
+}
+#endif /* EVE5_GAUSSIAN_FINAL_9TAP */
+
 /**********************
  * GAUSSIAN BLUR ENTRY POINT
  **********************/
@@ -467,8 +629,10 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
      * tiers plus the final pass at the deepest level.
      * Pyramid: +/-2 per tier at scale 2^k -> cumulative 2*(2^n - 1).
      * Final pass: +/-HALF_TAP at scale 2^n -> HALF_TAP * 2^n more.
-     * 5-tap HALF_TAP=2, 7-tap HALF_TAP=3. */
-#if EVE5_GAUSSIAN_FINAL_7TAP
+     * 5-tap HALF_TAP=2, 7-tap HALF_TAP=3, 9-tap HALF_TAP=4. */
+#if EVE5_GAUSSIAN_FINAL_9TAP
+    #define FINAL_HALF_TAP 4
+#elif EVE5_GAUSSIAN_FINAL_7TAP
     #define FINAL_HALF_TAP 3
 #else
     #define FINAL_HALF_TAP 2
@@ -577,8 +741,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     for(int32_t tier = 0; tier < MAX_PYRAMID_TIERS; tier++) {
         /* Stop when remaining sigma^2 fits within the final pass's range.
-         * With 7-tap (MAX=3) this stops earlier than 5-tap (MAX=1), keeping
-         * higher resolution for the final pass — no raw pyramid at boundaries. */
+         * With 9-tap (MAX=3.0) this stops earlier than 7-tap (MAX=2.25),
+         * keeping higher resolution for the final pass. */
         int32_t remaining_before = sigma_sq_target - levels[n_levels - 1].sigma_sq;
         if(remaining_before <= FINAL_MAX_LOCAL_SIGMA_SQ * pow4) break;
 
@@ -641,7 +805,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
      * and do one separable H+V pass (no downsample) to hit the target.
      *
      * 5-tap: sigma^2_local in [0, 1). Table index k = sigma^2_local * 32.
-     * 7-tap: sigma^2_local in [0, 3). Table index k = sigma^2_local * 16. */
+     * 7/9-tap: sigma^2_local in [0, 3). Table index k = sigma^2_local * 16.
+     * 9-tap selected at runtime when sigma^2_local > 2.25 (k > 36). */
     {
         int32_t remaining = sigma_sq_target - levels[n_levels - 1].sigma_sq;
 
@@ -651,16 +816,33 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             if(prev->w >= 4 && prev->h >= 4) {
 
 #if EVE5_GAUSSIAN_FINAL_7TAP
-                /* 7-tap: k = sigma^2_local * 16 = remaining * 2 / pow4 */
+                /* 7/9-tap: k = sigma^2_local * 16 = remaining * 2 / pow4 */
                 int32_t k = remaining * 2 / pow4;
                 if(k > 48) k = 48;
                 if(k < 0) k = 0;
+
+#if EVE5_GAUSSIAN_FINAL_9TAP
+                /* Use 9-tap when sigma^2_local > 2.25 (7-tap truncation > 1%) */
+                bool use_9tap = (k > 36);
+#endif
 
                 uint8_t ew_outer = s_gauss7_weights[k][0];
                 uint8_t ew_middle = s_gauss7_weights[k][1];
                 uint8_t ew_inner = s_gauss7_weights[k][2];
                 uint8_t ew_center = (uint8_t)(256 - 2 * (ew_outer + ew_middle + ew_inner));
                 bool has_blur = (ew_outer > 0 || ew_middle > 0 || ew_inner > 0);
+
+#if EVE5_GAUSSIAN_FINAL_9TAP
+                uint8_t ew_o4 = 0, ew_o3 = 0, ew_i2 = 0, ew_i1 = 0;
+                if(use_9tap) {
+                    ew_o4 = s_gauss9_weights[k][0];
+                    ew_o3 = s_gauss9_weights[k][1];
+                    ew_i2 = s_gauss9_weights[k][2];
+                    ew_i1 = s_gauss9_weights[k][3];
+                    ew_center = (uint8_t)(256 - 2 * (ew_o4 + ew_o3 + ew_i2 + ew_i1));
+                    has_blur = true; /* k > 36 always has blur */
+                }
+#endif
 #else
                 /* 5-tap: k = sigma^2_local * 32 = remaining * 4 / pow4 */
                 int32_t k = remaining * 4 / pow4;
@@ -683,35 +865,66 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                         uint32_t ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
 
                         if(prev_addr != GA_INVALID && t_addr != GA_INVALID && ex_addr != GA_INVALID) {
-#if EVE5_GAUSSIAN_FINAL_7TAP
-                            gaussian_7tap_pass(u, prev_addr, prev->aw * 4, prev->h,
-                                               t_addr, prev->aw, prev->ah, prev->w, prev->h,
-                                               true,
-                                               ew_outer, ew_middle, ew_inner, ew_center);
+                            bool final_ok = false;
 
-                            t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-                            ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
+#if EVE5_GAUSSIAN_FINAL_9TAP
+                            if(use_9tap) {
+                                gaussian_9tap_pass(u, prev_addr, prev->aw * 4, prev->h,
+                                                   t_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                                   true,
+                                                   ew_o4, ew_o3, ew_i2, ew_i1, ew_center);
 
-                            if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
-                                gaussian_7tap_pass(u, t_addr, prev->aw * 4, prev->h,
-                                                   ex_addr, prev->aw, prev->ah, prev->w, prev->h,
-                                                   false,
-                                                   ew_outer, ew_middle, ew_inner, ew_center);
-#else
-                            gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
-                                               t_addr, prev->aw, prev->ah, prev->w, prev->h,
-                                               true, false,
-                                               ew_outer, ew_inner, ew_center);
+                                t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
+                                ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
 
-                            t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-                            ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
-
-                            if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
-                                gaussian_5tap_pass(u, t_addr, prev->aw * 4, prev->h,
-                                                   ex_addr, prev->aw, prev->ah, prev->w, prev->h,
-                                                   false, false,
-                                                   ew_outer, ew_inner, ew_center);
+                                if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
+                                    gaussian_9tap_pass(u, t_addr, prev->aw * 4, prev->h,
+                                                       ex_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                                       false,
+                                                       ew_o4, ew_o3, ew_i2, ew_i1, ew_center);
+                                    final_ok = true;
+                                }
+                            } else
 #endif
+#if EVE5_GAUSSIAN_FINAL_7TAP
+                            {
+                                gaussian_7tap_pass(u, prev_addr, prev->aw * 4, prev->h,
+                                                   t_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                                   true,
+                                                   ew_outer, ew_middle, ew_inner, ew_center);
+
+                                t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
+                                ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
+
+                                if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
+                                    gaussian_7tap_pass(u, t_addr, prev->aw * 4, prev->h,
+                                                       ex_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                                       false,
+                                                       ew_outer, ew_middle, ew_inner, ew_center);
+                                    final_ok = true;
+                                }
+                            }
+#else
+                            {
+                                gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
+                                                   t_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                                   true, false,
+                                                   ew_outer, ew_inner, ew_center);
+
+                                t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
+                                ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
+
+                                if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
+                                    gaussian_5tap_pass(u, t_addr, prev->aw * 4, prev->h,
+                                                       ex_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                                       false, false,
+                                                       ew_outer, ew_inner, ew_center);
+                                    final_ok = true;
+                                }
+                            }
+#endif
+
+                            if(final_ok) {
                                 levels[n_levels].handle = extra_handle;
                                 levels[n_levels].w = prev->w;
                                 levels[n_levels].h = prev->h;
