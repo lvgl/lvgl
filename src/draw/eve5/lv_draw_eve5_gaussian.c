@@ -3,25 +3,24 @@
  *
  * EVE5 (BT820) High-Quality Gaussian Blur via Mipmap Downsampling
  *
- * Separable 5-tap [1,4,6,4,1]/16 Gaussian kernel with nearest sampling
- * throughout the pyramid, bilinear only on final upscale. Each pyramid
- * tier applies H blur+2x downsample then V blur+2x downsample using
- * 5 nearest-sampled bitmap draws per pass. Optional extra blur passes
- * at the deepest level provide fine-grained sigma control without
- * further resolution loss. Final output is bilinear-upscaled and
- * composited with optional rounded-corner masking.
+ * Separable 5-tap Gaussian kernel with nearest sampling throughout the
+ * pyramid, bilinear only on final upscale.
  *
- * Kernel sigma_local = 1 per pass. Per-tier contribution to original
- * sigma^2 = 4^tier. Accumulated sigma^2 after n tiers = (4^n - 1) / 3:
- *   1 tier:  sigma = 1.0      4 tiers: sigma = 9.2
- *   2 tiers: sigma = 2.2      5 tiers: sigma = 18.5
- *   3 tiers: sigma = 4.6      6 tiers: sigma = 37.0
+ * Pipeline:
+ * 1. Extract blur region with edge-extended padding
+ * 2. Build pyramid: each tier applies H blur+2x downsample then V blur+2x
+ *    downsample using the binomial [1,4,6,4,1]/16 kernel (sigma^2 = 1).
+ *    Stop BEFORE the next tier would overshoot sigma^2_target.
+ * 3. Extra pass: one H+V 5-tap blur at the deepest level (no downsample)
+ *    with Gaussian weights computed for sigma^2_remaining. This hits the
+ *    exact target without interpolation between levels.
+ * 4. Single bilinear upscale from the final level back to output.
  *
- * Extra blur passes at the deepest level each add 4^n to sigma^2
- * (same contribution as one more tier, but without halving resolution).
+ * Per-tier contribution to original sigma^2 = 4^tier (8x-scaled in code).
+ * Accumulated sigma^2 after n tiers = (4^n - 1) / 3.
  *
- * 5 nearest fetches per output pixel per pass vs 4 bilinear (16 nearest)
- * for the old mipmap approach -- fewer fetches AND a proper Gaussian kernel.
+ * 5 nearest fetches per output pixel per pass. Each pyramid tier costs
+ * 2 passes (H+V) = 10 fetches. Extra pass costs 10 more.
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
@@ -39,14 +38,13 @@
  * DEFINES
  *********************/
 #define MAX_PYRAMID_TIERS 8
-#define MAX_EXTRA_PASSES  4
-#define MAX_BLUR_LEVELS   (1 + MAX_PYRAMID_TIERS + MAX_EXTRA_PASSES)
+#define MAX_BLUR_LEVELS   (1 + MAX_PYRAMID_TIERS + 1)  /* extract + pyramid + extra */
 
-/* 5-tap Gaussian weights: [1, 4, 6, 4, 1] / 16
- * Scaled to 8-bit color: 16, 64, 96, 64, 16 (sum = 256 ~ 1.0) */
-#define GAUSS_W_OUTER  16
-#define GAUSS_W_INNER  64
-#define GAUSS_W_CENTER 96
+/* Binomial kernel [1,4,6,4,1]/16 weights in 8-bit (sum = 256).
+ * Exact sigma^2 = 1.0 per pass. Used for pyramid tiers. */
+#define BINOM_W_OUTER  16
+#define BINOM_W_INNER  64
+#define BINOM_W_CENTER 96
 
 /**********************
  * TYPES
@@ -59,13 +57,61 @@ typedef struct {
 } gauss_level_t;
 
 /**********************
+ * GAUSSIAN WEIGHT TABLE
+ *
+ * Precomputed Gaussian kernel weights for 5 taps at positions [-2,-1,0,+1,+2]
+ * indexed by sigma^2 in 1/32 steps (k = 0..32, sigma^2 = k/32).
+ *
+ * For each entry: {w_outer, w_inner}. w_center = 256 - 2*w_outer - 2*w_inner.
+ * Weights are 8-bit scaled (sum = 256 ~ 1.0).
+ *
+ * Computed from: w(x) = exp(-x^2 / (2*sigma^2)), normalized over 5 taps.
+ **********************/
+static const uint8_t s_gauss_weights[33][2] = {
+    /* k=0  sigma^2=0.000 */ {  0,   0 },  /* passthrough */
+    /* k=1  sigma^2=0.031 */ {  0,   0 },
+    /* k=2  sigma^2=0.063 */ {  0,   0 },
+    /* k=3  sigma^2=0.094 */ {  0,   1 },
+    /* k=4  sigma^2=0.125 */ {  0,   5 },
+    /* k=5  sigma^2=0.156 */ {  0,  10 },
+    /* k=6  sigma^2=0.188 */ {  0,  16 },
+    /* k=7  sigma^2=0.219 */ {  0,  22 },
+    /* k=8  sigma^2=0.250 */ {  0,  27 },
+    /* k=9  sigma^2=0.281 */ {  0,  32 },
+    /* k=10 sigma^2=0.313 */ {  0,  37 },
+    /* k=11 sigma^2=0.344 */ {  1,  41 },
+    /* k=12 sigma^2=0.375 */ {  1,  44 },
+    /* k=13 sigma^2=0.406 */ {  1,  47 },
+    /* k=14 sigma^2=0.438 */ {  2,  49 },
+    /* k=15 sigma^2=0.469 */ {  2,  51 },
+    /* k=16 sigma^2=0.500 */ {  3,  53 },
+    /* k=17 sigma^2=0.531 */ {  3,  55 },
+    /* k=18 sigma^2=0.563 */ {  4,  56 },
+    /* k=19 sigma^2=0.594 */ {  5,  57 },
+    /* k=20 sigma^2=0.625 */ {  5,  58 },
+    /* k=21 sigma^2=0.656 */ {  6,  59 },
+    /* k=22 sigma^2=0.688 */ {  7,  60 },
+    /* k=23 sigma^2=0.719 */ {  7,  60 },
+    /* k=24 sigma^2=0.750 */ {  8,  61 },
+    /* k=25 sigma^2=0.781 */ {  9,  61 },
+    /* k=26 sigma^2=0.813 */ { 10,  61 },
+    /* k=27 sigma^2=0.844 */ { 10,  62 },
+    /* k=28 sigma^2=0.875 */ { 11,  62 },
+    /* k=29 sigma^2=0.906 */ { 12,  62 },
+    /* k=30 sigma^2=0.938 */ { 13,  62 },
+    /* k=31 sigma^2=0.969 */ { 13,  63 },
+    /* k=32 sigma^2=1.000 */ { 14,  63 },
+};
+
+/**********************
  * STATIC PROTOTYPES
  **********************/
 static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
                                uint32_t src_addr, int32_t src_stride, int32_t src_h,
                                uint32_t dst_addr, int32_t dst_aw, int32_t dst_ah,
                                int32_t dst_w, int32_t dst_h,
-                               bool horizontal, bool downsample);
+                               bool horizontal, bool downsample,
+                               uint8_t w_outer, uint8_t w_inner, uint8_t w_center);
 
 /**********************
  * 5-TAP GAUSSIAN PASS
@@ -74,26 +120,25 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
 /**
  * One separable 5-tap Gaussian blur pass with optional 2x downsample.
  *
- * Renders 5 nearest-sampled bitmap draws with additive blending,
- * weighted by the [1,4,6,4,1]/16 binomial kernel. Each draw samples
- * at a different source offset along the blur axis.
- *
- * With downsample=true, the transform scales 2:1 along the blur axis,
- * so each output pixel's 5 taps cover a 5-pixel window in the source
- * and the output is half the source size along that axis.
+ * Renders 5 nearest-sampled bitmap draws at integer source offsets
+ * [-2,-1,0,+1,+2] with additive blending. The caller specifies the
+ * three unique symmetric weights.
  *
  * @param horizontal  true for horizontal blur, false for vertical
  * @param downsample  true for 2x downsample along blur axis
+ * @param w_outer     weight for taps at offset +/-2
+ * @param w_inner     weight for taps at offset +/-1
+ * @param w_center    weight for tap at offset 0
  */
 static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
                                uint32_t src_addr, int32_t src_stride, int32_t src_h,
                                uint32_t dst_addr, int32_t dst_aw, int32_t dst_ah,
                                int32_t dst_w, int32_t dst_h,
-                               bool horizontal, bool downsample)
+                               bool horizontal, bool downsample,
+                               uint8_t w_outer, uint8_t w_inner, uint8_t w_center)
 {
     EVE_HalContext *phost = u->hal;
 
-    /* 2.0 in unsigned 8.8 for downsample, 1.0 for same-resolution blur */
     int32_t scale_8_8 = downsample ? 0x0200 : 0x0100;
 
     EVE_CoCmd_renderTarget(phost, dst_addr, ARGB8, dst_aw, dst_ah);
@@ -112,8 +157,6 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
     EVE_CoDl_bitmapLayout(phost, ARGB8, src_stride, src_h);
     EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, dst_w, dst_h);
 
-    /* Scale along blur axis, identity on the other.
-     * Transform: src_coord = A * out_x + C (horizontal) or E * out_y + F (vertical) */
     EVE_CoDl_bitmapTransform_identity(phost);
     if(horizontal) {
         EVE_CoDl_bitmapTransformA_ex(phost, 0, scale_8_8);
@@ -122,21 +165,19 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
         EVE_CoDl_bitmapTransformE_ex(phost, 0, scale_8_8);
     }
 
-    /* Additive blend: accumulate weighted taps into cleared-to-zero target */
     EVE_CoDl_blendFunc(phost, ONE, ONE);
 
-    static const int32_t offsets[5] = { -2, -1, 0, 1, 2 };
-    static const uint8_t weights[5] = { GAUSS_W_OUTER, GAUSS_W_INNER, GAUSS_W_CENTER,
-                                         GAUSS_W_INNER, GAUSS_W_OUTER
-                                       };
+    const int32_t offsets[5] = { -2, -1, 0, 1, 2 };
+    const uint8_t weights[5] = { w_outer, w_inner, w_center, w_inner, w_outer };
 
     EVE_CoDl_begin(phost, BITMAPS);
 
     for(int i = 0; i < 5; i++) {
+        if(weights[i] == 0) continue;
+
         EVE_CoDl_colorRgb(phost, weights[i], weights[i], weights[i]);
         EVE_CoDl_colorA(phost, weights[i]);
 
-        /* Offset in 15.8 fixed point: 1 source pixel = 256 */
         int32_t ofs = offsets[i] * 256;
 
         if(horizontal) {
@@ -168,9 +209,9 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
  *
  * Pipeline:
  * 1. Extract blur region with edge-extended padding
- * 2. Build Gaussian pyramid (separable 5-tap H+V per tier)
- * 3. Optional extra blur passes at deepest level
- * 4. Bilinear-upscale interpolated result back to layer
+ * 2. Build Gaussian pyramid (stop before overshooting target sigma^2)
+ * 3. One extra separable 5-tap pass with computed weights for remaining sigma^2
+ * 4. Single bilinear upscale from final level back to layer
  */
 bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                 Esd_GpuHandle dst_handle, const lv_draw_task_t * blur_task)
@@ -230,16 +271,15 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
      *   effective_r = R / skip_cnt
      *   sigma^2 = effective_r * (effective_r + 4) / 8
      *
-     * We match this default behavior. Without skip (skip_cnt = 1), a true
-     * Gaussian with sigma = blur_radius would be ~8x stronger. */
+     * All sigma^2 values are stored 8x-scaled to avoid integer truncation
+     * on small radii. Target = eff_r * (eff_r + 4), without the /8. */
     int32_t eff_r = (blur_radius >= 8) ? blur_radius / 2 : blur_radius;
-    /* Keep 8x scale to avoid integer truncation on small radii.
-     * All level sigma_sq values are also stored 8x-scaled. */
     int32_t sigma_sq_target = eff_r * (eff_r + 4);
     if(sigma_sq_target < 1) sigma_sq_target = 1;
 
     /* Pre-estimate pyramid depth for padding computation.
-     * sigma^2 after n tiers = (4^n - 1) / 3, scaled by 8 to match target. */
+     * Each tier contributes 4^tier to sigma^2 (8x-scaled: 4^tier * 8).
+     * Stop before the next tier would overshoot. */
     int32_t n_tiers_est = 0;
     {
         int32_t acc = 0, p4 = 1;
@@ -249,20 +289,22 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             test_w = (test_w + 1) / 2;
             test_h = (test_h + 1) / 2;
             if(test_w < 4 || test_h < 4) break;
+            if(acc + p4 * 8 > sigma_sq_target) break;
             acc += p4 * 8;
             p4 *= 4;
             n_tiers_est++;
-            if(acc >= sigma_sq_target) break;
         }
     }
 
-    /* Padding must cover the cumulative 5-tap kernel reach through all tiers.
-     * At tier k the kernel reaches +/-2 pixels at scale 2^k = +/-2*2^k original pixels.
-     * Sum through n tiers: 2*(2^0 + 2^1 + ... + 2^(n-1)) = 2*(2^n - 1).
-     * Also keep blur_radius as a floor so the extraction region is visually adequate. */
-    int32_t kernel_reach = 2 * ((1 << n_tiers_est) - 1);
-    if(n_tiers_est == 0) kernel_reach = 2;  /* single tier: just +/-2 */
-    int32_t pad = LV_MAX(blur_radius, kernel_reach);
+    /* Padding must cover the cumulative 5-tap kernel reach through all tiers
+     * plus the extra pass at the deepest level (+/-2 more local pixels).
+     * At tier k the kernel reaches +/-2 pixels at scale 2^k.
+     * Cumulative: 2*(2^0 + ... + 2^(n-1)) = 2*(2^n - 1).
+     * Extra pass at scale 2^n: +/-2*2^n more.
+     * Total: 2*(2^n - 1) + 2*2^n = 2^(n+2) - 2. */
+    int32_t total_reach = (1 << (n_tiers_est + 2)) - 2;
+    if(n_tiers_est == 0) total_reach = 4;  /* just the extra pass at 1:1 */
+    int32_t pad = LV_MAX(blur_radius, total_reach);
 
     /* ========== Padded content dimensions (16px RT alignment) ========== */
     int32_t pw = ALIGN_UP(bw + 2 * pad, 16);
@@ -332,8 +374,6 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
     /* ========== Allocate reusable H-pass temp buffer ========== */
-    /* Max temp size at tier 0: (pw/2 x ph). All deeper tiers and extra
-     * passes (at the deepest level's resolution) fit within this. */
     int32_t temp_aw = ALIGN_UP((pw + 1) / 2, 16);
     int32_t temp_ah = ALIGN_UP(ph, 16);
     uint32_t temp_size = (uint32_t)temp_aw * 4 * (uint32_t)temp_ah;
@@ -348,7 +388,6 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     gauss_level_t levels[MAX_BLUR_LEVELS];
     int32_t n_levels = 0;
 
-    /* Level 0: the unblurred padded extraction */
     levels[0].handle = extract_handle;
     levels[0].w = pw;
     levels[0].h = ph;
@@ -357,20 +396,23 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     levels[0].sigma_sq = 0;
     n_levels = 1;
 
-    int32_t pow4 = 1;  /* 4^tier, tracks this tier's unscaled sigma^2 contribution */
+    int32_t pow4 = 1;  /* 4^tier: this tier's unscaled sigma^2 contribution */
 
     for(int32_t tier = 0; tier < MAX_PYRAMID_TIERS; tier++) {
+        /* Stop BEFORE overshooting: if this tier would exceed target, don't do it.
+         * The extra pass will handle the remaining sigma^2. */
+        if(levels[n_levels - 1].sigma_sq + pow4 * 8 > sigma_sq_target) break;
+
         gauss_level_t * prev = &levels[n_levels - 1];
 
         int32_t next_w = (prev->w + 1) / 2;
         int32_t next_h = (prev->h + 1) / 2;
         if(next_w < 4 || next_h < 4) break;
-        if(n_levels >= MAX_BLUR_LEVELS) break;
+        if(n_levels >= MAX_BLUR_LEVELS - 1) break;  /* reserve slot for extra pass */
 
         int32_t next_aw = ALIGN_UP(next_w, 16);
         int32_t next_ah = ALIGN_UP(next_h, 16);
 
-        /* Allocate level output */
         uint32_t level_size = (uint32_t)next_aw * 4 * (uint32_t)next_ah;
         Esd_GpuHandle level_handle = Esd_GpuAlloc_Alloc(u->allocator, level_size, GA_ALIGN_128);
         if(Esd_GpuAlloc_Get(u->allocator, level_handle) == GA_INVALID) {
@@ -378,13 +420,12 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             break;
         }
 
-        /* H intermediate dimensions: half-width x full-height */
+        /* H intermediate: half-width x full-height */
         int32_t h_w = next_w;
         int32_t h_h = prev->h;
         int32_t h_aw = ALIGN_UP(h_w, 16);
         int32_t h_ah = ALIGN_UP(h_h, 16);
 
-        /* Re-resolve addresses after allocation */
         uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, prev->handle);
         uint32_t t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
         uint32_t lev_addr = Esd_GpuAlloc_Get(u->allocator, level_handle);
@@ -393,9 +434,9 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         /* H blur + 2x downsample: prev -> temp */
         gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                            t_addr, h_aw, h_ah, h_w, h_h,
-                           true, true);
+                           true, true,
+                           BINOM_W_OUTER, BINOM_W_INNER, BINOM_W_CENTER);
 
-        /* Re-resolve after graphicsFinish */
         t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
         lev_addr = Esd_GpuAlloc_Get(u->allocator, level_handle);
         if(t_addr == GA_INVALID || lev_addr == GA_INVALID) break;
@@ -403,7 +444,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         /* V blur + 2x downsample: temp -> level */
         gaussian_5tap_pass(u, t_addr, h_aw * 4, h_h,
                            lev_addr, next_aw, next_ah, next_w, next_h,
-                           false, true);
+                           false, true,
+                           BINOM_W_OUTER, BINOM_W_INNER, BINOM_W_CENTER);
 
         levels[n_levels].handle = level_handle;
         levels[n_levels].w = next_w;
@@ -413,91 +455,92 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         levels[n_levels].sigma_sq = prev->sigma_sq + pow4 * 8;
         n_levels++;
         pow4 *= 4;
-
-        if(levels[n_levels - 1].sigma_sq >= sigma_sq_target) break;
     }
 
-    /* ========== Phase 3: Extra blur passes at deepest level ========== */
-    /* Each extra H+V pass (no downsample) adds pow4*8 to the 8x-scaled sigma^2 —
-     * same contribution as one more pyramid tier but without halving resolution,
-     * so more detail is preserved. */
-    int32_t extra_contribution = pow4 * 8;
+    /* ========== Phase 3: Extra blur pass for remaining sigma^2 ========== */
+    /* Compute sigma^2_local at the deepest level, look up Gaussian weights,
+     * and do one separable H+V pass (no downsample) to hit the target exactly.
+     *
+     * sigma^2_local = remaining / (pow4 * 8), range [0, 1).
+     * Table index k = sigma^2_local * 32 = remaining * 4 / pow4. */
+    {
+        int32_t remaining = sigma_sq_target - levels[n_levels - 1].sigma_sq;
 
-    while(n_levels >= 2 &&
-          levels[n_levels - 1].sigma_sq < sigma_sq_target &&
-          n_levels < MAX_BLUR_LEVELS) {
+        if(remaining > 0 && n_levels < MAX_BLUR_LEVELS) {
+            int32_t k = remaining * 4 / pow4;
+            if(k > 32) k = 32;
+            if(k < 0) k = 0;
 
-        gauss_level_t * prev = &levels[n_levels - 1];
-        if(prev->w < 2 || prev->h < 2) break;
+            uint8_t ew_outer = s_gauss_weights[k][0];
+            uint8_t ew_inner = s_gauss_weights[k][1];
+            uint8_t ew_center = (uint8_t)(256 - 2 * ew_outer - 2 * ew_inner);
 
-        uint32_t extra_buf_size = (uint32_t)prev->aw * 4 * (uint32_t)prev->ah;
-        Esd_GpuHandle extra_handle = Esd_GpuAlloc_Alloc(u->allocator, extra_buf_size, GA_ALIGN_128);
-        if(Esd_GpuAlloc_Get(u->allocator, extra_handle) == GA_INVALID) break;
+            /* Skip if the kernel is effectively a passthrough (all weight on center) */
+            if(ew_outer > 0 || ew_inner > 0) {
+                gauss_level_t * prev = &levels[n_levels - 1];
 
-        uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, prev->handle);
-        uint32_t t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-        uint32_t ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
-        if(prev_addr == GA_INVALID || t_addr == GA_INVALID || ex_addr == GA_INVALID) break;
+                if(prev->w >= 4 && prev->h >= 4) {
+                    uint32_t extra_size = (uint32_t)prev->aw * 4 * (uint32_t)prev->ah;
+                    Esd_GpuHandle extra_handle = Esd_GpuAlloc_Alloc(u->allocator, extra_size, GA_ALIGN_128);
 
-        /* H blur (no downsample): prev -> temp */
-        gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
-                           t_addr, prev->aw, prev->ah, prev->w, prev->h,
-                           true, false);
+                    if(Esd_GpuAlloc_Get(u->allocator, extra_handle) != GA_INVALID) {
+                        uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, prev->handle);
+                        uint32_t t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
+                        uint32_t ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
 
-        t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-        ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
-        if(t_addr == GA_INVALID || ex_addr == GA_INVALID) break;
+                        if(prev_addr != GA_INVALID && t_addr != GA_INVALID && ex_addr != GA_INVALID) {
+                            /* H blur (no downsample): prev -> temp */
+                            gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
+                                               t_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                               true, false,
+                                               ew_outer, ew_inner, ew_center);
 
-        /* V blur (no downsample): temp -> extra */
-        gaussian_5tap_pass(u, t_addr, prev->aw * 4, prev->h,
-                           ex_addr, prev->aw, prev->ah, prev->w, prev->h,
-                           false, false);
+                            t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
+                            ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
 
-        levels[n_levels].handle = extra_handle;
-        levels[n_levels].w = prev->w;
-        levels[n_levels].h = prev->h;
-        levels[n_levels].aw = prev->aw;
-        levels[n_levels].ah = prev->ah;
-        levels[n_levels].sigma_sq = prev->sigma_sq + extra_contribution;
-        n_levels++;
+                            if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
+                                /* V blur (no downsample): temp -> extra */
+                                gaussian_5tap_pass(u, t_addr, prev->aw * 4, prev->h,
+                                                   ex_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                                   false, false,
+                                                   ew_outer, ew_inner, ew_center);
+
+                                levels[n_levels].handle = extra_handle;
+                                levels[n_levels].w = prev->w;
+                                levels[n_levels].h = prev->h;
+                                levels[n_levels].aw = prev->aw;
+                                levels[n_levels].ah = prev->ah;
+                                levels[n_levels].sigma_sq = sigma_sq_target;
+                                n_levels++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    if(n_levels < 2) {
-        /* Could not build even one blur level — skip blur gracefully */
+    if(n_levels < 1) {
         Esd_GpuAlloc_PendingFree(u->allocator, extract_handle);
         Esd_GpuAlloc_PendingFree(u->allocator, temp_handle);
         return true;
     }
 
-    /* ========== Find bracketing levels for interpolation ========== */
-    int32_t level_low = 0;
-    int32_t level_high = 1;
-
-    for(int32_t i = 0; i < n_levels - 1; i++) {
-        if(levels[i + 1].sigma_sq >= sigma_sq_target) {
-            level_low = i;
-            level_high = i + 1;
-            break;
-        }
-        /* Target exceeds all built levels: use the deepest */
-        level_low = i + 1;
-        level_high = i + 1;
-    }
-
-    uint8_t frac = 0;
-    if(level_low != level_high) {
-        int32_t range = levels[level_high].sigma_sq - levels[level_low].sigma_sq;
-        int32_t delta = sigma_sq_target - levels[level_low].sigma_sq;
-        if(range > 0) {
-            frac = (uint8_t)LV_MIN(((int64_t)delta * 255) / range, 255);
-        }
-    }
-
     /* ========== Phase 4: Composite back to layer ========== */
+    /* Single bilinear upscale from the final (deepest) level. */
+    int32_t final_idx = n_levels - 1;
+
     dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
     if(dst_addr == GA_INVALID) goto cleanup;
 
     {
+        gauss_level_t * final_lev = &levels[final_idx];
+        uint32_t final_addr = Esd_GpuAlloc_Get(u->allocator, final_lev->handle);
+        if(final_addr == GA_INVALID) goto cleanup;
+
+        uint32_t scale_x = (uint32_t)final_lev->w * 256 / (uint32_t)pw;
+        uint32_t scale_y = (uint32_t)final_lev->h * 256 / (uint32_t)ph;
+
         EVE_CoCmd_renderTarget(phost, dst_addr, ARGB8, layer_aw, layer_ah);
         EVE_CoCmd_dlStart(phost);
 
@@ -537,63 +580,20 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             EVE_CoDl_stencilOp(phost, KEEP, KEEP);
         }
 
-        /* Composite blurred levels via bilinear upscale.
-         * Blend between bracketing levels for smooth radius transitions.
-         * Transform maps output coords to source: src = out * (level_dim / padded_dim). */
-        {
-            uint8_t weight_low = 255 - frac;
-            uint8_t weight_high_val = frac;
-
-            /* Draw low-sigma level */
-            {
-                gauss_level_t * lev = &levels[level_low];
-                uint32_t lev_addr = Esd_GpuAlloc_Get(u->allocator, lev->handle);
-                if(lev_addr != GA_INVALID) {
-                    uint32_t scale_x = (uint32_t)lev->w * 256 / (uint32_t)pw;
-                    uint32_t scale_y = (uint32_t)lev->h * 256 / (uint32_t)ph;
-
-                    EVE_CoDl_colorRgb(phost, weight_low, weight_low, weight_low);
-                    EVE_CoDl_colorA(phost, weight_low);
-                    EVE_CoDl_blendFunc(phost, ONE, ZERO);
-                    EVE_CoDl_bitmapSource(phost, lev_addr);
-                    EVE_CoDl_bitmapLayout(phost, ARGB8, lev->aw * 4, lev->h);
-                    EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, pw, ph);
-                    EVE_CoDl_bitmapTransform_identity(phost);
-                    if(scale_x != 0x0100 || scale_y != 0x0100) {
-                        EVE_CoDl_bitmapTransformA_ex(phost, 0, scale_x);
-                        EVE_CoDl_bitmapTransformE_ex(phost, 0, scale_y);
-                    }
-                    EVE_CoDl_begin(phost, BITMAPS);
-                    EVE_CoDl_vertex2f_0(phost, bx1 - pad, by1 - pad_y);
-                    EVE_CoDl_end(phost);
-                }
-            }
-
-            /* Draw high-sigma level (additive blend) */
-            if(weight_high_val > 0 && level_high != level_low) {
-                gauss_level_t * lev = &levels[level_high];
-                uint32_t lev_addr = Esd_GpuAlloc_Get(u->allocator, lev->handle);
-                if(lev_addr != GA_INVALID) {
-                    uint32_t scale_x = (uint32_t)lev->w * 256 / (uint32_t)pw;
-                    uint32_t scale_y = (uint32_t)lev->h * 256 / (uint32_t)ph;
-
-                    EVE_CoDl_colorRgb(phost, weight_high_val, weight_high_val, weight_high_val);
-                    EVE_CoDl_colorA(phost, weight_high_val);
-                    EVE_CoDl_blendFunc(phost, ONE, ONE);
-                    EVE_CoDl_bitmapSource(phost, lev_addr);
-                    EVE_CoDl_bitmapLayout(phost, ARGB8, lev->aw * 4, lev->h);
-                    EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, pw, ph);
-                    EVE_CoDl_bitmapTransform_identity(phost);
-                    if(scale_x != 0x0100 || scale_y != 0x0100) {
-                        EVE_CoDl_bitmapTransformA_ex(phost, 0, scale_x);
-                        EVE_CoDl_bitmapTransformE_ex(phost, 0, scale_y);
-                    }
-                    EVE_CoDl_begin(phost, BITMAPS);
-                    EVE_CoDl_vertex2f_0(phost, bx1 - pad, by1 - pad_y);
-                    EVE_CoDl_end(phost);
-                }
-            }
+        /* Bilinear upscale from final level */
+        EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+        EVE_CoDl_blendFunc(phost, ONE, ZERO);
+        EVE_CoDl_bitmapSource(phost, final_addr);
+        EVE_CoDl_bitmapLayout(phost, ARGB8, final_lev->aw * 4, final_lev->h);
+        EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, BORDER, pw, ph);
+        EVE_CoDl_bitmapTransform_identity(phost);
+        if(scale_x != 0x0100 || scale_y != 0x0100) {
+            EVE_CoDl_bitmapTransformA_ex(phost, 0, scale_x);
+            EVE_CoDl_bitmapTransformE_ex(phost, 0, scale_y);
         }
+        EVE_CoDl_begin(phost, BITMAPS);
+        EVE_CoDl_vertex2f_0(phost, bx1 - pad, by1 - pad_y);
+        EVE_CoDl_end(phost);
 
         if(corner_radius > 0) {
             EVE_CoDl_restoreContext(phost);
