@@ -1,7 +1,7 @@
 /**
  * @file lv_draw_eve5_blur.c
  *
- * EVE5 (BT820) Hardware Blur Implementation
+ * EVE5 (BT820) Hardware Blur
  *
  * Mipmap-style downsample chain using bilinear-filtered offset draws.
  * Each level: 4 bilinear draws at half-pixel offsets, additive blend at 1/4 weight.
@@ -26,7 +26,7 @@
  * DEFINES
  *********************/
 #define MAX_BLUR_LEVELS 8
-#define BLUR_R0 4  /* Effective blur radius of mipmap level 0 (calibration vs SW renderer) */
+#define BLUR_R0 4  /* Effective blur radius of mipmap level 0 (calibrated to SW renderer) */
 
 /**********************
  * STATIC PROTOTYPES
@@ -43,9 +43,8 @@ static bool downsample_level(lv_draw_eve5_unit_t * u,
 /**
  * One mipmap downsample step: 4 bilinear draws at half-pixel offsets.
  *
- * Each draw samples a 2x2 block (bilinear) shifted by 1 source pixel.
- * Together the 4 draws cover a 3x3 source region with Gaussian-like falloff.
- * Additive blend with 1/4 weight per draw (premultiplied-safe).
+ * Each draw samples a 2x2 block shifted by 1 source pixel. Together the
+ * 4 draws cover a 3x3 region with Gaussian-like weights (1-2-1 / 2-4-2 / 1-2-1).
  */
 static bool downsample_level(lv_draw_eve5_unit_t * u,
                              uint32_t src_addr, int32_t src_w, int32_t src_h, int32_t src_stride,
@@ -57,16 +56,14 @@ static bool downsample_level(lv_draw_eve5_unit_t * u,
     EVE_CoCmd_renderTarget(phost, dst_addr, ARGB8, dst_aw, dst_ah);
     EVE_CoCmd_dlStart(phost);
 
-    /* Clear to transparent black */
     EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
     EVE_CoDl_clearColorA(phost, 0);
     EVE_CoDl_clear(phost, 1, 1, 1);
 
-    /* Scissor to content area */
     EVE_CoDl_scissorXY(phost, 0, 0);
     EVE_CoDl_scissorSize(phost, dst_w, dst_h);
 
-    /* Bitmap: 2x downsample transform (A=E=2.0 maps 2 source pixels to 1 output pixel) */
+    /* 2x downsample: A=E=2.0 maps 2 source pixels to 1 output pixel */
     EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
     EVE_CoDl_bitmapSource(phost, src_addr);
     EVE_CoDl_bitmapLayout(phost, ARGB8, src_stride, src_h);
@@ -75,18 +72,14 @@ static bool downsample_level(lv_draw_eve5_unit_t * u,
     EVE_CoDl_bitmapTransformA_ex(phost, 0, 0x0200);  /* 2.0 in unsigned 8.8 */
     EVE_CoDl_bitmapTransformE_ex(phost, 0, 0x0200);
 
-    /* Additive blend, 1/4 weight per draw (premultiplied: scale all channels equally) */
+    /* Additive blend, 1/4 weight per draw (premultiplied: scale all channels) */
     EVE_CoDl_colorRgb(phost, 64, 64, 64);
     EVE_CoDl_colorA(phost, 64);
     EVE_CoDl_blendFunc(phost, ONE, ONE);
 
-    /* 4 draws at quarter-pixel offsets in output space.
-     * vertex2f_2 = 1/4 pixel units, so +/-1 = +/-0.25 output pixels = +/-0.5 source pixels.
-     * This places each bilinear sample at half-integer source coordinates,
-     * averaging a 2x2 block. The 4 draws overlap in a 3x3 region with weights:
-     *   1 2 1
-     *   2 4 2  (Gaussian-like, no gaps)
-     *   1 2 1                                                                    */
+    /* 4 draws at quarter-pixel offsets in output space (vertex2f_2 = 1/4 pixel units).
+     * +/-1 = +/-0.25 output pixels = +/-0.5 source pixels, placing each bilinear
+     * sample at half-integer source coords to average a 2x2 block. */
     EVE_CoDl_begin(phost, BITMAPS);
     EVE_CoDl_vertex2f_2(phost, -1, -1);
     EVE_CoDl_vertex2f_2(phost, +1, -1);
@@ -107,15 +100,7 @@ static bool downsample_level(lv_draw_eve5_unit_t * u,
 
 /**
  * Hardware-accelerated blur of a region within a completed layer buffer.
- *
- * Called from the slice-splitting loop in eve5_render_layer() when a
- * LV_DRAW_TASK_TYPE_BLUR task is encountered. Modifies dst_handle in place.
- *
- * @param u           draw unit
- * @param layer       target layer (for buf_area dimensions)
- * @param dst_handle  completed layer content (modified in place)
- * @param blur_task   blur task with descriptor
- * @return            true on success
+ * Modifies dst_handle in place.
  */
 bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                        Esd_GpuHandle dst_handle, const lv_draw_task_t * blur_task)
@@ -129,10 +114,8 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     if(blur_radius <= 0) return true;
 
-    /* Full blur area in layer-relative coordinates (for rounded rect geometry).
-     * The display driver tiles the screen into strips — each tile processes the
-     * blur task clipped to its strip. The rounded rect must use the FULL area
-     * so tiles produce consistent portions of the same shape. */
+    /* Full blur area in layer-relative coords (for rounded rect geometry).
+     * Rounded rect uses FULL area so tiled strips produce consistent portions. */
     int32_t full_x1 = blur_task->area.x1 - layer_area->x1;
     int32_t full_y1 = blur_task->area.y1 - layer_area->y1;
     int32_t full_x2 = blur_task->area.x2 - layer_area->x1;
@@ -153,12 +136,10 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     if(bw <= 0 || bh <= 0) return true;
 
-    /* Clamp corner radius to the FULL blur area */
     int32_t short_side = LV_MIN(full_w, full_h);
     if(corner_radius > short_side / 2) corner_radius = short_side / 2;
     if(corner_radius < 0) corner_radius = 0;
 
-    /* Layer dimensions */
     int32_t layer_w = lv_area_get_width(layer_area);
     int32_t layer_h = lv_area_get_height(layer_area);
     int32_t layer_aw = ALIGN_UP(layer_w, 16);
@@ -168,11 +149,7 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint32_t dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
     if(dst_addr == GA_INVALID) return false;
 
-    /* Padding must survive halvings down to the deepest level we'll actually USE
-     * (not the maximum buildable). For blur_radius R with BLUR_R0 calibration:
-     *   R < R0: need level 0 only → 1 halving → pad = 2
-     *   R < 2*R0: need levels 0-1 → 2 halvings → pad = 4
-     *   etc: pad = 2^(needed_levels)  */
+    /* Compute mipmap levels needed for this blur radius */
     int32_t needed_levels;
     {
         needed_levels = 1;
@@ -183,22 +160,18 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                 r *= 2;
             }
             if(r < blur_radius) {
-                needed_levels++;  /* +1 only when level_high is actually needed for interpolation */
+                needed_levels++;  /* for interpolation to level_high */
             }
         }
     }
     int32_t pad = blur_radius;
 
-    /* Padded content dimensions: RT stride alignment only (16px).
-     * Padding is blur_radius (continuous) rather than 2^needed_levels
-     * (which doubled at power-of-two boundaries, causing visible jumps).
-     * The 2x downsample and 1/2^N upsample scales are exact regardless
-     * of whether pw is power-of-two — content maps back correctly. */
+    /* Padded content dimensions (16px RT alignment) */
     int32_t pw = ALIGN_UP(bw + 2 * pad, 16);
     int32_t ph = ALIGN_UP(bh + 2 * pad, 16);
     pad = (pw - bw) / 2;
     int32_t pad_y = (ph - bh) / 2;
-    int32_t paw = ALIGN_UP(pw, 16);  /* RT stride alignment */
+    int32_t paw = ALIGN_UP(pw, 16);
     int32_t pah = ALIGN_UP(ph, 16);
 
     /* ========== Phase 1: Extract blur region with edge padding ========== */
@@ -211,7 +184,6 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
-    /* Source offset: point bitmap source at (bx1, by1) in the layer buffer */
     uint32_t src_ofs = (uint32_t)by1 * layer_stride + (uint32_t)bx1 * 4;
 
     EVE_CoCmd_renderTarget(phost, extract_addr, ARGB8, paw, pah);
@@ -226,12 +198,10 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_CoDl_bitmapSource(phost, dst_addr + src_ofs);
     EVE_CoDl_bitmapLayout(phost, ARGB8, layer_stride, layer_h - by1);
 
-    /* Draw 1: scale source to fill entire padded buffer (stretches edges into padding).
-     * NEAREST so edge pixels repeat cleanly — BILINEAR would interpolate between
-     * the last source texel and BORDER black, creating a dark fringe.
-     * Scale rounds UP to ensure full coverage, centered via C/F transform offset. */
+    /* Draw 1: stretch source to fill padded buffer (extends edges into padding).
+     * NEAREST prevents dark fringe from BILINEAR interpolating with BORDER black. */
     {
-        uint32_t scale_a = (uint32_t)bw * 256 / (uint32_t)pw;  /* floor: source stretches to fill padding */
+        uint32_t scale_a = (uint32_t)bw * 256 / (uint32_t)pw;
         uint32_t scale_e = (uint32_t)bh * 256 / (uint32_t)ph;
         int32_t ofs_c = ((int32_t)bw * 256 - (int32_t)(scale_a * (uint32_t)pw)) / 2;
         int32_t ofs_f = ((int32_t)bh * 256 - (int32_t)(scale_e * (uint32_t)ph)) / 2;
@@ -250,7 +220,7 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
 #if 1 /* Set to 0 to see padding only (debug) */
-    /* Draw 2: blit source 1:1 at center (overwrites with exact pixels) */
+    /* Draw 2: blit source 1:1 at center (exact pixels) */
     EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, bw, bh);
     EVE_CoDl_bitmapTransform_identity(phost);
 
@@ -285,10 +255,7 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         int32_t next_aw = ALIGN_UP(next_w, 16);
         int32_t next_ah = ALIGN_UP(next_h, 16);
 
-        /* Stop: content too small for useful blur work */
         if(next_w <= 4 && next_h <= 4) break;
-
-        /* Stop: alignment floor, no actual size reduction */
         if(next_aw >= prev_aw && next_ah >= prev_ah) break;
 
         uint32_t mip_size = (uint32_t)next_aw * 4 * (uint32_t)next_ah;
@@ -324,17 +291,12 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     /* ========== Phase 3: Find bracketing levels ========== */
 
-    /* Each mipmap level's effective blur radius is R0 * 2^n, where R0 is an
-     * empirical calibration factor matching the SW renderer's IIR intensity.
-     * For blur_radius < R0, blend between extraction (unblurred) and mip[0].
-     * For blur_radius >= R0, blend between the two bracketing mip levels. */
-
+    /* Each level's effective radius is R0 * 2^n. Blend between bracketing levels. */
     int32_t level_low = -1;    /* -1 = extraction (unblurred) */
     int32_t level_high = 0;
     uint8_t frac;
 
     if(blur_radius < BLUR_R0) {
-        /* Below level 0: blend extraction with mip[0] */
         frac = (uint8_t)(blur_radius * 255 / BLUR_R0);
     }
     else {
@@ -356,9 +318,6 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
     /* ========== Phase 4: Composite back ========== */
-    /* The render target starts from nothing — blit dst_handle as the
-     * background first, then draw the blurred region on top.
-     * Two weighted draws produce: low * (1-frac) + high * frac */
 
     EVE_CoCmd_renderTarget(phost, dst_addr, ARGB8, layer_aw, layer_ah);
     EVE_CoCmd_dlStart(phost);
@@ -375,7 +334,7 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_CoDl_vertex2f_0(phost, 0, 0);
     EVE_CoDl_end(phost);
 
-    /* Scissor to blur region for the blurred overlay */
+    /* Scissor to blur region */
     EVE_CoDl_scissorXY(phost, bx1, by1);
     EVE_CoDl_scissorSize(phost, bw, bh);
 
@@ -384,9 +343,7 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     if(corner_radius > 0) {
         EVE_CoDl_saveContext(phost);
 
-        /* Build rounded rect stencil using FULL blur area coordinates.
-         * Scissor clips to the tile — each tile gets the correct portion
-         * of the same rounded rect. */
+        /* Stencil from FULL area so tiles produce consistent rounded rect portions */
         EVE_CoDl_clearStencil(phost, 0);
         EVE_CoDl_clear(phost, 0, 1, 0);
 
@@ -400,11 +357,8 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoDl_stencilOp(phost, KEEP, KEEP);
     }
 
-    /* Upsample helper: blit a padded mip level back to the blur region.
-     * Each downsample uses exactly 2.0 transform, so the upsample reverses
-     * with exactly 1/2^(level+1). The (n+1)/2 buffer rounding only adds
-     * extra edge pixels that are never sampled — content maps back correctly.
-     * Vertex at (bx1 - pad) so the 1:1 center aligns with the blur region. */
+    /* Upsample: 2x downsample used exactly 2.0 transform, so upsample with 1/2^(level+1).
+     * Vertex at (bx1 - pad) aligns the 1:1 center with the blur region. */
 #define BLIT_LEVEL(addr_, src_h_, src_aw_, scale_, weight_, blend_src_, blend_dst_) \
     do { \
         EVE_CoDl_colorRgb(phost, (weight_), (weight_), (weight_)); \
@@ -427,7 +381,6 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     {
         uint8_t weight_low = 255 - frac;
         if(level_low < 0) {
-            /* Extraction (unblurred): identity scale */
             BLIT_LEVEL(extract_addr, ph, paw, 0x0100, weight_low, ONE, ZERO);
         }
         else {
