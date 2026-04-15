@@ -969,7 +969,7 @@ void test_vram_font_release(void)
     lv_memzero(&font, sizeof(font));
     font.dsc = &dsc;
 
-    lv_draw_buf_vram_font_release(&dsc.base.vram_res, &font);
+    lv_draw_buf_vram_font_release(&dsc.base.vram_res, &dsc.base);
     TEST_ASSERT_NULL(dsc.base.vram_res);
     TEST_ASSERT_EQUAL_INT(1, s_stats_a.font_free_count);
 }
