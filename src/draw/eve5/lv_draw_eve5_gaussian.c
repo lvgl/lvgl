@@ -46,6 +46,22 @@
 #define BINOM_W_INNER  64
 #define BINOM_W_CENTER 96
 
+/* 7-tap final pass: uses taps at [-3..+3] instead of [-2..+2].
+ * Covers sigma^2_local up to ~3 vs ~1 for 5-tap, so the pyramid stops
+ * earlier and the final pass always handles a meaningful blur — no raw
+ * pyramid artifacts at tier boundaries. 7 nearest draws vs 5 per axis. */
+#ifndef EVE5_GAUSSIAN_FINAL_7TAP
+#define EVE5_GAUSSIAN_FINAL_7TAP 1
+#endif
+
+/* Maximum sigma^2_local the final pass can handle.
+ * Pyramid stops when remaining fits within this range. */
+#if EVE5_GAUSSIAN_FINAL_7TAP
+#define FINAL_MAX_LOCAL_SIGMA_SQ 3
+#else
+#define FINAL_MAX_LOCAL_SIGMA_SQ 1
+#endif
+
 /**********************
  * TYPES
  **********************/
@@ -103,6 +119,71 @@ static const uint8_t s_gauss_weights[33][2] = {
     /* k=32 sigma^2=1.000 */ { 14,  63 },
 };
 
+#if EVE5_GAUSSIAN_FINAL_7TAP
+/**********************
+ * 7-TAP GAUSSIAN WEIGHT TABLE
+ *
+ * Precomputed weights for 7 taps at positions [-3,-2,-1,0,+1,+2,+3]
+ * indexed by sigma^2 in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
+ *
+ * For each entry: {w_outer3, w_middle2, w_inner1}.
+ * w_center = 256 - 2*(w_outer3 + w_middle2 + w_inner1).
+ *
+ * Computed from: w(x) = exp(-x^2 / (2*sigma^2)), normalized over 7 taps.
+ **********************/
+static const uint8_t s_gauss7_weights[49][3] = {
+    /* k=0  sigma^2=0.000 */ {  0,   0,   0 },  /* passthrough */
+    /* k=1  sigma^2=0.063 */ {  0,   0,   0 },
+    /* k=2  sigma^2=0.125 */ {  0,   0,   5 },
+    /* k=3  sigma^2=0.188 */ {  0,   0,  16 },
+    /* k=4  sigma^2=0.250 */ {  0,   0,  27 },
+    /* k=5  sigma^2=0.313 */ {  0,   0,  37 },
+    /* k=6  sigma^2=0.375 */ {  0,   1,  44 },
+    /* k=7  sigma^2=0.438 */ {  0,   2,  49 },
+    /* k=8  sigma^2=0.500 */ {  0,   3,  53 },
+    /* k=9  sigma^2=0.563 */ {  0,   4,  56 },
+    /* k=10 sigma^2=0.625 */ {  0,   5,  58 },
+    /* k=11 sigma^2=0.688 */ {  0,   7,  60 },
+    /* k=12 sigma^2=0.750 */ {  0,   8,  61 },
+    /* k=13 sigma^2=0.813 */ {  0,  10,  61 },
+    /* k=14 sigma^2=0.875 */ {  1,  11,  62 },
+    /* k=15 sigma^2=0.938 */ {  1,  12,  62 },
+    /* k=16 sigma^2=1.000 */ {  1,  14,  62 },
+    /* k=17 sigma^2=1.063 */ {  1,  15,  62 },
+    /* k=18 sigma^2=1.125 */ {  2,  16,  62 },
+    /* k=19 sigma^2=1.188 */ {  2,  17,  62 },
+    /* k=20 sigma^2=1.250 */ {  3,  18,  61 },
+    /* k=21 sigma^2=1.313 */ {  3,  19,  61 },
+    /* k=22 sigma^2=1.375 */ {  3,  20,  61 },
+    /* k=23 sigma^2=1.438 */ {  4,  21,  60 },
+    /* k=24 sigma^2=1.500 */ {  4,  22,  60 },
+    /* k=25 sigma^2=1.563 */ {  5,  23,  60 },
+    /* k=26 sigma^2=1.625 */ {  5,  24,  59 },
+    /* k=27 sigma^2=1.688 */ {  5,  24,  59 },
+    /* k=28 sigma^2=1.750 */ {  6,  25,  58 },
+    /* k=29 sigma^2=1.813 */ {  6,  25,  58 },
+    /* k=30 sigma^2=1.875 */ {  7,  26,  58 },
+    /* k=31 sigma^2=1.938 */ {  7,  26,  57 },
+    /* k=32 sigma^2=2.000 */ {  8,  27,  57 },
+    /* k=33 sigma^2=2.063 */ {  8,  27,  57 },
+    /* k=34 sigma^2=2.125 */ {  9,  28,  56 },
+    /* k=35 sigma^2=2.188 */ {  9,  28,  56 },
+    /* k=36 sigma^2=2.250 */ {  9,  29,  56 },
+    /* k=37 sigma^2=2.313 */ { 10,  29,  55 },
+    /* k=38 sigma^2=2.375 */ { 10,  30,  55 },
+    /* k=39 sigma^2=2.438 */ { 11,  30,  54 },
+    /* k=40 sigma^2=2.500 */ { 11,  30,  54 },
+    /* k=41 sigma^2=2.563 */ { 11,  31,  54 },
+    /* k=42 sigma^2=2.625 */ { 12,  31,  53 },
+    /* k=43 sigma^2=2.688 */ { 12,  31,  53 },
+    /* k=44 sigma^2=2.750 */ { 12,  31,  53 },
+    /* k=45 sigma^2=2.813 */ { 13,  32,  52 },
+    /* k=46 sigma^2=2.875 */ { 13,  32,  52 },
+    /* k=47 sigma^2=2.938 */ { 13,  32,  52 },
+    /* k=48 sigma^2=3.000 */ { 14,  32,  52 },
+};
+#endif /* EVE5_GAUSSIAN_FINAL_7TAP */
+
 /**********************
  * STATIC PROTOTYPES
  **********************/
@@ -112,6 +193,15 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
                                int32_t dst_w, int32_t dst_h,
                                bool horizontal, bool downsample,
                                uint8_t w_outer, uint8_t w_inner, uint8_t w_center);
+
+#if EVE5_GAUSSIAN_FINAL_7TAP
+static bool gaussian_7tap_pass(lv_draw_eve5_unit_t * u,
+                               uint32_t src_addr, int32_t src_stride, int32_t src_h,
+                               uint32_t dst_addr, int32_t dst_aw, int32_t dst_ah,
+                               int32_t dst_w, int32_t dst_h,
+                               bool horizontal,
+                               uint8_t w_outer, uint8_t w_middle, uint8_t w_inner, uint8_t w_center);
+#endif
 
 /**********************
  * 5-TAP GAUSSIAN PASS
@@ -199,6 +289,79 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
     return true;
 }
 
+#if EVE5_GAUSSIAN_FINAL_7TAP
+/**********************
+ * 7-TAP GAUSSIAN PASS
+ **********************/
+
+/**
+ * One separable 7-tap Gaussian blur pass (no downsample, same resolution).
+ * Used only for the final pass. 7 nearest-sampled draws at [-3..+3].
+ */
+static bool gaussian_7tap_pass(lv_draw_eve5_unit_t * u,
+                               uint32_t src_addr, int32_t src_stride, int32_t src_h,
+                               uint32_t dst_addr, int32_t dst_aw, int32_t dst_ah,
+                               int32_t dst_w, int32_t dst_h,
+                               bool horizontal,
+                               uint8_t w_outer, uint8_t w_middle, uint8_t w_inner, uint8_t w_center)
+{
+    EVE_HalContext *phost = u->hal;
+
+    EVE_CoCmd_renderTarget(phost, dst_addr, ARGB8, dst_aw, dst_ah);
+    EVE_CoCmd_dlStart(phost);
+
+    EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+    EVE_CoDl_clearColorA(phost, 0);
+    EVE_CoDl_clear(phost, 1, 1, 1);
+
+    EVE_CoDl_scissorXY(phost, 0, 0);
+    EVE_CoDl_scissorSize(phost, dst_w, dst_h);
+    EVE_CoDl_vertexFormat(phost, 0);
+
+    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+    EVE_CoDl_bitmapSource(phost, src_addr);
+    EVE_CoDl_bitmapLayout(phost, ARGB8, src_stride, src_h);
+    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, dst_w, dst_h);
+
+    EVE_CoDl_bitmapTransform_identity(phost);
+
+    EVE_CoDl_blendFunc(phost, ONE, ONE);
+
+    const int32_t offsets[7] = { -3, -2, -1, 0, 1, 2, 3 };
+    const uint8_t weights[7] = { w_outer, w_middle, w_inner, w_center,
+                                  w_inner, w_middle, w_outer
+                                };
+
+    EVE_CoDl_begin(phost, BITMAPS);
+
+    for(int i = 0; i < 7; i++) {
+        if(weights[i] == 0) continue;
+
+        EVE_CoDl_colorRgb(phost, weights[i], weights[i], weights[i]);
+        EVE_CoDl_colorA(phost, weights[i]);
+
+        int32_t ofs = offsets[i] * 256;
+
+        if(horizontal) {
+            EVE_CoDl_bitmapTransformC(phost, ofs);
+        }
+        else {
+            EVE_CoDl_bitmapTransformF(phost, ofs);
+        }
+
+        EVE_CoDl_vertex2f_0(phost, 0, 0);
+    }
+
+    EVE_CoDl_end(phost);
+
+    EVE_CoDl_display(phost);
+    EVE_CoCmd_swap(phost);
+    EVE_CoCmd_graphicsFinish(phost);
+
+    return true;
+}
+#endif /* EVE5_GAUSSIAN_FINAL_7TAP */
+
 /**********************
  * GAUSSIAN BLUR ENTRY POINT
  **********************/
@@ -279,7 +442,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     /* Pre-estimate pyramid depth for padding computation.
      * Each tier contributes 4^tier to sigma^2 (8x-scaled: 4^tier * 8).
-     * Stop before the next tier would overshoot. */
+     * Stop when remaining fits in the final pass's range (FINAL_MAX_LOCAL_SIGMA_SQ).
+     * With 7-tap this stops earlier, keeping more resolution for the final pass. */
     int32_t n_tiers_est = 0;
     {
         int32_t acc = 0, p4 = 1;
@@ -289,21 +453,28 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             test_w = (test_w + 1) / 2;
             test_h = (test_h + 1) / 2;
             if(test_w < 4 || test_h < 4) break;
-            if(acc + p4 * 8 > sigma_sq_target) break;
+            if(sigma_sq_target - acc <= FINAL_MAX_LOCAL_SIGMA_SQ * p4 * 8) break;
             acc += p4 * 8;
             p4 *= 4;
             n_tiers_est++;
         }
     }
 
-    /* Padding must cover the cumulative 5-tap kernel reach through all tiers
-     * plus the extra pass at the deepest level (+/-2 more local pixels).
-     * At tier k the kernel reaches +/-2 pixels at scale 2^k.
-     * Cumulative: 2*(2^0 + ... + 2^(n-1)) = 2*(2^n - 1).
-     * Extra pass at scale 2^n: +/-2*2^n more.
-     * Total: 2*(2^n - 1) + 2*2^n = 2^(n+2) - 2. */
-    int32_t total_reach = (1 << (n_tiers_est + 2)) - 2;
-    if(n_tiers_est == 0) total_reach = 4;  /* just the extra pass at 1:1 */
+    /* Padding must cover the cumulative 5-tap kernel reach through all pyramid
+     * tiers plus the final pass at the deepest level.
+     * Pyramid: +/-2 per tier at scale 2^k -> cumulative 2*(2^n - 1).
+     * Final pass: +/-HALF_TAP at scale 2^n -> HALF_TAP * 2^n more.
+     * 5-tap HALF_TAP=2, 7-tap HALF_TAP=3. */
+#if EVE5_GAUSSIAN_FINAL_7TAP
+    #define FINAL_HALF_TAP 3
+#else
+    #define FINAL_HALF_TAP 2
+#endif
+    int32_t scale_n = 1 << n_tiers_est;
+    int32_t pyramid_reach = 2 * (scale_n - 1);
+    int32_t final_reach = FINAL_HALF_TAP * scale_n;
+    int32_t total_reach = pyramid_reach + final_reach;
+    if(n_tiers_est == 0) total_reach = FINAL_HALF_TAP * 2;
     int32_t pad = LV_MAX(blur_radius, total_reach);
 
     /* ========== Padded content dimensions (16px RT alignment) ========== */
@@ -399,9 +570,11 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     int32_t pow4 = 1;  /* 4^tier: this tier's unscaled sigma^2 contribution */
 
     for(int32_t tier = 0; tier < MAX_PYRAMID_TIERS; tier++) {
-        /* Stop BEFORE overshooting: if this tier would exceed target, don't do it.
-         * The extra pass will handle the remaining sigma^2. */
-        if(levels[n_levels - 1].sigma_sq + pow4 * 8 > sigma_sq_target) break;
+        /* Stop when remaining sigma^2 fits within the final pass's range.
+         * With 7-tap (MAX=3) this stops earlier than 5-tap (MAX=1), keeping
+         * higher resolution for the final pass — no raw pyramid at boundaries. */
+        int32_t remaining_before = sigma_sq_target - levels[n_levels - 1].sigma_sq;
+        if(remaining_before <= FINAL_MAX_LOCAL_SIGMA_SQ * pow4 * 8) break;
 
         gauss_level_t * prev = &levels[n_levels - 1];
 
@@ -457,29 +630,44 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         pow4 *= 4;
     }
 
-    /* ========== Phase 3: Extra blur pass for remaining sigma^2 ========== */
+    /* ========== Phase 3: Final blur pass for remaining sigma^2 ========== */
     /* Compute sigma^2_local at the deepest level, look up Gaussian weights,
-     * and do one separable H+V pass (no downsample) to hit the target exactly.
+     * and do one separable H+V pass (no downsample) to hit the target.
      *
-     * sigma^2_local = remaining / (pow4 * 8), range [0, 1).
-     * Table index k = sigma^2_local * 32 = remaining * 4 / pow4. */
+     * 5-tap: sigma^2_local in [0, 1). Table index k = sigma^2_local * 32.
+     * 7-tap: sigma^2_local in [0, 3). Table index k = sigma^2_local * 16. */
     {
         int32_t remaining = sigma_sq_target - levels[n_levels - 1].sigma_sq;
 
         if(remaining > 0 && n_levels < MAX_BLUR_LEVELS) {
-            int32_t k = remaining * 4 / pow4;
-            if(k > 32) k = 32;
-            if(k < 0) k = 0;
+            gauss_level_t * prev = &levels[n_levels - 1];
 
-            uint8_t ew_outer = s_gauss_weights[k][0];
-            uint8_t ew_inner = s_gauss_weights[k][1];
-            uint8_t ew_center = (uint8_t)(256 - 2 * ew_outer - 2 * ew_inner);
+            if(prev->w >= 4 && prev->h >= 4) {
 
-            /* Skip if the kernel is effectively a passthrough (all weight on center) */
-            if(ew_outer > 0 || ew_inner > 0) {
-                gauss_level_t * prev = &levels[n_levels - 1];
+#if EVE5_GAUSSIAN_FINAL_7TAP
+                /* 7-tap: k = sigma^2_local * 16 = remaining * 2 / pow4 */
+                int32_t k = remaining * 2 / pow4;
+                if(k > 48) k = 48;
+                if(k < 0) k = 0;
 
-                if(prev->w >= 4 && prev->h >= 4) {
+                uint8_t ew_outer = s_gauss7_weights[k][0];
+                uint8_t ew_middle = s_gauss7_weights[k][1];
+                uint8_t ew_inner = s_gauss7_weights[k][2];
+                uint8_t ew_center = (uint8_t)(256 - 2 * (ew_outer + ew_middle + ew_inner));
+                bool has_blur = (ew_outer > 0 || ew_middle > 0 || ew_inner > 0);
+#else
+                /* 5-tap: k = sigma^2_local * 32 = remaining * 4 / pow4 */
+                int32_t k = remaining * 4 / pow4;
+                if(k > 32) k = 32;
+                if(k < 0) k = 0;
+
+                uint8_t ew_outer = s_gauss_weights[k][0];
+                uint8_t ew_inner = s_gauss_weights[k][1];
+                uint8_t ew_center = (uint8_t)(256 - 2 * ew_outer - 2 * ew_inner);
+                bool has_blur = (ew_outer > 0 || ew_inner > 0);
+#endif
+
+                if(has_blur) {
                     uint32_t extra_size = (uint32_t)prev->aw * 4 * (uint32_t)prev->ah;
                     Esd_GpuHandle extra_handle = Esd_GpuAlloc_Alloc(u->allocator, extra_size, GA_ALIGN_128);
 
@@ -489,7 +677,21 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                         uint32_t ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
 
                         if(prev_addr != GA_INVALID && t_addr != GA_INVALID && ex_addr != GA_INVALID) {
-                            /* H blur (no downsample): prev -> temp */
+#if EVE5_GAUSSIAN_FINAL_7TAP
+                            gaussian_7tap_pass(u, prev_addr, prev->aw * 4, prev->h,
+                                               t_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                               true,
+                                               ew_outer, ew_middle, ew_inner, ew_center);
+
+                            t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
+                            ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
+
+                            if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
+                                gaussian_7tap_pass(u, t_addr, prev->aw * 4, prev->h,
+                                                   ex_addr, prev->aw, prev->ah, prev->w, prev->h,
+                                                   false,
+                                                   ew_outer, ew_middle, ew_inner, ew_center);
+#else
                             gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                                                t_addr, prev->aw, prev->ah, prev->w, prev->h,
                                                true, false,
@@ -499,12 +701,11 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                             ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
 
                             if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
-                                /* V blur (no downsample): temp -> extra */
                                 gaussian_5tap_pass(u, t_addr, prev->aw * 4, prev->h,
                                                    ex_addr, prev->aw, prev->ah, prev->w, prev->h,
                                                    false, false,
                                                    ew_outer, ew_inner, ew_center);
-
+#endif
                                 levels[n_levels].handle = extra_handle;
                                 levels[n_levels].w = prev->w;
                                 levels[n_levels].h = prev->h;
