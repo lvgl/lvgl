@@ -690,7 +690,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     /* Image glyph (e.g., emoji): draw as full-color image */
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
-        const void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
+        void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
         if(img_src == NULL) return;
 
         int32_t x = glyph_dsc->letter_coords->x1 - layer->buf_area.x1;
@@ -797,7 +797,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_NONE) return;
 
     if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_IMAGE) {
-        const void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
+        void * img_src = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
         if(img_src == NULL) return;
 
         int32_t x = glyph_dsc->letter_coords->x1 - layer->buf_area.x1;

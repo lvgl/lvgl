@@ -21,7 +21,7 @@
 
 #include "../lv_draw.h"
 #include "../lv_draw_image.h"
-#include "../lv_draw_mask_private.h"
+#include "../lv_draw_mask.h"
 
 /**********************
  * HELPER FUNCTIONS

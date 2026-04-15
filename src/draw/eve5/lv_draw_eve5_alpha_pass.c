@@ -27,7 +27,7 @@
 #include "../lv_draw_line.h"
 #include "../lv_draw_triangle.h"
 #include "../lv_draw_arc.h"
-#include "../lv_draw_mask_private.h"
+#include "../lv_draw_mask.h"
 
 #if !LV_DRAW_EVE5_NO_FLOAT
     #include <math.h>
