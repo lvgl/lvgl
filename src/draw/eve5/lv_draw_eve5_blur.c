@@ -101,9 +101,20 @@ static bool downsample_level(lv_draw_eve5_unit_t * u,
 /**
  * Hardware-accelerated blur of a region within a completed layer buffer.
  * Modifies dst_handle in place.
+ *
+ * Delegates to lv_draw_eve5_gaussian_blur() for high-quality separable
+ * 5-tap Gaussian pyramid. The legacy bilinear mipmap implementation
+ * is retained below for reference.
  */
 bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                        Esd_GpuHandle dst_handle, const lv_draw_task_t * blur_task)
+{
+    return lv_draw_eve5_gaussian_blur(u, layer, dst_handle, blur_task);
+}
+
+#if 0 /* Legacy bilinear mipmap blur — retained for reference */
+static bool lv_draw_eve5_blur_legacy(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                     Esd_GpuHandle dst_handle, const lv_draw_task_t * blur_task)
 {
     EVE_HalContext *phost = u->hal;
     const lv_draw_blur_dsc_t * dsc = blur_task->draw_dsc;
@@ -416,5 +427,6 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     return true;
 }
+#endif /* Legacy bilinear mipmap blur */
 
 #endif /* LV_USE_DRAW_EVE5 */
