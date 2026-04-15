@@ -370,6 +370,7 @@ static inline void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_fla
  * @return      true if the buffer is now resident for the unit
  */
 #if LV_USE_DRAW_VRAM
+struct _lv_font_dsc_base_t;
 /**
  * Release a font's VRAM residency via its owning draw unit.
  * Calls vram_font_free_cb which frees GPU resources and NULLs the vram_res.
