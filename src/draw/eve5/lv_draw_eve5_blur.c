@@ -187,13 +187,15 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             }
         }
     }
-    int32_t pad = 1 << needed_levels;
+    int32_t pad = blur_radius;
 
-    /* Padded content dimensions: align to 2^needed_levels so every mipmap
-     * halving is exact. RT stride alignment (16) is separate. */
-    int32_t mip_align = 1 << needed_levels;
-    int32_t pw = ALIGN_UP(bw + 2 * pad, mip_align);
-    int32_t ph = ALIGN_UP(bh + 2 * pad, mip_align);
+    /* Padded content dimensions: RT stride alignment only (16px).
+     * Padding is blur_radius (continuous) rather than 2^needed_levels
+     * (which doubled at power-of-two boundaries, causing visible jumps).
+     * The 2x downsample and 1/2^N upsample scales are exact regardless
+     * of whether pw is power-of-two — content maps back correctly. */
+    int32_t pw = ALIGN_UP(bw + 2 * pad, 16);
+    int32_t ph = ALIGN_UP(bh + 2 * pad, 16);
     pad = (pw - bw) / 2;
     int32_t pad_y = (ph - bh) / 2;
     int32_t paw = ALIGN_UP(pw, 16);  /* RT stride alignment */
@@ -399,11 +401,9 @@ bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
     /* Upsample helper: blit a padded mip level back to the blur region.
-     * Downscales are always exactly 2×, so upsample is a clean pow2:
-     *   level -1 (extraction): scale = 256 (identity, 1:1)
-     *   level 0: scale = 128 (2× upsample)
-     *   level 1: scale = 64  (4× upsample)
-     *   level n: scale = 256 >> (n + 1)
+     * Each downsample uses exactly 2.0 transform, so the upsample reverses
+     * with exactly 1/2^(level+1). The (n+1)/2 buffer rounding only adds
+     * extra edge pixels that are never sampled — content maps back correctly.
      * Vertex at (bx1 - pad) so the 1:1 center aligns with the blur region. */
 #define BLIT_LEVEL(addr_, src_h_, src_aw_, scale_, weight_, blend_src_, blend_dst_) \
     do { \
