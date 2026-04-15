@@ -99,7 +99,12 @@ void test_draw_drop_shadow_invalidate(void)
     lv_obj_add_style(obj, &style, LV_PART_INDICATOR);
     lv_obj_set_pos(obj, 10, 10);
     lv_arc_set_value(obj, 50);
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
+
+    /*Don't use TEST_ASSERT_EQUAL_SCREENSHOT as it invalidates the screen removing all
+     *manual partial invalidations below*/
+    const char * path = "draw/draw_drop_shadow_invalidate.png";
+    lv_refr_now(NULL);
+    TEST_ASSERT_MESSAGE(lv_test_screenshot_compare_core(path), path);
 
     lv_arc_set_value(obj, 10);
     lv_refr_now(NULL);
@@ -123,11 +128,14 @@ void test_draw_drop_shadow_invalidate(void)
     lv_refr_now(NULL);
 
     lv_arc_set_value(obj, 50);
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_MESSAGE(lv_test_screenshot_compare_core(path), path);
 
     lv_area_t a = {20, 20, 200, 60};
     lv_obj_invalidate_area(obj, &a);
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_drop_shadow_invalidate.png");
+    lv_refr_now(NULL);
+    TEST_ASSERT_MESSAGE(lv_test_screenshot_compare_core(path), path);
 #endif
 }
 
