@@ -582,48 +582,57 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
         return;
     }
 
-    /* Blend-mode splitting: scan for IMAGE/LAYER tasks with non-standard blend modes.
-     * Each such task becomes an isolated slice, with the accumulated content before it
-     * as the "dst" and the task rendered in isolation as the "src". The per-channel
-     * blend math produces the composited result, which becomes prev_handle for the
-     * next slice. */
+    /* Slice-boundary splitting: scan for tasks that require splitting the render
+     * queue into slices. Two kinds:
+     * - Blend modes (IMAGE/LAYER with non-standard blend): isolated render + per-channel blend math
+     * - Blur: mipmap downsample chain on the accumulated content
+     * Each such task becomes a slice boundary. */
     {
         lv_draw_task_t * blend_task = NULL;
         lv_draw_task_t * t = layer->draw_task_head;
         while(t) {
             if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-               t->state == LV_DRAW_TASK_STATE_QUEUED &&
-               (t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER)) {
-                const lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
-                   dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
+               t->state == LV_DRAW_TASK_STATE_QUEUED) {
+                if(t->type == LV_DRAW_TASK_TYPE_BLUR) {
                     blend_task = t;
                     break;
+                }
+                if((t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER)) {
+                    const lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                    if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
+                       dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
+                        blend_task = t;
+                        break;
+                    }
                 }
             }
             t = t->next;
         }
 
         if(blend_task != NULL) {
-            EVE5_LOG("EVE5: Blend mode split at task %p (mode=%d)", (void *)blend_task,
-                     ((const lv_draw_image_dsc_t *)blend_task->draw_dsc)->blend_mode);
+            EVE5_LOG("EVE5: Slice split at task %p (type=%d)", (void *)blend_task, blend_task->type);
 
             Esd_GpuHandle prev = GA_HANDLE_INVALID;
             lv_draw_task_t * cursor = layer->draw_task_head;
 
             while(cursor) {
-                /* Find next blend-mode task from cursor */
+                /* Find next slice-boundary task from cursor */
                 blend_task = NULL;
                 t = cursor;
                 while(t) {
                     if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-                       t->state == LV_DRAW_TASK_STATE_QUEUED &&
-                       (t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER)) {
-                        const lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                        if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
-                           dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
+                       t->state == LV_DRAW_TASK_STATE_QUEUED) {
+                        if(t->type == LV_DRAW_TASK_TYPE_BLUR) {
                             blend_task = t;
                             break;
+                        }
+                        if((t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER)) {
+                            const lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                            if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
+                               dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
+                                blend_task = t;
+                                break;
+                            }
                         }
                     }
                     t = t->next;
@@ -682,6 +691,16 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     }
                 }
                 /* else: no tasks before blend task, prev stays as-is (from previous iteration or INVALID) */
+
+                /* Blur: modify prev in place, no isolation slice or blend math needed */
+                if(blend_task->type == LV_DRAW_TASK_TYPE_BLUR) {
+                    if(prev.Id != GA_HANDLE_INVALID.Id) {
+                        lv_draw_eve5_blur(u, layer, prev, blend_task);
+                    }
+                    blend_task->state = LV_DRAW_TASK_STATE_FINISHED;
+                    cursor = blend_task->next;
+                    continue;
+                }
 
                 /* If prev is still INVALID (first task in queue is a blend task with nothing before),
                  * the dst is effectively transparent black. We still need a dst buffer for the

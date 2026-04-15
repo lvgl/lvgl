@@ -582,6 +582,10 @@ bool lv_draw_eve5_image_needs_alpha_rendertarget(const lv_draw_task_t * t);
 /* Canvas optimization */
 bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
 
+/* Blur (mipmap downsample chain, see lv_draw_eve5_blur.c) */
+bool lv_draw_eve5_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                       Esd_GpuHandle dst_handle, const lv_draw_task_t * blur_task);
+
 /* Blend mode support (MULTIPLY, SUBTRACTIVE, DIFFERENCE) */
 bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
