@@ -219,16 +219,44 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint32_t dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
     if(dst_addr == GA_INVALID) return false;
 
+    /* LVGL blur_radius maps to sigma = blur_radius / 2 (matching the SW renderer's
+     * convention where blur_radius is the visual extent, roughly 2-3 sigma). */
+    int32_t sigma_sq_target = (blur_radius * blur_radius + 2) / 4;
+    if(sigma_sq_target < 1) sigma_sq_target = 1;
+
+    /* Pre-estimate pyramid depth for padding computation.
+     * sigma^2 after n tiers = (4^n - 1) / 3. Find n where this >= sigma_sq_target. */
+    int32_t n_tiers_est = 0;
+    {
+        int32_t acc = 0, p4 = 1;
+        int32_t test_w = bw + 2 * blur_radius;
+        int32_t test_h = bh + 2 * blur_radius;
+        while(n_tiers_est < MAX_PYRAMID_TIERS) {
+            test_w = (test_w + 1) / 2;
+            test_h = (test_h + 1) / 2;
+            if(test_w < 4 || test_h < 4) break;
+            acc += p4;
+            p4 *= 4;
+            n_tiers_est++;
+            if(acc >= sigma_sq_target) break;
+        }
+    }
+
+    /* Padding must cover the cumulative 5-tap kernel reach through all tiers.
+     * At tier k the kernel reaches +/-2 pixels at scale 2^k = +/-2*2^k original pixels.
+     * Sum through n tiers: 2*(2^0 + 2^1 + ... + 2^(n-1)) = 2*(2^n - 1).
+     * Also keep blur_radius as a floor so the extraction region is visually adequate. */
+    int32_t kernel_reach = 2 * ((1 << n_tiers_est) - 1);
+    if(n_tiers_est == 0) kernel_reach = 2;  /* single tier: just +/-2 */
+    int32_t pad = LV_MAX(blur_radius, kernel_reach);
+
     /* ========== Padded content dimensions (16px RT alignment) ========== */
-    int32_t pad = blur_radius;
     int32_t pw = ALIGN_UP(bw + 2 * pad, 16);
     int32_t ph = ALIGN_UP(bh + 2 * pad, 16);
     pad = (pw - bw) / 2;
     int32_t pad_y = (ph - bh) / 2;
     int32_t paw = ALIGN_UP(pw, 16);
     int32_t pah = ALIGN_UP(ph, 16);
-
-    int32_t sigma_sq_target = blur_radius * blur_radius;
 
     /* ========== Phase 1: Extract blur region with edge padding ========== */
 
