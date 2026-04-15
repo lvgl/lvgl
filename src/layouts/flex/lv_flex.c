@@ -335,10 +335,9 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
     bool first_item = true;
     while(item) {
-        if(!first_item && lv_obj_has_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK))
-            break;
-
         if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
+            if(!first_item && lv_obj_has_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK))
+                break;
             uint8_t grow_value = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
             if(grow_value) {
                 int32_t min_size = f->row ? lv_obj_calc_dynamic_width(item, LV_STYLE_MIN_WIDTH)
