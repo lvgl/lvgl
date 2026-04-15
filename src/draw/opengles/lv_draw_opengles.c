@@ -231,29 +231,6 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
-    switch(task->type) {
-        case LV_DRAW_TASK_TYPE_FILL:
-        case LV_DRAW_TASK_TYPE_BORDER:
-        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-        case LV_DRAW_TASK_TYPE_LABEL:
-        case LV_DRAW_TASK_TYPE_ARC:
-        case LV_DRAW_TASK_TYPE_LINE:
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
-        case LV_DRAW_TASK_TYPE_LAYER:
-#if LV_USE_3DTEXTURE
-        case LV_DRAW_TASK_TYPE_3D:
-#endif
-            break;
-        case LV_DRAW_TASK_TYPE_IMAGE: {
-                if(((lv_draw_image_dsc_t *)task->draw_dsc)->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
-                    return 0;
-                }
-                break;
-            }
-        default:
-            return 0;
-    }
-
     /*If not refreshing the display probably it's a canvas rendering
      *which his not supported in OpenGL as it's not a texture.*/
     if(lv_refr_get_disp_refreshing() == NULL) return 0;
@@ -398,7 +375,7 @@ static unsigned int draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * 
         default:
             /*The malloced cache_data->draw_dsc will be freed automatically on failure
             *in opengles_texture_cache_free_cb*/
-            LV_ASSERT(false);
+            LV_LOG_ERROR("OpenGLES draw unit does not support tasks of type %d", task->type);
             if(obj) {
                 lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
             }
