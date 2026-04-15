@@ -243,10 +243,10 @@ struct _lv_draw_unit_t {
      * Free font VRAM residency. Called when a different draw unit encounters
      * a font with vram_res owned by this unit. The callback must free GPU
      * resources, unlink from internal tracking, free the vram_res struct,
-     * and NULL out font->vram_res.
-     * @param font  pointer to lv_font_t whose vram_res is being released
+     * and NULL out font_dsc->vram_res.
+     * @param font_dsc  pointer to lv_font_dsc_base_t whose vram_res is being released
      */
-    void (*vram_font_free_cb)(lv_draw_unit_t * draw_unit, void * font);
+    void (*vram_font_free_cb)(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t * font_dsc);
 #endif
 };
 

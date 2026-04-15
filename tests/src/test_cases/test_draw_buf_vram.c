@@ -153,13 +153,12 @@ static bool fake_vram_check_cb(lv_draw_unit_t * unit, lv_draw_buf_t * buf)
     return vr->valid;
 }
 
-static void fake_vram_font_free_cb(lv_draw_unit_t * unit, void * font)
+static void fake_vram_font_free_cb(lv_draw_unit_t * unit, lv_font_dsc_base_t * font_dsc)
 {
     fake_vram_stats_t * stats = get_stats(unit);
     stats->font_free_count++;
 
-    lv_font_t * f = (lv_font_t *)font;
-    lv_font_dsc_base_t * dsc_base = (lv_font_dsc_base_t *)f->dsc;
+    lv_font_dsc_base_t * dsc_base = font_dsc;
     if(dsc_base && dsc_base->vram_res) {
         fake_vram_res_t * vr = (fake_vram_res_t *)dsc_base->vram_res;
         if(vr->fake_vram) {

@@ -640,11 +640,11 @@ void lv_image_buf_free(lv_image_dsc_t * dsc)
 
 #if LV_USE_DRAW_VRAM
 
-void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, void * font)
+void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, lv_font_dsc_base_t * font_dsc)
 {
     if(vram_res == NULL || *vram_res == NULL) return;
     lv_draw_unit_t * unit = (*vram_res)->unit;
-    unit->vram_font_free_cb(unit, font);
+    unit->vram_font_free_cb(unit, font_dsc);
 }
 
 /**

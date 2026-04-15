@@ -41,7 +41,7 @@ extern "C" {
  * Must be the first member of every font dsc struct so that the draw unit
  * can access vram_res generically via ((lv_font_dsc_base_t *)font->dsc)->vram_res.
  */
-typedef struct {
+typedef struct _lv_font_dsc_base_t {
     struct _lv_draw_buf_vram_res_t * vram_res;  /**< GPU residency, NULL if CPU-only */
 } lv_font_dsc_base_t;
 

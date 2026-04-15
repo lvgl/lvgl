@@ -374,10 +374,10 @@ static inline void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_fla
  * Release a font's VRAM residency via its owning draw unit.
  * Calls vram_font_free_cb which frees GPU resources and NULLs the vram_res.
  * Safe to call if vram_res is already NULL.
- * @param vram_res  pointer to the vram_res pointer (e.g. &font->vram_res)
- * @param font      opaque pointer to lv_font_t, forwarded to vram_font_free_cb
+ * @param vram_res  pointer to the vram_res pointer (e.g. &font_dsc->vram_res)
+ * @param font_dsc  pointer to lv_font_dsc_base_t, forwarded to vram_font_free_cb
  */
-void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, void * font);
+void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, struct _lv_font_dsc_base_t * font_dsc);
 
 bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit);
 #else
