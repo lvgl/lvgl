@@ -55,7 +55,7 @@ typedef struct {
     Esd_GpuHandle handle;
     int32_t w, h;       /**< Logical pixel dimensions */
     int32_t aw, ah;     /**< 16-byte aligned dimensions for render target */
-    int32_t sigma_sq;   /**< Accumulated variance in original pixels */
+    int32_t sigma_sq;   /**< Accumulated variance in original pixels, 8x-scaled */
 } gauss_level_t;
 
 /**********************
@@ -219,13 +219,27 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint32_t dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
     if(dst_addr == GA_INVALID) return false;
 
-    /* LVGL blur_radius maps to sigma = blur_radius / 2 (matching the SW renderer's
-     * convention where blur_radius is the visual extent, roughly 2-3 sigma). */
-    int32_t sigma_sq_target = (blur_radius * blur_radius + 2) / 4;
+    /* Match the LVGL SW renderer's effective blur strength.
+     *
+     * The SW blur is a 4-direction IIR exponential filter (not Gaussian):
+     *   alpha = R / (R + 4), applied forward+backward per axis.
+     *   Per-axis variance: sigma^2 = R * (R + 4) / 8.
+     *
+     * With default LV_BLUR_QUALITY_AUTO, it also applies skip_cnt = 2 for
+     * blur_radius >= 8, halving the effective radius before blurring:
+     *   effective_r = R / skip_cnt
+     *   sigma^2 = effective_r * (effective_r + 4) / 8
+     *
+     * We match this default behavior. Without skip (skip_cnt = 1), a true
+     * Gaussian with sigma = blur_radius would be ~8x stronger. */
+    int32_t eff_r = (blur_radius >= 8) ? blur_radius / 2 : blur_radius;
+    /* Keep 8x scale to avoid integer truncation on small radii.
+     * All level sigma_sq values are also stored 8x-scaled. */
+    int32_t sigma_sq_target = eff_r * (eff_r + 4);
     if(sigma_sq_target < 1) sigma_sq_target = 1;
 
     /* Pre-estimate pyramid depth for padding computation.
-     * sigma^2 after n tiers = (4^n - 1) / 3. Find n where this >= sigma_sq_target. */
+     * sigma^2 after n tiers = (4^n - 1) / 3, scaled by 8 to match target. */
     int32_t n_tiers_est = 0;
     {
         int32_t acc = 0, p4 = 1;
@@ -235,7 +249,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             test_w = (test_w + 1) / 2;
             test_h = (test_h + 1) / 2;
             if(test_w < 4 || test_h < 4) break;
-            acc += p4;
+            acc += p4 * 8;
             p4 *= 4;
             n_tiers_est++;
             if(acc >= sigma_sq_target) break;
@@ -343,7 +357,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     levels[0].sigma_sq = 0;
     n_levels = 1;
 
-    int32_t pow4 = 1;  /* 4^tier, tracks this tier's sigma^2 contribution */
+    int32_t pow4 = 1;  /* 4^tier, tracks this tier's unscaled sigma^2 contribution */
 
     for(int32_t tier = 0; tier < MAX_PYRAMID_TIERS; tier++) {
         gauss_level_t * prev = &levels[n_levels - 1];
@@ -396,7 +410,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         levels[n_levels].h = next_h;
         levels[n_levels].aw = next_aw;
         levels[n_levels].ah = next_ah;
-        levels[n_levels].sigma_sq = prev->sigma_sq + pow4;
+        levels[n_levels].sigma_sq = prev->sigma_sq + pow4 * 8;
         n_levels++;
         pow4 *= 4;
 
@@ -404,10 +418,10 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
     /* ========== Phase 3: Extra blur passes at deepest level ========== */
-    /* Each extra H+V pass (no downsample) adds pow4 to sigma^2 — same
-     * contribution as one more pyramid tier but without halving resolution,
+    /* Each extra H+V pass (no downsample) adds pow4*8 to the 8x-scaled sigma^2 —
+     * same contribution as one more pyramid tier but without halving resolution,
      * so more detail is preserved. */
-    int32_t extra_contribution = pow4;
+    int32_t extra_contribution = pow4 * 8;
 
     while(n_levels >= 2 &&
           levels[n_levels - 1].sigma_sq < sigma_sq_target &&
