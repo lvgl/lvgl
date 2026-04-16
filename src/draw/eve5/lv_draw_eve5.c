@@ -695,7 +695,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 /* Blur: modify prev in place, no isolation slice or blend math needed */
                 if(blend_task->type == LV_DRAW_TASK_TYPE_BLUR) {
                     if(prev.Id != GA_HANDLE_INVALID.Id) {
-                        lv_draw_eve5_blur(u, layer, prev, blend_task);
+                        lv_draw_eve5_gaussian_blur(u, layer, prev, blend_task);
                     }
                     blend_task->state = LV_DRAW_TASK_STATE_FINISHED;
                     cursor = blend_task->next;

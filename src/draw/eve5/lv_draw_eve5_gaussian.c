@@ -3,7 +3,7 @@
  *
  * EVE5 (BT820) High-Quality Gaussian Blur via Mipmap Downsampling
  *
- * Separable 5-tap Gaussian kernel with nearest sampling throughout the
+ * Separable Gaussian kernel with nearest sampling throughout the
  * pyramid, bilinear only on final upscale.
  *
  * Pipeline:
@@ -11,16 +11,13 @@
  * 2. Build pyramid: each tier applies H blur+2x downsample then V blur+2x
  *    downsample using the binomial [1,4,6,4,1]/16 kernel (sigma^2 = 1).
  *    Stop BEFORE the next tier would overshoot sigma^2_target.
- * 3. Extra pass: one H+V 5-tap blur at the deepest level (no downsample)
- *    with Gaussian weights computed for sigma^2_remaining. This hits the
- *    exact target without interpolation between levels.
+ * 3. Extra pass: one H+V blur at the deepest level (no downsample)
+ *    with Gaussian weights computed for sigma^2_remaining. Uses 5-tap,
+ *    7-tap, or 9-tap kernel selected at runtime based on sigma^2_local.
  * 4. Single bilinear upscale from the final level back to output.
  *
  * Per-tier contribution to original sigma^2 = 4^tier (8x-scaled in code).
  * Accumulated sigma^2 after n tiers = (4^n - 1) / 3.
- *
- * 5 nearest fetches per output pixel per pass. Each pyramid tier costs
- * 2 passes (H+V) = 10 fetches. Extra pass costs 10 more.
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
@@ -46,45 +43,15 @@
 #define BINOM_W_INNER  64
 #define BINOM_W_CENTER 96
 
-/* 7-tap final pass: uses taps at [-3..+3] instead of [-2..+2].
- * Covers sigma^2_local up to ~2.25 vs ~1 for 5-tap. */
-#ifndef EVE5_GAUSSIAN_FINAL_7TAP
-#define EVE5_GAUSSIAN_FINAL_7TAP 1
-#endif
-
-/* 9-tap final pass: uses taps at [-4..+4] for sigma^2_local up to 3.0.
- * Properly captures the ~3% tail energy that 7-tap truncates at sigma^2=3,
- * allowing FINAL_MAX_LOCAL_SIGMA_SQ=24 and pushing the 1->2 tier crossing
- * from blur_radius ~15 to ~17. The +-4 taps are naturally zero for small
- * sigma, so only 9 draws happen when the extra reach is needed. */
-#ifndef EVE5_GAUSSIAN_FINAL_9TAP
-#define EVE5_GAUSSIAN_FINAL_9TAP 1
-#endif
-
-#if EVE5_GAUSSIAN_FINAL_9TAP && !EVE5_GAUSSIAN_FINAL_7TAP
-#undef EVE5_GAUSSIAN_FINAL_7TAP
-#define EVE5_GAUSSIAN_FINAL_7TAP 1
-#endif
-
-/* Maximum sigma^2_local the final pass can handle.
+/* Maximum sigma^2_local the final pass can handle (9-tap range = 3.0).
  * Pyramid stops when remaining fits within this range. */
-#if EVE5_GAUSSIAN_FINAL_9TAP
-#define FINAL_MAX_LOCAL_SIGMA_SQ 24 /* 3.0 */
-#elif EVE5_GAUSSIAN_FINAL_7TAP
-#define FINAL_MAX_LOCAL_SIGMA_SQ 18 /* ~2.25 */
-#else
-#define FINAL_MAX_LOCAL_SIGMA_SQ 8 /* 1.0 */
-#endif
+#define FINAL_MAX_LOCAL_SIGMA_SQ 24 /* 3.0 in 8x-scaled units */
 
-/* Runtime tap-count selection thresholds (7/9-tap table index k = sigma^2_local * 16).
+/* Runtime tap-count selection thresholds (table index k = sigma^2_local * 16).
  * Below THRESHOLD_5TO7, the +-3 taps are zero — 5-tap is identical but 4 fewer draws.
  * Above THRESHOLD_7TO9, 7-tap truncation exceeds ~1% — 9-tap captures the tail. */
-#if EVE5_GAUSSIAN_FINAL_7TAP
 #define FINAL_K_THRESHOLD_5TO7  13  /* sigma^2_local <= 0.8125: use 5-tap */
-#endif
-#if EVE5_GAUSSIAN_FINAL_9TAP
 #define FINAL_K_THRESHOLD_7TO9  36  /* sigma^2_local > 2.25: use 9-tap */
-#endif
 
 /**********************
  * TYPES
@@ -96,54 +63,6 @@ typedef struct {
     int32_t sigma_sq;   /**< Accumulated variance in original pixels, 8x-scaled */
 } gauss_level_t;
 
-/**********************
- * GAUSSIAN WEIGHT TABLE
- *
- * Precomputed Gaussian kernel weights for 5 taps at positions [-2,-1,0,+1,+2]
- * indexed by sigma^2 in 1/32 steps (k = 0..32, sigma^2 = k/32).
- *
- * For each entry: {w_outer, w_inner}. w_center = 256 - 2*w_outer - 2*w_inner.
- * Weights are 8-bit scaled (sum = 256 ~ 1.0).
- *
- * Computed from: w(x) = exp(-x^2 / (2*sigma^2)), normalized over 5 taps.
- **********************/
-static const uint8_t s_gauss_weights[33][2] = {
-    /* k=0  sigma^2=0.000 */ {  0,   0 },  /* passthrough */
-    /* k=1  sigma^2=0.031 */ {  0,   0 },
-    /* k=2  sigma^2=0.063 */ {  0,   0 },
-    /* k=3  sigma^2=0.094 */ {  0,   1 },
-    /* k=4  sigma^2=0.125 */ {  0,   5 },
-    /* k=5  sigma^2=0.156 */ {  0,  10 },
-    /* k=6  sigma^2=0.188 */ {  0,  16 },
-    /* k=7  sigma^2=0.219 */ {  0,  22 },
-    /* k=8  sigma^2=0.250 */ {  0,  27 },
-    /* k=9  sigma^2=0.281 */ {  0,  32 },
-    /* k=10 sigma^2=0.313 */ {  0,  37 },
-    /* k=11 sigma^2=0.344 */ {  1,  41 },
-    /* k=12 sigma^2=0.375 */ {  1,  44 },
-    /* k=13 sigma^2=0.406 */ {  1,  47 },
-    /* k=14 sigma^2=0.438 */ {  2,  49 },
-    /* k=15 sigma^2=0.469 */ {  2,  51 },
-    /* k=16 sigma^2=0.500 */ {  3,  53 },
-    /* k=17 sigma^2=0.531 */ {  3,  55 },
-    /* k=18 sigma^2=0.563 */ {  4,  56 },
-    /* k=19 sigma^2=0.594 */ {  5,  57 },
-    /* k=20 sigma^2=0.625 */ {  5,  58 },
-    /* k=21 sigma^2=0.656 */ {  6,  59 },
-    /* k=22 sigma^2=0.688 */ {  7,  60 },
-    /* k=23 sigma^2=0.719 */ {  7,  60 },
-    /* k=24 sigma^2=0.750 */ {  8,  61 },
-    /* k=25 sigma^2=0.781 */ {  9,  61 },
-    /* k=26 sigma^2=0.813 */ { 10,  61 },
-    /* k=27 sigma^2=0.844 */ { 10,  62 },
-    /* k=28 sigma^2=0.875 */ { 11,  62 },
-    /* k=29 sigma^2=0.906 */ { 12,  62 },
-    /* k=30 sigma^2=0.938 */ { 13,  62 },
-    /* k=31 sigma^2=0.969 */ { 13,  62 },
-    /* k=32 sigma^2=1.000 */ { 14,  63 },
-};
-
-#if EVE5_GAUSSIAN_FINAL_7TAP
 /**********************
  * 7-TAP GAUSSIAN WEIGHT TABLE
  *
@@ -206,9 +125,7 @@ static const uint8_t s_gauss7_weights[49][3] = {
     /* k=47 sigma^2=2.938 */ { 13,  31,  52 },
     /* k=48 sigma^2=3.000 */ { 14,  32,  52 },
 };
-#endif /* EVE5_GAUSSIAN_FINAL_7TAP */
 
-#if EVE5_GAUSSIAN_FINAL_9TAP
 /**********************
  * 9-TAP GAUSSIAN WEIGHT TABLE
  *
@@ -271,7 +188,6 @@ static const uint8_t s_gauss9_weights[49][4] = {
     /* k=47 sigma^2=2.938 */ {  4,  13,  30,  51 },
     /* k=48 sigma^2=3.000 */ {  4,  13,  31,  50 },
 };
-#endif /* EVE5_GAUSSIAN_FINAL_9TAP */
 
 /**********************
  * STATIC PROTOTYPES
@@ -283,23 +199,19 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
                                bool horizontal, bool downsample,
                                uint8_t w_outer, uint8_t w_inner, uint8_t w_center);
 
-#if EVE5_GAUSSIAN_FINAL_7TAP
 static bool gaussian_7tap_pass(lv_draw_eve5_unit_t * u,
                                uint32_t src_addr, int32_t src_stride, int32_t src_h,
                                uint32_t dst_addr, int32_t dst_aw, int32_t dst_ah,
                                int32_t dst_w, int32_t dst_h,
                                bool horizontal,
                                uint8_t w_outer, uint8_t w_middle, uint8_t w_inner, uint8_t w_center);
-#endif
 
-#if EVE5_GAUSSIAN_FINAL_9TAP
 static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
                                uint32_t src_addr, int32_t src_stride, int32_t src_h,
                                uint32_t dst_addr, int32_t dst_aw, int32_t dst_ah,
                                int32_t dst_w, int32_t dst_h,
                                bool horizontal,
                                uint8_t w_o4, uint8_t w_o3, uint8_t w_i2, uint8_t w_i1, uint8_t w_center);
-#endif
 
 /**********************
  * 5-TAP GAUSSIAN PASS
@@ -387,7 +299,6 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
     return true;
 }
 
-#if EVE5_GAUSSIAN_FINAL_7TAP
 /**********************
  * 7-TAP GAUSSIAN PASS
  **********************/
@@ -458,9 +369,7 @@ static bool gaussian_7tap_pass(lv_draw_eve5_unit_t * u,
 
     return true;
 }
-#endif /* EVE5_GAUSSIAN_FINAL_7TAP */
 
-#if EVE5_GAUSSIAN_FINAL_9TAP
 /**********************
  * 9-TAP GAUSSIAN PASS
  **********************/
@@ -532,7 +441,6 @@ static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
 
     return true;
 }
-#endif /* EVE5_GAUSSIAN_FINAL_9TAP */
 
 /**********************
  * GAUSSIAN BLUR ENTRY POINT
@@ -545,7 +453,7 @@ static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
  * Pipeline:
  * 1. Extract blur region with edge-extended padding
  * 2. Build Gaussian pyramid (stop before overshooting target sigma^2)
- * 3. One extra separable 5-tap pass with computed weights for remaining sigma^2
+ * 3. One extra separable 5/7/9-tap pass with computed weights for remaining sigma^2
  * 4. Single bilinear upscale from final level back to layer
  */
 bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
@@ -640,13 +548,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
      * Pyramid: +/-2 per tier at scale 2^k -> cumulative 2*(2^n - 1).
      * Final pass: +/-HALF_TAP at scale 2^n -> HALF_TAP * 2^n more.
      * 5-tap HALF_TAP=2, 7-tap HALF_TAP=3, 9-tap HALF_TAP=4. */
-#if EVE5_GAUSSIAN_FINAL_9TAP
     #define FINAL_HALF_TAP 4
-#elif EVE5_GAUSSIAN_FINAL_7TAP
-    #define FINAL_HALF_TAP 3
-#else
-    #define FINAL_HALF_TAP 2
-#endif
     int32_t scale_n = 1 << n_tiers_est;
     int32_t pyramid_reach = 2 * (scale_n - 1);
     int32_t final_reach = FINAL_HALF_TAP * scale_n;
@@ -814,13 +716,12 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     /* Compute sigma^2_local at the deepest level, look up Gaussian weights,
      * and do one separable H+V pass (no downsample) to hit the target.
      *
-     * Runtime tap selection (when 7TAP and 9TAP are both enabled):
+     * Runtime tap selection:
      *   k <= FINAL_K_THRESHOLD_5TO7  -> 5-tap (+-3 weights are zero, saves 4 draws)
      *   k <= FINAL_K_THRESHOLD_7TO9  -> 7-tap
      *   k >  FINAL_K_THRESHOLD_7TO9  -> 9-tap (captures tail energy)
      *
-     * 5-tap only: table index k = sigma^2_local * 32, range [0..32].
-     * 7/9-tap:    table index k = sigma^2_local * 16, range [0..48]. */
+     * Table index k = sigma^2_local * 16, range [0..48]. */
     {
         int32_t remaining = sigma_sq_target - levels[n_levels - 1].sigma_sq;
 
@@ -829,20 +730,14 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
             if(prev->w >= 4 && prev->h >= 4) {
 
-                uint8_t ew_center;
-                bool has_blur;
-
-#if EVE5_GAUSSIAN_FINAL_7TAP
-                /* 7/9-tap: k = sigma^2_local * 16 = remaining * 2 / pow4 */
+                /* k = sigma^2_local * 16 = remaining * 2 / pow4 */
                 int32_t k = remaining * 2 / pow4;
                 if(k > 48) k = 48;
                 if(k < 0) k = 0;
 
                 /* Select tap count based on thresholds */
                 bool use_5tap = (k <= FINAL_K_THRESHOLD_5TO7);
-#if EVE5_GAUSSIAN_FINAL_9TAP
                 bool use_9tap = (k > FINAL_K_THRESHOLD_7TO9);
-#endif
 
                 /* 5-tap path: +-3 weights are zero, use the +-2/+-1 weights directly.
                  * The 7-tap table's middle2/inner1 are identical to 5-tap outer/inner
@@ -853,10 +748,9 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                 /* 7-tap weights (used when !use_5tap && !use_9tap) */
                 uint8_t ew_outer3 = s_gauss7_weights[k][0];
                 uint8_t ew_middle = ew_outer;  /* alias: same slot */
-                ew_center = (uint8_t)(256 - 2 * (ew_outer3 + ew_middle + ew_inner));
-                has_blur = (ew_outer3 > 0 || ew_middle > 0 || ew_inner > 0);
+                uint8_t ew_center = (uint8_t)(256 - 2 * (ew_outer3 + ew_middle + ew_inner));
+                bool has_blur = (ew_outer3 > 0 || ew_middle > 0 || ew_inner > 0);
 
-#if EVE5_GAUSSIAN_FINAL_9TAP
                 uint8_t ew_o4 = 0, ew_o3 = 0, ew_i2 = 0, ew_i1 = 0;
                 if(use_9tap) {
                     ew_o4 = s_gauss9_weights[k][0];
@@ -866,18 +760,6 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                     ew_center = (uint8_t)(256 - 2 * (ew_o4 + ew_o3 + ew_i2 + ew_i1));
                     has_blur = true; /* k > FINAL_K_THRESHOLD_7TO9 always has blur */
                 }
-#endif
-#else
-                /* 5-tap only: k = sigma^2_local * 32 = remaining * 4 / pow4 */
-                int32_t k = remaining * 4 / pow4;
-                if(k > 32) k = 32;
-                if(k < 0) k = 0;
-
-                uint8_t ew_outer = s_gauss_weights[k][0];
-                uint8_t ew_inner = s_gauss_weights[k][1];
-                ew_center = (uint8_t)(256 - 2 * ew_outer - 2 * ew_inner);
-                has_blur = (ew_outer > 0 || ew_inner > 0);
-#endif
 
                 if(has_blur) {
                     uint32_t extra_size = (uint32_t)prev->aw * 4 * (uint32_t)prev->ah;
@@ -891,7 +773,6 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                         if(prev_addr != GA_INVALID && t_addr != GA_INVALID && ex_addr != GA_INVALID) {
                             bool final_ok = false;
 
-#if EVE5_GAUSSIAN_FINAL_9TAP
                             if(use_9tap) {
                                 gaussian_9tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                                                    t_addr, prev->aw, prev->ah, prev->w, prev->h,
@@ -908,10 +789,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                                        ew_o4, ew_o3, ew_i2, ew_i1, ew_center);
                                     final_ok = true;
                                 }
-                            } else
-#endif
-#if EVE5_GAUSSIAN_FINAL_7TAP
-                            if(!use_5tap) {
+                            }
+                            else if(!use_5tap) {
                                 gaussian_7tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                                                    t_addr, prev->aw, prev->ah, prev->w, prev->h,
                                                    true,
@@ -927,9 +806,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                                        ew_outer3, ew_middle, ew_inner, ew_center);
                                     final_ok = true;
                                 }
-                            } else
-#endif
-                            {
+                            }
+                            else {
                                 ew_center = (uint8_t)(256 - 2 * ew_outer - 2 * ew_inner);
                                 gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                                                    t_addr, prev->aw, prev->ah, prev->w, prev->h,
