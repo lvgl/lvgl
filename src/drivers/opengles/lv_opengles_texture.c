@@ -276,7 +276,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
                              texture->fb1));
 #elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE,
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                              texture->fb1));
 #else
 #error("Unsupported color format")
