@@ -48,9 +48,9 @@
 #define FINAL_MAX_LOCAL_SIGMA_SQ 24 /* 3.0 in 8x-scaled units */
 
 /* Runtime tap-count selection thresholds (table index k = sigma^2_local * 16).
- * Below THRESHOLD_5TO7, the +-3 taps are zero — 5-tap is identical but 4 fewer draws.
+ * Below THRESHOLD_5TO7, the +-3 taps carry < ~1% total energy — 5-tap saves 4 draws.
  * Above THRESHOLD_7TO9, 7-tap truncation exceeds ~1% — 9-tap captures the tail. */
-#define FINAL_K_THRESHOLD_5TO7  13  /* sigma^2_local <= 0.8125: use 5-tap */
+#define FINAL_K_THRESHOLD_5TO7  16  /* sigma^2_local <= 1.0: use 5-tap */
 #define FINAL_K_THRESHOLD_7TO9  36  /* sigma^2_local > 2.25: use 9-tap */
 
 /**********************
@@ -62,6 +62,69 @@ typedef struct {
     int32_t aw, ah;     /**< 16-byte aligned dimensions for render target */
     int32_t sigma_sq;   /**< Accumulated variance in original pixels, 8x-scaled */
 } gauss_level_t;
+
+/**********************
+ * 5-TAP GAUSSIAN WEIGHT TABLE
+ *
+ * Precomputed weights for 5 taps at positions [-2,-1,0,+1,+2]
+ * indexed by sigma^2 in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
+ *
+ * For each entry: {w_outer, w_inner}.
+ * w_center = 256 - 2*(w_outer + w_inner).
+ *
+ * Computed from: w(x) = exp(-x^2 / (2*sigma^2)), normalized over 5 taps.
+ **********************/
+static const uint8_t s_gauss5_weights[49][2] = {
+    /* k=0  sigma^2=0.000 */ {  0,   0 },  /* passthrough */
+    /* k=1  sigma^2=0.062 */ {  0,   0 },
+    /* k=2  sigma^2=0.125 */ {  0,   5 },
+    /* k=3  sigma^2=0.188 */ {  0,  16 },
+    /* k=4  sigma^2=0.250 */ {  0,  27 },
+    /* k=5  sigma^2=0.312 */ {  0,  37 },
+    /* k=6  sigma^2=0.375 */ {  1,  44 },
+    /* k=7  sigma^2=0.438 */ {  2,  49 },
+    /* k=8  sigma^2=0.500 */ {  3,  53 },
+    /* k=9  sigma^2=0.562 */ {  4,  56 },
+    /* k=10 sigma^2=0.625 */ {  5,  58 },
+    /* k=11 sigma^2=0.688 */ {  7,  60 },
+    /* k=12 sigma^2=0.750 */ {  8,  61 },
+    /* k=13 sigma^2=0.812 */ { 10,  61 },
+    /* k=14 sigma^2=0.875 */ { 11,  62 },
+    /* k=15 sigma^2=0.938 */ { 13,  62 },
+    /* k=16 sigma^2=1.000 */ { 14,  63 },
+    /* k=17 sigma^2=1.062 */ { 15,  63 },
+    /* k=18 sigma^2=1.125 */ { 17,  63 },
+    /* k=19 sigma^2=1.188 */ { 18,  63 },
+    /* k=20 sigma^2=1.250 */ { 19,  63 },
+    /* k=21 sigma^2=1.312 */ { 20,  62 },
+    /* k=22 sigma^2=1.375 */ { 21,  62 },
+    /* k=23 sigma^2=1.438 */ { 22,  62 },
+    /* k=24 sigma^2=1.500 */ { 23,  62 },
+    /* k=25 sigma^2=1.562 */ { 24,  62 },
+    /* k=26 sigma^2=1.625 */ { 24,  62 },
+    /* k=27 sigma^2=1.688 */ { 25,  61 },
+    /* k=28 sigma^2=1.750 */ { 26,  61 },
+    /* k=29 sigma^2=1.812 */ { 27,  61 },
+    /* k=30 sigma^2=1.875 */ { 27,  61 },
+    /* k=31 sigma^2=1.938 */ { 28,  61 },
+    /* k=32 sigma^2=2.000 */ { 29,  61 },
+    /* k=33 sigma^2=2.062 */ { 29,  60 },
+    /* k=34 sigma^2=2.125 */ { 30,  60 },
+    /* k=35 sigma^2=2.188 */ { 30,  60 },
+    /* k=36 sigma^2=2.250 */ { 31,  60 },
+    /* k=37 sigma^2=2.312 */ { 31,  60 },
+    /* k=38 sigma^2=2.375 */ { 32,  60 },
+    /* k=39 sigma^2=2.438 */ { 32,  59 },
+    /* k=40 sigma^2=2.500 */ { 33,  59 },
+    /* k=41 sigma^2=2.562 */ { 33,  59 },
+    /* k=42 sigma^2=2.625 */ { 33,  59 },
+    /* k=43 sigma^2=2.688 */ { 34,  59 },
+    /* k=44 sigma^2=2.750 */ { 34,  59 },
+    /* k=45 sigma^2=2.812 */ { 34,  59 },
+    /* k=46 sigma^2=2.875 */ { 35,  58 },
+    /* k=47 sigma^2=2.938 */ { 35,  58 },
+    /* k=48 sigma^2=3.000 */ { 35,  58 },
+};
 
 /**********************
  * 7-TAP GAUSSIAN WEIGHT TABLE
@@ -739,17 +802,16 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                 bool use_5tap = (k <= FINAL_K_THRESHOLD_5TO7);
                 bool use_9tap = (k > FINAL_K_THRESHOLD_7TO9);
 
-                /* 5-tap path: +-3 weights are zero, use the +-2/+-1 weights directly.
-                 * The 7-tap table's middle2/inner1 are identical to 5-tap outer/inner
-                 * when outer3 == 0, so we read from the same table. */
-                uint8_t ew_outer = s_gauss7_weights[k][1];  /* w_middle2 == w_outer for 5-tap */
-                uint8_t ew_inner = s_gauss7_weights[k][2];  /* w_inner1 == w_inner for 5-tap */
+                /* 5-tap weights (properly normalized over 5 taps) */
+                uint8_t ew_outer = s_gauss5_weights[k][0];
+                uint8_t ew_inner = s_gauss5_weights[k][1];
 
                 /* 7-tap weights (used when !use_5tap && !use_9tap) */
                 uint8_t ew_outer3 = s_gauss7_weights[k][0];
-                uint8_t ew_middle = ew_outer;  /* alias: same slot */
-                uint8_t ew_center = (uint8_t)(256 - 2 * (ew_outer3 + ew_middle + ew_inner));
-                bool has_blur = (ew_outer3 > 0 || ew_middle > 0 || ew_inner > 0);
+                uint8_t ew_middle = s_gauss7_weights[k][1];
+                uint8_t ew_inner7 = s_gauss7_weights[k][2];
+                uint8_t ew_center = (uint8_t)(256 - 2 * (ew_outer3 + ew_middle + ew_inner7));
+                bool has_blur = (ew_outer > 0 || ew_inner > 0 || ew_outer3 > 0 || ew_middle > 0 || ew_inner7 > 0);
 
                 uint8_t ew_o4 = 0, ew_o3 = 0, ew_i2 = 0, ew_i1 = 0;
                 if(use_9tap) {
@@ -794,7 +856,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                 gaussian_7tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                                                    t_addr, prev->aw, prev->ah, prev->w, prev->h,
                                                    true,
-                                                   ew_outer3, ew_middle, ew_inner, ew_center);
+                                                   ew_outer3, ew_middle, ew_inner7, ew_center);
 
                                 t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
                                 ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
@@ -803,7 +865,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                     gaussian_7tap_pass(u, t_addr, prev->aw * 4, prev->h,
                                                        ex_addr, prev->aw, prev->ah, prev->w, prev->h,
                                                        false,
-                                                       ew_outer3, ew_middle, ew_inner, ew_center);
+                                                       ew_outer3, ew_middle, ew_inner7, ew_center);
                                     final_ok = true;
                                 }
                             }
