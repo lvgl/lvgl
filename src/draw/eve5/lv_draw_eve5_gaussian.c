@@ -634,13 +634,44 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             EVE_CoDl_end(phost);
         }
 
-        /* Draw 2: blit source 1:1 at center (exact pixels override stretched edges) */
+        /* Rounded corner pre-mask: stencil the rounded rect so draw 2 only
+         * writes inside it. Content outside keeps the stretched edge extension,
+         * preventing foreign content from contaminating the blur. */
+        if(corner_radius > 0) {
+            int32_t rx1 = full_x1 - bx1 + pad;
+            int32_t ry1 = full_y1 - by1 + pad_y;
+            int32_t rx2 = full_x2 - bx1 + pad;
+            int32_t ry2 = full_y2 - by1 + pad_y;
+
+            EVE_CoDl_saveContext(phost);
+
+            EVE_CoDl_colorMask(phost, 0, 0, 0, 0);
+            EVE_CoDl_stencilOp(phost, KEEP, INCR);
+            EVE_CoDl_stencilFunc(phost, ALWAYS, 0, 255);
+            lv_draw_eve5_draw_rect(u, rx1, ry1, rx2, ry2, corner_radius, NULL, NULL);
+
+            EVE_CoDl_colorMask(phost, 1, 1, 1, 1);
+            EVE_CoDl_stencilFunc(phost, NOTEQUAL, 0, 255);
+            EVE_CoDl_stencilOp(phost, KEEP, KEEP);
+        }
+
+        /* Draw 2: blit source 1:1 at center, masked to rounded rect when applicable.
+         * Re-set bitmap state since draw_rect may have clobbered it. */
+        EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+        EVE_CoDl_blendFunc(phost, ONE, ZERO);
+        EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+        EVE_CoDl_bitmapSource(phost, dst_addr + src_ofs);
+        EVE_CoDl_bitmapLayout(phost, ARGB8, layer_stride, layer_h - by1);
         EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, bw, bh);
         EVE_CoDl_bitmapTransform_identity(phost);
 
         EVE_CoDl_begin(phost, BITMAPS);
         EVE_CoDl_vertex2f_0(phost, pad, pad_y);
         EVE_CoDl_end(phost);
+
+        if(corner_radius > 0) {
+            EVE_CoDl_restoreContext(phost);
+        }
 
         EVE_CoDl_display(phost);
         EVE_CoCmd_swap(phost);
