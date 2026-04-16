@@ -13,7 +13,14 @@ static void event_handler(lv_event_t * e)
 }
 
 /**
- * An infinite roller with the name of the months
+ * @title Infinite month roller
+ * @brief Pick a month from a wrap-around roller and log the selection.
+ *
+ * A centered `lv_roller` is populated with the twelve English month names in
+ * `LV_ROLLER_MODE_INFINITE`, so scrolling past December wraps back to January.
+ * Four rows are visible at once via `lv_roller_set_visible_row_count`. An
+ * `LV_EVENT_ALL` handler prints the current selection string on
+ * `LV_EVENT_VALUE_CHANGED`.
  */
 void lv_example_roller_1(void)
 {

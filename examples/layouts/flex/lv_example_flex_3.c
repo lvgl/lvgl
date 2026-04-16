@@ -2,7 +2,14 @@
 #if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
- * Demonstrate flex grow.
+ * @title Flex grow between fixed items
+ * @brief Distribute leftover row space between two grow items bracketed by fixed-size items.
+ *
+ * A 300x220 row container holds four children. The first and last are fixed
+ * 40x40 squares. The two middle children have a fixed height of 40 and take
+ * `lv_obj_set_flex_grow` weights of 1 and 2, splitting the remaining
+ * horizontal space in that proportion while the trailing fixed item is pushed
+ * against the right edge.
  */
 void lv_example_flex_3(void)
 {

@@ -12,7 +12,14 @@ static void column_gap_anim(void * obj, int32_t v)
 }
 
 /**
- * Demonstrate the effect of column and row gap style properties
+ * @title Animated row and column gaps
+ * @brief Drive row and column padding of a wrap container with two looping animations.
+ *
+ * A 300x220 container uses `LV_FLEX_FLOW_ROW_WRAP` to arrange nine 70 px
+ * tiles. Two `lv_anim_t` instances animate `pad_row` and `pad_column`
+ * between 0 and 10 with `LV_ANIM_REPEAT_INFINITE`: the row gap cycles every
+ * 500 ms in each direction while the column gap cycles every 3000 ms, so the
+ * tile spacing shifts on two independent time scales.
  */
 void lv_example_flex_5(void)
 {

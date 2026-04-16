@@ -9,7 +9,14 @@
 #endif
 
 /**
- * Open a video from a file
+ * @title Play MP4 video with FFmpeg
+ * @brief Play an MP4 clip on loop through the FFmpeg player widget.
+ *
+ * An `lv_ffmpeg_player` is centered on the active screen and pointed at
+ * `birds.mp4`. The decoder is requested as `h264_v4l2m2m` (with software
+ * fallback when V4L2 is unavailable), auto-restart is enabled, and
+ * `LV_FFMPEG_PLAYER_CMD_START` begins playback. The source path uses an
+ * `A:` prefix when `LV_FFMPEG_PLAYER_USE_LV_FS` is set, otherwise `./`.
  */
 void lv_example_ffmpeg_2(void)
 {

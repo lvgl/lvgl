@@ -107,6 +107,19 @@ static void event_handler_swap(lv_event_t * e)
     }
 }
 
+/**
+ * @title Reorderable list with control panel
+ * @brief Select a row in one list and move it with Top, Up, Center, Down, Bottom, or Shuffle.
+ *
+ * A 60% wide list on the left holds 15 `lv_button` rows labeled
+ * `Item 0` through `Item 14`; clicking a row marks it as the current
+ * selection with `LV_STATE_CHECKED` and clears the state on siblings.
+ * A 40% wide list on the right pins Top, Up, Center, Down, Bottom,
+ * and Shuffle buttons wired to `LV_EVENT_ALL` handlers that call
+ * `lv_obj_move_to_index` and `lv_obj_scroll_to_view` to reposition
+ * the selected row, with the Up, Center, Down, and Shuffle handlers
+ * also firing on `LV_EVENT_LONG_PRESSED_REPEAT`.
+ */
 void lv_example_list_2(void)
 {
     /*Create a list*/

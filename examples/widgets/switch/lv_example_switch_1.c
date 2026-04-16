@@ -11,6 +11,17 @@ static void event_handler(lv_event_t * e)
     }
 }
 
+/**
+ * @title Switch states in a column
+ * @brief Four switches covering the default, checked, disabled, and checked-disabled states.
+ *
+ * The active screen is set to `LV_FLEX_FLOW_COLUMN` with centered flex
+ * alignment and holds four switches: a default one with
+ * `LV_OBJ_FLAG_EVENT_BUBBLE` set, a `LV_STATE_CHECKED` switch, a
+ * `LV_STATE_DISABLED` switch, and one with both states combined. Each one
+ * subscribes to `LV_EVENT_ALL` and logs `On` or `Off` on
+ * `LV_EVENT_VALUE_CHANGED` based on `lv_obj_has_state(..., LV_STATE_CHECKED)`.
+ */
 void lv_example_switch_1(void)
 {
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);

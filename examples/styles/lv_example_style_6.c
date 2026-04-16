@@ -2,7 +2,13 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Using the Image style properties
+ * @title Image recolor and rotation
+ * @brief Tint an image blue and rotate it using style properties.
+ *
+ * A style sets a grey background, a blue border, `image_recolor` to
+ * blue with `image_recolor_opa = 50%`, and `transform_rotation = 300`
+ * (30 degrees). The style is applied to an `lv_image` whose source is
+ * `img_cogwheel_argb`, then the image is centered on the active screen.
  */
 void lv_example_style_6(void)
 {

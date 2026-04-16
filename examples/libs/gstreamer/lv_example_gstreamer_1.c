@@ -21,7 +21,19 @@ static void play_pause_pressed(lv_event_t * e);
 static void stream_state_changed(lv_event_t * e);
 
 /**
- * Loads a video from the internet using the gstreamer widget
+ * @title GStreamer URI player with controls
+ * @brief Stream a WebM clip over HTTPS with a custom play/pause button and position slider.
+ *
+ * `lv_gstreamer_create` opens the Sintel trailer through
+ * `LV_GSTREAMER_FACTORY_URI_DECODE` and `LV_GSTREAMER_PROPERTY_URI_DECODE`.
+ * A side column binds a volume slider and label to an `lv_subject_t` that
+ * forwards new values to `lv_gstreamer_set_volume`. A bottom bar holds a
+ * position label, a play/pause button whose label switches between
+ * `LV_SYMBOL_PLAY`, `LV_SYMBOL_PAUSE`, and `LV_SYMBOL_REFRESH`, an
+ * `lv_bar` bound to a position subject, and a duration label.
+ * `LV_EVENT_STATE_CHANGED` updates the duration text when the stream
+ * starts, and a timer running at `LV_DEF_REFR_PERIOD` polls
+ * `lv_gstreamer_get_position` to update the seek bar.
  */
 void lv_example_gstreamer_1(void)
 {

@@ -9,6 +9,18 @@
 
 static lv_font_manager_t * g_font_manager = NULL;
 
+/**
+ * @title Font fallback across multiple sources
+ * @brief Combine a TinyTTF, a FreeType emoji font, and built-in Montserrat into one fallback chain.
+ *
+ * Up to three sources are registered with `lv_font_manager_add_src_static`:
+ * Montserrat 14 and 32 through `lv_builtin_font_class`, `NotoColorEmoji-32.subset.ttf`
+ * through `lv_freetype_font_class`, and `Ubuntu-Medium.ttf` through
+ * `lv_tiny_ttf_font_class`. `lv_font_manager_create_font` asks for the comma-joined
+ * chain `"Ubuntu-Medium,NotoColorEmoji,Montserrat"` at size 32, producing a font
+ * that falls through each source. A centered label uses it to render ASCII text,
+ * an emoji, and `LV_SYMBOL_OK`.
+ */
 void lv_example_font_manager_2(void)
 {
     /* Create font manager, with 8 fonts recycling buffers */

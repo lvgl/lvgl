@@ -2,7 +2,12 @@
 #if LV_USE_TJPGD && LV_BUILD_EXAMPLES
 
 /**
- * Load a JPG image
+ * @title Decode JPEG with TJpgDec
+ * @brief Load a JPEG file through the TJpgDec decoder and center it on the screen.
+ *
+ * An image widget is created on the active screen with its source set to
+ * `A:test_img_lvgl_logo.jpg`, so the TJpgDec image decoder reads the file
+ * through the filesystem driver registered under drive letter `A`.
  */
 void lv_example_tjpgd_1(void)
 {

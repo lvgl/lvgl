@@ -4,8 +4,16 @@
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /**
- * Simulate metallic knob using conical gradient
- * For best effect set LV_GRADIENT_MAX_STOPS to 8 or at least 3
+ * @title Conical gradient metallic knob
+ * @brief Fill a circular object with a reflected conical gradient to mimic brushed metal.
+ *
+ * A fully rounded `radius = 500` style sets a black drop shadow and a
+ * background `lv_grad_dsc_t` built with `lv_grad_conical_init` centered
+ * on the object with `LV_GRAD_EXTEND_REFLECT`. The gradient uses up to
+ * eight grey stops depending on `LV_GRADIENT_MAX_STOPS`. The styled
+ * 200 by 200 object is centered on the active screen; when
+ * `LV_USE_DRAW_SW_COMPLEX_GRADIENTS` is disabled, a scrolling label
+ * announces the missing feature instead.
  */
 void lv_example_style_17(void)
 {

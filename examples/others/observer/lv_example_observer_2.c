@@ -8,8 +8,17 @@ static void app_init(void);
 static void ui_init(void);
 
 /**
- * Simple PIN login screen to start an engine.
- * The only interface between the UI and the application is a single "subject".
+ * @title PIN login via state bindings
+ * @brief Decouple a login UI from an engine subject using `lv_obj_bind_state_if_*`.
+ *
+ * Two int subjects are initialised: `engine_subject` for the engine state and
+ * `auth_state_subject` for `LOGGED_OUT`, `LOGGED_IN`, and `AUTH_FAILED`. A
+ * password textarea fires `LV_EVENT_READY` to set the auth subject, a log-out
+ * button resets it, and an observer on `auth_state_subject` writes status text
+ * into an info label. `lv_obj_bind_state_if_eq` and
+ * `lv_obj_bind_state_if_not_eq` toggle `LV_STATE_DISABLED` on the textarea, log
+ * out button, and a start-engine button, which itself uses `lv_obj_bind_checked`
+ * to drive `engine_subject`.
  */
 void lv_example_observer_2(void)
 {

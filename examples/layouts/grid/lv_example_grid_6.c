@@ -2,7 +2,14 @@
 #if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
- * Demonstrate RTL direction on grid
+ * @title RTL grid column order
+ * @brief Populate a 3x3 grid under right-to-left base direction.
+ *
+ * A 300x220 container has `LV_BASE_DIR_RTL` applied before its column and
+ * row descriptors (three 60 px and three 45 px tracks). Nine stretched
+ * children are placed into columns 0, 1, 2 in loop order, but the RTL base
+ * direction maps column 0 to the rightmost track, so the cells read
+ * right-to-left.
  */
 void lv_example_grid_6(void)
 {

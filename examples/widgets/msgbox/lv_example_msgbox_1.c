@@ -9,6 +9,18 @@ static void event_cb(lv_event_t * e)
     LV_LOG_USER("Button %s clicked", lv_label_get_text(label));
 }
 
+/**
+ * @title Modal message box with footer buttons
+ * @brief A modal "Hello" dialog with Apply and Cancel footer buttons and a close icon.
+ *
+ * `lv_msgbox_create(NULL)` opens a modal message box on the top
+ * layer. `lv_msgbox_add_title` sets the title to `Hello`,
+ * `lv_msgbox_add_text` writes the body, and
+ * `lv_msgbox_add_close_button` installs the header close icon. Two
+ * `lv_msgbox_add_footer_button` calls add `Apply` and `Cancel`, each
+ * wired to a shared `LV_EVENT_CLICKED` handler that logs which label
+ * was tapped.
+ */
 void lv_example_msgbox_1(void)
 {
     lv_obj_t * mbox1 = lv_msgbox_create(NULL);

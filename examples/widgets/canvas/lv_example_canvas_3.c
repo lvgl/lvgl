@@ -5,7 +5,14 @@
 #define CANVAS_HEIGHT  50
 
 /**
- * Draw a rectangle to the canvas
+ * @title Rectangle with border and outline
+ * @brief Draw a red rounded rectangle with a blue border and a green outline onto a canvas.
+ *
+ * A 50x50 `LV_COLOR_FORMAT_ARGB8888` canvas is centered and filled with
+ * a light grey background. An `lv_draw_rect_dsc_t` is populated with a
+ * red fill, radius 5, a 3 px blue border, and a 2 px green outline at
+ * `LV_OPA_50`, then painted into area {10,10,40,30} via `lv_draw_rect`
+ * on a layer opened with `lv_canvas_init_layer`.
  */
 void lv_example_canvas_3(void)
 {

@@ -2,7 +2,12 @@
 #if LV_BUILD_EXAMPLES
 
 /**
- * Using the Shadow style properties
+ * @title Box shadow glow
+ * @brief Render a soft blue shadow around a centered object.
+ *
+ * A grey-filled style with `radius = 5` sets `shadow_width = 55` and
+ * `shadow_color` to the main blue palette entry. Applying the style to
+ * a centered base object produces a wide blue glow on all sides.
  */
 void lv_example_style_5(void)
 {

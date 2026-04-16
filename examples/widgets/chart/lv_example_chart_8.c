@@ -20,7 +20,14 @@ static void add_data(lv_timer_t * t)
 }
 
 /**
- * Circular line chart with gap
+ * @title Circular update mode with gap
+ * @brief Line chart that scrolls with `LV_CHART_UPDATE_MODE_CIRCULAR` and leaves a moving gap.
+ *
+ * A 280x150 line chart with 80 points and one red series is prefilled
+ * with random values, then a 300 ms `lv_timer` appends a new value via
+ * `lv_chart_set_next_value` and writes `LV_CHART_POINT_NONE` into the
+ * two slots ahead of the write cursor. The point indicator size is set
+ * to zero, producing a circular plot with a visible moving gap.
  */
 void lv_example_chart_8(void)
 {

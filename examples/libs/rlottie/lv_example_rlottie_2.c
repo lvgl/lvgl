@@ -3,7 +3,14 @@
 #if LV_USE_RLOTTIE
 
 /**
- * Load an lottie animation from file
+ * @title Rlottie animation from file
+ * @brief Play a Lottie JSON file loaded directly through the rlottie stdio path.
+ *
+ * `lv_rlottie_create_from_file` opens
+ * `lvgl/examples/libs/rlottie/lv_example_rlottie_approve.json` as a 100x100
+ * widget centered on the active screen. The path has no LVGL drive letter
+ * because rlottie reads the file through its own STDIO API rather than
+ * through the LVGL filesystem.
  */
 void lv_example_rlottie_2(void)
 {

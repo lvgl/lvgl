@@ -28,7 +28,16 @@ static void timer_cb(lv_timer_t * timer)
 }
 
 /**
- * Open a GLTF from a file and loop through the model cameras and multiple animation speeds
+ * @title Cycle glTF cameras and speeds
+ * @brief Rotate through the scene cameras and animation speeds every 5 seconds.
+ *
+ * `lv_gltf_create` fills the active screen with
+ * `webp_diffuse_transmission_plant.glb` loaded from drive letter `A`. The
+ * viewer starts at `LV_GLTF_ANIM_SPEED_HALF` with the first animation
+ * playing and a 45 degree downward pitch. A 5000 ms timer advances the
+ * active camera with `lv_gltf_set_camera` and doubles the playback rate
+ * with `lv_gltf_model_set_animation_speed`, wrapping back to half once it
+ * passes `LV_GLTF_ANIM_SPEED_4X`.
  */
 void lv_example_gltf_2(void)
 {

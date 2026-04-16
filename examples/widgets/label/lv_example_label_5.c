@@ -2,8 +2,14 @@
 #if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
- * Show customizing the circular scrolling animation of a label with `LV_LABEL_LONG_MODE_SCROLL_CIRCULAR`
- * long mode.
+ * @title Customized circular scroll timing
+ * @brief Set delays and infinite repeats on a label's circular scroll animation.
+ *
+ * An `lv_anim_t` template is configured with a 1000 ms initial delay, a 3000 ms
+ * repeat delay, and `LV_ANIM_REPEAT_INFINITE`. A style stores the template via
+ * `lv_style_set_anim` and is attached to a 150 px wide label running in
+ * `LV_LABEL_LONG_MODE_SCROLL_CIRCULAR`, which applies the timing whenever the
+ * scroll animation fires.
  */
 void lv_example_label_5(void)
 {

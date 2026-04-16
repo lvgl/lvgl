@@ -2,7 +2,13 @@
 #if LV_BUILD_EXAMPLES && LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 
 /**
- * Scrolling with Right To Left base direction
+ * @title RTL label scrolling
+ * @brief Scroll a wide Persian label inside an RTL container.
+ *
+ * A 200x100 container has `LV_BASE_DIR_RTL` applied to its main part. A
+ * child label 400 px wide, rendered with `lv_font_dejavu_16_persian_hebrew`,
+ * carries a Persian paragraph; the scrollbar and scroll direction reflect
+ * the right-to-left base direction as the label is dragged.
  */
 void lv_example_scroll_5(void)
 {

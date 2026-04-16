@@ -1,6 +1,19 @@
 #include "../../lv_examples.h"
 #if LV_USE_IMAGEBUTTON && LV_BUILD_EXAMPLES
 
+/**
+ * @title Image button with press transition
+ * @brief Three-part image button that widens and darkens while pressed.
+ *
+ * An `lv_imagebutton` uses `imagebutton_left`, `imagebutton_mid`, and
+ * `imagebutton_right` for the `LV_IMAGEBUTTON_STATE_RELEASED` source
+ * so the middle piece stretches across a fixed width of 100. A style
+ * transition on `LV_STYLE_TRANSFORM_WIDTH` and
+ * `LV_STYLE_IMAGE_RECOLOR_OPA` runs `lv_anim_path_linear` over 200 ms
+ * when `LV_STATE_PRESSED` is entered, widening the button by 20 px
+ * and darkening it with a black recolor at `LV_OPA_30`. A centered
+ * label reads `Button`.
+ */
 void lv_example_imagebutton_1(void)
 {
     LV_IMAGE_DECLARE(imagebutton_left);

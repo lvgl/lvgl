@@ -51,7 +51,15 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Add custom drawer to the keyboard to customize the buttons one by one
+ * @title Per-button colors via draw task hook
+ * @brief Recolor each keyboard key and swap the OK symbol for a star image.
+ *
+ * A centered `lv_keyboard` has `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` set and a
+ * `LV_EVENT_DRAW_TASK_ADDED` callback attached. For every `LV_PART_ITEMS` draw
+ * task the handler picks a palette entry from `base_dsc->id1`, darkens it while
+ * the button is in `LV_STATE_PRESSED`, and lightens the label text. When the
+ * task is drawing `LV_SYMBOL_OK` the label is hidden and `img_star` is drawn in
+ * its place.
  */
 void lv_example_keyboard_3(void)
 {

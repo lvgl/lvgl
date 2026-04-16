@@ -4,7 +4,14 @@
 static lv_subject_t temperature_subject;
 
 /**
- * A slider sends a message on value change and a label display's that value
+ * @title Slider and label bound to an int subject
+ * @brief Move a slider and watch a label 30 px below it reformat live as the shared subject updates.
+ *
+ * `temperature_subject` is initialised with `lv_subject_init_int` to 28. A
+ * centered slider binds to it with `lv_slider_bind_value`, and a label 30 px
+ * below binds with `lv_label_bind_text` using a degree-Celsius format. Moving
+ * the slider pushes the new value through the subject, which rewrites the
+ * label text.
  */
 void lv_example_observer_1(void)
 {

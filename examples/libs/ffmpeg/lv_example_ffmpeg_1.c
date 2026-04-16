@@ -3,7 +3,14 @@
 #if LV_USE_FFMPEG && LV_FFMPEG_PLAYER_USE_LV_FS
 
 /**
- * Open an image from a file
+ * @title Decode image with FFmpeg
+ * @brief Open a PNG through the FFmpeg integration and center it on the screen.
+ *
+ * An image widget is created on the active screen and its source is set to
+ * `A:lvgl/examples/libs/ffmpeg/ffmpeg.png`. The FFmpeg image path always
+ * routes through the LVGL filesystem abstraction regardless of
+ * `LV_FFMPEG_PLAYER_USE_LV_FS`, so the file is read via the driver registered
+ * under drive letter `A`.
  */
 void lv_example_ffmpeg_1(void)
 {

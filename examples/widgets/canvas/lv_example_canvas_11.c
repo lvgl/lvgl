@@ -48,6 +48,16 @@ static void timer_cb(lv_timer_t * timer)
     counter++;
 }
 
+/**
+ * @title Animated wave text on canvas
+ * @brief Draw a rainbow string on a sine wave, redrawn each frame for a sliding effect.
+ *
+ * A 300x200 `LV_COLOR_FORMAT_ARGB8888` canvas is centered on the active
+ * screen. A 16 ms `lv_timer` clears the canvas to white and walks the
+ * characters of a fixed string along `y = sin(x) * 40`, offset by a
+ * counter. Each letter is rendered with `lv_draw_letter` using its
+ * tangent as `rotation` and an HSV-derived color.
+ */
 void lv_example_canvas_11(void)
 {
     /*Create a buffer for the canvas*/
@@ -65,3 +75,4 @@ void lv_example_canvas_11(void)
 }
 
 #endif
+

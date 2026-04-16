@@ -2,7 +2,14 @@
 #if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
- * Show line wrap, re-color, line align and text scrolling.
+ * @title Wrapping and circular scrolling labels
+ * @brief Two labels share a width, one wraps with inline recolor and one scrolls in a loop.
+ *
+ * The top label sets `LV_LABEL_LONG_MODE_WRAP`, enables recolor so `#RRGGBB text#`
+ * markers change color per word, fixes the width to 150 px, and center-aligns text
+ * with `LV_TEXT_ALIGN_CENTER`. The bottom label uses
+ * `LV_LABEL_LONG_MODE_SCROLL_CIRCULAR` with the same width so its text cycles
+ * through continuously.
  */
 void lv_example_label_1(void)
 {

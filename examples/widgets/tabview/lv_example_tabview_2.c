@@ -1,7 +1,19 @@
 #include "../../lv_examples.h"
 #if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
-/*A vertical tab view with disabled scrolling and some styling*/
+/**
+ * @title Left-side vertical tab view
+ * @brief Five tabs arranged along the left edge with custom colors and swipe scrolling disabled.
+ *
+ * `lv_tabview_set_tab_bar_position` sets `LV_DIR_LEFT` and
+ * `lv_tabview_set_tab_bar_size` reserves 80 px for the tab bar. The
+ * tab bar is painted dark grey over a red-tinted view body, and each
+ * tab button gets a right border on `LV_STATE_CHECKED` through
+ * `lv_obj_set_style_border_side`. Five tabs labeled `Tab 1` to
+ * `Tab 5` each carry a small label, the second tab is tinted amber,
+ * and `LV_OBJ_FLAG_SCROLLABLE` is removed from the content so swipes
+ * no longer pan between tabs.
+ */
 void lv_example_tabview_2(void)
 {
     /*Create a Tab view object*/

@@ -2,7 +2,13 @@
 #if LV_BUILD_EXAMPLES
 
 /**
- * Using the border style properties
+ * @title Partial border sides
+ * @brief Draw a border only on the bottom and right edges of an object.
+ *
+ * The style sets a grey background with `radius = 10`, then configures a
+ * blue border with `width = 5` and `opa = 50%`, restricted to
+ * `LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT`. The style is applied
+ * to a centered base object so only two sides receive the border.
  */
 void lv_example_style_3(void)
 {

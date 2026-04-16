@@ -31,9 +31,17 @@ static void logo_scale_cb(lv_event_t * e)
 }
 
 /**
- * Load a logo model once and share it across four glTF viewers in a 2x2 grid.
- * Each viewer shows the logo from a different angle.
- * Animate the shared model's growth - changes affect all four viewers.
+ * @title Share one glTF across four viewers
+ * @brief Animate the scale of a logo shared by four `lv_gltf` viewers arranged in a 2x2 grid.
+ *
+ * `lv_gltf_data_load_from_file` loads `lvgl_logo.glb` once, and four
+ * `lv_gltf` viewers sized `50%` by `50%` are aligned to each corner of the
+ * active screen with pitch and yaw set to +/-30 degrees so each viewer
+ * shows a different angle. `lv_gltf_add_model` attaches the shared model
+ * to all four. An `lv_anim_t` drives the root node via `anim_scale_cb`
+ * from 10 to 100 (0.1 to 1.0 scale) over 2000 ms with
+ * `lv_anim_path_ease_in_out`, a 1000 ms reverse delay, a 1500 ms reverse
+ * duration, a 500 ms repeat delay, and `LV_ANIM_REPEAT_INFINITE`.
  */
 void lv_example_gltf_4(void)
 {
