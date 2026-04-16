@@ -43,13 +43,12 @@
 #define BINOM_W_INNER  64
 #define BINOM_W_CENTER 96
 
-/* Maximum sigma^2_local the final pass can handle (9-tap range = 3.0).
- * Pyramid stops when remaining fits within this. */
-#define FINAL_MAX_LOCAL_SIGMA_SQ 24 /* 3.0 in 8x-scaled units */
-
-/* Tap-count selection thresholds (table index k = sigma^2_local * 16).
- * Below 5TO7, the +-3 taps carry <1% energy — 5-tap saves 4 draws.
- * Above 7TO9, 7-tap truncation exceeds ~1% — 9-tap captures the tail. */
+/* Final pass thresholds (table index k = sigma^2_local * 16).
+ * FINAL_K_MAX: maximum sigma^2_local the final pass handles (9-tap range).
+ *   Pyramid stops when remaining sigma^2 fits within this range.
+ * THRESHOLD_5TO7: below this, +-3 taps carry <1% energy — 5-tap saves 4 draws.
+ * THRESHOLD_7TO9: above this, 7-tap truncation exceeds ~1% — 9-tap captures the tail. */
+#define FINAL_K_MAX             48  /* sigma^2_local = 3.0 */
 #define FINAL_K_THRESHOLD_5TO7  16  /* sigma^2_local <= 1.0: use 5-tap */
 #define FINAL_K_THRESHOLD_7TO9  36  /* sigma^2_local > 2.25: use 9-tap */
 
@@ -567,7 +566,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             test_w = (test_w + 1) / 2;
             test_h = (test_h + 1) / 2;
             if(test_w < 4 || test_h < 4) break;
-            if(sigma_sq_target - acc <= FINAL_MAX_LOCAL_SIGMA_SQ * p4) break;
+            if((sigma_sq_target - acc) * 2 <= FINAL_K_MAX * p4) break;
             acc += p4 * 8;
             p4 *= 4;
             n_tiers_est++;
@@ -675,7 +674,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     for(int32_t tier = 0; tier < MAX_PYRAMID_TIERS; tier++) {
         int32_t remaining_before = sigma_sq_target - levels[n_levels - 1].sigma_sq;
-        if(remaining_before <= FINAL_MAX_LOCAL_SIGMA_SQ * pow4) break;
+        if(remaining_before * 2 <= FINAL_K_MAX * pow4) break;
 
         gauss_level_t * prev = &levels[n_levels - 1];
 
