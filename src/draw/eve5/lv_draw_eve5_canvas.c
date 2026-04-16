@@ -19,11 +19,6 @@
 #include "../lv_draw_image.h"
 
 /**********************
- * DEFINES
- **********************/
-#define DRAW_UNIT_ID_EVE5 82
-
-/**********************
  * STATIC PROTOTYPES
  **********************/
 static bool is_simple_image_draw(const lv_draw_image_dsc_t * dsc, const lv_draw_task_t * t);

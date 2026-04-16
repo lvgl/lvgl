@@ -869,6 +869,9 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                 levels[n_levels].sigma_sq = sigma_sq_target;
                                 n_levels++;
                             }
+                            else {
+                                Esd_GpuAlloc_PendingFree(u->allocator, extra_handle);
+                            }
                         }
                     }
                 }

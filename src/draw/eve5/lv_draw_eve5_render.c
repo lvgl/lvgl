@@ -27,10 +27,8 @@
 /*********************
  * DEFINES
  *********************/
-#define DRAW_UNIT_ID_EVE5 82
 
-#if 0
-#define EVE5_LOG(...) LV_LOG_INFO(__VA_ARGS__)
+#if EVE5_DEBUG_LOG
 static const char * task_type_str(lv_draw_task_type_t type)
 {
     switch(type) {
@@ -60,8 +58,6 @@ static const char * task_type_str(lv_draw_task_type_t type)
             return "OTHER";
     }
 }
-#else
-#define EVE5_LOG(...) do {} while(0)
 #endif
 
 /**********************

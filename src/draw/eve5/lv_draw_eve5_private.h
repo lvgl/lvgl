@@ -119,6 +119,22 @@ extern "C" {
 #endif
 
 /*********************
+ * DEFINES
+ *********************/
+#define DRAW_UNIT_ID_EVE5 82
+
+/* Debug logging toggle. Set to 1 to enable verbose task logging. */
+#ifndef EVE5_DEBUG_LOG
+#define EVE5_DEBUG_LOG 0
+#endif
+
+#if EVE5_DEBUG_LOG
+#define EVE5_LOG(...) LV_LOG_INFO(__VA_ARGS__)
+#else
+#define EVE5_LOG(...) do {} while(0)
+#endif
+
+/*********************
  * UTILITY MACROS
  *********************/
 #define ALIGN_UP(x, align) (((x) + ((align) - 1)) & ~((align) - 1))
