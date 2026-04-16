@@ -257,7 +257,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         lv_opengles_render_params_t params = {
             .h_flip = false,
             .v_flip = false,
-            .rb_swap = LV_COLOR_DEPTH == 32,
         };
         lv_opengles_render_display(disp, &params);
         lv_opengles_egl_update(ctx->egl_ctx);

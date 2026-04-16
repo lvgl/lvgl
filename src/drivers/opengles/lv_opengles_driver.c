@@ -202,7 +202,6 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
     params.disp_h = disp_h;
     params.texture_clip_area = area;
     params.fill_color = color;
-    params.rb_swap = true;
     lv_opengles_render(&params);
     LV_PROFILER_DRAW_END;
 }
@@ -255,7 +254,6 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     lv_opengles_render_params_t params = {
         .v_flip = v_flip,
         .h_flip = h_flip,
-        .rb_swap = true
     };
     lv_opengles_render_display(display, &params);
 }
