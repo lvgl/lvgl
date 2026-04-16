@@ -275,25 +275,24 @@ static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     /* Read pixels from FBO */
-    GLenum format;
     GLenum type;
 
     /* OpenGL reads bottom-to-top, but LVGL expects top-to-bottom */
+    bool rb_swap = false;
     switch(draw_buf->header.cf) {
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-            format = GL_BGRA;
             type = GL_UNSIGNED_BYTE;
+            rb_swap = true;
             break;
 
         case LV_COLOR_FORMAT_RGB888:
-            format = GL_RGB;
             type = GL_UNSIGNED_BYTE;
+            rb_swap = true;
             break;
 
         case LV_COLOR_FORMAT_RGB565:
-            format = GL_RGB;
             type = GL_UNSIGNED_SHORT_5_6_5;
             break;
 
@@ -307,10 +306,10 @@ static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
         /* Reverse Y coordinate */
         void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
         LV_PROFILER_DRAW_BEGIN_TAG("glReadPixels");
-        glReadPixels(0, y, w, 1, format, type, row);
+        glReadPixels(0, y, w, 1, GL_RGB, type, row);
         LV_PROFILER_DRAW_END_TAG("glReadPixels");
 
-        if(draw_buf->header.cf == LV_COLOR_FORMAT_RGB888) {
+        if(rb_swap) {
             /* Swizzle RGB -> BGR */
             lv_color_t * px = row;
             for(int32_t x = 0; x < w; x++) {
