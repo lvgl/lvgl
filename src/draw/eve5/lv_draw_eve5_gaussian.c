@@ -1,7 +1,7 @@
 /**
  * @file lv_draw_eve5_gaussian.c
  *
- * EVE5 (BT820) High-Quality Gaussian Blur via Mipmap Downsampling
+ * EVE5 (BT820) Gaussian Blur via Mipmap Downsampling
  *
  * Separable Gaussian kernel with nearest sampling throughout the
  * pyramid, bilinear only on final upscale.
@@ -10,7 +10,7 @@
  * 1. Extract blur region with edge-extended padding
  * 2. Build pyramid: each tier applies H blur+2x downsample then V blur+2x
  *    downsample using the binomial [1,4,6,4,1]/16 kernel (sigma^2 = 1).
- *    Stop BEFORE the next tier would overshoot sigma^2_target.
+ *    Stop before the next tier would overshoot sigma^2_target.
  * 3. Extra pass: one H+V blur at the deepest level (no downsample)
  *    with Gaussian weights computed for sigma^2_remaining. Uses 5-tap,
  *    7-tap, or 9-tap kernel selected at runtime based on sigma^2_local.
@@ -38,18 +38,18 @@
 #define MAX_BLUR_LEVELS   (1 + MAX_PYRAMID_TIERS + 1)  /* extract + pyramid + extra */
 
 /* Binomial kernel [1,4,6,4,1]/16 weights in 8-bit (sum = 256).
- * Exact sigma^2 = 1.0 per pass. Used for pyramid tiers. */
+ * Exact sigma^2 = 1.0 per pass. */
 #define BINOM_W_OUTER  16
 #define BINOM_W_INNER  64
 #define BINOM_W_CENTER 96
 
 /* Maximum sigma^2_local the final pass can handle (9-tap range = 3.0).
- * Pyramid stops when remaining fits within this range. */
+ * Pyramid stops when remaining fits within this. */
 #define FINAL_MAX_LOCAL_SIGMA_SQ 24 /* 3.0 in 8x-scaled units */
 
-/* Runtime tap-count selection thresholds (table index k = sigma^2_local * 16).
- * Below THRESHOLD_5TO7, the +-3 taps carry < ~1% total energy — 5-tap saves 4 draws.
- * Above THRESHOLD_7TO9, 7-tap truncation exceeds ~1% — 9-tap captures the tail. */
+/* Tap-count selection thresholds (table index k = sigma^2_local * 16).
+ * Below 5TO7, the +-3 taps carry <1% energy — 5-tap saves 4 draws.
+ * Above 7TO9, 7-tap truncation exceeds ~1% — 9-tap captures the tail. */
 #define FINAL_K_THRESHOLD_5TO7  16  /* sigma^2_local <= 1.0: use 5-tap */
 #define FINAL_K_THRESHOLD_7TO9  36  /* sigma^2_local > 2.25: use 9-tap */
 
@@ -66,10 +66,10 @@ typedef struct {
 /**********************
  * 5-TAP GAUSSIAN WEIGHT TABLE
  *
- * Precomputed weights for 5 taps at positions [-2,-1,0,+1,+2]
- * indexed by sigma^2 in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
+ * Weights for taps at positions [-2,-1,0,+1,+2], indexed by sigma^2
+ * in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
  *
- * For each entry: {w_outer, w_inner}.
+ * Entry format: {w_outer, w_inner}.
  * w_center = 256 - 2*(w_outer + w_inner).
  *
  * Computed from: w(x) = exp(-x^2 / (2*sigma^2)), normalized over 5 taps.
@@ -129,10 +129,10 @@ static const uint8_t s_gauss5_weights[49][2] = {
 /**********************
  * 7-TAP GAUSSIAN WEIGHT TABLE
  *
- * Precomputed weights for 7 taps at positions [-3,-2,-1,0,+1,+2,+3]
- * indexed by sigma^2 in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
+ * Weights for taps at positions [-3..+3], indexed by sigma^2
+ * in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
  *
- * For each entry: {w_outer3, w_middle2, w_inner1}.
+ * Entry format: {w_outer3, w_middle2, w_inner1}.
  * w_center = 256 - 2*(w_outer3 + w_middle2 + w_inner1).
  *
  * Computed from: w(x) = exp(-x^2 / (2*sigma^2)), normalized over 7 taps.
@@ -192,10 +192,10 @@ static const uint8_t s_gauss7_weights[49][3] = {
 /**********************
  * 9-TAP GAUSSIAN WEIGHT TABLE
  *
- * Precomputed weights for 9 taps at positions [-4,-3,-2,-1,0,+1,+2,+3,+4]
- * indexed by sigma^2 in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
+ * Weights for taps at positions [-4..+4], indexed by sigma^2
+ * in 1/16 steps (k = 0..48, sigma^2 = k/16, range 0..3).
  *
- * For each entry: {w_outer4, w_middle3, w_inner2, w_inner1}.
+ * Entry format: {w_outer4, w_middle3, w_inner2, w_inner1}.
  * w_center = 256 - 2*(w_outer4 + w_middle3 + w_inner2 + w_inner1).
  *
  * Computed from: w(x) = exp(-x^2 / (2*sigma^2)), normalized over 9 taps.
@@ -284,14 +284,7 @@ static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
  * One separable 5-tap Gaussian blur pass with optional 2x downsample.
  *
  * Renders 5 nearest-sampled bitmap draws at integer source offsets
- * [-2,-1,0,+1,+2] with additive blending. The caller specifies the
- * three unique symmetric weights.
- *
- * @param horizontal  true for horizontal blur, false for vertical
- * @param downsample  true for 2x downsample along blur axis
- * @param w_outer     weight for taps at offset +/-2
- * @param w_inner     weight for taps at offset +/-1
- * @param w_center    weight for tap at offset 0
+ * [-2,-1,0,+1,+2] with additive blending.
  */
 static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
                                uint32_t src_addr, int32_t src_stride, int32_t src_h,
@@ -367,8 +360,8 @@ static bool gaussian_5tap_pass(lv_draw_eve5_unit_t * u,
  **********************/
 
 /**
- * One separable 7-tap Gaussian blur pass (no downsample, same resolution).
- * Used only for the final pass. 7 nearest-sampled draws at [-3..+3].
+ * One separable 7-tap Gaussian blur pass (no downsample).
+ * 7 nearest-sampled draws at [-3..+3].
  */
 static bool gaussian_7tap_pass(lv_draw_eve5_unit_t * u,
                                uint32_t src_addr, int32_t src_stride, int32_t src_h,
@@ -438,8 +431,7 @@ static bool gaussian_7tap_pass(lv_draw_eve5_unit_t * u,
  **********************/
 
 /**
- * One separable 9-tap Gaussian blur pass (no downsample, same resolution).
- * Used for the final pass when sigma^2_local requires the extra +-4 reach.
+ * One separable 9-tap Gaussian blur pass (no downsample).
  * 9 nearest-sampled draws at [-4..+4]; zero-weight taps are skipped.
  */
 static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
@@ -510,14 +502,8 @@ static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
  **********************/
 
 /**
- * High-quality Gaussian blur of a region within a completed layer buffer.
+ * Gaussian blur of a region within a completed layer buffer.
  * Modifies dst_handle in place.
- *
- * Pipeline:
- * 1. Extract blur region with edge-extended padding
- * 2. Build Gaussian pyramid (stop before overshooting target sigma^2)
- * 3. One extra separable 5/7/9-tap pass with computed weights for remaining sigma^2
- * 4. Single bilinear upscale from final level back to layer
  */
 bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                 Esd_GpuHandle dst_handle, const lv_draw_task_t * blur_task)
@@ -531,8 +517,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     if(blur_radius <= 0) return true;
 
-    /* Full blur area in layer-relative coords (for rounded rect geometry).
-     * Uses FULL area so tiled strips produce consistent rounded rect portions. */
+    /* Full blur area in layer-relative coords (for rounded rect geometry) */
     int32_t full_x1 = blur_task->area.x1 - layer_area->x1;
     int32_t full_y1 = blur_task->area.y1 - layer_area->y1;
     int32_t full_x2 = blur_task->area.x2 - layer_area->x1;
@@ -566,30 +551,13 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint32_t dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
     if(dst_addr == GA_INVALID) return false;
 
-    /* Match the LVGL SW renderer's effective blur strength.
-     *
-     * The SW blur is a 4-direction IIR exponential filter:
-     *   alpha = R / (R + 4), applied forward+backward per axis.
-     *   Per-axis sigma^2 = R * (R + 4) / 8.
-     *
-     * With LV_BLUR_QUALITY_AUTO, the SW renderer also halves R for R >= 8
-     * (skip_cnt = 2) as a speed optimization. This creates a visible
-     * discontinuity at R=8 where the blur suddenly weakens. Our GPU
-     * implementation doesn't need this hack, so we model the underlying
-     * IIR filter smoothly across all radii using the skip_cnt=2 formula
-     * (which is what most users see) but without the hard threshold:
-     *   effective_r = R / 2  (continuous, matches AUTO quality behavior)
-     *   sigma^2 = effective_r * (effective_r + 4) / 8
-     *
-     * All sigma^2 values are stored 8x-scaled to preserve precision on
-     * small radii: target = (R/2) * (R/2 + 4) = R*(R+8)/4. */
+    /* Convert blur_radius to sigma^2 (8x-scaled for precision).
+     * Uses effective_r = R/2 to match LVGL's AUTO quality IIR filter behavior.
+     * sigma^2 = (R/2) * (R/2 + 4) / 8 = R*(R+8)/32 -> scaled by 8 = R*(R+8)/4 */
     int32_t sigma_sq_target = blur_radius * (blur_radius + 8) / 4;
     if(sigma_sq_target < 1) sigma_sq_target = 1;
 
-    /* Pre-estimate pyramid depth for padding computation.
-     * Each tier contributes 4^tier to sigma^2 (8x-scaled: 4^tier * 8).
-     * Stop when remaining fits in the final pass's range (FINAL_MAX_LOCAL_SIGMA_SQ).
-     * With 7-tap this stops earlier, keeping more resolution for the final pass. */
+    /* Pre-estimate pyramid depth for padding computation */
     int32_t n_tiers_est = 0;
     {
         int32_t acc = 0, p4 = 1;
@@ -606,11 +574,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         }
     }
 
-    /* Padding must cover the cumulative 5-tap kernel reach through all pyramid
-     * tiers plus the final pass at the deepest level.
-     * Pyramid: +/-2 per tier at scale 2^k -> cumulative 2*(2^n - 1).
-     * Final pass: +/-HALF_TAP at scale 2^n -> HALF_TAP * 2^n more.
-     * 5-tap HALF_TAP=2, 7-tap HALF_TAP=3, 9-tap HALF_TAP=4. */
+    /* Padding covers cumulative kernel reach through all tiers plus final pass */
     #define FINAL_HALF_TAP 4
     int32_t scale_n = 1 << n_tiers_est;
     int32_t pyramid_reach = 2 * (scale_n - 1);
@@ -619,7 +583,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     if(n_tiers_est == 0) total_reach = FINAL_HALF_TAP * 2;
     int32_t pad = LV_MAX(blur_radius, total_reach);
 
-    /* ========== Padded content dimensions (16px RT alignment) ========== */
+    /* Padded content dimensions (16px RT alignment) */
     int32_t pw = ALIGN_UP(bw + 2 * pad, 16);
     int32_t ph = ALIGN_UP(bh + 2 * pad, 16);
     pad = (pw - bw) / 2;
@@ -627,8 +591,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     int32_t paw = ALIGN_UP(pw, 16);
     int32_t pah = ALIGN_UP(ph, 16);
 
-    /* ========== Phase 1: Extract blur region with edge padding ========== */
-
+    /* Phase 1: Extract blur region with edge padding */
     uint32_t extract_size = (uint32_t)paw * 4 * (uint32_t)pah;
     Esd_GpuHandle extract_handle = Esd_GpuAlloc_Alloc(u->allocator, extract_size, GA_ALIGN_128);
     uint32_t extract_addr = Esd_GpuAlloc_Get(u->allocator, extract_handle);
@@ -652,8 +615,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoDl_bitmapSource(phost, dst_addr + src_ofs);
         EVE_CoDl_bitmapLayout(phost, ARGB8, layer_stride, layer_h - by1);
 
-        /* Draw 1: stretch source to fill padded buffer (extends edges into padding).
-         * NEAREST prevents dark fringe from BILINEAR interpolating with BORDER black. */
+        /* Draw 1: stretch source to fill padded buffer (edge extension) */
         {
             uint32_t scale_a = (uint32_t)bw * 256 / (uint32_t)pw;
             uint32_t scale_e = (uint32_t)bh * 256 / (uint32_t)ph;
@@ -686,10 +648,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoCmd_graphicsFinish(phost);
     }
 
-    /* ========== Allocate reusable H-pass temp buffer ========== */
-    /* Must hold the largest intermediate: either the pyramid tier 0 H output
-     * (pw/2 x ph) or the final pass H output at full resolution (pw x ph)
-     * when no pyramid tiers are built. */
+    /* Allocate reusable H-pass temp buffer */
     int32_t temp_aw = (n_tiers_est > 0) ? ALIGN_UP((pw + 1) / 2, 16) : paw;
     int32_t temp_ah = ALIGN_UP(ph, 16);
     uint32_t temp_size = (uint32_t)temp_aw * 4 * (uint32_t)temp_ah;
@@ -700,7 +659,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return true;
     }
 
-    /* ========== Phase 2: Build Gaussian pyramid ========== */
+    /* Phase 2: Build Gaussian pyramid */
     gauss_level_t levels[MAX_BLUR_LEVELS];
     int32_t n_levels = 0;
 
@@ -712,12 +671,9 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     levels[0].sigma_sq = 0;
     n_levels = 1;
 
-    int32_t pow4 = 1;  /* 4^tier: this tier's unscaled sigma^2 contribution */
+    int32_t pow4 = 1;
 
     for(int32_t tier = 0; tier < MAX_PYRAMID_TIERS; tier++) {
-        /* Stop when remaining sigma^2 fits within the final pass's range.
-         * With 9-tap (MAX=3.0) this stops earlier than 7-tap (MAX=2.25),
-         * keeping higher resolution for the final pass. */
         int32_t remaining_before = sigma_sq_target - levels[n_levels - 1].sigma_sq;
         if(remaining_before <= FINAL_MAX_LOCAL_SIGMA_SQ * pow4) break;
 
@@ -726,7 +682,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         int32_t next_w = (prev->w + 1) / 2;
         int32_t next_h = (prev->h + 1) / 2;
         if(next_w < 4 || next_h < 4) break;
-        if(n_levels >= MAX_BLUR_LEVELS - 1) break;  /* reserve slot for extra pass */
+        if(n_levels >= MAX_BLUR_LEVELS - 1) break;
 
         int32_t next_aw = ALIGN_UP(next_w, 16);
         int32_t next_ah = ALIGN_UP(next_h, 16);
@@ -738,7 +694,6 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             break;
         }
 
-        /* H intermediate: half-width x full-height */
         int32_t h_w = next_w;
         int32_t h_h = prev->h;
         int32_t h_aw = ALIGN_UP(h_w, 16);
@@ -749,7 +704,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         uint32_t lev_addr = Esd_GpuAlloc_Get(u->allocator, level_handle);
         if(prev_addr == GA_INVALID || t_addr == GA_INVALID || lev_addr == GA_INVALID) break;
 
-        /* H blur + 2x downsample: prev -> temp */
+        /* H blur + 2x downsample */
         gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                            t_addr, h_aw, h_ah, h_w, h_h,
                            true, true,
@@ -759,7 +714,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         lev_addr = Esd_GpuAlloc_Get(u->allocator, level_handle);
         if(t_addr == GA_INVALID || lev_addr == GA_INVALID) break;
 
-        /* V blur + 2x downsample: temp -> level */
+        /* V blur + 2x downsample */
         gaussian_5tap_pass(u, t_addr, h_aw * 4, h_h,
                            lev_addr, next_aw, next_ah, next_w, next_h,
                            false, true,
@@ -775,16 +730,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         pow4 *= 4;
     }
 
-    /* ========== Phase 3: Final blur pass for remaining sigma^2 ========== */
-    /* Compute sigma^2_local at the deepest level, look up Gaussian weights,
-     * and do one separable H+V pass (no downsample) to hit the target.
-     *
-     * Runtime tap selection:
-     *   k <= FINAL_K_THRESHOLD_5TO7  -> 5-tap (+-3 weights are zero, saves 4 draws)
-     *   k <= FINAL_K_THRESHOLD_7TO9  -> 7-tap
-     *   k >  FINAL_K_THRESHOLD_7TO9  -> 9-tap (captures tail energy)
-     *
-     * Table index k = sigma^2_local * 16, range [0..48]. */
+    /* Phase 3: Final blur pass for remaining sigma^2 */
     {
         int32_t remaining = sigma_sq_target - levels[n_levels - 1].sigma_sq;
 
@@ -793,20 +739,16 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
             if(prev->w >= 4 && prev->h >= 4) {
 
-                /* k = sigma^2_local * 16 = remaining * 2 / pow4 */
                 int32_t k = remaining * 2 / pow4;
                 if(k > 48) k = 48;
                 if(k < 0) k = 0;
 
-                /* Select tap count based on thresholds */
                 bool use_5tap = (k <= FINAL_K_THRESHOLD_5TO7);
                 bool use_9tap = (k > FINAL_K_THRESHOLD_7TO9);
 
-                /* 5-tap weights (properly normalized over 5 taps) */
                 uint8_t ew_outer = s_gauss5_weights[k][0];
                 uint8_t ew_inner = s_gauss5_weights[k][1];
 
-                /* 7-tap weights (used when !use_5tap && !use_9tap) */
                 uint8_t ew_outer3 = s_gauss7_weights[k][0];
                 uint8_t ew_middle = s_gauss7_weights[k][1];
                 uint8_t ew_inner7 = s_gauss7_weights[k][2];
@@ -820,7 +762,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                     ew_i2 = s_gauss9_weights[k][2];
                     ew_i1 = s_gauss9_weights[k][3];
                     ew_center = (uint8_t)(256 - 2 * (ew_o4 + ew_o3 + ew_i2 + ew_i1));
-                    has_blur = true; /* k > FINAL_K_THRESHOLD_7TO9 always has blur */
+                    has_blur = true;
                 }
 
                 if(has_blur) {
@@ -910,8 +852,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return true;
     }
 
-    /* ========== Phase 4: Composite back to layer ========== */
-    /* Single bilinear upscale from the final (deepest) level. */
+    /* Phase 4: Composite back to layer (bilinear upscale from deepest level) */
     int32_t final_idx = n_levels - 1;
 
     dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
@@ -940,13 +881,11 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoDl_vertex2f_0(phost, 0, 0);
         EVE_CoDl_end(phost);
 
-        /* Scissor to clipped blur region */
         EVE_CoDl_scissorXY(phost, bx1, by1);
         EVE_CoDl_scissorSize(phost, bw, bh);
 
         EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
 
-        /* Rounded corner stencil (optional) */
         if(corner_radius > 0) {
             EVE_CoDl_saveContext(phost);
 
@@ -988,7 +927,6 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoCmd_graphicsFinish(phost);
     }
 
-    /* ========== Cleanup ========== */
 cleanup:
     Esd_GpuAlloc_PendingFree(u->allocator, extract_handle);
     Esd_GpuAlloc_PendingFree(u->allocator, temp_handle);
