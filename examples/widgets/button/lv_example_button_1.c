@@ -13,6 +13,16 @@ static void event_handler(lv_event_t * e)
     }
 }
 
+/**
+ * @title Button basics
+ * @brief A momentary button and a checkable toggle button sharing one event handler.
+ *
+ * Two buttons are created on the active screen. Both register `event_handler`,
+ * which logs `Clicked` on `LV_EVENT_CLICKED` and `Toggled` on
+ * `LV_EVENT_VALUE_CHANGED`. The first button has `LV_OBJ_FLAG_PRESS_LOCK`
+ * removed; the second has `LV_OBJ_FLAG_CHECKABLE` set so it stays checked
+ * when pressed and emits `LV_EVENT_VALUE_CHANGED` on toggle.
+ */
 void lv_example_button_1(void)
 {
     lv_obj_t * label;

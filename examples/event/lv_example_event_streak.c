@@ -19,6 +19,17 @@ static void streak_event_cb(lv_event_t * e)
     lv_label_set_text(label, text);
 }
 
+/**
+ * @title Click streaks (single, double, triple)
+ * @brief React to single, double, and triple click events plus the short-click streak count.
+ *
+ * A button is registered with four event callbacks: `LV_EVENT_SHORT_CLICKED`
+ * reads `lv_indev_get_short_click_streak()` and writes the count to a
+ * separate label; `LV_EVENT_SINGLE_CLICKED`, `LV_EVENT_DOUBLE_CLICKED`, and
+ * `LV_EVENT_TRIPLE_CLICKED` each set the button's label to a matching string.
+ *
+ * @hide_in_docs
+ */
 void lv_example_event_streak(void)
 {
     lv_obj_t * info_label = lv_label_create(lv_screen_active());
