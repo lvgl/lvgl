@@ -2,7 +2,12 @@
 #if LV_BUILD_EXAMPLES && LV_USE_LABEL
 
 /**
- * Basic example to create a "Hello world" label
+ * @title Hello world label
+ * @brief Set the screen background color and place a centered label.
+ *
+ * Sets the active screen's background color, creates a label with the text
+ * `Hello world`, sets the screen's text color to white, and centers the
+ * label on the screen.
  */
 void lv_example_get_started_1(void)
 {

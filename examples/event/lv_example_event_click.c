@@ -13,7 +13,12 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Add click event to a button
+ * @title Click event on a button
+ * @brief Update a button's label with an incrementing counter on each click.
+ *
+ * A button with a child label is placed on the active screen. An
+ * `LV_EVENT_CLICKED` callback retrieves the button, updates its label with
+ * a static incrementing counter, and logs `Clicked`.
  */
 void lv_example_event_click(void)
 {
