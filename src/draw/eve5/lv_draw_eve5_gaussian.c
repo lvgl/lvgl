@@ -76,6 +76,16 @@
 #define FINAL_MAX_LOCAL_SIGMA_SQ 8 /* 1.0 */
 #endif
 
+/* Runtime tap-count selection thresholds (7/9-tap table index k = sigma^2_local * 16).
+ * Below THRESHOLD_5TO7, the +-3 taps are zero — 5-tap is identical but 4 fewer draws.
+ * Above THRESHOLD_7TO9, 7-tap truncation exceeds ~1% — 9-tap captures the tail. */
+#if EVE5_GAUSSIAN_FINAL_7TAP
+#define FINAL_K_THRESHOLD_5TO7  13  /* sigma^2_local <= 0.8125: use 5-tap */
+#endif
+#if EVE5_GAUSSIAN_FINAL_9TAP
+#define FINAL_K_THRESHOLD_7TO9  36  /* sigma^2_local > 2.25: use 9-tap */
+#endif
+
 /**********************
  * TYPES
  **********************/
@@ -804,9 +814,13 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     /* Compute sigma^2_local at the deepest level, look up Gaussian weights,
      * and do one separable H+V pass (no downsample) to hit the target.
      *
-     * 5-tap: sigma^2_local in [0, 1). Table index k = sigma^2_local * 32.
-     * 7/9-tap: sigma^2_local in [0, 3). Table index k = sigma^2_local * 16.
-     * 9-tap selected at runtime when sigma^2_local > 2.25 (k > 36). */
+     * Runtime tap selection (when 7TAP and 9TAP are both enabled):
+     *   k <= FINAL_K_THRESHOLD_5TO7  -> 5-tap (+-3 weights are zero, saves 4 draws)
+     *   k <= FINAL_K_THRESHOLD_7TO9  -> 7-tap
+     *   k >  FINAL_K_THRESHOLD_7TO9  -> 9-tap (captures tail energy)
+     *
+     * 5-tap only: table index k = sigma^2_local * 32, range [0..32].
+     * 7/9-tap:    table index k = sigma^2_local * 16, range [0..48]. */
     {
         int32_t remaining = sigma_sq_target - levels[n_levels - 1].sigma_sq;
 
@@ -815,22 +829,32 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
             if(prev->w >= 4 && prev->h >= 4) {
 
+                uint8_t ew_center;
+                bool has_blur;
+
 #if EVE5_GAUSSIAN_FINAL_7TAP
                 /* 7/9-tap: k = sigma^2_local * 16 = remaining * 2 / pow4 */
                 int32_t k = remaining * 2 / pow4;
                 if(k > 48) k = 48;
                 if(k < 0) k = 0;
 
+                /* Select tap count based on thresholds */
+                bool use_5tap = (k <= FINAL_K_THRESHOLD_5TO7);
 #if EVE5_GAUSSIAN_FINAL_9TAP
-                /* Use 9-tap when sigma^2_local > 2.25 (7-tap truncation > 1%) */
-                bool use_9tap = (k > 36);
+                bool use_9tap = (k > FINAL_K_THRESHOLD_7TO9);
 #endif
 
-                uint8_t ew_outer = s_gauss7_weights[k][0];
-                uint8_t ew_middle = s_gauss7_weights[k][1];
-                uint8_t ew_inner = s_gauss7_weights[k][2];
-                uint8_t ew_center = (uint8_t)(256 - 2 * (ew_outer + ew_middle + ew_inner));
-                bool has_blur = (ew_outer > 0 || ew_middle > 0 || ew_inner > 0);
+                /* 5-tap path: +-3 weights are zero, use the +-2/+-1 weights directly.
+                 * The 7-tap table's middle2/inner1 are identical to 5-tap outer/inner
+                 * when outer3 == 0, so we read from the same table. */
+                uint8_t ew_outer = s_gauss7_weights[k][1];  /* w_middle2 == w_outer for 5-tap */
+                uint8_t ew_inner = s_gauss7_weights[k][2];  /* w_inner1 == w_inner for 5-tap */
+
+                /* 7-tap weights (used when !use_5tap && !use_9tap) */
+                uint8_t ew_outer3 = s_gauss7_weights[k][0];
+                uint8_t ew_middle = ew_outer;  /* alias: same slot */
+                ew_center = (uint8_t)(256 - 2 * (ew_outer3 + ew_middle + ew_inner));
+                has_blur = (ew_outer3 > 0 || ew_middle > 0 || ew_inner > 0);
 
 #if EVE5_GAUSSIAN_FINAL_9TAP
                 uint8_t ew_o4 = 0, ew_o3 = 0, ew_i2 = 0, ew_i1 = 0;
@@ -840,19 +864,19 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                     ew_i2 = s_gauss9_weights[k][2];
                     ew_i1 = s_gauss9_weights[k][3];
                     ew_center = (uint8_t)(256 - 2 * (ew_o4 + ew_o3 + ew_i2 + ew_i1));
-                    has_blur = true; /* k > 36 always has blur */
+                    has_blur = true; /* k > FINAL_K_THRESHOLD_7TO9 always has blur */
                 }
 #endif
 #else
-                /* 5-tap: k = sigma^2_local * 32 = remaining * 4 / pow4 */
+                /* 5-tap only: k = sigma^2_local * 32 = remaining * 4 / pow4 */
                 int32_t k = remaining * 4 / pow4;
                 if(k > 32) k = 32;
                 if(k < 0) k = 0;
 
                 uint8_t ew_outer = s_gauss_weights[k][0];
                 uint8_t ew_inner = s_gauss_weights[k][1];
-                uint8_t ew_center = (uint8_t)(256 - 2 * ew_outer - 2 * ew_inner);
-                bool has_blur = (ew_outer > 0 || ew_inner > 0);
+                ew_center = (uint8_t)(256 - 2 * ew_outer - 2 * ew_inner);
+                has_blur = (ew_outer > 0 || ew_inner > 0);
 #endif
 
                 if(has_blur) {
@@ -887,11 +911,11 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                             } else
 #endif
 #if EVE5_GAUSSIAN_FINAL_7TAP
-                            {
+                            if(!use_5tap) {
                                 gaussian_7tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                                                    t_addr, prev->aw, prev->ah, prev->w, prev->h,
                                                    true,
-                                                   ew_outer, ew_middle, ew_inner, ew_center);
+                                                   ew_outer3, ew_middle, ew_inner, ew_center);
 
                                 t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
                                 ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
@@ -900,12 +924,13 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                     gaussian_7tap_pass(u, t_addr, prev->aw * 4, prev->h,
                                                        ex_addr, prev->aw, prev->ah, prev->w, prev->h,
                                                        false,
-                                                       ew_outer, ew_middle, ew_inner, ew_center);
+                                                       ew_outer3, ew_middle, ew_inner, ew_center);
                                     final_ok = true;
                                 }
-                            }
-#else
+                            } else
+#endif
                             {
+                                ew_center = (uint8_t)(256 - 2 * ew_outer - 2 * ew_inner);
                                 gaussian_5tap_pass(u, prev_addr, prev->aw * 4, prev->h,
                                                    t_addr, prev->aw, prev->ah, prev->w, prev->h,
                                                    true, false,
@@ -922,7 +947,6 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                     final_ok = true;
                                 }
                             }
-#endif
 
                             if(final_ok) {
                                 levels[n_levels].handle = extra_handle;
