@@ -488,7 +488,6 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
     if(draw_buf == NULL)
         return;
 
-    void * buf = draw_buf->data;
     int32_t width = lv_area_get_width(&layer->buf_area);
     int32_t height = lv_area_get_height(&layer->buf_area);
     uint32_t stride = draw_buf->header.stride;
@@ -502,10 +501,19 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
        cf != LV_COLOR_FORMAT_XRGB8888) {
         allow_buffer = true;
         new_buf = lv_draw_buf_create(width, height, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+        if(new_buf) lv_draw_buf_ensure_resident(new_buf, NULL);
         lv_draw_buf_clear(new_buf, NULL);
-        buf = new_buf->data;
         stride = new_buf->header.stride;
     }
+    else {
+#if LV_USE_DRAW_VRAM
+        if(draw_buf->data == NULL) {
+            if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) return;
+        }
+#endif
+    }
+
+    void * buf = allow_buffer ? new_buf->data : draw_buf->data;
     Tvg_Canvas * canvas = tvg_swcanvas_create();
     tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
 
@@ -524,6 +532,15 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
     }
 
     if(allow_buffer) {
+#if LV_USE_DRAW_VRAM
+        if(draw_buf->data == NULL) {
+            if(!lv_draw_buf_ensure_resident(draw_buf, NULL)) {
+                lv_draw_buf_destroy(new_buf);
+                tvg_canvas_destroy(canvas);
+                return;
+            }
+        }
+#endif
         lv_area_t src_area = {0, 0, width, height};
         _blend_draw_buf(draw_buf, &layer->buf_area, new_buf, &src_area);
         lv_draw_buf_destroy(new_buf);

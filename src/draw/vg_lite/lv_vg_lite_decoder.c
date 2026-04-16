@@ -696,7 +696,8 @@ static lv_draw_buf_t * create_dest_buf(uint32_t width, uint32_t height, lv_color
     lv_draw_buf_t * dest_buf = lv_draw_buf_create_ex(image_cache_draw_buf_handlers,
                                                      width, height, dest_cf,
                                                      LV_STRIDE_AUTO);
-    if(!dest_buf) {
+    if(!dest_buf || !lv_draw_buf_ensure_resident(dest_buf, NULL)) {
+        if(dest_buf) lv_draw_buf_destroy(dest_buf);
         return NULL;
     }
 

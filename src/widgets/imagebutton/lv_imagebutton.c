@@ -36,7 +36,7 @@ static void lv_imagebutton_event(const lv_obj_class_t * class_p, lv_event_t * e)
 static void refr_image(lv_obj_t * imagebutton);
 static lv_imagebutton_state_t suggest_state(lv_obj_t * imagebutton, lv_imagebutton_state_t state);
 static lv_imagebutton_state_t get_state(const lv_obj_t * imagebutton);
-static void update_src_info(lv_imagebutton_src_info_t * info, const void * src);
+static void update_src_info(lv_imagebutton_src_info_t * info, LV_IMAGE_DSC_CONST void * src);
 
 /**********************
  *  STATIC VARIABLES
@@ -72,8 +72,9 @@ lv_obj_t * lv_imagebutton_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left, const void * src_mid,
-                            const void * src_right)
+void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, LV_IMAGE_DSC_CONST void * src_left,
+                            LV_IMAGE_DSC_CONST void * src_mid,
+                            LV_IMAGE_DSC_CONST void * src_right)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -90,7 +91,7 @@ void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const 
     refr_image(obj);
 }
 
-void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left)
+void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, LV_IMAGE_DSC_CONST void * src_left)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -99,7 +100,7 @@ void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, c
     refr_image(obj);
 }
 
-void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_right)
+void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, LV_IMAGE_DSC_CONST void * src_right)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -108,7 +109,7 @@ void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, 
     refr_image(obj);
 }
 
-void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_mid)
+void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, LV_IMAGE_DSC_CONST void * src_mid)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -353,7 +354,7 @@ static lv_imagebutton_state_t get_state(const lv_obj_t * imagebutton)
     }
 }
 
-static void update_src_info(lv_imagebutton_src_info_t * info, const void * src)
+static void update_src_info(lv_imagebutton_src_info_t * info, LV_IMAGE_DSC_CONST void * src)
 {
     if(!src) {
         lv_memzero(info, sizeof(lv_imagebutton_src_info_t));

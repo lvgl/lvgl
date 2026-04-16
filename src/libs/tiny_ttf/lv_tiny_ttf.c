@@ -56,6 +56,7 @@ static void ttf_cb_stream_seek_and_read(ttf_cb_stream_t * stream, size_t positio
  **********************/
 
 typedef struct ttf_font_desc {
+    lv_font_dsc_base_t base;        /**< Common base — must be first member */
     lv_cache_t * glyph_cache;
     lv_cache_t * draw_data_cache;
     lv_cache_t * kerning_cache;
@@ -101,7 +102,7 @@ typedef struct _lv_tiny_ttf_cache_data_t {
  **********************/
 static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                  uint32_t unicode_letter_next);
-static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+static LV_IMAGE_DSC_CONST void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size,
                                       int32_t font_size, lv_font_kerning_t kerning,
@@ -371,7 +372,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     return true; /*true: glyph found; false: glyph was not found*/
 }
 
-static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+static LV_IMAGE_DSC_CONST void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(draw_buf);
     uint32_t glyph_index = g_dsc->gid.index;
@@ -618,8 +619,9 @@ static bool tiny_ttf_draw_data_cache_create_cb(tiny_ttf_cache_data_t * node, voi
     h = y2 - y1 + 1;
 
     lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
-    if(NULL == draw_buf) {
+    if(NULL == draw_buf || !lv_draw_buf_ensure_resident(draw_buf, NULL)) {
         LV_LOG_ERROR("tiny_ttf: out of memory");
+        if(draw_buf) lv_draw_buf_destroy(draw_buf);
         return false;
     }
 

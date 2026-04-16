@@ -170,7 +170,7 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
     return mbox->title;
 }
 
-lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
+lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * icon)
 {
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->header == NULL) {

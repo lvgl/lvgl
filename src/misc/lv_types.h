@@ -396,6 +396,10 @@ typedef struct _lv_translation_pack_t lv_translation_pack_t;
 typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #endif
 
+#if LV_USE_DRAW_VRAM
+typedef struct _lv_draw_buf_vram_res_t lv_draw_buf_vram_res_t;
+#endif
+
 #endif /*__ASSEMBLY__*/
 
 /**********************

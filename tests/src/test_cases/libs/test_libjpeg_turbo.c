@@ -20,7 +20,8 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-static void create_image_unit(const char * img_src, uint32_t image_pos_x, uint32_t image_pos_y, const char * label_text,
+static void create_image_unit(LV_IMAGE_DSC_CONST char * img_src, uint32_t image_pos_x, uint32_t image_pos_y,
+                              const char * label_text,
                               uint32_t label_pos_x, uint32_t label_pos_y)
 {
     lv_obj_t * img = lv_image_create(lv_screen_active());
@@ -78,7 +79,11 @@ void test_jpg_2(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
 
+#if LV_USE_DRAW_VRAM
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 96);
+#else
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 64);
+#endif
 }
 
 void test_jpg_cmyk(void)
@@ -107,7 +112,7 @@ void test_jpg_sign_error(void)
 void test_jpg_decode_failed(void)
 {
     lv_image_decoder_dsc_t decoder_dsc;
-    const char * image_path = "A:src/test_assets/test_img_lvgl_logo_with_decode_failed.jpg";
+    LV_IMAGE_DSC_CONST char * image_path = "A:src/test_assets/test_img_lvgl_logo_with_decode_failed.jpg";
 
     /* Try to decode the image */
     lv_result_t res = lv_image_decoder_open(&decoder_dsc, image_path, NULL);

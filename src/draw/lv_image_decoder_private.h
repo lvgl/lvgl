@@ -57,10 +57,10 @@ struct _lv_image_decoder_t {
 struct _lv_image_cache_data_t {
     lv_cache_slot_size_t slot;
 
-    const void * src;
+    LV_IMAGE_DSC_CONST void * src;
     lv_image_src_t src_type;
 
-    const lv_draw_buf_t * decoded;
+    LV_IMAGE_DSC_CONST lv_draw_buf_t * decoded;
     const lv_image_decoder_t * decoder;
     void * user_data;
 };
@@ -82,7 +82,7 @@ struct _lv_image_decoder_dsc_t {
     lv_image_decoder_args_t args;
 
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_image_dsc_t` variable*/
-    const void * src;
+    LV_IMAGE_DSC_CONST void * src;
 
     /**Type of the source: file or variable. Can be set in `open` function if required*/
     lv_image_src_t src_type;
@@ -94,7 +94,7 @@ struct _lv_image_decoder_dsc_t {
 
     /** Pointer to a draw buffer where the image's data (pixels) are stored in a decoded, plain format.
      *  MUST be set in `open` or `get_area_cb`function*/
-    const lv_draw_buf_t * decoded;
+    LV_IMAGE_DSC_CONST lv_draw_buf_t * decoded;
 
     const lv_color32_t * palette;
     uint32_t palette_size;

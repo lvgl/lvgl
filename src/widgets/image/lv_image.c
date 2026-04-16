@@ -145,7 +145,7 @@ lv_obj_t * lv_image_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_image_set_src(lv_obj_t * obj, const void * src)
+void lv_image_set_src(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -194,7 +194,13 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         if(header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
             lv_draw_buf_t * buf = (lv_draw_buf_t *)src;
+#if LV_USE_DRAW_VRAM
+            /* VRAM-resident and lazy-allocated buffers have unaligned_data==NULL */
+            if(!buf->handlers || (buf->vram_res == NULL && !buf->unaligned_data
+                                  && buf->header.magic != LV_IMAGE_HEADER_MAGIC)) {
+#else
             if(!buf->unaligned_data || !buf->handlers) {
+#endif
                 LV_LOG_ERROR("Invalid draw buffer, unaligned_data: %p, handlers: %p",
                              buf->unaligned_data, (void *)buf->handlers);
                 return;
@@ -475,7 +481,7 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align)
     lv_obj_invalidate(obj);
 }
 
-void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src)
+void lv_image_set_bitmap_map_src(lv_obj_t * obj, LV_IMAGE_DSC_CONST lv_image_dsc_t * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_image_t * img = (lv_image_t *)obj;
@@ -487,7 +493,7 @@ void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src)
  * Getter functions
  *====================*/
 
-const void * lv_image_get_src(lv_obj_t * obj)
+LV_IMAGE_DSC_CONST void * lv_image_get_src(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -639,7 +645,7 @@ lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj)
     return img->align;
 }
 
-const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
+LV_IMAGE_DSC_CONST lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -1054,7 +1060,7 @@ static void reset_image_attributes(lv_obj_t * obj)
 static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     if(subject->type == LV_SUBJECT_TYPE_POINTER) {
-        lv_image_set_src(observer->target, subject->value.pointer);
+        lv_image_set_src(observer->target, (LV_IMAGE_DSC_CONST void *)subject->value.pointer);
     }
 }
 

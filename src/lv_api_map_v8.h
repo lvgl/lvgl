@@ -315,7 +315,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
  *      MACROS
  **********************/
 /** Use this macro to declare an image in a C file*/
-#define LV_IMG_DECLARE(var_name) extern const lv_image_dsc_t var_name;
+#define LV_IMG_DECLARE(var_name) extern LV_IMAGE_DSC_CONST lv_image_dsc_t var_name;
 
 /**********************
  * DEPRECATED FUNCTIONS

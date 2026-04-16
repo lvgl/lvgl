@@ -91,7 +91,7 @@ void lv_image_cache_drop(const void * src)
     }
 
     lv_image_cache_data_t search_key = {
-        .src = src,
+        .src = (LV_IMAGE_DSC_CONST void *)src,
         .src_type = lv_image_src_get_type(src),
     };
 

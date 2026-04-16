@@ -398,7 +398,7 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
     lv_obj_invalidate(obj);
 }
 
-void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
+void lv_dropdown_set_symbol(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * symbol)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

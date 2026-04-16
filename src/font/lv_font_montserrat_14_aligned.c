@@ -4123,7 +4123,9 @@ static const lv_font_fmt_txt_kern_classes_t kern_classes = {
     static  lv_font_fmt_txt_glyph_cache_t cache;
 #endif
 
-#if LVGL_VERSION_MAJOR >= 8
+#ifdef LV_FONT_DSC_CONST
+static LV_FONT_DSC_CONST lv_font_fmt_txt_dsc_t font_dsc = {
+#elif LVGL_VERSION_MAJOR >= 8
 static const lv_font_fmt_txt_dsc_t font_dsc = {
 #else
 static lv_font_fmt_txt_dsc_t font_dsc = {

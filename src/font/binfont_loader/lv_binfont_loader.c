@@ -134,8 +134,12 @@ void lv_binfont_destroy(lv_font_t * font)
 {
     if(font == NULL) return;
 
-    const lv_font_fmt_txt_dsc_t * dsc = font->dsc;
+    lv_font_fmt_txt_dsc_t * dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     if(dsc == NULL) return;
+
+#if LV_USE_DRAW_VRAM
+    lv_font_release_vram((lv_font_t *)font);
+#endif
 
     if(dsc->kern_classes == 0) {
         const lv_font_fmt_txt_kern_pair_t * kern_dsc = dsc->kern_dsc;

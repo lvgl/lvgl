@@ -13,3 +13,4 @@ Drawing
     draw_descriptors
     draw_units
     snapshot
+    vram

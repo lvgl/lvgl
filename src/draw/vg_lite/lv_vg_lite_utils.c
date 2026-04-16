@@ -862,8 +862,9 @@ vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_dra
     return 0;
 }
 
-bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
-                                  bool no_cache, bool premultiply)
+bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc,
+                                  LV_IMAGE_DSC_CONST void * src,
+                                  bool no_cache, bool premultiply, lv_draw_unit_t * draw_unit)
 {
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(decoder_dsc);
@@ -887,7 +888,21 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     }
 
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
-    if(decoded == NULL || decoded->data == NULL) {
+    if(decoded == NULL) {
+        lv_image_decoder_close(decoder_dsc);
+        LV_LOG_ERROR("image data is NULL");
+        return false;
+    }
+
+    if(draw_unit != NULL) {
+        if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoded, draw_unit)) {
+            lv_image_decoder_close(decoder_dsc);
+            LV_LOG_ERROR("Failed to ensure image residency");
+            return false;
+        }
+    }
+
+    if(decoded->data == NULL) {
         lv_image_decoder_close(decoder_dsc);
         LV_LOG_ERROR("image data is NULL");
         return false;

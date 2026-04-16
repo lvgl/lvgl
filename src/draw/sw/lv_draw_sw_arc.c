@@ -134,6 +134,11 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
             LV_LOG_WARN("Can't decode the background image");
             blend_dsc.color = dsc->color;
         }
+        else if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)decoder_dsc.decoded, t->draw_unit)) {
+            LV_LOG_WARN("Can't ensure arc image residency, falling back to solid color");
+            lv_image_decoder_close(&decoder_dsc);
+            blend_dsc.color = dsc->color;
+        }
         else {
             img_area.x1 = 0;
             img_area.y1 = 0;

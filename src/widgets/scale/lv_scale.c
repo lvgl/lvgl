@@ -1603,7 +1603,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         /* arc image src */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_IMAGE_SRC, &value);
         if(res == LV_STYLE_RES_FOUND) {
-            arc_dsc->img_src = (const void *)value.ptr;
+            arc_dsc->img_src = (LV_IMAGE_DSC_CONST void *)value.ptr;
         }
         else {
             arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);

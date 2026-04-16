@@ -251,6 +251,10 @@ static lv_draw_buf_t * decode_png(lv_image_decoder_dsc_t * dsc)
     /*Alloc image buffer*/
     lv_draw_buf_t * decoded;
     decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, image.width, image.height, cf, LV_STRIDE_AUTO);
+    if(decoded != NULL && !lv_draw_buf_ensure_resident(decoded, NULL)) {
+        lv_draw_buf_destroy(decoded);
+        decoded = NULL;
+    }
     if(decoded == NULL) {
 
         if(dsc->src_type == LV_IMAGE_SRC_FILE) {

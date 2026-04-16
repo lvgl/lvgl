@@ -59,7 +59,11 @@ uint8_t img_render_lvgl_logo_argb8888_premultiplied_map[] = {
 
 };
 
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_render_lvgl_logo_argb8888_premultiplied = {
+#else
 const lv_image_dsc_t img_render_lvgl_logo_argb8888_premultiplied = {
+#endif
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED,
   .header.flags = 0,

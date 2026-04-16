@@ -645,6 +645,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
                 uint32_t h = LV_ROUND_UP(g.box_h, 32); /*Assume a larger size to avoid many reallocations*/
                 draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
                 LV_ASSERT_MALLOC(draw_buf);
+                if(draw_buf) lv_draw_buf_ensure_resident(draw_buf, NULL);
                 draw_buf->header.h = g.box_h;
                 dsc->_draw_buf = draw_buf;
             }
@@ -655,7 +656,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
         if(g.format == LV_FONT_GLYPH_FORMAT_VECTOR) {
 
             /*Load the outline of the glyph, even if the function says bitmap*/
-            dsc->glyph_data = (void *) lv_font_get_glyph_bitmap(dsc->g, draw_buf);
+            dsc->glyph_data = lv_font_get_glyph_bitmap(dsc->g, draw_buf);
             dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
         }
     }

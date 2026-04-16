@@ -36,7 +36,7 @@ typedef struct _lv_freetype_image_cache_data_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+static LV_IMAGE_DSC_CONST void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void * user_data);
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * node, void * user_data);
@@ -82,7 +82,7 @@ void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc)
  *   STATIC FUNCTIONS
  **********************/
 
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+static LV_IMAGE_DSC_CONST void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(draw_buf);
     LV_PROFILER_FONT_BEGIN;
@@ -187,8 +187,12 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     uint32_t pitch = glyph_bitmap->bitmap.pitch;
     uint32_t stride = lv_draw_buf_width_to_stride(box_w, col_format);
     data->draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, box_w, box_h, col_format, stride);
-    if(!data->draw_buf) {
+    if(!data->draw_buf || !lv_draw_buf_ensure_resident(data->draw_buf, NULL)) {
         LV_LOG_WARN("Could not create draw buffer");
+        if(data->draw_buf) {
+            lv_draw_buf_destroy(data->draw_buf);
+            data->draw_buf = NULL;
+        }
         FT_Done_Glyph(glyph);
         lv_mutex_unlock(&dsc->cache_node->face_lock);
         LV_PROFILER_FONT_END;

@@ -287,6 +287,7 @@ void test_lcd_ft81x(void)
     lv_draw_buf_t * partial_buf = lv_draw_buf_create(TEST_LCD_WIDTH, TEST_LCD_HEIGHT, LV_COLOR_FORMAT_RGB565,
                                                      LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(partial_buf);
+    lv_draw_buf_ensure_resident(partial_buf, NULL);
 
     uint32_t user_data = 0x1234;
 

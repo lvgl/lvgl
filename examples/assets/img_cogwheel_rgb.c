@@ -425,7 +425,11 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_RGB uint8_t img_cog
 #endif
 };
 
+#ifdef LV_IMAGE_DSC_CONST
+LV_IMAGE_DSC_CONST lv_image_dsc_t img_cogwheel_rgb = {
+#else
 const lv_image_dsc_t img_cogwheel_rgb = {
+#endif
     .header = {
         .cf = LV_COLOR_FORMAT_NATIVE,
         .w = 100,

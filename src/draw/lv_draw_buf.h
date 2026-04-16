@@ -88,11 +88,25 @@ typedef void (*lv_draw_buf_cache_operation_cb_t)(const lv_draw_buf_t * draw_buf,
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb_t)(uint32_t w, lv_color_format_t color_format);
 
+#if LV_USE_DRAW_VRAM
+/**
+ * Base VRAM residency descriptor. Draw units extend this struct
+ * with their own fields (e.g. GPU handle, format, offsets).
+ */
+struct _lv_draw_buf_vram_res_t {
+    lv_draw_unit_t * unit;   /**< Which draw unit owns the VRAM allocation */
+    uint32_t size;           /**< Size of VRAM allocation in bytes */
+};
+#endif
+
 struct _lv_draw_buf_t {
     lv_image_header_t header;
     uint32_t data_size;       /**< Total buf size in bytes */
     uint8_t * data;
     void * unaligned_data;    /**< Unaligned address of `data`, used internally by lvgl */
+#if LV_USE_DRAW_VRAM
+    lv_draw_buf_vram_res_t * vram_res; /**< VRAM residency descriptor, NULL if CPU-only */
+#endif
     const lv_draw_buf_handlers_t * handlers; /**< draw buffer alloc/free ops. */
 };
 
@@ -345,6 +359,36 @@ static inline void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_fla
 {
     draw_buf->header.flags &= ~flag;
 }
+
+/**
+ * Ensure a draw buffer is usable by the given draw unit.
+ * Allocates, uploads, downloads, or no-ops as needed.
+ * When `LV_USE_DRAW_VRAM` is disabled this is a no-op that always returns true.
+ *
+ * @param buf   the draw buffer (may have CPU data, VRAM data, both, or neither)
+ * @param unit  the draw unit that needs to access this buffer
+ * @return      true if the buffer is now resident for the unit
+ */
+#if LV_USE_DRAW_VRAM
+struct _lv_font_dsc_base_t;
+/**
+ * Release a font's VRAM residency via its owning draw unit.
+ * Calls vram_font_free_cb which frees GPU resources and NULLs the vram_res.
+ * Safe to call if vram_res is already NULL.
+ * @param vram_res  pointer to the vram_res pointer (e.g. &font_dsc->vram_res)
+ * @param font_dsc  pointer to lv_font_dsc_base_t, forwarded to vram_font_free_cb
+ */
+void lv_draw_buf_vram_font_release(lv_draw_buf_vram_res_t ** vram_res, struct _lv_font_dsc_base_t * font_dsc);
+
+bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit);
+#else
+static inline bool lv_draw_buf_ensure_resident(lv_draw_buf_t * buf, lv_draw_unit_t * unit)
+{
+    LV_UNUSED(buf);
+    LV_UNUSED(unit);
+    return true;
+}
+#endif
 
 /**
  * As of now, draw buf share same definition as `lv_image_dsc_t`.

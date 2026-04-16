@@ -94,9 +94,25 @@ void lv_image_decoder_deinit(void)
 lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
 {
     LV_PROFILER_DECODER_BEGIN;
+
+#if LV_USE_DRAW_VRAM
+    /* VRAM-resident and lazy-allocated buffers have data==NULL but valid
+     * headers. Return the header directly without iterating decoders,
+     * which may reject or dereference the NULL data pointer. */
+    if(lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
+        const lv_image_dsc_t * img_dsc = src;
+        if(img_dsc->data == NULL && img_dsc->header.magic == LV_IMAGE_HEADER_MAGIC
+           && (img_dsc->header.flags & LV_IMAGE_FLAGS_ALLOCATED)) {
+            *header = img_dsc->header;
+            LV_PROFILER_DECODER_END;
+            return LV_RESULT_OK;
+        }
+    }
+#endif
+
     lv_image_decoder_dsc_t dsc;
     lv_memzero(&dsc, sizeof(lv_image_decoder_dsc_t));
-    dsc.src = src;
+    dsc.src = (LV_IMAGE_DSC_CONST void *)src;
     dsc.src_type = lv_image_src_get_type(src);
 
     lv_mutex_lock(img_decoder_info_lock_p);
@@ -107,7 +123,8 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
     return decoder ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args)
+lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, LV_IMAGE_DSC_CONST void * src,
+                                  const lv_image_decoder_args_t * args)
 {
     LV_PROFILER_DECODER_BEGIN;
     lv_memzero(dsc, sizeof(lv_image_decoder_dsc_t));
@@ -163,7 +180,17 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     LV_PROFILER_DECODER_END_TAG(dsc->decoder->name);
 
     if(res == LV_RESULT_OK && dsc->decoded != NULL) {
-        LV_ASSERT_MSG(dsc->decoded->unaligned_data && dsc->decoded->handlers, "Invalid draw buffer");
+        {
+            bool has_data = dsc->decoded->unaligned_data != NULL;
+#if LV_USE_DRAW_VRAM
+            has_data = has_data || dsc->decoded->vram_res != NULL;
+            /* Lazy-allocated buffers (created by lv_draw_buf_create_ex) have the ALLOCATED flag,
+             * handlers set, and data_size > 0, but no backing data yet */
+            has_data = has_data || (dsc->decoded->data_size > 0 && dsc->decoded->handlers != NULL
+                                    && (dsc->decoded->header.flags & LV_IMAGE_FLAGS_ALLOCATED));
+#endif
+            LV_ASSERT_MSG(has_data && dsc->decoded->handlers, "Invalid draw buffer");
+        }
 
         /* Flush the D-Cache if enabled and the image was successfully opened */
         if(dsc->args.flush_cache) {
@@ -275,7 +302,7 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
 
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
-                                                 const lv_draw_buf_t * decoded, void * user_data)
+                                                 LV_IMAGE_DSC_CONST lv_draw_buf_t * decoded, void * user_data)
 {
     LV_PROFILER_DECODER_BEGIN;
     lv_cache_entry_t * cache_entry = lv_cache_add(img_cache_p, search_key, NULL);
@@ -316,8 +343,9 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             if(res != LV_RESULT_OK) {
                 lv_draw_buf_t * aligned = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, decoded->header.w, decoded->header.h,
                                                                 decoded->header.cf, stride_expect);
-                if(aligned == NULL) {
+                if(aligned == NULL || !lv_draw_buf_ensure_resident(aligned, NULL)) {
                     LV_LOG_ERROR("No memory for Stride adjust.");
+                    if(aligned) lv_draw_buf_destroy(aligned);
                     LV_PROFILER_DECODER_END;
                     return NULL;
                 }
@@ -484,6 +512,24 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 
     if(entry) {
         lv_image_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
+
+#if LV_USE_DRAW_VRAM
+        /* Validate VRAM backing. If the GPU reclaimed or another consumer
+         * stole the allocation, drop this stale cache entry and fall
+         * through to a fresh decode. */
+        if(cached_data->decoded != NULL && cached_data->decoded->vram_res != NULL) {
+            lv_draw_unit_t * vr_unit = cached_data->decoded->vram_res->unit;
+            if(vr_unit != NULL
+               && !vr_unit->vram_check_cb(vr_unit, cached_data->decoded)) {
+                lv_cache_release(cache, entry, NULL);
+                lv_cache_drop(cache, &search_key, NULL);
+                LV_LOG_INFO("Decoder cache: VRAM lost, dropping entry");
+                LV_PROFILER_DECODER_END;
+                return LV_RESULT_INVALID;
+            }
+        }
+#endif
+
         dsc->decoded = cached_data->decoded;
         dsc->decoder = (lv_image_decoder_t *)cached_data->decoder;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/

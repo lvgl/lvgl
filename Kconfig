@@ -582,6 +582,10 @@ menu "LVGL configuration"
 			default 2048
 			depends on LV_USE_DRAW_EVE
 
+		config LV_USE_DRAW_VRAM
+			bool "VRAM buffer residency support for hardware draw units."
+			default n
+
 		config LV_USE_DRAW_NANOVG
 			bool "Use NanoVG Renderer."
 			default n

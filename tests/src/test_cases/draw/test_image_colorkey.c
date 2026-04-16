@@ -34,7 +34,7 @@ void test_image_colorkey(void)
     LV_IMAGE_DECLARE(test_XRGB8888_NONE_align64);
     LV_IMAGE_DECLARE(test_ARGB8888_NONE_align64);
 
-    const lv_image_dsc_t * img_dscs[] = {
+    LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dscs[] = {
         &test_RGB565A8_NONE_align64,
         &test_RGB565_NONE_align64,
         &test_RGB888_NONE_align64,

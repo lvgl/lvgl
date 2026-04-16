@@ -386,11 +386,26 @@ void lv_display_refr_timer(lv_timer_t * tmr)
     }
 
     lv_draw_buf_t * buf_act = disp_refr->buf_act;
-    if(!(buf_act && buf_act->data && buf_act->data_size)) {
+    if(buf_act == NULL) {
         LV_LOG_WARN("No draw buffer");
         LV_PROFILER_REFR_END;
         return;
     }
+#if LV_USE_DRAW_VRAM
+    /* VRAM-capable displays may use lazy-allocated buffers (header-only,
+     * no CPU pixel data). ensure_resident handles allocation at dispatch. */
+    if(!(buf_act->data || buf_act->vram_res || buf_act->header.w > 0)) {
+        LV_LOG_WARN("No draw buffer");
+        LV_PROFILER_REFR_END;
+        return;
+    }
+#else
+    if(!(buf_act->data && buf_act->data_size)) {
+        LV_LOG_WARN("No draw buffer");
+        LV_PROFILER_REFR_END;
+        return;
+    }
+#endif
 
     lv_result_t res = lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
     if(res == LV_RESULT_INVALID) {
@@ -557,7 +572,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
             layer_area_act.y2 = layer_area_act.y1 + max_rgb_row_height - 1;
             if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
 
-            const void * bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, LV_PART_MAIN);
+            LV_IMAGE_DSC_CONST void * bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, LV_PART_MAIN);
             bool area_need_alpha = bitmap_mask_src || alpha_test_area_on_obj(obj, &layer_area_act);
 
             if(area_need_alpha) {

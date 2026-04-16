@@ -284,7 +284,8 @@ lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u
         }
 
         tmp_buf = lv_draw_buf_create(w, h, cf, stride);
-        if(!tmp_buf) {
+        if(!tmp_buf || !lv_draw_buf_ensure_resident(tmp_buf, NULL)) {
+            if(tmp_buf) lv_draw_buf_destroy(tmp_buf);
             return NULL;
         }
     }

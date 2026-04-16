@@ -65,9 +65,9 @@ lv_obj_t * lv_imagebutton_create(lv_obj_t * parent);
  * @param src_right     pointer to an image source for the right side of the button (a C array or path
  * to a file)
  */
-void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left,
-                            const void * src_mid,
-                            const void * src_right);
+void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, LV_IMAGE_DSC_CONST void * src_left,
+                            LV_IMAGE_DSC_CONST void * src_mid,
+                            LV_IMAGE_DSC_CONST void * src_right);
 
 /**
  * Set the left image for a state of the image button
@@ -76,7 +76,7 @@ void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const 
  * @param src_left      pointer to an image source for the left side of the button
  *                      (a C array or path to a file)
  */
-void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left);
+void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, LV_IMAGE_DSC_CONST void * src_left);
 
 /**
  * Set the right image for a state of the image button
@@ -85,7 +85,7 @@ void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, c
  * @param src_right      pointer to an image source for the right side of the button
  *                      (a C array or path to a file)
  */
-void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_right);
+void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, LV_IMAGE_DSC_CONST void * src_right);
 
 /**
  * Set the middle image for a state of the image button
@@ -94,7 +94,7 @@ void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, 
  * @param src_mid       pointer to an image source for the middle of the button
  *                      (a C array or path to a file)
  */
-void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_mid);
+void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, LV_IMAGE_DSC_CONST void * src_mid);
 
 /**
  * Use this function instead of `lv_obj_add/remove_state` to set a state manually

@@ -89,7 +89,7 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
 static void colorkey_and_recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_buf, int32_t src_stride,
                                  lv_color_format_t cf, const lv_draw_image_dsc_t * draw_dsc, lv_draw_sw_blend_dsc_t * blend_dsc);
 
-static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc);
+static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc, lv_draw_unit_t * draw_unit);
 
 /**********************
  *  STATIC VARIABLES
@@ -113,7 +113,7 @@ void lv_draw_sw_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, 
     if(layer_to_draw->draw_buf == NULL) return;
 
     if(draw_dsc->bitmap_mask_src) {
-        bool visible = apply_mask(draw_dsc);
+        bool visible = apply_mask(draw_dsc, t->draw_unit);
         if(!visible) return;
     }
 
@@ -970,7 +970,7 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
     }
 }
 
-static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc)
+static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc, lv_draw_unit_t * draw_unit)
 {
     lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
     lv_draw_buf_t * image_draw_buf = layer_to_draw->draw_buf;
@@ -982,6 +982,12 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc)
     if(decoder_res != LV_RESULT_OK || mask_decoder_dsc.decoded == NULL) {
         if(decoder_res == LV_RESULT_OK) lv_image_decoder_close(&mask_decoder_dsc);
         LV_LOG_WARN("Could open the mask. The mask is not applied.");
+        return true;
+    }
+
+    if(!lv_draw_buf_ensure_resident((lv_draw_buf_t *)mask_decoder_dsc.decoded, draw_unit)) {
+        lv_image_decoder_close(&mask_decoder_dsc);
+        LV_LOG_WARN("Failed to ensure mask residency. The mask is not applied.");
         return true;
     }
 

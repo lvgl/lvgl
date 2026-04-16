@@ -48,7 +48,7 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt);
  * @param btn_w     width of the button
  * @return          the widget where the content of the button can be created
  */
-lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w);
+lv_obj_t * lv_win_add_button(lv_obj_t * win, LV_IMAGE_DSC_CONST void * icon, int32_t btn_w);
 
 /**
  * Get the header of the window
