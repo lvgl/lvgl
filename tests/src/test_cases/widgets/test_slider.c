@@ -610,4 +610,106 @@ void test_slider_range_mode_vertical_rtl_drag_start_value_selection(void)
                                        &ptr_ver->bar.cur_value, -1);
 }
 
+void test_slider_perpendicular_scroll_chain_blocked_during_horizontal_drag(void)
+{
+    lv_obj_set_size(slider, 200, 20);
+    lv_obj_center(slider);
+    lv_obj_update_layout(slider);
+
+    /* Manually add SCROLL_CHAIN_VER (simulates state after a previous release) */
+    lv_obj_add_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
+
+    /* Begin a pointer drag on the slider */
+    lv_area_t coords;
+    lv_obj_get_coords(slider, &coords);
+    lv_test_mouse_move_to(coords.x1 + 10, coords.y1 + 10);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+
+    /* Move to trigger PRESSING events */
+    lv_test_mouse_move_by(10, 0);
+    lv_test_wait(50);
+
+    /* During drag, perpendicular scroll chain (VER for horizontal slider) should be removed */
+    TEST_ASSERT_FALSE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
+
+    /* Release the slider */
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    /* After release, SCROLL_CHAIN_VER should be restored */
+    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
+}
+
+void test_slider_perpendicular_scroll_chain_blocked_during_vertical_drag(void)
+{
+    lv_obj_t * slider_ver = lv_slider_create(lv_screen_active());
+    lv_obj_set_size(slider_ver, 20, 200);
+    lv_obj_center(slider_ver);
+    lv_obj_update_layout(slider_ver);
+
+    /* Manually add SCROLL_CHAIN_HOR (simulates state after a previous release) */
+    lv_obj_add_flag(slider_ver, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+    TEST_ASSERT_TRUE(lv_obj_has_flag(slider_ver, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
+
+    /* Begin a pointer drag on the slider */
+    lv_area_t coords;
+    lv_obj_get_coords(slider_ver, &coords);
+    lv_test_mouse_move_to(coords.x1 + 10, coords.y1 + 10);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+
+    /* Move to trigger PRESSING events */
+    lv_test_mouse_move_by(0, 10);
+    lv_test_wait(50);
+
+    /* During drag, perpendicular scroll chain (HOR for vertical slider) should be removed */
+    TEST_ASSERT_FALSE(lv_obj_has_flag(slider_ver, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
+
+    /* Release the slider */
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    /* After release, SCROLL_CHAIN_HOR should be restored */
+    TEST_ASSERT_TRUE(lv_obj_has_flag(slider_ver, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
+}
+
+void test_slider_scroll_chain_not_blocked_for_encoder_input(void)
+{
+    lv_obj_set_size(slider, 200, 20);
+    lv_obj_center(slider);
+    lv_obj_update_layout(slider);
+
+    /* Add both scroll chain flags */
+    lv_obj_add_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+    lv_obj_add_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+
+    /* Setup group and encoder indev */
+    lv_group_add_obj(g, slider);
+    lv_group_set_editing(g, true);
+
+    lv_slider_set_value(slider, 50, LV_ANIM_OFF);
+    int32_t initial_value = lv_slider_get_value(slider);
+
+    /* Enter edit mode, then turn encoder */
+    lv_test_encoder_click();
+    lv_test_encoder_turn(5);
+
+    /* Verify encoder input was actually processed (value changed) */
+    int32_t new_value = lv_slider_get_value(slider);
+    TEST_ASSERT_NOT_EQUAL(initial_value, new_value);
+
+    /* Encoder input should NOT remove scroll chain flags */
+    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
+    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
+
+    /* Release encoder (exits edit mode) */
+    lv_test_encoder_click();
+
+    /* Flags should still be present after encoder release */
+    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
+    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
+}
+
 #endif
