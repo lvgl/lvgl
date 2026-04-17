@@ -404,10 +404,13 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     if(ddata->shm_cf == WL_SHM_FORMAT_ARGB8888 && cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
         const int32_t w = lv_area_get_width(area);
         const int32_t h = lv_area_get_height(area);
-        size_t index = 0;
+        const int32_t buf_w = lv_display_get_horizontal_resolution(disp);
+        lv_color32_t * start_pos = (lv_color32_t *)px_map + (area->y1 * buf_w) + area->x1;
+
         for(int32_t y = 0; y < h; ++y) {
+            size_t index = y * buf_w;
             for(int32_t x = 0; x < w; ++x) {
-                lv_color_premultiply((lv_color32_t *) px_map + (index++));
+                lv_color_premultiply(start_pos + (index++));
             }
         }
     }
