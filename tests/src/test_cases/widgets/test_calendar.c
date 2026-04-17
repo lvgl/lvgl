@@ -18,6 +18,9 @@ void test_calendar_set_highlighted_dates_gui(void);
 void test_calendar_set_day_names_gui(void);
 void test_calendar_get_highlighted_dates_num(void);
 void test_calendar_header_dropdown_create_gui(void);
+void test_calendar_header_dropdown_ignore_negative_year_selection(void);
+void test_calendar_header_dropdown_ignore_too_large_year_selection(void);
+void test_calendar_header_dropdown_bottom_boundary_scroll_should_not_jump(void);
 void test_calendar_header_arrow_create_gui(void);
 void test_calendar_event_key_down_gui(void);
 void test_calendar_get_pressed_date_null(void);
@@ -189,6 +192,70 @@ void test_calendar_header_dropdown_descending_year_order(void)
     lv_calendar_set_month_shown(g_calendar, 2022, 9);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_05.png");
+}
+
+void test_calendar_header_dropdown_ignore_negative_year_selection(void)
+{
+    lv_calendar_set_month_shown(g_calendar, 2022, 9);
+    lv_calendar_add_header_dropdown(g_calendar);
+    lv_calendar_header_dropdown_set_year_list(g_calendar, "-1\n2022\n2021");
+
+    lv_obj_t * header = lv_obj_get_child_by_type(g_calendar, 0, &lv_calendar_header_dropdown_class);
+    TEST_ASSERT_NOT_NULL(header);
+
+    lv_obj_t * year_dd = lv_obj_get_child(header, 0);
+    TEST_ASSERT_NOT_NULL(year_dd);
+
+    lv_dropdown_set_selected(year_dd, 0);
+    lv_obj_send_event(year_dd, LV_EVENT_VALUE_CHANGED, NULL);
+
+    const lv_calendar_date_t * date_after_test = lv_calendar_get_showed_date(g_calendar);
+    TEST_ASSERT_EQUAL_INT16(2022, date_after_test->year);
+    TEST_ASSERT_EQUAL_INT16(9, date_after_test->month);
+}
+
+void test_calendar_header_dropdown_ignore_too_large_year_selection(void)
+{
+    lv_calendar_set_month_shown(g_calendar, 2022, 9);
+    lv_calendar_add_header_dropdown(g_calendar);
+    lv_calendar_header_dropdown_set_year_list(g_calendar, "70000\n2022\n2021");
+
+    lv_obj_t * header = lv_obj_get_child_by_type(g_calendar, 0, &lv_calendar_header_dropdown_class);
+    TEST_ASSERT_NOT_NULL(header);
+
+    lv_obj_t * year_dd = lv_obj_get_child(header, 0);
+    TEST_ASSERT_NOT_NULL(year_dd);
+
+    lv_dropdown_set_selected(year_dd, 0);
+    lv_obj_send_event(year_dd, LV_EVENT_VALUE_CHANGED, NULL);
+
+    const lv_calendar_date_t * date_after_test = lv_calendar_get_showed_date(g_calendar);
+    TEST_ASSERT_EQUAL_INT16(2022, date_after_test->year);
+    TEST_ASSERT_EQUAL_INT16(9, date_after_test->month);
+}
+
+void test_calendar_header_dropdown_bottom_boundary_scroll_should_not_jump(void)
+{
+    lv_calendar_set_month_shown(g_calendar, 0, 1);
+    lv_calendar_add_header_dropdown(g_calendar);
+
+    lv_obj_t * header = lv_obj_get_child_by_type(g_calendar, 0, &lv_calendar_header_dropdown_class);
+    TEST_ASSERT_NOT_NULL(header);
+
+    lv_obj_t * year_dd = lv_obj_get_child(header, 0);
+    TEST_ASSERT_NOT_NULL(year_dd);
+
+    lv_dropdown_open(year_dd);
+    lv_obj_t * list = lv_dropdown_get_list(year_dd);
+    TEST_ASSERT_NOT_NULL(list);
+
+    lv_obj_scroll_to_y(list, 100000, LV_ANIM_OFF);
+    int32_t scroll_y_before = lv_obj_get_scroll_y(list);
+
+    lv_obj_scroll_to_y(list, 100000, LV_ANIM_OFF);
+    int32_t scroll_y_after = lv_obj_get_scroll_y(list);
+
+    TEST_ASSERT_EQUAL_INT32(scroll_y_before, scroll_y_after);
 }
 
 

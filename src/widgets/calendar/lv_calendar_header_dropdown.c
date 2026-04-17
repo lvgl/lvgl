@@ -48,11 +48,11 @@ static void year_dropdown_ready_event_cb(lv_event_t * e);
 static void year_list_scroll_event_cb(lv_event_t * e);
 static void month_event_cb(lv_event_t * e);
 static void value_changed_event_cb(lv_event_t * e);
-static void rebuild_auto_year_window(lv_obj_t * header, int32_t top_year);
+static int32_t rebuild_auto_year_window(lv_obj_t * header, int32_t top_year);
 static void refresh_open_year_list(lv_obj_t * year_dropdown);
 static void sync_auto_year_dropdown_state(lv_obj_t * header, bool preserve_scroll);
 static void set_year_dropdown_selected(lv_obj_t * year_dropdown, uint32_t sel, bool preserve_scroll);
-static int32_t parse_year_text(const char * text);
+static bool parse_year_text(const char * text, int32_t * year);
 static int32_t get_year_option_height(lv_obj_t * year_dropdown);
 static int32_t clamp_auto_top_year(int32_t top_year);
 static lv_obj_t * get_year_dropdown(lv_obj_t * header);
@@ -186,12 +186,15 @@ static void year_event_cb(lv_event_t * e)
 
     char year_buf[LV_CALENDAR_HEADER_DROPDOWN_YEAR_TEXT_LEN];
     lv_dropdown_get_selected_str(dropdown, year_buf, sizeof(year_buf));
-    const uint32_t year = (uint32_t)parse_year_text(year_buf);
+    int32_t year;
+    if(!parse_year_text(year_buf, &year) || year < 0 || year > UINT16_MAX) {
+        return;
+    }
 
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);
     lv_calendar_date_t newd = *d;
-    newd.year = year;
+    newd.year = (uint16_t)year;
 
     lv_calendar_set_month_shown(calendar, newd.year, newd.month);
 }
@@ -236,18 +239,25 @@ static void year_list_scroll_event_cb(lv_event_t * e)
     const int32_t scroll_y = lv_obj_get_scroll_y(list);
 
     if(lv_obj_get_scroll_bottom(list) <= threshold) {
+        int32_t old_top_year = header_dropdown->auto_top_year;
         header_dropdown->rebuilding_list = 1;
-        rebuild_auto_year_window(header, header_dropdown->auto_top_year - LV_CALENDAR_HEADER_DROPDOWN_YEAR_SHIFT_STEP);
+        int32_t new_top_year = rebuild_auto_year_window(header, old_top_year - LV_CALENDAR_HEADER_DROPDOWN_YEAR_SHIFT_STEP);
+        int32_t actual_shift_years = old_top_year - new_top_year;
         sync_auto_year_dropdown_state(header, true);
-        lv_obj_scroll_to_y(list, LV_MAX(0, scroll_y - LV_CALENDAR_HEADER_DROPDOWN_YEAR_SHIFT_STEP * item_height),
-                           LV_ANIM_OFF);
+        if(actual_shift_years > 0) {
+            lv_obj_scroll_to_y(list, LV_MAX(0, scroll_y - actual_shift_years * item_height), LV_ANIM_OFF);
+        }
         header_dropdown->rebuilding_list = 0;
     }
     else if(lv_obj_get_scroll_top(list) <= threshold) {
+        int32_t old_top_year = header_dropdown->auto_top_year;
         header_dropdown->rebuilding_list = 1;
-        rebuild_auto_year_window(header, header_dropdown->auto_top_year + LV_CALENDAR_HEADER_DROPDOWN_YEAR_SHIFT_STEP);
+        int32_t new_top_year = rebuild_auto_year_window(header, old_top_year + LV_CALENDAR_HEADER_DROPDOWN_YEAR_SHIFT_STEP);
+        int32_t actual_shift_years = new_top_year - old_top_year;
         sync_auto_year_dropdown_state(header, true);
-        lv_obj_scroll_to_y(list, scroll_y + LV_CALENDAR_HEADER_DROPDOWN_YEAR_SHIFT_STEP * item_height, LV_ANIM_OFF);
+        if(actual_shift_years > 0) {
+            lv_obj_scroll_to_y(list, scroll_y + actual_shift_years * item_height, LV_ANIM_OFF);
+        }
         header_dropdown->rebuilding_list = 0;
     }
 }
@@ -281,12 +291,12 @@ static void value_changed_event_cb(lv_event_t * e)
     lv_dropdown_set_selected(month_dd, cur_date->month - 1);
 }
 
-static void rebuild_auto_year_window(lv_obj_t * header, int32_t top_year)
+static int32_t rebuild_auto_year_window(lv_obj_t * header, int32_t top_year)
 {
     lv_calendar_header_dropdown_t * header_dropdown = (lv_calendar_header_dropdown_t *)header;
     lv_obj_t * year_dropdown = get_year_dropdown(header);
     if(year_dropdown == NULL) {
-        return;
+        return 0;
     }
 
     top_year = clamp_auto_top_year(top_year);
@@ -314,6 +324,8 @@ static void rebuild_auto_year_window(lv_obj_t * header, int32_t top_year)
 
     lv_dropdown_set_options_static(year_dropdown, header_dropdown->year_list_buf);
     refresh_open_year_list(year_dropdown);
+
+    return top_year;
 }
 
 static void refresh_open_year_list(lv_obj_t * year_dropdown)
@@ -385,13 +397,13 @@ static void set_year_dropdown_selected(lv_obj_t * year_dropdown, uint32_t sel, b
     }
 }
 
-static int32_t parse_year_text(const char * text)
+static bool parse_year_text(const char * text, int32_t * year)
 {
-    int32_t year = 0;
+    int32_t parsed_year = 0;
     bool negative = false;
 
     if(text == NULL) {
-        return 0;
+        return false;
     }
 
     if(text[0] == '-') {
@@ -399,12 +411,21 @@ static int32_t parse_year_text(const char * text)
         text++;
     }
 
+    if(*text == '\0') {
+        return false;
+    }
+
     while(*text >= '0' && *text <= '9') {
-        year = year * 10 + (*text - '0');
+        parsed_year = parsed_year * 10 + (*text - '0');
         text++;
     }
 
-    return negative ? -year : year;
+    if(*text != '\0') {
+        return false;
+    }
+
+    *year = negative ? -parsed_year : parsed_year;
+    return true;
 }
 
 static int32_t get_year_option_height(lv_obj_t * year_dropdown)
