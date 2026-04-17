@@ -86,6 +86,7 @@ void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb)
 
 void lv_theme_set_user_data(lv_theme_t * theme, void * user_data)
 {
+    if(theme == NULL) return;
     theme->user_data = user_data;
 }
 
@@ -121,6 +122,7 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
 
 void * lv_theme_get_user_data(const lv_theme_t * theme)
 {
+    if(theme == NULL) return NULL;
     return theme->user_data;
 }
 

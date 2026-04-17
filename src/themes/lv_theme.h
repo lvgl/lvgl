@@ -118,7 +118,7 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
  * @param theme pointer to a theme
  * @return the pointer to the user_data of the theme (can be NULL if not set)
  */
-void * lv_theme_get_user_data(lv_theme_t * theme);
+void * lv_theme_get_user_data(const lv_theme_t * theme);
 
 
 /**
