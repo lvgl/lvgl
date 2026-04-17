@@ -312,20 +312,12 @@ static inline void gif_blend_to_rgb565(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf
     uint16_t * dst = (uint16_t *)((uint8_t *)draw_buf->data + ((pDraw->iY + pDraw->y) * draw_buf->header.stride + pDraw->iX
                                                                * 2));
 
-    if(pDraw->ucHasTransparency) {
-        while(src < end) {
-            pixel = *src++;
-            if(pixel != pDraw->ucTransparent) {
-                *dst = pal[pixel];
-            }
-            dst++;
+    while(src < end) {
+        pixel = *src++;
+        if(!pDraw->ucHasTransparency || pixel != pDraw->ucTransparent) {
+            *dst = pal[pixel];
         }
-    }
-    else {
-        while(src < end) {
-            pixel = *src++;
-            *dst++ = pal[pixel];
-        }
+        dst++;
     }
 
     LV_PROFILER_DECODER_END;
@@ -341,25 +333,16 @@ static inline void gif_blend_to_rgb888(GIFDRAW * pDraw, lv_draw_buf_t * draw_buf
     uint8_t * pal = pDraw->pPalette24;
     uint8_t * dst = (uint8_t *)draw_buf->data + ((pDraw->iY + pDraw->y) * draw_buf->header.stride + pDraw->iX * 3);
 
-    if(pDraw->ucHasTransparency) {
-        while(src < end) {
-            pixel = *src++;
-            if(pixel != pDraw->ucTransparent) {
-                dst[0] = pal[(pixel * 3) + 2];
-                dst[1] = pal[(pixel * 3) + 1];
-                dst[2] = pal[(pixel * 3) + 0];
-            }
-            dst += 3;
-        }
-    }
-    else {
-        while(src < end) {
-            pixel = *src++;
+    while(src < end) {
+        pixel = *src++;
+        if(!pDraw->ucHasTransparency || pixel != pDraw->ucTransparent) {
+            /* The memory layout of gif files store the channels as RGB, while lv_color_t stores BGR,
+             * so the byte reversal is intentional. */
             dst[0] = pal[(pixel * 3) + 2];
             dst[1] = pal[(pixel * 3) + 1];
             dst[2] = pal[(pixel * 3) + 0];
-            dst += 3;
         }
+        dst += 3;
     }
 
     LV_PROFILER_DECODER_END;
@@ -375,27 +358,17 @@ static inline void gif_blend_to_argb8888(GIFDRAW * pDraw, lv_draw_buf_t * draw_b
     uint8_t * pal = pDraw->pPalette24;
     uint8_t * dst = (uint8_t *)draw_buf->data + ((pDraw->iY + pDraw->y) * draw_buf->header.stride + pDraw->iX * 4);
 
-    if(pDraw->ucHasTransparency) {
-        while(src < end) {
-            pixel = *src++;
-            if(pixel != pDraw->ucTransparent) {
-                dst[0] = pal[(pixel * 3) + 2];
-                dst[1] = pal[(pixel * 3) + 1];
-                dst[2] = pal[(pixel * 3) + 0];
-                dst[3] = 0xFF;
-            }
-            dst += 4;
-        }
-    }
-    else {
-        while(src < end) {
-            pixel = *src++;
+    while(src < end) {
+        pixel = *src++;
+        if(!pDraw->ucHasTransparency || pixel != pDraw->ucTransparent) {
+            /* The memory layout of gif files store the channels as RGB, while lv_color_t stores BGR,
+             * so the byte reversal is intentional. */
             dst[0] = pal[(pixel * 3) + 2];
             dst[1] = pal[(pixel * 3) + 1];
             dst[2] = pal[(pixel * 3) + 0];
             dst[3] = 0xFF;
-            dst += 4;
         }
+        dst += 4;
     }
 
     LV_PROFILER_DECODER_END;
@@ -560,6 +533,8 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
             case GIF_PALETTE_RGB565_BE: {
                     unsigned short * palette16 = (unsigned short *)palette;
                     uint16_t color = palette16[bg];
+
+                    /* This check is equivalent to whether the gif has defined a transparent color or not. */
                     if(gif->ucGIFBits & 1) color = 0;
 
                     for(i = y; i < y + h; i++) {
@@ -574,6 +549,8 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                     uint8_t r = palette[(bg * 3) + 2];
                     uint8_t g = palette[(bg * 3) + 1];
                     uint8_t b = palette[(bg * 3) + 0];
+
+                    /* This check is equivalent to whether the gif has defined a transparent color or not. */
                     if(gif->ucGIFBits & 1) {
                         r = 0;
                         g = 0;
@@ -592,7 +569,8 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                 break;
             case GIF_PALETTE_RGB8888: {
                     lv_color32_t bg_color = lv_color32_make(palette[(bg * 3) + 2], palette[(bg * 3) + 1], palette[(bg * 3)], 0xff);
-                    /* has transparent */
+
+                    /* This check is equivalent to whether the gif has defined a transparent color or not. */
                     if(gif->ucGIFBits & 1) {
                         bg_color = lv_color32_make(0, 0, 0, 0);
                     }
@@ -609,8 +587,11 @@ static void gif_disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
                 break;
         }
     }
-    /* disposal_method 0 and 1: do nothing, leave existing content */
     /* disposal_method 3: not supported, do nothing */
+    else if(disposal_method == 3) {
+        LV_LOG_WARN("GIF disposal method 3 not supported");
+    }
+    /* disposal_method 0 and 1: do nothing, leave existing content */
 
     LV_PROFILER_DECODER_END;
 }
