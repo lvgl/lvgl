@@ -102,6 +102,11 @@ void lv_draw_sw_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
+    if(dsc->font == NULL) {
+        LV_LOG_WARN("lv_draw_sw_label: NULL font, skipping");
+        return;
+    }
+
     LV_PROFILER_DRAW_BEGIN;
 
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
@@ -124,6 +129,15 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                                                  lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
     if(glyph_draw_dsc) {
+        /* Guard against stale draw tasks referencing freed glyph descriptors.
+         * This can happen when a widget is deleted while a draw task is still
+         * queued (e.g., panel navigation deletes arc+label during redraw). */
+        if(glyph_draw_dsc->format != LV_FONT_GLYPH_FORMAT_NONE
+           && (glyph_draw_dsc->g == NULL || glyph_draw_dsc->letter_coords == NULL)) {
+            LV_LOG_WARN("Skipping glyph draw: null glyph descriptor or letter coords");
+            return;
+        }
+
         switch(glyph_draw_dsc->format) {
             case LV_FONT_GLYPH_FORMAT_NONE: {
 #if LV_USE_FONT_PLACEHOLDER

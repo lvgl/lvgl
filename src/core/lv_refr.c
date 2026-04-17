@@ -859,7 +859,7 @@ static void refr_invalid_areas(void)
  * Reshape the draw buffer if required
  * @param layer  pointer to a layer which will be drawn
  */
-static void layer_reshape_draw_buf(lv_layer_t * layer, uint32_t stride)
+static bool layer_reshape_draw_buf(lv_layer_t * layer, uint32_t stride)
 {
     lv_draw_buf_t * ret = lv_draw_buf_reshape(
                               layer->draw_buf,
@@ -869,6 +869,13 @@ static void layer_reshape_draw_buf(lv_layer_t * layer, uint32_t stride)
                               stride);
     LV_UNUSED(ret);
     LV_ASSERT_NULL(ret);
+    if(ret == NULL) {
+        LV_LOG_ERROR("draw_buf reshape failed for %dx%d stride %" LV_PRIu32 " - skipping render",
+                     (int)lv_area_get_width(&layer->buf_area),
+                     (int)lv_area_get_height(&layer->buf_area), stride);
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -888,7 +895,11 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /*In partial mode render this area to the buffer*/
         layer->buf_area = *area_p;
-        layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
+        if(!layer_reshape_draw_buf(layer, LV_STRIDE_AUTO)) {
+            disp_refr->refreshed_area = *area_p;
+            LV_PROFILER_REFR_END;
+            return;
+        }
     }
     else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
             disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
@@ -903,7 +914,11 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
             layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
         }
-        layer_reshape_draw_buf(layer, disp_refr->stride_is_auto ? LV_STRIDE_AUTO : layer->draw_buf->header.stride);
+        if(!layer_reshape_draw_buf(layer, disp_refr->stride_is_auto ? LV_STRIDE_AUTO : layer->draw_buf->header.stride)) {
+            disp_refr->refreshed_area = *area_p;
+            LV_PROFILER_REFR_END;
+            return;
+        }
     }
 
     /*Try to divide the area to smaller tiles*/

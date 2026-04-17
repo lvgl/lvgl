@@ -254,6 +254,10 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
  */
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
+    if(dsc->dest_buf == NULL || dsc->dest_w <= 0 || dsc->dest_h <= 0) {
+        LV_LOG_WARN("lv_draw_sw_blend_color_to_rgb565: NULL dest_buf or invalid dimensions, skipping");
+        return;
+    }
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
     uint16_t color16 = lv_color_to_u16(dsc->color);

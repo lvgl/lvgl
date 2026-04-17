@@ -257,7 +257,6 @@ lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, u
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
-    LV_ASSERT_MALLOC(draw_buf);
     if(draw_buf == NULL) {
         LV_PROFILER_DRAW_END;
         return NULL;
@@ -378,8 +377,8 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     if(buf == NULL) return NULL;
 
     if(x >= buf->header.w || y >= buf->header.h) {
-        LV_LOG_ERROR("coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32, x, y,
-                     (uint32_t)buf->header.w, (uint32_t)buf->header.h);
+        LV_LOG_WARN("coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32, x, y,
+                    (uint32_t)buf->header.w, (uint32_t)buf->header.h);
         return NULL;
     }
 
