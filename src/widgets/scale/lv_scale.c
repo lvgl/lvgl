@@ -63,6 +63,7 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
 static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const lv_style_t * section_style,
                                       lv_part_t part);
 static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, const lv_style_t * section_style);
+static void scale_get_labels_max_size(lv_obj_t * obj, int32_t * max_w, int32_t * max_h);
 /* Helpers */
 static void scale_find_section_tick_idx(lv_obj_t * obj);
 static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint32_t tick_idx,
@@ -182,6 +183,7 @@ void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode)
 
     scale->mode = mode;
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -192,6 +194,7 @@ void lv_scale_set_total_tick_count(lv_obj_t * obj, uint32_t total_tick_count)
 
     scale->total_tick_count = total_tick_count;
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -202,6 +205,7 @@ void lv_scale_set_major_tick_every(lv_obj_t * obj, uint32_t major_tick_every)
 
     scale->major_tick_every = major_tick_every;
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -212,6 +216,7 @@ void lv_scale_set_label_show(lv_obj_t * obj, bool show_label)
 
     scale->label_enabled = show_label;
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -223,6 +228,7 @@ void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max)
     scale->range_min = min;
     scale->range_max = max;
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -233,6 +239,7 @@ void lv_scale_set_min_value(lv_obj_t * obj, int32_t min)
     if(scale->range_min == min) return;
     scale->range_min = min;
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -243,6 +250,7 @@ void lv_scale_set_max_value(lv_obj_t * obj, int32_t max)
     if(scale->range_max == max) return;
     scale->range_max = max;
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -396,6 +404,7 @@ void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[])
         }
     }
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -772,6 +781,60 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
     else if(event_code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /* NOTE: Extend scale draw size so the first tick label can be shown */
         lv_event_set_ext_draw_size(event, 100);
+    }
+    else if(event_code == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_self_size_info(event);
+
+        if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+            return;
+        }
+
+        const int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+        const int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        const int32_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+        const int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        const int32_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
+        const int32_t main_line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        const int32_t major_tick_len = LV_ABS(lv_obj_get_style_length(obj, LV_PART_INDICATOR));
+        const int32_t minor_tick_len = LV_ABS(lv_obj_get_style_length(obj, LV_PART_ITEMS));
+        const int32_t max_tick_len = LV_MAX(major_tick_len, minor_tick_len);
+
+        int32_t max_label_w = 0;
+        int32_t max_label_h = 0;
+        if(scale->label_enabled) {
+            scale_get_labels_max_size(obj, &max_label_w, &max_label_h);
+        }
+
+        const bool is_horizontal =
+            (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode);
+
+        if(is_horizontal) {
+            int32_t self_h = (border_width * 2) + pad_top + pad_bottom + main_line_width + max_tick_len;
+
+            if(scale->label_enabled && max_label_h > 0) {
+                int32_t label_pad = (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode)
+                                    ? lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR)
+                                    : lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+                int32_t label_translate = LV_ABS(lv_obj_get_style_translate_y(obj, LV_PART_INDICATOR));
+                self_h += label_pad + max_label_h + label_translate;
+            }
+
+            p->y = LV_MAX(p->y, self_h);
+        }
+        else {
+            int32_t self_w = (border_width * 2) + pad_left + pad_right + main_line_width + max_tick_len;
+
+            if(scale->label_enabled && max_label_w > 0) {
+                int32_t label_pad = (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode)
+                                    ? lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR)
+                                    : lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+                int32_t label_translate = LV_ABS(lv_obj_get_style_translate_x(obj, LV_PART_INDICATOR));
+                self_w += label_pad + max_label_w + label_translate;
+            }
+
+            p->x = LV_MAX(p->x, self_w);
+        }
     }
     else if(event_code == LV_EVENT_STYLE_CHANGED) {
         size_t needle_count = lv_array_size(&scale->needles);
@@ -1676,6 +1739,65 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
         label_dsc->opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
         label_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
         label_dsc->font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
+    }
+}
+
+static void scale_get_labels_max_size(lv_obj_t * obj, int32_t * max_w, int32_t * max_h)
+{
+    LV_ASSERT_NULL(max_w);
+    LV_ASSERT_NULL(max_h);
+
+    *max_w = 0;
+    *max_h = 0;
+
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    if(scale->total_tick_count == 0 || scale->major_tick_every == 0) {
+        return;
+    }
+
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
+
+    lv_text_attributes_t attributes = {0};
+    attributes.letter_space = label_dsc.letter_space;
+    attributes.line_space = label_dsc.line_space;
+    attributes.max_width = LV_COORD_MAX;
+    attributes.text_flags = LV_TEXT_FLAG_NONE;
+
+    char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
+    uint32_t major_tick_idx = 0U;
+
+    for(uint32_t tick_idx = 0; tick_idx < scale->total_tick_count; tick_idx++) {
+        if(!scale_is_major_tick(scale, tick_idx)) {
+            continue;
+        }
+
+        major_tick_idx++;
+        if(scale->txt_src) {
+            scale_build_custom_label_text(obj, &label_dsc, (uint16_t)major_tick_idx);
+        }
+        else {
+            int32_t tick_value = scale->range_min;
+            if(scale->total_tick_count > 1) {
+                tick_value = lv_map(
+                                 (int32_t)tick_idx, 0, (int32_t)scale->total_tick_count - 1, scale->range_min, scale->range_max);
+            }
+
+            lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+            label_dsc.text = text_buffer;
+            label_dsc.text_local = 1;
+        }
+
+        if(label_dsc.text == NULL) {
+            continue;
+        }
+
+        lv_point_t label_size;
+        lv_text_get_size_attributes(&label_size, label_dsc.text, label_dsc.font, &attributes);
+
+        *max_w = LV_MAX(*max_w, label_size.x);
+        *max_h = LV_MAX(*max_h, label_size.y);
     }
 }
 
