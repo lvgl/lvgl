@@ -41,11 +41,12 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_header_dropdown
 lv_obj_t * lv_calendar_add_header_dropdown(lv_obj_t * parent);
 
 /**
- * Sets a custom calendar year list
+ * Sets a custom calendar year list.
+ * Calling this function disables the default auto-generated sliding year window for this header.
  * @param parent        pointer to a calendar object
  * @param years_list    pointer to an const char array with the years list, see lv_dropdown set_options for more information.
  *                      E.g. `const char * years = "2023\n2022\n2021\n2020\n2019"
- *                      Only the pointer will be saved so this variable can't be local which will be destroyed later.
+ *                      The list is copied internally, so the source buffer can be released after the call.
  */
 void lv_calendar_header_dropdown_set_year_list(lv_obj_t * parent, const char * years_list);
 
