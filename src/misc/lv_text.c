@@ -514,7 +514,7 @@ char * lv_text_set_text_vfmt(const char * fmt, va_list ap)
     va_end(ap_copy);
 
     char * text = 0;
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     /*Put together the text according to the format string*/
     char * raw_txt = lv_malloc(len + 1);
     LV_ASSERT_MALLOC(raw_txt);
