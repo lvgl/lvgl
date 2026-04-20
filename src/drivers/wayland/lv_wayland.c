@@ -125,8 +125,7 @@ lv_result_t lv_wayland_init(void)
         LV_LOG_ERROR("failed to connect to Wayland server");
         return LV_RESULT_INVALID;
     }
-
-    lv_wl_ctx.backend_data = wl_backend_ops.init();
+    lv_wayland_backend_init_all();
 
     /* Add registry listener and wait for registry reception */
     lv_wl_ctx.wl_registry = wl_display_get_registry(lv_wl_ctx.wl_display);
@@ -167,7 +166,7 @@ void lv_wayland_deinit(void)
     lv_wayland_xdg_deinit();
 
     if(is_wayland_initialized) {
-        wl_backend_ops.deinit(lv_wl_ctx.backend_data);
+        lv_wayland_backend_deinit_all();
     }
 
     if(lv_wl_ctx.seat.wl_seat) {
@@ -324,8 +323,7 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
             ctx->wl_output_count++;
         }
     }
-
-    wl_backend_ops.global_handler(lv_wl_ctx.backend_data, registry, name, interface, version);
+    lv_wayland_backend_global_handler(registry, name, interface, version);
 }
 
 static void handle_global_remove(void * data, struct wl_registry * registry, uint32_t name)

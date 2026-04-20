@@ -99,7 +99,6 @@ typedef struct {
     struct wl_shm * wl_shm;
     lv_wl_seat_t seat;
 
-    void * backend_data;
     lv_wl_output_info_t physical_outputs[LV_WAYLAND_MAX_OUTPUTS];
     uint8_t wl_output_count;
 
@@ -126,12 +125,12 @@ typedef struct {
 
 
 typedef struct _lv_wl_window_t {
-    void * backend_display_data;
     lv_display_t * lv_disp;
     lv_indev_t * lv_indev_pointer;
     lv_indev_t * lv_indev_pointeraxis;
     lv_indev_t * lv_indev_touch;
     lv_indev_t * lv_indev_keyboard;
+    lv_wayland_backend_display_data_t backend_ddata;
     lv_wayland_display_close_cb_t close_cb;
     lv_wl_window_xdg_t xdg;
 
