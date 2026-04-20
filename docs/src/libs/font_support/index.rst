@@ -9,5 +9,6 @@ Font Support
     :maxdepth: 2
 
     freetype
+    harfbuzz
     tiny_ttf
 

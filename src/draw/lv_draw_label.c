@@ -21,6 +21,11 @@
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
 
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
+    #include "../libs/freetype/lv_freetype_harfbuzz.h"
+    #include "../libs/freetype/lv_freetype_private.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -312,14 +317,25 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
 
     /*Align to middle*/
     if(align == LV_TEXT_ALIGN_CENTER) {
-        line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
-        pos.x += (lv_area_get_width(coords) - line_width) / 2;
-
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
+        /*For HarfBuzz fonts, defer width calculation to the shaping path
+         *to avoid shaping the text twice (once for width, once for rendering).*/
+        if(!lv_freetype_is_harfbuzz_font(font))
+#endif
+        {
+            line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
+            pos.x += (lv_area_get_width(coords) - line_width) / 2;
+        }
     }
     /*Align to the right*/
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
-        pos.x += lv_area_get_width(coords) - line_width;
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
+        if(!lv_freetype_is_harfbuzz_font(font))
+#endif
+        {
+            line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &attributes);
+            pos.x += lv_area_get_width(coords) - line_width;
+        }
     }
 
     uint32_t sel_start = dsc->sel_start;
@@ -382,6 +398,157 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
 #else
         const char * bidi_txt = dsc->text + line_start;
 #endif
+
+
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
+        /*HarfBuzz shaping path: shape the entire line and render shaped glyphs*/
+        if(lv_freetype_is_harfbuzz_font(font)) {
+            uint32_t line_byte_len = line_end - line_start;
+            /* Strip trailing newline/carriage return from shaping input
+             * to avoid spurious glyphs in shaped output */
+            while(line_byte_len > 0 && (bidi_txt[line_byte_len - 1] == '\n' || bidi_txt[line_byte_len - 1] == '\r')) {
+                line_byte_len--;
+            }
+            /* When BIDI is enabled, bidi_txt is always in visual order (either
+             * pre-bided or processed by lv_bidi_process_paragraph above).
+             * Force LTR in HarfBuzz to prevent double-reordering. */
+#if LV_USE_BIDI
+            lv_base_dir_t hb_dir = LV_BASE_DIR_LTR;
+#else
+            lv_base_dir_t hb_dir = LV_BASE_DIR_AUTO;
+#endif
+            lv_hb_shaped_text_t * shaped = lv_hb_shape_text(font, bidi_txt, line_byte_len, hb_dir);
+            if(shaped) {
+                /*Compute line width from shaped result and apply alignment.
+                 *This avoids a separate lv_text_get_width() call which would shape the text again.*/
+                if(align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT) {
+                    int32_t shaped_width = 0;
+                    for(uint32_t wi = 0; wi < shaped->count; wi++) {
+                        int32_t gw = shaped->glyphs[wi].x_advance;
+                        if(gw > 0) shaped_width += gw + dsc->letter_space;
+                    }
+                    if(shaped_width > 0) shaped_width -= dsc->letter_space;
+                    if(align == LV_TEXT_ALIGN_CENTER) {
+                        pos.x += (lv_area_get_width(coords) - shaped_width) / 2;
+                    }
+                    else {
+                        pos.x += lv_area_get_width(coords) - shaped_width;
+                    }
+                }
+
+                for(uint32_t si = 0; si < shaped->count; si++) {
+                    lv_hb_glyph_info_t * gi = &shaped->glyphs[si];
+
+                    lv_font_glyph_dsc_t hb_glyph_dsc;
+                    lv_memzero(&hb_glyph_dsc, sizeof(hb_glyph_dsc));
+
+                    bool use_fallback = false;
+                    uint32_t fallback_letter = 0;
+
+                    if(gi->glyph_id == 0 && font->fallback != NULL) {
+                        /* .notdef glyph: character not in this font. Try fallback chain. */
+                        uint32_t tmp_ofs = gi->cluster;
+                        fallback_letter = lv_text_encoded_next(bidi_txt, &tmp_ofs);
+                        if(fallback_letter && lv_font_get_glyph_dsc(font->fallback, &hb_glyph_dsc,
+                                                                    fallback_letter, 0)) {
+                            use_fallback = true;
+                        }
+                        else {
+                            /* No fallback found either, load .notdef from primary font */
+                            if(!lv_freetype_get_glyph_dsc_by_gid(font, &hb_glyph_dsc, 0)) {
+                                continue;
+                            }
+                        }
+                    }
+                    else if(!lv_freetype_get_glyph_dsc_by_gid(font, &hb_glyph_dsc, gi->glyph_id)) {
+                        continue;
+                    }
+
+                    letter_w = hb_glyph_dsc.adv_w;
+                    int32_t x_off = use_fallback ? 0 : gi->x_offset;
+                    int32_t y_off = use_fallback ? 0 : gi->y_offset;
+                    int32_t x_adv = use_fallback ? hb_glyph_dsc.adv_w : gi->x_advance;
+
+                    bg_coords.x1 = pos.x + x_off - dsc->letter_space / 2;
+                    bg_coords.y1 = pos.y;
+                    bg_coords.x2 = pos.x + x_off + letter_w - 1 + (dsc->letter_space + 1) / 2;
+                    bg_coords.y2 = pos.y + line_height - 1;
+
+                    /* Decorations on last glyph */
+                    if(si == shaped->count - 1) {
+                        if(dsc->decor & LV_TEXT_DECOR_UNDERLINE) {
+                            lv_area_t fill_area;
+                            fill_area.x1 = line_start_x;
+                            fill_area.x2 = pos.x + x_off + letter_w - 1;
+                            fill_area.y1 = pos.y + font->line_height - font->base_line - font->underline_position;
+                            fill_area.y2 = fill_area.y1 + underline_width - 1;
+                            fill_dsc.color = dsc->color;
+                            cb(t, NULL, &fill_dsc, &fill_area);
+                        }
+                        if(dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH) {
+                            lv_area_t fill_area;
+                            fill_area.x1 = line_start_x;
+                            fill_area.x2 = pos.x + x_off + letter_w - 1;
+                            fill_area.y1 = pos.y + (font->line_height - font->base_line) * 2 / 3
+                                           + font->underline_thickness / 2;
+                            fill_area.y2 = fill_area.y1 + underline_width - 1;
+                            fill_dsc.color = dsc->color;
+                            cb(t, NULL, &fill_dsc, &fill_area);
+                        }
+                    }
+
+                    /* Handle text selection using cluster-to-character mapping */
+                    draw_letter_dsc.color = dsc->color;
+                    if(sel_start != LV_DRAW_LABEL_NO_TXT_SEL && sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
+                        uint32_t logical_char_pos;
+#if LV_USE_BIDI
+                        if(dsc->has_bided) {
+                            logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + gi->cluster);
+                        }
+                        else {
+                            logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
+                            uint32_t c_idx = lv_text_encoded_get_char_id(bidi_txt, gi->cluster);
+                            logical_char_pos += lv_bidi_get_logical_pos(dsc->text + line_start, NULL,
+                                                                        line_end - line_start,
+                                                                        base_dir, c_idx, NULL);
+                        }
+#else
+                        logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + gi->cluster);
+#endif
+                        if(logical_char_pos >= sel_start && logical_char_pos < sel_end) {
+                            draw_letter_dsc.color = dsc->sel_color;
+                            fill_dsc.color = dsc->sel_bg_color;
+                            cb(t, NULL, &fill_dsc, &bg_coords);
+                        }
+                    }
+
+                    lv_point_t glyph_pos;
+                    glyph_pos.x = pos.x + x_off;
+                    glyph_pos.y = pos.y - y_off;
+
+                    if(use_fallback) {
+                        /* Render via standard path using the fallback font */
+                        draw_letter_dsc.g = &hb_glyph_dsc;
+                        draw_letter_dsc.bg_coords = &bg_coords;
+                        lv_draw_unit_draw_letter(t, &draw_letter_dsc, &glyph_pos,
+                                                 hb_glyph_dsc.resolved_font, fallback_letter, cb);
+                        draw_letter_dsc.g = NULL;
+                    }
+                    else {
+                        /* Render using HarfBuzz glyph descriptor directly */
+                        draw_letter_dsc.g = &hb_glyph_dsc;
+                        draw_letter_dsc.bg_coords = &bg_coords;
+                        lv_draw_unit_draw_letter(t, &draw_letter_dsc, &glyph_pos, font, 'A', cb);
+                        draw_letter_dsc.g = NULL;
+                    }
+
+                    pos.x += x_adv + dsc->letter_space;
+                }
+                lv_hb_shaped_text_destroy(shaped);
+                goto harfbuzz_next_line;
+            }
+        }
+#endif /*LV_USE_FREETYPE && LV_USE_HARFBUZZ*/
 
         while(next_char_offset < remaining_len && next_char_offset < line_end - line_start) {
             uint32_t logical_char_pos = 0;
@@ -533,6 +700,10 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
             }
         }
 
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
+harfbuzz_next_line:
+#endif
+
 #if LV_USE_BIDI
         lv_free(bidi_txt);
         bidi_txt = NULL;
@@ -553,16 +724,26 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         pos.x = coords->x1;
         /*Align to middle*/
         if(align == LV_TEXT_ALIGN_CENTER) {
-            line_width =
-                lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
-
-            pos.x += (lv_area_get_width(coords) - line_width) / 2;
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
+            /*For HarfBuzz fonts, defer width calculation to the shaping path above*/
+            if(!lv_freetype_is_harfbuzz_font(font))
+#endif
+            {
+                line_width =
+                    lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
+                pos.x += (lv_area_get_width(coords) - line_width) / 2;
+            }
         }
         /*Align to the right*/
         else if(align == LV_TEXT_ALIGN_RIGHT) {
-            line_width =
-                lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
-            pos.x += lv_area_get_width(coords) - line_width;
+#if LV_USE_FREETYPE && LV_USE_HARFBUZZ
+            if(!lv_freetype_is_harfbuzz_font(font))
+#endif
+            {
+                line_width =
+                    lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, &text_attributes);
+                pos.x += lv_area_get_width(coords) - line_width;
+            }
         }
 
         /*Go the next line position*/

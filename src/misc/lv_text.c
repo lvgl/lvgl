@@ -15,6 +15,7 @@
 #include "../stdlib/lv_string.h"
 #include "../misc/lv_types.h"
 
+
 /*********************
  *      DEFINES
  *********************/
@@ -433,6 +434,14 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
     if(txt[0] == '\0') return 0;
+
+    /* Note: For HarfBuzz fonts, we intentionally use the character-by-character
+     * path below rather than calling lv_hb_shape_text(). This avoids expensive
+     * HarfBuzz shaping during layout/size calculation (lv_text_get_size), since
+     * the render path in lv_draw_label.c will shape the text again anyway.
+     * The per-character widths slightly overestimate for complex scripts (conjuncts
+     * merge multiple chars into one glyph) but this only affects layout sizing,
+     * not visual correctness — the render path uses HarfBuzz for precise placement. */
 
     uint32_t i                = 0;
     int32_t width             = 0;

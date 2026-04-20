@@ -3293,6 +3293,16 @@
             #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
         #endif
     #endif
+
+    /** HarfBuzz text shaping for complex scripts (e.g. Devanagari, Arabic).
+     *  Requires the HarfBuzz library to be installed. */
+    #ifndef LV_USE_HARFBUZZ
+        #ifdef CONFIG_LV_USE_HARFBUZZ
+            #define LV_USE_HARFBUZZ CONFIG_LV_USE_HARFBUZZ
+        #else
+            #define LV_USE_HARFBUZZ 0
+        #endif
+    #endif
 #endif
 
 /** Built-in TTF decoder */
