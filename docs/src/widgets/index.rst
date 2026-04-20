@@ -40,6 +40,7 @@ All Widgets
     lottie
     menu
     msgbox
+    polarchart
     roller
     scale
     slider
