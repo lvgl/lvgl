@@ -574,6 +574,9 @@ static bool ensure_file_loaded(eve5_sdcard_ctx_t * ctx, eve5_file_t * file)
     }
     LV_LOG_USER("Loaded file to RAM_G: %s (result=%u)", file->path, result);
 
+    /* File may be handed to the graphics engine via lv_eve5_sdcard_steal_ramg() */
+    EVE_Hal_requestFenceBeforeSwap(phost);
+
 #if LV_USE_OS
     lv_eve5_hal_unlock(ctx->disp);
 #endif
