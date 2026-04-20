@@ -2,7 +2,15 @@
 #if LV_BUILD_EXAMPLES && LV_USE_BUTTON && LV_USE_LABEL
 
 /**
- * Opacity and Transformations
+ * @title Opacity and transform
+ * @brief Compare a normal button with a half-opaque one and a rotated, scaled one.
+ *
+ * Three 100 by 40 buttons are stacked vertically on the active screen.
+ * The first uses defaults. The second sets `opa` to `LV_OPA_50` so the
+ * button and its label are rendered to a layer before blending. The
+ * third also sets `opa` to `LV_OPA_50` and applies
+ * `transform_rotation = 150` (15 degrees), `transform_scale = 256 + 64`
+ * (1.25x), and pivots the transform at `(50, 20)`.
  */
 void lv_example_style_16(void)
 {

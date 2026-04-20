@@ -2,7 +2,15 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Using multiple styles
+ * @title Layered base and warning styles
+ * @brief Override a shared base style with a warning style on one of two objects.
+ *
+ * A `style_base` sets light blue background, border, shadow, white
+ * text, and a 100 pixel width. A `style_warning` overrides only
+ * `bg_color`, `border_color`, and `text_color` with yellow tones. Two
+ * labeled objects are placed on the active screen: one with only the
+ * base style aligned to `LV_ALIGN_LEFT_MID`, and one with the base plus
+ * warning styles aligned to `LV_ALIGN_RIGHT_MID`.
  */
 void lv_example_style_12(void)
 {

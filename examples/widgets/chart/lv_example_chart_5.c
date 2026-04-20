@@ -8,7 +8,17 @@ static void add_faded_area(lv_event_t * e);
 static void draw_event_cb(lv_event_t * e);
 
 /**
- * Add a faded area effect to the line chart and make some division lines ticker
+ * @title Faded area under line chart
+ * @brief Line chart with a vertical gradient fill beneath the line and styled division lines.
+ *
+ * A 200x150 `LV_CHART_TYPE_LINE` chart with 10 points uses
+ * `lv_chart_set_div_line_count` to draw 5 horizontal and 7 vertical
+ * division lines. With `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` enabled, the
+ * `LV_EVENT_DRAW_TASK_ADDED` callback intercepts `LV_PART_ITEMS` line
+ * tasks and fills each segment below the polyline with an
+ * `lv_draw_triangle` and `lv_draw_rect` pair using a vertical gradient
+ * in the series color. `LV_PART_MAIN` line tasks are recolored and
+ * dashed to highlight specific grid indices.
  */
 void lv_example_chart_5(void)
 {

@@ -20,6 +20,17 @@ static void btnm_event_handler(lv_event_t * e)
 
 }
 
+/**
+ * @title Single-line textarea with button matrix
+ * @brief Feed a one-line textarea from a numeric button matrix.
+ *
+ * A textarea is placed at the top in one-line mode and forced into
+ * `LV_STATE_FOCUSED` so the cursor stays visible. A four-row button matrix
+ * holds digits `0..9` plus `LV_SYMBOL_BACKSPACE` and `LV_SYMBOL_NEW_LINE`. Its
+ * `LV_EVENT_VALUE_CHANGED` handler appends the pressed character, deletes on
+ * backspace, or sends `LV_EVENT_READY` to the textarea on new line. The matrix
+ * drops `LV_OBJ_FLAG_CLICK_FOCUSABLE` so focus stays with the textarea.
+ */
 void lv_example_textarea_1(void)
 {
     lv_obj_t * ta = lv_textarea_create(lv_screen_active());

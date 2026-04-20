@@ -38,7 +38,17 @@ static void add_data(lv_timer_t * timer)
 }
 
 /**
- * A scatter chart
+ * @title Scatter chart with fading points
+ * @brief Scatter chart whose points fade toward blue or red depending on their X and Y.
+ *
+ * A 200x150 `LV_CHART_TYPE_SCATTER` chart is configured with an X range
+ * of 0..200 and a Y range of 0..1000 and 50 points. Line width on
+ * `LV_PART_ITEMS` is zeroed so only the point markers show. With
+ * `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` set, the
+ * `LV_EVENT_DRAW_TASK_ADDED` callback fades older points by reducing
+ * opacity and recolors each `LV_PART_INDICATOR` fill between red and
+ * blue using the point's X and Y arrays. A 100 ms `lv_timer` pushes a
+ * new random point via `lv_chart_set_next_value2`.
  */
 void lv_example_chart_7(void)
 {

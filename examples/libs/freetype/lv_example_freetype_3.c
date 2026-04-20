@@ -31,7 +31,15 @@ static void create_label(lv_font_kerning_t kerning, int32_t y_ofs, const char * 
 }
 
 /**
- * FreeType kerning example
+ * @title FreeType kerning comparison
+ * @brief Compare a FreeType-loaded font rendered with and without kerning.
+ *
+ * A static helper builds a 32 px `Lato-Regular.ttf` font via
+ * `lv_freetype_font_create_with_info`, applies it to a label with
+ * `lv_obj_set_style_text_font`, and centers the label at a given y offset.
+ * The public function calls the helper twice, once with
+ * `LV_FONT_KERNING_NONE` above center and once with `LV_FONT_KERNING_NORMAL`
+ * below, both showing the pair test string `AVAWAY,ToTaTe`.
  */
 void lv_example_freetype_3(void)
 {

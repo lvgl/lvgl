@@ -3,7 +3,17 @@
 
 
 /**
- * A simple round scale with label/tick translation
+ * @title Round scale with rotated upright labels
+ * @brief Round inner scale whose labels follow ticks while staying upright.
+ *
+ * A 150 by 150 scale uses `LV_SCALE_MODE_ROUND_INNER` with a 270
+ * degree range rotated to 135 degrees, 31 ticks over the range 10 to
+ * 40. The indicator part applies
+ * `LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT`,
+ * a 10 px horizontal translate, a 15 px tick length, and a 10 px
+ * radial offset. Minor ticks get a 10 px length, a 5 px radial offset,
+ * and 50% line opacity. A static `lv_line` needle is anchored at
+ * value 33.
  */
 void lv_example_scale_8(void)
 {

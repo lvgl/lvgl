@@ -21,6 +21,17 @@ static void timer_cb(lv_timer_t * timer)
     }
 }
 
+/**
+ * @title Animated matrix transform on a base object
+ * @brief Continuously scale and rotate a centered object using `lv_obj_set_transform`.
+ *
+ * A centered base object is paired with a 20 ms `lv_timer` that
+ * builds an identity `lv_matrix_t`, scales its x axis, rotates it by
+ * 360 times the scale factor, and applies the result with
+ * `lv_obj_set_transform`. The scale factor grows from 0.1 to 2.0 in
+ * 0.01 steps; once it exceeds 2.0 the object is reset with
+ * `lv_obj_reset_transform` and the loop restarts.
+ */
 void lv_example_obj_3(void)
 {
     lv_obj_t * obj = lv_obj_create(lv_screen_active());

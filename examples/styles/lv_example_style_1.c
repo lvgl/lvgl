@@ -2,7 +2,14 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Using the Size, Position and Padding style properties
+ * @title Size, position, and padding
+ * @brief Style an object's width, height, coordinates, and padding, then add a child label.
+ *
+ * A single `lv_style_t` sets `radius`, `width` to 150, `height` to
+ * `LV_SIZE_CONTENT`, vertical padding to 20, left padding to 5, and
+ * positions the object at `x = 50%` of the parent with `y = 80`. The
+ * style is applied to a base object on the active screen, and a label
+ * with the text `Hello` is added as a child.
  */
 void lv_example_style_1(void)
 {

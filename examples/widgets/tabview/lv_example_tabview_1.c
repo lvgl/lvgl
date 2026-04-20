@@ -1,6 +1,17 @@
 #include "../../lv_examples.h"
 #if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
+/**
+ * @title Horizontal tab view with three tabs
+ * @brief Three tabs across the top with a scrollable long label in the first.
+ *
+ * `lv_tabview_create` fills the active screen and
+ * `lv_tabview_add_tab` adds `Tab 1`, `Tab 2`, and `Tab 3`. Tab 1 holds
+ * a tall multi-line label that exceeds the tab height so it becomes
+ * scrollable, while Tab 2 and Tab 3 carry short labels. A final
+ * `lv_obj_scroll_to_view_recursive` on the third-tab label scrolls it
+ * into view with `LV_ANIM_ON`.
+ */
 void lv_example_tabview_1(void)
 {
     /*Create a Tab view object*/

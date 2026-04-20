@@ -3,7 +3,12 @@
 #if LV_USE_SVG && LV_USE_VECTOR_GRAPHIC
 
 /**
- * Load an SVG from a file
+ * @title SVG from filesystem
+ * @brief Load an SVG file through the LVGL filesystem and use it as an image source.
+ *
+ * An image widget is created on the active screen and its source is set to
+ * `A:lvgl/examples/assets/circle.svg`, so the SVG decoder reads the file
+ * through the filesystem driver registered under drive letter `A`.
  */
 void lv_example_svg_2(void)
 {

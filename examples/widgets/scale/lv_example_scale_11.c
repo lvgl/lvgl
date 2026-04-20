@@ -23,6 +23,21 @@ static void label_color_cb(lv_event_t * e)
     }
 }
 
+/**
+ * @title 24-hour day and night dial
+ * @brief Round outer scale split into coloured day and night arcs with sunrise and sunset text.
+ *
+ * A 210 by 210 dark grey container hosts a 150 by 150
+ * `LV_SCALE_MODE_ROUND_OUTER` scale over the range 0 to 24 with a
+ * full 360 degree sweep rotated to 105 degrees and 25 hourly ticks in
+ * `lv_font_montserrat_12`. Labels `01` through `24` rotate to follow
+ * the ticks while staying upright, and an `LV_EVENT_DRAW_TASK_ADDED`
+ * callback whitens the `06`, `12`, `18`, and `24` labels while
+ * greying the rest. Two sections colour the arc blue for 17 to 5
+ * (night) and dark yellow for 5 to 17 (day). Inside the container,
+ * a top `TODAY` heading sits above `SUNRISE 6:43` on the left and
+ * `SUNSET 17:37` on the right, using `lv_font_montserrat_14` through `_20`.
+ */
 void lv_example_scale_11(void)
 {
     lv_obj_t * bg = lv_obj_create(lv_screen_active());

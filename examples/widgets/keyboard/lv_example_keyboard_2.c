@@ -1,6 +1,16 @@
 #include "../../lv_examples.h"
 #if LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
+/**
+ * @title AZERTY layout as USER_1 mode
+ * @brief Register a custom AZERTY button map on the keyboard.
+ *
+ * A `kb_map` and matching `lv_buttonmatrix_ctrl_t` control array describe an
+ * AZERTY layout with `LV_SYMBOL_BACKSPACE`, `LV_SYMBOL_NEW_LINE`,
+ * `LV_SYMBOL_CLOSE`, and `LV_SYMBOL_OK`. `lv_keyboard_set_map` installs the
+ * layout under `LV_KEYBOARD_MODE_USER_1` and `lv_keyboard_set_mode` activates
+ * it. A focused textarea above the keyboard receives the typed characters.
+ */
 void lv_example_keyboard_2(void)
 {
     /*Create an AZERTY keyboard map*/

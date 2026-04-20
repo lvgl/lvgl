@@ -27,8 +27,6 @@ static void streak_event_cb(lv_event_t * e)
  * reads `lv_indev_get_short_click_streak()` and writes the count to a
  * separate label; `LV_EVENT_SINGLE_CLICKED`, `LV_EVENT_DOUBLE_CLICKED`, and
  * `LV_EVENT_TRIPLE_CLICKED` each set the button's label to a matching string.
- *
- * @hide_in_docs
  */
 void lv_example_event_streak(void)
 {

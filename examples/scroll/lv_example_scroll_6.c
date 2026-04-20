@@ -46,7 +46,16 @@ static void scroll_event_cb(lv_event_t * e)
 }
 
 /**
- * Translate the object as they scroll
+ * @title Circular scroll translate effect
+ * @brief Bow a column of buttons along a circle while they scroll past center.
+ *
+ * A 200x200 container is given `LV_RADIUS_CIRCLE`, `clip_corner`,
+ * `LV_FLEX_FLOW_COLUMN`, `LV_SCROLL_SNAP_CENTER` on Y, and
+ * `LV_SCROLLBAR_MODE_OFF`. Twenty full-width buttons are scrolled vertically.
+ * An `LV_EVENT_SCROLL` callback computes each child's vertical offset from
+ * the container center, maps it onto a circle with radius 7/10 of the height
+ * via `lv_sqrt`, writes the result to `translate_x`, and fades children with
+ * larger offsets toward `LV_OPA_TRANSP`.
  */
 void lv_example_scroll_6(void)
 {

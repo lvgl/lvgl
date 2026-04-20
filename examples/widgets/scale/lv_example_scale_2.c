@@ -2,7 +2,16 @@
 #if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
- * An vertical scale with section and custom styling
+ * @title Vertical scale with red upper band
+ * @brief Celsius-labelled right-side vertical scale turning red above 75.
+ *
+ * A 60 by 200 scale uses `LV_SCALE_MODE_VERTICAL_RIGHT` with 21 ticks
+ * (major every fifth) over the range 0 to 100 and a custom label array
+ * (`0 °C` through `100 °C`). Blue styles are applied to
+ * `LV_PART_MAIN`, `LV_PART_INDICATOR`, and `LV_PART_ITEMS`, and a red
+ * section covering 75 to 100 overrides those styles via
+ * `lv_scale_add_section`. A translucent blue-grey background rounds out
+ * the widget with padding and corner radius.
  */
 void lv_example_scale_2(void)
 {

@@ -2,7 +2,15 @@
 #if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 /**
- * Example of styling the bar
+ * @title Custom background and indicator styles
+ * @brief Restyle the bar background and indicator, then fill it to 100 with animation.
+ *
+ * The theme styles are removed and two local styles are applied: a background
+ * style with a 2 px `LV_PALETTE_BLUE` border, 6 px padding to shrink the
+ * indicator inset, and a 1000 ms `anim_duration`, plus an
+ * `LV_PART_INDICATOR` style with a solid blue fill and 3 px radius.
+ * `lv_bar_set_value(bar, 100, LV_ANIM_ON)` drives the indicator up to full
+ * using the configured duration.
  */
 void lv_example_bar_2(void)
 {

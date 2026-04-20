@@ -1,6 +1,16 @@
 #include "../../lv_examples.h"
 #if LV_USE_LINE && LV_BUILD_EXAMPLES
 
+/**
+ * @title Styled polyline through five points
+ * @brief Draw a rounded blue polyline through five fixed coordinates.
+ *
+ * A static array of five `lv_point_precise_t` coordinates defines the
+ * polyline. An `lv_style_t` sets `line_width` to 8, `line_color` to
+ * `lv_palette_main(LV_PALETTE_BLUE)`, and `line_rounded` to true.
+ * `lv_line_create` and `lv_line_set_points` build the shape on the
+ * active screen, the style is attached, and the line is centered.
+ */
 void lv_example_line_1(void)
 {
     /*Create an array for the points of the line*/

@@ -2,7 +2,14 @@
 #if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
- * A simple horizontal scale with transforms
+ * @title Tilted major ticks on horizontal scale
+ * @brief Horizontal scale whose major ticks rotate 45 degrees with a translate offset.
+ *
+ * A 200 by 100 horizontal-bottom scale carries 31 ticks (major every
+ * fifth) over the range 10 to 40. The indicator part receives a
+ * transform rotation of 450 (45.0 degrees), a 30 px tick length, and a
+ * 5 px x-translate, leaning each major tick and its label away from
+ * vertical. Minor ticks keep a 5 px length and straight orientation.
  */
 void lv_example_scale_9(void)
 {

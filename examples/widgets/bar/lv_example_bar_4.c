@@ -2,7 +2,14 @@
 #if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 /**
- * Bar with stripe pattern and ranged value
+ * @title Ranged bar with tiled stripe pattern
+ * @brief A 260 x 20 bar filled between 20 and 90 with a tiled skewed-stripe overlay.
+ *
+ * `LV_IMAGE_DECLARE(img_skew_strip)` provides the stripe asset, and an
+ * `LV_PART_INDICATOR` style sets it as a tiled `bg_image_src` at 30% opacity.
+ * `lv_bar_set_mode(bar, LV_BAR_MODE_RANGE)` unlocks a configurable start
+ * value; `lv_bar_set_start_value` and `lv_bar_set_value` fill only the 20
+ * to 90 portion of the track with the stripes on top of the theme color.
  */
 void lv_example_bar_4(void)
 {

@@ -20,6 +20,18 @@ static void ta_event_cb(lv_event_t * e)
     }
 }
 
+/**
+ * @title Pinyin IME with 26-key keyboard
+ * @brief Wire a keyboard and candidate panel to an `lv_ime_pinyin` for Chinese input.
+ *
+ * `lv_ime_pinyin_create` is placed on the active screen with
+ * `lv_font_source_han_sans_sc_16_cjk` as its text font. A one-line `lv_textarea`
+ * receives focus; when a non-keypad indev focuses it the `lv_keyboard` is
+ * unhidden via `LV_OBJ_FLAG_HIDDEN` and attached with `lv_keyboard_set_textarea`.
+ * `LV_EVENT_CANCEL` hides the keyboard and calls `lv_indev_reset`.
+ * `lv_ime_pinyin_get_cand_panel` is sized to 100% by 10% and aligned above the
+ * keyboard. A second label shows sample Chinese text to copy.
+ */
 void lv_example_ime_pinyin_1(void)
 {
     lv_obj_t * pinyin_ime = lv_ime_pinyin_create(lv_screen_active());

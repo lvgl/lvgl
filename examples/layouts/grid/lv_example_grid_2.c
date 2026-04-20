@@ -2,7 +2,14 @@
 #if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
- * Demonstrate cell placement and span
+ * @title Cell alignment and spans
+ * @brief Mix per-cell alignments with two-cell spans inside a 3x3 grid.
+ *
+ * A 300x220 container uses three 70 px columns and three 50 px rows. Five
+ * `LV_SIZE_CONTENT` children are placed via `lv_obj_set_grid_cell`: the top
+ * row mixes `LV_GRID_ALIGN_START`, `LV_GRID_ALIGN_CENTER`, and
+ * `LV_GRID_ALIGN_END` alignments, a child at column 1 spans two columns with
+ * `LV_GRID_ALIGN_STRETCH`, and a child at row 1 spans two rows the same way.
  */
 void lv_example_grid_2(void)
 {

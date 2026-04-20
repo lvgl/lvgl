@@ -4,6 +4,17 @@
 #define CANVAS_WIDTH  200
 #define CANVAS_HEIGHT  150
 
+/**
+ * @title Rotated RGB565 canvas onto ARGB8888
+ * @brief Render a rounded rectangle and label on an RGB565 canvas, then rotate the result onto an ARGB8888 canvas.
+ *
+ * Two 200x150 canvases are centered on the active screen. The first uses
+ * `LV_COLOR_FORMAT_RGB565` and draws a gradient rounded rectangle with
+ * `lv_draw_rect` and orange text with `lv_draw_label`. The second uses
+ * `LV_COLOR_FORMAT_ARGB8888`, takes the first canvas as an image via
+ * `lv_draw_buf_to_image`, and blits it with `lv_draw_image` rotated by
+ * 120 degrees around the canvas center.
+ */
 void lv_example_canvas_1(void)
 {
     lv_draw_rect_dsc_t rect_dsc;

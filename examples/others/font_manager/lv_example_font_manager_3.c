@@ -69,6 +69,18 @@ static const lv_font_class_t imgfont_class = {
     .free_src_cb = imgfont_free_src_cb,
 };
 
+/**
+ * @title Custom image font class
+ * @brief Register a user-defined imgfont class that only matches a size range.
+ *
+ * The file defines an `lv_font_class_t` whose `create_cb` returns a font from
+ * `lv_imgfont_create` only when the requested size falls between
+ * `match_size_min` and `match_size_max` (70 to 80). That class is registered as
+ * `"Emoji"` alongside a FreeType `"Lato-Regular"` source.
+ * `lv_font_manager_create_font` builds the chain `"Lato-Regular,Emoji"` at size 75,
+ * and a centered label renders `"Quiet\uF617~"` with the emoji glyph coming from
+ * the image source.
+ */
 void lv_example_font_manager_3(void)
 {
     /* Create font manager, with 8 fonts recycling buffers */

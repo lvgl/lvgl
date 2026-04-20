@@ -5,6 +5,20 @@
 static const char * ARCLABEL_TEXT =
     "I'm on an #FA7C45 ARC#! Centered with #12c2E9 C##8B68E8 O##c471ed L##B654E5 O##C84AB2 R##DB417A F##f64659 U##ff8888 L# feature!\n";
 
+/**
+ * @title Curved text along circular paths
+ * @brief Four arclabels wrap recoloured text and slogans around concentric radii.
+ *
+ * A black screen hosts four `lv_arclabel` objects. An inner 200 by
+ * 200 arclabel curves a recoloured string counter-clockwise at 80%
+ * radius with trailing vertical alignment, and an outer arclabel
+ * paints the same string clockwise at 100% radius with leading
+ * alignment. Two 300 by 200 slogans (`STAY HUNGRY`, `STAY FOOLISH`)
+ * sit at a fixed 150 px radius with a 30 px offset, amber colour,
+ * and counter-clockwise direction. When available,
+ * `lv_font_montserrat_18` is applied to the inner pair and
+ * `lv_font_montserrat_24` to the slogans.
+ */
 void lv_example_arclabel_1(void)
 {
     lv_obj_t * arclabel_inner = NULL;

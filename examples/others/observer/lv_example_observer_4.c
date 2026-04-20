@@ -12,6 +12,18 @@ static lv_subject_t slider_subject[4];
 static lv_subject_t dropdown_subject[3];
 static lv_subject_t roller_subject[2];
 
+/**
+ * @title Tabbed content driven by a subject
+ * @brief One int subject selects which set of bound widgets appears in the content area.
+ *
+ * `current_tab_subject` is watched by three observers. One rebuilds the content
+ * area on change, creating four sliders, three dropdowns, or two rollers bound
+ * to their respective subject arrays. Children are faded and slid in and out
+ * with `lv_anim_t` using `lv_anim_path_ease_in_out` at 300 ms. Another observer
+ * toggles `LV_STATE_CHECKED` on the footer buttons, and a third animates an
+ * indicator bar under the active button using `lv_obj_get_x_aligned` as the
+ * start value.
+ */
 void lv_example_observer_4(void)
 {
     lv_subject_init_int(&current_tab_subject, 0);

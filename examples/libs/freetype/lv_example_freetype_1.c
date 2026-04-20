@@ -9,7 +9,15 @@
 #endif
 
 /**
- * Load a font with FreeType
+ * @title FreeType bitmap font
+ * @brief Render a label with a 24 px bitmap TTF loaded via FreeType.
+ *
+ * `lv_freetype_font_create` loads `Lato-Regular.ttf` in
+ * `LV_FREETYPE_FONT_RENDER_MODE_BITMAP` at 24 px with
+ * `LV_FREETYPE_FONT_STYLE_NORMAL`. A style binds the font and centers text,
+ * then a label carrying a two-line greeting is placed at the center of the
+ * active screen. The path prefix resolves to `A:` when
+ * `LV_FREETYPE_USE_LVGL_PORT` is enabled and `./` otherwise.
  */
 void lv_example_freetype_1(void)
 {

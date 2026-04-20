@@ -2,7 +2,14 @@
 #if LV_BUILD_EXAMPLES && LV_USE_LABEL
 
 /**
- * Using the text style properties
+ * @title Text color and spacing
+ * @brief Style a label's text color, letter spacing, line spacing, and underline.
+ *
+ * A style sets a grey background, a blue border, padding, and the text
+ * properties `text_color` to blue, `text_letter_space = 5`,
+ * `text_line_space = 20`, and `text_decor = LV_TEXT_DECOR_UNDERLINE`.
+ * The style is applied to a two-line label that is centered on the
+ * active screen.
  */
 void lv_example_style_8(void)
 {

@@ -4,7 +4,16 @@
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /**
- * Using radial gradient as background
+ * @title Radial gradient background
+ * @brief Fill the screen with a purple-to-black radial gradient.
+ *
+ * A style's background `lv_grad_dsc_t` is built with
+ * `lv_grad_radial_init`, centered on the object and extending to the
+ * bottom-right corner with `LV_GRAD_EXTEND_PAD`. The stops run from
+ * `0x9B1842` to black. An object sized to the display resolution is
+ * created on the active screen and centered. When
+ * `LV_USE_DRAW_SW_COMPLEX_GRADIENTS` is disabled, a scrolling label
+ * reports the missing feature instead.
  */
 void lv_example_style_18(void)
 {

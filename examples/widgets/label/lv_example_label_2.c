@@ -2,7 +2,13 @@
 #if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
- * Create a fake text shadow
+ * @title Faux text shadow from two labels
+ * @brief Layer two labels with the same text to fake a drop shadow.
+ *
+ * A background label receives a style that sets `text_opa` to `LV_OPA_30` and a
+ * black `text_color`, then the same text is placed on a foreground label centered
+ * on the screen. The shadow label is aligned to the main label's top-left with a
+ * 2 px x/y offset via `lv_obj_align_to`.
  */
 void lv_example_label_2(void)
 {

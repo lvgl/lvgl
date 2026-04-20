@@ -57,7 +57,17 @@ static void change_event_cb(lv_event_t * e)
 }
 
 /**
- * A very light-weighted list created from table
+ * @title 200-row list with custom switch cell
+ * @brief Scrollable 200-item table that draws a toggle switch per row and reports build cost.
+ *
+ * `lv_mem_monitor` and `lv_tick_get` bracket the creation of a one-column,
+ * 200-row table to measure memory and time usage. Each row is filled
+ * with `lv_table_set_cell_value_fmt`. An `LV_EVENT_DRAW_TASK_ADDED`
+ * handler intercepts each `LV_PART_ITEMS` fill task and paints a pill
+ * track and knob whose position and color reflect the row's
+ * `LV_TABLE_CELL_CTRL_CUSTOM_1` flag. An `LV_EVENT_VALUE_CHANGED`
+ * handler toggles that flag on the selected row. A bottom label reports
+ * the row count along with elapsed time and bytes used.
  */
 void lv_example_table_2(void)
 {

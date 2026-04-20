@@ -145,6 +145,20 @@ static void create_slice(lv_obj_t * parent, int percentage, lv_color_t color)
     lv_obj_add_event_cb(arc, arc_click_cb, LV_EVENT_CLICKED, info);
 }
 
+/**
+ * @title Clickable pie chart with exploding slices
+ * @brief Five coloured arc slices pop outward when clicked and snap back.
+ *
+ * A flex-row container holds a 150 by 150 slice canvas built from five
+ * overlapping arcs (12%, 18%, 26%, 24%, 20%) created with
+ * `LV_ARC_MODE_NORMAL`, each taking a share of the full circle via
+ * `lv_arc_set_bg_start_angle` and `lv_arc_set_bg_end_angle`. Each
+ * slice carries its own percentage label positioned along its midpoint
+ * and enables `LV_OBJ_FLAG_ADV_HITTEST` so clicks register on the
+ * wedge shape. An `LV_EVENT_CLICKED` callback animates the slice 20 px
+ * outward along the slice midpoint over 200 ms, reversing it on a
+ * second click and pulling any previously exploded slice back in.
+ */
 void lv_example_arc_3(void)
 {
     /* Root container: flex row */

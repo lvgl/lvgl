@@ -7,6 +7,19 @@ static void minimize_button_event_cb(lv_event_t * e)
     lv_obj_add_flag(mbox, LV_OBJ_FLAG_HIDDEN);
 }
 
+/**
+ * @title Settings dialog with minimize button
+ * @brief A 300x200 non-modal settings panel with Brightness and Speed sliders.
+ *
+ * A non-modal `lv_msgbox` on the active screen gets a header with
+ * title `Setting`, a close icon, and a minus header button whose
+ * `LV_EVENT_CLICKED` handler hides the panel with
+ * `LV_OBJ_FLAG_HIDDEN`. `lv_msgbox_get_content` is flipped to
+ * `LV_FLEX_FLOW_COLUMN` and holds two column containers that pair a
+ * label with a full-width `lv_slider`, preset to Brightness 50 and
+ * Speed 80. The footer adds flex-growing `Apply` and `Cancel`
+ * buttons tinted indigo.
+ */
 void lv_example_msgbox_2(void)
 {
     lv_obj_t * setting = lv_msgbox_create(lv_screen_active());
