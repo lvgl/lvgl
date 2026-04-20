@@ -99,7 +99,7 @@ void * lv_malloc_zeroed(size_t size)
 
     void * alloc = lv_malloc_core(size);
     if(alloc == NULL) {
-        LV_LOG_INFO("couldn't allocate memory (%lu bytes)", (unsigned long)size);
+        LV_LOG_WARN("couldn't allocate memory (%lu bytes)", (unsigned long)size);
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
         lv_mem_monitor_t mon;
         lv_mem_monitor(&mon);

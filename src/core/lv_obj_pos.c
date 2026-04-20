@@ -16,6 +16,7 @@
 #include "../display/lv_display_private.h"
 #include "lv_refr_private.h"
 #include "../core/lv_global.h"
+#include "src/misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -126,6 +127,9 @@ static int32_t calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t 
 
 int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop)
 {
+    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_ARG(prop == LV_STYLE_WIDTH || prop == LV_STYLE_MIN_WIDTH || prop == LV_STYLE_MAX_WIDTH, return 0);
+
     return calc_dynamic_width(obj, prop, NULL);
 }
 
@@ -169,6 +173,9 @@ static int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t
 
 int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop)
 {
+    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_ARG(prop == LV_STYLE_HEIGHT || prop == LV_STYLE_MIN_HEIGHT || prop == LV_STYLE_MAX_HEIGHT, return 0);
+
     return calc_dynamic_height(obj, prop, NULL);
 }
 
@@ -332,6 +339,8 @@ void lv_obj_set_height(lv_obj_t * obj, int32_t h)
 
 void lv_obj_set_content_width(lv_obj_t * obj, int32_t w)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     int32_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
     int32_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
     lv_obj_set_width(obj, w + left + right);
@@ -339,6 +348,8 @@ void lv_obj_set_content_width(lv_obj_t * obj, int32_t w)
 
 void lv_obj_set_content_height(lv_obj_t * obj, int32_t h)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     int32_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
     int32_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
     lv_obj_set_height(obj, h + top + bottom);
@@ -355,6 +366,8 @@ void lv_obj_set_layout(lv_obj_t * obj, uint32_t layout)
 
 bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(lv_obj_has_flag_any(obj, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING)) return false;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -367,6 +380,8 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
 
 void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     obj->layout_inv = 1;
 
     /*Mark the screen as dirty too to mark that there is something to do on this screen*/
@@ -380,6 +395,8 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 
 void lv_obj_update_layout(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(update_layout_mutex) {
         LV_LOG_TRACE("Already running, returning");
         return;
@@ -409,6 +426,7 @@ void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)
 
 void lv_obj_align(lv_obj_t * obj, lv_align_t align, int32_t x_ofs, int32_t y_ofs)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_set_style_align(obj, align, 0);
     lv_obj_set_pos(obj, x_ofs, y_ofs);
 }
@@ -416,6 +434,7 @@ void lv_obj_align(lv_obj_t * obj, lv_align_t align, int32_t x_ofs, int32_t y_ofs
 void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, int32_t x_ofs, int32_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_OBJ(base, MY_CLASS);
 
     lv_obj_update_layout(obj);
     if(base == NULL) base = lv_obj_get_parent(obj);
@@ -565,6 +584,7 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, in
 
 void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
 {
+    LV_CHECK_ARG(coords != NULL, return);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_area_copy(coords, &obj->coords);
@@ -620,11 +640,15 @@ int32_t lv_obj_get_y2(const lv_obj_t * obj)
 
 int32_t lv_obj_get_x_aligned(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     return lv_obj_get_style_x(obj, LV_PART_MAIN);
 }
 
 int32_t lv_obj_get_y_aligned(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     return lv_obj_get_style_y(obj, LV_PART_MAIN);
 }
 
@@ -676,6 +700,8 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 
 int32_t lv_obj_get_self_width(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_point_t p = {0, LV_COORD_MIN};
     lv_obj_send_event((lv_obj_t *)obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.x;
@@ -683,6 +709,8 @@ int32_t lv_obj_get_self_width(const lv_obj_t * obj)
 
 int32_t lv_obj_get_self_height(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_point_t p = {LV_COORD_MIN, 0};
     lv_obj_send_event((lv_obj_t *)obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.y;
@@ -786,6 +814,8 @@ bool lv_obj_is_height_max(lv_obj_t * obj)
 
 bool lv_obj_refresh_self_size(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(!lv_obj_is_style_any_width_content(obj) && !lv_obj_is_style_any_height_content(obj))
         return false;
 
@@ -805,6 +835,8 @@ bool lv_obj_refresh_self_size(lv_obj_t * obj)
 
 void lv_obj_refr_pos(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(lv_obj_is_layout_positioned(obj)) return;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -914,6 +946,8 @@ void lv_obj_refr_pos(lv_obj_t * obj)
 
 void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * parent = obj->parent;
 
@@ -983,6 +1017,8 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
 
 void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, bool ignore_floating)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
@@ -999,30 +1035,36 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
 
 void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, lv_obj_point_transform_flag_t flags)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_ARG(p != NULL, return);
+
     lv_obj_transform_point_array(obj, p, 1, flags);
 }
 
 void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], size_t count,
                                   lv_obj_point_transform_flag_t flags)
 {
-    if(obj) {
-        lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
-        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
-        bool recursive = flags & LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE;
-        bool inverse = flags & LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE;
-        if(inverse) {
-            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
-            if(do_tranf) transform_point_array(obj, points, count, inverse);
-        }
-        else {
-            if(do_tranf) transform_point_array(obj, points, count, inverse);
-            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
-        }
+    LV_CHECK_ARG(obj != NULL, return);
+
+    lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
+    bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
+    bool recursive = flags & LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE;
+    bool inverse = flags & LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE;
+    if(inverse) {
+        if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
+        if(do_tranf) transform_point_array(obj, points, count, inverse);
+    }
+    else {
+        if(do_tranf) transform_point_array(obj, points, count, inverse);
+        if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
     }
 }
 
 void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_point_transform_flag_t flags)
 {
+    LV_CHECK_ARG(area != NULL, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_point_t p[4] = {
         {area->x1, area->y1},
         {area->x1, area->y2 + 1},
@@ -1112,6 +1154,7 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
 
 lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
+    LV_CHECK_ARG(area != NULL, return LV_RESULT_INVALID);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_display_t * disp   = lv_obj_get_display(obj);
@@ -1144,6 +1187,9 @@ lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
 
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 {
+    LV_CHECK_ARG(area != NULL, return LV_RESULT_INVALID);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
 
     /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
@@ -1221,6 +1267,9 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, int32_t size)
 
 void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 {
+    LV_CHECK_ARG(area != NULL, return);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_area_copy(area, &obj->coords);
     if(obj->spec_attr) {
         lv_area_increase(area, obj->spec_attr->ext_click_pad, obj->spec_attr->ext_click_pad);
@@ -1229,6 +1278,9 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 
 bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
+    LV_CHECK_ARG(point != NULL, return false);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) return false;
 
     lv_area_t a;
@@ -1352,9 +1404,9 @@ const lv_matrix_t * lv_obj_get_transform(const lv_obj_t * obj)
 static lv_result_t obj_invalidate_area_internal(const lv_display_t * disp, const lv_obj_t * obj,
                                                 const lv_area_t * area)
 {
-    LV_ASSERT_NULL(disp);
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_NULL(area);
+    LV_CHECK_ARG(disp != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(obj != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(area != NULL, return LV_RESULT_INVALID);
 
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);

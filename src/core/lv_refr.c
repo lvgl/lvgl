@@ -23,6 +23,7 @@
 #include "../draw/lv_draw_private.h"
 #include "../stdlib/lv_string.h"
 #include "lv_global.h"
+#include "src/misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -105,6 +106,9 @@ void lv_refr_now(lv_display_t * disp)
 
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(obj != NULL, return);
+
     LV_PROFILER_REFR_BEGIN;
     lv_area_t clip_area_ori = layer->_clip_area;
     lv_area_t clip_coords_for_obj;
@@ -459,6 +463,9 @@ refr_finish:
  */
 lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 {
+    LV_CHECK_ARG(area_p != NULL, return NULL);
+    LV_CHECK_ARG(obj != NULL, return NULL);
+
     lv_obj_t * found_p = NULL;
 
     if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
@@ -496,8 +503,9 @@ lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
 void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(layer);
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(obj != NULL, return);
+
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
     /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/

@@ -9,6 +9,7 @@
 #include "lv_obj_class_private.h"
 #include "lv_obj_private.h"
 #include "lv_global.h"
+#include "src/misc/lv_check_arg.h"
 #include "../osal/lv_os_private.h"
 #include "../stdlib/lv_sprintf.h"
 
@@ -45,15 +46,15 @@ typedef struct _class_info_t {
 
 void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    LV_ASSERT(obj && class_p);
+    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_ARG(class_p != NULL, return);
 
     uint32_t i;
     uint32_t id = 0;
     lv_global_t * global = LV_GLOBAL_DEFAULT();
     class_info_t * info = NULL;
 
-    if(obj == NULL || class_p == NULL) return;
-    if(global == NULL) return;
+    LV_ASSERT_NULL(global);
 
     obj->id = NULL;
 
@@ -81,20 +82,22 @@ void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 void lv_obj_set_id(lv_obj_t * obj, void * id)
 {
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(obj != NULL, return);
     if(obj->id) lv_obj_free_id(obj);
     obj->id = id;
 }
 
 void lv_obj_free_id(lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return);
     obj->id = NULL;
 }
 
 const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len)
 {
-    if(obj == NULL || obj->class_p == NULL) return NULL;
-    if(buf == NULL) return NULL;
+    LV_CHECK_ARG(obj != NULL, return NULL);
+    LV_CHECK_ARG(obj->class_p != NULL, return NULL);
+    LV_CHECK_ARG(buf != NULL, return NULL);
 
     const char * name = obj->class_p->name;
     if(name == NULL) name = "nameless";
