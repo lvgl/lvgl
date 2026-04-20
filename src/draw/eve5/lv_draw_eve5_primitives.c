@@ -240,6 +240,7 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
     for(uint32_t i = 0; i < pixel_count; i++) {
         EVE_Cmd_wr32(phost, pixels[i]);
     }
+    EVE_Hal_requestFenceBeforeSwap(phost);
 
     int32_t bmp_w = is_ver ? 1 : (int32_t)pixel_count;
     int32_t bmp_h = is_ver ? (int32_t)pixel_count : 1;

@@ -573,6 +573,8 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
         return false;
     }
 
+    EVE_Hal_requestFenceBeforeSwap(phost);
+
     uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
     bool got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
 

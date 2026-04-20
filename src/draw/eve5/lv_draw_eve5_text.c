@@ -112,6 +112,7 @@ static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t * u, uint32_t addr,
             EVE_Hal_wrMem(u->hal, addr + y * eve_stride, row_buf, eve_stride);
         }
         lv_free(row_buf);
+        EVE_Hal_requestFenceBeforeSwap(u->hal);
         return true;
     }
 
@@ -123,6 +124,7 @@ static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t * u, uint32_t addr,
             EVE_Hal_wrMem(u->hal, addr + y * eve_stride, row_buf, eve_stride);
         }
         lv_free(row_buf);
+        EVE_Hal_requestFenceBeforeSwap(u->hal);
         return true;
     }
 
@@ -162,6 +164,7 @@ static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t * u, uint32_t addr,
         }
 
         lv_free(row_buf);
+        EVE_Hal_requestFenceBeforeSwap(u->hal);
         return true;
     }
 
@@ -173,6 +176,7 @@ static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t * u, uint32_t addr,
     }
 
     lv_free(row_buf);
+    EVE_Hal_requestFenceBeforeSwap(u->hal);
     return true;
 }
 
@@ -582,6 +586,8 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
         }
         lv_free(row_buf);
     }
+
+    EVE_Hal_requestFenceBeforeSwap(u->hal);
 
     fv->glyph_handles[gid] = handle;
     return addr;

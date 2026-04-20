@@ -283,6 +283,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
         generate_corner_texture(buf, SHADOW_TEX_SIZE, ratio_idx);
         EVE_Hal_wrMem(u->hal, corner_addr, buf, corner_bytes);
         lv_free(buf);
+        EVE_Hal_requestFenceBeforeSwap(u->hal);
 
         LV_LOG_INFO("EVE5: Generated shadow corner texture for ratio %"PRId32" at 0x%08"PRIx32,
                     ratio_idx, corner_addr);
@@ -313,6 +314,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
         generate_edge_texture(buf, SHADOW_TEX_SIZE, ratio_idx);
         EVE_Hal_wrMem(u->hal, edge_addr, buf, edge_bytes);
         lv_free(buf);
+        EVE_Hal_requestFenceBeforeSwap(u->hal);
 
         LV_LOG_INFO("EVE5: Generated shadow edge texture for ratio %"PRId32" at 0x%08"PRIx32,
                     ratio_idx, edge_addr);

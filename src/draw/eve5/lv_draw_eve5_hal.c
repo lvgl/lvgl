@@ -275,6 +275,7 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
             vr->is_premultiplied = lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED)
                                    || buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
             vr->has_content = true;
+            EVE_Hal_requestFenceBeforeSwap(u->hal);
         }
 
 #if LV_USE_OS
@@ -787,6 +788,8 @@ Esd_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u,
     }
 
     *out_stride = eve_stride;
+
+    EVE_Hal_requestFenceBeforeSwap(u->hal);
 
     LV_LOG_TRACE("EVE5: Uploaded texture %"PRId32"x%"PRId32" to 0x%08X",
                  buf_w, buf_h, ram_g_addr);

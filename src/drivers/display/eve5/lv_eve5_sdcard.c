@@ -812,6 +812,8 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
         return false;
     }
 
+    EVE_Hal_requestFenceBeforeSwap(phost);
+
     uint32_t out_source, out_fmt, out_w, out_h, out_palette;
     if(!EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette)) {
         LV_LOG_WARN("CMD_GETIMAGE failed, using parsed dimensions");

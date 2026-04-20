@@ -295,6 +295,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
         if(gpu_addr != GA_INVALID) {
             EVE_Hal_wrMem(phost, gpu_addr, px_map, size);
+            EVE_Hal_requestFenceBeforeSwap(phost);
         }
         else {
             LV_LOG_ERROR("EVE5: OOM in flush_cb SW path");

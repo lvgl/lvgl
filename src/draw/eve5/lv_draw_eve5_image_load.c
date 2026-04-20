@@ -284,6 +284,8 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         return false;
     }
 
+    EVE_Hal_requestFenceBeforeSwap(phost);
+
     /* Get actual format from coprocessor */
     uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
     bool got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
