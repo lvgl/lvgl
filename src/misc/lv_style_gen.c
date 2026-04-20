@@ -707,6 +707,14 @@ void lv_style_set_text_outline_stroke_opa(lv_style_t * style, lv_opa_t value)
     lv_style_set_prop(style, LV_STYLE_TEXT_OUTLINE_STROKE_OPA, v);
 }
 
+void lv_style_set_text_leading_trim(lv_style_t * style, lv_text_leading_trim_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TEXT_LEADING_TRIM, v);
+}
+
 void lv_style_set_blur_radius(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {

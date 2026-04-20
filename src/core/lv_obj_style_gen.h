@@ -501,7 +501,8 @@ static inline lv_color_t lv_obj_get_style_bg_grad_color(const lv_obj_t * obj, lv
  */
 static inline lv_color_t lv_obj_get_style_bg_grad_color_filtered(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_GRAD_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                          LV_STYLE_BG_GRAD_COLOR));
     return v.color;
 }
 
@@ -630,7 +631,8 @@ static inline lv_color_t lv_obj_get_style_bg_image_recolor(const lv_obj_t * obj,
  */
 static inline lv_color_t lv_obj_get_style_bg_image_recolor_filtered(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_IMAGE_RECOLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                          LV_STYLE_BG_IMAGE_RECOLOR));
     return v.color;
 }
 
@@ -681,7 +683,8 @@ static inline lv_color_t lv_obj_get_style_border_color(const lv_obj_t * obj, lv_
  */
 static inline lv_color_t lv_obj_get_style_border_color_filtered(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BORDER_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                          LV_STYLE_BORDER_COLOR));
     return v.color;
 }
 
@@ -770,7 +773,8 @@ static inline lv_color_t lv_obj_get_style_outline_color(const lv_obj_t * obj, lv
  */
 static inline lv_color_t lv_obj_get_style_outline_color_filtered(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_OUTLINE_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                          LV_STYLE_OUTLINE_COLOR));
     return v.color;
 }
 
@@ -869,7 +873,8 @@ static inline lv_color_t lv_obj_get_style_shadow_color(const lv_obj_t * obj, lv_
  */
 static inline lv_color_t lv_obj_get_style_shadow_color_filtered(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_SHADOW_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                          LV_STYLE_SHADOW_COLOR));
     return v.color;
 }
 
@@ -921,7 +926,8 @@ static inline lv_color_t lv_obj_get_style_image_recolor(const lv_obj_t * obj, lv
  */
 static inline lv_color_t lv_obj_get_style_image_recolor_filtered(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_IMAGE_RECOLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                          LV_STYLE_IMAGE_RECOLOR));
     return v.color;
 }
 
@@ -1233,7 +1239,8 @@ static inline lv_color_t lv_obj_get_style_text_outline_stroke_color(const lv_obj
  */
 static inline lv_color_t lv_obj_get_style_text_outline_stroke_color_filtered(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_OUTLINE_STROKE_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                          LV_STYLE_TEXT_OUTLINE_STROKE_COLOR));
     return v.color;
 }
 
@@ -1261,6 +1268,20 @@ static inline lv_opa_t lv_obj_get_style_text_outline_stroke_opa(const lv_obj_t *
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_OUTLINE_STROKE_OPA);
     return (lv_opa_t)v.num;
+}
+
+/**
+ * Get the text leading trim mode. Removes empty space above and/or below text based
+ * on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
+ * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAPITAL_BASELINE/LOWER_BASELINE/CAPITAL/LOWER`.
+ * Default: `LV_TEXT_LEADING_TRIM_NONE`, inherited: Yes, layout: Yes, ext. draw: No.
+ * @param  obj    Pointer to Widget
+ * @param  part   One of the `LV_PART_...` enum values
+ */
+static inline lv_text_leading_trim_t lv_obj_get_style_text_leading_trim(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_LEADING_TRIM);
+    return (lv_text_leading_trim_t)v.num;
 }
 
 /**
@@ -1361,7 +1382,8 @@ static inline lv_color_t lv_obj_get_style_drop_shadow_color(const lv_obj_t * obj
  */
 static inline lv_color_t lv_obj_get_style_drop_shadow_color_filtered(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_DROP_SHADOW_COLOR));
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                          LV_STYLE_DROP_SHADOW_COLOR));
     return v.color;
 }
 
@@ -2999,6 +3021,21 @@ void lv_obj_set_style_text_outline_stroke_width(lv_obj_t * obj, int32_t value, l
 void lv_obj_set_style_text_outline_stroke_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 
 /**
+ * Set the text leading trim mode. Removes empty space above and/or below text based
+ * on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`.
+ * Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAPITAL_BASELINE/LOWER_BASELINE/CAPITAL/LOWER`.
+ * Default: `LV_TEXT_LEADING_TRIM_NONE`, inherited: Yes, layout: Yes, ext. draw: No.
+ * @param  obj        Pointer to Widget
+ * @param  value      Value to submit
+ * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
+ *                        - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ *                        - `LV_STATE_PRESSED`
+ *                        - `LV_PART_KNOB`
+ *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
+void lv_obj_set_style_text_leading_trim(lv_obj_t * obj, lv_text_leading_trim_t value, lv_style_selector_t selector);
+
+/**
  * Sets the intensity of blurring. Applied on each lv_part separately before the
  * children are rendered.
  * Default: `0`, inherited: No, layout: No, ext. draw: No.
@@ -3206,7 +3243,8 @@ void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selec
  *                        - `LV_PART_KNOB`
  *                        - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
-void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector);
+void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value,
+                                       lv_style_selector_t selector);
 
 /**
  * The intensity of mixing of color filter.
