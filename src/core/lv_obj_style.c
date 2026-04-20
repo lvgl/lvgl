@@ -762,10 +762,23 @@ static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector
         }
     }
 
+    /*Allocate the individual style first so obj->styles stays valid on failure*/
+    lv_style_t * new_style = lv_malloc_zeroed(sizeof(lv_style_t));
+    if(new_style == NULL) {
+        LV_LOG_WARN("couldn't allocate local style");
+        return NULL;
+    }
+
     obj->style_cnt++;
     LV_ASSERT(obj->style_cnt != 0);
-    obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-    LV_ASSERT_MALLOC(obj->styles);
+    lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+    if(new_styles == NULL) {
+        obj->style_cnt--;
+        lv_free(new_style);
+        LV_LOG_WARN("couldn't allocate styles");
+        return NULL;
+    }
+    obj->styles = new_styles;
 
     for(i = obj->style_cnt - 1; i > 0 ; i--) {
         /*Copy only normal styles (not local and transition).
@@ -775,7 +788,7 @@ static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector
     }
 
     lv_memzero(&obj->styles[i], sizeof(lv_obj_style_t));
-    obj->styles[i].style = lv_malloc_zeroed(sizeof(lv_style_t));
+    obj->styles[i].style = new_style;
     lv_style_init((lv_style_t *)obj->styles[i].style);
 
     obj->styles[i].is_local = 1;
@@ -800,16 +813,30 @@ static lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t sel
     /*Already have a transition style for it*/
     if(i != obj->style_cnt) return &obj->styles[i];
 
+    /*Allocate the individual style first so obj->styles stays valid on failure*/
+    lv_style_t * new_style = lv_malloc(sizeof(lv_style_t));
+    if(new_style == NULL) {
+        LV_LOG_WARN("couldn't allocate transition style");
+        return NULL;
+    }
+
     obj->style_cnt++;
     LV_ASSERT(obj->style_cnt != 0);
-    obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+    lv_obj_style_t * new_styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+    if(new_styles == NULL) {
+        obj->style_cnt--;
+        lv_free(new_style);
+        LV_LOG_WARN("couldn't allocate styles");
+        return NULL;
+    }
+    obj->styles = new_styles;
 
     for(i = obj->style_cnt - 1; i > 0 ; i--) {
         obj->styles[i] = obj->styles[i - 1];
     }
 
     lv_memzero(&obj->styles[0], sizeof(lv_obj_style_t));
-    obj->styles[0].style = lv_malloc(sizeof(lv_style_t));
+    obj->styles[0].style = new_style;
     lv_style_init((lv_style_t *)obj->styles[0].style);
 
     obj->styles[0].is_trans = 1;

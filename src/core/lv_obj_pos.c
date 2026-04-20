@@ -1283,6 +1283,7 @@ void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix)
     if(!obj->spec_attr->matrix) {
         obj->spec_attr->matrix = lv_malloc(sizeof(lv_matrix_t));
         LV_ASSERT_MALLOC(obj->spec_attr->matrix);
+        if(obj->spec_attr->matrix == NULL) return;
     }
 
     /* Invalidate the old area */
