@@ -3,7 +3,7 @@
 
 /**
  * @title Cell alignment and spans
- * @brief Mix per-cell alignments with two- and three-cell spans inside a 3x3 grid.
+ * @brief Mix per-cell alignments with two-cell spans inside a 3x3 grid.
  *
  * A 300x220 container uses three 70 px columns and three 50 px rows. Five
  * `LV_SIZE_CONTENT` children are placed via `lv_obj_set_grid_cell`: the top
