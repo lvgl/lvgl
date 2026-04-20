@@ -162,6 +162,7 @@ lv_indev_t * lv_eve5_multitouch_get_indev(lv_eve5_multitouch_t * mt, uint8_t ind
  * @return     true if calibration completed successfully
  */
 bool lv_eve5_touch_calibrate(lv_display_t * disp);
+bool lv_eve5_touch_calibrate_hal(EVE_HalContext * phost);
 
 /**
  * Set touch calibration matrix directly (restore saved calibration).
@@ -180,6 +181,7 @@ void lv_eve5_touch_set_calibration(lv_display_t * disp, const int32_t matrix[6])
  * @param matrix array to receive 6 calibration values (A, B, C, D, E, F)
  */
 void lv_eve5_touch_get_calibration(lv_display_t * disp, int32_t matrix[6]);
+void lv_eve5_touch_get_calibration_hal(EVE_HalContext * phost, int32_t matrix[6]);
 
 /**
  * Set touch sampling mode

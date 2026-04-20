@@ -191,35 +191,40 @@ bool lv_eve5_touch_calibrate(lv_display_t * disp)
     if(disp == NULL) return false;
 
     EVE_HalContext *phost = lv_eve5_get_hal(disp);
+	return lv_eve5_touch_calibrate_hal(phost);
+}
+
+bool lv_eve5_touch_calibrate_hal(EVE_HalContext *phost)
+{
     if(phost == NULL) return false;
 
-    /* Calibration requires compatibility mode */
-    uint8_t prev_mode = EVE_Hal_rd8(phost, REG_CTOUCH_EXTENDED);
-    EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, 1);
+	/* Calibration requires compatibility mode */
+	uint8_t prev_mode = EVE_Hal_rd8(phost, REG_CTOUCH_EXTENDED);
+	EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, 1);
 
-    LV_LOG_INFO("EVE5: Starting touch calibration...");
+	LV_LOG_INFO("EVE5: Starting touch calibration...");
 
-    EVE_CoCmd_dlStart(phost);
-    EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
-    EVE_CoDl_clear(phost, true, true, true);
-    EVE_CoDl_colorRgb(phost, 255, 255, 255);
-    (void)EVE_CoCmd_calibrate(phost);
-    EVE_CoDl_display(phost);
-    EVE_CoCmd_swap(phost);
-    EVE_Cmd_waitFlush(phost);
+	EVE_CoCmd_dlStart(phost);
+	EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+	EVE_CoDl_clear(phost, true, true, true);
+	EVE_CoDl_colorRgb(phost, 255, 255, 255);
+	(void)EVE_CoCmd_calibrate(phost);
+	EVE_CoDl_display(phost);
+	EVE_CoCmd_swap(phost);
+	EVE_Cmd_waitFlush(phost);
 
-    bool success = (phost->Status == EVE_STATUS_OPENED);
+	bool success = (phost->Status == EVE_STATUS_OPENED);
 
-    EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, prev_mode);
+	EVE_Hal_wr8(phost, REG_CTOUCH_EXTENDED, prev_mode);
 
-    if(success) {
-        LV_LOG_INFO("EVE5: Touch calibration complete");
-    }
-    else {
-        LV_LOG_ERROR("EVE5: Touch calibration failed");
-    }
+	if(success) {
+		LV_LOG_INFO("EVE5: Touch calibration complete");
+	}
+	else {
+		LV_LOG_ERROR("EVE5: Touch calibration failed");
+	}
 
-    return success;
+	return success;
 }
 
 void lv_eve5_touch_set_calibration(lv_display_t * disp, const int32_t matrix[6])
@@ -241,17 +246,22 @@ void lv_eve5_touch_set_calibration(lv_display_t * disp, const int32_t matrix[6])
 
 void lv_eve5_touch_get_calibration(lv_display_t * disp, int32_t matrix[6])
 {
-    if(disp == NULL || matrix == NULL) return;
+    if(disp == NULL) return;
 
     EVE_HalContext *phost = lv_eve5_get_hal(disp);
-    if(phost == NULL) return;
+	return lv_eve5_touch_get_calibration_hal(phost, matrix);
+}
 
-    matrix[0] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_A);
-    matrix[1] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_B);
-    matrix[2] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_C);
-    matrix[3] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_D);
-    matrix[4] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_E);
-    matrix[5] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_F);
+void lv_eve5_touch_get_calibration_hal(EVE_HalContext *phost, int32_t matrix[6])
+{
+	if(phost == NULL || matrix == NULL) return;
+
+	matrix[0] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_A);
+	matrix[1] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_B);
+	matrix[2] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_C);
+	matrix[3] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_D);
+	matrix[4] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_E);
+	matrix[5] = (int32_t)EVE_Hal_rd32(phost, REG_TOUCH_TRANSFORM_F);
 }
 
 void lv_eve5_touch_set_mode(lv_display_t * disp, uint8_t mode)
