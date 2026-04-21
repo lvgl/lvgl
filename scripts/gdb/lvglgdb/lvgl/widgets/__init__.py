@@ -87,7 +87,10 @@ import gdb
 
 def wrap_widget(obj):
     """Wrap an LVObject into its widget class if known."""
-    cls = WIDGET_REGISTRY.get(obj.class_name)
+    name = obj.class_name
+    # Before 6d999331d (Feb 2025), LVGL class names had no 'lv_' prefix
+    # (e.g. 'label' instead of 'lv_label'). Try both for compatibility.
+    cls = WIDGET_REGISTRY.get(name) or WIDGET_REGISTRY.get('lv_' + name)
     if cls:
         try:
             return cls(obj)
