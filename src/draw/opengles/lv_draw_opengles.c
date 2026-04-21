@@ -144,6 +144,14 @@ void lv_draw_opengles_clear_layer_area(lv_layer_t * layer, const lv_area_t * are
 
     int32_t tex_h = lv_area_get_height(&layer->buf_area);
 
+    GLint prev_fbo = 0;
+    GLint prev_scissor_box[4] = {0};
+    GLfloat prev_clear_color[4] = {0};
+    GLboolean prev_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
+    GL_CALL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_fbo));
+    GL_CALL(glGetIntegerv(GL_SCISSOR_BOX, prev_scissor_box));
+    GL_CALL(glGetFloatv(GL_COLOR_CLEAR_VALUE, prev_clear_color));
+
     unsigned int framebuffer = get_framebuffer(g_unit);
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
@@ -152,9 +160,14 @@ void lv_draw_opengles_clear_layer_area(lv_layer_t * layer, const lv_area_t * are
     GL_CALL(glScissor(a.x1, tex_h - a.y1 - h, w, h));
     GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
-    GL_CALL(glDisable(GL_SCISSOR_TEST));
 
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    /*Restore previous GL state.*/
+    if(!prev_scissor_test) {
+        GL_CALL(glDisable(GL_SCISSOR_TEST));
+    }
+    GL_CALL(glScissor(prev_scissor_box[0], prev_scissor_box[1], prev_scissor_box[2], prev_scissor_box[3]));
+    GL_CALL(glClearColor(prev_clear_color[0], prev_clear_color[1], prev_clear_color[2], prev_clear_color[3]));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)prev_fbo));
 }
 
 /**********************

@@ -1059,11 +1059,21 @@ static void refr_configured_layer(lv_layer_t * layer)
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
 #if LV_USE_DRAW_OPENGLES
+        lv_layer_t * clear_target_layer = disp_refr->layer_head ? disp_refr->layer_head : layer;
+        /* TODO: this driver-specific branch is a temporary workaround.
+         * The proper fix may be a generic per-draw-unit clear callback (e.g.
+         * a `clear_area_cb` on `lv_draw_unit_t`) so `lv_refr` can just dispatch
+         * the right clear function. LVGL does not currently expose that hook now.
+         * This is a special-case for Draw_OpenGLES to fix issue #9912 (PR #9987).
+         */
         /*With Draw_OpenGLES the layer's draw_buf is a dummy CPU buffer and the
          *real pixels live in a GL texture. Clearing the CPU buffer is a no-op
-         *on the texture, so perform a GPU-side clear of the dirty area.*/
-        if(layer->user_data != NULL) {
-            lv_draw_opengles_clear_layer_area(layer, &layer->_clip_area);
+         *on the texture, so perform a GPU-side clear of the dirty area.
+         *Key this off the refreshing display's real backing layer instead of
+         *the current layer, because tiled rendering can use temporary tile
+         *layers with NULL user_data.*/
+        if(disp_refr->layer_head != NULL && disp_refr->layer_head->user_data != NULL) {
+            lv_draw_opengles_clear_layer_area(clear_target_layer, &layer->_clip_area);
         }
         else
 #endif
