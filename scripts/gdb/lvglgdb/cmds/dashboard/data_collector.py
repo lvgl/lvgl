@@ -58,6 +58,8 @@ def collect_all() -> dict:
     # Registry-driven simple collectors
     for dict_key, accessor, label in SIMPLE_REGISTRY:
         data[dict_key] = _collect_simple(lvgl, dict_key, accessor, label)
+    # Widget specs (global lookup table for uinspy rendering)
+    data["widget_specs"] = _collect_widget_specs(data.get("object_trees", []))
     return data
 
 
@@ -220,3 +222,56 @@ def _collect_subjects_from_obj(obj, seen, result):
     except CorruptedError:
         # Children pointer unreadable: stop traversal for this subtree
         pass
+
+
+def _collect_widget_specs(object_trees: list) -> dict:
+    """Build widget_specs dict for all class_names found in object trees."""
+    import json as _json
+    from pathlib import Path
+
+    specs_path = Path(__file__).parent.parent.parent.parent / "scripts" / "generators" / "widget_specs.json"
+    if not specs_path.exists():
+        return {}
+
+    all_specs = _json.loads(specs_path.read_text())
+
+    # Collect all class_names from object trees
+    seen = set()
+
+    def _walk(node):
+        cn = node.get("class_name", "")
+        if cn:
+            seen.add(cn)
+        for child in node.get("children", []):
+            _walk(child)
+
+    for tree in object_trees:
+        for screen in tree.get("screens", []):
+            _walk(screen)
+
+    # Build output: merge _auto + enums into flat fields spec
+    result = {}
+    for cn in seen:
+        raw = all_specs.get(cn) or all_specs.get("lv_" + cn)
+        if not raw:
+            continue
+        auto_fields = raw.get("_auto", {}).get("fields", {})
+        enums = raw.get("enums", {})
+        fields = {}
+        for fname, ftype in auto_fields.items():
+            entry = {"type": ftype}
+            if fname in enums:
+                entry["type"] = "enum"
+                entry["names"] = enums[fname]
+            fields[fname] = entry
+
+        spec = {}
+        if raw.get("summary_tpl") is not None:
+            spec["summary_tpl"] = raw["summary_tpl"]
+        if raw.get("primary"):
+            spec["primary"] = raw["primary"]
+        if fields:
+            spec["fields"] = fields
+        if spec:
+            result[cn] = spec
+    return result
