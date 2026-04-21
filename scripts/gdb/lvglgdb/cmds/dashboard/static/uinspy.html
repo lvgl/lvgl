@@ -1160,6 +1160,16 @@ ui-topbar .topbar-search::placeholder {
   font-weight: var(--font-weight-bold);
   color: var(--color-blue);
 }
+.detail-summary-text {
+  border-radius: 0.25rem;
+  background-color: var(--color-mantle);
+  padding-inline: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1.5);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-overlay1);
+  border: 1px solid var(--surface0);
+}
 .detail-section {
   margin-bottom: calc(var(--spacing) * 2.5);
 }
@@ -2169,7 +2179,7 @@ function renderObjDetail(addr, panel) {
     panel.appendChild(el("p", "empty", "Select an object to inspect."));
     return;
   }
-  let hdr = (() => {
+  let summary = widgetSummary(obj.class_name, obj.widget_data), hdr = (() => {
     let _e = document.createElement("div");
     _e.setAttribute("class", "detail-header");
     let _e1 = document.createElement("span");
@@ -2177,7 +2187,10 @@ function renderObjDetail(addr, panel) {
     let _e2 = document.createElement("span");
     return _e2.setAttribute("class", "mono-addr"), _e2.append(obj.addr), _e.append(_e1, _e2), _e;
   })();
-  panel.appendChild(hdr);
+  if (panel.appendChild(hdr), summary) {
+    let sumSec = el("div", "detail-section");
+    sumSec.appendChild(el("div", "detail-summary-text", summary)), panel.appendChild(sumSec);
+  }
   let c = obj.coords || { x1: 0, y1: 0, x2: 0, y2: 0 }, w = (c.x2 || 0) - (c.x1 || 0), h = (c.y2 || 0) - (c.y1 || 0), coordSec = (() => {
     let _e = document.createElement("div");
     _e.setAttribute("class", "detail-section");
@@ -3262,7 +3275,7 @@ class UiDashboard extends BaseComponent {
 customElements.define("ui-dashboard", UiDashboard);
 
 // src/app.ts
-document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-21 19:26 GMT+8"}</span><span>·</span><span>${"1b5dc67"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
+document.getElementById("about").innerHTML = `<span>uinspy v${"0.5.0"}</span><span>·</span><span>Built ${"2026-04-21 20:05 GMT+8"}</span><span>·</span><span>${"2fc5ea6"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
 </script>
 </body>
 </html>
