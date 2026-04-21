@@ -30,8 +30,9 @@
 #define LV_FREETYPE_VAR_WEIGHT_MIN 1
 #define LV_FREETYPE_VAR_WEIGHT_MAX 2000
 
-#define LV_FREETYPE_VAR_WEIGHT_NORMAL 400
-#define LV_FREETYPE_VAR_WEIGHT_BOLD   700
+#define LV_FREETYPE_VAR_WEIGHT_DEFAULT 0   /**< 0 = resolved from style: NORMAL(400) or BOLD(700) */
+#define LV_FREETYPE_VAR_WEIGHT_NORMAL  400
+#define LV_FREETYPE_VAR_WEIGHT_BOLD    700
 
 /**< This value is from the FreeType's function `FT_GlyphSlot_Oblique` in `ftsynth.c` */
 #define LV_FREETYPE_OBLIQUE_SLANT_DEF 0x0366A
@@ -148,7 +149,7 @@ void lv_freetype_init_font_info(lv_font_info_t * font_info)
     font_info->class_p = &lv_freetype_font_class;
     font_info->render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
     font_info->style = LV_FREETYPE_FONT_STYLE_NORMAL;
-    font_info->weight = 0; /* 0 = use default (WEIGHT_NORMAL, WEIGHT_BOLD if BOLD) */
+    font_info->weight = LV_FREETYPE_VAR_WEIGHT_DEFAULT;
     font_info->kerning = LV_FONT_KERNING_NONE;
 }
 
@@ -174,8 +175,8 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
         .pathname = lv_freetype_req_face_id(ctx, pathname),
         .style = font_info->style,
         .render_mode = font_info->render_mode,
-        /* Normalize weight: 0 resolves to BOLD(700) or NORMAL(400) to avoid duplicate cache nodes */
-        .weight = font_info->weight > 0 ? font_info->weight
+        /* Normalize weight: DEFAULT(0) resolves to BOLD(700) or NORMAL(400) to avoid duplicate cache nodes */
+        .weight = font_info->weight > LV_FREETYPE_VAR_WEIGHT_DEFAULT ? font_info->weight
         : ((font_info->style & LV_FREETYPE_FONT_STYLE_BOLD) ? LV_FREETYPE_VAR_WEIGHT_BOLD : LV_FREETYPE_VAR_WEIGHT_NORMAL),
     };
 
