@@ -387,5 +387,5 @@ More than 600 people have already left their fingerprint on LVGL. Be one of them
 
 ## Running tests
 
-When a PR is raised, automatic tests are run in GitHub CI. These tests can be run locally in a Docker container using the script `scripts/run_tests_in_docker.sh`. The script will build a Docker container and run tests in that. Run the script with `--help` for more detail.
+When a PR is raised, automatic tests are run in GitHub CI. These tests can be run locally in a Docker container using the script `scripts/run_tests_docker.sh`. The script will build a Docker container and run tests in that. Run the script with `--help` for more detail.
 
