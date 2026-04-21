@@ -19,6 +19,7 @@ Usage (from the GDB script root):
 
 import re
 import sys
+import json
 from pathlib import Path
 from dataclasses import dataclass, field as dc_field
 
@@ -27,6 +28,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
 WIDGETS_DIR = LVGL_SRC / "widgets"
 OUTPUT_DIR = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "widgets"
+SPECS_YAML = Path(__file__).parent / "widget_specs.yaml"
 
 SIMPLE_INT_TYPES = {
     "int8_t", "int16_t", "int32_t", "int64_t",
@@ -266,6 +268,33 @@ def _field_expr(f: StructField) -> str | None:
     return None
 
 
+def _field_type_name(f: StructField) -> str | None:
+    """Infer a spec type name for a field. Returns None to skip."""
+    if f.is_array:
+        return None
+    if f.is_obj_pointer:
+        return "pointer"
+    if f.is_string:
+        return "string"
+    if f.is_pointer:
+        return "pointer"
+    if f.c_type == "lv_color_t":
+        return "color"
+    if f.c_type == "lv_area_t":
+        return "area"
+    if f.c_type == "lv_point_t":
+        return "point"
+    if f.is_bitfield:
+        return "bool" if f.bitfield_width == 1 else f"enum:{f.bitfield_width}"
+    if f.c_type == "bool":
+        return "bool"
+    if f.c_type in SIMPLE_INT_TYPES or f.c_type.startswith(("uint", "int")):
+        return "int"
+    if f.c_type.startswith("lv_") and f.c_type.endswith("_t"):
+        return "int"
+    return None
+
+
 def _topo_sort(widgets: dict[str, WidgetDef]) -> list[WidgetDef]:
     result, visited = [], set()
     def visit(w):
@@ -494,6 +523,61 @@ def gen_init(ordered: list[WidgetDef]) -> str:
     return "\n".join(lines)
 
 
+SPECS_JSON = Path(__file__).parent / "widget_specs.json"
+
+
+def _build_auto_spec(wdef: WidgetDef) -> dict:
+    """Build the _auto section for a widget from parsed fields."""
+    fields = {}
+    for f in wdef.fields:
+        t = _field_type_name(f)
+        if t:
+            fields[f.name] = t
+    return {"fields": fields}
+
+
+def update_specs_json(widgets: dict[str, WidgetDef]) -> dict:
+    """Merge auto-generated field info with hand-written specs.
+
+    - _auto section is always regenerated
+    - Hand-written keys (summary_tpl, primary, enums) are preserved
+    - New widgets get an empty template
+    - Removed widgets get _removed: true
+    """
+    existing = {}
+    if SPECS_JSON.exists():
+        existing = json.loads(SPECS_JSON.read_text())
+
+    result = {}
+    # Preserve _comment
+    if "_comment" in existing:
+        result["_comment"] = existing["_comment"]
+    else:
+        result["_comment"] = "Auto-generated + hand-written widget specs. _auto is regenerated; other keys are preserved."
+
+    seen = set()
+    for wdef in sorted(widgets.values(), key=lambda w: w.c_class_name):
+        key = wdef.c_class_name  # e.g. "lv_label"
+        seen.add(key)
+        old = existing.get(key, {})
+        entry = {"_auto": _build_auto_spec(wdef)}
+        # Preserve hand-written keys
+        for k in ("summary_tpl", "primary", "enums"):
+            if k in old:
+                entry[k] = old[k]
+        result[key] = entry
+
+    # Mark removed widgets
+    for key, val in existing.items():
+        if key.startswith("_") or key in seen:
+            continue
+        val["_removed"] = True
+        result[key] = val
+
+    SPECS_JSON.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n")
+    return result
+
+
 def main():
     widgets = parse_widgets()
     ordered = _topo_sort(widgets)
@@ -501,6 +585,11 @@ def main():
 
     for w in ordered:
         print(f"  {w.module_name}.py: {w.class_name}({w.parent_class_name}) — {len(w.fields)} fields")
+
+    # Update specs JSON (merge auto + hand-written)
+    specs = update_specs_json(widgets)
+    new_count = sum(1 for k, v in specs.items() if not k.startswith("_") and "summary_tpl" not in v)
+    print(f"\nUpdated {SPECS_JSON.name}: {len(specs) - 1} widgets ({new_count} need manual spec)")
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -515,7 +604,7 @@ def main():
     # __init__.py
     (OUTPUT_DIR / "__init__.py").write_text(gen_init(ordered))
 
-    print(f"\nGenerated {len(ordered) + 2} files in {OUTPUT_DIR}/")
+    print(f"Generated {len(ordered) + 2} files in {OUTPUT_DIR}/")
 
 
 if __name__ == "__main__":

@@ -1137,6 +1137,10 @@ ui-topbar .topbar-search::placeholder {
 .obj-node > summary:hover {
   background-color: var(--color-hover-summary);
 }
+.obj-summary-hint {
+  margin-left: calc(var(--spacing) * 1);
+  color: var(--color-overlay0);
+}
 .obj-node.obj-selected > summary {
   background-color: var(--color-nav-active-bg);
   outline: 1px solid var(--blue);
@@ -1815,7 +1819,27 @@ function selectObj(addr) {
     document.getElementById("obj-" + prev)?.classList.remove("obj-selected");
   selectedAddr.val = addr, document.getElementById("obj-" + addr)?.classList.add("obj-selected");
 }
-var dashData = signal(null);
+var dashData = signal(null), widgetSpecs = {};
+function setWidgetSpecs(specs) {
+  widgetSpecs = specs;
+}
+function getWidgetSpec(className) {
+  return widgetSpecs[className] || widgetSpecs["lv_" + className];
+}
+function widgetSummary(className, wd) {
+  if (!wd)
+    return "";
+  let spec = getWidgetSpec(className);
+  if (!spec?.summary_tpl)
+    return "";
+  return spec.summary_tpl.replace(/\{(\w+)\}/g, (_, k) => {
+    let v = wd[k];
+    if (v == null)
+      return "";
+    let s = String(v);
+    return s.length > 24 ? s.slice(0, 24) + "…" : s;
+  });
+}
 function countObjects(trees) {
   let n = 0;
   function walk(obj) {
@@ -2100,9 +2124,17 @@ function buildCard(item, config) {
 }
 
 // src/builders/obj-tree.ui.ts
-function formatWdVal(v) {
+function formatField(v, spec) {
   if (v == null)
     return "-";
+  if (spec) {
+    if (spec.type === "enum" && spec.names && typeof v === "number")
+      return spec.names[v] ?? String(v);
+    if (spec.type === "bool")
+      return v ? "true" : "false";
+    if (spec.type === "string" && typeof v === "string")
+      return v.length > 60 ? '"' + v.slice(0, 60) + '…"' : '"' + v + '"';
+  }
   if (typeof v === "object")
     return JSON.stringify(v);
   return String(v);
@@ -2112,7 +2144,15 @@ function renderObjTree(obj, depth = 0) {
   if (det.className = "obj-node", obj.addr)
     det.id = "obj-" + obj.addr;
   let sum = document.createElement("summary");
-  if (sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]), sum.textContent = (obj.name ? obj.name + " " : "") + (obj.class_name || "obj"), obj.flags_list?.includes("HIDDEN"))
+  sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]);
+  let nameText = (obj.name ? obj.name + " " : "") + (obj.class_name || "obj");
+  sum.textContent = nameText;
+  let hint = widgetSummary(obj.class_name, obj.widget_data);
+  if (hint) {
+    let span = document.createElement("span");
+    span.className = "obj-summary-hint", span.textContent = hint, sum.appendChild(span);
+  }
+  if (obj.flags_list?.includes("HIDDEN"))
     sum.textContent += " \uD83D\uDC41‍\uD83D\uDDE8";
   if (det.appendChild(sum), obj.addr)
     objDataMap[obj.addr] = obj, registerHL(obj.addr, det), sum.addEventListener("mouseenter", () => highlightObj(obj.addr)), sum.addEventListener("mouseleave", () => clearHighlight()), sum.addEventListener("click", (e) => {
@@ -2187,23 +2227,25 @@ function renderObjDetail(addr, panel) {
     refSec.appendChild(kvPair("user_data", obj.user_data));
   if (obj.name)
     refSec.appendChild(kvPair("name", obj.name));
-  if (refSec.appendChild(kvPair("children", String(obj.child_count || 0))), refSec.appendChild(kvPair("styles", String(obj.style_count || 0))), panel.appendChild(refSec), obj.scroll || obj.ext_click_pad || obj.ext_draw_size || obj.scrollbar_mode || obj.layer_type || obj.w_layout || obj.h_layout) {
+  refSec.appendChild(kvPair("children", String(obj.child_count || 0))), refSec.appendChild(kvPair("styles", String(obj.style_count || 0))), panel.appendChild(refSec);
+  let _n = (v) => v != null;
+  if (obj.scroll || _n(obj.ext_click_pad) || _n(obj.ext_draw_size) || _n(obj.scrollbar_mode) || _n(obj.layer_type) || obj.w_layout || obj.h_layout) {
     let layoutSec = el("div", "detail-section");
     if (layoutSec.appendChild(el("div", "detail-section-title", "Layout & Scroll")), obj.scroll)
       layoutSec.appendChild(kvPair("scroll", `${obj.scroll.x}, ${obj.scroll.y}`));
-    if (obj.ext_click_pad)
+    if (_n(obj.ext_click_pad))
       layoutSec.appendChild(kvPair("ext_click_pad", String(obj.ext_click_pad)));
-    if (obj.ext_draw_size)
+    if (_n(obj.ext_draw_size))
       layoutSec.appendChild(kvPair("ext_draw_size", String(obj.ext_draw_size)));
-    if (obj.scrollbar_mode != null)
+    if (_n(obj.scrollbar_mode))
       layoutSec.appendChild(kvPair("scrollbar_mode", String(obj.scrollbar_mode)));
-    if (obj.scroll_dir != null)
+    if (_n(obj.scroll_dir))
       layoutSec.appendChild(kvPair("scroll_dir", String(obj.scroll_dir)));
-    if (obj.scroll_snap_x)
+    if (_n(obj.scroll_snap_x))
       layoutSec.appendChild(kvPair("scroll_snap_x", String(obj.scroll_snap_x)));
-    if (obj.scroll_snap_y)
+    if (_n(obj.scroll_snap_y))
       layoutSec.appendChild(kvPair("scroll_snap_y", String(obj.scroll_snap_y)));
-    if (obj.layer_type)
+    if (_n(obj.layer_type))
       layoutSec.appendChild(kvPair("layer_type", String(obj.layer_type)));
     if (obj.w_layout)
       layoutSec.appendChild(kvPair("w_layout", "true"));
@@ -2226,38 +2268,23 @@ function renderObjDetail(addr, panel) {
     intSec.appendChild(wrap), panel.appendChild(intSec);
   }
   if (obj.widget_data && Object.keys(obj.widget_data).length) {
-    let wd = obj.widget_data, primary = {
-      lv_label: ["text", "long_mode", "recolor"],
-      lv_image: ["src", "w", "h", "rotation", "scale_x", "scale_y", "align"],
-      lv_bar: ["cur_value", "min_value", "max_value", "start_value", "mode"],
-      lv_slider: ["cur_value", "min_value", "max_value", "start_value", "mode", "dragging"],
-      lv_arc: ["value", "min_value", "max_value", "rotation", "type"],
-      lv_switch: ["anim_state", "orientation"],
-      lv_checkbox: ["txt"],
-      lv_dropdown: ["options", "option_cnt", "sel_opt_id", "dir"],
-      lv_textarea: ["placeholder_txt", "max_length", "pwd_show_time"],
-      lv_tabview: ["tab_cur", "tab_pos", "tab_bar_size"],
-      lv_roller: ["option_cnt", "sel_opt_id", "mode"],
-      lv_chart: ["point_cnt", "hdiv_cnt", "vdiv_cnt", "type"],
-      lv_scale: ["mode", "range_min", "range_max", "total_tick_count", "angle_range", "rotation"],
-      lv_spinner: ["duration", "angle"],
-      lv_keyboard: ["mode", "popovers"],
-      lv_led: ["color", "bright"],
-      lv_spinbox: ["value", "range_min", "range_max", "step", "digit_count", "dec_point_pos"],
-      lv_calendar: ["today", "showed_date"],
-      lv_table: ["col_cnt", "row_cnt"],
-      lv_buttonmatrix: ["btn_cnt", "row_cnt", "btn_id_sel", "one_check"]
-    }[obj.class_name] || [], allKeys = Object.keys(wd), priKeys = allKeys.filter((k) => primary.includes(k)), advKeys = allKeys.filter((k) => !primary.includes(k)), wdSec = el("div", "detail-section");
+    let wd = obj.widget_data, spec = getWidgetSpec(obj.class_name), fieldSpecs = spec?.fields || {}, primary = spec?.primary || [], allKeys = Object.keys(wd), priKeys = primary.filter((k) => (k in wd)), advKeys = allKeys.filter((k) => !priKeys.includes(k)), wdSec = el("div", "detail-section");
     wdSec.appendChild(el("div", "detail-section-title", "Widget · " + obj.class_name));
+    let renderField = (k) => {
+      let fs = fieldSpecs[k], raw = wd[k];
+      wdSec.appendChild(kvPair(k, formatField(raw, fs)));
+    };
     for (let k of priKeys.length ? priKeys : allKeys.slice(0, 6))
-      wdSec.appendChild(kvPair(k, formatWdVal(wd[k])));
+      renderField(k);
     let rest = priKeys.length ? advKeys : allKeys.slice(6);
     if (rest.length) {
       let toggle = el("details", "detail-adv-toggle");
       toggle.appendChild(el("summary", "detail-adv-summary", `${rest.length} more fields`));
       let inner = el("div", "");
-      for (let k of rest)
-        inner.appendChild(kvPair(k, formatWdVal(wd[k])));
+      for (let k of rest) {
+        let fs = fieldSpecs[k];
+        inner.appendChild(kvPair(k, formatField(wd[k], fs)));
+      }
       toggle.appendChild(inner), wdSec.appendChild(toggle);
     }
     panel.appendChild(wdSec);
@@ -3223,7 +3250,7 @@ class UiDashboard extends BaseComponent {
       let data = dashData.val;
       if (!data)
         return;
-      grid.innerHTML = "";
+      setWidgetSpecs(data.widget_specs || {}), grid.innerHTML = "";
       let bento = el("div", "bento"), objCount = countObjects(data.object_trees || []);
       STAT_DEFS.forEach((s) => {
         let val = s.key === "_objects" ? objCount : data[s.key]?.length || 0;
@@ -3235,7 +3262,7 @@ class UiDashboard extends BaseComponent {
 customElements.define("ui-dashboard", UiDashboard);
 
 // src/app.ts
-document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-02 13:52 GMT+8"}</span><span>·</span><span>${"07131c2"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
+document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-21 19:26 GMT+8"}</span><span>·</span><span>${"1b5dc67"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
 </script>
 </body>
 </html>
