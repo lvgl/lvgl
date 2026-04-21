@@ -265,13 +265,13 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                                    : lv_obj_get_style_min_height(item, LV_PART_MAIN);
 
                 int32_t req_size = min_size;
-                if(item_id != item_start_id) req_size += item_gap; /*No gap before the first item*/
+                if(!first_item) req_size += item_gap; /*No gap before the first item*/
 
                 /*Wrap if can't fit*/
                 if(f->wrap && t->track_fix_main_size + grow_min_size_sum  + req_size > max_main_size) break;
 
                 grow_min_size_sum += req_size;
-                if(item_id != item_start_id) {
+                if(!first_item) {
                     t->track_fix_main_size += item_gap; /*The gap is always taken from the space*/
                 }
 
