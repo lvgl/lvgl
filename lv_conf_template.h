@@ -1046,6 +1046,13 @@
     /** Cache count of glyphs in FreeType, i.e. number of glyphs that can be cached.
      *  The higher the value, the more memory will be used. */
     #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
+
+    /** Enable L1 glyph metrics cache for FreeType.
+     *  A per-font, lock-free, 2-way set-associative cache that accelerates
+     *  repeated glyph metric lookups.  Automatically disabled when an OS is
+     *  configured (LV_USE_OS != LV_OS_NONE) because the cache is not
+     *  thread-safe. */
+    #define LV_FREETYPE_CACHE_FT_GLYPH_L1 1
 #endif
 
 /** Built-in TTF decoder */

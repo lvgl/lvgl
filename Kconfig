@@ -1576,6 +1576,10 @@ menu "LVGL configuration"
 			int "The maximum number of Glyph in count"
 			default 256
 			depends on LV_USE_FREETYPE
+		config LV_FREETYPE_CACHE_FT_GLYPH_L1
+			bool "Enable L1 glyph metrics cache (lock-free, single-thread only)"
+			default y
+			depends on LV_USE_FREETYPE && LV_OS_NONE
 
 		config LV_USE_TINY_TTF
 			bool "Enable Tiny TTF decoder"

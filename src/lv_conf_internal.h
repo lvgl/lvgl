@@ -3293,6 +3293,23 @@
             #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
         #endif
     #endif
+
+    /** Enable L1 glyph metrics cache for FreeType.
+     *  A per-font, lock-free, 2-way set-associative cache that accelerates
+     *  repeated glyph metric lookups.  Automatically disabled when an OS is
+     *  configured (LV_USE_OS != LV_OS_NONE) because the cache is not
+     *  thread-safe. */
+    #ifndef LV_FREETYPE_CACHE_FT_GLYPH_L1
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_L1
+                #define LV_FREETYPE_CACHE_FT_GLYPH_L1 CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_L1
+            #else
+                #define LV_FREETYPE_CACHE_FT_GLYPH_L1 0
+            #endif
+        #else
+            #define LV_FREETYPE_CACHE_FT_GLYPH_L1 1
+        #endif
+    #endif
 #endif
 
 /** Built-in TTF decoder */

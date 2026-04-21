@@ -18,9 +18,41 @@
 
 #define CACHE_NAME  "FREETYPE_GLYPH"
 
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+
+    /** Number of sets - reuse the FreeType glyph count (must be power of 2) */
+    #define GLYPH_L1_SETS       ((uint32_t)LV_FREETYPE_CACHE_FT_GLYPH_CNT)
+
+    #if (LV_FREETYPE_CACHE_FT_GLYPH_CNT & (LV_FREETYPE_CACHE_FT_GLYPH_CNT - 1)) != 0
+        #error "LV_FREETYPE_CACHE_FT_GLYPH_CNT must be power of 2 for L1 cache"
+    #endif
+
+    /** Associativity - fixed at 2-way, do NOT change */
+    #define GLYPH_L1_WAYS       2u
+
+    #define GLYPH_L1_SET_MASK   (GLYPH_L1_SETS - 1u)
+
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
+
 /**********************
  *      TYPEDEFS
  **********************/
+
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+
+typedef struct {
+    uint32_t unicode;
+    uint32_t size;
+    lv_font_glyph_dsc_t dsc;
+} glyph_l1_entry_t;
+
+typedef struct {
+    glyph_l1_entry_t ways[GLYPH_L1_WAYS];
+    uint8_t lru_bits;
+} glyph_l1_set_t;
+
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
+
 typedef struct _lv_freetype_glyph_cache_data_t {
     uint32_t unicode;
     uint32_t size;
@@ -39,6 +71,14 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
 static void freetype_glyph_free_cb(lv_freetype_glyph_cache_data_t * data, void * user_data);
 static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_cache_data_t * lhs,
                                                         const lv_freetype_glyph_cache_data_t * rhs);
+
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+static inline uint32_t glyph_l1_hash(uint32_t unicode, uint32_t size);
+static bool glyph_l1_lookup(lv_freetype_cache_node_t * node, uint32_t unicode, uint32_t size,
+                            lv_font_glyph_dsc_t * out_dsc);
+static void glyph_l1_fill(lv_freetype_cache_node_t * node, uint32_t unicode, uint32_t size,
+                          const lv_font_glyph_dsc_t * dsc);
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -72,9 +112,89 @@ void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc)
     dsc->font.get_glyph_dsc = freetype_get_glyph_dsc_cb;
 }
 
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+
+void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
+{
+    LV_ASSERT_NULL(node);
+    size_t sz = sizeof(glyph_l1_set_t) * GLYPH_L1_SETS;
+    node->glyph_l1 = lv_malloc_zeroed(sz);
+    LV_ASSERT_MALLOC(node->glyph_l1);
+    if(node->glyph_l1 == NULL) {
+        LV_LOG_WARN("Failed to allocate glyph L1 cache (%u bytes), L1 disabled for this node", (unsigned)sz);
+    }
+}
+
+void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node)
+{
+    LV_ASSERT_NULL(node);
+    if(node->glyph_l1) {
+        lv_free(node->glyph_l1);
+        node->glyph_l1 = NULL;
+    }
+}
+
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+
+static inline uint32_t glyph_l1_hash(uint32_t unicode, uint32_t size)
+{
+    uint32_t h = 2166136261u;   /* FNV-1a offset basis */
+    h ^= unicode;
+    h *= 16777619u;
+    h ^= size;
+    h *= 16777619u;
+    return h;
+}
+
+static bool glyph_l1_lookup(lv_freetype_cache_node_t * node,
+                            uint32_t unicode, uint32_t size,
+                            lv_font_glyph_dsc_t * out_dsc)
+{
+    glyph_l1_set_t * sets = (glyph_l1_set_t *)node->glyph_l1;
+    if(sets == NULL) return false;
+
+    uint32_t idx = glyph_l1_hash(unicode, size) & GLYPH_L1_SET_MASK;
+    glyph_l1_set_t * set = &sets[idx];
+
+    for(uint32_t w = 0; w < GLYPH_L1_WAYS; w++) {
+        glyph_l1_entry_t * e = &set->ways[w];
+        if(e->unicode == unicode && e->size == size) {
+            set->lru_bits = (uint8_t)w;
+            *out_dsc = e->dsc;
+            return true;
+        }
+    }
+    return false;
+}
+
+static void glyph_l1_fill(lv_freetype_cache_node_t * node,
+                          uint32_t unicode, uint32_t size,
+                          const lv_font_glyph_dsc_t * dsc)
+{
+    glyph_l1_set_t * sets = (glyph_l1_set_t *)node->glyph_l1;
+    if(sets == NULL) return;
+
+    uint32_t idx = glyph_l1_hash(unicode, size) & GLYPH_L1_SET_MASK;
+    glyph_l1_set_t * set = &sets[idx];
+
+    uint32_t victim = (set->lru_bits == 0) ? 1u : 0u;
+
+    glyph_l1_entry_t * e = &set->ways[victim];
+    e->unicode    = unicode;
+    e->size       = size;
+    e->dsc        = *dsc;
+    e->dsc.entry  = NULL;
+
+    set->lru_bits = (uint8_t)victim;
+}
+
+#endif /* LV_FREETYPE_CACHE_FT_GLYPH_L1 */
 
 static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
                                       uint32_t unicode_letter_next)
@@ -97,21 +217,42 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
-    lv_freetype_glyph_cache_data_t search_key = {
-        .unicode = unicode_letter,
-        .size = dsc->size,
-    };
+    lv_freetype_cache_node_t * cache_node = dsc->cache_node;
+    LV_ASSERT_NULL(cache_node);
+    LV_LOG_TRACE("Getting glyph for unicode = 0x%" LV_PRIx32 ", size = %" LV_PRIu32, unicode_letter, dsc->size);
 
-    lv_cache_t * glyph_cache = dsc->cache_node->glyph_cache;
-
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
-    if(entry == NULL) {
-        LV_LOG_ERROR("glyph lookup failed for unicode = 0x%" LV_PRIx32, unicode_letter);
-        LV_PROFILER_FONT_END;
-        return false;
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+    /* L1 lookup: per cache_node, 2-way set-associative (single-thread only) */
+    if(glyph_l1_lookup(cache_node, unicode_letter, dsc->size, g_dsc)) {
+        LV_LOG_TRACE("L1 cache hit");
     }
-    lv_freetype_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);
-    *g_dsc = data->glyph_dsc;
+    else
+#endif
+    {
+        LV_LOG_TRACE("L1 cache miss, looking up L2");
+        lv_freetype_glyph_cache_data_t search_key = {
+            .unicode = unicode_letter,
+            .size = dsc->size,
+        };
+
+        lv_cache_t * glyph_cache = cache_node->glyph_cache;
+
+        lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
+        if(entry == NULL) {
+            LV_LOG_ERROR("glyph lookup failed for unicode = 0x%" LV_PRIx32, unicode_letter);
+            LV_PROFILER_FONT_END;
+            return false;
+        }
+        lv_freetype_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);
+        *g_dsc = data->glyph_dsc;
+
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+        /* Populate L1 for future hits */
+        glyph_l1_fill(cache_node, unicode_letter, dsc->size, &data->glyph_dsc);
+#endif
+
+        lv_cache_release(glyph_cache, entry, NULL);
+    }
 
     if((dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) && (unicode_letter_next == '\0')) {
         g_dsc->adv_w = g_dsc->box_w + g_dsc->ofs_x;
@@ -140,7 +281,6 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 
     g_dsc->entry = NULL;
 
-    lv_cache_release(glyph_cache, entry, NULL);
     LV_PROFILER_FONT_END;
     return true;
 }
