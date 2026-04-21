@@ -116,6 +116,7 @@ void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc)
 
 void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
 {
+    LV_ASSERT_NULL(node);
     size_t sz = sizeof(glyph_l1_set_t) * GLYPH_L1_SETS;
     node->glyph_l1 = lv_malloc_zeroed(sz);
     LV_ASSERT_MALLOC(node->glyph_l1);
@@ -126,6 +127,7 @@ void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node)
 
 void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node)
 {
+    LV_ASSERT_NULL(node);
     if(node->glyph_l1) {
         lv_free(node->glyph_l1);
         node->glyph_l1 = NULL;
