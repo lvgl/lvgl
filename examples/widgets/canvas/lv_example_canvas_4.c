@@ -5,7 +5,14 @@
 #define CANVAS_HEIGHT  50
 
 /**
- * Draw a text to the canvas
+ * @title Underlined label on canvas
+ * @brief Paint a red "Hello" string in Montserrat 18 with an underline decoration onto a canvas.
+ *
+ * A 50x50 `LV_COLOR_FORMAT_ARGB8888` canvas is centered on the active
+ * screen and filled with a light grey background. An
+ * `lv_draw_label_dsc_t` is configured with `lv_font_montserrat_18`,
+ * `LV_TEXT_DECOR_UNDERLINE`, and red text, then rendered via
+ * `lv_draw_label` inside a canvas layer.
  */
 void lv_example_canvas_4(void)
 {

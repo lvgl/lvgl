@@ -5,7 +5,14 @@ static void slider_event_cb(lv_event_t * e);
 static lv_obj_t * slider_label;
 
 /**
- * Slider with opposite direction
+ * @title Reversed slider direction
+ * @brief Center a slider whose range runs from 100 down to 0 with a live label.
+ *
+ * `lv_slider_set_range(slider, 100, 0)` reverses the fill direction so the
+ * indicator grows from the right and the reported value drops as the knob
+ * moves right. A label below the slider starts at `0%` and is rewritten from
+ * `lv_slider_get_value` in the `LV_EVENT_VALUE_CHANGED` callback, then
+ * realigned with `LV_ALIGN_OUT_BOTTOM_MID`.
  */
 void lv_example_slider_4(void)
 {

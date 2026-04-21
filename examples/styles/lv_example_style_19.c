@@ -4,7 +4,17 @@
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /**
- * Using various gradients for button background
+ * @title Four gradient button backgrounds
+ * @brief Stack four buttons using horizontal, vertical, linear, and radial gradients.
+ *
+ * Two styles prepare complex gradients: a linear gradient from
+ * `(0%, 0%)` to `(20%, 100%)` with `LV_GRAD_EXTEND_REFLECT`, and a
+ * radial gradient centered at `(30%, 30%)` extending to `(100%, 100%)`
+ * with the same reflect mode. Four 150 by 50 buttons are aligned on
+ * `LV_ALIGN_CENTER`: the first two use local `bg_grad_dir` set to
+ * `LV_GRAD_DIR_HOR` and `LV_GRAD_DIR_VER`, and the last two apply the
+ * linear and radial gradient styles. A fallback label reports when
+ * `LV_USE_DRAW_SW_COMPLEX_GRADIENTS` is disabled.
  */
 void lv_example_style_19(void)
 {

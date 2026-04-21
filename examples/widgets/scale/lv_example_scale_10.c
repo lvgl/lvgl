@@ -83,6 +83,20 @@ static void add_section(lv_obj_t * target_scale,
     lv_scale_set_section_style_main(target_scale, sec, &styles->main);
 }
 
+/**
+ * @title Heart-rate zone gauge with animated needle
+ * @brief Round inner scale coloured by five heart-rate zones with a bpm readout.
+ *
+ * A 200 by 200 scale uses `LV_SCALE_MODE_ROUND_INNER` over the range
+ * 98 to 195 bpm with a 280 degree sweep rotated to 130 degrees and
+ * 15 ticks (major every third). Five sections colour the arc grey,
+ * blue, green, orange, and red for zones 1 through 5, and a black
+ * `lv_line` needle is placed with `lv_scale_set_line_needle_value`. A
+ * centred circular overlay holds a flex-column container with a
+ * Montserrat 40 bpm value and a Montserrat 18 `bpm` label. An 80 ms
+ * `lv_timer` sweeps the displayed heart rate between 98 and 195,
+ * updating the needle, the value, and the zone-matching text colour.
+ */
 void lv_example_scale_10(void)
 {
     scale = lv_scale_create(lv_screen_active());

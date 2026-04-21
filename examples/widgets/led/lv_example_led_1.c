@@ -2,7 +2,14 @@
 #if LV_USE_LED && LV_BUILD_EXAMPLES
 
 /**
- * Create LED's with different brightness and color
+ * @title Three LEDs at different brightness
+ * @brief One LED off, one dimmed red at mid brightness, and one fully on.
+ *
+ * Three `lv_led` objects are placed left of centre, at centre, and
+ * right of centre. The first is turned off with `lv_led_off`, the
+ * second is tinted red via `lv_led_set_color` and dimmed to
+ * brightness 150 with `lv_led_set_brightness`, and the third is
+ * switched on with `lv_led_on`.
  */
 void lv_example_led_1(void)
 {

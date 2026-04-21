@@ -60,8 +60,17 @@ static void frac_2_event_cb(lv_event_t * e)
 }
 
 /**
- * Play with a simple horizontal gradient.
- * Adjust the stop positions of the gradient.
+ * @title Horizontal gradient with draggable stops
+ * @brief Drag two bullets to move the stop fractions of a red-to-green horizontal gradient.
+ *
+ * A centered 80% by 80% object carries a two-stop horizontal gradient
+ * (red at 20%, transparent green at 80%) built with `lv_grad_init_stops`
+ * and `lv_grad_horizontal_init` and applied through
+ * `lv_style_set_bg_grad`. Two small buttons sitting on top act as handles;
+ * their `LV_EVENT_PRESSING` callbacks read the pointer with
+ * `lv_indev_get_point`, reposition the handle, and write the resulting
+ * x fraction into `dsc->stops[0].frac` or `dsc->stops[1].frac` before
+ * invalidating the parent.
  */
 void lv_example_grad_1(void)
 {

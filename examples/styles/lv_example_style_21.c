@@ -46,6 +46,20 @@ LV_IMAGE_DECLARE(img_transform_avatar_15);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+/**
+ * @title Transform a card with arc and slider
+ * @brief Rotate and scale a styled profile card using an arc and a slider.
+ *
+ * Separate styles configure a grid-based card with shadow and rounded
+ * corners, a circular avatar with shadow, and a gradient like-button.
+ * The helper `card_create` assembles the card from an avatar image, a
+ * name label, and a like-button. Two cards are centered on the active
+ * screen; the back one is faded with `LV_OPA_50`. A large arc and a
+ * bottom-aligned slider drive the front card through
+ * `LV_EVENT_VALUE_CHANGED`: the arc writes `transform_rotation` from
+ * `lv_arc_get_angle_end * 10`, while the slider (range 128 to 300,
+ * initial 256) sets `transform_scale_x` and `transform_scale_y`.
+ */
 void lv_example_style_21(void)
 {
     static const int32_t grid_cols[] = {LV_GRID_CONTENT, 4, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};

@@ -2,7 +2,14 @@
 #if LV_USE_GRIDNAV && LV_USE_LIST && LV_BUILD_EXAMPLES
 
 /**
- * Grid navigation on a list
+ * @title Keypad navigation across two lists
+ * @brief Side-by-side list widgets with distinct `lv_gridnav_ctrl_t` modes.
+ *
+ * Two `lv_list` widgets sit at the left and right edges. The left list registers
+ * with `LV_GRIDNAV_CTRL_NONE` and is populated with 15 `LV_SYMBOL_FILE` buttons;
+ * the right list uses `LV_GRIDNAV_CTRL_ROLLOVER` and holds 15 `LV_SYMBOL_DIRECTORY`
+ * buttons. Each list is added to the default group while every item is removed
+ * with `lv_group_remove_obj` so gridnav drives focus inside the list.
  */
 void lv_example_gridnav_2(void)
 {

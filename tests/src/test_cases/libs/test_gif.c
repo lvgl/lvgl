@@ -142,6 +142,19 @@ void test_gif_pause_and_resume(void)
     TEST_ASSERT_EQUAL(10, lv_gif_get_current_frame_index(gif));
 }
 
+static void wait_for_frame(lv_obj_t * gif, int32_t target_frame)
+{
+    uint32_t max_iterations = 100;
+    uint32_t i = 0;
+
+    while(lv_gif_get_current_frame_index(gif) < target_frame) {
+        lv_test_wait(10);
+        TEST_ASSERT_MESSAGE(++i < max_iterations, "Timeout waiting for GIF frame");
+    }
+
+    lv_gif_pause(gif);
+}
+
 void test_gif_blend_to_xrgb8888(void)
 {
     lv_obj_t * gif = create_gif_image("A:src/test_assets/totoro_transparent.gif");
@@ -149,6 +162,10 @@ void test_gif_blend_to_xrgb8888(void)
     lv_gif_set_color_format(gif, LV_COLOR_FORMAT_XRGB8888);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/gif_xrgb8888.png");
+
+    wait_for_frame(gif, 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/gif_xrgb8888_frame_5.png");
 }
 
 void test_gif_blend_to_argb8888(void)
@@ -158,6 +175,10 @@ void test_gif_blend_to_argb8888(void)
     lv_gif_set_color_format(gif, LV_COLOR_FORMAT_ARGB8888);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/gif_argb8888.png");
+
+    wait_for_frame(gif, 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/gif_argb8888_frame_5.png");
 
     gif = create_gif_image("A:src/test_assets/totoro_no_transparency.gif");
 
@@ -180,6 +201,10 @@ void test_gif_blend_to_rgb565(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/gif_rgb565.png");
 
+    wait_for_frame(gif, 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/gif_rgb565_frame_5.png");
+
     gif = create_gif_image("A:src/test_assets/totoro_no_transparency.gif");
 
     lv_gif_set_color_format(gif, LV_COLOR_FORMAT_RGB565);
@@ -200,6 +225,10 @@ void test_gif_blend_to_rgb888(void)
     lv_gif_set_color_format(gif, LV_COLOR_FORMAT_RGB888);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/gif_rgb888.png");
+
+    wait_for_frame(gif, 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/gif_rgb888_frame_5.png");
 
     gif = create_gif_image("A:src/test_assets/totoro_no_transparency.gif");
 

@@ -16,6 +16,16 @@ static void event_cb(lv_event_t * e)
     lv_svg_node_delete(svg);
 }
 
+/**
+ * @title Draw SVG in a draw event
+ * @brief Paint SVG markup directly into the screen's draw layer on `LV_EVENT_DRAW_MAIN`.
+ *
+ * `lv_obj_add_event_cb` subscribes a handler to the active screen's
+ * `LV_EVENT_DRAW_MAIN`. The handler parses an inline SVG string with
+ * `lv_svg_load_data`, calls `lv_draw_svg` against the layer returned by
+ * `lv_event_get_layer`, and then releases the node with
+ * `lv_svg_node_delete`.
+ */
 void lv_example_svg_3(void)
 {
     lv_obj_add_event_cb(lv_screen_active(), event_cb, LV_EVENT_DRAW_MAIN, NULL);

@@ -2,7 +2,14 @@
 #if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
- * A simple grid
+ * @title Fixed-pixel 3x3 grid
+ * @brief Fill a 3x3 grid of fixed-size cells with stretched buttons.
+ *
+ * A 300x220 container is given three 70 px columns and three 50 px rows via
+ * `lv_obj_set_style_grid_column_dsc_array` and
+ * `lv_obj_set_style_grid_row_dsc_array`, then switched to `LV_LAYOUT_GRID`.
+ * Nine buttons are placed one per cell with `LV_GRID_ALIGN_STRETCH` on both
+ * axes so each button fills its cell and carries a `cX, rY` label.
  */
 void lv_example_grid_1(void)
 {

@@ -2,7 +2,15 @@
 #if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 /**
- * Use lv_scale to add ticks to a scrollable chart
+ * @title Scrollable bar chart with month scale
+ * @brief Bar chart inside a scrollable wrapper paired with a horizontal month scale.
+ *
+ * A 200x150 container holds a transparent flex-column wrapper sized to
+ * 300% width so the chart scrolls horizontally. The wrapper contains a
+ * `LV_CHART_TYPE_BAR` chart with 12 points and two green series, plus a
+ * `lv_scale` in `LV_SCALE_MODE_HORIZONTAL_BOTTOM` labeled with month
+ * abbreviations. The scale's horizontal padding is aligned to the first
+ * bar using `lv_chart_get_first_point_center_offset`.
  */
 void lv_example_chart_2(void)
 {

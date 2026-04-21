@@ -2,7 +2,13 @@
 #if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
- * A simple row and a column layout with flexbox
+ * @title Flex row and column basics
+ * @brief A row container and a column container, each filled with buttons.
+ *
+ * Two containers are created on the active screen: one with
+ * `LV_FLEX_FLOW_ROW` and one with `LV_FLEX_FLOW_COLUMN`. Each is populated
+ * with ten buttons. Row items use a fixed 100 px width and full container
+ * height; column items use full container width with `LV_SIZE_CONTENT` height.
  */
 void lv_example_flex_1(void)
 {

@@ -3,13 +3,15 @@
  *
  */
 
+#if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
+
 #ifndef __ASSEMBLY__
 #define __ASSEMBLY__
 #endif
 
 #include "../../../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE && LV_USE_NATIVE_HELIUM_ASM
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && LV_USE_NATIVE_HELIUM_ASM
 
 #if defined(_RTE_)
 #include "Pre_Include_Global.h"
@@ -708,5 +710,7 @@ export_set rgb888, argb8888, 24, 32, normal
 export_set xrgb8888, argb8888, 31, 32, normal
 export_set argb8888, argb8888, 32, 32, normal
 
-#endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE && LV_USE_NATIVE_HELIUM_ASM*/
+#endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && LV_USE_NATIVE_HELIUM_ASM*/
+
+#endif /*defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE*/
 

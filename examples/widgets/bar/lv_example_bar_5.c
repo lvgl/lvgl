@@ -2,7 +2,13 @@
 #if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 /**
- * Bar with LTR and RTL base direction
+ * @title LTR and RTL base direction
+ * @brief Two 200 x 20 bars at value 70, one filling from the left, one from the right.
+ *
+ * The first bar uses the default base direction and fills left-to-right; the
+ * second sets `LV_BASE_DIR_RTL` through `lv_obj_set_style_base_dir` so the
+ * indicator grows from the right edge. Each bar has an explanatory label
+ * aligned above it with `LV_ALIGN_OUT_TOP_MID` to make the direction obvious.
  */
 void lv_example_bar_5(void)
 {

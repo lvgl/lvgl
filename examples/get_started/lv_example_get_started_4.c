@@ -13,7 +13,13 @@ static void slider_event_cb(lv_event_t * e)
 }
 
 /**
- * Create a slider and write its value on a label.
+ * @title Slider with live value label
+ * @brief Mirror a slider's value into a label anchored above it.
+ *
+ * A 200 px wide slider is centered on the active screen with a label placed
+ * 15 px above it via `lv_obj_align_to` and `LV_ALIGN_OUT_TOP_MID`. An
+ * `LV_EVENT_VALUE_CHANGED` callback reads `lv_slider_get_value` and rewrites
+ * the label text, re-aligning it after each update.
  */
 void lv_example_get_started_4(void)
 {

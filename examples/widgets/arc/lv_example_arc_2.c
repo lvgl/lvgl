@@ -8,7 +8,14 @@ static void set_angle(void * obj, int32_t v)
 }
 
 /**
- * Create an arc which acts as a loader.
+ * @title Arc loader animation
+ * @brief Centered 360 degree arc fills from 0 to 100 in a one-second loop.
+ *
+ * A centered arc has its background angles set to a full 360 degrees
+ * starting at rotation 270, with the knob style removed and
+ * `LV_OBJ_FLAG_CLICKABLE` cleared so it cannot be dragged. An
+ * `lv_anim_t` drives `lv_arc_set_value` from 0 to 100 across 1000 ms
+ * with a 500 ms repeat delay and `LV_ANIM_REPEAT_INFINITE`.
  */
 void lv_example_arc_2(void)
 {

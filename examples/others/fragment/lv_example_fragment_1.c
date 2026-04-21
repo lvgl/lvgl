@@ -25,6 +25,16 @@ static const lv_fragment_class_t sample_cls = {
     .instance_size = sizeof(struct sample_fragment_t),
     };
 
+/**
+ * @title Single fragment inside a container
+ * @brief Attach an `lv_fragment_manager_t` to a full-screen container and replace in one fragment.
+ *
+ * A full-screen `lv_obj_create` acts as the root container. An `lv_fragment_manager_t`
+ * is created and wired to the root's `LV_EVENT_DELETE` so
+ * `lv_fragment_manager_delete` runs before the children go away. The custom class
+ * `sample_cls` stores a name string; `lv_fragment_manager_replace` swaps it in and
+ * its `create_obj_cb` builds a label that prints `"Hello, Fragment!"`.
+ */
 void lv_example_fragment_1(void)
 {
     root = lv_obj_create(lv_screen_active());

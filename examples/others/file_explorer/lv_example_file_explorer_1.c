@@ -18,6 +18,17 @@ static void file_explorer_event_handler(lv_event_t * e)
     }
 }
 
+/**
+ * @title File explorer with quick access
+ * @brief Open a file explorer on the active screen and log the selected path.
+ *
+ * `lv_file_explorer_create` builds a full-screen browser, `lv_file_explorer_set_sort`
+ * sorts entries by `LV_EXPLORER_SORT_KIND`, and `lv_file_explorer_open_dir` opens the
+ * platform root (`"C:C:/"` on Win32 or `"A:/"` on the `lv_fs` Linux driver). When
+ * `LV_FILE_EXPLORER_QUICK_ACCESS` is enabled, `HOME`, `VIDEO`, `PICTURES`, `MUSIC`,
+ * `DOCS`, and `FS` shortcuts are registered. An `LV_EVENT_ALL` callback prints the
+ * current path and the selected file name on every `LV_EVENT_VALUE_CHANGED`.
+ */
 void lv_example_file_explorer_1(void)
 {
     lv_obj_t * file_explorer = lv_file_explorer_create(lv_screen_active());

@@ -1,6 +1,16 @@
 #include "../../lv_examples.h"
 #if LV_BUILD_EXAMPLES
 
+/**
+ * @title Base objects with and without shadow
+ * @brief Two base objects showing default styling next to a custom blue shadow.
+ *
+ * Two `lv_obj` base objects are placed on the active screen. The
+ * first, sized 100 by 50, uses the default theme. The second keeps
+ * the default size and picks up a shared `lv_style_t` with a blue
+ * 10 px shadow spread by 5 px. Both are offset from center so the
+ * shadow difference is visible side by side.
+ */
 void lv_example_obj_1(void)
 {
     lv_obj_t * obj1;

@@ -17,7 +17,15 @@ static void value_changed_event_cb(lv_event_t * e)
 }
 
 /**
- * Show cursor on the clicked point
+ * @title Cursor follows clicked point
+ * @brief Line chart whose cursor snaps to the pressed data point.
+ *
+ * A 200x150 chart sits centered with one red series of 10 points and a
+ * blue cursor added via `lv_chart_add_cursor` with direction
+ * `LV_DIR_LEFT | LV_DIR_BOTTOM`. The `LV_EVENT_VALUE_CHANGED` callback
+ * reads `lv_chart_get_pressed_point` and moves the cursor with
+ * `lv_chart_set_cursor_point`. A prompt label reading "Click on a
+ * point" is aligned above the chart.
  */
 void lv_example_chart_6(void)
 {

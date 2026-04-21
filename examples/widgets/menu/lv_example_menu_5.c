@@ -16,6 +16,21 @@ static lv_obj_t * create_slider(lv_obj_t * parent,
 static lv_obj_t * create_switch(lv_obj_t * parent,
                                 const char * icon, const char * txt, bool chk);
 
+/**
+ * @title Settings menu with sidebar mode
+ * @brief A full Settings screen with sidebar navigation and a switch that toggles between sidebar and stacked modes.
+ *
+ * A root page named `Settings` lists Mechanics, Sound, Display, and
+ * About entries inside `lv_menu_section` groups, with a Menu mode row
+ * that holds a `lv_switch` to flip between sidebar and stacked
+ * navigation through `lv_menu_set_sidebar_page` or
+ * `lv_menu_set_page`. Sub pages build slider rows such as
+ * `Velocity 0..150 at 120` and a sound switch using helper builders
+ * that pair a label with an `lv_slider` or `lv_switch`. The root
+ * back button is enabled and a `LV_EVENT_CLICKED` handler on the menu
+ * pops an `lv_msgbox` saying `Root back btn click.` when the root
+ * back arrow is used.
+ */
 void lv_example_menu_5(void)
 {
     lv_obj_t * menu = lv_menu_create(lv_screen_active());

@@ -2,7 +2,16 @@
 #if LV_USE_BUTTON && LV_BUILD_EXAMPLES
 
 /**
- * Style a button from scratch
+ * @title Style a button from scratch
+ * @brief Build a custom blue button with a vertical gradient and a pressed-state outline animation.
+ *
+ * The theme styles are removed from a centered button and two local `lv_style_t`
+ * values are applied instead: one for the default state with a
+ * `LV_PALETTE_BLUE` vertical gradient, grey border, drop shadow, and white
+ * text; another for `LV_STATE_PRESSED` that darkens the gradient, nudges the
+ * button down by 5 px, and runs a 300 ms linear transition on
+ * `LV_STYLE_OUTLINE_WIDTH` and `LV_STYLE_OUTLINE_OPA` to fade a 30 px outline
+ * out while pressed.
  */
 void lv_example_button_2(void)
 {

@@ -1497,6 +1497,36 @@
 #endif
 
 /*-------------
+ * Check arg
+ *-----------*/
+
+/** Enable LV_CHECK_ARG macro to validate function arguments at runtime.
+ * When enabled, failed checks log a warning and execute the specified action.
+ * 0: Disable all LV_CHECK_ARG checks (checks compile to nothing)
+ * 1: Enable LV_CHECK_ARG checks */
+#ifndef LV_USE_CHECK_ARG
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_CHECK_ARG
+            #define LV_USE_CHECK_ARG CONFIG_LV_USE_CHECK_ARG
+        #else
+            #define LV_USE_CHECK_ARG 0
+        #endif
+    #else
+        #define LV_USE_CHECK_ARG 1
+    #endif
+#endif
+
+/** If enabled, also call LV_ASSERT_HANDLER when an LV_CHECK_ARG check fails.
+ * Requires LV_USE_CHECK_ARG to be enabled. */
+#ifndef LV_CHECK_ARG_ASSERT_ON_FAIL
+    #ifdef CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL
+        #define LV_CHECK_ARG_ASSERT_ON_FAIL CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL
+    #else
+        #define LV_CHECK_ARG_ASSERT_ON_FAIL 0
+    #endif
+#endif
+
+/*-------------
  * Debug
  *-----------*/
 

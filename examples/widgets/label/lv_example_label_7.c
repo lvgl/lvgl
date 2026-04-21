@@ -28,7 +28,15 @@ static void language_change_cb(lv_event_t * e)
 }
 
 /**
- * Use a translation tag in labels
+ * @title Label translation tags with dropdown
+ * @brief Switch label text between English, German, and Spanish from a dropdown.
+ *
+ * A static translation table keyed by the tags `tiger`, `lion`, `rabbit`, and
+ * `elephant` is registered with `lv_translation_add_static`. A dropdown lists
+ * the three languages and its `LV_EVENT_VALUE_CHANGED` handler calls
+ * `lv_translation_set_language` with the selected string. One label per tag is
+ * created with `lv_label_set_translation_tag`, and all labels refresh to the
+ * chosen language.
  */
 void lv_example_label_7(void)
 {

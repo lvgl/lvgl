@@ -732,7 +732,7 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
         return;
     }
 
-    subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
+    subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_string_user_data_t));
     if(user_data == NULL) {
         LV_ASSERT_MALLOC(user_data);
         LV_LOG_WARN("Couldn't allocate user_data");
@@ -741,7 +741,12 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
 
     user_data->subject = subject;
     user_data->value = lv_strdup(value);
-    LV_ASSERT_MALLOC(user_data->value);
+    if(user_data->value == NULL) {
+        LV_ASSERT_MALLOC(user_data->value);
+        LV_LOG_WARN("Couldn't allocate string value");
+        lv_free(user_data);
+        return;
+    }
 
     lv_obj_add_event_cb(obj, subject_set_string_cb, trigger, user_data);
     lv_obj_add_event_cb(obj, subject_set_string_free_user_data_event_cb, LV_EVENT_DELETE, user_data);

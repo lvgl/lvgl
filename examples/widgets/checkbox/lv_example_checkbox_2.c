@@ -16,7 +16,16 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Checkboxes as radio buttons
+ * @title Checkboxes as radio buttons
+ * @brief A group of five checkboxes where only one can be checked at a time.
+ *
+ * A centered flex-column container holds five checkboxes labelled
+ * `Radio button 1` through `Radio button 5`. Each one calls
+ * `lv_obj_set_radio_button(obj, true)` so checking one clears the others,
+ * and two `LV_PART_INDICATOR` styles round the indicator with
+ * `LV_RADIUS_CIRCLE` and clear the default checkmark image in
+ * `LV_STATE_CHECKED`. Each checkbox logs its label and selection state on
+ * `LV_EVENT_VALUE_CHANGED`.
  */
 void lv_example_checkbox_2(void)
 {

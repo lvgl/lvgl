@@ -2,7 +2,13 @@
 #if LV_BUILD_EXAMPLES
 
 /**
- * Using the outline style properties
+ * @title Outline with padding gap
+ * @brief Wrap an object in a blue outline offset from its edge.
+ *
+ * A grey-filled style with `radius = 5` also sets `outline_width = 2`,
+ * `outline_color` to blue, and `outline_pad = 8` so the outline sits 8
+ * pixels outside the object's border box. The styled object is centered
+ * on the active screen.
  */
 void lv_example_style_4(void)
 {

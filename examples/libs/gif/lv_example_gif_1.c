@@ -2,7 +2,14 @@
 #if LV_USE_GIF && LV_BUILD_EXAMPLES
 
 /**
- * Open a GIF image from a file and a variable
+ * @title Animated GIF from array and file
+ * @brief Show the same bulb GIF decoded from a C array and from a file path.
+ *
+ * Two `lv_gif` widgets are created on the active screen with
+ * `LV_COLOR_FORMAT_ARGB8888`. The left one binds to the embedded
+ * `img_bulb_gif` descriptor via `lv_gif_set_src`; the right one reads
+ * `A:lvgl/examples/libs/gif/bulb.gif` through the filesystem driver
+ * registered under drive letter `A`.
  */
 void lv_example_gif_1(void)
 {

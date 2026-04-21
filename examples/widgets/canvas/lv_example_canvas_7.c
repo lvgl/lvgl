@@ -5,7 +5,13 @@
 #define CANVAS_HEIGHT  50
 
 /**
- * Draw a line to the canvas
+ * @title Rounded-end line on canvas
+ * @brief Draw a 4 px red line with rounded caps from (15,15) to (35,10) on a canvas.
+ *
+ * A 50x50 `LV_COLOR_FORMAT_ARGB8888` canvas is centered and filled with
+ * light grey. An `lv_draw_line_dsc_t` is configured with width 4,
+ * `round_start` and `round_end` set, and endpoints at (15,15) and
+ * (35,10), then rendered via `lv_draw_line` on a canvas layer.
  */
 void lv_example_canvas_7(void)
 {

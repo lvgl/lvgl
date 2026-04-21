@@ -1,6 +1,16 @@
 #include "../../lv_examples.h"
 #if LV_USE_MENU && LV_BUILD_EXAMPLES
 
+/**
+ * @title Customized back button header
+ * @brief A menu with a labeled "Back" button in the header and three titled sub pages.
+ *
+ * `lv_menu_get_main_header_back_button` returns the default back
+ * button, and a child `lv_label` adds the text `Back` next to its
+ * icon. The main page lists three items, each wired with
+ * `lv_menu_set_load_page_event` to sub pages titled `Page 1` through
+ * `Page 3` created via `lv_menu_page_create`.
+ */
 void lv_example_menu_3(void)
 {
     /*Create a menu object*/

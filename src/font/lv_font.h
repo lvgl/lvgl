@@ -90,6 +90,10 @@ typedef enum {
 
 /** Describe the properties of a font*/
 struct _lv_font_t {
+    const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
+    const lv_font_t * fallback;     /**< Fallback font for missing glyph. Resolved recursively */
+    void * user_data;               /**< Custom user data for font.*/
+
     /** Get a glyph's descriptor from a font.
      *
      * Fills `dsc_out` with metrics for the glyph corresponding to `letter` in `font`.
@@ -148,18 +152,17 @@ struct _lv_font_t {
     void (*release_glyph)(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
-    int32_t line_height;         /**< The real line height where any text fits*/
-    int32_t base_line;           /**< Base line measured from the bottom of the line_height*/
+    int32_t line_height;            /**< The real line height where any text fits*/
+    int32_t base_line;              /**< Base line measured from the bottom of the line_height*/
+    int32_t cap_height;             /**< Cap height of the font*/
+    int32_t x_height;               /**< x-height of the font*/
+
     uint8_t subpx   : 2;            /**< An element of `lv_font_subpx_t`*/
     uint8_t kerning : 1;            /**< An element of `lv_font_kerning_t`*/
     uint8_t static_bitmap : 1;      /**< The font will be used as static bitmap */
 
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
-
-    const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
-    const lv_font_t * fallback;     /**< Fallback font for missing glyph. Resolved recursively */
-    void * user_data;               /**< Custom user data for font.*/
 };
 
 struct _lv_font_class_t {

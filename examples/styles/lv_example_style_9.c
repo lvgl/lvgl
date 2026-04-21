@@ -2,7 +2,13 @@
 #if LV_BUILD_EXAMPLES && LV_USE_LINE
 
 /**
- * Using the line style properties
+ * @title Line stroke style
+ * @brief Style a polyline with a thick grey stroke and rounded end caps.
+ *
+ * A style sets `line_color` to the main grey palette entry,
+ * `line_width = 6`, and `line_rounded = true`. The style is applied to
+ * an `lv_line` whose point array is set with `lv_line_set_points`, and
+ * the line is centered on the active screen.
  */
 void lv_example_style_9(void)
 {

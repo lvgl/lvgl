@@ -20,6 +20,18 @@ static void dropdown_value_changed_event_cb(lv_event_t * e)
     }
 }
 
+/**
+ * @title Blurred message box over background
+ * @brief Toggle a blur radius between the screen backdrop and the message box itself.
+ *
+ * A long Lorem ipsum `lv_label` fills 60% width behind a translucent
+ * `lv_msgbox` placed on `lv_layer_top()` with a black header and
+ * body at `LV_OPA_40` and `blur_backdrop` enabled. A `lv_dropdown`
+ * offering `Blur screen` and `Blur msgbox` is anchored at (5, 5); its
+ * `LV_EVENT_VALUE_CHANGED` callback sets a blur radius of 24 on
+ * either `lv_layer_top()` or the message box. A synthetic event is
+ * sent to initialize the state.
+ */
 void lv_example_msgbox_3(void)
 {
 

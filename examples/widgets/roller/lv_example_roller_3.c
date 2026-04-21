@@ -36,7 +36,16 @@ static void generate_mask(lv_draw_buf_t * mask)
 }
 
 /**
- * Add a fade mask to roller.
+ * @title Roller with top and bottom fade
+ * @brief Fade the roller edges to black using a generated bitmap mask.
+ *
+ * The active screen is tinted `LV_PALETTE_BLUE_GREY` and a month roller in
+ * `LV_ROLLER_MODE_NORMAL` takes a style that paints it black with white text
+ * and no border. A 130x150 `LV_COLOR_FORMAT_L8` draw buffer is filled on a
+ * canvas with two `LV_GRAD_DIR_VER` rectangles (black-to-white on top,
+ * white-to-black on bottom), leaving the middle opaque. The resulting buffer is
+ * attached through `lv_obj_set_style_bitmap_mask_src` so the first and last
+ * rows fade out.
  */
 void lv_example_roller_3(void)
 {

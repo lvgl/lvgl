@@ -42,7 +42,16 @@ static void style_init(void)
 }
 
 /**
- * Create styles from scratch for buttons.
+ * @title Styles from scratch for buttons
+ * @brief Build reusable button styles and apply them with a pressed-state override.
+ *
+ * Three `lv_style_t` objects are initialized: a base grey gradient style with
+ * rounded corners and a thin border, a pressed style that applies a darken
+ * color filter at `LV_OPA_20`, and a red style that overrides only the
+ * background colors. Two buttons strip their theme styles with
+ * `lv_obj_remove_style_all`, adopt the base style for the default state and
+ * the pressed style for `LV_STATE_PRESSED`; the second also stacks the red
+ * style and sets a local `LV_RADIUS_CIRCLE` radius.
  */
 void lv_example_get_started_3(void)
 {

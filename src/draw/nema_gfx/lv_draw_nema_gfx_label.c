@@ -290,6 +290,19 @@ static inline uint8_t _bpp_nema_gfx_format(lv_draw_glyph_dsc_t * glyph_draw_dsc)
     }
 }
 
+static inline void _set_color_blend(uint32_t color, uint8_t alpha)
+{
+    nema_set_tex_color(color);
+
+    if(alpha < 255U) {
+        nema_set_blend_blit(NEMA_BL_SIMPLE | NEMA_BLOP_MODULATE_A);
+        nema_set_const_color(color);
+    }
+    else {
+        nema_set_blend_blit(NEMA_BL_SIMPLE);
+    }
+}
+
 static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                   lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
@@ -303,6 +316,13 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             border_draw_dsc.color = glyph_draw_dsc->color;
             border_draw_dsc.width = 1;
             lv_draw_nema_gfx_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+
+            /*lv_draw_nema_gfx_border alters the GPU blend state; restore it so
+             *subsequent glyphs are blitted correctly.*/
+            lv_color32_t restore_col32 = lv_color_to_32(glyph_draw_dsc->color, glyph_draw_dsc->opa);
+            uint32_t restore_nema_color = nema_rgba(restore_col32.red, restore_col32.green,
+                                                    restore_col32.blue, restore_col32.alpha);
+            _set_color_blend(restore_nema_color, restore_col32.alpha);
 #endif
         }
         else if(glyph_draw_dsc->format >= LV_FONT_GLYPH_FORMAT_A1 &&
@@ -395,19 +415,6 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
         lv_draw_nema_gfx_fill(t, fill_draw_dsc, fill_area);
     }
 
-}
-
-static inline void _set_color_blend(uint32_t color, uint8_t alpha)
-{
-    nema_set_tex_color(color);
-
-    if(alpha < 255U) {
-        nema_set_blend_blit(NEMA_BL_SIMPLE | NEMA_BLOP_MODULATE_A);
-        nema_set_const_color(color);
-    }
-    else {
-        nema_set_blend_blit(NEMA_BL_SIMPLE);
-    }
 }
 
 static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,

@@ -13,7 +13,16 @@ static void switch_theme_event_cb(lv_event_t * e);
 static lv_subject_t theme_subject;
 
 /**
- * Change between light and dark mode
+ * @title Theme styles with `lv_subject_add_observer_with_target`
+ * @brief Recolour two style sets when a theme subject flips between light and dark.
+ *
+ * `theme_subject` starts at `THEME_MODE_DARK`. A panel with ten child buttons is
+ * built with encapsulated factory helpers; each helper registers its own
+ * `lv_panel_styles_t` or `lv_button_styles_t` through
+ * `lv_subject_add_observer_with_target` so the observer gets the style bundle as
+ * its target. The observers rewrite background, shadow, text, and gradient
+ * colours per mode and call `lv_obj_report_style_change`. Any button click
+ * toggles the subject.
  */
 void lv_example_observer_6(void)
 {
