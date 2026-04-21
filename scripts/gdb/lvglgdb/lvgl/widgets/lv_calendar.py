@@ -21,16 +21,6 @@ class LVCalendar(LVObject):
         return ptr_or_none(self._wv.safe_field("btnm"))
 
     @property
-    def today(self):
-        """Date of today"""
-        return int(self._wv.safe_field("today", 0))
-
-    @property
-    def showed_date(self):
-        """Currently visible month (day is ignored)"""
-        return int(self._wv.safe_field("showed_date", 0))
-
-    @property
     def highlighted_dates(self):
         """Apply different style on these days (pointer to user-defined array)"""
         return ptr_or_none(self._wv.safe_field("highlighted_dates"))
@@ -49,8 +39,6 @@ class LVCalendar(LVObject):
         s = super().snapshot(include_children=include_children, include_styles=include_styles)
         d = s.get('widget_data') or {}
         d["btnm"] = self.btnm
-        d["today"] = self.today
-        d["showed_date"] = self.showed_date
         d["highlighted_dates"] = self.highlighted_dates
         d["highlighted_dates_num"] = self.highlighted_dates_num
         d["use_chinese_calendar"] = self.use_chinese_calendar

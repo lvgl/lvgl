@@ -25,6 +25,10 @@ class LVTable(LVObject):
         return int(self._wv.safe_field("row_cnt", 0))
 
     @property
+    def cell_data(self):
+        return ptr_or_none(self._wv.safe_field("cell_data"))
+
+    @property
     def row_h(self):
         return ptr_or_none(self._wv.safe_field("row_h"))
 
@@ -46,6 +50,7 @@ class LVTable(LVObject):
         d = s.get('widget_data') or {}
         d["col_cnt"] = self.col_cnt
         d["row_cnt"] = self.row_cnt
+        d["cell_data"] = self.cell_data
         d["row_h"] = self.row_h
         d["col_w"] = self.col_w
         d["col_act"] = self.col_act

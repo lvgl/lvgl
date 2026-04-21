@@ -56,6 +56,40 @@ class LVTextarea(LVObject):
         """Time to show characters in password mode before change them to '*'"""
         return int(self._wv.safe_field("pwd_show_time", 0))
 
+    @property
+    def sel_start(self):
+        """Temporary values for text selection"""
+        return int(self._wv.safe_field("sel_start", 0))
+
+    @property
+    def sel_end(self):
+        return int(self._wv.safe_field("sel_end", 0))
+
+    @property
+    def text_sel_in_prog(self):
+        """User is in process of selecting"""
+        return int(self._wv.safe_field("text_sel_in_prog", 0))
+
+    @property
+    def text_sel_en(self):
+        """Text can be selected on this text area"""
+        return int(self._wv.safe_field("text_sel_en", 0))
+
+    @property
+    def pwd_mode(self):
+        """Replace characters with '*'"""
+        return int(self._wv.safe_field("pwd_mode", 0))
+
+    @property
+    def one_line(self):
+        """One line mode (ignore line breaks)"""
+        return int(self._wv.safe_field("one_line", 0))
+
+    @property
+    def static_accepted_chars(self):
+        """1: Only a pointer is saved in `accepted_chars`"""
+        return int(self._wv.safe_field("static_accepted_chars", 0))
+
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""
         s = super().snapshot(include_children=include_children, include_styles=include_styles)
@@ -68,5 +102,12 @@ class LVTextarea(LVObject):
         d["accepted_chars"] = self.accepted_chars
         d["max_length"] = self.max_length
         d["pwd_show_time"] = self.pwd_show_time
+        d["sel_start"] = self.sel_start
+        d["sel_end"] = self.sel_end
+        d["text_sel_in_prog"] = self.text_sel_in_prog
+        d["text_sel_en"] = self.text_sel_en
+        d["pwd_mode"] = self.pwd_mode
+        d["one_line"] = self.one_line
+        d["static_accepted_chars"] = self.static_accepted_chars
         s['widget_data'] = d
         return s

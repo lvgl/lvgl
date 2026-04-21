@@ -6,7 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
-from ._helpers import ptr_or_none
+from ._helpers import ptr_or_none, safe_wrapper
 
 
 class LVMenu(LVObject):
@@ -59,7 +59,7 @@ class LVMenu(LVObject):
 
     @property
     def history_ll(self):
-        return int(self._wv.safe_field("history_ll", 0))
+        return safe_wrapper(self._wv, "history_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
 
     @property
     def cur_depth(self):

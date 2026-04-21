@@ -6,6 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
+from ._helpers import safe_wrapper
 
 
 class LVChart(LVObject):
@@ -18,12 +19,12 @@ class LVChart(LVObject):
     @property
     def series_ll(self):
         """Linked list for series (stores lv_chart_series_t)"""
-        return int(self._wv.safe_field("series_ll", 0))
+        return safe_wrapper(self._wv, "series_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
 
     @property
     def cursor_ll(self):
         """Linked list for cursors (stores lv_chart_cursor_t)"""
-        return int(self._wv.safe_field("cursor_ll", 0))
+        return safe_wrapper(self._wv, "cursor_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
 
     @property
     def pressed_point_id(self):

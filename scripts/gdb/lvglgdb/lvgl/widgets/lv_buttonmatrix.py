@@ -17,9 +17,9 @@ class LVButtonmatrix(LVObject):
         self._wv = self.cast("lv_buttonmatrix_t", ptr=True)
 
     @property
-    def const(self):
+    def map_p(self):
         """Pointer to the current map"""
-        return safe_string(self._wv, "const")
+        return safe_string(self._wv, "map_p")
 
     @property
     def button_areas(self):
@@ -60,7 +60,7 @@ class LVButtonmatrix(LVObject):
         """Snapshot with widget-specific fields in widget_data."""
         s = super().snapshot(include_children=include_children, include_styles=include_styles)
         d = s.get('widget_data') or {}
-        d["const"] = self.const
+        d["map_p"] = self.map_p
         d["button_areas"] = self.button_areas
         d["ctrl_bits"] = self.ctrl_bits
         d["btn_cnt"] = self.btn_cnt

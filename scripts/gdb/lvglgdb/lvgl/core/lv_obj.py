@@ -240,11 +240,14 @@ class LVObject(Value):
         return hex(addr) if addr else None
 
     def _get_spec_int(self, field_name):
-        """Get an int field from spec_attr, or None."""
+        """Get an int field from spec_attr, or None if unavailable."""
         spec = self.spec_attr
         if not spec or not int(spec):
             return None
-        return int(spec.safe_field(field_name, 0))
+        val = spec.safe_field(field_name)
+        if val is None:
+            return None
+        return int(val)
 
     def _get_scroll(self):
         """Get scroll offset from spec_attr, or None."""

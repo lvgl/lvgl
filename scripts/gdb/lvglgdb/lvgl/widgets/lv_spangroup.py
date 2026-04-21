@@ -6,6 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
+from ._helpers import safe_wrapper
 
 
 class LVSpangroup(LVObject):
@@ -36,7 +37,7 @@ class LVSpangroup(LVObject):
 
     @property
     def child_ll(self):
-        return int(self._wv.safe_field("child_ll", 0))
+        return safe_wrapper(self._wv, "child_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
 
     @property
     def overflow(self):

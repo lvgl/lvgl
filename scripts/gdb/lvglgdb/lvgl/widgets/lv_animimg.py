@@ -6,6 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from .lv_image import LVImage
+from ._helpers import ptr_or_none, safe_wrapper
 
 
 class LVAnimimg(LVImage):
@@ -17,7 +18,11 @@ class LVAnimimg(LVImage):
 
     @property
     def anim(self):
-        return int(self._wv.safe_field("anim", 0))
+        return safe_wrapper(self._wv, "anim", "lvglgdb.lvgl.misc.lv_anim", "LVAnim")
+
+    @property
+    def dsc(self):
+        return ptr_or_none(self._wv.safe_field("dsc"))
 
     @property
     def pic_count(self):
@@ -28,6 +33,7 @@ class LVAnimimg(LVImage):
         s = super().snapshot(include_children=include_children, include_styles=include_styles)
         d = s.get('widget_data') or {}
         d["anim"] = self.anim
+        d["dsc"] = self.dsc
         d["pic_count"] = self.pic_count
         s['widget_data'] = d
         return s
