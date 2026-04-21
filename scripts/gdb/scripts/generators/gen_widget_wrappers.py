@@ -1,0 +1,431 @@
+#!/usr/bin/env python3
+"""
+Generate widget wrapper classes from LVGL widget _private.h headers.
+
+Each widget gets its own Python file under lvglgdb/lvgl/widgets/,
+with a class inheriting from LVObject (or its parent widget wrapper).
+
+Output structure:
+    lvglgdb/lvgl/widgets/
+        __init__.py          ← re-exports + WIDGET_REGISTRY + wrap_widget()
+        _helpers.py          ← shared field-reading helpers
+        lv_label.py          ← class LVLabel(LVObject)
+        lv_slider.py         ← class LVSlider(LVBar)
+        ...
+
+Usage (from the GDB script root):
+    python3 scripts/generators/gen_widget_wrappers.py
+"""
+
+import re
+import sys
+from pathlib import Path
+from dataclasses import dataclass, field as dc_field
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
+WIDGETS_DIR = LVGL_SRC / "widgets"
+OUTPUT_DIR = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "widgets"
+
+SIMPLE_INT_TYPES = {
+    "int8_t", "int16_t", "int32_t", "int64_t",
+    "uint8_t", "uint16_t", "uint32_t", "uint64_t",
+    "int", "bool", "size_t",
+    "lv_value_precise_t",
+}
+
+
+@dataclass
+class StructField:
+    name: str
+    c_type: str
+    is_bitfield: bool = False
+    bitfield_width: int = 0
+    is_pointer: bool = False
+    is_obj_pointer: bool = False
+    is_string: bool = False
+    is_array: bool = False
+    comment: str = ""
+
+
+@dataclass
+class WidgetDef:
+    struct_name: str
+    c_type: str
+    parent_type: str
+    fields: list[StructField] = dc_field(default_factory=list)
+    widget_dir: str = ""
+
+    @property
+    def class_name(self) -> str:
+        inner = self.c_type.removeprefix("lv_").removesuffix("_t")
+        return "LV" + "".join(w.capitalize() for w in inner.split("_"))
+
+    @property
+    def parent_class_name(self) -> str:
+        if self.parent_type == "lv_obj_t":
+            return "LVObject"
+        inner = self.parent_type.removeprefix("lv_").removesuffix("_t")
+        return "LV" + "".join(w.capitalize() for w in inner.split("_"))
+
+    @property
+    def module_name(self) -> str:
+        """Python module filename without .py, e.g. 'lv_label'."""
+        return self.c_type.removesuffix("_t")
+
+    @property
+    def c_class_name(self) -> str:
+        """C class name for registry, e.g. 'lv_label'."""
+        return self.c_type.removesuffix("_t")
+
+
+def parse_struct_fields(body: str) -> list[StructField]:
+    fields = []
+    depth = 0
+    clean_lines = []
+    for line in body.splitlines():
+        stripped = line.strip()
+        if re.match(r"(struct|union)\s*\{", stripped):
+            depth += 1
+            continue
+        if stripped.startswith("}") and depth > 0:
+            depth -= 1
+            continue
+        if depth > 0:
+            continue
+        clean_lines.append(stripped)
+
+    for line in clean_lines:
+        line = line.rstrip(";").strip()
+        if not line or line.startswith("/*") or line.startswith("//") or line.startswith("*") or line.startswith("#"):
+            continue
+
+        comment = ""
+        cm = re.search(r"/\*\*?<?\s*(.*?)\s*\*/", line)
+        if cm:
+            comment = cm.group(1)
+            line = line[:cm.start()].strip().rstrip(";").strip()
+        if not line:
+            continue
+
+        if re.search(r"\[.*\]", line):
+            am = re.match(r"(?:const\s+)?(\w[\w\s\*]*?)\s+(\w+)\s*\[", line)
+            if am:
+                fields.append(StructField(
+                    name=am.group(2), c_type=am.group(1).strip(),
+                    is_array=True, comment=comment,
+                ))
+            continue
+
+        bm = re.match(r"(?:const\s+)?(\w[\w\s\*]*?)\s+(\w+)\s*:\s*(\d+)", line)
+        if bm:
+            fields.append(StructField(
+                name=bm.group(2), c_type=bm.group(1).strip(),
+                is_bitfield=True, bitfield_width=int(bm.group(3)),
+                comment=comment,
+            ))
+            continue
+
+        fm = re.match(r"((?:const\s+)?\w[\w\s]*?\s*\*?)\s+(\*?\w+)", line)
+        if fm:
+            c_type = fm.group(1).strip()
+            name = fm.group(2).strip().lstrip("*")
+            is_ptr = "*" in fm.group(1) or fm.group(2).startswith("*")
+            fields.append(StructField(
+                name=name, c_type=c_type,
+                is_pointer=is_ptr,
+                is_obj_pointer=is_ptr and "lv_obj_t" in c_type,
+                is_string=is_ptr and "char" in c_type,
+                comment=comment,
+            ))
+
+    return fields
+
+
+def parse_widgets() -> dict[str, WidgetDef]:
+    widgets = {}
+    for private_h in sorted(WIDGETS_DIR.glob("*/lv_*_private.h")):
+        text = private_h.read_text()
+        widget_dir = private_h.parent.name
+
+        for m in re.finditer(r"struct\s+_lv_(\w+)_t\s*\{([^}]+)\}", text, re.DOTALL):
+            struct_name = f"lv_{m.group(1)}_t"
+            body = m.group(2)
+
+            first_line = ""
+            for line in body.splitlines():
+                line = line.strip()
+                if line and not line.startswith(("/*", "//", "*", "#")):
+                    first_line = line.rstrip(";").strip()
+                    break
+
+            parent_match = re.match(r"(lv_\w+_t)\s+\w+", first_line)
+            if not parent_match:
+                continue
+
+            parent_type = parent_match.group(1)
+            if parent_type == "lv_obj_t" or parent_type in widgets or parent_type in (
+                "lv_bar_t", "lv_image_t", "lv_arc_t", "lv_textarea_t", "lv_buttonmatrix_t",
+            ):
+                all_fields = parse_struct_fields(body)
+                widgets[struct_name] = WidgetDef(
+                    struct_name=struct_name, c_type=struct_name,
+                    parent_type=parent_type,
+                    fields=all_fields[1:] if all_fields else [],
+                    widget_dir=widget_dir,
+                )
+    return widgets
+
+
+def _field_expr(f: StructField) -> str | None:
+    """Return snapshot expression for a field, or None to skip."""
+    if f.is_array:
+        return None
+    if f.is_obj_pointer:
+        return f'ptr_or_none(self._wv.safe_field("{f.name}"))'
+    if f.is_string:
+        return f'safe_string(self._wv, "{f.name}")'
+    if f.is_pointer:
+        return f'ptr_or_none(self._wv.safe_field("{f.name}"))'
+    if f.c_type == "lv_color_t":
+        return f'safe_color(self._wv, "{f.name}")'
+    if f.c_type == "lv_area_t":
+        return f'safe_area(self._wv, "{f.name}")'
+    if f.c_type == "lv_point_t":
+        return f'safe_point(self._wv, "{f.name}")'
+    if f.is_bitfield or f.c_type in SIMPLE_INT_TYPES or f.c_type.startswith(("uint", "int")):
+        return f'int(self._wv.safe_field("{f.name}", 0))'
+    if f.c_type.startswith("lv_") and f.c_type.endswith("_t"):
+        return f'int(self._wv.safe_field("{f.name}", 0))'
+    return None
+
+
+def _topo_sort(widgets: dict[str, WidgetDef]) -> list[WidgetDef]:
+    result, visited = [], set()
+    def visit(w):
+        if w.c_type in visited:
+            return
+        visited.add(w.c_type)
+        if w.parent_type in widgets:
+            visit(widgets[w.parent_type])
+        result.append(w)
+    for w in widgets.values():
+        visit(w)
+    return result
+
+
+def gen_helpers() -> str:
+    return '''\
+"""Shared field-reading helpers for widget wrappers.
+
+All helpers return a safe value (or None) without raising exceptions.
+Protection is provided by Value.safe_field() and Value.string(fallback=).
+"""
+
+from lvglgdb.lvgl.data_utils import ptr_or_none  # noqa: F401
+
+
+def safe_string(obj, field_name):
+    """Read a char* field as string, or None."""
+    val = obj.safe_field(field_name)
+    if val is None or not getattr(val, 'is_ok', True) or not int(val):
+        return None
+    return val.string(fallback=None)
+
+
+def safe_color(obj, field_name):
+    """Read lv_color_t as hex string."""
+    val = obj.safe_field(field_name)
+    if val is None or not getattr(val, 'is_ok', True):
+        return None
+    return f"#{int(val):06x}"
+
+
+def safe_area(obj, field_name):
+    """Read lv_area_t as dict."""
+    val = obj.safe_field(field_name)
+    if val is None or not getattr(val, 'is_ok', True):
+        return None
+    return {
+        "x1": int(val.safe_field("x1", 0)),
+        "y1": int(val.safe_field("y1", 0)),
+        "x2": int(val.safe_field("x2", 0)),
+        "y2": int(val.safe_field("y2", 0)),
+    }
+
+
+def safe_point(obj, field_name):
+    """Read lv_point_t as dict."""
+    val = obj.safe_field(field_name)
+    if val is None or not getattr(val, 'is_ok', True):
+        return None
+    return {
+        "x": int(val.safe_field("x", 0)),
+        "y": int(val.safe_field("y", 0)),
+    }
+'''
+
+
+def gen_widget_file(wdef: WidgetDef, widgets: dict[str, WidgetDef]) -> str:
+    """Generate a single widget module file."""
+    lines = [
+        '"""',
+        f"Auto-generated wrapper for {wdef.c_type}.",
+        "",
+        "Do not edit manually. Regenerate from the GDB script root with:",
+        "    python3 scripts/generate_all.py",
+        '"""',
+        "",
+    ]
+
+    # Import parent
+    if wdef.parent_type == "lv_obj_t":
+        lines.append("from lvglgdb.lvgl.core.lv_obj import LVObject")
+    else:
+        parent_def = widgets[wdef.parent_type]
+        lines.append(f"from .{parent_def.module_name} import {parent_def.class_name}")
+
+    # Import helpers only if needed
+    needs = set()
+    for f in wdef.fields:
+        expr = _field_expr(f)
+        if expr is None:
+            continue
+        if "ptr_or_none" in expr:
+            needs.add("ptr_or_none")
+        if "safe_string" in expr:
+            needs.add("safe_string")
+        if "safe_color" in expr:
+            needs.add("safe_color")
+        if "safe_area" in expr:
+            needs.add("safe_area")
+        if "safe_point" in expr:
+            needs.add("safe_point")
+
+    if needs:
+        imports = ", ".join(sorted(needs))
+        lines.append(f"from ._helpers import {imports}")
+
+    lines.append("")
+    lines.append("")
+
+    parent_cls = wdef.parent_class_name
+    lines.append(f"class {wdef.class_name}({parent_cls}):")
+    lines.append(f'    """LVGL {wdef.widget_dir} widget ({wdef.c_type})."""')
+    lines.append("")
+    lines.append(f"    def __init__(self, obj):")
+    lines.append(f"        super().__init__(obj)")
+    lines.append(f'        self._wv = self.cast("{wdef.c_type}", ptr=True)')
+    lines.append("")
+
+    # Properties
+    snapshot_fields = []
+    for f in wdef.fields:
+        expr = _field_expr(f)
+        if expr is None:
+            continue
+        lines.append(f"    @property")
+        lines.append(f"    def {f.name}(self):")
+        if f.comment:
+            lines.append(f'        """{f.comment}"""')
+        lines.append(f"        return {expr}")
+        lines.append("")
+        snapshot_fields.append(f.name)
+
+    # snapshot — override to include widget-specific fields in widget_data
+    lines.append(f"    def snapshot(self, include_children=False, include_styles=False):")
+    lines.append(f'        """Snapshot with widget-specific fields in widget_data."""')
+    lines.append(f"        s = super().snapshot(include_children=include_children, include_styles=include_styles)")
+
+    if snapshot_fields:
+        lines.append(f"        d = s.get('widget_data') or {{}}")
+        for fname in snapshot_fields:
+            lines.append(f'        d["{fname}"] = self.{fname}')
+        lines.append(f"        s['widget_data'] = d")
+
+    lines.append(f"        return s")
+    lines.append("")
+
+    return "\n".join(lines)
+
+
+def gen_init(ordered: list[WidgetDef]) -> str:
+    """Generate __init__.py with imports, registry, and wrap_widget()."""
+    lines = [
+        '"""',
+        "Auto-generated LVGL widget wrappers.",
+        "",
+        "Do not edit manually. Regenerate from the GDB script root with:",
+        "    python3 scripts/generate_all.py",
+        '"""',
+        "",
+    ]
+
+    # Imports
+    for w in ordered:
+        lines.append(f"from .{w.module_name} import {w.class_name}")
+    lines.append("")
+
+    # Registry
+    lines.append("WIDGET_REGISTRY: dict[str, type] = {")
+    for w in ordered:
+        lines.append(f'    "{w.c_class_name}": {w.class_name},')
+    lines.append("}")
+    lines.append("")
+    lines.append("")
+
+    # wrap_widget
+    lines.append("import gdb")
+    lines.append("")
+    lines.append("")
+    lines.append("def wrap_widget(obj):")
+    lines.append('    """Wrap an LVObject into its widget class if known."""')
+    lines.append("    cls = WIDGET_REGISTRY.get(obj.class_name)")
+    lines.append("    if cls:")
+    lines.append("        try:")
+    lines.append("            return cls(obj)")
+    lines.append("        except gdb.error:")
+    lines.append("            pass  # type not available in debug info")
+    lines.append("    return None")
+    lines.append("")
+
+    # __all__
+    names = [w.class_name for w in ordered]
+    lines.append("__all__ = [")
+    for n in names:
+        lines.append(f'    "{n}",')
+    lines.append('    "WIDGET_REGISTRY",')
+    lines.append('    "wrap_widget",')
+    lines.append("]")
+    lines.append("")
+
+    return "\n".join(lines)
+
+
+def main():
+    widgets = parse_widgets()
+    ordered = _topo_sort(widgets)
+    print(f"Parsed {len(widgets)} widget types")
+
+    for w in ordered:
+        print(f"  {w.module_name}.py: {w.class_name}({w.parent_class_name}) — {len(w.fields)} fields")
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # _helpers.py
+    (OUTPUT_DIR / "_helpers.py").write_text(gen_helpers())
+
+    # Per-widget files
+    for w in ordered:
+        src = gen_widget_file(w, widgets)
+        (OUTPUT_DIR / f"{w.module_name}.py").write_text(src)
+
+    # __init__.py
+    (OUTPUT_DIR / "__init__.py").write_text(gen_init(ordered))
+
+    print(f"\nGenerated {len(ordered) + 2} files in {OUTPUT_DIR}/")
+
+
+if __name__ == "__main__":
+    main()

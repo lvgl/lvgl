@@ -210,7 +210,8 @@ class LVObject(Value):
 
         @Snapshot.fallback()
         def _snap(c):
-            return c.snapshot(
+            w = self._wrap_as_widget(c)
+            return w.snapshot(
                 include_children=True, include_styles=include_styles,
             ).as_dict()
 
@@ -264,6 +265,15 @@ class LVObject(Value):
         if name is None or not int(name):
             return None
         return name.string()
+
+    @staticmethod
+    def _wrap_as_widget(obj):
+        """Try to wrap an LVObject as its specific widget type."""
+        try:
+            from lvglgdb.lvgl.widgets import wrap_widget
+            return wrap_widget(obj) or obj
+        except ImportError:
+            return obj
 
 
 def dump_obj_info(obj: LVObject):

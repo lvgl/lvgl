@@ -122,7 +122,9 @@ def _collect_object_trees(lvgl) -> list:
 
         @Snapshot.fallback(layer_name=lambda s: addrs.get(int(s)))
         def _screen_snapshot(screen):
-            snap = screen.snapshot(
+            from lvglgdb.lvgl.core.lv_obj import LVObject
+            w = LVObject._wrap_as_widget(screen)
+            snap = w.snapshot(
                 include_children=True, include_styles=True,
             ).as_dict()
             snap["layer_name"] = addrs.get(int(screen))

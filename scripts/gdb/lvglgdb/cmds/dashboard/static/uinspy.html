@@ -1249,6 +1249,24 @@ ui-topbar .topbar-search::placeholder {
   }
   color: var(--color-yellow);
 }
+.detail-adv-toggle {
+  margin-top: calc(var(--spacing) * 1);
+}
+.detail-adv-summary {
+  cursor: pointer;
+  padding-block: calc(var(--spacing) * 0.5);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-overlay0);
+  list-style: none;
+}
+.detail-adv-summary::before {
+  content: "▸ ";
+}
+.detail-adv-toggle[open] > .detail-adv-summary::before {
+  content: "▾ ";
+}
 .scene-controls {
   margin-bottom: calc(var(--spacing) * 1);
   display: flex;
@@ -2082,6 +2100,13 @@ function buildCard(item, config) {
 }
 
 // src/builders/obj-tree.ui.ts
+function formatWdVal(v) {
+  if (v == null)
+    return "-";
+  if (typeof v === "object")
+    return JSON.stringify(v);
+  return String(v);
+}
 function renderObjTree(obj, depth = 0) {
   let det = document.createElement("details");
   if (det.className = "obj-node", obj.addr)
@@ -2199,6 +2224,43 @@ function renderObjDetail(addr, panel) {
     if (obj.skip_trans)
       wrap.appendChild(el("span", "detail-flag-badge", "skip_trans"));
     intSec.appendChild(wrap), panel.appendChild(intSec);
+  }
+  if (obj.widget_data && Object.keys(obj.widget_data).length) {
+    let wd = obj.widget_data, primary = {
+      lv_label: ["text", "long_mode", "recolor"],
+      lv_image: ["src", "w", "h", "rotation", "scale_x", "scale_y", "align"],
+      lv_bar: ["cur_value", "min_value", "max_value", "start_value", "mode"],
+      lv_slider: ["cur_value", "min_value", "max_value", "start_value", "mode", "dragging"],
+      lv_arc: ["value", "min_value", "max_value", "rotation", "type"],
+      lv_switch: ["anim_state", "orientation"],
+      lv_checkbox: ["txt"],
+      lv_dropdown: ["options", "option_cnt", "sel_opt_id", "dir"],
+      lv_textarea: ["placeholder_txt", "max_length", "pwd_show_time"],
+      lv_tabview: ["tab_cur", "tab_pos", "tab_bar_size"],
+      lv_roller: ["option_cnt", "sel_opt_id", "mode"],
+      lv_chart: ["point_cnt", "hdiv_cnt", "vdiv_cnt", "type"],
+      lv_scale: ["mode", "range_min", "range_max", "total_tick_count", "angle_range", "rotation"],
+      lv_spinner: ["duration", "angle"],
+      lv_keyboard: ["mode", "popovers"],
+      lv_led: ["color", "bright"],
+      lv_spinbox: ["value", "range_min", "range_max", "step", "digit_count", "dec_point_pos"],
+      lv_calendar: ["today", "showed_date"],
+      lv_table: ["col_cnt", "row_cnt"],
+      lv_buttonmatrix: ["btn_cnt", "row_cnt", "btn_id_sel", "one_check"]
+    }[obj.class_name] || [], allKeys = Object.keys(wd), priKeys = allKeys.filter((k) => primary.includes(k)), advKeys = allKeys.filter((k) => !primary.includes(k)), wdSec = el("div", "detail-section");
+    wdSec.appendChild(el("div", "detail-section-title", "Widget · " + obj.class_name));
+    for (let k of priKeys.length ? priKeys : allKeys.slice(0, 6))
+      wdSec.appendChild(kvPair(k, formatWdVal(wd[k])));
+    let rest = priKeys.length ? advKeys : allKeys.slice(6);
+    if (rest.length) {
+      let toggle = el("details", "detail-adv-toggle");
+      toggle.appendChild(el("summary", "detail-adv-summary", `${rest.length} more fields`));
+      let inner = el("div", "");
+      for (let k of rest)
+        inner.appendChild(kvPair(k, formatWdVal(wd[k])));
+      toggle.appendChild(inner), wdSec.appendChild(toggle);
+    }
+    panel.appendChild(wdSec);
   }
   if (obj.styles?.length) {
     let styleSec = el("div", "detail-section");
@@ -3173,7 +3235,7 @@ class UiDashboard extends BaseComponent {
 customElements.define("ui-dashboard", UiDashboard);
 
 // src/app.ts
-document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-02 03:55 GMT+8"}</span><span>·</span><span>${"be336ae"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
+document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-02 13:52 GMT+8"}</span><span>·</span><span>${"07131c2"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
 </script>
 </body>
 </html>
