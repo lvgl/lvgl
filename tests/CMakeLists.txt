@@ -457,9 +457,9 @@ if (NOT LIBINPUT_FOUND)
 endif()
 
 find_package(PkgConfig)
-pkg_check_modules(xkbcommon)
+pkg_check_modules(XKB xkbcommon)
 
-if (NOT xkbcommon_FOUND)
+if (NOT XKB_FOUND)
     message("xkbcommon not found, defaulting to 0")
     add_definitions(-DLV_LIBINPUT_XKB=0)
 endif()
