@@ -79,8 +79,12 @@ void test_draw_buf_stride_adjust(void)
         res = lv_draw_buf_adjust_stride(decoded, min_stride - 1);
         TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
 
-        /*Expand the stride should fail if stride is too large that buffer size overflow*/
-        res = lv_draw_buf_adjust_stride(decoded, image_stride + 1);
+        /* Expand the stride should fail if the new stride is so large that the buffer
+         * would overflow. Use a stride that's guaranteed to push the required size past
+         * the aligned allocation (lv_draw_buf_create rounds the allocation up to
+         * LV_DRAW_BUF_ALIGN for PPA/cache-line reasons, so a +1 bump can fit in the
+         * padding for small images). Doubling the stride always overflows. */
+        res = lv_draw_buf_adjust_stride(decoded, image_stride * 2);
         TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
 
         /*Create a larger draw buffer*/
