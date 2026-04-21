@@ -36,6 +36,35 @@ SIMPLE_INT_TYPES = {
 }
 
 
+def _scan_enum_types() -> set[str]:
+    """Scan LVGL headers to find all typedef enum and int-like alias type names."""
+    result = set()
+    for h in LVGL_SRC.rglob("*.h"):
+        text = h.read_text(errors="ignore")
+        # typedef enum { ... } lv_xxx_t;
+        for m in re.finditer(
+            r"typedef\s+enum\s*\{[^}]*\}\s*(lv_\w+_t)", text, re.DOTALL
+        ):
+            result.add(m.group(1))
+        # typedef <int-like> lv_xxx_t;
+        for m in re.finditer(
+            r"typedef\s+((?:unsigned\s+)?\w+)\s+(lv_\w+_t)\s*;", text
+        ):
+            base = m.group(1).strip()
+            if base in (
+                "unsigned int", "unsigned char", "unsigned short",
+                "unsigned long", "int", "char", "short", "long",
+                "uint8_t", "uint16_t", "uint32_t", "uint64_t",
+                "int8_t", "int16_t", "int32_t", "int64_t", "size_t",
+            ):
+                result.add(m.group(2))
+    return result
+
+
+# Pre-scan: types safe to cast to int (enums + int-like typedefs)
+_INT_SAFE_TYPES = _scan_enum_types()
+
+
 @dataclass
 class StructField:
     name: str
@@ -127,11 +156,11 @@ def parse_struct_fields(body: str) -> list[StructField]:
             ))
             continue
 
-        fm = re.match(r"((?:const\s+)?\w[\w\s]*?\s*\*?)\s+(\*?\w+)", line)
+        fm = re.match(r"((?:const\s+)?[\w][\w\s]*?(?:\s*\*\s*(?:const\s*)?)*\*?)\s+(\*?\w+)", line)
         if fm:
             c_type = fm.group(1).strip()
             name = fm.group(2).strip().lstrip("*")
-            is_ptr = "*" in fm.group(1) or fm.group(2).startswith("*")
+            is_ptr = "*" in c_type or fm.group(2).startswith("*")
             fields.append(StructField(
                 name=name, c_type=c_type,
                 is_pointer=is_ptr,
@@ -143,15 +172,31 @@ def parse_struct_fields(body: str) -> list[StructField]:
     return fields
 
 
+def _find_structs(text: str):
+    """Find top-level struct _lv_*_t definitions with brace-balanced matching."""
+    for m in re.finditer(r"struct\s+_lv_(\w+)_t\s*\{", text):
+        name = m.group(1)
+        start = m.end()
+        depth = 1
+        i = start
+        while i < len(text) and depth > 0:
+            if text[i] == "{":
+                depth += 1
+            elif text[i] == "}":
+                depth -= 1
+            i += 1
+        if depth == 0:
+            yield name, text[start:i - 1]
+
+
 def parse_widgets() -> dict[str, WidgetDef]:
     widgets = {}
     for private_h in sorted(WIDGETS_DIR.glob("*/lv_*_private.h")):
         text = private_h.read_text()
         widget_dir = private_h.parent.name
 
-        for m in re.finditer(r"struct\s+_lv_(\w+)_t\s*\{([^}]+)\}", text, re.DOTALL):
-            struct_name = f"lv_{m.group(1)}_t"
-            body = m.group(2)
+        for raw_name, body in _find_structs(text):
+            struct_name = f"lv_{raw_name}_t"
 
             first_line = ""
             for line in body.splitlines():
@@ -194,9 +239,21 @@ def _field_expr(f: StructField) -> str | None:
         return f'safe_area(self._wv, "{f.name}")'
     if f.c_type == "lv_point_t":
         return f'safe_point(self._wv, "{f.name}")'
+    # Known wrapper types — use snapshot() for rich output
+    _WRAPPER_TYPES = {
+        "lv_draw_buf_t": ("lvglgdb.lvgl.draw.lv_draw_buf", "LVDrawBuf"),
+        "lv_ll_t": ("lvglgdb.lvgl.misc.lv_ll", "LVList"),
+        "lv_anim_t": ("lvglgdb.lvgl.misc.lv_anim", "LVAnim"),
+        "lv_array_t": ("lvglgdb.lvgl.misc.lv_array", "LVArray"),
+    }
+    if f.c_type in _WRAPPER_TYPES:
+        mod, cls = _WRAPPER_TYPES[f.c_type]
+        return f'safe_wrapper(self._wv, "{f.name}", "{mod}", "{cls}")'
     if f.is_bitfield or f.c_type in SIMPLE_INT_TYPES or f.c_type.startswith(("uint", "int")):
         return f'int(self._wv.safe_field("{f.name}", 0))'
-    if f.c_type.startswith("lv_") and f.c_type.endswith("_t"):
+    # TODO: implement generic struct expansion (Value.to_dict) for
+    # non-enum lv_*_t types like lv_calendar_date_t.
+    if f.c_type in _INT_SAFE_TYPES:
         return f'int(self._wv.safe_field("{f.name}", 0))'
     return None
 
@@ -264,6 +321,18 @@ def safe_point(obj, field_name):
         "x": int(val.safe_field("x", 0)),
         "y": int(val.safe_field("y", 0)),
     }
+
+
+def safe_wrapper(obj, field_name, module_path, class_name):
+    """Read a struct field using its known Value wrapper, return snapshot dict."""
+    val = obj.safe_field(field_name)
+    if val is None or not getattr(val, 'is_ok', True):
+        return None
+    import importlib
+    mod = importlib.import_module(module_path)
+    cls = getattr(mod, class_name)
+    wrapper = cls(val)
+    return wrapper.snapshot().as_dict()
 '''
 
 
@@ -302,6 +371,8 @@ def gen_widget_file(wdef: WidgetDef, widgets: dict[str, WidgetDef]) -> str:
             needs.add("safe_area")
         if "safe_point" in expr:
             needs.add("safe_point")
+        if "safe_wrapper" in expr:
+            needs.add("safe_wrapper")
 
     if needs:
         imports = ", ".join(sorted(needs))

@@ -6,7 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
-from ._helpers import ptr_or_none, safe_string
+from ._helpers import ptr_or_none, safe_string, safe_wrapper
 
 
 class LVImePinyin(LVObject):
@@ -30,7 +30,7 @@ class LVImePinyin(LVObject):
 
     @property
     def k9_legal_py_ll(self):
-        return int(self._wv.safe_field("k9_legal_py_ll", 0))
+        return safe_wrapper(self._wv, "k9_legal_py_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
 
     @property
     def cand_str(self):

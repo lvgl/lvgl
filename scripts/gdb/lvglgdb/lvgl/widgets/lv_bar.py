@@ -47,14 +47,6 @@ class LVBar(LVObject):
         return int(self._wv.safe_field("val_reversed", 0))
 
     @property
-    def cur_value_anim(self):
-        return int(self._wv.safe_field("cur_value_anim", 0))
-
-    @property
-    def start_value_anim(self):
-        return int(self._wv.safe_field("start_value_anim", 0))
-
-    @property
     def mode(self):
         """Type of bar"""
         return int(self._wv.safe_field("mode", 0))
@@ -74,8 +66,6 @@ class LVBar(LVObject):
         d["start_value"] = self.start_value
         d["indic_area"] = self.indic_area
         d["val_reversed"] = self.val_reversed
-        d["cur_value_anim"] = self.cur_value_anim
-        d["start_value_anim"] = self.start_value_anim
         d["mode"] = self.mode
         d["orientation"] = self.orientation
         s['widget_data'] = d

@@ -45,3 +45,15 @@ def safe_point(obj, field_name):
         "x": int(val.safe_field("x", 0)),
         "y": int(val.safe_field("y", 0)),
     }
+
+
+def safe_wrapper(obj, field_name, module_path, class_name):
+    """Read a struct field using its known Value wrapper, return snapshot dict."""
+    val = obj.safe_field(field_name)
+    if val is None or not getattr(val, 'is_ok', True):
+        return None
+    import importlib
+    mod = importlib.import_module(module_path)
+    cls = getattr(mod, class_name)
+    wrapper = cls(val)
+    return wrapper.snapshot().as_dict()

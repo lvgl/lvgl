@@ -6,7 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from .lv_image import LVImage
-from ._helpers import ptr_or_none
+from ._helpers import ptr_or_none, safe_wrapper
 
 
 class LVCanvas(LVImage):
@@ -22,7 +22,7 @@ class LVCanvas(LVImage):
 
     @property
     def static_buf(self):
-        return int(self._wv.safe_field("static_buf", 0))
+        return safe_wrapper(self._wv, "static_buf", "lvglgdb.lvgl.draw.lv_draw_buf", "LVDrawBuf")
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -6,6 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
+from ._helpers import safe_string, safe_wrapper
 
 
 class LVScale(LVObject):
@@ -18,7 +19,11 @@ class LVScale(LVObject):
     @property
     def section_ll(self):
         """Linked list for the sections (stores lv_scale_section_t)"""
-        return int(self._wv.safe_field("section_ll", 0))
+        return safe_wrapper(self._wv, "section_ll", "lvglgdb.lvgl.misc.lv_ll", "LVList")
+
+    @property
+    def txt_src(self):
+        return safe_string(self._wv, "txt_src")
 
     @property
     def mode(self):
@@ -87,13 +92,14 @@ class LVScale(LVObject):
     @property
     def needles(self):
         """Needle list of this scale"""
-        return int(self._wv.safe_field("needles", 0))
+        return safe_wrapper(self._wv, "needles", "lvglgdb.lvgl.misc.lv_array", "LVArray")
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""
         s = super().snapshot(include_children=include_children, include_styles=include_styles)
         d = s.get('widget_data') or {}
         d["section_ll"] = self.section_ll
+        d["txt_src"] = self.txt_src
         d["mode"] = self.mode
         d["range_min"] = self.range_min
         d["range_max"] = self.range_max
