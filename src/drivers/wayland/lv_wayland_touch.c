@@ -167,14 +167,16 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t 
     }
 
 #if LV_USE_GESTURE_RECOGNITION
-    uint8_t i = tdata->event_cnt;
+    if(tdata->event_cnt < LV_WAYLAND_MAX_TOUCHES) {
+        uint8_t i = tdata->event_cnt;
 
-    tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
-    tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
-    tdata->touches[i].id        = id;
-    tdata->touches[i].timestamp = time;
-    tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
-    tdata->event_cnt++;
+        tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
+        tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
+        tdata->touches[i].id        = id;
+        tdata->touches[i].timestamp = time;
+        tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
+        tdata->event_cnt++;
+    }
 #else
     tdata->point.x = wl_fixed_to_int(x_w);
     tdata->point.y = wl_fixed_to_int(y_w);
@@ -192,15 +194,17 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t se
 
     /* Create a released event */
 #if LV_USE_GESTURE_RECOGNITION
-    uint8_t i = tdata->event_cnt;
+    if(tdata->event_cnt < LV_WAYLAND_MAX_TOUCHES) {
+        uint8_t i = tdata->event_cnt;
 
-    tdata->touches[i].point.x   = 0;
-    tdata->touches[i].point.y   = 0;
-    tdata->touches[i].id        = id;
-    tdata->touches[i].timestamp = time;
-    tdata->touches[i].state     = LV_INDEV_STATE_RELEASED;
+        tdata->touches[i].point.x   = 0;
+        tdata->touches[i].point.y   = 0;
+        tdata->touches[i].id        = id;
+        tdata->touches[i].timestamp = time;
+        tdata->touches[i].state     = LV_INDEV_STATE_RELEASED;
 
-    tdata->event_cnt++;
+        tdata->event_cnt++;
+    }
 #else
     tdata->state = LV_INDEV_STATE_RELEASED;
 #endif
@@ -227,20 +231,17 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_
         touch++;
     }
 
-    if(cur == NULL) {
-        uint8_t i = tdata->event_cnt;
-        tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
-        tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
-        tdata->touches[i].id        = id;
-        tdata->touches[i].timestamp = time;
-        tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
+    if(cur == NULL && tdata->event_cnt < LV_WAYLAND_MAX_TOUCHES) {
+        cur = &tdata->touches[tdata->event_cnt];
         tdata->event_cnt++;
     }
-    else {
+
+    if(cur != NULL) {
         cur->point.x   = wl_fixed_to_int(x_w);
         cur->point.y   = wl_fixed_to_int(y_w);
         cur->id        = id;
         cur->timestamp = time;
+        cur->state     = LV_INDEV_STATE_PRESSED;
     }
 #else
     tdata->point.x = wl_fixed_to_int(x_w);
