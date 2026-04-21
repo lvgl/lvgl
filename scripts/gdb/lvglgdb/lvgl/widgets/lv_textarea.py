@@ -6,7 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
-from ._helpers import ptr_or_none, safe_string
+from ._helpers import ptr_or_none, safe_point, safe_string
 
 
 class LVTextarea(LVObject):
@@ -25,6 +25,11 @@ class LVTextarea(LVObject):
     def placeholder_txt(self):
         """Place holder label. only visible if text is an empty string"""
         return safe_string(self._wv, "placeholder_txt")
+
+    @property
+    def placeholder_txt_size(self):
+        """Size of the placeholder text"""
+        return safe_point(self._wv, "placeholder_txt_size")
 
     @property
     def pwd_tmp(self):
@@ -57,6 +62,7 @@ class LVTextarea(LVObject):
         d = s.get('widget_data') or {}
         d["label"] = self.label
         d["placeholder_txt"] = self.placeholder_txt
+        d["placeholder_txt_size"] = self.placeholder_txt_size
         d["pwd_tmp"] = self.pwd_tmp
         d["pwd_bullet"] = self.pwd_bullet
         d["accepted_chars"] = self.accepted_chars
