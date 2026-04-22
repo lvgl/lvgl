@@ -13,7 +13,7 @@ class LVSwitch(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_switch_t", ptr=True)
+        self._wv = self.cast("lv_switch_t", ptr=True) or self
 
     @property
     def anim_state(self):

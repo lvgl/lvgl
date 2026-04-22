@@ -14,7 +14,7 @@ class LVMenu(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_menu_t", ptr=True)
+        self._wv = self.cast("lv_menu_t", ptr=True) or self
 
     @property
     def storage(self):

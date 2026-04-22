@@ -13,7 +13,7 @@ class LVArc(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_arc_t", ptr=True)
+        self._wv = self.cast("lv_arc_t", ptr=True) or self
 
     @property
     def rotation(self):

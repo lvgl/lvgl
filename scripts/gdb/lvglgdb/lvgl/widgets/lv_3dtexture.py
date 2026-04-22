@@ -13,7 +13,7 @@ class LV3dtexture(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_3dtexture_t", ptr=True)
+        self._wv = self.cast("lv_3dtexture_t", ptr=True) or self
 
     @property
     def id(self):

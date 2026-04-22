@@ -14,7 +14,7 @@ class LVSlider(LVBar):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_slider_t", ptr=True)
+        self._wv = self.cast("lv_slider_t", ptr=True) or self
 
     @property
     def left_knob_area(self):
