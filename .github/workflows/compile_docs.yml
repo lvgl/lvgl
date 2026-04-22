@@ -82,12 +82,12 @@ jobs:
         if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
         run: |
             npx doxymark \
-               --input docs/doxygen/xml
-               --output docs/api
-               --index docs/api-index.json
-               --preset fumadocs 
-               --auto-group
-               --source-url https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src
+               --input docs/doxygen/xml \
+               --output docs/api \
+               --index docs/api-index.json \
+               --preset fumadocs \
+               --auto-group \
+               --source-url https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src 
             rm -rf docs/doxygen
 
       - name: Install Example Documentation
