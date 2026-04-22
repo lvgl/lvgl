@@ -354,11 +354,13 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
                 reset_recognizer(r);
                 break;
             default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+                LV_ASSERT_FORMAT_MSG(false, "invalid gesture recognizer state: %d", r->state);
         }
     }
     else {
         switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_NONE:
+                break;
             case LV_INDEV_GESTURE_STATE_RECOGNIZED:
                 /* Gesture has ended */
                 r->state = LV_INDEV_GESTURE_STATE_ENDED;
@@ -373,7 +375,7 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
                 break;
 
             default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+                LV_ASSERT_FORMAT_MSG(false, "invalid gesture recognizer state: %d", r->state);
         }
     }
 }
@@ -440,11 +442,13 @@ void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * recognizer
                 r->state = LV_INDEV_GESTURE_STATE_CANCELED;
                 break;
             default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+                LV_ASSERT_FORMAT_MSG(false, "invalid gesture recognizer state: %d", r->state);
         }
     }
     else {
         switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_NONE:
+                break;
             case LV_INDEV_GESTURE_STATE_RECOGNIZED:
                 /* Gesture has ended */
                 r->type = LV_INDEV_GESTURE_ROTATE;
@@ -459,7 +463,7 @@ void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * recognizer
                 reset_recognizer(r);
                 break;
             default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+                LV_ASSERT_FORMAT_MSG(false, "invalid gesture recognizer state: %d", r->state);
         }
     }
 }
@@ -529,12 +533,14 @@ void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * r
                 reset_recognizer(r);
                 break;
             default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+                LV_ASSERT_FORMAT_MSG(false, "invalid gesture recognizer state: %d", r->state);
         }
     }
     else {
 
         switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_NONE:
+                break;
             case LV_INDEV_GESTURE_STATE_RECOGNIZED:
                 /* Gesture has ended */
                 r->state = LV_INDEV_GESTURE_STATE_ENDED;
@@ -551,7 +557,7 @@ void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * r
                 r->state = LV_INDEV_GESTURE_STATE_NONE;
                 break;
             default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+                LV_ASSERT_FORMAT_MSG(false, "invalid gesture recognizer state: %d", r->state);
         }
     }
 }
