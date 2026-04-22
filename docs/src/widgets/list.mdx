@@ -1,0 +1,68 @@
+---
+title: "List (lv_list)"
+description: The List Widget is basically a rectangle with vertical layout to which Buttons and Text can be added.
+---
+
+## Overview
+
+The List Widget is basically a rectangle with vertical layout to which Buttons
+and Text can be added.
+
+## Parts and Styles
+
+**Background**
+
+- <ApiLink name="LV_PART_MAIN" /> The main part of the List that uses the
+  [typical background style properties](/common-widget-features/styles/overview).
+- <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar. See [base widget](/widgets/base_widget)
+  documentation for details.
+
+**Buttons and Text**
+
+- See the [Button](/widgets/button)'s and [Label](/widgets/label)'s documentation.
+
+## Usage
+
+### Buttons
+
+<ApiLink name="lv_list_add_button" display="lv_list_add_button(list, icon, text)" /> adds a full-width button with an icon
+(that can be an image or symbol) and text.  This function returns a pointer to the
+button created, which you can use to, for example, add an event call-back.
+
+The text is scrolled horizontally if it is longer than the button.
+
+### Text
+
+<ApiLink name="lv_list_add_text" display="lv_list_add_text(list, text)" /> adds a text string.  This function returns a
+pointer to the label created, which you can use to, for example, change its text
+with one of the `lv_label_set_text...()` functions.
+
+## Events
+
+No special events are sent by List Widgets, but events can be sent by Buttons as usual.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Keys
+
+No *Keys* are processed by List Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Keys](/main-modules/indev/keypad).
+</Callout>
+
+## Examples
+
+### Simple List
+
+<LvglExample name="lv_example_list_1" path="widgets/list/lv_example_list_1" />
+
+### Sorting a List using up and down buttons
+
+<LvglExample name="lv_example_list_2" path="widgets/list/lv_example_list_2" />
+
+## API

@@ -1,0 +1,11 @@
+{
+  "title": "Chip Vendor Support",
+  "pages": [
+    "alif",
+    "arm",
+    "espressif",
+    "nxp",
+    "renesas",
+    "stm32"
+  ]
+}

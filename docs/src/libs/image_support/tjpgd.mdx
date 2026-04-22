@@ -1,0 +1,52 @@
+---
+title: Tiny JPEG Decoder
+description: "Tiny JPEG Decompressor is an LVGL interface to the TJpgDec library --- a generic JPEG image decompressor module that highly optimized for small embedded systems. It works with very low memory consu..."
+---
+
+**Tiny JPEG Decompressor** is an LVGL interface to the TJpgDec library --- a generic
+JPEG image decompressor module that highly optimized for small embedded systems.  It
+works with very low memory consumption, so that it can be incorporated into tiny
+microcontrollers, such as AVR, 8051, PIC, Z80, Cortex-M0, etc..
+
+For a detailed introduction, see: [TJpgDec](https://elm-chan.org/fsw/tjpgd/).
+
+## Overview
+
+Features and restrictions:
+
+- JPEG is decoded in 8x8 tiles.
+- Only baseline JPEG files are supported (no progressive JPEG support).
+- Read from file and C array are implemented.
+- Only the required portions of the JPEG images are decoded,
+  therefore they cannot be zoomed or rotated.
+
+## Usage
+
+Set <ApiLink name="LV_USE_TJPGD" /> to `1` in `lv_conf.h`.  LVGL will register a new
+image decoder automatically so JPEG files can be used directly as image sources.
+
+For example:
+
+```c
+lv_image_set_src(my_img, "S:path/to/picture.jpg");
+```
+
+<Callout type="info">
+A file system driver needs to be registered to open images from files.  To do so,
+follow the instructions in [File System (lv_fs_drv)](/main-modules/fs).
+</Callout>
+
+## Converter
+
+### Converting JPEG to C array
+
+- Use lvgl online tool https://lvgl.io/tools/imageconverter
+- Color format = RAW, output format = C Array
+
+## Example
+
+### Load a JPG image
+
+<LvglExample name="lv_example_tjpgd_1" path="libs/tjpgd/lv_example_tjpgd_1" />
+
+## API

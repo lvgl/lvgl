@@ -1,0 +1,51 @@
+---
+title: Using Images
+description: "The simplest way to use an image in LVGL is to display it with an Image (lv_image) Widget:"
+---
+
+The simplest way to use an image in LVGL is to display it with an
+[Image (lv_image)](/widgets/image) Widget:
+
+```c
+lv_obj_t * icon = lv_image_create(lv_screen_active());
+
+/* From variable */
+lv_image_set_src(icon, &my_img_dsc);
+
+/* From file */
+lv_image_set_src(icon, "S:my_icon.bin");
+
+/* From Unicode string */
+lv_image_set_src(icon, LV_SYMBOL_BATTERY_FULL);
+```
+
+If the image was converted to a variable with the [online](/main-modules/images/adding_images)
+or [offline converter](/main-modules/images/adding_images), you should use
+<ApiLink name="LV_IMAGE_DECLARE" display="LV_IMAGE_DECLARE(my_img_dsc)" /> to declare the image in the file where
+you want to use it.
+
+## Examples
+
+### Image from variable and symbol
+
+<LvglExample name="lv_example_image_1" path="widgets/image/lv_example_image_1" />
+
+### Image recoloring
+
+<LvglExample name="lv_example_image_2" path="widgets/image/lv_example_image_2" />
+
+### Rotate and zoom
+
+<LvglExample name="lv_example_image_3" path="widgets/image/lv_example_image_3" />
+
+### Image offset and styling
+
+<LvglExample name="lv_example_image_4" path="widgets/image/lv_example_image_4" />
+
+### Open a BMP image from file
+
+<LvglExample name="lv_example_bmp_1" path="libs/bmp/lv_example_bmp_1" />
+
+### Open a PNG image from file and variable
+
+<LvglExample name="lv_example_libpng_1" path="libs/libpng/lv_example_libpng_1" />

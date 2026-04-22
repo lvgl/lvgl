@@ -1,0 +1,8 @@
+{
+  "title": "Yocto",
+  "pages": [
+    "core_components",
+    "lvgl_recipe",
+    "terms_and_variables"
+  ]
+}
