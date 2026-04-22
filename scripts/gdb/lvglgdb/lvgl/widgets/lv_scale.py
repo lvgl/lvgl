@@ -6,7 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
-from ._helpers import safe_string, safe_wrapper
+from ._helpers import ptr_or_none, safe_wrapper
 
 
 class LVScale(LVObject):
@@ -23,7 +23,7 @@ class LVScale(LVObject):
 
     @property
     def txt_src(self):
-        return safe_string(self._wv, "txt_src")
+        return ptr_or_none(self._wv.safe_field("txt_src"))
 
     @property
     def mode(self):

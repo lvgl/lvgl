@@ -6,7 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
-from ._helpers import ptr_or_none, safe_string
+from ._helpers import ptr_or_none
 
 
 class LVButtonmatrix(LVObject):
@@ -19,7 +19,7 @@ class LVButtonmatrix(LVObject):
     @property
     def map_p(self):
         """Pointer to the current map"""
-        return safe_string(self._wv, "map_p")
+        return ptr_or_none(self._wv.safe_field("map_p"))
 
     @property
     def button_areas(self):
