@@ -116,6 +116,11 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv
 static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
 {
     LV_ASSERT_NULL(font);
+
+    if(g_dsc->entry == NULL) {
+        return;
+    }
+
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     lv_cache_release(dsc->cache_node->draw_data_cache, g_dsc->entry, NULL);
     g_dsc->entry = NULL;
