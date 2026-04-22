@@ -197,6 +197,26 @@ lv_dir_t lv_event_get_two_fingers_swipe_dir(lv_event_t * gesture_event)
     return recognizer->two_fingers_swipe_dir;
 }
 
+bool lv_event_get_gesture_center_point(lv_event_t * gesture_event, lv_indev_gesture_type_t type,
+                                       lv_point_t * point)
+{
+    lv_indev_gesture_recognizer_t * recognizer;
+    if((recognizer = lv_indev_get_gesture_recognizer(gesture_event, type)) == NULL) {
+        return false;
+    }
+
+    if(lv_indev_recognizer_is_active(recognizer) == false) {
+        point->x = 0;
+        point->y = 0;
+        return false;
+    }
+
+    point->x = recognizer->info->center.x;
+    point->y = recognizer->info->center.y;
+
+    return true;
+}
+
 void lv_indev_get_gesture_center_point(lv_indev_gesture_recognizer_t * recognizer, lv_point_t * point)
 {
     if(lv_indev_recognizer_is_active(recognizer) == false) {
