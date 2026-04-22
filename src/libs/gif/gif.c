@@ -246,8 +246,11 @@ static int GIFInit(GIFIMAGE *pGIF)
     if (!GIFParseInfo(pGIF, 1)) // gather info for the first frame
        return 0; // something went wrong; not a GIF file?
     (*pGIF->pfnSeek)(&pGIF->GIFFile, 0); // seek back to start of the file
-    if (pGIF->iCanvasWidth > MAX_WIDTH || pGIF->iCanvasHeight > 32767) { // too big or corrupt
-        pGIF->iError = GIF_TOO_WIDE;
+    if (pGIF->iCanvasWidth > MAX_WIDTH || pGIF->iCanvasHeight > MAX_HEIGHT) { // too big or corrupt
+        pGIF->iError = GIF_TOO_LARGE;
+        LV_LOG_ERROR("GIF canvas %dx%d exceeds the maximum allowed size of %dx%d. "
+                     "Increase LV_GIF_MAX_WIDTH or LV_GIF_MAX_HEIGHT in lv_conf.h to fix this.",
+                     pGIF->iCanvasWidth, pGIF->iCanvasHeight, MAX_WIDTH, MAX_HEIGHT);
         return 0;
     }
   return 1;

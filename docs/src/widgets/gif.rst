@@ -92,6 +92,28 @@ RGB565 has a pixel size of 2, RGB888 has a pixel size of 3, and
 ARGB8888 has a pixel size of 4.
 
 
+Maximum GIF Size
+================
+
+By default, LVGL will accept GIF images up to 32768 × 32768 pixels.
+If you want to restrict GIFs maximum size to save memory on
+resource-constrained devices, you can configure the limits in ``lv_conf.h``:
+
+.. code-block:: c
+
+    #define LV_GIF_MAX_WIDTH 32768   // Maximum GIF width in pixels
+    #define LV_GIF_MAX_HEIGHT 32768  // Maximum GIF height in pixels
+
+If a GIF exceeds either limit, it will be rejected with a ``GIF_TOO_LARGE`` error.
+
+For example, on microcontroller systems with limited RAM, you might reduce these values:
+
+.. code-block:: c
+
+    #define LV_GIF_MAX_WIDTH 480      // Limit to 480px width
+    #define LV_GIF_MAX_HEIGHT 320     // Limit to 320px height
+
+
 
 Events
 ******
