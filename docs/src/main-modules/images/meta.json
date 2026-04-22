@@ -1,0 +1,12 @@
+{
+  "title": "Images",
+  "pages": [
+    "overview",
+    "sources",
+    "color_formats",
+    "adding_images",
+    "using_images",
+    "decoders",
+    "caching"
+  ]
+}

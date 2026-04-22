@@ -1,0 +1,39 @@
+---
+title: Image font
+description: Draw image in label or span obj with lv_imgfont. This is often used to display Unicode emoji icons in text.
+---
+
+Draw image in **label** or **span** obj with <ApiLink name="lv_imgfont" />. This is often used to
+display Unicode emoji icons in text.
+
+Supported image formats: determined by enabled LVGL [image decoders](/main-modules/images/decoders).
+
+## Usage
+
+Enable <ApiLink name="LV_USE_IMGFONT" /> in `lv_conf.h`.
+
+To create a new *imgfont*:
+
+```c
+static lv_font_t  * imgfont;
+...
+imgfont = lv_imgfont_create(height, path_cb, user_data);
+```
+
+- `height` Font size.
+- `path_cb` A function to get the image path of a character.
+  Pass `NULL` if no image should be shown, but the character itself.
+- `user_data` Pointer to user data.
+
+To use the *imgfont* in a label, reference it:
+<ApiLink name="lv_obj_set_style_text_font" display="lv_obj_set_style_text_font(label, imgfont, LV_PART_MAIN)" />
+
+To destroy the *imgfont* that is no longer used, use <ApiLink name="lv_imgfont_destroy" display="lv_imgfont_destroy(imgfont)" />.
+
+## Example
+
+### Use emojis in a text.
+
+<LvglExample name="lv_example_imgfont_1" path="others/imgfont/lv_example_imgfont_1" />
+
+## API

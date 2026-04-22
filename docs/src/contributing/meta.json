@@ -1,0 +1,12 @@
+{
+  "title": "Contributing",
+  "pages": [
+    "introduction",
+    "ways_to_contribute",
+    "writing_docs",
+    "pull_requests",
+    "dco",
+    "coding_style",
+    "assertions"
+  ]
+}

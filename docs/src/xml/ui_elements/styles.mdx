@@ -1,0 +1,161 @@
+---
+title: Styles
+description: "In XML files, both style sheets (lv_style_t) and local styles can be used."
+---
+
+## Overview
+
+In XML files, both style sheets (<ApiLink name="lv_style_t" />) and local styles can be used.
+
+## Style Sheets
+
+In the `<styles>` section, styles and their properties can be defined like this:
+
+```xml
+<style name="red"
+    help="What is this style about?"
+    border_width="2px"
+    border_color="0xff0000"/>
+```
+
+Styles can be referenced like this in the `<view>`:
+
+```xml
+<view>
+    <lv_slider value="20">
+         <style name="main"/>
+         <style name="red" selector="knob"/>
+         <style name="blue" selector="knob|focused"/>
+    </lv_slider>
+</view>
+```
+
+As shown in the example, parts and states can be set using `selector`.
+
+## Style Binding
+
+Instead of directly adding styles to the UI elements it's also possible to add them conditionally
+when a [Subject](/main-modules/observer/observer)'s value equals to a reference value.
+
+It works at runtime and it's a great way to check the appearace or event the layout based on a condition.
+
+A typical use case is the light/dark theme switching. It requires
+
+- a subject such as `dark_theme_on`
+- some default style that are added normally with the `<style>` tag
+- some dark styles to check the required colors to dark
+
+Here is an example:
+
+```xml
+<component>
+   <styles>
+       <style name="style_base" bg_color="0xeee" text_color="0x111" radius="20" />
+       <style name="style_dark" bg_color="0x333" text_color="0xeee" radius="20" />
+   </styles>
+
+   <view extends="lv_button">
+        <style name="style_base" />
+        <bind_style name="style_dark" subject="dark_theme_on" ref_value="1"/>
+        <lv_label text="Apply"/>
+   </view>
+</component>
+```
+
+## Local Styles
+
+Local styles can be used directly, for example:
+
+```xml
+<lv_label style_bg_opa="200" style_bg_color="0x123456"/>
+```
+
+Selectors are also supported for local style properties:
+
+```xml
+<lv_slider style_bg_opa-indicator-pressed="200"/>
+```
+
+## Local Style Binding
+
+Instead of setting local style properties directly, it's also possible to bind style properties
+to [Subject](/main-modules/observer/observer) values:
+
+```xml
+<component>
+   <view extends="lv_slider">
+        <bind_style_prop prop="bg_opa" selector="knob|pressed" subject="slider_knob_opa" />
+   </view>
+</component>
+```
+
+## Gradients
+
+Before the `<styles>` tag, the `<gradients>` tag can be used to describe various
+gradients, which can later be referenced in styles.
+
+When a gradient is created, it can be referenced by its name, like:
+
+```xml
+<style bg_grad="grad1"/>
+```
+
+or
+
+```xml
+<lv_button style_bg_grad="grad1"/>
+```
+
+Note that gradients are not supported in LVGL's UI Editor yet.
+
+### Horizontal or Vertical Gradient
+
+To define a simple `<horizontal>` or `<vertical>` gradient:
+
+```xml
+<gradients>
+    <horizontal name="grad1">
+        <stop color="#ff0000" offset="20%" opa="40%"/>
+        <stop color="#00ff00" offset="128" opa="100%"/>
+    </horizontal>
+</gradients>
+```
+
+### Linear Gradient
+
+To define a skewed gradient from two points:
+
+```xml
+<gradients>
+    <linear name="grad1" start="50 50" end="100 80">
+        <stop color="#ff0000" offset="20%" opa="100%"/>
+        <stop color="#00ff00" offset="240" opa="100%"/>
+    </linear>
+</gradients>
+```
+
+### Radial Gradient
+
+To define a radial gradient:
+
+```xml
+<gradients>
+    <radial name="grad1" center="100 50%" edge="200 50" focal_center="50 80%" focal_edge="55 80%">
+        <stop color="#ff0000" opa="100%"/>
+        <stop color="#00ff00" opa="100%"/>
+    </radial>
+</gradients>
+```
+
+### Conical Gradient
+
+To define a conical gradient:
+
+```xml
+<gradients>
+    <conical name="grad1" center="80 50%" angle="45 270">
+        <stop color="#ff0000" opa="100%"/>
+        <stop color="#00ff00" opa="100%"/>
+    </conical>
+</gradients>
+```

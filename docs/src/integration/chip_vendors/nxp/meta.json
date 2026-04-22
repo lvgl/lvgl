@@ -1,0 +1,10 @@
+{
+  "title": "NXP",
+  "pages": [
+    "overview",
+    "elcdif",
+    "pxp_gpu",
+    "vg_lite_gpu",
+    "g2d_gpu"
+  ]
+}

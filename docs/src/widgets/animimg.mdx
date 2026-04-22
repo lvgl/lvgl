@@ -1,0 +1,63 @@
+---
+title: "Animation Image (lv_animimg)"
+description: "The animation image is similar to the normal 'Image' Widget. The only difference is that instead of one source image, you set an array of multiple source images that supply \"frames\" in an animation."
+---
+
+## Overview
+
+The animation image is similar to the normal 'Image' Widget. The only
+difference is that instead of one source image, you set an array of
+multiple source images that supply "frames" in an animation.
+
+You can specify a duration and repeat count.
+
+## Parts and Styles
+
+- <ApiLink name="LV_PART_MAIN" /> A background rectangle that uses the [typical
+   background style properties](/common-widget-features/styles/overview) and the image itself using the image
+   style properties.
+
+## Usage
+
+### Image sources
+
+To set the image animation image sources, use
+<ApiLink name="lv_animimg_set_src" display="lv_animimg_set_src(animimg, dsc[], num)" />.
+
+To set the images source for flip playback of animation image, use
+<ApiLink name="lv_animimg_set_src_reverse" display="lv_animimg_set_src_reverse(animimg, dsc[], num)" />.
+
+### Using the inner animation
+
+For more advanced use cases, the animation used internally by the image can be
+retrieved using <ApiLink name="lv_animimg_get_anim" display="lv_animimg_get_anim(animimg)" />.  Using this, you can
+use the [Animation](/main-modules/animation) functions, for example, to
+override the animation values using the
+<ApiLink name="lv_anim_set_values" display="lv_anim_set_values(anim, start, end)" /> or to set a callback
+on the animation completed event.
+
+## Events
+
+No special events are sent by Animation-Image Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Keys
+
+No *Keys* are processed by Animation-Image Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Keys](/main-modules/indev/keypad).
+</Callout>
+
+## Example
+
+### Simple Animation Image
+
+<LvglExample name="lv_example_animimg_1" path="widgets/animimg/lv_example_animimg_1" />
+
+## API

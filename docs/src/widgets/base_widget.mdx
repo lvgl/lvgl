@@ -1,0 +1,53 @@
+---
+title: "Base Widget (lv_obj)"
+description: "The most fundamental of all widgets is the Base Widget, on which all other widgets are based. From an object-oriented perspective, think of the Base Widget as the widget class from which all other ..."
+---
+
+The most fundamental of all widgets is the Base Widget, on which all other widgets
+are based. From an object-oriented perspective, think of the Base Widget as the
+widget class from which all other widgets inherit.
+
+By this mechanism, all widgets carry the features of the Base Widget. Therefore, the
+functions and functionalities of the Base Widget can be used with other widgets as
+well. For example: <ApiLink name="lv_obj_set_width" display="lv_obj_set_width(slider, 100)" />.
+
+Although it's just a simple rectangle, the Base Widget is the most powerful widget,
+as it supports all the features that other widgets can use.
+
+The Base Widget can have:
+
+- [Children](/common-widget-features/tree)
+- [Position and Size](/common-widget-features/coordinates)
+- [Layouts](/common-widget-features/layouts)
+- [Styles](/common-widget-features/styles)
+- [Events](/common-widget-features/events)
+- [Data bindings](/main-modules/observer)
+- [Flags](/common-widget-features/flags)
+- [Parts and States](/common-widget-features/parts_and_states)
+- And many more
+
+A Slider widget, for example, uses these features to realize slider-like behavior,
+but it’s all based on the same style, event, layout, and other concepts supported by
+the Base Widget.
+
+All these common and versatile features are introduced in the
+[Common Widget Features](/common-widget-features) chapter.
+
+In HTML terms, think of it as a `<div>`, a very versatile building block that,
+with some CSS and JS, can become almost anything.
+
+## Examples
+
+### Base objects with custom styles
+
+<LvglExample name="lv_example_obj_1" path="widgets/obj/lv_example_obj_1" />
+
+### Make an object draggable
+
+<LvglExample name="lv_example_obj_2" path="widgets/obj/lv_example_obj_2" />
+
+### Transform object using a 3x3 matrix
+
+<LvglExample name="lv_example_obj_3" path="widgets/obj/lv_example_obj_3" />
+
+## API

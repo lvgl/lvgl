@@ -1,0 +1,78 @@
+---
+title: "RT-Thread RTOS"
+description: "RT-Thread is an open source, neutral, and community-based real-time operating system (RTOS). RT-Thread has Standard version and Nano version."
+---
+
+### What is RT-Thread?
+
+[RT-Thread](https://www.rt-thread.io/) is an [open
+source](https://github.com/RT-Thread/rt-thread), neutral, and
+community-based real-time operating system (RTOS). RT-Thread has
+**Standard version** and **Nano version**. For resource-constrained
+microcontroller (MCU) systems, the Nano version that requires only 3 KB
+Flash and 1.2 KB RAM memory resources can be tailored with easy-to-use
+tools. For resource-rich IoT devices, RT-Thread can use the **online
+software package** management tool, together with system configuration
+tools, to achieve intuitive and rapid modular cutting, seamlessly import
+rich software packages; thus, achieving complex functions like Android's
+graphical interface and touch sliding effects, smart voice interaction
+effects, and so on.
+
+##### Key features
+
+- Designed for resource-constrained devices, the minimum kernel
+   requires only 1.2KB of RAM and 3 KB of Flash.
+- A variety of standard interfaces, such as POSIX, CMSIS, C++
+   application environment.
+- Has rich components and a prosperous and fast growing [package ecosystem](https://packages.rt-thread.org/en/)
+- Elegant code style, easy to use, read and master.
+- High Scalability. RT-Thread has high-quality scalable software
+   architecture, loose coupling, modularity, is easy to tailor and
+   expand.
+- Supports high-performance applications.
+- Supports all mainstream compiling tools such as GCC, Keil and IAR.
+- Supports a wide range of [architectures and chips](https://www.rt-thread.io/board.html)
+
+### How to run LVGL on RT-Thread?
+
+[中文文档](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/packages-manual/lvgl-docs/introduction)
+
+LVGL has registered as a
+[softwarepackage](https://packages.rt-thread.org/en/detail.html?package=LVGL)
+of RT-Thread. By using
+[Env tool](https://www.rt-thread.io/download.html?download=Env) or
+[RT-Thread Studio IDE](https://www.rt-thread.io/download.html?download=Studio),
+RT-Thread users can easily download LVGL source code and combine with
+RT-Thread project.
+
+RT-Thread community has port LVGL to several Board-Support Packages (BSPs):
+
+| BSP | BSP |
+| --- | --- |
+| QEMU simulator | Renesas ra6m3-ek |
+| Visual Studio simulator | Renesas ra6m4-cpk |
+| Nuvoton numaker-iot-m487 | Renesas ra6m3-hmi |
+| Nuvoton numaker-pfm-m487 | Renesas ra8d1-ek |
+| Nuvoton nk-980iot | Renesas ra8m1-ek |
+| Nuvoton numaker-m2354 | STM32F407 explorer |
+| Nuvoton nk-n9h30 | STM32F407 RT-Spark |
+| Nuvoton numaker-m032ki | STM32F469 Discovery |
+| Nuvoton numaker-hmi-ma35d1 | STM32H750 ART-Pi |
+| Nuvoton numaker-iot-m467 | STM32H787 Discovery |
+| Nuvoton numaker-m467hj | STM32L475 pandora |
+| Infineon psoc6-evaluationkit-062S2 | NXP imxrt1060-evk |
+| Raspberry PICO | NXP LPC55S69 |
+
+##### Tutorials
+
+- Introduce about RT-Thread and how to run LVGL on RT-Thread in simulators
+- How to import a BSP project with latest code into RT-Thread Studio
+- How to Use LVGL with RT-Thread Studio in STM32F469 Discovery Board
+- RT-Thread Youtube Channel
+- RT-Thread documentation center
+
+https://www.youtube.com/watch?v=k7QYk6hSwnc
+
+https://www.youtube.com/watch?v=fREPLuh-h8k
+
+https://www.youtube.com/watch?v=O_QA99BxnOE

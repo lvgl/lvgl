@@ -1,0 +1,85 @@
+---
+title: "Checkbox (lv_checkbox)"
+description: "The Checkbox Widget is created from a \"tick box\" and a label. When the Checkbox is clicked the tick box is toggled."
+---
+
+## Overview
+
+The Checkbox Widget is created from a "tick box" and a label. When the
+Checkbox is clicked the tick box is toggled.
+
+## Parts and Styles
+
+- <ApiLink name="LV_PART_MAIN" /> Background of Checkbox and it uses
+   the text and the [typical background style properties](/common-widget-features/styles/overview).
+   `pad_column` adjusts spacing between tickbox and label
+- <ApiLink name="LV_PART_INDICATOR" /> The "tick box" is a square that uses the
+   [typical background style properties](/common-widget-features/styles/overview).  By default, its
+   size is equal to the height of the main part's font. Padding properties make the
+   tick box larger in the respective directions.
+
+The Checkbox is added to the default group (if one is set).
+
+## Usage
+
+### Text
+
+The text can be modified with
+<ApiLink name="lv_checkbox_set_text" display="lv_checkbox_set_text(cb, &quot;New text&quot;)" /> and will be
+dynamically allocated.
+
+To set static text, use <ApiLink name="lv_checkbox_set_text_static" display="lv_checkbox_set_text_static(cb, txt)" />. This
+way, only a pointer to `txt` will be stored. The provided text buffer must remain
+available for the lifetime of the Checkbox.
+
+### Check, uncheck, disable
+
+You can programmatically check, un-check, and disable the Checkbox by using the
+common state add/clear function:
+
+```c
+lv_obj_add_state(cb, LV_STATE_CHECKED);    /* Make Checkbox checked */
+lv_obj_remove_state(cb, LV_STATE_CHECKED); /* Make Checkbox unchecked */
+lv_obj_add_state(cb, LV_STATE_CHECKED);    /* Make Checkbox checked */
+lv_obj_add_state(cb, LV_STATE_DISABLED);   /* Make Checkbox disabled */
+```
+
+To find out whether the Checkbox is checked use
+<ApiLink name="lv_obj_has_state" display="lv_obj_has_state(cb, LV_STATE_CHECKED)" />.
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when Checkbox is toggled.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Keys
+
+The following *Keys* are processed by Checkbox:
+
+- `LV_KEY_RIGHT/UP` Go to CHECKED state if Checkbox is enabled
+- `LV_KEY_LEFT/DOWN` Go to non-CHECKED state if Checkbox is enabled
+- <ApiLink name="LV_KEY_ENTER" /> Clicks the Checkbox and toggles its value.
+
+Note that, as usual, the state of <ApiLink name="LV_KEY_ENTER" /> is translated to
+`LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Keys](/main-modules/indev/keypad).
+</Callout>
+
+## Examples
+
+### Simple Checkboxes
+
+<LvglExample name="lv_example_checkbox_1" path="widgets/checkbox/lv_example_checkbox_1" />
+
+### Checkboxes as radio buttons
+
+<LvglExample name="lv_example_checkbox_2" path="widgets/checkbox/lv_example_checkbox_2" />
+
+## API

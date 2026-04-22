@@ -52,8 +52,8 @@ emmake make -j$(nproc)
 rm -rf CMakeFiles
 cd ..
 if [ "$ARG_1" != "--symlink" ]; then
-  cp -a cmbuild ../docs/src/_static/built_lv_examples
+  cp -a cmbuild ../docs/built_lv_examples
 else
-  cp -a cmbuild lvgl/docs/src/_static/built_lv_examples
+  cp -a cmbuild lvgl/docs/built_lv_examples
 fi
 cd ..

@@ -1,0 +1,15 @@
+{
+  "title": "LVGL Pro and XML",
+  "pages": [
+    "intro",
+    "learn_by_examples",
+    "editor",
+    "xml",
+    "integration",
+    "ui_elements",
+    "assets",
+    "features",
+    "tools",
+    "best_practices"
+  ]
+}
