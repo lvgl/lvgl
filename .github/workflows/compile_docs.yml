@@ -68,7 +68,7 @@ jobs:
       # Parses the source code and generates XML files from the documentation
       - name: Generate Doxygen XML
         run: |
-            cd docs/doxygen
+            cd docs
             doxygen
 
       # Tool used to convert Doxygen XML to .mdx API pages
@@ -82,12 +82,13 @@ jobs:
         if: ${{ github.event_name == 'push' (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
         run: |
             npx doxymark \
-               --input docs/doxygen/doxygen/xml
+               --input docs/doxygen/xml
                --output docs/api
                --index docs/api-index.json
                --preset fumadocs 
                --auto-group
-               --source-url https://github.com/lvgl/lvgl/tree/$COMMIT_HASH/src 
+               --source-url https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src
+            rm -rf docs/doxygen
 
       - name: Install Example Documentation
         run: npm i @lvgl/examples-generator
