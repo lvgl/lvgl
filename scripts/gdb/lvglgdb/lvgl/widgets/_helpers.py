@@ -8,19 +8,28 @@ from lvglgdb.lvgl.data_utils import ptr_or_none  # noqa: F401
 
 
 def safe_string(obj, field_name):
-    """Read a char* field as string, or None."""
+    """Read a char* field as string or corrupted marker. Never returns None."""
+    from lvglgdb.value import CorruptedValue
     val = obj.safe_field(field_name)
-    if val is None or not getattr(val, 'is_ok', True) or not int(val):
-        return None
-    return val.string(fallback=None)
+    if val is None:
+        return str(CorruptedValue(0, ValueError("field not found")))
+    if not getattr(val, 'is_ok', True):
+        return str(val)
+    addr = int(val)
+    if not addr:
+        return str(CorruptedValue(0, ValueError("NULL pointer")))
+    return val.string(fallback=str(CorruptedValue(addr, MemoryError("unreadable"))))
 
 
 def safe_color(obj, field_name):
-    """Read lv_color_t as hex string."""
+    """Read lv_color_t {red, green, blue} as hex string."""
     val = obj.safe_field(field_name)
     if val is None or not getattr(val, 'is_ok', True):
         return None
-    return f"#{int(val):06x}"
+    r = int(val.safe_field("red", 0))
+    g = int(val.safe_field("green", 0))
+    b = int(val.safe_field("blue", 0))
+    return f"#{r:02x}{g:02x}{b:02x}"
 
 
 def safe_area(obj, field_name):
