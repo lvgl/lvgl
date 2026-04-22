@@ -1,0 +1,10 @@
+{
+  "title": "Integration",
+  "pages": [
+    "c_code",
+    "xml",
+    "renesas-dev-tools",
+    "arduino",
+    "zephyr"
+  ]
+}

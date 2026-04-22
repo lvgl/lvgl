@@ -1,0 +1,99 @@
+---
+title: "GIF (lv_gif)"
+---
+
+<br />
+
+<hr />
+
+The GIF Widget internally uses the
+[AnimatedGIF](https://github.com/bitbank2/AnimatedGIF/tree/master)
+GIF Decoder library, enabling you to use GIF images in your LVGL UI.
+
+## Parts and Styles
+
+- <ApiLink name="LV_PART_MAIN" /> A background rectangle that uses the [typical
+  background style properties](/common-widget-features/styles/overview).
+
+## Usage
+
+Once enabled in `lv_conf.h` by setting <ApiLink name="LV_USE_GIF" /> to `1`,
+<ApiLink name="lv_gif_create" display="lv_gif_create(parent)" /> can be used to create a GIF Widget.
+
+Set the color format of the GIF framebuffer with <ApiLink name="lv_gif_set_color_format" display="lv_gif_set_color_format(widget, color_format)" />.
+Use <ApiLink name="LV_COLOR_FORMAT_ARGB8888" /> for gifs with transparency.
+It is set to <ApiLink name="LV_COLOR_FORMAT_ARGB8888" /> by default.
+Significant RAM can be saved by using a smaller color format.
+A color format conversion can be saved during rendering if the color format matches the display
+color format.
+This function can be called before <ApiLink name="lv_gif_set_src" /> to prevent the initial default ARGB8888
+framebuffer from being allocated.
+
+The supported color formats are:
+
+- <ApiLink name="LV_COLOR_FORMAT_RGB565" />
+- <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED" />
+- <ApiLink name="LV_COLOR_FORMAT_RGB888" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />
+
+<ApiLink name="lv_gif_set_src" display="lv_gif_set_src(widget, src)" /> works very similarly to <ApiLink name="lv_image_set_src" />.
+As source, it also accepts images as variables (<ApiLink name="lv_image_dsc_t" />) or files.
+
+### Converting GIF Files to C Arrays
+
+Converting GIF files to an array of bytes is not supported in the online image
+converter since LVGL v9.0.  However, there is still a way to do it through the
+`./scripts/LVGLImage.py` Python script.  This command line:
+
+```bash
+python  ./scripts/LVGLImage.py  --cf RAW  --ofmt C  -o .  --name my_gif_image_array  input.gif
+```
+
+will produce all the bytes from the `input.gif` in unaltered form in a C array,
+ready to use in this code:
+
+```c
+LV_IMAGE_DECLARE(my_gif_image_array);
+lv_obj_t * img;
+
+img = lv_gif_create(lv_screen_active());
+lv_gif_set_color_format(img, LV_COLOR_FORMAT_ARGB8888);
+lv_gif_set_src(img, &my_gif_image_array);
+```
+
+### Using GIF Images from Files
+
+Example:
+
+```c
+lv_gif_set_src(widget, "S:path/to/example.gif");
+```
+
+Note that, a file system driver needs to be registered to open images
+from files.  To do so, follow the instructions in [File System (lv_fs_drv)](/main-modules/fs).
+
+## Memory Requirements
+
+To decode and display a GIF animation ~25 kB of RAM is needed plus
+(color format pixel size + 1) × image width × image height.
+RGB565 has a pixel size of 2, RGB888 has a pixel size of 3, and
+ARGB8888 has a pixel size of 4.
+
+## Events
+
+- <ApiLink name="LV_EVENT_READY" /> is emitted when the GIF animation has completed
+  rendering its last frame.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Example
+
+### Open a GIF image from file and variable
+
+<LvglExample name="lv_example_gif_1" path="libs/gif/lv_example_gif_1" />
+
+## API

@@ -1,0 +1,22 @@
+---
+title: Inactivity Measurement
+description: "A user's inactivity time is measured and stored with each lv_display_t object. Every use of an Input Device counts as activity."
+---
+
+A user's inactivity time is measured and stored with each `lv_display_t` object.
+Every use of an [Input Device](/main-modules/indev) counts as activity. To get time elapsed since the last
+activity, use <ApiLink name="lv_display_get_inactive_time" display="lv_display_get_inactive_time(display1)" />. If `NULL` is
+passed, the lowest inactivity time among all displays will be returned (in this case
+NULL does *not* mean the [Default Display](/main-modules/display/setup)).
+
+You can manually trigger an activity using
+<ApiLink name="lv_display_trigger_activity" display="lv_display_trigger_activity(display1)" />.  If `display1` is `NULL`, the
+[Default Display](/main-modules/display/setup) will be used (**not all displays**).
+
+<Callout type="info" title="Further Reading">
+- [lv_port_disp_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c)
+  for a template for your own driver.
+- [Drawing](/main-modules/draw) to learn more about how rendering works in LVGL.
+</Callout>
+
+## API
