@@ -73,13 +73,13 @@ jobs:
 
       # Tool used to convert Doxygen XML to .mdx API pages
       - name: Install doxymark 
-        if: ${{ github.event_name == 'push' (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
+        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
         run: |
           npm install github:mutahharmkhan/doxymark
 
       # Generate Documentation API pages 
       - name: Generate API pages
-        if: ${{ github.event_name == 'push' (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
+        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
         run: |
             npx doxymark \
                --input docs/doxygen/xml
@@ -132,133 +132,6 @@ jobs:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs  # The folder the action should deploy.
           target-folder: latest # needs to match what is inside `docs/version_list.json`
-          git-config-name: lvgl-bot
-          git-config-email: lvgl-bot@users.noreply.github.com
-          commit: true
-name: Build docs
-on:
-  pull_request:
-    paths:
-      # '**/lv*.h' is not included for pull requests because files in this path
-      # cannot break the doc build, and the purpose of having the docs build for
-      # pull requests is to catch when something breaks the build.  No input files
-      # in that path have the capacity to break the doc build.
-      - 'docs/**'
-      - 'examples/**'
-      - 'demos/**'
-      - 'configs/ci/docs/**'
-      - 'scripts/build_html_examples.sh'
-      - 'scripts/find_version.sh'
-  push:
-    branches:
-      - master
-      - 'release/*'
-    paths:
-      - 'docs/**'
-      - 'src/**/lv*.h'
-      - 'examples/**'
-      - 'demos/**'
-      - 'configs/ci/docs/**'
-      - 'scripts/build_html_examples.sh'
-      - 'scripts/find_version.sh'
-      - 'lv_conf_template.h'
-      - 'lv_version.h'
-      - 'lvgl.h'
-
-# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
-# Ensure that only one commit will be running tests at a time on each PR
-concurrency:
-  group: ${{ github.ref }}-${{ github.workflow }}
-  cancel-in-progress: true
-
-env:
-  EM_VERSION: 2.0.4
-  EM_CACHE_FOLDER: 'emsdk-cache'
-jobs:
-  build-and-deploy:
-    if: github.repository == 'lvgl/lvgl'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.12'
-      - name: Cache Python packages
-        uses: actions/cache@v5
-        with:
-          # Cache the Python package environment, excluding pip and setuptools installed by setup-python
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}/bin/*
-            ${{ env.pythonLocation }}/include
-            ${{ env.pythonLocation }}/lib/python*/site-packages/*
-            !${{ env.pythonLocation }}/bin/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-          key: ${{ env.pythonLocation }}-${{ hashFiles('docs/requirements.txt') }}
-      - name: Install Doxygen
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends doxygen
-          # Remember these for possible future use.
-          # texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
-      - name: Install Requirements
-        run: |
-          pip install -r docs/requirements.txt
-      - name: Setup Emscripten cache
-        id: cache-system-libraries
-        uses: actions/cache@v5
-        with:
-          path: ${{env.EM_CACHE_FOLDER}}
-          key: ${{env.EM_VERSION}}-${{ runner.os }}
-      - uses: mymindstorm/setup-emsdk@v14
-        with:
-          version: ${{env.EM_VERSION}}
-          actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
-      - name: ccache
-        uses: hendrikmuhs/ccache-action@v1
-      - name: Build examples (with cache)
-        run: |
-          # Grab the current name in case the LVGL folder is not called lvgl
-          # as it could be the case if this is running from a fork
-          LVGL_FOLDER=$(pwd)
-          # Move to the parent folder to fetch emscripten port.
-          cd ..
-          ./lvgl/scripts/build_html_examples.sh --symlink $LVGL_FOLDER
-      - name: Build docs
-        run: docs/build.py html
-      - name: Remove .doctrees
-        run: rm -rf docs/build/html/.doctrees
-      - name: Retrieve version
-        run: |
-          echo "VERSION_NAME=$(scripts/find_version.sh)" >> "$GITHUB_OUTPUT"
-        id: version
-      - name: Deploy to subfolder
-        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
-        uses: JamesIves/github-pages-deploy-action@v4.8.0
-        with:
-          token: ${{ secrets.LVGL_BOT_TOKEN }}
-          repository-name: lvgl/docs
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs/build/html  # The folder the action should deploy.
-          target-folder: ${{ steps.version.outputs.VERSION_NAME }}
-          git-config-name: lvgl-bot
-          git-config-email: lvgl-bot@users.noreply.github.com
-          single-commit: true
-      - name: Deploy to master
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@v4.8.0
-        with:
-          token: ${{ secrets.LVGL_BOT_TOKEN }}
-          repository-name: lvgl/docs
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs/build/html  # The folder the action should deploy.
-          target-folder: master
           git-config-name: lvgl-bot
           git-config-email: lvgl-bot@users.noreply.github.com
           commit: true
