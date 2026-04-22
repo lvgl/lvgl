@@ -657,6 +657,9 @@ static void draw_buf_free(const lv_draw_buf_handlers_t * handlers, void * buf)
 
 /**
  * For given width, height, color format, and stride, calculate the size needed for a new draw buffer.
+ * The result is rounded up to LV_DRAW_BUF_ALIGN so the allocated buffer length is a multiple of the
+ * alignment boundary (required, for example, by the ESP32 PPA whose config structure wants the full
+ * allocation size rather than the bytes actually in use).
  */
 static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
@@ -673,7 +676,7 @@ static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format
         size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
     }
 
-    return size;
+    return LV_ROUND_UP(size, LV_DRAW_BUF_ALIGN);
 }
 
 static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * full_area)
