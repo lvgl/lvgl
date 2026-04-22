@@ -2337,6 +2337,7 @@ class Canvas2DRenderer {
   hlAddr = null;
   dirty = !0;
   rafId = null;
+  showLabels = !1;
   projected = [];
   constructor(canvas, cam) {
     this.canvas = canvas, this.ctx = canvas.getContext("2d"), this.cam = cam, this.startLoop();
@@ -2438,7 +2439,13 @@ class Canvas2DRenderer {
       ctx.beginPath(), ctx.moveTo(q[0][0], q[0][1]);
       for (let i = 1;i < 4; i++)
         ctx.lineTo(q[i][0], q[i][1]);
-      ctx.closePath(), ctx.fillStyle = isHl ? "rgba(137, 180, 250, 0.25)" : "rgba(137, 180, 250, 0.06)", ctx.fill(), ctx.strokeStyle = isHl ? "rgba(137, 180, 250, 0.9)" : l.borderColor, ctx.lineWidth = isHl ? 2 : 1, ctx.stroke();
+      if (ctx.closePath(), ctx.fillStyle = isHl ? "rgba(137, 180, 250, 0.25)" : "rgba(137, 180, 250, 0.06)", ctx.fill(), ctx.strokeStyle = isHl ? "rgba(137, 180, 250, 0.9)" : l.borderColor, ctx.lineWidth = isHl ? 2 : 1, ctx.stroke(), this.showLabels && l.label) {
+        let ax = (q[1][0] - q[0][0] + (q[2][0] - q[3][0])) / 2, ay = (q[1][1] - q[0][1] + (q[2][1] - q[3][1])) / 2, bx = (q[3][0] - q[0][0] + (q[2][0] - q[1][0])) / 2, by = (q[3][1] - q[0][1] + (q[2][1] - q[1][1])) / 2, qw = Math.hypot(ax, ay), qh = Math.hypot(bx, by);
+        if (qw > 30) {
+          let ox = (q[0][0] + q[1][0] + q[2][0] + q[3][0]) / 4, oy = (q[0][1] + q[1][1] + q[2][1] + q[3][1]) / 4;
+          ctx.save(), ctx.transform(ax / qw, ay / qw, bx / qh, by / qh, ox, oy), ctx.font = "bold 10px system-ui", ctx.textAlign = "center", ctx.textBaseline = "middle", ctx.fillStyle = isHl ? "#89b4fa" : l.borderColor, ctx.fillText(l.label, 0, 0, qw * 0.9), ctx.restore();
+        }
+      }
     });
   }
   startLoop() {
@@ -2481,7 +2488,8 @@ function flattenLayers(trees) {
         child_count: obj.child_count || 0,
         style_count: obj.style_count || 0,
         screenIdx: idx,
-        hidden
+        hidden,
+        summary: widgetSummary(obj.class_name, obj.widget_data)
       }), maxLocal = Math.max(maxLocal, ld), obj.children?.forEach((ch) => walk(ch, ld + 1, hidden));
     }
     walk(s, 0, !1), screenMaxLocal[idx] = maxLocal, globalOffset += maxLocal + C.SCREEN_GAP;
@@ -2529,8 +2537,8 @@ function build3DScene(container, trees, displays, dispObjs) {
     }, btn;
   }, controls = el("div", "scene-controls"), toggle3d = makeToggle("3D", !0), toggleBorders = makeToggle("Borders", !0), bufToggles = [], toggleOrtho = makeToggle("Ortho", !1);
   controls.append(toggle3d, toggleBorders);
-  let toggleHidden = makeToggle("Hidden", !1);
-  controls.appendChild(toggleHidden), bufImages.forEach((bi) => {
+  let toggleHidden = makeToggle("Hidden", !1), toggleLabels = makeToggle("Props", !1);
+  controls.appendChild(toggleHidden), controls.appendChild(toggleLabels), bufImages.forEach((bi) => {
     let btn = makeToggle(bi.label, !0), thumb = (() => {
       let _e = document.createElement("img");
       return _e.setAttribute("draggable", "false"), _e.setAttribute("style", "height:1.2em;border-radius:2px;vertical-align:middle;image-rendering:pixelated"), _e;
@@ -2637,6 +2645,7 @@ function build3DScene(container, trees, displays, dispObjs) {
     borderColor: resolveCSSColor(DEPTH_COLORS[l.depth % DEPTH_COLORS.length]),
     addr: l.addr,
     info: l.class_name + "@" + (l.addr || "?") + " [" + l.x1 + "," + l.y1 + "," + l.x2 + "," + l.y2 + "] children=" + l.child_count + " styles=" + l.style_count,
+    label: l.summary ? l.class_name + " " + l.summary : l.class_name,
     screenIdx: l.screenIdx,
     visible: !0
   })), sceneBufs = bufImages.map((bi) => ({ img: bi.img, depth: 0, visible: !0 }));
@@ -2741,7 +2750,9 @@ function build3DScene(container, trees, displays, dispObjs) {
   }), toggleOrtho.addEventListener("click", () => {
     let ortho = toggleOrtho.dataset.on === "1";
     animateTo({ persp: ortho ? 0 : 1 });
-  }), toggleBorders.addEventListener("click", () => updateVisibility()), toggleHidden.addEventListener("click", () => updateVisibility()), bufToggles.forEach((btn) => btn.addEventListener("click", () => updateVisibility()));
+  }), toggleBorders.addEventListener("click", () => updateVisibility()), toggleHidden.addEventListener("click", () => updateVisibility()), toggleLabels.addEventListener("click", () => {
+    renderer.showLabels = toggleLabels.dataset.on === "1", renderer.markDirty();
+  }), bufToggles.forEach((btn) => btn.addEventListener("click", () => updateVisibility()));
   let dragging = !1, lastX = 0, lastY = 0;
   viewport.onmousedown = (e) => {
     if (inScreensaver)
@@ -2911,7 +2922,7 @@ function build3DScene(container, trees, displays, dispObjs) {
     btn.dataset.on = on ? "1" : "0", btn.classList.toggle("active", on);
   };
   return resetBtn.onclick = () => {
-    is3d = !0, setToggle(toggle3d, !0), setToggle(toggleBorders, !0), setToggle(toggleOrtho, !1), setToggle(toggleHidden, !1), bufToggles.forEach((btn) => setToggle(btn, !0)), screenNames.forEach((name, i) => {
+    is3d = !0, setToggle(toggle3d, !0), setToggle(toggleBorders, !0), setToggle(toggleOrtho, !1), setToggle(toggleHidden, !1), setToggle(toggleLabels, !1), renderer.showLabels = !1, bufToggles.forEach((btn) => setToggle(btn, !0)), screenNames.forEach((name, i) => {
       layerVisible[i] = name === "act_scr" || screenNames.length === 1;
     }), layerBtns.forEach((b, i) => b.classList.toggle("active", layerVisible[i])), spreadSlider.disabled = !1, focusedAddr = null, updateDepthSliderRange(), updateVisibility();
     let visMax = Number(depthMaxSlider.max);
@@ -3275,7 +3286,7 @@ class UiDashboard extends BaseComponent {
 customElements.define("ui-dashboard", UiDashboard);
 
 // src/app.ts
-document.getElementById("about").innerHTML = `<span>uinspy v${"0.5.0"}</span><span>·</span><span>Built ${"2026-04-21 20:05 GMT+8"}</span><span>·</span><span>${"2fc5ea6"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
+document.getElementById("about").innerHTML = `<span>uinspy v${"0.5.0"}</span><span>·</span><span>Built ${"2026-04-21 23:45 GMT+8"}</span><span>·</span><span>${"4b05eb0"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
 </script>
 </body>
 </html>
