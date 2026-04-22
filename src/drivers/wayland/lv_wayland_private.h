@@ -55,11 +55,10 @@ typedef struct {
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_touch_data_t touches[LV_WAYLAND_MAX_TOUCHES];
     uint8_t event_cnt;
-    uint8_t primary_id;
-#else
+#endif /*LV_USE_GESTURE_RECOGNITION*/
+    int32_t primary_id;
     lv_point_t point;
     lv_indev_state_t state;
-#endif /*LV_USE_GESTURE_RECOGNITION*/
 } lv_wl_seat_touch_t;
 
 typedef struct {
