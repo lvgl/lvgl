@@ -13,7 +13,7 @@ class LVButton(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_button_t", ptr=True)
+        self._wv = self.cast("lv_button_t", ptr=True) or self
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -14,7 +14,7 @@ class LVScale(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_scale_t", ptr=True)
+        self._wv = self.cast("lv_scale_t", ptr=True) or self
 
     @property
     def section_ll(self):

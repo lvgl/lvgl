@@ -190,36 +190,44 @@ def _find_structs(text: str):
 
 
 def parse_widgets() -> dict[str, WidgetDef]:
-    widgets = {}
+    # Pass 1: collect all structs with parent type
+    candidates = []
     for private_h in sorted(WIDGETS_DIR.glob("*/lv_*_private.h")):
         text = private_h.read_text()
         widget_dir = private_h.parent.name
-
         for raw_name, body in _find_structs(text):
             struct_name = f"lv_{raw_name}_t"
-
             first_line = ""
             for line in body.splitlines():
                 line = line.strip()
                 if line and not line.startswith(("/*", "//", "*", "#")):
                     first_line = line.rstrip(";").strip()
                     break
-
             parent_match = re.match(r"(lv_\w+_t)\s+\w+", first_line)
-            if not parent_match:
-                continue
+            if parent_match:
+                candidates.append((struct_name, parent_match.group(1), body, widget_dir))
 
-            parent_type = parent_match.group(1)
-            if parent_type == "lv_obj_t" or parent_type in widgets or parent_type in (
-                "lv_bar_t", "lv_image_t", "lv_arc_t", "lv_textarea_t", "lv_buttonmatrix_t",
-            ):
-                all_fields = parse_struct_fields(body)
-                widgets[struct_name] = WidgetDef(
-                    struct_name=struct_name, c_type=struct_name,
-                    parent_type=parent_type,
-                    fields=all_fields[1:] if all_fields else [],
-                    widget_dir=widget_dir,
-                )
+    # Pass 2: resolve inheritance from lv_obj_t (order-independent)
+    widget_types = {"lv_obj_t"}
+    changed = True
+    while changed:
+        changed = False
+        for name, parent, _, _ in candidates:
+            if name not in widget_types and parent in widget_types:
+                widget_types.add(name)
+                changed = True
+
+    # Pass 3: build WidgetDef for discovered widgets
+    widgets = {}
+    for struct_name, parent_type, body, widget_dir in candidates:
+        if struct_name in widget_types and struct_name != "lv_obj_t":
+            all_fields = parse_struct_fields(body)
+            widgets[struct_name] = WidgetDef(
+                struct_name=struct_name, c_type=struct_name,
+                parent_type=parent_type,
+                fields=all_fields[1:] if all_fields else [],
+                widget_dir=widget_dir,
+            )
     return widgets
 
 
@@ -284,16 +292,16 @@ from lvglgdb.lvgl.data_utils import ptr_or_none  # noqa: F401
 
 
 def safe_string(obj, field_name):
-    """Read a char* field as string or corrupted marker. Never returns None."""
+    """Read a char* field as string, corrupted marker, or None (NULL/missing)."""
     from lvglgdb.value import CorruptedValue
     val = obj.safe_field(field_name)
     if val is None:
-        return str(CorruptedValue(0, ValueError("field not found")))
+        return None
     if not getattr(val, 'is_ok', True):
         return str(val)
     addr = int(val)
     if not addr:
-        return str(CorruptedValue(0, ValueError("NULL pointer")))
+        return None
     return val.string(fallback=str(CorruptedValue(addr, MemoryError("unreadable"))))
 
 
@@ -396,7 +404,7 @@ def gen_widget_file(wdef: WidgetDef, widgets: dict[str, WidgetDef]) -> str:
     lines.append("")
     lines.append(f"    def __init__(self, obj):")
     lines.append(f"        super().__init__(obj)")
-    lines.append(f'        self._wv = self.cast("{wdef.c_type}", ptr=True)')
+    lines.append(f'        self._wv = self.cast("{wdef.c_type}", ptr=True) or self')
     lines.append("")
 
     # Properties

@@ -8,16 +8,16 @@ from lvglgdb.lvgl.data_utils import ptr_or_none  # noqa: F401
 
 
 def safe_string(obj, field_name):
-    """Read a char* field as string or corrupted marker. Never returns None."""
+    """Read a char* field as string, corrupted marker, or None (NULL/missing)."""
     from lvglgdb.value import CorruptedValue
     val = obj.safe_field(field_name)
     if val is None:
-        return str(CorruptedValue(0, ValueError("field not found")))
+        return None
     if not getattr(val, 'is_ok', True):
         return str(val)
     addr = int(val)
     if not addr:
-        return str(CorruptedValue(0, ValueError("NULL pointer")))
+        return None
     return val.string(fallback=str(CorruptedValue(addr, MemoryError("unreadable"))))
 
 

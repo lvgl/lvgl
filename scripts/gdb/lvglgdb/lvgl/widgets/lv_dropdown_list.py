@@ -14,7 +14,7 @@ class LVDropdownList(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_dropdown_list_t", ptr=True)
+        self._wv = self.cast("lv_dropdown_list_t", ptr=True) or self
 
     @property
     def dropdown(self):
