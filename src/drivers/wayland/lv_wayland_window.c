@@ -189,12 +189,18 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
     if(!window) {
         return;
     }
-    if(window->maximized != maximized) {
-        lv_wayland_xdg_set_maximized(&window->xdg, maximized);
-    }
-
-    window->maximized = maximized;
+    lv_wayland_xdg_set_maximized(&window->xdg, maximized);
 }
+
+bool lv_wayland_window_is_maximized(lv_display_t * disp)
+{
+    lv_wl_window_t * window = lv_display_get_driver_data(disp);
+    if(!window) {
+        return false;
+    }
+    return window->maximized;
+}
+
 void lv_wayland_window_set_minimized(lv_display_t * disp)
 {
     lv_wl_window_t * window = lv_display_get_driver_data(disp);
@@ -247,12 +253,16 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
     if(!window) {
         return;
     }
-
-    if(window->fullscreen == fullscreen) {
-        return;
-    }
     lv_wayland_xdg_set_fullscreen(&window->xdg, fullscreen, window->physical_output);
-    window->fullscreen = fullscreen;
+}
+
+bool lv_wayland_window_is_fullscreen(lv_display_t * disp)
+{
+    lv_wl_window_t * window = lv_display_get_driver_data(disp);
+    if(!window) {
+        return false;
+    }
+    return window->fullscreen;
 }
 
 /**********************
