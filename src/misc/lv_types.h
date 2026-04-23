@@ -16,15 +16,15 @@
  * @endcode
  */
 #ifndef LV_DEPRECATED
-#if defined(PYCPARSER)
-    #define LV_DEPRECATED(msg)
-#elif defined(__GNUC__) || defined(__clang__)
-    #define LV_DEPRECATED(msg) __attribute__((deprecated(msg)))
-#elif defined(_MSC_VER)
-    #define LV_DEPRECATED(msg) __declspec(deprecated(msg))
-#else
-    #define LV_DEPRECATED(msg)
-#endif
+    #if defined(PYCPARSER)
+        #define LV_DEPRECATED(msg)
+    #elif defined(__GNUC__) || defined(__clang__)
+        #define LV_DEPRECATED(msg) __attribute__((deprecated(msg)))
+    #elif defined(_MSC_VER)
+        #define LV_DEPRECATED(msg) __declspec(deprecated(msg))
+    #else
+        #define LV_DEPRECATED(msg)
+    #endif
 #endif /* LV_DEPRECATED not defined */
 
 /**
@@ -42,16 +42,16 @@
  * @endcode
  */
 #if defined(PYCPARSER)
-    #define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
+#define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
 #elif defined(__GNUC__) || defined(__clang__)
-    #define LV_DEPRECATED_MACRO_WARN(msg) \
-        do { \
-            typedef int __attribute__((deprecated(msg))) __lv_deprecated_t; \
-            __lv_deprecated_t __lv_deprecated_dummy; \
-            (void)__lv_deprecated_dummy; \
-        } while(0)
+#define LV_DEPRECATED_MACRO_WARN(msg) \
+    do { \
+        typedef int __attribute__((deprecated(msg))) __lv_deprecated_t; \
+        __lv_deprecated_t __lv_deprecated_dummy; \
+        (void)__lv_deprecated_dummy; \
+    } while(0)
 #else
-    /* Fallback: no warning, but the macro still compiles */
-    #define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
+/* Fallback: no warning, but the macro still compiles */
+#define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
 #endif
 

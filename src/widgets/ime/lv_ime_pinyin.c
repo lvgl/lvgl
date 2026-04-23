@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_ime_pinyin_private.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../core/lv_obj_class_private.h"
 #if LV_USE_IME_PINYIN != 0
 
@@ -425,10 +426,10 @@ lv_obj_t * lv_ime_pinyin_create(lv_obj_t * parent)
 void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
 {
     if(kb) {
-        LV_ASSERT_OBJ(kb, &lv_keyboard_class);
+        LV_CHECK_OBJ(kb, &lv_keyboard_class, true, return);
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
     pinyin_ime->kb = kb;
@@ -440,17 +441,17 @@ void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
 
 void lv_ime_pinyin_set_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     init_pinyin_dict(obj, dict);
 }
 
 void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    LV_ASSERT_OBJ(pinyin_ime->kb, &lv_keyboard_class);
+    LV_CHECK_OBJ(pinyin_ime->kb, &lv_keyboard_class, true, return);
 
     pinyin_ime->mode = mode;
 
@@ -470,7 +471,7 @@ void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode)
 
 lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
@@ -479,7 +480,7 @@ lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj)
 
 lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
@@ -488,7 +489,7 @@ lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj)
 
 const lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
