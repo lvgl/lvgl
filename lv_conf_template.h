@@ -527,6 +527,17 @@
  * Requires LV_USE_CHECK_ARG to be enabled. */
 #define LV_CHECK_ARG_ASSERT_ON_FAIL 0
 
+/** If enabled, LV_CHECK_OBJ will also verify that the object has the expected class.
+ * When disabled the class check is skipped even if the class argument is supplied.
+ * Requires LV_USE_CHECK_ARG to be enabled. */
+#define LV_USE_CHECK_OBJ_CLASSTYPE 1
+
+/** If enabled, LV_CHECK_OBJ will also verify that the object is still part of the
+ * widget tree (lv_obj_is_valid). When disabled the validity check is skipped even
+ * if the associated argument is supplied.
+ * Requires LV_USE_CHECK_ARG to be enabled. */
+#define LV_USE_CHECK_OBJ_VALIDITY 1
+
 /*-------------
  * Debug
  *-----------*/

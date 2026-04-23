@@ -43,7 +43,7 @@ extern "C" {
 
 #if LV_USE_CHECK_ARG
 
-#if LV_CHECK_ARG_ASSERT_ON_FAIL
+#if LV_CHECK_ARG_ASSERT_ON_FAIL == 1
 
 /**
  * Internal macro: checks a condition, logs a warning, calls the assert handler,

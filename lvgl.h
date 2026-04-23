@@ -37,6 +37,7 @@ extern "C" {
 #include "src/misc/lv_circle_buf.h"
 #include "src/misc/lv_tree.h"
 #include "src/misc/lv_check_arg.h"
+#include "src/misc/lv_check_obj.h"
 
 #include "src/osal/lv_os.h"
 
