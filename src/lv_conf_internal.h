@@ -4383,6 +4383,26 @@
             #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
         #endif
     #endif
+
+
+    #ifndef LV_USE_LINUX_DRM_PRIMARY_PRIORITY
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_LINUX_DRM_PRIMARY_PRIORITY
+                #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY CONFIG_LV_USE_LINUX_DRM_PRIMARY_PRIORITY
+            #else
+                #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 0
+            #endif
+        #else
+            #define LV_USE_LINUX_DRM_PRIMARY_PRIORITY 1
+        #endif
+    #endif
+    #ifndef LV_USE_LINUX_DRM_OVERLAY_PRIORITY
+        #ifdef CONFIG_LV_USE_LINUX_DRM_OVERLAY_PRIORITY
+            #define LV_USE_LINUX_DRM_OVERLAY_PRIORITY CONFIG_LV_USE_LINUX_DRM_OVERLAY_PRIORITY
+        #else
+            #define LV_USE_LINUX_DRM_OVERLAY_PRIORITY (!LV_USE_LINUX_DRM_PRIMARY_PRIORITY)
+        #endif
+    #endif
 #endif
 
 /** Interface for TFT_eSPI */
