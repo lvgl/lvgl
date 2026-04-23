@@ -86,7 +86,7 @@ extern "C" {
  * Usage:
  *   LV_CHECK_OBJ(obj, return false)                         // NULL check only
  *   LV_CHECK_OBJ(obj, &lv_label_class, return false)        // NULL + class check
- *   LV_CHECK_OBJ(obj, &lv_label_class, ext, return false)   // NULL + class + in_tree check
+ *   LV_CHECK_OBJ(obj, &lv_label_class, true, return false)  // NULL + class + in_tree check
  */
 #define LV_CHECK_OBJ(obj, ...) \
     __LV_CHECK_OBJ_PICK_(__VA_ARGS__, __LV_CHECK_OBJ_3, __LV_CHECK_OBJ_2, __LV_CHECK_OBJ_1, ~)(obj, __VA_ARGS__)

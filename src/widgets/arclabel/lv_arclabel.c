@@ -16,6 +16,7 @@
 #include "../../core/lv_obj_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../misc/lv_text_private.h"
 
 #if LV_USE_FLOAT
@@ -101,7 +102,7 @@ lv_obj_t * lv_arclabel_create(lv_obj_t * parent)
 
 void lv_arclabel_set_text(lv_obj_t * obj, const char * text)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arclabel = (lv_arclabel_t *)obj;
 
     /*If text is NULL then just refresh with the current text*/
@@ -137,7 +138,7 @@ void lv_arclabel_set_text(lv_obj_t * obj, const char * text)
 
 void lv_arclabel_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     LV_ASSERT_NULL(fmt);
 
     lv_arclabel_t * arclabel = (lv_arclabel_t *)obj;
@@ -164,7 +165,7 @@ void lv_arclabel_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 
 void lv_arclabel_set_text_static(lv_obj_t * obj, const char * text)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arclabel = (lv_arclabel_t *)obj;
 
     if(arclabel->static_txt == 0 && arclabel->text != NULL) {
@@ -182,7 +183,7 @@ void lv_arclabel_set_text_static(lv_obj_t * obj, const char * text)
 
 void lv_arclabel_set_angle_start(lv_obj_t * obj, lv_value_precise_t start)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->angle_start = start;
@@ -191,7 +192,7 @@ void lv_arclabel_set_angle_start(lv_obj_t * obj, lv_value_precise_t start)
 
 void lv_arclabel_set_angle_size(lv_obj_t * obj, lv_value_precise_t size)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->angle_size = size;
@@ -200,7 +201,7 @@ void lv_arclabel_set_angle_size(lv_obj_t * obj, lv_value_precise_t size)
 
 void lv_arclabel_set_offset(lv_obj_t * obj, int32_t offset)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->offset = offset;
@@ -209,7 +210,7 @@ void lv_arclabel_set_offset(lv_obj_t * obj, int32_t offset)
 
 void lv_arclabel_set_dir(lv_obj_t * obj, lv_arclabel_dir_t dir)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->dir = dir;
@@ -218,7 +219,7 @@ void lv_arclabel_set_dir(lv_obj_t * obj, lv_arclabel_dir_t dir)
 
 void lv_arclabel_set_recolor(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
     arc->recolor = en;
     lv_obj_invalidate(obj);
@@ -226,7 +227,7 @@ void lv_arclabel_set_recolor(lv_obj_t * obj, bool en)
 
 void lv_arclabel_set_radius(lv_obj_t * obj, uint32_t radius)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->radius = radius;
@@ -235,7 +236,7 @@ void lv_arclabel_set_radius(lv_obj_t * obj, uint32_t radius)
 
 void lv_arclabel_set_center_offset_x(lv_obj_t * obj, uint32_t x)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->center_offset.x = x;
@@ -244,7 +245,7 @@ void lv_arclabel_set_center_offset_x(lv_obj_t * obj, uint32_t x)
 
 void lv_arclabel_set_center_offset_y(lv_obj_t * obj, uint32_t y)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->center_offset.y = y;
@@ -253,7 +254,7 @@ void lv_arclabel_set_center_offset_y(lv_obj_t * obj, uint32_t y)
 
 void lv_arclabel_set_text_vertical_align(lv_obj_t * obj, lv_arclabel_text_align_t align)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->text_align_v = align;
@@ -262,7 +263,7 @@ void lv_arclabel_set_text_vertical_align(lv_obj_t * obj, lv_arclabel_text_align_
 
 void lv_arclabel_set_text_horizontal_align(lv_obj_t * obj, lv_arclabel_text_align_t align)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->text_align_h = align;
@@ -271,7 +272,7 @@ void lv_arclabel_set_text_horizontal_align(lv_obj_t * obj, lv_arclabel_text_alig
 
 void lv_arclabel_set_overflow(lv_obj_t * obj, lv_arclabel_overflow_t overflow)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->overflow = overflow;
@@ -280,7 +281,7 @@ void lv_arclabel_set_overflow(lv_obj_t * obj, lv_arclabel_overflow_t overflow)
 
 void lv_arclabel_set_end_overlap(lv_obj_t * obj, bool overlap)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_arclabel_t * arc = (lv_arclabel_t *)obj;
 
     arc->end_overlap = overlap;
@@ -293,74 +294,74 @@ void lv_arclabel_set_end_overlap(lv_obj_t * obj, bool overlap)
 
 lv_value_precise_t lv_arclabel_get_angle_start(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     return ((lv_arclabel_t *) obj)->angle_start;
 }
 
 lv_value_precise_t lv_arclabel_get_angle_size(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_arclabel_t * arclabel = (lv_arclabel_t *)obj;
     return arclabel->angle_size;
 }
 
 lv_arclabel_dir_t lv_arclabel_get_dir(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     return ((lv_arclabel_t *) obj)->dir;
 }
 
 bool lv_arclabel_get_recolor(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
     return ((lv_arclabel_t *) obj)->recolor;
 }
 
 uint32_t lv_arclabel_get_radius(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     return ((lv_arclabel_t *) obj)->radius;
 }
 
 uint32_t lv_arclabel_get_center_offset_x(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     return ((lv_arclabel_t *) obj)->center_offset.x;
 }
 
 uint32_t lv_arclabel_get_center_offset_y(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     return ((lv_arclabel_t *) obj)->center_offset.y;
 }
 
 lv_arclabel_text_align_t lv_arclabel_get_text_vertical_align(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     return ((lv_arclabel_t *) obj)->text_align_v;
 }
 
 lv_arclabel_text_align_t lv_arclabel_get_text_horizontal_align(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     return ((lv_arclabel_t *) obj)->text_align_h;
 }
 
 lv_arclabel_overflow_t lv_arclabel_get_overflow(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     return ((lv_arclabel_t *) obj)->overflow;
 }
 
 bool lv_arclabel_get_end_overlap(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
     return ((lv_arclabel_t *) obj)->end_overlap;
 }
 
 lv_value_precise_t lv_arclabel_get_text_angle(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     return arclabel_calc_arc_text_total_angle(obj, NULL, NULL, NULL);
 }

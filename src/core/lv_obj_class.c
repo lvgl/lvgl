@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_class_private.h"
+#include "../misc/lv_check_obj.h"
 #include "lv_obj_private.h"
 #include "../themes/lv_theme.h"
 #include "../display/lv_display.h"
@@ -92,7 +93,7 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     /*Create a normal object*/
     else {
         LV_TRACE_OBJ_CREATE("creating normal object");
-        LV_ASSERT_OBJ(parent, MY_CLASS);
+        LV_CHECK_OBJ(parent, return NULL);
 
         if(!lv_obj_allocate_spec_attr(parent)) {
             lv_free(obj);

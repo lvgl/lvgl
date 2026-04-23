@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_draw_private.h"
+#include "../misc/lv_check_obj.h"
 #include "lv_obj_private.h"
 #include "lv_obj_style.h"
 #include "../display/lv_display.h"
@@ -411,7 +412,7 @@ int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
     LV_PROFILER_DRAW_BEGIN;
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return);
 
     int32_t s_old = lv_obj_get_ext_draw_size(obj);
     int32_t s_new = 0;

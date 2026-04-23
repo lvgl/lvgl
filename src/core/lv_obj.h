@@ -472,14 +472,27 @@ void lv_objid_builtin_destroy(void);
  **********************/
 
 #if LV_USE_ASSERT_OBJ
+/**
+ * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
+ *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
+ *             and executes the supplied action, which is safer in production.
+ */
 #  define LV_ASSERT_OBJ(obj_p, obj_class)                                                               \
     do {                                                                                                \
+        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");            \
         LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
         LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
         LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
     } while(0)
 # else
-#  define LV_ASSERT_OBJ(obj_p, obj_class) LV_ASSERT_NULL(obj_p)
+/**
+ * @deprecated Use `LV_CHECK_OBJ(obj, return)` instead.
+ */
+#  define LV_ASSERT_OBJ(obj_p, obj_class) \
+    do { \
+        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead."); \
+        LV_ASSERT_NULL(obj_p); \
+    } while(0)
 #endif
 
 #if LV_USE_LOG && LV_LOG_TRACE_OBJ_CREATE

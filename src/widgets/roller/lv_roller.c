@@ -15,6 +15,7 @@
 #if LV_USE_ROLLER != 0
 
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../misc/lv_text_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_group.h"
@@ -123,7 +124,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * parent)
 
 void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     LV_ASSERT_NULL(options);
 
     lv_roller_t * roller = (lv_roller_t *)obj;
@@ -185,7 +186,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
 
 void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     /*Set the value even if it's the same as the current value because
      *if moving to the next option with an animation which was just deleted in the PRESS Call the ancestor's event handler
@@ -246,7 +247,7 @@ bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_en
 
 void lv_roller_set_visible_row_count(lv_obj_t * obj, uint32_t row_cnt)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -260,7 +261,7 @@ void lv_roller_set_visible_row_count(lv_obj_t * obj, uint32_t row_cnt)
 
 uint32_t lv_roller_get_selected(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     lv_roller_t * roller = (lv_roller_t *)obj;
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
@@ -274,7 +275,7 @@ uint32_t lv_roller_get_selected(const lv_obj_t * obj)
 
 void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_roller_t * roller = (lv_roller_t *)obj;
     lv_roller_get_option_str(obj, roller->sel_opt_id, buf, buf_size);
@@ -287,14 +288,14 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
  */
 const char * lv_roller_get_options(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
 
     return lv_label_get_text(get_label(obj));
 }
 
 uint32_t lv_roller_get_option_count(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     lv_roller_t * roller = (lv_roller_t *)obj;
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
@@ -326,7 +327,7 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
 lv_result_t lv_roller_get_option_str(const lv_obj_t * obj, uint32_t option, char * buf, uint32_t buf_size)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_RESULT_INVALID);
 
     lv_obj_t * label = get_label(obj);
     uint32_t i;

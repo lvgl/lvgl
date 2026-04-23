@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_lottie_private.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../lv_conf_internal.h"
 #if LV_USE_LOTTIE
 
@@ -153,7 +154,7 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
 
 lv_anim_t * lv_lottie_get_anim(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     return lottie->anim;
 }

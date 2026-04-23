@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../core/lv_obj_class_private.h"
+#include "../../misc/lv_check_obj.h"
 #include "lv_barcode_private.h"
 #include "../../lvgl.h"
 
@@ -63,7 +64,7 @@ lv_obj_t * lv_barcode_create(lv_obj_t * parent)
 
 void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     barcode->dark_color = color;
@@ -71,7 +72,7 @@ void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
 
 void lv_barcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     barcode->light_color = color;
@@ -79,7 +80,7 @@ void lv_barcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 
 void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     if(scale == 0) {
         scale = 1;
@@ -91,7 +92,7 @@ void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale)
 
 void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     barcode->direction = direction;
@@ -99,7 +100,7 @@ void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction)
 
 void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     barcode->tiled = tiled;
@@ -108,7 +109,7 @@ void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled)
 
 void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     barcode->encoding = encoding;
@@ -116,7 +117,7 @@ void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding)
 
 lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_RESULT_INVALID);
     LV_ASSERT_NULL(data);
 
     if(data == NULL || lv_strlen(data) == 0) {
@@ -231,7 +232,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 
 lv_color_t lv_barcode_get_dark_color(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return (lv_color_t){0});
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     return barcode->dark_color;
@@ -239,7 +240,7 @@ lv_color_t lv_barcode_get_dark_color(lv_obj_t * obj)
 
 lv_color_t lv_barcode_get_light_color(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return (lv_color_t){0});
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     return barcode->light_color;
@@ -247,7 +248,7 @@ lv_color_t lv_barcode_get_light_color(lv_obj_t * obj)
 
 uint16_t lv_barcode_get_scale(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     return barcode->scale;
@@ -255,7 +256,7 @@ uint16_t lv_barcode_get_scale(lv_obj_t * obj)
 
 lv_barcode_encoding_t lv_barcode_get_encoding(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     const lv_barcode_t * barcode = (const lv_barcode_t *)obj;
     return barcode->encoding;
