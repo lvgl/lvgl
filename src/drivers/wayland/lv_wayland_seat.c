@@ -16,6 +16,8 @@
  *      DEFINES
  *********************/
 
+#define SEAT_VERSION (5)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -26,6 +28,10 @@
 
 static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum wl_seat_capability caps);
 
+#ifdef WL_SEAT_NAME_SINCE_VERSION
+    static void seat_handle_name(void * data, struct wl_seat * wl_seat, char const * name);
+#endif
+
 static lv_wl_seat_pointer_t * create_pointer(struct wl_seat * wl_seat);
 static void delete_pointer(lv_wl_seat_pointer_t * seat_pointer);
 
@@ -35,6 +41,9 @@ static void delete_pointer(lv_wl_seat_pointer_t * seat_pointer);
 
 static const struct wl_seat_listener seat_listener = {
     .capabilities = seat_handle_capabilities,
+#ifdef WL_SEAT_NAME_SINCE_VERSION
+    .name = seat_handle_name,
+#endif
 };
 
 /**********************
@@ -53,7 +62,7 @@ void lv_wayland_seat_init(lv_wl_seat_t * seat, struct wl_registry * registry, ui
 {
     LV_ASSERT_NULL(seat);
     LV_UNUSED(version);
-    seat->wl_seat = wl_registry_bind(registry, name, &wl_seat_interface, 1);
+    seat->wl_seat = wl_registry_bind(registry, name, &wl_seat_interface, (version < SEAT_VERSION) ? version : SEAT_VERSION);
     wl_seat_add_listener(seat->wl_seat, &seat_listener, seat);
 }
 
@@ -85,6 +94,17 @@ void lv_wayland_update_indevs(lv_indev_read_cb_t read_cb, void * new_driver_data
     }
 }
 
+void lv_wayland_indevs_ready(lv_indev_read_cb_t read_cb)
+{
+    lv_indev_t * indev = NULL;
+    while((indev = lv_indev_get_next(indev))) {
+        if(lv_indev_get_read_cb(indev) != read_cb) {
+            continue;
+        }
+        lv_timer_t * timer = lv_indev_get_read_timer(indev);
+        lv_timer_ready(timer);
+    }
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -140,5 +160,14 @@ static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum
         seat->touch = NULL;
     }
 }
+
+#ifdef WL_SEAT_NAME_SINCE_VERSION
+static void seat_handle_name(void * data, struct wl_seat * wl_seat, char const * name)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(wl_seat);
+    LV_UNUSED(name);
+}
+#endif
 
 #endif /* LV_USE_WAYLAND */

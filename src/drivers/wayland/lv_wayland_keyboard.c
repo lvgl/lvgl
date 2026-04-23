@@ -45,6 +45,10 @@ static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard
 static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint32_t serial, uint32_t time,
                                 uint32_t key, uint32_t state);
 
+#ifdef WL_KEYBOARD_REPEAT_INFO_SINCE_VERSION
+    static void keyboard_handle_repeat_info(void * data, struct wl_keyboard * wl_keyboard, int32_t rate, int32_t delay);
+#endif
+
 static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key);
 
 /**********************
@@ -54,11 +58,14 @@ static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key);
 static struct xkb_context * xkb_context;
 
 static const struct wl_keyboard_listener keyboard_listener = {
-    .keymap    = keyboard_handle_keymap,
-    .enter     = keyboard_handle_enter,
-    .leave     = keyboard_handle_leave,
-    .key       = keyboard_handle_key,
-    .modifiers = keyboard_handle_modifiers,
+    .keymap      = keyboard_handle_keymap,
+    .enter       = keyboard_handle_enter,
+    .leave       = keyboard_handle_leave,
+    .key         = keyboard_handle_key,
+    .modifiers   = keyboard_handle_modifiers,
+#ifdef WL_KEYBOARD_REPEAT_INFO_SINCE_VERSION
+    .repeat_info = keyboard_handle_repeat_info,
+#endif
 };
 
 /**********************
@@ -250,6 +257,17 @@ static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard
 
     xkb_state_update_mask(kbdata->xkb_state, mods_depressed, mods_latched, mods_locked, 0, 0, group);
 }
+
+#ifdef WL_KEYBOARD_REPEAT_INFO_SINCE_VERSION
+static void keyboard_handle_repeat_info(void * data, struct wl_keyboard * wl_keyboard, int32_t rate, int32_t delay)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(wl_keyboard);
+    LV_UNUSED(rate);
+    LV_UNUSED(delay);
+}
+#endif
+
 static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key)
 {
 

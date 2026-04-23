@@ -252,6 +252,7 @@ static void touch_handle_frame(void * data, struct wl_touch * wl_touch)
 {
     LV_UNUSED(wl_touch);
     LV_UNUSED(data);
+    lv_wayland_indevs_ready(touch_read);
 }
 
 static void touch_handle_cancel(void * data, struct wl_touch * wl_touch)
