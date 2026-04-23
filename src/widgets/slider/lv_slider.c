@@ -14,6 +14,7 @@
 #if LV_USE_SLIDER != 0
 
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../core/lv_group.h"
 #include "../../indev/lv_indev.h"
 #include "../../indev/lv_indev_private.h"
@@ -130,7 +131,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent)
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     return slider->dragging;

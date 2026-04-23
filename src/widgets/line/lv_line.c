@@ -11,7 +11,7 @@
 
 
 #if LV_USE_LINE != 0
-#include "../../misc/lv_assert.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_types.h"
 #include "../../draw/lv_draw.h"
@@ -89,7 +89,7 @@ void lv_line_set_points_mutable(lv_obj_t * obj, lv_point_precise_t points[], uin
 
 void lv_line_set_y_invert(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_line_t * line = (lv_line_t *)obj;
     if(line->y_inv == en) return;
@@ -105,7 +105,7 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en)
 
 const lv_point_precise_t * lv_line_get_points(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
 
     lv_line_t * line = (lv_line_t *)obj;
     return line->point_array.constant;
@@ -113,7 +113,7 @@ const lv_point_precise_t * lv_line_get_points(lv_obj_t * obj)
 
 uint32_t lv_line_get_point_count(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     lv_line_t * line = (lv_line_t *)obj;
     return line->point_num;
@@ -121,7 +121,7 @@ uint32_t lv_line_get_point_count(lv_obj_t * obj)
 
 bool lv_line_is_point_array_mutable(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
 
     lv_line_t * line = (lv_line_t *)obj;
     return line->point_array_is_mutable;
@@ -129,7 +129,7 @@ bool lv_line_is_point_array_mutable(lv_obj_t * obj)
 
 lv_point_precise_t * lv_line_get_points_mutable(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
 
     lv_line_t * line = (lv_line_t *)obj;
     if(!line->point_array_is_mutable) {
@@ -141,7 +141,7 @@ lv_point_precise_t * lv_line_get_points_mutable(lv_obj_t * obj)
 
 bool lv_line_get_y_invert(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
 
     lv_line_t * line = (lv_line_t *)obj;
 
@@ -171,7 +171,7 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num, bool mut)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_line_t * line = (lv_line_t *)obj;
     line->point_array.constant = points;

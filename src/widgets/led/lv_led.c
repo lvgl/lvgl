@@ -12,7 +12,7 @@
 
 #if LV_USE_LED
 
-#include "../../misc/lv_assert.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../themes/lv_theme.h"
 #include "../../misc/lv_color.h"
 
@@ -83,7 +83,7 @@ lv_obj_t * lv_led_create(lv_obj_t * parent)
 
 void lv_led_set_color(lv_obj_t * obj, lv_color_t color)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_led_t * led = (lv_led_t *)obj;
     led->color = color;
@@ -92,7 +92,7 @@ void lv_led_set_color(lv_obj_t * obj, lv_color_t color)
 
 void lv_led_set_brightness(lv_obj_t * obj, uint8_t bright)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_led_t * led = (lv_led_t *)obj;
     if(led->bright == bright) return;
@@ -128,7 +128,7 @@ void lv_led_toggle(lv_obj_t * obj)
 
 uint8_t lv_led_get_brightness(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     lv_led_t * led = (lv_led_t *)obj;
     return led->bright;

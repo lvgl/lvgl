@@ -8,7 +8,6 @@
  *********************/
 
 #include "../../../draw/lv_image_decoder_private.h"
-#include "../../lv_assert.h"
 #include "../../../core/lv_global.h"
 
 #include "lv_image_header_cache.h"

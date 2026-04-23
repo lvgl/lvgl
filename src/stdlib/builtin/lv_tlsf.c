@@ -4,8 +4,8 @@
 #include "lv_tlsf_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_log.h"
-#include "../../misc/lv_assert.h"
 #include "../../misc/lv_types.h"
+#include "../../misc/lv_assert.h"
 
 #undef  printf
 #define printf LV_LOG_ERROR

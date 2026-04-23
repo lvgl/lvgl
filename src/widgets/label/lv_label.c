@@ -14,6 +14,7 @@
 #if LV_USE_LABEL != 0
 #include "../../core/lv_obj_private.h"
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../core/lv_group.h"
 #include "../../display/lv_display.h"
 #include "../../draw/lv_draw_private.h"
@@ -130,7 +131,7 @@ lv_obj_t * lv_label_create(lv_obj_t * parent)
 
 void lv_label_set_text(lv_obj_t * obj, const char * text)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     remove_translation_tag(obj);
     set_text_internal(obj, text);
 }
@@ -145,7 +146,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 
 void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     LV_ASSERT_NULL(fmt);
 
     remove_translation_tag(obj);
@@ -172,7 +173,7 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
 
 void lv_label_set_text_static(lv_obj_t * obj, const char * text)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_label_t * label = (lv_label_t *)obj;
 
     remove_translation_tag(obj);
@@ -192,7 +193,7 @@ void lv_label_set_text_static(lv_obj_t * obj, const char * text)
 #if LV_USE_TRANSLATION
 void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_label_t * label = (lv_label_t *)obj;
     if(!tag || tag[0] == '\0') {
         return;
@@ -213,7 +214,7 @@ void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag)
 
 void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -234,7 +235,7 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
 
 void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
 #if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
@@ -248,7 +249,7 @@ void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index)
 
 void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
 #if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
@@ -262,7 +263,7 @@ void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index)
 
 void lv_label_set_recolor(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     lv_label_t * label = (lv_label_t *)obj;
     if(label->recolor == en) return;
@@ -279,21 +280,21 @@ void lv_label_set_recolor(lv_obj_t * obj, bool en)
 
 char * lv_label_get_text(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     lv_label_t * label = (lv_label_t *)obj;
     return label->text;
 }
 
 lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_label_t * label = (lv_label_t *)obj;
     return label->long_mode;
 }
 
 void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     LV_ASSERT_NULL(pos);
 
     lv_label_t * label = (lv_label_t *)obj;
@@ -405,7 +406,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool bidi)
 {
     LV_UNUSED(bidi);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     LV_ASSERT_NULL(pos_in);
     lv_label_t * label = (lv_label_t *)obj;
 
@@ -533,7 +534,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
 
 bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
     LV_ASSERT_NULL(pos);
 
     lv_area_t txt_coords;
@@ -616,7 +617,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 
 uint32_t lv_label_get_text_selection_start(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
 #if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
@@ -629,7 +630,7 @@ uint32_t lv_label_get_text_selection_start(const lv_obj_t * obj)
 
 uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
 #if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
@@ -642,7 +643,7 @@ uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj)
 
 bool lv_label_get_recolor(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
 
     lv_label_t * label = (lv_label_t *)obj;
     return label->recolor == 0 ? false : true;
@@ -688,7 +689,7 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
 
 void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     LV_ASSERT_NULL(txt);
 
     lv_label_t * label = (lv_label_t *)obj;
@@ -714,7 +715,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 
 void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_label_t * label = (lv_label_t *)obj;
 
     /*Cannot append to static text*/

@@ -14,6 +14,7 @@
 #if LV_USE_SPAN != 0
 
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_check_obj.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_bidi_private.h"
 #include "../../core/lv_observer_private.h"
@@ -164,7 +165,7 @@ lv_span_t * lv_spangroup_add_span(lv_obj_t * obj)
         return NULL;
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_span_t * span = lv_ll_ins_tail(&spans->child_ll);
     LV_ASSERT_MALLOC(span);
@@ -184,7 +185,7 @@ void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
         return;
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_span_t * cur_span;
     LV_LL_READ(&spans->child_ll, cur_span) {
@@ -332,7 +333,7 @@ void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char
 
 void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_style_t * style)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     LV_ASSERT_NULL(span);
 
     lv_style_copy(&span->style, style);
@@ -349,7 +350,7 @@ void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align)
 
 void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->overflow == overflow) return;
     if(overflow >= LV_SPAN_OVERFLOW_LAST) return;
@@ -359,7 +360,7 @@ void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
 
 void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->indent == indent) return;
 
@@ -371,7 +372,7 @@ void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent)
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 {
     LV_LOG_WARN("DEPRECATED, set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping");
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
 
     if(mode >= LV_SPAN_MODE_LAST) return;
 
@@ -401,7 +402,7 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 
 void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     spans->lines = lines;
 
@@ -428,7 +429,7 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
         return NULL;
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_ll_t * linked_list = &spans->child_ll;
 
@@ -461,13 +462,13 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
 
 uint32_t lv_spangroup_get_span_count(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     if(obj == NULL) {
         return 0;
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return lv_ll_get_len(&(spans->child_ll));
 }
@@ -479,21 +480,21 @@ lv_text_align_t lv_spangroup_get_align(lv_obj_t * obj)
 
 lv_span_overflow_t lv_spangroup_get_overflow(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->overflow;
 }
 
 int32_t lv_spangroup_get_indent(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->indent;
 }
 
 lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
         return LV_SPAN_MODE_EXPAND;
@@ -511,7 +512,7 @@ lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
 
 int32_t lv_spangroup_get_max_lines(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->lines;
 }
@@ -519,7 +520,7 @@ int32_t lv_spangroup_get_max_lines(lv_obj_t * obj)
 
 int32_t lv_spangroup_get_max_line_height(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     int32_t max_line_h = 0;
@@ -537,7 +538,7 @@ int32_t lv_spangroup_get_max_line_height(lv_obj_t * obj)
 
 uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     if(lv_ll_get_head(&spans->child_ll) == NULL) {
@@ -572,7 +573,7 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width)
 
 int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(lv_ll_get_head(&spans->child_ll) == NULL || width <= 0) {
         return 0;

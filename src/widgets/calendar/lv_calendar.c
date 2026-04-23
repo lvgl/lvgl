@@ -14,6 +14,7 @@
 
 #include "../../misc/lv_assert.h"
 
+#include "../../misc/lv_check_obj.h"
 /*********************
  *      DEFINES
  *********************/
@@ -82,7 +83,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * parent)
 
 void lv_calendar_set_day_names(lv_obj_t * obj, const char * day_names[])
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     uint32_t i;
@@ -94,7 +95,7 @@ void lv_calendar_set_day_names(lv_obj_t * obj, const char * day_names[])
 
 void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, uint32_t day)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     if(calendar->today.year == year && calendar->today.month == month
@@ -109,7 +110,7 @@ void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, u
 
 void lv_calendar_set_today_year(lv_obj_t * obj, uint32_t year)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     lv_calendar_set_today_date(obj, year, calendar->today.month, calendar->today.day);
 
@@ -117,14 +118,14 @@ void lv_calendar_set_today_year(lv_obj_t * obj, uint32_t year)
 
 void lv_calendar_set_today_month(lv_obj_t * obj, uint32_t month)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     lv_calendar_set_today_date(obj, calendar->today.year, month, calendar->today.day);
 }
 
 void lv_calendar_set_today_day(lv_obj_t * obj, uint32_t day)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, day);
 }
@@ -133,7 +134,7 @@ void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highli
 {
     LV_ASSERT_NULL(highlighted);
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     calendar->highlighted_dates     = highlighted;
@@ -144,7 +145,7 @@ void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highli
 
 void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     /*Don't return if the new value is the same, as this function is also
@@ -242,7 +243,7 @@ void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month)
 
 void lv_calendar_set_shown_year(lv_obj_t * obj, uint32_t year)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     lv_calendar_set_month_shown(obj, year, calendar->showed_date.month);
 
@@ -250,7 +251,7 @@ void lv_calendar_set_shown_year(lv_obj_t * obj, uint32_t year)
 
 void lv_calendar_set_shown_month(lv_obj_t * obj, uint32_t month)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     lv_calendar_set_month_shown(obj, calendar->showed_date.year, month);
 }
@@ -261,14 +262,14 @@ void lv_calendar_set_shown_month(lv_obj_t * obj, uint32_t month)
 
 lv_obj_t * lv_calendar_get_btnmatrix(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     const lv_calendar_t * calendar = (lv_calendar_t *)obj;
     return calendar->btnm;
 }
 
 const lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     const lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     return &calendar->today;
@@ -276,7 +277,7 @@ const lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * obj)
 
 const lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     const lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     return &calendar->showed_date;
@@ -284,7 +285,7 @@ const lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * obj)
 
 lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     return calendar->highlighted_dates;
@@ -292,7 +293,7 @@ lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * obj)
 
 size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     return calendar->highlighted_dates_num;
@@ -300,7 +301,7 @@ size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * obj)
 
 lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * date)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_RESULT_INVALID);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     uint32_t d = lv_buttonmatrix_get_selected_button(calendar->btnm);

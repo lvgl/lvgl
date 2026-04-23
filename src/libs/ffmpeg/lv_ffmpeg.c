@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_ffmpeg_private.h"
+#include "../../misc/lv_check_obj.h"
 #if LV_USE_FFMPEG != 0
 #include "../../draw/lv_image_decoder_private.h"
 #include "../../draw/lv_draw_buf_private.h"
@@ -168,7 +169,7 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent)
 
 lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_RESULT_INVALID);
     lv_result_t res = LV_RESULT_INVALID;
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
@@ -232,7 +233,7 @@ failed:
 
 void lv_ffmpeg_player_set_cmd(lv_obj_t * obj, lv_ffmpeg_player_cmd_t cmd)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(!player->ffmpeg_ctx) {
@@ -271,14 +272,14 @@ void lv_ffmpeg_player_set_cmd(lv_obj_t * obj, lv_ffmpeg_player_cmd_t cmd)
 
 void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
     player->auto_restart = en;
 }
 
 void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * name)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
     if(player->decoder_name) {
         lv_free((void *)player->decoder_name);

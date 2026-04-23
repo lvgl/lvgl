@@ -20,6 +20,7 @@
 #include "../display/lv_display_private.h"
 #include "../themes/lv_theme.h"
 #include "../misc/lv_assert.h"
+#include "../misc/lv_check_obj.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_types.h"
@@ -258,7 +259,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
 
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return);
 
     if(lv_obj_has_flag(obj, f)) /*Check if all flags are set*/
         return;
@@ -298,7 +299,7 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
 void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return);
 
     if(!lv_obj_has_flag_any(obj, f))
         return;
@@ -333,7 +334,7 @@ void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
 
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return);
     LV_CHECK_ARG((state & ~LV_STATE_ANY) == 0, return);
 
     lv_state_t new_state = obj->state | state;
@@ -347,7 +348,7 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 
 void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return);
     LV_CHECK_ARG((state & ~LV_STATE_ANY) == 0, return);
 
     lv_state_t new_state = obj->state & (~state);
@@ -367,7 +368,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v)
 
 void lv_obj_set_radio_button(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return);
     obj->radio_button = en;
 }
 
@@ -377,41 +378,41 @@ void lv_obj_set_radio_button(lv_obj_t * obj, bool en)
 
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return false);
 
     return (obj->flags & f)  == f;
 }
 
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return false);
 
     return !!(obj->flags & f);
 }
 
 lv_state_t lv_obj_get_state(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return 0);
 
     return obj->state;
 }
 
 bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return false);
 
     return !!(obj->state & state);
 }
 
 bool lv_obj_is_radio_button(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return false);
     return obj->radio_button;
 }
 
 lv_group_t * lv_obj_get_group(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return NULL);
 
     if(obj->spec_attr) return obj->spec_attr->group_p;
     else return NULL;
@@ -423,7 +424,7 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj)
 
 lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child)
 {
-    LV_ASSERT_OBJ(parent, MY_CLASS);
+    LV_CHECK_OBJ(parent, return LV_RESULT_INVALID);
     LV_CHECK_ARG(child != NULL, return LV_RESULT_INVALID);
 
     uint16_t new_child_cnt = parent->spec_attr->child_cnt + 1;
@@ -442,8 +443,8 @@ lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child)
 
 void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
 {
-    LV_ASSERT_OBJ(parent, MY_CLASS);
-    LV_ASSERT_OBJ(child, MY_CLASS);
+    LV_CHECK_OBJ(parent, return);
+    LV_CHECK_OBJ(child, return);
 
     for(int32_t i = lv_obj_get_index(child); i < (int32_t)parent->spec_attr->child_cnt - 1; i++) {
         parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
@@ -466,7 +467,7 @@ void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
 
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return NULL);
 
     if(obj->spec_attr) {
         return obj->spec_attr;
@@ -1152,7 +1153,7 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 {
     if(obj->state == new_state) return;
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return);
 
     lv_state_t prev_state = obj->state;
 
@@ -1367,7 +1368,7 @@ static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj)
 
 static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_property_t * prop)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return LV_RESULT_INVALID);
 
     if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
@@ -1392,7 +1393,7 @@ static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_prop
 
 static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_property_t * prop)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return LV_RESULT_INVALID);
     if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
         prop->id = id;
