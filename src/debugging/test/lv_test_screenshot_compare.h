@@ -53,7 +53,7 @@ typedef enum {
  **********************/
 
 /**
- * Invalidate and redraw the current screen and compare the its content with a reference PNG image
+ * Invalidate and redraw the current screen and compare its content with a reference PNG image
  * - If the reference image is not found it will be created automatically from the rendered screen.
  * - If the compare fails an `<image_name>_err.png` file will be created with the rendered content next to the reference image.
  *

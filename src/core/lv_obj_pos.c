@@ -1096,7 +1096,7 @@ lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
     if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
 
     /*If there are blurred or drop-shadow parts the whole widget needs to be invalidated
-     *as the these can't be calculated partially. */
+     *as these can't be calculated partially. */
     if(has_blur(obj)) return lv_obj_invalidate(obj);
     else return obj_invalidate_area_internal(disp, obj, area);
 }
