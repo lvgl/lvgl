@@ -15,6 +15,7 @@ on:
       - 'lv_conf_template.h'
       - 'lv_version.h'
       - 'lvgl.h'
+      - '.github/workflows/compile_docs.yml'
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each PR
