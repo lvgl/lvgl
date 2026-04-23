@@ -69,7 +69,7 @@ lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref);
 
 /**
  * Works the same way as `lv_test_screenshot_compare` but it doesn't invalidate and redraw the screen
- * but uses it's current content. (lv_ref_now(NULL) might be called earlier)
+ * but uses its current content. (lv_refr_now(NULL) might be called earlier)
  * @param fn_ref    reference image path
  */
 lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref);
