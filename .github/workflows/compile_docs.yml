@@ -1,5 +1,6 @@
 name: Build Docs
 on:
+  workflow_dispatch: # allow manual triggering
   push:
     branches:
       - master
