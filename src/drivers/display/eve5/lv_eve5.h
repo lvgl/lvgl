@@ -172,6 +172,7 @@ bool lv_eve5_touch_calibrate_hal(EVE_HalContext * phost);
  * @param matrix array of 6 calibration values (A, B, C, D, E, F)
  */
 void lv_eve5_touch_set_calibration(lv_display_t * disp, const int32_t matrix[6]);
+void lv_eve5_touch_set_calibration_hal(EVE_HalContext * phost, const int32_t matrix[6]);
 
 /**
  * Get current touch calibration matrix (save for later restoration).

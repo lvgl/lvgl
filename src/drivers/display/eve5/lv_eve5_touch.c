@@ -229,10 +229,15 @@ bool lv_eve5_touch_calibrate_hal(EVE_HalContext *phost)
 
 void lv_eve5_touch_set_calibration(lv_display_t * disp, const int32_t matrix[6])
 {
-    if(disp == NULL || matrix == NULL) return;
+	if(disp == NULL || matrix == NULL) return;
 
-    EVE_HalContext *phost = lv_eve5_get_hal(disp);
-    if(phost == NULL) return;
+	EVE_HalContext *phost = lv_eve5_get_hal(disp);
+	lv_eve5_touch_set_calibration_hal(phost, matrix);
+}
+
+void lv_eve5_touch_set_calibration_hal(EVE_HalContext * phost, const int32_t matrix[6])
+{
+    if(phost == NULL || matrix == NULL) return;
 
     EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_A, (uint32_t)matrix[0]);
     EVE_Hal_wr32(phost, REG_TOUCH_TRANSFORM_B, (uint32_t)matrix[1]);
@@ -246,7 +251,7 @@ void lv_eve5_touch_set_calibration(lv_display_t * disp, const int32_t matrix[6])
 
 void lv_eve5_touch_get_calibration(lv_display_t * disp, int32_t matrix[6])
 {
-    if(disp == NULL) return;
+    if(disp == NULL || matrix == NULL) return;
 
     EVE_HalContext *phost = lv_eve5_get_hal(disp);
 	return lv_eve5_touch_get_calibration_hal(phost, matrix);
