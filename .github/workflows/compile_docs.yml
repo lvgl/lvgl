@@ -84,8 +84,8 @@ jobs:
         run: |
             npx doxymark \
                --input docs/doxygen/xml \
-               --output docs/api \
-               --index docs/api-index.json \
+               --output docs/src/api \
+               --index docs/src/api-index.json \
                --preset fumadocs \
                --auto-group \
                --source-url https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src 
@@ -104,7 +104,7 @@ jobs:
         run: |
             npx -p @lvgl/examples-generator lvgl-examples-gen \
             --src examples \
-            --out docs/examples
+            --out docs/src/examples
 
       - name: Retrieve version
         id: version
