@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_3dtexture_private.h"
-#include "../../misc/lv_check_obj.h"
+#include "../../lv_public_api.h"
 #if LV_USE_3DTEXTURE
 
 #include "../../core/lv_obj_class_private.h"

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_private.h"
-#include "../misc/lv_check_obj.h"
+#include "../lv_public_api.h"
 #include "lv_obj_class_private.h"
 #include "../indev/lv_indev_private.h"
 #include "../display/lv_display_private.h"
@@ -58,6 +58,7 @@ void lv_obj_delete(lv_obj_t * obj)
     if(obj->is_deleting) return;
 
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);
+    LV_CHECK_OBJ(obj, return);
     lv_obj_invalidate(obj);
 
     lv_obj_t * par = lv_obj_get_parent(obj);

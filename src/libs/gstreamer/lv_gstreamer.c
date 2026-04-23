@@ -9,7 +9,7 @@
 
 #include "lv_gstreamer_internal.h"
 
-#include "../../misc/lv_check_obj.h"
+#include "../../lv_public_api.h"
 #if LV_USE_GSTREAMER
 
 #include <glib.h>

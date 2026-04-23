@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_area_private.h"
-#include "../misc/lv_check_obj.h"
+#include "../lv_public_api.h"
 #include "../layouts/lv_layout_private.h"
 #include "lv_obj_event_private.h"
 #include "lv_obj_draw_private.h"
@@ -1047,7 +1047,7 @@ void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], siz
                                   lv_obj_point_transform_flag_t flags)
 {
     LV_CHECK_OBJ(obj, return);
-    
+
     lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
     bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
     bool recursive = flags & LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE;

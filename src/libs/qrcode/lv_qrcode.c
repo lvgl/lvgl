@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../core/lv_obj_class_private.h"
-#include "../../misc/lv_check_obj.h"
+#include "../../lv_public_api.h"
 #include "lv_qrcode_private.h"
 
 #if LV_USE_QRCODE

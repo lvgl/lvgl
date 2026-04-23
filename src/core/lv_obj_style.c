@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_private.h"
-#include "../misc/lv_check_obj.h"
+#include "../lv_public_api.h"
 #include "../misc/lv_anim_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_class_private.h"

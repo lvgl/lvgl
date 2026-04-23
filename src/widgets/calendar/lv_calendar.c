@@ -14,7 +14,7 @@
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
 
-#include "../../misc/lv_check_obj.h"
+#include "../../lv_public_api.h"
 /*********************
  *      DEFINES
  *********************/

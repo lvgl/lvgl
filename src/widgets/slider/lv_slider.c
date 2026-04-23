@@ -14,7 +14,7 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../misc/lv_check_obj.h"
+#include "../../lv_public_api.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../core/lv_observer_private.h"
 

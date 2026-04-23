@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_menu_private.h"
-#include "../../misc/lv_check_obj.h"
 
 #if LV_USE_MENU
 

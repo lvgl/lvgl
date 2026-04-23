@@ -15,7 +15,7 @@
 #include "lv_obj_class_private.h"
 #include "../indev/lv_indev_private.h"
 #include "../display/lv_display_private.h"
-#include "../misc/lv_check_obj.h"
+#include "../lv_public_api.h"
 #include "lv_obj_draw_private.h"
 
 /*********************

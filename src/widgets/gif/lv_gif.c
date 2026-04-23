@@ -8,7 +8,7 @@
  *********************/
 #include "../../lvgl_public.h"
 
-#include "../../misc/lv_check_obj.h"
+#include "../../lv_public_api.h"
 #if LV_USE_GIF
 #include "../../misc/lv_timer_private.h"
 #include "../../misc/cache/lv_cache.h"
