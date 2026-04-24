@@ -41,8 +41,8 @@ Code must be portable, memory-efficient, and bare-metal safe.
 
 - Prefer graceful degradation over assert for recoverable failures (e.g. cache alloc fail → log + disable, not crash)
 - `LV_LOG_WARN` for unexpected recoverable conditions; `LV_LOG_ERROR` for bugs
-- `LV_ASSERT_NULL` for debug invariants; `LV_CHECK_ARG` for public API runtime argument validation
-- Public API functions should validate arguments at entry with `LV_CHECK_ARG` (unless the API contract explicitly defines caller-side validation); use `LV_ASSERT_OBJ`/`LV_ASSERT_NULL` only for debug-time invariants
+- `LV_ASSERT_NULL` for debug invariants
+- Public API functions should validate arguments at entry with `LV_ASSERT_OBJ`/`LV_ASSERT_NULL`
 
 ## GPU / Draw Units
 
