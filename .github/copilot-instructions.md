@@ -23,7 +23,7 @@ Code must be portable, memory-efficient, and bare-metal safe.
 
 ## Naming & Style
 
-- `lv_<module>_<action>_<subject>` for public API; `_lv_` prefix for internal
+- `lv_<module>_<action>_<subject>` for public API
 - ALL_CAPS for enums/defines; `_t` suffix for typedefs
 - 4 spaces, no tabs; function brace on new line; `if`/`for` brace on same line
 - `<stdint.h>` types; C files use block comments `/* */` only (no `//`), C++ files may use `//`; `"%" LV_PRId32` for format strings
@@ -42,7 +42,6 @@ Code must be portable, memory-efficient, and bare-metal safe.
 - Prefer graceful degradation over assert for recoverable failures (e.g. cache alloc fail → log + disable, not crash)
 - `LV_LOG_WARN` for unexpected recoverable conditions; `LV_LOG_ERROR` for bugs
 - `LV_ASSERT_NULL` for debug invariants
-- Public API functions should validate arguments at entry with `LV_ASSERT_OBJ`/`LV_ASSERT_NULL`
 
 ## GPU / Draw Units
 
@@ -54,7 +53,9 @@ Code must be portable, memory-efficient, and bare-metal safe.
 ## PR Requirements
 
 - Commit: `<type>(<scope>): <subject>` — imperative, lowercase, no period, max 90 chars
-- Types: `fix`, `feat`, `arch`, `perf`, `example`, `docs`, `test`, `chore`
+- Types with source code changes: `fix`, `feat`, `refactor`, `arch`, `perf`, `style`, `test`
+- Types without source code changes: `chore`, `ci`, `docs`, `build`
+- Exception: inline source documentation (Doxygen) uses `docs` even though it lives in source files
 - CI analyzes and reports patch coverage on new coverable lines
 - New features need tests; bug fixes need regression tests when feasible
 - New features and API changes should include examples in `examples/`
