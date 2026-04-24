@@ -1,6 +1,20 @@
-name: Build Docs
+name: Build Docs 
+
 on:
   workflow_dispatch: # allow manual triggering
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - 'examples/**'
+      - 'demos/**'
+      - 'configs/ci/docs/**'
+      - 'scripts/build_html_examples.sh'
+      - 'scripts/find_version.sh'
+      - 'lv_conf_template.h'
+      - 'lv_version.h'
+      - 'lvgl.h'
+      - '.github/workflows/compile_docs.yml'
   push:
     branches:
       - master
@@ -75,13 +89,11 @@ jobs:
 
       # Tool used to convert Doxygen XML to .mdx API pages
       - name: Install doxymark 
-        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
         run: |
           npm install github:mutahharmkhan/doxymark
 
       # Generate Documentation API pages 
       - name: Generate API pages
-        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
         run: |
             npx doxymark \
                --input docs/doxygen/xml \
@@ -101,11 +113,19 @@ jobs:
             npx -p @lvgl/examples-generator lvgl-examples-check-examples --src examples
 
       - name: Generate Example Documentation
-        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
         run: |
             npx -p @lvgl/examples-generator lvgl-examples-gen \
             --src examples \
             --out docs/src/examples
+
+      - name: Install mdx linter
+        run: npm i @lvgl/mdx-lint
+
+      - name: Run mdx linter
+        run: |
+          npx @lvgl/mdx-lint "docs/**/*.{md,mdx}" \
+          --fail-on-warning \
+          --reporter github
 
       - name: Retrieve version
         id: version
