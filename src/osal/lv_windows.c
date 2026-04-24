@@ -107,12 +107,15 @@ lv_result_t lv_thread_init(
 lv_result_t lv_thread_delete(lv_thread_t * thread)
 {
     lv_result_t result = LV_RESULT_OK;
+    if(!thread) {
+        return LV_RESULT_OK;
+    }
 
-    if(!TerminateThread(thread, 0)) {
+    if(!TerminateThread(*thread, 0)) {
         result = LV_RESULT_INVALID;
     }
 
-    CloseHandle(thread);
+    CloseHandle(*thread);
 
     return result;
 }
