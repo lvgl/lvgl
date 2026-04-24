@@ -71,9 +71,33 @@ while [ "$#" -gt 0 ]; do
         --32)           bits="32" ;;
         --64)           bits="64" ;;
         --both)         bits="both" ;;
-        --build-option) build_option="$2"; shift ;;
-        --test-suite)   test_suite="$2"; shift ;;
-        --actions)      actions="$2"; shift ;;
+        --build-option)
+            if [ "$#" -lt 2 ]; then
+                echo "Error: --build-option requires a value." >&2
+                usage >&2
+                exit 1
+            fi
+            build_option="$2"
+            shift
+            ;;
+        --test-suite)
+            if [ "$#" -lt 2 ]; then
+                echo "Error: --test-suite requires a value." >&2
+                usage >&2
+                exit 1
+            fi
+            test_suite="$2"
+            shift
+            ;;
+        --actions)
+            if [ "$#" -lt 2 ]; then
+                echo "Error: --actions requires a value." >&2
+                usage >&2
+                exit 1
+            fi
+            actions="$2"
+            shift
+            ;;
         --no-clean)     clean="" ;;
         --report)       report="--report" ;;
         --rebuild)      rebuild=true ;;
