@@ -18,7 +18,7 @@ applyTo: "src/**/*.c,src/**/*.h"
 - Functions returning `lv_result_t` must be checked by callers
 - Error paths must clean up all allocated resources before returning
 - Use `LV_ASSERT_*` for debug-time invariant checks, not as runtime error handling
-- Public API functions should validate arguments with `LV_ASSERT_OBJ`, `LV_ASSERT_NULL`, etc. at entry
+- Public API functions should validate arguments with `LV_ASSERT_OBJ`, `LV_ASSERT_NULL`, etc. at entry unless the API contract explicitly defines caller-side validation (e.g. some `lv_fs_*` APIs)
 - Graceful runtime fallback is preferred over assert for recoverable failures (e.g. cache allocation failure should degrade, not crash)
 - Add `LV_LOG_WARN` for unexpected but recoverable conditions
 - Add `LV_LOG_ERROR` for conditions that indicate a bug
@@ -29,7 +29,7 @@ applyTo: "src/**/*.c,src/**/*.h"
 - Prefer stack allocation for small temporary buffers
 - Avoid `lv_obj_is_valid()` in internal callbacks — it walks the entire object tree
 - Cache-friendly access: sequential over random
-- Struct member ordering: group pointers together, then smaller types, to minimize padding bytes
+- Struct member ordering: pointers first, then int32_t, then smaller types/bitfields — minimizes padding
 
 ## Portability
 
@@ -42,6 +42,5 @@ applyTo: "src/**/*.c,src/**/*.h"
 ## Include Structure
 
 - `.h` files: `#ifndef LV_<MODULE>_H` / `#define` / `#endif`
-- Feature-gated: `#if LV_USE_<FEATURE>` near top, `#endif` at bottom
-- Only the matching `.h` include above the feature guard
+- Feature-gated files: keep `#if LV_USE_<FEATURE>` near the top and the matching `#endif` at the bottom; necessary includes (module headers, private headers) may appear before the feature guard
 - Never include test headers in production source files
