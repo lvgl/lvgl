@@ -62,6 +62,7 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t se
                                     lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
+static bool obj_has_selector_on_bits(lv_obj_t * obj, lv_state_t state_bits);
 static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
 static void trans_anim_cb(void * _tr, int32_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
@@ -82,6 +83,10 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+/* Cascade filter for the state-transition path. See
+ * lv_obj_style_refresh_on_state_change. */
+static lv_state_t refresh_cascade_bits = 0;
 
 /**********************
  *      MACROS
@@ -924,7 +929,10 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
 
 /**
  * Recursively refresh the style of the children. Go deeper until a not NULL style is found
- * because the NULL styles are inherited from the parent
+ * because the NULL styles are inherited from the parent.
+ * When refresh_cascade_bits is non-zero (state-transition path), descendants whose
+ * own styles have no selector keyed on those bits are skipped — they can't render
+ * differently because of the parent's state change.
  * @param obj pointer to an object
  */
 static void refresh_children_style(lv_obj_t * obj)
@@ -933,12 +941,55 @@ static void refresh_children_style(lv_obj_t * obj)
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        lv_obj_invalidate(child);
-        lv_obj_send_event(child, LV_EVENT_STYLE_CHANGED, NULL);
-        lv_obj_invalidate(child);
+        if(refresh_cascade_bits == 0 || obj_has_selector_on_bits(child, refresh_cascade_bits)) {
+            lv_obj_invalidate(child);
+            lv_obj_send_event(child, LV_EVENT_STYLE_CHANGED, NULL);
+            lv_obj_invalidate(child);
+        }
 
-        refresh_children_style(child); /*Check children too*/
+        /*Recurse unconditionally: a grandchild may have state-keyed styles
+         *its immediate parent lacks.*/
+        refresh_children_style(child);
     }
+}
+
+/**
+ * Does obj have any non-transition style whose selector intersects state_bits?
+ */
+static bool obj_has_selector_on_bits(lv_obj_t * obj, lv_state_t state_bits)
+{
+    for(uint32_t i = 0; i < obj->style_cnt; i++) {
+        if(obj->styles[i].is_trans) continue;
+        lv_state_t sel_state = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        if(sel_state & state_bits) return true;
+    }
+    return false;
+}
+
+void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t changed_bits)
+{
+    /*Single-threaded LVGL invariant: no reentry while a state refresh is in
+     *progress. Catches accidental nesting.*/
+    LV_ASSERT(refresh_cascade_bits == 0);
+
+    lv_state_t bits = changed_bits;
+
+    /*Defensive fallback: an inheritable prop (e.g. LV_STYLE_TEXT_COLOR) under a
+     *state-keyed selector affects descendants that don't have their own state-
+     *keyed styles, so filtering would drop a valid repaint.*/
+    for(uint32_t i = 0; i < obj->style_cnt; i++) {
+        if(obj->styles[i].is_trans) continue;
+        lv_state_t sel_state = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        if((sel_state & changed_bits) == 0) continue;
+        if(style_has_flag(obj->styles[i].style, LV_STYLE_PROP_FLAG_INHERITABLE)) {
+            bits = 0;
+            break;
+        }
+    }
+
+    refresh_cascade_bits = bits;
+    lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+    refresh_cascade_bits = 0;
 }
 
 /**

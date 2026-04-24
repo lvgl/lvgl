@@ -86,6 +86,18 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
  */
 void lv_obj_update_layer_type(lv_obj_t * obj);
 
+/**
+ * Same as `lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY)` but the
+ * descendant cascade (`refresh_children_style`) skips dispatching
+ * `LV_EVENT_STYLE_CHANGED` to subtrees with no styles keyed on the changed
+ * state bits. Intended for the state-transition path in `update_obj_state`
+ * where the only thing that changed is a set of state bits and descendants
+ * without selectors on those bits can't render differently.
+ * @param obj           the object whose state changed
+ * @param changed_bits  `prev_state ^ new_state` — the bits that flipped
+ */
+void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t changed_bits);
+
 /**********************
  *      MACROS
  **********************/
