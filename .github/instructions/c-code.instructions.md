@@ -18,7 +18,7 @@ applyTo: "src/**/*.c,src/**/*.h"
 - Functions returning `lv_result_t` must be checked by callers
 - Error paths must clean up all allocated resources before returning
 - Use `LV_ASSERT_*` for debug-time invariant checks, not as runtime error handling
-- Public API functions should validate arguments with `LV_ASSERT_OBJ`, `LV_ASSERT_NULL`, etc. at entry unless the API contract explicitly defines caller-side validation (e.g. some `lv_fs_*` APIs)
+- Public API functions should validate runtime arguments with `LV_CHECK_ARG`; use `LV_ASSERT_OBJ`, `LV_ASSERT_NULL`, etc. only for debug-time invariants or when the API contract explicitly requires it
 - Graceful runtime fallback is preferred over assert for recoverable failures (e.g. cache allocation failure should degrade, not crash)
 - Add `LV_LOG_WARN` for unexpected but recoverable conditions
 - Add `LV_LOG_ERROR` for conditions that indicate a bug

@@ -41,8 +41,8 @@ Code must be portable, memory-efficient, and bare-metal safe.
 
 - Prefer graceful degradation over assert for recoverable failures (e.g. cache alloc fail → log + disable, not crash)
 - `LV_LOG_WARN` for unexpected recoverable conditions; `LV_LOG_ERROR` for bugs
-- `LV_ASSERT_NULL` for debug invariants; `LV_CHECK_ARG` for public API validation
-- Public API functions should validate arguments at entry with `LV_ASSERT_OBJ`/`LV_ASSERT_NULL` (unless the API contract explicitly defines caller-side validation)
+- `LV_ASSERT_NULL` for debug invariants; `LV_CHECK_ARG` for public API runtime argument validation
+- Public API functions should validate arguments at entry with `LV_CHECK_ARG` (unless the API contract explicitly defines caller-side validation); use `LV_ASSERT_OBJ`/`LV_ASSERT_NULL` only for debug-time invariants
 
 ## GPU / Draw Units
 
@@ -55,7 +55,7 @@ Code must be portable, memory-efficient, and bare-metal safe.
 
 - Commit: `<type>(<scope>): <subject>` — imperative, lowercase, no period, max 90 chars
 - Types: `fix`, `feat`, `arch`, `perf`, `example`, `docs`, `test`, `chore`
-- CI enforces patch coverage checks on new coverable lines
+- CI analyzes and reports patch coverage on new coverable lines
 - New features need tests; bug fixes need regression tests when feasible
 - New features and API changes should include examples in `examples/`
 - If `lv_conf_template.h` was modified, check that `lv_conf_internal_gen.py` was run and `Kconfig` updated
