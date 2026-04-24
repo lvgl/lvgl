@@ -79,8 +79,12 @@ void test_draw_buf_stride_adjust(void)
         res = lv_draw_buf_adjust_stride(decoded, min_stride - 1);
         TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
 
-        /*Expand the stride should fail if stride is too large that buffer size overflow*/
-        res = lv_draw_buf_adjust_stride(decoded, image_stride + 1);
+        /* Expand the stride should fail if the new stride is so large that the buffer
+         * would overflow. Use a stride that's guaranteed to push the required size past
+         * the aligned allocation (lv_draw_buf_create rounds the allocation up to
+         * LV_DRAW_BUF_ALIGN for PPA/cache-line reasons, so a +1 bump can fit in the
+         * padding for small images). Doubling the stride always overflows. */
+        res = lv_draw_buf_adjust_stride(decoded, image_stride * 2);
         TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
 
         /*Create a larger draw buffer*/
@@ -112,6 +116,70 @@ void test_draw_buf_stride_adjust(void)
 
     lv_obj_delete(img);
 #endif
+}
+
+/* Verify that the draw buffer allocation size reported in `data_size`
+ * is rounded up to a multiple of LV_DRAW_BUF_ALIGN, as required by back-ends
+ * (e.g. the ESP32 PPA) that need the allocation length to match the cache-line
+ * boundary rather than the raw image content size. */
+void test_draw_buf_size_alignment(void)
+{
+    /* A set of (w, h, cf, stride) cases chosen so that the raw image size
+     * (stride*h [+ alpha/palette]) is deliberately not a multiple of
+     * LV_DRAW_BUF_ALIGN, so the round-up behavior is observable. */
+    struct {
+        uint32_t w;
+        uint32_t h;
+        lv_color_format_t cf;
+        uint32_t stride; /* 0 => let LVGL choose via lv_draw_buf_width_to_stride */
+    } cases[] = {
+        /* Small indexed: stride=1, h=1, palette=8 => raw=9 (not a multiple of ALIGN) */
+        { 5, 1, LV_COLOR_FORMAT_I1, 1 },
+        /* A8 with odd raw size: 1*3 = 3 */
+        { 1, 3, LV_COLOR_FORMAT_A8, 1 },
+        /* RGB565 with an intentionally non-aligned raw size: 6*1 = 6 */
+        { 3, 1, LV_COLOR_FORMAT_RGB565, 6 },
+        /* RGB888 with raw = 9*1 = 9 */
+        { 3, 1, LV_COLOR_FORMAT_RGB888, 9 },
+        /* RGB565A8: rgb=4*1=4, a8=(4/2)*1=2 => raw=6 */
+        { 2, 1, LV_COLOR_FORMAT_RGB565A8, 4 },
+        /* Larger ARGB8888 with raw already aligned: 10*10*4 = 400 (rounding should be a no-op) */
+        { 10, 10, LV_COLOR_FORMAT_ARGB8888, 40 },
+        /* Stride auto-computed (0) path */
+        { 7, 5, LV_COLOR_FORMAT_RGB565, 0 },
+    };
+
+    for(unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+        uint32_t w = cases[i].w;
+        uint32_t h = cases[i].h;
+        lv_color_format_t cf = cases[i].cf;
+        uint32_t stride = cases[i].stride;
+
+        lv_draw_buf_t * buf = lv_draw_buf_create(w, h, cf, stride);
+        TEST_ASSERT_NOT_NULL(buf);
+
+        /* Recompute the stride the same way `_calculate_draw_buf_size` would
+         * if the caller passed 0, so we can derive the expected raw size. */
+        uint32_t effective_stride = stride ? stride : lv_draw_buf_width_to_stride(w, cf);
+        uint32_t raw_size = effective_stride * h;
+        if(cf == LV_COLOR_FORMAT_RGB565A8) {
+            raw_size += (effective_stride / 2) * h;
+        }
+        else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+            raw_size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
+        }
+
+        uint32_t expected = LV_ROUND_UP(raw_size, LV_DRAW_BUF_ALIGN);
+
+        /* data_size must be rounded up to LV_DRAW_BUF_ALIGN ... */
+        TEST_ASSERT_EQUAL_UINT32(0, buf->data_size % LV_DRAW_BUF_ALIGN);
+        /* ... must cover at least the raw image content size ... */
+        TEST_ASSERT_TRUE(buf->data_size >= raw_size);
+        /* ... and must match the explicit LV_ROUND_UP value. */
+        TEST_ASSERT_EQUAL_UINT32(expected, buf->data_size);
+
+        lv_draw_buf_destroy(buf);
+    }
 }
 
 void test_draw_buf_xy_access(void)

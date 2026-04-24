@@ -56,7 +56,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8_t tolerance);
 static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width, unsigned * height,
                                const char * file_name);
 static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
@@ -83,20 +82,11 @@ lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
     lv_refr_now(NULL);
 
     lv_test_screenshot_result_t res;
-    res = screenshot_compare(fn_ref, REF_IMG_TOLERANCE);
+    res = lv_test_screenshot_compare_core(fn_ref);
     return res;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-/**
- * Compare the content of the frame buffer with a reference image
- * @param fn_ref    reference image path
- * @return          An element of lv_test_screenshot_result_t
- */
-static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8_t tolerance)
+lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
 {
     char fn_ref_full[256];
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
@@ -150,9 +140,9 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
             uint8_t * ptr_ref = &(ref_row[x * 4]);
             uint8_t * ptr_act = &screen_buf_tmp[x * 4];
 
-            if(LV_ABS((int32_t) ptr_act[0] - (int32_t) ptr_ref[0]) > tolerance ||
-               LV_ABS((int32_t) ptr_act[1] - (int32_t) ptr_ref[1]) > tolerance ||
-               LV_ABS((int32_t) ptr_act[2] - (int32_t) ptr_ref[2]) > tolerance) {
+            if(LV_ABS((int32_t) ptr_act[0] - (int32_t) ptr_ref[0]) > REF_IMG_TOLERANCE ||
+               LV_ABS((int32_t) ptr_act[1] - (int32_t) ptr_ref[1]) > REF_IMG_TOLERANCE ||
+               LV_ABS((int32_t) ptr_act[2] - (int32_t) ptr_ref[2]) > REF_IMG_TOLERANCE) {
                 uint32_t act_px = (ptr_act[2] << 16) + (ptr_act[1] << 8) + (ptr_act[0] << 0);
                 uint32_t ref_px = 0;
                 memcpy(&ref_px, ptr_ref, 3);
@@ -162,7 +152,7 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
                        "  - Expected: %X\n"
                        "  - Actual:   %X\n"
                        "  - Tolerance: %d\n",
-                       fn_ref_full,  x, y, ref_px, act_px, tolerance);
+                       fn_ref_full,  x, y, ref_px, act_px, REF_IMG_TOLERANCE);
                 err = true;
                 break;
             }
@@ -187,6 +177,10 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
     return err ? LV_TEST_SCREENSHOT_RESULT_FAILED : LV_TEST_SCREENSHOT_RESULT_PASSED;
 
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width, unsigned * height,
                                const char * file_name)

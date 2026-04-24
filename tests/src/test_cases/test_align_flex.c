@@ -746,6 +746,35 @@ void test_flex_hide_items(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("flex_hide_items.png");
 }
 
+
+void test_flex_hide_item_first_grow(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_pad_column(cont, 50, 0);
+    lv_obj_set_size(cont, 400, 80);
+
+    lv_obj_t * label1 = lv_label_create(cont);
+    lv_label_set_text(label1, "Hidden");
+    lv_obj_set_flag(label1, LV_OBJ_FLAG_HIDDEN, true);
+    lv_obj_set_style_bg_color(label1, lv_color_hex3(0xf00), 0);
+    lv_obj_set_style_bg_opa(label1, LV_OPA_30, 0);
+
+    lv_obj_t * label2 = lv_label_create(cont);
+    lv_label_set_text(label2, "Growing");
+    lv_obj_set_flex_grow(label2, 1);
+    lv_obj_set_style_bg_color(label2, lv_color_hex3(0x0f0), 0);
+    lv_obj_set_style_bg_opa(label2, LV_OPA_30, 0);
+
+    lv_obj_t * label3 = lv_label_create(cont);
+    lv_label_set_text(label3, "Fixed");
+    lv_obj_set_width(label3, 60);
+    lv_obj_set_style_bg_color(label3, lv_color_hex3(0x00f), 0);
+    lv_obj_set_style_bg_opa(label3, LV_OPA_30, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_hide_items_first_grow.png");
+}
+
 void test_flex_use_rtl(void)
 {
     lv_obj_t * test = lv_obj_create(lv_screen_active());
@@ -767,11 +796,11 @@ void test_flex_use_rtl(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("flex_use_rtl.png");
 }
 
-
 void test_flex_grow_on_screen_should_not_crash(void)
 {
     lv_obj_set_flex_grow(lv_screen_active(), 1);
     lv_refr_now(NULL);
 }
+
 
 #endif

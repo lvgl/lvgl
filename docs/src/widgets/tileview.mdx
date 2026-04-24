@@ -1,0 +1,67 @@
+---
+title: "Tile View (lv_tileview)"
+description: "The Tile View is a container Widget whose elements (called tiles) can be arranged in grid form. A user can navigate between the tiles by swiping."
+---
+
+## Overview
+
+The Tile View is a container Widget whose elements (called *tiles*) can
+be arranged in grid form. A user can navigate between the tiles by
+swiping. Any direction of swiping can be disabled on the tiles
+individually to not allow moving from one tile to another.
+
+If the Tile View is screen sized, the user interface resembles what you
+may have seen on smartwatches.
+
+## Parts and Styles
+
+The Tile View is built from a [base widget](/widgets/base_widget) container and
+[base widget](/widgets/base_widget) tiles.
+
+The parts and styles work the same as for [base widget](/widgets/base_widget).
+
+## Usage
+
+### Add a tile
+
+<ApiLink name="lv_tileview_add_tile" display="lv_tileview_add_tile(tileview, col_id, row_id, dir)" /> creates a new
+tile on the `col_id`-th column and `row_id`-th row. `dir` can be
+`LV_DIR_LEFT/RIGHT/TOP/BOTTOM/HOR/VER/ALL` or OR-ed values to enable
+moving to the adjacent tiles in the given direction by swiping.
+
+The returned value is a pointer to the tile (a [base widget](/widgets/base_widget)) on which the
+content of the tab can be created.
+
+### Change tile
+
+The Tile View can scroll to a specified tile with
+<ApiLink name="lv_tileview_set_tile" display="lv_tileview_set_tile(tileview, tile, LV_ANIM_ON/OFF)" /> or
+<ApiLink name="lv_tileview_set_tile_by_index" display="lv_tileview_set_tile_by_index(tileview, col_id, row_id, LV_ANIM_ON/OFF)" />.
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent after a new tile is displayed by scrolling.
+   <ApiLink name="lv_tileview_get_tile_active" display="lv_tileview_get_tile_active(tileview)" /> can be used within the event to
+   get a pointer to the newly-displayed tile.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Keys
+
+No *Keys* are processed by Tileview Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Keys](/main-modules/indev/keypad).
+</Callout>
+
+## Example
+
+### Tileview with content
+
+<LvglExample name="lv_example_tileview_1" path="widgets/tileview/lv_example_tileview_1" />
+
+## API

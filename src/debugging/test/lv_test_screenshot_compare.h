@@ -53,7 +53,7 @@ typedef enum {
  **********************/
 
 /**
- * Compare the current content of the test screen with a reference PNG image
+ * Invalidate and redraw the current screen and compare its content with a reference PNG image
  * - If the reference image is not found it will be created automatically from the rendered screen.
  * - If the compare fails an `<image_name>_err.png` file will be created with the rendered content next to the reference image.
  *
@@ -65,6 +65,14 @@ typedef enum {
  *                  `lv_test_display_create()`
  */
 lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref);
+
+
+/**
+ * Works the same way as `lv_test_screenshot_compare` but it doesn't invalidate and redraw the screen
+ * but uses its current content. (lv_refr_now(NULL) might be called earlier)
+ * @param fn_ref    reference image path
+ */
+lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref);
 
 /**********************
  *      MACROS

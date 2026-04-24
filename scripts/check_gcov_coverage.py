@@ -41,6 +41,18 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="Fail if coverage is below this percentage (0-100), default: 0 (no failure)",
     )
 
+    parser.add_argument(
+        "--min-lines",
+        type=int,
+        metavar="N",
+        default=0,
+        help=(
+            "Skip --fail-under enforcement when new coverable lines < N. "
+            "Small patches produce noisy percentages; this avoids false positives. "
+            "Default: 0 (always enforce)"
+        ),
+    )
+
     return parser
 
 
@@ -92,7 +104,6 @@ def get_coverage_data(root: str) -> Dict[str, Dict[int, int]]:
         non-coverable and will be ignored by the uncovered check.
     Raises: subprocess.CalledProcessError if gcovr fails
     """
-    filter_pattern = os.path.join(root, r"src/(?:.*/)?lv_.*\.c")
     cmd = [
         "gcovr",
         "--gcov-ignore-parse-errors",
@@ -100,8 +111,6 @@ def get_coverage_data(root: str) -> Dict[str, Dict[int, int]]:
         "-",
         "--root",
         root,
-        "--filter",
-        filter_pattern,
     ]
 
     result = subprocess.run(
@@ -296,6 +305,7 @@ def report_coverage(
     *,
     total_label: str,
     skipped_noncoverable: Optional[int] = None,
+    min_lines: int = 0,
 ) -> int:
     """
     Print a standardized coverage report and return exit code (0/1).
@@ -305,6 +315,7 @@ def report_coverage(
       "New coverable lines (per gcovr)" for commit mode, or
       "Coverable lines (per gcovr)" for path mode)
     - skipped_noncoverable: when provided, prints the skipped non-coverable count
+    - min_lines: when > 0, skip --fail-under enforcement if total < min_lines
     """
 
     title = f" Coverage analysis results for {header} "
@@ -320,7 +331,14 @@ def report_coverage(
     if total > 0:
         coverage_percent = (covered / total) * 100
         print(f"Coverage: {coverage_percent:.2f}%")
-        if coverage_percent < fail_under:
+
+        # Check if this patch is too small to enforce the threshold
+        if min_lines > 0 and fail_under > 0 and total < min_lines:
+            print(
+                f"\nℹ Only {total} new coverable line(s) (< {min_lines}), "
+                f"skipping --fail-under enforcement."
+            )
+        elif coverage_percent < fail_under:
             print(
                 f"\n✗ Coverage {coverage_percent:.2f}% is below required {fail_under}%"
             )
@@ -354,6 +372,7 @@ def main() -> int:
 
         if args.path:
             # Path mode: ignore commit, compute coverage for file/dir
+            # --min-lines is not applied here since it targets patch (commit) mode.
             covered, total, uncovered = check_path_coverage(args.path, root)
 
             return report_coverage(
@@ -378,6 +397,7 @@ def main() -> int:
                 fail_under=args.fail_under,
                 total_label="New coverable lines (per gcovr)",
                 skipped_noncoverable=skipped_noncoverable,
+                min_lines=args.min_lines,
             )
 
     except subprocess.CalledProcessError as e:
