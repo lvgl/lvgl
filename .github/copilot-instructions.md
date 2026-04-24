@@ -26,7 +26,7 @@ Code must be portable, memory-efficient, and bare-metal safe.
 - `lv_<module>_<action>_<subject>` for public API; `_lv_` prefix for internal
 - ALL_CAPS for enums/defines; `_t` suffix for typedefs
 - 4 spaces, no tabs; function brace on new line; `if`/`for` brace on same line
-- `<stdint.h>` types; block comments `/* */` only; `"%" LV_PRId32` for format strings
+- `<stdint.h>` types; block comments `/* */` only, never `//` (C++ style); `"%" LV_PRId32` for format strings
 - File-scope variables must be `static`; no globals outside `lv_global_t`
 
 ## Code Organization
