@@ -61,6 +61,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 {
     if(!inited) {
 #if LV_SDL_USE_EGL && defined(SDL_VIDEO_DRIVER_X11)
+        /* We only support x11 with EGL for now*/
         SDL_SetHintWithPriority("SDL_VIDEODRIVER", "x11", SDL_HINT_OVERRIDE);
         SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
 #endif
