@@ -107,6 +107,8 @@ fi
 run_args=(
     --rm
     --platform "$PLATFORM"
+    --user "$(id -u):$(id -g)"
+    -e HOME=/tmp
     -v "$REPO_ROOT":/work
     -w /work
 )
