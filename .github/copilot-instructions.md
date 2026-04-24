@@ -19,7 +19,6 @@ Code must be portable, memory-efficient, and bare-metal safe.
 - No heap allocation in draw loops, event handlers, timer callbacks
 - Avoid `lv_obj_is_valid()` in internal callbacks — walks entire object tree
 - `lv_free(NULL)` is safe — no redundant NULL check before it
-- No `LV_ASSERT_MALLOC` after functions that already check internally
 
 ## Naming & Style
 
@@ -41,7 +40,6 @@ Code must be portable, memory-efficient, and bare-metal safe.
 
 - Prefer graceful degradation over assert for recoverable failures (e.g. cache alloc fail → log + disable, not crash)
 - `LV_LOG_WARN` for unexpected recoverable conditions; `LV_LOG_ERROR` for bugs
-- `LV_ASSERT_NULL` for debug invariants
 
 ## GPU / Draw Units
 

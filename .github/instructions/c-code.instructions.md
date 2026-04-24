@@ -9,7 +9,6 @@ applyTo: "src/**/*.c,src/**/*.h"
 - Every `lv_malloc` / `lv_realloc` must have a NULL check immediately after
 - Every allocation must have a matching `lv_free` on all exit paths (including error paths)
 - `lv_free(NULL)` is safe — don't add redundant NULL checks before it
-- Don't add `LV_ASSERT_MALLOC` after functions that already check internally (e.g. `lv_vg_lite_path_create`)
 - Pointer parameters: NULL-check before dereference when caller could reasonably pass NULL
 - Array access must be bounds-checked
 
@@ -17,7 +16,6 @@ applyTo: "src/**/*.c,src/**/*.h"
 
 - Functions returning `lv_result_t` must be checked by callers
 - Error paths must clean up all allocated resources before returning
-- Use `LV_ASSERT_*` for debug-time invariant checks, not as runtime error handling
 - Graceful runtime fallback is preferred over assert for recoverable failures (e.g. cache allocation failure should degrade, not crash)
 - Add `LV_LOG_WARN` for unexpected but recoverable conditions
 - Add `LV_LOG_ERROR` for conditions that indicate a bug
