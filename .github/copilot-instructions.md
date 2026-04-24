@@ -56,5 +56,8 @@ Code must be portable, memory-efficient, and bare-metal safe.
 - Types: `fix`, `feat`, `arch`, `perf`, `example`, `docs`, `test`, `chore`
 - CI enforces ≥ 50% patch coverage on 5+ new coverable lines
 - New features need tests; bug fixes need regression tests when feasible
+- New features and API changes should include examples in `examples/`
+- If `lv_conf_template.h` was modified, check that `lv_conf_internal_gen.py` was run and `Kconfig` updated
+- Code must be formatted with `scripts/code-format.py` (astyle) — flag obvious style violations
 - Doxygen `/** */` with `@param`/`@return` for all public functions in `.h` files
 - Comments explain **why**, not what
