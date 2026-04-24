@@ -56,6 +56,7 @@ typedef struct {
     int32_t w;
     int32_t h;
     unsigned int texture;
+    lv_draw_task_type_t task_type;
 } cache_data_t;
 
 /**********************
@@ -65,6 +66,7 @@ typedef struct {
 static bool opengles_texture_cache_create_cb(cache_data_t * cached_data, void * user_data);
 static void opengles_texture_cache_free_cb(cache_data_t * cached_data, void * user_data);
 static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data_t * lhs, const cache_data_t * rhs);
+static int image_dsc_compare(const lv_draw_image_dsc_t * lhs, const lv_draw_image_dsc_t * rhs);
 
 static void blend_texture_layer(lv_draw_task_t * t);
 static void draw_from_cached_texture(lv_draw_task_t * t);
@@ -187,6 +189,15 @@ static void opengles_texture_cache_free_cb(cache_data_t * cached_data, void * us
     LV_UNUSED(user_data);
     LV_PROFILER_DRAW_BEGIN;
 
+    /* If it's an image with LV_IMAGE_SRC_FILE or LV_IMAGE_SRC_SYMBOL src,
+     * the path has been strdup()ed so the cache owns it. Free it now. */
+    if(cached_data->task_type == LV_DRAW_TASK_TYPE_IMAGE && cached_data->draw_dsc != NULL) {
+        lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)cached_data->draw_dsc;
+        lv_image_src_t src_type = lv_image_src_get_type(img_dsc->src);
+        if(src_type == LV_IMAGE_SRC_FILE || src_type == LV_IMAGE_SRC_SYMBOL) {
+            lv_free((void *)img_dsc->src);
+        }
+    }
     lv_free(cached_data->draw_dsc);
     GL_CALL(glDeleteTextures(1, &cached_data->texture));
     cached_data->draw_dsc = NULL;
@@ -211,6 +222,10 @@ static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data
         return 1;
     }
 
+    if(lhs->task_type != rhs->task_type) {
+        return lhs->task_type < rhs->task_type ? -1 : 1;
+    }
+
     uint32_t lhs_dsc_size = lhs->draw_dsc->dsc_size;
     uint32_t rhs_dsc_size = rhs->draw_dsc->dsc_size;
 
@@ -223,12 +238,103 @@ static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data
     left_draw_dsc += sizeof(lv_draw_dsc_base_t);
     right_draw_dsc += sizeof(lv_draw_dsc_base_t);
 
-    int cmp_res = lv_memcmp(left_draw_dsc, right_draw_dsc, lhs->draw_dsc->dsc_size - sizeof(lv_draw_dsc_base_t));
+    int cmp_res = 0;
+    if(lhs->task_type == LV_DRAW_TASK_TYPE_IMAGE) {
+        /* Use a field-aware compare for image descriptors. lv_memcmp would compare
+         * the bytes of pointer fields like `src`, producing false negatives when
+         * identical content lives at different addresses (see #9903). */
+        cmp_res = image_dsc_compare((const lv_draw_image_dsc_t *)lhs->draw_dsc,
+                                    (const lv_draw_image_dsc_t *)rhs->draw_dsc);
+    }
+    else {
+        cmp_res = lv_memcmp(left_draw_dsc, right_draw_dsc, lhs->draw_dsc->dsc_size - sizeof(lv_draw_dsc_base_t));
+    }
 
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
     }
 
+    return 0;
+}
+
+static int image_dsc_compare(const lv_draw_image_dsc_t * lhs, const lv_draw_image_dsc_t * rhs)
+{
+    int cmp;
+
+#define CMP_SCALAR(field)                                                                \
+    do {                                                                                 \
+        if(lhs->field != rhs->field) return lhs->field < rhs->field ? -1 : 1;            \
+    } while(0)
+
+    /* `src` is either a file path/symbol string or a pointer to an lv_image_dsc_t (VARIABLE).
+     * Comparing the raw pointer bytes breaks cache reuse because lv_image_set_src() lv_strdup()s
+     * the path per widget. Resolve the type and compare content when it's a string. */
+    lv_image_src_t lhs_src_type = lv_image_src_get_type(lhs->src);
+    lv_image_src_t rhs_src_type = lv_image_src_get_type(rhs->src);
+    if(lhs_src_type != rhs_src_type) return lhs_src_type < rhs_src_type ? -1 : 1;
+
+    if(lhs_src_type == LV_IMAGE_SRC_FILE || lhs_src_type == LV_IMAGE_SRC_SYMBOL) {
+        cmp = lv_strcmp((const char *)lhs->src, (const char *)rhs->src);
+        if(cmp != 0) return cmp < 0 ? -1 : 1;
+    }
+    else {
+        /* LV_IMAGE_SRC_VARIABLE: comparing pixel payloads is too expensive
+         * for the hot path so just compare the pointer. Cast to uintptr_t
+         * because relational compare on unrelated pointers is undefined in C. */
+        if(lhs->src != rhs->src) return (uintptr_t)lhs->src < (uintptr_t)rhs->src ? -1 : 1;
+    }
+
+    /* Header is not a pointer so just compare the struct using lv_memcmp(). */
+    cmp = lv_memcmp(&lhs->header, &rhs->header, sizeof(lhs->header));
+    if(cmp != 0) return cmp < 0 ? -1 : 1;
+
+    CMP_SCALAR(clip_radius);
+    CMP_SCALAR(rotation);
+    CMP_SCALAR(scale_x);
+    CMP_SCALAR(scale_y);
+    CMP_SCALAR(skew_x);
+    CMP_SCALAR(skew_y);
+    CMP_SCALAR(pivot.x);
+    CMP_SCALAR(pivot.y);
+
+    /* recolor is not a pointer so just compare the struct using lv_memcmp(). */
+    cmp = lv_memcmp(&lhs->recolor, &rhs->recolor, sizeof(lhs->recolor));
+    if(cmp != 0) return cmp < 0 ? -1 : 1;
+
+    CMP_SCALAR(recolor_opa);
+    CMP_SCALAR(opa);
+    CMP_SCALAR(blend_mode);
+    CMP_SCALAR(antialias);
+    CMP_SCALAR(tile);
+
+    /* `colorkey` is a `const lv_image_colorkey_t *` owned by the caller (typically
+     * a style's static const). The cache doesn't copy it, so dereferencing here
+     * would risk a use-after-free; pointer compare only. Same policy as
+     * `bitmap_mask_src` below. Cast to uintptr_t because relational compare on
+     * unrelated pointers is undefined in C. */
+    if(lhs->colorkey != rhs->colorkey) {
+        return (uintptr_t)lhs->colorkey < (uintptr_t)rhs->colorkey ? -1 : 1;
+    }
+
+    /* Skipping `sup`: it's filled in by the decoder at draw time and ends up with
+     * a different pointer on every decode of the same image, so comparing it would
+     * always miss. The palette/alpha info it carries is already determined by
+     * `src` + `header`, so leaving it out doesn't lose any identity info. */
+
+    CMP_SCALAR(image_area.x1);
+    CMP_SCALAR(image_area.y1);
+    CMP_SCALAR(image_area.x2);
+    CMP_SCALAR(image_area.y2);
+
+    /* `bitmap_mask_src` is a typed `lv_image_dsc_t *` and LVGL stores it as-is,
+     * without strdup()s like `src`. The same mask passed to multiple widgets shares
+     * the same address and hits the cache. Cast to uintptr_t because relational
+     * compare on unrelated pointers is undefined in C. */
+    if(lhs->bitmap_mask_src != rhs->bitmap_mask_src) {
+        return (uintptr_t)lhs->bitmap_mask_src < (uintptr_t)rhs->bitmap_mask_src ? -1 : 1;
+    }
+
+#undef CMP_SCALAR
     return 0;
 }
 
@@ -327,7 +433,21 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
 
     lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
     cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
+    cache_data->task_type = task->type;
     lv_memcpy((void *)cache_data->draw_dsc, base_dsc, base_dsc->dsc_size);
+
+    /* If is an image of type LV_IMAGE_SRC_FILE or LV_IMAGE_SRC_SYMBOL,
+     * strdup()s the draw descriptor src path to let the cache own the pointer.
+     * This is done to avoid use-after-free issues when the src path is freed by other widgets. */
+    if(task->type == LV_DRAW_TASK_TYPE_IMAGE) {
+        lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)cache_data->draw_dsc;
+        if(img_dsc->src != NULL) {
+            lv_image_src_t src_type = lv_image_src_get_type(img_dsc->src);
+            if(src_type == LV_IMAGE_SRC_FILE || src_type == LV_IMAGE_SRC_SYMBOL) {
+                img_dsc->src = lv_strdup((const char *)img_dsc->src);
+            }
+        }
+    }
 
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
@@ -506,6 +626,7 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     data_to_find.w = lv_area_get_width(&t->_real_area);
     data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = 0;
+    data_to_find.task_type = t->type;
 
     /*user_data stores the renderer to differentiate it from SW rendered tasks.
      *However the cached texture is independent from the renderer so use NULL user_data*/
