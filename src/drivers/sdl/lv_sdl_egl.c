@@ -163,7 +163,10 @@ static void * create_window_cb(void * driver_data, const lv_egl_native_window_pr
     lv_display_t * display = (lv_display_t *)driver_data;
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
-    SDL_GetWindowWMInfo(lv_sdl_window_get_window(display), &wmInfo);
+    if(SDL_GetWindowWMInfo(lv_sdl_window_get_window(display), &wmInfo) != SDL_TRUE) {
+        LV_LOG_ERROR("SDL_GetWindowWMInfo failed: %s", SDL_GetError());
+        return NULL;
+    }
 
     EGLNativeWindowType native_window;
     const char * driver = SDL_GetCurrentVideoDriver();
@@ -177,7 +180,7 @@ static void * create_window_cb(void * driver_data, const lv_egl_native_window_pr
 #endif
     }
     else {
-        LV_LOG_ERROR("Unsupported SDL video driver: (%s)", driver);
+        LV_LOG_ERROR("Unsupported SDL video driver: (%s)", driver ? driver : "(null)");
         return NULL;
     }
     return (void *)native_window;
