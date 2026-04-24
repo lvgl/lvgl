@@ -55,7 +55,7 @@ Code must be portable, memory-efficient, and bare-metal safe.
 
 - Commit: `<type>(<scope>): <subject>` — imperative, lowercase, no period, max 90 chars
 - Types: `fix`, `feat`, `arch`, `perf`, `example`, `docs`, `test`, `chore`
-- CI enforces ≥ 50% patch coverage on 5+ new coverable lines
+- CI enforces patch coverage checks on new coverable lines
 - New features need tests; bug fixes need regression tests when feasible
 - New features and API changes should include examples in `examples/`
 - If `lv_conf_template.h` was modified, check that `lv_conf_internal_gen.py` was run and `Kconfig` updated
