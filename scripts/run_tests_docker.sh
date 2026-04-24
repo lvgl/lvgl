@@ -201,8 +201,8 @@ run_one() {
 
 BITS="${bits}"
 if [ "\$BITS" = "both" ]; then
-    run_one 64
     run_one 32
+    run_one 64
 else
     run_one "\$BITS"
 fi
