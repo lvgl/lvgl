@@ -1,6 +1,6 @@
 # LVGL Code Review Instructions
 
-LVGL is an embedded C99 graphics library for MCUs (64KB+ RAM), MPUs, and simulators.
+LVGL is an embedded C99 graphics library for MCUs, MPUs, and simulators.
 Code must be portable, memory-efficient, and bare-metal safe.
 
 ## Critical Issues (always flag)
