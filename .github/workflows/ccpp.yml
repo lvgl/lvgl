@@ -141,7 +141,10 @@ jobs:
           git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
           MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
           echo "Merge-base: $MB"
-          python scripts/check_gcov_coverage.py --commit="${MB}...${{ github.event.pull_request.head.sha }}"
+          python scripts/check_gcov_coverage.py \
+            --commit="${MB}...${{ github.event.pull_request.head.sha }}" \
+            --fail-under=50 \
+            --min-lines=5
         else
           echo "Not a pull request, skipping code coverage analysis."
         fi
