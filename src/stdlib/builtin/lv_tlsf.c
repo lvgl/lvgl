@@ -232,6 +232,17 @@ typedef enum {
 #if defined (TLSF_64BIT)
     /* All allocation sizes and addresses are aligned to 8 bytes. */
     ALIGN_SIZE_LOG2 = 3,
+#elif (defined(__ARM_ARCH) && (__ARM_ARCH >= 7) && !defined(__ARM_ARCH_6M__))
+    /* ARMv7-M / ARMv7E-M / ARMv8-M (Cortex-M3/M4/M7/M33 …) require strict
+     * 8-byte alignment for LDRD/STRD (and LDM/STM of double words). These
+     * instructions fault with a UsageFault (UFSR.UNALIGNED) regardless of
+     * CCR.UNALIGN_TRP, so GCC may emit them for 64-bit struct accesses and
+     * expect the pointer returned by malloc to be at least 8-byte aligned
+     * (alignof(max_align_t) on these targets is 8 because of double /
+     * long long). Keeping ALIGN_SIZE at 4 causes hardfaults on external
+     * SDRAM pools where block addresses happen to be only 4-byte aligned.
+     * See e.g. https://github.com/lvgl/lvgl/issues/4747. */
+    ALIGN_SIZE_LOG2 = 3,
 #else
     /* All allocation sizes and addresses are aligned to 4 bytes. */
     ALIGN_SIZE_LOG2 = 2,
