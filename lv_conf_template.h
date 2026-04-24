@@ -428,6 +428,9 @@
     #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
 #endif
 
+/* Use EVE BT820 GPU through EVE HAL. */
+#define LV_USE_DRAW_EVE5 0
+
 /** Use NanoVG Renderer
  * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
  */
@@ -1464,6 +1467,9 @@
 #if LV_USE_QNX
     #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
 #endif
+
+/** EVE5 display output */
+#define LV_USE_EVE5 0
 
 /** Enable or disable for external data and destructor function */
 #define LV_USE_EXT_DATA   0
