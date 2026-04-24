@@ -101,6 +101,7 @@ lv_wl_seat_touch_t * lv_wayland_seat_touch_create(struct wl_seat * seat)
         wl_touch_destroy(touch);
         return NULL;
     }
+    wl_seat_touch->primary_id = -1;
     wl_touch_add_listener(touch, &touch_listener, NULL);
     wl_touch_set_user_data(touch, wl_seat_touch);
 
@@ -130,26 +131,19 @@ static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
     }
 #if LV_USE_GESTURE_RECOGNITION
     /* Collect touches if there are any - send them to the gesture recognizer */
-    lv_indev_gesture_recognizers_update(indev, tdata->touches, tdata->event_cnt);
 
     LV_LOG_TRACE("collected touch events: %d", tdata->event_cnt);
 
     if(tdata->event_cnt > 0) {
-        data->point = tdata->touches[0].point;
+        lv_indev_gesture_recognizers_update(indev, tdata->touches, tdata->event_cnt);
+        lv_indev_gesture_recognizers_set_data(indev, data);
+
+        tdata->event_cnt = 0;
     }
-    else {
-        data->point.x = data->point.y = 0;
-    }
+#endif
 
-    tdata->event_cnt = 0;
-
-    /* Set the gesture information, before returning to LVGL */
-    lv_indev_gesture_recognizers_set_data(indev, data);
-
-#else
     data->point = tdata->point;
     data->state = tdata->state;
-#endif
 }
 
 static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t serial, uint32_t time,
@@ -167,19 +161,27 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t 
     }
 
 #if LV_USE_GESTURE_RECOGNITION
-    uint8_t i = tdata->event_cnt;
+    if(tdata->event_cnt < LV_WAYLAND_MAX_TOUCHES) {
+        uint8_t i = tdata->event_cnt;
 
-    tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
-    tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
-    tdata->touches[i].id        = id;
-    tdata->touches[i].timestamp = time;
-    tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
-    tdata->event_cnt++;
-#else
-    tdata->point.x = wl_fixed_to_int(x_w);
-    tdata->point.y = wl_fixed_to_int(y_w);
-    tdata->state = LV_INDEV_STATE_PRESSED;
+        tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
+        tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
+        tdata->touches[i].id        = id;
+        tdata->touches[i].timestamp = time;
+        tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
+        tdata->event_cnt++;
+    }
+    else {
+        LV_LOG_ERROR("Touch event overrun. Touch ID %d event %d dropped", id, LV_INDEV_STATE_PRESSED);
+    }
 #endif
+
+    if(tdata->primary_id < 0) {
+        tdata->primary_id = id;
+        tdata->point.x = wl_fixed_to_int(x_w);
+        tdata->point.y = wl_fixed_to_int(y_w);
+        tdata->state = LV_INDEV_STATE_PRESSED;
+    }
 }
 
 static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t serial, uint32_t time, int32_t id)
@@ -192,18 +194,26 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t se
 
     /* Create a released event */
 #if LV_USE_GESTURE_RECOGNITION
-    uint8_t i = tdata->event_cnt;
+    if(tdata->event_cnt < LV_WAYLAND_MAX_TOUCHES) {
+        uint8_t i = tdata->event_cnt;
 
-    tdata->touches[i].point.x   = 0;
-    tdata->touches[i].point.y   = 0;
-    tdata->touches[i].id        = id;
-    tdata->touches[i].timestamp = time;
-    tdata->touches[i].state     = LV_INDEV_STATE_RELEASED;
+        tdata->touches[i].point.x   = 0;
+        tdata->touches[i].point.y   = 0;
+        tdata->touches[i].id        = id;
+        tdata->touches[i].timestamp = time;
+        tdata->touches[i].state     = LV_INDEV_STATE_RELEASED;
 
-    tdata->event_cnt++;
-#else
-    tdata->state = LV_INDEV_STATE_RELEASED;
+        tdata->event_cnt++;
+    }
+    else {
+        LV_LOG_ERROR("Touch event overrun. Touch ID %d event %d dropped", id, LV_INDEV_STATE_RELEASED);
+    }
 #endif
+
+    if(id == tdata->primary_id) {
+        tdata->state = LV_INDEV_STATE_RELEASED;
+        tdata->primary_id = -1;
+    }
 }
 
 static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_t time, int32_t id, wl_fixed_t x_w,
@@ -217,35 +227,40 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_
 
 #if LV_USE_GESTURE_RECOGNITION
     /* Update the contact point of the corresponding id with the latest coordinate */
-    lv_indev_touch_data_t * touch = &tdata->touches[0];
     lv_indev_touch_data_t * cur = NULL;
 
     for(uint8_t i = 0; i < tdata->event_cnt; i++) {
+        lv_indev_touch_data_t * touch = &tdata->touches[i];
         if(touch->id == id) {
             cur = touch;
+            break;
         }
-        touch++;
     }
 
     if(cur == NULL) {
-        uint8_t i = tdata->event_cnt;
-        tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
-        tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
-        tdata->touches[i].id        = id;
-        tdata->touches[i].timestamp = time;
-        tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
-        tdata->event_cnt++;
+        if(tdata->event_cnt < LV_WAYLAND_MAX_TOUCHES) {
+            cur = &tdata->touches[tdata->event_cnt];
+            tdata->event_cnt++;
+        }
+        else {
+            LV_LOG_ERROR("Touch event overrun. Touch ID %d event %d dropped",
+                         id, LV_INDEV_STATE_RELEASED);
+        }
     }
-    else {
+
+    if(cur != NULL) {
         cur->point.x   = wl_fixed_to_int(x_w);
         cur->point.y   = wl_fixed_to_int(y_w);
         cur->id        = id;
         cur->timestamp = time;
+        cur->state     = LV_INDEV_STATE_PRESSED;
     }
-#else
-    tdata->point.x = wl_fixed_to_int(x_w);
-    tdata->point.y = wl_fixed_to_int(y_w);
 #endif
+
+    if(id == tdata->primary_id) {
+        tdata->point.x = wl_fixed_to_int(x_w);
+        tdata->point.y = wl_fixed_to_int(y_w);
+    }
 }
 
 static void touch_handle_frame(void * data, struct wl_touch * wl_touch)
