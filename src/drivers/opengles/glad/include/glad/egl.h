@@ -378,8 +378,8 @@ typedef void (*GLADpostcallback)(void *ret, const char *name, GLADapiproc apipro
 #define EGL_YUV_NARROW_RANGE_EXT 0x3283
 
 
-#include <KHR/khrplatform.h>
-#include <EGL/eglplatform.h>
+#include "../KHR/khrplatform.h"
+#include "../EGL/eglplatform.h"
 
 
 
