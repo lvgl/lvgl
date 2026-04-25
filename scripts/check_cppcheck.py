@@ -59,10 +59,12 @@ def find_repo_root() -> Path:
 
 def is_excluded(filepath: str) -> bool:
     """Check if a file path matches any exclusion pattern."""
-    # Normalize to forward slashes and make relative to src/
+    # Normalize to forward slashes and ensure it's relative to repo root
     rel = filepath.replace("\\", "/")
+    # Use path prefix matching for deterministic exclusions (Copilot fix)
     for exc in EXCLUDE_DIRS:
-        if exc in rel:
+        # Match as path prefix (e.g., "src/libs/" matches "src/libs/foo/bar.c")
+        if rel.startswith(exc) or f"/{exc}" in rel:
             return True
     return False
 
@@ -83,16 +85,16 @@ def run_cppcheck(files: List[str], jobs: int = 1) -> List[Dict]:
         result = subprocess.run(
             cmd, capture_output=True, text=True, timeout=600
         )
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as exc:
         print("cppcheck timed out after 600s", file=sys.stderr)
-        return []
+        raise RuntimeError("cppcheck timed out after 600s") from exc
 
-    # Check cppcheck exit status (Cubic P1)
+    # Treat cppcheck exit failures as hard errors (Copilot + Cubic P1)
     if result.returncode != 0:
         print(f"cppcheck failed with exit code {result.returncode}", file=sys.stderr)
         if result.stderr:
             print(result.stderr, file=sys.stderr)
-        # Continue parsing — cppcheck may still emit useful diagnostics
+        raise RuntimeError(f"cppcheck exited with code {result.returncode}")
 
     issues = []
     for line in result.stderr.splitlines():
