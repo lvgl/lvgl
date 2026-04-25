@@ -6,7 +6,7 @@ LVGL Commit Message Style Checker
 Format: type(scope): description
 
 Valid types: feat, fix, arch, test, perf, example, refactor, revert, docs, style, chore, ci, build
-Scope:       required (except chore), letters/digits/_/-/ allowed, e.g. (draw), (obj)
+Scope:       required (except chore/docs/ci), letters/digits/_/-/ allowed, e.g. (draw), (obj)
 Description: lowercase start, no trailing period
 
 Usage:
@@ -55,11 +55,14 @@ TYPE_TYPOS = {
 
 VALID_TYPES_RE = "|".join(VALID_TYPES)
 
-# type(scope): description  (chore allows omitting scope)
+# type(scope): description  (chore/docs/ci allow omitting scope)
 FULL_PATTERN = re.compile(rf"^({VALID_TYPES_RE})\(([a-zA-Z0-9_/-]+)\): (.+)$")
 
-# chore: description (no scope)
-CHORE_NO_SCOPE_PATTERN = re.compile(r"^chore: (.+)$")
+# Types that allow omitting scope
+SCOPE_OPTIONAL_TYPES = {"chore", "docs", "ci"}
+
+# type: description (no scope, for scope-optional types)
+NO_SCOPE_PATTERN = re.compile(rf"^({'|'.join(SCOPE_OPTIONAL_TYPES)}): (.+)$")
 
 # type( or type:
 TYPE_ONLY_PATTERN = re.compile(r"^([a-zA-Z_]+)")
@@ -141,11 +144,11 @@ def check_commit_msg(msg):
         # type: desc (missing scope)
         type_with_colon = re.compile(rf"^({VALID_TYPES_RE}):")
         if type_with_colon.match(msg):
-            # Allow chore: without scope
-            if type_lower == "chore":
-                chore_match = CHORE_NO_SCOPE_PATTERN.match(msg)
-                if chore_match:
-                    desc = chore_match.group(1)
+            # Allow scope-optional types (chore, docs, ci) without scope
+            if type_lower in SCOPE_OPTIONAL_TYPES:
+                no_scope_match = NO_SCOPE_PATTERN.match(msg)
+                if no_scope_match:
+                    desc = no_scope_match.group(2)
                     if desc and desc[0].isupper():
                         errors.append(
                             f"Description should start with lowercase: '{desc[:30]}...'"
@@ -299,7 +302,7 @@ def check_commits(base_branch=None, last_n=None):
 Expected format: type(scope): description
 
   Valid types: {', '.join(VALID_TYPES)}
-  Scope:       required, e.g. (draw), (obj), (style)
+  Scope:       required (except chore/docs/ci), e.g. (draw), (obj), (style)
   Description: lowercase start, no trailing period
 
 Good examples:
@@ -353,9 +356,13 @@ def self_test():
         ("feat(core): 0123456789", "description exactly 10 chars"),
         # PR number in description
         ("fix(render): handle opacity reset on layer fail (#9521)", "with PR number"),
-        # chore without scope (allowed)
+        # chore/docs/ci without scope (allowed)
         ("chore: bump version to release candidate tag", "chore without scope"),
         ("chore: fix typos in configuration file names", "chore without scope 2"),
+        ("docs: fix typos", "docs without scope"),
+        ("docs: add hero image", "docs without scope 2"),
+        ("ci: add workflow for automated testing", "ci without scope"),
+        ("ci: deploy doc builds to release folders", "ci without scope 2"),
         # Don't squash variants (rebase merge, skip title check)
         ("Dont's squash: minor docs fixes", "dont squash variant 1"),
         (
@@ -542,7 +549,7 @@ def check_title(title):
             f"\nExpected format: type(scope): description\n"
             f"\n"
             f"  Valid types: {', '.join(VALID_TYPES)}\n"
-            f"  Scope:       required (except chore), e.g. (draw), (obj)\n"
+            f"  Scope:       required (except chore/docs/ci), e.g. (draw), (obj)\n"
             f"  Description: lowercase start, no trailing period\n"
             f"\n"
             f"Examples:\n"
