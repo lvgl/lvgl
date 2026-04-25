@@ -50,9 +50,6 @@ FUNC_DECL_RE = re.compile(
     re.MULTILINE,
 )
 
-# Matches a Doxygen comment block /** ... */
-DOXYGEN_BLOCK_RE = re.compile(r"/\*\*.*?\*/", re.DOTALL)
-
 # Matches @param tags
 PARAM_TAG_RE = re.compile(r"@param\s+(?:\[(?:in|out|in,\s*out)\]\s+)?(\w+)")
 
@@ -366,6 +363,15 @@ def _check_file_impl(
     # Join multi-line declarations for regex matching
     joined = join_multiline_decls(raw_content)
 
+    # Build an index of all lv_* function name positions in the original content
+    # so we can match each regex hit to the correct location (not just the first).
+    func_positions: Dict[str, List[int]] = {}
+    for fm in re.finditer(r"\b(lv_\w+)\s*\(", raw_content):
+        name = fm.group(1)
+        if name not in func_positions:
+            func_positions[name] = []
+        func_positions[name].append(fm.start())
+
     errors = []
 
     for m in FUNC_DECL_RE.finditer(joined):
@@ -376,16 +382,14 @@ def _check_file_impl(
         if should_skip_func(func_name):
             continue
 
-        # Find this function in the original content to get accurate line number
-        # Search for the function name near a '(' and ';'
-        func_pattern = re.compile(
-            re.escape(func_name) + r"\s*\(",
-        )
-        original_match = func_pattern.search(raw_content)
-        if not original_match:
+        # Find this function in the original content to get accurate line number.
+        # Use the position list to pick the next unprocessed occurrence,
+        # avoiding the "first match only" bug for repeated function names.
+        positions = func_positions.get(func_name, [])
+        if not positions:
             continue
 
-        func_offset = original_match.start()
+        func_offset = positions.pop(0)
         line_num = offset_to_line(func_offset)
 
         # If we're filtering by lines, skip functions not in the target set
@@ -458,7 +462,7 @@ def get_changed_header_lines(commit_range: str) -> Dict[str, Set[int]]:
     return result
 
 
-def check_diff(commit_range: str) -> List[str]:
+def check_diff(commit_range: str, timeout: int = DEFAULT_FILE_TIMEOUT) -> List[str]:
     """Check Doxygen comments for functions changed in the given commit range."""
     changed = get_changed_header_lines(commit_range)
     if not changed:
@@ -469,7 +473,15 @@ def check_diff(commit_range: str) -> List[str]:
     for filepath, lines in sorted(changed.items()):
         if not filepath.endswith(".h"):
             continue
-        errs = check_file(filepath, target_lines=lines)
+        # Expand each changed line by a context window so that edits to
+        # a Doxygen block or multi-line declaration parameters also trigger
+        # a check on the associated function declaration.
+        expanded = set()
+        for ln in lines:
+            for offset in range(-15, 6):
+                expanded.add(ln + offset)
+        expanded.discard(0)
+        errs = check_file(filepath, target_lines=expanded, timeout=timeout)
         all_errors.extend(errs)
 
     return all_errors
@@ -880,7 +892,12 @@ lv_observer_t * lv_test_bind(lv_obj_t * obj, const lv_style_t * style,
 
     try:
         result = subprocess.run(
-            ["flake8", "--max-line-length=120", "--ignore=E501,W503,E402,E203", script_path],
+            [
+                "flake8",
+                "--max-line-length=120",
+                "--ignore=E501,W503,E402,E203",
+                script_path,
+            ],
             capture_output=True,
             text=True,
         )
@@ -956,7 +973,7 @@ def main():
         return self_test()
 
     if args.diff:
-        errors = check_diff(args.diff)
+        errors = check_diff(args.diff, timeout=args.timeout)
     elif args.file:
         errors = check_file(args.file, timeout=args.timeout)
     elif args.all:
