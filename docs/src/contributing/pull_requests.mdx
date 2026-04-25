@@ -61,18 +61,24 @@ The following structure should be used:
 
 Possible `<type>`s:
 
-- `fix` bugfix in LVGL source code
 - `feat` new feature
+- `fix` bugfix in LVGL source code
 - `arch` architectural changes
 - `perf` changes that affect performance
 - `example` anything related to examples (including fixes and new examples)
+- `refactor` code restructuring without changing behavior
+- `revert` reverting a previous commit
 - `docs` anything related to documentation (including fixes, formatting, and new pages)
+- `style` code formatting changes (not CSS-like style)
 - `test` anything related to tests (new and updated tests or CI actions)
 - `chore` any minor formatting or style changes that would make the changelog noisy
+- `ci` changes to CI configuration files and scripts
+- `build` changes that affect the build system or external dependencies
 
 `<scope>` is the name of the module, file, or subsystem affected by the
 commit. It's usually one word and can be chosen freely. For example
-`img`, `layout`, `txt`, `anim`. The scope can be omitted.
+`img`, `layout`, `txt`, `anim`. The scope is required for all types
+except `chore`, where it can be omitted.
 
 `<subject>` contains a short description of the change following these guidelines:
 
@@ -106,7 +112,7 @@ Fixes: #1234
 ```
 
 ```text
-feat: add span widget
+feat(span): add span widget
 
 The span widget allows mixing different font sizes, colors and styles.
 It's similar to HTML <span>
@@ -114,4 +120,38 @@ It's similar to HTML <span>
 
 ```text
 docs(porting): fix typo
+```
+
+```text
+chore: bump version to release candidate tag
+```
+
+### PR Title
+
+Since the repository uses squash merge by default, the PR title becomes
+the final commit message. Please make sure your PR title follows the
+same format described above.
+
+A CI check (`Verify PR title format`) will automatically verify the
+format when you open or update a PR. If the check fails, simply edit
+your PR title to fix the format — the check will re-run automatically.
+
+If your PR contains multiple independent commits that should **not** be
+squashed (i.e. the maintainer will use rebase merge), include
+"don't squash" in the PR title. The title check will be skipped in this
+case.
+
+### Automated Checker
+
+You can validate commit messages locally using the checker script:
+
+```bash
+# Check a single message
+python3 scripts/commit_msg_check.py --check-title "feat(draw): add gradient support"
+
+# Check commits between base branch and HEAD
+python3 scripts/commit_msg_check.py --base origin/master
+
+# Run self-tests
+python3 scripts/commit_msg_check.py --self-test
 ```
