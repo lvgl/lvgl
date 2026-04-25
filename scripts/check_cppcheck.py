@@ -212,40 +212,112 @@ def print_summary(issues: List[Dict], root: Path) -> int:
 
 
 def run_self_test() -> int:
-    """Basic sanity checks."""
+    """Comprehensive sanity checks including cppcheck detection verification."""
+    import tempfile
+
     print("Running self-tests...")
     passed = 0
     failed = 0
 
-    # Test 1: exclusion logic
-    assert is_excluded("src/libs/lodepng/lodepng.c"), "should exclude src/libs/"
-    assert is_excluded("src/libs/freetype/lv_freetype.c"), "should exclude src/libs/ subdir"
-    assert not is_excluded("src/core/lv_obj.c"), "should not exclude core"
-    assert not is_excluded("src/widgets/chart/lv_chart.c"), "should not exclude widgets"
-    assert not is_excluded("src/draw/nanovg/lv_nanovg.c"), "should not exclude drivers"
-    assert not is_excluded("src/drivers/wayland/lv_wayland.c"), "should not exclude drivers"
-    passed += 6
+    def check(condition: bool, name: str):
+        nonlocal passed, failed
+        if condition:
+            passed += 1
+        else:
+            failed += 1
+            print(f"  ❌ FAIL: {name}")
+
+    # --- 1. Exclusion logic ---
+    check(is_excluded("src/libs/lodepng/lodepng.c"), "exclude src/libs/")
+    check(is_excluded("src/libs/freetype/lv_freetype.c"), "exclude src/libs/ subdir")
+    check(not is_excluded("src/core/lv_obj.c"), "include core")
+    check(not is_excluded("src/widgets/chart/lv_chart.c"), "include widgets")
+    check(not is_excluded("src/draw/nanovg/lv_nanovg.c"), "include draw drivers")
+    check(not is_excluded("src/drivers/wayland/lv_wayland.c"), "include platform drivers")
+    # Edge case: path containing "libs" but not as "src/libs/"
+    check(not is_excluded("src/core/lv_libs_helper.c"), "include file with 'libs' in name")
     print(f"  exclusion logic: {passed} passed")
 
-    # Test 2: cppcheck is available
+    # --- 2. cppcheck availability ---
     try:
         result = subprocess.run(["cppcheck", "--version"], capture_output=True, text=True)
-        assert result.returncode == 0
+        check(result.returncode == 0, "cppcheck available")
         print(f"  cppcheck available: {result.stdout.strip()}")
-        passed += 1
     except FileNotFoundError:
-        print("  ❌ cppcheck not found")
-        failed += 1
+        check(False, "cppcheck available")
 
-    # Test 3: template parsing
+    # --- 3. Template parsing ---
     test_line = "error|test.c|42|nullPointer|Null pointer dereference"
     parts = test_line.split("|", 4)
-    assert len(parts) == 5
-    assert parts[0] == "error"
-    assert parts[2] == "42"
-    passed += 1
+    check(len(parts) == 5, "template split count")
+    check(parts[0] == "error", "template severity")
+    check(parts[2] == "42", "template line number")
     print(f"  template parsing: OK")
 
+    # --- 4. Detection tests: feed known-bad code to cppcheck ---
+    print("  detection tests:")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        test_cases = [
+            {
+                "name": "null pointer dereference",
+                "code": 'void f(void) { int *p = 0; *p = 1; }\n',
+                "expect_severity": "error",
+                "expect_id": "nullPointer",
+            },
+            {
+                "name": "uninitialized variable",
+                "code": 'void f(void) { int x; int y = x + 1; (void)y; }\n',
+                "expect_severity": "error",
+                "expect_id": "uninitvar",
+            },
+            {
+                "name": "array out of bounds",
+                "code": 'void f(void) { int a[10]; a[10] = 0; }\n',
+                "expect_severity": "error",
+                "expect_id": "arrayIndexOutOfBounds",
+            },
+            {
+                "name": "memory leak",
+                "code": 'void* malloc(unsigned long);\nvoid f(void) { void *p = malloc(10); if(!p) return; }\n',
+                "expect_severity": "error",
+                "expect_id": "memleak",
+            },
+            {
+                "name": "variable scope (style)",
+                "code": 'void f(int n) { int i; if(n > 0) { for(i = 0; i < n; i++) {} } }\n',
+                "expect_severity": "style",
+                "expect_id": "variableScope",
+            },
+        ]
+
+        for tc in test_cases:
+            test_file = os.path.join(tmpdir, "test.c")
+            with open(test_file, "w") as fh:
+                fh.write(tc["code"])
+
+            issues = run_cppcheck([test_file], jobs=1)
+            found = any(
+                i["id"] == tc["expect_id"] and i["severity"] == tc["expect_severity"]
+                for i in issues
+            )
+            check(found, f"detect {tc['name']} [{tc['expect_id']}]")
+            status = "✅" if found else "❌"
+            print(f"    {status} {tc['name']} ({tc['expect_id']})")
+
+    # --- 5. Annotation formatting ---
+    root = Path("/fake/root")
+    test_issue = {"severity": "error", "file": "/fake/root/src/core/lv_obj.c", "line": 42, "id": "nullPointer", "message": "test"}
+    ann = format_github_annotation(test_issue, root)
+    check("::error" in ann, "annotation level")
+    check("line=42" in ann, "annotation line")
+    check("cppcheck:nullPointer" in ann, "annotation checker id")
+
+    test_issue_noline = {"severity": "warning", "file": "/fake/root/src/core/lv_obj.c", "line": 0, "id": "test", "message": "test"}
+    ann2 = format_github_annotation(test_issue_noline, root)
+    check("line=" not in ann2, "annotation omits line=0")
+    print(f"  annotation formatting: OK")
+
+    # --- Summary ---
     print(f"\nSelf-test: {passed} passed, {failed} failed")
     return 1 if failed else 0
 
