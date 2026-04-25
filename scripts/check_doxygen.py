@@ -52,8 +52,8 @@ FUNC_DECL_RE = re.compile(
     re.MULTILINE,
 )
 
-# Matches @param tags
-PARAM_TAG_RE = re.compile(r"@param\s+(?:\[(?:in|out|in,\s*out)\]\s+)?(\w+)")
+# Matches @param tags — supports both "@param name" and "@param[in] name" forms
+PARAM_TAG_RE = re.compile(r"@param\s*(?:\[(?:in|out|in,\s*out)\]\s*)?(\w+)")
 
 # Matches @return tag
 RETURN_TAG_RE = re.compile(r"@return\b")
@@ -652,11 +652,32 @@ def self_test() -> int:
             "/** Set callback\n * @param obj pointer\n * @param cb callback\n */",
         ),
         (
-            "@param with [in] qualifier",
+            "@param with [in] qualifier (spaced)",
             "lv_test_qual",
             "void",
             "lv_obj_t * obj",
             "/** Do something\n * @param [in] obj pointer\n */",
+        ),
+        (
+            "@param[in] qualifier (no space)",
+            "lv_test_qual_in",
+            "void",
+            "lv_obj_t * obj",
+            "/** Do something\n * @param[in] obj pointer\n */",
+        ),
+        (
+            "@param[out] qualifier (no space)",
+            "lv_test_qual_out",
+            "void",
+            "lv_obj_t * obj",
+            "/** Do something\n * @param[out] obj pointer\n */",
+        ),
+        (
+            "@param[in,out] qualifier (no space)",
+            "lv_test_qual_inout",
+            "void",
+            "lv_obj_t * obj",
+            "/** Do something\n * @param[in,out] obj pointer\n */",
         ),
     ]
     for desc, func_name, ret_type, params, doxygen in good_cases:
