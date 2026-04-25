@@ -190,6 +190,7 @@ static void wl_g2d_deinit(void * backend_ctx)
     }
     if(ctx->handler) {
         zwp_linux_dmabuf_v1_destroy(ctx->handler);
+        ctx->handler = NULL;
     }
 }
 
