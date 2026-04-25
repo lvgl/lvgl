@@ -36,6 +36,7 @@ ANNOTATION_SEVERITIES = {"warning"}
 CPPCHECK_COMMON_ARGS = [
     "--enable=all",
     "--quiet",
+    "--inline-suppr",
     "--suppress=unusedFunction",
     "--suppress=preprocessorErrorDirective",
     "--suppress=missingIncludeSystem",
