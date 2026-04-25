@@ -497,20 +497,28 @@ def self_test():
     print("\n--- Don't Squash (check_title should pass, check_commit_msg should fail) ---")
     for msg, desc in dont_squash_cases:
         title_rc = check_title(msg)
+        commit_errors = check_commit_msg(msg)
         # check_title should return 0 (pass) due to don't squash bypass
-        if title_rc == 0:
+        # check_commit_msg should return errors (unless msg is independently valid)
+        msg_is_valid = not check_commit_msg(msg.replace("don't squash", "").replace("dont squash", ""))
+        if title_rc == 0 and (commit_errors or msg_is_valid):
             passed += 1
-            print(f"  ✓ PASS  [{desc}] -> check_title bypassed")
+            if commit_errors:
+                print(f"  ✓ PASS  [{desc}] -> title bypassed, commit rejected")
+            else:
+                print(f"  ✓ PASS  [{desc}] -> title bypassed, commit valid independently")
         else:
             failed += 1
-            print(f"  ✗ FAIL  [{desc}] -> check_title should have bypassed!")
+            if title_rc != 0:
+                print(f"  ✗ FAIL  [{desc}] -> check_title should have bypassed!")
+            else:
+                print(f"  ✗ FAIL  [{desc}] -> check_commit_msg should have rejected!")
             print(f"          msg: {msg}")
 
     print(f"\n{'=' * 60}")
-    print(f" Results: {passed}/{total} passed, {failed} failed")
-    print(f"{'=' * 60}")
 
     # Lint self
+    total += 1
     print(f"\n{'=' * 60}")
     print(" Lint Check (self)")
     print(f"{'=' * 60}")
@@ -547,8 +555,14 @@ def self_test():
 
     if lint_failed:
         failed += 1
+    else:
+        passed += 1
 
-    return 0 if (failed == 0 and not lint_failed) else 1
+    print(f"\n{'=' * 60}")
+    print(f" Final Results: {passed}/{total} passed, {failed} failed")
+    print(f"{'=' * 60}")
+
+    return 0 if failed == 0 else 1
 
 
 def check_title(title):
