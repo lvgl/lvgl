@@ -84,6 +84,13 @@ def run_cppcheck(files: List[str], jobs: int = 1) -> List[Dict]:
         cmd, capture_output=True, text=True, timeout=600
     )
 
+    # Check cppcheck exit status (Cubic P1)
+    if result.returncode != 0:
+        print(f"cppcheck failed with exit code {result.returncode}", file=sys.stderr)
+        if result.stderr:
+            print(result.stderr, file=sys.stderr)
+        # Continue parsing — cppcheck may still emit useful diagnostics
+
     issues = []
     for line in result.stderr.splitlines():
         parts = line.split("|", 4)
@@ -102,7 +109,8 @@ def run_cppcheck(files: List[str], jobs: int = 1) -> List[Dict]:
 
 def get_changed_files(diff_range: str, root: Path) -> List[str]:
     """Get .c/.h files changed in a git diff range."""
-    cmd = ["git", "diff", "--name-only", "--diff-filter=ACMR", diff_range, "--", "*.c", "*.h"]
+    # Get all changed files first, then filter by extension in Python (Copilot fix)
+    cmd = ["git", "diff", "--name-only", "--diff-filter=ACMR", diff_range]
     result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(root))
     if result.returncode != 0:
         print(f"git diff failed: {result.stderr}", file=sys.stderr)
@@ -111,7 +119,8 @@ def get_changed_files(diff_range: str, root: Path) -> List[str]:
     files = []
     for f in result.stdout.strip().splitlines():
         f = f.strip()
-        if f and not is_excluded(f):
+        # Filter by extension and exclusion
+        if f and (f.endswith(".c") or f.endswith(".h")) and not is_excluded(f):
             full = root / f
             if full.exists():
                 files.append(str(full))
