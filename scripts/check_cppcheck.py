@@ -118,14 +118,16 @@ def get_changed_files(diff_range: str, root: Path) -> List[str]:
     cmd = ["git", "diff", "--name-only", "--diff-filter=ACMR", diff_range]
     result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(root))
     if result.returncode != 0:
-        print(f"git diff failed: {result.stderr}", file=sys.stderr)
-        return []
+        stderr = result.stderr.strip() or "unknown error"
+        raise RuntimeError(
+            f"git diff failed for range '{diff_range}' in '{root}': {stderr}"
+        )
 
     files = []
     for f in result.stdout.strip().splitlines():
         f = f.strip()
-        # Filter by extension and exclusion
-        if f and (f.endswith(".c") or f.endswith(".h")) and not is_excluded(f):
+        # Filter: only src/ .c/.h files, apply exclusions (Copilot fix)
+        if f and f.startswith("src/") and (f.endswith(".c") or f.endswith(".h")) and not is_excluded(f):
             full = root / f
             if full.exists():
                 files.append(str(full))
