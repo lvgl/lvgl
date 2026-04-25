@@ -8,17 +8,16 @@ Modes:
   --all            Full scan of all src/**/*.c src/**/*.h (audit mode)
   --self-test      Run built-in sanity checks
 
-Exclusion list is aligned with gcovr.cfg to keep CI checks consistent.
+Exclusion: only src/libs/ (third-party code) is excluded.
 """
 
 import argparse
 import os
-import re
 import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import List, Dict
 
 # ---------------------------------------------------------------------------
 # Exclusion list — aligned with gcovr.cfg filter/exclude
@@ -80,9 +79,13 @@ def run_cppcheck(files: List[str], jobs: int = 1) -> List[Dict]:
         cmd.append(f"-j{jobs}")
     cmd.extend(files)
 
-    result = subprocess.run(
-        cmd, capture_output=True, text=True, timeout=600
-    )
+    try:
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=600
+        )
+    except subprocess.TimeoutExpired:
+        print("cppcheck timed out after 600s", file=sys.stderr)
+        return []
 
     # Check cppcheck exit status (Cubic P1)
     if result.returncode != 0:
@@ -128,7 +131,7 @@ def get_changed_files(diff_range: str, root: Path) -> List[str]:
 
 
 def get_all_files(root: Path) -> List[str]:
-    """Get all .c/.h files under src/, excluding third-party and hardware dirs."""
+    """Get all .c/.h files under src/, excluding paths in EXCLUDE_DIRS."""
     src_dir = root / "src"
     files = []
     for ext in ("*.c", "*.h"):
@@ -147,7 +150,14 @@ def format_github_annotation(issue: Dict, root: Path) -> str:
         rel = issue["file"]
 
     level = "error" if issue["severity"] in BLOCKING_SEVERITIES else "warning"
-    return f"::{level} file={rel},line={issue['line']}::[cppcheck:{issue['id']}] {issue['message']}"
+    
+    # Omit line attribute when unknown (Copilot fix)
+    line = issue.get("line", 0)
+    attrs = [f"file={rel}"]
+    if line > 0:
+        attrs.append(f"line={line}")
+    
+    return f"::{level} {','.join(attrs)}::[cppcheck:{issue['id']}] {issue['message']}"
 
 
 def print_summary(issues: List[Dict], root: Path) -> int:
@@ -266,7 +276,7 @@ def main() -> int:
         if not files:
             print("No .c/.h files changed (after exclusions). Nothing to check.")
             return 0
-        print(f"  {len(files)} file(s) to check (excluded: libs, hardware drivers)")
+        print(f"  {len(files)} file(s) to check (excluded: src/libs/)")
     elif args.file:
         target = Path(args.file)
         if target.is_dir():
@@ -279,7 +289,7 @@ def main() -> int:
             return 0
         print(f"  {len(files)} file(s) to check")
     elif args.all:
-        print("Full scan of src/ (excluding libs and hardware drivers)...")
+        print("Full scan of src/ (excluding src/libs/)...")
         files = get_all_files(root)
         print(f"  {len(files)} file(s) to check")
     else:
