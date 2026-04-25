@@ -6,7 +6,7 @@ LVGL Commit Message Style Checker
 Format: type(scope): description
 
 Valid types: feat, fix, arch, test, perf, example, refactor, revert, docs, style, chore, ci, build
-Scope:       required, lowercase, e.g. (draw), (obj)
+Scope:       required (except chore), letters/digits/_/-/ allowed, e.g. (draw), (obj)
 Description: lowercase start, no trailing period
 
 Usage:
@@ -92,7 +92,7 @@ def check_commit_msg(msg):
         return errors
 
     # Allow Revert commits
-    if msg.startswith('Revert "') or msg.startswith('Revert "'):
+    if msg.startswith('Revert "'):
         return errors
 
     # Allow merge commits
