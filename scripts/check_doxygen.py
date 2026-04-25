@@ -53,7 +53,7 @@ FUNC_DECL_RE = re.compile(
 )
 
 # Matches @param tags — supports both "@param name" and "@param[in] name" forms
-PARAM_TAG_RE = re.compile(r"@param\s*(?:\[(?:in|out|in,\s*out)\]\s*)?(\w+)")
+PARAM_TAG_RE = re.compile(r"@param(?:\s*\[(?:in|out|in,\s*out)\])?\s+(\w+)")
 
 # Matches @return tag
 RETURN_TAG_RE = re.compile(r"@return\b")
@@ -678,6 +678,13 @@ def self_test() -> int:
             "void",
             "lv_obj_t * obj",
             "/** Do something\n * @param[in,out] obj pointer\n */",
+        ),
+        (
+            "mixed @param[in] and @param[out] qualifiers",
+            "lv_test_qual_mixed",
+            "void",
+            "const lv_obj_t * src, lv_obj_t * dst",
+            "/** Copy object\n * @param[in] src source pointer\n * @param[out] dst destination pointer\n */",
         ),
     ]
     for desc, func_name, ret_type, params, doxygen in good_cases:
