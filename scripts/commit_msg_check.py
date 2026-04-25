@@ -65,7 +65,10 @@ CHORE_NO_SCOPE_PATTERN = re.compile(r"^chore: (.+)$")
 TYPE_ONLY_PATTERN = re.compile(r"^([a-zA-Z_]+)")
 
 # "don't squash" PR pattern (rebase merge, title won't become commit msg)
-DONT_SQUASH_PATTERN = re.compile(r"don'?t'?s?\s+squash", re.IGNORECASE)
+# Covers: don't squash, dont squash, dont's squash, do not squash, do-not-squash
+DONT_SQUASH_PATTERN = re.compile(
+    r"(?:don'?t'?s?|do[\s-]+not)[\s-]+squash", re.IGNORECASE
+)
 
 # Commit message format documentation URL
 COMMIT_MSG_DOC_URL = (
@@ -366,6 +369,8 @@ def self_test():
         ),
         ("DONT SQUASH: feat(draw): add new gradient support", "dont squash caps"),
         ("dont squash - multiple independent fixes", "dont squash lowercase"),
+        ("do not squash: multiple independent fixes", "do not squash"),
+        ("do-not-squash: multiple independent fixes", "do-not-squash"),
         # Leading/trailing whitespace (should be stripped)
         ("  feat(draw): add gradient support  ", "leading/trailing spaces"),
     ]
@@ -579,7 +584,7 @@ def main():
     if args.self_test:
         return self_test()
 
-    if args.check_title:
+    if args.check_title is not None:
         return check_title(args.check_title)
 
     return check_commits(args.base, args.last)
