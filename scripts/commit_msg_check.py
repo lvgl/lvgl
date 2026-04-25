@@ -102,10 +102,6 @@ def check_commit_msg(msg):
     if msg.startswith("Merge "):
         return errors
 
-    # Allow "don't squash" PRs (rebase merge, title won't become commit msg)
-    if DONT_SQUASH_PATTERN.search(msg):
-        return errors
-
     # Check for Chinese punctuation (common mistake)
     cn_punctuation = {
         "\uff08": "(",  # （ -> (
@@ -228,7 +224,7 @@ def git_run(*args):
 
 def find_base_branch():
     """Find the base branch for comparison."""
-    candidates = ["vela/dev-graphic", "m/dev-graphic", "mainline/master"]
+    candidates = ["origin/master", "origin/main", "upstream/master", "upstream/main"]
     for branch in candidates:
         _, rc = git_run("rev-parse", "--verify", branch)
         if rc == 0:
@@ -363,7 +359,12 @@ def self_test():
         ("docs: add hero image", "docs without scope 2"),
         ("ci: add workflow for automated testing", "ci without scope"),
         ("ci: deploy doc builds to release folders", "ci without scope 2"),
-        # Don't squash variants (rebase merge, skip title check)
+        # Leading/trailing whitespace (should be stripped)
+        ("  feat(draw): add gradient support  ", "leading/trailing spaces"),
+    ]
+
+    # Don't squash cases: should pass check_title() but NOT check_commit_msg()
+    dont_squash_cases = [
         ("Dont's squash: minor docs fixes", "dont squash variant 1"),
         (
             "Dont' Squash: improvements and fixes to workflow",
@@ -378,8 +379,6 @@ def self_test():
         ("dont squash - multiple independent fixes", "dont squash lowercase"),
         ("do not squash: multiple independent fixes", "do not squash"),
         ("do-not-squash: multiple independent fixes", "do-not-squash"),
-        # Leading/trailing whitespace (should be stripped)
-        ("  feat(draw): add gradient support  ", "leading/trailing spaces"),
     ]
 
     fail_cases = [
@@ -493,6 +492,20 @@ def self_test():
             print(f"  ✗ FAIL  [{desc}] -> should have been rejected!")
             print(f"          msg: {msg}")
 
+    # Test don't squash: should bypass check_title() but NOT check_commit_msg()
+    total += len(dont_squash_cases)
+    print("\n--- Don't Squash (check_title should pass, check_commit_msg should fail) ---")
+    for msg, desc in dont_squash_cases:
+        title_rc = check_title(msg)
+        # check_title should return 0 (pass) due to don't squash bypass
+        if title_rc == 0:
+            passed += 1
+            print(f"  ✓ PASS  [{desc}] -> check_title bypassed")
+        else:
+            failed += 1
+            print(f"  ✗ FAIL  [{desc}] -> check_title should have bypassed!")
+            print(f"          msg: {msg}")
+
     print(f"\n{'=' * 60}")
     print(f" Results: {passed}/{total} passed, {failed} failed")
     print(f"{'=' * 60}")
@@ -540,6 +553,10 @@ def self_test():
 
 def check_title(title):
     """Check a single PR title / commit message string."""
+    # Allow "don't squash" PRs (rebase merge, title won't become commit msg)
+    if DONT_SQUASH_PATTERN.search(title):
+        print(f"✓ PR title OK (don't squash): {title}")
+        return 0
     errors = check_commit_msg(title)
     if errors:
         print(f"\n  PR Title: {title}")
