@@ -39,13 +39,15 @@ DEFAULT_FILE_TIMEOUT = 5
 # Matches a C function declaration (not definition) in a header.
 # Captures: return_type, function_name, param_list
 # Handles multi-line declarations by working on joined text.
+# The param list uses a lazy match up to ");", supporting nested parens
+# (e.g. function pointer params like "void (*cb)(void *)").
 FUNC_DECL_RE = re.compile(
     r"^"
     r"(?!.*\b(?:typedef|struct|enum|union)\b)"  # skip typedefs/struct/enum/union
-    r"([\w][\w\s*]*?)"  # return type (non-greedy, e.g. "lv_obj_t *", "void", "bool")
+    r"([\w][\w\s*]*?)"  # return type (non-greedy)
     r"\b(lv_\w+)"  # function name starting with lv_
     r"\s*\("  # opening paren
-    r"([^)]*)"  # param list
+    r"(.*?)"  # param list (lazy, allows nested parens)
     r"\)\s*;",  # closing paren + semicolon
     re.MULTILINE,
 )
@@ -146,9 +148,11 @@ def parse_params(param_str: str) -> List[str]:
 def returns_value(return_type: str) -> bool:
     """Check if a return type is non-void (i.e. needs @return)."""
     rt = return_type.strip()
-    # Remove qualifiers
+    # Remove C qualifiers
     rt = re.sub(r"\b(static|inline|extern|const|volatile)\b", "", rt).strip()
-    return rt != "void"
+    # Remove LVGL attribute/deprecation macros (e.g. LV_ATTRIBUTE_FLUSH_READY, LV_DEPRECATED)
+    rt = re.sub(r"\bLV_\w+\b", "", rt).strip()
+    return rt != "void" and rt != ""
 
 
 def find_doxygen_for_line(content: str, func_start: int) -> Optional[str]:
@@ -456,8 +460,14 @@ def get_changed_header_lines(commit_range: str) -> Dict[str, Set[int]]:
             if hunk_match:
                 start = int(hunk_match.group(1))
                 count = int(hunk_match.group(2)) if hunk_match.group(2) else 1
-                for i in range(start, start + count):
-                    result[current_file].add(i)
+                if count == 0:
+                    # Pure deletion hunk: still record the start line so
+                    # nearby functions get checked (the context expansion
+                    # in check_diff will cover the surrounding declarations).
+                    result[current_file].add(start)
+                else:
+                    for i in range(start, start + count):
+                        result[current_file].add(i)
 
     return result
 
@@ -567,6 +577,10 @@ def self_test() -> int:
         ),
         ("char buf[64], size_t len", ["buf", "len"]),
         ("const lv_obj_class_t * class_p, lv_obj_t * obj", ["class_p", "obj"]),
+        (
+            "lv_obj_t * obj, void (* free_cb)(void * data), int32_t id",
+            ["obj", "free_cb", "id"],
+        ),
     ]
     for param_str, expected in param_tests:
         total += 1
@@ -591,6 +605,9 @@ def self_test() -> int:
         ("static inline void", False),
         ("static inline int32_t", True),
         ("lv_style_value_t", True),
+        ("LV_ATTRIBUTE_FLUSH_READY void", False),
+        ("LV_DEPRECATED void", False),
+        ("LV_ATTRIBUTE_FAST_MEM lv_obj_t *", True),
     ]
     for rt, expected in return_tests:
         total += 1
