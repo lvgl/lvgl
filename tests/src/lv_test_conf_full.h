@@ -208,6 +208,10 @@
 
 #define LV_USE_GESTURE_RECOGNITION 1
 
+#if defined(__linux__)
+    #define LV_USE_EVDEV 1
+#endif
+
 #define LV_DISABLE_API_MAPPING 1
 
 #endif /* LV_TEST_CONF_FULL_H */
