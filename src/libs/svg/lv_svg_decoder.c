@@ -362,8 +362,8 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * decoder_
     lv_matrix_translate(&matrix, coords->x1, coords->y1);
     dsc->ctx->scissor_area = *clip_area;
     if(image_dsc) {
-        float off_x = (lv_area_get_width(coords) - (int32_t)image_dsc->header.w - 1) / 2.0f;
-        float off_y = (lv_area_get_height(coords) - (int32_t)image_dsc->header.h - 1) / 2.0f;
+        int32_t off_x = (lv_area_get_width(coords) - (int32_t)image_dsc->header.w - 1) / 2;
+        int32_t off_y = (lv_area_get_height(coords) - (int32_t)image_dsc->header.h - 1) / 2;
 
         if(image_dsc->pivot.x != 0 || image_dsc->pivot.y != 0) {
             lv_matrix_translate(&matrix, off_x, off_y);
