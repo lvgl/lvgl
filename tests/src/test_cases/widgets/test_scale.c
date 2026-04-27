@@ -637,4 +637,23 @@ void test_scale_properties(void)
 #endif
 }
 
+void test_scale_with_1_tick(void)
+{
+    /* When the scale has 1 (or less) ticks, only the main part should be drawn,
+     * no ticks nor labels are expected to be drawn. */
+    lv_obj_t * lv_obj_t_id = lv_scale_create(lv_screen_active());
+    lv_obj_set_style_height(lv_obj_t_id, lv_pct(100), LV_PART_MAIN);
+    lv_obj_set_style_width(lv_obj_t_id, lv_pct(100), LV_PART_MAIN);
+    lv_obj_set_style_align(lv_obj_t_id, LV_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(lv_obj_t_id, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_set_style_radius(lv_obj_t_id, LV_RADIUS_CIRCLE, 0);
+    lv_scale_set_mode(lv_obj_t_id, LV_SCALE_MODE_ROUND_INNER);
+    lv_scale_set_range(lv_obj_t_id, 0, 100);
+    lv_scale_set_angle_range(lv_obj_t_id, 180);
+    lv_scale_set_rotation(lv_obj_t_id, 270);
+    lv_scale_set_total_tick_count(lv_obj_t_id, 1);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_9.png");
+}
+
 #endif
