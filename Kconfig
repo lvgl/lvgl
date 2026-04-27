@@ -756,6 +756,26 @@ menu "LVGL configuration"
 				help
 					When enabled, LV_ASSERT_HANDLER is also invoked when an
 					LV_CHECK_ARG check fails, before the action is executed.
+
+			config LV_USE_CHECK_OBJ_CLASSTYPE
+				bool "Enable class check in LV_CHECK_OBJ"
+				default y if !LV_CONF_MINIMAL
+				depends on LV_USE_CHECK_ARG
+				help
+					When enabled, LV_CHECK_OBJ verifies that the object has the
+					expected class (lv_obj_has_class). When disabled, the class
+					check is skipped even if a class argument is supplied.
+
+			config LV_USE_CHECK_OBJ_VALIDITY
+				bool "Enable widget-tree validity check in LV_CHECK_OBJ"
+				default y if !LV_CONF_MINIMAL
+				depends on LV_USE_CHECK_ARG
+				help
+					When enabled, LV_CHECK_OBJ also verifies that the object is
+					still part of the widget tree (lv_obj_is_valid). When disabled,
+					the validity check is skipped even if the associated argument
+					is supplied.
+
 		endmenu
 
 		menu "Debug"

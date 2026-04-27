@@ -1531,6 +1531,22 @@
     #endif
 #endif
 
+#ifndef LV_USE_CHECK_OBJ_CLASSTYPE
+    #ifdef CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
+        #define LV_USE_CHECK_OBJ_CLASSTYPE CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
+    #else
+        #define LV_USE_CHECK_OBJ_CLASSTYPE 1
+    #endif
+#endif
+
+#ifndef LV_USE_CHECK_OBJ_VALIDITY
+    #ifdef CONFIG_LV_USE_CHECK_OBJ_VALIDITY
+        #define LV_USE_CHECK_OBJ_VALIDITY CONFIG_LV_USE_CHECK_OBJ_VALIDITY
+    #else
+        #define LV_USE_CHECK_OBJ_VALIDITY 1
+    #endif
+#endif
+
 /*-------------
  * Debug
  *-----------*/
