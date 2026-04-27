@@ -112,28 +112,34 @@ jobs:
         run: |
           echo "VERSION_NAME=$(scripts/find_version.sh)" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy to subfolder
-        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
-        uses: JamesIves/github-pages-deploy-action@v4.8.0
-        with:
-          token: ${{ secrets.LVGL_BOT_TOKEN }}
-          repository-name: lvgl/open-docs
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs  # The folder the action should deploy.
-          target-folder: ${{ steps.version.outputs.VERSION_NAME }} # needs to match what is inside `docs/version_list.json`
-          git-config-name: lvgl-bot
-          git-config-email: lvgl-bot@users.noreply.github.com
-          commit: true
+      - name: Deploy Specific Version
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/') }}
+        run: |
+          git clone https://lvgl-bot:${{ secrets.LVGL_BOT_TOKEN }}@github.com/lvgl/open-docs.git /tmp/open-docs
+          rm -rf /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}
+          mkdir -p /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}
+          cp -r docs/. /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}/
+          cd /tmp/open-docs
+          git config user.name lvgl-bot
+          git config user.email lvgl-bot@users.noreply.github.com
+          git add .
+          git diff --cached --quiet || git commit -m "Deploy ${{ steps.version.outputs.VERSION_NAME }} ${{ github.sha }}"
+          git push
 
-      - name: Deploy to master
+      - name: Deploy Latest
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@v4.8.0
-        with:
-          token: ${{ secrets.LVGL_BOT_TOKEN }}
-          repository-name: lvgl/open-docs
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs  # The folder the action should deploy.
-          target-folder: latest # needs to match what is inside `docs/version_list.json`
-          git-config-name: lvgl-bot
-          git-config-email: lvgl-bot@users.noreply.github.com
-          commit: true
+        run: |
+          git clone https://lvgl-bot:${{ secrets.LVGL_BOT_TOKEN }}@github.com/lvgl/open-docs.git /tmp/open-docs-latest
+          rm -rf /tmp/open-docs-latest/latest
+          rm -rf /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}
+          mkdir -p /tmp/open-docs-latest/latest
+          mkdir -p /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}
+          cp -r docs/. /tmp/open-docs-latest/latest/
+          cp -r docs/. /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}/
+          cd /tmp/open-docs-latest
+          git config user.name lvgl-bot
+          git config user.email lvgl-bot@users.noreply.github.com
+          git add .
+          git diff --cached --quiet || git commit -m "Deploy ${{ steps.version.outputs.VERSION_NAME }} and latest from commit ${{ github.sha }}"
+          git push
+
