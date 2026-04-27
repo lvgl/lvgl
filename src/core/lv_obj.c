@@ -1197,11 +1197,13 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     lv_free(ts);
 
     if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW) {
-        /*Invalidation is not enough, e.g. layer type needs to be updated too*/
-        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+        /*Invalidation is not enough, e.g. layer type needs to be updated too.
+         *Pass the changed state bits so the descendant cascade can skip
+         *LV_EVENT_STYLE_CHANGED for subtrees with no state-keyed styles.*/
+        lv_obj_style_refresh_on_state_change(obj, prev_state ^ new_state);
     }
     else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
-        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+        lv_obj_style_refresh_on_state_change(obj, prev_state ^ new_state);
     }
     else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
         lv_obj_invalidate(obj);
