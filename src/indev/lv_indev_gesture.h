@@ -175,6 +175,16 @@ float lv_event_get_two_fingers_swipe_distance(lv_event_t * gesture_event);
 lv_dir_t lv_event_get_two_fingers_swipe_dir(lv_event_t * gesture_event);
 
 /**
+ * Obtains the center point for the gesture
+ * @param gesture_event     pointer to a gesture event
+ * @param type              the gesture type
+ * @param point             the center point of the gesture
+ * @return                  true if the gesture has a center point, false if not
+ */
+bool lv_event_get_gesture_center_point(lv_event_t * gesture_event, lv_indev_gesture_type_t type,
+                                       lv_point_t * point);
+
+/**
  * Sets the state of the recognizer to a indev data structure,
  * it is usually called from the indev read callback
  * @param data the indev data
