@@ -395,7 +395,7 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 
 void lv_subject_deinit(lv_subject_t * subject)
 {
-    if (!subject) return;
+    if(!subject) return;
 
     lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {

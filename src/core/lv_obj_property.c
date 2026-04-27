@@ -143,7 +143,9 @@ lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, u
 
 lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
 {
-    LV_CHECK_ARG(obj != NULL, return (lv_property_t){ .id = LV_PROPERTY_ID_INVALID});
+    LV_CHECK_ARG(obj != NULL, return (lv_property_t) {
+        .id = LV_PROPERTY_ID_INVALID
+    });
 
     lv_result_t result;
     lv_property_t value = { 0 };
@@ -172,7 +174,9 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
 
 lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, lv_part_t part)
 {
-    LV_CHECK_ARG(obj != NULL, return (lv_property_t){ .id = LV_PROPERTY_ID_INVALID});
+    LV_CHECK_ARG(obj != NULL, return (lv_property_t) {
+        .id = LV_PROPERTY_ID_INVALID
+    });
 
     lv_property_t value;
     uint32_t index = LV_PROPERTY_ID_INDEX(id);

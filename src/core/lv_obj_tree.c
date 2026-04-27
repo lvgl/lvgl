@@ -56,7 +56,7 @@ static lv_obj_t * lv_obj_get_first_not_deleting_child(lv_obj_t * obj);
 
 void lv_obj_delete(lv_obj_t * obj)
 {
-    if (!obj) return;
+    if(!obj) return;
     if(obj->is_deleting) return;
 
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);

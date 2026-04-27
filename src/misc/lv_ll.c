@@ -318,8 +318,8 @@ static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * pre
 
     act8 += LL_PREV_P_OFFSET(ll_p);
 
-    lv_ll_node_t **act_node_p = (lv_ll_node_t **) act8;
-    lv_ll_node_t **prev_node_p = (lv_ll_node_t **) &prev;
+    lv_ll_node_t ** act_node_p = (lv_ll_node_t **) act8;
+    lv_ll_node_t ** prev_node_p = (lv_ll_node_t **) &prev;
 
     *act_node_p = *prev_node_p;
 }

@@ -681,7 +681,9 @@ void lv_obj_update_layer_type(lv_obj_t * obj)
 
 lv_color32_t lv_obj_style_apply_recolor(const lv_obj_t * obj, lv_part_t part, lv_color32_t color)
 {
-    LV_CHECK_ARG(obj != NULL, return (lv_color32_t){0});
+    LV_CHECK_ARG(obj != NULL, return (lv_color32_t) {
+        0
+    });
 
     lv_opa_t opa = lv_obj_get_style_recolor_opa(obj, part);
     if(opa > LV_OPA_TRANSP) {
@@ -694,7 +696,9 @@ lv_color32_t lv_obj_style_apply_recolor(const lv_obj_t * obj, lv_part_t part, lv
 
 lv_color32_t lv_obj_get_style_recolor_recursive(const lv_obj_t * obj, lv_part_t part)
 {
-    LV_CHECK_ARG(obj != NULL, return (lv_color32_t){0});
+    LV_CHECK_ARG(obj != NULL, return (lv_color32_t) {
+        0
+    });
 
     lv_color32_t result;
 
