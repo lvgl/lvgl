@@ -301,11 +301,19 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
 
     lv_ll_remove(&lv_wl_ctx.window_ll, window);
 
-    if(LV_WAYLAND_DIRECT_EXIT && lv_ll_is_empty(&lv_wl_ctx.window_ll)) {
+    if(LV_WAYLAND_DIRECT_EXIT && lv_wayland_exit_ready()) {
         /* lv_deinit will deinit the wayland driver*/
         lv_deinit();
         exit(0);
     }
+}
+
+bool lv_wayland_exit_ready(void)
+{
+    if(lv_ll_is_empty(&lv_wl_ctx.window_ll)) {
+        return true;
+    }
+    return false;
 }
 
 /**********************

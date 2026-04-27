@@ -126,8 +126,20 @@ lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat
 void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard)
 {
     lv_wayland_update_indevs(keyboard_read, NULL);
+
+    if(seat_keyboard->xkb_keymap) {
+        xkb_keymap_unref(seat_keyboard->xkb_keymap);
+    }
+    if(seat_keyboard->xkb_state) {
+        xkb_state_unref(seat_keyboard->xkb_state);
+    }
+    if(seat_keyboard->wl_keyboard) {
+        wl_keyboard_destroy(seat_keyboard->wl_keyboard);
+    }
+
     lv_free(seat_keyboard);
 }
+
 
 /**********************
  *   STATIC FUNCTIONS
