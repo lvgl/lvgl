@@ -968,10 +968,6 @@ static bool obj_has_selector_on_bits(lv_obj_t * obj, lv_state_t state_bits)
 
 void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t changed_bits)
 {
-    /*Single-threaded LVGL invariant: no reentry while a state refresh is in
-     *progress. Catches accidental nesting.*/
-    LV_ASSERT(refresh_cascade_bits == 0);
-
     lv_state_t bits = changed_bits;
 
     /*Defensive fallback: an inheritable prop (e.g. LV_STYLE_TEXT_COLOR) under a
@@ -987,9 +983,14 @@ void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t changed_bit
         }
     }
 
+    /*Save and restore: an event handler dispatched during the cascade may
+     *legally trigger another state change, re-entering this function. We
+     *want the inner cascade to use its own filter and the outer cascade to
+     *resume with its previous filter intact, not be cleared to "no filter."*/
+    lv_state_t prev_refresh_cascade_bits = refresh_cascade_bits;
     refresh_cascade_bits = bits;
     lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
-    refresh_cascade_bits = 0;
+    refresh_cascade_bits = prev_refresh_cascade_bits;
 }
 
 /**
