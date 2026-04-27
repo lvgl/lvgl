@@ -13,6 +13,18 @@ static uint32_t anim2_start_called;
 static uint32_t anim1_completed_called;
 static uint32_t anim2_completed_called;
 
+/*Wrapper to adapt lv_obj_set_x (int32_t) to lv_anim_exec_xcb_t (lv_anim_value_t)*/
+static void set_x_anim_cb(void * obj, lv_anim_value_t v)
+{
+    lv_obj_set_x(obj, (int32_t)v);
+}
+
+/*Wrapper to adapt lv_obj_set_y (int32_t) to lv_anim_exec_xcb_t (lv_anim_value_t)*/
+static void set_y_anim_cb(void * obj, lv_anim_value_t v)
+{
+    lv_obj_set_y(obj, (int32_t)v);
+}
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -34,7 +46,7 @@ void test_anim_timeline_progress_1(void)
 
     lv_anim_t a1;
     lv_anim_init(&a1);
-    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_exec_cb(&a1, set_x_anim_cb);
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 0, 700);
     lv_anim_set_duration(&a1, 1000);
@@ -92,14 +104,14 @@ void test_anim_timeline_progress_2(void)
     lv_obj_set_size(obj, 100, 100);
     lv_anim_t a1;
     lv_anim_init(&a1);
-    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_exec_cb(&a1, set_x_anim_cb);
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 0, 700);
     lv_anim_set_duration(&a1, 1000);
 
     lv_anim_t a2;
     lv_anim_init(&a2);
-    lv_anim_set_exec_cb(&a2, (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_set_exec_cb(&a2, set_y_anim_cb);
     lv_anim_set_var(&a2, obj);
     lv_anim_set_values(&a2, 0, 300);
     lv_anim_set_duration(&a2, 1000);
@@ -169,7 +181,7 @@ void test_anim_timeline_start(void)
 
     lv_anim_t a1;
     lv_anim_init(&a1);
-    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_exec_cb(&a1, set_x_anim_cb);
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 50, 100);
     lv_anim_set_duration(&a1, 800);
@@ -261,7 +273,7 @@ void test_anim_timeline_reverse(void)
 
     lv_anim_t a1;
     lv_anim_init(&a1);
-    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_exec_cb(&a1, set_x_anim_cb);
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 50, 100);
     lv_anim_set_duration(&a1, 800);

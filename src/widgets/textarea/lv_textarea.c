@@ -50,8 +50,8 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void label_event_cb(lv_event_t * e);
-static void cursor_blink_anim_cb(void * obj, int32_t show);
-static void pwd_char_hider_anim(void * obj, int32_t x);
+static void cursor_blink_anim_cb(void * obj, lv_anim_value_t show);
+static void pwd_char_hider_anim(void * obj, lv_anim_value_t x);
 static void pwd_char_hider_anim_completed(lv_anim_t * a);
 static void pwd_char_hider(lv_obj_t * obj);
 static bool char_is_accepted(lv_obj_t * obj, uint32_t c);
@@ -958,7 +958,7 @@ static void label_event_cb(lv_event_t * e)
  * @param ta pointer to a text area
  * @param hide 1: hide the cursor, 0: show it
  */
-static void cursor_blink_anim_cb(void * obj, int32_t show)
+static void cursor_blink_anim_cb(void * obj, lv_anim_value_t show)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(show != ta->cursor.show) {
@@ -980,7 +980,7 @@ static void cursor_blink_anim_cb(void * obj, int32_t show)
  * @param ta unused
  * @param x unused
  */
-static void pwd_char_hider_anim(void * obj, int32_t x)
+static void pwd_char_hider_anim(void * obj, lv_anim_value_t x)
 {
     LV_UNUSED(obj);
     LV_UNUSED(x);

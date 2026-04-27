@@ -43,12 +43,14 @@ static void anim_timer(lv_timer_t * param);
 static void anim_vsync_event(lv_event_t * e);
 static void anim_mark_list_change(void);
 static void anim_completed_handler(lv_anim_t * a);
-static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
-                                         int32_t y1, int32_t x2, int32_t y2);
+static lv_anim_value_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
+                                                 int32_t y1, int32_t x2, int32_t y2);
 static void lv_anim_pause_for_internal(lv_anim_t * a, uint32_t ms);
+
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(const lv_anim_t * a_current);
 static void remove_anim(void * a);
+static bool anim_is_finished_time_cb(const lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -114,6 +116,7 @@ void lv_anim_init(lv_anim_t * a)
     a->repeat_cnt = 1;
     a->path_cb = lv_anim_path_linear;
     a->early_apply = 1;
+    a->is_finished_cb = anim_is_finished_time_cb;
 #if LV_USE_EXT_DATA
     a->ext_data.free_cb = NULL;
     a->ext_data.data = NULL;
@@ -144,10 +147,9 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     /*Set the start value*/
     if(new_anim->early_apply) {
         if(new_anim->get_value_cb) {
-            int32_t v_ofs = new_anim->get_value_cb(new_anim);
+            lv_anim_value_t v_ofs = new_anim->get_value_cb(new_anim);
             new_anim->start_value += v_ofs;
             new_anim->end_value += v_ofs;
-
         }
 
         resolve_time(new_anim);
@@ -187,7 +189,7 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
     bool del_any = false;
-    a        = lv_ll_get_head(anim_ll_p);
+    a = lv_ll_get_head(anim_ll_p);
     while(a != NULL) {
         bool del = false;
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
@@ -240,7 +242,6 @@ uint16_t lv_anim_count_running(void)
 
 uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time)
 {
-
     if(speed > 10000) {
         LV_LOG_WARN("speed is truncated to 10000 (was %"LV_PRIu32")", speed);
         speed = 10230;
@@ -272,9 +273,7 @@ uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end)
 {
     uint32_t d = LV_ABS(start - end);
     uint32_t time = (d * 1000) / speed;
-
     time = time == 0 ? 1 : time;
-
     return time;
 }
 
@@ -283,49 +282,53 @@ void lv_anim_refr_now(void)
     anim_timer(NULL);
 }
 
-int32_t lv_anim_path_linear(const lv_anim_t * a)
+lv_anim_value_t lv_anim_path_linear(const lv_anim_t * a)
 {
     /*Calculate the current step*/
     int32_t step = lv_map(a->act_time, 0, a->duration, 0, LV_ANIM_RESOLUTION);
 
     /*Get the new value which will be proportional to `step`
      *and the `start` and `end` values*/
-    int32_t new_value;
+    lv_anim_value_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> LV_ANIM_RES_SHIFT;
+
+    /* Use division to ensure truncation toward zero for negative values too.
+     * Right shift of negative signed values is implementation-defined and typically rounds toward -inf.
+     */
+    new_value = lv_anim_shift_divide(new_value, LV_ANIM_RES_SHIFT);
     new_value += a->start_value;
 
     return new_value;
 }
 
-int32_t lv_anim_path_ease_in(const lv_anim_t * a)
+lv_anim_value_t lv_anim_path_ease_in(const lv_anim_t * a)
 {
     return lv_anim_path_cubic_bezier(a, LV_BEZIER_VAL_FLOAT(0.42), LV_BEZIER_VAL_FLOAT(0),
                                      LV_BEZIER_VAL_FLOAT(1), LV_BEZIER_VAL_FLOAT(1));
 }
 
-int32_t lv_anim_path_ease_out(const lv_anim_t * a)
+lv_anim_value_t lv_anim_path_ease_out(const lv_anim_t * a)
 {
     return lv_anim_path_cubic_bezier(a, LV_BEZIER_VAL_FLOAT(0), LV_BEZIER_VAL_FLOAT(0),
                                      LV_BEZIER_VAL_FLOAT(0.58), LV_BEZIER_VAL_FLOAT(1));
 }
 
-int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
+lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_t * a)
 {
     return lv_anim_path_cubic_bezier(a, LV_BEZIER_VAL_FLOAT(0.42), LV_BEZIER_VAL_FLOAT(0),
                                      LV_BEZIER_VAL_FLOAT(0.58), LV_BEZIER_VAL_FLOAT(1));
 }
 
-int32_t lv_anim_path_overshoot(const lv_anim_t * a)
+lv_anim_value_t lv_anim_path_overshoot(const lv_anim_t * a)
 {
     return lv_anim_path_cubic_bezier(a, 341, 0, 683, 1300);
 }
 
-int32_t lv_anim_path_bounce(const lv_anim_t * a)
+lv_anim_value_t lv_anim_path_bounce(const lv_anim_t * a)
 {
     /*Calculate the current step*/
     int32_t t = lv_map(a->act_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
-    int32_t diff = (a->end_value - a->start_value);
+    lv_anim_value_t diff = (a->end_value - a->start_value);
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
 
@@ -365,15 +368,18 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
     if(t < 0) t = 0;
     int32_t step = lv_bezier3(t, 0, 500, 800, LV_BEZIER_VAL_MAX);
 
-    int32_t new_value;
+    lv_anim_value_t new_value;
     new_value = step * diff;
-    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
+    /* Use division to ensure truncation toward zero for negative values too.
+     * Right shift of negative signed values is implementation-defined and typically rounds toward -inf.
+     */
+    new_value = lv_anim_shift_divide(new_value, LV_BEZIER_VAL_SHIFT);
     new_value = a->end_value - new_value;
 
     return new_value;
 }
 
-int32_t lv_anim_path_step(const lv_anim_t * a)
+lv_anim_value_t lv_anim_path_step(const lv_anim_t * a)
 {
     if(a->act_time >= a->duration)
         return a->end_value;
@@ -381,7 +387,7 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
         return a->start_value;
 }
 
-int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a)
+lv_anim_value_t lv_anim_path_custom_bezier3(const lv_anim_t * a)
 {
     const lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
     return lv_anim_path_cubic_bezier(a, para->x1, para->y1, para->x2, para->y2);
@@ -407,10 +413,10 @@ void lv_anim_set_delay(lv_anim_t * a, uint32_t delay)
     a->act_time = -(int32_t)(delay);
 }
 
-void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
+void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_anim_value_t end)
 {
     a->start_value = start;
-    a->current_value = INT32_MIN;
+    a->current_value = (lv_anim_value_t)INT32_MIN;
     a->end_value = end;
 }
 
@@ -572,6 +578,16 @@ void lv_anim_set_external_data(lv_anim_t * anim, void * data, void (* free_cb)(v
 }
 #endif
 
+lv_anim_value_t lv_anim_shift_divide(lv_anim_value_t v, int32_t shift_unit)
+{
+#if LV_USE_ANIM_FLOAT
+    /* For floating-point, just perform normal division */
+    return v / (lv_anim_value_t)(1 << shift_unit);
+#else
+    return v >> shift_unit;
+#endif
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -617,9 +633,8 @@ static void anim_timer(lv_timer_t * param)
             a->run_round = state.anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
             /*The animation will run now for the first time. Call `start_cb`*/
             if(!a->start_cb_called && a->act_time >= 0) {
-
                 if(a->early_apply == 0 && a->get_value_cb) {
-                    int32_t v_ofs = a->get_value_cb(a);
+                    lv_anim_value_t v_ofs = a->get_value_cb(a);
                     a->start_value += v_ofs;
                     a->end_value += v_ofs;
                 }
@@ -635,11 +650,16 @@ static void anim_timer(lv_timer_t * param)
 
             if(a->act_time >= 0) {
                 int32_t act_time_original = a->act_time; /*The unclipped version is used later to correctly repeat the animation*/
-                if(a->act_time > a->duration) a->act_time = a->duration;
+                /*For time-finished animations clamp act_time to duration.
+                 *For convergence-finished paths (e.g. spring) act_time can run past duration;
+                 *clamping would freeze dt (= act_time - last_act_time) and break integration.
+                 */
+                if(a->is_finished_cb == anim_is_finished_time_cb) {
+                    if(a->act_time > a->duration) a->act_time = a->duration;
+                }
 
                 int32_t act_time_before_exec = a->act_time;
-                int32_t new_value;
-                new_value = a->path_cb(a);
+                lv_anim_value_t new_value = a->path_cb(a);
 
                 if(new_value != a->current_value) {
                     a->current_value = new_value;
@@ -651,12 +671,13 @@ static void anim_timer(lv_timer_t * param)
                 if(!state.anim_list_changed) {
                     /*Restore the original time to see if there is over time, ignoring silly values.
                      *Restore only if it wasn't changed in the `exec_cb` for some special reasons.*/
-                    if(a->act_time == act_time_before_exec && act_time_original < a->duration * 2) {
+                    if(a->is_finished_cb == anim_is_finished_time_cb &&
+                       a->act_time == act_time_before_exec && act_time_original < a->duration * 2) {
                         a->act_time = act_time_original;
                     }
 
-                    /*If the time is elapsed the animation is ready*/
-                    if(a->act_time >= a->duration) {
+                    /*If the animation is ready (time based, or custom condition)*/
+                    if(a->is_finished_cb && a->is_finished_cb(a)) {
                         anim_completed_handler(a);
                     }
                 }
@@ -670,7 +691,6 @@ static void anim_timer(lv_timer_t * param)
         else
             a = lv_ll_get_next(anim_ll_p, a);
     }
-
 }
 
 /**
@@ -722,13 +742,13 @@ static void anim_completed_handler(lv_anim_t * a)
             /*Toggle reverse-play state*/
             a->reverse_play_in_progress = a->reverse_play_in_progress == 0 ? 1 : 0;
             /*Swap the start and end values*/
-            int32_t tmp    = a->start_value;
+            lv_anim_value_t tmp = a->start_value;
             a->start_value = a->end_value;
             a->end_value   = tmp;
             /*Swap the time and reverse_duration*/
-            tmp = a->duration;
+            int32_t dt = a->duration;
             a->duration = a->reverse_duration;
-            a->reverse_duration = tmp;
+            a->reverse_duration = dt;
         }
     }
 }
@@ -767,15 +787,19 @@ static void anim_mark_list_change(void)
     }
 }
 
-static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+static lv_anim_value_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
     /*Calculate the current step*/
     uint32_t t = lv_map(a->act_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
     int32_t step = lv_cubic_bezier(t, x1, y1, x2, y2);
 
-    int32_t new_value;
+    lv_anim_value_t new_value;
     new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
+
+    /* Use division to ensure truncation toward zero for negative values too.
+    * Right shift of negative signed values is implementation-defined and typically rounds toward -inf.
+    */
+    new_value = lv_anim_shift_divide(new_value, LV_ANIM_RES_SHIFT);
     new_value += a->start_value;
 
     return new_value;
@@ -856,4 +880,9 @@ static void remove_anim(void * a)
     }
 #endif
     lv_free(a);
+}
+
+static bool anim_is_finished_time_cb(const lv_anim_t * a)
+{
+    return (a->act_time >= a->duration);
 }

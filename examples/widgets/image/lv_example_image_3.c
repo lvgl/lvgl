@@ -1,12 +1,12 @@
 #include "../../lv_examples.h"
 #if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
-static void set_angle(void * img, int32_t v)
+static void set_angle(void * img, lv_anim_value_t v)
 {
     lv_image_set_rotation((lv_obj_t *)img, v);
 }
 
-static void set_scale(void * img, int32_t v)
+static void set_scale(void * img, lv_anim_value_t v)
 {
     lv_image_set_scale((lv_obj_t *)img, v);
 }

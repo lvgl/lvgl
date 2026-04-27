@@ -41,7 +41,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void index_change(lv_obj_t * obj, int32_t idx);
+static void index_change(void * obj, lv_anim_value_t idx);
 static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_animimg_set_src_inner(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse);
 
@@ -226,12 +226,12 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_anim_init(&animimg->anim);
     lv_anim_set_var(&animimg->anim, obj);
     lv_anim_set_duration(&animimg->anim, 30);
-    lv_anim_set_exec_cb(&animimg->anim, (lv_anim_exec_xcb_t)index_change);
+    lv_anim_set_exec_cb(&animimg->anim, index_change);
     lv_anim_set_values(&animimg->anim, 0, 1);
     lv_anim_set_repeat_count(&animimg->anim, LV_ANIM_REPEAT_INFINITE);
 }
 
-static void index_change(lv_obj_t * obj, int32_t idx)
+static void index_change(void * obj, lv_anim_value_t idx)
 {
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
@@ -242,7 +242,7 @@ static void index_change(lv_obj_t * obj, int32_t idx)
 
     if(idx >= animimg->pic_count) idx =  animimg->pic_count - 1;
 
-    lv_image_set_src(obj, animimg->dsc[idx]);
+    lv_image_set_src(obj, animimg->dsc[(int32_t)idx]);
 }
 
 static void lv_animimg_set_src_inner(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse)

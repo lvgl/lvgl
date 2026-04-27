@@ -1843,6 +1843,17 @@
     #endif
 #endif
 
+/** Use `float` as `lv_anim_value_t` (the unified animation value type).
+ *  When enabled, all animation exec/get-value callbacks receive/return float.
+ *  Requires LV_USE_FLOAT. */
+#ifndef LV_USE_ANIM_FLOAT
+    #ifdef CONFIG_LV_USE_ANIM_FLOAT
+        #define LV_USE_ANIM_FLOAT CONFIG_LV_USE_ANIM_FLOAT
+    #else
+        #define LV_USE_ANIM_FLOAT      0
+    #endif
+#endif
+
 /** Enable matrix support
  *  - Requires `LV_USE_FLOAT = 1` */
 #ifndef LV_USE_MATRIX

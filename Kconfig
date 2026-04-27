@@ -938,6 +938,14 @@ menu "LVGL configuration"
 			bool "Use float as lv_value_precise_t"
 			default n
 
+		config LV_USE_ANIM_FLOAT
+			bool "Use float as lv_anim_value_t (unified animation value type)"
+			depends on LV_USE_FLOAT
+			default n
+			help
+				When enabled, all animation exec/get-value callbacks receive and
+				return float instead of int32_t. Requires LV_USE_FLOAT.
+
 		config LV_USE_MATRIX
 			bool "Enable matrix support"
 			default n

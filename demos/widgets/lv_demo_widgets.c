@@ -34,8 +34,7 @@
 static void color_changer_create(lv_obj_t * parent);
 static void color_changer_event_cb(lv_event_t * e);
 static void color_event_cb(lv_event_t * e);
-static void scroll_anim_y_cb(void * var, int32_t v);
-static void scroll_anim_y_cb(void * var, int32_t v);
+static void scroll_anim_y_cb(void * var, lv_anim_value_t v);
 static void slideshow_anim_completed_cb(lv_anim_t * a_old);
 static void tabview_delete_event_cb(lv_event_t * e);
 
@@ -184,14 +183,14 @@ static void color_changer_create(lv_obj_t * parent)
     }
 }
 
-static void color_changer_anim_cb(void * var, int32_t v)
+static void color_changer_anim_cb(void * var, lv_anim_value_t v)
 {
     lv_obj_t * obj = var;
     int32_t max_w = lv_obj_get_width(lv_obj_get_parent(obj)) - LV_DPX(20);
     int32_t w;
 
     if(disp_size == DISP_SMALL) {
-        w = lv_map(v, 0, 256, LV_DPX(52), max_w);
+        w = lv_map((int32_t)v, 0, 256, LV_DPX(52), max_w);
         lv_obj_set_width(obj, w);
         lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, - LV_DPX(10),  - LV_DPX(10));
     }
@@ -273,9 +272,9 @@ static void color_event_cb(lv_event_t * e)
     }
 }
 
-static void scroll_anim_y_cb(void * var, int32_t v)
+static void scroll_anim_y_cb(void * var, lv_anim_value_t v)
 {
-    lv_obj_scroll_to_y(var, v, LV_ANIM_OFF);
+    lv_obj_scroll_to_y(var, (int32_t)v, LV_ANIM_OFF);
 }
 
 static void slideshow_anim_completed_cb(lv_anim_t * a_old)

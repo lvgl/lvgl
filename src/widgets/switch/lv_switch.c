@@ -46,7 +46,7 @@ static void lv_switch_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
-static void lv_switch_anim_exec_cb(void * sw, int32_t value);
+static void lv_switch_anim_exec_cb(void * sw, lv_anim_value_t value);
 static void lv_switch_trigger_anim(lv_obj_t * obj);
 static void lv_switch_anim_completed(lv_anim_t * a);
 
@@ -289,7 +289,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect(layer, &knob_rect_dsc, &knob_area);
 }
 
-static void lv_switch_anim_exec_cb(void * var, int32_t value)
+static void lv_switch_anim_exec_cb(void * var, lv_anim_value_t value)
 {
     lv_switch_t * sw = var;
     sw->anim_state = value;

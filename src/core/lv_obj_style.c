@@ -63,12 +63,12 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t se
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
-static void trans_anim_cb(void * _tr, int32_t v);
+static void trans_anim_cb(void * _tr, lv_anim_value_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_completed_cb(lv_anim_t * a);
 static lv_layer_type_t calculate_layer_type(lv_obj_t * obj);
 static void full_cache_refresh(lv_obj_t * obj, lv_part_t part);
-static void fade_anim_cb(void * obj, int32_t v);
+static void fade_anim_cb(void * obj, lv_anim_value_t v);
 static void fade_in_anim_completed(lv_anim_t * a);
 static bool style_has_flag(const lv_style_t * style, uint32_t flag);
 static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
@@ -984,10 +984,11 @@ static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, t
     return removed;
 }
 
-static void trans_anim_cb(void * _tr, int32_t v)
+static void trans_anim_cb(void * _tr, lv_anim_value_t v)
 {
     trans_t * tr = _tr;
     lv_obj_t * obj = tr->obj;
+    int32_t vi = (int32_t)v;  /*Integer value for comparisons and arithmetic*/
 
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
@@ -999,18 +1000,18 @@ static void trans_anim_cb(void * _tr, int32_t v)
             case LV_STYLE_BORDER_SIDE:
             case LV_STYLE_BORDER_POST:
             case LV_STYLE_BLEND_MODE:
-                if(v < 255) value_final.num = tr->start_value.num;
+                if(vi < 255) value_final.num = tr->start_value.num;
                 else value_final.num = tr->end_value.num;
                 break;
             case LV_STYLE_TRANSITION:
             case LV_STYLE_TEXT_FONT:
-                if(v < 255) value_final.ptr = tr->start_value.ptr;
+                if(vi < 255) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
             case LV_STYLE_COLOR_FILTER_DSC:
                 if(tr->start_value.ptr == NULL) value_final.ptr = tr->end_value.ptr;
                 else if(tr->end_value.ptr == NULL) value_final.ptr = tr->start_value.ptr;
-                else if(v < 128) value_final.ptr = tr->start_value.ptr;
+                else if(vi < 128) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
             case LV_STYLE_RECOLOR:
@@ -1021,15 +1022,15 @@ static void trans_anim_cb(void * _tr, int32_t v)
             case LV_STYLE_SHADOW_COLOR:
             case LV_STYLE_OUTLINE_COLOR:
             case LV_STYLE_IMAGE_RECOLOR:
-                if(v <= 0) value_final.color = tr->start_value.color;
-                else if(v >= 255) value_final.color = tr->end_value.color;
-                else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
+                if(vi <= 0) value_final.color = tr->start_value.color;
+                else if(vi >= 255) value_final.color = tr->end_value.color;
+                else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, vi);
                 break;
 
             default:
-                if(v == 0) value_final.num = tr->start_value.num;
-                else if(v == 255) value_final.num = tr->end_value.num;
-                else value_final.num = tr->start_value.num + ((int32_t)((int32_t)(tr->end_value.num - tr->start_value.num) * v) >> 8);
+                if(vi == 0) value_final.num = tr->start_value.num;
+                else if(vi == 255) value_final.num = tr->end_value.num;
+                else value_final.num = tr->start_value.num + ((int32_t)((tr->end_value.num - tr->start_value.num) * vi) >> 8);
                 break;
         }
 
@@ -1179,9 +1180,9 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
 #endif
 }
 
-static void fade_anim_cb(void * obj, int32_t v)
+static void fade_anim_cb(void * obj, lv_anim_value_t v)
 {
-    lv_obj_set_style_opa(obj, v, 0);
+    lv_obj_set_style_opa(obj, (int32_t)v, 0);
 }
 
 static void fade_in_anim_completed(lv_anim_t * a)

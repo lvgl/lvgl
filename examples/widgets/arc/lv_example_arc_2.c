@@ -2,7 +2,7 @@
 
 #if LV_USE_ARC && LV_BUILD_EXAMPLES
 
-static void set_angle(void * obj, int32_t v)
+static void set_angle(void * obj, lv_anim_value_t v)
 {
     lv_arc_set_value((lv_obj_t *)obj, v);
 }
