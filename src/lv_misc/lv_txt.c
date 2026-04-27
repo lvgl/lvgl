@@ -440,6 +440,34 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 }
 
 /**
+ * Convert a hexadecimal characters to a number (0..15)
+ * @param hex Pointer to a hexadecimal character (0..9, A..F)
+ * @return the numerical value of `hex` or 0 on error
+ */
+uint8_t lv_txt_hex_char_to_num(char hex)
+{
+    uint8_t result = 0;
+
+    if(hex >= '0' && hex <= '9') {
+        result = hex - '0';
+    } else {
+        if(hex >= 'a') hex -= 'a' - 'A'; /*Convert to upper case*/
+
+        switch(hex) {
+            case 'A': result = 10; break;
+            case 'B': result = 11; break;
+            case 'C': result = 12; break;
+            case 'D': result = 13; break;
+            case 'E': result = 14; break;
+            case 'F': result = 15; break;
+            default: result = 0; break;
+        }
+    }
+
+    return result;
+}
+
+/**
  * Delete a part of a string
  * @param txt string to modify
  * @param pos position where to start the deleting (0: before the first char, 1: after the first

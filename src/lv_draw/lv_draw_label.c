@@ -8,6 +8,7 @@
  *********************/
 #include "lv_draw_label.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_bidi.h"
 
 /*********************
@@ -29,7 +30,6 @@ typedef uint8_t cmd_state_t;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static uint8_t hex_char_to_num(char hex);
 
 /**********************
  *  STATIC VARIABLES
@@ -227,9 +227,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                             memcpy(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
                             int r, g, b;
-                            r       = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
-                            g       = (hex_char_to_num(buf[2]) << 4) + hex_char_to_num(buf[3]);
-                            b       = (hex_char_to_num(buf[4]) << 4) + hex_char_to_num(buf[5]);
+                            r = (lv_txt_hex_char_to_num(buf[0]) << 4) + lv_txt_hex_char_to_num(buf[1]);
+                            g = (lv_txt_hex_char_to_num(buf[2]) << 4) + lv_txt_hex_char_to_num(buf[3]);
+                            b = (lv_txt_hex_char_to_num(buf[4]) << 4) + lv_txt_hex_char_to_num(buf[5]);
                             recolor = lv_color_make(r, g, b);
                         } else {
                             recolor.full = style->text.color.full;
@@ -293,31 +293,3 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-/**
- * Convert a hexadecimal characters to a number (0..15)
- * @param hex Pointer to a hexadecimal character (0..9, A..F)
- * @return the numerical value of `hex` or 0 on error
- */
-static uint8_t hex_char_to_num(char hex)
-{
-    uint8_t result = 0;
-
-    if(hex >= '0' && hex <= '9') {
-        result = hex - '0';
-    } else {
-        if(hex >= 'a') hex -= 'a' - 'A'; /*Convert to upper case*/
-
-        switch(hex) {
-        case 'A': result = 10; break;
-        case 'B': result = 11; break;
-        case 'C': result = 12; break;
-        case 'D': result = 13; break;
-        case 'E': result = 14; break;
-        case 'F': result = 15; break;
-        default: result = 0; break;
-        }
-    }
-
-    return result;
-}

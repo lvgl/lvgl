@@ -130,6 +130,13 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
  */
 void lv_txt_cut(char * txt, uint32_t pos, uint32_t len);
 
+/**
+ * Convert a hexadecimal characters to a number (0..15)
+ * @param hex Pointer to a hexadecimal character (0..9, A..F)
+ * @return the numerical value of `hex` or 0 on error
+ */
+uint8_t lv_txt_hex_char_to_num(char hex);
+
 /***************************************************************
  *  GLOBAL FUNCTION POINTERS FOR CAHRACTER ENCODING INTERFACE
  ***************************************************************/
