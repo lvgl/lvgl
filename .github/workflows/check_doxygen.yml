@@ -1,0 +1,37 @@
+name: Verify Doxygen comments on public API
+on:
+  pull_request:
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  check-doxygen:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Self-test Doxygen checker
+        run: python3 scripts/check_doxygen.py --self-test
+      - name: Check Doxygen comments on changed headers
+        run: |
+          git fetch --no-tags --prune origin \
+            ${{ github.event.pull_request.base.sha }} \
+            ${{ github.event.pull_request.head.sha }}
+          MB=$(git merge-base \
+            ${{ github.event.pull_request.base.sha }} \
+            ${{ github.event.pull_request.head.sha }})
+          echo "Merge-base: $MB"
+          python3 scripts/check_doxygen.py \
+            --diff "${MB}...${{ github.event.pull_request.head.sha }}" \
+            --timeout 5
