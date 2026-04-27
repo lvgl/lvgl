@@ -129,6 +129,7 @@ typedef struct _lv_timer_t lv_timer_t;
 typedef struct _lv_theme_t lv_theme_t;
 
 typedef struct _lv_anim_t lv_anim_t;
+typedef struct _lv_delete_dsc_t lv_delete_dsc_t;
 
 typedef struct _lv_anim_timeline_t lv_anim_timeline_t;
 
