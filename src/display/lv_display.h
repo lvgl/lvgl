@@ -363,6 +363,41 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
 lv_color_format_t lv_display_get_color_format(lv_display_t * disp);
 
 /**
+ * Set the palette used when the display's color format is indexed
+ * (e.g. `LV_COLOR_FORMAT_I4`, `LV_COLOR_FORMAT_I8`).
+ *
+ * The software blender uses this to quantize incoming RGB pixels to
+ * the closest palette index when rendering into an indexed framebuffer.
+ *
+ * The palette is *not* copied — the caller is responsible for ensuring
+ * the buffer outlives the display, or for keeping it valid until the
+ * next call to this function.
+ *
+ * @param disp              pointer to a display
+ * @param palette           pointer to an array of `lv_color32_t` palette
+ *                          entries, or NULL to clear (a default 16-entry
+ *                          grayscale palette will be used by the I4 blender
+ *                          when none is set).
+ * @param size              number of entries in `palette`. Must be 16
+ *                          for I4 destinations, 256 for I8 destinations.
+ */
+void lv_display_set_palette(lv_display_t * disp, const lv_color32_t * palette, uint32_t size);
+
+/**
+ * Get the palette previously set with `lv_display_set_palette`.
+ * @param disp              pointer to a display
+ * @return                  pointer to the palette, or NULL if none was set
+ */
+const lv_color32_t * lv_display_get_palette(lv_display_t * disp);
+
+/**
+ * Get the number of entries in the display's palette.
+ * @param disp              pointer to a display
+ * @return                  number of palette entries, or 0 if no palette was set
+ */
+uint32_t lv_display_get_palette_size(lv_display_t * disp);
+
+/**
  * Set the number of tiles for parallel rendering.
  * @param disp              pointer to a display
  * @param tile_cnt          number of tiles (1 =< tile_cnt < 256)
