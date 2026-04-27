@@ -126,6 +126,17 @@ The SDL driver can leverage OpenGL for hardware-accelerated rendering. LVGL prov
 
 See the [Complete OpenGL overview](/integration/embedded_linux/opengl) for more information.
 
+<Callout type="info" title="Driver Support">
+OpenGL-based rendering is only supported on Linux when using `x11` as the SDL video driver.
+
+When the EGL/OpenGL path is enabled, LVGL currently forces SDL to use the `x11`
+video driver, overriding `SDL_VIDEODRIVER`. As a result, selecting drivers such as
+`wayland` or `kmsdrm` via `SDL_VIDEODRIVER` will not take effect in this mode.
+
+To use those SDL backends, do not enable the OpenGL/EGL rendering path; use the
+regular SDL renderer instead.
+</Callout>
+
 ## See Also
 
 - [SDL Draw Unit](/integration/embedded_linux/draw_sdl) - SDL texture-based rendering

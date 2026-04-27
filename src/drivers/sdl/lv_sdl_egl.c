@@ -79,7 +79,9 @@ static lv_result_t init_display(lv_display_t * display)
     }
     ddata->egl_ctx = lv_opengles_egl_context_create(&ifc);
     if(!ddata->egl_ctx) {
-        LV_LOG_ERROR("Failed to initialize EGL context");
+        LV_LOG_ERROR("Failed to initialize EGL context.");
+        LV_LOG_ERROR("This probably means you're trying to use an unsupported SDL_VIDEO_DRIVER.");
+        LV_LOG_ERROR("Try setting SDL_VIDEODRIVER=x11 via an environment variable");
         lv_free(ddata);
         return LV_RESULT_INVALID;
     }
@@ -161,19 +163,26 @@ static void * create_window_cb(void * driver_data, const lv_egl_native_window_pr
     lv_display_t * display = (lv_display_t *)driver_data;
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
-    SDL_GetWindowWMInfo(lv_sdl_window_get_window(display), &wmInfo);
+    if(SDL_GetWindowWMInfo(lv_sdl_window_get_window(display), &wmInfo) != SDL_TRUE) {
+        LV_LOG_ERROR("SDL_GetWindowWMInfo failed: %s", SDL_GetError());
+        return NULL;
+    }
 
     EGLNativeWindowType native_window;
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
-    native_window = wmInfo.info.win.window;
-#elif defined(SDL_VIDEO_DRIVER_X11)
-    native_window = wmInfo.info.x11.window;
-#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
-    native_window = wmInfo.info.wl.surface;
+    const char * driver = SDL_GetCurrentVideoDriver();
+
+    if(driver && strcmp(driver, "x11") == 0) {
+#if defined(SDL_VIDEO_DRIVER_X11)
+        native_window = (EGLNativeWindowType)wmInfo.info.x11.window;
 #else
-    LV_LOG_ERROR("Unsupported platform for EGL");
-    return NULL;
+        LV_LOG_ERROR("SDL built without X11 support");
+        return NULL;
 #endif
+    }
+    else {
+        LV_LOG_ERROR("Unsupported SDL video driver: (%s)", driver ? driver : "(null)");
+        return NULL;
+    }
     return (void *)native_window;
 }
 
