@@ -13,7 +13,7 @@
 #include "../indev/lv_indev_scroll.h"
 #include "../display/lv_display.h"
 #include "../misc/lv_area.h"
-#include "src/misc/lv_check_arg.h"
+#include "../misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -521,8 +521,8 @@ void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
 void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t * ver_area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_CHECK_ARG(hor_area != NULL, return;)
-    LV_CHECK_ARG(ver_area != NULL, return;)
+    LV_CHECK_ARG(hor_area != NULL, return);
+    LV_CHECK_ARG(ver_area != NULL, return);
 
     lv_area_set(hor_area, 0, 0, -1, -1);
     lv_area_set(ver_area, 0, 0, -1, -1);
@@ -700,7 +700,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
 
 void lv_obj_scrollbar_invalidate(lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return;)
+    LV_CHECK_ARG(obj != NULL, return);
 
     lv_area_t hor_area;
     lv_area_t ver_area;
@@ -714,7 +714,7 @@ void lv_obj_scrollbar_invalidate(lv_obj_t * obj)
 
 void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
-    LV_CHECK_ARG(obj != NULL, return;)
+    LV_CHECK_ARG(obj != NULL, return);
 
     /*Be sure the bottom side is not remains scrolled in*/
     /*With snapping the content can't be scrolled in*/

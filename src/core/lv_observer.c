@@ -14,8 +14,6 @@
 #include "../misc/lv_check_arg.h"
 #include "../core/lv_obj_private.h"
 #include "../misc/lv_event_private.h"
-#include <math.h>
-
 /*********************
  *      DEFINES
  *********************/
@@ -189,16 +187,16 @@ void lv_subject_set_float(lv_subject_t * subject, float value)
 
 float lv_subject_get_float(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return NAN);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return NAN);
+    LV_CHECK_ARG(subject != NULL, return 0.0);
+    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return 0.0);
 
     return subject->value.float_v;
 }
 
 float lv_subject_get_previous_float(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return NAN);
-    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return NAN);
+    LV_CHECK_ARG(subject != NULL, return 0.0);
+    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_FLOAT, return 0.0);
 
     return subject->prev_value.float_v;
 }
@@ -397,7 +395,7 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 
 void lv_subject_deinit(lv_subject_t * subject)
 {
-    LV_CHECK_ARG(subject != NULL, return);
+    if (!subject) return;
 
     lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {
@@ -565,7 +563,7 @@ lv_subject_increment_dsc_t * lv_obj_add_subject_increment_event(lv_obj_t * obj, 
 {
     LV_CHECK_ARG(obj != NULL, return NULL);
     LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT, return NULL);
+    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_INT || subject->type == LV_SUBJECT_TYPE_FLOAT, return NULL);
 
     lv_subject_increment_dsc_t * user_data = lv_malloc(sizeof(lv_subject_increment_dsc_t));
     if(user_data == NULL) {
@@ -959,8 +957,8 @@ static void unsubscribe_on_delete_cb(lv_event_t * e)
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv, flag_cond_t cond)
 {
-    LV_CHECK_ARG(subject != NULL, return NULL);
-    LV_CHECK_ARG(obj != NULL, return NULL);
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
 
     if(subject->type != LV_SUBJECT_TYPE_INT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);

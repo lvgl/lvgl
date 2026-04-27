@@ -12,7 +12,7 @@
 #include "lv_obj_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
-#include "src/misc/lv_check_arg.h"
+#include "../misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES

@@ -16,7 +16,7 @@
 #include "../display/lv_display_private.h"
 #include "lv_refr_private.h"
 #include "../core/lv_global.h"
-#include "src/misc/lv_check_arg.h"
+#include "../misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -434,7 +434,6 @@ void lv_obj_align(lv_obj_t * obj, lv_align_t align, int32_t x_ofs, int32_t y_ofs
 void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, int32_t x_ofs, int32_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_OBJ(base, MY_CLASS);
 
     lv_obj_update_layout(obj);
     if(base == NULL) base = lv_obj_get_parent(obj);
@@ -1187,7 +1186,7 @@ lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
 
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 {
-    LV_CHECK_ARG(area != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(area != NULL, return false);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;

@@ -15,7 +15,7 @@
 #include "../misc/lv_anim_private.h"
 #include "../misc/lv_async.h"
 #include "../core/lv_global.h"
-#include "src/misc/lv_check_arg.h"
+#include "../misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -56,10 +56,8 @@ static lv_obj_t * lv_obj_get_first_not_deleting_child(lv_obj_t * obj);
 
 void lv_obj_delete(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    if(obj->is_deleting)
-        return;
+    if (!obj) return;
+    if(obj->is_deleting) return;
 
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);
     lv_obj_invalidate(obj);

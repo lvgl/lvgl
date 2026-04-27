@@ -12,7 +12,7 @@
 #include "../misc/lv_utils.h"
 #include "lv_obj_property.h"
 #include "lv_obj_class_private.h"
-#include "src/misc/lv_check_arg.h"
+#include "../misc/lv_check_arg.h"
 
 #if LV_USE_OBJ_PROPERTY
 
@@ -229,7 +229,7 @@ lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char
 lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name)
 {
 #if LV_USE_OBJ_PROPERTY_NAME
-    LV_CHECK_ARG(obj != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(obj != NULL, return LV_PROPERTY_ID_INVALID);
 
     const lv_obj_class_t * clz;
     lv_prop_id_t id;

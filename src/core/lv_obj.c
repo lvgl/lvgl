@@ -334,7 +334,6 @@ void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_CHECK_ARG((state & ~LV_STATE_ANY) == 0, return);
 
     lv_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
@@ -348,7 +347,6 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_CHECK_ARG((state & ~LV_STATE_ANY) == 0, return);
 
     lv_state_t new_state = obj->state & (~state);
     if(obj->state != new_state) {
@@ -544,7 +542,7 @@ void * lv_obj_get_id(const lv_obj_t * obj)
     return obj->id;
 }
 
-lv_obj_t * lv_obj_find_by_id(lv_obj_t * obj, const void * id)
+lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
 {
     LV_CHECK_ARG(id != NULL, return NULL);
 
@@ -553,14 +551,15 @@ lv_obj_t * lv_obj_find_by_id(lv_obj_t * obj, const void * id)
     if(obj == NULL) obj = lv_display_get_screen_active(NULL);
     if(obj == NULL) return NULL;
 
-    if(lv_obj_id_compare(obj->id, id) == 0) return obj;
-
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
 
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
+
+        if(lv_obj_id_compare(child->id, id) == 0) return child;
         lv_obj_t * found = lv_obj_find_by_id(child, id);
+
         if(found != NULL) return found;
     }
 

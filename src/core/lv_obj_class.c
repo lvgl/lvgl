@@ -11,8 +11,8 @@
 #include "../themes/lv_theme.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
-#include "../stdlib/lv_string.h"
 #include "../misc/lv_check_arg.h"
+#include "../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -206,11 +206,11 @@ void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void
 
 static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    LV_CHECK_ARG(class_p != NULL, return);
-    LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(obj->class_p != NULL, return);
+    LV_ASSERT_NULL(class_p);
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NULL(obj->class_p);
 
-#ifdef LV_USE_OBJ_NAME
+#if LV_USE_OBJ_NAME
     LV_CHECK_ARG(class_p->name != NULL, return);
 #endif
 

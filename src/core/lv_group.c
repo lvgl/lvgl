@@ -136,9 +136,11 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
         return;
     }
 
+    LV_ASSERT_NULL(obj->spec_attr);
+
     /*Be sure the object is removed from its current group*/
     lv_group_remove_obj(obj);
-    if (obj->spec_attr) obj->spec_attr->group_p = group;
+    obj->spec_attr->group_p = group;
 
     lv_obj_t ** next = lv_ll_ins_tail(&group->obj_ll);
     LV_ASSERT_MALLOC(next);
@@ -185,7 +187,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
 
     LV_LOG_TRACE("begin");
 
-    /* If we are removing the focued object */
+    /* If we are removing the focused object */
     if(g->obj_focus && *g->obj_focus == obj) {
         if(g->frozen) g->frozen = 0;
 
@@ -244,7 +246,10 @@ void lv_group_focus_obj(lv_obj_t * obj)
     lv_group_t * g;
 
     LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG((g = lv_obj_get_group(obj)), return);
+
+    g = lv_obj_get_group(obj);
+
+    LV_CHECK_ARG(g != NULL, return);
     LV_CHECK_ARG(g->frozen == 0, return, "Cannot change focus on a frozen group")
 
     /*On defocus edit mode must be leaved*/

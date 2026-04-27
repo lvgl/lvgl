@@ -16,7 +16,7 @@
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
 #include "lv_observer_private.h"
-#include "src/misc/lv_check_arg.h"
+#include "../misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -214,21 +214,21 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
 
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
-    LV_CHECK_ARG(obj != NULL, return;)
+    LV_CHECK_ARG(obj != NULL, return);
 
     remove_style_core(obj, style, selector, false);
 }
 
 void lv_obj_remove_theme(lv_obj_t * obj, lv_style_selector_t selector)
 {
-    LV_CHECK_ARG(obj != NULL, return;)
+    LV_CHECK_ARG(obj != NULL, return);
 
     remove_style_core(obj, NULL, selector, true);
 }
 
 void lv_obj_remove_style_all(lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return;)
+    LV_CHECK_ARG(obj != NULL, return);
 
     remove_style_core(obj, NULL, LV_PART_ANY | LV_STATE_ANY, false);
 }
@@ -297,8 +297,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 
 void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis)
 {
-    LV_CHECK_ARG(obj != NULL, return;)
-    LV_CHECK_ARG(style != NULL, return;)
+    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_ARG(style != NULL, return);
 
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
@@ -317,8 +317,8 @@ void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_styl
 
 bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
-    LV_CHECK_ARG(obj != NULL, return false;)
-    LV_CHECK_ARG(style != NULL, return false;)
+    LV_CHECK_ARG(obj != NULL, return false);
+    LV_CHECK_ARG(style != NULL, return false);
 
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
@@ -367,7 +367,7 @@ bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, l
 void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value,
                                  lv_style_selector_t selector)
 {
-    LV_CHECK_ARG(obj != NULL, return;)
+    LV_CHECK_ARG(obj != NULL, return);
 
     LV_PROFILER_STYLE_BEGIN;
 
@@ -440,8 +440,8 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_sty
 void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t prev_state, lv_state_t new_state,
                                     const lv_obj_style_transition_dsc_t * tr_dsc)
 {
-    LV_CHECK_ARG(obj != NULL, return;)
-    LV_CHECK_ARG(tr_dsc != NULL, return;)
+    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_ARG(tr_dsc != NULL, return);
 
     trans_t * tr;
 
