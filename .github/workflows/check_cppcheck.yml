@@ -1,0 +1,34 @@
+name: Cppcheck static analysis
+
+on:
+  pull_request:
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Show cppcheck version
+        run: cppcheck --version
+
+      - name: Self-test
+        run: python3 scripts/check_cppcheck.py --self-test
+
+      - name: Run cppcheck on changed files
+        run: |
+          python3 scripts/check_cppcheck.py \
+            --diff "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
