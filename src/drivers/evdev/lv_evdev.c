@@ -67,6 +67,7 @@ typedef struct {
     int root_y;
     int key;
     lv_indev_state_t state;
+    lv_indev_state_t last_reported_state; /* Used to break the read loop on each press/release transition */
     bool deleting;
     /* Multi-touch support */
 #if LV_USE_GESTURE_RECOGNITION
@@ -249,8 +250,8 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                 }
             }
         }
-#if LV_USE_GESTURE_RECOGNITION
         else if(in.type == EV_SYN && in.code == SYN_REPORT) {
+#if LV_USE_GESTURE_RECOGNITION
             /* Handle gesture recognition at sync event */
             if(dsc->touch_count > 0 && dsc->touch_data_changed) {
                 LV_LOG_TRACE("=== SYN_REPORT: touch_count=%d ===", dsc->touch_count);
@@ -303,8 +304,13 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
                 dsc->touch_data_changed = false;
             }
-        }
 #endif
+            /* Break on each state transition so a buffered press+release isn't coalesced */
+            if(dsc->state != dsc->last_reported_state) {
+                data->continue_reading = true;
+                break;
+            }
+        }
     }
 
     if(!dsc->deleting && br == -1 && errno != EAGAIN) {
@@ -342,6 +348,8 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
         default:
             break;
     }
+
+    dsc->last_reported_state = dsc->state;
 }
 
 static void _evdev_indev_delete_cb(lv_event_t * e)
