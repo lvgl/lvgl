@@ -65,6 +65,18 @@ struct _lv_chart_t {
     uint32_t point_cnt;         /**< Number of points in all series */
     lv_chart_type_t type  : 4;  /**< Chart type */
     lv_chart_update_mode_t update_mode : 2;
+
+#if LV_USE_CHART_SCISSOR_FILL_MODE
+    bool force_crowded_mode;
+    uint32_t head_percent;
+    int32_t head_size_offset;
+    lv_color_t head_color;
+
+    uint32_t tail_percent;
+    int32_t tail_size_offset;
+    lv_color_t tail_color;
+#endif
+
 };
 
 

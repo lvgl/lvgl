@@ -26,6 +26,10 @@ extern "C" {
 #define LV_CHART_POINT_NONE     (INT32_MAX)
 LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 
+/* Enable crowded mode rendering on Opengles output using
+    glScissor fills.  Also enables head/tail tint gradients */
+#define LV_USE_CHART_SCISSOR_FILL_MODE 1
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -123,6 +127,109 @@ void lv_chart_set_axis_min_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t m
  */
 void lv_chart_set_axis_max_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t max);
 
+#if LV_USE_CHART_SCISSOR_FILL_MODE
+/**
+ * Force crowded mode chart rendering
+ * @param obj           pointer to a chart object
+ * @param force_enable  true to force crowded mode rendering, false to only enable if needed
+ */
+void lv_chart_set_force_crowded(lv_obj_t * obj, bool force_enable);
+
+/**
+ * Get the force crowded mode chart rendering flag state
+ * @param obj           pointer to a chart object
+ */
+bool lv_chart_get_force_crowded(lv_obj_t * obj);
+
+/**
+ * Set the head percentage
+ * @param obj       pointer to a chart object
+ * @param norm      set a 0 to 1024 value representing what portion of the chart should be the head
+ */
+void lv_chart_set_head_percent(lv_obj_t * obj, uint32_t norm);
+
+/**
+ * Set the head size offset
+ * @param obj       pointer to a chart object
+ * @param pixels    set how many pixels to grow or shrink the line at the head
+ */
+void lv_chart_set_head_size_offset(lv_obj_t * obj, int32_t pixels);
+
+/**
+ * Set the head color
+ * @param obj       pointer to a chart object
+ * @param color     set the color of the line at the tip of the head
+ */
+void lv_chart_set_head_color(lv_obj_t * obj, lv_color_t color);
+
+/**
+ * Get the head percentage
+ * @param obj       pointer to a chart object
+ */
+uint32_t lv_chart_get_head_percent(lv_obj_t * obj);
+
+/**
+ * Get the head size offset
+ * @param obj       pointer to a chart object
+ */
+int32_t lv_chart_get_head_size_offset(lv_obj_t * obj);
+
+/**
+ * Get the head color
+ * @param obj       pointer to a chart object
+ */
+lv_color_t lv_chart_get_head_color(lv_obj_t * obj);
+
+/**
+ * Set the tail percentage
+ * @param obj       pointer to a chart object
+ * @param norm      set a 0 to 1024 value representing what portion of the chart should be the tail
+ */
+void lv_chart_set_tail_percent(lv_obj_t * obj, uint32_t norm);
+
+/**
+ * Set the tail power
+ * @param obj       pointer to a chart object
+ * @param norm      set a 0 to 4096 value representing how sharply the tail effect should taper in, 1024 = linear
+ */
+//void lv_chart_set_tail_pow(lv_obj_t * obj, uint32_t norm);
+
+/**
+ * Set the tail size offset
+ * @param obj       pointer to a chart object
+ * @param pixels    set how many pixels to grow or shrink the line at the tail
+ */
+void lv_chart_set_tail_size_offset(lv_obj_t * obj, int32_t pixels);
+
+/**
+ * Get the tail color
+ * @param obj       pointer to a chart object
+ * @param color     set the color of the line at the tip of the tail
+ */
+void lv_chart_set_tail_color(lv_obj_t * obj, lv_color_t color);
+
+/**
+ * Get the tail percentage
+ * @param obj       pointer to a chart object
+ * @return          the 0 to 1024 value representing what portion of the chart should be the tail
+ */
+uint32_t lv_chart_get_tail_percent(lv_obj_t * obj);
+
+/**
+ * Get the tail size offset
+ * @param obj       pointer to a chart object
+ * @return          how many pixels to grow or shrink the line at the tail
+ */
+int32_t lv_chart_get_tail_size_offset(lv_obj_t * obj);
+
+/**
+ * Get the tail color
+ * @param obj       pointer to a chart object
+ * @return          the color of the line at the tip of the tail
+ */
+lv_color_t lv_chart_get_tail_color(lv_obj_t * obj);
+
+#endif
 
 /**
  * Set update mode of the chart object. Affects
