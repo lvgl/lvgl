@@ -488,6 +488,26 @@ static void blend_texture_layer(lv_draw_task_t * t)
     LV_PROFILER_DRAW_END;
 }
 
+static void render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                  int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
+                                  bool h_flip, bool v_flip)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = texture;
+    params.texture_area = texture_area;
+    params.opa = opa;
+    params.disp_w = disp_w;
+    params.disp_h = disp_h;
+    params.texture_clip_area = texture_clip_area;
+    params.h_flip = h_flip;
+    params.v_flip = v_flip;
+    params.rb_swap = true;
+    lv_opengles_render(&params);
+    LV_PROFILER_DRAW_END;
+}
+
 static void draw_from_cached_texture(lv_draw_task_t * t)
 {
     LV_PROFILER_DRAW_BEGIN;
@@ -575,7 +595,10 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     lv_area_move(&t->clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
     lv_area_t render_area = t->_real_area;
     lv_area_move(&render_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
-    lv_opengles_render_texture(texture, &render_area, 0xff, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip);
+    /* LVGL renders in BGR color format, but for compatibility with GLES 2.0,
+     * only RGB textures are used in OpenGL. When rendering a cached texture,
+     * the color channels need to be swapped using the shader */
+    render_texture_rbswap(texture, &render_area, 0xff, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip);
 
     if(target_texture) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -638,9 +661,8 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 float tex_h = (float)lv_area_get_height(&fill_area);
                 GL_CALL(glEnable(GL_SCISSOR_TEST));
                 GL_CALL(glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h));
-                /* swap red and blue channels here as they will be swapped back during flushing*/
-                GL_CALL(glClearColor((float)fill_dsc->color.blue / 255.0f, (float)fill_dsc->color.green / 255.0f,
-                                     (float)fill_dsc->color.red / 255.0f, 1.0f));
+                GL_CALL(glClearColor((float)fill_dsc->color.red / 255.0f, (float)fill_dsc->color.green / 255.0f,
+                                     (float)fill_dsc->color.blue / 255.0f, 1.0f));
                 GL_CALL(glClearDepthf(1.0f));
                 GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
                 GL_CALL(glDisable(GL_SCISSOR_TEST));

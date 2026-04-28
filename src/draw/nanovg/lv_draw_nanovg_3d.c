@@ -80,7 +80,6 @@ void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const l
     params.texture_clip_area = &clip_area;
     params.h_flip = dsc->h_flip;
     params.v_flip = dsc->v_flip;
-    params.rb_swap = true;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     params.matrix = &layer->matrix;
 #endif
