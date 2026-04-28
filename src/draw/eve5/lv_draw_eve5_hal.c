@@ -160,7 +160,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
         return false;
     }
 
-    lv_eve5_vram_res_t * vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
+    lv_eve5_vram_res_t * vr = lv_malloc_zeroed(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
         Esd_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
@@ -174,10 +174,16 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     vr->gpu_handle = handle;
     vr->eve_format = eve_fmt;
     vr->stride = aligned_w * bpp;
+    vr->width = w;
+    vr->height = h;
     vr->source_offset = 0;
     vr->palette_offset = GA_INVALID;
     vr->is_premultiplied = false;
     vr->has_content = false;
+    /* is_swapchain stays false (zeroed) — only the driver-owned full_buf vr
+     * sets it to true. Leaving it uninitialized previously caused init_layer
+     * to take the swapchain branch on sub-layer vr's whose memory happened to
+     * land on a non-zero byte (e.g., 0xCD malloc poisoning in debug builds). */
 
     buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
 
@@ -314,6 +320,13 @@ static bool eve5_vram_download_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * bu
     lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
 
     if(vr == NULL || buf->data == NULL) return false;
+
+    /* Swapchain: nothing to download. The SC0 buffers hold the last presented
+     * frame, but reading them back would race the scanout and there's no
+     * usable pixel layout we can hand back to LVGL anyway. The SW renderer
+     * about to use this buffer will render the full screen from scratch — leave
+     * the freshly allocated CPU memory uninitialized. */
+    if(vr->is_swapchain) return true;
 
 #if LV_USE_OS
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));

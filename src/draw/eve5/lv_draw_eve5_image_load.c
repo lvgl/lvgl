@@ -665,7 +665,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     uint32_t alloc_size = (uint32_t)(eve_stride * src_h);
     if(pal_offset != GA_INVALID) alloc_size += 256 * 4;
 
-    lv_eve5_vram_res_t * vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
+    lv_eve5_vram_res_t * vr = lv_malloc_zeroed(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
         Esd_GpuAlloc_Free(u->allocator, handle);
         return LV_RESULT_INVALID;
@@ -675,10 +675,13 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     vr->gpu_handle = handle;
     vr->eve_format = eve_format;
     vr->stride = (uint32_t)eve_stride;
+    vr->width = src_w;
+    vr->height = src_h;
     vr->source_offset = source_offset;
     vr->palette_offset = pal_offset;
     vr->is_premultiplied = false;
     vr->has_content = true;
+    /* is_swapchain stays zero — only the driver-owned full_buf vr sets it. */
 
     lv_color_format_t lv_cf = eve_format_to_lv_cf(eve_format);
     lv_draw_buf_t * decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));

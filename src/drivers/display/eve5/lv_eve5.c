@@ -65,6 +65,13 @@ typedef struct {
     rendered_region_t pending_regions[MAX_REGIONS];
     int pending_count;
     EVE_CmdSync last_frame_sync;
+    /* Set by lv_eve5_record_frame_sync when the EVE5 draw unit's finish_layer
+     * runs on the swapchain (FULL HW path). flush_cb FULL-mode reads + clears
+     * it to decide between HW (already swapped — just reclaim deferred frees)
+     * and SW (need to upload px_map and CMD_SWAP ourselves). Stays false when
+     * the draw unit is disabled at runtime, so the screen layer falls through
+     * to LVGL's SW renderer instead. */
+    bool full_frame_hw_rendered;
     lv_eve5_render_mode_t render_mode;
     /* Both draw buffers are created at init and kept alive for the display's
      * lifetime so mode switching is allocation-free. Only one is bound to the
@@ -85,6 +92,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 static void wait_cb(lv_display_t * disp);
 static void invalidate_area_cb(lv_event_t * e);
 static void composite_to_framebuffer(lv_eve5_driver_t * drvr);
+static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area, const uint8_t * px_map);
 static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf);
 static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost);
 static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode);
@@ -343,6 +351,7 @@ void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync)
     /* Already serialized by the draw unit's hal_lock around eve5_render_layer
      * (which contains finish_layer); no additional locking needed. */
     drvr->last_frame_sync = sync;
+    drvr->full_frame_hw_rendered = true;
 }
 
 /**********************
@@ -378,12 +387,18 @@ static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t
 /**
  * Build the full-mode screen draw buffer.
  *
- * Virtual buffer: no actual RAM_G allocation. The pre-attached vram_res has
- * is_swapchain=true and gpu_handle=GA_HANDLE_INVALID; when the EVE5 draw unit's
- * init_layer sees is_swapchain on the screen layer, it issues
- * EVE_CoCmd_renderTarget with SWAPCHAIN_0, which the render engine resolves to
- * the current back buffer. data is always NULL — LVGL never accesses pixel
- * memory on this buffer because the EVE5 draw unit handles all rendering.
+ * vram_res is pre-attached with is_swapchain=true and gpu_handle=GA_HANDLE_INVALID:
+ *   - HW path: EVE5 draw unit's init_layer detects is_swapchain on the screen
+ *     layer and issues EVE_CoCmd_renderTarget with SWAPCHAIN_0. The render
+ *     engine resolves it to the current back buffer; finish_layer's CMD_SWAP
+ *     flips scanout. data stays NULL.
+ *   - SW path (set_enabled(false) at runtime): LVGL's ensure_resident takes
+ *     the "different unit" migration branch, allocates CPU memory through
+ *     LVGL's normal mechanism, calls our vram_download_cb (no-op for
+ *     swapchain), and our vram_free_cb (no-op for swapchain — the swapchain
+ *     descriptor is owned by the driver). The SW renderer renders into the
+ *     allocated CPU buffer; flush_cb's FULL-mode SW branch uploads it to a
+ *     temp VRAM and presents via SWAPCHAIN_0 + CMD_SWAP.
  *
  * Format is RGB8 to match the HAL-reserved swapchain. With LV_COLOR_DEPTH != 24,
  * applying this mode causes lv_display_set_color_format to retag the display
@@ -402,17 +417,18 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
 
     /* Stride matches what a CPU-side draw buffer would have (LVGL's canonical
      * RGB888 stride, including its alignment rules) so lv_draw_buf_reshape's
-     * size check accepts the screen-sized layer. The physical SC0 buffer set
-     * up by HAL bootup uses Width × 3 with no row alignment, but we never read
-     * the swapchain via this stride — the render engine writes through
-     * SWAPCHAIN_0 and intermediate prev_handle blits carry their own stride. */
+     * size check accepts the screen-sized layer and SW migration can allocate
+     * a compatible CPU buffer. The physical SC0 buffer set up by HAL bootup
+     * uses Width × 3 with no row alignment, but we never read the swapchain
+     * via this stride — the render engine writes through SWAPCHAIN_0 and
+     * intermediate prev_handle blits carry their own stride. */
     int32_t W = phost->Width;
     int32_t H = phost->Height;
     uint32_t stride = lv_draw_buf_width_to_stride((uint32_t)W, LV_COLOR_FORMAT_RGB888);
     uint32_t cpu_size = stride * (uint32_t)H;
 
-    vr->base.unit = NULL; /* Set by the EVE5 draw unit on first use */
-    vr->base.size = 0;    /* No allocation — virtual */
+    vr->base.unit = NULL; /* Set by lv_eve5_link_draw_unit on EVE5 draw unit init */
+    vr->base.size = 0;    /* No GPU allocation — virtual */
     vr->gpu_handle = GA_HANDLE_INVALID;
     vr->eve_format = RGB8;
     vr->stride = stride;
@@ -429,13 +445,14 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
     buf->header.h = H;
     buf->header.cf = LV_COLOR_FORMAT_RGB888;
     buf->header.stride = stride;
-    /* ALLOCATED tells LVGL it doesn't need to alloc CPU memory; vram_res below
-     * tells the EVE5 draw unit that residency is virtual (SWAPCHAIN_0). */
-    buf->header.flags = LV_IMAGE_FLAGS_ALLOCATED;
+    /* MODIFIABLE so SW migration can allocate writable CPU memory.
+     * ALLOCATED tells LVGL not to bypass our buffer in default paths. */
+    buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     /* data_size mirrors what the CPU buffer would occupy. Required because
      * lv_draw_buf_reshape rejects shapes whose computed size exceeds data_size,
      * and lv_refr's layer_reshape_draw_buf calls reshape on every refresh.
-     * No CPU memory is actually allocated — data stays NULL. */
+     * For HW path, no CPU memory is actually allocated (data stays NULL). For
+     * SW path, ensure_resident allocates CPU memory matching this size. */
     buf->data_size = cpu_size;
     buf->data = NULL;
     buf->handlers = lv_draw_buf_get_handlers();
@@ -524,25 +541,33 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         return;
     }
 
-    /* Full mode: rendering and CMD_SWAP already happened in lv_draw_eve5_hal_finish_layer
-     * for the screen layer (which targets SWAPCHAIN_0). The draw unit also calls
-     * lv_eve5_record_frame_sync after that swap, so last_frame_sync is up to
-     * date for the next mode switch. px_map is unused (the full_buf has no CPU
-     * pixel data).
+    /* Full mode dispatches based on which path produced the frame:
+     *   HW: lv_draw_eve5_hal_finish_layer rendered to SWAPCHAIN_0 and CMD_SWAP'd.
+     *       lv_eve5_record_frame_sync set full_frame_hw_rendered. We just need
+     *       to reclaim deferred VRAM frees the GPU has caught up with.
+     *   SW: the EVE5 draw unit was disabled (or absent), the LVGL SW renderer
+     *       wrote pixels into full_buf->data == px_map. We upload that bitmap
+     *       to a temp VRAM, draw it into SWAPCHAIN_0, CMD_SWAP, and defer-free
+     *       the temp.
      *
-     * One thing we *do* need to do: reclaim any deferred frees the GPU has
-     * caught up with. Sub-layer (opa_layered) draw_bufs go vram_free_cb →
-     * PendingFree → FlushPending (via finish_layer's sync) → DeferredFree, but
-     * the actual handle reclamation only happens in UpdateFree. PARTIAL mode
-     * does this in composite_to_framebuffer; FULL mode has no compositor, so
-     * without an explicit UpdateFree here the deferred queue grows unboundedly
-     * and VRAM exhausts after a few seconds of layered content. */
+     * Sub-layer (opa_layered) draw_bufs go vram_free_cb → PendingFree →
+     * FlushPending (via finish_layer's sync) → DeferredFree. The actual handle
+     * reclamation only happens in UpdateFree, which PARTIAL does inside
+     * composite_to_framebuffer; FULL has no compositor, so we call it here on
+     * both HW and SW paths or VRAM exhausts after a few seconds of layered
+     * content. */
     if(drvr->render_mode == LV_EVE5_RENDER_MODE_FULL) {
-        LV_UNUSED(area);
-        LV_UNUSED(px_map);
 #if LV_USE_OS
         lv_mutex_lock(&drvr->hal_mutex);
 #endif
+        bool hw_rendered = drvr->full_frame_hw_rendered;
+        drvr->full_frame_hw_rendered = false;
+
+        if(!hw_rendered && px_map != NULL) {
+            /* SW path: upload the rendered bitmap and present it. */
+            full_mode_sw_present(drvr, area, px_map);
+        }
+
         EVE_CmdSync completed = EVE_Cmd_syncCompleted(drvr->hal);
         Esd_GpuAlloc_UpdateFree(drvr->allocator, completed);
 #if LV_USE_OS
@@ -717,6 +742,76 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
     EVE_CmdSync completed = EVE_Cmd_syncCompleted(phost);
     Esd_GpuAlloc_UpdateFree(drvr->allocator,
                             completed); /* FIXME: Idle callback in EVE_Cmd_syncCompleted should handle this (running out of sync ids?) */
+}
+
+/**
+ * Present a SW-rendered full-screen frame.
+ *
+ * Allocates a temp VRAM block, uploads px_map (full_buf->data, RGB888 packed),
+ * draws it into SWAPCHAIN_0 with CMD_SWAP, and queues the temp for deferred
+ * free. Caller holds the HAL mutex.
+ *
+ * Used when the EVE5 draw unit is disabled at runtime — the LVGL SW renderer
+ * fills full_buf->data each frame and we hand the bitmap to the GPU here.
+ */
+static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area, const uint8_t * px_map)
+{
+    EVE_HalContext * phost = drvr->hal;
+    int32_t W = phost->Width;
+    int32_t H = phost->Height;
+
+    /* SW always renders the full screen in FULL render mode; warn if not. */
+    if(area->x1 != 0 || area->y1 != 0
+       || lv_area_get_width(area) != W || lv_area_get_height(area) != H) {
+        LV_LOG_WARN("EVE5 FULL SW: unexpected partial area (%d,%d)-(%d,%d)",
+                    area->x1, area->y1, area->x2, area->y2);
+    }
+
+    uint32_t stride = (uint32_t)W * FB_BYTES_PER_PIXEL;
+    uint32_t size = stride * (uint32_t)H;
+
+    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(drvr->allocator, size, GA_ALIGN_4);
+    uint32_t gpu_addr = Esd_GpuAlloc_Get(drvr->allocator, handle);
+    if(gpu_addr == GA_INVALID) {
+        LV_LOG_WARN("EVE5 FULL SW: temp VRAM alloc failed (%u bytes)", size);
+        return;
+    }
+
+    EVE_Hal_wrMem(phost, gpu_addr, px_map, size);
+    EVE_Hal_requestFenceBeforeSwap(phost);
+
+    EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, FB_BITMAP_FORMAT, W, H);
+    EVE_CoCmd_dlStart(phost);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoDl_blendFunc(phost, ONE, ZERO);
+    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+    EVE_CoDl_scissorXY(phost, 0, 0);
+    EVE_CoDl_scissorSize(phost, W, H);
+    EVE_CoDl_vertexTranslateX(phost, 0);
+    EVE_CoDl_vertexTranslateY(phost, 0);
+
+    EVE_CoDl_bitmapSource(phost, gpu_addr);
+    EVE_CoDl_bitmapLayout(phost, FB_BITMAP_FORMAT, stride, H);
+    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, W, H);
+    EVE_CoDl_begin(phost, BITMAPS);
+    EVE_CoDl_vertex2f_0(phost, 0, 0);
+    EVE_CoDl_end(phost);
+
+    EVE_CoDl_blendFunc_default(phost);
+    EVE_CoDl_display(phost);
+    EVE_CoCmd_swap(phost);
+    EVE_CoCmd_graphicsFinish(phost);
+
+    EVE_CmdSync sync = EVE_Cmd_sync(phost);
+
+    /* Wait for previous frame's resources to drain before reusing them, then
+     * track this frame's sync for the next iteration / mode switch. */
+    if(drvr->last_frame_sync != EVE_CMD_SYNC_INVALID) {
+        EVE_Cmd_waitSync(phost, drvr->last_frame_sync);
+    }
+    drvr->last_frame_sync = sync;
+
+    Esd_GpuAlloc_DeferredFree(drvr->allocator, handle, sync);
 }
 
 static void wait_cb(lv_display_t * disp)
