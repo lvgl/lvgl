@@ -209,4 +209,21 @@ void test_theme_simple(void)
     TEST_ASSERT_NULL(lv_theme_simple_get());
 }
 
+void test_theme_user_data(void)
+{
+    lv_theme_t theme;
+    lv_memzero(&theme, sizeof(theme));
+    int dummy = 42;
+
+    // NULL user_data must be accepted
+    lv_theme_set_user_data(&theme, NULL);
+    TEST_ASSERT_EQUAL_PTR(NULL, theme.user_data);
+
+    // NULL theme must not crash
+    lv_theme_set_user_data(NULL, &dummy);
+
+    // A non NULL value can be retrieved
+    lv_theme_set_user_data(&theme, &dummy);
+    TEST_ASSERT_EQUAL_PTR(&dummy, lv_theme_get_user_data(&theme));
+}
 #endif
