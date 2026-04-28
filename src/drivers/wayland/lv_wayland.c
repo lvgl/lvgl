@@ -11,7 +11,7 @@
 #if LV_USE_WAYLAND
 
 #if (LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1)
-    #error[wayland] Unsupported LV_COLOR_DEPTH
+    #error [wayland] Unsupported LV_COLOR_DEPTH
 #endif
 
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
@@ -22,18 +22,19 @@
 #endif
 
 #include "lv_wayland_private.h"
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <time.h>
+#include "xdg-output-unstable-v1-client-protocol.h"
 #include <errno.h>
-#include <poll.h>
-#include <sys/mman.h>
-#include <linux/input.h>
+#include <fcntl.h>
 #include <linux/input-event-codes.h>
+#include <linux/input.h>
+#include <poll.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <time.h>
+#include <unistd.h>
 #include <wayland-client.h>
 #include <wayland-cursor.h>
 #include <xkbcommon/xkbcommon.h>
@@ -42,11 +43,9 @@
  *      DEFINES
  *********************/
 
-
 /**********************
  *      TYPEDEFS
  **********************/
-
 
 /**********************
  *  STATIC PROTOTYPES
@@ -90,6 +89,56 @@ static const struct wl_output_listener output_listener = {
     .scale = output_scale
 };
 
+static struct zxdg_output_manager_v1 * xdg_mgr = NULL;
+
+/*****************xdg_output listeners***************************************************************************/
+static void xdg_output_logical_position(void * data,
+                                        struct zxdg_output_v1 * xdg_output, int32_t x, int32_t y)
+{
+    (void)data;
+    (void)xdg_output;
+    (void)x;
+    (void)y;
+}
+
+static void xdg_output_logical_size(void * data,
+                                    struct zxdg_output_v1 * xdg_output, int32_t w, int32_t h)
+{
+    lv_wl_output_info_t * info = data;
+    info->width = w;
+    info->height = h;
+}
+
+static void xdg_output_done(void * data, struct zxdg_output_v1 * xdg_output)
+{
+    (void)data;
+    (void)xdg_output;
+}
+
+static void xdg_output_name(void * data,
+                            struct zxdg_output_v1 * xdg_output, const char * name)
+{
+    (void)xdg_output;
+    lv_wl_output_info_t * info = data;
+    strncpy(info->name, name, sizeof(info->name) - 1);
+}
+
+static void xdg_output_description(void * data,
+                                   struct zxdg_output_v1 * xdg_output, const char * desc)
+{
+    (void)xdg_output;
+    lv_wl_output_info_t * info = data;
+    strncpy(info->description, desc, sizeof(info->description) - 1);
+}
+
+static const struct zxdg_output_v1_listener xdg_output_listener = {
+    .logical_position = xdg_output_logical_position,
+    .logical_size = xdg_output_logical_size,
+    .done = xdg_output_done,
+    .name = xdg_output_name,
+    .description = xdg_output_description,
+};
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -105,6 +154,20 @@ int lv_wayland_get_fd(void)
         return -1;
     }
     return wl_display_get_fd(lv_wl_ctx.wl_display);
+}
+
+int lv_wayland_get_display_size(const char * name, int32_t * width, int32_t * height)
+{
+    *width = 800;
+    *height = 480;
+    for(int i = 0; i < lv_wl_ctx.wl_output_count; i++) {
+        if(!strcmp(name, lv_wl_ctx.physical_outputs[i].name)) {
+            *width = lv_wl_ctx.physical_outputs[i].width;
+            *height = lv_wl_ctx.physical_outputs[i].height;
+            return i;
+        }
+    }
+    return 0;
 }
 
 /**********************
@@ -140,7 +203,6 @@ lv_result_t lv_wayland_init(void)
         wl_display_disconnect(lv_wl_ctx.wl_display);
         lv_wl_ctx.wl_display = NULL;
         return LV_RESULT_INVALID;
-
     }
 
     lv_ll_init(&lv_wl_ctx.window_ll, sizeof(lv_wl_window_t));
@@ -148,7 +210,24 @@ lv_result_t lv_wayland_init(void)
     lv_tick_set_cb(tick_get_cb);
     lv_wl_ctx.read_compositor_events_timer = lv_timer_create(read_compositor_events_timer_cb, LV_DEF_REFR_PERIOD, NULL);
 
+    if(xdg_mgr) {
+        lv_wl_output_info_t * info;
+        for(int i = 0; i < lv_wl_ctx.wl_output_count; i++) {
+            info = &lv_wl_ctx.physical_outputs[i];
+            info->xdg_output = zxdg_output_manager_v1_get_xdg_output(
+                                   xdg_mgr, info->wl_output);
+            zxdg_output_v1_add_listener(info->xdg_output,
+                                        &xdg_output_listener, info);
+        }
+    }
+    else {
+        printf("WARNING: zxdg_output_manager_v1 not available.\n"
+               "  Output names via xdg-output will not be shown.\n\n");
+    }
+
     is_wayland_initialized = true;
+    wl_display_roundtrip(lv_wl_ctx.wl_display);
+    wl_display_roundtrip(lv_wl_ctx.wl_display);
     return LV_RESULT_OK;
 }
 
@@ -180,6 +259,18 @@ void lv_wayland_deinit(void)
         lv_wl_ctx.wl_registry = NULL;
     }
 
+    if(lv_wl_ctx.wl_shm) {
+        wl_shm_destroy(lv_wl_ctx.wl_shm);
+        lv_wl_ctx.wl_shm = NULL;
+    }
+
+    for(uint8_t i = 0; i < lv_wl_ctx.wl_output_count; ++i) {
+        if(lv_wl_ctx.physical_outputs[i].wl_output) {
+            wl_output_destroy(lv_wl_ctx.physical_outputs[i].wl_output);
+            lv_wl_ctx.physical_outputs[i].wl_output = NULL;
+        }
+    }
+
     if(lv_wl_ctx.wl_compositor) {
         wl_compositor_destroy(lv_wl_ctx.wl_compositor);
         lv_wl_ctx.wl_compositor = NULL;
@@ -196,6 +287,7 @@ void lv_wayland_deinit(void)
 
     lv_ll_clear(&lv_wl_ctx.window_ll);
     is_wayland_initialized = false;
+    xdg_mgr = NULL;
 }
 
 void lv_wayland_flush(void)
@@ -318,11 +410,17 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
     else if(strcmp(interface, wl_output_interface.name) == 0) {
         if(ctx->wl_output_count < LV_WAYLAND_MAX_OUTPUTS) {
             memset(&ctx->physical_outputs[ctx->wl_output_count], 0, sizeof(lv_wl_output_info_t));
-            struct wl_output * out = wl_registry_bind(registry, name, &wl_output_interface, 1);
+            ctx->physical_outputs[ctx->wl_output_count].scale = 1;
+            struct wl_output * out = wl_registry_bind(registry, name, &wl_output_interface, LV_MIN(version, 2));
             ctx->physical_outputs[ctx->wl_output_count].wl_output = out;
             wl_output_add_listener(out, &output_listener, &ctx->physical_outputs[ctx->wl_output_count].wl_output);
             ctx->wl_output_count++;
         }
+    }
+    else if(strcmp(interface, "zxdg_output_manager_v1") == 0) {
+        xdg_mgr = wl_registry_bind(registry, name,
+                                   &zxdg_output_manager_v1_interface,
+                                   version < 3 ? version : 3);
     }
 
     wl_backend_ops.global_handler(lv_wl_ctx.backend_data, registry, name, interface, version);
