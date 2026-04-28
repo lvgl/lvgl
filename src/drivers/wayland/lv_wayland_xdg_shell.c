@@ -209,9 +209,23 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
     lv_wl_window_t * window = (lv_wl_window_t *)data;
 
     LV_UNUSED(xdg_toplevel);
-    LV_UNUSED(states);
     LV_LOG_TRACE("XDG toplevel configure: w=%d h=%d (current: %dx%d)",
                  width, height, lv_wayland_window_get_width(window), lv_wayland_window_get_height(window));
+
+    window->maximized = false;
+    window->fullscreen = false;
+    uint32_t * s;
+    wl_array_for_each(s, states) {
+        switch(*s) {
+            case XDG_TOPLEVEL_STATE_MAXIMIZED:
+                window->maximized = true;
+                break;
+
+            case XDG_TOPLEVEL_STATE_FULLSCREEN:
+                window->fullscreen = true;
+                break;
+        }
+    }
 
     if((width < 0) || (height < 0)) {
         LV_LOG_TRACE("will not resize to w:%d h:%d", width, height);
