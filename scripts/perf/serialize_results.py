@@ -52,7 +52,7 @@ There are 3 possibilities when handling these files
     In this case we create a new `file1.mpk` with a single history entry.
 
 3. `file1.mpk` exists but `file1.json` doesn't: Happens when an old config isn't tested anymore for any reason.
-    In this case we simpyl copy the old `file1.mpk`
+    In this case we simply copy the old `file1.mpk`
 """
 
 import argparse
