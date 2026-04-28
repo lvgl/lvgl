@@ -803,6 +803,8 @@ static void bar_value_observer_cb(lv_observer_t * observer, lv_subject_t * subje
 #endif
 }
 
+#endif /*LV_USE_OBSERVER*/
+
 #if LV_USE_OBJ_PROPERTY
 static void lv_bar_set_value_helper(lv_obj_t * obj, int32_t value)
 {
@@ -814,7 +816,5 @@ static void lv_bar_set_start_value_helper(lv_obj_t * obj, int32_t value)
     lv_bar_set_start_value(obj, value, LV_ANIM_OFF);
 }
 #endif
-
-#endif /*LV_USE_OBSERVER*/
 
 #endif
