@@ -94,9 +94,9 @@ void lv_obj_update_layer_type(lv_obj_t * obj);
  * where the only thing that changed is a set of state bits and descendants
  * without selectors on those bits can't render differently.
  * @param obj           the object whose state changed
- * @param changed_bits  `prev_state ^ new_state` — the bits that flipped
+ * @param state_changed `prev_state ^ new_state` — the bits that flipped
  */
-void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t changed_bits);
+void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t state_changed);
 
 /**********************
  *      MACROS

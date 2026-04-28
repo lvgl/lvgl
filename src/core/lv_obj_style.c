@@ -61,7 +61,8 @@ static lv_obj_style_t * get_trans_style(lv_obj_t * obj, lv_style_selector_t sele
 static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                     lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
-static void refresh_children_style(lv_obj_t * obj);
+static void refresh_style_internal(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_state_t state_changed);
+static void refresh_children_style(lv_obj_t * obj, lv_state_t state_changed);
 static bool obj_has_selector_on_bits(lv_obj_t * obj, lv_state_t state_bits);
 static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
 static void trans_anim_cb(void * _tr, int32_t v);
@@ -83,10 +84,6 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-/* Cascade filter for the state-transition path. See
- * lv_obj_style_refresh_on_state_change. */
-static lv_state_t refresh_cascade_bits = 0;
 
 /**********************
  *      MACROS
@@ -246,6 +243,11 @@ void lv_obj_report_style_change(lv_style_t * style)
 
 void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
+    refresh_style_internal(obj, part, prop, 0);
+}
+
+static void refresh_style_internal(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_state_t state_changed)
+{
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(!style_refr) return;
@@ -285,7 +287,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 
     if(prop == LV_STYLE_PROP_ANY || (is_inheritable && (is_ext_draw || is_layout_refr))) {
         if(part != LV_PART_SCROLLBAR) {
-            refresh_children_style(obj);
+            refresh_children_style(obj, state_changed);
         }
     }
 
@@ -930,18 +932,20 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
 /**
  * Recursively refresh the style of the children. Go deeper until a not NULL style is found
  * because the NULL styles are inherited from the parent.
- * When refresh_cascade_bits is non-zero (state-transition path), descendants whose
- * own styles have no selector keyed on those bits are skipped — they can't render
- * differently because of the parent's state change.
- * @param obj pointer to an object
+ * When state_changed is non-zero (state-transition path), descendants whose own styles
+ * have no selector keyed on those bits are skipped — they can't render differently because
+ * of the parent's state change.
+ * @param obj           pointer to an object
+ * @param state_changed bits that flipped on the originating object, or 0 to dispatch to
+ *                      every descendant unconditionally (the existing public callers)
  */
-static void refresh_children_style(lv_obj_t * obj)
+static void refresh_children_style(lv_obj_t * obj, lv_state_t state_changed)
 {
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(refresh_cascade_bits == 0 || obj_has_selector_on_bits(child, refresh_cascade_bits)) {
+        if(state_changed == 0 || obj_has_selector_on_bits(child, state_changed)) {
             lv_obj_invalidate(child);
             lv_obj_send_event(child, LV_EVENT_STYLE_CHANGED, NULL);
             lv_obj_invalidate(child);
@@ -949,7 +953,7 @@ static void refresh_children_style(lv_obj_t * obj)
 
         /*Recurse unconditionally: a grandchild may have state-keyed styles
          *its immediate parent lacks.*/
-        refresh_children_style(child);
+        refresh_children_style(child, state_changed);
     }
 }
 
@@ -966,9 +970,9 @@ static bool obj_has_selector_on_bits(lv_obj_t * obj, lv_state_t state_bits)
     return false;
 }
 
-void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t changed_bits)
+void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t state_changed)
 {
-    lv_state_t bits = changed_bits;
+    lv_state_t cascade_filter = state_changed;
 
     /*Defensive fallback: an inheritable prop (e.g. LV_STYLE_TEXT_COLOR) under a
      *state-keyed selector affects descendants that don't have their own state-
@@ -976,21 +980,14 @@ void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t changed_bit
     for(uint32_t i = 0; i < obj->style_cnt; i++) {
         if(obj->styles[i].is_trans) continue;
         lv_state_t sel_state = lv_obj_style_get_selector_state(obj->styles[i].selector);
-        if((sel_state & changed_bits) == 0) continue;
+        if((sel_state & state_changed) == 0) continue;
         if(style_has_flag(obj->styles[i].style, LV_STYLE_PROP_FLAG_INHERITABLE)) {
-            bits = 0;
+            cascade_filter = 0;
             break;
         }
     }
 
-    /*Save and restore: an event handler dispatched during the cascade may
-     *legally trigger another state change, re-entering this function. We
-     *want the inner cascade to use its own filter and the outer cascade to
-     *resume with its previous filter intact, not be cleared to "no filter."*/
-    lv_state_t prev_refresh_cascade_bits = refresh_cascade_bits;
-    refresh_cascade_bits = bits;
-    lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
-    refresh_cascade_bits = prev_refresh_cascade_bits;
+    refresh_style_internal(obj, LV_PART_ANY, LV_STYLE_PROP_ANY, cascade_filter);
 }
 
 /**
