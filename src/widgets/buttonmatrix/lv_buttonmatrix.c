@@ -653,7 +653,7 @@ static void draw_main(lv_event_t * e)
     int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     int32_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     char txt_ap[256];
 #endif
 
@@ -735,7 +735,7 @@ static void draw_main(lv_event_t * e)
         int32_t line_space = draw_label_dsc_act.line_space;
         const char * txt = btnm->map_p[txt_i];
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
         /*Get the size of the Arabic text and process it*/
         size_t len_ap = lv_text_ap_strlen(txt) + 1;
         if(len_ap < sizeof(txt_ap)) {
