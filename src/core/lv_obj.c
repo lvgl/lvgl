@@ -23,6 +23,7 @@
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_types.h"
+#include "../misc/lv_check_arg.h"
 #include "../misc/lv_anim_timeline.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
@@ -56,6 +57,12 @@ typedef struct {
     bool reverse;
 } timeline_play_dsc_t;
 
+struct _lv_delete_dsc_t {
+    lv_obj_t * obj;
+    lv_delete_cb_t cb;
+    void * item;
+};
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -74,6 +81,7 @@ static void screen_load_on_trigger_event_cb(lv_event_t * e);
 static void screen_create_on_trigger_event_cb(lv_event_t * e);
 static void play_timeline_on_trigger_event_cb(lv_event_t * e);
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
+static void call_delete_cb(lv_event_t * e);
 
 #if LV_USE_OBJ_PROPERTY
     static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
@@ -605,6 +613,41 @@ void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
 void * lv_obj_get_user_data(lv_obj_t * obj)
 {
     return obj->user_data;
+}
+
+lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void * item)
+{
+    LV_CHECK_ARG(obj != NULL, return NULL);
+    LV_CHECK_ARG(cb != NULL, return NULL);
+
+    lv_delete_dsc_t * dsc = lv_malloc(sizeof(*dsc));
+    if(!dsc) {
+        return NULL;
+    }
+    dsc->obj = obj;
+    dsc->cb = cb;
+    dsc->item = item;
+
+    lv_event_dsc_t * event_dsc = lv_obj_add_event_cb(obj, call_delete_cb, LV_EVENT_DELETE, dsc);
+    if(!event_dsc) {
+        lv_free(dsc);
+        return NULL;
+    }
+    return dsc;
+}
+
+void lv_obj_remove_delete_cb(lv_delete_dsc_t * dsc)
+{
+    if(!dsc) {
+        return;
+    }
+
+    uint32_t count = lv_obj_remove_event_cb_with_user_data(dsc->obj, call_delete_cb, dsc);
+    if(count == 0) {
+        LV_LOG_WARN("Failed to detach delete callback from object. Ensure the context is bound to the object");
+        return;
+    }
+    lv_free(dsc);
 }
 
 /**********************
@@ -1325,6 +1368,19 @@ static void play_timeline_on_trigger_event_cb(lv_event_t * e)
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e)
 {
     lv_obj_delete(lv_event_get_target_obj(e));
+}
+
+static void call_delete_cb(lv_event_t * e)
+{
+    LV_ASSERT(e != NULL);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
+    lv_delete_dsc_t * dsc = lv_event_get_user_data(e);
+    LV_ASSERT(dsc != NULL);
+    LV_ASSERT(dsc->cb != NULL);
+    LV_ASSERT(dsc->obj == obj);
+
+    dsc->cb(dsc->item);
+    lv_obj_remove_delete_cb(dsc);
 }
 
 #if LV_USE_OBJ_PROPERTY

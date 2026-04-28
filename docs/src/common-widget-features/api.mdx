@@ -121,3 +121,27 @@ void some_timer_callback(lv_timer_t * t)
    }
 }
 ```
+
+### Delete Callbacks
+
+If you need to perform cleanup when a widget is deleted, you can register a delete
+callback using <ApiLink name="lv_obj_add_delete_cb" display="lv_obj_add_delete_cb(widget, cb, item)" />.
+The callback will be automatically invoked with `item` as its argument when the widget
+is deleted.
+
+This is a convenience utility built on top of <ApiLink name="LV_EVENT_DELETE" />, useful for freeing
+resources that are tied to a widget's lifetime without manually managing event handlers.
+
+```c
+void my_delete_cb(void * item)
+{
+    free(item);
+}
+
+void * my_data = malloc(64);
+lv_obj_add_delete_cb(obj, my_delete_cb, my_data);
+```
+
+<ApiLink name="lv_obj_add_delete_cb" /> returns a pointer to the created <ApiLink name="lv_delete_dsc_t"/>
+descriptor, which can be used to remove the callback later if needed via <ApiLink name="lv_obj_remove_delete_cb"/>.
+Multiple delete callbacks can be attached to the same widget, and all of them will be called when the widget is deleted.
