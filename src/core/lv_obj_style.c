@@ -25,6 +25,7 @@
 #define style_trans_ll_p &(LV_GLOBAL_DEFAULT()->style_trans_ll)
 #define _style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
 #define STYLE_PROP_SHIFTED(prop) ((uint32_t)1 << ((prop) >> 3))
+#define STYLE_TRANSITION_MAX 32
 
 /**********************
  *      TYPEDEFS
@@ -970,7 +971,7 @@ static bool obj_has_selector_on_bits(lv_obj_t * obj, lv_state_t state_bits)
     return false;
 }
 
-void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t state_changed)
+static void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t state_changed)
 {
     lv_state_t cascade_filter = state_changed;
 
@@ -988,6 +989,101 @@ void lv_obj_style_refresh_on_state_change(lv_obj_t * obj, lv_state_t state_chang
     }
 
     refresh_style_internal(obj, LV_PART_ANY, LV_STYLE_PROP_ANY, cascade_filter);
+}
+
+void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
+{
+    if(obj->state == new_state) return;
+
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_state_t prev_state = obj->state;
+
+    lv_style_state_cmp_t cmp_res = lv_obj_style_state_compare(obj, prev_state, new_state);
+    /*If there is no difference in styles there is nothing else to do*/
+    if(cmp_res == LV_STYLE_STATE_CMP_SAME) {
+        obj->state = new_state;
+        lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
+        return;
+    }
+
+    /*Invalidate the object in their current state*/
+    lv_obj_invalidate(obj);
+
+    obj->state = new_state;
+    lv_obj_update_layer_type(obj);
+
+    /*Skip transitions if the widget is not rendered yet. */
+    if(!obj->rendered) {
+        lv_obj_invalidate(obj);
+        if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+            lv_obj_refresh_ext_draw_size(obj);
+        }
+
+        lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
+        return;
+    }
+
+    lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    uint32_t tsi = 0;
+    uint32_t i;
+    for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
+        lv_obj_style_t * obj_style = &obj->styles[i];
+        lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
+        if(state_act & (~new_state)) continue; /*Skip unrelated styles*/
+        if(obj_style->is_trans) continue;
+
+        lv_style_value_t v;
+        if(lv_style_get_prop_inlined(obj_style->style, LV_STYLE_TRANSITION, &v) != LV_STYLE_RES_FOUND) continue;
+        const lv_style_transition_dsc_t * tr = v.ptr;
+
+        /*Add the props to the set if not added yet or added but with smaller weight*/
+        uint32_t j;
+        for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
+            uint32_t t;
+            for(t = 0; t < tsi; t++) {
+                lv_style_selector_t selector = ts[t].selector;
+                lv_state_t state_ts = lv_obj_style_get_selector_state(selector);
+                lv_part_t part_ts = lv_obj_style_get_selector_part(selector);
+                if(ts[t].prop == tr->props[j] && part_ts == part_act && state_ts >= state_act) break;
+            }
+
+            /*If not found  add it*/
+            if(t == tsi) {
+                ts[tsi].time = tr->time;
+                ts[tsi].delay = tr->delay;
+                ts[tsi].path_cb = tr->path_xcb;
+                ts[tsi].prop = tr->props[j];
+                ts[tsi].user_data = tr->user_data;
+                ts[tsi].selector = obj_style->selector;
+                tsi++;
+            }
+        }
+    }
+
+    for(i = 0; i < tsi; i++) {
+        lv_part_t part_act = lv_obj_style_get_selector_part(ts[i].selector);
+        lv_obj_style_create_transition(obj, part_act, prev_state, new_state, &ts[i]);
+    }
+
+    lv_free(ts);
+
+    if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW) {
+        /*Invalidation is not enough, e.g. layer type needs to be updated too.
+         *Pass the changed state bits so the descendant cascade can skip
+         *LV_EVENT_STYLE_CHANGED for subtrees with no state-keyed styles.*/
+        lv_obj_style_refresh_on_state_change(obj, prev_state ^ new_state);
+    }
+    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
+        lv_obj_style_refresh_on_state_change(obj, prev_state ^ new_state);
+    }
+    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+        lv_obj_invalidate(obj);
+        lv_obj_refresh_ext_draw_size(obj);
+    }
+
+    lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
 }
 
 /**
