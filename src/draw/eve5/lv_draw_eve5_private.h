@@ -223,6 +223,12 @@ typedef struct {
     lv_draw_task_t * end;       /**< Exclusive end (NULL = all remaining) */
     Esd_GpuHandle prev_handle;  /**< Previous slice render output (GA_HANDLE_INVALID = none) */
     bool isolated;              /**< Force clear to (0,0,0,0): ignore canvas content and prev_handle */
+    /* Format of the prev_handle bitmap when blitted as the new slice's base. When 0,
+     * matches the new slice's render-target format. Used for full-mode screen slicing
+     * where the prev slice was rendered to an ARGB8 temp but the final tail slice
+     * targets SWAPCHAIN_0 in RGB8. */
+    uint16_t prev_eve_format;
+    uint32_t prev_stride;       /**< Stride of prev_handle in bytes (only used when prev_eve_format != 0) */
 } lv_draw_eve5_slice_t;
 
 /* EVE5 draw unit */

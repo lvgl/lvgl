@@ -36,18 +36,42 @@
 typedef struct {
     Esd_GpuHandle handle;
     lv_area_t area;
-    bool is_gpu_rendered;  /* GPU path (ARGB8) vs CPU path (RGB565/RGB8/ARGB8) */
+    /* Source format and stride captured at flush time. The HW path's tile VRAM
+     * format follows the layer's color format (typically the display's natural
+     * cf — RGB565 for LV_COLOR_DEPTH=16, RGB8 for 24, ARGB8 for 32). The SW
+     * path goes through px_map in EVE_SW_BITMAP_FORMAT. The compositor must
+     * sample each region with its actual format/stride or it'll read garbage. */
+    uint16_t eve_format;
+    uint32_t eve_stride;
+    bool is_gpu_rendered;
 } rendered_region_t;
 
 typedef struct {
     EVE_HalContext * hal;
     Esd_GpuAlloc * allocator;
+    /* frame_buffer_0/1 mirror the *active* swapchain config (what the
+     * coprocessor will sample on the next CMD_SWAP). In FULL mode they're the
+     * two original HAL-boot buffers (proper double buffer). In PARTIAL mode
+     * they're equal, both pointing at frame_buffer_0_orig (single-buffer
+     * workaround). The compositor reads from one and writes the back via
+     * SWAPCHAIN_0 — keeping these in sync with REG_SC0_PTR1 ensures the read
+     * targets a buffer the swapchain actually scans out from. */
     uint32_t frame_buffer_0;
     uint32_t frame_buffer_1;
+    /* Original HAL-boot PTR1 — preserved so FULL mode can restore the
+     * double-buffered configuration after a partial-mode override. */
+    uint32_t frame_buffer_1_orig;
     uint32_t current_fb;
     rendered_region_t pending_regions[MAX_REGIONS];
     int pending_count;
     EVE_CmdSync last_frame_sync;
+    lv_eve5_render_mode_t render_mode;
+    /* Both draw buffers are created at init and kept alive for the display's
+     * lifetime so mode switching is allocation-free. Only one is bound to the
+     * display via lv_display_set_draw_buffers at any given time. */
+    lv_draw_buf_t * tile_buf;       /**< Partial mode: small W×64 tile, RGB565 (or LV_COLOR_DEPTH-derived) */
+    lv_draw_buf_t * full_buf;       /**< Full mode: virtual W×H, RGB8, vram_res pre-attached with is_swapchain=true */
+    lv_color_format_t partial_cf;   /**< Color format used in partial mode (display's natural format) */
 #if LV_USE_OS
     lv_mutex_t hal_mutex;
 #endif
@@ -61,6 +85,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 static void wait_cb(lv_display_t * disp);
 static void invalidate_area_cb(lv_event_t * e);
 static void composite_to_framebuffer(lv_eve5_driver_t * drvr);
+static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf);
+static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost);
+static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode);
 
 /**********************
  * MACROS
@@ -84,15 +111,17 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr);
 #define FB_BYTES_PER_PIXEL 3
 #define FB_BITMAP_FORMAT RGB8
 
-/* HW draw unit always produces ARGB8 */
-#define HW_BYTES_PER_PIXEL 4
-#define HW_BITMAP_FORMAT ARGB8
-
 /**********************
  * GLOBAL FUNCTIONS
  **********************/
 
 lv_display_t * lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
+{
+    return lv_eve5_create_ex(hal, allocator, LV_EVE5_RENDER_MODE_PARTIAL);
+}
+
+lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
+                                 lv_eve5_render_mode_t mode)
 {
     EVE_HalContext *phost = hal;
 
@@ -109,6 +138,8 @@ lv_display_t * lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     drvr->allocator = allocator;
     drvr->pending_count = 0;
     drvr->last_frame_sync = EVE_CMD_SYNC_INVALID;
+    drvr->render_mode = LV_EVE5_RENDER_MODE_PARTIAL; /* set by apply_render_mode below */
+    drvr->partial_cf = lv_display_get_color_format(disp);
 #if LV_USE_OS
     lv_mutex_init(&drvr->hal_mutex);
 #endif
@@ -120,38 +151,61 @@ lv_display_t * lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     /* Expand invalidated areas by 1px to cover EVE's AA fringe bleed */
     lv_display_add_event_cb(disp, invalidate_area_cb, LV_EVENT_INVALIDATE_AREA, NULL);
 
-    /* Lazy-allocated tile buffer for partial rendering.
-     * Header-only initially; backing allocated on first dispatch:
-     * - EVE5 draw unit: VRAM only
-     * - SW fallback: CPU memory
-     * DISCARDABLE flag set after each flush prevents stale uploads. */
-    {
-        lv_color_format_t cf = lv_display_get_color_format(disp);
-        uint32_t stride = lv_draw_buf_width_to_stride(phost->Width, cf);
-        lv_draw_buf_t * buf1 = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
-        if(buf1 == NULL) {
-            lv_free(drvr);
-            lv_display_delete(disp);
-            return NULL;
+    /* Create both draw buffers up front. Only one is active at a time (selected
+     * by render mode). Keeping both around avoids alloc/free churn on mode switch. */
+    drvr->tile_buf = create_tile_buf(phost, drvr->partial_cf);
+    drvr->full_buf = create_full_buf(phost);
+    if(drvr->tile_buf == NULL || drvr->full_buf == NULL) {
+        if(drvr->tile_buf) lv_free(drvr->tile_buf);
+        if(drvr->full_buf) {
+            if(drvr->full_buf->vram_res) lv_free(drvr->full_buf->vram_res);
+            lv_free(drvr->full_buf);
         }
-        buf1->header.magic = LV_IMAGE_HEADER_MAGIC;
-        buf1->header.w = phost->Width;
-        buf1->header.h = 64;
-        buf1->header.cf = cf;
-        buf1->header.stride = stride;
-        buf1->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
-        buf1->data_size = stride * 64;
-        buf1->handlers = lv_draw_buf_get_handlers();
-
-        lv_display_set_draw_buffers(disp, buf1, NULL);
-        lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
+        lv_free(drvr);
+        lv_display_delete(disp);
+        return NULL;
     }
 
-    /* Get swapchain buffer addresses from HAL */
+    /* Read the swapchain buffer addresses set up by HAL bootup. frame_buffer_0
+     * and frame_buffer_1_orig are the canonical double-buffered values;
+     * frame_buffer_1 mirrors the *active* PTR1 (which apply_render_mode may
+     * override to PTR0 in partial mode). The compositor reads frame_buffer_0/1
+     * to find the previous front buffer, so they must reflect what the
+     * swapchain actually points at — otherwise the compositor reads from a
+     * buffer the scanout never sources from.
+     *
+     * Mode-specific swapchain config:
+     *   - FULL: leaves PTR1 at frame_buffer_1_orig (proper double buffering — tear-free).
+     *   - PARTIAL: overrides PTR1 = PTR0 to force single-buffer scanout. This is
+     *     because the partial-mode compositor needs to read the "previous front"
+     *     buffer as the base for compositing the next frame, but EVE provides no
+     *     reliable way to identify which swapchain buffer is the live scanout
+     *     after a CMD_SWAP. The natural alternative — pointing REG_SO_SOURCE at
+     *     a fixed memory address rather than SWAPCHAIN_0 — would sidestep the
+     *     detection problem, but in the emulator that path does not correctly
+     *     trigger the render, so we emulate the fixed-address behavior through
+     *     the swapchain by making PTR0 and PTR1 alias the same buffer. Proper
+     *     double-buffered partial mode would require encoding a per-frame
+     *     sentinel into the rendered output so the compositor can detect which
+     *     buffer was last rendered (and thus which is the previous front).
+     */
     drvr->frame_buffer_0 = EVE_Hal_rd32(phost, REG_SC0_PTR0);
-    EVE_Hal_wr32(phost, REG_SC0_PTR1, drvr->frame_buffer_0); /* TODO: Remove, forces single buffer for testing */
-    drvr->frame_buffer_1 = EVE_Hal_rd32(phost, REG_SC0_PTR1);
+    drvr->frame_buffer_1_orig = EVE_Hal_rd32(phost, REG_SC0_PTR1);
+    drvr->frame_buffer_1 = drvr->frame_buffer_1_orig; /* updated by apply_render_mode below */
     drvr->current_fb = 0;
+
+    /* Bind initial buffer + apply swapchain register config for the requested mode */
+    apply_render_mode(disp, mode);
+
+    /* Stash the display on the HAL's user context so lv_draw_eve5_init can reach
+     * back to the display when given just the HAL pointer. The EVE5 driver
+     * assumes a 1:1 hal:display:draw_unit relationship — UserContext is owned by
+     * lv_eve5 for that purpose. */
+    if(phost->UserContext != NULL && phost->UserContext != disp) {
+        LV_LOG_WARN("EVE5: phost->UserContext already set to %p; overwriting with display %p",
+                    phost->UserContext, (void *)disp);
+    }
+    phost->UserContext = disp;
 
     /* Initialize GPU allocator */
     allocator->TotalMemorySize = RAM_G_SIZE;
@@ -222,19 +276,232 @@ void lv_eve5_hal_unlock(lv_display_t * disp)
 }
 #endif
 
-bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, Esd_GpuHandle *out_handle)
+bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, Esd_GpuHandle *out_handle,
+                               uint16_t *out_format, uint32_t *out_stride)
 {
     if(buf == NULL || buf->vram_res == NULL) return false;
     lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
+    /* Swapchain vram_res is owned by the driver (full_buf); refuse to detach.
+     * Returning false routes the caller (e.g., partial-mode flush_cb) to its
+     * SW path, which is the safe degraded behavior if a flush ever fires for
+     * the full_buf. */
+    if(vr->is_swapchain) return false;
     *out_handle = vr->gpu_handle;
+    if(out_format) *out_format = vr->eve_format;
+    if(out_stride) *out_stride = vr->stride;
     lv_free(vr);
     buf->vram_res = NULL;
     return true;
 }
 
+bool lv_eve5_set_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
+{
+    if(disp == NULL) return false;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL) return false;
+    if(drvr->render_mode == mode) return true;
+
+#if LV_USE_OS
+    /* HAL mutex serializes us against the EVE5 draw unit. */
+    lv_mutex_lock(&drvr->hal_mutex);
+#endif
+    /* Drain the entire command FIFO before reconfiguring swapchain registers.
+     * waitFlush blocks until the coprocessor has processed every queued command,
+     * including any in-flight CMD_SWAP / scanout pipeline state — stronger than
+     * waiting on a specific sync marker, and the right tool for a one-off
+     * config change like a mode toggle. */
+    EVE_Cmd_waitFlush(drvr->hal);
+    apply_render_mode(disp, mode);
+#if LV_USE_OS
+    lv_mutex_unlock(&drvr->hal_mutex);
+#endif
+    return true;
+}
+
+lv_eve5_render_mode_t lv_eve5_get_render_mode(lv_display_t * disp)
+{
+    if(disp == NULL) return LV_EVE5_RENDER_MODE_PARTIAL;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    return drvr ? drvr->render_mode : LV_EVE5_RENDER_MODE_PARTIAL;
+}
+
+void lv_eve5_link_draw_unit(lv_display_t * disp, struct _lv_draw_unit_t * draw_unit)
+{
+    if(disp == NULL || draw_unit == NULL) return;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL) return;
+    if(drvr->full_buf != NULL && drvr->full_buf->vram_res != NULL) {
+        drvr->full_buf->vram_res->unit = (lv_draw_unit_t *)draw_unit;
+    }
+}
+
+void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync)
+{
+    if(disp == NULL) return;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL) return;
+    /* Already serialized by the draw unit's hal_lock around eve5_render_layer
+     * (which contains finish_layer); no additional locking needed. */
+    drvr->last_frame_sync = sync;
+}
+
 /**********************
  * STATIC FUNCTIONS
  **********************/
+
+/**
+ * Build the partial-mode tile draw buffer.
+ *
+ * Header-only initially; backing allocated on first dispatch:
+ *   - EVE5 draw unit: VRAM only (via vram_alloc_cb)
+ *   - SW fallback: CPU memory (lazy-allocated by LVGL)
+ * DISCARDABLE flag set after each flush prevents stale uploads when the
+ * tile is re-used across frames or after a mode switch.
+ */
+static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf)
+{
+    uint32_t stride = lv_draw_buf_width_to_stride(phost->Width, cf);
+    lv_draw_buf_t * buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+    if(buf == NULL) return NULL;
+
+    buf->header.magic = LV_IMAGE_HEADER_MAGIC;
+    buf->header.w = phost->Width;
+    buf->header.h = 64;
+    buf->header.cf = cf;
+    buf->header.stride = stride;
+    buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+    buf->data_size = stride * 64;
+    buf->handlers = lv_draw_buf_get_handlers();
+    return buf;
+}
+
+/**
+ * Build the full-mode screen draw buffer.
+ *
+ * Virtual buffer: no actual RAM_G allocation. The pre-attached vram_res has
+ * is_swapchain=true and gpu_handle=GA_HANDLE_INVALID; when the EVE5 draw unit's
+ * init_layer sees is_swapchain on the screen layer, it issues
+ * EVE_CoCmd_renderTarget with SWAPCHAIN_0, which the render engine resolves to
+ * the current back buffer. data is always NULL — LVGL never accesses pixel
+ * memory on this buffer because the EVE5 draw unit handles all rendering.
+ *
+ * Format is RGB8 to match the HAL-reserved swapchain. With LV_COLOR_DEPTH != 24,
+ * applying this mode causes lv_display_set_color_format to retag the display
+ * and screen layer to RGB888.
+ */
+static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
+{
+    lv_draw_buf_t * buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+    if(buf == NULL) return NULL;
+
+    lv_eve5_vram_res_t * vr = lv_malloc_zeroed(sizeof(lv_eve5_vram_res_t));
+    if(vr == NULL) {
+        lv_free(buf);
+        return NULL;
+    }
+
+    /* Stride matches what a CPU-side draw buffer would have (LVGL's canonical
+     * RGB888 stride, including its alignment rules) so lv_draw_buf_reshape's
+     * size check accepts the screen-sized layer. The physical SC0 buffer set
+     * up by HAL bootup uses Width × 3 with no row alignment, but we never read
+     * the swapchain via this stride — the render engine writes through
+     * SWAPCHAIN_0 and intermediate prev_handle blits carry their own stride. */
+    int32_t W = phost->Width;
+    int32_t H = phost->Height;
+    uint32_t stride = lv_draw_buf_width_to_stride((uint32_t)W, LV_COLOR_FORMAT_RGB888);
+    uint32_t cpu_size = stride * (uint32_t)H;
+
+    vr->base.unit = NULL; /* Set by the EVE5 draw unit on first use */
+    vr->base.size = 0;    /* No allocation — virtual */
+    vr->gpu_handle = GA_HANDLE_INVALID;
+    vr->eve_format = RGB8;
+    vr->stride = stride;
+    vr->width = W;
+    vr->height = H;
+    vr->source_offset = 0;
+    vr->palette_offset = GA_INVALID;
+    vr->is_premultiplied = false;
+    vr->has_content = false;
+    vr->is_swapchain = true;
+
+    buf->header.magic = LV_IMAGE_HEADER_MAGIC;
+    buf->header.w = W;
+    buf->header.h = H;
+    buf->header.cf = LV_COLOR_FORMAT_RGB888;
+    buf->header.stride = stride;
+    /* ALLOCATED tells LVGL it doesn't need to alloc CPU memory; vram_res below
+     * tells the EVE5 draw unit that residency is virtual (SWAPCHAIN_0). */
+    buf->header.flags = LV_IMAGE_FLAGS_ALLOCATED;
+    /* data_size mirrors what the CPU buffer would occupy. Required because
+     * lv_draw_buf_reshape rejects shapes whose computed size exceeds data_size,
+     * and lv_refr's layer_reshape_draw_buf calls reshape on every refresh.
+     * No CPU memory is actually allocated — data stays NULL. */
+    buf->data_size = cpu_size;
+    buf->data = NULL;
+    buf->handlers = lv_draw_buf_get_handlers();
+    buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
+    return buf;
+}
+
+/**
+ * Activate the requested render mode on the display.
+ *
+ * Updates the swapchain buffer config (REG_SC0_PTR1) and LVGL state (active
+ * draw buffer, color format, render mode). When called at runtime, the caller
+ * must already have synced past the last frame and held the HAL mutex so the
+ * register write doesn't race in-flight rendering.
+ *
+ * Idempotent — setting the same mode twice rewrites the same values (cheap).
+ */
+static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
+{
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL) return;
+    EVE_HalContext * phost = drvr->hal;
+
+    if(mode == LV_EVE5_RENDER_MODE_FULL) {
+        /* Proper double-buffered scanout: PTR0 and PTR1 distinct.
+         * SWAPCHAIN_0 magic-resolves to whichever is currently back; CMD_SWAP
+         * rotates them. No tearing because scanout reads the front while
+         * rendering writes the back. */
+        EVE_Hal_wr32(phost, REG_SC0_PTR1, drvr->frame_buffer_1_orig);
+        drvr->frame_buffer_1 = drvr->frame_buffer_1_orig;
+
+        lv_display_set_draw_buffers(disp, drvr->full_buf, NULL);
+        /* set_color_format propagates to disp, layer_head, and the active
+         * draw_buf's header.cf — sets things up for FULL render mode. */
+        lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB888);
+        lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
+    }
+    else {
+        /* Single-buffered scanout: PTR1 = PTR0. The partial-mode compositor has
+         * no reliable way to identify the live scanout buffer post-swap, so it
+         * cannot safely pick "previous front" to read as base in a true
+         * double-buffered swapchain. We emulate the fixed-scanout-address path
+         * here (which would otherwise be REG_SO_SOURCE = some_addr — but that
+         * path doesn't trigger the render correctly in the emulator). See
+         * create_ex for the full explanation and the path forward.
+         * frame_buffer_1 is mirrored to frame_buffer_0 so the compositor's
+         * read_fb selection always lands on the active scanout buffer
+         * regardless of which side of the toggle current_fb is on. */
+        EVE_Hal_wr32(phost, REG_SC0_PTR1, drvr->frame_buffer_0);
+        drvr->frame_buffer_1 = drvr->frame_buffer_0;
+
+        lv_display_set_draw_buffers(disp, drvr->tile_buf, NULL);
+        lv_display_set_color_format(disp, drvr->partial_cf);
+        lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+        /* Force a full-screen invalidation so the next refresh re-renders the
+         * whole screen via partial tiles. After a FULL→PARTIAL switch the
+         * scanout buffer holds the last full-mode frame; without this LVGL
+         * would only re-render whatever happens to be invalidated next, leaving
+         * stale full-mode pixels visible everywhere else. (At create time the
+         * screen is empty, so this is effectively a no-op.) */
+        lv_obj_t * scr = lv_display_get_screen_active(disp);
+        if(scr != NULL) lv_obj_invalidate(scr);
+    }
+    drvr->render_mode = mode;
+}
 
 static void invalidate_area_cb(lv_event_t * e)
 {
@@ -253,6 +520,34 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
 
     if(drvr == NULL || drvr->hal == NULL) {
+        lv_display_flush_ready(disp);
+        return;
+    }
+
+    /* Full mode: rendering and CMD_SWAP already happened in lv_draw_eve5_hal_finish_layer
+     * for the screen layer (which targets SWAPCHAIN_0). The draw unit also calls
+     * lv_eve5_record_frame_sync after that swap, so last_frame_sync is up to
+     * date for the next mode switch. px_map is unused (the full_buf has no CPU
+     * pixel data).
+     *
+     * One thing we *do* need to do: reclaim any deferred frees the GPU has
+     * caught up with. Sub-layer (opa_layered) draw_bufs go vram_free_cb →
+     * PendingFree → FlushPending (via finish_layer's sync) → DeferredFree, but
+     * the actual handle reclamation only happens in UpdateFree. PARTIAL mode
+     * does this in composite_to_framebuffer; FULL mode has no compositor, so
+     * without an explicit UpdateFree here the deferred queue grows unboundedly
+     * and VRAM exhausts after a few seconds of layered content. */
+    if(drvr->render_mode == LV_EVE5_RENDER_MODE_FULL) {
+        LV_UNUSED(area);
+        LV_UNUSED(px_map);
+#if LV_USE_OS
+        lv_mutex_lock(&drvr->hal_mutex);
+#endif
+        EVE_CmdSync completed = EVE_Cmd_syncCompleted(drvr->hal);
+        Esd_GpuAlloc_UpdateFree(drvr->allocator, completed);
+#if LV_USE_OS
+        lv_mutex_unlock(&drvr->hal_mutex);
+#endif
         lv_display_flush_ready(disp);
         return;
     }
@@ -278,16 +573,23 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     }
 
     /* Transfer ownership: if draw_buf has VRAM backing, detach the handle
-     * so lv_draw_buf_destroy doesn't double-free. */
+     * so lv_draw_buf_destroy doesn't double-free. Capture the actual EVE
+     * format and stride too — tile VRAM is allocated in the layer's color
+     * format (RGB565 / RGB8 / ARGB8 depending on LV_COLOR_DEPTH and any
+     * promotion flags), and the compositor must sample it with that format. */
     Esd_GpuHandle handle = GA_HANDLE_INVALID;
+    uint16_t region_format = 0;
+    uint32_t region_stride = 0;
     bool is_gpu_rendered = false;
 
     if(layer && layer->draw_buf) {
-        is_gpu_rendered = lv_eve5_detach_gpu_handle(layer->draw_buf, &handle);
+        is_gpu_rendered = lv_eve5_detach_gpu_handle(layer->draw_buf, &handle,
+                                                    &region_format, &region_stride);
     }
 
     if(!is_gpu_rendered) {
-        /* SW path: copy px_map (system RAM) to VRAM */
+        /* SW path: copy px_map (system RAM) to VRAM. The pixel format is the
+         * display's native LVGL format (EVE_SW_BITMAP_FORMAT) packed tight. */
         uint32_t size = (w * h) * SW_BYTES_PER_PIXEL;
 
         handle = Esd_GpuAlloc_Alloc(drvr->allocator, size, GA_ALIGN_4);
@@ -296,6 +598,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         if(gpu_addr != GA_INVALID) {
             EVE_Hal_wrMem(phost, gpu_addr, px_map, size);
             EVE_Hal_requestFenceBeforeSwap(phost);
+            region_format = EVE_SW_BITMAP_FORMAT;
+            region_stride = (uint32_t)w * SW_BYTES_PER_PIXEL;
         }
         else {
             LV_LOG_ERROR("EVE5: OOM in flush_cb SW path");
@@ -311,6 +615,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     if(handle.Id != GA_HANDLE_INVALID.Id) {
         drvr->pending_regions[drvr->pending_count].handle = handle;
         drvr->pending_regions[drvr->pending_count].area = *area;
+        drvr->pending_regions[drvr->pending_count].eve_format = region_format;
+        drvr->pending_regions[drvr->pending_count].eve_stride = region_stride;
         drvr->pending_regions[drvr->pending_count].is_gpu_rendered = is_gpu_rendered;
         drvr->pending_count++;
     }
@@ -373,18 +679,12 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
         EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
         EVE_CoDl_bitmapSource(phost, gpu_addr);
 
-        if(region->is_gpu_rendered) {
-            /* HW path: ARGB8 with 16-pixel aligned stride */
-            int32_t aligned_w = (w + 15) & ~15;
-            EVE_CoDl_bitmapLayout(phost, HW_BITMAP_FORMAT,
-                                  aligned_w * HW_BYTES_PER_PIXEL, h);
-        }
-        else {
-            /* SW path: tightly packed */
-            EVE_CoDl_bitmapLayout(phost, EVE_SW_BITMAP_FORMAT,
-                                  w * SW_BYTES_PER_PIXEL, h);
-        }
-
+        /* Sample the region in its actual format/stride captured at flush time.
+         * HW: layer-cf-derived (RGB565 for LV_COLOR_DEPTH=16, RGB8 for 24, ARGB8
+         * for 32 or alpha-promoted layers), 16-px aligned stride from the EVE5
+         * draw unit's vram_alloc_cb. SW: EVE_SW_BITMAP_FORMAT tightly packed. */
+        EVE_CoDl_bitmapLayout(phost, (uint8_t)region->eve_format,
+                              region->eve_stride, h);
         EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, w, h);
         EVE_CoDl_begin(phost, BITMAPS);
         EVE_CoDl_vertex2f_0(phost, region->area.x1, region->area.y1);

@@ -202,7 +202,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     uint32_t decoded_size = (uint32_t)(decoded_stride * (int32_t)img_h);
 
 #if LV_USE_OS
-    lv_eve5_hal_lock(lv_display_get_default());
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, decoded_size, GA_ALIGN_4);
@@ -210,7 +210,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     if(addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate %u bytes for decoded image", decoded_size);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         lv_fs_close(&file);
         return false;
@@ -222,7 +222,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         LV_LOG_ERROR("EVE5: Coprocessor fault before CMD_LOADIMAGE");
         Esd_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         lv_fs_close(&file);
         return false;
@@ -270,7 +270,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     if(!success) {
         Esd_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         return false;
     }
@@ -279,7 +279,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         LV_LOG_ERROR("EVE5: CMD_LOADIMAGE failed for %s", path);
         Esd_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         return false;
     }
@@ -300,7 +300,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
                 LV_LOG_INFO("EVE5 HW_DECODE: PALETTEDARGB8 not supported by caller, falling back to SW for %s", path);
                 Esd_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
-                lv_eve5_hal_unlock(lv_display_get_default());
+                lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
                 return false;
             }
@@ -345,7 +345,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     }
 
 #if LV_USE_OS
-    lv_eve5_hal_unlock(lv_display_get_default());
+    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     *ram_g_addr = addr;
@@ -491,11 +491,11 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, LV_IMA
     if(src_type == LV_IMAGE_SRC_FILE) {
         eve5_resolved_image_t resolved = {0};
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         bool ok = lv_draw_eve5_resolve_image_source(src, &resolved, &u->base_unit);
 #if LV_USE_OS
-        lv_eve5_hal_lock(lv_display_get_default());
+        lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
         if(!ok) return NULL;
 
@@ -631,12 +631,12 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
      * data is already the luminance value. Enables SW renderer's apply_mask. */
     if(eve_format == PALETTEDARGB8 && palette_addr != GA_INVALID) {
 #if LV_USE_OS
-        lv_eve5_hal_lock(lv_display_get_default());
+        lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
         uint8_t pal_buf[256 * 4];
         EVE_Hal_rdMem(u->hal, pal_buf, palette_addr, sizeof(pal_buf));
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         bool is_grayscale = true;
         for(uint32_t i = 0; i < 256; i++) {

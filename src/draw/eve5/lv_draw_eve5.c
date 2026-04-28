@@ -124,6 +124,7 @@ static void eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                               bool is_screen, bool layer_has_alpha,
                               const lv_draw_eve5_slice_t * slice, bool apply_bitmap_mask);
 static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
+static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_task_t * end);
 
 static bool s_eve5_enabled = true;
 
@@ -159,6 +160,14 @@ void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     lv_draw_eve5_register_image_decoder(unit);
 #endif
 
+    /* Wire the draw unit into the display's full_buf vram_res so LVGL can
+     * dispatch vram callbacks (vram_check, vram_free, etc.). lv_eve5_create*
+     * stashed the display on hal->UserContext for exactly this lookup —
+     * one display per HAL context per draw unit. */
+    if(hal != NULL && hal->UserContext != NULL) {
+        lv_eve5_link_draw_unit((lv_display_t *)hal->UserContext, &unit->base_unit);
+    }
+
     LV_LOG_INFO("EVE5: Draw unit initialized, ID=%d", DRAW_UNIT_ID_EVE5);
     LV_LOG_INFO("EVE5: SW fallback config: FILL=%d BORDER=%d LINE=%d TRI=%d LABEL=%d ARC=%d SHADOW=%d CANVAS=%d",
                 LV_DRAW_EVE5_SW_FILL, LV_DRAW_EVE5_SW_BORDER, LV_DRAW_EVE5_SW_LINE,
@@ -188,8 +197,6 @@ bool lv_draw_eve5_get_enabled(void)
 
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
-    LV_UNUSED(draw_unit);
-
     if(!s_eve5_enabled) return 0;
 
     /* Skip tasks marked for SW fallback (re-issued with user_data set) */
@@ -202,12 +209,15 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     /* Decline tasks on canvas layers (draw_buf != NULL, parent == NULL, not screen) */
     lv_layer_t * target = task->target_layer;
     if(target != NULL && target->draw_buf != NULL && target->parent == NULL) {
-        lv_display_t * disp = lv_display_get_default();
+        lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+        lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
         if(!disp || target != disp->layer_head) {
             EVE5_LOG("EVE5: Evaluate: type=%s -> declined (canvas layer)", task_type_str(task->type));
             return 0;
         }
     }
+#else
+    LV_UNUSED(draw_unit);
 #endif
 
     task->preference_score = 10;
@@ -541,7 +551,7 @@ static void eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
 static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 {
-    lv_display_t * disp = lv_display_get_default();
+    lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
     bool is_screen = (layer->parent == NULL && disp && layer == disp->layer_head);
 
     u->rendering_in_progress = true;
@@ -584,94 +594,170 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
      * - Blur: mipmap downsample chain on the accumulated content
      * Each such task becomes a slice boundary. */
     {
-        lv_draw_task_t * blend_task = NULL;
-        lv_draw_task_t * t = layer->draw_task_head;
-        while(t) {
-            if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-               t->state == LV_DRAW_TASK_STATE_QUEUED) {
-                if(t->type == LV_DRAW_TASK_TYPE_BLUR) {
-                    blend_task = t;
-                    break;
-                }
-                if((t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER)) {
-                    const lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                    if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
-                       dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
-                        blend_task = t;
-                        break;
-                    }
-                }
-            }
-            t = t->next;
-        }
+        lv_draw_task_t * blend_task = eve5_find_blend_task(layer->draw_task_head, NULL);
 
         if(blend_task != NULL) {
             EVE5_LOG("EVE5: Slice split at task %p (type=%d)", (void *)blend_task, blend_task->type);
+
+            /* Slicing intermediates need to be regular allocator-backed buffers.
+             * For non-screen layers the layer's own vram_res already plays that
+             * role. For full-mode-screen the layer's vram_res is virtual
+             * (is_swapchain), so we temporarily swap it to a fresh ARGB8 RAM_G
+             * allocation for the duration of the slice loop. The tail slice
+             * restores swapchain state so the final render writes directly to
+             * SWAPCHAIN_0 with the prev intermediate decoded as ARGB8. */
+            lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+            bool is_full_screen_sliced = (is_screen && vr != NULL && vr->is_swapchain);
+
+            /* Saved swapchain state (only used when is_full_screen_sliced) */
+            bool saved_is_swapchain = false;
+            Esd_GpuHandle saved_gpu_handle = GA_HANDLE_INVALID;
+            uint16_t saved_eve_format = 0;
+            uint32_t saved_stride = 0;
+            uint32_t saved_base_size = 0;
+            bool saved_has_content = false;
+            bool saved_is_premultiplied = false;
+            lv_color_format_t saved_layer_cf = LV_COLOR_FORMAT_UNKNOWN;
+            lv_color_format_t saved_buf_cf = LV_COLOR_FORMAT_UNKNOWN;
+            uint32_t inter_argb8_stride = 0;
+
+            /* Per-iteration eve5_render_slice parameters. For non-screen-layer
+             * slicing, intermediates and the tail share the outer is_screen /
+             * layer_has_alpha. For full-mode-screen, intermediates render as a
+             * regular ARGB8 layer (so blend math / alpha pass behave correctly)
+             * and only the tail runs with is_screen=true so init_layer's
+             * swapchain branch fires. */
+            bool inter_is_screen = is_screen;
+            bool inter_layer_has_alpha = layer_has_alpha;
+            bool tail_is_screen = is_screen;
+            bool tail_layer_has_alpha = layer_has_alpha;
+
+            if(is_full_screen_sliced) {
+                int32_t W = lv_area_get_width(&layer->buf_area);
+                int32_t H = lv_area_get_height(&layer->buf_area);
+                int32_t aw = ALIGN_UP(W, 16);
+                int32_t ah = ALIGN_UP(H, 16);
+                inter_argb8_stride = (uint32_t)aw * 4;
+                uint32_t inter_argb8_size = inter_argb8_stride * (uint32_t)ah;
+
+                Esd_GpuHandle first_temp = Esd_GpuAlloc_Alloc(u->allocator,
+                                                              inter_argb8_size, GA_ALIGN_128);
+                if(Esd_GpuAlloc_Get(u->allocator, first_temp) == GA_INVALID) {
+                    LV_LOG_ERROR("EVE5: Failed to allocate ARGB8 intermediate for full-mode slicing (%u bytes)",
+                                 inter_argb8_size);
+                    /* Mark all queued tasks finished and bail (frame is dropped) */
+                    for(lv_draw_task_t * tt = layer->draw_task_head; tt != NULL; tt = tt->next) {
+                        if(tt->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+                           tt->state == LV_DRAW_TASK_STATE_QUEUED) {
+                            tt->state = LV_DRAW_TASK_STATE_FINISHED;
+                        }
+                    }
+                    goto render_done;
+                }
+
+                /* Save swapchain state */
+                saved_is_swapchain = vr->is_swapchain;
+                saved_gpu_handle = vr->gpu_handle;
+                saved_eve_format = vr->eve_format;
+                saved_stride = vr->stride;
+                saved_base_size = vr->base.size;
+                saved_has_content = vr->has_content;
+                saved_is_premultiplied = vr->is_premultiplied;
+                saved_layer_cf = layer->color_format;
+                saved_buf_cf = layer->draw_buf ? layer->draw_buf->header.cf : LV_COLOR_FORMAT_UNKNOWN;
+
+                /* Override vr/layer to look like an ARGB8 layer */
+                vr->is_swapchain = false;
+                vr->gpu_handle = first_temp;
+                vr->eve_format = ARGB8;
+                vr->stride = inter_argb8_stride;
+                vr->base.size = inter_argb8_size;
+                vr->has_content = false;
+                vr->is_premultiplied = false;
+
+                layer->color_format = LV_COLOR_FORMAT_ARGB8888;
+                if(layer->draw_buf) layer->draw_buf->header.cf = LV_COLOR_FORMAT_ARGB8888;
+
+                inter_is_screen = false;
+                inter_layer_has_alpha = true;
+                tail_is_screen = true;
+                tail_layer_has_alpha = false;
+            }
 
             Esd_GpuHandle prev = GA_HANDLE_INVALID;
             lv_draw_task_t * cursor = layer->draw_task_head;
 
             while(cursor) {
                 /* Find next slice-boundary task from cursor */
-                blend_task = NULL;
-                t = cursor;
-                while(t) {
-                    if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-                       t->state == LV_DRAW_TASK_STATE_QUEUED) {
-                        if(t->type == LV_DRAW_TASK_TYPE_BLUR) {
-                            blend_task = t;
-                            break;
-                        }
-                        if((t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER)) {
-                            const lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                            if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
-                               dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
-                                blend_task = t;
-                                break;
-                            }
-                        }
-                    }
-                    t = t->next;
-                }
+                blend_task = eve5_find_blend_task(cursor, NULL);
 
                 if(blend_task == NULL) {
                     /* No more blend tasks — render remainder as final slice */
                     lv_draw_eve5_slice_t slice_tail;
+                    lv_memzero(&slice_tail, sizeof(slice_tail));
                     slice_tail.start = cursor;
                     slice_tail.end = NULL;
                     slice_tail.prev_handle = prev;
                     slice_tail.isolated = false;
-                    eve5_render_slice(u, layer, is_screen, layer_has_alpha,
+
+                    if(is_full_screen_sliced) {
+                        /* Free the unused-fresh ARGB8 buffer (was reserved for the
+                         * "next" slice that never happened — the tail goes to
+                         * SWAPCHAIN_0 instead). */
+                        if(Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID) {
+                            Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+                        }
+                        /* Restore swapchain state on vr and layer */
+                        vr->is_swapchain = saved_is_swapchain;
+                        vr->gpu_handle = saved_gpu_handle;
+                        vr->eve_format = saved_eve_format;
+                        vr->stride = saved_stride;
+                        vr->base.size = saved_base_size;
+                        vr->has_content = saved_has_content;
+                        vr->is_premultiplied = saved_is_premultiplied;
+                        layer->color_format = saved_layer_cf;
+                        if(layer->draw_buf) layer->draw_buf->header.cf = saved_buf_cf;
+
+                        /* prev was rendered as ARGB8 — tell init_layer's
+                         * prev_handle blit to decode the source as ARGB8 (target
+                         * is RGB8 swapchain). */
+                        slice_tail.prev_eve_format = ARGB8;
+                        slice_tail.prev_stride = inter_argb8_stride;
+                    }
+
+                    eve5_render_slice(u, layer, tail_is_screen, tail_layer_has_alpha,
                                       &slice_tail, true);
                     break;
                 }
 
                 /* Slice A: render tasks before the blend task */
                 bool has_pre_tasks = false;
-                t = cursor;
-                while(t && t != blend_task) {
-                    if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
-                       t->state == LV_DRAW_TASK_STATE_QUEUED) {
-                        has_pre_tasks = true;
-                        break;
+                {
+                    lv_draw_task_t * t = cursor;
+                    while(t && t != blend_task) {
+                        if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+                           t->state == LV_DRAW_TASK_STATE_QUEUED) {
+                            has_pre_tasks = true;
+                            break;
+                        }
+                        t = t->next;
                     }
-                    t = t->next;
                 }
 
                 if(has_pre_tasks) {
                     lv_draw_eve5_slice_t slice_pre;
+                    lv_memzero(&slice_pre, sizeof(slice_pre));
                     slice_pre.start = cursor;
                     slice_pre.end = blend_task;
                     slice_pre.prev_handle = prev;
                     slice_pre.isolated = false;
-                    eve5_render_slice(u, layer, is_screen, layer_has_alpha,
+                    eve5_render_slice(u, layer, inter_is_screen, inter_layer_has_alpha,
                                       &slice_pre, false);
 
                     /* Capture slice_pre output as dst, allocate new buffer for next slice.
                      * If the slice produced no content (all tasks were no-ops, e.g. empty
                      * child layers), treat it as if has_pre_tasks was false — prev stays
                      * unchanged and no buffer swap is needed. */
-                    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
                     if(vr != NULL && vr->has_content) {
                         Esd_GpuHandle dst_handle = vr->gpu_handle;
                         Esd_GpuHandle new_handle = Esd_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
@@ -698,18 +784,16 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     continue;
                 }
 
-                /* If prev is still INVALID (first task in queue is a blend task with nothing before),
-                 * the dst is effectively transparent black. We still need a dst buffer for the
-                 * blend math — allocate and clear one. */
-                /* Sentinel: prev_handle is specifically GA_HANDLE_INVALID when no previous slice exists */
+                /* If prev is still INVALID (first task in queue is a blend task with
+                 * nothing before), the dst is effectively transparent black. Allocate
+                 * and clear an ARGB8 buffer so blend math has a defined dst. */
                 if(prev.Id == GA_HANDLE_INVALID.Id) {
                     int32_t aw = ALIGN_UP(lv_area_get_width(&layer->buf_area), 16);
                     int32_t ah = ALIGN_UP(lv_area_get_height(&layer->buf_area), 16);
-                    uint32_t sz = aw * ah * 4;
+                    uint32_t sz = (uint32_t)aw * (uint32_t)ah * 4;
                     prev = Esd_GpuAlloc_Alloc(u->allocator, sz, GA_ALIGN_128);
                     uint32_t pa = Esd_GpuAlloc_Get(u->allocator, prev);
                     if(pa != GA_INVALID) {
-                        /* Clear via render target */
                         EVE_CoCmd_renderTarget(u->hal, pa, ARGB8, aw, ah);
                         EVE_CoCmd_dlStart(u->hal);
                         EVE_CoDl_clearColorRgb(u->hal, 0, 0, 0);
@@ -723,31 +807,29 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
                 /* Slice B: render the blend task in isolation */
                 lv_draw_eve5_slice_t slice_iso;
+                lv_memzero(&slice_iso, sizeof(slice_iso));
                 slice_iso.start = blend_task;
                 slice_iso.end = blend_task->next;
                 slice_iso.prev_handle = GA_HANDLE_INVALID;
                 slice_iso.isolated = true;
-                eve5_render_slice(u, layer, is_screen, layer_has_alpha,
+                eve5_render_slice(u, layer, inter_is_screen, inter_layer_has_alpha,
                                   &slice_iso, false);
 
                 /* Capture isolated output as src.
                  * If the slice produced no content (empty child layer), src stays
                  * GA_HANDLE_INVALID and the blend math is skipped below. */
                 Esd_GpuHandle src_handle = GA_HANDLE_INVALID;
-                {
-                    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
-                    if(vr != NULL && vr->has_content) {
-                        src_handle = vr->gpu_handle;
-                        /* Allocate fresh buffer for the next phase */
-                        Esd_GpuHandle new_handle = Esd_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
-                        if(Esd_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
-                            vr->gpu_handle = new_handle;
-                            vr->has_content = false;
-                        }
-                        else {
-                            LV_LOG_ERROR("EVE5: Failed to allocate buffer after isolated slice");
-                            src_handle = GA_HANDLE_INVALID;
-                        }
+                if(vr != NULL && vr->has_content) {
+                    src_handle = vr->gpu_handle;
+                    /* Allocate fresh buffer for the next phase */
+                    Esd_GpuHandle new_handle = Esd_GpuAlloc_Alloc(u->allocator, vr->base.size, GA_ALIGN_128);
+                    if(Esd_GpuAlloc_Get(u->allocator, new_handle) != GA_INVALID) {
+                        vr->gpu_handle = new_handle;
+                        vr->has_content = false;
+                    }
+                    else {
+                        LV_LOG_ERROR("EVE5: Failed to allocate buffer after isolated slice");
+                        src_handle = GA_HANDLE_INVALID;
                     }
                 }
 
@@ -781,8 +863,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                         int32_t bh = lv_area_get_height(&layer->buf_area);
                         int32_t baw = ALIGN_UP(bw, 16);
                         int32_t bah = ALIGN_UP(bh, 16);
-                        uint32_t bstride = baw * 4;
-                        uint32_t bsize = bstride * bah;
+                        uint32_t bstride = (uint32_t)baw * 4;
+                        uint32_t bsize = bstride * (uint32_t)bah;
 
                         result = Esd_GpuAlloc_Alloc(u->allocator, bsize, GA_ALIGN_128);
                         uint32_t result_addr = Esd_GpuAlloc_Get(u->allocator, result);
@@ -848,16 +930,66 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                 cursor = blend_task->next;
             }
 
-            /* Store final blend result in the layer's vram_res so the parent
-             * can find it for compositing. If cursor is NULL (last blend task
-             * was the last task), no tail slice runs so we must swap directly. */
-            /* Sentinel: prev is specifically GA_HANDLE_INVALID when no blend result was produced */
-            if(cursor == NULL && prev.Id != GA_HANDLE_INVALID.Id) {
-                lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
-                if(vr != NULL) {
-                    Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
-                    vr->gpu_handle = prev;
-                    vr->has_content = true;
+            /* Edge case: cursor became NULL because the very last task was a
+             * blend (no remaining tasks for a tail slice).
+             * Non-screen-layer: store prev on vr so the parent can composite it.
+             * Full-mode-screen: free the unused fresh buffer, restore swapchain
+             *   state, then blit prev to SWAPCHAIN_0 via an empty-tail
+             *   init_layer/finish_layer pair. (eve5_render_slice would early-exit
+             *   on "no visible tasks" and skip the prev blit we need.) */
+            if(cursor == NULL) {
+                if(is_full_screen_sliced) {
+                    if(Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID) {
+                        Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+                    }
+                    vr->is_swapchain = saved_is_swapchain;
+                    vr->gpu_handle = saved_gpu_handle;
+                    vr->eve_format = saved_eve_format;
+                    vr->stride = saved_stride;
+                    vr->base.size = saved_base_size;
+                    vr->has_content = saved_has_content;
+                    vr->is_premultiplied = saved_is_premultiplied;
+                    layer->color_format = saved_layer_cf;
+                    if(layer->draw_buf) layer->draw_buf->header.cf = saved_buf_cf;
+
+                    if(prev.Id != GA_HANDLE_INVALID.Id) {
+                        lv_draw_eve5_slice_t slice_empty;
+                        lv_memzero(&slice_empty, sizeof(slice_empty));
+                        slice_empty.start = NULL;
+                        slice_empty.end = NULL;
+                        slice_empty.prev_handle = prev;
+                        slice_empty.isolated = false;
+                        slice_empty.prev_eve_format = ARGB8;
+                        slice_empty.prev_stride = inter_argb8_stride;
+                        lv_draw_eve5_hal_init_layer(u, layer, true, &slice_empty);
+                        if(eve5_get_vram_res(layer) != NULL) {
+                            lv_draw_eve5_hal_finish_layer(u, layer, true, 0);
+                        }
+                    }
+                    else {
+                        /* No content — issue clear+swap to keep swapchain rotation consistent. */
+                        EVE_HalContext * phost = u->hal;
+                        int32_t W = lv_area_get_width(&layer->buf_area);
+                        int32_t H = lv_area_get_height(&layer->buf_area);
+                        EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, vr->eve_format, W, H);
+                        EVE_CoCmd_dlStart(phost);
+                        EVE_CoDl_scissorXY(phost, 0, 0);
+                        EVE_CoDl_scissorSize(phost, W, H);
+                        EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+                        EVE_CoDl_clear(phost, 1, 1, 1);
+                        EVE_CoDl_display(phost);
+                        EVE_CoCmd_swap(phost);
+                        EVE_CoCmd_graphicsFinish(phost);
+                        EVE_CmdSync sync = EVE_Cmd_sync(phost);
+                        Esd_GpuAlloc_FlushPending(u->allocator, sync);
+                    }
+                }
+                else if(prev.Id != GA_HANDLE_INVALID.Id) {
+                    if(vr != NULL) {
+                        Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+                        vr->gpu_handle = prev;
+                        vr->has_content = true;
+                    }
                 }
             }
 
@@ -904,6 +1036,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
             /* Slice 1: render first portion */
             lv_draw_eve5_slice_t slice1;
+            lv_memzero(&slice1, sizeof(slice1));
             slice1.start = NULL;
             slice1.end = split;
             slice1.prev_handle = GA_HANDLE_INVALID;
@@ -929,6 +1062,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
             /* Slice 2: render remainder with previous slice output */
             lv_draw_eve5_slice_t slice2;
+            lv_memzero(&slice2, sizeof(slice2));
             slice2.start = split;
             slice2.end = NULL;
             slice2.prev_handle = slice1_output;
@@ -938,6 +1072,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
         else {
             /* Too few tasks to split — render as single slice */
             lv_draw_eve5_slice_t slice;
+            lv_memzero(&slice, sizeof(slice));
             slice.start = NULL;
             slice.end = NULL;
             slice.prev_handle = GA_HANDLE_INVALID;
@@ -949,6 +1084,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
     /* Normal path: single full-range slice */
     {
         lv_draw_eve5_slice_t slice;
+        lv_memzero(&slice, sizeof(slice));
         slice.start = NULL;
         slice.end = NULL;
         slice.prev_handle = GA_HANDLE_INVALID;
@@ -965,6 +1101,34 @@ render_done:
 #if LV_USE_OS
     lv_eve5_hal_unlock(disp);
 #endif
+}
+
+/**********************
+ * SLICE-BOUNDARY HELPERS
+ **********************/
+
+/**
+ * Find the next blend/blur task (slice boundary) in [cursor, end). Returns
+ * NULL if none. Centralizes the search used by eve5_render_layer and
+ * eve5_render_layer_full_screen_sliced.
+ */
+static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_task_t * end)
+{
+    for(lv_draw_task_t * t = cursor; t != end; t = t->next) {
+        if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5) continue;
+        if(t->state != LV_DRAW_TASK_STATE_QUEUED) continue;
+        if(t->type == LV_DRAW_TASK_TYPE_BLUR) {
+            return t;
+        }
+        if(t->type == LV_DRAW_TASK_TYPE_IMAGE || t->type == LV_DRAW_TASK_TYPE_LAYER) {
+            const lv_draw_image_dsc_t * dsc = t->draw_dsc;
+            if(dsc->blend_mode != LV_BLEND_MODE_NORMAL &&
+               dsc->blend_mode != LV_BLEND_MODE_ADDITIVE) {
+                return t;
+            }
+        }
+    }
+    return NULL;
 }
 
 #endif /* LV_USE_DRAW_EVE5 */

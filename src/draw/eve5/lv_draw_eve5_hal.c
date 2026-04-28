@@ -148,14 +148,14 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     uint32_t size = aligned_w * aligned_h * bpp;
 
 #if LV_USE_OS
-    lv_eve5_hal_lock(lv_display_get_default());
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
     if(Esd_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
         LV_LOG_WARN("EVE5 VRAM alloc failed (%ux%u fmt=%d, %u bytes)", w, h, eve_fmt, size);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         return false;
     }
@@ -164,7 +164,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     if(vr == NULL) {
         Esd_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         return false;
     }
@@ -182,7 +182,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
 
 #if LV_USE_OS
-    lv_eve5_hal_unlock(lv_display_get_default());
+    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     LV_LOG_INFO("EVE5 VRAM alloc: %ux%u fmt=%d stride=%u -> handle %d",
@@ -197,8 +197,14 @@ static void eve5_vram_free_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 
     if(vr == NULL) return;
 
+    /* Swapchain vram_res is owned by the display driver (full_buf) for the
+     * lifetime of the display. Don't free it here — switching modes or
+     * destroying the buffer through LVGL must not invalidate the driver's
+     * reference. The driver frees it explicitly on display teardown. */
+    if(vr->is_swapchain) return;
+
 #if LV_USE_OS
-    lv_eve5_hal_lock(lv_display_get_default());
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     /* PendingFree: the texture may still be referenced by an in-flight
@@ -207,7 +213,7 @@ static void eve5_vram_free_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
 
 #if LV_USE_OS
-    lv_eve5_hal_unlock(lv_display_get_default());
+    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     lv_free(vr);
@@ -232,13 +238,13 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
         lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
 
 #if LV_USE_OS
-        lv_eve5_hal_lock(lv_display_get_default());
+        lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
         uint32_t gpu_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle);
         if(gpu_addr == GA_INVALID) {
 #if LV_USE_OS
-            lv_eve5_hal_unlock(lv_display_get_default());
+            lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
             return false;
         }
@@ -279,7 +285,7 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
         }
 
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_display_get_default());
+        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
         return true;
     }
@@ -290,13 +296,13 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
 
 #if LV_USE_OS
-    lv_eve5_hal_lock(lv_display_get_default());
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     lv_eve5_vram_res_t * vr = lv_draw_eve5_upload_image_to_gpu(u, (LV_IMAGE_DSC_CONST lv_image_dsc_t *)buf);
 
 #if LV_USE_OS
-    lv_eve5_hal_unlock(lv_display_get_default());
+    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     return vr != NULL;
@@ -310,7 +316,7 @@ static bool eve5_vram_download_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * bu
     if(vr == NULL || buf->data == NULL) return false;
 
 #if LV_USE_OS
-    lv_eve5_hal_lock(lv_display_get_default());
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     /* Flush coprocessor before reading since render target writes may be in flight.
@@ -320,7 +326,7 @@ static bool eve5_vram_download_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * bu
     bool ok = lv_draw_eve5_download_image(u, buf, vr);
 
 #if LV_USE_OS
-    lv_eve5_hal_unlock(lv_display_get_default());
+    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
     return ok;
@@ -332,6 +338,9 @@ static bool eve5_vram_check_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     lv_eve5_vram_res_t * vr = (lv_eve5_vram_res_t *)buf->vram_res;
 
     if(vr == NULL) return false;
+    /* Swapchain target is always "resident" — SWAPCHAIN_0 is a virtual render-engine
+     * sentinel that resolves to the current back buffer, not an allocator handle. */
+    if(vr->is_swapchain) return true;
 
     return Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID;
 }
@@ -353,6 +362,88 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  bool is_screen,
                                  const lv_draw_eve5_slice_t * slice)
 {
+    /* Swapchain target (full-mode screen): render the screen layer directly to
+     * SWAPCHAIN_0. SWAPCHAIN_0 is resolved by the render engine to the current
+     * back buffer (one of REG_SC0_PTR0/PTR1); finish_layer's CMD_SWAP triggers
+     * the actual scanout flip. The HAL-reserved SC0 backbuffers are sized
+     * exactly Width × Height with stride = Width × 3 (no row alignment — see
+     * EVE_Util.c bootup), so we use unaligned dimensions.
+     *
+     * Future improvement: allocate the backbuffers via Esd_GpuAlloc with
+     * GA_VERYLARGE_FLAG | GA_FIXED_FLAG and override REG_SC0_PTR0/PTR1 at create
+     * time. That would also make per-frame triple buffering possible.
+     */
+    {
+        lv_eve5_vram_res_t * sc_vr = eve5_get_vram_res(layer);
+        if(sc_vr != NULL && sc_vr->is_swapchain) {
+            EVE_HalContext * phost = u->hal;
+            int32_t sw = lv_area_get_width(&layer->buf_area);
+            int32_t sh = lv_area_get_height(&layer->buf_area);
+
+            u->canvas_orig_addr = GA_INVALID;
+            u->canvas_orig_palette = GA_INVALID;
+
+            EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, sc_vr->eve_format, sw, sh);
+            EVE_CoCmd_dlStart(phost);
+            EVE_CoDl_scissorXY(phost, 0, 0);
+            EVE_CoDl_scissorSize(phost, sw, sh);
+
+            if(slice->isolated) {
+                /* Isolated slice — clear to transparent. (Unusual on screen target,
+                 * but supports being driven by the slice infrastructure.) */
+                EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+                EVE_CoDl_clearColorA(phost, 0);
+                EVE_CoDl_clear(phost, 1, 1, 1);
+            }
+            else if(slice->prev_handle.Id != GA_HANDLE_INVALID.Id) {
+                /* Tail slice in full-mode-screen slicing: prev_handle is the previous
+                 * intermediate (typically ARGB8). Blit it as the starting content;
+                 * format conversion ARGB8 → swapchain RGB8 happens implicitly at
+                 * the render-engine output. */
+                uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, slice->prev_handle);
+                if(prev_addr != GA_INVALID) {
+                    uint16_t prev_fmt = slice->prev_eve_format ? slice->prev_eve_format : sc_vr->eve_format;
+                    uint32_t prev_stride = slice->prev_stride ? slice->prev_stride : sc_vr->stride;
+
+                    EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+                    EVE_CoDl_clearColorA(phost, 255);
+                    EVE_CoDl_clear(phost, 1, 1, 1);
+
+                    EVE_CoDl_saveContext(phost);
+                    EVE_CoDl_blendFunc(phost, ONE, ZERO);
+                    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+                    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+                    EVE_CoDl_bitmapSource(phost, prev_addr);
+                    EVE_CoDl_bitmapLayout(phost, (uint8_t)prev_fmt, prev_stride, sh);
+                    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, sw, sh);
+                    EVE_CoDl_begin(phost, BITMAPS);
+                    EVE_CoDl_vertex2f_0(phost, 0, 0);
+                    EVE_CoDl_end(phost);
+                    EVE_CoDl_restoreContext(phost);
+
+                    Esd_GpuAlloc_PendingFree(u->allocator, slice->prev_handle);
+                }
+                else {
+                    EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+                    EVE_CoDl_clearColorA(phost, 255);
+                    EVE_CoDl_clear(phost, 1, 1, 1);
+                }
+            }
+            else {
+                /* Non-sliced (or first slice): plain clear, fresh fullscreen render. */
+                EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+                EVE_CoDl_clearColorA(phost, 255);
+                EVE_CoDl_clear(phost, 1, 1, 1);
+            }
+
+            EVE_CoDl_scissorXY(phost, 0, 0);
+            EVE_CoDl_scissorSize(phost, sw, sh);
+            EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+            EVE_CoDl_blendFunc(phost, SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
+            return;
+        }
+    }
+
     uint32_t ram_g_addr = GA_INVALID;
     bool existing_has_content = false;
     bool existing_is_premultiplied = false;
@@ -614,17 +705,15 @@ canvas_cleared:
 void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                    bool is_screen, int rendered_count)
 {
-    {
-        lv_eve5_vram_res_t * finish_vr = eve5_get_vram_res(layer);
-        if(finish_vr != NULL) {
-            /* Only update state when tasks actually rendered.
-             * A discarded/fresh layer that ran zero tasks should retain
-             * its current has_content and is_premultiplied flags — the
-             * content wasn't re-rendered so its state hasn't changed. */
-            if(rendered_count > 0) {
-                finish_vr->is_premultiplied = true;
-                finish_vr->has_content = true;
-            }
+    lv_eve5_vram_res_t * finish_vr = eve5_get_vram_res(layer);
+    if(finish_vr != NULL) {
+        /* Only update state when tasks actually rendered.
+         * A discarded/fresh layer that ran zero tasks should retain
+         * its current has_content and is_premultiplied flags — the
+         * content wasn't re-rendered so its state hasn't changed. */
+        if(rendered_count > 0) {
+            finish_vr->is_premultiplied = true;
+            finish_vr->has_content = true;
         }
     }
 
@@ -634,6 +723,15 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     EVE_CmdSync sync = EVE_Cmd_sync(u->hal);
     Esd_GpuAlloc_FlushPending(u->allocator, sync);
+
+    /* In FULL mode the screen layer renders directly into SWAPCHAIN_0, so the
+     * CMD_SWAP above is the actual frame swap. Record the sync so a runtime
+     * mode switch can drain the scanout pipeline before reconfiguring registers.
+     * For PARTIAL mode and non-screen layers the swap doesn't flip scanout —
+     * composite_to_framebuffer does, and it updates last_frame_sync itself. */
+    if(is_screen && finish_vr != NULL && finish_vr->is_swapchain) {
+        lv_eve5_record_frame_sync(lv_eve5_disp_from_hal(u->hal), sync);
+    }
 }
 
 /**********************
