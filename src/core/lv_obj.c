@@ -27,6 +27,7 @@
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
 #include "lv_obj_draw_private.h"
+#include "../misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -235,10 +236,15 @@ const lv_obj_class_t lv_obj_class = {
 lv_obj_t * lv_obj_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
+
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
-    LV_ASSERT_NULL(obj);
+
     if(obj == NULL) return NULL;
+
     lv_obj_class_init_obj(obj);
+
+    LV_LOG_TRACE("finished");
+
     return obj;
 }
 
@@ -253,6 +259,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(lv_obj_has_flag(obj, f)) /*Check if all flags are set*/
         return;
 
@@ -292,6 +299,7 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(!lv_obj_has_flag_any(obj, f))
         return;
 
@@ -414,6 +422,7 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj)
 lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child)
 {
     LV_ASSERT_OBJ(parent, MY_CLASS);
+    LV_CHECK_ARG(child != NULL, return LV_RESULT_INVALID);
 
     uint16_t new_child_cnt = parent->spec_attr->child_cnt + 1;
 
@@ -433,6 +442,7 @@ void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
 {
     LV_ASSERT_OBJ(parent, MY_CLASS);
     LV_ASSERT_OBJ(child, MY_CLASS);
+
     for(int32_t i = lv_obj_get_index(child); i < (int32_t)parent->spec_attr->child_cnt - 1; i++) {
         parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
     }
@@ -455,6 +465,7 @@ void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(obj->spec_attr) {
         return obj->spec_attr;
     }
@@ -474,12 +485,14 @@ lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 
 bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
-    if(obj == NULL) return false;
+    LV_CHECK_ARG(obj != NULL, return false);
     return obj->class_p == class_p;
 }
 
 bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
+    LV_CHECK_ARG(obj != NULL, return false);
+
     const lv_obj_class_t * obj_class = obj->class_p;
     while(obj_class) {
         if(obj_class == class_p) return true;
@@ -491,11 +504,14 @@ bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 
 const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return NULL);
     return obj->class_p;
 }
 
 bool lv_obj_is_valid(const lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return false);
+
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
         uint32_t i;
@@ -513,18 +529,23 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
 
 void lv_obj_null_on_delete(lv_obj_t ** obj_ptr)
 {
+    LV_CHECK_ARG(obj_ptr != NULL, return);
+    LV_CHECK_ARG(*obj_ptr != NULL, return);
+
     lv_obj_add_event_cb(*obj_ptr, null_on_delete_cb, LV_EVENT_DELETE, obj_ptr);
 }
 
 #if LV_USE_OBJ_ID
 void * lv_obj_get_id(const lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(obj != NULL, return NULL);
     return obj->id;
 }
 
 lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
 {
+    LV_CHECK_ARG(id != NULL, return NULL);
+
     LV_LOG_WARN("DEPRECATED: IDs are used only to print the widget trees. To find a widget use obj_name");
 
     if(obj == NULL) obj = lv_display_get_screen_active(NULL);
@@ -532,15 +553,13 @@ lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
 
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
-    for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = obj->spec_attr->children[i];
-        if(lv_obj_id_compare(child->id, id) == 0) return child;
-    }
 
-    /*Search children*/
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
+
+        if(lv_obj_id_compare(child->id, id) == 0) return child;
         lv_obj_t * found = lv_obj_find_by_id(child, id);
+
         if(found != NULL) return found;
     }
 
@@ -551,10 +570,8 @@ lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
 void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_obj_t * screen,
                                   lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay)
 {
-    if(screen == NULL) {
-        LV_LOG_WARN("`screen` is NULL, can't load a non existing screens");
-        return;
-    }
+    LV_CHECK_ARG(screen != NULL, return, "can't load a non-existing screen");
+    LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
 
     screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
     LV_ASSERT_MALLOC(dsc);
@@ -571,6 +588,8 @@ void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_ob
 void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_screen_create_cb_t screen_create_cb,
                                     lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay)
 {
+    LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
+
     screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
     LV_ASSERT_MALLOC(dsc);
     lv_memzero(dsc, sizeof(screen_load_anim_dsc_t));
@@ -586,6 +605,9 @@ void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_anim_timeline_t * at, uint32_t delay,
                                     bool reverse)
 {
+    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_ARG(at != NULL, return);
+
     timeline_play_dsc_t * dsc = lv_malloc(sizeof(timeline_play_dsc_t));
     LV_ASSERT_MALLOC(dsc);
     lv_memzero(dsc, sizeof(timeline_play_dsc_t));
@@ -599,11 +621,14 @@ void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
 {
+    LV_CHECK_ARG(obj != NULL, return);
     obj->user_data = user_data;
 }
 
 void * lv_obj_get_user_data(lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return NULL);
+
     return obj->user_data;
 }
 
@@ -613,6 +638,8 @@ void * lv_obj_get_user_data(lv_obj_t * obj)
 
 static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return);
+
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -648,6 +675,8 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return);
+
     LV_UNUSED(class_p);
 
     lv_event_mark_deleted(obj);

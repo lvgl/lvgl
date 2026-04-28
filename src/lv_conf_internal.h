@@ -1500,8 +1500,13 @@
  * Check arg
  *-----------*/
 
-/** Enable LV_CHECK_ARG macro to validate function arguments at runtime.
- * When enabled, failed checks log a warning and execute the specified action.
+/** When enabled, LV_CHECK_ARG checks validate function arguments
+ * at runtime. Failed checks log a warning and execute the specified
+ * action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+ * Disabling this is not recommended unless extreme care is taken and only
+ * in very resource constrained environments where it can be absolutely
+ * ensured that invariants are never violated.
+ *
  * 0: Disable all LV_CHECK_ARG checks (checks compile to nothing)
  * 1: Enable LV_CHECK_ARG checks */
 #ifndef LV_USE_CHECK_ARG

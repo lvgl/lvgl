@@ -8,6 +8,8 @@
  *      INCLUDES
  *********************/
 #include "lv_ll.h"
+
+#include "lv_check_arg.h"
 #include "../stdlib/lv_mem.h"
 
 /*********************
@@ -41,6 +43,8 @@ static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * nex
 
 void lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
 {
+    LV_CHECK_ARG(ll_p != NULL, return);
+    LV_CHECK_ARG(node_size > 0, return, "cannot initialize a linked list with empty nodes");
     ll_p->head = NULL;
     ll_p->tail = NULL;
 #ifdef LV_ARCH_64

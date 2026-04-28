@@ -12,6 +12,7 @@
 #include "lv_obj_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
+#include "../misc/lv_check_arg.h"
 
 /*********************
  *      DEFINES
@@ -48,7 +49,7 @@ static bool event_is_trickled(lv_event_t * e);
 
 lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 {
-    if(obj == NULL) return LV_RESULT_OK;
+    LV_CHECK_ARG(obj != NULL, return LV_RESULT_OK);
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -76,6 +77,9 @@ lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void *
 
 lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_CHECK_ARG(e != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(e->current_target != NULL, return LV_RESULT_INVALID);
+
     const lv_obj_class_t * base;
     if(class_p == NULL) base = ((lv_obj_t *)e->current_target)->class_p;
     else base = class_p->base_class;
@@ -101,7 +105,9 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 
 lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
+    LV_CHECK_ARG(event_cb != NULL, return NULL);
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
     if(!lv_obj_allocate_spec_attr(obj)) {
         return NULL;
     }
@@ -111,36 +117,38 @@ lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_
 
 uint32_t lv_obj_get_event_count(lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(obj != NULL, return 0);
     if(obj->spec_attr == NULL) return 0;
     return lv_event_get_count(&obj->spec_attr->event_list);
 }
 
 lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(obj != NULL, return 0);
     if(obj->spec_attr == NULL) return NULL;
     return lv_event_get_dsc(&obj->spec_attr->event_list, index);
 }
 
 bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(obj != NULL, return 0);
     if(obj->spec_attr == NULL) return false;
     return lv_event_remove(&obj->spec_attr->event_list, index);
 }
 
 bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc)
 {
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_NULL(dsc);
+    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_ARG(dsc != NULL, return 0);
+
     if(obj->spec_attr == NULL) return false;
     return lv_event_remove_dsc(&obj->spec_attr->event_list, dsc);
 }
 
 uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_ARG(event_cb != NULL, return 0);
 
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t removed_count = 0;
@@ -161,7 +169,8 @@ uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 
 uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
 {
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_ARG(event_cb != NULL, return 0);
 
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t removed_count = 0;
@@ -214,7 +223,7 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
         return lv_event_get_param(e);
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return NULL;
     }
 }
@@ -230,7 +239,7 @@ lv_layer_t * lv_event_get_layer(lv_event_t * e)
         return lv_event_get_param(e);
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return NULL;
     }
 }
@@ -241,7 +250,7 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e)
         return lv_event_get_param(e);
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return NULL;
     }
 }
@@ -254,7 +263,7 @@ uint32_t lv_event_get_key(lv_event_t * e)
         else return 0;
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return 0;
     }
 }
@@ -267,7 +276,7 @@ int32_t lv_event_get_rotary_diff(lv_event_t * e)
         else return 0;
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return 0;
     }
 }
@@ -278,7 +287,7 @@ lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
         return lv_event_get_param(e);
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return NULL;
     }
 }
@@ -290,7 +299,7 @@ void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size)
         *cur_size = LV_MAX(*cur_size, size);
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
     }
 }
 
@@ -300,7 +309,7 @@ lv_point_t * lv_event_get_self_size_info(lv_event_t * e)
         return lv_event_get_param(e);
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return 0;
     }
 }
@@ -311,7 +320,7 @@ lv_hit_test_info_t * lv_event_get_hit_test_info(lv_event_t * e)
         return lv_event_get_param(e);
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return 0;
     }
 }
@@ -323,7 +332,7 @@ const lv_area_t * lv_event_get_cover_area(lv_event_t * e)
         return p->area;
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return NULL;
     }
 }
@@ -335,7 +344,7 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
         if(res > p->res) p->res = res;  /*Save only "stronger" results*/
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
     }
 }
 
@@ -345,7 +354,7 @@ lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
         return lv_event_get_param(e);
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return NULL;
     }
 }
@@ -357,7 +366,7 @@ lv_state_t lv_event_get_prev_state(lv_event_t * e)
         return state ? *state : 0;
     }
     else {
-        LV_LOG_WARN("Not interpreted with this event code");
+        LV_LOG_WARN("Invalid event code %d", e->code);
         return 0;
     }
 }
