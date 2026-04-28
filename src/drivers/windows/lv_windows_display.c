@@ -11,6 +11,7 @@
 #if LV_USE_WINDOWS
 
 #include "lv_windows_context.h"
+#include "../../misc/lv_timer.h"
 
 #include <process.h>
 
@@ -82,6 +83,8 @@ lv_display_t * lv_windows_create_display(
     if(data.mutex) {
         CloseHandle(data.mutex);
     }
+
+    lv_timer_handler();
 
     return data.display;
 }
