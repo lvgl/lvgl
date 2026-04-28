@@ -37,6 +37,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static inline int32_t mul_div(int32_t v, int32_t factor, int32_t divisor);
 static void scroll_x_anim(void * obj, int32_t v);
 static void scroll_y_anim(void * obj, int32_t v);
 static void scroll_end_cb(lv_anim_t * a);
@@ -553,7 +554,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
             ver_area->x1 = ver_area->x2 - thickness + 1;
         }
 
-        int32_t sb_h = ((obj_h - top_space - bottom_space - hor_req_space) * obj_h) / content_h;
+        int32_t sb_h = mul_div(obj_h - top_space - bottom_space - hor_req_space, obj_h, content_h);
         sb_h = LV_MAX(length > 0 ? length : sb_h, SCROLLBAR_MIN_SIZE); /*Style-defined size, calculated size, or minimum size*/
         sb_h = LV_MIN(sb_h, obj_h); /*Limit scrollbar length to parent height*/
         rem = (obj_h - top_space - bottom_space - hor_req_space) -
@@ -564,7 +565,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
             ver_area->y2 = obj->coords.y2 - bottom_space - hor_req_space - 1;
         }
         else {
-            int32_t sb_y = (rem * sb) / scroll_h;
+            int32_t sb_y = mul_div(rem, sb, scroll_h);
             sb_y = rem - sb_y;
 
             ver_area->y1 = obj->coords.y1 + sb_y + top_space;
@@ -592,7 +593,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
         hor_area->x1 = obj->coords.x1;
         hor_area->x2 = obj->coords.x2;
 
-        int32_t sb_w = ((obj_w - left_space - right_space - ver_reg_space) * obj_w) / content_w;
+        int32_t sb_w = mul_div(obj_w - left_space - right_space - ver_reg_space, obj_w, content_w);
         sb_w = LV_MAX(length > 0 ? length : sb_w, SCROLLBAR_MIN_SIZE); /*Style-defined size, calculated size, or minimum size*/
         sb_w = LV_MIN(sb_w, obj_w); /*Limit scrollbar length to parent width*/
         rem = (obj_w - left_space - right_space - ver_reg_space) -
@@ -609,7 +610,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
             }
         }
         else {
-            int32_t sb_x = (rem * sr) / scroll_w;
+            int32_t sb_x = mul_div(rem, sr, scroll_w);
             sb_x = rem - sb_x;
 
             if(rtl) {
@@ -696,6 +697,11 @@ void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static inline int32_t mul_div(int32_t v, int32_t factor, int32_t divisor)
+{
+    return ((int64_t)v * factor) / divisor;
+}
 
 static void scroll_x_anim(void * obj, int32_t v)
 {
