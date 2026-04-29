@@ -79,7 +79,7 @@ extern "C" {
 #define EVE5_FONT_WHOLE_THRESHOLD       1024        /* Max glyph count */
 #endif
 #ifndef EVE5_FONT_WHOLE_MAX_BYTES
-#define EVE5_FONT_WHOLE_MAX_BYTES       (256 * 1024) /* Max GPU allocation size */
+#define EVE5_FONT_WHOLE_MAX_BYTES       (RAM_G_SIZE > (1024 * 1024) ? (256 * 1024) : (64 * 1024)) /* Max GPU allocation size */
 #endif
 
 #if LV_DRAW_EVE5_SW_FALLBACK
