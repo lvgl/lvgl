@@ -548,12 +548,12 @@ bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t * u, Esd_GpuHandle handl
  * IMAGE LOADING API
  **********************/
 
-bool lv_draw_eve5_resolve_image_source(LV_IMAGE_DSC_CONST void * src, eve5_resolved_image_t * resolved,
+bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t * resolved,
                                        lv_draw_unit_t * draw_unit);
 void lv_draw_eve5_release_image_source(eve5_resolved_image_t * resolved);
 lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                                       LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc);
-lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, LV_IMAGE_DSC_CONST void * src);
+lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const void * src);
 
 #if EVE5_HW_IMAGE_DECODE
 void lv_draw_eve5_register_image_decoder(lv_draw_eve5_unit_t * unit);

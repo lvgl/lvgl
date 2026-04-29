@@ -38,7 +38,7 @@
  * Resolve an image source to an lv_image_dsc_t.
  * For files, opens with use_indexed=true to preserve indexed formats.
  */
-bool lv_draw_eve5_resolve_image_source(LV_IMAGE_DSC_CONST void * src, eve5_resolved_image_t * resolved,
+bool lv_draw_eve5_resolve_image_source(const void * src, eve5_resolved_image_t * resolved,
                                        lv_draw_unit_t * draw_unit)
 {
     lv_memzero(resolved, sizeof(*resolved));
@@ -519,7 +519,7 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src
  *
  * Returns NULL on failure.
  */
-lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, LV_IMAGE_DSC_CONST void * src)
+lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const void * src)
 {
     lv_image_src_t src_type = lv_image_src_get_type(src);
 
