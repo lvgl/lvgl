@@ -218,10 +218,10 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     dropdown->sel_opt_id_orig = 0;
 
     /*Allocate space for the new text*/
-#if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    size_t len = lv_strlen(options) + 1;
-#else
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     size_t len = lv_text_ap_strlen(options) + 1;
+#else
+    size_t len = lv_strlen(options) + 1;
 #endif
 
     if(dropdown->options != NULL && dropdown->static_options == 0) {
@@ -234,10 +234,10 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     LV_ASSERT_MALLOC(dropdown->options);
     if(dropdown->options == NULL) return;
 
-#if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    lv_strcpy(dropdown->options, options);
-#else
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     lv_text_ap_proc(options, dropdown->options);
+#else
+    lv_strcpy(dropdown->options, options);
 #endif
 
     /*Now the text is dynamically allocated*/
@@ -301,10 +301,10 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 
     /*Allocate space for the new option*/
     size_t old_len = lv_strlen(dropdown->options);
-#if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    size_t ins_len = lv_strlen(option) + 1;
-#else
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     size_t ins_len = lv_text_ap_strlen(option) + 1;
+#else
+    size_t ins_len = lv_strlen(option) + 1;
 #endif
 
     size_t new_len = ins_len + old_len + 2; /*+2 for terminating NULL and possible \n*/
@@ -334,10 +334,10 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     char * ins_buf = lv_malloc(ins_len + 2); /*+ 2 for terminating NULL and possible \n*/
     LV_ASSERT_MALLOC(ins_buf);
     if(ins_buf == NULL) return;
-#if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    lv_strcpy(ins_buf, option);
-#else
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     lv_text_ap_proc(option, ins_buf);
+#else
+    lv_strcpy(ins_buf, option);
 #endif
     if(pos < dropdown->option_cnt) lv_strcat(ins_buf, "\n");
 

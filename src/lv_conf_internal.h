@@ -2218,6 +2218,15 @@
     #endif
 #endif
 
+/** Enabling Persian keyboard layout alongside Arabic if arabic is enabled otherwise english layout is set as first layout */
+#ifndef LV_USE_PERSIAN_KEYBOARD_LAYOUT
+    #ifdef CONFIG_LV_USE_PERSIAN_KEYBOARD_LAYOUT
+        #define LV_USE_PERSIAN_KEYBOARD_LAYOUT CONFIG_LV_USE_PERSIAN_KEYBOARD_LAYOUT
+    #else
+        #define LV_USE_PERSIAN_KEYBOARD_LAYOUT 0
+    #endif
+#endif
+
 /*The control character to use for signaling text recoloring*/
 #ifndef LV_TXT_COLOR_CMD
     #ifdef CONFIG_LV_TXT_COLOR_CMD

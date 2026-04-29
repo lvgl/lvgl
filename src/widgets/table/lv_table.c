@@ -174,7 +174,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
     uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
     va_end(ap);
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     /*Put together the text according to the format string*/
     char * raw_txt = lv_malloc(len + 1);
     LV_ASSERT_MALLOC(raw_txt);
@@ -1074,7 +1074,7 @@ static size_t get_cell_txt_len(const char * txt)
 {
     size_t retval = 0;
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     retval = sizeof(lv_table_cell_t) + lv_text_ap_strlen(txt) + 1;
 #else
     retval = sizeof(lv_table_cell_t) + lv_strlen(txt) + 1;
@@ -1086,7 +1086,7 @@ static size_t get_cell_txt_len(const char * txt)
 /* Copy txt into dst skipping the format byte */
 static void copy_cell_txt(lv_table_cell_t * dst, const char * txt)
 {
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     lv_text_ap_proc(txt, dst->txt);
 #else
     lv_strcpy(dst->txt, txt);

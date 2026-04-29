@@ -1029,7 +1029,7 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
         LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
         lv_text_ap_proc(label->text, label->text);
 #endif
 
@@ -1450,7 +1450,7 @@ static void set_ofs_y_anim(void * obj, int32_t v)
 static size_t get_text_length(const char * text)
 {
     size_t len = 0;
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     len = lv_text_ap_strlen(text) + 1;
 #else
     len = lv_strlen(text) + 1;
@@ -1461,7 +1461,7 @@ static size_t get_text_length(const char * text)
 
 static void copy_text_to_label(lv_label_t * label, const char * text)
 {
-#if LV_USE_ARABIC_PERSIAN_CHARS
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
     lv_text_ap_proc(text, label->text);
 #else
     lv_strcpy(label->text, text);

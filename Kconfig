@@ -1190,6 +1190,12 @@ menu "LVGL configuration"
 			help
 				In these languages characters should be replaced with
 				another form based on their position in the text.
+
+		config LV_USE_PERSIAN_KEYBOARD_LAYOUT
+		    bool "Enabling Persian keyboard layout"
+		    help
+		        Adding Persian keyboard layout (alongside with Arabic if enabled) and
+		        remaining Persian letters.
 	endmenu
 
 	menu "Widget Usage"
