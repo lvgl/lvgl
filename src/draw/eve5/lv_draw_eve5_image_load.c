@@ -228,10 +228,16 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         return false;
     }
 
-    /* OPT_TRUECOLOR: decode to RGB8/ARGB8 instead of RGB565/ARGB4 (avoids banding) */
+    /* OPT_TRUECOLOR is BT820-only — it requests RGB8/ARGB8 output instead of
+     * the default RGB565/ARGB4 (which avoids gradient banding). On earlier
+     * gens those output formats don't exist, so we drop the flag and accept
+     * the default 16bpp output. */
+    uint32_t loadimage_opts = OPT_NODL;
+    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
+
     EVE_Cmd_wr32(phost, CMD_LOADIMAGE);
     EVE_Cmd_wr32(phost, addr);
-    EVE_Cmd_wr32(phost, OPT_NODL | OPT_TRUECOLOR);
+    EVE_Cmd_wr32(phost, loadimage_opts);
 
     /* Stream file data while holding HAL lock.
      * SD card and flash paths are excluded above, so lv_fs_read won't hit

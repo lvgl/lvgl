@@ -126,6 +126,12 @@ static void eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
 static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_task_t * end);
 
+/* Non-render-target dispatch path for EVE generations without CMD_RENDERTARGET
+ * (EVE3/EVE4). Single DL per frame, screen-layer only, no slicing or alpha pass. */
+static int32_t dispatch_nort(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t evaluate_nort(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
+
 static bool s_eve5_enabled = true;
 
 
@@ -136,9 +142,17 @@ static bool s_eve5_enabled = true;
 void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
 {
     lv_draw_eve5_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_eve5_unit_t));
-    unit->base_unit.dispatch_cb = dispatch;
-    unit->base_unit.evaluate_cb = evaluate;
-    unit->base_unit.name = "EVE5_BT820";
+    if(EVE_Hal_supportRenderTarget(hal)) {
+        unit->base_unit.dispatch_cb = dispatch;
+        unit->base_unit.evaluate_cb = evaluate;
+        unit->base_unit.name = "EVE5_BT820";
+    }
+    else {
+        unit->base_unit.dispatch_cb = dispatch_nort;
+        unit->base_unit.evaluate_cb = evaluate_nort;
+        unit->base_unit.name = "EVE_NORT";
+        LV_LOG_INFO("EVE5: No render-target support, using non-RT dispatch (screen-layer only)");
+    }
     unit->hal = hal;
     unit->allocator = allocator;
     unit->rendering_in_progress = false;
@@ -1129,6 +1143,206 @@ static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_ta
         }
     }
     return NULL;
+}
+
+/**********************
+ * NON-RENDER-TARGET DISPATCH (EVE3/EVE4)
+ *
+ * For chips without CMD_RENDERTARGET, the screen renders as a single display
+ * list each frame. There's no swapchain to flip and no per-layer render targets.
+ *
+ * Strategy: claim only screen-layer tasks; sub-layer tasks fall through to
+ * LVGL's SW renderer, which writes them into CPU buffers. When the screen DL
+ * encounters a LAYER task, ensure_resident migrates the SW-rendered child to
+ * GPU via vram_upload_cb. The composite DL then samples the uploaded bitmap
+ * like any other image source.
+ *
+ * Unsupported tasks (BLUR, MASK_RECTANGLE) are skipped via the existing
+ * render_tasks default case. Blend modes other than NORMAL/ADDITIVE on
+ * IMAGE/LAYER tasks degrade to NORMAL — non-RT can't isolate them per slice.
+ **********************/
+
+static int32_t evaluate_nort(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
+{
+    if(!s_eve5_enabled) return 0;
+
+    /* Skip tasks marked for SW fallback (re-issued with user_data set) */
+    if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data != NULL) {
+        EVE5_LOG("EVE5 NORT: Evaluate: type=%s -> SW fallback", task_type_str(task->type));
+        return 0;
+    }
+
+    /* Only the screen layer is rendered on hardware. Sub-layers (canvases,
+     * opa_layered, transformed widgets, etc.) all fall through to SW. */
+    lv_layer_t * target = task->target_layer;
+    if(target == NULL) return 0;
+
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
+    if(disp == NULL || target != disp->layer_head) {
+        EVE5_LOG("EVE5 NORT: Evaluate: type=%s -> declined (not screen layer)", task_type_str(task->type));
+        return 0;
+    }
+
+    task->preference_score = 10;
+    task->preferred_draw_unit_id = DRAW_UNIT_ID_EVE5;
+
+    EVE5_LOG("EVE5 NORT: Evaluate: type=%s -> claimed", task_type_str(task->type));
+    return 0;
+}
+
+static int32_t dispatch_nort(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+{
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)draw_unit;
+    lv_draw_task_t * t;
+
+    if(u->rendering_in_progress) return 0;
+
+    int32_t waiting_count = 0;
+    int32_t queued_count = 0;
+    int32_t blocked_count = 0;
+
+    for(t = layer->draw_task_head; t != NULL; t = t->next) {
+        if(t->preferred_draw_unit_id != DRAW_UNIT_ID_EVE5) continue;
+        switch(t->state) {
+            case LV_DRAW_TASK_STATE_WAITING:
+                waiting_count++;
+                break;
+            case LV_DRAW_TASK_STATE_QUEUED:
+                queued_count++;
+                break;
+            case LV_DRAW_TASK_STATE_BLOCKED:
+                blocked_count++;
+                break;
+            default:
+                break;
+        }
+    }
+
+    EVE5_LOG("EVE5 NORT: Dispatch layer=%p W=%d Q=%d B=%d",
+             (void *)layer, waiting_count, queued_count, blocked_count);
+
+    /* New tasks arrived — claim them, wait for upstream */
+    if(waiting_count > 0) {
+        for(t = layer->draw_task_head; t != NULL; t = t->next) {
+            if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+               t->state == LV_DRAW_TASK_STATE_WAITING) {
+                t->state = LV_DRAW_TASK_STATE_QUEUED;
+            }
+        }
+        lv_draw_dispatch_request();
+        return waiting_count;
+    }
+
+    /* All queued and ready — render atomically */
+    if(queued_count > 0 && layer->all_tasks_added && blocked_count == 0) {
+        lv_draw_layer_alloc_buf(layer, draw_unit);
+
+        for(t = layer->draw_task_head; t != NULL; t = t->next) {
+            if(t->preferred_draw_unit_id == DRAW_UNIT_ID_EVE5 &&
+               t->state == LV_DRAW_TASK_STATE_QUEUED) {
+                if(!lv_draw_buf_ensure_task_sources_resident(t, draw_unit)) {
+                    LV_LOG_WARN("EVE5 NORT: Failed to ensure task sources resident, type=%d", t->type);
+                    t->state = LV_DRAW_TASK_STATE_FINISHED;
+                }
+            }
+        }
+
+        eve5_render_layer_nort(u, layer);
+        lv_draw_dispatch_request();
+        return 1;
+    }
+
+    return LV_DRAW_UNIT_IDLE;
+}
+
+/**
+ * Single-DL render of all queued screen-layer tasks.
+ *
+ * Reuses lv_draw_eve5_render_tasks with a synthesized full slice and
+ * is_screen=true. The existing render_tasks switch handles all primitive
+ * types; unsupported types (BLUR) hit the default case and are no-ops.
+ *
+ * No render target, no alpha pass, no slicing. Output goes straight into
+ * the implicit framebuffer that CMD_SWAP latches for scanout.
+ */
+static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
+{
+    EVE_HalContext * phost = u->hal;
+    lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
+    int32_t sw = lv_area_get_width(&layer->buf_area);
+    int32_t sh = lv_area_get_height(&layer->buf_area);
+
+    u->rendering_in_progress = true;
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(disp);
+#endif
+
+    EVE5_LOG("EVE5 NORT: === RENDER START layer=%p %dx%d ===",
+             (void *)layer, (int)sw, (int)sh);
+
+    /* Reset alpha tracking — the per-task draw functions still call the
+     * track_alpha_* helpers, but no alpha pass consumes them. Keep state
+     * hygienic across frames. */
+    u->has_alpha_opaque = false;
+    u->has_alpha_trashed = false;
+    u->alpha_needs_rendertarget = false;
+    u->canvas_orig_addr = GA_INVALID;
+    u->canvas_orig_palette = GA_INVALID;
+
+#if LV_DRAW_EVE5_SW_FALLBACK
+    lv_draw_eve5_sw_cache_new_frame(u);
+#endif
+
+    /* Open DL targeting the implicit framebuffer (no CMD_RENDERTARGET) */
+    EVE_CoCmd_dlStart(phost);
+    EVE_CoDl_scissorXY(phost, 0, 0);
+    EVE_CoDl_scissorSize(phost, sw, sh);
+    EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
+    EVE_CoDl_clearColorA(phost, 255);
+    EVE_CoDl_clear(phost, 1, 1, 1);
+    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+    EVE_CoDl_blendFunc(phost, SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
+
+    /* Synthesize a full-range slice so render_tasks iterates layer->draw_task_head
+     * to NULL. is_screen=true skips MASK_RECTANGLE deferral; finish_tasks=true
+     * marks each rendered task FINISHED. */
+    lv_draw_eve5_slice_t slice;
+    lv_memzero(&slice, sizeof(slice));
+    slice.prev_handle = GA_HANDLE_INVALID;
+    int rendered_count = lv_draw_eve5_render_tasks(u, layer, /*is_screen=*/true,
+                                                   /*finish_tasks=*/true, &slice);
+
+    EVE_CoDl_display(phost);
+    EVE_CoCmd_swap(phost);
+    /* CMD_GRAPHICSFINISH is BT820-only. On previous gens CMD_SWAP itself is
+     * blocking — the coprocessor stalls until the swap completes — so the
+     * subsequent CMD_SYNC marker is already past the rendered frame. */
+
+    EVE_CmdSync sync = EVE_Cmd_sync(phost);
+    Esd_GpuAlloc_FlushPending(u->allocator, sync);
+
+    /* Bookkeeping mirrors lv_draw_eve5_hal_finish_layer */
+    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+    if(vr != NULL && rendered_count > 0) {
+        vr->is_premultiplied = true;
+        vr->has_content = true;
+    }
+
+    /* Tell the display driver this frame's swap was the screen swap, so
+     * flush_cb's FULL-mode HW branch reclaims deferred frees instead of
+     * trying to upload a SW-rendered px_map. */
+    lv_eve5_record_frame_sync(disp, sync);
+
+    EVE5_LOG("EVE5 NORT: === RENDER END layer=%p rendered=%d ===",
+             (void *)layer, rendered_count);
+
+    u->rendering_in_progress = false;
+
+#if LV_USE_OS
+    lv_eve5_hal_unlock(disp);
+#endif
 }
 
 #endif /* LV_USE_DRAW_EVE5 */

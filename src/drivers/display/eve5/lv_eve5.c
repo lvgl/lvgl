@@ -137,6 +137,14 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
     if(disp == NULL)
         return NULL;
 
+    /* Chips without render-target support can't run the partial-mode tile
+     * compositor (no SWAPCHAIN_0 / no CMD_RENDERTARGET). Lock to FULL mode so
+     * the EVE5 draw unit's non-RT path renders the screen as a single DL. */
+    if(!EVE_Hal_supportRenderTarget(hal) && mode != LV_EVE5_RENDER_MODE_FULL) {
+        LV_LOG_INFO("EVE5: Forcing FULL render mode (no render-target support)");
+        mode = LV_EVE5_RENDER_MODE_FULL;
+    }
+
     lv_eve5_driver_t * drvr = lv_malloc_zeroed(sizeof(lv_eve5_driver_t));
     if(drvr == NULL) {
         lv_display_delete(disp);
@@ -197,9 +205,17 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
      *     sentinel into the rendered output so the compositor can detect which
      *     buffer was last rendered (and thus which is the previous front).
      */
-    drvr->frame_buffer_0 = EVE_Hal_rd32(phost, REG_SC0_PTR0);
-    drvr->frame_buffer_1_orig = EVE_Hal_rd32(phost, REG_SC0_PTR1);
-    drvr->frame_buffer_1 = drvr->frame_buffer_1_orig; /* updated by apply_render_mode below */
+    /* SC0 swapchain registers exist only on chips with render-target support
+     * (BT820+). On EVE3/EVE4 the swap mechanism is just CMD_SWAP rotating DL
+     * banks; no per-buffer pointers to track. Leave frame_buffer_* at zero
+     * (already zeroed by lv_malloc_zeroed) so the partial-mode compositor
+     * paths — which we never enter without RT support — can't read anything
+     * meaningful from them. */
+    if(EVE_Hal_supportRenderTarget(phost)) {
+        drvr->frame_buffer_0 = EVE_Hal_rd32(phost, REG_SC0_PTR0);
+        drvr->frame_buffer_1_orig = EVE_Hal_rd32(phost, REG_SC0_PTR1);
+        drvr->frame_buffer_1 = drvr->frame_buffer_1_orig; /* updated by apply_render_mode below */
+    }
     drvr->current_fb = 0;
 
     /* Bind initial buffer + apply swapchain register config for the requested mode */
@@ -223,14 +239,16 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
 
     /* TODO: Handle REG_SC0_RESET on coprocessor error to avoid missed SWAPs */
 
-    /* Clear both framebuffers with distinct colors to detect buffer order */
+    /* Clear both framebuffers with distinct colors to detect buffer order.
+     * CMD_GRAPHICSFINISH is BT820-only; on previous gens CMD_SWAP itself
+     * is blocking, so the followup waitFlush is sufficient sync. */
     EVE_CoCmd_dlStart(phost);
     EVE_CoDl_clearColorRgb_ex(phost, 0x008000);
     EVE_CoDl_clearTag(phost, EVE_TAG_NONE);
     EVE_CoDl_clear(phost, true, true, true);
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
-    EVE_CoCmd_graphicsFinish(phost);
+    if(EVE_Hal_supportRenderTarget(phost)) EVE_CoCmd_graphicsFinish(phost);
     EVE_Cmd_waitFlush(phost);
 
     EVE_CoCmd_dlStart(phost);
@@ -239,20 +257,24 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
     EVE_CoDl_clear(phost, true, true, true);
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
-    EVE_CoCmd_graphicsFinish(phost);
+    if(EVE_Hal_supportRenderTarget(phost)) EVE_CoCmd_graphicsFinish(phost);
     EVE_CoCmd_sync(phost);
     EVE_Cmd_waitFlush(phost);
 
-    /* Detect which buffer is front by reading back the test color */
-    uint32_t test_pixel = EVE_Hal_rd32(phost, drvr->frame_buffer_0);
-    if((test_pixel & 0xFFFFFF) == 0x008000) {
-        drvr->current_fb = 1;
-    }
-    else if((test_pixel & 0xFFFFFF) == 0x000080) {
-        drvr->current_fb = 0;
-    }
-    else {
-        eve_printf("Warning: Unable to determine current framebuffer state\n");
+    /* Detect which buffer is front by reading back the test color. Only
+     * meaningful on RT-capable chips with a real swapchain — on EVE3/EVE4
+     * frame_buffer_0 is zero and the read would be garbage. */
+    if(EVE_Hal_supportRenderTarget(phost)) {
+        uint32_t test_pixel = EVE_Hal_rd32(phost, drvr->frame_buffer_0);
+        if((test_pixel & 0xFFFFFF) == 0x008000) {
+            drvr->current_fb = 1;
+        }
+        else if((test_pixel & 0xFFFFFF) == 0x000080) {
+            drvr->current_fb = 0;
+        }
+        else {
+            eve_printf("Warning: Unable to determine current framebuffer state\n");
+        }
     }
 
     return disp;
@@ -308,6 +330,13 @@ bool lv_eve5_set_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
     if(drvr == NULL) return false;
     if(drvr->render_mode == mode) return true;
+
+    /* PARTIAL mode requires CMD_RENDERTARGET for tile composition. Refuse the
+     * switch on chips that don't support it — the caller should stick to FULL. */
+    if(mode != LV_EVE5_RENDER_MODE_FULL && !EVE_Hal_supportRenderTarget(drvr->hal)) {
+        LV_LOG_WARN("EVE5: PARTIAL render mode unsupported (no render-target capability)");
+        return false;
+    }
 
 #if LV_USE_OS
     /* HAL mutex serializes us against the EVE5 draw unit. */
@@ -477,12 +506,17 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
     EVE_HalContext * phost = drvr->hal;
 
     if(mode == LV_EVE5_RENDER_MODE_FULL) {
-        /* Proper double-buffered scanout: PTR0 and PTR1 distinct.
+        /* Proper double-buffered scanout on BT820+: PTR0 and PTR1 distinct.
          * SWAPCHAIN_0 magic-resolves to whichever is currently back; CMD_SWAP
          * rotates them. No tearing because scanout reads the front while
-         * rendering writes the back. */
-        EVE_Hal_wr32(phost, REG_SC0_PTR1, drvr->frame_buffer_1_orig);
-        drvr->frame_buffer_1 = drvr->frame_buffer_1_orig;
+         * rendering writes the back.
+         *
+         * Non-RT chips (EVE3/EVE4) have no swapchain registers; CMD_SWAP just
+         * rotates the DL bank that the GPU replays. Skip the register write. */
+        if(EVE_Hal_supportRenderTarget(phost)) {
+            EVE_Hal_wr32(phost, REG_SC0_PTR1, drvr->frame_buffer_1_orig);
+            drvr->frame_buffer_1 = drvr->frame_buffer_1_orig;
+        }
 
         lv_display_set_draw_buffers(disp, drvr->full_buf, NULL);
         /* set_color_format propagates to disp, layer_head, and the active
@@ -780,7 +814,11 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
     EVE_Hal_wrMem(phost, gpu_addr, px_map, size);
     EVE_Hal_requestFenceBeforeSwap(phost);
 
-    EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, FB_BITMAP_FORMAT, W, H);
+    /* SWAPCHAIN_0 is a BT820+ render-target sentinel. On non-RT chips, just
+     * open a DL — CMD_SWAP at the end rotates the implicit framebuffer. */
+    if(EVE_Hal_supportRenderTarget(phost)) {
+        EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, FB_BITMAP_FORMAT, W, H);
+    }
     EVE_CoCmd_dlStart(phost);
     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_blendFunc(phost, ONE, ZERO);
@@ -800,7 +838,8 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
     EVE_CoDl_blendFunc_default(phost);
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
-    EVE_CoCmd_graphicsFinish(phost);
+    /* CMD_GRAPHICSFINISH is BT820-only; previous gens have a blocking CMD_SWAP. */
+    if(EVE_Hal_supportRenderTarget(phost)) EVE_CoCmd_graphicsFinish(phost);
 
     EVE_CmdSync sync = EVE_Cmd_sync(phost);
 

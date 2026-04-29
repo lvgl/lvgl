@@ -69,10 +69,19 @@ void lv_draw_eve5_clear_stencil(lv_draw_eve5_unit_t * u,
 
 /**
  * Map LVGL color format to EVE render target format and bytes per pixel.
+ *
+ * BT820+ has the wider RGB8 (24bpp) and ARGB8 (32bpp) formats. Earlier EVE
+ * generations top out at 16bpp — XRGB8888/RGB888 fall back to RGB565 and
+ * ARGB8888 falls back to ARGB4 (with lossy 8→4 bit-per-channel conversion
+ * applied during pixel upload).
+ *
  * Returns true if the format is directly supported.
  */
-bool lv_draw_eve5_get_render_target_format(lv_color_format_t lv_cf, uint16_t * eve_fmt, uint8_t * bpp)
+bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_t lv_cf,
+                                           uint16_t * eve_fmt, uint8_t * bpp)
 {
+    bool has_argb8 = EVE_Hal_supportRenderTarget(hal);
+
     switch(lv_cf) {
         case LV_COLOR_FORMAT_RGB565:
             *eve_fmt = RGB565;
@@ -80,26 +89,51 @@ bool lv_draw_eve5_get_render_target_format(lv_color_format_t lv_cf, uint16_t * e
             return true;
 
         case LV_COLOR_FORMAT_RGB888:
-            *eve_fmt = RGB8;
-            *bpp = 3;
-            return true;
-
         case LV_COLOR_FORMAT_XRGB8888:
-            *eve_fmt = RGB8;
-            *bpp = 3;
+            if(has_argb8) {
+                *eve_fmt = RGB8;
+                *bpp = 3;
+            }
+            else {
+                *eve_fmt = RGB565;
+                *bpp = 2;
+            }
             return true;
 
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-            *eve_fmt = ARGB8;
-            *bpp = 4;
+            if(has_argb8) {
+                *eve_fmt = ARGB8;
+                *bpp = 4;
+            }
+            else {
+                *eve_fmt = ARGB4;
+                *bpp = 2;
+            }
             return true;
 
         case LV_COLOR_FORMAT_ARGB1555:
+            if(has_argb8) {
+                /* Use ARGB8 for better alpha precision */
+                *eve_fmt = ARGB8;
+                *bpp = 4;
+            }
+            else {
+                *eve_fmt = ARGB1555;
+                *bpp = 2;
+            }
+            return true;
+
         case LV_COLOR_FORMAT_ARGB4444:
-            /* Use ARGB8 for better alpha precision */
-            *eve_fmt = ARGB8;
-            *bpp = 4;
+            if(has_argb8) {
+                /* Use ARGB8 for better alpha precision */
+                *eve_fmt = ARGB8;
+                *bpp = 4;
+            }
+            else {
+                *eve_fmt = ARGB4;
+                *bpp = 2;
+            }
             return true;
 
         case LV_COLOR_FORMAT_L8:
@@ -109,8 +143,14 @@ bool lv_draw_eve5_get_render_target_format(lv_color_format_t lv_cf, uint16_t * e
 
         default:
             if(lv_color_format_has_alpha(lv_cf)) {
-                *eve_fmt = ARGB8;
-                *bpp = 4;
+                if(has_argb8) {
+                    *eve_fmt = ARGB8;
+                    *bpp = 4;
+                }
+                else {
+                    *eve_fmt = ARGB4;
+                    *bpp = 2;
+                }
             }
             else {
                 *eve_fmt = RGB565;
@@ -134,10 +174,11 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 
     uint16_t eve_fmt;
     uint8_t bpp;
-    lv_draw_eve5_get_render_target_format(cf, &eve_fmt, &bpp);
+    lv_draw_eve5_get_render_target_format(u->hal, cf, &eve_fmt, &bpp);
 
 #if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
-    if(!lv_color_format_has_alpha(cf) && eve_fmt != ARGB8) {
+    /* RGB8 promotion is BT820-only — earlier gens have no RGB8 format. */
+    if(EVE_Hal_supportRenderTarget(u->hal) && !lv_color_format_has_alpha(cf) && eve_fmt != ARGB8) {
         eve_fmt = RGB8;
         bpp = 3;
     }
@@ -258,29 +299,71 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
         uint32_t cpu_stride = buf->header.stride;
         if(cpu_stride == 0) cpu_stride = lv_draw_buf_width_to_stride(buf->header.w, buf->header.cf);
         uint32_t gpu_stride = vr->stride;
-        uint32_t row_bytes = LV_MIN(cpu_stride, gpu_stride);
         uint8_t * src = buf->data;
 
         if(src != NULL) {
-            if(gpu_stride == row_bytes) {
+            /* Determine whether the LVGL CPU bytes can land on the GPU as-is or
+             * need per-pixel format conversion (e.g., ARGB8888 → ARGB4 on
+             * pre-BT820, where ARGB8 doesn't exist). */
+            uint16_t expected_eve_fmt;
+            uint8_t expected_bpp;
+            bool needs_conv = false;
+            (void)lv_draw_eve5_get_eve_format_info(u->hal, buf->header.cf,
+                                                   &expected_eve_fmt, &expected_bpp, &needs_conv);
+
+            if(needs_conv && expected_eve_fmt == vr->eve_format) {
+                /* Convert each row through the unified per-pixel converter. */
+                uint8_t * row_buf = lv_malloc(gpu_stride);
+                if(row_buf == NULL) {
+                    LV_LOG_ERROR("EVE5: Failed to allocate row buffer for upload conversion");
+#if LV_USE_OS
+                    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
+#endif
+                    return false;
+                }
+                bool ok = true;
                 for(int32_t y = 0; y < buf->header.h; y++) {
-                    EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, src + y * cpu_stride, row_bytes);
+                    lv_memzero(row_buf, gpu_stride);
+                    if(!lv_draw_eve5_convert_row(buf->header.cf, vr->eve_format,
+                                                 src + y * cpu_stride, row_buf, buf->header.w)) {
+                        LV_LOG_ERROR("EVE5: No row conversion for cf=%d eve_fmt=%d",
+                                     buf->header.cf, vr->eve_format);
+                        ok = false;
+                        break;
+                    }
+                    EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, row_buf, gpu_stride);
+                }
+                lv_free(row_buf);
+                if(!ok) {
+#if LV_USE_OS
+                    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
+#endif
+                    return false;
                 }
             }
             else {
-                /* GPU stride wider than source — zero-pad each row */
-                uint8_t * row_buf = lv_malloc(gpu_stride);
-                if(row_buf != NULL) {
-                    for(int32_t y = 0; y < buf->header.h; y++) {
-                        lv_memzero(row_buf, gpu_stride);
-                        lv_memcpy(row_buf, src + y * cpu_stride, row_bytes);
-                        EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, row_buf, gpu_stride);
-                    }
-                    lv_free(row_buf);
-                }
-                else {
+                /* Direct byte-for-byte upload (CPU and GPU layouts match). */
+                uint32_t row_bytes = LV_MIN(cpu_stride, gpu_stride);
+                if(gpu_stride == row_bytes) {
                     for(int32_t y = 0; y < buf->header.h; y++) {
                         EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, src + y * cpu_stride, row_bytes);
+                    }
+                }
+                else {
+                    /* GPU stride wider than source — zero-pad each row */
+                    uint8_t * row_buf = lv_malloc(gpu_stride);
+                    if(row_buf != NULL) {
+                        for(int32_t y = 0; y < buf->header.h; y++) {
+                            lv_memzero(row_buf, gpu_stride);
+                            lv_memcpy(row_buf, src + y * cpu_stride, row_bytes);
+                            EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, row_buf, gpu_stride);
+                        }
+                        lv_free(row_buf);
+                    }
+                    else {
+                        for(int32_t y = 0; y < buf->header.h; y++) {
+                            EVE_Hal_wrMem(u->hal, gpu_addr + y * gpu_stride, src + y * cpu_stride, row_bytes);
+                        }
                     }
                 }
             }
@@ -480,10 +563,11 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         else {
             target_lv_cf = layer->color_format;
         }
-        lv_draw_eve5_get_render_target_format(target_lv_cf, &target_eve_fmt, &target_bpp);
+        lv_draw_eve5_get_render_target_format(u->hal, target_lv_cf, &target_eve_fmt, &target_bpp);
 
 #if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
-        if(!lv_color_format_has_alpha(target_lv_cf) && target_eve_fmt != ARGB8) {
+        if(EVE_Hal_supportRenderTarget(u->hal)
+           && !lv_color_format_has_alpha(target_lv_cf) && target_eve_fmt != ARGB8) {
             target_eve_fmt = RGB8;
             target_bpp = 3;
         }

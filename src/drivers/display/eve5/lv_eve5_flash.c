@@ -168,6 +168,14 @@ static bool ensure_flash_ready(eve5_flash_ctx_t * ctx)
     if(ctx->flash_ready) return true;
 
 #if (EVE_SUPPORT_CHIPID >= EVE_BT815)
+    /* Flash commands (CMD_FLASHATTACH, CMD_FLASHREAD, CMD_FLASHSOURCE,
+     * CMD_LOADIMAGE+OPT_FLASH) are BT815+. In a multi-target build they're
+     * compiled in, but earlier gens (FT80X, FT81X, BT88X) would fault on
+     * the unrecognized coprocessor commands. */
+    if(!EVE_Hal_supportFlash(ctx->hal)) {
+        return false;
+    }
+
     EVE_HalContext *phost = ctx->hal;
 
     uint32_t status = EVE_Hal_rd32(phost, REG_FLASH_STATUS);
@@ -551,12 +559,16 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
         return false;
     }
 
+    /* OPT_TRUECOLOR is BT820-only — earlier gens decode to RGB565/ARGB4. */
+    uint32_t loadimage_opts = OPT_FLASH | OPT_NODL;
+    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
+
     EVE_Cmd_startFunc(phost);
     EVE_Cmd_wr32(phost, CMD_FLASHSOURCE);
     EVE_Cmd_wr32(phost, flash_addr);
     EVE_Cmd_wr32(phost, CMD_LOADIMAGE);
     EVE_Cmd_wr32(phost, final_addr);
-    EVE_Cmd_wr32(phost, OPT_FLASH | OPT_NODL | OPT_TRUECOLOR);
+    EVE_Cmd_wr32(phost, loadimage_opts);
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     if(EVE_CHIPID == EVE_BT820) {
         EVE_Cmd_wr32(phost, CMD_NOP);  /* BT820: early return without data */

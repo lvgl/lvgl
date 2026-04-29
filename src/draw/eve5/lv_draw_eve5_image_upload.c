@@ -31,6 +31,11 @@ static void convert_rgb565a8_to_argb8(const uint8_t * rgb, const uint8_t * alpha
                                       uint8_t * dst, uint32_t w);
 static void convert_xrgb8888_to_rgb8(const uint8_t * src, uint8_t * dst, uint32_t w);
 static void convert_rgb565_byteswap(const uint8_t * src, uint8_t * dst, uint32_t w);
+static void convert_argb8888_to_argb4(const uint8_t * src, uint8_t * dst, uint32_t w);
+static void convert_rgb888_to_rgb565(const uint8_t * src, uint8_t * dst, uint32_t w);
+static void convert_xrgb8888_to_rgb565(const uint8_t * src, uint8_t * dst, uint32_t w);
+static void convert_rgb565a8_to_argb4(const uint8_t * rgb, const uint8_t * alpha,
+                                      uint8_t * dst, uint32_t w);
 
 /**********************
  * IMAGE FORMAT CONVERSION
@@ -79,16 +84,133 @@ static void convert_rgb565_byteswap(const uint8_t * src, uint8_t * dst, uint32_t
     }
 }
 
+/* Pre-BT820 fallbacks: 8-bits-per-channel formats lose precision when
+ * mapped onto the 16bpp formats available on EVE1-EVE4 (ARGB4, RGB565). */
+
+static void convert_argb8888_to_argb4(const uint8_t * src, uint8_t * dst, uint32_t w)
+{
+    /* LVGL ARGB8888: BGRA bytes. EVE ARGB4 (16-bit value, A in MSB nibble):
+     * stored little-endian as low byte = (G<<4)|B, high byte = (A<<4)|R. */
+    uint16_t * d = (uint16_t *)dst;
+    for(uint32_t x = 0; x < w; x++) {
+        uint8_t b = src[4 * x + 0];
+        uint8_t g = src[4 * x + 1];
+        uint8_t r = src[4 * x + 2];
+        uint8_t a = src[4 * x + 3];
+        d[x] = (uint16_t)(((a & 0xF0) << 8) | ((r & 0xF0) << 4) | (g & 0xF0) | (b >> 4));
+    }
+}
+
+static void convert_rgb888_to_rgb565(const uint8_t * src, uint8_t * dst, uint32_t w)
+{
+    /* LVGL RGB888: BGR bytes (3bpp). */
+    uint16_t * d = (uint16_t *)dst;
+    for(uint32_t x = 0; x < w; x++) {
+        uint8_t b = src[3 * x + 0];
+        uint8_t g = src[3 * x + 1];
+        uint8_t r = src[3 * x + 2];
+        d[x] = (uint16_t)(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3));
+    }
+}
+
+static void convert_xrgb8888_to_rgb565(const uint8_t * src, uint8_t * dst, uint32_t w)
+{
+    /* LVGL XRGB8888: BGRX bytes. Drop X. */
+    uint16_t * d = (uint16_t *)dst;
+    for(uint32_t x = 0; x < w; x++) {
+        uint8_t b = src[4 * x + 0];
+        uint8_t g = src[4 * x + 1];
+        uint8_t r = src[4 * x + 2];
+        d[x] = (uint16_t)(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3));
+    }
+}
+
+static void convert_rgb565a8_to_argb4(const uint8_t * rgb, const uint8_t * alpha,
+                                      uint8_t * dst, uint32_t w)
+{
+    /* RGB plane is RGB565; alpha plane is one A8 byte per pixel.
+     * Combine into ARGB4 with bit-replicated 4-bit channels. */
+    uint16_t * d = (uint16_t *)dst;
+    const uint16_t * s = (const uint16_t *)rgb;
+    for(uint32_t x = 0; x < w; x++) {
+        uint16_t c = s[x];
+        uint8_t r5 = (uint8_t)((c >> 11) & 0x1F);
+        uint8_t g6 = (uint8_t)((c >> 5) & 0x3F);
+        uint8_t b5 = (uint8_t)(c & 0x1F);
+        uint8_t r4 = r5 >> 1;             /* R5 → R4 (drop LSB) */
+        uint8_t g4 = g6 >> 2;             /* G6 → G4 */
+        uint8_t b4 = b5 >> 1;             /* B5 → B4 */
+        uint8_t a4 = (uint8_t)(alpha[x] >> 4);
+        d[x] = (uint16_t)((a4 << 12) | (r4 << 8) | (g4 << 4) | b4);
+    }
+}
+
+/**
+ * Public per-row converter: dispatches to the right per-pixel conversion
+ * based on the (LVGL format, EVE format) pair.
+ *
+ * Limitations: handles only formats that have a 1:1 pixel layout. RGB565A8
+ * (separate alpha plane) and indexed formats (palette lookup) need their
+ * own paths that don't fit this signature.
+ */
+bool lv_draw_eve5_convert_row(lv_color_format_t lv_cf, uint16_t eve_fmt,
+                              const uint8_t * src_row, uint8_t * dst_row, int32_t w)
+{
+    switch(lv_cf) {
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            if(eve_fmt == RGB565) {
+                convert_rgb565_byteswap(src_row, dst_row, (uint32_t)w);
+                return true;
+            }
+            return false;
+
+        case LV_COLOR_FORMAT_RGB888:
+            if(eve_fmt == RGB565) {
+                convert_rgb888_to_rgb565(src_row, dst_row, (uint32_t)w);
+                return true;
+            }
+            return false;
+
+        case LV_COLOR_FORMAT_XRGB8888:
+            if(eve_fmt == RGB8) {
+                convert_xrgb8888_to_rgb8(src_row, dst_row, (uint32_t)w);
+                return true;
+            }
+            if(eve_fmt == RGB565) {
+                convert_xrgb8888_to_rgb565(src_row, dst_row, (uint32_t)w);
+                return true;
+            }
+            return false;
+
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            if(eve_fmt == ARGB4) {
+                convert_argb8888_to_argb4(src_row, dst_row, (uint32_t)w);
+                return true;
+            }
+            return false;
+
+        default:
+            return false;
+    }
+}
+
 /**********************
  * FORMAT MAPPING
  **********************/
 
-bool lv_draw_eve5_get_eve_format_info(lv_color_format_t src_cf,
+bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
+                                      lv_color_format_t src_cf,
                                       uint16_t * eve_format,
                                       uint8_t * bits_per_pixel,
                                       bool *needs_conversion)
 {
     *needs_conversion = false;
+
+    /* BT820+ has the wider 24-bit RGB8, 32-bit ARGB8, and 8-bit
+     * PALETTEDARGB8 formats. Earlier gens fall back to 16bpp formats
+     * with lossy 8→4 (or 8→5/6/5) bit-per-channel conversion at upload. */
+    bool has_argb8 = EVE_Hal_supportRenderTarget(hal);
 
     switch(src_cf) {
         case LV_COLOR_FORMAT_A1:
@@ -139,40 +261,70 @@ bool lv_draw_eve5_get_eve_format_info(lv_color_format_t src_cf,
             break;
 
         case LV_COLOR_FORMAT_RGB888:
-            *eve_format = RGB8;
-            *bits_per_pixel = 24;
+            if(has_argb8) {
+                *eve_format = RGB8;
+                *bits_per_pixel = 24;
+            }
+            else {
+                *eve_format = RGB565;
+                *bits_per_pixel = 16;
+                *needs_conversion = true;
+            }
             break;
 
         case LV_COLOR_FORMAT_XRGB8888:
-            *eve_format = RGB8;
-            *bits_per_pixel = 24;
+            if(has_argb8) {
+                *eve_format = RGB8;
+                *bits_per_pixel = 24;
+            }
+            else {
+                *eve_format = RGB565;
+                *bits_per_pixel = 16;
+            }
             *needs_conversion = true;
             break;
 
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-            *eve_format = ARGB8;
-            *bits_per_pixel = 32;
+            if(has_argb8) {
+                *eve_format = ARGB8;
+                *bits_per_pixel = 32;
+            }
+            else {
+                *eve_format = ARGB4;
+                *bits_per_pixel = 16;
+                *needs_conversion = true;
+            }
             break;
 
         case LV_COLOR_FORMAT_RGB565A8:
-            *eve_format = ARGB8;
-            *bits_per_pixel = 32;
+            if(has_argb8) {
+                *eve_format = ARGB8;
+                *bits_per_pixel = 32;
+            }
+            else {
+                *eve_format = ARGB4;
+                *bits_per_pixel = 16;
+            }
             *needs_conversion = true;
             break;
 
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
-            *eve_format = PALETTEDARGB8;
-            *bits_per_pixel = 8;  /* Expanded to 8-bit indices for EVE */
-            *needs_conversion = true;
-            break;
-
         case LV_COLOR_FORMAT_I8:
-            *eve_format = PALETTEDARGB8;
-            *bits_per_pixel = 8;
-            *needs_conversion = true;  /* Needs palette prefix upload */
+            if(has_argb8) {
+                *eve_format = PALETTEDARGB8;
+                *bits_per_pixel = 8;  /* Expanded to 8-bit indices for EVE */
+                *needs_conversion = true;
+            }
+            else {
+                /* No PALETTEDARGB8 on earlier chips. Expand to ARGB4 inline
+                 * — palette is applied per pixel during upload. */
+                *eve_format = ARGB4;
+                *bits_per_pixel = 16;
+                *needs_conversion = true;
+            }
             break;
 
         default:
@@ -219,7 +371,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     uint8_t bpp;
     bool needs_conversion;
 
-    if(!lv_draw_eve5_get_eve_format_info(src_cf, &eve_format, &bpp, &needs_conversion)) {
+    if(!lv_draw_eve5_get_eve_format_info(u->hal, src_cf, &eve_format, &bpp, &needs_conversion)) {
         return NULL;
     }
 
@@ -231,9 +383,11 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     int32_t eve_stride = ALIGN_UP((src_w * bpp + 7) / 8, 4);
     int32_t eve_size = eve_stride * src_h;
 
-    /* EVE PALETTEDARGB8 always uses 256-entry ARGB8888 palette (1024 bytes) */
+    /* EVE PALETTEDARGB8 always uses 256-entry ARGB8888 palette (1024 bytes).
+     * On non-RT chips we expand indexed images to ARGB4 inline — the palette
+     * is consumed during conversion, so no GPU palette is needed. */
     uint16_t palette_size = 0;
-    if(LV_COLOR_FORMAT_IS_INDEXED(src_cf)) {
+    if(LV_COLOR_FORMAT_IS_INDEXED(src_cf) && eve_format == PALETTEDARGB8) {
         palette_size = 256 * sizeof(lv_color32_t);
     }
 
@@ -284,114 +438,112 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     else switch(src_cf) {
             case LV_COLOR_FORMAT_I1:
             case LV_COLOR_FORMAT_I2:
-            case LV_COLOR_FORMAT_I4: {
-                    /* LVGL I1/I2/I4: [palette N×ARGB8888][packed indices]
-                     * EVE PALETTEDARGB8: [256×ARGB8888 palette][8-bit indices]
-                     * Expand palette and unpack sub-byte indices. */
+            case LV_COLOR_FORMAT_I4:
+            case LV_COLOR_FORMAT_I8: {
                     uint32_t src_palette_entries = LV_COLOR_INDEXED_PALETTE_SIZE(src_cf);
                     uint32_t src_palette_bytes = src_palette_entries * sizeof(lv_color32_t);
                     const uint8_t * palette_data = src_buf;
                     const uint8_t * index_data = src_buf + src_palette_bytes;
 
-                    EVE_Hal_wrMem(u->hal, base_addr, palette_data, src_palette_bytes);
-                    if(src_palette_entries < 256) {
-                        uint32_t pad_bytes = (256 - src_palette_entries) * sizeof(lv_color32_t);
-                        uint8_t * zeros = lv_calloc(1, pad_bytes);
-                        if(zeros) {
-                            EVE_Hal_wrMem(u->hal, base_addr + src_palette_bytes, zeros, pad_bytes);
-                            lv_free(zeros);
-                        }
-                    }
-
-                    uint8_t * tmp_buf = lv_malloc(eve_stride);
-                    if(!tmp_buf) {
-                        LV_LOG_ERROR("EVE5: Failed to allocate index expansion buffer");
-                        Esd_GpuAlloc_Free(u->allocator, handle);
-                        return NULL;
-                    }
-
-                    uint32_t src_bpp_val = lv_color_format_get_bpp(src_cf);
-                    uint32_t pixels_per_byte = 8 / src_bpp_val;
-                    uint32_t index_mask = (1u << src_bpp_val) - 1u;
-
-                    for(int32_t y = 0; y < src_h; y++) {
-                        const uint8_t * src_row = index_data + y * src_stride;
-                        lv_memzero(tmp_buf, eve_stride);
-                        for(int32_t x = 0; x < src_w; x++) {
-                            uint32_t byte_idx = x / pixels_per_byte;
-                            /* MSB-first packing */
-                            uint32_t bit_shift = (pixels_per_byte - 1 - (x % pixels_per_byte)) * src_bpp_val;
-                            tmp_buf[x] = (src_row[byte_idx] >> bit_shift) & index_mask;
-                        }
-                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-                    }
-                    lv_free(tmp_buf);
-                    break;
-                }
-
-            case LV_COLOR_FORMAT_I8: {
-                    /* LVGL I8: [256×ARGB8888 palette][8-bit indices]
-                     * EVE PALETTEDARGB8: same layout, upload contiguously. */
-                    const uint8_t * palette_data = src_buf;
-                    const uint8_t * index_data = src_buf + palette_size;
-
-                    EVE_Hal_wrMem(u->hal, base_addr, palette_data, palette_size);
-
-                    int32_t row_bytes = (src_w * bpp + 7) / 8;
-                    if(eve_stride == src_stride) {
-                        EVE_Hal_wrMem(u->hal, ram_g_addr, index_data, eve_size);
-                    }
-                    else {
-                        uint8_t * row_buf = lv_malloc(eve_stride);
-                        if(row_buf != NULL) {
-                            for(int32_t y = 0; y < src_h; y++) {
-                                lv_memzero(row_buf, eve_stride);
-                                lv_memcpy(row_buf, index_data + y * src_stride, row_bytes);
-                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, row_buf, eve_stride);
+                    if(eve_format == PALETTEDARGB8) {
+                        /* BT820 path: write ARGB8888 palette to GPU + 8-bit indices. */
+                        EVE_Hal_wrMem(u->hal, base_addr, palette_data, src_palette_bytes);
+                        if(src_palette_entries < 256) {
+                            uint32_t pad_bytes = (256 - src_palette_entries) * sizeof(lv_color32_t);
+                            uint8_t * zeros = lv_calloc(1, pad_bytes);
+                            if(zeros) {
+                                EVE_Hal_wrMem(u->hal, base_addr + src_palette_bytes, zeros, pad_bytes);
+                                lv_free(zeros);
                             }
-                            lv_free(row_buf);
+                        }
+
+                        uint8_t * tmp_buf = lv_malloc(eve_stride);
+                        if(!tmp_buf) {
+                            LV_LOG_ERROR("EVE5: Failed to allocate index expansion buffer");
+                            Esd_GpuAlloc_Free(u->allocator, handle);
+                            return NULL;
+                        }
+
+                        if(src_cf == LV_COLOR_FORMAT_I8) {
+                            int32_t row_bytes = src_w;
+                            for(int32_t y = 0; y < src_h; y++) {
+                                lv_memzero(tmp_buf, eve_stride);
+                                lv_memcpy(tmp_buf, index_data + y * src_stride, row_bytes);
+                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                            }
                         }
                         else {
+                            uint32_t src_bpp_val = lv_color_format_get_bpp(src_cf);
+                            uint32_t pixels_per_byte = 8 / src_bpp_val;
+                            uint32_t index_mask = (1u << src_bpp_val) - 1u;
+
                             for(int32_t y = 0; y < src_h; y++) {
-                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride,
-                                              index_data + y * src_stride, row_bytes);
+                                const uint8_t * src_row = index_data + y * src_stride;
+                                lv_memzero(tmp_buf, eve_stride);
+                                for(int32_t x = 0; x < src_w; x++) {
+                                    uint32_t byte_idx = x / pixels_per_byte;
+                                    /* MSB-first packing */
+                                    uint32_t bit_shift = (pixels_per_byte - 1 - (x % pixels_per_byte)) * src_bpp_val;
+                                    tmp_buf[x] = (src_row[byte_idx] >> bit_shift) & index_mask;
+                                }
+                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
                             }
                         }
+                        lv_free(tmp_buf);
                     }
-                    break;
-                }
+                    else {
+                        /* Pre-BT820 path: no GPU palette. Convert palette to ARGB4
+                         * once on host, then expand each pixel through the LUT. */
+                        uint16_t palette_argb4[256];
+                        lv_memzero(palette_argb4, sizeof(palette_argb4));
+                        uint32_t pal_n = src_palette_entries < 256 ? src_palette_entries : 256;
+                        for(uint32_t i = 0; i < pal_n; i++) {
+                            uint8_t b = palette_data[i * 4 + 0];
+                            uint8_t g = palette_data[i * 4 + 1];
+                            uint8_t r = palette_data[i * 4 + 2];
+                            uint8_t a = palette_data[i * 4 + 3];
+                            palette_argb4[i] = (uint16_t)(((a & 0xF0) << 8) | ((r & 0xF0) << 4)
+                                                          | (g & 0xF0) | (b >> 4));
+                        }
 
-            case LV_COLOR_FORMAT_RGB565_SWAPPED: {
-                    uint8_t * tmp_buf = lv_malloc(eve_stride);
-                    if(!tmp_buf) {
-                        LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
-                        Esd_GpuAlloc_Free(u->allocator, handle);
-                        return NULL;
-                    }
+                        uint8_t * tmp_buf = lv_malloc(eve_stride);
+                        if(!tmp_buf) {
+                            LV_LOG_ERROR("EVE5: Failed to allocate ARGB4 expansion buffer");
+                            Esd_GpuAlloc_Free(u->allocator, handle);
+                            return NULL;
+                        }
 
-                    for(int32_t y = 0; y < src_h; y++) {
-                        lv_memzero(tmp_buf, eve_stride);
-                        convert_rgb565_byteswap(src_buf + y * src_stride, tmp_buf, src_w);
-                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-                    }
-                    lv_free(tmp_buf);
-                    break;
-                }
+                        if(src_cf == LV_COLOR_FORMAT_I8) {
+                            for(int32_t y = 0; y < src_h; y++) {
+                                lv_memzero(tmp_buf, eve_stride);
+                                uint16_t * dst_row = (uint16_t *)tmp_buf;
+                                const uint8_t * src_row = index_data + y * src_stride;
+                                for(int32_t x = 0; x < src_w; x++) {
+                                    dst_row[x] = palette_argb4[src_row[x]];
+                                }
+                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                            }
+                        }
+                        else {
+                            uint32_t src_bpp_val = lv_color_format_get_bpp(src_cf);
+                            uint32_t pixels_per_byte = 8 / src_bpp_val;
+                            uint32_t index_mask = (1u << src_bpp_val) - 1u;
 
-            case LV_COLOR_FORMAT_XRGB8888: {
-                    uint8_t * tmp_buf = lv_malloc(eve_stride);
-                    if(!tmp_buf) {
-                        LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
-                        Esd_GpuAlloc_Free(u->allocator, handle);
-                        return NULL;
+                            for(int32_t y = 0; y < src_h; y++) {
+                                lv_memzero(tmp_buf, eve_stride);
+                                uint16_t * dst_row = (uint16_t *)tmp_buf;
+                                const uint8_t * src_row = index_data + y * src_stride;
+                                for(int32_t x = 0; x < src_w; x++) {
+                                    uint32_t byte_idx = x / pixels_per_byte;
+                                    uint32_t bit_shift = (pixels_per_byte - 1 - (x % pixels_per_byte)) * src_bpp_val;
+                                    uint8_t idx = (src_row[byte_idx] >> bit_shift) & index_mask;
+                                    dst_row[x] = palette_argb4[idx];
+                                }
+                                EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                            }
+                        }
+                        lv_free(tmp_buf);
                     }
-
-                    for(int32_t y = 0; y < src_h; y++) {
-                        lv_memzero(tmp_buf, eve_stride);
-                        convert_xrgb8888_to_rgb8(src_buf + y * src_stride, tmp_buf, src_w);
-                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
-                    }
-                    lv_free(tmp_buf);
                     break;
                 }
 
@@ -408,9 +560,45 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                     int32_t alpha_stride = src_stride / 2;
 
                     for(int32_t y = 0; y < src_h; y++) {
-                        convert_rgb565a8_to_argb8(src_buf + y * src_stride,
-                                                  alpha_buf + y * alpha_stride,
-                                                  tmp_buf, src_w);
+                        lv_memzero(tmp_buf, eve_stride);
+                        if(eve_format == ARGB8) {
+                            convert_rgb565a8_to_argb8(src_buf + y * src_stride,
+                                                      alpha_buf + y * alpha_stride,
+                                                      tmp_buf, src_w);
+                        }
+                        else { /* ARGB4 fallback for non-RT */
+                            convert_rgb565a8_to_argb4(src_buf + y * src_stride,
+                                                      alpha_buf + y * alpha_stride,
+                                                      tmp_buf, src_w);
+                        }
+                        EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
+                }
+
+            /* All other conversion cases route through the per-row helper. */
+            case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            case LV_COLOR_FORMAT_RGB888:
+            case LV_COLOR_FORMAT_XRGB8888:
+            case LV_COLOR_FORMAT_ARGB8888:
+            case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED: {
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    if(!tmp_buf) {
+                        LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
+                        Esd_GpuAlloc_Free(u->allocator, handle);
+                        return NULL;
+                    }
+
+                    for(int32_t y = 0; y < src_h; y++) {
+                        lv_memzero(tmp_buf, eve_stride);
+                        if(!lv_draw_eve5_convert_row(src_cf, eve_format,
+                                                     src_buf + y * src_stride, tmp_buf, src_w)) {
+                            LV_LOG_ERROR("EVE5: No row conversion for cf=%d eve_fmt=%d", src_cf, eve_format);
+                            lv_free(tmp_buf);
+                            Esd_GpuAlloc_Free(u->allocator, handle);
+                            return NULL;
+                        }
                         EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
                     }
                     lv_free(tmp_buf);

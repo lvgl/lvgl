@@ -119,9 +119,9 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 uint16_t expected_eve_fmt;
                 uint8_t expected_bpp;
                 bool upload_converts;
-                if(lv_draw_eve5_get_eve_format_info(lv_cf, &expected_eve_fmt,
+                if(lv_draw_eve5_get_eve_format_info(u->hal, lv_cf, &expected_eve_fmt,
                                                     &expected_bpp, &upload_converts)) {
-                    if(eve_fmt != expected_eve_fmt) needs_conversion = true;
+                    if(eve_fmt != expected_eve_fmt || upload_converts) needs_conversion = true;
                 }
             }
             break;
@@ -159,17 +159,21 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
             break;
 
         case LV_COLOR_FORMAT_XRGB8888:
-            /* EVE stores RGB8 (3 bpp) → expand to XRGB8888 (4 bpp) */
-            for(int32_t y = 0; y < h; y++) {
-                EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w * 3);
-                convert_rgb8_to_xrgb8888(row_buf, buf->data + y * lv_stride, w);
+            if(eve_fmt == RGB8) {
+                /* BT820: EVE stores RGB8 (3 bpp) → expand to XRGB8888 (4 bpp) */
+                for(int32_t y = 0; y < h; y++) {
+                    EVE_Hal_rdMem(u->hal, row_buf, gpu_addr + y * eve_stride, w * 3);
+                    convert_rgb8_to_xrgb8888(row_buf, buf->data + y * lv_stride, w);
+                }
+                break;
             }
-            break;
+            /* Other gens map XRGB8888 → RGB565 etc.; fall through to generic
+             * ARGB8 expansion path which handles all eve formats. */
+            goto generic_download;
 
         case LV_COLOR_FORMAT_RGB565A8:
-            /* EVE stores ARGB8 → split into RGB565 plane + A8 plane.
-             * LVGL layout: [RGB565 rows][A8 rows] */
-            {
+            if(eve_fmt == ARGB8) {
+                /* BT820: EVE stores ARGB8 → split into RGB565 + A8 plane. */
                 uint32_t rgb_stride = (w * 16 + 7) / 8;
                 if(lv_stride > 0) rgb_stride = lv_stride;
                 uint32_t alpha_stride = rgb_stride / 2;
@@ -183,6 +187,12 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 }
                 break;
             }
+            /* Non-BT820: EVE stores ARGB4 (or similar). RGB565A8 download from
+             * non-ARGB8 sources isn't currently supported — would need a
+             * 2-plane conversion writer. */
+            LV_LOG_WARN("EVE5: RGB565A8 download from eve_fmt=%d not supported", eve_fmt);
+            lv_free(row_buf);
+            return false;
 
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
@@ -255,7 +265,8 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 break;
             }
 
-        default: {
+        default:
+generic_download: {
                 /* Generic mismatch: expand EVE pixels to ARGB8, then pack to LVGL format */
                 int32_t eve_bpp = eve5_format_bpp(eve_fmt);
                 uint32_t eve_row_bytes = (uint32_t)(w * eve_bpp);

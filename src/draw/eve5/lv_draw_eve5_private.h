@@ -440,10 +440,18 @@ void lv_draw_eve5_sw_cache_drop(lv_draw_eve5_unit_t * u, lv_draw_task_type_t typ
  **********************/
 
 void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u);
-bool lv_draw_eve5_get_render_target_format(lv_color_format_t lv_cf, uint16_t * eve_fmt, uint8_t * bpp);
-bool lv_draw_eve5_get_eve_format_info(lv_color_format_t src_cf, uint16_t * eve_format,
-                                      uint8_t * bits_per_pixel, bool *needs_conversion);
+bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_t lv_cf,
+                                           uint16_t * eve_fmt, uint8_t * bpp);
+bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal, lv_color_format_t src_cf,
+                                      uint16_t * eve_format, uint8_t * bits_per_pixel,
+                                      bool *needs_conversion);
 bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u, lv_draw_buf_t * buf, const lv_eve5_vram_res_t * vr);
+
+/* Convert one row of pixel data from LVGL color format to EVE bitmap format.
+ * Handles per-pixel conversions (no palette, no separate alpha plane).
+ * Returns true if the (lv_cf, eve_fmt) pair is supported. */
+bool lv_draw_eve5_convert_row(lv_color_format_t lv_cf, uint16_t eve_fmt,
+                              const uint8_t * src_row, uint8_t * dst_row, int32_t w);
 
 #if LV_DRAW_EVE5_SW_FALLBACK
 /**********************

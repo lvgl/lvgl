@@ -595,6 +595,13 @@ static bool ensure_sd_attached(eve5_sdcard_ctx_t * ctx)
     if(ctx->sd_attached) return true;
 
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    /* CMD_SDATTACH and the CMD_FS* family are BT820-only. In multi-target
+     * builds the code compiles in but must not be reached on earlier gens —
+     * the chip would fault on the unrecognized coprocessor command. */
+    if(!EVE_Hal_supportSdCard(ctx->hal)) {
+        return false;
+    }
+
     EVE_HalContext *phost = ctx->hal;
 
     uint32_t result = EVE_CoCmd_sdAttach(phost, 0);
@@ -802,8 +809,10 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     /* Data already in RAM_G from CMD_FSREAD, just set write pointer */
     EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
 
-    /* OPT_TRUECOLOR: decode to RGB8/ARGB8 instead of RGB565/ARGB4 to avoid banding */
-    EVE_CoCmd_loadImage(phost, final_addr, OPT_MEDIAFIFO | OPT_NODL | OPT_TRUECOLOR);
+    /* OPT_TRUECOLOR is BT820-only — defaults to RGB565/ARGB4 on earlier gens. */
+    uint32_t loadimage_opts = OPT_MEDIAFIFO | OPT_NODL;
+    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
+    EVE_CoCmd_loadImage(phost, final_addr, loadimage_opts);
     if(!EVE_Cmd_waitFlush(phost)) {
         LV_LOG_ERROR("CMD_LOADIMAGE failed");
         EVE_MediaFifo_close(phost);
