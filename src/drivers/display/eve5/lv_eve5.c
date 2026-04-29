@@ -72,6 +72,12 @@ typedef struct {
      * the draw unit is disabled at runtime, so the screen layer falls through
      * to LVGL's SW renderer instead. */
     bool full_frame_hw_rendered;
+    /* Set by lv_eve5_request_invalidate when a deferred screen invalidate is
+     * needed (typically because frame-time alloc failures became unblocked by
+     * a post-frame GC sweep). Consumed and cleared by the LV_EVENT_REFR_READY
+     * handler once LVGL is out of its rendering pass and lv_obj_invalidate is
+     * legal again. */
+    bool invalidate_pending;
     lv_eve5_render_mode_t render_mode;
     /* Both draw buffers are created at init and kept alive for the display's
      * lifetime so mode switching is allocation-free. Only one is bound to the
@@ -91,6 +97,7 @@ typedef struct {
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void wait_cb(lv_display_t * disp);
 static void invalidate_area_cb(lv_event_t * e);
+static void refr_ready_cb(lv_event_t * e);
 static void composite_to_framebuffer(lv_eve5_driver_t * drvr);
 static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area, const uint8_t * px_map);
 static lv_draw_buf_t * create_tile_buf(EVE_HalContext * phost, lv_color_format_t cf);
@@ -166,6 +173,9 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
 
     /* Expand invalidated areas by 1px to cover EVE's AA fringe bleed */
     lv_display_add_event_cb(disp, invalidate_area_cb, LV_EVENT_INVALIDATE_AREA, NULL);
+
+    /* Drain deferred-invalidate requests from the draw unit after each refresh */
+    lv_display_add_event_cb(disp, refr_ready_cb, LV_EVENT_REFR_READY, NULL);
 
     /* Create both draw buffers up front. Only one is active at a time (selected
      * by render mode). Keeping both around avoids alloc/free churn on mode switch. */
@@ -384,6 +394,14 @@ void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync)
     drvr->full_frame_hw_rendered = true;
 }
 
+void lv_eve5_request_invalidate(lv_display_t * disp)
+{
+    if(disp == NULL) return;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL) return;
+    drvr->invalidate_pending = true;
+}
+
 /**********************
  * STATIC FUNCTIONS
  **********************/
@@ -582,6 +600,25 @@ static void invalidate_area_cb(lv_event_t * e)
     area->y1 = LV_MAX(area->y1 - 1, 0);
     area->x2 = LV_MIN(area->x2 + 1, lv_display_get_horizontal_resolution(disp) - 1);
     area->y2 = LV_MIN(area->y2 + 1, lv_display_get_vertical_resolution(disp) - 1);
+}
+
+static void refr_ready_cb(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_target(e);
+    if(disp == NULL) return;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL || !drvr->invalidate_pending) return;
+
+    drvr->invalidate_pending = false;
+
+    /* LVGL has cleared rendering_in_progress by the time REFR_READY fires,
+     * so lv_obj_invalidate is legal here. The screen will be marked dirty
+     * for the next refresh cycle. */
+    lv_obj_t * scr = lv_display_get_screen_active(disp);
+    if(scr != NULL) {
+        LV_LOG_INFO("EVE5: deferred screen invalidate (post-GC retry)");
+        lv_obj_invalidate(scr);
+    }
 }
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)

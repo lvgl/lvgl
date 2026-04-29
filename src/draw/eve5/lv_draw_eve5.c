@@ -1310,6 +1310,12 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
     EVE5_LOG("EVE5 NORT: === RENDER START layer=%p %dx%d ===",
              (void *)layer, (int)sw, (int)sh);
 
+    /* Clear the per-frame alloc-failure counter so that anything bumped
+     * during this frame's rendering can be checked at the end of the frame
+     * (combined with whether Update freed anything) to decide if a screen
+     * invalidate is worth it. */
+    Esd_GpuAlloc_ClearAllocFailedCount(u->allocator);
+
     /* Reset alpha tracking — the per-task draw functions still call the
      * track_alpha_* helpers, but no alpha pass consumes them. Keep state
      * hygienic across frames. */
@@ -1371,7 +1377,19 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
      * Distinct from Esd_GpuAlloc_UpdateFree (sync-based deferred queue, GA5).
      * No-op on BT820 — GA5 has no frame-based GC and we don't take this path. */
     EVE_Cmd_waitFlush(phost);
-    Esd_GpuAlloc_Update(u->allocator);
+    bool gc_freed_any = Esd_GpuAlloc_Update(u->allocator);
+
+    /* If this frame had any allocation failures (image/font upload, scratch
+     * gradient buffer, etc.) AND the GC sweep just freed something, the
+     * pending content might fit next frame. Queue a screen invalidate for
+     * after LVGL exits its rendering pass — calling lv_obj_invalidate now
+     * trips the rendering_in_progress assert in lv_inv_area. The deferred
+     * request fires from LV_EVENT_REFR_READY in the lv_eve5 driver. */
+    if(gc_freed_any && Esd_GpuAlloc_GetAllocFailedCount(u->allocator) > 0) {
+        LV_LOG_INFO("EVE5 NORT: %u alloc failures + GC freed memory — requesting screen invalidate",
+                    (unsigned)Esd_GpuAlloc_GetAllocFailedCount(u->allocator));
+        lv_eve5_request_invalidate(disp);
+    }
 
     /* Bookkeeping mirrors lv_draw_eve5_hal_finish_layer */
     lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
