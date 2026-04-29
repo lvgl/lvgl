@@ -173,13 +173,8 @@ void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync);
 
 /**
  * Queue a full-screen invalidate for after the current refresh completes.
- *
- * Called by the EVE5 draw unit when it detects that this frame had GPU memory
- * allocation failures AND the post-frame GC just freed something — meaning the
- * previously-failing draws may now succeed. Direct lv_obj_invalidate is not
- * safe here because LVGL is still inside its rendering pass (asserts in
- * lv_inv_area). The driver registers a LV_EVENT_REFR_READY handler that
- * consumes this flag once rendering is done and the invalidate is allowed.
+ * Direct lv_obj_invalidate during rendering trips an assert in lv_inv_area;
+ * this flag is consumed by a LV_EVENT_REFR_READY handler in the driver.
  */
 void lv_eve5_request_invalidate(lv_display_t * disp);
 

@@ -33,9 +33,8 @@ extern "C" {
 
 #include "EVE_Hal.h"
 
-/* SD card coprocessor commands (CMD_SDATTACH, CMD_FSREAD, CMD_FSDIR, CMD_FSSIZE,
- * CMD_GETIMAGE) are BT820-only. The driver still exposes its public API on
- * earlier chips, but those public functions become no-op stubs in lv_eve5_sdcard.c. */
+/* SD card coprocessor commands (CMD_SDATTACH, CMD_FS*, CMD_GETIMAGE) are
+ * BT820-only. On earlier chips these public functions are no-op stubs. */
 #if LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
 
 #include "../../../display/lv_display.h"

@@ -80,12 +80,8 @@ void lv_draw_eve5_clear_stencil(lv_draw_eve5_unit_t * u,
 bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_t lv_cf,
                                            uint16_t * eve_fmt, uint8_t * bpp)
 {
-    /* The wider 24/32-bit formats (RGB8, ARGB8) are BT820-only — both the
-     * symbols themselves and the runtime capability come from render-target
-     * support. On non-RT builds the macros aren't defined, so we keep the
-     * BT820+ branches behind the same compile-time gate that guards them in
-     * EVE_GpuDefs.h. The 16bpp fallbacks (RGB565, ARGB4, ARGB1555) are
-     * available on every chip and are always reachable. */
+    /* RGB8 / ARGB8 are BT820-only; 16bpp fallbacks (RGB565, ARGB4, ARGB1555)
+     * are available on every chip. */
 #ifdef EVE_SUPPORT_RENDERTARGET
     const bool has_argb8 = EVE_Hal_supportRenderTarget(hal);
 #else
@@ -192,8 +188,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     lv_draw_eve5_get_render_target_format(u->hal, cf, &eve_fmt, &bpp);
 
 #if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 && defined(EVE_SUPPORT_RENDERTARGET)
-    /* RGB8 promotion is BT820-only — earlier gens have neither the format
-     * symbol nor the render-target capability the runtime check probes. */
+    /* RGB8 promotion is BT820-only. */
     if(EVE_Hal_supportRenderTarget(u->hal) && !lv_color_format_has_alpha(cf) && eve_fmt != ARGB8) {
         eve_fmt = RGB8;
         bpp = 3;
@@ -238,9 +233,8 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     vr->is_premultiplied = false;
     vr->has_content = false;
     /* is_swapchain stays false (zeroed) — only the driver-owned full_buf vr
-     * sets it to true. Leaving it uninitialized previously caused init_layer
-     * to take the swapchain branch on sub-layer vr's whose memory happened to
-     * land on a non-zero byte (e.g., 0xCD malloc poisoning in debug builds). */
+     * sets it to true. Must be zero-initialized to avoid init_layer taking
+     * the swapchain branch on sub-layer vr's via uninitialized memory. */
 
     buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
 
@@ -472,9 +466,7 @@ void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
 
 #ifdef EVE_SUPPORT_RENDERTARGET
 /* init_layer / finish_layer / blit_l8_to_alpha drive the BT820 render engine
- * (CMD_RENDERTARGET, SWAPCHAIN_0, RGB8/ARGB8 layer formats). They are only
- * called from the RT-gated dispatch path in lv_draw_eve5.c, so on pre-BT820
- * single-target builds this whole block is dead. */
+ * (CMD_RENDERTARGET, SWAPCHAIN_0, RGB8/ARGB8 layer formats). */
 
 void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  bool is_screen,
@@ -964,9 +956,7 @@ void lv_draw_eve5_hal_blit_l8_to_alpha(lv_draw_eve5_unit_t * u, uint32_t l8_addr
 
 #else /* EVE_SUPPORT_RENDERTARGET */
 
-/* Stubs for chips without render-target support. The dispatch path that
- * exercises layer init/finish is also gated on EVE_SUPPORT_RENDERTARGET, so
- * these are unreachable in practice; they exist to satisfy the linker. */
+/* Linker stubs for chips without render-target support. */
 
 void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  bool is_screen,
@@ -1082,9 +1072,8 @@ void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u,
 
     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(phost, ram_g_addr);
-    /* SW fallback always renders LVGL ARGB8888 (matched at upload as 4 bpp).
-     * EVE ARGB8 is BT820-only — pre-BT820 builds compile this stub but the
-     * format mismatch means SW fallback is unsupported there in practice. */
+    /* SW fallback renders LVGL ARGB8888 (4 bpp at upload). ARGB8 is
+     * BT820-only; the ARGB4 fallback compiles but is functionally a stub. */
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     EVE_CoDl_bitmapLayout(phost, ARGB8, eve_stride, tex_h);
 #else

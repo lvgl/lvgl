@@ -185,7 +185,7 @@ static bool glyph_bitmap_to_ramg_aligned(lv_draw_eve5_unit_t * u, uint32_t addr,
  **********************/
 
 /**
- * Compute glyph count from cmap tables (max_gid + 1).
+ * Compute glyph_dsc array size from cmap tables.
  * Sparse cmaps use list_length to avoid over-allocation for CJK ranges.
  */
 static uint32_t compute_glyph_count(const lv_font_fmt_txt_dsc_t * font_dsc)

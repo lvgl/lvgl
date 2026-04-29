@@ -33,15 +33,10 @@
     #define LV_DRAW_EVE5_USE_CMD_ARC 0
 #endif
 
-/* Chip-safe "fill everything" coordinate for vertex2f_0 used to alpha-clear /
- * opacity-modulate the arc bbox (scissor clips to the actual arc bbox).
- *
- * vertex2f_0 on FT80X goes through a compatibility shim that shifts coords
- * by 4 (FT800/FT801 has no VERTEX_FORMAT — vertex2f is hardcoded to 1/16 px,
- * so integer-pixel inputs must be pre-shifted). 2048 << 4 = 32768 overflows
- * int16_t and wraps to -32768, breaking the rect. FT80X max display is
- * 512×512, so 511 covers it; FT810+ keeps 2048 (display max 2048×2048).
- * Multi-target picks at runtime. */
+/* "Fill arc bbox" sentinel for vertex2f_0 (scissor clips it). FT80X has no
+ * VERTEX_FORMAT, so vertex2f_0 pre-shifts integer inputs by 4 — 2048 << 4
+ * overflows int16_t. 511 is enough for FT80X (max display 512×512); FT810+
+ * uses 2048 (max display 2048×2048). */
 #if defined(EVE_MULTI_GRAPHICS_TARGET)
     #define EVE5_ARC_BBOX_FILL ((EVE_CHIPID < EVE_FT810) ? 511 : 2048)
 #elif EVE_SUPPORT_CHIPID < EVE_FT810

@@ -38,9 +38,8 @@ extern "C" {
 
 #include "EVE_Hal.h"
 
-/* Flash filesystem uses CMD_FLASHSOURCE / CMD_FLASHREAD (BT815+). The driver
- * still exposes its public API on chips without flash; those entry points
- * become no-op stubs in lv_eve5_flash.c. */
+/* Flash filesystem uses CMD_FLASHSOURCE / CMD_FLASHREAD (BT815+).
+ * On chips without flash these public functions are no-op stubs. */
 #if LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH
 
 #include "../../../display/lv_display.h"

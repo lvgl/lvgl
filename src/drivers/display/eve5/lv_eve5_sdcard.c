@@ -879,8 +879,7 @@ Esd_GpuAlloc * lv_eve5_sdcard_get_allocator(void)
 
 #elif LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
 
-/* Stubs for chips without BT820 SD-card command support. The public API
- * surface stays linkable; every entry point is a safe no-op. */
+/* Linker stubs for chips without BT820 SD-card command support. */
 
 void lv_fs_eve5_sdcard_init(lv_display_t * disp)         { (void)disp; }
 void lv_fs_eve5_sdcard_deinit(void)                       {}

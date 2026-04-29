@@ -241,14 +241,8 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
     LV_UNUSED(phost);
     *needs_conversion = false;
 
-    /* BT820+ has the wider 24-bit RGB8, 32-bit ARGB8, and 8-bit
-     * PALETTEDARGB8 formats. Earlier gens fall back to 16bpp formats
-     * with lossy 8→4 (or 8→5/6/5) bit-per-channel conversion at upload.
-     *
-     * The check is gated at compile time on EVE_SUPPORT_CHIPID so the BT820
-     * format symbols (ARGB8 / RGB8 / PALETTEDARGB8) don't appear in
-     * single-target pre-EVE5 builds where they're undefined. At runtime in
-     * multi-target builds it still falls back to false on pre-BT820 chips. */
+    /* RGB8 / ARGB8 / PALETTEDARGB8 are BT820-only; earlier gens fall back to
+     * 16bpp formats with lossy bit-per-channel conversion at upload. */
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     bool has_argb8 = EVE_Hal_supportRenderTarget(hal);
 #else

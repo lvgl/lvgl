@@ -661,8 +661,7 @@ Esd_GpuAlloc * lv_eve5_flash_get_allocator(void)
 
 #elif LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH
 
-/* Stubs for chips without EVE_SUPPORT_FLASH (i.e., pre-BT815). The public API
- * surface stays linkable; every entry point is a safe no-op. */
+/* Linker stubs for chips without EVE_SUPPORT_FLASH (pre-BT815). */
 
 void lv_fs_eve5_flash_init(lv_display_t * disp)          { (void)disp; }
 void lv_fs_eve5_flash_deinit(void)                        {}

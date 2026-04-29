@@ -72,11 +72,7 @@ typedef struct {
      * the draw unit is disabled at runtime, so the screen layer falls through
      * to LVGL's SW renderer instead. */
     bool full_frame_hw_rendered;
-    /* Set by lv_eve5_request_invalidate when a deferred screen invalidate is
-     * needed (typically because frame-time alloc failures became unblocked by
-     * a post-frame GC sweep). Consumed and cleared by the LV_EVENT_REFR_READY
-     * handler once LVGL is out of its rendering pass and lv_obj_invalidate is
-     * legal again. */
+    /* Pending deferred screen invalidate; consumed by the REFR_READY handler. */
     bool invalidate_pending;
     lv_eve5_render_mode_t render_mode;
     /* Both draw buffers are created at init and kept alive for the display's
@@ -216,11 +212,7 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
      *     buffer was last rendered (and thus which is the previous front).
      */
     /* SC0 swapchain registers only exist on chips with render-target support.
-     * On EVE1-EVE4 the swap mechanism is just CMD_SWAP rotating DL banks;
-     * no per-buffer pointers to track. Leave frame_buffer_* at zero (already
-     * zeroed by lv_malloc_zeroed) so the partial-mode compositor paths —
-     * which we never enter without RT support — can't read anything
-     * meaningful from them. */
+     * On EVE1-EVE4 the swap mechanism is just CMD_SWAP rotating DL banks. */
 #ifdef EVE_SUPPORT_RENDERTARGET
     if(EVE_Hal_supportRenderTarget(phost)) {
         drvr->frame_buffer_0 = EVE_Hal_rd32(phost, REG_SC0_PTR0);
@@ -611,9 +603,6 @@ static void refr_ready_cb(lv_event_t * e)
 
     drvr->invalidate_pending = false;
 
-    /* LVGL has cleared rendering_in_progress by the time REFR_READY fires,
-     * so lv_obj_invalidate is legal here. The screen will be marked dirty
-     * for the next refresh cycle. */
     lv_obj_t * scr = lv_display_get_screen_active(disp);
     if(scr != NULL) {
         LV_LOG_INFO("EVE5: deferred screen invalidate (post-GC retry)");
