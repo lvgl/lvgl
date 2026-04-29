@@ -552,6 +552,17 @@
             #define LV_DRAW_SW_SUPPORT_I1           1
         #endif
     #endif
+    #ifndef LV_DRAW_SW_SUPPORT_I4
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DRAW_SW_SUPPORT_I4
+                #define LV_DRAW_SW_SUPPORT_I4 CONFIG_LV_DRAW_SW_SUPPORT_I4
+            #else
+                #define LV_DRAW_SW_SUPPORT_I4 0
+            #endif
+        #else
+            #define LV_DRAW_SW_SUPPORT_I4           1
+        #endif
+    #endif
 
     /* The threshold of the luminance to consider a pixel as
      * active in indexed color format */

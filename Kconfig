@@ -296,6 +296,11 @@ menu "LVGL configuration"
 			default y
 			depends on LV_USE_DRAW_SW
 
+		config LV_DRAW_SW_SUPPORT_I4
+			bool "Enable support for I4 (4-bit indexed) color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
 		config LV_DRAW_SW_I1_LUM_THRESHOLD
 			int "Luminance threshold for a pixel to be active"
 			default 127

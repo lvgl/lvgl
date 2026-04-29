@@ -126,6 +126,13 @@ struct _lv_display_t {
 
     lv_color_format_t   color_format;
 
+    /** Palette used when the display's color format is indexed (e.g. I4, I8).
+     *  May be NULL — in that case the software blender falls back to a default
+     *  16-entry grayscale palette for I4. Not owned by the display; the user
+     *  is responsible for the lifetime of the buffer. */
+    const lv_color32_t * palette;
+    uint32_t palette_size;
+
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];

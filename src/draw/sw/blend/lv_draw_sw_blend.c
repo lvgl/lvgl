@@ -37,6 +37,9 @@
 #if LV_DRAW_SW_SUPPORT_I1
     #include "lv_draw_sw_blend_to_i1.h"
 #endif
+#if LV_DRAW_SW_SUPPORT_I4
+    #include "lv_draw_sw_blend_to_i4.h"
+#endif
 #if LV_USE_DRAW_SW
 
 /*********************
@@ -228,6 +231,11 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color(lv_color_format_
             lv_draw_sw_blend_color_to_i1(fill_dsc);
             break;
 #endif
+#if LV_DRAW_SW_SUPPORT_I4
+        case LV_COLOR_FORMAT_I4:
+            lv_draw_sw_blend_color_to_i4(fill_dsc);
+            break;
+#endif
         default:
             break;
     }
@@ -286,6 +294,11 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image(lv_color_format_
 #if LV_DRAW_SW_SUPPORT_I1
         case LV_COLOR_FORMAT_I1:
             lv_draw_sw_blend_image_to_i1(image_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_I4
+        case LV_COLOR_FORMAT_I4:
+            lv_draw_sw_blend_image_to_i4(image_dsc);
             break;
 #endif
         default:

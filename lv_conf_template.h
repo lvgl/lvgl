@@ -187,6 +187,7 @@
     #define LV_DRAW_SW_SUPPORT_AL88         1
     #define LV_DRAW_SW_SUPPORT_A8           1
     #define LV_DRAW_SW_SUPPORT_I1           1
+    #define LV_DRAW_SW_SUPPORT_I4           1
 
     /* The threshold of the luminance to consider a pixel as
      * active in indexed color format */

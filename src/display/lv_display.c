@@ -625,6 +625,31 @@ lv_color_format_t lv_display_get_color_format(lv_display_t * disp)
     return disp->color_format;
 }
 
+void lv_display_set_palette(lv_display_t * disp, const lv_color32_t * palette, uint32_t size)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->palette = palette;
+    disp->palette_size = palette ? size : 0;
+}
+
+const lv_color32_t * lv_display_get_palette(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return NULL;
+
+    return disp->palette;
+}
+
+uint32_t lv_display_get_palette_size(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return 0;
+
+    return disp->palette_size;
+}
+
 void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
 {
     LV_ASSERT_FORMAT_MSG(tile_cnt < 256, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)", tile_cnt);
