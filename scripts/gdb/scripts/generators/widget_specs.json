@@ -142,7 +142,7 @@
   "lv_buttonmatrix": {
     "_auto": {
       "fields": {
-        "map_p": "string",
+        "map_p": "pointer",
         "button_areas": "pointer",
         "ctrl_bits": "pointer",
         "btn_cnt": "int",
@@ -527,7 +527,7 @@
     "_auto": {
       "fields": {
         "section_ll": "int",
-        "txt_src": "string",
+        "txt_src": "pointer",
         "mode": "int",
         "range_min": "int",
         "range_max": "int",
