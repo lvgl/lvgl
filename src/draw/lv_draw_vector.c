@@ -633,6 +633,7 @@ lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer)
     }
 
     dsc->base.layer = layer;
+    dsc->base.dsc_size = sizeof(*dsc);
 
     dsc->ctx = lv_zalloc(sizeof(lv_vector_path_ctx_t));
     if(dsc->ctx == NULL) {
@@ -665,8 +666,21 @@ lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer)
     return dsc;
 }
 
+void lv_draw_vector_dsc_add_delete_cb(lv_draw_vector_dsc_t * dsc, lv_vector_draw_dsc_delete_cb_t cb, void * user_data)
+{
+    if(!dsc) {
+        return;
+    }
+    dsc->delete_cb = cb;
+    dsc->delete_cb_user_data = user_data;
+}
+
 void lv_draw_vector_dsc_delete(lv_draw_vector_dsc_t * dsc)
 {
+    if(dsc->delete_cb) {
+        dsc->delete_cb(dsc, dsc->delete_cb_user_data);
+    }
+
     if(dsc->task_list) {
         lv_ll_t * task_list = dsc->task_list;
         lv_vector_for_each_destroy_tasks(task_list, NULL, NULL);
