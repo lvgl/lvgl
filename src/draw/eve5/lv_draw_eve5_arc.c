@@ -33,6 +33,23 @@
     #define LV_DRAW_EVE5_USE_CMD_ARC 0
 #endif
 
+/* Chip-safe "fill everything" coordinate for vertex2f_0 used to alpha-clear /
+ * opacity-modulate the arc bbox (scissor clips to the actual arc bbox).
+ *
+ * vertex2f_0 on FT80X goes through a compatibility shim that shifts coords
+ * by 4 (FT800/FT801 has no VERTEX_FORMAT — vertex2f is hardcoded to 1/16 px,
+ * so integer-pixel inputs must be pre-shifted). 2048 << 4 = 32768 overflows
+ * int16_t and wraps to -32768, breaking the rect. FT80X max display is
+ * 512×512, so 511 covers it; FT810+ keeps 2048 (display max 2048×2048).
+ * Multi-target picks at runtime. */
+#if defined(EVE_MULTI_GRAPHICS_TARGET)
+    #define EVE5_ARC_BBOX_FILL ((EVE_CHIPID < EVE_FT810) ? 511 : 2048)
+#elif EVE_SUPPORT_CHIPID < EVE_FT810
+    #define EVE5_ARC_BBOX_FILL 511
+#else
+    #define EVE5_ARC_BBOX_FILL 2048
+#endif
+
 /**********************
  * STATIC HELPERS
  **********************/
@@ -156,7 +173,7 @@ static void draw_arc_stencil(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
         EVE_CoDl_lineWidth(phost, 16);
         EVE_CoDl_begin(phost, RECTS);
         EVE_CoDl_vertex2f_0(phost, 0, 0);
-        EVE_CoDl_vertex2f_0(phost, 2048, 2048);
+        EVE_CoDl_vertex2f_0(phost, EVE5_ARC_BBOX_FILL, EVE5_ARC_BBOX_FILL);
         EVE_CoDl_end(phost);
 
         /* Paint outer circle (paintalpha) */
@@ -176,7 +193,7 @@ static void draw_arc_stencil(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
             EVE_CoDl_lineWidth(phost, 16);
             EVE_CoDl_begin(phost, RECTS);
             EVE_CoDl_vertex2f_0(phost, 0, 0);
-            EVE_CoDl_vertex2f_0(phost, 2048, 2048);
+            EVE_CoDl_vertex2f_0(phost, EVE5_ARC_BBOX_FILL, EVE5_ARC_BBOX_FILL);
             EVE_CoDl_end(phost);
         }
 
@@ -230,7 +247,7 @@ static void draw_arc_stencil(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
         EVE_CoDl_lineWidth(phost, 16);
         EVE_CoDl_begin(phost, RECTS);
         EVE_CoDl_vertex2f_0(phost, 0, 0);
-        EVE_CoDl_vertex2f_0(phost, 2048, 2048);
+        EVE_CoDl_vertex2f_0(phost, EVE5_ARC_BBOX_FILL, EVE5_ARC_BBOX_FILL);
         EVE_CoDl_end(phost);
 
         /* Build stencil wedge mask using EDGE_STRIP_R */
@@ -317,7 +334,7 @@ static void draw_arc_stencil(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
         EVE_CoDl_lineWidth(phost, 16);
         EVE_CoDl_begin(phost, RECTS);
         EVE_CoDl_vertex2f_0(phost, 0, 0);
-        EVE_CoDl_vertex2f_0(phost, 2048, 2048);
+        EVE_CoDl_vertex2f_0(phost, EVE5_ARC_BBOX_FILL, EVE5_ARC_BBOX_FILL);
         EVE_CoDl_end(phost);
     }
 
@@ -610,7 +627,7 @@ void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         EVE_CoDl_lineWidth(phost, 16);
         EVE_CoDl_begin(phost, RECTS);
         EVE_CoDl_vertex2f_0(phost, 0, 0);
-        EVE_CoDl_vertex2f_0(phost, 2048, 2048);
+        EVE_CoDl_vertex2f_0(phost, EVE5_ARC_BBOX_FILL, EVE5_ARC_BBOX_FILL);
         EVE_CoDl_end(phost);
     }
 
