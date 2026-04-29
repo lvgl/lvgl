@@ -217,7 +217,7 @@ uint32_t lv_draw_eve_image_upload_image(bool burst_is_active, const lv_image_dsc
                     LV_ASSERT_MALLOC(tmp_buf);
                     const uint8_t * src_alpha_buf = src_buf + src_h * src_stride;
                     int32_t src_alpha_stride = src_stride / 2;
-                    for(uint32_t y = 0; y < src_h; y++) {
+                    for(int32_t y = 0; y < src_h; y++) {
                         convert_row_rgb565a8_to_argb4444(src_buf + y * src_stride, src_alpha_buf + y * src_alpha_stride, tmp_buf, src_w);
                         EVE_memWrite_flash_buffer(ramg_addr + y * eve_stride, tmp_buf, eve_stride);
                     }
@@ -227,7 +227,7 @@ uint32_t lv_draw_eve_image_upload_image(bool burst_is_active, const lv_image_dsc
             case LV_COLOR_FORMAT_ARGB8888: {
                     uint8_t * tmp_buf = lv_malloc(eve_stride);
                     LV_ASSERT_MALLOC(tmp_buf);
-                    for(uint32_t y = 0; y < src_h; y++) {
+                    for(int32_t y = 0; y < src_h; y++) {
                         convert_row_argb8888_to_argb4444(src_buf + y * src_stride, tmp_buf, src_w);
                         EVE_memWrite_flash_buffer(ramg_addr + y * eve_stride, tmp_buf, eve_stride);
                     }

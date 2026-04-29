@@ -1209,6 +1209,21 @@
     #endif
 #endif
 
+/* Use EVE BT820 GPU through EVE HAL. */
+#ifndef LV_USE_DRAW_EVE5
+    #ifdef CONFIG_LV_USE_DRAW_EVE5
+        #define LV_USE_DRAW_EVE5 CONFIG_LV_USE_DRAW_EVE5
+    #else
+        #define LV_USE_DRAW_EVE5 0
+    #endif
+#endif
+
+/* LV_USE_DRAW_EVE5 requires LV_USE_DRAW_VRAM */
+#if LV_USE_DRAW_EVE5 && !LV_USE_DRAW_VRAM
+    #undef LV_USE_DRAW_VRAM
+    #define LV_USE_DRAW_VRAM 1
+#endif
+
 /** Use NanoVG Renderer
  * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
  */
@@ -4652,6 +4667,37 @@
             #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
         #endif
     #endif
+#endif
+
+/** EVE5 display output */
+#ifndef LV_USE_EVE5
+    #ifdef CONFIG_LV_USE_EVE5
+        #define LV_USE_EVE5 CONFIG_LV_USE_EVE5
+    #else
+        #define LV_USE_EVE5 0
+    #endif
+#endif
+
+#if LV_USE_EVE5
+    #ifndef LV_USE_FS_EVE5_SDCARD
+        #ifdef CONFIG_LV_USE_FS_EVE5_SDCARD
+            #define LV_USE_FS_EVE5_SDCARD CONFIG_LV_USE_FS_EVE5_SDCARD
+        #else
+            #define LV_USE_FS_EVE5_SDCARD 0
+        #endif
+    #endif
+    #ifndef LV_USE_FS_EVE5_FLASH
+        #ifdef CONFIG_LV_USE_FS_EVE5_FLASH
+            #define LV_USE_FS_EVE5_FLASH CONFIG_LV_USE_FS_EVE5_FLASH
+        #else
+            #define LV_USE_FS_EVE5_FLASH 0
+        #endif
+    #endif
+#else
+    #undef LV_USE_FS_EVE5_SDCARD
+    #define LV_USE_FS_EVE5_SDCARD 0
+    #undef LV_USE_FS_EVE5_FLASH
+    #define LV_USE_FS_EVE5_FLASH 0
 #endif
 
 /** Enable or disable for external data and destructor function */
