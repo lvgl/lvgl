@@ -205,17 +205,19 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
      *     sentinel into the rendered output so the compositor can detect which
      *     buffer was last rendered (and thus which is the previous front).
      */
-    /* SC0 swapchain registers exist only on chips with render-target support
-     * (BT820+). On EVE3/EVE4 the swap mechanism is just CMD_SWAP rotating DL
-     * banks; no per-buffer pointers to track. Leave frame_buffer_* at zero
-     * (already zeroed by lv_malloc_zeroed) so the partial-mode compositor
-     * paths — which we never enter without RT support — can't read anything
+    /* SC0 swapchain registers only exist on chips with render-target support.
+     * On EVE1-EVE4 the swap mechanism is just CMD_SWAP rotating DL banks;
+     * no per-buffer pointers to track. Leave frame_buffer_* at zero (already
+     * zeroed by lv_malloc_zeroed) so the partial-mode compositor paths —
+     * which we never enter without RT support — can't read anything
      * meaningful from them. */
+#ifdef EVE_SUPPORT_RENDERTARGET
     if(EVE_Hal_supportRenderTarget(phost)) {
         drvr->frame_buffer_0 = EVE_Hal_rd32(phost, REG_SC0_PTR0);
         drvr->frame_buffer_1_orig = EVE_Hal_rd32(phost, REG_SC0_PTR1);
         drvr->frame_buffer_1 = drvr->frame_buffer_1_orig; /* updated by apply_render_mode below */
     }
+#endif
     drvr->current_fb = 0;
 
     /* Bind initial buffer + apply swapchain register config for the requested mode */
@@ -458,7 +460,15 @@ static lv_draw_buf_t * create_full_buf(EVE_HalContext * phost)
     vr->base.unit = NULL; /* Set by lv_eve5_link_draw_unit on EVE5 draw unit init */
     vr->base.size = 0;    /* No GPU allocation — virtual */
     vr->gpu_handle = GA_HANDLE_INVALID;
+    /* eve_format describes the swapchain/framebuffer pixel format. RGB8 is
+     * BT820-only — pre-BT820 single-target builds don't have the symbol, and
+     * the non-RT dispatch path renders directly via CMD_SWAP without
+     * sampling this vram_res, so the value is just inert metadata. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     vr->eve_format = RGB8;
+#else
+    vr->eve_format = RGB565;
+#endif
     vr->stride = stride;
     vr->width = W;
     vr->height = H;
@@ -510,12 +520,16 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
          * rotates them. No tearing because scanout reads the front while
          * rendering writes the back.
          *
-         * Non-RT chips (EVE3/EVE4) have no swapchain registers; CMD_SWAP just
+         * Non-RT chips (EVE1-EVE4) have no swapchain registers; CMD_SWAP just
          * rotates the DL bank that the GPU replays. Skip the register write. */
+#ifdef EVE_SUPPORT_RENDERTARGET
         if(EVE_Hal_supportRenderTarget(phost)) {
             EVE_Hal_wr32(phost, REG_SC0_PTR1, drvr->frame_buffer_1_orig);
             drvr->frame_buffer_1 = drvr->frame_buffer_1_orig;
         }
+#else
+        (void)phost;
+#endif
 
         lv_display_set_draw_buffers(disp, drvr->full_buf, NULL);
         /* set_color_format propagates to disp, layer_head, and the active
@@ -523,6 +537,7 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
         lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB888);
         lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
     }
+#ifdef EVE_SUPPORT_RENDERTARGET
     else {
         /* Single-buffered scanout: PTR1 = PTR0. The partial-mode compositor has
          * no reliable way to identify the live scanout buffer post-swap, so it
@@ -533,7 +548,10 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
          * create_ex for the full explanation and the path forward.
          * frame_buffer_1 is mirrored to frame_buffer_0 so the compositor's
          * read_fb selection always lands on the active scanout buffer
-         * regardless of which side of the toggle current_fb is on. */
+         * regardless of which side of the toggle current_fb is on.
+         *
+         * PARTIAL mode requires render-target support — non-RT builds force
+         * FULL in lv_eve5_create_ex, and REG_SC0_PTR1 isn't defined there. */
         EVE_Hal_wr32(phost, REG_SC0_PTR1, drvr->frame_buffer_0);
         drvr->frame_buffer_1 = drvr->frame_buffer_0;
 
@@ -550,6 +568,7 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode)
         lv_obj_t * scr = lv_display_get_screen_active(disp);
         if(scr != NULL) lv_obj_invalidate(scr);
     }
+#endif
     drvr->render_mode = mode;
 }
 
@@ -596,10 +615,19 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         bool hw_rendered = drvr->full_frame_hw_rendered;
         drvr->full_frame_hw_rendered = false;
 
+#ifdef EVE_SUPPORT_RENDERTARGET
         if(!hw_rendered && px_map != NULL) {
             /* SW path: upload the rendered bitmap and present it. */
             full_mode_sw_present(drvr, area, px_map);
         }
+#else
+        /* Non-RT chips: the EVE5 draw unit's non-RT dispatch always renders
+         * directly to the implicit framebuffer via CMD_SWAP, so flush_cb
+         * never sees a SW-rendered px_map needing upload. */
+        (void)hw_rendered;
+        (void)area;
+        (void)px_map;
+#endif
 
         EVE_CmdSync completed = EVE_Cmd_syncCompleted(drvr->hal);
         Esd_GpuAlloc_UpdateFree(drvr->allocator, completed);
@@ -609,6 +637,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         lv_display_flush_ready(disp);
         return;
     }
+
+#ifdef EVE_SUPPORT_RENDERTARGET
+    /* Partial-mode tile collection — render-target only. On non-RT chips
+     * lv_eve5_create_ex forces FULL mode, so this code path is unreachable;
+     * the symbols it uses (SWAPCHAIN_0, RGB8 framebuffer format, etc.) also
+     * don't exist on those builds. */
 
 #if LV_USE_OS
     lv_mutex_lock(&drvr->hal_mutex);
@@ -692,9 +726,17 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_mutex_unlock(&drvr->hal_mutex);
 #endif
 
+#endif /* EVE_SUPPORT_RENDERTARGET — partial-mode tile collection */
+
     lv_display_flush_ready(disp);
 }
 
+#ifdef EVE_SUPPORT_RENDERTARGET
+/* Partial-mode tile compositor — render-target only. Uses CMD_RENDERTARGET,
+ * SWAPCHAIN_0, CMD_GRAPHICSFINISH, and the BT820+ RGB8 framebuffer format,
+ * none of which exist on non-RT builds. The PARTIAL render mode itself is
+ * forced to FULL on those chips by lv_eve5_create_ex, so this function
+ * would never be reached at runtime anyway. */
 static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
 {
     EVE_HalContext *phost = drvr->hal;
@@ -776,6 +818,7 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
     Esd_GpuAlloc_UpdateFree(drvr->allocator,
                             completed); /* FIXME: Idle callback in EVE_Cmd_syncCompleted should handle this (running out of sync ids?) */
 }
+#endif /* EVE_SUPPORT_RENDERTARGET — composite_to_framebuffer */
 
 /**
  * Present a SW-rendered full-screen frame.
@@ -786,7 +829,13 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
  *
  * Used when the EVE5 draw unit is disabled at runtime — the LVGL SW renderer
  * fills full_buf->data each frame and we hand the bitmap to the GPU here.
+ *
+ * Render-target gated: uses SWAPCHAIN_0 and the BT820+ RGB8 framebuffer
+ * format. On non-RT chips the EVE5 draw unit's non-RT dispatch handles the
+ * screen render directly via CMD_SWAP, so this SW present path is not
+ * needed (and the symbols don't exist).
  */
+#ifdef EVE_SUPPORT_RENDERTARGET
 static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area, const uint8_t * px_map)
 {
     EVE_HalContext * phost = drvr->hal;
@@ -851,6 +900,7 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
 
     Esd_GpuAlloc_DeferredFree(drvr->allocator, handle, sync);
 }
+#endif /* EVE_SUPPORT_RENDERTARGET — full_mode_sw_present */
 
 static void wait_cb(lv_display_t * disp)
 {

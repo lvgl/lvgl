@@ -61,7 +61,7 @@ static uint16_t degrees_to_furmans(int32_t degrees)
 static void setup_arc_image(EVE_HalContext *phost, uint32_t addr, uint16_t eve_format,
                             int32_t stride, int32_t w, int32_t h, uint32_t palette_addr)
 {
-    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(phost, addr);
     set_palette_if_needed(phost, eve_format, palette_addr);
     eve5_set_bitmap_layout(phost, eve_format, stride, h);
@@ -115,7 +115,7 @@ static void draw_arc_stencil(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                 img_w = img_vr->width;
                 img_h = img_vr->height;
                 has_img = true;
-                img_has_alpha = (img_eve_format == ARGB8);
+                img_has_alpha = lv_draw_eve5_format_has_alpha(img_eve_format);
             }
         }
     }
@@ -478,7 +478,7 @@ void lv_draw_eve5_alpha_draw_arc(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
                 img_eve_stride = (int32_t)img_vr->stride;
                 img_w = img_vr->width;
                 img_h = img_vr->height;
-                img_has_alpha = (img_eve_format == ARGB8);
+                img_has_alpha = lv_draw_eve5_format_has_alpha(img_eve_format);
             }
         }
     }

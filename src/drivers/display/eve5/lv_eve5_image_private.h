@@ -59,16 +59,20 @@ bool eve5_is_jpeg_or_png(const char * path, bool *is_jpeg, bool *is_png);
 static inline int32_t eve5_format_bpp(uint32_t eve_format)
 {
     switch(eve_format) {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         case ARGB8:
             return 4;
         case RGB8:
             return 3;
+#endif
         case RGB565:
         case ARGB1555:
         case ARGB4:
             return 2;
         case L8:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         case PALETTEDARGB8:
+#endif
             return 1;
         default:
             return 2;

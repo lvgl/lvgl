@@ -354,11 +354,48 @@ static inline bool eve5_fill_border_area_match(const lv_area_t * fill_area, cons
            (dx2 <= 0 && dx2 >= -2) && (dy2 <= 0 && dy2 >= -2);
 }
 
+/**
+ * Returns true if the EVE bitmap format carries a per-pixel alpha channel
+ * that may vary across pixels — i.e. sampling the texture as `SRC_ALPHA`
+ * gives values other than constant 1. RGB-only formats return false.
+ *
+ * Formats classed as "has alpha":
+ *   - ARGB1555/2/4/6/8, ARGB6, PALETTED, PALETTED4444, PALETTED8,
+ *     PALETTEDARGB8, LA1/2/4/8 (any palette/explicit alpha channel)
+ *   - L1/L2/L4/L8 (luminance is sampled as alpha by EVE — varies per pixel)
+ *
+ * Formats classed as "no alpha" (sampled alpha == 1 everywhere):
+ *   - RGB332, RGB565, PALETTED565, RGB6, RGB8
+ *
+ * Specialty formats (TEXT8X8, TEXTVGA, BARGRAPH, GLFORMAT, YCBCR) fall into
+ * the default and return true; they don't appear in image-source paths.
+ */
+static inline bool lv_draw_eve5_format_has_alpha(uint16_t eve_format)
+{
+    if(eve_format == RGB332 || eve_format == RGB565 || eve_format == PALETTED565)
+        return false;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    if(eve_format == RGB8 || eve_format == RGB6)
+        return false;
+#endif
+    return true;
+}
+
 static inline void set_palette_if_needed(EVE_HalContext *phost, uint16_t eve_format, uint32_t palette_addr)
 {
-    if(eve_format == PALETTEDARGB8 && palette_addr != GA_INVALID) {
+    /* PALETTEDARGB8 is BT820-only (EVE5). The macro itself is undefined on
+     * pre-BT820 single-target builds, hence the compile-time guard; the
+     * runtime EVE_GEN check covers multi-target builds running on older
+     * hardware where the format identifier is reserved. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
+    if(EVE_GEN >= EVE5 && eve_format == PALETTEDARGB8 && palette_addr != GA_INVALID) {
         EVE_CoDl_paletteSource(phost, palette_addr);
     }
+#else
+    (void)phost;
+    (void)eve_format;
+    (void)palette_addr;
+#endif
 }
 
 /** Check if an EVE bitmap format requires GLFORMAT + BITMAP_EXT_FORMAT mode.

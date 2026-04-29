@@ -80,7 +80,17 @@ void lv_draw_eve5_clear_stencil(lv_draw_eve5_unit_t * u,
 bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_t lv_cf,
                                            uint16_t * eve_fmt, uint8_t * bpp)
 {
-    bool has_argb8 = EVE_Hal_supportRenderTarget(hal);
+    /* The wider 24/32-bit formats (RGB8, ARGB8) are BT820-only — both the
+     * symbols themselves and the runtime capability come from render-target
+     * support. On non-RT builds the macros aren't defined, so we keep the
+     * BT820+ branches behind the same compile-time gate that guards them in
+     * EVE_GpuDefs.h. The 16bpp fallbacks (RGB565, ARGB4, ARGB1555) are
+     * available on every chip and are always reachable. */
+#ifdef EVE_SUPPORT_RENDERTARGET
+    const bool has_argb8 = EVE_Hal_supportRenderTarget(hal);
+#else
+    (void)hal;
+#endif
 
     switch(lv_cf) {
         case LV_COLOR_FORMAT_RGB565:
@@ -90,50 +100,54 @@ bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_
 
         case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_XRGB8888:
+#ifdef EVE_SUPPORT_RENDERTARGET
             if(has_argb8) {
                 *eve_fmt = RGB8;
                 *bpp = 3;
+                return true;
             }
-            else {
-                *eve_fmt = RGB565;
-                *bpp = 2;
-            }
+#endif
+            *eve_fmt = RGB565;
+            *bpp = 2;
             return true;
 
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+#ifdef EVE_SUPPORT_RENDERTARGET
             if(has_argb8) {
                 *eve_fmt = ARGB8;
                 *bpp = 4;
+                return true;
             }
-            else {
-                *eve_fmt = ARGB4;
-                *bpp = 2;
-            }
+#endif
+            *eve_fmt = ARGB4;
+            *bpp = 2;
             return true;
 
         case LV_COLOR_FORMAT_ARGB1555:
+#ifdef EVE_SUPPORT_RENDERTARGET
             if(has_argb8) {
                 /* Use ARGB8 for better alpha precision */
                 *eve_fmt = ARGB8;
                 *bpp = 4;
+                return true;
             }
-            else {
-                *eve_fmt = ARGB1555;
-                *bpp = 2;
-            }
+#endif
+            *eve_fmt = ARGB1555;
+            *bpp = 2;
             return true;
 
         case LV_COLOR_FORMAT_ARGB4444:
+#ifdef EVE_SUPPORT_RENDERTARGET
             if(has_argb8) {
                 /* Use ARGB8 for better alpha precision */
                 *eve_fmt = ARGB8;
                 *bpp = 4;
+                return true;
             }
-            else {
-                *eve_fmt = ARGB4;
-                *bpp = 2;
-            }
+#endif
+            *eve_fmt = ARGB4;
+            *bpp = 2;
             return true;
 
         case LV_COLOR_FORMAT_L8:
@@ -143,14 +157,15 @@ bool lv_draw_eve5_get_render_target_format(EVE_HalContext *hal, lv_color_format_
 
         default:
             if(lv_color_format_has_alpha(lv_cf)) {
+#ifdef EVE_SUPPORT_RENDERTARGET
                 if(has_argb8) {
                     *eve_fmt = ARGB8;
                     *bpp = 4;
+                    return false;
                 }
-                else {
-                    *eve_fmt = ARGB4;
-                    *bpp = 2;
-                }
+#endif
+                *eve_fmt = ARGB4;
+                *bpp = 2;
             }
             else {
                 *eve_fmt = RGB565;
@@ -176,8 +191,9 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     uint8_t bpp;
     lv_draw_eve5_get_render_target_format(u->hal, cf, &eve_fmt, &bpp);
 
-#if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8
-    /* RGB8 promotion is BT820-only — earlier gens have no RGB8 format. */
+#if LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 && defined(EVE_SUPPORT_RENDERTARGET)
+    /* RGB8 promotion is BT820-only — earlier gens have neither the format
+     * symbol nor the render-target capability the runtime check probes. */
     if(EVE_Hal_supportRenderTarget(u->hal) && !lv_color_format_has_alpha(cf) && eve_fmt != ARGB8) {
         eve_fmt = RGB8;
         bpp = 3;
@@ -454,10 +470,18 @@ void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
  * LAYER MANAGEMENT
  **********************/
 
+#ifdef EVE_SUPPORT_RENDERTARGET
+/* init_layer / finish_layer / blit_l8_to_alpha drive the BT820 render engine
+ * (CMD_RENDERTARGET, SWAPCHAIN_0, RGB8/ARGB8 layer formats). They are only
+ * called from the RT-gated dispatch path in lv_draw_eve5.c, so on pre-BT820
+ * single-target builds this whole block is dead. */
+
 void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                  bool is_screen,
                                  const lv_draw_eve5_slice_t * slice)
 {
+    EVE_HalContext * phost = u->hal;
+
     /* Swapchain target (full-mode screen): render the screen layer directly to
      * SWAPCHAIN_0. SWAPCHAIN_0 is resolved by the render engine to the current
      * back buffer (one of REG_SC0_PTR0/PTR1); finish_layer's CMD_SWAP triggers
@@ -472,7 +496,6 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     {
         lv_eve5_vram_res_t * sc_vr = eve5_get_vram_res(layer);
         if(sc_vr != NULL && sc_vr->is_swapchain) {
-            EVE_HalContext * phost = u->hal;
             int32_t sw = lv_area_get_width(&layer->buf_area);
             int32_t sh = lv_area_get_height(&layer->buf_area);
 
@@ -508,7 +531,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                     EVE_CoDl_saveContext(phost);
                     EVE_CoDl_blendFunc(phost, ONE, ZERO);
                     EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
-                    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+                    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
                     EVE_CoDl_bitmapSource(phost, prev_addr);
                     EVE_CoDl_bitmapLayout(phost, (uint8_t)prev_fmt, prev_stride, sh);
                     EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, sw, sh);
@@ -661,11 +684,11 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             EVE_CoDl_clearColorA(u->hal, is_screen ? 255 : 0);
             EVE_CoDl_clear(u->hal, 1, 1, 1);
 
-            EVE_CoDl_saveContext(u->hal);
-            EVE_CoDl_blendFunc(u->hal, ONE, ZERO);
-            EVE_CoDl_colorArgb_ex(u->hal, 0xFFFFFFFF);
-            EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
-            EVE_CoDl_bitmapSource(u->hal, prev_addr);
+            EVE_CoDl_saveContext(phost);
+            EVE_CoDl_blendFunc(phost, ONE, ZERO);
+            EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+            EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+            EVE_CoDl_bitmapSource(phost, prev_addr);
             EVE_CoDl_bitmapLayout(u->hal, (uint8_t)target_eve_fmt, aligned_w * target_bpp, h);
             EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, w, h);
             EVE_CoDl_begin(u->hal, BITMAPS);
@@ -875,7 +898,7 @@ Esd_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
         EVE_CoDl_saveContext(phost);
         EVE_CoDl_blendFunc(phost, ONE, ZERO);
         EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
-        EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+        EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(phost, u->canvas_orig_addr);
         /* GLFORMAT mode required for BITMAP_SWIZZLE to take effect on BT820 */
         EVE_CoDl_bitmapLayout(phost, GLFORMAT, u->canvas_orig_stride, u->canvas_orig_h);
@@ -923,7 +946,7 @@ void lv_draw_eve5_hal_blit_l8_to_alpha(lv_draw_eve5_unit_t * u, uint32_t l8_addr
     EVE_CoDl_vertexFormat(phost, 0);
     EVE_CoDl_saveContext(phost);
 
-    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(phost, l8_addr);
     EVE_CoDl_bitmapLayout(phost, L8, aligned_w, aligned_h);
     EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, w, h);
@@ -938,6 +961,48 @@ void lv_draw_eve5_hal_blit_l8_to_alpha(lv_draw_eve5_unit_t * u, uint32_t l8_addr
 
     EVE_CoDl_restoreContext(phost);
 }
+
+#else /* EVE_SUPPORT_RENDERTARGET */
+
+/* Stubs for chips without render-target support. The dispatch path that
+ * exercises layer init/finish is also gated on EVE_SUPPORT_RENDERTARGET, so
+ * these are unreachable in practice; they exist to satisfy the linker. */
+
+void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                 bool is_screen,
+                                 const lv_draw_eve5_slice_t * slice)
+{
+    LV_UNUSED(u); LV_UNUSED(layer); LV_UNUSED(is_screen); LV_UNUSED(slice);
+}
+
+void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+                                   bool is_screen, int rendered_count)
+{
+    LV_UNUSED(u); LV_UNUSED(layer); LV_UNUSED(is_screen); LV_UNUSED(rendered_count);
+}
+
+Esd_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
+                                                    int32_t aligned_w, int32_t aligned_h,
+                                                    int32_t w, int32_t h)
+{
+    LV_UNUSED(u); LV_UNUSED(aligned_w); LV_UNUSED(aligned_h); LV_UNUSED(w); LV_UNUSED(h);
+    return GA_HANDLE_INVALID;
+}
+
+void lv_draw_eve5_hal_finish_l8_rendertarget(lv_draw_eve5_unit_t * u)
+{
+    LV_UNUSED(u);
+}
+
+void lv_draw_eve5_hal_blit_l8_to_alpha(lv_draw_eve5_unit_t * u, uint32_t l8_addr,
+                                       int32_t aligned_w, int32_t aligned_h,
+                                       int32_t w, int32_t h)
+{
+    LV_UNUSED(u); LV_UNUSED(l8_addr);
+    LV_UNUSED(aligned_w); LV_UNUSED(aligned_h); LV_UNUSED(w); LV_UNUSED(h);
+}
+
+#endif /* EVE_SUPPORT_RENDERTARGET */
 
 #if LV_DRAW_EVE5_SW_FALLBACK
 /**********************
@@ -999,6 +1064,7 @@ void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u,
                                    uint32_t eve_stride,
                                    const lv_area_t * draw_area)
 {
+    EVE_HalContext * phost = u->hal;
     lv_layer_t * layer = t->target_layer;
 
     if(ram_g_addr == GA_INVALID) {
@@ -1011,16 +1077,23 @@ void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u,
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    EVE_CoDl_colorArgb_ex(u->hal, 0xFFFFFFFF);
-    EVE_CoDl_bitmapTransform_identity(u->hal);
+    EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
+    EVE_CoDl_bitmapTransform_identity(phost);
 
-    EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
-    EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
-    EVE_CoDl_bitmapLayout(u->hal, ARGB8, eve_stride, tex_h);
-    EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, tex_w, tex_h);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoDl_bitmapSource(phost, ram_g_addr);
+    /* SW fallback always renders LVGL ARGB8888 (matched at upload as 4 bpp).
+     * EVE ARGB8 is BT820-only — pre-BT820 builds compile this stub but the
+     * format mismatch means SW fallback is unsupported there in practice. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    EVE_CoDl_bitmapLayout(phost, ARGB8, eve_stride, tex_h);
+#else
+    EVE_CoDl_bitmapLayout(phost, ARGB4, eve_stride, tex_h);
+#endif
+    EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, tex_w, tex_h);
 
-    EVE_CoDl_begin(u->hal, BITMAPS);
-    EVE_CoDl_vertex2f_0(u->hal, x, y);
+    EVE_CoDl_begin(phost, BITMAPS);
+    EVE_CoDl_vertex2f_0(phost, x, y);
     EVE_CoDl_end(u->hal);
 }
 
@@ -1134,15 +1207,18 @@ void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     /* Set up mask bitmap.
      * ARGB8/PALETTEDARGB8 grayscale masks: swizzle RED to ALPHA.
      * L8/A8: BT820 natively decodes as (255,255,255,L). */
-    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(phost, mask_addr);
     set_palette_if_needed(phost, mask_img->eve_format, mask_palette);
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     if(mask_img->eve_format == ARGB8 || mask_img->eve_format == PALETTEDARGB8) {
         EVE_CoDl_bitmapLayout(phost, GLFORMAT, mask_img->stride, mask_img->height);
         EVE_CoDl_bitmapExtFormat(phost, mask_img->eve_format);
         EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);
     }
-    else {
+    else
+#endif
+    {
         EVE_CoDl_bitmapLayout(phost, (uint8_t)mask_img->eve_format,
                               mask_img->stride, mask_img->height);
     }

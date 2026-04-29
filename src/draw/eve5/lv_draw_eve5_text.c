@@ -675,6 +675,8 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     if(u == NULL || layer == NULL) return;
 
+    EVE_HalContext * phost = u->hal;
+
     /* Underline/strikethrough */
     if(fill_dsc && fill_area) {
         int32_t x1 = fill_area->x1 - layer->buf_area.x1;
@@ -720,7 +722,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
         EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
         EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
-        EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
+        EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(u->hal, addr);
         set_palette_if_needed(u->hal, vr->eve_format, palette_addr);
         eve5_set_bitmap_layout(u->hal, vr->eve_format, (int32_t)vr->stride, g_h);
@@ -791,6 +793,8 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     if(u == NULL || layer == NULL) return;
 
+    EVE_HalContext * phost = u->hal;
+
     if(fill_dsc && fill_area) {
         int32_t x1 = fill_area->x1 - layer->buf_area.x1;
         int32_t y1 = fill_area->y1 - layer->buf_area.y1;
@@ -826,7 +830,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         EVE_CoDl_end(u->hal);
 
         EVE_CoDl_colorA(u->hal, glyph_dsc->opa);
-        EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
+        EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(u->hal, addr);
         set_palette_if_needed(u->hal, vr->eve_format, palette_addr);
         eve5_set_bitmap_layout(u->hal, vr->eve_format, (int32_t)vr->stride, g_h);
@@ -919,7 +923,7 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
     if(use_bitmap_font) {
         /* BT820 L-format decodes as (255,255,255,L) on hardware */
         EVE_CoDl_bitmapTransform_identity(u->hal);
-        EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+        EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_begin(u->hal, BITMAPS);
 
         s_current_unit = u;
@@ -954,6 +958,7 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
 
 void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
 {
+    EVE_HalContext * phost = u->hal;
     lv_layer_t * layer = t->target_layer;
     lv_draw_letter_dsc_t * dsc = t->draw_dsc;
 
@@ -961,10 +966,10 @@ void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
-    EVE_CoDl_colorA(u->hal, dsc->opa);
-    EVE_CoDl_bitmapTransform_identity(u->hal);
-    EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
+    EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
+    EVE_CoDl_colorA(phost, dsc->opa);
+    EVE_CoDl_bitmapTransform_identity(phost);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
 
     if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
         EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE);
@@ -1013,6 +1018,7 @@ void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
  */
 void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, bool alpha_to_rgb)
 {
+    EVE_HalContext * phost = u->hal;
     lv_layer_t * layer = t->target_layer;
     lv_draw_label_dsc_t * dsc = t->draw_dsc;
 
@@ -1055,11 +1061,11 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, 
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    if(alpha_to_rgb) EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
-    EVE_CoDl_colorA(u->hal, dsc->opa);
-    EVE_CoDl_bitmapTransform_identity(u->hal);
-    EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
-    EVE_CoDl_begin(u->hal, BITMAPS);
+    if(alpha_to_rgb) EVE_CoDl_colorRgb(phost, 255, 255, 255);
+    EVE_CoDl_colorA(phost, dsc->opa);
+    EVE_CoDl_bitmapTransform_identity(phost);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoDl_begin(phost, BITMAPS);
 
     s_alpha_unit = u;
     s_alpha_layer = layer;
@@ -1077,6 +1083,7 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, 
  */
 void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, bool alpha_to_rgb)
 {
+    EVE_HalContext * phost = u->hal;
     lv_layer_t * layer = t->target_layer;
     lv_draw_letter_dsc_t * dsc = t->draw_dsc;
 
@@ -1084,11 +1091,11 @@ void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t,
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
-    if(alpha_to_rgb) EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
-    EVE_CoDl_colorA(u->hal, dsc->opa);
-    EVE_CoDl_bitmapTransform_identity(u->hal);
-    EVE_CoDl_bitmapHandle(u->hal, u->hal->CoScratchHandle);
-    EVE_CoDl_begin(u->hal, BITMAPS);
+    if(alpha_to_rgb) EVE_CoDl_colorRgb(phost, 255, 255, 255);
+    EVE_CoDl_colorA(phost, dsc->opa);
+    EVE_CoDl_bitmapTransform_identity(phost);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
+    EVE_CoDl_begin(phost, BITMAPS);
 
     s_alpha_unit = u;
     s_alpha_layer = layer;

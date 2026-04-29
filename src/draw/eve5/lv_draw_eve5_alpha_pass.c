@@ -20,6 +20,12 @@
 #include "lv_draw_eve5_private.h"
 
 #if LV_USE_DRAW_EVE5
+#ifdef EVE_SUPPORT_RENDERTARGET
+
+/* Alpha recovery is part of the render-target compositing pipeline — these
+ * helpers re-issue tasks into a freshly-cleared alpha channel after the RGB
+ * pass. The whole flow is reachable only from the RT dispatch, so this file
+ * is excluded on chips without render-target support. */
 
 #include "../lv_draw.h"
 #include "../lv_draw_image.h"
@@ -680,4 +686,36 @@ void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t * u, const lv_draw_tas
 }
 
 
+#else /* EVE_SUPPORT_RENDERTARGET */
+
+/* Stubs for chips without render-target support. The alpha recovery pipeline
+ * is only reachable from the RT dispatch path (also gated on
+ * EVE_SUPPORT_RENDERTARGET), so these are never actually called. They exist
+ * solely to satisfy the linker — lv_draw_eve5_render.c references them
+ * without a chip-level gate, since runtime checks short-circuit the calls. */
+
+bool lv_draw_eve5_fill_needs_alpha_rendertarget(const lv_draw_task_t * t)        { LV_UNUSED(t); return false; }
+bool lv_draw_eve5_border_needs_alpha_rendertarget(const lv_draw_task_t * t)      { LV_UNUSED(t); return false; }
+bool lv_draw_eve5_arc_needs_alpha_rendertarget(const lv_draw_task_t * t)         { LV_UNUSED(t); return false; }
+
+void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
+{
+    LV_UNUSED(u); LV_UNUSED(t);
+}
+void lv_draw_eve5_alpha_draw_fill_with_border(lv_draw_eve5_unit_t * u,
+                                              const lv_draw_task_t * fill_task,
+                                              const lv_draw_task_t * border_task)
+{
+    LV_UNUSED(u); LV_UNUSED(fill_task); LV_UNUSED(border_task);
+}
+void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
+{
+    LV_UNUSED(u); LV_UNUSED(t);
+}
+void lv_draw_eve5_alpha_draw_triangle(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t)
+{
+    LV_UNUSED(u); LV_UNUSED(t);
+}
+
+#endif /* EVE_SUPPORT_RENDERTARGET */
 #endif /* LV_USE_DRAW_EVE5 */

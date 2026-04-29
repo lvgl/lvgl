@@ -13,9 +13,9 @@
  *********************/
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
-
 #include "lv_eve5_sdcard.h"
+
+#if LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD && (EVE_SUPPORT_CHIPID >= EVE_BT820)
 #include "lv_eve5.h"
 #include "lv_eve5_image_private.h"
 #include "../../../core/lv_global.h"
@@ -877,4 +877,31 @@ Esd_GpuAlloc * lv_eve5_sdcard_get_allocator(void)
     return s_ctx.alloc;
 }
 
-#endif /* LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD */
+#elif LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
+
+/* Stubs for chips without BT820 SD-card command support. The public API
+ * surface stays linkable; every entry point is a safe no-op. */
+
+void lv_fs_eve5_sdcard_init(lv_display_t * disp)         { (void)disp; }
+void lv_fs_eve5_sdcard_deinit(void)                       {}
+bool lv_eve5_sdcard_ready(void)                           { return false; }
+bool lv_eve5_sdcard_is_path(const char * path)            { (void)path; return false; }
+Esd_GpuAlloc * lv_eve5_sdcard_get_allocator(void)         { return NULL; }
+
+bool lv_eve5_sdcard_steal_ramg(void * file_p, Esd_GpuAlloc ** alloc,
+                               Esd_GpuHandle *handle, uint32_t * size)
+{
+    (void)file_p; (void)alloc; (void)handle; (void)size;
+    return false;
+}
+
+bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
+                               uint32_t * width, uint32_t * height, uint32_t * format,
+                               uint32_t * image_offset, uint32_t * palette_offset)
+{
+    (void)path; (void)handle; (void)width; (void)height;
+    (void)format; (void)image_offset; (void)palette_offset;
+    return false;
+}
+
+#endif /* LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD && (EVE_SUPPORT_CHIPID >= EVE_BT820) */

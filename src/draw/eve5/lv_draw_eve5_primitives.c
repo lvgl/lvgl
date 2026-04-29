@@ -240,7 +240,14 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
         }
     }
     uint8_t bpp = is_argb8 ? 4 : 2;
+    /* ARGB8 (format 20) is BT820-only; symbol doesn't exist on earlier-gen
+     * single-target builds. is_argb8 evaluates to false there at compile time
+     * via EVE_GEN, but the symbol still needs to be hidden from the compiler. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     uint16_t eve_fmt = is_argb8 ? ARGB8 : (need_alpha ? ARGB4 : RGB565);
+#else
+    uint16_t eve_fmt = need_alpha ? ARGB4 : RGB565;
+#endif
     uint32_t byte_count = pixel_count * bpp;
     uint32_t byte_count_aligned = ALIGN_UP(byte_count, 4);
 

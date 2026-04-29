@@ -186,7 +186,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     }
 
     /* Set up bitmap */
-    EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+    EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
     set_palette_if_needed(u->hal, eve_format, palette_addr);
     eve5_set_bitmap_layout(u->hal, eve_format, eve_stride, layout_h);
@@ -250,16 +250,19 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             int32_t mask_draw_y = mask_y1 + (img_h - mask_h) / 2;
 
             EVE_CoDl_saveContext(phost);
-            EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+            EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
             EVE_CoDl_bitmapSource(phost, mask_ram_g_addr);
             set_palette_if_needed(phost, mask_eve_format, mask_palette_addr);
             /* ARGB8/PALETTEDARGB8: extract RED as alpha (grayscale PNGs decode with R=G=B=gray) */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(mask_eve_format == ARGB8 || mask_eve_format == PALETTEDARGB8) {
                 EVE_CoDl_bitmapLayout(phost, GLFORMAT, mask_eve_stride, mask_h);
                 EVE_CoDl_bitmapExtFormat(phost, mask_eve_format);
                 EVE_CoDl_bitmapSwizzle(phost, ZERO, ZERO, ZERO, RED);
             }
-            else {
+            else
+#endif
+            {
                 EVE_CoDl_bitmapLayout(phost, (uint8_t)mask_eve_format, mask_eve_stride, mask_h);
             }
             EVE_CoDl_bitmapSize(phost, NEAREST, BORDER, BORDER, mask_w, mask_h);
@@ -270,7 +273,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoDl_restoreContext(phost);
 
             /* Re-setup main image bitmap */
-            EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
+            EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
             EVE_CoDl_bitmapSource(phost, ram_g_addr);
             set_palette_if_needed(phost, eve_format, palette_addr);
             eve5_set_bitmap_layout(phost, eve_format, eve_stride, layout_h);

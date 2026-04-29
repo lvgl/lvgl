@@ -300,8 +300,10 @@ static uint32_t get_touch_register(EVE_HalContext *phost, uint8_t index)
             return REG_CTOUCH_TOUCHB_XY;
         case 3:
             return REG_CTOUCH_TOUCHC_XY;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         case 4:
             return REG_CTOUCH_TOUCH4_XY;
+#endif
         default:
             return REG_CTOUCH_TOUCH0_XY;
     }

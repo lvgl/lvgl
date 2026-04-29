@@ -159,6 +159,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
             break;
 
         case LV_COLOR_FORMAT_XRGB8888:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(eve_fmt == RGB8) {
                 /* BT820: EVE stores RGB8 (3 bpp) → expand to XRGB8888 (4 bpp) */
                 for(int32_t y = 0; y < h; y++) {
@@ -167,11 +168,13 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 }
                 break;
             }
+#endif
             /* Other gens map XRGB8888 → RGB565 etc.; fall through to generic
              * ARGB8 expansion path which handles all eve formats. */
             goto generic_download;
 
         case LV_COLOR_FORMAT_RGB565A8:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(eve_fmt == ARGB8) {
                 /* BT820: EVE stores ARGB8 → split into RGB565 + A8 plane. */
                 uint32_t rgb_stride = (w * 16 + 7) / 8;
@@ -187,6 +190,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 }
                 break;
             }
+#endif
             /* Non-BT820: EVE stores ARGB4 (or similar). RGB565A8 download from
              * non-ARGB8 sources isn't currently supported — would need a
              * 2-plane conversion writer. */
@@ -198,8 +202,12 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4: {
                 /* EVE stores PALETTEDARGB8 (8-bit indices + 256-entry palette).
-                 * LVGL layout: [palette N×ARGB8888][packed sub-byte index data] */
-                if(eve_fmt != PALETTEDARGB8) {
+                 * LVGL layout: [palette N×ARGB8888][packed sub-byte index data].
+                 * PALETTEDARGB8 is BT820-only — pre-BT820 builds always fail here. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+                if(eve_fmt != PALETTEDARGB8)
+#endif
+                {
                     LV_LOG_WARN("EVE5: Cannot download %d format to indexed I%d (no quantization)",
                                 eve_fmt, lv_color_format_get_bpp(lv_cf));
                     lv_free(row_buf);
@@ -240,8 +248,12 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
 
         case LV_COLOR_FORMAT_I8: {
                 /* EVE stores PALETTEDARGB8 (8-bit indices + 256-entry palette).
-                 * LVGL layout: [palette 256×ARGB8888][8-bit index data] */
-                if(eve_fmt != PALETTEDARGB8) {
+                 * LVGL layout: [palette 256×ARGB8888][8-bit index data].
+                 * PALETTEDARGB8 is BT820-only — pre-BT820 builds always fail here. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+                if(eve_fmt != PALETTEDARGB8)
+#endif
+                {
                     LV_LOG_WARN("EVE5: Cannot download %d format to indexed I8 (no quantization)",
                                 eve_fmt);
                     lv_free(row_buf);
@@ -285,6 +297,7 @@ generic_download: {
                     for(int32_t x = 0; x < w; x++) {
                         uint8_t r = 0, g = 0, b = 0, a = 255;
                         switch(eve_fmt) {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
                             case ARGB8:
                                 b = row_buf[4 * x + 0];
                                 g = row_buf[4 * x + 1];
@@ -296,6 +309,7 @@ generic_download: {
                                 g = row_buf[3 * x + 1];
                                 r = row_buf[3 * x + 2];
                                 break;
+#endif
                             case RGB565: {
                                     uint16_t c = ((uint16_t *)row_buf)[x];
                                     uint8_t r5 = (c >> 11) & 0x1F;

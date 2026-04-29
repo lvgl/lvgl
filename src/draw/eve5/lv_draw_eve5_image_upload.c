@@ -195,10 +195,12 @@ bool lv_draw_eve5_convert_row(lv_color_format_t lv_cf, uint16_t eve_fmt,
             return false;
 
         case LV_COLOR_FORMAT_XRGB8888:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(eve_fmt == RGB8) {
                 convert_xrgb8888_to_rgb8(src_row, dst_row, (uint32_t)w);
                 return true;
             }
+#endif
             if(eve_fmt == RGB565) {
                 convert_xrgb8888_to_rgb565(src_row, dst_row, (uint32_t)w);
                 return true;
@@ -235,12 +237,23 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
                                       uint8_t * bits_per_pixel,
                                       bool *needs_conversion)
 {
+    EVE_HalContext *phost = hal;
+    LV_UNUSED(phost);
     *needs_conversion = false;
 
     /* BT820+ has the wider 24-bit RGB8, 32-bit ARGB8, and 8-bit
      * PALETTEDARGB8 formats. Earlier gens fall back to 16bpp formats
-     * with lossy 8→4 (or 8→5/6/5) bit-per-channel conversion at upload. */
+     * with lossy 8→4 (or 8→5/6/5) bit-per-channel conversion at upload.
+     *
+     * The check is gated at compile time on EVE_SUPPORT_CHIPID so the BT820
+     * format symbols (ARGB8 / RGB8 / PALETTEDARGB8) don't appear in
+     * single-target pre-EVE5 builds where they're undefined. At runtime in
+     * multi-target builds it still falls back to false on pre-BT820 chips. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     bool has_argb8 = EVE_Hal_supportRenderTarget(hal);
+#else
+    bool has_argb8 = false;
+#endif
 
     switch(src_cf) {
         case LV_COLOR_FORMAT_A1:
@@ -251,7 +264,7 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
         case LV_COLOR_FORMAT_A2:
             /* L2 was added in EVE2 (FT810+). FT800/FT801 only have L1 and L4 — fall
              * back to L4 with 2bpp→4bpp bit-replication so 0/1/2/3 → 0/5/A/F. */
-            if(hal->ChipId >= EVE_FT810) {
+            if(EVE_CHIPID >= EVE_FT810) {
                 *eve_format = L2;
                 *bits_per_pixel = 2;
             }
@@ -300,11 +313,14 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
             break;
 
         case LV_COLOR_FORMAT_RGB888:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(has_argb8) {
                 *eve_format = RGB8;
                 *bits_per_pixel = 24;
             }
-            else {
+            else
+#endif
+            {
                 *eve_format = RGB565;
                 *bits_per_pixel = 16;
                 *needs_conversion = true;
@@ -312,11 +328,14 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
             break;
 
         case LV_COLOR_FORMAT_XRGB8888:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(has_argb8) {
                 *eve_format = RGB8;
                 *bits_per_pixel = 24;
             }
-            else {
+            else
+#endif
+            {
                 *eve_format = RGB565;
                 *bits_per_pixel = 16;
             }
@@ -325,11 +344,14 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
 
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(has_argb8) {
                 *eve_format = ARGB8;
                 *bits_per_pixel = 32;
             }
-            else {
+            else
+#endif
+            {
                 *eve_format = ARGB4;
                 *bits_per_pixel = 16;
                 *needs_conversion = true;
@@ -337,11 +359,14 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
             break;
 
         case LV_COLOR_FORMAT_RGB565A8:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(has_argb8) {
                 *eve_format = ARGB8;
                 *bits_per_pixel = 32;
             }
-            else {
+            else
+#endif
+            {
                 *eve_format = ARGB4;
                 *bits_per_pixel = 16;
             }
@@ -352,12 +377,15 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_I8:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
             if(has_argb8) {
                 *eve_format = PALETTEDARGB8;
                 *bits_per_pixel = 8;  /* Expanded to 8-bit indices for EVE */
                 *needs_conversion = true;
             }
-            else {
+            else
+#endif
+            {
                 /* No PALETTEDARGB8 on earlier chips. Expand to ARGB4 inline
                  * — palette is applied per pixel during upload. */
                 *eve_format = ARGB4;
@@ -426,9 +454,11 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
      * On non-RT chips we expand indexed images to ARGB4 inline — the palette
      * is consumed during conversion, so no GPU palette is needed. */
     uint16_t palette_size = 0;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     if(LV_COLOR_FORMAT_IS_INDEXED(src_cf) && eve_format == PALETTEDARGB8) {
         palette_size = 256 * sizeof(lv_color32_t);
     }
+#endif
 
     /* Allocate RAM_G space. On pre-BT820 the allocator caps live handles at 64;
      * flag image source uploads as GC so they can be reclaimed under pressure. */
@@ -486,6 +516,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                     const uint8_t * palette_data = src_buf;
                     const uint8_t * index_data = src_buf + src_palette_bytes;
 
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
                     if(eve_format == PALETTEDARGB8) {
                         /* BT820 path: write ARGB8888 palette to GPU + 8-bit indices. */
                         EVE_Hal_wrMem(u->hal, base_addr, palette_data, src_palette_bytes);
@@ -532,7 +563,9 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                         }
                         lv_free(tmp_buf);
                     }
-                    else {
+                    else
+#endif
+                    {
                         /* Pre-BT820 path: no GPU palette. Convert palette to ARGB4
                          * once on host, then expand each pixel through the LUT. */
                         uint16_t palette_argb4[256];
@@ -602,12 +635,15 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
 
                     for(int32_t y = 0; y < src_h; y++) {
                         lv_memzero(tmp_buf, eve_stride);
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
                         if(eve_format == ARGB8) {
                             convert_rgb565a8_to_argb8(src_buf + y * src_stride,
                                                       alpha_buf + y * alpha_stride,
                                                       tmp_buf, src_w);
                         }
-                        else { /* ARGB4 fallback for non-RT */
+                        else
+#endif
+                        { /* ARGB4 fallback for non-RT */
                             convert_rgb565a8_to_argb4(src_buf + y * src_stride,
                                                       alpha_buf + y * alpha_stride,
                                                       tmp_buf, src_w);

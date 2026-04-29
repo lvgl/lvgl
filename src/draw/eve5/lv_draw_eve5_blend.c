@@ -33,6 +33,13 @@
 #include "lv_draw_eve5_private.h"
 
 #if LV_USE_DRAW_EVE5
+#ifdef EVE_SUPPORT_RENDERTARGET
+
+/* This whole file targets render-target compositing — every path here
+ * allocates an intermediate ARGB8 RT, renders into it via CMD_RENDERTARGET,
+ * and re-blits the result. None of that is reachable on chips without
+ * render-target support, and the symbols (CMD_RENDERTARGET, ARGB8, the
+ * BT820+ alignment-flag encoding) don't exist there either. */
 
 /**********************
  * STATIC PROTOTYPES
@@ -463,4 +470,5 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     return composite_over_dst(u, out_result, dst_addr, temp3, false, aw, ah, w, h, stride, buf_size);
 }
 
+#endif /* EVE_SUPPORT_RENDERTARGET */
 #endif /* LV_USE_DRAW_EVE5 */

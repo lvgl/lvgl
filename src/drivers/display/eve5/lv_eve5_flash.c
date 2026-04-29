@@ -13,9 +13,9 @@
  *********************/
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH
-
 #include "lv_eve5_flash.h"
+
+#if LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH && defined(EVE_SUPPORT_FLASH)
 #include "lv_eve5.h"
 #include "lv_eve5_image_private.h"
 #include "../../../misc/lv_fs.h"
@@ -623,9 +623,11 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t alloc_base = Esd_GpuAlloc_Get(alloc, final_handle);
     uint32_t img_ofs = (out_source >= alloc_base) ? (out_source - alloc_base) : 0;
     uint32_t pal_ofs = GA_INVALID;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     if(out_fmt == PALETTEDARGB8 && out_palette >= alloc_base) {
         pal_ofs = out_palette - alloc_base;
     }
+#endif
 
     /* Trim allocation to actual decoded size */
     int32_t bpp = eve5_format_bpp(out_fmt);
@@ -657,4 +659,24 @@ Esd_GpuAlloc * lv_eve5_flash_get_allocator(void)
     return s_ctx.alloc;
 }
 
-#endif /* LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH */
+#elif LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH
+
+/* Stubs for chips without EVE_SUPPORT_FLASH (i.e., pre-BT815). The public API
+ * surface stays linkable; every entry point is a safe no-op. */
+
+void lv_fs_eve5_flash_init(lv_display_t * disp)          { (void)disp; }
+void lv_fs_eve5_flash_deinit(void)                        {}
+bool lv_eve5_flash_ready(void)                            { return false; }
+bool lv_eve5_flash_is_path(const char * path)             { (void)path; return false; }
+Esd_GpuAlloc * lv_eve5_flash_get_allocator(void)          { return NULL; }
+
+bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
+                              uint32_t * width, uint32_t * height, uint32_t * format,
+                              uint32_t * image_offset, uint32_t * palette_offset)
+{
+    (void)path; (void)handle; (void)width; (void)height;
+    (void)format; (void)image_offset; (void)palette_offset;
+    return false;
+}
+
+#endif /* LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH && defined(EVE_SUPPORT_FLASH) */

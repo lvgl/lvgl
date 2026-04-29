@@ -321,7 +321,9 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     }
 
     if(got_image) {
-        /* For PALETTEDARGB8, CMD_LOADIMAGE stores palette at alloc start */
+        /* For PALETTEDARGB8, CMD_LOADIMAGE stores palette at alloc start.
+         * PALETTEDARGB8 is BT820-only — pre-BT820 builds skip this branch. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         if(out_fmt == PALETTEDARGB8) {
             if(!out_palette_addr) {
                 LV_LOG_INFO("EVE5 HW_DECODE: PALETTEDARGB8 not supported by caller, falling back to SW for %s", path);
@@ -334,7 +336,9 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
             *out_palette_addr = out_palette;
             addr = out_source;
         }
-        else {
+        else
+#endif
+        {
             if(out_source != addr) {
                 LV_LOG_WARN("EVE5 HW_DECODE: source mismatch: getImage=0x%08x alloc=0x%08x for %s",
                             out_source, addr, path);
@@ -365,7 +369,11 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 
     /* Trim allocation to actual size */
     uint32_t index_size = (uint32_t)(decoded_stride * (int32_t)img_h);
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     uint32_t palette_offset = (out_fmt == PALETTEDARGB8) ? (uint32_t)(addr - Esd_GpuAlloc_Get(u->allocator, handle)) : 0;
+#else
+    uint32_t palette_offset = 0;
+#endif
     uint32_t actual_size = palette_offset + index_size;
     if(actual_size < decoded_size) {
         Esd_GpuAlloc_Truncate(u->allocator, handle, actual_size);
@@ -555,14 +563,16 @@ static lv_draw_eve5_unit_t * s_decoder_unit;
 static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt)
 {
     switch(eve_fmt) {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         case ARGB8:
             return LV_COLOR_FORMAT_ARGB8888;
         case RGB8:
             return LV_COLOR_FORMAT_RGB888;
-        case RGB565:
-            return LV_COLOR_FORMAT_RGB565;
         case PALETTEDARGB8:
             return LV_COLOR_FORMAT_I8;
+#endif
+        case RGB565:
+            return LV_COLOR_FORMAT_RGB565;
         case L8:
             return LV_COLOR_FORMAT_L8;
         default:
@@ -624,7 +634,13 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     }
 
     uint32_t ram_g_addr = GA_INVALID, palette_addr = GA_INVALID;
+    /* Initial format placeholder; the chosen loader fills in the actual EVE
+     * format. Pre-BT820 has no ARGB8 — use RGB565 so the symbol exists. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
     uint16_t eve_format = ARGB8;
+#else
+    uint16_t eve_format = RGB565;
+#endif
     int32_t eve_stride = 0, src_w = 0, src_h = 0;
     Esd_GpuHandle handle = GA_HANDLE_INVALID;
     bool loaded = false;
@@ -655,8 +671,14 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     /* Detect grayscale PALETTEDARGB8 and promote to L8.
      * BT820 produces PALETTEDARGB8 for grayscale PNGs. If the palette is a
      * simple grayscale ramp (R=G=B=i, A=255), reinterpret as L8 because the index
-     * data is already the luminance value. Enables SW renderer's apply_mask. */
-    if(eve_format == PALETTEDARGB8 && palette_addr != GA_INVALID) {
+     * data is already the luminance value. Enables SW renderer's apply_mask.
+     * PALETTEDARGB8 is BT820-only — pre-BT820 builds skip this entire block. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    if(eve_format == PALETTEDARGB8 && palette_addr != GA_INVALID)
+#else
+    if(0)
+#endif
+    {
 #if LV_USE_OS
         lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif

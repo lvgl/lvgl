@@ -118,6 +118,11 @@ static const char * task_type_str(lv_draw_task_type_t type)
 /**********************
  * STATIC PROTOTYPES
  **********************/
+#ifdef EVE_SUPPORT_RENDERTARGET
+/* Render-target dispatch path. Requires CMD_RENDERTARGET, the alpha-pass /
+ * blend / gaussian helpers (themselves RT-only), and BT820+ format
+ * identifiers used inside those helpers. The whole RT side of this file is
+ * compiled out below the same guard. */
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static void eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
@@ -125,9 +130,10 @@ static void eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                               const lv_draw_eve5_slice_t * slice, bool apply_bitmap_mask);
 static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
 static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_task_t * end);
+#endif
 
 /* Non-render-target dispatch path for EVE generations without CMD_RENDERTARGET
- * (EVE3/EVE4). Single DL per frame, screen-layer only, no slicing or alpha pass. */
+ * (EVE1-EVE4). Single DL per frame, screen-layer only, no slicing or alpha pass. */
 static int32_t dispatch_nort(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t evaluate_nort(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer);
@@ -141,13 +147,18 @@ static bool s_eve5_enabled = true;
 
 void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
 {
+	EVE_HalContext *phost = hal;
+
     lv_draw_eve5_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_eve5_unit_t));
+#ifdef EVE_SUPPORT_RENDERTARGET
     if(EVE_Hal_supportRenderTarget(hal)) {
         unit->base_unit.dispatch_cb = dispatch;
         unit->base_unit.evaluate_cb = evaluate;
         unit->base_unit.name = "EVE5_BT820";
     }
-    else {
+    else
+#endif
+    {
         unit->base_unit.dispatch_cb = dispatch_nort;
         unit->base_unit.evaluate_cb = evaluate_nort;
         unit->base_unit.name = "EVE_NORT";
@@ -215,6 +226,14 @@ bool lv_draw_eve5_get_enabled(void)
 /**********************
  * DISPATCH/EVALUATE
  **********************/
+
+#ifdef EVE_SUPPORT_RENDERTARGET
+
+/* Render-target dispatch path. Everything from here down to
+ * "NON-RENDER-TARGET DISPATCH" depends on CMD_RENDERTARGET, SWAPCHAIN_0, the
+ * alpha-pass / blend / gaussian helpers, and the BT820+ format identifiers
+ * those helpers reference (ARGB8, PALETTEDARGB8, ...). Compiled out entirely
+ * on chips without render-target support. */
 
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
@@ -1152,8 +1171,10 @@ static lv_draw_task_t * eve5_find_blend_task(lv_draw_task_t * cursor, lv_draw_ta
     return NULL;
 }
 
+#endif /* EVE_SUPPORT_RENDERTARGET — RT dispatch path */
+
 /**********************
- * NON-RENDER-TARGET DISPATCH (EVE3/EVE4)
+ * NON-RENDER-TARGET DISPATCH (EVE1-EVE4)
  *
  * For chips without CMD_RENDERTARGET, the screen renders as a single display
  * list each frame. There's no swapchain to flip and no per-layer render targets.
