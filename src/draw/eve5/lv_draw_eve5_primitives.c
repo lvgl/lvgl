@@ -326,21 +326,28 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
     EVE_CoDl_bitmapSource(phost, addr);
 
     /* Scale bitmap: map (pixel_count - 1) texels to the gradient dimension.
-     * Use signed 1.15 for best precision; fall back to unsigned 8.8 on overflow. */
+     * BT815+ supports s1.15 precision (p=1); pre-BT815 (FT80x/FT81x) only
+     * supports s8.8 (p=0) — the `p` bit at position 17 of BITMAP_TRANSFORM_*
+     * is reserved on those chips. Use s1.15 when available for sharper
+     * gradients; fall back to s8.8 on overflow or older silicon. */
+    bool can_s1_15 = (EVE_GEN >= EVE3);
+    int32_t unity = can_s1_15 ? 0x8000 : 0x100;
+    bool xform_p = can_s1_15;
     int32_t grad_dim = is_ver ? h : w;
-    int32_t grad_coeff = (int32_t)(pixel_count - 1) * 0x8000 / grad_dim;
-    bool grad_p = 1;
+    int32_t grad_coeff = (int32_t)(pixel_count - 1) * unity / grad_dim;
+    bool grad_p = xform_p;
     if(grad_coeff > 0xFFFF) {
+        /* Overflow only happens in s1.15; drop to s8.8 for this axis. */
         grad_coeff = (int32_t)(pixel_count - 1) * 0x0100 / grad_dim;
         grad_p = 0;
     }
     if(is_ver) {
-        EVE_CoDl_bitmapTransformA_ex(phost, 1, 0x8000 / w);
+        EVE_CoDl_bitmapTransformA_ex(phost, xform_p, unity / w);
         EVE_CoDl_bitmapTransformE_ex(phost, grad_p, grad_coeff);
     }
     else {
         EVE_CoDl_bitmapTransformA_ex(phost, grad_p, grad_coeff);
-        EVE_CoDl_bitmapTransformE_ex(phost, 1, 0x8000 / h);
+        EVE_CoDl_bitmapTransformE_ex(phost, xform_p, unity / h);
     }
 
     return true;

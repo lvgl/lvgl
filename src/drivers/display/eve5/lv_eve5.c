@@ -258,7 +258,6 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
     if(EVE_Hal_supportRenderTarget(phost)) EVE_CoCmd_graphicsFinish(phost);
-    EVE_CoCmd_sync(phost);
     EVE_Cmd_waitFlush(phost);
 
     /* Detect which buffer is front by reading back the test color. Only

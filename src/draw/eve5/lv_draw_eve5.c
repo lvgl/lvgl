@@ -164,9 +164,14 @@ void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
 
     lv_draw_eve5_ring_init(unit);
 
-    /* Load EVE ROM fonts into their matching bitmap handles (16-31) */
-    for(uint8_t f = 16; f <= 31; f++) {
-        EVE_CoCmd_romFont(hal, f, f);
+    /* Load EVE ROM fonts into their matching bitmap handles (16-31).
+     * CMD_ROMFONT is FT810+; on FT800 handles 16-31 are pre-configured to
+     * ROM fonts at boot, so the loop is unnecessary (and the command is
+     * unsupported). */
+    if(EVE_GEN >= EVE2) {
+        for(uint8_t f = 16; f <= 31; f++) {
+            EVE_CoCmd_romFont(hal, f, f);
+        }
     }
 
     lv_draw_eve5_register_vram_callbacks(unit);
