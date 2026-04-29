@@ -97,9 +97,6 @@ extern "C" {
 /* Alpha pass stencil approximation for border masking (experimental) */
 #define EVE5_ALPHA_STENCIL_APPROX 1
 
-/* Multi-step stencil AA for rounded gradient fills (not useful with rendertarget alpha) */
-#define EVE5_ALPHA_STENCIL_MULTISTEP 0
-
 /* L8 render-target alpha recovery for tasks that trash alpha. See lv_draw_eve5.c header. */
 #define EVE5_USE_RENDERTARGET_ALPHA 1
 

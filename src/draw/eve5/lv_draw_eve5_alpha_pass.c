@@ -203,84 +203,7 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t * u, const lv_draw_task_t 
             lv_draw_eve5_clear_stencil(u, x1, y1, x2, y2,
                                        &t->clip_area, &layer->buf_area);
 
-#if EVE5_ALPHA_STENCIL_MULTISTEP
-            /* Multi-step stencil AA: 4 concentric boundaries creating discrete
-             * coverage zones. Draw gradient once per zone with colorA modulation.
-             * Coverage values derived from hardware AA coverage table (s_CovTab). */
-            EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
-            EVE_CoDl_stencilOp(u->hal, KEEP, INCR);
-            if(w == h && radius == LV_RADIUS_CIRCLE && w >= 4) {
-                int32_t cx2 = x1 * 2 + (w - 1);
-                int32_t cy2 = y1 * 2 + (h - 1);
-                int32_t ps[4] = { w * 8 - 4, w * 8 - 8, w * 8 - 12, w * 8 - 16 };
-                for(int i = 0; i < 4; i++) {
-                    if(ps[i] > 0) {
-                        EVE_CoDl_pointSize(u->hal, ps[i]);
-                        EVE_CoDl_begin(u->hal, POINTS);
-                        EVE_CoDl_vertex2f_1(u->hal, cx2, cy2);
-                        EVE_CoDl_end(u->hal);
-                    }
-                }
-            }
-            else {
-                int32_t lw[4] = { real_radius * 16 + 4, real_radius * 16,
-                                  real_radius * 16 - 4, real_radius * 16 - 8
-                                };
-                for(int i = 0; i < 4; i++) {
-                    if(lw[i] > 0) {
-                        EVE_CoDl_lineWidth(u->hal, lw[i]);
-                        EVE_CoDl_begin(u->hal, RECTS);
-                        EVE_CoDl_vertex2f_0(u->hal, x1 + real_radius, y1 + real_radius);
-                        EVE_CoDl_vertex2f_0(u->hal, x2 - real_radius, y2 - real_radius);
-                        EVE_CoDl_end(u->hal);
-                    }
-                }
-            }
-
-            /* Draw gradient through stencil at 4 coverage levels */
-            EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
-            EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
-            if(setup_gradient_bitmap(u, &dsc->grad, dsc->opa, w, h, false)) {
-                /* Interior: stencil >= 4, full gradient alpha */
-                EVE_CoDl_colorA(u->hal, 255);
-                EVE_CoDl_stencilFunc(u->hal, GEQUAL, 4, 255);
-                EVE_CoDl_begin(u->hal, BITMAPS);
-                EVE_CoDl_vertex2f_0(u->hal, x1, y1);
-                EVE_CoDl_end(u->hal);
-
-                /* Inner fringe: stencil == 3, coverage ~120/255 */
-                EVE_CoDl_colorA(u->hal, 120);
-                EVE_CoDl_stencilFunc(u->hal, EQUAL, 3, 255);
-                EVE_CoDl_begin(u->hal, BITMAPS);
-                EVE_CoDl_vertex2f_0(u->hal, x1, y1);
-                EVE_CoDl_end(u->hal);
-
-                /* Middle fringe: stencil == 2, coverage ~65/255 */
-                EVE_CoDl_colorA(u->hal, 65);
-                EVE_CoDl_stencilFunc(u->hal, EQUAL, 2, 255);
-                EVE_CoDl_begin(u->hal, BITMAPS);
-                EVE_CoDl_vertex2f_0(u->hal, x1, y1);
-                EVE_CoDl_end(u->hal);
-
-                /* Outer fringe: stencil == 1, coverage ~26/255 */
-                EVE_CoDl_colorA(u->hal, 26);
-                EVE_CoDl_stencilFunc(u->hal, EQUAL, 1, 255);
-                EVE_CoDl_begin(u->hal, BITMAPS);
-                EVE_CoDl_vertex2f_0(u->hal, x1, y1);
-                EVE_CoDl_end(u->hal);
-            }
-            else {
-                /* Gradient allocation failed; uniform opa through stencil */
-                EVE_CoDl_stencilFunc(u->hal, NOTEQUAL, 0, 255);
-                EVE_CoDl_colorA(u->hal, opa);
-                EVE_CoDl_lineWidth(u->hal, 16);
-                EVE_CoDl_begin(u->hal, RECTS);
-                EVE_CoDl_vertex2f_0(u->hal, x1, y1);
-                EVE_CoDl_vertex2f_0(u->hal, x2, y2);
-                EVE_CoDl_end(u->hal);
-            }
-#else
-            /* Single-step stencil: binary threshold at AA midpoint */
+            /* Stencil: binary threshold at AA midpoint */
             EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
             EVE_CoDl_stencilOp(u->hal, KEEP, INCR);
             if(w == h && radius == LV_RADIUS_CIRCLE && w >= 4) {
@@ -313,7 +236,6 @@ void lv_draw_eve5_alpha_draw_fill(lv_draw_eve5_unit_t * u, const lv_draw_task_t 
                 EVE_CoDl_vertex2f_0(u->hal, x2, y2);
                 EVE_CoDl_end(u->hal);
             }
-#endif /* EVE5_ALPHA_STENCIL_MULTISTEP */
 
             EVE_CoDl_restoreContext(u->hal);
             return;
@@ -476,76 +398,7 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t * u, const lv_draw_task_
         lv_draw_eve5_clear_stencil(u, x1, y1, x2, y2,
                                    &t->clip_area, &layer->buf_area);
 
-#if EVE5_ALPHA_STENCIL_MULTISTEP
-        /* Multi-step inner edge: 4 concentric INCR passes */
-        EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
-        EVE_CoDl_stencilOp(u->hal, KEEP, INCR);
-        if(is_circle) {
-            int32_t inner_d = w - 2 * dsc->width;
-            int32_t ps[4] = { inner_d * 8 - 4, inner_d * 8 - 8,
-                              inner_d * 8 - 12, inner_d * 8 - 16
-                            };
-            for(int i = 0; i < 4; i++) {
-                if(ps[i] > 0)
-                    draw_circle_subpx(u, bcx2, bcy2, ps[i]);
-            }
-        }
-        else if(rin > 0) {
-            int32_t lw[4] = { rin * 16 + 4, rin * 16,
-                              rin * 16 - 4, rin * 16 - 8
-                            };
-            for(int i = 0; i < 4; i++) {
-                if(lw[i] > 0) {
-                    EVE_CoDl_lineWidth(u->hal, lw[i]);
-                    EVE_CoDl_begin(u->hal, RECTS);
-                    EVE_CoDl_vertex2f_0(u->hal, inner_x1 + rin, inner_y1 + rin);
-                    EVE_CoDl_vertex2f_0(u->hal, inner_x2 - rin, inner_y2 - rin);
-                    EVE_CoDl_end(u->hal);
-                }
-            }
-        }
-        else {
-            /* rin == 0: sharp inner edge, single INCR */
-            EVE_CoDl_begin(u->hal, RECTS);
-            EVE_CoDl_vertex2f_0(u->hal, inner_x1, inner_y1);
-            EVE_CoDl_vertex2f_0(u->hal, inner_x2, inner_y2);
-            EVE_CoDl_end(u->hal);
-        }
-
-        /* Draw outer shape at inverted coverage levels.
-         * Border remaining = 255 - inner coverage. */
-        EVE_CoDl_colorMask(u->hal, 0, 0, 0, 1);
-        EVE_CoDl_stencilOp(u->hal, KEEP, KEEP);
-
-        /* Stencil 0: full border */
-        EVE_CoDl_colorA(u->hal, dsc->opa);
-        EVE_CoDl_stencilFunc(u->hal, EQUAL, 0, 255);
-        if(is_circle)
-            draw_circle_subpx(u, bcx2, bcy2, w * 8);
-        else
-            lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
-
-        if(is_circle || rin > 0) {
-            /* Stencil 1: coverage ~229/255 */
-            EVE_CoDl_colorA(u->hal, (uint8_t)((uint16_t)dsc->opa * 229 / 255));
-            EVE_CoDl_stencilFunc(u->hal, EQUAL, 1, 255);
-            if(is_circle) draw_circle_subpx(u, bcx2, bcy2, w * 8);
-            else lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
-
-            /* Stencil 2: coverage ~190/255 */
-            EVE_CoDl_colorA(u->hal, (uint8_t)((uint16_t)dsc->opa * 190 / 255));
-            EVE_CoDl_stencilFunc(u->hal, EQUAL, 2, 255);
-            if(is_circle) draw_circle_subpx(u, bcx2, bcy2, w * 8);
-            else lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
-
-            /* Stencil 3: coverage ~135/255 */
-            EVE_CoDl_colorA(u->hal, (uint8_t)((uint16_t)dsc->opa * 135 / 255));
-            EVE_CoDl_stencilFunc(u->hal, EQUAL, 3, 255);
-            if(is_circle) draw_circle_subpx(u, bcx2, bcy2, w * 8);
-            else lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
-        }
-#else
-        /* Single-step stencil: binary inner edge at AA midpoint */
+        /* Stencil: binary inner edge at AA midpoint */
         EVE_CoDl_colorMask(u->hal, 0, 0, 0, 0);
         EVE_CoDl_stencilOp(u->hal, KEEP, INCR);
         if(is_circle) {
@@ -576,7 +429,6 @@ void lv_draw_eve5_alpha_draw_border(lv_draw_eve5_unit_t * u, const lv_draw_task_
             draw_circle_subpx(u, bcx2, bcy2, w * 8);
         else
             lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, rout, clip, layer_area);
-#endif /* EVE5_ALPHA_STENCIL_MULTISTEP */
 
         EVE_CoDl_restoreContext(u->hal);
 #else
