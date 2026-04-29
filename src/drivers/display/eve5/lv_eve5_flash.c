@@ -587,11 +587,28 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
 
     EVE_Hal_requestFenceBeforeSwap(phost);
 
+    /* CMD_GETIMAGE (full source/fmt/w/h/palette) is BT817+. Flash works on
+     * BT815+, so on BT815/BT816 we use CMD_GETIMAGE_FORMAT (with the 0x3097e8
+     * fallback) and supply parsed dimensions. */
     uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
-    bool got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
+    bool got_image = false;
 
-    LV_LOG_INFO("getImage: source=0x%08x fmt=%u w=%u h=%u palette=0x%08x",
-                out_source, out_fmt, out_w, out_h, out_palette);
+#if (EVE_SUPPORT_CHIPID >= EVE_BT817)
+    if(EVE_CHIPID >= EVE_BT817) {
+        got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
+        LV_LOG_INFO("getImage: source=0x%08x fmt=%u w=%u h=%u palette=0x%08x",
+                    out_source, out_fmt, out_w, out_h, out_palette);
+    }
+    else
+#endif
+    {
+        got_image = EVE_CoCmd_getImage_format(phost, &out_fmt);
+        out_source = final_addr;
+        out_w = img_w;
+        out_h = img_h;
+        out_palette = 0;
+        LV_LOG_INFO("getImage_format: fmt=%u (header w=%u h=%u)", out_fmt, img_w, img_h);
+    }
 
     if(!got_image) {
         LV_LOG_WARN("getImage failed, assuming RGB565 %ux%u", img_w, img_h);

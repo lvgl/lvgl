@@ -113,6 +113,16 @@ void build_colorkey_stencil(EVE_HalContext *phost,
                             uint16_t eve_format, int32_t eve_stride, int32_t layout_h,
                             int32_t vx, int32_t vy)
 {
+    /* GLFORMAT, BITMAP_EXT_FORMAT, and BITMAP_SWIZZLE arrived with ASTC support
+     * in BT815. On earlier chips the swizzle calls silently no-op and the per-
+     * channel routing the stencil build relies on doesn't happen. Skip the whole
+     * stencil setup so the caller's clear-stencil + EQUAL-6 punch becomes a
+     * no-op — colorkey filtering is disabled but the bitmap still renders. */
+    if(EVE_CHIPID < EVE_BT815) {
+        LV_LOG_INFO("EVE5: colorkey unsupported on chipid=%u (need BT815+ for swizzle)", (unsigned)EVE_CHIPID);
+        return;
+    }
+
     bool extended = eve5_is_extended_format(eve_format);
 
     if(!extended) {

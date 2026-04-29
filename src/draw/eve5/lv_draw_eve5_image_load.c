@@ -292,12 +292,32 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 
     EVE_Hal_requestFenceBeforeSwap(phost);
 
-    /* Get actual format from coprocessor */
+    /* Query format from the coprocessor. CMD_GETIMAGE (returning source/fmt/w/h/palette
+     * in one call) is BT817+. On earlier chips we use CMD_GETIMAGE_FORMAT, which falls
+     * back to reading the format word from a hardcoded coprocessor RAM address
+     * (0x3097e8) for backward compat — see EVE_CoCmd_IO.c. Earlier-gen output formats
+     * are not paletted-with-separate-address, so we use the addr we passed to
+     * CMD_LOADIMAGE for the source and the parsed JPEG/PNG dimensions for w/h. */
     uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
-    bool got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
+    bool got_image = false;
 
-    LV_LOG_INFO("EVE5 HW_DECODE: getImage: source=0x%08x fmt=%u w=%u h=%u palette=0x%08x (alloc=0x%08x)",
-                out_source, out_fmt, out_w, out_h, out_palette, addr);
+#if (EVE_SUPPORT_CHIPID >= EVE_BT817)
+    if(EVE_CHIPID >= EVE_BT817) {
+        got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
+        LV_LOG_INFO("EVE5 HW_DECODE: getImage: source=0x%08x fmt=%u w=%u h=%u palette=0x%08x (alloc=0x%08x)",
+                    out_source, out_fmt, out_w, out_h, out_palette, addr);
+    }
+    else
+#endif
+    {
+        got_image = EVE_CoCmd_getImage_format(phost, &out_fmt);
+        out_source = addr;
+        out_w = img_w;
+        out_h = img_h;
+        out_palette = 0;
+        LV_LOG_INFO("EVE5 HW_DECODE: getImage_format: fmt=%u (header w=%u h=%u alloc=0x%08x)",
+                    out_fmt, img_w, img_h, addr);
+    }
 
     if(got_image) {
         /* For PALETTEDARGB8, CMD_LOADIMAGE stores palette at alloc start */

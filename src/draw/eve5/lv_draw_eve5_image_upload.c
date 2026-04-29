@@ -36,6 +36,7 @@ static void convert_rgb888_to_rgb565(const uint8_t * src, uint8_t * dst, uint32_
 static void convert_xrgb8888_to_rgb565(const uint8_t * src, uint8_t * dst, uint32_t w);
 static void convert_rgb565a8_to_argb4(const uint8_t * rgb, const uint8_t * alpha,
                                       uint8_t * dst, uint32_t w);
+static void convert_a2_to_l4(const uint8_t * src, uint8_t * dst, uint32_t w);
 
 /**********************
  * IMAGE FORMAT CONVERSION
@@ -145,6 +146,28 @@ static void convert_rgb565a8_to_argb4(const uint8_t * rgb, const uint8_t * alpha
     }
 }
 
+/* A2 (LVGL): 4 pixels per byte, MSB-first, 2 bits each.
+ * L4 (EVE): 2 pixels per byte, high nibble = left pixel.
+ * Bit-replicate the 2-bit value to 4 bits so 0/1/2/3 → 0/5/A/F (preserves
+ * proportional alpha levels). Caller must zero dst_row beforehand. */
+static void convert_a2_to_l4(const uint8_t * src, uint8_t * dst, uint32_t w)
+{
+    for(uint32_t x = 0; x < w; x++) {
+        uint32_t src_byte = x >> 2;
+        uint32_t src_shift = (3 - (x & 3)) << 1;
+        uint8_t v = (uint8_t)((src[src_byte] >> src_shift) & 0x3);
+        uint8_t l4 = (uint8_t)((v << 2) | v);
+
+        uint32_t dst_byte = x >> 1;
+        if((x & 1) == 0) {
+            dst[dst_byte] = (uint8_t)(l4 << 4);
+        }
+        else {
+            dst[dst_byte] |= l4;
+        }
+    }
+}
+
 /**
  * Public per-row converter: dispatches to the right per-pixel conversion
  * based on the (LVGL format, EVE format) pair.
@@ -190,6 +213,13 @@ bool lv_draw_eve5_convert_row(lv_color_format_t lv_cf, uint16_t eve_fmt,
             }
             return false;
 
+        case LV_COLOR_FORMAT_A2:
+            if(eve_fmt == L4) {
+                convert_a2_to_l4(src_row, dst_row, (uint32_t)w);
+                return true;
+            }
+            return false;
+
         default:
             return false;
     }
@@ -219,8 +249,17 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
             break;
 
         case LV_COLOR_FORMAT_A2:
-            *eve_format = L2;
-            *bits_per_pixel = 2;
+            /* L2 was added in EVE2 (FT810+). FT800/FT801 only have L1 and L4 — fall
+             * back to L4 with 2bpp→4bpp bit-replication so 0/1/2/3 → 0/5/A/F. */
+            if(hal->ChipId >= EVE_FT810) {
+                *eve_format = L2;
+                *bits_per_pixel = 2;
+            }
+            else {
+                *eve_format = L4;
+                *bits_per_pixel = 4;
+                *needs_conversion = true;
+            }
             break;
 
         case LV_COLOR_FORMAT_A4:
@@ -578,6 +617,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                 }
 
             /* All other conversion cases route through the per-row helper. */
+            case LV_COLOR_FORMAT_A2:
             case LV_COLOR_FORMAT_RGB565_SWAPPED:
             case LV_COLOR_FORMAT_RGB888:
             case LV_COLOR_FORMAT_XRGB8888:
