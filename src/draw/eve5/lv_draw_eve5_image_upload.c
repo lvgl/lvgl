@@ -430,8 +430,10 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
         palette_size = 256 * sizeof(lv_color32_t);
     }
 
-    /* Allocate RAM_G space */
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, palette_size + eve_size, GA_ALIGN_4);
+    /* Allocate RAM_G space. On pre-BT820 the allocator caps live handles at 64;
+     * flag image source uploads as GC so they can be reclaimed under pressure. */
+    uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
+    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, palette_size + eve_size, alloc_flags);
     uint32_t base_addr = Esd_GpuAlloc_Get(u->allocator, handle);
 
     if(base_addr == GA_INVALID) {

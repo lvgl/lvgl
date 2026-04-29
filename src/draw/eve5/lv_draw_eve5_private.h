@@ -118,6 +118,20 @@ extern "C" {
 #define LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 0
 #endif
 
+/* Pre-BT820 scratch ring for gradient bitmaps. The pre-BT820 GPU allocator
+ * (the variant of Esd_GpuAlloc used on FT80X..BT81X) caps live allocation
+ * handles at 64; a frame with many gradients trips it. BT820 uses Esd_GpuAlloc5
+ * which doesn't have that ceiling. The ring takes one allocator handle up
+ * front and serves an unbounded number of frame-local gradient uploads from
+ * it; read/write cursors advance with CMD_SWAP so the section being scanned
+ * out isn't overwritten while we build the next frame's DL.
+ *
+ * Sized for ~32 small gradients per frame at ~64 B each (a 16-pixel pre-
+ * rendered strip is the common case), with two-frame in-flight headroom. */
+#ifndef LV_DRAW_EVE5_RING_SIZE
+#define LV_DRAW_EVE5_RING_SIZE 4096
+#endif
+
 /*********************
  * DEFINES
  *********************/
@@ -194,6 +208,23 @@ typedef struct {
     Esd_GpuHandle edge_handle;
 } lv_draw_eve5_shadow_slot_t;
 
+/* Pre-BT820 transient-allocation ring (currently used only for gradient bitmaps).
+ * Three cursors using absolute (unwrapped) positions: write_abs advances on
+ * each allocation, curr_start snapshots write_abs at every CMD_SWAP, and
+ * safe_until lags one swap behind curr_start — anything before safe_until is
+ * no longer being scanned out and is safe to overwrite. The free byte count
+ * is ring_size - (write_abs - safe_until); allocation fails when a request
+ * would push that delta past ring_size. base == GA_INVALID on chips that
+ * don't use the ring (BT820+). */
+typedef struct {
+    Esd_GpuHandle handle;
+    uint32_t base;
+    uint32_t size;
+    uint32_t write_abs;
+    uint32_t curr_start;
+    uint32_t safe_until;
+} lv_draw_eve5_ring_t;
+
 /* Resolved image source: direct pointer or decoder session */
 typedef struct {
     LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dsc;
@@ -264,6 +295,9 @@ typedef struct {
     uint32_t canvas_orig_palette;
     int32_t canvas_orig_w;
     int32_t canvas_orig_h;
+
+    /* Pre-BT820 transient ring (gradients). Unused on BT820+. */
+    lv_draw_eve5_ring_t scratch_ring;
 } lv_draw_eve5_unit_t;
 
 /**********************
@@ -452,6 +486,16 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u, lv_draw_buf_t * buf, c
  * Returns true if the (lv_cf, eve_fmt) pair is supported. */
 bool lv_draw_eve5_convert_row(lv_color_format_t lv_cf, uint16_t eve_fmt,
                               const uint8_t * src_row, uint8_t * dst_row, int32_t w);
+
+/* Scratch ring (pre-BT820 only). init/deinit are no-ops on BT820+ where
+ * Esd_GpuAlloc handles short-lived allocations directly. */
+void lv_draw_eve5_ring_init(lv_draw_eve5_unit_t * u);
+void lv_draw_eve5_ring_deinit(lv_draw_eve5_unit_t * u);
+/** Allocate `size` bytes from the ring with `align`-byte alignment.
+ *  Returns RAM_G address, or GA_INVALID when the ring is unused or full. */
+uint32_t lv_draw_eve5_ring_alloc(lv_draw_eve5_unit_t * u, uint32_t size, uint32_t align);
+/** Advance the in-use boundary; called once per CMD_SWAP. */
+void lv_draw_eve5_ring_swap(lv_draw_eve5_unit_t * u);
 
 #if LV_DRAW_EVE5_SW_FALLBACK
 /**********************

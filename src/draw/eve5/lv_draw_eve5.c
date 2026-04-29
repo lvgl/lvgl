@@ -162,6 +162,8 @@ void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     lv_draw_eve5_sw_cache_init(unit);
 #endif
 
+    lv_draw_eve5_ring_init(unit);
+
     /* Load EVE ROM fonts into their matching bitmap handles (16-31) */
     for(uint8_t f = 16; f <= 31; f++) {
         EVE_CoCmd_romFont(hal, f, f);
@@ -1322,6 +1324,28 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
     EVE_CmdSync sync = EVE_Cmd_sync(phost);
     Esd_GpuAlloc_FlushPending(u->allocator, sync);
+
+    /* Advance the scratch ring's in-use boundary to match the just-issued
+     * CMD_SWAP. The frame we just built is now the "currently scanned out"
+     * region; the frame before it is released. */
+    lv_draw_eve5_ring_swap(u);
+
+    /* Run the GA3 mark-and-sweep GC between fullscreen swaps. Every Get()
+     * call this frame refreshed GA_USED_FLAG on handles in use; Update frees
+     * GC-flagged handles whose USED bit wasn't set, then clears USED for the
+     * next cycle. Two-frame lifecycle: a handle survives one Update with
+     * USED set, then gets freed on the next Update if not refreshed.
+     *
+     * Timing: this must run AFTER the previous swap has completed, so the
+     * frame whose handles we might free is no longer being scanned out by
+     * the GPU. waitFlush blocks until the coprocessor drains its FIFO; on
+     * pre-BT820, CMD_SWAP itself is blocking until V-sync, so once waitFlush
+     * returns, the swap has happened and the old DL bank is inactive.
+     *
+     * Distinct from Esd_GpuAlloc_UpdateFree (sync-based deferred queue, GA5).
+     * No-op on BT820 — GA5 has no frame-based GC and we don't take this path. */
+    EVE_Cmd_waitFlush(phost);
+    Esd_GpuAlloc_Update(u->allocator);
 
     /* Bookkeeping mirrors lv_draw_eve5_hal_finish_layer */
     lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);

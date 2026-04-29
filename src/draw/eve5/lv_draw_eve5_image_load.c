@@ -205,7 +205,8 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, decoded_size, GA_ALIGN_4);
+    uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
+    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, decoded_size, alloc_flags);
     uint32_t addr = Esd_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate %u bytes for decoded image", decoded_size);

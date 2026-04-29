@@ -539,7 +539,8 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     int32_t decoded_stride = ALIGN_UP((int32_t)(img_w * 4), 4);
     uint32_t decoded_size = (uint32_t)(decoded_stride * (int32_t)img_h);
 
-    Esd_GpuHandle final_handle = Esd_GpuAlloc_Alloc(alloc, decoded_size, GA_ALIGN_4);
+    uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(phost) ? 0 : GA_GC_FLAG);
+    Esd_GpuHandle final_handle = Esd_GpuAlloc_Alloc(alloc, decoded_size, alloc_flags);
     uint32_t final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", decoded_size);

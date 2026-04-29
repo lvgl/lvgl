@@ -227,14 +227,27 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
 
     uint32_t byte_count = pixel_count * 4;
     uint32_t byte_count_aligned = ALIGN_UP(byte_count, 4);
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, byte_count_aligned, 0);
-    uint32_t addr = Esd_GpuAlloc_Get(u->allocator, handle);
-    if(addr == GA_INVALID) {
-        LV_LOG_WARN("EVE5: Failed to allocate GPU memory for gradient bitmap");
-        return false;
-    }
 
-    Esd_GpuAlloc_PendingFree(u->allocator, handle);
+    /* Pre-BT820: serve from the scratch ring (the underlying allocator caps
+     * live handles at 64, which a frame full of gradients can blow past).
+     * BT820 uses Esd_GpuAlloc directly with PendingFree → deferred reclaim. */
+    uint32_t addr;
+    if(EVE_Hal_supportRenderTarget(phost)) {
+        Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, byte_count_aligned, 0);
+        addr = Esd_GpuAlloc_Get(u->allocator, handle);
+        if(addr == GA_INVALID) {
+            LV_LOG_WARN("EVE5: Failed to allocate GPU memory for gradient bitmap");
+            return false;
+        }
+        Esd_GpuAlloc_PendingFree(u->allocator, handle);
+    }
+    else {
+        addr = lv_draw_eve5_ring_alloc(u, byte_count_aligned, 4);
+        if(addr == GA_INVALID) {
+            LV_LOG_WARN("EVE5: Failed to allocate gradient bitmap from scratch ring");
+            return false;
+        }
+    }
 
     EVE_CoCmd_memWrite(phost, addr, byte_count);
     for(uint32_t i = 0; i < pixel_count; i++) {

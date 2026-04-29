@@ -225,7 +225,11 @@ static bool upload_whole_font(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc
 
     if(total_size == 0) return false;
 
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, total_size, GA_ALIGN_4);
+    /* On pre-BT820 the GPU allocator caps live handles at 64 — flag font
+     * allocations as GC so the allocator can reclaim them when out-of-RAM_G
+     * pressure hits. BT820+ uses Esd_GpuAlloc5 which has no such cap. */
+    uint32_t flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
+    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, total_size, flags);
     uint32_t base_addr = Esd_GpuAlloc_Get(u->allocator, handle);
     if(base_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate whole font (%"PRIu32" bytes, %"PRIu32" glyphs)",
@@ -281,7 +285,8 @@ static bool upload_single_glyph(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_d
     uint32_t stride = ALIGN_UP((g->box_w * bpp + 7) / 8, 4);
     uint32_t glyph_size = stride * g->box_h;
 
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, glyph_size, GA_ALIGN_4);
+    uint32_t flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
+    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, glyph_size, flags);
     uint32_t addr = Esd_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) return false;
 
@@ -562,7 +567,8 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
     if(glyph_data == NULL || glyph_data->data == NULL) return GA_INVALID;
 
     uint32_t glyph_size = eve_stride * g_h;
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, glyph_size, GA_ALIGN_4);
+    uint32_t flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
+    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, glyph_size, flags);
     addr = Esd_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) return GA_INVALID;
 
