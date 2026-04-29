@@ -203,7 +203,7 @@ static uint32_t compute_glyph_count(const lv_font_fmt_txt_dsc_t * font_dsc)
         }
         if(end_gid > max_gid) max_gid = end_gid;
     }
-    return max_gid + 1;
+    return max_gid;
 }
 
 /**
