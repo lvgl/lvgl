@@ -225,14 +225,30 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
         }
     }
 
-    uint32_t byte_count = pixel_count * 4;
+    /* ARGB8 is BT820-only (format 20). On pre-EVE5 we drop to a 16bpp format:
+     *   - ARGB4 (format 6) when the gradient carries alpha (any stop opa < max,
+     *     parent opa < max, or alpha_to_rgb mode using alpha as the gradient).
+     *   - RGB565 (format 7) when fully opaque — gives 5-6-5 RGB precision vs
+     *     ARGB4's 4-4-4, so smooth gradients band less.
+     * pixel_count is 2/16/256 — always even, so 16bpp stride is 4-byte aligned
+     * and we can write two pixels per memWrite word. */
+    bool is_argb8 = (EVE_GEN >= EVE5);
+    bool need_alpha = alpha_to_rgb || opa < LV_OPA_MAX;
+    if(!need_alpha) {
+        for(uint8_t i = 0; i < grad->stops_count; i++) {
+            if(grad->stops[i].opa < LV_OPA_MAX) { need_alpha = true; break; }
+        }
+    }
+    uint8_t bpp = is_argb8 ? 4 : 2;
+    uint16_t eve_fmt = is_argb8 ? ARGB8 : (need_alpha ? ARGB4 : RGB565);
+    uint32_t byte_count = pixel_count * bpp;
     uint32_t byte_count_aligned = ALIGN_UP(byte_count, 4);
 
     /* Pre-BT820: serve from the scratch ring (the underlying allocator caps
      * live handles at 64, which a frame full of gradients can blow past).
      * BT820 uses Esd_GpuAlloc directly with PendingFree → deferred reclaim. */
     uint32_t addr;
-    if(EVE_Hal_supportRenderTarget(phost)) {
+    if(is_argb8) {
         Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, byte_count_aligned, 0);
         addr = Esd_GpuAlloc_Get(u->allocator, handle);
         if(addr == GA_INVALID) {
@@ -250,28 +266,64 @@ bool setup_gradient_bitmap(lv_draw_eve5_unit_t * u, const lv_grad_dsc_t * grad,
     }
 
     EVE_CoCmd_memWrite(phost, addr, byte_count);
-    for(uint32_t i = 0; i < pixel_count; i++) {
-        EVE_Cmd_wr32(phost, pixels[i]);
+    if(is_argb8) {
+        for(uint32_t i = 0; i < pixel_count; i++) {
+            EVE_Cmd_wr32(phost, pixels[i]);
+        }
+    }
+    else if(need_alpha) {
+        /* ARGB4 layout (matches convert_argb8888_to_argb4):
+         *   16-bit value, little-endian, A in MSB nibble:
+         *     bits 15-12 = A4, 11-8 = R4, 7-4 = G4, 3-0 = B4. */
+        for(uint32_t i = 0; i < pixel_count; i += 2) {
+            uint32_t p0 = pixels[i];
+            uint32_t p1 = pixels[i + 1];
+            uint16_t v0 = (uint16_t)((((p0 >> 24) & 0xF0) << 8)
+                                     | (((p0 >> 16) & 0xF0) << 4)
+                                     | ((p0 >> 8) & 0xF0)
+                                     | ((p0 & 0xFF) >> 4));
+            uint16_t v1 = (uint16_t)((((p1 >> 24) & 0xF0) << 8)
+                                     | (((p1 >> 16) & 0xF0) << 4)
+                                     | ((p1 >> 8) & 0xF0)
+                                     | ((p1 & 0xFF) >> 4));
+            EVE_Cmd_wr32(phost, ((uint32_t)v1 << 16) | v0);
+        }
+    }
+    else {
+        /* RGB565 layout (matches convert_rgb888_to_rgb565):
+         *   bits 15-11 = R5, 10-5 = G6, 4-0 = B5. */
+        for(uint32_t i = 0; i < pixel_count; i += 2) {
+            uint32_t p0 = pixels[i];
+            uint32_t p1 = pixels[i + 1];
+            uint16_t v0 = (uint16_t)((((p0 >> 16) & 0xF8) << 8)
+                                     | (((p0 >> 8) & 0xFC) << 3)
+                                     | ((p0 & 0xFF) >> 3));
+            uint16_t v1 = (uint16_t)((((p1 >> 16) & 0xF8) << 8)
+                                     | (((p1 >> 8) & 0xFC) << 3)
+                                     | ((p1 & 0xFF) >> 3));
+            EVE_Cmd_wr32(phost, ((uint32_t)v1 << 16) | v0);
+        }
     }
     EVE_Hal_requestFenceBeforeSwap(phost);
 
     int32_t bmp_w = is_ver ? 1 : (int32_t)pixel_count;
     int32_t bmp_h = is_ver ? (int32_t)pixel_count : 1;
-    int32_t stride = bmp_w * 4;
+    int32_t stride = bmp_w * bpp;
 
     EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
-    EVE_CoCmd_dl(phost, BITMAP_LAYOUT_H(0, 0));
-    EVE_CoCmd_dl(phost, BITMAP_SIZE_H(w >> 9, h >> 9));
-    EVE_CoCmd_dl(phost, BITMAP_LAYOUT(ARGB8, stride, bmp_h));
+    /* Use the CoDl wrappers — they emit BITMAP_{LAYOUT,SIZE,SOURCE}_H only on
+     * chips that support them (LAYOUT_H/SIZE_H: FT810+, SOURCE_H: BT820+). */
+    EVE_CoDl_bitmapLayout(phost, eve_fmt, (uint16_t)stride, (uint16_t)bmp_h);
     if(is_ver) {
-        EVE_CoCmd_dl(phost, BITMAP_SIZE(BILINEAR, REPEAT, BORDER, w, h));
+        EVE_CoDl_bitmapSize(phost, BILINEAR, REPEAT, BORDER,
+                            (uint16_t)w, (uint16_t)h);
     }
     else {
-        EVE_CoCmd_dl(phost, BITMAP_SIZE(BILINEAR, BORDER, REPEAT, w, h));
+        EVE_CoDl_bitmapSize(phost, BILINEAR, BORDER, REPEAT,
+                            (uint16_t)w, (uint16_t)h);
     }
-    EVE_CoCmd_dl(phost, BITMAP_SOURCE_H(addr >> 24));
-    EVE_CoCmd_dl(phost, BITMAP_SOURCE(addr));
+    EVE_CoDl_bitmapSource(phost, addr);
 
     /* Scale bitmap: map (pixel_count - 1) texels to the gradient dimension.
      * Use signed 1.15 for best precision; fall back to unsigned 8.8 on overflow. */
