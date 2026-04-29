@@ -47,7 +47,7 @@ typedef struct {
     lv_point_t center;
 
     /**An image source to be used instead of `color`. `NULL` if unused*/
-    LV_IMAGE_DSC_CONST void * img_src;
+    const void * img_src;
 
     /**The outer radius of the arc*/
     uint16_t radius;

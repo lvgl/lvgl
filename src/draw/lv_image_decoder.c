@@ -123,7 +123,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
     return decoder ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, LV_IMAGE_DSC_CONST void * src,
+lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src,
                                   const lv_image_decoder_args_t * args)
 {
     LV_PROFILER_DECODER_BEGIN;
@@ -133,7 +133,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, LV_IMAGE_DSC_CON
         LV_PROFILER_DECODER_END;
         return LV_RESULT_INVALID;
     }
-    dsc->src = src;
+    dsc->src = (LV_IMAGE_DSC_CONST void *)src;
     dsc->src_type = lv_image_src_get_type(src);
 
     lv_mutex_lock(img_decoder_open_lock_p);

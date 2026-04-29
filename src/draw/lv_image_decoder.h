@@ -113,7 +113,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  * @return LV_RESULT_OK: opened the image. `dsc->decoded` and `dsc->header` are set.
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
-lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, LV_IMAGE_DSC_CONST void * src,
+lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src,
                                   const lv_image_decoder_args_t * args);
 
 /**
