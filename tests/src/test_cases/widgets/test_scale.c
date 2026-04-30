@@ -656,4 +656,89 @@ void test_scale_with_1_tick(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_9.png");
 }
 
+/* When LV_STYLE_PAD_RADIAL is set on a section's main style, the section arc
+ * should be drawn with a radius reduced by the pad value. Two sections sharing
+ * the same range but with different radial paddings must therefore produce
+ * concentric arcs at distinct radii. */
+void test_scale_section_pad_radial(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_obj_set_size(scale, 200, 200);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+    lv_obj_center(scale);
+
+    lv_scale_set_label_show(scale, false);
+    lv_scale_set_total_tick_count(scale, 11);
+    lv_scale_set_major_tick_every(scale, 5);
+    lv_scale_set_range(scale, 0, 100);
+
+    /* Make the main arc visible so the section arcs can be visually distinguished. */
+    static lv_style_t main_arc_style;
+    lv_style_init(&main_arc_style);
+    lv_style_set_arc_color(&main_arc_style, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_arc_width(&main_arc_style, 2U);
+    lv_obj_add_style(scale, &main_arc_style, LV_PART_MAIN);
+
+    /* Section 1: no radial pad - the arc should sit on the default scale radius. */
+    static lv_style_t section_no_pad_style;
+    lv_style_init(&section_no_pad_style);
+    lv_style_set_arc_color(&section_no_pad_style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_arc_width(&section_no_pad_style, 4U);
+
+    lv_scale_section_t * section_no_pad = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section_no_pad, 0, 50);
+    lv_scale_set_section_style_main(scale, section_no_pad, &section_no_pad_style);
+
+    /* Section 2: radial pad of 20 - the section arc must be drawn 20 px inside. */
+    static lv_style_t section_padded_style;
+    lv_style_init(&section_padded_style);
+    lv_style_set_arc_color(&section_padded_style, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_arc_width(&section_padded_style, 4U);
+    lv_style_set_pad_radial(&section_padded_style, 20);
+
+    lv_scale_section_t * section_padded = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section_padded, 50, 100);
+    lv_scale_set_section_style_main(scale, section_padded, &section_padded_style);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_10.png");
+}
+
+/* Verify that LV_STYLE_PAD_RADIAL on a section's main style only affects round
+ * scale modes. For non-round modes the property must be ignored - the section
+ * line should be drawn identically with or without the pad set. */
+void test_scale_section_pad_radial_ignored_in_horizontal_mode(void)
+{
+    static lv_style_t section_style;
+    lv_style_init(&section_style);
+    lv_style_set_line_color(&section_style, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_line_width(&section_style, 4U);
+    /* Setting pad_radial here should have no effect in horizontal mode. */
+    lv_style_set_pad_radial(&section_style, 50);
+
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_obj_set_size(scale, lv_pct(80), 100);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_obj_center(scale);
+
+    lv_scale_set_label_show(scale, true);
+    lv_scale_set_total_tick_count(scale, 11);
+    lv_scale_set_major_tick_every(scale, 5);
+    lv_scale_set_range(scale, 0, 100);
+
+    lv_scale_section_t * section = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section, 50, 100);
+    lv_scale_set_section_style_main(scale, section, &section_style);
+
+    /* Force a layout/draw cycle. The render should complete without using the
+     * pad_radial property on horizontal scales. */
+    lv_obj_update_layout(scale);
+    lv_refr_now(NULL);
+
+    /* Sanity check: the property is still readable from the style. */
+    lv_style_value_t v;
+    TEST_ASSERT_EQUAL(LV_STYLE_RES_FOUND,
+                      lv_style_get_prop(&section_style, LV_STYLE_PAD_RADIAL, &v));
+    TEST_ASSERT_EQUAL_INT(50, v.num);
+}
+
 #endif

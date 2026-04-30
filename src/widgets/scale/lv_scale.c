@@ -1227,6 +1227,11 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             lv_point_t section_arc_center;
             int32_t section_arc_radius;
             scale_get_center(obj, &section_arc_center, &section_arc_radius);
+            lv_style_value_t v;
+            if(section->main_style != NULL
+               && lv_style_get_prop(section->main_style, LV_STYLE_PAD_RADIAL, &v) == LV_STYLE_RES_FOUND) {
+                section_arc_radius -= v.num;
+            }
 
             /* TODO: Add compensation for the width of the first and last tick over the arc */
             const int32_t section_start_angle = lv_map(section->range_min, scale->range_min, scale->range_max, scale->rotation,
