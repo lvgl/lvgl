@@ -7,16 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_mask_private.h"
-#include "../lv_draw_mask.h"
-#include "../lv_draw.h"
 
 #if LV_DRAW_SW_COMPLEX
 #include "../../core/lv_global.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_assert.h"
 #include "../../osal/lv_os_private.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

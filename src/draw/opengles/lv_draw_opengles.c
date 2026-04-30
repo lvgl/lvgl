@@ -10,27 +10,16 @@
 #include "lv_draw_opengles.h"
 #if LV_USE_DRAW_OPENGLES
 
-#if LV_USE_DRAW_NANOVG
-    #error "LV_USE_DRAW_NANOVG and LV_USE_DRAW_OPENGLES cannot be enabled at the same time. Disable one of them in lv_conf.h or Kconfig."
-#endif
+// #if LV_USE_DRAW_NANOVG
+//     #error "LV_USE_DRAW_NANOVG and LV_USE_DRAW_OPENGLES cannot be enabled at the same time. Disable one of them in lv_conf.h or Kconfig."
+// #endif
 
 #include "../lv_draw_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../drivers/opengles/lv_opengles_debug.h"
-#include "../../drivers/opengles/lv_opengles_texture.h"
-#include "../../drivers/opengles/lv_opengles_driver.h"
 #include "../../drivers/opengles/lv_opengles_private.h"
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_rect.h"
-#include "../../draw/lv_draw_arc.h"
-#include "../../draw/lv_draw_image.h"
-#include "../../draw/lv_draw_triangle.h"
-#include "../../draw/lv_draw_line.h"
-#include "../../draw/lv_draw_3d.h"
-#include "../../core/lv_obj.h"
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
 #include "../../misc/lv_area_private.h"
 
 /*********************

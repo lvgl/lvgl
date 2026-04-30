@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_buf_convert.h"
-#include "../../misc/lv_profiler.h"
+
+#include "../../lv_internal.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     #include "neon/lv_draw_buf_convert_neon.h"

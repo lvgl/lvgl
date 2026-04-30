@@ -7,7 +7,8 @@
  *      INCLUDES
  *********************/
 
-#include "lv_windows_input.h"
+#include "../../lv_internal.h"
+
 #if LV_USE_WINDOWS
 
 #ifdef __GNUC__
@@ -15,7 +16,6 @@
 #endif
 
 #include "lv_windows_context.h"
-#include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_obj_private.h"

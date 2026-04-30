@@ -7,10 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_test_helpers.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_TEST
-#include "../../lvgl.h"
 
 /*********************
  *      DEFINES

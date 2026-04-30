@@ -6,11 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_theme_private.h"
-#include "../../../lvgl.h" /*To see all the widgets*/
+
+#include "../../lv_internal.h"
 
 #if LV_USE_THEME_MONO
 
+#include "../lv_theme_private.h"
 #include "lv_theme_mono.h"
 #include "../../core/lv_global.h"
 

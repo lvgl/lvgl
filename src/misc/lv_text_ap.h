@@ -13,11 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_text.h"
-#include "lv_types.h"
-#include "../draw/lv_draw.h"
 
-#if LV_USE_ARABIC_PERSIAN_CHARS == 1
+#include "../lv_internal.h"
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
 
 /*********************
  *      DEFINES

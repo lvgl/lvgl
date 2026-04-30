@@ -11,7 +11,6 @@
 
 #if LV_USE_DRAW_NANOVG
 
-#include "../../display/lv_display.h"
 #include "../../core/lv_refr_private.h"
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"

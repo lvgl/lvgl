@@ -17,14 +17,6 @@ extern "C" {
 
 #if LV_USE_DRAW_VG_LITE
 
-#include "../../draw/lv_draw_vector.h"
-#include "../../draw/lv_draw_arc.h"
-#include "../../draw/lv_draw_rect.h"
-#include "../../draw/lv_draw_image.h"
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_line.h"
-#include "../../draw/lv_draw_triangle.h"
-
 /*********************
  *      DEFINES
  *********************/

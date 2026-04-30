@@ -9,12 +9,7 @@
 #include "lv_line_private.h"
 #include "../../core/lv_obj_class_private.h"
 
-
-#if LV_USE_LINE != 0
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_types.h"
-#include "../../draw/lv_draw.h"
+#if LV_USE_LINE
 
 /*********************
  *      DEFINES

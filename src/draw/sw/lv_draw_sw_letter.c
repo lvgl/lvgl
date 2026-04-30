@@ -20,14 +20,7 @@
 
 #if LV_USE_DRAW_SW
 
-#include "../../display/lv_display.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_style.h"
-#include "../../font/lv_font.h"
 #include "../../core/lv_refr_private.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

@@ -41,8 +41,7 @@
 ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "../../misc/lv_ll.h"
-#include "../../misc/lv_types.h"
+#include "../../lv_internal.h"
 
 #if defined(__cplusplus)
 extern "C" {

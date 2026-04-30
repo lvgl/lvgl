@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vector.h"
+#include "lv_draw_private.h"
 
 #if LV_USE_VECTOR_GRAPHIC
 

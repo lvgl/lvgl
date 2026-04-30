@@ -7,15 +7,11 @@
  *      INCLUDES
  *********************/
 
-#include "lv_ft81x.h"
+#include "../../../lv_internal.h"
 #if LV_USE_FT81X
 
 #include "lv_ft81x_defines.h"
 
-#include "../../../stdlib/lv_mem.h"
-#include "../../../stdlib/lv_sprintf.h"
-#include "../../../stdlib/lv_string.h"
-#include "../../../misc/lv_types.h"
 #include "../../../misc/lv_utils.h"
 
 /*********************

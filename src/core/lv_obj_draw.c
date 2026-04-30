@@ -8,10 +8,6 @@
  *********************/
 #include "lv_obj_draw_private.h"
 #include "lv_obj_private.h"
-#include "lv_obj_style.h"
-#include "../display/lv_display.h"
-#include "../indev/lv_indev.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

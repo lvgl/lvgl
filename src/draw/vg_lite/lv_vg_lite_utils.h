@@ -18,11 +18,6 @@ extern "C" {
 
 #if LV_USE_DRAW_VG_LITE
 
-#include "../../misc/lv_profiler.h"
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_style.h"
-#include "../../misc/lv_matrix.h"
-
 #if LV_USE_VG_LITE_THORVG
 #include "../../debugging/vg_lite_tvg/vg_lite.h"
 #else

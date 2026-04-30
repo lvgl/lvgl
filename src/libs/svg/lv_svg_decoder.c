@@ -10,8 +10,8 @@
 #include "../../draw/lv_image_decoder_private.h"
 
 #if LV_USE_SVG
-#include "lv_svg_decoder.h"
 
+#include "lv_svg_decoder.h"
 #include "lv_svg_render.h"
 #include "../../draw/lv_draw_buf_private.h"
 #include "../../display/lv_display_private.h"

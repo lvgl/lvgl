@@ -19,10 +19,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_eve.h"
+#include "../../lv_internal.h"
 #if LV_USE_DRAW_EVE
 
-#include "lv_draw_eve_target.h"
 #include "lv_draw_eve_ram_g.h"
 #include "../lv_draw_private.h"
 #include "../../core/lv_global.h"

@@ -5,12 +5,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_nuttx_libuv.h"
-
-#include "../../lvgl.h"
-#include "../../lvgl_private.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_NUTTX
+#include "../../lvgl_private.h"
+
 #include <stdlib.h>
 
 #if LV_USE_NUTTX_LIBUV

@@ -16,7 +16,6 @@ extern "C" {
 #include "../../../../lv_internal.h"
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_RISCV_V
 
-#include "../../../../misc/lv_types.h"
 /*********************
  *      DEFINES
  *********************/

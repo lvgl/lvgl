@@ -11,8 +11,6 @@
 
 #if LV_USE_SDL && !LV_SDL_USE_EGL && LV_USE_DRAW_SDL
 
-#include "../../draw/lv_draw_buf.h"
-
 /*********************
  *      DEFINES
  *********************/

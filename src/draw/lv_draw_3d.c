@@ -7,10 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_3d.h"
-#if LV_USE_3DTEXTURE
-
 #include "lv_draw_private.h"
+
+#if LV_USE_3DTEXTURE
 
 /*********************
  *      DEFINES

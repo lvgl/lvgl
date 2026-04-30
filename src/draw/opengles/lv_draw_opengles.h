@@ -17,8 +17,6 @@ extern "C" {
 #include "../../lv_internal.h"
 #if LV_USE_DRAW_OPENGLES
 
-#include "../lv_draw.h"
-#include "../../misc/lv_area.h"
 
 /*********************
  *      DEFINES

@@ -7,25 +7,18 @@
  *      INCLUDES
  *********************/
 #include "lv_label_private.h"
+#if LV_USE_LABEL
+
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../draw/lv_draw_label_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_LABEL != 0
 #include "../../core/lv_obj_private.h"
-#include "../../misc/lv_assert.h"
-#include "../../core/lv_group.h"
-#include "../../display/lv_display.h"
 #include "../../draw/lv_draw_private.h"
-#include "../../misc/lv_color.h"
-#include "../../misc/lv_math.h"
 #include "../../misc/lv_bidi_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"
-#include "../../stdlib/lv_sprintf.h"
-#include "../../stdlib/lv_string.h"
 #include "../../core/lv_observer_private.h"
-#include "../../others/translation/lv_translation.h"
 
 /*********************
  *      DEFINES

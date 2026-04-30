@@ -404,6 +404,9 @@ void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, con
  */
 void lv_cache_entry_delete(lv_cache_entry_t * entry);
 
+#include "class/lv_cache_class.h"
+#include "instance/lv_image_cache.h"
+
 /*************************
  *    GLOBAL VARIABLES
  *************************/

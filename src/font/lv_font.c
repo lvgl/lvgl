@@ -7,13 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_font.h"
 #include "lv_font_private.h"
 #include "../misc/lv_text_private.h"
 #include "../misc/lv_utils.h"
-#include "../misc/lv_log.h"
-#include "../misc/lv_assert.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

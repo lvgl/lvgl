@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_nuttx_lcd.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_NUTTX
 
@@ -20,7 +20,6 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include "../../../lvgl.h"
 #include "../../lvgl_private.h"
 
 #ifdef __NuttX__

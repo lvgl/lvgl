@@ -1,5 +1,5 @@
 /**
-* @file lv_circle_buf.h
+* @file lv_circle_buf_private.h
 *
  */
 
@@ -15,7 +15,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_types.h"
+#include "../lv_internal.h"
 
 /*********************
  *      DEFINES

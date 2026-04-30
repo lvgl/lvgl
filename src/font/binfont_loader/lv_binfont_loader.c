@@ -6,12 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl.h"
+
+#include "../../lv_internal.h"
 #include "../fmt_txt/lv_font_fmt_txt_private.h"
 #include "../../misc/lv_fs_private.h"
-#include "../../misc/lv_types.h"
-#include "../../stdlib/lv_string.h"
-#include "lv_binfont_loader.h"
 
 /**********************
  *      TYPEDEFS

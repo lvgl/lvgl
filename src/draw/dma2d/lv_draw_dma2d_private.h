@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_dma2d.h"
+#include "../../lv_internal.h"
 #if LV_USE_DRAW_DMA2D
 
 #include "../lv_draw_private.h"

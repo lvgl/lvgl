@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_x11.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_X11
 

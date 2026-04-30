@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_st7796.h"
+#include "../../../lv_internal.h"
 
 #if LV_USE_ST7796
 

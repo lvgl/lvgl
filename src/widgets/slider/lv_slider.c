@@ -7,21 +7,14 @@
  *      INCLUDES
  *********************/
 #include "lv_slider_private.h"
+
+#if LV_USE_SLIDER
+
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_SLIDER != 0
-
-#include "../../misc/lv_assert.h"
-#include "../../core/lv_group.h"
-#include "../../indev/lv_indev.h"
 #include "../../indev/lv_indev_private.h"
-#include "../../display/lv_display.h"
-#include "../../draw/lv_draw.h"
-#include "../../stdlib/lv_string.h"
-#include "../../misc/lv_math.h"
-#include "../image/lv_image.h"
 #include "../../core/lv_observer_private.h"
 
 /*Check dependencies*/

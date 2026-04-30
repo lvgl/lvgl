@@ -3,7 +3,7 @@
  *
  */
 
-#include "lv_wayland_pointer.h"
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
 
@@ -13,7 +13,6 @@
 #include <wayland-cursor.h>
 #include <xkbcommon/xkbcommon.h>
 #include <linux/input-event-codes.h>
-#include "lv_wayland_private.h"
 
 /*********************
  *      INCLUDES

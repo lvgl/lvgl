@@ -10,7 +10,6 @@
 #include "lv_obj_event_private.h"
 #include "lv_obj_class_private.h"
 #include "lv_obj_private.h"
-#include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
 
 /*********************

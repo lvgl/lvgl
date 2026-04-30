@@ -12,7 +12,6 @@
 #include "lv_obj_draw_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_private.h"
-#include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
 #include "lv_refr_private.h"
 #include "../core/lv_global.h"

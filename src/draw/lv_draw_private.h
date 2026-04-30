@@ -18,7 +18,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw.h"
+#include "../lv_internal.h"
 #include "../osal/lv_os_private.h"
 #include "../misc/cache/lv_cache.h"
 

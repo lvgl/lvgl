@@ -8,8 +8,7 @@
  *********************/
 
 #include "lv_pending.h"
-#include "lv_array.h"
-#include "lv_assert.h"
+#include "../lv_internal.h"
 
 /*********************
  *      DEFINES

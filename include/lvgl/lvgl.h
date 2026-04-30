@@ -58,6 +58,7 @@
 #include "draw/lv_color.h"
 #include "draw/lv_color_op.h"
 #include "draw/lv_draw.h"
+#include "draw/lv_draw_3d.h"
 #include "draw/lv_draw_arc.h"
 #include "draw/lv_draw_blur.h"
 #include "draw/lv_draw_buf.h"

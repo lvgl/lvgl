@@ -57,13 +57,8 @@
 #include "lv_cache_sc_da.h"
 #include "../lv_cache_entry.h"
 #include "../lv_cache_entry_private.h"
-#include "../../../stdlib/lv_sprintf.h"
-#include "../../../stdlib/lv_string.h"
-
-#include "../../lv_iter.h"
-#include "../../lv_assert.h"
-#include "../../lv_math.h"
-#include "../../lv_types.h"
+#include "../../../lv_internal.h"
+#include "../../lv_iter_private.h"
 
 /*********************
  *      DEFINES

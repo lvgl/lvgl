@@ -9,10 +9,11 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../../lv_internal.h"
+
 #if LV_USE_SVG
 
-#include "lv_svg.h"
 #include "lv_svg_token.h"
 
 /*********************

@@ -35,10 +35,6 @@
 #include "../../lv_internal.h"
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
 
-#include "../lv_sprintf.h"
-#include "../lv_string.h"
-#include "../../misc/lv_types.h"
-
 #define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_USE_FLOAT)
 
 // 'ntoa' conversion buffer size, this must be big enough to hold one converted

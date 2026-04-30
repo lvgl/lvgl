@@ -12,6 +12,7 @@
 
 #include "../../misc/lv_fs_private.h"
 #include "../../core/lv_global.h"
+#include "../../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES

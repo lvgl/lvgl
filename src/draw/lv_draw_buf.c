@@ -7,10 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_buf_private.h"
-#include "../misc/lv_types.h"
-#include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
-#include "../misc/lv_math.h"
 #include "../misc/lv_area_private.h"
 #include "convert/lv_draw_buf_convert.h"
 

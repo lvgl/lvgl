@@ -7,14 +7,11 @@
  *      INCLUDES
  *********************/
 
-#include "lv_opengles_driver.h"
+#include "lv_opengles_private.h"
+
 #if LV_USE_OPENGLES
 
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_profiler.h"
-#include "../../misc/lv_matrix.h"
 #include "lv_opengles_debug.h"
-#include "lv_opengles_private.h"
 
 #include "../../display/lv_display_private.h"
 #include "../../draw/nanovg/lv_draw_nanovg.h"

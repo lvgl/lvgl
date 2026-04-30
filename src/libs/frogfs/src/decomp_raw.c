@@ -5,8 +5,6 @@
 #include "../../../lv_internal.h"
 #include LV_STDDEF_INCLUDE
 #include LV_STDINT_INCLUDE
-#include "../../../stdlib/lv_string.h"
-#include "../../../misc/lv_fs.h"
 
 #include "frogfs_priv.h"
 #include "frogfs_format.h"

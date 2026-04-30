@@ -9,9 +9,9 @@
 #include "../../../lv_internal.h"
 
 #if LV_USE_OPENGLES
+
 #include "../lv_opengles_private.h"
 #include "../lv_opengles_debug.h"
-#include "../../../misc/lv_types.h"
 #include "../../../misc/lv_rb_private.h"
 
 #ifdef __cplusplus

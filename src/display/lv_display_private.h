@@ -13,11 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_ext_data.h"
-#include "../misc/lv_types.h"
-#include "../core/lv_obj.h"
-#include "../draw/lv_draw.h"
-#include "lv_display.h"
+#include "../lv_internal.h"
 
 #if LV_USE_SYSMON
 #include "../debugging/sysmon/lv_sysmon_private.h"

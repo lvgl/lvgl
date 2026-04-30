@@ -7,10 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_cache_entry.h"
-#include "../../stdlib/lv_sprintf.h"
-#include "../lv_assert.h"
 #include "lv_cache_entry_private.h"
-#include "../../misc/lv_math.h"
 
 /*********************
  *      DEFINES

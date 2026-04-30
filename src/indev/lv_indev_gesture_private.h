@@ -1,15 +1,7 @@
-/*******************************************************************
- *
+/**
  * @file lv_indev_gesture_private.h
  *
- * Contains declarations and definition that are internal
- * to the gesture detection logic
- *
- * Copyright (c) 2024 EDGEMTech Ltd.
- *
- * Author EDGEMTech Ltd, (erik.tagirov@edgemtech.ch)
- *
- ******************************************************************/
+ */
 
 #ifndef LV_INDEV_GESTURE_PRIVATE_H
 #define LV_INDEV_GESTURE_PRIVATE_H
@@ -21,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../core/lv_obj.h"
+#include "../lv_internal.h"
 
 #if LV_USE_GESTURE_RECOGNITION
 

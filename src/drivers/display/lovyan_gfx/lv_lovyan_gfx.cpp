@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_lovyan_gfx.h"
+#include "../../../lv_internal.h"
 #if LV_USE_LOVYAN_GFX
 
 #include LV_LGFX_USER_INCLUDE

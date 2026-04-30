@@ -19,8 +19,6 @@
 #define NANOVG_GL_UTILS_H
 
 #include "../../lv_internal.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
 
 #if LV_USE_NANOVG
 

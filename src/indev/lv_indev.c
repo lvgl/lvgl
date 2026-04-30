@@ -1,8 +1,3 @@
-#include "lv_indev_private.h"
-#include "../misc/lv_event_private.h"
-#include "../misc/lv_area_private.h"
-#include "../misc/lv_anim_private.h"
-#include "../core/lv_obj_draw_private.h"
 /**
  * @file lv_indev.c
  *
@@ -11,19 +6,18 @@
 /*********************
  *      INCLUDES
  ********************/
+
+#include "lv_indev_private.h"
+#include "../misc/lv_event_private.h"
+#include "../misc/lv_area_private.h"
+#include "../misc/lv_anim_private.h"
+#include "../core/lv_obj_draw_private.h"
 #include "lv_indev_scroll.h"
-#include "lv_indev_gesture.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_obj_private.h"
-#include "../core/lv_group.h"
-#include "../core/lv_refr.h"
 
-#include "../tick/lv_tick.h"
 #include "../misc/lv_timer_private.h"
-#include "../misc/lv_math.h"
-#include "../misc/lv_profiler.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

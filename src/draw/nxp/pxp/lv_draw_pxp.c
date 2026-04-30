@@ -19,10 +19,7 @@
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
-
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    #include "../../../core/lv_global.h"
-#endif
+#include "../../../core/lv_global.h"
 
 /*********************
  *      DEFINES

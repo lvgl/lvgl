@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_nuttx_cache.h"
-#include "../../../lvgl.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_NUTTX
 

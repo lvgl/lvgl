@@ -6,14 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_qnx.h"
+#include "../../lv_internal.h"
 #if LV_USE_QNX
 #include <stdbool.h>
-#include "../../core/lv_refr.h"
-#include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
-#include "../../lv_init.h"
 #include <stdlib.h>
 #include <time.h>
 #include <screen/screen.h>

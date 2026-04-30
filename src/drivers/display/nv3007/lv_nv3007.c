@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_nv3007.h"
+#include "../../../lv_internal.h"
 
 #if LV_USE_NV3007
 

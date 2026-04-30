@@ -8,7 +8,7 @@
  */
 
 
-#include "lv_style.h"
+#include "../lv_internal.h"
 
 
 void lv_style_set_width(lv_style_t * style, int32_t value)

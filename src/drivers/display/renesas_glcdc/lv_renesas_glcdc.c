@@ -4,6 +4,13 @@
  */
 
 /*********************
+ *      INCLUDES
+ *********************/
+#include "../../../lv_internal.h"
+
+#if LV_USE_RENESAS_GLCDC
+
+/*********************
  *PLATFORM ABSTRACTION
  *********************/
 
@@ -18,13 +25,6 @@
     #define DISPLAY_VSIZE_INPUT0                LCD_CH0_IN_GR2_VSIZE
     #define DISPLAY_BUFFER_STRIDE_BYTES_INPUT0  LCD_CH0_IN_GR2_LINEOFFSET
 #endif /*_RENESAS_RA_*/
-
-/*********************
- *      INCLUDES
- *********************/
-#include "lv_renesas_glcdc.h"
-
-#if LV_USE_RENESAS_GLCDC
 
 #ifdef _RENESAS_RA_
     #include "LVGL_thread.h"

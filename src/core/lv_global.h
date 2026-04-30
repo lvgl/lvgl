@@ -15,20 +15,10 @@ extern "C" {
  *********************/
 #include "../lv_internal.h"
 
-#include "../misc/lv_types.h"
-#include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 #include "../draw/sw/lv_draw_sw.h"
 #endif
-#include "../misc/lv_anim.h"
-#include "../misc/lv_area.h"
-#include "../misc/lv_color_op.h"
-#include "../misc/lv_ll.h"
-#include "../misc/lv_log.h"
-#include "../misc/lv_style.h"
-#include "../misc/lv_timer.h"
 #include "../osal/lv_os_private.h"
-#include "../debugging/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED

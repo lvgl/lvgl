@@ -3,7 +3,6 @@
 #if LV_USE_OPENGLES
 
 #include "../opengl_shader/lv_opengl_shader_internal.h"
-#include "../../../misc/lv_types.h"
 
 static const lv_opengl_shader_t src_includes_v100[] = {{
         "hsv_adjust.glsl", R"(

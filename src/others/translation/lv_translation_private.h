@@ -18,7 +18,6 @@ extern "C" {
 #if LV_USE_TRANSLATION
 
 #include LV_STDINT_INCLUDE
-#include "../../misc/lv_array.h"
 
 /*********************
  *      DEFINES

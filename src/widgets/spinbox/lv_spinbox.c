@@ -6,14 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_spinbox_private.h"
 
 #if LV_USE_SPINBOX
 
 #include "../../core/lv_obj_class_private.h"
-#include "../../misc/lv_assert.h"
-#include "../../indev/lv_indev.h"
-#include "../../stdlib/lv_string.h"
 #include "../../core/lv_observer_private.h"
 
 /*Check dependencies*/

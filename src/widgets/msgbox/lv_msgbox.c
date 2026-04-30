@@ -6,18 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_msgbox_private.h"
-#include "../../core/lv_obj_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_MSGBOX
 
-#include "../label/lv_label.h"
-#include "../image/lv_image.h"
-#include "../../misc/lv_assert.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../misc/lv_text_private.h"
-#include "../../display/lv_display.h"
-#include "../../layouts/flex/lv_flex.h"
-#include "../../stdlib/lv_string.h"
 
 #if LV_USE_LABEL == 0
     #error "lv_mbox: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "

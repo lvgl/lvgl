@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../misc/lv_types.h"
-#include "lv_sdl_window.h"
+
+#include "../../lv_internal.h"
 
 #if LV_USE_SDL
 

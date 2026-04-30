@@ -3,16 +3,14 @@
  *
  */
 
-#include "lv_wayland_keyboard.h"
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
 
-#include "lv_wayland_private.h"
 #include <sys/mman.h>
 #include <unistd.h>
 #include <wayland-client-protocol.h>
 #include <xkbcommon/xkbcommon.h>
-#include "../../misc/lv_log.h"
 
 /*********************
  *      INCLUDES

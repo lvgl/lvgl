@@ -14,8 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_ext_data.h"
-#include "lv_event.h"
+#include "../lv_internal.h"
 
 /*********************
  *      DEFINES

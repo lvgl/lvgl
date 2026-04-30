@@ -10,10 +10,7 @@
 #include "../misc/lv_anim_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_class_private.h"
-#include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
-#include "../misc/lv_color.h"
-#include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
 #include "lv_observer_private.h"
 

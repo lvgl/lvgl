@@ -14,7 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_font_fmt_txt.h"
+#include "../../lv_internal.h"
+
+#if LV_USE_FONT_COMPRESSED
 
 /*********************
  *      DEFINES
@@ -24,7 +26,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-#if LV_USE_FONT_COMPRESSED
 typedef enum {
     RLE_STATE_SINGLE = 0,
     RLE_STATE_REPEATED,
@@ -39,7 +40,6 @@ typedef struct {
     uint8_t count;
     lv_font_fmt_rle_state_t state;
 } lv_font_fmt_rle_t;
-#endif
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -49,6 +49,7 @@ typedef struct {
  *      MACROS
  **********************/
 
+#endif
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

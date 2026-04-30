@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_nuttx_entry.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_NUTTX
 
@@ -19,7 +19,7 @@
 #include "../../core/lv_global.h"
 #include "lv_nuttx_profiler.h"
 #include "lv_nuttx_mouse.h"
-#include "../../../lvgl.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_NUTTX_LIBUV
     #include <uv.h>

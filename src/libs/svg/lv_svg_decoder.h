@@ -17,8 +17,6 @@ extern "C" {
 
 #if LV_USE_SVG
 
-#include "../../draw/lv_image_decoder.h"
-
 /*********************
  *      DEFINES
  *********************/

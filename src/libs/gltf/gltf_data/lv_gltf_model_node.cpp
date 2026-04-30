@@ -12,12 +12,7 @@
 
 #include <float.h>
 #include "fastgltf/types.hpp"
-#include "../../../misc/lv_array.h"
-#include "../../../misc/lv_assert.h"
-#include "../../../misc/lv_types.h"
 #include "../../../misc/lv_event_private.h"
-#include "../../../stdlib/lv_string.h"
-#include "../../../stdlib/lv_sprintf.h"
 
 /*********************
  *      DEFINES

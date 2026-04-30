@@ -16,11 +16,6 @@ extern "C" {
 #include "../../lv_internal.h"
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_color.h"
-#include "../../display/lv_display.h"
-
-
 /*********************
  *      DEFINES
  *********************/

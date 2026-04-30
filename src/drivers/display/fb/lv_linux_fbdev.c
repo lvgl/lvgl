@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linux_fbdev.h"
+#include "../../../lv_internal.h"
 #if LV_USE_LINUX_FBDEV
 
 #include <stdlib.h>

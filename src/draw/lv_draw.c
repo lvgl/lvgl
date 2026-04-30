@@ -10,18 +10,14 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_internal.h"
 #include "../misc/lv_area_private.h"
-#include "../misc/lv_assert.h"
 #include "../misc/lv_event_private.h"
 #include "lv_draw_private.h"
-#include "lv_draw_mask.h"
 #include "lv_draw_vector_private.h"
-#include "lv_draw_3d.h"
-#include "sw/lv_draw_sw.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_refr_private.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

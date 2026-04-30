@@ -11,11 +11,9 @@
 
 #if LV_USE_NUTTX && LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
+#include "../../lv_internal.h"
 #include "../../misc/lv_profiler_builtin_private.h"
-#include "../../misc/lv_log.h"
 #include "../../core/lv_global.h"
-#include "../../stdlib/lv_sprintf.h"
-#include "../../stdlib/lv_string.h"
 #include "lv_nuttx_entry.h"
 #include <fcntl.h>
 #include <stdio.h>

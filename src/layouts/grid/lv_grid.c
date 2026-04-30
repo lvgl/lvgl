@@ -6,14 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_grid.h"
+
+#include "../../lv_internal.h"
 
 #if LV_USE_GRID
 
-#include "../../stdlib/lv_string.h"
-#include "../lv_layout.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_global.h"
+
 /*********************
  *      DEFINES
  *********************/

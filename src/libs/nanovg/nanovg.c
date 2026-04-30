@@ -21,9 +21,6 @@
 #if LV_USE_NANOVG
 
 #include <math.h>
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
-#include "../../misc/lv_log.h"
 
 #include "nanovg.h"
 

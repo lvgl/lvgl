@@ -7,19 +7,15 @@
  *      INCLUDES
  *********************/
 
-#include "lv_opengles_glfw.h"
+#include "../../lv_internal.h"
+
 #if LV_USE_GLFW
 
-#include "lv_opengles_window.h"
-#include "lv_opengles_driver.h"
-#include "lv_opengles_texture.h"
-#include "lv_opengles_private.h"
 #include "lv_opengles_debug.h"
-
+#include "lv_opengles_private.h"
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
 #include "../../indev/lv_indev.h"
-#include "../../lv_init.h"
 #include "../../misc/lv_area_private.h"
 
 #include <stdlib.h>

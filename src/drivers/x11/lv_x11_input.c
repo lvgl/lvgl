@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_x11.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_X11
 
@@ -14,7 +14,6 @@
 #include <stdbool.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include "../../widgets/image/lv_image.h"
 
 /*********************
  *      DEFINES

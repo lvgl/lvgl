@@ -14,9 +14,6 @@
 #include "../gltf_data/lv_gltf_data_internal.hpp"
 
 #include "../fastgltf/lv_fastgltf.hpp"
-#include "../../../misc/lv_types.h"
-#include "../../../misc/lv_array.h"
-#include "../../../stdlib/lv_sprintf.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
 #include "../../../drivers/opengles/lv_opengles_debug.h"
 #include "../math/lv_gltf_math.hpp"

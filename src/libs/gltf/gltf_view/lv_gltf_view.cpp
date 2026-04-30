@@ -11,15 +11,10 @@
 
 #if LV_USE_GLTF
 
-#include "../gltf_data/lv_gltf_model.h"
 #include "../gltf_data/lv_gltf_data_internal.hpp"
 #include "../gltf_data/lv_gltf_data_internal.h"
-#include "../../../draw/lv_draw_3d.h"
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../core/lv_obj_class_private.h"
-#include "../../../misc/lv_types.h"
-#include "../../../widgets/3dtexture/lv_3dtexture.h"
-#include "../gltf_environment/lv_gltf_environment.h"
 #include "assets/lv_gltf_view_shader.h"
 #include <fastgltf/math.hpp>
 #include <fastgltf/tools.hpp>

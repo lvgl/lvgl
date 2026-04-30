@@ -19,7 +19,6 @@ extern "C" {
 #if LV_USE_DRAW_NANOVG
 
 #include "../lv_draw_private.h"
-#include "../../draw/lv_draw_3d.h"
 #include "../../misc/lv_area_private.h"
 
 #if !LV_USE_NANOVG

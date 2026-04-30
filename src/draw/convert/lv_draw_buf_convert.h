@@ -10,8 +10,7 @@
 extern "C" {
 #endif
 
-#include "../../misc/lv_color.h"
-#include "../lv_draw_buf.h"
+#include "../../lv_internal.h"
 
 /*********************
  *      DEFINES

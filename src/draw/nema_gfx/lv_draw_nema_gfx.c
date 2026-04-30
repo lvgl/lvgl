@@ -32,13 +32,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_refr.h"
-
-#if LV_USE_NEMA_GFX
 
 #include "lv_draw_nema_gfx.h"
-#include "../../font/lv_font.h"
-#include "../../font/fmt_txt/lv_font_fmt_txt.h"
+
+#if LV_USE_NEMA_GFX
 
 /*********************
  *      DEFINES

@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_cache.h"
+#include "lv_cache_entry.h"
 
 /*********************
  *      DEFINES

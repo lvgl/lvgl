@@ -6,20 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_wayland_window.h"
+
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
 
-#include "../../lv_init.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lv_wayland_private.h"
-#include "lv_wayland_private.h"
-#include "lv_wayland_pointer.h"
-#include "lv_wayland_pointer_axis.h"
-#include "lv_wayland_touch.h"
-#include "lv_wayland_keyboard.h"
 
 /*********************
  *      DEFINES

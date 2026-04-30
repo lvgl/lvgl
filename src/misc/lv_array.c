@@ -7,12 +7,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_array.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
+#include "../lv_internal.h"
 
-#include "lv_assert.h"
-#include "lv_types.h"
 /*********************
  *      DEFINES
  *********************/

@@ -12,7 +12,8 @@
  *********************/
 #include "lv_animimage_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_ANIMIMG != 0
+
+#if LV_USE_ANIMIMG
 
 /*Testing of dependencies*/
 #if LV_USE_IMAGE == 0
@@ -20,12 +21,7 @@
 #endif
 
 #include "../../draw/lv_image_decoder.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_fs.h"
 #include "../../misc/lv_text_private.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_anim.h"
 
 /*********************
  *      DEFINES

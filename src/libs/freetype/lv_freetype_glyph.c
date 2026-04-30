@@ -7,10 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
 #include "lv_freetype_private.h"
 
 #if LV_USE_FREETYPE
+
+#include "../../misc/cache/lv_cache.h"
+#include "../../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES

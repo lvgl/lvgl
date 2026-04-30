@@ -3,11 +3,9 @@
  *
  */
 
-#include "lv_wayland_touch.h"
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
-
-#include "lv_wayland_private.h"
 
 #include <wayland-client-protocol.h>
 #include <wayland-cursor.h>

@@ -23,7 +23,6 @@ extern "C" {
 #include "../../opengles/lv_opengles_texture_private.h"
 #include "../../opengles/lv_opengles_egl.h"
 #include "../../opengles/lv_opengles_egl_private.h"
-#include "lv_linux_drm.h"
 
 /*********************
  *      DEFINES

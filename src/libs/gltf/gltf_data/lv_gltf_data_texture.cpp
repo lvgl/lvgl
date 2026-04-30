@@ -11,7 +11,6 @@
 #if LV_USE_GLTF
 
 #include <cstdint>
-#include "../../../misc/lv_color.h"
 
 /*********************
  *      DEFINES

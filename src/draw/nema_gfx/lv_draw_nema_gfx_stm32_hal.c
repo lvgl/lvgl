@@ -16,9 +16,6 @@
 
 #include "lv_draw_nema_gfx_utils.h"
 
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_string.h"
 #include "../../osal/lv_os_private.h"
 
 #include <assert.h>
