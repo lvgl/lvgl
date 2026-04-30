@@ -170,19 +170,19 @@ typedef struct {
     uint16_t kern_scale;
 
     /** Number of cmap tables */
-    uint16_t cmap_num       : 9;
+    uint16_t cmap_num;
 
     /** Bit per pixel: 1, 2, 3, 4, 8 */
-    uint16_t bpp            : 4;
+    uint8_t bpp            : 4;
 
     /** Type of `kern_dsc` */
-    uint16_t kern_classes   : 1;
+    uint8_t kern_classes   : 1;
 
     /**
      * storage format of the bitmap
      * from `lv_font_fmt_txt_bitmap_format_t`
      */
-    uint16_t bitmap_format  : 2;
+    uint8_t bitmap_format  : 2;
 
     /**
      * Bytes to which each line is padded.
