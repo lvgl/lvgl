@@ -354,6 +354,8 @@ void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t 
 lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
                                                     const lv_font_t * font)
 {
+    EVE_HalContext * phost = u->hal;
+
     const lv_font_fmt_txt_dsc_t * font_dsc = (const lv_font_fmt_txt_dsc_t *)font->dsc;
 
     lv_draw_eve5_font_vram_t * fv = eve5_get_font_vram(font);
