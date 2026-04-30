@@ -1,9 +1,8 @@
 #ifndef EVE_TARGET_H
 #define EVE_TARGET_H
 
+#include "../../lv_internal.h"
 #include "../../draw/eve/lv_draw_eve_private.h"
-#include "../../tick/lv_tick.h"
-#include "../../misc/lv_utils.h"
 #include "../../core/lv_global.h"
 
 #define lv_eve_write_buf (LV_GLOBAL_DEFAULT()->draw_eve_unit->lv_eve_write_buf)
@@ -80,7 +79,8 @@ static inline void lv_eve_target_flush_write_buf(void)
     if(lv_eve_write_buf_len == 0) {
         return;
     }
-    lv_draw_eve_unit_g->op_cb(lv_draw_eve_unit_g->disp, LV_DRAW_EVE_OPERATION_SPI_SEND, lv_eve_write_buf, lv_eve_write_buf_len);
+    lv_draw_eve_unit_g->op_cb(lv_draw_eve_unit_g->disp, LV_DRAW_EVE_OPERATION_SPI_SEND, lv_eve_write_buf,
+                              lv_eve_write_buf_len);
     lv_eve_write_buf_len = 0;
 #endif
 }
@@ -103,7 +103,7 @@ static inline uint8_t spi_receive(uint8_t data)
     return byte;
 }
 
-static inline uint8_t fetch_flash_byte(const uint8_t *p_data)
+static inline uint8_t fetch_flash_byte(const uint8_t * p_data)
 {
     return (*p_data);
 }

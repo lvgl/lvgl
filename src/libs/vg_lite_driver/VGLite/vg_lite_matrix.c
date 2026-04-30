@@ -25,7 +25,7 @@
 *
 *****************************************************************************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lv_internal.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include <math.h>

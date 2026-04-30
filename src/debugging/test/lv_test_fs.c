@@ -7,13 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_test_fs.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_TEST
-
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_fs.h"
-#include "../../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES

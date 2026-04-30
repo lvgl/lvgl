@@ -13,12 +13,11 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_eve_private.h"
+#include "../../lv_internal.h"
 #if LV_USE_DRAW_EVE
 
 #include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
 #include "lv_draw_eve_ram_g.h"
 #include "lv_draw_eve.h"
 #include "lv_eve.h"

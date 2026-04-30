@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_RTTHREAD
 #include <rtthread.h>
 #include <stdarg.h>

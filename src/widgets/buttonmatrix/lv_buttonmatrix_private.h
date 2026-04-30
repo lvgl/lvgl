@@ -15,9 +15,9 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_obj_private.h"
-#include "lv_buttonmatrix.h"
+#include "../../lv_internal.h"
 
-#if LV_USE_BUTTONMATRIX != 0
+#if LV_USE_BUTTONMATRIX
 
 /*********************
  *      DEFINES

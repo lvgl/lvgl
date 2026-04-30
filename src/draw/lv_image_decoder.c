@@ -13,6 +13,8 @@
 #include "../misc/lv_profiler.h"
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
+#include "../misc/cache/instance/lv_image_cache.h"
+#include "../misc/cache/instance/lv_image_header_cache.h"
 
 /*********************
  *      DEFINES

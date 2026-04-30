@@ -10,7 +10,7 @@ import re
 
 SCRIPT_DIR = os.path.dirname(__file__)
 LV_CONF_TEMPLATE = os.path.join(SCRIPT_DIR, "..", "lv_conf_template.h")
-LV_CONF_INTERNAL = os.path.join(SCRIPT_DIR, "..", "src", "lv_conf_internal.h")
+LV_CONF_INTERNAL = os.path.join(SCRIPT_DIR, "..", "include", "lvgl", "config", "lv_conf_internal.h")
 
 if sys.version_info < (3,6,0):
   print("Python >=3.6 is required", file=sys.stderr)

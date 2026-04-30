@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_rlottie.h"
+#include "../../lv_internal.h"
 #if LV_USE_RLOTTIE
 #include "../../widgets/image/lv_image_private.h"
 

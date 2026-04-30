@@ -16,8 +16,6 @@
 #include <pthread.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include "../../core/lv_obj_pos.h"
-#include "../../core/lv_refr.h"
 
 /*********************
  *      DEFINES

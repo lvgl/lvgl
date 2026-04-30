@@ -12,11 +12,6 @@
 #if LV_DRAW_SW_SUPPORT_AL88
 
 #include "lv_draw_sw_blend_private.h"
-#include "../../../misc/lv_math.h"
-#include "../../../display/lv_display.h"
-#include "../../../core/lv_refr.h"
-#include "../../../misc/lv_color.h"
-#include "../../../stdlib/lv_string.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     #include "neon/lv_blend_neon.h"

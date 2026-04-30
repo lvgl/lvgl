@@ -14,7 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_evdev.h"
+
+#include "../../lv_internal.h"
 
 #if LV_USE_EVDEV
 

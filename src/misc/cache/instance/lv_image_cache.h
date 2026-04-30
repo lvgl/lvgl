@@ -14,7 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_types.h"
+#include "../../../lv_internal.h"
+#include "../../lv_iter_private.h"
 
 /*********************
  *      DEFINES

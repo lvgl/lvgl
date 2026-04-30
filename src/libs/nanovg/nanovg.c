@@ -16,7 +16,7 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_NANOVG
 

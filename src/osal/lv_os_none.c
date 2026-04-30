@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_conf_internal.h"
+#include "../lv_internal.h"
 #if LV_USE_OS == LV_OS_NONE
 
 #include "lv_os_private.h"

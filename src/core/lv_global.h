@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "../lv_internal.h"
 
 #include "../misc/lv_types.h"
 #include "../draw/lv_draw.h"
@@ -34,11 +34,6 @@ extern "C" {
 #if LV_USE_FONT_COMPRESSED
 #include "../font/fmt_txt/lv_font_fmt_txt_private.h"
 #endif
-
-#include "../tick/lv_tick.h"
-#include "../layouts/lv_layout.h"
-
-#include "../misc/lv_types.h"
 
 #include "../misc/lv_timer_private.h"
 #include "../misc/lv_anim_private.h"

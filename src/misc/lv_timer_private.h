@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "lv_ext_data.h"
-#include "lv_timer.h"
+#include "../lv_internal.h"
 
 /*********************
  *      DEFINES

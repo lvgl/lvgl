@@ -21,7 +21,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 #if LV_USE_DRAW_EVE
 
 #include "lv_draw_eve_target.h"

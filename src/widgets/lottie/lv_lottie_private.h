@@ -14,10 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../core/lv_obj_private.h"
+#include "../../lv_internal.h"
+
 #if LV_USE_LOTTIE
 
-#include "lv_lottie.h"
 #include "../canvas/lv_canvas_private.h"
 
 /*********************

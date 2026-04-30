@@ -20,11 +20,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
 
-#if LV_USE_TEMPL != 0
+#include "../../lv_internal.h"
 
-#include "../core/lv_obj.h"
+#if LV_USE_TEMPL
+
 
 /*********************
  *      DEFINES

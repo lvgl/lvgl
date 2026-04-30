@@ -7,13 +7,11 @@
  *      INCLUDES
  *********************/
 
-#include "lv_font_manager.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_FONT_MANAGER
 
 #include "lv_font_manager_recycle.h"
-#include "../../misc/lv_ll.h"
-#include "../../stdlib/lv_sprintf.h"
 
 /*********************
  *      DEFINES

@@ -1,7 +1,7 @@
 #ifndef _THORVG_H_
 #define _THORVG_H_
 
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 
 /*Testing of dependencies*/
 #if LV_USE_THORVG && LV_USE_VECTOR_GRAPHIC == 0

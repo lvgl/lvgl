@@ -20,7 +20,6 @@ extern "C" {
 #include "src/misc/lv_text_private.h"
 #include "src/misc/cache/lv_cache.h"
 #include "src/misc/cache/lv_cache_entry_private.h"
-#include "src/misc/cache/lv_cache_private.h"
 #include "src/layouts/lv_layout_private.h"
 #include "src/stdlib/lv_mem_private.h"
 #include "src/others/file_explorer/lv_file_explorer_private.h"
@@ -65,8 +64,6 @@ extern "C" {
 #include "src/misc/lv_event_private.h"
 #include "src/misc/lv_bidi_private.h"
 #include "src/misc/lv_rb_private.h"
-#include "src/misc/lv_style_private.h"
-#include "src/misc/lv_color_op_private.h"
 #include "src/misc/lv_anim_private.h"
 #include "src/misc/lv_anim_timeline_private.h"
 

@@ -14,10 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lv_conf_internal.h"
+#include "../lv_internal.h"
 #if LV_USE_3DTEXTURE
-
-#include "lv_draw.h"
 
 /*********************
  *      DEFINES

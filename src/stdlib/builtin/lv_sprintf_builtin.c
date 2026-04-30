@@ -32,7 +32,7 @@
 
 /*Original repository: https://github.com/mpaland/printf*/
 
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
 
 #include "../lv_sprintf.h"

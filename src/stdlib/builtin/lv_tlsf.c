@@ -1,4 +1,4 @@
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #include "lv_tlsf_private.h"

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lv_internal.h"
 #if LV_USE_ST_LTDC
 
 #include "lv_st_ltdc.h"

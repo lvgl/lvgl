@@ -17,10 +17,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
-
-#include "lv_os.h"
-#include "../misc/lv_types.h"
+#include "../lv_internal.h"
 
 #ifdef __linux__
 #include "lv_linux.h"

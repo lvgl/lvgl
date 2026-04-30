@@ -14,10 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_table.h"
-
-#if LV_USE_TABLE != 0
 #include "../../core/lv_obj_private.h"
+#include "../../lv_internal.h"
+
+#if LV_USE_TABLE
 
 /*********************
  *      DEFINES

@@ -10,13 +10,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_sdl_window.h"
+#include "../../lv_internal.h"
+
 #if LV_USE_SDL
 #include <stdbool.h>
-#include "../../core/lv_refr.h"
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
-#include "../../lv_init.h"
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include "lv_sdl_private.h"

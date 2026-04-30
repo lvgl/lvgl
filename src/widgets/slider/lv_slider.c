@@ -24,6 +24,11 @@
 #include "../image/lv_image.h"
 #include "../../core/lv_observer_private.h"
 
+/*Check dependencies*/
+#if LV_USE_BAR == 0
+    #error "lv_slider: lv_bar is required. Enable it in lv_conf.h (LV_USE_BAR 1)"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

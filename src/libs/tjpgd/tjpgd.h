@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 #include "tjpgdcnf.h"
 
 #if LV_USE_TJPGD

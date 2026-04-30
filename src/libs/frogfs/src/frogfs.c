@@ -8,7 +8,7 @@
  * tool that comes with this source distribution.
  */
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lv_internal.h"
 #if LV_USE_FS_FROGFS
 
 #include LV_INTTYPES_INCLUDE

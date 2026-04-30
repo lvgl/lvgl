@@ -9,7 +9,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_SVG
 #if !LV_USE_VECTOR_GRAPHIC
@@ -108,13 +108,6 @@ lv_result_t lv_svg_render_get_viewport_size(const lv_svg_render_obj_t * render, 
  * @param render pointer to the SVG render object to render
  */
 void lv_draw_svg_render(lv_draw_vector_dsc_t * dsc, const lv_svg_render_obj_t * render);
-
-/**
- * @brief Draw an SVG document to a layer
- * @param layer pointer to the target layer
- * @param svg_doc pointer to the SVG document to draw
- */
-void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc);
 
 /**********************
  *      MACROS

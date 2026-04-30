@@ -1,7 +1,7 @@
 #ifndef __eglplatform_h_
 #define __eglplatform_h_
 
-#include "../../../../../lv_conf_internal.h"
+#include "../../../../../lv_internal.h"
 #if LV_USE_OPENGLES
 
 /*

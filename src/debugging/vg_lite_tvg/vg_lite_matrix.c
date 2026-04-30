@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
 

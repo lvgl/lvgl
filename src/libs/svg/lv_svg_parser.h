@@ -9,7 +9,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 #if LV_USE_SVG
 
 #include "lv_svg.h"

@@ -5,7 +5,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lv_internal.h"
 #if LV_USE_STDLIB_STRING == LV_STDLIB_BUILTIN
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_log.h"
