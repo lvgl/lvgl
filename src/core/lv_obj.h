@@ -169,6 +169,9 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, DISPLAY,                    LV_PROPERTY_TYPE_POINTER,   71),
     LV_PROPERTY_ID(OBJ, CHILD_COUNT,                LV_PROPERTY_TYPE_INT,       72),
     LV_PROPERTY_ID(OBJ, INDEX,                      LV_PROPERTY_TYPE_INT,       73),
+#if LV_USE_OBJ_NAME
+    LV_PROPERTY_ID(OBJ, NAME,               LV_PROPERTY_TYPE_TEXT,  74),
+#endif
 
     LV_PROPERTY_OBJ_END,
 };
