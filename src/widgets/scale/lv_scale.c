@@ -1233,6 +1233,9 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
                 section_arc_radius -= v.num;
             }
 
+            if(section_arc_radius <= 0) {
+                continue;
+            }
             /* TODO: Add compensation for the width of the first and last tick over the arc */
             const int32_t section_start_angle = lv_map(section->range_min, scale->range_min, scale->range_max, scale->rotation,
                                                        scale->rotation + scale->angle_range);
