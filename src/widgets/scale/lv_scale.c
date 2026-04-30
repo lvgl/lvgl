@@ -906,6 +906,8 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     else { /* Add label with mapped values */
         lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+        // using a local buffer is safe only because we take care to zero the pointer before return from this function
+        // cppcheck-suppress autoVariables
         label_dsc->text = text_buffer;
         label_dsc->text_local = 1;
     }
@@ -980,6 +982,11 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     /* Invalid mode */
     else {
+        if(label_dsc->text_local) {
+            /* clear the reference to the text buffer on the stack */
+            label_dsc->text = NULL;
+            label_dsc->text_local = false;
+        }
         return;
     }
 
