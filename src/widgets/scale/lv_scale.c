@@ -980,6 +980,11 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     /* Invalid mode */
     else {
+        if(label_dsc->text_local) {
+            /* clear the reference to the text buffer on the stack */
+            label_dsc->text = NULL;
+            label_dsc->text_local = false;
+        }
         return;
     }
 
