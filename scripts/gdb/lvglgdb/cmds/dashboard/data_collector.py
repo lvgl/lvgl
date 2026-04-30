@@ -233,7 +233,10 @@ def _collect_widget_specs(object_trees: list) -> dict:
     if not specs_path.exists():
         return {}
 
-    all_specs = _json.loads(specs_path.read_text())
+    try:
+        all_specs = _json.loads(specs_path.read_text())
+    except Exception:
+        return {}
 
     # Collect all class_names from object trees
     seen = set()
