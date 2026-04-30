@@ -217,18 +217,22 @@ replaces `tick_style_1` with `tick_style_2` for part
 
 The Style properties that are used during Scale drawing (and are thus useful) are:
 
-- For main line *when it is a straight line* (<ApiLink name="LV_PART_MAIN" />):
+- For the main line *when it is a straight line* (<ApiLink name="LV_PART_MAIN" />):
   
   :LV_STYLE_LINE_WIDTH:         <ApiLink name="lv_style_set_line_width" />
   :LV_STYLE_LINE_COLOR:         <ApiLink name="lv_style_set_line_color" />
   :LV_STYLE_LINE_OPA:           <ApiLink name="lv_style_set_line_opa" />
-- For main line *when it is an arc* (<ApiLink name="LV_PART_MAIN" />):
+- For the main line or a section *when it is an arc* (<ApiLink name="LV_PART_MAIN" />):
   
   :LV_STYLE_ARC_WIDTH:          <ApiLink name="lv_style_set_arc_width" />
   :LV_STYLE_ARC_COLOR:          <ApiLink name="lv_style_set_arc_color" />
   :LV_STYLE_ARC_OPA:            <ApiLink name="lv_style_set_arc_opa" />
   :LV_STYLE_ARC_ROUNDED:        <ApiLink name="lv_style_set_arc_rounded" />
   :LV_STYLE_ARC_IMAGE_SRC:      <ApiLink name="lv_style_set_arc_image_src" />
+  :LV_STYLE_PAD_RADIAL:         <ApiLink name="lv_style_set_pad_radial" />
+
+  Note that PAD_RADIAL applies only to sections. Positive values will move the arc toward the center.
+  
 - For tick lines (<ApiLink name="LV_PART_ITEMS" /> and <ApiLink name="LV_PART_INDICATOR" />):
   
   :LV_STYLE_LINE_WIDTH:         <ApiLink name="lv_style_set_line_width" />
