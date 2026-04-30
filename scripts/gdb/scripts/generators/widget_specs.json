@@ -12,7 +12,6 @@
   "lv_animimg": {
     "_auto": {
       "fields": {
-        "anim": "int",
         "dsc": "pointer",
         "pic_count": "int"
       }
@@ -107,8 +106,6 @@
         "start_value": "int",
         "indic_area": "area",
         "val_reversed": "bool",
-        "cur_value_anim": "int",
-        "start_value_anim": "int",
         "mode": "enum:3",
         "orientation": "enum:3"
       }
@@ -164,8 +161,6 @@
     "_auto": {
       "fields": {
         "btnm": "pointer",
-        "today": "int",
-        "showed_date": "int",
         "highlighted_dates": "pointer",
         "highlighted_dates_num": "int",
         "use_chinese_calendar": "bool"
@@ -181,8 +176,7 @@
   "lv_canvas": {
     "_auto": {
       "fields": {
-        "draw_buf": "pointer",
-        "static_buf": "int"
+        "draw_buf": "pointer"
       }
     },
     "summary_tpl": "",
@@ -193,8 +187,6 @@
   "lv_chart": {
     "_auto": {
       "fields": {
-        "series_ll": "int",
-        "cursor_ll": "int",
         "pressed_point_id": "int",
         "hdiv_cnt": "int",
         "vdiv_cnt": "int",
@@ -344,7 +336,6 @@
         "kb": "pointer",
         "cand_panel": "pointer",
         "dict": "pointer",
-        "k9_legal_py_ll": "int",
         "cand_str": "string",
         "k9_py_ll_pos": "int",
         "k9_legal_py_count": "int",
@@ -389,7 +380,6 @@
         "text": "string",
         "translation_tag": "string",
         "dot_begin": "int",
-        "hint": "int",
         "sel_start": "int",
         "sel_end": "int",
         "size_cache": "point",
@@ -455,7 +445,6 @@
         "sidebar_header": "pointer",
         "sidebar_header_title": "pointer",
         "selected_tab": "pointer",
-        "history_ll": "int",
         "cur_depth": "int",
         "prev_depth": "int",
         "sidebar_generated": "bool",
@@ -526,7 +515,6 @@
   "lv_scale": {
     "_auto": {
       "fields": {
-        "section_ll": "int",
         "txt_src": "pointer",
         "mode": "int",
         "range_min": "int",
@@ -540,8 +528,7 @@
         "rotation": "int",
         "custom_label_cnt": "int",
         "last_tick_width": "int",
-        "first_tick_width": "int",
-        "needles": "int"
+        "first_tick_width": "int"
       }
     },
     "summary_tpl": "{range_min}..{range_max}",
@@ -591,7 +578,6 @@
         "indent": "int",
         "cache_w": "int",
         "cache_h": "int",
-        "child_ll": "int",
         "overflow": "bool",
         "refresh": "bool"
       }

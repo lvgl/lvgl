@@ -29,7 +29,7 @@ LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
 LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
 WIDGETS_DIR = LVGL_SRC / "widgets"
 OUTPUT_DIR = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "widgets"
-SPECS_YAML = Path(__file__).parent / "widget_specs.yaml"
+SPECS_JSON = Path(__file__).parent / "widget_specs.json"
 
 SIMPLE_INT_TYPES = {
     "int8_t", "int16_t", "int32_t", "int64_t",
@@ -292,7 +292,7 @@ def _field_type_name(f: StructField) -> str | None:
         return "bool"
     if f.c_type in SIMPLE_INT_TYPES or f.c_type.startswith(("uint", "int")):
         return "int"
-    if f.c_type.startswith("lv_") and f.c_type.endswith("_t"):
+    if f.c_type in _INT_SAFE_TYPES:
         return "int"
     return None
 
@@ -525,9 +525,6 @@ def gen_init(ordered: list[WidgetDef]) -> str:
     return "\n".join(lines)
 
 
-SPECS_JSON = Path(__file__).parent / "widget_specs.json"
-
-
 def _build_auto_spec(wdef: WidgetDef) -> dict:
     """Build the _auto section for a widget from parsed fields."""
     fields = {}
@@ -543,7 +540,7 @@ def update_specs_json(widgets: dict[str, WidgetDef]) -> dict:
 
     - _auto section is always regenerated
     - Hand-written keys (summary_tpl, primary, enums) are preserved
-    - New widgets get an empty template
+    - New widgets get only _auto (hand-write summary_tpl/primary/enums to complete)
     - Removed widgets get _removed: true
     """
     existing = {}
