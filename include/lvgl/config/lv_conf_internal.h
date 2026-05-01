@@ -88,7 +88,7 @@
 
 /* If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
 #if  0 && defined(__ASSEMBLY__)
-    #include "my_include.h"
+#include "my_include.h"
 #endif
 
 /*====================
@@ -297,10 +297,10 @@
 #endif
 #if LV_USE_OS == LV_OS_FREERTOS
     /*
-    * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
-    * than unblocking a task using an intermediary object such as a binary semaphore.
-    * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
-    */
+     * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+     * than unblocking a task using an intermediary object such as a binary semaphore.
+     * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+     */
     #ifndef LV_USE_FREERTOS_TASK_NOTIFY
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
@@ -426,11 +426,11 @@
 #endif
 #if LV_USE_DRAW_SW == 1
     /*
-    * Selectively disable color format support in order to reduce code size.
-    * NOTE: some features use certain color formats internally, e.g.
-    * - gradients use RGB888
-    * - bitmaps with transparency may use ARGB8888
-    */
+     * Selectively disable color format support in order to reduce code size.
+     * NOTE: some features use certain color formats internally, e.g.
+     * - gradients use RGB888
+     * - bitmaps with transparency may use ARGB8888
+     */
     #ifndef LV_DRAW_SW_SUPPORT_RGB565
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565
@@ -554,7 +554,7 @@
     #endif
 
     /* The threshold of the luminance to consider a pixel as
-    * active in indexed color format */
+     * active in indexed color format */
     #ifndef LV_DRAW_SW_I1_LUM_THRESHOLD
         #ifdef CONFIG_LV_DRAW_SW_I1_LUM_THRESHOLD
             #define LV_DRAW_SW_I1_LUM_THRESHOLD CONFIG_LV_DRAW_SW_I1_LUM_THRESHOLD
@@ -564,8 +564,8 @@
     #endif
 
     /** Set number of draw units.
-    *  - > 1 requires operating system to be enabled in `LV_USE_OS`.
-    *  - > 1 means multiple threads will render the screen in parallel. */
+     *  - > 1 requires operating system to be enabled in `LV_USE_OS`.
+     *  - > 1 means multiple threads will render the screen in parallel. */
     #ifndef LV_DRAW_SW_DRAW_UNIT_CNT
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_DRAW_UNIT_CNT
@@ -597,8 +597,8 @@
     #endif
 
     /**
-    * - 0: Use a simple renderer capable of drawing only simple rectangles with gradient, images, text, and straight lines only.
-    * - 1: Use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too. */
+     * - 0: Use a simple renderer capable of drawing only simple rectangles with gradient, images, text, and straight lines only.
+     * - 1: Use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too. */
     #ifndef LV_DRAW_SW_COMPLEX
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_COMPLEX
@@ -613,8 +613,8 @@
 
     #if LV_DRAW_SW_COMPLEX == 1
         /** Allow buffering some shadow calculation.
-        *  LV_DRAW_SW_SHADOW_CACHE_SIZE is the maximum shadow size to buffer, where shadow size is
-        *  `shadow_width + radius`.  Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost. */
+         *  LV_DRAW_SW_SHADOW_CACHE_SIZE is the maximum shadow size to buffer, where shadow size is
+         *  `shadow_width + radius`.  Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost. */
         #ifndef LV_DRAW_SW_SHADOW_CACHE_SIZE
             #ifdef CONFIG_LV_DRAW_SW_SHADOW_CACHE_SIZE
                 #define LV_DRAW_SW_SHADOW_CACHE_SIZE CONFIG_LV_DRAW_SW_SHADOW_CACHE_SIZE
@@ -624,9 +624,9 @@
         #endif
 
         /** Set number of maximally-cached circle data.
-        *  The circumference of 1/4 circle are saved for anti-aliasing.
-        *  `radius * 4` bytes are used per circle (the most often used radiuses are saved).
-        *  - 0: disables caching */
+         *  The circumference of 1/4 circle are saved for anti-aliasing.
+         *  `radius * 4` bytes are used per circle (the most often used radiuses are saved).
+         *  - 0: disables caching */
         #ifndef LV_DRAW_SW_CIRCLE_CACHE_SIZE
             #ifdef CONFIG_LV_DRAW_SW_CIRCLE_CACHE_SIZE
                 #define LV_DRAW_SW_CIRCLE_CACHE_SIZE CONFIG_LV_DRAW_SW_CIRCLE_CACHE_SIZE
@@ -676,14 +676,14 @@
 
 #if LV_USE_NEMA_GFX
     /** Select which NemaGFX static library headers to use. Possible options:
-    * - LV_NEMA_LIB_NONE           an alias of LV_NEMA_LIB_M33_REVC
-    * - LV_NEMA_LIB_M33_REVC
-    * - LV_NEMA_LIB_M33_NEMAPVG
-    * - LV_NEMA_LIB_M55
-    * - LV_NEMA_LIB_M7
-    * You must also take care to link the correct corresponding static library
-    * in libs/nema_gfx/lib/core/
-    */
+     * - LV_NEMA_LIB_NONE           an alias of LV_NEMA_LIB_M33_REVC
+     * - LV_NEMA_LIB_M33_REVC
+     * - LV_NEMA_LIB_M33_NEMAPVG
+     * - LV_NEMA_LIB_M55
+     * - LV_NEMA_LIB_M7
+     * You must also take care to link the correct corresponding static library
+     * in libs/nema_gfx/lib/core/
+     */
     #ifndef LV_USE_NEMA_LIB
         #ifdef CONFIG_LV_USE_NEMA_LIB
             #define LV_USE_NEMA_LIB CONFIG_LV_USE_NEMA_LIB
@@ -693,8 +693,8 @@
     #endif
 
     /** Select which NemaGFX HAL to use. Possible options:
-    * - LV_NEMA_HAL_CUSTOM
-    * - LV_NEMA_HAL_STM32 */
+     * - LV_NEMA_HAL_CUSTOM
+     * - LV_NEMA_HAL_STM32 */
     #ifndef LV_USE_NEMA_HAL
         #ifdef CONFIG_LV_USE_NEMA_HAL
             #define LV_USE_NEMA_HAL CONFIG_LV_USE_NEMA_HAL
@@ -712,9 +712,9 @@
         #endif
 
         /** Set it to a value like __attribute__((section("Nemagfx_Memory_Pool_Buffer")))
-        * and define the section in the linker script if you need the GPU memory to
-        * be, e.g. in a region where accesses will not be cached.
-        */
+         * and define the section in the linker script if you need the GPU memory to
+         * be, e.g. in a region where accesses will not be cached.
+         */
         #ifndef LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
             #ifdef CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
                 #define LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM CONFIG_LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
@@ -832,7 +832,7 @@
     #endif
 
     /** Maximum number of buffers that can be stored for G2D draw unit.
-    *  Includes the frame buffers and assets. */
+     *  Includes the frame buffers and assets. */
     #ifndef LV_G2D_HASH_TABLE_SIZE
         #ifdef CONFIG_LV_G2D_HASH_TABLE_SIZE
             #define LV_G2D_HASH_TABLE_SIZE CONFIG_LV_G2D_HASH_TABLE_SIZE
@@ -921,8 +921,8 @@
     #endif
 
     /** Enable border to simulate shadow.
-    *  NOTE: which usually improves performance,
-    *  but does not guarantee the same rendering quality as the software. */
+     *  NOTE: which usually improves performance,
+     *  but does not guarantee the same rendering quality as the software. */
     #ifndef LV_VG_LITE_USE_BOX_SHADOW
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
@@ -936,7 +936,7 @@
     #endif
 
     /** VG-Lite gradient maximum cache number.
-    *  @note  The memory usage of a single gradient image is 4K bytes. */
+     *  @note  The memory usage of a single gradient image is 4K bytes. */
     #ifndef LV_VG_LITE_GRAD_CACHE_CNT
         #ifdef CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
             #define LV_VG_LITE_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
@@ -1027,7 +1027,7 @@
         #endif
 
         /** Base memory address of the GPU IP it depends on SoC,
-        *  default value is for NXP based devices */
+         *  default value is for NXP based devices */
         #ifndef LV_VG_LITE_HAL_GPU_BASE_ADDRESS
             #ifdef CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
                 #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
@@ -1038,7 +1038,7 @@
     #endif /*LV_USE_VG_LITE_DRIVER*/
 
     /** Use ThorVG (a software vector library) as VG-Lite driver to allow testing VGLite on PC
-    *  Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
+     *  Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
     #ifndef LV_USE_VG_LITE_THORVG
         #ifdef CONFIG_LV_USE_VG_LITE_THORVG
             #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
@@ -1125,8 +1125,8 @@
     #endif
 
     /* if enabled, the user is required to call `lv_draw_dma2d_transfer_complete_interrupt_handler`
-    * upon receiving the DMA2D global interrupt
-    */
+     * upon receiving the DMA2D global interrupt
+     */
     #ifndef LV_USE_DRAW_DMA2D_INTERRUPT
         #ifdef CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
             #define LV_USE_DRAW_DMA2D_INTERRUPT CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
@@ -1198,8 +1198,8 @@
     #endif
 
     /* The maximum number of bytes to buffer before a single SPI transmission.
-    * Set it to 0 to disable write buffering.
-    */
+     * Set it to 0 to disable write buffering.
+     */
     #ifndef LV_DRAW_EVE_WRITE_BUFFER_SIZE
         #ifdef CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
             #define LV_DRAW_EVE_WRITE_BUFFER_SIZE CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
@@ -1221,11 +1221,11 @@
 #endif
 #if LV_USE_DRAW_NANOVG
     /** Select OpenGL backend for NanoVG:
-    * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
-    * - LV_NANOVG_BACKEND_GL3:   OpenGL 3.0+
-    * - LV_NANOVG_BACKEND_GLES2: OpenGL ES 2.0
-    * - LV_NANOVG_BACKEND_GLES3: OpenGL ES 3.0+
-    */
+     * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
+     * - LV_NANOVG_BACKEND_GL3:   OpenGL 3.0+
+     * - LV_NANOVG_BACKEND_GLES2: OpenGL ES 2.0
+     * - LV_NANOVG_BACKEND_GLES3: OpenGL ES 3.0+
+     */
     #ifndef LV_NANOVG_BACKEND
         #ifdef CONFIG_LV_NANOVG_BACKEND
             #define LV_NANOVG_BACKEND CONFIG_LV_NANOVG_BACKEND
@@ -1271,12 +1271,12 @@
 #endif
 #if LV_USE_LOG
     /** Set value to one of the following levels of logging detail:
-    *  - LV_LOG_LEVEL_TRACE    Log detailed information.
-    *  - LV_LOG_LEVEL_INFO     Log important events.
-    *  - LV_LOG_LEVEL_WARN     Log if something unwanted happened but didn't cause a problem.
-    *  - LV_LOG_LEVEL_ERROR    Log only critical issues, when system may fail.
-    *  - LV_LOG_LEVEL_USER     Log only custom log messages added by the user.
-    *  - LV_LOG_LEVEL_NONE     Do not log anything. */
+     *  - LV_LOG_LEVEL_TRACE    Log detailed information.
+     *  - LV_LOG_LEVEL_INFO     Log important events.
+     *  - LV_LOG_LEVEL_WARN     Log if something unwanted happened but didn't cause a problem.
+     *  - LV_LOG_LEVEL_ERROR    Log only critical issues, when system may fail.
+     *  - LV_LOG_LEVEL_USER     Log only custom log messages added by the user.
+     *  - LV_LOG_LEVEL_NONE     Do not log anything. */
     #ifndef LV_LOG_LEVEL
         #ifdef CONFIG_LV_LOG_LEVEL
             #define LV_LOG_LEVEL CONFIG_LV_LOG_LEVEL
@@ -1286,7 +1286,7 @@
     #endif
 
     /** - 1: Print log with 'printf';
-    *  - 0: User needs to register a callback with `lv_log_register_print_cb()`. */
+     *  - 0: User needs to register a callback with `lv_log_register_print_cb()`. */
     #ifndef LV_LOG_PRINTF
         #ifdef CONFIG_LV_LOG_PRINTF
             #define LV_LOG_PRINTF CONFIG_LV_LOG_PRINTF
@@ -1296,12 +1296,12 @@
     #endif
 
     /** Set callback to print logs.
-    *  E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`.
-    *  Can be overwritten by `lv_log_register_print_cb`. */
+     *  E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`.
+     *  Can be overwritten by `lv_log_register_print_cb`. */
     //#define LV_LOG_PRINT_CB
 
     /** - 1: Enable printing timestamp;
-    *  - 0: Disable printing timestamp. */
+     *  - 0: Disable printing timestamp. */
     #ifndef LV_LOG_USE_TIMESTAMP
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_USE_TIMESTAMP
@@ -1315,7 +1315,7 @@
     #endif
 
     /** - 1: Print file and line number of the log;
-    *  - 0: Do not print file and line number of the log. */
+     *  - 0: Do not print file and line number of the log. */
     #ifndef LV_LOG_USE_FILE_LINE
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_USE_FILE_LINE
@@ -3285,7 +3285,7 @@
     #endif
 
     /** Cache count of glyphs in FreeType, i.e. number of glyphs that can be cached.
-    *  The higher the value, the more memory will be used. */
+     *  The higher the value, the more memory will be used. */
     #ifndef LV_FREETYPE_CACHE_FT_GLYPH_CNT
         #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
             #define LV_FREETYPE_CACHE_FT_GLYPH_CNT CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
@@ -3295,10 +3295,10 @@
     #endif
 
     /** Enable L1 glyph metrics cache for FreeType.
-    *  A per-font, lock-free, 2-way set-associative cache that accelerates
-    *  repeated glyph metric lookups.  Automatically disabled when an OS is
-    *  configured (LV_USE_OS != LV_OS_NONE) because the cache is not
-    *  thread-safe. */
+     *  A per-font, lock-free, 2-way set-associative cache that accelerates
+     *  repeated glyph metric lookups.  Automatically disabled when an OS is
+     *  configured (LV_USE_OS != LV_OS_NONE) because the cache is not
+     *  thread-safe. */
     #ifndef LV_FREETYPE_CACHE_FT_GLYPH_L1
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_L1
@@ -3465,8 +3465,8 @@
         #endif
     #endif
     /** Use lvgl file path in FFmpeg Player widget
-    *  You won't be able to open URLs after enabling this feature.
-    *  Note that FFmpeg image decoder will always use lvgl file system. */
+     *  You won't be able to open URLs after enabling this feature.
+     *  Note that FFmpeg image decoder will always use lvgl file system. */
     #ifndef LV_FFMPEG_PLAYER_USE_LV_FS
         #ifdef CONFIG_LV_FFMPEG_PLAYER_USE_LV_FS
             #define LV_FFMPEG_PLAYER_USE_LV_FS CONFIG_LV_FFMPEG_PLAYER_USE_LV_FS
@@ -3517,7 +3517,7 @@
     #endif
     #if LV_SYSMON_PROC_IDLE_AVAILABLE
         /** Get the applications idle percentage.
-        * - Requires `LV_USE_OS == LV_OS_PTHREAD` */
+         * - Requires `LV_USE_OS == LV_OS_PTHREAD` */
         #ifndef LV_SYSMON_GET_PROC_IDLE
             #ifdef CONFIG_LV_SYSMON_GET_PROC_IDLE
                 #define LV_SYSMON_GET_PROC_IDLE CONFIG_LV_SYSMON_GET_PROC_IDLE
@@ -3528,7 +3528,7 @@
     #endif
 
     /** 1: Show CPU usage and FPS count.
-    *  - Requires `LV_USE_SYSMON = 1` */
+     *  - Requires `LV_USE_SYSMON = 1` */
     #ifndef LV_USE_PERF_MONITOR
         #ifdef CONFIG_LV_USE_PERF_MONITOR
             #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
@@ -3556,8 +3556,8 @@
     #endif
 
     /** 1: Show used memory and memory fragmentation.
-    *     - Requires `LV_USE_STDLIB_MALLOC = LV_STDLIB_BUILTIN`
-    *     - Requires `LV_USE_SYSMON = 1`*/
+     *     - Requires `LV_USE_STDLIB_MALLOC = LV_STDLIB_BUILTIN`
+     *     - Requires `LV_USE_SYSMON = 1`*/
     #ifndef LV_USE_MEM_MONITOR
         #ifdef CONFIG_LV_USE_MEM_MONITOR
             #define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
@@ -3871,7 +3871,7 @@
 #endif
 #if LV_USE_IME_PINYIN
     /** 1: Use default thesaurus.
-    *  @note  If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesaurus. */
+     *  @note  If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesaurus. */
     #ifndef LV_IME_PINYIN_USE_DEFAULT_DICT
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
@@ -3884,7 +3884,7 @@
         #endif
     #endif
     /** Set maximum number of candidate panels that can be displayed.
-    *  @note  This needs to be adjusted according to size of screen. */
+     *  @note  This needs to be adjusted according to size of screen. */
     #ifndef LV_IME_PINYIN_CAND_TEXT_NUM
         #ifdef CONFIG_LV_IME_PINYIN_CAND_TEXT_NUM
             #define LV_IME_PINYIN_CAND_TEXT_NUM CONFIG_LV_IME_PINYIN_CAND_TEXT_NUM
@@ -3935,7 +3935,7 @@
         #endif
     #endif
     /** Quick access bar, 1:use, 0:do not use.
-    *  - Requires: lv_list */
+     *  - Requires: lv_list */
     #ifndef LV_FILE_EXPLORER_QUICK_ACCESS
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
@@ -3959,14 +3959,14 @@
 #endif
 #if LV_USE_FONT_MANAGER
 
-    /**Font manager name max length*/
-    #ifndef LV_FONT_MANAGER_NAME_MAX_LEN
-        #ifdef CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
-            #define LV_FONT_MANAGER_NAME_MAX_LEN CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
-        #else
-            #define LV_FONT_MANAGER_NAME_MAX_LEN            32
-        #endif
+/**Font manager name max length*/
+#ifndef LV_FONT_MANAGER_NAME_MAX_LEN
+    #ifdef CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
+        #define LV_FONT_MANAGER_NAME_MAX_LEN CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
+    #else
+        #define LV_FONT_MANAGER_NAME_MAX_LEN            32
     #endif
+#endif
 
 #endif
 
@@ -3980,30 +3980,30 @@
 #endif
 #if LV_USE_TEST
 
-    /** Enable `lv_test_screenshot_compare`.
-    * Requires lodepng and a few MB of extra RAM. */
-    #ifndef LV_USE_TEST_SCREENSHOT_COMPARE
-        #ifdef CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
-            #define LV_USE_TEST_SCREENSHOT_COMPARE CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
+/** Enable `lv_test_screenshot_compare`.
+ * Requires lodepng and a few MB of extra RAM. */
+#ifndef LV_USE_TEST_SCREENSHOT_COMPARE
+    #ifdef CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
+        #define LV_USE_TEST_SCREENSHOT_COMPARE CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
+    #else
+        #define LV_USE_TEST_SCREENSHOT_COMPARE 0
+    #endif
+#endif
+
+#if LV_USE_TEST_SCREENSHOT_COMPARE
+    /** 1: Automatically create missing reference images*/
+    #ifndef LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+                #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+            #else
+                #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 0
+            #endif
         #else
-            #define LV_USE_TEST_SCREENSHOT_COMPARE 0
+            #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 1
         #endif
     #endif
-
-    #if LV_USE_TEST_SCREENSHOT_COMPARE
-        /** 1: Automatically create missing reference images*/
-        #ifndef LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
-            #ifdef LV_KCONFIG_PRESENT
-                #ifdef CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
-                    #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
-                #else
-                    #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 0
-                #endif
-            #else
-                #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 1
-            #endif
-        #endif
-    #endif /*LV_USE_TEST_SCREENSHOT_COMPARE*/
+#endif /*LV_USE_TEST_SCREENSHOT_COMPARE*/
 
 #endif /*LV_USE_TEST*/
 
@@ -4373,9 +4373,9 @@
 #if LV_USE_LINUX_DRM
 
     /* Use the MESA GBM library to allocate DMA buffers that can be
-    * shared across sub-systems and libraries using the Linux DMA-BUF API.
-    * The GBM library aims to provide a platform independent memory management system
-    * it supports the major GPU vendors - This option requires linking with libgbm */
+     * shared across sub-systems and libraries using the Linux DMA-BUF API.
+     * The GBM library aims to provide a platform independent memory management system
+     * it supports the major GPU vendors - This option requires linking with libgbm */
     #ifndef LV_USE_LINUX_DRM_GBM_BUFFERS
         #ifdef CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS
             #define LV_USE_LINUX_DRM_GBM_BUFFERS CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS
@@ -4737,7 +4737,7 @@
     #endif
 
     /** Render test for each primitive.
-    *  - Requires at least 480x272 display. */
+     *  - Requires at least 480x272 display. */
     #ifndef LV_USE_DEMO_RENDER
         #ifdef CONFIG_LV_USE_DEMO_RENDER
             #define LV_USE_DEMO_RENDER CONFIG_LV_USE_DEMO_RENDER
@@ -4820,8 +4820,8 @@
     #endif
 
     /*---------------------------
-    * Demos from lvgl/lv_demos
-    ---------------------------*/
+     * Demos from lvgl/lv_demos
+      ---------------------------*/
 
     /** Flex layout demo */
     #ifndef LV_USE_DEMO_FLEX_LAYOUT
@@ -4888,9 +4888,9 @@
 #define LV_USE_ANIMIMAGE LV_USE_ANIMIMG
 
 #ifndef __ASSEMBLY__
-    LV_EXPORT_CONST_INT(LV_DPI_DEF);
-    LV_EXPORT_CONST_INT(LV_DRAW_BUF_STRIDE_ALIGN);
-    LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
+LV_EXPORT_CONST_INT(LV_DPI_DEF);
+LV_EXPORT_CONST_INT(LV_DRAW_BUF_STRIDE_ALIGN);
+LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
 #undef LV_KCONFIG_PRESENT
