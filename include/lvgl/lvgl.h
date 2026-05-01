@@ -154,6 +154,7 @@
 #include "lv_types.h"
 #include "misc/lv_async.h"
 #include "misc/lv_math.h"
+#include "misc/lv_tree.h"
 #include "osal/lv_os.h"
 #include "others/file_explorer/lv_file_explorer.h"
 #include "others/fragment/lv_fragment.h"
