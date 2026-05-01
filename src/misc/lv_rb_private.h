@@ -33,7 +33,7 @@ typedef enum {
     LV_RB_COLOR_BLACK
 } lv_rb_color_t;
 
-typedef struct {
+typedef struct _lv_rb_node_t {
     struct _lv_rb_node_t * parent;
     struct _lv_rb_node_t * left;
     struct _lv_rb_node_t * right;

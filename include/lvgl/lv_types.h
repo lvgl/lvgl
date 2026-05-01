@@ -150,8 +150,6 @@ typedef struct _lv_fragment_managed_states_t lv_fragment_managed_states_t;
 
 typedef struct _lv_profiler_builtin_config_t lv_profiler_builtin_config_t;
 
-typedef struct _lv_rb_t lv_rb_t;
-
 typedef struct _lv_color_filter_dsc_t lv_color_filter_dsc_t;
 
 typedef struct _lv_event_dsc_t lv_event_dsc_t;
