@@ -8,6 +8,7 @@
  *********************/
 
 #include "../../lv_public_api.h"
+#include "lv_draw_buf_convert.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     #include "neon/lv_draw_buf_convert_neon.h"
