@@ -15,6 +15,7 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../misc/lv_anim_private.h"
+#include "../../core/lv_observer_private.h"
 
 /*********************
  *      DEFINES

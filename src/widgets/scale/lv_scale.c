@@ -10,8 +10,10 @@
 
 #if LV_USE_SCALE
 
+#include "lv_scale_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
+#include "../../core/lv_obj_class_private.h"
 
 /*********************
  *      DEFINES
