@@ -19,7 +19,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 #if LV_USE_DRAW_EVE
 
 #include "lv_draw_eve_ram_g.h"

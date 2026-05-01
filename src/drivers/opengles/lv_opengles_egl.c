@@ -16,7 +16,7 @@
 #include <string.h>
 #include "lv_opengles_debug.h"
 
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 #include "glad/include/glad/egl.h"
 #include "lv_opengles_private.h"
 #include "lv_opengles_egl_private.h"

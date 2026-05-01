@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "../image/lv_image_private.h"
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 
 #if LV_USE_CANVAS
 

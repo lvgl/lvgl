@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 #if LV_USE_THORVG_INTERNAL
 
 #ifndef _TVG_SIMPLE_XML_PARSER_H_

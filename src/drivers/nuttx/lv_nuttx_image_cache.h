@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 #include LV_STDBOOL_INCLUDE
 
 /*********************

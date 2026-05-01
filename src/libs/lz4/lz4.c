@@ -32,7 +32,7 @@
     - LZ4 source repository : https://github.com/lz4/lz4
 */
 
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 #if LV_USE_LZ4_INTERNAL
 
 /*-************************************

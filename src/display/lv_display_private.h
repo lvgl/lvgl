@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_internal.h"
+#include "../lv_public_api.h"
 
 #if LV_USE_SYSMON
 #include "../debugging/sysmon/lv_sysmon_private.h"

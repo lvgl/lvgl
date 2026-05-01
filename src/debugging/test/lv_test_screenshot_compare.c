@@ -11,7 +11,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 
 #if LV_USE_TEST && defined(LV_USE_TEST_SCREENSHOT_COMPARE) && LV_USE_TEST_SCREENSHOT_COMPARE
 

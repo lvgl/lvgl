@@ -46,7 +46,7 @@
 
 #include "lv_cache_lru_rb.h"
 #include "../lv_cache_entry.h"
-#include "../../../lv_internal.h"
+#include "../../../lv_public_api.h"
 #include "../../lv_rb_private.h"
 #include "../../lv_iter_private.h"
 

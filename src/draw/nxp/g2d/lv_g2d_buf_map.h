@@ -21,7 +21,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_internal.h"
+#include "../../../lv_public_api.h"
 
 #if LV_USE_G2D
 #if LV_USE_DRAW_G2D

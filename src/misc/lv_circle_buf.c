@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_circle_buf_private.h"
-#include "../lv_internal.h"
+#include "../lv_public_api.h"
 
 /*********************
  *      DEFINES

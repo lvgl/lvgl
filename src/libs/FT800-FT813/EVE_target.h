@@ -1,7 +1,7 @@
 #ifndef EVE_TARGET_H
 #define EVE_TARGET_H
 
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 #include "../../draw/eve/lv_draw_eve_private.h"
 #include "../../core/lv_global.h"
 

@@ -15,7 +15,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_internal.h"
+#include "../../../lv_public_api.h"
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_internal.h"
+#include "lv_public_api.h"
 #include "misc/lv_timer_private.h"
 #include "misc/lv_profiler_builtin_private.h"
 #include "misc/lv_anim_private.h"

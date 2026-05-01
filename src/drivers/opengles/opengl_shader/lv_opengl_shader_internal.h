@@ -6,7 +6,7 @@
 #ifndef LV_OPENGL_SHADER_INTERNAL_H
 #define LV_OPENGL_SHADER_INTERNAL_H
 
-#include "../../../lv_internal.h"
+#include "../../../lv_public_api.h"
 
 #if LV_USE_OPENGLES
 

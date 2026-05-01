@@ -18,7 +18,7 @@
 #ifndef NANOVG_GL_H
 #define NANOVG_GL_H
 
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 
 #if LV_USE_NANOVG
 
@@ -116,7 +116,7 @@ enum NVGimageFlagsGL {
 
 #include <math.h>
 #include "nanovg.h"
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 
 enum GLNVGuniformLoc {
     GLNVG_LOC_VIEWSIZE,

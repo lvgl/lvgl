@@ -984,7 +984,7 @@ print('#endif /* LV_OBJ_STYLE_GEN_H */')
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
 
 print(HEADING)
-print('#include "../lv_internal.h"')
+print('#include "../lv_public_api.h"')
 print()
 
 for prop in props:
@@ -998,7 +998,7 @@ guard_close()
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.c', 'w')
 
 print(HEADING)
-print('#include "../lv_internal.h"')
+print('#include "../lv_public_api.h"')
 print()
 
 for prop in props:

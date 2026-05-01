@@ -28,7 +28,7 @@
 #ifndef VG_LITE_OPTIONS_DISPATCH_H
 #define VG_LITE_OPTIONS_DISPATCH_H
 
-#include "../../../lv_internal.h"
+#include "../../../lv_public_api.h"
 #if LV_USE_VG_LITE_DRIVER
 
     #define VG_LITE_OPTIONS VG_LITE_OPTIONS_2

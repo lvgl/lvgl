@@ -1,7 +1,7 @@
 #ifndef _THORVG_H_
 #define _THORVG_H_
 
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 
 /*Testing of dependencies*/
 #if LV_USE_THORVG && LV_USE_VECTOR_GRAPHIC == 0
@@ -17,7 +17,7 @@
 #include <memory>
 #include <string>
 #include <list>
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 
 #ifdef TVG_API
     #undef TVG_API

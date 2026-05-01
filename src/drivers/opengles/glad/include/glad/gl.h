@@ -29,7 +29,7 @@
 #ifndef GLAD_GL_H_
 #define GLAD_GL_H_
 
-#include "../../../../../lv_internal.h"
+#include "../../../../../lv_public_api.h"
 
 #if LV_USE_OPENGLES && !LV_USE_EGL
 

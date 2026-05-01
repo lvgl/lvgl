@@ -10,7 +10,7 @@
 #include "lv_observer_private.h"
 #if LV_USE_OBSERVER
 
-#include "../lv_internal.h"
+#include "../lv_public_api.h"
 #include "../core/lv_obj_private.h"
 #include "../misc/lv_event_private.h"
 

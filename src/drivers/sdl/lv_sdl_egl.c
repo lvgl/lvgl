@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_internal.h"
+#include "../../lv_public_api.h"
 
 #if LV_SDL_USE_EGL
 

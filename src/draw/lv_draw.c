@@ -10,7 +10,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_internal.h"
+#include "../lv_public_api.h"
 #include "../misc/lv_area_private.h"
 #include "../misc/lv_event_private.h"
 #include "lv_draw_private.h"
