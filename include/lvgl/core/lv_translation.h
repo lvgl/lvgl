@@ -15,7 +15,10 @@ extern "C" {
  *********************/
 #include "../config/lv_conf_internal.h"
 
+#if LV_USE_TRANSLATION
+
 #include LV_STDINT_INCLUDE
+#include "../lv_types.h"
 
 /*********************
  *      DEFINES
@@ -141,3 +144,4 @@ lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_
 } /*extern "C"*/
 #endif
 
+#endif /*LV_TRANSLATION_H*/

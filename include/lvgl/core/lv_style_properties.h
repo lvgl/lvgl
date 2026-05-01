@@ -6,7 +6,7 @@
 #ifndef LV_STYLE_PROPERTIES_H
 #define LV_STYLE_PROPERTIES_H
 
-#include "../../lv_internal.h"
+#include "../config/lv_conf_internal.h"
 #if LV_USE_OBJ_PROPERTY
 
 

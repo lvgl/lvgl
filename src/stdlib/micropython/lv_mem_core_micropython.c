@@ -10,7 +10,7 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_MICROPYTHON
 
-#include "include/lv_mp_mem_custom_include.h"
+#include <include/lv_mp_mem_custom_include.h>
 
 /*********************
  *      DEFINES

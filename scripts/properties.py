@@ -127,7 +127,7 @@ def write_widget_properties(root_folder, properties_by_widget):
 #ifndef LV_OBJ_PROPERTY_NAMES_H
 #define LV_OBJ_PROPERTY_NAMES_H
 
-#include "../../misc/lv_types.h"
+#include "../lv_types.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 
@@ -197,7 +197,7 @@ def write_style_header(root_folder, properties_by_widget):
 #ifndef LV_STYLE_PROPERTIES_H
 #define LV_STYLE_PROPERTIES_H
 
-#include "../../lv_internal.h"
+#include "../config/lv_conf_internal.h"
 #if LV_USE_OBJ_PROPERTY
 
 

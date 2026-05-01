@@ -6,7 +6,7 @@
 #ifndef LV_OBJ_PROPERTY_NAMES_H
 #define LV_OBJ_PROPERTY_NAMES_H
 
-#include "../../misc/lv_types.h"
+#include "../lv_types.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

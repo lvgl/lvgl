@@ -18,7 +18,7 @@ extern "C" {
 
 #if LV_USE_GIF
 
-#include "../misc/lv_color.h"
+#include "../draw/lv_color.h"
 
 /*********************
  *      DEFINES
