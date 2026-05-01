@@ -17,8 +17,6 @@
 
 #if LV_USE_GIF
 
-#include "../../misc/lv_fs.h"
-
 //
 // GIF Animator
 // Written by Larry Bank

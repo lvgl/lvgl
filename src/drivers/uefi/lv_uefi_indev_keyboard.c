@@ -12,7 +12,6 @@
 #if LV_USE_UEFI
 
 #include "../../misc/lv_text_private.h"
-#include "lv_uefi_indev.h"
 
 /*********************
  *      DEFINES

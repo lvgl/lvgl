@@ -11,8 +11,6 @@
 
 #if LV_USE_UEFI
 
-#include "lv_uefi_context.h"
-
 /*********************
  *      DEFINES
  *********************/

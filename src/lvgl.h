@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../include/lvgl/lvgl.h"
+#include "../include/lvgl/lvgl.h"
 
 /*********************
  *      DEFINES

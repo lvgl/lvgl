@@ -13,7 +13,6 @@
 
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"

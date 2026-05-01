@@ -1,3 +1,4 @@
+
 /**
  * @file lv_obj_property_names.h
  * GENERATED FILE, DO NOT EDIT IT!
@@ -5,7 +6,7 @@
 #ifndef LV_OBJ_PROPERTY_NAMES_H
 #define LV_OBJ_PROPERTY_NAMES_H
 
-#include "../config/lv_conf_internal.h"
+#include "../../misc/lv_types.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_image_private.h"
+
+#if LV_USE_IMAGE != 0
+
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../draw/lv_draw_image_private.h"
@@ -16,10 +19,6 @@
 #include "../../core/lv_obj_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_observer_private.h"
-
-#if LV_USE_IMAGE != 0
-
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

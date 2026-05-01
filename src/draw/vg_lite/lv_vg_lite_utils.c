@@ -17,7 +17,6 @@
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_grad.h"
 #include "../../misc/lv_area_private.h"
-#include "../../draw/lv_draw_image.h"
 #include "../lv_image_decoder_private.h"
 #include <math.h>
 

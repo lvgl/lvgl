@@ -15,11 +15,6 @@
 #include <fastgltf/tools.hpp>
 #include <fastgltf/types.hpp>
 #include "../fastgltf/lv_fastgltf.hpp"
-#include "../../../misc/lv_assert.h"
-#include "../../../misc/lv_log.h"
-#include "../../../misc/lv_math.h"
-#include "../../../stdlib/lv_sprintf.h"
-#include "../../../misc/lv_fs.h"
 
 #include "../stb_image/stb_image.h"
 #include <webp/decode.h>

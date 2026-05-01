@@ -12,7 +12,6 @@
 #if LV_USE_THEME_MONO
 
 #include "../lv_theme_private.h"
-#include "lv_theme_mono.h"
 #include "../../core/lv_global.h"
 
 /*********************

@@ -23,7 +23,6 @@
 #include <windowsx.h>
 
 #include "../../widgets/textarea/lv_textarea_private.h"
-#include "../../widgets/keyboard/lv_keyboard.h"
 
 /*********************
  *      DEFINES

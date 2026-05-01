@@ -13,9 +13,6 @@
 
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
-#include "../../core/lv_refr.h"
-#include "../../stdlib/lv_string.h"
-#include "../../indev/lv_indev.h"
 #include "../../misc/lv_area_private.h"
 
 #include <stdlib.h>

@@ -23,8 +23,6 @@ extern "C" {
 
 #include "../../widgets/image/lv_image_private.h"
 
-#include "lv_gstreamer.h"
-
 /*********************
  *      DEFINES
  *********************/

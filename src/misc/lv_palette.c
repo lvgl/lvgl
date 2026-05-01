@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_palette.h"
+
+#include "../lv_internal.h"
 
 /*********************
  *      DEFINES

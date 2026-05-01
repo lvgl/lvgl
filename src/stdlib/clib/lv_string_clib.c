@@ -5,10 +5,11 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../../lv_internal.h"
+
 #if LV_USE_STDLIB_STRING == LV_STDLIB_CLIB
-#include "../lv_string.h"
-#include "../lv_mem.h" /*Need lv_malloc*/
+
 #include <string.h>
 
 /*********************

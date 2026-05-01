@@ -22,9 +22,6 @@
 #include <xf86drmMode.h>
 #include <drm_fourcc.h>
 
-#include "../../../stdlib/lv_sprintf.h"
-#include "../../../draw/lv_draw_buf.h"
-
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
     #include <gbm.h>
     #include <linux/dma-buf.h>

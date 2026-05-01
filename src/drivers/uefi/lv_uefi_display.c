@@ -11,8 +11,6 @@
 
 #if LV_USE_UEFI
 
-#include "lv_uefi_display.h"
-
 #if LV_COLOR_DEPTH != 32
     #error [lv_uefi] Unsupported LV_COLOR_DEPTH.
 #endif

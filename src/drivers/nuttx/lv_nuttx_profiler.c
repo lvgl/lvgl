@@ -14,7 +14,6 @@
 #include "../../lv_internal.h"
 #include "../../misc/lv_profiler_builtin_private.h"
 #include "../../core/lv_global.h"
-#include "lv_nuttx_entry.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>

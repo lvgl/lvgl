@@ -12,7 +12,6 @@
 #if LV_USE_OS == LV_OS_WINDOWS
 
 #include <process.h>
-#include "../misc/lv_timer.h"
 
 /*********************
  *      DEFINES

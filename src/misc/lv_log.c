@@ -6,14 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_log.h"
+#include "../lv_internal.h"
+
 #if LV_USE_LOG
 
-#include "../misc/lv_types.h"
-#include "../stdlib/lv_sprintf.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
-#include "../tick/lv_tick.h"
 #include "../core/lv_global.h"
 
 #if LV_LOG_PRINTF
