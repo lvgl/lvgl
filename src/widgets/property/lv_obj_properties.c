@@ -4,7 +4,7 @@
  * @file lv_obj_properties.c
  */
 
-#include "../../core/lv_obj.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

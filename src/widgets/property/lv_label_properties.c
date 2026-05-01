@@ -4,7 +4,7 @@
  * @file lv_label_properties.c
  */
 
-#include "../label/lv_label.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

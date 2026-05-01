@@ -4,7 +4,7 @@
  * @file lv_spinbox_properties.c
  */
 
-#include "../spinbox/lv_spinbox.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

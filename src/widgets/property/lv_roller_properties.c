@@ -4,7 +4,7 @@
  * @file lv_roller_properties.c
  */
 
-#include "../roller/lv_roller.h"
+#include "../../lv_internal.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 
