@@ -378,7 +378,7 @@ if(CONFIG_LV_BUILD_DEMOS)
 
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/demos"
-        DESTINATION "${INC_INSTALL_DIR}"
+        DESTINATION "${INC_INSTALL_DIR}/lvgl"
         FILES_MATCHING
         PATTERN "*.h")
 
@@ -404,7 +404,7 @@ if(CONFIG_LV_BUILD_EXAMPLES)
 
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples"
-        DESTINATION "${INC_INSTALL_DIR}"
+        DESTINATION "${INC_INSTALL_DIR}/lvgl"
         FILES_MATCHING
         PATTERN "*.h")
 
