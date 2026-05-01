@@ -25,8 +25,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_tree_class_t lv_tree_class_t;
-typedef struct _lv_tree_node_t lv_tree_node_t;
 
 typedef void (*lv_tree_constructor_cb_t)(const lv_tree_class_t * class_p, lv_tree_node_t * node);
 typedef void (*lv_tree_destructor_cb_t)(const lv_tree_class_t * class_p, lv_tree_node_t * node);

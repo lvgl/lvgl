@@ -12,6 +12,8 @@
 #include "../../../misc/lv_iter_private.h"
 
 #include "lv_image_cache.h"
+#include "lv_image_header_cache.h"
+#include "../lv_cache_entry.h"
 
 /*********************
  *      DEFINES

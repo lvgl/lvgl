@@ -349,6 +349,8 @@ typedef struct _lv_ffmpeg_player_t lv_ffmpeg_player_t;
 typedef struct _lv_opengles_window_t lv_opengles_window_t;
 typedef struct _lv_opengles_window_texture_t lv_opengles_window_texture_t;
 
+typedef struct _lv_tree_class_t lv_tree_class_t;
+typedef struct _lv_tree_node_t lv_tree_node_t;
 typedef uint32_t lv_prop_id_t;
 
 
