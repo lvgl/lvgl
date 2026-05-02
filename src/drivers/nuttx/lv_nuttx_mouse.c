@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include "../../lvgl_private.h"
+#include "lv_nuttx_mouse.h"
 
 #ifdef __NuttX__
     #include <debug.h>
