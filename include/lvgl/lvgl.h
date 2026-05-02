@@ -7,13 +7,19 @@
 #include "3d/lv_gltf_model.h"
 #include "3d/lv_gltf_model_loader.h"
 #include "3d/lv_gltf_model_node.h"
-#include "api_map/lv_api_map_v8.h"
-#include "api_map/lv_api_map_v9_0.h"
-#include "api_map/lv_api_map_v9_1.h"
-#include "api_map/lv_api_map_v9_2.h"
-#include "api_map/lv_api_map_v9_3.h"
-#include "api_map/lv_api_map_v9_4.h"
-#include "api_map/lv_api_map_v9_5.h"
+
+/* Define LV_DISABLE_API_MAPPING using a compiler option
+ * to make sure your application is not using deprecated names */
+#ifndef LV_DISABLE_API_MAPPING
+    #include "api_map/lv_api_map_v8.h"
+    #include "api_map/lv_api_map_v9_0.h"
+    #include "api_map/lv_api_map_v9_1.h"
+    #include "api_map/lv_api_map_v9_2.h"
+    #include "api_map/lv_api_map_v9_3.h"
+    #include "api_map/lv_api_map_v9_4.h"
+    #include "api_map/lv_api_map_v9_5.h"
+#endif /*LV_DISABLE_API_MAPPING*/
+
 #include "config/lv_conf_internal.h"
 #include "config/lv_conf_kconfig.h"
 #include "core/lv_anim.h"
