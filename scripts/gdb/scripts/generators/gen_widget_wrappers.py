@@ -25,6 +25,7 @@ from dataclasses import dataclass, field as dc_field
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
+LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
 WIDGETS_DIR = LVGL_SRC / "widgets"
 OUTPUT_DIR = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "widgets"
 
@@ -39,7 +40,8 @@ SIMPLE_INT_TYPES = {
 def _scan_enum_types() -> set[str]:
     """Scan LVGL headers to find all typedef enum and int-like alias type names."""
     result = set()
-    for h in LVGL_SRC.rglob("*.h"):
+    headers = list(LVGL_SRC.rglob("*.h")) + list(LVGL_INC.rglob("*.h"))
+    for h in headers:
         text = h.read_text(errors="ignore")
         # typedef enum { ... } lv_xxx_t;
         for m in re.finditer(
