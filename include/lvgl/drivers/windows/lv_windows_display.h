@@ -19,8 +19,6 @@ extern "C" {
 
 #if LV_USE_WINDOWS
 
-#include <windows.h>
-
 /*********************
  *      DEFINES
  *********************/
@@ -34,6 +32,9 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct HWND__;
+typedef struct HWND__ * HWND;
 
 /**********************
  * GLOBAL PROTOTYPES
