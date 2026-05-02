@@ -10,9 +10,7 @@ if(LV_MICROPYTHON)
     SRCS
     ${SOURCES}
     INCLUDE_DIRS
-    ${LVGL_ROOT_DIR}
-    ${LVGL_ROOT_DIR}/src
-    ${LVGL_ROOT_DIR}/../
+    ${LVGL_ROOT_DIR}/include
     REQUIRES
     main)
 else()
