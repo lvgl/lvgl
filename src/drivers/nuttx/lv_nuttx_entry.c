@@ -262,6 +262,11 @@ void lv_nuttx_deinit(lv_nuttx_result_t * result)
             lv_indev_delete(result->utouch_indev);
             result->utouch_indev = NULL;
         }
+
+        if(result->mouse_indev) {
+            lv_indev_delete(result->mouse_indev);
+            result->mouse_indev = NULL;
+        }
     }
 #else
     lv_nuttx_deinit_custom(result);
@@ -317,11 +322,15 @@ static void lv_nuttx_uv_loop(lv_nuttx_result_t * result)
     uv_info.loop = &loop;
     uv_info.disp = result->disp;
     uv_info.indev = result->indev;
-#ifdef CONFIG_UINPUT_TOUCH
-    uv_info.uindev = result->utouch_indev;
-#endif
+    uv_info.utouch_indev = result->utouch_indev;
+    uv_info.mouse_indev = result->mouse_indev;
 
     data = lv_nuttx_uv_init(&uv_info);
+    if(data == NULL) {
+        LV_LOG_ERROR("lv_nuttx_uv_init failed");
+        uv_loop_close(&loop);
+        return;
+    }
     uv_run(&loop, UV_RUN_DEFAULT);
     lv_nuttx_uv_deinit(&data);
 }
