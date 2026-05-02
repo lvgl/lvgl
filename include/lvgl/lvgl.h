@@ -73,6 +73,7 @@
 #include "draw/lv_image_dsc.h"
 #include "draw/lv_palette.h"
 #include "draw/lv_snapshot.h"
+#include "draw/sw/lv_draw_sw_utils.h"
 #include "drivers/display/lv_linux_drm.h"
 #include "drivers/display/lv_draw_eve_display.h"
 #include "drivers/display/lv_draw_eve_display_defines.h"

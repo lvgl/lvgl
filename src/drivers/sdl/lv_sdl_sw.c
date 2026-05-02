@@ -23,7 +23,6 @@
 #endif /* _WIN32 */
 
 #include "../../display/lv_display_private.h"
-#include "../../draw/sw/lv_draw_sw_utils.h"
 
 
 /*********************

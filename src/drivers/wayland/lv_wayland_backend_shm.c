@@ -11,7 +11,6 @@
 
 #if LV_WAYLAND_USE_SHM
 
-#include "../../draw/sw/lv_draw_sw_utils.h"
 #include "../../display/lv_display_private.h"
 #include <errno.h>
 #include <fcntl.h>

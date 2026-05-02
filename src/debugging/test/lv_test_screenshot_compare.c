@@ -25,7 +25,6 @@
 #include <stdarg.h>
 #include <errno.h>
 #include "../../libs/lodepng/lodepng.h"
-#include "../../draw/sw/lv_draw_sw_utils.h"
 
 #ifdef _WIN32
     #include <direct.h>
