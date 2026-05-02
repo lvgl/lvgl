@@ -18,6 +18,8 @@ extern "C" {
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
 
+#include "../../misc/cache/lv_cache_entry.h"
+
 /*********************
  *      DEFINES
  *********************/
