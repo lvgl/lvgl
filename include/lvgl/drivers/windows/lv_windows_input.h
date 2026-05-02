@@ -19,8 +19,6 @@ extern "C" {
 
 #if LV_USE_WINDOWS
 
-#include <windows.h>
-
 /*********************
  *      DEFINES
  *********************/
@@ -32,6 +30,9 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+struct HWND__;
+typedef struct HWND__ * HWND;
 
 /**
  * @brief Get the window handle from specific LVGL input device object.
