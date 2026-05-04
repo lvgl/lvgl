@@ -245,8 +245,8 @@ void lv_group_focus_obj(lv_obj_t * obj)
 
     lv_group_t * g = lv_obj_get_group(obj);
 
-    LV_CHECK_ARG(g != NULL, return);
-    LV_CHECK_ARG(g->frozen == 0, return, "Cannot change focus on a frozen group");
+    if(g == NULL) return;
+    if(g->frozen) return;
 
     /*On defocus edit mode must be leaved*/
     lv_group_set_editing(g, false);
