@@ -1,8 +1,0 @@
-{
-  "title": "OS Support",
-  "pages": [
-    "buildroot",
-    "yocto",
-    "torizon_os"
-  ]
-}

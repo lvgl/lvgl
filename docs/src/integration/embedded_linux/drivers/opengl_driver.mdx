@@ -1,5 +1,5 @@
 ---
-title: OpenGL
+title: OpenGL Driver
 description: The OpenGL display driver is a generic driver that creates textures for embedding LVGL content in other applications. The goal is to create textures that people can embed in other applications.
 ---
 
@@ -24,9 +24,9 @@ An OpenGL context must be created before using the OpenGL driver. You can create
 
 1. Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
    
-    .. code-block:: c
-   
-        #define LV_USE_OPENGLES  1
+```c
+#define LV_USE_OPENGLES  1
+```
 
 ##### Basic Usage
 

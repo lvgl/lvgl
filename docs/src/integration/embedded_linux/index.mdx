@@ -1,6 +1,52 @@
 ---
 title: Embedded Linux Support
+description: "LVGL runs as a native Linux application and supports a wide range of display backends, input systems, rendering accelerators, and Linux distributions out of the box."
 ---
 
+## Overview
+
+LVGL supports Linux as a first-class target, running as a standard Linux application without requiring an RTOS. It integrates with the
+display and input infrastructure available on your platform through a modular set of drivers and rendering backends, giving you the
+flexibility to target anything from a minimal framebuffer setup to a fully GPU-accelerated Wayland compositor.
+
+The recommended way to get started is the [lv_port_linux](https://github.com/lvgl/lv_port_linux) reference project. It provides a
+ready-to-build CMake project with the most common drivers pre-configured, and is the fastest path to a running LVGL application on Linux hardware.
+
+## What LVGL supports
+
+### Display and input drivers
+
+LVGL provides drivers for the most common Linux display and input interfaces:
+
+- **[Framebuffer (fbdev)](/integration/embedded_linux/drivers/fbdev)**: the simplest option, works on virtually any Linux system with no compositor required
+- **[DRM/KMS](/integration/embedded_linux/drivers/drm)**: modern direct rendering, recommended for production embedded targets
+- **[Wayland](/integration/embedded_linux/drivers/wayland)**: suitable for systems running a Wayland compositor, with SHM, EGL, and G2D backends. Also useful for development
+- **[X11](/integration/embedded_linux/drivers/X11)**: useful for development and desktop simulation
+- **[EGL](/integration/embedded_linux/drivers/egl)**: hardware-accelerated OpenGL ES rendering, usable via DRM or Wayland
+- **[evdev](/integration/embedded_linux/drivers/evdev) / [libinput](/integration/embedded_linux/drivers/libinput)**: touchscreen, mouse, and keyboard input
+- **[GLFW](/integration/embedded_linux/drivers/glfw)**: cross-platform windowing, primarily for development
+
+### Rendering acceleration
+
+Beyond the CPU-based software renderer, LVGL supports GPU-accelerated draw units on Linux:
+
+- **[NanoVG](/integration/embedded_linux/draw_units/draw_nanovg)** (`draw_nanovg`): GPU-accelerated vector graphics via OpenGL; the recommended default for most use cases, supports all LVGL features
+- **[OpenGL](/integration/embedded_linux/draw_units/draw_opengl)** (`draw_opengl`): direct OpenGL ES rendering, including 3D/glTF support
+- **[SDL](/integration/embedded_linux/draw_units/draw_sdl)** (`draw_sdl`):  SDL2-based rendering
+
+### OS and distribution support
+
+LVGL works with standard Linux distributions and embedded build systems. Dedicated integration guides are available for:
+
+- **[Buildroot](/integration/embedded_linux/distros/buildroot)**: minimal embedded Linux images
+- **[Yocto](/integration/embedded_linux/distros/yocto)**: layer-based embedded Linux build system
+- **[Torizon](/integration/embedded_linux/distros/torizon/torizon)**: container-based embedded Linux platform by Toradex
+
+### Multimedia
+
+LVGL supports hardware-accelerated video playback on Linux through:
+
+- **[FFmpeg](/libs/video_support/ffmpeg)** — video decoding and playback
+- **[GStreamer](/libs/video_support/gstreamer)** — pipeline-based multimedia framework
 
 <DirectoryIndex />

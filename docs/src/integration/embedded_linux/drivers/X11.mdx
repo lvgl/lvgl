@@ -1,5 +1,5 @@
 ---
-title: X11 Display/Inputs driver
+title: X11
 description: The X11 display/input driver offers support for simulating the LVGL display and keyboard/mouse inputs in an X11 desktop window.
 ---
 
@@ -24,16 +24,19 @@ The X11 driver uses XLib to access the linux window manager.
 ### Configure X11 driver
 
 1. Enable the X11 driver support in lv_conf.h, by cmake compiler define or by KConfig
-    .. code-block:: c
-   
-        #define LV_USE_X11  1
+
+```c
+#define LV_USE_X11  1
+```
+
 2. Optional configuration options:
     -  Direct Exit
-        .. code-block:: c
-   
-            #define LV_X11_DIRECT_EXIT  1 /* preferred default - ends the application automatically if last window has been closed */
-            // or
-            #define LV_X11_DIRECT_EXIT  0 /* application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler */
+
+```c
+#define LV_X11_DIRECT_EXIT  1 /* preferred default - ends the application automatically if last window has been closed */
+// or
+#define LV_X11_DIRECT_EXIT  0 /* application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler */
+```
 
 -  Double buffering
 

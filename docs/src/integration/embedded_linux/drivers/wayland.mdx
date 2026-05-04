@@ -1,5 +1,5 @@
 ---
-title: Wayland Display/Inputs driver
+title: Wayland
 description: "The Wayland driver provides integration between LVGL and Wayland-based systems, allowing LVGL applications to render directly into a Wayland surface and handle keyboard, mouse and touch input. This..."
 ---
 
@@ -73,14 +73,15 @@ To enable the EGL backend:
 
 1. Enable OpenGL ES support in your LVGL configuration:
    
-   .. code-block:: c
-   
-      #define LV_USE_OPENGLES 1
+```c   
+#define LV_USE_OPENGLES 1
+```
+
 2. Link your application with the `wayland-egl` library (add to your build system):
    
-   .. code-block:: bash
-   
-      -lwayland-egl
+```bash
+-lwayland-egl
+```
 
 **Note:** If your target board has OpenGL ES 2.0 support, this backend can be used with LVGL's 3D rendering
 capabilities for glTF model visualization. See [3D/glTF Support](/integration/embedded_linux/opengl) for details on 3D rendering support.
@@ -106,15 +107,16 @@ To enable the G2D backend:
 
 1. Enable G2D support in your LVGL configuration:
    
-   .. code-block:: c
-   
-      #define LV_USE_G2D 1
-      #define LV_USE_DRAW_G2D 1
+```c
+#define LV_USE_G2D 1
+#define LV_USE_DRAW_G2D 1
+```
+
 2. Link your application with the `g2d` library (add to your build system):
    
-   .. code-block:: bash
-   
-      -lg2d
+```bash
+-lg2d
+```
 
 ## Configuring the wayland driver
 
