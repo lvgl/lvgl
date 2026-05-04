@@ -44,6 +44,7 @@ extern "C" {
 #if LV_USE_NEMA_GFX
 
 #include "lv_draw_nema_gfx_utils.h"
+#include "lv_draw_nema_gfx_cache.h"
 
 #include "../lv_draw_private.h"
 #include "../lv_draw_buf_private.h"

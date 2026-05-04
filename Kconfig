@@ -579,6 +579,16 @@ menu "LVGL configuration"
 			bool "Use NemaGFX acceleration"
 			default n
 
+		config LV_NEMA_USE_CACHE
+			bool "Cache handling of NemaGFX"
+			depends on LV_USE_NEMA_GFX
+			default n
+
+		config LV_NEMA_CACHE_HAL_INCLUDE
+			string "NemaGFX Cache HAL include"
+			default "stm32u5xx_hal.h"
+			depends on LV_USE_NEMA_GFX && LV_NEMA_USE_CACHE
+
 		choice LV_USE_NEMA_LIB
 			prompt "NemaGFX static library"
 			depends on LV_USE_NEMA_GFX
@@ -689,7 +699,6 @@ menu "LVGL configuration"
 			int "Draw letter cache count"
 			default 512
 			depends on LV_USE_DRAW_NANOVG
-
 	endmenu
 
 	menu "Feature Configuration"

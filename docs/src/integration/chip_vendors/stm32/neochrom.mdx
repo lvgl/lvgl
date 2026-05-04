@@ -80,6 +80,11 @@ that will place the memory shared between the CPU and the GPU in a region of mem
 not cached. This requires coordination from the linker script and memory protection unit
 configuration. See [lv_port_stm32h7s78-dk](https://github.com/lvgl/lv_port_stm32h7s78-dk)
 as a reference.
+Alternatively, <ApiLink name="LV_NEMA_USE_CACHE" /> can be set to 1 to perform necessary
+cache management on the buffers, avoiding the need to place buffers in non-cached area.
+For that purpose, the <ApiLink name="LV_NEMA_CACHE_HAL_INCLUDE" /> must also be set to
+a HAL include file exposing the CMSIS cache handling functions and SCB pointer,
+such as for example "stm32u5xx_hal.h".
 
 ## Vector Graphics
 
