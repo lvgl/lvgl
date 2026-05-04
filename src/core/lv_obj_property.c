@@ -9,7 +9,6 @@
 #include "lv_obj_private.h"
 #include "../misc/lv_utils.h"
 #include "lv_obj_class_private.h"
-#include "include/lvgl/debugging/lv_check_arg.h"
 #include "../lv_public_api.h"
 
 #if LV_USE_OBJ_PROPERTY
