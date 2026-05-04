@@ -168,9 +168,9 @@ void lv_image_decoder_set_open_cb(lv_image_decoder_t * decoder, lv_image_decoder
 /**
  * Set a callback to a decoded line of an image
  * @param decoder pointer to an image decoder
- * @param read_line_cb a function to read a line of an image
+ * @param get_area_cb a function to read a line of an image
  */
-void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_decoder_get_area_cb_t read_line_cb);
+void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_decoder_get_area_cb_t get_area_cb);
 
 /**
  * Set a callback to close a decoding session. E.g. close files and free other resources.
