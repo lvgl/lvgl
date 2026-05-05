@@ -157,6 +157,21 @@ placed from right to left.
 You can force Flex to put an item into a new line with
 <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(child, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)" />.
 
+### Ignoring layout
+
+A child can opt out of flex positioning entirely by setting the
+<ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> flag:
+
+```c
+lv_obj_add_flag(child, LV_OBJ_FLAG_IGNORE_LAYOUT);
+```
+
+When set, the flex algorithm skips that child — it does not occupy a flex slot
+and the remaining children close the gap as if it were absent.  The child keeps
+whatever position was set manually with `lv_obj_set_pos()`.  This is useful for
+overlay elements (badges, tooltips, decorations) that should float above the
+flex content without disturbing the normal flow.
+
 <Callout type="info" title="Further Reading">
 Learn more about CSS Flexbox.
 </Callout>
@@ -206,5 +221,33 @@ The following behaviors clarify interactions between flex grow, wrapping and siz
 ### RTL base direction changes order of the items
 
 <LvglExample name="lv_example_flex_6" path="layouts/flex/lv_example_flex_6" />
+
+### Flex flow: row wrap
+
+<LvglExample name="lv_example_flex_flow" path="layouts/flex/flex_flow/lv_example_flex_flow" />
+
+### Flex align: main and cross axis placement
+
+<LvglExample name="lv_example_flex_align" path="layouts/flex/flex_align/lv_example_flex_align" />
+
+### Flex grow: distribute remaining space proportionally
+
+<LvglExample name="lv_example_flex_grow" path="layouts/flex/flex_grow/lv_example_flex_grow" />
+
+### Internal padding: gap between flex items
+
+<LvglExample name="lv_example_flex_internal_padding" path="layouts/flex/flex_internal_padding/lv_example_flex_internal_padding" />
+
+### New track: force items onto a new flex row
+
+<LvglExample name="lv_example_flex_new_track" path="layouts/flex/flex_new_track/lv_example_flex_new_track" />
+
+### RTL: items flow from right to left
+
+<LvglExample name="lv_example_flex_rtl" path="layouts/flex/flex_rtl/lv_example_flex_rtl" />
+
+### Ignore layout: opt out of flex positioning
+
+<LvglExample name="lv_example_flex_ignore_layout" path="layouts/flex/flex_ignore_layout/lv_example_flex_ignore_layout" />
 
 ## API

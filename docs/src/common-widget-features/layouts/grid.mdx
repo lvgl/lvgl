@@ -157,6 +157,19 @@ swapped. I.e. `START` will mean right-most.
 
 The columns will be placed from right to left.
 
+### Ignoring layout
+
+To opt a child out of Grid positioning, set
+<ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> on that child:
+
+```c
+lv_obj_add_flag(child, LV_OBJ_FLAG_IGNORE_LAYOUT);
+```
+
+When this flag is set, Grid skips the child completely. It does not occupy a
+grid cell and keeps its manually set position, which is useful for overlays
+or decorative elements.
+
 ### Edge cases and notes
 
 - Min/max as content or percent: Child Widgets can set min/max width/height to
@@ -194,5 +207,33 @@ The columns will be placed from right to left.
 ### Demonstrate RTL direction on grid
 
 <LvglExample name="lv_example_grid_6" path="layouts/grid/lv_example_grid_6" />
+
+### Grid descriptors: fixed tracks in XML
+
+<LvglExample name="lv_example_grid_descriptors" path="layouts/grid/grid_descriptors/lv_example_grid_descriptors" />
+
+### Grid cells: alignment and span in XML
+
+<LvglExample name="lv_example_grid_cell_span" path="layouts/grid/grid_cell_span/lv_example_grid_cell_span" />
+
+### Grid FR units in XML
+
+<LvglExample name="lv_example_grid_fr" path="layouts/grid/grid_fr/lv_example_grid_fr" />
+
+### Grid align in XML
+
+<LvglExample name="lv_example_grid_align" path="layouts/grid/grid_align/lv_example_grid_align" />
+
+### Grid internal padding in XML
+
+<LvglExample name="lv_example_grid_internal_padding" path="layouts/grid/grid_internal_padding/lv_example_grid_internal_padding" />
+
+### Grid RTL in XML
+
+<LvglExample name="lv_example_grid_rtl" path="layouts/grid/grid_rtl/lv_example_grid_rtl" />
+
+### Grid ignore layout in XML
+
+<LvglExample name="lv_example_grid_ignore_layout" path="layouts/grid/grid_ignore_layout/lv_example_grid_ignore_layout" />
 
 ## API
