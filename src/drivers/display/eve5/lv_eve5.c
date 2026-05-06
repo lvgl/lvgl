@@ -19,6 +19,7 @@
 #include "../../../stdlib/lv_mem.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../core/lv_refr_private.h"
+#include "../../../tick/lv_tick.h"
 #if LV_USE_OS
     #include "../../../osal/lv_os_private.h"
 #endif
@@ -139,6 +140,11 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
     lv_display_t * disp = lv_display_create(phost->Width, phost->Height);
     if(disp == NULL)
         return NULL;
+
+    /* EVE_millis is the default LVGL tick source. App may override by calling
+     * lv_tick_set_cb before or after; this only fills in when nothing is set. */
+    if(lv_tick_get_cb() == NULL)
+        lv_tick_set_cb(EVE_millis);
 
     /* Chips without render-target support can't run the partial-mode tile
      * compositor (no SWAPCHAIN_0 / no CMD_RENDERTARGET). Lock to FULL mode so
