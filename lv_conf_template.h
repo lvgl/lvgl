@@ -1056,7 +1056,7 @@
     /** Maximum GIF canvas width in pixels.
      *  GIFs wider than this value will be rejected with GIF_TOO_LARGE.
      *  Decrease this value to save RAM. */
-    #define LV_GIF_MAX_WIDTH 32768
+    #define LV_GIF_MAX_WIDTH 480
     /** Maximum GIF canvas height in pixels.
      *  GIFs taller than this value will be rejected with GIF_TOO_LARGE.
      *  Decrease this value to save RAM. */
