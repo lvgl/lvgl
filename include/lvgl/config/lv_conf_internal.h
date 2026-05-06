@@ -3293,7 +3293,7 @@
         #ifdef CONFIG_LV_GIF_MAX_WIDTH
             #define LV_GIF_MAX_WIDTH CONFIG_LV_GIF_MAX_WIDTH
         #else
-            #define LV_GIF_MAX_WIDTH 32768
+            #define LV_GIF_MAX_WIDTH 480
         #endif
     #endif
     /** Maximum GIF canvas height in pixels.
