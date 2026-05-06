@@ -353,6 +353,7 @@ void lv_eve5_hal_unlock(lv_display_t * disp);
 
 #include "lv_eve5_sdcard.h"
 #include "lv_eve5_flash.h"
+#include "lv_eve5_rom_font.h"
 
 #endif /* LV_USE_EVE5 */
 

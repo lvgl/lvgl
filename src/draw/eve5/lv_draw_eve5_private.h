@@ -259,6 +259,37 @@ typedef struct {
     uint32_t prev_stride;       /**< Stride of prev_handle in bytes (only used when prev_eve_format != 0) */
 } lv_draw_eve5_slice_t;
 
+/* ROM font cache entry, indexed by (rom_idx - LV_DRAW_EVE5_ROM_FONT_MIN). The
+ * default policy assigns handle == rom_idx — handles 16..(MAX-1) are reserved
+ * for ROM fonts to mirror the firmware default and avoid clashing with the
+ * scratch handle. `generation` tracks whether the CMD_ROMFONT setup is still
+ * valid; bumping the unit-wide generation invalidates every slot in O(1) for
+ * coprocessor reset handling.
+ *
+ * Range macros mirror Esd_BitmapHandle.c: MIN inclusive, CAP/MAX exclusive.
+ * CAP is the compile-time upper bound (used to size the array); MAX(phost) is
+ * the runtime upper bound (== CAP on single-target builds, runtime-checked
+ * via EVE_Hal_supportLargeFont in MULTI builds). LARGEFONT is the firmware
+ * feature that exposes rom indices 32..34 (FT810+ excluding BT88X). */
+typedef struct {
+    uint8_t handle;     /**< Bitmap handle the rom font is bound to (== rom_idx) */
+    uint8_t generation; /**< Last generation at which CMD_ROMFONT was emitted; 0 = unbound */
+} lv_draw_eve5_rom_font_slot_t;
+
+#define LV_DRAW_EVE5_ROM_FONT_MIN 16UL /* inclusive */
+#ifdef EVE_SUPPORT_LARGEFONT
+#define LV_DRAW_EVE5_ROM_FONT_CAP 35UL /* exclusive — matches ESD_ROMFONT_CAP */
+#else
+#define LV_DRAW_EVE5_ROM_FONT_CAP 32UL
+#endif
+#define LV_DRAW_EVE5_ROM_FONT_NBCAP (LV_DRAW_EVE5_ROM_FONT_CAP - LV_DRAW_EVE5_ROM_FONT_MIN)
+
+/** Runtime exclusive upper bound: 35 if the chip ships large fonts, else 32. */
+static inline uint8_t lv_draw_eve5_rom_font_max(EVE_HalContext * phost)
+{
+    return EVE_Hal_supportLargeFont(phost) ? 35 : 32;
+}
+
 /* EVE5 draw unit */
 typedef struct {
     lv_draw_unit_t base_unit;
@@ -270,6 +301,17 @@ typedef struct {
 #if LV_DRAW_EVE5_SW_FALLBACK
     lv_draw_eve5_sw_cache_t sw_cache;
 #endif
+
+    /* ROM font handle cache. CMD_ROMFONT(handle, idx) bindings persist across
+     * frames but become stale if the coprocessor resets — bumping
+     * rom_font_generation invalidates all slots; lazy resolve re-emits setup
+     * the next time a rom font is rendered. handle_mask records which bitmap
+     * handles are currently held by rom font bindings so non-font code can
+     * avoid stomping them. Array sized at compile-time CAP; init walks only
+     * up to the runtime MAX so smaller chips don't waste cycles. */
+    lv_draw_eve5_rom_font_slot_t rom_font_slots[LV_DRAW_EVE5_ROM_FONT_NBCAP];
+    uint64_t rom_font_handle_mask;
+    uint8_t rom_font_generation; /**< Always >= 1; 0 means "slot unbound" */
 
     /* Re-entrancy guard for SW fallback */
     bool rendering_in_progress;
@@ -487,6 +529,14 @@ uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t * u,
                                      lv_draw_eve5_font_vram_t * fv,
                                      const lv_font_t * font,
                                      uint32_t gid, uint16_t * out_stride);
+
+/* ROM font cache. init pre-binds 16..34 to matching handles and stamps
+ * generation 1 on every slot. resolve() re-emits CMD_ROMFONT lazily when a
+ * slot's generation lags the unit's current generation. invalidate() bumps
+ * the unit generation, forcing the next resolve to re-issue setup. */
+void lv_draw_eve5_rom_font_init(lv_draw_eve5_unit_t * u);
+uint8_t lv_draw_eve5_rom_font_resolve(lv_draw_eve5_unit_t * u, uint8_t rom_idx);
+void lv_draw_eve5_rom_font_invalidate(lv_draw_eve5_unit_t * u);
 
 #if LV_DRAW_EVE5_SW_FALLBACK
 /* SW cache */

@@ -22,6 +22,8 @@
 
 #include "../lv_draw.h"
 #include "../lv_draw_label.h"
+#include "../../drivers/display/eve5/lv_eve5_rom_font.h"
+#include "../../misc/lv_text_private.h"
 
 /**********************
  * STATIC VARIABLES
@@ -666,6 +668,42 @@ static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 }
 
 /**********************
+ * ROM FONT HELPERS
+ **********************/
+
+/**
+ * Encode a unicode codepoint as a NUL-terminated UTF-8 string. The caller's
+ * buffer must hold at least 8 bytes (the encoded value can be up to 4 bytes
+ * plus terminator; the LVGL helper packs the encoding into a uint32 we copy
+ * out byte-by-byte to handle any locale encoding without endian assumptions).
+ */
+static void rom_font_encode_codepoint(uint32_t letter, char buf[8])
+{
+    uint32_t enc = lv_text_unicode_to_encoded(letter);
+    buf[0] = (char)((enc >> 0) & 0xFF);
+    buf[1] = (char)((enc >> 8) & 0xFF);
+    buf[2] = (char)((enc >> 16) & 0xFF);
+    buf[3] = (char)((enc >> 24) & 0xFF);
+    buf[4] = '\0';
+    buf[5] = '\0';
+    buf[6] = '\0';
+    buf[7] = '\0';
+}
+
+/**
+ * Render a single rom-font glyph at (x, y) using CMD_TEXT. The firmware
+ * resolves cell-page lookups for unicode rom fonts (BT820 large fonts) so
+ * we don't have to walk the page tables host-side.
+ */
+static void rom_font_draw_glyph(lv_draw_eve5_unit_t * u, uint8_t handle,
+                                int32_t x, int32_t y, uint32_t letter)
+{
+    char buf[8];
+    rom_font_encode_codepoint(letter, buf);
+    EVE_CoCmd_text(u->hal, x, y, handle, 0, buf);
+}
+
+/**********************
  * GLYPH CALLBACKS
  **********************/
 
@@ -906,6 +944,21 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
 
+    /* Native rom font path: bypass the bitmap-font dispatcher entirely and
+     * issue CMD_TEXT for the whole string. Firmware handles cell-page lookups,
+     * unicode, kerning. */
+    if(lv_eve5_is_rom_font(dsc->font)) {
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+        EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
+        EVE_CoDl_colorA(u->hal, dsc->opa);
+        uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
+        if(handle == 0xFF) return;
+        int32_t x = t->area.x1 - layer->buf_area.x1;
+        int32_t y = t->area.y1 - layer->buf_area.y1;
+        EVE_CoCmd_text(u->hal, x, y, handle, 0, dsc->text);
+        return;
+    }
+
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap != NULL) {
         if(dsc->font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
@@ -939,7 +992,9 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
         EVE_CoDl_end(u->hal);
     }
     else {
-        /* ROM font fallback (ASCII only) */
+        /* Heuristic ROM font fallback for fonts that aren't lv_eve5_rom_font_t
+         * but also have no get_glyph_bitmap — pick a rom by line height.
+         * ASCII only. */
         int32_t x = t->area.x1 - layer->buf_area.x1;
         int32_t y = t->area.y1 - layer->buf_area.y1;
 
@@ -965,6 +1020,26 @@ void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
     lv_draw_letter_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
+
+    /* Native rom font path: single-glyph CMD_TEXT, no BITMAPS state setup. */
+    if(lv_eve5_is_rom_font(dsc->font)) {
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+        EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
+        EVE_CoDl_colorA(phost, dsc->opa);
+        if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
+            EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE);
+        }
+        uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
+        if(handle != 0xFF) {
+            int32_t x = t->area.x1 - layer->buf_area.x1;
+            int32_t y = t->area.y1 - layer->buf_area.y1;
+            rom_font_draw_glyph(u, handle, x, y, dsc->unicode);
+        }
+        if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
+            EVE_CoDl_blendFunc_default(u->hal);
+        }
+        return;
+    }
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
@@ -1026,6 +1101,20 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, 
 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
+
+    /* Native rom font alpha path: same single CMD_TEXT, color rule depends on
+     * whether we're stamping into RGB (white) or recovering alpha directly. */
+    if(lv_eve5_is_rom_font(dsc->font)) {
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+        if(alpha_to_rgb) EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
+        EVE_CoDl_colorA(u->hal, dsc->opa);
+        uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
+        if(handle == 0xFF) return;
+        int32_t x = t->area.x1 - layer->buf_area.x1;
+        int32_t y = t->area.y1 - layer->buf_area.y1;
+        EVE_CoCmd_text(u->hal, x, y, handle, 0, dsc->text);
+        return;
+    }
 
     bool use_bitmap_font = false;
     if(dsc->font && dsc->font->get_glyph_bitmap != NULL) {
@@ -1090,6 +1179,19 @@ void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t,
     lv_draw_letter_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= LV_OPA_MIN) return;
+
+    if(lv_eve5_is_rom_font(dsc->font)) {
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+        if(alpha_to_rgb) EVE_CoDl_colorRgb(phost, 255, 255, 255);
+        EVE_CoDl_colorA(phost, dsc->opa);
+        uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
+        if(handle != 0xFF) {
+            int32_t x = t->area.x1 - layer->buf_area.x1;
+            int32_t y = t->area.y1 - layer->buf_area.y1;
+            rom_font_draw_glyph(u, handle, x, y, dsc->unicode);
+        }
+        return;
+    }
 
     lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
 
