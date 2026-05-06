@@ -8,7 +8,7 @@
  */
 
 
-#include "../lv_public_api.h"
+#include "../lvgl_public.h"
 
 
 void lv_obj_set_style_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)

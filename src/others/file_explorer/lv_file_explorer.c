@@ -12,7 +12,7 @@
 
 #include "../../misc/lv_fs_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "../../core/lv_global.h"
 
 /*********************

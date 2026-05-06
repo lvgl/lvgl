@@ -57,7 +57,7 @@
 #include "lv_cache_sc_da.h"
 #include "../lv_cache_entry.h"
 #include "../lv_cache_entry_private.h"
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #include "../../lv_iter_private.h"
 
 /*********************

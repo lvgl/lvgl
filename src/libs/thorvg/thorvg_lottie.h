@@ -18,7 +18,7 @@ namespace tvg
  * @since 0.15
  */
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #if LV_USE_THORVG_INTERNAL
 class TVG_API LottieAnimation final : public Animation
 {

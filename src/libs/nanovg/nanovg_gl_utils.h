@@ -18,7 +18,7 @@
 #ifndef NANOVG_GL_UTILS_H
 #define NANOVG_GL_UTILS_H
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NANOVG
 

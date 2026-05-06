@@ -16,7 +16,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #include "../../../misc/lv_area_private.h"
 #include "../../../draw/lv_draw_private.h"
 #include "../../../draw/lv_draw_image_private.h"

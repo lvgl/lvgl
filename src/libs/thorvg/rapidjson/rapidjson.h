@@ -690,7 +690,7 @@ RAPIDJSON_NAMESPACE_END
 
 ///////////////////////////////////////////////////////////////////////////////
 // malloc/realloc/free
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #ifndef RAPIDJSON_MALLOC
 ///! customization point for global \c malloc
 #define RAPIDJSON_MALLOC(size) lv_malloc(size)

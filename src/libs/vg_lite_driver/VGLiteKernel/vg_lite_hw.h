@@ -55,7 +55,7 @@
 #ifndef VG_LITE_HW_H
 #define VG_LITE_HW_H
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #define VG_LITE_HW_CLOCK_CONTROL     0x000

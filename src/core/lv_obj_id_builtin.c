@@ -9,7 +9,7 @@
 #include "lv_obj_class_private.h"
 #include "lv_obj_private.h"
 #include "lv_global.h"
-#include "../lv_public_api.h"
+#include "../lvgl_public.h"
 #include "../osal/lv_os_private.h"
 
 /*********************

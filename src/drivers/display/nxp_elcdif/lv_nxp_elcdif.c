@@ -4,7 +4,7 @@
  * Driver for NXP's ELCD
  */
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_NXP_ELCDIF
 /*********************

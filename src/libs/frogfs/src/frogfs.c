@@ -8,7 +8,7 @@
  * tool that comes with this source distribution.
  */
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_FS_FROGFS
 
 #include "frogfs_priv.h"

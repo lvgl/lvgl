@@ -13,7 +13,7 @@ extern "C" {
 /*********************
 *      INCLUDES
 *********************/
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_PPA
 #if LV_PPA_NONBLOCKING_OPS

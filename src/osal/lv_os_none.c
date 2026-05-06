@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_public_api.h"
+#include "../lvgl_public.h"
 #if LV_USE_OS == LV_OS_NONE
 
 #include "lv_os_private.h"
