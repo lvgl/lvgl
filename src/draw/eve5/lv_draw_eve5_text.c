@@ -671,12 +671,8 @@ static void emit_glyph_vertex(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
  * ROM FONT HELPERS
  **********************/
 
-/**
- * Encode a unicode codepoint as a NUL-terminated UTF-8 string. The caller's
- * buffer must hold at least 8 bytes (the encoded value can be up to 4 bytes
- * plus terminator; the LVGL helper packs the encoding into a uint32 we copy
- * out byte-by-byte to handle any locale encoding without endian assumptions).
- */
+/* Encode a unicode codepoint as a NUL-terminated UTF-8 string. Caller's
+ * buffer must hold at least 8 bytes. */
 static void rom_font_encode_codepoint(uint32_t letter, char buf[8])
 {
     uint32_t enc = lv_text_unicode_to_encoded(letter);
@@ -690,17 +686,144 @@ static void rom_font_encode_codepoint(uint32_t letter, char buf[8])
     buf[7] = '\0';
 }
 
-/**
- * Render a single rom-font glyph at (x, y) using CMD_TEXT. The firmware
- * resolves cell-page lookups for unicode rom fonts (BT820 large fonts) so
- * we don't have to walk the page tables host-side.
- */
+/* Render a single rom-font glyph at (x, y) using CMD_TEXT. */
 static void rom_font_draw_glyph(lv_draw_eve5_unit_t * u, uint8_t handle,
                                 int32_t x, int32_t y, uint32_t letter)
 {
     char buf[8];
     rom_font_encode_codepoint(letter, buf);
     EVE_CoCmd_text(u->hal, x, y, handle, 0, buf);
+}
+
+/* Per-line CMD_TEXT state. iterate_characters drives the per-glyph layout
+ * from LVGL's metrics; we accumulate consecutive glyphs at the expected
+ * position into a UTF-8 buffer and emit one CMD_TEXT per visual line.
+ * Y change or X mismatch flushes; color change flushes + re-emits the
+ * GPU color state. */
+typedef struct {
+    lv_draw_eve5_unit_t * unit;
+    lv_layer_t * layer;
+    uint8_t handle;
+    bool alpha_to_rgb;       /**< Alpha pass with RGB target: force white text */
+    int32_t line_x;          /**< Cursor X for the current fragment's first glyph (screen coords) */
+    int32_t line_y;          /**< Cursor Y for the current fragment (screen coords) */
+    int32_t expected_x;      /**< Where the next glyph is expected to land (screen coords) */
+    char * buf;              /**< Heap-allocated UTF-8 fragment buffer */
+    uint32_t buf_cap;
+    uint32_t buf_len;
+    bool active;             /**< false until first glyph seen */
+    uint8_t curr_r, curr_g, curr_b, curr_a;
+    bool color_set;
+} rom_line_state_t;
+
+static rom_line_state_t s_rom_line;
+
+static void rom_line_flush(void)
+{
+    if(!s_rom_line.active || s_rom_line.buf_len == 0) return;
+    s_rom_line.buf[s_rom_line.buf_len] = '\0';
+    EVE_CoCmd_text(s_rom_line.unit->hal,
+                   s_rom_line.line_x - s_rom_line.layer->buf_area.x1,
+                   s_rom_line.line_y - s_rom_line.layer->buf_area.y1,
+                   s_rom_line.handle, 0, s_rom_line.buf);
+    s_rom_line.buf_len = 0;
+}
+
+static void rom_line_append(uint32_t letter)
+{
+    uint32_t enc = lv_text_unicode_to_encoded(letter);
+    while(enc != 0 && s_rom_line.buf_len + 1 < s_rom_line.buf_cap) {
+        s_rom_line.buf[s_rom_line.buf_len++] = (char)(enc & 0xFFu);
+        enc >>= 8;
+    }
+}
+
+static void rom_line_set_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    if(s_rom_line.color_set
+       && r == s_rom_line.curr_r && g == s_rom_line.curr_g
+       && b == s_rom_line.curr_b && a == s_rom_line.curr_a) return;
+
+    rom_line_flush();
+    if(s_rom_line.alpha_to_rgb) {
+        EVE_CoDl_colorRgb(s_rom_line.unit->hal, 255, 255, 255);
+    }
+    else {
+        EVE_CoDl_colorRgb(s_rom_line.unit->hal, r, g, b);
+    }
+    EVE_CoDl_colorA(s_rom_line.unit->hal, a);
+    s_rom_line.curr_r = r;
+    s_rom_line.curr_g = g;
+    s_rom_line.curr_b = b;
+    s_rom_line.curr_a = a;
+    s_rom_line.color_set = true;
+}
+
+static void rom_line_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
+                              lv_draw_fill_dsc_t * fill_dsc, const lv_area_t * fill_area)
+{
+    /* Underline / strikethrough / selection background. */
+    if(fill_dsc != NULL && fill_area != NULL) {
+        rom_line_flush();
+        uint8_t r = s_rom_line.alpha_to_rgb ? 255 : fill_dsc->color.red;
+        uint8_t g = s_rom_line.alpha_to_rgb ? 255 : fill_dsc->color.green;
+        uint8_t b = s_rom_line.alpha_to_rgb ? 255 : fill_dsc->color.blue;
+        EVE_CoDl_colorRgb(s_rom_line.unit->hal, r, g, b);
+        EVE_CoDl_colorA(s_rom_line.unit->hal, fill_dsc->opa);
+        s_rom_line.color_set = false;
+
+        int32_t x1 = fill_area->x1 - s_rom_line.layer->buf_area.x1;
+        int32_t y1 = fill_area->y1 - s_rom_line.layer->buf_area.y1;
+        int32_t x2 = fill_area->x2 - s_rom_line.layer->buf_area.x1;
+        int32_t y2 = fill_area->y2 - s_rom_line.layer->buf_area.y1;
+        lv_draw_eve5_draw_rect(s_rom_line.unit, x1, y1, x2, y2, 0,
+                               &t->clip_area, &s_rom_line.layer->buf_area);
+    }
+
+    if(glyph_dsc == NULL) return;
+    if(glyph_dsc->format == LV_FONT_GLYPH_FORMAT_NONE) return;
+
+    rom_line_set_color(glyph_dsc->color.red, glyph_dsc->color.green,
+                       glyph_dsc->color.blue, glyph_dsc->opa);
+
+    int32_t gx = glyph_dsc->letter_coords->x1;
+    int32_t gy = glyph_dsc->letter_coords->y1;
+
+    if(!s_rom_line.active || gy != s_rom_line.line_y || gx != s_rom_line.expected_x) {
+        rom_line_flush();
+        s_rom_line.line_x = gx;
+        s_rom_line.line_y = gy;
+        s_rom_line.active = true;
+    }
+
+    rom_line_append(glyph_dsc->g->gid.index);
+    s_rom_line.expected_x = glyph_dsc->letter_coords->x2 + 1;
+}
+
+static void rom_label_render(lv_draw_eve5_unit_t * u, lv_draw_task_t * t,
+                             lv_draw_label_dsc_t * dsc, lv_layer_t * layer,
+                             uint8_t handle, bool alpha_to_rgb)
+{
+    uint32_t text_len = (uint32_t)lv_strlen(dsc->text);
+    uint32_t buf_cap = text_len + 1u;
+    char * buf = lv_malloc(buf_cap);
+    if(buf == NULL) return;
+
+    s_rom_line.unit = u;
+    s_rom_line.layer = layer;
+    s_rom_line.handle = handle;
+    s_rom_line.alpha_to_rgb = alpha_to_rgb;
+    s_rom_line.buf = buf;
+    s_rom_line.buf_cap = buf_cap;
+    s_rom_line.buf_len = 0;
+    s_rom_line.active = false;
+    s_rom_line.color_set = false;
+
+    lv_draw_label_iterate_characters(t, dsc, &t->area, rom_line_glyph_cb);
+    rom_line_flush();
+
+    lv_free(buf);
+    s_rom_line.buf = NULL;
 }
 
 /**********************
@@ -717,17 +840,19 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     EVE_HalContext * phost = u->hal;
 
-    /* Underline/strikethrough */
+    /* Underline / strikethrough / selection background. The end/begin
+     * BITMAPS pair preserves the glyph stream's primitive state. */
     if(fill_dsc && fill_area) {
         int32_t x1 = fill_area->x1 - layer->buf_area.x1;
         int32_t y1 = fill_area->y1 - layer->buf_area.y1;
         int32_t x2 = fill_area->x2 - layer->buf_area.x1;
         int32_t y2 = fill_area->y2 - layer->buf_area.y1;
 
-        EVE_CoDl_begin(u->hal, RECTS);
-        EVE_CoDl_vertex2f_0(u->hal, x1, y1);
-        EVE_CoDl_vertex2f_0(u->hal, x2, y2);
         EVE_CoDl_end(u->hal);
+        EVE_CoDl_colorRgb(u->hal, fill_dsc->color.red, fill_dsc->color.green, fill_dsc->color.blue);
+        EVE_CoDl_colorA(u->hal, fill_dsc->opa);
+        lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, 0, &t->clip_area, &layer->buf_area);
+        EVE_CoDl_begin(u->hal, BITMAPS);
     }
 
     if(glyph_dsc == NULL) return;
@@ -835,16 +960,19 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
 
     EVE_HalContext * phost = u->hal;
 
+    /* Underline / strikethrough / selection background. Color/alpha is
+     * already set up by the alpha-pass driver (white in L8-RT mode); only
+     * the per-fill opa is updated. */
     if(fill_dsc && fill_area) {
         int32_t x1 = fill_area->x1 - layer->buf_area.x1;
         int32_t y1 = fill_area->y1 - layer->buf_area.y1;
         int32_t x2 = fill_area->x2 - layer->buf_area.x1;
         int32_t y2 = fill_area->y2 - layer->buf_area.y1;
 
-        EVE_CoDl_begin(u->hal, RECTS);
-        EVE_CoDl_vertex2f_0(u->hal, x1, y1);
-        EVE_CoDl_vertex2f_0(u->hal, x2, y2);
         EVE_CoDl_end(u->hal);
+        EVE_CoDl_colorA(u->hal, fill_dsc->opa);
+        lv_draw_eve5_draw_rect(u, x1, y1, x2, y2, 0, &t->clip_area, &layer->buf_area);
+        EVE_CoDl_begin(u->hal, BITMAPS);
     }
 
     if(glyph_dsc == NULL) return;
@@ -944,18 +1072,11 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
 
-    /* Native rom font path: bypass the bitmap-font dispatcher entirely and
-     * issue CMD_TEXT for the whole string. Firmware handles cell-page lookups,
-     * unicode, kerning. */
     if(lv_eve5_is_rom_font(dsc->font)) {
-        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
-        EVE_CoDl_colorRgb(u->hal, dsc->color.red, dsc->color.green, dsc->color.blue);
-        EVE_CoDl_colorA(u->hal, dsc->opa);
         uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
         if(handle == 0xFF) return;
-        int32_t x = t->area.x1 - layer->buf_area.x1;
-        int32_t y = t->area.y1 - layer->buf_area.y1;
-        EVE_CoCmd_text(u->hal, x, y, handle, 0, dsc->text);
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+        rom_label_render(u, t, dsc, layer, handle, false);
         return;
     }
 
@@ -992,9 +1113,8 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
         EVE_CoDl_end(u->hal);
     }
     else {
-        /* Heuristic ROM font fallback for fonts that aren't lv_eve5_rom_font_t
-         * but also have no get_glyph_bitmap — pick a rom by line height.
-         * ASCII only. */
+        /* Heuristic fallback for fonts with no get_glyph_bitmap: pick a
+         * built-in rom font by line height and render via CMD_TEXT. */
         int32_t x = t->area.x1 - layer->buf_area.x1;
         int32_t y = t->area.y1 - layer->buf_area.y1;
 
@@ -1021,7 +1141,6 @@ void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    /* Native rom font path: single-glyph CMD_TEXT, no BITMAPS state setup. */
     if(lv_eve5_is_rom_font(dsc->font)) {
         lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
         EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
@@ -1102,17 +1221,11 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
 
-    /* Native rom font alpha path: same single CMD_TEXT, color rule depends on
-     * whether we're stamping into RGB (white) or recovering alpha directly. */
     if(lv_eve5_is_rom_font(dsc->font)) {
-        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
-        if(alpha_to_rgb) EVE_CoDl_colorRgb(u->hal, 255, 255, 255);
-        EVE_CoDl_colorA(u->hal, dsc->opa);
         uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
         if(handle == 0xFF) return;
-        int32_t x = t->area.x1 - layer->buf_area.x1;
-        int32_t y = t->area.y1 - layer->buf_area.y1;
-        EVE_CoCmd_text(u->hal, x, y, handle, 0, dsc->text);
+        lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
+        rom_label_render(u, t, dsc, layer, handle, alpha_to_rgb);
         return;
     }
 

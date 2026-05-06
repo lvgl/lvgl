@@ -64,10 +64,15 @@ void draw_circle_subpx(lv_draw_eve5_unit_t * u, int32_t cx2, int32_t cy2, int32_
 void lv_draw_eve5_draw_rect(lv_draw_eve5_unit_t * u, int32_t x1, int32_t y1, int32_t x2, int32_t y2,
                             int32_t radius, const lv_area_t * clip_area, const lv_area_t * layer_area)
 {
+    /* x1/y1/x2/y2 are inclusive (LVGL convention). w/h here are "size minus 1"
+     * — the rendering math (vertices, scissor width via lv_area_get_width,
+     * circle center as x1+x2) consistently uses this convention. A degenerate
+     * rect has x2 < x1 (so w < 0); a 1-pixel rect has x2 == x1 (w == 0) and
+     * must still render. */
     int32_t w = x2 - x1;
     int32_t h = y2 - y1;
 
-    if(w <= 0 || h <= 0) return;
+    if(w < 0 || h < 0) return;
 
     int32_t max_r = LV_MIN(w, h) / 2;
     if(radius > max_r) radius = max_r;

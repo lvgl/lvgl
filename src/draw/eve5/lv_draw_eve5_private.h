@@ -259,21 +259,53 @@ typedef struct {
     uint32_t prev_stride;       /**< Stride of prev_handle in bytes (only used when prev_eve_format != 0) */
 } lv_draw_eve5_slice_t;
 
-/* ROM font cache entry, indexed by (rom_idx - LV_DRAW_EVE5_ROM_FONT_MIN). The
- * default policy assigns handle == rom_idx — handles 16..(MAX-1) are reserved
- * for ROM fonts to mirror the firmware default and avoid clashing with the
- * scratch handle. `generation` tracks whether the CMD_ROMFONT setup is still
- * valid; bumping the unit-wide generation invalidates every slot in O(1) for
- * coprocessor reset handling.
+/* Bitmap handle pool with LRU eviction.
+ *
+ * Tracks owner identity per handle so callers can detect eviction —
+ * handle_check(handle, owner) returns true only if the caller still owns
+ * the slot. Allocation: a non-0xFF `preferred` argument force-claims that
+ * specific handle (evicting whatever was there); 0xFF picks the LRU tail.
+ * Ownership is just pointer equality — pass anything stable per logical
+ * binding (e.g., the address of a per-rom-font slot, or an lv_font_t *).
+ *
+ * Reserved slots are excluded from the LRU list and never returned by
+ * alloc: the EVE_CO_SCRATCH_HANDLE (trashed on coprocessor command entry)
+ * and any slot index >= the runtime BITMAP_HANDLE_MASK + 1.
+ */
+typedef struct {
+    void * owner;       /**< NULL = unowned. Owner identity tested by handle_check. */
+    uint8_t lru_prev;   /**< 0xFF = none (head sentinel) */
+    uint8_t lru_next;   /**< 0xFF = none (tail sentinel) */
+    bool reserved;      /**< true = excluded from LRU; never returned by alloc */
+} lv_draw_eve5_handle_slot_t;
+
+/* Compile-time slot array size. BT820 has 64 bitmap handles, FT81X-class
+ * chips have 32. In MULTI builds we always need 64; for single-target
+ * non-BT820 builds the high slots get reserved at init (small overhead). */
+#if defined(BT_82X_ENABLE) || defined(EVE_MULTI_GRAPHICS_TARGET)
+#define LV_DRAW_EVE5_HANDLE_CAP 64
+#else
+#define LV_DRAW_EVE5_HANDLE_CAP 32
+#endif
+
+typedef struct {
+    lv_draw_eve5_handle_slot_t slots[LV_DRAW_EVE5_HANDLE_CAP];
+    uint8_t lru_head;   /**< MRU end; 0xFF if pool is empty */
+    uint8_t lru_tail;   /**< LRU end (next alloc target); 0xFF if pool is empty */
+} lv_draw_eve5_handle_pool_t;
+
+/* ROM font cache entry, indexed by (rom_idx - LV_DRAW_EVE5_ROM_FONT_MIN).
+ * The slot's address serves as a stable per-rom_idx owner pointer for the
+ * handle pool. `handle` records the last-allocated handle so resolve() can
+ * fast-path ownership-checked reuse without re-running the alloc.
  *
  * Range macros mirror Esd_BitmapHandle.c: MIN inclusive, CAP/MAX exclusive.
- * CAP is the compile-time upper bound (used to size the array); MAX(phost) is
- * the runtime upper bound (== CAP on single-target builds, runtime-checked
- * via EVE_Hal_supportLargeFont in MULTI builds). LARGEFONT is the firmware
- * feature that exposes rom indices 32..34 (FT810+ excluding BT88X). */
+ * CAP is compile-time (sizes the array); MAX(phost) is runtime (== CAP on
+ * single-target builds, runtime-checked via EVE_Hal_supportLargeFont in
+ * MULTI builds). LARGEFONT covers rom indices 32..34 (FT810+ excluding
+ * BT88X). */
 typedef struct {
-    uint8_t handle;     /**< Bitmap handle the rom font is bound to (== rom_idx) */
-    uint8_t generation; /**< Last generation at which CMD_ROMFONT was emitted; 0 = unbound */
+    uint8_t handle;     /**< Last-allocated bitmap handle, or 0xFF if unallocated */
 } lv_draw_eve5_rom_font_slot_t;
 
 #define LV_DRAW_EVE5_ROM_FONT_MIN 16UL /* inclusive */
@@ -302,16 +334,14 @@ typedef struct {
     lv_draw_eve5_sw_cache_t sw_cache;
 #endif
 
-    /* ROM font handle cache. CMD_ROMFONT(handle, idx) bindings persist across
-     * frames but become stale if the coprocessor resets — bumping
-     * rom_font_generation invalidates all slots; lazy resolve re-emits setup
-     * the next time a rom font is rendered. handle_mask records which bitmap
-     * handles are currently held by rom font bindings so non-font code can
-     * avoid stomping them. Array sized at compile-time CAP; init walks only
-     * up to the runtime MAX so smaller chips don't waste cycles. */
+    /* Bitmap handle pool: LRU allocator over the chip's bitmap handles, with
+     * owner-identity tracking for eviction detection. CO scratch is reserved. */
+    lv_draw_eve5_handle_pool_t handle_pool;
+
+    /* ROM font cache. Each slot tracks the last bitmap handle the matching
+     * rom_idx claimed from handle_pool. Sized at compile-time CAP; init walks
+     * the runtime MAX. */
     lv_draw_eve5_rom_font_slot_t rom_font_slots[LV_DRAW_EVE5_ROM_FONT_NBCAP];
-    uint64_t rom_font_handle_mask;
-    uint8_t rom_font_generation; /**< Always >= 1; 0 means "slot unbound" */
 
     /* Re-entrancy guard for SW fallback */
     bool rendering_in_progress;
@@ -530,10 +560,26 @@ uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t * u,
                                      const lv_font_t * font,
                                      uint32_t gid, uint16_t * out_stride);
 
-/* ROM font cache. init pre-binds 16..34 to matching handles and stamps
- * generation 1 on every slot. resolve() re-emits CMD_ROMFONT lazily when a
- * slot's generation lags the unit's current generation. invalidate() bumps
- * the unit generation, forcing the next resolve to re-issue setup. */
+/* Bitmap handle pool. Init builds the LRU list across all non-reserved
+ * handles. alloc(owner, preferred) takes ownership: a non-0xFF preferred
+ * forces that handle (evicting current owner); 0xFF picks the LRU tail.
+ * touch() marks a handle MRU without changing ownership. check() returns
+ * true only if `owner` still matches — callers use this to detect eviction
+ * before assuming their previous handle is still valid. invalidate_all()
+ * drops all owner references (e.g. after a coprocessor reset); reserved
+ * slots stay reserved. */
+void lv_draw_eve5_handle_pool_init(lv_draw_eve5_unit_t * u);
+uint8_t lv_draw_eve5_handle_alloc(lv_draw_eve5_unit_t * u, void * owner, uint8_t preferred);
+void lv_draw_eve5_handle_touch(lv_draw_eve5_unit_t * u, uint8_t handle);
+bool lv_draw_eve5_handle_check(const lv_draw_eve5_unit_t * u, uint8_t handle, const void * owner);
+void lv_draw_eve5_handle_invalidate_all(lv_draw_eve5_unit_t * u);
+
+/* ROM font cache. init pre-binds rom fonts to identity handles (rom_idx ==
+ * handle) where the rom_idx fits in the bitmap handle range; out-of-range
+ * rom indices (32..34 on FT81X-class chips) bind lazily through the LRU
+ * pool. resolve() returns a usable handle for a given rom_idx, re-binding
+ * via CMD_ROMFONT if the cached handle was evicted. invalidate() drops all
+ * cached bindings (call after a coprocessor reset). */
 void lv_draw_eve5_rom_font_init(lv_draw_eve5_unit_t * u);
 uint8_t lv_draw_eve5_rom_font_resolve(lv_draw_eve5_unit_t * u, uint8_t rom_idx);
 void lv_draw_eve5_rom_font_invalidate(lv_draw_eve5_unit_t * u);

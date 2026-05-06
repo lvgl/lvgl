@@ -5,18 +5,18 @@
  *
  * Builds an lv_font_t that delegates rendering to the EVE coprocessor's
  * built-in fonts (rom indices 16..34). Glyphs render via CMD_TEXT — the
- * firmware handles unicode cell-page lookups, so multibyte UTF-8 is
- * supported transparently for fonts that carry the data (BT820 fonts
- * 32..34). For layout, the wrapper currently exposes the rom font's
- * uniform PixelWidth as advance width for every glyph; this is correct
- * for monospace rom fonts and a slight overestimate for proportional
- * ones (text wraps a touch more aggressively than necessary).
+ * firmware handles unicode cell-page lookups, so multibyte UTF-8 works
+ * transparently for fonts that carry the data.
+ *
+ * The rom font's metrics block (legacy / extended format 1 / extended
+ * format 2 per the BT82X programmer's guide §5.5) is parsed once at create
+ * time into a run-based per-glyph width table. LVGL gets correct
+ * adv_w / box_w from get_glyph_dsc, so text wrapping, alignment, and
+ * cursor positioning match bitmap fonts.
  *
  * Detection: the EVE5 text renderer compares font->get_glyph_bitmap
  * against lv_eve5_rom_font_glyph_bitmap_sentinel to identify rom fonts.
- *
- * No SW fallback — when the EVE5 draw unit is disabled (LV_USE_DRAW_EVE5=0)
- * a rom font renders nothing. Pair with a fallback font if that matters.
+ * Rendering requires the EVE5 draw unit (LV_USE_DRAW_EVE5=1).
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
@@ -43,10 +43,8 @@ extern "C" {
  *      DEFINES
  **********************/
 
-/** Sentinel get_glyph_bitmap callback. The EVE5 text renderer treats any font
- *  whose get_glyph_bitmap matches this pointer as a rom font and dispatches
- *  CMD_TEXT instead of the bitmap upload path. The function itself returns
- *  NULL — rom font glyphs have no host-side bitmap. */
+/** Sentinel get_glyph_bitmap callback used by lv_eve5_is_rom_font for
+ *  pointer-equality detection. Returns NULL. */
 LV_IMAGE_DSC_CONST void * lv_eve5_rom_font_glyph_bitmap_sentinel(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**********************
@@ -56,13 +54,15 @@ LV_IMAGE_DSC_CONST void * lv_eve5_rom_font_glyph_bitmap_sentinel(lv_font_glyph_d
 /**
  * Create an lv_font_t backed by an EVE ROM font.
  *
- * Reads height/width metrics from the rom font header at create time. The
- * returned font is heap-allocated; release with lv_eve5_rom_font_destroy.
+ * Parses the rom font's metrics block (legacy or extended format 1/2) and
+ * builds a per-glyph width table. The returned font is heap-allocated;
+ * release with lv_eve5_rom_font_destroy.
  *
  * @param phost     EVE HAL context (must already be booted)
  * @param rom_idx   ROM font index (16..31 universal, 32..34 BT820 large fonts)
- * @return          newly allocated lv_font_t, or NULL if the index is out of range
- *                  or the chip doesn't support that rom font
+ * @return          newly allocated lv_font_t, or NULL if the index is out of range,
+ *                  the chip doesn't support that rom font, or the metrics block
+ *                  fails to parse
  */
 lv_font_t * lv_eve5_rom_font_create(EVE_HalContext * phost, uint8_t rom_idx);
 

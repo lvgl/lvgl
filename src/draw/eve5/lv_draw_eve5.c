@@ -175,9 +175,7 @@ void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
 
     lv_draw_eve5_ring_init(unit);
 
-    /* Pre-bind ROM fonts to bitmap handles 16..34 and seed the rom font cache.
-     * Subsequent invalidations (coprocessor reset) bump the cache generation
-     * so the next render re-emits CMD_ROMFONT lazily. */
+    lv_draw_eve5_handle_pool_init(unit);
     lv_draw_eve5_rom_font_init(unit);
 
     lv_draw_eve5_register_vram_callbacks(unit);
