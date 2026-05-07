@@ -433,6 +433,15 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
 
     lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
     cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
+    LV_ASSERT_MALLOC(cache_data->draw_dsc);
+    if(cache_data->draw_dsc == NULL) {
+        LV_LOG_WARN("OpenGL ES cache draw descriptor allocation failed");
+        if(obj && original_send_draw_task_event) {
+            lv_obj_add_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+        }
+        return;
+    }
+
     cache_data->task_type = task->type;
     lv_memcpy((void *)cache_data->draw_dsc, base_dsc, base_dsc->dsc_size);
 
