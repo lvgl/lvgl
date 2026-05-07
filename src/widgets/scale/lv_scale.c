@@ -903,6 +903,9 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     else { /* Add label with mapped values */
         lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+        /* LVGL guarantees it will copy the label text if the text is local*/
+        /* TODO: get rid of text_local and this suppression*/
+        /*cppcheck-suppress autoVariables*/
         label_dsc->text = text_buffer;
         label_dsc->text_local = 1;
     }
