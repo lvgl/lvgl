@@ -318,7 +318,7 @@ void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb
 /**
  * Get the flush callback which will be called to copy the rendered image to the display.
  * @param disp      pointer to a display
- * @return          the color format
+ * @return          the flush callback
  */
 lv_display_flush_cb_t lv_display_get_flush_cb(lv_display_t * disp);
 
