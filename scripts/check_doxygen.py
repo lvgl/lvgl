@@ -3,13 +3,13 @@
 """
 LVGL Doxygen Comment Checker
 
-Checks that public function declarations in .h files under src/ have
+Checks that public function declarations in .h files under include/lvgl/ have
 proper Doxygen comments with @param and @return tags.
 
 Modes:
     --diff <commit-range>   Only check functions touched by the diff (CI mode)
     --file <path>           Check all functions in a specific file
-    --all                   Check all src/**/*.h files (full scan)
+    --all                   Check all include/lvgl/**/*.h files (full scan)
     --self-test             Run built-in self-tests
 
 Exit code:
@@ -439,8 +439,8 @@ def get_changed_header_lines(commit_range: str) -> Dict[str, Set[int]]:
         "--diff-filter=ACMR",
         commit_range,
         "--",
-        "src/*.h",
-        "src/**/*.h",
+        "include/lvgl/*.h",
+        "include/lvgl/**/*.h",
     )
     if rc != 0 or not diff_output:
         return {}
@@ -449,7 +449,7 @@ def get_changed_header_lines(commit_range: str) -> Dict[str, Set[int]]:
     current_file = None
 
     for line in diff_output.split("\n"):
-        # +++ b/src/core/lv_obj.h
+        # +++ b/include/lvgl/core/lv_obj.h
         if line.startswith("+++ b/"):
             current_file = line[6:]
             if current_file not in result:
@@ -503,12 +503,12 @@ def check_diff(commit_range: str, timeout: int = DEFAULT_FILE_TIMEOUT) -> List[s
 
 
 def find_all_headers(root: str) -> List[str]:
-    """Find all .h files under root/src/."""
+    """Find all .h files under root/include/lvgl/."""
     headers = []
-    src_dir = os.path.join(root, "src")
-    if not os.path.isdir(src_dir):
+    inc_dir = os.path.join(root, "include", "lvgl")
+    if not os.path.isdir(inc_dir):
         return headers
-    for dirpath, _, filenames in os.walk(src_dir):
+    for dirpath, _, filenames in os.walk(inc_dir):
         for fn in filenames:
             if fn.endswith(".h"):
                 headers.append(os.path.join(dirpath, fn))
@@ -518,7 +518,7 @@ def find_all_headers(root: str) -> List[str]:
 def check_all(
     root: str, verbose: bool = False, timeout: int = DEFAULT_FILE_TIMEOUT
 ) -> List[str]:
-    """Check all header files under root/src/."""
+    """Check all header files under root/include/lvgl/."""
     headers = find_all_headers(root)
     all_errors = []
     skipped = 0
@@ -878,12 +878,12 @@ lv_observer_t * lv_test_bind(lv_obj_t * obj, const lv_style_t * style,
     # --- Test should_skip_file ---
     print("\n--- should_skip_file ---")
     skip_tests = [
-        ("src/libs/qrcode/lv_qrcode.h", True),
-        ("src/core/lv_obj.h", False),
-        ("src/lv_conf_internal.h", True),
-        ("src/lv_api_map_v9_1.h", True),
-        ("src/widgets/lv_btn_gen.h", True),
-        ("src/misc/lv_utils.h", False),
+        ("include/lvgl/libs/qrcode/lv_qrcode.h", True),
+        ("include/lvgl/core/lv_obj.h", False),
+        ("include/lvgl/lv_conf_internal.h", True),
+        ("include/lvgl/lv_api_map_v9_1.h", True),
+        ("include/lvgl/widgets/lv_btn_gen.h", True),
+        ("include/lvgl/misc/lv_utils.h", False),
     ]
     for path, expected in skip_tests:
         total += 1
@@ -993,7 +993,7 @@ def main():
     parser.add_argument(
         "--all",
         action="store_true",
-        help="Check all src/**/*.h files",
+        help="Check all include/lvgl/**/*.h files",
     )
     parser.add_argument(
         "--fail-under",
