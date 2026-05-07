@@ -243,10 +243,10 @@ void lv_nanovg_draw_grad_helper(
  *      MACROS
  **********************/
 
+#endif /*LV_USE_DRAW_NANOVG*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
-
-#endif /*LV_USE_DRAW_NANOVG*/
 
 #endif /*LV_DRAW_NANOVG_PRIVATE_H*/

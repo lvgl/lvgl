@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_FONT_MANAGER && LV_BUILD_EXAMPLES
+#if LV_USE_FONT_MANAGER && LV_USE_FREETYPE && LV_BUILD_EXAMPLES
 
 #if defined(LV_FREETYPE_USE_LVGL_PORT) && LV_FREETYPE_USE_LVGL_PORT
     #define PATH_PREFIX "A:"
@@ -45,13 +45,11 @@ void lv_example_font_manager_2(void)
                                    &lv_builtin_font_class);
 #endif
 
-#if LV_USE_FREETYPE
     /* Register FreeType font source */
     lv_font_manager_add_src_static(g_font_manager,
                                    "NotoColorEmoji",
                                    PATH_PREFIX "lvgl/examples/libs/freetype/NotoColorEmoji-32.subset.ttf",
                                    &lv_freetype_font_class);
-#endif
 
 #if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
     /* Register TinyTTF font source */
@@ -93,7 +91,7 @@ void lv_example_font_manager_2(void)
 void lv_example_font_manager_2(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "Font Manager is not enabled");
+    lv_label_set_text(label, "FreeType is not installed");
     lv_obj_center(label);
 }
 
