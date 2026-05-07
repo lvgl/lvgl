@@ -26,6 +26,8 @@ can be vertical or horizontal.
 
 ### Value, range and orientation
 
+<LvglXMLExample name="lv_example_slider_value_range_orientation" path="widgets/slider/slider_value_range_orientation/lv_example_slider_value_range_orientation" />
+
 Once a Slider is created, it has:
 
 - value == 0
@@ -42,7 +44,7 @@ To set different values use:
 - for orientation, width and height, simply set width and height properties;
 - <ApiLink name="lv_slider_set_orientation" display="lv_slider_set_orientation(slider, orientation)" /> to override orientation
   caused by `width` and `height`.  Valid values for `orientation` are:
-  
+
   - <ApiLink name="LV_SLIDER_ORIENTATION_AUTO" />
   - <ApiLink name="LV_SLIDER_ORIENTATION_HORIZONTAL" />
   - <ApiLink name="LV_SLIDER_ORIENTATION_VERTICAL" />
@@ -51,7 +53,11 @@ The default drawing direction is from left to right in horizontal orientation an
 bottom to top in vertical orientation.  If the minimum value is set to be greater
 than the maximum value (e.g. [100..0]), the drawing direction is reversed.
 
+<LvglXMLExample name="lv_example_slider_reversed_direction" path="widgets/slider/slider_reversed_direction/lv_example_slider_reversed_direction" />
+
 ### Modes
+
+<LvglXMLExample name="lv_example_slider_modes" path="widgets/slider/slider_modes/lv_example_slider_modes" />
 
 The Slider can be in one of the following modes:
 
@@ -129,5 +135,17 @@ Learn more about [Keys](/main-modules/indev/keypad).
 ### Slider with opposite direction
 
 <LvglExample name="lv_example_slider_4" path="widgets/slider/lv_example_slider_4" />
+
+### Slider: value, range, orientation
+
+<LvglExample name="lv_example_slider_value_range_orientation" path="widgets/slider/slider_value_range_orientation/lv_example_slider_value_range_orientation" />
+
+### Slider: reversed direction
+
+<LvglExample name="lv_example_slider_reversed_direction" path="widgets/slider/slider_reversed_direction/lv_example_slider_reversed_direction" />
+
+### Slider: modes
+
+<LvglExample name="lv_example_slider_modes" path="widgets/slider/slider_modes/lv_example_slider_modes" />
 
 ## API

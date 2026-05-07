@@ -1,0 +1,13 @@
+<screen>
+	<view>
+		<!-- 💡 Adjust width and style_text_align to see where left, center, and right alignment become visible. -->
+		<lv_label width="100%" style_text_align="center" text="Label: text alignment" />
+
+		<!-- Left-aligned multi-line label -->
+		<lv_label y="30" width="220" style_text_align="left" text="Left aligned&#10;Second line" />
+		<!-- Center-aligned multi-line label -->
+		<lv_label y="72" width="220" style_text_align="center" text="Centered&#10;Second line" />
+		<!-- Right-aligned multi-line label -->
+		<lv_label y="114" width="220" style_text_align="right" text="Right aligned&#10;Second line" />
+	</view>
+</screen>

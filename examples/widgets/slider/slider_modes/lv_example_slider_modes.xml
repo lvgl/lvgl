@@ -1,0 +1,40 @@
+<screen>
+	<view>
+		<!-- 💡 Switch mode and range values together: symmetrical needs negative+positive range, range mode uses left_value + value. -->
+		<lv_label width="100%" style_text_align="center" text="Slider: modes" />
+
+		<!-- Normal mode -->
+		<lv_slider x="12" y="36" width="220" height="16" mode="normal" min_value="0" max_value="100" value="70">
+			<lv_label align="center" text="normal" />
+		</lv_slider>
+
+		<!-- Symmetrical mode around zero -->
+		<lv_slider
+			x="12"
+			y="82"
+			width="220"
+			height="16"
+			mode="symmetrical"
+			min_value="-100"
+			max_value="100"
+			value="45"
+		>
+			<lv_label align="center" text="symmetrical" />
+		</lv_slider>
+
+		<!-- Range mode with left and right values -->
+		<lv_slider
+			x="12"
+			y="128"
+			width="220"
+			height="16"
+			mode="range"
+			min_value="0"
+			max_value="100"
+			left_value="25"
+			value="80"
+		>
+			<lv_label align="center" text="range" />
+		</lv_slider>
+	</view>
+</screen>

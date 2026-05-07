@@ -1,0 +1,33 @@
+<screen>
+	<view>
+		<!-- 💡 Edit min_value/max_value/value and orientation to see how fill direction and knob travel change. -->
+		<lv_label width="100%" style_text_align="center" text="Slider: value, range, orientation" />
+
+		<!-- Horizontal slider with custom range -->
+		<lv_slider
+			x="12"
+			y="38"
+			width="220"
+			height="16"
+			min_value="-20"
+			max_value="80"
+			value="35"
+		>
+			<lv_label align="center" text="-20..80" />
+		</lv_slider>
+
+		<!-- Vertical slider with explicit vertical orientation -->
+		<lv_slider
+			x="98"
+			y="76"
+			width="18"
+			height="130"
+			orientation="vertical"
+			min_value="0"
+			max_value="100"
+			value="60"
+		>
+			<lv_label align="center" text="V" />
+		</lv_slider>
+	</view>
+</screen>

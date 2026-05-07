@@ -1,0 +1,16 @@
+<screen>
+	<view>
+		<!-- 💡 Reverse min/max to flip slider direction without changing orientation. -->
+		<lv_label width="100%" style_text_align="center" text="Slider: reversed direction" />
+
+		<!-- Forward direction: range 0..100 -->
+		<lv_slider x="12" y="42" width="220" height="16" min_value="0" max_value="100" value="30">
+			<lv_label align="center" text="0..100" />
+		</lv_slider>
+
+		<!-- Reverse direction: range 100..0 -->
+		<lv_slider x="12" y="102" width="220" height="16" min_value="100" max_value="0" value="30">
+			<lv_label align="center" text="100..0" />
+		</lv_slider>
+	</view>
+</screen>

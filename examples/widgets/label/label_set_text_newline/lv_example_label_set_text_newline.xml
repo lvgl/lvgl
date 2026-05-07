@@ -1,0 +1,11 @@
+<screen>
+	<view>
+		<!-- 💡 Adjust text and line breaks (&#10;) to test multi-line layout and spacing. -->
+		<lv_label width="100%" style_text_align="center" text="Label: set text and newline" />
+
+		<!-- Label with explicit newline characters -->
+		<lv_label y="26" text="First line&#10;Second line&#10;&#10;Fourth line" />
+		<!-- Plain label for comparison -->
+		<lv_label y="140" text="Text is set directly with the text attribute." />
+	</view>
+</screen>
