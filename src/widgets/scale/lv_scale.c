@@ -903,6 +903,8 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     else { /* Add label with mapped values */
         lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+        // using a local buffer is safe only because we take care to zero the pointer before return from this function
+        // cppcheck-suppress autoVariables
         label_dsc->text = text_buffer;
         label_dsc->text_local = 1;
     }
@@ -977,6 +979,11 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     /* Invalid mode */
     else {
+        if(label_dsc->text_local) {
+            /* clear the reference to the text buffer on the stack */
+            label_dsc->text = NULL;
+            label_dsc->text_local = false;
+        }
         return;
     }
 
@@ -1224,7 +1231,15 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             lv_point_t section_arc_center;
             int32_t section_arc_radius;
             scale_get_center(obj, &section_arc_center, &section_arc_radius);
+            lv_style_value_t v;
+            if(section->main_style != NULL
+               && lv_style_get_prop(section->main_style, LV_STYLE_PAD_RADIAL, &v) == LV_STYLE_RES_FOUND) {
+                section_arc_radius -= v.num;
+            }
 
+            if(section_arc_radius <= 0) {
+                continue;
+            }
             /* TODO: Add compensation for the width of the first and last tick over the arc */
             const int32_t section_start_angle = lv_map(section->range_min, scale->range_min, scale->range_max, scale->rotation,
                                                        scale->rotation + scale->angle_range);

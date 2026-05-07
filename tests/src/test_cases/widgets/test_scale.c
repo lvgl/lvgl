@@ -656,4 +656,51 @@ void test_scale_with_1_tick(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_9.png");
 }
 
+/* When LV_STYLE_PAD_RADIAL is set on a section's main style, the section arc
+ * should be drawn with a radius reduced by the pad value. Two sections with
+ * adjacent ranges but with different radial paddings must therefore produce
+ * concentric arcs at distinct radii. */
+void test_scale_section_pad_radial(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_obj_set_size(scale, 200, 200);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+    lv_obj_center(scale);
+
+    lv_scale_set_label_show(scale, false);
+    lv_scale_set_total_tick_count(scale, 11);
+    lv_scale_set_major_tick_every(scale, 5);
+    lv_scale_set_range(scale, 0, 100);
+
+    /* Make the main arc visible so the section arcs can be visually distinguished. */
+    static lv_style_t main_arc_style;
+    lv_style_init(&main_arc_style);
+    lv_style_set_arc_color(&main_arc_style, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_arc_width(&main_arc_style, 2U);
+    lv_obj_add_style(scale, &main_arc_style, LV_PART_MAIN);
+
+    /* Section 1: no radial pad - the arc should sit on the default scale radius. */
+    static lv_style_t section_no_pad_style;
+    lv_style_init(&section_no_pad_style);
+    lv_style_set_arc_color(&section_no_pad_style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_arc_width(&section_no_pad_style, 4U);
+
+    lv_scale_section_t * section_no_pad = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section_no_pad, 0, 50);
+    lv_scale_set_section_style_main(scale, section_no_pad, &section_no_pad_style);
+
+    /* Section 2: radial pad of 20 - the section arc must be drawn 20 px inside. */
+    static lv_style_t section_padded_style;
+    lv_style_init(&section_padded_style);
+    lv_style_set_arc_color(&section_padded_style, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_arc_width(&section_padded_style, 4U);
+    lv_style_set_pad_radial(&section_padded_style, 20);
+
+    lv_scale_section_t * section_padded = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, section_padded, 50, 100);
+    lv_scale_set_section_style_main(scale, section_padded, &section_padded_style);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_10.png");
+}
+
 #endif
