@@ -439,7 +439,7 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
         if(obj && original_send_draw_task_event) {
             lv_obj_add_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
         }
-        return;
+        return false;
     }
 
     cache_data->task_type = task->type;
@@ -453,7 +453,17 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
         if(img_dsc->src != NULL) {
             lv_image_src_t src_type = lv_image_src_get_type(img_dsc->src);
             if(src_type == LV_IMAGE_SRC_FILE || src_type == LV_IMAGE_SRC_SYMBOL) {
-                img_dsc->src = lv_strdup((const char *)img_dsc->src);
+                const char * src_dup = lv_strdup((const char *)img_dsc->src);
+                if(src_dup == NULL) {
+                    LV_LOG_WARN("OpenGL ES cache image src duplication failed");
+                    lv_free(cache_data->draw_dsc);
+                    cache_data->draw_dsc = NULL;
+                    if(obj && original_send_draw_task_event) {
+                        lv_obj_add_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+                    }
+                    return false;
+                }
+                img_dsc->src = src_dup;
             }
         }
     }
