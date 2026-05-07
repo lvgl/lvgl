@@ -17,7 +17,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_public_api.h"
+#include "../lvgl_public.h"
 
 #ifdef __linux__
 #include "lv_linux.h"

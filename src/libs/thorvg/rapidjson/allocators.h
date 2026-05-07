@@ -25,7 +25,7 @@
 #include <type_traits>
 #endif
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
 

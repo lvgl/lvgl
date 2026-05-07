@@ -36,7 +36,7 @@ extern "C" {
 #define inline __inline
 #endif
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include <stddef.h>

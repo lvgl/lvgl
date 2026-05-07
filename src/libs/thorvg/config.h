@@ -6,7 +6,7 @@
 #ifndef TVG_CONFIG_H
 #define TVG_CONFIG_H
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 
 #define THORVG_SW_RASTER_SUPPORT 1
 

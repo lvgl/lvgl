@@ -144,7 +144,7 @@ def write_widget_properties(root_folder, properties_by_widget):
             else:
                 guard = None
 
-            include = "../../lv_public_api.h"
+            include = "../../lvgl_public.h"
 
             with open(output_file, 'w') as f:
                 f.write(f'''

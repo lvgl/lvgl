@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #if LV_USE_THORVG_INTERNAL
 
 #ifdef THORVG_SW_OPENMP_SUPPORT

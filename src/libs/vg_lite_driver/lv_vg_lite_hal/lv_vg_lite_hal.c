@@ -1,5 +1,5 @@
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include "../../../osal/lv_os_private.h"

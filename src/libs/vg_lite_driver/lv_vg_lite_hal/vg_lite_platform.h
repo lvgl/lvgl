@@ -1,7 +1,7 @@
 #ifndef VG_LITE_PLATFORM_H
 #define VG_LITE_PLATFORM_H
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include <stdint.h>

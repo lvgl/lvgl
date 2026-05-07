@@ -32,7 +32,7 @@
 
 /*Original repository: https://github.com/mpaland/printf*/
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
 
 #define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_USE_FLOAT)

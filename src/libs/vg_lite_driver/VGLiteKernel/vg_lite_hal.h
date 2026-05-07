@@ -55,7 +55,7 @@
 #ifndef VG_LITE_HAL_H
 #define VG_LITE_HAL_H
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #define VGLITE_MEM_ALIGNMENT      128

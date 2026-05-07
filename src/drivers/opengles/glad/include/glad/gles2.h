@@ -29,7 +29,7 @@
 #ifndef GLAD_GLES2_H_
 #define GLAD_GLES2_H_
 
-#include "../../../../../lv_public_api.h"
+#include "../../../../../lvgl_public.h"
 #if LV_USE_EGL
 
 #ifdef __clang__

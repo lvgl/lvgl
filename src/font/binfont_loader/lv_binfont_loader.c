@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "../fmt_txt/lv_font_fmt_txt_private.h"
 #include "../../misc/lv_fs_private.h"
 

@@ -12,7 +12,7 @@
 #include "../display/lv_display_private.h"
 #include "../misc/lv_anim_private.h"
 #include "../core/lv_global.h"
-#include "../lv_public_api.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

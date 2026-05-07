@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
 

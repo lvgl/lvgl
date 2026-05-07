@@ -30,7 +30,7 @@
 #define GLAD_EGL_H_
 
 
-#include "../../../../../lv_public_api.h"
+#include "../../../../../lvgl_public.h"
 #if LV_USE_EGL
 
 #define GLAD_EGL

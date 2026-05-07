@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_LINUX_DRM && !LV_LINUX_DRM_USE_EGL
 
 #include <errno.h>

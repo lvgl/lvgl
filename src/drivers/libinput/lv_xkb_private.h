@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 
 #if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
 
