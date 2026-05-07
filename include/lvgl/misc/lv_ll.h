@@ -1,6 +1,65 @@
 /**
  * @file lv_ll.h
- * Handle linked lists. The nodes are dynamically allocated by the 'lv_mem' module.
+ *
+ * Doubly-linked list that embeds user data directly inside each node allocation.
+ *
+ * ## Memory layout
+ *
+ * Unlike a textbook linked list that holds a `data` pointer inside each node,
+ * `lv_ll` allocates a single flat block per node and places the user data at
+ * the **beginning** of that block.  The `prev` / `next` bookkeeping pointers
+ * are appended **after** the user data:
+ *
+ * @code
+ * +---------------------------------+------------------+------------------+
+ * |  user data  (n_size bytes,      |  prev  pointer   |  next  pointer   |
+ * |  rounded up for alignment)      |  (sizeof ptr)    |  (sizeof ptr)    |
+ * |  ^--- pointer returned to       |                  |                  |
+ * |       the caller                |                  |                  |
+ * +---------------------------------+------------------+------------------+
+ *  offset 0                         offset n_size      offset n_size+ptrsize
+ * @endcode
+ *
+ * Because the returned pointer already **is** the user data pointer, callers
+ * only need a cast — no `->data` indirection is required.  This keeps usage
+ * sites clean and avoids a level of indirection on every access:
+ *
+ * @code
+ * my_item_t *item = lv_ll_ins_tail(&my_list);
+ * item->x = 10;   // write directly, no ->data needed
+ * @endcode
+ *
+ * Pointer arithmetic using the offsets defined by `LL_PREV_P_OFFSET` /
+ * `LL_NEXT_P_OFFSET` (in lv_ll.c) is used internally to read and write the
+ * `prev` / `next` fields without exposing them to callers.
+ *
+ * ## Ownership semantics
+ *
+ * `lv_ll` **owns the node allocation** but **not the resources referenced by
+ * the data stored in each node**.
+ *
+ * * `lv_ll_ins_head` / `lv_ll_ins_prev` / `lv_ll_ins_tail` allocate a node
+ *   block with `lv_malloc` and return a pointer to it.
+ * * `lv_ll_remove` unlinks a node from the list but does **not** free the
+ *   block — the caller must call `lv_free(node)` afterwards if appropriate.
+ * * `lv_ll_clear` frees every node block (the flat allocation described
+ *   above).  It does **not** chase any pointers stored inside the user data
+ *   portion. If the stored structs themselves contain heap-allocated members,
+ *   those will leak unless the caller frees them first (or last).
+ * * `lv_ll_clear_custom` accepts a `cleanup` callback that is invoked for
+ *   each node **instead** of the default `lv_free`.  Use this when the stored
+ *   data needs deep cleanup:
+ *
+ * @code
+ * static void my_cleanup(void * node)
+ * {
+ *     my_item_t * item = node;
+ *     lv_free(item->inner_buf);   // free owned sub-allocation
+ *     lv_ll_remove(&my_list, node);
+ *     lv_free(node);              // free the node block itself
+ * }
+ * lv_ll_clear_custom(&my_list, my_cleanup);
+ * @endcode
  */
 
 #ifndef LV_LL_H
@@ -74,6 +133,15 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p);
  */
 void lv_ll_remove(lv_ll_t * ll_p, void * node_p);
 
+/**
+ * Remove and optionally clean up all elements from a linked list via a custom callback.
+ * If `cleanup` is NULL the node block is simply freed with `lv_free`.
+ * If `cleanup` is provided it is called for every node **instead** of `lv_free`;
+ * the callback is then responsible for both releasing any owned sub-resources
+ * and freeing the node block itself.
+ * @param ll_p    pointer to linked list
+ * @param cleanup optional per-node cleanup callback, or NULL for a plain free
+ */
 void lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *));
 
 /**
