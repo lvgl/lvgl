@@ -55,6 +55,7 @@ typedef enum {
     LV_IMAGE_ALIGN_STRETCH, /**< Set X and Y scale to fill the Widget's area. */
     LV_IMAGE_ALIGN_TILE,    /**< Tile image to fill Widget's area. Offset is applied to shift the tiling. */
     LV_IMAGE_ALIGN_CONTAIN, /**< The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area. */
+    LV_IMAGE_ALIGN_CONTAIN_DOWNSCALE, /**< The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area if the image is bigger. */
     LV_IMAGE_ALIGN_COVER,   /**< The image keeps its aspect ratio and fills the Widget's area. */
 } lv_image_align_t;
 
