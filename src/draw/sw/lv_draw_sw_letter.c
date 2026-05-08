@@ -390,9 +390,7 @@ static void freetype_outline_event_cb(lv_event_t * e)
                         lv_vector_path_quad_to(path, &ctrl_pnt1, &pnt);
                         break;
                     case LV_FREETYPE_OUTLINE_END:
-                        /* It's not necessary to close the path and
-                         * border start is handled above
-                         */
+                        /* It's not necessary to close the path */
                         break;
                 }
                 break;
