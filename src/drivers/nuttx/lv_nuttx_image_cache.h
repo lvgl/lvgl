@@ -15,6 +15,9 @@ extern "C" {
  *********************/
 
 #include "../../lvgl_public.h"
+
+#if LV_USE_NUTTX
+
 #include LV_STDBOOL_INCLUDE
 
 /*********************
@@ -36,6 +39,8 @@ void lv_nuttx_image_cache_deinit(void);
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_NUTTX*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
