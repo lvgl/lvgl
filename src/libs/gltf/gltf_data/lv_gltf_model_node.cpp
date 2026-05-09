@@ -11,7 +11,7 @@
 #if LV_USE_GLTF
 
 #include <float.h>
-#include "fastgltf/types.hpp"
+#include <fastgltf/types.hpp>
 #include "../../../misc/lv_event_private.h"
 
 /*********************

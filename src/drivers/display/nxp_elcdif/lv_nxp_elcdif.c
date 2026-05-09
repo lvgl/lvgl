@@ -11,9 +11,9 @@
  *      INCLUDES
  *********************/
 #include "../../../display/lv_display_private.h"
-#include "fsl_video_common.h"
-#include "fsl_elcdif.h"
-#include "fsl_cache.h"
+#include <fsl_video_common.h>
+#include <fsl_elcdif.h>
+#include <fsl_cache.h>
 
 /*********************
  *      DEFINES

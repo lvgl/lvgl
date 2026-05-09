@@ -24,8 +24,8 @@ extern "C" {
 #if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include "../../sw/lv_draw_sw_private.h"
-#include "g2d.h"
-#include "g2dExt.h"
+#include <g2d.h>
+#include <g2dExt.h>
 
 /*********************
  *      DEFINES

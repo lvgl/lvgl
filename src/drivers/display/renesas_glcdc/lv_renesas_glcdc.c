@@ -27,12 +27,12 @@
 #endif /*_RENESAS_RA_*/
 
 #ifdef _RENESAS_RA_
-    #include "LVGL_thread.h"
+    #include <LVGL_thread.h>
 #else /* RX */
-    #include "hal_data.h"
-    #include "platform.h"
-    #include "r_glcdc_rx_if.h"
-    #include "r_glcdc_rx_pinset.h"
+    #include <hal_data.h>
+    #include <platform.h>
+    #include <r_glcdc_rx_if.h>
+    #include <r_glcdc_rx_pinset.h>
 #endif /*_RENESAS_RA_*/
 
 #include <stdbool.h>

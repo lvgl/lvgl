@@ -3,7 +3,7 @@
 
 #include "../../core/lv_global.h"
 #include <SPI.h>
-#include "SD.h"
+#include <SD.h>
 
 #if !LV_FS_IS_VALID_LETTER(LV_FS_ARDUINO_SD_LETTER)
     #error "Invalid drive letter"

@@ -23,7 +23,7 @@ extern "C" {
 
 #if LV_USE_PXP
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
-#include "fsl_pxp.h"
+#include <fsl_pxp.h>
 
 /*********************
  *      DEFINES

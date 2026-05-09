@@ -50,7 +50,7 @@ void lv_fs_memfs_init(void);
 #endif
 
 #if LV_USE_FS_LITTLEFS
-#include "lfs.h"
+#include <lfs.h>
 struct lfs;
 /**
  * Set the default LittleFS handler to be used by LVGL
