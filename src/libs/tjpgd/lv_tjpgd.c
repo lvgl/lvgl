@@ -107,9 +107,14 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         const char * fn = src;
         const char * ext = lv_fs_get_ext(fn);
         if((lv_strcmp(ext, "jpg") == 0) || (lv_strcmp(ext, "jpeg") == 0)) {
-            uint8_t workb[TJPGD_WORKBUFF_SIZE];
+            uint8_t * workb = lv_malloc(TJPGD_WORKBUFF_SIZE);
+            if(!workb) {
+                LV_LOG_WARN("failed to allocate memory for buffer");
+                return LV_RESULT_INVALID;
+            }
             JDEC jd;
             JRESULT rc = jd_prepare(&jd, input_func, workb, TJPGD_WORKBUFF_SIZE, &dsc->file);
+            lv_free(workb);
             if(rc) {
                 LV_LOG_WARN("jd_prepare error: %d", rc);
                 return LV_RESULT_INVALID;
