@@ -35,7 +35,7 @@
     #include "r_glcdc_rx_pinset.h"
 #endif /*_RENESAS_RA_*/
 
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
 

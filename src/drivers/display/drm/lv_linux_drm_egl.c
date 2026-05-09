@@ -14,7 +14,7 @@
 #include <string.h>
 #include <xf86drmMode.h>
 #include <stdlib.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <gbm.h>
 #include <drm_fourcc.h>
 #include <xf86drm.h>

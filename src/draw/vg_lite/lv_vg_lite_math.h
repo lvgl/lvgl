@@ -19,7 +19,7 @@ extern "C" {
 #if LV_USE_DRAW_VG_LITE
 
 #include <math.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <float.h>
 
 /*********************

@@ -10,7 +10,7 @@
 
 #if LV_USE_X11
 
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>

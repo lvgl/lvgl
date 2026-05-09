@@ -4,7 +4,7 @@
 #include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <stdlib.h>
 #include <stdio.h>
 #include "../VGLiteKernel/vg_lite_debug.h"

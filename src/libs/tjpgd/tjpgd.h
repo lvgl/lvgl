@@ -14,7 +14,7 @@ extern "C" {
 #if LV_USE_TJPGD
 
 #include <string.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 
 #if JD_FASTDECODE >= 1
 typedef int16_t jd_yuv_t;

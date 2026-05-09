@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
+#include LV_STDARG_INCLUDE
 #include <errno.h>
 #include "../../libs/lodepng/lodepng.h"
 

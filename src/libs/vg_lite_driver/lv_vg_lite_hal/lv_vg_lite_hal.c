@@ -13,7 +13,7 @@
 #include "../VGLiteKernel/vg_lite_hal.h"
 #include "../VGLiteKernel/vg_lite_hw.h"
 
-#include <stdarg.h>
+#include LV_STDARG_INCLUDE
 
 static void sleep(uint32_t msec)
 {

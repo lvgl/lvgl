@@ -12,7 +12,7 @@
 
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_draw_private.h"
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../core/lv_obj_private.h"
