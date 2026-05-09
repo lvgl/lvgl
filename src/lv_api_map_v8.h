@@ -20,10 +20,10 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_DISP_ROTATION_0       LV_DISPLAY_ROTATION_0
-#define LV_DISP_ROTATION_90      LV_DISPLAY_ROTATION_90
-#define LV_DISP_ROTATION_180     LV_DISPLAY_ROTATION_180
-#define LV_DISP_ROTATION_270     LV_DISPLAY_ROTATION_270
+#define LV_DISP_ROT_NONE       LV_DISPLAY_ROTATION_0
+#define LV_DISP_ROT_90      LV_DISPLAY_ROTATION_90
+#define LV_DISP_ROT_180     LV_DISPLAY_ROTATION_180
+#define LV_DISP_ROT_270     LV_DISPLAY_ROTATION_270
 
 #define LV_DISP_RENDER_MODE_PARTIAL LV_DISPLAY_RENDER_MODE_PARTIAL
 #define LV_DISP_RENDER_MODE_DIRECT  LV_DISPLAY_RENDER_MODE_DIRECT
@@ -50,7 +50,7 @@ typedef int32_t                     lv_coord_t;
 typedef lv_result_t                 lv_res_t;
 typedef lv_image_dsc_t              lv_img_dsc_t;
 typedef lv_display_t                lv_disp_t;
-typedef lv_display_rotation_t       lv_disp_rotation_t;
+typedef lv_display_rotation_t       lv_disp_rot_t;
 typedef lv_display_render_mode_t    lv_disp_render_t;
 typedef lv_anim_completed_cb_t      lv_anim_ready_cb_t;
 typedef lv_screen_load_anim_t       lv_scr_load_anim_t;
