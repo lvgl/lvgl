@@ -670,22 +670,26 @@ static void colorkey_and_recolor(lv_area_t relative_area, uint8_t * src_buf, uin
                 src_color.green = src_buf_tmp[1];
                 src_color.red = src_buf_tmp[2];
 
-                /* Check colorkey */
                 if(lv_color_is_in_range(src_color, colorkey_low, colorkey_high)) {
                     dest_buf_tmp[0] = 0;
                     dest_buf_tmp[1] = 0;
                     dest_buf_tmp[2] = 0;
                     if(cf == LV_COLOR_FORMAT_ARGB8888) {
-                        dest_buf_tmp[3] = 0; // Set alpha to 0
+                        dest_buf_tmp[3] = 0;
+                    }
+                    else if(cf == LV_COLOR_FORMAT_XRGB8888) {
+                        dest_buf_tmp[3] = 0xff;
                     }
                 }
-                /* Apply recolor */
                 else if(mix >= LV_OPA_MAX) {
                     dest_buf_tmp[0] = recolor.blue;
                     dest_buf_tmp[1] = recolor.green;
                     dest_buf_tmp[2] = recolor.red;
                     if(cf == LV_COLOR_FORMAT_ARGB8888) {
-                        dest_buf_tmp[3] = src_buf_tmp[3]; // Keep original alpha
+                        dest_buf_tmp[3] = src_buf_tmp[3];
+                    }
+                    else if(cf == LV_COLOR_FORMAT_XRGB8888) {
+                        dest_buf_tmp[3] = 0xff;
                     }
                 }
                 else if(mix > LV_OPA_MIN) {
@@ -693,16 +697,21 @@ static void colorkey_and_recolor(lv_area_t relative_area, uint8_t * src_buf, uin
                     dest_buf_tmp[1] = (c_mult[1] + (src_buf_tmp[1] * mix_inv)) >> 8;
                     dest_buf_tmp[2] = (c_mult[2] + (src_buf_tmp[2] * mix_inv)) >> 8;
                     if(cf == LV_COLOR_FORMAT_ARGB8888) {
-                        dest_buf_tmp[3] = src_buf_tmp[3]; // Keep original alpha
+                        dest_buf_tmp[3] = src_buf_tmp[3];
+                    }
+                    else if(cf == LV_COLOR_FORMAT_XRGB8888) {
+                        dest_buf_tmp[3] = 0xff;
                     }
                 }
                 else {
-                    // Copy as-is
                     dest_buf_tmp[0] = src_buf_tmp[0];
                     dest_buf_tmp[1] = src_buf_tmp[1];
                     dest_buf_tmp[2] = src_buf_tmp[2];
                     if(cf == LV_COLOR_FORMAT_ARGB8888) {
                         dest_buf_tmp[3] = src_buf_tmp[3];
+                    }
+                    else if(cf == LV_COLOR_FORMAT_XRGB8888) {
+                        dest_buf_tmp[3] = 0xff;
                     }
                 }
 
@@ -886,6 +895,7 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
                         dest_buf[1] = color.green;
                         dest_buf[2] = color.red;
                         if(cf == LV_COLOR_FORMAT_ARGB8888) dest_buf[3] = src_buf[3];
+                        else if(cf == LV_COLOR_FORMAT_XRGB8888) dest_buf[3] = 0xff;
                         src_buf += px_size;
                         dest_buf += px_size;
                     }
@@ -905,6 +915,7 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
                         dest_buf[1] = (c_mult[1] + (src_buf[1] * mix_inv)) >> 8;
                         dest_buf[2] = (c_mult[2] + (src_buf[2] * mix_inv)) >> 8;
                         if(cf == LV_COLOR_FORMAT_ARGB8888) dest_buf[3] = src_buf[3];
+                        else if(cf == LV_COLOR_FORMAT_XRGB8888) dest_buf[3] = 0xff;
                         src_buf += px_size;
                         dest_buf += px_size;
                     }
