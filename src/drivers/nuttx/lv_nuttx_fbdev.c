@@ -11,7 +11,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <stddef.h>
+#include LV_STDDEF_INCLUDE
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>

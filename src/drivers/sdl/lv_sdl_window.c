@@ -13,7 +13,7 @@
 #include "../../lvgl_public.h"
 
 #if LV_USE_SDL
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 

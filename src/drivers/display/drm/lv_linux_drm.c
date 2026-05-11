@@ -12,7 +12,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>

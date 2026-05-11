@@ -12,7 +12,7 @@
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_CLIB
 
 #include <stdio.h>
-#include <stdarg.h>
+#include LV_STDARG_INCLUDE
 
 /*********************
  *      DEFINES

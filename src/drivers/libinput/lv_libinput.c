@@ -19,7 +19,7 @@
 #include <linux/limits.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <dirent.h>
 #include <libinput.h>
 #include <pthread.h>
