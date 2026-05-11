@@ -387,8 +387,9 @@ void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * recognizer
     if(r->config == NULL) {
         LV_LOG_TRACE("init gesture configuration - set defaults");
         r->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
+        LV_ASSERT_MALLOC(r->config);
 
-        LV_ASSERT(r->config != NULL);
+        r->config->rotation_angle_rad_threshold = LV_GESTURE_ROTATION_ANGLE_RAD_THRESHOLD;
     }
 
     /* Process collected touch events */
