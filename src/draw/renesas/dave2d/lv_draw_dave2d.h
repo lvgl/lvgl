@@ -16,8 +16,8 @@ extern "C" {
 #include "../../../lvgl_public.h"
 #if LV_USE_DRAW_DAVE2D
 #include "../../lv_draw_private.h"
-#include "bsp_api.h"
-#include "dave_driver.h"
+#include <bsp_api.h>
+#include <dave_driver.h>
 
 #if LV_USE_FLOAT
 

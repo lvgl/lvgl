@@ -29,7 +29,7 @@ extern "C" {
 #include "../../../misc/lv_area_private.h"
 
 /* The ppa driver depends heavily on the esp-idf headers*/
-#include "sdkconfig.h"
+#include <sdkconfig.h>
 
 #if (CONFIG_LV_DRAW_BUF_ALIGN != CONFIG_CACHE_L2_CACHE_LINE_SIZE)
 #error "CONFIG_LV_DRAW_BUF_ALIGN must be equal to CONFIG_CACHE_L2_CACHE_LINE_SIZE!"
@@ -40,12 +40,12 @@ extern "C" {
 #error "This SoC does not support PPA"
 #endif
 
-#include "driver/ppa.h"
-#include "esp_heap_caps.h"
-#include "esp_err.h"
-#include "hal/color_hal.h"
-#include "esp_cache.h"
-#include "esp_log.h"
+#include <driver/ppa.h>
+#include <esp_heap_caps.h>
+#include <esp_err.h>
+#include <hal/color_hal.h>
+#include <esp_cache.h>
+#include <esp_log.h>
 /*********************
 *      DEFINES
 *********************/
