@@ -6,15 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_led_private.h"
-#include "../../core/lv_obj_private.h"
-#include "../../core/lv_obj_class_private.h"
 
 #if LV_USE_LED
 
-#include "../../misc/lv_assert.h"
-#include "../../themes/lv_theme.h"
-#include "../../misc/lv_color.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
 
 /*********************
  *      DEFINES

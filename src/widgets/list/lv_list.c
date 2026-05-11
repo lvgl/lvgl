@@ -6,15 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_obj_class_private.h"
-#include "lv_list.h"
-#include "../../layouts/flex/lv_flex.h"
-#include "../../display/lv_display.h"
-#include "../label/lv_label.h"
-#include "../image/lv_image.h"
-#include "../button/lv_button.h"
+
+
+#include "../../lvgl_public.h"
 
 #if LV_USE_LIST
+
+#include "../../core/lv_obj_class_private.h"
 
 /*********************
  *      DEFINES

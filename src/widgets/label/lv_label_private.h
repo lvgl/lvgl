@@ -16,9 +16,9 @@ extern "C" {
 
 #include "../../draw/lv_draw_label_private.h"
 #include "../../core/lv_obj_private.h"
-#include "lv_label.h"
+#include "../../lvgl_public.h"
 
-#if LV_USE_LABEL != 0
+#if LV_USE_LABEL
 
 /*********************
  *      DEFINES

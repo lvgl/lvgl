@@ -47,6 +47,7 @@
     --color-blue: var(--blue);
     --color-sapphire: var(--sapphire);
     --color-green: var(--green);
+    --color-yellow: var(--yellow);
     --color-peach: var(--peach);
     --color-mauve: var(--mauve);
     --color-teal: var(--teal);
@@ -1219,6 +1220,53 @@ ui-topbar .topbar-search::placeholder {
 .detail-style-table td {
   padding: 1px 4px;
 }
+.detail-flags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 1);
+}
+.detail-flag-badge {
+  display: inline-block;
+  border-radius: 0.25rem;
+  background-color: var(--color-surface0);
+  padding-inline: calc(var(--spacing) * 1.5);
+  padding-block: 1px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-overlay1);
+  border: 1px solid var(--surface0);
+}
+.detail-state-active {
+  border-color: var(--color-yellow);
+  @supports (color: color-mix(in lab, red, red)) {
+    border-color: color-mix(in oklab, var(--color-yellow) 30%, transparent);
+  }
+  background-color: var(--color-yellow);
+  @supports (color: color-mix(in lab, red, red)) {
+    background-color: color-mix(in oklab, var(--color-yellow) 10%, transparent);
+  }
+  color: var(--color-yellow);
+}
+.detail-adv-toggle {
+  margin-top: calc(var(--spacing) * 1);
+}
+.detail-adv-summary {
+  cursor: pointer;
+  padding-block: calc(var(--spacing) * 0.5);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-overlay0);
+  list-style: none;
+}
+.detail-adv-summary::before {
+  content: "▸ ";
+}
+.detail-adv-toggle[open] > .detail-adv-summary::before {
+  content: "▾ ";
+}
 .scene-controls {
   margin-bottom: calc(var(--spacing) * 1);
   display: flex;
@@ -2052,12 +2100,21 @@ function buildCard(item, config) {
 }
 
 // src/builders/obj-tree.ui.ts
+function formatWdVal(v) {
+  if (v == null)
+    return "-";
+  if (typeof v === "object")
+    return JSON.stringify(v);
+  return String(v);
+}
 function renderObjTree(obj, depth = 0) {
   let det = document.createElement("details");
   if (det.className = "obj-node", obj.addr)
     det.id = "obj-" + obj.addr;
   let sum = document.createElement("summary");
-  if (sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]), sum.textContent = obj.class_name || "obj", det.appendChild(sum), obj.addr)
+  if (sum.style.setProperty("--depth-color", DEPTH_COLORS[depth % DEPTH_COLORS.length]), sum.textContent = (obj.name ? obj.name + " " : "") + (obj.class_name || "obj"), obj.flags_list?.includes("HIDDEN"))
+    sum.textContent += " \uD83D\uDC41‍\uD83D\uDDE8";
+  if (det.appendChild(sum), obj.addr)
     objDataMap[obj.addr] = obj, registerHL(obj.addr, det), sum.addEventListener("mouseenter", () => highlightObj(obj.addr)), sum.addEventListener("mouseleave", () => clearHighlight()), sum.addEventListener("click", (e) => {
       e.stopPropagation(), selectObj(obj.addr);
     }), sum.addEventListener("dblclick", (e) => {
@@ -2105,7 +2162,18 @@ function renderObjDetail(addr, panel) {
     let _e10 = document.createElement("span");
     return _e10.setAttribute("class", "detail-coord-val"), _e10.append(String(w), " × ", String(h)), _e8.append(_e9, _e10), _e2.append(_e3, _e8), _e.append(_e1, _e2), _e;
   })();
-  panel.appendChild(coordSec);
+  if (panel.appendChild(coordSec), obj.flags_list?.length) {
+    let flagSec = el("div", "detail-section");
+    flagSec.appendChild(el("div", "detail-section-title", "Flags"));
+    let wrap = el("div", "detail-flags-wrap");
+    obj.flags_list.forEach((f) => wrap.appendChild(el("span", "detail-flag-badge", f))), flagSec.appendChild(wrap), panel.appendChild(flagSec);
+  }
+  if (obj.state_list?.length) {
+    let stateSec = el("div", "detail-section");
+    stateSec.appendChild(el("div", "detail-section-title", "State"));
+    let wrap = el("div", "detail-flags-wrap");
+    obj.state_list.forEach((s) => wrap.appendChild(el("span", "detail-flag-badge" + (s === "DEFAULT" ? "" : " detail-state-active"), s))), stateSec.appendChild(wrap), panel.appendChild(stateSec);
+  }
   let refSec = el("div", "detail-section");
   if (refSec.appendChild(el("div", "detail-section-title", "References")), obj.parent_addr) {
     let row = el("div", "kv-row");
@@ -2115,7 +2183,86 @@ function renderObjDetail(addr, panel) {
     let row = el("div", "kv-row");
     row.appendChild(el("span", "kv-label", "group")), row.appendChild(xref(obj.group_addr, "group")), refSec.appendChild(row);
   }
-  if (refSec.appendChild(kvPair("children", String(obj.child_count || 0))), refSec.appendChild(kvPair("styles", String(obj.style_count || 0))), panel.appendChild(refSec), obj.styles?.length) {
+  if (obj.user_data)
+    refSec.appendChild(kvPair("user_data", obj.user_data));
+  if (obj.name)
+    refSec.appendChild(kvPair("name", obj.name));
+  if (refSec.appendChild(kvPair("children", String(obj.child_count || 0))), refSec.appendChild(kvPair("styles", String(obj.style_count || 0))), panel.appendChild(refSec), obj.scroll || obj.ext_click_pad || obj.ext_draw_size || obj.scrollbar_mode || obj.layer_type || obj.w_layout || obj.h_layout) {
+    let layoutSec = el("div", "detail-section");
+    if (layoutSec.appendChild(el("div", "detail-section-title", "Layout & Scroll")), obj.scroll)
+      layoutSec.appendChild(kvPair("scroll", `${obj.scroll.x}, ${obj.scroll.y}`));
+    if (obj.ext_click_pad)
+      layoutSec.appendChild(kvPair("ext_click_pad", String(obj.ext_click_pad)));
+    if (obj.ext_draw_size)
+      layoutSec.appendChild(kvPair("ext_draw_size", String(obj.ext_draw_size)));
+    if (obj.scrollbar_mode != null)
+      layoutSec.appendChild(kvPair("scrollbar_mode", String(obj.scrollbar_mode)));
+    if (obj.scroll_dir != null)
+      layoutSec.appendChild(kvPair("scroll_dir", String(obj.scroll_dir)));
+    if (obj.scroll_snap_x)
+      layoutSec.appendChild(kvPair("scroll_snap_x", String(obj.scroll_snap_x)));
+    if (obj.scroll_snap_y)
+      layoutSec.appendChild(kvPair("scroll_snap_y", String(obj.scroll_snap_y)));
+    if (obj.layer_type)
+      layoutSec.appendChild(kvPair("layer_type", String(obj.layer_type)));
+    if (obj.w_layout)
+      layoutSec.appendChild(kvPair("w_layout", "true"));
+    if (obj.h_layout)
+      layoutSec.appendChild(kvPair("h_layout", "true"));
+    panel.appendChild(layoutSec);
+  }
+  if (obj.layout_inv || obj.is_deleting || obj.rendered || obj.skip_trans) {
+    let intSec = el("div", "detail-section");
+    intSec.appendChild(el("div", "detail-section-title", "Internal"));
+    let wrap = el("div", "detail-flags-wrap");
+    if (obj.layout_inv)
+      wrap.appendChild(el("span", "detail-flag-badge detail-state-active", "layout_inv"));
+    if (obj.is_deleting)
+      wrap.appendChild(el("span", "detail-flag-badge detail-state-active", "is_deleting"));
+    if (obj.rendered)
+      wrap.appendChild(el("span", "detail-flag-badge", "rendered"));
+    if (obj.skip_trans)
+      wrap.appendChild(el("span", "detail-flag-badge", "skip_trans"));
+    intSec.appendChild(wrap), panel.appendChild(intSec);
+  }
+  if (obj.widget_data && Object.keys(obj.widget_data).length) {
+    let wd = obj.widget_data, primary = {
+      lv_label: ["text", "long_mode", "recolor"],
+      lv_image: ["src", "w", "h", "rotation", "scale_x", "scale_y", "align"],
+      lv_bar: ["cur_value", "min_value", "max_value", "start_value", "mode"],
+      lv_slider: ["cur_value", "min_value", "max_value", "start_value", "mode", "dragging"],
+      lv_arc: ["value", "min_value", "max_value", "rotation", "type"],
+      lv_switch: ["anim_state", "orientation"],
+      lv_checkbox: ["txt"],
+      lv_dropdown: ["options", "option_cnt", "sel_opt_id", "dir"],
+      lv_textarea: ["placeholder_txt", "max_length", "pwd_show_time"],
+      lv_tabview: ["tab_cur", "tab_pos", "tab_bar_size"],
+      lv_roller: ["option_cnt", "sel_opt_id", "mode"],
+      lv_chart: ["point_cnt", "hdiv_cnt", "vdiv_cnt", "type"],
+      lv_scale: ["mode", "range_min", "range_max", "total_tick_count", "angle_range", "rotation"],
+      lv_spinner: ["duration", "angle"],
+      lv_keyboard: ["mode", "popovers"],
+      lv_led: ["color", "bright"],
+      lv_spinbox: ["value", "range_min", "range_max", "step", "digit_count", "dec_point_pos"],
+      lv_calendar: ["today", "showed_date"],
+      lv_table: ["col_cnt", "row_cnt"],
+      lv_buttonmatrix: ["btn_cnt", "row_cnt", "btn_id_sel", "one_check"]
+    }[obj.class_name] || [], allKeys = Object.keys(wd), priKeys = allKeys.filter((k) => primary.includes(k)), advKeys = allKeys.filter((k) => !primary.includes(k)), wdSec = el("div", "detail-section");
+    wdSec.appendChild(el("div", "detail-section-title", "Widget · " + obj.class_name));
+    for (let k of priKeys.length ? priKeys : allKeys.slice(0, 6))
+      wdSec.appendChild(kvPair(k, formatWdVal(wd[k])));
+    let rest = priKeys.length ? advKeys : allKeys.slice(6);
+    if (rest.length) {
+      let toggle = el("details", "detail-adv-toggle");
+      toggle.appendChild(el("summary", "detail-adv-summary", `${rest.length} more fields`));
+      let inner = el("div", "");
+      for (let k of rest)
+        inner.appendChild(kvPair(k, formatWdVal(wd[k])));
+      toggle.appendChild(inner), wdSec.appendChild(toggle);
+    }
+    panel.appendChild(wdSec);
+  }
+  if (obj.styles?.length) {
     let styleSec = el("div", "detail-section");
     styleSec.appendChild(el("div", "detail-section-title", "Styles (" + obj.styles.length + ")")), obj.styles.forEach((s) => {
       let card = el("div", "detail-style-card");
@@ -2280,8 +2427,8 @@ function flattenLayers(trees) {
     let idx = sIdx++;
     screenNames.push(s.layer_name || s.class_name || "screen_" + idx);
     let maxLocal = 0;
-    function walk(obj, ld) {
-      let c = obj.coords || { x1: 0, y1: 0, x2: 0, y2: 0 };
+    function walk(obj, ld, parentHidden) {
+      let c = obj.coords || { x1: 0, y1: 0, x2: 0, y2: 0 }, hidden = parentHidden || (obj.flags_list?.includes("HIDDEN") ?? !1);
       layers.push({
         addr: obj.addr,
         class_name: obj.class_name || "obj",
@@ -2293,10 +2440,11 @@ function flattenLayers(trees) {
         localDepth: ld,
         child_count: obj.child_count || 0,
         style_count: obj.style_count || 0,
-        screenIdx: idx
-      }), maxLocal = Math.max(maxLocal, ld), obj.children?.forEach((ch) => walk(ch, ld + 1));
+        screenIdx: idx,
+        hidden
+      }), maxLocal = Math.max(maxLocal, ld), obj.children?.forEach((ch) => walk(ch, ld + 1, hidden));
     }
-    walk(s, 0), screenMaxLocal[idx] = maxLocal, globalOffset += maxLocal + C.SCREEN_GAP;
+    walk(s, 0, !1), screenMaxLocal[idx] = maxLocal, globalOffset += maxLocal + C.SCREEN_GAP;
   })), { layers, screenNames, screenMaxLocal };
 }
 function resolveCSSColor(cssVar) {
@@ -2340,7 +2488,9 @@ function build3DScene(container, trees, displays, dispObjs) {
       btn.dataset.on = v ? "0" : "1", btn.classList.toggle("active", !v);
     }, btn;
   }, controls = el("div", "scene-controls"), toggle3d = makeToggle("3D", !0), toggleBorders = makeToggle("Borders", !0), bufToggles = [], toggleOrtho = makeToggle("Ortho", !1);
-  controls.append(toggle3d, toggleBorders), bufImages.forEach((bi) => {
+  controls.append(toggle3d, toggleBorders);
+  let toggleHidden = makeToggle("Hidden", !1);
+  controls.appendChild(toggleHidden), bufImages.forEach((bi) => {
     let btn = makeToggle(bi.label, !0), thumb = (() => {
       let _e = document.createElement("img");
       return _e.setAttribute("draggable", "false"), _e.setAttribute("style", "height:1.2em;border-radius:2px;vertical-align:middle;image-rendering:pixelated"), _e;
@@ -2474,7 +2624,7 @@ function build3DScene(container, trees, displays, dispObjs) {
       depthRange.min = visMax, depthMinSlider.value = String(visMax);
   }
   function updateDepths(spreadOv, rangeOv) {
-    let bordersOn = toggleBorders.dataset.on === "1", range = rangeOv ?? depthRange, screenOffset = computeScreenOffsets();
+    let bordersOn = toggleBorders.dataset.on === "1", showHidden = toggleHidden.dataset.on === "1", range = rangeOv ?? depthRange, screenOffset = computeScreenOffsets();
     currentSpread = spreadOv ?? (is3d ? Number(spreadSlider.value) : 0.1);
     let compressedIdx = 0, compressedDepth = {}, seenDepths = /* @__PURE__ */ new Set;
     layers.forEach((l) => {
@@ -2483,7 +2633,7 @@ function build3DScene(container, trees, displays, dispObjs) {
         seenDepths.add(gd), compressedDepth[gd] = compressedIdx++;
     }), layers.forEach((l, idx) => {
       let sl = sceneLayers[idx], gd = screenOffset[l.screenIdx] !== void 0 ? screenOffset[l.screenIdx] + l.localDepth : -1, inRange = gd >= Math.round(range.min) && gd <= Math.round(range.max);
-      sl.visible = bordersOn && layerVisible[l.screenIdx] && inRange, sl.depth = (compressedDepth[gd] ?? 0) * currentSpread;
+      sl.visible = bordersOn && layerVisible[l.screenIdx] && inRange && (!l.hidden || showHidden), sl.depth = (compressedDepth[gd] ?? 0) * currentSpread;
     }), sceneBufs.forEach((b) => {
       b.depth = -currentSpread * 0.5;
     }), renderer.markDirty();
@@ -2551,7 +2701,7 @@ function build3DScene(container, trees, displays, dispObjs) {
   }), toggleOrtho.addEventListener("click", () => {
     let ortho = toggleOrtho.dataset.on === "1";
     animateTo({ persp: ortho ? 0 : 1 });
-  }), toggleBorders.addEventListener("click", () => updateVisibility()), bufToggles.forEach((btn) => btn.addEventListener("click", () => updateVisibility()));
+  }), toggleBorders.addEventListener("click", () => updateVisibility()), toggleHidden.addEventListener("click", () => updateVisibility()), bufToggles.forEach((btn) => btn.addEventListener("click", () => updateVisibility()));
   let dragging = !1, lastX = 0, lastY = 0;
   viewport.onmousedown = (e) => {
     if (inScreensaver)
@@ -2721,7 +2871,7 @@ function build3DScene(container, trees, displays, dispObjs) {
     btn.dataset.on = on ? "1" : "0", btn.classList.toggle("active", on);
   };
   return resetBtn.onclick = () => {
-    is3d = !0, setToggle(toggle3d, !0), setToggle(toggleBorders, !0), setToggle(toggleOrtho, !1), bufToggles.forEach((btn) => setToggle(btn, !0)), screenNames.forEach((name, i) => {
+    is3d = !0, setToggle(toggle3d, !0), setToggle(toggleBorders, !0), setToggle(toggleOrtho, !1), setToggle(toggleHidden, !1), bufToggles.forEach((btn) => setToggle(btn, !0)), screenNames.forEach((name, i) => {
       layerVisible[i] = name === "act_scr" || screenNames.length === 1;
     }), layerBtns.forEach((b, i) => b.classList.toggle("active", layerVisible[i])), spreadSlider.disabled = !1, focusedAddr = null, updateDepthSliderRange(), updateVisibility();
     let visMax = Number(depthMaxSlider.max);
@@ -3085,7 +3235,7 @@ class UiDashboard extends BaseComponent {
 customElements.define("ui-dashboard", UiDashboard);
 
 // src/app.ts
-document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-03-27 20:04 GMT+8"}</span><span>·</span><span>${"14ea6ea"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
+document.getElementById("about").innerHTML = `<span>uinspy v${"0.4.6"}</span><span>·</span><span>Built ${"2026-04-02 13:52 GMT+8"}</span><span>·</span><span>${"07131c2"}</span><span>·</span><span>${"Canvas2D"}</span><span>·</span><a href="https://github.com/W-Mai/uinspy" target="_blank" rel="noopener">GitHub</a><span>·</span><a href="https://lvgl.io" target="_blank" rel="noopener">LVGL</a><span>·</span><span>MIT</span>`;
 </script>
 </body>
 </html>

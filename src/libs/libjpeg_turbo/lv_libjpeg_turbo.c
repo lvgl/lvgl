@@ -6,11 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../draw/lv_image_decoder_private.h"
-#include "../../../lvgl.h"
+
+#include "../../lvgl_public.h"
+
 #if LV_USE_LIBJPEG_TURBO
 
-#include "lv_libjpeg_turbo.h"
+#include "../../draw/lv_image_decoder_private.h"
 #include <stdio.h>
 #include <jpeglib.h>
 #include <jpegint.h>

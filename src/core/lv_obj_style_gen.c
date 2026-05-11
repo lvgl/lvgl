@@ -8,7 +8,7 @@
  */
 
 
-#include "lv_obj.h"
+#include "../lvgl_public.h"
 
 
 void lv_obj_set_style_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
@@ -705,6 +705,14 @@ void lv_obj_set_style_text_outline_stroke_opa(lv_obj_t * obj, lv_opa_t value, lv
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_TEXT_OUTLINE_STROKE_OPA, v, selector);
+}
+
+void lv_obj_set_style_text_leading_trim(lv_obj_t * obj, lv_text_leading_trim_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TEXT_LEADING_TRIM, v, selector);
 }
 
 void lv_obj_set_style_blur_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)

@@ -81,7 +81,16 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Add custom drawer to the button matrix to customize buttons one by one
+ * @title Per-button custom drawing
+ * @brief Rewrite individual button draw descriptors through `LV_EVENT_DRAW_TASK_ADDED`.
+ *
+ * A centered button matrix is flagged with `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`
+ * and subscribes to `LV_EVENT_DRAW_TASK_ADDED`. For each `LV_PART_ITEMS` draw
+ * task the callback inspects `base_dsc->id1`. Button index 1 becomes a blue
+ * rectangular button with an offset shadow and a white label. Button 2
+ * becomes a red `LV_RADIUS_CIRCLE` button that darkens on press. Button 3
+ * hides its label and draws the `img_star` image centered in the fill area
+ * with a 30% black recolor while pressed.
  */
 void lv_example_buttonmatrix_2(void)
 {

@@ -10,19 +10,14 @@
 #include "lv_obj_draw_private.h"
 #include "../misc/lv_area_private.h"
 #include "../draw/sw/lv_draw_sw_mask_private.h"
-#include "../draw/lv_draw_mask.h"
 #include "lv_obj_private.h"
 #include "lv_obj_event_private.h"
-#include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
-#include "../tick/lv_tick.h"
 #include "../misc/lv_timer_private.h"
-#include "../misc/lv_math.h"
-#include "../misc/lv_profiler.h"
-#include "../misc/lv_types.h"
 #include "../draw/lv_draw_private.h"
-#include "../stdlib/lv_string.h"
+#include "../draw/opengles/lv_draw_opengles.h"
 #include "lv_global.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -105,6 +100,9 @@ void lv_refr_now(lv_display_t * disp)
 
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 {
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(obj != NULL, return);
+
     LV_PROFILER_REFR_BEGIN;
     lv_area_t clip_area_ori = layer->_clip_area;
     lv_area_t clip_coords_for_obj;
@@ -459,6 +457,9 @@ refr_finish:
  */
 lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 {
+    LV_CHECK_ARG(area_p != NULL, return NULL);
+    LV_CHECK_ARG(obj != NULL, return NULL);
+
     lv_obj_t * found_p = NULL;
 
     if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
@@ -496,8 +497,9 @@ lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
 void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(layer);
-    LV_ASSERT_NULL(obj);
+    LV_CHECK_ARG(layer != NULL, return);
+    LV_CHECK_ARG(obj != NULL, return);
+
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
     /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/
@@ -1057,9 +1059,30 @@ static void refr_configured_layer(lv_layer_t * layer)
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
-        lv_area_t clear_area = layer->_clip_area;
-        lv_area_move(&clear_area, -layer->buf_area.x1, -layer->buf_area.y1);
-        lv_draw_buf_clear(layer->draw_buf, &clear_area);
+#if LV_USE_DRAW_OPENGLES
+        lv_layer_t * clear_target_layer = disp_refr->layer_head ? disp_refr->layer_head : layer;
+        /* TODO: this driver-specific branch is a temporary workaround.
+         * The proper fix may be a generic per-draw-unit clear callback (e.g.
+         * a `clear_area_cb` on `lv_draw_unit_t`) so `lv_refr` can just dispatch
+         * the right clear function. LVGL does not currently expose that hook now.
+         * This is a special-case for Draw_OpenGLES to fix issue #9912 (PR #9987).
+         */
+        /*With Draw_OpenGLES the layer's draw_buf is a dummy CPU buffer and the
+         *real pixels live in a GL texture. Clearing the CPU buffer is a no-op
+         *on the texture, so perform a GPU-side clear of the dirty area.
+         *Key this off the refreshing display's real backing layer instead of
+         *the current layer, because tiled rendering can use temporary tile
+         *layers with NULL user_data.*/
+        if(disp_refr->layer_head != NULL && disp_refr->layer_head->user_data != NULL) {
+            lv_draw_opengles_clear_layer_area(clear_target_layer, &layer->_clip_area);
+        }
+        else
+#endif
+        {
+            lv_area_t clear_area = layer->_clip_area;
+            lv_area_move(&clear_area, -layer->buf_area.x1, -layer->buf_area.y1);
+            lv_draw_buf_clear(layer->draw_buf, &clear_area);
+        }
     }
 
     lv_obj_t * top_act_scr = NULL;

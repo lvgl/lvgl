@@ -7,19 +7,13 @@
  *      INCLUDES
  *********************/
 #include "lv_buttonmatrix_private.h"
+#if LV_USE_BUTTONMATRIX
+
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_BUTTONMATRIX != 0
-
-#include "../../misc/lv_assert.h"
-#include "../../indev/lv_indev.h"
-#include "../../core/lv_group.h"
-#include "../../draw/lv_draw.h"
-#include "../../core/lv_refr.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

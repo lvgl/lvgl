@@ -745,6 +745,9 @@ menu "LVGL configuration"
 					When enabled, LV_CHECK_ARG checks validate function arguments
 					at runtime. Failed checks log a warning and execute the specified
 					action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+					Disabling this is not recommended unless extreme care is taken and only
+					in very resource constrained environments where it can be absolutely
+					ensured that invariants are never violated.
 
 			config LV_CHECK_ARG_ASSERT_ON_FAIL
 				bool "Call assert handler on LV_CHECK_ARG failure"
@@ -753,6 +756,36 @@ menu "LVGL configuration"
 				help
 					When enabled, LV_ASSERT_HANDLER is also invoked when an
 					LV_CHECK_ARG check fails, before the action is executed.
+
+			choice
+				prompt "Log behavior on LV_CHECK_ARG failure"
+				depends on LV_USE_CHECK_ARG
+				default LV_CHECK_ARG_LOG_MODE_VERBOSE if LV_USE_LOG
+				default LV_CHECK_ARG_LOG_MODE_NONE if !LV_USE_LOG
+				help
+					Controls what is logged when an LV_CHECK_ARG check fails.
+					MINIMAL and VERBOSE modes require LV_USE_LOG to be enabled;
+					selecting either when LV_USE_LOG is disabled will cause a
+					compile-time error.
+
+				config LV_CHECK_ARG_LOG_MODE_NONE
+					bool "None: no log output on failure"
+
+				config LV_CHECK_ARG_LOG_MODE_MINIMAL
+					bool "Minimal: log 'Check failed' only (file/line from LV_LOG_WARN)"
+					depends on LV_USE_LOG
+
+				config LV_CHECK_ARG_LOG_MODE_VERBOSE
+					bool "Verbose: log 'Check failed: <cond>' plus caller-supplied message"
+					depends on LV_USE_LOG
+			endchoice
+
+			config LV_CHECK_ARG_LOG_MODE
+				int
+				depends on LV_USE_CHECK_ARG
+				default 0 if LV_CHECK_ARG_LOG_MODE_NONE
+				default 1 if LV_CHECK_ARG_LOG_MODE_MINIMAL
+				default 2 if LV_CHECK_ARG_LOG_MODE_VERBOSE
 		endmenu
 
 		menu "Debug"
@@ -1576,6 +1609,10 @@ menu "LVGL configuration"
 			int "The maximum number of Glyph in count"
 			default 256
 			depends on LV_USE_FREETYPE
+		config LV_FREETYPE_CACHE_FT_GLYPH_L1
+			bool "Enable L1 glyph metrics cache (lock-free, single-thread only)"
+			default y
+			depends on LV_USE_FREETYPE && LV_OS_NONE
 
 		config LV_USE_TINY_TTF
 			bool "Enable Tiny TTF decoder"

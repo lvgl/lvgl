@@ -1,0 +1,56 @@
+---
+title: "libjpeg-turbo Decoder"
+---
+
+<br />
+
+<hr />
+
+**libjpeg-turbo** is an LVGL interface to the libjpeg-turbo library --- a JPEG image
+codec that uses SIMD instructions to accelerate baseline JPEG compression and
+decompression on x86, x86-64, Arm, PowerPC, and MIPS systems, as well as progressive
+JPEG compression on x86, x86-64, and Arm systems.
+
+On such systems, libjpeg-turbo is generally 2-6x as fast as libjpeg, all else being
+equal.
+
+For a detailed introduction, see:  https://libjpeg-turbo.org .
+
+Library source:  https://github.com/libjpeg-turbo/libjpeg-turbo
+
+## Install
+
+```bash
+sudo apt install libjpeg-turbo8-dev
+```
+
+## Adding  libjpeg-turbo to Your Project
+
+Cmake:
+
+```cmake
+find_package(JPEG REQUIRED)
+include_directories(${JPEG_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${JPEG_LIBRARIES})
+```
+
+## Usage
+
+Set <ApiLink name="LV_USE_LIBJPEG_TURBO" /> in `lv_conf.h` to `1`.
+
+See the examples below.
+
+It should be noted that each image decoded needs to consume:
+
+image width × image height × 3
+
+bytes of RAM, and it needs to be combined with the [Image Caching](/main-modules/images/caching)
+feature to ensure that the memory usage is within a reasonable range.
+
+## Example
+
+### Load a JPG image
+
+<LvglExample name="lv_example_libjpeg_turbo_1" path="libs/libjpeg_turbo/lv_example_libjpeg_turbo_1" />
+
+## API

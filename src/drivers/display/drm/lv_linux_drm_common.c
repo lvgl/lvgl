@@ -7,15 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "lv_linux_drm.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_LINUX_DRM
 
 #include <dirent.h>
 #include <xf86drmMode.h>
-
-#include "lv_linux_drm.h"
-#include "../../../stdlib/lv_sprintf.h"
 
 /*********************
  *      DEFINES

@@ -1,18 +1,13 @@
 #ifndef LV_GLTFDATA_HPP
 #define LV_GLTFDATA_HPP
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_GLTF
 
-#include "../gltf_view/lv_gltf.h"
 #include "lv_gltf_data_internal.h"
 
 #include "../../../drivers/opengles/lv_opengles_private.h"
-
-#include "../../../misc/lv_types.h"
-#include "../../../misc/lv_array.h"
-#include "../../../misc/lv_event.h"
 
 #ifdef __cplusplus
 

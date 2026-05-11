@@ -13,6 +13,17 @@ static void create_styled_textarea_cursor(const char * txt, int32_t y_ofs, lv_st
     lv_textarea_set_cursor_pos(ta, 0);
 }
 
+/**
+ * @title Custom textarea cursor styles
+ * @brief Apply three different cursor styles to three one-line textareas.
+ *
+ * Three `lv_style_t` values are built for `LV_PART_CURSOR | LV_STATE_FOCUSED`.
+ * The simple style draws only a red border, the underline style disables the
+ * background and uses `LV_BORDER_SIDE_BOTTOM` with a blue 3 px border, and the
+ * block style fills with an orange-to-yellow vertical gradient, a red border,
+ * and a 4 px radius. A helper creates each textarea, forces `LV_STATE_FOCUSED`,
+ * and attaches one style so the cursor shape matches its label.
+ */
 void lv_example_textarea_4(void)
 {
     static lv_style_t style_simple, style_block, style_underline;

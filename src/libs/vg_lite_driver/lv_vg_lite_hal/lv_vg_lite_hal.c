@@ -1,9 +1,8 @@
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include "../../../osal/lv_os_private.h"
-#include "../../../stdlib/lv_mem.h"
 
 #if LV_USE_OS == LV_OS_NONE
     #error "VGLite hal needs support from an OS, please select one of the supported by LVGL!"

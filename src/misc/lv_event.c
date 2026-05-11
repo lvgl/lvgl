@@ -8,9 +8,6 @@
  *********************/
 #include "lv_event_private.h"
 #include "../core/lv_global.h"
-#include "../stdlib/lv_mem.h"
-#include "lv_assert.h"
-#include "lv_types.h"
 
 /*********************
  *      DEFINES
@@ -487,3 +484,4 @@ static lv_event_dsc_t ** event_array_at(lv_event_list_t * list, uint32_t index)
 {
     return lv_array_at(&list->array, index);
 }
+

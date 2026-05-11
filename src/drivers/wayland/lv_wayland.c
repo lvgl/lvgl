@@ -21,7 +21,6 @@
     #endif
 #endif
 
-#include "lv_wayland_private.h"
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>

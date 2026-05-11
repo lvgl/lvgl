@@ -16,15 +16,10 @@
 #include <string.h>
 #include "lv_opengles_debug.h"
 
+#include "../../lvgl_public.h"
 #include "glad/include/glad/egl.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_types.h"
-#include "../../stdlib/lv_mem.h"
 #include "lv_opengles_private.h"
 #include "lv_opengles_egl_private.h"
-#include "lv_opengles_driver.h"
 
 /*********************
 *      DEFINES

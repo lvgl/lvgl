@@ -63,12 +63,14 @@ static void log_cb(lv_log_level_t level, const char * buf)
 static int helper_return_val_on_null(void * ptr)
 {
     LV_CHECK_ARG(ptr != NULL, return -1, "ptr is NULL");
+    LV_UNUSED(ptr);
     return 42;
 }
 
 static void helper_return_void_on_null(void * ptr, bool * was_reached)
 {
     LV_CHECK_ARG(ptr != NULL, return, "ptr is NULL");
+    LV_UNUSED(ptr);
     *was_reached = true;
 }
 
@@ -108,6 +110,7 @@ void test_check_arg_printf_args(void)
 {
     int x = 0;
     int val = 7;
+    LV_UNUSED(val);
     LV_CHECK_ARG(val > 10, x = -1, ": val=%d", val);
     TEST_ASSERT_EQUAL_INT(-1, x);
     TEST_ASSERT_TRUE(log_warned);
@@ -195,6 +198,7 @@ void test_check_arg_multiple_in_sequence(void)
 static int helper_return_val_complex_expr(void * ptr)
 {
     LV_CHECK_ARG(ptr != NULL, return (1 > 0 ? -100 : -200), "complex expr");
+    LV_UNUSED(ptr);
     return 42;
 }
 
@@ -210,6 +214,7 @@ void test_check_arg_return_val_complex_expr(void)
 static int helper_return_val_zero(void * ptr)
 {
     LV_CHECK_ARG(ptr != NULL, return 0, "returns zero");
+    LV_UNUSED(ptr);
     return 42;
 }
 

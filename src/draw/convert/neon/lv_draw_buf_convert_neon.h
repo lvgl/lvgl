@@ -10,8 +10,7 @@
 extern "C" {
 #endif
 
-#include "../../../misc/lv_color.h"
-#include "../../lv_draw_buf.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
 

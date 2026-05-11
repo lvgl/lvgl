@@ -2,7 +2,16 @@
 #if LV_BUILD_EXAMPLES && LV_USE_SLIDER && LV_USE_LOG
 
 /**
- * Test between a full background modal and a recolor modal
+ * @title Modal overlay timing
+ * @brief Compare a full-screen dim layer against a recolor overlay for modal dialogs.
+ *
+ * The scene from `lv_example_style_12` is reused as the background,
+ * then a modal overlay is drawn over it. By default a semi-transparent
+ * black background is set on `lv_layer_top()`; toggling the `#if 0`
+ * branch switches to `lv_obj_set_style_recolor` on the active screen
+ * instead. A slider is added to `lv_layer_top()` and centered, then
+ * `lv_refr_now` and `lv_tick_elaps` print the render cost of the chosen
+ * approach through `LV_LOG_USER`.
  */
 void lv_example_style_20(void)
 {

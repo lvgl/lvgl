@@ -520,6 +520,7 @@ def run_tests(
     test_src_dir = os.path.join(build_dir, "test_src")
     main_cmakelists = os.path.join(build_dir, "CMakeLists.txt")
     lvgl_src_dir = os.path.join(lvgl_test_dir, "..", "src")
+    lvgl_include_dir = os.path.join(lvgl_test_dir, "..", "include")
     lv_conf_path = os.path.join(lvgl_test_dir, "src", lv_conf_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
     lvgl_private_h_path = os.path.join(lvgl_test_dir, "..", "lvgl_private.h")
@@ -531,6 +532,7 @@ def run_tests(
         # It is also the reason we only support linux for now.
         volume("/dev", "/dev"),
         # Replace container's lvgl source and lv_conf
+        volume(lvgl_include_dir, so3_usr_lib("lvgl/include")),
         volume(lvgl_src_dir, so3_usr_lib("lvgl/src")),
         volume(lv_conf_path, so3_usr_lib("lv_conf.h")),
         volume(lvgl_h_path, so3_usr_lib("lvgl/lvgl.h")),

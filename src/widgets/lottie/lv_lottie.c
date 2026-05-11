@@ -6,8 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_lottie_private.h"
-#include "../../lv_conf_internal.h"
+
 #if LV_USE_LOTTIE
 
 #if LV_USE_THORVG_EXTERNAL
@@ -16,9 +17,17 @@
     #include "../../libs/thorvg/thorvg_capi.h"
 #endif
 
-#include "../../misc/lv_timer.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../misc/cache/lv_cache.h"
+
+/*Check dependencies*/
+#if LV_USE_CANVAS == 0
+    #error "lv_lottie: lv_canvas is required. Enable it in lv_conf.h (LV_USE_CANVAS 1)"
+#endif
+
+#if LV_USE_THORVG == 0
+    #error "lv_lottie: ThorVG is required. Enable it in lv_conf.h (LV_USE_THORVG_INTERNAL/EXTERNAL 1)"
+#endif
 
 /*********************
  *      DEFINES

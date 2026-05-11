@@ -68,6 +68,61 @@ def parse_enum(path: Path, enum_type: str, prefix: str,
     return entries
 
 
+def parse_bitmask_enum(path: Path, enum_type: str, prefix: str,
+                       skip: set[str] | None = None) -> dict[int, str]:
+    """Parse a C typedef enum with bitmask values (1u << N) from a header.
+
+    Only entries with explicit ``(1u << N)`` assignments are collected.
+    Entries whose value references other enum members (aliases / combos)
+    are silently skipped.
+
+    Args:
+        path: Path to the C header file.
+        enum_type: The typedef name (e.g. "lv_obj_flag_t").
+        prefix: Enum member prefix to strip (e.g. "LV_OBJ_FLAG_").
+        skip: Optional set of full enum member names to skip.
+
+    Returns:
+        Dict mapping int value -> short name string.
+    """
+    text = path.read_text()
+    skip = skip or set()
+
+    pattern = rf"\}}\s*{re.escape(enum_type)}\s*;"
+    m = re.search(rf"typedef\s+enum\s*\{{(.*?){pattern}", text, re.DOTALL)
+    if not m:
+        raise RuntimeError(f"Cannot find {enum_type} enum in {path}")
+
+    entries = {}
+    for line in m.group(1).splitlines():
+        line = line.strip().rstrip(",")
+        if (
+            not line
+            or line.startswith("/*")
+            or line.startswith("//")
+            or line.startswith("*")
+            or line.startswith("#")
+        ):
+            continue
+
+        # Match: NAME = (1u << N) or NAME = 1 << N (parens optional)
+        match = re.match(
+            rf"({re.escape(prefix)}\w+)\s*=\s*\(?1u?\s*<<\s*(\d+)\)?", line
+        )
+        if not match:
+            continue
+
+        name = match.group(1)
+        if name in skip:
+            continue
+
+        bit = int(match.group(2))
+        short = name.removeprefix(prefix)
+        entries[1 << bit] = short
+
+    return entries
+
+
 def generate_dict_module(
     description: str,
     dicts: dict[str, dict],

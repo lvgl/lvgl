@@ -10,7 +10,15 @@ static void event_handler(lv_event_t * e)
 }
 
 /**
- * Simple navigation on a list widget
+ * @title List with section separators
+ * @brief Twenty list buttons grouped by `lv_list_add_text` separators under gridnav rollover.
+ *
+ * A list on the left is registered with `LV_GRIDNAV_CTRL_ROLLOVER`. Every fifth
+ * iteration adds a non-focusable separator via `lv_list_add_text`, and each
+ * focusable entry is added with `lv_list_add_button` using `LV_SYMBOL_FILE`.
+ * Items are removed from the default group so gridnav handles movement, and
+ * each item's `LV_EVENT_CLICKED` callback logs its text through
+ * `lv_list_get_button_text`. A separate `Button` sits at the right edge.
  */
 void lv_example_gridnav_4(void)
 {

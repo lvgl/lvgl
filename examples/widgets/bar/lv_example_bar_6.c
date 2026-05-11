@@ -51,7 +51,16 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Custom drawer on the bar to display the current value
+ * @title Animated bar with custom value label
+ * @brief Draw the live value inside or beside the indicator via `LV_EVENT_DRAW_MAIN_END`.
+ *
+ * A 200 x 20 bar with range 0 to 100 is animated by `lv_anim_t` from 0 to
+ * 100 over 4000 ms with a matching reverse duration and
+ * `LV_ANIM_REPEAT_INFINITE`. On each `LV_EVENT_DRAW_MAIN_END` the callback
+ * measures the indicator width: when it is wider than the text plus 20 px
+ * the value is drawn in white inside the indicator at `LV_ALIGN_RIGHT_MID`,
+ * otherwise it is drawn in black outside the indicator with
+ * `LV_ALIGN_OUT_RIGHT_MID`.
  */
 void lv_example_bar_6(void)
 {

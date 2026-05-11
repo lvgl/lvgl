@@ -14,6 +14,19 @@ static void event_handler(lv_event_t * e)
     }
 }
 
+/**
+ * @title Calendar with highlighted days
+ * @brief Show February 2021 with three highlighted dates and log the tapped day.
+ *
+ * A 185x230 `lv_calendar` is placed below screen center with today set
+ * to 2021-02-23 via `lv_calendar_set_today_date` and the shown month
+ * fixed by `lv_calendar_set_month_shown`. A static array of three
+ * `lv_calendar_date_t` entries is registered through
+ * `lv_calendar_set_highlighted_dates`. The `LV_EVENT_VALUE_CHANGED`
+ * callback reads `lv_calendar_get_pressed_date` and logs the tapped
+ * day. If `LV_USE_CALENDAR_HEADER_DROPDOWN` or `_ARROW` is available
+ * the matching header is attached.
+ */
 void lv_example_calendar_1(void)
 {
     lv_obj_t  * calendar = lv_calendar_create(lv_screen_active());

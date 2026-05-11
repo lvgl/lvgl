@@ -7,21 +7,17 @@
  *      INCLUDES
  *********************/
 #include "lv_roller_private.h"
+#if LV_USE_ROLLER != 0
+
 #include "../label/lv_label_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_ROLLER != 0
-
-#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../draw/lv_draw_private.h"
-#include "../../core/lv_group.h"
-#include "../../indev/lv_indev.h"
 #include "../../indev/lv_indev_scroll.h"
 #include "../../indev/lv_indev_private.h"
-#include "../../stdlib/lv_string.h"
 #include "../../core/lv_observer_private.h"
 
 /*********************

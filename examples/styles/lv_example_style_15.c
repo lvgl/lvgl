@@ -51,7 +51,17 @@ static void new_theme_init_and_set(void)
 }
 
 /**
- * Extending the current theme
+ * @title Extending the current theme
+ * @brief Create a child theme that adds a green style to every button.
+ *
+ * A first button labeled `Original theme` is added to the active screen
+ * under the system theme. The helper `new_theme_init_and_set` clones
+ * the current theme via `lv_theme_copy`, reparents it with
+ * `lv_theme_set_parent`, and registers an apply callback that attaches
+ * `style_btn` to any `lv_button_class` object. The new theme is
+ * assigned with `lv_display_set_theme`, and a second button labeled
+ * `New theme` renders with the green background and darker border. A
+ * `LV_EVENT_DELETE` handler on the display frees the theme.
  */
 void lv_example_style_15(void)
 {

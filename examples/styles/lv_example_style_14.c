@@ -2,7 +2,14 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Add styles to parts and states
+ * @title Slider indicator part and pressed state
+ * @brief Style a slider's indicator differently when it is pressed.
+ *
+ * One style gives the slider's `LV_PART_INDICATOR` a horizontal red
+ * gradient, and a second style adds a red shadow with `shadow_width = 10`
+ * and `shadow_spread = 3` on `LV_PART_INDICATOR | LV_STATE_PRESSED`. The
+ * slider is created with value 70 and centered on the active screen, so
+ * pressing the indicator reveals the shadow.
  */
 void lv_example_style_14(void)
 {

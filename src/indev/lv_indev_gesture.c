@@ -1,26 +1,18 @@
-/******************************************************************
+/*
  * @file lv_indev_gesture.c
- *
- * Recognize gestures that consist of multiple touch events
- *
- * Copyright (c) 2024 EDGEMTech Ltd
- *
- * Author EDGEMTech Ltd. (erik.tagirov@edgemtech.ch)
- *
- ******************************************************************/
+ */
 
 /********************
  *      INCLUDES
  ********************/
 
-#include "lv_indev_private.h"
-#include "../misc/lv_event_private.h"
+#include "lv_indev_gesture_private.h"
 
 #if LV_USE_GESTURE_RECOGNITION
 
 #include <math.h>
-#include "lv_indev_gesture.h"
-#include "lv_indev_gesture_private.h"
+#include "lv_indev_private.h"
+#include "../misc/lv_event_private.h"
 
 /********************
  *      DEFINES

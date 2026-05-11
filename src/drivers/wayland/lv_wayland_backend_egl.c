@@ -11,7 +11,6 @@
 #if LV_WAYLAND_USE_EGL
 
 #include "../../display/lv_display_private.h"
-#include "../opengles/lv_opengles_driver.h"
 #include "../opengles/lv_opengles_texture_private.h"
 #include "../opengles/lv_opengles_egl_private.h"
 #include "../opengles/lv_opengles_debug.h"

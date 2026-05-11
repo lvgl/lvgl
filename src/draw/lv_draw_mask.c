@@ -6,12 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_mask.h"
+
 #include "lv_draw_private.h"
-#include "../core/lv_refr.h"
-#include "../misc/lv_math.h"
-#include "../misc/lv_types.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

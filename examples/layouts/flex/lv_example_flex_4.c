@@ -2,7 +2,13 @@
 #if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
- * Reverse the order of flex items
+ * @title Reversed column flex order
+ * @brief Stack six items bottom-up inside a centered container.
+ *
+ * A 300x220 container uses `LV_FLEX_FLOW_COLUMN_REVERSE`, so items added later
+ * in the loop appear higher on screen. Six 100x50 children numbered 0 through
+ * 5 are added in ascending order but rendered in reverse, with "Item: 0"
+ * sitting at the bottom of the container.
  */
 void lv_example_flex_4(void)
 {

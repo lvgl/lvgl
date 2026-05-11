@@ -19,7 +19,15 @@ static void spin_timer_cb(lv_timer_t * timer)
 }
 
 /**
- * Open a GLTF from a file and make it spin forever like a platter
+ * @title Spin a glTF model on a platter
+ * @brief Load a glTF scene and spin it around the yaw axis with a timer.
+ *
+ * `lv_gltf_create` attaches the viewer to the active screen and
+ * `lv_obj_set_size` sizes it to fill the screen. `lv_gltf_load_model_from_file`
+ * loads `webp_diffuse_transmission_plant.glb` from drive letter `A`. The first
+ * embedded animation plays, the viewer is pitched down by 45 degrees, and a
+ * timer running at `LV_DEF_REFR_PERIOD` advances yaw by one degree per tick,
+ * wrapping at 360.
  */
 void lv_example_gltf_1(void)
 {

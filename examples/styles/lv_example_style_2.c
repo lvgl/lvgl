@@ -2,7 +2,13 @@
 #if LV_BUILD_EXAMPLES
 
 /**
- * Using the background style properties
+ * @title Background gradient fill
+ * @brief Apply a two-stop vertical gradient background to a centered object.
+ *
+ * A style is configured with `radius = 5` and a `lv_grad_dsc_t` holding
+ * two stops: a light grey at `frac = 128` and a blue at `frac = 192`,
+ * with `LV_GRAD_DIR_VER`. The style is applied to a base object that is
+ * centered on the active screen, producing a shifted vertical gradient.
  */
 void lv_example_style_2(void)
 {

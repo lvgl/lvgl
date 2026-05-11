@@ -11,9 +11,6 @@
 
 #if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
 
-#include "../../core/lv_group.h"
-#include "../../misc/lv_log.h"
-
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_fragment.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_FRAGMENT
 

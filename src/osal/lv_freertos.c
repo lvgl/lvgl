@@ -21,8 +21,6 @@
     #include "atomic.h"
 #endif
 
-#include "../tick/lv_tick.h"
-#include "../misc/lv_log.h"
 #include "../core/lv_global.h"
 
 /*********************

@@ -45,7 +45,15 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Demonstrate the usage of draw event
+ * @title Custom drawing on draw task events
+ * @brief Draw a pulsing red circle on top of a container with a draw task callback.
+ *
+ * A 200x200 container is centered and flagged with
+ * `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`. An `LV_EVENT_DRAW_TASK_ADDED`
+ * callback inspects the draw task and, when `base_dsc->part` is
+ * `LV_PART_MAIN`, calls `lv_draw_rect` to paint a pink circle with a red
+ * border and outline. A 30 ms `lv_timer_t` bounces a `size` counter between
+ * 0 and 50 and invalidates the container each tick to animate the circle.
  */
 void lv_example_event_draw(void)
 {

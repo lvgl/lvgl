@@ -3,11 +3,9 @@
  *
  */
 
-#include "lv_wayland_touch.h"
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
-
-#include "lv_wayland_private.h"
 
 #include <wayland-client-protocol.h>
 #include <wayland-cursor.h>
@@ -252,6 +250,7 @@ static void touch_handle_frame(void * data, struct wl_touch * wl_touch)
 {
     LV_UNUSED(wl_touch);
     LV_UNUSED(data);
+    lv_wayland_indevs_ready(touch_read);
 }
 
 static void touch_handle_cancel(void * data, struct wl_touch * wl_touch)

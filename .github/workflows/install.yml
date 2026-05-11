@@ -45,4 +45,4 @@ jobs:
               return 0; 
           }" >> main.c
           # We link with `g++` as thorvg (ThorVG library) contains C++ code that requires C++ runtime symbols
-          g++ main.c -o main -I$(pwd)/lvgl-install/include -L$(pwd)/lvgl-install/lib -llvgl_thorvg -llvgl_examples -llvgl_demos -llvgl -lm
+          g++ main.c -o main -I$(pwd)/lvgl-install/include -L$(pwd)/lvgl-install/lib -llvgl_examples -llvgl_demos -llvgl -llvgl_thorvg -lm

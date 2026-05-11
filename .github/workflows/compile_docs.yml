@@ -1,24 +1,11 @@
-name: Build docs
+name: Build Docs 
+
 on:
+  workflow_dispatch: # allow manual triggering
   pull_request:
     paths:
-      # '**/lv*.h' is not included for pull requests because files in this path
-      # cannot break the doc build, and the purpose of having the docs build for
-      # pull requests is to catch when something breaks the build.  No input files
-      # in that path have the capacity to break the doc build.
       - 'docs/**'
-      - 'examples/**'
-      - 'demos/**'
-      - 'configs/ci/docs/**'
-      - 'scripts/build_html_examples.sh'
-      - 'scripts/find_version.sh'
-  push:
-    branches:
-      - master
-      - 'release/*'
-    paths:
-      - 'docs/**'
-      - 'src/**/lv*.h'
+      - 'src/**'
       - 'examples/**'
       - 'demos/**'
       - 'configs/ci/docs/**'
@@ -27,6 +14,23 @@ on:
       - 'lv_conf_template.h'
       - 'lv_version.h'
       - 'lvgl.h'
+      - '.github/workflows/compile_docs.yml'
+  push:
+    branches:
+      - master
+      - 'release/*'
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - 'examples/**'
+      - 'demos/**'
+      - 'configs/ci/docs/**'
+      - 'scripts/build_html_examples.sh'
+      - 'scripts/find_version.sh'
+      - 'lv_conf_template.h'
+      - 'lv_version.h'
+      - 'lvgl.h'
+      - '.github/workflows/compile_docs.yml'
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each PR
@@ -37,9 +41,9 @@ concurrency:
 env:
   EM_VERSION: 2.0.4
   EM_CACHE_FOLDER: 'emsdk-cache'
+
 jobs:
   build-and-deploy:
-    if: github.repository == 'lvgl/lvgl'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -47,44 +51,22 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.12'
-      - name: Cache Python packages
-        uses: actions/cache@v5
-        with:
-          # Cache the Python package environment, excluding pip and setuptools installed by setup-python
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}/bin/*
-            ${{ env.pythonLocation }}/include
-            ${{ env.pythonLocation }}/lib/python*/site-packages/*
-            !${{ env.pythonLocation }}/bin/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
-            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-          key: ${{ env.pythonLocation }}-${{ hashFiles('docs/requirements.txt') }}
-      - name: Install Doxygen
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends doxygen
-          # Remember these for possible future use.
-          # texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
-      - name: Install Requirements
-        run: |
-          pip install -r docs/requirements.txt
+
       - name: Setup Emscripten cache
         id: cache-system-libraries
         uses: actions/cache@v5
         with:
           path: ${{env.EM_CACHE_FOLDER}}
           key: ${{env.EM_VERSION}}-${{ runner.os }}
-      - uses: mymindstorm/setup-emsdk@v14
+
+      - uses: mymindstorm/setup-emsdk@v16
         with:
           version: ${{env.EM_VERSION}}
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1
+
       - name: Build examples (with cache)
         run: |
           # Grab the current name in case the LVGL folder is not called lvgl
@@ -93,35 +75,91 @@ jobs:
           # Move to the parent folder to fetch emscripten port.
           cd ..
           ./lvgl/scripts/build_html_examples.sh --symlink $LVGL_FOLDER
-      - name: Build docs
-        run: docs/build.py html
-      - name: Remove .doctrees
-        run: rm -rf docs/build/html/.doctrees
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends doxygen
+
+      # Parses the source code and generates XML files from the documentation
+      - name: Generate Doxygen XML
+        run: |
+            cd docs
+            doxygen
+
+      # Tool used to convert Doxygen XML to .mdx API pages
+      - name: Install doxymark 
+        run: |
+          npm install github:mutahharmkhan/doxymark
+
+      # Generate Documentation API pages 
+      - name: Generate API pages
+        run: |
+            npx doxymark \
+               --input docs/doxygen/xml \
+               --output docs/src/api \
+               --index docs/src/api-index.json \
+               --preset fumadocs \
+               --auto-group \
+               --source-url https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src 
+            rm -rf docs/doxygen
+
+      - name: Install Example Documentation
+        run: npm i @lvgl/examples-generator
+
+      - name: Check Example Documentation
+        run: |
+            npx -p @lvgl/examples-generator lvgl-examples-check-about --src examples
+            npx -p @lvgl/examples-generator lvgl-examples-check-examples --src examples
+
+      - name: Generate Example Documentation
+        run: |
+            npx -p @lvgl/examples-generator lvgl-examples-gen \
+            --src examples \
+            --out docs/src/examples
+
+      - name: Install mdx linter
+        run: npm i @lvgl/mdx-lint
+
+      - name: Run mdx linter
+        run: |
+          npx @lvgl/mdx-lint "docs/**/*.{md,mdx}" \
+          --fail-on-warning \
+          --reporter github
+
       - name: Retrieve version
+        id: version
         run: |
           echo "VERSION_NAME=$(scripts/find_version.sh)" >> "$GITHUB_OUTPUT"
-        id: version
-      - name: Deploy to subfolder
-        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
-        uses: JamesIves/github-pages-deploy-action@v4.8.0
-        with:
-          token: ${{ secrets.LVGL_BOT_TOKEN }}
-          repository-name: lvgl/docs
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs/build/html  # The folder the action should deploy.
-          target-folder: ${{ steps.version.outputs.VERSION_NAME }}
-          git-config-name: lvgl-bot
-          git-config-email: lvgl-bot@users.noreply.github.com
-          single-commit: true
-      - name: Deploy to master
+
+      - name: Deploy Specific Version
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/') }}
+        run: |
+          git clone https://lvgl-bot:${{ secrets.LVGL_BOT_TOKEN }}@github.com/lvgl/open-docs.git /tmp/open-docs
+          rm -rf /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}
+          mkdir -p /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}
+          cp -r docs/. /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}/
+          cd /tmp/open-docs
+          git config user.name lvgl-bot
+          git config user.email lvgl-bot@users.noreply.github.com
+          git add .
+          git diff --cached --quiet || git commit -m "Deploy ${{ steps.version.outputs.VERSION_NAME }} ${{ github.sha }}"
+          git push
+
+      - name: Deploy Latest
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@v4.8.0
-        with:
-          token: ${{ secrets.LVGL_BOT_TOKEN }}
-          repository-name: lvgl/docs
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs/build/html  # The folder the action should deploy.
-          target-folder: master
-          git-config-name: lvgl-bot
-          git-config-email: lvgl-bot@users.noreply.github.com
-          commit: true
+        run: |
+          git clone https://lvgl-bot:${{ secrets.LVGL_BOT_TOKEN }}@github.com/lvgl/open-docs.git /tmp/open-docs-latest
+          rm -rf /tmp/open-docs-latest/latest
+          rm -rf /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}
+          mkdir -p /tmp/open-docs-latest/latest
+          mkdir -p /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}
+          cp -r docs/. /tmp/open-docs-latest/latest/
+          cp -r docs/. /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}/
+          cd /tmp/open-docs-latest
+          git config user.name lvgl-bot
+          git config user.email lvgl-bot@users.noreply.github.com
+          git add .
+          git diff --cached --quiet || git commit -m "Deploy ${{ steps.version.outputs.VERSION_NAME }} and latest from commit ${{ github.sha }}"
+          git push
+

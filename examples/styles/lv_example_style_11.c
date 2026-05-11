@@ -2,7 +2,15 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Creating a transition
+ * @title Style transitions on press
+ * @brief Smoothly animate color and border changes when an object is pressed.
+ *
+ * Two `lv_style_transition_dsc_t` instances animate `LV_STYLE_BG_COLOR`,
+ * `LV_STYLE_BORDER_COLOR`, and `LV_STYLE_BORDER_WIDTH`: the default
+ * transition runs for 100 ms with a 200 ms delay, while the pressed
+ * transition runs for 500 ms with no delay. A red pressed style is
+ * attached to `LV_STATE_PRESSED` on a centered base object, so pressing
+ * it eases to red and releasing eases back.
  */
 void lv_example_style_11(void)
 {

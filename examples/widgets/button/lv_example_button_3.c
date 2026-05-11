@@ -2,7 +2,15 @@
 #if LV_BUILD_EXAMPLES && LV_USE_BUTTON
 
 /**
- * Create a style transition on a button to act like a gum when clicked
+ * @title Gum-like press transition
+ * @brief Squash and stretch a button on press using style transitions.
+ *
+ * A centered button labelled `Gum` is given two styles. The pressed style
+ * widens the button by 10 px, shrinks the height by 10 px, and bumps
+ * `LV_STYLE_TEXT_LETTER_SPACE` to 10 px with a 250 ms
+ * `lv_anim_path_ease_in_out` transition. The default style uses the same
+ * property list with `lv_anim_path_overshoot` and a 100 ms delay so the press
+ * animation stays visible on a quick tap before it rubber-bands back.
  */
 void lv_example_button_3(void)
 {

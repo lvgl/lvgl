@@ -12,7 +12,7 @@
 #if LV_USE_WAYLAND
 
 #include <linux/input-event-codes.h>
-#include "wayland_xdg_shell.h"
+#include <wayland_xdg_shell.h>
 
 /*********************
  *      DEFINES

@@ -11,7 +11,6 @@
 #if LV_USE_3DTEXTURE
 
 #include "../../core/lv_obj_class_private.h"
-#include "../../draw/lv_draw_3d.h"
 
 /*********************
  *      DEFINES

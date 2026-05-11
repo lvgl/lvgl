@@ -13,7 +13,7 @@ extern "C" {
 /*********************
 *      INCLUDES
 *********************/
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_PPA
 #if LV_PPA_NONBLOCKING_OPS
@@ -24,12 +24,6 @@ extern "C" {
 #define LV_PPA_NONBLOCKING_OPS 0
 #endif
 
-#include LV_STDDEF_INCLUDE
-#include LV_STDBOOL_INCLUDE
-#include LV_STDINT_INCLUDE
-
-#include "../../../misc/lv_color.h"
-#include "../../../misc/lv_log.h"
 #include "../../lv_draw_private.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../misc/lv_area_private.h"

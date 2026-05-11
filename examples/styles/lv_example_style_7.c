@@ -2,7 +2,12 @@
 #if LV_BUILD_EXAMPLES && LV_USE_ARC
 
 /**
- * Using the Arc style properties
+ * @title Arc color and width
+ * @brief Style the arc stroke with a red color and thin width.
+ *
+ * A style sets `arc_color` to the main red palette entry and
+ * `arc_width = 4`, then applies it to an `lv_arc` centered on the
+ * active screen so the background arc renders as a thin red ring.
  */
 void lv_example_style_7(void)
 {

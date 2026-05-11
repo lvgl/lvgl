@@ -14,10 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_scale.h"
-
-#if LV_USE_SCALE != 0
 #include "../../core/lv_obj_private.h"
+#include "../../lvgl_public.h"
+
+#if LV_USE_SCALE
 
 /*********************
  *      DEFINES

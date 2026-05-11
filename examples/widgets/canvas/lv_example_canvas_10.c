@@ -5,7 +5,15 @@
 #define CANVAS_HEIGHT   100
 
 /**
- *Blur an area on the canvas
+ * @title Frosted glass blur region
+ * @brief Blur a rounded rectangle area of a canvas and overlay a tinted label on it.
+ *
+ * A 100x100 `LV_COLOR_FORMAT_RGB565` canvas is centered and filled with
+ * light grey. An underlined red background label is painted across the
+ * canvas. `lv_draw_blur` is then called over area {20,30,80,70} with an
+ * `lv_draw_blur_dsc_t` whose `blur_radius` is 8 and `corner_radius` is
+ * 10. A 30% opacity blue rounded fill and a black centered "Hello
+ * world" label are layered on top of the blurred region.
  */
 void lv_example_canvas_10(void)
 {

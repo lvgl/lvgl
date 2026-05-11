@@ -11,6 +11,8 @@
 #if LV_USE_TINY_TTF != 0
 #include "../../core/lv_global.h"
 
+#include "../../misc/cache/lv_cache_entry.h"
+
 #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
 
 /*********************

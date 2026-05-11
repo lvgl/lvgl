@@ -13,10 +13,7 @@
 
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_types.h"
 #include "../../core/lv_refr_private.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

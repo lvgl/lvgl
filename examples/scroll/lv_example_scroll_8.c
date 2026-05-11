@@ -98,6 +98,18 @@ static void cont_col_scroll_event_cb(lv_event_t * e)
     }
 }
 
+/**
+ * @title Endless wrap-around scroll
+ * @brief Wrap items from one edge to the other so a row and column scroll without limits.
+ *
+ * Two flex containers are built: a 300x75 row and a 200x150 column, each
+ * filled with ten 80 px-sized buttons. Both register an `LV_EVENT_SCROLL`
+ * callback that detects when `lv_obj_get_scroll_x` or `lv_obj_get_scroll_y`
+ * reaches either edge and calls `lv_obj_move_to_index` to move the last or
+ * first child across, then compensates with `lv_obj_scroll_to_x` or
+ * `lv_obj_scroll_to_y` so the visible content stays stable and scrolling
+ * feels endless. Scrollbars are hidden with `LV_SCROLLBAR_MODE_OFF`.
+ */
 void lv_example_scroll_8(void)
 {
     /* Create a scroll container with ROW flex direction */

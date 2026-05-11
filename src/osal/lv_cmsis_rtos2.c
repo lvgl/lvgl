@@ -16,9 +16,6 @@
 
 #if LV_USE_OS == LV_OS_CMSIS_RTOS2
 
-#include "../misc/lv_log.h"
-#include "../misc/lv_timer.h"
-
 /*********************
  *      DEFINES
  *********************/

@@ -13,11 +13,9 @@
 #ifndef __ANIMATEDGIF__
 #define __ANIMATEDGIF__
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_GIF
-
-#include "../../misc/lv_fs.h"
 
 //
 // GIF Animator

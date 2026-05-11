@@ -47,7 +47,16 @@ static void draw_event_cb(lv_event_t * e)
 }
 
 /**
- * Customizing scale major tick label color with `LV_EVENT_DRAW_TASK_ADDED` event
+ * @title Rainbow major-tick labels via draw task
+ * @brief Recolour and reformat scale labels during `LV_EVENT_DRAW_TASK_ADDED`.
+ *
+ * A horizontal-bottom scale (80% width, 100 px tall, 31 ticks, range
+ * 10 to 40) enables `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` and subscribes
+ * to `LV_EVENT_DRAW_TASK_ADDED`. The callback inspects each draw
+ * task targeting `LV_PART_INDICATOR`, rewrites the label text to a
+ * one-decimal value formatted from `id2`, picks one of seven palette
+ * colours by tick index, and expands the draw area to fit the new
+ * text width.
  */
 void lv_example_scale_7(void)
 {

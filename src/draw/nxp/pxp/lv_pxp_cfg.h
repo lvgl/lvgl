@@ -20,7 +20,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_PXP
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
@@ -30,8 +30,6 @@ extern "C" {
 #if ((LV_DRAW_BUF_ALIGN % 32) != 0)
 #error "If PXP is enabled the draw buffers should be aligned to 32-byte boundary, please set LV_DRAW_BUF_ALIGN to a multiple of 32 in lv_conf.h"
 #endif
-
-#include "../../../misc/lv_log.h"
 
 /*********************
  *      DEFINES

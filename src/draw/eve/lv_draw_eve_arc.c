@@ -15,7 +15,6 @@
 #include "lv_draw_eve_private.h"
 #if LV_USE_DRAW_EVE
 
-#include "../lv_draw_arc.h"
 #include "lv_eve.h"
 
 /*********************

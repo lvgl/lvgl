@@ -11,6 +11,17 @@ static void generic_switch_event_cb(lv_event_t * e);
 
 static lv_obj_t * list;
 
+/**
+ * @title Toggle scroll flags on a list
+ * @brief A panel of four switches enables or clears scroll behavior flags on an image list.
+ *
+ * A shadowed panel holds a ten-entry `lv_list` of `LV_SYMBOL_IMAGE`
+ * buttons and four rows, each pairing a label with a switch. The switches
+ * are wired to `LV_EVENT_VALUE_CHANGED` and add or remove
+ * `LV_OBJ_FLAG_SCROLLABLE`, `LV_OBJ_FLAG_SCROLL_CHAIN`,
+ * `LV_OBJ_FLAG_SCROLL_ELASTIC`, and `LV_OBJ_FLAG_SCROLL_MOMENTUM` on the
+ * list. The list is moved to the last index so the switches appear above it.
+ */
 void lv_example_scroll_9(void)
 {
     lv_obj_t * panel = lv_obj_create(lv_screen_active());

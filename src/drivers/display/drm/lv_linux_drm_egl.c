@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linux_drm.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
@@ -21,15 +21,8 @@
 #include <time.h>
 #include <unistd.h>
 #include "lv_linux_drm_egl_private.h"
-#include "../../../draw/lv_draw_buf.h"
 #include "../../opengles/lv_opengles_debug.h"
-
-#include "../../opengles/lv_opengles_driver.h"
-#include "../../opengles/lv_opengles_texture.h"
 #include "../../opengles/lv_opengles_private.h"
-
-#include "../../../stdlib/lv_string.h"
-#include "../../../display/lv_display.h"
 
 /**********************
  *      TYPEDEFS

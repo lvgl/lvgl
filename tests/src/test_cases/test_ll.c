@@ -1,8 +1,7 @@
-
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "../../src/misc/lv_ll.h"
 #include "unity/unity.h"
+
 /* Test fixture */
 static lv_ll_t test_ll;
 

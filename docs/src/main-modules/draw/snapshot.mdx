@@ -1,0 +1,78 @@
+---
+title: Snapshot
+description: Snapshot provides an API to take a snapshot image for an LVGL Widget together with its children. The image will look exactly like the Widget on the display.
+---
+
+Snapshot provides an API to take a snapshot image for an LVGL Widget together
+with its children.  The image will look exactly like the Widget on the display.
+
+## Usage
+
+Simply call function <ApiLink name="lv_snapshot_take" display="lv_snapshot_take(widget, color_format)" /> to generate
+the image descriptor which can be used as an Image Widget's image source using
+<ApiLink name="lv_image_set_src" />.
+
+Note, only following color formats are supported at this time:
+
+- <ApiLink name="LV_COLOR_FORMAT_RGB565" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB8565" />
+- <ApiLink name="LV_COLOR_FORMAT_RGB888" />
+- <ApiLink name="LV_COLOR_FORMAT_XRGB8888" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />
+- <ApiLink name="LV_COLOR_FORMAT_A8" />
+- <ApiLink name="LV_COLOR_FORMAT_L8" />
+- <ApiLink name="LV_COLOR_FORMAT_I1" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB2222" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB4444" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB1555" />
+
+Support for color formats depends on the drawing unit. Please check your drawing unit.
+
+### Freeing the Image
+
+The memory <ApiLink name="lv_snapshot_take" /> uses is dynamically allocated using
+<ApiLink name="lv_draw_buf_create" />. Use <ApiLink name="lv_draw_buf_destroy" /> to free the
+memory it allocated.
+
+The snapshot image which is the draw buffer returned by <ApiLink name="lv_snapshot_take" />
+normally won't be added to the cache because it can be drawn directly. So you don't need
+to invalidate the cache by calling <ApiLink name="lv_image_cache_drop" /> before destroying
+the draw buffer.
+
+The below code snippet demonstrates correct use of <ApiLink name="lv_snapshot_take" />:
+
+```c
+void update_snapshot(lv_obj_t * widget, lv_obj_t * img_snapshot)
+{
+    lv_draw_buf_t* snapshot = (void*)lv_image_get_src(img_snapshot);
+    if(snapshot) {
+        lv_draw_buf_destroy(snapshot);
+    }
+    snapshot = lv_snapshot_take(widget, LV_COLOR_FORMAT_ARGB8888);
+    lv_image_set_src(img_snapshot, snapshot);
+}
+```
+
+### Using an Existing Buffer
+
+If the snapshot needs to be updated repeatedly, or if the caller provides the draw
+buffer, use <ApiLink name="lv_snapshot_take_to_draw_buf" display="lv_snapshot_take_to_draw_buf(widget, color_format, draw_buf)" />.
+In this case, the caller is responsible for creating and destroying the draw buffer.
+
+If snapshot is generated successfully, the image descriptor is updated,
+the image data will be stored to the provided `draw_buf`, and the function will
+return <ApiLink name="LV_RESULT_OK" />.
+
+Note that snapshot may fail if the provided buffer is not large enough, which can
+happen if the Widget's size changes.  It's recommended to use
+<ApiLink name="lv_snapshot_reshape_draw_buf" display="lv_snapshot_reshape_draw_buf(widget, draw_buf)" /> to first ensure the buffer
+is large enough, and if it fails, destroy the existing draw buffer and call
+`lv_snapshot_take` directly.
+
+## Example
+
+### Simple snapshot example
+
+<LvglExample name="lv_example_snapshot_1" path="others/snapshot/lv_example_snapshot_1" />
+
+## API

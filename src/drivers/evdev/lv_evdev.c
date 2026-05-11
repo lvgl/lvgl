@@ -23,17 +23,9 @@
     #include <linux/input.h>
     #include <sys/inotify.h>
 #endif /*BSD*/
+
 #include "../../core/lv_global.h"
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_async.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
-#include "../../display/lv_display.h"
 #include "../../display/lv_display_private.h"
-#include "../../widgets/image/lv_image.h"
-#include "../../indev/lv_indev_gesture.h"
 
 /*********************
  *      DEFINES

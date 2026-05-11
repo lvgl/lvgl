@@ -3,7 +3,7 @@
  *
  */
 
-#include "lv_wayland_pointer.h"
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
 
@@ -13,7 +13,6 @@
 #include <wayland-cursor.h>
 #include <xkbcommon/xkbcommon.h>
 #include <linux/input-event-codes.h>
-#include "lv_wayland_private.h"
 
 /*********************
  *      INCLUDES
@@ -50,6 +49,10 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
 static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer, uint32_t time, uint32_t axis,
                                 wl_fixed_t value);
 
+#ifdef WL_POINTER_FRAME_SINCE_VERSION
+    static void pointer_handle_frame(void * data, struct wl_pointer * pointer);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -62,6 +65,9 @@ static const struct wl_pointer_listener pointer_listener = {
     .motion = pointer_handle_motion,
     .button = pointer_handle_button,
     .axis   = pointer_handle_axis,
+#ifdef WL_POINTER_FRAME_SINCE_VERSION
+    .frame  = pointer_handle_frame,
+#endif
 };
 
 /**********************
@@ -258,5 +264,15 @@ static void pointer_handle_axis(void * data, struct wl_pointer * pointer, uint32
     }
     seat_pointer->wheel_diff += diff;
 }
+
+#ifdef WL_POINTER_FRAME_SINCE_VERSION
+static void pointer_handle_frame(void * data, struct wl_pointer * pointer)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(pointer);
+    lv_wayland_indevs_ready(pointer_read);
+    lv_wayland_indevs_ready(pointeraxis_read);
+}
+#endif
 
 #endif /* LV_USE_WAYLAND */

@@ -13,9 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_DRAW_DAVE2D
-#include "../../lv_draw.h"
 #include "../../lv_draw_private.h"
 #include "bsp_api.h"
 #include "dave_driver.h"
@@ -49,14 +48,6 @@ extern "C" {
 #endif
 
 #include "lv_draw_dave2d_utils.h"
-#include "../../lv_draw_rect.h"
-#include "../../lv_draw_line.h"
-#include "../../lv_draw_arc.h"
-#include "../../lv_draw_label.h"
-#include "../../lv_draw_image.h"
-#include "../../lv_draw_triangle.h"
-#include "../../lv_draw_buf.h"
-
 
 
 /*********************

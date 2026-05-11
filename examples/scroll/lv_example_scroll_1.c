@@ -39,7 +39,14 @@ static void button_event_cb(lv_event_t * e)
 }
 
 /**
- * Demonstrate how scrolling appears automatically
+ * @title Automatic scrolling and save/restore
+ * @brief Log scroll metrics on a 200x200 panel and save or restore its scroll position.
+ *
+ * A panel is placed on the active screen with three children positioned
+ * outside its bounds so scrolling is needed to reach them. A callback on
+ * `LV_EVENT_SCROLL` logs `lv_obj_get_scroll_x/y/top/bottom/left/right`. Two
+ * buttons aligned with `LV_ALIGN_OUT_LEFT_MID` capture and replay the scroll
+ * position via `lv_obj_scroll_to` with `LV_ANIM_ON`.
  */
 void lv_example_scroll_1(void)
 {

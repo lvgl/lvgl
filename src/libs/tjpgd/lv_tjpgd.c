@@ -7,12 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "../../draw/lv_image_decoder_private.h"
-#include "../../../lvgl.h"
+#include "../../lvgl_public.h"
+
 #if LV_USE_TJPGD
 
+#include "../../draw/lv_image_decoder_private.h"
 #include "tjpgd.h"
-#include "lv_tjpgd.h"
 #include "../../misc/lv_fs_private.h"
 #include <string.h>
 

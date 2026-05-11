@@ -2,7 +2,14 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Local styles
+ * @title Local style overrides shared style
+ * @brief Replace a style's background color with a per-object local setting.
+ *
+ * A reusable style sets a green background and a lighter green border
+ * with `width = 3`. After applying it to a centered base object,
+ * `lv_obj_set_style_bg_color` is called with the orange palette on
+ * `LV_PART_MAIN`, so the object keeps the green border but shows an
+ * orange fill.
  */
 void lv_example_style_13(void)
 {

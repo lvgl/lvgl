@@ -29,7 +29,7 @@
 #ifndef GLAD_GLES2_H_
 #define GLAD_GLES2_H_
 
-#include "../../../../../lv_conf_internal.h"
+#include "../../../../../lvgl_public.h"
 #if LV_USE_EGL
 
 #ifdef __clang__
@@ -526,7 +526,7 @@ typedef void (*GLADpostcallback)(void *ret, const char *name, GLADapiproc apipro
 #define GL_ZERO 0
 
 
-#include <KHR/khrplatform.h>
+#include "../KHR/khrplatform.h"
 typedef unsigned int GLenum;
 typedef unsigned char GLboolean;
 typedef unsigned int GLbitfield;

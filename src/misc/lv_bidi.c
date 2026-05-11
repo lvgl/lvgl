@@ -6,11 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_bidi_private.h"
 #include "lv_text_private.h"
-#include "lv_types.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
 
 #if LV_USE_BIDI
 

@@ -89,7 +89,16 @@ static void checkbox_cb(lv_event_t * e)
 }
 
 /**
- * Dynamically load widgets while scrolling
+ * @title Virtualized infinite scroll
+ * @brief Load numbered rows on demand and drop far-off ones as a column is scrolled.
+ *
+ * A 160x220 column container tracks the highest and lowest loaded numbers in
+ * `top_num` and `bottom_num`. An `LV_EVENT_SCROLL` callback adds items while
+ * `lv_obj_get_scroll_top` or `lv_obj_get_scroll_bottom` is under 200 and
+ * within the (-30, 30) range, and deletes items once those values exceed
+ * 600, compensating each delta with `lv_obj_scroll_by` so the view stays
+ * steady. Two labels report the current extremes, and a checkbox toggles
+ * `LV_PART_SCROLLBAR` opacity between `LV_OPA_TRANSP` and `LV_OPA_COVER`.
  */
 void lv_example_scroll_7(void)
 {

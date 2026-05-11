@@ -3,7 +3,6 @@
 
 #if LV_USE_GLTF
 
-#include "../../../../stdlib/lv_sprintf.h"
 #include <string.h>
 
 static const lv_opengl_shader_t src_includes[] = {

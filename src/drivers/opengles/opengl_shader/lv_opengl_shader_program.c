@@ -13,8 +13,7 @@
 
 #include "../lv_opengles_private.h"
 #include "../lv_opengles_debug.h"
-#include "../../../misc/lv_assert.h"
-#include "../../../stdlib/lv_mem.h"
+
 /*********************
  *      DEFINES
  *********************/
