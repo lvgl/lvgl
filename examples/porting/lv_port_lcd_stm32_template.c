@@ -15,7 +15,7 @@
 */
 
 #include "lv_port_disp.h"
-#include "lvgl.h"
+#include "lv_port_lcd_stm32_template.h"
 
 /*********************
  *      DEFINES
