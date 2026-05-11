@@ -1,3 +1,11 @@
+<!--
+ @title Grid ignore layout
+ @brief Detach an item from grid placement.
+
+ Four normal grid items occupy their cells while a fifth item with ignore_layout="true"
+ is skipped by the grid. The detached item keeps its manual x/y position and does not
+ displace any of the placed cells, useful for floating badges or overlays.
+-->
 <screen>
 	<styles>
 		<!-- Shared style for grid cells -->

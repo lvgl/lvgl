@@ -1,3 +1,11 @@
+<!--
+ @title Label set text with newlines
+ @brief Insert explicit line breaks into a label's text.
+
+ In XML attributes the &#10; entity produces a newline; using two of them in a row leaves
+ a blank line between paragraphs. The second label demonstrates that the text attribute
+ also accepts plain text with no escaping for normal characters.
+-->
 <screen>
 	<view>
 		<!-- 💡 Adjust text and line breaks (&#10;) to test multi-line layout and spacing. -->

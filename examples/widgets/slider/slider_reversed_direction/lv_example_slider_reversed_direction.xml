@@ -1,3 +1,11 @@
+<!--
+ @title Slider reversed direction
+ @brief Flip the fill direction by swapping min and max.
+
+ The two sliders are identical except that the second one declares min_value greater
+ than max_value. Swapping the two reverses the fill direction and the sign of motion
+ without touching orientation, styling, or layout.
+-->
 <screen>
 	<view>
 		<!-- 💡 Reverse min/max to flip slider direction without changing orientation. -->

@@ -1,3 +1,11 @@
+<!--
+ @title Slider value, range, and orientation
+ @brief Set a custom numeric range and choose horizontal or vertical layout.
+
+ The horizontal slider uses min_value=-20 and max_value=80 to show that ranges need not
+ start at zero. The vertical slider sets orientation="vertical" explicitly and uses a
+ tall, narrow size so the knob travels upward instead of left-to-right.
+-->
 <screen>
 	<view>
 		<!-- 💡 Edit min_value/max_value/value and orientation to see how fill direction and knob travel change. -->

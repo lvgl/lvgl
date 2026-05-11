@@ -1,3 +1,11 @@
+<!--
+ @title Grid descriptors
+ @brief Define fixed-size column and row tracks.
+
+ style_grid_column_dsc_array and style_grid_row_dsc_array list the size of each track in
+ pixels. The example uses three 70px columns and two 44px rows, and each child positions
+ itself with style_grid_cell_column_pos and style_grid_cell_row_pos.
+-->
 <screen>
 	<view flex_flow="column">
 		<!-- 💡 Adjust style_grid_column_dsc_array and style_grid_row_dsc_array to change fixed track sizes. -->

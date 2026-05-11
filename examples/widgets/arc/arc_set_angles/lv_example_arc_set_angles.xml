@@ -1,3 +1,12 @@
+<!--
+ @title Arc with explicit indicator angles
+ @brief Drive the indicator directly via start_angle and end_angle.
+
+ The left arc draws the indicator the usual way, from value, mode, and range. The right
+ arc sets start_angle and end_angle explicitly, which overrides the value-based drawing.
+ This is handy for static graphics or custom dial layouts where the indicator span is
+ not tied to a numeric value.
+-->
 <screen>
 	<view>
 		<!-- 💡 Edit start_angle/end_angle directly to draw any indicator span independent of value and mode. -->

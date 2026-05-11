@@ -1,3 +1,12 @@
+<!--
+ @title Dropdown open direction
+ @brief Open the option list towards a specific edge.
+
+ Four dropdowns sit on the four sides of the screen and use the dir attribute to choose
+ which way their option list pops. The default is bottom, but top, left, and right are
+ useful when a dropdown sits close to a screen edge and there is no room to expand
+ downward.
+-->
 <screen>
 	<view>
 		<!-- 💡 Click each dropdown: each list pops toward the screen edge defined by its dir attribute. -->

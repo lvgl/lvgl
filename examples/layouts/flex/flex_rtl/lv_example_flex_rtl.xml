@@ -1,3 +1,11 @@
+<!--
+ @title Flex RTL
+ @brief Reverse the main axis direction with style_base_dir.
+
+ The same three children appear in two identical row containers. Setting style_base_dir
+ to rtl on the second container reverses item ordering on the main axis without changing
+ the order of children in XML — handy for right-to-left languages or mirrored layouts.
+-->
 <screen>
 	<styles>
 		<!-- Shared style for colored labels -->

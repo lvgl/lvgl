@@ -1,3 +1,11 @@
+<!--
+ @title Grid internal padding
+ @brief Set horizontal and vertical gaps between grid cells.
+
+ style_pad_column inserts space between columns and style_pad_row inserts space between
+ rows. The two are independent, so column gaps and row gaps can differ — here columns
+ are flush together while rows have a large vertical gap.
+-->
 <screen>
 	<styles>
 		<!-- Shared chip style for all tiles -->

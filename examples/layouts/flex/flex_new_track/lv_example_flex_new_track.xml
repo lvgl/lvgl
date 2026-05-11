@@ -1,3 +1,11 @@
+<!--
+ @title Flex new track
+ @brief Force an item to start a new wrap row.
+
+ In a row_wrap container an item with flex_in_new_track="true" begins a fresh track
+ instead of continuing the previous one. Here the weekend labels are pushed onto their
+ own row regardless of how much horizontal space remains on the first row.
+-->
 <screen>
 	<styles>
 		<!-- Shared style for day labels -->

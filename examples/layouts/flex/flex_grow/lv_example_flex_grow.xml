@@ -1,3 +1,11 @@
+<!--
+ @title Flex grow
+ @brief Distribute leftover row space by weight.
+
+ Three buttons share a row: the first has a fixed width and the other two use flex_grow.
+ The free space left in the row is split in proportion to the grow weights, so the
+ grow=2 item receives twice as much extra width as the grow=1 item.
+-->
 <screen>
 	<view flex_flow="column">
 		<!-- 💡 Adjust the flex_grow values (e.g. 1, 3, 5) to see how free space is distributed. -->

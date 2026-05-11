@@ -1,3 +1,11 @@
+<!--
+ @title Grid FR units
+ @brief Share remaining space across tracks with fr() weights.
+
+ The first column has a fixed 60px size; the next two columns use fr(1) and fr(2) and
+ split the remaining width in a 1:2 ratio. The same idea applies to rows: the first row
+ is fixed at 44px and the second uses fr(1) to absorb the leftover height.
+-->
 <screen>
 	<view flex_flow="column">
 		<!-- 💡 Adjust fr() weights and fixed values to compare how remaining space is split across tracks. -->

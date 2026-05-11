@@ -1,3 +1,12 @@
+<!--
+ @title Slider modes
+ @brief Compare normal, symmetrical, and range modes.
+
+ Normal fills from min_value to value. Symmetrical needs a range that crosses zero and
+ fills outward from the middle, so positive and negative values pull the indicator in
+ opposite directions. Range mode draws a band between left_value and value, useful for
+ picking an interval rather than a single number.
+-->
 <screen>
 	<view>
 		<!-- 💡 Switch mode and range values together: symmetrical needs negative+positive range, range mode uses left_value + value. -->

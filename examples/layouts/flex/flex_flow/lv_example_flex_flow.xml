@@ -1,3 +1,11 @@
+<!--
+ @title Flex flow
+ @brief Arrange children with a flex flow direction.
+
+ A single row_wrap container holds enough buttons to overflow one line, so wrapping kicks
+ in. Try other flex_flow values (row, column, row_reverse, column_wrap_reverse) to see
+ how item order and wrap direction change with the same set of children.
+-->
 <screen>
 	<view flex_flow="column">
 		<!-- 💡 Adjust flex_flow (row, column, row_wrap, row_reverse) to see how item order and wrapping change. -->

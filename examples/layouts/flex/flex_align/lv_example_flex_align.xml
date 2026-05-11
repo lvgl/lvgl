@@ -1,3 +1,11 @@
+<!--
+ @title Flex align
+ @brief Place items along the main and cross axes.
+
+ style_flex_main_place distributes items along the row direction, while
+ style_flex_cross_place aligns items of different heights on the cross axis. The mix of a
+ tall button, a switch, and a checkbox makes cross-axis alignment easy to see.
+-->
 <screen>
 	<view flex_flow="column">
 		<!-- 💡 Adjust style_flex_main_place and style_flex_cross_place to compare distribution and cross-axis alignment. -->

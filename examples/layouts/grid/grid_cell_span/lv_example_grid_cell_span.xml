@@ -1,3 +1,12 @@
+<!--
+ @title Grid cell span and alignment
+ @brief Position cells inside their track and span multiple tracks.
+
+ The first row uses different style_grid_cell_x_align / y_align values to show start,
+ center, and end placement within a cell. Two further items use column_span and row_span
+ to occupy multiple tracks at once, demonstrating how a single child can cover several
+ cells of the grid.
+-->
 <screen>
 	<styles>
 		<!-- Shared card style for compact text blocks -->

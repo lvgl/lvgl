@@ -1,3 +1,11 @@
+<!--
+ @title Grid sub-grid
+ @brief Nest a grid inside a cell of a parent grid.
+
+ The outer grid defines 3x2 tracks, and an inner grid occupies a 2x2 area within it. The
+ inner grid intentionally omits its own column/row descriptors so it inherits the parent
+ tracks, keeping its cells aligned with the outer grid's columns and rows.
+-->
 <screen>
 	<styles>
 		<!-- Shared style for parent and sub-grid tiles -->

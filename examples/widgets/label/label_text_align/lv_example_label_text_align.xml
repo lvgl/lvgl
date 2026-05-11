@@ -1,3 +1,12 @@
+<!--
+ @title Label text alignment
+ @brief Align multi-line text inside a fixed-width label.
+
+ Three labels of equal width hold the same two-line text but use different
+ style_text_align values: left, center, and right. Alignment only changes anything when
+ the label is wider than its text or contains line breaks, so each label is given an
+ explicit width that exceeds the longest line.
+-->
 <screen>
 	<view>
 		<!-- 💡 Adjust width and style_text_align to see where left, center, and right alignment become visible. -->

@@ -1,3 +1,11 @@
+<!--
+ @title Arc rotation offset
+ @brief Rotate the whole dial around its center.
+
+ The rotation attribute shifts both background and indicator angles by the same amount,
+ keeping their relative span. The two arcs share the same bg_start_angle, bg_end_angle,
+ and value, so only the rotation offset distinguishes them visually.
+-->
 <screen>
 	<view>
 		<!-- 💡 Adjust rotation while keeping bg_start_angle/bg_end_angle fixed to see the whole dial rotate around its center. -->

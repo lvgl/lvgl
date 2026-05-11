@@ -1,3 +1,11 @@
+<!--
+ @title Flex ignore layout
+ @brief Opt one item out of the flex flow.
+
+ With ignore_layout="true", Flex skips the item entirely: it keeps its manual x/y
+ position and does not occupy a slot. The remaining items lay out as if it were not
+ there, which is useful for overlays, floating badges, or absolutely positioned helpers.
+-->
 <screen>
 	<view flex_flow="column">
 		<!-- 💡 Toggle ignore_layout and tweak x/y on the red item to see how it detaches from normal Flex positioning. -->

@@ -1,3 +1,11 @@
+<!--
+ @title Grid alignment of tracks
+ @brief Place column and row tracks within free space.
+
+ Track sizes are smaller than the container, so leftover space is distributed by
+ style_grid_column_align and style_grid_row_align. Here columns use space_between to
+ push them to the edges, while rows align to end and stick to the bottom.
+-->
 <screen>
 	<view flex_flow="column" style_pad_row="8">
 		<!-- 💡 Adjust style_grid_column_align and style_grid_row_align to compare how tracks are placed in free space. -->

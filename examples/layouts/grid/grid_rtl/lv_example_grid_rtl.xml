@@ -1,3 +1,11 @@
+<!--
+ @title Grid RTL
+ @brief Reverse column order with style_base_dir.
+
+ Both grids declare the same three columns and the same children. Setting style_base_dir
+ to rtl on the second grid flips the column order, so cell 0 appears on the right
+ without changing how children are referenced or ordered in XML.
+-->
 <screen>
 	<styles>
 		<!-- Shared style for numbered badges -->

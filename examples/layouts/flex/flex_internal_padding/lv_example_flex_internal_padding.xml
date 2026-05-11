@@ -1,3 +1,11 @@
+<!--
+ @title Flex internal padding
+ @brief Set horizontal and vertical gaps between flex items.
+
+ style_pad_column controls the gap between items on a row, and style_pad_row controls the
+ gap between wrapped rows. The container uses row_wrap so both gaps are visible at once
+ — the chips spread out horizontally and rows are pushed apart vertically.
+-->
 <screen>
 	<styles>
 		<!-- Shared chip style for all language tags -->

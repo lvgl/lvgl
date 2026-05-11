@@ -1,3 +1,11 @@
+<!--
+ @title Label long modes
+ @brief Show every long_mode behavior side by side.
+
+ Five labels share the same width but use different long_mode values: wrap, dots, scroll,
+ scroll_circular, and clip. Each label is colored differently and contains text that does
+ not fit on a single line, so the mode-specific behavior is immediately visible.
+-->
 <screen>
 	<styles>
 		<!-- Shared visual style for all long-mode labels -->

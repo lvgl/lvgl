@@ -57,6 +57,29 @@ This guide documents all rules and best practices learned through systematic cre
 - **Label text**: Keep concise; abbreviate when space-constrained (e.g., "rev." for "reverse")
 
 ### Comments and Hints
+- **Top-of-file comment block**: Every example XML must begin with a multi-line comment placed *above* the `<screen>` element. It documents the example for humans, doc tooling, and AI assistants regenerating or migrating the example.
+  - Format:
+    ```xml
+    <!--
+     @title <Short capitalized example title>
+     @brief <Single-sentence description ending with a period.>
+
+     <Body: 2–3 sentences describing what the example shows, which attributes
+     drive the visible difference, and why the specific values were chosen.
+     This is the place to capture intent and trade-offs, not what the code
+     literally does.>
+    -->
+    <screen>
+      ...
+    </screen>
+    ```
+  - `@title` mirrors the on-screen title label without the "XML" word (e.g. "Arc rotation offset").
+  - `@brief` is a single sentence, ≤ ~80 chars, ending with a period. It is what doc generators surface first.
+  - The 2–3 sentence body must:
+    - Reference the *specific* attributes / values the example varies (e.g. `min_value`, `style_base_dir`, `flex_grow`).
+    - Explain *why* the variation is interesting (what visual or behavioral difference it produces).
+    - Be self-contained — readable without the surrounding doc page.
+  - Keep wrapping consistent: hard-wrap body lines around 90 characters so the comment is readable in plain text.
 - **Meaningful block comments**: Add `<!-- ... -->` above each logical demo section
   - Describe what the code demonstrates
   - Example: `<!-- Arc with negative knob offset -->`
@@ -66,6 +89,7 @@ This guide documents all rules and best practices learned through systematic cre
   - Example: ✅ "Drag each arc quickly: lower change_rate responds more slowly…"
   - Example: ❌ "Adjust the slider" (too vague)
 - **Omit `<!-- Example title -->`** if a 💡 hint already exists; they are redundant
+- **Comment redundancy rule**: top-of-file block describes intent, 💡 hint describes the interactive observation, inline block comments describe each demo item. Each layer should add information — do not repeat the same sentence at multiple levels.
 
 ### Flag and Property Usage
 - Use lowercase for boolean/enum attribute values (e.g., `mode="normal"`, `orientation="vertical"`, `ignore_layout="true"`)
@@ -131,6 +155,8 @@ This guide documents all rules and best practices learned through systematic cre
 ## Validation Checklist
 
 Before finalizing examples:
+- ✅ Top-of-file comment block with `@title`, `@brief`, and a 2–3 sentence body is present above `<screen>`
+- ✅ Body of the top-of-file comment names the specific attributes/values that vary
 - ✅ No default values are set unnecessarily
 - ✅ All hints are specific to the feature, not generic
 - ✅ Style names are prefixed with `style_`
@@ -149,7 +175,8 @@ Before finalizing examples:
 The goal is to create **focused, pedagogical XML examples** that:
 1. Demonstrate one feature per file
 2. Avoid repetitive content and default values
-3. Include specific, actionable hints
-4. Use clean, readable XML with meaningful comments
-5. Integrate seamlessly into widget documentation both inline and in example lists
-6. Prioritize clarity and simplicity over comprehensiveness
+3. Begin with a top-of-file `@title` / `@brief` / 2–3 sentence body comment that documents intent
+4. Include specific, actionable 💡 hints and per-section block comments
+5. Use clean, readable XML with meaningful comments at each layer (file, hint, section)
+6. Integrate seamlessly into widget documentation both inline and in example lists
+7. Prioritize clarity and simplicity over comprehensiveness
