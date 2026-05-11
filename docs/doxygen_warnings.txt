@@ -1,0 +1,53 @@
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/misc/cache/class/lv_cache_class.h:2: warning: the name 'lv_cache_clazz.h' supplied as the argument in the \file statement is not an input file
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/lv_draw_vector_private.h:121: warning: argument 'user_data' of command @param is not found in the argument list of lv_vector_for_each_destroy_tasks(lv_ll_t *task_list, vector_draw_task_cb cb, void *used_data)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/lv_draw_vector_private.h:121: warning: The following parameter of lv_vector_for_each_destroy_tasks(lv_ll_t *task_list, vector_draw_task_cb cb, void *used_data) is not documented:
+  parameter 'used_data'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_utils.h:166: warning: The following parameters of lv_nemagfx_grad_set(void *gradient, lv_grad_dsc_t lv_grad, lv_opa_t opa) are not documented:
+  parameter 'lv_grad'
+  parameter 'opa'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/sw/blend/lv_draw_sw_blend.h:46: warning: argument 'draw_unit' of command @param is not found in the argument list of lv_draw_sw_blend(lv_draw_task_t *t, const lv_draw_sw_blend_dsc_t *dsc)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/sw/blend/lv_draw_sw_blend.h:46: warning: The following parameter of lv_draw_sw_blend(lv_draw_task_t *t, const lv_draw_sw_blend_dsc_t *dsc) is not documented:
+  parameter 't'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/sw/lv_draw_sw.h:124: warning: argument 'coords' of command @param is not found in the argument list of lv_draw_sw_mask_rect(lv_draw_task_t *t, const lv_draw_mask_rect_dsc_t *dsc)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/vg_lite/lv_vg_lite_stroke.h:70: warning: argument 'stroke' of command @param is not found in the argument list of lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t *unit, lv_cache_entry_t *cache_entry)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/vg_lite/lv_vg_lite_stroke.h:70: warning: The following parameter of lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t *unit, lv_cache_entry_t *cache_entry) is not documented:
+  parameter 'cache_entry'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/vg_lite/lv_vg_lite_stroke.h:40: warning: The following parameter of lv_vg_lite_stroke_init(struct _lv_draw_vg_lite_unit_t *unit, uint32_t cache_cnt) is not documented:
+  parameter 'cache_cnt'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/drivers/opengles/lv_opengles_private.h:146: warning: The following parameter of lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t *texture_area, lv_opa_t opa, int32_t disp_w, int32_t disp_h, const lv_area_t *texture_clip_area, bool h_flip, bool v_flip) is not documented:
+  parameter 'texture_clip_area'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/font/font_manager/lv_font_manager_recycle.h:61: warning: The following parameter of lv_font_manager_recycle_set_reuse(lv_font_manager_recycle_t *manager, lv_font_t *font, const lv_font_info_t *ft_info) is not documented:
+  parameter 'font'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/libs/gltf/gltf_data/lv_gltf_data_internal.h:195: warning: argument 'D' of command @param is not found in the argument list of lv_gltf_data_get_radius(const lv_gltf_model_t *model)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/libs/gltf/gltf_data/lv_gltf_data_internal.h:195: warning: The following parameter of lv_gltf_data_get_radius(const lv_gltf_model_t *model) is not documented:
+  parameter 'model'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/misc/lv_circle_buf_private.h:109: warning: found documented return type for lv_circle_buf_reset that does not return anything
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_event_private.h:40: warning: explicit link request to 'LV_EVENT_COVER_CHECK' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_event_private.h:28: warning: explicit link request to 'LV_EVENT_HIT_TEST' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_class_private.h:57: warning: explicit link request to 'lv_obj_class_editable_t' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_class_private.h:58: warning: explicit link request to 'lv_obj_class_group_def_t' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_class_private.h:60: warning: explicit link request to 'lv_obj_class_theme_inheritable_t' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_event_private.h:40: warning: explicit link request to 'LV_EVENT_COVER_CHECK' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_event_private.h:28: warning: explicit link request to 'LV_EVENT_HIT_TEST' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_class_private.h:57: warning: explicit link request to 'lv_obj_class_editable_t' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_class_private.h:58: warning: explicit link request to 'lv_obj_class_group_def_t' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/core/lv_obj_class_private.h:60: warning: explicit link request to 'lv_obj_class_theme_inheritable_t' could not be resolved
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/lv_draw_vector_private.h:121: warning: argument 'user_data' of command @param is not found in the argument list of lv_vector_for_each_destroy_tasks(lv_ll_t *task_list, vector_draw_task_cb cb, void *used_data)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/lv_draw_vector_private.h:121: warning: The following parameter of lv_vector_for_each_destroy_tasks(lv_ll_t *task_list, vector_draw_task_cb cb, void *used_data) is not documented:
+  parameter 'used_data'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/sw/blend/lv_draw_sw_blend.h:46: warning: argument 'draw_unit' of command @param is not found in the argument list of lv_draw_sw_blend(lv_draw_task_t *t, const lv_draw_sw_blend_dsc_t *dsc)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/sw/blend/lv_draw_sw_blend.h:46: warning: The following parameter of lv_draw_sw_blend(lv_draw_task_t *t, const lv_draw_sw_blend_dsc_t *dsc) is not documented:
+  parameter 't'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/sw/lv_draw_sw.h:124: warning: argument 'coords' of command @param is not found in the argument list of lv_draw_sw_mask_rect(lv_draw_task_t *t, const lv_draw_mask_rect_dsc_t *dsc)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/vg_lite/lv_vg_lite_stroke.h:40: warning: The following parameter of lv_vg_lite_stroke_init(struct _lv_draw_vg_lite_unit_t *unit, uint32_t cache_cnt) is not documented:
+  parameter 'cache_cnt'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/vg_lite/lv_vg_lite_stroke.h:70: warning: argument 'stroke' of command @param is not found in the argument list of lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t *unit, lv_cache_entry_t *cache_entry)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/draw/vg_lite/lv_vg_lite_stroke.h:70: warning: The following parameter of lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t *unit, lv_cache_entry_t *cache_entry) is not documented:
+  parameter 'cache_entry'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/drivers/opengles/lv_opengles_private.h:146: warning: The following parameter of lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t *texture_area, lv_opa_t opa, int32_t disp_w, int32_t disp_h, const lv_area_t *texture_clip_area, bool h_flip, bool v_flip) is not documented:
+  parameter 'texture_clip_area'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/font/font_manager/lv_font_manager_recycle.h:61: warning: The following parameter of lv_font_manager_recycle_set_reuse(lv_font_manager_recycle_t *manager, lv_font_t *font, const lv_font_info_t *ft_info) is not documented:
+  parameter 'font'
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/libs/gltf/gltf_data/lv_gltf_data_internal.h:195: warning: argument 'D' of command @param is not found in the argument list of lv_gltf_data_get_radius(const lv_gltf_model_t *model)
+WARNING: /home/kisvegabor/projects/lvgl/eclipse-workspace/lv_port_pc_eclipse/lvgl/src/libs/gltf/gltf_data/lv_gltf_data_internal.h:195: warning: The following parameter of lv_gltf_data_get_radius(const lv_gltf_model_t *model) is not documented:
+  parameter 'model'

@@ -176,6 +176,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                             lv_draw_sw_blend(t, &blend_dsc);
                         }
                     }
+                    //image
                     else {
                         glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                         lv_draw_image_dsc_t img_dsc;
@@ -195,7 +196,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                     break;
                 }
                 break;
-#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
+#if LV_USE_FREETYPE && (LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG)
             case LV_FONT_GLYPH_FORMAT_VECTOR: {
                     draw_letter_outline(t, glyph_draw_dsc);
                 }

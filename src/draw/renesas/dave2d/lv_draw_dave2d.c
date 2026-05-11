@@ -401,7 +401,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) return LV_DRAW_UNIT_IDLE;
-
+#if 0
     deps = lv_draw_get_dependent_count(t);
     if(deps > 0 || draw_pressure > 0) {
         draw_pressure += deps;
@@ -429,7 +429,9 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
          */
         return LV_DRAW_UNIT_IDLE;
     }
-    else {
+    else
+#endif
+    {
         /* Handles a special case when there is no sufficient draw pressure
          * But the actual task did not carry any extra pressure to get drew
          * in this case, the drawing pipeline have a few set of tasks that
