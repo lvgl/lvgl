@@ -112,6 +112,8 @@ typedef uint8_t lv_style_prop_t;
 
 typedef struct _lv_obj_class_t lv_obj_class_t;
 
+typedef struct _lv_delete_dsc_t lv_delete_dsc_t;
+
 typedef struct _lv_group_t lv_group_t;
 
 typedef struct _lv_display_t lv_display_t;

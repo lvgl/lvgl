@@ -38,6 +38,9 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef void(*lv_delete_cb_t)(void * user_data);
+
 /**
  * On/Off features controlling the object's behavior.
  * OR-ed values are possible
@@ -351,6 +354,37 @@ bool lv_obj_is_valid(const lv_obj_t * obj);
  * @param obj_ptr   a pointer to a pointer to an object
  */
 void lv_obj_null_on_delete(lv_obj_t ** obj_ptr);
+
+/**
+ * Attach a delete callback to an object.
+ *
+ * The registered callback will be automatically invoked with `user_data` as
+ * its argument when the object is deleted, allowing associated resources to
+ * be released or any other cleanup logic to be executed by the callback.
+ *
+ * This is a utility function that simplifies attaching an `LV_EVENT_DELETE`
+ * event callback to `obj` and passing `user_data` to that callback when the
+ * object is deleted.
+ *
+ * The `lv_delete_dsc_t` returned by this function is automatically released when
+ * the object is deleted as well.
+ *
+ * @param obj       Pointer to the LVGL object to attach the delete callback to.
+ * @param cb        The delete callback function to register.
+ * @param user_data     User data pointer passed to `cb` when the object is deleted.
+ *
+ * @return      Pointer to the delete descriptor or NULL if the operation failed.
+ */
+lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void * user_data);
+
+/**
+ * Detach a delete callback from an object.
+ *
+ * Removes a delete descriptor previously created via @ref lv_obj_add_delete_cb
+ *
+ * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op
+ */
+void lv_obj_remove_delete_cb(lv_delete_dsc_t * dsc);
 
 /**
  * Add an event handler to a widget that will load a screen on a trigger.
