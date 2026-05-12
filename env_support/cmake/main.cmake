@@ -319,10 +319,21 @@ install(
 # Install private headers only if required
 if(CONFIG_LV_USE_PRIVATE_API)
     install(
-        DIRECTORY "${LVGL_ROOT_DIR}/src"
-        DESTINATION "${INC_INSTALL_DIR}"
-        FILES_MATCHING
-        PATTERN "*_private.h")
+        DIRECTORY "${LVGL_ROOT_DIR}/src/"
+        DESTINATION "${INC_INSTALL_DIR}/lvgl_private"
+        FILES_MATCHING PATTERN "*.h")
+
+    # In the source tree, `lvgl_public.h` includes the public API via "../include/lvgl/lvgl.h".
+    # When installed, `lvgl/` and `lvgl_private/` are siblings under `include/`, so the path
+    # is patched to "../lvgl/lvgl.h" to match the installed layout.
+    # No other changes are required to other files because the `lvgl_private` folder structure
+    # is the same as the one in `src` meaning that all other includes work, as long as all
+    # private header files always go through `lvgl_public.h` to include public API symbols
+    install(CODE "
+	file(READ \"\${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/lvgl_private/lvgl_public.h\" content)
+        string(REPLACE \"../include/lvgl/lvgl.h\" \"../lvgl/lvgl.h\" content \"\${content}\")
+        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/lvgl_private/lvgl_public.h\" \"\${content}\")
+    ")
 endif()
 
 # When KConfig is used, copy the expanded conf header and rename it to lv_conf.h
