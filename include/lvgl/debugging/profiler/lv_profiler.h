@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../config/lv_conf_internal.h"
+#include "../../config/lv_conf_internal.h"
 
 #if LV_USE_PROFILER
 
