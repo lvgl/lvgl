@@ -53,5 +53,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: lvgl-deb-packages-${{ github.ref_name }}-${{ github.sha }}
+          name: lvgl-deb-packages-${{ github.sha }}
           path: debian-result-packages/*
