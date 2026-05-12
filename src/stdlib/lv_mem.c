@@ -29,6 +29,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void oom_notifier_default(size_t new_size);
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -42,6 +43,7 @@ lv_result_t lv_mem_test_core(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_mem_oom_event oom_notifier = oom_notifier_default;
 
 /**********************
  *      MACROS
@@ -67,14 +69,7 @@ void * lv_malloc(size_t size)
     void * alloc = lv_malloc_core(size);
 
     if(alloc == NULL) {
-        LV_LOG_INFO("couldn't allocate memory (%lu bytes)", (unsigned long)size);
-#if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
-        lv_mem_monitor_t mon;
-        lv_mem_monitor(&mon);
-        LV_LOG_INFO("used: %zu (%3d %%), frag: %3d %%, biggest free: %zu",
-                    mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
-                    mon.free_biggest_size);
-#endif
+        oom_notifier(size);
         return NULL;
     }
 
@@ -96,14 +91,7 @@ void * lv_malloc_zeroed(size_t size)
 
     void * alloc = lv_malloc_core(size);
     if(alloc == NULL) {
-        LV_LOG_INFO("couldn't allocate memory (%lu bytes)", (unsigned long)size);
-#if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
-        lv_mem_monitor_t mon;
-        lv_mem_monitor(&mon);
-        LV_LOG_INFO("used: %zu (%3d %%), frag: %3d %%, biggest free: %zu",
-                    mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
-                    mon.free_biggest_size);
-#endif
+        oom_notifier(size);
         return NULL;
     }
 
@@ -156,7 +144,7 @@ void * lv_realloc(void * data_p, size_t new_size)
     void * new_p = lv_realloc_core(data_p, new_size);
 
     if(new_p == NULL) {
-        LV_LOG_ERROR("couldn't reallocate memory");
+        oom_notifier(new_size);
         return NULL;
     }
 
@@ -180,6 +168,22 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     lv_mem_monitor_core(mon_p);
 }
 
+void lv_mem_register_oom(lv_mem_oom_event oom_p)
+{
+    oom_notifier = oom_p ? oom_p : oom_notifier_default;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static void oom_notifier_default(size_t new_size)
+{
+    LV_LOG_ERROR("couldn't allocate memory (%lu bytes)", (unsigned long)new_size);
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
+    lv_mem_monitor_t mon;
+    lv_mem_monitor(&mon);
+    LV_LOG_INFO("used: %zu (%3d %%), frag: %3d %%, biggest free: %zu",
+                mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+                mon.free_biggest_size);
+#endif
+}
