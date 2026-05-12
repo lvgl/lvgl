@@ -13,7 +13,9 @@
     "debugging",
     "guides",
     "contributing",
+    "api",
+    "api-private",
     "CHANGELOG",
-    "api"
+    "deprecated"
   ]
 }
