@@ -45,7 +45,7 @@ Angle-bracket includes are subject to the allow-list and macro rules described i
 
 Angle-bracket includes are only permitted in two situations:
 
-- The header appears in `ALLOWED_SYSTEM_HEADERS` in `scripts/static_checks/check_headers.py`.
+- The header appears in `ALLOWED_EXTERNAL_HEADERS` in `scripts/static_checks/check_headers.py`.
 - The include uses one of the LVGL indirection macros.
 
 The following standard headers are **forbidden** as direct angle-bracket includes.
@@ -70,7 +70,7 @@ enumerated in one place, making it easy to audit what LVGL pulls in from the out
 assess the cost of porting to a new platform.
 
 <Callout type="info" title="Adding a new allowed header">
-To add a new allowed angle-bracket include, add it to `ALLOWED_SYSTEM_HEADERS` in
+To add a new allowed angle-bracket include, add it to `ALLOWED_EXTERNAL_HEADERS` in
 `scripts/static_checks/check_headers.py` with a comment explaining why it is needed.
 </Callout>
 

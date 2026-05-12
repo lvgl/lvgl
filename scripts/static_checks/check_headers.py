@@ -6,8 +6,8 @@ Subcommands (each exits 0 on success, 1 on failure):
   public-api          Check every header in include/lvgl/ is included by include/lvgl/lvgl.h
   private-api         Check every header in src/ is included by src/lvgl_private.h
   include-paths       Check every #include inside src/ references a valid relative path
-                      (angle-bracket includes must appear in ALLOWED_SYSTEM_HEADERS)
-  allowed-list-audit  Report usage of every entry in ALLOWED_SYSTEM_HEADERS across
+                      (angle-bracket includes must appear in ALLOWED_EXTERNAL_HEADERS)
+  allowed-list-audit  Report usage of every entry in ALLOWED_EXTERNAL_HEADERS across
                       src/ and include/lvgl/; fail if any entry is unused anywhere
   deprecated          Check no source file includes a deprecated header
   no-direct-public-include
@@ -17,11 +17,11 @@ Subcommands (each exits 0 on success, 1 on failure):
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import os
 import re
 import subprocess
 import sys
-import fnmatch
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -85,11 +85,11 @@ DEPRECATION_MARKERS = (
 # Add any other headers that should NEVER appear as raw angle-bracket
 # includes to FORBIDDEN_SYSTEM_HEADERS.  Everything not in this set that
 # appears as an angle-bracket include is reported as an error (the
-# developer must either add it to ALLOWED_SYSTEM_HEADERS or switch to a
+# developer must either add it to ALLOWED_EXTERNAL_HEADERS or switch to a
 # quoted / macro include).
 #
 # To allow an angle-bracket header unconditionally, add it to
-# ALLOWED_SYSTEM_HEADERS instead.
+# ALLOWED_EXTERNAL_HEADERS instead.
 
 FORBIDDEN_SYSTEM_HEADERS: set[str] = {
     "stdint.h",
@@ -103,7 +103,7 @@ FORBIDDEN_SYSTEM_HEADERS: set[str] = {
 # Headers that are explicitly permitted inside <>.
 # This is the exhaustive allow-list; anything not here (and not forbidden)
 # is still an error so the list stays intentional and auditable.
-ALLOWED_SYSTEM_HEADERS: set[str] = {
+ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "FreeRTOS.h",
     "GL/glew.h",
     "GLES2/gl2.h",
@@ -479,14 +479,14 @@ def check_private_api(repo_root: Path) -> bool:
 # Check 3 -- include path validity + angle-bracket policy
 # ---------------------------------------------------------------------------
 def is_allowed_header(header: str) -> bool:
-    return any(fnmatch.fnmatch(header, pattern) for pattern in ALLOWED_SYSTEM_HEADERS)
+    return any(fnmatch.fnmatch(header, pattern) for pattern in ALLOWED_EXTERNAL_HEADERS)
 
 
 def check_include_paths(repo_root: Path) -> bool:
     """
     For every source file under src/:
       - Quoted includes must resolve to an existing file.
-      - Angle-bracket includes must be in ALLOWED_SYSTEM_HEADERS and must
+      - Angle-bracket includes must be in ALLOWED_EXTERNAL_HEADERS and must
         NOT be in FORBIDDEN_SYSTEM_HEADERS (use LV_*_INCLUDE macros instead).
       - Macro-style includes (LV_*_INCLUDE) are always fine.
     """
@@ -526,7 +526,7 @@ def check_include_paths(repo_root: Path) -> bool:
                     _error(
                         loc,
                         f"unlisted angle-bracket include <{angle.group(1)}>. '{header_name}' "
-                        "Add to ALLOWED_SYSTEM_HEADERS if intentional.",
+                        "Add to ALLOWED_EXTERNAL_HEADERS if intentional.",
                     )
                     ok = False
                 continue
@@ -636,7 +636,7 @@ def check_no_direct_public_include(repo_root: Path) -> bool:
 
 def check_allowed_list_audit(repo_root: Path) -> bool:
     """
-    For every header in ALLOWED_SYSTEM_HEADERS, search for literal
+    For every header in ALLOWED_EXTERNAL_HEADERS, search for literal
     #include <header> in both src/ and include/lvgl/.
 
     Report:
@@ -646,19 +646,19 @@ def check_allowed_list_audit(repo_root: Path) -> bool:
 
     Fails if any header is unused.
     """
-    if not ALLOWED_SYSTEM_HEADERS:
-        log_ok("ALLOWED_SYSTEM_HEADERS is empty, nothing to audit")
+    if not ALLOWED_EXTERNAL_HEADERS:
+        log_ok("ALLOWED_EXTERNAL_HEADERS is empty, nothing to audit")
         return True
 
     src_dir = repo_root / "src"
     include_dir = repo_root / "include" / "lvgl"
     ok = True
 
-    col = max(len(h) for h in ALLOWED_SYSTEM_HEADERS) + 4  # padding for <header>
+    col = max(len(h) for h in ALLOWED_EXTERNAL_HEADERS) + 4  # padding for <header>
 
     print(f"\n{C.BOLD}Allowed system header usage report:{C.RESET}\n")
 
-    for header in sorted(ALLOWED_SYSTEM_HEADERS):
+    for header in sorted(ALLOWED_EXTERNAL_HEADERS):
         pattern = rf"#\s*include\s*<{re.escape(header)}>"
         src_hits = _grep(pattern, src_dir)
         inc_hits = _grep(pattern, include_dir)
@@ -668,7 +668,7 @@ def check_allowed_list_audit(repo_root: Path) -> bool:
         if not src_hits and not inc_hits:
             print(
                 f"  {C.RED}{C.BOLD}{padded}{C.RESET}  "
-                f"{C.RED}unused -- remove from ALLOWED_SYSTEM_HEADERS{C.RESET}"
+                f"{C.RED}unused -- remove from ALLOWED_EXTERNAL_HEADERS{C.RESET}"
             )
             ok = False
 

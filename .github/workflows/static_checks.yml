@@ -42,7 +42,7 @@ jobs:
       # ------------------------------------------------------------------
       # - All #includes inside must be valid relative paths.
       # - Angle-bracket includes must be in the explicit allow-list
-      #   - see `ALLOWED_SYSTEM_HEADERS` in `scripts/static_checks/check_headers.py` 
+      #   - see `ALLOWED_EXTERNAL_HEADERS` in `scripts/static_checks/check_headers.py` 
       # - forbidden headers (stdint.h etc.) must use LV_*_INCLUDE macros.
       # ------------------------------------------------------------------
       - name: "Check: include path validity + angle-bracket policy"
