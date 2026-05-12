@@ -48,12 +48,7 @@ jobs:
               -v $(pwd):/workspace \
               -w /workspace \
               deb-builder:latest \
-              dpkg-buildpackage -b -d -uc -us
-
-      - name: Move all resulting packages to a folder
-        run: |
-          mkdir debian-result-packages
-          mv ../*.deb debian-result-packages
+              bash -c "dpkg-buildpackage -b -d -uc -us && mkdir debian-result-packages && mv ../*.deb debian-result-packages"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
