@@ -1,0 +1,131 @@
+---
+title: Coding Guidelines
+description: Code style rules and policies enforced by LVGL's CI pipeline.
+---
+
+# Coding Guidelines
+
+This page documents the source-code policies that are enforced automatically on every pull request.
+Each rule exists for a concrete reason, the goal is to make LVGL easy to integrate, portable
+across toolchains, and maintainable as the codebase grows.
+
+<Callout type="info" title="Automated enforcement">
+All policies below are checked by the **Policy Checks** CI workflow. The workflow runs every check
+independently and reports all failures before marking a PR as failing, so you will always see the
+full picture in one run.
+</Callout>
+
+## Include guidelines
+
+### 1. External dependencies must use angle-bracket notation
+
+Headers belonging to external libraries and system-provided headers must use angle-bracket notation
+rather than quoted paths.
+
+```c
+/* Wrong */
+#include "freertos/FreeRTOS.h"
+
+/* Correct */
+#include <freertos/FreeRTOS.h>
+```
+
+Reason: Angle-bracket notation signals that a header is not part of this project and should be
+resolved through the compiler's system or configured include search paths. Quoted includes imply a
+path relative to the current file, which is semantically incorrect for external dependencies and
+can cause resolution to silently find the wrong file.
+
+<Callout type="info" title="Automated enforcement">
+Angle-bracket includes are subject to the allow-list and macro rules described in rule 2 below.
+</Callout>
+
+---
+
+### 2. Angle-bracket includes must use the allow-list or `LV_*` macros
+
+Angle-bracket includes are only permitted in two situations:
+
+- The header appears in `ALLOWED_EXTERNAL_HEADERS` in `scripts/static_checks/check_headers.py`.
+- The include uses one of the LVGL indirection macros.
+
+The following standard headers are **forbidden** as direct angle-bracket includes.
+Use the corresponding macro instead:
+
+| Forbidden                  | Use instead                    |
+|----------------------------|--------------------------------|
+| `#include <stdint.h>`      | `#include LV_STDINT_INCLUDE`   |
+| `#include <stddef.h>`      | `#include LV_STDDEF_INCLUDE`   |
+| `#include <stdbool.h>`     | `#include LV_STDBOOL_INCLUDE`  |
+| `#include <inttypes.h>`    | `#include LV_INTTYPES_INCLUDE` |
+| `#include <limits.h>`      | `#include LV_LIMITS_INCLUDE`   |
+| `#include <stdarg.h>`      | `#include LV_STDARG_INCLUDE`   |
+
+Reason: LVGL targets a wide range of embedded toolchains, including bare-metal environments
+without a standard C library, or environments where these headers live in non-standard locations.
+The `LV_*_INCLUDE` macros can be overridden by the user to point to platform-specific
+replacements, giving integrators full control.
+
+The allow-list also serves a documentation purpose: every external dependency is explicitly
+enumerated in one place, making it easy to audit what LVGL pulls in from the outside and to
+assess the cost of porting to a new platform.
+
+<Callout type="info" title="Adding a new allowed header">
+To add a new allowed angle-bracket include, add it to `ALLOWED_EXTERNAL_HEADERS` in
+`scripts/static_checks/check_headers.py` with a comment explaining why it is needed.
+</Callout>
+
+---
+
+### 3. All `#include` directives inside `src/` and `include/` must use relative paths
+
+Source files inside `src/` must use quoted, relative includes, e.g. `"../core/lv_obj_private.h"`.
+
+Reason: LVGL supports build environments, such as Arduino, where the build system does not
+allow specifying additional include search directories. Relative paths work everywhere because they
+are resolved by the preprocessor relative to the including file, with no reliance on `-I` flags or
+toolchain configuration.
+
+---
+
+### 4. Internal code must not include public headers directly
+
+Source files under `src/` must not include headers from `include/lvgl/` by path. Instead, they
+must obtain the full public API through `lvgl_public.h`, which itself pulls in `lvgl.h`.
+
+```c
+/* Wrong, do not do this */
+#include "../../include/lvgl/lv_obj.h"
+
+/* Correct */
+#include "../lvgl_public.h"
+```
+
+Reason: Source files under `src/` must not reach into `include/lvgl/` directly because the
+relative paths become deeply nested and fragile as the directory structure evolves. More
+importantly, `lvgl_public.h` serves as an indirection point that adapts to the installation
+context: during development it resolves to `../include/lvgl/lvgl.h`, but once the library is
+installed it redirects to the system-installed `../lvgl/lvgl.h`. Bypassing it by including public
+headers directly would break this mechanism and cause include resolution to fail in installed
+builds.
+
+---
+
+### 5. Every public header must be reachable from `lvgl.h`
+
+Every `.h` file under `include/lvgl/` must be directly included by `include/lvgl/lvgl.h`.
+
+Reason: Users integrating LVGL are not required to use the umbrella header, but if they do,
+`#include "lvgl.h"` should be enough to pull in the entire public API. Internally, LVGL's own
+source code also uses `lvgl.h` as the single authoritative entry point for the public API. This
+keeps maintenance simple and avoids accidental omissions.
+
+---
+
+### 6. Every private header must be reachable from `lvgl_private.h`
+
+Every `.h` file under `src/` must be directly included by `src/lvgl_private.h`.
+
+Reason: The same reasoning applies internally: `lvgl_private.h` is the single entry point for
+LVGL's private API. Any internal translation unit that needs access to internal types or
+functions includes this one header and gets everything. This makes the internal surface area
+auditable and prevents headers from silently falling out of the dependency graph.
