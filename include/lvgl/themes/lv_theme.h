@@ -133,9 +133,9 @@ void lv_theme_set_external_data(lv_theme_t * theme, void * data, void (* free_cb
  *    MACROS
  **********************/
 
-#include "default/lv_theme_default.h"
-#include "mono/lv_theme_mono.h"
-#include "simple/lv_theme_simple.h"
+#include "lv_theme_default.h"
+#include "lv_theme_mono.h"
+#include "lv_theme_simple.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/
