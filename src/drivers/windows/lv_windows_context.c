@@ -17,6 +17,9 @@
 #include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
 #include "../../osal/lv_os_private.h"
+#include "../../osal/lv_os.h"
+#include "../../display/lv_display.h"
+#include "../../core/lv_obj_pos.h"
 
 /*********************
  *      DEFINES
@@ -649,6 +652,20 @@ static bool lv_windows_window_message_callback_nolock(
 
                 PostQuitMessage(0);
 
+                break;
+            }
+            case WM_PAINT: {
+                lv_lock();
+
+                PAINTSTRUCT ps;
+                lv_windows_window_context_t * context = (lv_windows_window_context_t *)(lv_windows_get_window_context(hWnd));
+                if(context && context->display_device_object) {
+                    HDC hdc = BeginPaint(hWnd, &ps);
+                    lv_obj_invalidate(lv_display_get_screen_active(context->display_device_object));
+                    EndPaint(hWnd, &ps);
+                }
+
+                lv_unlock();
                 break;
             }
         default: {
