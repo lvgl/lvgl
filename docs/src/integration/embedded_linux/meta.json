@@ -1,11 +1,4 @@
 {
   "title": "Embedded Linux Support",
-  "pages": [
-    "opengl",
-    "draw_opengl",
-    "draw_sdl",
-    "nanovg",
-    "os",
-    "drivers"
-  ]
+  "pages": ["opengl", "drivers", "draw_units", "distros"]
 }

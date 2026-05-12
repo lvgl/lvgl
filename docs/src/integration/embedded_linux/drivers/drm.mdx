@@ -35,9 +35,10 @@ sudo apt-get install libdrm-dev
 
 1. Enable the DRM driver support in `lv_conf.h`, by CMake compiler define, or by KConfig:
    
-   .. code-block:: c
-   
-       #define LV_USE_LINUX_DRM   1
+```c
+#define LV_USE_LINUX_DRM   1
+```
+
 2. Link against `libdrm` when building.
 
 ##### Basic Usage

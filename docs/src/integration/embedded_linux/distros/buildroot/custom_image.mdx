@@ -1,10 +1,9 @@
 ---
-title: build
-description: "RPi4 custom image #################"
+title: Custom Buildroot Image
+description: "Step-by-step guide to creating a custom Buildroot image, using the Raspberry Pi 4 as an example. Adaptable to other boards."
 ---
 
-RPi4 custom image
-#################
+# Custom image for buildroot
 
 This chapter offers a detailed guide for creating a custom image for the
 Raspberry Pi 4 (RPi4). Key Buildroot components and concepts will be
@@ -168,9 +167,6 @@ If it is mounted on /dev/sda, run the following command
 ```bash
 sudo dd if=images/sdcard.img of=/dev/sda
 ```
-
-As mentioned in [images](/integration/embedded_linux/os/buildroot/image_generation), the output image is in `images` and named
-`sdcard.img`.
 
 Connect an Ethernet cable to the RPi4 and ensure the laptop and the RPi4 are on
 the same network.

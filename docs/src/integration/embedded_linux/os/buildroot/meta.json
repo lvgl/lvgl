@@ -1,7 +1,0 @@
-{
-  "pages": [
-    "quick_setup",
-    "image_generation",
-    "lvgl_app"
-  ]
-}

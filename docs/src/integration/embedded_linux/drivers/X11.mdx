@@ -1,5 +1,5 @@
 ---
-title: X11 Display/Inputs driver
+title: X11
 description: The X11 display/input driver offers support for simulating the LVGL display and keyboard/mouse inputs in an X11 desktop window.
 ---
 
@@ -24,34 +24,37 @@ The X11 driver uses XLib to access the linux window manager.
 ### Configure X11 driver
 
 1. Enable the X11 driver support in lv_conf.h, by cmake compiler define or by KConfig
-    .. code-block:: c
-   
-        #define LV_USE_X11  1
+
+    ```c
+    #define LV_USE_X11  1
+    ```
+
 2. Optional configuration options:
     -  Direct Exit
-        .. code-block:: c
-   
-            #define LV_X11_DIRECT_EXIT  1 /* preferred default - ends the application automatically if last window has been closed */
-            // or
-            #define LV_X11_DIRECT_EXIT  0 /* application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler */
+
+    ```c
+    #define LV_X11_DIRECT_EXIT  1 /* preferred default - ends the application automatically if last window has been closed */
+    // or
+    #define LV_X11_DIRECT_EXIT  0 /* application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler) */
+    ```
 
 -  Double buffering
 
-```c
-#define LV_X11_DOUBLE_BUFFER  1 /* preferred default */
-// or
-#define LV_X11_DOUBLE_BUFFER  0 /* not recommended */
-```
+    ```c
+    #define LV_X11_DOUBLE_BUFFER  1 /* preferred default */
+    // or
+    #define LV_X11_DOUBLE_BUFFER  0 /* not recommended */
+    ```
 
 - Render mode
 
-```c
-#define LV_X11_RENDER_MODE_PARTIAL 1  /* LV_DISPLAY_RENDER_MODE_PARTIAL, preferred default */
-// or
-#define LV_X11_RENDER_MODE_DIRECT  1  /* LV_DISPLAY_RENDER_MODE_DIRECT, not recommended for X11 driver */
-// or
-#define LV_X11_RENDER_MODE_DULL    1  /* LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver */
-```
+    ```c
+    #define LV_X11_RENDER_MODE_PARTIAL 1  /* LV_DISPLAY_RENDER_MODE_PARTIAL, preferred default */
+    // or
+    #define LV_X11_RENDER_MODE_DIRECT  1  /* LV_DISPLAY_RENDER_MODE_DIRECT, not recommended for X11 driver */
+    // or
+    #define LV_X11_RENDER_MODE_DULL    1  /* LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver */
+    ```
 
 ### Usage
 
