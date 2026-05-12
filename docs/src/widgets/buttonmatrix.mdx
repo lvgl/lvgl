@@ -28,6 +28,8 @@ the buttons with encoder and keyboard navigation as well.
 
 ### Button map
 
+<LvglXMLExample name="lv_example_buttonmatrix_map" path="widgets/buttonmatrix/buttonmatrix_map/lv_example_buttonmatrix_map" />
+
 The number of buttons, their positions and text are controlled by a descriptor string
 array, called a *map*, passed to
 <ApiLink name="lv_buttonmatrix_set_map" display="lv_buttonmatrix_set_map(btn_matrix, my_map)" />. The declaration of a map should
@@ -48,6 +50,8 @@ element of the array.
 
 ### Button widths
 
+<LvglXMLExample name="lv_example_buttonmatrix_button_width" path="widgets/buttonmatrix/buttonmatrix_button_width/lv_example_buttonmatrix_button_width" />
+
 The buttons' width can be set in proportion to the width of other buttons in the same
 row with <ApiLink name="lv_buttonmatrix_set_button_width" display="lv_buttonmatrix_set_button_width(btn_matrix, button_id, width)" /> E.g. in a
 line with two buttons: *buttonA, width = 1* and *buttonB, width = 2*, *buttonA*
@@ -56,6 +60,12 @@ will have 33 % width and *buttonB* will have 66 % width.  This is similar to how
 property works in CSS. The width must be in the range [1..15] with the default being 1.
 
 ### Button behavior
+
+<LvglXMLExample name="lv_example_buttonmatrix_button_ctrl" path="widgets/buttonmatrix/buttonmatrix_button_ctrl/lv_example_buttonmatrix_button_ctrl" />
+
+<LvglXMLExample name="lv_example_buttonmatrix_popover" path="widgets/buttonmatrix/buttonmatrix_popover/lv_example_buttonmatrix_popover" />
+
+<LvglXMLExample name="lv_example_buttonmatrix_recolor" path="widgets/buttonmatrix/buttonmatrix_recolor/lv_example_buttonmatrix_recolor" />
 
 Each button's behavior can be customized with the following control flags:
 
@@ -97,6 +107,8 @@ An element of `ctrl_map` should look like
 The number of elements must be equal to the number of buttons.
 
 ### One checked
+
+<LvglXMLExample name="lv_example_buttonmatrix_one_checked" path="widgets/buttonmatrix/buttonmatrix_one_checked/lv_example_buttonmatrix_one_checked" />
 
 The "One-checked" feature can be enabled with
 <ApiLink name="lv_buttonmatrix_set_one_checked" display="lv_buttonmatrix_set_one_checked(btn_matrix, true)" /> to allow only one button to
@@ -151,5 +163,29 @@ Learn more about [Keys](/main-modules/indev/keypad).
 ### Pagination
 
 <LvglExample name="lv_example_buttonmatrix_3" path="widgets/buttonmatrix/lv_example_buttonmatrix_3" />
+
+### Button matrix: map and row breaks
+
+<LvglExample name="lv_example_buttonmatrix_map" path="widgets/buttonmatrix/buttonmatrix_map/lv_example_buttonmatrix_map" />
+
+### Button matrix: button widths
+
+<LvglExample name="lv_example_buttonmatrix_button_width" path="widgets/buttonmatrix/buttonmatrix_button_width/lv_example_buttonmatrix_button_width" />
+
+### Button matrix: per-button control flags
+
+<LvglExample name="lv_example_buttonmatrix_button_ctrl" path="widgets/buttonmatrix/buttonmatrix_button_ctrl/lv_example_buttonmatrix_button_ctrl" />
+
+### Button matrix: one-checked
+
+<LvglExample name="lv_example_buttonmatrix_one_checked" path="widgets/buttonmatrix/buttonmatrix_one_checked/lv_example_buttonmatrix_one_checked" />
+
+### Button matrix: popover
+
+<LvglExample name="lv_example_buttonmatrix_popover" path="widgets/buttonmatrix/buttonmatrix_popover/lv_example_buttonmatrix_popover" />
+
+### Button matrix: recolor
+
+<LvglExample name="lv_example_buttonmatrix_recolor" path="widgets/buttonmatrix/buttonmatrix_recolor/lv_example_buttonmatrix_recolor" />
 
 ## API
