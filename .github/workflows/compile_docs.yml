@@ -102,11 +102,12 @@ jobs:
             --preset fumadocs \
             --auto-group \
             --root api=./include/lvgl \
-            --root 'api-private=./src#*_private.h' \
+            --root api-private=./src \
             --source-url-for api=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/include/lvgl \
             --source-url-for api-private=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src \
             --root-title api=API \
-            --root-title 'api-private=API Private'
+            --root-title 'api-private=API Private' \
+            --drop-empty-files
             rm -rf docs/doxygen 
 
       - name: Install Example Documentation
