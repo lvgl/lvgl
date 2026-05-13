@@ -108,6 +108,30 @@ extern "C" {
 #endif
 
 /*******************
+ * LV_USE_NEMA_LIB
+ *******************/
+#ifdef CONFIG_LV_NEMA_LIB_NONE
+#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_NONE
+#elif defined(CONFIG_LV_NEMA_LIB_M33_REVC)
+#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_M33_REVC
+#elif defined(CONFIG_LV_NANOVG_BACKEND_GLES2)
+#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_M33_NEMAPVG
+#elif defined(CONFIG_LV_NANOVG_BACKEND_GLES3)
+#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_M55
+#elif defined(CONFIG_LV_NEMA_LIB_M7)
+#  define CONFIG_LV_USE_NEMA_LIB LV_NEMA_LIB_M7
+#endif
+
+/*******************
+ * LV_USE_NEMA_HAL
+ *******************/
+#ifdef CONFIG_LV_NEMA_HAL_STM32
+#  define CONFIG_LV_USE_NEMA_HAL LV_NEMA_HAL_STM32
+#elif defined(CONFIG_LV_NEMA_HAL_CUSTOM)
+#  define CONFIG_LV_USE_NEMA_HAL LV_NEMA_HAL_CUSTOM
+#endif
+
+/*******************
  * LV_NANOVG_BACKEND
  *******************/
 
