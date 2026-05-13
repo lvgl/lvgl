@@ -336,7 +336,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
             is_zero_fill = (opa <= LV_OPA_MIN);
         }
         else {
-            is_zero_fill = (opa >= LV_OPA_MAX && color.red == 0 && color.green == 0 && color.blue == 0);
+            is_zero_fill = (color.red == 0 && color.green == 0 && color.blue == 0);
         }
         if(is_zero_fill) {
             /* Zero the CPU data if present, then mark CLEARZERO so
