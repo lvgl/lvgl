@@ -2,6 +2,14 @@ name: Build Docs
 
 on:
   workflow_dispatch: # allow manual triggering
+    inputs:
+      deploy:
+        description: 'Deploy after build'
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
   pull_request:
     paths:
       - 'docs/**'
@@ -133,7 +141,9 @@ jobs:
           echo "VERSION_NAME=$(scripts/find_version.sh)" >> "$GITHUB_OUTPUT"
 
       - name: Deploy Specific Version
-        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/') }}
+        if: >
+          startsWith(github.ref, 'refs/heads/release/') &&
+          (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true'))
         run: |
           git clone https://lvgl-bot:${{ secrets.LVGL_BOT_TOKEN }}@github.com/lvgl/open-docs.git /tmp/open-docs
           rm -rf /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}
@@ -147,7 +157,9 @@ jobs:
           git push
 
       - name: Deploy Latest
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        if: >
+          github.ref == 'refs/heads/master' &&
+          (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true'))
         run: |
           git clone https://lvgl-bot:${{ secrets.LVGL_BOT_TOKEN }}@github.com/lvgl/open-docs.git /tmp/open-docs-latest
           rm -rf /tmp/open-docs-latest/latest
