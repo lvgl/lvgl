@@ -1,18 +1,33 @@
+# ============================================================
+# GStreamer Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "GStreamer")
+list(APPEND PKG_CONFIG_NAME "gstreamer-1.0" "gstreamer-video-1.0"
+     "gstreamer-app-1.0")
+set(PKG_LIB_PRIVATE "-lgstreamer-1.0 -lgstreamer-video-1.0 -lgstreamer-app-1.0")
+
 option(LV_USE_FIND_PACKAGE_GSTREAMER "Resolve GStreamer via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_GSTREAMER "Resolve GStreamer via pkg-config"
        ${LV_USE_PKG_CONFIG})
 
 if(LV_USE_FIND_PACKAGE_GSTREAMER)
-  find_package(GStreamer QUIET COMPONENTS gstreamer gstreamer-video
-                                          gstreamer-app)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET COMPONENTS gstreamer gstreamer-video
+                                                      gstreamer-app)
   if(GStreamer_FOUND
      AND GStreamer_gstreamer-video_FOUND
      AND GStreamer_gstreamer-app_FOUND)
     message(STATUS "lvgl: GStreamer: found via find_package")
-    target_link_libraries(
-      lvgl PRIVATE GStreamer::gstreamer GStreamer::gstreamer-video
-                   GStreamer::gstreamer-app)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      GStreamer::gstreamer
+      GStreamer::gstreamer-video
+      GStreamer::gstreamer-app
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
@@ -25,9 +40,16 @@ if(LV_USE_PKG_CONFIG_GSTREAMER AND PkgConfig_FOUND)
      AND GSTREAMER_VIDEO_FOUND
      AND GSTREAMER_APP_FOUND)
     message(STATUS "lvgl: GStreamer: found via pkg-config")
-    target_link_libraries(
-      lvgl PRIVATE PkgConfig::GSTREAMER PkgConfig::GSTREAMER_VIDEO
-                   PkgConfig::GSTREAMER_APP)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      PkgConfig::GSTREAMER
+      PkgConfig::GSTREAMER_VIDEO
+      PkgConfig::GSTREAMER_APP
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()

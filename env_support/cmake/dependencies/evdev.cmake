@@ -1,22 +1,47 @@
+# ============================================================
+# libevdev Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "evdev")
+set(PKG_CONFIG_NAME "libevdev")
+set(PKG_LIB_PRIVATE "-levdev")
+
 option(LV_USE_FIND_PACKAGE_EVDEV "Resolve libevdev via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_EVDEV "Resolve libevdev via pkg-config"
        ${LV_USE_PKG_CONFIG})
 
 if(LV_USE_FIND_PACKAGE_EVDEV)
-  find_package(evdev QUIET)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(evdev_FOUND)
     message(STATUS "lvgl: evdev: found via find_package")
-    target_link_libraries(lvgl PRIVATE evdev::evdev)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      evdev::evdev
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
 
 if(LV_USE_PKG_CONFIG_EVDEV AND PkgConfig_FOUND)
-  pkg_check_modules(EVDEV IMPORTED_TARGET QUIET libevdev)
+  pkg_check_modules(EVDEV IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(EVDEV_FOUND)
     message(STATUS "lvgl: evdev: found via pkg-config")
-    target_link_libraries(lvgl PRIVATE PkgConfig::EVDEV)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      PkgConfig::EVDEV
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()

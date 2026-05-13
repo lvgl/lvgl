@@ -1,3 +1,10 @@
+# ============================================================
+# libjpeg Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "JPEG")
+set(PKG_CONFIG_NAME "libjpeg")
+set(PKG_LIB_PRIVATE "-ljpeg")
+
 option(LV_USE_FIND_PACKAGE_JPEG "Resolve libjpeg via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_JPEG "Resolve libjpeg via pkg-config"
@@ -5,19 +12,37 @@ option(LV_USE_PKG_CONFIG_JPEG "Resolve libjpeg via pkg-config"
 option(LV_FETCH_JPEG "Fetch libjpeg-turbo from source" ${LV_FETCH_DEPENDENCIES})
 
 if(LV_USE_FIND_PACKAGE_JPEG)
-  find_package(JPEG QUIET)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(JPEG_FOUND)
     message(STATUS "lvgl: libjpeg: found via find_package")
-    target_link_libraries(lvgl PRIVATE JPEG::JPEG)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      JPEG::JPEG
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
 
 if(LV_USE_PKG_CONFIG_JPEG AND PkgConfig_FOUND)
-  pkg_check_modules(LIBJPEG IMPORTED_TARGET QUIET libjpeg)
+  pkg_check_modules(LIBJPEG IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(LIBJPEG_FOUND)
     message(STATUS "lvgl: libjpeg: found via pkg-config")
-    target_link_libraries(lvgl PRIVATE PkgConfig::LIBJPEG)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      PkgConfig::LIBJPEG
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
@@ -51,4 +76,4 @@ set(WITH_CRT_DLL
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libjpeg-turbo)
-target_link_libraries(lvgl PRIVATE jpeg-static)
+lvgl_link_libraries(PRIVATE TARGETS jpeg-static FETCHED)

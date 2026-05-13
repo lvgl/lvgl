@@ -1,13 +1,34 @@
+# ============================================================
+# FFmpeg Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "FFmpeg")
+list(
+  APPEND
+  PKG_CONFIG_NAME
+  "libavcodec"
+  "libavformat"
+  "libavutil"
+  "libswscale"
+  "libswresample")
+set(PKG_LIB_PRIVATE "-lavcodec -lavformat -lavutil -lswscale -lswresample")
+
 option(LV_USE_FIND_PACKAGE_FFMPEG "Resolve FFmpeg via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_FFMPEG "Resolve FFmpeg via pkg-config"
        ${LV_USE_PKG_CONFIG})
 
 if(LV_USE_FIND_PACKAGE_FFMPEG)
-  find_package(FFmpeg QUIET)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(FFmpeg_FOUND)
     message(STATUS "lvgl: FFmpeg: found via find_package")
-    target_link_libraries(lvgl PRIVATE FFmpeg::FFmpeg)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      FFmpeg::FFmpeg
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
@@ -22,8 +43,18 @@ if(LV_USE_PKG_CONFIG_FFMPEG AND PkgConfig_FOUND)
      AND AVUTIL_FOUND
      AND SWSCALE_FOUND)
     message(STATUS "lvgl: FFmpeg: found via pkg-config")
-    target_link_libraries(lvgl PRIVATE PkgConfig::AVFORMAT PkgConfig::AVCODEC
-                                       PkgConfig::AVUTIL PkgConfig::SWSCALE)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      PkgConfig::AVFORMAT
+      PkgConfig::AVCODEC
+      PkgConfig::AVUTIL
+      PkgConfig::SWSCALE
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
+
     return()
   endif()
 endif()

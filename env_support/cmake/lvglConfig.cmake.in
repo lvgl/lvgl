@@ -1,0 +1,33 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Use a semicolon-separated list for CMake to iterate correctly
+set(LVGL_DEPS "@LVGL_CMAKE_PUBLIC_DEPS@;@LVGL_CMAKE_PRIVATE_DEPS@")
+
+foreach(dep ${LVGL_DEPS})
+  if(NOT dep STREQUAL "")
+    # find_dependency is quieter and handles REQUIRED automatically
+    find_dependency(${dep})
+  endif()
+endforeach()
+
+# Special fix for SDL2 if it doesn't provide the expected namespace
+if(TARGET SDL2 AND NOT TARGET SDL2::SDL2)
+  add_library(SDL2::SDL2 ALIAS SDL2)
+endif()
+
+# Now include the targets file. It will now find SDL2::SDL2 in the global scope
+# and be happy.
+include("${CMAKE_CURRENT_LIST_DIR}/lvgl-targets.cmake")
+
+# Handle raw flags (-lm)
+set(LVGL_RAW_FLAGS "@LVGL_PKG_LIBS_PRIVATE@")
+if(LVGL_RAW_FLAGS)
+  set_property(
+    TARGET lvgl::lvgl
+    APPEND
+    PROPERTY INTERFACE_LINK_LIBRARIES "${LVGL_RAW_FLAGS}")
+endif()
+
+check_required_components(lvgl)

@@ -1,3 +1,10 @@
+# ============================================================
+# GLFW Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "glfw3")
+set(PKG_CONFIG_NAME "glfw3")
+set(PKG_LIB_PRIVATE "-lglfw")
+
 option(LV_USE_FIND_PACKAGE_GLFW "Resolve GLFW via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_GLFW "Resolve GLFW via pkg-config"
@@ -5,19 +12,37 @@ option(LV_USE_PKG_CONFIG_GLFW "Resolve GLFW via pkg-config"
 option(LV_FETCH_GLFW "Fetch GLFW from source" ${LV_FETCH_DEPENDENCIES})
 
 if(LV_USE_FIND_PACKAGE_GLFW)
-  find_package(glfw3 QUIET)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(glfw3_FOUND)
     message(STATUS "lvgl: GLFW: found via find_package")
-    target_link_libraries(lvgl PRIVATE glfw)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      glfw
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
 
 if(LV_USE_PKG_CONFIG_GLFW AND PkgConfig_FOUND)
-  pkg_check_modules(GLFW3 IMPORTED_TARGET QUIET glfw3)
+  pkg_check_modules(GLFW3 IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(GLFW3_FOUND)
     message(STATUS "lvgl: GLFW: found via pkg-config")
-    target_link_libraries(lvgl PRIVATE PkgConfig::GLFW3)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      PkgConfig::GLFW3
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
@@ -46,4 +71,4 @@ set(GLFW_BUILD_EXAMPLES
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(glfw)
-target_link_libraries(lvgl PRIVATE glfw)
+lvgl_link_libraries(PRIVATE TARGETS glfw FETCHED)

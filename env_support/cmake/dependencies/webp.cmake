@@ -1,3 +1,10 @@
+# ============================================================
+# libwebp Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "WebP")
+set(PKG_CONFIG_NAME "libwebp")
+set(PKG_LIB_PRIVATE "-lwebp")
+
 option(LV_USE_FIND_PACKAGE_WEBP "Resolve libwebp via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_WEBP "Resolve libwebp via pkg-config"
@@ -5,19 +12,37 @@ option(LV_USE_PKG_CONFIG_WEBP "Resolve libwebp via pkg-config"
 option(LV_FETCH_WEBP "Fetch libwebp from source" ${LV_FETCH_DEPENDENCIES})
 
 if(LV_USE_FIND_PACKAGE_WEBP)
-  find_package(WebP QUIET)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(WebP_FOUND)
     message(STATUS "lvgl: libwebp: found via find_package")
-    target_link_libraries(lvgl PRIVATE WebP::webp)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      WebP::webp
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
 
 if(LV_USE_PKG_CONFIG_WEBP AND PkgConfig_FOUND)
-  pkg_check_modules(WebP IMPORTED_TARGET QUIET libwebp)
+  pkg_check_modules(WebP IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(WebP_FOUND)
     message(STATUS "lvgl: libwebp: found via pkg-config")
-    target_link_libraries(lvgl PRIVATE PkgConfig::WebP)
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      PkgConfig::WebP
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
@@ -63,4 +88,4 @@ FetchContent_Declare(
   GIT_TAG 4fa21912338357f89e4fd51cf2368325b59e9bd9)
 
 FetchContent_MakeAvailable(webp)
-target_link_libraries(lvgl PRIVATE webp)
+lvgl_link_libraries(PRIVATE TARGETS webp FETCHED)

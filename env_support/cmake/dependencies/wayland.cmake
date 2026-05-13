@@ -1,3 +1,10 @@
+# ============================================================
+# Wayland Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "Wayland")
+list(APPEND PKG_CONFIG_NAME "wayland-client" "wayland-cursor")
+set(PKG_LIB_PRIVATE "-lwayland-client -lwayland-cursor")
+
 option(LV_USE_FIND_PACKAGE_WAYLAND "Resolve Wayland via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_WAYLAND "Resolve Wayland via pkg-config"
@@ -9,10 +16,11 @@ if(LV_USE_FIND_PACKAGE_WAYLAND)
     message(STATUS "lvgl: Wayland: found via find_package")
     set(WAYLAND_CLIENT_LIBRARIES Wayland::Client)
     set(WAYLAND_CURSOR_LIBRARIES Wayland::Cursor)
+    set(WAYLAND_FIND_METHOD "find_package")
   endif()
 endif()
 
-if(NOT Wayland_FOUND
+if(NOT WAYLAND_FIND_METHOD
    AND LV_USE_PKG_CONFIG_WAYLAND
    AND PkgConfig_FOUND)
   pkg_check_modules(WAYLAND_CLIENT IMPORTED_TARGET QUIET wayland-client)
@@ -22,6 +30,7 @@ if(NOT Wayland_FOUND
     message(STATUS "lvgl: Wayland: found via pkg-config")
     set(WAYLAND_CLIENT_LIBRARIES PkgConfig::WAYLAND_CLIENT)
     set(WAYLAND_CURSOR_LIBRARIES PkgConfig::WAYLAND_CURSOR)
+    set(WAYLAND_FIND_METHOD "pkg-config")
   else()
     message(
       FATAL_ERROR
@@ -30,7 +39,7 @@ if(NOT Wayland_FOUND
   endif()
 endif()
 
-if(NOT Wayland_FOUND AND NOT WAYLAND_CLIENT_FOUND)
+if(NOT WAYLAND_FIND_METHOD)
   message(
     FATAL_ERROR
       "lvgl: Wayland not found. Please install wayland-client and wayland-cursor."
@@ -40,23 +49,6 @@ endif()
 find_program(WAYLAND_SCANNER wayland-scanner REQUIRED)
 
 include(${CMAKE_CURRENT_LIST_DIR}/xkbcommon.cmake)
-
-# EGL
-if(CONFIG_LV_WAYLAND_USE_EGL)
-  if(LV_USE_PKG_CONFIG_WAYLAND AND PkgConfig_FOUND)
-    pkg_check_modules(WAYLAND_EGL IMPORTED_TARGET QUIET wayland-egl)
-    if(WAYLAND_EGL_FOUND)
-      message(STATUS "lvgl: Wayland EGL: found via pkg-config")
-      set(WAYLAND_EGL_LIBRARIES PkgConfig::WAYLAND_EGL)
-    else()
-      message(
-        FATAL_ERROR "lvgl: wayland-egl not found. Please install wayland-egl.")
-    endif()
-  else()
-    message(
-      FATAL_ERROR "lvgl: wayland-egl not found and PkgConfig unavailable.")
-  endif()
-endif()
 
 # Protocol root resolution
 if(DEFINED ENV{SDKTARGETSYSROOT} AND DEFINED ENV{SYSROOT})
@@ -154,14 +146,46 @@ if(CONFIG_LV_WAYLAND_USE_G2D)
 endif()
 
 # Protocol library
-add_library(lv_wayland_protocols ${WAYLAND_PROTOCOL_SOURCES})
+add_library(lv_wayland_protocols OBJECT ${WAYLAND_PROTOCOL_SOURCES})
 target_include_directories(lv_wayland_protocols PUBLIC ${PROTOCOLS_DIR})
 
-# Link lvgl
-target_link_libraries(
-  lvgl PRIVATE lv_wayland_protocols ${WAYLAND_CLIENT_LIBRARIES}
-               ${WAYLAND_CURSOR_LIBRARIES})
+# Link wayland libraries and protocols
+lvgl_link_libraries(
+  PRIVATE
+  TARGETS
+  lv_wayland_protocols
+  ${WAYLAND_CLIENT_LIBRARIES}
+  ${WAYLAND_CURSOR_LIBRARIES}
+  PKG_CONFIG
+  wayland-client
+  wayland-cursor)
 
+# Link wayland-egl if enabled
 if(CONFIG_LV_WAYLAND_USE_EGL)
-  target_link_libraries(lvgl PRIVATE ${WAYLAND_EGL_LIBRARIES})
+  if(WAYLAND_FIND_METHOD STREQUAL "find_package")
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      Wayland::Egl
+      PKG_CONFIG
+      wayland-egl
+      PKG_LIB_PRIVATE
+      -lwayland-egl)
+  elseif(WAYLAND_FIND_METHOD STREQUAL "pkg-config")
+    pkg_check_modules(WAYLAND_EGL IMPORTED_TARGET QUIET wayland-egl)
+    if(WAYLAND_EGL_FOUND)
+      message(STATUS "lvgl: Wayland EGL: found via pkg-config")
+      lvgl_link_libraries(
+        PRIVATE
+        TARGETS
+        PkgConfig::WAYLAND_EGL
+        PKG_CONFIG
+        wayland-egl
+        PKG_LIB_PRIVATE
+        -lwayland-egl)
+    else()
+      message(
+        FATAL_ERROR "lvgl: wayland-egl not found. Please install wayland-egl.")
+    endif()
+  endif()
 endif()
