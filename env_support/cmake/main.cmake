@@ -413,7 +413,7 @@ if(CONFIG_LV_BUILD_DEMOS)
     # Install demo headers (only if user enables demos)
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/demos"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/demos"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl"
         FILES_MATCHING PATTERN "*.h"
     )
 
