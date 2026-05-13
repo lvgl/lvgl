@@ -436,7 +436,7 @@ if(CONFIG_LV_BUILD_EXAMPLES)
 
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/examples"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl"
         FILES_MATCHING PATTERN "*.h"
     )
 
