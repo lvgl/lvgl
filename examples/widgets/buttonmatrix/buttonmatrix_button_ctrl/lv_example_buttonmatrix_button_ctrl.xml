@@ -1,0 +1,25 @@
+<!--
+ @title Button matrix per-button control flags
+ @brief Apply checkable, checked, disabled, and hidden flags via `ctrl_map`.
+
+ Each token in `ctrl_map` is a `|`-separated list of flag names that applies to
+ the matching button in `map`. The four buttons here show a plain button, a
+ checkable button that starts checked (`checkable|checked`), a `disabled` button,
+ and a `hidden` button which still reserves its slot in the layout.
+-->
+<screen>
+	<view>
+		<!-- 💡 Edit individual `ctrl_map` tokens to see how each button state is rendered and which still receives input. -->
+		<lv_label width="100%" style_text_align="center" text="Button matrix: per-button control flags" />
+
+		<!-- One row with four differently-flagged buttons -->
+		<lv_buttonmatrix
+			align="center"
+			y="30"
+			width="310"
+			height="60"
+			map="'Normal' 'Checked' 'Disabled' 'Hidden'"
+			ctrl_map="none checkable|checked disabled hidden"
+		/>
+	</view>
+</screen>

@@ -1,10 +1,9 @@
 /**
- * @file lv_example_flex.h
- *
+ * @file xml_project.h
  */
 
-#ifndef LV_EXAMPLE_FLEX_H
-#define LV_EXAMPLE_FLEX_H
+#ifndef XML_PROJECT_H
+#define XML_PROJECT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +12,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+
+#include "xml_project_gen.h"
 
 /*********************
  *      DEFINES
@@ -23,15 +24,17 @@ extern "C" {
  **********************/
 
 /**********************
+ * GLOBAL VARIABLES
+ **********************/
+
+/**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_flex_align_create(void);
-void lv_example_flex_flow_create(void);
-void lv_example_flex_grow_create(void);
-void lv_example_flex_ignore_layout_create(void);
-void lv_example_flex_internal_padding_create(void);
-void lv_example_flex_new_track_create(void);
-void lv_example_flex_rtl_create(void);
+
+/**
+ * Initialize the component library
+ */
+void xml_project_init(const char * asset_path);
 
 /**********************
  *      MACROS
@@ -41,4 +44,4 @@ void lv_example_flex_rtl_create(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLE_FLEX_H*/
+#endif /*XML_PROJECT_H*/

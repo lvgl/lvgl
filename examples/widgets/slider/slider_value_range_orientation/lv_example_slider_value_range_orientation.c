@@ -1,0 +1,48 @@
+/**
+ * @file lv_example_slider_value_range_orientation.c
+ */
+
+#include "../../../../lvgl.h"
+
+/**
+ * @title Slider value, range, and orientation
+ * @brief Set a custom numeric range and choose horizontal or vertical layout.
+ *
+ * The horizontal slider uses min_value=-20 and max_value=80 to show that ranges need not
+ * start at zero. The vertical slider sets orientation="vertical" explicitly and uses a
+ * tall, narrow size so the knob travels upward instead of left-to-right.
+ */
+void lv_example_slider_value_range_orientation_create(void)
+{
+    lv_obj_t * screen = lv_screen_active();
+
+    /* 💡 Edit min_value/max_value/value and orientation to see how fill direction and knob travel change. */
+    lv_obj_t * lv_label_0 = lv_label_create(screen);
+    lv_obj_set_width(lv_label_0, lv_pct(100));
+    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text(lv_label_0, "Slider: value, range, orientation");
+
+    /* Horizontal slider with custom range */
+    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
+    lv_obj_set_pos(lv_slider_0, 12, 38);
+    lv_obj_set_size(lv_slider_0, 220, 16);
+    lv_slider_set_min_value(lv_slider_0, -20);
+    lv_slider_set_max_value(lv_slider_0, 80);
+    lv_slider_set_value(lv_slider_0, 35, false);
+    lv_obj_t * lv_label_1 = lv_label_create(lv_slider_0);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_1, "-20..80");
+
+    /* Vertical slider with explicit vertical orientation */
+    lv_obj_t * lv_slider_1 = lv_slider_create(screen);
+    lv_obj_set_pos(lv_slider_1, 98, 76);
+    lv_obj_set_size(lv_slider_1, 18, 130);
+    lv_slider_set_orientation(lv_slider_1, LV_SLIDER_ORIENTATION_VERTICAL);
+    lv_slider_set_min_value(lv_slider_1, 0);
+    lv_slider_set_max_value(lv_slider_1, 100);
+    lv_slider_set_value(lv_slider_1, 60, false);
+    lv_obj_t * lv_label_2 = lv_label_create(lv_slider_1);
+    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_2, "V");
+}
+

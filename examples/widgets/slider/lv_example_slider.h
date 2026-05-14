@@ -1,10 +1,10 @@
 /**
- * @file lv_example_flex.h
+ * @file lv_example_slider.h
  *
  */
 
-#ifndef LV_EXAMPLE_FLEX_H
-#define LV_EXAMPLE_FLEX_H
+#ifndef LV_EXAMPLE_SLIDER_H
+#define LV_EXAMPLE_SLIDER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,13 +25,9 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_flex_align_create(void);
-void lv_example_flex_flow_create(void);
-void lv_example_flex_grow_create(void);
-void lv_example_flex_ignore_layout_create(void);
-void lv_example_flex_internal_padding_create(void);
-void lv_example_flex_new_track_create(void);
-void lv_example_flex_rtl_create(void);
+void lv_example_slider_modes_create(void);
+void lv_example_slider_reversed_direction_create(void);
+void lv_example_slider_value_range_orientation_create(void);
 
 /**********************
  *      MACROS
@@ -41,4 +37,4 @@ void lv_example_flex_rtl_create(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLE_FLEX_H*/
+#endif /*LV_EXAMPLE_SLIDER_H*/
