@@ -30,6 +30,10 @@ void lv_example_arc_1(void)
 
     /*Manually update the label for the first time*/
     lv_obj_send_event(arc, LV_EVENT_VALUE_CHANGED, NULL);
+
+    lv_obj_set_style_drop_shadow_opa(arc, 255, LV_PART_INDICATOR);
+    lv_obj_set_style_drop_shadow_radius(arc, 20, LV_PART_INDICATOR);
+    lv_obj_set_style_drop_shadow_color(arc, lv_color_hex(0xff0000), LV_PART_INDICATOR);
 }
 
 static void value_changed_event_cb(lv_event_t * e)
