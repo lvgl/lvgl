@@ -60,34 +60,34 @@
  * (attribute / varying / texture2D / gl_FragColor) and is remapped to GL3
  * / GLES3 modern equivalents via #define when needed. */
 #if LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GL3
-    #define BLUR_VS_HEADER \
-        "#version 130\n" \
-        "#define attribute in\n" \
-        "#define varying out\n"
-    #define BLUR_FS_HEADER \
-        "#version 130\n" \
-        "#define varying in\n" \
-        "#define texture2D texture\n" \
-        "out vec4 blur_frag_out;\n" \
-        "#define gl_FragColor blur_frag_out\n"
+#define BLUR_VS_HEADER \
+    "#version 130\n" \
+    "#define attribute in\n" \
+    "#define varying out\n"
+#define BLUR_FS_HEADER \
+    "#version 130\n" \
+    "#define varying in\n" \
+    "#define texture2D texture\n" \
+    "out vec4 blur_frag_out;\n" \
+    "#define gl_FragColor blur_frag_out\n"
 #elif LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GLES3
-    #define BLUR_VS_HEADER \
-        "#version 300 es\n" \
-        "#define attribute in\n" \
-        "#define varying out\n"
-    #define BLUR_FS_HEADER \
-        "#version 300 es\n" \
-        "precision mediump float;\n" \
-        "#define varying in\n" \
-        "#define texture2D texture\n" \
-        "out vec4 blur_frag_out;\n" \
-        "#define gl_FragColor blur_frag_out\n"
+#define BLUR_VS_HEADER \
+    "#version 300 es\n" \
+    "#define attribute in\n" \
+    "#define varying out\n"
+#define BLUR_FS_HEADER \
+    "#version 300 es\n" \
+    "precision mediump float;\n" \
+    "#define varying in\n" \
+    "#define texture2D texture\n" \
+    "out vec4 blur_frag_out;\n" \
+    "#define gl_FragColor blur_frag_out\n"
 #elif LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GLES2
-    #define BLUR_VS_HEADER ""
-    #define BLUR_FS_HEADER "precision mediump float;\n"
+#define BLUR_VS_HEADER ""
+#define BLUR_FS_HEADER "precision mediump float;\n"
 #else /* GL2 */
-    #define BLUR_VS_HEADER ""
-    #define BLUR_FS_HEADER ""
+#define BLUR_VS_HEADER ""
+#define BLUR_FS_HEADER ""
 #endif
 
 /**********************
