@@ -122,9 +122,9 @@ static const char * FS_SRC =
 /* Fullscreen triangle strip: x, y, u, v */
 static const float QUAD_VERTS[] = {
     -1.0f, -1.0f, 0.0f, 0.0f,
-     1.0f, -1.0f, 1.0f, 0.0f,
+    1.0f, -1.0f, 1.0f, 0.0f,
     -1.0f,  1.0f, 0.0f, 1.0f,
-     1.0f,  1.0f, 1.0f, 1.0f,
+    1.0f,  1.0f, 1.0f, 1.0f,
 };
 
 /**********************
