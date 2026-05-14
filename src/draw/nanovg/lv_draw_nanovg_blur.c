@@ -59,6 +59,7 @@ typedef struct {
     GLint  loc_step;
     GLint  loc_tap_count;
     GLint  loc_weights;
+    GLint  loc_src_uv;
     GLint  attr_pos;
     GLint  attr_uv;
     bool   program_ok;
@@ -105,16 +106,18 @@ static const char * FS_SRC =
     "precision mediump float;\n"
     "uniform sampler2D u_tex;\n"
     "uniform vec2 u_step;\n"
+    "uniform vec4 u_src_uv;\n"  /* xy = sub-region UV offset, zw = sub-region UV scale */
     "uniform int u_tap_count;\n"
     "uniform float u_weights[17];\n"
     "varying vec2 v_uv;\n"
     "void main() {\n"
-    "    vec4 sum = texture2D(u_tex, v_uv) * u_weights[0];\n"
+    "    vec2 base = u_src_uv.xy + v_uv * u_src_uv.zw;\n"
+    "    vec4 sum = texture2D(u_tex, base) * u_weights[0];\n"
     "    for(int i = 1; i <= 16; i++) {\n"
     "        if(i > u_tap_count) break;\n"
     "        vec2 off = u_step * float(i);\n"
-    "        sum += texture2D(u_tex, v_uv + off) * u_weights[i];\n"
-    "        sum += texture2D(u_tex, v_uv - off) * u_weights[i];\n"
+    "        sum += texture2D(u_tex, base + off) * u_weights[i];\n"
+    "        sum += texture2D(u_tex, base - off) * u_weights[i];\n"
     "    }\n"
     "    gl_FragColor = sum;\n"
     "}\n";
@@ -269,14 +272,19 @@ void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, con
     glDisable(GL_SCISSOR_TEST);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-    /* --- Pick the source texture ---
-     * Sub-layer: sample the layer's FBO texture directly. UV [0,1] covers
-     *            the whole FBO, which matches the existing drop-shadow
-     *            behaviour of blurring the entire layer.
+    /* --- Pick the source texture and its sampling sub-region ---
+     * Sub-layer: sample only the clip sub-region within the layer's FBO
+     *            texture, expressed as UV offset/scale against the full
+     *            FBO. This is essential when the BLUR task targets a
+     *            sub-rect of the layer (e.g. backdrop blur on a child of
+     *            a widget that was promoted to a sub-layer).
      * Root layer: there's no FBO behind the screen, so snapshot the
-     *            blur_area region from the default framebuffer into a
-     *            captured texture and sample that. */
+     *            blur region from the default framebuffer into a capture
+     *            texture sized exactly to the blur area and sample with
+     *            UV [0,1]. */
     GLuint src_tex;
+    float  src_uv_off_x, src_uv_off_y, src_uv_scl_x, src_uv_scl_y;
+    int    src_tex_w, src_tex_h;
     if(is_root) {
         ensure_capture_tex(s, blur_w, blur_h);
         if(s->capture_tex == 0) {
@@ -285,39 +293,52 @@ void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, con
         }
         glBindTexture(GL_TEXTURE_2D, s->capture_tex);
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, rel_x, gl_y, blur_w, blur_h);
-        src_tex = s->capture_tex;
+        src_tex      = s->capture_tex;
+        src_tex_w    = blur_w;
+        src_tex_h    = blur_h;
+        src_uv_off_x = 0.0f;
+        src_uv_off_y = 0.0f;
+        src_uv_scl_x = 1.0f;
+        src_uv_scl_y = 1.0f;
     }
     else {
-        src_tex = (GLuint)lv_nanovg_fb_get_texture_id(src_fb);
+        src_tex      = (GLuint)lv_nanovg_fb_get_texture_id(src_fb);
+        src_tex_w    = lv_area_get_width(&layer->buf_area);
+        src_tex_h    = layer_h;
+        src_uv_off_x = (float)rel_x / (float)src_tex_w;
+        src_uv_off_y = (float)gl_y  / (float)src_tex_h;
+        src_uv_scl_x = (float)blur_w / (float)src_tex_w;
+        src_uv_scl_y = (float)blur_h / (float)src_tex_h;
     }
     const GLuint scratch_tex = (GLuint)lv_nanovg_fb_get_texture_id(s->scratch_fb);
 
-    /* --- Pass 1: source → scratch, horizontal --- */
+    /* --- Pass 1: source sub-region → scratch (whole), horizontal --- */
     LV_PROFILER_DRAW_BEGIN_TAG("blur_h");
     nvgluBindFramebuffer(s->scratch_fb);
     glViewport(0, 0, blur_w, blur_h);
     glBindTexture(GL_TEXTURE_2D, src_tex);
     set_tex_params();
-    glUniform2f(s->loc_step, (float)step_px / (float)blur_w, 0.0f);
+    glUniform4f(s->loc_src_uv, src_uv_off_x, src_uv_off_y, src_uv_scl_x, src_uv_scl_y);
+    /* Step is expressed in source-texture UV space (pixels of src_tex). */
+    glUniform2f(s->loc_step, (float)step_px / (float)src_tex_w, 0.0f);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     LV_PROFILER_DRAW_END_TAG("blur_h");
 
-    /* --- Pass 2: scratch → destination, vertical ---
-     * Sub-layer: write back into the layer's own FBO (fullscreen quad
-     *            covers the whole FBO; matches pass 1 source).
-     * Root layer: write back to the default framebuffer at the same screen
-     *            region we captured from. Viewport positions the quad. */
+    /* --- Pass 2: scratch (whole) → destination sub-region, vertical ---
+     * Both root and sub-layer cases now write back into the clip
+     * sub-region of the destination framebuffer via glViewport. Scratch
+     * is exactly blur-sized, so we sample it with UV [0,1]. */
     LV_PROFILER_DRAW_BEGIN_TAG("blur_v");
     if(is_root) {
         nvgluBindFramebuffer(NULL);
-        glViewport(rel_x, gl_y, blur_w, blur_h);
     }
     else {
         nvgluBindFramebuffer(src_fb);
-        glViewport(0, 0, blur_w, blur_h);
     }
+    glViewport(rel_x, gl_y, blur_w, blur_h);
     glBindTexture(GL_TEXTURE_2D, scratch_tex);
     set_tex_params();
+    glUniform4f(s->loc_src_uv, 0.0f, 0.0f, 1.0f, 1.0f);
     glUniform2f(s->loc_step, 0.0f, (float)step_px / (float)blur_h);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     LV_PROFILER_DRAW_END_TAG("blur_v");
@@ -372,6 +393,7 @@ static bool ensure_program(blur_state_t * s)
     s->program       = prog;
     s->loc_tex       = glGetUniformLocation(prog, "u_tex");
     s->loc_step      = glGetUniformLocation(prog, "u_step");
+    s->loc_src_uv    = glGetUniformLocation(prog, "u_src_uv");
     s->loc_tap_count = glGetUniformLocation(prog, "u_tap_count");
     s->loc_weights   = glGetUniformLocation(prog, "u_weights[0]");
     if(s->loc_weights < 0) s->loc_weights = glGetUniformLocation(prog, "u_weights");
