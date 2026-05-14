@@ -72,6 +72,12 @@ The size of the tab bar can be adjusted by <ApiLink name="lv_tabview_set_tab_bar
 When tabs are on the top or bottom, this means the height of the tab bar, and when
 they are on the sides, it means the width.
 
+### Tab bar style
+
+The tab view exposes three independent style targets: the tab view body, the
+tab bar container, and individual tab buttons. Each can be styled separately
+to customize background, padding, indicator colors, and per-tab accents.
+
 <LvglXMLExample name="lv_example_tabview_tab_bar_style" path="widgets/tabview/tabview_tab_bar_style/lv_example_tabview_tab_bar_style" />
 
 ### Accessing the parts
@@ -84,6 +90,8 @@ they are on the sides, it means the width.
   specific tab button (a [Button (lv_button)](/widgets/button))
 - <ApiLink name="lv_tabview_get_tab_count" display="lv_tabview_get_tab_count(tabview)" /> returns how many tabs the tab view
   currently has
+
+### Tab button content
 
 Tab buttons are regular widgets, so additional children — such as a switch,
 icon, or status indicator — can be parented to a tab button to enrich its
@@ -111,3 +119,4 @@ Programmatically add these buttons to a group if required.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
+

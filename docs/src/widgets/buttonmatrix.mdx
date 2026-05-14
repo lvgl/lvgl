@@ -59,13 +59,7 @@ will have 33 % width and *buttonB* will have 66 % width.  This is similar to how
 ["flex-grow"](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-grow)
 property works in CSS. The width must be in the range [1..15] with the default being 1.
 
-### Button behavior
-
-<LvglXMLExample name="lv_example_buttonmatrix_button_ctrl" path="widgets/buttonmatrix/buttonmatrix_button_ctrl/lv_example_buttonmatrix_button_ctrl" />
-
-<LvglXMLExample name="lv_example_buttonmatrix_popover" path="widgets/buttonmatrix/buttonmatrix_popover/lv_example_buttonmatrix_popover" />
-
-<LvglXMLExample name="lv_example_buttonmatrix_recolor" path="widgets/buttonmatrix/buttonmatrix_recolor/lv_example_buttonmatrix_recolor" />
+### Control flags
 
 Each button's behavior can be customized with the following control flags:
 
@@ -81,6 +75,10 @@ Each button's behavior can be customized with the following control flags:
 - <ApiLink name="LV_BUTTONMATRIX_CTRL_CUSTOM_2" />: Custom free-to-use flag
 
 By default, these flags are disabled.
+
+<LvglXMLExample name="lv_example_buttonmatrix_button_ctrl" path="widgets/buttonmatrix/buttonmatrix_button_ctrl/lv_example_buttonmatrix_button_ctrl" />
+
+### Setting control flags
 
 To set and clear a button's control flags, use
 
@@ -105,6 +103,22 @@ To set a control map for a Button Matrix (similar to Button map), use
 An element of `ctrl_map` should look like
 <ApiLink name="ctrl_map" display="ctrl_map[0] = width | LV_BUTTONMATRIX_CTRL_NO_REPEAT |  LV_BUTTONMATRIX_CTRL_CHECKABLE" />.
 The number of elements must be equal to the number of buttons.
+
+### Popover
+
+<LvglXMLExample name="lv_example_buttonmatrix_popover" path="widgets/buttonmatrix/buttonmatrix_popover/lv_example_buttonmatrix_popover" />
+
+The <ApiLink name="LV_BUTTONMATRIX_CTRL_POPOVER" /> flag shows the pressed button's
+text in a magnified popover above the finger, mirroring the on-screen keyboard
+convention so the user can still read what they are pressing.
+
+### Recolor
+
+<LvglXMLExample name="lv_example_buttonmatrix_recolor" path="widgets/buttonmatrix/buttonmatrix_recolor/lv_example_buttonmatrix_recolor" />
+
+The <ApiLink name="LV_BUTTONMATRIX_CTRL_RECOLOR" /> flag enables the same
+`#RRGGBB ... #` inline color syntax used by `lv_label` recoloring, so individual
+words or characters in a button's text can be colored without per-button styles.
 
 ### One checked
 
@@ -149,43 +163,5 @@ the button will not be activated upon leaving edit mode.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Simple Button matrix
-
-<LvglExample name="lv_example_buttonmatrix_1" path="widgets/buttonmatrix/lv_example_buttonmatrix_1" />
-
-### Custom buttons
-
-<LvglExample name="lv_example_buttonmatrix_2" path="widgets/buttonmatrix/lv_example_buttonmatrix_2" />
-
-### Pagination
-
-<LvglExample name="lv_example_buttonmatrix_3" path="widgets/buttonmatrix/lv_example_buttonmatrix_3" />
-
-### Button matrix: map and row breaks
-
-<LvglExample name="lv_example_buttonmatrix_map" path="widgets/buttonmatrix/buttonmatrix_map/lv_example_buttonmatrix_map" />
-
-### Button matrix: button widths
-
-<LvglExample name="lv_example_buttonmatrix_button_width" path="widgets/buttonmatrix/buttonmatrix_button_width/lv_example_buttonmatrix_button_width" />
-
-### Button matrix: per-button control flags
-
-<LvglExample name="lv_example_buttonmatrix_button_ctrl" path="widgets/buttonmatrix/buttonmatrix_button_ctrl/lv_example_buttonmatrix_button_ctrl" />
-
-### Button matrix: one-checked
-
-<LvglExample name="lv_example_buttonmatrix_one_checked" path="widgets/buttonmatrix/buttonmatrix_one_checked/lv_example_buttonmatrix_one_checked" />
-
-### Button matrix: popover
-
-<LvglExample name="lv_example_buttonmatrix_popover" path="widgets/buttonmatrix/buttonmatrix_popover/lv_example_buttonmatrix_popover" />
-
-### Button matrix: recolor
-
-<LvglExample name="lv_example_buttonmatrix_recolor" path="widgets/buttonmatrix/buttonmatrix_recolor/lv_example_buttonmatrix_recolor" />
 
 ## API
