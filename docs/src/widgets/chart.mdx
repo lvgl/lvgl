@@ -72,7 +72,7 @@ Any number of data series
 - You can hide a point by setting its Y-value to <ApiLink name="LV_CHART_POINT_NONE" />.
 - If desired, you can tell a data series to instead use a value array you
   provide.  If you do:
-  
+
   - Pre-allocated value arrays are automatically freed.
   - That data series will continue to use *your* array from that time onward.
   - The values in your array must remain available through the life of that data series.
@@ -96,12 +96,12 @@ order, from back to front:
 
 - The chart's background (with optional division lines)
 - Each data series:
-  
+
   - Earliest data series added appears on top.
   - For a SCATTER chart, within each series, points later in the sequence will appear
     on top of points earlier in the sequence when there is overlap.
 - Each cursor (if there are any):
-  
+
   - The most recent cursor added appears on top.
 
 ## Parts and Styles
@@ -113,7 +113,7 @@ order, from back to front:
 - <ApiLink name="LV_PART_SCROLLBAR" /> A scrollbar used if the chart is zoomed. See
    [base widget](/widgets/base_widget)'s documentation for details.
 - <ApiLink name="LV_PART_ITEMS" /> Refers to the LINE or BAR data series.
-  
+
    -  LINE chart: *line* properties are used by lines.
       `width`, `height`, `bg_color` and `radius` are used to set
       the appearance of points on the line.
@@ -129,6 +129,8 @@ order, from back to front:
 ## Details
 
 ### Chart type
+
+<LvglXMLExample name="lv_example_chart_types" path="widgets/chart/chart_types/lv_example_chart_types" />
 
 A chart can be one of the following types:
 
@@ -154,6 +156,8 @@ Charts start their life as LINE charts.  You can change a chart's type with
 <ApiLink name="lv_chart_set_type" display="lv_chart_set_type(chart, LV_CHART_TYPE_...)" />.
 
 ### Data series
+
+<LvglXMLExample name="lv_example_chart_series" path="widgets/chart/chart_series/lv_example_chart_series" />
 
 You can add any number of data series to a chart by using
 
@@ -287,6 +291,8 @@ Note that <ApiLink name="LV_CHART_UPDATE_MODE_SHIFT" /> also changes the
 
 ### Tick marks and labels
 
+<LvglXMLExample name="lv_example_chart_ticks_labels" path="widgets/chart/chart_ticks_labels/lv_example_chart_ticks_labels" />
+
 With the help of [Scale](/widgets/scale), vertical and horizontal scales can be added
 in a very flexible way.  See the [examples 2](#axis-ticks-and-labels-with-scrolling)
 below to learn more.
@@ -299,6 +305,8 @@ to be scrollable in its parent --- the parent container provides the scrollable 
 window".
 
 ### Cursor
+
+<LvglXMLExample name="lv_example_chart_cursor" path="widgets/chart/chart_cursor/lv_example_chart_cursor" />
 
 A new cursor is initially given position <ApiLink name="LV_CHART_POINT_NONE" /> which causes
 it to be hidden.  To show the cursor, its location must be set by you

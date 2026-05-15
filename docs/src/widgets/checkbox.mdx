@@ -32,6 +32,8 @@ To set static text, use <ApiLink name="lv_checkbox_set_text_static" display="lv_
 way, only a pointer to `txt` will be stored. The provided text buffer must remain
 available for the lifetime of the Checkbox.
 
+<LvglXMLExample name="lv_example_checkbox_text" path="widgets/checkbox/checkbox_text/lv_example_checkbox_text" />
+
 ### Check, uncheck, disable
 
 You can programmatically check, un-check, and disable the Checkbox by using the
@@ -46,6 +48,37 @@ lv_obj_add_state(cb, LV_STATE_DISABLED);   /* Make Checkbox disabled */
 
 To find out whether the Checkbox is checked use
 <ApiLink name="lv_obj_has_state" display="lv_obj_has_state(cb, LV_STATE_CHECKED)" />.
+
+<LvglXMLExample name="lv_example_checkbox_states" path="widgets/checkbox/checkbox_states/lv_example_checkbox_states" />
+
+### Styling
+
+<LvglXMLExample name="lv_example_checkbox_styling" path="widgets/checkbox/checkbox_styling/lv_example_checkbox_styling" />
+
+Checkbox exposes two parts: <ApiLink name="LV_PART_MAIN" /> (the
+label/text area) and <ApiLink name="LV_PART_INDICATOR" /> (the tick
+box). The tick box is where most of the visual treatment happens —
+attach a `<style>` block with `selector="indicator"` for the default
+look, and a second one with `selector="indicator|checked"` to swap fill,
+border, and outline color when the user ticks it. MAIN uses the
+standard text and background properties; local `style_*` props on the
+`<lv_checkbox>` tag (e.g. `style_text_color`, `style_pad_column`)
+target it directly.
+
+### Data binding
+
+To get familiar with observers, subjects, and data bindings in general, visit
+the [Observer](/main-modules/observer/observer) page.
+
+A Checkbox's checked state is exposed via the generic `lv_obj_bind_checked` —
+the binding is two-way, so flipping the box writes 0/1 into the int Subject
+and assigning the Subject toggles the box. Pair it with `bind_flag_if_*` /
+`bind_state_if_*` on other widgets to react to that flag without writing any
+event callback.
+
+- <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked(obj, &subject)" />
+
+<LvglXMLExample name="lv_example_checkbox_bind_checked" path="widgets/checkbox/checkbox_bind_checked/lv_example_checkbox_bind_checked" />
 
 ## Events
 
@@ -71,15 +104,5 @@ Note that, as usual, the state of <ApiLink name="LV_KEY_ENTER" /> is translated 
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Simple Checkboxes
-
-<LvglExample name="lv_example_checkbox_1" path="widgets/checkbox/lv_example_checkbox_1" />
-
-### Checkboxes as radio buttons
-
-<LvglExample name="lv_example_checkbox_2" path="widgets/checkbox/lv_example_checkbox_2" />
 
 ## API

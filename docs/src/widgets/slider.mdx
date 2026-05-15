@@ -65,10 +65,25 @@ The Slider can be in one of the following modes:
 - <ApiLink name="LV_SLIDER_SYMMETRICAL" /> Draw the indicator from the zero value to
   current value. Requires negative minimum range and positive maximum range.
 - <ApiLink name="LV_SLIDER_RANGE" /> Allows setting the start value as well by
-  <ApiLink name="lv_bar_set_start_value" display="lv_bar_set_start_value(slider, new_value, LV_ANIM_ON/OFF)" />. The start
+  <ApiLink name="lv_slider_set_start_value" display="lv_slider_set_start_value(slider, new_value, LV_ANIM_ON/OFF)" />. The start
   value must always be smaller than the end value.
 
 The mode can be changed with <ApiLink name="lv_slider_set_mode" display="lv_slider_set_mode(slider, LV_SLIDER_MODE_...)" />
+
+### Styling
+
+<LvglXMLExample name="lv_example_slider_styling" path="widgets/slider/slider_styling/lv_example_slider_styling" />
+
+Slider has three parts: <ApiLink name="LV_PART_MAIN" /> (track),
+<ApiLink name="LV_PART_INDICATOR" /> (filled portion), and
+<ApiLink name="LV_PART_KNOB" />. Each accepts the full background style
+stack — `bg_color`, `bg_grad_color` + `bg_grad_dir` for gradients,
+`radius`, `border_*`, `outline_*`, `shadow_*`, and `pad_*`. Attach
+named styles with `selector="main"`, `selector="indicator"`, or
+`selector="knob"`. Combine part and state to get interactive feedback,
+e.g. `selector="pressed|knob"` to highlight the knob only while it is
+being dragged. Local `style_*` props on the `<lv_slider>` tag target
+MAIN.
 
 ### Knob-only mode
 
@@ -95,6 +110,14 @@ versa.
 It supports integer and float subjects.
 
 - <ApiLink name="lv_slider_bind_value" display="lv_slider_bind_value(slider, &subject)" />
+
+<LvglXMLExample name="lv_example_slider_bind_value" path="widgets/slider/slider_bind_value/lv_example_slider_bind_value" />
+
+A Slider's value can also drive another widget's state via the generic
+`bind_state_if_*` helpers — handy for guards like "disable submit when the
+value exceeds a threshold".
+
+<LvglXMLExample name="lv_example_slider_bind_state" path="widgets/slider/slider_bind_state/lv_example_slider_bind_state" />
 
 ## Events
 

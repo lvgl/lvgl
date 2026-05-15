@@ -128,6 +128,22 @@ The "One-checked" feature can be enabled with
 <ApiLink name="lv_buttonmatrix_set_one_checked" display="lv_buttonmatrix_set_one_checked(btn_matrix, true)" /> to allow only one button to
 be checked at a time.
 
+### Styling
+
+<LvglXMLExample name="lv_example_buttonmatrix_styling" path="widgets/buttonmatrix/buttonmatrix_styling/lv_example_buttonmatrix_styling" />
+
+Button Matrix has two stylable parts: <ApiLink name="LV_PART_MAIN" />
+(the container) and <ApiLink name="LV_PART_ITEMS" /> (each virtual
+button). Style them separately with `selector="main"` and
+`selector="items"`, and combine with states using
+`selector="items|checked"`, `selector="items|pressed"`, or
+`selector="items|focused"` to recolor only the affected button.
+The container accepts the full background stack including `pad_row`
+and `pad_column` for the gaps between buttons; items use the same
+`bg_*`, `border_*`, `radius`, and `text_*` properties as a regular
+button. Local `style_*` props on the `<lv_buttonmatrix>` tag apply to
+MAIN.
+
 ## Events
 
 - <ApiLink name="LV_EVENT_VALUE_CHANGED" />: Sent when a button is pressed/released or

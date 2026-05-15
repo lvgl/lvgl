@@ -24,6 +24,8 @@ can be supported as well.
 
 ### Image source
 
+<LvglXMLExample name="lv_example_image_src" path="widgets/image/image_src/lv_example_image_src" />
+
 To provide maximum flexibility, the source of the image can be:
 
 - a variable in code (a C array containing the pixels).
@@ -103,6 +105,8 @@ or a "running image" effect can be created by [Animating](/main-modules/animatio
 
 ### Transformations
 
+<LvglXMLExample name="lv_example_image_transformations" path="widgets/image/image_transformations/lv_example_image_transformations" />
+
 You can zoom images in or out by using <ApiLink name="lv_image_set_scale" display="lv_image_set_scale(img, factor)" />.
 Set `factor` to `256` or <ApiLink name="LV_SCALE_NONE" /> to disable zooming. A
 larger value enlarges the images (e.g. `512` double size), a smaller
@@ -143,6 +147,8 @@ The main differences are that pure Image Widget transformations:
 - the image is transformed directly without creating an intermediate layer (buffer) to snapshot the Widget.
 
 ### Inner align
+
+<LvglXMLExample name="lv_example_image_inner_align" path="widgets/image/image_inner_align/lv_example_image_inner_align" />
 
 By default the image Widget's width and height are <ApiLink name="LV_SIZE_CONTENT" />,
 meaning that the Widget will be sized automatically to the size of its image source.

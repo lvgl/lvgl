@@ -25,10 +25,12 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_arc_bind_value_create(void);
 void lv_example_arc_change_rate_create(void);
 void lv_example_arc_mode_create(void);
 void lv_example_arc_rotation_create(void);
 void lv_example_arc_set_angles_create(void);
+void lv_example_arc_styling_create(void);
 void lv_example_arc_value_range_create(void);
 
 /**********************

@@ -19,7 +19,7 @@ void lv_example_tabview_active_tab_create(void)
     /* 💡 active is 0-based — change the value to pick which tab opens first. */
     lv_obj_t * lv_tabview_0 = lv_tabview_create(screen);
     lv_obj_set_size(lv_tabview_0, lv_pct(100), lv_pct(100));
-    lv_tabview_set_active(lv_tabview_0, 2);
+    lv_tabview_set_active(lv_tabview_0, 2, LV_ANIM_OFF);
     lv_obj_t * lv_tabview_tab_0 = lv_tabview_add_tab(lv_tabview_0, "A");
     lv_obj_t * lv_label_0 = lv_label_create(lv_tabview_tab_0);
     lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);

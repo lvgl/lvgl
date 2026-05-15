@@ -114,6 +114,21 @@ the selected option is displayed on the button.
 To programmatically open or close the Drop-Down List use
 <ApiLink name="lv_dropdown_open" display="lv_dropdown_open(dropdown)" /> or <ApiLink name="lv_dropdown_close" display="lv_dropdown_close(dropdown)" />.
 
+### Styling
+
+<LvglXMLExample name="lv_example_dropdown_styling" path="widgets/dropdown/dropdown_styling/lv_example_dropdown_styling" />
+
+The dropdown's primary surface is <ApiLink name="LV_PART_MAIN" /> — the
+tap target the user sees when the list is closed. It accepts the full
+background stack: `bg_color`, `radius`, `border_*`, `outline_*`,
+`shadow_*`, `pad_*`, and `text_*`. Combine with states for visual
+feedback: `selector="main|focused"`, `selector="main|pressed"`, or
+`selector="main|checked"` (CHECKED is set automatically while the list
+is open). The popup list is a separate object — style it via
+`lv_dropdown_get_list(dropdown)` in C; XML styling of the open list
+itself is not available. Local `style_*` props on the `<lv_dropdown>`
+tag target MAIN.
+
 ### Data binding
 
 To get familiar with observers, subjects, and data bindings in general visit the
@@ -127,6 +142,8 @@ vice versa.
 It support only integer Subjects.
 
 - <ApiLink name="lv_dropdown_bind_value" display="lv_dropdown_bind_value(dropdown, &subject)" />
+
+<LvglXMLExample name="lv_example_dropdown_bind_value" path="widgets/dropdown/dropdown_bind_value/lv_example_dropdown_bind_value" />
 
 ## Events
 

@@ -47,6 +47,8 @@
  * Images
  *----------------*/
 
+const void * img_cogwheel;
+
 /*----------------
  * Global styles
  *----------------*/
@@ -54,6 +56,12 @@
 /*----------------
  * Subjects
  *----------------*/
+
+lv_subject_t subject_value;
+lv_subject_t subject_value2;
+lv_subject_t subject_index;
+lv_subject_t subject_flag;
+lv_subject_t subject_text;
 
 /**********************
  *      MACROS
@@ -76,6 +84,9 @@ void xml_project_init_gen(const char * asset_path)
     /*----------------
      * Images
      *----------------*/
+    lv_snprintf(buf, 256, "%s%s", asset_path, "../assets/img_cogwheel_argb.png");
+    img_cogwheel = lv_strdup(buf);
+
     /*----------------
      * Global styles
      *----------------*/
@@ -83,6 +94,23 @@ void xml_project_init_gen(const char * asset_path)
     /*----------------
      * Subjects
      *----------------*/
+    lv_subject_init_int(&subject_value, 50);
+    lv_subject_set_min_value_int(&subject_value, 0);
+    lv_subject_set_max_value_int(&subject_value, 100);
+    lv_subject_init_int(&subject_value2, 20);
+    lv_subject_set_min_value_int(&subject_value2, 0);
+    lv_subject_set_max_value_int(&subject_value2, 100);
+    lv_subject_init_int(&subject_index, 0);
+    lv_subject_init_int(&subject_flag, 0);
+    static char subject_text_buf[UI_SUBJECT_STRING_LENGTH];
+    static char subject_text_prev_buf[UI_SUBJECT_STRING_LENGTH];
+    lv_subject_init_string(&subject_text,
+                           subject_text_buf,
+                           subject_text_prev_buf,
+                           UI_SUBJECT_STRING_LENGTH,
+                           "Hello"
+                          );
+
     /*----------------
      * Translations
      *----------------*/
@@ -93,6 +121,11 @@ void xml_project_init_gen(const char * asset_path)
     /* Register fonts */
 
     /* Register subjects */
+    lv_xml_register_subject(NULL, "subject_value", &subject_value);
+    lv_xml_register_subject(NULL, "subject_value2", &subject_value2);
+    lv_xml_register_subject(NULL, "subject_index", &subject_index);
+    lv_xml_register_subject(NULL, "subject_flag", &subject_flag);
+    lv_xml_register_subject(NULL, "subject_text", &subject_text);
 
     /* Register callbacks */
 #endif
@@ -101,6 +134,7 @@ void xml_project_init_gen(const char * asset_path)
      * While running in the editor skip this step to update the preview when the XML changes */
 #if LV_USE_XML && !defined(LV_EDITOR_PREVIEW)
     /* Register images */
+    lv_xml_register_image(NULL, "img_cogwheel", img_cogwheel);
 #endif
 
 #if LV_USE_XML == 0

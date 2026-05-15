@@ -23,7 +23,7 @@ void lv_example_tabview_tab_bar_style_create(void)
     lv_obj_t * lv_tabview_0 = lv_tabview_create(screen);
     lv_obj_set_size(lv_tabview_0, lv_pct(100), lv_pct(100));
     lv_tabview_set_tab_bar_position(lv_tabview_0, LV_DIR_LEFT);
-    lv_tabview_set_active(lv_tabview_0, 1);
+    lv_tabview_set_active(lv_tabview_0, 1, LV_ANIM_OFF);
     lv_obj_set_style_bg_color(lv_tabview_0, lv_color_hex(0x37474f), 0);
     lv_obj_set_style_bg_opa(lv_tabview_0, (255 * 100 / 100), 0);
     lv_obj_t * lv_tabview_tab_bar_0 = lv_tabview_get_tab_bar(lv_tabview_0);

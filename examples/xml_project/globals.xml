@@ -12,11 +12,21 @@
     </styles>
 
     <subjects>
-        <!-- Add <int>, <string>, or <float> subjects here -->
+        <!-- Generic subjects used by the data-binding examples. Each binding
+             example reuses these so users don't have to invent new subject
+             names per example. -->
+        <int    name="subject_value"  value="50" min_value="0" max_value="100"/>
+        <int    name="subject_value2" value="20" min_value="0" max_value="100"/>
+        <int    name="subject_index"  value="0"/>
+        <int    name="subject_flag"   value="0"/>
+        <string name="subject_text"   value="Hello"/>
     </subjects>
 
     <images>
-        <!-- Add <file> or <data> tags here -->
+        <!-- Use a pre-built image bundled with the legacy examples so the
+             image example doesn't depend on the editor's image-conversion
+             pipeline. -->
+        <file name="img_cogwheel" src_path="../assets/img_cogwheel_argb.png" />
     </images>
 
     <fonts>

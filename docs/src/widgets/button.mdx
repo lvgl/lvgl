@@ -23,6 +23,38 @@ Buttons, by default, differ from the Base Widget in the following ways:
 
 There are no new features compared to [Base Widget](/widgets/base_widget).
 
+### Basics
+
+A button is a clickable Base Widget. The default `LV_SIZE_CONTENT` width and
+height let it wrap tightly around its label child; setting an explicit `width`
+or `height` overrides this.
+
+<LvglXMLExample name="lv_example_button_basic" path="widgets/button/button_basic/lv_example_button_basic" />
+
+### States
+
+Buttons inherit base-widget states. The two most relevant for buttons are
+<ApiLink name="LV_STATE_CHECKED" /> (combined with the
+<ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> flag so a click toggles the state)
+and <ApiLink name="LV_STATE_DISABLED" />, which mutes the button and stops
+input events.
+
+<LvglXMLExample name="lv_example_button_states" path="widgets/button/button_states/lv_example_button_states" />
+
+### Styling
+
+<LvglXMLExample name="lv_example_button_styling" path="widgets/button/button_styling/lv_example_button_styling" />
+
+A button only has <ApiLink name="LV_PART_MAIN" />, but it picks up the
+full base-widget style stack: `bg_color`, `radius`, `border_*`,
+`outline_*`, `shadow_*`, `pad_*`, and `text_color`. The interesting
+piece is state-aware styling: declare separate `<style>` blocks and
+attach them with `selector="pressed"`, `selector="checked"`,
+`selector="focused"`, or `selector="disabled"` so the rendered button
+changes its look as the user interacts with it. Local `style_*` props
+on the `<lv_button>` tag are a shortcut when you only need a single
+state.
+
 ## Events
 
 - <ApiLink name="LV_EVENT_VALUE_CHANGED" /> when the <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> flag is
@@ -44,19 +76,5 @@ and <ApiLink name="LV_EVENT_RELEASED" /> etc.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Simple Buttons
-
-<LvglExample name="lv_example_button_1" path="widgets/button/lv_example_button_1" />
-
-### Styling buttons
-
-<LvglExample name="lv_example_button_2" path="widgets/button/lv_example_button_2" />
-
-### Gummy button
-
-<LvglExample name="lv_example_button_3" path="widgets/button/lv_example_button_3" />
 
 ## API

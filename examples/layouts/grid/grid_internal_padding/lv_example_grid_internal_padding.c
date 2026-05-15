@@ -16,16 +16,16 @@ void lv_example_grid_internal_padding_create(void)
 {
     static lv_style_t style_chip;
 
-    static bool style_inited = false;
+    static bool inited = false;
 
-    if(!style_inited) {
+    if(!inited) {
         lv_style_init(&style_chip);
         lv_style_set_bg_opa(&style_chip, (255 * 100 / 100));
         lv_style_set_text_color(&style_chip, lv_color_hex(0xffffff));
         lv_style_set_pad_all(&style_chip, 6);
         lv_style_set_radius(&style_chip, 4);
 
-        style_inited = true;
+        inited = true;
     }
 
     lv_obj_t * screen = lv_screen_active();

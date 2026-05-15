@@ -24,15 +24,19 @@ value other than the minimum value in its range adjusts the start position of th
 
 ### Orientation and size
 
+<LvglXMLExample name="lv_example_bar_orientation" path="widgets/bar/bar_orientation/lv_example_bar_orientation" />
+
 - for orientation, width and height, simply set width and height style properties;
 - <ApiLink name="lv_bar_set_orientation" display="lv_bar_set_orientation(bar, orientation)" /> to override orientation
   caused by `width` and `height`.  Valid values for `orientation` are:
-  
+
   - <ApiLink name="LV_BAR_ORIENTATION_AUTO" />
   - <ApiLink name="LV_BAR_ORIENTATION_HORIZONTAL" />
   - <ApiLink name="LV_BAR_ORIENTATION_VERTICAL" />
 
 ### Value and range
+
+<LvglXMLExample name="lv_example_bar_value_range" path="widgets/bar/bar_value_range/lv_example_bar_value_range" />
 
 A new value can be set with
 <ApiLink name="lv_bar_set_value" display="lv_bar_set_value(bar, new_value, LV_ANIM_ON/OFF)" />. The value is
@@ -47,6 +51,8 @@ animation depending on the last parameter (`LV_ANIM_ON/OFF`).
 
 ### Modes
 
+<LvglXMLExample name="lv_example_bar_modes" path="widgets/bar/bar_modes/lv_example_bar_modes" />
+
 The Bar can be one of the following modes:
 
 - <ApiLink name="LV_BAR_MODE_NORMAL" /> A normal Bar as described above
@@ -55,6 +61,19 @@ The Bar can be one of the following modes:
 - <ApiLink name="LV_BAR_MODE_RANGE" /> Allows setting the start value as well with
   <ApiLink name="lv_bar_set_start_value" display="lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)" />. The start
   value must be smaller than the end value.
+
+### Styling
+
+<LvglXMLExample name="lv_example_bar_styling" path="widgets/bar/bar_styling/lv_example_bar_styling" />
+
+Bar has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the
+background track) and <ApiLink name="LV_PART_INDICATOR" /> (the filled
+portion). Both accept the full background style stack: `bg_color`,
+`bg_grad_color` + `bg_grad_dir` for gradients, `radius`, `border_*`,
+`shadow_*`, and `pad_*`. Attach a named `<style>` with
+`selector="main"` or `selector="indicator"` to target a part, or set
+local `style_*` props on the `<lv_bar>` tag for one-off tweaks. Padding
+on MAIN shrinks the indicator inside the track.
 
 ### Data binding
 
@@ -68,6 +87,8 @@ the subject changes the Bar will be updated too.
 It supports integer and float subjects.
 
 - <ApiLink name="lv_bar_bind_value" display="lv_bar_bind_value(bar, &subject)" />
+
+<LvglXMLExample name="lv_example_bar_bind_value" path="widgets/bar/bar_bind_value/lv_example_bar_bind_value" />
 
 ## Events
 
@@ -86,35 +107,5 @@ No *Keys* are processed by Bar Widgets.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Simple Bar
-
-<LvglExample name="lv_example_bar_1" path="widgets/bar/lv_example_bar_1" />
-
-### Styling a bar
-
-<LvglExample name="lv_example_bar_2" path="widgets/bar/lv_example_bar_2" />
-
-### Temperature meter
-
-<LvglExample name="lv_example_bar_3" path="widgets/bar/lv_example_bar_3" />
-
-### Stripe pattern and range value
-
-<LvglExample name="lv_example_bar_4" path="widgets/bar/lv_example_bar_4" />
-
-### Bar with LTR and RTL base direction
-
-<LvglExample name="lv_example_bar_5" path="widgets/bar/lv_example_bar_5" />
-
-### Custom drawer to show the current value
-
-<LvglExample name="lv_example_bar_6" path="widgets/bar/lv_example_bar_6" />
-
-### Bar with opposite direction
-
-<LvglExample name="lv_example_bar_7" path="widgets/bar/lv_example_bar_7" />
 
 ## API

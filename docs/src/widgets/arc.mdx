@@ -75,6 +75,20 @@ its change is limited according to its *change rate*.  Change rate is defined in
 degrees/second units and can be set with
 <ApiLink name="lv_arc_set_change_rate" display="lv_arc_set_change_rate(arc, rate)" />
 
+### Styling
+
+<LvglXMLExample name="lv_example_arc_styling" path="widgets/arc/arc_styling/lv_example_arc_styling" />
+
+Arc's three parts — <ApiLink name="LV_PART_MAIN" /> (background ring),
+<ApiLink name="LV_PART_INDICATOR" /> (active arc), and
+<ApiLink name="LV_PART_KNOB" /> — are styled independently. Use the
+`arc_*` style properties (`arc_color`, `arc_width`, `arc_rounded`,
+`arc_opa`) for the two rings; the knob is a fill and accepts the full
+`bg_*`, `border_*`, `shadow_*`, and `pad_*` stack. Attach a named style
+via `selector="main"`, `selector="indicator"`, or `selector="knob"`,
+or apply one-off tweaks with local `style_*` attributes on the
+`<lv_arc>` tag.
+
 ### Knob offset
 
 Changing the knob offset allows the location of the knob to be moved
@@ -146,6 +160,8 @@ versa.
 It supports integer subjects and, when <ApiLink name="LV_USE_FLOAT" /> is enabled, float subjects.
 
 - <ApiLink name="lv_arc_bind_value" display="lv_arc_bind_value(arc, &subject)" />
+
+<LvglXMLExample name="lv_example_arc_bind_value" path="widgets/arc/arc_bind_value/lv_example_arc_bind_value" />
 
 ## Events
 

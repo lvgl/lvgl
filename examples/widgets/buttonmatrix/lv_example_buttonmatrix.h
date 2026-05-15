@@ -31,6 +31,7 @@ void lv_example_buttonmatrix_map_create(void);
 void lv_example_buttonmatrix_one_checked_create(void);
 void lv_example_buttonmatrix_popover_create(void);
 void lv_example_buttonmatrix_recolor_create(void);
+void lv_example_buttonmatrix_styling_create(void);
 
 /**********************
  *      MACROS

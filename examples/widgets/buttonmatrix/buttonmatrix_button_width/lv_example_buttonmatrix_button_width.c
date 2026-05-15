@@ -12,6 +12,10 @@
  * skipped). Tokens like `width_1`..`width_15` give the button a relative width that
  * acts like CSS flex-grow within its row. Here the second row uses `width_1`,
  * `width_2`, `width_3`, splitting the row into a 1/6, 2/6, 3/6 ratio.
+ *
+ * The row break itself is written as `'&#10;'` — the XML numeric character entity
+ * for a newline (U+000A) — because a raw `\n` inside an attribute would stay as
+ * the literal backslash-n.
  */
 void lv_example_buttonmatrix_button_width_create(void)
 {
@@ -28,7 +32,7 @@ void lv_example_buttonmatrix_button_width_create(void)
     lv_obj_set_align(lv_buttonmatrix_0, LV_ALIGN_CENTER);
     lv_obj_set_y(lv_buttonmatrix_0, 20);
     lv_obj_set_size(lv_buttonmatrix_0, 240, 120);
-    static const char * lv_buttonmatrix_0_map_0[] = {"A", "B", "C", "\\n", "x1", "x2", "x3", NULL};
+    static const char * lv_buttonmatrix_0_map_0[] = {"A", "B", "C", "\n", "x1", "x2", "x3", NULL};
     lv_buttonmatrix_set_map(lv_buttonmatrix_0, lv_buttonmatrix_0_map_0);
     static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_WIDTH_1, LV_BUTTONMATRIX_CTRL_WIDTH_2, LV_BUTTONMATRIX_CTRL_WIDTH_3};
     lv_buttonmatrix_set_ctrl_map(lv_buttonmatrix_0, lv_buttonmatrix_0_ctrl_map_1);

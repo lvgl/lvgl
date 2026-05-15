@@ -16,15 +16,15 @@ void lv_example_flex_internal_padding_create(void)
 {
     static lv_style_t style_tag;
 
-    static bool style_inited = false;
+    static bool inited = false;
 
-    if(!style_inited) {
+    if(!inited) {
         lv_style_init(&style_tag);
         lv_style_set_bg_opa(&style_tag, (255 * 100 / 100));
         lv_style_set_pad_all(&style_tag, 8);
         lv_style_set_radius(&style_tag, 4);
 
-        style_inited = true;
+        inited = true;
     }
 
     lv_obj_t * screen = lv_screen_active();

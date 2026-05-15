@@ -16,16 +16,16 @@ void lv_example_grid_subgrid_create(void)
 {
     static lv_style_t style_tile;
 
-    static bool style_inited = false;
+    static bool inited = false;
 
-    if(!style_inited) {
+    if(!inited) {
         lv_style_init(&style_tile);
         lv_style_set_bg_opa(&style_tile, (255 * 100 / 100));
         lv_style_set_text_color(&style_tile, lv_color_hex(0xffffff));
         lv_style_set_pad_all(&style_tile, 6);
         lv_style_set_radius(&style_tile, 4);
 
-        style_inited = true;
+        inited = true;
     }
 
     lv_obj_t * screen = lv_screen_active();

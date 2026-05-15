@@ -58,6 +58,15 @@ from pathlib import Path
 # and (b) compute the relative path to `lvgl.h` for include rewriting.
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
+# Subjects declared at the project level (one source of truth) so each example
+# can pull the names/types/initial-values it actually references.
+GLOBALS_XML_PATH = REPO_ROOT / "examples" / "xml_project" / "globals.xml"
+
+# Fixed buffer size used for string subjects when promoted into example-local
+# inits. The project's gen header uses `UI_SUBJECT_STRING_LENGTH = 256`; the
+# example files don't include that header so we inline the literal here.
+SUBJECT_STRING_BUF_SIZE = 256
+
 
 # =============================================================================
 # Generator boilerplate removal
@@ -474,6 +483,235 @@ def map_xml_comments(source: str, path: Path) -> str:
 
 
 # =============================================================================
+# Local subject inits
+# =============================================================================
+#
+# Subjects are declared once in `examples/xml_project/globals.xml`. The
+# generator emits `&subject_X` references but assumes those subjects are
+# externs defined by the project init code. For standalone example files we
+# instead want each example to declare and initialise the subjects it
+# references, so a reader can copy-paste the example and have it work.
+#
+# This section:
+#   * Parses `globals.xml` (once) to learn each subject's type and initial
+#     value.
+#   * Scans the C source for `&subject_X` references.
+#   * Injects `static lv_subject_t subject_X;` declarations alongside any
+#     existing `static lv_style_t` declarations.
+#   * Injects `lv_subject_init_*(...)` calls inside the existing
+#     `if (!style_inited) { ... }` block — or creates the block if the file
+#     has no styles yet but does have subjects to init.
+#
+# It uses `style_inited` as the label here because `remove_empty_style_inited`
+# downstream of it still matches that name. The final rename to plain
+# `inited` happens after the empty-block removal step.
+
+
+def _load_globals_subjects() -> dict[str, dict]:
+    """Return a mapping `name -> {type, value, min_value, max_value}` from
+    `globals.xml`.
+
+    Cached on first call. Subjects keep their declaration order (Python 3.7+
+    dict preserves insertion order), which we lean on when emitting init
+    blocks so the example files stay diff-stable run-to-run.
+    """
+    cache = getattr(_load_globals_subjects, "_cache", None)
+    if cache is not None:
+        return cache
+
+    subjects: dict[str, dict] = {}
+    if GLOBALS_XML_PATH.exists():
+        tree = ET.parse(GLOBALS_XML_PATH)
+        subjects_elem = tree.getroot().find("subjects")
+        if subjects_elem is not None:
+            for child in subjects_elem:
+                # ElementTree gives us comment nodes too when comments are
+                # captured; filter those out by checking the tag is a real
+                # string.
+                if not isinstance(child.tag, str):
+                    continue
+                name = child.get("name")
+                if not name:
+                    continue
+                subjects[name] = {
+                    "type": child.tag,  # "int", "string", "float"
+                    "value": child.get("value", "0"),
+                    "min_value": child.get("min_value"),
+                    "max_value": child.get("max_value"),
+                }
+
+    _load_globals_subjects._cache = subjects  # type: ignore[attr-defined]
+    return subjects
+
+
+def _subject_decl_lines(name: str, meta: dict) -> list[str]:
+    """Top-of-function static declarations for a subject (4-space indent).
+
+    `string` subjects need two backing buffers — value and previous-value —
+    plus the subject itself.
+    """
+    out = [f"    static lv_subject_t {name};"]
+    if meta["type"] == "string":
+        out.append(f"    static char {name}_buf[{SUBJECT_STRING_BUF_SIZE}];")
+        out.append(f"    static char {name}_prev_buf[{SUBJECT_STRING_BUF_SIZE}];")
+    return out
+
+
+def _subject_init_lines(name: str, meta: dict) -> list[str]:
+    """Init-block calls for a subject (8-space indent, inside `if (!inited)`)."""
+    typ = meta["type"]
+    value = meta["value"]
+    out: list[str] = []
+    if typ == "int":
+        out.append(f"        lv_subject_init_int(&{name}, {value});")
+        if meta.get("min_value") is not None:
+            out.append(
+                f"        lv_subject_set_min_value_int(&{name}, {meta['min_value']});"
+            )
+        if meta.get("max_value") is not None:
+            out.append(
+                f"        lv_subject_set_max_value_int(&{name}, {meta['max_value']});"
+            )
+    elif typ == "float":
+        out.append(f"        lv_subject_init_float(&{name}, {value});")
+    elif typ == "string":
+        # Multi-line call to match the canonical formatting of generated
+        # project code; the args are too long to fit comfortably on one line.
+        out.extend([
+            f"        lv_subject_init_string(&{name},",
+            f"                               {name}_buf,",
+            f"                               {name}_prev_buf,",
+            f"                               {SUBJECT_STRING_BUF_SIZE},",
+            f'                               "{value}");',
+        ])
+    return out
+
+
+# Locates the function body's opening brace. We pair it with FUNCTION_DECL_RE
+# (defined earlier) when we need to insert a fresh `style_inited` block in a
+# file that didn't have one.
+FUNCTION_OPEN_BRACE_RE = re.compile(
+    r"^(void\s+\w+_create\s*\(\s*void\s*\))\s*\n\{\s*\n", re.MULTILINE
+)
+
+# Captures the body of the existing `static bool style_inited` block so we
+# can splice subject inits in just before the `style_inited = true;` line.
+INITED_BLOCK_RE = re.compile(
+    r"""
+    (?P<head>[ \t]*static\ bool\ style_inited\ =\ false;[ \t]*\n
+             (?:[ \t]*\n)*
+             [ \t]*if\ \(!style_inited\)\ \{[ \t]*\n)
+    (?P<body>(?:.*?\n)*?)
+    (?P<tail>[ \t]*style_inited\ =\ true;[ \t]*\n
+             [ \t]*\}[ \t]*\n)
+    """,
+    re.VERBOSE,
+)
+
+
+def _used_subjects(source: str) -> list[str]:
+    """Return subjects from globals.xml referenced as `&name` in `source`,
+    keeping `globals.xml` order (for stable output)."""
+    meta = _load_globals_subjects()
+    return [n for n in meta if re.search(rf"&{re.escape(n)}\b", source)]
+
+
+def init_subjects(source: str, path: Path) -> str:
+    """Add `static lv_subject_t` declarations + init calls for any subject
+    the example references, so the file is self-contained.
+
+    Idempotent: a subject that already has a `static lv_subject_t <name>`
+    declaration isn't re-declared, and one that already has an
+    `lv_subject_init_*(&<name>` call isn't re-initialised.
+    """
+    meta = _load_globals_subjects()
+    if not meta:
+        return source
+
+    used = _used_subjects(source)
+    if not used:
+        return source
+
+    new_decls: list[str] = []
+    new_inits: list[str] = []
+    for name in used:
+        if not re.search(rf"\bstatic\s+lv_subject_t\s+{re.escape(name)}\b", source):
+            new_decls.extend(_subject_decl_lines(name, meta[name]))
+        if not re.search(
+            rf"lv_subject_init_(?:int|float|string)\s*\(\s*&{re.escape(name)}\b",
+            source,
+        ):
+            new_inits.extend(_subject_init_lines(name, meta[name]))
+
+    if not new_decls and not new_inits:
+        return source
+
+    block_match = INITED_BLOCK_RE.search(source)
+    if block_match:
+        # The example already has a `style_inited` block (typically because
+        # it has styles). Splice the subject decls in just before the block
+        # and the init lines in just before `style_inited = true;`.
+        block_start = block_match.start()
+        head = block_match.group("head")
+        body = block_match.group("body")
+        tail = block_match.group("tail")
+
+        if new_inits:
+            extra = "\n".join(new_inits) + "\n"
+            body = body + extra
+
+        new_block = head + body + tail
+
+        before_block = source[:block_start]
+        after_block = source[block_match.end():]
+
+        if new_decls:
+            # Insert decls just before the block, separated by a blank line
+            # from any earlier static declarations.
+            decl_text = "\n".join(new_decls) + "\n\n"
+            before_block = before_block + decl_text
+
+        return before_block + new_block + after_block
+
+    # No existing block — synthesise one right after the function's `{`.
+    fn_match = FUNCTION_OPEN_BRACE_RE.search(source)
+    if not fn_match:
+        return source
+
+    insert_pos = fn_match.end()
+    lines: list[str] = []
+    if new_decls:
+        lines.extend(new_decls)
+        lines.append("")
+    lines.append("    static bool style_inited = false;")
+    lines.append("")
+    lines.append("    if (!style_inited) {")
+    lines.extend(new_inits)
+    lines.append("        style_inited = true;")
+    lines.append("    }")
+    lines.append("")
+    block_text = "\n".join(lines) + "\n"
+    return source[:insert_pos] + block_text + source[insert_pos:]
+
+
+# =============================================================================
+# Rename `style_inited` → `inited`
+# =============================================================================
+#
+# After empty-block removal has done its job (which matches the literal name
+# `style_inited`), rename any surviving guards. The block now also gates
+# subject inits, so the more generic `inited` reads cleaner than
+# `style_inited`. Whole-word match so we don't touch unrelated identifiers
+# that happen to contain the substring.
+
+STYLE_INITED_NAME_RE = re.compile(r"\bstyle_inited\b")
+
+
+def rename_style_inited(source: str) -> str:
+    return STYLE_INITED_NAME_RE.sub("inited", source)
+
+
+# =============================================================================
 # Whitespace cleanup
 # =============================================================================
 
@@ -518,6 +756,9 @@ def strip_trailing_whitespace(source: str) -> str:
 #   * `remove_blank_after_open_brace` runs last so it can clean up blanks
 #     left by everything else.
 TRANSFORMATIONS = [
+    # Subject decls/inits — must run before the empty-block removal so the
+    # block isn't yet "empty" when we want to fill it.
+    init_subjects,
     # Generator boilerplate.
     lambda s, p: remove_empty_style_inited(s),
     lambda s, p: remove_lv_trace_obj_create(s),
@@ -535,6 +776,10 @@ TRANSFORMATIONS = [
     # XML doc mapping.
     add_top_level_doc_comment,
     map_xml_comments,
+    # Rename the guard variable now that the block has potentially gained
+    # subject inits — `inited` reads better than the legacy `style_inited`.
+    # Must follow `remove_empty_style_inited` which matches the literal name.
+    lambda s, p: rename_style_inited(s),
     # Whitespace cleanup (always last so it can mop up).
     lambda s, p: remove_blank_after_open_brace(s),
     lambda s, p: strip_trailing_whitespace(s),

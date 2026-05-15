@@ -164,6 +164,18 @@ It will be treated as a template which will be used to create the scroll animati
 The Labels can display symbols alongside letters (or on their own). Read
 the [Overview](/main-modules/fonts/overview) section to learn more about symbols.
 
+### Styling
+
+<LvglXMLExample name="lv_example_label_styling" path="widgets/label/label_styling/lv_example_label_styling" />
+
+A Label is mostly text but inherits the full base-widget background
+stack. `bg_color` + `bg_opa` + `radius` + `pad_*` turn a label into a
+chip or pill; add `border_*`, `outline_*`, and `shadow_*` for cards or
+call-outs. `text_color`, `text_font`, and `text_align` control the
+glyphs. Use a named `<style>` block when the look is reused across
+multiple labels (e.g. a "badge" style), or set local `style_*` props
+directly on the `<lv_label>` tag for one-off variations.
+
 ### Data binding
 
 To get familiar with observers, subjects, and data bindings in general visit the
@@ -185,6 +197,8 @@ the Subject's value is used to update the Label's text as follows:
 Note that this is a one-way binding (Subject ===> Widget).
 
 - <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, format_string)" />
+
+<LvglXMLExample name="lv_example_label_bind_text" path="widgets/label/label_bind_text/lv_example_label_bind_text" />
 
 ##### The `format_string` Argument
 

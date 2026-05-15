@@ -17,16 +17,16 @@ void lv_example_grid_cell_span_create(void)
 {
     static lv_style_t style_card;
 
-    static bool style_inited = false;
+    static bool inited = false;
 
-    if(!style_inited) {
+    if(!inited) {
         lv_style_init(&style_card);
         lv_style_set_bg_color(&style_card, lv_color_hex(0xf6f6f6));
         lv_style_set_bg_opa(&style_card, (255 * 100 / 100));
         lv_style_set_pad_all(&style_card, 6);
         lv_style_set_radius(&style_card, 6);
 
-        style_inited = true;
+        inited = true;
     }
 
     lv_obj_t * screen = lv_screen_active();

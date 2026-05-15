@@ -59,9 +59,17 @@ extern "C" {
  * Images
  *----------------*/
 
+extern const void * img_cogwheel;
+
 /*----------------
  * Subjects
  *----------------*/
+
+extern lv_subject_t subject_value;
+extern lv_subject_t subject_value2;
+extern lv_subject_t subject_index;
+extern lv_subject_t subject_flag;
+extern lv_subject_t subject_text;
 
 /**********************
  * GLOBAL PROTOTYPES

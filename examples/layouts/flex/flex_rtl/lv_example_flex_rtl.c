@@ -16,15 +16,15 @@ void lv_example_flex_rtl_create(void)
 {
     static lv_style_t style_label;
 
-    static bool style_inited = false;
+    static bool inited = false;
 
-    if(!style_inited) {
+    if(!inited) {
         lv_style_init(&style_label);
         lv_style_set_bg_opa(&style_label, (255 * 100 / 100));
         lv_style_set_text_color(&style_label, lv_color_hex(0xffffff));
         lv_style_set_pad_all(&style_label, 8);
 
-        style_inited = true;
+        inited = true;
     }
 
     lv_obj_t * screen = lv_screen_active();
