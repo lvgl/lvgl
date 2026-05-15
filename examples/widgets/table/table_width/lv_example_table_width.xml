@@ -1,0 +1,32 @@
+<!--
+ @title Table column widths
+ @brief Set per-column pixel widths through `<lv_table-column>` children.
+
+ By default every column gets the same width (the table's content area
+ divided by `column_count`). A `<lv_table-column>` child overrides that for
+ a single column: pick a column index and give it a `width` in pixels.
+ Mixing default-width and explicit-width columns is fine — only the ones
+ you address change.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Edit the `width` values to redistribute horizontal space between columns. -->
+		<lv_label width="100%" style_text_align="center" text="Table: column widths" />
+
+		<lv_table row_count="3" column_count="3">
+			<lv_table-column column="0" width="50px" />
+			<lv_table-column column="1" width="180px" />
+			<lv_table-column column="2" width="80px" />
+
+			<lv_table-cell row="0" column="0" value="No." />
+			<lv_table-cell row="0" column="1" value="Description" />
+			<lv_table-cell row="0" column="2" value="Price" />
+			<lv_table-cell row="1" column="0" value="1" />
+			<lv_table-cell row="1" column="1" value="Espresso, small" />
+			<lv_table-cell row="1" column="2" value="2.50" />
+			<lv_table-cell row="2" column="0" value="2" />
+			<lv_table-cell row="2" column="1" value="Cappuccino, regular" />
+			<lv_table-cell row="2" column="2" value="3.80" />
+		</lv_table>
+	</view>
+</screen>

@@ -72,6 +72,12 @@ You can specify a new map (layout) for the Keyboard with
 Button Matrix's [Button map](/widgets/buttonmatrix) section for more information about
 creating new maps.
 
+This C example replaces the default text keymap with an AZERTY layout
+(both the visible keys and the per-key control flags), demonstrating the
+shape of the two arrays passed to `lv_keyboard_set_map`:
+
+<LvglExample name="lv_example_keyboard_custom_map" path="widgets/keyboard/lv_example_keyboard_custom_map" />
+
 Keep in mind that using following keywords in the map will have the same effect as
 with the original map:
 
@@ -89,7 +95,12 @@ with the original map:
 
 Each key can be customized by using draw events such as <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />.
 
-Check out the examples to see how it can be used in the practice.
+The handler receives every draw task the keyboard emits; mutating the fill
+descriptor recolours the key, and swapping in an image draw lets you
+replace text glyphs with bitmaps. This example colours each key and
+substitutes the OK glyph with a star image:
+
+<LvglExample name="lv_example_keyboard_custom_draw" path="widgets/keyboard/lv_example_keyboard_custom_draw" />
 
 ## Events
 
@@ -125,19 +136,3 @@ Learn more about [events](/common-widget-features/events).
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Keyboard with text area
-
-<LvglExample name="lv_example_keyboard_1" path="widgets/keyboard/lv_example_keyboard_1" />
-
-### Keyboard with custom map
-
-<LvglExample name="lv_example_keyboard_2" path="widgets/keyboard/lv_example_keyboard_2" />
-
-### Keyboard with drawing
-
-<LvglExample name="lv_example_keyboard_3" path="widgets/keyboard/lv_example_keyboard_3" />
-
-## API

@@ -1,0 +1,22 @@
+<!--
+ @title Spinner basics
+ @brief A loading indicator that rotates a configurable arc segment.
+
+ A spinner is a self-animating widget: nothing has to drive its value from
+ outside. `anim_duration` is the number of milliseconds it takes to complete
+ one full rotation (lower = faster). `arc_sweep` is the angular length of
+ the moving segment in degrees — common values are 270° (a long C shape) or
+ 90° (a short dash). Width and height set the diameter; the spinner sizes
+ the arc to fill the widget.
+-->
+<screen>
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="32">
+		<!-- 💡 Lower `anim_duration` to spin faster; raise `arc_sweep` to make the moving segment longer. -->
+
+		<!-- Long arc, medium speed -->
+		<lv_spinner width="80" height="80" anim_duration="1500" arc_sweep="270" />
+
+		<!-- Short arc, faster -->
+		<lv_spinner width="80" height="80" anim_duration="600" arc_sweep="180" />
+	</view>
+</screen>

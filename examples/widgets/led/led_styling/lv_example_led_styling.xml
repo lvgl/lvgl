@@ -1,0 +1,32 @@
+<!--
+ @title LED styling
+ @brief Push the LED past its color attribute with border, outline, shadow, and shape.
+
+ The color attribute drives the base lit look, but the LED is still a base widget so
+ the border / outline / shadow / radius stack all apply. The first LED keeps the round
+ default with a ring outline + glow; the second uses a small radius to render as a
+ square indicator with a hard border instead.
+-->
+<screen>
+	<view flex_flow="row" style_flex_cross_place="center" style_flex_main_place="space_evenly" style_pad_top="56">
+		<!-- 💡 Combine color + border + outline + shadow to design status indicators. -->
+		<lv_label x="0" y="8" width="100%" style_text_align="center" text="LED: styling" />
+
+		<!-- Round LED with a tight ring outline and a soft outer glow -->
+		<lv_led width="50" height="50" color="0x22c55e"
+			style_border_color="0x14532d" style_border_width="2"
+			style_outline_color="0x22c55e" style_outline_width="6" style_outline_pad="4" style_outline_opa="80"
+			style_shadow_color="0x22c55e" style_shadow_width="20" style_shadow_opa="200" />
+
+		<!-- Square LED via small radius + hard border, no shadow -->
+		<lv_led width="50" height="50" color="0xef4444"
+			style_radius="6"
+			style_border_color="0x7f1d1d" style_border_width="3"
+			style_shadow_width="0" />
+
+		<!-- Dimmed LED with a heavy outline ring as a "pending" indicator -->
+		<lv_led width="50" height="50" color="0xf59e0b" brightness="120"
+			style_outline_color="0xf59e0b" style_outline_width="3" style_outline_pad="6" style_outline_opa="180"
+			style_shadow_width="0" />
+	</view>
+</screen>

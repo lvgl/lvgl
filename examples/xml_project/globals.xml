@@ -15,8 +15,9 @@
         <!-- Generic subjects used by the data-binding examples. Each binding
              example reuses these so users don't have to invent new subject
              names per example. -->
-        <int    name="subject_value"  value="50" min_value="0" max_value="100"/>
-        <int    name="subject_value2" value="20" min_value="0" max_value="100"/>
+        <int    name="subject_value"  value="50"  min_value="0" max_value="100"/>
+        <int    name="subject_value2" value="20"  min_value="0" max_value="100"/>
+        <int    name="subject_opa"    value="128" min_value="0" max_value="255"/>
         <int    name="subject_index"  value="0"/>
         <int    name="subject_flag"   value="0"/>
         <string name="subject_text"   value="Hello"/>

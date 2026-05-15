@@ -1,0 +1,45 @@
+/**
+ * @file lv_example_checkbox_bind_checked.c
+ */
+
+#include "../../../../lvgl.h"
+
+/**
+ * @title Checkbox bind checked + bind flag
+ * @brief A checkbox drives an int subject; a sibling label hides when the subject is zero.
+ *
+ * `bind_checked` connects the checkbox's checked state to `subject_flag` (0 or 1).
+ * The note label uses `bind_flag_if_eq` to enable the `hidden` flag while
+ * `subject_flag` equals 0 — so the label only shows once the box is ticked.
+ */
+void lv_example_checkbox_bind_checked_create(void)
+{
+    static lv_subject_t subject_flag;
+
+    static bool inited = false;
+
+    if(!inited) {
+        lv_subject_init_int(&subject_flag, 0);
+        inited = true;
+    }
+
+    lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_row(screen, 16, 0);
+
+    /* 💡 Toggle the checkbox; the note appears/disappears as `subject_flag` flips between 0 and 1. */
+    lv_obj_t * lv_label_0 = lv_label_create(screen);
+    lv_obj_set_width(lv_label_0, lv_pct(100));
+    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text(lv_label_0, "Checkbox: bind checked");
+
+    lv_obj_t * lv_checkbox_0 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(lv_checkbox_0, "Show extra details");
+    lv_obj_bind_checked(lv_checkbox_0, &subject_flag);
+
+    lv_obj_t * lv_label_1 = lv_label_create(screen);
+    lv_label_set_text(lv_label_1, "Extra details only visible while the box is ticked.");
+    lv_obj_bind_flag_if_eq(lv_label_1, &subject_flag, LV_OBJ_FLAG_HIDDEN, 0);
+}
+

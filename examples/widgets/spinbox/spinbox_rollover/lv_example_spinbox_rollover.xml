@@ -1,0 +1,22 @@
+<!--
+ @title Spinbox rollover
+ @brief Wrap the value around when it hits a bound instead of sticking.
+
+ `rollover="true"` makes the spinbox treat its range as circular: pressing
+ past `max_value` jumps to `min_value` and vice versa. This is convenient
+ for cyclic quantities like hours (0..23) or angles (0..359), where the user
+ should be able to step from 23 → 0 without re-entering the value.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Increment past 23; the value wraps to 0 because `rollover="true"`. -->
+		<lv_label width="100%" style_text_align="center" text="Spinbox: rollover" />
+
+		<lv_spinbox width="160"
+			digit_count="2"
+			value="22"
+			min_value="0" max_value="23"
+			step="1"
+			rollover="true" />
+	</view>
+</screen>

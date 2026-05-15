@@ -1,0 +1,36 @@
+<!--
+ @title Scale tick configuration
+ @brief Tune tick density and which ticks count as "major" (drawn longer with labels).
+
+ `total_tick_count` is the *total* number of ticks rendered — both minor and
+ major. `major_tick_every` picks every Nth tick to be drawn longer and
+ (when `label_show="true"`) carry a numeric label. The three scales below
+ share the same physical width but vary their tick density.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="20">
+		<!-- 💡 Bump `total_tick_count` or change `major_tick_every` to see how density and labels reorganise. -->
+		<lv_label width="100%" style_text_align="center" text="Scale: tick configuration" />
+
+		<!-- Sparse: 5 ticks total, every second one major -->
+		<lv_scale width="260" height="60"
+			mode="horizontal_bottom"
+			total_tick_count="5" major_tick_every="2"
+			label_show="true"
+			min_value="0" max_value="100" />
+
+		<!-- Medium: 11 ticks, every 5th major -->
+		<lv_scale width="260" height="60"
+			mode="horizontal_bottom"
+			total_tick_count="11" major_tick_every="5"
+			label_show="true"
+			min_value="0" max_value="100" />
+
+		<!-- Dense: 21 ticks, every 4th major — minor ticks become visible -->
+		<lv_scale width="260" height="60"
+			mode="horizontal_bottom"
+			total_tick_count="21" major_tick_every="4"
+			label_show="true"
+			min_value="0" max_value="100" />
+	</view>
+</screen>

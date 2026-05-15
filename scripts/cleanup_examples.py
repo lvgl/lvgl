@@ -695,6 +695,68 @@ def init_subjects(source: str, path: Path) -> str:
 
 
 # =============================================================================
+# Image declarations
+# =============================================================================
+#
+# The generator emits `lv_image_set_src(img, my_image)` for registered image
+# names. To compile against a C-array image the call needs to pass `&my_image`
+# (an `lv_image_dsc_t *`) and the example must declare the symbol via
+# `LV_IMAGE_DECLARE(my_image)` so the linker can resolve the extern.
+#
+# This transformation:
+#   * Adds `&` in front of the image-name argument of every `lv_image_set_src`
+#     call (skipping ones that already have it).
+#   * Inserts `LV_IMAGE_DECLARE(<name>);` at the top of the function body for
+#     every unique image referenced this way.
+#
+# Image names that look like LVGL constants (start with `LV_`) — e.g.
+# `LV_SYMBOL_OK` — are skipped because those are string macros, not C-array
+# image descriptors.
+
+# Captures the `lv_image_set_src(obj, [&]name)` call. Groups:
+#   1 = call prefix up to and including the `,`/whitespace before the arg
+#   2 = optional `&` already present (idempotency)
+#   3 = the image identifier
+LV_IMAGE_SET_SRC_RE = re.compile(
+    r"(lv_image_set_src\s*\(\s*[A-Za-z_]\w*\s*,\s*)(&?)([A-Za-z_]\w*)"
+)
+
+
+def declare_and_ref_images(source: str, path: Path) -> str:
+    images: list[str] = []  # preserve first-seen order for stable output
+
+    def repl(m: re.Match) -> str:
+        prefix, amp, name = m.group(1), m.group(2), m.group(3)
+        if name.startswith("LV_"):
+            # `LV_SYMBOL_*` etc. — symbol macros, not C-array images.
+            return m.group(0)
+        if name not in images:
+            images.append(name)
+        return f"{prefix}&{name}" if not amp else m.group(0)
+
+    new_source = LV_IMAGE_SET_SRC_RE.sub(repl, source)
+    if not images:
+        return new_source
+
+    # Add `LV_IMAGE_DECLARE(name);` once per image at the top of the function
+    # body. Idempotent: skip names that already have a declare line.
+    fn_match = FUNCTION_OPEN_BRACE_RE.search(new_source)
+    if not fn_match:
+        return new_source
+
+    insert_pos = fn_match.end()
+    decls: list[str] = []
+    for img in images:
+        if not re.search(rf"LV_IMAGE_DECLARE\s*\(\s*{re.escape(img)}\s*\)", new_source):
+            decls.append(f"    LV_IMAGE_DECLARE({img});")
+    if not decls:
+        return new_source
+
+    block = "\n".join(decls) + "\n\n"
+    return new_source[:insert_pos] + block + new_source[insert_pos:]
+
+
+# =============================================================================
 # Rename `style_inited` → `inited`
 # =============================================================================
 #
@@ -759,6 +821,8 @@ TRANSFORMATIONS = [
     # Subject decls/inits — must run before the empty-block removal so the
     # block isn't yet "empty" when we want to fill it.
     init_subjects,
+    # Image declarations + `&` prefix.
+    declare_and_ref_images,
     # Generator boilerplate.
     lambda s, p: remove_empty_style_inited(s),
     lambda s, p: remove_lv_trace_obj_create(s),

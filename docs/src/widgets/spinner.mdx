@@ -16,11 +16,25 @@ Spinner's parts are identical to those of [Arc](/widgets/arc).
 
 ### Create a spinner
 
+<LvglXMLExample name="lv_example_spinner_basic" path="widgets/spinner/spinner_basic/lv_example_spinner_basic" />
+
 To create a spinner use
 <ApiLink name="lv_spinner_create" display="lv_spinner_create(parent)" />.
 
 Use <ApiLink name="lv_spinner_set_anim_params" display="lv_spinner_set_anim_params(spinner, spin_duration, angle)" /> to
 customize the duration of one revolution and the length of the arc.
+
+### Styling
+
+<LvglXMLExample name="lv_example_spinner_styling" path="widgets/spinner/spinner_styling/lv_example_spinner_styling" />
+
+Spinner inherits its drawing model from `lv_arc`, so it exposes the same
+parts: <ApiLink name="LV_PART_MAIN" /> for the static background ring and
+<ApiLink name="LV_PART_INDICATOR" /> for the moving arc segment. Style each
+with arc-family properties — `arc_color`, `arc_width`, `arc_rounded` —
+attached via `selector="main"` or `selector="indicator"`. Pick a faint
+colour for MAIN and a stronger accent for INDICATOR to get the familiar
+loading-spinner look.
 
 ## Events
 
@@ -39,11 +53,3 @@ No *Keys* are processed by Spinner Widgets.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Example
-
-### Simple spinner
-
-<LvglExample name="lv_example_spinner_1" path="widgets/spinner/lv_example_spinner_1" />
-
-## API

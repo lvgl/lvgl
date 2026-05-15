@@ -1,0 +1,27 @@
+<!--
+ @title Bar value and custom range
+ @brief Drive the indicator with a custom min/max range.
+
+ The first bar uses the default 0..100 range with value 30. The second bar shifts the
+ range to -20..80 with value 35 to demonstrate that ranges need not start at zero — the
+ indicator length is computed relative to wherever the range begins.
+-->
+<screen>
+	<consts>
+		<color name="text_color" value="0x013992" />
+	</consts>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Edit min_value / max_value / value to see how the indicator scales within the chosen range. -->
+		<lv_label width="100%" style_text_align="center" text="Bar: value and range" />
+
+		<!-- Default 0..100 range -->
+		<lv_bar width="220" height="16" min_value="0" max_value="100" value="30">
+			<lv_label align="center" text="0..100" style_text_color="#text_color" />
+		</lv_bar>
+
+		<!-- Custom range that does not start at zero -->
+		<lv_bar width="220" height="16" min_value="-20" max_value="80" value="35">
+			<lv_label align="center" text="-20..80" style_text_color="#text_color" />
+		</lv_bar>
+	</view>
+</screen>

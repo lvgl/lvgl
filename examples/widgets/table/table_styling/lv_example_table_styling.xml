@@ -1,0 +1,41 @@
+<!--
+ @title Table styling
+ @brief Style the table background and the per-cell appearance.
+
+ Table has two relevant parts: `MAIN` (the background and overall frame)
+ and `ITEMS` (each cell — borders, padding, text). Attaching a named
+ `style_items` style covers every cell uniformly. To make the header row
+ stand out, attach a second style with `selector="items"` and the
+ row-specific state — but XML doesn't yet have a per-row selector; instead
+ set the header row's cell `ctrl` flags or restyle in code.
+-->
+<screen>
+	<styles>
+		<style name="style_table_main"
+			bg_color="0xffffff" bg_opa="100%"
+			radius="8"
+			border_color="0xe5e7eb" border_width="1" />
+		<style name="style_table_items"
+			bg_color="0xffffff" bg_opa="100%"
+			border_color="0xe5e7eb" border_width="1"
+			pad_all="8"
+			text_color="0x111827" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Recolour `style_table_items` to apply a different look to every cell at once. -->
+		<lv_label width="100%" style_text_align="center" text="Table: styling parts" />
+
+		<lv_table row_count="3" column_count="2">
+			<lv_table-cell row="0" column="0" value="Metric" />
+			<lv_table-cell row="0" column="1" value="Value" />
+			<lv_table-cell row="1" column="0" value="Latency" />
+			<lv_table-cell row="1" column="1" value="14 ms" />
+			<lv_table-cell row="2" column="0" value="Throughput" />
+			<lv_table-cell row="2" column="1" value="98 req/s" />
+
+			<style name="style_table_main"  selector="main" />
+			<style name="style_table_items" selector="items" />
+		</lv_table>
+	</view>
+</screen>

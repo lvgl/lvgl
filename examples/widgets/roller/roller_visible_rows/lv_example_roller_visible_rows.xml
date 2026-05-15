@@ -1,0 +1,22 @@
+<!--
+ @title Roller visible row count
+ @brief Tune how many list items the roller shows at once.
+
+ `visible_row_count` determines the height of the roller in *items*, not
+ pixels — the widget computes its own pixel height from the current font and
+ line spacing. A short roller (3 rows) feels compact for a yes/no pick;
+ a tall one (7 rows) shows more context but takes more screen real estate.
+-->
+<screen>
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="32">
+		<!-- 💡 Edit `visible_row_count` on either roller to compare its overall height. -->
+
+		<lv_roller width="120" visible_row_count="3"
+			options="Jan&#10;Feb&#10;Mar&#10;Apr&#10;May&#10;Jun&#10;Jul"
+			selected="0" />
+
+		<lv_roller width="120" visible_row_count="7"
+			options="Jan&#10;Feb&#10;Mar&#10;Apr&#10;May&#10;Jun&#10;Jul"
+			selected="3" />
+	</view>
+</screen>

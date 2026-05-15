@@ -33,16 +33,16 @@ The Menu Widget is built from the following Widgets:
 This creates a Menu Widget with this object hierarchy:
 
 - Menu: <ApiLink name="lv_menu_t" />
-  
+
   - Hidden Sub-Page Storage: <ApiLink name="lv_obj_t" />
   - Main container: <ApiLink name="lv_menu_main_cont_class" />
-  
+
     - Main header: <ApiLink name="lv_menu_main_header_cont_class" />
-  
+
       - Back button: [Button (lv_button)](/widgets/button)
-  
+
         - Back button icon: [Image (lv_image)](/widgets/image)
-  
+
       - Main header title: [Label (lv_label)](/widgets/label) (default hidden)
 
 Note that no sidebar is created. You can create one later if you wish.
@@ -101,7 +101,7 @@ Menu:
 ## Events
 
 - <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when a Page is shown.
-  
+
    -  <ApiLink name="lv_menu_get_cur_main_page" display="lv_menu_get_cur_main_page(menu)" /> returns a pointer to Menu Page
       that is currently displayed in the main container.
    -  <ApiLink name="lv_menu_get_cur_sidebar_page" display="lv_menu_get_cur_sidebar_page(menu)" /> returns a pointer to Menu
@@ -109,7 +109,7 @@ Menu:
 - <ApiLink name="LV_EVENT_CLICKED" /> Sent when a back button in a header from either
    main or sidebar is clicked. <ApiLink name="LV_OBJ_FLAG_EVENT_BUBBLE" /> is enabled
    on the buttons so you can add events to the Menu itself.
-  
+
    -  <ApiLink name="lv_menu_back_button_is_root" display="lv_menu_back_button_is_root(menu, button)" /> to check if button is root
       back button.
 
@@ -148,5 +148,3 @@ Learn more about [Keys](/main-modules/indev/keypad).
 ### Complex Menu
 
 <LvglExample name="lv_example_menu_5" path="widgets/menu/lv_example_menu_5" />
-
-## API

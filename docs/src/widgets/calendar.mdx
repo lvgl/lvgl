@@ -61,6 +61,13 @@ The list of highlighted dates should be stored in a
 Only the array's pointer will be saved so the array should be have static or
 global scope.
 
+Highlighted dates aren't yet exposed through XML attributes (the dates need
+a static array that outlives the widget). This C example also wires an
+`LV_EVENT_VALUE_CHANGED` callback that logs the tapped date — the typical
+pattern for picking a day:
+
+<LvglExample name="lv_example_calendar_highlighted_days" path="widgets/calendar/lv_example_calendar_highlighted_days" />
+
 ### Names of days
 
 The names of the days can be adjusted with
@@ -92,6 +99,10 @@ culture.
 
 If you want to use the Chinese calendar, please
 use <ApiLink name="lv_calendar_set_chinese_mode" display="lv_calendar_set_chinese_mode(calendar, true)" /> to enable it.
+The mode isn't yet exposed through an XML attribute and requires a CJK
+font, so the example is C-only:
+
+<LvglExample name="lv_example_calendar_chinese" path="widgets/calendar/lv_example_calendar_chinese" />
 
 ## Events
 
@@ -130,15 +141,3 @@ current year and month.
 
 <ApiLink name="lv_calendar_add_header_dropdown" display="lv_calendar_add_header_dropdown(calendar)" /> creates a header that
 contains 2 Drop-Drown List Widgets for the year and month.
-
-## Examples
-
-### Calendar with header
-
-<LvglExample name="lv_example_calendar_1" path="widgets/calendar/lv_example_calendar_1" />
-
-### Chinese calendar
-
-<LvglExample name="lv_example_calendar_2" path="widgets/calendar/lv_example_calendar_2" />
-
-## API

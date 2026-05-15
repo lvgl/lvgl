@@ -1,0 +1,71 @@
+/**
+ * @file lv_example_checkbox_styling.c
+ */
+
+#include "../../../../lvgl.h"
+
+/**
+ * @title Checkbox styling
+ * @brief Style the tick box (INDICATOR) and its checked state separately.
+ *
+ * Checkbox exposes MAIN (label text area) and INDICATOR (tick box). The named styles
+ * target INDICATOR in both default and `checked` states so the tick box has a soft,
+ * rounded look unchecked and switches to an accent color with a tinted halo when
+ * checked. MAIN is styled with local `style_*` props to recolor the label area.
+ */
+void lv_example_checkbox_styling_create(void)
+{
+    static lv_style_t style_cb_indicator;
+    static lv_style_t style_cb_indicator_checked;
+
+    static bool inited = false;
+
+    if(!inited) {
+        lv_style_init(&style_cb_indicator);
+        lv_style_set_bg_opa(&style_cb_indicator, (255 * 100 / 100));
+        lv_style_set_bg_color(&style_cb_indicator, lv_color_hex(0xf9fafb));
+        lv_style_set_radius(&style_cb_indicator, 6);
+        lv_style_set_border_color(&style_cb_indicator, lv_color_hex(0x9ca3af));
+        lv_style_set_border_width(&style_cb_indicator, 2);
+        lv_style_set_pad_all(&style_cb_indicator, 4);
+
+        lv_style_init(&style_cb_indicator_checked);
+        lv_style_set_bg_color(&style_cb_indicator_checked, lv_color_hex(0x16a34a));
+        lv_style_set_border_color(&style_cb_indicator_checked, lv_color_hex(0x14532d));
+        lv_style_set_outline_color(&style_cb_indicator_checked, lv_color_hex(0x16a34a));
+        lv_style_set_outline_width(&style_cb_indicator_checked, 4);
+        lv_style_set_outline_pad(&style_cb_indicator_checked, 2);
+        lv_style_set_outline_opa(&style_cb_indicator_checked, 80);
+
+        inited = true;
+    }
+
+    lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_row(screen, 14, 0);
+
+    /* 💡 Click a checkbox to swap to the checked-state indicator style. */
+    lv_obj_t * lv_label_0 = lv_label_create(screen);
+    lv_obj_set_width(lv_label_0, lv_pct(100));
+    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text(lv_label_0, "Checkbox: styling parts and states");
+
+    /* Unchecked: only the default indicator style applies */
+    lv_obj_t * lv_checkbox_0 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(lv_checkbox_0, "Default look");
+    lv_obj_set_style_text_color(lv_checkbox_0, lv_color_hex(0x111827), 0);
+    lv_obj_set_style_pad_column(lv_checkbox_0, 10, 0);
+    lv_obj_add_style(lv_checkbox_0, &style_cb_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(lv_checkbox_0, &style_cb_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
+
+    /* Pre-checked so the checked-state style is visible at load time */
+    lv_obj_t * lv_checkbox_1 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(lv_checkbox_1, "Pre-checked");
+    lv_obj_set_state(lv_checkbox_1, LV_STATE_CHECKED, true);
+    lv_obj_set_style_text_color(lv_checkbox_1, lv_color_hex(0x111827), 0);
+    lv_obj_set_style_pad_column(lv_checkbox_1, 10, 0);
+    lv_obj_add_style(lv_checkbox_1, &style_cb_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(lv_checkbox_1, &style_cb_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
+}
+

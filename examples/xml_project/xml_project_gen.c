@@ -59,6 +59,7 @@ const void * img_cogwheel;
 
 lv_subject_t subject_value;
 lv_subject_t subject_value2;
+lv_subject_t subject_opa;
 lv_subject_t subject_index;
 lv_subject_t subject_flag;
 lv_subject_t subject_text;
@@ -100,6 +101,9 @@ void xml_project_init_gen(const char * asset_path)
     lv_subject_init_int(&subject_value2, 20);
     lv_subject_set_min_value_int(&subject_value2, 0);
     lv_subject_set_max_value_int(&subject_value2, 100);
+    lv_subject_init_int(&subject_opa, 128);
+    lv_subject_set_min_value_int(&subject_opa, 0);
+    lv_subject_set_max_value_int(&subject_opa, 255);
     lv_subject_init_int(&subject_index, 0);
     lv_subject_init_int(&subject_flag, 0);
     static char subject_text_buf[UI_SUBJECT_STRING_LENGTH];
@@ -123,6 +127,7 @@ void xml_project_init_gen(const char * asset_path)
     /* Register subjects */
     lv_xml_register_subject(NULL, "subject_value", &subject_value);
     lv_xml_register_subject(NULL, "subject_value2", &subject_value2);
+    lv_xml_register_subject(NULL, "subject_opa", &subject_opa);
     lv_xml_register_subject(NULL, "subject_index", &subject_index);
     lv_xml_register_subject(NULL, "subject_flag", &subject_flag);
     lv_xml_register_subject(NULL, "subject_text", &subject_text);

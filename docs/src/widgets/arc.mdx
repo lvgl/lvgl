@@ -147,6 +147,25 @@ used to rotate the Widget to the current value of the Arc.
 A typical use case is to call these functions in the `VALUE_CHANGED`
 event of the Arc.
 
+### Pie chart from arcs
+
+<LvglXMLExample name="lv_example_arc_pie_chart" path="widgets/arc/arc_pie_chart/lv_example_arc_pie_chart" />
+
+A pie chart is built from several arcs that share the same centre. Each arc
+carves out one slice via `bg_start_angle`/`bg_end_angle`, fixes `value` to
+`max_value` so the coloured indicator fills the slice end-to-end, and uses an
+`arc_width` on `LV_PART_INDICATOR` that is large enough to reach the centre
+— this turns the band into a solid wedge. Hide the bg track and the knob
+(opacity 0 on `LV_PART_MAIN` and `LV_PART_KNOB`) so nothing else is drawn.
+The slice colours are set with `style_arc_color` on the indicator part.
+
+Set `arc_rounded="false"` on the indicator: rounded end caps add a curved
+overshoot to each slice, which produces a visible gap where two slices
+meet. Square end caps let adjacent slices share their seam pixels
+exactly. The example factors the three shared bits (invisible MAIN track,
+square-ended INDICATOR, invisible KNOB) into named styles so each slice
+only declares its own angles and colour.
+
 ### Data binding
 
 To get familiar with observers, subjects, and data bindings in general visit the
@@ -182,5 +201,3 @@ Learn more about [events](/common-widget-features/events).
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## API

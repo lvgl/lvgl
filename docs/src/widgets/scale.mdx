@@ -39,7 +39,16 @@ be any of these values:
 - <ApiLink name="LV_SCALE_MODE_ROUND_INNER" />
 - <ApiLink name="LV_SCALE_MODE_ROUND_OUTER" />
 
+<LvglXMLExample name="lv_example_scale_modes" path="widgets/scale/scale_modes/lv_example_scale_modes" />
+
+The round variants additionally honour `angle_range` (the sweep in degrees)
+and `rotation` (offset of the first tick from 3 o'clock):
+
+<LvglXMLExample name="lv_example_scale_round_modes" path="widgets/scale/scale_round_modes/lv_example_scale_round_modes" />
+
 ### Setting range
+
+<LvglXMLExample name="lv_example_scale_range" path="widgets/scale/scale_range/lv_example_scale_range" />
 
 A Scale starts its life with a default numeric range of [0..100] and a default
 angular range of 270.  You can change these ranges with:
@@ -68,6 +77,8 @@ Example with ticks and labels drawn *on top of* the main line:
 ![Scale Ticks On Top](/_static/images/scale_ticks_on_top.png)
 
 ### Configuring ticks
+
+<LvglXMLExample name="lv_example_scale_ticks" path="widgets/scale/scale_ticks/lv_example_scale_ticks" />
 
 You configure the major and minor ticks of a Scale by calling 2 functions:
 
@@ -127,6 +138,32 @@ Using length and radial offset together allows total control of the tick positio
 
 It is also possible to offset the labels from the major ticks (either positive or negative) using
 <ApiLink name="lv_obj_set_style_pad_radial" display="lv_obj_set_style_pad_radial(scale, 5, LV_PART_INDICATOR)" />
+
+### Styling
+
+<LvglXMLExample name="lv_example_scale_styling" path="widgets/scale/scale_styling/lv_example_scale_styling" />
+
+Scale has three stylable parts: <ApiLink name="LV_PART_MAIN" /> (the rail
+line or arc), <ApiLink name="LV_PART_ITEMS" /> (every minor tick) and
+<ApiLink name="LV_PART_INDICATOR" /> (every major tick *plus* its label).
+Use line-family properties (`line_color`/`line_width`/`line_opa`) on each
+part for the ticks and rail; on INDICATOR you can also set text properties
+to style the numeric labels.
+
+The label rotation comes from the indicator's `transform_rotation` style —
+units are 0.1°, so `style_transform_rotation-indicator="300"` tilts every
+label by 30°. Use this on linear scales when dense labels would overlap,
+or to lay out angled labels on round modes.
+
+### Drawing customisations
+
+Style attributes can colour ticks and labels uniformly, but per-tick or
+per-label customisation needs a draw event. The scale emits
+`LV_EVENT_DRAW_TASK_ADDED` once per draw task; for label tasks
+`base_dsc->id1` and `id2` carry the tick index and tick value, which is
+enough to mutate the label text or recolour individual entries:
+
+<LvglExample name="lv_example_scale_label_recolor" path="widgets/scale/lv_example_scale_label_recolor" />
 
 ### Sections
 
@@ -257,6 +294,12 @@ attach it to the Scale as a needle with the appropriate function:
 - <ApiLink name="lv_scale_set_line_needle_value" display="lv_scale_set_line_needle_value(scale, needle_line, needle_length, value)" />
 - <ApiLink name="lv_scale_set_image_needle_value" display="lv_scale_set_image_needle_value(scale, needle_img, value)" />
 
+A round-inner scale with a line needle and an image needle, both driven
+by a periodic timer that sweeps their values — the typical gauge pattern.
+Needles aren't yet exposed through XML, so this example is C-only:
+
+<LvglExample name="lv_example_scale_needles" path="widgets/scale/lv_example_scale_needles" />
+
 ##### Data binding
 
 To get familiar with observers, subjects, and data bindings in general, visit the
@@ -295,59 +338,29 @@ No *Keys* are processed by Scale Widgets.
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
 
-## Examples
+## Showcase examples
 
-### A simple horizontal scale
+These C examples combine the features above into full mini-widgets.
+Use them as a starting point for dashboards and gauges.
 
-<LvglExample name="lv_example_scale_1" path="widgets/scale/lv_example_scale_1" />
+### Heart-rate monitor
 
-### An vertical scale with section and custom styling
+A round-inner scale split into five colour zones with a live BPM readout.
 
-<LvglExample name="lv_example_scale_2" path="widgets/scale/lv_example_scale_2" />
+<LvglExample name="lv_example_scale_heart_rate" path="widgets/scale/lv_example_scale_heart_rate" />
 
-### A simple round scale
+### Sunset / sunrise widget
 
-<LvglExample name="lv_example_scale_3" path="widgets/scale/lv_example_scale_3" />
+A round-outer scale split into day and night arcs with sunrise and sunset
+labels.
 
-### A round scale with section and custom styling
+<LvglExample name="lv_example_scale_sunset_sunrise" path="widgets/scale/lv_example_scale_sunset_sunrise" />
 
-<LvglExample name="lv_example_scale_4" path="widgets/scale/lv_example_scale_4" />
+### Compass
 
-### A scale with section and custom styling
+A round scale rotating beneath a fixed arrow as its heading sweeps 0..360°.
 
-<LvglExample name="lv_example_scale_5" path="widgets/scale/lv_example_scale_5" />
-
-### A round scale with multiple needles, resembling a clock
-
-<LvglExample name="lv_example_scale_6" path="widgets/scale/lv_example_scale_6" />
-
-### Customizing scale major tick label color with `LV_EVENT_DRAW_TASK_ADDED` event
-
-<LvglExample name="lv_example_scale_7" path="widgets/scale/lv_example_scale_7" />
-
-### A round scale with labels rotated and translated
-
-<LvglExample name="lv_example_scale_8" path="widgets/scale/lv_example_scale_8" />
-
-### A horizontal scale with labels rotated and translated
-
-<LvglExample name="lv_example_scale_9" path="widgets/scale/lv_example_scale_9" />
-
-### A round scale style simulating a Heart Rate monitor
-
-<LvglExample name="lv_example_scale_10" path="widgets/scale/lv_example_scale_10" />
-
-### A round scale style simulating a sunset/sunrise widget
-
-<LvglExample name="lv_example_scale_11" path="widgets/scale/lv_example_scale_11" />
-
-### A round scale style simulating a compass
-
-<LvglExample name="lv_example_scale_12" path="widgets/scale/lv_example_scale_12" />
-
-### Axis ticks and labels with scrolling on a chart
-
-<LvglExample name="lv_example_chart_2" path="widgets/chart/lv_example_chart_2" />
+<LvglExample name="lv_example_scale_compass" path="widgets/scale/lv_example_scale_compass" />
 
 ## API
 

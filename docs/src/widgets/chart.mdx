@@ -132,6 +132,15 @@ order, from back to front:
 
 <LvglXMLExample name="lv_example_chart_types" path="widgets/chart/chart_types/lv_example_chart_types" />
 
+For scatter charts each data point is an (X, Y) pair, and the series
+binds to both an X axis and a Y axis with `LV_CHART_AXIS_PRIMARY_X | LV_CHART_AXIS_PRIMARY_Y`.
+This C example also tints each point between red and blue based on its
+position and fades older samples — both effects are driven from
+`LV_EVENT_DRAW_TASK_ADDED`, so they stay in C even though the chart
+itself is pure widget config:
+
+<LvglExample name="lv_example_chart_scatter" path="widgets/chart/lv_example_chart_scatter" />
+
 A chart can be one of the following types:
 
 - <ApiLink name="LV_CHART_TYPE_NONE" />: Do not display any data. Can be used to hide chart's data.
@@ -244,6 +253,13 @@ mode*:
 The update mode can be changed with
 <ApiLink name="lv_chart_set_update_mode" display="lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_...)" />.
 
+A practical illustration of `LV_CHART_UPDATE_MODE_CIRCULAR`: a line series is
+fed by a timer that pushes a new random value each tick; the rendering loops
+around the buffer, leaving a small gap that marks where the next sample
+will land. Useful for ECG-style "live" plots.
+
+<LvglExample name="lv_example_chart_circular_gap" path="widgets/chart/lv_example_chart_circular_gap" />
+
 ### Number of points
 
 The number of points in the series can be modified by
@@ -304,6 +320,8 @@ chart's width and/or height to a larger value.  Doing this will cause the chart
 to be scrollable in its parent --- the parent container provides the scrollable "view
 window".
 
+<LvglXMLExample name="lv_example_chart_scrollable" path="widgets/chart/chart_scrollable/lv_example_chart_scrollable" />
+
 ### Cursor
 
 <LvglXMLExample name="lv_example_chart_cursor" path="widgets/chart/chart_cursor/lv_example_chart_cursor" />
@@ -333,7 +351,33 @@ that data point.
 <ApiLink name="lv_chart_set_cursor_point" display="lv_chart_set_cursor_point(chart, cursor, series, point_id)" /> places the
 cursor on the specified data point on the chart.  If the point's position changes
 (via a new value or via scrolling), the cursor moves with the point.
-See an example of using this function [here](#show-cursor-on-the-clicked-point).
+
+### Pressed-point tooltip
+
+`LV_EVENT_VALUE_CHANGED` fires when the user presses a chart point;
+`lv_chart_get_pressed_point` returns the index. This C example reads that
+index and floats a small tooltip with the pressed value above the chart —
+the kind of inspection helper XML can't drive on its own because it
+requires a callback.
+
+<LvglExample name="lv_example_chart_pressed_tooltip" path="widgets/chart/lv_example_chart_pressed_tooltip" />
+
+### Drawing customisations
+
+Chart styling stops at the part level — to vary appearance *per data point*
+or paint custom shapes alongside the series, hook
+`LV_EVENT_DRAW_TASK_ADDED`. The callback receives every draw task the chart
+emits and may mutate the fill/stroke descriptors before they execute, or
+draw extra shapes on the chart's layer.
+
+Recolour bars between green and red based on their value:
+
+<LvglExample name="lv_example_chart_recolor_bars" path="widgets/chart/lv_example_chart_recolor_bars" />
+
+Add a vertical gradient fill beneath a line series and restyle the
+division lines:
+
+<LvglExample name="lv_example_chart_area_gradient" path="widgets/chart/lv_example_chart_area_gradient" />
 
 ## Events
 
@@ -354,39 +398,3 @@ No *Keys* are processed by Chart Widgets.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Line Chart
-
-<LvglExample name="lv_example_chart_1" path="widgets/chart/lv_example_chart_1" />
-
-### Axis ticks and labels with scrolling
-
-<LvglExample name="lv_example_chart_2" path="widgets/chart/lv_example_chart_2" />
-
-### Show the value of the pressed points
-
-<LvglExample name="lv_example_chart_3" path="widgets/chart/lv_example_chart_3" />
-
-### Recolor bars based on their value
-
-<LvglExample name="lv_example_chart_4" path="widgets/chart/lv_example_chart_4" />
-
-### Faded area line chart with custom division lines
-
-<LvglExample name="lv_example_chart_5" path="widgets/chart/lv_example_chart_5" />
-
-### Show cursor on the clicked point
-
-<LvglExample name="lv_example_chart_6" path="widgets/chart/lv_example_chart_6" />
-
-### Scatter chart
-
-<LvglExample name="lv_example_chart_7" path="widgets/chart/lv_example_chart_7" />
-
-### Circular line chart with gap
-
-<LvglExample name="lv_example_chart_8" path="widgets/chart/lv_example_chart_8" />
-
-## API

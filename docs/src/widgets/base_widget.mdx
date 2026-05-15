@@ -53,16 +53,19 @@ underlying mechanism.
 
 ## Examples
 
-### Base objects with custom styles
-
-<LvglExample name="lv_example_obj_1" path="widgets/obj/lv_example_obj_1" />
-
 ### Make an object draggable
 
-<LvglExample name="lv_example_obj_2" path="widgets/obj/lv_example_obj_2" />
+Interactive drag-to-move is driven from an `LV_EVENT_PRESSING` callback,
+which reads the input device's motion vector and feeds it back through
+`lv_obj_set_pos`. There's no XML attribute for "drag with the pointer", so
+this lives in C.
 
-### Transform object using a 3x3 matrix
+<LvglExample name="lv_example_obj_draggable" path="widgets/obj/lv_example_obj_draggable" />
 
-<LvglExample name="lv_example_obj_3" path="widgets/obj/lv_example_obj_3" />
+### Transform an object with a 3x3 matrix
 
-## API
+A timer ticks the rotation and scale of the object via `lv_obj_set_transform`.
+This needs `LV_DRAW_TRANSFORM_USE_MATRIX` and an animation loop, neither of
+which is reachable from XML attributes — the C example shows the full setup.
+
+<LvglExample name="lv_example_obj_transform" path="widgets/obj/lv_example_obj_transform" />

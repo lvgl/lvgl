@@ -67,6 +67,7 @@ extern const void * img_cogwheel;
 
 extern lv_subject_t subject_value;
 extern lv_subject_t subject_value2;
+extern lv_subject_t subject_opa;
 extern lv_subject_t subject_index;
 extern lv_subject_t subject_flag;
 extern lv_subject_t subject_text;
@@ -94,7 +95,7 @@ void xml_project_init_gen(const char * asset_path);
  **********************/
 
 /*Include all the widgets, components and screens of this library*/
-#include "screens/lv_example_tabview_tab_button_content_gen.h"
+#include "screens/lv_example_image_recolor_gen.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

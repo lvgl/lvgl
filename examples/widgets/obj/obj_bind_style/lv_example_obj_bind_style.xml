@@ -1,0 +1,34 @@
+<!--
+ @title Obj bind style (theme toggle)
+ @brief Apply a named style only when a subject equals a reference value.
+
+ The "dark" style is attached to the panel via `<bind_style>` with
+ `subject="subject_flag"` and `ref_value="1"`: it's applied whenever
+ `subject_flag` is 1 and removed otherwise. The toggle button flips
+ `subject_flag` through `subject_toggle_event`. This is the canonical
+ "binding-driven theme switch" pattern — no event callback in user code.
+-->
+<screen>
+	<styles>
+		<!-- The dark theme: applied only when subject_flag == 1 -->
+		<style name="style_dark"
+			bg_color="0x1f2937"
+			text_color="0xf9fafb"
+			border_color="0x4b5563" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Click the toggle to flip `subject_flag` between 0 and 1; the panel restyles via `bind_style`. -->
+		<lv_label width="100%" style_text_align="center" text="Obj: bind_style (light / dark)" />
+
+		<lv_obj width="240" height="120" style_pad_all="16" style_radius="8" style_border_width="1">
+			<bind_style name="style_dark" subject="subject_flag" ref_value="1" />
+			<lv_label align="center" text="Panel content" />
+		</lv_obj>
+
+		<lv_button>
+			<lv_label align="center" text="Toggle theme" />
+			<subject_toggle_event subject="subject_flag" />
+		</lv_button>
+	</view>
+</screen>

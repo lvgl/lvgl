@@ -29,6 +29,8 @@ the other items due to different styles applied to it.
 
 ### Setting the list items
 
+<LvglXMLExample name="lv_example_roller_options" path="widgets/roller/roller_options/lv_example_roller_options" />
+
 List items are passed to the Roller as a string with
 <ApiLink name="lv_roller_set_options" display="lv_roller_set_options(roller, string_list, LV_ROLLER_MODE_NORMAL)" />.
 The items should be separated by `\n`. For example:
@@ -52,11 +54,28 @@ To get the *index* of the currently selected item use <ApiLink name="lv_roller_g
 
 ### Visible rows
 
+<LvglXMLExample name="lv_example_roller_visible_rows" path="widgets/roller/roller_visible_rows/lv_example_roller_visible_rows" />
+
 The number of visible rows can be adjusted with <ApiLink name="lv_roller_set_visible_row_count" display="lv_roller_set_visible_row_count(roller, num)" />.
 
 This function calculates the height with the current style. If the font,
 line space, border width, etc. of the Roller changes, this function needs
 to be called again.
+
+### Styling
+
+<LvglXMLExample name="lv_example_roller_styling" path="widgets/roller/roller_styling/lv_example_roller_styling" />
+
+Roller has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the listbox
+background and unselected items) and <ApiLink name="LV_PART_SELECTED" /> (the
+highlighted row in the middle). Attach a named `<style>` with
+`selector="main"` or `selector="selected"` to target a part, or set local
+`style_*` props on the `<lv_roller>` tag (those target MAIN).
+
+`text_line_space` on MAIN is doing double duty: it sets the spacing between
+list rows *and* the height of the selected band, because the indicator always
+sits in the gap between two items. Increase `text_line_space` when you want
+a chunkier highlighted row without computing a separate selected-area height.
 
 ### Data binding
 
@@ -73,6 +92,15 @@ It supports only integer subjects.
 - <ApiLink name="lv_roller_bind_value" display="lv_roller_bind_value(roller, &subject)" />
 
 <LvglXMLExample name="lv_example_roller_bind_value" path="widgets/roller/roller_bind_value/lv_example_roller_bind_value" />
+
+### Fade mask via draw events
+
+XML can style the parts but can't paint a soft gradient over them. To fade
+the top and bottom edges of the roller, attach an
+`LV_EVENT_DRAW_TASK_ADDED` handler and blit a pre-rendered alpha mask onto
+the layer the roller is being drawn into:
+
+<LvglExample name="lv_example_roller_fade_mask" path="widgets/roller/lv_example_roller_fade_mask" />
 
 ## Events
 
@@ -93,19 +121,3 @@ Learn more about [events](/common-widget-features/events).
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Simple Roller
-
-<LvglExample name="lv_example_roller_1" path="widgets/roller/lv_example_roller_1" />
-
-### Styling the roller
-
-<LvglExample name="lv_example_roller_2" path="widgets/roller/lv_example_roller_2" />
-
-### add fade mask to roller
-
-<LvglExample name="lv_example_roller_3" path="widgets/roller/lv_example_roller_3" />
-
-## API

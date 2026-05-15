@@ -1,0 +1,26 @@
+<!--
+ @title Checkbox states
+ @brief Show unchecked, checked, and disabled tick boxes side by side.
+
+ Each checkbox carries the same text but advertises a different state. State is
+ toggled at runtime with `lv_obj_add_state(cb, LV_STATE_CHECKED)` and friends; in
+ XML the same effect is achieved by setting the state attribute directly.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Add or remove `checked` / `disabled` to flip the rendered state. -->
+		<lv_label width="100%" style_text_align="center" text="Checkbox: states" />
+
+		<!-- Default unchecked -->
+		<lv_checkbox text="Unchecked" />
+
+		<!-- Checked -->
+		<lv_checkbox text="Checked" checked="true" />
+
+		<!-- Disabled -->
+		<lv_checkbox text="Disabled" disabled="true" />
+
+		<!-- Disabled and Checked-->
+		<lv_checkbox text="Disabled + Checked" disabled="true" checked="true" />
+	</view>
+</screen>

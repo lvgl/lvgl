@@ -26,6 +26,8 @@ navigation as well.
 
 ### Set cell value
 
+<LvglXMLExample name="lv_example_table_cells" path="widgets/table/table_cells/lv_example_table_cells" />
+
 Cells can store only text so numbers need to be converted to text
 before displaying them in a Table.
 
@@ -38,11 +40,15 @@ New rows and columns are automatically added as required.
 
 ### Rows and Columns
 
+<LvglXMLExample name="lv_example_table_rows_columns" path="widgets/table/table_rows_columns/lv_example_table_rows_columns" />
+
 To explicitly set number of rows and columns use
 <ApiLink name="lv_table_set_row_count" display="lv_table_set_row_count(table, row_cnt)" /> and
 <ApiLink name="lv_table_set_column_count" display="lv_table_set_column_count(table, col_cnt)" />.
 
 ### Width and Height
+
+<LvglXMLExample name="lv_example_table_width" path="widgets/table/table_width/lv_example_table_width" />
 
 Column width can be set with
 <ApiLink name="lv_table_set_column_width" display="lv_table_set_column_width(table, col_id, width)" />. The overall width of
@@ -53,9 +59,22 @@ padding etc) and the number of rows.
 
 ### Merge cells
 
+<LvglXMLExample name="lv_example_table_merge_cells" path="widgets/table/table_merge_cells/lv_example_table_merge_cells" />
+
 Cells can be merged horizontally with
 <ApiLink name="lv_table_set_cell_ctrl" display="lv_table_set_cell_ctrl(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)" />.
 To merge more adjacent cells, call this function for each cell.
+
+### Styling
+
+<LvglXMLExample name="lv_example_table_styling" path="widgets/table/table_styling/lv_example_table_styling" />
+
+Table has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the table's
+outer frame and background) and <ApiLink name="LV_PART_ITEMS" /> (every
+cell — borders, padding, text). Attach a named style with
+`selector="main"` or `selector="items"`; cells inherit the items style
+uniformly. Per-row styling isn't expressed through XML selectors today —
+use cell `ctrl` flags or a runtime draw event to vary the header row.
 
 ### Scrolling
 
@@ -120,16 +139,13 @@ Learn more about [Keys](/main-modules/indev/keypad).
 
 ## Examples
 
-### Simple table
+### Scrollable 200-item list with per-row toggle
 
-<LvglExample name="lv_example_table_1" path="widgets/table/lv_example_table_1" />
+Pure XML can't yet draw custom rendering into individual cells, so this
+example stays in C. It builds a 200-row table inside a scrollable parent,
+attaches an `LV_EVENT_DRAW_TASK_ADDED` callback that paints a switch-style
+toggle in the second column based on the row's `CUSTOM_1` cell control flag,
+and toggles that flag from `LV_EVENT_VALUE_CHANGED`. A footer label reports
+the row count and the memory cost of building the table.
 
-### Lightweighted list from table
-
-<LvglExample name="lv_example_table_2" path="widgets/table/lv_example_table_2" />
-
-### MicroPython
-
-No examples yet.
-
-## API
+<LvglExample name="lv_example_table_scrollable_list" path="widgets/table/lv_example_table_scrollable_list" />

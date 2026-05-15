@@ -1,0 +1,29 @@
+<!--
+ @title Button states
+ @brief Show normal, checked, and disabled buttons side by side.
+
+ Three buttons share the same shape but advertise different states via flags. The
+ second one is checkable and starts in the checked state, picking up the checked-style
+ colors. The third uses the disabled state so it ignores input and renders faded.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Add or remove `checkable` / `checked` / `disabled` to flip the rendered state. -->
+		<lv_label width="100%" style_text_align="center" text="Button: states" />
+
+		<!-- Default button -->
+		<lv_button width="160" height="40">
+			<lv_label align="center" text="Normal" />
+		</lv_button>
+
+		<!-- Checkable, starts checked -->
+		<lv_button width="160" height="40" checkable="true" checked="true">
+			<lv_label align="center" text="Checked" />
+		</lv_button>
+
+		<!-- Disabled -->
+		<lv_button width="160" height="40" disabled="true">
+			<lv_label align="center" text="Disabled" />
+		</lv_button>
+	</view>
+</screen>

@@ -10,31 +10,11 @@
 extern "C" {
 #endif
 
-/*********************
- *      INCLUDES
- *********************/
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
 void lv_example_slider_bind_state_create(void);
 void lv_example_slider_bind_value_create(void);
-void lv_example_slider_modes_create(void);
 void lv_example_slider_reversed_direction_create(void);
 void lv_example_slider_styling_create(void);
 void lv_example_slider_value_range_orientation_create(void);
-
-/**********************
- *      MACROS
- **********************/
 
 #ifdef __cplusplus
 } /*extern "C"*/

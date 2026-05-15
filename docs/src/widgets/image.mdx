@@ -53,6 +53,13 @@ specified in the style. It enables the use of light-weight monochrome
 "characters" instead of real images. You can set a symbol as an image source with
 <ApiLink name="lv_image_set_src" display="lv_image_set_src(img1, LV_SYMBOL_OK)" />.
 
+SVG sources can also be set (with `LV_USE_SVG` enabled). This C example
+loads an SVG into the same `lv_image` widget and applies both widget-level
+transforms (`lv_image_set_scale`, `lv_image_set_rotation`) and style-based
+transforms — handy for icons that need to stay sharp at any size:
+
+<LvglExample name="lv_example_image_svg" path="widgets/image/lv_example_image_svg" />
+
 ### Label as an image
 
 Images and labels are sometimes used to convey the same thing, such as
@@ -94,6 +101,12 @@ the same image. This feature can be enabled in the style by setting
 <ApiLink name="LV_OPA_TRANSP" /> causing this feature to be disabled.
 
 The color to mix is set by `img_recolor`.
+
+This example binds `image_recolor_opa` to a subject via `<bind_style_prop>`
+and drives that subject from a slider — moving the slider retints the
+image live without any event callback:
+
+<LvglXMLExample name="lv_example_image_recolor" path="widgets/image/image_recolor/lv_example_image_recolor" />
 
 ### Offset
 
@@ -217,23 +230,3 @@ No *Keys* are processed by Image Widgets.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Image from variable and symbol
-
-<LvglExample name="lv_example_image_1" path="widgets/image/lv_example_image_1" />
-
-### Image recoloring
-
-<LvglExample name="lv_example_image_2" path="widgets/image/lv_example_image_2" />
-
-### Rotate and zoom
-
-<LvglExample name="lv_example_image_3" path="widgets/image/lv_example_image_3" />
-
-### Image offset and styling
-
-<LvglExample name="lv_example_image_4" path="widgets/image/lv_example_image_4" />
-
-## API

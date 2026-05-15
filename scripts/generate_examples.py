@@ -138,6 +138,15 @@ def _topic_dir_for(xml: Path) -> Path:
     return xml.parent.parent
 
 
+# The per-widget header is rewritten wholesale on every run. Every prototype
+# comes from a `.c` file actually present in the widget's folder — there is
+# no marker / preserved-region machinery.
+#
+# Convention used to map `.c` file → prototype:
+#   * `<topic>/lv_example_<stem>.c`            → C-only example,
+#                                                `void lv_example_<stem>(void)`.
+#   * `<topic>/<feature>/lv_example_<stem>.c`  → XML-generated example,
+#                                                `void lv_example_<stem>_create(void)`.
 HEADER_TEMPLATE = """\
 /**
  * @file {header_name}
@@ -151,26 +160,7 @@ HEADER_TEMPLATE = """\
 extern "C" {{
 #endif
 
-/*********************
- *      INCLUDES
- *********************/
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
 {prototypes}
-
-/**********************
- *      MACROS
- **********************/
 
 #ifdef __cplusplus
 }} /*extern "C"*/
@@ -180,13 +170,28 @@ extern "C" {{
 """
 
 
-def write_topic_headers(touched: list[Path]) -> list[Path]:
-    """Overwrite `lv_example_<topic>.h` in every topic folder we touched.
+def _collect_prototypes(topic_dir: Path) -> list[str]:
+    """Return prototype lines for every `.c` example under `topic_dir`.
 
-    Prototypes are derived by scanning each topic dir's subtree for
-    `lv_example_*.xml` files — *not* just the XMLs processed in this run —
-    so a partial run (e.g. one XML via `--paths`) doesn't shrink the header
-    and break the build for other examples.
+    XML-generated examples sit in feature subfolders and carry the `_create`
+    suffix; legacy C-only examples sit directly in the widget folder and
+    use the file stem as the function name. Both kinds appear in the same
+    header so consumers don't have to know which is which.
+    """
+    xml_stems = sorted({c.stem for c in topic_dir.glob("*/lv_example_*.c")})
+    legacy_stems = sorted({c.stem for c in topic_dir.glob("lv_example_*.c")})
+
+    out = [f"void {stem}_create(void);" for stem in xml_stems]
+    out += [f"void {stem}(void);" for stem in legacy_stems]
+    return out
+
+
+def write_topic_headers(touched: list[Path]) -> list[Path]:
+    """Rewrite `lv_example_<topic>.h` from the `.c` files on disk.
+
+    No markers, no preserved region. Adding or removing a `.c` file
+    (XML- or hand-written) automatically reshapes the header on the next
+    run.
     """
     topic_dirs = {_topic_dir_for(xml) for xml in touched}
     written: list[Path] = []
@@ -194,17 +199,16 @@ def write_topic_headers(touched: list[Path]) -> list[Path]:
         if not topic_dir.is_dir() or EXAMPLES_DIR not in topic_dir.parents:
             continue
         topic = topic_dir.name
-        stems = sorted({xml.stem for xml in topic_dir.rglob("lv_example_*.xml")})
-        if not stems:
+        prototypes = _collect_prototypes(topic_dir)
+        if not prototypes:
             continue
         header_path = topic_dir / f"lv_example_{topic}.h"
         guard = f"LV_EXAMPLE_{topic.upper()}_H"
-        prototypes = "\n".join(f"void {stem}_create(void);" for stem in stems)
         header_path.write_text(
             HEADER_TEMPLATE.format(
                 header_name=header_path.name,
                 guard=guard,
-                prototypes=prototypes,
+                prototypes="\n".join(prototypes),
             )
         )
         written.append(header_path)
