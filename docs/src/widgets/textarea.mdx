@@ -121,57 +121,25 @@ The maximum number of characters can be limited using
 
 ## Very long text
 
-If the text in the Text Area is very long (e.g. > 20k characters), scrolling and
-drawing might be slow.  However, by setting <ApiLink name="LV_LABEL_LONG_TXT_HINT" /> in
-`lv_conf.h` to a non-zero value, the performance with long text is significantly
-improved.  It does this by saving some additional information about the current
-vertical position of the text shown.  With this mode configured, scrolling and drawing
-is as fast as with "normal" short text.  The cost is 12 extra bytes per label in RAM.
-
-This value is set to `1` by default.  If you do not use long text, you can save
-12 bytes per label by setting it to `0`.
+For text exceeding ~20k characters, enable <ApiLink name="LV_LABEL_LONG_TXT_HINT" /> in
+`lv_conf.h` to improve scrolling and drawing performance by caching vertical
+position data. It is set to `1` by default.
 
 ## Selecting text
 
-If <ApiLink name="LV_LABEL_TEXT_SELECTION" /> is set to a non-zero value in `lv_conf.h`,
-some additional functionality (and 8 bytes per label) are added to Label Widgets
-and Text Area Widgets, and text-selection functionality is automated in Text Area
-Widgets.  (If you do not use selected text in your application, you can save 8 bytes
-per label in RAM by setting that macro to equate to `0`.)
+Enable text selection with
+<ApiLink name="lv_textarea_set_text_selection" display="lv_textarea_set_text_selection(textarea, true)" />.
+Requires <ApiLink name="LV_LABEL_TEXT_SELECTION" /> set to a non-zero value in `lv_conf.h`.
 
-Any part of the text can be selected if enabled with
-<ApiLink name="lv_textarea_set_text_selection" display="lv_textarea_set_text_selection(textarea, true)" />.  This works much like
-when you select text on your PC by clicking and dragging with your mouse or other
-pointer input device.  If you pass `false` to this function to disable text
-selection, any text selected time of the call will be de-selected.
+To manipulate the selection programmatically (`ta_label = lv_textarea_get_label(textarea)`):
 
-Shift+click and keyboard-only text selection with Shift+Arrow keys is expected to
-be added in the future.
-
-If you need to programmatically deal with selected text, in addition to the
-<ApiLink name="lv_textarea_set_text_selection" display="lv_textarea_set_text_selection(textarea, enable)" /> function, the following
-is your tool set for doing so.  (`ta_label` is a pointer to the Text Area's
-Label retrieved with `ta_label = lv_textarea_get_label(textarea);`.)
-
-- <ApiLink name="lv_textarea_get_text_selection" display="lv_textarea_get_text_selection(textarea)" /> tells whether text selection is enabled.
-- <ApiLink name="lv_textarea_text_is_selected" display="lv_textarea_text_is_selected(textarea)" /> tells whether any text is currently selected.
-- <ApiLink name="lv_textarea_clear_selection" display="lv_textarea_clear_selection(textarea)" /> clears current text selection.
-- <ApiLink name="lv_label_set_text_selection_start" display="lv_label_set_text_selection_start(ta_label, index)" /> where `index` is
-  the zero-based index of the first character of the selected text.
-  Pass <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> to specify no text selected.
-- <ApiLink name="lv_label_set_text_selection_end" display="lv_label_set_text_selection_end(ta_label, index)" /> where `index` is
-  the zero-based index of the character just after the selected text.
-  Pass <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> to specify no text selected.
-- <ApiLink name="lv_label_get_text_selection_start" display="lv_label_get_text_selection_start(ta_label)" /> zero-based index of the
-  first character of the selected text.
-  <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> indicates no text selected.
-- <ApiLink name="lv_label_get_text_selection_end" display="lv_label_get_text_selection_end(ta_label)" /> zero-based index of the
-  character just after the selected text.
-  <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> indicates no text selected.
-
-Normally you won't need these since Text Area automates the text selection process,
-but if you do need to change the selection programmatically, the above are your
-tools to do so.
+- <ApiLink name="lv_textarea_get_text_selection" display="lv_textarea_get_text_selection(textarea)" /> — whether selection is enabled.
+- <ApiLink name="lv_textarea_text_is_selected" display="lv_textarea_text_is_selected(textarea)" /> — whether text is currently selected.
+- <ApiLink name="lv_textarea_clear_selection" display="lv_textarea_clear_selection(textarea)" /> — clears the selection.
+- <ApiLink name="lv_label_set_text_selection_start" display="lv_label_set_text_selection_start(ta_label, index)" /> — start index; pass <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> for none.
+- <ApiLink name="lv_label_set_text_selection_end" display="lv_label_set_text_selection_end(ta_label, index)" /> — end index (exclusive); pass <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> for none.
+- <ApiLink name="lv_label_get_text_selection_start" display="lv_label_get_text_selection_start(ta_label)" /> — gets start index.
+- <ApiLink name="lv_label_get_text_selection_end" display="lv_label_get_text_selection_end(ta_label)" /> — gets end index.
 
 ## Styling
 
@@ -217,8 +185,6 @@ style and a `selector`:
 
 <Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
 </Callout>
 
 ## Keys

@@ -5,18 +5,9 @@ description: "The Spangroup Widget is used to display rich text. Different from 
 
 ## Overview
 
-The Spangroup Widget is used to display rich text.  Different
-from the Label Widget, Spangroups can render text styled with
-different fonts, colors, and sizes into the Spangroup Widget.
-See example below.
-
-A Spangroup contains 0 or more Span Descriptors ("Spans").  Each Span contains its
-own text and style properties for that text.  You add 1 Span (as a child) to the
-Spangroup for each "span" of uniquely-styled text needed.  Each Span so added is
-appended to the end of the list.  The list sequence determines the order in which the
-Spans are displayed.  Spans can be added to, and removed from, the Spangroup
-throughout its life.  The number of Spans that can be added is limited only by
-available RAM.
+The Spangroup Widget is used to display rich text. Unlike a Label, each Span within
+a Spangroup has its own text, font, color, and size. Spans can be added and removed
+at any time.
 
 ## Create spans
 
@@ -45,15 +36,8 @@ Spans to ensure it is redrawn appropriately.
 Spangroups store their children differently from normal Widgets, so
 normal functions for getting children won't work.
 
-<ApiLink name="lv_spangroup_get_child" display="lv_spangroup_get_child(spangroup, id)" /> will return a pointer to the
-child Span at index `id`. In addition, `id` can be negative to index
-from the end of the Spangroup where `-1` is the youngest child, `-2`
-is second youngest, etc.
-
-E.g. `lv_span_t * span = lv_spangroup_get_child(spangroup, 0)` will
-return the first child of the Spangroup.
-`lv_span_t * span = lv_spangroup_get_child(spangroup, -1)` will return
-the last (or most recent) child.
+<ApiLink name="lv_spangroup_get_child" display="lv_spangroup_get_child(spangroup, id)" /> returns the Span at index `id`.
+Negative indices count from the end (`-1` = last, `-2` = second to last).
 
 To resolve a span from a screen coordinate — for example the point where
 the Spangroup was clicked — use
@@ -67,8 +51,6 @@ span was hit.
 
 Use <ApiLink name="lv_spangroup_get_span_count" display="lv_spangroup_get_span_count(spangroup)" /> to get
 the number of contained Spans.
-
-E.g. `uint32_t size = lv_spangroup_get_span_count(spangroup)`
 
 ## Removing a Span
 
@@ -132,12 +114,6 @@ value indicates no limit.
 
 ## Data binding
 
-Data bindings connect a widget property to a piece of global data — a
-[Subject](/main-modules/observer/observer). When the subject's value
-changes, every widget bound to it updates automatically; and an
-interactive widget can write back into the subject so other subscribers
-see the new value.
-
 A Span binds its text to a Subject. The link is one-way (Subject →
 Widget) — the binding works like Label-text binding, except both the
 Spangroup and the Span need to be specified in the bind call:
@@ -153,8 +129,6 @@ No special events are sent by Span Widgets.
 
 <Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
 </Callout>
 
 ## Keys
