@@ -1,0 +1,90 @@
+---
+title: Adding Images to Your Project
+description: "You can add images to LVGL in three ways:"
+---
+
+You can add images to LVGL in three ways:
+
+- using the [online converter](/main-modules/images/adding_images)
+- using the [offline converter](/main-modules/images/adding_images)
+- [manually create images](/main-modules/images/adding_images)
+
+## Online Converter
+
+Adding an image to LVGL via the LVGL Online Image Converter is easy:
+
+1. Click [Select image file(s)] and select a BMP, PNG, JPG, WEBP or SVG image.
+   Also supported:  GIF, SVGZ, TIF, TIFF, AI, DRW, PCT, PSP, XCF, PSD, RAW and HEIC.
+2. Select the [Color format](/main-modules/images/color_formats).  Currently supported:
+   
+   - RGB565
+   - RGB565A8
+   - RGB888
+   - XRGB8888
+   - ARGB8888
+   
+   If you need another color format, use the [offline converter](/main-modules/images/adding_images).
+   
+   .. note::  BMP images are currently supported in file form only.
+              See [BMP and WEBP Files](/main-modules/images/adding_images) below.
+3. Click the [Convert] button.  This will convert the file and open a "Save As..."
+   dialog box.  The default filename will be the filename of the selected image file
+   with a `.c` extension.
+
+In the case of binary (.bin) files, you need to specify the color format you want:
+
+- RGB332 for 8-bit color depth
+- RGB565 for 16-bit color depth
+- RGB565 Swap for 16-bit color depth (two bytes are swapped)
+- RGB888 for 24-bit color depth (8-bit channels without an alpha channel)
+
+## Offline Converter
+
+The offline converter is contained in `./scripts/LVGLImage.py`.  Run it with no
+arguments to see its command-line options.
+
+## BMP and WEBP Files
+
+Currently, support for BMP and WEBP images is limited to using them as files on an
+external file system.  For a BMP file, follow the instructions in [BMP Decoder](/libs/image_support/bmp).  For
+WEBP files, follow the instructions in [WebP Decoder](/libs/image_support/libwebp).
+
+## BIN Files
+
+Another way you can add an image to your project is by using the
+[Offline Converter](/main-modules/images/adding_images) to create a `.bin` file.  Typically, you would do
+this with a target color format matching the Display the image is going to be sent
+to. Optionally, you can use a command-line argument to cause the image contents to
+be compressed using RLE or LZ4 compression as well.  Of course, the decompression
+logic must be part of your project by enabling appropriate <ApiLink name="LV_USE_RLE" />,
+<ApiLink name="LV_USE_LZ4_INTERNAL" />, and/or <ApiLink name="LV_USE_LZ4_EXTERNAL" /> macros in your `lv_conf.h`
+file.
+
+This enables the drawing logic to have a very low RAM footprint because the pixels
+are extracted directly from the file similar to how they are extracted from BMP files.
+
+See [RLE Decompression](/libs/image_support/rle) and [LZ4 Decompression](/libs/image_support/lz4)
+
+## Manually Creating an Image
+
+If you are generating an image at run-time, you can craft an image
+variable to display it using LVGL. For example:
+
+```c
+uint8_t my_img_data[] = {0x00, 0x01, 0x02, ...};
+
+static lv_image_dsc_t my_img_dsc = {
+   .header.magic = LV_IMAGE_HEADER_MAGIC,
+   .header.cf = LV_COLOR_FORMAT_RGB565,          /* Set color format */
+   .header.flags = 0,
+   .header.w = 80,
+   .header.h = 60,
+   .header.stride = 80 * LV_COLOR_DEPTH / 8,
+   .header.reserved_2 = 0,
+   .data_size = 80 * 60 * LV_COLOR_DEPTH / 8,
+   .data = my_img_data,
+};
+```
+
+Another (possibly simpler) option to create and display an image at
+run-time is to use the [Canvas](/widgets/canvas) Widget.

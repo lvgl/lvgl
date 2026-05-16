@@ -14,8 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_demos.h"
-#include "../../src/draw/lv_draw.h"
-#include "../../src/draw/lv_draw_triangle.h"
+#include "../../include/lvgl/draw/lv_draw.h"
+#include "../../include/lvgl/draw/lv_draw_triangle.h"
 
 #if LV_USE_DEMO_WIDGETS
 
@@ -41,6 +41,11 @@ extern "C" {
 void lv_demo_widgets(void);
 void lv_demo_widgets_start_slideshow(void);
 
+/**
+ * Create the widgets demo with custom arguments.
+ * @param args Pointer to demo arguments structure containing the parent widget and other options.
+ */
+void lv_demo_widgets_with_args(const lv_demo_args_t * args);
 /**********************
  *      MACROS
  **********************/

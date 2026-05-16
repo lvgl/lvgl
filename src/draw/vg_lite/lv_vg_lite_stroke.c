@@ -11,9 +11,8 @@
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
 
-#include "lv_vg_lite_path.h"
 #include "lv_draw_vg_lite_type.h"
-#include "lv_vg_lite_math.h"
+#include "lv_vg_lite_path.h"
 #include "../lv_draw_vector_private.h"
 
 /*********************
@@ -236,20 +235,34 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
     vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(item->vg.path);
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, VG_LITE_DRAW_STROKE_PATH), {});
 
-    vg_lite_error_t error = vg_lite_set_stroke(
-                                vg_path,
-                                lv_stroke_cap_to_vg(item->lv.cap),
-                                lv_stroke_join_to_vg(item->lv.join),
-                                item->lv.width,
-                                item->lv.miter_limit,
-                                vg_dash_pattern,
-                                size,
-                                item->lv.width / 2,
-                                0);
+    vg_lite_error_t err = VG_LITE_SUCCESS;
+    LV_VG_LITE_CHECK_ERROR(
+        err = vg_lite_set_stroke(
+                  vg_path,
+                  lv_stroke_cap_to_vg(item->lv.cap),
+                  lv_stroke_join_to_vg(item->lv.join),
+                  item->lv.width,
+                  item->lv.miter_limit,
+                  vg_dash_pattern,
+                  size,
+                  item->lv.width / 2,
+                  0),
+        /* Dump parameters */
+    {
+        lv_vg_lite_path_dump_info(vg_path);
+        LV_LOG_USER("Cap: 0x%X", (int)lv_stroke_cap_to_vg(item->lv.cap));
+        LV_LOG_USER("Join: 0x%X", (int)lv_stroke_join_to_vg(item->lv.join));
+        LV_LOG_USER("Width: %f", item->lv.width);
+        LV_LOG_USER("Miter limit: %d", item->lv.miter_limit);
+        if(vg_dash_pattern)
+        {
+            for(uint32_t i = 0; i < size; i++) {
+                LV_LOG_USER("Dash pattern[%" LV_PRIu32 "]: %f", i, vg_dash_pattern[i]);
+            }
+        }
+    });
 
-    if(error != VG_LITE_SUCCESS) {
-        LV_LOG_ERROR("vg_lite_set_stroke error: %d", (int)error);
-        lv_vg_lite_error_dump_info(error);
+    if(err != VG_LITE_SUCCESS) {
         stroke_free_cb(item, NULL);
         return false;
     }
@@ -258,16 +271,16 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
     const vg_lite_uint32_t ori_path_length = vg_path->path_length;
 
     LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_update_stroke");
-    error = vg_lite_update_stroke(vg_path);
+    LV_VG_LITE_CHECK_ERROR(err = vg_lite_update_stroke(vg_path), {
+        lv_vg_lite_path_dump_info(vg_path);
+    });
     LV_PROFILER_DRAW_END_TAG("vg_lite_update_stroke");
 
     /* check if path is changed */
     LV_ASSERT_MSG(vg_path->path_length == ori_path_length, "vg_path->path_length should not change");
     LV_ASSERT_MSG(vg_path->path == ori_path, "vg_path->path should not change");
 
-    if(error != VG_LITE_SUCCESS) {
-        LV_LOG_ERROR("vg_lite_update_stroke error: %d", (int)error);
-        lv_vg_lite_error_dump_info(error);
+    if(err != VG_LITE_SUCCESS) {
         stroke_free_cb(item, NULL);
         return false;
     }

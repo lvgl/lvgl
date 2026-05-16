@@ -7,11 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_buf_private.h"
-#include "../misc/lv_types.h"
-#include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
-#include "../misc/lv_math.h"
 #include "../misc/lv_area_private.h"
+#include "convert/lv_draw_buf_convert.h"
 
 /*********************
  *      DEFINES
@@ -241,7 +239,7 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
     draw_buf->handlers = &default_handlers;
     draw_buf->data_size = data_size;
     if(lv_draw_buf_align(data, cf) != draw_buf->unaligned_data) {
-        LV_LOG_WARN("Data is not aligned, ignored");
+        LV_LOG_INFO("Data is not aligned, ignored");
     }
     return LV_RESULT_OK;
 }
@@ -304,8 +302,7 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
         return NULL;
     }
 
-    new_buf->header.flags = draw_buf->header.flags;
-    new_buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+    lv_draw_buf_set_flag(new_buf, draw_buf->header.flags | LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED);
 
     /*Choose the smaller size to copy*/
     uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);
@@ -348,8 +345,7 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
     LV_ASSERT_NULL(draw_buf);
     if(draw_buf == NULL) return;
     LV_PROFILER_DRAW_BEGIN;
-
-    if(draw_buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
+    if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_ALLOCATED)) {
         LV_ASSERT_NULL(draw_buf->handlers);
 
         const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
@@ -377,6 +373,12 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 {
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return NULL;
+
+    if(x >= buf->header.w || y >= buf->header.h) {
+        LV_LOG_ERROR("coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32, x, y,
+                     (uint32_t)buf->header.w, (uint32_t)buf->header.h);
+        return NULL;
+    }
 
     uint8_t * data = buf->data;
 
@@ -465,79 +467,32 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
     LV_ASSERT_NULL(draw_buf);
     if(draw_buf == NULL) return LV_RESULT_INVALID;
 
-    if(draw_buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) return LV_RESULT_INVALID;
-    if((draw_buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) == 0) {
+    if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED)) return LV_RESULT_INVALID;
+
+    if(!lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_MODIFIABLE)) {
         LV_LOG_WARN("draw buf is not modifiable: 0x%04x", draw_buf->header.flags);
         return LV_RESULT_INVALID;
     }
+
     LV_PROFILER_DRAW_BEGIN;
 
-    /*Premultiply color with alpha, do case by case by judging color format*/
-    lv_color_format_t cf = draw_buf->header.cf;
-    if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        int size = LV_COLOR_INDEXED_PALETTE_SIZE(cf);
-        lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
-        for(int i = 0; i < size; i++) {
-            lv_color_premultiply(&palette[i]);
+    lv_result_t res = lv_draw_buf_convert_premultiply(draw_buf);
+    if(res == LV_RESULT_OK) {
+        lv_area_t area = {0, 0, draw_buf->header.w - 1, draw_buf->header.h - 1};
+        if(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
+            /**
+             * We only need to flush the palette table, so we set y2 equal to y1 to improve performance
+             * and reduce cache flush overhead.
+             */
+            area.y2 = 0;
         }
-    }
-    else if(cf == LV_COLOR_FORMAT_ARGB8888) {
-        uint32_t h = draw_buf->header.h;
-        uint32_t w = draw_buf->header.w;
-        uint32_t stride = draw_buf->header.stride;
-        uint8_t * line = (uint8_t *)draw_buf->data;
-        for(uint32_t y = 0; y < h; y++) {
-            lv_color32_t * pixel = (lv_color32_t *)line;
-            for(uint32_t x = 0; x < w; x++) {
-                lv_color_premultiply(pixel);
-                pixel++;
-            }
-            line += stride;
-        }
-    }
-    else if(cf == LV_COLOR_FORMAT_RGB565A8) {
-        uint32_t h = draw_buf->header.h;
-        uint32_t w = draw_buf->header.w;
-        uint32_t stride = draw_buf->header.stride;
-        uint32_t alpha_stride = stride / 2;
-        uint8_t * line = (uint8_t *)draw_buf->data;
-        lv_opa_t * alpha = (lv_opa_t *)(line + stride * h);
-        for(uint32_t y = 0; y < h; y++) {
-            lv_color16_t * pixel = (lv_color16_t *)line;
-            for(uint32_t x = 0; x < w; x++) {
-                lv_color16_premultiply(pixel, alpha[x]);
-                pixel++;
-            }
-            line += stride;
-            alpha += alpha_stride;
-        }
-    }
-    else if(cf == LV_COLOR_FORMAT_ARGB8565) {
-        uint32_t h = draw_buf->header.h;
-        uint32_t w = draw_buf->header.w;
-        uint32_t stride = draw_buf->header.stride;
-        uint8_t * line = (uint8_t *)draw_buf->data;
-        for(uint32_t y = 0; y < h; y++) {
-            uint8_t * pixel = line;
-            for(uint32_t x = 0; x < w; x++) {
-                uint8_t alpha = pixel[2];
-                lv_color16_premultiply((lv_color16_t *)pixel, alpha);
-                pixel += 3;
-            }
-            line += stride;
-        }
-    }
-    else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
-        /*Pass*/
-    }
-    else {
-        LV_LOG_WARN("draw buf has no alpha, cf: %d", cf);
-    }
 
-    draw_buf->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
+        lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+        lv_draw_buf_flush_cache(draw_buf, &area);
+    }
 
     LV_PROFILER_DRAW_END;
-    return LV_RESULT_OK;
+    return res;
 }
 
 void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color)
@@ -552,21 +507,6 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
 
     lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
     palette[index] = color;
-}
-
-bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    return draw_buf->header.flags & flag;
-}
-
-void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    draw_buf->header.flags |= flag;
-}
-
-void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    draw_buf->header.flags &= ~flag;
 }
 
 lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)
@@ -714,6 +654,9 @@ static void draw_buf_free(const lv_draw_buf_handlers_t * handlers, void * buf)
 
 /**
  * For given width, height, color format, and stride, calculate the size needed for a new draw buffer.
+ * The result is rounded up to LV_DRAW_BUF_ALIGN so the allocated buffer length is a multiple of the
+ * alignment boundary (required, for example, by the ESP32 PPA whose config structure wants the full
+ * allocation size rather than the bytes actually in use).
  */
 static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
@@ -730,7 +673,7 @@ static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format
         size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
     }
 
-    return size;
+    return LV_ROUND_UP(size, LV_DRAW_BUF_ALIGN);
 }
 
 static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * full_area)

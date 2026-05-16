@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../lvgl_public.h"
 #include "../../draw/lv_image_decoder_private.h"
-#include "../../../lvgl.h"
 
 #if LV_USE_SVG
-#include "lv_svg_decoder.h"
 
-#include "lv_svg.h"
+#include "lv_svg_decoder.h"
+#include "lv_svg_render.h"
 #include "../../draw/lv_draw_buf_private.h"
 #include "../../display/lv_display_private.h"
 
@@ -185,6 +185,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
         header->cf = LV_COLOR_FORMAT_ARGB8888;
         header->w = width;
         header->h = height;
+        header->stride = width * 4;
         header->flags |= LV_IMAGE_FLAGS_CUSTOM_DRAW;
 
         decoder->custom_draw_cb = svg_draw;
@@ -343,22 +344,26 @@ static void svg_draw_buf_free(void * svg_buf)
     lv_svg_render_delete(draw_list);
 }
 
-static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, const lv_area_t * coords,
+static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * decoder_dsc, const lv_area_t * coords,
                      const lv_draw_image_dsc_t * image_dsc, const lv_area_t * clip_area)
 {
-    const lv_draw_buf_t * draw_buf = dsc->decoded;
+    const lv_draw_buf_t * draw_buf = decoder_dsc->decoded;
     const lv_svg_render_obj_t * list = draw_buf->unaligned_data;
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+    lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(layer);
+
+    /*Save the widget so that `LV_EVENT_DRAW_TASK_ADDED` can be sent to it in `lv_draw_vector`*/
+    dsc->base.obj = image_dsc->base.obj;
+
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
     lv_matrix_translate(&matrix, coords->x1, coords->y1);
-    ctx->current_dsc.scissor_area = *clip_area;
+    dsc->ctx->scissor_area = *clip_area;
     if(image_dsc) {
-        int32_t off_x = (lv_area_get_width(coords) - image_dsc->header.w - 1) / 2;
-        int32_t off_y = (lv_area_get_height(coords) - image_dsc->header.h - 1) / 2;
+        int32_t off_x = (lv_area_get_width(coords) - (int32_t)image_dsc->header.w - 1) / 2;
+        int32_t off_y = (lv_area_get_height(coords) - (int32_t)image_dsc->header.h - 1) / 2;
 
         if(image_dsc->pivot.x != 0 || image_dsc->pivot.y != 0) {
             lv_matrix_translate(&matrix, off_x, off_y);
@@ -368,10 +373,10 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
         lv_matrix_scale(&matrix, image_dsc->scale_x / 256.0f, image_dsc->scale_y / 256.0f);
         lv_matrix_translate(&matrix, -image_dsc->pivot.x, -image_dsc->pivot.y);
     }
-    lv_vector_dsc_set_transform(ctx, &matrix);
-    lv_draw_svg_render(ctx, list);
-    lv_draw_vector(ctx);
-    lv_vector_dsc_delete(ctx);
+    lv_draw_vector_dsc_set_transform(dsc, &matrix);
+    lv_draw_svg_render(dsc, list);
+    lv_draw_vector(dsc);
+    lv_draw_vector_dsc_delete(dsc);
 
     LV_PROFILER_DRAW_END;
 }

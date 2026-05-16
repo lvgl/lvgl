@@ -290,6 +290,19 @@ static inline uint8_t _bpp_nema_gfx_format(lv_draw_glyph_dsc_t * glyph_draw_dsc)
     }
 }
 
+static inline void _set_color_blend(uint32_t color, uint8_t alpha)
+{
+    nema_set_tex_color(color);
+
+    if(alpha < 255U) {
+        nema_set_blend_blit(NEMA_BL_SIMPLE | NEMA_BLOP_MODULATE_A);
+        nema_set_const_color(color);
+    }
+    else {
+        nema_set_blend_blit(NEMA_BL_SIMPLE);
+    }
+}
+
 static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                   lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
@@ -303,6 +316,13 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             border_draw_dsc.color = glyph_draw_dsc->color;
             border_draw_dsc.width = 1;
             lv_draw_nema_gfx_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+
+            /*lv_draw_nema_gfx_border alters the GPU blend state; restore it so
+             *subsequent glyphs are blitted correctly.*/
+            lv_color32_t restore_col32 = lv_color_to_32(glyph_draw_dsc->color, glyph_draw_dsc->opa);
+            uint32_t restore_nema_color = nema_rgba(restore_col32.red, restore_col32.green,
+                                                    restore_col32.blue, restore_col32.alpha);
+            _set_color_blend(restore_nema_color, restore_col32.alpha);
 #endif
         }
         else if(glyph_draw_dsc->format >= LV_FONT_GLYPH_FORMAT_A1 &&
@@ -397,19 +417,6 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
 
 }
 
-static inline void _set_color_blend(uint32_t color, uint8_t alpha)
-{
-    nema_set_tex_color(color);
-
-    if(alpha < 255U) {
-        nema_set_blend_blit(NEMA_BL_SIMPLE | NEMA_BLOP_MODULATE_A);
-        nema_set_const_color(color);
-    }
-    else {
-        nema_set_blend_blit(NEMA_BL_SIMPLE);
-    }
-}
-
 static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
                                            const lv_area_t * coords)
 {
@@ -436,7 +443,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
-        lv_text_get_size(&p, dsc->text, dsc->font, &attributes);
+        lv_text_get_size_attributes(&p, dsc->text, dsc->font, &attributes);
         attributes.max_width = p.x;
     }
 
@@ -530,6 +537,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
     uint32_t next_char_offset;
     uint32_t recolor_command_start_index = 0;
     int32_t letter_w;
+
     cmd_state_t recolor_cmd_state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
     lv_color_t recolor = lv_color_black(); /* Holds the selected color inside the recolor command */
     uint8_t is_first_space_after_cmd = 0;
@@ -553,7 +561,6 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
         line_start_x = pos.x;
 
         /*Write all letter of a line*/
-        recolor_cmd_state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
         next_char_offset = 0;
 #if LV_USE_BIDI
         char * bidi_txt = lv_malloc(line_end - line_start + 1);

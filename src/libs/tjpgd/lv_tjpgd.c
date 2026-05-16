@@ -7,12 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "../../draw/lv_image_decoder_private.h"
-#include "../../../lvgl.h"
+#include "../../lvgl_public.h"
+
 #if LV_USE_TJPGD
 
+#include "../../draw/lv_image_decoder_private.h"
 #include "tjpgd.h"
-#include "lv_tjpgd.h"
 #include "../../misc/lv_fs_private.h"
 #include <string.h>
 
@@ -107,9 +107,14 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         const char * fn = src;
         const char * ext = lv_fs_get_ext(fn);
         if((lv_strcmp(ext, "jpg") == 0) || (lv_strcmp(ext, "jpeg") == 0)) {
-            uint8_t workb[TJPGD_WORKBUFF_SIZE];
+            uint8_t * workb = lv_malloc(TJPGD_WORKBUFF_SIZE);
+            if(!workb) {
+                LV_LOG_WARN("failed to allocate memory for buffer");
+                return LV_RESULT_INVALID;
+            }
             JDEC jd;
             JRESULT rc = jd_prepare(&jd, input_func, workb, TJPGD_WORKBUFF_SIZE, &dsc->file);
+            lv_free(workb);
             if(rc) {
                 LV_LOG_WARN("jd_prepare error: %d", rc);
                 return LV_RESULT_INVALID;
@@ -153,13 +158,15 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    lv_fs_file_t * f = lv_malloc(sizeof(lv_fs_file_t));
+    lv_fs_file_t * f = NULL;
     if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
 #if LV_USE_FS_MEMFS
         const lv_image_dsc_t * img_dsc = dsc->src;
         if(is_jpg(img_dsc->data, img_dsc->data_size) == true) {
+            f = lv_malloc(sizeof(lv_fs_file_t));
+            if(f == NULL) return LV_RESULT_INVALID;
             lv_fs_path_ex_t path;
-            lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, img_dsc->data, img_dsc->data_size);
+            lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, img_dsc->data, img_dsc->data_size, "bin");
             lv_fs_res_t res;
             res = lv_fs_open(f, (const char *)&path, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
@@ -169,12 +176,13 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         }
 #else
         LV_LOG_WARN("LV_USE_FS_MEMFS needs to enabled to decode from data");
-        return LV_RESULT_INVALID;
 #endif
     }
     else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
         if((lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
+            f = lv_malloc(sizeof(lv_fs_file_t));
+            if(f == NULL) return LV_RESULT_INVALID;
             lv_fs_res_t res;
             res = lv_fs_open(f, fn, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
@@ -183,23 +191,29 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             }
         }
     }
+    if(f == NULL) return LV_RESULT_INVALID;
 
     uint8_t * workb_temp = lv_malloc(TJPGD_WORKBUFF_SIZE);
     JDEC * jd = lv_malloc(sizeof(JDEC));
-    dsc->user_data = jd;
-    JRESULT rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
-    if(rc) return LV_RESULT_INVALID;
+    JRESULT rc = JDR_MEM1;
 
+    if(workb_temp != NULL && jd != NULL)
+        rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
+
+    if(rc != JDR_OK) {
+        lv_fs_close(f);
+        lv_free(f);
+        lv_free(workb_temp);
+        lv_free(jd);
+        LV_LOG_WARN("jd_prepare error: %d", rc);
+        return LV_RESULT_INVALID;
+    }
+
+    dsc->user_data = jd;
     dsc->header.cf = LV_COLOR_FORMAT_RGB888;
     dsc->header.w = jd->width;
     dsc->header.h = jd->height;
     dsc->header.stride = jd->width * 3;
-
-    if(rc != JDR_OK) {
-        lv_free(workb_temp);
-        lv_free(jd);
-        return LV_RESULT_INVALID;
-    }
 
     return LV_RESULT_OK;
 }
@@ -232,7 +246,10 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         else {
             lv_fs_seek(jd->device, 0, LV_FS_SEEK_SET);
             JRESULT rc = jd_prepare(jd, input_func, jd->pool_original, (size_t)TJPGD_WORKBUFF_SIZE, jd->device);
-            if(rc) return LV_RESULT_INVALID;
+            if(rc) {
+                LV_LOG_WARN("jd_prepare error: %d", rc);
+                return LV_RESULT_INVALID;
+            }
         }
         decoded->data = jd->workbuf;
         decoded->header = dsc->header;
@@ -260,17 +277,26 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     JRESULT rc;
     if(jd->nrst && jd->rst++ == jd->nrst) {
         rc = jd_restart(jd, jd->rsc++);
-        if(rc != JDR_OK) return LV_RESULT_INVALID;
+        if(rc != JDR_OK) {
+            LV_LOG_WARN("jd_restart error: %d", rc);
+            return LV_RESULT_INVALID;
+        }
         jd->rst = 1;
     }
 
     /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
     rc = jd_mcu_load(jd);
-    if(rc != JDR_OK) return LV_RESULT_INVALID;
+    if(rc != JDR_OK) {
+        LV_LOG_WARN("jd_mcu_load error: %d", rc);
+        return LV_RESULT_INVALID;
+    }
 
     /* Output the MCU (YCbCr to RGB, scaling and output) */
     rc = jd_mcu_output(jd, NULL, decoded_area->x1, decoded_area->y1);
-    if(rc != JDR_OK) return LV_RESULT_INVALID;
+    if(rc != JDR_OK) {
+        LV_LOG_WARN("jd_mcu_output error: %d", rc);
+        return LV_RESULT_INVALID;
+    }
 
     return LV_RESULT_OK;
 }

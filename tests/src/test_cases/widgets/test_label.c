@@ -164,7 +164,7 @@ void test_label_long_text_get_letter_pos_align_left(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = 0,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
@@ -291,7 +291,7 @@ void test_label_long_text_get_letter_pos_align_right(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = -3,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
@@ -418,7 +418,7 @@ void test_label_long_text_get_letter_pos_align_center(void)
     };
     const lv_point_t expected_last_letter_point = {
         .x = -1,
-        .y = 1536
+        .y = 1328
     };
 
     const uint32_t first_letter_idx = 0;
@@ -615,6 +615,44 @@ void test_label_max_width(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_width.png");
 }
 
+void test_label_dots(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+
+    lv_obj_t * label1 = lv_label_create(cont);
+    lv_obj_t * label2 = lv_label_create(cont);
+    lv_obj_t * label3 = lv_label_create(cont);
+    lv_obj_t * label4 = lv_label_create(cont);
+
+    lv_obj_set_size(label1, 150, 30);
+    lv_obj_set_size(label2, 150, 30);
+    lv_obj_set_size(label3, 150, 30);
+    lv_obj_set_size(label4, 150, 30);
+
+    const char * temp_text = "Some other text";
+
+    lv_label_set_text(label1, long_text);
+    lv_label_set_text(label2, temp_text);
+
+    lv_label_set_text_fmt(label3, "%.*s", (int)strlen(long_text), long_text);
+    lv_label_set_text_fmt(label4, "%.*s", (int)strlen(temp_text), temp_text);
+
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_MODE_DOTS);
+    lv_label_set_long_mode(label2, LV_LABEL_LONG_MODE_DOTS);
+    lv_label_set_long_mode(label3, LV_LABEL_LONG_MODE_DOTS);
+    lv_label_set_long_mode(label4, LV_LABEL_LONG_MODE_DOTS);
+
+    /* Setting the text with _fmt when long mode was dots would cause the incorrect text to be displayed */
+    lv_label_set_text(label2, long_text);
+    lv_label_set_text_fmt(label4, "%.*s", (int)strlen(long_text), long_text);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_dots.png");
+}
+
 void test_label_with_recolor_cmd(void)
 {
     lv_obj_clean(lv_screen_active());
@@ -624,6 +662,50 @@ void test_label_with_recolor_cmd(void)
     lv_label_set_recolor(label_recolor, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor.png");
+}
+
+void test_label_recolor_with_text_wrap(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    /* Create a label with recolor enabled and text wrapping */
+    lv_obj_t * label_recolor_wrap = lv_label_create(lv_screen_active());
+
+    /* Configure the label similar to the bug report */
+    lv_obj_set_style_text_font(label_recolor_wrap, &lv_font_montserrat_22, 0);
+    lv_obj_set_style_text_color(label_recolor_wrap, lv_color_hex(0x8199f7), 0);
+    lv_obj_set_width(label_recolor_wrap, 300); /* Fixed width to force wrapping */
+    lv_obj_set_style_text_align(label_recolor_wrap, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_long_mode(label_recolor_wrap, LV_LABEL_LONG_MODE_WRAP);
+    lv_label_set_recolor(label_recolor_wrap, true);
+
+    /* Test text with recolor commands that should wrap across multiple lines */
+    const char * test_text_with_recolor =
+        "Before color. #ff0000 This is a very long red colored text that should maintain its red color even when it wraps across multiple lines due to the label width being too narrow to contain the entire text on a single line# After color.";
+
+    lv_label_set_text(label_recolor_wrap, test_text_with_recolor);
+    lv_obj_align(label_recolor_wrap, LV_ALIGN_TOP_MID, 0, 20);
+
+    /* Create a reference label without recolor for comparison */
+    lv_obj_t * label_no_recolor = lv_label_create(lv_screen_active());
+    lv_obj_set_style_text_font(label_no_recolor, &lv_font_montserrat_22, 0);
+    lv_obj_set_style_text_color(label_no_recolor, lv_color_hex(0x8199f7), 0);
+    lv_obj_set_width(label_no_recolor, 300);
+    lv_obj_set_style_text_align(label_no_recolor, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_long_mode(label_no_recolor, LV_LABEL_LONG_MODE_WRAP);
+    lv_label_set_recolor(label_no_recolor, false); /* Disabled for comparison */
+
+    /* Same text but without recolor commands */
+    const char * test_text_without_recolor =
+        "Before color. This is a very long red colored text that should maintain its red color even when it wraps across multiple lines due to the label width being too narrow to contain the entire text on a single line After color.";
+
+    lv_label_set_text(label_no_recolor, test_text_without_recolor);
+    lv_obj_align(label_no_recolor, LV_ALIGN_BOTTOM_MID, 0, -20);
+
+    /* The bug would manifest as improper recolor handling when text wraps */
+    /* This test verifies that recolor commands work correctly with text wrapping */
+    /* No assertion needed - the test passes if no crashes occur during rendering */
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor_2.png");
 }
 
 static void scroll_next_step(lv_obj_t * label1, lv_obj_t * label2, const char * text1, const char * text2, uint32_t idx)
@@ -706,6 +788,204 @@ void test_label_wrap_mode_clip(void)
     char buf[128];
     lv_snprintf(buf, sizeof(buf), "widgets/label_wrap_clip.png");
     TEST_ASSERT_EQUAL_SCREENSHOT(buf);
+}
+void test_label_translation_tag(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+    label = lv_label_create(NULL);
+    lv_label_set_translation_tag(label, "tiger");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    lv_translation_set_language("es");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "El Tigre");
+
+    /* Unknown language translates to the tag */
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
+}
+
+void test_label_setting_text_disables_translation(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+    label = lv_label_create(NULL);
+    lv_label_set_translation_tag(label, "tiger");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    /* Using set text should unbind the translation tag*/
+    lv_label_set_text(label, "Hello world");
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world");
+
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    /* Using set text static should unbind the translation tag*/
+    lv_label_set_text_static(label, "Hello world");
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world");
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    /* Using set text fmt should unbind the translation tag*/
+    lv_label_set_text_fmt(label, "Hello world %d", 1);
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world 1");
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+}
+
+static void display_invalidate_area_cb(lv_event_t * e)
+{
+    int * i = lv_event_get_user_data(e);
+    *i += 1;
+}
+
+void test_label_invalidate_area(void)
+{
+    int i = 0;
+    label = lv_label_create(lv_screen_active());
+    lv_display_add_event_cb(lv_display_get_default(), display_invalidate_area_cb, LV_EVENT_INVALIDATE_AREA, &i);
+    i = 0;
+    lv_label_set_text_static(label, "Hello world");
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_set_text(label, "Hello world");
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_set_text_fmt(label, "%s", "Hello world");
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL);
+    TEST_ASSERT(i > 0);
+
+#if LV_LABEL_TEXT_SELECTION
+    i = 0;
+    lv_label_set_text_selection_start(label, 1);
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_set_text_selection_end(label, 1);
+    TEST_ASSERT(i > 0);
+#endif
+
+    i = 0;
+    lv_label_set_recolor(label, true);
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_ins_text(label, 5, " world");
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_cut_text(label, 5, 5);
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_obj_set_style_align(label, LV_ALIGN_CENTER, 0);
+    TEST_ASSERT(i > 0);
+
+    lv_display_remove_event_cb_with_user_data(lv_display_get_default(), display_invalidate_area_cb, &i);
+}
+
+void test_label_no_leading_space_after_line_wrap(void)
+{
+    /*
+     * Test for issue #9629: Leading space after line wrap in labels
+     * When text wraps at a space character, the next line should not
+     * start with that space.
+     */
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * test_label = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label, "LongWord not!");
+    lv_obj_set_size(test_label, 80, 100);
+    lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(test_label, LV_OPA_COVER, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_no_leading_space.png");
+}
+
+void test_label_preserve_spaces_after_explicit_newline(void)
+{
+    /*
+     * Spaces after explicit \n should be preserved as intentional indentation,
+     * while spaces after automatic word-wrap should still be removed.
+     */
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * test_label = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label, "Hello\n   World\n\n   Indent");
+    lv_obj_set_size(test_label, 200, 120);
+    lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(test_label, LV_OPA_COVER, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_preserve_indent_after_newline.png");
+}
+
+void test_label_text_trim(void)
+{
+    lv_obj_t * parent = lv_screen_active();
+    lv_obj_clean(parent);
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(parent, 32, 0);
+    lv_obj_set_style_pad_all(parent, 32, 0);
+    lv_obj_set_style_text_font(parent, &lv_font_montserrat_40, 0);
+
+    lv_obj_t * label1 = lv_label_create(parent);
+    lv_label_set_text(label1, "Text Leading Trim None");
+    lv_obj_set_style_bg_color(label1, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label1, LV_OPA_50, 0);
+
+    lv_obj_t * label2 = lv_label_create(parent);
+    lv_label_set_text(label2, "Text Leading Trim Capital");
+    lv_obj_set_style_bg_color(label2, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label2, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label2, LV_TEXT_LEADING_TRIM_CAPITAL,
+                                       LV_PART_MAIN);
+
+    lv_obj_t * label3 = lv_label_create(parent);
+    lv_label_set_text(label3, "Text Leading Trim Lower");
+    lv_obj_set_style_bg_color(label3, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label3, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label3, LV_TEXT_LEADING_TRIM_LOWER,
+                                       LV_PART_MAIN);
+
+    lv_obj_t * label4 = lv_label_create(parent);
+    lv_label_set_text(label4, "Text Leading Trim Capital Baseline");
+    lv_obj_set_style_bg_color(label4, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label4, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(
+        label4, LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE, LV_PART_MAIN);
+
+    lv_obj_t * label5 = lv_label_create(parent);
+    lv_label_set_text(label5, "Text Leading Trim Lower Baseline");
+    lv_obj_set_style_bg_color(label5, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label5, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label5, LV_TEXT_LEADING_TRIM_LOWER_BASELINE,
+                                       LV_PART_MAIN);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_text_trim.png");
 }
 
 #endif

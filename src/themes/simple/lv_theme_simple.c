@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_theme_private.h"
-#include "../../../lvgl.h" /*To see all the widgets*/
+
+#include "../../lvgl_public.h"
 
 #if LV_USE_THEME_SIMPLE
 
-#include "lv_theme_simple.h"
+#include "../lv_theme_private.h"
 #include "../../core/lv_global.h"
 
 /*********************
@@ -149,6 +149,7 @@ lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_simple_is_inited()) {
         theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
+        LV_ASSERT_MALLOC(theme_def);
     }
 
     my_theme_t * theme = theme_def;
@@ -158,6 +159,10 @@ lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
     theme->base.font_normal = LV_FONT_DEFAULT;
     theme->base.font_large = LV_FONT_DEFAULT;
     theme->base.apply_cb = theme_apply;
+#if LV_USE_EXT_DATA
+    theme->base.ext_data.free_cb = NULL;
+    theme->base.ext_data.data = NULL;
+#endif
 
     style_init(theme);
 
@@ -197,6 +202,12 @@ void lv_theme_simple_deinit(void)
                 lv_style_reset(theme_styles + i);
             }
         }
+#if LV_USE_EXT_DATA
+        if(theme->base.ext_data.free_cb) {
+            theme->base.ext_data.free_cb(theme->base.ext_data.data);
+            theme->base.ext_data.data = NULL;
+        }
+#endif
         lv_free(theme_def);
         theme_def = NULL;
     }

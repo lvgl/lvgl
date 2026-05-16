@@ -252,8 +252,8 @@ void lv_demo_widgets_profile_create(lv_obj_t * parent)
         lv_obj_set_grid_dsc_array(parent, grid_main_col_dsc, grid_main_row_dsc);
         lv_obj_set_grid_cell(panel1, LV_GRID_ALIGN_STRETCH, 0, 2, LV_GRID_ALIGN_CENTER, 0, 1);
 
-        lv_obj_set_width(log_out_btn, 120);
-        lv_obj_set_width(invite_btn, 120);
+        lv_obj_set_width(log_out_btn, 110);
+        lv_obj_set_width(invite_btn, 110);
 
         lv_obj_set_grid_dsc_array(panel1, grid_1_col_dsc, grid_1_row_dsc);
         lv_obj_set_grid_cell(avatar, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_START, 0, 4);
@@ -457,12 +457,8 @@ static void slider_event_cb(lv_event_t * e)
             char buf[8];
             lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_slider_get_value(obj));
 
-            lv_text_attributes_t attributes;
-            lv_text_attributes_init(&attributes);
-            attributes.max_width = LV_COORD_MAX;
-            attributes.text_flags = LV_TEXT_FLAG_NONE;
             lv_point_t text_size;
-            lv_text_get_size(&text_size, buf, font_normal, &attributes);
+            lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t txt_area;
             lv_area_t draw_task_area;

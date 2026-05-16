@@ -26,10 +26,10 @@ lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 def main() -> bool:
-    epilog = """This program runs LVGL perfomance tests
-    In order to provide timing consitency between host computers,
-    these runs are run in an ARM emulated environnement inside QEMU.
-    For the runtime environnement, SO3 is used which is a lightweight, ARM-based 
+    epilog = """This program runs LVGL performance tests
+    In order to provide timing consistency between host computers,
+    these runs are run in an ARM emulated environment inside QEMU.
+    For the runtime environment, SO3 is used which is a lightweight, ARM-based 
     operating system.
     Right now, this script requires a host linux computer as we depend on
     `losetup` which is used to set up and control loop devices.
@@ -520,8 +520,10 @@ def run_tests(
     test_src_dir = os.path.join(build_dir, "test_src")
     main_cmakelists = os.path.join(build_dir, "CMakeLists.txt")
     lvgl_src_dir = os.path.join(lvgl_test_dir, "..", "src")
+    lvgl_include_dir = os.path.join(lvgl_test_dir, "..", "include")
     lv_conf_path = os.path.join(lvgl_test_dir, "src", lv_conf_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
+    lvgl_private_h_path = os.path.join(lvgl_test_dir, "..", "lvgl_private.h")
     commands_ini_path = os.path.join(build_dir, "commands.ini")
     docker_image_name = perf_test_options[options_name]["image_name"]
 
@@ -530,9 +532,11 @@ def run_tests(
         # It is also the reason we only support linux for now.
         volume("/dev", "/dev"),
         # Replace container's lvgl source and lv_conf
+        volume(lvgl_include_dir, so3_usr_lib("lvgl/include")),
         volume(lvgl_src_dir, so3_usr_lib("lvgl/src")),
         volume(lv_conf_path, so3_usr_lib("lv_conf.h")),
         volume(lvgl_h_path, so3_usr_lib("lvgl/lvgl.h")),
+        volume(lvgl_private_h_path, so3_usr_lib("lvgl/lvgl_private.h")),
         # We also need to add the current "lvgl.h" and mount it in the correct path
         # As there's a `#include "../../lvgl.h"` in the `unity_support.h` file
         volume(lvgl_h_path, "/so3/usr/lvgl.h"),

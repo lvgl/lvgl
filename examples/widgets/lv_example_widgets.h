@@ -63,6 +63,7 @@ void lv_example_canvas_8(void);
 void lv_example_canvas_9(void);
 void lv_example_canvas_10(void);
 void lv_example_canvas_11(void);
+void lv_example_canvas_12(void);
 
 void lv_example_chart_1(void);
 void lv_example_chart_2(void);
@@ -98,6 +99,7 @@ void lv_example_label_3(void);
 void lv_example_label_4(void);
 void lv_example_label_5(void);
 void lv_example_label_6(void);
+void lv_example_label_7(void);
 
 void lv_example_led_1(void);
 
@@ -117,6 +119,7 @@ void lv_example_menu_5(void);
 
 void lv_example_msgbox_1(void);
 void lv_example_msgbox_2(void);
+void lv_example_msgbox_3(void);
 
 void lv_example_obj_1(void);
 void lv_example_obj_2(void);

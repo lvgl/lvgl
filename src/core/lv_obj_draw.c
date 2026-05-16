@@ -8,11 +8,7 @@
  *********************/
 #include "lv_obj_draw_private.h"
 #include "lv_obj_private.h"
-#include "lv_obj_style.h"
-#include "../display/lv_display.h"
-#include "../indev/lv_indev.h"
-#include "../stdlib/lv_string.h"
-#include "../draw/lv_draw_arc.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -33,6 +29,8 @@ static lv_color_t normal_apply_layer_recolor(const lv_obj_t * obj, lv_part_t par
 static lv_color32_t image_apply_layer_recolor(const lv_obj_t * obj, lv_part_t part,
                                               const lv_draw_dsc_base_t * base_dsc, lv_color_t color, lv_opa_t opa);
 
+static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_base_t * base_dsc);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -47,6 +45,8 @@ static lv_color32_t image_apply_layer_recolor(const lv_obj_t * obj, lv_part_t pa
 
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -132,6 +132,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
                     draw_dsc->bg_image_recolor = lv_color_make(result.red, result.green, result.blue);
                     draw_dsc->bg_image_tiled = lv_obj_get_style_bg_image_tiled(obj, part);
                 }
+
+                draw_dsc->bg_image_colorkey = lv_obj_get_style_image_colorkey(obj, part);
             }
         }
     }
@@ -160,11 +162,15 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
         draw_dsc->outline_opa = LV_OPA_MIX2(draw_dsc->outline_opa, opa);
     }
 
+    drop_shadow_init(obj, part, &draw_dsc->base);
+
     LV_PROFILER_DRAW_END;
 }
 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -184,6 +190,7 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_ds
         return;
     }
 
+
     lv_color_t text_color = lv_obj_get_style_text_color_filtered(obj, part);
     draw_dsc->color = normal_apply_layer_recolor(obj, part, &draw_dsc->base, text_color);
     draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
@@ -198,11 +205,15 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_ds
 
     draw_dsc->align = lv_obj_get_style_text_align(obj, part);
 
+    drop_shadow_init(obj, part, &draw_dsc->base);
+
     LV_PROFILER_DRAW_END;
 }
 
 void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -234,13 +245,19 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_ds
     draw_dsc->recolor_opa = result.alpha;
     draw_dsc->recolor = lv_color_make(result.red, result.green, result.blue);
 
+    draw_dsc->colorkey = lv_obj_get_style_image_colorkey(obj, part);
+
     if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
+
+    drop_shadow_init(obj, part, &draw_dsc->base);
 
     LV_PROFILER_DRAW_END;
 }
 
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -277,11 +294,15 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_
     draw_dsc->round_start = lv_obj_get_style_line_rounded(obj, part);
     draw_dsc->round_end = draw_dsc->round_start;
 
+    drop_shadow_init(obj, part, &draw_dsc->base);
+
     LV_PROFILER_DRAW_END;
 }
 
 void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -312,8 +333,31 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
     draw_dsc->img_src = lv_obj_get_style_arc_image_src(obj, part);
 
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
+
+    drop_shadow_init(obj, part, &draw_dsc->base);
+
     LV_PROFILER_DRAW_END;
 }
+
+void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc)
+{
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
+    LV_PROFILER_DRAW_BEGIN;
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
+
+    draw_dsc->blur_radius = lv_obj_get_style_blur_radius(obj, part);
+    draw_dsc->quality = lv_obj_get_style_blur_quality(obj, part);
+
+    /*Radius might be set earlier as it's already known*/
+    if(draw_dsc->corner_radius == 0) {
+        draw_dsc->corner_radius = lv_obj_get_style_radius(obj, part);
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
 
 int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 {
@@ -342,6 +386,15 @@ int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
         }
     }
 
+    int32_t drop_shadow_size = 0;
+    if(lv_obj_get_style_drop_shadow_opa(obj, part) > 0) {
+        drop_shadow_size += LV_MAX(LV_ABS(lv_obj_get_style_drop_shadow_offset_x(obj, part)),
+                                   LV_ABS(lv_obj_get_style_drop_shadow_offset_y(obj, part)));
+
+        drop_shadow_size += lv_obj_get_style_drop_shadow_radius(obj, part) + 1;
+    }
+    s += drop_shadow_size;
+
     int32_t w = lv_obj_get_style_transform_width(obj, part);
     int32_t h = lv_obj_get_style_transform_height(obj, part);
     int32_t wh = LV_MAX(w, h);
@@ -367,7 +420,10 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
     /*Allocate spec. attrs. only if the result is not zero.
      *Zero is the default value if the spec. attr. are not defined.*/
     else if(s_new != 0) {
-        lv_obj_allocate_spec_attr(obj);
+        if(!lv_obj_allocate_spec_attr(obj)) {
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         obj->spec_attr->ext_draw_size = s_new;
     }
 
@@ -377,12 +433,15 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 
 int32_t lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return 0);
+
     if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;
 }
 
 lv_layer_type_t lv_obj_get_layer_type(const lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return LV_LAYER_TYPE_NONE);
 
     if(obj->spec_attr) return (lv_layer_type_t)obj->spec_attr->layer_type;
     else return LV_LAYER_TYPE_NONE;
@@ -450,5 +509,19 @@ static lv_color32_t image_apply_layer_recolor(const lv_obj_t * obj, lv_part_t pa
     }
     else {
         return lv_color_to_32(color, opa);
+    }
+}
+
+static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_base_t * base_dsc)
+{
+    base_dsc->drop_shadow_opa = lv_obj_get_style_drop_shadow_opa(obj, part);
+    if(base_dsc->drop_shadow_opa) {
+        base_dsc->drop_shadow_blur_radius = lv_obj_get_style_drop_shadow_radius(obj, part);
+        base_dsc->drop_shadow_ofs_x = lv_obj_get_style_drop_shadow_offset_x(obj, part);
+        base_dsc->drop_shadow_ofs_y = lv_obj_get_style_drop_shadow_offset_y(obj, part);
+        base_dsc->drop_shadow_color = lv_obj_get_style_drop_shadow_color(obj, part);
+        base_dsc->drop_shadow_color = normal_apply_layer_recolor(obj, part, base_dsc, base_dsc->drop_shadow_color);
+
+        base_dsc->drop_shadow_quality = lv_obj_get_style_drop_shadow_quality(obj, part);
     }
 }

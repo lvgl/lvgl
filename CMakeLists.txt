@@ -23,11 +23,11 @@ if(ESP_PLATFORM)
 elseif(MICROPY_DIR)
   include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/micropython.cmake)
 else()
-  include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/os_desktop.cmake)
+  include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/main.cmake)
 endif()
 
 #[[
-    unfortunately CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not work for global data. 
+    unfortunately CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not work for global data.
     for global data we still need decl specs.
     Check out the docs to learn more about the limitations of CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS
     https://cmake.org/cmake/help/latest/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html#prop_tgt:WINDOWS_EXPORT_ALL_SYMBOLS
@@ -36,9 +36,9 @@ endif()
     For all compiled sources from outside the library (i.e. files which include lvgl headers) we need to use dllimport.
     We can do this by using CMakes INTERFACE and PRIVATE keyword.
   ]]
-if (MSVC)
-  target_compile_definitions(lvgl
-    INTERFACE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllimport\)
-    PRIVATE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllexport\)
-  )
+if(MSVC AND BUILD_SHARED_LIBS)
+  target_compile_definitions(
+    lvgl
+    INTERFACE "LV_ATTRIBUTE_EXTERN_DATA=__declspec(dllimport)"
+    PRIVATE "LV_ATTRIBUTE_EXTERN_DATA=__declspec(dllexport)")
 endif()

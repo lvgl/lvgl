@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width='800' height='400' viewBox='0 0 800 800'>
+    <defs>
+        <linearGradient id='ggg1' x1='0%' y1='0%' x2='100%' y2='0%'>
+        <stop offset='0' stop-color='red' />
+        <stop offset='0.5' stop-color='green' />
+        <stop offset='1' stop-color='blue' />
+        </linearGradient>
+    </defs>
+
+    <!-- Line 1 -->
+    <polyline points='10,50 30,30 50,70 70,30 90,70 110,30 130,50'/>
+    <polyline points='140,50 160,30 180,70 200,30 220,70 240,30 260,50' fill='url(#ggg1)'/>
+    <polyline points='270,50 290,30 310,70 330,30 350,70 370,30 390,50' fill='white' stroke='green'/>
+    <polyline points='400,50 420,30 440,70 460,30 480,70 500,30 520,50' fill='white' stroke='url(#ggg1)'/>
+
+    <!-- Line 2 -->
+    <polyline points='10,110 30,90 50,130 70,90 90,130 110,90 130,110' fill='red'/>
+    <polyline points='140,110 160,90 180,130 200,90 220,130 240,90 260,110' fill='#ff0000'/>
+    <polyline points='270,110 290,90 310,130 330,90 350,130 370,90 390,110' fill='rgb(255,0,0)'/>
+    <polyline points='400,110 420,90 440,130 460,90 480,130 500,90 520,110' fill='rgba(255,0,0,0.5)'/>
+    <polyline points='530,110 550,90 570,130 590,90 610,130 630,90 650,110' fill='none'/>
+
+    <!-- Line 3 -->
+    <polyline points='10,170 30,150 50,190 70,150 90,190 110,150 130,170' transform='translate(0, 50)'/>
+    <polyline points='140,170 160,150 180,190 200,150 220,190 240,150 260,170' transform='rotate(10, 100, 100)'/>
+    <polyline points='270,170 290,150 310,190 330,150 350,190 370,150 390,170' transform='scale(1.4, 1.8)'/>
+    <polyline points='400,170 420,150 440,190 460,150 480,190 500,150 520,170' transform='skewX(30)'/>
+    <polyline points='530,170 550,150 570,190 590,150 610,190 630,150 650,170' transform='skewY(10)'/>
+
+    <!-- Line 4 -->
+    <polyline points='10,230 30,210 50,250 70,210 90,250 110,210 130,230' transform='matrix(1, 0, 0.8, 1, 0, 0)'/>
+    <polyline points='140,230 160,210 180,250 200,210 220,250 240,210 260,230' fill='pink' stroke='red' transform='matrix(1, 0, 0.9, 1, 0, 0)'/>
+</svg>

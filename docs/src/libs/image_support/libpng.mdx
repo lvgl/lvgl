@@ -1,0 +1,51 @@
+---
+title: libpng Decoder
+---
+
+<br />
+
+<hr />
+
+**libpng** is an LVGL interface to the official PNG reference library, which
+supports almost all PNG features, is extensible, and has been extensively tested for
+over 28 years.
+
+For a detailed introduction, see:  http://www.libpng.org/pub/png/libpng.html .
+
+## Install
+
+```bash
+sudo apt install libpng-dev
+```
+
+## Adding libpng to Your Project
+
+Cmake:
+
+```cmake
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PNG_LIBRARIES})
+```
+
+## Usage
+
+Set <ApiLink name="LV_USE_LIBPNG" /> in `lv_conf.h` to `1`.
+
+See the examples below.
+
+It should be noted that each image of this decoder needs to consume
+
+width × height × 4
+
+bytes of RAM, and it needs to be combined with the [Image Caching](/main-modules/images/caching) feature to
+ensure that the memory usage is within a reasonable range. The decoded image is
+stored in RGBA pixel format.
+
+## Example
+
+### Open a PNG image from file and variable
+
+<LvglExample name="lv_example_libpng_1" path="libs/libpng/lv_example_libpng_1" />
+
+## API

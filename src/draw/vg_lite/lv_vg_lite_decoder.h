@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lv_image_decoder.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_DRAW_VG_LITE
 

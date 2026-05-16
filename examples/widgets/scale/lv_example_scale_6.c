@@ -49,7 +49,17 @@ static void timer_cb(lv_timer_t * timer)
 }
 
 /**
- * A round scale with multiple needles, resembling a clock
+ * @title Analog clock face with two hands
+ * @brief Round inner scale that advances minute and hour hands on a timer.
+ *
+ * A 150 by 150 scale uses `LV_SCALE_MODE_ROUND_INNER` with a 360
+ * degree range rotated to 270 degrees, 61 ticks (major every fifth),
+ * and hour labels `12` through `11`. Two `lv_line` hands are added:
+ * the white minute hand stores its points in a caller-owned buffer via
+ * `lv_line_set_points_mutable`, while the red hour hand lets the scale
+ * allocate points internally. A 250 ms `lv_timer` advances the clock
+ * by one minute per tick, re-positioning both hands with
+ * `lv_scale_set_line_needle_value`.
  */
 void lv_example_scale_6(void)
 {

@@ -7,19 +7,13 @@
  *      INCLUDES
  *********************/
 #include "lv_buttonmatrix_private.h"
+#if LV_USE_BUTTONMATRIX
+
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_BUTTONMATRIX != 0
-
-#include "../../misc/lv_assert.h"
-#include "../../indev/lv_indev.h"
-#include "../../core/lv_group.h"
-#include "../../draw/lv_draw.h"
-#include "../../core/lv_refr.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -66,6 +60,21 @@ static void free_map(lv_buttonmatrix_t * btnm);
 static const char * const lv_buttonmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
 #endif
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_buttonmatrix_properties[] = {
+    {
+        .id = LV_PROPERTY_BUTTONMATRIX_SELECTED_BUTTON,
+        .setter = lv_buttonmatrix_set_selected_button,
+        .getter = lv_buttonmatrix_get_selected_button,
+    },
+    {
+        .id = LV_PROPERTY_BUTTONMATRIX_ONE_CHECKED,
+        .setter = lv_buttonmatrix_set_one_checked,
+        .getter = lv_buttonmatrix_get_one_checked,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_buttonmatrix_class = {
     .constructor_cb = lv_buttonmatrix_constructor,
     .destructor_cb = lv_buttonmatrix_destructor,
@@ -77,6 +86,7 @@ const lv_obj_class_t lv_buttonmatrix_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
     .name = "lv_buttonmatrix",
+    LV_PROPERTY_CLASS_FIELDS(buttonmatrix, BUTTONMATRIX)
 };
 
 /**********************
@@ -721,7 +731,7 @@ static void draw_main(lv_event_t * e)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the Arabic text and process it*/
-        size_t len_ap = lv_text_ap_calc_bytes_count(txt);
+        size_t len_ap = lv_text_ap_strlen(txt) + 1;
         if(len_ap < sizeof(txt_ap)) {
             lv_text_ap_proc(txt, txt_ap);
             txt = txt_ap;
@@ -734,7 +744,7 @@ static void draw_main(lv_event_t * e)
         attributes.max_width = lv_area_get_width(&area_obj);
 
         lv_point_t txt_size;
-        lv_text_get_size(&txt_size, txt, font, &attributes);
+        lv_text_get_size_attributes(&txt_size, txt, font, &attributes);
 
         btn_area.x1 += (lv_area_get_width(&btn_area) - txt_size.x) / 2;
         btn_area.y1 += (lv_area_get_height(&btn_area) - txt_size.y) / 2;
@@ -1020,8 +1030,8 @@ static void update_map(lv_obj_t * obj)
     const char * const * map_row = btnm->map_p;
 
     /*Count the units and the buttons in a line*/
-    uint32_t row;
-    for(row = 0; row < btnm->row_cnt; row++) {
+    int32_t row_cnt = (int32_t)btnm->row_cnt;
+    for(int32_t row = 0; row < row_cnt; row++) {
         uint32_t unit_cnt = 0;           /*Number of units in a row*/
         uint32_t btn_cnt = 0;            /*Number of buttons in a row*/
         /*Count the buttons and units in this row*/
@@ -1036,8 +1046,8 @@ static void update_map(lv_obj_t * obj)
             continue;
         }
 
-        int32_t row_y1 = stop + (max_h_no_gap * row) / btnm->row_cnt + row * prow;
-        int32_t row_y2 = stop + (max_h_no_gap * (row + 1)) / btnm->row_cnt + row * prow - 1;
+        int32_t row_y1 = stop + (max_h_no_gap * row) / row_cnt + row * prow;
+        int32_t row_y2 = stop + (max_h_no_gap * (row + 1)) / row_cnt + row * prow - 1;
 
         /*Set the button size and positions*/
         int32_t max_w_no_gap = max_w - (pcol * (btn_cnt - 1));

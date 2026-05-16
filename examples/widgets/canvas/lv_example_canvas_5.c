@@ -5,7 +5,14 @@
 #define CANVAS_HEIGHT  50
 
 /**
- * Draw an arc to the canvas
+ * @title Arc primitive on canvas
+ * @brief Draw a 10 px wide red arc spanning 0 to 220 degrees on a canvas.
+ *
+ * A 50x50 `LV_COLOR_FORMAT_ARGB8888` canvas is centered with a light
+ * grey background. An `lv_draw_arc_dsc_t` is built with center (25,25),
+ * radius 15, width 10, and `start_angle`/`end_angle` of 0 and 220, then
+ * rendered with `lv_draw_arc` into a layer opened via
+ * `lv_canvas_init_layer`.
  */
 void lv_example_canvas_5(void)
 {
@@ -25,7 +32,6 @@ void lv_example_canvas_5(void)
     lv_draw_arc_dsc_t dsc;
     lv_draw_arc_dsc_init(&dsc);
     dsc.color = lv_palette_main(LV_PALETTE_RED);
-    dsc.width = 5;
     dsc.center.x = 25;
     dsc.center.y = 25;
     dsc.width = 10;

@@ -13,12 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_os.h"
+#include "lv_os_private.h"
 
 #if LV_USE_OS == LV_OS_MQX
 
-#include "mqx.h"
-#include "mutex.h"
+#include <mqx.h>
+#include <mutex.h>
 
 /*********************
  *      DEFINES

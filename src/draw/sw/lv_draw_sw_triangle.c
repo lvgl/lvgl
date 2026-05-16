@@ -12,12 +12,7 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_math.h"
-#include "../../stdlib/lv_mem.h"
 #include "../../misc/lv_area_private.h"
-#include "../../misc/lv_color.h"
-#include "../../stdlib/lv_string.h"
-#include "../lv_draw_triangle_private.h"
 #include "lv_draw_sw_grad.h"
 
 /*********************
@@ -88,8 +83,10 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
         if(p[1].y < p[2].y) lv_point_swap(&p[1], &p[2]);
     }
 
-    /*Be sure p[0] is on the top*/
+    /*Be sure p[0] is on top followed by lowest point (p[1]) and middle point last (p[2])*/
+    if(p[0].y > p[2].y) lv_point_swap(&p[0], &p[2]);
     if(p[0].y > p[1].y) lv_point_swap(&p[0], &p[1]);
+    if(p[1].y < p[2].y) lv_point_swap(&p[1], &p[2]);
 
     /*If right == true p[2] is on the right side of the p[0] p[1] line*/
     bool right = ((p[1].x - p[0].x) * (p[2].y - p[0].y) - (p[1].y - p[0].y) * (p[2].x - p[0].x)) < 0;
@@ -133,6 +130,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
     blend_dsc.mask_area = &blend_area;
     blend_dsc.mask_stride = 0;
     blend_dsc.blend_mode = LV_BLEND_MODE_NORMAL;
+    blend_dsc.src_stride = 0;
     blend_dsc.src_buf = NULL;
 
     lv_grad_dir_t grad_dir = dsc->grad.dir;

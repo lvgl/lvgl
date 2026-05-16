@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_sw_utils.h"
+#include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
 /*********************

@@ -1,4 +1,4 @@
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #ifndef LV_TLSF_H
@@ -41,8 +41,7 @@
 ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "../../misc/lv_ll.h"
-#include "../../misc/lv_types.h"
+#include "../../lvgl_public.h"
 
 #if defined(__cplusplus)
 extern "C" {

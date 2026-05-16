@@ -14,8 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_ffmpeg.h"
-#if LV_USE_FFMPEG != 0
+#include "../../lvgl_public.h"
+#if LV_USE_FFMPEG
 #include "../../widgets/image/lv_image_private.h"
 
 /*********************
@@ -32,6 +32,7 @@ struct _lv_ffmpeg_player_t {
     lv_image_dsc_t imgdsc;
     bool auto_restart;
     struct ffmpeg_context_s * ffmpeg_ctx;
+    const char * decoder_name;
 };
 
 /**********************

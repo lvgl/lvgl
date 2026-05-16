@@ -7,15 +7,15 @@
  *      INCLUDES
  *********************/
 #include "lv_span_private.h"
+
+#if LV_USE_SPAN
+
 #include "../../misc/lv_area_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
-
-#if LV_USE_SPAN != 0
-
-#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_bidi_private.h"
+#include "../../core/lv_observer_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../core/lv_global.h"
 
@@ -42,6 +42,14 @@ struct _snippet_stack {
     lv_snippet_t    stack[LV_SPAN_SNIPPET_STACK_SIZE];
     uint32_t        index;
 };
+
+#if LV_USE_OBSERVER
+typedef struct {
+    lv_subject_t * subject;
+    void * element; /**< span of a span group*/
+    const char * fmt;
+} bind_element_string_t;
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -71,10 +79,43 @@ static int32_t convert_indent_pct(lv_obj_t * spans, int32_t width);
 
 static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_span_t * curr_span, int32_t width,
                                          lv_area_t padding, int32_t indent);
+#if LV_USE_OBSERVER
+    static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_span_properties[] = {
+    {
+        .id = LV_PROPERTY_SPAN_ALIGN,
+        .setter = lv_spangroup_set_align,
+        .getter = lv_spangroup_get_align,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_OVERFLOW,
+        .setter = lv_spangroup_set_overflow,
+        .getter = lv_spangroup_get_overflow,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_INDENT,
+        .setter = lv_spangroup_set_indent,
+        .getter = lv_spangroup_get_indent,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_MODE,
+        .setter = lv_spangroup_set_mode,
+        .getter = lv_spangroup_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_MAX_LINES,
+        .setter = lv_spangroup_set_max_lines,
+        .getter = lv_spangroup_get_max_lines,
+    },
+};
+#endif
 
 const lv_obj_class_t lv_spangroup_class  = {
     .base_class = &lv_obj_class,
@@ -85,6 +126,7 @@ const lv_obj_class_t lv_spangroup_class  = {
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
     .name = "lv_span",
+    LV_PROPERTY_CLASS_FIELDS(span, SPAN)
 };
 
 /**********************
@@ -174,7 +216,7 @@ void lv_span_set_text(lv_span_t * span, const char * text)
     size_t text_alloc_len = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    text_alloc_len = lv_text_ap_calc_bytes_count(text);
+    text_alloc_len = lv_text_ap_strlen(text) + 1;
 #else
     text_alloc_len = lv_strlen(text) + 1;
 #endif
@@ -244,7 +286,7 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
     span->static_flag = 1;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    size_t text_alloc_len = lv_text_ap_calc_bytes_count(text);
+    size_t text_alloc_len = lv_text_ap_strlen(text) + 1;
     span->txt = lv_malloc(text_alloc_len);
     LV_ASSERT_MALLOC(span->txt)
     lv_text_ap_proc(text, span->txt);
@@ -729,6 +771,54 @@ void lv_spangroup_refresh(lv_obj_t * obj)
     lv_obj_refresh_self_size(obj);
 }
 
+#if LV_USE_OBSERVER
+lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv_subject_t * subject, const char * fmt)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NULL(span);
+
+    if(fmt == NULL) {
+        if(subject->type == LV_SUBJECT_TYPE_INT) {
+            fmt = "%d";
+        }
+#if LV_USE_FLOAT
+        else if(subject->type == LV_SUBJECT_TYPE_FLOAT) {
+            fmt = "%0.1f";
+        }
+#endif
+        else if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
+            LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+            return NULL;
+        }
+    }
+    else {
+        if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER &&
+           subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+            LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+            return NULL;
+        }
+    }
+
+    bind_element_string_t * user_data = lv_zalloc(sizeof(bind_element_string_t));
+    if(user_data == NULL) {
+        LV_LOG_WARN("Couldn't allocate user_data");
+        LV_ASSERT_MALLOC(user_data);
+        return NULL;
+    }
+
+    user_data->subject = subject;
+    user_data->element = span;
+    user_data->fmt = fmt;
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, span_text_observer_cb, obj, user_data);
+    observer->auto_free_user_data = 1;
+
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -857,7 +947,7 @@ static bool lv_text_get_snippet(const char * txt, const lv_font_t * font,
     uint32_t ofs = lv_text_get_next_line(txt, LV_TEXT_LEN_MAX, font, use_width, &attributes);
     *end_ofs = ofs;
 
-    if(txt[ofs] == '\0' && *use_width < attributes.max_width && !(ofs && (txt[ofs - 1] == '\n' || txt[ofs - 1] == '\r'))) {
+    if(txt[ofs] == '\0' && *use_width <= attributes.max_width && !(ofs && (txt[ofs - 1] == '\n' || txt[ofs - 1] == '\r'))) {
         return false;
     }
     else {
@@ -1139,15 +1229,20 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
         {
             lv_snippet_t * last_snippet = lv_get_snippet(item_cnt - 1);
             int32_t next_line_h = last_snippet->line_h;
-            if(last_snippet->txt[last_snippet->bytes] == '\0') {
+            bool has_more_content = last_snippet->txt[last_snippet->bytes] != '\0';
+            if(!has_more_content) {
                 next_line_h = 0;
                 lv_span_t * next_span = lv_ll_get_next(&spans->child_ll, last_snippet->span);
+                while(next_span && (!next_span->txt || next_span->txt[0] == '\0')) {
+                    next_span = lv_ll_get_next(&spans->child_ll, next_span);
+                }
                 if(next_span && next_span->txt && next_span->txt[0]) { /* have the next line */
                     next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
+                    has_more_content = true;
                 }
             }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
-                ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
+                ellipsis_valid = has_more_content && spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
                 is_end_line = true;
             }
         }
@@ -1175,8 +1270,8 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             lv_snippet_t * pinfo = lv_get_snippet(i_item);
             if(ellipsis_valid && i_item == item_cnt - 1) {
                 uint32_t n_ofs = 0;
-                lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, max_width - txts_w,
-                                    LV_TEXT_FLAG_BREAK_ALL, &pinfo->txt_w, &n_ofs);
+                ellipsis_valid = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, max_width - txts_w,
+                                                     LV_TEXT_FLAG_BREAK_ALL, &pinfo->txt_w, &n_ofs);
                 pinfo->bytes = n_ofs;
             }
             txts_w = txts_w + pinfo->txt_w;
@@ -1262,16 +1357,17 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 #endif
 
             bool need_draw_ellipsis = false;
-            uint32_t dot_width = 0;
-
+            int32_t dot_width = 0;
             /* deal overflow */
             if(ellipsis_valid) {
-                uint32_t dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
+                int32_t dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
                 dot_width = dot_letter_w * 3;
 
                 label_draw_dsc.flag = LV_TEXT_FLAG_BREAK_ALL;
+                int32_t text_width = coords.x2 - a.x1;
                 uint32_t next_ofs;
-                need_draw_ellipsis = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, coords.x2 - a.x1 - dot_width,
+                text_width = text_width > dot_width ? text_width - dot_width : text_width;
+                need_draw_ellipsis = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, text_width,
                                                          label_draw_dsc.flag, &pinfo->txt_w, &next_ofs);
                 a.x2 = a.x1 + pinfo->txt_w;
                 label_draw_dsc.text_length = next_ofs;
@@ -1308,6 +1404,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
             if(need_draw_ellipsis) {
                 label_draw_dsc.text = "...";
+                label_draw_dsc.text_length = LV_TEXT_LEN_MAX;
 
 #if LV_USE_BIDI
                 if(label_draw_dsc.bidi_dir == LV_BASE_DIR_RTL) {
@@ -1397,5 +1494,37 @@ static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_s
 
     return coords;
 }
+
+#if LV_USE_OBSERVER
+
+static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    bind_element_string_t * user_data = observer->user_data;
+
+    if(user_data->fmt == NULL) {
+        lv_spangroup_set_span_text(observer->target, user_data->element, subject->value.pointer);
+    }
+    else {
+        switch(subject->type) {
+
+            case LV_SUBJECT_TYPE_INT:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.num);
+                break;
+#if LV_USE_FLOAT
+            case LV_SUBJECT_TYPE_FLOAT:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.float_v);
+                break;
+#endif
+            case LV_SUBJECT_TYPE_STRING:
+            case LV_SUBJECT_TYPE_POINTER:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.pointer);
+                break;
+            default:
+                return;
+        }
+    }
+}
+
+#endif /*LV_USE_OBSERVER*/
 
 #endif

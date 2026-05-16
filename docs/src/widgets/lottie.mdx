@@ -1,0 +1,109 @@
+---
+title: "Lottie (lv_lottie)"
+description: "The Lottie Widget is capable of parsing, rasterizing, and playing Lottie animations."
+---
+
+## Overview
+
+The Lottie Widget is capable of parsing, rasterizing, and playing [Lottie animations](https://lottiefiles.com).
+
+The Lottie animations are vector-based animations. Think of them as the modern combination of SVG and GIF.
+
+The animations can be downloaded from various sources, such as [https://lottiefiles.com/](https://lottiefiles.com/)
+or you can create your own animations using, for example, Adobe After Effects.
+
+The Lottie Widget is based on [Canvas (lv_canvas)](/widgets/canvas) because in order to render the animation
+the user needs to provide a buffer where the current animation frame is stored.
+
+## Parts and Styles
+
+- <ApiLink name="LV_PART_MAIN" /> The background of the Lottie animation. The typical background style properties apply but usually it is left transparent.
+
+## Usage
+
+### Dependencies
+
+The Lottie Widget uses the [ThorVG](https://github.com/thorvg/thorvg) library which is [integrated into LVGL](https://github.com/lvgl/lvgl/tree/master/src/libs/thorvg).
+In order to use Lottie animations <ApiLink name="LV_USE_THORVG_INTERNAL" /> (to use the built-in ThorVG) or
+<ApiLink name="LV_USE_THORVG_EXTERNAL" /> (to link it externally) needs to be enabled in `lv_conf.h`. For vector graphics in general
+<ApiLink name="LV_USE_VECTOR_GRAPHIC" /> also needs to be enabled.
+
+As ThorVG is written in C++, when using <ApiLink name="LV_USE_THORVG_INTERNAL" /> be sure that you
+can compile the cpp files.
+
+### Set a buffer
+
+In order to render the animation a buffer needs to be assigned to the Lottie Widget.
+The animations are rendered in ARGB8888 format, therefore the buffer's size should be equal to
+`target_width x target_height x 4` bytes.
+
+To keep the buffer size and the animation size consistent,
+the size of the Widget (i.e. the size of the animation) is set to the dimensions of the buffer internally.
+
+The buffer can be set with either <ApiLink name="lv_lottie_set_buffer" display="lv_lottie_set_buffer(lottie, w, h, buf)" />
+or <ApiLink name="lv_lottie_set_draw_buf" display="lv_lottie_set_draw_buf(lottie, draw_buf)" />.
+
+When a draw buffer is used, it must be already initialized by the user with <ApiLink name="LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED" /> color format.
+
+### Set a source
+
+`lv_example_lottie_approve.c` contains an example animation. Instead of storing the JSON string, a hex array is stored for the
+following reasons:
+
+- to avoid escaping `"` character in the JSON file, and
+- some compilers don't support very long strings.
+
+`lvgl/scripts/filetohex.py` can be used to convert a Lottie file to a hex
+array. E.g.:
+
+```bash
+./filetohex.py path/to/lottie.json --filter-character --null-terminate > out.txt
+```
+
+`--filter-character` filters out non-ASCII characters and `--null-terminate` makes sure that a trailing zero is appended to properly close the string.
+
+To create an animation from data use
+<ApiLink name="lv_lottie_set_src_data" display="lv_lottie_set_src_data(lottie, data, sizeof(data))" />
+
+Lottie animations can be opened from JSON files by using <ApiLink name="lv_lottie_set_src_file" display="lv_lottie_set_src_file(lottie, &quot;path/to/file.json&quot;)" />.
+Note that the Lottie loader doesn't support LVGL's File System interface but a "normal path" should be used without a driver letter.
+
+### Get the animation
+
+```c
+lv_anim_t * a = lv_lottie_get_anim(lottie)
+```
+
+returns the LVGL animation which controls the
+Lottie animation. By default it is running infinitely at 60FPS however the LVGL animation
+can be freely adjusted.
+
+## Events
+
+No events are emitted by Lottie Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Keys
+
+No keys are processed by Lottie Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Keys](/main-modules/indev/keypad).
+</Callout>
+
+## Examples
+
+### Load a Lottie animation from an array
+
+<LvglExample name="lv_example_lottie_1" path="widgets/lottie/lv_example_lottie_1" />
+
+### Load a Lottie animation from file
+
+<LvglExample name="lv_example_lottie_2" path="widgets/lottie/lv_example_lottie_2" />
+
+## API

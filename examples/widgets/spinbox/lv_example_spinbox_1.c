@@ -19,11 +19,23 @@ static void lv_spinbox_decrement_event_cb(lv_event_t * e)
     }
 }
 
+/**
+ * @title Spinbox with plus and minus buttons
+ * @brief Step a fixed-point spinbox with two side buttons that repeat on hold.
+ *
+ * A centered spinbox is set to five digits with a decimal point at position 2
+ * and a range of `-1000..25000`. `lv_spinbox_step_prev` shifts the active
+ * digit. Two square buttons sized to the spinbox height sit on either side
+ * using `LV_SYMBOL_PLUS` and `LV_SYMBOL_MINUS` as background images. Their
+ * `LV_EVENT_ALL` handlers call `lv_spinbox_increment` or `lv_spinbox_decrement`
+ * on `LV_EVENT_SHORT_CLICKED` and `LV_EVENT_LONG_PRESSED_REPEAT`.
+ */
 void lv_example_spinbox_1(void)
 {
     spinbox = lv_spinbox_create(lv_screen_active());
     lv_spinbox_set_range(spinbox, -1000, 25000);
-    lv_spinbox_set_digit_format(spinbox, 5, 2);
+    lv_spinbox_set_digit_count(spinbox, 5);
+    lv_spinbox_set_dec_point_pos(spinbox, 2);
     lv_spinbox_step_prev(spinbox);
     lv_obj_set_width(spinbox, 100);
     lv_obj_center(spinbox);

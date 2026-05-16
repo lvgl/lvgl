@@ -3,22 +3,29 @@
 #if LV_USE_SVG && LV_USE_VECTOR_GRAPHIC
 
 /**
- * Load an SVG data
+ * @title SVG from inline markup
+ * @brief Render an SVG circle described by a literal string as an image source.
+ *
+ * A static `lv_image_dsc_t` is populated with `LV_IMAGE_HEADER_MAGIC`, a
+ * 450x150 display size, and a pointer to the literal SVG markup drawing
+ * a red circle with a blue stroke. The descriptor is handed to
+ * `lv_image_set_src` on an image widget placed on the active screen so
+ * the SVG decoder renders the markup on demand.
  */
-static void event_cb(lv_event_t * e)
-{
-    static char svg_data[] = "<svg width=\"12cm\" height=\"4cm\" viewBox=\"0 0 1200 400\">"
-                             "<circle cx=\"600\" cy=\"200\" r=\"100\" fill=\"red\" stroke=\"blue\" stroke-width=\"10\"/></svg>";
-
-    lv_layer_t * layer = lv_event_get_layer(e);
-    lv_svg_node_t * svg = lv_svg_load_data(svg_data, sizeof(svg_data) / sizeof(char));
-    lv_draw_svg(layer, svg);
-    lv_svg_node_delete(svg);
-}
-
 void lv_example_svg_1(void)
 {
-    lv_obj_add_event_cb(lv_screen_active(), event_cb, LV_EVENT_DRAW_MAIN, NULL);
+    static const char svg_data[] = "<svg width=\"12cm\" height=\"4cm\" viewBox=\"0 0 1200 400\">"
+                                   "<circle cx=\"600\" cy=\"200\" r=\"100\" fill=\"red\" stroke=\"blue\" stroke-width=\"10\"/></svg>";
+
+    static lv_image_dsc_t svg_dsc;
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 450;
+    svg_dsc.header.h = 150;
+    svg_dsc.data_size = sizeof(svg_data) - 1;
+    svg_dsc.data = (const uint8_t *) svg_data;
+
+    lv_obj_t * svg = lv_image_create(lv_screen_active());
+    lv_image_set_src(svg, &svg_dsc);
 }
 #else
 

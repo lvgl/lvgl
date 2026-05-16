@@ -11,6 +11,7 @@
 
 #if LV_USE_QRCODE
 
+#include "../../misc/cache/lv_cache.h"
 #include "qrcodegen.h"
 
 /*********************
@@ -27,6 +28,7 @@
  **********************/
 static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static int32_t get_satisfied_size(int32_t min_version, int32_t size, int32_t * scale);
 
 /**********************
  *  STATIC VARIABLES
@@ -111,20 +113,13 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
 
     int32_t qr_version = qrcodegen_getMinFitVersion(qrcodegen_Ecc_MEDIUM, data_len);
-    if(qr_version <= 0) return LV_RESULT_INVALID;
-    int32_t qr_size = qrcodegen_version2size(qr_version);
+    int32_t quiet_zone_scale = 0;
+    if(qrcode->quiet_zone) qr_version = get_satisfied_size(qr_version, draw_buf->header.w, &quiet_zone_scale);
+    if(qr_version <= 0 || (qrcode->quiet_zone && quiet_zone_scale <= 0)) return LV_RESULT_INVALID;
+
+    const int32_t qr_size = qrcodegen_version2size(qr_version);
     if(qr_size <= 0) return LV_RESULT_INVALID;
-    int32_t scale = draw_buf->header.w / qr_size;
-    if(scale <= 0) return LV_RESULT_INVALID;
-
-    /* Pick the largest QR code that still maintains scale. */
-    for(int32_t i = qr_version + 1; i < qrcodegen_VERSION_MAX; i++) {
-        if(qrcodegen_version2size(i) * scale > draw_buf->header.w)
-            break;
-
-        qr_version = i;
-    }
-    qr_size = qrcodegen_version2size(qr_version);
+    const int32_t scale = qrcode->quiet_zone ? quiet_zone_scale : draw_buf->header.w / qr_size;
 
     uint8_t * qr0 = lv_malloc(qrcodegen_BUFFER_LEN_FOR_VERSION(qr_version));
     LV_ASSERT_MALLOC(qr0);
@@ -147,11 +142,9 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
     lv_display_enable_invalidation(lv_obj_get_display(obj), false);
 
     int32_t obj_w = draw_buf->header.w;
-    qr_size = qrcodegen_getSize(qr0);
-    scale = obj_w / qr_size;
     int scaled = qr_size * scale;
     int margin = (obj_w - scaled) / 2;
-    uint8_t * buf_u8 = (uint8_t *)draw_buf->data + 8;    /*+8 skip the palette*/
+    uint8_t * buf_u8 = draw_buf->data + 8;    /*+8 skip the palette*/
     lv_color_t c = lv_color_hex(1);
 
     /* Copy the qr code canvas:
@@ -211,6 +204,18 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
     return LV_RESULT_OK;
 }
 
+void lv_qrcode_set_data(lv_obj_t * obj, const char * data)
+{
+    if(data == NULL) return;
+    lv_qrcode_update(obj, data, lv_strlen(data));
+}
+
+void lv_qrcode_set_quiet_zone(lv_obj_t * obj, bool enable)
+{
+    lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
+    qrcode->quiet_zone = enable;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -237,6 +242,28 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     /*@fixme destroy buffer in cache free_cb.*/
     lv_draw_buf_destroy(draw_buf);
+}
+
+static int32_t get_satisfied_size(int32_t min_version, int32_t size, int32_t * scale)
+{
+    if(min_version <= 0) return -1;
+
+    int32_t offset = size;
+    int32_t satisfied_version = min_version;
+    if(scale) *scale = 0;
+
+    for(int32_t version = min_version; version <= min_version + 2 && version <= qrcodegen_VERSION_MAX - 3; version++) {
+        int32_t version_size = qrcodegen_version2size(version + 1);
+        int32_t tmp_offset = size % version_size;
+        int32_t tmp_scale = size / version_size;
+
+        if(tmp_offset < offset) {
+            offset = tmp_offset;
+            satisfied_version = version;
+            if(scale) *scale = tmp_scale;
+        }
+    }
+    return satisfied_version;
 }
 
 #endif /*LV_USE_QRCODE*/

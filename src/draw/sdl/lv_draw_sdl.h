@@ -13,21 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_DRAW_SDL
 
-#include "../../misc/cache/lv_cache.h"
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_color.h"
-#include "../../display/lv_display.h"
-#include "../../osal/lv_os.h"
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_rect.h"
-#include "../../draw/lv_draw_arc.h"
-#include "../../draw/lv_draw_image.h"
-#include "../../draw/lv_draw_triangle.h"
-#include "../../draw/lv_draw_line.h"
+#include "../../osal/lv_os_private.h"
 
 /*********************
  *      DEFINES

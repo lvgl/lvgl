@@ -1,5 +1,7 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../src/misc/cache/lv_cache.h"
+#include "../src/libs/svg/lv_svg_render.h"
 
 #include <string.h>
 
@@ -11,7 +13,7 @@ static lv_draw_buf_t * canvas_buf;
 
 void setUp(void)
 {
-    canvas = lv_canvas_create(lv_scr_act());
+    canvas = lv_canvas_create(lv_screen_active());
     canvas_buf = lv_draw_buf_create(480, 480, LV_COLOR_FORMAT_ARGB8888, 0);
     TEST_ASSERT_NOT_NULL(canvas_buf);
     lv_canvas_set_draw_buf(canvas, canvas_buf);
@@ -23,7 +25,7 @@ void tearDown(void)
 {
     lv_image_cache_drop(canvas_buf);
     lv_draw_buf_destroy(canvas_buf);
-    lv_obj_del(canvas);
+    lv_obj_delete(canvas);
 }
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_SVG

@@ -2,7 +2,13 @@
 #if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 /**
- * Bar with opposite direction
+ * @title Vertical bar filling top to bottom
+ * @brief A 20 x 180 vertical bar with a reversed 100-to-0 range at value 70.
+ *
+ * `lv_bar_set_range(bar_tob, 100, 0)` flips the indicator so it grows from
+ * the top edge downward instead of bottom-up. `lv_bar_set_value` pins the
+ * value at 70, and a label placed with `LV_ALIGN_OUT_TOP_MID` names the
+ * direction above the bar.
  */
 void lv_example_bar_7(void)
 {

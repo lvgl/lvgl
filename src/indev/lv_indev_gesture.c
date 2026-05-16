@@ -1,26 +1,18 @@
-/******************************************************************
+/*
  * @file lv_indev_gesture.c
- *
- * Recognize gestures that consist of multiple touch events
- *
- * Copyright (c) 2024 EDGEMTech Ltd
- *
- * Author EDGEMTech Ltd. (erik.tagirov@edgemtech.ch)
- *
- ******************************************************************/
+ */
 
 /********************
  *      INCLUDES
  ********************/
 
-#include "lv_indev_private.h"
-#include "../misc/lv_event_private.h"
+#include "lv_indev_gesture_private.h"
 
 #if LV_USE_GESTURE_RECOGNITION
 
 #include <math.h>
-#include "lv_indev_gesture.h"
-#include "lv_indev_gesture_private.h"
+#include "lv_indev_private.h"
+#include "../misc/lv_event_private.h"
 
 /********************
  *      DEFINES
@@ -51,6 +43,7 @@ static lv_indev_gesture_recognizer_t * lv_indev_get_gesture_recognizer(lv_event_
                                                                        lv_indev_gesture_type_t type);
 static lv_dir_t calculate_swipe_dir(lv_indev_gesture_recognizer_t * recognizer);
 static lv_indev_gesture_type_t get_first_recognized_or_ended_gesture(lv_indev_t * indev);
+static void indev_delete_event_cb(lv_event_t * e);
 
 /********************
  * STATIC VARIABLES
@@ -65,6 +58,19 @@ static lv_indev_gesture_type_t get_first_recognized_or_ended_gesture(lv_indev_t 
 /********************
  * GLOBAL FUNCTIONS
  ********************/
+
+void lv_indev_gesture_init(lv_indev_t * indev)
+{
+    LV_ASSERT_NULL(indev);
+    indev->recognizers[LV_INDEV_GESTURE_NONE].recog_fn = NULL;
+    indev->recognizers[LV_INDEV_GESTURE_PINCH].recog_fn = lv_indev_gesture_detect_pinch;
+    indev->recognizers[LV_INDEV_GESTURE_ROTATE].recog_fn = lv_indev_gesture_detect_rotation;
+    indev->recognizers[LV_INDEV_GESTURE_TWO_FINGERS_SWIPE].recog_fn = lv_indev_gesture_detect_two_fingers_swipe;
+    indev->recognizers[LV_INDEV_GESTURE_SCROLL].recog_fn = NULL;
+    indev->recognizers[LV_INDEV_GESTURE_SWIPE].recog_fn = NULL;
+
+    lv_indev_add_event_cb(indev, indev_delete_event_cb, LV_EVENT_DELETE, NULL);
+}
 
 void lv_indev_set_pinch_up_threshold(lv_indev_t * indev, float threshold)
 {
@@ -478,7 +484,7 @@ void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * r
                 to be higher than the threshold to pass it as recognized */
                 gesture_calculate_factors(r->info, 2);
                 dist = SQUARE_SUM(r->info->delta_x, r->info->delta_y);
-                if(dist > SQUARE(lv_indev_active()->gesture_limit)) {
+                if(dist > SQUARE(lv_indev_active()->gesture_min_distance)) {
                     r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
                 }
                 break;
@@ -527,7 +533,7 @@ void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data
     lv_indev_gesture_type_t type;
 
     /* First check if a recognizer state is RECOGNIZED or ENDED. *
-     * In that case, call its recongizer function and reset the other*/
+     * In that case, call its recognizer function and reset the other */
     type = get_first_recognized_or_ended_gesture(indev);
     if(type != LV_INDEV_GESTURE_NONE) {
 
@@ -944,6 +950,23 @@ static lv_indev_gesture_type_t get_first_recognized_or_ended_gesture(lv_indev_t 
     }
 
     return LV_INDEV_GESTURE_NONE;
+}
+
+static void indev_delete_event_cb(lv_event_t * e)
+{
+    lv_indev_t * indev = lv_event_get_current_target(e);
+
+    for(uint8_t i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
+        if(indev->recognizers[i].info) {
+            lv_free(indev->recognizers[i].info);
+            indev->recognizers[i].info = NULL;
+        }
+
+        if(indev->recognizers[i].config) {
+            lv_free(indev->recognizers[i].config);
+            indev->recognizers[i].config = NULL;
+        }
+    }
 }
 
 

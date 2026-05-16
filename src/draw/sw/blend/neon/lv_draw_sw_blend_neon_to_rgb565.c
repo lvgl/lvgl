@@ -9,8 +9,6 @@
 #include "lv_draw_sw_blend_neon_to_rgb565.h"
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
 
-#include "../../../../misc/lv_color.h"
-#include "../../../../misc/lv_types.h"
 #include "../lv_draw_sw_blend_private.h"
 #include <arm_neon.h>
 

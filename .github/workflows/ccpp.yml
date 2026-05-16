@@ -25,20 +25,21 @@ jobs:
                        'OPTIONS_16BIT',
                        'OPTIONS_24BIT',
                        'OPTIONS_FULL_32BIT',
-                       'OPTIONS_VG_LITE',
                        'OPTIONS_SDL']
     name: Build ${{ matrix.build_option }} - Ubuntu
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Install pngquant
       run:  scripts/install_pngquant.sh
+    - name: Verify the environment dependency installation
+      run: scripts/run_tests.sh --skip-tests
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
 
@@ -50,8 +51,7 @@ jobs:
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
         build_option: ['OPTIONS_16BIT',
                        'OPTIONS_24BIT',
-                       'OPTIONS_FULL_32BIT',
-                       'OPTIONS_VG_LITE']
+                       'OPTIONS_FULL_32BIT']
         compiler: [gcc, cl]
 
     name: Build ${{ matrix.build_option }} - ${{matrix.compiler }} - Windows
@@ -60,7 +60,7 @@ jobs:
     - name: patch freetype vcpkg URL
       run: (Get-Content C:\vcpkg\ports\freetype\portfile.cmake) -replace 'freedesktop.org', 'com' | Out-File -encoding ASCII C:\vcpkg\ports\freetype\portfile.cmake
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install prerequisites
       run: scripts\install-prerequisites.bat
@@ -89,11 +89,11 @@ jobs:
     container: espressif/idf:v5.3.1
     steps:
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
     - name: Clone LVGL as a Component
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         path: components/lvgl
     - name: Copy IDF Project Example
@@ -113,16 +113,18 @@ jobs:
                       '32bit build']
     name: Run tests with ${{ matrix.build_config }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Install pngquant
       run: scripts/install_pngquant.sh
+    - name: Verify the environment dependency installation
+      run: scripts/run_tests.sh --skip-tests
     - name: Fix kernel mmap rnd bits
       # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
       # high-entropy ASLR in much newer kernels that GitHub runners are
@@ -132,10 +134,23 @@ jobs:
       if: matrix.build_config == '32bit build'
       run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
-      run: python tests/main.py --report --update-image test --auto-clean
+      run: python tests/main.py --report --update-image test --auto-clean --keep-report
+    - name: Code coverage analysis
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
+          MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          echo "Merge-base: $MB"
+          python scripts/check_gcov_coverage.py \
+            --commit="${MB}...${{ github.event.pull_request.head.sha }}" \
+            --fail-under=50 \
+            --min-lines=5
+        else
+          echo "Not a pull request, skipping code coverage analysis."
+        fi
     - name: Archive screenshot errors
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: screenshot-errors-amd64
         path: |
@@ -161,7 +176,7 @@ jobs:
 
     - name: Upload untracked reference images
       if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: Untracked Reference Images
         path: untracked_ref_imgs.zip
@@ -174,7 +189,7 @@ jobs:
 
     - name: Upload coverage reports as artifacts
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: coverage-reports-${{ matrix.build_config }}
         path: tests/report/

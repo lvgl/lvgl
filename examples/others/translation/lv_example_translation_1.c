@@ -3,9 +3,10 @@
 
 static void add_static(void)
 {
-    static const char * languages[] = {"en", "de", "es", NULL};
-    static const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
-    static const char * translations[] = {
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const languages[] = {"en", "de", "es", NULL};
+    static const char * const tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
+    static const char * const translations[] = {
         "The Tiger", "Der Tiger", "El Tigre",
         "The Lion", "Der Löwe", "El León",
         "The Rabbit", "Das Kaninchen", "El Conejo",
@@ -32,7 +33,16 @@ static void add_dynamic(void)
 }
 
 /**
- * Create and use translations
+ * @title Static and dynamic translation packs
+ * @brief Register two translation sources and print labels via `lv_tr`.
+ *
+ * A static pack provides the tags `tiger`, `lion`, `rabbit`, and `elephant` in
+ * English, German, and Spanish through `lv_translation_add_static`. A dynamic
+ * pack built with `lv_translation_add_dynamic` adds the tags `table` and
+ * `chair` for English and German using `lv_translation_add_tag` and
+ * `lv_translation_set_tag_translation`. `lv_translation_set_language("de")`
+ * selects German and two labels render the `tiger` and `chair` translations
+ * through `lv_tr`.
  */
 void lv_example_translation_1(void)
 {

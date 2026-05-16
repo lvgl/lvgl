@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linux_drm.h"
-#if LV_USE_LINUX_DRM
+#include "../../../lvgl_public.h"
+#if LV_USE_LINUX_DRM && !LV_LINUX_DRM_USE_EGL
 
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>
@@ -22,15 +22,10 @@
 #include <xf86drmMode.h>
 #include <drm_fourcc.h>
 
-#include "../../../stdlib/lv_sprintf.h"
-#include "../../../draw/lv_draw_buf.h"
-
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
-
     #include <gbm.h>
     #include <linux/dma-buf.h>
     #include <sys/ioctl.h>
-
 #endif
 
 /*********************
@@ -80,6 +75,9 @@ typedef struct {
     drmModePropertyPtr conn_props[128];
     drm_buffer_t drm_bufs[BUFFER_CNT];
     drm_buffer_t * act_buf;
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
+    struct gbm_device * gbm_device;
+#endif
 } drm_dev_t;
 
 /**********************
@@ -96,35 +94,30 @@ static int drm_get_conn_props(drm_dev_t * drm_dev);
 static int drm_add_plane_property(drm_dev_t * drm_dev, const char * name, uint64_t value);
 static int drm_add_crtc_property(drm_dev_t * drm_dev, const char * name, uint64_t value);
 static int drm_add_conn_property(drm_dev_t * drm_dev, const char * name, uint64_t value);
-static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf);
 static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane_id, uint32_t crtc_id,
                       uint32_t crtc_idx);
 static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id);
 static int drm_open(const char * path);
 static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t connector_id, unsigned int fourcc);
-static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf);
-static int drm_setup_buffers(drm_dev_t * drm_dev);
-static void drm_flush_wait(lv_display_t * drm_dev);
-static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
-static void drm_dmabuf_set_active_buf(lv_event_t * event);
 
 static uint32_t tick_get_cb(void);
 
-#if LV_USE_LINUX_DRM_GBM_BUFFERS
-
+#if !LV_USE_LINUX_DRM_GBM_BUFFERS
+    static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf);
+#elif LV_USE_LINUX_DRM_GBM_BUFFERS
     static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf);
-
 #endif
+
+static int drm_setup_buffers(drm_dev_t * drm_dev);
+static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf);
+static void drm_flush_wait(lv_display_t * drm_dev);
+static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
+static void drm_dmabuf_set_active_buf(lv_event_t * event);
+static void drm_del_event_cb(lv_event_t * event);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-#if LV_USE_LINUX_DRM_GBM_BUFFERS
-
-    static struct gbm_device * gbm_device;
-
-#endif
 
 /**********************
  *      MACROS
@@ -139,22 +132,25 @@ static uint32_t tick_get_cb(void);
 
 lv_display_t * lv_linux_drm_create(void)
 {
+    lv_display_t * disp;
+
     lv_tick_set_cb(tick_get_cb);
 
     drm_dev_t * drm_dev = lv_malloc_zeroed(sizeof(drm_dev_t));
     LV_ASSERT_MALLOC(drm_dev);
     if(drm_dev == NULL) return NULL;
 
-    lv_display_t * disp = lv_display_create(800, 480);
+    drm_dev->fd = -1;
+
+    disp = lv_display_create(800, 480);
     if(disp == NULL) {
         lv_free(drm_dev);
         return NULL;
     }
-    drm_dev->fd = -1;
     lv_display_set_driver_data(disp, drm_dev);
     lv_display_set_flush_wait_cb(disp, drm_flush_wait);
     lv_display_set_flush_cb(disp, drm_flush);
-
+    lv_display_add_event_cb(disp, drm_del_event_cb, LV_EVENT_DELETE, NULL);
 
     return disp;
 }
@@ -165,7 +161,6 @@ lv_display_t * lv_linux_drm_create(void)
  * before the atomic commit */
 static void drm_dmabuf_set_active_buf(lv_event_t * event)
 {
-
     drm_dev_t * drm_dev;
     lv_display_t * disp;
     lv_draw_buf_t * act_buf;
@@ -185,9 +180,7 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
             }
         }
 
-
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
-
         struct dma_buf_sync sync_req;
         sync_req.flags = DMA_BUF_SYNC_START | DMA_BUF_SYNC_RW;
         int res;
@@ -205,39 +198,40 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
 
 }
 
-void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
+lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
 {
-    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
     int ret;
+
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
 
     ret = drm_setup(drm_dev, file, connector_id, DRM_FOURCC);
     if(ret) {
-        close(drm_dev->fd);
-        drm_dev->fd = -1;
-        return;
+        return LV_RESULT_INVALID;
     }
+
+    int32_t hor_res = drm_dev->width;
+    int32_t ver_res = drm_dev->height;
 
     ret = drm_setup_buffers(drm_dev);
     if(ret) {
         LV_LOG_ERROR("DRM buffer allocation failed");
         close(drm_dev->fd);
         drm_dev->fd = -1;
-        return;
+        return LV_RESULT_INVALID;
     }
 
     LV_LOG_INFO("DRM subsystem and buffer mapped successfully");
 
-    int32_t hor_res = drm_dev->width;
-    int32_t ver_res = drm_dev->height;
     int32_t width = drm_dev->mmWidth;
 
     size_t buf_size = LV_MIN(drm_dev->drm_bufs[1].size, drm_dev->drm_bufs[0].size);
+    uint32_t stride = drm_dev->drm_bufs[0].pitch;
     /* Resolution must be set first because if the screen is smaller than the size passed
      * to lv_display_create then the buffers aren't big enough for LV_DISPLAY_RENDER_MODE_DIRECT.
      */
     lv_display_set_resolution(disp, hor_res, ver_res);
-    lv_display_set_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
-                           LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers_with_stride(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
+                                       stride, LV_DISPLAY_RENDER_MODE_DIRECT);
 
 
     /* Set the handler that is called before a redraw occurs to set the active buffer/plane
@@ -250,8 +244,15 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
                 hor_res, ver_res, lv_display_get_dpi(disp));
+    return LV_RESULT_OK;
 }
 
+void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t callback)
+{
+    LV_UNUSED(disp);
+    LV_UNUSED(callback);
+    LV_LOG_WARN("DRM without EGL support doesn't currently support setting a mode selection callback");
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -497,7 +498,6 @@ static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane
     unsigned int i;
     unsigned int j;
     int ret = 0;
-    unsigned int format = fourcc;
 
     planes = drmModeGetPlaneResources(drm_dev->fd);
     if(!planes) {
@@ -511,6 +511,7 @@ static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane
         plane = drmModeGetPlane(drm_dev->fd, planes->planes[i]);
         if(!plane) {
             LV_LOG_ERROR("drmModeGetPlane failed: %s", strerror(errno));
+            ret = -1;
             break;
         }
 
@@ -520,7 +521,7 @@ static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane
         }
 
         for(j = 0; j < plane->count_formats; ++j) {
-            if(plane->formats[j] == format)
+            if(plane->formats[j] == fourcc)
                 break;
         }
 
@@ -534,14 +535,14 @@ static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane
 
         LV_LOG_TRACE("found plane %d", *plane_id);
 
-        break;
+        /* Success */
+        goto out;
     }
 
     if(i == planes->count_planes)
         ret = -1;
-
+out:
     drmModeFreePlaneResources(planes);
-
     return ret;
 }
 
@@ -551,10 +552,11 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
     drmModeEncoder * enc = NULL;
     drmModeRes * res;
     int i;
+    int ret = -1;
 
     if((res = drmModeGetResources(drm_dev->fd)) == NULL) {
         LV_LOG_ERROR("drmModeGetResources() failed");
-        return -1;
+        goto free_res;
     }
 
     if(res->count_crtcs <= 0) {
@@ -634,9 +636,11 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
         drm_dev->crtc_id = enc->crtc_id;
         LV_LOG_TRACE("crtc_id: %d", drm_dev->crtc_id);
         drmModeFreeEncoder(enc);
+        enc = NULL;
     }
     else {
         /* Encoder hasn't been associated yet, look it up */
+        bool found = false;
         for(i = 0; i < conn->count_encoders; i++) {
             int crtc, crtc_id = -1;
 
@@ -661,6 +665,9 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
                 LV_LOG_TRACE("enc_id: %d", drm_dev->enc_id);
                 drm_dev->crtc_id = crtc_id;
                 LV_LOG_TRACE("crtc_id: %d", drm_dev->crtc_id);
+                drmModeFreeEncoder(enc);
+                enc = NULL;
+                found = true;
                 break;
             }
 
@@ -668,12 +675,10 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
             enc = NULL;
         }
 
-        if(!enc) {
+        if(!found) {
             LV_LOG_ERROR("suitable encoder not found");
             goto free_res;
         }
-
-        drmModeFreeEncoder(enc);
     }
 
     drm_dev->crtc_idx = UINT32_MAX;
@@ -691,13 +696,22 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
     }
 
     LV_LOG_TRACE("crtc_idx: %d", drm_dev->crtc_idx);
-
-    return 0;
+    ret = 0;
 
 free_res:
-    drmModeFreeResources(res);
-
-    return -1;
+    if(enc) {
+        drmModeFreeEncoder(enc);
+        enc = NULL;
+    }
+    if(conn) {
+        drmModeFreeConnector(conn);
+        conn = NULL;
+    }
+    if(res) {
+        drmModeFreeResources(res);
+        res = NULL;
+    }
+    return ret;
 }
 
 static int drm_open(const char * path)
@@ -810,24 +824,46 @@ static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t conn
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
 
     /* Create GBM device and buffer */
-    gbm_device = gbm_create_device(drm_dev->fd);
+    drm_dev->gbm_device = gbm_create_device(drm_dev->fd);
 
-    if(gbm_device == NULL) {
+    if(drm_dev->gbm_device == NULL) {
         LV_LOG_ERROR("Failed to create GBM device");
         goto err;
     }
 
-    LV_LOG_INFO("GBM device backend: %s", gbm_device_get_backend_name(gbm_device));
-
+    LV_LOG_INFO("GBM device backend: %s", gbm_device_get_backend_name(drm_dev->gbm_device));
 #endif
 
     return 0;
 
 err:
-    close(drm_dev->fd);
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
+    if(drm_dev->gbm_device) {
+        gbm_device_destroy(drm_dev->gbm_device);
+        drm_dev->gbm_device = NULL;
+    }
+#endif
+
+    if(drm_dev->plane) {
+        drmModeFreePlane(drm_dev->plane);
+        drm_dev->plane = NULL;
+    }
+    if(drm_dev->crtc) {
+        drmModeFreeCrtc(drm_dev->crtc);
+        drm_dev->crtc = NULL;
+    }
+    if(drm_dev->conn) {
+        drmModeFreeConnector(drm_dev->conn);
+        drm_dev->conn = NULL;
+    }
+    if(drm_dev->fd >= 0) {
+        close(drm_dev->fd);
+        drm_dev->fd = -1;
+    }
     return -1;
 }
 
+#if !LV_USE_LINUX_DRM_GBM_BUFFERS
 static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
     struct drm_mode_create_dumb creq;
@@ -885,18 +921,16 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     return 0;
 }
+#endif /*!LV_USE_LINUX_DRM_GBM_BUFFERS*/
 
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
 
 static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
-
     struct gbm_bo * gbm_bo;
     int prime_fd;
     uint32_t handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
-    uint32_t w, h, format;
     uint32_t n_planes;
-    char * drm_format_name;
     int res;
 
     /* gbm_bo_format does not define anything other than ARGB8888 or XRGB8888 */
@@ -906,7 +940,7 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
     }
 
     /* Create a linear GBM buffer object - best practice when modifiers are not used */
-    if(!(gbm_bo = gbm_bo_create(gbm_device,
+    if(!(gbm_bo = gbm_bo_create(drm_dev->gbm_device,
                                 drm_dev->width, drm_dev->height, GBM_BO_FORMAT_XRGB8888,
                                 GBM_BO_USE_SCANOUT | GBM_BO_USE_LINEAR))) {
 
@@ -925,16 +959,13 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
         return -1;
     }
 
-    w = gbm_bo_get_width(gbm_bo);
-    h = gbm_bo_get_height(gbm_bo);
-    format = gbm_bo_get_format(gbm_bo);
+    uint32_t h = gbm_bo_get_height(gbm_bo);
     pitches[0] = buf->pitch = gbm_bo_get_stride_for_plane(gbm_bo, 0);
     offsets[0] = buf->offset = gbm_bo_get_offset(gbm_bo, 0);
     buf->size = h * buf->pitch;
-    drm_format_name = drmGetFormatName(format);
 
-    LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u format: %s",
-                buf->size, buf->pitch, buf->offset, drm_format_name);
+    LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u",
+                buf->size, buf->pitch, buf->offset);
 
     prime_fd = gbm_bo_get_fd_for_plane(gbm_bo, 0);
 
@@ -975,15 +1006,13 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
 }
 
-#endif /* END LV_USE_LINUX_DRM_GBM_BUFFERS */
-
+#endif /* LV_USE_LINUX_DRM_GBM_BUFFERS */
 
 static int drm_setup_buffers(drm_dev_t * drm_dev)
 {
     int ret;
 
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
-
     ret = create_gbm_buffer(drm_dev, &drm_dev->drm_bufs[0]);
     if(ret < 0) {
         return ret;
@@ -995,7 +1024,6 @@ static int drm_setup_buffers(drm_dev_t * drm_dev)
     }
 
 #else
-
     /* Use dumb buffers */
     ret = drm_allocate_dumb(drm_dev, &drm_dev->drm_bufs[0]);
     if(ret)
@@ -1035,7 +1063,6 @@ static void drm_flush_wait(lv_display_t * disp)
 
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-
     if(!lv_display_flush_is_last(disp)) return;
 
     LV_UNUSED(area);
@@ -1053,6 +1080,131 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
 
 }
 
+static void drm_del_event_cb(lv_event_t * e)
+{
+    if(LV_EVENT_DELETE != lv_event_get_code(e))
+        return;
+
+    lv_display_t * disp = lv_event_get_current_target(e);
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
+    if(!drm_dev) return;
+
+    /* Restore original CRTC if saved */
+    if(drm_dev->fd >= 0 && drm_dev->saved_crtc) {
+        drmModeCrtc * s_crtc = drm_dev->saved_crtc;
+        drmModeSetCrtc(drm_dev->fd, s_crtc->crtc_id, s_crtc->buffer_id, 0, 0,
+                       NULL, 0, &s_crtc->mode);
+        drmModeFreeCrtc(s_crtc);
+        drm_dev->saved_crtc = NULL;
+    }
+
+    /* Prevent further flushes & free any pending atomic request */
+    lv_display_set_flush_cb(disp, NULL);
+    if(drm_dev->req) {
+        drmModeAtomicFree(drm_dev->req);
+        drm_dev->req = NULL;
+    }
+
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
+    for(int i = 0; i < BUFFER_CNT; ++i) {
+        drm_buffer_t * b = &drm_dev->drm_bufs[i];
+
+        if(b->fb_handle) {
+            drmModeRmFB(drm_dev->fd, b->fb_handle);
+            b->fb_handle = 0;
+        }
+
+        if(MAP_FAILED != b->map) {
+            munmap(b->map, b->size);
+            b->map = MAP_FAILED;
+        }
+
+        if((int)b->handle >= 0) {
+            close((int)b->handle);
+            b->handle = 0;
+        }
+    }
+
+    if(drm_dev->gbm_device) {
+        gbm_device_destroy(drm_dev->gbm_device);
+        drm_dev->gbm_device = NULL;
+    }
+
+#else /* dumb buffers */
+    for(int i = 0; i < BUFFER_CNT; ++i) {
+        drm_buffer_t * b = &drm_dev->drm_bufs[i];
+
+        if(b->fb_handle) {
+            drmModeRmFB(drm_dev->fd, b->fb_handle);
+            b->fb_handle = 0;
+        }
+        if(MAP_FAILED != b->map) {
+            munmap(b->map, b->size);
+            b->map = MAP_FAILED;
+        }
+        if(b->handle) {
+            struct drm_mode_destroy_dumb d = { .handle = b->handle };
+            /* Dumb buffers should be destroyed if they are closed, but might as well use the DRM_IOCTL_MODE_DESTROY_DUMB */
+            drmIoctl(drm_dev->fd, DRM_IOCTL_MODE_DESTROY_DUMB, &d);
+            b->handle = 0;
+        }
+    }
+#endif
+
+    /* Free DRM properties */
+    for(uint32_t i = 0; i < drm_dev->count_plane_props; ++i) {
+        if(drm_dev->plane_props[i]) {
+            drmModeFreeProperty(drm_dev->plane_props[i]);
+            drm_dev->plane_props[i] = NULL;
+        }
+    }
+    drm_dev->count_plane_props = 0;
+
+    for(uint32_t i = 0; i < drm_dev->count_crtc_props; ++i) {
+        if(drm_dev->crtc_props[i]) {
+            drmModeFreeProperty(drm_dev->crtc_props[i]);
+            drm_dev->crtc_props[i] = NULL;
+        }
+    }
+    drm_dev->count_crtc_props = 0;
+
+    for(uint32_t i = 0; i < drm_dev->count_conn_props; ++i) {
+        if(drm_dev->conn_props[i]) {
+            drmModeFreeProperty(drm_dev->conn_props[i]);
+            drm_dev->conn_props[i] = NULL;
+        }
+    }
+    drm_dev->count_conn_props = 0;
+
+    if(drm_dev->blob_id) {
+        drmModeDestroyPropertyBlob(drm_dev->fd, drm_dev->blob_id);
+        drm_dev->blob_id = 0;
+    }
+
+    if(drm_dev->conn) {
+        drmModeFreeConnector(drm_dev->conn);
+        drm_dev->conn = NULL;
+    }
+
+    if(drm_dev->crtc) {
+        drmModeFreeCrtc(drm_dev->crtc);
+        drm_dev->crtc = NULL;
+    }
+
+    if(drm_dev->plane) {
+        drmModeFreePlane(drm_dev->plane);
+        drm_dev->plane = NULL;
+    }
+
+    if(drm_dev->fd >= 0) {
+        close(drm_dev->fd);
+        drm_dev->fd = -1;
+    }
+
+    lv_display_set_driver_data(disp, NULL);
+    lv_free(drm_dev);
+}
+
 static uint32_t tick_get_cb(void)
 {
     struct timespec t;
@@ -1061,4 +1213,4 @@ static uint32_t tick_get_cb(void)
     return time_ms;
 }
 
-#endif /*LV_USE_LINUX_DRM*/
+#endif /*LV_USE_LINUX_DRM && !LV_LINUX_DRM_USE_EGL*/

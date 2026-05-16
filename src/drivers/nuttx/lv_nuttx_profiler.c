@@ -8,13 +8,22 @@
  *********************/
 
 #include "lv_nuttx_profiler.h"
-#include "../../../lvgl.h"
 
 #if LV_USE_NUTTX && LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
-#include <nuttx/arch.h>
+#include "../../lvgl_public.h"
+#include "../../misc/lv_profiler_builtin_private.h"
+#include "../../core/lv_global.h"
 #include <fcntl.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+
+#ifdef __NuttX__
+    #include <nuttx/arch.h>
+#else
+    #include "mock/nuttx_arch.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -124,7 +133,7 @@ static void flush_cb(const char * buf)
 {
 #if LV_USE_NUTTX_TRACE_FILE
     if(trace_fd >= 0) {
-        write(trace_fd, buf, strlen(buf));
+        write(trace_fd, buf, lv_strlen(buf));
         return;
     }
 #endif

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../../lv_conf_internal.h"
+#include "../../../../lvgl_public.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
 
@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 #include "lv_draw_sw_blend_neon_to_rgb565.h"
+#include "lv_draw_sw_blend_neon_to_rgb888.h"
 
 /*********************
  *      DEFINES

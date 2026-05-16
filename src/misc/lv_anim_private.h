@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_anim.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

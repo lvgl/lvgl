@@ -36,6 +36,7 @@
  **********************/
 static lv_obj_t * ctrl;
 static lv_obj_t * list;
+static uint32_t music_height;
 
 static const char * title_list[] = {
     "Waiting for true love",
@@ -116,10 +117,25 @@ static const uint32_t time_list[] = {
 
 void lv_demo_music(void)
 {
-    lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x343247), 0);
+    lv_demo_args_t args;
+    lv_demo_args_init(&args);
+    lv_demo_music_with_args(&args);
+}
 
-    list = lv_demo_music_list_create(lv_screen_active());
-    ctrl = lv_demo_music_main_create(lv_screen_active());
+void lv_demo_music_with_args(const lv_demo_args_t * args)
+{
+    LV_ASSERT_NULL(args);
+
+    lv_obj_t * root = lv_obj_create(args->parent);
+    lv_obj_remove_style_all(root);
+    lv_obj_set_size(root, lv_pct(100), lv_pct(100));
+    lv_obj_set_style_bg_opa(root, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(root, lv_color_hex(0x343247), 0);
+    lv_obj_update_layout(root);
+
+    list = lv_demo_music_list_create(root);
+    ctrl = lv_demo_music_main_create(root);
+    music_height = lv_obj_get_height(root);
 
 #if LV_DEMO_MUSIC_AUTO_PLAY
     lv_timer_create(auto_step_cb, 1000, NULL);
@@ -184,14 +200,14 @@ static void auto_step_cb(lv_timer_t * t)
             break;
 #if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
         case 11:
-            lv_obj_scroll_by(ctrl, 0, -LV_VER_RES, LV_ANIM_ON);
+            lv_obj_scroll_by(ctrl, 0, -music_height, LV_ANIM_ON);
             break;
         case 13:
-            lv_obj_scroll_by(ctrl, 0, -LV_VER_RES, LV_ANIM_ON);
+            lv_obj_scroll_by(ctrl, 0, -music_height, LV_ANIM_ON);
             break;
 #else
         case 12:
-            lv_obj_scroll_by(ctrl, 0, -LV_VER_RES, LV_ANIM_ON);
+            lv_obj_scroll_by(ctrl, 0, -music_height, LV_ANIM_ON);
             break;
 #endif
         case 15:
@@ -204,11 +220,11 @@ static void auto_step_cb(lv_timer_t * t)
             lv_demo_music_play(1);
             break;
         case 19:
-            lv_obj_scroll_by(ctrl, 0, LV_VER_RES, LV_ANIM_ON);
+            lv_obj_scroll_by(ctrl, 0, music_height, LV_ANIM_ON);
             break;
 #if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
         case 20:
-            lv_obj_scroll_by(ctrl, 0, LV_VER_RES, LV_ANIM_ON);
+            lv_obj_scroll_by(ctrl, 0, music_height, LV_ANIM_ON);
             break;
 #endif
         case 30:

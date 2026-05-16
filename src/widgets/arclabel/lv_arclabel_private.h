@@ -13,10 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_obj_private.h"
 
-#if LV_USE_ARCLABEL != 0
-#include "lv_arclabel.h"
+#include "../../core/lv_obj_private.h"
+#include "../../lvgl_public.h"
+
+#if LV_USE_ARCLABEL
 
 /*********************
  *      DEFINES
@@ -58,6 +59,8 @@ struct _lv_arclabel_t {
     lv_arclabel_text_align_t text_align_h; /**< Horizontal text alignment */
     uint8_t static_txt : 1;             /**< Flag to indicate the text is static */
     uint8_t recolor    : 1;             /**< Enable in-line letter re-coloring */
+    uint8_t overflow   : 2;             /**< Overflow mode: 0=visible, 1=ellipsis, 2=clip */
+    bool end_overlap   : 1;             /**< End overlap flag, false if prevent end overlap */
 };
 
 /**********************

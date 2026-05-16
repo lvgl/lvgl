@@ -7,11 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_conf_internal.h"
+#include "../lvgl_public.h"
 #if LV_USE_OS == LV_OS_NONE
 
-#include "lv_os.h"
-#include "../misc/lv_timer.h"
+#include "lv_os_private.h"
 
 /*********************
  *      DEFINES
@@ -37,10 +36,12 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+#ifndef __linux__
 uint32_t lv_os_get_idle_percent(void)
 {
     return lv_timer_get_idle();
 }
+#endif /*__linux__*/
 
 /**********************
  *   STATIC FUNCTIONS

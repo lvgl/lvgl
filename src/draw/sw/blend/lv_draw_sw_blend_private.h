@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "lv_draw_sw_blend.h"
-
+#include "../lv_draw_sw_mask.h"
 #if LV_USE_DRAW_SW
 
 /*********************

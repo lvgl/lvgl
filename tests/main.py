@@ -25,7 +25,6 @@ build_only_options = {
     'OPTIONS_16BIT': 'Minimal config, 16 bit color depth',
     'OPTIONS_24BIT': 'Normal config, 24 bit color depth',
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
-    'OPTIONS_VG_LITE': 'VG-Lite simulator with full config, 32 bit color depth',
 }
 
 if platform.system() != 'Windows':
@@ -35,6 +34,7 @@ test_options = {
     'OPTIONS_TEST_SYSHEAP': 'Test config, system heap, 32 bit color depth',
     'OPTIONS_TEST_DEFHEAP': 'Test config, LVGL heap, 32 bit color depth',
     'OPTIONS_TEST_VG_LITE': 'VG-Lite simulator with full config, 32 bit color depth',
+    'OPTIONS_TEST_RISCV_V': 'RISC-V Vector emulation with full config, 32 bit color depth',
 }
 
 
@@ -181,8 +181,8 @@ def generate_code_coverage_report():
     cmd = ['gcovr', '--gcov-ignore-parse-errors', 
            '--root', root_dir, '--html-details', '--output',
            html_report_file, '--xml', 'report/coverage.xml',
-           '-j', str(os.cpu_count()), '--print-summary',
-           '--html-title', 'LVGL Test Coverage', '--filter', os.path.join(root_dir, 'src/.*/lv_.*\.c')]
+           '-j', str(os.cpu_count()), '--print-summary', '--merge-mode-functions=merge-use-line-min',
+           '--html-title', 'LVGL Test Coverage']
 
     subprocess.check_call(cmd)
     print("Done: See %s" % html_report_file, flush=True)
@@ -252,6 +252,8 @@ if __name__ == "__main__":
                         help='Update test image using LVGLImage.py script')
     parser.add_argument('--auto-clean', action='store_true', default=False,
                         help='Automatically clean build directories')
+    parser.add_argument('--keep-report', action='store_true', default=False,
+                        help='Skip cleaning gcov report files when --auto-clean and --report are enabled')
 
     args = parser.parse_args()
 
@@ -297,8 +299,13 @@ if __name__ == "__main__":
                 # the rest to solve the storage capacity limit of GitHub CI
                 clean_filters = ['CMakeFiles', '.c']
                 clean_build_dirs_with_filter(build_dir, clean_filters)
-                print(f"Append {build_dir} to clean list")
-                clean_build_dirs.append(build_dir)
+
+                if args.keep_report:
+                    # Retain the gcov report files for subsequent automated coverage analysis.
+                    print(f"Keeping {build_dir} for report")
+                else:
+                    print(f"Append {build_dir} to clean list")
+                    clean_build_dirs.append(build_dir)
             else:
                 # Remove all build directories directly
                 print(f"Removing {build_dir}")

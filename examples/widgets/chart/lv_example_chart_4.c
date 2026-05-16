@@ -23,7 +23,14 @@ static void draw_event_cb(lv_event_t * e)
 }
 
 /**
- * Recolor the bars of a chart based on their value
+ * @title Value-based bar colors
+ * @brief Bar chart that tints each bar between green and red based on its value.
+ *
+ * A 260x160 `LV_CHART_TYPE_BAR` chart holds 24 points on one series. The
+ * chart sets `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` and subscribes to
+ * `LV_EVENT_DRAW_TASK_ADDED`. For each `LV_PART_ITEMS` fill task the
+ * callback reads the underlying Y value and replaces the fill color
+ * with an `lv_color_mix` of green and red proportional to the value.
  */
 void lv_example_chart_4(void)
 {

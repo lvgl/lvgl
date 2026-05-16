@@ -8,9 +8,6 @@
  *********************/
 #include "lv_event_private.h"
 #include "../core/lv_global.h"
-#include "../stdlib/lv_mem.h"
-#include "lv_assert.h"
-#include "lv_types.h"
 
 /*********************
  *      DEFINES
@@ -54,6 +51,19 @@ static lv_event_dsc_t ** event_array_at(lv_event_list_t * list, uint32_t index);
  *   GLOBAL FUNCTIONS
  **********************/
 
+#if LV_USE_EXT_DATA
+void lv_event_desc_set_external_data(lv_event_dsc_t * dsc, void * data, void (* free_cb)(void * data))
+{
+    if(!dsc) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL event descriptor");
+        return;
+    }
+
+    dsc->ext_data.data = data;
+    dsc->ext_data.free_cb = free_cb;
+}
+#endif
+
 void lv_event_push(lv_event_t * e)
 {
     /*Build a simple linked list from the objects used in the events
@@ -67,6 +77,29 @@ void lv_event_push(lv_event_t * e)
 void lv_event_pop(lv_event_t * e)
 {
     event_head = e->prev;
+}
+
+lv_result_t lv_event_push_and_send(lv_event_list_t * event_list, lv_event_code_t code, void * original_target,
+                                   void * param)
+{
+    LV_ASSERT_NULL(event_list);
+    lv_event_t e;
+    lv_memzero(&e, sizeof(e));
+    e.code = code;
+    e.current_target = original_target;
+    e.original_target = original_target;
+    e.param = param;
+
+    lv_event_push(&e);
+    lv_result_t res = lv_event_send(event_list, &e, true);
+    if(res != LV_RESULT_OK) goto ret;
+
+    res = lv_event_send(event_list, &e, false);
+    if(res != LV_RESULT_OK) goto ret;
+
+ret:
+    lv_event_pop(&e);
+    return res;
 }
 
 lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess)
@@ -95,6 +128,9 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
         lv_event_code_t filter = dsc->filter & ~LV_EVENT_PREPROCESS;
         if(filter == LV_EVENT_ALL || filter == e->code) {
             e->user_data = dsc->user_data;
+#if LV_USE_EXT_DATA
+            e->ext_data.data = dsc->ext_data.data;
+#endif
             dsc->cb(e);
             if(e->stop_processing) break;
 
@@ -126,6 +162,10 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
     dsc->cb = cb;
     dsc->filter = filter;
     dsc->user_data = user_data;
+#if LV_USE_EXT_DATA
+    dsc->ext_data.free_cb = NULL;
+    dsc->ext_data.data = NULL;
+#endif
 
     if(event_array_size(list) == 0) {
         /*event list hasn't been initialized.*/
@@ -145,6 +185,12 @@ bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
     for(uint32_t i = 0; i < size; i++) {
         lv_event_dsc_t * event = *event_array_at(list, i);
         if(event == dsc) {
+#if LV_USE_EXT_DATA
+            if(dsc->ext_data.free_cb) {
+                dsc->ext_data.free_cb(dsc->ext_data.data);
+                dsc->ext_data.data = NULL;
+            }
+#endif
             event_mark_deleting(list, event);
             cleanup_event_list(list);
             return true;
@@ -185,6 +231,12 @@ bool lv_event_remove(lv_event_list_t * list, uint32_t index)
     LV_ASSERT_NULL(list);
     lv_event_dsc_t * dsc = lv_event_get_dsc(list, index);
     if(dsc == NULL) return false;
+#if LV_USE_EXT_DATA
+    if(dsc->ext_data.free_cb) {
+        dsc->ext_data.free_cb(dsc->ext_data.data);
+        dsc->ext_data.data = NULL;
+    }
+#endif
     event_mark_deleting(list, dsc);
     cleanup_event_list(list);
     return true;
@@ -194,8 +246,17 @@ void lv_event_remove_all(lv_event_list_t * list)
 {
     LV_ASSERT_NULL(list);
     const uint32_t size = event_array_size(list);
-    for(uint32_t i = 0; i < size; i++)
+    for(uint32_t i = 0; i < size; i++) {
+#if LV_USE_EXT_DATA
+        lv_event_dsc_t * dsc = lv_event_get_dsc(list, i);
+        if(dsc && dsc->ext_data.free_cb) {
+            dsc->ext_data.free_cb(dsc->ext_data.data);
+            dsc->ext_data.data = NULL;
+        }
+#endif
         event_mark_deleting(list, *event_array_at(list, i));
+    }
+
     cleanup_event_list(list);
 }
 
@@ -315,6 +376,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_REFRESH);
             ENUM_CASE(EVENT_READY);
             ENUM_CASE(EVENT_CANCEL);
+            ENUM_CASE(EVENT_STATE_CHANGED);
 
             /** Other events*/
             ENUM_CASE(EVENT_CREATE);
@@ -330,6 +392,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_STYLE_CHANGED);
             ENUM_CASE(EVENT_LAYOUT_CHANGED);
             ENUM_CASE(EVENT_GET_SELF_SIZE);
+            ENUM_CASE(EVENT_UPDATE_LAYOUT_COMPLETED);
 
             /** Events of optional LVGL components*/
             ENUM_CASE(EVENT_INVALIDATE_AREA);
@@ -344,9 +407,17 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_FLUSH_FINISH);
             ENUM_CASE(EVENT_FLUSH_WAIT_START);
             ENUM_CASE(EVENT_FLUSH_WAIT_FINISH);
+            ENUM_CASE(EVENT_SYNC_START);
+            ENUM_CASE(EVENT_SYNC_FINISH);
+            ENUM_CASE(EVENT_SYNC_WAIT_START);
+            ENUM_CASE(EVENT_SYNC_WAIT_FINISH);
 
             ENUM_CASE(EVENT_VSYNC);
             ENUM_CASE(EVENT_VSYNC_REQUEST);
+
+#if LV_USE_TRANSLATION
+            ENUM_CASE(EVENT_TRANSLATION_LANGUAGE_CHANGED);
+#endif /*LV_USE_TRANSLATION*/
 
         /* Special event flags */
         case LV_EVENT_LAST:
@@ -413,3 +484,4 @@ static lv_event_dsc_t ** event_array_at(lv_event_list_t * list, uint32_t index)
 {
     return lv_array_at(&list->array, index);
 }
+

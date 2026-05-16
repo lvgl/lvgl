@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../core/lv_obj_scroll_private.h"
 #include "../core/lv_obj_private.h"
-#include "lv_indev.h"
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
 
@@ -317,11 +317,16 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
             lv_point_transform(&obj_scroll_sum, angle, scale_x, scale_y, &pivot, false);
         }
 
+        /*Determine scroll direction in current object's coordinate system.
+         *Reset both flags each iteration so that a child's transform rotation
+         *does not pollute the direction judgment of its ancestors.*/
         if(LV_ABS(obj_scroll_sum.x) > LV_ABS(obj_scroll_sum.y)) {
             hor_en = true;
+            ver_en = false;
         }
         else {
             ver_en = true;
+            hor_en = false;
         }
 
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
@@ -652,7 +657,7 @@ static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_
          * then respect the current position instead of going straight back to 0.
          */
         const int32_t scroll_ended = diff > 0 ? scroll_start : scroll_end;
-        if(scroll_ended < 0) diff = 0;
+        if(scroll_ended <= 0) diff = 0;
         else if(scroll_ended - diff < 0) diff = scroll_ended;
     }
     /*Handle elastic scrolling*/

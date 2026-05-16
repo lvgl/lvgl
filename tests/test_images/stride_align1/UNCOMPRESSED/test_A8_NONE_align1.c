@@ -1,12 +1,13 @@
 
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
+#elif defined(LV_LVGL_H_INCLUDE_SYSTEM)
+#include <lvgl.h>
 #elif defined(LV_BUILD_TEST)
 #include "../lvgl.h"
 #else
 #include "lvgl/lvgl.h"
 #endif
-
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
@@ -84,13 +85,17 @@ uint8_t test_A8_NONE_align1_map[] = {
 };
 
 const lv_image_dsc_t test_A8_NONE_align1 = {
-  .header.magic = LV_IMAGE_HEADER_MAGIC,
-  .header.cf = LV_COLOR_FORMAT_A8,
-  .header.flags = 0,
-  .header.w = 71,
-  .header.h = 60,
-  .header.stride = 80,
+  .header = {
+    .magic = LV_IMAGE_HEADER_MAGIC,
+    .cf = LV_COLOR_FORMAT_A8,
+    .flags = 0,
+    .w = 71,
+    .h = 60,
+    .stride = 80,
+    .reserved_2 = 0,
+  },
   .data_size = sizeof(test_A8_NONE_align1_map),
   .data = test_A8_NONE_align1_map,
+  .reserved = NULL,
 };
 

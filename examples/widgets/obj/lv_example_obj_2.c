@@ -17,7 +17,14 @@ static void drag_event_handler(lv_event_t * e)
 }
 
 /**
- * Make an object draggable.
+ * @title Draggable base object
+ * @brief Move a `Drag me` object under the pointer using `LV_EVENT_PRESSING`.
+ *
+ * A 150 by 100 base object carries a centered `Drag me` label. An
+ * `LV_EVENT_PRESSING` callback reads the active input device's motion
+ * vector with `lv_indev_get_vect`, adds it to the object's current
+ * aligned position, and calls `lv_obj_set_pos` so the object follows
+ * the pointer as long as it is held down.
  */
 void lv_example_obj_2(void)
 {

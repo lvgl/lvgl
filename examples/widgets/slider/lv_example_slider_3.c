@@ -7,8 +7,15 @@
 static void slider_event_cb(lv_event_t * e);
 
 /**
- * Show the current value when the slider is pressed by extending the drawer
+ * @title Range slider with pressed value tooltip
+ * @brief Draw the current low-high pair above a range slider only while it is pressed.
  *
+ * The slider is set to `LV_SLIDER_MODE_RANGE` over 0 to 100 with a start
+ * value of 20 and an end value of 70. `LV_EVENT_REFR_EXT_DRAW_SIZE` reserves
+ * 50 px above the widget so the tooltip has room, and `LV_EVENT_DRAW_MAIN_END`
+ * draws a `<left> - <right>` label centered above the indicator when
+ * `LV_STATE_PRESSED` is active. Releasing the slider removes the tooltip on
+ * the next redraw.
  */
 void lv_example_slider_3(void)
 {
@@ -46,14 +53,8 @@ static void slider_event_cb(lv_event_t * e)
         char buf[16];
         lv_snprintf(buf, sizeof(buf), "%d - %d", (int)lv_slider_get_left_value(obj), (int)lv_slider_get_value(obj));
 
-        lv_text_attributes_t attributes = {0};
-        attributes.text_flags = LV_TEXT_FLAG_NONE;
-        attributes.max_width = LV_COORD_MAX;
-        attributes.letter_space = 0;
-        attributes.line_space = 0;
-
         lv_point_t label_size;
-        lv_text_get_size(&label_size, buf, LV_FONT_DEFAULT, &attributes);
+        lv_text_get_size(&label_size, buf, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         lv_area_t label_area;
         label_area.x1 = 0;
         label_area.x2 = label_size.x - 1;

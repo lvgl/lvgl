@@ -6,19 +6,31 @@ from collections import defaultdict
 
 
 style_properties_type = {
+    "LV_STYLE_ANIM": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_ARC_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_ARC_IMAGE_SRC": "LV_PROPERTY_TYPE_IMGSRC",
     "LV_STYLE_BG_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_BG_GRAD": "LV_PROPERTY_TYPE_POINTER",
     "LV_STYLE_BG_GRAD_COLOR": "LV_PROPERTY_TYPE_COLOR",
-    "LV_STYLE_BG_IMAGE_SRC": "LV_PROPERTY_TYPE_IMGSRC",
     "LV_STYLE_BG_IMAGE_RECOLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_BG_IMAGE_SRC": "LV_PROPERTY_TYPE_IMGSRC",
+    "LV_STYLE_BITMAP_MASK_SRC": "LV_PROPERTY_TYPE_POINTER",
     "LV_STYLE_BORDER_COLOR": "LV_PROPERTY_TYPE_COLOR",
-    "LV_STYLE_OUTLINE_COLOR": "LV_PROPERTY_TYPE_COLOR",
-    "LV_STYLE_SHADOW_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_COLOR_FILTER_DSC": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_GRID_COLUMN_DSC_ARRAY": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_GRID_ROW_DSC_ARRAY": "LV_PROPERTY_TYPE_POINTER",
     "LV_STYLE_IMAGE_RECOLOR": "LV_PROPERTY_TYPE_COLOR",
-    "LV_STYLE_ARCH_IMAGE_SRC": "LV_PROPERTY_TYPE_IMGSRC",
-    "LV_STYLE_ARCH_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_LAST_BUILT_IN_PROP": "LV_PROPERTY_TYPE_INVALID",
+    "LV_STYLE_LINE_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_OUTLINE_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_PROP_INV": "LV_PROPERTY_TYPE_INVALID",
+    "LV_STYLE_RECOLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_SHADOW_COLOR": "LV_PROPERTY_TYPE_COLOR",
     "LV_STYLE_TEXT_COLOR": "LV_PROPERTY_TYPE_COLOR",
     "LV_STYLE_TEXT_FONT": "LV_PROPERTY_TYPE_FONT",
-    "LV_STYLE_LINE_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_TEXT_OUTLINE_STROKE_COLOR": "LV_PROPERTY_TYPE_COLOR",
+    "LV_STYLE_TRANSITION": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_DROP_SHADOW_COLOR": "LV_PROPERTY_TYPE_COLOR",
 }
 
 
@@ -57,16 +69,35 @@ def read_widget_properties(directory):
                         id)
 
     def match_styles(file_path):
-        pattern = r'^\s+LV_STYLE_(\w+)\s*=\s*(\d+),'
+        pattern_with_value = r'^\s+LV_STYLE_(\w+)\s*=\s*(\d+),'
+        pattern_name_only = r'^\s+LV_STYLE_(\w+)\s*,'
+        last_value = 0
+        process = False
         with open(file_path, 'r', encoding='utf-8') as file:
             for line in file.readlines():
-                match = re.match(pattern, line)
+                if re.match("enum _lv_style_id_t", line):
+                    process = True
+                    continue
+
+                if process and re.match("};", line):
+                    return
+
+                if process == False: continue
+                match = re.match(pattern_with_value, line)
+                name = ""
                 if match:
                     name = match.group(1).upper()
+                    last_value = int(match.group(2))
+                else:
+                    match = re.match(pattern_name_only, line)
+                    if match:
+                        name = match.group(1).upper()
+                        last_value += 1
+                if name:
                     id = f"LV_PROPERTY_STYLE_{name}"
                     yield Property("style",
                                    match.group(1).lower(), "style",
-                                   match.group(2), id)
+                                   last_value, id)
 
     properties_by_widget = defaultdict(list)
     for file_path in find_headers(directory):
@@ -84,9 +115,10 @@ def read_widget_properties(directory):
     return properties_by_widget
 
 
-def write_widget_properties(output, properties_by_widget):
+def write_widget_properties(root_folder, properties_by_widget):
     # Open header file for update.
-    with open(f'{output}/lv_obj_property_names.h', "w") as header:
+    pub_header = os.path.join(root_folder, 'include', 'lvgl', 'core', 'lv_obj_property_names.h')
+    with open(pub_header, "w") as header:
         header.write(f'''
 /**
  * @file lv_obj_property_names.h
@@ -95,7 +127,7 @@ def write_widget_properties(output, properties_by_widget):
 #ifndef LV_OBJ_PROPERTY_NAMES_H
 #define LV_OBJ_PROPERTY_NAMES_H
 
-#include "../../misc/lv_types.h"
+#include "../lv_types.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 
@@ -104,18 +136,15 @@ def write_widget_properties(output, properties_by_widget):
         for widget in sorted(properties_by_widget.keys()):
             properties = properties_by_widget[widget]
             file_name = f'lv_{widget}_properties.c'
-            output_file = f'{output}/{file_name}'
+            output_file = os.path.join(root_folder, 'src', 'widgets', 'property', file_name)
 
             count = len(properties)
-            if widget == 'style':
-                include = "lv_style_properties.h"
-                guard = None
-            elif widget == "obj":
-                include = "../../core/lv_obj.h"
-                guard = None
-            else:
-                include = f'../{widget}/lv_{widget}.h'
+            if widget != 'style' and widget != 'obj':
                 guard = f"#if LV_USE_{widget.upper()}"
+            else:
+                guard = None
+
+            include = "../../lvgl_public.h"
 
             with open(output_file, 'w') as f:
                 f.write(f'''
@@ -154,12 +183,12 @@ const lv_property_name_t lv_{widget}_property_names[{count}] = {{
         header.write('#endif\n')
 
 
-def write_style_header(output, properties_by_widget):
+def write_style_header(root_folder, properties_by_widget):
     properties = properties_by_widget['style']
 
-    output_file = f'{output}/lv_style_properties.h'
+    header = os.path.join(root_folder, 'include', 'lvgl', 'core', 'lv_style_properties.h')
 
-    with open(output_file, 'w') as f:
+    with open(header, 'w') as f:
         f.write(f'''
 /**
  * GENERATED FILE, DO NOT EDIT IT!
@@ -168,7 +197,7 @@ def write_style_header(output, properties_by_widget):
 #ifndef LV_STYLE_PROPERTIES_H
 #define LV_STYLE_PROPERTIES_H
 
-#include "../../core/lv_obj_property.h"
+#include "../config/lv_conf_internal.h"
 #if LV_USE_OBJ_PROPERTY
 
 
@@ -189,11 +218,11 @@ enum _lv_property_style_id_t {{
         f.write('#endif\n')
 
 
-def main(directory, output):
+def main(directory):
     """Generate property names"""
     property = read_widget_properties(directory)
-    write_widget_properties(output, property)
-    write_style_header(output, property)
+    write_widget_properties(directory, property)
+    write_style_header(directory, property)
 
 
 if __name__ == "__main__":
@@ -201,18 +230,15 @@ if __name__ == "__main__":
         description='Search files and filter lines.')
     parser.add_argument('-d', '--directory',
                         help='Directory to lvgl root path')
-    parser.add_argument(
-        '-o', '--output', help='Folders to write generated properties for all widgets.')
     args = parser.parse_args()
 
     # default directory is the lvgl root path of where this script sits
     if args.directory is None:
         args.directory = os.path.join(os.path.dirname(__file__), "../")
 
-    if args.output is None:
-        args.output = os.path.join(args.directory, "src/widgets/property/")
-
+    property_folder = os.path.join(args.directory, 'src', 'widgets', 'property')
+    
     # create output directory if it doesn't exist
-    os.makedirs(args.output, exist_ok=True)
+    os.makedirs(property_folder, exist_ok=True)
 
-    main(args.directory, args.output)
+    main(args.directory)

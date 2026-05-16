@@ -8,13 +8,18 @@
  *********************/
 
 #include "lv_nuttx_cache.h"
-#include "../../../lvgl.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NUTTX
 
 #include "../../draw/lv_draw_buf_private.h"
 #include "../../core/lv_global.h"
-#include <nuttx/cache.h>
+
+#ifdef __NuttX__
+    #include <nuttx/cache.h>
+#else
+    #include "mock/nuttx_cache.h"
+#endif
 
 /*********************
  *      DEFINES

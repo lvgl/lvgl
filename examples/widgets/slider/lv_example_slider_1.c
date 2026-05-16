@@ -5,7 +5,14 @@ static void slider_event_cb(lv_event_t * e);
 static lv_obj_t * slider_label;
 
 /**
- * A default slider with a label displaying the current value
+ * @title Slider with live value label
+ * @brief Center a slider and update a percentage label beneath it on value changes.
+ *
+ * A default `lv_slider_create` slider is centered on the active screen with a
+ * 2000 ms `LV_STYLE_ANIM_DURATION` for smooth programmatic moves. A label
+ * starting at `0%` is placed with `LV_ALIGN_OUT_BOTTOM_MID` below the slider,
+ * and an `LV_EVENT_VALUE_CHANGED` callback rewrites the label with the
+ * current `lv_slider_get_value` and realigns it under the slider.
  */
 void lv_example_slider_1(void)
 {

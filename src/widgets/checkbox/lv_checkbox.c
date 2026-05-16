@@ -6,17 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_checkbox_private.h"
+
+#if LV_USE_CHECKBOX
+
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_CHECKBOX != 0
-
-#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../core/lv_group.h"
-#include "../../draw/lv_draw.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -38,6 +36,17 @@ static void lv_checkbox_draw(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_checkbox_properties[] = {
+    {
+        .id = LV_PROPERTY_CHECKBOX_TEXT,
+        .setter = lv_checkbox_set_text,
+        .getter = lv_checkbox_get_text,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_checkbox_class = {
     .constructor_cb = lv_checkbox_constructor,
     .destructor_cb = lv_checkbox_destructor,
@@ -48,6 +57,7 @@ const lv_obj_class_t lv_checkbox_class = {
     .instance_size = sizeof(lv_checkbox_t),
     .base_class = &lv_obj_class,
     .name = "lv_checkbox",
+    LV_PROPERTY_CLASS_FIELDS(checkbox, CHECKBOX)
 };
 
 /**********************
@@ -78,7 +88,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
         size_t len;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        len = lv_text_ap_calc_bytes_count(txt) + 1;
+        len = lv_text_ap_strlen(txt) + 1;
 #else
         len = lv_strlen(txt) + 1;
 #endif
@@ -192,7 +202,7 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_point_t txt_size;
 
-        lv_text_get_size(&txt_size, cb->txt, font, &attributes);
+        lv_text_get_size_attributes(&txt_size, cb->txt, font, &attributes);
 
         int32_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
         int32_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
@@ -270,7 +280,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     attributes.max_width = LV_COORD_MAX;
 
     lv_point_t txt_size;
-    lv_text_get_size(&txt_size, cb->txt, font, &attributes);
+    lv_text_get_size_attributes(&txt_size, cb->txt, font, &attributes);
 
     lv_draw_label_dsc_t txt_dsc;
     lv_draw_label_dsc_init(&txt_dsc);

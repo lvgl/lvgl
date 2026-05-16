@@ -7,10 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_3d.h"
-#if LV_USE_3DTEXTURE
-
 #include "lv_draw_private.h"
+
+#if LV_USE_3DTEXTURE
 
 /*********************
  *      DEFINES
@@ -39,11 +38,11 @@
 void lv_draw_3d_dsc_init(lv_draw_3d_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_3d_dsc_t));
-    dsc->base.dsc_size = sizeof(lv_draw_3d_dsc_t);
     dsc->tex_id = LV_3DTEXTURE_ID_NULL;
     dsc->h_flip = false;
     dsc->v_flip = false;
     dsc->opa = LV_OPA_COVER;
+    dsc->base.dsc_size = sizeof(lv_draw_3d_dsc_t);
 }
 
 lv_draw_3d_dsc_t * lv_draw_task_get_3d_dsc(lv_draw_task_t * task)

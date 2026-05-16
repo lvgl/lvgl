@@ -13,7 +13,6 @@
 
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_math.h"
-#include <float.h>
 
 /*********************
  *      DEFINES
@@ -228,8 +227,8 @@ bool lv_vg_lite_path_update_bounding_box(lv_vg_lite_path_t * path)
     /* init bounds */
     bounds.min_x = FLT_MAX;
     bounds.min_y = FLT_MAX;
-    bounds.max_x = FLT_MIN;
-    bounds.max_y = FLT_MIN;
+    bounds.max_x = -FLT_MAX;
+    bounds.max_y = -FLT_MAX;
 
     /* calc bounds */
     lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(path), path_bounds_iter_cb, &bounds);
@@ -647,6 +646,7 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
 {
     LV_ASSERT_NULL(path);
     LV_ASSERT_NULL(cb);
+    LV_PROFILER_DRAW_BEGIN;
 
     uint8_t fmt_len = lv_vg_lite_path_format_len(path->format);
     uint8_t * cur = path->path;
@@ -688,6 +688,8 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
 
         cb(user_data, op_code, tmp_data, arg_len);
     }
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_path_append_path(lv_vg_lite_path_t * dest, const lv_vg_lite_path_t * src)

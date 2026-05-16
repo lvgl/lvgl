@@ -11,7 +11,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <limits.h>
+#include LV_LIMITS_INCLUDE
 
 #include "../../core/lv_global.h"
 /*********************

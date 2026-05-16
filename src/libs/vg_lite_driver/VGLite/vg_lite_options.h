@@ -28,15 +28,12 @@
 #ifndef VG_LITE_OPTIONS_DISPATCH_H
 #define VG_LITE_OPTIONS_DISPATCH_H
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
-    #if defined(GCID_REV_CID)
-        #define VG_LITE_OPTIONS  <Series/GCID_REV_CID/vg_lite_options.h>
-        #include VG_LITE_OPTIONS
-    #else
-        #error "GCID_REV_CID is not defined; eg: -DGCID_REV_CID=gc355/0x0_1216"
-    #endif
+    #define VG_LITE_OPTIONS VG_LITE_OPTIONS_2
+    #define VG_LITE_OPTIONS_2  <../VGLite/Series/LV_VG_LITE_HAL_GPU_SERIES/LV_VG_LITE_HAL_GPU_REVISION/vg_lite_options.h>
+    #include VG_LITE_OPTIONS
 
 #endif /* LV_USE_VG_LITE_DRIVER */
 

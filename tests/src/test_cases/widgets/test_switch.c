@@ -156,7 +156,31 @@ void test_screeshots(void)
     lv_obj_add_state(sw, LV_STATE_CHECKED);
     lv_obj_set_size(sw, 50, 100);
 
+    lv_test_wait(1000); /*Wait for the transitions*/
+
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/switch_1.png");
+}
+
+void test_switch_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_switch_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test ORIENTATION property */
+    prop.id = LV_PROPERTY_SWITCH_ORIENTATION;
+    prop.num = LV_SWITCH_ORIENTATION_VERTICAL;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_SWITCH_ORIENTATION_VERTICAL, lv_obj_get_property(obj, LV_PROPERTY_SWITCH_ORIENTATION).num);
+    TEST_ASSERT_EQUAL_INT(LV_SWITCH_ORIENTATION_VERTICAL, lv_switch_get_orientation(obj));
+
+    prop.num = LV_SWITCH_ORIENTATION_HORIZONTAL;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_SWITCH_ORIENTATION_HORIZONTAL, lv_obj_get_property(obj, LV_PROPERTY_SWITCH_ORIENTATION).num);
+    TEST_ASSERT_EQUAL_INT(LV_SWITCH_ORIENTATION_HORIZONTAL, lv_switch_get_orientation(obj));
+
+    lv_obj_delete(obj);
+#endif
 }
 
 #endif

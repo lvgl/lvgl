@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width='400' height='400'>
+    <defs>
+    <linearGradient id='ggg1' x1='0%' y1='0%' x2='100%' y2='0%'>
+        <stop offset='0' stop-color='red' />
+        <stop offset='0.5' stop-color='green' />
+        <stop offset='1' stop-color='blue' />
+    </linearGradient>
+    </defs>
+
+    <rect x='306' y='100' width='50' height='50' rx='25' ry='25'/>
+    <rect x='0' y='100' width='50' height='50' fill='red' rx='0' ry='0'/>
+    <rect x='51' y='100' width='50' height='50' fill='#ff0000' rx='0' ry='0'/>
+    <rect x='102' y='100' width='50' height='50' fill='rgb(255,0,0)' rx='0' ry='0'/>
+    <rect x='153' y='100' width='50' height='50' fill='rgba(255,0,0,0.5)' rx='0' ry='0'/>
+    <rect x='204' y='100' width='50' height='50' fill='none' rx='0' ry='0'/>
+    <rect x='255' y='100' width='50' height='50' fill='url(#ggg1)' rx='0' ry='0'/>
+
+    <rect x='0' y='153' fill='white' width='50' height='50' stroke='green' rx='0' ry='0'/>
+    <rect x='53' y='153' fill='white' width='50' height='50' stroke='url(#ggg1)' rx='0' ry='0'/>
+
+    <rect x='0' y='201' width='50' height='50' transform='translate(0, 50)' rx='0' ry='0'/>
+    <rect x='51' y='215' width='50' height='50' transform='rotate(290, 100, 100)' rx='0' ry='0'/>
+    <rect x='80' y='230' width='50' height='50' transform='scale(1.4, 1.4)' rx='0' ry='0'/>
+    <rect x='153' y='201' width='50' height='50' transform='skewX(10)' rx='0' ry='0'/>
+    <rect x='204' y='201' width='50' height='50' transform='skewY(20)' rx='0' ry='0'/>
+    <rect x='255' y='201' width='50' height='50' transform='matrix(1, 0, 0.3640, 1, 0, 0)' rx='0' ry='25'/>
+    <rect x='0' y='220' width='50' height='50' fill='pink' stroke='red' rx='25' ry='0' transform='matrix(1, 0, 0.3640, 1, 0, 0)'/>
+</svg>

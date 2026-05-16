@@ -6,13 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_rect_private.h"
+
 #include "lv_draw_private.h"
-#include "../core/lv_obj.h"
-#include "../misc/lv_assert.h"
 #include "../misc/lv_text_private.h"
-#include "../core/lv_obj_event.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -55,6 +51,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->border_opa = LV_OPA_COVER;
     dsc->shadow_opa = LV_OPA_COVER;
     dsc->border_side = LV_BORDER_SIDE_FULL;
+    dsc->base.dsc_size = sizeof(lv_draw_rect_dsc_t);
 }
 
 void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc)
@@ -74,6 +71,16 @@ void lv_draw_fill(lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc, const lv_a
     if(dsc->opa <= LV_OPA_MIN) return;
 
     LV_PROFILER_DRAW_BEGIN;
+
+    if(dsc->base.drop_shadow_opa) {
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
+        LV_ASSERT_NULL(ds_layer);
+        lv_draw_fill_dsc_t ds_dsc = *dsc;
+        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain fill*/
+        lv_draw_fill(ds_layer, &ds_dsc, coords);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+    }
+
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_FILL);
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
@@ -100,6 +107,16 @@ void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const 
     if(dsc->opa <= LV_OPA_MIN) return;
 
     LV_PROFILER_DRAW_BEGIN;
+
+    if(dsc->base.drop_shadow_opa) {
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
+        LV_ASSERT_NULL(ds_layer);
+        lv_draw_border_dsc_t ds_dsc = *dsc;
+        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain border*/
+        lv_draw_border(ds_layer, &ds_dsc, coords);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+    }
+
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BORDER);
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
@@ -137,6 +154,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 {
 
     LV_PROFILER_DRAW_BEGIN;
+
     bool has_shadow;
     bool has_fill;
     bool has_border;
@@ -178,6 +196,16 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                 break;
             }
         }
+    }
+
+    if(dsc->base.drop_shadow_opa && (has_fill || has_outline)) {
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
+        LV_ASSERT_NULL(ds_layer);
+        lv_draw_rect_dsc_t ds_dsc = *dsc;
+        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain shadow*/
+        ds_dsc.shadow_opa = 0;
+        lv_draw_rect(ds_layer, &ds_dsc, coords);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
     }
 
     lv_draw_task_t * t;
@@ -267,6 +295,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                 bg_image_dsc->recolor = dsc->bg_image_recolor;
                 bg_image_dsc->recolor_opa = dsc->bg_image_recolor_opa;
                 bg_image_dsc->tile = dsc->bg_image_tiled;
+                bg_image_dsc->colorkey = dsc->bg_image_colorkey;
                 bg_image_dsc->header = header;
                 bg_image_dsc->clip_radius = dsc->radius;
                 bg_image_dsc->image_area = *coords;
@@ -281,7 +310,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                 attributes.line_space = 0;
                 attributes.letter_space = 0;
 
-                lv_text_get_size(&s, dsc->bg_image_src, dsc->bg_image_symbol_font, &attributes);
+                lv_text_get_size_attributes(&s, dsc->bg_image_src, dsc->bg_image_symbol_font, &attributes);
 
                 lv_area_t a = {0, 0, s.x - 1, s.y - 1};
                 lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);

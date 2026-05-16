@@ -1,0 +1,34 @@
+"""
+Auto-generated wrapper for lv_checkbox_t.
+
+Do not edit manually. Regenerate from the GDB script root with:
+    python3 scripts/generate_all.py
+"""
+
+from lvglgdb.lvgl.core.lv_obj import LVObject
+from ._helpers import safe_string
+
+
+class LVCheckbox(LVObject):
+    """LVGL checkbox widget (lv_checkbox_t)."""
+
+    def __init__(self, obj):
+        super().__init__(obj)
+        self._wv = self.cast("lv_checkbox_t", ptr=True) or self
+
+    @property
+    def txt(self):
+        return safe_string(self._wv, "txt")
+
+    @property
+    def static_txt(self):
+        return int(self._wv.safe_field("static_txt", 0))
+
+    def snapshot(self, include_children=False, include_styles=False):
+        """Snapshot with widget-specific fields in widget_data."""
+        s = super().snapshot(include_children=include_children, include_styles=include_styles)
+        d = s.get('widget_data') or {}
+        d["txt"] = self.txt
+        d["static_txt"] = self.static_txt
+        s['widget_data'] = d
+        return s

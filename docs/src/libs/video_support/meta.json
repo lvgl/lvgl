@@ -1,0 +1,7 @@
+{
+  "title": "Video Support",
+  "pages": [
+    "ffmpeg",
+    "gstreamer"
+  ]
+}

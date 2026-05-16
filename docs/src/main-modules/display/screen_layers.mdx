@@ -1,0 +1,81 @@
+---
+title: Screen Layers
+description: "When an lv_display_t object is created, 4 permanent Screens that facilitate layering are created and attached to it."
+---
+
+When an `lv_display_t` object is created, 4 permanent [Screens](/common-widget-features/screens) that
+facilitate layering are created and attached to it.
+
+1. Bottom Layer       (below Active Screen, transparent, not scroll-able, but click-able)
+2. [Active Screen](/common-widget-features/screens)
+3. Top Layer          (above Active Screen, transparent and neither scroll-able nor click-able)
+4. System Layer       (above Top Layer, transparent and neither scroll-able nor click-able)
+
+1, 3 and 4 are independent of the [Active Screen](/common-widget-features/screens) and they will be shown (if
+they contain anything that is visible) regardless of which screen is the
+[Active Screen](/common-widget-features/screens).
+
+<Callout type="info">
+For the bottom layer to be visible, the Active Screen's background has to be
+at least partially, if not fully, transparent.
+</Callout>
+
+You can get pointers to each of these screens on the [Default Display](/main-modules/display/setup) by using
+(respectively):
+
+- <ApiLink name="lv_screen_active" />,
+- <ApiLink name="lv_layer_top" />,
+- <ApiLink name="lv_layer_sys" />, and
+- <ApiLink name="lv_layer_bottom" />.
+
+You can get pointers to each of these screens on a specified display by using
+(respectively):
+
+- <ApiLink name="lv_display_get_screen_active" display="lv_display_get_screen_active(disp)" />,
+- <ApiLink name="lv_display_get_layer_top" display="lv_display_get_layer_top(disp)" />,
+- <ApiLink name="lv_display_get_layer_sys" display="lv_display_get_layer_sys(disp)" />, and
+- <ApiLink name="lv_display_get_layer_bottom" display="lv_display_get_layer_bottom(disp)" />.
+
+To set a Screen you create to be the [Active Screen](/common-widget-features/screens), call
+<ApiLink name="lv_screen_load" /> or <ApiLink name="lv_screen_load_anim" />.
+
+Calling <ApiLink name="lv_display_get_screen_loading" display="lv_display_get_screen_loading(disp)" /> will return the screen that is
+being loaded. A Screen is considered "being loaded" until the loading animation finishes.
+If no Screen is being loaded, this function will return `NULL`.
+
+## Top and System Layers
+
+LVGL uses the Top Layer and System Layer to empower you to ensure that certain
+[All Widgets](/widgets) are *always* on top of other layers.
+
+You can add "pop-up windows" to the *Top Layer* freely.  The Top Layer was meant to
+be used to create Widgets that are visible on all Screens shown on a Display.  But,
+the *System Layer* is intended for system-level things (e.g. mouse cursor will be
+placed there with <ApiLink name="lv_indev_set_cursor" />).
+
+These layers work like any other Widget, meaning they have styles, and any kind of
+Widgets can be created in them.
+
+<Callout type="info">
+While the Top Layer and System Layer are created by their owning [Display (lv_display)](/main-modules/display)
+as not scroll-able and not click-able, these behaviors can be overridden the same
+as any other Widget by using <ApiLink name="lv_obj_set_scrollbar_mode" display="lv_obj_set_scrollbar_mode(scr1, LV_SCROLLBAR_MODE_xxx)" />
+and <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(scr1, LV_OBJ_FLAG_CLICKABLE)" /> respectively.
+</Callout>
+
+If the <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag is set on the Top Layer, then it will
+absorb all user clicks and acts as a modal Widget.
+
+```c
+lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
+```
+
+## Bottom Layer
+
+Similar to the Top- and System Layers, the Bottom Layer is also the full size of the
+Display, but it is located below the [Active Screen](/common-widget-features/screens).  It's visible only if the
+Active Screen's background opacity is &lt; 255.
+
+
+
+## API

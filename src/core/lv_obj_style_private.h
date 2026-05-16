@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_obj_style.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -30,6 +30,7 @@ struct _lv_obj_style_t {
     uint32_t is_local : 1;
     uint32_t is_trans : 1;
     uint32_t is_disabled : 1;
+    uint32_t is_theme : 1;  /**< The style is added by a theme */
 };
 
 struct _lv_obj_style_transition_dsc_t {

@@ -122,41 +122,63 @@ document.addEventListener("DOMContentLoaded", (event) => {
    *---------------------------------------------------------------------*/
   document.querySelectorAll("dl.cpp").forEach((cppListing) => {
     const dt = cppListing.querySelector("dt");
+    let exClass = "expanded";
+    let unExClass = "unexpanded";
     let shouldBeExpanded = false;
     if (dt.id == document.location.hash.substring(1)) shouldBeExpanded = true;
-    cppListing.classList.add(shouldBeExpanded ? "expanded" : "unexpanded");
+    if (shouldBeExpanded) {
+      cppListing.classList.add(exClass);
+
+      /* If `dt.id` is for an enumerator, also expand its parent
+       * <dl class="cpp enum unexpanded"> element. */
+      let parentDlNode = cppListing.parentNode.parentNode;
+      if (
+           parentDlNode != null
+        && parentDlNode.classList.contains("cpp")
+        && parentDlNode.classList.contains("enum")
+        && parentDlNode.classList.contains(unExClass)
+        ) {
+        parentDlNode.classList.remove(unExClass);
+        parentDlNode.classList.add(exClass);
+      }
+
+      /* Have browser scroll `cppListing` into view if it is not already. */
+      cppListing.scrollIntoView();
+    } else {
+      cppListing.classList.add(unExClass);
+    }
     const button = document.createElement("span");
     button.classList.add("lv-api-expansion-button");
     button.addEventListener("click", () => {
-      cppListing.classList.toggle("unexpanded");
-      cppListing.classList.toggle("expanded");
+      cppListing.classList.toggle(unExClass);
+      cppListing.classList.toggle(exClass);
     });
 
     dt.insertBefore(button, dt.firstChild);
   });
 
   /*---------------------------------------------------------------------
-     * Display any current custom banner in `banner.json` at top of each page.
-     *---------------------------------------------------------------------
-     * Custom banners are inserted between these two elements at top of page.
-    <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+   * Display any current custom banner in `banner.json` at top of each page.
+   *---------------------------------------------------------------------
+   * Custom banners are inserted between these two elements at top of page.
+  <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
-    <div class="lv-custom-banner-list">
-      <p class="lv-custom-banner">
-         <em>Important</em> announcement one!
-      </p>
-      <p class="lv-custom-banner">
-         <em>Important</em> announcement two!
-      </p>
-      <p class="lv-custom-banner">
-         <em>Important</em> announcement three!
-      </p>
-    </div>
+  <div class="lv-custom-banner-list">
+    <p class="lv-custom-banner">
+      <em>Important</em> announcement one!
+    </p>
+    <p class="lv-custom-banner">
+      <em>Important</em> announcement two!
+    </p>
+    <p class="lv-custom-banner">
+      <em>Important</em> announcement three!
+    </p>
+  </div>
 
-    <div class="page">
-      ...page content...
-     *---------------------------------------------------------------------*/
-  let bannerJsonUrl = "https://lvgl.io/data/banner.json";
+  <div class="page">
+    ...page content...
+   *---------------------------------------------------------------------*/
+  let bannerJsonUrl = "https://static.lvgl.io/data/banner.json";
   let bannerContainerClass = "lv-custom-banner-list";
   let bannerClass = "lv-custom-banner";
   /* Note:  banner priority property can have only one of these values:
@@ -274,13 +296,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
             const pgParent = page.parentElement;
             pgParent.insertBefore(newDiv, page);
 
-            /* Finally, we need to tell the page element that its `min-hight`
-             * is 100% minus the hight of all the banners, including the one
+            /* Finally, we need to tell the page element that its `min-height`
+             * is 100% minus the height of all the banners, including the one
              * supplied by `conf.py` in `conf.html_theme_options.announcement`
              * if one is present === var(--header-height).
              *
              * This extends short pages by just enough to place [PREV] and [NEXT]
-             * buttoms and footer at bottom of page without scrolling.
+             * buttons and footer at bottom of page without scrolling.
              *
              * Note:  this overrides the `min-height` property set for this
              * element in `furo.css`, which is:  calc(100% - var(--header-height)).

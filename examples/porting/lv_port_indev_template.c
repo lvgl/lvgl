@@ -69,7 +69,7 @@ static lv_indev_state_t encoder_state;
 void lv_port_indev_init(void)
 {
     /**
-     * Here you will find example implementation of input devices supported by LittelvGL:
+     * Here you will find example implementation of input devices supported by LVGL:
      *  - Touchpad
      *  - Mouse (with cursor support)
      *  - Keypad (supports GUI usage only with key)

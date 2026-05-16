@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_timer.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -28,12 +28,15 @@ extern "C" {
  * Descriptor of a lv_timer
  */
 struct _lv_timer_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     uint32_t period;           /**< How often the timer should run */
     uint32_t last_run;         /**< Last time the timer ran */
     lv_timer_cb_t timer_cb;    /**< Timer function */
     void * user_data;          /**< Custom user data */
     int32_t repeat_count;      /**< 1: One time;  -1 : infinity;  n>0: residual times */
-    uint32_t paused : 1;
+    volatile int paused;
     uint32_t auto_delete : 1;
 };
 
@@ -44,7 +47,7 @@ typedef struct {
     uint8_t idle_last;
     bool timer_deleted;
     bool timer_created;
-    uint32_t timer_time_until_next;
+    volatile uint32_t timer_time_until_next;
 
     bool already_running;
     uint32_t periodic_last_tick;

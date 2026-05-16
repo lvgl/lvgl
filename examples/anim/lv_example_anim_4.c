@@ -43,7 +43,15 @@ static void sw_event_cb(lv_event_t * e)
 }
 
 /**
- * Start animation on an event
+ * @title Pause a running animation
+ * @brief Pause a label slide for one second shortly after it starts.
+ *
+ * A label and a pre-checked switch are placed on the active screen. When
+ * the switch's `LV_EVENT_VALUE_CHANGED` fires, an `lv_anim_t` slides the
+ * label to x=100 with `lv_anim_path_overshoot` on check or to `-width`
+ * with `lv_anim_path_ease_in` on uncheck, each 500 ms long. After starting
+ * the animation a 200 ms `lv_timer_t` calls `lv_anim_pause_for` to hold
+ * it for 1000 ms before it resumes.
  */
 void lv_example_anim_4(void)
 {

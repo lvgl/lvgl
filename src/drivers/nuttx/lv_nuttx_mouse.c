@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_nuttx_mouse.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NUTTX
 
@@ -17,11 +17,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <debug.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <nuttx/input/mouse.h>
+#include <string.h>
 #include "../../lvgl_private.h"
+#include "lv_nuttx_mouse.h"
+
+#ifdef __NuttX__
+    #include <debug.h>
+    #include <nuttx/input/mouse.h>
+#else
+    #include "mock/nuttx_input_mouse.h"
+#endif
 
 /*********************
  *      DEFINES

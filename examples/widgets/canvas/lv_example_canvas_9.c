@@ -6,7 +6,14 @@
 #define CANVAS_HEIGHT 150
 
 /**
- * Draw a triangle to the canvas
+ * @title Gradient triangle on canvas
+ * @brief Draw a triangle filled with a vertical red-to-transparent-blue gradient at 50% opacity.
+ *
+ * A 150x150 `LV_COLOR_FORMAT_ARGB8888` canvas is centered with a light
+ * grey background. An `lv_draw_triangle_dsc_t` is built with vertices
+ * at (10,10), (100,30), and (50,100), a `LV_GRAD_DIR_VER` gradient from
+ * red at `frac=64` to transparent blue at `frac=192`, and a top-level
+ * `opa` of 128, then rendered via `lv_draw_triangle` on a canvas layer.
  */
 void lv_example_canvas_9(void)
 {

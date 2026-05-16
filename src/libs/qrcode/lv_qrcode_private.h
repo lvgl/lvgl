@@ -14,10 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../widgets/canvas/lv_canvas_private.h"
-#include "lv_qrcode.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_QRCODE
+
+#include "../../widgets/canvas/lv_canvas_private.h"
 
 /*********************
  *      DEFINES
@@ -32,6 +33,7 @@ struct _lv_qrcode_t {
     lv_canvas_t canvas;
     lv_color_t dark_color;
     lv_color_t light_color;
+    int32_t quiet_zone;
 };
 
 

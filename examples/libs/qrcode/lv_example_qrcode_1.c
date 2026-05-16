@@ -3,7 +3,14 @@
 #include <string.h>
 
 /**
- * Create a QR Code
+ * @title QR code with palette colors
+ * @brief Render a 150 px QR code encoding an LVGL URL with custom dark and light colors.
+ *
+ * A QR code widget is centered on the active screen and sized to 150 px.
+ * `lv_qrcode_set_dark_color` and `lv_qrcode_set_light_color` use
+ * darkened and lightened entries from `LV_PALETTE_BLUE` and
+ * `LV_PALETTE_LIGHT_BLUE`, `lv_qrcode_update` encodes `https://lvgl.io`,
+ * and a matching 5 px border is applied via local style properties.
  */
 void lv_example_qrcode_1(void)
 {

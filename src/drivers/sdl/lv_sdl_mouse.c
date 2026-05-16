@@ -6,12 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_sdl_mouse.h"
-#if LV_USE_SDL
 
-#include "../../core/lv_group.h"
-#include "../../stdlib/lv_string.h"
 #include "lv_sdl_private.h"
+
+#if LV_USE_SDL
 
 /*********************
  *      DEFINES
@@ -128,6 +126,7 @@ void lv_sdl_mouse_handler(SDL_Event * event)
     }
 
     lv_display_t * disp = lv_sdl_get_disp_from_win_id(win_id);
+    if(disp == NULL) return;
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);

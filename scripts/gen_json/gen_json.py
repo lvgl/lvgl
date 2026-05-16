@@ -64,6 +64,7 @@ def run(output_path, lv_conf_file, output_to_stdout, target_header, filter_priva
                         'LV_USE_BMP',
                         'LV_USE_TJPGD',
                         'LV_USE_LIBJPEG_TURBO',
+                        'LV_USE_LIBWEBP',
                         'LV_USE_GIF',
                         'LV_BIN_DECODER_RAM_LOAD',
                         'LV_USE_RLE',

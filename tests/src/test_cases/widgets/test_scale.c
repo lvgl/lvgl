@@ -284,7 +284,7 @@ static void draw_event_cb(lv_event_t * e)
             attributes.max_width = 1000;
             attributes.text_flags = LV_TEXT_FLAG_NONE;
 
-            lv_text_get_size(&size, label_draw_dsc->text, label_draw_dsc->font, &attributes);
+            lv_text_get_size_attributes(&size, label_draw_dsc->text, label_draw_dsc->font, &attributes);
             int32_t new_w = size.x;
             int32_t old_w = lv_area_get_width(&draw_task->area);
 
@@ -540,6 +540,120 @@ void test_scale_set_line_needle_value(void)
         provided_points_array[0].x == -100 && provided_points_array[0].y == -100
         && provided_points_array[1].x == -100 && provided_points_array[1].y == -100
     );
+}
+
+void test_scale_needle_updates_when_style_changes(void)
+{
+
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    lv_obj_align(scale, LV_ALIGN_LEFT_MID, 0, 0);
+    lv_obj_set_style_width(scale, 200, LV_PART_MAIN);
+    lv_obj_set_style_height(scale, 200, LV_PART_MAIN);
+
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+
+    lv_scale_set_range(scale, 0, 100);
+    lv_scale_set_angle_range(scale, 270);
+    lv_scale_set_rotation(scale, 135);
+
+    lv_scale_set_total_tick_count(scale, 20);
+    lv_scale_set_major_tick_every(scale, 5);
+
+    lv_obj_t * needle_line = lv_line_create(scale);
+    lv_obj_set_style_line_width(needle_line, 6, LV_PART_MAIN);
+    lv_obj_set_style_line_rounded(needle_line, true, LV_PART_MAIN);
+    lv_scale_set_line_needle_value(scale, needle_line, 60, 26);
+
+    LV_IMAGE_DECLARE(img_hand);
+    lv_obj_t * needle_img = lv_image_create(scale);
+    lv_image_set_src(needle_img, &img_hand);
+    lv_scale_set_image_needle_value(scale, needle_img, 78);
+    lv_obj_align(needle_img, LV_ALIGN_CENTER, 47, -2);
+    lv_image_set_pivot(needle_img, 3, 4);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_7.png");
+
+    lv_obj_align(scale, LV_ALIGN_RIGHT_MID, 0, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_8.png");
+}
+
+void test_scale_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_scale_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test MODE property */
+    prop.id = LV_PROPERTY_SCALE_MODE;
+    prop.num = LV_SCALE_MODE_ROUND_INNER;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_SCALE_MODE_ROUND_INNER, lv_obj_get_property(obj, LV_PROPERTY_SCALE_MODE).num);
+
+    /* Test TOTAL_TICK_COUNT property */
+    prop.id = LV_PROPERTY_SCALE_TOTAL_TICK_COUNT;
+    prop.num = 21;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(21, lv_obj_get_property(obj, LV_PROPERTY_SCALE_TOTAL_TICK_COUNT).num);
+
+    /* Test MAJOR_TICK_EVERY property */
+    prop.id = LV_PROPERTY_SCALE_MAJOR_TICK_EVERY;
+    prop.num = 5;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(5, lv_obj_get_property(obj, LV_PROPERTY_SCALE_MAJOR_TICK_EVERY).num);
+
+    /* Test LABEL_SHOW property */
+    prop.id = LV_PROPERTY_SCALE_LABEL_SHOW;
+    prop.num = 0;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(0, lv_obj_get_property(obj, LV_PROPERTY_SCALE_LABEL_SHOW).num);
+
+    /* Test ANGLE_RANGE property */
+    prop.id = LV_PROPERTY_SCALE_ANGLE_RANGE;
+    prop.num = 180;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(180, lv_obj_get_property(obj, LV_PROPERTY_SCALE_ANGLE_RANGE).num);
+
+    /* Test ROTATION property */
+    prop.id = LV_PROPERTY_SCALE_ROTATION;
+    prop.num = 90;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(90, lv_obj_get_property(obj, LV_PROPERTY_SCALE_ROTATION).num);
+
+    /* Test RANGE_MIN_VALUE property */
+    prop.id = LV_PROPERTY_SCALE_RANGE_MIN_VALUE;
+    prop.num = -50;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(-50, lv_obj_get_property(obj, LV_PROPERTY_SCALE_RANGE_MIN_VALUE).num);
+
+    /* Test RANGE_MAX_VALUE property */
+    prop.id = LV_PROPERTY_SCALE_RANGE_MAX_VALUE;
+    prop.num = 150;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(150, lv_obj_get_property(obj, LV_PROPERTY_SCALE_RANGE_MAX_VALUE).num);
+
+    lv_obj_delete(obj);
+#endif
+}
+
+void test_scale_with_1_tick(void)
+{
+    /* When the scale has 1 (or less) ticks, only the main part should be drawn,
+     * no ticks nor labels are expected to be drawn. */
+    lv_obj_t * lv_obj_t_id = lv_scale_create(lv_screen_active());
+    lv_obj_set_style_height(lv_obj_t_id, lv_pct(100), LV_PART_MAIN);
+    lv_obj_set_style_width(lv_obj_t_id, lv_pct(100), LV_PART_MAIN);
+    lv_obj_set_style_align(lv_obj_t_id, LV_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(lv_obj_t_id, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_set_style_radius(lv_obj_t_id, LV_RADIUS_CIRCLE, 0);
+    lv_scale_set_mode(lv_obj_t_id, LV_SCALE_MODE_ROUND_INNER);
+    lv_scale_set_range(lv_obj_t_id, 0, 100);
+    lv_scale_set_angle_range(lv_obj_t_id, 180);
+    lv_scale_set_rotation(lv_obj_t_id, 270);
+    lv_scale_set_total_tick_count(lv_obj_t_id, 1);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_9.png");
 }
 
 #endif

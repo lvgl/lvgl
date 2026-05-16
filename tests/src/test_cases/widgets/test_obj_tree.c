@@ -238,6 +238,10 @@ void test_obj_get_by_name(void)
     lv_obj_t * label5 = lv_label_create(cont3);
     lv_obj_set_name(label5, "title_#");
 
+    lv_obj_t * cont5 = lv_obj_create(lv_screen_active());
+    lv_obj_set_name(cont5, "my_obj_1a");
+    lv_obj_t * cont6 = lv_obj_create(lv_screen_active());
+    lv_obj_set_name(cont6, "my_obj_1");
 
     lv_obj_t * found_obj;
 
@@ -294,6 +298,9 @@ void test_obj_get_by_name(void)
 
     found_obj = lv_obj_get_child_by_name(lv_screen_active(), "third/title_2");
     TEST_ASSERT_EQUAL(label5, found_obj);
+
+    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "my_obj_1");
+    TEST_ASSERT_EQUAL(found_obj, cont6);
 
     /*-------------
      * Find by name

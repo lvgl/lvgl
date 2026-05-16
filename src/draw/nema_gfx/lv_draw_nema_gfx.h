@@ -39,7 +39,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NEMA_GFX
 
@@ -50,11 +50,7 @@ extern "C" {
 #include "../lv_draw_image_private.h"
 #include "../lv_image_decoder_private.h"
 #include "../lv_draw_label_private.h"
-#include "../lv_draw_mask_private.h"
-#include "../lv_draw_rect_private.h"
-#include "../lv_draw_triangle_private.h"
 #include "../lv_draw_vector_private.h"
-
 #include "../../misc/lv_area_private.h"
 
 /**********************
@@ -109,6 +105,11 @@ void lv_draw_nema_gfx_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * ds
 
 void lv_draw_nema_gfx_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
                           const lv_area_t * coords);
+
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
+void lv_draw_nema_gfx_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc,
+                             const lv_area_t * coords);
+#endif
 
 
 /**********************

@@ -13,6 +13,7 @@
 #if LV_USE_BARCODE
 
 #include "code128.h"
+#include "../../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES

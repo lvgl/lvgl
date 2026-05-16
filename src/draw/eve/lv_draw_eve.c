@@ -13,12 +13,10 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_eve_private.h"
+#include "../../lvgl_public.h"
 #if LV_USE_DRAW_EVE
 
-#include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
 #include "lv_draw_eve_ram_g.h"
 #include "lv_draw_eve.h"
 #include "lv_eve.h"
@@ -116,6 +114,9 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    if(lv_draw_eve_unit_g == NULL || lv_draw_eve_unit_g->disp == NULL)
+        return 0;
+
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_EVE;
@@ -127,16 +128,9 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
 
-    uint8_t coprocessor_status;
-    do {
-        coprocessor_status = EVE_busy();
-    } while(coprocessor_status != E_OK && coprocessor_status != EVE_FIFO_HALF_EMPTY);
-
-    EVE_start_cmd_burst();
-
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_eve_line(t, t->draw_dsc);
+            lv_draw_line_iterate(t, t->draw_dsc, lv_draw_eve_line);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
             lv_draw_eve_border(t, t->draw_dsc, &t->area);
@@ -159,8 +153,6 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
         default:
             break;
     }
-
-    EVE_end_cmd_burst();
 }
 
 static void disp_delete_cb(lv_event_t * e)

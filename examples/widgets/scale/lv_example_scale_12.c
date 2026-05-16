@@ -26,7 +26,7 @@ static void set_heading_value(void * obj, int32_t v)
 {
     LV_UNUSED(obj);
     lv_scale_set_rotation(scale, 270 - v);
-    lv_label_set_text_fmt(label, "%d°\n%s", v, heading_to_cardinal(v));
+    lv_label_set_text_fmt(label, "%d°\n%s", (int)v, heading_to_cardinal(v));
 }
 
 static void draw_event_cb(lv_event_t * e)
@@ -50,7 +50,18 @@ static void draw_event_cb(lv_event_t * e)
 }
 
 /**
- * A round scale style simulating a compass
+ * @title Rotating compass with cardinal labels
+ * @brief Round scale rotates under a fixed arrow as its heading sweeps 0 to 360.
+ *
+ * A 200 by 200 scale uses `LV_SCALE_MODE_ROUND_INNER` over 0 to 360
+ * with a 360 degree sweep, 61 ticks, and custom labels alternating
+ * `N`, `30`, `60`, `E`, and so on. A red `LV_SYMBOL_UP` label pins
+ * the forward bearing at the top, and a centre label formats the
+ * heading as `<deg>` plus the cardinal string from
+ * `heading_to_cardinal`. An `LV_EVENT_DRAW_TASK_ADDED` callback paints
+ * the `N` label and its tick red. An infinite 5000 ms forward and
+ * reverse animation drives `lv_scale_set_rotation`, turning the dial
+ * beneath the arrow.
  */
 void lv_example_scale_12(void)
 {

@@ -125,7 +125,7 @@ You can also run this script by passing a performance test config to the `main.p
 ## Emulated benchmarks
 
 In addition to unit and performance tests, LVGL automatically runs the `lv_demo_benchmark` inside the same ARM emulated
-environment mentionned in the previous section through CI to prevent unintentional slowdowns.
+environment mentioned in the previous section through CI to prevent unintentional slowdowns.
 
 ### Requirements
 

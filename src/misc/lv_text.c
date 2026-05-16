@@ -6,14 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_text_private.h"
 #include "lv_text_ap.h"
-#include "lv_math.h"
-#include "lv_log.h"
-#include "lv_assert.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
-#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -93,8 +88,20 @@ void lv_text_attributes_init(lv_text_attributes_t * attributes)
     lv_memzero(attributes, sizeof(lv_text_attributes_t));
 }
 
-void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
-                      lv_text_attributes_t * attributes)
+void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, int32_t letter_space,
+                      int32_t line_space, int32_t max_width, lv_text_flag_t flag)
+{
+    lv_text_attributes_t attrs;
+    lv_text_attributes_init(&attrs);
+    attrs.line_space = line_space;
+    attrs.max_width = max_width;
+    attrs.text_flags = flag;
+    attrs.letter_space = letter_space;
+    lv_text_get_size_attributes(size_res, text, font, &attrs);
+}
+
+void lv_text_get_size_attributes(lv_point_t * size_res, const char * text, const lv_font_t * font,
+                                 lv_text_attributes_t * attributes)
 {
     uint32_t line_start     = 0;
     uint32_t new_line_start = 0;
@@ -362,6 +369,7 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
 
     uint32_t i = 0;                                        /*Iterating index into txt*/
     uint32_t max_width = attributes->max_width;
+    bool explicit_new_line = false;
 
     while(i < len && txt[i] != '\0' && max_width > 0) {
         lv_text_flag_t word_flag = attributes->text_flags;
@@ -380,10 +388,14 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
 
         i += advance;
 
-        if(txt[0] == '\n' || txt[0] == '\r') break;
+        if(txt[0] == '\n' || txt[0] == '\r') {
+            explicit_new_line = true;
+            break;
+        }
 
         if(txt[i] == '\n' || txt[i] == '\r') {
             i++;  /*Include the following newline in the current line*/
+            explicit_new_line = true;
             break;
         }
     }
@@ -398,6 +410,13 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
 
     if(used_width != NULL) {
         *used_width = line_w;
+    }
+
+    /*Skip leading spaces of the next line only for automatic word wrapping*/
+    if(!explicit_new_line) {
+        while(i < len && txt[i] == ' ') {
+            i++;
+        }
     }
 
     return i;
@@ -501,7 +520,7 @@ char * lv_text_set_text_vfmt(const char * fmt, va_list ap)
     lv_vsnprintf(raw_txt, len + 1, fmt, ap);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = lv_text_ap_calc_bytes_count(raw_txt);
+    size_t len_ap = lv_text_ap_strlen(raw_txt);
     text = lv_malloc(len_ap + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {

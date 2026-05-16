@@ -3,7 +3,16 @@
 #if LV_USE_LOTTIE
 
 /**
- * Load an lottie animation from data
+ * @title Lottie animation from memory
+ * @brief Play a Lottie JSON animation embedded as a C byte array.
+ *
+ * An `lv_lottie` widget on the active screen receives the approve
+ * animation through `lv_lottie_set_src_data`, pointing at the
+ * `lv_example_lottie_approve` byte array and its size. A 64x64
+ * ARGB8888 premultiplied buffer is attached with
+ * `lv_lottie_set_buffer` when the draw buffer alignment allows, or an
+ * `LV_DRAW_BUF_DEFINE_STATIC` draw buffer via `lv_lottie_set_draw_buf`
+ * otherwise, then the widget is centered.
  */
 void lv_example_lottie_1(void)
 {
@@ -20,7 +29,7 @@ void lv_example_lottie_1(void)
     lv_lottie_set_buffer(lottie, 64, 64, buf);
 #else
     /*For GPUs and special alignment/strid setting use a draw_buf instead*/
-    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     lv_lottie_set_draw_buf(lottie, &draw_buf);
 #endif
 

@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.3.0
+# Kconfig file for LVGL v9.5.0
 
 menu "LVGL configuration"
 
@@ -143,6 +143,8 @@ menu "LVGL configuration"
 				bool "5: WINDOWS"
 			config LV_OS_MQX
 				bool "6: MQX"
+			config LV_OS_SDL2
+				bool "7: SDL2"
 			config LV_OS_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -160,6 +162,15 @@ menu "LVGL configuration"
 			Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
 			than unblocking a task using an intermediary object such as a binary semaphore.
 			RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+		config LV_OS_IDLE_PERCENT_CUSTOM
+			bool "Custom idle percentage calculation"
+			default n
+			depends on LV_OS_FREERTOS
+			help
+				Enable this to provide a custom implementation of lv_os_get_idle_percent.
+				This is useful for multi-core systems where the default
+				FreeRTOS implementation might not sufficiently track idle time across all cores.
+
 	endmenu
 
 	menu "Rendering Configuration"
@@ -235,6 +246,11 @@ menu "LVGL configuration"
 			default y
 			depends on LV_USE_DRAW_SW
 
+		config LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+			bool "Enable support for RGB565 swapped color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
 		config LV_DRAW_SW_SUPPORT_RGB565A8
 			bool "Enable support for RGB565A8 color format"
 			default y
@@ -252,6 +268,11 @@ menu "LVGL configuration"
 
 		config LV_DRAW_SW_SUPPORT_ARGB8888
 			bool "Enable support for ARGB8888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+			bool "Enable support for ARGB8888 premultiplied color format"
 			default y
 			depends on LV_USE_DRAW_SW
 
@@ -351,6 +372,8 @@ menu "LVGL configuration"
 				bool "1: NEON"
 			config LV_DRAW_SW_ASM_HELIUM
 				bool "2: HELIUM"
+			config LV_DRAW_SW_ASM_RISCV_V
+				bool "3: RISC-V Vector"
 			config LV_DRAW_SW_ASM_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -360,43 +383,13 @@ menu "LVGL configuration"
 			default 0 if LV_DRAW_SW_ASM_NONE
 			default 1 if LV_DRAW_SW_ASM_NEON
 			default 2 if LV_DRAW_SW_ASM_HELIUM
+			default 3 if LV_DRAW_SW_ASM_RISCV_V
 			default 255 if LV_DRAW_SW_ASM_CUSTOM
 
 		config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 			string "Set the custom asm include file"
 			default ""
 			depends on LV_DRAW_SW_ASM_CUSTOM
-
-		config LV_USE_DRAW_VGLITE
-			bool "Use NXP's VG-Lite GPU on iMX RTxxx platforms"
-			default n
-
-		config LV_USE_VGLITE_BLIT_SPLIT
-			bool "Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels"
-			depends on LV_USE_DRAW_VGLITE
-			default n
-
-		config LV_USE_VGLITE_DRAW_THREAD
-			bool "Use additional draw thread for VG-Lite processing"
-			depends on LV_USE_DRAW_VGLITE && !LV_OS_NONE
-			default y
-
-		config LV_USE_VGLITE_DRAW_ASYNC
-			bool "Enable VGLite draw async"
-			depends on LV_USE_VGLITE_DRAW_THREAD
-			default y
-			help
-				Queue multiple tasks and flash them once to the GPU. The task ready state will be send asynchronous to dispatcher.
-
-		config LV_USE_VGLITE_ASSERT
-			bool "Enable VGLite asserts"
-			depends on LV_USE_DRAW_VGLITE
-			default n
-
-		config LV_USE_VGLITE_CHECK_ERROR
-			bool "Enable VGLite error checks"
-			depends on LV_USE_DRAW_VGLITE
-			default n
 
 		config LV_USE_PXP
 		bool "Use NXP's PXP on iMX RTxxx platforms"
@@ -421,14 +414,19 @@ menu "LVGL configuration"
 			bool "Enable PXP asserts"
 			depends on LV_USE_DRAW_PXP
 
-		config LV_USE_DRAW_G2D
+		config LV_USE_G2D
 			bool "Use NXP's G2D on MPU platforms"
 			default n
+
+		config LV_USE_DRAW_G2D
+			bool "Use G2D for drawing."
+			depends on LV_USE_G2D
+			default y
 
 		config LV_G2D_HASH_TABLE_SIZE
 			bool "Maximum number of buffers that can be stored for G2D draw unit."
 			default 50
-			depends on LV_USE_DRAW_G2D
+			depends on LV_USE_G2D
 			help
 				Includes the frame buffers and assets.
 
@@ -439,7 +437,7 @@ menu "LVGL configuration"
 
 		config LV_USE_G2D_ASSERT
 			bool "Enable G2D asserts"
-			depends on LV_USE_DRAW_G2D
+			depends on LV_USE_G2D
 			default n
 
 		config LV_USE_DRAW_DAVE2D
@@ -496,6 +494,11 @@ menu "LVGL configuration"
 			default 8
 			depends on LV_USE_DRAW_VG_LITE
 
+		config LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+			int "VG-Lite unaligned bitmap font maximum cache number."
+			default 256
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
 			bool "Remove VLC_OP_CLOSE path instruction (Workaround for NXP)"
 			default n
@@ -504,6 +507,16 @@ menu "LVGL configuration"
 		config LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
 			bool "Disable linear gradient extension for some older versions of drivers."
 			default n
+			depends on LV_USE_DRAW_VG_LITE
+
+		config LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+			bool "Disable blit rectangular offset to resolve certain hardware errors."
+			default n
+			depends on LV_USE_DRAW_VG_LITE
+
+		config LV_VG_LITE_PATH_DUMP_MAX_LEN
+			int "Maximum path dump print length (in points)"
+			default 1000
 			depends on LV_USE_DRAW_VG_LITE
 
 		config LV_USE_VECTOR_GRAPHIC
@@ -547,6 +560,13 @@ menu "LVGL configuration"
 		default n
 		depends on LV_USE_PPA
 
+		config LV_PPA_BURST_LENGTH
+		int "PPA Burst length in bytes"
+		depends on LV_USE_PPA
+		default 128
+		help
+			PPA burst length size in bytes.
+
 		config LV_USE_DRAW_EVE
 			bool "Use EVE FT81X GPU."
 			default n
@@ -556,6 +576,43 @@ menu "LVGL configuration"
 			default 4
 			range 2 4
 			depends on LV_USE_DRAW_EVE
+
+		config LV_DRAW_EVE_WRITE_BUFFER_SIZE
+			int "Max bytes to buffer for each SPI transmission or 0 to disable buffering"
+			default 2048
+			depends on LV_USE_DRAW_EVE
+
+		config LV_USE_DRAW_NANOVG
+			bool "Use NanoVG Renderer."
+			default n
+			depends on LV_USE_NANOVG && LV_USE_MATRIX
+
+		choice LV_NANOVG_BACKEND
+			prompt "NanoVG OpenGL backend"
+			default LV_NANOVG_BACKEND_GLES2
+			depends on LV_USE_DRAW_NANOVG
+			help
+				Select which OpenGL implementation to use for NanoVG rendering.
+
+			config LV_NANOVG_BACKEND_GL2
+				bool "OpenGL 2.0"
+			config LV_NANOVG_BACKEND_GL3
+				bool "OpenGL 3.0+"
+			config LV_NANOVG_BACKEND_GLES2
+				bool "OpenGL ES 2.0"
+			config LV_NANOVG_BACKEND_GLES3
+				bool "OpenGL ES 3.0+"
+		endchoice
+
+		config LV_NANOVG_IMAGE_CACHE_CNT
+			int "Draw image texture cache count"
+			default 128
+			depends on LV_USE_DRAW_NANOVG
+
+		config LV_NANOVG_LETTER_CACHE_CNT
+			int "Draw letter cache count"
+			default 512
+			depends on LV_USE_DRAW_NANOVG
 
 	endmenu
 
@@ -571,17 +628,17 @@ menu "LVGL configuration"
 					Specify how important log should be added.
 
 				config LV_LOG_LEVEL_TRACE
-					bool "A lot of logs to give detailed information"
+					bool "LOG_LEVEL_TRACE: A lot of logs to give detailed information"
 				config LV_LOG_LEVEL_INFO
-					bool "Log important events"
+					bool "LOG_LEVEL_INFO: Log important events"
 				config LV_LOG_LEVEL_WARN
-					bool "Log if something unwanted happened but didn't cause a problem"
+					bool "LOG_LEVEL_WARN: Log if something unwanted happened but didn't cause a problem"
 				config LV_LOG_LEVEL_ERROR
-					bool "Only critical issues, when the system may fail"
+					bool "LOG_LEVEL_ERROR: Only critical issues, when the system may fail"
 				config LV_LOG_LEVEL_USER
-					bool "Only logs added by the user"
+					bool "LOG_LEVEL_USER: Only logs added by the user"
 				config LV_LOG_LEVEL_NONE
-					bool "Do not log anything"
+					bool "LOG_LEVEL_NONE: Do not log anything"
 			endchoice
 
 			config LV_LOG_LEVEL
@@ -678,6 +735,57 @@ menu "LVGL configuration"
 				default "assert.h"
 				help
 					Add a custom handler when assert happens e.g. to restart the MCU
+		endmenu
+
+		menu "Check arg"
+			config LV_USE_CHECK_ARG
+				bool "Enable LV_CHECK_ARG macro for runtime argument validation"
+				default y if !LV_CONF_MINIMAL
+				help
+					When enabled, LV_CHECK_ARG checks validate function arguments
+					at runtime. Failed checks log a warning and execute the specified
+					action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+					Disabling this is not recommended unless extreme care is taken and only
+					in very resource constrained environments where it can be absolutely
+					ensured that invariants are never violated.
+
+			config LV_CHECK_ARG_ASSERT_ON_FAIL
+				bool "Call assert handler on LV_CHECK_ARG failure"
+				default n
+				depends on LV_USE_CHECK_ARG
+				help
+					When enabled, LV_ASSERT_HANDLER is also invoked when an
+					LV_CHECK_ARG check fails, before the action is executed.
+
+			choice
+				prompt "Log behavior on LV_CHECK_ARG failure"
+				depends on LV_USE_CHECK_ARG
+				default LV_CHECK_ARG_LOG_MODE_VERBOSE if LV_USE_LOG
+				default LV_CHECK_ARG_LOG_MODE_NONE if !LV_USE_LOG
+				help
+					Controls what is logged when an LV_CHECK_ARG check fails.
+					MINIMAL and VERBOSE modes require LV_USE_LOG to be enabled;
+					selecting either when LV_USE_LOG is disabled will cause a
+					compile-time error.
+
+				config LV_CHECK_ARG_LOG_MODE_NONE
+					bool "None: no log output on failure"
+
+				config LV_CHECK_ARG_LOG_MODE_MINIMAL
+					bool "Minimal: log 'Check failed' only (file/line from LV_LOG_WARN)"
+					depends on LV_USE_LOG
+
+				config LV_CHECK_ARG_LOG_MODE_VERBOSE
+					bool "Verbose: log 'Check failed: <cond>' plus caller-supplied message"
+					depends on LV_USE_LOG
+			endchoice
+
+			config LV_CHECK_ARG_LOG_MODE
+				int
+				depends on LV_USE_CHECK_ARG
+				default 0 if LV_CHECK_ARG_LOG_MODE_NONE
+				default 1 if LV_CHECK_ARG_LOG_MODE_MINIMAL
+				default 2 if LV_CHECK_ARG_LOG_MODE_VERBOSE
 		endmenu
 
 		menu "Debug"
@@ -826,6 +934,23 @@ menu "LVGL configuration"
 				bool "Enable the multi-touch gesture recognition feature"
 				depends on LV_USE_FLOAT
 				default n
+
+			config LV_USE_EXT_DATA
+				bool "External data and destructor"
+				default n
+				help
+					Enable this option to activate external data and destructor functionality,
+					which assists in resource cleanup when objects are freed by either LVGL core
+					or applications. Currently supported features include:
+						- event
+						- object
+						- observer
+						- anim
+						- timer
+						- group
+						- display
+						- indev (input device)
+						- theme
 		endmenu
 	endmenu
 
@@ -1274,6 +1399,12 @@ menu "LVGL configuration"
 		config LV_USE_WIN
 			bool "Win"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_3DTEXTURE
+			bool "3D Texture"
+			depends on LV_USE_DRAW_OPENGLES
+		config LV_USE_GLTF
+			bool "glTF support"
+			depends on LV_USE_3DTEXTURE
 	endmenu
 
 	menu "Themes"
@@ -1318,7 +1449,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_STDIO
 			bool "File system on top of stdio API"
 		config LV_FS_STDIO_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_STDIO
 		config LV_FS_STDIO_PATH
@@ -1332,7 +1463,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_POSIX
 			bool "File system on top of posix API"
 		config LV_FS_POSIX_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_POSIX
 		config LV_FS_POSIX_PATH
@@ -1346,7 +1477,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_WIN32
 			bool "File system on top of Win32 API"
 		config LV_FS_WIN32_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_WIN32
 		config LV_FS_WIN32_PATH
@@ -1360,7 +1491,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_FATFS
 			bool "File system on top of FatFS"
 		config LV_FS_FATFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_FATFS
 		config LV_FS_FATFS_PATH
@@ -1374,14 +1505,14 @@ menu "LVGL configuration"
 		config LV_USE_FS_MEMFS
 			bool "File system on top of memory-mapped API"
 		config LV_FS_MEMFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_MEMFS
 
 		config LV_USE_FS_LITTLEFS
 			bool "File system on top of littlefs API"
 		config LV_FS_LITTLEFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_LITTLEFS
 		config LV_FS_LITTLEFS_PATH
@@ -1391,7 +1522,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_ARDUINO_ESP_LITTLEFS
 			bool "File system on top of Arduino ESP littlefs API"
 		config LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
 		config LV_FS_ARDUINO_ESP_LITTLEFS_PATH
@@ -1401,7 +1532,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_ARDUINO_SD
 			bool "File system on top of Arduino SD API"
 		config LV_FS_ARDUINO_SD_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_SD
 		config LV_FS_ARDUINO_SD_PATH
@@ -1411,9 +1542,16 @@ menu "LVGL configuration"
 		config LV_USE_FS_UEFI
 			bool "File system on top of the UEFI EFI_SIMPLE_FILE_SYSTEM_PROTOCOL"
 		config LV_USE_FS_UEFI_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_UEFI
+
+		config LV_USE_FS_FROGFS
+			bool "FrogFS read-only filesystem"
+		config LV_FS_FROGFS_LETTER
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
+			default 0
+			depends on LV_USE_FS_FROGFS
 
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
@@ -1429,6 +1567,9 @@ menu "LVGL configuration"
 
 		config LV_USE_LIBJPEG_TURBO
 			bool "libjpeg-turbo decoder library"
+
+		config LV_USE_LIBWEBP
+			bool "WebP decoder library"
 
 		config LV_USE_GIF
 			bool "GIF decoder library"
@@ -1468,6 +1609,10 @@ menu "LVGL configuration"
 			int "The maximum number of Glyph in count"
 			default 256
 			depends on LV_USE_FREETYPE
+		config LV_FREETYPE_CACHE_FT_GLYPH_L1
+			bool "Enable L1 glyph metrics cache (lock-free, single-thread only)"
+			default y
+			depends on LV_USE_FREETYPE && LV_OS_NONE
 
 		config LV_USE_TINY_TTF
 			bool "Enable Tiny TTF decoder"
@@ -1477,12 +1622,12 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_TINY_TTF
 		config LV_TINY_TTF_CACHE_GLYPH_CNT
-			bool "Tiny ttf cache entries count"
+			int "Tiny ttf cache entries count"
 			default 128
 			depends on LV_USE_TINY_TTF
 
 		config LV_TINY_TTF_CACHE_KERNING_CNT
-			bool "Tiny ttf kerning cache entries count"
+			int "Tiny ttf kerning cache entries count"
 			default 256
 			depends on LV_USE_TINY_TTF
 
@@ -1500,6 +1645,10 @@ menu "LVGL configuration"
 				config LV_USE_THORVG_EXTERNAL
 					bool "Use ThorVG external"
 			endchoice
+
+		config LV_USE_NANOVG
+			bool "NanoVG library"
+			default n
 
 		config LV_USE_LZ4
 			bool "Enable LZ4 compress/decompress lib"
@@ -1617,6 +1766,10 @@ menu "LVGL configuration"
 			bool "Enable built-in profiler by default"
 			depends on LV_USE_PROFILER_BUILTIN
 			default y
+		config LV_USE_PROFILER_BUILTIN_POSIX
+			bool "Enable POSIX profiler port"
+			depends on LV_USE_PROFILER_BUILTIN
+			default n
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
 			default "lvgl/src/misc/lv_profiler_builtin.h"
@@ -1740,8 +1893,6 @@ menu "LVGL configuration"
 			depends on LV_USE_TEST
 		config LV_USE_TRANSLATION
 			bool "Enable text translation support"
-		config LV_USE_XML
-			bool "Enable loading XML UIs runtime"
 		config LV_USE_COLOR_FILTER
 			bool "Enable color filter style"
 			default n
@@ -1750,7 +1901,7 @@ menu "LVGL configuration"
 			default 9 # LVGL_VERSION_MAJOR
 		config LVGL_VERSION_MINOR
 			int
-			default 4 # LVGL_VERSION_MINOR
+			default 6 # LVGL_VERSION_MINOR
 		config LVGL_VERSION_PATCH
 			int
 			default 0 # LVGL_VERSION_PATCH
@@ -1875,39 +2026,11 @@ menu "LVGL configuration"
 		config LV_USE_WAYLAND
 			bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
 			default n
-		config LV_WAYLAND_WINDOW_DECORATIONS
-			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
-			depends on LV_USE_WAYLAND
-			default n
-		config LV_WAYLAND_WL_SHELL
-			bool "Support the legacy wl_shell instead of the default XDG Shell protocol"
-			depends on LV_USE_WAYLAND
-			default n
-		config LV_WAYLAND_BUF_COUNT
-			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
-			depends on LV_USE_WAYLAND
-			default 1
-		choice
-			prompt "Wayland rendering mode"
-			depends on LV_USE_WAYLAND
-			default LV_WAYLAND_RENDER_MODE_PARTIAL
 
-			config LV_WAYLAND_RENDER_MODE_PARTIAL
-				bool "Use the buffer(s) to render the screen is smaller parts"
-				depends on !LV_WAYLAND_USE_DMABUF
-
-			config LV_WAYLAND_RENDER_MODE_DIRECT
-				bool "Only the changed areas will be updated with 2 screen sized buffers"
-				depends on LV_WAYLAND_USE_DMABUF
-
-			config LV_WAYLAND_RENDER_MODE_FULL
-				bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
-				depends on LV_WAYLAND_USE_DMABUF
-		endchoice
-
-		config LV_WAYLAND_USE_DMABUF
-			bool "Use DMA buffers for frame buffers"
-			depends on LV_USE_WAYLAND && LV_USE_DRAW_G2D
+		config LV_WAYLAND_DIRECT_EXIT
+			bool "Deinitialize LVGL and quit the application when the last wayland window closes"
+			default y
+			depends on LV_USE_WAYLAND
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
@@ -2075,6 +2198,14 @@ menu "LVGL configuration"
 			bool "Use TFT_eSPI driver"
 			default n
 
+		config LV_USE_LOVYAN_GFX
+			bool "Use LovyanGFX driver"
+			default n
+		config LV_LGFX_USER_INCLUDE
+			string "Header for LovyanGFX user configuration"
+			default "lv_lgfx_user.hpp"
+			depends on LV_USE_LOVYAN_GFX
+
 		config LV_USE_EVDEV
 			bool "Use evdev input driver"
 			default n
@@ -2096,18 +2227,22 @@ menu "LVGL configuration"
 		config LV_USE_ST7735
 			bool "Use ST7735 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ST7789
 			bool "Use ST7789 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ST7796
 			bool "Use ST7796 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ILI9341
 			bool "Use ILI9341 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_GENERIC_MIPI
 			bool "Generic MIPI driver"
@@ -2155,6 +2290,7 @@ menu "LVGL configuration"
 
 		config LV_USE_OPENGLES
 			bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
+			depends on LV_USE_MATRIX
 			default n
 
 		config LV_USE_OPENGLES_DEBUG
@@ -2204,18 +2340,9 @@ menu "LVGL configuration"
 				bool "Render test for each primitives. Requires at least 480x272 display"
 				default n
 
-			config LV_USE_DEMO_SCROLL
-				bool "Scroll settings test for LVGL"
-				default n
-
 			config LV_USE_DEMO_STRESS
 				bool "Stress test for LVGL"
 				default n
-
-			config LV_USE_DEMO_TRANSFORM
-				bool "Transform test for LVGL"
-				default n
-				depends on LV_FONT_MONTSERRAT_18
 
 			config LV_USE_DEMO_MUSIC
 				bool "Music player demo"
@@ -2251,6 +2378,10 @@ menu "LVGL configuration"
 				bool "vector graphic demo"
 				default n
 				depends on LV_USE_VECTOR_GRAPHIC
+			config LV_USE_DEMO_GLTF
+				bool "glTF demo"
+				default n
+				depends on LV_USE_GLTF
 			config LV_USE_DEMO_SMARTWATCH
 				bool "Smartwatch demo"
 			config LV_USE_DEMO_EBIKE

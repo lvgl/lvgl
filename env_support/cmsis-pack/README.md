@@ -31,8 +31,8 @@ remove the misleading guide above this code segment.
 3. Add including for '**RTE_Components.h**'
 
 ```c
-#ifndef LV_CONF_H
-#define LV_CONF_H
+#ifndef LV_CONF_CMSIS_H
+#define LV_CONF_CMSIS_H
 
 #if defined(_RTE_)
 #include "RTE_Components.h"
@@ -41,8 +41,6 @@ remove the misleading guide above this code segment.
 ```
 4. Remove macro definitions for
 
-   - LV_USE_DEMO_WIDGETS
-   - LV_USE_DEMO_BENCHMARK
    - LV_USE_IME_PINYIN
    - LV_USE_OS
    - LV_USE_FILE_EXPLORER
@@ -54,21 +52,31 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_MUSIC
    - LV_USE_DEMO_FLEX_LAYOUT
    - LV_USE_DEMO_MULTILANG
-   - LV_USE_DEMO_TRANSFORM
-   - LV_USE_DEMO_SCROLL
    - LV_USE_DEMO_VECTOR_GRAPHIC
    - LV_USE_DEMO_EBIKE
    - LV_USE_DEMO_HIGH_RES
    - LV_USE_DEMO_SMARTWATCH
-   - LV_USE_DRAW_VGLITE
+   - LV_USE_DEMO_GLTF
    - LV_USE_DRAW_VG_LITE
    - LV_USE_PXP
-   - LV_USE_DRAW_G2D
+   - LV_USE_FS_FROGFS
+   - LV_USE_GLTF
+   - LV_USE_GSTREAMER
+   - LV_USE_VG_LITE_DRIVER
+   - LV_USE_LOVYAN_GFX
+   - LV_USE_G2D
    - LV_USE_DRAW_SDL
    - LV_USE_DRAW_ARM2D_SYNC
    - LV_USE_DRAW_ARM2D_ASYNC
    - LV_USE_DRAW_DAVE2D
    - LV_USE_DRAW_DMA2D
+   - LV_USE_DRAW_EVE
+   - LV_USE_DRAW_NANOVG
+   - LV_USE_NANOVG
+   - LV_USE_PPA
+   - LV_USE_NV3007
+   - LV_USE_NXP_ELCDIF
+   - LV_USE_TRANSLATION
    - LV_USE_SNAPSHOT
    - LV_USE_MONKEY
    - LV_USE_GRIDNAV
@@ -84,7 +92,7 @@ remove the misleading guide above this code segment.
    - LV_USE_ST_LTDC
    - LV_USE_FT81X
    - LV_USE_ILI9341
-   - LV_USE_RENESAS_GLCDC   
+   - LV_USE_RENESAS_GLCDC
    - LV_USE_NEMA_GFX
    - LV_USE_SVG
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
@@ -117,6 +125,7 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_RLE 0
     - \#define LV_USE_TJPGD 0
     - \#define LV_USE_LIBJPEG_TURBO 0
+    - \#define LV_USE_LIBWEBP 0
     - \#define LV_USE_GIF 0
     - \#define LV_USE_BARCODE 0
     - \#define LV_USE_QRCODE 0
@@ -125,9 +134,8 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_RLOTTIE 0
     - \#define LV_USE_FFMPEG 0
     - \#define LV_USE_FONT_MANAGER 0
-    - \#define LV_USE_XML 0
-
-9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVE_INTERNAL` and `LV_USE_THORVE_EXTERNAL` as 
+    
+9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVG_INTERNAL` and `LV_USE_THORVG_EXTERNAL` as 
 
     ```c
     /*Enable Vector Graphic APIs*/

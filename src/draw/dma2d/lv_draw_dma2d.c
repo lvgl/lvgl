@@ -35,7 +35,7 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t delete_cb(lv_draw_unit_t * draw_unit);
 #if LV_DRAW_DMA2D_ASYNC
-    static void thread_cb(void * arg);
+    static int32_t wait_finish_cb(lv_draw_unit_t * u);
 #endif
 #if !LV_DRAW_DMA2D_ASYNC
     static bool check_transfer_completion(void);
@@ -64,14 +64,14 @@ void lv_draw_dma2d_init(void)
     draw_dma2d_unit->base_unit.evaluate_cb = evaluate_cb;
     draw_dma2d_unit->base_unit.dispatch_cb = dispatch_cb;
     draw_dma2d_unit->base_unit.delete_cb = delete_cb;
+#if LV_DRAW_DMA2D_ASYNC
+    draw_dma2d_unit->base_unit.wait_for_finish_cb = wait_finish_cb;
+#endif
     draw_dma2d_unit->base_unit.name = "DMA2D";
 
 #if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;
-
-    lv_result_t res = lv_thread_init(&draw_dma2d_unit->thread, "dma2d", LV_DRAW_THREAD_PRIO, thread_cb, 2 * 1024,
-                                     draw_dma2d_unit);
-    LV_ASSERT(res == LV_RESULT_OK);
+    lv_thread_sync_init(&draw_dma2d_unit->interrupt_signal);
 #endif
 
     /* enable the DMA2D clock */
@@ -79,7 +79,7 @@ void lv_draw_dma2d_init(void)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
-#elif defined(STM32H7RS)
+#elif defined(STM32H7RS) || defined(STM32N6)
     RCC->AHB5ENR |= RCC_AHB5ENR_DMA2DEN;
 #else
 #warning "LVGL can't enable the clock for DMA2D"
@@ -102,15 +102,12 @@ void lv_draw_dma2d_deinit(void)
     RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR &= ~RCC_AHB3ENR_DMA2DEN;
-#elif defined(STM32H7RS)
+#elif defined(STM32H7RS) || defined(STM32N6)
     RCC->AHB5ENR &= ~RCC_AHB5ENR_DMA2DEN;
 #endif
 
 #if LV_DRAW_DMA2D_ASYNC
-    lv_result_t res = lv_thread_delete(&g_unit->thread);
-    LV_ASSERT(res == LV_RESULT_OK);
-
-    res = lv_thread_sync_delete(&g_unit->interrupt_signal);
+    lv_result_t res = lv_thread_sync_delete(&g_unit->interrupt_signal);
     LV_ASSERT(res == LV_RESULT_OK);
 
     g_unit = NULL;
@@ -212,14 +209,16 @@ void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuratio
 void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 {
     if(SCB->CCR & SCB_CCR_DC_Msk) {
-        SCB_InvalidateDCache();
+        SCB_InvalidateDCache_by_Addr((uint32_t *)mem_area->first_byte,
+                                     mem_area->stride * mem_area->height);
     }
 }
 
 void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 {
     if(SCB->CCR & SCB_CCR_DC_Msk) {
-        SCB_CleanDCache();
+        SCB_CleanDCache_by_Addr((uint32_t *)mem_area->first_byte,
+                                mem_area->stride * mem_area->height);
     }
 }
 #endif
@@ -288,7 +287,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(draw_dma2d_unit->task_act) {
 #if LV_DRAW_DMA2D_ASYNC
         /*Return immediately if it's busy with draw task*/
-        return 0;
+        return LV_DRAW_UNIT_IDLE;
 #else
         if(!check_transfer_completion()) {
             return LV_DRAW_UNIT_IDLE;
@@ -354,9 +353,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         }
     }
 
-#if !LV_DRAW_DMA2D_ASYNC
     lv_draw_dispatch_request();
-#endif
 
     return 1;
 }
@@ -367,23 +364,18 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit)
 }
 
 #if LV_DRAW_DMA2D_ASYNC
-static void thread_cb(void * arg)
+static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
 {
-    lv_draw_dma2d_unit_t * u = arg;
+    lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) draw_unit;
 
-    lv_thread_sync_init(&u->interrupt_signal);
+    /* If a DMA2D task has been dispatched, wait its interrupt */
+    lv_thread_sync_wait(&u->interrupt_signal);
 
-    while(1) {
-
-        do {
-            lv_thread_sync_wait(&u->interrupt_signal);
-        } while(u->task_act != NULL);
-
-        post_transfer_tasks(u);
-        lv_draw_dispatch_request();
-    }
+    /* Then cleanup the DMA2D draw unit to accept a new task */
+    post_transfer_tasks(u);
+    return 0;
 }
-#endif
+#endif /*LV_DRAW_DMA2D_ASYNC*/
 
 #if !LV_DRAW_DMA2D_ASYNC
 static bool check_transfer_completion(void)

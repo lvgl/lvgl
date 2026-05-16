@@ -1,0 +1,63 @@
+---
+title: "LED (lv_led)"
+description: "LEDs are rectangle-like (or circle) Widgets whose brightness can be adjusted. With lower brightness the color of the LED becomes darker."
+---
+
+## Overview
+
+LEDs are rectangle-like (or circle) Widgets whose brightness can be
+adjusted. With lower brightness the color of the LED becomes darker.
+
+## Parts and Styles
+
+- <ApiLink name="LV_LED_PART_MAIN" /> uses the [typical background style
+  properties](/common-widget-features/styles/overview).
+
+## Usage
+
+### Color
+
+You can set the color of the LED with
+<ApiLink name="lv_led_set_color" display="lv_led_set_color(led, lv_color_hex(0xff0080))" />. This will be used as its
+background color, border color, and shadow color.
+
+### Brightness
+
+You can set their brightness with <ApiLink name="lv_led_set_brightness" display="lv_led_set_brightness(led, brightness)" />.
+The `brightness` value should be in the range 0 (darkest) to 255 (lightest).
+
+### Toggle
+
+Use <ApiLink name="lv_led_on" display="lv_led_on(led)" /> and <ApiLink name="lv_led_off" display="lv_led_off(led)" /> to set the brightness to
+a predefined ON or OFF value. The <ApiLink name="lv_led_toggle" display="lv_led_toggle(led)" /> toggles between
+the ON and OFF state.
+
+You can set custom LED ON and OFF brightness values by defining macros
+<ApiLink name="LV_LED_BRIGHT_MAX" /> and <ApiLink name="LV_LED_BRIGHT_MIN" /> in your project.  Their default
+values are 255 and 80. These too must be in the range [0..255].
+
+## Events
+
+No special events are sent by LED Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Keys
+
+No *Keys* are processed by LED Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Keys](/main-modules/indev/keypad).
+</Callout>
+
+## Example
+
+### LED with custom style
+
+<LvglExample name="lv_example_led_1" path="widgets/led/lv_example_led_1" />
+
+## API

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_profiler_builtin.h"
+#include "../lvgl_public.h"
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
@@ -42,6 +42,15 @@ struct _lv_profiler_builtin_config_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+#if LV_USE_PROFILER_BUILTIN_POSIX
+
+/**
+ * Initialize the built-in profiler with POSIX functions.
+ */
+void lv_profiler_builtin_posix_init(void);
+
+#endif /* LV_USE_PROFILER_BUILTIN_POSIX */
 
 /**********************
  *      MACROS

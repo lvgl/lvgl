@@ -55,6 +55,8 @@ static lv_eve_drawing_context_t ct = {
 
 static lv_eve_drawing_context_t ct_temp;
 
+static lv_eve_drawing_state_t st;
+
 /**********************
  *      MACROS
  **********************/
@@ -86,17 +88,12 @@ void lv_eve_primitive(uint8_t context)
 
 void lv_eve_scissor(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
-    if(x1 != scissor_x1 || y1 != scissor_y1) {
-        int16_t adjusted_x1 = x1 > 0 ? x1 - 1 : 0;
-        int16_t adjusted_y1 = y1 > 0 ? y1 - 1 : 0;
-        EVE_cmd_dl_burst(SCISSOR_XY(adjusted_x1, adjusted_y1));
+    if(x1 != scissor_x1 || y1 != scissor_y1 || x2 != scissor_x2 || y2 != scissor_y2) {
+        EVE_cmd_dl_burst(SCISSOR_XY(x1, y1));
         scissor_x1 = x1;
         scissor_y1 = y1;
-    }
-
-    if(x2 != scissor_x2 || y2 != scissor_y2) {
-        uint16_t w = x2 - x1 + 3;
-        uint16_t h = y2 - y1 + 3;
+        uint16_t w = x2 - x1 + 1;
+        uint16_t h = y2 - y1 + 1;
         EVE_cmd_dl_burst(SCISSOR_SIZE(w, h));
         scissor_x2 = x2;
         scissor_y2 = y2;
@@ -199,6 +196,13 @@ void lv_eve_draw_rect_simple(int16_t coord_x1, int16_t coord_y1, int16_t coord_x
     if(radius > 1) {
         lv_eve_line_width(radius * 16);
     }
+    if(radius > 0) {
+        /* With radius 1, the EVE engine draws one half-opacity
+         * pixel outline around the rectangle. Subtracting one
+         * here ensures that the full-opacity rectangle reaches
+         * the coordinate pixels we were passed in. */
+        radius--;
+    }
 
     lv_eve_vertex_2f(coord_x1 + radius, coord_y1 + radius);
     lv_eve_vertex_2f(coord_x2 - radius, coord_y2 - radius);
@@ -213,6 +217,45 @@ void lv_eve_mask_round(int16_t coord_x1, int16_t coord_y1, int16_t coord_x2, int
     lv_eve_draw_rect_simple(coord_x1, coord_y1, coord_x2, coord_y2, radius);
     lv_eve_color_mask(1, 1, 1, 0);
     lv_eve_blend_func(EVE_DST_ALPHA, EVE_ONE_MINUS_DST_ALPHA);
+}
+
+void lv_eve_bitmap_source(uint32_t addr)
+{
+    uint32_t bitmap_source = BITMAP_SOURCE(addr);
+    if(st.bitmap_source != bitmap_source) {
+        EVE_cmd_dl_burst(bitmap_source);
+        st.bitmap_source = bitmap_source;
+    }
+}
+
+void lv_eve_bitmap_size(uint8_t filter, uint8_t wrapx, uint8_t wrapy, uint16_t width, uint16_t height)
+{
+    uint32_t bitmap_size = BITMAP_SIZE(filter, wrapx, wrapy, width, height);
+    if(st.bitmap_size != bitmap_size) {
+        EVE_cmd_dl_burst(bitmap_size);
+        st.bitmap_size = bitmap_size;
+    }
+    /* set the high bits too, of the width and height */
+    uint32_t bitmap_size_h = BITMAP_SIZE_H(width, height);
+    if(st.bitmap_size_h != bitmap_size_h) {
+        EVE_cmd_dl_burst(bitmap_size_h);
+        st.bitmap_size_h = bitmap_size_h;
+    }
+}
+
+void lv_eve_bitmap_layout(uint8_t format, uint16_t linestride, uint16_t height)
+{
+    uint32_t bitmap_layout = BITMAP_LAYOUT(format, linestride, height);
+    if(st.bitmap_layout != bitmap_layout) {
+        EVE_cmd_dl_burst(bitmap_layout);
+        st.bitmap_layout = bitmap_layout;
+    }
+    /* set the high bits too, of the linestride and height */
+    uint32_t bitmap_layout_h = BITMAP_LAYOUT_H(linestride, height);
+    if(st.bitmap_layout_h != bitmap_layout_h) {
+        EVE_cmd_dl_burst(bitmap_layout_h);
+        st.bitmap_layout_h = bitmap_layout_h;
+    }
 }
 
 

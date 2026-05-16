@@ -73,7 +73,16 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Show the value of the pressed points
+ * @title Pressed point tooltip on stacked chart
+ * @brief Stacked bar chart that draws a value tooltip above the pressed point.
+ *
+ * A 280x180 `LV_CHART_TYPE_STACKED` chart holds three series (red, green,
+ * blue), each with 10 points. The chart subscribes to `LV_EVENT_ALL`:
+ * `LV_EVENT_REFR_EXT_DRAW_SIZE` reserves 20 px of external draw space,
+ * and `LV_EVENT_DRAW_POST_END` reads the pressed point via
+ * `lv_chart_get_pressed_point` and uses `lv_draw_rect` plus
+ * `lv_draw_label` to draw an accumulated dollar value above the stack.
+ * `LV_EVENT_VALUE_CHANGED` and `LV_EVENT_RELEASED` invalidate the chart.
  */
 void lv_example_chart_3(void)
 {

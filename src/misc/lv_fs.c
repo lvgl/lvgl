@@ -6,12 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_fs_private.h"
 
-#include "../misc/lv_assert.h"
-#include "../misc/lv_profiler.h"
-#include "../stdlib/lv_string.h"
-#include "lv_ll.h"
+#include "lv_fs_private.h"
 #include "../core/lv_global.h"
 
 /*********************
@@ -125,10 +121,13 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         /* If this is a memory-mapped file, then set "cache" to the memory buffer */
         if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
             lv_fs_path_ex_t * path_ex = (lv_fs_path_ex_t *)path;
-            file_p->cache->buffer = (void *)path_ex->buffer;
+            lv_result_t res = lv_fs_get_buffer_from_path(path_ex, &file_p->cache->buffer, &file_p->cache->end);
+            if(res == LV_RESULT_INVALID) {
+                LV_LOG_WARN("lv_fs_path_ex_t is invalid");
+                return LV_FS_RES_UNKNOWN;
+            }
             file_p->cache->start = 0;
             file_p->cache->file_position = 0;
-            file_p->cache->end = path_ex->size;
         }
         /*Set an invalid range by default*/
         else {
@@ -142,13 +141,50 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     return LV_FS_RES_OK;
 }
 
-void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size)
+void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size, const char * ext)
 {
-    path->path[0] = letter;
-    path->path[1] = ':';
-    path->path[2] = 0;
-    path->buffer = buf;
-    path->size = size;
+    /*Make a path the contains both the address and the size. */
+
+    /*Don't add the '.' and the extension if the extension is NULL*/
+    if(ext == NULL) {
+        lv_snprintf(path->path, sizeof(path->path), "%c:%zu-%" LV_PRIu32, letter, (size_t) buf, size);
+    }
+    else {
+        lv_snprintf(path->path, sizeof(path->path), "%c:%zu-%" LV_PRIu32 ".%s", letter,
+                    (size_t) buf, size, ext);
+    }
+}
+
+lv_result_t lv_fs_get_buffer_from_path(lv_fs_path_ex_t * path, void ** buffer, uint32_t * size)
+{
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(buffer);
+    LV_ASSERT_NULL(size);
+
+    *size = 0;
+    *buffer = NULL;
+
+    if(path->path[0] < 'A' || path->path[0] > 'Z') return LV_RESULT_INVALID;
+    if(path->path[1] != ':') return LV_RESULT_INVALID;
+
+    uint32_t i;
+    lv_uintptr_t adr = 0;
+    for(i = 2; path->path[i] != '-' && path->path[i] != '\0' && i < sizeof(path->path); i++) {
+        adr = adr * 10;
+        adr += path->path[i] - '0';
+    }
+
+    if(path->path[i] == '\0' || i == sizeof(path->path)) return LV_RESULT_INVALID;
+    i++; /*Skip '-'*/
+
+    for(; path->path[i] != '.' && path->path[i] != '\0' && i < sizeof(path->path); i++) {
+        *size = (*size) * 10;
+        *size += path->path[i] - '0';
+    }
+
+    *buffer = (void *)adr;
+
+    return LV_RESULT_OK;
 }
 
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
@@ -301,6 +337,114 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
     return res;
 }
 
+lv_fs_res_t lv_fs_get_size(lv_fs_file_t * file_p, uint32_t * size_res)
+{
+    uint32_t original_pos;
+    lv_fs_res_t ret = lv_fs_tell(file_p, &original_pos);
+    if(ret != LV_FS_RES_OK) {
+        return ret;
+    }
+
+    ret = lv_fs_seek(file_p, 0, LV_FS_SEEK_END);
+    if(ret != LV_FS_RES_OK) {
+        return ret;
+    }
+
+    ret = lv_fs_tell(file_p, size_res);
+
+    if(ret != LV_FS_RES_OK || *size_res != original_pos) {
+        lv_fs_res_t seek_res = lv_fs_seek(file_p, original_pos, LV_FS_SEEK_SET);
+        if(ret == LV_FS_RES_OK) {
+            ret = seek_res;
+        }
+    }
+
+    return ret;
+}
+
+lv_fs_res_t lv_fs_path_get_size(const char * path, uint32_t * size_res)
+{
+    lv_fs_file_t file;
+    lv_fs_res_t ret = lv_fs_open(&file, path, LV_FS_MODE_RD);
+    if(ret != LV_FS_RES_OK) {
+        return ret;
+    }
+
+    ret = lv_fs_seek(&file, 0, LV_FS_SEEK_END);
+
+    if(ret == LV_FS_RES_OK) {
+        ret = lv_fs_tell(&file, size_res);
+    }
+
+    lv_fs_res_t close_res = lv_fs_close(&file);
+    if(ret == LV_FS_RES_OK) {
+        ret = close_res;
+    }
+
+    return ret;
+}
+
+lv_fs_res_t lv_fs_load_to_buf(void * buf, uint32_t buf_size, const char * path)
+{
+    lv_fs_file_t file;
+    lv_fs_res_t ret = lv_fs_open(&file, path, LV_FS_MODE_RD);
+    if(ret != LV_FS_RES_OK) {
+        return ret;
+    }
+
+    uint32_t bytes_read;
+    ret = lv_fs_read(&file, buf, buf_size, &bytes_read);
+
+    if(ret == LV_FS_RES_OK && bytes_read != buf_size) {
+        LV_LOG_WARN("Only %"LV_PRIu32" bytes out of %"LV_PRIu32" were read from the file to the buffer",
+                    bytes_read, buf_size);
+        ret = LV_FS_RES_UNKNOWN;
+    }
+
+    lv_fs_res_t close_res = lv_fs_close(&file);
+    if(ret == LV_FS_RES_OK) {
+        ret = close_res;
+    }
+
+    return ret;
+}
+
+void * lv_fs_load_with_alloc(const char * path, uint32_t * size)
+{
+    lv_fs_file_t file;
+    uint8_t * data = NULL;
+
+    lv_fs_res_t ret = lv_fs_open(&file, path, LV_FS_MODE_RD);
+    if(ret != LV_FS_RES_OK) {
+        LV_LOG_WARN("can't open file %s, res %d", path, ret);
+        return NULL;
+    }
+
+    ret = lv_fs_get_size(&file, size);
+    if(ret != LV_FS_RES_OK) {
+        LV_LOG_WARN("can't get file size %s, res %d", path, ret);
+        goto fail;
+    }
+
+    data = lv_malloc(*size);
+    if(data == NULL) {
+        LV_LOG_WARN("malloc failed for data with size %" LV_PRIu32, *size);
+        goto fail;
+    }
+
+    uint32_t bytes_read;
+    ret = lv_fs_read(&file, data, *size, &bytes_read);
+    if(ret != LV_FS_RES_OK || bytes_read != *size) {
+        LV_LOG_WARN("read %s failed, rn %" LV_PRIu32 ", res %d", path, bytes_read, ret);
+        lv_free(data);
+        data = NULL;
+    }
+
+fail:
+    lv_fs_close(&file);
+    return data;
+}
+
 lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 {
     if(path == NULL) return LV_FS_RES_INV_PARAM;
@@ -403,6 +547,20 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
     *new_drv = drv_p;
 }
 
+void lv_fs_remove_drive(char letter)
+{
+    lv_fs_drv_t ** drv;
+    LV_LL_READ(fsdrv_ll_p, drv) {
+        if((*drv)->letter == letter) {
+            lv_ll_remove(fsdrv_ll_p, drv); /* remove the drive from the list of registered drives */
+            if((*drv)->remove_cb) {
+                (*drv)->remove_cb(*drv); /* call the remove callback if available */
+            }
+            lv_free(drv); /* free the list node*/
+        }
+    }
+}
+
 lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t ** drv;
@@ -497,6 +655,31 @@ const char * lv_fs_get_last(const char * path)
 
     return &path[i + 1];
 }
+
+int lv_fs_path_join(char * buf, size_t buf_sz, const char * base, const char * end)
+{
+    if(base[0] == '\0') return lv_strlcpy(buf, end, buf_sz);
+    if(end[0] == '\0') return lv_strlcpy(buf, base, buf_sz);
+
+    size_t base_len = lv_strlen(base);
+    char base_end_char = base_len ? base[base_len - 1] : '\0';
+
+    bool base_has_sep = base_end_char == '/' || base_end_char == '\\';
+    bool end_has_sep = end[0] == '/' || end[0] == '\\';
+
+    if(base_has_sep && end_has_sep) {
+        end++;
+        end_has_sep = false;
+    }
+
+    const char * sep = "/";
+    if(base_has_sep || end_has_sep) {
+        sep = "";
+    }
+
+    return lv_snprintf(buf, buf_sz, "%s%s%s", base, sep, end);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -2,7 +2,15 @@
 #if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 /**
- * Create a drop down, up, left and right menus
+ * @title Dropdowns opening in four directions
+ * @brief Four dropdowns share a menu and open toward top, bottom, left, and right.
+ *
+ * Four dropdowns built from the same `Apple/Banana/Orange/Melon` option string
+ * are anchored to the top, bottom, left, and right of the screen. Each one
+ * sets its open direction through `lv_dropdown_set_dir` (`LV_DIR_BOTTOM`,
+ * `LV_DIR_RIGHT`, `LV_DIR_LEFT`) and picks a matching arrow via
+ * `lv_dropdown_set_symbol` (`LV_SYMBOL_UP`, `LV_SYMBOL_RIGHT`,
+ * `LV_SYMBOL_LEFT`). The top dropdown keeps the default downward open.
  */
 void lv_example_dropdown_2(void)
 {

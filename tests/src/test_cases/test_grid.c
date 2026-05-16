@@ -15,10 +15,10 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-static void button_create(lv_obj_t * parent, const char * text, int32_t x, int32_t y)
+static void button_create(lv_obj_t * parent, const char * text, int32_t x, int32_t x_span, int32_t y, int32_t y_span)
 {
     lv_obj_t * btn = lv_button_create(parent);
-    lv_obj_set_grid_cell(btn, LV_GRID_ALIGN_STRETCH, x, 1, LV_GRID_ALIGN_STRETCH, y, 1);
+    lv_obj_set_grid_cell(btn, LV_GRID_ALIGN_STRETCH, x, x_span, LV_GRID_ALIGN_STRETCH, y, y_span);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, text);
@@ -43,15 +43,15 @@ void test_subgrid_row(void)
     lv_obj_set_grid_dsc_array(cont_sub, col_dsc2, NULL);
     lv_obj_set_style_pad_all(cont_sub, 0, 0);
 
-    button_create(cont_main, "Main 0,0", 0, 0);
-    button_create(cont_main, "Main 3,3", 3, 3);
-    button_create(cont_main, "Main 2,2", 2, 2);
-    button_create(cont_sub, "Sub 0,0", 0, 0);
-    button_create(cont_sub, "Sub 1,0", 1, 0);
-    button_create(cont_sub, "Sub 2,0", 2, 0);
-    button_create(cont_sub, "Sub 3,0", 3, 0);
-    button_create(cont_sub, "Sub 1,1", 1, 1);
-    button_create(cont_sub, "Sub 0,1", 0, 1);
+    button_create(cont_main, "Main 0,0", 0, 1, 0, 1);
+    button_create(cont_main, "Main 3,3", 3, 1, 3, 1);
+    button_create(cont_main, "Main 2,2", 2, 1, 2, 1);
+    button_create(cont_sub, "Sub 0,0", 0, 1, 0, 1);
+    button_create(cont_sub, "Sub 1,0", 1, 1, 0, 1);
+    button_create(cont_sub, "Sub 2,0", 2, 1, 0, 1);
+    button_create(cont_sub, "Sub 3,0", 3, 1, 0, 1);
+    button_create(cont_sub, "Sub 1,1", 1, 1, 1, 1);
+    button_create(cont_sub, "Sub 0,1", 0, 1, 1, 1);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("subgrid_row.png");
 }
@@ -73,17 +73,108 @@ void test_subgrid_col(void)
     lv_obj_set_grid_dsc_array(cont_sub, NULL, row_dsc2);
     lv_obj_set_style_pad_all(cont_sub, 0, 0);
 
-    button_create(cont_main, "Main 0,0", 0, 0);
-    button_create(cont_main, "Main 3,3", 3, 3);
-    button_create(cont_main, "Main 2,2", 2, 2);
-    button_create(cont_sub, "Sub 0,0", 0, 0);
-    button_create(cont_sub, "Sub 0,1", 0, 1);
-    button_create(cont_sub, "Sub 0,2", 0, 2);
-    button_create(cont_sub, "Sub 0,3", 0, 3);
-    button_create(cont_sub, "Sub 1,0", 1, 0);
-    button_create(cont_sub, "Sub 1,1", 1, 1);
+    button_create(cont_main, "Main 0,0", 0, 1, 0, 1);
+    button_create(cont_main, "Main 3,3", 3, 1, 3, 1);
+    button_create(cont_main, "Main 2,2", 2, 1, 2, 1);
+    button_create(cont_sub, "Sub 0,0", 0, 1, 0, 1);
+    button_create(cont_sub, "Sub 0,1", 0, 1, 1, 1);
+    button_create(cont_sub, "Sub 0,2", 0, 1, 2, 1);
+    button_create(cont_sub, "Sub 0,3", 0, 1, 3, 1);
+    button_create(cont_sub, "Sub 1,0", 1, 1, 0, 1);
+    button_create(cont_sub, "Sub 1,1", 1, 1, 1, 1);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("subgrid_col.png");
 }
+
+void test_grid_ltr(void)
+{
+    const int32_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    const int32_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+
+    lv_obj_t * grid = lv_obj_create(lv_screen_active());
+    lv_obj_set_style_base_dir(grid, LV_BASE_DIR_LTR, LV_PART_MAIN);
+    lv_obj_set_size(grid, lv_pct(100), lv_pct(100));
+    lv_obj_set_grid_dsc_array(grid, col_dsc, row_dsc);
+
+    button_create(grid, "Button 1", 0, 2, 0, 1);
+    button_create(grid, "Button 2", 2, 2, 0, 2);
+    button_create(grid, "Btn 3", 0, 1, 1, 1);
+    button_create(grid, "Btn 4", 1, 1, 1, 1);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("grid_ltr.png");
+}
+
+void test_grid_rtl(void)
+{
+    const int32_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    const int32_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+
+    lv_obj_t * grid = lv_obj_create(lv_screen_active());
+    lv_obj_set_style_base_dir(grid, LV_BASE_DIR_RTL, LV_PART_MAIN);
+    lv_obj_set_size(grid, lv_pct(100), lv_pct(100));
+    lv_obj_set_grid_dsc_array(grid, col_dsc, row_dsc);
+
+    button_create(grid, "Button 1", 0, 2, 0, 1);
+    button_create(grid, "Button 2", 2, 2, 0, 2);
+    button_create(grid, "Btn 3", 0, 1, 1, 1);
+    button_create(grid, "Btn 4", 1, 1, 1, 1);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("grid_rtl.png");
+}
+
+
+void test_grid_no_crash_on_invalid_settings(void)
+{
+    /*Should't crash because of these*/
+
+    /*No col/row descriptors on screen*/
+    lv_obj_t * scr = lv_obj_create(NULL);
+    lv_screen_load(scr);
+    lv_obj_set_style_layout(scr, LV_LAYOUT_GRID, 0);
+    lv_refr_now(NULL);
+
+    /*No col/row descriptors on a widget*/
+    lv_obj_t * cont = lv_obj_create(scr);
+    lv_obj_set_style_layout(cont, LV_LAYOUT_GRID, 0);
+    lv_refr_now(NULL);
+
+    /*Set a cell without having row/col descriptor on the parent*/
+    lv_obj_set_grid_cell(cont, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 0, 1);
+    lv_refr_now(NULL);
+
+    /*Add grid descriptors*/
+    const int32_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    const int32_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    lv_obj_set_grid_dsc_array(cont, col_dsc, row_dsc);
+    lv_refr_now(NULL);
+
+    lv_obj_t * label = lv_label_create(cont);
+
+    /*Zero span*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 0, 0, LV_GRID_ALIGN_CENTER, 0, 0);
+    lv_refr_now(NULL);
+
+    /*Too large span*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 0, 20, LV_GRID_ALIGN_CENTER, 0, 30);
+    lv_refr_now(NULL);
+
+    /*Negative span*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 0, -50, LV_GRID_ALIGN_CENTER, 0, -20);
+    lv_refr_now(NULL);
+
+    /*Too large position*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 30, 1, LV_GRID_ALIGN_CENTER, 20, 1);
+    lv_refr_now(NULL);
+
+    /*Negative position*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, -100, 1, LV_GRID_ALIGN_CENTER, -20, 1);
+    lv_refr_now(NULL);
+
+    /*Valid settings*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 1, 2, LV_GRID_ALIGN_CENTER, 0, 1);
+    lv_refr_now(NULL);
+    TEST_PASS();
+}
+
 
 #endif

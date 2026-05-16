@@ -10,7 +10,16 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Create a menu from a drop-down list and show some drop-down list features and styling
+ * @title Dropdown styled as a menu
+ * @brief Turn a dropdown into a fixed-label menu with a rotating caret image.
+ *
+ * A dropdown in the top-left is filled with file-menu actions and given a
+ * fixed button label of `Menu` via `lv_dropdown_set_text`. `img_caret_down` is
+ * installed with `lv_dropdown_set_symbol` and rotated 180 degrees on
+ * `LV_PART_INDICATOR | LV_STATE_CHECKED` using `transform_rotation` so the
+ * caret flips when the list opens. `lv_dropdown_set_selected_highlight(false)`
+ * drops the last-picked highlight, and an `LV_EVENT_VALUE_CHANGED` handler
+ * logs the chosen item.
  */
 void lv_example_dropdown_3(void)
 {

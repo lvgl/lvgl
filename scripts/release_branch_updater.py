@@ -82,7 +82,7 @@ def main():
 
         branches_to_update = lvgl_release_branches
         if not skip_master:
-            branches_to_update += [lvgl_default_branch]
+            branches_to_update = branches_to_update + [lvgl_default_branch]
 
         # from oldest to newest release...
         for lvgl_branch in branches_to_update:
@@ -151,19 +151,28 @@ def main():
                     if "lvgl.path " in line
                 ), None)
 
+                # check if the submodule is really in the index and not just a leftover in .gitmodules
+                out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "submodule", "status"))
+                if not any(
+                    line.split(maxsplit=1)[1].rsplit(maxsplit=1)[0] == port_lvgl_submodule_path
+                    for line
+                    in out.decode().strip().splitlines()
+                ):
+                    port_lvgl_submodule_path = None
+
             if port_lvgl_submodule_path is None:
                 print(LOG, "this port has no LVGL submodule")
             else:
                 print(LOG, "lvgl submodule found in port at:", port_lvgl_submodule_path)
 
                 # get the SHA of LVGL in this release of LVGL
-                out = subprocess.check_output(("git", "-C", lvgl_path, "rev-parse", "--verify", "--quiet", "HEAD"))
+                out = subprocess.check_output(("git", "-C", lvgl_path, "rev-parse", "--verify", "HEAD"))
                 lvgl_sha = out.decode().strip()
                 print(LOG, "the SHA of LVGL in this release should be:", lvgl_sha)
 
                 # get the SHA of LVGL this port wants to use in this release
                 out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "rev-parse",
-                                               "--verify", "--quiet", f"HEAD:{port_lvgl_submodule_path}"))
+                                               "--verify", f"HEAD:{port_lvgl_submodule_path}"))
                 port_lvgl_submodule_sha = out.decode().strip()
                 print(LOG, "the SHA of LVGL in the submodule of this port is:", port_lvgl_submodule_sha)
 
@@ -233,7 +242,7 @@ def main():
 
 def get_release_branches(working_dir):
 
-    out = subprocess.check_output(("git", "-C", working_dir, "branch", "--quiet", "--format", "%(refname)", "--all"))
+    out = subprocess.check_output(("git", "-C", working_dir, "branch", "--format", "%(refname)", "--all"))
     branches = out.decode().strip().splitlines()
 
     release_versions = []

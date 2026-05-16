@@ -19,19 +19,19 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_eve.h"
+#include "../../lvgl_public.h"
 #if LV_USE_DRAW_EVE
 
-#include "lv_draw_eve_target.h"
 #include "lv_draw_eve_ram_g.h"
 #include "../lv_draw_private.h"
-#include "../../misc/lv_types.h"
 #include "../../core/lv_global.h"
-#include "../lv_draw_triangle.h"
-#include "../lv_draw_line.h"
-#include "../lv_draw_label.h"
-#include "../../font/lv_font_fmt_txt.h"
-#include "../lv_draw_arc.h"
+
+#if LV_DRAW_EVE_WRITE_BUFFER_SIZE != 0 && LV_DRAW_EVE_WRITE_BUFFER_SIZE < 4
+#warning LV_DRAW_EVE_WRITE_BUFFER_SIZE cannot be less than 4. Using 0 (buffering disabled).
+#define LV_DRAW_EVE_WRITE_BUFFER_SIZE_INTERNAL 0
+#else
+#define LV_DRAW_EVE_WRITE_BUFFER_SIZE_INTERNAL LV_DRAW_EVE_WRITE_BUFFER_SIZE
+#endif
 
 /*********************
  *      DEFINES
@@ -60,6 +60,10 @@ struct _lv_draw_eve_unit_t {
     lv_draw_eve_ramg_t ramg;
     lv_draw_eve_parameters_t params;
     lv_draw_eve_operation_cb_t op_cb;
+#if LV_DRAW_EVE_WRITE_BUFFER_SIZE_INTERNAL
+    uint32_t lv_eve_write_buf_len;
+    uint8_t lv_eve_write_buf[LV_DRAW_EVE_WRITE_BUFFER_SIZE_INTERNAL];
+#endif
 };
 
 /**********************

@@ -6,20 +6,17 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_table_private.h"
+
+#if LV_USE_TABLE
+
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_TABLE != 0
-
-#include "../../indev/lv_indev.h"
-#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../misc/lv_math.h"
-#include "../../stdlib/lv_sprintf.h"
 #include "../../draw/lv_draw_private.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -56,6 +53,22 @@ static inline bool is_cell_empty(void * cell)
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_table_properties[] = {
+    {
+        .id = LV_PROPERTY_TABLE_ROW_COUNT,
+        .setter = lv_table_set_row_count,
+        .getter = lv_table_get_row_count,
+    },
+    {
+        .id = LV_PROPERTY_TABLE_COLUMN_COUNT,
+        .setter = lv_table_set_column_count,
+        .getter = lv_table_get_column_count,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_table_class  = {
     .constructor_cb = lv_table_constructor,
     .destructor_cb = lv_table_destructor,
@@ -67,6 +80,7 @@ const lv_obj_class_t lv_table_class  = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_table_t),
     .name = "lv_table",
+    LV_PROPERTY_CLASS_FIELDS(table, TABLE)
 };
 /**********************
  *      MACROS
@@ -169,13 +183,14 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
     lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = lv_text_ap_calc_bytes_count(raw_txt);
-    table->cell_data[cell] = lv_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len_ap + 1);
-    LV_ASSERT_MALLOC(table->cell_data[cell]);
-    if(table->cell_data[cell] == NULL) {
+    size_t len_ap = lv_text_ap_strlen(raw_txt) + 1;
+    lv_table_cell_t * cell_data = lv_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len_ap);
+    LV_ASSERT_MALLOC(cell_data);
+    if(!cell_data) {
         va_end(ap2);
         return;
     }
+    table->cell_data[cell] = cell_data;
     lv_text_ap_proc(raw_txt, table->cell_data[cell]->txt);
 
     lv_free(raw_txt);
@@ -221,10 +236,6 @@ void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt)
         uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
         uint32_t i;
         for(i = new_cell_cnt; i < old_cell_cnt; i++) {
-            if(table->cell_data[i] && table->cell_data[i]->user_data) {
-                lv_free(table->cell_data[i]->user_data);
-                table->cell_data[i]->user_data = NULL;
-            }
             lv_free(table->cell_data[i]);
         }
     }
@@ -277,10 +288,6 @@ void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
         int32_t i;
         for(i = 0; i < (int32_t)old_col_cnt - (int32_t)col_cnt; i++) {
             uint32_t idx = old_col_start + min_col_cnt + i;
-            if(table->cell_data[idx] && table->cell_data[idx]->user_data) {
-                lv_free(table->cell_data[idx]->user_data);
-                table->cell_data[idx]->user_data = NULL;
-            }
             lv_free(table->cell_data[idx]);
             table->cell_data[idx] = NULL;
         }
@@ -386,10 +393,6 @@ void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, voi
         table->cell_data[cell]->ctrl = 0;
         table->cell_data[cell]->user_data = NULL;
         table->cell_data[cell]->txt[0] = '\0';
-    }
-
-    if(table->cell_data[cell]->user_data) {
-        lv_free(table->cell_data[cell]->user_data);
     }
 
     table->cell_data[cell]->user_data = user_data;
@@ -536,10 +539,6 @@ static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < table->col_cnt * table->row_cnt; i++) {
         if(table->cell_data[i]) {
-            if(table->cell_data[i]->user_data) {
-                lv_free(table->cell_data[i]->user_data);
-                table->cell_data[i]->user_data = NULL;
-            }
             lv_free(table->cell_data[i]);
             table->cell_data[i] = NULL;
         }
@@ -844,7 +843,7 @@ static void draw_main(lv_event_t * e)
                     label_dsc_act.flag |= LV_TEXT_FLAG_EXPAND;
                 }
 
-                lv_text_get_size(&txt_size, table->cell_data[cell]->txt, label_dsc_def.font, &attributes);
+                lv_text_get_size_attributes(&txt_size, table->cell_data[cell]->txt, label_dsc_def.font, &attributes);
 
                 /*Align the content to the middle if not cropped*/
                 if(!crop) {
@@ -989,7 +988,7 @@ static int32_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t *
             lv_point_t txt_size;
             attributes.max_width -= cell_left + cell_right;
 
-            lv_text_get_size(&txt_size, table->cell_data[cell]->txt, font, &attributes);
+            lv_text_get_size_attributes(&txt_size, table->cell_data[cell]->txt, font, &attributes);
 
             h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
             /*Skip until one element after the last merged column*/
@@ -1073,7 +1072,7 @@ static size_t get_cell_txt_len(const char * txt)
     size_t retval = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    retval = sizeof(lv_table_cell_t) + lv_text_ap_calc_bytes_count(txt) + 1;
+    retval = sizeof(lv_table_cell_t) + lv_text_ap_strlen(txt) + 1;
 #else
     retval = sizeof(lv_table_cell_t) + lv_strlen(txt) + 1;
 #endif

@@ -1,0 +1,78 @@
+name: Install LVGL using CMake
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build-examples:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        api: [public, private]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install kconfig
+        run: pip install kconfiglib
+
+      - name: Build LVGL
+        run: |
+          defconfig configs/ci/install/${{ matrix.api }}_api_config
+          cmake -B build -GNinja -DLV_BUILD_USE_KCONFIG=ON
+          cmake --build build
+          cmake --install build --prefix lvgl-${{ matrix.api }}-install
+
+      - name: Generate Compilation Test Code
+        run: |
+          if [ "${{ matrix.api }}" = "public" ]; then
+            echo "#include <lvgl/lvgl.h>
+              #include <lvgl/lvgl.h>
+              #include <lvgl/demos/lv_demos.h>
+              #include <lvgl/examples/lv_examples.h>
+              int main(void) {
+                lv_init();
+                lv_example_label_1();
+                lv_demo_widgets();
+                while(1) {
+                  lv_timer_handler();
+                }
+                return 0;
+            }" >> main_${{ matrix.api }}.c
+          else
+            echo "#include <lvgl/lvgl.h>
+              #include <lvgl/lvgl.h>
+              #include <lvgl/demos/lv_demos.h>
+              #include <lvgl/examples/lv_examples.h>
+              #include <lvgl_private/lvgl_private.h>
+
+              int main(void) {
+                lv_init();
+                lv_example_label_1();
+                lv_demo_widgets();
+                lv_obj_destruct(lv_screen_active()); /*private*/
+                while(1) {
+                  lv_timer_handler();
+                }
+                return 0;
+            }" >> main_${{ matrix.api }}.c
+          fi
+
+      - name: Compile Test Code
+        run: |
+          g++ main_${{ matrix.api }}.c -o main \
+          -I$(pwd)/lvgl-${{ matrix.api }}-install/include \
+          -L$(pwd)/lvgl-${{ matrix.api }}-install/lib \
+          -llvgl_examples \
+          -llvgl_demos \
+          -llvgl \
+          -llvgl_thorvg \
+          -lm

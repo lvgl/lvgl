@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_fs.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -29,13 +29,6 @@ struct _lv_fs_file_cache_t {
     uint32_t end;
     uint32_t file_position;
     void * buffer;
-};
-
-/** Extended path object to specify buffer for memory-mapped files */
-struct _lv_fs_path_ex_t {
-    char path[4];   /**<  This is needed to make it compatible with a normal path */
-    const void * buffer;
-    uint32_t size;
 };
 
 /**********************

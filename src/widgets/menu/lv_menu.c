@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_menu_private.h"
-#include "../../core/lv_obj_class_private.h"
 
 #if LV_USE_MENU
 
@@ -16,12 +15,8 @@
  *********************/
 #define MY_CLASS (&lv_menu_class)
 
+#include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_private.h"
-#include "../../layouts/lv_layout.h"
-#include "../../stdlib/lv_string.h"
-#include "../label/lv_label.h"
-#include "../button/lv_button.h"
-#include "../image/lv_image.h"
 
 /**********************
  *      TYPEDEFS
@@ -37,6 +32,21 @@ static void lv_menu_page_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void lv_menu_cont_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_menu_section_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_menu_properties[] = {
+    {
+        .id = LV_PROPERTY_MENU_MODE_HEADER,
+        .setter = lv_menu_set_mode_header,
+        .getter = lv_menu_get_mode_header,
+    },
+    {
+        .id = LV_PROPERTY_MENU_MODE_ROOT_BACK_BUTTON,
+        .setter = lv_menu_set_mode_root_back_button,
+        .getter = lv_menu_get_mode_root_back_button,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_menu_class = {
     .constructor_cb = lv_menu_constructor,
     .destructor_cb = lv_menu_destructor,
@@ -45,6 +55,7 @@ const lv_obj_class_t lv_menu_class = {
     .height_def = LV_DPI_DEF * 2,
     .instance_size = sizeof(lv_menu_t),
     .name = "lv_menu",
+    LV_PROPERTY_CLASS_FIELDS(menu, MENU)
 };
 const lv_obj_class_t lv_menu_page_class = {
     .constructor_cb = lv_menu_page_constructor,
@@ -81,18 +92,22 @@ const lv_obj_class_t lv_menu_separator_class = {
 
 const lv_obj_class_t lv_menu_sidebar_cont_class = {
     .base_class = &lv_obj_class,
+    .name = "lv_menu_sidebar",
 };
 
 const lv_obj_class_t lv_menu_main_cont_class = {
     .base_class = &lv_obj_class,
+    .name = "lv_menu_main_container",
 };
 
 const lv_obj_class_t lv_menu_main_header_cont_class = {
     .base_class = &lv_obj_class,
+    .name = "lv_menu_main_header",
 };
 
 const lv_obj_class_t lv_menu_sidebar_header_cont_class = {
     .base_class = &lv_obj_class,
+    .name = "lv_menu_sidebar_header",
 };
 
 static void lv_menu_refr(lv_obj_t * obj);
@@ -142,7 +157,13 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * menu, char const * const title)
 
 lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
 {
-    LV_ASSERT_OBJ(parent, &lv_menu_page_class);
+    LV_ASSERT_NULL(parent);
+    if(!parent || (LV_USE_ASSERT_OBJ &&
+                   !(lv_obj_has_class(parent, &lv_menu_page_class)
+                     || lv_obj_has_class(parent, &lv_menu_section_class)))) {
+        LV_LOG_WARN("Invalid parent object type for menu container object");
+        return NULL;
+    }
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_cont_class, parent);
@@ -380,8 +401,20 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
     for(i = 0; i < event_cnt; i++) {
         lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, i);
         if(lv_event_dsc_get_cb(event_dsc) == lv_menu_load_page_event_cb) {
-            lv_obj_send_event(obj, LV_EVENT_DELETE, NULL);
+            /* Free the old event data */
+            lv_menu_load_page_event_data_t * old_event_data = lv_event_dsc_get_user_data(event_dsc);
             lv_obj_remove_event(obj, i);
+            /* Also remove the corresponding DELETE event callback */
+            event_cnt = lv_obj_get_event_count(obj);
+            for(uint32_t j = 0; j < event_cnt; j++) {
+                lv_event_dsc_t * del_dsc = lv_obj_get_event_dsc(obj, j);
+                if(lv_event_dsc_get_cb(del_dsc) == lv_menu_obj_delete_event_cb &&
+                   lv_event_dsc_get_user_data(del_dsc) == old_event_data) {
+                    lv_obj_remove_event(obj, j);
+                    break;
+                }
+            }
+            lv_free(old_event_data);
             break;
         }
     }
@@ -509,6 +542,20 @@ bool lv_menu_back_button_is_root(lv_obj_t * menu, lv_obj_t * obj)
     }
 
     return false;
+}
+
+lv_menu_mode_header_t lv_menu_get_mode_header(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    return menu->mode_header;
+}
+
+lv_menu_mode_root_back_button_t lv_menu_get_mode_root_back_button(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    return menu->mode_root_back_btn;
 }
 
 void lv_menu_clear_history(lv_obj_t * obj)

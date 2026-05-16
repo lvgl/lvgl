@@ -5,7 +5,14 @@
 #define CANVAS_HEIGHT  50
 
 /**
- * Draw an image to the canvas
+ * @title Image blit via raw buffer
+ * @brief Attach a raw ARGB8888 pixel buffer to a canvas and blit a star image into it.
+ *
+ * A 50x50 canvas is backed by a static byte buffer sized with
+ * `LV_CANVAS_BUF_SIZE` and bound via `lv_canvas_set_buffer` in
+ * `LV_COLOR_FORMAT_ARGB8888`. After filling with light grey, the
+ * declared `img_star` image is drawn at offset (10,10) using
+ * `lv_draw_image` on a canvas layer.
  */
 void lv_example_canvas_6(void)
 {

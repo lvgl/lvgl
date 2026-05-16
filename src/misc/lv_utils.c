@@ -6,9 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_utils.h"
-#include "lv_fs.h"
-#include "lv_types.h"
 #include "cache/lv_cache.h"
 
 /*********************

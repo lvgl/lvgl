@@ -7,7 +7,17 @@
 #define CANVAS_HEIGHT 150
 
 /**
- * Draw a path to the canvas
+ * @title Vector path filled triangle
+ * @brief Build a closed three-point vector path and fill it blue on a canvas.
+ *
+ * A 150x150 `LV_COLOR_FORMAT_ARGB8888` canvas is centered with light
+ * grey background. An `lv_vector_path_t` at
+ * `LV_VECTOR_PATH_QUALITY_MEDIUM` is traced between (10,10), (130,130),
+ * and (10,130) using `lv_vector_path_move_to` and
+ * `lv_vector_path_line_to`, then closed. An `lv_draw_vector_dsc_t`
+ * with a blue fill color is attached to the path and rendered via
+ * `lv_draw_vector`. When vector graphics are disabled the example
+ * falls back to a centered "not enabled" label.
  */
 void lv_example_canvas_8(void)
 {
@@ -24,7 +34,7 @@ void lv_example_canvas_8(void)
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
-    lv_vector_dsc_t * dsc = lv_vector_dsc_create(&layer);
+    lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(&layer);
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
     lv_fpoint_t pts[] = {{10, 10}, {130, 130}, {10, 130}};
@@ -33,12 +43,12 @@ void lv_example_canvas_8(void)
     lv_vector_path_line_to(path, &pts[2]);
     lv_vector_path_close(path);
 
-    lv_vector_dsc_set_fill_color(dsc, lv_color_make(0x00, 0x80, 0xff));
-    lv_vector_dsc_add_path(dsc, path);
+    lv_draw_vector_dsc_set_fill_color(dsc, lv_color_make(0x00, 0x80, 0xff));
+    lv_draw_vector_dsc_add_path(dsc, path);
 
     lv_draw_vector(dsc);
     lv_vector_path_delete(path);
-    lv_vector_dsc_delete(dsc);
+    lv_draw_vector_dsc_delete(dsc);
 
     lv_canvas_finish_layer(canvas, &layer);
 }

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_dma2d.h"
+#include "../../lvgl_public.h"
 #if LV_USE_DRAW_DMA2D
 
 #include "../lv_draw_private.h"
@@ -120,7 +120,6 @@ typedef struct {
     lv_draw_dma2d_cache_area_t writing_area;
 #endif
 #if LV_DRAW_DMA2D_ASYNC
-    lv_thread_t thread;
     lv_thread_sync_t interrupt_signal;
 #endif
 } lv_draw_dma2d_unit_t;

@@ -996,6 +996,45 @@ void test_observer_dropdown_value(void)
     TEST_ASSERT_EQUAL(0, lv_subject_get_int(&subject));
 }
 
+void test_observer_scale_line_needle_value(void)
+{
+    lv_obj_t * obj = lv_scale_create(lv_screen_active());
+    lv_scale_set_mode(obj, LV_SCALE_MODE_ROUND_INNER);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    lv_obj_t * needle = lv_line_create(obj);
+
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 30);
+    lv_scale_bind_line_needle_value(obj, needle, 50, &subject);
+
+    lv_scale_needle_t * scale_needle = lv_array_at(&scale->needles, 0);
+
+    TEST_ASSERT_EQUAL(30, scale_needle->value);
+    TEST_ASSERT_EQUAL(50, scale_needle->length);
+
+    lv_subject_set_int(&subject, 40);
+    TEST_ASSERT_EQUAL(40, scale_needle->value);
+}
+
+void test_observer_scale_image_needle_value(void)
+{
+    lv_obj_t * obj = lv_scale_create(lv_screen_active());
+    lv_scale_set_mode(obj, LV_SCALE_MODE_ROUND_INNER);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    lv_obj_t * needle = lv_image_create(obj);
+
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 30);
+    lv_scale_bind_image_needle_value(obj, needle, &subject);
+
+    lv_scale_needle_t * scale_needle = lv_array_at(&scale->needles, 0);
+
+    TEST_ASSERT_EQUAL(30, scale_needle->value);
+
+    lv_subject_set_int(&subject, 40);
+    TEST_ASSERT_EQUAL(40, scale_needle->value);
+}
+
 void test_observer_deinit(void)
 {
     static lv_subject_t subject;

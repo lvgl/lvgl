@@ -10,7 +10,7 @@ import re
 
 SCRIPT_DIR = os.path.dirname(__file__)
 LV_CONF_TEMPLATE = os.path.join(SCRIPT_DIR, "..", "lv_conf_template.h")
-LV_CONF_INTERNAL = os.path.join(SCRIPT_DIR, "..", "src", "lv_conf_internal.h")
+LV_CONF_INTERNAL = os.path.join(SCRIPT_DIR, "..", "include", "lvgl", "config", "lv_conf_internal.h")
 
 if sys.version_info < (3,6,0):
   print("Python >=3.6 is required", file=sys.stderr)
@@ -66,10 +66,26 @@ fout.write(
 #define LV_DRAW_SW_ASM_NONE             0
 #define LV_DRAW_SW_ASM_NEON             1
 #define LV_DRAW_SW_ASM_HELIUM           2
+#define LV_DRAW_SW_ASM_RISCV_V          3
 #define LV_DRAW_SW_ASM_CUSTOM           255
+
+#define LV_NEMA_LIB_NONE            0
+#define LV_NEMA_LIB_M33_REVC        1
+#define LV_NEMA_LIB_M33_NEMAPVG     2
+#define LV_NEMA_LIB_M55             3
+#define LV_NEMA_LIB_M7              4
 
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
+
+#define LV_NANOVG_BACKEND_GL2       1
+#define LV_NANOVG_BACKEND_GL3       2
+#define LV_NANOVG_BACKEND_GLES2     3
+#define LV_NANOVG_BACKEND_GLES3     4
+
+#define LV_CHECK_ARG_LOG_MODE_NONE    0
+#define LV_CHECK_ARG_LOG_MODE_MINIMAL 1
+#define LV_CHECK_ARG_LOG_MODE_VERBOSE 2
 
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
@@ -95,7 +111,7 @@ fout.write(
     #elif defined(LV_CONF_INCLUDE_SIMPLE)         /* Or simply include lv_conf.h is enabled. */
         #include "lv_conf.h"
     #else
-        #include "../../lv_conf.h"                /* Else assume lv_conf.h is next to the lvgl folder. */
+        #include "../../../../lv_conf.h"                /* Else assume lv_conf.h is next to the lvgl folder. */
     #endif
     #if !defined(LV_CONF_H) && !defined(LV_CONF_SUPPRESS_DEFINE_CHECK)
         /* #include will sometimes silently fail when __has_include is used */
@@ -196,6 +212,15 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #undef LV_KCONFIG_PRESENT
 
+/* Disable VGLite drivers if VGLite drawing is disabled */
+#ifndef LV_USE_VG_LITE_DRIVER
+    #define LV_USE_VG_LITE_DRIVER 0
+#endif
+
+#ifndef LV_USE_VG_LITE_THORVG
+    #define LV_USE_VG_LITE_THORVG 0
+#endif
+
 /* Set some defines if a dependency is disabled. */
 #if LV_USE_LOG == 0
     #define LV_LOG_LEVEL            LV_LOG_LEVEL_NONE
@@ -209,15 +234,41 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
-#if LV_USE_WAYLAND == 0
-    #define LV_WAYLAND_USE_DMABUF           0
-    #define LV_WAYLAND_WINDOW_DECORATIONS   0
-    #define LV_WAYLAND_WL_SHELL             0
-#endif /* LV_USE_WAYLAND */
+#if LV_USE_WAYLAND
+    /*Automatically detect wayland backend*/
+    #if LV_USE_OPENGLES
+        #define LV_WAYLAND_USE_EGL 1
+        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_SHM 0
+    #elif LV_USE_G2D
+        #define LV_WAYLAND_USE_EGL 0
+        #define LV_WAYLAND_USE_G2D 1
+        #define LV_WAYLAND_USE_SHM 0
+    #else
+        #define LV_WAYLAND_USE_EGL 0
+        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_SHM 1
+    #endif
+#else
+    #define LV_WAYLAND_USE_G2D 0
+    #define LV_WAYLAND_USE_SHM 0
+    #define LV_WAYLAND_USE_EGL 0
+#endif
+
+#if LV_USE_LINUX_DRM
+    #if LV_USE_OPENGLES
+        #define LV_LINUX_DRM_USE_EGL 1
+    #else
+        #define LV_LINUX_DRM_USE_EGL 0
+    #endif /* LV_USE_OPENGLES */
+#else
+    #define LV_LINUX_DRM_USE_EGL 0
+#endif /*LV_USE_LINUX_DRM*/
 
 #if LV_USE_SYSMON == 0
     #define LV_USE_PERF_MONITOR 0
     #define LV_USE_MEM_MONITOR 0
+    #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
 #endif /*LV_USE_SYSMON*/
 
 #if LV_USE_PERF_MONITOR == 0
@@ -234,11 +285,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #define LV_USE_DEMO_FLEX_LAYOUT     0
     #define LV_USE_DEMO_MULTILANG       0
-    #define LV_USE_DEMO_TRANSFORM       0
-    #define LV_USE_DEMO_SCROLL          0
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0
+    #define LV_USE_DEMO_GLTF            0
 #endif /* LV_BUILD_DEMOS */
 
 #ifndef LV_USE_LZ4
@@ -257,9 +307,24 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #endif
 #endif
 
+#if LV_USE_SDL && LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
+    #define LV_SDL_USE_EGL 1
+#else
+    #define LV_SDL_USE_EGL 0
+#endif
+
+#ifndef LV_USE_EGL
+    #if LV_LINUX_DRM_USE_EGL || LV_WAYLAND_USE_EGL || LV_SDL_USE_EGL
+        #define LV_USE_EGL 1
+    #else
+        #define LV_USE_EGL 0
+    #endif
+#endif /* LV_USE_EGL */
+
+
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
-        #warning "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
+        #error "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
     #endif
 
     #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)
@@ -278,9 +343,15 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #endif
 #endif  /*defined(LV_CONF_SKIP)*/
 
+#ifndef LV_CHECK_ARG_LOG_MODE
+    #define LV_CHECK_ARG_LOG_MODE   0
+#endif
+
 #endif  /*LV_CONF_INTERNAL_H*/
 '''
 )
 
 fin.close()
 fout.close()
+
+check_for_tabs(LV_CONF_INTERNAL)

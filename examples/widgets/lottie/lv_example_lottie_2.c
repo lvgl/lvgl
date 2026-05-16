@@ -3,7 +3,16 @@
 #if LV_USE_LOTTIE
 
 /**
- * Load an lottie animation from file
+ * @title Lottie animation from file path
+ * @brief Play a Lottie JSON animation loaded through the filesystem driver.
+ *
+ * An `lv_lottie` widget is created on the active screen and receives
+ * its source through `lv_lottie_set_src_file`, pointing at
+ * `lvgl/examples/widgets/lottie/lv_example_lottie_approve.json`, so a
+ * filesystem driver for the working directory must be registered. A
+ * 64x64 ARGB8888 premultiplied buffer is attached via
+ * `lv_lottie_set_buffer` or `lv_lottie_set_draw_buf` depending on the
+ * draw buffer alignment, then the widget is centered.
  */
 void lv_example_lottie_2(void)
 {
@@ -18,7 +27,7 @@ void lv_example_lottie_2(void)
     lv_lottie_set_buffer(lottie, 64, 64, buf);
 #else
     /*For GPUs and special alignment/strid setting use a draw_buf instead*/
-    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     lv_lottie_set_draw_buf(lottie, &draw_buf);
 #endif
 

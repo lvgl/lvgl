@@ -99,13 +99,12 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
 
         nema_vg_paint_clear(draw_nema_gfx_unit->paint);
 
-        nema_vg_paint_set_type(draw_nema_gfx_unit->paint, NEMA_VG_PAINT_GRAD_LINEAR);
         nema_vg_set_blend(NEMA_BL_SRC_OVER | NEMA_BLOP_SRC_PREMULT);
 
         float stops[LV_GRADIENT_MAX_STOPS];
         color_var_t colors[LV_GRADIENT_MAX_STOPS];
 
-        uint32_t cnt = LV_MAX(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        uint32_t cnt = LV_MIN(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
 
         for(uint8_t i = 0; i < cnt; i++) {
             stops[i] = (float)(dsc->grad.stops[i].frac) / 255.f;
@@ -117,23 +116,57 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
 
         nema_vg_grad_set(draw_nema_gfx_unit->gradient, cnt, stops, colors);
 
-        float x0, y0, x1, y1;
-
-        if(dsc->grad.dir == LV_GRAD_DIR_HOR) {
-            x0 = rel_coords.x1;
-            x1 = rel_coords.x2;
-            y0 = rel_coords.y1;
-            y1 = rel_coords.y1;
+        nema_tex_mode_t extend_type;
+        switch(dsc->grad.extend) {
+            case LV_GRAD_EXTEND_REPEAT:
+                extend_type = NEMA_TEX_REPEAT;
+                break;
+            case LV_GRAD_EXTEND_REFLECT:
+                extend_type = NEMA_TEX_MIRROR;
+                break;
+            case LV_GRAD_EXTEND_PAD:
+            default:
+                extend_type = NEMA_TEX_CLAMP;
+                break;
         }
-        else {
-            x0 = rel_coords.x1;
-            x1 = rel_coords.x1;
-            y0 = rel_coords.y1;
-            y1 = rel_coords.y2;
-        }
 
-        nema_vg_paint_set_grad_linear(draw_nema_gfx_unit->paint, draw_nema_gfx_unit->gradient, x0, y0, x1, y1,
-                                      NEMA_TEX_CLAMP | NEMA_FILTER_BL);
+        if(dsc->grad.dir == LV_GRAD_DIR_VER || dsc->grad.dir == LV_GRAD_DIR_HOR
+           || dsc->grad.dir == LV_GRAD_DIR_LINEAR) {
+            nema_vg_paint_set_type(draw_nema_gfx_unit->paint, NEMA_VG_PAINT_GRAD_LINEAR);
+
+            float x0, y0, x1, y1;
+
+            if(dsc->grad.dir == LV_GRAD_DIR_HOR) {
+                x0 = rel_coords.x1;
+                x1 = rel_coords.x2;
+                y0 = rel_coords.y1;
+                y1 = rel_coords.y2;
+            }
+            else if(dsc->grad.dir == LV_GRAD_DIR_VER) {
+                x0 = rel_coords.x1;
+                x1 = rel_coords.x1;
+                y0 = rel_coords.y1;
+                y1 = rel_coords.y2;
+            }
+            else {
+                x0 = rel_coords.x1 + lv_pct_to_px(dsc->grad.params.linear.start.x, lv_area_get_width(coords));
+                x1 = rel_coords.x1 + lv_pct_to_px(dsc->grad.params.linear.end.x, lv_area_get_width(coords));
+                y0 = rel_coords.y1 + lv_pct_to_px(dsc->grad.params.linear.start.y, lv_area_get_height(coords));
+                y1 = rel_coords.y1 + lv_pct_to_px(dsc->grad.params.linear.end.y, lv_area_get_height(coords));
+            }
+
+            nema_vg_paint_set_grad_linear(draw_nema_gfx_unit->paint, draw_nema_gfx_unit->gradient, x0, y0, x1, y1,
+                                          extend_type | NEMA_FILTER_BL);
+        }
+        else if(dsc->grad.dir == LV_GRAD_DIR_RADIAL) {
+            nema_vg_paint_set_type(draw_nema_gfx_unit->paint, NEMA_VG_PAINT_GRAD_RADIAL);
+
+            nema_vg_paint_set_grad_radial(draw_nema_gfx_unit->paint, draw_nema_gfx_unit->gradient,
+                                          rel_coords.x1 + dsc->grad.params.radial.end.x,
+                                          rel_coords.y1 + dsc->grad.params.radial.end.y,
+                                          LV_ABS(dsc->grad.params.radial.end_extent.x - dsc->grad.params.radial.end.x),
+                                          extend_type | NEMA_FILTER_BL);
+        }
 
         if(radius > 0.f)
             nema_vg_draw_rounded_rect(rel_coords.x1, rel_coords.y1, coords_bg_w, coords_bg_h, radius, radius, NULL,

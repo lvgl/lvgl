@@ -6,17 +6,18 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linux_fbdev.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_LINUX_FBDEV
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <stddef.h>
+#include LV_STDDEF_INCLUDE
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <time.h>
+#include <errno.h>
 
 #if LV_LINUX_FBDEV_BSD
     #include <sys/fcntl.h>
@@ -28,6 +29,7 @@
 
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
+#include "../../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -67,12 +69,15 @@ typedef struct {
     long int screensize;
     int fbfd;
     bool force_refresh;
+    uint8_t * draw_buf_1;
+    uint8_t * draw_buf_2;
 } lv_linux_fb_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
+static void del_event_cb(lv_event_t * e);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static uint32_t tick_get_cb(void);
 
@@ -112,15 +117,18 @@ lv_display_t * lv_linux_fbdev_create(void)
     dsc->fbfd = -1;
     lv_display_set_driver_data(disp, dsc);
     lv_display_set_flush_cb(disp, flush_cb);
+    lv_display_add_event_cb(disp, del_event_cb, LV_EVENT_DELETE, NULL);
 
     return disp;
 }
 
-void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
+lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 {
     char * devname = lv_strdup(file);
     LV_ASSERT_MALLOC(devname);
-    if(devname == NULL) return;
+    if(devname == NULL) {
+        return LV_RESULT_INVALID;
+    }
 
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->devname = devname;
@@ -131,7 +139,7 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     dsc->fbfd = open(dsc->devname, O_RDWR);
     if(dsc->fbfd == -1) {
         perror("Error: cannot open framebuffer device");
-        return;
+        return LV_RESULT_INVALID;
     }
     LV_LOG_INFO("The framebuffer device was opened successfully");
 
@@ -148,13 +156,13 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     /*Get fb type*/
     if(ioctl(dsc->fbfd, FBIOGTYPE, &fb) != 0) {
         perror("ioctl(FBIOGTYPE)");
-        return;
+        return LV_RESULT_INVALID;
     }
 
     /*Get screen width*/
     if(ioctl(dsc->fbfd, FBIO_GETLINEWIDTH, &line_length) != 0) {
         perror("ioctl(FBIO_GETLINEWIDTH)");
-        return;
+        return LV_RESULT_INVALID;
     }
 
     dsc->vinfo.xres = (unsigned) fb.fb_width;
@@ -169,13 +177,13 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     /* Get fixed screen information*/
     if(ioctl(dsc->fbfd, FBIOGET_FSCREENINFO, &dsc->finfo) == -1) {
         perror("Error reading fixed information");
-        return;
+        return LV_RESULT_INVALID;
     }
 
     /* Get variable screen information*/
     if(ioctl(dsc->fbfd, FBIOGET_VSCREENINFO, &dsc->vinfo) == -1) {
         perror("Error reading variable information");
-        return;
+        return LV_RESULT_INVALID;
     }
 #endif /* LV_LINUX_FBDEV_BSD */
 
@@ -189,7 +197,7 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     dsc->fbp = (char *)mmap(0, dsc->screensize, PROT_READ | PROT_WRITE, MAP_SHARED, dsc->fbfd, 0);
     if((intptr_t)dsc->fbp == -1) {
         perror("Error: failed to map framebuffer device to memory");
-        return;
+        return LV_RESULT_INVALID;
     }
 #endif
 
@@ -210,7 +218,7 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
             break;
         default:
             LV_LOG_WARN("Not supported color format (%d bits)", dsc->vinfo.bits_per_pixel);
-            return;
+            return LV_RESULT_INVALID;
     }
 
     int32_t hor_res = dsc->vinfo.xres;
@@ -226,11 +234,14 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     uint8_t * draw_buf = NULL;
     uint8_t * draw_buf_2 = NULL;
-    draw_buf = malloc(draw_buf_size);
+    draw_buf = lv_malloc(draw_buf_size);
 
     if(LV_LINUX_FBDEV_BUFFER_COUNT == 2) {
-        draw_buf_2 = malloc(draw_buf_size);
+        draw_buf_2 = lv_malloc(draw_buf_size);
     }
+
+    dsc->draw_buf_1 = draw_buf;
+    dsc->draw_buf_2 = draw_buf_2;
 
     lv_display_set_resolution(disp, hor_res, ver_res);
     lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
@@ -241,6 +252,8 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
                 hor_res, ver_res, lv_display_get_dpi(disp));
+
+    return LV_RESULT_OK;
 }
 
 void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
@@ -264,6 +277,34 @@ static void write_to_fb(lv_linux_fb_t * dsc, uint32_t fb_pos, const void * data,
 #endif
 }
 
+static void del_event_cb(lv_event_t * e)
+{
+    if(LV_EVENT_DELETE != lv_event_get_code(e))
+        return;
+
+    lv_display_t * disp = lv_event_get_target(e);
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
+    if(!dsc) return;
+
+#if LV_LINUX_FBDEV_MMAP
+    if(MAP_FAILED != dsc->fbp) {
+        munmap(dsc->fbp, dsc->screensize);
+        dsc->fbp = MAP_FAILED;
+    }
+#endif
+    if(dsc->fbfd >= 0) {
+        close(dsc->fbfd);
+        dsc->fbfd = -1;
+    }
+    if(dsc->rotated_buf) lv_free(dsc->rotated_buf);
+    if(dsc->draw_buf_1) lv_free(dsc->draw_buf_1);
+    if(dsc->draw_buf_2) lv_free(dsc->draw_buf_2);
+    if(dsc->devname) lv_free((void *)dsc->devname);
+
+    lv_free(dsc);
+    lv_display_set_driver_data(disp, NULL);
+}
+
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
@@ -275,81 +316,107 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     }
 #endif
 
-    int32_t w = lv_area_get_width(area);
-    int32_t h = lv_area_get_height(area);
-    lv_color_format_t cf = lv_display_get_color_format(disp);
-    uint32_t px_size = lv_color_format_get_size(cf);
+    const bool wait_for_last_flush = LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_FULL;
+    const bool is_last_flush = lv_display_flush_is_last(disp);
+    const bool skip_flush = wait_for_last_flush && !is_last_flush;
 
-    lv_area_t rotated_area;
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-
-    /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
-    if(rotation != LV_DISPLAY_ROTATION_0 && LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        /* (Re)allocate temporary buffer if needed */
-        size_t buf_size = w * h * px_size;
-        if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
-            dsc->rotated_buf = realloc(dsc->rotated_buf, buf_size);
-            dsc->rotated_buf_size = buf_size;
-        }
-
-        /* Rotate the pixel buffer */
-        uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
-        uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
-
-        switch(rotation) {
-            case LV_DISPLAY_ROTATION_0:
-                break;
-            case LV_DISPLAY_ROTATION_90:
-                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-                break;
-            case LV_DISPLAY_ROTATION_180:
-                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
-                break;
-            case LV_DISPLAY_ROTATION_270:
-                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-                break;
-        }
-        color_p = dsc->rotated_buf;
-
-        /* Rotate the area */
-        rotated_area = *area;
-        lv_display_rotate_area(disp, &rotated_area);
-        area = &rotated_area;
-
-        if(rotation != LV_DISPLAY_ROTATION_180) {
-            w = lv_area_get_width(area);
-            h = lv_area_get_height(area);
-        }
+    if(skip_flush) {
+        lv_display_flush_ready(disp);
+        return;
     }
 
-    /* Ensure that we're within the framebuffer's bounds */
-    if(area->x2 < 0 || area->y2 < 0 || area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
+    const lv_color_format_t cf = lv_display_get_color_format(disp);
+    const uint32_t px_size = lv_color_format_get_size(cf);
+
+    lv_area_t rotated_area;
+    const lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+
+    /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
+    if(rotation != LV_DISPLAY_ROTATION_0) {
+        int32_t src_w;
+        int32_t src_h;
+        uint32_t src_stride;
+
+        /* Direct render mode rotation only works if we rotate the whole screen at the same time
+         * To do that, we use the display's resolution and as the area
+         *  we also grab the current draw buffer so that we can rotate the whole display */
+        if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
+            if(!is_last_flush) {
+                /* We need to wait for the last flush when using direct render mode with rotation*/
+                lv_display_flush_ready(disp);
+                return;
+            }
+            lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
+            src_w = lv_display_get_horizontal_resolution(disp);
+            src_h = lv_display_get_vertical_resolution(disp);
+            src_stride = lv_draw_buf_width_to_stride(src_w, cf);
+            color_p = draw_buf->data;
+            rotated_area.x1 = rotated_area.y1 =  0;
+            lv_area_set_width(&rotated_area, src_w);
+            lv_area_set_height(&rotated_area, src_h);
+        }
+        else {
+            /* For partial and full render modes, we need to rotate the current area
+             * In Full mode we will rotate the whole display just like with direct render mode
+             * but we don't need to do anything special since the area is already the full area of the display
+             * For Partial mode we will rotate just the part we're currently displaying*/
+            src_w = lv_area_get_width(area);
+            src_h = lv_area_get_height(area);
+            src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
+            rotated_area = *area;
+        }
+
+        lv_display_rotate_area(disp, &rotated_area);
+        const uint32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&rotated_area), cf);
+        const size_t buf_size = dest_stride * lv_area_get_height(&rotated_area);
+        if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
+            dsc->rotated_buf = lv_realloc(dsc->rotated_buf, buf_size);
+            LV_ASSERT_MALLOC(dsc->rotated_buf);
+            dsc->rotated_buf_size = buf_size;
+        }
+        lv_draw_sw_rotate(color_p, dsc->rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
+        area = &rotated_area;
+        color_p = dsc->rotated_buf;
+    }
+
+    lv_area_t display_area;
+    lv_area_set(&display_area, 0, 0, dsc->vinfo.xres - 1, dsc->vinfo.yres - 1);
+
+    /* Clip the area to the display bounds */
+    lv_area_t clipped_area;
+    if(!lv_area_intersect(&clipped_area, area, &display_area)) {
+        /* No intersection at all, nothing to render */
         lv_display_flush_ready(disp);
         return;
     }
 
     uint32_t fb_pos =
-        (area->x1 + dsc->vinfo.xoffset) * px_size +
-        (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
+        (clipped_area.x1 + dsc->vinfo.xoffset) * px_size +
+        (clipped_area.y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
+    const int32_t w = lv_area_get_width(&clipped_area);
 
-    int32_t y;
-    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
+    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
         uint32_t color_pos =
-            area->x1 * px_size +
-            area->y1 * disp->hor_res * px_size;
-
-        for(y = area->y1; y <= area->y2; y++) {
+            (clipped_area.x1 - disp->offset_x) * px_size +
+            (clipped_area.y1 - disp->offset_y) * disp->hor_res * px_size;
+        for(int32_t y = clipped_area.y1; y <= clipped_area.y2; y++) {
             write_to_fb(dsc, fb_pos, &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
             color_pos += disp->hor_res * px_size;
         }
     }
     else {
-        w = lv_area_get_width(area);
-        for(y = area->y1; y <= area->y2; y++) {
+        /* Calculate offset into color_p buffer based on original area */
+        const int32_t x_offset = clipped_area.x1 - area->x1;
+        const int32_t y_offset = clipped_area.y1 - area->y1;
+        const int32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
+
+        color_p += y_offset * stride + x_offset * px_size;
+
+        for(int32_t y = clipped_area.y1; y <= clipped_area.y2; y++) {
             write_to_fb(dsc, fb_pos, color_p, w * px_size);
             fb_pos += dsc->finfo.line_length;
-            color_p += w * px_size;
+            color_p += stride;
         }
     }
 

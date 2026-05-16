@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_nuttx_lcd.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NUTTX
 
@@ -17,13 +17,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <debug.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <nuttx/lcd/lcd_dev.h>
 
-#include "../../../lvgl.h"
 #include "../../lvgl_private.h"
+
+#ifdef __NuttX__
+    #include <debug.h>
+    #include <nuttx/lcd/lcd_dev.h>
+#else
+    #include "mock/nuttx_lcd_dev.h"
+#endif
 
 /*********************
  *      DEFINES

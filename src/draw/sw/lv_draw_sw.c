@@ -10,9 +10,7 @@
 #include "../lv_draw_private.h"
 #if LV_USE_DRAW_SW
 
-#include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../misc/lv_area_private.h"
 
@@ -302,6 +300,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         if(thread_dsc->inited) lv_thread_sync_signal(&thread_dsc->sync);
     }
 
+    LV_PROFILER_DRAW_END;
     if(all_idle) return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     else return taken_cnt;
 
@@ -407,7 +406,10 @@ static void execute_drawing(lv_draw_task_t * t)
             lv_draw_sw_arc(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_sw_line(t, t->draw_dsc);
+            lv_draw_line_iterate(t, t->draw_dsc, lv_draw_sw_line);
+            break;
+        case LV_DRAW_TASK_TYPE_BLUR:
+            lv_draw_sw_blur(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
             lv_draw_sw_triangle(t, t->draw_dsc);
@@ -460,7 +462,7 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
         lv_draw_sw_border(t, &border_dsc, &draw_area);
 
         lv_point_t txt_size;
-        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, &attributes);
+        lv_text_get_size_attributes(&txt_size, "W", LV_FONT_DEFAULT, &attributes);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_area.x1;

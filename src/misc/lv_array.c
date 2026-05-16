@@ -7,11 +7,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_array.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
+#include "../lvgl_public.h"
 
-#include "lv_assert.h"
 /*********************
  *      DEFINES
  *********************/
@@ -88,6 +85,10 @@ void lv_array_shrink(lv_array_t * array)
 
 lv_result_t lv_array_remove(lv_array_t * array, uint32_t index)
 {
+    if(!array) {
+        return LV_RESULT_INVALID;
+    }
+
     if(index >= array->size) {
         return LV_RESULT_INVALID;
     }
@@ -103,6 +104,33 @@ lv_result_t lv_array_remove(lv_array_t * array, uint32_t index)
     uint8_t * remaining = start + array->element_size;
     uint32_t remaining_size = (array->size - index - 1) * array->element_size;
     lv_memmove(start, remaining, remaining_size);
+    array->size--;
+    lv_array_shrink(array);
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_array_remove_unordered(lv_array_t * array, uint32_t index)
+{
+    if(!array) {
+        return LV_RESULT_INVALID;
+    }
+
+    if(index >= array->size) {
+        return LV_RESULT_INVALID;
+    }
+
+    /*Shortcut*/
+    if(index == array->size - 1) {
+        array->size--;
+        lv_array_shrink(array);
+        return LV_RESULT_OK;
+    }
+
+    /* Copy the last element into the position to remove*/
+    uint8_t * dst = lv_array_at(array, index);
+    uint8_t * src = lv_array_at(array, array->size - 1);
+
+    lv_memcpy(dst, src, array->element_size);
     array->size--;
     lv_array_shrink(array);
     return LV_RESULT_OK;
@@ -128,7 +156,7 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
     uint8_t * start_p = lv_array_at(array, start);
     uint8_t * remaining = start_p + (end - start) * array->element_size;
     uint32_t remaining_size = (array->size - end) * array->element_size;
-    lv_memcpy(start_p, remaining, remaining_size);
+    lv_memmove(start_p, remaining, remaining_size);
     array->size -= (end - start);
     lv_array_shrink(array);
     return LV_RESULT_OK;

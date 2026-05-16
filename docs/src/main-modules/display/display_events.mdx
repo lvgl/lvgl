@@ -1,0 +1,49 @@
+---
+title: Display Events
+description: lv_display_add_event_cb adds an event handler to a display.
+---
+
+<ApiLink name="lv_display_add_event_cb" display="lv_display_add_event_cb(disp, event_cb, LV_EVENT_..., user_data)" /> adds
+an event handler to a display.
+
+If you added `user_data` to the Display, you can retrieve it in an event like this:
+
+```c
+lv_display_t * display1;
+my_type_t    * my_user_data;
+display1 = (lv_display_t *)lv_event_get_current_target(e);
+my_user_data = lv_display_get_user_data(display1);
+```
+
+The following events are sent for Display (lv_display_t) objects:
+
+- <ApiLink name="LV_EVENT_INVALIDATE_AREA" /> An area is invalidated (marked for redraw).
+  <ApiLink name="lv_event_get_param" display="lv_event_get_param(e)" /> returns a pointer to an <ApiLink name="lv_area_t" />
+  object with the coordinates of the area to be invalidated. The area can
+  be freely modified if needed to adapt it a special requirement of the
+  display. Usually needed with monochrome displays to invalidate `N x 8`
+  rows or columns in one pass.
+- <ApiLink name="LV_EVENT_RESOLUTION_CHANGED" />: Sent when the resolution changes due
+  to <ApiLink name="lv_display_set_resolution" /> or <ApiLink name="lv_display_set_rotation" />.
+- <ApiLink name="LV_EVENT_COLOR_FORMAT_CHANGED" />: Sent as a result of any call to `lv_display_set_color_format()`.
+- <ApiLink name="LV_EVENT_REFR_REQUEST" />: Sent when something happened that requires redraw.
+- <ApiLink name="LV_EVENT_REFR_START" />: Sent before a refreshing cycle starts. Sent even
+  if there is nothing to redraw.
+- <ApiLink name="LV_EVENT_REFR_READY" />: Sent when refreshing has been completed (after
+  rendering and calling [Flush Callback](/main-modules/display/setup)). Sent even if no redraw happened.
+- <ApiLink name="LV_EVENT_RENDER_START" />: Sent just before rendering begins.
+- <ApiLink name="LV_EVENT_RENDER_READY" />: Sent after rendering has been completed (before
+  calling [Flush Callback](/main-modules/display/setup))
+- <ApiLink name="LV_EVENT_FLUSH_START" />: Sent before [Flush Callback](/main-modules/display/setup) is called.
+- <ApiLink name="LV_EVENT_FLUSH_FINISH" />: Sent after [Flush Callback](/main-modules/display/setup) call has returned.
+- <ApiLink name="LV_EVENT_FLUSH_WAIT_START" />: Sent at the beginning of internal call to
+  `wait_for_flushing()` -- happens whether or not any waiting will actually occur.
+  Call returns immediately if `disp->flushing == 0`.
+- <ApiLink name="LV_EVENT_FLUSH_WAIT_FINISH" />: Sent when the call to `wait_for_flushing()`
+  is about to return, regardless whether any actual waiting occurred.
+- <ApiLink name="LV_EVENT_SCREEN_UNLOAD_START" />: Sent when a screen starts to be unloaded on this display
+- <ApiLink name="LV_EVENT_SCREEN_LOAD_START" />: Sent when a screen starts to be loaded on this display
+- <ApiLink name="LV_EVENT_SCREEN_LOADED" />: Sent when a screen finishes being loaded on this display
+- <ApiLink name="LV_EVENT_SCREEN_UNLOADED" />: Sent when a screen finishes being unloaded on this display
+
+## API

@@ -9,7 +9,7 @@
 #include "../../../lvgl.h"
 
 #if LV_USE_FS_FATFS
-#include "ff.h"
+#include <ff.h>
 
 #include "../../core/lv_global.h"
 /*********************

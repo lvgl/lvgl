@@ -17,25 +17,10 @@ extern "C" {
 #include "lv_vg_lite_utils.h"
 
 #if LV_USE_DRAW_VG_LITE
-#include <float.h>
 
 /*********************
  *      DEFINES
  *********************/
-
-#if LV_USE_VG_LITE_THORVG
-/**
-* It is found that thorvg cannot handle large coordinates well.
-* When the coordinates are larger than 4096, the calculation of tvgSwRle module will overflow in 32-bit system.
-* So we use FLT_MAX and FLT_MIN to write the mark to bounding_box to tell vg_lite_tvg not to add clip path to the current path.
-*/
-#define PATH_COORD_MAX FLT_MAX
-#define PATH_COORD_MIN FLT_MIN
-#else
-/*  18 bits is enough to represent the coordinates of path bounding box */
-#define PATH_COORD_MAX (1 << 18)
-#define PATH_COORD_MIN (-PATH_COORD_MAX)
-#endif
 
 #define LV_VG_LITE_PATH_SET_OP_CODE(PTR, TYPE, OP_CODE) (*((TYPE*)PTR) = (OP_CODE))
 #define LV_VG_LITE_PATH_GET_OP_CODE(PTR) (*((uint8_t*)PTR))
@@ -45,7 +30,7 @@ extern "C" {
  **********************/
 
 typedef struct _lv_vg_lite_path_t lv_vg_lite_path_t;
-typedef struct _lv_draw_vg_lite_unit_t lv_draw_vg_lite_unit_t;
+struct _lv_draw_vg_lite_unit_t;
 
 typedef void (*lv_vg_lite_path_iter_cb_t)(void * user_data, uint8_t op_code, const float * data, uint32_t len);
 
@@ -53,17 +38,17 @@ typedef void (*lv_vg_lite_path_iter_cb_t)(void * user_data, uint8_t op_code, con
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_vg_lite_path_init(lv_draw_vg_lite_unit_t * unit);
+void lv_vg_lite_path_init(struct _lv_draw_vg_lite_unit_t * unit);
 
-void lv_vg_lite_path_deinit(lv_draw_vg_lite_unit_t * unit);
+void lv_vg_lite_path_deinit(struct _lv_draw_vg_lite_unit_t * unit);
 
 lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format);
 
 void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path);
 
-lv_vg_lite_path_t * lv_vg_lite_path_get(lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format);
+lv_vg_lite_path_t * lv_vg_lite_path_get(struct _lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format);
 
-void lv_vg_lite_path_drop(lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path);
+void lv_vg_lite_path_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path);
 
 void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_format);
 

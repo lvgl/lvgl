@@ -8,10 +8,8 @@
  *********************/
 #include "lv_obj_class_private.h"
 #include "lv_obj_private.h"
-#include "../themes/lv_theme.h"
-#include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
-#include "../stdlib/lv_string.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -46,9 +44,12 @@ static uint32_t get_instance_size(const lv_obj_class_t * class_p);
 
 lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent)
 {
+    LV_CHECK_ARG(class_p != NULL, return NULL);
+
     LV_TRACE_OBJ_CREATE("Creating object with %p class on %p parent", (void *)class_p, (void *)parent);
     uint32_t s = get_instance_size(class_p);
     lv_obj_t * obj = lv_malloc_zeroed(s);
+    LV_ASSERT_MALLOC(obj);
     if(obj == NULL) return NULL;
     obj->class_p = class_p;
     obj->parent = parent;
@@ -70,6 +71,7 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         lv_obj_t ** screens = lv_realloc(disp->screens, sizeof(lv_obj_t *) * (disp->screen_cnt + 1));
         LV_ASSERT_MALLOC(screens);
         if(screens == NULL) {
+            LV_LOG_WARN("Failed to expand memory for screen array");
             lv_free(obj);
             return NULL;
         }
@@ -88,14 +90,15 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     else {
         LV_TRACE_OBJ_CREATE("creating normal object");
         LV_ASSERT_OBJ(parent, MY_CLASS);
-        if(parent->spec_attr == NULL) {
-            lv_obj_allocate_spec_attr(parent);
-        }
 
-        parent->spec_attr->child_cnt++;
-        parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
-                                                 sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
-        parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
+        if(!lv_obj_allocate_spec_attr(parent)) {
+            lv_free(obj);
+            return NULL;
+        }
+        if(lv_obj_add_child(parent, obj) != LV_RESULT_OK) {
+            lv_free(obj);
+            return NULL;
+        }
     }
 
     return obj;
@@ -103,7 +106,7 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
 
 void lv_obj_class_init_obj(lv_obj_t * obj)
 {
-    if(obj == NULL) return;
+    LV_CHECK_ARG(obj != NULL, return);
 
     lv_obj_mark_layout_as_dirty(obj);
     lv_obj_enable_style_refresh(false);
@@ -135,6 +138,16 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
 
 void lv_obj_destruct(lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_ARG(obj->class_p != NULL, return);
+
+#if LV_USE_EXT_DATA
+    if(obj->ext_data.free_cb) {
+        obj->ext_data.free_cb(obj->ext_data.data);
+        obj->ext_data.data = NULL;
+    }
+#endif
+
     if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj->class_p, obj);
 
     if(obj->class_p->base_class) {
@@ -146,8 +159,10 @@ void lv_obj_destruct(lv_obj_t * obj)
     }
 }
 
-bool lv_obj_is_editable(lv_obj_t * obj)
+bool lv_obj_is_editable(const lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return false);
+
     const lv_obj_class_t * class_p = obj->class_p;
 
     /*Find a base in which editable is set*/
@@ -158,8 +173,10 @@ bool lv_obj_is_editable(lv_obj_t * obj)
     return class_p->editable == LV_OBJ_CLASS_EDITABLE_TRUE;
 }
 
-bool lv_obj_is_group_def(lv_obj_t * obj)
+bool lv_obj_is_group_def(const lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return false);
+
     const lv_obj_class_t * class_p = obj->class_p;
 
     /*Find a base in which group_def is set*/
@@ -170,12 +187,35 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
     return class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_TRUE;
 }
 
+#if LV_USE_EXT_DATA
+void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void * data))
+{
+    LV_CHECK_ARG(obj != NULL, return, "Can't attach external user data and destructor callback to a NULL object");
+
+    obj->ext_data.data = data;
+    obj->ext_data.free_cb = free_cb;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+    LV_ASSERT_NULL(class_p);
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NULL(obj->class_p);
+
+#if LV_USE_OBJ_NAME
+    LV_ASSERT_NULL(class_p->name);
+#endif
+
+#if LV_USE_EXT_DATA
+    obj->ext_data.free_cb = NULL;
+    obj->ext_data.data = NULL;
+#endif
+
     if(obj->class_p->base_class) {
         const lv_obj_class_t * original_class_p = obj->class_p;
 
@@ -195,10 +235,9 @@ static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static uint32_t get_instance_size(const lv_obj_class_t * class_p)
 {
     /*Find a base in which instance size is set*/
-    const lv_obj_class_t * base = class_p;
-    while(base && base->instance_size == 0) base = base->base_class;
+    while(class_p && class_p->instance_size == 0) class_p = class_p->base_class;
 
-    if(base == NULL) return 0;  /*Never happens: set at least in `lv_obj` class*/
+    LV_ASSERT(class_p != NULL); /*Never happens: set at least in `lv_obj` class*/
 
-    return base->instance_size;
+    return class_p->instance_size;
 }

@@ -25,18 +25,18 @@
 *
 *****************************************************************************/
 
-#include "../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <stddef.h>
+#include LV_STDINT_INCLUDE
+#include LV_STDDEF_INCLUDE
 #include <math.h>
-#include "vg_lite.h"
-#include "vg_lite_kernel.h"
-#include "vg_lite_options.h"
+#include "../inc/vg_lite.h"
+#include "../VGLiteKernel/vg_lite_kernel.h"
+#include "../VGLiteKernel/vg_lite_option.h"
 
 #define DUMP_CAPTURE                            0
 #define DUMP_COMMAND_CAPTURE                    0

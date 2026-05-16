@@ -15,12 +15,14 @@
  *      DEFINES
  *********************/
 #define DRAW_UNIT_ID_DAVE2D         4
-/* The amount of tasks exercising pressure to the currrent to get finished
+/* The amount of tasks exercising pressure to the current to get finished
  * This one is used as the main signal to start to render a block of tasks.
  */
-#define DAVE2D_MAX_DRAW_PRESSURE    256
+#ifndef LV_DAVE2D_MAX_DRAW_PRESSURE
+    #define LV_DAVE2D_MAX_DRAW_PRESSURE    256
+#endif
 
-#if (DAVE2D_MAX_DRAW_PRESSURE < 256)
+#if (LV_DAVE2D_MAX_DRAW_PRESSURE < 256)
     #error "DRAW Pressure should be at least 256 otherwise the Dave engine may crash!"
 #endif
 /**********************
@@ -32,8 +34,8 @@
  **********************/
 
 static void execute_drawing(lv_draw_dave2d_unit_t * u);
-#if defined(RENESAS_CORTEX_M85)
-    #if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+    #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
         static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
     #endif
 #endif
@@ -114,16 +116,16 @@ void lv_draw_dave2d_init(void)
 static void lv_draw_buf_dave2d_init_handlers(void)
 {
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
     handlers->invalidate_cache_cb = _dave2d_buf_invalidate_cache_cb;
 #endif
 #endif
 }
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
 static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     const lv_image_header_t * header = &draw_buf->header;
@@ -141,7 +143,11 @@ static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, cons
     address = address + (area->x1 * (int32_t)bytes_per_pixel) + (stride * (uint32_t)area->y1);
 
     for(i = 0; i < lines; i++) {
+#if defined(RENESAS_CORTEX_M85)
         SCB_CleanInvalidateDCache_by_Addr(address, bytes_to_flush_per_line);
+#else /* _RENESAS_RZA_ */
+        R_BSP_CACHE_CleanInvalidateRange((uint64_t) address, (uint64_t) bytes_to_flush_per_line);
+#endif
         address += stride;
     }
 }
@@ -381,7 +387,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_DAVE2D);
     if(t == NULL) {
         /* No valid task, but there are tasks waiting to be rendered,
-         * start to draw then immediatelly.
+         * start to draw then immediately.
          */
         if(false == lv_ll_is_empty(&draw_tasks_on_dlist)) {
             draw_pressure = 0;
@@ -399,7 +405,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     deps = lv_draw_get_dependent_count(t);
     if(deps > 0 || draw_pressure > 0) {
         draw_pressure += deps;
-        if(draw_pressure < DAVE2D_MAX_DRAW_PRESSURE) {
+        if(draw_pressure < LV_DAVE2D_MAX_DRAW_PRESSURE) {
             /* No other tasks are pressuring to get the current block
              * of tasks including the latest one, just accumulate it
              * and tells the drawing pipeline to send a new one if there is any
@@ -452,6 +458,14 @@ static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit)
      * Dave and wait for its interrupt. (Dave2D driver is RTOS aware, no need for semaphores);
      */
     lv_draw_dave2d_unit_t * draw_dave2d_unit = (lv_draw_dave2d_unit_t *) draw_unit;
+
+    if(!draw_pressure) {
+        /* It reached here because Dave2D Draw Unit was not suitable to take a task
+         * While there is nothing being rendered, prevent the dead lock
+         * by flushing the GPU command buffer empty and just return.
+         */
+        return 0;
+    }
     dave2d_execute_dlist_and_flush();
     draw_pressure = 0;
 
@@ -466,8 +480,8 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     /* remember draw unit for access to unit's context */
     t->draw_unit = (lv_draw_unit_t *)u;
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_layer_t * layer = t->target_layer;
     lv_area_t clipped_area;
     int32_t x;
@@ -507,7 +521,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
             lv_draw_dave2d_image(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_dave2d_line(t, t->draw_dsc);
+            lv_draw_line_iterate(t, t->draw_dsc, lv_draw_dave2d_line);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
             lv_draw_dave2d_arc(t, t->draw_dsc, &t->area);
@@ -525,8 +539,8 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
             break;
     }
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
 #endif
 #endif

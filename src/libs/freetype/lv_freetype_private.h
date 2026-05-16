@@ -14,14 +14,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_freetype.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_FREETYPE
 
 #include "../../misc/cache/lv_cache.h"
-#include "../../misc/lv_ll.h"
-#include "../../font/lv_font.h"
-#include "ft2build.h"
+#include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_CACHE_H
@@ -29,10 +27,17 @@ extern "C" {
 #include FT_IMAGE_H
 #include FT_OUTLINE_H
 #include FT_STROKER_H
+#include FT_MULTIPLE_MASTERS_H
 
 /*********************
  *      DEFINES
  *********************/
+
+/* L1 glyph cache is not thread-safe — force-disable when an OS is configured */
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1 && LV_USE_OS != LV_OS_NONE
+#undef LV_FREETYPE_CACHE_FT_GLYPH_L1
+#define LV_FREETYPE_CACHE_FT_GLYPH_L1 0
+#endif
 
 #ifdef FT_CONFIG_OPTION_ERROR_STRINGS
 #define FT_ERROR_MSG(msg, error_code) \
@@ -80,13 +85,13 @@ struct _lv_freetype_outline_event_param_t {
     lv_freetype_outline_sizes_t sizes;
 };
 
-
 typedef struct _lv_freetype_cache_node_t lv_freetype_cache_node_t;
 
 struct _lv_freetype_cache_node_t {
     const char * pathname;
     lv_freetype_font_style_t style;
     lv_freetype_font_render_mode_t render_mode;
+    int32_t weight;                     /**< Variable font weight (range 1-2000, 0 = default; values are clamped) */
 
     uint32_t ref_size;                  /**< Reference size for calculating outline glyph's real size.*/
 
@@ -99,6 +104,11 @@ struct _lv_freetype_cache_node_t {
 
     /*draw data cache*/
     lv_cache_t * draw_data_cache;
+
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+    /* L1 glyph metrics cache (single-thread only, managed by lv_freetype_glyph.c) */
+    void * glyph_l1;
+#endif
 };
 
 typedef struct _lv_freetype_context_t {
@@ -121,7 +131,6 @@ typedef struct _lv_freetype_font_dsc_t {
     lv_freetype_cache_node_t * cache_node;
     lv_cache_entry_t * cache_node_entry;
     FTC_FaceID face_id;
-    uint32_t outline_stroke_width;
     lv_font_kerning_t kerning;
 } lv_freetype_font_dsc_t;
 
@@ -141,6 +150,11 @@ int32_t lv_freetype_italic_transform_on_pos(lv_point_t point);
 
 lv_cache_t * lv_freetype_create_glyph_cache(uint32_t cache_size);
 void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc);
+
+#if LV_FREETYPE_CACHE_FT_GLYPH_L1
+void lv_freetype_glyph_l1_init(lv_freetype_cache_node_t * node);
+void lv_freetype_glyph_l1_deinit(lv_freetype_cache_node_t * node);
+#endif
 
 lv_cache_t * lv_freetype_create_draw_data_image(uint32_t cache_size);
 void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc);

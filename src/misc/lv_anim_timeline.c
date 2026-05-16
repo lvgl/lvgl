@@ -6,14 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_anim_private.h"
-#include "lv_assert.h"
 #include "lv_anim_timeline_private.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
-#if LV_USE_OBJ_NAME
-    #include "../core/lv_obj_tree.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -29,7 +24,7 @@
 static void anim_timeline_exec_cb(void * var, int32_t v);
 static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_time);
 static int32_t anim_timeline_path_cb(const lv_anim_t * a);
-static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v);
+static void exec_anim(lv_anim_t * a, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -156,16 +151,6 @@ void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data)
     at->user_data = user_data;
 }
 
-#if LV_USE_OBJ_NAME
-
-void lv_anim_timeline_set_base_obj(lv_anim_timeline_t * at, lv_obj_t * base_obj)
-{
-    LV_ASSERT_NULL(at);
-    at->base_obj = base_obj;
-}
-
-#endif
-
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
@@ -222,16 +207,16 @@ void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at)
     return at->user_data;
 }
 
-
-#if LV_USE_OBJ_NAME
-
-lv_obj_t * lv_anim_timeline_get_base_obj(lv_anim_timeline_t * at)
+void lv_anim_timeline_merge(lv_anim_timeline_t * dest, const lv_anim_timeline_t * src, int32_t delay)
 {
-    LV_ASSERT_NULL(at);
-    return at->base_obj;
+    uint32_t i;
+    for(i = 0; i < src->anim_dsc_cnt; i++) {
+        uint32_t anim_delay = src->anim_dsc[i].start_time + delay;
+        lv_anim_timeline_add(dest, anim_delay, &src->anim_dsc[i].anim);
+    }
 }
 
-#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -259,7 +244,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             }
 
             value = a->start_value;
-            exec_anim(at, a, value);
+            exec_anim(a, value);
 
             if(anim_timeline_is_started) {
                 if(at->reverse) {
@@ -279,7 +264,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
 
             a->act_time = act_time - start_time;
             value = a->path_cb(a);
-            exec_anim(at, a, value);
+            exec_anim(a, value);
 
             if(anim_timeline_is_started) {
                 if(at->reverse) {
@@ -314,7 +299,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             }
 
             value = a->end_value;
-            exec_anim(at, a, value);
+            exec_anim(a, value);
 
             if(anim_timeline_is_started) {
                 if(at->reverse) {
@@ -341,38 +326,13 @@ static void anim_timeline_exec_cb(void * var, int32_t v)
     anim_timeline_set_act_time(at, v);
 }
 
-static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v)
+static void exec_anim(lv_anim_t * a, int32_t v)
 {
 
-    /*a->var stores children names if at->base_obj is set. */
-#if LV_USE_OBJ_NAME
-    lv_obj_t * obj_resolved;
-    if(at->base_obj) {
-        if(lv_streq(a->var, "self")) obj_resolved = at->base_obj;
-        else if(lv_streq(a->var, "")) obj_resolved = at->base_obj;
-        else obj_resolved = lv_obj_get_child_by_name(at->base_obj, a->var);
-        if(obj_resolved == NULL) {
-            LV_LOG_WARN("Widget was not found with name `%s` as child of %p", (const char *)a->var, (void *)at->base_obj);
-            return;
-        }
-    }
-    else {
-        obj_resolved = a->var;
-    }
-#else
-    LV_UNUSED(at);
-    lv_obj_t * obj_resolved = a->var;
-#endif
-
-
     if(a->exec_cb) {
-        a->exec_cb(obj_resolved, v);
+        a->exec_cb(a->var, v);
     }
     if(a->custom_exec_cb) {
-        /*Temporarily replace the var with the resolved object*/
-        void * var_ori = a->var;
-        a->var = obj_resolved;
         a->custom_exec_cb(a, v);
-        a->var = var_ori;
     }
 }

@@ -39,11 +39,6 @@
 /* Smart-phone like multi-language demo */
 #define LV_USE_DEMO_MULTILANG       0
 
-/* Widget transformation demo */
-#define LV_USE_DEMO_TRANSFORM       0
-
-/* Demonstrate scroll settings */
-#define LV_USE_DEMO_SCROLL          0
 ...
 ```
 

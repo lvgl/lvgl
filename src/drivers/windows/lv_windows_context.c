@@ -8,15 +8,15 @@
  *********************/
 
 #include "lv_windows_context.h"
+
 #if LV_USE_WINDOWS
 
 #ifdef __GNUC__
     #pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
 
-#include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
-#include "../../osal/lv_os.h"
+#include "../../osal/lv_os_private.h"
 
 /*********************
  *      DEFINES

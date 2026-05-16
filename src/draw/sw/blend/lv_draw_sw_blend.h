@@ -13,12 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw_sw_mask.h"
-#if LV_USE_DRAW_SW
 
-#include "../../../misc/lv_color.h"
-#include "../../../misc/lv_area.h"
-#include "../../../misc/lv_style.h"
+#include "../../../lvgl_public.h"
+
+#if LV_USE_DRAW_SW
 
 /*********************
  *      DEFINES

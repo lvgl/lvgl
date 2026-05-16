@@ -6,15 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_translation.h"
+#include "lv_translation_private.h"
 #if LV_USE_TRANSLATION
 
-#include "lv_translation_private.h"
-#include "../../misc/lv_ll.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_assert.h"
 #include "../../core/lv_global.h"
 
 /*********************
@@ -30,6 +24,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static lv_obj_tree_walk_res_t send_language_change_event(lv_obj_t * obj, void * lang);
 
 /**********************
  *  STATIC VARIABLES
@@ -81,8 +77,8 @@ void lv_translation_deinit(void)
     lv_free((void *)selected_lang);
 }
 
-lv_translation_pack_t * lv_translation_add_static(const char * languages[], const char * tags[],
-                                                  const char * translations[])
+lv_translation_pack_t * lv_translation_add_static(const char * const languages[], const char * const tags[],
+                                                  const char * const translations[])
 {
     LV_ASSERT_NULL(languages);
     LV_ASSERT_NULL(tags);
@@ -99,9 +95,9 @@ lv_translation_pack_t * lv_translation_add_static(const char * languages[], cons
         pack->language_cnt++;
     }
 
-    pack->languages = languages;
-    pack->tag_p = tags;
-    pack->translation_p = translations;
+    pack->languages = (const char **)languages;
+    pack->tag_p = (const char **)tags;
+    pack->translation_p = (const char **)translations;
     return pack;
 }
 
@@ -119,10 +115,16 @@ lv_translation_pack_t * lv_translation_add_dynamic(void)
     return pack;
 }
 
+const char * lv_translation_get_language(void)
+{
+    return selected_lang;
+}
+
 void lv_translation_set_language(const char * lang)
 {
     if(selected_lang) lv_free((void *)selected_lang);
     selected_lang = lv_strdup(lang);
+    lv_obj_tree_walk(NULL, send_language_change_event, (void *)lang);
 }
 
 const char * lv_translation_get(const char * tag)
@@ -279,5 +281,11 @@ lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_obj_tree_walk_res_t send_language_change_event(lv_obj_t * obj, void * lang)
+{
+    lv_obj_send_event(obj, LV_EVENT_TRANSLATION_LANGUAGE_CHANGED, lang);
+    return LV_OBJ_TREE_WALK_NEXT;
+}
 
 #endif /*LV_USE_TRANSLATION*/

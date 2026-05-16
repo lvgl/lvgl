@@ -33,15 +33,8 @@ static void draw_event_cb(lv_event_t * e)
             label_draw_dsc->text = lv_strdup(tmp_buffer);
             label_draw_dsc->text_local = 1;
 
-            lv_text_attributes_t attributes = {0};
             lv_point_t size;
-
-            attributes.text_flags = LV_TEXT_FLAG_NONE;
-            attributes.letter_space = 0;
-            attributes.line_space = 0;
-            attributes.max_width = 1000;
-
-            lv_text_get_size(&size, label_draw_dsc->text, label_draw_dsc->font, &attributes);
+            lv_text_get_size(&size, label_draw_dsc->text, label_draw_dsc->font, 0, 0, 1000, LV_TEXT_FLAG_NONE);
             int32_t new_w = size.x;
             int32_t old_w = lv_area_get_width(&draw_task->area);
 
@@ -54,7 +47,16 @@ static void draw_event_cb(lv_event_t * e)
 }
 
 /**
- * Customizing scale major tick label color with `LV_EVENT_DRAW_TASK_ADDED` event
+ * @title Rainbow major-tick labels via draw task
+ * @brief Recolour and reformat scale labels during `LV_EVENT_DRAW_TASK_ADDED`.
+ *
+ * A horizontal-bottom scale (80% width, 100 px tall, 31 ticks, range
+ * 10 to 40) enables `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` and subscribes
+ * to `LV_EVENT_DRAW_TASK_ADDED`. The callback inspects each draw
+ * task targeting `LV_PART_INDICATOR`, rewrites the label text to a
+ * one-decimal value formatted from `id2`, picks one of seven palette
+ * colours by tick index, and expands the draw area to fit the new
+ * text width.
  */
 void lv_example_scale_7(void)
 {

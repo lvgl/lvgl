@@ -1,0 +1,23 @@
+[project]
+name = "lvglgdb"
+dynamic = ["version"]
+description = "LVGL GDB scripts"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "numpy~=2.2.6",
+    "Pillow~=11.3.0",
+    "prettytable~=3.16.0",
+]
+
+[tool.setuptools.package-data]
+lvglgdb = ["cmds/dashboard/static/*"]
+
+[project.urls]
+Homepage = "https://lvgl.io"
+Documentation = "https://docs.lvgl.io/master/debugging/gdb_plugin.html"
+Repository = "https://github.com/lvgl/lvgl"
+
+[tool.setuptools.dynamic]
+version = {attr = "lvglgdb._version.__version__"}

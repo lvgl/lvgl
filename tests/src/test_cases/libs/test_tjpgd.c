@@ -8,6 +8,11 @@
 void setUp(void)
 {
     /* Function run before every test */
+    /* Temporarily remove other JPEG decoders to make sure tjpegd is used */
+    lv_libjpeg_turbo_deinit();
+#if LV_USE_FFMPEG
+    lv_ffmpeg_deinit();
+#endif
 }
 
 void tearDown(void)
@@ -67,7 +72,7 @@ void test_tjpgd_1(void)
 
 static void create_image_2(void)
 {
-    LV_IMG_DECLARE(test_img_lvgl_logo_jpg);
+    LV_IMAGE_DECLARE(test_img_lvgl_logo_jpg);
     lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, &test_img_lvgl_logo_jpg);
     lv_obj_center(img);

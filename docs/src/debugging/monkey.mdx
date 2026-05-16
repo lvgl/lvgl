@@ -1,0 +1,55 @@
+---
+title: Monkey
+description: The Monkey module provides LVGL applications with a simple monkey test. Monkey Testing is a technique where the user tests the application or system by providing random inputs and checking the beha...
+---
+
+The Monkey module provides LVGL applications with a simple monkey test.  Monkey
+Testing is a technique where the user tests the application or system by providing
+random inputs and checking the behavior or seeing whether the application or system
+will crash.  This module provides this service as simulated random input to stress
+test an LVGL application.
+
+## Usage
+
+First, enable <ApiLink name="LV_USE_MONKEY" /> in `lv_conf.h`.
+
+Next, declare a variable (it can be local) of type <ApiLink name="lv_monkey_config_t" /> to
+define the configuration structure, initialize it using
+<ApiLink name="lv_monkey_config_init" display="lv_monkey_config_init(cfg)" /> then set its `type` member to the desired
+type of [input device](/main-modules/indev), and set the `min` and `max` values for its
+`period_range` and `input_range` members to set the time ranges (in milliseconds)
+and input ranges the Monkey module will use to generate random input at random times.
+
+Next, call <ApiLink name="lv_monkey_create" display="lv_monkey_create(cfg)" /> to create the Monkey.  It returns a
+pointer to the `lv_monkey_t` created.
+
+Finally call <ApiLink name="lv_monkey_set_enable" display="lv_monkey_set_enable(monkey, true)" /> to enable Monkey.
+
+If you want to pause the monkey, call
+<ApiLink name="lv_monkey_set_enable" display="lv_monkey_set_enable(monkey, false)" />. To delete it, call
+<ApiLink name="lv_monkey_delete" display="lv_monkey_delete(monkey)" />.
+
+Note that `input_range` has different meanings depending on the `type` input device:
+
+- <ApiLink name="LV_INDEV_TYPE_POINTER" />: No effect, click randomly within the pixels of the screen resolution.
+- <ApiLink name="LV_INDEV_TYPE_ENCODER" />: The minimum and maximum values of `enc_diff`.
+- <ApiLink name="LV_INDEV_TYPE_BUTTON" />: The minimum and maximum values of `btn_id`.
+  Use <ApiLink name="lv_monkey_get_indev" /> to get the input device, and use
+  <ApiLink name="lv_indev_set_button_points" /> to map the key ID to the coordinates.
+- <ApiLink name="LV_INDEV_TYPE_KEYPAD" />: No effect, Send random [Keys](/main-modules/indev/keypad).
+
+## Examples
+
+### Touchpad monkey example
+
+<LvglExample name="lv_example_monkey_1" path="others/monkey/lv_example_monkey_1" />
+
+### Encoder monkey example
+
+<LvglExample name="lv_example_monkey_2" path="others/monkey/lv_example_monkey_2" />
+
+### Button monkey example
+
+<LvglExample name="lv_example_monkey_3" path="others/monkey/lv_example_monkey_3" />
+
+## API

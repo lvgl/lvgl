@@ -6,13 +6,19 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_spinbox_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_SPINBOX
 
-#include "../../misc/lv_assert.h"
-#include "../../indev/lv_indev.h"
-#include "../../stdlib/lv_string.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_observer_private.h"
+
+/*Check dependencies*/
+#if LV_USE_TEXTAREA == 0
+    #error "lv_spinbox: lv_textarea is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
+#endif
+
 
 /*********************
  *      DEFINES
@@ -33,9 +39,60 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
 
+#if LV_USE_OBSERVER
+    static void spinbox_value_changed_event_cb(lv_event_t * e);
+    static void spinbox_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_spinbox_properties[] = {
+    {
+        .id = LV_PROPERTY_SPINBOX_VALUE,
+        .setter = lv_spinbox_set_value,
+        .getter = lv_spinbox_get_value,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_ROLLOVER,
+        .setter = lv_spinbox_set_rollover,
+        .getter = lv_spinbox_get_rollover,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_DIGIT_COUNT,
+        .setter = lv_spinbox_set_digit_count,
+        .getter = lv_spinbox_get_digit_count,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_DEC_POINT_POS,
+        .setter = lv_spinbox_set_dec_point_pos,
+        .getter = lv_spinbox_get_dec_point_pos,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_STEP,
+        .setter = lv_spinbox_set_step,
+        .getter = lv_spinbox_get_step,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_MIN_VALUE,
+        .setter = lv_spinbox_set_min_value,
+        .getter = lv_spinbox_get_min_value,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_MAX_VALUE,
+        .setter = lv_spinbox_set_max_value,
+        .getter = lv_spinbox_get_max_value,
+    },
+    {
+        .id = LV_PROPERTY_SPINBOX_DIGIT_STEP_DIRECTION,
+        .setter = lv_spinbox_set_digit_step_direction,
+        .getter = lv_spinbox_get_digit_step_direction,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_spinbox_class = {
     .constructor_cb = lv_spinbox_constructor,
     .event_cb = lv_spinbox_event,
@@ -44,6 +101,7 @@ const lv_obj_class_t lv_spinbox_class = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_textarea_class,
     .name = "lv_spinbox",
+    LV_PROPERTY_CLASS_FIELDS(spinbox, SPINBOX)
 };
 /**********************
  *      MACROS
@@ -107,6 +165,28 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t 
     lv_spinbox_updatevalue(obj);
 }
 
+void lv_spinbox_set_digit_count(lv_obj_t * obj, uint32_t digit_count)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+
+    if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT) digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
+
+    spinbox->digit_count = digit_count;
+
+    lv_spinbox_updatevalue(obj);
+}
+
+void lv_spinbox_set_dec_point_pos(lv_obj_t * obj, uint32_t dec_point_pos)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+
+    spinbox->dec_point_pos = dec_point_pos;
+
+    lv_spinbox_updatevalue(obj);
+}
+
 void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -116,16 +196,40 @@ void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step)
     lv_spinbox_updatevalue(obj);
 }
 
-void lv_spinbox_set_range(lv_obj_t * obj, int32_t range_min, int32_t range_max)
+void lv_spinbox_set_range(lv_obj_t * obj, int32_t min_value, int32_t max_value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
-    spinbox->range_max = range_max;
-    spinbox->range_min = range_min;
+    spinbox->range_max = max_value;
+    spinbox->range_min = min_value;
 
     if(spinbox->value > spinbox->range_max) spinbox->value = spinbox->range_max;
     if(spinbox->value < spinbox->range_min) spinbox->value = spinbox->range_min;
+
+    lv_spinbox_updatevalue(obj);
+}
+
+void lv_spinbox_set_min_value(lv_obj_t * obj, int32_t min_value)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+
+    spinbox->range_min = min_value;
+
+    if(spinbox->value < spinbox->range_min) spinbox->value = spinbox->range_min;
+
+    lv_spinbox_updatevalue(obj);
+}
+
+void lv_spinbox_set_max_value(lv_obj_t * obj, int32_t max_value)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+
+    spinbox->range_max = max_value;
+
+    if(spinbox->value > spinbox->range_max) spinbox->value = spinbox->range_max;
 
     lv_spinbox_updatevalue(obj);
 }
@@ -207,6 +311,41 @@ bool lv_spinbox_get_rollover(lv_obj_t * obj)
     return spinbox->rollover;
 }
 
+uint32_t lv_spinbox_get_digit_count(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->digit_count;
+}
+
+uint32_t lv_spinbox_get_dec_point_pos(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->dec_point_pos;
+}
+
+int32_t lv_spinbox_get_min_value(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->range_min;
+}
+
+int32_t lv_spinbox_get_max_value(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->range_max;
+}
+
+lv_dir_t lv_spinbox_get_digit_step_direction(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
+    return spinbox->digit_step_dir;
+}
+
 void lv_spinbox_increment(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -264,6 +403,24 @@ void lv_spinbox_decrement(lv_obj_t * obj)
         lv_spinbox_updatevalue(obj);
     }
 }
+
+#if LV_USE_OBSERVER
+lv_observer_t * lv_spinbox_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_event_cb(obj, spinbox_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, spinbox_value_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *   STATIC FUNCTIONS
@@ -425,7 +582,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     const size_t digits_len = lv_strlen(digits);
 
     const int leading_zeros_cnt = spinbox->digit_count - digits_len;
-    if(leading_zeros_cnt) {
+    if(leading_zeros_cnt > 0) {
         for(i = (int32_t) digits_len; i >= 0; i--) {
             digits[i + leading_zeros_cnt] = digits[i];
         }
@@ -436,8 +593,8 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     }
 
     /*Add the decimal part*/
-    const uint32_t intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
-    for(i = 0; i < (int32_t)intDigits && digits[i] != '\0'; i++) {
+    const uint32_t int_digits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
+    for(i = 0; i < (int32_t)int_digits && digits[i] != '\0'; i++) {
         (*buf_p) = digits[i];
         buf_p++;
     }
@@ -464,11 +621,34 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
         cur_pos--;
     }
 
-    if(cur_pos > intDigits) cur_pos++; /*Skip the decimal point*/
+    if(cur_pos > int_digits) cur_pos++; /*Skip the decimal point*/
 
     cur_pos -= cur_shift_left;
 
     lv_textarea_set_cursor_pos(obj, cur_pos);
 }
+
+
+#if LV_USE_OBSERVER
+
+static void spinbox_value_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * arc = lv_event_get_current_target(e);
+    lv_subject_t * subject = lv_event_get_user_data(e);
+
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_subject_set_int(subject, lv_spinbox_get_value(arc));
+    }
+}
+
+static void spinbox_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_spinbox_set_value(observer->target, subject->value.num);
+    }
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 
 #endif /*LV_USE_SPINBOX*/

@@ -1,6 +1,16 @@
 #include "../../lv_examples.h"
 #if LV_USE_MONKEY && LV_BUILD_EXAMPLES
 
+/**
+ * @title Button monkey input
+ * @brief Fire random button presses mapped to three fixed screen coordinates.
+ *
+ * The config is set to `LV_INDEV_TYPE_BUTTON` with a 50 to 500 ms period and
+ * an input range covering indices 0 through 2. Three points are placed along
+ * the top of the screen at `hor_res/4`, `hor_res/2`, and `hor_res*3/4`, then
+ * bound to the monkey's indev with `lv_indev_set_button_points`.
+ * `lv_monkey_set_enable` starts the random presses.
+ */
 void lv_example_monkey_3(void)
 {
     static lv_point_t btn_points[3];

@@ -14,6 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "../lv_examples.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -44,6 +46,8 @@ void lv_example_style_16(void);
 void lv_example_style_17(void);
 void lv_example_style_18(void);
 void lv_example_style_19(void);
+void lv_example_style_20(void);
+void lv_example_style_21(void);
 
 /**********************
  *      MACROS

@@ -104,4 +104,27 @@ void test_led_get_brightness_works(void)
     TEST_ASSERT_EQUAL(150, lv_led_get_brightness(led));
 }
 
+void test_led_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_led_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test COLOR property */
+    prop.id = LV_PROPERTY_LED_COLOR;
+    prop.color = lv_palette_main(LV_PALETTE_RED);
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_COLOR(lv_palette_main(LV_PALETTE_RED), lv_obj_get_property(obj, LV_PROPERTY_LED_COLOR).color);
+
+    /* Test BRIGHTNESS property */
+    prop.id = LV_PROPERTY_LED_BRIGHTNESS;
+    prop.num = 200;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(200, lv_obj_get_property(obj, LV_PROPERTY_LED_BRIGHTNESS).num);
+    TEST_ASSERT_EQUAL_INT(200, lv_led_get_brightness(obj));
+
+    lv_obj_delete(obj);
+#endif
+}
+
 #endif

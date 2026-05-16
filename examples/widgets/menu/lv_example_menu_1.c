@@ -1,6 +1,17 @@
 #include "../../lv_examples.h"
 #if LV_USE_MENU && LV_BUILD_EXAMPLES
 
+/**
+ * @title Basic menu with sub page
+ * @brief A three-item main page whose third entry opens a hidden sub page.
+ *
+ * A display-sized `lv_menu` holds a main page with three
+ * `lv_menu_cont` items labeled `Item 1`, `Item 2`, and
+ * `Item 3 (Click me!)`. A separate sub page created with
+ * `lv_menu_page_create` carries a greeting label, and
+ * `lv_menu_set_load_page_event` wires the third item to load that sub
+ * page when clicked. `lv_menu_set_page` opens the main page.
+ */
 void lv_example_menu_1(void)
 {
     /*Create a menu object*/

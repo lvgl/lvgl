@@ -12,8 +12,6 @@
 #include "lv_draw_sdl.h"
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
-#include "../../drivers/sdl/lv_sdl_window.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_area_private.h"
 
@@ -90,6 +88,12 @@ static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * 
     }
     if(lhs->h != rhs->h) {
         return lhs->h > rhs->h ? 1 : -1;
+    }
+
+    if(lhs->draw_dsc == NULL || rhs->draw_dsc == NULL) {
+        if(lhs->draw_dsc == rhs->draw_dsc) return 0;
+        if(lhs->draw_dsc == NULL) return -1;
+        return 1;
     }
 
     uint32_t lhs_dsc_size = lhs->draw_dsc->dsc_size;
@@ -471,6 +475,13 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
         if(!label_dsc->text_static) {
             lv_cache_drop(u->texture_cache, &data_to_find, NULL);
+        }
+    }
+    /*Do not cache lines rendered from points at dsc->points will be freed*/
+    else if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+        lv_draw_line_dsc_t * line_dsc = t->draw_dsc;
+        if(line_dsc->points) {
+            lv_cache_drop(u->texture_cache, &data_to_find, u);
         }
     }
 }
