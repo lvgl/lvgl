@@ -14,7 +14,7 @@
  * rendered with `lv_draw_arc` into a layer opened via
  * `lv_canvas_init_layer`.
  */
-void lv_example_canvas_5(void)
+void lv_example_canvas_arc(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);

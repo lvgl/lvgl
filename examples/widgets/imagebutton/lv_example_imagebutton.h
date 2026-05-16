@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_imagebutton_1(void);
+void lv_example_imagebutton_transition(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

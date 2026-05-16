@@ -52,7 +52,7 @@ lv_display_set_buffers(display1, buf1, buf2, buf_size_in_bytes, render_mode)
 - `buf2` a second optional buffer (see below)
 - `buf_size_in_bytes` size of buffer(s) in bytes
 - `render_mode` is one of the following:
-  
+
    -  <ApiLink name="LV_DISPLAY_RENDER_MODE_PARTIAL" /> Use the buffer(s) to render
       to the display using buffers smaller than the size of the display.  Use of
       buffers at least 1/10 display size is recommended.  In [Flush Callback](/main-modules/display/setup) the rendered
@@ -170,4 +170,3 @@ that (clearing the display's `flushing` flag) when your callback returns.
 However, if a Flush-Wait Callback is not set, LVGL assumes that
 <ApiLink name="lv_display_flush_ready" /> is called after the flush has completed.
 
-## API

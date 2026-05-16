@@ -12,7 +12,6 @@ extern "C" {
 
 void lv_example_lottie_1(void);
 void lv_example_lottie_2(void);
-void lv_example_lottie_approve(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

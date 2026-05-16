@@ -59,7 +59,7 @@ extern "C" {
  * Images
  *----------------*/
 
-extern const void * img_lvgl_logo;
+extern const void * img_example_lvgl_logo;
 
 /*----------------
  * Subjects
@@ -95,7 +95,7 @@ void xml_project_init_gen(const char * asset_path);
  **********************/
 
 /*Include all the widgets, components and screens of this library*/
-#include "screens/lv_example_style_image_gen.h"
+#include "screens/lv_example_textarea_placeholder_gen.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

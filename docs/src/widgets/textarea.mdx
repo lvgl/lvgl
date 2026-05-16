@@ -11,28 +11,9 @@ text becomes long enough, the Text Area can be scrolled.
 
 One-line mode and password modes are supported.
 
-## Styling
-
-- <ApiLink name="LV_PART_MAIN" /> The background of the Text Area; uses the
-   [typical background style properties](/common-widget-features/styles/overview) and the text related
-   style properties including `text_align` to align the text to the left,
-   right or center.
-- <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar that is shown when the text is
-   longer than its height.
-- <ApiLink name="LV_PART_SELECTED" /> Determines the style of the [selected
-   text](/widgets/label). Only `text_color` and
-   `bg_color` style properties can be used. `bg_color` should be set
-   directly on the label of the Text Area.
-- <ApiLink name="LV_PART_CURSOR" /> Marks the position where the characters are
-   inserted. The cursor's area is always the bounding box of the current
-   character. A block cursor can be created by adding a background color
-   and background opacity to <ApiLink name="LV_PART_CURSOR" />'s style. To create
-   a "bar" cursor leave the cursor transparent and set a left border. The
-   `anim_time` style property sets the cursor's blink time.
-- <ApiLink name="LV_PART_TEXTAREA_PLACEHOLDER" /> Unique to Text Area; allows styling
-   the [placeholder text](/widgets/textarea).
-
 ## Adding text
+
+<LvglExample name="lv_example_textarea_buttonmatrix" path="widgets/textarea/lv_example_textarea_buttonmatrix" />
 
 You can insert text or characters to the current cursor's position with:
 
@@ -46,6 +27,8 @@ To add wide characters like `'á'`, `'ß'` or CJK characters, use
 with "New text".
 
 ## Placeholder text
+
+<LvglXMLExample name="lv_example_textarea_placeholder" path="widgets/textarea/textarea_placeholder/lv_example_textarea_placeholder" />
 
 Placeholder text is text that is displayed when the Text Area is empty.  This can be
 a handy way to provide the end user with a hint about what to type there.
@@ -95,6 +78,8 @@ The Text Area can be configured to keep all text on a single line with
 
 ## Password mode
 
+<LvglExample name="lv_example_textarea_password" path="widgets/textarea/lv_example_textarea_password" />
+
 The Text Area supports password mode which can be enabled with
 <ApiLink name="lv_textarea_set_password_mode" display="lv_textarea_set_password_mode(textarea, true)" />.
 
@@ -116,6 +101,8 @@ text entered, not the bullet characters.
 The visibility time can be adjusted with <ApiLink name="LV_TEXTAREA_DEF_PWD_SHOW_TIME" /> in `lv_conf.h`.
 
 ## Accepted characters
+
+<LvglExample name="lv_example_textarea_format" path="widgets/textarea/lv_example_textarea_format" />
 
 You can set a list of accepted characters with
 <ApiLink name="lv_textarea_set_accepted_chars" display="lv_textarea_set_accepted_chars(textarea, list)" /> or
@@ -186,6 +173,32 @@ Normally you won't need these since Text Area automates the text selection proce
 but if you do need to change the selection programmatically, the above are your
 tools to do so.
 
+## Styling
+
+<LvglXMLExample name="lv_example_textarea_cursor" path="widgets/textarea/textarea_cursor/lv_example_textarea_cursor" />
+
+The Text Area exposes these parts, each styled independently with a named
+style and a `selector`:
+
+- <ApiLink name="LV_PART_MAIN" /> The background of the Text Area; uses the
+   [typical background style properties](/common-widget-features/styles/overview) and the text related
+   style properties including `text_align` to align the text to the left,
+   right or center.
+- <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar that is shown when the text is
+   longer than its height.
+- <ApiLink name="LV_PART_SELECTED" /> Determines the style of the [selected
+   text](/widgets/label). Only `text_color` and
+   `bg_color` style properties can be used. `bg_color` should be set
+   directly on the label of the Text Area.
+- <ApiLink name="LV_PART_CURSOR" /> Marks the position where the characters are
+   inserted. The cursor's area is always the bounding box of the current
+   character. A block cursor can be created by adding a background color
+   and background opacity to <ApiLink name="LV_PART_CURSOR" />'s style. To create
+   a "bar" cursor leave the cursor transparent and set a left border. The
+   `anim_time` style property sets the cursor's blink time.
+- <ApiLink name="LV_PART_TEXTAREA_PLACEHOLDER" /> Unique to Text Area; allows styling
+   the [placeholder text](/widgets/textarea).
+
 ## Events
 
 - <ApiLink name="LV_EVENT_INSERT" /> Sent right before a character or text is
@@ -217,20 +230,3 @@ Learn more about [events](/common-widget-features/events).
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
 
-## Examples
-
-### Simple Text area
-
-<LvglExample name="lv_example_textarea_1" path="widgets/textarea/lv_example_textarea_1" />
-
-### Text area with password field
-
-<LvglExample name="lv_example_textarea_2" path="widgets/textarea/lv_example_textarea_2" />
-
-### Text auto-formatting
-
-<LvglExample name="lv_example_textarea_3" path="widgets/textarea/lv_example_textarea_3" />
-
-### Text area cursor styling
-
-<LvglExample name="lv_example_textarea_4" path="widgets/textarea/lv_example_textarea_4" />

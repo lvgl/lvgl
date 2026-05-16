@@ -10,10 +10,11 @@
 extern "C" {
 #endif
 
-void lv_example_textarea_1(void);
-void lv_example_textarea_2(void);
-void lv_example_textarea_3(void);
-void lv_example_textarea_4(void);
+void lv_example_textarea_cursor_create(void);
+void lv_example_textarea_placeholder_create(void);
+void lv_example_textarea_buttonmatrix(void);
+void lv_example_textarea_format(void);
+void lv_example_textarea_password(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

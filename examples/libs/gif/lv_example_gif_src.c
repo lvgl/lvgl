@@ -11,7 +11,7 @@
  * `A:lvgl/examples/libs/gif/bulb.gif` through the filesystem driver
  * registered under drive letter `A`.
  */
-void lv_example_gif_1(void)
+void lv_example_gif_src(void)
 {
     LV_IMAGE_DECLARE(img_bulb_gif);
     lv_obj_t * img;

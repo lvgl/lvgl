@@ -4,7 +4,7 @@
 
  `lv_image` paints whatever is set as its `src`. In XML the value must
  resolve through `lv_xml_get_image`, so `src` references a name that was
- registered via `<file>` or `<data>` in `<images>` — here `img_lvgl_logo`
+ registered via `<file>` or `<data>` in `<images>` — here `img_example_lvgl_logo`
  declared in `examples/xml_project/globals.xml`. The C API also accepts
  a symbol string or a raw image variable pointer; those alternatives are
  documented in this page but cannot appear in XML.
@@ -14,6 +14,6 @@
 		<!-- 💡 Register another image in `globals.xml` and swap `src` to its name to see a different bitmap. -->
 		<lv_label width="100%" style_text_align="center" text="Image: source" />
 
-		<lv_image src="img_lvgl_logo" />
+		<lv_image src="img_example_lvgl_logo" />
 	</view>
 </screen>

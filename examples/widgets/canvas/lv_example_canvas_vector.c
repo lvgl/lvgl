@@ -19,7 +19,7 @@
  * `lv_draw_vector`. When vector graphics are disabled the example
  * falls back to a centered "not enabled" label.
  */
-void lv_example_canvas_8(void)
+void lv_example_canvas_vector(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
@@ -54,7 +54,7 @@ void lv_example_canvas_8(void)
 }
 #else
 
-void lv_example_canvas_8(void)
+void lv_example_canvas_vector(void)
 {
     /*fallback for online examples*/
     lv_obj_t * label = lv_label_create(lv_screen_active());

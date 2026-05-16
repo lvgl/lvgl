@@ -15,7 +15,7 @@
  * red at `frac=64` to transparent blue at `frac=192`, and a top-level
  * `opa` of 128, then rendered via `lv_draw_triangle` on a canvas layer.
  */
-void lv_example_canvas_9(void)
+void lv_example_canvas_triangle(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);

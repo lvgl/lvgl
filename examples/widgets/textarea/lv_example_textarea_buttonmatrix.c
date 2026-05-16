@@ -31,7 +31,7 @@ static void btnm_event_handler(lv_event_t * e)
  * backspace, or sends `LV_EVENT_READY` to the textarea on new line. The matrix
  * drops `LV_OBJ_FLAG_CLICK_FOCUSABLE` so focus stays with the textarea.
  */
-void lv_example_textarea_1(void)
+void lv_example_textarea_buttonmatrix(void)
 {
     lv_obj_t * ta = lv_textarea_create(lv_screen_active());
     lv_textarea_set_one_line(ta, true);

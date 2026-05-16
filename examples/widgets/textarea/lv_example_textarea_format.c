@@ -16,7 +16,7 @@ static lv_obj_t * kb;
  * `lv_textarea_add_char(':')`. A numeric `lv_keyboard` in
  * `LV_KEYBOARD_MODE_NUMBER` feeds the textarea.
  */
-void lv_example_textarea_3(void)
+void lv_example_textarea_format(void)
 {
     /*Create the text area*/
     lv_obj_t * ta = lv_textarea_create(lv_screen_active());

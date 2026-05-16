@@ -10,26 +10,7 @@
 extern "C" {
 #endif
 
-/*********************
- *      INCLUDES
- *********************/
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
-void lv_example_qrcode_1(void);
-
-/**********************
- *      MACROS
- **********************/
+void lv_example_qrcode_basic_create(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

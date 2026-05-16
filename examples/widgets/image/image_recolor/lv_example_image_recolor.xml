@@ -15,7 +15,7 @@
 		<!-- 💡 Drag the slider; the logo's tint fades in and out as `subject_opa` (0..255) moves. -->
 		<lv_label width="100%" style_text_align="center" text="Image: recolor" />
 
-		<lv_image src="img_lvgl_logo"
+		<lv_image src="img_example_lvgl_logo"
 			style_image_recolor-main="0xef4444">
 			<bind_style_prop prop="image_recolor_opa" selector="main" subject="subject_opa" />
 		</lv_image>

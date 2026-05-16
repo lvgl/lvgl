@@ -10,18 +10,18 @@
 extern "C" {
 #endif
 
-void lv_example_canvas_1(void);
-void lv_example_canvas_10(void);
-void lv_example_canvas_11(void);
-void lv_example_canvas_12(void);
-void lv_example_canvas_2(void);
-void lv_example_canvas_3(void);
-void lv_example_canvas_4(void);
-void lv_example_canvas_5(void);
-void lv_example_canvas_6(void);
-void lv_example_canvas_7(void);
-void lv_example_canvas_8(void);
-void lv_example_canvas_9(void);
+void lv_example_canvas_alpha(void);
+void lv_example_canvas_arc(void);
+void lv_example_canvas_blur(void);
+void lv_example_canvas_image(void);
+void lv_example_canvas_label(void);
+void lv_example_canvas_line(void);
+void lv_example_canvas_rectangle(void);
+void lv_example_canvas_rotate(void);
+void lv_example_canvas_triangle(void);
+void lv_example_canvas_vector(void);
+void lv_example_canvas_wave_text(void);
+void lv_example_canvas_windstorm_text(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

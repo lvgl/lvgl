@@ -10,13 +10,15 @@
  *
  * `lv_image` paints whatever is set as its `src`. In XML the value must
  * resolve through `lv_xml_get_image`, so `src` references a name that was
- * registered via `<file>` or `<data>` in `<images>` — here `img_lvgl_logo`
+ * registered via `<file>` or `<data>` in `<images>` — here `img_example_lvgl_logo`
  * declared in `examples/xml_project/globals.xml`. The C API also accepts
  * a symbol string or a raw image variable pointer; those alternatives are
  * documented in this page but cannot appear in XML.
  */
 void lv_example_image_src_create(void)
 {
+    LV_IMAGE_DECLARE(img_example_lvgl_logo);
+
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
@@ -29,6 +31,6 @@ void lv_example_image_src_create(void)
     lv_label_set_text(lv_label_0, "Image: source");
 
     lv_obj_t * lv_image_0 = lv_image_create(screen);
-    lv_image_set_src(lv_image_0, &img_lvgl_logo);
+    lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
 }
 

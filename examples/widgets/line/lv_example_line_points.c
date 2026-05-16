@@ -11,7 +11,7 @@
  * `lv_line_create` and `lv_line_set_points` build the shape on the
  * active screen, the style is attached, and the line is centered.
  */
-void lv_example_line_1(void)
+void lv_example_line_points(void)
 {
     /*Create an array for the points of the line*/
     static lv_point_precise_t line_points[] = { {5, 5}, {70, 70}, {120, 10}, {180, 60}, {240, 10} };

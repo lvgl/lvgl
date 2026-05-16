@@ -18,17 +18,15 @@ Spans are displayed.  Spans can be added to, and removed from, the Spangroup
 throughout its life.  The number of Spans that can be added is limited only by
 available RAM.
 
-## Styling
-
-- <ApiLink name="LV_PART_MAIN" /> Spangroup has only one part.
-
-## Set text and style
+## Create spans
 
 Add each needed Span to a Spangroup like this:
 
 ```c
 lv_span_t * span = lv_spangroup_new_span(spangroup);
 ```
+
+## Set text
 
 After a Span is created, use the following functions to set its text
 and style properties:
@@ -56,6 +54,14 @@ E.g. `lv_span_t * span = lv_spangroup_get_child(spangroup, 0)` will
 return the first child of the Spangroup.
 `lv_span_t * span = lv_spangroup_get_child(spangroup, -1)` will return
 the last (or most recent) child.
+
+To resolve a span from a screen coordinate — for example the point where
+the Spangroup was clicked — use
+<ApiLink name="lv_spangroup_get_span_by_point" display="lv_spangroup_get_span_by_point(spangroup, &point)" />.
+The example below makes the group clickable and logs the text of whichever
+span was hit.
+
+<LvglExample name="lv_example_span_hittest" path="widgets/span/lv_example_span_hittest" />
 
 ## Child count
 
@@ -116,6 +122,14 @@ Use <ApiLink name="lv_spangroup_set_max_lines" display="lv_spangroup_set_max_lin
 of lines to be displayed in <ApiLink name="LV_SPAN_MODE_BREAK" /> mode. A negative
 value indicates no limit.
 
+
+## Styling
+
+<ApiLink name="LV_PART_MAIN" /> Spangroup has only one part.
+
+<LvglXMLExample name="lv_example_span_styling" path="widgets/span/span_styling/lv_example_span_styling" />
+
+
 ## Data binding
 
 Data bindings connect a widget property to a piece of global data — a
@@ -150,9 +164,3 @@ No *Keys* are processed by Span Widgets.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Example
-
-### Span with custom styles
-
-<LvglExample name="lv_example_span_1" path="widgets/span/lv_example_span_1" />

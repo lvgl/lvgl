@@ -14,7 +14,7 @@
  * `LV_TEXT_DECOR_UNDERLINE`, and red text, then rendered via
  * `lv_draw_label` inside a canvas layer.
  */
-void lv_example_canvas_4(void)
+void lv_example_canvas_label(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);

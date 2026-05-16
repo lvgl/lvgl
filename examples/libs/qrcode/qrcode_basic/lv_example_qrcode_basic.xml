@@ -1,0 +1,24 @@
+<!--
+ @title QR code colors and quiet zone
+ @brief Encode a URL with custom dark/light colors and a padded quiet zone.
+
+ The QR code is fixed at 150 px and recolored: a dark blue `dark_color` on a
+ light blue `light_color` instead of the default black-on-white. `quiet_zone`
+ adds the standard light margin so scanners lock on, and a matching border
+ frames it against the screen.
+-->
+<screen>
+	<consts>
+		<color name="qr_dark" value="0x1d4ed8" />
+		<color name="qr_light" value="0xdbeafe" />
+	</consts>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Swap dark_color/light_color for brand colors; keep enough contrast or scanners fail. -->
+		<lv_label width="100%" style_text_align="center" text="QR code: colors" />
+
+		<lv_qrcode size="150" dark_color="#qr_dark" light_color="#qr_light"
+			data="https://lvgl.io" quiet_zone="true"
+			style_border_color="#qr_dark" style_border_width="4" />
+	</view>
+</screen>

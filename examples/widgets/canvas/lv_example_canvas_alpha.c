@@ -14,7 +14,7 @@
  * `lv_canvas_set_px` at `LV_OPA_50`, `LV_OPA_20`, and `LV_OPA_0`, so
  * the underlying screen color shows through progressively.
  */
-void lv_example_canvas_2(void)
+void lv_example_canvas_alpha(void)
 {
     lv_obj_set_style_bg_color(lv_screen_active(), lv_palette_lighten(LV_PALETTE_RED, 5), 0);
 

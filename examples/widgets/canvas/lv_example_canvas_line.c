@@ -13,7 +13,7 @@
  * `round_start` and `round_end` set, and endpoints at (15,15) and
  * (35,10), then rendered via `lv_draw_line` on a canvas layer.
  */
-void lv_example_canvas_7(void)
+void lv_example_canvas_line(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);

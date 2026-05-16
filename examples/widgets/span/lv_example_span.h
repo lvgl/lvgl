@@ -10,7 +10,8 @@
 extern "C" {
 #endif
 
-void lv_example_span_1(void);
+void lv_example_span_styling_create(void);
+void lv_example_span_hittest(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

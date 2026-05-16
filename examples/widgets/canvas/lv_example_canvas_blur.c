@@ -15,7 +15,7 @@
  * 10. A 30% opacity blue rounded fill and a black centered "Hello
  * world" label are layered on top of the blurred region.
  */
-void lv_example_canvas_10(void)
+void lv_example_canvas_blur(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_RGB565);

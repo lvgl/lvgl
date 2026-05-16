@@ -14,7 +14,7 @@
  * and darkening it with a black recolor at `LV_OPA_30`. A centered
  * label reads `Button`.
  */
-void lv_example_imagebutton_1(void)
+void lv_example_imagebutton_transition(void)
 {
     LV_IMAGE_DECLARE(imagebutton_left);
     LV_IMAGE_DECLARE(imagebutton_right);

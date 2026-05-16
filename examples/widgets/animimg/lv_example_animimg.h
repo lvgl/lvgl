@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_animimg_1(void);
+void lv_example_animimg_play(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -61,7 +61,7 @@ static void timer_cb(lv_timer_t * timer)
  * windstorm shape. Letters are drawn with `lv_draw_letter`, rotated by
  * the tangent and colored via `lv_color_hsv_to_rgb`.
  */
-void lv_example_canvas_12(void)
+void lv_example_canvas_windstorm_text(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);

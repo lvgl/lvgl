@@ -24,12 +24,12 @@
     </subjects>
 
     <images>
-        <!-- The name matches the pre-built `img_lvgl_logo` descriptor in
-             `demos/widgets/assets/img_lvgl_logo.c`, so the generated C links
+        <!-- The name matches the pre-built `img_example_lvgl_logo` descriptor in
+             `demos/widgets/assets/img_example_lvgl_logo.c`, so the generated C links
              against that symbol and the example doesn't depend on the
              editor's image-conversion pipeline. `src_path` is only the
              editor's preview/source. -->
-        <file name="img_lvgl_logo" src_path="images/img_lvgl_logo.png" />
+        <file name="img_example_lvgl_logo" src_path="images/img_example_lvgl_logo.png" />
     </images>
 
     <fonts>

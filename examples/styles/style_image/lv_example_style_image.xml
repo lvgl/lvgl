@@ -28,7 +28,7 @@
 		<!-- 💡 The bitmap is tinted and rotated by style alone; lower `image_recolor_opa` to fade the tint or change `transform_rotation`. -->
 		<lv_label width="100%" style_text_align="center" text="Style: image recolor and rotation" />
 
-		<lv_image src="img_lvgl_logo">
+		<lv_image src="img_example_lvgl_logo">
 			<style name="style_img" />
 		</lv_image>
 	</view>

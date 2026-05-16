@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_line_1(void);
+void lv_example_line_points(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

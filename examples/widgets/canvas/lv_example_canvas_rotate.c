@@ -15,7 +15,7 @@
  * `lv_draw_buf_to_image`, and blits it with `lv_draw_image` rotated by
  * 120 degrees around the canvas center.
  */
-void lv_example_canvas_1(void)
+void lv_example_canvas_rotate(void)
 {
     lv_draw_rect_dsc_t rect_dsc;
     lv_draw_rect_dsc_init(&rect_dsc);

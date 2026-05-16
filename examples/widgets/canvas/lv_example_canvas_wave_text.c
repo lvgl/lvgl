@@ -58,7 +58,7 @@ static void timer_cb(lv_timer_t * timer)
  * counter. Each letter is rendered with `lv_draw_letter` using its
  * tangent as `rotation` and an HSV-derived color.
  */
-void lv_example_canvas_11(void)
+void lv_example_canvas_wave_text(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);

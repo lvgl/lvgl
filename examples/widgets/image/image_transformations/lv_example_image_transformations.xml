@@ -5,17 +5,17 @@
  `rotation` is in *tenths of a degree*, so `450` means 45°. `scale_x`/
  `scale_y` use 100 = original (so `160` is 1.6×). `pivot_x`/`pivot_y` move
  the rotation/scale anchor; defaults centre on the image. All three copies
- share the same registered `img_lvgl_logo` source — the transforms happen
+ share the same registered `img_example_lvgl_logo` source — the transforms happen
  at render time, no extra image variants needed.
 -->
 <screen>
 	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="16">
 		<!-- 💡 Edit `rotation`, the `scale_*` pair, or `pivot_*` to compare against the unmodified copy on the left. -->
 
-		<lv_image src="img_lvgl_logo" />
+		<lv_image src="img_example_lvgl_logo" />
 
-		<lv_image src="img_lvgl_logo" rotation="450" />
+		<lv_image src="img_example_lvgl_logo" rotation="450" />
 
-		<lv_image src="img_lvgl_logo" scale_x="160" scale_y="160" />
+		<lv_image src="img_example_lvgl_logo" scale_x="160" scale_y="160" />
 	</view>
 </screen>

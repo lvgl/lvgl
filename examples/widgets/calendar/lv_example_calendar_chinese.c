@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CALENDAR && LV_USE_CALENDAR_CHINESE && LV_BUILD_EXAMPLES
+#if LV_USE_CALENDAR && LV_USE_CALENDAR_CHINESE && LV_FONT_SOURCE_HAN_SANS_SC_14_CJK && LV_BUILD_EXAMPLES
 
 /**
  * @title Chinese calendar mode

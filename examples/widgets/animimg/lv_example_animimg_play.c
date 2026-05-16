@@ -21,7 +21,7 @@ static const lv_image_dsc_t * anim_imgs[3] = {
  * `LV_ANIM_REPEAT_INFINITE`, and `lv_animimg_start` kicks the
  * animation off.
  */
-void lv_example_animimg_1(void)
+void lv_example_animimg_play(void)
 {
     lv_obj_t * animimg0 = lv_animimg_create(lv_screen_active());
     lv_obj_center(animimg0);

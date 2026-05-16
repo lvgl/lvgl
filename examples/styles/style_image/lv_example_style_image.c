@@ -17,6 +17,8 @@
  */
 void lv_example_style_image_create(void)
 {
+    LV_IMAGE_DECLARE(img_example_lvgl_logo);
+
     static lv_style_t style_img;
 
     static bool inited = false;
@@ -47,7 +49,7 @@ void lv_example_style_image_create(void)
     lv_label_set_text(lv_label_0, "Style: image recolor and rotation");
 
     lv_obj_t * lv_image_0 = lv_image_create(screen);
-    lv_image_set_src(lv_image_0, &img_lvgl_logo);
+    lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
     lv_obj_add_style(lv_image_0, &style_img, 0);
 }
 

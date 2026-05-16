@@ -14,7 +14,7 @@
  * declared `img_star` image is drawn at offset (10,10) using
  * `lv_draw_image` on a canvas layer.
  */
-void lv_example_canvas_6(void)
+void lv_example_canvas_image(void)
 {
     /*Create a buffer for the canvas*/
     static uint8_t cbuf[LV_CANVAS_BUF_SIZE(CANVAS_WIDTH, CANVAS_HEIGHT, 32, LV_DRAW_BUF_STRIDE_ALIGN)];

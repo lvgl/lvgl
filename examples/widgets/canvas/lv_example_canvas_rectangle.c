@@ -14,7 +14,7 @@
  * `LV_OPA_50`, then painted into area {10,10,40,30} via `lv_draw_rect`
  * on a layer opened with `lv_canvas_init_layer`.
  */
-void lv_example_canvas_3(void)
+void lv_example_canvas_rectangle(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);

@@ -2,7 +2,7 @@
  @title Image inner align
  @brief When the widget is larger than the image, `inner_align` chooses where it sits.
 
- Each image widget here has a fixed 140x100 size while `img_lvgl_logo` is
+ Each image widget here has a fixed 140x100 size while `img_example_lvgl_logo` is
  smaller, so the source occupies a fraction of the widget. `inner_align`
  picks how the image is positioned inside the widget box — `top_left`,
  `center`, `bottom_right` for fixed placement; `contain`, `cover`, `stretch`,
@@ -12,16 +12,31 @@
 	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="16">
 		<!-- 💡 Switch `inner_align` to `contain`, `cover`, or `stretch` to compare placement vs scaling modes. -->
 
-		<lv_image src="img_lvgl_logo" width="140" height="100"
+		<lv_image
+			src="img_example_lvgl_logo"
+			width="80"
+			height="80"
 			inner_align="top_left"
-			style_bg_color="0xe5e7eb" style_bg_opa="100%" />
+			style_bg_color="0xe5e7eb"
+			style_bg_opa="100%"
+		/>
 
-		<lv_image src="img_lvgl_logo" width="140" height="100"
+		<lv_image
+			src="img_example_lvgl_logo"
+			width="80"
+			height="80"
 			inner_align="center"
-			style_bg_color="0xe5e7eb" style_bg_opa="100%" />
+			style_bg_color="0xe5e7eb"
+			style_bg_opa="100%"
+		/>
 
-		<lv_image src="img_lvgl_logo" width="140" height="100"
+		<lv_image
+			src="img_example_lvgl_logo"
+			width="80"
+			height="80"
 			inner_align="bottom_right"
-			style_bg_color="0xe5e7eb" style_bg_opa="100%" />
+			style_bg_color="0xe5e7eb"
+			style_bg_opa="100%"
+		/>
 	</view>
 </screen>

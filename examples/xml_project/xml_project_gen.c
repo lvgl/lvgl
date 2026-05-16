@@ -47,7 +47,7 @@
  * Images
  *----------------*/
 
-const void * img_lvgl_logo;
+const void * img_example_lvgl_logo;
 
 /*----------------
  * Global styles
@@ -85,8 +85,8 @@ void xml_project_init_gen(const char * asset_path)
     /*----------------
      * Images
      *----------------*/
-    lv_snprintf(buf, 256, "%s%s", asset_path, "images/img_lvgl_logo.png");
-    img_lvgl_logo = lv_strdup(buf);
+    lv_snprintf(buf, 256, "%s%s", asset_path, "images/img_example_lvgl_logo.png");
+    img_example_lvgl_logo = lv_strdup(buf);
 
     /*----------------
      * Global styles
@@ -139,7 +139,7 @@ void xml_project_init_gen(const char * asset_path)
      * While running in the editor skip this step to update the preview when the XML changes */
 #if LV_USE_XML && !defined(LV_EDITOR_PREVIEW)
     /* Register images */
-    lv_xml_register_image(NULL, "img_lvgl_logo", img_lvgl_logo);
+    lv_xml_register_image(NULL, "img_example_lvgl_logo", img_example_lvgl_logo);
 #endif
 
 #if LV_USE_XML == 0

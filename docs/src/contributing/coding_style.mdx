@@ -16,21 +16,21 @@ and [misc/lv_templ.h](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ
 - In enums and defines use only upper case letters
    (e.g. *MAX_LINE_NUM*)
 - Global names (API):
-  
+
    -  start with *lv*
    -  followed by module name: *button*, *label*, *style* etc.
    -  followed by the action (for functions): *set*, *get*, etc.
    -  closed with the subject: *name*, *size*, *state* etc.
 - Typedefs
-  
+
    -  prefer `typedef struct` and `typedef enum` instead of
       `struct name` and `enum name`
    -  always end `typedef struct` and `typedef enum type names with
       t`
 - Abbreviations:
-  
+
    -  The following abbreviations are used and allowed:
-  
+
       - `dsc` descriptor
       - `param` parameter
       - `indev` input device
@@ -41,22 +41,22 @@ and [misc/lv_templ.h](https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ
       - `alloc` allocate
       - `ctrl` control
       - `pos` position
-  
+
    -  Avoid adding new abbreviations
 
 ## Coding Guide
 
 - Editor:
-  
+
    -  Set editor to use 4 spaces for tab indentations (instead of tab characters).
    -  Exception:  the **Kconfig** file and any make files require leading tab characters
       on child items.
 - Functions:
-  
+
    -  Write functions that use the single-responsibility principle.
    -  Make functions `static` when not part of that object's public API (where possible).
 - Variables:
-  
+
    -  One line, one declaration (BAD: char x, y;).
    -  Use `<stdint.h>` (*uint8_t*, *int32_t* etc).
    -  Declare variables where needed (not all at function start).
@@ -108,7 +108,7 @@ typedef struct {
 - In comments use back-quotes (`...`) when referring to a code element, such as a variable, type,
    or struct name: ``/* Update value of `x_act` */``
 - When adding or modifying comments, priorities are (in order of importance):
-  
+
        1.  clarity (the ease with which other programmers can understand your intention),
        2.  readability (the ease with which other programmers can read your comments),
        3.  brevity (the quality of using few words when speaking or writing).
@@ -167,7 +167,7 @@ void lv_obj_set_flex_align(lv_obj_t * widget, lv_flex_align_t main_place, lv_fle
   to the address contained by a pointer parameter, if not already obvious (e.g. when
   the parameter name contains the word "out"), include the direction in the command
   for clarity:
-  
+
       `@param[out]  param_name     description`.
 - Describe return values with the `@return` command.
 - Add at least 2 spaces after Doxygen commands for improved readability.
@@ -220,8 +220,7 @@ void lv_obj_set_flex_align(lv_obj_t * widget, lv_flex_align_t main_place, lv_fle
 - `@see  text`
    generates a "See also" paragraph in a highlighted section, helpful when additional
    information about a topic can be found elsewhere.
-
-## API Conventions
+ Conventions
 
 To support the auto-generation of bindings, the LVGL C API must
 follow some coding conventions:
@@ -241,7 +240,7 @@ follow some coding conventions:
 - Do not `malloc` into a static or global variables. Instead declare the variable in `lv_global_t`
   structure in `lv_global.h` and mark the variable with <ApiLink name="(LV_GLOBAL_DEFAULT()->variable)" /> when it's used.
 - To register and use callbacks one of the following needs to be followed.
-  
+
    - Pass a pointer to a `struct` as the first argument of both the registration function and the callback. That
      `struct` must contain `void * user_data` field.
    - The last argument of the registration function must be `void * user_data` and the same `user_data`
