@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 void lv_example_bar_bind_value_create(void);
+void lv_example_bar_img_indicator_create(void);
 void lv_example_bar_modes_create(void);
 void lv_example_bar_orientation_create(void);
 void lv_example_bar_styling_create(void);

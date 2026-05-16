@@ -12,6 +12,7 @@ extern "C" {
 
 void lv_example_arc_bind_value_create(void);
 void lv_example_arc_change_rate_create(void);
+void lv_example_arc_img_indicator_create(void);
 void lv_example_arc_mode_create(void);
 void lv_example_arc_mode_original_create(void);
 void lv_example_arc_pie_chart_create(void);

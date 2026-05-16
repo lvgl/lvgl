@@ -72,6 +72,19 @@ e.g. `selector="pressed|knob"` to highlight the knob only while it is
 being dragged. Local `style_*` props on the `<lv_slider>` tag target
 MAIN.
 
+### Image indicator
+
+<LvglXMLExample name="lv_example_slider_img_indicator" path="widgets/slider/slider_img_indicator/lv_example_slider_img_indicator" />
+
+Setting `bg_image_src` on a part adds a bitmap on top of the solid fill,
+clipped to the part's current bounds. The track
+image shows the full width at all times; the indicator image is revealed
+left-to-right as the knob moves. Assign different bitmaps to
+<ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_PART_INDICATOR" /> to texture
+both independently.
+
+- <ApiLink name="lv_obj_set_style_bg_image_src" display="lv_obj_set_style_bg_image_src(slider, src, selector)" />
+
 ## Knob-only mode
 
 Normally, the Slider can be adjusted either by dragging the knob, or by

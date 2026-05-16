@@ -43,11 +43,23 @@
  * Fonts
  *----------------*/
 
+lv_font_t * font_large;
+extern lv_font_t font_large_data;
+
 /*----------------
  * Images
  *----------------*/
 
 const void * img_example_lvgl_logo;
+extern const void * img_example_lvgl_logo_data;
+const void * img_arc_bg;
+extern const void * img_arc_bg_data;
+const void * img_arc_indicator;
+extern const void * img_arc_indicator_data;
+const void * img_bar_bg;
+extern const void * img_bar_bg_data;
+const void * img_bar_indicator;
+extern const void * img_bar_indicator_data;
 
 /*----------------
  * Global styles
@@ -81,12 +93,18 @@ void xml_project_init_gen(const char * asset_path)
      * Fonts
      *----------------*/
 
+    /* get font 'font_large' from a C array */
+    font_large = &font_large_data;
+
 
     /*----------------
      * Images
      *----------------*/
-    lv_snprintf(buf, 256, "%s%s", asset_path, "images/img_example_lvgl_logo.png");
-    img_example_lvgl_logo = lv_strdup(buf);
+    img_example_lvgl_logo = &img_example_lvgl_logo_data;
+    img_arc_bg = &img_arc_bg_data;
+    img_arc_indicator = &img_arc_indicator_data;
+    img_bar_bg = &img_bar_bg_data;
+    img_bar_indicator = &img_bar_indicator_data;
 
     /*----------------
      * Global styles
@@ -123,6 +141,7 @@ void xml_project_init_gen(const char * asset_path)
     /* Register widgets */
 
     /* Register fonts */
+    lv_xml_register_font(NULL, "font_large", font_large);
 
     /* Register subjects */
     lv_xml_register_subject(NULL, "subject_value", &subject_value);
@@ -140,6 +159,10 @@ void xml_project_init_gen(const char * asset_path)
 #if LV_USE_XML && !defined(LV_EDITOR_PREVIEW)
     /* Register images */
     lv_xml_register_image(NULL, "img_example_lvgl_logo", img_example_lvgl_logo);
+    lv_xml_register_image(NULL, "img_arc_bg", img_arc_bg);
+    lv_xml_register_image(NULL, "img_arc_indicator", img_arc_indicator);
+    lv_xml_register_image(NULL, "img_bar_bg", img_bar_bg);
+    lv_xml_register_image(NULL, "img_bar_indicator", img_bar_indicator);
 #endif
 
 #if LV_USE_XML == 0

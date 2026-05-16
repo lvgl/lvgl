@@ -757,6 +757,87 @@ def declare_and_ref_images(source: str, path: Path) -> str:
 
 
 # =============================================================================
+# Image declarations from globals.xml
+# =============================================================================
+#
+# `declare_and_ref_images` above only covers images that appear as the direct
+# argument to `lv_image_set_src`. Images registered in `globals.xml` can also
+# be referenced through style setters such as `lv_style_set_arc_image_src` or
+# `lv_style_set_bg_image_src`. This companion transformation reads the image
+# registry from globals.xml and inserts `LV_IMAGE_DECLARE(name)` for every
+# registered image whose name appears anywhere in the source as a bare C
+# identifier — regardless of which API it was passed to.
+
+
+def _load_globals_images() -> dict[str, dict]:
+    """Return a mapping `name -> {src_path}` from the `<images>` section of `globals.xml`.
+
+    Cached on first call. Keeps declaration order (Python 3.7+ dicts) for
+    stable output across runs.
+    """
+    cache = getattr(_load_globals_images, "_cache", None)
+    if cache is not None:
+        return cache
+
+    images: dict[str, dict] = {}
+    if GLOBALS_XML_PATH.exists():
+        tree = ET.parse(GLOBALS_XML_PATH)
+        images_elem = tree.getroot().find("images")
+        if images_elem is not None:
+            for child in images_elem:
+                if not isinstance(child.tag, str):
+                    continue
+                name = child.get("name")
+                if not name:
+                    continue
+                images[name] = {
+                    "src_path": child.get("src_path", ""),
+                }
+
+    _load_globals_images._cache = images  # type: ignore[attr-defined]
+    return images
+
+
+def _used_global_images(source: str) -> list[str]:
+    """Return image names from globals.xml referenced as identifiers in `source`.
+
+    Keeps globals.xml declaration order for stable output.
+    """
+    meta = _load_globals_images()
+    return [n for n in meta if re.search(rf"\b{re.escape(n)}\b", source)]
+
+
+def declare_global_images(source: str, path: Path) -> str:
+    """Insert `LV_IMAGE_DECLARE(name)` for every globals.xml image the example references.
+
+    Idempotent: images that already have a declare line are skipped.
+    """
+    meta = _load_globals_images()
+    if not meta:
+        return source
+
+    used = _used_global_images(source)
+    if not used:
+        return source
+
+    fn_match = FUNCTION_OPEN_BRACE_RE.search(source)
+    if not fn_match:
+        return source
+
+    insert_pos = fn_match.end()
+    decls: list[str] = []
+    for img in used:
+        if not re.search(rf"LV_IMAGE_DECLARE\s*\(\s*{re.escape(img)}\s*\)", source):
+            decls.append(f"    LV_IMAGE_DECLARE({img});")
+
+    if not decls:
+        return source
+
+    block = "\n".join(decls) + "\n\n"
+    return source[:insert_pos] + block + source[insert_pos:]
+
+
+# =============================================================================
 # Rename `style_inited` → `inited`
 # =============================================================================
 #
@@ -821,7 +902,9 @@ TRANSFORMATIONS = [
     # Subject decls/inits — must run before the empty-block removal so the
     # block isn't yet "empty" when we want to fill it.
     init_subjects,
-    # Image declarations + `&` prefix.
+    # Image declarations from globals.xml (covers style setters and any other use).
+    declare_global_images,
+    # Image declarations + `&` prefix for lv_image_set_src calls.
     declare_and_ref_images,
     # Generator boilerplate.
     lambda s, p: remove_empty_style_inited(s),

@@ -1,9 +1,8 @@
-#include "../../lv_examples.h"
+#include "../../../lvgl.h"
 #if LV_USE_LINE && LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * @title Line stroke
- * @brief Style a polyline's color, thickness, and rounded end caps.
  *
  * `line_color` and `line_width` set the stroke and `line_rounded` rounds
  * the end caps and vertices so the bends look smooth instead of mitred.
@@ -23,6 +22,7 @@ void lv_example_style_line(void)
     lv_obj_set_style_flex_cross_place(scr, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(scr, 16, 0);
 
+    /* 💡 Raise `line_width` or toggle `line_rounded`; the stroke thickens and the bends round off instead of mitring. */
     lv_obj_t * title = lv_label_create(scr);
     lv_obj_set_width(title, lv_pct(100));
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);

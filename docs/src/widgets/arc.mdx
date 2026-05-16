@@ -85,6 +85,19 @@ via `selector="main"`, `selector="indicator"`, or `selector="knob"`,
 or apply one-off tweaks with local `style_*` attributes on the
 `<lv_arc>` tag.
 
+### Image indicator
+
+<LvglXMLExample name="lv_example_arc_img_indicator" path="widgets/arc/arc_img_indicator/lv_example_arc_img_indicator" />
+
+Setting `arc_image_src` on a part replaces the solid `arc_color` with pixels
+sampled from a bitmap. The image is centred on the arc's centre point and the
+arc shape is used as a mask, so any graphic painted in the ring zone of the
+image appears clipped to the arc band. Assign different bitmaps to
+<ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_PART_INDICATOR" /> to
+texture both the background ring and the active sweep independently.
+
+- <ApiLink name="lv_obj_set_style_arc_image_src" display="lv_obj_set_style_arc_image_src(arc, src, selector)" />
+
 ## Knob offset
 
 Changing the knob offset allows the location of the knob to be moved

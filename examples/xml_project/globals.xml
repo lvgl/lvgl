@@ -29,10 +29,17 @@
              against that symbol and the example doesn't depend on the
              editor's image-conversion pipeline. `src_path` is only the
              editor's preview/source. -->
-        <file name="img_example_lvgl_logo" src_path="images/img_example_lvgl_logo.png" />
+        <data name="img_example_lvgl_logo"   src_path="images/img_example_lvgl_logo.png" color_format="argb8888"/>
+
+        <data name="img_arc_bg"              src_path="images/img_arc_bg.png" color_format="argb8888"/>
+        <data name="img_arc_indicator"       src_path="images/img_arc_indicator.png" color_format="argb8888"/>
+        <!-- Bar image-source images (280×30, matching 280×30 bar widget) -->
+        <data name="img_bar_bg"              src_path="images/img_bar_bg.png" color_format="argb8888"/>
+        <data name="img_bar_indicator"       src_path="images/img_bar_indicator.png" color_format="argb8888"/>
     </images>
 
     <fonts>
         <!-- Add <bin> , <tiny_ttf>, <freetype> tags here -->
+        <bin name="font_large" src_path="fonts/Montserrat-Medium.ttf" size="32" bpp="4" as_file="false" />
     </fonts>
 </globals>

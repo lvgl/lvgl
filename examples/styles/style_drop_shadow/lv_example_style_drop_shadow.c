@@ -1,9 +1,8 @@
-#include "../../lv_examples.h"
+#include "../../../lvgl.h"
 #if LV_USE_ARC && LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * @title Drop shadow
- * @brief Blur an A8 snapshot of the arc's indicator into a colored shadow.
  *
  * Unlike `shadow_*` (always a rectangle), `drop_shadow_*` blurs the actual
  * shape of the part. Added to `LV_PART_INDICATOR`, the active arc gets a
@@ -25,6 +24,7 @@ void lv_example_style_drop_shadow(void)
     lv_obj_set_style_flex_cross_place(scr, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(scr, 16, 0);
 
+    /* 💡 The shadow follows the arc's curve, not a box; change `drop_shadow_offset_x`/`drop_shadow_offset_y` to slide it. */
     lv_obj_t * title = lv_label_create(scr);
     lv_obj_set_width(title, lv_pct(100));
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);

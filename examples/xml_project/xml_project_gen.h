@@ -55,11 +55,17 @@ extern "C" {
  * Fonts
  *----------------*/
 
+extern lv_font_t * font_large;
+
 /*----------------
  * Images
  *----------------*/
 
 extern const void * img_example_lvgl_logo;
+extern const void * img_arc_bg;
+extern const void * img_arc_indicator;
+extern const void * img_bar_bg;
+extern const void * img_bar_indicator;
 
 /*----------------
  * Subjects
@@ -95,7 +101,7 @@ void xml_project_init_gen(const char * asset_path);
  **********************/
 
 /*Include all the widgets, components and screens of this library*/
-#include "screens/lv_example_textarea_placeholder_gen.h"
+#include "screens/lv_example_slider_img_indicator_gen.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

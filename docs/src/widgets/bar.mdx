@@ -61,6 +61,19 @@ portion). Both accept the full background style stack: `bg_color`,
 local `style_*` props on the `<lv_bar>` tag for one-off tweaks. Padding
 on MAIN shrinks the indicator inside the track.
 
+### Image indicator
+
+<LvglXMLExample name="lv_example_bar_img_indicator" path="widgets/bar/bar_img_indicator/lv_example_bar_img_indicator" />
+
+Setting `bg_image_src` on a part replaces the solid fill with pixels
+sampled from a bitmap. The image is drawn from the left edge of the part
+and clipped to its current width, so as the bar value rises the indicator
+image is progressively revealed left-to-right. Assign different bitmaps
+to <ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_PART_INDICATOR" /> to texture
+both the track and the active fill independently.
+
+- <ApiLink name="lv_obj_set_style_bg_image_src" display="lv_obj_set_style_bg_image_src(bar, src, selector)" />
+
 ## Data binding
 
 Data bindings connect a widget property to a piece of global data — a
