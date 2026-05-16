@@ -368,10 +368,13 @@ static void window_create(lv_display_t * disp)
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     dsc->zoom = 1.0;
 
-    int flag = SDL_WINDOW_RESIZABLE | SDL_WINDOW_TRANSPARENT;
-#if LV_SDL_FULLSCREEN
-    flag |= SDL_WINDOW_FULLSCREEN;
-#endif
+    int flag = SDL_WINDOW_RESIZABLE;
+    #if SDL_VERSION_ATLEAST(2, 0, 22)
+        flag |= SDL_WINDOW_TRANSPARENT;
+    #endif
+    #if LV_SDL_FULLSCREEN
+        flag |= SDL_WINDOW_FULLSCREEN;
+    #endif
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
