@@ -368,7 +368,7 @@ static void window_create(lv_display_t * disp)
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     dsc->zoom = 1.0;
 
-    int flag = SDL_WINDOW_RESIZABLE;
+    int flag = SDL_WINDOW_RESIZABLE | SDL_WINDOW_TRANSPARENT;
 #if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
@@ -411,7 +411,8 @@ static void window_update(lv_display_t * disp)
     }
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, cf);
     SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
-
+    
+    SDL_SetRenderDrawColor(dsc->renderer, 0, 0, 0, 0);
     SDL_RenderClear(dsc->renderer);
 
     /*Update the renderer with the texture containing the rendered image*/
