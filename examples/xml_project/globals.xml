@@ -24,10 +24,12 @@
     </subjects>
 
     <images>
-        <!-- Use a pre-built image bundled with the legacy examples so the
-             image example doesn't depend on the editor's image-conversion
-             pipeline. -->
-        <file name="img_cogwheel" src_path="../assets/img_cogwheel_argb.png" />
+        <!-- The name matches the pre-built `img_lvgl_logo` descriptor in
+             `demos/widgets/assets/img_lvgl_logo.c`, so the generated C links
+             against that symbol and the example doesn't depend on the
+             editor's image-conversion pipeline. `src_path` is only the
+             editor's preview/source. -->
+        <file name="img_lvgl_logo" src_path="images/img_lvgl_logo.png" />
     </images>
 
     <fonts>

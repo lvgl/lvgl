@@ -13,6 +13,7 @@ extern "C" {
 void lv_example_switch_orientation_create(void);
 void lv_example_switch_state_create(void);
 void lv_example_switch_styling_create(void);
+void lv_example_switch_event(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

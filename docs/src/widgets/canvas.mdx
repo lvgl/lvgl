@@ -9,14 +9,12 @@ A Canvas inherits from [Image](/widgets/image) and extends it, enabling the user
 anything. Rectangles, text, images, lines, arcs, etc. can be drawn here using
 LVGL's extensive drawing engine.
 
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> Uses the [typical background](/common-widget-features/styles/overview)
    and image style properties.
 
-## Usage
-
-### Buffer
+## Buffer
 
 The Canvas needs a buffer in which to store the drawn image. To assign a
 buffer to a Canvas, use
@@ -37,7 +35,7 @@ Canvas supports all the color formats like
 <ApiLink name="LV_COLOR_FORMAT_ARGB8888" /> or <ApiLink name="LV_COLOR_FORMAT_I2" />. See the full
 list in the [Color formats](/main-modules/images/color_formats) section.
 
-### Indexed colors
+## Indexed colors
 
 For indexed color formats (`LV_COLOR_FORMAT_I1/2/4/8`), the palette needs to be
 populated for all palette indices that will be used using
@@ -48,7 +46,7 @@ sets pixels with *index==3* to red.
 lv_canvas_set_palette(canvas, 3, lv_color_hex(0xff0000))
 ```
 
-### Drawing
+## Drawing
 
 To set an individual pixel's color on the Canvas, use
 <ApiLink name="lv_canvas_set_px" display="lv_canvas_set_px(canvas, x, y, color, opa)" />.  With indexed color formats

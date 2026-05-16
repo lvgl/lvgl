@@ -9,7 +9,7 @@ The Menu Widget can be used to create multi-level menus that automatically handl
 navigation among menu levels, and enable its user to capture page navigation and
 click events.
 
-## Parts and Styles
+## Styling
 
 The Menu Widget is built from the following Widgets:
 
@@ -24,9 +24,7 @@ The Menu Widget is built from the following Widgets:
 - Back button icon: [Image (lv_image)](/widgets/image)
 - Sidebar Page: <ApiLink name="lv_menu_page" />
 
-## Usage
-
-### Create a Menu
+## Create a Menu
 
 <ApiLink name="lv_menu_create" display="lv_menu_create(parent)" /> creates a new empty Menu.
 
@@ -47,7 +45,7 @@ This creates a Menu Widget with this object hierarchy:
 
 Note that no sidebar is created. You can create one later if you wish.
 
-### Header mode
+## Header mode
 
 The following header modes exist:
 
@@ -57,7 +55,7 @@ The following header modes exist:
 
 You can set header modes with <ApiLink name="lv_menu_set_mode_header" display="lv_menu_set_mode_header(menu, LV_MENU_HEADER...)" />.
 
-### Root back button mode
+## Root back button mode
 
 The following root back button modes exist:
 
@@ -67,29 +65,29 @@ The following root back button modes exist:
 You can set root back button modes with
 <ApiLink name="lv_menu_set_mode_root_back_button" display="lv_menu_set_mode_root_back_button(menu, LV_MENU_ROOT_BACK_BTN...)" />.
 
-### Create a Menu Page
+## Create a Menu Page
 
 <ApiLink name="lv_menu_page_create" display="lv_menu_page_create(menu, title)" /> creates a new empty Menu Page. You
 can add any Widgets to the Page.
 
-### Set a Menu Page in the main area
+## Set a Menu Page in the main area
 
 Once a Menu Page has been created, you can set it to the main area with
 <ApiLink name="lv_menu_set_page" display="lv_menu_set_page(menu, page)" />. `NULL` to clear main and clear Menu
 history.
 
-### Set a Menu Page in the sidebar
+## Set a Menu Page in the sidebar
 
 Once a Menu Page has been created, you can set it to the sidebar with
 <ApiLink name="lv_menu_set_sidebar_page" display="lv_menu_set_sidebar_page(menu, page)" />. `NULL` to clear sidebar.
 
-### Linking between Menu Pages
+## Linking between Menu Pages
 
 If you have, for instance, created a button obj in the main Page. When you
 click the button Widget, you want it to open up a new Page, use
 <ApiLink name="lv_menu_set_load_page_event" display="lv_menu_set_load_page_event(menu, btn, new page)" />.
 
-### Create a Menu container, section, separator
+## Create a Menu container, section, separator
 
 The following objects can be created so that it is easier to style the
 Menu:

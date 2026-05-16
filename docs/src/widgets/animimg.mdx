@@ -11,15 +11,13 @@ multiple source images that supply "frames" in an animation.
 
 You can specify a duration and repeat count.
 
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> A background rectangle that uses the [typical
    background style properties](/common-widget-features/styles/overview) and the image itself using the image
    style properties.
 
-## Usage
-
-### Image sources
+## Image sources
 
 To set the image animation image sources, use
 <ApiLink name="lv_animimg_set_src" display="lv_animimg_set_src(animimg, dsc[], num)" />.
@@ -27,7 +25,7 @@ To set the image animation image sources, use
 To set the images source for flip playback of animation image, use
 <ApiLink name="lv_animimg_set_src_reverse" display="lv_animimg_set_src_reverse(animimg, dsc[], num)" />.
 
-### Using the inner animation
+## Using the inner animation
 
 For more advanced use cases, the animation used internally by the image can be
 retrieved using <ApiLink name="lv_animimg_get_anim" display="lv_animimg_get_anim(animimg)" />.  Using this, you can

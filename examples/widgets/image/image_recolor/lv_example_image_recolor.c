@@ -18,8 +18,6 @@
  */
 void lv_example_image_recolor_create(void)
 {
-    LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
-
     static lv_subject_t subject_opa;
 
     static bool inited = false;
@@ -36,14 +34,14 @@ void lv_example_image_recolor_create(void)
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
-    /* 💡 Drag the slider; the cogwheel's tint fades in and out as `subject_opa` (0..255) moves. */
+    /* 💡 Drag the slider; the logo's tint fades in and out as `subject_opa` (0..255) moves. */
     lv_obj_t * lv_label_0 = lv_label_create(screen);
     lv_obj_set_width(lv_label_0, lv_pct(100));
     lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(lv_label_0, "Image: recolor");
 
     lv_obj_t * lv_image_0 = lv_image_create(screen);
-    lv_image_set_src(lv_image_0, &img_render_lvgl_logo_argb8888);
+    lv_image_set_src(lv_image_0, &img_lvgl_logo);
     lv_obj_set_style_image_recolor(lv_image_0, lv_color_hex(0xef4444), LV_PART_MAIN);
     lv_obj_bind_style_prop(lv_image_0, LV_STYLE_IMAGE_RECOLOR_OPA, LV_PART_MAIN, &subject_opa);
 

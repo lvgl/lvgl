@@ -1,0 +1,35 @@
+<!--
+ @title Image recolor and rotation
+ @brief Tint and rotate an image purely through style properties.
+
+ `image_recolor` with `image_recolor_opa="50%"` mixes a blue tint into the
+ bitmap without touching the source, and `transform_rotation="300"` turns
+ the widget 30° (the unit is 0.1°). The `radius`, `bg_color`, and `border_*`
+ on the same style transform together with the image.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x2196f3" />
+	</consts>
+	<styles>
+		<!-- Framed card that tints and rotates whatever image it wraps -->
+		<style name="style_img"
+			radius="5"
+			bg_opa="100%"
+			bg_color="0xf5f5f5"
+			border_width="2"
+			border_color="#accent"
+			image_recolor="#accent"
+			image_recolor_opa="50%"
+			transform_rotation="300" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 The bitmap is tinted and rotated by style alone; lower `image_recolor_opa` to fade the tint or change `transform_rotation`. -->
+		<lv_label width="100%" style_text_align="center" text="Style: image recolor and rotation" />
+
+		<lv_image src="img_lvgl_logo">
+			<style name="style_img" />
+		</lv_image>
+	</view>
+</screen>

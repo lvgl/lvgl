@@ -15,13 +15,11 @@ or you can create your own animations using, for example, Adobe After Effects.
 The Lottie Widget is based on [Canvas (lv_canvas)](/widgets/canvas) because in order to render the animation
 the user needs to provide a buffer where the current animation frame is stored.
 
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> The background of the Lottie animation. The typical background style properties apply but usually it is left transparent.
 
-## Usage
-
-### Dependencies
+## Dependencies
 
 The Lottie Widget uses the [ThorVG](https://github.com/thorvg/thorvg) library which is [integrated into LVGL](https://github.com/lvgl/lvgl/tree/master/src/libs/thorvg).
 In order to use Lottie animations <ApiLink name="LV_USE_THORVG_INTERNAL" /> (to use the built-in ThorVG) or
@@ -31,7 +29,7 @@ In order to use Lottie animations <ApiLink name="LV_USE_THORVG_INTERNAL" /> (to 
 As ThorVG is written in C++, when using <ApiLink name="LV_USE_THORVG_INTERNAL" /> be sure that you
 can compile the cpp files.
 
-### Set a buffer
+## Set a buffer
 
 In order to render the animation a buffer needs to be assigned to the Lottie Widget.
 The animations are rendered in ARGB8888 format, therefore the buffer's size should be equal to
@@ -45,7 +43,7 @@ or <ApiLink name="lv_lottie_set_draw_buf" display="lv_lottie_set_draw_buf(lottie
 
 When a draw buffer is used, it must be already initialized by the user with <ApiLink name="LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED" /> color format.
 
-### Set a source
+## Set a source
 
 `lv_example_lottie_approve.c` contains an example animation. Instead of storing the JSON string, a hex array is stored for the
 following reasons:
@@ -68,7 +66,7 @@ To create an animation from data use
 Lottie animations can be opened from JSON files by using <ApiLink name="lv_lottie_set_src_file" display="lv_lottie_set_src_file(lottie, &quot;path/to/file.json&quot;)" />.
 Note that the Lottie loader doesn't support LVGL's File System interface but a "normal path" should be used without a driver letter.
 
-### Get the animation
+## Get the animation
 
 ```c
 lv_anim_t * a = lv_lottie_get_anim(lottie)

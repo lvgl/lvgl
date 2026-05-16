@@ -19,18 +19,16 @@ side of the Tab View.
 A new tab can be selected either by clicking on a tab button or by
 sliding horizontally on the content.
 
-## Parts and Styles
+## Styling
 
 There are no special parts on the Tab View but the [base widget](/widgets/base_widget) and
 [Button (lv_button)](/widgets/button) Widgets are used to create the Tab View.
 
-## Usage
-
-### Creating a Tab View
+## Creating a Tab View
 
 <ApiLink name="lv_tabview_create" display="lv_tabview_create(parent)" /> creates a new empty Tab View.
 
-### Adding tabs
+## Adding tabs
 
 New tabs can be added with <ApiLink name="lv_tabview_add_tab" display="lv_tabview_add_tab(tabview, &quot;Tab name&quot;)" />.
 This will return a pointer to a [base widget](/widgets/base_widget) where
@@ -38,12 +36,12 @@ the tab's content can be created.
 
 <LvglXMLExample name="lv_example_tabview_basic" path="widgets/tabview/tabview_basic/lv_example_tabview_basic" />
 
-### Renaming tabs
+## Renaming tabs
 
 A tab can be renamed with
 <ApiLink name="lv_tabview_set_tab_text" display="lv_tabview_set_tab_text(tabview, tab_id, &quot;New Name&quot;)" />.
 
-### Navigating to a new tab
+## Navigating to a new tab
 
 To select a new tab you can:
 
@@ -59,20 +57,20 @@ After that, tabs can only be switched by tapping a tab button or by calling
 
 <LvglXMLExample name="lv_example_tabview_active_tab" path="widgets/tabview/tabview_active_tab/lv_example_tabview_active_tab" />
 
-### Setting tab bar position
+## Setting tab bar position
 
 Using the <ApiLink name="lv_tabview_set_tab_bar_position" display="lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT/RIGHT/TOP/BOTTOM)" />
 the tab bar can be moved to any side.
 
 <LvglXMLExample name="lv_example_tabview_tab_bar_position" path="widgets/tabview/tabview_tab_bar_position/lv_example_tabview_tab_bar_position" />
 
-### Setting tab bar size
+## Setting tab bar size
 
 The size of the tab bar can be adjusted by <ApiLink name="lv_tabview_set_tab_bar_size" display="lv_tabview_set_tab_bar_size(tabview, size)" />.
 When tabs are on the top or bottom, this means the height of the tab bar, and when
 they are on the sides, it means the width.
 
-### Tab bar style
+## Tab bar style
 
 The tab view exposes three independent style targets: the tab view body, the
 tab bar container, and individual tab buttons. Each can be styled separately
@@ -80,7 +78,7 @@ to customize background, padding, indicator colors, and per-tab accents.
 
 <LvglXMLExample name="lv_example_tabview_tab_bar_style" path="widgets/tabview/tabview_tab_bar_style/lv_example_tabview_tab_bar_style" />
 
-### Accessing the parts
+## Accessing the parts
 
 - <ApiLink name="lv_tabview_get_content" display="lv_tabview_get_content(tabview)" /> returns a pointer to the container for
   tabs content (a [base widget](/widgets/base_widget))
@@ -91,7 +89,7 @@ to customize background, padding, indicator colors, and per-tab accents.
 - <ApiLink name="lv_tabview_get_tab_count" display="lv_tabview_get_tab_count(tabview)" /> returns how many tabs the tab view
   currently has
 
-### Tab button content
+## Tab button content
 
 Tab buttons are regular widgets, so additional children — such as a switch,
 icon, or status indicator — can be parented to a tab button to enrich its

@@ -11,7 +11,7 @@ text becomes long enough, the Text Area can be scrolled.
 
 One-line mode and password modes are supported.
 
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> The background of the Text Area; uses the
    [typical background style properties](/common-widget-features/styles/overview) and the text related
@@ -32,9 +32,7 @@ One-line mode and password modes are supported.
 - <ApiLink name="LV_PART_TEXTAREA_PLACEHOLDER" /> Unique to Text Area; allows styling
    the [placeholder text](/widgets/textarea).
 
-## Usage
-
-### Adding text
+## Adding text
 
 You can insert text or characters to the current cursor's position with:
 
@@ -47,7 +45,7 @@ To add wide characters like `'á'`, `'ß'` or CJK characters, use
 <ApiLink name="lv_textarea_set_text" display="lv_textarea_set_text(textarea, &quot;New text&quot;)" /> replaces all existing text
 with "New text".
 
-### Placeholder text
+## Placeholder text
 
 Placeholder text is text that is displayed when the Text Area is empty.  This can be
 a handy way to provide the end user with a hint about what to type there.
@@ -55,14 +53,14 @@ a handy way to provide the end user with a hint about what to type there.
 Specify placeholder text using
 <ApiLink name="lv_textarea_set_placeholder_text" display="lv_textarea_set_placeholder_text(textarea, &quot;Placeholder text&quot;)" />.
 
-### Delete character
+## Delete character
 
 To delete the character to the left of the current cursor position, use
 <ApiLink name="lv_textarea_delete_char" display="lv_textarea_delete_char(textarea)" />.
 
 To delete to the right, use <ApiLink name="lv_textarea_delete_char_forward" display="lv_textarea_delete_char_forward(textarea)" />
 
-### Moving the cursor
+## Moving the cursor
 
 The cursor position can be modified programmatically using
 <ApiLink name="lv_textarea_set_cursor_pos" display="lv_textarea_set_cursor_pos(textarea, cursor_pos)" /> where `cursor_pos` is
@@ -80,13 +78,13 @@ You can move the cursor one character-position (or line) at a time with
 If <ApiLink name="lv_textarea_set_cursor_click_pos" display="lv_textarea_set_cursor_click_pos(textarea, true)" /> is applied, the
 cursor will jump to the position where the Text Area was clicked.
 
-### Hiding the cursor
+## Hiding the cursor
 
 The cursor is normally always visible. It can be a good idea to style it
 to be visible only in <ApiLink name="LV_STATE_FOCUSED" /> state. See [Styles](/common-widget-features/styles)
 for more information about how to do this.
 
-### One-line mode
+## One-line mode
 
 The Text Area can be configured to keep all text on a single line with
 <ApiLink name="lv_textarea_set_one_line" display="lv_textarea_set_one_line(textarea, true)" />. In this mode:
@@ -95,7 +93,7 @@ The Text Area can be configured to keep all text on a single line with
 - line break characters are ignored, and
 - word wrap is disabled.
 
-### Password mode
+## Password mode
 
 The Text Area supports password mode which can be enabled with
 <ApiLink name="lv_textarea_set_password_mode" display="lv_textarea_set_password_mode(textarea, true)" />.
@@ -117,7 +115,7 @@ text entered, not the bullet characters.
 
 The visibility time can be adjusted with <ApiLink name="LV_TEXTAREA_DEF_PWD_SHOW_TIME" /> in `lv_conf.h`.
 
-### Accepted characters
+## Accepted characters
 
 You can set a list of accepted characters with
 <ApiLink name="lv_textarea_set_accepted_chars" display="lv_textarea_set_accepted_chars(textarea, list)" /> or
@@ -129,12 +127,12 @@ entered not in this list will be ignored.
 lv_textarea_set_accepted_chars(textarea, "0123456789.+-");
 ```
 
-### Max text length
+## Max text length
 
 The maximum number of characters can be limited using
 <ApiLink name="lv_textarea_set_max_length" display="lv_textarea_set_max_length(textarea, max_char_num)" />.
 
-### Very long text
+## Very long text
 
 If the text in the Text Area is very long (e.g. > 20k characters), scrolling and
 drawing might be slow.  However, by setting <ApiLink name="LV_LABEL_LONG_TXT_HINT" /> in
@@ -146,7 +144,7 @@ is as fast as with "normal" short text.  The cost is 12 extra bytes per label in
 This value is set to `1` by default.  If you do not use long text, you can save
 12 bytes per label by setting it to `0`.
 
-### Selecting text
+## Selecting text
 
 If <ApiLink name="LV_LABEL_TEXT_SELECTION" /> is set to a non-zero value in `lv_conf.h`,
 some additional functionality (and 8 bytes per label) are added to Label Widgets

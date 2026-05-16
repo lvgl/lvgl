@@ -11,10 +11,10 @@
 	<styles>
 		<!-- Background ring: thick, light, semi-transparent -->
 		<style name="style_arc_bg"
-			arc_color="0xe2e8f0" arc_width="14" arc_rounded="true" arc_opa="180" />
+			arc_color="0xced8e4" arc_width="22" arc_rounded="true" arc_opa="180" />
 		<!-- Indicator ring: same thickness, accent color, rounded ends -->
 		<style name="style_arc_indicator"
-			arc_color="0x6366f1" arc_width="14" arc_rounded="true" />
+			arc_color="0x6366f1" arc_width="14" arc_rounded="true"  pad_all="4" />
 		<!-- Knob: filled circle with halo -->
 		<style name="style_arc_knob"
 			bg_opa="100%" bg_color="0x6366f1"

@@ -8,14 +8,12 @@ description: The Line Widget is capable of drawing straight lines between a set 
 The Line Widget is capable of drawing straight lines between a set of
 points.
 
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> uses the [typical background](/common-widget-features/styles/overview)
    and line style properties.
 
-## Usage
-
-### Set points
+## Set points
 
 A Line's points have to be stored in an <ApiLink name="lv_point_precise_t" /> array and passed to
 the Widget by the <ApiLink name="lv_line_set_points" display="lv_line_set_points(lines, point_array, point_cnt)" />
@@ -27,13 +25,13 @@ Their coordinates can either be specified as raw pixel coordinates
 be set explicitly using <ApiLink name="lv_obj_set_width" /> and <ApiLink name="lv_obj_set_height" />,
 as percentage values do not automatically expand the bounding box.
 
-### Auto-size
+## Auto-size
 
 By default, the Line's width and height are set to <ApiLink name="LV_SIZE_CONTENT" />.
 This means it will automatically set its size to fit all the points. If
 the size is set explicitly, parts on the Line may not be visible.
 
-### Invert y
+## Invert y
 
 By default, the *y == 0* point is at the top of the Widget. It might be
 counterintuitive in some cases, so the y coordinates can be inverted

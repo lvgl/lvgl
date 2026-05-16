@@ -13,6 +13,7 @@ extern "C" {
 void lv_example_table_cells_create(void);
 void lv_example_table_merge_cells_create(void);
 void lv_example_table_rows_columns_create(void);
+void lv_example_table_scroll_create(void);
 void lv_example_table_styling_create(void);
 void lv_example_table_width_create(void);
 void lv_example_table_scrollable_list(void);

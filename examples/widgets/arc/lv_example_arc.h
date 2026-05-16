@@ -19,6 +19,8 @@ void lv_example_arc_rotation_create(void);
 void lv_example_arc_set_angles_create(void);
 void lv_example_arc_styling_create(void);
 void lv_example_arc_value_range_create(void);
+void lv_example_arc_event(void);
+void lv_example_arc_knob_widget(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

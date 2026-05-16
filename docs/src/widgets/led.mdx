@@ -8,14 +8,7 @@ description: "LEDs are rectangle-like (or circle) Widgets whose brightness can b
 LEDs are rectangle-like (or circle) Widgets whose brightness can be
 adjusted. With lower brightness the color of the LED becomes darker.
 
-## Parts and Styles
-
-- <ApiLink name="LV_LED_PART_MAIN" /> uses the [typical background style
-  properties](/common-widget-features/styles/overview).
-
-## Usage
-
-### Color
+## Color
 
 You can set the color of the LED with
 <ApiLink name="lv_led_set_color" display="lv_led_set_color(led, lv_color_hex(0xff0080))" />. This will be used as its
@@ -23,14 +16,14 @@ background color, border color, and shadow color.
 
 <LvglXMLExample name="lv_example_led_color" path="widgets/led/led_color/lv_example_led_color" />
 
-### Brightness
+## Brightness
 
 You can set their brightness with <ApiLink name="lv_led_set_brightness" display="lv_led_set_brightness(led, brightness)" />.
 The `brightness` value should be in the range 0 (darkest) to 255 (lightest).
 
 <LvglXMLExample name="lv_example_led_brightness" path="widgets/led/led_brightness/lv_example_led_brightness" />
 
-### Toggle
+## Toggle
 
 Use <ApiLink name="lv_led_on" display="lv_led_on(led)" /> and <ApiLink name="lv_led_off" display="lv_led_off(led)" /> to set the brightness to
 a predefined ON or OFF value. The <ApiLink name="lv_led_toggle" display="lv_led_toggle(led)" /> toggles between
@@ -40,11 +33,14 @@ You can set custom LED ON and OFF brightness values by defining macros
 <ApiLink name="LV_LED_BRIGHT_MAX" /> and <ApiLink name="LV_LED_BRIGHT_MIN" /> in your project.  Their default
 values are 255 and 80. These too must be in the range [0..255].
 
-### Styling
+## Styling
+
+- <ApiLink name="LV_LED_PART_MAIN" /> uses the [typical background style
+  properties](/common-widget-features/styles/overview).
 
 <LvglXMLExample name="lv_example_led_styling" path="widgets/led/led_styling/lv_example_led_styling" />
 
-`lv_led_set_color` drives the base lit look (background, border, and
+<ApiLink name="lv_led_set_color" /> drives the base lit look (background, border, and
 shadow color), but the LED is still a base widget so the full style
 stack applies on top. Use `style_border_*` for a tight ring, a tinted
 `style_outline_*` for a soft halo, `style_shadow_*` for the glow, and

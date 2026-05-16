@@ -14,6 +14,7 @@ void lv_example_dropdown_bind_value_create(void);
 void lv_example_dropdown_direction_create(void);
 void lv_example_dropdown_styling_create(void);
 void lv_example_dropdown_text_create(void);
+void lv_example_dropdown_event(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

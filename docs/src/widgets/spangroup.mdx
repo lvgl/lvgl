@@ -18,13 +18,11 @@ Spans are displayed.  Spans can be added to, and removed from, the Spangroup
 throughout its life.  The number of Spans that can be added is limited only by
 available RAM.
 
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> Spangroup has only one part.
 
-## Usage
-
-### Set text and style
+## Set text and style
 
 Add each needed Span to a Spangroup like this:
 
@@ -44,7 +42,7 @@ If the Spangroup Widget's `mode != LV_SPAN_MODE_FIXED` call
 <ApiLink name="lv_spangroup_refr_mode" display="lv_spangroup_refr_mode(spangroup)" /> after you have modifying any of its
 Spans to ensure it is redrawn appropriately.
 
-### Retrieving a Span child
+## Retrieving a Span child
 
 Spangroups store their children differently from normal Widgets, so
 normal functions for getting children won't work.
@@ -59,19 +57,19 @@ return the first child of the Spangroup.
 `lv_span_t * span = lv_spangroup_get_child(spangroup, -1)` will return
 the last (or most recent) child.
 
-### Child count
+## Child count
 
 Use <ApiLink name="lv_spangroup_get_span_count" display="lv_spangroup_get_span_count(spangroup)" /> to get
 the number of contained Spans.
 
 E.g. `uint32_t size = lv_spangroup_get_span_count(spangroup)`
 
-### Removing a Span
+## Removing a Span
 
 You can remove a Span at any time during the Spangroup's life using the function
 <ApiLink name="lv_spangroup_delete_span" display="lv_spangroup_delete_span(spangroup, span)" />.
 
-### Text align
+## Text align
 
 Like the Label Widget, a Spangroup can be set to one the following text-alignment modes:
 
@@ -83,7 +81,7 @@ Like the Label Widget, a Spangroup can be set to one the following text-alignmen
 Use function <ApiLink name="lv_spangroup_set_align" display="lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_...)" />
 to set text alignment.
 
-### Modes
+## Modes
 
 **DEPRECATED**, set the width to <ApiLink name="LV_SIZE_CONTENT" /> or fixed value to control expanding/wrapping.
 
@@ -95,7 +93,7 @@ A Spangroup can be set to one the following modes:
 
 Use <ApiLink name="lv_spangroup_set_mode" display="lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK)" /> to set its mode.
 
-### Overflow
+## Overflow
 
 A Spangroup can be set to handle text overflow in one of the following ways:
 
@@ -105,27 +103,30 @@ A Spangroup can be set to handle text overflow in one of the following ways:
 Use <ApiLink name="lv_spangroup_set_overflow" display="lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)" /> to set
 the Spangroup's overflow mode.
 
-### First line indent
+## First line indent
 
 Use <ApiLink name="lv_spangroup_set_indent" display="lv_spangroup_set_indent(spangroup, 20)" /> to set the indent of the
 first line. All modes support pixel units. In addition, <ApiLink name="LV_SPAN_MODE_FIXED" />
 and <ApiLink name="LV_SPAN_MODE_BREAK" /> modes support percentage units as well
 (e.g. `lv_pct(10)`).
 
-### Lines
+## Lines
 
 Use <ApiLink name="lv_spangroup_set_max_lines" display="lv_spangroup_set_max_lines(spangroup, 10)" /> to set the maximum number
 of lines to be displayed in <ApiLink name="LV_SPAN_MODE_BREAK" /> mode. A negative
 value indicates no limit.
 
-### Data binding
+## Data binding
 
-To get familiar with observers, subjects, and data bindings in general, visit the
-[Observer](/main-modules/observer/observer) page.
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
 
-Very similar to Label-text binding, a Span's text can be bound to a subject as well.
-
-The only difference is that in the bind function both the Spangroup and the Span need to be specified:
+A Span binds its text to a Subject. The link is one-way (Subject →
+Widget) — the binding works like Label-text binding, except both the
+Spangroup and the Span need to be specified in the bind call:
 
 <ApiLink name="lv_spangroup_bind_span_text" display="lv_spangroup_bind_span_text(spangroup, span1, &subject, format_string)" />
 

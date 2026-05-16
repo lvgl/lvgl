@@ -14,6 +14,7 @@ void lv_example_roller_bind_value_create(void);
 void lv_example_roller_options_create(void);
 void lv_example_roller_styling_create(void);
 void lv_example_roller_visible_rows_create(void);
+void lv_example_roller_event(void);
 void lv_example_roller_fade_mask(void);
 
 #ifdef __cplusplus

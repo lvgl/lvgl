@@ -13,6 +13,7 @@ extern "C" {
 void lv_example_button_basic_create(void);
 void lv_example_button_states_create(void);
 void lv_example_button_styling_create(void);
+void lv_example_button_event(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

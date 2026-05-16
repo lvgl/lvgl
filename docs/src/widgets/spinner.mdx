@@ -8,33 +8,22 @@ description: "The Spinner Widget is a spinning arc over a ring, typically used t
 The Spinner Widget is a spinning arc over a ring, typically used to show some type of
 activity is in progress.
 
-## Parts and Styles
-
-Spinner's parts are identical to those of [Arc](/widgets/arc).
-
-## Usage
-
-### Create a spinner
+## Create a spinner
 
 <LvglXMLExample name="lv_example_spinner_basic" path="widgets/spinner/spinner_basic/lv_example_spinner_basic" />
 
-To create a spinner use
-<ApiLink name="lv_spinner_create" display="lv_spinner_create(parent)" />.
+<ApiLink name="lv_spinner_create" display="lv_spinner_create(parent)" /> creates the widget;
+<ApiLink name="lv_spinner_set_anim_params" display="lv_spinner_set_anim_params(spinner, spin_duration, angle)" /> tunes one
+revolution's duration (ms) and the moving arc's length (degrees).
 
-Use <ApiLink name="lv_spinner_set_anim_params" display="lv_spinner_set_anim_params(spinner, spin_duration, angle)" /> to
-customize the duration of one revolution and the length of the arc.
-
-### Styling
+## Styling
 
 <LvglXMLExample name="lv_example_spinner_styling" path="widgets/spinner/spinner_styling/lv_example_spinner_styling" />
 
-Spinner inherits its drawing model from `lv_arc`, so it exposes the same
-parts: <ApiLink name="LV_PART_MAIN" /> for the static background ring and
-<ApiLink name="LV_PART_INDICATOR" /> for the moving arc segment. Style each
-with arc-family properties — `arc_color`, `arc_width`, `arc_rounded` —
-attached via `selector="main"` or `selector="indicator"`. Pick a faint
-colour for MAIN and a stronger accent for INDICATOR to get the familiar
-loading-spinner look.
+Spinner reuses <ApiLink name="lv_arc" />'s parts: <ApiLink name="LV_PART_MAIN" /> (static background
+ring) and <ApiLink name="LV_PART_INDICATOR" /> (moving arc segment). Style each with the
+arc-family properties — `arc_color`, `arc_width`, `arc_rounded`. A faint
+MAIN with an accent INDICATOR gives the familiar loading look.
 
 ## Events
 

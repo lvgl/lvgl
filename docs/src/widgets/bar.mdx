@@ -11,7 +11,37 @@ indicator against the background indicates the Bar's current value.
 Both the start and end values of the Bar can be set. Changing the start value to a
 value other than the minimum value in its range adjusts the start position of the indicator.
 
-## Parts and Styles
+## Orientation and size
+
+<LvglXMLExample name="lv_example_bar_orientation" path="widgets/bar/bar_orientation/lv_example_bar_orientation" />
+
+Width and height pick orientation by default. Override with
+<ApiLink name="lv_bar_set_orientation" display="lv_bar_set_orientation(bar, LV_BAR_ORIENTATION_…)" /> — `AUTO`,
+`HORIZONTAL`, or `VERTICAL`.
+
+## Value and range
+
+<LvglXMLExample name="lv_example_bar_value_range" path="widgets/bar/bar_value_range/lv_example_bar_value_range" />
+
+- <ApiLink name="lv_bar_set_value" display="lv_bar_set_value(bar, v, LV_ANIM_ON/OFF)" /> — set value; animation
+  toggle is the last argument.
+- <ApiLink name="lv_bar_set_range" display="lv_bar_set_range(bar, min, max)" /> — default `[0..100]`. Pass `min > max`
+  (e.g. `100..0`) to flip the fill direction.
+
+## Modes
+
+<LvglXMLExample name="lv_example_bar_modes" path="widgets/bar/bar_modes/lv_example_bar_modes" />
+
+Set with <ApiLink name="lv_bar_set_mode" display="lv_bar_set_mode(bar, LV_BAR_MODE_…)" />:
+
+- `NORMAL` — default; fills from `min` to `value`.
+- `SYMMETRICAL` — fills from zero outward, so positive and negative
+  values pull the indicator in opposite directions. Needs a range that
+  crosses zero (e.g. `[-100..100]`).
+- `RANGE` — fills between `start` and `value`. Set the start with
+  <ApiLink name="lv_bar_set_start_value" display="lv_bar_set_start_value(bar, v, LV_ANIM_ON/OFF)" />. Start must be ≤ end.
+
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> The Bar's background.  It uses the [typical
    background style properties](/common-widget-features/styles/overview). Adding padding makes the indicator
@@ -19,50 +49,6 @@ value other than the minimum value in its range adjusts the start position of th
    animation time if the values set with <ApiLink name="LV_ANIM_ON" />.
 - <ApiLink name="LV_PART_INDICATOR" /> The Bar's indicator; also uses the [typical
    background style properties](/common-widget-features/styles/overview).
-
-## Usage
-
-### Orientation and size
-
-<LvglXMLExample name="lv_example_bar_orientation" path="widgets/bar/bar_orientation/lv_example_bar_orientation" />
-
-- for orientation, width and height, simply set width and height style properties;
-- <ApiLink name="lv_bar_set_orientation" display="lv_bar_set_orientation(bar, orientation)" /> to override orientation
-  caused by `width` and `height`.  Valid values for `orientation` are:
-
-  - <ApiLink name="LV_BAR_ORIENTATION_AUTO" />
-  - <ApiLink name="LV_BAR_ORIENTATION_HORIZONTAL" />
-  - <ApiLink name="LV_BAR_ORIENTATION_VERTICAL" />
-
-### Value and range
-
-<LvglXMLExample name="lv_example_bar_value_range" path="widgets/bar/bar_value_range/lv_example_bar_value_range" />
-
-A new value can be set with
-<ApiLink name="lv_bar_set_value" display="lv_bar_set_value(bar, new_value, LV_ANIM_ON/OFF)" />. The value is
-interpreted in a range (minimum and maximum values) which can be
-modified with <ApiLink name="lv_bar_set_range" display="lv_bar_set_range(bar, min, max)" />. The default range is
-0..100, and the default drawing direction is from left to right in horizontal mode and
-bottom to top in vertical mode. If the minimum value is greater than the maximum value, like
-100..0, the drawing direction is reversed.
-
-The new value in <ApiLink name="lv_bar_set_value" /> can be set with or without an
-animation depending on the last parameter (`LV_ANIM_ON/OFF`).
-
-### Modes
-
-<LvglXMLExample name="lv_example_bar_modes" path="widgets/bar/bar_modes/lv_example_bar_modes" />
-
-The Bar can be one of the following modes:
-
-- <ApiLink name="LV_BAR_MODE_NORMAL" /> A normal Bar as described above
-- <ApiLink name="LV_BAR_MODE_SYMMETRICAL" /> Draws indicator from zero value to current value. Requires a negative
-  minimum value and positive maximum value, e.g. [-100..100].
-- <ApiLink name="LV_BAR_MODE_RANGE" /> Allows setting the start value as well with
-  <ApiLink name="lv_bar_set_start_value" display="lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)" />. The start
-  value must be smaller than the end value.
-
-### Styling
 
 <LvglXMLExample name="lv_example_bar_styling" path="widgets/bar/bar_styling/lv_example_bar_styling" />
 
@@ -75,18 +61,23 @@ portion). Both accept the full background style stack: `bg_color`,
 local `style_*` props on the `<lv_bar>` tag for one-off tweaks. Padding
 on MAIN shrinks the indicator inside the track.
 
-### Data binding
+## Data binding
 
-To get familiar with observers, subjects, and data bindings in general visit the
-[Observer](/main-modules/observer/observer) page.
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
 
-This method of subscribing to an integer Subject affects a Bar Widget's integer
-value directly.  Note that this is a one-way binding (Subject ==> Widget) so when
-the subject changes the Bar will be updated too.
-
-It supports integer and float subjects.
+A Bar binds its value to a Subject. The link is one-way (Subject →
+Widget) because the bar isn't interactive — application-side writes into
+the subject update the bar's fill. Integer and float subjects are
+supported.
 
 - <ApiLink name="lv_bar_bind_value" display="lv_bar_bind_value(bar, &subject)" />
+
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+
 
 <LvglXMLExample name="lv_example_bar_bind_value" path="widgets/bar/bar_bind_value/lv_example_bar_bind_value" />
 

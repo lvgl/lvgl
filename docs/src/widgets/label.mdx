@@ -10,68 +10,31 @@ title: "Label (lv_label)"
 
 A Label is the Widget used to display text.
 
-## Parts and Styles
+## Set text
 
-- <ApiLink name="LV_PART_MAIN" /> Uses the [typical background](/common-widget-features/styles/overview) and
-  text properties. Padding values can be used to add space between
-  the text and the edges of the Label's background.
-- <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar that is shown when the text is
-  larger than the Widget's size.
-- <ApiLink name="LV_PART_SELECTED" /> Tells the style of the
-  [selected text](/widgets/label). Only `text_color` and `bg_color` style
-  properties can be used.
-
-## Usage
-
-### Set text
-
-You can set the text on a Label at runtime with
-<ApiLink name="lv_label_set_text" display="lv_label_set_text(label, &quot;New text&quot;)" />. This will allocate a buffer
-dynamically, and the provided string will be copied into that buffer.
-Therefore, you don't need to keep the text you pass to
-<ApiLink name="lv_label_set_text" /> in scope after that function returns.
-
-With <ApiLink name="lv_label_set_text_fmt" display="lv_label_set_text_fmt(label, fmt, ...)" /> printf formatting
-can be used to set the text.  Example:  <ApiLink name="lv_label_set_text_fmt" display="lv_label_set_text_fmt(label, &quot;Value: %d&quot;, 15)" />.
-
-Labels are able to show text from a static character buffer as well.  To do so, use
-<ApiLink name="lv_label_set_text_static" display="lv_label_set_text_static(label, &quot;Text&quot;)" />.  In this case, the text is not
-stored in dynamic memory and the given buffer is used directly instead.  This means
-that the contents of the character buffer *must* remain valid for the life of the
-label or until another buffer is set via one of the above functions.
-
-`const` strings are safe to use with <ApiLink name="lv_label_set_text_static" /> since
-they are stored in ROM memory, which is always accessible.
+| Function | Behaviour |
+|---|---|
+| <ApiLink name="lv_label_set_text" display="lv_label_set_text(label, str)" /> | Copies `str` into a dynamically allocated buffer. `str` doesn't need to outlive the call. |
+| <ApiLink name="lv_label_set_text_fmt" display="lv_label_set_text_fmt(label, fmt, ...)" /> | `printf`-style formatting — e.g. <ApiLink name="lv_label_set_text_fmt" display="lv_label_set_text_fmt(label, &quot;Value: %d&quot;, 15)" />. |
+| <ApiLink name="lv_label_set_text_static" display="lv_label_set_text_static(label, buf)" /> | Stores the pointer; `buf` must outlive the label. Pass `const` strings or a long-lived buffer. |
 
 <Callout type="warn">
-Do not use `const` strings with <ApiLink name="lv_label_set_text_static" /> when the
-Label is being used in <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> mode since the Label
-will attempt to do an in-place edit of the string.  This will cause an MCU
-exception by attempting to modify program memory (ROM).
+For fast-changing labels (e.g. live readouts), prefer
+<ApiLink name="lv_label_set_text_static" /> over <ApiLink name="lv_label_set_text" /> — the latter forces a
+realloc whenever the string length changes. Don't pass `const` strings to
+`_set_text_static` when <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> is active; that mode
+edits the buffer in place and will crash on ROM strings.
 </Callout>
 
-<Callout type="warn">
-If your Label is updated with new strings rapidly (e.g. > 30X / second, such as
-RPM in a dashboard, or an ADC value), and the length of those strings changes
-frequently, it is advisable to:
-
-- allocate a static string buffer large enough contain the largest possible string,
-- update that buffer with the new strings only when they will make a visible
-  difference for the end user, and
-- update the Label with <ApiLink name="lv_label_set_text_static" display="lv_label_set_text_static(label, buffer)" /> using that buffer.
-
-Reason:  if you use <ApiLink name="lv_label_set_text" display="lv_label_set_text(label, new_text)" />, a memory
-realloc() will be forced every time the length of the string changes.  That
-MCU overhead can be avoided by doing the above.
-</Callout>
-
-### Set translation tag
+## Set translation tag
 
 When using LVGL's translation module, you can bind a translation tag to a label directly with <ApiLink name="lv_label_set_translation_tag" display="lv_label_set_translation_tag(label, tag)" />.
 After this function is called, future changes to the language will automatically update the label's text to display the corresponding translation
 for that tag in the new language.
 
-### Newline
+<LvglExample name="lv_example_label_translation" path="widgets/label/lv_example_label_translation" />
+
+## Newline
 
 <LvglXMLExample name="lv_example_label_set_text_newline" path="widgets/label/label_set_text_newline/lv_example_label_set_text_newline" />
 
@@ -79,38 +42,23 @@ Newline characters are handled automatically by the Label Widget. You
 can use `\n` to make a line break. For example:
 `"line1\nline2\n\nline4"`
 
-### Long modes
+## Long modes
 
 <LvglXMLExample name="lv_example_label_long_mode" path="widgets/label/label_long_mode/lv_example_label_long_mode" />
 
-By default, the width and height of the Label are set to
-<ApiLink name="LV_SIZE_CONTENT" />. Thus, the size of the Label is automatically expanded
-to the text size + padding + border width. Otherwise, if the width or height are
-explicitly set (using e.g.<ApiLink name="lv_obj_set_width" /> or a layout), the lines
-wider than the Label's width can be manipulated according to several
-long mode policies. Similarly, the policies can be applied if the height
-of the text is greater than the height of the Label.
+With default <ApiLink name="LV_SIZE_CONTENT" /> sizing a label grows to fit its text. When
+width or height is fixed, the long mode picks how overflow is handled
+(set with <ApiLink name="lv_label_set_long_mode" />):
 
-- <ApiLink name="LV_LABEL_LONG_MODE_WRAP" /> Wrap lines that are too long. If the height is <ApiLink name="LV_SIZE_CONTENT" /> the Label's
-  height will be expanded, otherwise the text will be clipped. (Default)
-- <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> Replaces the last 3 characters from bottom right corner of the Label with dots (`.`)
-- <ApiLink name="LV_LABEL_LONG_MODE_SCROLL" /> If the text is wider than the label, scroll it horizontally back and forth. If it's
-  higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
-- <ApiLink name="LV_LABEL_LONG_MODE_SCROLL_CIRCULAR" /> If the text is wider than the Label, scroll it horizontally continuously. If it's
-  higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
-- <ApiLink name="LV_LABEL_LONG_MODE_CLIP" /> Simply clip the parts of the text outside the Label.
+| Mode | Behaviour |
+|---|---|
+| <ApiLink name="LV_LABEL_LONG_MODE_WRAP" /> (default) | Wrap to next line. With <ApiLink name="LV_SIZE_CONTENT" /> height the label grows; otherwise overflow is clipped. |
+| <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> | Trim to fit and append `…`. **Edits the buffer in place** — `_set_text_static` needs a writable buffer for this mode. |
+| <ApiLink name="LV_LABEL_LONG_MODE_SCROLL" /> | Scroll the overflow back-and-forth. Horizontal takes precedence over vertical. |
+| <ApiLink name="LV_LABEL_LONG_MODE_SCROLL_CIRCULAR" /> | Scroll continuously in one direction. Same horizontal-first rule. |
+| <ApiLink name="LV_LABEL_LONG_MODE_CLIP" /> | Clip the overflow. |
 
-You can specify the long mode with <ApiLink name="lv_label_set_long_mode" display="lv_label_set_long_mode(label, LV_LABEL_LONG_...)" />
-
-Note that <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> manipulates the text buffer in-place in
-order to add/remove the dots. When <ApiLink name="lv_label_set_text" /> or
-<ApiLink name="lv_label_set_array_text" /> are used, a separate buffer is allocated and
-this implementation detail is unnoticed. This is not the case with
-<ApiLink name="lv_label_set_text_static" />. The buffer you pass to
-<ApiLink name="lv_label_set_text_static" /> must be writable if you plan to use
-<ApiLink name="LV_LABEL_LONG_MODE_DOTS" />.
-
-### Text recolor
+## Text recolor
 
 <LvglXMLExample name="lv_example_label_recolor" path="widgets/label/label_recolor/lv_example_label_recolor" />
 
@@ -121,7 +69,7 @@ function. In the context of word-wrapped text, any Recoloring started on a
 line will be terminated at the end of the line where the line is wrapped if it
 was not already terminated by an ending `#` in the text.
 
-### Text selection
+## Text selection
 
 <LvglXMLExample name="lv_example_label_text_selection" path="widgets/label/label_text_selection/lv_example_label_text_selection" />
 
@@ -133,7 +81,7 @@ the Label Widget only allows programmatic text selection with
 <ApiLink name="lv_label_get_text_selection_start" display="lv_label_get_text_selection_start(label, start_char_index)" /> and
 <ApiLink name="lv_label_get_text_selection_end" display="lv_label_get_text_selection_end(label, end_char_index)" />.
 
-### Text alignment
+## Text alignment
 
 <LvglXMLExample name="lv_example_label_text_align" path="widgets/label/label_text_align/lv_example_label_text_align" />
 
@@ -145,13 +93,13 @@ Note that this has a visible effect only if:
 - the Label Widget's width is larger than the width of the longest line of text, and
 - the text has multiple lines with different line lengths.
 
-### Very long text
+## Very long text
 
 LVGL can efficiently handle very long (e.g. > 40k characters) Labels by
 saving some extra data (~12 bytes) to speed up drawing. To enable this
 feature, set <ApiLink name="LV_LABEL_LONG_TXT_HINT" /> to `1` in `lv_conf.h`.
 
-### Custom scrolling animations
+## Custom scrolling animations
 
 Some aspects of the scrolling animations in long modes
 <ApiLink name="LV_LABEL_LONG_SCROLL" /> and <ApiLink name="LV_LABEL_LONG_SCROLL_CIRCULAR" /> can be
@@ -159,12 +107,21 @@ customized by setting the Label's animation style property, using
 <ApiLink name="lv_style_set_anim" />.
 It will be treated as a template which will be used to create the scroll animations.
 
-### Symbols
+## Symbols
 
 The Labels can display symbols alongside letters (or on their own). Read
 the [Overview](/main-modules/fonts/overview) section to learn more about symbols.
 
-### Styling
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> Uses the [typical background](/common-widget-features/styles/overview) and
+  text properties. Padding values can be used to add space between
+  the text and the edges of the Label's background.
+- <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar that is shown when the text is
+  larger than the Widget's size.
+- <ApiLink name="LV_PART_SELECTED" /> Tells the style of the
+  [selected text](/widgets/label). Only `text_color` and `bg_color` style
+  properties can be used.
 
 <LvglXMLExample name="lv_example_label_styling" path="widgets/label/label_styling/lv_example_label_styling" />
 
@@ -176,16 +133,18 @@ glyphs. Use a named `<style>` block when the look is reused across
 multiple labels (e.g. a "badge" style), or set local `style_*` props
 directly on the `<lv_label>` tag for one-off variations.
 
-### Data binding
+## Data binding
 
-To get familiar with observers, subjects, and data bindings in general visit the
-[Observer](/main-modules/observer/observer) page.
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
 
-This method of subscribing to a Subject affects a Label Widget's
-`text`.  The Subject can be a STRING, POINTER, INTEGER, or FLOAT type.
-
-When the subscription occurs, and each time the Subject's value is changed thereafter,
-the Subject's value is used to update the Label's text as follows:
+A Label binds its text to a Subject. The link is one-way (Subject →
+Widget) because labels aren't editable. The Subject can be a string,
+pointer, integer, or float, and is rendered into the label's text as
+follows:
 
 | Field | Description |
 |-------|-------------|
@@ -194,13 +153,11 @@ the Subject's value is used to update the Label's text as follows:
 | `integer Subject` | Subject's integer value is used with the `format_string` argument. See [The ``format_string`` Argument](/widgets/label) for details. |
 | `float Subject` | Subject's float value is used with the `format_string` argument. Requires <ApiLink name="LV_USE_FLOAT" />. See [The ``format_string`` Argument](/widgets/label) for details. |
 
-Note that this is a one-way binding (Subject ===> Widget).
-
 - <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, format_string)" />
 
 <LvglXMLExample name="lv_example_label_bind_text" path="widgets/label/label_bind_text/lv_example_label_bind_text" />
 
-##### The `format_string` Argument
+#### The `format_string` Argument
 
 The `format_string` argument is optional and if provided, must contain exactly 1
 printf-like format specifier and be one of the following:

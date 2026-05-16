@@ -15,6 +15,7 @@ void lv_example_slider_bind_value_create(void);
 void lv_example_slider_reversed_direction_create(void);
 void lv_example_slider_styling_create(void);
 void lv_example_slider_value_range_orientation_create(void);
+void lv_example_slider_event(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -14,62 +14,45 @@ from files. Images can also display symbols (`LV_SYMBOL_...`).
 Using the [Image decoder interface](/main-modules/images/decoders), custom image formats
 can be supported as well.
 
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> A background rectangle that uses the [typical
    background style properties](/common-widget-features/styles/overview), and the image itself uses the image
    style properties.
 
-## Usage
-
-### Image source
+## Image source
 
 <LvglXMLExample name="lv_example_image_src" path="widgets/image/image_src/lv_example_image_src" />
 
-To provide maximum flexibility, the source of the image can be:
+Set the source with <ApiLink name="lv_image_set_src" display="lv_image_set_src(img, src)" />. `src` can be:
 
-- a variable in code (a C array containing the pixels).
-- a file stored externally (e.g. on an SD card).
-- a [Symbol](/main-modules/fonts/overview) as text.
+- **A compiled-in C array.** Generate it with the LVGL Online Image
+  Converter, declare it with `LV_IMAGE_DECLARE(my_img)`, and pass
+  `&my_img` to <ApiLink name="lv_image_set_src" />.
+- **A file path.** Convert the image to binary with the same converter
+  and route it through the [File system](/main-modules/fs) module —
+  e.g. <ApiLink name="lv_image_set_src" display="lv_image_set_src(img, &quot;S:folder/my_img.bin&quot;)" />.
+- **A symbol.** Pass an `LV_SYMBOL_*` macro to render it as text using
+  the symbol font — useful for monochrome glyphs without a full
+  bitmap.
 
-To set the source of an image, use <ApiLink name="lv_image_set_src" display="lv_image_set_src(img, src)" />.
-
-To generate a pixel array from a PNG, JPG or BMP image, use the LVGL Online Image Converter
-and set the converted image as the image source with its pointer with
-<ApiLink name="lv_image_set_src" display="lv_image_set_src(img1, &converted_img_var)" />.
-To make the converted image variable accessible from the C file, declare it with
-<ApiLink name="LV_IMAGE_DECLARE" display="LV_IMAGE_DECLARE(converted_img_var)" />.
-
-To use external files, you also need to convert the image files using
-the online converter tool, but select the binary output
-format. You also need to use LVGL's file system module and register a
-driver with some functions for basic file operations.  See
-[File system](/main-modules/fs) to learn more.  Then set the translated
-image as the image source with <ApiLink name="lv_image_set_src" display="lv_image_set_src(img, &quot;S:folder1/my_img.bin&quot;)" />.
-
-You can also set a symbol as an image source similar to a [Labels](/widgets/label). In
-this case, the image will be rendered as text according to the *font*
-specified in the style. It enables the use of light-weight monochrome
-"characters" instead of real images. You can set a symbol as an image source with
-<ApiLink name="lv_image_set_src" display="lv_image_set_src(img1, LV_SYMBOL_OK)" />.
-
-SVG sources can also be set (with `LV_USE_SVG` enabled). This C example
-loads an SVG into the same `lv_image` widget and applies both widget-level
-transforms (`lv_image_set_scale`, `lv_image_set_rotation`) and style-based
-transforms — handy for icons that need to stay sharp at any size:
+SVG sources are supported when <ApiLink name="LV_USE_SVG" /> is enabled. The example
+below loads an SVG and applies both widget-level
+(<ApiLink name="lv_image_set_scale" />/`_rotation`) and style-based transforms — handy
+for icons that need to stay sharp at any size:
 
 <LvglExample name="lv_example_image_svg" path="widgets/image/lv_example_image_svg" />
 
-### Label as an image
+## Label as an image
 
 Images and labels are sometimes used to convey the same thing, such as
 describing what a button does.  In this context, images and labels
 are somewhat interchangeable:  images can display text by
 using the macro <ApiLink name="LV_SYMBOL_DUMMY" /> (which equates to a 3-byte C string
 containing a special code) as the prefix of the text.  For example,
-`lv_image_set_src(img, LV_SYMBOL_DUMMY "Some text")`.
+<ApiLink name="lv_image_set_src" display="lv_image_set_src(img, LV_SYMBOL_DUMMY &quot;Some text&quot;)" />.
 
-### Transparency
+## Transparency
 
 The internal (pixel array) and external images support 2 transparency
 handling methods:
@@ -80,7 +63,10 @@ handling methods:
 - **Indexed transparent color**:  a specific index in a color palette serves to
    signal transparency for each pixel that uses it.
 
-### Palette and Alpha index
+The format is fixed when the image is converted; from the widget's side
+just call <ApiLink name="lv_image_set_src" display="lv_image_set_src(img, &my_image)" /> like with any other source.
+
+## Palette and Alpha index
 
 Besides RGB888 and ARGB8888 color formats, the following formats are supported:
 
@@ -89,8 +75,11 @@ Besides RGB888 and ARGB8888 color formats, the following formats are supported:
 
 These options can be selected in the LVGL Online Image Converter.  Learn more
 about color formats in the [Color Formats](/main-modules/images/color_formats) section.
+Indexed images cannot be transformed (`rotation`/`scale_*`) because the
+decoder doesn't expose the full pixel buffer; use a non-indexed format
+for any image you plan to rotate or scale.
 
-### Recolor
+## Recolor
 
 A color can be mixed with every pixel of an image with a given
 intensity. This can be useful to show different states (checked,
@@ -108,106 +97,65 @@ image live without any event callback:
 
 <LvglXMLExample name="lv_example_image_recolor" path="widgets/image/image_recolor/lv_example_image_recolor" />
 
-### Offset
+## Offset
 
-With <ApiLink name="lv_image_set_offset_x" display="lv_image_set_offset_x(img, x_ofs)" /> and
-<ApiLink name="lv_image_set_offset_y" display="lv_image_set_offset_y(img, y_ofs)" />, you can add some offset to the
-displayed image. Useful if the Widget size is smaller than the image
-source size. Using the offset parameter a [Texture atlas](https://en.wikipedia.org/wiki/Texture_atlas)
-or a "running image" effect can be created by [Animating](/main-modules/animation) the x or y offset.
+<ApiLink name="lv_image_set_offset_x" display="lv_image_set_offset_x(img, x)" /> and `_offset_y(img, y)` shift the source
+inside the widget. When the widget is smaller than the source the offset
+chooses which slice is visible — animate it for a
+[texture atlas](https://en.wikipedia.org/wiki/Texture_atlas) or a marquee
+effect.
 
-### Transformations
+## Transformations
 
 <LvglXMLExample name="lv_example_image_transformations" path="widgets/image/image_transformations/lv_example_image_transformations" />
 
-You can zoom images in or out by using <ApiLink name="lv_image_set_scale" display="lv_image_set_scale(img, factor)" />.
-Set `factor` to `256` or <ApiLink name="LV_SCALE_NONE" /> to disable zooming. A
-larger value enlarges the images (e.g. `512` double size), a smaller
-value shrinks it (e.g. `128` half size). Fractional scaling works using a value
-that is proportionally larger or smaller, e.g. `281` for 10% enlargement.
+| Function | Effect |
+|---|---|
+| <ApiLink name="lv_image_set_scale" display="lv_image_set_scale(img, factor)" /> | Uniform zoom. `256` (or <ApiLink name="LV_SCALE_NONE" />) is 1×; `512` doubles, `128` halves. |
+| <ApiLink name="lv_image_set_scale_x" /> / `_scale_y` | Independent horizontal/vertical scale. |
+| <ApiLink name="lv_image_set_rotation" display="lv_image_set_rotation(img, angle_x10)" /> | Rotate by `angle / 10` degrees (so `458` = 45.8°). |
+| <ApiLink name="lv_image_set_pivot" display="lv_image_set_pivot(img, x, y)" /> | Move the rotation/scale anchor. Defaults to image centre; `(0, 0)` is top-left. |
+| <ApiLink name="lv_image_set_antialias" display="lv_image_set_antialias(img, true)" /> | Higher quality at the cost of speed. |
 
-<ApiLink name="lv_image_set_scale_x" display="lv_image_set_scale_x(img, factor)" /> and
-<ApiLink name="lv_image_set_scale_y" display="lv_image_set_scale_y(img, factor)" /> can also be used to
-set the horizontal and vertical scaling independently.  They can be different values.
+Transformations need the full pixel buffer, so they don't work on
+indexed (`LV_COLOR_FORMAT_I1/2/4/8`) or alpha-only formats — use ARGB,
+RGB or A8 for anything you plan to rotate or scale. The widget's own
+`get_width/height/x/y` still return the untransformed values.
 
-To rotate the image use <ApiLink name="lv_image_set_rotation" display="lv_image_set_rotation(img, angle_x10)" />.
-The `angle_x10` argument is an `int32_t` containing the angle (in degrees)
-multiplied by 10.  This gives 0.1-degree resolution.  Example:  458 means 45.8°.
+Image-widget transforms differ from
+[style transforms](/common-widget-features/styles/overview): they don't
+affect child widgets and don't create an intermediate snapshot layer.
 
-By default, the pivot point of the rotation is the center of the image.
-This can be changed with <ApiLink name="lv_image_set_pivot" display="lv_image_set_pivot(img, pivot_x, pivot_y)" /> where
-the coordinates `(0,0)` represent the top left corner.
-
-The quality of the transformation can be adjusted with
-<ApiLink name="lv_image_set_antialias" display="lv_image_set_antialias(img, true)" />. Enabling anti-aliasing
-causes the transformations to be of higher quality, but slower.
-
-Transformations require the whole image to be available. Therefore
-indexed images (`LV_COLOR_FORMAT_I1/2/4/8_...`) and alpha only images cannot be transformed.
-In other words transformations work only on normal (A)RGB or A8 images stored as a
-C array, or on images provided by a custom [Image Decoders](/main-modules/images/decoders)
-that returns the whole image.
-
-Note that the real coordinates of image Widgets do not change with a
-transformation. That is <ApiLink name="lv_obj_get_width" display="lv_obj_get_width/height/x/y" /> will return
-the original, non-zoomed coordinates.
-
-**IMPORTANT**:  The transformation of the image is independent of the transformation
-properties [coming from styles](/common-widget-features/styles/overview).
-The main differences are that pure Image Widget transformations:
-
-- do not transform the children of the Image Widget, and
-- the image is transformed directly without creating an intermediate layer (buffer) to snapshot the Widget.
-
-### Inner align
+## Inner align
 
 <LvglXMLExample name="lv_example_image_inner_align" path="widgets/image/image_inner_align/lv_example_image_inner_align" />
 
-By default the image Widget's width and height are <ApiLink name="LV_SIZE_CONTENT" />,
-meaning that the Widget will be sized automatically to the size of its image source.
+When the widget is larger than its image source, `inner_align`
+(<ApiLink name="lv_image_set_inner_align" />) controls placement:
 
-If the Widget's width or height is set to a different value, the value of the `inner_align`
-property (set using <ApiLink name="lv_image_set_inner_align" display="lv_image_set_inner_align(widget, align)" />) governs how
-the image source is aligned inside the Widget.
+- `TOP_LEFT` / `TOP_MID` / `TOP_RIGHT` / `LEFT_MID` / `CENTER` /
+  `RIGHT_MID` / `BOTTOM_LEFT` / `BOTTOM_MID` / `BOTTOM_RIGHT` — pin the
+  source to the named anchor inside the widget.
+- `STRETCH` — independent scale on X and Y to fill the widget.
+- `TILE` — repeat the source to fill the widget (offset shifts the
+  tiling).
+- `CONTAIN` — keep aspect ratio, fit inside the widget.
+- `COVER` — keep aspect ratio, fill the widget (may crop).
 
-`align` can be any of these values:
+`offset_x`/`offset_y` are applied *after* alignment — e.g. `CENTER` with
+`offset_y=-10` shifts the image 10 px up from centre.
 
-- <ApiLink name="LV_IMAGE_ALIGN_DEFAULT" />: Meaning top left
-- <ApiLink name="LV_IMAGE_ALIGN_TOP_LEFT" />
-- <ApiLink name="LV_IMAGE_ALIGN_TOP_MID" />
-- <ApiLink name="LV_IMAGE_ALIGN_TOP_RIGHT" />
-- <ApiLink name="LV_IMAGE_ALIGN_BOTTOM_LEFT" />
-- <ApiLink name="LV_IMAGE_ALIGN_BOTTOM_MID" />
-- <ApiLink name="LV_IMAGE_ALIGN_BOTTOM_RIGHT" />
-- <ApiLink name="LV_IMAGE_ALIGN_LEFT_MID" />
-- <ApiLink name="LV_IMAGE_ALIGN_RIGHT_MID" />
-- <ApiLink name="LV_IMAGE_ALIGN_CENTER" />
-- <ApiLink name="LV_IMAGE_ALIGN_STRETCH" />
-- <ApiLink name="LV_IMAGE_ALIGN_TILE" />
-- <ApiLink name="LV_IMAGE_ALIGN_CONTAIN" />
-- <ApiLink name="LV_IMAGE_ALIGN_COVER" />
+## Data binding
 
-Any `offset` value is applied after the image source is aligned. For example setting
-an offset of `y=-10` with `align` == <ApiLink name="LV_IMAGE_ALIGN_CENTER" /> will
-move the image source up 10 pixels from the center of the Widget.
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
 
-To automatically scale or tile the image, pass one of these `align` values:
-
-- <ApiLink name="LV_IMAGE_ALIGN_STRETCH" /> Set X and Y scale to fill the Widget's area
-- <ApiLink name="LV_IMAGE_ALIGN_TILE" /> Tile image to fill Widget's area. Offset is applied to shift the tiling.
-- <ApiLink name="LV_IMAGE_ALIGN_CONTAIN" /> The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area.
-- <ApiLink name="LV_IMAGE_ALIGN_COVER" /> The image keeps its aspect ratio and fills the Widget's area.
-
-### Data binding
-
-To get familiar with observers, subjects, and data bindings in general visit the
-[Observer](/main-modules/observer/observer) page.
-
-This method of subscribing to a pointer Subject affects a Image Widget's source (`src`)
-value directly.  Note that this is a one-way binding (Subject ==> Widget) so when
-the subject changes, the Image will be updated too.
-
-It supports only pointer subjects.
+An Image binds its `src` to a pointer Subject. The link is one-way
+(Subject → Widget): application-side writes into the subject point the
+widget at a new image descriptor. Only pointer subjects are supported.
 
 - <ApiLink name="lv_image_bind_src" display="lv_image_bind_src(img, &subject)" />
 

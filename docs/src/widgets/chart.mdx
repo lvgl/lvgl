@@ -27,84 +27,23 @@ Charts can:
 
 ## Chart Basics
 
-Each chart has the following attributes (over and above attributes found in
-[all Widgets](/widgets/base_widget)):
+A chart is built from a few independent pieces, each covered in its own
+section below:
 
-Type (governs how a chart's data series are drawn)
+- a **type** (line / curve / bar / stacked / scatter) — see [Chart type](#chart-type)
+- one or more **data series**, each pinned to one of the four built-in
+  axes — see [Data series](#data-series)
+- a fixed **point count** that sizes every series' value array — see
+  [Number of points](#number-of-points)
+- optional **cursors** to mark a location on the chart — see [Cursor](#cursor)
+- an **update mode** controlling how <ApiLink name="lv_chart_set_next_value" /> reshapes the
+  series — see [Update modes](#update-modes)
 
-- Can be LINE (default), BAR, STACKED, SCATTER, or NONE.
-- You can change the chart's type at any point during its life.
+Drawing order is back-to-front: background and division lines, then
+data series in the order they were added, then cursors in the order they
+were added. The most recently added series and cursor sit on top.
 
-Horizontal and Vertical division lines
-
-- default 3 and 5 respectively
-- can be any non-negative value including 0
-
-2 Y axes and 2 X axes (the latter are used with SCATTER charts)
-
-- All 4 axes come with each chart automatically (they do not have to be created).
-- Their default ranges are [0..100].  If you need a different range, set it before
-  chart is drawn.
-- You "use" an axis by associating it with a data series, which happens when the
-  data series is created (more on this below).  More than one data series can be
-  associated with each axis.
-
-Point count (number of data points in all data series added to the chart)
-
-- default 10
-- If you provide your own data-value arrays, each array so provided must contain
-  at least this number of values.
-- For LINE-, CURVE-, BAR-, STACKED-charts, this is the number of points on the X axis.
-- LINE-, CURVE-, BAR-, STACKED-charts require only one data-value array to supply Y-values for each data point.
-- For SCATTER charts, this is the number of scatter-points in the data series.
-- SCATTER charts have separate data-value arrays for both X-values and Y-values.
-
-Any number of data series
-
-- After a chart is created, it initially contains no data series.  You have to add them.
-- You can add and remove data series at any time during a chart's life.
-- When a data series is created, it comes with pre-allocated values array(s)
-  based on its chart type and `point_count`.  (All chart types use an array of
-  Y-values.  SCATTER-type charts also use an array of X-values.).  All Y-values so
-  allocated are set to <ApiLink name="LV_CHART_POINT_NONE" />, which causes that point to be hidden.
-- To get points to be drawn on the chart, you must set their Y-values to something
-  other than <ApiLink name="LV_CHART_POINT_NONE" />.
-- You can hide a point by setting its Y-value to <ApiLink name="LV_CHART_POINT_NONE" />.
-- If desired, you can tell a data series to instead use a value array you
-  provide.  If you do:
-
-  - Pre-allocated value arrays are automatically freed.
-  - That data series will continue to use *your* array from that time onward.
-  - The values in your array must remain available through the life of that data series.
-  - You must ensure each array provided contains at least `point_count` `int32_t` elements.
-  - Management of the life any value arrays you provide is up to you.
-
-Any number of cursors
-
-- After a chart is created, it initially contains no cursors.  You have to add them
-  if you want to use them.
-- You can add, show, hide or remove cursors at any time during a chart's life.
-
-Update mode
-
-- [See below](/widgets/chart)
-
-### Chart layers
-
-When a chart is drawn, certain things appear on top of other things, in this
-order, from back to front:
-
-- The chart's background (with optional division lines)
-- Each data series:
-
-  - Earliest data series added appears on top.
-  - For a SCATTER chart, within each series, points later in the sequence will appear
-    on top of points earlier in the sequence when there is overlap.
-- Each cursor (if there are any):
-
-  - The most recent cursor added appears on top.
-
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> The background of the chart. Uses the [typical
    background](/common-widget-features/styles/overview) and line style properties (for division lines).
@@ -126,9 +65,7 @@ order, from back to front:
    the appearance of the cursor's "point" showing its location.  If either `width`
    or `height` are set to 0, only the cursor's lines are drawn.
 
-## Details
-
-### Chart type
+## Chart type
 
 <LvglXMLExample name="lv_example_chart_types" path="widgets/chart/chart_types/lv_example_chart_types" />
 
@@ -136,7 +73,7 @@ For scatter charts each data point is an (X, Y) pair, and the series
 binds to both an X axis and a Y axis with `LV_CHART_AXIS_PRIMARY_X | LV_CHART_AXIS_PRIMARY_Y`.
 This C example also tints each point between red and blue based on its
 position and fades older samples — both effects are driven from
-`LV_EVENT_DRAW_TASK_ADDED`, so they stay in C even though the chart
+<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />, so they stay in C even though the chart
 itself is pure widget config:
 
 <LvglExample name="lv_example_chart_scatter" path="widgets/chart/lv_example_chart_scatter" />
@@ -149,7 +86,7 @@ A chart can be one of the following types:
   styles (for <ApiLink name="LV_PART_ITEMS" />) are set and both `width` and
   `height` have non-zero values.
 - <ApiLink name="LV_CHART_TYPE_CURVE" />: Similar to the LINE type, but it draws Bezier curves
-  between data points.  `LV_USE_VECTOR_GRAPHICS` and a draw unit (e.g. VGLite, or ThorVG for
+  between data points.  <ApiLink name="LV_USE_VECTOR_GRAPHICS" /> and a draw unit (e.g. VGLite, or ThorVG for
   software rendering) need to be enabled. It also supports the `line_dash_gap/width` style
   properties.
 - <ApiLink name="LV_CHART_TYPE_BAR" />: Draw individual vertical bars for each point in each series.
@@ -164,7 +101,7 @@ A chart can be one of the following types:
 Charts start their life as LINE charts.  You can change a chart's type with
 <ApiLink name="lv_chart_set_type" display="lv_chart_set_type(chart, LV_CHART_TYPE_...)" />.
 
-### Data series
+## Data series
 
 <LvglXMLExample name="lv_example_chart_series" path="widgets/chart/chart_series/lv_example_chart_series" />
 
@@ -220,47 +157,32 @@ For SCATTER-type charts,
 
 can be used as well.
 
-### Modifying data
+## Modifying data
 
-You have several options to set the Y-values for a data series:
+Four ways to write a series value:
 
-1. Set the values programmatically in the array like `ser1->points[3] = 7` and refresh the
-   chart with <ApiLink name="lv_chart_refresh" display="lv_chart_refresh(chart)" />.
-2. Use <ApiLink name="lv_chart_set_series_value_by_id" display="lv_chart_set_series_value_by_id(chart, series, id, value)" /> where `id` is
-   the zero-based index of the point you wish to update.
-3. Use <ApiLink name="lv_chart_set_next_value" display="lv_chart_set_next_value(chart, series, value)" />.
-   (See Update modes below.)
-4. Set all points to a single Y-value with <ApiLink name="lv_chart_set_all_values" display="lv_chart_set_all_values(chart, series, value)" />.
+| Function | Use when |
+|---|---|
+| <ApiLink name="lv_chart_set_series_value_by_id" display="lv_chart_set_series_value_by_id(chart, ser, id, v)" /> | updating one specific point by index |
+| <ApiLink name="lv_chart_set_next_value" display="lv_chart_set_next_value(chart, ser, v)" /> | streaming live data — paired with [Update modes](#update-modes) |
+| <ApiLink name="lv_chart_set_all_values" display="lv_chart_set_all_values(chart, ser, v)" /> | filling the whole series with one value |
+| `ser->points[i] = v` + <ApiLink name="lv_chart_refresh" display="lv_chart_refresh(chart)" /> | bulk writes where the helpers would be overhead |
 
-Use <ApiLink name="LV_CHART_POINT_NONE" /> as value to make the library skip drawing
-that point, column, or scatter-point.
+Use <ApiLink name="LV_CHART_POINT_NONE" /> to hide a point. Scatter charts have
+`_set_series_value_by_id2` / `_set_next_value2` variants that take both X
+and Y.
 
-For SCATTER-type charts,
+## Update modes
 
-- <ApiLink name="lv_chart_set_series_value_by_id2" display="lv_chart_set_series_value_by_id2(chart, series, id, x_value, y_value)" /> and
-- <ApiLink name="lv_chart_set_next_value2" display="lv_chart_set_next_value2(chart, series, x_value, y_value)" />
+<ApiLink name="lv_chart_set_next_value" /> writes into the series according to the chart's
+update mode (set with <ApiLink name="lv_chart_set_update_mode" />):
 
-can be used as well.
-
-### Update modes
-
-<ApiLink name="lv_chart_set_next_value" /> can behave in two ways depending on *update
-mode*:
-
-- <ApiLink name="LV_CHART_UPDATE_MODE_SHIFT" />: Shift old data to the left and add the new one to the right.
-- <ApiLink name="LV_CHART_UPDATE_MODE_CIRCULAR" />: Add the new data in circular fashion, like an ECG diagram.
-
-The update mode can be changed with
-<ApiLink name="lv_chart_set_update_mode" display="lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_...)" />.
-
-A practical illustration of `LV_CHART_UPDATE_MODE_CIRCULAR`: a line series is
-fed by a timer that pushes a new random value each tick; the rendering loops
-around the buffer, leaving a small gap that marks where the next sample
-will land. Useful for ECG-style "live" plots.
+- <ApiLink name="LV_CHART_UPDATE_MODE_SHIFT" /> — shift older points left, new value on the right.
+- <ApiLink name="LV_CHART_UPDATE_MODE_CIRCULAR" /> — overwrite oldest in place, leaving a gap that marks the write head (ECG-style).
 
 <LvglExample name="lv_example_chart_circular_gap" path="widgets/chart/lv_example_chart_circular_gap" />
 
-### Number of points
+## Number of points
 
 The number of points in the series can be modified by
 <ApiLink name="lv_chart_set_point_count" display="lv_chart_set_point_count(chart, point_num)" />. The default value is 10.
@@ -268,7 +190,7 @@ Note: this affects the number of points processed when an external
 value array is assigned to a series, so you also need to be sure any external
 array so provided contains at least `point_num` elements.
 
-#### Handling large numbers of points
+### Handling large numbers of points
 
 On LINE charts, if the number of points is greater than the pixels
 horizontally, the Chart will draw only vertical lines to make the
@@ -276,7 +198,7 @@ drawing of large amount of data effective. If there are, let's say, 10
 points to a pixel, LVGL searches the smallest and the largest value and
 draws a vertical lines between them to ensure no peaks are missed.
 
-### Vertical range
+## Vertical range
 
 You can specify the minimum and maximum values in Y-direction with
 <ApiLink name="lv_chart_set_axis_range" display="lv_chart_set_axis_range(chart, axis, min, max)" />. `axis` can be
@@ -286,7 +208,7 @@ You can specify the minimum and maximum values in Y-direction with
 The value of the points will be scaled proportionally. The default range
 is: 0..100.
 
-### Division lines
+## Division lines
 
 The number of horizontal and vertical division lines can be modified by
 <ApiLink name="lv_chart_set_div_line_count" display="lv_chart_set_div_line_count(chart, hdiv_num, vdiv_num)" />. The default
@@ -295,7 +217,7 @@ visible border on a side and no padding on that side, the division line
 would be drawn on top of the border and in this case it is not drawn so
 as not to hide the chart border.
 
-### Override default start point for series
+## Override default start point for series
 
 If you want a plot to start from a point other than the default which is
 `point[0]` of the series, you can set an alternative index with the
@@ -305,7 +227,7 @@ the new zero-based index position to start plotting from.
 Note that <ApiLink name="LV_CHART_UPDATE_MODE_SHIFT" /> also changes the
 `start_point`.
 
-### Tick marks and labels
+## Tick marks and labels
 
 <LvglXMLExample name="lv_example_chart_ticks_labels" path="widgets/chart/chart_ticks_labels/lv_example_chart_ticks_labels" />
 
@@ -313,7 +235,7 @@ With the help of [Scale](/widgets/scale), vertical and horizontal scales can be 
 in a very flexible way.  See the [examples 2](#axis-ticks-and-labels-with-scrolling)
 below to learn more.
 
-### Zoom
+## Zoom
 
 To zoom the chart all you need to do is wrap it in a parent container and set the
 chart's width and/or height to a larger value.  Doing this will cause the chart
@@ -322,51 +244,36 @@ window".
 
 <LvglXMLExample name="lv_example_chart_scrollable" path="widgets/chart/chart_scrollable/lv_example_chart_scrollable" />
 
-### Cursor
+## Cursor
 
 <LvglXMLExample name="lv_example_chart_cursor" path="widgets/chart/chart_cursor/lv_example_chart_cursor" />
 
-A new cursor is initially given position <ApiLink name="LV_CHART_POINT_NONE" /> which causes
-it to be hidden.  To show the cursor, its location must be set by you
-programmatically using one of the functions below.
+Add a cursor with <ApiLink name="lv_chart_add_cursor" display="lv_chart_add_cursor(chart, color, dir)" />. `dir` is one
+or more `LV_DIR_*` values OR'd together — they pick which lines extend
+from the cursor point. A new cursor starts hidden; place it with one of:
 
-You can hide a cursor without removing it from the chart by using
-<ApiLink name="lv_chart_set_cursor_point" /> by passing <ApiLink name="LV_CHART_POINT_NONE" /> as
-the point id.
+- <ApiLink name="lv_chart_set_cursor_pos" display="lv_chart_set_cursor_pos(chart, cursor, &point)" /> — anchor at `(x, y)` in chart coordinates; the cursor scrolls with the chart.
+- <ApiLink name="lv_chart_set_cursor_point" display="lv_chart_set_cursor_point(chart, cursor, series, point_id)" /> — attach to a data point; the cursor follows it as values change.
 
-A cursor can be added with `lv_chart_cursor_t * c1 = lv_chart_add_cursor(chart, color, dir);`.
-The possible values of `dir` are the enumeration values of <ApiLink name="lv_dir_t" />:
-`LV_DIR_NONE/RIGHT/UP/LEFT/DOWN/HOR/VER/ALL` or their bit-wise OR-ed values to tell
-the chart which direction(s) to draw its lines.
+Pass <ApiLink name="LV_CHART_POINT_NONE" /> as the `point_id` to hide without removing.
+<ApiLink name="lv_chart_get_point_pos_by_id" /> returns a point's pixel coordinates if
+you need to set up a cursor via <ApiLink name="lv_chart_set_cursor_pos" />.
 
-<ApiLink name="lv_chart_set_cursor_pos" display="lv_chart_set_cursor_pos(chart, cursor, &point)" /> sets the position of
-the cursor to an arbitrary point on the chart. `&point` is a pointer to an
-<ApiLink name="lv_point_t" /> variable. E.g. `lv_point_t point = {10, 20}`. If the chart
-is scrolled, the cursor moves with it.
+## Pressed-point tooltip
 
-<ApiLink name="lv_chart_get_point_pos_by_id" display="lv_chart_get_point_pos_by_id(chart, series, id, &point_out)" /> gets the
-coordinate of a given point on the chart.  This is useful to place the cursor on
-that data point.
-
-<ApiLink name="lv_chart_set_cursor_point" display="lv_chart_set_cursor_point(chart, cursor, series, point_id)" /> places the
-cursor on the specified data point on the chart.  If the point's position changes
-(via a new value or via scrolling), the cursor moves with the point.
-
-### Pressed-point tooltip
-
-`LV_EVENT_VALUE_CHANGED` fires when the user presses a chart point;
-`lv_chart_get_pressed_point` returns the index. This C example reads that
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> fires when the user presses a chart point;
+<ApiLink name="lv_chart_get_pressed_point" /> returns the index. This C example reads that
 index and floats a small tooltip with the pressed value above the chart —
 the kind of inspection helper XML can't drive on its own because it
 requires a callback.
 
 <LvglExample name="lv_example_chart_pressed_tooltip" path="widgets/chart/lv_example_chart_pressed_tooltip" />
 
-### Drawing customisations
+## Drawing customisations
 
 Chart styling stops at the part level — to vary appearance *per data point*
 or paint custom shapes alongside the series, hook
-`LV_EVENT_DRAW_TASK_ADDED`. The callback receives every draw task the chart
+<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" />. The callback receives every draw task the chart
 emits and may mutate the fill/stroke descriptors before they execute, or
 draw extra shapes on the chart's layer.
 

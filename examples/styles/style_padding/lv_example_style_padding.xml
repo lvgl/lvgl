@@ -1,0 +1,45 @@
+<!--
+ @title Padding
+ @brief Inset a Widget's content per side with the directional pad_* properties.
+
+ Padding shrinks the content area. The left card pads only top and left
+ (`style_pad_top`/`style_pad_left` = 26, the opposite sides 8); the right
+ card pads every side by 18. An accent block fills each card at
+ 100% × 100%, so the offset makes asymmetric vs uniform inset obvious.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- Card surface -->
+		<style name="style_card"
+			radius="16" bg_opa="100%" bg_color="0xffffff"
+			border_width="1" border_color="0xe2e8f0" />
+		<!-- Block that fills the padded content area -->
+		<style name="style_block" radius="10" bg_opa="100%" bg_color="#accent" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="18">
+		<!-- 💡 Edit each card's `style_pad_*`; the accent block tracks the shrinking content area. -->
+		<lv_label width="100%" style_text_align="center" text="Style: padding" />
+
+		<lv_obj width="content" height="content" flex_flow="row"
+			style_pad_column="22" style_bg_opa="0" style_border_width="0" style_pad_all="0">
+			<lv_obj width="120" height="120"
+				style_pad_top="26" style_pad_left="26" style_pad_right="8" style_pad_bottom="8">
+				<style name="style_card" />
+				<lv_obj width="100%" height="100%">
+					<style name="style_block" />
+				</lv_obj>
+			</lv_obj>
+
+			<lv_obj width="120" height="120" style_pad_all="18">
+				<style name="style_card" />
+				<lv_obj width="100%" height="100%">
+					<style name="style_block" />
+				</lv_obj>
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>

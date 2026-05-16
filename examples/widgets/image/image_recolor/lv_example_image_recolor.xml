@@ -12,10 +12,10 @@
 -->
 <screen>
 	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
-		<!-- 💡 Drag the slider; the cogwheel's tint fades in and out as `subject_opa` (0..255) moves. -->
+		<!-- 💡 Drag the slider; the logo's tint fades in and out as `subject_opa` (0..255) moves. -->
 		<lv_label width="100%" style_text_align="center" text="Image: recolor" />
 
-		<lv_image src="img_render_lvgl_logo_argb8888"
+		<lv_image src="img_lvgl_logo"
 			style_image_recolor-main="0xef4444">
 			<bind_style_prop prop="image_recolor_opa" selector="main" subject="subject_opa" />
 		</lv_image>

@@ -12,15 +12,13 @@ of drawing a rectangle.  The list of states is covered below.
 You can set a left, right and middle image, and the middle image will be
 repeated to match the width of the Widget.
 
-## Parts and Styles
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> Refers to the image(s). If background style
    properties are used, a rectangle will be drawn behind the Image
    Button.
 
-## Usage
-
-### Image sources
+## Image sources
 
 To set the image in a state, use the
 <ApiLink name="lv_imagebutton_set_src" display="lv_imagebutton_set_src(imagebutton, LV_IMAGEBUTTON_STATE_..., src_left, src_mid, src_right)" />.
@@ -47,7 +45,7 @@ used for any state that has not had image sources set for it.  If an image sourc
 have been set for other states, e.g. <ApiLink name="LV_IMAGEBUTTON_STATE_PRESSED" />,
 they will be used instead when the Image Button is in that state.
 
-### Setting State Programmatically
+## Setting State Programmatically
 
 Instead of the regular <ApiLink name="lv_obj_add_state" /> and <ApiLink name="lv_obj_remove_state" /> functions,
 use <ApiLink name="lv_imagebutton_set_state" display="lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)" /> to
