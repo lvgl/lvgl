@@ -369,7 +369,7 @@ static void window_create(lv_display_t * disp)
     dsc->zoom = 1.0;
 
     int flag = SDL_WINDOW_RESIZABLE;
-    #if SDL_VERSION_ATLEAST(2, 0, 22)
+    #if SDL_WINDOW_TRANSPARENT
         flag |= SDL_WINDOW_TRANSPARENT;
     #endif
     #if LV_SDL_FULLSCREEN
