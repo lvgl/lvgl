@@ -2,12 +2,12 @@ set(LV_EDITOR_PROJECT_SOURCES)
 list(
   APPEND
   LV_EDITOR_PROJECT_SOURCES
-  ${CMAKE_CURRENT_LIST_DIR}/fonts/font_large_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/font_example_large_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_arc_bg_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_arc_indicator_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_bar_bg_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_bar_indicator_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_example_lvgl_logo_data.c
-  ${CMAKE_CURRENT_LIST_DIR}/screens/lv_example_slider_img_indicator_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/lv_example_textarea_placeholder_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/xml_project_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/xml_project.c)

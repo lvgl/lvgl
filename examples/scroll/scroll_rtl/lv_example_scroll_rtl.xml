@@ -1,0 +1,34 @@
+<!--
+ @title Right-to-left scrolling
+ @brief An RTL base direction moves the vertical scrollbar to the left side.
+
+ `style_base_dir="rtl"` flips the panel's base direction. The vertical
+ scrollbar is then drawn on the left edge instead of the right, and the
+ property is inherited, so setting it once on the panel is enough. The
+ content itself is ordinary so the placement change is the only visible
+ difference.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x9429ff" />
+	</consts>
+	<styles>
+		<!-- Accent the bar so its left-side (RTL) placement is obvious -->
+		<style name="style_scrollbar" width="10" radius="5" bg_color="#accent" bg_opa="100%" pad_left="4" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+		<!-- 💡 The scrollbar sits on the LEFT because the panel's base direction is RTL. -->
+		<lv_label width="100%" style_text_align="center" text="Scroll: right-to-left" />
+
+		<lv_obj width="220" height="160" flex_flow="column" style_pad_row="8" style_base_dir="rtl" scrollbar_mode="on">
+			<style name="style_scrollbar" selector="scrollbar" />
+			<lv_button width="100%"><lv_label align="center" text="Row 1" /></lv_button>
+			<lv_button width="100%"><lv_label align="center" text="Row 2" /></lv_button>
+			<lv_button width="100%"><lv_label align="center" text="Row 3" /></lv_button>
+			<lv_button width="100%"><lv_label align="center" text="Row 4" /></lv_button>
+			<lv_button width="100%"><lv_label align="center" text="Row 5" /></lv_button>
+			<lv_button width="100%"><lv_label align="center" text="Row 6" /></lv_button>
+		</lv_obj>
+	</view>
+</screen>

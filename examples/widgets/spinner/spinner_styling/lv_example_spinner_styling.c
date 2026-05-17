@@ -17,21 +17,32 @@
  */
 void lv_example_spinner_styling_create(void)
 {
-    static lv_style_t style_spinner_main;
-    static lv_style_t style_spinner_indicator;
+    static lv_style_t style_table_main;
+    static lv_style_t style_table_items;
+    static lv_style_t style_table_items_pressed;
 
     static bool inited = false;
 
     if(!inited) {
-        lv_style_init(&style_spinner_main);
-        lv_style_set_arc_color(&style_spinner_main, lv_color_hex(0xe5e7eb));
-        lv_style_set_arc_width(&style_spinner_main, 8);
-        lv_style_set_arc_rounded(&style_spinner_main, true);
+        lv_style_init(&style_table_main);
+        lv_style_set_bg_color(&style_table_main, lv_color_hex(0xffffff));
+        lv_style_set_border_color(&style_table_main, lv_color_hex(0xe5e7eb));
+        lv_style_set_border_width(&style_table_main, 2);
+        lv_style_set_clip_corner(&style_table_main, true);
 
-        lv_style_init(&style_spinner_indicator);
-        lv_style_set_arc_color(&style_spinner_indicator, lv_color_hex(0x6366f1));
-        lv_style_set_arc_width(&style_spinner_indicator, 8);
-        lv_style_set_arc_rounded(&style_spinner_indicator, true);
+        lv_style_init(&style_table_items);
+        lv_style_set_bg_color(&style_table_items, lv_color_hex(0xffffff));
+        lv_style_set_bg_opa(&style_table_items, (255 * 100 / 100));
+        lv_style_set_border_color(&style_table_items, lv_color_hex(0xe5e7eb));
+        lv_style_set_border_width(&style_table_items, 1);
+        lv_style_set_border_side(&style_table_items, LV_BORDER_SIDE_FULL);
+        lv_style_set_pad_all(&style_table_items, 6);
+        lv_style_set_text_align(&style_table_items, LV_TEXT_ALIGN_CENTER);
+        lv_style_set_text_color(&style_table_items, lv_color_hex(0x111827));
+
+        lv_style_init(&style_table_items_pressed);
+        lv_style_set_bg_color(&style_table_items_pressed, lv_color_hex(0x6366f1));
+        lv_style_set_text_color(&style_table_items_pressed, lv_color_hex(0xffffff));
 
         inited = true;
     }
@@ -45,13 +56,19 @@ void lv_example_spinner_styling_create(void)
     lv_obj_t * lv_label_0 = lv_label_create(screen);
     lv_obj_set_width(lv_label_0, lv_pct(100));
     lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Spinner: styling parts");
+    lv_label_set_text(lv_label_0, "Table: styling parts");
 
-    lv_obj_t * lv_spinner_0 = lv_spinner_create(screen);
-    lv_obj_set_size(lv_spinner_0, 100, 100);
-    lv_spinner_set_anim_duration(lv_spinner_0, 1200);
-    lv_spinner_set_arc_sweep(lv_spinner_0, 270);
-    lv_obj_add_style(lv_spinner_0, &style_spinner_main, LV_PART_MAIN);
-    lv_obj_add_style(lv_spinner_0, &style_spinner_indicator, LV_PART_INDICATOR);
+    lv_obj_t * lv_table_0 = lv_table_create(screen);
+    lv_table_set_row_count(lv_table_0, 3);
+    lv_table_set_column_count(lv_table_0, 2);
+    lv_table_set_cell_value(lv_table_0, 0, 0, "Metric");
+    lv_table_set_cell_value(lv_table_0, 0, 1, "Value");
+    lv_table_set_cell_value(lv_table_0, 1, 0, "Latency");
+    lv_table_set_cell_value(lv_table_0, 1, 1, "14 ms");
+    lv_table_set_cell_value(lv_table_0, 2, 0, "Throughput");
+    lv_table_set_cell_value(lv_table_0, 2, 1, "98 req/s");
+    lv_obj_add_style(lv_table_0, &style_table_main, LV_PART_MAIN);
+    lv_obj_add_style(lv_table_0, &style_table_items, LV_PART_ITEMS);
+    lv_obj_add_style(lv_table_0, &style_table_items_pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
 }
 

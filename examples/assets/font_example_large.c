@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 32 px
  * Bpp: 4
- * Opts: --font /fonts/Montserrat-Medium.ttf -o /fonts/font_example_large_data.c --size 32 --bpp 4 --format lvgl --no-compress --range 0x20-0x7F
+ * Opts: --font /fonts/Montserrat-Medium.ttf -o /fonts/font_example_large.c --size 32 --bpp 4 --format lvgl --no-compress --range 0x20-0x7F
  ******************************************************************************/
 
 #ifdef __has_include
@@ -20,11 +20,11 @@
 
 
 
-#ifndef font_example_large_DATA
-    #define font_example_large_DATA 1
+#ifndef FONT_EXAMPLE_LARGE
+    #define FONT_EXAMPLE_LARGE 1
 #endif
 
-#if font_example_large_DATA
+#if FONT_EXAMPLE_LARGE
 
 /*-----------------
  *    BITMAPS
@@ -2431,9 +2431,9 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
 
 /*Initialize a public general font descriptor*/
 #if LVGL_VERSION_MAJOR >= 8
-const lv_font_t font_example_large_data = {
+const lv_font_t font_example_large = {
 #else
-lv_font_t font_example_large_data = {
+lv_font_t font_example_large = {
 #endif
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
@@ -2460,4 +2460,4 @@ lv_font_t font_example_large_data = {
 
 
 
-#endif /*#if font_example_large_DATA*/
+#endif /*#if FONT_EXAMPLE_LARGE*/

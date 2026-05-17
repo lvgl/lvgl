@@ -34,13 +34,13 @@
 			height="content"
 		>
 			<lv_button>
-				<lv_label align="center" text="-"  style_text_font="font_large"/>
+				<lv_label align="center" text="-"  style_text_font="font_example_large"/>
 				<subject_increment_event subject="subject_value2" trigger="clicked" step="-1"/>
 				<subject_increment_event subject="subject_value2" trigger="long_pressed_repeat"  step="-1"/>
 			</lv_button>
-			<lv_label bind_text="subject_value2" style_text_font="font_large"/>
+			<lv_label bind_text="subject_value2" style_text_font="font_example_large"/>
 			<lv_button>
-				<lv_label align="center" text="+"  style_text_font="font_large"/>
+				<lv_label align="center" text="+"  style_text_font="font_example_large"/>
 				<subject_increment_event subject="subject_value2" trigger="clicked"  step="1"/>
 				<subject_increment_event subject="subject_value2" trigger="long_pressed_repeat" step="1" />
 			</lv_button>

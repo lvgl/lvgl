@@ -41,6 +41,7 @@ void lv_example_chart_ticks_labels_create(void)
 
     lv_obj_t * lv_scale_0 = lv_scale_create(screen);
     lv_obj_set_size(lv_scale_0, 280, 28);
+    lv_obj_set_style_pad_hor(lv_scale_0, 24, 0);
     lv_scale_set_mode(lv_scale_0, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
     lv_scale_set_total_tick_count(lv_scale_0, 6);
     lv_scale_set_major_tick_every(lv_scale_0, 1);

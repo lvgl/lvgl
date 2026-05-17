@@ -40,6 +40,6 @@
 
     <fonts>
         <!-- Add <bin> , <tiny_ttf>, <freetype> tags here -->
-        <bin name="font_large" src_path="fonts/Montserrat-Medium.ttf" size="32" bpp="4" as_file="false" />
+        <bin name="font_example_large" src_path="fonts/Montserrat-Medium.ttf" size="32" bpp="4" as_file="false" />
     </fonts>
 </globals>

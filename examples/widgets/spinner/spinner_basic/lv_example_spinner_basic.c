@@ -32,7 +32,7 @@ void lv_example_spinner_basic_create(void)
     /* Short arc, faster */
     lv_obj_t * lv_spinner_1 = lv_spinner_create(screen);
     lv_obj_set_size(lv_spinner_1, 80, 80);
-    lv_spinner_set_anim_duration(lv_spinner_1, 800);
-    lv_spinner_set_arc_sweep(lv_spinner_1, 90);
+    lv_spinner_set_anim_duration(lv_spinner_1, 600);
+    lv_spinner_set_arc_sweep(lv_spinner_1, 180);
 }
 

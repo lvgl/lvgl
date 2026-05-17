@@ -16,25 +16,26 @@
  */
 void lv_example_slider_img_indicator_create(void)
 {
-    LV_IMAGE_DECLARE(img_bar_bg);
-    LV_IMAGE_DECLARE(img_bar_indicator);
-
     static lv_style_t style_slider_track;
     static lv_style_t style_slider_indicator;
     static lv_style_t style_slider_knob;
 
     static lv_subject_t subject_value2;
 
+    LV_IMAGE_DECLARE(img_bar_bg);
+    LV_IMAGE_DECLARE(img_bar_indicator);
+    LV_FONT_DECLARE(font_example_large);
+
     static bool inited = false;
 
     if(!inited) {
         lv_style_init(&style_slider_track);
-        lv_style_set_bg_image_src(&style_slider_track, img_bar_bg);
+        lv_style_set_bg_image_src(&style_slider_track, &img_bar_bg);
         lv_style_set_bg_opa(&style_slider_track, 0);
         lv_style_set_radius(&style_slider_track, 0);
 
         lv_style_init(&style_slider_indicator);
-        lv_style_set_bg_image_src(&style_slider_indicator, img_bar_indicator);
+        lv_style_set_bg_image_src(&style_slider_indicator, &img_bar_indicator);
         lv_style_set_bg_opa(&style_slider_indicator, 0);
         lv_style_set_radius(&style_slider_indicator, 0);
 
@@ -75,6 +76,6 @@ void lv_example_slider_img_indicator_create(void)
 
     lv_obj_t * lv_label_1 = lv_label_create(screen);
     lv_label_bind_text(lv_label_1, &subject_value2, "%d");
-    lv_obj_set_style_text_font(lv_label_1, font_large, 0);
+    lv_obj_set_style_text_font(lv_label_1, &font_example_large, 0);
 }
 

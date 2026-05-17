@@ -18,32 +18,31 @@ void lv_example_arc_img_indicator_create(void)
 {
     LV_IMAGE_DECLARE(img_arc_bg);
     LV_IMAGE_DECLARE(img_arc_indicator);
-
     static lv_style_t style_arc_bg;
     static lv_style_t style_arc_indicator;
     static lv_style_t style_arc_knob;
 
-    static lv_subject_t subject_value;
+    static lv_subject_t subject_value2;
 
     static bool inited = false;
 
     if(!inited) {
         lv_style_init(&style_arc_bg);
-        lv_style_set_arc_image_src(&style_arc_bg, img_arc_bg);
+        lv_style_set_arc_image_src(&style_arc_bg, &img_arc_bg);
         lv_style_set_arc_width(&style_arc_bg, 40);
         lv_style_set_arc_rounded(&style_arc_bg, false);
 
         lv_style_init(&style_arc_indicator);
-        lv_style_set_arc_image_src(&style_arc_indicator, img_arc_indicator);
+        lv_style_set_arc_image_src(&style_arc_indicator, &img_arc_indicator);
         lv_style_set_arc_width(&style_arc_indicator, 40);
         lv_style_set_arc_rounded(&style_arc_indicator, false);
 
         lv_style_init(&style_arc_knob);
         lv_style_set_opa(&style_arc_knob, 0);
 
-        lv_subject_init_int(&subject_value, 50);
-        lv_subject_set_min_value_int(&subject_value, 0);
-        lv_subject_set_max_value_int(&subject_value, 100);
+        lv_subject_init_int(&subject_value2, 20);
+        lv_subject_set_min_value_int(&subject_value2, 0);
+        lv_subject_set_max_value_int(&subject_value2, 100);
         inited = true;
     }
 
@@ -53,18 +52,23 @@ void lv_example_arc_img_indicator_create(void)
     lv_obj_set_style_pad_row(screen, 0, 0);
 
     /* 💡 Change value to sweep the glowing cyan indicator across the dark segmented background. */
+    lv_obj_t * lv_label_0 = lv_label_create(screen);
+    lv_obj_set_width(lv_label_0, lv_pct(100));
+    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text(lv_label_0, "Arc: image as indicator");
+
     lv_obj_t * lv_arc_0 = lv_arc_create(screen);
     lv_obj_set_size(lv_arc_0, 200, 200);
     lv_arc_set_min_value(lv_arc_0, 0);
     lv_arc_set_max_value(lv_arc_0, 22);
     lv_arc_set_bg_start_angle(lv_arc_0, 138);
     lv_arc_set_bg_end_angle(lv_arc_0, 41);
-    lv_arc_bind_value(lv_arc_0, &subject_value);
+    lv_arc_bind_value(lv_arc_0, &subject_value2);
     lv_obj_add_style(lv_arc_0, &style_arc_bg, LV_PART_MAIN);
     lv_obj_add_style(lv_arc_0, &style_arc_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(lv_arc_0, &style_arc_knob, LV_PART_KNOB);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_arc_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_bind_text(lv_label_0, &subject_value, NULL);
+    lv_obj_t * lv_label_1 = lv_label_create(lv_arc_0);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_bind_text(lv_label_1, &subject_value2, NULL);
 }
 

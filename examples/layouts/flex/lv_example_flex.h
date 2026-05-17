@@ -10,21 +10,6 @@
 extern "C" {
 #endif
 
-/*********************
- *      INCLUDES
- *********************/
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
 void lv_example_flex_align_create(void);
 void lv_example_flex_flow_create(void);
 void lv_example_flex_grow_create(void);
@@ -32,10 +17,6 @@ void lv_example_flex_ignore_layout_create(void);
 void lv_example_flex_internal_padding_create(void);
 void lv_example_flex_new_track_create(void);
 void lv_example_flex_rtl_create(void);
-
-/**********************
- *      MACROS
- **********************/
 
 #ifdef __cplusplus
 } /*extern "C"*/

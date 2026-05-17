@@ -23,8 +23,8 @@ void lv_example_arc_styling_create(void)
 
     if(!inited) {
         lv_style_init(&style_arc_bg);
-        lv_style_set_arc_color(&style_arc_bg, lv_color_hex(0xe2e8f0));
-        lv_style_set_arc_width(&style_arc_bg, 14);
+        lv_style_set_arc_color(&style_arc_bg, lv_color_hex(0xced8e4));
+        lv_style_set_arc_width(&style_arc_bg, 22);
         lv_style_set_arc_rounded(&style_arc_bg, true);
         lv_style_set_arc_opa(&style_arc_bg, 180);
 
@@ -32,6 +32,7 @@ void lv_example_arc_styling_create(void)
         lv_style_set_arc_color(&style_arc_indicator, lv_color_hex(0x6366f1));
         lv_style_set_arc_width(&style_arc_indicator, 14);
         lv_style_set_arc_rounded(&style_arc_indicator, true);
+        lv_style_set_pad_all(&style_arc_indicator, 4);
 
         lv_style_init(&style_arc_knob);
         lv_style_set_bg_opa(&style_arc_knob, (255 * 100 / 100));

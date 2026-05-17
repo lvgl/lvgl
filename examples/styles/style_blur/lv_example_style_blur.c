@@ -47,7 +47,7 @@ void lv_example_style_blur_create(void)
     lv_obj_set_width(lv_label_0, lv_pct(100));
     lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(lv_label_0,
-                      "Hey there, I'm a little text in the background and I'm mostly blurred.\n\nYou might see that some of my parts are sharp, but others under the glass cannot be read. ");
+                      "Hey there, I'm a little text in the background which is blurred. You might seem that some of parts are sharp, but other under the glass cannot be read. ");
 
     lv_obj_t * lv_button_0 = lv_button_create(screen);
     lv_obj_set_align(lv_button_0, LV_ALIGN_CENTER);
