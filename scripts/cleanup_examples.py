@@ -721,6 +721,15 @@ LV_IMAGE_SET_SRC_RE = re.compile(
     r"(lv_image_set_src\s*\(\s*[A-Za-z_]\w*\s*,\s*)(&?)([A-Za-z_]\w*)"
 )
 
+# A registered image can also reach a style by name through the image-src
+# style setters — `lv_style_set_bg_image_src(&style, name)`,
+# `lv_style_set_arc_image_src(...)`, `lv_obj_set_style_bg_image_src(obj,
+# name, sel)`, … — which need the same `&name` + `LV_IMAGE_DECLARE` fix. The
+# first argument is a `&style`/`obj`, so it is matched loosely as `[^,]+`.
+LV_STYLE_IMAGE_SRC_RE = re.compile(
+    r"(lv_(?:style_set|obj_set_style)_\w*image_src\s*\(\s*[^,]+,\s*)(&?)([A-Za-z_]\w*)"
+)
+
 
 def declare_and_ref_images(source: str, path: Path) -> str:
     images: list[str] = []  # preserve first-seen order for stable output
@@ -735,6 +744,7 @@ def declare_and_ref_images(source: str, path: Path) -> str:
         return f"{prefix}&{name}" if not amp else m.group(0)
 
     new_source = LV_IMAGE_SET_SRC_RE.sub(repl, source)
+    new_source = LV_STYLE_IMAGE_SRC_RE.sub(repl, new_source)
     if not images:
         return new_source
 
@@ -838,6 +848,140 @@ def declare_global_images(source: str, path: Path) -> str:
 
 
 # =============================================================================
+# Font declarations from globals.xml
+# =============================================================================
+#
+# The generator passes a `globals.xml`-registered font to a font setter by
+# bare name: `lv_obj_set_style_text_font(label, font_example_large, 0)` or
+# `lv_style_set_text_font(&style, font_example_large)`. To compile against a
+# C-array font the call needs `&font_example_large` and the example must
+# `LV_FONT_DECLARE(font_example_large)` so the linker resolves the extern.
+#
+# Scoped strictly to fonts declared in `globals.xml`'s `<fonts>` section, so
+# built-in fonts (`&lv_font_montserrat_*`, `LV_FONT_DEFAULT`), theme getters
+# (`lv_theme_get_font_*(...)`), and unrelated local `lv_font_t *` variables in
+# C-only examples are left untouched.
+
+
+def _load_globals_fonts() -> list[str]:
+    """Return font names from the `<fonts>` section of `globals.xml`.
+
+    Cached on first call. Keeps declaration order for stable output.
+    """
+    cache = getattr(_load_globals_fonts, "_cache", None)
+    if cache is not None:
+        return cache
+
+    fonts: list[str] = []
+    if GLOBALS_XML_PATH.exists():
+        tree = ET.parse(GLOBALS_XML_PATH)
+        fonts_elem = tree.getroot().find("fonts")
+        if fonts_elem is not None:
+            for child in fonts_elem:
+                if not isinstance(child.tag, str):
+                    continue
+                name = child.get("name")
+                if name and name not in fonts:
+                    fonts.append(name)
+
+    _load_globals_fonts._cache = fonts  # type: ignore[attr-defined]
+    return fonts
+
+
+def declare_and_ref_fonts(source: str, path: Path) -> str:
+    """`&`-prefix + `LV_FONT_DECLARE` every globals.xml font the example uses.
+
+    Idempotent: an already-`&`'d reference is left as-is, and a font that
+    already has a declare line is not declared again.
+    """
+    names = _load_globals_fonts()
+    if not names:
+        return source
+
+    used: list[str] = []  # globals order — stable output
+    new_source = source
+    for name in names:
+        # The font name must be the *whole* argument of a text-font setter:
+        # the trailing `[,)]` guard prevents matching a substring of e.g.
+        # `lv_theme_get_<name>(...)`.
+        ref_re = re.compile(
+            r"(lv_(?:obj_set_style|style_set)_text_font\s*\(\s*[^,]+,\s*)"
+            r"(&?)(" + re.escape(name) + r")(\s*[,)])"
+        )
+
+        def repl(m: re.Match) -> str:
+            prefix, amp, fname, tail = m.groups()
+            return m.group(0) if amp else f"{prefix}&{fname}{tail}"
+
+        new_source, count = ref_re.subn(repl, new_source)
+        if count:
+            used.append(name)
+
+    if not used:
+        return new_source
+
+    fn_match = FUNCTION_OPEN_BRACE_RE.search(new_source)
+    if not fn_match:
+        return new_source
+
+    insert_pos = fn_match.end()
+    decls = [
+        f"    LV_FONT_DECLARE({f});"
+        for f in used
+        if not re.search(rf"LV_FONT_DECLARE\s*\(\s*{re.escape(f)}\s*\)", new_source)
+    ]
+    if not decls:
+        return new_source
+
+    block = "\n".join(decls) + "\n\n"
+    return new_source[:insert_pos] + block + new_source[insert_pos:]
+
+
+# =============================================================================
+# Coalesce the declaration block
+# =============================================================================
+#
+# `declare_global_images`, `declare_and_ref_images` and `declare_and_ref_fonts`
+# each splice their own `\n\n`-terminated block in at the function's opening
+# brace, so a file using both ends up with the font block, a blank line, then
+# the image block — two stray groups in insertion order. Gather every
+# `LV_*_DECLARE` line that leads the function body and re-emit them as a single
+# contiguous block, images before fonts, followed by exactly one blank line —
+# the hand-written convention the example tree already uses.
+
+DECLARE_LINE_RE = re.compile(r"[ \t]*LV_(IMAGE|FONT)_DECLARE\([^)]*\);[ \t]*\Z")
+
+
+def coalesce_declares(source: str, path: Path) -> str:
+    fn_match = FUNCTION_OPEN_BRACE_RE.search(source)
+    if not fn_match:
+        return source
+
+    start = fn_match.end()
+    lines = source[start:].split("\n")
+
+    images: list[str] = []
+    fonts: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line.strip() == "":
+            i += 1
+            continue
+        m = DECLARE_LINE_RE.fullmatch(line)
+        if not m:
+            break
+        (images if m.group(1) == "IMAGE" else fonts).append(line.strip())
+        i += 1
+
+    if not images and not fonts:
+        return source
+
+    block = "\n".join(f"    {d}" for d in images + fonts) + "\n\n"
+    return source[:start] + block + "\n".join(lines[i:])
+
+
+# =============================================================================
 # Rename `style_inited` → `inited`
 # =============================================================================
 #
@@ -902,10 +1046,6 @@ TRANSFORMATIONS = [
     # Subject decls/inits — must run before the empty-block removal so the
     # block isn't yet "empty" when we want to fill it.
     init_subjects,
-    # Image declarations from globals.xml (covers style setters and any other use).
-    declare_global_images,
-    # Image declarations + `&` prefix for lv_image_set_src calls.
-    declare_and_ref_images,
     # Generator boilerplate.
     lambda s, p: remove_empty_style_inited(s),
     lambda s, p: remove_lv_trace_obj_create(s),
@@ -916,6 +1056,17 @@ TRANSFORMATIONS = [
     remove_return_screen,
     # Identity / naming.
     rename_create_function,
+    # Image/font declarations + `&` prefix. These insert `LV_*_DECLARE`
+    # lines at the function's opening brace, which `FUNCTION_OPEN_BRACE_RE`
+    # only locates once the signature is the final `void <name>_create(void)`
+    # — so they must run *after* `remove_return_screen` +
+    # `rename_create_function`, not before.
+    declare_global_images,
+    declare_and_ref_images,
+    declare_and_ref_fonts,
+    # Merge the blocks the three transforms above each spliced in separately
+    # into one contiguous, images-then-fonts declare group.
+    coalesce_declares,
     lambda s, p: remove_section_banners(s),
     lambda s, p: remove_brief_line(s),
     replace_includes_with_lvgl,

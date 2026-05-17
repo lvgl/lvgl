@@ -18,6 +18,7 @@ void lv_example_arc_img_indicator_create(void)
 {
     LV_IMAGE_DECLARE(img_arc_bg);
     LV_IMAGE_DECLARE(img_arc_indicator);
+
     static lv_style_t style_arc_bg;
     static lv_style_t style_arc_indicator;
     static lv_style_t style_arc_knob;

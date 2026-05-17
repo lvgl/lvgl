@@ -56,6 +56,19 @@ SCREENS_DIR = PROJECT_DIR / "screens"
 # Files at the examples/ root that are project metadata, not examples.
 ROOT_METADATA = {"project.xml", "globals.xml"}
 
+# Project scaffolding C/H files. They define globals (subjects, images,
+# fonts) that collide with the host example project when it builds with
+# source globbing — and `xml_project/` is globbed too. They are kept on
+# disk with a `.txt` suffix so the glob skips them, and unmasked to real
+# `.c`/`.h` only while lved-cli runs (it needs them), then re-masked.
+MASKED_PROJECT_FILES = [
+    PROJECT_DIR / "xml_project.c",
+    PROJECT_DIR / "xml_project.h",
+    PROJECT_DIR / "xml_project_gen.c",
+    PROJECT_DIR / "xml_project_gen.h",
+]
+MASK_SUFFIX = ".txt"
+
 
 def find_example_xmls() -> list[Path]:
     """Return every example XML under `examples/` worth processing.
@@ -86,6 +99,16 @@ def resolve_cli(cli_arg: str | None) -> str:
     sys.exit("lved-cli.js not found on PATH; pass --cli /path/to/lved-cli.js")
 
 
+def _run_generator(cli_path: str) -> subprocess.CompletedProcess:
+    """Run `lved-cli.js generate` against the working project tree."""
+    return subprocess.run(
+        ["node", cli_path, "generate", str(PROJECT_DIR.relative_to(REPO_ROOT))],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+
+
 def generate_one(xml_path: Path, cli_path: str) -> bool:
     """Generate the C file for a single XML. Return True on success."""
     name = xml_path.stem  # e.g. "lv_example_flex_grow"
@@ -98,12 +121,7 @@ def generate_one(xml_path: Path, cli_path: str) -> bool:
     shutil.copyfile(xml_path, staged_xml)
 
     try:
-        result = subprocess.run(
-            ["node", cli_path, "generate", str(PROJECT_DIR.relative_to(REPO_ROOT))],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-        )
+        result = _run_generator(cli_path)
         if result.returncode != 0:
             sys.stderr.write(
                 f"  ! lved-cli failed (exit {result.returncode}):\n{result.stderr}"
@@ -215,6 +233,61 @@ def write_topic_headers(touched: list[Path]) -> list[Path]:
     return written
 
 
+def unmask_project_files() -> None:
+    """Strip the `.txt` guard so lved-cli sees real `.c`/`.h` files.
+
+    Tolerant of a partial state: if the masked file is missing but a real
+    one already exists (e.g. the very first run, before masking was ever
+    applied), it is left as-is and `mask_project_files()` will guard it
+    afterwards.
+    """
+    for real in MASKED_PROJECT_FILES:
+        masked = real.with_name(real.name + MASK_SUFFIX)
+        if masked.exists():
+            masked.replace(real)
+
+
+def mask_project_files() -> None:
+    """Re-add the `.txt` guard so host-project C globbing skips these files.
+
+    Run from a `finally` so an interrupted generation can never leave
+    globbable scaffolding behind.
+    """
+    for real in MASKED_PROJECT_FILES:
+        if real.exists():
+            real.replace(real.with_name(real.name + MASK_SUFFIX))
+
+
+def regenerate_project(cli_path: str) -> bool:
+    """Re-run the CLI against the now-empty `screens/` to sync project files.
+
+    `generate_one` deletes each staged screen in its `finally` block, so once
+    every example is processed `screens/` is empty again. The project-level
+    generated artifacts (`xml_project_gen.{c,h}`, `file_list_gen.cmake`) still
+    reference whatever screen was staged last, though. One final generation
+    against the empty tree rewrites them to match real project content instead
+    of a transient staged screen.
+
+    Skipped (returning False) if `screens/` still holds staged XML, so a
+    partial/interrupted run won't bake a half-state into the project files.
+    """
+    staged = sorted(SCREENS_DIR.glob("*.xml"))
+    if staged:
+        sys.stderr.write(
+            "  ! screens/ still has XML, skipping final regeneration: "
+            f"{', '.join(p.name for p in staged)}\n"
+        )
+        return False
+    result = _run_generator(cli_path)
+    if result.returncode != 0:
+        sys.stderr.write(
+            f"  ! final regeneration failed (exit {result.returncode}):\n"
+            f"{result.stderr}"
+        )
+        return False
+    return True
+
+
 def collect_targets(paths: list[str]) -> list[Path]:
     """Expand user-supplied paths into a flat list of XML files."""
     out: list[Path] = []
@@ -227,7 +300,6 @@ def collect_targets(paths: list[str]) -> list[Path]:
         else:
             sys.stderr.write(f"skipping (not an XML or directory): {p}\n")
     return out
-
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
@@ -252,17 +324,27 @@ def main(argv: list[str]) -> int:
         print("No XML examples found.")
         return 0
 
+    # Unmask the scaffolding for the duration of generation; the `finally`
+    # re-masks it even if a generation step raises, so the tree never keeps
+    # globbable project files.
     ok = 0
-    for xml in targets:
-        rel = xml.relative_to(REPO_ROOT) if REPO_ROOT in xml.parents else xml
-        print(f"processing: {rel}")
-        if generate_one(xml, cli_path):
-            ok += 1
+    unmask_project_files()
+    try:
+        for xml in targets:
+            rel = xml.relative_to(REPO_ROOT) if REPO_ROOT in xml.parents else xml
+            print(f"processing: {rel}")
+            if generate_one(xml, cli_path):
+                ok += 1
 
-    headers = write_topic_headers(targets)
-    for h in headers:
-        rel = h.relative_to(REPO_ROOT) if REPO_ROOT in h.parents else h
-        print(f"wrote header: {rel}")
+        headers = write_topic_headers(targets)
+        for h in headers:
+            rel = h.relative_to(REPO_ROOT) if REPO_ROOT in h.parents else h
+            print(f"wrote header: {rel}")
+
+        print("regenerating project against empty screens/ to sync _gen files")
+        regenerate_project(cli_path)
+    finally:
+        mask_project_files()
 
     print(f"\n{ok} of {len(targets)} examples generated.")
     return 0 if ok == len(targets) else 1

@@ -8,6 +8,5 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/images/img_bar_bg_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_bar_indicator_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_example_lvgl_logo_data.c
-  ${CMAKE_CURRENT_LIST_DIR}/screens/lv_example_textarea_placeholder_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/xml_project_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/xml_project.c)

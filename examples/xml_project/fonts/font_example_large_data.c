@@ -20,11 +20,11 @@
 
 
 
-#ifndef font_example_large_DATA
-    #define font_example_large_DATA 1
+#ifndef FONT_EXAMPLE_LARGE_DATA
+    #define FONT_EXAMPLE_LARGE_DATA 1
 #endif
 
-#if font_example_large_DATA
+#if FONT_EXAMPLE_LARGE_DATA
 
 /*-----------------
  *    BITMAPS
@@ -2460,4 +2460,4 @@ lv_font_t font_example_large_data = {
 
 
 
-#endif /*#if font_example_large_DATA*/
+#endif /*#if FONT_EXAMPLE_LARGE_DATA*/

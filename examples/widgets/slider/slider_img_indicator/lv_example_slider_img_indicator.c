@@ -16,15 +16,15 @@
  */
 void lv_example_slider_img_indicator_create(void)
 {
+    LV_IMAGE_DECLARE(img_bar_bg);
+    LV_IMAGE_DECLARE(img_bar_indicator);
+    LV_FONT_DECLARE(font_example_large);
+
     static lv_style_t style_slider_track;
     static lv_style_t style_slider_indicator;
     static lv_style_t style_slider_knob;
 
     static lv_subject_t subject_value2;
-
-    LV_IMAGE_DECLARE(img_bar_bg);
-    LV_IMAGE_DECLARE(img_bar_indicator);
-    LV_FONT_DECLARE(font_example_large);
 
     static bool inited = false;
 
