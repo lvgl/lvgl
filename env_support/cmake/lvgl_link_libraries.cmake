@@ -9,16 +9,27 @@ function(lvgl_link_libraries)
     set(SCOPE "PUBLIC")
   endif()
 
-  # Internal Build
-  if(ARG_TARGETS)
-    target_link_libraries(lvgl ${SCOPE} ${ARG_TARGETS})
-  endif()
+  foreach(target IN LISTS ARG_TARGETS)
+    if(target MATCHES "^PkgConfig::")
+      target_link_libraries(lvgl ${SCOPE} $<BUILD_INTERFACE:${target}>)
+    else()
+      target_link_libraries(lvgl ${SCOPE} ${target})
+    endif()
+  endforeach()
 
   # Handle Raw Linker Flags (e.g., -lm, -lpthread)
   if(ARG_PKG_LIB_PRIVATE)
     get_property(current_libs GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
     list(APPEND current_libs ${ARG_PKG_LIB_PRIVATE})
     set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "${current_libs}")
+  endif()
+
+  # If we have a raw lib but no cmake package, it needs to be baked into the
+  # exported target
+  if(ARG_PKG_LIB_PRIVATE AND NOT ARG_CMAKE_PACKAGE)
+    get_property(current_raw GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS)
+    list(APPEND current_raw ${ARG_PKG_LIB_PRIVATE})
+    set_property(GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS "${current_raw}")
   endif()
 
   # Skip Metadata Registration for Fetched Dependencies If FETCHED is set, the
@@ -67,3 +78,4 @@ set_property(GLOBAL PROPERTY LVGL_PKG_REQUIRES_PRIVATE "")
 set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "")
 set_property(GLOBAL PROPERTY LVGL_CMAKE_PUBLIC_DEPS "")
 set_property(GLOBAL PROPERTY LVGL_CMAKE_PRIVATE_DEPS "")
+set_property(GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS "")

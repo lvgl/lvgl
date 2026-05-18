@@ -2,13 +2,11 @@
 
 include(CMakeFindDependencyMacro)
 
-# Transitive public dependencies
 set(_lvgl_public_deps "@LVGL_CMAKE_PUBLIC_DEPS@")
 foreach(_dep IN LISTS _lvgl_public_deps)
   find_dependency(${_dep})
 endforeach()
 
-# Transitive private dependencies
 set(_lvgl_private_deps "@LVGL_CMAKE_PRIVATE_DEPS@")
 foreach(_dep IN LISTS _lvgl_private_deps)
   find_dependency(${_dep})
@@ -17,8 +15,6 @@ endforeach()
 unset(_lvgl_public_deps)
 unset(_lvgl_private_deps)
 
-# ── Import the installed targets ─────────────────────────────────────────────
 include("${CMAKE_CURRENT_LIST_DIR}/lvglTargets.cmake")
 
-# ── Compatibility check ───────────────────────────────────────────────────────
 check_required_components(lvgl)
