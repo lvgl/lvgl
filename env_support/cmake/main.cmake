@@ -448,7 +448,7 @@ if(CONFIG_LV_BUILD_EXAMPLES)
     )
 
     install(EXPORT lvgl-examples-targets
-        NAMESPACE lvgl::lvgl_examples
+        NAMESPACE lvgl::
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
     )
 
