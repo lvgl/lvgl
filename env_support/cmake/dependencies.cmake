@@ -13,7 +13,9 @@ if(UNIX AND NOT PkgConfig_FOUND)
       "Install `pkg-config` to improve dependency detection.")
 endif()
 
-lvgl_link_system_library(m -lm)
+if(UNIX)
+  lvgl_link_system_library(m -lm)
+endif()
 
 # ====== Draw Units ====== #
 if(CONFIG_LV_USE_DRAW_G2D)
