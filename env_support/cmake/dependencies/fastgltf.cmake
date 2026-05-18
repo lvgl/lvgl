@@ -2,7 +2,6 @@
 # fastgltf Configuration
 # ============================================================
 set(CMAKE_PACKAGE_NAME "fastgltf")
-set(PKG_CONFIG_NAME "") # fastgltf doesn't provide pkg-config support
 set(PKG_LIB_PRIVATE "-lfastgltf")
 
 option(LV_USE_FIND_PACKAGE_FASTGLTF "Resolve fastgltf via find_package"
@@ -14,7 +13,7 @@ if(LV_USE_FIND_PACKAGE_FASTGLTF)
   if(fastgltf_FOUND)
     message(STATUS "lvgl: fastgltf: found via find_package")
     # Note: fastgltf doesn't have pkg-config support, so PKG_CONFIG not passed
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       fastgltf::fastgltf
@@ -55,4 +54,4 @@ set(FASTGLTF_DIFFUSE_TRANSMISSION_SUPPORT
 
 FetchContent_MakeAvailable(fastgltf)
 
-lvgl_link_libraries(PRIVATE TARGETS fastgltf::fastgltf FETCHED)
+lvgl_link_raw(PRIVATE TARGETS fastgltf::fastgltf FETCHED)

@@ -13,7 +13,7 @@ if(LV_USE_FIND_PACKAGE_GBM)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(gbm_FOUND)
     message(STATUS "lvgl: gbm: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       gbm::gbm
@@ -31,12 +31,10 @@ if(LV_USE_PKG_CONFIG_GBM AND PkgConfig_FOUND)
   pkg_check_modules(LIBGBM IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(LIBGBM_FOUND)
     message(STATUS "lvgl: gbm: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::LIBGBM
-      CMAKE_PACKAGE
-      ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
       ${PKG_CONFIG_NAME}
       PKG_LIB_PRIVATE

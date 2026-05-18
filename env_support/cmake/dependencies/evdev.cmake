@@ -14,7 +14,7 @@ if(LV_USE_FIND_PACKAGE_EVDEV)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(evdev_FOUND)
     message(STATUS "lvgl: evdev: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       evdev::evdev
@@ -32,12 +32,10 @@ if(LV_USE_PKG_CONFIG_EVDEV AND PkgConfig_FOUND)
   pkg_check_modules(EVDEV IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(EVDEV_FOUND)
     message(STATUS "lvgl: evdev: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::EVDEV
-      CMAKE_PACKAGE
-      ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
       ${PKG_CONFIG_NAME}
       PKG_LIB_PRIVATE

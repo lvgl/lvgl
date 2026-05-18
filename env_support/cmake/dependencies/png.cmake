@@ -15,7 +15,7 @@ if(LV_USE_FIND_PACKAGE_PNG)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(PNG_FOUND)
     message(STATUS "lvgl: libpng: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       PNG::PNG
@@ -33,12 +33,10 @@ if(LV_USE_PKG_CONFIG_PNG AND PkgConfig_FOUND)
   pkg_check_modules(LIBPNG IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(LIBPNG_FOUND)
     message(STATUS "lvgl: libpng: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::LIBPNG
-      CMAKE_PACKAGE
-      ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
       ${PKG_CONFIG_NAME}
       PKG_LIB_PRIVATE

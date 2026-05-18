@@ -15,7 +15,7 @@ if(LV_USE_FIND_PACKAGE_JPEG)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(JPEG_FOUND)
     message(STATUS "lvgl: libjpeg: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       JPEG::JPEG
@@ -33,7 +33,7 @@ if(LV_USE_PKG_CONFIG_JPEG AND PkgConfig_FOUND)
   pkg_check_modules(LIBJPEG IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(LIBJPEG_FOUND)
     message(STATUS "lvgl: libjpeg: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::LIBJPEG

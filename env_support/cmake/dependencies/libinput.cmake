@@ -14,7 +14,7 @@ if(LV_USE_FIND_PACKAGE_LIBINPUT)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(libinput_FOUND)
     message(STATUS "lvgl: libinput: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       libinput::libinput
@@ -32,12 +32,10 @@ if(LV_USE_PKG_CONFIG_LIBINPUT AND PkgConfig_FOUND)
   pkg_check_modules(LIBINPUT IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(LIBINPUT_FOUND)
     message(STATUS "lvgl: libinput: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::LIBINPUT
-      CMAKE_PACKAGE
-      ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
       ${PKG_CONFIG_NAME}
       PKG_LIB_PRIVATE

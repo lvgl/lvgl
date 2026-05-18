@@ -15,7 +15,7 @@ if(LV_USE_FIND_PACKAGE_FREETYPE)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(Freetype_FOUND)
     message(STATUS "lvgl: Freetype: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       Freetype::Freetype
@@ -33,7 +33,7 @@ if(LV_USE_PKG_CONFIG_FREETYPE AND PkgConfig_FOUND)
   pkg_check_modules(LIBFREETYPE IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(LIBFREETYPE_FOUND)
     message(STATUS "lvgl: Freetype: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::LIBFREETYPE
@@ -80,5 +80,4 @@ set(FT_WITH_ZLIB
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(freetype)
-
-lvgl_link_libraries(PRIVATE TARGETS freetype FETCHED)
+lvgl_link_raw(TARGETS freetype PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

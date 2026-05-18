@@ -14,7 +14,7 @@ if(LV_USE_FIND_PACKAGE_XKBCOMMON)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(Xkbcommon_FOUND)
     message(STATUS "lvgl: xkbcommon: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       Xkbcommon::Xkbcommon
@@ -32,7 +32,7 @@ if(LV_USE_PKG_CONFIG_XKBCOMMON AND PkgConfig_FOUND)
   pkg_check_modules(XKBCOMMON IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(XKBCOMMON_FOUND)
     message(STATUS "lvgl: xkbcommon: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::XKBCOMMON

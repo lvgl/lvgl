@@ -14,10 +14,12 @@ if(LV_USE_FIND_PACKAGE_FFMPEG)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(FFmpeg_FOUND)
     message(STATUS "lvgl: FFmpeg: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       FFmpeg::FFmpeg
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
       ${PKG_CONFIG_NAME}
       PKG_LIB_PRIVATE
@@ -36,7 +38,7 @@ if(LV_USE_PKG_CONFIG_FFMPEG AND PkgConfig_FOUND)
      AND AVUTIL_FOUND
      AND SWSCALE_FOUND)
     message(STATUS "lvgl: FFmpeg: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::AVFORMAT

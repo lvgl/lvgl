@@ -21,7 +21,7 @@ if(LV_USE_FIND_PACKAGE_WAYLAND)
   if(Wayland_FOUND)
     set(WAYLAND_FOUND 1)
     message(STATUS "lvgl: Wayland: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       Wayland::Client
@@ -59,7 +59,7 @@ if(NOT WAYLAND_FOUND
     if(CONFIG_LV_WAYLAND_USE_EGL)
       list(APPEND TARGETS PkgConfig::WAYLAND_EGL)
     endif()
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       ${TARGETS}

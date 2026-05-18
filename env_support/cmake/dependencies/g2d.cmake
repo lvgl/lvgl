@@ -4,7 +4,7 @@ find_path(G2D_INCLUDE_DIR NAMES g2d.h g2dExt.h QUIET)
 if(G2D_LIBRARY AND G2D_INCLUDE_DIR)
   message(STATUS "lvgl: G2D: found at ${G2D_LIBRARY}")
   target_include_directories(lvgl PRIVATE ${G2D_INCLUDE_DIR})
-  target_link_libraries(lvgl PRIVATE ${G2D_LIBRARY})
+  lvgl_link_raw(TARGETS ${G2D_LIBRARY} PKG_LIB_PRIVATE "-l${G2D_LIBRARY}")
   return()
 endif()
 

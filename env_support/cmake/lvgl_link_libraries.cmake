@@ -1,81 +1,142 @@
-function(lvgl_link_libraries)
-  set(options PUBLIC PRIVATE FETCHED)
-  set(multiValueArgs TARGETS PKG_CONFIG CMAKE_PACKAGE PKG_LIB_PRIVATE
-                     RAW_LIB_PRIVATE)
-  cmake_parse_arguments(ARG "${options}" "" "${multiValueArgs}" ${ARGN})
-
-  set(SCOPE "PRIVATE")
-  if(ARG_PUBLIC)
-    set(SCOPE "PUBLIC")
-  endif()
-
-  foreach(target IN LISTS ARG_TARGETS)
-    if(target MATCHES "^PkgConfig::")
-      target_link_libraries(lvgl ${SCOPE} $<BUILD_INTERFACE:${target}>)
-    else()
-      target_link_libraries(lvgl ${SCOPE} ${target})
-    endif()
-  endforeach()
-
-  # Handle Raw Linker Flags (e.g., -lm, -lpthread)
-  if(ARG_PKG_LIB_PRIVATE)
-    get_property(current_libs GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
-    list(APPEND current_libs ${ARG_PKG_LIB_PRIVATE})
-    set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "${current_libs}")
-  endif()
-
-  # If we have a raw lib but no cmake package, it needs to be baked into the
-  # exported target
-  if(ARG_PKG_LIB_PRIVATE AND NOT ARG_CMAKE_PACKAGE)
-    get_property(current_raw GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS)
-    list(APPEND current_raw ${ARG_PKG_LIB_PRIVATE})
-    set_property(GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS "${current_raw}")
-  endif()
-
-  # Skip Metadata Registration for Fetched Dependencies If FETCHED is set, the
-  # code is baked in or handled internally. We do NOT want downstream users to
-  # try and find these on their system.
-  if(ARG_FETCHED)
-    return()
-  endif()
-
-  # Registration for pkg-config (.pc)
-  if(ARG_PKG_CONFIG)
-    if(ARG_PUBLIC)
-      set(pc_prop "LVGL_PKG_REQUIRES")
-    else()
-      set(pc_prop "LVGL_PKG_REQUIRES_PRIVATE")
-    endif()
-
-    get_property(current_pc GLOBAL PROPERTY ${pc_prop})
-    list(APPEND current_pc ${ARG_PKG_CONFIG})
-    set_property(GLOBAL PROPERTY ${pc_prop} "${current_pc}")
-  endif()
-
-  # Registration for CMake (lvglConfig.cmake)
-  if(ARG_CMAKE_PACKAGE)
-    if(ARG_PUBLIC)
-      set(cmake_prop "LVGL_CMAKE_PUBLIC_DEPS")
-    else()
-      set(cmake_prop "LVGL_CMAKE_PRIVATE_DEPS")
-    endif()
-
-    get_property(current_cmake GLOBAL PROPERTY ${cmake_prop})
-    list(APPEND current_cmake ${ARG_CMAKE_PACKAGE})
-    set_property(GLOBAL PROPERTY ${cmake_prop} "${current_cmake}")
-  endif()
-endfunction()
-
-function(lvgl_link_system_library LIB_NAME PC_FLAG)
-  target_link_libraries(lvgl PRIVATE ${LIB_NAME})
-  get_property(current_libs GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
-  list(APPEND current_libs ${PC_FLAG})
-  set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "${current_libs}")
-endfunction()
-
 set_property(GLOBAL PROPERTY LVGL_PKG_REQUIRES "")
 set_property(GLOBAL PROPERTY LVGL_PKG_REQUIRES_PRIVATE "")
 set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "")
 set_property(GLOBAL PROPERTY LVGL_CMAKE_PUBLIC_DEPS "")
 set_property(GLOBAL PROPERTY LVGL_CMAKE_PRIVATE_DEPS "")
 set_property(GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS "")
+
+macro(lvgl_add_pkg_requires)
+  get_property(_cur GLOBAL PROPERTY LVGL_PKG_REQUIRES)
+  list(APPEND _cur ${ARGN})
+  set_property(GLOBAL PROPERTY LVGL_PKG_REQUIRES "${_cur}")
+endmacro()
+
+macro(lvgl_add_pkg_requires_private)
+  get_property(_cur GLOBAL PROPERTY LVGL_PKG_REQUIRES_PRIVATE)
+  list(APPEND _cur ${ARGN})
+  set_property(GLOBAL PROPERTY LVGL_PKG_REQUIRES_PRIVATE "${_cur}")
+endmacro()
+
+macro(lvgl_add_pkg_libs_private)
+  get_property(_cur GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
+  list(APPEND _cur ${ARGN})
+  set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "${_cur}")
+endmacro()
+
+macro(lvgl_add_cmake_public_deps)
+  get_property(_cur GLOBAL PROPERTY LVGL_CMAKE_PUBLIC_DEPS)
+  list(APPEND _cur ${ARGN})
+  set_property(GLOBAL PROPERTY LVGL_CMAKE_PUBLIC_DEPS "${_cur}")
+endmacro()
+
+macro(lvgl_add_cmake_private_deps)
+  get_property(_cur GLOBAL PROPERTY LVGL_CMAKE_PRIVATE_DEPS)
+  list(APPEND _cur ${ARGN})
+  set_property(GLOBAL PROPERTY LVGL_CMAKE_PRIVATE_DEPS "${_cur}")
+endmacro()
+
+macro(lvgl_add_cmake_raw_libs)
+  get_property(_cur GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS)
+  list(APPEND _cur ${ARGN})
+  set_property(GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS "${_cur}")
+endmacro()
+
+# ============================================================
+# Link Functions
+# ============================================================
+
+# Links packages found via `find_package` 
+# 1. Links targets normally (will be exported)
+# 2. Registers CMAKE_PACKAGE for find_dependency in lvglConfig.cmake
+# 3. Registers PKG_CONFIG for .pc Requires/Requires.private 
+# 4. Registers PKG_LIB_PRIVATE for .pc Libs.private
+function(lvgl_link_packages)
+  set(options PUBLIC PRIVATE)
+  set(multiValueArgs TARGETS CMAKE_PACKAGE PKG_CONFIG PKG_LIB_PRIVATE)
+  cmake_parse_arguments(ARG "${options}" "" "${multiValueArgs}" ${ARGN})
+
+  set(SCOPE PRIVATE)
+  if(ARG_PUBLIC)
+    set(SCOPE PUBLIC)
+  endif()
+
+  if(ARG_TARGETS)
+    target_link_libraries(lvgl ${SCOPE} ${ARG_TARGETS})
+  endif()
+
+  if(ARG_CMAKE_PACKAGE)
+    if(ARG_PUBLIC)
+      lvgl_add_cmake_public_deps(${ARG_CMAKE_PACKAGE})
+    else()
+      lvgl_add_cmake_private_deps(${ARG_CMAKE_PACKAGE})
+    endif()
+  endif()
+
+  if(ARG_PKG_CONFIG)
+    if(ARG_PUBLIC)
+      lvgl_add_pkg_requires(${ARG_PKG_CONFIG})
+    else()
+      lvgl_add_pkg_requires_private(${ARG_PKG_CONFIG})
+    endif()
+  endif()
+
+  if(ARG_PKG_LIB_PRIVATE)
+    lvgl_add_pkg_libs_private(${ARG_PKG_LIB_PRIVATE})
+  endif()
+endfunction()
+
+# Links a package via pkg-config
+# 1. Wraps targets in BUILD_INTERFACE (not exported) 
+# 2. Bakes include dirs into lvgl's interface 
+# 3. Registers raw libs for INTERFACE_LINK_LIBRARIES on exported target 
+# 4. Registers PKG_CONFIG for .pc Requires/Requires.private
+# 5. Registers PKG_LIB_PRIVATE for .pc Libs.private
+function(lvgl_link_pkg_config)
+  set(options PUBLIC PRIVATE)
+  set(multiValueArgs TARGETS PKG_CONFIG PKG_LIB_PRIVATE)
+  cmake_parse_arguments(ARG "${options}" "" "${multiValueArgs}" ${ARGN})
+
+  set(SCOPE PRIVATE)
+  if(ARG_PUBLIC)
+    set(SCOPE PUBLIC)
+  endif()
+
+  foreach(_target IN LISTS ARG_TARGETS)
+    target_link_libraries(lvgl ${SCOPE} $<BUILD_INTERFACE:${_target}>)
+    get_target_property(_inc_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
+    if(_inc_dirs)
+      target_include_directories(
+        lvgl ${SCOPE} $<BUILD_INTERFACE:${_inc_dirs}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    endif()
+  endforeach()
+
+  if(ARG_PKG_LIB_PRIVATE)
+    lvgl_add_pkg_libs_private(${ARG_PKG_LIB_PRIVATE})
+    lvgl_add_cmake_raw_libs(${ARG_PKG_LIB_PRIVATE})
+  endif()
+
+  if(ARG_PKG_CONFIG)
+    if(ARG_PUBLIC)
+      lvgl_add_pkg_requires(${ARG_PKG_CONFIG})
+    else()
+      lvgl_add_pkg_requires_private(${ARG_PKG_CONFIG})
+    endif()
+  endif()
+endfunction()
+
+# No find_package nor pkgconfig support. Links targets normally 
+# Only registers PKG_LIB_PRIVATE for .pc Libs.private
+# Nothing exported to CMake consumers
+function(lvgl_link_raw)
+  set(multiValueArgs TARGETS PKG_LIB_PRIVATE)
+  cmake_parse_arguments(ARG "" "" "${multiValueArgs}" ${ARGN})
+
+  if(ARG_TARGETS)
+    target_link_libraries(lvgl PRIVATE ${ARG_TARGETS})
+  endif()
+
+  if(ARG_PKG_LIB_PRIVATE)
+    lvgl_add_pkg_libs_private(${ARG_PKG_LIB_PRIVATE})
+  endif()
+endfunction()

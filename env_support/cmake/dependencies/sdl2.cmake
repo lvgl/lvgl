@@ -15,7 +15,7 @@ if(LV_USE_FIND_PACKAGE_SDL2)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(SDL2_FOUND AND TARGET SDL2::SDL2)
     message(STATUS "lvgl: SDL2: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       SDL2::SDL2
@@ -33,12 +33,10 @@ if(LV_USE_PKG_CONFIG_SDL2 AND PkgConfig_FOUND)
   pkg_check_modules(SDL2 IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(SDL2_FOUND)
     message(STATUS "lvgl: SDL2: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::SDL2
-      CMAKE_PACKAGE
-      ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
       ${PKG_CONFIG_NAME}
       PKG_LIB_PRIVATE
@@ -104,4 +102,4 @@ set(SDL_DBUS
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(SDL2)
-lvgl_link_libraries(PRIVATE TARGETS SDL2::SDL2-static FETCHED)
+lvgl_link_raw(TARGETS SDL2::SDL2-static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

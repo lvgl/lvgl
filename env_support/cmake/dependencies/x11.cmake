@@ -15,7 +15,7 @@ if(LV_USE_FIND_PACKAGE_X11)
     message(STATUS "lvgl: X11: found via find_package")
     # X11::X11 imported target requires CMake 3.14+
     if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.14")
-      lvgl_link_libraries(
+      lvgl_link_packages(
         PRIVATE
         TARGETS
         X11::X11
@@ -37,12 +37,10 @@ if(LV_USE_PKG_CONFIG_X11 AND PkgConfig_FOUND)
   pkg_check_modules(X11 IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(X11_FOUND)
     message(STATUS "lvgl: X11: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::X11
-      CMAKE_PACKAGE
-      ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
       ${PKG_CONFIG_NAME}
       PKG_LIB_PRIVATE

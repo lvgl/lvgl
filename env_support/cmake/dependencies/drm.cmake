@@ -14,7 +14,7 @@ if(LV_USE_FIND_PACKAGE_LIBDRM)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(libdrm_FOUND)
     message(STATUS "lvgl: libdrm: found via find_package")
-    lvgl_link_libraries(
+    lvgl_link_packages(
       PRIVATE
       TARGETS
       libdrm::libdrm
@@ -32,12 +32,10 @@ if(LV_USE_PKG_CONFIG_LIBDRM AND PkgConfig_FOUND)
   pkg_check_modules(LIBDRM IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(LIBDRM_FOUND)
     message(STATUS "lvgl: libdrm: found via pkg-config")
-    lvgl_link_libraries(
+    lvgl_link_pkg_config(
       PRIVATE
       TARGETS
       PkgConfig::LIBDRM
-      CMAKE_PACKAGE
-      ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
       ${PKG_CONFIG_NAME}
       PKG_LIB_PRIVATE
