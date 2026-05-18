@@ -248,7 +248,13 @@ if(CONFIG_LV_USE_THORVG_INTERNAL)
 
     # This tells cmake to link lvgl with lvgl_thorvg
     # The linker will resolve all dependencies when dynamic linking 
-    lvgl_link_libraries(PRIVATE TARGET lvgl_thorvg PKG_LIB_PRIVATE -llvgl_thorvg)
+    target_link_libraries(lvgl PRIVATE lvgl_thorvg)
+
+    # export lvgl_thorvg as a private library to pkg-config
+    get_property(current_libs GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
+    list(APPEND current_libs "-llvgl_thorvg")
+    set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "${current_libs}")
+
     # During static linking, we need to create a cyclic dependency as thorvg also needs lvgl
     if (NOT BUILD_SHARED_LIBS)
         target_link_libraries(lvgl_thorvg PRIVATE lvgl)
