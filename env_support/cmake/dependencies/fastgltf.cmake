@@ -14,8 +14,14 @@ if(LV_USE_FIND_PACKAGE_FASTGLTF)
   if(fastgltf_FOUND)
     message(STATUS "lvgl: fastgltf: found via find_package")
     # Note: fastgltf doesn't have pkg-config support, so PKG_CONFIG not passed
-    lvgl_link_libraries(PRIVATE TARGETS fastgltf::fastgltf PKG_LIB_PRIVATE
-                        ${PKG_LIB_PRIVATE})
+    lvgl_link_libraries(
+      PRIVATE
+      TARGETS
+      fastgltf::fastgltf
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
