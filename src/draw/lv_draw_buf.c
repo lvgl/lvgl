@@ -279,7 +279,7 @@ lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, u
     draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     draw_buf->header.stride = stride;
     draw_buf->header.magic = LV_IMAGE_HEADER_MAGIC;
-    draw_buf->data = lv_draw_buf_align(buf, cf);
+    draw_buf->data = lv_draw_buf_align_ex(handlers, buf, cf);
     draw_buf->unaligned_data = buf;
     draw_buf->data_size = size;
     draw_buf->handlers = handlers;
