@@ -2,15 +2,8 @@
 # FFmpeg Configuration
 # ============================================================
 set(CMAKE_PACKAGE_NAME "FFmpeg")
-list(
-  APPEND
-  PKG_CONFIG_NAME
-  "libavcodec"
-  "libavformat"
-  "libavutil"
-  "libswscale"
-  "libswresample")
-set(PKG_LIB_PRIVATE "-lavcodec -lavformat -lavutil -lswscale -lswresample")
+list(APPEND PKG_CONFIG_NAME "libavcodec" "libavformat" "libavutil" "libswscale")
+set(PKG_LIB_PRIVATE "-lavcodec -lavformat -lavutil -lswscale")
 
 option(LV_USE_FIND_PACKAGE_FFMPEG "Resolve FFmpeg via find_package"
        ${LV_USE_FIND_PACKAGE})
