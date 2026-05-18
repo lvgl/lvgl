@@ -382,13 +382,13 @@ install(
 )
 
 install(TARGETS lvgl
-    EXPORT lvgl-targets
+    EXPORT lvglTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-install(EXPORT lvgl-targets
+install(EXPORT lvglTargets
     NAMESPACE lvgl::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
 )
@@ -406,7 +406,7 @@ if(CONFIG_LV_USE_THORVG_INTERNAL)
         PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
     install(TARGETS lvgl_thorvg
-        EXPORT lvgl-targets
+        EXPORT lvglTargets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -425,13 +425,13 @@ if(CONFIG_LV_BUILD_DEMOS)
 
     # Demo library target (if you build one)
     install(TARGETS lvgl_demos
-        EXPORT lvgl-demos-targets
+	EXPORT lvglDemosTargets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 
-    install(EXPORT lvgl-demos-targets
+    install(EXPORT lvglDemosTargets
         NAMESPACE lvgl::
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
     )
@@ -447,13 +447,13 @@ if(CONFIG_LV_BUILD_EXAMPLES)
     )
 
     install(TARGETS lvgl_examples
-        EXPORT lvgl-examples-targets
+	EXPORT lvglExamplesTargets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 
-    install(EXPORT lvgl-examples-targets
+    install(EXPORT lvglExamplesTargets
         NAMESPACE lvgl::
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
     )
