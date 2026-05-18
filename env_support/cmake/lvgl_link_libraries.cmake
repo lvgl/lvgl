@@ -1,7 +1,9 @@
 function(lvgl_link_libraries)
   set(options PUBLIC PRIVATE FETCHED)
-  set(oneValueArgs TARGETS PKG_CONFIG CMAKE_PACKAGE PKG_LIB_PRIVATE)
-  cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "" ${ARGN})
+  set(oneValueArgs)
+  set(multiValueArgs TARGETS PKG_CONFIG CMAKE_PACKAGE PKG_LIB_PRIVATE)
+  cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}"
+                        ${ARGN})
 
   set(SCOPE "PRIVATE")
   if(ARG_PUBLIC)
