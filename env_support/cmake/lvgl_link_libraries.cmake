@@ -55,6 +55,13 @@ function(lvgl_link_libraries)
   endif()
 endfunction()
 
+function(lvgl_link_system_library LIB_NAME PC_FLAG)
+  target_link_libraries(lvgl PRIVATE ${LIB_NAME})
+  get_property(current_libs GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
+  list(APPEND current_libs ${PC_FLAG})
+  set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "${current_libs}")
+endfunction()
+
 set_property(GLOBAL PROPERTY LVGL_PKG_REQUIRES "")
 set_property(GLOBAL PROPERTY LVGL_PKG_REQUIRES_PRIVATE "")
 set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "")

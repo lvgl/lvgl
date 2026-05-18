@@ -13,6 +13,8 @@ if(UNIX AND NOT PkgConfig_FOUND)
       "Install `pkg-config` to improve dependency detection.")
 endif()
 
+lvgl_link_system_library(m -lm)
+
 # ====== Draw Units ====== #
 if(CONFIG_LV_USE_DRAW_G2D)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/g2d.cmake)
