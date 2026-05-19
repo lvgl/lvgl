@@ -2,7 +2,8 @@
  * @file lv_example_dropdown_text.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 /**
  * @title Dropdown fixed text
@@ -12,7 +13,7 @@
  * text="Menu" the button always displays that string while the option list remains
  * intact, which is useful for icon-style or fixed-label menus.
  */
-void lv_example_dropdown_text_create(void)
+void lv_example_dropdown_text(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -37,4 +38,4 @@ void lv_example_dropdown_text_create(void)
     lv_dropdown_set_text(lv_dropdown_1, "Menu");
     lv_dropdown_set_options(lv_dropdown_1, "Cut\nCopy\nPaste");
 }
-
+#endif

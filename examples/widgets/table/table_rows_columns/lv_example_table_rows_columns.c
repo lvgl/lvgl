@@ -2,7 +2,8 @@
  * @file lv_example_table_rows_columns.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABLE && LV_BUILD_EXAMPLES
 
 /**
  * @title Table rows and columns
@@ -17,7 +18,7 @@
  * don't render. When the row count is tall enough that the grid no longer
  * fits the widget's height, the table becomes scrollable.
  */
-void lv_example_table_rows_columns_create(void)
+void lv_example_table_rows_columns(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -39,4 +40,4 @@ void lv_example_table_rows_columns_create(void)
     lv_table_set_cell_value(lv_table_0, 8, 0, "8th");
     lv_table_set_cell_value(lv_table_0, 9, 0, "last row");
 }
-
+#endif

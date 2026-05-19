@@ -2,7 +2,8 @@
  * @file lv_example_arc_pie_chart.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * @title Arc as pie-chart slices
@@ -23,7 +24,7 @@
  * `width`/`height`/`align`/`y` — so each `<lv_arc>` only carries its slice
  * angles and its colour.
  */
-void lv_example_arc_pie_chart_create(void)
+void lv_example_arc_pie_chart(void)
 {
     static lv_style_t style_pie_main;
     static lv_style_t style_pie_indicator;
@@ -104,4 +105,4 @@ void lv_example_arc_pie_chart_create(void)
     lv_obj_add_style(lv_arc_4, &style_pie_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(lv_arc_4, &style_pie_knob, LV_PART_KNOB);
 }
-
+#endif

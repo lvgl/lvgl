@@ -2,7 +2,8 @@
  * @file lv_example_style_outline.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -15,7 +16,7 @@
  * and `outline_pad="6"` is the gap between the card edge and the ring —
  * the look of a modern keyboard-focus halo.
  */
-void lv_example_style_outline_create(void)
+void lv_example_style_outline(void)
 {
     static lv_style_t style_focus;
 
@@ -53,4 +54,4 @@ void lv_example_style_outline_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_1, "Focused");
 }
-
+#endif

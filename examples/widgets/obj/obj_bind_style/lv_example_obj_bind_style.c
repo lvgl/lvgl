@@ -2,7 +2,8 @@
  * @file lv_example_obj_bind_style.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Obj bind style (theme toggle)
@@ -14,7 +15,7 @@
  * `subject_flag` through `subject_toggle_event`. This is the canonical
  * "binding-driven theme switch" pattern — no event callback in user code.
  */
-void lv_example_obj_bind_style_create(void)
+void lv_example_obj_bind_style(void)
 {
     static lv_style_t style_dark;
 
@@ -60,4 +61,4 @@ void lv_example_obj_bind_style_create(void)
 
     lv_obj_add_subject_toggle_event(lv_button_0, &subject_flag, LV_EVENT_CLICKED);
 }
-
+#endif

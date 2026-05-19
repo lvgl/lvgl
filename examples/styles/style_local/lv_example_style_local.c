@@ -2,7 +2,8 @@
  * @file lv_example_style_local.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -16,7 +17,7 @@
  * turns green only while held. Both keep the shared border, showing local
  * styles — and local *state* selectors — have the highest precedence.
  */
-void lv_example_style_local_create(void)
+void lv_example_style_local(void)
 {
     static lv_style_t style_shared;
 
@@ -78,4 +79,4 @@ void lv_example_style_local_create(void)
     lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_3, "On press");
 }
-
+#endif

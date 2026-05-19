@@ -2,7 +2,8 @@
  * @file lv_example_roller_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ROLLER && LV_BUILD_EXAMPLES
 
 /**
  * @title Roller styling
@@ -18,7 +19,7 @@
  * `text_line_space` directly grows the height of the highlighted band — so
  * the selected row gets visually taller without a separate height setting.
  */
-void lv_example_roller_styling_create(void)
+void lv_example_roller_styling(void)
 {
     static lv_style_t style_roller_main;
     static lv_style_t style_roller_selected;
@@ -62,4 +63,4 @@ void lv_example_roller_styling_create(void)
     lv_obj_add_style(lv_roller_0, &style_roller_main, LV_PART_MAIN);
     lv_obj_add_style(lv_roller_0, &style_roller_selected, LV_PART_SELECTED);
 }
-
+#endif

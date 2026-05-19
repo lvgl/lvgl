@@ -2,7 +2,8 @@
  * @file lv_example_textarea_placeholder.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TEXTAREA && LV_BUILD_EXAMPLES
 
 /**
  * @title Text area placeholder
@@ -12,7 +13,7 @@
  * so the grey hint is visible; the second has `text` set, which hides the
  * placeholder — the contrast shows exactly when the hint appears.
  */
-void lv_example_textarea_placeholder_create(void)
+void lv_example_textarea_placeholder(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -38,4 +39,4 @@ void lv_example_textarea_placeholder_create(void)
     lv_textarea_set_placeholder_text(lv_textarea_1, "Search…");
     lv_textarea_set_text(lv_textarea_1, "lv_textarea");
 }
-
+#endif

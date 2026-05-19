@@ -2,7 +2,8 @@
  * @file lv_example_arc_value_range.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * @title Arc value and range
@@ -12,7 +13,7 @@
  * indicator length depends on (value - min_value) / (max_value - min_value), so any range
  * — including one crossing zero — produces the same relative fill.
  */
-void lv_example_arc_value_range_create(void)
+void lv_example_arc_value_range(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -48,4 +49,4 @@ void lv_example_arc_value_range_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "20..220\nv=140");
 }
-
+#endif

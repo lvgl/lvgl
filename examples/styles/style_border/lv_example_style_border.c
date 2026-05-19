@@ -2,7 +2,8 @@
  * @file lv_example_style_border.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -15,7 +16,7 @@
  * as a soft accent instead of a hard line. `radius="20"` rounds the corners
  * and the border follows them.
  */
-void lv_example_style_border_create(void)
+void lv_example_style_border(void)
 {
     static lv_style_t style_framed;
 
@@ -51,4 +52,4 @@ void lv_example_style_border_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_1, "Bordered card");
 }
-
+#endif

@@ -10,11 +10,11 @@
 extern "C" {
 #endif
 
-void lv_example_image_inner_align_create(void);
-void lv_example_image_recolor_create(void);
-void lv_example_image_src_create(void);
-void lv_example_image_transformations_create(void);
+void lv_example_image_inner_align(void);
+void lv_example_image_recolor(void);
+void lv_example_image_src(void);
 void lv_example_image_svg(void);
+void lv_example_image_transformations(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

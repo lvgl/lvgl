@@ -2,7 +2,8 @@
  * @file lv_example_button_states.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTON && LV_BUILD_EXAMPLES
 
 /**
  * @title Button states
@@ -12,7 +13,7 @@
  * second one is checkable and starts in the checked state, picking up the checked-style
  * colors. The third uses the disabled state so it ignores input and renders faded.
  */
-void lv_example_button_states_create(void)
+void lv_example_button_states(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -49,4 +50,4 @@ void lv_example_button_states_create(void)
     lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_3, "Disabled");
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_flex_flow.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * @title Flex flow
@@ -12,7 +13,7 @@
  * in. Try other flex_flow values (row, column, row_reverse, column_wrap_reverse) to see
  * how item order and wrap direction change with the same set of children.
  */
-void lv_example_flex_flow_create(void)
+void lv_example_flex_flow(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -68,4 +69,4 @@ void lv_example_flex_flow_create(void)
     lv_obj_t * lv_label_10 = lv_label_create(lv_button_9);
     lv_label_set_text(lv_label_10, "Tenth");
 }
-
+#endif

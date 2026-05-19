@@ -2,7 +2,8 @@
  * @file lv_example_tabview_basic.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
 /**
  * @title Tab view basic structure
@@ -13,7 +14,7 @@
  * `tab_bar_position` or `active` is set, so the bar sits on the top edge and
  * the first tab opens.
  */
-void lv_example_tabview_basic_create(void)
+void lv_example_tabview_basic(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -35,4 +36,4 @@ void lv_example_tabview_basic_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "Third tab");
 }
-
+#endif

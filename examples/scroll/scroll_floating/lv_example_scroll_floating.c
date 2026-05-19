@@ -2,7 +2,8 @@
  * @file lv_example_scroll_floating.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Floating button over a list
@@ -13,7 +14,7 @@
  * moved when its parent scrolls, so it stays anchored to the bottom-right
  * corner while the list slides underneath it.
  */
-void lv_example_scroll_floating_create(void)
+void lv_example_scroll_floating(void)
 {
     static lv_style_t style_fab;
 
@@ -88,4 +89,4 @@ void lv_example_scroll_floating_create(void)
     lv_obj_set_align(lv_label_7, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_7, "+");
 }
-
+#endif

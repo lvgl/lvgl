@@ -2,7 +2,8 @@
  * @file lv_example_arc_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * @title Arc styling
@@ -13,7 +14,7 @@
  * `arc_color`, `arc_width`, and `arc_rounded` are the line-style equivalents for ring
  * segments; the knob uses the regular background properties since it's drawn as a fill.
  */
-void lv_example_arc_styling_create(void)
+void lv_example_arc_styling(void)
 {
     static lv_style_t style_arc_bg;
     static lv_style_t style_arc_indicator;
@@ -70,4 +71,4 @@ void lv_example_arc_styling_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_1, "65");
 }
-
+#endif

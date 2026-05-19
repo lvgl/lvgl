@@ -2,7 +2,8 @@
  * @file lv_example_grid_subgrid.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * @title Grid sub-grid
@@ -12,7 +13,7 @@
  * inner grid intentionally omits its own column/row descriptors so it inherits the parent
  * tracks, keeping its cells aligned with the outer grid's columns and rows.
  */
-void lv_example_grid_subgrid_create(void)
+void lv_example_grid_subgrid(void)
 {
     static lv_style_t style_tile;
 
@@ -97,4 +98,4 @@ void lv_example_grid_subgrid_create(void)
     lv_label_set_text(lv_label_5, "S1,1");
     lv_obj_add_style(lv_label_5, &style_tile, 0);
 }
-
+#endif

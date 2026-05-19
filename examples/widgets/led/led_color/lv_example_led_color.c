@@ -2,7 +2,8 @@
  * @file lv_example_led_color.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LED && LV_BUILD_EXAMPLES
 
 /**
  * @title LED color
@@ -12,7 +13,7 @@
  * a single value drives the whole lit-bulb look. Brightness stays at the default here
  * to isolate the effect of changing the color alone.
  */
-void lv_example_led_color_create(void)
+void lv_example_led_color(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -42,4 +43,4 @@ void lv_example_led_color_create(void)
     lv_obj_set_size(lv_led_2, 40, 40);
     lv_led_set_color(lv_led_2, lv_color_hex(0x3080ff));
 }
-
+#endif

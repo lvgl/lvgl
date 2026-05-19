@@ -10,13 +10,13 @@
 extern "C" {
 #endif
 
-void lv_example_table_cells_create(void);
-void lv_example_table_merge_cells_create(void);
-void lv_example_table_rows_columns_create(void);
-void lv_example_table_scroll_create(void);
-void lv_example_table_styling_create(void);
-void lv_example_table_width_create(void);
+void lv_example_table_cells(void);
+void lv_example_table_merge_cells(void);
+void lv_example_table_rows_columns(void);
+void lv_example_table_scroll(void);
 void lv_example_table_scrollable_list(void);
+void lv_example_table_styling(void);
+void lv_example_table_width(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

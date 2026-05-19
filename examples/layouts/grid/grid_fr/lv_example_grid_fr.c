@@ -2,7 +2,8 @@
  * @file lv_example_grid_fr.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * @title Grid FR units
@@ -12,7 +13,7 @@
  * split the remaining width in a 1:2 ratio. The same idea applies to rows: the first row
  * is fixed at 44px and the second uses fr(1) to absorb the leftover height.
  */
-void lv_example_grid_fr_create(void)
+void lv_example_grid_fr(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -93,4 +94,4 @@ void lv_example_grid_fr_create(void)
     lv_label_set_text(lv_label_6, "2fr");
     lv_obj_set_align(lv_label_6, LV_ALIGN_CENTER);
 }
-
+#endif

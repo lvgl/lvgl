@@ -2,7 +2,8 @@
  * @file lv_example_grid_internal_padding.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * @title Grid internal padding
@@ -12,7 +13,7 @@
  * rows. The two are independent, so column gaps and row gaps can differ — here columns
  * are flush together while rows have a large vertical gap.
  */
-void lv_example_grid_internal_padding_create(void)
+void lv_example_grid_internal_padding(void)
 {
     static lv_style_t style_chip;
 
@@ -90,4 +91,4 @@ void lv_example_grid_internal_padding_create(void)
     lv_label_set_text(lv_label_6, "Six");
     lv_obj_add_style(lv_label_6, &style_chip, 0);
 }
-
+#endif

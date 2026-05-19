@@ -2,7 +2,8 @@
  * @file lv_example_image_transformations.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
 /**
  * @title Image transformations
@@ -14,7 +15,7 @@
  * share the same registered `img_example_lvgl_logo` source — the transforms happen
  * at render time, no extra image variants needed.
  */
-void lv_example_image_transformations_create(void)
+void lv_example_image_transformations(void)
 {
     LV_IMAGE_DECLARE(img_example_lvgl_logo);
 
@@ -37,4 +38,4 @@ void lv_example_image_transformations_create(void)
     lv_image_set_scale_x(lv_image_2, 160);
     lv_image_set_scale_y(lv_image_2, 160);
 }
-
+#endif

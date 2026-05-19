@@ -2,7 +2,8 @@
  * @file lv_example_spinbox_rollover.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SPINBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Spinbox rollover
@@ -13,7 +14,7 @@
  * for cyclic quantities like hours (0..23) or angles (0..359), where the user
  * should be able to step from 23 → 0 without re-entering the value.
  */
-void lv_example_spinbox_rollover_create(void)
+void lv_example_spinbox_rollover(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -35,4 +36,4 @@ void lv_example_spinbox_rollover_create(void)
     lv_spinbox_set_step(lv_spinbox_0, 1);
     lv_spinbox_set_rollover(lv_spinbox_0, true);
 }
-
+#endif

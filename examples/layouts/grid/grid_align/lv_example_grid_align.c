@@ -2,7 +2,8 @@
  * @file lv_example_grid_align.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * @title Grid alignment of tracks
@@ -12,7 +13,7 @@
  * style_grid_column_align and style_grid_row_align. Here columns use space_between to
  * push them to the edges, while rows align to end and stick to the bottom.
  */
-void lv_example_grid_align_create(void)
+void lv_example_grid_align(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -90,4 +91,4 @@ void lv_example_grid_align_create(void)
     lv_obj_set_style_bg_opa(lv_label_6, (255 * 100 / 100), 0);
     lv_label_set_text(lv_label_6, "2,1");
 }
-
+#endif

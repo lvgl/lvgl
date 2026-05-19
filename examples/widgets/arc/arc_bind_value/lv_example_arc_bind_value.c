@@ -2,7 +2,8 @@
  * @file lv_example_arc_bind_value.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * @title Arc bind value
@@ -13,7 +14,7 @@
  * level, the arc would also push updates back if it were interactive — but here
  * we lock it with `clickable="false"` so it stays purely indicative.
  */
-void lv_example_arc_bind_value_create(void)
+void lv_example_arc_bind_value(void)
 {
     static lv_subject_t subject_value;
 
@@ -46,4 +47,4 @@ void lv_example_arc_bind_value_create(void)
     lv_obj_set_width(lv_slider_0, 220);
     lv_slider_bind_value(lv_slider_0, &subject_value);
 }
-
+#endif

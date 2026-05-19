@@ -2,7 +2,8 @@
  * @file lv_example_flex_new_track.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * @title Flex new track
@@ -12,7 +13,7 @@
  * instead of continuing the previous one. Here the weekend labels are pushed onto their
  * own row regardless of how much horizontal space remains on the first row.
  */
-void lv_example_flex_new_track_create(void)
+void lv_example_flex_new_track(void)
 {
     static lv_style_t style_day;
 
@@ -78,4 +79,4 @@ void lv_example_flex_new_track_create(void)
     lv_label_set_text(lv_label_7, "Sun");
     lv_obj_add_style(lv_label_7, &style_day, 0);
 }
-
+#endif

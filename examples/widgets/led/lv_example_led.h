@@ -10,9 +10,9 @@
 extern "C" {
 #endif
 
-void lv_example_led_brightness_create(void);
-void lv_example_led_color_create(void);
-void lv_example_led_styling_create(void);
+void lv_example_led_brightness(void);
+void lv_example_led_color(void);
+void lv_example_led_styling(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

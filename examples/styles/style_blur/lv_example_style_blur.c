@@ -2,7 +2,8 @@
  * @file lv_example_style_blur.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Backdrop blur
@@ -13,7 +14,7 @@
  * only what is behind it, and `bg_opa="40%"` keeps the card translucent so
  * the blurred text shows through — sharp text around it, soft text under it.
  */
-void lv_example_style_blur_create(void)
+void lv_example_style_blur(void)
 {
     static lv_style_t style_glass;
 
@@ -64,4 +65,4 @@ void lv_example_style_blur_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "Frosted glass");
 }
-
+#endif

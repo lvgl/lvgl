@@ -2,7 +2,8 @@
  * @file lv_example_flex_ignore_layout.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * @title Flex ignore layout
@@ -12,7 +13,7 @@
  * position and does not occupy a slot. The remaining items lay out as if it were not
  * there, which is useful for overlays, floating badges, or absolutely positioned helpers.
  */
-void lv_example_flex_ignore_layout_create(void)
+void lv_example_flex_ignore_layout(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -56,4 +57,4 @@ void lv_example_flex_ignore_layout_create(void)
     lv_label_set_text(lv_label_4, "Item C");
     lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
 }
-
+#endif

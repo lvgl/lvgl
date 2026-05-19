@@ -2,7 +2,8 @@
  * @file lv_example_textarea_cursor.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TEXTAREA && LV_BUILD_EXAMPLES
 
 /**
  * @title Text area cursor styling
@@ -13,7 +14,7 @@
  * background transparent and draws only a left border for a bar cursor — the
  * same part, two looks.
  */
-void lv_example_textarea_cursor_create(void)
+void lv_example_textarea_cursor(void)
 {
     static lv_style_t style_block_cursor;
     static lv_style_t style_bar_cursor;
@@ -65,4 +66,4 @@ void lv_example_textarea_cursor_create(void)
     lv_obj_set_state(lv_textarea_1, LV_STATE_FOCUSED, true);
     lv_obj_add_style(lv_textarea_1, &style_bar_cursor, LV_PART_CURSOR | LV_STATE_FOCUSED);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_span_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SPAN && LV_BUILD_EXAMPLES
 
 /**
  * @title Spangroup styled text
@@ -14,7 +15,7 @@
  * wraps, `indent` pushes the first line in, and `overflow="ellipsis"` with
  * `max_lines` shows how the tail is truncated.
  */
-void lv_example_span_styling_create(void)
+void lv_example_span_styling(void)
 {
     static lv_style_t style_span_title;
     static lv_style_t style_span_body;
@@ -81,4 +82,4 @@ void lv_example_span_styling_create(void)
     lv_spangroup_set_span_text(lv_spangroup_0, lv_spangroup_span_4, "and strikethrough decoration.");
     lv_spangroup_set_span_style(lv_spangroup_0, lv_spangroup_span_4, &style_span_strike);
 }
-
+#endif

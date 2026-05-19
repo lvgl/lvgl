@@ -2,7 +2,8 @@
  * @file lv_example_scroll_scrollbar_style.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x9429ff)
 
@@ -16,7 +17,7 @@
  * the edge). `scrollbar_mode="on"` keeps it visible so the styling is
  * always seen.
  */
-void lv_example_scroll_scrollbar_style_create(void)
+void lv_example_scroll_scrollbar_style(void)
 {
     static lv_style_t style_scrollbar;
 
@@ -87,4 +88,4 @@ void lv_example_scroll_scrollbar_style_create(void)
     lv_obj_set_align(lv_label_6, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_6, "Row 6");
 }
-
+#endif

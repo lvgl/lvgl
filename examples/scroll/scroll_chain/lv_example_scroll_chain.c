@@ -2,7 +2,8 @@
  * @file lv_example_scroll_chain.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Scroll chaining
@@ -14,7 +15,7 @@
  * on the inner box breaks that link, so scrolling stops at the box and
  * the outer panel does not move.
  */
-void lv_example_scroll_chain_create(void)
+void lv_example_scroll_chain(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -88,4 +89,4 @@ void lv_example_scroll_chain_create(void)
     lv_obj_set_align(lv_label_8, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_8, "Outer 4");
 }
-
+#endif

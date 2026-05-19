@@ -2,7 +2,8 @@
  * @file lv_example_scale_round_modes.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
  * @title Scale round modes
@@ -14,7 +15,7 @@
  * `angle_range` (the arc's angular sweep) and `rotation` (where the first
  * tick sits, measured clockwise from 3 o'clock).
  */
-void lv_example_scale_round_modes_create(void)
+void lv_example_scale_round_modes(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
@@ -46,4 +47,4 @@ void lv_example_scale_round_modes_create(void)
     lv_scale_set_min_value(lv_scale_1, 0);
     lv_scale_set_max_value(lv_scale_1, 100);
 }
-
+#endif

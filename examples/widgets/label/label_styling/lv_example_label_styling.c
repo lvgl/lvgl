@@ -2,7 +2,8 @@
  * @file lv_example_label_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * @title Label styling
@@ -13,7 +14,7 @@
  * padding + bg color; the second label demonstrates the same effect built purely from
  * local `style_*` attributes for a one-off look.
  */
-void lv_example_label_styling_create(void)
+void lv_example_label_styling(void)
 {
     static lv_style_t style_badge;
 
@@ -68,4 +69,4 @@ void lv_example_label_styling_create(void)
     lv_obj_set_style_shadow_offset_y(lv_label_2, 3, 0);
     lv_obj_set_style_shadow_opa(lv_label_2, 100, 0);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_style_arc.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -15,7 +16,7 @@
  * `selector="indicator"` it is the accent, so the same three properties
  * produce a clean circular-progress look.
  */
-void lv_example_style_arc_create(void)
+void lv_example_style_arc(void)
 {
     static lv_style_t style_track;
     static lv_style_t style_progress;
@@ -58,4 +59,4 @@ void lv_example_style_arc_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_1, "68%");
 }
-
+#endif

@@ -10,11 +10,11 @@
 extern "C" {
 #endif
 
-void lv_example_tabview_active_tab_create(void);
-void lv_example_tabview_basic_create(void);
-void lv_example_tabview_tab_bar_position_create(void);
-void lv_example_tabview_tab_bar_style_create(void);
-void lv_example_tabview_tab_button_content_create(void);
+void lv_example_tabview_active_tab(void);
+void lv_example_tabview_basic(void);
+void lv_example_tabview_tab_bar_position(void);
+void lv_example_tabview_tab_bar_style(void);
+void lv_example_tabview_tab_button_content(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

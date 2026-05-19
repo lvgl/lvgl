@@ -2,7 +2,8 @@
  * @file lv_example_tabview_tab_bar_style.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
 /**
  * @title Tab view styling spots
@@ -15,7 +16,7 @@
  * stay transparent and let the tab view body show through. `active="1"` opens
  * the styled tab first so the per-tab override is immediately visible.
  */
-void lv_example_tabview_tab_bar_style_create(void)
+void lv_example_tabview_tab_bar_style(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -50,4 +51,4 @@ void lv_example_tabview_tab_bar_style_create(void)
     lv_obj_set_style_text_color(lv_label_2, lv_color_hex(0xeeeeee), 0);
     lv_label_set_text(lv_label_2, "tab bar bg = 0x222831");
 }
-
+#endif

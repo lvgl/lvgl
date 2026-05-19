@@ -2,7 +2,8 @@
  * @file lv_example_scroll_overview.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Scroll basics
@@ -13,7 +14,7 @@
  * shows a vertical scrollbar automatically — no scroll-specific API is
  * used here, only content that exceeds the bounds.
  */
-void lv_example_scroll_overview_create(void)
+void lv_example_scroll_overview(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -67,4 +68,4 @@ void lv_example_scroll_overview_create(void)
     lv_obj_set_align(lv_label_6, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_6, "Item 6");
 }
-
+#endif

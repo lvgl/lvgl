@@ -10,14 +10,14 @@
 extern "C" {
 #endif
 
-void lv_example_buttonmatrix_button_ctrl_create(void);
-void lv_example_buttonmatrix_button_width_create(void);
-void lv_example_buttonmatrix_map_create(void);
-void lv_example_buttonmatrix_one_checked_create(void);
-void lv_example_buttonmatrix_popover_create(void);
-void lv_example_buttonmatrix_recolor_create(void);
-void lv_example_buttonmatrix_styling_create(void);
+void lv_example_buttonmatrix_button_ctrl(void);
+void lv_example_buttonmatrix_button_width(void);
 void lv_example_buttonmatrix_event(void);
+void lv_example_buttonmatrix_map(void);
+void lv_example_buttonmatrix_one_checked(void);
+void lv_example_buttonmatrix_popover(void);
+void lv_example_buttonmatrix_recolor(void);
+void lv_example_buttonmatrix_styling(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

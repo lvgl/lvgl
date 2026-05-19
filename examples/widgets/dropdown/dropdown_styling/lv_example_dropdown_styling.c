@@ -2,7 +2,8 @@
  * @file lv_example_dropdown_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 /**
  * @title Dropdown styling
@@ -13,7 +14,7 @@
  * style applied to MAIN brightens the border ring when the dropdown receives focus, so
  * the example also demonstrates a state-specific style on a non-button widget.
  */
-void lv_example_dropdown_styling_create(void)
+void lv_example_dropdown_styling(void)
 {
     static lv_style_t style_dropdown_main;
     static lv_style_t style_dropdown_focused;
@@ -60,4 +61,4 @@ void lv_example_dropdown_styling_create(void)
     lv_obj_add_style(lv_dropdown_0, &style_dropdown_main, LV_PART_MAIN);
     lv_obj_add_style(lv_dropdown_0, &style_dropdown_focused, LV_PART_MAIN | LV_STATE_FOCUSED);
 }
-
+#endif

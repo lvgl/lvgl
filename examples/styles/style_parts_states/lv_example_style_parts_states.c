@@ -2,7 +2,8 @@
  * @file lv_example_style_parts_states.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Parts and states
@@ -13,7 +14,7 @@
  * while the indicator is pressed, so the same part carries one base look
  * plus a state-specific overlay — the core of LVGL's part/state model.
  */
-void lv_example_style_parts_states_create(void)
+void lv_example_style_parts_states(void)
 {
     static lv_style_t style_indicator;
     static lv_style_t style_indicator_pressed;
@@ -55,4 +56,4 @@ void lv_example_style_parts_states_create(void)
     lv_obj_add_style(lv_slider_0, &style_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(lv_slider_0, &style_indicator_pressed, LV_PART_INDICATOR | LV_STATE_PRESSED);
 }
-
+#endif

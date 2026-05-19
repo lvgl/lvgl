@@ -2,7 +2,8 @@
  * @file lv_example_table_merge_cells.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABLE && LV_BUILD_EXAMPLES
 
 /**
  * @title Table merge cells
@@ -16,7 +17,7 @@
  * last. `text_crop` is a useful companion flag when a long value would
  * overflow the merged cell.
  */
-void lv_example_table_merge_cells_create(void)
+void lv_example_table_merge_cells(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -37,4 +38,4 @@ void lv_example_table_merge_cells_create(void)
     lv_table_set_cell_value(lv_table_0, 2, 0, "120");
     lv_table_set_cell_value(lv_table_0, 2, 1, "145");
 }
-
+#endif

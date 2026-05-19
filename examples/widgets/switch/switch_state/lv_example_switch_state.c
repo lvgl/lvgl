@@ -2,7 +2,8 @@
  * @file lv_example_switch_state.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SWITCH && LV_BUILD_EXAMPLES
 
 /**
  * @title Switch states
@@ -14,7 +15,7 @@
  * To react to changes in code, attach an `LV_EVENT_VALUE_CHANGED` callback
  * (not shown here — see the docs for the C-side API).
  */
-void lv_example_switch_state_create(void)
+void lv_example_switch_state(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -39,4 +40,4 @@ void lv_example_switch_state_create(void)
     lv_obj_set_state(lv_switch_3, LV_STATE_DISABLED, true);
     lv_obj_set_state(lv_switch_3, LV_STATE_CHECKED, true);
 }
-
+#endif

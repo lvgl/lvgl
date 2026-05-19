@@ -2,7 +2,8 @@
  * @file lv_example_image_src.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
 /**
  * @title Image source
@@ -15,7 +16,7 @@
  * a symbol string or a raw image variable pointer; those alternatives are
  * documented in this page but cannot appear in XML.
  */
-void lv_example_image_src_create(void)
+void lv_example_image_src(void)
 {
     LV_IMAGE_DECLARE(img_example_lvgl_logo);
 
@@ -33,4 +34,4 @@ void lv_example_image_src_create(void)
     lv_obj_t * lv_image_0 = lv_image_create(screen);
     lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
 }
-
+#endif

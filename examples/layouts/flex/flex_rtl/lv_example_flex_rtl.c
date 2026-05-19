@@ -2,7 +2,8 @@
  * @file lv_example_flex_rtl.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * @title Flex RTL
@@ -12,7 +13,7 @@
  * to rtl on the second container reverses item ordering on the main axis without changing
  * the order of children in XML — handy for right-to-left languages or mirrored layouts.
  */
-void lv_example_flex_rtl_create(void)
+void lv_example_flex_rtl(void)
 {
     static lv_style_t style_label;
 
@@ -82,4 +83,4 @@ void lv_example_flex_rtl_create(void)
     lv_label_set_text(lv_label_8, "Third");
     lv_obj_add_style(lv_label_8, &style_label, 0);
 }
-
+#endif

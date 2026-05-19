@@ -10,14 +10,14 @@
 extern "C" {
 #endif
 
-void lv_example_grid_align_create(void);
-void lv_example_grid_cell_span_create(void);
-void lv_example_grid_descriptors_create(void);
-void lv_example_grid_fr_create(void);
-void lv_example_grid_ignore_layout_create(void);
-void lv_example_grid_internal_padding_create(void);
-void lv_example_grid_rtl_create(void);
-void lv_example_grid_subgrid_create(void);
+void lv_example_grid_align(void);
+void lv_example_grid_cell_span(void);
+void lv_example_grid_descriptors(void);
+void lv_example_grid_fr(void);
+void lv_example_grid_ignore_layout(void);
+void lv_example_grid_internal_padding(void);
+void lv_example_grid_rtl(void);
+void lv_example_grid_subgrid(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

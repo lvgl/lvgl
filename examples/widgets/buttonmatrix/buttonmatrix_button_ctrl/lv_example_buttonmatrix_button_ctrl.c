@@ -2,7 +2,8 @@
  * @file lv_example_buttonmatrix_button_ctrl.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTONMATRIX && LV_BUILD_EXAMPLES
 
 /**
  * @title Button matrix per-button control flags
@@ -13,7 +14,7 @@
  * checkable button that starts checked (`checkable|checked`), a `disabled` button,
  * and a `hidden` button which still reserves its slot in the layout.
  */
-void lv_example_buttonmatrix_button_ctrl_create(void)
+void lv_example_buttonmatrix_button_ctrl(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -33,4 +34,4 @@ void lv_example_buttonmatrix_button_ctrl_create(void)
     static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_CHECKABLE | LV_BUTTONMATRIX_CTRL_CHECKED, LV_BUTTONMATRIX_CTRL_DISABLED, LV_BUTTONMATRIX_CTRL_HIDDEN};
     lv_buttonmatrix_set_ctrl_map(lv_buttonmatrix_0, lv_buttonmatrix_0_ctrl_map_1);
 }
-
+#endif

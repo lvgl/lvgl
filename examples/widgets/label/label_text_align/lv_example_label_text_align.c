@@ -2,7 +2,8 @@
  * @file lv_example_label_text_align.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * @title Label text alignment
@@ -13,7 +14,7 @@
  * the label is wider than its text or contains line breaks, so each label is given an
  * explicit width that exceeds the longest line.
  */
-void lv_example_label_text_align_create(void)
+void lv_example_label_text_align(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -44,4 +45,4 @@ void lv_example_label_text_align_create(void)
     lv_obj_set_style_text_align(lv_label_3, LV_TEXT_ALIGN_RIGHT, 0);
     lv_label_set_text(lv_label_3, "Right aligned\nSecond line");
 }
-
+#endif

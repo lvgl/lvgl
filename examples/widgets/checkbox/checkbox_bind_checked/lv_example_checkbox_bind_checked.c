@@ -2,7 +2,8 @@
  * @file lv_example_checkbox_bind_checked.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CHECKBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Checkbox bind checked + bind flag
@@ -12,7 +13,7 @@
  * The note label uses `bind_flag_if_eq` to enable the `hidden` flag while
  * `subject_flag` equals 0 — so the label only shows once the box is ticked.
  */
-void lv_example_checkbox_bind_checked_create(void)
+void lv_example_checkbox_bind_checked(void)
 {
     static lv_subject_t subject_flag;
 
@@ -42,4 +43,4 @@ void lv_example_checkbox_bind_checked_create(void)
     lv_label_set_text(lv_label_1, "Extra details only visible while the box is ticked.");
     lv_obj_bind_flag_if_eq(lv_label_1, &subject_flag, LV_OBJ_FLAG_HIDDEN, 0);
 }
-
+#endif

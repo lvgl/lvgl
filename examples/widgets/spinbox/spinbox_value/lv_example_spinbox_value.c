@@ -2,7 +2,8 @@
  * @file lv_example_spinbox_value.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SPINBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Spinbox value, range, and step
@@ -14,7 +15,7 @@
  * `rollover="false"` (the default) the value sticks at the bounds; see
  * `spinbox_rollover` for the wraparound variant.
  */
-void lv_example_spinbox_value_create(void)
+void lv_example_spinbox_value(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -35,4 +36,4 @@ void lv_example_spinbox_value_create(void)
     lv_spinbox_set_max_value(lv_spinbox_0, 100);
     lv_spinbox_set_step(lv_spinbox_0, 1);
 }
-
+#endif

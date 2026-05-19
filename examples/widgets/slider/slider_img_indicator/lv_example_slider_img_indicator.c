@@ -2,7 +2,8 @@
  * @file lv_example_slider_img_indicator.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 /**
  * @title Slider image indicator
@@ -14,7 +15,7 @@
  * to yellow then red at the high end. Both images are 280×30, matching the slider
  * width.
  */
-void lv_example_slider_img_indicator_create(void)
+void lv_example_slider_img_indicator(void)
 {
     LV_IMAGE_DECLARE(img_bar_bg);
     LV_IMAGE_DECLARE(img_bar_indicator);
@@ -78,4 +79,4 @@ void lv_example_slider_img_indicator_create(void)
     lv_label_bind_text(lv_label_1, &subject_value2, "%d");
     lv_obj_set_style_text_font(lv_label_1, &font_example_large, 0);
 }
-
+#endif

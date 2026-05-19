@@ -2,7 +2,8 @@
  * @file lv_example_slider_bind_state.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 /**
  * @title Slider drives another widget's state
@@ -13,7 +14,7 @@
  * a guard like "block submit when the value is out of range". Slide past 80 to
  * watch the button grey out.
  */
-void lv_example_slider_bind_state_create(void)
+void lv_example_slider_bind_state(void)
 {
     static lv_subject_t subject_value;
 
@@ -51,4 +52,4 @@ void lv_example_slider_bind_state_create(void)
 
     lv_obj_bind_state_if_gt(lv_button_0, &subject_value, LV_STATE_DISABLED, 80);
 }
-
+#endif

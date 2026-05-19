@@ -10,12 +10,12 @@
 extern "C" {
 #endif
 
-void lv_example_label_bind_text_create(void);
-void lv_example_label_long_mode_create(void);
-void lv_example_label_recolor_create(void);
-void lv_example_label_set_text_newline_create(void);
-void lv_example_label_styling_create(void);
-void lv_example_label_text_align_create(void);
+void lv_example_label_bind_text(void);
+void lv_example_label_long_mode(void);
+void lv_example_label_recolor(void);
+void lv_example_label_set_text_newline(void);
+void lv_example_label_styling(void);
+void lv_example_label_text_align(void);
 void lv_example_label_translation(void);
 
 #ifdef __cplusplus

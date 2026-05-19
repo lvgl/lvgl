@@ -2,7 +2,8 @@
  * @file lv_example_bar_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 /**
  * @title Bar styling
@@ -13,7 +14,7 @@
  * indicator style adds a horizontal gradient and a darker inner shadow so the fill
  * reads as a glossy progress strip on top of the recessed track.
  */
-void lv_example_bar_styling_create(void)
+void lv_example_bar_styling(void)
 {
     static lv_style_t style_bar_track;
     static lv_style_t style_bar_indicator;
@@ -74,4 +75,4 @@ void lv_example_bar_styling_create(void)
     lv_obj_set_style_border_color(lv_bar_1, lv_color_hex(0xd1d5db), 0);
     lv_obj_set_style_border_width(lv_bar_1, 1, 0);
 }
-
+#endif

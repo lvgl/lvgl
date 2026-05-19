@@ -2,7 +2,8 @@
  * @file lv_example_spinbox_format.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SPINBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Spinbox digit count and decimal point
@@ -14,7 +15,7 @@
  * puts it two digits from the right. The stored value is the same integer in
  * both spinboxes (`123`); only the rendering differs.
  */
-void lv_example_spinbox_format_create(void)
+void lv_example_spinbox_format(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -43,4 +44,4 @@ void lv_example_spinbox_format_create(void)
     lv_spinbox_set_dec_point_pos(lv_spinbox_1, 2);
     lv_spinbox_set_step(lv_spinbox_1, 1);
 }
-
+#endif

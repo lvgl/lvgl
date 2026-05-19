@@ -2,7 +2,8 @@
  * @file lv_example_scroll_scrollbar_mode.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x9429ff)
 
@@ -16,7 +17,7 @@
  * are `auto` (bar only while scrollable) and `active` (bar only while
  * actively scrolling).
  */
-void lv_example_scroll_scrollbar_mode_create(void)
+void lv_example_scroll_scrollbar_mode(void)
 {
     static lv_style_t style_scrollbar;
 
@@ -116,4 +117,4 @@ void lv_example_scroll_scrollbar_mode_create(void)
     lv_obj_set_align(lv_label_10, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_10, "D");
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_grid_cell_span.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * @title Grid cell span and alignment
@@ -13,7 +14,7 @@
  * to occupy multiple tracks at once, demonstrating how a single child can cover several
  * cells of the grid.
  */
-void lv_example_grid_cell_span_create(void)
+void lv_example_grid_cell_span(void)
 {
     static lv_style_t style_card;
 
@@ -105,4 +106,4 @@ void lv_example_grid_cell_span_create(void)
     lv_label_set_text(lv_label_5, "span\n2 rows");
     lv_obj_set_align(lv_label_5, LV_ALIGN_CENTER);
 }
-
+#endif

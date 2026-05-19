@@ -2,7 +2,8 @@
  * @file lv_example_arc_set_angles.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * @title Arc with explicit indicator angles
@@ -13,7 +14,7 @@
  * This is handy for static graphics or custom dial layouts where the indicator span is
  * not tied to a numeric value.
  */
-void lv_example_arc_set_angles_create(void)
+void lv_example_arc_set_angles(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -48,4 +49,4 @@ void lv_example_arc_set_angles_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "angles");
 }
-
+#endif

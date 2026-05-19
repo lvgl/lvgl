@@ -2,7 +2,8 @@
  * @file lv_example_style_size_position.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -15,7 +16,7 @@
  * fit its label plus that padding, so the same style yields a tight chip
  * and a roomy panel — size comes only from these properties.
  */
-void lv_example_style_size_position_create(void)
+void lv_example_style_size_position(void)
 {
     static lv_style_t style_card;
 
@@ -62,4 +63,4 @@ void lv_example_style_size_position_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "240 wide, roomy padding");
 }
-
+#endif

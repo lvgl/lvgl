@@ -2,7 +2,8 @@
  * @file lv_example_style_margin.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -15,7 +16,7 @@
  * visibly further from its neighbors than the 8 px flex gap — margin
  * reserves space around a Widget without changing the Widget's size.
  */
-void lv_example_style_margin_create(void)
+void lv_example_style_margin(void)
 {
     static lv_style_t style_chip;
     static lv_style_t style_chip_accent;
@@ -71,4 +72,4 @@ void lv_example_style_margin_create(void)
     lv_label_set_text(lv_label_3, "C");
     lv_obj_add_style(lv_label_3, &style_chip, 0);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_buttonmatrix_recolor.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTONMATRIX && LV_BUILD_EXAMPLES
 
 /**
  * @title Button matrix per-button text recolor
@@ -13,7 +14,7 @@
  * buttons share a layout but each colors a different word, so a single buttonmatrix
  * can mix severity colors, badges, or status markers without per-button styles.
  */
-void lv_example_buttonmatrix_recolor_create(void)
+void lv_example_buttonmatrix_recolor(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -33,4 +34,4 @@ void lv_example_buttonmatrix_recolor_create(void)
     static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_RECOLOR, LV_BUTTONMATRIX_CTRL_RECOLOR, LV_BUTTONMATRIX_CTRL_RECOLOR};
     lv_buttonmatrix_set_ctrl_map(lv_buttonmatrix_0, lv_buttonmatrix_0_ctrl_map_1);
 }
-
+#endif

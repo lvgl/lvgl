@@ -2,7 +2,8 @@
  * @file lv_example_spinbox_bind_value.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SPINBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Spinbox bind value
@@ -13,7 +14,7 @@
  * without any explicit redraw call. Use this pattern whenever a numeric editor
  * and a graphical indicator both refer to the same underlying quantity.
  */
-void lv_example_spinbox_bind_value_create(void)
+void lv_example_spinbox_bind_value(void)
 {
     static lv_subject_t subject_value;
 
@@ -59,10 +60,8 @@ void lv_example_spinbox_bind_value_create(void)
     lv_label_set_text(lv_label_1, "-");
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
 
-    lv_subject_increment_dsc_t * subject_increment_event_0 = lv_obj_add_subject_increment_event(lv_button_0, &subject_value,
-                                                                                                LV_EVENT_CLICKED, -1);
-    lv_subject_increment_dsc_t * subject_increment_event_1 = lv_obj_add_subject_increment_event(lv_button_0, &subject_value,
-                                                                                                LV_EVENT_LONG_PRESSED_REPEAT, -1);
+    lv_obj_add_subject_increment_event(lv_button_0, &subject_value, LV_EVENT_CLICKED, -1);
+    lv_obj_add_subject_increment_event(lv_button_0, &subject_value, LV_EVENT_LONG_PRESSED_REPEAT, -1);
 
     lv_obj_t * lv_button_1 = lv_button_create(lv_arc_0);
     lv_obj_set_align(lv_button_1, LV_ALIGN_CENTER);
@@ -73,9 +72,7 @@ void lv_example_spinbox_bind_value_create(void)
     lv_label_set_text(lv_label_2, "+");
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
 
-    lv_subject_increment_dsc_t * subject_increment_event_2 = lv_obj_add_subject_increment_event(lv_button_1, &subject_value,
-                                                                                                LV_EVENT_CLICKED, 1);
-    lv_subject_increment_dsc_t * subject_increment_event_3 = lv_obj_add_subject_increment_event(lv_button_1, &subject_value,
-                                                                                                LV_EVENT_LONG_PRESSED_REPEAT, 1);
+    lv_obj_add_subject_increment_event(lv_button_1, &subject_value, LV_EVENT_CLICKED, 1);
+    lv_obj_add_subject_increment_event(lv_button_1, &subject_value, LV_EVENT_LONG_PRESSED_REPEAT, 1);
 }
-
+#endif

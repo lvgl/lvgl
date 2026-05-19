@@ -2,7 +2,8 @@
  * @file lv_example_buttonmatrix_popover.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTONMATRIX && LV_BUILD_EXAMPLES
 
 /**
  * @title Button matrix popover preview
@@ -13,7 +14,7 @@
  * can still read what they are pressing. The entire top row carries `popover` in
  * `ctrl_map`, which is how a keyboard layer typically enables the feature.
  */
-void lv_example_buttonmatrix_popover_create(void)
+void lv_example_buttonmatrix_popover(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -33,4 +34,4 @@ void lv_example_buttonmatrix_popover_create(void)
     static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER};
     lv_buttonmatrix_set_ctrl_map(lv_buttonmatrix_0, lv_buttonmatrix_0_ctrl_map_1);
 }
-
+#endif

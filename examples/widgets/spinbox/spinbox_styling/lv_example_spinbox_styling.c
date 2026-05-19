@@ -2,7 +2,8 @@
  * @file lv_example_spinbox_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SPINBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Spinbox styling
@@ -22,7 +23,7 @@
  * double-drawing), and use `pad_ver` to let the frame breathe vertically
  * around the glyph.
  */
-void lv_example_spinbox_styling_create(void)
+void lv_example_spinbox_styling(void)
 {
     static lv_style_t style_spinbox_main;
     static lv_style_t style_spinbox_cursor;
@@ -71,4 +72,4 @@ void lv_example_spinbox_styling_create(void)
     lv_obj_add_style(lv_spinbox_0, &style_spinbox_main, LV_PART_MAIN);
     lv_obj_add_style(lv_spinbox_0, &style_spinbox_cursor, LV_PART_CURSOR);
 }
-
+#endif

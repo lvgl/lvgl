@@ -10,14 +10,14 @@
 extern "C" {
 #endif
 
-void lv_example_slider_bind_state_create(void);
-void lv_example_slider_bind_value_create(void);
-void lv_example_slider_img_indicator_create(void);
-void lv_example_slider_modes_create(void);
-void lv_example_slider_reversed_direction_create(void);
-void lv_example_slider_styling_create(void);
-void lv_example_slider_value_range_orientation_create(void);
+void lv_example_slider_bind_state(void);
+void lv_example_slider_bind_value(void);
 void lv_example_slider_event(void);
+void lv_example_slider_img_indicator(void);
+void lv_example_slider_modes(void);
+void lv_example_slider_reversed_direction(void);
+void lv_example_slider_styling(void);
+void lv_example_slider_value_range_orientation(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

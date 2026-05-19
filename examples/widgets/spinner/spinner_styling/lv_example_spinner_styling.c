@@ -2,7 +2,8 @@
  * @file lv_example_spinner_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SPINNER && LV_BUILD_EXAMPLES
 
 /**
  * @title Table styling
@@ -15,7 +16,7 @@
  * row-specific state — but XML doesn't yet have a per-row selector; instead
  * set the header row's cell `ctrl` flags or restyle in code.
  */
-void lv_example_spinner_styling_create(void)
+void lv_example_spinner_styling(void)
 {
     static lv_style_t style_table_main;
     static lv_style_t style_table_items;
@@ -71,4 +72,4 @@ void lv_example_spinner_styling_create(void)
     lv_obj_add_style(lv_table_0, &style_table_items, LV_PART_ITEMS);
     lv_obj_add_style(lv_table_0, &style_table_items_pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
 }
-
+#endif

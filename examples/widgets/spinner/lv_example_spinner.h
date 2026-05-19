@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-void lv_example_spinner_basic_create(void);
-void lv_example_spinner_styling_create(void);
+void lv_example_spinner_basic(void);
+void lv_example_spinner_styling(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

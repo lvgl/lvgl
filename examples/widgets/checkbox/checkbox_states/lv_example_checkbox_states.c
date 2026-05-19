@@ -2,7 +2,8 @@
  * @file lv_example_checkbox_states.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CHECKBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Checkbox states
@@ -12,7 +13,7 @@
  * toggled at runtime with `lv_obj_add_state(cb, LV_STATE_CHECKED)` and friends; in
  * XML the same effect is achieved by setting the state attribute directly.
  */
-void lv_example_checkbox_states_create(void)
+void lv_example_checkbox_states(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -45,4 +46,4 @@ void lv_example_checkbox_states_create(void)
     lv_obj_set_state(lv_checkbox_3, LV_STATE_DISABLED, true);
     lv_obj_set_state(lv_checkbox_3, LV_STATE_CHECKED, true);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_tabview_tab_bar_position.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
 /**
  * @title Tab view tab bar position
@@ -13,7 +14,7 @@
  * the four widgets are easy to tell apart at a glance; only `tab_bar_position`
  * changes the layout itself.
  */
-void lv_example_tabview_tab_bar_position_create(void)
+void lv_example_tabview_tab_bar_position(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -35,7 +36,7 @@ void lv_example_tabview_tab_bar_position_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_1, "top");
 
-    lv_obj_t * lv_tabview_tab_1 = lv_tabview_add_tab(lv_tabview_0, "B");
+    lv_tabview_add_tab(lv_tabview_0, "B");
 
     lv_obj_t * lv_tabview_1 = lv_tabview_create(screen);
     lv_obj_set_pos(lv_tabview_1, 164, 28);
@@ -48,7 +49,7 @@ void lv_example_tabview_tab_bar_position_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "bottom");
 
-    lv_obj_t * lv_tabview_tab_3 = lv_tabview_add_tab(lv_tabview_1, "B");
+    lv_tabview_add_tab(lv_tabview_1, "B");
 
     /* Bar on the bottom edge */
     lv_obj_t * lv_tabview_2 = lv_tabview_create(screen);
@@ -62,7 +63,7 @@ void lv_example_tabview_tab_bar_position_create(void)
     lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_3, "left");
 
-    lv_obj_t * lv_tabview_tab_5 = lv_tabview_add_tab(lv_tabview_2, "B");
+    lv_tabview_add_tab(lv_tabview_2, "B");
 
     lv_obj_t * lv_tabview_3 = lv_tabview_create(screen);
     lv_obj_set_pos(lv_tabview_3, 164, 136);
@@ -75,6 +76,6 @@ void lv_example_tabview_tab_bar_position_create(void)
     lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_4, "right");
 
-    lv_obj_t * lv_tabview_tab_7 = lv_tabview_add_tab(lv_tabview_3, "B");
+    lv_tabview_add_tab(lv_tabview_3, "B");
 }
-
+#endif

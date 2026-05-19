@@ -2,7 +2,8 @@
  * @file lv_example_chart_ticks_labels.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 /**
  * @title Chart ticks and labels
@@ -15,7 +16,7 @@
  * tick), the same syntax button matrix maps use. For the Y axis you can place
  * a vertical scale on either side of the chart with the same technique.
  */
-void lv_example_chart_ticks_labels_create(void)
+void lv_example_chart_ticks_labels(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -48,4 +49,4 @@ void lv_example_chart_ticks_labels_create(void)
     static const char * lv_scale_0_text_src_1[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", NULL};
     lv_scale_set_text_src(lv_scale_0, lv_scale_0_text_src_1);
 }
-
+#endif

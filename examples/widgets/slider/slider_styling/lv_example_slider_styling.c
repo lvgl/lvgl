@@ -2,7 +2,8 @@
  * @file lv_example_slider_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 #define TEXT_COLOR lv_color_hex(0x013992)
 
@@ -15,7 +16,7 @@
  * `selector="pressed|knob"` so it picks up an outline halo and a brighter fill only
  * while being dragged, demonstrating combined part+state selectors.
  */
-void lv_example_slider_styling_create(void)
+void lv_example_slider_styling(void)
 {
     static lv_style_t style_slider_track;
     static lv_style_t style_slider_indicator;
@@ -86,4 +87,4 @@ void lv_example_slider_styling_create(void)
     lv_obj_add_style(lv_slider_0, &style_slider_knob, LV_PART_KNOB);
     lv_obj_add_style(lv_slider_0, &style_slider_knob_pressed, LV_PART_KNOB | LV_STATE_PRESSED);
 }
-
+#endif

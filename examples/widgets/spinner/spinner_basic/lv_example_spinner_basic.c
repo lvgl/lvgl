@@ -2,7 +2,8 @@
  * @file lv_example_spinner_basic.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SPINNER && LV_BUILD_EXAMPLES
 
 /**
  * @title Spinner basics
@@ -15,7 +16,7 @@
  * 90° (a short dash). Width and height set the diameter; the spinner sizes
  * the arc to fill the widget.
  */
-void lv_example_spinner_basic_create(void)
+void lv_example_spinner_basic(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
@@ -35,4 +36,4 @@ void lv_example_spinner_basic_create(void)
     lv_spinner_set_anim_duration(lv_spinner_1, 600);
     lv_spinner_set_arc_sweep(lv_spinner_1, 180);
 }
-
+#endif

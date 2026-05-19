@@ -2,7 +2,8 @@
  * @file lv_example_buttonmatrix_map.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTONMATRIX && LV_BUILD_EXAMPLES
 
 /**
  * @title Button matrix map
@@ -16,7 +17,7 @@
  * Within a row the matrix shares the available width equally between buttons by
  * default.
  */
-void lv_example_buttonmatrix_map_create(void)
+void lv_example_buttonmatrix_map(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -34,4 +35,4 @@ void lv_example_buttonmatrix_map_create(void)
     static const char * lv_buttonmatrix_0_map_0[] = {"1", "2", "3", "\n", "4", "5", "6", "\n", "7", "8", "9", NULL};
     lv_buttonmatrix_set_map(lv_buttonmatrix_0, lv_buttonmatrix_0_map_0);
 }
-
+#endif

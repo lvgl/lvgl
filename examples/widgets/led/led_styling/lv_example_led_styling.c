@@ -2,7 +2,8 @@
  * @file lv_example_led_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LED && LV_BUILD_EXAMPLES
 
 /**
  * @title LED styling
@@ -13,7 +14,7 @@
  * default with a ring outline + glow; the second uses a small radius to render as a
  * square indicator with a hard border instead.
  */
-void lv_example_led_styling_create(void)
+void lv_example_led_styling(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
@@ -62,4 +63,4 @@ void lv_example_led_styling_create(void)
     lv_obj_set_style_outline_opa(lv_led_2, 180, 0);
     lv_obj_set_style_shadow_width(lv_led_2, 0, 0);
 }
-
+#endif

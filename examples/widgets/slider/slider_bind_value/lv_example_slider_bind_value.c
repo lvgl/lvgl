@@ -2,7 +2,8 @@
  * @file lv_example_slider_bind_value.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 /**
  * @title Slider bind value
@@ -14,7 +15,7 @@
  * immediately. `bind_text-fmt` lets a label render a numeric subject through a
  * printf-style format.
  */
-void lv_example_slider_bind_value_create(void)
+void lv_example_slider_bind_value(void)
 {
     static lv_subject_t subject_value;
 
@@ -45,4 +46,4 @@ void lv_example_slider_bind_value_create(void)
     lv_obj_t * lv_label_1 = lv_label_create(screen);
     lv_label_bind_text(lv_label_1, &subject_value, "Value: %d/100");
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_label_set_text_newline.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * @title Label set text with newlines
@@ -12,7 +13,7 @@
  * a blank line between paragraphs. The second label demonstrates that the text attribute
  * also accepts plain text with no escaping for normal characters.
  */
-void lv_example_label_set_text_newline_create(void)
+void lv_example_label_set_text_newline(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -32,4 +33,4 @@ void lv_example_label_set_text_newline_create(void)
     lv_obj_set_y(lv_label_2, 140);
     lv_label_set_text(lv_label_2, "Text is set directly with the text attribute.");
 }
-
+#endif

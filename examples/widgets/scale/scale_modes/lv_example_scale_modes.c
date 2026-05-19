@@ -2,7 +2,8 @@
  * @file lv_example_scale_modes.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
  * @title Scale linear modes
@@ -13,7 +14,7 @@
  * `vertical_right` rotate the same idea 90°. The four scales below share the
  * same tick count and value range so the only visible difference is layout.
  */
-void lv_example_scale_modes_create(void)
+void lv_example_scale_modes(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
@@ -59,4 +60,4 @@ void lv_example_scale_modes_create(void)
     lv_scale_set_min_value(lv_scale_3, 0);
     lv_scale_set_max_value(lv_scale_3, 100);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_label_recolor.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * @title Label text recolor
@@ -12,7 +13,7 @@
  * lets a single label mix multiple colors in one string without splitting it into separate
  * label widgets.
  */
-void lv_example_label_recolor_create(void)
+void lv_example_label_recolor(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -28,4 +29,4 @@ void lv_example_label_recolor_create(void)
     lv_label_set_recolor(lv_label_1, true);
     lv_label_set_text(lv_label_1, "Write a #ff0000 red# word, a #00a000 green# word, and a #0000ff blue# word.");
 }
-
+#endif

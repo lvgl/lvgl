@@ -2,7 +2,8 @@
  * @file lv_example_scroll_one.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Scroll one at a time
@@ -14,7 +15,7 @@
  * matter how hard it is thrown. It requires snappable children and a
  * snap mode other than `none`.
  */
-void lv_example_scroll_one_create(void)
+void lv_example_scroll_one(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -87,4 +88,4 @@ void lv_example_scroll_one_create(void)
     lv_obj_set_align(lv_label_9, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_9, "Panel 9");
 }
-
+#endif

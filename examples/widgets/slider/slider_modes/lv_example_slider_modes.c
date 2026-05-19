@@ -2,7 +2,8 @@
  * @file lv_example_slider_modes.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 #define TEXT_COLOR lv_color_hex(0x013992)
 
@@ -15,7 +16,7 @@
  * opposite directions. Range mode draws a band between left_value and value, useful for
  * picking an interval rather than a single number.
  */
-void lv_example_slider_modes_create(void)
+void lv_example_slider_modes(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -68,4 +69,4 @@ void lv_example_slider_modes_create(void)
     lv_label_set_text(lv_label_3, "range");
     lv_obj_set_style_text_color(lv_label_3, TEXT_COLOR, 0);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_arc_mode.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * @title Arc indicator modes
@@ -13,7 +14,7 @@
  * and symmetrical grows outward from the middle of the range — making it obvious where
  * each mode anchors the indicator.
  */
-void lv_example_arc_mode_create(void)
+void lv_example_arc_mode(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -55,4 +56,4 @@ void lv_example_arc_mode_create(void)
     lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_3, "sym.");
 }
-
+#endif

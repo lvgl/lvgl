@@ -2,7 +2,8 @@
  * @file lv_example_grid_descriptors.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * @title Grid descriptors
@@ -12,7 +13,7 @@
  * pixels. The example uses three 70px columns and two 44px rows, and each child positions
  * itself with style_grid_cell_column_pos and style_grid_cell_row_pos.
  */
-void lv_example_grid_descriptors_create(void)
+void lv_example_grid_descriptors(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -93,4 +94,4 @@ void lv_example_grid_descriptors_create(void)
     lv_obj_set_style_text_color(lv_label_6, lv_color_hex(0xffffff), 0);
     lv_label_set_text(lv_label_6, "2,1");
 }
-
+#endif

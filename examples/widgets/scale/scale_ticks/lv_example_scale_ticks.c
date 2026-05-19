@@ -2,7 +2,8 @@
  * @file lv_example_scale_ticks.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
  * @title Scale tick configuration
@@ -13,7 +14,7 @@
  * (when `label_show="true"`) carry a numeric label. The three scales below
  * share the same physical width but vary their tick density.
  */
-void lv_example_scale_ticks_create(void)
+void lv_example_scale_ticks(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -56,4 +57,4 @@ void lv_example_scale_ticks_create(void)
     lv_scale_set_min_value(lv_scale_2, 0);
     lv_scale_set_max_value(lv_scale_2, 100);
 }
-
+#endif

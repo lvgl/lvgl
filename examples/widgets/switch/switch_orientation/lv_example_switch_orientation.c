@@ -2,7 +2,8 @@
  * @file lv_example_switch_orientation.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SWITCH && LV_BUILD_EXAMPLES
 
 /**
  * @title Switch orientation
@@ -14,7 +15,7 @@
  * dimensions don't match the orientation you want, e.g. a tall vertical
  * switch inside a wide row.
  */
-void lv_example_switch_orientation_create(void)
+void lv_example_switch_orientation(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
@@ -33,4 +34,4 @@ void lv_example_switch_orientation_create(void)
     lv_switch_set_orientation(lv_switch_1, LV_SWITCH_ORIENTATION_VERTICAL);
     lv_obj_set_state(lv_switch_1, LV_STATE_CHECKED, true);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_flex_align.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * @title Flex align
@@ -12,7 +13,7 @@
  * style_flex_cross_place aligns items of different heights on the cross axis. The mix of a
  * tall button, a switch, and a checkbox makes cross-axis alignment easy to see.
  */
-void lv_example_flex_align_create(void)
+void lv_example_flex_align(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -41,4 +42,4 @@ void lv_example_flex_align_create(void)
     lv_obj_t * lv_checkbox_0 = lv_checkbox_create(lv_obj_1);
     lv_checkbox_set_text(lv_checkbox_0, "Check");
 }
-
+#endif

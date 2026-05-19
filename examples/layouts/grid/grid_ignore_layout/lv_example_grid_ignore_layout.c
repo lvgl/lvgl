@@ -2,7 +2,8 @@
  * @file lv_example_grid_ignore_layout.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * @title Grid ignore layout
@@ -12,7 +13,7 @@
  * is skipped by the grid. The detached item keeps its manual x/y position and does not
  * displace any of the placed cells, useful for floating badges or overlays.
  */
-void lv_example_grid_ignore_layout_create(void)
+void lv_example_grid_ignore_layout(void)
 {
     static lv_style_t style_cell;
 
@@ -81,4 +82,4 @@ void lv_example_grid_ignore_layout_create(void)
     lv_label_set_text(lv_label_5, "FREE");
     lv_obj_add_style(lv_label_5, &style_cell, 0);
 }
-
+#endif

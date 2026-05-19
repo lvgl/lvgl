@@ -2,7 +2,8 @@
  * @file lv_example_keyboard_popovers.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
 /**
  * @title Keyboard pop-overs
@@ -15,7 +16,7 @@
  * keyboard's bounds — leave free space above it (here the textarea provides
  * that headroom).
  */
-void lv_example_keyboard_popovers_create(void)
+void lv_example_keyboard_popovers(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -38,4 +39,4 @@ void lv_example_keyboard_popovers_create(void)
     lv_keyboard_set_mode(lv_keyboard_0, LV_KEYBOARD_MODE_TEXT_LOWER);
     lv_keyboard_set_popovers(lv_keyboard_0, true);
 }
-
+#endif

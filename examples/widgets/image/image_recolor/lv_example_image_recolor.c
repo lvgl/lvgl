@@ -2,7 +2,8 @@
  * @file lv_example_image_recolor.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
 /**
  * @title Image recolor
@@ -16,7 +17,7 @@
  * intensity into the style, so the image retints in real time without any
  * event callback.
  */
-void lv_example_image_recolor_create(void)
+void lv_example_image_recolor(void)
 {
     LV_IMAGE_DECLARE(img_example_lvgl_logo);
 
@@ -56,4 +57,4 @@ void lv_example_image_recolor_create(void)
     lv_obj_t * lv_label_1 = lv_label_create(screen);
     lv_label_bind_text(lv_label_1, &subject_opa, "recolor_opa = %d / 255");
 }
-
+#endif

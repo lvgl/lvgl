@@ -2,7 +2,8 @@
  * @file lv_example_slider_reversed_direction.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 #define TEXT_COLOR lv_color_hex(0x013992)
 
@@ -14,7 +15,7 @@
  * than max_value. Swapping the two reverses the fill direction and the sign of motion
  * without touching orientation, styling, or layout.
  */
-void lv_example_slider_reversed_direction_create(void)
+void lv_example_slider_reversed_direction(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -49,4 +50,4 @@ void lv_example_slider_reversed_direction_create(void)
     lv_label_set_text(lv_label_2, "100..0");
     lv_obj_set_style_text_color(lv_label_2, TEXT_COLOR, 0);
 }
-
+#endif

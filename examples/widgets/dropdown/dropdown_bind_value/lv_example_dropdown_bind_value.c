@@ -2,7 +2,8 @@
  * @file lv_example_dropdown_bind_value.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 /**
  * @title Roller bind value
@@ -13,7 +14,7 @@
  * picks up the change and animates to that option without any direct call into
  * the roller widget.
  */
-void lv_example_dropdown_bind_value_create(void)
+void lv_example_dropdown_bind_value(void)
 {
     static lv_subject_t subject_index;
 
@@ -51,4 +52,4 @@ void lv_example_dropdown_bind_value_create(void)
 
     lv_obj_add_subject_set_int_event(lv_button_0, &subject_index, LV_EVENT_CLICKED, 2);
 }
-
+#endif

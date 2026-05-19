@@ -2,7 +2,8 @@
  * @file lv_example_scale_range.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
  * @title Scale value range
@@ -14,7 +15,7 @@
  * inverted range (min > max) flips the label direction without changing the
  * layout.
  */
-void lv_example_scale_range_create(void)
+void lv_example_scale_range(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -47,4 +48,4 @@ void lv_example_scale_range_create(void)
     lv_scale_set_min_value(lv_scale_1, -50);
     lv_scale_set_max_value(lv_scale_1, 50);
 }
-
+#endif

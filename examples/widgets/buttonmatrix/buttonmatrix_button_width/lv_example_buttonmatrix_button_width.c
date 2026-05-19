@@ -2,7 +2,8 @@
  * @file lv_example_buttonmatrix_button_width.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTONMATRIX && LV_BUILD_EXAMPLES
 
 /**
  * @title Button matrix button widths
@@ -17,7 +18,7 @@
  * for a newline (U+000A) — because a raw `\n` inside an attribute would stay as
  * the literal backslash-n.
  */
-void lv_example_buttonmatrix_button_width_create(void)
+void lv_example_buttonmatrix_button_width(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -37,4 +38,4 @@ void lv_example_buttonmatrix_button_width_create(void)
     static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_WIDTH_1, LV_BUTTONMATRIX_CTRL_WIDTH_2, LV_BUTTONMATRIX_CTRL_WIDTH_3};
     lv_buttonmatrix_set_ctrl_map(lv_buttonmatrix_0, lv_buttonmatrix_0_ctrl_map_1);
 }
-
+#endif

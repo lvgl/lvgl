@@ -2,7 +2,8 @@
  * @file lv_example_arc_change_rate.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * @title Arc change rate
@@ -12,7 +13,7 @@
  * setting responds sluggishly to fast pointer gestures, while the higher setting tracks
  * the pointer almost instantly — useful for fine-tuning versus quick-jump knobs.
  */
-void lv_example_arc_change_rate_create(void)
+void lv_example_arc_change_rate(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -46,4 +47,4 @@ void lv_example_arc_change_rate_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "rate=360");
 }
-
+#endif

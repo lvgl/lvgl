@@ -2,7 +2,8 @@
  * @file lv_example_switch_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SWITCH && LV_BUILD_EXAMPLES
 
 /**
  * @title Switch styling
@@ -24,7 +25,7 @@
  * `pad_all="2"` here lets the knob sit slightly larger than the track,
  * which (combined with a shadow) gives the typical floating-knob look.
  */
-void lv_example_switch_styling_create(void)
+void lv_example_switch_styling(void)
 {
     static lv_style_t style_switch_main;
     static lv_style_t style_switch_indicator_checked;
@@ -82,4 +83,4 @@ void lv_example_switch_styling_create(void)
     lv_obj_add_style(lv_switch_1, &style_switch_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
     lv_obj_add_style(lv_switch_1, &style_switch_knob, LV_PART_KNOB);
 }
-
+#endif

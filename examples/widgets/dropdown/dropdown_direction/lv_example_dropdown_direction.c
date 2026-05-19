@@ -2,7 +2,8 @@
  * @file lv_example_dropdown_direction.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 /**
  * @title Dropdown open direction
@@ -13,7 +14,7 @@
  * useful when a dropdown sits close to a screen edge and there is no room to expand
  * downward.
  */
-void lv_example_dropdown_direction_create(void)
+void lv_example_dropdown_direction(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -52,4 +53,4 @@ void lv_example_dropdown_direction_create(void)
     lv_dropdown_set_dir(lv_dropdown_3, LV_DIR_LEFT);
     lv_dropdown_set_options(lv_dropdown_3, "Apple\nBanana\nOrange\nMelon");
 }
-
+#endif

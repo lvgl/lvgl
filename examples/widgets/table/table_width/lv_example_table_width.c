@@ -2,7 +2,8 @@
  * @file lv_example_table_width.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABLE && LV_BUILD_EXAMPLES
 
 /**
  * @title Table column widths
@@ -14,7 +15,7 @@
  * Mixing default-width and explicit-width columns is fine — only the ones
  * you address change.
  */
-void lv_example_table_width_create(void)
+void lv_example_table_width(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -43,4 +44,4 @@ void lv_example_table_width_create(void)
     lv_table_set_cell_value(lv_table_0, 2, 1, "Cappuccino, regular");
     lv_table_set_cell_value(lv_table_0, 2, 2, "3.80");
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_style_text.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -15,7 +16,7 @@
  * `text_decor="underline"` underlines every line — the spacing makes the
  * two lines read as a styled heading rather than body text.
  */
-void lv_example_style_text_create(void)
+void lv_example_style_text(void)
 {
     static lv_style_t style_card;
     static lv_style_t style_heading;
@@ -60,4 +61,4 @@ void lv_example_style_text_create(void)
     lv_label_set_text(lv_label_1, "Modern\nTypography");
     lv_obj_add_style(lv_label_1, &style_heading, 0);
 }
-
+#endif

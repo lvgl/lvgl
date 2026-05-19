@@ -2,7 +2,8 @@
  * @file lv_example_label_bind_text.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * @title Label bind text
@@ -13,7 +14,7 @@
  * `<subject_set_string_event>` child that, on click, writes a fixed value into
  * `subject_text` — and the label re-renders automatically.
  */
-void lv_example_label_bind_text_create(void)
+void lv_example_label_bind_text(void)
 {
     static lv_subject_t subject_text;
     static char subject_text_buf[256];
@@ -64,4 +65,4 @@ void lv_example_label_bind_text_create(void)
 
     lv_obj_add_subject_set_string_event(lv_button_1, &subject_text, LV_EVENT_CLICKED, "Running");
 }
-
+#endif

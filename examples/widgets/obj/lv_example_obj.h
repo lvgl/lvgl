@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_obj_bind_style_create(void);
+void lv_example_obj_bind_style(void);
 void lv_example_obj_draggable(void);
 void lv_example_obj_transform(void);
 

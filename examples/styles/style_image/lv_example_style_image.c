@@ -2,7 +2,8 @@
  * @file lv_example_style_image.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x2196f3)
 
@@ -15,7 +16,7 @@
  * the widget 30° (the unit is 0.1°). The `radius`, `bg_color`, and `border_*`
  * on the same style transform together with the image.
  */
-void lv_example_style_image_create(void)
+void lv_example_style_image(void)
 {
     LV_IMAGE_DECLARE(img_example_lvgl_logo);
 
@@ -52,4 +53,4 @@ void lv_example_style_image_create(void)
     lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
     lv_obj_add_style(lv_image_0, &style_img, 0);
 }
-
+#endif

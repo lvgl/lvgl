@@ -2,7 +2,8 @@
  * @file lv_example_image_inner_align.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
 /**
  * @title Image inner align
@@ -14,7 +15,7 @@
  * `center`, `bottom_right` for fixed placement; `contain`, `cover`, `stretch`,
  * `tile` for fit modes. A coloured background makes the unused area visible.
  */
-void lv_example_image_inner_align_create(void)
+void lv_example_image_inner_align(void)
 {
     LV_IMAGE_DECLARE(img_example_lvgl_logo);
 
@@ -46,4 +47,4 @@ void lv_example_image_inner_align_create(void)
     lv_obj_set_style_bg_color(lv_image_2, lv_color_hex(0xe5e7eb), 0);
     lv_obj_set_style_bg_opa(lv_image_2, (255 * 100 / 100), 0);
 }
-
+#endif

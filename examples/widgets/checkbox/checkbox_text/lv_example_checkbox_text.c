@@ -2,7 +2,8 @@
  * @file lv_example_checkbox_text.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CHECKBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Checkbox text
@@ -13,7 +14,7 @@
  * The text attribute is what `lv_checkbox_set_text` would set in code, and the gap
  * between tick box and label is controlled by `pad_column` on the main part.
  */
-void lv_example_checkbox_text_create(void)
+void lv_example_checkbox_text(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -38,4 +39,4 @@ void lv_example_checkbox_text_create(void)
     lv_obj_t * lv_checkbox_2 = lv_checkbox_create(screen);
     lv_checkbox_set_text(lv_checkbox_2, "I agree to the terms\nand the privacy policy");
 }
-
+#endif

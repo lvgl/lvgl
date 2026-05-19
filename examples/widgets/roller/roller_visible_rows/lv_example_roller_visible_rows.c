@@ -2,7 +2,8 @@
  * @file lv_example_roller_visible_rows.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ROLLER && LV_BUILD_EXAMPLES
 
 /**
  * @title Roller visible row count
@@ -13,7 +14,7 @@
  * line spacing. A short roller (3 rows) feels compact for a yes/no pick;
  * a tall one (7 rows) shows more context but takes more screen real estate.
  */
-void lv_example_roller_visible_rows_create(void)
+void lv_example_roller_visible_rows(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
@@ -34,4 +35,4 @@ void lv_example_roller_visible_rows_create(void)
     lv_roller_set_options(lv_roller_1, "Jan\nFeb\nMar\nApr\nMay\nJun\nJul", LV_ROLLER_MODE_NORMAL);
     lv_roller_set_selected(lv_roller_1, 3, false);
 }
-
+#endif

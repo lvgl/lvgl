@@ -2,7 +2,8 @@
  * @file lv_example_flex_internal_padding.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * @title Flex internal padding
@@ -12,7 +13,7 @@
  * gap between wrapped rows. The container uses row_wrap so both gaps are visible at once
  * — the chips spread out horizontally and rows are pushed apart vertically.
  */
-void lv_example_flex_internal_padding_create(void)
+void lv_example_flex_internal_padding(void)
 {
     static lv_style_t style_tag;
 
@@ -73,4 +74,4 @@ void lv_example_flex_internal_padding_create(void)
     lv_label_set_text(lv_label_6, "Rust");
     lv_obj_add_style(lv_label_6, &style_tag, 0);
 }
-
+#endif

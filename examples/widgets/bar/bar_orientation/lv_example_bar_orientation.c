@@ -2,7 +2,8 @@
  * @file lv_example_bar_orientation.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 #define TEXT_COLOR lv_color_hex(0x013992)
 
@@ -14,7 +15,7 @@
  * vertical one sets orientation="vertical" explicitly and uses a tall, narrow size so the
  * indicator grows upward instead of left-to-right.
  */
-void lv_example_bar_orientation_create(void)
+void lv_example_bar_orientation(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -51,4 +52,4 @@ void lv_example_bar_orientation_create(void)
     lv_obj_set_style_text_align(lv_label_2, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_color(lv_label_2, TEXT_COLOR, 0);
 }
-
+#endif

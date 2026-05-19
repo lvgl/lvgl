@@ -2,7 +2,8 @@
  * @file lv_example_arc_img_indicator.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ARC && LV_BUILD_EXAMPLES
 
 /**
  * @title Arc image indicator
@@ -14,7 +15,7 @@
  * a glowing-cyan version of the same ring so the filled portion lights up. Both images
  * are 224×224 and match the 180×180 widget with `arc_width="23"`.
  */
-void lv_example_arc_img_indicator_create(void)
+void lv_example_arc_img_indicator(void)
 {
     LV_IMAGE_DECLARE(img_arc_bg);
     LV_IMAGE_DECLARE(img_arc_indicator);
@@ -72,4 +73,4 @@ void lv_example_arc_img_indicator_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
     lv_label_bind_text(lv_label_1, &subject_value2, NULL);
 }
-
+#endif

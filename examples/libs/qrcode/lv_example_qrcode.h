@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_qrcode_basic_create(void);
+void lv_example_qrcode_basic(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

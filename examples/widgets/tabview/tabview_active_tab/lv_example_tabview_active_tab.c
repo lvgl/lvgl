@@ -2,7 +2,8 @@
  * @file lv_example_tabview_active_tab.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
 /**
  * @title Tab view active tab on creation
@@ -12,7 +13,7 @@
  * ("C") open when the screen first appears, so the user lands directly on a
  * specific tab without having to tap or swipe.
  */
-void lv_example_tabview_active_tab_create(void)
+void lv_example_tabview_active_tab(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -40,4 +41,4 @@ void lv_example_tabview_active_tab_create(void)
     lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_3, "D");
 }
-
+#endif

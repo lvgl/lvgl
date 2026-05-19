@@ -2,7 +2,8 @@
  * @file lv_example_table_cells.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABLE && LV_BUILD_EXAMPLES
 
 /**
  * @title Table cell values
@@ -14,7 +15,7 @@
  * cells render in the right slots even if their declaration order doesn't
  * walk row-major.
  */
-void lv_example_table_cells_create(void)
+void lv_example_table_cells(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -37,4 +38,4 @@ void lv_example_table_cells_create(void)
     lv_table_set_cell_value(lv_table_0, 2, 0, "Paris");
     lv_table_set_cell_value(lv_table_0, 2, 1, "2.1M");
 }
-
+#endif

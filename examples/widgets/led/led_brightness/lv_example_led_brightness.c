@@ -2,7 +2,8 @@
  * @file lv_example_led_brightness.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LED && LV_BUILD_EXAMPLES
 
 /**
  * @title LED brightness
@@ -12,7 +13,7 @@
  * lower brightness the color darkens; with 255 it reaches the configured peak. The
  * three LEDs share one color so the effect of brightness alone is visible.
  */
-void lv_example_led_brightness_create(void)
+void lv_example_led_brightness(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -45,4 +46,4 @@ void lv_example_led_brightness_create(void)
     lv_led_set_color(lv_led_2, lv_color_hex(0xff8000));
     lv_led_set_brightness(lv_led_2, 255);
 }
-
+#endif

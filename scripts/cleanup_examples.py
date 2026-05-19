@@ -29,9 +29,9 @@ Transformations are grouped at the bottom of the file:
   * Code modernization — collapse adjacent width/height into `set_size` and
     x/y into `set_pos`; replace `lv_obj_create(NULL)` root with
     `lv_screen_active()`; drop the trailing `return screen;`.
-  * Identity / naming — rename `screenN_create` to `<file_stem>_create`,
+  * Identity / naming — rename `screenN_create` to `<file_stem>`,
     update `@file`, collapse all `#include`s to a single relative
-    `lvgl.h` include.
+    `lv_examples.h` include.
   * XML doc mapping — top-level `<!-- ... -->` becomes a doxygen block
     above the function (with `@title`/`@brief` recognised on re-runs);
     element-preceding XML comments become `/* */` comments above the
@@ -55,7 +55,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 # Repo root = parent of `scripts/`. Used to (a) locate the `examples/` tree
-# and (b) compute the relative path to `lvgl.h` for include rewriting.
+# and (b) compute the relative path to `examples/lv_examples.h` for include
+# rewriting.
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Subjects declared at the project level (one source of truth) so each example
@@ -213,11 +214,13 @@ def remove_return_screen(source: str, path: Path) -> str:
 # Identity / naming
 # =============================================================================
 
-# `lv_obj_t * <name>_create(void)` → `void <file_stem>_create(void)`.
+# `lv_obj_t * <name>_create(void)` → `void <file_stem>(void)`.
 # The generator names the entry function either by screen index
 # (`screenN_create`, older builds) or by the screen XML's filename
 # (`<file_stem>_create`, current builds). The broader `\w+_create` match
-# handles both. The new return type is `void` because `remove_return_screen`
+# handles both. We drop the `_create` suffix entirely so example functions
+# read as `void lv_example_<feature>(void)` — matching the legacy C-only
+# examples. The new return type is `void` because `remove_return_screen`
 # already dropped the return statement — leaving `lv_obj_t *` would emit a
 # function declared to return a pointer with no return statement.
 CREATE_FUNC_DECL_RE = re.compile(
@@ -226,20 +229,22 @@ CREATE_FUNC_DECL_RE = re.compile(
 
 
 def rename_create_function(source: str, path: Path) -> str:
-    return CREATE_FUNC_DECL_RE.sub(f"void {path.stem}_create(void)", source)
+    return CREATE_FUNC_DECL_RE.sub(f"void {path.stem}(void)", source)
 
 
 # Collapse the contiguous `#include` block at the top of the file into a
-# single relative include of `lvgl.h`. `count=1` ensures we only touch the
-# first such block, leaving any deeper `#include` (rare) untouched.
+# single relative include of `examples/lv_examples.h` (the shared example
+# header that pulls in `lvgl.h` plus the per-topic prototypes). `count=1`
+# ensures we only touch the first such block, leaving any deeper `#include`
+# (rare) untouched.
 INCLUDE_BLOCK_RE = re.compile(
     r"(?:#include[ \t]+[\"<][^\">\n]+[\">][ \t]*\n)+"
 )
 
 
-def replace_includes_with_lvgl(source: str, path: Path) -> str:
+def replace_includes_with_lv_examples(source: str, path: Path) -> str:
     # Relative path is recomputed per file so this works for any directory depth.
-    rel = os.path.relpath(REPO_ROOT / "lvgl.h", path.parent)
+    rel = os.path.relpath(REPO_ROOT / "examples" / "lv_examples.h", path.parent)
     return INCLUDE_BLOCK_RE.sub(f'#include "{rel}"\n', source, count=1)
 
 
@@ -316,7 +321,7 @@ TOP_LEVEL_XML_COMMENT_RE = re.compile(r"\A\s*<!--(.*?)-->", re.DOTALL)
 # Locates the `void <name>_create(void)` line so we can insert the doxygen
 # block immediately above it.
 FUNCTION_DECL_RE = re.compile(
-    r"^void\s+\w+_create\s*\(\s*void\s*\)", re.MULTILINE
+    r"^void\s+lv_example_\w+\s*\(\s*void\s*\)", re.MULTILINE
 )
 
 # Matches a single `/** ... */` block at the very end of a substring (we slice
@@ -591,7 +596,7 @@ def _subject_init_lines(name: str, meta: dict) -> list[str]:
 # (defined earlier) when we need to insert a fresh `style_inited` block in a
 # file that didn't have one.
 FUNCTION_OPEN_BRACE_RE = re.compile(
-    r"^(void\s+\w+_create\s*\(\s*void\s*\))\s*\n\{\s*\n", re.MULTILINE
+    r"^(void\s+lv_example_\w+\s*\(\s*void\s*\))\s*\n\{\s*\n", re.MULTILINE
 )
 
 # Captures the body of the existing `static bool style_inited` block so we
@@ -1024,6 +1029,46 @@ def strip_trailing_whitespace(source: str) -> str:
 
 
 # =============================================================================
+# Drop unused pointer variables
+# =============================================================================
+#
+# The generator assigns every created/added object to a local even when the
+# example never touches it again, and not always an `lv_obj_t *` — e.g.
+#
+#     lv_obj_t * lv_calendar_header_arrow_0 = lv_calendar_add_header_arrow(cal);
+#     lv_subject_increment_dsc_t * subject_increment_event_0 =
+#         lv_obj_add_subject_increment_event(btn, &s, LV_EVENT_CLICKED, -1);
+#
+# The call has the side effect we want but the variable is dead. Hand-written
+# examples just write the bare call. Strip the `<type> * <name> = ` prefix
+# for any single-token-typed pointer local when `<name>` occurs exactly once
+# in the whole file (i.e. only at its own declaration); a variable referenced
+# anywhere else is kept as-is. The optional-`const` + single type token
+# matches the generator's actual output without reaching for arbitrary
+# multi-word C types. `static` decls can't match (the `*` must follow the
+# type token directly), so subject/style scaffolding is untouched.
+# Idempotent: the rewritten bare call no longer matches the pattern.
+
+PTR_DECL_ASSIGN_RE = re.compile(
+    r"^([ \t]*)(?:const\s+)?[A-Za-z_]\w*\s*\*\s*([A-Za-z_]\w*)\s*=\s*([^\n]+;)[ \t]*$",
+    re.MULTILINE,
+)
+
+
+def drop_unused_ptr_vars(source: str) -> str:
+    def repl(m: re.Match) -> str:
+        indent, name, rhs = m.group(1), m.group(2), m.group(3)
+        # A used variable appears at least twice (declaration + >=1 use).
+        # `\b` stops `lv_calendar_0` matching inside
+        # `lv_calendar_header_arrow_0`, and still counts `&name` uses.
+        if len(re.findall(rf"\b{re.escape(name)}\b", source)) > 1:
+            return m.group(0)
+        return f"{indent}{rhs}"
+
+    return PTR_DECL_ASSIGN_RE.sub(repl, source)
+
+
+# =============================================================================
 # Pipeline
 # =============================================================================
 #
@@ -1034,7 +1079,7 @@ def strip_trailing_whitespace(source: str) -> str:
 #   * `remove_return_screen` and `rename_create_function` must both run
 #     before any reader assumes the function is `void` — together they make
 #     it so.
-#   * `replace_includes_with_lvgl` must run before `fix_file_directive`
+#   * `replace_includes_with_lv_examples` must run before `fix_file_directive`
 #     would be meaningless either way, but conceptually the include block
 #     belongs to the "file identity" group.
 #   * `add_top_level_doc_comment` reads from the XML and writes above the
@@ -1069,7 +1114,7 @@ TRANSFORMATIONS = [
     coalesce_declares,
     lambda s, p: remove_section_banners(s),
     lambda s, p: remove_brief_line(s),
-    replace_includes_with_lvgl,
+    replace_includes_with_lv_examples,
     fix_file_directive,
     # XML doc mapping.
     add_top_level_doc_comment,
@@ -1078,6 +1123,11 @@ TRANSFORMATIONS = [
     # subject inits — `inited` reads better than the legacy `style_inited`.
     # Must follow `remove_empty_style_inited` which matches the literal name.
     lambda s, p: rename_style_inited(s),
+    # Strip dead `<type> * x = ...;` declarations (x referenced only at
+    # its own declaration). Must run after `map_xml_comments`: removing a
+    # `... = lv_<type>_create(...)` LHS would otherwise desync the
+    # comment-to-create pairing, which keys off `CREATE_LINE_RE`.
+    lambda s, p: drop_unused_ptr_vars(s),
     # Whitespace cleanup (always last so it can mop up).
     lambda s, p: remove_blank_after_open_brace(s),
     lambda s, p: strip_trailing_whitespace(s),

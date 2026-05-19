@@ -10,10 +10,10 @@
 extern "C" {
 #endif
 
-void lv_example_switch_orientation_create(void);
-void lv_example_switch_state_create(void);
-void lv_example_switch_styling_create(void);
 void lv_example_switch_event(void);
+void lv_example_switch_orientation(void);
+void lv_example_switch_state(void);
+void lv_example_switch_styling(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

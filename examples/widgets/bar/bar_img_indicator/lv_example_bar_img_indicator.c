@@ -2,7 +2,8 @@
  * @file lv_example_bar_img_indicator.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 /**
  * @title Bar image indicator
@@ -14,7 +15,7 @@
  * image is revealed left-to-right, showing cyan segments that transition to yellow
  * then red at the high end. Both images are 280×30, matching the bar widget size.
  */
-void lv_example_bar_img_indicator_create(void)
+void lv_example_bar_img_indicator(void)
 {
     LV_IMAGE_DECLARE(img_bar_bg);
     LV_IMAGE_DECLARE(img_bar_indicator);
@@ -72,10 +73,8 @@ void lv_example_bar_img_indicator_create(void)
     lv_label_set_text(lv_label_0, "-");
     lv_obj_set_style_text_font(lv_label_0, &font_example_large, 0);
 
-    lv_subject_increment_dsc_t * subject_increment_event_0 = lv_obj_add_subject_increment_event(lv_button_0,
-                                                                                                &subject_value2, LV_EVENT_CLICKED, -1);
-    lv_subject_increment_dsc_t * subject_increment_event_1 = lv_obj_add_subject_increment_event(lv_button_0,
-                                                                                                &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, -1);
+    lv_obj_add_subject_increment_event(lv_button_0, &subject_value2, LV_EVENT_CLICKED, -1);
+    lv_obj_add_subject_increment_event(lv_button_0, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, -1);
 
     lv_obj_t * lv_label_1 = lv_label_create(lv_obj_1);
     lv_label_bind_text(lv_label_1, &subject_value2, NULL);
@@ -87,9 +86,7 @@ void lv_example_bar_img_indicator_create(void)
     lv_label_set_text(lv_label_2, "+");
     lv_obj_set_style_text_font(lv_label_2, &font_example_large, 0);
 
-    lv_subject_increment_dsc_t * subject_increment_event_2 = lv_obj_add_subject_increment_event(lv_button_1,
-                                                                                                &subject_value2, LV_EVENT_CLICKED, 1);
-    lv_subject_increment_dsc_t * subject_increment_event_3 = lv_obj_add_subject_increment_event(lv_button_1,
-                                                                                                &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, 1);
+    lv_obj_add_subject_increment_event(lv_button_1, &subject_value2, LV_EVENT_CLICKED, 1);
+    lv_obj_add_subject_increment_event(lv_button_1, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, 1);
 }
-
+#endif

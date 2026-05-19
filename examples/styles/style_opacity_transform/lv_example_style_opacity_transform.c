@@ -2,7 +2,8 @@
  * @file lv_example_style_opacity_transform.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -16,7 +17,7 @@
  * `style_transform_scale_x/y="320"`. `opa` and the transforms render the
  * button to a layer first, so its label fades and transforms with it.
  */
-void lv_example_style_opacity_transform_create(void)
+void lv_example_style_opacity_transform(void)
 {
     static lv_style_t style_btn;
 
@@ -71,4 +72,4 @@ void lv_example_style_opacity_transform_create(void)
     lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_3, "Transformed");
 }
-
+#endif

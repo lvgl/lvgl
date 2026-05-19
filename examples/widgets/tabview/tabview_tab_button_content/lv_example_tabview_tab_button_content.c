@@ -2,7 +2,8 @@
  * @file lv_example_tabview_tab_button_content.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
 /**
  * @title Tab view tab-button content
@@ -15,7 +16,7 @@
  * build a custom tab bar from scratch. The tab elements come first so the
  * buttons exist by the time the `_button` references attach to them.
  */
-void lv_example_tabview_tab_button_content_create(void)
+void lv_example_tabview_tab_button_content(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -46,4 +47,4 @@ void lv_example_tabview_tab_button_content_create(void)
     lv_obj_set_align(lv_switch_1, LV_ALIGN_RIGHT_MID);
     lv_obj_set_x(lv_switch_1, -10);
 }
-
+#endif

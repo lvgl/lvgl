@@ -2,7 +2,8 @@
  * @file lv_example_roller_options.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_ROLLER && LV_BUILD_EXAMPLES
 
 /**
  * @title Roller options and mode
@@ -14,7 +15,7 @@
  * first/last entry; `infinite` wraps around so the user can keep scrolling in
  * either direction. `selected` picks the initially focused index.
  */
-void lv_example_roller_options_create(void)
+void lv_example_roller_options(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
@@ -36,4 +37,4 @@ void lv_example_roller_options_create(void)
     lv_roller_set_options(lv_roller_1, "Mon\nTue\nWed\nThu\nFri\nSat\nSun", LV_ROLLER_MODE_INFINITE);
     lv_roller_set_selected(lv_roller_1, 2, false);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_bar_bind_value.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 /**
  * @title Bar bind value with increment buttons
@@ -14,7 +15,7 @@
  * `min_value`/`max_value` clamp the result and `rollover="true"` wraps around
  * once the bound is hit; hold past 100 to see it wrap back to 0.
  */
-void lv_example_bar_bind_value_create(void)
+void lv_example_bar_bind_value(void)
 {
     static lv_subject_t subject_value;
 
@@ -83,4 +84,4 @@ void lv_example_bar_bind_value_create(void)
     lv_obj_set_subject_increment_event_max_value(lv_button_1, subject_increment_event_3, 100);
     lv_obj_set_subject_increment_event_rollover(lv_button_1, subject_increment_event_3, true);
 }
-
+#endif

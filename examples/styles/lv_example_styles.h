@@ -10,28 +10,28 @@
 extern "C" {
 #endif
 
-void lv_example_style_arc_create(void);
-void lv_example_style_background_create(void);
-void lv_example_style_blur_create(void);
-void lv_example_style_border_create(void);
-void lv_example_style_drop_shadow_create(void);
-void lv_example_style_image_create(void);
-void lv_example_style_line_create(void);
-void lv_example_style_local_create(void);
-void lv_example_style_margin_create(void);
-void lv_example_style_multiple_create(void);
-void lv_example_style_opacity_transform_create(void);
-void lv_example_style_outline_create(void);
-void lv_example_style_padding_create(void);
-void lv_example_style_parts_states_create(void);
-void lv_example_style_shadow_create(void);
-void lv_example_style_size_position_create(void);
-void lv_example_style_text_create(void);
 void lv_example_style_21(void);
+void lv_example_style_arc(void);
+void lv_example_style_background(void);
+void lv_example_style_blur(void);
+void lv_example_style_border(void);
+void lv_example_style_drop_shadow(void);
 void lv_example_style_gradient_buttons(void);
 void lv_example_style_gradient_conic(void);
 void lv_example_style_gradient_radial(void);
+void lv_example_style_image(void);
+void lv_example_style_line(void);
+void lv_example_style_local(void);
+void lv_example_style_margin(void);
 void lv_example_style_modal(void);
+void lv_example_style_multiple(void);
+void lv_example_style_opacity_transform(void);
+void lv_example_style_outline(void);
+void lv_example_style_padding(void);
+void lv_example_style_parts_states(void);
+void lv_example_style_shadow(void);
+void lv_example_style_size_position(void);
+void lv_example_style_text(void);
 void lv_example_style_theme(void);
 void lv_example_style_transition(void);
 

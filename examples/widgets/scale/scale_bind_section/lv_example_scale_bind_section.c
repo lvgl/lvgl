@@ -2,7 +2,8 @@
  * @file lv_example_scale_bind_section.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
  * @title Scale section bind min/max
@@ -13,7 +14,7 @@
  * edit those subjects, so dragging them moves the start and end of the
  * highlighted band on the scale — useful for "safe range" indicators on gauges.
  */
-void lv_example_scale_bind_section_create(void)
+void lv_example_scale_bind_section(void)
 {
     static lv_style_t style_section_main;
     static lv_style_t style_section_items;
@@ -89,4 +90,4 @@ void lv_example_scale_bind_section_create(void)
     lv_obj_set_width(lv_slider_1, 240);
     lv_slider_bind_value(lv_slider_1, &subject_value);
 }
-
+#endif

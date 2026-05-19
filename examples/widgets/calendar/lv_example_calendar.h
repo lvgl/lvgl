@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_calendar_basic_create(void);
+void lv_example_calendar_basic(void);
 void lv_example_calendar_chinese(void);
 void lv_example_calendar_highlighted_days(void);
 

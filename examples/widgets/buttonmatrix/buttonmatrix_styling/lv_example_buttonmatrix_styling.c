@@ -2,7 +2,8 @@
  * @file lv_example_buttonmatrix_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTONMATRIX && LV_BUILD_EXAMPLES
 
 /**
  * @title Button matrix styling
@@ -13,7 +14,7 @@
  * `selector="items|checked"`, so the highlighted day picks up an accent fill. The
  * container gets a flat, padded look via local `style_*` props on the matrix tag.
  */
-void lv_example_buttonmatrix_styling_create(void)
+void lv_example_buttonmatrix_styling(void)
 {
     static lv_style_t style_bm_item;
     static lv_style_t style_bm_item_checked;
@@ -70,4 +71,4 @@ void lv_example_buttonmatrix_styling_create(void)
     lv_obj_add_style(lv_buttonmatrix_0, &style_bm_item, LV_PART_ITEMS);
     lv_obj_add_style(lv_buttonmatrix_0, &style_bm_item_checked, LV_PART_ITEMS | LV_STATE_CHECKED);
 }
-
+#endif

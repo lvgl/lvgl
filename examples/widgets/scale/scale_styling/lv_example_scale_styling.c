@@ -2,7 +2,8 @@
  * @file lv_example_scale_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
  * @title Scale styling
@@ -21,7 +22,7 @@
  * (units of 0.1°, so 300 = 30°) tilts every label by 30°. Use this when
  * dense labels would otherwise overlap.
  */
-void lv_example_scale_styling_create(void)
+void lv_example_scale_styling(void)
 {
     static lv_style_t style_scale_main;
     static lv_style_t style_scale_items;
@@ -70,4 +71,4 @@ void lv_example_scale_styling_create(void)
     lv_obj_add_style(lv_scale_0, &style_scale_items, LV_PART_ITEMS);
     lv_obj_add_style(lv_scale_0, &style_scale_indicator, LV_PART_INDICATOR);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_bar_value_range.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 #define TEXT_COLOR lv_color_hex(0x013992)
 
@@ -14,7 +15,7 @@
  * range to -20..80 with value 35 to demonstrate that ranges need not start at zero — the
  * indicator length is computed relative to wherever the range begins.
  */
-void lv_example_bar_value_range_create(void)
+void lv_example_bar_value_range(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -49,4 +50,4 @@ void lv_example_bar_value_range_create(void)
     lv_label_set_text(lv_label_2, "-20..80");
     lv_obj_set_style_text_color(lv_label_2, TEXT_COLOR, 0);
 }
-
+#endif

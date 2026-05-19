@@ -2,7 +2,8 @@
  * @file lv_example_style_shadow.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Box shadow
@@ -13,7 +14,7 @@
  * elevation, and `shadow_opa="80"` keeps it soft. With both offsets at 0
  * the same blur becomes an even glow instead.
  */
-void lv_example_style_shadow_create(void)
+void lv_example_style_shadow(void)
 {
     static lv_style_t style_elevated;
 
@@ -51,4 +52,4 @@ void lv_example_style_shadow_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_1, "Elevated");
 }
-
+#endif

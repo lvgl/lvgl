@@ -2,7 +2,8 @@
  * @file lv_example_style_background.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 /**
  * @title Background gradient
@@ -13,7 +14,7 @@
  * briefly and `bg_grad_stop="220"` stretches the blend almost to the
  * bottom, so most of the card is transition rather than flat color.
  */
-void lv_example_style_background_create(void)
+void lv_example_style_background(void)
 {
     static lv_style_t style_grad;
 
@@ -55,4 +56,4 @@ void lv_example_style_background_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_1, "Gradient");
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_style_padding.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define ACCENT lv_color_hex(0x6366f1)
 
@@ -15,7 +16,7 @@
  * card pads every side by 18. An accent block fills each card at
  * 100% × 100%, so the offset makes asymmetric vs uniform inset obvious.
  */
-void lv_example_style_padding_create(void)
+void lv_example_style_padding(void)
 {
     static lv_style_t style_card;
     static lv_style_t style_block;
@@ -75,4 +76,4 @@ void lv_example_style_padding_create(void)
     lv_obj_set_size(lv_obj_5, lv_pct(100), lv_pct(100));
     lv_obj_add_style(lv_obj_5, &style_block, 0);
 }
-
+#endif

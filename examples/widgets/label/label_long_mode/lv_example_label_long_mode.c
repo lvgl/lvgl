@@ -2,7 +2,8 @@
  * @file lv_example_label_long_mode.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
  * @title Label long modes
@@ -12,7 +13,7 @@
  * scroll_circular, and clip. Each label is colored differently and contains text that does
  * not fit on a single line, so the mode-specific behavior is immediately visible.
  */
-void lv_example_label_long_mode_create(void)
+void lv_example_label_long_mode(void)
 {
     static lv_style_t style_label_bg;
 
@@ -79,4 +80,4 @@ void lv_example_label_long_mode_create(void)
     lv_label_set_text(lv_label_5, "Clip simply cuts any part that falls outside the label width.");
     lv_obj_add_style(lv_label_5, &style_label_bg, 0);
 }
-
+#endif

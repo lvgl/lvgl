@@ -2,7 +2,8 @@
  * @file lv_example_style_multiple.c
  */
 
-#include "../../../lvgl.h"
+#include "../../lv_examples.h"
+#if LV_BUILD_EXAMPLES
 
 #define BASE lv_color_hex(0x6366f1)
 
@@ -18,7 +19,7 @@
  * style wins for the properties it sets, the base shows through for the
  * rest, so one small style re-themes the card without redefining it.
  */
-void lv_example_style_multiple_create(void)
+void lv_example_style_multiple(void)
 {
     static lv_style_t style_base;
     static lv_style_t style_warning;
@@ -80,4 +81,4 @@ void lv_example_style_multiple_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "Warning");
 }
-
+#endif

@@ -13,14 +13,16 @@ project tree, so this script shuttles each example XML through
   3. Copy the generated `lv_example_foo_gen.c` back next to the source XML,
      renamed to `lv_example_foo.c` so `cleanup_examples.py` will pick it up
      (it requires `.c` and `.xml` siblings with matching basenames).
-  4. Run the cleanup transformations on that `.c` in-process.
+  4. Run the cleanup transformations on that `.c` in-process, then wrap it
+     in an `#if LV_USE_<topic> && LV_BUILD_EXAMPLES` build guard derived
+     from the example's topic folder (see `wrap_with_build_guard`).
   5. Remove the staged XML and its generated outputs from `screens/` so
      re-runs start clean.
 
 After all XMLs in a run are processed, each touched "topic" folder (the
 parent of the XML's containing dir — e.g. `examples/layouts/flex/` for
 `flex/flex_grow/lv_example_flex_grow.xml`) gets a `lv_example_<topic>.h`
-header rewritten with `void <stem>_create(void);` prototypes for every
+header rewritten with `void <stem>(void);` prototypes for every
 example XML in that subtree. Headers are always overwritten.
 
 Existing sibling `.c` files are always overwritten.
@@ -37,6 +39,7 @@ Paths may be individual XML files or directories to recurse into.
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import subprocess
 import sys
@@ -68,6 +71,14 @@ MASKED_PROJECT_FILES = [
     PROJECT_DIR / "xml_project_gen.h",
 ]
 MASK_SUFFIX = ".txt"
+
+# Topic folders whose name has no matching `LV_USE_<TOPIC>` macro. LVGL
+# always builds scroll handling, the style system, and the base `lv_obj`
+# widget in, so these examples get gated on `LV_BUILD_EXAMPLES` alone —
+# emitting `LV_USE_STYLES` / `LV_USE_SCROLL` / `LV_USE_OBJ` (undefined)
+# would make the `#if` false and silently drop every example in those
+# folders.
+TOPICS_WITHOUT_LV_USE = {"scroll", "styles", "obj"}
 
 
 def find_example_xmls() -> list[Path]:
@@ -136,6 +147,7 @@ def generate_one(xml_path: Path, cli_path: str) -> bool:
 
         shutil.copyfile(generated_c, target_c)
         cleanup_examples.process(target_c)
+        wrap_with_build_guard(xml_path, target_c)
         return True
     finally:
         # Tidy up so the screens folder doesn't accumulate per-file artifacts
@@ -156,15 +168,63 @@ def _topic_dir_for(xml: Path) -> Path:
     return xml.parent.parent
 
 
+def _guard_expr_for(xml_path: Path) -> str:
+    """Return the `#if` expression for an example, derived from its topic.
+
+    The topic folder name maps to `LV_USE_<TOPIC>` (e.g. `canvas` →
+    `LV_USE_CANVAS`, `flex` → `LV_USE_FLEX`). Topics in
+    `TOPICS_WITHOUT_LV_USE` have no such macro and are gated on
+    `LV_BUILD_EXAMPLES` only.
+    """
+    topic = _topic_dir_for(xml_path).name
+    if topic in TOPICS_WITHOUT_LV_USE:
+        return "LV_BUILD_EXAMPLES"
+    return f"LV_USE_{topic.upper()} && LV_BUILD_EXAMPLES"
+
+
+# First `#include` line in the cleaned file. `cleanup_examples` collapses the
+# include block to a single relative `lvgl.h`, so the first match is it; the
+# `#if` is inserted right after so the guard wraps everything below the
+# include (mirroring the hand-written examples).
+_FIRST_INCLUDE_RE = re.compile(
+    r"^#include[ \t]+[\"<][^\">\n]+[\">][ \t]*\n", re.MULTILINE
+)
+# Idempotency probe: an existing top-level guard already mentioning
+# LV_BUILD_EXAMPLES means this file is already wrapped.
+_EXISTING_GUARD_RE = re.compile(r"^#if\b.*\bLV_BUILD_EXAMPLES\b", re.MULTILINE)
+
+
+def wrap_with_build_guard(xml_path: Path, c_path: Path) -> None:
+    """Wrap a cleaned example C file in its `#if … #endif` build guard.
+
+    Inserts `#if <expr>` directly after the include line and appends
+    `#endif` at EOF. Idempotent: a file that already carries a
+    `LV_BUILD_EXAMPLES` guard is left untouched.
+    """
+    text = c_path.read_text()
+    if _EXISTING_GUARD_RE.search(text):
+        return
+
+    m = _FIRST_INCLUDE_RE.search(text)
+    if not m:
+        sys.stderr.write(
+            f"  ! no #include found in {c_path.name}, skipping build guard\n"
+        )
+        return
+
+    guard = f"#if {_guard_expr_for(xml_path)}\n"
+    text = text[: m.end()] + guard + text[m.end():]
+    c_path.write_text(text.rstrip() + "\n#endif\n")
+
+
 # The per-widget header is rewritten wholesale on every run. Every prototype
 # comes from a `.c` file actually present in the widget's folder — there is
 # no marker / preserved-region machinery.
 #
 # Convention used to map `.c` file → prototype:
-#   * `<topic>/lv_example_<stem>.c`            → C-only example,
-#                                                `void lv_example_<stem>(void)`.
-#   * `<topic>/<feature>/lv_example_<stem>.c`  → XML-generated example,
-#                                                `void lv_example_<stem>_create(void)`.
+#   * `<topic>/lv_example_<stem>.c`            → C-only example.
+#   * `<topic>/<feature>/lv_example_<stem>.c`  → XML-generated example.
+# Both map to `void lv_example_<stem>(void)`.
 HEADER_TEMPLATE = """\
 /**
  * @file {header_name}
@@ -191,17 +251,15 @@ extern "C" {{
 def _collect_prototypes(topic_dir: Path) -> list[str]:
     """Return prototype lines for every `.c` example under `topic_dir`.
 
-    XML-generated examples sit in feature subfolders and carry the `_create`
-    suffix; legacy C-only examples sit directly in the widget folder and
-    use the file stem as the function name. Both kinds appear in the same
+    XML-generated examples sit in feature subfolders; legacy C-only
+    examples sit directly in the widget folder. Both use the bare file
+    stem as the function name (`void <stem>(void)`) and appear in the same
     header so consumers don't have to know which is which.
     """
-    xml_stems = sorted({c.stem for c in topic_dir.glob("*/lv_example_*.c")})
-    legacy_stems = sorted({c.stem for c in topic_dir.glob("lv_example_*.c")})
+    xml_stems = {c.stem for c in topic_dir.glob("*/lv_example_*.c")}
+    legacy_stems = {c.stem for c in topic_dir.glob("lv_example_*.c")}
 
-    out = [f"void {stem}_create(void);" for stem in xml_stems]
-    out += [f"void {stem}(void);" for stem in legacy_stems]
-    return out
+    return [f"void {stem}(void);" for stem in sorted(xml_stems | legacy_stems)]
 
 
 def write_topic_headers(touched: list[Path]) -> list[Path]:

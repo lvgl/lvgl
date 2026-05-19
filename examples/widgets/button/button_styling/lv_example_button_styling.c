@@ -2,7 +2,8 @@
  * @file lv_example_button_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTON && LV_BUILD_EXAMPLES
 
 /**
  * @title Button styling
@@ -13,7 +14,7 @@
  * swap the background color, lift the shadow, and add an outline so the rendered
  * button changes appearance when the user interacts with it.
  */
-void lv_example_button_styling_create(void)
+void lv_example_button_styling(void)
 {
     static lv_style_t style_button;
     static lv_style_t style_button_pressed;
@@ -96,4 +97,4 @@ void lv_example_button_styling_create(void)
     lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_3, "Local props");
 }
-
+#endif

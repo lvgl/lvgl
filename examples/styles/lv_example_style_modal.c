@@ -16,7 +16,7 @@
 void lv_example_style_modal(void)
 {
     /*Add the cascading-styles scene as background*/
-    lv_example_style_multiple_create();
+    lv_example_style_multiple();
 
     /* Set to 1 to enable recolor overlay instead of solid background */
 #if 0

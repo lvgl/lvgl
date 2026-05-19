@@ -2,7 +2,8 @@
  * @file lv_example_checkbox_styling.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CHECKBOX && LV_BUILD_EXAMPLES
 
 /**
  * @title Checkbox styling
@@ -13,7 +14,7 @@
  * rounded look unchecked and switches to an accent color with a tinted halo when
  * checked. MAIN is styled with local `style_*` props to recolor the label area.
  */
-void lv_example_checkbox_styling_create(void)
+void lv_example_checkbox_styling(void)
 {
     static lv_style_t style_cb_indicator;
     static lv_style_t style_cb_indicator_checked;
@@ -68,4 +69,4 @@ void lv_example_checkbox_styling_create(void)
     lv_obj_add_style(lv_checkbox_1, &style_cb_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(lv_checkbox_1, &style_cb_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
 }
-
+#endif

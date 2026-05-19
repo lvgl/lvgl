@@ -2,7 +2,8 @@
  * @file lv_example_flex_grow.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
  * @title Flex grow
@@ -12,7 +13,7 @@
  * The free space left in the row is split in proportion to the grow weights, so the
  * grow=2 item receives twice as much extra width as the grow=1 item.
  */
-void lv_example_flex_grow_create(void)
+void lv_example_flex_grow(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -50,4 +51,4 @@ void lv_example_flex_grow_create(void)
     lv_label_set_text(lv_label_3, "Grow x2");
     lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
 }
-
+#endif

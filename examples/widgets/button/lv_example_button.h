@@ -10,10 +10,10 @@
 extern "C" {
 #endif
 
-void lv_example_button_basic_create(void);
-void lv_example_button_states_create(void);
-void lv_example_button_styling_create(void);
+void lv_example_button_basic(void);
 void lv_example_button_event(void);
+void lv_example_button_states(void);
+void lv_example_button_styling(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

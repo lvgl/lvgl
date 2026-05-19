@@ -2,7 +2,8 @@
  * @file lv_example_table_scroll.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_TABLE && LV_BUILD_EXAMPLES
 
 /**
  * @title Table scrolling
@@ -15,7 +16,7 @@
  * so the bottom rows are off-screen and the user has to scroll the table
  * itself.
  */
-void lv_example_table_scroll_create(void)
+void lv_example_table_scroll(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -59,4 +60,4 @@ void lv_example_table_scroll_create(void)
     lv_table_set_cell_value(lv_table_0, 11, 0, "11");
     lv_table_set_cell_value(lv_table_0, 11, 1, "Chisel");
 }
-
+#endif

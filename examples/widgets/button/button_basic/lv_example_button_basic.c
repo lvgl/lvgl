@@ -2,7 +2,8 @@
  * @file lv_example_button_basic.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTON && LV_BUILD_EXAMPLES
 
 /**
  * @title Button basics
@@ -12,7 +13,7 @@
  * button sets an explicit width and height, illustrating that a button is just a
  * clickable base widget with a label child.
  */
-void lv_example_button_basic_create(void)
+void lv_example_button_basic(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -38,4 +39,4 @@ void lv_example_button_basic_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "Wide button");
 }
-
+#endif

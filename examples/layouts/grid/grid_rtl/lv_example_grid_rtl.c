@@ -2,7 +2,8 @@
  * @file lv_example_grid_rtl.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
  * @title Grid RTL
@@ -12,7 +13,7 @@
  * to rtl on the second grid flips the column order, so cell 0 appears on the right
  * without changing how children are referenced or ordered in XML.
  */
-void lv_example_grid_rtl_create(void)
+void lv_example_grid_rtl(void)
 {
     static lv_style_t style_badge;
 
@@ -103,4 +104,4 @@ void lv_example_grid_rtl_create(void)
     lv_label_set_text(lv_label_8, "2");
     lv_obj_add_style(lv_label_8, &style_badge, 0);
 }
-
+#endif

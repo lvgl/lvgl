@@ -2,7 +2,8 @@
  * @file lv_example_chart_scrollable.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 /**
  * @title Scrollable chart
@@ -14,7 +15,7 @@
  * `scrollable` behaviour kicks in. A horizontal `lv_scale` sits inside the
  * same wrapper so its labels scroll in lockstep with the bars.
  */
-void lv_example_chart_scrollable_create(void)
+void lv_example_chart_scrollable(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -61,4 +62,4 @@ void lv_example_chart_scrollable_create(void)
     static const char * lv_scale_0_text_src_1[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", NULL};
     lv_scale_set_text_src(lv_scale_0, lv_scale_0_text_src_1);
 }
-
+#endif

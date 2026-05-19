@@ -2,7 +2,8 @@
  * @file lv_example_chart_cursor.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 /**
  * @title Chart cursor
@@ -16,7 +17,7 @@
  * highlighting "today" on a time-series, or marking a threshold without
  * baking the line into the series.
  */
-void lv_example_chart_cursor_create(void)
+void lv_example_chart_cursor(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -43,4 +44,4 @@ void lv_example_chart_cursor_create(void)
     lv_chart_set_cursor_pos_x(lv_chart_0, lv_chart_cursor_0, 60);
     lv_chart_set_cursor_pos_y(lv_chart_0, lv_chart_cursor_0, 70);
 }
-
+#endif

@@ -2,7 +2,8 @@
  * @file lv_example_buttonmatrix_one_checked.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_BUTTONMATRIX && LV_BUILD_EXAMPLES
 
 /**
  * @title Button matrix one-checked mode
@@ -13,7 +14,7 @@
  * Every weekday here is `checkable`, and Tue starts as `checkable|checked` so the
  * example doubles as a small weekday selector.
  */
-void lv_example_buttonmatrix_one_checked_create(void)
+void lv_example_buttonmatrix_one_checked(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
@@ -34,4 +35,4 @@ void lv_example_buttonmatrix_one_checked_create(void)
     static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_CHECKABLE, LV_BUTTONMATRIX_CTRL_CHECKABLE | LV_BUTTONMATRIX_CTRL_CHECKED, LV_BUTTONMATRIX_CTRL_CHECKABLE, LV_BUTTONMATRIX_CTRL_CHECKABLE, LV_BUTTONMATRIX_CTRL_CHECKABLE};
     lv_buttonmatrix_set_ctrl_map(lv_buttonmatrix_0, lv_buttonmatrix_0_ctrl_map_1);
 }
-
+#endif

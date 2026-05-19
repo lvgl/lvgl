@@ -10,13 +10,13 @@
 extern "C" {
 #endif
 
-void lv_example_flex_align_create(void);
-void lv_example_flex_flow_create(void);
-void lv_example_flex_grow_create(void);
-void lv_example_flex_ignore_layout_create(void);
-void lv_example_flex_internal_padding_create(void);
-void lv_example_flex_new_track_create(void);
-void lv_example_flex_rtl_create(void);
+void lv_example_flex_align(void);
+void lv_example_flex_flow(void);
+void lv_example_flex_grow(void);
+void lv_example_flex_ignore_layout(void);
+void lv_example_flex_internal_padding(void);
+void lv_example_flex_new_track(void);
+void lv_example_flex_rtl(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

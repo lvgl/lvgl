@@ -2,7 +2,8 @@
  * @file lv_example_chart_types.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 /**
  * @title Chart types
@@ -14,7 +15,7 @@
  * `axis="primary_y|primary_x"` token encodes. Compare against
  * `chart_basic` (a `line` chart) to complete the family.
  */
-void lv_example_chart_types_create(void)
+void lv_example_chart_types(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -52,4 +53,4 @@ void lv_example_chart_types_create(void)
     lv_chart_set_axis_min_value(lv_chart_1, LV_CHART_AXIS_PRIMARY_Y, 0);
     lv_chart_set_axis_max_value(lv_chart_1, LV_CHART_AXIS_PRIMARY_Y, 100);
 }
-
+#endif

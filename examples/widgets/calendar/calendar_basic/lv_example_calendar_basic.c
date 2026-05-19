@@ -2,7 +2,8 @@
  * @file lv_example_calendar_basic.c
  */
 
-#include "../../../../lvgl.h"
+#include "../../../lv_examples.h"
+#if LV_USE_CALENDAR && LV_BUILD_EXAMPLES
 
 /**
  * @title Calendar basics
@@ -15,7 +16,7 @@
  * the top of the calendar; swap it for `<header_dropdown/>` to get the
  * month/year selector variant.
  */
-void lv_example_calendar_basic_create(void)
+void lv_example_calendar_basic(void)
 {
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
@@ -35,6 +36,6 @@ void lv_example_calendar_basic_create(void)
     lv_calendar_set_today_day(lv_calendar_0, 15);
     lv_calendar_set_shown_year(lv_calendar_0, 2026);
     lv_calendar_set_shown_month(lv_calendar_0, 5);
-    lv_obj_t * lv_calendar_header_arrow_0 = lv_calendar_add_header_arrow(lv_calendar_0);
+    lv_calendar_add_header_arrow(lv_calendar_0);
 }
-
+#endif
