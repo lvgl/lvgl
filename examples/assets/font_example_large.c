@@ -4,21 +4,7 @@
  * Opts: --font /fonts/Montserrat-Medium.ttf -o /fonts/font_example_large.c --size 32 --bpp 4 --format lvgl --no-compress --range 0x20-0x7F
  ******************************************************************************/
 
-#ifdef __has_include
-    #if __has_include("lvgl.h")
-        #ifndef LV_LVGL_H_INCLUDE_SIMPLE
-            #define LV_LVGL_H_INCLUDE_SIMPLE
-        #endif
-    #endif
-#endif
-
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-    #include "lvgl.h"
-#else
-    #include "lvgl/lvgl.h"
-#endif
-
-
+#include "../../lvgl.h"
 
 #ifndef FONT_EXAMPLE_LARGE
     #define FONT_EXAMPLE_LARGE 1
