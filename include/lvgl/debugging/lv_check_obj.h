@@ -62,7 +62,7 @@ extern "C" {
      * @param obj     Pointer to the object to validate. Must not be NULL.
      * @param action  Statement to execute on failure (e.g. `return false`).
      */
-    #define LV_CHECK_OBJ_VALID(obj, action) LV_CHECK_ARG(lv_obj_is_valid(obj), action);
+    #define LV_CHECK_OBJ_VALID(obj, associated, action) LV_CHECK_ARG(lv_obj_is_valid(obj) == associated, action);
 #else
     #define LV_CHECK_OBJ_VALID(obj, action)
 #endif
@@ -74,7 +74,7 @@ extern "C" {
 #define __LV_CHECK_OBJ_3(obj, cls, associated, action) \
     LV_CHECK_ARG((obj) != NULL, action); \
     LV_CHECK_OBJ_CLASS(obj, cls, action); \
-    LV_CHECK_OBJ_VALID(obj, action)
+    LV_CHECK_OBJ_VALID(obj, associated, action)
 
 /* Internal: picks __LV_CHECK_OBJ_1/2/3 based on the number of __VA_ARGS__ */
 #define __LV_CHECK_OBJ_PICK_(_1, _2, _3, NAME, ...) NAME
