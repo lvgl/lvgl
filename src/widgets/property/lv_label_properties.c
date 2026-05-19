@@ -14,8 +14,9 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_label_property_names[4] = {
+const lv_property_name_t lv_label_property_names[5] = {
     {"long_mode",              LV_PROPERTY_LABEL_LONG_MODE,},
+    {"max_lines",              LV_PROPERTY_LABEL_MAX_LINES,},
     {"text",                   LV_PROPERTY_LABEL_TEXT,},
     {"text_selection_end",     LV_PROPERTY_LABEL_TEXT_SELECTION_END,},
     {"text_selection_start",   LV_PROPERTY_LABEL_TEXT_SELECTION_START,},
