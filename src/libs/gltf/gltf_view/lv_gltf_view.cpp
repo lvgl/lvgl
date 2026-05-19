@@ -107,7 +107,7 @@ lv_obj_t * lv_gltf_create(lv_obj_t * parent)
 lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path)
 {
     LV_ASSERT_NULL(obj);
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(!viewer->environment) {
@@ -124,7 +124,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path
 lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * bytes, size_t len)
 {
     LV_ASSERT_NULL(obj);
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(!viewer->environment) {
@@ -140,7 +140,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
 
 lv_result_t lv_gltf_add_model(lv_obj_t * obj, lv_gltf_model_t * model)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_RESULT_INVALID);
     if(!model) {
         return LV_RESULT_INVALID;
     }
@@ -175,14 +175,14 @@ void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * env)
 
 size_t lv_gltf_get_model_count(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
 
     return lv_array_size(&((lv_gltf_t *)obj)->models);
 }
 
 lv_gltf_model_t * lv_gltf_get_model_by_index(const lv_obj_t * obj, size_t id)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
     lv_gltf_t * viewer = (lv_gltf_t *) obj;
 
     if(id >= lv_array_size(&viewer->models)) {
@@ -209,7 +209,7 @@ void lv_gltf_set_yaw(lv_obj_t * obj, float yaw)
 
 float lv_gltf_get_yaw(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.yaw;
 }
@@ -224,7 +224,7 @@ void lv_gltf_set_pitch(lv_obj_t * obj, float pitch)
 
 float lv_gltf_get_pitch(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.pitch;
 }
@@ -239,7 +239,7 @@ void lv_gltf_set_fov(lv_obj_t * obj, float value)
 
 float lv_gltf_get_fov(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.fov;
 }
@@ -254,14 +254,14 @@ void lv_gltf_set_distance(lv_obj_t * obj, float value)
 
 float lv_gltf_get_distance(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.distance;
 }
 
 float lv_gltf_get_world_distance(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
     if(viewer->models.size == 0) {
@@ -287,7 +287,7 @@ void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value)
 
 uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     LV_LOG_WARN("Deprecated. lv_gltf_get_animation_speed should now be called on the model directly via `lv_gltf_model_get_animation_speed`. Getting the animation speed from the main model as a fallback");
     lv_gltf_model_t * model = lv_gltf_get_primary_model(obj);
     if(!model) {
@@ -306,7 +306,7 @@ void lv_gltf_set_focal_x(lv_obj_t * obj, float value)
 
 float lv_gltf_get_focal_x(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.focal_x;
 }
@@ -321,7 +321,7 @@ void lv_gltf_set_focal_y(lv_obj_t * obj, float value)
 
 float lv_gltf_get_focal_y(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.focal_y;
 }
@@ -336,7 +336,7 @@ void lv_gltf_set_focal_z(lv_obj_t * obj, float value)
 
 float lv_gltf_get_focal_z(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.focal_z;
 }
@@ -366,7 +366,7 @@ void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
 
 uint32_t lv_gltf_get_camera(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(lv_array_is_empty(&viewer->models)) {
@@ -382,7 +382,7 @@ uint32_t lv_gltf_get_camera(const lv_obj_t * obj)
 uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj)
 {
 
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(lv_array_is_empty(&viewer->models)) {
@@ -405,7 +405,7 @@ void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_aa_mode_t value)
 
 lv_gltf_aa_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_GLTF_AA_MODE_OFF);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.aa_mode;
 }
@@ -420,7 +420,7 @@ void lv_gltf_set_background_mode(lv_obj_t * obj, lv_gltf_bg_mode_t value)
 
 lv_gltf_bg_mode_t lv_gltf_get_background_mode(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_GLTF_BG_MODE_SOLID);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.bg_mode;
 }
@@ -438,7 +438,7 @@ void lv_gltf_set_background_blur(lv_obj_t * obj, uint32_t value)
 
 uint32_t lv_gltf_get_background_blur(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.blur_bg * 100;
 }
@@ -453,7 +453,7 @@ void lv_gltf_set_env_brightness(lv_obj_t * obj, uint32_t value)
 
 uint32_t lv_gltf_get_env_brightness(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.env_pow * 100;
 }
@@ -468,7 +468,7 @@ void lv_gltf_set_image_exposure(lv_obj_t * obj, float value)
 
 float lv_gltf_get_image_exposure(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0.0f);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.exposure;
 }
@@ -489,7 +489,7 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
 
 lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return (lv_3dray_t){{0, 0, 0}, {0, 0, 0}});
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     float norm_mouse_x = (float)screen_pos->x / (float)(lv_obj_get_width(obj));
@@ -545,7 +545,7 @@ lv_result_t lv_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane
 
 lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return (lv_3dplane_t){{0, 0, 0}, {0, 0, 0}});
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     lv_3dplane_t outplane = {{0, 0, 0}, {0, 0, 0}};
 
@@ -563,7 +563,7 @@ lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
 
 lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, lv_point_t * screen_pos)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_RESULT_INVALID);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     fastgltf::math::fvec4 world_position_h = fastgltf::math::fvec4(world_pos.x, world_pos.y, world_pos.z, 1.0f);
