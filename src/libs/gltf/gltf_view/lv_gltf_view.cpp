@@ -594,12 +594,16 @@ lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos
 
 static lv_3dray_t make_empty_ray(void)
 {
-    return (lv_3dray_t){{0, 0, 0}, {0, 0, 0}};
+    return (lv_3dray_t) {
+        {0, 0, 0}, {0, 0, 0}
+    };
 }
 
 static lv_3dplane_t make_empty_plane(void)
 {
-    return (lv_3dplane_t){{0, 0, 0}, {0, 0, 0}};
+    return (lv_3dplane_t) {
+        {0, 0, 0}, {0, 0, 0}
+    };
 }
 
 static lv_gltf_model_t * add_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool owned)
