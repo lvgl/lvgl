@@ -4,9 +4,9 @@ int main(void)
 {
     lv_init();
     lv_display_t * disp1 = lv_sdl_window_create(1024, 768);
-    lv_display_t * disp2 = lv_wayland_window_create(1024, 768, "test", NULL);
+    lv_display_t * disp2 = lv_wayland_window_create(1024, 768, (char *)"hello", NULL);
     lv_display_t * disp3 = lv_linux_drm_create();
-    const char * device = lv_linux_drm_find_device_path();
+    char * device = lv_linux_drm_find_device_path();
     lv_linux_drm_set_file(disp3, device, -1);
     lv_free(device);
 
@@ -15,6 +15,6 @@ int main(void)
 
     while(1) {
         uint32_t ms = lv_timer_handler();
-        usleep(ms * 1000);
+        lv_sleep_ms(ms * 1000);
     }
 }
