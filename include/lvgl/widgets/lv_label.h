@@ -58,8 +58,9 @@ typedef enum {
 enum _lv_property_label_id_t {
     LV_PROPERTY_ID(LABEL, TEXT,                   LV_PROPERTY_TYPE_TEXT,      0),
     LV_PROPERTY_ID(LABEL, LONG_MODE,              LV_PROPERTY_TYPE_INT,       1),
-    LV_PROPERTY_ID(LABEL, TEXT_SELECTION_START,   LV_PROPERTY_TYPE_INT,       2),
-    LV_PROPERTY_ID(LABEL, TEXT_SELECTION_END,     LV_PROPERTY_TYPE_INT,       3),
+    LV_PROPERTY_ID(LABEL, MAX_LINES,              LV_PROPERTY_TYPE_INT,       2),
+    LV_PROPERTY_ID(LABEL, TEXT_SELECTION_START,   LV_PROPERTY_TYPE_INT,       3),
+    LV_PROPERTY_ID(LABEL, TEXT_SELECTION_END,     LV_PROPERTY_TYPE_INT,       4),
     LV_PROPERTY_LABEL_END,
 };
 #endif
@@ -137,6 +138,14 @@ void lv_label_set_text_static(lv_obj_t * obj, const char * text);
 void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode);
 
 /**
+ * Set the maximum number of lines that the label should display in
+ * `LV_LABEL_LONG_MODE_WRAP` and `LV_LABEL_LONG_MODE_DOTS` mode.
+ * @param obj     pointer to a label object
+ * @param lines   number of lines to display (unlimited if not positive)
+ */
+void lv_label_set_max_lines(lv_obj_t * obj, int32_t lines);
+
+/**
  * Set where text selection should start
  * @param obj       pointer to a label object
  * @param index     character index from where selection should start. `LV_LABEL_TEXT_SELECTION_OFF` for no selection
@@ -188,6 +197,13 @@ char * lv_label_get_text(const lv_obj_t * obj);
  * @return          the current long mode
  */
 lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj);
+
+/**
+ * Get the maximum number of lines that a label should display
+ * @param obj       pointer to a label object
+ * @return          the maximum number of lines, if positive
+ */
+int32_t lv_label_get_max_lines(const lv_obj_t * obj);
 
 /**
  * Get the relative x and y coordinates of a letter

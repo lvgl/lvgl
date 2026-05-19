@@ -77,6 +77,11 @@ static const lv_property_ops_t lv_label_properties[] = {
         .getter = lv_label_get_long_mode,
     },
     {
+        .id = LV_PROPERTY_LABEL_MAX_LINES,
+        .setter = lv_label_set_max_lines,
+        .getter = lv_label_get_max_lines,
+    },
+    {
         .id = LV_PROPERTY_LABEL_TEXT_SELECTION_START,
         .setter = lv_label_set_text_selection_start,
         .getter = lv_label_get_text_selection_start,
@@ -225,6 +230,14 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     lv_label_mark_need_refr_text(obj);
 }
 
+void lv_label_set_max_lines(lv_obj_t * obj, int32_t lines)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_label_t * label = (lv_label_t *)obj;
+    label->max_lines = lines;
+    lv_label_refr_text(obj);
+}
+
 void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -282,6 +295,13 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
     return label->long_mode;
+}
+
+int32_t lv_label_get_max_lines(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    const lv_label_t * label = (const lv_label_t *)obj;
+    return label->max_lines;
 }
 
 void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
@@ -839,6 +859,11 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
             lv_text_get_size_attributes(&label->size_cache, label->text, font, &attributes);
             lv_label_set_dots(obj, dot_begin);
+
+            if(label->max_lines > 0) {
+                label->size_cache.y = LV_MIN(label->size_cache.y,
+                                             lv_font_get_line_height(font) * label->max_lines + line_space * (label->max_lines - 1));
+            }
 
             lv_text_leading_trim_t leading_trim =
                 lv_obj_get_style_text_leading_trim(obj, LV_PART_MAIN);
