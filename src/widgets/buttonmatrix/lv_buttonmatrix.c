@@ -1025,7 +1025,6 @@ static void update_map(lv_obj_t * obj)
 
     /*Count the units and the buttons in a line
      *(A button can be 1,2,3... unit wide)*/
-    uint32_t txt_tot_i = 0; /*Act. index in the str map*/
     uint32_t btn_tot_i = 0; /*Act. index of button areas*/
     const char * const * map_row = btnm->map_p;
 
@@ -1055,7 +1054,7 @@ static void update_map(lv_obj_t * obj)
 
         uint32_t row_unit_cnt = 0;  /*The current unit position in the row*/
         uint32_t btn;
-        for(btn = 0; btn < btn_cnt; btn++, btn_tot_i++, txt_tot_i++) {
+        for(btn = 0; btn < btn_cnt; btn++, btn_tot_i++) {
             uint32_t btn_u = get_button_width(btnm->ctrl_bits[btn_tot_i]);
 
             int32_t btn_x1 = (max_w_no_gap * row_unit_cnt) / unit_cnt + btn * pcol;
