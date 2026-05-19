@@ -37,8 +37,18 @@
  */
 
 #include "lv_draw_eve5_private.h"
+#include "../../drivers/display/eve5/lv_eve5_asset_font.h"
 
 #if LV_USE_DRAW_EVE5
+
+/* Asset-font draw-time state hooks. Declared locally to keep the dsc-
+ * shape out of the public header — these are coupled to the draw unit's
+ * resolve, not part of the application-facing asset font API. */
+void * lv_eve5_asset_font_get_owner_internal(const lv_font_t * font);
+uint8_t lv_eve5_asset_font_get_cached_handle_internal(const lv_font_t * font);
+void lv_eve5_asset_font_set_cached_handle_internal(const lv_font_t * font, uint8_t handle);
+uint32_t lv_eve5_asset_font_get_last_bound_addr_internal(const lv_font_t * font);
+void lv_eve5_asset_font_set_last_bound_addr_internal(const lv_font_t * font, uint32_t addr);
 
 /*********************
  * HANDLE POOL
@@ -232,5 +242,69 @@ void lv_draw_eve5_rom_font_invalidate(lv_draw_eve5_unit_t * u)
         u->rom_font_slots[i].handle = 0xFFu;
     }
 }
+
+/*********************
+ * ASSET FONT BINDING
+ *
+ * Asset fonts share the bitmap handle pool with ROM fonts. The asset
+ * font's dsc pointer is the stable owner identity; the per-dsc cached
+ * handle field is the fast-path slot (queried via
+ * lv_eve5_asset_font_get_cached_handle_internal). Allocation is always
+ * non-preferred — asset fonts have no identity-handle constraint.
+ *********************/
+
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
+uint8_t lv_draw_eve5_asset_font_resolve(lv_draw_eve5_unit_t * u, const lv_font_t * font)
+{
+    void * owner = lv_eve5_asset_font_get_owner_internal(font);
+    if(owner == NULL) return 0xFFu;
+
+    /* Always Esd_GpuAlloc_Get the current address — never cache the
+     * address itself, only the value we last bound (for change detection).
+     * Get is the canonical way to ask the allocator "where does this
+     * handle live right now" and the address must come fresh every time. */
+    uint32_t addr = lv_eve5_asset_font_get_address(font);
+    if(addr == GA_INVALID) return 0xFFu;
+
+    uint8_t cached = lv_eve5_asset_font_get_cached_handle_internal(font);
+    uint32_t last_addr = lv_eve5_asset_font_get_last_bound_addr_internal(font);
+
+    bool handle_held = (cached != 0xFFu && lv_draw_eve5_handle_check(u, cached, owner));
+
+    /* Fast path: still own our handle AND its bind still points at the
+     * current address. The CMD_SETFONT2 binding persists in the
+     * coprocessor's font table as long as the handle isn't reassigned to
+     * something else, so we skip the re-emit. Same persistence model
+     * the rom-font path uses (rom font handles 16-34 have a hardware
+     * default; asset fonts get it from the prior CMD_SETFONT2). */
+    if(handle_held && addr == last_addr) {
+        lv_draw_eve5_handle_touch(u, cached);
+        return cached;
+    }
+
+    uint8_t h = handle_held
+                ? cached
+                : lv_draw_eve5_handle_alloc(u, owner, 0xFFu);
+    if(h == 0xFFu) return 0xFFu;
+    if(handle_held) lv_draw_eve5_handle_touch(u, h);
+
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    /* CMD_SETFONT2 binds (handle, font_block_addr, first_char). For
+     * extended format 2 (.reloc default) first_char is 0. */
+    EVE_CoCmd_setFont2(u->hal, h, addr, lv_eve5_asset_font_get_first_char(font));
+#endif
+
+    lv_eve5_asset_font_set_cached_handle_internal(font, h);
+    lv_eve5_asset_font_set_last_bound_addr_internal(font, addr);
+    return h;
+}
+#else
+uint8_t lv_draw_eve5_asset_font_resolve(lv_draw_eve5_unit_t * u, const lv_font_t * font)
+{
+    LV_UNUSED(u);
+    LV_UNUSED(font);
+    return 0xFFu;
+}
+#endif
 
 #endif /* LV_USE_DRAW_EVE5 */

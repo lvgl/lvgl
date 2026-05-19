@@ -584,6 +584,13 @@ void lv_draw_eve5_rom_font_init(lv_draw_eve5_unit_t * u);
 uint8_t lv_draw_eve5_rom_font_resolve(lv_draw_eve5_unit_t * u, uint8_t rom_idx);
 void lv_draw_eve5_rom_font_invalidate(lv_draw_eve5_unit_t * u);
 
+/* Asset font binding (BT820 .reloc fonts loaded via CMD_LOADASSET).
+ * Shares the bitmap handle pool with ROM fonts; the asset font's dsc
+ * pointer is the stable owner identity. Returns 0xFF if @p font isn't an
+ * asset font, the font's RAM_G allocation was reclaimed, or the chip
+ * doesn't support CMD_SETFONT2. */
+uint8_t lv_draw_eve5_asset_font_resolve(lv_draw_eve5_unit_t * u, const lv_font_t * font);
+
 #if LV_DRAW_EVE5_SW_FALLBACK
 /* SW cache */
 void lv_draw_eve5_sw_cache_init(lv_draw_eve5_unit_t * u);

@@ -23,7 +23,29 @@
 #include "../lv_draw.h"
 #include "../lv_draw_label.h"
 #include "../../drivers/display/eve5/lv_eve5_rom_font.h"
+#include "../../drivers/display/eve5/lv_eve5_asset_font.h"
 #include "../../misc/lv_text_private.h"
+
+/* Both ROM fonts and .reloc-loaded asset fonts render via CMD_TEXT once a
+ * bitmap handle has been bound (CMD_ROMFONT for rom, CMD_SETFONT2 for
+ * asset). The text renderer's CMD_TEXT path doesn't care which — the
+ * handle is just an index — so we route both through rom_label_render
+ * after dispatching to the right resolver. */
+static inline bool font_is_cmdtext_font(const lv_font_t * font)
+{
+    return lv_eve5_is_rom_font(font) || lv_eve5_is_asset_font(font);
+}
+
+static inline uint8_t cmdtext_font_resolve(lv_draw_eve5_unit_t * u, const lv_font_t * font)
+{
+    if(lv_eve5_is_rom_font(font)) {
+        return lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(font));
+    }
+    if(lv_eve5_is_asset_font(font)) {
+        return lv_draw_eve5_asset_font_resolve(u, font);
+    }
+    return 0xFFu;
+}
 
 /**********************
  * STATIC VARIABLES
@@ -1072,8 +1094,8 @@ void lv_draw_eve5_hal_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
 
-    if(lv_eve5_is_rom_font(dsc->font)) {
-        uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
+    if(font_is_cmdtext_font(dsc->font)) {
+        uint8_t handle = cmdtext_font_resolve(u, dsc->font);
         if(handle == 0xFF) return;
         lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
         rom_label_render(u, t, dsc, layer, handle, false);
@@ -1141,14 +1163,14 @@ void lv_draw_eve5_hal_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t)
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    if(lv_eve5_is_rom_font(dsc->font)) {
+    if(font_is_cmdtext_font(dsc->font)) {
         lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
         EVE_CoDl_colorRgb(phost, dsc->color.red, dsc->color.green, dsc->color.blue);
         EVE_CoDl_colorA(phost, dsc->opa);
         if(dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
             EVE_CoDl_blendFunc(u->hal, SRC_ALPHA, ONE);
         }
-        uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
+        uint8_t handle = cmdtext_font_resolve(u, dsc->font);
         if(handle != 0xFF) {
             int32_t x = t->area.x1 - layer->buf_area.x1;
             int32_t y = t->area.y1 - layer->buf_area.y1;
@@ -1221,8 +1243,8 @@ void lv_draw_eve5_alpha_draw_label(lv_draw_eve5_unit_t * u, lv_draw_task_t * t, 
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->text == NULL || dsc->text[0] == '\0') return;
 
-    if(lv_eve5_is_rom_font(dsc->font)) {
-        uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
+    if(font_is_cmdtext_font(dsc->font)) {
+        uint8_t handle = cmdtext_font_resolve(u, dsc->font);
         if(handle == 0xFF) return;
         lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
         rom_label_render(u, t, dsc, layer, handle, alpha_to_rgb);
@@ -1293,11 +1315,11 @@ void lv_draw_eve5_alpha_draw_letter(lv_draw_eve5_unit_t * u, lv_draw_task_t * t,
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    if(lv_eve5_is_rom_font(dsc->font)) {
+    if(font_is_cmdtext_font(dsc->font)) {
         lv_draw_eve5_set_scissor(u, &t->clip_area, &layer->buf_area);
         if(alpha_to_rgb) EVE_CoDl_colorRgb(phost, 255, 255, 255);
         EVE_CoDl_colorA(phost, dsc->opa);
-        uint8_t handle = lv_draw_eve5_rom_font_resolve(u, lv_eve5_rom_font_get_index(dsc->font));
+        uint8_t handle = cmdtext_font_resolve(u, dsc->font);
         if(handle != 0xFF) {
             int32_t x = t->area.x1 - layer->buf_area.x1;
             int32_t y = t->area.y1 - layer->buf_area.y1;
