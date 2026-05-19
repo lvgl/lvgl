@@ -1037,6 +1037,18 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 #endif
 }
 
+static lv_result_t decode_indexed_line_i8(const lv_color32_t * palette, int32_t x,
+                                          int32_t w_px, const uint8_t * in, lv_color32_t * out)
+{
+    in += x;
+
+    for(int32_t i = 0; i < w_px; i++) {
+        out[i] = palette[*in++];
+    }
+
+    return LV_RESULT_OK;
+}
+
 static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
                                        int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
@@ -1061,10 +1073,7 @@ static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_
             shift = 4 - 4 * (x & 0x1);
             break;
         case LV_COLOR_FORMAT_I8:
-            px_size = 8;
-            in += x;
-            shift = 0;
-            break;
+            return decode_indexed_line_i8(palette, x, w_px, in, out);
         default:
             return LV_RESULT_INVALID;
     }
