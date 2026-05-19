@@ -45,7 +45,7 @@ void lv_example_chart_types(void)
     lv_chart_set_type(lv_chart_1, LV_CHART_TYPE_SCATTER);
     lv_chart_set_point_count(lv_chart_1, 6);
     lv_chart_series_t * lv_chart_series_1 = lv_chart_add_series(lv_chart_1, lv_color_hex(0xef4444),
-                                                                LV_CHART_AXIS_PRIMARY_Y | LV_CHART_AXIS_PRIMARY_X);
+                                                                (lv_chart_axis_t)(LV_CHART_AXIS_PRIMARY_Y | LV_CHART_AXIS_PRIMARY_X));
     static const int32_t lv_chart_1_values_1[] = {10, 40, 20, 80, 50, 30};
     lv_chart_set_series_values(lv_chart_1, lv_chart_series_1, lv_chart_1_values_1, 6);
     lv_chart_set_axis_min_value(lv_chart_1, LV_CHART_AXIS_PRIMARY_X, 0);

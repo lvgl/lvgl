@@ -1069,40 +1069,60 @@ def drop_unused_ptr_vars(source: str) -> str:
 
 
 # =============================================================================
-# Cast OR-ed enum array initializers
+# Cast OR-ed enum flag expressions
 # =============================================================================
 #
-# The generator emits flag-enum arrays like
+# The generator emits OR-ed enum constants both in array initializers and as
+# call arguments, e.g.
 #
 #     static const lv_buttonmatrix_ctrl_t m[] = {A, B | C, D};
+#     lv_chart_add_series(c, col, LV_CHART_AXIS_PRIMARY_Y | LV_CHART_AXIS_PRIMARY_X);
 #
-# In C `B | C` is fine, but in C++ the `|` yields `int` and the array's
-# `lv_<...>_t` element type rejects the implicit narrowing — examples built
-# with g++ fail with "invalid conversion from 'int' to 'lv_..._t'". Cast
-# each OR-ed element to the array's element type so the same source compiles
-# as both C and C++. Scoped to `static const lv_<...>_t <name>[] = { ... }`
-# (no nested braces); string/`char *` maps don't match the `lv_<...>_t`
-# type. Idempotent: an element already starting with `(` is left as-is.
+# In C `B | C` is an `int`, which is fine; in C++ an `int` won't implicitly
+# convert to the expected `enum` type, so g++ fails with "invalid conversion
+# from 'int' to 'lv_..._t'". Wrap each `|`-run of constants from a *single*
+# known enum family in an explicit `(lv_..._t)(...)` cast so the same source
+# compiles as both C and C++.
+#
+# Only true `enum` types are listed. Deliberately excluded:
+#   * LV_PART_* | LV_STATE_*  — combine into `lv_style_selector_t`, which is
+#     `typedef uint32_t` (no enum, `int` converts cleanly). Mixed-family runs
+#     are skipped anyway.
+#   * LV_SCALE_LABEL_ROTATE_*  — plain `#define` int macros, no enum type.
+ENUM_FLAG_TYPES = {
+    "LV_BUTTONMATRIX_CTRL_": "lv_buttonmatrix_ctrl_t",
+    "LV_CHART_AXIS_":        "lv_chart_axis_t",
+    "LV_DIR_":               "lv_dir_t",
+    "LV_FS_MODE_":           "lv_fs_mode_t",
+    "LV_GRIDNAV_CTRL_":      "lv_gridnav_ctrl_t",
+}
 
-ENUM_ARRAY_INIT_RE = re.compile(
-    r"(static\s+const\s+(lv_\w+_t)\s+\w+\s*\[\s*\]\s*=\s*\{)([^{}]*)(\})"
-)
+ORED_CONSTS_RE = re.compile(r"LV_[A-Z0-9_]+(?:\s*\|\s*LV_[A-Z0-9_]+)+")
 
 
-def cast_ored_enum_array_elems(source: str) -> str:
+def _enum_flag_type(token: str) -> str | None:
+    for pfx, typ in ENUM_FLAG_TYPES.items():
+        if token.startswith(pfx):
+            return typ
+    return None
+
+
+def cast_ored_enum_flags(source: str) -> str:
     def repl(m: re.Match) -> str:
-        head, typ, body, tail = m.groups()
-        out = []
-        for part in body.split(","):
-            elem = part.strip()
-            if not elem:
-                continue  # tolerate a trailing comma
-            if "|" in elem and not elem.startswith("("):
-                elem = f"({typ})({elem})"
-            out.append(elem)
-        return head + ", ".join(out) + tail
+        run = m.group(0)
+        types = {_enum_flag_type(t.strip()) for t in run.split("|")}
+        # Cast only when every operand is from the same known enum family;
+        # a mixed run (e.g. LV_PART_*|LV_STATE_*) or any unknown operand
+        # leaves `types` with >1 entry or a `None`.
+        if len(types) != 1 or None in types:
+            return run
+        typ = types.pop()
+        # Idempotent: don't re-wrap a run already inside its cast.
+        if source[: m.start()].endswith(f"({typ})("):
+            return run
+        return f"({typ})({run})"
 
-    return ENUM_ARRAY_INIT_RE.sub(repl, source)
+    return ORED_CONSTS_RE.sub(repl, source)
 
 
 # =============================================================================
@@ -1165,8 +1185,8 @@ TRANSFORMATIONS = [
     # `... = lv_<type>_create(...)` LHS would otherwise desync the
     # comment-to-create pairing, which keys off `CREATE_LINE_RE`.
     lambda s, p: drop_unused_ptr_vars(s),
-    # Make OR-ed flag-enum arrays compile under g++ too.
-    lambda s, p: cast_ored_enum_array_elems(s),
+    # Cast OR-ed enum flag runs so examples compile under g++ too.
+    lambda s, p: cast_ored_enum_flags(s),
     # Whitespace cleanup (always last so it can mop up).
     lambda s, p: remove_blank_after_open_brace(s),
     lambda s, p: strip_trailing_whitespace(s),
