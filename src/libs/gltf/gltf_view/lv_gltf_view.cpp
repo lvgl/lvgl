@@ -48,6 +48,8 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
 static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
+static lv_3dray_t make_empty_ray(void);
+static lv_3dplane_t make_empty_plane(void);
 
 static lv_result_t create_default_environment(lv_gltf_t * gltf);
 
@@ -489,7 +491,7 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
 
 lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return (lv_3dray_t){{0, 0, 0}, {0, 0, 0}});
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return make_empty_ray());
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     float norm_mouse_x = (float)screen_pos->x / (float)(lv_obj_get_width(obj));
@@ -545,7 +547,7 @@ lv_result_t lv_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane
 
 lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return (lv_3dplane_t){{0, 0, 0}, {0, 0, 0}});
+    LV_CHECK_OBJ(obj, MY_CLASS, true, return make_empty_plane());
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     lv_3dplane_t outplane = {{0, 0, 0}, {0, 0, 0}};
 
@@ -589,6 +591,16 @@ lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_3dray_t make_empty_ray(void)
+{
+    return (lv_3dray_t){{0, 0, 0}, {0, 0, 0}};
+}
+
+static lv_3dplane_t make_empty_plane(void)
+{
+    return (lv_3dplane_t){{0, 0, 0}, {0, 0, 0}};
+}
 
 static lv_gltf_model_t * add_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool owned)
 {
