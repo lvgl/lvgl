@@ -777,7 +777,7 @@ menu "LVGL configuration"
 
 				config LV_CHECK_ARG_LOG_MODE_VERBOSE
 					bool "Verbose: log 'Check failed: <cond>' plus caller-supplied message"
- 					depends on LV_USE_LOG
+					depends on LV_USE_LOG
 
 			config LV_USE_CHECK_OBJ_CLASSTYPE
 				bool "Enable class check in LV_CHECK_OBJ"
