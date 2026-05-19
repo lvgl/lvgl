@@ -12,7 +12,7 @@ if(LV_USE_FIND_PACKAGE_FASTGLTF)
   find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(fastgltf_FOUND)
     message(STATUS "lvgl: fastgltf: found via find_package")
-    # Note: fastgltf doesn't have pkg-config support, so PKG_CONFIG not passed
+    # Note: fastgltf doesn't have pkg-config support
     lvgl_link_packages(
       PRIVATE
       TARGETS
@@ -21,6 +21,9 @@ if(LV_USE_FIND_PACKAGE_FASTGLTF)
       ${CMAKE_PACKAGE_NAME}
       PKG_LIB_PRIVATE
       ${PKG_LIB_PRIVATE})
+    # Since fastgltf doesn't have pkg-config support we need to specify its
+    # dependencies in order for pkg-config to work
+    lvgl_add_pkg_libs_private("-lsimdjson")
     return()
   endif()
 endif()
