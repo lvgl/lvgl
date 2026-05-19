@@ -316,6 +316,13 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
 void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb);
 
 /**
+ * Get the flush callback which will be called to copy the rendered image to the display.
+ * @param disp      pointer to a display
+ * @return          the flush callback
+ */
+lv_display_flush_cb_t lv_display_get_flush_cb(lv_display_t * disp);
+
+/**
  * Set a callback to be used while LVGL is waiting flushing to be finished.
  * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
  * If not set the `disp->flushing` flag is used which can be cleared with `lv_display_flush_ready()`

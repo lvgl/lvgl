@@ -235,6 +235,8 @@ void test_display_triple_buffer(void)
 {
     lv_display_t * disp = lv_display_create(480, 320);
     lv_display_set_flush_cb(disp, dummy_flush_cb);
+    TEST_ASSERT_EQUAL_PTR(lv_display_get_flush_cb(disp), dummy_flush_cb);
+
     lv_draw_buf_t * buf1 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
     lv_draw_buf_t * buf2 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
     lv_draw_buf_t * buf3 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
