@@ -12,7 +12,7 @@
 
 #include "../label/lv_label_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_text_private.h"
 

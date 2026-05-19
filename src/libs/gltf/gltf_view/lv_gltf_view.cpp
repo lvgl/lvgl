@@ -9,7 +9,7 @@
 
 #include "lv_gltf_view_internal.h"
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_GLTF
 
 #include "../gltf_data/lv_gltf_data_internal.hpp"

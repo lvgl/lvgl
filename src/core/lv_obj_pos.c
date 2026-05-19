@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_area_private.h"
-#include "../lv_public_api.h"
+#include "../lvgl_public.h"
 #include "../layouts/lv_layout_private.h"
 #include "lv_obj_event_private.h"
 #include "lv_obj_draw_private.h"
@@ -350,7 +350,7 @@ void lv_obj_set_content_width(lv_obj_t * obj, int32_t w)
 
 void lv_obj_set_content_height(lv_obj_t * obj, int32_t h)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, return);
 
     int32_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
     int32_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);

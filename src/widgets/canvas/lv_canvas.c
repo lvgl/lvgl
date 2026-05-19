@@ -16,7 +16,7 @@
 #if LV_USE_CANVAS
 
 #include "../../core/lv_obj_class_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../misc/cache/lv_cache.h"
 /*********************

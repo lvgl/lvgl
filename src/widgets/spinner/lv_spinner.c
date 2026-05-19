@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_spinner_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #if LV_USE_SPINNER
 
 #include "../../misc/lv_anim_private.h"

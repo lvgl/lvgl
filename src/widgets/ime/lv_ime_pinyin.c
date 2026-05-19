@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_ime_pinyin_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "../../core/lv_obj_class_private.h"
 #if LV_USE_IME_PINYIN != 0
 

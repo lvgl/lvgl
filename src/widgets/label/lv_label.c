@@ -14,7 +14,7 @@
 #include "../../draw/lv_draw_label_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../misc/lv_bidi_private.h"
 #include "../../misc/lv_text_ap.h"

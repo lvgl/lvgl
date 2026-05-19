@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_ffmpeg_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #if LV_USE_FFMPEG != 0
 #include "../../draw/lv_image_decoder_private.h"
 #include "../../draw/lv_draw_buf_private.h"

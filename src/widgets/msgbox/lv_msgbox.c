@@ -13,7 +13,7 @@
 
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
 
 #if LV_USE_LABEL == 0
