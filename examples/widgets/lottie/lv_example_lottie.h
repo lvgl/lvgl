@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-void lv_example_lottie_1(void);
-void lv_example_lottie_2(void);
+void lv_example_lottie_from_data(void);
+void lv_example_lottie_from_file(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

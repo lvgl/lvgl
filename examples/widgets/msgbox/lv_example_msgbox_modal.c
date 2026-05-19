@@ -21,7 +21,7 @@ static void event_cb(lv_event_t * e)
  * wired to a shared `LV_EVENT_CLICKED` handler that logs which label
  * was tapped.
  */
-void lv_example_msgbox_1(void)
+void lv_example_msgbox_modal(void)
 {
     lv_obj_t * mbox1 = lv_msgbox_create(NULL);
 

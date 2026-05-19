@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_arclabel_1(void);
+void lv_example_arclabel_curved_text(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

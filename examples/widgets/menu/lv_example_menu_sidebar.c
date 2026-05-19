@@ -31,7 +31,7 @@ static lv_obj_t * create_switch(lv_obj_t * parent,
  * pops an `lv_msgbox` saying `Root back btn click.` when the root
  * back arrow is used.
  */
-void lv_example_menu_5(void)
+void lv_example_menu_sidebar(void)
 {
     lv_obj_t * menu = lv_menu_create(lv_screen_active());
 

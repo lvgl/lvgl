@@ -11,7 +11,7 @@
  * `lv_menu_set_load_page_event` to sub pages titled `Page 1` through
  * `Page 3` created via `lv_menu_page_create`.
  */
-void lv_example_menu_3(void)
+void lv_example_menu_custom_back_button(void)
 {
     /*Create a menu object*/
     lv_obj_t * menu = lv_menu_create(lv_screen_active());

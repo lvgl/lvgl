@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_style_21(void);
+void lv_example_style_transform_card(void);
 void lv_example_style_arc(void);
 void lv_example_style_background(void);
 void lv_example_style_blur(void);

@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_tileview_1(void);
+void lv_example_tileview_l_shape(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

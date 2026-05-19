@@ -19,7 +19,7 @@ static const char * ARCLABEL_TEXT =
  * `lv_font_montserrat_18` is applied to the inner pair and
  * `lv_font_montserrat_24` to the slogans.
  */
-void lv_example_arclabel_1(void)
+void lv_example_arclabel_curved_text(void)
 {
     lv_obj_t * arclabel_inner = NULL;
     lv_obj_t * arclabel_outer = NULL;

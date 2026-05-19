@@ -13,7 +13,7 @@
  * with ten buttons `One` through `Ten` whose scroll chains back into
  * the tile view when the list reaches its edge.
  */
-void lv_example_tileview_1(void)
+void lv_example_tileview_l_shape(void)
 {
     lv_obj_t * tv = lv_tileview_create(lv_screen_active());
 

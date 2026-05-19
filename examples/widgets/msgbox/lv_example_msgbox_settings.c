@@ -20,7 +20,7 @@ static void minimize_button_event_cb(lv_event_t * e)
  * Speed 80. The footer adds flex-growing `Apply` and `Cancel`
  * buttons tinted indigo.
  */
-void lv_example_msgbox_2(void)
+void lv_example_msgbox_settings(void)
 {
     lv_obj_t * setting = lv_msgbox_create(lv_screen_active());
     lv_obj_set_style_clip_corner(setting, true, 0);

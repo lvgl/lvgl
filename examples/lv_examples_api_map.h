@@ -44,6 +44,9 @@ extern "C" {
 #define lv_example_arc_2           lv_example_arc_change_rate
 #define lv_example_arc_3           lv_example_arc_event
 
+/* arclabel */
+#define lv_example_arclabel_1      lv_example_arclabel_curved_text
+
 /* bar */
 #define lv_example_bar_1           lv_example_bar_bind_value
 #define lv_example_bar_2           lv_example_bar_img_indicator
@@ -149,6 +152,26 @@ extern "C" {
 /* line */
 #define lv_example_line_1          lv_example_line_points
 
+/* list */
+#define lv_example_list_1          lv_example_list_reorder
+#define lv_example_list_2          lv_example_list_sections
+
+/* lottie */
+#define lv_example_lottie_1        lv_example_lottie_from_data
+#define lv_example_lottie_2        lv_example_lottie_from_file
+
+/* menu */
+#define lv_example_menu_1          lv_example_menu_custom_back_button
+#define lv_example_menu_2          lv_example_menu_floating_button
+#define lv_example_menu_3          lv_example_menu_root_back_button
+#define lv_example_menu_4          lv_example_menu_sidebar
+#define lv_example_menu_5          lv_example_menu_sub_page
+
+/* msgbox */
+#define lv_example_msgbox_1        lv_example_msgbox_blur
+#define lv_example_msgbox_2        lv_example_msgbox_modal
+#define lv_example_msgbox_3        lv_example_msgbox_settings
+
 /* obj */
 #define lv_example_obj_1           lv_example_obj_bind_style
 #define lv_example_obj_2           lv_example_obj_draggable
@@ -203,26 +226,27 @@ extern "C" {
 #define lv_example_spinner_1       lv_example_spinner_basic
 
 /* styles */
-#define lv_example_style_1         lv_example_style_21
-#define lv_example_style_2         lv_example_style_arc
-#define lv_example_style_3         lv_example_style_background
-#define lv_example_style_4         lv_example_style_blur
-#define lv_example_style_5         lv_example_style_border
-#define lv_example_style_6         lv_example_style_drop_shadow
-#define lv_example_style_7         lv_example_style_gradient_buttons
-#define lv_example_style_8         lv_example_style_gradient_conic
-#define lv_example_style_9         lv_example_style_gradient_radial
-#define lv_example_style_10        lv_example_style_image
-#define lv_example_style_11        lv_example_style_line
-#define lv_example_style_12        lv_example_style_local
-#define lv_example_style_13        lv_example_style_margin
-#define lv_example_style_14        lv_example_style_modal
-#define lv_example_style_15        lv_example_style_multiple
-#define lv_example_style_16        lv_example_style_opacity_transform
-#define lv_example_style_17        lv_example_style_outline
-#define lv_example_style_18        lv_example_style_padding
-#define lv_example_style_19        lv_example_style_parts_states
-#define lv_example_style_20        lv_example_style_shadow
+#define lv_example_style_1         lv_example_style_arc
+#define lv_example_style_2         lv_example_style_background
+#define lv_example_style_3         lv_example_style_blur
+#define lv_example_style_4         lv_example_style_border
+#define lv_example_style_5         lv_example_style_drop_shadow
+#define lv_example_style_6         lv_example_style_gradient_buttons
+#define lv_example_style_7         lv_example_style_gradient_conic
+#define lv_example_style_8         lv_example_style_gradient_radial
+#define lv_example_style_9         lv_example_style_image
+#define lv_example_style_10        lv_example_style_line
+#define lv_example_style_11        lv_example_style_local
+#define lv_example_style_12        lv_example_style_margin
+#define lv_example_style_13        lv_example_style_modal
+#define lv_example_style_14        lv_example_style_multiple
+#define lv_example_style_15        lv_example_style_opacity_transform
+#define lv_example_style_16        lv_example_style_outline
+#define lv_example_style_17        lv_example_style_padding
+#define lv_example_style_18        lv_example_style_parts_states
+#define lv_example_style_19        lv_example_style_shadow
+#define lv_example_style_20        lv_example_style_size_position
+#define lv_example_style_21        lv_example_style_text
 
 /* switch */
 #define lv_example_switch_1        lv_example_switch_event
@@ -241,6 +265,12 @@ extern "C" {
 #define lv_example_textarea_2      lv_example_textarea_cursor
 #define lv_example_textarea_3      lv_example_textarea_format
 #define lv_example_textarea_4      lv_example_textarea_password
+
+/* tileview */
+#define lv_example_tileview_1      lv_example_tileview_l_shape
+
+/* win */
+#define lv_example_win_1           lv_example_win_toolbar
 
 #ifdef __cplusplus
 } /*extern "C"*/

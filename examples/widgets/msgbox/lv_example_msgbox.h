@@ -10,9 +10,9 @@
 extern "C" {
 #endif
 
-void lv_example_msgbox_1(void);
-void lv_example_msgbox_2(void);
-void lv_example_msgbox_3(void);
+void lv_example_msgbox_modal(void);
+void lv_example_msgbox_settings(void);
+void lv_example_msgbox_blur(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

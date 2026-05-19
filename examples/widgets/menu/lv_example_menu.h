@@ -10,11 +10,11 @@
 extern "C" {
 #endif
 
-void lv_example_menu_1(void);
-void lv_example_menu_2(void);
-void lv_example_menu_3(void);
-void lv_example_menu_4(void);
-void lv_example_menu_5(void);
+void lv_example_menu_sub_page(void);
+void lv_example_menu_root_back_button(void);
+void lv_example_menu_custom_back_button(void);
+void lv_example_menu_floating_button(void);
+void lv_example_menu_sidebar(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

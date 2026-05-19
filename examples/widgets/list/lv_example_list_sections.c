@@ -22,7 +22,7 @@ static void event_handler(lv_event_t * e)
  * single `LV_EVENT_CLICKED` handler logs the clicked entry via
  * `lv_list_get_button_text`.
  */
-void lv_example_list_1(void)
+void lv_example_list_sections(void)
 {
     /*Create a list*/
     list1 = lv_list_create(lv_screen_active());

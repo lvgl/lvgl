@@ -20,7 +20,7 @@ static void event_handler(lv_event_t * e)
  * area from `lv_win_get_content` holds a long multi-line `lv_label`
  * that makes the window scroll.
  */
-void lv_example_win_1(void)
+void lv_example_win_toolbar(void)
 {
     lv_obj_t * win = lv_win_create(lv_screen_active());
     lv_obj_t * btn;

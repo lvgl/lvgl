@@ -32,7 +32,7 @@ static void dropdown_value_changed_event_cb(lv_event_t * e)
  * either `lv_layer_top()` or the message box. A synthetic event is
  * sent to initialize the state.
  */
-void lv_example_msgbox_3(void)
+void lv_example_msgbox_blur(void)
 {
 
     lv_obj_t * label = lv_label_create(lv_screen_active());

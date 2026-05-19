@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_style_21(void);
+void lv_example_style_transform_card(void);
 
 /**********************
  *      MACROS

@@ -3,22 +3,24 @@
 #if LV_USE_LOTTIE
 
 /**
- * @title Lottie animation from file path
- * @brief Play a Lottie JSON animation loaded through the filesystem driver.
+ * @title Lottie animation from memory
+ * @brief Play a Lottie JSON animation embedded as a C byte array.
  *
- * An `lv_lottie` widget is created on the active screen and receives
- * its source through `lv_lottie_set_src_file`, pointing at
- * `lvgl/examples/widgets/lottie/lv_example_lottie_approve.json`, so a
- * filesystem driver for the working directory must be registered. A
- * 64x64 ARGB8888 premultiplied buffer is attached via
- * `lv_lottie_set_buffer` or `lv_lottie_set_draw_buf` depending on the
- * draw buffer alignment, then the widget is centered.
+ * An `lv_lottie` widget on the active screen receives the approve
+ * animation through `lv_lottie_set_src_data`, pointing at the
+ * `lv_example_lottie_approve` byte array and its size. A 64x64
+ * ARGB8888 premultiplied buffer is attached with
+ * `lv_lottie_set_buffer` when the draw buffer alignment allows, or an
+ * `LV_DRAW_BUF_DEFINE_STATIC` draw buffer via `lv_lottie_set_draw_buf`
+ * otherwise, then the widget is centered.
  */
-void lv_example_lottie_2(void)
+void lv_example_lottie_from_data(void)
 {
+    extern const uint8_t lv_example_lottie_approve[];
+    extern const size_t lv_example_lottie_approve_size;
 
     lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
-    lv_lottie_set_src_file(lottie, "lvgl/examples/widgets/lottie/lv_example_lottie_approve.json");
+    lv_lottie_set_src_data(lottie, lv_example_lottie_approve, lv_example_lottie_approve_size);
 
 #if LV_DRAW_BUF_ALIGN == 4 && LV_DRAW_BUF_STRIDE_ALIGN == 1
     /*If there are no special requirements, just declare a buffer
@@ -36,7 +38,7 @@ void lv_example_lottie_2(void)
 
 #else
 
-void lv_example_lottie_2(void)
+void lv_example_lottie_from_data(void)
 {
     /*fallback for online examples*/
 

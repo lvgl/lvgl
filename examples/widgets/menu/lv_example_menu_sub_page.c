@@ -12,7 +12,7 @@
  * `lv_menu_set_load_page_event` wires the third item to load that sub
  * page when clicked. `lv_menu_set_page` opens the main page.
  */
-void lv_example_menu_1(void)
+void lv_example_menu_sub_page(void)
 {
     /*Create a menu object*/
     lv_obj_t * menu = lv_menu_create(lv_screen_active());

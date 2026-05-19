@@ -1,5 +1,5 @@
 /**
- * @file lv_example_style_21.c
+ * @file lv_example_style_transform_card.c
  */
 
 /*********************
@@ -60,7 +60,7 @@ LV_IMAGE_DECLARE(img_transform_avatar_15);
  * `lv_arc_get_angle_end * 10`, while the slider (range 128 to 300,
  * initial 256) sets `transform_scale_x` and `transform_scale_y`.
  */
-void lv_example_style_21(void)
+void lv_example_style_transform_card(void)
 {
     static const int32_t grid_cols[] = {LV_GRID_CONTENT, 4, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     static const int32_t grid_rows[] = {LV_GRID_CONTENT, -10, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};

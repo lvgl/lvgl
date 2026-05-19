@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-void lv_example_list_1(void);
-void lv_example_list_2(void);
+void lv_example_list_sections(void);
+void lv_example_list_reorder(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

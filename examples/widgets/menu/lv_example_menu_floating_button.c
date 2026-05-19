@@ -41,7 +41,7 @@ static void float_button_event_cb(lv_event_t * e)
  * `lv_menu_set_load_page_event`, and calls
  * `lv_obj_scroll_to_view_recursive` so the fresh row stays visible.
  */
-void lv_example_menu_4(void)
+void lv_example_menu_floating_button(void)
 {
     /*Create a menu object*/
     menu = lv_menu_create(lv_screen_active());

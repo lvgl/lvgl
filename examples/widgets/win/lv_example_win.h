@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void lv_example_win_1(void);
+void lv_example_win_toolbar(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

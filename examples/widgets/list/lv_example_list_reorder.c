@@ -120,7 +120,7 @@ static void event_handler_swap(lv_event_t * e)
  * the selected row, with the Up, Center, Down, and Shuffle handlers
  * also firing on `LV_EVENT_LONG_PRESSED_REPEAT`.
  */
-void lv_example_list_2(void)
+void lv_example_list_reorder(void)
 {
     /*Create a list*/
     list1 = lv_list_create(lv_screen_active());
