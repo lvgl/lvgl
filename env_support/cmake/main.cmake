@@ -90,6 +90,11 @@ endif()
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
+if(MSVC)
+    # Required for reliable variadic macro dispatch (e.g. LV_CHECK_OBJ) on MSVC.
+    target_compile_options(lvgl PUBLIC /Zc:preprocessor)
+endif()
+
 if (NOT LV_BUILD_USE_KCONFIG)
 
     # Default - use the lv_conf.h configuration file

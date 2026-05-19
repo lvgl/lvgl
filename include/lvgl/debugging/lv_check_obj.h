@@ -73,7 +73,7 @@ extern "C" {
 
 #define __LV_CHECK_OBJ_3(obj, cls, associated, action) \
     LV_CHECK_ARG((obj) != NULL, action); \
-    LV_CHECK_OBJ_CLASS(obj, cls, action) \
+    LV_CHECK_OBJ_CLASS(obj, cls, action); \
     LV_CHECK_OBJ_VALID(obj, action)
 
 /* Internal: picks __LV_CHECK_OBJ_1/2/3 based on the number of __VA_ARGS__ */
