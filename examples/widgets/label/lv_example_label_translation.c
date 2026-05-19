@@ -18,9 +18,13 @@ void lv_example_label_translation(void)
      * generated file or an asset. */
     static const char * const langs[]   = {"en", "de", NULL};
     static const char * const tags[]    = {"greeting", "farewell", "thanks", NULL};
-    static const char * const trans[] = {"Hello", "Goodbye", "Thank you",
-                                         "Hallo", "Auf Wiedersehen", "Danke"
-                                        };
+
+    /*                                    en             de */
+    static const char * const trans[] = {"Hey!",        "Hallo",            /*greetings*/
+                                         "Goodbye",     "Auf Wiedersehen",  /*farewell*/
+                                         "Thank you",   "Danke"
+                                        };           /*thanks*/
+
     lv_translation_add_static(langs, tags, trans);
 
     lv_translation_set_language("en");
@@ -34,11 +38,12 @@ void lv_example_label_translation(void)
     lv_obj_t * l_greet = lv_label_create(scr);
     lv_label_set_translation_tag(l_greet, "greeting");
 
+    lv_obj_t * l_bye = lv_label_create(scr);
+    lv_label_set_translation_tag(l_bye, "farewell");
+
     lv_obj_t * l_thanks = lv_label_create(scr);
     lv_label_set_translation_tag(l_thanks, "thanks");
 
-    lv_obj_t * l_bye = lv_label_create(scr);
-    lv_label_set_translation_tag(l_bye, "farewell");
 
     /* Switching the language causes every bound label to refresh automatically. */
     lv_translation_set_language("de");
