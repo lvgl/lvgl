@@ -16,12 +16,12 @@ void lv_example_label_translation(void)
     /* Register a small inline translation table so the example is
      * self-contained. In a real project this typically lives in a
      * generated file or an asset. */
-    static const char * langs[]   = {"en", "de", NULL};
-    static const char * tags[]    = {"greeting", "farewell", "thanks", NULL};
-    static const char * trans_en[] = {"Hello", "Goodbye", "Thank you"};
-    static const char * trans_de[] = {"Hallo", "Auf Wiedersehen", "Danke"};
-    static const char ** translations[] = {trans_en, trans_de};
-    lv_translation_add_static(langs, tags, translations);
+    static const char * const langs[]   = {"en", "de", NULL};
+    static const char * const tags[]    = {"greeting", "farewell", "thanks", NULL};
+    static const char * const trans[] = {"Hello", "Goodbye", "Thank you",
+                                         "Hallo", "Auf Wiedersehen", "Danke"
+                                        };
+    lv_translation_add_static(langs, tags, trans);
 
     lv_translation_set_language("en");
 
