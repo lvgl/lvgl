@@ -16,7 +16,7 @@ navigation as well.
 
 ## Set cell value
 
-<LvglXMLExample name="lv_example_table_cells" path="widgets/table/table_cells/lv_example_table_cells" />
+<LvglExample name="lv_example_table_cells" path="widgets/table/table_cells/lv_example_table_cells" />
 
 <ApiLink name="lv_table_set_cell_value" display="lv_table_set_cell_value(table, row, col, &quot;Content&quot;)" /> writes a cell.
 The text is copied so the source buffer can be local. Use `\n` for a
@@ -25,14 +25,14 @@ table automatically.
 
 ## Rows and Columns
 
-<LvglXMLExample name="lv_example_table_rows_columns" path="widgets/table/table_rows_columns/lv_example_table_rows_columns" />
+<LvglExample name="lv_example_table_rows_columns" path="widgets/table/table_rows_columns/lv_example_table_rows_columns" />
 
 Pre-size the grid with <ApiLink name="lv_table_set_row_count" display="lv_table_set_row_count(table, n)" /> and
 <ApiLink name="lv_table_set_column_count" display="lv_table_set_column_count(table, n)" />.
 
 ## Width and Height
 
-<LvglXMLExample name="lv_example_table_width" path="widgets/table/table_width/lv_example_table_width" />
+<LvglExample name="lv_example_table_width" path="widgets/table/table_width/lv_example_table_width" />
 
 <ApiLink name="lv_table_set_column_width" display="lv_table_set_column_width(table, col, w)" /> sets per-column pixel width;
 the table's overall width is the sum. Height is derived automatically
@@ -40,7 +40,7 @@ from cell styles (font, padding) and row count.
 
 ## Merge cells
 
-<LvglXMLExample name="lv_example_table_merge_cells" path="widgets/table/table_merge_cells/lv_example_table_merge_cells" />
+<LvglExample name="lv_example_table_merge_cells" path="widgets/table/table_merge_cells/lv_example_table_merge_cells" />
 
 <ApiLink name="lv_table_set_cell_ctrl" display="lv_table_set_cell_ctrl(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)" />
 extends a cell into the next column. Chain it on adjacent cells to span
@@ -54,7 +54,7 @@ more than two columns.
    [typical background style properties](/common-widget-features/styles/overview) as well as text
    style properties.
 
-<LvglXMLExample name="lv_example_table_styling" path="widgets/table/table_styling/lv_example_table_styling" />
+<LvglExample name="lv_example_table_styling" path="widgets/table/table_styling/lv_example_table_styling" />
 
 Table has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the table's
 outer frame and background) and <ApiLink name="LV_PART_ITEMS" /> (every
@@ -73,7 +73,7 @@ automatically sets the Table size to show all columns and rows.
 If the width or height is set to a smaller number than its "intrinsic"
 size then the Table becomes scrollable.
 
-<LvglXMLExample name="lv_example_table_scroll" path="widgets/table/table_scroll/lv_example_table_scroll" />
+<LvglExample name="lv_example_table_scroll" path="widgets/table/table_scroll/lv_example_table_scroll" />
 
 ## Set cell user data
 

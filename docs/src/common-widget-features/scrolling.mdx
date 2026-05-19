@@ -5,7 +5,7 @@ description: "In LVGL scrolling works very intuitively: if a Widget is outside i
 
 ## Overview
 
-<LvglXMLExample name="lv_example_scroll_overview" path="scroll/scroll_overview/lv_example_scroll_overview" />
+<LvglExample name="lv_example_scroll_overview" path="scroll/scroll_overview/lv_example_scroll_overview" />
 
 In LVGL scrolling works very intuitively: if a Widget is outside its parent
 content area (the size without padding), the parent becomes scrollable and
@@ -20,7 +20,7 @@ vertically in one stroke; diagonal scrolling is not possible.
 
 ### Mode
 
-<LvglXMLExample name="lv_example_scroll_scrollbar_mode" path="scroll/scroll_scrollbar_mode/lv_example_scroll_scrollbar_mode" />
+<LvglExample name="lv_example_scroll_scrollbar_mode" path="scroll/scroll_scrollbar_mode/lv_example_scroll_scrollbar_mode" />
 
 The scrollbar is shown according to the configured mode, set with
 <ApiLink name="lv_obj_set_scrollbar_mode" display="lv_obj_set_scrollbar_mode(widget, LV_SCROLLBAR_MODE_...)" />:
@@ -32,7 +32,7 @@ The scrollbar is shown according to the configured mode, set with
 
 ### Styling
 
-<LvglXMLExample name="lv_example_scroll_scrollbar_style" path="scroll/scroll_scrollbar_style/lv_example_scroll_scrollbar_style" />
+<LvglExample name="lv_example_scroll_scrollbar_style" path="scroll/scroll_scrollbar_style/lv_example_scroll_scrollbar_style" />
 
 The scrollbar is a dedicated part of every scrollable Widget,
 <ApiLink name="LV_PART_SCROLLBAR" />. Add a style to that part to recolor or
@@ -57,7 +57,7 @@ is the Widget's height or width depending on the scrollbar's orientation.
 
 ### Right-to-left scrolling
 
-<LvglXMLExample name="lv_example_scroll_rtl" path="scroll/scroll_rtl/lv_example_scroll_rtl" />
+<LvglExample name="lv_example_scroll_rtl" path="scroll/scroll_rtl/lv_example_scroll_rtl" />
 
 When the base direction is <ApiLink name="LV_BASE_DIR_RTL" />, the vertical
 scrollbar is placed on the left side. `base_dir` is inherited, so it can be set
@@ -91,7 +91,7 @@ style layer cannot express.
 
 ## Scrollable
 
-<LvglXMLExample name="lv_example_scroll_scrollable" path="scroll/scroll_scrollable/lv_example_scroll_scrollable" />
+<LvglExample name="lv_example_scroll_scrollable" path="scroll/scroll_scrollable/lv_example_scroll_scrollable" />
 
 A Widget can be made non-scrollable by clearing its
 <ApiLink name="LV_OBJ_FLAG_SCROLLABLE" /> flag with
@@ -111,7 +111,7 @@ OR-ed values are possible, e.g. <ApiLink name="LV_DIR_TOP" display="LV_DIR_TOP |
 
 ## Scroll chaining
 
-<LvglXMLExample name="lv_example_scroll_chain" path="scroll/scroll_chain/lv_example_scroll_chain" />
+<LvglExample name="lv_example_scroll_chain" path="scroll/scroll_chain/lv_example_scroll_chain" />
 
 If a Widget can't be scrolled further, the additional scroll is propagated to
 its parent and continues up to the [Screen](/common-widget-features/screens).
@@ -136,7 +136,7 @@ toggles them live on a list:
 
 ## Snapping
 
-<LvglXMLExample name="lv_example_scroll_snap" path="scroll/scroll_snap/lv_example_scroll_snap" />
+<LvglExample name="lv_example_scroll_snap" path="scroll/scroll_snap/lv_example_scroll_snap" />
 
 Children can be snapped to a position when scrolling ends. Make a child
 snappable with the <ApiLink name="LV_OBJ_FLAG_SNAPPABLE" /> flag (XML:
@@ -154,7 +154,7 @@ point, and animates to it.
 
 ### Scroll one
 
-<LvglXMLExample name="lv_example_scroll_one" path="scroll/scroll_one/lv_example_scroll_one" />
+<LvglExample name="lv_example_scroll_one" path="scroll/scroll_one/lv_example_scroll_one" />
 
 The <ApiLink name="LV_OBJ_FLAG_SCROLL_ONE" /> flag (XML: `scroll_one`) limits
 each gesture to a single snappable child. It requires snappable children and a
@@ -169,7 +169,7 @@ off-page tabview content are handled. This is driven by input-device focus
 
 ## Floating children
 
-<LvglXMLExample name="lv_example_scroll_floating" path="scroll/scroll_floating/lv_example_scroll_floating" />
+<LvglExample name="lv_example_scroll_floating" path="scroll/scroll_floating/lv_example_scroll_floating" />
 
 A child with the <ApiLink name="LV_OBJ_FLAG_FLOATING" /> flag (XML:
 `floating="true"`) is ignored by the layout and is not moved when its parent

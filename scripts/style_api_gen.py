@@ -906,9 +906,8 @@ def docs(p):
         print()
         print(p['dsc'])
         if 'example' in p:
-            tag = 'LvglXMLExample' if p.get('example_kind', 'xml') == 'xml' else 'LvglExample'
             print()
-            print(f'<{tag} name="{p["example"]}" path="{p["example_path"]}" />')
+            print(f'<LvglExample name="{p["example"]}" path="{p["example_path"]}" />')
         return
 
     dsc = word_wrapped_description(p['dsc'], in_a_comment=False)

@@ -28,6 +28,9 @@ extern "C" {
 #include "widgets/lv_example_widgets.h"
 #include "grad/lv_example_grad.h"
 
+/*Backward-compatible aliases for the pre-rework numbered example names.*/
+#include "lv_examples_api_map.h"
+
 /*********************
  *      DEFINES
  *********************/

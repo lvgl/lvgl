@@ -13,7 +13,7 @@ to be viewed and modified with configurable constraints.
 
 ## Value, range and step
 
-<LvglXMLExample name="lv_example_spinbox_value" path="widgets/spinbox/spinbox_value/lv_example_spinbox_value" />
+<LvglExample name="lv_example_spinbox_value" path="widgets/spinbox/spinbox_value/lv_example_spinbox_value" />
 
 - <ApiLink name="lv_spinbox_set_value" display="lv_spinbox_set_value(spinbox, 1234)" /> sets a new value for the Spinbox.
 - <ApiLink name="lv_spinbox_increment" display="lv_spinbox_increment(spinbox)" /> and <ApiLink name="lv_spinbox_decrement" display="lv_spinbox_decrement(spinbox)" />
@@ -34,7 +34,7 @@ to the left, the <ApiLink name="lv_spinbox_set_digit_step_direction" display="lv
 
 ## Format
 
-<LvglXMLExample name="lv_example_spinbox_format" path="widgets/spinbox/spinbox_format/lv_example_spinbox_format" />
+<LvglExample name="lv_example_spinbox_format" path="widgets/spinbox/spinbox_format/lv_example_spinbox_format" />
 
 <ApiLink name="lv_spinbox_set_digit_format" display="lv_spinbox_set_digit_format(spinbox, digit_count, separator_position)" />
 sets the number format. `digit_count` is the total number of digits to display.
@@ -43,7 +43,7 @@ Pass 0 for `separator_position` to display no decimal point.
 
 ## Rollover
 
-<LvglXMLExample name="lv_example_spinbox_rollover" path="widgets/spinbox/spinbox_rollover/lv_example_spinbox_rollover" />
+<LvglExample name="lv_example_spinbox_rollover" path="widgets/spinbox/spinbox_rollover/lv_example_spinbox_rollover" />
 
 <ApiLink name="lv_spinbox_set_rollover" display="lv_spinbox_set_rollover(spinbox, true/false)" /> enables/disables
 rollover mode. If either the minimum or maximum value is reached with
@@ -65,7 +65,7 @@ selected digit by one, and holding a button keeps repeating
 
 Spinbox's parts are identical to those of [Text Area](/widgets/textarea).
 
-<LvglXMLExample name="lv_example_spinbox_styling" path="widgets/spinbox/spinbox_styling/lv_example_spinbox_styling" />
+<LvglExample name="lv_example_spinbox_styling" path="widgets/spinbox/spinbox_styling/lv_example_spinbox_styling" />
 
 Spinbox has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the box
 itself — background, border, radius, padding, and the digits themselves)
@@ -100,7 +100,7 @@ subject moves the displayed digits. Only integer subjects are supported.
 To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
 
 
-<LvglXMLExample name="lv_example_spinbox_bind_value" path="widgets/spinbox/spinbox_bind_value/lv_example_spinbox_bind_value" />
+<LvglExample name="lv_example_spinbox_bind_value" path="widgets/spinbox/spinbox_bind_value/lv_example_spinbox_bind_value" />
 
 ## Events
 
