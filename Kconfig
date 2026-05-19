@@ -1401,7 +1401,7 @@ menu "LVGL configuration"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_3DTEXTURE
 			bool "3D Texture"
-			depends on LV_USE_DRAW_OPENGLES
+			depends on LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
 		config LV_USE_GLTF
 			bool "glTF support"
 			depends on LV_USE_3DTEXTURE
