@@ -776,7 +776,9 @@ menu "LVGL configuration"
 					depends on LV_USE_LOG
 
 				config LV_CHECK_ARG_LOG_MODE_VERBOSE
-				
+					bool "Verbose: log 'Check failed: <cond>' plus caller-supplied message"
+ 					depends on LV_USE_LOG
+
 			config LV_USE_CHECK_OBJ_CLASSTYPE
 				bool "Enable class check in LV_CHECK_OBJ"
 				default y if !LV_CONF_MINIMAL
@@ -795,9 +797,6 @@ menu "LVGL configuration"
 					still part of the widget tree (lv_obj_is_valid). When disabled,
 					the validity check is skipped even if the associated argument
 					is supplied.
-
-					bool "Verbose: log 'Check failed: <cond>' plus caller-supplied message"
-					depends on LV_USE_LOG
 			endchoice
 
 			config LV_CHECK_ARG_LOG_MODE
