@@ -1069,6 +1069,43 @@ def drop_unused_ptr_vars(source: str) -> str:
 
 
 # =============================================================================
+# Cast OR-ed enum array initializers
+# =============================================================================
+#
+# The generator emits flag-enum arrays like
+#
+#     static const lv_buttonmatrix_ctrl_t m[] = {A, B | C, D};
+#
+# In C `B | C` is fine, but in C++ the `|` yields `int` and the array's
+# `lv_<...>_t` element type rejects the implicit narrowing — examples built
+# with g++ fail with "invalid conversion from 'int' to 'lv_..._t'". Cast
+# each OR-ed element to the array's element type so the same source compiles
+# as both C and C++. Scoped to `static const lv_<...>_t <name>[] = { ... }`
+# (no nested braces); string/`char *` maps don't match the `lv_<...>_t`
+# type. Idempotent: an element already starting with `(` is left as-is.
+
+ENUM_ARRAY_INIT_RE = re.compile(
+    r"(static\s+const\s+(lv_\w+_t)\s+\w+\s*\[\s*\]\s*=\s*\{)([^{}]*)(\})"
+)
+
+
+def cast_ored_enum_array_elems(source: str) -> str:
+    def repl(m: re.Match) -> str:
+        head, typ, body, tail = m.groups()
+        out = []
+        for part in body.split(","):
+            elem = part.strip()
+            if not elem:
+                continue  # tolerate a trailing comma
+            if "|" in elem and not elem.startswith("("):
+                elem = f"({typ})({elem})"
+            out.append(elem)
+        return head + ", ".join(out) + tail
+
+    return ENUM_ARRAY_INIT_RE.sub(repl, source)
+
+
+# =============================================================================
 # Pipeline
 # =============================================================================
 #
@@ -1128,6 +1165,8 @@ TRANSFORMATIONS = [
     # `... = lv_<type>_create(...)` LHS would otherwise desync the
     # comment-to-create pairing, which keys off `CREATE_LINE_RE`.
     lambda s, p: drop_unused_ptr_vars(s),
+    # Make OR-ed flag-enum arrays compile under g++ too.
+    lambda s, p: cast_ored_enum_array_elems(s),
     # Whitespace cleanup (always last so it can mop up).
     lambda s, p: remove_blank_after_open_brace(s),
     lambda s, p: strip_trailing_whitespace(s),
