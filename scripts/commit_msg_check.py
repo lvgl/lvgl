@@ -56,13 +56,13 @@ TYPE_TYPOS = {
 VALID_TYPES_RE = "|".join(VALID_TYPES)
 
 # type(scope): description  (chore/docs/ci allow omitting scope)
-FULL_PATTERN = re.compile(rf"^({VALID_TYPES_RE})\(([a-zA-Z0-9_/-]+)\): (.+)$")
+FULL_PATTERN = re.compile(rf"^({VALID_TYPES_RE})\(([a-zA-Z0-9_/-]+)\)(!?): (.+)$")
 
 # Types that allow omitting scope
 SCOPE_OPTIONAL_TYPES = {"chore", "docs", "ci"}
 
 # type: description (no scope, for scope-optional types)
-NO_SCOPE_PATTERN = re.compile(rf"^({'|'.join(SCOPE_OPTIONAL_TYPES)}): (.+)$")
+NO_SCOPE_PATTERN = re.compile(rf"^({'|'.join(SCOPE_OPTIONAL_TYPES)})(!?): (.+)$")
 
 # type( or type:
 TYPE_ONLY_PATTERN = re.compile(r"^([a-zA-Z_]+)")
@@ -138,13 +138,13 @@ def check_commit_msg(msg):
     type_with_paren = re.compile(rf"^({VALID_TYPES_RE})\(")
     if not type_with_paren.match(msg):
         # type: desc (missing scope)
-        type_with_colon = re.compile(rf"^({VALID_TYPES_RE}):")
+        type_with_colon = re.compile(rf"^({VALID_TYPES_RE})!?:")
         if type_with_colon.match(msg):
             # Allow scope-optional types (chore, docs, ci) without scope
             if type_lower in SCOPE_OPTIONAL_TYPES:
                 no_scope_match = NO_SCOPE_PATTERN.match(msg)
                 if no_scope_match:
-                    desc = no_scope_match.group(2)
+                    desc = no_scope_match.group(3)
                     if desc and desc[0].isupper():
                         errors.append(
                             f"Description should start with lowercase: '{desc[:30]}...'"
@@ -173,8 +173,8 @@ def check_commit_msg(msg):
     if not full:
         # Diagnose specific issues
         empty_scope = re.compile(rf"^({VALID_TYPES_RE})\(\)")
-        no_space = re.compile(rf"^({VALID_TYPES_RE})\([^)]*\):[^ ]")
-        no_colon = re.compile(rf"^({VALID_TYPES_RE})\([^)]*\)[^:]")
+        no_space = re.compile(rf"^({VALID_TYPES_RE})\([^)]*\)!?:[^ ]")
+        no_colon = re.compile(rf"^({VALID_TYPES_RE})\([^)]*\)!?[^:!]")
 
         if empty_scope.match(msg):
             errors.append("Scope cannot be empty")
@@ -184,7 +184,7 @@ def check_commit_msg(msg):
             errors.append("Missing colon after scope. Use 'type(scope): description'")
         else:
             # Check if scope contains filename or PR reference
-            scope_match = re.match(rf"^({VALID_TYPES_RE})\(([^)]+)\): .+", msg)
+            scope_match = re.match(rf"^({VALID_TYPES_RE})\(([^)]+)\)!?: .+", msg)
             if scope_match:
                 scope = scope_match.group(2)
                 if re.search(r"\.[a-zA-Z]+$", scope):
@@ -205,7 +205,7 @@ def check_commit_msg(msg):
         return errors
 
     # Validate description
-    desc = full.group(3)
+    desc = full.group(4)
 
     if desc and desc[0].isupper():
         errors.append(f"Description should start with lowercase: '{desc[:30]}...'")

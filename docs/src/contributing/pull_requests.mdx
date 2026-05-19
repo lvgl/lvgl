@@ -52,12 +52,15 @@ Format](https://github.com/angular/angular/blob/main/CONTRIBUTING.md#-commit-mes
 The following structure should be used:
 
 ```text
-<type>(<scope>): <subject>
+<type>(<scope>)!: <subject>
             <--- blank line
 <body>
             <--- blank line
 <footer>
 ```
+
+The `!` after the scope is optional and is used to flag breaking changes
+(see [Breaking Changes](#breaking-changes) below).
 
 Possible `<type>`s:
 
@@ -97,7 +100,38 @@ change.
   (See [Linking a pull request to an issue](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/using-keywords-in-issues-and-pull-requests#linking-a-pull-request-to-an-issue)
   for details.)
 
-Some examples:
+### Breaking Changes
+
+If your commit introduces a change that breaks backward compatibility (e.g. removes or
+renames a public API, changes a function signature, or alters existing behavior in a
+way that requires callers to update their code), it must be flagged the following ways:
+
+**1. Add `!` after the scope in the subject line** to make the breaking change immediately
+visible in the commit history:
+
+```text
+feat(drm)!: replace lv_drm_init() arguments
+```
+
+**2. Add a `BREAKING CHANGE` entry in the footer** to describe what changed and how to
+migrate:
+
+```text
+feat(drm)!: replace lv_drm_init() arguments
+
+The card and connector arguments have been merged into a single
+device path string for consistency with other driver APIs.
+
+BREAKING CHANGE: lv_drm_init(card, connector) is now
+lv_drm_init(device). Replace calls like lv_drm_init(0, 1) with
+lv_drm_init("/dev/dri/card0").
+```
+
+Using both `!` and `BREAKING CHANGE` together is recommended for maximum clarity,
+the `!` signals at a glance that the commit is breaking, while the footer explains
+exactly what callers need to update.
+
+### Commit Message Examples
 
 ```text
 fix(image): update size when a new source is set
@@ -124,6 +158,14 @@ docs(porting): fix typo
 
 ```text
 chore: bump version to release candidate tag
+```
+
+```text
+feat(drm)!: replace lv_drm_init() arguments
+
+BREAKING CHANGE: lv_drm_init(card, connector) is now
+lv_drm_init(device). Replace calls like lv_drm_init(0, 1) with
+lv_drm_init("/dev/dri/card0").
 ```
 
 ### PR Title
