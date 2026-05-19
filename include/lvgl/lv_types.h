@@ -420,7 +420,7 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #ifndef LV_NORETURN
 #if defined(PYCPARSER)
 #define LV_NORETURN
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__IAR_SYSTEMS_ICC__)
 #define LV_NORETURN __attribute__((noreturn))
 #elif defined(_MSC_VER)
 #define LV_NORETURN __declspec(noreturn)
@@ -430,7 +430,7 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #endif /* LV_NORETURN not defined */
 
 #ifndef LV_UNREACHABLE
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__IAR_SYSTEMS_ICC__)
 #define LV_UNREACHABLE() __builtin_unreachable()
 #elif defined(_MSC_VER)
 #define LV_UNREACHABLE() __assume(0)
@@ -461,7 +461,7 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #ifndef LV_DEPRECATED
 #if defined(PYCPARSER)
 #define LV_DEPRECATED(msg)
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__) || defined(__IAR_SYSTEMS_ICC__)
 #define LV_DEPRECATED(msg) __attribute__((deprecated(msg)))
 #elif defined(_MSC_VER)
 #define LV_DEPRECATED(msg) __declspec(deprecated(msg))
@@ -486,7 +486,7 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
  */
 #if defined(PYCPARSER)
 #define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__) || defined(__IAR_SYSTEMS_ICC__)
 #define LV_DEPRECATED_MACRO_WARN(msg) \
 do { \
 typedef int __attribute__((deprecated(msg))) __lv_deprecated_t; \
