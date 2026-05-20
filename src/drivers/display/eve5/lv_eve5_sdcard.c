@@ -749,8 +749,9 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
      * into loadImage_fs via out_* outputs) returns the actual format and
      * lets the truncate step below trim any slack. */
     uint32_t q_w = 0, q_h = 0;
-    if(!EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &q_w, &q_h, NULL)) {
-        LV_LOG_ERROR("CMD_QUERYIMAGE failed for %s", sd_path);
+    uint32_t q_res = EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &q_w, &q_h, NULL);
+    if(q_res != 0) {
+        LV_LOG_ERROR("CMD_QUERYIMAGE failed for %s (code %u)", sd_path, (unsigned)q_res);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -780,9 +781,10 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
         return false;
     }
 
-    if(!EVE_CoCmd_loadImage_fs(phost, final_addr, sd_path, loadimage_opts,
-                               &out_fmt, &out_source, &out_w, &out_h, &out_palette)) {
-        LV_LOG_ERROR("CMD_LOADIMAGE failed for %s", sd_path);
+    uint32_t load_res = EVE_CoCmd_loadImage_fs(phost, final_addr, sd_path, loadimage_opts,
+                                               &out_fmt, &out_source, &out_w, &out_h, &out_palette);
+    if(load_res != 0) {
+        LV_LOG_ERROR("CMD_LOADIMAGE failed for %s (code %u)", sd_path, (unsigned)load_res);
         Esd_GpuAlloc_Free(alloc, final_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
@@ -972,7 +974,7 @@ bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32
 #endif
 
     if(ensure_sd_attached(&s_ctx)
-       && EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &qw, &qh, NULL)
+       && EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &qw, &qh, NULL) == 0
        && qw != 0 && qh != 0) {
         ok = true;
     }

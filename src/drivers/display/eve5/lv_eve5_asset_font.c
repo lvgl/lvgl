@@ -547,8 +547,9 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
      * back via CMD_GETIMAGE. CMD_GETPROPS reads REG_EJPG_DST which the
      * query commands never touch, so it would always come back as 0. */
     uint32_t asset_size = 0;
-    if(!EVE_CoCmd_queryAsset_fs(phost, sd_path, 0, &asset_size)) {
-        LV_LOG_WARN("EVE5 asset font: CMD_QUERYASSET failed for %s", path);
+    uint32_t q_res = EVE_CoCmd_queryAsset_fs(phost, sd_path, 0, &asset_size);
+    if(q_res != 0) {
+        LV_LOG_WARN("EVE5 asset font: CMD_QUERYASSET failed for %s (code %u)", path, (unsigned)q_res);
         return false;
     }
     if(asset_size == 0 || asset_size > (64u * 1024u * 1024u)) {
@@ -566,8 +567,9 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
         return false;
     }
 
-    if(!EVE_CoCmd_loadAsset_fs(phost, final_addr, sd_path, 0)) {
-        LV_LOG_ERROR("EVE5 asset font: SD CMD_LOADASSET failed for %s", path);
+    uint32_t load_res = EVE_CoCmd_loadAsset_fs(phost, final_addr, sd_path, 0);
+    if(load_res != 0) {
+        LV_LOG_ERROR("EVE5 asset font: SD CMD_LOADASSET failed for %s (code %u)", path, (unsigned)load_res);
         Esd_GpuAlloc_Free(alloc, final_handle);
         return false;
     }
