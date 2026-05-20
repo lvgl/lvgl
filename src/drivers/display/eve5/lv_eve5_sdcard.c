@@ -25,6 +25,7 @@
 
 #include "EVE_Hal.h"
 #include "EVE_CoCmd.h"
+#include "EVE_CoCmd_Ext.h"
 #include "EVE_MediaFifo.h"
 #include "Esd_GpuAlloc.h"
 
@@ -722,6 +723,115 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
         return false;
     }
 
+    /* OPT_TRUECOLOR is BT820-only — defaults to RGB565/ARGB4 on earlier gens. */
+    uint32_t loadimage_opts = OPT_NODL;
+    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
+
+    Esd_GpuHandle final_handle;
+    uint32_t final_addr;
+    uint32_t allocated_size;
+    /* Pre-load fallback dims, populated by whichever branch ran. Used only
+     * if the post-load CMD_GETIMAGE fails. */
+    uint32_t fallback_w = 0, fallback_h = 0, fallback_fmt = RGB565;
+
+#if EVE_COCMD_PATCH_QUERY
+    /* Zero-copy fast path: CMD_QUERYIMAGE reports the image dimensions
+     * without writing to RAM_G, replacing the host-side JPEG/PNG header
+     * parse. CMD_LOADIMAGE(OPT_FS) then decodes straight from the SD card
+     * into the destination — no intermediate compressed buffer, no
+     * MediaFIFO setup. We still allocate worst-case ARGB8 from the
+     * queried w/h because the query does not honor OPT_TRUECOLOR (only
+     * w/h are reliable); the post-load CMD_GETIMAGE truncate trims slack.
+     * The is_jpeg/is_png check above already gated this to formats
+     * CMD_QUERYIMAGE supports. */
+    LV_UNUSED(is_png);
+    LV_UNUSED(is_jpeg);
+
+    if(EVE_CoCmd_fsSource(phost, sd_path) != 0) {
+        LV_LOG_ERROR("CMD_FSSOURCE (query) failed for %s", sd_path);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    /* Only w/h from CMD_QUERYIMAGE are reliable. The query does not honor
+     * OPT_TRUECOLOR (and likely other format-affecting options), so the
+     * reported byte size / format / palette size can differ from what
+     * CMD_LOADIMAGE will actually produce. We use the queried dimensions
+     * to replace the host-side header parse and allocate worst-case
+     * ARGB8 — the post-load CMD_GETIMAGE truncate trims any slack. The
+     * big win (no intermediate compressed buffer, no host header parse)
+     * still stands. */
+    EVE_CoCmd_queryImage(phost, OPT_FS);
+    uint32_t q_size = 0, q_fmt = 0, q_w = 0, q_h = 0, q_palsize = 0;
+    if(!EVE_CoCmd_getImage(phost, &q_size, &q_fmt, &q_w, &q_h, &q_palsize)) {
+        LV_LOG_ERROR("CMD_QUERYIMAGE failed for %s", sd_path);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+    LV_UNUSED(q_size);
+    LV_UNUSED(q_fmt);
+    LV_UNUSED(q_palsize);
+    if(q_w == 0 || q_h == 0) {
+        LV_LOG_ERROR("Implausible CMD_QUERYIMAGE result for %s (w=%u h=%u)",
+                     sd_path, (unsigned)q_w, (unsigned)q_h);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    /* Worst-case decoded size: ARGB8 (4 bpp), 4-byte aligned stride.
+     * Matches the legacy path's allocation strategy. */
+    uint32_t decoded_stride = ((q_w * 4u) + 3u) & ~3u;
+    allocated_size = decoded_stride * q_h;
+
+    final_handle = Esd_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
+    final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
+    if(final_addr == GA_INVALID) {
+        LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    /* CMD_QUERYIMAGE consumed FSSOURCE — re-issue before CMD_LOADIMAGE. */
+    if(EVE_CoCmd_fsSource(phost, sd_path) != 0) {
+        LV_LOG_ERROR("CMD_FSSOURCE (load) failed for %s", sd_path);
+        Esd_GpuAlloc_Free(alloc, final_handle);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    EVE_CoCmd_loadImage(phost, final_addr, OPT_FS | loadimage_opts);
+    if(!EVE_Cmd_waitFlush(phost)) {
+        LV_LOG_ERROR("CMD_LOADIMAGE failed");
+        Esd_GpuAlloc_Free(alloc, final_handle);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    fallback_w = q_w;
+    fallback_h = q_h;
+    fallback_fmt = q_fmt;
+
+#else  /* EVE_COCMD_PATCH_QUERY */
+
+    /* Legacy intermediate-buffer path: CMD_FSREAD the whole compressed
+     * file into a temp RAM_G slot, host-parse the header for dimensions,
+     * allocate worst-case decoded buffer, then CMD_LOADIMAGE(OPT_MEDIAFIFO).
+     * Use EVE_COCMD_PATCH_QUERY=1 for the zero-copy CMD_QUERYIMAGE path. */
+    LV_LOG_WARN("EVE5 SD image load uses intermediate RAM_G buffer "
+                "(define EVE_COCMD_PATCH_QUERY=1 for zero-copy CMD_QUERYIMAGE path)");
+
     uint32_t file_size = EVE_CoCmd_fsSize(phost, sd_path);
     if(file_size == 0xFFFFFFFF || file_size == 0) {
         LV_LOG_ERROR("File not found or empty: %s", sd_path);
@@ -780,12 +890,12 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
 
     /* Worst case decoded size: ARGB8 (4 bpp), 4-byte aligned stride */
     uint32_t decoded_stride = ((img_width * 4) + 3) & ~3U;
-    uint32_t decoded_size = decoded_stride * img_height;
+    allocated_size = decoded_stride * img_height;
 
-    Esd_GpuHandle final_handle = Esd_GpuAlloc_Alloc(alloc, decoded_size, GA_ALIGN_4);
-    uint32_t final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
+    final_handle = Esd_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
+    final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
-        LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", decoded_size);
+        LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
         Esd_GpuAlloc_Free(alloc, temp_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
@@ -805,14 +915,10 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
 #endif
         return false;
     }
-
     /* Data already in RAM_G from CMD_FSREAD, just set write pointer */
     EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
 
-    /* OPT_TRUECOLOR is BT820-only — defaults to RGB565/ARGB4 on earlier gens. */
-    uint32_t loadimage_opts = OPT_MEDIAFIFO | OPT_NODL;
-    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
-    EVE_CoCmd_loadImage(phost, final_addr, loadimage_opts);
+    EVE_CoCmd_loadImage(phost, final_addr, OPT_MEDIAFIFO | loadimage_opts);
     if(!EVE_Cmd_waitFlush(phost)) {
         LV_LOG_ERROR("CMD_LOADIMAGE failed");
         EVE_MediaFifo_close(phost);
@@ -824,20 +930,28 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
         return false;
     }
 
-    EVE_Hal_requestFenceBeforeSwap(phost);
-
-    uint32_t out_source, out_fmt, out_w, out_h, out_palette;
-    if(!EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette)) {
-        LV_LOG_WARN("CMD_GETIMAGE failed, using parsed dimensions");
-        out_source = final_addr;
-        out_w = img_width;
-        out_h = img_height;
-        out_fmt = RGB565;
-        out_palette = GA_INVALID;
-    }
-
     EVE_MediaFifo_close(phost);
     Esd_GpuAlloc_Free(alloc, temp_handle);
+
+    fallback_w = img_width;
+    fallback_h = img_height;
+    fallback_fmt = RGB565;
+
+#endif /* EVE_COCMD_PATCH_QUERY */
+
+    EVE_Hal_requestFenceBeforeSwap(phost);
+
+    /* CMD_GETIMAGE after CMD_LOADIMAGE returns actual addresses (not sizes)
+     * for source and palette — shared by both paths. */
+    uint32_t out_source, out_fmt, out_w, out_h, out_palette;
+    if(!EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette)) {
+        LV_LOG_WARN("CMD_GETIMAGE failed, using fallback dimensions");
+        out_source = final_addr;
+        out_w = fallback_w;
+        out_h = fallback_h;
+        out_fmt = fallback_fmt;
+        out_palette = GA_INVALID;
+    }
 
     /* Compute offsets from allocation base */
     uint32_t alloc_base = Esd_GpuAlloc_Get(alloc, final_handle);
@@ -853,7 +967,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t img_end = img_ofs + index_size;
     uint32_t pal_end = (pal_ofs != GA_INVALID) ? (pal_ofs + 256 * 4) : 0;
     uint32_t actual_size = img_end > pal_end ? img_end : pal_end;
-    if(actual_size < decoded_size) {
+    if(actual_size < allocated_size) {
         Esd_GpuAlloc_Truncate(alloc, final_handle, actual_size);
     }
 
