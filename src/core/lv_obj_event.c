@@ -170,7 +170,6 @@ uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
 {
     LV_CHECK_ARG(obj != NULL, return 0);
-    LV_CHECK_ARG(event_cb != NULL, return 0);
 
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t removed_count = 0;
