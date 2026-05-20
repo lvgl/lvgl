@@ -61,7 +61,7 @@ Every XML example opens with a comment block directly above `<screen>`,
 plus one in-view hint. Keep the layers distinct — never repeat a sentence:
 
 - **`@title`** — short, capitalized; mirrors the on-screen label. No "XML".
-- **`@brief`** — one sentence, ≤80 chars, ending with a period.
+- **`@brief`** — one sentence, less than 80 chars, ending with a period.
 - **Description** — 2–3 sentences after `@brief`: name the *specific*
   attributes/values that vary and *why* it's interesting. Self-contained
   (readable without the doc page).
