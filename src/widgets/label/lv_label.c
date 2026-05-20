@@ -233,7 +233,7 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
 
 void lv_label_set_max_lines(lv_obj_t * obj, int32_t lines)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_label_t * label = (lv_label_t *)obj;
     label->max_lines = lines;
     lv_label_refr_text(obj);
@@ -300,7 +300,7 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
 
 int32_t lv_label_get_max_lines(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     const lv_label_t * label = (const lv_label_t *)obj;
     return label->max_lines;
 }
