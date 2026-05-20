@@ -6,17 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_checkbox_private.h"
+
+#if LV_USE_CHECKBOX
+
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_CHECKBOX != 0
-
-#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../core/lv_group.h"
-#include "../../draw/lv_draw.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

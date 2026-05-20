@@ -10,15 +10,13 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_canvas_private.h"
+
+#if LV_USE_CANVAS
+
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_CANVAS != 0
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
 #include "../../draw/lv_draw_private.h"
-#include "../../core/lv_refr.h"
-#include "../../display/lv_display.h"
-#include "../../stdlib/lv_string.h"
 #include "../../misc/cache/lv_cache.h"
 /*********************
  *      DEFINES

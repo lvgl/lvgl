@@ -12,7 +12,16 @@
 
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj_property.h"
+
+/*Check dependencies*/
+#if LV_USE_ARC == 0
+    #error "lv_spinner: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC  1) "
+#endif
+
+/*Check dependencies*/
+#if LV_USE_ARC == 0
+    #error "lv_spinner: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC  1) "
+#endif
 
 /*********************
  *      DEFINES

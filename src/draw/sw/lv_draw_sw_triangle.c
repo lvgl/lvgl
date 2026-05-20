@@ -12,12 +12,7 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_math.h"
-#include "../../stdlib/lv_mem.h"
 #include "../../misc/lv_area_private.h"
-#include "../../misc/lv_color.h"
-#include "../../stdlib/lv_string.h"
-#include "../lv_draw_triangle_private.h"
 #include "lv_draw_sw_grad.h"
 
 /*********************

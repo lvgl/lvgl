@@ -5,10 +5,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_mem.h"
+#include "../../lvgl_public.h"
 #if LV_USE_UEFI
 #if LV_UEFI_USE_MEMORY_SERVICES && LV_USE_STDLIB_MALLOC == LV_STDLIB_CUSTOM
-#include "../drivers/uefi/lv_uefi_private.h"
+#include "../../drivers/uefi/lv_uefi_private.h"
 
 /*********************
  *      DEFINES

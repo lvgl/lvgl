@@ -61,6 +61,16 @@ static void file_explorer_event_handler(lv_event_t * e)
     }
 }
 
+/**
+ * @title Custom file explorer sort
+ * @brief Apply a 3-way quicksort over the file table after each directory load.
+ *
+ * The file explorer is created with `LV_EXPLORER_SORT_NONE` so that default sorting
+ * stays out of the way. On `LV_EVENT_READY`, `lv_file_explorer_get_file_table`
+ * returns the underlying table and a static 3-way quicksort reorders rows by the
+ * kind column. `LV_EVENT_VALUE_CHANGED` still logs the current path and selected
+ * file name.
+ */
 void lv_example_file_explorer_3(void)
 {
     lv_obj_t * file_explorer = lv_file_explorer_create(lv_screen_active());

@@ -90,6 +90,27 @@ class LVObject(Value):
         return int(self.coords.y2)
 
     @property
+    def flags_raw(self) -> int:
+        """Return raw flags bitmask, 0 if corrupted."""
+        raw = self.safe_field("flags", 0)
+        return int(raw)
+
+    @property
+    def flags_list(self) -> list[str]:
+        """Return decoded flag names."""
+        from .lv_obj_flag_consts import decode_obj_flags
+        return decode_obj_flags(self.flags_raw)
+
+    @property
+    def state_raw(self) -> int:
+        return int(self.safe_field("state", 0))
+
+    @property
+    def state_list(self) -> list[str]:
+        from .lv_obj_state_consts import decode_obj_states
+        return decode_obj_states(self.state_raw)
+
+    @property
     def child_cnt(self) -> int:
         """Return child count, 0 if corrupted."""
         if not self.spec_attr:
@@ -153,8 +174,28 @@ class LVObject(Value):
             }, {"x1": 0, "y1": 0, "x2": 0, "y2": 0}),
             ("child_count", lambda s: s.child_cnt, 0),
             ("style_count", lambda s: int(s.style_cnt), 0),
+            ("flags", lambda s: s.flags_raw, 0),
+            ("flags_list", lambda s: s.flags_list, []),
+            ("state", lambda s: s.state_raw, 0),
+            ("state_list", lambda s: s.state_list, []),
             ("parent_addr", lambda s: ptr_or_none(s.super_value("parent"))),
             ("group_addr", lambda s: s._get_group_addr()),
+            ("user_data", lambda s: ptr_or_none(s.safe_field("user_data"))),
+            ("layout_inv", lambda s: bool(s.safe_field("layout_inv", 0, int)), False),
+            ("w_layout", lambda s: bool(s.safe_field("w_layout", 0, int)), False),
+            ("h_layout", lambda s: bool(s.safe_field("h_layout", 0, int)), False),
+            ("is_deleting", lambda s: bool(s.safe_field("is_deleting", 0, int)), False),
+            ("rendered", lambda s: bool(s.safe_field("rendered", 0, int)), False),
+            ("skip_trans", lambda s: bool(s.safe_field("skip_trans", 0, int)), False),
+            ("scroll", lambda s: s._get_scroll()),
+            ("ext_click_pad", lambda s: s._get_spec_int("ext_click_pad")),
+            ("ext_draw_size", lambda s: s._get_spec_int("ext_draw_size")),
+            ("scrollbar_mode", lambda s: s._get_spec_int("scrollbar_mode")),
+            ("scroll_snap_x", lambda s: s._get_spec_int("scroll_snap_x")),
+            ("scroll_snap_y", lambda s: s._get_spec_int("scroll_snap_y")),
+            ("scroll_dir", lambda s: s._get_spec_int("scroll_dir")),
+            ("layer_type", lambda s: s._get_spec_int("layer_type")),
+            ("name", lambda s: s._get_name()),
         ])
         if include_children:
             d["children"] = self._collect_children(include_styles)
@@ -169,7 +210,8 @@ class LVObject(Value):
 
         @Snapshot.fallback()
         def _snap(c):
-            return c.snapshot(
+            w = self._wrap_as_widget(c)
+            return w.snapshot(
                 include_children=True, include_styles=include_styles,
             ).as_dict()
 
@@ -196,6 +238,45 @@ class LVObject(Value):
             return None
         addr = int(grp)
         return hex(addr) if addr else None
+
+    def _get_spec_int(self, field_name):
+        """Get an int field from spec_attr, or None if unavailable."""
+        spec = self.spec_attr
+        if not spec or not int(spec):
+            return None
+        val = spec.safe_field(field_name)
+        if val is None:
+            return None
+        return int(val)
+
+    def _get_scroll(self):
+        """Get scroll offset from spec_attr, or None."""
+        spec = self.spec_attr
+        if not spec or not int(spec):
+            return None
+        scroll = spec.safe_field("scroll")
+        if scroll is None:
+            return None
+        return {"x": int(scroll["x"]), "y": int(scroll["y"])}
+
+    def _get_name(self):
+        """Get object name from spec_attr, or None."""
+        spec = self.spec_attr
+        if not spec or not int(spec):
+            return None
+        name = spec.safe_field("name")
+        if name is None or not int(name):
+            return None
+        return name.string()
+
+    @staticmethod
+    def _wrap_as_widget(obj):
+        """Try to wrap an LVObject as its specific widget type."""
+        try:
+            from lvglgdb.lvgl.widgets import wrap_widget
+            return wrap_widget(obj) or obj
+        except ImportError:
+            return obj
 
 
 def dump_obj_info(obj: LVObject):

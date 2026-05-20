@@ -19,7 +19,15 @@ static void roller_key_cb(lv_event_t * e)
 }
 
 /**
- * Grid navigation for only one axis
+ * @title Single-axis gridnav with pass-through keys
+ * @brief Forward the unused axis to sliders and rollers so they mirror each other.
+ *
+ * The top container registers with `LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY` and holds
+ * three sliders; left and right arrows pass through as `LV_EVENT_KEY` to the
+ * focused slider. The bottom container uses `LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY`
+ * and holds three rollers; up and down pass through to the focused roller. Key
+ * callbacks mirror values so roller i tracks slider i through
+ * `lv_roller_set_selected` and `lv_slider_set_value` with `LV_ANIM_ON`.
  */
 void lv_example_gridnav_5(void)
 {

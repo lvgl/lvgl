@@ -1,0 +1,53 @@
+/**
+ * @file lv_wayland.h
+ */
+
+#ifndef LV_WAYLAND_H
+#define LV_WAYLAND_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "../../config/lv_conf_internal.h"
+
+#if LV_USE_WAYLAND
+
+#include "lv_wayland_keyboard.h"
+#include "lv_wayland_pointer.h"
+#include "lv_wayland_touch.h"
+#include "lv_wayland_window.h"
+#include "lv_wayland_pointer_axis.h"
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+/**
+ * Retrieves the file descriptor of the wayland socket
+ */
+int lv_wayland_get_fd(void);
+
+/**********************
+ *      MACROS
+ **********************/
+
+#endif /* LV_USE_WAYLAND */
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif /* LV_WAYLAND_H */

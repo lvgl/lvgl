@@ -6,17 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_translation.h"
+#include "lv_translation_private.h"
 #if LV_USE_TRANSLATION
 
-#include "lv_translation_private.h"
-#include "../../misc/lv_ll.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_assert.h"
 #include "../../core/lv_global.h"
-#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES

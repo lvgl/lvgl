@@ -58,7 +58,18 @@ static void end_event_cb(lv_event_t * e)
 }
 
 /**
- * Play with the conical gradient
+ * @title Conical gradient with draggable angles
+ * @brief Drag two bullets to set the start and end angles of a conical gradient.
+ *
+ * A centered 80% by 80% object carries a two-stop conical gradient built
+ * with `lv_grad_init_stops` and `lv_grad_conical_init` centered at 50% by
+ * 50% sweeping from 0 to 180 degrees with `LV_GRAD_EXTEND_PAD`. Two small
+ * buttons act as angle handles; their `LV_EVENT_PRESSING` callbacks read
+ * the pointer, reposition the handle, and recompute
+ * `dsc->params.conical.start_angle` or `dsc->params.conical.end_angle`
+ * with `lv_atan2` relative to the parent center before invalidating it.
+ * When `LV_USE_DRAW_SW_COMPLEX_GRADIENTS` is disabled, the example
+ * instead shows a single label noting the dependency.
  */
 void lv_example_grad_4(void)
 {

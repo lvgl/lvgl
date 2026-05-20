@@ -7,11 +7,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+
+#include "../../lvgl_public.h"
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_CLIB
+
 #include <stdio.h>
-#include <stdarg.h>
-#include "../lv_sprintf.h"
+#include LV_STDARG_INCLUDE
 
 /*********************
  *      DEFINES

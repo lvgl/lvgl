@@ -11,6 +11,8 @@
 
 #if LV_USE_GLTF
 #include <fastgltf/tools.hpp>
+#include <fastgltf/math.hpp>
+#include "lv_gltf_data_internal.hpp"
 
 /*********************
  *      DEFINES
@@ -26,8 +28,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#include "fastgltf/math.hpp"
-#include "lv_gltf_data_internal.hpp"
 static fastgltf::math::fvec3 animation_get_vec3_at_timestamp(lv_gltf_model_t * data,
                                                              fastgltf::AnimationSampler * sampler,
                                                              float seconds);

@@ -61,6 +61,7 @@ endif()
 # Determine if LVGL is built from a top-level directory
 get_directory_property(HAS_PARENT_SCOPE PARENT_DIRECTORY)
 
+set(LVGL_INCLUDE_DIR ${LVGL_ROOT_DIR}/include)
 
 # Set sources used for LVGL components
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c
@@ -70,6 +71,9 @@ file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp
                                  ${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/*.cpp)
+
+# Remove the ThorVG sources from the main sources
+list(REMOVE_ITEM SOURCES ${THORVG_SOURCES})
 
 # Check for the case where LVGL is distributed with only its source code
 if(NOT EXAMPLE_SOURCES AND CONFIG_LV_BUILD_EXAMPLES)
@@ -175,7 +179,7 @@ if (LV_BUILD_SET_CONFIG_OPTS)
 
     execute_process(
         COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
-        --input ${LVGL_ROOT_DIR}/src/lv_conf_internal.h
+        --input ${LVGL_INCLUDE_DIR}/lvgl/config/lv_conf_internal.h
         --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
         --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
         --workfolder ${CMAKE_CURRENT_BINARY_DIR}
@@ -218,9 +222,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/dependencies.cmake)
 
 # Set the configuration inc dir for all targets created in this CMakeLists.txt
 # CMAKE_CURRENT_SOURCE_DIR is necessary because the assets include lvgl/lvgl.h ...
-include_directories(${CONF_INC_DIR} ${LVGL_ROOT_DIR})
+include_directories(${CONF_INC_DIR} ${LVGL_INCLUDE_DIR} ${LVGL_INCLUDE_DIR}/lvgl)
 
-target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${CONF_INC_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LVGL_INCLUDE_DIR} ${CONF_INC_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Propagate the compiler definitions set on LVGL to the rest of the targets
 # mentioned in this file
@@ -296,16 +300,7 @@ endif()
 
 ############################## INSTALLATION ######################################
 
-# Library and headers can be installed to system using make install
-file(GLOB LVGL_PUBLIC_HEADERS
-    "${LVGL_ROOT_DIR}/lvgl.h"
-    "${CONF_INC_DIR}/*.h"
-    "${LVGL_ROOT_DIR}/lv_version.h")
-
-if (CONFIG_LV_USE_PRIVATE_API)
-    list(APPEND LVGL_PUBLIC_HEADERS "${LVGL_ROOT_DIR}/lvgl_private.h")
-endif()
-
+# Install directory defaults
 if("${LIB_INSTALL_DIR}" STREQUAL "")
     set(LIB_INSTALL_DIR "lib")
 endif()
@@ -313,63 +308,64 @@ if("${RUNTIME_INSTALL_DIR}" STREQUAL "")
     set(RUNTIME_INSTALL_DIR "bin")
 endif()
 if("${INC_INSTALL_DIR}" STREQUAL "")
-    set(INC_INSTALL_DIR "include/lvgl")
+    set(INC_INSTALL_DIR "include")
 endif()
 
-#Install public headers
+# Install public headers
 install(
-    DIRECTORY "${LVGL_ROOT_DIR}/src"
-    DESTINATION "${INC_INSTALL_DIR}"
-    FILES_MATCHING
-    PATTERN "*.h"
-    PATTERN "*_private.h" EXCLUDE)
+    DIRECTORY "${LVGL_ROOT_DIR}/include/lvgl"
+    DESTINATION "${INC_INSTALL_DIR}")
 
-if (CONFIG_LV_USE_PRIVATE_API)
-    # Install private headers - only if required
+# Install private headers only if required
+if(CONFIG_LV_USE_PRIVATE_API)
     install(
-        DIRECTORY "${LVGL_ROOT_DIR}/src"
+        DIRECTORY "${LVGL_ROOT_DIR}/src/"
+        DESTINATION "${INC_INSTALL_DIR}/lvgl_private"
+        FILES_MATCHING PATTERN "*.h")
+
+    # In the source tree, `lvgl_public.h` includes the public API via "../include/lvgl/lvgl.h".
+    # When installed, `lvgl/` and `lvgl_private/` are siblings under `include/`, so the path
+    # is patched to "../lvgl/lvgl.h" to match the installed layout.
+    # No other changes are required to other files because the `lvgl_private` folder structure
+    # is the same as the one in `src` meaning that all other includes work, as long as all
+    # private header files always go through `lvgl_public.h` to include public API symbols
+    install(CODE "
+	file(READ \"\${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/lvgl_private/lvgl_public.h\" content)
+        string(REPLACE \"../include/lvgl/lvgl.h\" \"../lvgl/lvgl.h\" content \"\${content}\")
+        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/lvgl_private/lvgl_public.h\" \"\${content}\")
+    ")
+endif()
+
+# When KConfig is used, copy the expanded conf header and rename it to lv_conf.h
+if(LV_BUILD_USE_KCONFIG)
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h"
         DESTINATION "${INC_INSTALL_DIR}"
-        FILES_MATCHING
-        PATTERN "*_private.h")
+        RENAME lv_conf.h)
 endif()
 
-
-if (LV_BUILD_USE_KCONFIG)
-    # When KConfig is used, copy the expanded conf header
-    # and rename it to lv_conf.h
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
-            DESTINATION ${INC_INSTALL_DIR}
-            RENAME lv_conf.h)
-endif()
+# Configure and install generated files
+configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc" @ONLY)
+configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/lv_version.h" @ONLY)
 
 install(
-    FILES ${LVGL_PUBLIC_HEADERS}
-    DESTINATION "${INC_INSTALL_DIR}/")
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
+    DESTINATION "share/pkgconfig/")
 
 # Install library
-set_target_properties(
-    lvgl
-    PROPERTIES OUTPUT_NAME lvgl
-    VERSION ${LVGL_VERSION}
-    SOVERSION ${LVGL_SOVERSION}
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-    PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+set_target_properties(lvgl
+    PROPERTIES
+        OUTPUT_NAME lvgl
+        VERSION ${LVGL_VERSION}
+        SOVERSION ${LVGL_SOVERSION}
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
 
 install(
     TARGETS lvgl
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
     LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
-    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
-
-# TODO: if LVGL is linked with something else eg Freetype, Pkgconfig file must contain -lfreetype2
-configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" ${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc @ONLY)
-configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" ${CMAKE_CURRENT_BINARY_DIR}/lv_version.h @ONLY)
-
-install(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
-    DESTINATION "share/pkgconfig/")
+    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}")
 
 # Install library thorvg
 if(CONFIG_LV_USE_THORVG_INTERNAL)
@@ -396,7 +392,7 @@ if(CONFIG_LV_BUILD_DEMOS)
 
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/demos"
-        DESTINATION "${INC_INSTALL_DIR}"
+        DESTINATION "${INC_INSTALL_DIR}/lvgl"
         FILES_MATCHING
         PATTERN "*.h")
 
@@ -422,7 +418,7 @@ if(CONFIG_LV_BUILD_EXAMPLES)
 
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples"
-        DESTINATION "${INC_INSTALL_DIR}"
+        DESTINATION "${INC_INSTALL_DIR}/lvgl"
         FILES_MATCHING
         PATTERN "*.h")
 

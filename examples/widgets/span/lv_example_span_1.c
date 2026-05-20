@@ -14,7 +14,15 @@ static void click_event_cb(lv_event_t * e)
 }
 
 /**
- * Create spans and get clicked one
+ * @title Styled spans with click hit-test
+ * @brief Stack multiple styled spans in one group and log the clicked segment.
+ *
+ * A centered `lv_spangroup` of width 300 and `LV_SIZE_CONTENT` height is styled
+ * with an orange 1 px border and 20 px indent, and uses
+ * `LV_SPAN_OVERFLOW_CLIP`. Five spans add text with per-segment color,
+ * `LV_TEXT_DECOR_UNDERLINE`, `LV_TEXT_DECOR_STRIKETHROUGH`, reduced opacity, and
+ * alternate fonts. A `LV_EVENT_CLICKED` handler resolves the clicked point to a
+ * span via `lv_spangroup_get_span_by_point` and logs its text.
  */
 void lv_example_span_1(void)
 {

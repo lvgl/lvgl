@@ -2,9 +2,16 @@
 #if LV_USE_TILEVIEW && LV_BUILD_EXAMPLES
 
 /**
- * Create a 2x2 tile view and allow scrolling only in an "L" shape.
- * Demonstrate scroll chaining with a long list that
- * scrolls the tile view when it can't be scrolled further.
+ * @title L-shaped tile view with scroll chaining
+ * @brief Three tiles in an L layout where a ten-item list chains its scroll to the tile view.
+ *
+ * `lv_tileview_add_tile` places a label tile at (0, 0) allowing
+ * `LV_DIR_BOTTOM`, a button tile at (0, 1) allowing `LV_DIR_TOP` and
+ * `LV_DIR_RIGHT`, and a list tile at (1, 1) allowing `LV_DIR_LEFT`.
+ * The button tile holds a centered `lv_button` labeled
+ * `Scroll up or right`; the list tile holds a full-size `lv_list`
+ * with ten buttons `One` through `Ten` whose scroll chains back into
+ * the tile view when the list reaches its edge.
  */
 void lv_example_tileview_1(void)
 {

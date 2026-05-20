@@ -9,9 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from enum_parser import parse_enum, generate_dict_module
 
 LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
+LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
 OUTPUT = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "draw" / "lv_draw_consts.py"
 
-DRAW_H = LVGL_SRC / "draw" / "lv_draw.h"
+DRAW_H = LVGL_INC / "draw" / "lv_draw.h"
 DRAW_DIR = LVGL_SRC / "draw"
 
 

@@ -1,0 +1,29 @@
+name: Verify PR title format
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  check-pr-title:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Self-test commit message checker
+        run: python3 scripts/commit_msg_check.py --self-test
+      - name: Check PR title format
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: python3 scripts/commit_msg_check.py --check-title "$PR_TITLE"

@@ -2,7 +2,16 @@
 #if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 /**
- * Show how to style a slider.
+ * @title Fully styled slider parts
+ * @brief Restyle every part of a slider with a cyan palette and pressed-state darkening.
+ *
+ * The theme styles are removed from a centered slider and four local styles
+ * are attached. The `LV_PART_MAIN` track is grey with negative vertical
+ * padding so the indicator overflows, the `LV_PART_INDICATOR` uses
+ * `LV_PALETTE_CYAN`, and the `LV_PART_KNOB` adds a darker border plus 6 px
+ * padding. A shared pressed-state style darkens both the indicator and knob,
+ * and a 300 ms linear transition on `LV_STYLE_BG_COLOR` cross-fades the
+ * color change.
  */
 void lv_example_slider_2(void)
 {

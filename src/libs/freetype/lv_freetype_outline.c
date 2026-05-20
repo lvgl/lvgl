@@ -7,11 +7,13 @@
  *      INCLUDES
  *********************/
 
+#include "../../lvgl_public.h"
 #include "../../misc/lv_event_private.h"
-#include "../../lvgl.h"
 #include "lv_freetype_private.h"
 
 #if LV_USE_FREETYPE
+
+#include "../../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES
@@ -128,7 +130,7 @@ static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, 
                              dsc->cache_node->face,
                              node->glyph_index,
                              dsc->cache_node->ref_size,
-                             dsc->style & LV_FREETYPE_FONT_STYLE_BOLD ? 1 : 0);
+                             (dsc->style & LV_FREETYPE_FONT_STYLE_BOLD) && !FT_HAS_MULTIPLE_MASTERS(dsc->cache_node->face) ? 1 : 0);
     lv_mutex_unlock(&dsc->cache_node->face_lock);
 
     if(!outline) {

@@ -9,13 +9,12 @@
 
 #include "lv_arclabel_private.h"
 
-#if LV_USE_ARCLABEL != 0
+#if LV_USE_ARCLABEL
 
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../misc/lv_area_private.h"
-#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 
 #if LV_USE_FLOAT

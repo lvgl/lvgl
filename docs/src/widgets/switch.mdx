@@ -1,0 +1,82 @@
+---
+title: "Switch (lv_switch)"
+description: "Switch Widgets look like little sliders and are used to display, and optionally modify, a value that can be \"on\" or \"off\"."
+---
+
+## Overview
+
+Switch Widgets look like little sliders and are used to display, and optionally
+modify, a value that can be "on" or "off".
+
+By default, a Switch is oriented horizontally. Its orientation will be vertical
+if you set `width` &lt; `height`.
+
+## Parts and Styles
+
+- <ApiLink name="LV_PART_MAIN" /> Switch's background; uses the [typical
+   background style properties](/common-widget-features/styles/overview). `padding` makes the indicator smaller
+   in the respective direction.
+- <ApiLink name="LV_PART_INDICATOR" /> The indicator that shows the current state of
+   the Switch; also uses the [typical background style properties](/common-widget-features/styles/overview).
+- <ApiLink name="LV_PART_KNOB" /> A rectangle (or circle) drawn at the left or right
+   side of the indicator; also uses the [typical background style properties](/common-widget-features/styles/overview) to modify the knob's appearance. By default, the knob is round
+   (radius-style can modify this) with diameter slightly smaller than the smaller
+   side of the slider.  The knob can be made larger with the `padding` values.
+   Padding values can be asymmetric as well.
+
+## Usage
+
+### Change state
+
+The Switch uses the standard <ApiLink name="LV_STATE_CHECKED" /> state.
+
+To get the current state of the Switch (with `true` being ON), use
+<ApiLink name="lv_obj_has_state" display="lv_obj_has_state(widget, LV_STATE_CHECKED)" />.
+
+Call <ApiLink name="lv_obj_add_state" display="lv_obj_add_state(widget, LV_STATE_CHECKED)" /> to turn it on, or
+<ApiLink name="lv_obj_remove_state" display="lv_obj_remove_state(widget, LV_STATE_CHECKED)" /> to turn it off
+programmatically.
+
+### Change orientation
+
+With a Switch is created, its default orientation is
+<ApiLink name="LV_SWITCH_ORIENTATION_AUTO" />, which causes it to be oriented based
+on `width` and `height`.  You can change this behavior using
+<ApiLink name="lv_switch_set_orientation" display="lv_switch_set_orientation(widget, orientation)" />.  Possible values for
+`orientation` are:
+
+- <ApiLink name="LV_SWITCH_ORIENTATION_AUTO" />
+- <ApiLink name="LV_SWITCH_ORIENTATION_HORIZONTAL" />
+- <ApiLink name="LV_SWITCH_ORIENTATION_VERTICAL" />
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when Switch changes state.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Keys
+
+- `LV_KEY_UP/RIGHT` Turns Switch ON
+- `LV_KEY_DOWN/LEFT` Turns Switch OFF
+- <ApiLink name="LV_KEY_ENTER" /> Toggles the Switch
+
+<Callout type="info" title="Further Reading">
+Learn more about [Keys](/main-modules/indev/keypad).
+</Callout>
+
+## Examples
+
+### Simple Switch
+
+<LvglExample name="lv_example_switch_1" path="widgets/switch/lv_example_switch_1" />
+
+### Switch Orientation
+
+<LvglExample name="lv_example_switch_2" path="widgets/switch/lv_example_switch_2" />
+
+## API

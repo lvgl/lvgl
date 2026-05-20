@@ -12,7 +12,15 @@ static void set_scale(void * img, int32_t v)
 }
 
 /**
- * Show transformations (zoom and rotation) using a pivot point.
+ * @title Rotate and zoom around a pivot
+ * @brief Spin and scale a cogwheel image continuously around its top-left corner.
+ *
+ * `lv_image_set_pivot` moves the transform origin to (0, 0) so the
+ * image rotates around its top-left corner. One `lv_anim_t` drives
+ * `lv_image_set_rotation` from 0 to 3600 over 5000 ms and repeats
+ * forever with `LV_ANIM_REPEAT_INFINITE`. A second animation drives
+ * `lv_image_set_scale` from 128 to 256 with a 3000 ms reverse phase
+ * so the image pulses while spinning.
  */
 void lv_example_image_3(void)
 {

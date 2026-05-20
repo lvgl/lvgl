@@ -50,6 +50,17 @@ static void timer_cb(lv_timer_t * timer)
     counter++;
 }
 
+/**
+ * @title Windstorm text along a curve
+ * @brief Scatter characters along an amplitude-growing sine curve, redrawn per frame with shifting colors.
+ *
+ * A 300x200 `LV_COLOR_FORMAT_ARGB8888` canvas is centered on the active
+ * screen. A 16 ms `lv_timer` clears the canvas to white and places each
+ * letter of a fixed string on a curve whose X uses `cos` and whose Y
+ * blends index-scaled `sin` with the counter, producing a spreading
+ * windstorm shape. Letters are drawn with `lv_draw_letter`, rotated by
+ * the tangent and colored via `lv_color_hsv_to_rgb`.
+ */
 void lv_example_canvas_12(void)
 {
     /*Create a buffer for the canvas*/

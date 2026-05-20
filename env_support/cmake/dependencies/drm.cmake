@@ -16,6 +16,7 @@ if(LV_USE_PKG_CONFIG_LIBDRM AND PkgConfig_FOUND)
   pkg_check_modules(LIBDRM IMPORTED_TARGET QUIET libdrm)
   if(LIBDRM_FOUND)
     message(STATUS "lvgl: libdrm: found via pkg-config")
+    # Link libdrm publicly since lvgl headers expose drm types
     target_link_libraries(lvgl PRIVATE PkgConfig::LIBDRM)
     return()
   endif()

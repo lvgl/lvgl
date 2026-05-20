@@ -2,7 +2,13 @@
 #if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
- * Demonstrate grid's "free unit"
+ * @title Grid free units (FR)
+ * @brief Distribute leftover space between grid tracks using FR units.
+ *
+ * A 300x220 container uses three columns (60 px, FR(1), FR(2)) and three
+ * rows (50 px, FR(1), 50 px). Nine child objects fill the cells with
+ * `LV_GRID_ALIGN_STRETCH`. Pixel tracks take their fixed size first; the
+ * remaining space is divided between FR tracks in proportion to their weights.
  */
 void lv_example_grid_3(void)
 {

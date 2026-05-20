@@ -11,6 +11,17 @@ static void event_handler(lv_event_t * e)
     }
 }
 
+/**
+ * @title Vertical switch orientation
+ * @brief Two 30 x 60 switches, one horizontal and one forced to vertical orientation.
+ *
+ * The active screen is laid out as `LV_FLEX_FLOW_ROW` with centered flex
+ * alignment. Both switches are sized 30 x 60 so one is taller than it is
+ * wide; the first keeps the default orientation while the second calls
+ * `lv_switch_set_orientation(..., LV_SWITCH_ORIENTATION_VERTICAL)` and starts
+ * in `LV_STATE_CHECKED`. A shared callback logs `On` or `Off` on
+ * `LV_EVENT_VALUE_CHANGED`.
+ */
 void lv_example_switch_2(void)
 {
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW);

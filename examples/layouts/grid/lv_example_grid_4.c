@@ -2,7 +2,14 @@
 #if LV_USE_GRID && LV_BUILD_EXAMPLES
 
 /**
- * Demonstrate track placement
+ * @title Track placement in extra space
+ * @brief Place nine grid cells with space-between columns and bottom-aligned rows.
+ *
+ * A 300x220 container defines three 60 px columns and three 45 px rows that
+ * do not fill the full size. `lv_obj_set_grid_align` is called with
+ * `LV_GRID_ALIGN_SPACE_BETWEEN` for columns and `LV_GRID_ALIGN_END` for rows,
+ * so leftover horizontal space is distributed between the three columns and
+ * the rows collapse against the bottom of the container.
  */
 void lv_example_grid_4(void)
 {

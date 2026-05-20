@@ -18,7 +18,17 @@ static lv_subject_t subject_room_temperature;
 static lv_subject_t subject_theme;
 
 /**
- * Very simple and elegant way to create light and dark themes with subjects
+ * @title Light and dark themes via `lv_obj_bind_style`
+ * @brief Apply a second style only when a theme subject equals the selected value.
+ *
+ * Two subjects are created: `subject_room_temperature` for a value shown on a
+ * slider and label, and `subject_theme` with values 0 (light) and 1 (dark).
+ * Light styles are applied unconditionally; dark overrides are attached with
+ * `lv_obj_bind_style` tied to `subject_theme == 1` on the screen, a container,
+ * the slider main, indicator, and knob parts, and a dropdown. The dropdown's
+ * options are `"Light\nDark"` and bound with `lv_dropdown_bind_value`.
+ * `lv_slider_bind_value` ties the slider to the temperature subject with range
+ * 20 to 40.
  */
 void lv_example_observer_7(void)
 {

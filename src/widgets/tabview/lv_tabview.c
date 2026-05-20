@@ -7,12 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_tabview_private.h"
-#include "../../core/lv_obj_class_private.h"
-#include "../../lvgl.h"
 
 #if LV_USE_TABVIEW
 
-#include "../../misc/lv_assert.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../indev/lv_indev_private.h"
 
 /*********************

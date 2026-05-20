@@ -773,6 +773,34 @@ void test_label_long_mode_clip(void)
     TEST_ASSERT_EQUAL_SCREENSHOT(buf);
 }
 
+void test_label_max_lines(void)
+{
+    lv_obj_clean(lv_screen_active());
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_text_line_space(parent, 10, LV_PART_MAIN);
+
+    const char * texts[] = {
+        "Fits in single line",
+        "Length such that exactly three lines will be needed for this text",
+        "Text\nwith line breaks\nwhere display will need more than three lines",
+    };
+
+    for(int i = 0; i < 3; i++) {
+        lv_obj_t * test_label = lv_label_create(parent);
+        lv_obj_set_width(test_label, 200);
+        lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(test_label, LV_OPA_100, LV_PART_MAIN);
+        lv_label_set_long_mode(test_label, LV_LABEL_LONG_MODE_DOTS);
+        lv_label_set_text(test_label, texts[i]);
+        lv_label_set_max_lines(test_label, 3);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_lines.png");
+}
+
 void test_label_wrap_mode_clip(void)
 {
     lv_obj_clean(lv_screen_active());
@@ -941,6 +969,51 @@ void test_label_preserve_spaces_after_explicit_newline(void)
     lv_obj_set_style_bg_opa(test_label, LV_OPA_COVER, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_preserve_indent_after_newline.png");
+}
+
+void test_label_text_trim(void)
+{
+    lv_obj_t * parent = lv_screen_active();
+    lv_obj_clean(parent);
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(parent, 32, 0);
+    lv_obj_set_style_pad_all(parent, 32, 0);
+    lv_obj_set_style_text_font(parent, &lv_font_montserrat_40, 0);
+
+    lv_obj_t * label1 = lv_label_create(parent);
+    lv_label_set_text(label1, "Text Leading Trim None");
+    lv_obj_set_style_bg_color(label1, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label1, LV_OPA_50, 0);
+
+    lv_obj_t * label2 = lv_label_create(parent);
+    lv_label_set_text(label2, "Text Leading Trim Capital");
+    lv_obj_set_style_bg_color(label2, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label2, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label2, LV_TEXT_LEADING_TRIM_CAPITAL,
+                                       LV_PART_MAIN);
+
+    lv_obj_t * label3 = lv_label_create(parent);
+    lv_label_set_text(label3, "Text Leading Trim Lower");
+    lv_obj_set_style_bg_color(label3, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label3, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label3, LV_TEXT_LEADING_TRIM_LOWER,
+                                       LV_PART_MAIN);
+
+    lv_obj_t * label4 = lv_label_create(parent);
+    lv_label_set_text(label4, "Text Leading Trim Capital Baseline");
+    lv_obj_set_style_bg_color(label4, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label4, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(
+        label4, LV_TEXT_LEADING_TRIM_CAPITAL_BASELINE, LV_PART_MAIN);
+
+    lv_obj_t * label5 = lv_label_create(parent);
+    lv_label_set_text(label5, "Text Leading Trim Lower Baseline");
+    lv_obj_set_style_bg_color(label5, lv_color_hex(0xFFCCCC), 0);
+    lv_obj_set_style_bg_opa(label5, LV_OPA_50, 0);
+    lv_obj_set_style_text_leading_trim(label5, LV_TEXT_LEADING_TRIM_LOWER_BASELINE,
+                                       LV_PART_MAIN);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_text_trim.png");
 }
 
 #endif

@@ -14,12 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OPENGLES
-
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_color.h"
 
 #if !LV_USE_MATRIX
 #error "LV_USE_OPENGLES requires LV_USE_MATRIX"

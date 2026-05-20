@@ -14,19 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_DRAW_NANOVG
-#include "../lv_draw.h"
+
 #include "../lv_draw_private.h"
-#include "../../draw/lv_draw_vector.h"
-#include "../../draw/lv_draw_arc.h"
-#include "../../draw/lv_draw_rect.h"
-#include "../../draw/lv_draw_3d.h"
-#include "../../draw/lv_draw_image.h"
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_line.h"
-#include "../../draw/lv_draw_triangle.h"
 #include "../../misc/lv_area_private.h"
 
 #if !LV_USE_NANOVG
@@ -251,10 +243,10 @@ void lv_nanovg_draw_grad_helper(
  *      MACROS
  **********************/
 
+#endif /*LV_USE_DRAW_NANOVG*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
-
-#endif /*LV_USE_DRAW_NANOVG*/
 
 #endif /*LV_DRAW_NANOVG_PRIVATE_H*/

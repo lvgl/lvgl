@@ -1,0 +1,36 @@
+---
+title: QR Code
+description: "The QR-Code-generator library by nayuki is a 3rd-party library that generates QR-Code bitmaps."
+---
+
+The [QR-Code-generator library](https://github.com/nayuki/QR-Code-generator) by
+[nayuki](https://github.com/nayuki) is a 3rd-party library that generates QR-Code
+bitmaps.
+
+The lv_qrcode LVGL extension is an interface to that library which implements a custom
+Widget that generates and displays QR Codes using the library.
+
+## Usage
+
+Enable <ApiLink name="LV_USE_QRCODE" /> in `lv_conf.h` by setting its value to `1`.
+
+Use <ApiLink name="lv_qrcode_create" /> to create the QR-Code Widget.  Then use
+<ApiLink name="lv_qrcode_update" /> to generate the QR Code on it.
+
+If you need to re-modify the size and color, use
+<ApiLink name="lv_qrcode_set_size" /> and <ApiLink name="lv_qrcode_set_dark_color" /> or
+<ApiLink name="lv_qrcode_set_light_color" /> respectively, and then
+call <ApiLink name="lv_qrcode_update" /> again to update the QR Code.
+
+## Notes
+
+- QR Codes with less data are smaller, but they are scaled by an integer
+   value to best fit to the given size.
+
+## Example
+
+### Create a QR Code
+
+<LvglExample name="lv_example_qrcode_1" path="libs/qrcode/lv_example_qrcode_1" />
+
+## API

@@ -6,17 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_scale_private.h"
-#include "../../core/lv_obj_private.h"
-#include "../../core/lv_obj_class_private.h"
-#if LV_USE_SCALE != 0
+#include "../../lvgl_public.h"
 
-#include "../../core/lv_group.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
+#if LV_USE_SCALE
+
+#include "lv_scale_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
-#include "../../draw/lv_draw_arc.h"
+#include "../../core/lv_obj_class_private.h"
 
 /*********************
  *      DEFINES
@@ -906,6 +903,9 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     else { /* Add label with mapped values */
         lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+        /* LVGL guarantees it will copy the label text if the text is local*/
+        /* TODO: get rid of text_local and this suppression*/
+        /*cppcheck-suppress autoVariables*/
         label_dsc->text = text_buffer;
         label_dsc->text_local = 1;
     }
@@ -1017,9 +1017,17 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
 
     const uint32_t total_tick_count = scale->total_tick_count;
 
-    if(total_tick_count <= 1) return;
     /* Not supported in round modes */
     if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) return;
+
+    /* Reset compensation when scale has 1 or less ticks on vertical and horizontal scales */
+    if(total_tick_count <= 1) {
+        /* Store initial tick width to be used in the main line drawing */
+        scale_store_main_line_tick_width_compensation(obj, 0U, false, 0U, 0U);
+
+        /* Store last tick width to be used in the main line drawing */
+        scale_store_main_line_tick_width_compensation(obj, total_tick_count, false, 0U, 0U);
+    }
 
     /* Major tick style */
     lv_draw_line_dsc_t major_tick_dsc;
@@ -1074,8 +1082,6 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(event);
-
-    if(scale->total_tick_count <= 1) return;
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {

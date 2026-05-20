@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from enum_parser import parse_enum, generate_dict_module
 
-LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
+LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
 OUTPUT = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "misc" / "lv_event_consts.py"
 
 SKIP_EVENTS = {"LV_EVENT_LAST", "LV_EVENT_PREPROCESS", "LV_EVENT_MARKED_DELETING"}
@@ -15,7 +15,7 @@ SKIP_EVENTS = {"LV_EVENT_LAST", "LV_EVENT_PREPROCESS", "LV_EVENT_MARKED_DELETING
 
 def main():
     event_codes = parse_enum(
-        LVGL_SRC / "misc" / "lv_event.h",
+        LVGL_INC / "core" / "lv_event.h",
         "lv_event_code_t",
         "LV_EVENT_",
         skip=SKIP_EVENTS,

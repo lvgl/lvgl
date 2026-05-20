@@ -1,7 +1,7 @@
 #include "../../../lvgl.h"
 #if LV_USE_FS_LITTLEFS
 
-#include "lfs.h"
+#include <lfs.h>
 #include "../../core/lv_global.h"
 
 #if !LV_FS_IS_VALID_LETTER(LV_FS_LITTLEFS_LETTER)

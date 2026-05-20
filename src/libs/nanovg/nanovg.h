@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NANOVG
 

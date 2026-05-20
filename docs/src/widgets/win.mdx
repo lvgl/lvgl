@@ -1,0 +1,95 @@
+---
+title: "Window (lv_win)"
+description: "The Window Widget is built from a header (like a title bar) with title and buttons and a content area."
+---
+
+## Overview
+
+The Window Widget is built from a header (like a title bar) with title and
+buttons and a content area.
+
+## Parts and Styles
+
+The Window is built from other Widgets so you can check their
+documentation for details:
+
+- Background: [base widget](/widgets/base_widget)
+- Header on the background: [base widget](/widgets/base_widget)
+- Title on the header: [Label (lv_label)](/widgets/label)
+- Buttons on the header: [Button (lv_button)](/widgets/button)
+- Content Area on the background: [base widget](/widgets/base_widget)
+
+## Usage
+
+### Create a Window
+
+<ApiLink name="lv_win_create" display="lv_win_create(parent)" /> creates a Window that is initially
+composed of the following Widget structure:
+
+- Background (a [base widget](/widgets/base_widget), the main window container), is set up to be a
+  Flex-Flow container that flows its contained Widgets vertically
+  (<ApiLink name="LV_FLEX_FLOW_COLUMN" />).
+- Header (like a title bar) is initially empty, and is a Flex-Flow container set up
+  to flow its contained Widgets horizontally (<ApiLink name="LV_FLEX_FLOW_ROW" />),
+  left to right.  The Header occupies the full width of the Background (its parent)
+  and the top approximately 1/2 inch (according to <ApiLink name="LV_DPI_DEF" />).
+- Content Area (a [base widget](/widgets/base_widget)) occupies the full width of the Background (its
+  parent) the remainder of the available Background area below the Header.  It is
+  *not itself* a Flex-Flow container, but you can make it so if you wish.  See
+  [Flex](/common-widget-features/layouts/flex) for details.
+
+### Title and buttons
+
+You can add Button and Label Widgets to the Header using these two functions.  They
+will be placed in the Header in left-to-right order as they are added.  These
+functions can be called in any order, any number of times.
+
+- <ApiLink name="lv_win_add_title" display="lv_win_add_title(win, &quot;The title&quot;)" /> adds a Label to the header, with
+  long mode <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> so that if its text contents are wider
+  than the area it has, the text will be truncated with an ellipsis ("...") placed
+  at the end of the text.  It is set to be FLEX GROW 1, so if it is the only Label
+  in the header, it will occupy all available space after any Buttons are added.
+  If more than one label is added, each label will share that space equally unless
+  its FLEX GROW value is altered.  See [Flex](/common-widget-features/layouts/flex) for details about how this works.
+  Because of this, any buttons added after the last Label added will be "stacked"
+  on the far right of the Header.
+- <ApiLink name="lv_win_add_button" display="lv_win_add_button(win, icon, button_width)" /> adds a Button with the
+  specified width that occupies the full height of the Header (its parent).  If
+  `icon` is not NULL, an image is created, centered on the button, using `icon`
+  as its image source.  All valid image sources are supported, but a common source
+  to use is one of the `LV_SYMBOL_...` macros, such as <ApiLink name="LV_SYMBOL_CLOSE" />
+  to provide an "x" (close) symbol.  You get back a pointer to the Button created so
+  you can add an event callback with it and/or whatever else might be needed.
+
+## Getting the parts
+
+<ApiLink name="lv_win_get_header" display="lv_win_get_header(win)" /> returns a pointer to the header,
+<ApiLink name="lv_win_get_content" display="lv_win_get_content(win)" /> returns a pointer to the content container
+to which the content of the window can be added.
+
+## Events
+
+No special events are sent by Window Widgets, however events can be added
+to any Buttons added.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+Learn more about [events](/common-widget-features/events).
+</Callout>
+
+## Keys
+
+No *Keys* are processed by Window Widgets.
+
+<Callout type="info" title="Further Reading">
+Learn more about [Keys](/main-modules/indev/keypad).
+</Callout>
+
+## Example
+
+### Simple window
+
+<LvglExample name="lv_example_win_1" path="widgets/win/lv_example_win_1" />
+
+## API

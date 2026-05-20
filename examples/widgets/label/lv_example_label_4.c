@@ -31,7 +31,14 @@ static void generate_mask(lv_draw_buf_t * mask, int32_t w, int32_t h, const char
 }
 
 /**
- * Draw label with gradient color
+ * @title Gradient-filled text via bitmap mask
+ * @brief Render text with a gradient fill by masking a gradient rectangle.
+ *
+ * A canvas in `LV_COLOR_FORMAT_L8` is used as an alpha mask: a centered label is
+ * drawn onto it with `lv_draw_label` using `lv_font_montserrat_24`. A plain
+ * object sized 150x60 is created, given a horizontal red-to-blue background
+ * gradient with `LV_GRAD_DIR_HOR`, and the mask is applied through
+ * `lv_obj_set_style_bitmap_mask_src` so only the text shape shows through.
  */
 void lv_example_label_4(void)
 {

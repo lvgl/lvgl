@@ -7,9 +7,8 @@
  *      INCLUDES
  *********************/
 
-#include "lv_async.h"
+#include "../lvgl_public.h"
 #include "lv_timer_private.h"
-#include "../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES

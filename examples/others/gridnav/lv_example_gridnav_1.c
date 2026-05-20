@@ -2,7 +2,15 @@
 #if LV_USE_GRIDNAV && LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 /**
- * Demonstrate a a basic grid navigation
+ * @title Basic grid navigation
+ * @brief Two side-by-side containers, one plain and one with rollover keypad navigation.
+ *
+ * Each container is added to the default group with `lv_group_add_obj` and
+ * registered with `lv_gridnav_add`. The left container uses
+ * `LV_GRIDNAV_CTRL_NONE` and wraps 10 checkable buttons in `LV_FLEX_FLOW_ROW_WRAP`.
+ * The right container uses `LV_GRIDNAV_CTRL_ROLLOVER` and holds a textarea, a
+ * checkbox, and two switches placed by absolute position. Children are removed
+ * from the group with `lv_group_remove_obj` so gridnav handles keypad movement.
  */
 void lv_example_gridnav_1(void)
 {

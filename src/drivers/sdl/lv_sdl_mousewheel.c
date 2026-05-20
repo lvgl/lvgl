@@ -6,12 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_sdl_mousewheel.h"
-#if LV_USE_SDL && LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_ENCODER
 
-#include "../../core/lv_group.h"
-#include "../../stdlib/lv_string.h"
 #include "lv_sdl_private.h"
+
+#if LV_USE_SDL && LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_ENCODER
 
 /*********************
  *      DEFINES

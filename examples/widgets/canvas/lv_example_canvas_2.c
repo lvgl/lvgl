@@ -5,7 +5,14 @@
 #define CANVAS_HEIGHT  40
 
 /**
- * Create a transparent canvas with transparency
+ * @title Per-pixel alpha bands on ARGB8888
+ * @brief Fade horizontal blue bands from 50% to 20% to 0% opacity using `lv_canvas_set_px`.
+ *
+ * The active screen is tinted light red and an 80x40 canvas with
+ * `LV_COLOR_FORMAT_ARGB8888` is centered on it. The canvas is filled
+ * solid blue, then three row bands are overwritten pixel by pixel with
+ * `lv_canvas_set_px` at `LV_OPA_50`, `LV_OPA_20`, and `LV_OPA_0`, so
+ * the underlying screen color shows through progressively.
  */
 void lv_example_canvas_2(void)
 {

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_WAYLAND
 
@@ -22,7 +22,6 @@ extern "C" {
 #include <sys/poll.h>
 #include <wayland-client-protocol.h>
 #include <wayland_xdg_shell.h>
-#include "../../misc/lv_types.h"
 #include "lv_wayland_backend_private.h"
 
 /*********************
@@ -209,6 +208,8 @@ void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard);
 
 /* Updates indev's driver data with the given 'read_cb' to 'new_driver_data' */
 void lv_wayland_update_indevs(lv_indev_read_cb_t read_cb, void * new_driver_data);
+
+void lv_wayland_indevs_ready(lv_indev_read_cb_t read_cb);
 
 #endif /* LV_USE_WAYLAND */
 

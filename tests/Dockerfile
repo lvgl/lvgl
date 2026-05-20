@@ -8,7 +8,7 @@ RUN apt update
 COPY ./scripts/prerequisites-apt.txt .
 COPY ./scripts/prerequisites-pip.txt .
 
-RUN cat prerequisites-apt.txt | xargs apt install -y
+RUN cat prerequisites-apt.txt | tr -d '\r' | xargs apt install -y
 
 RUN pip install --break-system-packages -r prerequisites-pip.txt
 

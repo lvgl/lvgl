@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../../lvgl_public.h"
+
 #if LV_USE_LOVYAN_GFX
 
 /**
@@ -11,43 +13,43 @@
  * Create an LGFX wrapper class that implements the functions used in lv_lovyan_gfx.cpp */
 class LGFX
 {
-public:
-    LGFX(void) {}
+    public:
+        LGFX(void) {}
 
-    bool init(void)
-    {
-        return true;
-    }
+        bool init(void)
+        {
+            return true;
+        }
 
-    void initDMA(void) {}
+        void initDMA(void) {}
 
-    void waitDMA(void) {}
+        void waitDMA(void) {}
 
-    void fillScreen(uint16_t color) {}
+        void fillScreen(uint16_t color) {}
 
-    void setRotation(uint8_t rotation) {}
+        void setRotation(uint8_t rotation) {}
 
-    void pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *data) {}
+        void pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t * data) {}
 
-    void pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *data) {}
+        void pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t * data) {}
 
-    void startWrite(void) {}
+        void startWrite(void) {}
 
-    uint32_t getStartCount(void)
-    {
-        return 0;
-    }
+        uint32_t getStartCount(void)
+        {
+            return 0;
+        }
 
-    void endWrite(void) {}
+        void endWrite(void) {}
 
-    void setBrightness(uint8_t brightness){}
+        void setBrightness(uint8_t brightness) {}
 
-    void writePixel(int32_t x, int32_t y, const uint16_t color) {}
+        void writePixel(int32_t x, int32_t y, const uint16_t color) {}
 
-    bool getTouch(uint16_t *x, uint16_t *y)
-    {
-        return false;
-    }
+        bool getTouch(uint16_t * x, uint16_t * y)
+        {
+            return false;
+        }
 };
 
 #endif

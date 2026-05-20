@@ -1,0 +1,21 @@
+lvgl (9.5.0+git20260511.aebad7cc-3ppa1~noble1) noble; urgency=medium
+
+  * Add missing semi-colon to `override_dh_auto_configure` rule
+
+ -- André Costa <andre@lvgl.io>  Mon, 11 May 2026 12:24:00 +0200
+
+lvgl (9.5.0+git20260511.aebad7cc-2ppa1~noble1) noble; urgency=medium
+
+  * Correctly export PATH variable so that build system finds `pcpp`
+
+ -- André Costa <andre@lvgl.io>  Mon, 11 May 2026 12:13:00 +0200
+
+lvgl (9.5.0+git20260511.aebad7cc-1ppa1~noble1) noble; urgency=medium
+
+  * Initial PPA packaging for Ubuntu Noble.
+  * Pinned to commit aebad7ccbf5cca81df56cd3cd670813253264c14
+  * Build lvgl-sdl2, lvgl-sdl2-dev, lvgl-drm, lvgl-drm-3d, lvgl-wayland and
+    lvgl-wayland-3d development packages.
+  * Examples and demos are not part of the built packages
+
+ -- André Costa <andre@lvgl.io>  Mon, 11 May 2026 09:32:00 +0200

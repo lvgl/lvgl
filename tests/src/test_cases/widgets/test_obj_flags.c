@@ -237,4 +237,14 @@ void test_obj_flag_radio_button(void)
 
 }
 
+void test_obj_flag_parent_hidden(void)
+{
+    /* #10083: Ensure that adding and removing screen flags don't make lvgl crash*/
+    lv_obj_add_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN);
+    TEST_ASSERT_TRUE(lv_obj_has_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN));
+    lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN);
+    TEST_ASSERT_FALSE(lv_obj_has_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN));
+    TEST_PASS();
+}
+
 #endif

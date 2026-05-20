@@ -8,12 +8,10 @@
  *      INCLUDES
  *********************/
 #include "lv_keyboard_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_KEYBOARD
 
-#include "../textarea/lv_textarea.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_string.h"
+#include "../../core/lv_obj_class_private.h"
 
 /*Testing of dependencies*/
 #if LV_USE_BUTTONMATRIX == 0

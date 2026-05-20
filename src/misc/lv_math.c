@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_math.h"
+
+#include "../lvgl_public.h"
 #include "../core/lv_global.h"
 
 /*********************

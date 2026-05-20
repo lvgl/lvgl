@@ -1,0 +1,120 @@
+---
+title: Draw Units
+description: "A \"Draw Unit\" (lv_draw_unit_t) is any peripheral or system that can render something on the screen. This can be a CPU core, a GPU, a custom rendering library for specific draw tasks, or any entity ..."
+---
+
+A "Draw Unit" (<ApiLink name="lv_draw_unit_t" />) is any peripheral or system that can render
+something on the screen. This can be a CPU core, a GPU, a custom rendering library for
+specific draw tasks, or any entity capable of performing rendering.
+
+LVGL supports several built-in draw units that can be enabled in `lv_conf.h`.
+
+## Software Rendering
+
+A highly optimized renderer written in C. Even when no GPU is enabled, software rendering
+provides a performant, low-footprint, and very capable engine for rendering.
+
+### Rendering Features
+
+The software renderer is capable of rendering most typical draw tasks, including:
+
+- fill rectangles with a color or gradient
+- rounded rectangles and borders
+- draw box shadows
+- blend, rotate, scale, or recolor images
+- draw labels, even with rotated letters
+- draw skew lines with perpendicular endings and any thickness
+- draw arcs with rounded or straight endings
+- blur an area
+- draw drop shadows for any shape
+- anti-alaising for all rendering
+- and many more
+
+### Color Format Support
+
+It also supports the most common color formats as source and destination, such as
+RGB888, XRGB8888, ARGB8888, RGB565, L8, A8, I1, and more.
+
+### Multi-Core Rendering
+
+In case of a multi-core system, each core can perform software rendering in parallel by setting
+`LV_DRAW_SW_DRAW_UNIT_CNT` to greater than `1`, and setting `LV_USE_OS`
+to something other than `LV_OS_NONE`.
+
+### Assembly Acceleration
+
+Software rendering can also use various assembly accelerators, such as:
+
+- Arm Neon: available on most Cortex-A cores
+- Arm Helium: available on Cortex-M55 and M85 cores
+- Arm-2D: a complete library supporting highly optimized Helium acceleration
+- RISC-V: uses SIMD instructions on RISC-V cores
+
+These can be enabled in `lv_conf.h` and typically provide 10-30% faster rendering.
+
+### Vector Graphics
+
+To render vector graphics (e.g. SVG), LVGL uses a third-party library called
+[ThorVG](https://github.com/thorvg/thorvg). It supports most vector rendering features such as:
+
+- paths from lines, arcs, and Bézier curves
+- stroke with dashing and joint settings
+- fill with color, image, or gradient
+- and many more
+
+To use it, enable `LV_USE_THORVG_INTERNAL` and `LV_USE_VECTOR_GRAPHIC`.
+
+## VG-Lite
+
+A powerful vector graphics accelerator IP developed by Verisilicon. It is widely used
+by NXP and other chip vendors to provide hardware-accelerated 2D and vector rendering.
+
+### Key Features
+
+- Hardware-accelerated vector path rendering (lines, arcs, Bézier curves)
+- Fill and stroke support with solid colors and gradients
+- Image transformations such as scaling, rotation, and blending
+- Anti-aliasing for smoother edges
+- Efficient memory usage optimized for embedded systems
+- High performance with low CPU utilization
+
+To enable VG-Lite support in LVGL, set `LV_USE_DRAW_VG_LITE` in `lv_conf.h`.
+
+## NemaGFX
+
+NemaGFX is a graphics API and GPU family developed by Think Silicon. It is used in
+various embedded platforms, including STM32 devices with NeoChrom GPUs and Ambiq MCUs,
+to provide hardware-accelerated 2D rendering.
+
+In addition to the 2D engine, some platforms also include NemaVG, which provides
+hardware-accelerated vector graphics rendering.
+
+### Key Features
+
+- Hardware-accelerated 2D rendering (fills, blits, compositing)
+- Image transformations such as scaling, rotation, and blending
+- Alpha blending and transparency support
+- Vector graphics acceleration via NemaVG (paths, fills, strokes)
+- Optimized for low-power embedded systems
+- Offloads rendering from the CPU for improved performance
+
+To enable NemaGFX support in LVGL, set `LV_USE_DRAW_NEMA_GFX` in `lv_conf.h`.
+
+## Dave2D
+
+Dave2D is a 2D graphics accelerator developed by TES and widely used on
+Renesas and Alif MCUs.
+
+In Renesas FSP, the DRW peripheral is provided as a port of D/AVE 2D, which is the driver
+used by the LVGL Dave2D draw unit.
+
+### Key Features
+
+- Rectangle drawing, including gradients
+- Image drawing, scaling, and rotation
+- Letter drawing
+- Triangle drawing
+- Line drawing
+- Background rendering that reduces CPU load during drawing
+
+To enable Dave2D support in LVGL, set `LV_USE_DRAW_DAVE2D` in `lv_conf.h`.

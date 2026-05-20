@@ -8,13 +8,13 @@
 extern "C" {
 #endif
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #include "tjpgdcnf.h"
 
 #if LV_USE_TJPGD
 
 #include <string.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 
 #if JD_FASTDECODE >= 1
 typedef int16_t jd_yuv_t;

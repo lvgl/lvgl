@@ -22,7 +22,16 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Make a button group (pagination)
+ * @title Pagination button group
+ * @brief A pill-shaped matrix with arrow buttons that step through numbered pages.
+ *
+ * A 225 x 35 button matrix holds `LV_SYMBOL_LEFT`, the digits `1` to `5`, and
+ * `LV_SYMBOL_RIGHT`. A background style with `LV_RADIUS_CIRCLE` and
+ * `clip_corner` gives the pill shape, and an `LV_PART_ITEMS` style draws a
+ * 50% grey `LV_BORDER_SIDE_INTERNAL` divider between buttons. Only the number
+ * buttons are `LV_BUTTONMATRIX_CTRL_CHECKABLE` and `lv_buttonmatrix_set_one_checked`
+ * enforces a single selection; the `LV_EVENT_VALUE_CHANGED` callback moves
+ * the checked state one slot left or right when the arrow buttons fire.
  */
 void lv_example_buttonmatrix_3(void)
 {

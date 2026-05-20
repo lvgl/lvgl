@@ -6,14 +6,19 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_spinbox_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_SPINBOX
 
-#include "../../misc/lv_assert.h"
-#include "../../indev/lv_indev.h"
-#include "../../stdlib/lv_string.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_observer_private.h"
+
+/*Check dependencies*/
+#if LV_USE_TEXTAREA == 0
+    #error "lv_spinbox: lv_textarea is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
+#endif
+
 
 /*********************
  *      DEFINES

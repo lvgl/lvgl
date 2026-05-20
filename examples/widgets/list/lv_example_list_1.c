@@ -11,6 +11,17 @@ static void event_handler(lv_event_t * e)
         LV_LOG_USER("Clicked: %s", lv_list_get_button_text(list1, obj));
     }
 }
+
+/**
+ * @title Icon list with section headers
+ * @brief A 180x220 list grouped into File, Connectivity, and Exit sections with symbol icons.
+ *
+ * `lv_list_create` builds a centered list; `lv_list_add_text` inserts
+ * section headers and `lv_list_add_button` adds entries such as
+ * `LV_SYMBOL_FILE` + "New" or `LV_SYMBOL_BLUETOOTH` + "Bluetooth". A
+ * single `LV_EVENT_CLICKED` handler logs the clicked entry via
+ * `lv_list_get_button_text`.
+ */
 void lv_example_list_1(void)
 {
     /*Create a list*/

@@ -320,6 +320,35 @@ void test_image_contain(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_contain.png");
 }
 
+void test_image_contain_downscale(void)
+{
+    lv_obj_t * img;
+    uint32_t i;
+
+    int32_t img_w = test_img_lvgl_logo_png.header.w;
+    int32_t img_h = test_img_lvgl_logo_png.header.h;
+    int32_t aspect_ratio = img_w / img_h;
+
+    int32_t w_array[] = {img_w / 2, img_w, img_w * 2};
+    int32_t h_array[] = {img_h / 2, img_h, img_h * 2};
+
+    for(i = 0; i < 9; i++) {
+        img = img_create();
+        const int32_t w = w_array[i / 3];
+        const int32_t h = h_array[i % 3];
+        lv_obj_set_size(img, w, h);
+        lv_obj_set_pos(img, 30 + (i % 3) * 260, 40 + (i / 3) * 150);
+        lv_image_set_inner_align(img, LV_IMAGE_ALIGN_CONTAIN_DOWNSCALE);
+
+        const int32_t scale = lv_image_get_scale(img);
+        TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
+        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_transformed_width(img));
+        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_contain_downscale.png");
+}
+
 void test_image_cover(void)
 {
     lv_obj_t * img;

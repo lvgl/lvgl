@@ -11,21 +11,16 @@
  *      INCLUDES
  *********************/
 #include "lv_animimage_private.h"
-#include "../../core/lv_obj_class_private.h"
-#if LV_USE_ANIMIMG != 0
 
+#if LV_USE_ANIMIMG
+
+#include "../../core/lv_obj_class_private.h"
 /*Testing of dependencies*/
 #if LV_USE_IMAGE == 0
     #error "lv_animimg: lv_img is required. Enable it in lv_conf.h (LV_USE_IMAGE  1) "
 #endif
 
-#include "../../draw/lv_image_decoder.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_fs.h"
 #include "../../misc/lv_text_private.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_anim.h"
 
 /*********************
  *      DEFINES

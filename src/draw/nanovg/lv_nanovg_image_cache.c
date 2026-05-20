@@ -15,7 +15,8 @@
 #include "lv_nanovg_utils.h"
 #include "../lv_image_decoder_private.h"
 #include "../../misc/lv_pending.h"
-#include "../../misc/lv_iter.h"
+#include "../../misc/cache/lv_cache_entry.h"
+#include "../../misc/cache/class/lv_cache_lru_rb.h"
 
 /*********************
 *      DEFINES
@@ -35,7 +36,7 @@ typedef struct {
     int image_flags;
 
     /* for drop search */
-    LV_IMAGE_DSC_CONST void * src;
+    const void * src;
     lv_image_src_t src_type;
 
     /* value */
@@ -98,7 +99,7 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u)
 }
 
 int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
-                                     LV_IMAGE_DSC_CONST void * src,
+                                     const void * src,
                                      lv_color32_t color,
                                      int image_flags,
                                      lv_image_header_t * header)

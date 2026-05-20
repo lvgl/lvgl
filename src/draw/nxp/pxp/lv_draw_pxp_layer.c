@@ -18,10 +18,7 @@
 #if LV_USE_PXP
 #if LV_USE_DRAW_PXP
 
-#include "../../../stdlib/lv_string.h"
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    #include "../../../core/lv_global.h"
-#endif
+#include "../../../core/lv_global.h"
 
 /*********************
  *      DEFINES

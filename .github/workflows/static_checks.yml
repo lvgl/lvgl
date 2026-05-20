@@ -1,0 +1,123 @@
+name: Static Checks
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    name: Static Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------------------------------------------------
+      # Every header in include/lvgl/ must appear in include/lvgl/lvgl.h
+      # ------------------------------------------------------------------
+      - name: "Check: public API umbrella (include/lvgl/lvgl.h)"
+        id: public-api
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py public-api
+
+      # ------------------------------------------------------------------
+      # Every header in src/ must appear in src/lvgl_private.h
+      # ------------------------------------------------------------------
+      - name: "Check: private API umbrella (src/lvgl_private.h)"
+        id: private-api
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py private-api
+
+      # ------------------------------------------------------------------
+      # - All #includes inside must be valid relative paths.
+      # - Angle-bracket includes must be in the explicit allow-list
+      #   - see `ALLOWED_EXTERNAL_HEADERS` in `scripts/static_checks/check_headers.py` 
+      # - forbidden headers (stdint.h etc.) must use LV_*_INCLUDE macros.
+      # ------------------------------------------------------------------
+      - name: "Check: include path validity + angle-bracket policy"
+        id: include-paths
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py include-paths
+
+      # ------------------------------------------------------------------
+      # All external headers in the allow-list (see check above), are used
+      # ------------------------------------------------------------------
+      - name: "Check: all headers in allow-list are used"
+        id: allowed-list
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py allowed-list-audit
+
+      # ------------------------------------------------------------------
+      # No file may include a deprecated header
+      # ------------------------------------------------------------------
+      - name: "Check: no deprecated header includes"
+        id: deprecated
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py deprecated
+
+      # ------------------------------------------------------------------
+      # Every header file inside `src` must use `lvgl_public.h` to access 
+      # the public API
+      # ------------------------------------------------------------------
+      - name: "Check: no direct public include from source files"
+        id: direct-public-include
+        continue-on-error: true
+        run: python scripts/static_checks/check_headers.py no-direct-public-include
+
+      # ------------------------------------------------------------------
+      # Every typedef struct/enum in include/lvgl/lv_types.h must have
+      #    a real definition (with a body) somewhere
+      # ------------------------------------------------------------------
+      - name: "Check: lv_types.h forward declarations have a real definition"
+        id: lv_types
+        continue-on-error: true
+        run: python scripts/static_checks/check_lv_types.py
+
+      # ------------------------------------------------------------------
+      # Final gate – fail the job if any step above failed.
+      # This gives us full output from every check before failing.
+      # ------------------------------------------------------------------
+      - name: "Gate: fail if any check failed"
+        if: |
+          steps.public-api.outcome            == 'failure' ||
+          steps.private-api.outcome           == 'failure' ||
+          steps.include-paths.outcome         == 'failure' ||
+          steps.allowed-list.outcome          == 'failure' ||
+          steps.direct-public-include.outcome == 'failure' ||
+          steps.deprecated.outcome            == 'failure' ||
+          steps.lv_types.outcome              == 'failure'
+        run: |
+          echo "Policy check results:"
+          echo "---------------------"
+          print_result() {
+            local name="$1"
+            local outcome="$2"
+            if [ "$outcome" = "success" ]; then
+              echo "  ✅ $name"
+            else
+              echo "  ❌ $name"
+            fi
+          }
+
+          print_result "public-api"            "${{ steps.public-api.outcome }}"
+          print_result "private-api"           "${{ steps.private-api.outcome }}"
+          print_result "include-paths"         "${{ steps.include-paths.outcome }}"
+          print_result "allowed-list"          "${{ steps.allowed-list.outcome }}"
+          print_result "direct-public-include" "${{ steps.direct-public-include.outcome }}"
+          print_result "deprecated"            "${{ steps.deprecated.outcome }}"
+          print_result "lv_types"              "${{ steps.lv_types.outcome }}"
+
+          echo "---------------------"
+          echo "One or more policy checks failed. See above for details."
+          exit 1

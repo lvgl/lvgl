@@ -15,7 +15,7 @@
 #if LV_USE_DRAW_G2D
 #include <stdio.h>
 #include "lv_g2d_utils.h"
-#include "g2d.h"
+#include <g2d.h>
 
 /*********************
  *      DEFINES

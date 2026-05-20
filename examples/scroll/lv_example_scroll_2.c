@@ -15,7 +15,14 @@ static void sw_event_cb(lv_event_t * e)
 }
 
 /**
- * Show an example to scroll snap
+ * @title Horizontal scroll snap with opt-out
+ * @brief Snap a row of ten panels to center, skip one panel, and toggle one-at-a-time scrolling.
+ *
+ * A 280x120 flex-row panel uses `lv_obj_set_scroll_snap_x(panel,
+ * LV_SCROLL_SNAP_CENTER)` so each 150 px button centers as it scrolls past.
+ * Panel 3 removes `LV_OBJ_FLAG_SNAPPABLE` so scrolling skips over it. A
+ * switch aligned at the top right toggles `LV_OBJ_FLAG_SCROLL_ONE` on the
+ * panel, restricting scroll gestures to one panel at a time when checked.
  */
 void lv_example_scroll_2(void)
 {

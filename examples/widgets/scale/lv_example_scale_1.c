@@ -2,7 +2,13 @@
 #if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 /**
- * A simple horizontal scale
+ * @title Horizontal scale with labels
+ * @brief Place a bottom-labelled horizontal scale across 80% of the screen.
+ *
+ * A scale is created with `LV_SCALE_MODE_HORIZONTAL_BOTTOM`, sized to
+ * 80% width and 100 px height, and centered. It has 31 ticks with every
+ * fifth promoted to a major tick, minor ticks 5 px long and major ticks
+ * 10 px long, and a value range from 10 to 40.
  */
 void lv_example_scale_1(void)
 {

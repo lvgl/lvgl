@@ -1,0 +1,13 @@
+{
+  "title": "Input devices (lv_indev)",
+  "pages": [
+    "overview",
+    "pointer",
+    "keypad",
+    "encoder",
+    "button",
+    "groups",
+    "gestures",
+    "gridnav"
+  ]
+}

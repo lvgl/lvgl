@@ -6,11 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../draw/lv_image_decoder_private.h"
-#include "../../../lvgl.h"
+
+#include "../../lvgl_public.h"
+
 #if LV_USE_LIBWEBP
 
-#include "lv_libwebp.h"
+#include "../../draw/lv_image_decoder_private.h"
 #include <webp/decode.h>
 #include "../../core/lv_global.h"
 

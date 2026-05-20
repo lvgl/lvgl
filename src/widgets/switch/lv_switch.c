@@ -10,13 +10,9 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
 
-#if LV_USE_SWITCH != 0
+#if LV_USE_SWITCH
 
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
 #include "../../misc/lv_anim_private.h"
-#include "../../indev/lv_indev.h"
-#include "../../display/lv_display.h"
 
 /*********************
  *      DEFINES

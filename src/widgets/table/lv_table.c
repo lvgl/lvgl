@@ -6,20 +6,17 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_table_private.h"
+
+#if LV_USE_TABLE
+
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_TABLE != 0
-
-#include "../../indev/lv_indev.h"
-#include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
-#include "../../misc/lv_math.h"
-#include "../../stdlib/lv_sprintf.h"
 #include "../../draw/lv_draw_private.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

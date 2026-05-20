@@ -1,0 +1,54 @@
+---
+title: WebP Decoder
+description: "libwebp is an LVGL interface to the WebP image format --- a modern image format that provides superior lossless and lossy compression for images on the web."
+---
+
+**libwebp** is an LVGL interface to the WebP image format --- a modern image format that provides superior lossless and lossy compression for images on the web. WebP offers:
+
+- Smaller file sizes compared to JPEG and PNG
+- Lossy compression with transparency
+- Lossless compression
+- Animation support (not yet supported in the LVGL integration)
+
+For more information, see: https://developers.google.com/speed/webp
+
+Library source: https://github.com/webmproject/libwebp
+
+## Install
+
+```bash
+# Linux
+sudo apt install libwebp-dev
+# macOS
+brew install webp
+```
+
+## Adding libwebp to Your Project
+
+CMake configuration:
+
+```cmake
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(WebP REQUIRED libwebp)
+include_directories(${WebP_INCLUDEDIR})
+target_link_libraries(main ${WebP_LINK_LIBRARIES})
+```
+
+## Usage
+
+Set <ApiLink name="LV_USE_LIBWEBP" /> in `lv_conf.h` to `1`.
+
+Memory requirements for WebP images:
+
+- Lossy WebP: width × height × 4 bytes (ARGB8888 format)
+- Lossless WebP: width × height × 4 bytes (ARGB8888 format)
+
+For optimal memory usage, combine with LVGL's [Image Caching](/main-modules/images/caching) feature.
+
+## Example
+
+### Open a WEBP image from file and variable
+
+<LvglExample name="lv_example_libwebp_1" path="libs/libwebp/lv_example_libwebp_1" />
+
+## API

@@ -7,11 +7,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_tree.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
 
-#include "lv_assert.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

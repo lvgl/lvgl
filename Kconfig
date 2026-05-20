@@ -106,7 +106,6 @@ menu "LVGL configuration"
 			hex "Address for the memory pool instead of allocating it as a normal array"
 			default 0x0
 			depends on LV_USE_BUILTIN_MALLOC
-
 	endmenu
 
 	menu "HAL Settings"
@@ -519,6 +518,26 @@ menu "LVGL configuration"
 			default 1000
 			depends on LV_USE_DRAW_VG_LITE
 
+		config LV_USE_VG_LITE_DRIVER
+			bool "Use LVGL's built-in vg_lite driver"
+			default n
+			depends on LV_USE_DRAW_VG_LITE
+
+		config LV_VG_LITE_HAL_GPU_SERIES
+			string "VG-Lite GPU series"
+			default "gc255"
+			depends on LV_USE_VG_LITE_DRIVER
+
+		config LV_VG_LITE_HAL_GPU_REVISION
+			hex "VG-Lite GPU revision"
+			default 0x40
+			depends on LV_USE_VG_LITE_DRIVER
+
+		config LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+			hex "VG-Lite GPU base address"
+			default 0x40240000
+			depends on LV_USE_VG_LITE_DRIVER
+
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
 			default n
@@ -550,6 +569,63 @@ menu "LVGL configuration"
 			bool "Draw using cached OpenGLES textures"
 			default n
 			depends on LV_USE_OPENGLES
+
+		config LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+			int "OpenGLES texture cache count"
+			default 64
+			depends on LV_USE_DRAW_OPENGLES
+
+		config LV_USE_NEMA_GFX
+			bool "Use NemaGFX acceleration"
+			default n
+
+		choice LV_USE_NEMA_LIB
+			prompt "NemaGFX static library"
+			depends on LV_USE_NEMA_GFX
+			default LV_NEMA_LIB_NONE
+
+			config LV_NEMA_LIB_NONE
+				bool "LV_NEMA_LIB_NONE"
+			config LV_NEMA_LIB_M33_REVC
+				bool "LV_NEMA_LIB_M33_REVC"
+			config LV_NEMA_LIB_M33_NEMAPVG
+				bool "LV_NEMA_LIB_M33_NEMAPVG"
+			config LV_NEMA_LIB_M55
+				bool "LV_NEMA_LIB_M55"
+			config LV_NEMA_LIB_M7
+				bool "LV_NEMA_LIB_M7"
+		endchoice
+
+		choice LV_USE_NEMA_HAL
+			prompt "NemaGFX HAL"
+			depends on LV_USE_NEMA_GFX
+			default LV_NEMA_HAL_CUSTOM
+
+			config LV_NEMA_HAL_CUSTOM
+				bool "LV_NEMA_HAL_CUSTOM"
+			config LV_NEMA_HAL_STM32
+				bool "LV_NEMA_HAL_STM32"
+		endchoice
+
+		config LV_NEMA_STM32_HAL_INCLUDE
+			string "NemaGFX STM32 HAL include"
+			default "stm32u5xx_hal.h"
+			depends on LV_USE_NEMA_GFX && LV_NEMA_HAL_STM32
+
+		config LV_USE_NEMA_VG
+			bool "Enable NemaVG operations"
+			default n
+			depends on LV_USE_NEMA_GFX
+
+		config LV_NEMA_GFX_MAX_RESX
+			int "NemaVG max horizontal resolution"
+			default 800
+			depends on LV_USE_NEMA_VG
+
+		config LV_NEMA_GFX_MAX_RESY
+			int "NemaVG max vertical resolution"
+			default 600
+			depends on LV_USE_NEMA_VG
 
 		config LV_USE_PPA
 		bool "Use Espressif's PPA accelerator for ESP SoCs"
@@ -741,6 +817,57 @@ menu "LVGL configuration"
 					Add a custom handler when assert happens e.g. to restart the MCU
 		endmenu
 
+		menu "Check arg"
+			config LV_USE_CHECK_ARG
+				bool "Enable LV_CHECK_ARG macro for runtime argument validation"
+				default y if !LV_CONF_MINIMAL
+				help
+					When enabled, LV_CHECK_ARG checks validate function arguments
+					at runtime. Failed checks log a warning and execute the specified
+					action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+					Disabling this is not recommended unless extreme care is taken and only
+					in very resource constrained environments where it can be absolutely
+					ensured that invariants are never violated.
+
+			config LV_CHECK_ARG_ASSERT_ON_FAIL
+				bool "Call assert handler on LV_CHECK_ARG failure"
+				default n
+				depends on LV_USE_CHECK_ARG
+				help
+					When enabled, LV_ASSERT_HANDLER is also invoked when an
+					LV_CHECK_ARG check fails, before the action is executed.
+
+			choice
+				prompt "Log behavior on LV_CHECK_ARG failure"
+				depends on LV_USE_CHECK_ARG
+				default LV_CHECK_ARG_LOG_MODE_VERBOSE if LV_USE_LOG
+				default LV_CHECK_ARG_LOG_MODE_NONE if !LV_USE_LOG
+				help
+					Controls what is logged when an LV_CHECK_ARG check fails.
+					MINIMAL and VERBOSE modes require LV_USE_LOG to be enabled;
+					selecting either when LV_USE_LOG is disabled will cause a
+					compile-time error.
+
+				config LV_CHECK_ARG_LOG_MODE_NONE
+					bool "None: no log output on failure"
+
+				config LV_CHECK_ARG_LOG_MODE_MINIMAL
+					bool "Minimal: log 'Check failed' only (file/line from LV_LOG_WARN)"
+					depends on LV_USE_LOG
+
+				config LV_CHECK_ARG_LOG_MODE_VERBOSE
+					bool "Verbose: log 'Check failed: <cond>' plus caller-supplied message"
+					depends on LV_USE_LOG
+			endchoice
+
+			config LV_CHECK_ARG_LOG_MODE
+				int
+				depends on LV_USE_CHECK_ARG
+				default 0 if LV_CHECK_ARG_LOG_MODE_NONE
+				default 1 if LV_CHECK_ARG_LOG_MODE_MINIMAL
+				default 2 if LV_CHECK_ARG_LOG_MODE_VERBOSE
+		endmenu
+
 		menu "Debug"
 			config LV_USE_REFR_DEBUG
 				bool "Draw random colored rectangles over the redrawn areas"
@@ -765,7 +892,7 @@ menu "LVGL configuration"
 				default "lv_global.h"
 
 			config LV_CACHE_DEF_SIZE
-				int "Default image cache size. 0 to disable caching"
+				int "Default image cache size in bytes. 0 to disable caching"
 				default 0
 				depends on LV_USE_DRAW_SW
 				help
@@ -1158,6 +1285,19 @@ menu "LVGL configuration"
 				The direction will be processed according to the Unicode Bidirectional Algorithm:
 				https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
 
+		choice LV_BIDI_BASE_DIR_DEF
+			prompt "Set the default BIDI base direction"
+			depends on LV_USE_BIDI
+			default LV_BASE_DIR_AUTO
+
+			config LV_BASE_DIR_LTR
+				bool "Left-to-Right"
+			config LV_BASE_DIR_RTL
+				bool "Right-to-Left"
+			config LV_BASE_DIR_AUTO
+				bool "Auto detect"
+		endchoice
+
 		choice
 			prompt "Set the default BIDI direction"
 			default LV_BIDI_DIR_AUTO
@@ -1354,7 +1494,7 @@ menu "LVGL configuration"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_3DTEXTURE
 			bool "3D Texture"
-			depends on LV_USE_DRAW_OPENGLES
+			depends on LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
 		config LV_USE_GLTF
 			bool "glTF support"
 			depends on LV_USE_3DTEXTURE
@@ -1498,6 +1638,10 @@ menu "LVGL configuration"
 			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_UEFI
+		config LV_FS_UEFI_LETTER
+			int "UEFI driver-identifier letter alias"
+			default LV_USE_FS_UEFI_LETTER
+			depends on LV_USE_FS_UEFI
 
 		config LV_USE_FS_FROGFS
 			bool "FrogFS read-only filesystem"
@@ -1543,8 +1687,17 @@ menu "LVGL configuration"
 			bool "SVG animation"
 			depends on LV_USE_SVG
 
+		config LV_USE_SVG_DEBUG
+			bool "Enable SVG debug logs"
+			depends on LV_USE_SVG
+			default n
+
 		config LV_USE_RLE
 			bool "LVGL's version of RLE compression method"
+
+		config LV_USE_GSTREAMER
+			bool "GStreamer library"
+			default n
 
 		config LV_USE_QRCODE
 			bool "QR code library"
@@ -1562,6 +1715,10 @@ menu "LVGL configuration"
 			int "The maximum number of Glyph in count"
 			default 256
 			depends on LV_USE_FREETYPE
+		config LV_FREETYPE_CACHE_FT_GLYPH_L1
+			bool "Enable L1 glyph metrics cache (lock-free, single-thread only)"
+			default y
+			depends on LV_USE_FREETYPE && LV_OS_NONE
 
 		config LV_USE_TINY_TTF
 			bool "Enable Tiny TTF decoder"
@@ -1633,6 +1790,11 @@ menu "LVGL configuration"
 
 		config LV_USE_SYSMON
 			bool "Enable system monitor component"
+			default n
+
+		config LV_SYSMON_PROC_IDLE_AVAILABLE
+			bool "Enable process idle measurement"
+			depends on LV_USE_SYSMON
 			default n
 
 		config LV_USE_PERF_MONITOR
@@ -1840,6 +2002,7 @@ menu "LVGL configuration"
 		config LV_USE_TEST_SCREENSHOT_COMPARE
 			bool "Enable `lv_test_screenshot_compare`. Requires libpng and a few MB of extra RAM."
 			depends on LV_USE_TEST
+
 		config LV_USE_TRANSLATION
 			bool "Enable text translation support"
 		config LV_USE_COLOR_FILTER
@@ -1860,6 +2023,11 @@ menu "LVGL configuration"
 		config LV_USE_SDL
 			bool "Use SDL to open window on PC and handle mouse and keyboard"
 			default n
+
+		config LV_USE_GLFW
+			bool "Use GLFW for OpenGL context handling"
+			default n
+			depends on LV_USE_OPENGLES
 		config LV_SDL_INCLUDE_PATH
 			string "SDL include path"
 			depends on LV_USE_SDL
@@ -1905,6 +2073,11 @@ menu "LVGL configuration"
 			default 0 if LV_SDL_CUSTOM_BUFFER
 			default 1 if LV_SDL_SINGLE_BUFFER
 			default 2 if LV_SDL_DOUBLE_BUFFER
+
+		config LV_SDL_BUF_COUNT
+			int
+			depends on LV_USE_SDL
+			default LV_SDL_BUFFER_COUNT
 
 		config LV_SDL_ACCELERATED
 			bool "Use hardware acceleration"
@@ -2143,6 +2316,11 @@ menu "LVGL configuration"
 			bool "Use Linux DRM device"
 			default n
 
+		config LV_USE_LINUX_DRM_GBM_BUFFERS
+			bool "Use MESA GBM for Linux DRM DMA buffers"
+			depends on LV_USE_LINUX_DRM
+			default n
+
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
 			default n
@@ -2217,6 +2395,11 @@ menu "LVGL configuration"
 		config LV_USE_FT81X
 			bool "Use ft81x EVE driver"
 			default n
+
+		config LV_USE_NV3007
+			bool "Use NV3007 LCD driver"
+			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
@@ -2335,6 +2518,10 @@ menu "LVGL configuration"
 				bool "Smartwatch demo"
 			config LV_USE_DEMO_EBIKE
 				bool "Ebike demo"
+			config LV_DEMO_EBIKE_PORTRAIT
+				bool "Ebike portrait layout"
+				depends on LV_USE_DEMO_EBIKE
+				default n
 			config LV_USE_DEMO_HIGH_RES
 			bool "High resolution demo"
 		endif

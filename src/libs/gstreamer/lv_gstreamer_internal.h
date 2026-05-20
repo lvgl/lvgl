@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_GSTREAMER
 
@@ -22,8 +22,6 @@ extern "C" {
 #include <gst/video/video.h>
 
 #include "../../widgets/image/lv_image_private.h"
-
-#include "lv_gstreamer.h"
 
 /*********************
  *      DEFINES

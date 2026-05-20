@@ -9,7 +9,7 @@
 
 #include "lv_nuttx_image_cache.h"
 #include "../../core/lv_global.h"
-#include "../../../lvgl.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NUTTX
 

@@ -2,7 +2,14 @@
 #if LV_USE_LABEL && LV_BUILD_EXAMPLES && LV_FONT_DEJAVU_16_PERSIAN_HEBREW && LV_FONT_SOURCE_HAN_SANS_SC_16_CJK && LV_USE_BIDI
 
 /**
- * Show mixed LTR, RTL and Chinese label
+ * @title LTR, RTL, and CJK labels
+ * @brief Three labels rendered with scripts that need different fonts and base directions.
+ *
+ * An English label at the top-left uses `lv_font_montserrat_16`. A Hebrew label
+ * in the middle sets `base_dir` to `LV_BASE_DIR_RTL` and renders with
+ * `lv_font_dejavu_16_persian_hebrew`. A Simplified Chinese label at the
+ * bottom-left renders with `lv_font_source_han_sans_sc_16_cjk`. All three wrap at
+ * 310 px.
  */
 void lv_example_label_3(void)
 {

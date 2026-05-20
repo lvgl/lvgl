@@ -41,6 +41,19 @@ static void draw_event_cb(lv_event_t * e)
     }
 }
 
+/**
+ * @title Styled table with header and zebra rows
+ * @brief Two-column fruits-and-prices table with custom header, right-aligned first column, and alternating rows.
+ *
+ * A `lv_table` is filled with fruit names in column 0 and dollar prices
+ * in column 1. The table height is capped at 200 px so the body
+ * scrolls. With `LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` set, an
+ * `LV_EVENT_DRAW_TASK_ADDED` callback tints the header row blue and
+ * center-aligns its text, right-aligns the first column's labels, and
+ * adds a grey wash on every other body row by editing the
+ * `lv_draw_fill_dsc_t` and `lv_draw_label_dsc_t` of each
+ * `LV_PART_ITEMS` task.
+ */
 void lv_example_table_1(void)
 {
     lv_obj_t * table = lv_table_create(lv_screen_active());

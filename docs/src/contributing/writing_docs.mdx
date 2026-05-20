@@ -1,0 +1,143 @@
+---
+title: Writing Docs
+description: "How to author LVGL documentation in MDX — formatting rules, sidebar ordering, and the full component catalog."
+---
+
+LVGL documentation is authored in **MDX** (Markdown + JSX). Pages live under `docs/src/` and the directory structure drives the URL. This page is the full reference for authors; the top-level `docs/README.md` is the quick start.
+
+## Page Basics
+
+Every page is a `.mdx` file with YAML frontmatter:
+
+```mdx
+---
+title: Animations
+description: Animate widget properties over time with the LVGL animation engine.
+---
+
+# Animations
+
+Animations change a property's value over a period of time...
+
+<LvglExample name="lv_example_anim_1" path="anim/lv_example_anim_1" />
+```
+
+- `title` — appears in the sidebar, the browser tab, and as the page's default heading.
+- `description` — short summary used in cards, search results, and social previews.
+
+
+## Formatting
+
+- **Headings** use standard Markdown (`#`, `##`, `###`).
+- **Emphasis** is `*italic*` / `**bold**`. Markdown tables and GFM (task lists, strikethrough) are enabled.
+- **Unicode** is supported directly — type `°`, `→`, `µ`, etc.
+- **Internal links** are plain relative Markdown links, e.g. `[Flex](../layouts/flex)`.
+- **API references** use the `<ApiLink>` component instead of raw Markdown links.
+- **Images** go under `docs/src/_static/images/` and are referenced via `<Figure src="/_static/images/..." />`.
+- **Code blocks** are triple-backtick fenced with a language tag:
+
+  ````mdx
+  ```c
+  lv_obj_t * btn = lv_button_create(lv_screen_active());
+  ```
+  ````
+
+
+## Sidebar Ordering with `meta.json`
+
+Each directory may contain a `meta.json` file that sets the sidebar title and the order of its pages. Without it, pages are listed alphabetically.
+
+```json
+{
+  "title": "Getting Started",
+  "pages": [
+    "introduction",
+    "quick-overview",
+    "platforms",
+    "micropython"
+  ]
+}
+```
+
+- `title` — the label shown for the directory in the sidebar.
+- `pages` — file/folder names (no extension) in the order they should appear. Any page not listed is appended after the listed ones.
+
+
+## Components You Can Use in MDX
+
+These components are registered globally by the docs site — you do **not** import them in `.mdx`, just use the JSX tag.
+
+### Structure / layout
+
+| Component | Purpose |
+| --------- | ------- |
+| `<Card>`, `<Cards>` | Grid of navigation cards. Used on index pages. |
+| `<Step>`, `<Steps>` | Numbered walkthroughs / tutorials. |
+| `<Tab>`, `<Tabs>` | Tabbed content (e.g. platform-specific instructions). |
+| `<Callout type="info\|warn\|error" title="...">` | Admonitions / notes / warnings. |
+| `<Collapsible title="...">...</Collapsible>` | Disclosure block for long optional content. |
+| `<DirectoryIndex />` | Auto-generated list of child pages for the current directory. |
+| `<IndexCards items={[{ title, href, description }]} />` | Card grid generated from a data array. |
+| `<ConceptCard>`, `<ConceptCards>` | Cards for conceptual overview sections. |
+| `<SmartCard>` | Richer link card with icon + description. |
+| `<Figure src="..." alt="..." caption="..." border={false} />` | Image with caption and sizing. |
+| `<Kbd>`, `<KbdGroup>` | Keyboard-key styling (e.g. `<Kbd>Ctrl</Kbd>+<Kbd>K</Kbd>`). |
+| `<CustomIcon name="..." />` | Renders an LVGL-specific icon from the shared icon set. |
+
+### LVGL examples
+
+| Component | Purpose |
+| --------- | ------- |
+| `<LvglExample name="..." path="..." />` | Embeds a runnable example: live simulator (when available), the `.c` source, and a GitHub link. The primary way to showcase code. |
+| `<LvglExampleBrief>...</LvglExampleBrief>` | One-line summary placed above the detailed description of an example. |
+
+### API references
+
+| Component | Purpose |
+| --------- | ------- |
+| `<ApiLink name="lv_label_create" display="lv_label_create(parent)" />` | In-line link to an API symbol (function, type, macro, enum). `display` is optional. |
+| `<ApiLinkList items={["lv_label", "lv_obj_property_names"]} />` | Placed at the end of a page to link out to the full API pages for related headers. |
+| `<ApiMember>`, `<ApiSummary>`, `<ApiTabs>`, `<ApiTab>` | Render function/type members on generated API pages. Rarely hand-authored. |
+| `<CallbackSignature>` | Formats a callback function signature block. |
+| `<TypeUsedBy>` | Lists callers/users of a given type on API pages. |
+| `<ModuleOverview>...</ModuleOverview>` | Wraps the "Header / Functions / Types" summary table at the top of a module page. |
+| `<FileIncludes>` | Shows the list of headers / source files that contribute to a module. |
+| `<RelatedHeaders>` | Inline list of sibling headers on API pages. |
+| `<SourceLink>` | "View source on GitHub" link for the current page / symbol. |
+
+### Widgets & styles
+
+| Component | Purpose |
+| --------- | ------- |
+| `<StyleProperty name="width" default="..." inherited="..." layout="yes/no" ext_draw="...">` | The standardized "style property" info box used across widget style docs. |
+| `<FAQSection>` | Renders Q&A blocks on FAQ pages. |
+
+### Icons
+
+Only a limited set of icons is available for inline use. Use any of the following as a JSX tag — anything outside this list will not render:
+
+- `FileCode`
+- `Code`
+- `Cloud`
+- `Terminal`
+- `Palette`
+- `Download`
+- `Keyboard`
+- `Layout`
+- `Info`
+- `FileText`
+- `BookOpen`
+- `Sparkles`
+- `Box`
+- `Blocks`
+- `Eye`
+- `Hash`
+- `Zap`
+- `Monitor`
+- `Image`
+- `Cpu`
+- `Server`
+- `Link`
+- `TestTube`
+- `Globe`
+- `Figma`

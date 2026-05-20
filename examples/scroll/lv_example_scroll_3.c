@@ -23,7 +23,15 @@ static void float_button_event_cb(lv_event_t * e)
 }
 
 /**
- * Create a list with a floating button
+ * @title Floating add button over list
+ * @brief Keep a circular plus button pinned to a scrollable list while it adds track entries.
+ *
+ * A 280x220 `lv_list` is seeded with two `LV_SYMBOL_AUDIO` track entries. A
+ * child button given `LV_OBJ_FLAG_FLOATING` and `LV_RADIUS_CIRCLE` is aligned
+ * to `LV_ALIGN_BOTTOM_RIGHT` so it stays over the list while it scrolls.
+ * Clicking the floating button appends a new "Track N" entry, moves itself
+ * back to the foreground with `lv_obj_move_to_index`, and calls
+ * `lv_obj_scroll_to_view` with `LV_ANIM_ON` to reveal the new row.
  */
 void lv_example_scroll_3(void)
 {

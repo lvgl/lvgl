@@ -2,7 +2,14 @@
 #if LV_BUILD_EXAMPLES && LV_USE_LINE
 
 /**
- * Using the drop shadow style properties
+ * @title Drop shadow on arc indicator
+ * @brief Cast a red drop shadow from an arc's indicator part.
+ *
+ * A style sets `drop_shadow_color` to red, `drop_shadow_radius = 16`,
+ * `drop_shadow_opa = 255`, `drop_shadow_offset_x = 5`, and
+ * `drop_shadow_offset_y = 10`. It is added to an `lv_arc` on
+ * `LV_PART_INDICATOR` so only the foreground arc casts the shadow, and
+ * the arc is centered on the active screen.
  */
 void lv_example_style_10(void)
 {

@@ -17,7 +17,16 @@ static void set_needle_img_value(void * obj, int32_t v)
 }
 
 /**
- * A simple round scale
+ * @title Round scales with animated needles
+ * @brief Two round inner scales driven by looping line and image needles.
+ *
+ * Two 150 by 150 scales use `LV_SCALE_MODE_ROUND_INNER` with a 270
+ * degree range rotated to 135 degrees, 31 ticks, and the range 10 to
+ * 40. The left scale attaches an `lv_line` needle driven by
+ * `lv_scale_set_line_needle_value`; the right one attaches an
+ * `lv_image` needle (`img_hand`) driven by
+ * `lv_scale_set_image_needle_value`. Both needles animate between 10
+ * and 40 on an infinite 1000 ms forward and 1000 ms reverse loop.
  */
 void lv_example_scale_3(void)
 {

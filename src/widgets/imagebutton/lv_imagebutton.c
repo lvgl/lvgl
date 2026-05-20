@@ -7,16 +7,14 @@
  *      INCLUDES
  *********************/
 #include "lv_imagebutton_private.h"
+
+#if LV_USE_IMAGEBUTTON
+
 #include "../../misc/lv_area_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-
-
-#if LV_USE_IMAGEBUTTON != 0
-
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
