@@ -235,7 +235,7 @@ void lv_label_set_max_lines(lv_obj_t * obj, int32_t lines)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
     label->max_lines = lines;
-    lv_label_refr_text(obj);
+    lv_label_mark_need_refr_text(obj);
 }
 
 void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index)
