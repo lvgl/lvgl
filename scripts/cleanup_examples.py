@@ -1,49 +1,16 @@
 #!/usr/bin/env python3
 """Clean up generated LVGL example C files.
 
-PURPOSE
--------
-Generator output (`screenN_gen.c`) is verbose: section-banner comments, an
+Generator output (`screenN_gen.c`) is verbose — section-banner comments, an
 empty `style_inited` block, `LV_TRACE_OBJ_CREATE` traces, redundant
-`lv_obj_set_name` calls, etc. This script post-processes those files into the
-hand-written-looking examples we ship in `examples/`.
+`lv_obj_set_name` calls, etc. — and this script post-processes those files
+into the hand-written-looking examples we ship in `examples/`.
 
-INPUT SELECTION
----------------
-Walks `examples/` recursively and operates only on `.c` files that have a
-sibling `.xml` of the same basename. The `.xml` is both the gating signal
-(only generator-produced examples are touched) and a source of metadata
-(per-element comments + a top-level description).
-
-PIPELINE
---------
-Each file is run through `TRANSFORMATIONS` in order. Every transformation is
-`(source: str, path: Path) -> str` and pure (no side effects); the runner
-writes the file back only if the final text differs from the original.
-
-Transformations are grouped at the bottom of the file:
-
-  * Generator boilerplate removal — strip `style_inited`, `LV_TRACE_*`,
-    `lv_obj_set_name(_static)`, section banner comments, `@brief` line in the
-    file header.
-  * Code modernization — collapse adjacent width/height into `set_size` and
-    x/y into `set_pos`; replace `lv_obj_create(NULL)` root with
-    `lv_screen_active()`; drop the trailing `return screen;`.
-  * Identity / naming — rename `screenN_create` to `<file_stem>`,
-    update `@file`, collapse all `#include`s to a single relative
-    `lv_examples.h` include.
-  * XML doc mapping — top-level `<!-- ... -->` becomes a doxygen block
-    above the function (with `@title`/`@brief` recognised on re-runs);
-    element-preceding XML comments become `/* */` comments above the
-    matching `lv_<type>_create(...)` line.
-  * Whitespace cleanup — remove blank lines right after `{`.
-
-IDEMPOTENCY
------------
-All transformations are designed to be safe to re-run: regex anchors and
-"already in target state?" checks let you run the script against output
-that's already been processed (e.g. after editing an `.xml` and re-running)
-without duplicating content.
+Each `.c` file that has a sibling `.xml` of the same basename is run through
+`TRANSFORMATIONS` in order; each transform is `(source, path) -> str` and
+pure, so the runner only writes back when the final text differs. Every
+transform is idempotent — safe to re-run on already-processed output without
+duplicating content.
 """
 
 from __future__ import annotations
@@ -493,23 +460,13 @@ def map_xml_comments(source: str, path: Path) -> str:
 #
 # Subjects are declared once in `examples/xml_project/globals.xml`. The
 # generator emits `&subject_X` references but assumes those subjects are
-# externs defined by the project init code. For standalone example files we
-# instead want each example to declare and initialise the subjects it
-# references, so a reader can copy-paste the example and have it work.
+# externs defined by project init code. For standalone example files we
+# inject the decl + init for each referenced subject so a reader can
+# copy-paste the example and have it work.
 #
-# This section:
-#   * Parses `globals.xml` (once) to learn each subject's type and initial
-#     value.
-#   * Scans the C source for `&subject_X` references.
-#   * Injects `static lv_subject_t subject_X;` declarations alongside any
-#     existing `static lv_style_t` declarations.
-#   * Injects `lv_subject_init_*(...)` calls inside the existing
-#     `if (!style_inited) { ... }` block — or creates the block if the file
-#     has no styles yet but does have subjects to init.
-#
-# It uses `style_inited` as the label here because `remove_empty_style_inited`
-# downstream of it still matches that name. The final rename to plain
-# `inited` happens after the empty-block removal step.
+# Note the label `style_inited` survives this section because
+# `remove_empty_style_inited` downstream matches that literal name; the
+# rename to `inited` happens after empty-block removal.
 
 
 def _load_globals_subjects() -> dict[str, dict]:
@@ -708,12 +665,6 @@ def init_subjects(source: str, path: Path) -> str:
 # (an `lv_image_dsc_t *`) and the example must declare the symbol via
 # `LV_IMAGE_DECLARE(my_image)` so the linker can resolve the extern.
 #
-# This transformation:
-#   * Adds `&` in front of the image-name argument of every `lv_image_set_src`
-#     call (skipping ones that already have it).
-#   * Inserts `LV_IMAGE_DECLARE(<name>);` at the top of the function body for
-#     every unique image referenced this way.
-#
 # Image names that look like LVGL constants (start with `LV_`) — e.g.
 # `LV_SYMBOL_OK` — are skipped because those are string macros, not C-array
 # image descriptors.
@@ -776,12 +727,11 @@ def declare_and_ref_images(source: str, path: Path) -> str:
 # =============================================================================
 #
 # `declare_and_ref_images` above only covers images that appear as the direct
-# argument to `lv_image_set_src`. Images registered in `globals.xml` can also
-# be referenced through style setters such as `lv_style_set_arc_image_src` or
-# `lv_style_set_bg_image_src`. This companion transformation reads the image
-# registry from globals.xml and inserts `LV_IMAGE_DECLARE(name)` for every
+# argument to `lv_image_set_src`. This companion transform reads the image
+# registry from `globals.xml` and inserts `LV_IMAGE_DECLARE(name)` for every
 # registered image whose name appears anywhere in the source as a bare C
-# identifier — regardless of which API it was passed to.
+# identifier — covering setters like `lv_style_set_arc_image_src` that the
+# narrower regex above doesn't see.
 
 
 def _load_globals_images() -> dict[str, dict]:

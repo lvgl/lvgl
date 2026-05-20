@@ -1,31 +1,18 @@
 #!/usr/bin/env python3
 """Generate C files for every XML example by driving `lved-cli.js`.
 
-PURPOSE
--------
-Each XML example under `examples/` is turned into a C file by the LVGL Pro
-editor's CLI (`lved-cli.js generate <project>`). The CLI only operates on a
-project tree, so this script shuttles each example XML through
-`examples/xml_project/screens/`:
+Each XML example under `examples/` is run through the LVGL Pro editor's CLI
+(`lved-cli.js generate <project>`), which only operates on a project tree, so
+this script shuttles each example XML through `examples/xml_project/screens/`,
+copies the generated `_gen.c` back beside its source XML, and finishes by
+running the `cleanup_examples.py` transformations + wrapping the file in an
+`#if LV_USE_<topic> && LV_BUILD_EXAMPLES` build guard.
 
-  1. Copy `<...>/lv_example_foo.xml` into `examples/xml_project/screens/`.
-  2. Run `lved-cli.js generate examples/xml_project` from the repo root.
-  3. Copy the generated `lv_example_foo_gen.c` back next to the source XML,
-     renamed to `lv_example_foo.c` so `cleanup_examples.py` will pick it up
-     (it requires `.c` and `.xml` siblings with matching basenames).
-  4. Run the cleanup transformations on that `.c` in-process, then wrap it
-     in an `#if LV_USE_<topic> && LV_BUILD_EXAMPLES` build guard derived
-     from the example's topic folder (see `wrap_with_build_guard`).
-  5. Remove the staged XML and its generated outputs from `screens/` so
-     re-runs start clean.
-
-After all XMLs in a run are processed, each touched "topic" folder (the
-parent of the XML's containing dir — e.g. `examples/layouts/flex/` for
-`flex/flex_grow/lv_example_flex_grow.xml`) gets a `lv_example_<topic>.h`
-header rewritten with `void <stem>(void);` prototypes for every
-example XML in that subtree. Headers are always overwritten.
-
-Existing sibling `.c` files are always overwritten.
+Once every XML is processed the script rewrites each touched topic's
+`lv_example_<topic>.h` (one prototype per `.c` on disk), runs
+`code-format.py examples` to astyle the output, and wipes every `.c`/`.h`
+file from `examples/xml_project/` so the scaffolding the CLI generates can't
+collide with the host project's source globbing.
 
 USAGE
 -----
@@ -55,22 +42,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES_DIR = REPO_ROOT / "examples"
 PROJECT_DIR = EXAMPLES_DIR / "xml_project"
 SCREENS_DIR = PROJECT_DIR / "screens"
+CODE_FORMATTER = REPO_ROOT / "scripts" / "code-format.py"
 
 # Files at the examples/ root that are project metadata, not examples.
 ROOT_METADATA = {"project.xml", "globals.xml"}
-
-# Project scaffolding C/H files. They define globals (subjects, images,
-# fonts) that collide with the host example project when it builds with
-# source globbing — and `xml_project/` is globbed too. They are kept on
-# disk with a `.txt` suffix so the glob skips them, and unmasked to real
-# `.c`/`.h` only while lved-cli runs (it needs them), then re-masked.
-MASKED_PROJECT_FILES = [
-    PROJECT_DIR / "xml_project.c",
-    PROJECT_DIR / "xml_project.h",
-    PROJECT_DIR / "xml_project_gen.c",
-    PROJECT_DIR / "xml_project_gen.h",
-]
-MASK_SUFFIX = ".txt"
 
 # Topic folders whose name has no matching `LV_USE_<TOPIC>` macro. LVGL
 # always builds scroll handling, the style system, and the base `lv_obj`
@@ -291,29 +266,32 @@ def write_topic_headers(touched: list[Path]) -> list[Path]:
     return written
 
 
-def unmask_project_files() -> None:
-    """Strip the `.txt` guard so lved-cli sees real `.c`/`.h` files.
+def cleanup_project_files() -> None:
+    """Wipe every `.c`/`.h` file under `examples/xml_project/`.
 
-    Tolerant of a partial state: if the masked file is missing but a real
-    one already exists (e.g. the very first run, before masking was ever
-    applied), it is left as-is and `mask_project_files()` will guard it
-    afterwards.
+    The CLI generates scaffolding (`xml_project.{c,h}`, `xml_project_gen.{c,h}`,
+    per-screen `_gen.{c,h}`, plus font/image `_data.c` files) that would collide
+    with the host project's source globbing. We don't need it between runs —
+    the CLI re-creates whatever it needs on next invocation.
     """
-    for real in MASKED_PROJECT_FILES:
-        masked = real.with_name(real.name + MASK_SUFFIX)
-        if masked.exists():
-            masked.replace(real)
+    if not PROJECT_DIR.is_dir():
+        return
+    for pattern in ("*.c", "*.h"):
+        for f in PROJECT_DIR.rglob(pattern):
+            f.unlink()
 
 
-def mask_project_files() -> None:
-    """Re-add the `.txt` guard so host-project C globbing skips these files.
-
-    Run from a `finally` so an interrupted generation can never leave
-    globbable scaffolding behind.
-    """
-    for real in MASKED_PROJECT_FILES:
-        if real.exists():
-            real.replace(real.with_name(real.name + MASK_SUFFIX))
+def format_examples() -> None:
+    """Run the project's astyle wrapper on the examples tree."""
+    if not CODE_FORMATTER.exists():
+        sys.stderr.write(
+            f"  ! formatter not found at {CODE_FORMATTER}, skipping format step\n"
+        )
+        return
+    subprocess.run(
+        [sys.executable, str(CODE_FORMATTER), "examples"],
+        cwd=REPO_ROOT,
+    )
 
 
 def regenerate_project(cli_path: str) -> bool:
@@ -382,11 +360,9 @@ def main(argv: list[str]) -> int:
         print("No XML examples found.")
         return 0
 
-    # Unmask the scaffolding for the duration of generation; the `finally`
-    # re-masks it even if a generation step raises, so the tree never keeps
-    # globbable project files.
+    # `finally` guarantees the scaffolding cleanup runs even if generation
+    # raises, so the tree never keeps globbable xml_project `.c`/`.h` behind.
     ok = 0
-    unmask_project_files()
     try:
         for xml in targets:
             rel = xml.relative_to(REPO_ROOT) if REPO_ROOT in xml.parents else xml
@@ -401,8 +377,11 @@ def main(argv: list[str]) -> int:
 
         print("regenerating project against empty screens/ to sync _gen files")
         regenerate_project(cli_path)
+
+        print("formatting examples/ via scripts/code-format.py")
+        format_examples()
     finally:
-        mask_project_files()
+        cleanup_project_files()
 
     print(f"\n{ok} of {len(targets)} examples generated.")
     return 0 if ok == len(targets) else 1

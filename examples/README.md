@@ -27,17 +27,21 @@ Most widgets need many XML examples and zero or one C-only example.
 You write `.xml`; a script produces the shipped `.c`. **Never hand-edit a
 generated `.c`** — your changes will be overwritten.
 
-```
+```bash
 python scripts/generate_examples.py [path ...]   # all examples if no path
 ```
 
 Run it after every new or edited XML, then build to confirm it compiles.
+The script auto-runs `scripts/code-format.py examples` at the end so every
+generated `.c` ships astyle-formatted, and then wipes all `.c`/`.h` files
+from `examples/xml_project/` (the CLI's project scaffolding) so they can't
+collide with the host project's source globbing.
 
 The generator drives the **LVGL Pro editor CLI** (`lved-cli.js`), which
 ships with the LVGL Pro editor — see <https://lvgl.io/docs/pro>. The script
 picks it up from your `PATH`, or point at it explicitly:
 
-```
+```bash
 python scripts/generate_examples.py --cli /path/to/lved-cli.js [path ...]
 ```
 
