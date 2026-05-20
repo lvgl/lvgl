@@ -5,12 +5,19 @@
  * lv_font_t instances. See lv_eve5_asset_font.h for API.
  *
  * Load flow:
- *   1. Read the source's 12-byte EVE_Gpu_AssetHeader to learn AssetSize.
- *      (Source-specific: lv_fs read for SRC_FILE, CMD_FLASHREAD for SRC_FLASH.)
+ *   1. Determine AssetSize. Source-specific:
+ *      - SRC_FILE: lv_fs read of the 12-byte EVE_Gpu_AssetHeader.
+ *      - SRC_FLASH: CMD_FLASHREAD of the header into a tiny RAM_G slot.
+ *      - SRC_SDCARD (EVE_COCMD_PATCH_QUERY=1): CMD_FSSOURCE +
+ *        CMD_QUERYASSET + CMD_GETPROPS — no RAM_G round-trip.
+ *      - SRC_SDCARD (legacy): CMD_FSREAD the whole file into a temp
+ *        RAM_G buffer, read back the header. Warns at load time.
  *   2. Allocate AssetSize bytes in RAM_G via Esd_GpuAlloc (4-byte aligned).
  *   3. Issue CMD_LOADASSET with the destination address; source data is
  *      either streamed into the command FIFO from a pre-read host buffer
- *      (lv_fs path) or pointed at via CMD_FLASHSOURCE + OPT_FLASH.
+ *      (lv_fs path), pointed at via CMD_FLASHSOURCE + OPT_FLASH, sourced
+ *      via CMD_FSSOURCE + OPT_FS (SD fast path), or fed via MediaFIFO
+ *      (SD legacy path).
  *   4. Wait for coprocessor completion. The asset loader inflates the
  *      data and patches embedded pointers to be relative to the load
  *      address, leaving a directly-usable font block in RAM_G.
@@ -44,6 +51,7 @@
 
 #include "EVE_Hal.h"
 #include "EVE_CoCmd.h"
+#include "EVE_CoCmd_Ext.h"
 #include "EVE_GpuTypes.h"
 #include "EVE_MediaFifo.h"
 #include "Esd_GpuAlloc.h"
@@ -517,18 +525,110 @@ static const char * strip_lvgl_drive_letter(const char * path)
     return path;
 }
 
-/* SD card load: CMD_FSREAD the .reloc into a temp RAM_G buffer, peek the
- * 12-byte AssetHeader for AssetSize, allocate the destination, then run
- * CMD_LOADASSET(OPT_MEDIAFIFO) sourcing from the temp buffer. Mirrors
- * lv_eve5_sdcard_load_image — one SD read, exact destination size. The
- * coprocessor consumes the FIFO synchronously with EVE_Cmd_waitFlush, so
- * the temp buffer is safe to free immediately after.
+#if EVE_COCMD_PATCH_QUERY
+
+/* SD card load (zero-copy fast path, enabled by EVE_COCMD_PATCH_QUERY):
+ * CMD_QUERYASSET reports the inflated AssetSize via the coprocessor's
+ * GetProps result without touching RAM_G. We then allocate the exact
+ * destination and run CMD_LOADASSET(OPT_FS) which streams directly from
+ * the SD card to the final RAM_G slot — no intermediate buffer, no
+ * MediaFIFO. CMD_FSSOURCE is re-issued before each consuming command
+ * because the firmware reopens the file per scan.
  *
  * Caller holds the HAL mutex. */
 static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
                                    const char * path, Esd_GpuHandle * out_handle,
                                    uint32_t * out_asset_size)
 {
+    if(!EVE_Hal_supportSdCard(phost)) {
+        LV_LOG_WARN("EVE5 asset font: SD card not supported on this chip");
+        return false;
+    }
+    if(EVE_CoCmd_sdAttach(phost, 0) != 0) {
+        LV_LOG_WARN("EVE5 asset font: SD card attach failed");
+        return false;
+    }
+
+    const char * sd_path = strip_lvgl_drive_letter(path);
+
+    if(EVE_CoCmd_fsSource(phost, sd_path) != 0) {
+        LV_LOG_WARN("EVE5 asset font: CMD_FSSOURCE (query) failed for %s", path);
+        return false;
+    }
+
+    /* The queryassets patch's CMD_QUERYASSET writes the inflated size into
+     * `image.source` (and nothing else). That slot is the first field
+     * returned by CMD_GETIMAGE; CMD_GETPROPS reads REG_EJPG_DST which the
+     * query commands never touch, so it would always come back as 0. */
+    EVE_CoCmd_queryAsset(phost, OPT_FS);
+    uint32_t asset_size = 0, qfmt = 0, qw = 0, qh = 0, qpal = 0;
+    if(!EVE_CoCmd_getImage(phost, &asset_size, &qfmt, &qw, &qh, &qpal)) {
+        LV_LOG_WARN("EVE5 asset font: CMD_QUERYASSET failed for %s", path);
+        return false;
+    }
+    if(asset_size == 0 || asset_size > (64u * 1024u * 1024u)) {
+        LV_LOG_WARN("EVE5 asset font: implausible queried AssetSize %u for %s",
+                    (unsigned)asset_size, path);
+        return false;
+    }
+
+    /* GA_FIXED_FLAG pins the allocation (see SRC_FILE/SRC_FLASH branch). */
+    Esd_GpuHandle final_handle = Esd_GpuAlloc_Alloc(alloc, asset_size, GA_ALIGN_4 | GA_FIXED_FLAG);
+    uint32_t final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
+    if(final_addr == GA_INVALID) {
+        LV_LOG_WARN("EVE5 asset font: SD final RAM_G alloc failed (%u bytes)",
+                    (unsigned)asset_size);
+        return false;
+    }
+
+    /* QUERYASSET likely consumed FSSOURCE — re-issue before LOADASSET. */
+    if(EVE_CoCmd_fsSource(phost, sd_path) != 0) {
+        LV_LOG_WARN("EVE5 asset font: CMD_FSSOURCE (load) failed for %s", path);
+        Esd_GpuAlloc_Free(alloc, final_handle);
+        return false;
+    }
+
+    if(phost->CmdFault) {
+        LV_LOG_ERROR("EVE5 asset font: coprocessor fault before SD CMD_LOADASSET");
+        Esd_GpuAlloc_Free(alloc, final_handle);
+        return false;
+    }
+
+    EVE_CoCmd_loadAsset(phost, final_addr, OPT_FS);
+    if(!EVE_Cmd_waitFlush(phost)) {
+        LV_LOG_ERROR("EVE5 asset font: SD CMD_LOADASSET failed for %s", path);
+        Esd_GpuAlloc_Free(alloc, final_handle);
+        return false;
+    }
+    EVE_Hal_requestFenceBeforeSwap(phost);
+
+    *out_handle = final_handle;
+    *out_asset_size = asset_size;
+    return true;
+}
+
+#else /* EVE_COCMD_PATCH_QUERY */
+
+/* SD card load (legacy intermediate-buffer path): CMD_FSREAD the .reloc
+ * into a temp RAM_G buffer, peek the 12-byte AssetHeader for AssetSize,
+ * allocate the destination, then run CMD_LOADASSET(OPT_MEDIAFIFO) sourcing
+ * from the temp buffer. Mirrors lv_eve5_sdcard_load_image — one SD read,
+ * exact destination size. The coprocessor consumes the FIFO synchronously
+ * with EVE_Cmd_waitFlush, so the temp buffer is safe to free immediately
+ * after.
+ *
+ * This path roundtrips the full compressed file through RAM_G. Define
+ * EVE_COCMD_PATCH_QUERY=1 to enable the CMD_QUERYASSET fast path that
+ * avoids the intermediate copy.
+ *
+ * Caller holds the HAL mutex. */
+static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
+                                   const char * path, Esd_GpuHandle * out_handle,
+                                   uint32_t * out_asset_size)
+{
+    LV_LOG_WARN("EVE5 asset font: SD load uses intermediate RAM_G buffer "
+                "(define EVE_COCMD_PATCH_QUERY=1 for zero-copy CMD_QUERYASSET path)");
+
     /* Idempotent attach — lv_eve5_sdcard_ready() would re-take the HAL
      * mutex which our caller already holds. CMD_SDATTACH returns 0 on
      * success / already-attached. */
@@ -632,6 +732,8 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
     *out_asset_size = hdr.AssetSize;
     return true;
 }
+
+#endif /* EVE_COCMD_PATCH_QUERY */
 
 /**********************
  *   GLYPH METRICS

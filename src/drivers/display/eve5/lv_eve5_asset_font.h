@@ -58,12 +58,15 @@ typedef enum {
      *  then fed into the command FIFO. Use this for filesystem backends
      *  that don't have an EVE-side zero-copy alternative. */
     LV_EVE5_ASSET_FONT_SRC_FILE = 0,
-    /** Load from the BT820 SD card via CMD_FSREAD into a temp RAM_G
-     *  buffer + CMD_LOADASSET(OPT_MEDIAFIFO). Bypasses LVGL I/O — one
-     *  SD read, exact destination allocation (AssetSize comes from the
-     *  EVE_Gpu_AssetHeader peeked out of the temp). Mirrors the image
-     *  loader's SD path. path may include an LVGL drive-letter prefix
-     *  (e.g. "S:/foo.reloc"); it's stripped before CMD_FSREAD. */
+    /** Load from the BT820 SD card. Bypasses LVGL I/O. Path may include
+     *  an LVGL drive-letter prefix (e.g. "S:/foo.reloc"); it's stripped
+     *  before the EVE FS commands. Two implementations selected at
+     *  compile time:
+     *    - EVE_COCMD_PATCH_QUERY=1: zero-copy via CMD_FSSOURCE +
+     *      CMD_QUERYASSET + CMD_GETPROPS + CMD_LOADASSET(OPT_FS).
+     *    - Otherwise (legacy): CMD_FSREAD the whole file into a temp
+     *      RAM_G buffer, peek the EVE_Gpu_AssetHeader, then
+     *      CMD_LOADASSET(OPT_MEDIAFIFO) from the temp. Logs a warning. */
     LV_EVE5_ASSET_FONT_SRC_SDCARD,
     /** Zero-copy load from EVE QSPI flash via CMD_FLASHSOURCE +
      *  CMD_LOADASSET(OPT_FLASH). flash_address must be 64-byte aligned. */
