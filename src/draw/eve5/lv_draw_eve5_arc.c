@@ -24,9 +24,6 @@
 
 #if LV_USE_DRAW_EVE5
 
-#include "../lv_draw.h"
-#include "../lv_draw_arc.h"
-
 /* CMD_ARC (BT820+) has slight rendering alignment issues.
  * Set to 1 to use CMD_ARC anyway for testing or if firmware is fixed. */
 #ifndef LV_DRAW_EVE5_USE_CMD_ARC

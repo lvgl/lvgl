@@ -11,17 +11,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
-
 #include "lv_eve5_sdcard.h"
 
 #if LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD && (EVE_SUPPORT_CHIPID >= EVE_BT820)
 #include "lv_eve5.h"
 #include "lv_eve5_image_private.h"
 #include "../../../core/lv_global.h"
-#include "../../../misc/lv_fs.h"
-#include "../../../stdlib/lv_mem.h"
-#include "../../../stdlib/lv_string.h"
 
 #include "EVE_Hal.h"
 #include "EVE_CoCmd.h"

@@ -26,9 +26,6 @@
 
 #if LV_USE_DRAW_EVE5
 
-#include "../lv_draw.h"
-#include "../lv_draw_image.h"
-
 /**********************
  * IMAGE DRAWING
  **********************/

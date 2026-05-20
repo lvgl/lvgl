@@ -22,12 +22,10 @@ extern "C" {
 #if LV_USE_DRAW_EVE5
 
 #include "../lv_draw_private.h"
-#include "../lv_draw_image.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_image_decoder_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
-#include "../../font/fmt_txt/lv_font_fmt_txt.h"
 #include "../../drivers/display/eve5/lv_eve5.h"
 
 /*********************

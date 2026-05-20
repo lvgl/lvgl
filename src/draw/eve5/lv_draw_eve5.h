@@ -17,7 +17,7 @@ extern "C" {
 /*********************
  * INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_DRAW_EVE5
 

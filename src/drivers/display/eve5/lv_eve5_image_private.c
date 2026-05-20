@@ -8,11 +8,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "../../../lv_conf_internal.h"
+#include "lv_eve5_image_private.h"
 
 #if LV_USE_EVE5
-
-#include "lv_eve5_image_private.h"
 
 /**********************
  * IMAGE HEADER PARSING

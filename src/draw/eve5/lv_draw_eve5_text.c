@@ -20,8 +20,6 @@
 
 #if LV_USE_DRAW_EVE5
 
-#include "../lv_draw.h"
-#include "../lv_draw_label.h"
 #include "../../drivers/display/eve5/lv_eve5_rom_font.h"
 #include "../../drivers/display/eve5/lv_eve5_asset_font.h"
 #include "../../misc/lv_text_private.h"

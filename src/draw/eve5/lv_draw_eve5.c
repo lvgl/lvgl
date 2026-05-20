@@ -58,7 +58,6 @@
 
 #if LV_USE_DRAW_EVE5
 
-#include "../lv_draw_image.h"
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 

@@ -29,7 +29,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #include "EVE_Hal.h"
 
@@ -37,7 +37,6 @@ extern "C" {
  * BT820-only. On earlier chips these public functions are no-op stubs. */
 #if LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
 
-#include "../../../display/lv_display.h"
 #include "Esd_GpuAlloc.h"
 
 /*********************

@@ -22,7 +22,6 @@
 #if LV_USE_EVE5
 
 #include "lv_eve5_font_block.h"
-#include "../../../stdlib/lv_mem.h"
 #include "EVE_HalDefs.h"
 #include "EVE_GpuDefs.h"
 #include "EVE_CoCmd.h"

@@ -45,9 +45,6 @@
 
 #include "lv_eve5.h"
 #include "lv_eve5_font_block.h"
-#include "../../../misc/lv_fs.h"
-#include "../../../stdlib/lv_mem.h"
-#include "../../../stdlib/lv_string.h"
 
 #include "EVE_Hal.h"
 #include "EVE_CoCmd.h"

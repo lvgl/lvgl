@@ -20,8 +20,6 @@
 
 #if LV_USE_DRAW_EVE5
 
-#include "../lv_draw.h"
-#include "../lv_draw_image.h"
 #include "../lv_image_decoder_private.h"
 #if LV_USE_FS_EVE5_SDCARD
     #include "../../drivers/display/eve5/lv_eve5_sdcard.h"

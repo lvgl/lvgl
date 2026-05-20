@@ -17,13 +17,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_EVE5
 
-#include "../../../display/lv_display.h"
-#include "../../../draw/lv_draw_buf.h"
-#include "../../../indev/lv_indev.h"
 #include "EVE_Hal.h"
 #include "Esd_GpuAlloc.h"
 

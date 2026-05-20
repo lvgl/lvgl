@@ -17,12 +17,9 @@
 extern "C" {
 #endif
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_EVE5
-
-#include "../../../misc/lv_types.h"
-#include "../../../stdlib/lv_string.h"
 
 #include "EVE_Hal.h"
 

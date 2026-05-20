@@ -24,10 +24,6 @@
 #if !LV_DRAW_EVE5_NO_FLOAT
     #include <math.h>
 #endif
-#include "../lv_draw.h"
-#include "../lv_draw_rect.h"
-#include "../lv_draw_line.h"
-#include "../lv_draw_triangle.h"
 
 /**********************
  * STATIC PROTOTYPES

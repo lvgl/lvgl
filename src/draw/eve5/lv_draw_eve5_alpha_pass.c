@@ -27,14 +27,6 @@
  * pass. The whole flow is reachable only from the RT dispatch, so this file
  * is excluded on chips without render-target support. */
 
-#include "../lv_draw.h"
-#include "../lv_draw_image.h"
-#include "../lv_draw_rect.h"
-#include "../lv_draw_line.h"
-#include "../lv_draw_triangle.h"
-#include "../lv_draw_arc.h"
-#include "../lv_draw_mask.h"
-
 #if !LV_DRAW_EVE5_NO_FLOAT
     #include <math.h>
 #endif

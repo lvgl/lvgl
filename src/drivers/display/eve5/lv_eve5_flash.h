@@ -34,7 +34,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #include "EVE_Hal.h"
 
@@ -42,7 +42,6 @@ extern "C" {
  * On chips without flash these public functions are no-op stubs. */
 #if LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH
 
-#include "../../../display/lv_display.h"
 #include "Esd_GpuAlloc.h"
 
 /*********************

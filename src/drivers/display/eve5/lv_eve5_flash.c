@@ -11,16 +11,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
-
 #include "lv_eve5_flash.h"
 
 #if LV_USE_EVE5 && LV_USE_FS_EVE5_FLASH && defined(EVE_SUPPORT_FLASH)
 #include "lv_eve5.h"
 #include "lv_eve5_image_private.h"
-#include "../../../misc/lv_fs.h"
-#include "../../../stdlib/lv_mem.h"
-#include "../../../stdlib/lv_string.h"
 
 #include "EVE_Hal.h"
 #include "EVE_CoCmd.h"

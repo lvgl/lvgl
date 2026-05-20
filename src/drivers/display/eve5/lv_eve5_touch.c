@@ -22,11 +22,6 @@
 
 #if LV_USE_EVE5
 
-#include "../../../stdlib/lv_mem.h"
-#if LV_USE_OS
-    #include "../../../osal/lv_os.h"
-#endif
-
 /*********************
  * DEFINES
  *********************/

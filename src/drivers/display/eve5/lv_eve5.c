@@ -15,11 +15,8 @@
 
 #if LV_USE_EVE5
 
-#include "../../../core/lv_refr.h"
-#include "../../../stdlib/lv_mem.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../core/lv_refr_private.h"
-#include "../../../tick/lv_tick.h"
 #if LV_USE_OS
     #include "../../../osal/lv_os_private.h"
 #endif

@@ -32,11 +32,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_EVE5
 
-#include "../../../font/lv_font.h"
 #include "EVE_Hal.h"
 
 /**********************

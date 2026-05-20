@@ -29,7 +29,6 @@
 
 #if LV_USE_EVE5
 
-#include "../../../stdlib/lv_mem.h"
 #include "EVE_HalDefs.h"
 #include "EVE_GpuDefs.h"
 

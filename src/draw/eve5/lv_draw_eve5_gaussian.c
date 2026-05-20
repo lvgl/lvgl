@@ -34,9 +34,6 @@
  * are all BT820+, so the whole file is excluded on chips without render-
  * target support. */
 
-#include "../lv_draw.h"
-#include "../lv_draw_blur.h"
-
 /*********************
  * DEFINES
  *********************/
