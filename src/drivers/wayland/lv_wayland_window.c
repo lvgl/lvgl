@@ -94,34 +94,29 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_add_event_cb(window->lv_disp, refr_end_event, LV_EVENT_REFR_READY, NULL);
     lv_display_add_event_cb(window->lv_disp, delete_event, LV_EVENT_DELETE, NULL);
 
+
     /* Register input */
-    window->lv_indev_pointer = lv_wayland_pointer_create();
-    lv_indev_set_display(window->lv_indev_pointer, window->lv_disp);
+    struct {
+        const char * name;
+        lv_indev_t ** indev;
+        lv_indev_t * (*create)(void);
+    } indevs [] = {
+        {"pointer", &window->lv_indev_pointer, lv_wayland_pointer_create},
+        {"pointer axis", &window->lv_indev_pointeraxis, lv_wayland_pointer_axis_create},
+        {"keyboard", &window->lv_indev_keyboard, lv_wayland_keyboard_create},
+        {"touch", &window->lv_indev_touch, lv_wayland_touch_create},
+    };
 
-    if(!window->lv_indev_pointer) {
-        LV_LOG_ERROR("failed to register pointer indev");
+    for(size_t i = 0; i < sizeof(indevs) / sizeof(indevs[0]); ++i) {
+        lv_indev_t ** indev = indevs[i].indev;
+        *indev = indevs[i].create();
+        if(!*indev) {
+            LV_LOG_WARN("Failed to create %s indev", indevs[i].name);
+            continue;
+        }
+        lv_indev_set_display(*indev, window->lv_disp);
     }
 
-    window->lv_indev_pointeraxis = lv_wayland_pointer_axis_create();
-    lv_indev_set_display(window->lv_indev_pointeraxis, window->lv_disp);
-
-    if(!window->lv_indev_pointeraxis) {
-        LV_LOG_ERROR("failed to register pointeraxis indev");
-    }
-
-    window->lv_indev_touch = lv_wayland_touch_create();
-    lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
-
-    if(!window->lv_indev_touch) {
-        LV_LOG_ERROR("failed to register touch indev");
-    }
-
-    window->lv_indev_keyboard = lv_wayland_keyboard_create();
-    lv_indev_set_display(window->lv_indev_keyboard, window->lv_disp);
-
-    if(!window->lv_indev_keyboard) {
-        LV_LOG_ERROR("failed to register keyboard indev");
-    }
     return window->lv_disp;
 
 create_window_err:
