@@ -64,7 +64,7 @@ extern "C" {
      */
     #define LV_CHECK_OBJ_VALID(obj, associated, action) LV_CHECK_ARG(lv_obj_is_valid(obj) == associated, action);
 #else
-    #define LV_CHECK_OBJ_VALID(obj, action)
+    #define LV_CHECK_OBJ_VALID(obj, associated, action)
 #endif
 
 #define __LV_CHECK_OBJ_2(obj, cls, action) \
