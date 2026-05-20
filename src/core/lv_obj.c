@@ -1095,8 +1095,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_scroll_to_view_recursive(obj, LV_ANIM_ON);
         }
 
-        bool editing = false;
-        editing = lv_group_get_editing(lv_obj_get_group(obj));
+        lv_group_t * group = lv_obj_get_group(obj);
+        const bool editing = group && lv_group_get_editing(group);
         lv_state_t state = LV_STATE_FOCUSED;
 
         /* Use the indev for then indev handler.
