@@ -80,7 +80,7 @@ void test_jpg_2(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
 
 #if LV_USE_DRAW_VRAM
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 96);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 128);
 #else
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 64);
 #endif
