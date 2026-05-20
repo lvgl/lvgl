@@ -22,33 +22,33 @@ static void log_cb(lv_log_level_t level, const char * buf)
     last_log_buf[sizeof(last_log_buf) - 1] = '\0';
 }
 
-/** 1-arg form: NULL check only */
+/** Exercises LV_CHECK_OBJ (full chain: NULL + class-type + validity). */
 static bool helper_null_check(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, return false);
+    LV_CHECK_OBJ(obj, &lv_obj_class, return false);
     LV_UNUSED(obj);
     return true;
 }
 
-/** 2-arg form: NULL + optional class check */
+/** Exercises LV_CHECK_OBJ_CLASS (NULL + optional class-type check only). */
 static bool helper_class_check(lv_obj_t * obj, const lv_obj_class_t * cls)
 {
-    LV_CHECK_OBJ(obj, cls, return false);
+    LV_CHECK_OBJ_CLASS(obj, cls, return false);
     LV_UNUSED(obj);
     LV_UNUSED(cls);
     return true;
 }
 
-/** 3-arg form: NULL + optional class + optional validity check */
+/** Exercises LV_CHECK_OBJ_VALID (NULL + class-type + optional validity check). */
 static bool helper_validity_check(lv_obj_t * obj, const lv_obj_class_t * cls)
 {
-    LV_CHECK_OBJ(obj, cls, true, return false);
+    LV_CHECK_OBJ_VALID(obj, cls, return false);
     LV_UNUSED(obj);
     LV_UNUSED(cls);
     return true;
 }
 
-/* --- NULL check (1-arg form) --- */
+/* --- NULL check (via LV_CHECK_OBJ with base class) --- */
 
 void test_check_obj_null_check_pass(void)
 {
@@ -73,7 +73,7 @@ void test_check_obj_null_check_fail(void)
 #endif
 }
 
-/* --- Class check (2-arg form) --- */
+/* --- Class check (via LV_CHECK_OBJ_CLASS: NULL + optional class-type) --- */
 
 void test_check_obj_class_correct_class_pass(void)
 {
@@ -115,7 +115,7 @@ void test_check_obj_class_null_still_fails(void)
 #endif
 }
 
-/* --- Validity check (3-arg form) --- */
+/* --- Validity check (via LV_CHECK_OBJ_VALID: NULL + class-type + optional validity) --- */
 
 void test_check_obj_validity_valid_obj_pass(void)
 {

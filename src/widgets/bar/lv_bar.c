@@ -140,7 +140,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent)
 
 void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     if(bar->cur_value == value) return;
@@ -155,7 +155,7 @@ void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 
 void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_bar_t * bar = (lv_bar_t *)obj;
 
@@ -173,7 +173,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim
 
 void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_bar_t * bar = (lv_bar_t *)obj;
 
@@ -213,7 +213,7 @@ void lv_bar_set_max_value(lv_obj_t * obj, int32_t max)
 
 void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     bar->mode = mode;
@@ -226,7 +226,7 @@ void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode)
 
 void lv_bar_set_orientation(lv_obj_t * obj, lv_bar_orientation_t orientation)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     bar->orientation = orientation;
@@ -239,7 +239,7 @@ void lv_bar_set_orientation(lv_obj_t * obj, lv_bar_orientation_t orientation)
 
 int32_t lv_bar_get_value(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     return LV_BAR_GET_ANIM_VALUE(bar->cur_value, bar->cur_value_anim);
@@ -247,7 +247,7 @@ int32_t lv_bar_get_value(const lv_obj_t * obj)
 
 int32_t lv_bar_get_start_value(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     if(bar->mode != LV_BAR_MODE_RANGE) return bar->min_value;
@@ -257,14 +257,14 @@ int32_t lv_bar_get_start_value(const lv_obj_t * obj)
 
 int32_t lv_bar_get_min_value(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_bar_t * bar = (lv_bar_t *)obj;
     return bar->val_reversed ? bar->max_value : bar->min_value;
 }
 
 int32_t lv_bar_get_max_value(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     return bar->val_reversed ? bar->min_value : bar->max_value;
@@ -272,7 +272,7 @@ int32_t lv_bar_get_max_value(const lv_obj_t * obj)
 
 lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     return bar->mode;
@@ -280,7 +280,7 @@ lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj)
 
 lv_bar_orientation_t lv_bar_get_orientation(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     return bar->orientation;
@@ -288,7 +288,7 @@ lv_bar_orientation_t lv_bar_get_orientation(lv_obj_t * obj)
 
 bool lv_bar_is_symmetrical(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     return  bar->mode == LV_BAR_MODE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&

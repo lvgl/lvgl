@@ -103,7 +103,7 @@ lv_obj_t * lv_gstreamer_create(lv_obj_t * parent)
 
 lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, const char * property, const char * source)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(factory_name);
 
     if(!obj || !factory_name) {
@@ -199,7 +199,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
 
 void lv_gstreamer_play(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     if(!obj) {
         return;
     }
@@ -218,7 +218,7 @@ void lv_gstreamer_play(lv_obj_t * obj)
 
 void lv_gstreamer_pause(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     if(!obj) {
         return;
     }
@@ -238,7 +238,7 @@ void lv_gstreamer_pause(lv_obj_t * obj)
 
 void lv_gstreamer_stop(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     if(!obj) {
         return;
     }
@@ -256,7 +256,7 @@ void lv_gstreamer_stop(lv_obj_t * obj)
 }
 void lv_gstreamer_set_position(lv_obj_t * obj, uint32_t position)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     if(!obj) {
         return;
     }
@@ -276,7 +276,7 @@ void lv_gstreamer_set_position(lv_obj_t * obj, uint32_t position)
 
 uint32_t lv_gstreamer_get_duration(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->pipeline) {
@@ -293,7 +293,7 @@ uint32_t lv_gstreamer_get_duration(lv_obj_t * obj)
 
 uint32_t lv_gstreamer_get_position(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->pipeline) {
@@ -310,7 +310,7 @@ uint32_t lv_gstreamer_get_position(lv_obj_t * obj)
 
 lv_gstreamer_state_t lv_gstreamer_get_state(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->pipeline) {
@@ -341,7 +341,7 @@ lv_gstreamer_state_t lv_gstreamer_get_state(lv_obj_t * obj)
 void lv_gstreamer_set_volume(lv_obj_t * obj, uint8_t volume)
 {
 
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->audio_volume) {
@@ -353,7 +353,7 @@ void lv_gstreamer_set_volume(lv_obj_t * obj, uint8_t volume)
 
 uint8_t lv_gstreamer_get_volume(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->audio_volume) {
@@ -369,7 +369,7 @@ uint8_t lv_gstreamer_get_volume(lv_obj_t * obj)
 void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
 {
 
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->pipeline) {

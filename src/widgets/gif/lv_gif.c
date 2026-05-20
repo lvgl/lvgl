@@ -82,7 +82,7 @@ lv_obj_t * lv_gif_create(lv_obj_t * parent)
 
 void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(gifobj->color_format == color_format) {
@@ -111,7 +111,7 @@ void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format)
 
 void lv_gif_set_src(lv_obj_t * obj, const void * src)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(gifobj->is_open) {
@@ -125,7 +125,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
 void lv_gif_restart(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -146,7 +146,7 @@ void lv_gif_restart(lv_obj_t * obj)
 
 void lv_gif_pause(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     lv_timer_pause(gifobj->timer);
@@ -154,7 +154,7 @@ void lv_gif_pause(lv_obj_t * obj)
 
 void lv_gif_resume(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -167,7 +167,7 @@ void lv_gif_resume(lv_obj_t * obj)
 
 bool lv_gif_is_loaded(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     return gifobj->is_open;
@@ -175,7 +175,7 @@ bool lv_gif_is_loaded(lv_obj_t * obj)
 
 int32_t lv_gif_get_loop_count(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -187,7 +187,7 @@ int32_t lv_gif_get_loop_count(lv_obj_t * obj)
 
 void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -200,7 +200,7 @@ void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
 
 void lv_gif_set_auto_pause_invisible(lv_obj_t * obj, bool auto_pause)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     gifobj->is_auto_pause = auto_pause;
@@ -231,7 +231,7 @@ bool lv_gif_get_size(const char * src, uint16_t * w, uint16_t * h)
 
 int32_t lv_gif_get_frame_count(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {
@@ -253,7 +253,7 @@ int32_t lv_gif_get_frame_count(lv_obj_t * obj)
 
 int32_t lv_gif_get_current_frame_index(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     if(!gifobj->is_open) {

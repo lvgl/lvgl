@@ -129,7 +129,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent)
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return false);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     return slider->dragging;

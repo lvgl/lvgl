@@ -91,7 +91,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * parent)
 
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_obj_t * cont = lv_tabview_get_content(obj);
 
     lv_obj_t * page = lv_obj_create(cont);
@@ -121,7 +121,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
 void lv_tabview_set_tab_text(lv_obj_t * obj, uint32_t idx, const char * new_name)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
     lv_obj_t * button = lv_obj_get_child_by_type(tab_bar, idx, &lv_button_class);
@@ -133,7 +133,7 @@ void lv_tabview_set_tab_text(lv_obj_t * obj, uint32_t idx, const char * new_name
 
 lv_obj_t * lv_tabview_set_tab_translation_tag(lv_obj_t * obj, const char * tag)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_obj_t * page = lv_tabview_add_tab(obj, NULL);
     lv_obj_t * button = lv_tabview_get_tab_button(obj, -1);
@@ -147,7 +147,7 @@ lv_obj_t * lv_tabview_set_tab_translation_tag(lv_obj_t * obj, const char * tag)
 
 void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     tabview->tab_cur = idx;
@@ -192,7 +192,7 @@ void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_e
 
 void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     switch(dir) {
@@ -263,7 +263,7 @@ void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir)
 
 void lv_tabview_set_tab_bar_size(lv_obj_t * obj, int32_t size)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
@@ -278,21 +278,21 @@ void lv_tabview_set_tab_bar_size(lv_obj_t * obj, int32_t size)
 
 uint32_t lv_tabview_get_tab_active(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
     return tabview->tab_cur;
 }
 
 lv_obj_t * lv_tabview_get_tab_button(lv_obj_t * obj, int32_t idx)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     return lv_obj_get_child_by_type(lv_tabview_get_tab_bar(obj), idx, &lv_button_class);
 }
 
 uint32_t lv_tabview_get_tab_count(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
     return lv_obj_get_child_count_by_type(tab_bar, &lv_button_class);
 }
@@ -309,7 +309,7 @@ lv_obj_t * lv_tabview_get_tab_bar(lv_obj_t * tv)
 
 lv_dir_t lv_tabview_get_tab_bar_position(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
     return tabview->tab_pos;
 }

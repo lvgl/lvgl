@@ -91,7 +91,7 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent)
 #if LV_FILE_EXPLORER_QUICK_ACCESS
 void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir_t dir, const char * path)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -138,7 +138,7 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
 
 void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -149,7 +149,7 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 
 void lv_file_explorer_show_back_button(lv_obj_t * obj, bool show)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -161,7 +161,7 @@ void lv_file_explorer_show_back_button(lv_obj_t * obj, bool show)
  *====================*/
 const char * lv_file_explorer_get_selected_file_name(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -170,7 +170,7 @@ const char * lv_file_explorer_get_selected_file_name(const lv_obj_t * obj)
 
 const char * lv_file_explorer_get_current_path(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -179,7 +179,7 @@ const char * lv_file_explorer_get_current_path(const lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -188,7 +188,7 @@ lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -197,7 +197,7 @@ lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -207,7 +207,7 @@ lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 #if LV_FILE_EXPLORER_QUICK_ACCESS
 lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -216,7 +216,7 @@ lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -225,7 +225,7 @@ lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
 
 lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -236,7 +236,7 @@ lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj)
 
 lv_file_explorer_sort_t lv_file_explorer_get_sort(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
@@ -248,7 +248,7 @@ lv_file_explorer_sort_t lv_file_explorer_get_sort(const lv_obj_t * obj)
  *====================*/
 void lv_file_explorer_open_dir(lv_obj_t * obj, const char * dir)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     show_dir(obj, dir);
 }
@@ -742,7 +742,7 @@ static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 
 static void file_explorer_sort(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 

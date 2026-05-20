@@ -162,7 +162,7 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
 
 lv_anim_t * lv_lottie_get_anim(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
     return lottie->anim;
 }

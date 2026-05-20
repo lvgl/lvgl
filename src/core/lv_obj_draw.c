@@ -408,7 +408,7 @@ int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
     LV_PROFILER_DRAW_BEGIN;
-    LV_CHECK_OBJ(obj, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     int32_t s_old = lv_obj_get_ext_draw_size(obj);
     int32_t s_new = 0;

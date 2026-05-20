@@ -61,7 +61,7 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent)
 
 void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_draw_buf_t * old_buf = lv_canvas_get_draw_buf(obj);
     lv_draw_buf_t * new_buf = lv_draw_buf_create(size, size, LV_COLOR_FORMAT_I1, LV_STRIDE_AUTO);
@@ -81,21 +81,21 @@ void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
 
 void lv_qrcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
     qrcode->dark_color = color;
 }
 
 void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
     qrcode->light_color = color;
 }
 
 lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, true, return LV_RESULT_INVALID);
+    LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
