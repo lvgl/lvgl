@@ -42,7 +42,7 @@ static bool helper_class_check(lv_obj_t * obj, const lv_obj_class_t * cls)
 /** 3-arg form: NULL + optional class + optional validity check */
 static bool helper_validity_check(lv_obj_t * obj, const lv_obj_class_t * cls)
 {
-    LV_CHECK_OBJ(obj, cls, obj, return false);
+    LV_CHECK_OBJ(obj, cls, true, return false);
     LV_UNUSED(obj);
     LV_UNUSED(cls);
     return true;
