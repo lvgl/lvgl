@@ -550,34 +550,33 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* Decode via CMD_FLASHSOURCE + CMD_LOADIMAGE */
-    if(phost->CmdFault) {
-        LV_LOG_ERROR("Coprocessor fault before flash image decode");
-        Esd_GpuAlloc_Free(alloc, final_handle);
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    /* OPT_TRUECOLOR is BT820-only — earlier gens decode to RGB565/ARGB4. */
-    uint32_t loadimage_opts = OPT_FLASH | OPT_NODL;
+    /* OPT_TRUECOLOR is BT820-only — earlier gens decode to RGB565/ARGB4.
+     * The wrapper bakes in OPT_FLASH | OPT_NODL plus the BT820 CMD_NOP
+     * early-return workaround, and chooses CMD_GETIMAGE vs CMD_GETIMAGE_FORMAT
+     * based on which outputs are requested. */
+    uint32_t loadimage_opts = 0;
     if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
 
-    EVE_Cmd_startFunc(phost);
-    EVE_Cmd_wr32(phost, CMD_FLASHSOURCE);
-    EVE_Cmd_wr32(phost, flash_addr);
-    EVE_Cmd_wr32(phost, CMD_LOADIMAGE);
-    EVE_Cmd_wr32(phost, final_addr);
-    EVE_Cmd_wr32(phost, loadimage_opts);
-#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
-    if(EVE_CHIPID == EVE_BT820) {
-        EVE_Cmd_wr32(phost, CMD_NOP);  /* BT820: early return without data */
-    }
-#endif
-    EVE_Cmd_endFunc(phost);
+    uint32_t out_source = final_addr;     /* BT815/816: CMD_GETIMAGE unavailable, source = alloc base */
+    uint32_t out_fmt = 0;
+    uint32_t out_w = img_w;               /* BT815/816: dims from JPEG/PNG header parse */
+    uint32_t out_h = img_h;
+    uint32_t out_palette = GA_INVALID;
+    bool ok;
 
-    if(!EVE_Cmd_waitFlush(phost)) {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT817) || defined(EVE_MULTI_GRAPHICS_TARGET)
+    if(EVE_CHIPID >= EVE_BT817) {
+        ok = EVE_CoCmd_loadImage_flash_ex(phost, final_addr, flash_addr, loadimage_opts,
+                                          &out_fmt, &out_source, &out_w, &out_h, &out_palette);
+    }
+    else
+#endif
+    {
+        ok = EVE_CoCmd_loadImage_flash_ex(phost, final_addr, flash_addr, loadimage_opts,
+                                          &out_fmt, NULL, NULL, NULL, NULL);
+    }
+
+    if(!ok) {
         LV_LOG_ERROR("CMD_LOADIMAGE from flash failed for %s", path);
         Esd_GpuAlloc_Free(alloc, final_handle);
 #if LV_USE_OS
@@ -587,38 +586,6 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     }
 
     EVE_Hal_requestFenceBeforeSwap(phost);
-
-    /* CMD_GETIMAGE (full source/fmt/w/h/palette) is BT817+. Flash works on
-     * BT815+, so on BT815/BT816 we use CMD_GETIMAGE_FORMAT (with the 0x3097e8
-     * fallback) and supply parsed dimensions. */
-    uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
-    bool got_image = false;
-
-#if (EVE_SUPPORT_CHIPID >= EVE_BT817)
-    if(EVE_CHIPID >= EVE_BT817) {
-        got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
-        LV_LOG_INFO("getImage: source=0x%08x fmt=%u w=%u h=%u palette=0x%08x",
-                    out_source, out_fmt, out_w, out_h, out_palette);
-    }
-    else
-#endif
-    {
-        got_image = EVE_CoCmd_getImage_format(phost, &out_fmt);
-        out_source = final_addr;
-        out_w = img_w;
-        out_h = img_h;
-        out_palette = 0;
-        LV_LOG_INFO("getImage_format: fmt=%u (header w=%u h=%u)", out_fmt, img_w, img_h);
-    }
-
-    if(!got_image) {
-        LV_LOG_WARN("getImage failed, assuming RGB565 %ux%u", img_w, img_h);
-        out_source = final_addr;
-        out_w = img_w;
-        out_h = img_h;
-        out_fmt = RGB565;
-        out_palette = GA_INVALID;
-    }
 
     uint32_t alloc_base = Esd_GpuAlloc_Get(alloc, final_handle);
     uint32_t img_ofs = (out_source >= alloc_base) ? (out_source - alloc_base) : 0;

@@ -477,13 +477,7 @@ static bool issue_loadasset_from_buffer(EVE_HalContext * phost,
 static bool issue_loadasset_from_flash(EVE_HalContext * phost, uint32_t flash_addr,
                                        uint32_t dst_addr)
 {
-    if(phost->CmdFault) {
-        LV_LOG_ERROR("EVE5 asset font: coprocessor fault before flash CMD_LOADASSET");
-        return false;
-    }
-    EVE_CoCmd_flashSource(phost, flash_addr);
-    EVE_CoCmd_loadAsset(phost, dst_addr, OPT_FLASH);
-    if(!EVE_Cmd_waitFlush(phost)) {
+    if(!EVE_CoCmd_loadAsset_flash(phost, dst_addr, flash_addr, 0)) {
         LV_LOG_ERROR("EVE5 asset font: flash CMD_LOADASSET failed");
         return false;
     }
@@ -551,18 +545,12 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
 
     const char * sd_path = strip_lvgl_drive_letter(path);
 
-    if(EVE_CoCmd_fsSource(phost, sd_path) != 0) {
-        LV_LOG_WARN("EVE5 asset font: CMD_FSSOURCE (query) failed for %s", path);
-        return false;
-    }
-
     /* The queryassets patch's CMD_QUERYASSET writes the inflated size into
-     * `image.source` (and nothing else). That slot is the first field
-     * returned by CMD_GETIMAGE; CMD_GETPROPS reads REG_EJPG_DST which the
+     * `image.source` (and nothing else); EVE_CoCmd_queryAsset_fs reads it
+     * back via CMD_GETIMAGE. CMD_GETPROPS reads REG_EJPG_DST which the
      * query commands never touch, so it would always come back as 0. */
-    EVE_CoCmd_queryAsset(phost, OPT_FS);
-    uint32_t asset_size = 0, qfmt = 0, qw = 0, qh = 0, qpal = 0;
-    if(!EVE_CoCmd_getImage(phost, &asset_size, &qfmt, &qw, &qh, &qpal)) {
+    uint32_t asset_size = 0;
+    if(!EVE_CoCmd_queryAsset_fs(phost, sd_path, 0, &asset_size)) {
         LV_LOG_WARN("EVE5 asset font: CMD_QUERYASSET failed for %s", path);
         return false;
     }
@@ -581,21 +569,7 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
         return false;
     }
 
-    /* QUERYASSET likely consumed FSSOURCE — re-issue before LOADASSET. */
-    if(EVE_CoCmd_fsSource(phost, sd_path) != 0) {
-        LV_LOG_WARN("EVE5 asset font: CMD_FSSOURCE (load) failed for %s", path);
-        Esd_GpuAlloc_Free(alloc, final_handle);
-        return false;
-    }
-
-    if(phost->CmdFault) {
-        LV_LOG_ERROR("EVE5 asset font: coprocessor fault before SD CMD_LOADASSET");
-        Esd_GpuAlloc_Free(alloc, final_handle);
-        return false;
-    }
-
-    EVE_CoCmd_loadAsset(phost, final_addr, OPT_FS);
-    if(!EVE_Cmd_waitFlush(phost)) {
+    if(!EVE_CoCmd_loadAsset_fs(phost, final_addr, sd_path, 0)) {
         LV_LOG_ERROR("EVE5 asset font: SD CMD_LOADASSET failed for %s", path);
         Esd_GpuAlloc_Free(alloc, final_handle);
         return false;

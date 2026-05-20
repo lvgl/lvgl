@@ -730,9 +730,8 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     Esd_GpuHandle final_handle;
     uint32_t final_addr;
     uint32_t allocated_size;
-    /* Pre-load fallback dims, populated by whichever branch ran. Used only
-     * if the post-load CMD_GETIMAGE fails. */
-    uint32_t fallback_w = 0, fallback_h = 0, fallback_fmt = RGB565;
+    /* Post-load metadata, populated by each branch via CMD_GETIMAGE. */
+    uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
 
 #if EVE_COCMD_PATCH_QUERY
     /* Zero-copy fast path: CMD_QUERYIMAGE reports the image dimensions
@@ -747,34 +746,21 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     LV_UNUSED(is_png);
     LV_UNUSED(is_jpeg);
 
-    if(EVE_CoCmd_fsSource(phost, sd_path) != 0) {
-        LV_LOG_ERROR("CMD_FSSOURCE (query) failed for %s", sd_path);
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
     /* Only w/h from CMD_QUERYIMAGE are reliable. The query does not honor
-     * OPT_TRUECOLOR (and likely other format-affecting options), so the
+     * OPT_TRUECOLOR (and likely other format-affecting options), so its
      * reported byte size / format / palette size can differ from what
      * CMD_LOADIMAGE will actually produce. We use the queried dimensions
-     * to replace the host-side header parse and allocate worst-case
-     * ARGB8 — the post-load CMD_GETIMAGE truncate trims any slack. The
-     * big win (no intermediate compressed buffer, no host header parse)
-     * still stands. */
-    EVE_CoCmd_queryImage(phost, OPT_FS);
-    uint32_t q_size = 0, q_fmt = 0, q_w = 0, q_h = 0, q_palsize = 0;
-    if(!EVE_CoCmd_getImage(phost, &q_size, &q_fmt, &q_w, &q_h, &q_palsize)) {
+     * to allocate worst-case ARGB8; the post-load CMD_GETIMAGE (folded
+     * into loadImage_fs via out_* outputs) returns the actual format and
+     * lets the truncate step below trim any slack. */
+    uint32_t q_w = 0, q_h = 0;
+    if(!EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &q_w, &q_h, NULL)) {
         LV_LOG_ERROR("CMD_QUERYIMAGE failed for %s", sd_path);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
-    LV_UNUSED(q_size);
-    LV_UNUSED(q_fmt);
-    LV_UNUSED(q_palsize);
     if(q_w == 0 || q_h == 0) {
         LV_LOG_ERROR("Implausible CMD_QUERYIMAGE result for %s (w=%u h=%u)",
                      sd_path, (unsigned)q_w, (unsigned)q_h);
@@ -799,29 +785,15 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
         return false;
     }
 
-    /* CMD_QUERYIMAGE consumed FSSOURCE — re-issue before CMD_LOADIMAGE. */
-    if(EVE_CoCmd_fsSource(phost, sd_path) != 0) {
-        LV_LOG_ERROR("CMD_FSSOURCE (load) failed for %s", sd_path);
+    if(!EVE_CoCmd_loadImage_fs(phost, final_addr, sd_path, loadimage_opts,
+                               &out_fmt, &out_source, &out_w, &out_h, &out_palette)) {
+        LV_LOG_ERROR("CMD_LOADIMAGE failed for %s", sd_path);
         Esd_GpuAlloc_Free(alloc, final_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
-
-    EVE_CoCmd_loadImage(phost, final_addr, OPT_FS | loadimage_opts);
-    if(!EVE_Cmd_waitFlush(phost)) {
-        LV_LOG_ERROR("CMD_LOADIMAGE failed");
-        Esd_GpuAlloc_Free(alloc, final_handle);
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    fallback_w = q_w;
-    fallback_h = q_h;
-    fallback_fmt = q_fmt;
 
 #else  /* EVE_COCMD_PATCH_QUERY */
 
@@ -933,25 +905,13 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     EVE_MediaFifo_close(phost);
     Esd_GpuAlloc_Free(alloc, temp_handle);
 
-    fallback_w = img_width;
-    fallback_h = img_height;
-    fallback_fmt = RGB565;
+    /* CMD_GETIMAGE reads the decoded image's actual source/format/dims.
+     * (The wrapper-based patch path above folds this into loadImage_fs.) */
+    EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
 
 #endif /* EVE_COCMD_PATCH_QUERY */
 
     EVE_Hal_requestFenceBeforeSwap(phost);
-
-    /* CMD_GETIMAGE after CMD_LOADIMAGE returns actual addresses (not sizes)
-     * for source and palette — shared by both paths. */
-    uint32_t out_source, out_fmt, out_w, out_h, out_palette;
-    if(!EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette)) {
-        LV_LOG_WARN("CMD_GETIMAGE failed, using fallback dimensions");
-        out_source = final_addr;
-        out_w = fallback_w;
-        out_h = fallback_h;
-        out_fmt = fallback_fmt;
-        out_palette = GA_INVALID;
-    }
 
     /* Compute offsets from allocation base */
     uint32_t alloc_base = Esd_GpuAlloc_Get(alloc, final_handle);
@@ -1017,13 +977,9 @@ bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32
 #endif
 
     if(ensure_sd_attached(&s_ctx)
-       && EVE_CoCmd_fsSource(phost, sd_path) == 0) {
-        EVE_CoCmd_queryImage(phost, OPT_FS);
-        uint32_t q_size = 0, q_fmt = 0, q_pal = 0;
-        if(EVE_CoCmd_getImage(phost, &q_size, &q_fmt, &qw, &qh, &q_pal)
-           && qw != 0 && qh != 0) {
-            ok = true;
-        }
+       && EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &qw, &qh, NULL)
+       && qw != 0 && qh != 0) {
+        ok = true;
     }
 
 #if LV_USE_OS
