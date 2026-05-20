@@ -1456,15 +1456,20 @@ static void indev_proc_release(lv_indev_t * indev)
         lv_obj_t ** last = &indev->pointer.last_hovered;
         lv_obj_t * hovered = pointer_search_obj(lv_display_get_default(), &indev->pointer.act_point);
         if(*last != hovered) {
-            lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev);
-            if(indev_reset_check(indev)) return;
-            lv_indev_send_event(indev, LV_EVENT_HOVER_OVER, hovered);
-            if(indev_reset_check(indev)) return;
 
-            lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev);
-            if(indev_reset_check(indev)) return;
-            lv_indev_send_event(indev, LV_EVENT_HOVER_LEAVE, *last);
-            if(indev_reset_check(indev)) return;
+            if(hovered) {
+                lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev);
+                if(indev_reset_check(indev)) return;
+                lv_indev_send_event(indev, LV_EVENT_HOVER_OVER, hovered);
+                if(indev_reset_check(indev)) return;
+            }
+
+            if(*last) {
+                lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev);
+                if(indev_reset_check(indev)) return;
+                lv_indev_send_event(indev, LV_EVENT_HOVER_LEAVE, *last);
+                if(indev_reset_check(indev)) return;
+            }
             *last = hovered;
         }
     }
@@ -1728,8 +1733,10 @@ static void indev_click_focus(lv_indev_t * indev)
         /*The object are not in group*/
         else {
             if(indev->pointer.last_pressed != indev_obj_act) {
-                lv_obj_send_event(indev->pointer.last_pressed, LV_EVENT_DEFOCUSED, indev_act);
-                if(indev_reset_check(indev)) return;
+                if(indev->pointer.last_pressed) {
+                    lv_obj_send_event(indev->pointer.last_pressed, LV_EVENT_DEFOCUSED, indev_act);
+                    if(indev_reset_check(indev)) return;
+                }
 
                 lv_obj_send_event(indev_obj_act, LV_EVENT_FOCUSED, indev_act);
                 if(indev_reset_check(indev)) return;
