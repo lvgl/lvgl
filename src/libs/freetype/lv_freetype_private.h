@@ -122,6 +122,7 @@ typedef struct _lv_freetype_context_t {
 } lv_freetype_context_t;
 
 typedef struct _lv_freetype_font_dsc_t {
+    lv_font_dsc_base_t base;        /**< Common base — must be first member */
     uint32_t magic_num;
     lv_font_t font;
     uint32_t size;

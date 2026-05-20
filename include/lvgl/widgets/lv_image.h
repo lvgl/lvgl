@@ -219,7 +219,7 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align);
  * @param obj       pointer to an image object
  * @param src       an lv_image_dsc_t bitmap mask source.
  */
-void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src);
+void lv_image_set_bitmap_map_src(lv_obj_t * obj, LV_IMAGE_DSC_CONST lv_image_dsc_t * src);
 
 /*=====================
  * Getter functions
@@ -230,7 +230,7 @@ void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src);
  * @param obj       pointer to an image object
  * @return          the image source (symbol, file name or ::lv-img_dsc_t for C arrays)
  */
-const void * lv_image_get_src(lv_obj_t * obj);
+LV_IMAGE_DSC_CONST void * lv_image_get_src(lv_obj_t * obj);
 
 /**
  * Get the offset's x attribute of the image object.
@@ -338,7 +338,7 @@ lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj);
  * @param obj       pointer to an image object
  * @return          an lv_image_dsc_t bitmap mask source.
  */
-const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj);
+LV_IMAGE_DSC_CONST lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj);
 
 
 #if LV_USE_OBSERVER
@@ -356,7 +356,7 @@ lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject);
  **********************/
 
 /** Use this macro to declare an image in a C file*/
-#define LV_IMAGE_DECLARE(var_name) extern const lv_image_dsc_t var_name
+#define LV_IMAGE_DECLARE(var_name) extern LV_IMAGE_DSC_CONST lv_image_dsc_t var_name
 
 #endif /*LV_USE_IMAGE*/
 

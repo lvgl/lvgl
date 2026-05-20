@@ -155,8 +155,9 @@ static bool cache_create_cb(cache_item_t * item, void * user_data)
                                                      item->g_dsc.box_h,
                                                      LV_COLOR_FORMAT_A8,
                                                      LV_STRIDE_AUTO);
-    if(!draw_buf) {
+    if(!draw_buf || !lv_draw_buf_ensure_resident(draw_buf, NULL)) {
         LV_LOG_ERROR("Failed to create draw buffer for bitmap font cache");
+        if(draw_buf) lv_draw_buf_destroy(draw_buf);
         LV_PROFILER_FONT_END;
         return false;
     }

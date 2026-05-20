@@ -1202,7 +1202,11 @@ static const lv_font_fmt_txt_kern_classes_t kern_classes = {
  *  ALL CUSTOM DATA
  *--------------------*/
 
-#if LV_VERSION_CHECK(8, 0, 0)
+#ifdef LV_FONT_DSC_CONST
+/*Store all the custom data of the font*/
+
+static LV_FONT_DSC_CONST lv_font_fmt_txt_dsc_t font_dsc = {
+#elif LV_VERSION_CHECK(8, 0, 0)
 /*Store all the custom data of the font*/
 
 static const lv_font_fmt_txt_dsc_t font_dsc = {

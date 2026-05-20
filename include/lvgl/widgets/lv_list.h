@@ -58,7 +58,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt);
  * @param txt       text of the new button, when NULL no text will be added
  * @return          pointer to the created button
  */
-lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt);
+lv_obj_t * lv_list_add_button(lv_obj_t * list, LV_IMAGE_DSC_CONST void * icon, const char * txt);
 
 /**
  * Get text of a given list button
@@ -93,7 +93,7 @@ lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag);
  * @param tag       translation tag of the new button, when NULL no translation tag will be added
  * @return          pointer to the created button
  */
-lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon, const char * tag);
+lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, LV_IMAGE_DSC_CONST void * icon, const char * tag);
 
 /**
  * Set translation tag text of a given list button

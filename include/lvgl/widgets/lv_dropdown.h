@@ -134,7 +134,7 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir);
  * @note angle and zoom transformation can be applied if the symbol is an image.
  * E.g. when drop down is checked (opened) rotate the symbol by 180 degree
  */
-void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol);
+void lv_dropdown_set_symbol(lv_obj_t * obj, LV_IMAGE_DSC_CONST void * symbol);
 
 /**
  * Set whether the selected option in the list should be highlighted or not

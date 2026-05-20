@@ -66,6 +66,24 @@ typedef enum _lvimage_flags_t {
     LV_IMAGE_FLAGS_CUSTOM_DRAW      = 0x0040,
 
     /**
+     * Content should be zeroed. Implies DISCARDABLE (skip upload/download).
+     * For CPU: ensure_resident clears the buffer after allocation.
+     * For VRAM: draw unit handles clearing (e.g., has_content=false on EVE5).
+     * Set by lv_draw_buf_clear(buf, NULL) and fill_bg(transparent) on
+     * non-CPU-resident buffers. Cleared by ensure_resident (CPU path)
+     * or by the draw unit (VRAM path).
+     */
+    LV_IMAGE_FLAGS_CLEARZERO       = 0x0002,
+
+    /**
+     * Content is stale and may be discarded. On the next lv_draw_buf_ensure_resident(),
+     * skip upload/download — just allocate fresh backing. Cleared automatically by
+     * ensure_resident. Set by display drivers after flush to avoid uploading consumed
+     * tile data when the draw unit changes between frames.
+     */
+    LV_IMAGE_FLAGS_DISCARDABLE     = 0x0080,
+
+    /**
      * Flags reserved for user, lvgl won't use these bits.
      */
     LV_IMAGE_FLAGS_USER1            = 0x0100,
@@ -125,15 +143,35 @@ typedef union {
     } semi_planar;              /**< planar format with 2 plane*/
 } lv_yuv_buf_t;
 
+#if LV_USE_DRAW_VRAM
+struct _lv_draw_buf_vram_res_t;
+#endif
+
 /**
- * Struct to describe a constant image resource.
+ * When VRAM residency is enabled, image descriptors must be writable
+ * so that vram_res can be attached directly. Use LV_IMAGE_DSC_CONST
+ * instead of plain `const` when declaring lv_image_dsc_t variables.
+ */
+#if LV_USE_DRAW_VRAM
+#define LV_IMAGE_DSC_CONST  /* non-const: allow vram_res to be written */
+#else
+#define LV_IMAGE_DSC_CONST const
+#endif
+
+/**
+ * Struct to describe an image resource.
  * It's similar to lv_draw_buf_t, but the data is constant.
+ * When LV_USE_DRAW_VRAM is enabled, the struct itself is writable
+ * so that VRAM residency can be attached by the draw unit.
  */
 typedef struct {
     lv_image_header_t header;   /**< A header describing the basics of the image*/
     uint32_t data_size;         /**< Size of the image in bytes*/
     const uint8_t * data;       /**< Pointer to the data of the image*/
     const void * reserved;      /**< A reserved field to make it has same size as lv_draw_buf_t*/
+#if LV_USE_DRAW_VRAM
+    struct _lv_draw_buf_vram_res_t * vram_res; /**< VRAM residency descriptor, NULL if CPU-only */
+#endif
     const void * reserved_2;    /**< A reserved field to make it has same size as lv_draw_buf_t*/
 } lv_image_dsc_t;
 

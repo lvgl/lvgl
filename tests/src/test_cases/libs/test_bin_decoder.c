@@ -14,14 +14,14 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-static void create_image(const void * src)
+static void create_image(LV_IMAGE_DSC_CONST void * src)
 {
     lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, src);
     lv_obj_center(img);
 }
 
-static void bin_decoder(const void * src, const char * screenshot)
+static void bin_decoder(LV_IMAGE_DSC_CONST void * src, const char * screenshot)
 {
     lv_image_cache_drop(src);
     create_image(src);
@@ -41,7 +41,7 @@ static void bin_decoder(const void * src, const char * screenshot)
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
 }
 
-static void create_image_tile(const void * src)
+static void create_image_tile(LV_IMAGE_DSC_CONST void * src)
 {
     lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, src);
@@ -78,7 +78,7 @@ static lv_image_decoder_dsc_t * get_image_decoder_dsc(void)
     return &decoder_dsc;
 }
 
-void bin_decoder_tile(const void * src, const char * screenshot)
+void bin_decoder_tile(LV_IMAGE_DSC_CONST void * src, const char * screenshot)
 {
     create_image_tile(src);
     TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
@@ -191,7 +191,7 @@ void test_bin_decoder_flush_cache(void)
     LV_IMAGE_DECLARE(test_XRGB8888_NONE_align64);
     LV_IMAGE_DECLARE(test_ARGB8888_NONE_align64);
 
-    const lv_image_dsc_t * img_dscs[] = {
+    LV_IMAGE_DSC_CONST lv_image_dsc_t * img_dscs[] = {
         &test_I1_NONE_align64,
         &test_I2_NONE_align64,
         &test_I4_NONE_align64,

@@ -428,6 +428,9 @@
     #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
 #endif
 
+/* VRAM buffer residency support for hardware draw units. */
+#define LV_USE_DRAW_VRAM 0
+
 /** Use NanoVG Renderer
  * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
  */

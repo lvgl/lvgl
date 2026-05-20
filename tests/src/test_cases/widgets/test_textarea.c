@@ -41,7 +41,7 @@ static bool test_font_get_glyph_dsc(const lv_font_t * font,
     return false;
 }
 
-const void * test_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+LV_IMAGE_DSC_CONST void * test_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(g_dsc);
     LV_UNUSED(draw_buf);
