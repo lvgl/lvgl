@@ -595,12 +595,29 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
     bool is_png = (lv_strcmp(ext, "png") == 0);
     if(!is_jpeg && !is_png) return LV_RESULT_INVALID;
 
+    uint32_t w = 0, h = 0;
+
+#if LV_USE_FS_EVE5_SDCARD
+    /* Prefer CMD_QUERYIMAGE for SD-card-rooted paths so we don't trigger
+     * the SD card driver's lazy whole-file load (lv_fs_read → fs_read →
+     * ensure_file_loaded). Falls through to the host-side header parse
+     * if the patch isn't built in or the firmware path fails. */
+    if(lv_eve5_sdcard_is_path(fn)) {
+        if(lv_eve5_sdcard_query_image_dims(fn, &w, &h)) {
+            header->cf = LV_COLOR_FORMAT_RAW;
+            header->w = (int32_t)w;
+            header->h = (int32_t)h;
+            header->stride = (int32_t)(w * 3);
+            return LV_RESULT_OK;
+        }
+    }
+#endif
+
     uint8_t buf[1024];
     uint32_t bytes_read = 0;
     lv_fs_read(&dsc->file, buf, sizeof(buf), &bytes_read);
     if(bytes_read < 24) return LV_RESULT_INVALID;
 
-    uint32_t w = 0, h = 0;
     bool ok;
     if(is_jpeg) {
         ok = eve5_parse_jpeg_dimensions(buf, bytes_read, &w, &h);

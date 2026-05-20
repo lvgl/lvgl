@@ -991,6 +991,53 @@ Esd_GpuAlloc * lv_eve5_sdcard_get_allocator(void)
     return s_ctx.alloc;
 }
 
+bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32_t * height)
+{
+#if !EVE_COCMD_PATCH_QUERY
+    LV_UNUSED(path);
+    LV_UNUSED(width);
+    LV_UNUSED(height);
+    return false;
+#else
+    if(path == NULL || width == NULL || height == NULL) return false;
+    if(s_ctx.hal == NULL) return false;
+
+    /* Strip drive letter prefix for SD card commands */
+    const char * sd_path = path;
+    if(path[1] == ':' && (path[2] == '/' || path[2] == '\\')) {
+        sd_path = path + 2;
+    }
+
+    EVE_HalContext * phost = s_ctx.hal;
+    bool ok = false;
+    uint32_t qw = 0, qh = 0;
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(s_ctx.disp);
+#endif
+
+    if(ensure_sd_attached(&s_ctx)
+       && EVE_CoCmd_fsSource(phost, sd_path) == 0) {
+        EVE_CoCmd_queryImage(phost, OPT_FS);
+        uint32_t q_size = 0, q_fmt = 0, q_pal = 0;
+        if(EVE_CoCmd_getImage(phost, &q_size, &q_fmt, &qw, &qh, &q_pal)
+           && qw != 0 && qh != 0) {
+            ok = true;
+        }
+    }
+
+#if LV_USE_OS
+    lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+
+    if(ok) {
+        *width = qw;
+        *height = qh;
+    }
+    return ok;
+#endif
+}
+
 #elif LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
 
 /* Linker stubs for chips without BT820 SD-card command support. */
@@ -1014,6 +1061,12 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
 {
     (void)path; (void)handle; (void)width; (void)height;
     (void)format; (void)image_offset; (void)palette_offset;
+    return false;
+}
+
+bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32_t * height)
+{
+    (void)path; (void)width; (void)height;
     return false;
 }
 

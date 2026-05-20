@@ -149,6 +149,23 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
  */
 Esd_GpuAlloc * lv_eve5_sdcard_get_allocator(void);
 
+/**
+ * Query JPEG/PNG image dimensions on the SD card without loading the file.
+ *
+ * Uses CMD_FSSOURCE + CMD_QUERYIMAGE + CMD_GETIMAGE — the firmware streams
+ * just enough of the file to learn w/h, with no RAM_G allocation. Caller
+ * must filter to JPEG/PNG extensions before invoking (CMD_QUERYIMAGE
+ * faults on unrecognized signatures).
+ *
+ * Only available when EVE_COCMD_PATCH_QUERY=1; returns false otherwise.
+ *
+ * @param path     Full path including drive letter (e.g., "S:/image.jpg")
+ * @param width    [out] Pointer to receive image width
+ * @param height   [out] Pointer to receive image height
+ * @return         true on success
+ */
+bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32_t * height);
+
 /**********************
  *      MACROS
  **********************/
