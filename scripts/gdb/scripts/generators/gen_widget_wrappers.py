@@ -132,6 +132,9 @@ def parse_struct_fields(body: str) -> list[StructField]:
         if not line or line.startswith("/*") or line.startswith("//") or line.startswith("*") or line.startswith("#"):
             continue
 
+        # Normalize LVGL constness macros so the field regexes can match.
+        line = re.sub(r"\bLV_(?:IMAGE_DSC|FONT_DSC)_CONST\b", "const", line)
+
         comment = ""
         cm = re.search(r"/\*\*?<?\s*(.*?)\s*\*/", line)
         if cm:
