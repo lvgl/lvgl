@@ -19,8 +19,8 @@ void lv_example_get_started_hello_world(void)
     lv_obj_set_style_bg_color(screen, lv_color_hex(0x003a57), 0);
     lv_obj_set_style_text_color(screen, lv_color_hex(0xffffff), 0);
 
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "Hello world");
+    lv_obj_t * label = lv_label_create(screen);
+    lv_obj_set_align(label, LV_ALIGN_CENTER);
+    lv_label_set_text(label, "Hello world");
 }
 #endif

@@ -32,22 +32,20 @@
 			bg_grad_color="0xffcdd2" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view>
 		<!-- 💡 Hold the first button to see `style_button_pressed` darken its gradient. -->
-		<lv_label width="100%" style_text_align="center" text="Styles from scratch" />
-
 		<!-- Base style + a pressed-state override -->
-		<lv_button width="120" height="50">
+		<lv_button name="button_1" align="center" y="-35" width="120" height="50">
 			<style name="style_button" />
 			<style name="style_button_pressed" selector="pressed" />
-			<lv_label align="center" text="Button" />
+			<lv_label name="label_1" align="center" text="Button" />
 		</lv_button>
 
 		<!-- Base + accent variant + a local circular radius -->
-		<lv_button width="120" height="50" style_radius="25">
+		<lv_button name="button_2" align="center" y="35" width="120" height="50" style_radius="25">
 			<style name="style_button" />
 			<style name="style_button_red" />
-			<lv_label align="center" text="Button 2" />
+			<lv_label name="label_2" align="center" text="Button 2" />
 		</lv_button>
 	</view>
 </screen>

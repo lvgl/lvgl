@@ -30,13 +30,15 @@ void lv_example_get_started_slider(void)
     lv_obj_t * screen = lv_screen_active();
 
     /* 💡 Drag the slider; the label tracks it because both share `subject_value`. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_label_bind_text(lv_label_0, &subject_value, "%d");
-    lv_obj_align(lv_label_0, LV_ALIGN_CENTER, 0, -30);
+    lv_obj_t * label = lv_label_create(screen);
+    lv_obj_set_align(label, LV_ALIGN_CENTER);
+    lv_obj_set_y(label, -20);
+    lv_label_bind_text(label, &subject_value, "%d");
 
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_width(lv_slider_0, lv_pct(90));
-    lv_slider_bind_value(lv_slider_0, &subject_value);
-    lv_obj_center(lv_slider_0);
+    lv_obj_t * slider = lv_slider_create(screen);
+    lv_obj_set_align(slider, LV_ALIGN_CENTER);
+    lv_obj_set_y(slider, 20);
+    lv_obj_set_width(slider, lv_pct(90));
+    lv_slider_bind_value(slider, &subject_value);
 }
 #endif
