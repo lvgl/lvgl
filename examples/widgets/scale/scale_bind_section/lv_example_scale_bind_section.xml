@@ -14,11 +14,9 @@
 		<style name="style_section_indicator" line_color="0xef4444" line_width="4" text_color="0xef4444" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Move the sliders; the red section on the scale grows and shrinks because its bounds are bound to the subjects. -->
-		<lv_label width="100%" style_text_align="center" text="Scale: bind section bounds" />
-
-		<lv_scale
+		<lv_scale name="scale"
 			width="280"
 			height="80"
 			mode="horizontal_bottom"
@@ -37,10 +35,10 @@
 			/>
 		</lv_scale>
 
-		<lv_label text="Section start (subject_value2)" />
-		<lv_slider width="240" bind_value="subject_value2" />
+		<lv_label name="label_1" text="Section start (subject_value2)" />
+		<lv_slider name="slider_1" width="240" bind_value="subject_value2" />
 
-		<lv_label text="Section end (subject_value)" />
-		<lv_slider width="240" bind_value="subject_value" />
+		<lv_label name="label_2" text="Section end (subject_value)" />
+		<lv_slider name="slider_2" width="240" bind_value="subject_value" />
 	</view>
 </screen>

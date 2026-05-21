@@ -21,30 +21,30 @@ void lv_example_tabview_tab_button_content(void)
     lv_obj_t * screen = lv_screen_active();
 
     /* 💡 Tap the switch inside a tab button — it lives on the tab button itself, not on the tab content. */
-    lv_obj_t * lv_tabview_0 = lv_tabview_create(screen);
-    lv_obj_set_size(lv_tabview_0, lv_pct(100), lv_pct(100));
-    lv_obj_t * lv_tabview_tab_0 = lv_tabview_add_tab(lv_tabview_0, "WiFi");
-    lv_obj_t * lv_label_0 = lv_label_create(lv_tabview_tab_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "WiFi tab content");
+    lv_obj_t * tabview = lv_tabview_create(screen);
+    lv_obj_set_size(tabview, lv_pct(100), lv_pct(100));
+    lv_obj_t * lv_tabview_tab_0 = lv_tabview_add_tab(tabview, "WiFi");
+    lv_obj_t * label_1 = lv_label_create(lv_tabview_tab_0);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(label_1, "WiFi tab content");
 
-    lv_obj_t * lv_tabview_tab_1 = lv_tabview_add_tab(lv_tabview_0, "Bluetooth");
-    lv_obj_t * lv_label_1 = lv_label_create(lv_tabview_tab_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "Bluetooth tab content");
+    lv_obj_t * lv_tabview_tab_1 = lv_tabview_add_tab(tabview, "Bluetooth");
+    lv_obj_t * label_2 = lv_label_create(lv_tabview_tab_1);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "Bluetooth tab content");
 
-    lv_obj_t * lv_tabview_tab_button_0 = lv_tabview_get_tab_button(lv_tabview_0, 0);
-    lv_obj_t * lv_switch_0 = lv_switch_create(lv_tabview_tab_button_0);
-    lv_obj_set_size(lv_switch_0, 40, 20);
-    lv_obj_set_flag(lv_switch_0, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
-    lv_obj_set_align(lv_switch_0, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_x(lv_switch_0, -10);
+    lv_obj_t * lv_tabview_tab_button_0 = lv_tabview_get_tab_button(tabview, 0);
+    lv_obj_t * sw_1 = lv_switch_create(lv_tabview_tab_button_0);
+    lv_obj_set_size(sw_1, 40, 20);
+    lv_obj_set_flag(sw_1, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
+    lv_obj_set_align(sw_1, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_x(sw_1, -10);
 
-    lv_obj_t * lv_tabview_tab_button_1 = lv_tabview_get_tab_button(lv_tabview_0, 1);
-    lv_obj_t * lv_switch_1 = lv_switch_create(lv_tabview_tab_button_1);
-    lv_obj_set_size(lv_switch_1, 40, 20);
-    lv_obj_set_flag(lv_switch_1, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
-    lv_obj_set_align(lv_switch_1, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_x(lv_switch_1, -10);
+    lv_obj_t * lv_tabview_tab_button_1 = lv_tabview_get_tab_button(tabview, 1);
+    lv_obj_t * sw_2 = lv_switch_create(lv_tabview_tab_button_1);
+    lv_obj_set_size(sw_2, 40, 20);
+    lv_obj_set_flag(sw_2, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
+    lv_obj_set_align(sw_2, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_x(sw_2, -10);
 }
 #endif

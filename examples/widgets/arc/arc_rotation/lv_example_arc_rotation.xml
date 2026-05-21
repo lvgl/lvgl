@@ -9,12 +9,10 @@
 <screen>
 	<view>
 		<!-- 💡 Adjust rotation while keeping bg_start_angle/bg_end_angle fixed to see the whole dial rotate around its center. -->
-		<lv_label width="100%" style_text_align="center" text="Arc: rotation offset" />
-
 		<!-- Arc rotated by 45 degrees -->
-		<lv_arc
-			x="18"
-			y="34"
+		<lv_arc name="arc_1"
+			align="left_mid"
+			x="10"
 			width="90"
 			height="90"
 			bg_start_angle="0"
@@ -22,13 +20,13 @@
 			rotation="45"
 			value="60"
 		>
-			<lv_label align="center" text="rot=45" />
+			<lv_label name="label_1" align="center" text="rot=45" />
 		</lv_arc>
 
 		<!-- Arc rotated by 135 degrees -->
-		<lv_arc
-			x="132"
-			y="34"
+		<lv_arc name="arc_2"
+			align="right_mid"
+			x="-10"
 			width="90"
 			height="90"
 			bg_start_angle="0"
@@ -36,7 +34,7 @@
 			rotation="135"
 			value="60"
 		>
-			<lv_label align="center" text="rot=135" />
+			<lv_label name="label_2" align="center" text="rot=135" />
 		</lv_arc>
 	</view>
 </screen>

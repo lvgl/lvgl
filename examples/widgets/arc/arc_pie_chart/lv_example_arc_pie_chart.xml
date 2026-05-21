@@ -14,7 +14,7 @@
  The three shared parts (thick flat-ended main, invisible indicator,
  invisible knob) are factored into named styles. Because position and size
  are style properties too, the `style_pie_main` style also pins
- `width`/`height`/`align`/`y` — so each `<lv_arc>` only carries its slice
+ `width`/`height`/`align` — so each `<lv_arc>` only carries its slice
  angles and its colour.
 -->
 <screen>
@@ -23,7 +23,7 @@
 		     The size and centre alignment live here too, so every slice picks them up. -->
 		<style name="style_pie_main"
 			width="200" height="200"
-			align="center" y="20"
+			align="center"
 			arc_width="100" arc_rounded="false" />
 		<!-- Hide the indicator entirely — we don't drive a value here. -->
 		<style name="style_pie_indicator" arc_opa="0" />
@@ -33,11 +33,9 @@
 
 	<view>
 		<!-- 💡 Edit the `bg_start_angle`/`bg_end_angle` pair on any arc to grow/shrink that slice; the others stay put. -->
-		<lv_label width="100%" style_text_align="center" text="Arc: pie chart" />
-
 		<!-- 5 slices with uneven sweeps so the colours look like a real data breakdown.
 		     Angles measured clockwise from 3 o'clock; the seam between E and A is at 12 o'clock (270°). -->
-		<lv_arc clickable="false"
+		<lv_arc name="arc_1" clickable="false"
 			bg_start_angle="270" bg_end_angle="335"
 			style_arc_color-main="0xef4444">
 			<style name="style_pie_main" selector="main" />
@@ -45,7 +43,7 @@
 			<style name="style_pie_knob" selector="knob" />
 		</lv_arc>
 
-		<lv_arc clickable="false"
+		<lv_arc name="arc_2" clickable="false"
 			bg_start_angle="335" bg_end_angle="38"
 			style_arc_color-main="0xf59e0b">
 			<style name="style_pie_main" selector="main" />
@@ -53,7 +51,7 @@
 			<style name="style_pie_knob" selector="knob" />
 		</lv_arc>
 
-		<lv_arc clickable="false"
+		<lv_arc name="arc_3" clickable="false"
 			bg_start_angle="38" bg_end_angle="142"
 			style_arc_color-main="0x22c55e">
 			<style name="style_pie_main" selector="main" />
@@ -61,7 +59,7 @@
 			<style name="style_pie_knob" selector="knob" />
 		</lv_arc>
 
-		<lv_arc clickable="false"
+		<lv_arc name="arc_4" clickable="false"
 			bg_start_angle="142" bg_end_angle="205"
 			style_arc_color-main="0x3b82f6">
 			<style name="style_pie_main" selector="main" />
@@ -69,7 +67,7 @@
 			<style name="style_pie_knob" selector="knob" />
 		</lv_arc>
 
-		<lv_arc clickable="false"
+		<lv_arc name="arc_5" clickable="false"
 			bg_start_angle="205" bg_end_angle="270"
 			style_arc_color-main="0xa855f7">
 			<style name="style_pie_main" selector="main" />

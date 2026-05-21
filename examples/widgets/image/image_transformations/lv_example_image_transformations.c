@@ -26,16 +26,16 @@ void lv_example_image_transformations(void)
     lv_obj_set_style_pad_column(screen, 16, 0);
 
     /* 💡 Edit `rotation`, the `scale_*` pair, or `pivot_*` to compare against the unmodified copy on the left. */
-    lv_obj_t * lv_image_0 = lv_image_create(screen);
-    lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
+    lv_obj_t * image_1 = lv_image_create(screen);
+    lv_image_set_src(image_1, &img_example_lvgl_logo);
 
-    lv_obj_t * lv_image_1 = lv_image_create(screen);
-    lv_image_set_src(lv_image_1, &img_example_lvgl_logo);
-    lv_image_set_rotation(lv_image_1, 450);
+    lv_obj_t * image_2 = lv_image_create(screen);
+    lv_image_set_src(image_2, &img_example_lvgl_logo);
+    lv_image_set_rotation(image_2, 450);
 
-    lv_obj_t * lv_image_2 = lv_image_create(screen);
-    lv_image_set_src(lv_image_2, &img_example_lvgl_logo);
-    lv_image_set_scale_x(lv_image_2, 160);
-    lv_image_set_scale_y(lv_image_2, 160);
+    lv_obj_t * image_3 = lv_image_create(screen);
+    lv_image_set_src(image_3, &img_example_lvgl_logo);
+    lv_image_set_scale_x(image_3, 160);
+    lv_image_set_scale_y(image_3, 160);
 }
 #endif

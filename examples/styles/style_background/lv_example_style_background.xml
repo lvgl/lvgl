@@ -25,13 +25,11 @@
 			text_color="0xffffff" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Slide `bg_main_stop`/`bg_grad_stop` (0..255) to move where the indigo→pink blend starts and ends. -->
-		<lv_label width="100%" style_text_align="center" text="Style: background gradient" />
-
-		<lv_obj width="210" height="150">
+		<lv_obj name="container" width="210" height="150">
 			<style name="style_grad" />
-			<lv_label align="center" text="Gradient" />
+			<lv_label name="label" align="center" text="Gradient" />
 		</lv_obj>
 	</view>
 </screen>

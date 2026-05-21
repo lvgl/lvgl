@@ -47,46 +47,48 @@ void lv_example_bar_img_indicator(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Drag the slider to change subject_value; the bar reveals more of the segmented indicator image as the value rises. */
-    lv_obj_t * lv_bar_0 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_0, 280, 35);
-    lv_bar_set_min_value(lv_bar_0, 0);
-    lv_bar_set_max_value(lv_bar_0, 20);
-    lv_bar_bind_value(lv_bar_0, &subject_value2);
-    lv_obj_add_style(lv_bar_0, &style_bar_track, LV_PART_MAIN);
-    lv_obj_add_style(lv_bar_0, &style_bar_indicator, LV_PART_INDICATOR);
+    lv_obj_t * bar = lv_bar_create(screen);
+    lv_obj_set_size(bar, 280, 35);
+    lv_bar_set_min_value(bar, 0);
+    lv_bar_set_max_value(bar, 20);
+    lv_bar_bind_value(bar, &subject_value2);
+    lv_obj_add_style(bar, &style_bar_track, LV_PART_MAIN);
+    lv_obj_add_style(bar, &style_bar_indicator, LV_PART_INDICATOR);
 
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_flex_flow(lv_obj_1, LV_FLEX_FLOW_ROW);
-    lv_obj_set_style_flex_cross_place(lv_obj_1, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_main_place(lv_obj_1, LV_FLEX_ALIGN_SPACE_BETWEEN, 0);
-    lv_obj_set_style_pad_column(lv_obj_1, 12, 0);
-    lv_obj_set_style_bg_opa(lv_obj_1, 0, 0);
-    lv_obj_set_style_border_width(lv_obj_1, 0, 0);
-    lv_obj_set_size(lv_obj_1, 150, LV_SIZE_CONTENT);
-    lv_obj_t * lv_button_0 = lv_button_create(lv_obj_1);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "-");
-    lv_obj_set_style_text_font(lv_label_0, &font_example_large, 0);
+    lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_flex_cross_place(container, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_main_place(container, LV_FLEX_ALIGN_SPACE_BETWEEN, 0);
+    lv_obj_set_style_pad_column(container, 12, 0);
+    lv_obj_set_style_bg_opa(container, 0, 0);
+    lv_obj_set_style_border_width(container, 0, 0);
+    lv_obj_set_size(container, 150, LV_SIZE_CONTENT);
+    lv_obj_t * button_1 = lv_button_create(container);
+    lv_obj_t * label_1 = lv_label_create(button_1);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(label_1, "-");
+    lv_obj_set_style_text_font(label_1, &font_example_large, 0);
 
-    lv_obj_add_subject_increment_event(lv_button_0, &subject_value2, LV_EVENT_CLICKED, -1);
-    lv_obj_add_subject_increment_event(lv_button_0, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, -1);
+    lv_obj_add_subject_increment_event(button_1, &subject_value2, LV_EVENT_CLICKED, -1);
+    lv_obj_add_subject_increment_event(button_1, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, -1);
 
-    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_1);
-    lv_label_bind_text(lv_label_1, &subject_value2, NULL);
-    lv_obj_set_style_text_font(lv_label_1, &font_example_large, 0);
+    lv_obj_t * label_2 = lv_label_create(container);
+    lv_label_bind_text(label_2, &subject_value2, NULL);
+    lv_obj_set_style_text_font(label_2, &font_example_large, 0);
 
-    lv_obj_t * lv_button_1 = lv_button_create(lv_obj_1);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_button_1);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "+");
-    lv_obj_set_style_text_font(lv_label_2, &font_example_large, 0);
+    lv_obj_t * button_2 = lv_button_create(container);
+    lv_obj_t * label_3 = lv_label_create(button_2);
+    lv_obj_set_align(label_3, LV_ALIGN_CENTER);
+    lv_label_set_text(label_3, "+");
+    lv_obj_set_style_text_font(label_3, &font_example_large, 0);
 
-    lv_obj_add_subject_increment_event(lv_button_1, &subject_value2, LV_EVENT_CLICKED, 1);
-    lv_obj_add_subject_increment_event(lv_button_1, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, 1);
+    lv_obj_add_subject_increment_event(button_2, &subject_value2, LV_EVENT_CLICKED, 1);
+    lv_obj_add_subject_increment_event(button_2, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, 1);
 }
 #endif

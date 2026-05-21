@@ -10,11 +10,9 @@
  itself.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Drag the table vertically to reveal the lower rows. -->
-		<lv_label width="100%" style_text_align="center" text="Table: scrolling" />
-
-		<lv_table width="240" height="160" row_count="12" column_count="2">
+		<lv_table name="table" width="240" height="160" row_count="12" column_count="2">
 			<lv_table-column column="0" width="70px" />
 			<lv_table-column column="1" width="160px" />
 

@@ -16,14 +16,14 @@
 		<style name="style_bar_indicator" bg_image_src="img_bar_indicator" bg_opa="0" radius="0" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Drag the slider to change subject_value; the bar reveals more of the segmented indicator image as the value rises. -->
-		<lv_bar width="280" height="35" min_value="0" max_value="20" bind_value="subject_value2">
+		<lv_bar name="bar" width="280" height="35" min_value="0" max_value="20" bind_value="subject_value2">
 			<style name="style_bar_track" selector="main" />
 			<style name="style_bar_indicator" selector="indicator" />
 		</lv_bar>
 
-		<lv_obj
+		<lv_obj name="container"
 			flex_flow="row"
             style_flex_cross_place="center"
             style_flex_main_place="space_between"
@@ -33,14 +33,14 @@
 			width="150"
 			height="content"
 		>
-			<lv_button>
-				<lv_label align="center" text="-"  style_text_font="font_example_large"/>
+			<lv_button name="button_1">
+				<lv_label name="label_1" align="center" text="-"  style_text_font="font_example_large"/>
 				<subject_increment_event subject="subject_value2" trigger="clicked" step="-1"/>
 				<subject_increment_event subject="subject_value2" trigger="long_pressed_repeat"  step="-1"/>
 			</lv_button>
-			<lv_label bind_text="subject_value2" style_text_font="font_example_large"/>
-			<lv_button>
-				<lv_label align="center" text="+"  style_text_font="font_example_large"/>
+			<lv_label name="label_2" bind_text="subject_value2" style_text_font="font_example_large"/>
+			<lv_button name="button_2">
+				<lv_label name="label_3" align="center" text="+"  style_text_font="font_example_large"/>
 				<subject_increment_event subject="subject_value2" trigger="clicked"  step="1"/>
 				<subject_increment_event subject="subject_value2" trigger="long_pressed_repeat" step="1" />
 			</lv_button>

@@ -29,27 +29,24 @@ void lv_example_slider_bind_state(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Drag past 80: the button becomes disabled; drop below 80 to re-enable it. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Slider: bind state (threshold)");
+    lv_obj_t * slider = lv_slider_create(screen);
+    lv_obj_set_width(slider, lv_pct(90));
+    lv_slider_bind_value(slider, &subject_value);
 
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_width(lv_slider_0, 240);
-    lv_slider_bind_value(lv_slider_0, &subject_value);
+    lv_obj_t * label_1 = lv_label_create(screen);
+    lv_label_bind_text(label_1, &subject_value, "Current: %d (disabled above 80)");
 
-    lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_label_bind_text(lv_label_1, &subject_value, "Current: %d (disabled above 80)");
+    lv_obj_t * button = lv_button_create(screen);
+    lv_obj_t * label_2 = lv_label_create(button);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "Submit");
 
-    lv_obj_t * lv_button_0 = lv_button_create(screen);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "Submit");
-
-    lv_obj_bind_state_if_gt(lv_button_0, &subject_value, LV_STATE_DISABLED, 80);
+    lv_obj_bind_state_if_gt(button, &subject_value, LV_STATE_DISABLED, 80);
 }
 #endif

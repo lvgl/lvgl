@@ -8,19 +8,17 @@
  `subject_text` — and the label re-renders automatically.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Click either button; the label updates because it reads `subject_text` live. -->
-		<lv_label width="100%" style_text_align="center" text="Label: bind text" />
+		<lv_label name="label_1" bind_text="subject_text" />
 
-		<lv_label bind_text="subject_text" />
-
-		<lv_obj flex_flow="row" style_pad_column="12" style_bg_opa="0" style_border_width="0" width="content" height="content">
-			<lv_button>
-				<lv_label align="center" text="Idle" />
+		<lv_obj name="container" flex_flow="row" style_pad_column="12" style_bg_opa="0" style_border_width="0" width="content" height="content">
+			<lv_button name="button_1">
+				<lv_label name="label_2" align="center" text="Idle" />
 				<subject_set_string_event subject="subject_text" value="Idle" />
 			</lv_button>
-			<lv_button>
-				<lv_label align="center" text="Running" />
+			<lv_button name="button_2">
+				<lv_label name="label_3" align="center" text="Running" />
 				<subject_set_string_event subject="subject_text" value="Running" />
 			</lv_button>
 		</lv_obj>

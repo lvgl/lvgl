@@ -68,23 +68,20 @@ void lv_example_slider_styling(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 20, 0);
 
     /* 💡 Drag the knob slowly to see the knob-pressed style kick in. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Slider: styling parts and states");
-
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_size(lv_slider_0, 240, 22);
-    lv_slider_set_min_value(lv_slider_0, 0);
-    lv_slider_set_max_value(lv_slider_0, 100);
-    lv_slider_set_value(lv_slider_0, 55, false);
-    lv_obj_add_style(lv_slider_0, &style_slider_track, LV_PART_MAIN);
-    lv_obj_add_style(lv_slider_0, &style_slider_indicator, LV_PART_INDICATOR);
-    lv_obj_add_style(lv_slider_0, &style_slider_knob, LV_PART_KNOB);
-    lv_obj_add_style(lv_slider_0, &style_slider_knob_pressed, LV_PART_KNOB | LV_STATE_PRESSED);
+    lv_obj_t * slider = lv_slider_create(screen);
+    lv_obj_set_size(slider, lv_pct(90), 22);
+    lv_slider_set_min_value(slider, 0);
+    lv_slider_set_max_value(slider, 100);
+    lv_slider_set_value(slider, 55, false);
+    lv_obj_add_style(slider, &style_slider_track, LV_PART_MAIN);
+    lv_obj_add_style(slider, &style_slider_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(slider, &style_slider_knob, LV_PART_KNOB);
+    lv_obj_add_style(slider, &style_slider_knob_pressed, LV_PART_KNOB | LV_STATE_PRESSED);
 }
 #endif

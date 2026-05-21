@@ -9,12 +9,10 @@
 <screen>
 	<view>
 		<!-- 💡 Drag each arc quickly: lower change_rate responds more slowly, higher change_rate tracks your pointer faster. -->
-		<lv_label width="100%" style_text_align="center" text="Arc: change rate" />
-
 		<!-- Slower response arc -->
-		<lv_arc
-			x="14"
-			y="34"
+		<lv_arc name="arc_1"
+			align="left_mid"
+			x="10"
 			width="96"
 			height="96"
 			bg_start_angle="135"
@@ -22,13 +20,13 @@
 			change_rate="40"
 			value="35"
 		>
-			<lv_label align="center" text="rate=40" />
+			<lv_label name="label_1" align="center" text="rate=40" />
 		</lv_arc>
 
 		<!-- Faster response arc -->
-		<lv_arc
-			x="130"
-			y="34"
+		<lv_arc name="arc_2"
+			align="right_mid"
+			x="-10"
 			width="96"
 			height="96"
 			bg_start_angle="135"
@@ -36,7 +34,7 @@
 			change_rate="360"
 			value="35"
 		>
-			<lv_label align="center" text="rate=360" />
+			<lv_label name="label_2" align="center" text="rate=360" />
 		</lv_arc>
 	</view>
 </screen>

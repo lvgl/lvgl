@@ -11,11 +11,9 @@
  baking the line into the series.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Tweak `pos_x`/`pos_y` or `dir` to see how the cross-hair lines hug the cursor point. -->
-		<lv_label width="100%" style_text_align="center" text="Chart: cursor" />
-
-		<lv_chart width="280" height="180" type="line" point_count="8">
+		<lv_chart name="chart" width="90%" height="180" type="line" point_count="8">
 			<lv_chart-series color="0x6366f1" axis="primary_y" values="10 35 25 55 40 70 60 85" />
 			<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
 			<lv_chart-cursor color="0xef4444" dir="hor" pos_x="60" pos_y="70" />

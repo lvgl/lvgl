@@ -32,18 +32,18 @@
 		style_pad_all="10"
 	>
 		<!-- 💡 The text under the card is blurred; lower the card's `bg_opa` or raise `blur_radius` for a stronger frost. -->
-		<lv_label
+		<lv_label name="label_1"
 			align="center"
 			width="100%"
 			style_text_align="center"
 			text="Hey there, I&apos;m a little text in the background which is blurred. You might seem that some of parts are sharp, but other under the glass cannot be read. "
 		/>
-		<lv_button align="center" style_pad_all="16" y="55">
-			<lv_label text="Click me" />
+		<lv_button name="button" align="center" style_pad_all="16" y="55">
+			<lv_label name="label_2" text="Click me" />
 		</lv_button>
-		<lv_obj width="210" height="110" align="center">
+		<lv_obj name="container" width="210" height="110" align="center">
 			<style name="style_glass" />
-			<lv_label align="center" text="Frosted glass" />
+			<lv_label name="label_3" align="center" text="Frosted glass" />
 		</lv_obj>
 	</view>
 </screen>

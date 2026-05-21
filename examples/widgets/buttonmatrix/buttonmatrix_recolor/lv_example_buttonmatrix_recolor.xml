@@ -10,13 +10,10 @@
 <screen>
 	<view>
 		<!-- 💡 Edit the `#RRGGBB ... #` segments in any `map` entry to recolor different parts of the button label. -->
-		<lv_label width="100%" style_text_align="center" text="Button matrix: per-button text recolor" />
-
 		<!-- Three buttons, each highlighting a different word with recolor -->
-		<lv_buttonmatrix
+		<lv_buttonmatrix name="buttonmatrix"
 			align="center"
-			y="30"
-			width="280"
+			width="90%"
 			height="60"
 			map="'#ff0000 Stop#' '#e08800 Warn#' '#00a000 Go#'"
 			ctrl_map="recolor recolor recolor"

@@ -36,20 +36,17 @@ void lv_example_style_border(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Tune `border_width`/`border_opa`, or set `border_side` to `none` to drop the frame. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Style: border");
-
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_size(lv_obj_1, 210, 140);
-    lv_obj_add_style(lv_obj_1, &style_framed, 0);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "Bordered card");
+    lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_size(container, 210, 140);
+    lv_obj_add_style(container, &style_framed, 0);
+    lv_obj_t * label = lv_label_create(container);
+    lv_obj_set_align(label, LV_ALIGN_CENTER);
+    lv_label_set_text(label, "Bordered card");
 }
 #endif

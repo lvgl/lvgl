@@ -18,20 +18,13 @@ void lv_example_buttonmatrix_recolor(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
-    /* 💡 Edit the `#RRGGBB ... #` segments in any `map` entry to recolor different parts of the button label. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Button matrix: per-button text recolor");
-
     /* Three buttons, each highlighting a different word with recolor */
-    lv_obj_t * lv_buttonmatrix_0 = lv_buttonmatrix_create(screen);
-    lv_obj_set_align(lv_buttonmatrix_0, LV_ALIGN_CENTER);
-    lv_obj_set_y(lv_buttonmatrix_0, 30);
-    lv_obj_set_size(lv_buttonmatrix_0, 280, 60);
-    static const char * lv_buttonmatrix_0_map_0[] = {"#ff0000 Stop#", "#e08800 Warn#", "#00a000 Go#", NULL};
-    lv_buttonmatrix_set_map(lv_buttonmatrix_0, lv_buttonmatrix_0_map_0);
-    static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_RECOLOR, LV_BUTTONMATRIX_CTRL_RECOLOR, LV_BUTTONMATRIX_CTRL_RECOLOR};
-    lv_buttonmatrix_set_ctrl_map(lv_buttonmatrix_0, lv_buttonmatrix_0_ctrl_map_1);
+    lv_obj_t * buttonmatrix = lv_buttonmatrix_create(screen);
+    lv_obj_set_align(buttonmatrix, LV_ALIGN_CENTER);
+    lv_obj_set_size(buttonmatrix, lv_pct(90), 60);
+    static const char * buttonmatrix_map_0[] = {"#ff0000 Stop#", "#e08800 Warn#", "#00a000 Go#", NULL};
+    lv_buttonmatrix_set_map(buttonmatrix, buttonmatrix_map_0);
+    static const lv_buttonmatrix_ctrl_t buttonmatrix_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_RECOLOR, LV_BUTTONMATRIX_CTRL_RECOLOR, LV_BUTTONMATRIX_CTRL_RECOLOR};
+    lv_buttonmatrix_set_ctrl_map(buttonmatrix, buttonmatrix_ctrl_map_1);
 }
 #endif

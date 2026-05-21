@@ -41,39 +41,36 @@ void lv_example_style_padding(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 18, 0);
 
     /* 💡 Edit each card's `style_pad_*`; the accent block tracks the shrinking content area. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Style: padding");
+    lv_obj_t * container_1 = lv_obj_create(screen);
+    lv_obj_set_size(container_1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(container_1, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_pad_column(container_1, 22, 0);
+    lv_obj_set_style_bg_opa(container_1, 0, 0);
+    lv_obj_set_style_border_width(container_1, 0, 0);
+    lv_obj_set_style_pad_all(container_1, 0, 0);
+    lv_obj_t * container_2 = lv_obj_create(container_1);
+    lv_obj_set_size(container_2, 120, 120);
+    lv_obj_set_style_pad_top(container_2, 26, 0);
+    lv_obj_set_style_pad_left(container_2, 26, 0);
+    lv_obj_set_style_pad_right(container_2, 8, 0);
+    lv_obj_set_style_pad_bottom(container_2, 8, 0);
+    lv_obj_add_style(container_2, &style_card, 0);
+    lv_obj_t * container_3 = lv_obj_create(container_2);
+    lv_obj_set_size(container_3, lv_pct(100), lv_pct(100));
+    lv_obj_add_style(container_3, &style_block, 0);
 
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_size(lv_obj_1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_flex_flow(lv_obj_1, LV_FLEX_FLOW_ROW);
-    lv_obj_set_style_pad_column(lv_obj_1, 22, 0);
-    lv_obj_set_style_bg_opa(lv_obj_1, 0, 0);
-    lv_obj_set_style_border_width(lv_obj_1, 0, 0);
-    lv_obj_set_style_pad_all(lv_obj_1, 0, 0);
-    lv_obj_t * lv_obj_2 = lv_obj_create(lv_obj_1);
-    lv_obj_set_size(lv_obj_2, 120, 120);
-    lv_obj_set_style_pad_top(lv_obj_2, 26, 0);
-    lv_obj_set_style_pad_left(lv_obj_2, 26, 0);
-    lv_obj_set_style_pad_right(lv_obj_2, 8, 0);
-    lv_obj_set_style_pad_bottom(lv_obj_2, 8, 0);
-    lv_obj_add_style(lv_obj_2, &style_card, 0);
-    lv_obj_t * lv_obj_3 = lv_obj_create(lv_obj_2);
-    lv_obj_set_size(lv_obj_3, lv_pct(100), lv_pct(100));
-    lv_obj_add_style(lv_obj_3, &style_block, 0);
-
-    lv_obj_t * lv_obj_4 = lv_obj_create(lv_obj_1);
-    lv_obj_set_size(lv_obj_4, 120, 120);
-    lv_obj_set_style_pad_all(lv_obj_4, 18, 0);
-    lv_obj_add_style(lv_obj_4, &style_card, 0);
-    lv_obj_t * lv_obj_5 = lv_obj_create(lv_obj_4);
-    lv_obj_set_size(lv_obj_5, lv_pct(100), lv_pct(100));
-    lv_obj_add_style(lv_obj_5, &style_block, 0);
+    lv_obj_t * container_4 = lv_obj_create(container_1);
+    lv_obj_set_size(container_4, 120, 120);
+    lv_obj_set_style_pad_all(container_4, 18, 0);
+    lv_obj_add_style(container_4, &style_card, 0);
+    lv_obj_t * container_5 = lv_obj_create(container_4);
+    lv_obj_set_size(container_5, lv_pct(100), lv_pct(100));
+    lv_obj_add_style(container_5, &style_block, 0);
 }
 #endif

@@ -36,17 +36,15 @@
 		/>
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Bump `pad_all` on `style_switch_main` to widen the track around the indicator; bump it on `style_switch_knob` to grow the knob past the track height. -->
-		<lv_label width="100%" style_text_align="center" text="Switch: styling parts" />
-
-		<lv_switch width="60" height="30">
+		<lv_switch name="sw_1" width="60" height="30">
 			<style name="style_switch_main" selector="main" />
 			<style name="style_switch_indicator_checked" selector="indicator|checked" />
 			<style name="style_switch_knob" selector="knob" />
 		</lv_switch>
 
-		<lv_switch width="60" height="30" checked="true">
+		<lv_switch name="sw_2" width="60" height="30" checked="true">
 			<style name="style_switch_main" selector="main" />
 			<style name="style_switch_indicator_checked" selector="indicator|checked" />
 			<style name="style_switch_knob" selector="knob" />

@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-void lv_example_style_transform_card(void);
 void lv_example_style_arc(void);
 void lv_example_style_background(void);
 void lv_example_style_blur(void);
@@ -33,6 +32,7 @@ void lv_example_style_shadow(void);
 void lv_example_style_size_position(void);
 void lv_example_style_text(void);
 void lv_example_style_theme(void);
+void lv_example_style_transform_card(void);
 void lv_example_style_transition(void);
 
 #ifdef __cplusplus

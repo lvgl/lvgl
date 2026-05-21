@@ -18,39 +18,33 @@ void lv_example_dropdown_direction(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
-    /* 💡 Click each dropdown: each list pops toward the screen edge defined by its dir attribute. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Dropdown: open direction");
-
     /* Default: list opens downward */
-    lv_obj_t * lv_dropdown_0 = lv_dropdown_create(screen);
-    lv_obj_set_align(lv_dropdown_0, LV_ALIGN_TOP_MID);
-    lv_obj_set_y(lv_dropdown_0, 34);
-    lv_dropdown_set_options(lv_dropdown_0, "Apple\nBanana\nOrange\nMelon");
+    lv_obj_t * dropdown_1 = lv_dropdown_create(screen);
+    lv_obj_set_align(dropdown_1, LV_ALIGN_TOP_MID);
+    lv_obj_set_y(dropdown_1, 10);
+    lv_dropdown_set_options(dropdown_1, "Apple\nBanana\nOrange\nMelon");
 
     /* List opens upward */
-    lv_obj_t * lv_dropdown_1 = lv_dropdown_create(screen);
-    lv_obj_set_align(lv_dropdown_1, LV_ALIGN_BOTTOM_MID);
-    lv_obj_set_y(lv_dropdown_1, -10);
-    lv_dropdown_set_dir(lv_dropdown_1, LV_DIR_TOP);
-    lv_dropdown_set_options(lv_dropdown_1, "Apple\nBanana\nOrange\nMelon");
+    lv_obj_t * dropdown_2 = lv_dropdown_create(screen);
+    lv_obj_set_align(dropdown_2, LV_ALIGN_BOTTOM_MID);
+    lv_obj_set_y(dropdown_2, -10);
+    lv_dropdown_set_dir(dropdown_2, LV_DIR_TOP);
+    lv_dropdown_set_options(dropdown_2, "Apple\nBanana\nOrange\nMelon");
 
     /* List opens to the right */
-    lv_obj_t * lv_dropdown_2 = lv_dropdown_create(screen);
-    lv_obj_set_align(lv_dropdown_2, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(lv_dropdown_2, 10);
-    lv_obj_set_width(lv_dropdown_2, 80);
-    lv_dropdown_set_dir(lv_dropdown_2, LV_DIR_RIGHT);
-    lv_dropdown_set_options(lv_dropdown_2, "Apple\nBanana\nOrange\nMelon");
+    lv_obj_t * dropdown_3 = lv_dropdown_create(screen);
+    lv_obj_set_align(dropdown_3, LV_ALIGN_LEFT_MID);
+    lv_obj_set_x(dropdown_3, 10);
+    lv_obj_set_width(dropdown_3, 80);
+    lv_dropdown_set_dir(dropdown_3, LV_DIR_RIGHT);
+    lv_dropdown_set_options(dropdown_3, "Apple\nBanana\nOrange\nMelon");
 
     /* List opens to the left */
-    lv_obj_t * lv_dropdown_3 = lv_dropdown_create(screen);
-    lv_obj_set_align(lv_dropdown_3, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_x(lv_dropdown_3, -10);
-    lv_obj_set_width(lv_dropdown_3, 80);
-    lv_dropdown_set_dir(lv_dropdown_3, LV_DIR_LEFT);
-    lv_dropdown_set_options(lv_dropdown_3, "Apple\nBanana\nOrange\nMelon");
+    lv_obj_t * dropdown_4 = lv_dropdown_create(screen);
+    lv_obj_set_align(dropdown_4, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_x(dropdown_4, -10);
+    lv_obj_set_width(dropdown_4, 80);
+    lv_dropdown_set_dir(dropdown_4, LV_DIR_LEFT);
+    lv_dropdown_set_options(dropdown_4, "Apple\nBanana\nOrange\nMelon");
 }
 #endif
