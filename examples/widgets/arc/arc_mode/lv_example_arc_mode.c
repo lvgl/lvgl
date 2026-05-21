@@ -19,35 +19,35 @@ void lv_example_arc_mode(void)
     lv_obj_t * screen = lv_screen_active();
 
     /* Normal mode: clockwise from minimum to current value */
-    lv_obj_t * lv_arc_0 = lv_arc_create(screen);
-    lv_obj_set_align(lv_arc_0, LV_ALIGN_LEFT_MID);
-    lv_obj_set_size(lv_arc_0, 90, 90);
-    lv_obj_set_x(lv_arc_0, 10);
-    lv_arc_set_mode(lv_arc_0, LV_ARC_MODE_NORMAL);
-    lv_arc_set_value(lv_arc_0, 75);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_arc_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "normal");
+    lv_obj_t * arc_1 = lv_arc_create(screen);
+    lv_obj_set_align(arc_1, LV_ALIGN_LEFT_MID);
+    lv_obj_set_size(arc_1, 90, 90);
+    lv_obj_set_x(arc_1, 10);
+    lv_arc_set_mode(arc_1, LV_ARC_MODE_NORMAL);
+    lv_arc_set_value(arc_1, 75);
+    lv_obj_t * label_1 = lv_label_create(arc_1);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(label_1, "normal");
 
     /* Reverse mode: counter-clockwise from maximum to current value */
-    lv_obj_t * lv_arc_1 = lv_arc_create(screen);
-    lv_obj_set_align(lv_arc_1, LV_ALIGN_CENTER);
-    lv_obj_set_size(lv_arc_1, 90, 90);
-    lv_arc_set_mode(lv_arc_1, LV_ARC_MODE_REVERSE);
-    lv_arc_set_value(lv_arc_1, 75);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_arc_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "rev.");
+    lv_obj_t * arc_2 = lv_arc_create(screen);
+    lv_obj_set_align(arc_2, LV_ALIGN_CENTER);
+    lv_obj_set_size(arc_2, 90, 90);
+    lv_arc_set_mode(arc_2, LV_ARC_MODE_REVERSE);
+    lv_arc_set_value(arc_2, 75);
+    lv_obj_t * label_2 = lv_label_create(arc_2);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "rev.");
 
     /* Symmetrical mode: indicator grows from the middle */
-    lv_obj_t * lv_arc_2 = lv_arc_create(screen);
-    lv_obj_set_align(lv_arc_2, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_size(lv_arc_2, 90, 90);
-    lv_obj_set_x(lv_arc_2, -10);
-    lv_arc_set_mode(lv_arc_2, LV_ARC_MODE_SYMMETRICAL);
-    lv_arc_set_value(lv_arc_2, 75);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_arc_2);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "sym.");
+    lv_obj_t * arc_3 = lv_arc_create(screen);
+    lv_obj_set_align(arc_3, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_size(arc_3, 90, 90);
+    lv_obj_set_x(arc_3, -10);
+    lv_arc_set_mode(arc_3, LV_ARC_MODE_SYMMETRICAL);
+    lv_arc_set_value(arc_3, 75);
+    lv_obj_t * label_3 = lv_label_create(arc_3);
+    lv_obj_set_align(label_3, LV_ALIGN_CENTER);
+    lv_label_set_text(label_3, "sym.");
 }
 #endif

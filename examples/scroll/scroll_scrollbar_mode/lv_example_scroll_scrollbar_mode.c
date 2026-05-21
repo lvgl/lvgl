@@ -42,76 +42,76 @@ void lv_example_scroll_scrollbar_mode(void)
     lv_obj_set_style_pad_row(screen, 12, 0);
 
     /* 💡 Both panels scroll; only the right one ever shows a scrollbar. */
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_size(lv_obj_1, lv_pct(100), 160);
-    lv_obj_set_flex_flow(lv_obj_1, LV_FLEX_FLOW_ROW);
-    lv_obj_set_style_flex_main_place(lv_obj_1, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_column(lv_obj_1, 16, 0);
+    lv_obj_t * container_1 = lv_obj_create(screen);
+    lv_obj_set_size(container_1, lv_pct(100), 160);
+    lv_obj_set_flex_flow(container_1, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_flex_main_place(container_1, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_column(container_1, 16, 0);
     /* scrollbar_mode="off": scrolls, bar never shown */
-    lv_obj_t * lv_obj_2 = lv_obj_create(lv_obj_1);
-    lv_obj_set_size(lv_obj_2, 130, lv_pct(100));
-    lv_obj_set_flex_flow(lv_obj_2, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(lv_obj_2, 8, 0);
-    lv_obj_set_scrollbar_mode(lv_obj_2, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_obj_2);
-    lv_label_set_text(lv_label_0, "mode: off");
+    lv_obj_t * container_2 = lv_obj_create(container_1);
+    lv_obj_set_size(container_2, 130, lv_pct(100));
+    lv_obj_set_flex_flow(container_2, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(container_2, 8, 0);
+    lv_obj_set_scrollbar_mode(container_2, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_t * label_1 = lv_label_create(container_2);
+    lv_label_set_text(label_1, "mode: off");
 
-    lv_obj_t * lv_button_0 = lv_button_create(lv_obj_2);
-    lv_obj_set_width(lv_button_0, lv_pct(100));
-    lv_obj_t * lv_label_1 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "A");
+    lv_obj_t * button_1 = lv_button_create(container_2);
+    lv_obj_set_width(button_1, lv_pct(100));
+    lv_obj_t * label_2 = lv_label_create(button_1);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "A");
 
-    lv_obj_t * lv_button_1 = lv_button_create(lv_obj_2);
-    lv_obj_set_width(lv_button_1, lv_pct(100));
-    lv_obj_t * lv_label_2 = lv_label_create(lv_button_1);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "B");
+    lv_obj_t * button_2 = lv_button_create(container_2);
+    lv_obj_set_width(button_2, lv_pct(100));
+    lv_obj_t * label_3 = lv_label_create(button_2);
+    lv_obj_set_align(label_3, LV_ALIGN_CENTER);
+    lv_label_set_text(label_3, "B");
 
-    lv_obj_t * lv_button_2 = lv_button_create(lv_obj_2);
-    lv_obj_set_width(lv_button_2, lv_pct(100));
-    lv_obj_t * lv_label_3 = lv_label_create(lv_button_2);
-    lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_3, "C");
+    lv_obj_t * button_3 = lv_button_create(container_2);
+    lv_obj_set_width(button_3, lv_pct(100));
+    lv_obj_t * label_4 = lv_label_create(button_3);
+    lv_obj_set_align(label_4, LV_ALIGN_CENTER);
+    lv_label_set_text(label_4, "C");
 
-    lv_obj_t * lv_button_3 = lv_button_create(lv_obj_2);
-    lv_obj_set_width(lv_button_3, lv_pct(100));
-    lv_obj_t * lv_label_4 = lv_label_create(lv_button_3);
-    lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_4, "D");
+    lv_obj_t * button_4 = lv_button_create(container_2);
+    lv_obj_set_width(button_4, lv_pct(100));
+    lv_obj_t * label_5 = lv_label_create(button_4);
+    lv_obj_set_align(label_5, LV_ALIGN_CENTER);
+    lv_label_set_text(label_5, "D");
 
     /* scrollbar_mode="on": bar always visible */
-    lv_obj_t * lv_obj_3 = lv_obj_create(lv_obj_1);
-    lv_obj_set_size(lv_obj_3, 130, lv_pct(100));
-    lv_obj_set_flex_flow(lv_obj_3, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_row(lv_obj_3, 8, 0);
-    lv_obj_set_scrollbar_mode(lv_obj_3, LV_SCROLLBAR_MODE_ON);
-    lv_obj_add_style(lv_obj_3, &style_scrollbar, LV_PART_SCROLLBAR);
-    lv_obj_t * lv_label_5 = lv_label_create(lv_obj_3);
-    lv_label_set_text(lv_label_5, "mode: on");
+    lv_obj_t * container_3 = lv_obj_create(container_1);
+    lv_obj_set_size(container_3, 130, lv_pct(100));
+    lv_obj_set_flex_flow(container_3, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_row(container_3, 8, 0);
+    lv_obj_set_scrollbar_mode(container_3, LV_SCROLLBAR_MODE_ON);
+    lv_obj_add_style(container_3, &style_scrollbar, LV_PART_SCROLLBAR);
+    lv_obj_t * label_6 = lv_label_create(container_3);
+    lv_label_set_text(label_6, "mode: on");
 
-    lv_obj_t * lv_button_4 = lv_button_create(lv_obj_3);
-    lv_obj_set_width(lv_button_4, lv_pct(100));
-    lv_obj_t * lv_label_6 = lv_label_create(lv_button_4);
-    lv_obj_set_align(lv_label_6, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_6, "A");
+    lv_obj_t * button_5 = lv_button_create(container_3);
+    lv_obj_set_width(button_5, lv_pct(100));
+    lv_obj_t * label_7 = lv_label_create(button_5);
+    lv_obj_set_align(label_7, LV_ALIGN_CENTER);
+    lv_label_set_text(label_7, "A");
 
-    lv_obj_t * lv_button_5 = lv_button_create(lv_obj_3);
-    lv_obj_set_width(lv_button_5, lv_pct(100));
-    lv_obj_t * lv_label_7 = lv_label_create(lv_button_5);
-    lv_obj_set_align(lv_label_7, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_7, "B");
+    lv_obj_t * button_6 = lv_button_create(container_3);
+    lv_obj_set_width(button_6, lv_pct(100));
+    lv_obj_t * label_8 = lv_label_create(button_6);
+    lv_obj_set_align(label_8, LV_ALIGN_CENTER);
+    lv_label_set_text(label_8, "B");
 
-    lv_obj_t * lv_button_6 = lv_button_create(lv_obj_3);
-    lv_obj_set_width(lv_button_6, lv_pct(100));
-    lv_obj_t * lv_label_8 = lv_label_create(lv_button_6);
-    lv_obj_set_align(lv_label_8, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_8, "C");
+    lv_obj_t * button_7 = lv_button_create(container_3);
+    lv_obj_set_width(button_7, lv_pct(100));
+    lv_obj_t * label_9 = lv_label_create(button_7);
+    lv_obj_set_align(label_9, LV_ALIGN_CENTER);
+    lv_label_set_text(label_9, "C");
 
-    lv_obj_t * lv_button_7 = lv_button_create(lv_obj_3);
-    lv_obj_set_width(lv_button_7, lv_pct(100));
-    lv_obj_t * lv_label_9 = lv_label_create(lv_button_7);
-    lv_obj_set_align(lv_label_9, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_9, "D");
+    lv_obj_t * button_8 = lv_button_create(container_3);
+    lv_obj_set_width(button_8, lv_pct(100));
+    lv_obj_t * label_10 = lv_label_create(button_8);
+    lv_obj_set_align(label_10, LV_ALIGN_CENTER);
+    lv_label_set_text(label_10, "D");
 }
 #endif

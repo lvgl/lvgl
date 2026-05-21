@@ -18,29 +18,29 @@
 		     style_pad_row would control the vertical gap between rows when wrapping.
 		     Try changing style_pad_column to 0 or 20 to see the effect. -->
 		<!-- Demo container with row/column gaps -->
-		<lv_obj
+		<lv_obj name="container"
 			flex_flow="row_wrap"
 			style_pad_column="10"
 			style_pad_row="30"
 			width="100%"
 			height="content"
 		>
-			<lv_label style_bg_color="0x4a90d9" text="HTML">
+			<lv_label name="label_1" style_bg_color="0x4a90d9" text="HTML">
 				<style name="style_tag" />
 			</lv_label>
-			<lv_label style_bg_color="0xe67e22" text="CSS">
+			<lv_label name="label_2" style_bg_color="0xe67e22" text="CSS">
 				<style name="style_tag" />
 			</lv_label>
-			<lv_label style_bg_color="0x27ae60" text="JavaScript">
+			<lv_label name="label_3" style_bg_color="0x27ae60" text="JavaScript">
 				<style name="style_tag" />
 			</lv_label>
-			<lv_label style_bg_color="0x8e44ad" text="Python">
+			<lv_label name="label_4" style_bg_color="0x8e44ad" text="Python">
 				<style name="style_tag" />
 			</lv_label>
-			<lv_label style_bg_color="0xc0392b" text="C++">
+			<lv_label name="label_5" style_bg_color="0xc0392b" text="C++">
 				<style name="style_tag" />
 			</lv_label>
-			<lv_label style_bg_color="0x16a085" text="Rust">
+			<lv_label name="label_6" style_bg_color="0x16a085" text="Rust">
 				<style name="style_tag" />
 			</lv_label>
 		</lv_obj>

@@ -23,18 +23,18 @@ void lv_example_led_color(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Red LED */
-    lv_obj_t * lv_led_0 = lv_led_create(screen);
-    lv_obj_set_size(lv_led_0, 40, 40);
-    lv_led_set_color(lv_led_0, lv_color_hex(0xff3030));
+    lv_obj_t * led_1 = lv_led_create(screen);
+    lv_obj_set_size(led_1, 40, 40);
+    lv_led_set_color(led_1, lv_color_hex(0xff3030));
 
     /* Green LED */
-    lv_obj_t * lv_led_1 = lv_led_create(screen);
-    lv_obj_set_size(lv_led_1, 40, 40);
-    lv_led_set_color(lv_led_1, lv_color_hex(0x30c050));
+    lv_obj_t * led_2 = lv_led_create(screen);
+    lv_obj_set_size(led_2, 40, 40);
+    lv_led_set_color(led_2, lv_color_hex(0x30c050));
 
     /* Blue LED */
-    lv_obj_t * lv_led_2 = lv_led_create(screen);
-    lv_obj_set_size(lv_led_2, 40, 40);
-    lv_led_set_color(lv_led_2, lv_color_hex(0x3080ff));
+    lv_obj_t * led_3 = lv_led_create(screen);
+    lv_obj_set_size(led_3, 40, 40);
+    lv_led_set_color(led_3, lv_color_hex(0x3080ff));
 }
 #endif

@@ -11,10 +11,10 @@
 <screen>
 	<view>
 		<!-- 💡 Change `mode` from `number` to `text_lower`, `text_upper`, or `special` to see each keymap. -->
-		<lv_textarea align="top_mid" y="10" width="90%" height="60"
+		<lv_textarea name="textarea" align="top_mid" y="10" width="90%" height="60"
 			one_line="true" placeholder_text="Numbers only" />
 
-		<lv_keyboard align="bottom_mid" width="100%" height="50%"
+		<lv_keyboard name="keyboard" align="bottom_mid" width="100%" height="50%"
 			mode="number" />
 	</view>
 </screen>

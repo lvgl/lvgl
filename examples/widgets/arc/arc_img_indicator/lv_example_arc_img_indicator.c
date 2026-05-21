@@ -56,18 +56,18 @@ void lv_example_arc_img_indicator(void)
     lv_obj_set_style_pad_row(screen, 0, 0);
 
     /* 💡 Change value to sweep the glowing cyan indicator across the dark segmented background. */
-    lv_obj_t * lv_arc_0 = lv_arc_create(screen);
-    lv_obj_set_size(lv_arc_0, 200, 200);
-    lv_arc_set_min_value(lv_arc_0, 0);
-    lv_arc_set_max_value(lv_arc_0, 22);
-    lv_arc_set_bg_start_angle(lv_arc_0, 138);
-    lv_arc_set_bg_end_angle(lv_arc_0, 41);
-    lv_arc_bind_value(lv_arc_0, &subject_value2);
-    lv_obj_add_style(lv_arc_0, &style_arc_bg, LV_PART_MAIN);
-    lv_obj_add_style(lv_arc_0, &style_arc_indicator, LV_PART_INDICATOR);
-    lv_obj_add_style(lv_arc_0, &style_arc_knob, LV_PART_KNOB);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_arc_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_bind_text(lv_label_0, &subject_value2, NULL);
+    lv_obj_t * arc = lv_arc_create(screen);
+    lv_obj_set_size(arc, 200, 200);
+    lv_arc_set_min_value(arc, 0);
+    lv_arc_set_max_value(arc, 22);
+    lv_arc_set_bg_start_angle(arc, 138);
+    lv_arc_set_bg_end_angle(arc, 41);
+    lv_arc_bind_value(arc, &subject_value2);
+    lv_obj_add_style(arc, &style_arc_bg, LV_PART_MAIN);
+    lv_obj_add_style(arc, &style_arc_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(arc, &style_arc_knob, LV_PART_KNOB);
+    lv_obj_t * label = lv_label_create(arc);
+    lv_obj_set_align(label, LV_ALIGN_CENTER);
+    lv_label_bind_text(label, &subject_value2, NULL);
 }
 #endif

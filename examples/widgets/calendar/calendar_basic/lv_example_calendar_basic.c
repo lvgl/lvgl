@@ -26,13 +26,13 @@ void lv_example_calendar_basic(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Tap a day to select it; use the header arrows to jump between months. */
-    lv_obj_t * lv_calendar_0 = lv_calendar_create(screen);
-    lv_obj_set_size(lv_calendar_0, lv_pct(90), 200);
-    lv_calendar_set_today_year(lv_calendar_0, 2026);
-    lv_calendar_set_today_month(lv_calendar_0, 5);
-    lv_calendar_set_today_day(lv_calendar_0, 15);
-    lv_calendar_set_shown_year(lv_calendar_0, 2026);
-    lv_calendar_set_shown_month(lv_calendar_0, 5);
-    lv_calendar_add_header_arrow(lv_calendar_0);
+    lv_obj_t * calendar = lv_calendar_create(screen);
+    lv_obj_set_size(calendar, lv_pct(90), 200);
+    lv_calendar_set_today_year(calendar, 2026);
+    lv_calendar_set_today_month(calendar, 5);
+    lv_calendar_set_today_day(calendar, 15);
+    lv_calendar_set_shown_year(calendar, 2026);
+    lv_calendar_set_shown_month(calendar, 5);
+    lv_calendar_add_header_arrow(calendar);
 }
 #endif

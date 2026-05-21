@@ -15,7 +15,7 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Raise `line_width` or toggle `line_rounded`; the stroke thickens and the bends round off instead of mitring. -->
-		<lv_line points="10 30, 60 90, 130 20, 200 70">
+		<lv_line name="line" points="10 30, 60 90, 130 20, 200 70">
 			<style name="style_stroke" />
 		</lv_line>
 	</view>

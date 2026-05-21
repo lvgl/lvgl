@@ -46,8 +46,8 @@ void lv_example_style_image(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 The bitmap is tinted and rotated by style alone; lower `image_recolor_opa` to fade the tint or change `transform_rotation`. */
-    lv_obj_t * lv_image_0 = lv_image_create(screen);
-    lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
-    lv_obj_add_style(lv_image_0, &style_img, 0);
+    lv_obj_t * image = lv_image_create(screen);
+    lv_image_set_src(image, &img_example_lvgl_logo);
+    lv_obj_add_style(image, &style_img, 0);
 }
 #endif

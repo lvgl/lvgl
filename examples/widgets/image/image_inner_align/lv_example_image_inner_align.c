@@ -26,25 +26,25 @@ void lv_example_image_inner_align(void)
     lv_obj_set_style_pad_column(screen, 16, 0);
 
     /* 💡 Switch `inner_align` to `contain`, `cover`, or `stretch` to compare placement vs scaling modes. */
-    lv_obj_t * lv_image_0 = lv_image_create(screen);
-    lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
-    lv_obj_set_size(lv_image_0, 80, 80);
-    lv_image_set_inner_align(lv_image_0, LV_IMAGE_ALIGN_TOP_LEFT);
-    lv_obj_set_style_bg_color(lv_image_0, lv_color_hex(0xe5e7eb), 0);
-    lv_obj_set_style_bg_opa(lv_image_0, (255 * 100 / 100), 0);
+    lv_obj_t * image_1 = lv_image_create(screen);
+    lv_image_set_src(image_1, &img_example_lvgl_logo);
+    lv_obj_set_size(image_1, 80, 80);
+    lv_image_set_inner_align(image_1, LV_IMAGE_ALIGN_TOP_LEFT);
+    lv_obj_set_style_bg_color(image_1, lv_color_hex(0xe5e7eb), 0);
+    lv_obj_set_style_bg_opa(image_1, (255 * 100 / 100), 0);
 
-    lv_obj_t * lv_image_1 = lv_image_create(screen);
-    lv_image_set_src(lv_image_1, &img_example_lvgl_logo);
-    lv_obj_set_size(lv_image_1, 80, 80);
-    lv_image_set_inner_align(lv_image_1, LV_IMAGE_ALIGN_CENTER);
-    lv_obj_set_style_bg_color(lv_image_1, lv_color_hex(0xe5e7eb), 0);
-    lv_obj_set_style_bg_opa(lv_image_1, (255 * 100 / 100), 0);
+    lv_obj_t * image_2 = lv_image_create(screen);
+    lv_image_set_src(image_2, &img_example_lvgl_logo);
+    lv_obj_set_size(image_2, 80, 80);
+    lv_image_set_inner_align(image_2, LV_IMAGE_ALIGN_CENTER);
+    lv_obj_set_style_bg_color(image_2, lv_color_hex(0xe5e7eb), 0);
+    lv_obj_set_style_bg_opa(image_2, (255 * 100 / 100), 0);
 
-    lv_obj_t * lv_image_2 = lv_image_create(screen);
-    lv_image_set_src(lv_image_2, &img_example_lvgl_logo);
-    lv_obj_set_size(lv_image_2, 80, 80);
-    lv_image_set_inner_align(lv_image_2, LV_IMAGE_ALIGN_BOTTOM_RIGHT);
-    lv_obj_set_style_bg_color(lv_image_2, lv_color_hex(0xe5e7eb), 0);
-    lv_obj_set_style_bg_opa(lv_image_2, (255 * 100 / 100), 0);
+    lv_obj_t * image_3 = lv_image_create(screen);
+    lv_image_set_src(image_3, &img_example_lvgl_logo);
+    lv_obj_set_size(image_3, 80, 80);
+    lv_image_set_inner_align(image_3, LV_IMAGE_ALIGN_BOTTOM_RIGHT);
+    lv_obj_set_style_bg_color(image_3, lv_color_hex(0xe5e7eb), 0);
+    lv_obj_set_style_bg_opa(image_3, (255 * 100 / 100), 0);
 }
 #endif

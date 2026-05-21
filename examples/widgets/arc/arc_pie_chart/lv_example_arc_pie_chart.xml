@@ -35,7 +35,7 @@
 		<!-- 💡 Edit the `bg_start_angle`/`bg_end_angle` pair on any arc to grow/shrink that slice; the others stay put. -->
 		<!-- 5 slices with uneven sweeps so the colours look like a real data breakdown.
 		     Angles measured clockwise from 3 o'clock; the seam between E and A is at 12 o'clock (270°). -->
-		<lv_arc clickable="false"
+		<lv_arc name="arc_1" clickable="false"
 			bg_start_angle="270" bg_end_angle="335"
 			style_arc_color-main="0xef4444">
 			<style name="style_pie_main" selector="main" />
@@ -43,7 +43,7 @@
 			<style name="style_pie_knob" selector="knob" />
 		</lv_arc>
 
-		<lv_arc clickable="false"
+		<lv_arc name="arc_2" clickable="false"
 			bg_start_angle="335" bg_end_angle="38"
 			style_arc_color-main="0xf59e0b">
 			<style name="style_pie_main" selector="main" />
@@ -51,7 +51,7 @@
 			<style name="style_pie_knob" selector="knob" />
 		</lv_arc>
 
-		<lv_arc clickable="false"
+		<lv_arc name="arc_3" clickable="false"
 			bg_start_angle="38" bg_end_angle="142"
 			style_arc_color-main="0x22c55e">
 			<style name="style_pie_main" selector="main" />
@@ -59,7 +59,7 @@
 			<style name="style_pie_knob" selector="knob" />
 		</lv_arc>
 
-		<lv_arc clickable="false"
+		<lv_arc name="arc_4" clickable="false"
 			bg_start_angle="142" bg_end_angle="205"
 			style_arc_color-main="0x3b82f6">
 			<style name="style_pie_main" selector="main" />
@@ -67,7 +67,7 @@
 			<style name="style_pie_knob" selector="knob" />
 		</lv_arc>
 
-		<lv_arc clickable="false"
+		<lv_arc name="arc_5" clickable="false"
 			bg_start_angle="205" bg_end_angle="270"
 			style_arc_color-main="0xa855f7">
 			<style name="style_pie_main" selector="main" />

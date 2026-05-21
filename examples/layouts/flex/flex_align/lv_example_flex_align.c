@@ -22,21 +22,23 @@ void lv_example_flex_align(void)
     lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
 
     /* Demo container with explicit main and cross alignment */
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_flex_flow(lv_obj_1, LV_FLEX_FLOW_ROW);
-    lv_obj_set_style_flex_main_place(lv_obj_1, LV_FLEX_ALIGN_SPACE_EVENLY, 0);
-    lv_obj_set_style_flex_cross_place(lv_obj_1, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_size(lv_obj_1, lv_pct(100), lv_pct(40));
+    lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_flex_main_place(container, LV_FLEX_ALIGN_SPACE_EVENLY, 0);
+    lv_obj_set_style_flex_cross_place(container, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_size(container, lv_pct(100), lv_pct(40));
     /* Tall item: a label with a large font */
-    lv_obj_t * lv_button_0 = lv_button_create(lv_obj_1);
-    lv_obj_set_height(lv_button_0, 64);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
-    lv_label_set_text(lv_label_0, "64px");
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_obj_t * button = lv_button_create(container);
+    lv_obj_set_height(button, 64);
+    lv_obj_t * label = lv_label_create(button);
+    lv_label_set_text(label, "64px");
+    lv_obj_set_align(label, LV_ALIGN_CENTER);
 
-    lv_switch_create(lv_obj_1);
+    /* Medium item: a toggle switch */
+    lv_switch_create(container);
 
-    lv_obj_t * lv_checkbox_0 = lv_checkbox_create(lv_obj_1);
-    lv_checkbox_set_text(lv_checkbox_0, "Check");
+    /* Another medium item: a checkbox */
+    lv_obj_t * checkbox = lv_checkbox_create(container);
+    lv_checkbox_set_text(checkbox, "Check");
 }
 #endif

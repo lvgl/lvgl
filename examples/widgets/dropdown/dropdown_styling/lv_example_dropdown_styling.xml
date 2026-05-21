@@ -24,7 +24,7 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Tap or focus the dropdown to see the focused-state border swap in. -->
-		<lv_dropdown width="200" options="Apple&#10;Banana&#10;Cherry&#10;Date">
+		<lv_dropdown name="dropdown" width="200" options="Apple&#10;Banana&#10;Cherry&#10;Date">
 			<style name="style_dropdown_main" selector="main" />
 			<style name="style_dropdown_focused" selector="main|focused" />
 		</lv_dropdown>

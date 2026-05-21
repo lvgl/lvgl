@@ -25,12 +25,12 @@ void lv_example_spinbox_value(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Edit `step` to 5 or 10; each press now changes by that delta until a bound is hit. */
-    lv_obj_t * lv_spinbox_0 = lv_spinbox_create(screen);
-    lv_obj_set_width(lv_spinbox_0, 160);
-    lv_spinbox_set_digit_count(lv_spinbox_0, 3);
-    lv_spinbox_set_value(lv_spinbox_0, 25);
-    lv_spinbox_set_min_value(lv_spinbox_0, 0);
-    lv_spinbox_set_max_value(lv_spinbox_0, 100);
-    lv_spinbox_set_step(lv_spinbox_0, 1);
+    lv_obj_t * spinbox = lv_spinbox_create(screen);
+    lv_obj_set_width(spinbox, 160);
+    lv_spinbox_set_digit_count(spinbox, 3);
+    lv_spinbox_set_value(spinbox, 25);
+    lv_spinbox_set_min_value(spinbox, 0);
+    lv_spinbox_set_max_value(spinbox, 100);
+    lv_spinbox_set_step(spinbox, 1);
 }
 #endif

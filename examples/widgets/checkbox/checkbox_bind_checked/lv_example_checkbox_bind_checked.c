@@ -32,12 +32,12 @@ void lv_example_checkbox_bind_checked(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Toggle the checkbox; the note appears/disappears as `subject_flag` flips between 0 and 1. */
-    lv_obj_t * lv_checkbox_0 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_0, "Show extra details");
-    lv_obj_bind_checked(lv_checkbox_0, &subject_flag);
+    lv_obj_t * checkbox = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox, "Show extra details");
+    lv_obj_bind_checked(checkbox, &subject_flag);
 
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_label_set_text(lv_label_0, "Extra details only visible while the box is ticked.");
-    lv_obj_bind_flag_if_eq(lv_label_0, &subject_flag, LV_OBJ_FLAG_HIDDEN, 0);
+    lv_obj_t * label = lv_label_create(screen);
+    lv_label_set_text(label, "Extra details only visible while the box is ticked.");
+    lv_obj_bind_flag_if_eq(label, &subject_flag, LV_OBJ_FLAG_HIDDEN, 0);
 }
 #endif

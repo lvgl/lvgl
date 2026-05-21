@@ -12,22 +12,22 @@
 <screen>
 	<view>
 		<!-- 💡 Tap the switch inside a tab button — it lives on the tab button itself, not on the tab content. -->
-		<lv_tabview width="100%" height="100%">
+		<lv_tabview name="tabview" width="100%" height="100%">
 			<lv_tabview-tab text="WiFi">
-				<lv_label align="center" text="WiFi tab content" />
+				<lv_label name="label_1" align="center" text="WiFi tab content" />
 			</lv_tabview-tab>
 			<lv_tabview-tab text="Bluetooth">
-				<lv_label align="center" text="Bluetooth tab content" />
+				<lv_label name="label_2" align="center" text="Bluetooth tab content" />
 			</lv_tabview-tab>
 
 			<!-- Switch parented to the first tab's button -->
 			<lv_tabview-tab_button index="0">
-				<lv_switch width="40" height="20" ignore_layout="true" align="right_mid" x="-10" />
+				<lv_switch name="sw_1" width="40" height="20" ignore_layout="true" align="right_mid" x="-10" />
 			</lv_tabview-tab_button>
 
 			<!-- Switch parented to the second tab's button -->
 			<lv_tabview-tab_button index="1">
-				<lv_switch width="40" height="20" ignore_layout="true" align="right_mid" x="-10" />
+				<lv_switch name="sw_2" width="40" height="20" ignore_layout="true" align="right_mid" x="-10" />
 			</lv_tabview-tab_button>
 		</lv_tabview>
 	</view>

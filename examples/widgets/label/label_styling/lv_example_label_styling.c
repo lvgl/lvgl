@@ -42,27 +42,27 @@ void lv_example_label_styling(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Named-style pill badge */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_label_set_text(lv_label_0, "NEW");
-    lv_obj_add_style(lv_label_0, &style_badge, 0);
+    lv_obj_t * label_1 = lv_label_create(screen);
+    lv_label_set_text(label_1, "NEW");
+    lv_obj_add_style(label_1, &style_badge, 0);
 
     /* Local-style call-out: border + outline halo + shadow + padding */
-    lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_label_set_text(lv_label_1, "Heads up");
-    lv_obj_set_style_bg_opa(lv_label_1, (255 * 100 / 100), 0);
-    lv_obj_set_style_bg_color(lv_label_1, lv_color_hex(0xfef3c7), 0);
-    lv_obj_set_style_text_color(lv_label_1, lv_color_hex(0x92400e), 0);
-    lv_obj_set_style_border_color(lv_label_1, lv_color_hex(0xf59e0b), 0);
-    lv_obj_set_style_border_width(lv_label_1, 2, 0);
-    lv_obj_set_style_radius(lv_label_1, 8, 0);
-    lv_obj_set_style_pad_all(lv_label_1, 10, 0);
-    lv_obj_set_style_outline_color(lv_label_1, lv_color_hex(0xf59e0b), 0);
-    lv_obj_set_style_outline_width(lv_label_1, 3, 0);
-    lv_obj_set_style_outline_pad(lv_label_1, 3, 0);
-    lv_obj_set_style_outline_opa(lv_label_1, 80, 0);
-    lv_obj_set_style_shadow_color(lv_label_1, lv_color_hex(0x78350f), 0);
-    lv_obj_set_style_shadow_width(lv_label_1, 14, 0);
-    lv_obj_set_style_shadow_offset_y(lv_label_1, 3, 0);
-    lv_obj_set_style_shadow_opa(lv_label_1, 100, 0);
+    lv_obj_t * label_2 = lv_label_create(screen);
+    lv_label_set_text(label_2, "Heads up");
+    lv_obj_set_style_bg_opa(label_2, (255 * 100 / 100), 0);
+    lv_obj_set_style_bg_color(label_2, lv_color_hex(0xfef3c7), 0);
+    lv_obj_set_style_text_color(label_2, lv_color_hex(0x92400e), 0);
+    lv_obj_set_style_border_color(label_2, lv_color_hex(0xf59e0b), 0);
+    lv_obj_set_style_border_width(label_2, 2, 0);
+    lv_obj_set_style_radius(label_2, 8, 0);
+    lv_obj_set_style_pad_all(label_2, 10, 0);
+    lv_obj_set_style_outline_color(label_2, lv_color_hex(0xf59e0b), 0);
+    lv_obj_set_style_outline_width(label_2, 3, 0);
+    lv_obj_set_style_outline_pad(label_2, 3, 0);
+    lv_obj_set_style_outline_opa(label_2, 80, 0);
+    lv_obj_set_style_shadow_color(label_2, lv_color_hex(0x78350f), 0);
+    lv_obj_set_style_shadow_width(label_2, 14, 0);
+    lv_obj_set_style_shadow_offset_y(label_2, 3, 0);
+    lv_obj_set_style_shadow_opa(label_2, 100, 0);
 }
 #endif

@@ -26,40 +26,40 @@ void lv_example_bar_modes(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Normal mode */
-    lv_obj_t * lv_bar_0 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_0, lv_pct(90), 16);
-    lv_bar_set_mode(lv_bar_0, LV_BAR_MODE_NORMAL);
-    lv_bar_set_min_value(lv_bar_0, 0);
-    lv_bar_set_max_value(lv_bar_0, 100);
-    lv_bar_set_value(lv_bar_0, 70, false);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_bar_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "normal");
-    lv_obj_set_style_text_color(lv_label_0, TEXT_COLOR, 0);
+    lv_obj_t * bar_1 = lv_bar_create(screen);
+    lv_obj_set_size(bar_1, lv_pct(90), 16);
+    lv_bar_set_mode(bar_1, LV_BAR_MODE_NORMAL);
+    lv_bar_set_min_value(bar_1, 0);
+    lv_bar_set_max_value(bar_1, 100);
+    lv_bar_set_value(bar_1, 70, false);
+    lv_obj_t * label_1 = lv_label_create(bar_1);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(label_1, "normal");
+    lv_obj_set_style_text_color(label_1, TEXT_COLOR, 0);
 
     /* Symmetrical mode around zero */
-    lv_obj_t * lv_bar_1 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_1, lv_pct(90), 16);
-    lv_bar_set_mode(lv_bar_1, LV_BAR_MODE_SYMMETRICAL);
-    lv_bar_set_min_value(lv_bar_1, -100);
-    lv_bar_set_max_value(lv_bar_1, 100);
-    lv_bar_set_value(lv_bar_1, 45, false);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_bar_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "symmetrical");
-    lv_obj_set_style_text_color(lv_label_1, TEXT_COLOR, 0);
+    lv_obj_t * bar_2 = lv_bar_create(screen);
+    lv_obj_set_size(bar_2, lv_pct(90), 16);
+    lv_bar_set_mode(bar_2, LV_BAR_MODE_SYMMETRICAL);
+    lv_bar_set_min_value(bar_2, -100);
+    lv_bar_set_max_value(bar_2, 100);
+    lv_bar_set_value(bar_2, 45, false);
+    lv_obj_t * label_2 = lv_label_create(bar_2);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "symmetrical");
+    lv_obj_set_style_text_color(label_2, TEXT_COLOR, 0);
 
     /* Range mode with start and end values */
-    lv_obj_t * lv_bar_2 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_2, lv_pct(90), 16);
-    lv_bar_set_mode(lv_bar_2, LV_BAR_MODE_RANGE);
-    lv_bar_set_min_value(lv_bar_2, 0);
-    lv_bar_set_max_value(lv_bar_2, 100);
-    lv_bar_set_start_value(lv_bar_2, 25, false);
-    lv_bar_set_value(lv_bar_2, 80, false);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_bar_2);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "range");
-    lv_obj_set_style_text_color(lv_label_2, TEXT_COLOR, 0);
+    lv_obj_t * bar_3 = lv_bar_create(screen);
+    lv_obj_set_size(bar_3, lv_pct(90), 16);
+    lv_bar_set_mode(bar_3, LV_BAR_MODE_RANGE);
+    lv_bar_set_min_value(bar_3, 0);
+    lv_bar_set_max_value(bar_3, 100);
+    lv_bar_set_start_value(bar_3, 25, false);
+    lv_bar_set_value(bar_3, 80, false);
+    lv_obj_t * label_3 = lv_label_create(bar_3);
+    lv_obj_set_align(label_3, LV_ALIGN_CENTER);
+    lv_label_set_text(label_3, "range");
+    lv_obj_set_style_text_color(label_3, TEXT_COLOR, 0);
 }
 #endif

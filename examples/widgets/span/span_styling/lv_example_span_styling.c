@@ -55,28 +55,28 @@ void lv_example_span_styling(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Each span keeps its own style; the group only controls wrap, indent, and overflow. */
-    lv_obj_t * lv_spangroup_0 = lv_spangroup_create(screen);
-    lv_obj_set_size(lv_spangroup_0, 260, LV_SIZE_CONTENT);
-    lv_spangroup_set_indent(lv_spangroup_0, 20);
-    lv_spangroup_set_overflow(lv_spangroup_0, LV_SPAN_OVERFLOW_ELLIPSIS);
-    lv_spangroup_set_max_lines(lv_spangroup_0, 4);
-    lv_obj_set_style_border_color(lv_spangroup_0, lv_color_hex(0xf59e0b), 0);
-    lv_obj_set_style_border_width(lv_spangroup_0, 1, 0);
-    lv_obj_set_style_pad_all(lv_spangroup_0, 6, 0);
-    lv_span_t * lv_spangroup_span_0 = lv_spangroup_add_span(lv_spangroup_0);
-    lv_spangroup_set_span_text(lv_spangroup_0, lv_spangroup_span_0, "LVGL ");
-    lv_spangroup_set_span_style(lv_spangroup_0, lv_spangroup_span_0, &style_span_title);
-    lv_span_t * lv_spangroup_span_1 = lv_spangroup_add_span(lv_spangroup_0);
-    lv_spangroup_set_span_text(lv_spangroup_0, lv_spangroup_span_1, "renders rich text ");
-    lv_spangroup_set_span_style(lv_spangroup_0, lv_spangroup_span_1, &style_span_body);
-    lv_span_t * lv_spangroup_span_2 = lv_spangroup_add_span(lv_spangroup_0);
-    lv_spangroup_set_span_text(lv_spangroup_0, lv_spangroup_span_2, "with per-span color, ");
-    lv_spangroup_set_span_style(lv_spangroup_0, lv_spangroup_span_2, &style_span_accent);
-    lv_span_t * lv_spangroup_span_3 = lv_spangroup_add_span(lv_spangroup_0);
-    lv_spangroup_set_span_text(lv_spangroup_0, lv_spangroup_span_3, "underline, ");
-    lv_spangroup_set_span_style(lv_spangroup_0, lv_spangroup_span_3, &style_span_underline);
-    lv_span_t * lv_spangroup_span_4 = lv_spangroup_add_span(lv_spangroup_0);
-    lv_spangroup_set_span_text(lv_spangroup_0, lv_spangroup_span_4, "and strikethrough decoration.");
-    lv_spangroup_set_span_style(lv_spangroup_0, lv_spangroup_span_4, &style_span_strike);
+    lv_obj_t * spangroup = lv_spangroup_create(screen);
+    lv_obj_set_size(spangroup, 260, LV_SIZE_CONTENT);
+    lv_spangroup_set_indent(spangroup, 20);
+    lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_ELLIPSIS);
+    lv_spangroup_set_max_lines(spangroup, 4);
+    lv_obj_set_style_border_color(spangroup, lv_color_hex(0xf59e0b), 0);
+    lv_obj_set_style_border_width(spangroup, 1, 0);
+    lv_obj_set_style_pad_all(spangroup, 6, 0);
+    lv_span_t * lv_spangroup_span_0 = lv_spangroup_add_span(spangroup);
+    lv_spangroup_set_span_text(spangroup, lv_spangroup_span_0, "LVGL ");
+    lv_spangroup_set_span_style(spangroup, lv_spangroup_span_0, &style_span_title);
+    lv_span_t * lv_spangroup_span_1 = lv_spangroup_add_span(spangroup);
+    lv_spangroup_set_span_text(spangroup, lv_spangroup_span_1, "renders rich text ");
+    lv_spangroup_set_span_style(spangroup, lv_spangroup_span_1, &style_span_body);
+    lv_span_t * lv_spangroup_span_2 = lv_spangroup_add_span(spangroup);
+    lv_spangroup_set_span_text(spangroup, lv_spangroup_span_2, "with per-span color, ");
+    lv_spangroup_set_span_style(spangroup, lv_spangroup_span_2, &style_span_accent);
+    lv_span_t * lv_spangroup_span_3 = lv_spangroup_add_span(spangroup);
+    lv_spangroup_set_span_text(spangroup, lv_spangroup_span_3, "underline, ");
+    lv_spangroup_set_span_style(spangroup, lv_spangroup_span_3, &style_span_underline);
+    lv_span_t * lv_spangroup_span_4 = lv_spangroup_add_span(spangroup);
+    lv_spangroup_set_span_text(spangroup, lv_spangroup_span_4, "and strikethrough decoration.");
+    lv_spangroup_set_span_style(spangroup, lv_spangroup_span_4, &style_span_strike);
 }
 #endif

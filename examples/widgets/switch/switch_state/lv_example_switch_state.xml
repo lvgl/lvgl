@@ -11,9 +11,9 @@
 <screen>
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Toggle either of the first two switches by clicking; the disabled ones won't respond. -->
-		<lv_switch />
-		<lv_switch checked="true" />
-		<lv_switch disabled="true" />
-		<lv_switch disabled="true" checked="true" />
+		<lv_switch name="sw_1" />
+		<lv_switch name="sw_2" checked="true" />
+		<lv_switch name="sw_3" disabled="true" />
+		<lv_switch name="sw_4" disabled="true" checked="true" />
 	</view>
 </screen>

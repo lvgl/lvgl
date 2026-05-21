@@ -14,20 +14,20 @@
 		     "A" gets 1 portion, "B" gets 2 portions of the free space.
 		     Try changing the style_flex_grow values to see the effect. -->
 		<!-- Demo row for grow behavior -->
-		<lv_obj flex_flow="row" width="100%" height="content">
+		<lv_obj name="container" flex_flow="row" width="100%" height="content">
 			<!-- Fixed-width item on the left -->
-			<lv_button width="50" height="content">
-				<lv_label text="Fix" align="center" />
+			<lv_button name="button_1" width="50" height="content">
+				<lv_label name="label_1" text="Fix" align="center" />
 			</lv_button>
 
 			<!-- Grows with weight 1 -->
-			<lv_button height="content" flex_grow="1">
-				<lv_label text="Grow x1" align="center" />
+			<lv_button name="button_2" height="content" flex_grow="1">
+				<lv_label name="label_2" text="Grow x1" align="center" />
 			</lv_button>
 
 			<!-- Grows with weight 2 — receives twice as much free space -->
-			<lv_button height="content" flex_grow="2">
-				<lv_label text="Grow x2" align="center" />
+			<lv_button name="button_3" height="content" flex_grow="2">
+				<lv_label name="label_3" text="Grow x2" align="center" />
 			</lv_button>
 		</lv_obj>
 	</view>

@@ -11,7 +11,7 @@
 	<view>
 		<!-- 💡 Edit the `#RRGGBB ... #` segments in any `map` entry to recolor different parts of the button label. -->
 		<!-- Three buttons, each highlighting a different word with recolor -->
-		<lv_buttonmatrix
+		<lv_buttonmatrix name="buttonmatrix"
 			align="center"
 			width="90%"
 			height="60"

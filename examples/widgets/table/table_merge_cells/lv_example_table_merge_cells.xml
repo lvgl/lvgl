@@ -13,7 +13,7 @@
 <screen>
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Add a third column plus another `merge_right` on the header to span it; without the chain the title stops at column 1. -->
-		<lv_table >
+		<lv_table name="table" >
 			<!-- 2-column table; the header spans both columns via a single merge_right -->
 			<lv_table-cell row="0" column="0" value="Quarterly summary" ctrl="merge_right" />
 			<lv_table-cell row="1" column="0" value="Q1" />

@@ -24,13 +24,13 @@ void lv_example_spinbox_rollover(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Increment past 23; the value wraps to 0 because `rollover="true"`. */
-    lv_obj_t * lv_spinbox_0 = lv_spinbox_create(screen);
-    lv_obj_set_width(lv_spinbox_0, 160);
-    lv_spinbox_set_digit_count(lv_spinbox_0, 2);
-    lv_spinbox_set_value(lv_spinbox_0, 22);
-    lv_spinbox_set_min_value(lv_spinbox_0, 0);
-    lv_spinbox_set_max_value(lv_spinbox_0, 23);
-    lv_spinbox_set_step(lv_spinbox_0, 1);
-    lv_spinbox_set_rollover(lv_spinbox_0, true);
+    lv_obj_t * spinbox = lv_spinbox_create(screen);
+    lv_obj_set_width(spinbox, 160);
+    lv_spinbox_set_digit_count(spinbox, 2);
+    lv_spinbox_set_value(spinbox, 22);
+    lv_spinbox_set_min_value(spinbox, 0);
+    lv_spinbox_set_max_value(spinbox, 23);
+    lv_spinbox_set_step(spinbox, 1);
+    lv_spinbox_set_rollover(spinbox, true);
 }
 #endif

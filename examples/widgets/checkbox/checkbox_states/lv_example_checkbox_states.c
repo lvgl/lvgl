@@ -23,23 +23,23 @@ void lv_example_checkbox_states(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Default unchecked */
-    lv_obj_t * lv_checkbox_0 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_0, "Unchecked");
+    lv_obj_t * checkbox_1 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_1, "Unchecked");
 
     /* Checked */
-    lv_obj_t * lv_checkbox_1 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_1, "Checked");
-    lv_obj_set_state(lv_checkbox_1, LV_STATE_CHECKED, true);
+    lv_obj_t * checkbox_2 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_2, "Checked");
+    lv_obj_set_state(checkbox_2, LV_STATE_CHECKED, true);
 
     /* Disabled */
-    lv_obj_t * lv_checkbox_2 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_2, "Disabled");
-    lv_obj_set_state(lv_checkbox_2, LV_STATE_DISABLED, true);
+    lv_obj_t * checkbox_3 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_3, "Disabled");
+    lv_obj_set_state(checkbox_3, LV_STATE_DISABLED, true);
 
     /* Disabled and Checked */
-    lv_obj_t * lv_checkbox_3 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_3, "Disabled + Checked");
-    lv_obj_set_state(lv_checkbox_3, LV_STATE_DISABLED, true);
-    lv_obj_set_state(lv_checkbox_3, LV_STATE_CHECKED, true);
+    lv_obj_t * checkbox_4 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_4, "Disabled + Checked");
+    lv_obj_set_state(checkbox_4, LV_STATE_DISABLED, true);
+    lv_obj_set_state(checkbox_4, LV_STATE_CHECKED, true);
 }
 #endif

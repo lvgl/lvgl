@@ -55,17 +55,17 @@ void lv_example_scale_styling(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Recolour the three named styles to see exactly which part each selector targets; bump `transform_rotation-indicator` to tilt labels further. */
-    lv_obj_t * lv_scale_0 = lv_scale_create(screen);
-    lv_obj_set_size(lv_scale_0, 280, 80);
-    lv_scale_set_mode(lv_scale_0, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
-    lv_scale_set_total_tick_count(lv_scale_0, 21);
-    lv_scale_set_major_tick_every(lv_scale_0, 4);
-    lv_scale_set_label_show(lv_scale_0, true);
-    lv_scale_set_min_value(lv_scale_0, 0);
-    lv_scale_set_max_value(lv_scale_0, 100);
-    lv_obj_set_style_transform_rotation(lv_scale_0, 300, LV_PART_INDICATOR);
-    lv_obj_add_style(lv_scale_0, &style_scale_main, LV_PART_MAIN);
-    lv_obj_add_style(lv_scale_0, &style_scale_items, LV_PART_ITEMS);
-    lv_obj_add_style(lv_scale_0, &style_scale_indicator, LV_PART_INDICATOR);
+    lv_obj_t * scale = lv_scale_create(screen);
+    lv_obj_set_size(scale, 280, 80);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_scale_set_total_tick_count(scale, 21);
+    lv_scale_set_major_tick_every(scale, 4);
+    lv_scale_set_label_show(scale, true);
+    lv_scale_set_min_value(scale, 0);
+    lv_scale_set_max_value(scale, 100);
+    lv_obj_set_style_transform_rotation(scale, 300, LV_PART_INDICATOR);
+    lv_obj_add_style(scale, &style_scale_main, LV_PART_MAIN);
+    lv_obj_add_style(scale, &style_scale_items, LV_PART_ITEMS);
+    lv_obj_add_style(scale, &style_scale_indicator, LV_PART_INDICATOR);
 }
 #endif

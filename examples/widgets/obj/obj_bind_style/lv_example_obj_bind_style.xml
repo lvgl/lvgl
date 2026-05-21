@@ -19,13 +19,13 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Click the toggle to flip `subject_flag` between 0 and 1; the panel restyles via `bind_style`. -->
-		<lv_obj width="240" height="120" style_pad_all="16" style_radius="8" style_border_width="1">
+		<lv_obj name="container" width="240" height="120" style_pad_all="16" style_radius="8" style_border_width="1">
 			<bind_style name="style_dark" subject="subject_flag" ref_value="1" />
-			<lv_label align="center" text="Panel content" />
+			<lv_label name="label_1" align="center" text="Panel content" />
 		</lv_obj>
 
-		<lv_button>
-			<lv_label align="center" text="Toggle theme" />
+		<lv_button name="button">
+			<lv_label name="label_2" align="center" text="Toggle theme" />
 			<subject_toggle_event subject="subject_flag" />
 		</lv_button>
 	</view>

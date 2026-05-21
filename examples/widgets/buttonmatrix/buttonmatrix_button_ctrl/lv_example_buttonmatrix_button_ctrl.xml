@@ -11,7 +11,7 @@
 	<view>
 		<!-- 💡 Edit individual `ctrl_map` tokens to see how each button state is rendered and which still receives input. -->
 		<!-- One row with four differently-flagged buttons -->
-		<lv_buttonmatrix
+		<lv_buttonmatrix name="buttonmatrix"
 			align="center"
 			width="90%"
 			height="60"

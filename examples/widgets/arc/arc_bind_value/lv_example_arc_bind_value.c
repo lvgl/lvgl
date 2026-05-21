@@ -35,13 +35,13 @@ void lv_example_arc_bind_value(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Slide to change `subject_value`; the arc follows because both bind to it. */
-    lv_obj_t * lv_arc_0 = lv_arc_create(screen);
-    lv_obj_set_size(lv_arc_0, 160, 160);
-    lv_arc_bind_value(lv_arc_0, &subject_value);
-    lv_obj_set_flag(lv_arc_0, LV_OBJ_FLAG_CLICKABLE, false);
+    lv_obj_t * arc = lv_arc_create(screen);
+    lv_obj_set_size(arc, 160, 160);
+    lv_arc_bind_value(arc, &subject_value);
+    lv_obj_set_flag(arc, LV_OBJ_FLAG_CLICKABLE, false);
 
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_width(lv_slider_0, 220);
-    lv_slider_bind_value(lv_slider_0, &subject_value);
+    lv_obj_t * slider = lv_slider_create(screen);
+    lv_obj_set_width(slider, 220);
+    lv_slider_bind_value(slider, &subject_value);
 }
 #endif

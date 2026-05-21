@@ -10,12 +10,12 @@
 <screen>
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Drag past 80: the button becomes disabled; drop below 80 to re-enable it. -->
-		<lv_slider width="90%" bind_value="subject_value" />
+		<lv_slider name="slider" width="90%" bind_value="subject_value" />
 
-		<lv_label bind_text="subject_value" bind_text-fmt="Current: %d (disabled above 80)" />
+		<lv_label name="label_1" bind_text="subject_value" bind_text-fmt="Current: %d (disabled above 80)" />
 
-		<lv_button>
-			<lv_label align="center" text="Submit" />
+		<lv_button name="button">
+			<lv_label name="label_2" align="center" text="Submit" />
 			<bind_state_if_gt subject="subject_value" state="disabled" ref_value="80" />
 		</lv_button>
 	</view>

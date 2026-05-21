@@ -56,17 +56,17 @@ void lv_example_spinner_styling(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Recolour `style_table_items` to apply a different look to every cell at once. */
-    lv_obj_t * lv_table_0 = lv_table_create(screen);
-    lv_table_set_row_count(lv_table_0, 3);
-    lv_table_set_column_count(lv_table_0, 2);
-    lv_table_set_cell_value(lv_table_0, 0, 0, "Metric");
-    lv_table_set_cell_value(lv_table_0, 0, 1, "Value");
-    lv_table_set_cell_value(lv_table_0, 1, 0, "Latency");
-    lv_table_set_cell_value(lv_table_0, 1, 1, "14 ms");
-    lv_table_set_cell_value(lv_table_0, 2, 0, "Throughput");
-    lv_table_set_cell_value(lv_table_0, 2, 1, "98 req/s");
-    lv_obj_add_style(lv_table_0, &style_table_main, LV_PART_MAIN);
-    lv_obj_add_style(lv_table_0, &style_table_items, LV_PART_ITEMS);
-    lv_obj_add_style(lv_table_0, &style_table_items_pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
+    lv_obj_t * table = lv_table_create(screen);
+    lv_table_set_row_count(table, 3);
+    lv_table_set_column_count(table, 2);
+    lv_table_set_cell_value(table, 0, 0, "Metric");
+    lv_table_set_cell_value(table, 0, 1, "Value");
+    lv_table_set_cell_value(table, 1, 0, "Latency");
+    lv_table_set_cell_value(table, 1, 1, "14 ms");
+    lv_table_set_cell_value(table, 2, 0, "Throughput");
+    lv_table_set_cell_value(table, 2, 1, "98 req/s");
+    lv_obj_add_style(table, &style_table_main, LV_PART_MAIN);
+    lv_obj_add_style(table, &style_table_items, LV_PART_ITEMS);
+    lv_obj_add_style(table, &style_table_items_pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
 }
 #endif

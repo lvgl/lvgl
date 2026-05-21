@@ -24,17 +24,17 @@ void lv_example_switch_state(void)
     lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
+    /* 💡 Toggle either of the first two switches by clicking; the disabled ones won't respond. */
     lv_switch_create(screen);
 
-    /* 💡 Toggle either of the first two switches by clicking; the disabled ones won't respond. */
-    lv_obj_t * lv_switch_1 = lv_switch_create(screen);
-    lv_obj_set_state(lv_switch_1, LV_STATE_CHECKED, true);
+    lv_obj_t * sw_2 = lv_switch_create(screen);
+    lv_obj_set_state(sw_2, LV_STATE_CHECKED, true);
 
-    lv_obj_t * lv_switch_2 = lv_switch_create(screen);
-    lv_obj_set_state(lv_switch_2, LV_STATE_DISABLED, true);
+    lv_obj_t * sw_3 = lv_switch_create(screen);
+    lv_obj_set_state(sw_3, LV_STATE_DISABLED, true);
 
-    lv_obj_t * lv_switch_3 = lv_switch_create(screen);
-    lv_obj_set_state(lv_switch_3, LV_STATE_DISABLED, true);
-    lv_obj_set_state(lv_switch_3, LV_STATE_CHECKED, true);
+    lv_obj_t * sw_4 = lv_switch_create(screen);
+    lv_obj_set_state(sw_4, LV_STATE_DISABLED, true);
+    lv_obj_set_state(sw_4, LV_STATE_CHECKED, true);
 }
 #endif

@@ -12,7 +12,7 @@
 <screen>
 	<view>
 		<!-- 💡 Switch tabs: tab B paints its own bg, A and C show the tab view body color. -->
-		<lv_tabview
+		<lv_tabview name="tabview"
 			width="100%"
 			height="100%"
 			tab_bar_position="left"
@@ -30,17 +30,17 @@
 
 			<!-- Transparent tab — the tab view body color is what you see -->
 			<lv_tabview-tab text="A">
-				<lv_label align="center" style_text_color="0xeeeeee" text="tab view bg = 0x37474f" />
+				<lv_label name="label_1" align="center" style_text_color="0xeeeeee" text="tab view bg = 0x37474f" />
 			</lv_tabview-tab>
 
 			<!-- Per-tab override: this tab paints its own background -->
 			<lv_tabview-tab text="B" style_bg_color="0xff7043" style_bg_opa="100%">
-				<lv_label align="center" text="this tab overrides bg = 0xff7043" />
+				<lv_label name="label_2" align="center" text="this tab overrides bg = 0xff7043" />
 			</lv_tabview-tab>
 
 			<!-- Transparent tab again — back to the tab view body color -->
 			<lv_tabview-tab text="C">
-				<lv_label align="center" style_text_color="0xeeeeee" text="tab bar bg = 0x222831" />
+				<lv_label name="label_3" align="center" style_text_color="0xeeeeee" text="tab bar bg = 0x222831" />
 			</lv_tabview-tab>
 		</lv_tabview>
 	</view>

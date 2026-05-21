@@ -23,9 +23,9 @@ void lv_example_label_recolor(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Recolor-enabled label using inline #RRGGBB color commands */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(90));
-    lv_label_set_recolor(lv_label_0, true);
-    lv_label_set_text(lv_label_0, "Write a #ff0000 red# word, a #00a000 green# word, and a #0000ff blue# word.");
+    lv_obj_t * label = lv_label_create(screen);
+    lv_obj_set_width(label, lv_pct(90));
+    lv_label_set_recolor(label, true);
+    lv_label_set_text(label, "Write a #ff0000 red# word, a #00a000 green# word, and a #0000ff blue# word.");
 }
 #endif

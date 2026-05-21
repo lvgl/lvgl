@@ -23,16 +23,16 @@ void lv_example_roller_visible_rows(void)
     lv_obj_set_style_pad_column(screen, 32, 0);
 
     /* 💡 Edit `visible_row_count` on either roller to compare its overall height. */
-    lv_obj_t * lv_roller_0 = lv_roller_create(screen);
-    lv_obj_set_width(lv_roller_0, 120);
-    lv_roller_set_visible_row_count(lv_roller_0, 3);
-    lv_roller_set_options(lv_roller_0, "Jan\nFeb\nMar\nApr\nMay\nJun\nJul", LV_ROLLER_MODE_NORMAL);
-    lv_roller_set_selected(lv_roller_0, 0, false);
+    lv_obj_t * roller_1 = lv_roller_create(screen);
+    lv_obj_set_width(roller_1, 120);
+    lv_roller_set_visible_row_count(roller_1, 3);
+    lv_roller_set_options(roller_1, "Jan\nFeb\nMar\nApr\nMay\nJun\nJul", LV_ROLLER_MODE_NORMAL);
+    lv_roller_set_selected(roller_1, 0, false);
 
-    lv_obj_t * lv_roller_1 = lv_roller_create(screen);
-    lv_obj_set_width(lv_roller_1, 120);
-    lv_roller_set_visible_row_count(lv_roller_1, 7);
-    lv_roller_set_options(lv_roller_1, "Jan\nFeb\nMar\nApr\nMay\nJun\nJul", LV_ROLLER_MODE_NORMAL);
-    lv_roller_set_selected(lv_roller_1, 3, false);
+    lv_obj_t * roller_2 = lv_roller_create(screen);
+    lv_obj_set_width(roller_2, 120);
+    lv_roller_set_visible_row_count(roller_2, 7);
+    lv_roller_set_options(roller_2, "Jan\nFeb\nMar\nApr\nMay\nJun\nJul", LV_ROLLER_MODE_NORMAL);
+    lv_roller_set_selected(roller_2, 3, false);
 }
 #endif

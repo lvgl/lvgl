@@ -25,25 +25,25 @@ void lv_example_slider_reversed_direction(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Forward direction: range 0..100 */
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_size(lv_slider_0, lv_pct(90), 16);
-    lv_slider_set_min_value(lv_slider_0, 0);
-    lv_slider_set_max_value(lv_slider_0, 100);
-    lv_slider_set_value(lv_slider_0, 30, false);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_slider_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "0..100");
-    lv_obj_set_style_text_color(lv_label_0, TEXT_COLOR, 0);
+    lv_obj_t * slider_1 = lv_slider_create(screen);
+    lv_obj_set_size(slider_1, lv_pct(90), 16);
+    lv_slider_set_min_value(slider_1, 0);
+    lv_slider_set_max_value(slider_1, 100);
+    lv_slider_set_value(slider_1, 30, false);
+    lv_obj_t * label_1 = lv_label_create(slider_1);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(label_1, "0..100");
+    lv_obj_set_style_text_color(label_1, TEXT_COLOR, 0);
 
     /* Reverse direction: range 100..0 */
-    lv_obj_t * lv_slider_1 = lv_slider_create(screen);
-    lv_obj_set_size(lv_slider_1, lv_pct(90), 16);
-    lv_slider_set_min_value(lv_slider_1, 100);
-    lv_slider_set_max_value(lv_slider_1, 0);
-    lv_slider_set_value(lv_slider_1, 30, false);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_slider_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "100..0");
-    lv_obj_set_style_text_color(lv_label_1, TEXT_COLOR, 0);
+    lv_obj_t * slider_2 = lv_slider_create(screen);
+    lv_obj_set_size(slider_2, lv_pct(90), 16);
+    lv_slider_set_min_value(slider_2, 100);
+    lv_slider_set_max_value(slider_2, 0);
+    lv_slider_set_value(slider_2, 30, false);
+    lv_obj_t * label_2 = lv_label_create(slider_2);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "100..0");
+    lv_obj_set_style_text_color(label_2, TEXT_COLOR, 0);
 }
 #endif

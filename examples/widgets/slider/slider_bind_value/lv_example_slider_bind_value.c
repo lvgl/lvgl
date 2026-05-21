@@ -36,11 +36,11 @@ void lv_example_slider_bind_value(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Drag the slider; the label re-renders because both widgets share `subject_value`. */
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_width(lv_slider_0, lv_pct(90));
-    lv_slider_bind_value(lv_slider_0, &subject_value);
+    lv_obj_t * slider = lv_slider_create(screen);
+    lv_obj_set_width(slider, lv_pct(90));
+    lv_slider_bind_value(slider, &subject_value);
 
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_label_bind_text(lv_label_0, &subject_value, "Value: %d/100");
+    lv_obj_t * label = lv_label_create(screen);
+    lv_label_bind_text(label, &subject_value, "Value: %d/100");
 }
 #endif

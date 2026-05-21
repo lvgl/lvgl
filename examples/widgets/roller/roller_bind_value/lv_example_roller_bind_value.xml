@@ -10,10 +10,10 @@
 <screen>
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Scroll the roller, or click the button to snap to a fixed option through the subject. -->
-		<lv_roller width="160" visible_row_count="3" options="Mon&#10;Tue&#10;Wed&#10;Thu&#10;Fri&#10;Sat&#10;Sun" bind_value="subject_index" />
+		<lv_roller name="roller" width="160" visible_row_count="3" options="Mon&#10;Tue&#10;Wed&#10;Thu&#10;Fri&#10;Sat&#10;Sun" bind_value="subject_index" />
 
-		<lv_button>
-			<lv_label align="center" text="Jump to Wed" />
+		<lv_button name="button">
+			<lv_label name="label" align="center" text="Jump to Wed" />
 			<subject_set_int_event subject="subject_index" value="2" />
 		</lv_button>
 	</view>

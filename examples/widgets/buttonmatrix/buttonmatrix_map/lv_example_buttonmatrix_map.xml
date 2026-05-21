@@ -14,7 +14,7 @@
 	<view>
 		<!-- 💡 Move or remove `'&#10;'` (the XML newline entity) tokens inside `map` to change how buttons are grouped into rows. -->
 		<!-- 3x3 numeric keypad: rows split by '&#10;' (XML entity = newline) inside the map -->
-		<lv_buttonmatrix
+		<lv_buttonmatrix name="buttonmatrix"
 			align="center"
 			width="90%"
 			height="180"

@@ -24,15 +24,15 @@ void lv_example_checkbox_text(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Short label */
-    lv_obj_t * lv_checkbox_0 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_0, "Enable");
+    lv_obj_t * checkbox_1 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_1, "Enable");
 
     /* Longer label */
-    lv_obj_t * lv_checkbox_1 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_1, "Send anonymous usage data");
+    lv_obj_t * checkbox_2 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_2, "Send anonymous usage data");
 
     /* Multi-line label via &amp;#10; */
-    lv_obj_t * lv_checkbox_2 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_2, "I agree to the terms\nand the privacy policy");
+    lv_obj_t * checkbox_3 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_3, "I agree to the terms\nand the privacy policy");
 }
 #endif

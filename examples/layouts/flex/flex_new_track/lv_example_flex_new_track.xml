@@ -17,29 +17,29 @@
 		<!-- A row-wrap container holds 7 items grouped into 2 tracks.
 		     The sixth item is forced to start in a new tracks -->
 		<!-- Demo container showing explicit new-track start -->
-		<lv_obj flex_flow="row_wrap" width="100%" height="content">
+		<lv_obj name="container" flex_flow="row_wrap" width="100%" height="content">
 			<!-- Track 1 -->
-			<lv_label style_bg_color="0x3498db" text="Mon">
+			<lv_label name="label_1" style_bg_color="0x3498db" text="Mon">
 				<style name="style_day" />
 			</lv_label>
-			<lv_label style_bg_color="0x3498db" text="Tue">
+			<lv_label name="label_2" style_bg_color="0x3498db" text="Tue">
 				<style name="style_day" />
 			</lv_label>
-			<lv_label style_bg_color="0x3498db" text="Wed">
+			<lv_label name="label_3" style_bg_color="0x3498db" text="Wed">
 				<style name="style_day" />
 			</lv_label>
-			<lv_label style_bg_color="0x3498db" text="Thu">
+			<lv_label name="label_4" style_bg_color="0x3498db" text="Thu">
 				<style name="style_day" />
 			</lv_label>
-			<lv_label style_bg_color="0x3498db" text="Fri">
+			<lv_label name="label_5" style_bg_color="0x3498db" text="Fri">
 				<style name="style_day" />
 			</lv_label>
 
 			<!-- Track 2 — forced onto a new track -->
-			<lv_label flex_in_new_track="true" style_bg_color="0xe74c3c" text="Sat">
+			<lv_label name="label_6" flex_in_new_track="true" style_bg_color="0xe74c3c" text="Sat">
 				<style name="style_day" />
 			</lv_label>
-			<lv_label style_bg_color="0xe74c3c" text="Sun">
+			<lv_label name="label_7" style_bg_color="0xe74c3c" text="Sun">
 				<style name="style_day" />
 			</lv_label>
 		</lv_obj>

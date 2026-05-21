@@ -30,7 +30,7 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Bump `text_line_space` on `style_roller_main` to grow the selected band's height — the indicator always fills the gap between rows. -->
-		<lv_roller width="160" visible_row_count="5"
+		<lv_roller name="roller" width="160" visible_row_count="5"
 			options="Berlin&#10;Paris&#10;Tokyo&#10;Sydney&#10;New York"
 			selected="2">
 			<style name="style_roller_main" selector="main" />

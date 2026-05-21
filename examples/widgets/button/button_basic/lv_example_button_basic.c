@@ -23,16 +23,16 @@ void lv_example_button_basic(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Default size driven by label content */
-    lv_obj_t * lv_button_0 = lv_button_create(screen);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "Click me");
+    lv_obj_t * button_1 = lv_button_create(screen);
+    lv_obj_t * label_1 = lv_label_create(button_1);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(label_1, "Click me");
 
     /* Explicit width and height */
-    lv_obj_t * lv_button_1 = lv_button_create(screen);
-    lv_obj_set_size(lv_button_1, 160, 48);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_button_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "Wide button");
+    lv_obj_t * button_2 = lv_button_create(screen);
+    lv_obj_set_size(button_2, 160, 48);
+    lv_obj_t * label_2 = lv_label_create(button_2);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "Wide button");
 }
 #endif

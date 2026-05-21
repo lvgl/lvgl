@@ -11,12 +11,12 @@
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Edit each text attribute to see the label update next to the tick box. -->
 		<!-- Short label -->
-		<lv_checkbox text="Enable" />
+		<lv_checkbox name="checkbox_1" text="Enable" />
 
 		<!-- Longer label -->
-		<lv_checkbox text="Send anonymous usage data" />
+		<lv_checkbox name="checkbox_2" text="Send anonymous usage data" />
 
 		<!-- Multi-line label via &amp;#10; -->
-		<lv_checkbox text="I agree to the terms&#10;and the privacy policy" />
+		<lv_checkbox name="checkbox_3" text="I agree to the terms&#10;and the privacy policy" />
 	</view>
 </screen>

@@ -19,35 +19,21 @@ void lv_example_tabview_basic(void)
     lv_obj_t * screen = lv_screen_active();
 
     /* 💡 Tap a tab button or swipe horizontally to switch tabs. */
-    lv_obj_t * lv_tabview_0 = lv_tabview_create(screen);
-    lv_obj_set_size(lv_tabview_0, lv_pct(100), lv_pct(100));
-    lv_obj_t * lv_tabview_tab_0 = lv_tabview_add_tab(lv_tabview_0, "Tab 1");
-    lv_obj_set_name(lv_tabview_tab_0, "this is tab 1");
-    lv_obj_t * lv_label_0 = lv_label_create(lv_tabview_tab_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "First tab");
+    lv_obj_t * tabview = lv_tabview_create(screen);
+    lv_obj_set_size(tabview, lv_pct(100), lv_pct(100));
+    lv_obj_t * lv_tabview_tab_0 = lv_tabview_add_tab(tabview, "Tab 1");
+    lv_obj_t * label_1 = lv_label_create(lv_tabview_tab_0);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(label_1, "First tab");
 
-    lv_obj_t * lv_tabview_tab_1 = lv_tabview_add_tab(lv_tabview_0, "Tab 2");
-    lv_obj_t * lv_label_1 = lv_label_create(lv_tabview_tab_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "Second tab");
+    lv_obj_t * lv_tabview_tab_1 = lv_tabview_add_tab(tabview, "Tab 2");
+    lv_obj_t * label_2 = lv_label_create(lv_tabview_tab_1);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "Second tab");
 
-    lv_obj_t * lv_tabview_tab_2 = lv_tabview_add_tab(lv_tabview_0, "Tab 3");
-    lv_obj_t * lv_label_2 = lv_label_create(lv_tabview_tab_2);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "Third tab");
-
-
-    //    lv_obj_t * internal0 = lv_obj_get_child_by_name(lv_tabview_0, "lv_obj_0");
-    //    lv_obj_t * internal1 = lv_obj_get_child_by_name(lv_tabview_0, "lv_obj_1");
-
-
-    list_name(lv_screen_active(), 0);
-
-
-
+    lv_obj_t * lv_tabview_tab_2 = lv_tabview_add_tab(tabview, "Tab 3");
+    lv_obj_t * label_3 = lv_label_create(lv_tabview_tab_2);
+    lv_obj_set_align(label_3, LV_ALIGN_CENTER);
+    lv_label_set_text(label_3, "Third tab");
 }
-
-
-
 #endif

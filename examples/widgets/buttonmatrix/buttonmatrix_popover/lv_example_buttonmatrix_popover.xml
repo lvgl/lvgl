@@ -11,7 +11,7 @@
 	<view>
 		<!-- 💡 Press and hold any letter: a popover appears above the pressed key while the press is active. -->
 		<!-- Keyboard-style row with popover enabled on every button -->
-		<lv_buttonmatrix
+		<lv_buttonmatrix name="buttonmatrix"
 			align="center"
 			width="90%"
 			height="60"

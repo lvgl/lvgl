@@ -10,7 +10,7 @@
 	<view>
 		<!-- 💡 Change min_value, max_value, and value together to see how the indicator span maps onto the same background arc. -->
 		<!-- Arc with a symmetric custom range -->
-		<lv_arc
+		<lv_arc name="arc_1"
 			align="left_mid"
 			x="10"
 			width="96"
@@ -21,11 +21,11 @@
 			bg_start_angle="135"
 			bg_end_angle="45"
 		>
-			<lv_label align="center" text="-50..50" />
+			<lv_label name="label_1" align="center" text="-50..50" />
 		</lv_arc>
 
 		<!-- Arc with a custom range showing the same concept at different numeric scale -->
-		<lv_arc
+		<lv_arc name="arc_2"
 			align="right_mid"
 			x="-10"
 			width="96"
@@ -36,7 +36,7 @@
 			bg_start_angle="135"
 			bg_end_angle="45"
 		>
-			<lv_label align="center" text="20..220" />
+			<lv_label name="label_2" align="center" text="20..220" />
 		</lv_arc>
 	</view>
 </screen>

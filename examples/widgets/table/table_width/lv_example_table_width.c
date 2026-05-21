@@ -25,20 +25,20 @@ void lv_example_table_width(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Edit the `width` values to redistribute horizontal space between columns. */
-    lv_obj_t * lv_table_0 = lv_table_create(screen);
-    lv_table_set_row_count(lv_table_0, 3);
-    lv_table_set_column_count(lv_table_0, 3);
-    lv_table_set_column_width(lv_table_0, 0, 50);
-    lv_table_set_column_width(lv_table_0, 1, 180);
-    lv_table_set_column_width(lv_table_0, 2, 80);
-    lv_table_set_cell_value(lv_table_0, 0, 0, "No.");
-    lv_table_set_cell_value(lv_table_0, 0, 1, "Description");
-    lv_table_set_cell_value(lv_table_0, 0, 2, "Price");
-    lv_table_set_cell_value(lv_table_0, 1, 0, "1");
-    lv_table_set_cell_value(lv_table_0, 1, 1, "Espresso, small");
-    lv_table_set_cell_value(lv_table_0, 1, 2, "2.50");
-    lv_table_set_cell_value(lv_table_0, 2, 0, "2");
-    lv_table_set_cell_value(lv_table_0, 2, 1, "Cappuccino, regular");
-    lv_table_set_cell_value(lv_table_0, 2, 2, "3.80");
+    lv_obj_t * table = lv_table_create(screen);
+    lv_table_set_row_count(table, 3);
+    lv_table_set_column_count(table, 3);
+    lv_table_set_column_width(table, 0, 50);
+    lv_table_set_column_width(table, 1, 180);
+    lv_table_set_column_width(table, 2, 80);
+    lv_table_set_cell_value(table, 0, 0, "No.");
+    lv_table_set_cell_value(table, 0, 1, "Description");
+    lv_table_set_cell_value(table, 0, 2, "Price");
+    lv_table_set_cell_value(table, 1, 0, "1");
+    lv_table_set_cell_value(table, 1, 1, "Espresso, small");
+    lv_table_set_cell_value(table, 1, 2, "2.50");
+    lv_table_set_cell_value(table, 2, 0, "2");
+    lv_table_set_cell_value(table, 2, 1, "Cappuccino, regular");
+    lv_table_set_cell_value(table, 2, 2, "3.80");
 }
 #endif

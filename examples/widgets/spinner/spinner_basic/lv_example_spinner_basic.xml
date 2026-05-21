@@ -14,9 +14,9 @@
 		<!-- 💡 Lower `anim_duration` to spin faster; raise `arc_sweep` to make the moving segment longer. -->
 
 		<!-- Long arc, medium speed -->
-		<lv_spinner width="80" height="80" anim_duration="1500" arc_sweep="270" />
+		<lv_spinner name="spinner_1" width="80" height="80" anim_duration="1500" arc_sweep="270" />
 
 		<!-- Short arc, faster -->
-		<lv_spinner width="80" height="80" anim_duration="600" arc_sweep="180" />
+		<lv_spinner name="spinner_2" width="80" height="80" anim_duration="600" arc_sweep="180" />
 	</view>
 </screen>

@@ -25,15 +25,15 @@ void lv_example_spinner_basic(void)
     lv_obj_set_style_pad_column(screen, 32, 0);
 
     /* Long arc, medium speed */
-    lv_obj_t * lv_spinner_0 = lv_spinner_create(screen);
-    lv_obj_set_size(lv_spinner_0, 80, 80);
-    lv_spinner_set_anim_duration(lv_spinner_0, 1500);
-    lv_spinner_set_arc_sweep(lv_spinner_0, 270);
+    lv_obj_t * spinner_1 = lv_spinner_create(screen);
+    lv_obj_set_size(spinner_1, 80, 80);
+    lv_spinner_set_anim_duration(spinner_1, 1500);
+    lv_spinner_set_arc_sweep(spinner_1, 270);
 
     /* Short arc, faster */
-    lv_obj_t * lv_spinner_1 = lv_spinner_create(screen);
-    lv_obj_set_size(lv_spinner_1, 80, 80);
-    lv_spinner_set_anim_duration(lv_spinner_1, 600);
-    lv_spinner_set_arc_sweep(lv_spinner_1, 180);
+    lv_obj_t * spinner_2 = lv_spinner_create(screen);
+    lv_obj_set_size(spinner_2, 80, 80);
+    lv_spinner_set_anim_duration(spinner_2, 600);
+    lv_spinner_set_arc_sweep(spinner_2, 180);
 }
 #endif

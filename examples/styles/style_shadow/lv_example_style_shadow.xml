@@ -23,9 +23,9 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Set `shadow_offset_x`/`shadow_offset_y` to 0 to turn the elevation into an even glow. -->
-		<lv_obj width="210" height="130">
+		<lv_obj name="container" width="210" height="130">
 			<style name="style_elevated" />
-			<lv_label align="center" text="Elevated" />
+			<lv_label name="label" align="center" text="Elevated" />
 		</lv_obj>
 	</view>
 </screen>

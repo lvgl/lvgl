@@ -25,27 +25,27 @@ void lv_example_bar_orientation(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Horizontal bar (auto orientation from width &gt; height) */
-    lv_obj_t * lv_bar_0 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_0, lv_pct(90), 16);
-    lv_bar_set_min_value(lv_bar_0, 0);
-    lv_bar_set_max_value(lv_bar_0, 100);
-    lv_bar_set_value(lv_bar_0, 60, false);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_bar_0);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "horizontal");
-    lv_obj_set_style_text_color(lv_label_0, TEXT_COLOR, 0);
+    lv_obj_t * bar_1 = lv_bar_create(screen);
+    lv_obj_set_size(bar_1, lv_pct(90), 16);
+    lv_bar_set_min_value(bar_1, 0);
+    lv_bar_set_max_value(bar_1, 100);
+    lv_bar_set_value(bar_1, 60, false);
+    lv_obj_t * label_1 = lv_label_create(bar_1);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(label_1, "horizontal");
+    lv_obj_set_style_text_color(label_1, TEXT_COLOR, 0);
 
     /* Explicit vertical orientation */
-    lv_obj_t * lv_bar_1 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_1, 18, 130);
-    lv_bar_set_orientation(lv_bar_1, LV_BAR_ORIENTATION_VERTICAL);
-    lv_bar_set_min_value(lv_bar_1, 0);
-    lv_bar_set_max_value(lv_bar_1, 100);
-    lv_bar_set_value(lv_bar_1, 60, false);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_bar_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "V\ne\nr");
-    lv_obj_set_style_text_align(lv_label_1, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_color(lv_label_1, TEXT_COLOR, 0);
+    lv_obj_t * bar_2 = lv_bar_create(screen);
+    lv_obj_set_size(bar_2, 18, 130);
+    lv_bar_set_orientation(bar_2, LV_BAR_ORIENTATION_VERTICAL);
+    lv_bar_set_min_value(bar_2, 0);
+    lv_bar_set_max_value(bar_2, 100);
+    lv_bar_set_value(bar_2, 60, false);
+    lv_obj_t * label_2 = lv_label_create(bar_2);
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(label_2, "V\ne\nr");
+    lv_obj_set_style_text_align(label_2, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_style_text_color(label_2, TEXT_COLOR, 0);
 }
 #endif

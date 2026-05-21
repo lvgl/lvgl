@@ -13,13 +13,13 @@
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Swap width/height or set orientation explicitly to flip the indicator's travel direction. -->
 		<!-- Horizontal bar (auto orientation from width &gt; height) -->
-		<lv_bar width="90%" height="16" min_value="0" max_value="100" value="60">
-			<lv_label align="center" text="horizontal" style_text_color="#text_color" />
+		<lv_bar name="bar_1" width="90%" height="16" min_value="0" max_value="100" value="60">
+			<lv_label name="label_1" align="center" text="horizontal" style_text_color="#text_color" />
 		</lv_bar>
 
 		<!-- Explicit vertical orientation -->
-		<lv_bar width="18" height="130" orientation="vertical" min_value="0" max_value="100" value="60">
-			<lv_label align="center" text="V&#10;e&#10;r" style_text_align="center" style_text_color="#text_color" />
+		<lv_bar name="bar_2" width="18" height="130" orientation="vertical" min_value="0" max_value="100" value="60">
+			<lv_label name="label_2" align="center" text="V&#10;e&#10;r" style_text_align="center" style_text_color="#text_color" />
 		</lv_bar>
 	</view>
 </screen>

@@ -28,7 +28,7 @@ void lv_example_image_src(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Register another image in `globals.xml` and swap `src` to its name to see a different bitmap. */
-    lv_obj_t * lv_image_0 = lv_image_create(screen);
-    lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
+    lv_obj_t * image = lv_image_create(screen);
+    lv_image_set_src(image, &img_example_lvgl_logo);
 }
 #endif

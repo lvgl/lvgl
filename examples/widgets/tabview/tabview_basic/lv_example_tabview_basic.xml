@@ -10,15 +10,15 @@
 <screen>
 	<view>
 		<!-- 💡 Tap a tab button or swipe horizontally to switch tabs. -->
-		<lv_tabview width="100%" height="100%">
+		<lv_tabview name="tabview" width="100%" height="100%">
 			<lv_tabview-tab text="Tab 1">
-				<lv_label align="center" text="First tab" />
+				<lv_label name="label_1" align="center" text="First tab" />
 			</lv_tabview-tab>
 			<lv_tabview-tab text="Tab 2">
-				<lv_label align="center" text="Second tab" />
+				<lv_label name="label_2" align="center" text="Second tab" />
 			</lv_tabview-tab>
 			<lv_tabview-tab text="Tab 3">
-				<lv_label align="center" text="Third tab" />
+				<lv_label name="label_3" align="center" text="Third tab" />
 			</lv_tabview-tab>
 		</lv_tabview>
 	</view>

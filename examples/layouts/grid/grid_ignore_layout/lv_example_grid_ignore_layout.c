@@ -37,46 +37,46 @@ void lv_example_grid_ignore_layout(void)
     lv_obj_set_style_pad_row(screen, 8, 0);
 
     /* Main grid container */
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    static const int32_t lv_obj_1_style_grid_column_dsc_array_0[] = {54, 54, 54, LV_GRID_TEMPLATE_LAST};
-    lv_obj_set_style_grid_column_dsc_array(lv_obj_1, lv_obj_1_style_grid_column_dsc_array_0, 0);
-    static const int32_t lv_obj_1_style_grid_row_dsc_array_1[] = {42, 42, LV_GRID_TEMPLATE_LAST};
-    lv_obj_set_style_grid_row_dsc_array(lv_obj_1, lv_obj_1_style_grid_row_dsc_array_1, 0);
-    lv_obj_set_style_layout(lv_obj_1, LV_LAYOUT_GRID, 0);
-    lv_obj_set_size(lv_obj_1, lv_pct(100), 120);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_obj_1);
-    lv_obj_set_style_grid_cell_column_pos(lv_label_0, 0, 0);
-    lv_obj_set_style_grid_cell_row_pos(lv_label_0, 0, 0);
-    lv_obj_set_style_bg_color(lv_label_0, lv_color_hex(0x3498db), 0);
-    lv_label_set_text(lv_label_0, "A");
-    lv_obj_add_style(lv_label_0, &style_cell, 0);
+    lv_obj_t * container = lv_obj_create(screen);
+    static const int32_t container_style_grid_column_dsc_array_0[] = {54, 54, 54, LV_GRID_TEMPLATE_LAST};
+    lv_obj_set_style_grid_column_dsc_array(container, container_style_grid_column_dsc_array_0, 0);
+    static const int32_t container_style_grid_row_dsc_array_1[] = {42, 42, LV_GRID_TEMPLATE_LAST};
+    lv_obj_set_style_grid_row_dsc_array(container, container_style_grid_row_dsc_array_1, 0);
+    lv_obj_set_style_layout(container, LV_LAYOUT_GRID, 0);
+    lv_obj_set_size(container, lv_pct(100), 120);
+    lv_obj_t * label_1 = lv_label_create(container);
+    lv_obj_set_style_grid_cell_column_pos(label_1, 0, 0);
+    lv_obj_set_style_grid_cell_row_pos(label_1, 0, 0);
+    lv_obj_set_style_bg_color(label_1, lv_color_hex(0x3498db), 0);
+    lv_label_set_text(label_1, "A");
+    lv_obj_add_style(label_1, &style_cell, 0);
 
-    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_1);
-    lv_obj_set_style_grid_cell_column_pos(lv_label_1, 1, 0);
-    lv_obj_set_style_grid_cell_row_pos(lv_label_1, 0, 0);
-    lv_obj_set_style_bg_color(lv_label_1, lv_color_hex(0x2ecc71), 0);
-    lv_label_set_text(lv_label_1, "B");
-    lv_obj_add_style(lv_label_1, &style_cell, 0);
+    lv_obj_t * label_2 = lv_label_create(container);
+    lv_obj_set_style_grid_cell_column_pos(label_2, 1, 0);
+    lv_obj_set_style_grid_cell_row_pos(label_2, 0, 0);
+    lv_obj_set_style_bg_color(label_2, lv_color_hex(0x2ecc71), 0);
+    lv_label_set_text(label_2, "B");
+    lv_obj_add_style(label_2, &style_cell, 0);
 
-    lv_obj_t * lv_label_2 = lv_label_create(lv_obj_1);
-    lv_obj_set_style_grid_cell_column_pos(lv_label_2, 2, 0);
-    lv_obj_set_style_grid_cell_row_pos(lv_label_2, 0, 0);
-    lv_obj_set_style_bg_color(lv_label_2, lv_color_hex(0xe67e22), 0);
-    lv_label_set_text(lv_label_2, "C");
-    lv_obj_add_style(lv_label_2, &style_cell, 0);
+    lv_obj_t * label_3 = lv_label_create(container);
+    lv_obj_set_style_grid_cell_column_pos(label_3, 2, 0);
+    lv_obj_set_style_grid_cell_row_pos(label_3, 0, 0);
+    lv_obj_set_style_bg_color(label_3, lv_color_hex(0xe67e22), 0);
+    lv_label_set_text(label_3, "C");
+    lv_obj_add_style(label_3, &style_cell, 0);
 
-    lv_obj_t * lv_label_3 = lv_label_create(lv_obj_1);
-    lv_obj_set_style_grid_cell_column_pos(lv_label_3, 0, 0);
-    lv_obj_set_style_grid_cell_row_pos(lv_label_3, 1, 0);
-    lv_obj_set_style_bg_color(lv_label_3, lv_color_hex(0x8e44ad), 0);
-    lv_label_set_text(lv_label_3, "D");
-    lv_obj_add_style(lv_label_3, &style_cell, 0);
+    lv_obj_t * label_4 = lv_label_create(container);
+    lv_obj_set_style_grid_cell_column_pos(label_4, 0, 0);
+    lv_obj_set_style_grid_cell_row_pos(label_4, 1, 0);
+    lv_obj_set_style_bg_color(label_4, lv_color_hex(0x8e44ad), 0);
+    lv_label_set_text(label_4, "D");
+    lv_obj_add_style(label_4, &style_cell, 0);
 
-    lv_obj_t * lv_label_4 = lv_label_create(lv_obj_1);
-    lv_obj_set_flag(lv_label_4, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
-    lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
-    lv_obj_set_style_bg_color(lv_label_4, lv_color_hex(0xe74c3c), 0);
-    lv_label_set_text(lv_label_4, "FREE");
-    lv_obj_add_style(lv_label_4, &style_cell, 0);
+    lv_obj_t * label_5 = lv_label_create(container);
+    lv_obj_set_flag(label_5, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
+    lv_obj_set_align(label_5, LV_ALIGN_CENTER);
+    lv_obj_set_style_bg_color(label_5, lv_color_hex(0xe74c3c), 0);
+    lv_label_set_text(label_5, "FREE");
+    lv_obj_add_style(label_5, &style_cell, 0);
 }
 #endif

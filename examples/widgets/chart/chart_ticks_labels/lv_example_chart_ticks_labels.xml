@@ -12,12 +12,12 @@
 <screen>
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="8">
 		<!-- 💡 Edit the `text_src` list to relabel the X axis; entries must match `total_tick_count`. -->
-		<lv_chart width="90%" height="160" type="bar" point_count="6">
+		<lv_chart name="chart" width="90%" height="160" type="bar" point_count="6">
 			<lv_chart-series color="0x6366f1" axis="primary_y" values="20 45 30 70 55 80" />
 			<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
 		</lv_chart>
 
-		<lv_scale width="90%" height="28" style_pad_hor="24"
+		<lv_scale name="scale" width="90%" height="28" style_pad_hor="24"
 			mode="horizontal_bottom"
 			total_tick_count="6"
 			major_tick_every="1"

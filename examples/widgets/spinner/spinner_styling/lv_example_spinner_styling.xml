@@ -34,7 +34,7 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Recolour `style_table_items` to apply a different look to every cell at once. -->
-		<lv_table row_count="3" column_count="2">
+		<lv_table name="table" row_count="3" column_count="2">
 			<lv_table-cell row="0" column="0" value="Metric" />
 			<lv_table-cell row="0" column="1" value="Value" />
 			<lv_table-cell row="1" column="0" value="Latency" />

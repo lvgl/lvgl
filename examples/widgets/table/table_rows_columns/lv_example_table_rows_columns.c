@@ -28,13 +28,13 @@ void lv_example_table_rows_columns(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Bump `row_count` past what fits on screen — the table scrolls; the empty cells stay in place because they're part of the grid. */
-    lv_obj_t * lv_table_0 = lv_table_create(screen);
-    lv_table_set_row_count(lv_table_0, 10);
-    lv_table_set_column_count(lv_table_0, 2);
-    lv_table_set_cell_value(lv_table_0, 0, 0, "A");
-    lv_table_set_cell_value(lv_table_0, 0, 1, "B");
-    lv_table_set_cell_value(lv_table_0, 2, 1, "middle");
-    lv_table_set_cell_value(lv_table_0, 8, 0, "8th");
-    lv_table_set_cell_value(lv_table_0, 9, 0, "last row");
+    lv_obj_t * table = lv_table_create(screen);
+    lv_table_set_row_count(table, 10);
+    lv_table_set_column_count(table, 2);
+    lv_table_set_cell_value(table, 0, 0, "A");
+    lv_table_set_cell_value(table, 0, 1, "B");
+    lv_table_set_cell_value(table, 2, 1, "middle");
+    lv_table_set_cell_value(table, 8, 0, "8th");
+    lv_table_set_cell_value(table, 9, 0, "last row");
 }
 #endif

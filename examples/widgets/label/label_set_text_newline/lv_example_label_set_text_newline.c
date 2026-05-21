@@ -23,11 +23,11 @@ void lv_example_label_set_text_newline(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Label with explicit newline characters */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_label_set_text(lv_label_0, "First line\nSecond line\n\nFourth line");
+    lv_obj_t * label_1 = lv_label_create(screen);
+    lv_label_set_text(label_1, "First line\nSecond line\n\nFourth line");
 
     /* Plain label for comparison */
-    lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_label_set_text(lv_label_1, "Text is set directly with the text attribute.");
+    lv_obj_t * label_2 = lv_label_create(screen);
+    lv_label_set_text(label_2, "Text is set directly with the text attribute.");
 }
 #endif

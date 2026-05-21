@@ -52,10 +52,10 @@ void lv_example_dropdown_styling(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Tap or focus the dropdown to see the focused-state border swap in. */
-    lv_obj_t * lv_dropdown_0 = lv_dropdown_create(screen);
-    lv_obj_set_width(lv_dropdown_0, 200);
-    lv_dropdown_set_options(lv_dropdown_0, "Apple\nBanana\nCherry\nDate");
-    lv_obj_add_style(lv_dropdown_0, &style_dropdown_main, LV_PART_MAIN);
-    lv_obj_add_style(lv_dropdown_0, &style_dropdown_focused, LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_obj_t * dropdown = lv_dropdown_create(screen);
+    lv_obj_set_width(dropdown, 200);
+    lv_dropdown_set_options(dropdown, "Apple\nBanana\nCherry\nDate");
+    lv_obj_add_style(dropdown, &style_dropdown_main, LV_PART_MAIN);
+    lv_obj_add_style(dropdown, &style_dropdown_focused, LV_PART_MAIN | LV_STATE_FOCUSED);
 }
 #endif

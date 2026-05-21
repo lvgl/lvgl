@@ -25,14 +25,14 @@ void lv_example_table_cells(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Add another `<lv_table-cell>` with different `row`/`column` to populate more cells. */
-    lv_obj_t * lv_table_0 = lv_table_create(screen);
-    lv_table_set_row_count(lv_table_0, 3);
-    lv_table_set_column_count(lv_table_0, 2);
-    lv_table_set_cell_value(lv_table_0, 0, 0, "City");
-    lv_table_set_cell_value(lv_table_0, 0, 1, "Population");
-    lv_table_set_cell_value(lv_table_0, 1, 0, "Berlin");
-    lv_table_set_cell_value(lv_table_0, 1, 1, "3.7M");
-    lv_table_set_cell_value(lv_table_0, 2, 0, "Paris");
-    lv_table_set_cell_value(lv_table_0, 2, 1, "2.1M");
+    lv_obj_t * table = lv_table_create(screen);
+    lv_table_set_row_count(table, 3);
+    lv_table_set_column_count(table, 2);
+    lv_table_set_cell_value(table, 0, 0, "City");
+    lv_table_set_cell_value(table, 0, 1, "Population");
+    lv_table_set_cell_value(table, 1, 0, "Berlin");
+    lv_table_set_cell_value(table, 1, 1, "3.7M");
+    lv_table_set_cell_value(table, 2, 0, "Paris");
+    lv_table_set_cell_value(table, 2, 1, "2.1M");
 }
 #endif

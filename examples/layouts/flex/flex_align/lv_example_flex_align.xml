@@ -14,7 +14,7 @@
 			(vertical). Try other flex_main_place values: "start", "end", "center",
 			"space_between", "space_around" -->
 		<!-- Demo container with explicit main and cross alignment -->
-		<lv_obj
+		<lv_obj name="container"
 			flex_flow="row"
 			style_flex_main_place="space_evenly"
 			style_flex_cross_place="center"
@@ -22,15 +22,15 @@
 			height="40%"
 		>
 			<!-- Tall item: a label with a large font -->
-			<lv_button height="64">
-				<lv_label text="64px" align="center" />
+			<lv_button name="button" height="64">
+				<lv_label name="label" text="64px" align="center" />
 			</lv_button>
 
 			<!-- Medium item: a toggle switch -->
-			<lv_switch />
+			<lv_switch name="sw" />
 
 			<!-- Another medium item: a checkbox -->
-			<lv_checkbox text="Check" />
+			<lv_checkbox name="checkbox" text="Check" />
 		</lv_obj>
 	</view>
 </screen>

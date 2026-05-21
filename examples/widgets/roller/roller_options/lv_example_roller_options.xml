@@ -13,13 +13,13 @@
 		<!-- 💡 Switch one of the rollers to `options-mode="normal"` to compare its end-of-list behaviour. -->
 
 		<!-- Normal: bounded scrolling -->
-		<lv_roller width="120" visible_row_count="3"
+		<lv_roller name="roller_1" width="120" visible_row_count="3"
 			options="Mon&#10;Tue&#10;Wed&#10;Thu&#10;Fri&#10;Sat&#10;Sun"
 			options-mode="normal"
 			selected="0" />
 
 		<!-- Infinite: wraps endlessly -->
-		<lv_roller width="120" visible_row_count="3"
+		<lv_roller name="roller_2" width="120" visible_row_count="3"
 			options="Mon&#10;Tue&#10;Wed&#10;Thu&#10;Fri&#10;Sat&#10;Sun"
 			options-mode="infinite"
 			selected="2" />

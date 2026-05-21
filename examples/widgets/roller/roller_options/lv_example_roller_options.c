@@ -24,17 +24,17 @@ void lv_example_roller_options(void)
     lv_obj_set_style_pad_column(screen, 32, 0);
 
     /* Normal: bounded scrolling */
-    lv_obj_t * lv_roller_0 = lv_roller_create(screen);
-    lv_obj_set_width(lv_roller_0, 120);
-    lv_roller_set_visible_row_count(lv_roller_0, 3);
-    lv_roller_set_options(lv_roller_0, "Mon\nTue\nWed\nThu\nFri\nSat\nSun", LV_ROLLER_MODE_NORMAL);
-    lv_roller_set_selected(lv_roller_0, 0, false);
+    lv_obj_t * roller_1 = lv_roller_create(screen);
+    lv_obj_set_width(roller_1, 120);
+    lv_roller_set_visible_row_count(roller_1, 3);
+    lv_roller_set_options(roller_1, "Mon\nTue\nWed\nThu\nFri\nSat\nSun", LV_ROLLER_MODE_NORMAL);
+    lv_roller_set_selected(roller_1, 0, false);
 
     /* Infinite: wraps endlessly */
-    lv_obj_t * lv_roller_1 = lv_roller_create(screen);
-    lv_obj_set_width(lv_roller_1, 120);
-    lv_roller_set_visible_row_count(lv_roller_1, 3);
-    lv_roller_set_options(lv_roller_1, "Mon\nTue\nWed\nThu\nFri\nSat\nSun", LV_ROLLER_MODE_INFINITE);
-    lv_roller_set_selected(lv_roller_1, 2, false);
+    lv_obj_t * roller_2 = lv_roller_create(screen);
+    lv_obj_set_width(roller_2, 120);
+    lv_roller_set_visible_row_count(roller_2, 3);
+    lv_roller_set_options(roller_2, "Mon\nTue\nWed\nThu\nFri\nSat\nSun", LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_selected(roller_2, 2, false);
 }
 #endif

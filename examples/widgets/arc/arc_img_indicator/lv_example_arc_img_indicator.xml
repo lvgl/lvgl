@@ -20,7 +20,7 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="0">
 		<!-- 💡 Change value to sweep the glowing cyan indicator across the dark segmented background. -->
-		<lv_arc
+		<lv_arc name="arc"
 			width="200"
 			height="200"
 			min_value="0"
@@ -32,7 +32,7 @@
 			<style name="style_arc_bg" selector="main" />
 			<style name="style_arc_indicator" selector="indicator" />
 			<style name="style_arc_knob" selector="knob" />
-			<lv_label align="center" bind_text="subject_value2" />
+			<lv_label name="label" align="center" bind_text="subject_value2" />
 		</lv_arc>
 	</view>
 </screen>

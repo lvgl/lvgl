@@ -15,7 +15,7 @@
 	<view>
 		<!-- 💡 Change a `width_*` token (1..15) to see the matching button stretch relative to its row neighbors. -->
 		<!-- First row: equal widths. Second row: 1:2:3 split via width_1/2/3 tokens. -->
-		<lv_buttonmatrix
+		<lv_buttonmatrix name="buttonmatrix"
 			align="center"
 			width="90%"
 			height="120"

@@ -61,7 +61,7 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="20">
 		<!-- 💡 Drag the knob slowly to see the knob-pressed style kick in. -->
-		<lv_slider width="90%" height="22" min_value="0" max_value="100" value="55">
+		<lv_slider name="slider" width="90%" height="22" min_value="0" max_value="100" value="55">
 			<style name="style_slider_track" selector="main" />
 			<style name="style_slider_indicator" selector="indicator" />
 			<style name="style_slider_knob" selector="knob" />

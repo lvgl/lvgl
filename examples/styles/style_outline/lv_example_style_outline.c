@@ -44,11 +44,11 @@ void lv_example_style_outline(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Raise `outline_pad` to push the ring further out; the card and layout never move. */
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_size(lv_obj_1, 200, 120);
-    lv_obj_add_style(lv_obj_1, &style_focus, 0);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_obj_1);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "Focused");
+    lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_size(container, 200, 120);
+    lv_obj_add_style(container, &style_focus, 0);
+    lv_obj_t * label = lv_label_create(container);
+    lv_obj_set_align(label, LV_ALIGN_CENTER);
+    lv_label_set_text(label, "Focused");
 }
 #endif

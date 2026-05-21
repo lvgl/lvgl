@@ -49,20 +49,20 @@ void lv_example_checkbox_styling(void)
     lv_obj_set_style_pad_row(screen, 14, 0);
 
     /* Unchecked: only the default indicator style applies */
-    lv_obj_t * lv_checkbox_0 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_0, "Default look");
-    lv_obj_set_style_text_color(lv_checkbox_0, lv_color_hex(0x111827), 0);
-    lv_obj_set_style_pad_column(lv_checkbox_0, 10, 0);
-    lv_obj_add_style(lv_checkbox_0, &style_cb_indicator, LV_PART_INDICATOR);
-    lv_obj_add_style(lv_checkbox_0, &style_cb_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_t * checkbox_1 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_1, "Default look");
+    lv_obj_set_style_text_color(checkbox_1, lv_color_hex(0x111827), 0);
+    lv_obj_set_style_pad_column(checkbox_1, 10, 0);
+    lv_obj_add_style(checkbox_1, &style_cb_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(checkbox_1, &style_cb_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
 
     /* Pre-checked so the checked-state style is visible at load time */
-    lv_obj_t * lv_checkbox_1 = lv_checkbox_create(screen);
-    lv_checkbox_set_text(lv_checkbox_1, "Pre-checked");
-    lv_obj_set_state(lv_checkbox_1, LV_STATE_CHECKED, true);
-    lv_obj_set_style_text_color(lv_checkbox_1, lv_color_hex(0x111827), 0);
-    lv_obj_set_style_pad_column(lv_checkbox_1, 10, 0);
-    lv_obj_add_style(lv_checkbox_1, &style_cb_indicator, LV_PART_INDICATOR);
-    lv_obj_add_style(lv_checkbox_1, &style_cb_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_t * checkbox_2 = lv_checkbox_create(screen);
+    lv_checkbox_set_text(checkbox_2, "Pre-checked");
+    lv_obj_set_state(checkbox_2, LV_STATE_CHECKED, true);
+    lv_obj_set_style_text_color(checkbox_2, lv_color_hex(0x111827), 0);
+    lv_obj_set_style_pad_column(checkbox_2, 10, 0);
+    lv_obj_add_style(checkbox_2, &style_cb_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(checkbox_2, &style_cb_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
 }
 #endif

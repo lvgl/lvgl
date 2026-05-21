@@ -58,33 +58,33 @@ void lv_example_scale_bind_section(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Move the sliders; the red section on the scale grows and shrinks because its bounds are bound to the subjects. */
-    lv_obj_t * lv_scale_0 = lv_scale_create(screen);
-    lv_obj_set_size(lv_scale_0, 280, 80);
-    lv_scale_set_mode(lv_scale_0, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
-    lv_scale_set_total_tick_count(lv_scale_0, 11);
-    lv_scale_set_major_tick_every(lv_scale_0, 2);
-    lv_scale_set_label_show(lv_scale_0, true);
-    lv_scale_set_min_value(lv_scale_0, 0);
-    lv_scale_set_max_value(lv_scale_0, 100);
-    lv_scale_section_t * lv_scale_section_0 = lv_scale_add_section(lv_scale_0);
-    lv_scale_set_section_style_main(lv_scale_0, lv_scale_section_0, &style_section_main);
-    lv_scale_set_section_style_items(lv_scale_0, lv_scale_section_0, &style_section_items);
-    lv_scale_set_section_style_indicator(lv_scale_0, lv_scale_section_0, &style_section_indicator);
-    lv_scale_bind_section_min_value(lv_scale_0, lv_scale_section_0, &subject_value2);
-    lv_scale_bind_section_max_value(lv_scale_0, lv_scale_section_0, &subject_value);
+    lv_obj_t * scale = lv_scale_create(screen);
+    lv_obj_set_size(scale, 280, 80);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_scale_set_total_tick_count(scale, 11);
+    lv_scale_set_major_tick_every(scale, 2);
+    lv_scale_set_label_show(scale, true);
+    lv_scale_set_min_value(scale, 0);
+    lv_scale_set_max_value(scale, 100);
+    lv_scale_section_t * lv_scale_section_0 = lv_scale_add_section(scale);
+    lv_scale_set_section_style_main(scale, lv_scale_section_0, &style_section_main);
+    lv_scale_set_section_style_items(scale, lv_scale_section_0, &style_section_items);
+    lv_scale_set_section_style_indicator(scale, lv_scale_section_0, &style_section_indicator);
+    lv_scale_bind_section_min_value(scale, lv_scale_section_0, &subject_value2);
+    lv_scale_bind_section_max_value(scale, lv_scale_section_0, &subject_value);
 
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_label_set_text(lv_label_0, "Section start (subject_value2)");
+    lv_obj_t * label_1 = lv_label_create(screen);
+    lv_label_set_text(label_1, "Section start (subject_value2)");
 
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_width(lv_slider_0, 240);
-    lv_slider_bind_value(lv_slider_0, &subject_value2);
+    lv_obj_t * slider_1 = lv_slider_create(screen);
+    lv_obj_set_width(slider_1, 240);
+    lv_slider_bind_value(slider_1, &subject_value2);
 
-    lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_label_set_text(lv_label_1, "Section end (subject_value)");
+    lv_obj_t * label_2 = lv_label_create(screen);
+    lv_label_set_text(label_2, "Section end (subject_value)");
 
-    lv_obj_t * lv_slider_1 = lv_slider_create(screen);
-    lv_obj_set_width(lv_slider_1, 240);
-    lv_slider_bind_value(lv_slider_1, &subject_value);
+    lv_obj_t * slider_2 = lv_slider_create(screen);
+    lv_obj_set_width(slider_2, 240);
+    lv_slider_bind_value(slider_2, &subject_value);
 }
 #endif

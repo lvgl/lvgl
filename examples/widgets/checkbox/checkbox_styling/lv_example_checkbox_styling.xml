@@ -25,14 +25,14 @@
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="14">
 		<!-- 💡 Click a checkbox to swap to the checked-state indicator style. -->
 		<!-- Unchecked: only the default indicator style applies -->
-		<lv_checkbox text="Default look"
+		<lv_checkbox name="checkbox_1" text="Default look"
 			style_text_color="0x111827" style_pad_column="10">
 			<style name="style_cb_indicator" selector="indicator" />
 			<style name="style_cb_indicator_checked" selector="indicator|checked" />
 		</lv_checkbox>
 
 		<!-- Pre-checked so the checked-state style is visible at load time -->
-		<lv_checkbox text="Pre-checked" checked="true"
+		<lv_checkbox name="checkbox_2" text="Pre-checked" checked="true"
 			style_text_color="0x111827" style_pad_column="10">
 			<style name="style_cb_indicator" selector="indicator" />
 			<style name="style_cb_indicator_checked" selector="indicator|checked" />

@@ -23,21 +23,21 @@ void lv_example_led_brightness(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* Dim */
-    lv_obj_t * lv_led_0 = lv_led_create(screen);
-    lv_obj_set_size(lv_led_0, 40, 40);
-    lv_led_set_color(lv_led_0, lv_color_hex(0xff8000));
-    lv_led_set_brightness(lv_led_0, 60);
+    lv_obj_t * led_1 = lv_led_create(screen);
+    lv_obj_set_size(led_1, 40, 40);
+    lv_led_set_color(led_1, lv_color_hex(0xff8000));
+    lv_led_set_brightness(led_1, 60);
 
     /* Mid */
-    lv_obj_t * lv_led_1 = lv_led_create(screen);
-    lv_obj_set_size(lv_led_1, 40, 40);
-    lv_led_set_color(lv_led_1, lv_color_hex(0xff8000));
-    lv_led_set_brightness(lv_led_1, 150);
+    lv_obj_t * led_2 = lv_led_create(screen);
+    lv_obj_set_size(led_2, 40, 40);
+    lv_led_set_color(led_2, lv_color_hex(0xff8000));
+    lv_led_set_brightness(led_2, 150);
 
     /* Full */
-    lv_obj_t * lv_led_2 = lv_led_create(screen);
-    lv_obj_set_size(lv_led_2, 40, 40);
-    lv_led_set_color(lv_led_2, lv_color_hex(0xff8000));
-    lv_led_set_brightness(lv_led_2, 255);
+    lv_obj_t * led_3 = lv_led_create(screen);
+    lv_obj_set_size(led_3, 40, 40);
+    lv_led_set_color(led_3, lv_color_hex(0xff8000));
+    lv_led_set_brightness(led_3, 255);
 }
 #endif

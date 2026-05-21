@@ -24,34 +24,34 @@ void lv_example_flex_ignore_layout(void)
     /* Demo row mixing normal and ignore_layout items.
        The red item uses ignore_layout="true", so Flex skips it;
        it keeps its manual x/y position and the other items are laid out normally. */
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_flex_flow(lv_obj_1, LV_FLEX_FLOW_ROW);
-    lv_obj_set_size(lv_obj_1, lv_pct(100), 150);
-    lv_obj_t * lv_button_0 = lv_button_create(lv_obj_1);
-    lv_obj_set_height(lv_button_0, LV_SIZE_CONTENT);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
-    lv_label_set_text(lv_label_0, "Item A");
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_size(container, lv_pct(100), 150);
+    lv_obj_t * button_1 = lv_button_create(container);
+    lv_obj_set_height(button_1, LV_SIZE_CONTENT);
+    lv_obj_t * label_1 = lv_label_create(button_1);
+    lv_label_set_text(label_1, "Item A");
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
 
     /* This item is invisible to flex. It centers itself by its own
        align and does not occupy a flex slot. */
-    lv_obj_t * lv_button_1 = lv_button_create(lv_obj_1);
-    lv_obj_set_align(lv_button_1, LV_ALIGN_CENTER);
-    lv_obj_set_flag(lv_button_1, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
-    lv_obj_set_style_bg_color(lv_button_1, lv_color_hex(0xe74c3c), 0);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_button_1);
-    lv_label_set_text(lv_label_1, "I'm Free!");
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_obj_t * button_2 = lv_button_create(container);
+    lv_obj_set_align(button_2, LV_ALIGN_CENTER);
+    lv_obj_set_flag(button_2, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
+    lv_obj_set_style_bg_color(button_2, lv_color_hex(0xe74c3c), 0);
+    lv_obj_t * label_2 = lv_label_create(button_2);
+    lv_label_set_text(label_2, "I'm Free!");
+    lv_obj_set_align(label_2, LV_ALIGN_CENTER);
 
-    lv_obj_t * lv_button_2 = lv_button_create(lv_obj_1);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_button_2);
-    lv_label_set_text(lv_label_2, "Item B");
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
+    lv_obj_t * button_3 = lv_button_create(container);
+    lv_obj_t * label_3 = lv_label_create(button_3);
+    lv_label_set_text(label_3, "Item B");
+    lv_obj_set_align(label_3, LV_ALIGN_CENTER);
 
-    lv_obj_t * lv_button_3 = lv_button_create(lv_obj_1);
-    lv_obj_set_height(lv_button_3, LV_SIZE_CONTENT);
-    lv_obj_t * lv_label_3 = lv_label_create(lv_button_3);
-    lv_label_set_text(lv_label_3, "Item C");
-    lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
+    lv_obj_t * button_4 = lv_button_create(container);
+    lv_obj_set_height(button_4, LV_SIZE_CONTENT);
+    lv_obj_t * label_4 = lv_label_create(button_4);
+    lv_label_set_text(label_4, "Item C");
+    lv_obj_set_align(label_4, LV_ALIGN_CENTER);
 }
 #endif

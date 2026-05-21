@@ -45,12 +45,12 @@ void lv_example_style_parts_states(void)
     lv_obj_set_style_pad_row(screen, 20, 0);
 
     /* 💡 Press and hold the slider: the indicator keeps its gradient but gains the pressed glow. */
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_size(lv_slider_0, 220, 16);
-    lv_slider_set_min_value(lv_slider_0, 0);
-    lv_slider_set_max_value(lv_slider_0, 100);
-    lv_slider_set_value(lv_slider_0, 65, false);
-    lv_obj_add_style(lv_slider_0, &style_indicator, LV_PART_INDICATOR);
-    lv_obj_add_style(lv_slider_0, &style_indicator_pressed, LV_PART_INDICATOR | LV_STATE_PRESSED);
+    lv_obj_t * slider = lv_slider_create(screen);
+    lv_obj_set_size(slider, 220, 16);
+    lv_slider_set_min_value(slider, 0);
+    lv_slider_set_max_value(slider, 100);
+    lv_slider_set_value(slider, 65, false);
+    lv_obj_add_style(slider, &style_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(slider, &style_indicator_pressed, LV_PART_INDICATOR | LV_STATE_PRESSED);
 }
 #endif

@@ -23,12 +23,12 @@ void lv_example_buttonmatrix_button_width(void)
     lv_obj_t * screen = lv_screen_active();
 
     /* First row: equal widths. Second row: 1:2:3 split via width_1/2/3 tokens. */
-    lv_obj_t * lv_buttonmatrix_0 = lv_buttonmatrix_create(screen);
-    lv_obj_set_align(lv_buttonmatrix_0, LV_ALIGN_CENTER);
-    lv_obj_set_size(lv_buttonmatrix_0, lv_pct(90), 120);
-    static const char * lv_buttonmatrix_0_map_0[] = {"A", "B", "C", "\n", "x1", "x2", "x3", NULL};
-    lv_buttonmatrix_set_map(lv_buttonmatrix_0, lv_buttonmatrix_0_map_0);
-    static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_WIDTH_1, LV_BUTTONMATRIX_CTRL_WIDTH_2, LV_BUTTONMATRIX_CTRL_WIDTH_3};
-    lv_buttonmatrix_set_ctrl_map(lv_buttonmatrix_0, lv_buttonmatrix_0_ctrl_map_1);
+    lv_obj_t * buttonmatrix = lv_buttonmatrix_create(screen);
+    lv_obj_set_align(buttonmatrix, LV_ALIGN_CENTER);
+    lv_obj_set_size(buttonmatrix, lv_pct(90), 120);
+    static const char * buttonmatrix_map_0[] = {"A", "B", "C", "\n", "x1", "x2", "x3", NULL};
+    lv_buttonmatrix_set_map(buttonmatrix, buttonmatrix_map_0);
+    static const lv_buttonmatrix_ctrl_t buttonmatrix_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_WIDTH_1, LV_BUTTONMATRIX_CTRL_WIDTH_2, LV_BUTTONMATRIX_CTRL_WIDTH_3};
+    lv_buttonmatrix_set_ctrl_map(buttonmatrix, buttonmatrix_ctrl_map_1);
 }
 #endif

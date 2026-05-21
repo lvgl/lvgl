@@ -42,11 +42,11 @@ void lv_example_style_shadow(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Set `shadow_offset_x`/`shadow_offset_y` to 0 to turn the elevation into an even glow. */
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_size(lv_obj_1, 210, 130);
-    lv_obj_add_style(lv_obj_1, &style_elevated, 0);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_obj_1);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_0, "Elevated");
+    lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_size(container, 210, 130);
+    lv_obj_add_style(container, &style_elevated, 0);
+    lv_obj_t * label = lv_label_create(container);
+    lv_obj_set_align(label, LV_ALIGN_CENTER);
+    lv_label_set_text(label, "Elevated");
 }
 #endif

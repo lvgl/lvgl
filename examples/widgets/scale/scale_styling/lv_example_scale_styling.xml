@@ -25,7 +25,7 @@
 
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Recolour the three named styles to see exactly which part each selector targets; bump `transform_rotation-indicator` to tilt labels further. -->
-		<lv_scale width="280" height="80"
+		<lv_scale name="scale" width="280" height="80"
 			mode="horizontal_bottom"
 			total_tick_count="21" major_tick_every="4"
 			label_show="true"

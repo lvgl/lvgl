@@ -49,13 +49,13 @@ void lv_example_style_text(void)
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Tune `text_letter_space`/`text_line_space`, or switch `text_decor` to `strikethrough`. */
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_size(lv_obj_1, 240, LV_SIZE_CONTENT);
-    lv_obj_add_style(lv_obj_1, &style_card, 0);
-    lv_obj_t * lv_label_0 = lv_label_create(lv_obj_1);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Modern\nTypography");
-    lv_obj_add_style(lv_label_0, &style_heading, 0);
+    lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_size(container, 240, LV_SIZE_CONTENT);
+    lv_obj_add_style(container, &style_card, 0);
+    lv_obj_t * label = lv_label_create(container);
+    lv_obj_set_align(label, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text(label, "Modern\nTypography");
+    lv_obj_add_style(label, &style_heading, 0);
 }
 #endif

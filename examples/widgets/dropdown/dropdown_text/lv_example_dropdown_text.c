@@ -18,18 +18,18 @@ void lv_example_dropdown_text(void)
     lv_obj_t * screen = lv_screen_active();
 
     /* Without text the button reflects the selected option */
-    lv_obj_t * lv_dropdown_0 = lv_dropdown_create(screen);
-    lv_obj_set_align(lv_dropdown_0, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(lv_dropdown_0, 14);
-    lv_obj_set_width(lv_dropdown_0, 110);
-    lv_dropdown_set_options(lv_dropdown_0, "Cut\nCopy\nPaste");
+    lv_obj_t * dropdown_1 = lv_dropdown_create(screen);
+    lv_obj_set_align(dropdown_1, LV_ALIGN_LEFT_MID);
+    lv_obj_set_x(dropdown_1, 14);
+    lv_obj_set_width(dropdown_1, 110);
+    lv_dropdown_set_options(dropdown_1, "Cut\nCopy\nPaste");
 
     /* text='Menu' overrides the displayed option */
-    lv_obj_t * lv_dropdown_1 = lv_dropdown_create(screen);
-    lv_obj_set_align(lv_dropdown_1, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_x(lv_dropdown_1, -14);
-    lv_obj_set_width(lv_dropdown_1, 110);
-    lv_dropdown_set_text(lv_dropdown_1, "Menu");
-    lv_dropdown_set_options(lv_dropdown_1, "Cut\nCopy\nPaste");
+    lv_obj_t * dropdown_2 = lv_dropdown_create(screen);
+    lv_obj_set_align(dropdown_2, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_x(dropdown_2, -14);
+    lv_obj_set_width(dropdown_2, 110);
+    lv_dropdown_set_text(dropdown_2, "Menu");
+    lv_dropdown_set_options(dropdown_2, "Cut\nCopy\nPaste");
 }
 #endif
