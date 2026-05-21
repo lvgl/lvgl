@@ -193,3 +193,8 @@ target_sources(lvgl PRIVATE $<TARGET_OBJECTS:lv_wayland_protocols>)
 target_include_directories(
   lvgl
   PRIVATE $<TARGET_PROPERTY:lv_wayland_protocols,INTERFACE_INCLUDE_DIRECTORIES>)
+
+if(CONFIG_LV_USE_PRIVATE_API)
+target_include_directories(lvgl PUBLIC
+    $<BUILD_INTERFACE:${PROTOCOLS_DIR}>)
+endif()
