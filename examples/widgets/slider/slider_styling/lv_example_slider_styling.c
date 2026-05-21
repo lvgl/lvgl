@@ -78,7 +78,7 @@ void lv_example_slider_styling(void)
     lv_label_set_text(lv_label_0, "Slider: styling parts and states");
 
     lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_size(lv_slider_0, 240, 22);
+    lv_obj_set_size(lv_slider_0, lv_pct(90), 22);
     lv_slider_set_min_value(lv_slider_0, 0);
     lv_slider_set_max_value(lv_slider_0, 100);
     lv_slider_set_value(lv_slider_0, 55, false);

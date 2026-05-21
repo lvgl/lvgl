@@ -14,13 +14,13 @@
 		<lv_label width="100%" style_text_align="center" text="Chart: types (bar + scatter)" />
 
 		<!-- BAR chart: one column per slot -->
-		<lv_chart width="260" height="120" type="bar" point_count="8">
+		<lv_chart width="90%" height="120" type="bar" point_count="8">
 			<lv_chart-series color="0x6366f1" axis="primary_y" values="10 35 25 55 40 70 60 85" />
 			<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
 		</lv_chart>
 
 		<!-- SCATTER chart: arbitrary X/Y pairs, no connecting line -->
-		<lv_chart width="260" height="120" type="scatter" point_count="6">
+		<lv_chart width="90%" height="120" type="scatter" point_count="6">
 			<lv_chart-series color="0xef4444" axis="primary_y|primary_x" values="10 40 20 80 50 30" />
 			<lv_chart-axis axis="primary_x" min_value="0" max_value="100" />
 			<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />

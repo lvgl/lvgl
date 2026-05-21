@@ -16,7 +16,7 @@
 		<lv_buttonmatrix
 			align="center"
 			y="40"
-			width="280"
+			width="90%"
 			height="60"
 			map="'Q' 'W' 'E' 'R' 'T' 'Y'"
 			ctrl_map="popover popover popover popover popover popover"

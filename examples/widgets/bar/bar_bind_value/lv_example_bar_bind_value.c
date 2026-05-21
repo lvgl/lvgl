@@ -40,7 +40,7 @@ void lv_example_bar_bind_value(void)
     lv_label_set_text(lv_label_0, "Bar: increment via events");
 
     lv_obj_t * lv_bar_0 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_0, 240, 20);
+    lv_obj_set_size(lv_bar_0, lv_pct(90), 20);
     lv_bar_bind_value(lv_bar_0, &subject_value);
 
     lv_obj_t * lv_label_1 = lv_label_create(screen);

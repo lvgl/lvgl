@@ -28,7 +28,7 @@ void lv_example_keyboard_textarea(void)
     lv_obj_t * lv_textarea_0 = lv_textarea_create(screen);
     lv_obj_set_align(lv_textarea_0, LV_ALIGN_TOP_MID);
     lv_obj_set_y(lv_textarea_0, 40);
-    lv_obj_set_size(lv_textarea_0, 280, 80);
+    lv_obj_set_size(lv_textarea_0, lv_pct(90), 80);
     lv_textarea_set_one_line(lv_textarea_0, true);
     lv_textarea_set_placeholder_text(lv_textarea_0, "Type here...");
 

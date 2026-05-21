@@ -26,13 +26,13 @@
 		<lv_label width="100%" style_text_align="center" text="Bar: styling parts" />
 
 		<!-- Tall pill-shaped bar with named styles for both parts -->
-		<lv_bar width="240" height="22" min_value="0" max_value="100" value="65">
+		<lv_bar width="90%" height="22" min_value="0" max_value="100" value="65">
 			<style name="style_bar_track" selector="main" />
 			<style name="style_bar_indicator" selector="indicator" />
 		</lv_bar>
 
 		<!-- Same widget, local style_* overrides for a flat alternative look -->
-		<lv_bar width="240" height="10" min_value="0" max_value="100" value="35"
+		<lv_bar width="90%" height="10" min_value="0" max_value="100" value="35"
 			style_bg_color="0xe5e7eb" style_bg_opa="100%" style_radius="2"
 			style_border_color="0xd1d5db" style_border_width="1" />
 	</view>

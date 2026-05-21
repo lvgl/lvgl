@@ -7,13 +7,12 @@
  highlights characters 11..16 of the label content.
 -->
 <screen>
-	<view>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
 		<!-- 💡 Adjust text_selection_start/end to highlight different ranges in the same text. -->
 		<lv_label width="100%" style_text_align="center" text="Label: text selection range" />
 
 		<!-- Label with predefined selected text range -->
 		<lv_label
-			y="30"
 			text="Selectable text range example"
 			text_selection_start="11"
 			text_selection_end="16"

@@ -16,7 +16,7 @@
 		<lv_buttonmatrix
 			align="center"
 			y="30"
-			width="310"
+			width="90%"
 			height="60"
 			map="'Normal' 'Checked' 'Disabled' 'Hidden'"
 			ctrl_map="none checkable|checked disabled hidden"

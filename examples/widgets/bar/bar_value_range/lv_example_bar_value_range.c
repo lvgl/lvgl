@@ -30,7 +30,7 @@ void lv_example_bar_value_range(void)
 
     /* Default 0..100 range */
     lv_obj_t * lv_bar_0 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_0, 220, 16);
+    lv_obj_set_size(lv_bar_0, lv_pct(90), 16);
     lv_bar_set_min_value(lv_bar_0, 0);
     lv_bar_set_max_value(lv_bar_0, 100);
     lv_bar_set_value(lv_bar_0, 30, false);
@@ -41,7 +41,7 @@ void lv_example_bar_value_range(void)
 
     /* Custom range that does not start at zero */
     lv_obj_t * lv_bar_1 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_1, 220, 16);
+    lv_obj_set_size(lv_bar_1, lv_pct(90), 16);
     lv_bar_set_min_value(lv_bar_1, -20);
     lv_bar_set_max_value(lv_bar_1, 80);
     lv_bar_set_value(lv_bar_1, 35, false);

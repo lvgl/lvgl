@@ -63,7 +63,7 @@
 		<!-- 💡 Drag the knob slowly to see the knob-pressed style kick in. -->
 		<lv_label width="100%" style_text_align="center" text="Slider: styling parts and states" />
 
-		<lv_slider width="240" height="22" min_value="0" max_value="100" value="55">
+		<lv_slider width="90%" height="22" min_value="0" max_value="100" value="55">
 			<style name="style_slider_track" selector="main" />
 			<style name="style_slider_indicator" selector="indicator" />
 			<style name="style_slider_knob" selector="knob" />

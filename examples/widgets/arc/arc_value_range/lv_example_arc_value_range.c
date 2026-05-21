@@ -25,7 +25,8 @@ void lv_example_arc_value_range(void)
 
     /* Arc with a symmetric custom range */
     lv_obj_t * lv_arc_0 = lv_arc_create(screen);
-    lv_obj_set_pos(lv_arc_0, 14, 34);
+    lv_obj_set_align(lv_arc_0, LV_ALIGN_LEFT_MID);
+    lv_obj_set_x(lv_arc_0, 10);
     lv_obj_set_size(lv_arc_0, 96, 96);
     lv_arc_set_min_value(lv_arc_0, -50);
     lv_arc_set_max_value(lv_arc_0, 50);
@@ -34,11 +35,12 @@ void lv_example_arc_value_range(void)
     lv_arc_set_bg_end_angle(lv_arc_0, 45);
     lv_obj_t * lv_label_1 = lv_label_create(lv_arc_0);
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "-50..50\nv=20");
+    lv_label_set_text(lv_label_1, "-50..50");
 
     /* Arc with a custom range showing the same concept at different numeric scale */
     lv_obj_t * lv_arc_1 = lv_arc_create(screen);
-    lv_obj_set_pos(lv_arc_1, 130, 34);
+    lv_obj_set_align(lv_arc_1, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_x(lv_arc_1, -10);
     lv_obj_set_size(lv_arc_1, 96, 96);
     lv_arc_set_min_value(lv_arc_1, 20);
     lv_arc_set_max_value(lv_arc_1, 220);
@@ -47,6 +49,6 @@ void lv_example_arc_value_range(void)
     lv_arc_set_bg_end_angle(lv_arc_1, 45);
     lv_obj_t * lv_label_2 = lv_label_create(lv_arc_1);
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "20..220\nv=140");
+    lv_label_set_text(lv_label_2, "20..220");
 }
 #endif

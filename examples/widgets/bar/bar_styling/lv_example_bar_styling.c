@@ -56,7 +56,7 @@ void lv_example_bar_styling(void)
 
     /* Tall pill-shaped bar with named styles for both parts */
     lv_obj_t * lv_bar_0 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_0, 240, 22);
+    lv_obj_set_size(lv_bar_0, lv_pct(90), 22);
     lv_bar_set_min_value(lv_bar_0, 0);
     lv_bar_set_max_value(lv_bar_0, 100);
     lv_bar_set_value(lv_bar_0, 65, false);
@@ -65,7 +65,7 @@ void lv_example_bar_styling(void)
 
     /* Same widget, local style_* overrides for a flat alternative look */
     lv_obj_t * lv_bar_1 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_1, 240, 10);
+    lv_obj_set_size(lv_bar_1, lv_pct(90), 10);
     lv_bar_set_min_value(lv_bar_1, 0);
     lv_bar_set_max_value(lv_bar_1, 100);
     lv_bar_set_value(lv_bar_1, 35, false);

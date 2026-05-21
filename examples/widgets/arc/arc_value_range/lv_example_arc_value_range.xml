@@ -13,8 +13,8 @@
 
 		<!-- Arc with a symmetric custom range -->
 		<lv_arc
-			x="14"
-			y="34"
+			align="left_mid"
+			x="10"
 			width="96"
 			height="96"
 			min_value="-50"
@@ -23,13 +23,13 @@
 			bg_start_angle="135"
 			bg_end_angle="45"
 		>
-			<lv_label align="center" text="-50..50&#10;v=20" />
+			<lv_label align="center" text="-50..50" />
 		</lv_arc>
 
 		<!-- Arc with a custom range showing the same concept at different numeric scale -->
 		<lv_arc
-			x="130"
-			y="34"
+			align="right_mid"
+			x="-10"
 			width="96"
 			height="96"
 			min_value="20"
@@ -38,7 +38,7 @@
 			bg_start_angle="135"
 			bg_end_angle="45"
 		>
-			<lv_label align="center" text="20..220&#10;v=140" />
+			<lv_label align="center" text="20..220" />
 		</lv_arc>
 	</view>
 </screen>

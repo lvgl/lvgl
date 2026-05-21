@@ -20,12 +20,12 @@
 		<lv_label width="100%" style_text_align="center" text="Text area: cursor styling" />
 
 		<!-- Block cursor -->
-		<lv_textarea width="240" one_line="true" text="Block" cursor_pos="2" focused="true">
+		<lv_textarea width="90%" one_line="true" text="Block" cursor_pos="2" focused="true">
 			<style name="style_block_cursor" selector="cursor|focused" />
 		</lv_textarea>
 
 		<!-- Bar cursor -->
-		<lv_textarea width="240" one_line="true" text="Bar" cursor_pos="2" focused="true">
+		<lv_textarea width="90%" one_line="true" text="Bar" cursor_pos="2" focused="true">
 			<style name="style_bar_cursor" selector="cursor|focused" />
 		</lv_textarea>
 	</view>

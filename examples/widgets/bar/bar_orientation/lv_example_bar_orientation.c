@@ -30,7 +30,7 @@ void lv_example_bar_orientation(void)
 
     /* Horizontal bar (auto orientation from width &gt; height) */
     lv_obj_t * lv_bar_0 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_0, 220, 16);
+    lv_obj_set_size(lv_bar_0, lv_pct(90), 16);
     lv_bar_set_min_value(lv_bar_0, 0);
     lv_bar_set_max_value(lv_bar_0, 100);
     lv_bar_set_value(lv_bar_0, 60, false);

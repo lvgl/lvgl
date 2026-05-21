@@ -28,7 +28,7 @@
 
 		<!-- Weekday matrix with one-checked semantics + styled items -->
 		<lv_buttonmatrix
-			width="280" height="60"
+			width="90%" height="60"
 			map="'M' 'T' 'W' 'T' 'F' 'S' 'S'"
 			one_checked="true"
 			ctrl_map="checkable checkable checkable|checked checkable checkable checkable checkable"

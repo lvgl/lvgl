@@ -25,7 +25,8 @@ void lv_example_arc_change_rate(void)
 
     /* Slower response arc */
     lv_obj_t * lv_arc_0 = lv_arc_create(screen);
-    lv_obj_set_pos(lv_arc_0, 14, 34);
+    lv_obj_set_align(lv_arc_0, LV_ALIGN_LEFT_MID);
+    lv_obj_set_x(lv_arc_0, 10);
     lv_obj_set_size(lv_arc_0, 96, 96);
     lv_arc_set_bg_start_angle(lv_arc_0, 135);
     lv_arc_set_bg_end_angle(lv_arc_0, 45);
@@ -37,7 +38,8 @@ void lv_example_arc_change_rate(void)
 
     /* Faster response arc */
     lv_obj_t * lv_arc_1 = lv_arc_create(screen);
-    lv_obj_set_pos(lv_arc_1, 130, 34);
+    lv_obj_set_align(lv_arc_1, LV_ALIGN_RIGHT_MID);
+    lv_obj_set_x(lv_arc_1, -10);
     lv_obj_set_size(lv_arc_1, 96, 96);
     lv_arc_set_bg_start_angle(lv_arc_1, 135);
     lv_arc_set_bg_end_angle(lv_arc_1, 45);

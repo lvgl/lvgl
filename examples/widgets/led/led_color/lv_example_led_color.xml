@@ -9,7 +9,7 @@
 <screen>
 	<view flex_flow="column" style_flex_cross_place="center" style_flex_main_place="space_evenly" style_pad_top="56">
 		<!-- 💡 Edit each color attribute to recolor that LED. -->
-		<lv_label x="0" y="8" width="100%" style_text_align="center" text="LED: color" />
+		<lv_label width="100%" style_text_align="center" text="LED: color" />
 
 		<!-- Red LED -->
 		<lv_led width="40" height="40" color="0xff3030" />

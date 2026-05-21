@@ -15,12 +15,12 @@
 		<lv_label width="100%" style_text_align="center" text="Bar: value and range" />
 
 		<!-- Default 0..100 range -->
-		<lv_bar width="220" height="16" min_value="0" max_value="100" value="30">
+		<lv_bar width="90%" height="16" min_value="0" max_value="100" value="30">
 			<lv_label align="center" text="0..100" style_text_color="#text_color" />
 		</lv_bar>
 
 		<!-- Custom range that does not start at zero -->
-		<lv_bar width="220" height="16" min_value="-20" max_value="80" value="35">
+		<lv_bar width="90%" height="16" min_value="-20" max_value="80" value="35">
 			<lv_label align="center" text="-20..80" style_text_color="#text_color" />
 		</lv_bar>
 	</view>

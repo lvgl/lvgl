@@ -16,7 +16,7 @@
 		<lv_buttonmatrix
 			align="center"
 			y="30"
-			width="280"
+			width="90%"
 			height="60"
 			one_checked="true"
 			map="'Mon' 'Tue' 'Wed' 'Thu' 'Fri'"

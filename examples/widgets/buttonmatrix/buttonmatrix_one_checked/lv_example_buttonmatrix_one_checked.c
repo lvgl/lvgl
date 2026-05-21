@@ -28,7 +28,7 @@ void lv_example_buttonmatrix_one_checked(void)
     lv_obj_t * lv_buttonmatrix_0 = lv_buttonmatrix_create(screen);
     lv_obj_set_align(lv_buttonmatrix_0, LV_ALIGN_CENTER);
     lv_obj_set_y(lv_buttonmatrix_0, 30);
-    lv_obj_set_size(lv_buttonmatrix_0, 280, 60);
+    lv_obj_set_size(lv_buttonmatrix_0, lv_pct(90), 60);
     lv_buttonmatrix_set_one_checked(lv_buttonmatrix_0, true);
     static const char * lv_buttonmatrix_0_map_0[] = {"Mon", "Tue", "Wed", "Thu", "Fri", NULL};
     lv_buttonmatrix_set_map(lv_buttonmatrix_0, lv_buttonmatrix_0_map_0);

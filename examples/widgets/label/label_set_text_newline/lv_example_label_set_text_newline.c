@@ -16,6 +16,9 @@
 void lv_example_label_set_text_newline(void)
 {
     lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Adjust text and line breaks (&#10;) to test multi-line layout and spacing. */
     lv_obj_t * lv_label_0 = lv_label_create(screen);
@@ -25,12 +28,10 @@ void lv_example_label_set_text_newline(void)
 
     /* Label with explicit newline characters */
     lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_obj_set_y(lv_label_1, 26);
     lv_label_set_text(lv_label_1, "First line\nSecond line\n\nFourth line");
 
     /* Plain label for comparison */
     lv_obj_t * lv_label_2 = lv_label_create(screen);
-    lv_obj_set_y(lv_label_2, 140);
     lv_label_set_text(lv_label_2, "Text is set directly with the text attribute.");
 }
 #endif

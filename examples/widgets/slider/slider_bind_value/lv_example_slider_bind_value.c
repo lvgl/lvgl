@@ -40,7 +40,7 @@ void lv_example_slider_bind_value(void)
     lv_label_set_text(lv_label_0, "Slider: bind to subject");
 
     lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_width(lv_slider_0, 220);
+    lv_obj_set_width(lv_slider_0, lv_pct(90));
     lv_slider_bind_value(lv_slider_0, &subject_value);
 
     lv_obj_t * lv_label_1 = lv_label_create(screen);

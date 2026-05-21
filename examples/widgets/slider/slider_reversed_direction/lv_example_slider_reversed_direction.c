@@ -30,7 +30,7 @@ void lv_example_slider_reversed_direction(void)
 
     /* Forward direction: range 0..100 */
     lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_size(lv_slider_0, 220, 16);
+    lv_obj_set_size(lv_slider_0, lv_pct(90), 16);
     lv_slider_set_min_value(lv_slider_0, 0);
     lv_slider_set_max_value(lv_slider_0, 100);
     lv_slider_set_value(lv_slider_0, 30, false);
@@ -41,7 +41,7 @@ void lv_example_slider_reversed_direction(void)
 
     /* Reverse direction: range 100..0 */
     lv_obj_t * lv_slider_1 = lv_slider_create(screen);
-    lv_obj_set_size(lv_slider_1, 220, 16);
+    lv_obj_set_size(lv_slider_1, lv_pct(90), 16);
     lv_slider_set_min_value(lv_slider_1, 100);
     lv_slider_set_max_value(lv_slider_1, 0);
     lv_slider_set_value(lv_slider_1, 30, false);

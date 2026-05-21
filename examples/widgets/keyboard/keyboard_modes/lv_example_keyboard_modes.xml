@@ -13,7 +13,7 @@
 		<!-- 💡 Change `mode` from `number` to `text_lower`, `text_upper`, or `special` to see each keymap. -->
 		<lv_label width="100%" style_text_align="center" text="Keyboard: modes" />
 
-		<lv_textarea align="top_mid" y="40" width="280" height="60"
+		<lv_textarea align="top_mid" y="40" width="90%" height="60"
 			one_line="true" placeholder_text="Numbers only" />
 
 		<lv_keyboard align="bottom_mid" width="100%" height="50%"

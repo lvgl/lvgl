@@ -24,7 +24,6 @@ void lv_example_led_styling(void)
 
     /* 💡 Combine color + border + outline + shadow to design status indicators. */
     lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_pos(lv_label_0, 0, 8);
     lv_obj_set_width(lv_label_0, lv_pct(100));
     lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(lv_label_0, "LED: styling");

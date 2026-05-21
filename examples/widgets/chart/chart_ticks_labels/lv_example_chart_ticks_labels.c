@@ -30,7 +30,7 @@ void lv_example_chart_ticks_labels(void)
     lv_label_set_text(lv_label_0, "Chart: ticks and labels");
 
     lv_obj_t * lv_chart_0 = lv_chart_create(screen);
-    lv_obj_set_size(lv_chart_0, 280, 160);
+    lv_obj_set_size(lv_chart_0, lv_pct(90), 160);
     lv_chart_set_type(lv_chart_0, LV_CHART_TYPE_BAR);
     lv_chart_set_point_count(lv_chart_0, 6);
     lv_chart_series_t * lv_chart_series_0 = lv_chart_add_series(lv_chart_0, lv_color_hex(0x6366f1),
@@ -41,7 +41,7 @@ void lv_example_chart_ticks_labels(void)
     lv_chart_set_axis_max_value(lv_chart_0, LV_CHART_AXIS_PRIMARY_Y, 100);
 
     lv_obj_t * lv_scale_0 = lv_scale_create(screen);
-    lv_obj_set_size(lv_scale_0, 280, 28);
+    lv_obj_set_size(lv_scale_0, lv_pct(90), 28);
     lv_obj_set_style_pad_hor(lv_scale_0, 24, 0);
     lv_scale_set_mode(lv_scale_0, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
     lv_scale_set_total_tick_count(lv_scale_0, 6);

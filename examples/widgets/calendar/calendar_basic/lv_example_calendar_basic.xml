@@ -14,7 +14,7 @@
 		<!-- 💡 Tap a day to select it; use the header arrows to jump between months. -->
 		<lv_label width="100%" style_text_align="center" text="Calendar: basics" />
 
-		<lv_calendar width="280" height="200"
+		<lv_calendar width="90%" height="200"
 			today_year="2026" today_month="5" today_day="15"
 			shown_year="2026" shown_month="5">
 			<lv_calendar-header_arrow />

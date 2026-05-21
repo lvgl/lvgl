@@ -8,7 +8,7 @@
 -->
 <screen>
 	<view flex_flow="column">
-		<!-- 💡 Toggle ignore_layout and tweak x/y on the red item to see how it detaches from normal Flex positioning. -->
+		<!-- 💡 Toggle ignore_layout on the red item: Flex skips it and it floats by its own align. -->
 		<lv_label width="100%" style_text_align="center" text="IGNORE_LAYOUT&#10;Opt out of flex positioning" />
 
 		<!-- Demo row mixing normal and ignore_layout items.
@@ -19,9 +19,9 @@
 				<lv_label text="Item A" align="center" />
 			</lv_button>
 
-			<!-- This item is invisible to flex. It sits at x=120, y=10
-			     (its own alignment) and does not occupy a flex slot. -->
-			<lv_button x="130" y="70" ignore_layout="true" style_bg_color="0xe74c3c">
+			<!-- This item is invisible to flex. It centers itself by its own
+			     align and does not occupy a flex slot. -->
+			<lv_button align="center" ignore_layout="true" style_bg_color="0xe74c3c">
 				<lv_label text="I'm Free!" align="center" />
 			</lv_button>
 

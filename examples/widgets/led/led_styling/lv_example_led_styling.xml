@@ -10,7 +10,7 @@
 <screen>
 	<view flex_flow="row" style_flex_cross_place="center" style_flex_main_place="space_evenly" style_pad_top="56">
 		<!-- 💡 Combine color + border + outline + shadow to design status indicators. -->
-		<lv_label x="0" y="8" width="100%" style_text_align="center" text="LED: styling" />
+		<lv_label width="100%" style_text_align="center" text="LED: styling" />
 
 		<!-- Round LED with a tight ring outline and a soft outer glow -->
 		<lv_led width="50" height="50" color="0x22c55e"

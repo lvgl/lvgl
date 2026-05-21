@@ -7,13 +7,13 @@
  also accepts plain text with no escaping for normal characters.
 -->
 <screen>
-	<view>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
 		<!-- 💡 Adjust text and line breaks (&#10;) to test multi-line layout and spacing. -->
 		<lv_label width="100%" style_text_align="center" text="Label: set text and newline" />
 
 		<!-- Label with explicit newline characters -->
-		<lv_label y="26" text="First line&#10;Second line&#10;&#10;Fourth line" />
+		<lv_label text="First line&#10;Second line&#10;&#10;Fourth line" />
 		<!-- Plain label for comparison -->
-		<lv_label y="140" text="Text is set directly with the text attribute." />
+		<lv_label text="Text is set directly with the text attribute." />
 	</view>
 </screen>

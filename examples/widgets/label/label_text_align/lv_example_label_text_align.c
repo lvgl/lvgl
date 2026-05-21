@@ -17,6 +17,9 @@
 void lv_example_label_text_align(void)
 {
     lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Adjust width and style_text_align to see where left, center, and right alignment become visible. */
     lv_obj_t * lv_label_0 = lv_label_create(screen);
@@ -26,21 +29,18 @@ void lv_example_label_text_align(void)
 
     /* Left-aligned multi-line label */
     lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_obj_set_y(lv_label_1, 30);
     lv_obj_set_width(lv_label_1, 220);
     lv_obj_set_style_text_align(lv_label_1, LV_TEXT_ALIGN_LEFT, 0);
     lv_label_set_text(lv_label_1, "Left aligned\nSecond line");
 
     /* Center-aligned multi-line label */
     lv_obj_t * lv_label_2 = lv_label_create(screen);
-    lv_obj_set_y(lv_label_2, 72);
     lv_obj_set_width(lv_label_2, 220);
     lv_obj_set_style_text_align(lv_label_2, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(lv_label_2, "Centered\nSecond line");
 
     /* Right-aligned multi-line label */
     lv_obj_t * lv_label_3 = lv_label_create(screen);
-    lv_obj_set_y(lv_label_3, 114);
     lv_obj_set_width(lv_label_3, 220);
     lv_obj_set_style_text_align(lv_label_3, LV_TEXT_ALIGN_RIGHT, 0);
     lv_label_set_text(lv_label_3, "Right aligned\nSecond line");

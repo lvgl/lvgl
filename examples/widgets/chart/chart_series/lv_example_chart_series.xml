@@ -13,7 +13,7 @@
 		<!-- 💡 Edit either axis range; the series tied to that axis rescales while the other stays put. -->
 		<lv_label width="100%" style_text_align="center" text="Chart: dual-axis series" />
 
-		<lv_chart width="280" height="180" type="line" point_count="8">
+		<lv_chart width="90%" height="180" type="line" point_count="8">
 			<!-- Temperature: left axis, 0..100 -->
 			<lv_chart-series color="0xef4444" axis="primary_y" values="22 28 35 50 65 70 60 45" />
 			<!-- Pressure: right axis, 0..2000 -->

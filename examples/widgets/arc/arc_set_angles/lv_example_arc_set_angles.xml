@@ -14,8 +14,8 @@
 
 		<!-- Value-driven indicator arc -->
 		<lv_arc
-			x="14"
-			y="34"
+			align="left_mid"
+			x="10"
 			width="96"
 			height="96"
 			bg_start_angle="135"
@@ -29,8 +29,8 @@
 
 		<!-- Indicator angle set explicitly; value/mode are ignored for indicator drawing -->
 		<lv_arc
-			x="130"
-			y="34"
+			align="right_mid"
+			x="-10"
 			width="96"
 			height="96"
 			bg_start_angle="135"

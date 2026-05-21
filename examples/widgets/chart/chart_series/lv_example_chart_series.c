@@ -29,7 +29,7 @@ void lv_example_chart_series(void)
     lv_label_set_text(lv_label_0, "Chart: dual-axis series");
 
     lv_obj_t * lv_chart_0 = lv_chart_create(screen);
-    lv_obj_set_size(lv_chart_0, 280, 180);
+    lv_obj_set_size(lv_chart_0, lv_pct(90), 180);
     lv_chart_set_type(lv_chart_0, LV_CHART_TYPE_LINE);
     lv_chart_set_point_count(lv_chart_0, 8);
     lv_chart_series_t * lv_chart_series_0 = lv_chart_add_series(lv_chart_0, lv_color_hex(0xef4444),

@@ -33,7 +33,7 @@ void lv_example_grid_ignore_layout(void)
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(screen, 8, 0);
 
-    /* 💡 Toggle ignore_layout and x/y on the FREE tile to see how it leaves the grid flow. */
+    /* 💡 Toggle ignore_layout on the FREE tile to see how it leaves the grid flow and floats by its own align. */
     lv_obj_t * lv_label_0 = lv_label_create(screen);
     lv_obj_set_width(lv_label_0, lv_pct(100));
     lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
@@ -77,7 +77,7 @@ void lv_example_grid_ignore_layout(void)
 
     lv_obj_t * lv_label_5 = lv_label_create(lv_obj_1);
     lv_obj_set_flag(lv_label_5, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
-    lv_obj_set_pos(lv_label_5, 105, 66);
+    lv_obj_set_align(lv_label_5, LV_ALIGN_CENTER);
     lv_obj_set_style_bg_color(lv_label_5, lv_color_hex(0xe74c3c), 0);
     lv_label_set_text(lv_label_5, "FREE");
     lv_obj_add_style(lv_label_5, &style_cell, 0);

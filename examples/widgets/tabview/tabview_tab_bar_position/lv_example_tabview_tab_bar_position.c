@@ -17,6 +17,10 @@
 void lv_example_tabview_tab_bar_position(void)
 {
     lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_SPACE_EVENLY, 0);
+    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_all(screen, 8, 0);
 
     /* 💡 Change tab_bar_position to top/bottom/left/right to move the tab bar. */
     lv_obj_t * lv_label_0 = lv_label_create(screen);
@@ -26,8 +30,7 @@ void lv_example_tabview_tab_bar_position(void)
 
     /* Bar on the top edge */
     lv_obj_t * lv_tabview_0 = lv_tabview_create(screen);
-    lv_obj_set_pos(lv_tabview_0, 8, 28);
-    lv_obj_set_size(lv_tabview_0, 150, 100);
+    lv_obj_set_size(lv_tabview_0, lv_pct(45), 100);
     lv_tabview_set_tab_bar_position(lv_tabview_0, LV_DIR_TOP);
     lv_obj_set_style_bg_color(lv_tabview_0, lv_color_hex(0xffcc80), 0);
     lv_obj_set_style_bg_opa(lv_tabview_0, (255 * 100 / 100), 0);
@@ -39,8 +42,7 @@ void lv_example_tabview_tab_bar_position(void)
     lv_tabview_add_tab(lv_tabview_0, "B");
 
     lv_obj_t * lv_tabview_1 = lv_tabview_create(screen);
-    lv_obj_set_pos(lv_tabview_1, 164, 28);
-    lv_obj_set_size(lv_tabview_1, 150, 100);
+    lv_obj_set_size(lv_tabview_1, lv_pct(45), 100);
     lv_tabview_set_tab_bar_position(lv_tabview_1, LV_DIR_BOTTOM);
     lv_obj_set_style_bg_color(lv_tabview_1, lv_color_hex(0x90caf9), 0);
     lv_obj_set_style_bg_opa(lv_tabview_1, (255 * 100 / 100), 0);
@@ -53,8 +55,7 @@ void lv_example_tabview_tab_bar_position(void)
 
     /* Bar on the bottom edge */
     lv_obj_t * lv_tabview_2 = lv_tabview_create(screen);
-    lv_obj_set_pos(lv_tabview_2, 8, 136);
-    lv_obj_set_size(lv_tabview_2, 150, 100);
+    lv_obj_set_size(lv_tabview_2, lv_pct(45), 100);
     lv_tabview_set_tab_bar_position(lv_tabview_2, LV_DIR_LEFT);
     lv_obj_set_style_bg_color(lv_tabview_2, lv_color_hex(0xa5d6a7), 0);
     lv_obj_set_style_bg_opa(lv_tabview_2, (255 * 100 / 100), 0);
@@ -66,8 +67,7 @@ void lv_example_tabview_tab_bar_position(void)
     lv_tabview_add_tab(lv_tabview_2, "B");
 
     lv_obj_t * lv_tabview_3 = lv_tabview_create(screen);
-    lv_obj_set_pos(lv_tabview_3, 164, 136);
-    lv_obj_set_size(lv_tabview_3, 150, 100);
+    lv_obj_set_size(lv_tabview_3, lv_pct(45), 100);
     lv_tabview_set_tab_bar_position(lv_tabview_3, LV_DIR_RIGHT);
     lv_obj_set_style_bg_color(lv_tabview_3, lv_color_hex(0xce93d8), 0);
     lv_obj_set_style_bg_opa(lv_tabview_3, (255 * 100 / 100), 0);

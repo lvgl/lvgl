@@ -16,7 +16,7 @@
 		<lv_buttonmatrix
 			align="center"
 			y="30"
-			width="280"
+			width="90%"
 			height="60"
 			map="'#ff0000 Stop#' '#e08800 Warn#' '#00a000 Go#'"
 			ctrl_map="recolor recolor recolor"

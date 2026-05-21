@@ -32,7 +32,7 @@ void lv_example_buttonmatrix_button_width(void)
     lv_obj_t * lv_buttonmatrix_0 = lv_buttonmatrix_create(screen);
     lv_obj_set_align(lv_buttonmatrix_0, LV_ALIGN_CENTER);
     lv_obj_set_y(lv_buttonmatrix_0, 20);
-    lv_obj_set_size(lv_buttonmatrix_0, 240, 120);
+    lv_obj_set_size(lv_buttonmatrix_0, lv_pct(90), 120);
     static const char * lv_buttonmatrix_0_map_0[] = {"A", "B", "C", "\n", "x1", "x2", "x3", NULL};
     lv_buttonmatrix_set_map(lv_buttonmatrix_0, lv_buttonmatrix_0_map_0);
     static const lv_buttonmatrix_ctrl_t lv_buttonmatrix_0_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_NONE, LV_BUTTONMATRIX_CTRL_WIDTH_1, LV_BUTTONMATRIX_CTRL_WIDTH_2, LV_BUTTONMATRIX_CTRL_WIDTH_3};

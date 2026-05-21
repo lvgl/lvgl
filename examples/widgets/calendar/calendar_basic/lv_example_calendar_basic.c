@@ -30,7 +30,7 @@ void lv_example_calendar_basic(void)
     lv_label_set_text(lv_label_0, "Calendar: basics");
 
     lv_obj_t * lv_calendar_0 = lv_calendar_create(screen);
-    lv_obj_set_size(lv_calendar_0, 280, 200);
+    lv_obj_set_size(lv_calendar_0, lv_pct(90), 200);
     lv_calendar_set_today_year(lv_calendar_0, 2026);
     lv_calendar_set_today_month(lv_calendar_0, 5);
     lv_calendar_set_today_day(lv_calendar_0, 15);

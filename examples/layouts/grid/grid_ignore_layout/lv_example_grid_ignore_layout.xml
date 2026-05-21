@@ -13,7 +13,7 @@
 	</styles>
 
 	<view flex_flow="column" style_pad_row="8">
-		<!-- 💡 Toggle ignore_layout and x/y on the FREE tile to see how it leaves the grid flow. -->
+		<!-- 💡 Toggle ignore_layout on the FREE tile to see how it leaves the grid flow and floats by its own align. -->
 		<lv_label width="100%" style_text_align="center" text="Grid + IGNORE_LAYOUT: one item floats freely" />
 
 		<!-- The red item has flag_ignore_layout="true", so grid ignores it.
@@ -42,7 +42,7 @@
 				<style name="style_cell" />
 			</lv_label>
 
-			<lv_label ignore_layout="true" x="105" y="66" style_bg_color="0xe74c3c" text="FREE">
+			<lv_label ignore_layout="true" align="center" style_bg_color="0xe74c3c" text="FREE">
 				<style name="style_cell" />
 			</lv_label>
 		</lv_obj>

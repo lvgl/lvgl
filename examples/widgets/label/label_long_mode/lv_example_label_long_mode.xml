@@ -12,13 +12,12 @@
 		<style name="style_label_bg" bg_opa="100%" radius="6" />
 	</styles>
 
-	<view>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
 		<!-- 💡 Adjust long_mode, width, and height to compare wrap, dots, scroll, circular scroll, and clip results. -->
 		<lv_label width="100%" style_text_align="center" text="Label: all long_mode options" />
 
 		<!-- Wrap mode example -->
 		<lv_label
-			y="30"
 			width="170"
 			long_mode="wrap"
 			style_bg_color="0xd6eaf8"
@@ -29,7 +28,6 @@
 
 		<!-- Dots mode example -->
 		<lv_label
-			y="102"
 			width="170"
 			height="32"
 			long_mode="dots"
@@ -41,7 +39,6 @@
 
 		<!-- Scroll mode example -->
 		<lv_label
-			y="146"
 			width="170"
 			long_mode="scroll"
 			style_bg_color="0xfdebd0"
@@ -52,7 +49,6 @@
 
 		<!-- Circular scroll mode example -->
 		<lv_label
-			y="190"
 			width="170"
 			long_mode="scroll_circular"
 			style_bg_color="0xfadbd8"
@@ -63,7 +59,6 @@
 
 		<!-- Clip mode example -->
 		<lv_label
-			y="234"
 			width="170"
 			long_mode="clip"
 			style_bg_color="0xebdef0"

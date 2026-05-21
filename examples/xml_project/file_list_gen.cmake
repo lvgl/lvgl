@@ -8,7 +8,5 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/images/img_bar_bg_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_bar_indicator_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/img_example_lvgl_logo_data.c
-  ${CMAKE_CURRENT_LIST_DIR}/screens/lv_example_scroll_scrollable_gen.c
-  ${CMAKE_CURRENT_LIST_DIR}/screens/lv_example_switch_orientation_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/xml_project_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/xml_project.c)

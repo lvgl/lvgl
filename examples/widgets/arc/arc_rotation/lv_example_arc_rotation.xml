@@ -13,8 +13,8 @@
 
 		<!-- Arc rotated by 45 degrees -->
 		<lv_arc
-			x="18"
-			y="34"
+			align="left_mid"
+			x="10"
 			width="90"
 			height="90"
 			bg_start_angle="0"
@@ -27,8 +27,8 @@
 
 		<!-- Arc rotated by 135 degrees -->
 		<lv_arc
-			x="132"
-			y="34"
+			align="right_mid"
+			x="-10"
 			width="90"
 			height="90"
 			bg_start_angle="0"

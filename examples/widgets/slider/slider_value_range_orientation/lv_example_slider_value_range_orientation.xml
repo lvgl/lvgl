@@ -16,7 +16,7 @@
 
 		<!-- Horizontal slider with custom range -->
 		<lv_slider
-			width="220"
+			width="90%"
 			height="16"
 			min_value="-20"
 			max_value="80"
@@ -34,7 +34,7 @@
 			max_value="100"
 			value="60"
 		>
-			<lv_label align="center" text="V" style_text_color="#text_color" />
+			<lv_label align="center" text="V&#10;e&#10;r" style_text_color="#text_color" />
 		</lv_slider>
 	</view>
 </screen>

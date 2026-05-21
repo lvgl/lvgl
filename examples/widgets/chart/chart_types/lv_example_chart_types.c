@@ -30,7 +30,7 @@ void lv_example_chart_types(void)
 
     /* BAR chart: one column per slot */
     lv_obj_t * lv_chart_0 = lv_chart_create(screen);
-    lv_obj_set_size(lv_chart_0, 260, 120);
+    lv_obj_set_size(lv_chart_0, lv_pct(90), 120);
     lv_chart_set_type(lv_chart_0, LV_CHART_TYPE_BAR);
     lv_chart_set_point_count(lv_chart_0, 8);
     lv_chart_series_t * lv_chart_series_0 = lv_chart_add_series(lv_chart_0, lv_color_hex(0x6366f1),
@@ -41,7 +41,7 @@ void lv_example_chart_types(void)
     lv_chart_set_axis_max_value(lv_chart_0, LV_CHART_AXIS_PRIMARY_Y, 100);
 
     lv_obj_t * lv_chart_1 = lv_chart_create(screen);
-    lv_obj_set_size(lv_chart_1, 260, 120);
+    lv_obj_set_size(lv_chart_1, lv_pct(90), 120);
     lv_chart_set_type(lv_chart_1, LV_CHART_TYPE_SCATTER);
     lv_chart_set_point_count(lv_chart_1, 6);
     lv_chart_series_t * lv_chart_series_1 = lv_chart_add_series(lv_chart_1, lv_color_hex(0xef4444),

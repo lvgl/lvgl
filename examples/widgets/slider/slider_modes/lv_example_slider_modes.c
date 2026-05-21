@@ -31,8 +31,7 @@ void lv_example_slider_modes(void)
 
     /* Normal mode */
     lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_pos(lv_slider_0, 12, 36);
-    lv_obj_set_size(lv_slider_0, 220, 16);
+    lv_obj_set_width(lv_slider_0, lv_pct(90));
     lv_slider_set_mode(lv_slider_0, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_min_value(lv_slider_0, 0);
     lv_slider_set_max_value(lv_slider_0, 100);
@@ -44,8 +43,7 @@ void lv_example_slider_modes(void)
 
     /* Symmetrical mode around zero */
     lv_obj_t * lv_slider_1 = lv_slider_create(screen);
-    lv_obj_set_pos(lv_slider_1, 12, 82);
-    lv_obj_set_size(lv_slider_1, 220, 16);
+    lv_obj_set_width(lv_slider_1, lv_pct(90));
     lv_slider_set_mode(lv_slider_1, LV_SLIDER_MODE_SYMMETRICAL);
     lv_slider_set_min_value(lv_slider_1, -100);
     lv_slider_set_max_value(lv_slider_1, 100);
@@ -57,8 +55,7 @@ void lv_example_slider_modes(void)
 
     /* Range mode with left and right values */
     lv_obj_t * lv_slider_2 = lv_slider_create(screen);
-    lv_obj_set_pos(lv_slider_2, 12, 128);
-    lv_obj_set_size(lv_slider_2, 220, 16);
+    lv_obj_set_width(lv_slider_2, lv_pct(90));
     lv_slider_set_mode(lv_slider_2, LV_SLIDER_MODE_RANGE);
     lv_slider_set_min_value(lv_slider_2, 0);
     lv_slider_set_max_value(lv_slider_2, 100);

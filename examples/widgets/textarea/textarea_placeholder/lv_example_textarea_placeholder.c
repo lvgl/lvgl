@@ -28,13 +28,13 @@ void lv_example_textarea_placeholder(void)
 
     /* Empty: placeholder hint is shown */
     lv_obj_t * lv_textarea_0 = lv_textarea_create(screen);
-    lv_obj_set_width(lv_textarea_0, 240);
+    lv_obj_set_width(lv_textarea_0, lv_pct(90));
     lv_textarea_set_one_line(lv_textarea_0, true);
     lv_textarea_set_placeholder_text(lv_textarea_0, "Search…");
 
     /* Filled: placeholder is hidden */
     lv_obj_t * lv_textarea_1 = lv_textarea_create(screen);
-    lv_obj_set_width(lv_textarea_1, 240);
+    lv_obj_set_width(lv_textarea_1, lv_pct(90));
     lv_textarea_set_one_line(lv_textarea_1, true);
     lv_textarea_set_placeholder_text(lv_textarea_1, "Search…");
     lv_textarea_set_text(lv_textarea_1, "lv_textarea");

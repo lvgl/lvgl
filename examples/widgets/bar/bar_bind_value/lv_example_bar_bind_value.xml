@@ -13,7 +13,7 @@
 		<!-- 💡 Tap +/- to step; hold to repeat. Reach the limit to see rollover. -->
 		<lv_label width="100%" style_text_align="center" text="Bar: increment via events" />
 
-		<lv_bar width="240" height="20" bind_value="subject_value" />
+		<lv_bar width="90%" height="20" bind_value="subject_value" />
 
 		<lv_label bind_text="subject_value" bind_text-fmt="%d%%" />
 

@@ -15,12 +15,12 @@
 		<lv_label width="100%" style_text_align="center" text="Slider: reversed direction" />
 
 		<!-- Forward direction: range 0..100 -->
-		<lv_slider width="220" height="16" min_value="0" max_value="100" value="30">
+		<lv_slider width="90%" height="16" min_value="0" max_value="100" value="30">
 			<lv_label align="center" text="0..100" style_text_color="#text_color" />
 		</lv_slider>
 
 		<!-- Reverse direction: range 100..0 -->
-		<lv_slider width="220" height="16" min_value="100" max_value="0" value="30">
+		<lv_slider width="90%" height="16" min_value="100" max_value="0" value="30">
 			<lv_label align="center" text="100..0" style_text_color="#text_color" />
 		</lv_slider>
 	</view>

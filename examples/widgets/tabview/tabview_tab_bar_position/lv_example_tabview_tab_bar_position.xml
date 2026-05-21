@@ -8,15 +8,13 @@
  changes the layout itself.
 -->
 <screen>
-	<view>
+	<view flex_flow="row_wrap" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_all="8">
 		<!-- 💡 Change tab_bar_position to top/bottom/left/right to move the tab bar. -->
 		<lv_label width="100%" style_text_align="center" text="Tab view: tab bar position" />
 
 		<!-- Bar on the top edge -->
 		<lv_tabview
-			x="8"
-			y="28"
-			width="150"
+			width="45%"
 			height="100"
 			tab_bar_position="top"
 			style_bg_color="0xffcc80"
@@ -28,9 +26,7 @@
 
 		<!-- Bar on the bottom edge -->
 		<lv_tabview
-			x="164"
-			y="28"
-			width="150"
+			width="45%"
 			height="100"
 			tab_bar_position="bottom"
 			style_bg_color="0x90caf9"
@@ -42,9 +38,7 @@
 
 		<!-- Bar on the left edge -->
 		<lv_tabview
-			x="8"
-			y="136"
-			width="150"
+			width="45%"
 			height="100"
 			tab_bar_position="left"
 			style_bg_color="0xa5d6a7"
@@ -56,9 +50,7 @@
 
 		<!-- Bar on the right edge -->
 		<lv_tabview
-			x="164"
-			y="136"
-			width="150"
+			width="45%"
 			height="100"
 			tab_bar_position="right"
 			style_bg_color="0xce93d8"
