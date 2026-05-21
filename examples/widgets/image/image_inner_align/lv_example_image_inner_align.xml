@@ -12,7 +12,7 @@
 	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="16">
 		<!-- 💡 Switch `inner_align` to `contain`, `cover`, or `stretch` to compare placement vs scaling modes. -->
 
-		<lv_image
+		<lv_image name="image_1"
 			src="img_example_lvgl_logo"
 			width="80"
 			height="80"
@@ -21,7 +21,7 @@
 			style_bg_opa="100%"
 		/>
 
-		<lv_image
+		<lv_image name="image_2"
 			src="img_example_lvgl_logo"
 			width="80"
 			height="80"
@@ -30,7 +30,7 @@
 			style_bg_opa="100%"
 		/>
 
-		<lv_image
+		<lv_image name="image_3"
 			src="img_example_lvgl_logo"
 			width="80"
 			height="80"

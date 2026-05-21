@@ -24,27 +24,25 @@
 			text_color="0xffffff" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="18">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="18">
 		<!-- 💡 "Override" is always pink; press "On press" — its `style_bg_color-pressed` wins only while held. Borders never change. -->
-		<lv_label width="100%" style_text_align="center" text="Style: local override" />
-
-		<lv_obj width="content" height="content" flex_flow="row"
+		<lv_obj name="container" width="content" height="content" flex_flow="row"
 			style_pad_column="16" style_bg_opa="0" style_border_width="0" style_pad_all="0">
-			<lv_button width="95">
+			<lv_button name="button_1" width="95">
 				<style name="style_shared" />
-				<lv_label align="center" text="Shared" />
+				<lv_label name="label_1" align="center" text="Shared" />
 			</lv_button>
 
 			<!-- Plain local override: fill always wins over the shared style -->
-			<lv_button width="95" style_bg_color="0xec4899">
+			<lv_button name="button_2" width="95" style_bg_color="0xec4899">
 				<style name="style_shared" />
-				<lv_label align="center" text="Override" />
+				<lv_label name="label_2" align="center" text="Override" />
 			</lv_button>
 
 			<!-- Local state selector: overrides the fill only while pressed -->
-			<lv_button width="95" style_bg_color-pressed="0x10b981">
+			<lv_button name="button_3" width="95" style_bg_color-pressed="0x10b981">
 				<style name="style_shared" />
-				<lv_label align="center" text="On press" />
+				<lv_label name="label_3" align="center" text="On press" />
 			</lv_button>
 		</lv_obj>
 	</view>

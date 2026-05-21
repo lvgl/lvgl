@@ -61,26 +61,23 @@ void lv_example_switch_styling(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Bump `pad_all` on `style_switch_main` to widen the track around the indicator; bump it on `style_switch_knob` to grow the knob past the track height. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Switch: styling parts");
+    lv_obj_t * sw_1 = lv_switch_create(screen);
+    lv_obj_set_size(sw_1, 60, 30);
+    lv_obj_add_style(sw_1, &style_switch_main, LV_PART_MAIN);
+    lv_obj_add_style(sw_1, &style_switch_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_add_style(sw_1, &style_switch_knob, LV_PART_KNOB);
 
-    lv_obj_t * lv_switch_0 = lv_switch_create(screen);
-    lv_obj_set_size(lv_switch_0, 60, 30);
-    lv_obj_add_style(lv_switch_0, &style_switch_main, LV_PART_MAIN);
-    lv_obj_add_style(lv_switch_0, &style_switch_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
-    lv_obj_add_style(lv_switch_0, &style_switch_knob, LV_PART_KNOB);
-
-    lv_obj_t * lv_switch_1 = lv_switch_create(screen);
-    lv_obj_set_size(lv_switch_1, 60, 30);
-    lv_obj_set_state(lv_switch_1, LV_STATE_CHECKED, true);
-    lv_obj_add_style(lv_switch_1, &style_switch_main, LV_PART_MAIN);
-    lv_obj_add_style(lv_switch_1, &style_switch_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
-    lv_obj_add_style(lv_switch_1, &style_switch_knob, LV_PART_KNOB);
+    lv_obj_t * sw_2 = lv_switch_create(screen);
+    lv_obj_set_size(sw_2, 60, 30);
+    lv_obj_set_state(sw_2, LV_STATE_CHECKED, true);
+    lv_obj_add_style(sw_2, &style_switch_main, LV_PART_MAIN);
+    lv_obj_add_style(sw_2, &style_switch_indicator_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_add_style(sw_2, &style_switch_knob, LV_PART_KNOB);
 }
 #endif

@@ -24,13 +24,11 @@
 			text_decor="underline" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Tune `text_letter_space`/`text_line_space`, or switch `text_decor` to `strikethrough`. -->
-		<lv_label width="100%" style_text_align="center" text="Style: text properties" />
-
-		<lv_obj width="240" height="content">
+		<lv_obj name="container" width="240" height="content">
 			<style name="style_card" />
-			<lv_label align="center" style_text_align="center" text="Modern&#10;Typography">
+			<lv_label name="label" align="center" style_text_align="center" text="Modern&#10;Typography">
 				<style name="style_heading" />
 			</lv_label>
 		</lv_obj>

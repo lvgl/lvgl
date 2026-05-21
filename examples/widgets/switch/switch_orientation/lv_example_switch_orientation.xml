@@ -12,7 +12,7 @@
 	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="32">
 		<!-- 💡 Swap `orientation` on either switch to compare auto-derived vs explicit layouts. -->
 
-		<lv_switch width="60" height="30" orientation="horizontal" checked="true" />
-		<lv_switch width="30" height="60" orientation="vertical" checked="true" />
+		<lv_switch name="sw_1" width="60" height="30" orientation="horizontal" checked="true" />
+		<lv_switch name="sw_2" width="30" height="60" orientation="vertical" checked="true" />
 	</view>
 </screen>

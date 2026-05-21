@@ -46,21 +46,18 @@ void lv_example_roller_styling(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Bump `text_line_space` on `style_roller_main` to grow the selected band's height — the indicator always fills the gap between rows. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Roller: styling parts");
-
-    lv_obj_t * lv_roller_0 = lv_roller_create(screen);
-    lv_obj_set_width(lv_roller_0, 160);
-    lv_roller_set_visible_row_count(lv_roller_0, 5);
-    lv_roller_set_options(lv_roller_0, "Berlin\nParis\nTokyo\nSydney\nNew York", LV_ROLLER_MODE_NORMAL);
-    lv_roller_set_selected(lv_roller_0, 2, false);
-    lv_obj_add_style(lv_roller_0, &style_roller_main, LV_PART_MAIN);
-    lv_obj_add_style(lv_roller_0, &style_roller_selected, LV_PART_SELECTED);
+    lv_obj_t * roller = lv_roller_create(screen);
+    lv_obj_set_width(roller, 160);
+    lv_roller_set_visible_row_count(roller, 5);
+    lv_roller_set_options(roller, "Berlin\nParis\nTokyo\nSydney\nNew York", LV_ROLLER_MODE_NORMAL);
+    lv_roller_set_selected(roller, 2, false);
+    lv_obj_add_style(roller, &style_roller_main, LV_PART_MAIN);
+    lv_obj_add_style(roller, &style_roller_selected, LV_PART_SELECTED);
 }
 #endif

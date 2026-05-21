@@ -7,13 +7,11 @@
  push them to the edges, while rows align to end and stick to the bottom.
 -->
 <screen>
-	<view flex_flow="column" style_pad_row="8">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="8">
 		<!-- 💡 Adjust style_grid_column_align and style_grid_row_align to compare how tracks are placed in free space. -->
-		<lv_label width="100%" style_text_align="center" text="Grid align: tracks in free space" />
-
 		<!-- Track sizes are smaller than container, so alignment is visible. -->
 		<!-- Grid container with explicit track alignment settings -->
-		<lv_obj
+		<lv_obj name="container"
 			style_grid_column_dsc_array="56 56 56"
 			style_grid_row_dsc_array="36 36"
 			style_grid_column_align="space_between"
@@ -23,13 +21,13 @@
 			height="180"
 		>
 			<!-- First row -->
-			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="0" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0xd6eaf8" style_bg_opa="100%" text="0,0" />
-			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="1" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0xd6eaf8" style_bg_opa="100%" text="1,0" />
-			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="2" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0xd6eaf8" style_bg_opa="100%" text="2,0" />
+			<lv_label name="label_1" style_grid_cell_x_align="stretch" style_grid_cell_column_pos="0" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0xd6eaf8" style_bg_opa="100%" text="0,0" />
+			<lv_label name="label_2" style_grid_cell_x_align="stretch" style_grid_cell_column_pos="1" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0xd6eaf8" style_bg_opa="100%" text="1,0" />
+			<lv_label name="label_3" style_grid_cell_x_align="stretch" style_grid_cell_column_pos="2" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0xd6eaf8" style_bg_opa="100%" text="2,0" />
 			<!-- Second row -->
-			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="0" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0xd5f5e3" style_bg_opa="100%" text="0,1" />
-			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="1" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0xd5f5e3" style_bg_opa="100%" text="1,1" />
-			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="2" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0xd5f5e3" style_bg_opa="100%" text="2,1" />
+			<lv_label name="label_4" style_grid_cell_x_align="stretch" style_grid_cell_column_pos="0" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0xd5f5e3" style_bg_opa="100%" text="0,1" />
+			<lv_label name="label_5" style_grid_cell_x_align="stretch" style_grid_cell_column_pos="1" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0xd5f5e3" style_bg_opa="100%" text="1,1" />
+			<lv_label name="label_6" style_grid_cell_x_align="stretch" style_grid_cell_column_pos="2" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0xd5f5e3" style_bg_opa="100%" text="2,1" />
 		</lv_obj>
 	</view>
 </screen>

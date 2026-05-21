@@ -45,34 +45,30 @@ void lv_example_bar_styling(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 20, 0);
 
-    /* 💡 Adjust min/max/value to see how the gradient indicator scales inside the styled track. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Bar: styling parts");
-
     /* Tall pill-shaped bar with named styles for both parts */
-    lv_obj_t * lv_bar_0 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_0, 240, 22);
-    lv_bar_set_min_value(lv_bar_0, 0);
-    lv_bar_set_max_value(lv_bar_0, 100);
-    lv_bar_set_value(lv_bar_0, 65, false);
-    lv_obj_add_style(lv_bar_0, &style_bar_track, LV_PART_MAIN);
-    lv_obj_add_style(lv_bar_0, &style_bar_indicator, LV_PART_INDICATOR);
+    lv_obj_t * bar_1 = lv_bar_create(screen);
+    lv_obj_set_size(bar_1, lv_pct(90), 22);
+    lv_bar_set_min_value(bar_1, 0);
+    lv_bar_set_max_value(bar_1, 100);
+    lv_bar_set_value(bar_1, 65, false);
+    lv_obj_add_style(bar_1, &style_bar_track, LV_PART_MAIN);
+    lv_obj_add_style(bar_1, &style_bar_indicator, LV_PART_INDICATOR);
 
     /* Same widget, local style_* overrides for a flat alternative look */
-    lv_obj_t * lv_bar_1 = lv_bar_create(screen);
-    lv_obj_set_size(lv_bar_1, 240, 10);
-    lv_bar_set_min_value(lv_bar_1, 0);
-    lv_bar_set_max_value(lv_bar_1, 100);
-    lv_bar_set_value(lv_bar_1, 35, false);
-    lv_obj_set_style_bg_color(lv_bar_1, lv_color_hex(0xe5e7eb), 0);
-    lv_obj_set_style_bg_opa(lv_bar_1, (255 * 100 / 100), 0);
-    lv_obj_set_style_radius(lv_bar_1, 2, 0);
-    lv_obj_set_style_border_color(lv_bar_1, lv_color_hex(0xd1d5db), 0);
-    lv_obj_set_style_border_width(lv_bar_1, 1, 0);
+    lv_obj_t * bar_2 = lv_bar_create(screen);
+    lv_obj_set_size(bar_2, lv_pct(90), 10);
+    lv_bar_set_min_value(bar_2, 0);
+    lv_bar_set_max_value(bar_2, 100);
+    lv_bar_set_value(bar_2, 35, false);
+    lv_obj_set_style_bg_color(bar_2, lv_color_hex(0xe5e7eb), 0);
+    lv_obj_set_style_bg_opa(bar_2, (255 * 100 / 100), 0);
+    lv_obj_set_style_radius(bar_2, 2, 0);
+    lv_obj_set_style_border_color(bar_2, lv_color_hex(0xd1d5db), 0);
+    lv_obj_set_style_border_width(bar_2, 1, 0);
 }
 #endif

@@ -13,7 +13,7 @@
 		<!-- 💡 Change `angle_range` to 360 for a full ring, or shrink `rotation` to slide the sweep around. -->
 
 		<!-- Ticks inside: gauge-style -->
-		<lv_scale width="180" height="180"
+		<lv_scale name="scale_1" width="180" height="180"
 			mode="round_inner"
 			total_tick_count="11" major_tick_every="2"
 			label_show="true"
@@ -21,7 +21,7 @@
 			min_value="0" max_value="100" />
 
 		<!-- Ticks outside: clock face / dial -->
-		<lv_scale width="180" height="180"
+		<lv_scale name="scale_2" width="180" height="180"
 			mode="round_outer"
 			total_tick_count="11" major_tick_every="2"
 			label_show="true"

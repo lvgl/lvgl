@@ -13,13 +13,10 @@
 <screen>
 	<view>
 		<!-- 💡 Move or remove `'&#10;'` (the XML newline entity) tokens inside `map` to change how buttons are grouped into rows. -->
-		<lv_label width="100%" style_text_align="center" text="Button matrix: map and row breaks" />
-
 		<!-- 3x3 numeric keypad: rows split by '&#10;' (XML entity = newline) inside the map -->
-		<lv_buttonmatrix
+		<lv_buttonmatrix name="buttonmatrix"
 			align="center"
-			y="20"
-			width="220"
+			width="90%"
 			height="180"
 			map="'1' '2' '3' '&#10;' '4' '5' '6' '&#10;' '7' '8' '9'"
 		/>

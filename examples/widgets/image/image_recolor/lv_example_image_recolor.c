@@ -34,27 +34,24 @@ void lv_example_image_recolor(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Drag the slider; the logo's tint fades in and out as `subject_opa` (0..255) moves. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Image: recolor");
+    lv_obj_t * image = lv_image_create(screen);
+    lv_image_set_src(image, &img_example_lvgl_logo);
+    lv_obj_set_style_image_recolor(image, lv_color_hex(0xef4444), LV_PART_MAIN);
+    lv_obj_bind_style_prop(image, LV_STYLE_IMAGE_RECOLOR_OPA, LV_PART_MAIN, &subject_opa);
 
-    lv_obj_t * lv_image_0 = lv_image_create(screen);
-    lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
-    lv_obj_set_style_image_recolor(lv_image_0, lv_color_hex(0xef4444), LV_PART_MAIN);
-    lv_obj_bind_style_prop(lv_image_0, LV_STYLE_IMAGE_RECOLOR_OPA, LV_PART_MAIN, &subject_opa);
+    lv_obj_t * slider = lv_slider_create(screen);
+    lv_obj_set_width(slider, 240);
+    lv_slider_set_min_value(slider, 0);
+    lv_slider_set_max_value(slider, 255);
+    lv_slider_bind_value(slider, &subject_opa);
 
-    lv_obj_t * lv_slider_0 = lv_slider_create(screen);
-    lv_obj_set_width(lv_slider_0, 240);
-    lv_slider_set_min_value(lv_slider_0, 0);
-    lv_slider_set_max_value(lv_slider_0, 255);
-    lv_slider_bind_value(lv_slider_0, &subject_opa);
-
-    lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_label_bind_text(lv_label_1, &subject_opa, "recolor_opa = %d / 255");
+    lv_obj_t * label = lv_label_create(screen);
+    lv_label_bind_text(label, &subject_opa, "recolor_opa = %d / 255");
 }
 #endif

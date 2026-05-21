@@ -43,26 +43,26 @@ void lv_example_style_blur(void)
     lv_obj_set_style_pad_all(screen, 10, 0);
 
     /* 💡 The text under the card is blurred; lower the card's `bg_opa` or raise `blur_radius` for a stronger frost. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0,
+    lv_obj_t * label_1 = lv_label_create(screen);
+    lv_obj_set_align(label_1, LV_ALIGN_CENTER);
+    lv_obj_set_width(label_1, lv_pct(100));
+    lv_obj_set_style_text_align(label_1, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text(label_1,
                       "Hey there, I'm a little text in the background which is blurred. You might seem that some of parts are sharp, but other under the glass cannot be read. ");
 
-    lv_obj_t * lv_button_0 = lv_button_create(screen);
-    lv_obj_set_align(lv_button_0, LV_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(lv_button_0, 16, 0);
-    lv_obj_set_y(lv_button_0, 55);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_button_0);
-    lv_label_set_text(lv_label_1, "Click me");
+    lv_obj_t * button = lv_button_create(screen);
+    lv_obj_set_align(button, LV_ALIGN_CENTER);
+    lv_obj_set_style_pad_all(button, 16, 0);
+    lv_obj_set_y(button, 55);
+    lv_obj_t * label_2 = lv_label_create(button);
+    lv_label_set_text(label_2, "Click me");
 
-    lv_obj_t * lv_obj_1 = lv_obj_create(screen);
-    lv_obj_set_size(lv_obj_1, 210, 110);
-    lv_obj_set_align(lv_obj_1, LV_ALIGN_CENTER);
-    lv_obj_add_style(lv_obj_1, &style_glass, 0);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_obj_1);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "Frosted glass");
+    lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_size(container, 210, 110);
+    lv_obj_set_align(container, LV_ALIGN_CENTER);
+    lv_obj_add_style(container, &style_glass, 0);
+    lv_obj_t * label_3 = lv_label_create(container);
+    lv_obj_set_align(label_3, LV_ALIGN_CENTER);
+    lv_label_set_text(label_3, "Frosted glass");
 }
 #endif

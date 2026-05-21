@@ -24,14 +24,14 @@ void lv_example_switch_orientation(void)
     lv_obj_set_style_pad_column(screen, 32, 0);
 
     /* 💡 Swap `orientation` on either switch to compare auto-derived vs explicit layouts. */
-    lv_obj_t * lv_switch_0 = lv_switch_create(screen);
-    lv_obj_set_size(lv_switch_0, 60, 30);
-    lv_switch_set_orientation(lv_switch_0, LV_SWITCH_ORIENTATION_HORIZONTAL);
-    lv_obj_set_state(lv_switch_0, LV_STATE_CHECKED, true);
+    lv_obj_t * sw_1 = lv_switch_create(screen);
+    lv_obj_set_size(sw_1, 60, 30);
+    lv_switch_set_orientation(sw_1, LV_SWITCH_ORIENTATION_HORIZONTAL);
+    lv_obj_set_state(sw_1, LV_STATE_CHECKED, true);
 
-    lv_obj_t * lv_switch_1 = lv_switch_create(screen);
-    lv_obj_set_size(lv_switch_1, 30, 60);
-    lv_switch_set_orientation(lv_switch_1, LV_SWITCH_ORIENTATION_VERTICAL);
-    lv_obj_set_state(lv_switch_1, LV_STATE_CHECKED, true);
+    lv_obj_t * sw_2 = lv_switch_create(screen);
+    lv_obj_set_size(sw_2, 30, 60);
+    lv_switch_set_orientation(sw_2, LV_SWITCH_ORIENTATION_VERTICAL);
+    lv_obj_set_state(sw_2, LV_STATE_CHECKED, true);
 }
 #endif

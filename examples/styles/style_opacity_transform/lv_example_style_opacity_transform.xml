@@ -22,27 +22,25 @@
 			text_color="0xffffff" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
 		<!-- 💡 The third button shares the same style; only `opa` + the `transform_*` props change it. -->
-		<lv_label width="100%" style_text_align="center" text="Style: opacity and transform" />
-
-		<lv_button width="130">
+		<lv_button name="button_1" width="130">
 			<style name="style_btn" />
-			<lv_label align="center" text="Normal" />
+			<lv_label name="label_1" align="center" text="Normal" />
 		</lv_button>
 
-		<lv_button width="130" style_opa="128">
+		<lv_button name="button_2" width="130" style_opa="128">
 			<style name="style_btn" />
-			<lv_label align="center" text="Opa 50%" />
+			<lv_label name="label_2" align="center" text="Opa 50%" />
 		</lv_button>
 
-		<lv_button width="130" style_opa="128"
+		<lv_button name="button_3" width="130" style_opa="128"
 			style_transform_rotation="110"
 			style_transform_pivot_x="50%"
 			style_transform_pivot_y="50%"
 			style_transform_scale_x="420">
 			<style name="style_btn" />
-			<lv_label align="center" text="Transformed" />
+			<lv_label name="label_3" align="center" text="Transformed" />
 		</lv_button>
 	</view>
 </screen>
