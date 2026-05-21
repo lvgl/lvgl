@@ -57,4 +57,4 @@ set(FASTGLTF_DIFFUSE_TRANSMISSION_SUPPORT
 
 FetchContent_MakeAvailable(fastgltf)
 
-lvgl_link_raw(PRIVATE TARGETS fastgltf::fastgltf FETCHED)
+lvgl_link_raw(PRIVATE TARGETS fastgltf::fastgltf PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

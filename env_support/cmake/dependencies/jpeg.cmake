@@ -76,4 +76,4 @@ set(WITH_CRT_DLL
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libjpeg-turbo)
-lvgl_link_libraries(PRIVATE TARGETS jpeg-static FETCHED)
+lvgl_link_raw(TARGETS jpeg-static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
