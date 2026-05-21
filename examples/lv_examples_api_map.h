@@ -36,6 +36,12 @@ extern "C" {
  *      MACROS
  **********************/
 
+/* get_started */
+#define lv_example_get_started_1       lv_example_get_started_hello_world
+#define lv_example_get_started_2       lv_example_get_started_button
+#define lv_example_get_started_3       lv_example_get_started_slider
+#define lv_example_get_started_4       lv_example_get_started_styles
+
 /* animimg */
 #define lv_example_animimg_1       lv_example_animimg_play
 
