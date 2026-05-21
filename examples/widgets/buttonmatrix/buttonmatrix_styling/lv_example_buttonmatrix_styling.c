@@ -43,14 +43,10 @@ void lv_example_buttonmatrix_styling(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
-
-    /* 💡 Tap a day to switch the checked tile and see the items|checked style apply. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Button matrix: styling parts and states");
 
     /* Weekday matrix with one-checked semantics + styled items */
     lv_obj_t * lv_buttonmatrix_0 = lv_buttonmatrix_create(screen);

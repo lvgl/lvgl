@@ -8,10 +8,8 @@
  square indicator with a hard border instead.
 -->
 <screen>
-	<view flex_flow="row" style_flex_cross_place="center" style_flex_main_place="space_evenly" style_pad_top="56">
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_flex_track_place="center">
 		<!-- 💡 Combine color + border + outline + shadow to design status indicators. -->
-		<lv_label width="100%" style_text_align="center" text="LED: styling" />
-
 		<!-- Round LED with a tight ring outline and a soft outer glow -->
 		<lv_led width="50" height="50" color="0x22c55e"
 			style_border_color="0x14532d" style_border_width="2"

@@ -38,15 +38,12 @@ void lv_example_style_local(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 18, 0);
 
     /* 💡 "Override" is always pink; press "On press" — its `style_bg_color-pressed` wins only while held. Borders never change. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Style: local override");
-
     lv_obj_t * lv_obj_1 = lv_obj_create(screen);
     lv_obj_set_size(lv_obj_1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(lv_obj_1, LV_FLEX_FLOW_ROW);
@@ -57,26 +54,26 @@ void lv_example_style_local(void)
     lv_obj_t * lv_button_0 = lv_button_create(lv_obj_1);
     lv_obj_set_width(lv_button_0, 95);
     lv_obj_add_style(lv_button_0, &style_shared, 0);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "Shared");
+    lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_0, "Shared");
 
     /* Plain local override: fill always wins over the shared style */
     lv_obj_t * lv_button_1 = lv_button_create(lv_obj_1);
     lv_obj_set_width(lv_button_1, 95);
     lv_obj_set_style_bg_color(lv_button_1, lv_color_hex(0xec4899), 0);
     lv_obj_add_style(lv_button_1, &style_shared, 0);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_button_1);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "Override");
+    lv_obj_t * lv_label_1 = lv_label_create(lv_button_1);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_1, "Override");
 
     /* Local state selector: overrides the fill only while pressed */
     lv_obj_t * lv_button_2 = lv_button_create(lv_obj_1);
     lv_obj_set_width(lv_button_2, 95);
     lv_obj_set_style_bg_color(lv_button_2, lv_color_hex(0x10b981), LV_STATE_PRESSED);
     lv_obj_add_style(lv_button_2, &style_shared, 0);
-    lv_obj_t * lv_label_3 = lv_label_create(lv_button_2);
-    lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_3, "On press");
+    lv_obj_t * lv_label_2 = lv_label_create(lv_button_2);
+    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_2, "On press");
 }
 #endif

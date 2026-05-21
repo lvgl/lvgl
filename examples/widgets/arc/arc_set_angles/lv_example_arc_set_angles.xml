@@ -10,8 +10,6 @@
 <screen>
 	<view>
 		<!-- 💡 Edit start_angle/end_angle directly to draw any indicator span independent of value and mode. -->
-		<lv_label width="100%" style_text_align="center" text="Arc: set indicator angles" />
-
 		<!-- Value-driven indicator arc -->
 		<lv_arc
 			align="left_mid"

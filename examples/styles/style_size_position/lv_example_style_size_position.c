@@ -38,29 +38,26 @@ void lv_example_style_size_position(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 22, 0);
 
     /* 💡 Change a card's `width` or `style_pad_all`; `height="content"` keeps it exactly as tall as its text. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Style: size and padding");
-
     lv_obj_t * lv_obj_1 = lv_obj_create(screen);
     lv_obj_set_size(lv_obj_1, 140, LV_SIZE_CONTENT);
     lv_obj_set_style_pad_all(lv_obj_1, 12, 0);
     lv_obj_add_style(lv_obj_1, &style_card, 0);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "140 wide");
+    lv_obj_t * lv_label_0 = lv_label_create(lv_obj_1);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_0, "140 wide");
 
     lv_obj_t * lv_obj_2 = lv_obj_create(screen);
     lv_obj_set_size(lv_obj_2, 240, LV_SIZE_CONTENT);
     lv_obj_set_style_pad_all(lv_obj_2, 28, 0);
     lv_obj_add_style(lv_obj_2, &style_card, 0);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_obj_2);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "240 wide, roomy padding");
+    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_2);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_1, "240 wide, roomy padding");
 }
 #endif

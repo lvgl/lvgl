@@ -9,8 +9,6 @@
 <screen>
 	<view>
 		<!-- 💡 Change min_value, max_value, and value together to see how the indicator span maps onto the same background arc. -->
-		<lv_label width="100%" style_text_align="center" text="Arc: value and range" />
-
 		<!-- Arc with a symmetric custom range -->
 		<lv_arc
 			align="left_mid"

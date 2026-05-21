@@ -17,10 +17,8 @@
 			border_color="0x4b5563" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Click the toggle to flip `subject_flag` between 0 and 1; the panel restyles via `bind_style`. -->
-		<lv_label width="100%" style_text_align="center" text="Obj: bind_style (light / dark)" />
-
 		<lv_obj width="240" height="120" style_pad_all="16" style_radius="8" style_border_width="1">
 			<bind_style name="style_dark" subject="subject_flag" ref_value="1" />
 			<lv_label align="center" text="Panel content" />

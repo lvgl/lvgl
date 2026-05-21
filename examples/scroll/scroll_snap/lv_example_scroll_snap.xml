@@ -8,10 +8,8 @@
  glides over it and lands on a neighbouring, snappable panel instead.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
 		<!-- 💡 Release a drag — panels snap to centre; "No snap" is skipped because `snappable="false"`. -->
-		<lv_label width="100%" style_text_align="center" text="Scroll: centre snap" />
-
 		<lv_obj width="290" height="150" flex_flow="row" style_pad_column="10" scroll_snap_x="center">
 			<lv_button width="120" height="100%"><lv_label align="center" text="Panel 1" /></lv_button>
 			<lv_button width="120" height="100%"><lv_label align="center" text="Panel 2" /></lv_button>

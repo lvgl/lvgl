@@ -10,10 +10,8 @@
 	<consts>
 		<color name="text_color" value="0x013992" />
 	</consts>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Swap width/height or set orientation explicitly to flip the indicator's travel direction. -->
-		<lv_label width="100%" style_text_align="center" text="Bar: orientation and size" />
-
 		<!-- Horizontal bar (auto orientation from width &gt; height) -->
 		<lv_bar width="90%" height="16" min_value="0" max_value="100" value="60">
 			<lv_label align="center" text="horizontal" style_text_color="#text_color" />

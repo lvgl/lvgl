@@ -12,10 +12,8 @@
 		<style name="style_label_bg" bg_opa="100%" radius="6" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Adjust long_mode, width, and height to compare wrap, dots, scroll, circular scroll, and clip results. -->
-		<lv_label width="100%" style_text_align="center" text="Label: all long_mode options" />
-
 		<!-- Wrap mode example -->
 		<lv_label
 			width="170"

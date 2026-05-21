@@ -7,10 +7,8 @@
  label widgets.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Adjust inline #RRGGBB segments to recolor different words and ranges in one label. -->
-		<lv_label width="100%" style_text_align="center" text="Label: text recolor" />
-
 		<!-- Recolor-enabled label using inline #RRGGBB color commands -->
 		<lv_label
 			width="90%"

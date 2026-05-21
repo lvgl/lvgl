@@ -30,21 +30,18 @@ void lv_example_bar_bind_value(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Tap +/- to step; hold to repeat. Reach the limit to see rollover. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Bar: increment via events");
-
     lv_obj_t * lv_bar_0 = lv_bar_create(screen);
     lv_obj_set_size(lv_bar_0, lv_pct(90), 20);
     lv_bar_bind_value(lv_bar_0, &subject_value);
 
-    lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_label_bind_text(lv_label_1, &subject_value, "%d%%");
+    lv_obj_t * lv_label_0 = lv_label_create(screen);
+    lv_label_bind_text(lv_label_0, &subject_value, "%d%%");
 
     lv_obj_t * lv_obj_1 = lv_obj_create(screen);
     lv_obj_set_flex_flow(lv_obj_1, LV_FLEX_FLOW_ROW);
@@ -53,9 +50,9 @@ void lv_example_bar_bind_value(void)
     lv_obj_set_style_border_width(lv_obj_1, 0, 0);
     lv_obj_set_size(lv_obj_1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_t * lv_button_0 = lv_button_create(lv_obj_1);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "-");
+    lv_obj_t * lv_label_1 = lv_label_create(lv_button_0);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_1, "-");
 
     lv_subject_increment_dsc_t * subject_increment_event_0 = lv_obj_add_subject_increment_event(lv_button_0, &subject_value,
                                                                                                 LV_EVENT_CLICKED, -5);
@@ -69,9 +66,9 @@ void lv_example_bar_bind_value(void)
     lv_obj_set_subject_increment_event_rollover(lv_button_0, subject_increment_event_1, true);
 
     lv_obj_t * lv_button_1 = lv_button_create(lv_obj_1);
-    lv_obj_t * lv_label_3 = lv_label_create(lv_button_1);
-    lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_3, "+");
+    lv_obj_t * lv_label_2 = lv_label_create(lv_button_1);
+    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_2, "+");
 
     lv_subject_increment_dsc_t * subject_increment_event_2 = lv_obj_add_subject_increment_event(lv_button_1, &subject_value,
                                                                                                 LV_EVENT_CLICKED, 5);

@@ -18,12 +18,6 @@ void lv_example_arc_set_angles(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
-    /* 💡 Edit start_angle/end_angle directly to draw any indicator span independent of value and mode. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Arc: set indicator angles");
-
     /* Value-driven indicator arc */
     lv_obj_t * lv_arc_0 = lv_arc_create(screen);
     lv_obj_set_align(lv_arc_0, LV_ALIGN_LEFT_MID);
@@ -34,9 +28,9 @@ void lv_example_arc_set_angles(void)
     lv_arc_set_min_value(lv_arc_0, 100);
     lv_arc_set_max_value(lv_arc_0, 200);
     lv_arc_set_value(lv_arc_0, 145);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_arc_0);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "value");
+    lv_obj_t * lv_label_0 = lv_label_create(lv_arc_0);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_0, "value");
 
     /* Indicator angle set explicitly; value/mode are ignored for indicator drawing */
     lv_obj_t * lv_arc_1 = lv_arc_create(screen);
@@ -47,8 +41,8 @@ void lv_example_arc_set_angles(void)
     lv_arc_set_bg_end_angle(lv_arc_1, 45);
     lv_arc_set_start_angle(lv_arc_1, 210);
     lv_arc_set_end_angle(lv_arc_1, 330);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_arc_1);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "angles");
+    lv_obj_t * lv_label_1 = lv_label_create(lv_arc_1);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_1, "angles");
 }
 #endif

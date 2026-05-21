@@ -10,10 +10,8 @@
 <screen>
 	<view>
 		<!-- 💡 Click each dropdown: each list pops toward the screen edge defined by its dir attribute. -->
-		<lv_label width="100%" style_text_align="center" text="Dropdown: open direction" />
-
 		<!-- Default: list opens downward -->
-		<lv_dropdown align="top_mid" y="34" options="Apple&#10;Banana&#10;Orange&#10;Melon" />
+		<lv_dropdown align="top_mid" y="10" options="Apple&#10;Banana&#10;Orange&#10;Melon" />
 
 		<!-- List opens upward -->
 		<lv_dropdown align="bottom_mid" y="-10" dir="top" options="Apple&#10;Banana&#10;Orange&#10;Melon" />

@@ -9,10 +9,8 @@
  both spinboxes (`123`); only the rendering differs.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Move `dec_point_pos` to see the dot shift; the stored value stays at 123. -->
-		<lv_label width="100%" style_text_align="center" text="Spinbox: format" />
-
 		<!-- 3 digits, no decimal point → "123" -->
 		<lv_spinbox width="160"
 			digit_count="3"

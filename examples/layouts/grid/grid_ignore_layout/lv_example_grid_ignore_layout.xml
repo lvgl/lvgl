@@ -12,10 +12,8 @@
 		<style name="style_cell" bg_opa="100%" text_color="0xffffff" pad_all="6" radius="4" />
 	</styles>
 
-	<view flex_flow="column" style_pad_row="8">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="8">
 		<!-- 💡 Toggle ignore_layout on the FREE tile to see how it leaves the grid flow and floats by its own align. -->
-		<lv_label width="100%" style_text_align="center" text="Grid + IGNORE_LAYOUT: one item floats freely" />
-
 		<!-- The red item has flag_ignore_layout="true", so grid ignores it.
 		     The other items keep normal grid placement. -->
 		<!-- Main grid container -->

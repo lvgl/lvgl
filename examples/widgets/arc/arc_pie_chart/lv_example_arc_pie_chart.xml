@@ -14,7 +14,7 @@
  The three shared parts (thick flat-ended main, invisible indicator,
  invisible knob) are factored into named styles. Because position and size
  are style properties too, the `style_pie_main` style also pins
- `width`/`height`/`align`/`y` — so each `<lv_arc>` only carries its slice
+ `width`/`height`/`align` — so each `<lv_arc>` only carries its slice
  angles and its colour.
 -->
 <screen>
@@ -23,7 +23,7 @@
 		     The size and centre alignment live here too, so every slice picks them up. -->
 		<style name="style_pie_main"
 			width="200" height="200"
-			align="center" y="20"
+			align="center"
 			arc_width="100" arc_rounded="false" />
 		<!-- Hide the indicator entirely — we don't drive a value here. -->
 		<style name="style_pie_indicator" arc_opa="0" />
@@ -33,8 +33,6 @@
 
 	<view>
 		<!-- 💡 Edit the `bg_start_angle`/`bg_end_angle` pair on any arc to grow/shrink that slice; the others stay put. -->
-		<lv_label width="100%" style_text_align="center" text="Arc: pie chart" />
-
 		<!-- 5 slices with uneven sweeps so the colours look like a real data breakdown.
 		     Angles measured clockwise from 3 o'clock; the seam between E and A is at 12 o'clock (270°). -->
 		<lv_arc clickable="false"

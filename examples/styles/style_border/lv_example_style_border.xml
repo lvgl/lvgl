@@ -22,10 +22,8 @@
 			border_opa="60%" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Tune `border_width`/`border_opa`, or set `border_side` to `none` to drop the frame. -->
-		<lv_label width="100%" style_text_align="center" text="Style: border" />
-
 		<lv_obj width="210" height="140">
 			<style name="style_framed" />
 			<lv_label align="center" text="Bordered card" />

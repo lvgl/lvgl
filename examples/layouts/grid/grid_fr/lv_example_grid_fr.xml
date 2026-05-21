@@ -7,10 +7,8 @@
  is fixed at 44px and the second uses fr(1) to absorb the leftover height.
 -->
 <screen>
-	<view flex_flow="column">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center">
 		<!-- 💡 Adjust fr() weights and fixed values to compare how remaining space is split across tracks. -->
-		<lv_label width="100%" style_text_align="center" text="Grid FR units: remaining space distribution" />
-
 		<!-- Columns: 60px, 1fr, 2fr.
 		Rows: 44px, 1fr. -->
 		<!-- Main grid container with fixed and FR tracks -->

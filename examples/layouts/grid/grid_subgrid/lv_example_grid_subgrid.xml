@@ -12,11 +12,9 @@
 		<style name="style_tile" bg_opa="100%" text_color="0xffffff" pad_all="6" radius="4" />
 	</styles>
 
-	<view flex_flow="column" style_pad_row="8">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="8">
 		<!-- Screen title label -->
 		<!-- 💡 Adjust descriptors, spans, and colors to explore sub-grid behavior. -->
-		<lv_label width="100%" style_text_align="center" text="Grid: sub-grid inherits parent tracks" />
-
 		<!-- Parent grid container -->
 		<lv_obj
 			style_grid_column_dsc_array="60 60 60"

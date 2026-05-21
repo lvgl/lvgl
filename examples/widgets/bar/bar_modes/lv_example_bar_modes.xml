@@ -11,10 +11,8 @@
 	<consts>
 		<color name="text_color" value="0x013992" />
 	</consts>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Switch mode and range values together: symmetrical needs negative+positive range, range mode uses start_value + value. -->
-		<lv_label width="100%" style_text_align="center" text="Bar: modes" />
-
 		<!-- Normal mode -->
 		<lv_bar width="90%" height="16" mode="normal" min_value="0" max_value="100" value="70">
 			<lv_label align="center" text="normal" style_text_color="#text_color" />

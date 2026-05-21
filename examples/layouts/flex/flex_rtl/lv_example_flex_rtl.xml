@@ -12,10 +12,8 @@
 		<style name="style_label" bg_opa="100%" text_color="0xffffff" pad_all="8" />
 	</styles>
 
-	<view flex_flow="column" style_pad_row="10">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="10">
 		<!-- 💡 Switch style_base_dir between ltr and rtl to compare item ordering on the same row setup. -->
-		<lv_label width="100%" style_text_align="center" text="RTL: items flow from right to left" />
-
 		<!-- LTR row for comparison -->
 		<!-- Default left-to-right row -->
 		<lv_label text="LTR (default):" />

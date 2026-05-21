@@ -68,15 +68,12 @@ void lv_example_slider_styling(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 20, 0);
 
     /* 💡 Drag the knob slowly to see the knob-pressed style kick in. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Slider: styling parts and states");
-
     lv_obj_t * lv_slider_0 = lv_slider_create(screen);
     lv_obj_set_size(lv_slider_0, lv_pct(90), 22);
     lv_slider_set_min_value(lv_slider_0, 0);

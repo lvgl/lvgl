@@ -18,16 +18,10 @@ void lv_example_dropdown_direction(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
-    /* 💡 Click each dropdown: each list pops toward the screen edge defined by its dir attribute. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Dropdown: open direction");
-
     /* Default: list opens downward */
     lv_obj_t * lv_dropdown_0 = lv_dropdown_create(screen);
     lv_obj_set_align(lv_dropdown_0, LV_ALIGN_TOP_MID);
-    lv_obj_set_y(lv_dropdown_0, 34);
+    lv_obj_set_y(lv_dropdown_0, 10);
     lv_dropdown_set_options(lv_dropdown_0, "Apple\nBanana\nOrange\nMelon");
 
     /* List opens upward */

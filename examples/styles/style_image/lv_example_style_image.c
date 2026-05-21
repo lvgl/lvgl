@@ -40,15 +40,12 @@ void lv_example_style_image(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 The bitmap is tinted and rotated by style alone; lower `image_recolor_opa` to fade the tint or change `transform_rotation`. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Style: image recolor and rotation");
-
     lv_obj_t * lv_image_0 = lv_image_create(screen);
     lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
     lv_obj_add_style(lv_image_0, &style_img, 0);

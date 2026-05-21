@@ -34,15 +34,12 @@ void lv_example_image_recolor(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Drag the slider; the logo's tint fades in and out as `subject_opa` (0..255) moves. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Image: recolor");
-
     lv_obj_t * lv_image_0 = lv_image_create(screen);
     lv_image_set_src(lv_image_0, &img_example_lvgl_logo);
     lv_obj_set_style_image_recolor(lv_image_0, lv_color_hex(0xef4444), LV_PART_MAIN);
@@ -54,7 +51,7 @@ void lv_example_image_recolor(void)
     lv_slider_set_max_value(lv_slider_0, 255);
     lv_slider_bind_value(lv_slider_0, &subject_opa);
 
-    lv_obj_t * lv_label_1 = lv_label_create(screen);
-    lv_label_bind_text(lv_label_1, &subject_opa, "recolor_opa = %d / 255");
+    lv_obj_t * lv_label_0 = lv_label_create(screen);
+    lv_label_bind_text(lv_label_0, &subject_opa, "recolor_opa = %d / 255");
 }
 #endif

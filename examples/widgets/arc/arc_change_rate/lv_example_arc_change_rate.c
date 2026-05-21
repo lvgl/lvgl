@@ -17,12 +17,6 @@ void lv_example_arc_change_rate(void)
 {
     lv_obj_t * screen = lv_screen_active();
 
-    /* 💡 Drag each arc quickly: lower change_rate responds more slowly, higher change_rate tracks your pointer faster. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Arc: change rate");
-
     /* Slower response arc */
     lv_obj_t * lv_arc_0 = lv_arc_create(screen);
     lv_obj_set_align(lv_arc_0, LV_ALIGN_LEFT_MID);
@@ -32,9 +26,9 @@ void lv_example_arc_change_rate(void)
     lv_arc_set_bg_end_angle(lv_arc_0, 45);
     lv_arc_set_change_rate(lv_arc_0, 40);
     lv_arc_set_value(lv_arc_0, 35);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_arc_0);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "rate=40");
+    lv_obj_t * lv_label_0 = lv_label_create(lv_arc_0);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_0, "rate=40");
 
     /* Faster response arc */
     lv_obj_t * lv_arc_1 = lv_arc_create(screen);
@@ -45,8 +39,8 @@ void lv_example_arc_change_rate(void)
     lv_arc_set_bg_end_angle(lv_arc_1, 45);
     lv_arc_set_change_rate(lv_arc_1, 360);
     lv_arc_set_value(lv_arc_1, 35);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_arc_1);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "rate=360");
+    lv_obj_t * lv_label_1 = lv_label_create(lv_arc_1);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_1, "rate=360");
 }
 #endif

@@ -20,14 +20,9 @@ void lv_example_keyboard_textarea(void)
     lv_obj_t * screen = lv_screen_active();
 
     /* 💡 Tap the textarea to focus it, then type — the keyboard writes into the focused input. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Keyboard: with text area");
-
     lv_obj_t * lv_textarea_0 = lv_textarea_create(screen);
     lv_obj_set_align(lv_textarea_0, LV_ALIGN_TOP_MID);
-    lv_obj_set_y(lv_textarea_0, 40);
+    lv_obj_set_y(lv_textarea_0, 10);
     lv_obj_set_size(lv_textarea_0, lv_pct(90), 80);
     lv_textarea_set_one_line(lv_textarea_0, true);
     lv_textarea_set_placeholder_text(lv_textarea_0, "Type here...");

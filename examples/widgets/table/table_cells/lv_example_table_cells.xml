@@ -9,10 +9,8 @@
  walk row-major.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Add another `<lv_table-cell>` with different `row`/`column` to populate more cells. -->
-		<lv_label width="100%" style_text_align="center" text="Table: cell values" />
-
 		<lv_table row_count="3" column_count="2">
 			<!-- Header row -->
 			<lv_table-cell row="0" column="0" value="City" />

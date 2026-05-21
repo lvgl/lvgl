@@ -8,10 +8,8 @@
  simply clipped and the panel cannot be scrolled at all.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
 		<!-- 💡 Left panel scrolls; the right has `scrollable="false"` so the same content is just clipped. -->
-		<lv_label width="100%" style_text_align="center" text="Scroll: scrollable flag" />
-
 		<lv_obj width="100%" height="160" flex_flow="row" style_flex_main_place="center" style_pad_column="16">
 			<!-- Default: scrollable -->
 			<lv_obj width="130" height="100%" flex_flow="column" style_pad_row="8">

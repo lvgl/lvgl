@@ -16,7 +16,7 @@
 		<style name="style_bar_indicator" bg_image_src="img_bar_indicator" bg_opa="0" radius="0" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Drag the slider to change subject_value; the bar reveals more of the segmented indicator image as the value rises. -->
 		<lv_bar width="280" height="35" min_value="0" max_value="20" bind_value="subject_value2">
 			<style name="style_bar_track" selector="main" />

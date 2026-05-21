@@ -20,10 +20,8 @@
 		<style name="style_block" radius="10" bg_opa="100%" bg_color="#accent" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="18">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="18">
 		<!-- 💡 Edit each card's `style_pad_*`; the accent block tracks the shrinking content area. -->
-		<lv_label width="100%" style_text_align="center" text="Style: padding" />
-
 		<lv_obj width="content" height="content" flex_flow="row"
 			style_pad_column="22" style_bg_opa="0" style_border_width="0" style_pad_all="0">
 			<lv_obj width="120" height="120"

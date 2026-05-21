@@ -17,10 +17,8 @@
 		<style name="style_scrollbar" width="10" radius="5" bg_color="#accent" bg_opa="100%" pad_right="4" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
 		<!-- 💡 Both panels scroll; only the right one ever shows a scrollbar. -->
-		<lv_label width="100%" style_text_align="center" text="Scroll: scrollbar mode" />
-
 		<lv_obj width="100%" height="160" flex_flow="row" style_flex_main_place="center" style_pad_column="16">
 			<!-- scrollbar_mode="off": scrolls, bar never shown -->
 			<lv_obj width="130" height="100%" flex_flow="column" style_pad_row="8" scrollbar_mode="off">

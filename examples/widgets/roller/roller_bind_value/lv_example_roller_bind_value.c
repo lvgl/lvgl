@@ -27,15 +27,12 @@ void lv_example_roller_bind_value(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Scroll the roller, or click the button to snap to a fixed option through the subject. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Roller: bind to subject");
-
     lv_obj_t * lv_roller_0 = lv_roller_create(screen);
     lv_obj_set_width(lv_roller_0, 160);
     lv_roller_set_visible_row_count(lv_roller_0, 3);
@@ -43,9 +40,9 @@ void lv_example_roller_bind_value(void)
     lv_roller_bind_value(lv_roller_0, &subject_index);
 
     lv_obj_t * lv_button_0 = lv_button_create(screen);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "Jump to Wed");
+    lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_0, "Jump to Wed");
 
     lv_obj_add_subject_set_int_event(lv_button_0, &subject_index, LV_EVENT_CLICKED, 2);
 }

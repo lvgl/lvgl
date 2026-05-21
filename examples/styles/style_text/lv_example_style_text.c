@@ -43,22 +43,19 @@ void lv_example_style_text(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Tune `text_letter_space`/`text_line_space`, or switch `text_decor` to `strikethrough`. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Style: text properties");
-
     lv_obj_t * lv_obj_1 = lv_obj_create(screen);
     lv_obj_set_size(lv_obj_1, 240, LV_SIZE_CONTENT);
     lv_obj_add_style(lv_obj_1, &style_card, 0);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_1);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_obj_set_style_text_align(lv_label_1, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_1, "Modern\nTypography");
-    lv_obj_add_style(lv_label_1, &style_heading, 0);
+    lv_obj_t * lv_label_0 = lv_label_create(lv_obj_1);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text(lv_label_0, "Modern\nTypography");
+    lv_obj_add_style(lv_label_0, &style_heading, 0);
 }
 #endif

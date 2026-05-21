@@ -10,10 +10,8 @@
  month/year selector variant.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Tap a day to select it; use the header arrows to jump between months. -->
-		<lv_label width="100%" style_text_align="center" text="Calendar: basics" />
-
 		<lv_calendar width="90%" height="200"
 			today_year="2026" today_month="5" today_day="15"
 			shown_year="2026" shown_month="5">

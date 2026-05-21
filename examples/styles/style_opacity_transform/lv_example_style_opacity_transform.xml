@@ -22,10 +22,8 @@
 			text_color="0xffffff" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
 		<!-- 💡 The third button shares the same style; only `opa` + the `transform_*` props change it. -->
-		<lv_label width="100%" style_text_align="center" text="Style: opacity and transform" />
-
 		<lv_button width="130">
 			<style name="style_btn" />
 			<lv_label align="center" text="Normal" />

@@ -33,10 +33,8 @@
 			pad_ver="2" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Tap a digit position to move the cursor and see the cursor style highlight it. -->
-		<lv_label width="100%" style_text_align="center" text="Spinbox: styling parts" />
-
 		<lv_spinbox width="180"
 			digit_count="5"
 			value="12345"

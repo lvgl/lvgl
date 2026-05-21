@@ -24,10 +24,8 @@
 			transform_rotation="300" />
 	</styles>
 
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 The bitmap is tinted and rotated by style alone; lower `image_recolor_opa` to fade the tint or change `transform_rotation`. -->
-		<lv_label width="100%" style_text_align="center" text="Style: image recolor and rotation" />
-
 		<lv_image src="img_example_lvgl_logo">
 			<style name="style_img" />
 		</lv_image>

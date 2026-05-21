@@ -7,10 +7,8 @@
  itself with style_grid_cell_column_pos and style_grid_cell_row_pos.
 -->
 <screen>
-	<view flex_flow="column">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center">
 		<!-- 💡 Adjust style_grid_column_dsc_array and style_grid_row_dsc_array to change fixed track sizes. -->
-		<lv_label width="100%" style_text_align="center" text="Grid descriptors: fixed tracks (3x2)" />
-
 		<!-- Define 3 columns and 2 rows with fixed pixel sizes. -->
 		<!-- Main grid container with fixed descriptors -->
 		<lv_obj

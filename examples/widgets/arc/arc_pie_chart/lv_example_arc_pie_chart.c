@@ -21,7 +21,7 @@
  * The three shared parts (thick flat-ended main, invisible indicator,
  * invisible knob) are factored into named styles. Because position and size
  * are style properties too, the `style_pie_main` style also pins
- * `width`/`height`/`align`/`y` — so each `<lv_arc>` only carries its slice
+ * `width`/`height`/`align` — so each `<lv_arc>` only carries its slice
  * angles and its colour.
  */
 void lv_example_arc_pie_chart(void)
@@ -37,7 +37,6 @@ void lv_example_arc_pie_chart(void)
         lv_style_set_width(&style_pie_main, 200);
         lv_style_set_height(&style_pie_main, 200);
         lv_style_set_align(&style_pie_main, LV_ALIGN_CENTER);
-        lv_style_set_y(&style_pie_main, 20);
         lv_style_set_arc_width(&style_pie_main, 100);
         lv_style_set_arc_rounded(&style_pie_main, false);
 
@@ -51,12 +50,6 @@ void lv_example_arc_pie_chart(void)
     }
 
     lv_obj_t * screen = lv_screen_active();
-
-    /* 💡 Edit the `bg_start_angle`/`bg_end_angle` pair on any arc to grow/shrink that slice; the others stay put. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Arc: pie chart");
 
     /* 5 slices with uneven sweeps so the colours look like a real data breakdown.
        Angles measured clockwise from 3 o'clock; the seam between E and A is at 12 o'clock (270°). */

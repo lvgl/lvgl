@@ -9,10 +9,8 @@
  same wrapper so its labels scroll in lockstep with the bars.
 -->
 <screen>
-	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Drag horizontally to scroll the chart; the scale below follows because both share the scrolling wrapper. -->
-		<lv_label width="100%" style_text_align="center" text="Chart: scrollable" />
-
 		<!-- Viewport: small fixed width; clips its scrollable child. -->
 		<lv_obj width="220" height="180" style_pad_all="0">
 			<!-- Wrapper: wider than the viewport so it scrolls. Hosts both chart and scale stacked vertically. -->

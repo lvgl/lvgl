@@ -54,23 +54,19 @@ void lv_example_button_styling(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 20, 0);
-
-    /* 💡 Press or toggle a button to see the state-specific style swap in. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Button: styling with parts and states");
 
     /* Default button (resting style only) */
     lv_obj_t * lv_button_0 = lv_button_create(screen);
     lv_obj_set_size(lv_button_0, 180, 48);
     lv_obj_add_style(lv_button_0, &style_button, 0);
     lv_obj_add_style(lv_button_0, &style_button_pressed, LV_STATE_PRESSED);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "Press me");
+    lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_0, "Press me");
 
     /* Checkable button: swaps to the checked style on toggle */
     lv_obj_t * lv_button_1 = lv_button_create(screen);
@@ -79,9 +75,9 @@ void lv_example_button_styling(void)
     lv_obj_add_style(lv_button_1, &style_button, 0);
     lv_obj_add_style(lv_button_1, &style_button_pressed, LV_STATE_PRESSED);
     lv_obj_add_style(lv_button_1, &style_button_checked, LV_STATE_CHECKED);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_button_1);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "Toggle me");
+    lv_obj_t * lv_label_1 = lv_label_create(lv_button_1);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_1, "Toggle me");
 
     /* Local style_* overrides: pure-CSS-style attribute styling, no named block needed */
     lv_obj_t * lv_button_2 = lv_button_create(screen);
@@ -93,8 +89,8 @@ void lv_example_button_styling(void)
     lv_obj_set_style_border_width(lv_button_2, 2, 0);
     lv_obj_set_style_text_color(lv_button_2, lv_color_hex(0x451a03), 0);
     lv_obj_set_style_pad_all(lv_button_2, 10, 0);
-    lv_obj_t * lv_label_3 = lv_label_create(lv_button_2);
-    lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_3, "Local props");
+    lv_obj_t * lv_label_2 = lv_label_create(lv_button_2);
+    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_2, "Local props");
 }
 #endif

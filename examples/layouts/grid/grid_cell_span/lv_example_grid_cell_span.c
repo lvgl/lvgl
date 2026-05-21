@@ -32,12 +32,9 @@ void lv_example_grid_cell_span(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-
-    /* 💡 Adjust style_grid_cell_*_span and *_align values to test spanning and per-cell alignment behaviors. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Grid cells: alignment and span");
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
 
     /* Main grid container for alignment and span cases */
     lv_obj_t * lv_obj_1 = lv_obj_create(screen);
@@ -55,8 +52,8 @@ void lv_example_grid_cell_span(void)
     lv_obj_set_style_grid_cell_row_pos(lv_obj_2, 0, 0);
     lv_obj_set_size(lv_obj_2, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_add_style(lv_obj_2, &style_card, 0);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_2);
-    lv_label_set_text(lv_label_1, "start/start");
+    lv_obj_t * lv_label_0 = lv_label_create(lv_obj_2);
+    lv_label_set_text(lv_label_0, "start/start");
 
     /* Cell aligned to center/center */
     lv_obj_t * lv_obj_3 = lv_obj_create(lv_obj_1);
@@ -66,8 +63,8 @@ void lv_example_grid_cell_span(void)
     lv_obj_set_style_grid_cell_row_pos(lv_obj_3, 0, 0);
     lv_obj_set_size(lv_obj_3, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_add_style(lv_obj_3, &style_card, 0);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_obj_3);
-    lv_label_set_text(lv_label_2, "center");
+    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_3);
+    lv_label_set_text(lv_label_1, "center");
 
     /* Cell aligned to end/end */
     lv_obj_t * lv_obj_4 = lv_obj_create(lv_obj_1);
@@ -77,8 +74,8 @@ void lv_example_grid_cell_span(void)
     lv_obj_set_style_grid_cell_row_pos(lv_obj_4, 0, 0);
     lv_obj_set_size(lv_obj_4, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_add_style(lv_obj_4, &style_card, 0);
-    lv_obj_t * lv_label_3 = lv_label_create(lv_obj_4);
-    lv_label_set_text(lv_label_3, "end/end");
+    lv_obj_t * lv_label_2 = lv_label_create(lv_obj_4);
+    lv_label_set_text(lv_label_2, "end/end");
 
     /* Item spanning two columns */
     lv_obj_t * lv_obj_5 = lv_obj_create(lv_obj_1);
@@ -89,9 +86,9 @@ void lv_example_grid_cell_span(void)
     lv_obj_set_style_grid_cell_row_pos(lv_obj_5, 1, 0);
     lv_obj_set_style_bg_color(lv_obj_5, lv_color_hex(0xd8ecff), 0);
     lv_obj_set_style_bg_opa(lv_obj_5, (255 * 100 / 100), 0);
-    lv_obj_t * lv_label_4 = lv_label_create(lv_obj_5);
-    lv_label_set_text(lv_label_4, "span 2 columns");
-    lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
+    lv_obj_t * lv_label_3 = lv_label_create(lv_obj_5);
+    lv_label_set_text(lv_label_3, "span 2 columns");
+    lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
 
     /* Item spanning two rows */
     lv_obj_t * lv_obj_6 = lv_obj_create(lv_obj_1);
@@ -102,8 +99,8 @@ void lv_example_grid_cell_span(void)
     lv_obj_set_style_grid_cell_row_span(lv_obj_6, 2, 0);
     lv_obj_set_style_bg_color(lv_obj_6, lv_color_hex(0xffe8cc), 0);
     lv_obj_set_style_bg_opa(lv_obj_6, (255 * 100 / 100), 0);
-    lv_obj_t * lv_label_5 = lv_label_create(lv_obj_6);
-    lv_label_set_text(lv_label_5, "span\n2 rows");
-    lv_obj_set_align(lv_label_5, LV_ALIGN_CENTER);
+    lv_obj_t * lv_label_4 = lv_label_create(lv_obj_6);
+    lv_label_set_text(lv_label_4, "span\n2 rows");
+    lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
 }
 #endif

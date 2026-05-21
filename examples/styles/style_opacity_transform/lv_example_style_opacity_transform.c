@@ -36,29 +36,26 @@ void lv_example_style_opacity_transform(void)
 
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 12, 0);
 
     /* 💡 The third button shares the same style; only `opa` + the `transform_*` props change it. */
-    lv_obj_t * lv_label_0 = lv_label_create(screen);
-    lv_obj_set_width(lv_label_0, lv_pct(100));
-    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text(lv_label_0, "Style: opacity and transform");
-
     lv_obj_t * lv_button_0 = lv_button_create(screen);
     lv_obj_set_width(lv_button_0, 130);
     lv_obj_add_style(lv_button_0, &style_btn, 0);
-    lv_obj_t * lv_label_1 = lv_label_create(lv_button_0);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_1, "Normal");
+    lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_0, "Normal");
 
     lv_obj_t * lv_button_1 = lv_button_create(screen);
     lv_obj_set_width(lv_button_1, 130);
     lv_obj_set_style_opa(lv_button_1, 128, 0);
     lv_obj_add_style(lv_button_1, &style_btn, 0);
-    lv_obj_t * lv_label_2 = lv_label_create(lv_button_1);
-    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_2, "Opa 50%");
+    lv_obj_t * lv_label_1 = lv_label_create(lv_button_1);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_1, "Opa 50%");
 
     lv_obj_t * lv_button_2 = lv_button_create(screen);
     lv_obj_set_width(lv_button_2, 130);
@@ -68,8 +65,8 @@ void lv_example_style_opacity_transform(void)
     lv_obj_set_style_transform_pivot_y(lv_button_2, lv_pct(50), 0);
     lv_obj_set_style_transform_scale_x(lv_button_2, 420, 0);
     lv_obj_add_style(lv_button_2, &style_btn, 0);
-    lv_obj_t * lv_label_3 = lv_label_create(lv_button_2);
-    lv_obj_set_align(lv_label_3, LV_ALIGN_CENTER);
-    lv_label_set_text(lv_label_3, "Transformed");
+    lv_obj_t * lv_label_2 = lv_label_create(lv_button_2);
+    lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
+    lv_label_set_text(lv_label_2, "Transformed");
 }
 #endif

@@ -8,10 +8,8 @@
  changes the layout itself.
 -->
 <screen>
-	<view flex_flow="row_wrap" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_all="8">
+	<view flex_flow="row_wrap" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_flex_track_place="center" style_pad_all="8">
 		<!-- 💡 Change tab_bar_position to top/bottom/left/right to move the tab bar. -->
-		<lv_label width="100%" style_text_align="center" text="Tab view: tab bar position" />
-
 		<!-- Bar on the top edge -->
 		<lv_tabview
 			width="45%"

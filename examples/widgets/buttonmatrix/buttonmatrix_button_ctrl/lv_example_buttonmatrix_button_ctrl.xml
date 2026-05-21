@@ -10,12 +10,9 @@
 <screen>
 	<view>
 		<!-- 💡 Edit individual `ctrl_map` tokens to see how each button state is rendered and which still receives input. -->
-		<lv_label width="100%" style_text_align="center" text="Button matrix: per-button control flags" />
-
 		<!-- One row with four differently-flagged buttons -->
 		<lv_buttonmatrix
 			align="center"
-			y="30"
 			width="90%"
 			height="60"
 			map="'Normal' 'Checked' 'Disabled' 'Hidden'"

@@ -22,6 +22,7 @@ void lv_example_tabview_basic(void)
     lv_obj_t * lv_tabview_0 = lv_tabview_create(screen);
     lv_obj_set_size(lv_tabview_0, lv_pct(100), lv_pct(100));
     lv_obj_t * lv_tabview_tab_0 = lv_tabview_add_tab(lv_tabview_0, "Tab 1");
+    lv_obj_set_name(lv_tabview_tab_0, "this is tab 1");
     lv_obj_t * lv_label_0 = lv_label_create(lv_tabview_tab_0);
     lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_0, "First tab");
@@ -35,5 +36,18 @@ void lv_example_tabview_basic(void)
     lv_obj_t * lv_label_2 = lv_label_create(lv_tabview_tab_2);
     lv_obj_set_align(lv_label_2, LV_ALIGN_CENTER);
     lv_label_set_text(lv_label_2, "Third tab");
+
+
+    //    lv_obj_t * internal0 = lv_obj_get_child_by_name(lv_tabview_0, "lv_obj_0");
+    //    lv_obj_t * internal1 = lv_obj_get_child_by_name(lv_tabview_0, "lv_obj_1");
+
+
+    list_name(lv_screen_active(), 0);
+
+
+
 }
+
+
+
 #endif
