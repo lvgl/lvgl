@@ -56,7 +56,7 @@ function(lvgl_link_packages)
   cmake_parse_arguments(ARG "${options}" "" "${multiValueArgs}" ${ARGN})
 
   set(SCOPE PRIVATE)
-  if(ARG_PUBLIC)
+  if(ARG_PUBLIC OR CONFIG_LV_USE_PRIVATE_API)
     set(SCOPE PUBLIC)
   endif()
 
@@ -97,7 +97,7 @@ function(lvgl_link_pkg_config)
   cmake_parse_arguments(ARG "${options}" "" "${multiValueArgs}" ${ARGN})
 
   set(SCOPE PRIVATE)
-  if(ARG_PUBLIC)
+  if(ARG_PUBLIC OR CONFIG_LV_USE_PRIVATE_API)
     set(SCOPE PUBLIC)
   endif()
 
@@ -131,8 +131,13 @@ function(lvgl_link_raw)
   set(multiValueArgs TARGETS PKG_LIB_PRIVATE)
   cmake_parse_arguments(ARG "" "" "${multiValueArgs}" ${ARGN})
 
+  set(SCOPE PRIVATE)
+  if(CONFIG_LV_USE_PRIVATE_API)
+    set(SCOPE PUBLIC)
+  endif()
+
   if(ARG_TARGETS)
-    target_link_libraries(lvgl PRIVATE ${ARG_TARGETS})
+    target_link_libraries(lvgl ${SCOPE} ${ARG_TARGETS})
   endif()
 
   if(ARG_PKG_LIB_PRIVATE)
