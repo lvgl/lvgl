@@ -1,0 +1,46 @@
+<!--
+ @title Scale section bind min/max
+ @brief Drive a scale section's range live from two subjects.
+
+ The scale has a single styled section whose `bind_min_value`/`bind_max_value`
+ are wired to `subject_value2` and `subject_value` respectively. Two sliders
+ edit those subjects, so dragging them moves the start and end of the
+ highlighted band on the scale — useful for "safe range" indicators on gauges.
+-->
+<screen>
+	<styles>
+		<style name="style_section_main" line_color="0xef4444" line_width="4" text_color="0xef4444" />
+		<style name="style_section_items" line_color="0xef4444" line_width="2" text_color="0xef4444" />
+		<style name="style_section_indicator" line_color="0xef4444" line_width="4" text_color="0xef4444" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Move the sliders; the red section on the scale grows and shrinks because its bounds are bound to the subjects. -->
+		<lv_label width="100%" style_text_align="center" text="Scale: bind section bounds" />
+
+		<lv_scale
+			width="280"
+			height="80"
+			mode="horizontal_bottom"
+			total_tick_count="11"
+			major_tick_every="2"
+			label_show="true"
+			min_value="0"
+			max_value="100"
+		>
+			<lv_scale-section
+				style_main="style_section_main"
+				style_items="style_section_items"
+				style_indicator="style_section_indicator"
+				bind_min_value="subject_value2"
+				bind_max_value="subject_value"
+			/>
+		</lv_scale>
+
+		<lv_label text="Section start (subject_value2)" />
+		<lv_slider width="240" bind_value="subject_value2" />
+
+		<lv_label text="Section end (subject_value)" />
+		<lv_slider width="240" bind_value="subject_value" />
+	</view>
+</screen>

@@ -1,0 +1,49 @@
+<!--
+ @title Flex RTL
+ @brief Reverse the main axis direction with style_base_dir.
+
+ The same three children appear in two identical row containers. Setting style_base_dir
+ to rtl on the second container reverses item ordering on the main axis without changing
+ the order of children in XML — handy for right-to-left languages or mirrored layouts.
+-->
+<screen>
+	<styles>
+		<!-- Shared style for colored labels -->
+		<style name="style_label" bg_opa="100%" text_color="0xffffff" pad_all="8" />
+	</styles>
+
+	<view flex_flow="column" style_pad_row="10">
+		<!-- 💡 Switch style_base_dir between ltr and rtl to compare item ordering on the same row setup. -->
+		<lv_label width="100%" style_text_align="center" text="RTL: items flow from right to left" />
+
+		<!-- LTR row for comparison -->
+		<!-- Default left-to-right row -->
+		<lv_label text="LTR (default):" />
+		<lv_obj flex_flow="row" width="100%" height="content">
+			<lv_label style_bg_color="0x3498db" text="First">
+				<style name="style_label" />
+			</lv_label>
+			<lv_label style_bg_color="0x2ecc71" text="Second">
+				<style name="style_label" />
+			</lv_label>
+			<lv_label style_bg_color="0xe74c3c" text="Third">
+				<style name="style_label" />
+			</lv_label>
+		</lv_obj>
+
+		<!-- RTL row: style_base_dir="rtl" reverses the main axis direction -->
+		<!-- Right-to-left row with the same children -->
+		<lv_label text="RTL:" />
+		<lv_obj flex_flow="row" style_base_dir="rtl" width="100%" height="content">
+			<lv_label style_bg_color="0x3498db" text="First">
+				<style name="style_label" />
+			</lv_label>
+			<lv_label style_bg_color="0x2ecc71" text="Second">
+				<style name="style_label" />
+			</lv_label>
+			<lv_label style_bg_color="0xe74c3c" text="Third">
+				<style name="style_label" />
+			</lv_label>
+		</lv_obj>
+	</view>
+</screen>

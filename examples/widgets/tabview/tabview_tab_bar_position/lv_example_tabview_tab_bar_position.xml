@@ -1,0 +1,71 @@
+<!--
+ @title Tab view tab bar position
+ @brief Place the tab bar on any of the four sides.
+
+ Four mini tab views lay out a 2×2 grid covering every `tab_bar_position` value:
+ `top`, `bottom`, `left`, `right`. Each carries a distinct `style_bg_color` so
+ the four widgets are easy to tell apart at a glance; only `tab_bar_position`
+ changes the layout itself.
+-->
+<screen>
+	<view>
+		<!-- 💡 Change tab_bar_position to top/bottom/left/right to move the tab bar. -->
+		<lv_label width="100%" style_text_align="center" text="Tab view: tab bar position" />
+
+		<!-- Bar on the top edge -->
+		<lv_tabview
+			x="8"
+			y="28"
+			width="150"
+			height="100"
+			tab_bar_position="top"
+			style_bg_color="0xffcc80"
+			style_bg_opa="100%"
+		>
+			<lv_tabview-tab text="A"><lv_label align="center" text="top" /></lv_tabview-tab>
+			<lv_tabview-tab text="B" />
+		</lv_tabview>
+
+		<!-- Bar on the bottom edge -->
+		<lv_tabview
+			x="164"
+			y="28"
+			width="150"
+			height="100"
+			tab_bar_position="bottom"
+			style_bg_color="0x90caf9"
+			style_bg_opa="100%"
+		>
+			<lv_tabview-tab text="A"><lv_label align="center" text="bottom" /></lv_tabview-tab>
+			<lv_tabview-tab text="B" />
+		</lv_tabview>
+
+		<!-- Bar on the left edge -->
+		<lv_tabview
+			x="8"
+			y="136"
+			width="150"
+			height="100"
+			tab_bar_position="left"
+			style_bg_color="0xa5d6a7"
+			style_bg_opa="100%"
+		>
+			<lv_tabview-tab text="A"><lv_label align="center" text="left" /></lv_tabview-tab>
+			<lv_tabview-tab text="B" />
+		</lv_tabview>
+
+		<!-- Bar on the right edge -->
+		<lv_tabview
+			x="164"
+			y="136"
+			width="150"
+			height="100"
+			tab_bar_position="right"
+			style_bg_color="0xce93d8"
+			style_bg_opa="100%"
+		>
+			<lv_tabview-tab text="A"><lv_label align="center" text="right" /></lv_tabview-tab>
+			<lv_tabview-tab text="B" />
+		</lv_tabview>
+	</view>
+</screen>

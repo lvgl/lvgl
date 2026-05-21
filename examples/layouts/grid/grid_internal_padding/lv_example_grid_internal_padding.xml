@@ -1,0 +1,50 @@
+<!--
+ @title Grid internal padding
+ @brief Set horizontal and vertical gaps between grid cells.
+
+ style_pad_column inserts space between columns and style_pad_row inserts space between
+ rows. The two are independent, so column gaps and row gaps can differ — here columns
+ are flush together while rows have a large vertical gap.
+-->
+<screen>
+	<styles>
+		<!-- Shared chip style for all tiles -->
+		<style name="style_chip" bg_opa="100%" text_color="0xffffff" pad_all="6" radius="4" />
+	</styles>
+
+	<view flex_flow="column" style_pad_row="8">
+		<!-- 💡 Adjust style_pad_column and style_pad_row to control column and row gaps independently. -->
+		<lv_label width="100%" style_text_align="center" text="Grid internal padding: row and column gaps" />
+
+		<!-- pad_column controls horizontal gap, pad_row controls vertical gap. -->
+		<!-- Grid container with explicit row and column gaps -->
+		<lv_obj
+			style_grid_column_dsc_array="50 50 50"
+			style_grid_row_dsc_array="40 40"
+			style_pad_column="0"
+			style_pad_row="66"
+			style_layout="grid"
+			width="100%"
+			height="content"
+		>
+			<lv_label style_grid_cell_column_pos="0" style_grid_cell_row_pos="0" style_bg_color="0x1f77b4" text="One">
+				<style name="style_chip" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="1" style_grid_cell_row_pos="0" style_bg_color="0xff7f0e" text="Two">
+				<style name="style_chip" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="2" style_grid_cell_row_pos="0" style_bg_color="0x2ca02c" text="Three">
+				<style name="style_chip" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="0" style_grid_cell_row_pos="1" style_bg_color="0xd62728" text="Four">
+				<style name="style_chip" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="1" style_grid_cell_row_pos="1" style_bg_color="0x9467bd" text="Five">
+				<style name="style_chip" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="2" style_grid_cell_row_pos="1" style_bg_color="0x17becf" text="Six">
+				<style name="style_chip" />
+			</lv_label>
+		</lv_obj>
+	</view>
+</screen>

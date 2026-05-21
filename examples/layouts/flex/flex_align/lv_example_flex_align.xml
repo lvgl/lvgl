@@ -1,0 +1,43 @@
+<!--
+ @title Flex align
+ @brief Place items along the main and cross axes.
+
+ style_flex_main_place distributes items along the row direction, while
+ style_flex_cross_place aligns items of different heights on the cross axis. The mix of a
+ tall button, a switch, and a checkbox makes cross-axis alignment easy to see.
+-->
+<screen>
+	<view flex_flow="column">
+		<!-- 💡 Adjust style_flex_main_place and style_flex_cross_place to compare distribution and cross-axis alignment. -->
+		<lv_label
+			width="100%"
+			style_text_align="center"
+			text="Space the items evenly horizontally, and to the center vertically"
+		/>
+
+		<!-- Items of different heights are spaced evenly on the main axis
+		    (horizontal in case of row flow) and centered on the cross axis
+			(vertical). Try other flex_main_place values: "start", "end", "center",
+			"space_between", "space_around" -->
+		<!-- Demo container with explicit main and cross alignment -->
+		<lv_obj
+			flex_flow="row"
+			style_flex_main_place="space_evenly"
+			style_flex_cross_place="center"
+			width="100%"
+			height="40%"
+		>
+			<!-- Tall item: a label with a large font -->
+			<lv_button height="64">
+				<lv_label text="64px" align="center" />
+			</lv_button>
+
+			<!-- Medium item: a toggle switch -->
+			<lv_switch />
+
+			<!-- Another medium item: a checkbox -->
+			<lv_checkbox text="Check" />
+		</lv_obj>
+	</view>
+</screen>
+

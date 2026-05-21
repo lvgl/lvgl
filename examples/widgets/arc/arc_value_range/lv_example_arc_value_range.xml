@@ -1,0 +1,44 @@
+<!--
+ @title Arc value and range
+ @brief Show how min_value/max_value map onto the same background arc.
+
+ Two arcs with different numeric ranges share the same visible background span. The
+ indicator length depends on (value - min_value) / (max_value - min_value), so any range
+ — including one crossing zero — produces the same relative fill.
+-->
+<screen>
+	<view>
+		<!-- 💡 Change min_value, max_value, and value together to see how the indicator span maps onto the same background arc. -->
+		<lv_label width="100%" style_text_align="center" text="Arc: value and range" />
+
+		<!-- Arc with a symmetric custom range -->
+		<lv_arc
+			x="14"
+			y="34"
+			width="96"
+			height="96"
+			min_value="-50"
+			max_value="50"
+			value="20"
+			bg_start_angle="135"
+			bg_end_angle="45"
+		>
+			<lv_label align="center" text="-50..50&#10;v=20" />
+		</lv_arc>
+
+		<!-- Arc with a custom range showing the same concept at different numeric scale -->
+		<lv_arc
+			x="130"
+			y="34"
+			width="96"
+			height="96"
+			min_value="20"
+			max_value="220"
+			value="140"
+			bg_start_angle="135"
+			bg_end_angle="45"
+		>
+			<lv_label align="center" text="20..220&#10;v=140" />
+		</lv_arc>
+	</view>
+</screen>

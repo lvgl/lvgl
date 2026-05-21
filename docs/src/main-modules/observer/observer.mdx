@@ -243,7 +243,7 @@ from memory using any of the methods below, depending on the effect you want to 
   gracefully remove the Observer (and its events) from the Subject, while deleting
   the Widget.
 - If Widget does NOT need to be deleted:
-  
+
     - <ApiLink name="lv_obj_remove_from_subject" display="lv_obj_remove_from_subject(widget, subject)" /> deletes all Observers
       associated with `widget`.  `subject` can be NULL to unsubscribe the Widget
       from all associated Subjects.
@@ -482,4 +482,3 @@ and <ApiLink name="lv_subject_set_max_value_int" /> (same for float subjects).
 
 These functions set the given subject (integer or string) to a fixed value when the specified trigger event occurs.
 
-## API

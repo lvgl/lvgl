@@ -1,0 +1,80 @@
+<!--
+ @title Arc as pie-chart slices
+ @brief Stack five arcs at the same centre to render a coloured pie chart.
+
+ Each slice is a separate `lv_arc` aligned at the same centre.
+ `bg_start_angle` and `bg_end_angle` carve out the wedge; the slice is
+ painted by `LV_PART_MAIN` (the bg track) — there's no need to set a value
+ just to make an indicator cover the bg, instead we hide the indicator
+ entirely with `arc_opa="0"` on the `indicator` selector. The MAIN style
+ sets `arc_width` to half the radius so the band reaches the centre, and
+ `arc_rounded="false"` flattens the end caps so adjacent slices share
+ their seam pixels exactly (rounded caps overshoot and leave gaps).
+
+ The three shared parts (thick flat-ended main, invisible indicator,
+ invisible knob) are factored into named styles. Because position and size
+ are style properties too, the `style_pie_main` style also pins
+ `width`/`height`/`align`/`y` — so each `<lv_arc>` only carries its slice
+ angles and its colour.
+-->
+<screen>
+	<styles>
+		<!-- Thick, flat-ended main arc — this is what actually paints each slice.
+		     The size and centre alignment live here too, so every slice picks them up. -->
+		<style name="style_pie_main"
+			width="200" height="200"
+			align="center" y="20"
+			arc_width="100" arc_rounded="false" />
+		<!-- Hide the indicator entirely — we don't drive a value here. -->
+		<style name="style_pie_indicator" arc_opa="0" />
+		<!-- Hide the knob so it doesn't poke out at the value angle. -->
+		<style name="style_pie_knob" bg_opa="0" />
+	</styles>
+
+	<view>
+		<!-- 💡 Edit the `bg_start_angle`/`bg_end_angle` pair on any arc to grow/shrink that slice; the others stay put. -->
+		<lv_label width="100%" style_text_align="center" text="Arc: pie chart" />
+
+		<!-- 5 slices with uneven sweeps so the colours look like a real data breakdown.
+		     Angles measured clockwise from 3 o'clock; the seam between E and A is at 12 o'clock (270°). -->
+		<lv_arc clickable="false"
+			bg_start_angle="270" bg_end_angle="335"
+			style_arc_color-main="0xef4444">
+			<style name="style_pie_main" selector="main" />
+			<style name="style_pie_indicator" selector="indicator" />
+			<style name="style_pie_knob" selector="knob" />
+		</lv_arc>
+
+		<lv_arc clickable="false"
+			bg_start_angle="335" bg_end_angle="38"
+			style_arc_color-main="0xf59e0b">
+			<style name="style_pie_main" selector="main" />
+			<style name="style_pie_indicator" selector="indicator" />
+			<style name="style_pie_knob" selector="knob" />
+		</lv_arc>
+
+		<lv_arc clickable="false"
+			bg_start_angle="38" bg_end_angle="142"
+			style_arc_color-main="0x22c55e">
+			<style name="style_pie_main" selector="main" />
+			<style name="style_pie_indicator" selector="indicator" />
+			<style name="style_pie_knob" selector="knob" />
+		</lv_arc>
+
+		<lv_arc clickable="false"
+			bg_start_angle="142" bg_end_angle="205"
+			style_arc_color-main="0x3b82f6">
+			<style name="style_pie_main" selector="main" />
+			<style name="style_pie_indicator" selector="indicator" />
+			<style name="style_pie_knob" selector="knob" />
+		</lv_arc>
+
+		<lv_arc clickable="false"
+			bg_start_angle="205" bg_end_angle="270"
+			style_arc_color-main="0xa855f7">
+			<style name="style_pie_main" selector="main" />
+			<style name="style_pie_indicator" selector="indicator" />
+			<style name="style_pie_knob" selector="knob" />
+		</lv_arc>
+	</view>
+</screen>

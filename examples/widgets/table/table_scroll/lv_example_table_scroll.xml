@@ -1,0 +1,47 @@
+<!--
+ @title Table scrolling
+ @brief A table whose content grid is taller than its explicit height becomes scrollable.
+
+ The table itself handles scrolling — when its `height` is smaller than
+ the height needed to draw all rows, the rest are reachable by dragging.
+ With `height="LV_SIZE_CONTENT"` (the default), the table grows to fit
+ every row and the parent decides if it scrolls. Here we fix the height
+ so the bottom rows are off-screen and the user has to scroll the table
+ itself.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Drag the table vertically to reveal the lower rows. -->
+		<lv_label width="100%" style_text_align="center" text="Table: scrolling" />
+
+		<lv_table width="240" height="160" row_count="12" column_count="2">
+			<lv_table-column column="0" width="70px" />
+			<lv_table-column column="1" width="160px" />
+
+			<lv_table-cell row="0"  column="0" value="No." />
+			<lv_table-cell row="0"  column="1" value="Item" />
+			<lv_table-cell row="1"  column="0" value="1" />
+			<lv_table-cell row="1"  column="1" value="Wrench" />
+			<lv_table-cell row="2"  column="0" value="2" />
+			<lv_table-cell row="2"  column="1" value="Screwdriver" />
+			<lv_table-cell row="3"  column="0" value="3" />
+			<lv_table-cell row="3"  column="1" value="Hammer" />
+			<lv_table-cell row="4"  column="0" value="4" />
+			<lv_table-cell row="4"  column="1" value="Drill" />
+			<lv_table-cell row="5"  column="0" value="5" />
+			<lv_table-cell row="5"  column="1" value="Saw" />
+			<lv_table-cell row="6"  column="0" value="6" />
+			<lv_table-cell row="6"  column="1" value="Pliers" />
+			<lv_table-cell row="7"  column="0" value="7" />
+			<lv_table-cell row="7"  column="1" value="Tape measure" />
+			<lv_table-cell row="8"  column="0" value="8" />
+			<lv_table-cell row="8"  column="1" value="Level" />
+			<lv_table-cell row="9"  column="0" value="9" />
+			<lv_table-cell row="9"  column="1" value="Crowbar" />
+			<lv_table-cell row="10" column="0" value="10" />
+			<lv_table-cell row="10" column="1" value="Mallet" />
+			<lv_table-cell row="11" column="0" value="11" />
+			<lv_table-cell row="11" column="1" value="Chisel" />
+		</lv_table>
+	</view>
+</screen>

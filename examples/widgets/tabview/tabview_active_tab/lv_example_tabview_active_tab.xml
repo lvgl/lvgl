@@ -1,0 +1,19 @@
+<!--
+ @title Tab view active tab on creation
+ @brief Open a specific tab on first display via the `active` prop.
+
+ `active` takes a 0-based tab index. Setting `active="2"` makes the third tab
+ ("C") open when the screen first appears, so the user lands directly on a
+ specific tab without having to tap or swipe.
+-->
+<screen>
+	<view>
+		<!-- 💡 active is 0-based — change the value to pick which tab opens first. -->
+		<lv_tabview width="100%" height="100%" active="2">
+			<lv_tabview-tab text="A"><lv_label align="center" text="A" /></lv_tabview-tab>
+			<lv_tabview-tab text="B"><lv_label align="center" text="B" /></lv_tabview-tab>
+			<lv_tabview-tab text="C"><lv_label align="center" text="C — opened first" /></lv_tabview-tab>
+			<lv_tabview-tab text="D"><lv_label align="center" text="D" /></lv_tabview-tab>
+		</lv_tabview>
+	</view>
+</screen>

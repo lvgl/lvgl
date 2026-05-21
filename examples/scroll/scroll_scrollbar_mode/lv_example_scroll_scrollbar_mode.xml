@@ -1,0 +1,45 @@
+<!--
+ @title Scrollbar mode
+ @brief Compare an always-hidden scrollbar with an always-visible one.
+
+ Two identical overflowing panels differ only in `scrollbar_mode`: the
+ left one is `off` (scrollable, but the bar is never drawn), the right
+ one is `on` (the bar is always drawn even when idle). The other modes
+ are `auto` (bar only while scrollable) and `active` (bar only while
+ actively scrolling).
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x9429ff" />
+	</consts>
+	<styles>
+		<!-- Accent the always-on bar so it reads as the point of the example -->
+		<style name="style_scrollbar" width="10" radius="5" bg_color="#accent" bg_opa="100%" pad_right="4" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+		<!-- 💡 Both panels scroll; only the right one ever shows a scrollbar. -->
+		<lv_label width="100%" style_text_align="center" text="Scroll: scrollbar mode" />
+
+		<lv_obj width="100%" height="160" flex_flow="row" style_flex_main_place="center" style_pad_column="16">
+			<!-- scrollbar_mode="off": scrolls, bar never shown -->
+			<lv_obj width="130" height="100%" flex_flow="column" style_pad_row="8" scrollbar_mode="off">
+				<lv_label text="mode: off" />
+				<lv_button width="100%"><lv_label align="center" text="A" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="B" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="C" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="D" /></lv_button>
+			</lv_obj>
+
+			<!-- scrollbar_mode="on": bar always visible -->
+			<lv_obj width="130" height="100%" flex_flow="column" style_pad_row="8" scrollbar_mode="on">
+				<style name="style_scrollbar" selector="scrollbar" />
+				<lv_label text="mode: on" />
+				<lv_button width="100%"><lv_label align="center" text="A" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="B" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="C" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="D" /></lv_button>
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>

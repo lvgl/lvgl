@@ -11,20 +11,7 @@ title: "Scale (lv_scale)"
 Scale Widgets show linear or circular scales with configurable ranges, tick counts,
 placement, labeling, and subsections ([Sections](/widgets/scale)) with custom styling.
 
-## Parts and Styles
-
-The Scale Widget has the following three parts:
-
-- <ApiLink name="LV_PART_MAIN" /> Main line --- the blue line in example image.
-- <ApiLink name="LV_PART_ITEMS" /> Minor ticks --- the red minor ticks in example image.
-- <ApiLink name="LV_PART_INDICATOR" /> Major ticks and their labels (if enabled) ---
-  the green major ticks and pink labels in example image.
-
-![Scale](/_static/images/scale.png)
-
-## Usage
-
-### Mode
+## Mode
 
 When a Scale Widget is created, it starts out in MODE
 <ApiLink name="LV_SCALE_MODE_HORIZONTAL_BOTTOM" />.  This makes the scale horizontal
@@ -39,7 +26,16 @@ be any of these values:
 - <ApiLink name="LV_SCALE_MODE_ROUND_INNER" />
 - <ApiLink name="LV_SCALE_MODE_ROUND_OUTER" />
 
-### Setting range
+<LvglExample name="lv_example_scale_modes" path="widgets/scale/scale_modes/lv_example_scale_modes" />
+
+The round variants additionally honour `angle_range` (the sweep in degrees)
+and `rotation` (offset of the first tick from 3 o'clock):
+
+<LvglExample name="lv_example_scale_round_modes" path="widgets/scale/scale_round_modes/lv_example_scale_round_modes" />
+
+## Setting range
+
+<LvglExample name="lv_example_scale_range" path="widgets/scale/scale_range/lv_example_scale_range" />
 
 A Scale starts its life with a default numeric range of [0..100] and a default
 angular range of 270.  You can change these ranges with:
@@ -50,204 +46,142 @@ angular range of 270.  You can change these ranges with:
 where `min` and `max` will become the numeric low and high values for the Scale,
 and `angle_range` is the angle between the low and high ends of the Scale.
 
-### Tick drawing order
+## Tick drawing order
 
-Normally ticks and their labels are drawn first and the main line is drawn next,
-giving the ticks and their labels the appearance of being underneath the main line
-when there is overlap.  You can reverse this sequence if you wish, making the ticks
-and labels appear on top the main line, using
-<ApiLink name="lv_scale_set_draw_ticks_on_top" display="lv_scale_set_draw_ticks_on_top(scale, true)" />.  (This effect can be
-reversed by passing `false` instead.)
+Ticks are drawn under the main line by default. Pass `true` to
+<ApiLink name="lv_scale_set_draw_ticks_on_top" display="lv_scale_set_draw_ticks_on_top(scale, true)" />
+to paint them on top instead.
 
-Example with with ticks and labels drawn *under* the main line (default):
+## Configuring ticks
 
-![Scale Ticks Below](/_static/images/scale_ticks_below.png)
+<LvglExample name="lv_example_scale_ticks" path="widgets/scale/scale_ticks/lv_example_scale_ticks" />
 
-Example with ticks and labels drawn *on top of* the main line:
+- <ApiLink name="lv_scale_set_total_tick_count" display="lv_scale_set_total_tick_count(scale, n)" /> — total number of ticks drawn.
+- <ApiLink name="lv_scale_set_major_tick_every" display="lv_scale_set_major_tick_every(scale, n)" /> — every Nth tick is a major one.
+- <ApiLink name="lv_scale_set_label_show" display="lv_scale_set_label_show(scale, true)" /> — show/hide numeric labels next to major ticks.
 
-![Scale Ticks On Top](/_static/images/scale_ticks_on_top.png)
-
-### Configuring ticks
-
-You configure the major and minor ticks of a Scale by calling 2 functions:
-
-- <ApiLink name="lv_scale_set_total_tick_count" display="lv_scale_set_total_tick_count(scale, total_tick_count)" />, and
-- <ApiLink name="lv_scale_set_major_tick_every" display="lv_scale_set_major_tick_every(scale, nth_tick)" />.
-
-If you want labels to be drawn with the major ticks, call
-<ApiLink name="lv_scale_set_label_show" display="lv_scale_set_label_show(scale, true)" />.  (Pass `false` to hide them again.)
-
-By default, the labels shown are the numeric values of the scale at the major tick
-points.  Can you specify different label content by calling
-<ApiLink name="lv_scale_set_text_src" display="lv_scale_set_text_src(scale, custom_labels)" /> where `custom_labels` is an
-array of string pointers.  Example:
+By default the labels show the numeric scale value at each major tick.
+Override the strings with
+<ApiLink name="lv_scale_set_text_src" display="lv_scale_set_text_src(scale, labels)" /> —
+the array must be `NULL`-terminated and outlive the widget.
 
 ```c
-static char * custom_labels[3] = {"One", "Two", NULL};
+static const char * custom_labels[] = {"Lo", "Med", "Hi", NULL};
+lv_scale_set_text_src(scale, custom_labels);
 ```
 
-Note that a `NULL` pointer is used to terminate the list.
+Tick length and radial offset are configurable through style properties
+on <ApiLink name="LV_PART_INDICATOR" /> (major ticks) and <ApiLink name="LV_PART_ITEMS" /> (minor ticks):
+`length` sets the tick length; `radial_offset` shifts the tick inward or
+outward (round scales only); `pad_radial` on the indicator offsets the
+label from its tick.
 
-The content of the buffers pointed to need to remain valid for the life of the Scale.
+### Rotating labels (round scales)
 
-For a Scale in one of the `..._ROUND_...` modes, you can optionally get it to
-rotate the major-tick labels to match the rotation of the major ticks using
-<ApiLink name="lv_obj_set_style_transform_rotation" display="lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS, LV_PART_INDICATOR)" />.
+`style_transform_rotation` on <ApiLink name="LV_PART_INDICATOR" /> rotates every label by
+the given angle (units of 0.1°). Two special flags are recognised on
+round scales:
 
-Alternately, labels can be rotated by a fixed amount (for any Scale mode).  This
-example rotates labels by 20 degrees:
-<ApiLink name="lv_obj_set_style_transform_rotation" display="lv_obj_set_style_transform_rotation(scale, 200, LV_PART_INDICATOR)" />.
+- <ApiLink name="LV_SCALE_LABEL_ROTATE_MATCH_TICKS" /> — rotate each label to match its
+  tick angle.
+- <ApiLink name="LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT" /> — flip labels that would otherwise
+  appear upside down.
 
-Or both of the above can be done at the same time:
-<ApiLink name="lv_obj_set_style_transform_rotation" display="lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS + 200, LV_PART_INDICATOR)" />.
+The flags combine with each other and with a fixed offset:
 
-Some labels of the Scale might be drawn upside down (to match the tick) if the Scale includes a certain angle range.
-If you don't want this, to automatically rotate the labels to keep them upright, an additional flag can be used.
-Labels that would be upside down are then rotated 180°
-<ApiLink name="lv_obj_set_style_transform_rotation" display="lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT, LV_PART_INDICATOR)" />.
-Labels can also be moved a fixed distance in X and Y pixels using
-<ApiLink name="lv_obj_set_style_translate_x" display="lv_obj_set_style_translate_x(scale, 10, LV_PART_INDICATOR)" />.
+```c
+lv_obj_set_style_transform_rotation(scale,
+    LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT + 200,
+    LV_PART_INDICATOR);
+```
 
-<Callout type="info">
-The major tick value is calculated with the <ApiLink name="lv_map" /> API (when not
-setting custom labels), this calculation takes into consideration the total
-number of ticks and the Scale range, so the label drawn can present rounding
-errors when the calculated value is a floating-point value.
-</Callout>
+## Styling
 
-The length of the ticks can be configured with the length Style property on the
-<ApiLink name="LV_PART_INDICATOR" /> for major ticks and <ApiLink name="LV_PART_ITEMS" />
-for minor ticks.  Example with local Style:
-<ApiLink name="lv_obj_set_style_length" display="lv_obj_set_style_length(scale, 5, LV_PART_INDICATOR)" /> for major ticks
-and <ApiLink name="lv_obj_set_style_length" display="lv_obj_set_style_length(scale, 5, LV_PART_ITEMS)" /> for minor ticks. The ticks can be
-padded in either direction (outwards or inwards) for `..._ROUND_...` Scales only with:
-<ApiLink name="lv_obj_set_style_radial_offset" display="lv_obj_set_style_radial_offset(scale, 5, LV_PART_INDICATOR)" /> for major ticks and
-<ApiLink name="lv_obj_set_style_radial_offset" display="lv_obj_set_style_radial_offset(scale, 5, LV_PART_ITEMS)" /> for minor.
-Using length and radial offset together allows total control of the tick position.
+Three stylable parts:
 
-It is also possible to offset the labels from the major ticks (either positive or negative) using
-<ApiLink name="lv_obj_set_style_pad_radial" display="lv_obj_set_style_pad_radial(scale, 5, LV_PART_INDICATOR)" />
+- <ApiLink name="LV_PART_MAIN" /> — the rail line (or arc on round scales)
+- <ApiLink name="LV_PART_ITEMS" /> — minor ticks
+- <ApiLink name="LV_PART_INDICATOR" /> — major ticks and their labels
 
-### Sections
+![Scale](/_static/images/scale.png)
 
-Sections make it possible for portions of a Scale to *convey meaning* by using
-different Style properties to draw them (colors, line thicknesses, font, etc.).
+<LvglExample name="lv_example_scale_styling" path="widgets/scale/scale_styling/lv_example_scale_styling" />
 
-A Section represents a sub-range of the Scale, whose Styles (like Cascading Style
-Sheets) take precedence while drawing the PARTS (lines, arcs, ticks and labels) of
-the Scale that are within the range of that Section.
+Use line-family properties (`line_color`/`line_width`/`line_opa`) on each
+part. <ApiLink name="LV_PART_INDICATOR" /> also picks up text properties for the numeric
+labels. `transform_rotation` on the indicator tilts every label (units of
+0.1°) — useful when dense labels overlap.
 
-If a PART of a Scale is within the range of 2 or more Sections (i.e. those Sections
-overlap), the Style's properties belonging to the most recently added Section takes
-precedence over the same style properties of other Section(s) that "involve" that
-PART.
+## Drawing customisations
 
-##### Creating Sections
+Style attributes can colour ticks and labels uniformly, but per-tick or
+per-label customisation needs a draw event. The scale emits
+<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> once per draw task; for label tasks
+`base_dsc->id1` and `id2` carry the tick index and tick value, which is
+enough to mutate the label text or recolour individual entries:
 
-A Section is created using <ApiLink name="lv_scale_add_section" display="lv_scale_add_section(scale)" />, which returns a
-pointer to a <ApiLink name="lv_scale_section_t" /> object.  This creates a Section with
-range [0..0] and no Styles added to it, which ensures that Section will not be drawn
-yet:  it needs both a range inside the Scale's range and at least one [Style](/common-widget-features/styles) added to it before it will be used in drawing the Scale.
+<LvglExample name="lv_example_scale_label_recolor" path="widgets/scale/lv_example_scale_label_recolor" />
 
-Next, set the range using <ApiLink name="lv_scale_section_set_range" display="lv_scale_section_set_range(section, min, max)" />
-where `min` and `max` are the Section's boundary values that should normally be
-within the Scale's value range.  (If they are only partially within the Scale's
-range, the Scale will only use that portion of the Section that overlaps the Scale's
-range.  If a Section's range is not within the Scale's range at all, it will not be
-used in drawing.  That can be useful to temporarily "disable" a Section, e.g.
-<ApiLink name="lv_scale_section_set_range" display="lv_scale_section_set_range(section, 0, -1)" />.)
+## Sections
 
-##### Data binding
+A Section is a sub-range of the Scale with its own style overrides — use
+it to draw a coloured "red zone", a highlighted band, etc. When sections
+overlap, the most recently added wins.
 
-To get familiar with observers, subjects, and data bindings in general, visit the
-[Observer](/main-modules/observer/observer) page.
+### Creating Sections
 
-This method of subscribing to an integer Subject affects a Section of a Scale Widget's integer
-minimum or maximum values directly.  Note that this is a one-way binding (Subject ==> Widget)
-as the Scale Section's boundaries are not interactive.
+```c
+lv_scale_section_t * sec = lv_scale_add_section(scale);
+lv_scale_section_set_range(sec, 80, 100);
+```
 
-It supports only integer subjects.
+A fresh section has range `[0..0]` and no styles, so it won't draw until
+both are set. Setting a range outside the scale's own range silently
+hides the section — a quick way to toggle it off
+(<ApiLink name="lv_scale_section_set_range" display="lv_scale_section_set_range(sec, 0, -1)" />).
+
+### Data binding
+
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+A Scale Section binds its minimum and maximum to Subjects. The link is
+one-way (Subject → Widget): application-side writes into either subject
+move that end of the section band. Only integer subjects are supported.
 
 - <ApiLink name="lv_scale_bind_section_min_value" display="lv_scale_bind_section_min_value(scale, section1, &subject)" />
 - <ApiLink name="lv_scale_bind_section_max_value" display="lv_scale_bind_section_max_value(scale, section1, &subject)" />
 
-##### Styling Sections
+<LvglExample name="lv_example_scale_bind_section" path="widgets/scale/scale_bind_section/lv_example_scale_bind_section" />
 
-You set a Section's Style properties by creating a <ApiLink name="lv_style_t" /> object
-for each "section" you want to appear different than the parent Scale.  Add style
-properties as is documented in [Style Sheets](/common-widget-features/styles/style_sheets).
+### Styling Sections
 
-You attach each <ApiLink name="lv_style_t" /> object to each Section it will apply to using
-<ApiLink name="lv_scale_section_set_style" display="lv_scale_section_set_style(section, PART, style_pointer)" />, where:
+Attach a style to a section with
+<ApiLink name="lv_scale_section_set_style" display="lv_scale_section_set_style(section, PART, &style)" />.
+`PART` must be one of <ApiLink name="LV_PART_MAIN" />, <ApiLink name="LV_PART_ITEMS" />, or
+<ApiLink name="LV_PART_INDICATOR" /> — they can't be OR'd. To restyle multiple parts,
+attach the same style object to each part separately. Each (section, part)
+pair holds exactly one style; setting again replaces, not adds.
 
-- `style_pointer` should point to the contents of a global or static variable (can
-  be dynamically-allocated), since it needs to remain valid through the life of the
-  Scale; and
-- `PART` indicates which single [PART](/widgets/scale) of the
-  parent Scale it will apply to, namely <ApiLink name="LV_PART_MAIN" />,
-  <ApiLink name="LV_PART_ITEMS" /> or <ApiLink name="LV_PART_INDICATOR" />.
+Relevant style properties per part:
 
-Unlike adding normal styles to Widgets, you cannot combine PARTs by bit-wise OR-ing
-the PART values together to get the style to apply to more than one part.  However,
-you can do something like this to accomplish the same thing:
+| Part | Properties |
+|---|---|
+| <ApiLink name="LV_PART_MAIN" /> (line) | `line_width`, `line_color`, `line_opa` |
+| <ApiLink name="LV_PART_MAIN" /> (arc) | `arc_width`, `arc_color`, `arc_opa`, `arc_rounded`, `arc_image_src` |
+| <ApiLink name="LV_PART_ITEMS" /> / <ApiLink name="LV_PART_INDICATOR" /> | `line_width`, `line_color`, `line_opa` |
+| <ApiLink name="LV_PART_INDICATOR" /> labels | `text_color`, `text_opa`, `text_letter_space`, `text_font` |
 
-```c
-static lv_style_t  tick_style;
-lv_style_init(&tick_style);
-lv_style_set_line_color(&tick_style, lv_palette_darken(LV_PALETTE_RED, 3));
-lv_scale_section_set_style(section, LV_PART_ITEMS, &tick_style);
-lv_scale_section_set_style(section, LV_PART_INDICATOR, &tick_style);
-```
-
-to get that one Style object to apply to both major and minor ticks.
-
-<ApiLink name="lv_style_t" /> objects can be shared among Sections and among PARTs, but
-unlike normal Styles added to a Widget, a Section can only have 1 style per PART.
-Thus, doing this:
-
-```c
-lv_scale_section_set_style(section, LV_PART_INDICATOR, &tick_style_1);
-lv_scale_section_set_style(section, LV_PART_INDICATOR, &tick_style_2);
-```
-
-replaces `tick_style_1` with `tick_style_2` for part
-<ApiLink name="LV_PART_INDICATOR" /> rather than adding to it.
-
-##### Useful Style Properties for Sections
-
-The Style properties that are used during Scale drawing (and are thus useful) are:
-
-- For main line *when it is a straight line* (<ApiLink name="LV_PART_MAIN" />):
-  
-  :LV_STYLE_LINE_WIDTH:         <ApiLink name="lv_style_set_line_width" />
-  :LV_STYLE_LINE_COLOR:         <ApiLink name="lv_style_set_line_color" />
-  :LV_STYLE_LINE_OPA:           <ApiLink name="lv_style_set_line_opa" />
-- For main line *when it is an arc* (<ApiLink name="LV_PART_MAIN" />):
-  
-  :LV_STYLE_ARC_WIDTH:          <ApiLink name="lv_style_set_arc_width" />
-  :LV_STYLE_ARC_COLOR:          <ApiLink name="lv_style_set_arc_color" />
-  :LV_STYLE_ARC_OPA:            <ApiLink name="lv_style_set_arc_opa" />
-  :LV_STYLE_ARC_ROUNDED:        <ApiLink name="lv_style_set_arc_rounded" />
-  :LV_STYLE_ARC_IMAGE_SRC:      <ApiLink name="lv_style_set_arc_image_src" />
-- For tick lines (<ApiLink name="LV_PART_ITEMS" /> and <ApiLink name="LV_PART_INDICATOR" />):
-  
-  :LV_STYLE_LINE_WIDTH:         <ApiLink name="lv_style_set_line_width" />
-  :LV_STYLE_LINE_COLOR:         <ApiLink name="lv_style_set_line_color" />
-  :LV_STYLE_LINE_OPA:           <ApiLink name="lv_style_set_line_opa" />
-- For labels on major ticks (<ApiLink name="LV_PART_INDICATOR" />)
-  
-  :LV_STYLE_TEXT_COLOR:         <ApiLink name="lv_style_set_text_color" />
-  :LV_STYLE_TEXT_OPA:           <ApiLink name="lv_style_set_text_opa" />
-  :LV_STYLE_TEXT_LETTER_SPACE:  <ApiLink name="lv_style_set_text_letter_space" />
-  :LV_STYLE_TEXT_FONT:          <ApiLink name="lv_style_set_text_font" />
-
-### Needles
+## Needles
 
 Needles are used to indicate a specific value for `..._ROUND_...` Scales only.
 They can be lines or images and can be customized in terms of length, color, and
 other properties.
 
-##### Creating Needles
+### Creating Needles
 
 Create a [lv_line](/widgets/line) or a [lv_image](/widgets/image) Widget and then
 attach it to the Scale as a needle with the appropriate function:
@@ -255,16 +189,23 @@ attach it to the Scale as a needle with the appropriate function:
 - <ApiLink name="lv_scale_set_line_needle_value" display="lv_scale_set_line_needle_value(scale, needle_line, needle_length, value)" />
 - <ApiLink name="lv_scale_set_image_needle_value" display="lv_scale_set_image_needle_value(scale, needle_img, value)" />
 
-##### Data binding
+A round-inner scale with a line needle and an image needle, both driven
+by a periodic timer that sweeps their values — the typical gauge pattern.
+Needles aren't yet exposed through XML, so this example is C-only:
 
-To get familiar with observers, subjects, and data bindings in general, visit the
-[Observer](/main-modules/observer/observer) page.
+<LvglExample name="lv_example_scale_needles" path="widgets/scale/lv_example_scale_needles" />
 
-This method of subscribing to an integer Subject affects the needle value of a Scale
-Widget directly.  Note that this is a one-way binding (Subject ==> Widget) so when
-the subject changes, the Scale's needle will be updated too.
+### Data binding
 
-It supports only integer subjects.
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+A Scale needle binds its value to a Subject. The link is one-way (Subject
+→ Widget): application-side writes into the subject sweep the needle.
+Only integer subjects are supported.
 
 - <ApiLink name="lv_scale_bind_line_needle_value" display="lv_scale_bind_line_needle_value(scale, needle_line, needle_length, &subject)" />
 - <ApiLink name="lv_scale_bind_image_needle_value" display="lv_scale_bind_image_needle_value(scale, needle_img, &subject)" />
@@ -293,60 +234,27 @@ No *Keys* are processed by Scale Widgets.
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
 
-## Examples
+## Showcase examples
 
-### A simple horizontal scale
+These C examples combine the features above into full mini-widgets.
+Use them as a starting point for dashboards and gauges.
 
-<LvglExample name="lv_example_scale_1" path="widgets/scale/lv_example_scale_1" />
+### Heart-rate monitor
 
-### An vertical scale with section and custom styling
+A round-inner scale split into five colour zones with a live BPM readout.
 
-<LvglExample name="lv_example_scale_2" path="widgets/scale/lv_example_scale_2" />
+<LvglExample name="lv_example_scale_heart_rate" path="widgets/scale/lv_example_scale_heart_rate" />
 
-### A simple round scale
+### Sunset / sunrise widget
 
-<LvglExample name="lv_example_scale_3" path="widgets/scale/lv_example_scale_3" />
+A round-outer scale split into day and night arcs with sunrise and sunset
+labels.
 
-### A round scale with section and custom styling
+<LvglExample name="lv_example_scale_sunset_sunrise" path="widgets/scale/lv_example_scale_sunset_sunrise" />
 
-<LvglExample name="lv_example_scale_4" path="widgets/scale/lv_example_scale_4" />
+### Compass
 
-### A scale with section and custom styling
+A round scale rotating beneath a fixed arrow as its heading sweeps 0..360°.
 
-<LvglExample name="lv_example_scale_5" path="widgets/scale/lv_example_scale_5" />
+<LvglExample name="lv_example_scale_compass" path="widgets/scale/lv_example_scale_compass" />
 
-### A round scale with multiple needles, resembling a clock
-
-<LvglExample name="lv_example_scale_6" path="widgets/scale/lv_example_scale_6" />
-
-### Customizing scale major tick label color with `LV_EVENT_DRAW_TASK_ADDED` event
-
-<LvglExample name="lv_example_scale_7" path="widgets/scale/lv_example_scale_7" />
-
-### A round scale with labels rotated and translated
-
-<LvglExample name="lv_example_scale_8" path="widgets/scale/lv_example_scale_8" />
-
-### A horizontal scale with labels rotated and translated
-
-<LvglExample name="lv_example_scale_9" path="widgets/scale/lv_example_scale_9" />
-
-### A round scale style simulating a Heart Rate monitor
-
-<LvglExample name="lv_example_scale_10" path="widgets/scale/lv_example_scale_10" />
-
-### A round scale style simulating a sunset/sunrise widget
-
-<LvglExample name="lv_example_scale_11" path="widgets/scale/lv_example_scale_11" />
-
-### A round scale style simulating a compass
-
-<LvglExample name="lv_example_scale_12" path="widgets/scale/lv_example_scale_12" />
-
-### Axis ticks and labels with scrolling on a chart
-
-<LvglExample name="lv_example_chart_2" path="widgets/chart/lv_example_chart_2" />
-
-## API
-
-[Scale (lv_scale)](/widgets/scale)

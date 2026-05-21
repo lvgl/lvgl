@@ -1,0 +1,24 @@
+<!--
+ @title Slider drives another widget's state
+ @brief Bind a button's `disabled` state to a subject driven by a slider's value.
+
+ The slider edits `subject_value` (0..100). The "Submit" button uses
+ `bind_state_if_gt` to apply `disabled` whenever `subject_value > 80` — modelling
+ a guard like "block submit when the value is out of range". Slide past 80 to
+ watch the button grey out.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Drag past 80: the button becomes disabled; drop below 80 to re-enable it. -->
+		<lv_label width="100%" style_text_align="center" text="Slider: bind state (threshold)" />
+
+		<lv_slider width="240" bind_value="subject_value" />
+
+		<lv_label bind_text="subject_value" bind_text-fmt="Current: %d (disabled above 80)" />
+
+		<lv_button>
+			<lv_label align="center" text="Submit" />
+			<bind_state_if_gt subject="subject_value" state="disabled" ref_value="80" />
+		</lv_button>
+	</view>
+</screen>

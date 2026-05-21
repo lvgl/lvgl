@@ -1,0 +1,38 @@
+<!--
+ @title Scale linear modes
+ @brief Horizontal and vertical scales, ticks on either side of the rail.
+
+ Linear scales come in four flavours: `horizontal_top` / `horizontal_bottom`
+ lay the rail across and put ticks above or below it; `vertical_left` /
+ `vertical_right` rotate the same idea 90°. The four scales below share the
+ same tick count and value range so the only visible difference is layout.
+-->
+<screen>
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="24" style_pad_row="24">
+		<!-- 💡 Swap `mode` between the four `horizontal_*`/`vertical_*` values to compare layouts. -->
+
+		<lv_scale width="160" height="60"
+			mode="horizontal_top"
+			total_tick_count="11" major_tick_every="2"
+			label_show="true"
+			min_value="0" max_value="100" />
+
+		<lv_scale width="160" height="60"
+			mode="horizontal_bottom"
+			total_tick_count="11" major_tick_every="2"
+			label_show="true"
+			min_value="0" max_value="100" />
+
+		<lv_scale width="60" height="160"
+			mode="vertical_left"
+			total_tick_count="11" major_tick_every="2"
+			label_show="true"
+			min_value="0" max_value="100" />
+
+		<lv_scale width="60" height="160"
+			mode="vertical_right"
+			total_tick_count="11" major_tick_every="2"
+			label_show="true"
+			min_value="0" max_value="100" />
+	</view>
+</screen>

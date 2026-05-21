@@ -24,8 +24,12 @@ extern "C" {
 #include "porting/osal/lv_example_osal.h"
 #include "scroll/lv_example_scroll.h"
 #include "styles/lv_example_style.h"
+#include "styles/lv_example_styles.h"
 #include "widgets/lv_example_widgets.h"
 #include "grad/lv_example_grad.h"
+
+/*Backward-compatible aliases for the pre-rework numbered example names.*/
+#include "lv_examples_api_map.h"
 
 /*********************
  *      DEFINES

@@ -14,7 +14,39 @@ The Table is added to the default group (if one is set).
 Table is an editable Widget, allowing selection of a cell with encoder and keyboard
 navigation as well.
 
-## Parts and Styles
+## Set cell value
+
+<LvglExample name="lv_example_table_cells" path="widgets/table/table_cells/lv_example_table_cells" />
+
+<ApiLink name="lv_table_set_cell_value" display="lv_table_set_cell_value(table, row, col, &quot;Content&quot;)" /> writes a cell.
+The text is copied so the source buffer can be local. Use `\n` for a
+line break inside a cell. Writing past the current grid grows the
+table automatically.
+
+## Rows and Columns
+
+<LvglExample name="lv_example_table_rows_columns" path="widgets/table/table_rows_columns/lv_example_table_rows_columns" />
+
+Pre-size the grid with <ApiLink name="lv_table_set_row_count" display="lv_table_set_row_count(table, n)" /> and
+<ApiLink name="lv_table_set_column_count" display="lv_table_set_column_count(table, n)" />.
+
+## Width and Height
+
+<LvglExample name="lv_example_table_width" path="widgets/table/table_width/lv_example_table_width" />
+
+<ApiLink name="lv_table_set_column_width" display="lv_table_set_column_width(table, col, w)" /> sets per-column pixel width;
+the table's overall width is the sum. Height is derived automatically
+from cell styles (font, padding) and row count.
+
+## Merge cells
+
+<LvglExample name="lv_example_table_merge_cells" path="widgets/table/table_merge_cells/lv_example_table_merge_cells" />
+
+<ApiLink name="lv_table_set_cell_ctrl" display="lv_table_set_cell_ctrl(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)" />
+extends a cell into the next column. Chain it on adjacent cells to span
+more than two columns.
+
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> The background of the Table; uses the [typical
    background style properties](/common-widget-features/styles/overview).
@@ -22,42 +54,16 @@ navigation as well.
    [typical background style properties](/common-widget-features/styles/overview) as well as text
    style properties.
 
-## Usage
+<LvglExample name="lv_example_table_styling" path="widgets/table/table_styling/lv_example_table_styling" />
 
-### Set cell value
+Table has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the table's
+outer frame and background) and <ApiLink name="LV_PART_ITEMS" /> (every
+cell — borders, padding, text). Attach a named style with
+`selector="main"` or `selector="items"`; cells inherit the items style
+uniformly. Per-row styling isn't expressed through XML selectors today —
+use cell `ctrl` flags or a runtime draw event to vary the header row.
 
-Cells can store only text so numbers need to be converted to text
-before displaying them in a Table.
-
-<ApiLink name="lv_table_set_cell_value" display="lv_table_set_cell_value(table, row, col, &quot;Content&quot;)" />. The text is
-saved by the Table so the buffer containing the string can be a local variable.
-
-Line breaks can be used in the text like `"Value\n60.3"`.
-
-New rows and columns are automatically added as required.
-
-### Rows and Columns
-
-To explicitly set number of rows and columns use
-<ApiLink name="lv_table_set_row_count" display="lv_table_set_row_count(table, row_cnt)" /> and
-<ApiLink name="lv_table_set_column_count" display="lv_table_set_column_count(table, col_cnt)" />.
-
-### Width and Height
-
-Column width can be set with
-<ApiLink name="lv_table_set_column_width" display="lv_table_set_column_width(table, col_id, width)" />. The overall width of
-the Table Widget will be set to the sum of all column widths.
-
-Height is calculated automatically from the cell styles (font,
-padding etc) and the number of rows.
-
-### Merge cells
-
-Cells can be merged horizontally with
-<ApiLink name="lv_table_set_cell_ctrl" display="lv_table_set_cell_ctrl(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)" />.
-To merge more adjacent cells, call this function for each cell.
-
-### Scrolling
+## Scrolling
 
 If a Table's width or height is set to <ApiLink name="LV_SIZE_CONTENT" /> that size
 will be used to show the whole Table in the respective direction. E.g.
@@ -67,27 +73,25 @@ automatically sets the Table size to show all columns and rows.
 If the width or height is set to a smaller number than its "intrinsic"
 size then the Table becomes scrollable.
 
-### Set cell user data
+<LvglExample name="lv_example_table_scroll" path="widgets/table/table_scroll/lv_example_table_scroll" />
 
-Custom data can be bound to a table cell. The data lifetime must be managed by the user. If the data is dynamically allocated,
-the user must free it to prevent memory leaks. This can be done by binding to the <ApiLink name="LV_EVENT_DELETE" /> event.
+## Set cell user data
+
+<ApiLink name="lv_table_set_cell_user_data" display="lv_table_set_cell_user_data(table, row, col, ptr)" /> attaches an opaque
+pointer to a cell, retrievable with <ApiLink name="lv_table_get_cell_user_data" />. The
+table doesn't own the pointer — free it yourself on <ApiLink name="LV_EVENT_DELETE" /> if
+the data was dynamically allocated:
 
 ```c
-static void table_delete_event_cb(lv_event_t * e) {
-    lv_obj_t * my_table = lv_event_get_target_obj(e);
-    const uint32_t row_count = lv_table_get_row_count(table);
-    const uint32_t col_count = lv_table_get_column_count(table);
-
-    /* Assuming every cell has custom data associated with it*/
-    for(uint32_t i = 0; i < row_count; ++i) {
-        for(uint32_t j = 0; j < col_count; ++j) {
-            void * cell_user_data = lv_table_get_cell_user_data(table, i, j);
-            lv_free(cell_user_data);
+static void table_delete_cb(lv_event_t * e) {
+    lv_obj_t * table = lv_event_get_target_obj(e);
+    for(uint32_t r = 0; r < lv_table_get_row_count(table); r++) {
+        for(uint32_t c = 0; c < lv_table_get_column_count(table); c++) {
+            lv_free(lv_table_get_cell_user_data(table, r, c));
         }
     }
 }
-
-lv_obj_add_event_cb(table, table_delete_event_cb, LV_EVENT_DELETE, NULL);
+lv_obj_add_event_cb(table, table_delete_cb, LV_EVENT_DELETE, NULL);
 ```
 
 ## Events
@@ -120,16 +124,13 @@ Learn more about [Keys](/main-modules/indev/keypad).
 
 ## Examples
 
-### Simple table
+### Scrollable 200-item list with per-row toggle
 
-<LvglExample name="lv_example_table_1" path="widgets/table/lv_example_table_1" />
+Pure XML can't yet draw custom rendering into individual cells, so this
+example stays in C. It builds a 200-row table inside a scrollable parent,
+attaches an <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> callback that paints a switch-style
+toggle in the second column based on the row's `CUSTOM_1` cell control flag,
+and toggles that flag from <ApiLink name="LV_EVENT_VALUE_CHANGED" />. A footer label reports
+the row count and the memory cost of building the table.
 
-### Lightweighted list from table
-
-<LvglExample name="lv_example_table_2" path="widgets/table/lv_example_table_2" />
-
-### MicroPython
-
-No examples yet.
-
-## API
+<LvglExample name="lv_example_table_scrollable_list" path="widgets/table/lv_example_table_scrollable_list" />

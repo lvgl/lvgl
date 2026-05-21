@@ -1,0 +1,45 @@
+
+<!--
+ @title Arc indicator modes
+ @brief Compare normal, reverse, and symmetrical mode side by side.
+
+ Three arcs share the same min/max range and value but use different mode settings.
+ Normal grows clockwise from min_value, reverse grows counter-clockwise from max_value,
+ and symmetrical grows outward from the middle of the range — making it obvious where
+ each mode anchors the indicator.
+-->
+<screen>
+	<view>
+		<!-- 💡 Switch mode between normal, reverse, and symmetrical to compare where the indicator grows from. -->
+		<lv_label width="100%" style_text_align="center" text="Arc: indicator modes" />
+
+		<!-- Normal mode: clockwise from minimum to current value -->
+		<lv_arc
+			align="left_mid"
+			width="90"
+			height="90"
+			x="10"
+			mode="normal"
+			value="75"
+		>
+			<lv_label align="center" text="normal" />
+		</lv_arc>
+
+		<!-- Reverse mode: counter-clockwise from maximum to current value -->
+		<lv_arc align="center" width="90" height="90" mode="reverse" value="75">
+			<lv_label align="center" text="rev." />
+		</lv_arc>
+
+		<!-- Symmetrical mode: indicator grows from the middle -->
+		<lv_arc
+			align="right_mid"
+			width="90"
+			height="90"
+			x="-10"
+			mode="symmetrical"
+			value="75"
+		>
+			<lv_label align="center" text="sym." />
+		</lv_arc>
+	</view>
+</screen>

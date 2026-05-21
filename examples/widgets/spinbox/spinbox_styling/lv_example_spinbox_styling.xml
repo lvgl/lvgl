@@ -1,0 +1,49 @@
+<!--
+ @title Spinbox styling
+ @brief Style the main box and the editing cursor as separate parts.
+
+ Spinbox inherits its drawable surface from the base widget, so `MAIN`
+ accepts the full background style stack — backgrounds, borders, radii,
+ padding, and text. `text_letter_space` on MAIN spreads the digits apart
+ so the cursor's frame visually sits around a single digit rather than
+ hugging two together.
+
+ The `CURSOR` selector targets the highlight that marks the currently
+ editable digit. A clean pattern is to leave the cursor background
+ transparent (`bg_opa="0"`) and draw only a coloured border — the active
+ digit then reads as framed. Set `text_opa="0"` on the cursor so it
+ doesn't re-paint the digit on top of MAIN's render (avoids subtle
+ double-drawing), and use `pad_ver` to let the frame breathe vertically
+ around the glyph.
+-->
+<screen>
+	<styles>
+		<style name="style_spinbox_main"
+			bg_color="0xf3f4f6" bg_opa="100%"
+			radius="8"
+			border_color="0xd1d5db" border_width="1"
+			pad_all="8"
+			text_color="0x111827"
+            text_letter_space="4"/>
+		<style name="style_spinbox_cursor"
+			bg_opa="0"
+            text_opa="0"
+			border_color="0x6366f1" border_width="2"
+			radius="4"
+			pad_ver="2" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Tap a digit position to move the cursor and see the cursor style highlight it. -->
+		<lv_label width="100%" style_text_align="center" text="Spinbox: styling parts" />
+
+		<lv_spinbox width="180"
+			digit_count="5"
+			value="12345"
+			dec_point_pos="2"
+			step="1">
+			<style name="style_spinbox_main" selector="main" />
+			<style name="style_spinbox_cursor" selector="cursor" />
+		</lv_spinbox>
+	</view>
+</screen>

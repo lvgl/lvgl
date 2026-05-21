@@ -11,7 +11,37 @@ indicator against the background indicates the Bar's current value.
 Both the start and end values of the Bar can be set. Changing the start value to a
 value other than the minimum value in its range adjusts the start position of the indicator.
 
-## Parts and Styles
+## Orientation and size
+
+<LvglExample name="lv_example_bar_orientation" path="widgets/bar/bar_orientation/lv_example_bar_orientation" />
+
+Width and height pick orientation by default. Override with
+<ApiLink name="lv_bar_set_orientation" display="lv_bar_set_orientation(bar, LV_BAR_ORIENTATION_…)" /> — `AUTO`,
+`HORIZONTAL`, or `VERTICAL`.
+
+## Value and range
+
+<LvglExample name="lv_example_bar_value_range" path="widgets/bar/bar_value_range/lv_example_bar_value_range" />
+
+- <ApiLink name="lv_bar_set_value" display="lv_bar_set_value(bar, v, LV_ANIM_ON/OFF)" /> — set value; animation
+  toggle is the last argument.
+- <ApiLink name="lv_bar_set_range" display="lv_bar_set_range(bar, min, max)" /> — default `[0..100]`. Pass `min > max`
+  (e.g. `100..0`) to flip the fill direction.
+
+## Modes
+
+<LvglExample name="lv_example_bar_modes" path="widgets/bar/bar_modes/lv_example_bar_modes" />
+
+Set with <ApiLink name="lv_bar_set_mode" display="lv_bar_set_mode(bar, LV_BAR_MODE_…)" />:
+
+- `NORMAL` — default; fills from `min` to `value`.
+- `SYMMETRICAL` — fills from zero outward, so positive and negative
+  values pull the indicator in opposite directions. Needs a range that
+  crosses zero (e.g. `[-100..100]`).
+- `RANGE` — fills between `start` and `value`. Set the start with
+  <ApiLink name="lv_bar_set_start_value" display="lv_bar_set_start_value(bar, v, LV_ANIM_ON/OFF)" />. Start must be ≤ end.
+
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> The Bar's background.  It uses the [typical
    background style properties](/common-widget-features/styles/overview). Adding padding makes the indicator
@@ -20,54 +50,49 @@ value other than the minimum value in its range adjusts the start position of th
 - <ApiLink name="LV_PART_INDICATOR" /> The Bar's indicator; also uses the [typical
    background style properties](/common-widget-features/styles/overview).
 
-## Usage
+<LvglExample name="lv_example_bar_styling" path="widgets/bar/bar_styling/lv_example_bar_styling" />
 
-### Orientation and size
+Bar has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the
+background track) and <ApiLink name="LV_PART_INDICATOR" /> (the filled
+portion). Both accept the full background style stack: `bg_color`,
+`bg_grad_color` + `bg_grad_dir` for gradients, `radius`, `border_*`,
+`shadow_*`, and `pad_*`. Attach a named `<style>` with
+`selector="main"` or `selector="indicator"` to target a part, or set
+local `style_*` props on the `<lv_bar>` tag for one-off tweaks. Padding
+on MAIN shrinks the indicator inside the track.
 
-- for orientation, width and height, simply set width and height style properties;
-- <ApiLink name="lv_bar_set_orientation" display="lv_bar_set_orientation(bar, orientation)" /> to override orientation
-  caused by `width` and `height`.  Valid values for `orientation` are:
-  
-  - <ApiLink name="LV_BAR_ORIENTATION_AUTO" />
-  - <ApiLink name="LV_BAR_ORIENTATION_HORIZONTAL" />
-  - <ApiLink name="LV_BAR_ORIENTATION_VERTICAL" />
+### Image indicator
 
-### Value and range
+<LvglExample name="lv_example_bar_img_indicator" path="widgets/bar/bar_img_indicator/lv_example_bar_img_indicator" />
 
-A new value can be set with
-<ApiLink name="lv_bar_set_value" display="lv_bar_set_value(bar, new_value, LV_ANIM_ON/OFF)" />. The value is
-interpreted in a range (minimum and maximum values) which can be
-modified with <ApiLink name="lv_bar_set_range" display="lv_bar_set_range(bar, min, max)" />. The default range is
-0..100, and the default drawing direction is from left to right in horizontal mode and
-bottom to top in vertical mode. If the minimum value is greater than the maximum value, like
-100..0, the drawing direction is reversed.
+Setting `bg_image_src` on a part replaces the solid fill with pixels
+sampled from a bitmap. The image is drawn from the left edge of the part
+and clipped to its current width, so as the bar value rises the indicator
+image is progressively revealed left-to-right. Assign different bitmaps
+to <ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_PART_INDICATOR" /> to texture
+both the track and the active fill independently.
 
-The new value in <ApiLink name="lv_bar_set_value" /> can be set with or without an
-animation depending on the last parameter (`LV_ANIM_ON/OFF`).
+- <ApiLink name="lv_obj_set_style_bg_image_src" display="lv_obj_set_style_bg_image_src(bar, src, selector)" />
 
-### Modes
+## Data binding
 
-The Bar can be one of the following modes:
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
 
-- <ApiLink name="LV_BAR_MODE_NORMAL" /> A normal Bar as described above
-- <ApiLink name="LV_BAR_MODE_SYMMETRICAL" /> Draws indicator from zero value to current value. Requires a negative
-  minimum value and positive maximum value, e.g. [-100..100].
-- <ApiLink name="LV_BAR_MODE_RANGE" /> Allows setting the start value as well with
-  <ApiLink name="lv_bar_set_start_value" display="lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)" />. The start
-  value must be smaller than the end value.
-
-### Data binding
-
-To get familiar with observers, subjects, and data bindings in general visit the
-[Observer](/main-modules/observer/observer) page.
-
-This method of subscribing to an integer Subject affects a Bar Widget's integer
-value directly.  Note that this is a one-way binding (Subject ==> Widget) so when
-the subject changes the Bar will be updated too.
-
-It supports integer and float subjects.
+A Bar binds its value to a Subject. The link is one-way (Subject →
+Widget) because the bar isn't interactive — application-side writes into
+the subject update the bar's fill. Integer and float subjects are
+supported.
 
 - <ApiLink name="lv_bar_bind_value" display="lv_bar_bind_value(bar, &subject)" />
+
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+
+
+<LvglExample name="lv_example_bar_bind_value" path="widgets/bar/bar_bind_value/lv_example_bar_bind_value" />
 
 ## Events
 
@@ -86,35 +111,3 @@ No *Keys* are processed by Bar Widgets.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Simple Bar
-
-<LvglExample name="lv_example_bar_1" path="widgets/bar/lv_example_bar_1" />
-
-### Styling a bar
-
-<LvglExample name="lv_example_bar_2" path="widgets/bar/lv_example_bar_2" />
-
-### Temperature meter
-
-<LvglExample name="lv_example_bar_3" path="widgets/bar/lv_example_bar_3" />
-
-### Stripe pattern and range value
-
-<LvglExample name="lv_example_bar_4" path="widgets/bar/lv_example_bar_4" />
-
-### Bar with LTR and RTL base direction
-
-<LvglExample name="lv_example_bar_5" path="widgets/bar/lv_example_bar_5" />
-
-### Custom drawer to show the current value
-
-<LvglExample name="lv_example_bar_6" path="widgets/bar/lv_example_bar_6" />
-
-### Bar with opposite direction
-
-<LvglExample name="lv_example_bar_7" path="widgets/bar/lv_example_bar_7" />
-
-## API

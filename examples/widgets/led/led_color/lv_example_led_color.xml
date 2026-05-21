@@ -1,0 +1,23 @@
+<!--
+ @title LED color
+ @brief Three LEDs lit in different hues via the color attribute.
+
+ The color attribute sets the LED's background, border, and shadow color together, so
+ a single value drives the whole lit-bulb look. Brightness stays at the default here
+ to isolate the effect of changing the color alone.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_flex_main_place="space_evenly" style_pad_top="56">
+		<!-- 💡 Edit each color attribute to recolor that LED. -->
+		<lv_label x="0" y="8" width="100%" style_text_align="center" text="LED: color" />
+
+		<!-- Red LED -->
+		<lv_led width="40" height="40" color="0xff3030" />
+
+		<!-- Green LED -->
+		<lv_led width="40" height="40" color="0x30c050" />
+
+		<!-- Blue LED -->
+		<lv_led width="40" height="40" color="0x3080ff" />
+	</view>
+</screen>

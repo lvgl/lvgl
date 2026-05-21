@@ -14,7 +14,7 @@ LVGL rendering acceleration can be supported without the need for LVGL adaptatio
 1. Set <ApiLink name="LV_USE_DRAW_VG_LITE" /> to 1 in `lv_conf.h` to enabled the VG-Lite rendering backend.
    Make sure that your hardware has been adapted to the VG-Lite API and that the absolute path to `vg_lite.h`, which can be directly referenced by lvgl, has been exposed.
 2. Confirm the GPU initialization method, there are two ways:
-   
+
    - The SDK calls the GPU initialization function on its own during system startup, and the GPU is available when LVGL starts; set <ApiLink name="LV_VG_LITE_USE_GPU_INIT" /> to 0.
    - LVGL actively calls the GPU initialization function, and the SDK needs to implement the public function `gpu_init()`.
      LVGL will call it to complete the GPU hardware initialization during startup; set <ApiLink name="LV_VG_LITE_USE_GPU_INIT" /> to 1.
@@ -27,13 +27,13 @@ LVGL rendering acceleration can be supported without the need for LVGL adaptatio
 4. Set the <ApiLink name="LV_VG_LITE_FLUSH_MAX_COUNT" /> configuration to specify the flush method.
    VG-Lite uses two sets of command buffer buffers to render instructions, and utilizing this mechanism well can greatly improve drawing efficiency.
    Currently, two buffering methods are supported:
-   
+
    - Set <ApiLink name="LV_VG_LITE_FLUSH_MAX_COUNT" /> to zero (recommended). The rendering backend will obtain the GPU's working status every time it writes rendering instructions to the command buffer.
-   
+
      When the GPU is idle, it will immediately call `vg_lite_flush` to notify the GPU to start rendering and swap the command buffer. When the GPU is busy, it will continue to fill the command buffer cache with rendering instructions.
      The underlying driver will automatically determine if the command buffer has been filled. When it is about to be filled, it will forcibly wait for the unfinished drawing tasks to end and swap the command buffer.
      This method can effectively improve GPU utilization, especially in scenarios where rendering text, as the GPU's drawing time and the CPU's data preparation time are very close, allowing the CPU and GPU to run in parallel.
-   
+
    - Set <ApiLink name="LV_VG_LITE_FLUSH_MAX_COUNT" /> to a value greater than zero, such as 8. After writing 8 rendering instructions to the command buffer, the rendering backend
      will call `vg_lite_flush` to notify the GPU to start rendering and swap the command buffer.
 5. Set the <ApiLink name="LV_VG_LITE_USE_BOX_SHADOW" /> configuration to use GPU rendering for shadows.
@@ -88,4 +88,3 @@ The following table shows the color format mapping:
 - **Compressed formats are not supported.** Images with `LV_IMAGE_FLAGS_COMPRESSED` flag will be rejected by this decoder
   and passed to other decoders that support decompression.
 
-## API

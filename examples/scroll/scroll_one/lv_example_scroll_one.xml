@@ -1,0 +1,28 @@
+<!--
+ @title Scroll one at a time
+ @brief Restrict each scroll gesture to a single snappable child.
+
+ The panel combines centre snapping with `scroll_one="true"`. Snapping
+ alone lets a fast fling cross several panels before settling; with
+ "scroll one" enabled every gesture advances by exactly one panel, no
+ matter how hard it is thrown. It requires snappable children and a
+ snap mode other than `none`.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+		<!-- 💡 Fling hard — it still advances exactly one panel because `scroll_one="true"`. -->
+		<lv_label width="100%" style_text_align="center" text="Scroll: one at a time" />
+
+		<lv_obj width="290" height="150" flex_flow="row" style_pad_column="10" scroll_snap_x="center" scroll_one="true">
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 1" /></lv_button>
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 2" /></lv_button>
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 3" /></lv_button>
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 4" /></lv_button>
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 5" /></lv_button>
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 6" /></lv_button>
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 7" /></lv_button>
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 8" /></lv_button>
+			<lv_button width="80" height="100%"><lv_label align="center" text="Panel 9" /></lv_button>
+		</lv_obj>
+	</view>
+</screen>

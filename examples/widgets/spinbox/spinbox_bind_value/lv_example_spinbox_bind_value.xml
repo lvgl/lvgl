@@ -1,0 +1,39 @@
+<!--
+ @title Spinbox bind value
+ @brief Spinbox edits a subject; a bound arc visualises the same number.
+
+ The spinbox lets the user nudge `subject_value` with precision. The arc reads
+ the same subject through `bind_value`, so the visualisation tracks every step
+ without any explicit redraw call. Use this pattern whenever a numeric editor
+ and a graphical indicator both refer to the same underlying quantity.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Tap the spinbox arrows; the arc follows because both bind to `subject_value`. -->
+		<lv_label width="100%" style_text_align="center" text="Spinbox: edit, arc displays" />
+
+		<lv_arc width="160" height="160" bind_value="subject_value">
+			<lv_spinbox
+				width="80"
+				digit_count="3"
+				min_value="0"
+				max_value="100"
+				step="1"
+				bind_value="subject_value"
+				align="center"
+				y="-20"
+			/>
+
+			<lv_button align="center" y="20" x="-20" width="30" height="30">
+				<lv_label text="-" align="center" />
+				<subject_increment_event subject="subject_value" step="-1" trigger="clicked" />
+				<subject_increment_event subject="subject_value" step="-1" trigger="long_pressed_repeat" />
+			</lv_button>
+			<lv_button align="center" y="20" x="20" width="30" height="30">
+				<lv_label text="+" align="center" />
+				<subject_increment_event subject="subject_value" step="1" trigger="clicked" />
+				<subject_increment_event subject="subject_value" step="1" trigger="long_pressed_repeat" />
+			</lv_button>
+		</lv_arc>
+	</view>
+</screen>

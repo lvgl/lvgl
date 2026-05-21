@@ -1,0 +1,33 @@
+<!--
+ @title Grid descriptors
+ @brief Define fixed-size column and row tracks.
+
+ style_grid_column_dsc_array and style_grid_row_dsc_array list the size of each track in
+ pixels. The example uses three 70px columns and two 44px rows, and each child positions
+ itself with style_grid_cell_column_pos and style_grid_cell_row_pos.
+-->
+<screen>
+	<view flex_flow="column">
+		<!-- 💡 Adjust style_grid_column_dsc_array and style_grid_row_dsc_array to change fixed track sizes. -->
+		<lv_label width="100%" style_text_align="center" text="Grid descriptors: fixed tracks (3x2)" />
+
+		<!-- Define 3 columns and 2 rows with fixed pixel sizes. -->
+		<!-- Main grid container with fixed descriptors -->
+		<lv_obj
+			style_grid_column_dsc_array="70 70 70"
+			style_grid_row_dsc_array="44 44"
+			style_layout="grid"
+			width="100%"
+			height="content"
+		>
+			<!-- Row 0 cells -->
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="0" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0x4a90d9" style_bg_opa="100%" style_text_color="0xffffff" text="0,0" />
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="1" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0x4a90d9" style_bg_opa="100%" style_text_color="0xffffff" text="1,0" />
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="2" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0x4a90d9" style_bg_opa="100%" style_text_color="0xffffff" text="2,0" />
+			<!-- Row 1 cells -->
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="0" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0x27ae60" style_bg_opa="100%" style_text_color="0xffffff" text="0,1" />
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="1" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0x27ae60" style_bg_opa="100%" style_text_color="0xffffff" text="1,1" />
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="2" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0x27ae60" style_bg_opa="100%" style_text_color="0xffffff" text="2,1" />
+		</lv_obj>
+	</view>
+</screen>

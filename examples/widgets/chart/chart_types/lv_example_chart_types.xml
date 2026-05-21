@@ -1,0 +1,29 @@
+<!--
+ @title Chart types
+ @brief Same data rendered as bar and scatter to highlight the type difference.
+
+ The `type` attribute controls how a chart draws its series. `bar` paints one
+ column per slot; `scatter` plots (X, Y) pairs as dots. A scatter series binds
+ to *both* a Y axis and an X axis — that's what the OR-flavoured
+ `axis="primary_y|primary_x"` token encodes. Compare against
+ `chart_basic` (a `line` chart) to complete the family.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Swap `type` between `bar`, `line`, and `scatter` to see how the same series renders. -->
+		<lv_label width="100%" style_text_align="center" text="Chart: types (bar + scatter)" />
+
+		<!-- BAR chart: one column per slot -->
+		<lv_chart width="260" height="120" type="bar" point_count="8">
+			<lv_chart-series color="0x6366f1" axis="primary_y" values="10 35 25 55 40 70 60 85" />
+			<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
+		</lv_chart>
+
+		<!-- SCATTER chart: arbitrary X/Y pairs, no connecting line -->
+		<lv_chart width="260" height="120" type="scatter" point_count="6">
+			<lv_chart-series color="0xef4444" axis="primary_y|primary_x" values="10 40 20 80 50 30" />
+			<lv_chart-axis axis="primary_x" min_value="0" max_value="100" />
+			<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
+		</lv_chart>
+	</view>
+</screen>

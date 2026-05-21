@@ -1,0 +1,37 @@
+<!--
+ @title Flex ignore layout
+ @brief Opt one item out of the flex flow.
+
+ With ignore_layout="true", Flex skips the item entirely: it keeps its manual x/y
+ position and does not occupy a slot. The remaining items lay out as if it were not
+ there, which is useful for overlays, floating badges, or absolutely positioned helpers.
+-->
+<screen>
+	<view flex_flow="column">
+		<!-- 💡 Toggle ignore_layout and tweak x/y on the red item to see how it detaches from normal Flex positioning. -->
+		<lv_label width="100%" style_text_align="center" text="IGNORE_LAYOUT&#10;Opt out of flex positioning" />
+
+		<!-- Demo row mixing normal and ignore_layout items.
+		     The red item uses ignore_layout="true", so Flex skips it;
+		     it keeps its manual x/y position and the other items are laid out normally. -->
+		<lv_obj flex_flow="row" width="100%" height="150">
+			<lv_button height="content">
+				<lv_label text="Item A" align="center" />
+			</lv_button>
+
+			<!-- This item is invisible to flex. It sits at x=120, y=10
+			     (its own alignment) and does not occupy a flex slot. -->
+			<lv_button x="130" y="70" ignore_layout="true" style_bg_color="0xe74c3c">
+				<lv_label text="I'm Free!" align="center" />
+			</lv_button>
+
+			<lv_button>
+				<lv_label text="Item B" align="center" />
+			</lv_button>
+
+			<lv_button height="content">
+				<lv_label text="Item C" align="center" />
+			</lv_button>
+		</lv_obj>
+	</view>
+</screen>
