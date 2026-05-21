@@ -5,10 +5,6 @@
 #ifndef LVGL_PRIVATE_SRC_H
 #define LVGL_PRIVATE_SRC_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*********************
  *      INCLUDES
  *********************/
@@ -243,7 +239,4 @@ extern "C" {
  *      MACROS
  **********************/
 
-#ifdef __cplusplus
-} /*extern "C"*/
-#endif
 #endif /* LVGL_PRIVATE_SRC_H */
