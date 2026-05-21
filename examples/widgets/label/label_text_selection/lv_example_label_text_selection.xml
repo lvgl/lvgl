@@ -1,0 +1,22 @@
+<!--
+ @title Label text selection range
+ @brief Highlight a substring inside a label.
+
+ text_selection_start and text_selection_end take character indices and visually highlight
+ the range between them, useful for showing selected or marked-up text. The example
+ highlights characters 11..16 of the label content.
+-->
+<screen>
+	<view>
+		<!-- 💡 Adjust text_selection_start/end to highlight different ranges in the same text. -->
+		<lv_label width="100%" style_text_align="center" text="Label: text selection range" />
+
+		<!-- Label with predefined selected text range -->
+		<lv_label
+			y="30"
+			text="Selectable text range example"
+			text_selection_start="11"
+			text_selection_end="16"
+		/>
+	</view>
+</screen>

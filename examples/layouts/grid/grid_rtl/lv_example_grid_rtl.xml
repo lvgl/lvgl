@@ -1,0 +1,60 @@
+<!--
+ @title Grid RTL
+ @brief Reverse column order with style_base_dir.
+
+ Both grids declare the same three columns and the same children. Setting style_base_dir
+ to rtl on the second grid flips the column order, so cell 0 appears on the right
+ without changing how children are referenced or ordered in XML.
+-->
+<screen>
+	<styles>
+		<!-- Shared style for numbered badges -->
+		<style name="style_badge" bg_opa="100%" text_color="0xffffff" pad_all="6" radius="4" />
+	</styles>
+
+	<view flex_flow="column" style_pad_row="8">
+		<!-- 💡 Switch style_base_dir between ltr and rtl to see column order flip. -->
+		<lv_label width="100%" style_text_align="center" text="Grid RTL: columns are ordered right-to-left" />
+
+		<!-- LTR reference block -->
+		<lv_label text="LTR (default):" />
+		<lv_obj
+			style_grid_column_dsc_array="40 40 40"
+			style_grid_row_dsc_array="38"
+			style_layout="grid"
+			width="100%"
+			height="content"
+		>
+			<lv_label style_grid_cell_column_pos="0" style_grid_cell_row_pos="0" style_bg_color="0x3498db" text="0">
+				<style name="style_badge" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="1" style_grid_cell_row_pos="0" style_bg_color="0x2ecc71" text="1">
+				<style name="style_badge" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="2" style_grid_cell_row_pos="0" style_bg_color="0xe74c3c" text="2">
+				<style name="style_badge" />
+			</lv_label>
+		</lv_obj>
+
+		<!-- RTL block with identical children -->
+		<lv_label text="RTL:" />
+		<lv_obj
+			style_base_dir="rtl"
+			style_grid_column_dsc_array="40 40 40"
+			style_grid_row_dsc_array="38"
+			style_layout="grid"
+			width="100%"
+			height="content"
+		>
+			<lv_label style_grid_cell_column_pos="0" style_grid_cell_row_pos="0" style_bg_color="0x3498db" text="0">
+				<style name="style_badge" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="1" style_grid_cell_row_pos="0" style_bg_color="0x2ecc71" text="1">
+				<style name="style_badge" />
+			</lv_label>
+			<lv_label style_grid_cell_column_pos="2" style_grid_cell_row_pos="0" style_bg_color="0xe74c3c" text="2">
+				<style name="style_badge" />
+			</lv_label>
+		</lv_obj>
+	</view>
+</screen>

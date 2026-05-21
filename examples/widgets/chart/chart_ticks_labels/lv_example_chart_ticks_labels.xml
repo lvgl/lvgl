@@ -1,0 +1,28 @@
+<!--
+ @title Chart ticks and labels
+ @brief Pair a chart with an `lv_scale` to get a labelled X axis.
+
+ A chart has no built-in tick or label rendering for its X axis — the
+ convention is to stack a horizontal `lv_scale` directly below, sized to the
+ chart's width and with `total_tick_count` matching the chart's `point_count`.
+ `text_src` is a space-separated list of single-quoted labels (one per major
+ tick), the same syntax button matrix maps use. For the Y axis you can place
+ a vertical scale on either side of the chart with the same technique.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="8">
+		<!-- 💡 Edit the `text_src` list to relabel the X axis; entries must match `total_tick_count`. -->
+		<lv_label width="100%" style_text_align="center" text="Chart: ticks and labels" />
+
+		<lv_chart width="280" height="160" type="bar" point_count="6">
+			<lv_chart-series color="0x6366f1" axis="primary_y" values="20 45 30 70 55 80" />
+			<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
+		</lv_chart>
+
+		<lv_scale width="280" height="28" style_pad_hor="24"
+			mode="horizontal_bottom"
+			total_tick_count="6"
+			major_tick_every="1"
+			text_src="'Mon' 'Tue' 'Wed' 'Thu' 'Fri' 'Sat'" />
+	</view>
+</screen>

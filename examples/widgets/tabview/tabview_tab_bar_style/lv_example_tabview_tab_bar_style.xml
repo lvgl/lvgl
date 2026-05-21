@@ -1,0 +1,47 @@
+<!--
+ @title Tab view styling spots
+ @brief Three independent style targets: tab view body, tab bar, and a single tab.
+
+ The tab view body gets a dark `style_bg_color` (with `style_bg_opa="100%"` so
+ it actually paints). The `<lv_tabview-tab_bar>` element overrides the bar's
+ width, background, and text color. One `<lv_tabview-tab>` then sets its own
+ `bg_color` + `bg_opa` to override only that tab's content area; the others
+ stay transparent and let the tab view body show through. `active="1"` opens
+ the styled tab first so the per-tab override is immediately visible.
+-->
+<screen>
+	<view>
+		<!-- 💡 Switch tabs: tab B paints its own bg, A and C show the tab view body color. -->
+		<lv_tabview
+			width="100%"
+			height="100%"
+			tab_bar_position="left"
+			active="1"
+			style_bg_color="0x37474f"
+			style_bg_opa="100%"
+		>
+			<!-- Tab bar styling: wider bar, dark fill, light text -->
+			<lv_tabview-tab_bar
+				width="100"
+				style_bg_color="0x222831"
+				style_bg_opa="100%"
+				style_text_color="0xeeeeee"
+			/>
+
+			<!-- Transparent tab — the tab view body color is what you see -->
+			<lv_tabview-tab text="A">
+				<lv_label align="center" style_text_color="0xeeeeee" text="tab view bg = 0x37474f" />
+			</lv_tabview-tab>
+
+			<!-- Per-tab override: this tab paints its own background -->
+			<lv_tabview-tab text="B" style_bg_color="0xff7043" style_bg_opa="100%">
+				<lv_label align="center" text="this tab overrides bg = 0xff7043" />
+			</lv_tabview-tab>
+
+			<!-- Transparent tab again — back to the tab view body color -->
+			<lv_tabview-tab text="C">
+				<lv_label align="center" style_text_color="0xeeeeee" text="tab bar bg = 0x222831" />
+			</lv_tabview-tab>
+		</lv_tabview>
+	</view>
+</screen>

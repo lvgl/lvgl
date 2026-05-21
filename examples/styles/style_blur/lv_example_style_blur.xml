@@ -1,0 +1,49 @@
+<!--
+ @title Backdrop blur
+ @brief Frost the text sitting behind a translucent card.
+
+ A paragraph fills the screen and the glass card is centered over its
+ middle. The card's `blur_backdrop="true"` with `blur_radius="14"` blurs
+ only what is behind it, and `bg_opa="40%"` keeps the card translucent so
+ the blurred text shows through — sharp text around it, soft text under it.
+-->
+<screen>
+	<styles>
+		<!-- Translucent card that frosts whatever it covers -->
+		<style
+			name="style_glass"
+			radius="40"
+			bg_opa="40%"
+			bg_color="0xffffff"
+			border_width="1"
+			border_color="0xffffff"
+			border_opa="60%"
+			blur_backdrop="true"
+			blur_radius="18"
+			text_color="0xffffff"
+		/>
+	</styles>
+
+	<view
+		style_bg_opa="100%"
+		style_bg_color="0x6366f1"
+		style_bg_grad_color="0xec4899"
+		style_bg_grad_dir="ver"
+		style_pad_all="10"
+	>
+		<!-- 💡 The text under the card is blurred; lower the card's `bg_opa` or raise `blur_radius` for a stronger frost. -->
+		<lv_label
+			align="center"
+			width="100%"
+			style_text_align="center"
+			text="Hey there, I&apos;m a little text in the background which is blurred. You might seem that some of parts are sharp, but other under the glass cannot be read. "
+		/>
+		<lv_button align="center" style_pad_all="16" y="55">
+			<lv_label text="Click me" />
+		</lv_button>
+		<lv_obj width="210" height="110" align="center">
+			<style name="style_glass" />
+			<lv_label align="center" text="Frosted glass" />
+		</lv_obj>
+	</view>
+</screen>

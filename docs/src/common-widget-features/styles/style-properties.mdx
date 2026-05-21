@@ -12,6 +12,8 @@ description: LVGL style property reference.
 
 Properties related to size, position, alignment and layout of Widgets.
 
+<LvglExample name="lv_example_style_size_position" path="styles/style_size_position/lv_example_style_size_position" />
+
 <StyleProperty
   name="width"
   default="Widget dependent"
@@ -262,6 +264,8 @@ Skew Widget vertically. The value is interpreted in 0.1 degree units. E.g. 450 m
 
 Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML.
 
+<LvglExample name="lv_example_style_padding" path="styles/style_padding/lv_example_style_padding" />
+
 <StyleProperty
   name="pad_top"
   default="0"
@@ -336,6 +340,8 @@ Pad text labels away from the scale ticks/remainder of the ``LV_PART_``.
 
 Properties to describe spacing around a Widget. Very similar to the margin properties in HTML.
 
+<LvglExample name="lv_example_style_margin" path="styles/style_margin/lv_example_style_margin" />
+
 <StyleProperty
   name="margin_top"
   default="0"
@@ -379,6 +385,8 @@ Sets margin on the right. Widget will keep this space from its siblings in layou
 ## Background
 
 Properties to describe the background color and image of Widget.
+
+<LvglExample name="lv_example_style_background" path="styles/style_background/lv_example_style_background" />
 
 <StyleProperty
   name="bg_color"
@@ -538,6 +546,8 @@ If enabled the background image will be tiled. Possible values are `true` or `fa
 
 Properties to describe the borders
 
+<LvglExample name="lv_example_style_border" path="styles/style_border/lv_example_style_border" />
+
 <StyleProperty
   name="border_color"
   default="`0x000000`"
@@ -597,6 +607,8 @@ Sets whether the border should be drawn before or after the children are drawn.
 
 Properties to describe the outline. It's like a border but drawn outside of the rectangles.
 
+<LvglExample name="lv_example_style_outline" path="styles/style_outline/lv_example_style_outline" />
+
 <StyleProperty
   name="outline_width"
   default="0"
@@ -642,6 +654,8 @@ Set padding of outline, i.e. the gap between Widget and the outline.
 ## Shadow
 
 Properties to describe the shadow drawn under the rectangles.
+
+<LvglExample name="lv_example_style_shadow" path="styles/style_shadow/lv_example_style_shadow" />
 
 <StyleProperty
   name="shadow_width"
@@ -710,6 +724,8 @@ or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 
 Properties to describe the images
 
+<LvglExample name="lv_example_style_image" path="styles/lv_example_style_image" />
+
 <StyleProperty
   name="image_opa"
   default="`LV_OPA_COVER`"
@@ -759,6 +775,8 @@ Set image colorkey definition. The lv_image_colorkey_t contains two color values
 ## Line
 
 Properties to describe line-like Widgets
+
+<LvglExample name="lv_example_style_line" path="styles/lv_example_style_line" />
 
 <StyleProperty
   name="line_width"
@@ -824,6 +842,8 @@ Set opacity of lines.
 
 Properties to describe the Arc Widget
 
+<LvglExample name="lv_example_style_arc" path="styles/style_arc/lv_example_style_arc" />
+
 <StyleProperty
   name="arc_width"
   default="0"
@@ -878,6 +898,8 @@ effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file.
 ## Text
 
 Properties to describe the properties of text. All these properties are inherited.
+
+<LvglExample name="lv_example_style_text" path="styles/style_text/lv_example_style_text" />
 
 <StyleProperty
   name="text_color"
@@ -1003,6 +1025,8 @@ Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAPITAL_BASELINE/LOWER_BASELINE/C
 
 Blur the widget or its background
 
+<LvglExample name="lv_example_style_blur" path="styles/style_blur/lv_example_style_blur" />
+
 <StyleProperty
   name="blur_radius"
   default="`0`"
@@ -1041,6 +1065,8 @@ blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
 ## Drop Shadow
 
 Take an A8 snapshot of the given part and blur it.
+
+<LvglExample name="lv_example_style_drop_shadow" path="styles/lv_example_style_drop_shadow" />
 
 <StyleProperty
   name="drop_shadow_radius"
@@ -1108,6 +1134,8 @@ blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
 ## Miscellaneous
 
 Mixed properties for various purposes.
+
+<LvglExample name="lv_example_style_opacity_transform" path="styles/style_opacity_transform/lv_example_style_opacity_transform" />
 
 <StyleProperty
   name="radius"
@@ -1302,6 +1330,8 @@ rotary to half, 512: speeds up to double, 256: no change.
 
 Flex layout properties.
 
+<LvglExample name="lv_example_flex_flow" path="layouts/flex/flex_flow/lv_example_flex_flow" />
+
 <StyleProperty
   name="flex_flow"
   default="`LV_FLEX_FLOW_NONE`"
@@ -1355,6 +1385,8 @@ Defines how much space to take proportionally from the free space of the Widget'
 ## Grid
 
 Grid layout properties.
+
+<LvglExample name="lv_example_grid_descriptors" path="layouts/grid/grid_descriptors/lv_example_grid_descriptors" />
 
 <StyleProperty
   name="grid_column_dsc_array"

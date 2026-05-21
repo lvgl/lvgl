@@ -5,32 +5,19 @@ description: "The Spangroup Widget is used to display rich text. Different from 
 
 ## Overview
 
-The Spangroup Widget is used to display rich text.  Different
-from the Label Widget, Spangroups can render text styled with
-different fonts, colors, and sizes into the Spangroup Widget.
-See example below.
+The Spangroup Widget is used to display rich text. Unlike a Label, each Span within
+a Spangroup has its own text, font, color, and size. Spans can be added and removed
+at any time.
 
-A Spangroup contains 0 or more Span Descriptors ("Spans").  Each Span contains its
-own text and style properties for that text.  You add 1 Span (as a child) to the
-Spangroup for each "span" of uniquely-styled text needed.  Each Span so added is
-appended to the end of the list.  The list sequence determines the order in which the
-Spans are displayed.  Spans can be added to, and removed from, the Spangroup
-throughout its life.  The number of Spans that can be added is limited only by
-available RAM.
-
-## Parts and Styles
-
-- <ApiLink name="LV_PART_MAIN" /> Spangroup has only one part.
-
-## Usage
-
-### Set text and style
+## Create spans
 
 Add each needed Span to a Spangroup like this:
 
 ```c
 lv_span_t * span = lv_spangroup_new_span(spangroup);
 ```
+
+## Set text
 
 After a Span is created, use the following functions to set its text
 and style properties:
@@ -44,34 +31,33 @@ If the Spangroup Widget's `mode != LV_SPAN_MODE_FIXED` call
 <ApiLink name="lv_spangroup_refr_mode" display="lv_spangroup_refr_mode(spangroup)" /> after you have modifying any of its
 Spans to ensure it is redrawn appropriately.
 
-### Retrieving a Span child
+## Retrieving a Span child
 
 Spangroups store their children differently from normal Widgets, so
 normal functions for getting children won't work.
 
-<ApiLink name="lv_spangroup_get_child" display="lv_spangroup_get_child(spangroup, id)" /> will return a pointer to the
-child Span at index `id`. In addition, `id` can be negative to index
-from the end of the Spangroup where `-1` is the youngest child, `-2`
-is second youngest, etc.
+<ApiLink name="lv_spangroup_get_child" display="lv_spangroup_get_child(spangroup, id)" /> returns the Span at index `id`.
+Negative indices count from the end (`-1` = last, `-2` = second to last).
 
-E.g. `lv_span_t * span = lv_spangroup_get_child(spangroup, 0)` will
-return the first child of the Spangroup.
-`lv_span_t * span = lv_spangroup_get_child(spangroup, -1)` will return
-the last (or most recent) child.
+To resolve a span from a screen coordinate — for example the point where
+the Spangroup was clicked — use
+<ApiLink name="lv_spangroup_get_span_by_point" display="lv_spangroup_get_span_by_point(spangroup, &point)" />.
+The example below makes the group clickable and logs the text of whichever
+span was hit.
 
-### Child count
+<LvglExample name="lv_example_span_hittest" path="widgets/span/lv_example_span_hittest" />
+
+## Child count
 
 Use <ApiLink name="lv_spangroup_get_span_count" display="lv_spangroup_get_span_count(spangroup)" /> to get
 the number of contained Spans.
 
-E.g. `uint32_t size = lv_spangroup_get_span_count(spangroup)`
-
-### Removing a Span
+## Removing a Span
 
 You can remove a Span at any time during the Spangroup's life using the function
 <ApiLink name="lv_spangroup_delete_span" display="lv_spangroup_delete_span(spangroup, span)" />.
 
-### Text align
+## Text align
 
 Like the Label Widget, a Spangroup can be set to one the following text-alignment modes:
 
@@ -83,7 +69,7 @@ Like the Label Widget, a Spangroup can be set to one the following text-alignmen
 Use function <ApiLink name="lv_spangroup_set_align" display="lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_...)" />
 to set text alignment.
 
-### Modes
+## Modes
 
 **DEPRECATED**, set the width to <ApiLink name="LV_SIZE_CONTENT" /> or fixed value to control expanding/wrapping.
 
@@ -95,7 +81,7 @@ A Spangroup can be set to one the following modes:
 
 Use <ApiLink name="lv_spangroup_set_mode" display="lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK)" /> to set its mode.
 
-### Overflow
+## Overflow
 
 A Spangroup can be set to handle text overflow in one of the following ways:
 
@@ -105,27 +91,32 @@ A Spangroup can be set to handle text overflow in one of the following ways:
 Use <ApiLink name="lv_spangroup_set_overflow" display="lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)" /> to set
 the Spangroup's overflow mode.
 
-### First line indent
+## First line indent
 
 Use <ApiLink name="lv_spangroup_set_indent" display="lv_spangroup_set_indent(spangroup, 20)" /> to set the indent of the
 first line. All modes support pixel units. In addition, <ApiLink name="LV_SPAN_MODE_FIXED" />
 and <ApiLink name="LV_SPAN_MODE_BREAK" /> modes support percentage units as well
 (e.g. `lv_pct(10)`).
 
-### Lines
+## Lines
 
 Use <ApiLink name="lv_spangroup_set_max_lines" display="lv_spangroup_set_max_lines(spangroup, 10)" /> to set the maximum number
 of lines to be displayed in <ApiLink name="LV_SPAN_MODE_BREAK" /> mode. A negative
 value indicates no limit.
 
-### Data binding
 
-To get familiar with observers, subjects, and data bindings in general, visit the
-[Observer](/main-modules/observer/observer) page.
+## Styling
 
-Very similar to Label-text binding, a Span's text can be bound to a subject as well.
+<ApiLink name="LV_PART_MAIN" /> Spangroup has only one part.
 
-The only difference is that in the bind function both the Spangroup and the Span need to be specified:
+<LvglExample name="lv_example_span_styling" path="widgets/span/span_styling/lv_example_span_styling" />
+
+
+## Data binding
+
+A Span binds its text to a Subject. The link is one-way (Subject →
+Widget) — the binding works like Label-text binding, except both the
+Spangroup and the Span need to be specified in the bind call:
 
 <ApiLink name="lv_spangroup_bind_span_text" display="lv_spangroup_bind_span_text(spangroup, span1, &subject, format_string)" />
 
@@ -138,8 +129,6 @@ No special events are sent by Span Widgets.
 
 <Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
 </Callout>
 
 ## Keys
@@ -149,11 +138,3 @@ No *Keys* are processed by Span Widgets.
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Example
-
-### Span with custom styles
-
-<LvglExample name="lv_example_span_1" path="widgets/span/lv_example_span_1" />
-
-## API

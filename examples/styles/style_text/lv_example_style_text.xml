@@ -1,0 +1,38 @@
+<!--
+ @title Text styling
+ @brief Color text, widen letter/line spacing, and underline it.
+
+ `text_color` recolors the glyphs, `text_letter_space="4"` and
+ `text_line_space="14"` open up tracking and leading, and
+ `text_decor="underline"` underlines every line — the spacing makes the
+ two lines read as a styled heading rather than body text.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- Card surface -->
+		<style name="style_card"
+			radius="16" bg_opa="100%" bg_color="0xffffff"
+			border_width="1" border_color="0xe2e8f0" pad_all="22" />
+		<!-- The styled type itself -->
+		<style name="style_heading"
+			text_color="#accent"
+			text_letter_space="4"
+			text_line_space="14"
+			text_decor="underline" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Tune `text_letter_space`/`text_line_space`, or switch `text_decor` to `strikethrough`. -->
+		<lv_label width="100%" style_text_align="center" text="Style: text properties" />
+
+		<lv_obj width="240" height="content">
+			<style name="style_card" />
+			<lv_label align="center" style_text_align="center" text="Modern&#10;Typography">
+				<style name="style_heading" />
+			</lv_label>
+		</lv_obj>
+	</view>
+</screen>

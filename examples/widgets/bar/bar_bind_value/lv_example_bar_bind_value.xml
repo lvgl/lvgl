@@ -1,0 +1,33 @@
+<!--
+ @title Bar bind value with increment buttons
+ @brief Mutate a bound int subject via `subject_increment_event` instead of dragging.
+
+ The bar listens to `subject_value`. Each +/- button carries two
+ `<subject_increment_event>` children — one on `clicked` and one on
+ `long_pressed_repeat` — so a tap nudges by `step` and a hold keeps repeating.
+ `min_value`/`max_value` clamp the result and `rollover="true"` wraps around
+ once the bound is hit; hold past 100 to see it wrap back to 0.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Tap +/- to step; hold to repeat. Reach the limit to see rollover. -->
+		<lv_label width="100%" style_text_align="center" text="Bar: increment via events" />
+
+		<lv_bar width="240" height="20" bind_value="subject_value" />
+
+		<lv_label bind_text="subject_value" bind_text-fmt="%d%%" />
+
+		<lv_obj flex_flow="row" style_pad_column="12" style_bg_opa="0" style_border_width="0" width="content" height="content">
+			<lv_button>
+				<lv_label align="center" text="-" />
+				<subject_increment_event subject="subject_value" step="-5" min_value="0" max_value="100" rollover="true" trigger="clicked" />
+				<subject_increment_event subject="subject_value" step="-5" min_value="0" max_value="100" rollover="true" trigger="long_pressed_repeat" />
+			</lv_button>
+			<lv_button>
+				<lv_label align="center" text="+" />
+				<subject_increment_event subject="subject_value" step="5" min_value="0" max_value="100" rollover="true" trigger="clicked" />
+				<subject_increment_event subject="subject_value" step="5" min_value="0" max_value="100" rollover="true" trigger="long_pressed_repeat" />
+			</lv_button>
+		</lv_obj>
+	</view>
+</screen>

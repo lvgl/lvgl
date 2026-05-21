@@ -1,0 +1,25 @@
+<!--
+ @title Button matrix popover preview
+ @brief Show a magnified label above a button while it is pressed.
+
+ The `popover` flag mirrors the on-screen keyboard convention: while a button is
+ held down, its text floats up in a small popover above the finger so the user
+ can still read what they are pressing. The entire top row carries `popover` in
+ `ctrl_map`, which is how a keyboard layer typically enables the feature.
+-->
+<screen>
+	<view>
+		<!-- 💡 Press and hold any letter: a popover appears above the pressed key while the press is active. -->
+		<lv_label width="100%" style_text_align="center" text="Button matrix: popover preview on press" />
+
+		<!-- Keyboard-style row with popover enabled on every button -->
+		<lv_buttonmatrix
+			align="center"
+			y="40"
+			width="280"
+			height="60"
+			map="'Q' 'W' 'E' 'R' 'T' 'Y'"
+			ctrl_map="popover popover popover popover popover popover"
+		/>
+	</view>
+</screen>

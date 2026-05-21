@@ -1,0 +1,31 @@
+<!--
+ @title Scale round modes
+ @brief Two round scales: ticks pointing inward and outward.
+
+ `round_inner` places the ticks on the inside of the arc — useful when the
+ scale wraps content like a gauge needle. `round_outer` puts the ticks on
+ the outside — typical for dials and clocks. Both modes pick up
+ `angle_range` (the arc's angular sweep) and `rotation` (where the first
+ tick sits, measured clockwise from 3 o'clock).
+-->
+<screen>
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="24">
+		<!-- 💡 Change `angle_range` to 360 for a full ring, or shrink `rotation` to slide the sweep around. -->
+
+		<!-- Ticks inside: gauge-style -->
+		<lv_scale width="180" height="180"
+			mode="round_inner"
+			total_tick_count="11" major_tick_every="2"
+			label_show="true"
+			angle_range="270" rotation="135"
+			min_value="0" max_value="100" />
+
+		<!-- Ticks outside: clock face / dial -->
+		<lv_scale width="180" height="180"
+			mode="round_outer"
+			total_tick_count="11" major_tick_every="2"
+			label_show="true"
+			angle_range="270" rotation="135"
+			min_value="0" max_value="100" />
+	</view>
+</screen>

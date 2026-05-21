@@ -1,0 +1,21 @@
+<!--
+ @title Label text recolor
+ @brief Recolor individual words via inline color tags.
+
+ With recolor="true", segments wrapped as "#RRGGBB ... #" render in the given color. This
+ lets a single label mix multiple colors in one string without splitting it into separate
+ label widgets.
+-->
+<screen>
+	<view>
+		<!-- 💡 Adjust inline #RRGGBB segments to recolor different words and ranges in one label. -->
+		<lv_label width="100%" style_text_align="center" text="Label: text recolor" />
+
+		<!-- Recolor-enabled label using inline #RRGGBB color commands -->
+		<lv_label
+			y="30"
+			recolor="true"
+			text="Write a #ff0000 red# word, a #00a000 green# word, and a #0000ff blue# word."
+		/>
+	</view>
+</screen>

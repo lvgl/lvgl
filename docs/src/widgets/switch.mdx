@@ -11,7 +11,25 @@ modify, a value that can be "on" or "off".
 By default, a Switch is oriented horizontally. Its orientation will be vertical
 if you set `width` &lt; `height`.
 
-## Parts and Styles
+## Change state
+
+<LvglExample name="lv_example_switch_state" path="widgets/switch/switch_state/lv_example_switch_state" />
+
+The switch uses <ApiLink name="LV_STATE_CHECKED" />:
+
+- <ApiLink name="lv_obj_add_state" display="lv_obj_add_state(sw, LV_STATE_CHECKED)" /> — turn on.
+- <ApiLink name="lv_obj_remove_state" display="lv_obj_remove_state(sw, LV_STATE_CHECKED)" /> — turn off.
+- <ApiLink name="lv_obj_has_state" display="lv_obj_has_state(sw, LV_STATE_CHECKED)" /> — query.
+
+## Change orientation
+
+<LvglExample name="lv_example_switch_orientation" path="widgets/switch/switch_orientation/lv_example_switch_orientation" />
+
+<ApiLink name="lv_switch_set_orientation" display="lv_switch_set_orientation(sw, LV_SWITCH_ORIENTATION_…)" /> overrides the
+default `AUTO` (which picks based on `width`/`height`). Pass
+`HORIZONTAL` or `VERTICAL` to force one.
+
+## Styling
 
 - <ApiLink name="LV_PART_MAIN" /> Switch's background; uses the [typical
    background style properties](/common-widget-features/styles/overview). `padding` makes the indicator smaller
@@ -24,34 +42,34 @@ if you set `width` &lt; `height`.
    side of the slider.  The knob can be made larger with the `padding` values.
    Padding values can be asymmetric as well.
 
-## Usage
+<LvglExample name="lv_example_switch_styling" path="widgets/switch/switch_styling/lv_example_switch_styling" />
 
-### Change state
+Switch has three stylable parts: <ApiLink name="LV_PART_MAIN" /> (the
+rounded track), <ApiLink name="LV_PART_INDICATOR" /> (the filled side that
+appears when the switch is on), and <ApiLink name="LV_PART_KNOB" /> (the
+circle that slides). The on-state look is normally attached with
+`selector="indicator|checked"` so the indicator paints only while the
+switch is checked. Local `style_*` props on the `<lv_switch>` tag target
+MAIN.
 
-The Switch uses the standard <ApiLink name="LV_STATE_CHECKED" /> state.
+Padding controls the relative sizes of these parts:
 
-To get the current state of the Switch (with `true` being ON), use
-<ApiLink name="lv_obj_has_state" display="lv_obj_has_state(widget, LV_STATE_CHECKED)" />.
-
-Call <ApiLink name="lv_obj_add_state" display="lv_obj_add_state(widget, LV_STATE_CHECKED)" /> to turn it on, or
-<ApiLink name="lv_obj_remove_state" display="lv_obj_remove_state(widget, LV_STATE_CHECKED)" /> to turn it off
-programmatically.
-
-### Change orientation
-
-With a Switch is created, its default orientation is
-<ApiLink name="LV_SWITCH_ORIENTATION_AUTO" />, which causes it to be oriented based
-on `width` and `height`.  You can change this behavior using
-<ApiLink name="lv_switch_set_orientation" display="lv_switch_set_orientation(widget, orientation)" />.  Possible values for
-`orientation` are:
-
-- <ApiLink name="LV_SWITCH_ORIENTATION_AUTO" />
-- <ApiLink name="LV_SWITCH_ORIENTATION_HORIZONTAL" />
-- <ApiLink name="LV_SWITCH_ORIENTATION_VERTICAL" />
+- `pad_*` on <ApiLink name="LV_PART_MAIN" /> shrinks the indicator *inwards*.
+  The indicator fills the padded content area of MAIN, so the more padding
+  you add the more of the track stays visible around the coloured fill —
+  e.g. `pad_all="6"` keeps a 6 px ring of track exposed behind the
+  indicator.
+- `pad_*` on <ApiLink name="LV_PART_KNOB" /> grows the knob *outside* the
+  track. With `pad_all="0"` the knob is exactly as tall as MAIN. Positive
+  padding makes it overhang, which (with a soft shadow) produces the
+  typical floating-knob look. Negative padding would shrink it inside the
+  track.
 
 ## Events
 
 - <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when Switch changes state.
+
+<LvglExample name="lv_example_switch_event" path="widgets/switch/lv_example_switch_event" />
 
 <Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
@@ -68,15 +86,3 @@ Learn more about [events](/common-widget-features/events).
 <Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
-
-## Examples
-
-### Simple Switch
-
-<LvglExample name="lv_example_switch_1" path="widgets/switch/lv_example_switch_1" />
-
-### Switch Orientation
-
-<LvglExample name="lv_example_switch_2" path="widgets/switch/lv_example_switch_2" />
-
-## API

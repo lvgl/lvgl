@@ -1,0 +1,43 @@
+<!--
+ @title Checkbox styling
+ @brief Style the tick box (INDICATOR) and its checked state separately.
+
+ Checkbox exposes MAIN (label text area) and INDICATOR (tick box). The named styles
+ target INDICATOR in both default and `checked` states so the tick box has a soft,
+ rounded look unchecked and switches to an accent color with a tinted halo when
+ checked. MAIN is styled with local `style_*` props to recolor the label area.
+-->
+<screen>
+	<styles>
+		<!-- Tick box default: rounded square, soft border, neutral fill -->
+		<style name="style_cb_indicator"
+			bg_opa="100%" bg_color="0xf9fafb"
+			radius="6"
+			border_color="0x9ca3af" border_width="2"
+			pad_all="4" />
+		<!-- Tick box checked: accent fill + outline halo -->
+		<style name="style_cb_indicator_checked"
+			bg_color="0x16a34a"
+			border_color="0x14532d"
+			outline_color="0x16a34a" outline_width="4" outline_pad="2" outline_opa="80" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="14">
+		<!-- 💡 Click a checkbox to swap to the checked-state indicator style. -->
+		<lv_label width="100%" style_text_align="center" text="Checkbox: styling parts and states" />
+
+		<!-- Unchecked: only the default indicator style applies -->
+		<lv_checkbox text="Default look"
+			style_text_color="0x111827" style_pad_column="10">
+			<style name="style_cb_indicator" selector="indicator" />
+			<style name="style_cb_indicator_checked" selector="indicator|checked" />
+		</lv_checkbox>
+
+		<!-- Pre-checked so the checked-state style is visible at load time -->
+		<lv_checkbox text="Pre-checked" checked="true"
+			style_text_color="0x111827" style_pad_column="10">
+			<style name="style_cb_indicator" selector="indicator" />
+			<style name="style_cb_indicator_checked" selector="indicator|checked" />
+		</lv_checkbox>
+	</view>
+</screen>

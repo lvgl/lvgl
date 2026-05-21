@@ -38,6 +38,8 @@ Grid container if it is not already.
 
 ### Grid descriptors
 
+<LvglExample name="lv_example_grid_descriptors" path="layouts/grid/grid_descriptors/lv_example_grid_descriptors" />
+
 First you need to describe the size of rows and columns. It can be done
 by declaring 2 arrays and the track sizes in them. The last element must
 be <ApiLink name="LV_GRID_TEMPLATE_LAST" />.
@@ -55,11 +57,15 @@ To set the descriptors on a parent use
 Besides settings the sizes in pixels, you can use two special
 values:
 
+<LvglExample name="lv_example_grid_fr" path="layouts/grid/grid_fr/lv_example_grid_fr" />
+
 - <ApiLink name="LV_GRID_CONTENT" /> sets size to fit the largest child on this track
 - <ApiLink name="LV_GRID_FR" display="LV_GRID_FR(X)" /> determines what portion of the remaining space
   should be used by this track. Larger values means larger space.
 
 ### Grid items
+
+<LvglExample name="lv_example_grid_cell_span" path="layouts/grid/grid_cell_span/lv_example_grid_cell_span" />
 
 By default, a Widget's children are not added to the grid. They need to be
 added manually to a cell.
@@ -80,6 +86,8 @@ from the start cell. Must be `>= 1`.
 
 ### Grid align
 
+<LvglExample name="lv_example_grid_align" path="layouts/grid/grid_align/lv_example_grid_align" />
+
 If there is some empty space, items (Widgets) in Grid tracks can be aligned in several ways:
 
 - <ApiLink name="LV_GRID_ALIGN_START" />: means left when direction is horizontal and top when vertical. (default)
@@ -99,7 +107,9 @@ If there is some empty space, items (Widgets) in Grid tracks can be aligned in s
 To set the track's alignment use
 <ApiLink name="lv_obj_set_grid_align" display="lv_obj_set_grid_align(widget, column_align, row_align)" />.
 
-### Sub grid
+## Sub grid
+
+<LvglExample name="lv_example_grid_subgrid" path="layouts/grid/grid_subgrid/lv_example_grid_subgrid" />
 
 If you set the column and/or row grid descriptors of a widget to `NULL` it will use
 the grid descriptor(s) from it's parent.
@@ -139,7 +149,9 @@ The following Grid-related style properties exist:
 - <ApiLink name="GRID_CELL_ROW_POS" />
 - <ApiLink name="GRID_CELL_ROW_SPAN" />
 
-### Internal padding
+## Internal padding
+
+<LvglExample name="lv_example_grid_internal_padding" path="layouts/grid/grid_internal_padding/lv_example_grid_internal_padding" />
 
 To modify the minimum space Grid inserts between Widgets, the following
 properties can be set on the Grid container style:
@@ -147,15 +159,31 @@ properties can be set on the Grid container style:
 - <ApiLink name="lv_style_set_pad_row" /> sets padding between rows.
 - <ApiLink name="lv_style_set_pad_column" /> sets padding between columns.
 
-## Other features
 
-### RTL
+## Right-to-Left writing direction (RTL)
+
+<LvglExample name="lv_example_grid_rtl" path="layouts/grid/grid_rtl/lv_example_grid_rtl" />
 
 If the base direction of the container is set to <ApiLink name="LV_BASE_DIR_RTL" />,
 the meaning of <ApiLink name="LV_GRID_ALIGN_START" /> and <ApiLink name="LV_GRID_ALIGN_END" /> is
 swapped. I.e. `START` will mean right-most.
 
 The columns will be placed from right to left.
+
+## Ignoring layout
+
+<LvglExample name="lv_example_grid_ignore_layout" path="layouts/grid/grid_ignore_layout/lv_example_grid_ignore_layout" />
+
+To opt a child out of Grid positioning, set
+<ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" /> on that child:
+
+```c
+lv_obj_add_flag(child, LV_OBJ_FLAG_IGNORE_LAYOUT);
+```
+
+When this flag is set, Grid skips the child completely. It does not occupy a
+grid cell and keeps its manually set position, which is useful for overlays
+or decorative elements.
 
 ### Edge cases and notes
 
@@ -169,30 +197,3 @@ The columns will be placed from right to left.
 - Learn more about CSS Subgrid layout.
 </Callout>
 
-## Examples
-
-### A simple grid
-
-<LvglExample name="lv_example_grid_1" path="layouts/grid/lv_example_grid_1" />
-
-### Demonstrate cell placement and span
-
-<LvglExample name="lv_example_grid_2" path="layouts/grid/lv_example_grid_2" />
-
-### Demonstrate grid's -free unit-
-
-<LvglExample name="lv_example_grid_3" path="layouts/grid/lv_example_grid_3" />
-
-### Demonstrate track placement
-
-<LvglExample name="lv_example_grid_4" path="layouts/grid/lv_example_grid_4" />
-
-### Demonstrate column and row gap
-
-<LvglExample name="lv_example_grid_5" path="layouts/grid/lv_example_grid_5" />
-
-### Demonstrate RTL direction on grid
-
-<LvglExample name="lv_example_grid_6" path="layouts/grid/lv_example_grid_6" />
-
-## API

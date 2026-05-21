@@ -1,0 +1,34 @@
+<!--
+ @title Border
+ @brief Frame a card with a colored, partially transparent border.
+
+ `border_width="4"` and `border_color` draw the frame and
+ `border_opa="60%"` lets the surface show through it, so the border reads
+ as a soft accent instead of a hard line. `radius="20"` rounds the corners
+ and the border follows them.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- Soft, half-opacity accent frame on a clean surface -->
+		<style name="style_framed"
+			radius="20"
+			bg_opa="100%"
+			bg_color="0xffffff"
+			border_color="#accent"
+			border_width="4"
+			border_opa="60%" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Tune `border_width`/`border_opa`, or set `border_side` to `none` to drop the frame. -->
+		<lv_label width="100%" style_text_align="center" text="Style: border" />
+
+		<lv_obj width="210" height="140">
+			<style name="style_framed" />
+			<lv_label align="center" text="Bordered card" />
+		</lv_obj>
+	</view>
+</screen>

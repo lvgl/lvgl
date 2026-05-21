@@ -1,0 +1,54 @@
+<!--
+ @title Flex internal padding
+ @brief Set horizontal and vertical gaps between flex items.
+
+ style_pad_column controls the gap between items on a row, and style_pad_row controls the
+ gap between wrapped rows. The container uses row_wrap so both gaps are visible at once
+ — the chips spread out horizontally and rows are pushed apart vertically.
+-->
+<screen>
+	<styles>
+		<!-- Shared chip style for all language tags -->
+		<style name="style_tag" bg_opa="100%" pad_all="8" radius="4" />
+	</styles>
+
+	<view flex_flow="column" style_pad_row="10">
+		<!-- 💡 Adjust style_pad_column and style_pad_row to compare horizontal and vertical gaps between wrapped items. -->
+		<lv_label
+			width="100%"
+			style_text_align="center"
+			text="Internal padding: gap between flex items"
+		/>
+
+		<!-- style_pad_column controls horizontal gap between items in a row.
+		     style_pad_row would control the vertical gap between rows when wrapping.
+		     Try changing style_pad_column to 0 or 20 to see the effect. -->
+		<!-- Demo container with row/column gaps -->
+		<lv_obj
+			flex_flow="row_wrap"
+			style_pad_column="10"
+			style_pad_row="30"
+			width="100%"
+			height="content"
+		>
+			<lv_label style_bg_color="0x4a90d9" text="HTML">
+				<style name="style_tag" />
+			</lv_label>
+			<lv_label style_bg_color="0xe67e22" text="CSS">
+				<style name="style_tag" />
+			</lv_label>
+			<lv_label style_bg_color="0x27ae60" text="JavaScript">
+				<style name="style_tag" />
+			</lv_label>
+			<lv_label style_bg_color="0x8e44ad" text="Python">
+				<style name="style_tag" />
+			</lv_label>
+			<lv_label style_bg_color="0xc0392b" text="C++">
+				<style name="style_tag" />
+			</lv_label>
+			<lv_label style_bg_color="0x16a085" text="Rust">
+				<style name="style_tag" />
+			</lv_label>
+		</lv_obj>
+	</view>
+</screen>

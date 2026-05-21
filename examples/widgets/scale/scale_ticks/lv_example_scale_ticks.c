@@ -1,0 +1,60 @@
+/**
+ * @file lv_example_scale_ticks.c
+ */
+
+#include "../../../lv_examples.h"
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES
+
+/**
+ * @title Scale tick configuration
+ * @brief Tune tick density and which ticks count as "major" (drawn longer with labels).
+ *
+ * `total_tick_count` is the *total* number of ticks rendered — both minor and
+ * major. `major_tick_every` picks every Nth tick to be drawn longer and
+ * (when `label_show="true"`) carry a numeric label. The three scales below
+ * share the same physical width but vary their tick density.
+ */
+void lv_example_scale_ticks(void)
+{
+    lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_pad_row(screen, 20, 0);
+
+    /* 💡 Bump `total_tick_count` or change `major_tick_every` to see how density and labels reorganise. */
+    lv_obj_t * lv_label_0 = lv_label_create(screen);
+    lv_obj_set_width(lv_label_0, lv_pct(100));
+    lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text(lv_label_0, "Scale: tick configuration");
+
+    /* Sparse: 5 ticks total, every second one major */
+    lv_obj_t * lv_scale_0 = lv_scale_create(screen);
+    lv_obj_set_size(lv_scale_0, 260, 60);
+    lv_scale_set_mode(lv_scale_0, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_scale_set_total_tick_count(lv_scale_0, 5);
+    lv_scale_set_major_tick_every(lv_scale_0, 2);
+    lv_scale_set_label_show(lv_scale_0, true);
+    lv_scale_set_min_value(lv_scale_0, 0);
+    lv_scale_set_max_value(lv_scale_0, 100);
+
+    /* Medium: 11 ticks, every 5th major */
+    lv_obj_t * lv_scale_1 = lv_scale_create(screen);
+    lv_obj_set_size(lv_scale_1, 260, 60);
+    lv_scale_set_mode(lv_scale_1, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_scale_set_total_tick_count(lv_scale_1, 11);
+    lv_scale_set_major_tick_every(lv_scale_1, 5);
+    lv_scale_set_label_show(lv_scale_1, true);
+    lv_scale_set_min_value(lv_scale_1, 0);
+    lv_scale_set_max_value(lv_scale_1, 100);
+
+    /* Dense: 21 ticks, every 4th major — minor ticks become visible */
+    lv_obj_t * lv_scale_2 = lv_scale_create(screen);
+    lv_obj_set_size(lv_scale_2, 260, 60);
+    lv_scale_set_mode(lv_scale_2, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_scale_set_total_tick_count(lv_scale_2, 21);
+    lv_scale_set_major_tick_every(lv_scale_2, 4);
+    lv_scale_set_label_show(lv_scale_2, true);
+    lv_scale_set_min_value(lv_scale_2, 0);
+    lv_scale_set_max_value(lv_scale_2, 100);
+}
+#endif

@@ -1,0 +1,35 @@
+<!--
+ @title Scrollable chart
+ @brief A chart wider than its container scrolls horizontally as the user drags it.
+
+ LVGL doesn't expose a chart-specific zoom: to let a chart grow beyond the
+ visible width, wrap it in a parent that *is* the viewport, then size the
+ chart's width to a percentage larger than 100%. The parent's default
+ `scrollable` behaviour kicks in. A horizontal `lv_scale` sits inside the
+ same wrapper so its labels scroll in lockstep with the bars.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Drag horizontally to scroll the chart; the scale below follows because both share the scrolling wrapper. -->
+		<lv_label width="100%" style_text_align="center" text="Chart: scrollable" />
+
+		<!-- Viewport: small fixed width; clips its scrollable child. -->
+		<lv_obj width="220" height="180" style_pad_all="0">
+			<!-- Wrapper: wider than the viewport so it scrolls. Hosts both chart and scale stacked vertically. -->
+			<lv_obj width="300%" height="100%" flex_flow="column" style_bg_opa="0" style_border_width="0" style_pad_all="4">
+				<lv_chart width="100%" flex_grow="1"
+					type="bar" point_count="12"
+					hor_div_line_count="3" ver_div_line_count="0">
+					<lv_chart-series color="0x6366f1" axis="primary_y" values="32 41 38 55 62 70 65 58 47 60 75 80" />
+					<lv_chart-axis axis="primary_y" min_value="0" max_value="100" />
+				</lv_chart>
+
+				<lv_scale width="100%" height="22"
+					mode="horizontal_bottom"
+					total_tick_count="12" major_tick_every="1"
+					label_show="true"
+					text_src="'Jan' 'Feb' 'Mar' 'Apr' 'May' 'Jun' 'Jul' 'Aug' 'Sep' 'Oct' 'Nov' 'Dec'" />
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>

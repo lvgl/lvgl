@@ -8,7 +8,7 @@ description: The List Widget is basically a rectangle with vertical layout to wh
 The List Widget is basically a rectangle with vertical layout to which Buttons
 and Text can be added.
 
-## Parts and Styles
+## Styling
 
 **Background**
 
@@ -21,9 +21,7 @@ and Text can be added.
 
 - See the [Button](/widgets/button)'s and [Label](/widgets/label)'s documentation.
 
-## Usage
-
-### Buttons
+## Buttons
 
 <ApiLink name="lv_list_add_button" display="lv_list_add_button(list, icon, text)" /> adds a full-width button with an icon
 (that can be an image or symbol) and text.  This function returns a pointer to the
@@ -31,7 +29,7 @@ button created, which you can use to, for example, add an event call-back.
 
 The text is scrolled horizontally if it is longer than the button.
 
-### Text
+## Text
 
 <ApiLink name="lv_list_add_text" display="lv_list_add_text(list, text)" /> adds a text string.  This function returns a
 pointer to the label created, which you can use to, for example, change its text
@@ -59,10 +57,8 @@ Learn more about [Keys](/main-modules/indev/keypad).
 
 ### Simple List
 
-<LvglExample name="lv_example_list_1" path="widgets/list/lv_example_list_1" />
+<LvglExample name="lv_example_list_sections" path="widgets/list/lv_example_list_sections" />
 
 ### Sorting a List using up and down buttons
 
-<LvglExample name="lv_example_list_2" path="widgets/list/lv_example_list_2" />
-
-## API
+<LvglExample name="lv_example_list_reorder" path="widgets/list/lv_example_list_reorder" />

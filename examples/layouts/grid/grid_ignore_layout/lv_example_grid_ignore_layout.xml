@@ -1,0 +1,50 @@
+<!--
+ @title Grid ignore layout
+ @brief Detach an item from grid placement.
+
+ Four normal grid items occupy their cells while a fifth item with ignore_layout="true"
+ is skipped by the grid. The detached item keeps its manual x/y position and does not
+ displace any of the placed cells, useful for floating badges or overlays.
+-->
+<screen>
+	<styles>
+		<!-- Shared style for grid cells -->
+		<style name="style_cell" bg_opa="100%" text_color="0xffffff" pad_all="6" radius="4" />
+	</styles>
+
+	<view flex_flow="column" style_pad_row="8">
+		<!-- 💡 Toggle ignore_layout and x/y on the FREE tile to see how it leaves the grid flow. -->
+		<lv_label width="100%" style_text_align="center" text="Grid + IGNORE_LAYOUT: one item floats freely" />
+
+		<!-- The red item has flag_ignore_layout="true", so grid ignores it.
+		     The other items keep normal grid placement. -->
+		<!-- Main grid container -->
+		<lv_obj
+			style_grid_column_dsc_array="54 54 54"
+			style_grid_row_dsc_array="42 42"
+			style_layout="grid"
+			width="100%"
+			height="120"
+		>
+			<lv_label style_grid_cell_column_pos="0" style_grid_cell_row_pos="0" style_bg_color="0x3498db" text="A">
+				<style name="style_cell" />
+			</lv_label>
+
+			<lv_label style_grid_cell_column_pos="1" style_grid_cell_row_pos="0" style_bg_color="0x2ecc71" text="B">
+				<style name="style_cell" />
+			</lv_label>
+
+			<lv_label style_grid_cell_column_pos="2" style_grid_cell_row_pos="0" style_bg_color="0xe67e22" text="C">
+				<style name="style_cell" />
+			</lv_label>
+
+			<lv_label style_grid_cell_column_pos="0" style_grid_cell_row_pos="1" style_bg_color="0x8e44ad" text="D">
+				<style name="style_cell" />
+			</lv_label>
+
+			<lv_label ignore_layout="true" x="105" y="66" style_bg_color="0xe74c3c" text="FREE">
+				<style name="style_cell" />
+			</lv_label>
+		</lv_obj>
+	</view>
+</screen>

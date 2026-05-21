@@ -1,0 +1,35 @@
+<!--
+ @title Disabling scrolling
+ @brief Clearing the SCROLLABLE flag clips overflowing content instead of scrolling it.
+
+ Both panels hold the same overflowing column of buttons. The left one
+ keeps the default behaviour and scrolls. The right one sets
+ `scrollable="false"`, so the flag is cleared: the extra content is
+ simply clipped and the panel cannot be scrolled at all.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="12">
+		<!-- 💡 Left panel scrolls; the right has `scrollable="false"` so the same content is just clipped. -->
+		<lv_label width="100%" style_text_align="center" text="Scroll: scrollable flag" />
+
+		<lv_obj width="100%" height="160" flex_flow="row" style_flex_main_place="center" style_pad_column="16">
+			<!-- Default: scrollable -->
+			<lv_obj width="130" height="100%" flex_flow="column" style_pad_row="8">
+				<lv_label text="scrollable" />
+				<lv_button width="100%"><lv_label align="center" text="A" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="B" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="C" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="D" /></lv_button>
+			</lv_obj>
+
+			<!-- Flag cleared: content is clipped, no scrolling -->
+			<lv_obj width="130" height="100%" flex_flow="column" style_pad_row="8" scrollable="false" style_border_color="0x9429ff" style_border_width="2">
+				<lv_label text="clipped" />
+				<lv_button width="100%"><lv_label align="center" text="A" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="B" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="C" /></lv_button>
+				<lv_button width="100%"><lv_label align="center" text="D" /></lv_button>
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>

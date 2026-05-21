@@ -1,0 +1,23 @@
+<!--
+ @title Calendar basics
+ @brief Month view with an arrow header for navigation.
+
+ `today_*` marks the current date (rendered with the today highlight). `shown_*`
+ controls which month the calendar opens on — here we start a month behind
+ today so the user immediately sees that the today indicator only fires when
+ the shown month matches. A `<header_arrow/>` child adds prev/next arrows to
+ the top of the calendar; swap it for `<header_dropdown/>` to get the
+ month/year selector variant.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Tap a day to select it; use the header arrows to jump between months. -->
+		<lv_label width="100%" style_text_align="center" text="Calendar: basics" />
+
+		<lv_calendar width="280" height="200"
+			today_year="2026" today_month="5" today_day="15"
+			shown_year="2026" shown_month="5">
+			<lv_calendar-header_arrow />
+		</lv_calendar>
+	</view>
+</screen>

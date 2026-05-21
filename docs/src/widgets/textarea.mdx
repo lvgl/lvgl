@@ -11,30 +11,9 @@ text becomes long enough, the Text Area can be scrolled.
 
 One-line mode and password modes are supported.
 
-## Parts and Styles
+## Adding text
 
-- <ApiLink name="LV_PART_MAIN" /> The background of the Text Area; uses the
-   [typical background style properties](/common-widget-features/styles/overview) and the text related
-   style properties including `text_align` to align the text to the left,
-   right or center.
-- <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar that is shown when the text is
-   longer than its height.
-- <ApiLink name="LV_PART_SELECTED" /> Determines the style of the [selected
-   text](/widgets/label). Only `text_color` and
-   `bg_color` style properties can be used. `bg_color` should be set
-   directly on the label of the Text Area.
-- <ApiLink name="LV_PART_CURSOR" /> Marks the position where the characters are
-   inserted. The cursor's area is always the bounding box of the current
-   character. A block cursor can be created by adding a background color
-   and background opacity to <ApiLink name="LV_PART_CURSOR" />'s style. To create
-   a "bar" cursor leave the cursor transparent and set a left border. The
-   `anim_time` style property sets the cursor's blink time.
-- <ApiLink name="LV_PART_TEXTAREA_PLACEHOLDER" /> Unique to Text Area; allows styling
-   the [placeholder text](/widgets/textarea).
-
-## Usage
-
-### Adding text
+<LvglExample name="lv_example_textarea_buttonmatrix" path="widgets/textarea/lv_example_textarea_buttonmatrix" />
 
 You can insert text or characters to the current cursor's position with:
 
@@ -47,7 +26,9 @@ To add wide characters like `'á'`, `'ß'` or CJK characters, use
 <ApiLink name="lv_textarea_set_text" display="lv_textarea_set_text(textarea, &quot;New text&quot;)" /> replaces all existing text
 with "New text".
 
-### Placeholder text
+## Placeholder text
+
+<LvglExample name="lv_example_textarea_placeholder" path="widgets/textarea/textarea_placeholder/lv_example_textarea_placeholder" />
 
 Placeholder text is text that is displayed when the Text Area is empty.  This can be
 a handy way to provide the end user with a hint about what to type there.
@@ -55,14 +36,14 @@ a handy way to provide the end user with a hint about what to type there.
 Specify placeholder text using
 <ApiLink name="lv_textarea_set_placeholder_text" display="lv_textarea_set_placeholder_text(textarea, &quot;Placeholder text&quot;)" />.
 
-### Delete character
+## Delete character
 
 To delete the character to the left of the current cursor position, use
 <ApiLink name="lv_textarea_delete_char" display="lv_textarea_delete_char(textarea)" />.
 
 To delete to the right, use <ApiLink name="lv_textarea_delete_char_forward" display="lv_textarea_delete_char_forward(textarea)" />
 
-### Moving the cursor
+## Moving the cursor
 
 The cursor position can be modified programmatically using
 <ApiLink name="lv_textarea_set_cursor_pos" display="lv_textarea_set_cursor_pos(textarea, cursor_pos)" /> where `cursor_pos` is
@@ -80,13 +61,13 @@ You can move the cursor one character-position (or line) at a time with
 If <ApiLink name="lv_textarea_set_cursor_click_pos" display="lv_textarea_set_cursor_click_pos(textarea, true)" /> is applied, the
 cursor will jump to the position where the Text Area was clicked.
 
-### Hiding the cursor
+## Hiding the cursor
 
 The cursor is normally always visible. It can be a good idea to style it
 to be visible only in <ApiLink name="LV_STATE_FOCUSED" /> state. See [Styles](/common-widget-features/styles)
 for more information about how to do this.
 
-### One-line mode
+## One-line mode
 
 The Text Area can be configured to keep all text on a single line with
 <ApiLink name="lv_textarea_set_one_line" display="lv_textarea_set_one_line(textarea, true)" />. In this mode:
@@ -95,7 +76,9 @@ The Text Area can be configured to keep all text on a single line with
 - line break characters are ignored, and
 - word wrap is disabled.
 
-### Password mode
+## Password mode
+
+<LvglExample name="lv_example_textarea_password" path="widgets/textarea/lv_example_textarea_password" />
 
 The Text Area supports password mode which can be enabled with
 <ApiLink name="lv_textarea_set_password_mode" display="lv_textarea_set_password_mode(textarea, true)" />.
@@ -117,7 +100,9 @@ text entered, not the bullet characters.
 
 The visibility time can be adjusted with <ApiLink name="LV_TEXTAREA_DEF_PWD_SHOW_TIME" /> in `lv_conf.h`.
 
-### Accepted characters
+## Accepted characters
+
+<LvglExample name="lv_example_textarea_format" path="widgets/textarea/lv_example_textarea_format" />
 
 You can set a list of accepted characters with
 <ApiLink name="lv_textarea_set_accepted_chars" display="lv_textarea_set_accepted_chars(textarea, list)" /> or
@@ -129,64 +114,58 @@ entered not in this list will be ignored.
 lv_textarea_set_accepted_chars(textarea, "0123456789.+-");
 ```
 
-### Max text length
+## Max text length
 
 The maximum number of characters can be limited using
 <ApiLink name="lv_textarea_set_max_length" display="lv_textarea_set_max_length(textarea, max_char_num)" />.
 
-### Very long text
+## Very long text
 
-If the text in the Text Area is very long (e.g. > 20k characters), scrolling and
-drawing might be slow.  However, by setting <ApiLink name="LV_LABEL_LONG_TXT_HINT" /> in
-`lv_conf.h` to a non-zero value, the performance with long text is significantly
-improved.  It does this by saving some additional information about the current
-vertical position of the text shown.  With this mode configured, scrolling and drawing
-is as fast as with "normal" short text.  The cost is 12 extra bytes per label in RAM.
+For text exceeding ~20k characters, enable <ApiLink name="LV_LABEL_LONG_TXT_HINT" /> in
+`lv_conf.h` to improve scrolling and drawing performance by caching vertical
+position data. It is set to `1` by default.
 
-This value is set to `1` by default.  If you do not use long text, you can save
-12 bytes per label by setting it to `0`.
+## Selecting text
 
-### Selecting text
+Enable text selection with
+<ApiLink name="lv_textarea_set_text_selection" display="lv_textarea_set_text_selection(textarea, true)" />.
+Requires <ApiLink name="LV_LABEL_TEXT_SELECTION" /> set to a non-zero value in `lv_conf.h`.
 
-If <ApiLink name="LV_LABEL_TEXT_SELECTION" /> is set to a non-zero value in `lv_conf.h`,
-some additional functionality (and 8 bytes per label) are added to Label Widgets
-and Text Area Widgets, and text-selection functionality is automated in Text Area
-Widgets.  (If you do not use selected text in your application, you can save 8 bytes
-per label in RAM by setting that macro to equate to `0`.)
+To manipulate the selection programmatically (`ta_label = lv_textarea_get_label(textarea)`):
 
-Any part of the text can be selected if enabled with
-<ApiLink name="lv_textarea_set_text_selection" display="lv_textarea_set_text_selection(textarea, true)" />.  This works much like
-when you select text on your PC by clicking and dragging with your mouse or other
-pointer input device.  If you pass `false` to this function to disable text
-selection, any text selected time of the call will be de-selected.
+- <ApiLink name="lv_textarea_get_text_selection" display="lv_textarea_get_text_selection(textarea)" /> — whether selection is enabled.
+- <ApiLink name="lv_textarea_text_is_selected" display="lv_textarea_text_is_selected(textarea)" /> — whether text is currently selected.
+- <ApiLink name="lv_textarea_clear_selection" display="lv_textarea_clear_selection(textarea)" /> — clears the selection.
+- <ApiLink name="lv_label_set_text_selection_start" display="lv_label_set_text_selection_start(ta_label, index)" /> — start index; pass <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> for none.
+- <ApiLink name="lv_label_set_text_selection_end" display="lv_label_set_text_selection_end(ta_label, index)" /> — end index (exclusive); pass <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> for none.
+- <ApiLink name="lv_label_get_text_selection_start" display="lv_label_get_text_selection_start(ta_label)" /> — gets start index.
+- <ApiLink name="lv_label_get_text_selection_end" display="lv_label_get_text_selection_end(ta_label)" /> — gets end index.
 
-Shift+click and keyboard-only text selection with Shift+Arrow keys is expected to
-be added in the future.
+## Styling
 
-If you need to programmatically deal with selected text, in addition to the
-<ApiLink name="lv_textarea_set_text_selection" display="lv_textarea_set_text_selection(textarea, enable)" /> function, the following
-is your tool set for doing so.  (`ta_label` is a pointer to the Text Area's
-Label retrieved with `ta_label = lv_textarea_get_label(textarea);`.)
+<LvglExample name="lv_example_textarea_cursor" path="widgets/textarea/textarea_cursor/lv_example_textarea_cursor" />
 
-- <ApiLink name="lv_textarea_get_text_selection" display="lv_textarea_get_text_selection(textarea)" /> tells whether text selection is enabled.
-- <ApiLink name="lv_textarea_text_is_selected" display="lv_textarea_text_is_selected(textarea)" /> tells whether any text is currently selected.
-- <ApiLink name="lv_textarea_clear_selection" display="lv_textarea_clear_selection(textarea)" /> clears current text selection.
-- <ApiLink name="lv_label_set_text_selection_start" display="lv_label_set_text_selection_start(ta_label, index)" /> where `index` is
-  the zero-based index of the first character of the selected text.
-  Pass <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> to specify no text selected.
-- <ApiLink name="lv_label_set_text_selection_end" display="lv_label_set_text_selection_end(ta_label, index)" /> where `index` is
-  the zero-based index of the character just after the selected text.
-  Pass <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> to specify no text selected.
-- <ApiLink name="lv_label_get_text_selection_start" display="lv_label_get_text_selection_start(ta_label)" /> zero-based index of the
-  first character of the selected text.
-  <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> indicates no text selected.
-- <ApiLink name="lv_label_get_text_selection_end" display="lv_label_get_text_selection_end(ta_label)" /> zero-based index of the
-  character just after the selected text.
-  <ApiLink name="LV_DRAW_LABEL_NO_TXT_SEL" /> indicates no text selected.
+The Text Area exposes these parts, each styled independently with a named
+style and a `selector`:
 
-Normally you won't need these since Text Area automates the text selection process,
-but if you do need to change the selection programmatically, the above are your
-tools to do so.
+- <ApiLink name="LV_PART_MAIN" /> The background of the Text Area; uses the
+   [typical background style properties](/common-widget-features/styles/overview) and the text related
+   style properties including `text_align` to align the text to the left,
+   right or center.
+- <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar that is shown when the text is
+   longer than its height.
+- <ApiLink name="LV_PART_SELECTED" /> Determines the style of the [selected
+   text](/widgets/label). Only `text_color` and
+   `bg_color` style properties can be used. `bg_color` should be set
+   directly on the label of the Text Area.
+- <ApiLink name="LV_PART_CURSOR" /> Marks the position where the characters are
+   inserted. The cursor's area is always the bounding box of the current
+   character. A block cursor can be created by adding a background color
+   and background opacity to <ApiLink name="LV_PART_CURSOR" />'s style. To create
+   a "bar" cursor leave the cursor transparent and set a left border. The
+   `anim_time` style property sets the cursor's blink time.
+- <ApiLink name="LV_PART_TEXTAREA_PLACEHOLDER" /> Unique to Text Area; allows styling
+   the [placeholder text](/widgets/textarea).
 
 ## Events
 
@@ -206,8 +185,6 @@ tools to do so.
 
 <Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
 </Callout>
 
 ## Keys
@@ -219,22 +196,3 @@ Learn more about [events](/common-widget-features/events).
 Learn more about [Keys](/main-modules/indev/keypad).
 </Callout>
 
-## Examples
-
-### Simple Text area
-
-<LvglExample name="lv_example_textarea_1" path="widgets/textarea/lv_example_textarea_1" />
-
-### Text area with password field
-
-<LvglExample name="lv_example_textarea_2" path="widgets/textarea/lv_example_textarea_2" />
-
-### Text auto-formatting
-
-<LvglExample name="lv_example_textarea_3" path="widgets/textarea/lv_example_textarea_3" />
-
-### Text area cursor styling
-
-<LvglExample name="lv_example_textarea_4" path="widgets/textarea/lv_example_textarea_4" />
-
-## API

@@ -1,0 +1,41 @@
+<!--
+ @title Grid FR units
+ @brief Share remaining space across tracks with fr() weights.
+
+ The first column has a fixed 60px size; the next two columns use fr(1) and fr(2) and
+ split the remaining width in a 1:2 ratio. The same idea applies to rows: the first row
+ is fixed at 44px and the second uses fr(1) to absorb the leftover height.
+-->
+<screen>
+	<view flex_flow="column">
+		<!-- 💡 Adjust fr() weights and fixed values to compare how remaining space is split across tracks. -->
+		<lv_label width="100%" style_text_align="center" text="Grid FR units: remaining space distribution" />
+
+		<!-- Columns: 60px, 1fr, 2fr.
+		Rows: 44px, 1fr. -->
+		<!-- Main grid container with fixed and FR tracks -->
+		<lv_obj
+			style_grid_column_dsc_array="60 fr(1) fr(2)"
+			style_grid_row_dsc_array="44 fr(1)"
+			style_layout="grid"
+			width="100%"
+			height="190"
+		>
+			<!-- Header row showing column proportions -->
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="0" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0xb8d8f8" style_bg_opa="100%" text="60px" />
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="1" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0x7ec8ff" style_bg_opa="100%" text="1fr" />
+			<lv_label style_grid_cell_x_align="stretch" style_grid_cell_column_pos="2" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="0" style_bg_color="0x4daff7" style_bg_opa="100%" text="2fr" />
+
+			<!-- Second row with matching column tracks -->
+			<lv_obj style_grid_cell_x_align="stretch" style_grid_cell_column_pos="0" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0xb8d8f8" style_bg_opa="100%">
+				<lv_label text="60px" align="center" />
+			</lv_obj>
+			<lv_obj style_grid_cell_x_align="stretch" style_grid_cell_column_pos="1" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0x7ec8ff" style_bg_opa="100%">
+				<lv_label text="1fr row" align="center" />
+			</lv_obj>
+			<lv_obj style_grid_cell_x_align="stretch" style_grid_cell_column_pos="2" style_grid_cell_y_align="stretch" style_grid_cell_row_pos="1" style_bg_color="0x4daff7" style_bg_opa="100%">
+				<lv_label text="2fr" align="center" />
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>

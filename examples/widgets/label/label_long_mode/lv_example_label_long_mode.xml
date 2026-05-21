@@ -1,0 +1,75 @@
+<!--
+ @title Label long modes
+ @brief Show every long_mode behavior side by side.
+
+ Five labels share the same width but use different long_mode values: wrap, dots, scroll,
+ scroll_circular, and clip. Each label is colored differently and contains text that does
+ not fit on a single line, so the mode-specific behavior is immediately visible.
+-->
+<screen>
+	<styles>
+		<!-- Shared visual style for all long-mode labels -->
+		<style name="style_label_bg" bg_opa="100%" radius="6" />
+	</styles>
+
+	<view>
+		<!-- 💡 Adjust long_mode, width, and height to compare wrap, dots, scroll, circular scroll, and clip results. -->
+		<lv_label width="100%" style_text_align="center" text="Label: all long_mode options" />
+
+		<!-- Wrap mode example -->
+		<lv_label
+			y="30"
+			width="170"
+			long_mode="wrap"
+			style_bg_color="0xd6eaf8"
+			text="Wrap keeps all text visible by splitting long lines into multiple rows."
+		>
+			<style name="style_label_bg" />
+		</lv_label>
+
+		<!-- Dots mode example -->
+		<lv_label
+			y="102"
+			width="170"
+			height="32"
+			long_mode="dots"
+			style_bg_color="0xd5f5e3"
+			text="Dots shortens overflowing text and replaces the tail with '...'"
+		>
+			<style name="style_label_bg" />
+		</lv_label>
+
+		<!-- Scroll mode example -->
+		<lv_label
+			y="146"
+			width="170"
+			long_mode="scroll"
+			style_bg_color="0xfdebd0"
+			text="Scroll moves overflowing text back and forth inside the label area."
+		>
+			<style name="style_label_bg" />
+		</lv_label>
+
+		<!-- Circular scroll mode example -->
+		<lv_label
+			y="190"
+			width="170"
+			long_mode="scroll_circular"
+			style_bg_color="0xfadbd8"
+			text="Scroll circular continuously loops overflowing text forever."
+		>
+			<style name="style_label_bg" />
+		</lv_label>
+
+		<!-- Clip mode example -->
+		<lv_label
+			y="234"
+			width="170"
+			long_mode="clip"
+			style_bg_color="0xebdef0"
+			text="Clip simply cuts any part that falls outside the label width."
+		>
+			<style name="style_label_bg" />
+		</lv_label>
+	</view>
+</screen>

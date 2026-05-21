@@ -1,0 +1,20 @@
+<!--
+ @title Checkbox bind checked + bind flag
+ @brief A checkbox drives an int subject; a sibling label hides when the subject is zero.
+
+ `bind_checked` connects the checkbox's checked state to `subject_flag` (0 or 1).
+ The note label uses `bind_flag_if_eq` to enable the `hidden` flag while
+ `subject_flag` equals 0 — so the label only shows once the box is ticked.
+-->
+<screen>
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Toggle the checkbox; the note appears/disappears as `subject_flag` flips between 0 and 1. -->
+		<lv_label width="100%" style_text_align="center" text="Checkbox: bind checked" />
+
+		<lv_checkbox text="Show extra details" bind_checked="subject_flag" />
+
+		<lv_label text="Extra details only visible while the box is ticked.">
+			<bind_flag_if_eq subject="subject_flag" flag="hidden" ref_value="0" />
+		</lv_label>
+	</view>
+</screen>

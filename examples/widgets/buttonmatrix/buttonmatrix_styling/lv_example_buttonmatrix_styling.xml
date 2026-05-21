@@ -1,0 +1,43 @@
+<!--
+ @title Button matrix styling
+ @brief Style the MAIN container, the ITEMS, and the checked-state items separately.
+
+ Button matrix has two parts: MAIN (the container) and ITEMS (each virtual button).
+ The named styles target ITEMS in the default state and in the `checked` state via
+ `selector="items|checked"`, so the highlighted day picks up an accent fill. The
+ container gets a flat, padded look via local `style_*` props on the matrix tag.
+-->
+<screen>
+	<styles>
+		<!-- Items: rounded tiles with a subtle border, neutral fill -->
+		<style name="style_bm_item"
+			bg_opa="100%" bg_color="0xf3f4f6"
+			radius="8"
+			border_color="0xd1d5db" border_width="1"
+			text_color="0x111827" />
+		<!-- Items, checked: accent fill, white text, slight outline halo -->
+		<style name="style_bm_item_checked"
+			bg_color="0x6366f1"
+			text_color="0xffffff"
+			outline_color="0x6366f1" outline_width="3" outline_pad="2" outline_opa="80" />
+	</styles>
+
+	<view flex_flow="column" style_flex_cross_place="center" style_pad_row="16">
+		<!-- 💡 Tap a day to switch the checked tile and see the items|checked style apply. -->
+		<lv_label width="100%" style_text_align="center" text="Button matrix: styling parts and states" />
+
+		<!-- Weekday matrix with one-checked semantics + styled items -->
+		<lv_buttonmatrix
+			width="280" height="60"
+			map="'M' 'T' 'W' 'T' 'F' 'S' 'S'"
+			one_checked="true"
+			ctrl_map="checkable checkable checkable|checked checkable checkable checkable checkable"
+			style_bg_opa="100%" style_bg_color="0xffffff"
+			style_border_color="0xe5e7eb" style_border_width="1"
+			style_radius="10"
+			style_pad_all="6" style_pad_row="6" style_pad_column="6">
+			<style name="style_bm_item" selector="items" />
+			<style name="style_bm_item_checked" selector="items|checked" />
+		</lv_buttonmatrix>
+	</view>
+</screen>
