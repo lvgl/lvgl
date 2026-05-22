@@ -1050,13 +1050,14 @@ void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], siz
     bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
     bool recursive = flags & LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE;
     bool inverse = flags & LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE;
+    lv_obj_t * parent = lv_obj_get_parent(obj);
     if(inverse) {
-        if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
+        if(recursive && parent) lv_obj_transform_point_array(parent, points, count, flags);
         if(do_tranf) transform_point_array(obj, points, count, inverse);
     }
     else {
         if(do_tranf) transform_point_array(obj, points, count, inverse);
-        if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
+        if(recursive && parent) lv_obj_transform_point_array(parent, points, count, flags);
     }
 }
 
