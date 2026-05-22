@@ -271,12 +271,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
     if(lv_obj_check_type(obj, &lv_obj_class)) {
 #if LV_USE_TABVIEW
+        lv_obj_t * grandparent = lv_obj_get_parent(parent);
         /*Tabview content area*/
         if(lv_obj_check_type(parent, &lv_tabview_class)) {
             return;
         }
         /*Tabview pages*/
-        else if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
+        else if(grandparent && lv_obj_check_type(grandparent, &lv_tabview_class)) {
             lv_obj_add_style(obj, &theme->styles.card, 0);
             lv_obj_add_style(obj, &theme->styles.no_radius, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
