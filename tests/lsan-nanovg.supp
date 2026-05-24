@@ -1,0 +1,7 @@
+# LeakSanitizer suppressions for NanoVG headless tests.
+# Mesa/EGL drivers have known internal leaks that are not our concern.
+leak:libgallium
+leak:libEGL_mesa
+leak:libGLESv2
+leak:libGLdispatch
+leak:libdrm

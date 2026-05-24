@@ -88,6 +88,14 @@ typedef void * lv_user_data_t;
 #define  LV_USE_SDL         1
 #define  LV_USE_NUTTX       1
 #include "lv_test_conf_full.h"
+#elif LV_TEST_OPTION == 8
+#define  LV_COLOR_DEPTH     32
+#define  LV_DPI_DEF         160
+#define  LV_USE_NANOVG_TEST_HEADLESS 1
+#define  LV_USE_OPENGLES    0   /* Disable glad/opengles driver to avoid GL symbol conflicts with NanoVG */
+#define  LV_USE_NANOVG      1
+#define  LV_USE_DRAW_NANOVG 1
+#include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 4
 #define  LV_COLOR_DEPTH     24
 #define  LV_DPI_DEF         120
