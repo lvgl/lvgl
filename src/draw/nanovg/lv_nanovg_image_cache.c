@@ -332,6 +332,10 @@ static void image_cache_drop_collect_cb(void * elem)
     image_item_t * item = elem;
     const void * src = item->u->image_drop_src;
     LV_ASSERT_NULL(src);
+
+    /* Skip entries with invalid/NULL src (already freed or not yet initialized) */
+    if(item->src == NULL) return;
+
     lv_image_src_t src_type = lv_image_src_get_type(src);
 
     if((src_type == LV_IMAGE_SRC_FILE && lv_strcmp(item->src, src) == 0)
