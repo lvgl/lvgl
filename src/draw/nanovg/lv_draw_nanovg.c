@@ -123,12 +123,6 @@ int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb)
     return fb->image;
 }
 
-unsigned int lv_nanovg_fb_get_texture_id(struct NVGLUframebuffer * fb)
-{
-    if(fb == NULL) return 0;
-    return (unsigned int)fb->texture;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

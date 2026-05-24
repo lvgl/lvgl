@@ -70,7 +70,7 @@ void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, con
 
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
     lv_layer_t * layer = t->target_layer;
-    NVGLUblurState * state = (NVGLUblurState *)u->blur_state;
+    NVGLUblurState * state = u->blur_state;
 
     if(state == NULL) {
         LV_LOG_WARN("nanovg blur: state not initialized (FBO not supported?), skipping");
@@ -134,7 +134,10 @@ void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, con
     }
 
     /* Call the NanoVG blur utility */
-    nvgluBlurRegion(state, u->vg, src_fb, rel_x, gl_y, blur_w, blur_h, &params);
+    int ret = nvgluBlurRegion(state, u->vg, src_fb, rel_x, gl_y, blur_w, blur_h, &params);
+    if(ret != 0) {
+        LV_LOG_WARN("nanovg blur: nvgluBlurRegion failed (ret=%d)", ret);
+    }
 
     LV_PROFILER_DRAW_END;
 }

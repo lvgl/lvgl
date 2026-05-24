@@ -54,6 +54,7 @@ extern "C" {
 
 struct _lv_pending_t;
 struct NVGLUframebuffer;
+struct NVGLUblurState;
 
 typedef struct _lv_draw_nanovg_unit_t {
     lv_draw_unit_t base_unit;
@@ -72,7 +73,7 @@ typedef struct _lv_draw_nanovg_unit_t {
 
     lv_cache_t * fbo_cache;
 
-    void * blur_state;
+    struct NVGLUblurState * blur_state;
 } lv_draw_nanovg_unit_t;
 
 /**********************
@@ -194,13 +195,6 @@ void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t 
  * @return the image handle
  */
 int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb);
-
-/**
- * Get the raw GL texture id backing a NanoVG framebuffer
- * @param fb the framebuffer
- * @return the GL texture id (GLuint), or 0 if fb is NULL
- */
-unsigned int lv_nanovg_fb_get_texture_id(struct NVGLUframebuffer * fb);
 
 /**
  * Initialize the blur draw unit state on the given nanovg unit

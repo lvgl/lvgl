@@ -192,6 +192,8 @@ void nvgluDeleteFramebuffer(NVGLUframebuffer * fb)
 
 // ---- Blur implementation ----
 
+#include <math.h>
+
 #define NVGLU_BLUR_MAX_TAPS   16
 #define NVGLU_BLUR_MAX_RADIUS 256
 
@@ -525,7 +527,7 @@ int nvgluBlurRegion(NVGLUblurState * state, NVGcontext * ctx, NVGLUframebuffer *
                     const NVGLUblurParams * params)
 {
 #ifdef NANOVG_FBO_VALID
-    if(!state || !ctx || w <= 0 || h <= 0) return -1;
+    if(!state || !ctx || !params || w <= 0 || h <= 0) return -1;
 
     int radius = params->radius;
     if(radius <= 0) return 0;
@@ -557,6 +559,23 @@ int nvgluBlurRegion(NVGLUblurState * state, NVGcontext * ctx, NVGLUframebuffer *
         if(step_px < 1) step_px = 1;
         tap_count = nvglu__compute_kernel(radius, max_taps, step_px, weights, offsets);
     }
+
+    // Save GL state that we modify
+    GLint prev_program = 0, prev_fbo = 0, prev_vbo = 0, prev_tex = 0;
+    GLint prev_viewport[4] = {0};
+    GLboolean prev_blend, prev_scissor, prev_depth, prev_stencil, prev_cull;
+    GLboolean prev_colormask[4];
+    glGetIntegerv(GL_CURRENT_PROGRAM, &prev_program);
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_fbo);
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prev_vbo);
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev_tex);
+    glGetIntegerv(GL_VIEWPORT, prev_viewport);
+    prev_blend = glIsEnabled(GL_BLEND);
+    prev_scissor = glIsEnabled(GL_SCISSOR_TEST);
+    prev_depth = glIsEnabled(GL_DEPTH_TEST);
+    prev_stencil = glIsEnabled(GL_STENCIL_TEST);
+    prev_cull = glIsEnabled(GL_CULL_FACE);
+    glGetBooleanv(GL_COLOR_WRITEMASK, prev_colormask);
 
     // Setup GL state
 #if NVGLU_BLUR_NEEDS_VAO
@@ -652,15 +671,28 @@ int nvgluBlurRegion(NVGLUblurState * state, NVGcontext * ctx, NVGLUframebuffer *
     glUniform2f(state->loc_step, 0.0f, 1.0f / (float)state->scratch_h);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    // Restore
+    // Restore GL state
     glDisableVertexAttribArray((GLuint)state->attr_pos);
     glDisableVertexAttribArray((GLuint)state->attr_uv);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glUseProgram(0);
 #if NVGLU_BLUR_NEEDS_VAO
     glBindVertexArray(0);
 #endif
+    glUseProgram((GLuint)prev_program);
+    glBindBuffer(GL_ARRAY_BUFFER, (GLuint)prev_vbo);
+    glBindTexture(GL_TEXTURE_2D, (GLuint)prev_tex);
+    glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)prev_fbo);
+    glViewport(prev_viewport[0], prev_viewport[1], prev_viewport[2], prev_viewport[3]);
+    if(prev_blend) glEnable(GL_BLEND);
+    else glDisable(GL_BLEND);
+    if(prev_scissor) glEnable(GL_SCISSOR_TEST);
+    else glDisable(GL_SCISSOR_TEST);
+    if(prev_depth) glEnable(GL_DEPTH_TEST);
+    else glDisable(GL_DEPTH_TEST);
+    if(prev_stencil) glEnable(GL_STENCIL_TEST);
+    else glDisable(GL_STENCIL_TEST);
+    if(prev_cull) glEnable(GL_CULL_FACE);
+    else glDisable(GL_CULL_FACE);
+    glColorMask(prev_colormask[0], prev_colormask[1], prev_colormask[2], prev_colormask[3]);
 
     return 0;
 #else
