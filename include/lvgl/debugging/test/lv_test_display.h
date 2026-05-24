@@ -42,7 +42,7 @@ extern "C" {
  */
 lv_display_t * lv_test_display_create(int32_t hor_res, int32_t ver_res);
 
-#if LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
+#if defined(LV_USE_DRAW_NANOVG) && LV_USE_DRAW_NANOVG && defined(LV_USE_NANOVG_TEST_HEADLESS) && LV_USE_NANOVG_TEST_HEADLESS
 /**
  * Create a headless EGL display for NanoVG rendering tests.
  * Uses EGL + pbuffer + FBO for off-screen rendering with glReadPixels readback.

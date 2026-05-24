@@ -18,7 +18,7 @@ void lv_test_init(void)
     lv_profiler_builtin_set_enable(false);
 #endif
 
-#if LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
+#if defined(LV_USE_DRAW_NANOVG) && LV_USE_DRAW_NANOVG && defined(LV_USE_NANOVG_TEST_HEADLESS) && LV_USE_NANOVG_TEST_HEADLESS
     lv_display_t * nanovg_disp = lv_test_display_nanovg_create(LV_TEST_DISPLAY_HOR_RES, LV_TEST_DISPLAY_VER_RES);
     if(!nanovg_disp) {
         printf("FATAL: NanoVG headless display creation failed\n");
