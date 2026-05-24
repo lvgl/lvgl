@@ -51,6 +51,11 @@ void lv_test_deinit(void)
 #endif
     lv_test_indev_delete_all();
     lv_deinit();
+
+#if defined(LV_USE_DRAW_NANOVG) && LV_USE_DRAW_NANOVG && defined(LV_USE_NANOVG_TEST_HEADLESS) && LV_USE_NANOVG_TEST_HEADLESS
+    /* Clean up EGL/GL resources after NanoVG draw unit is destroyed */
+    lv_test_display_nanovg_cleanup();
+#endif
 }
 
 static void test_log_print_cb(lv_log_level_t level, const char * buf)

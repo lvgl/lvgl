@@ -99,7 +99,12 @@ lv_display_t * lv_test_display_nanovg_create(int32_t hor_res, int32_t ver_res)
     /* Allocate draw buffer */
     size_t buf_size = 4 * (hor_res + LV_DRAW_BUF_STRIDE_ALIGN - 1) * ver_res + LV_DRAW_BUF_ALIGN;
     uint8_t * buf = malloc(buf_size);
-    LV_ASSERT_MALLOC(buf);
+    if(!buf) {
+        LV_LOG_ERROR("Failed to allocate draw buffer (%zu bytes)", buf_size);
+        lv_display_delete(disp);
+        deinit_egl(&g_ctx);
+        return NULL;
+    }
 
     lv_draw_buf_init(&_state.draw_buf, hor_res, ver_res, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO,
                      lv_draw_buf_align(buf, LV_COLOR_FORMAT_XRGB8888), buf_size);
@@ -159,17 +164,34 @@ static void nanovg_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t
 
 static void nanovg_delete_event_cb(lv_event_t * e)
 {
-    LV_UNUSED(e);
     lv_display_t * disp = lv_event_get_target(e);
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
+    LV_UNUSED(e);
     free(draw_buf->unaligned_data);
 
     /* NOTE: Do NOT destroy EGL context or GL resources here.
      * lv_deinit() deletes displays before draw units, so the NanoVG
      * draw unit's delete_cb may still execute GL calls after this.
-     * EGL cleanup is deferred to lv_deinit() -> draw_delete -> NVG_CTX_DELETE,
-     * which happens after all GL work is done. The OS will reclaim
-     * EGL/GL resources when the process exits (test runner). */
+     * Cleanup is done via lv_test_display_nanovg_cleanup() called
+     * from lv_test_deinit() after lv_deinit(). */
+}
+
+void lv_test_display_nanovg_cleanup(void)
+{
+    /* Called after lv_deinit() when NanoVG draw unit is already destroyed */
+    if(g_ctx.fbo) {
+        glDeleteFramebuffers(1, &g_ctx.fbo);
+        g_ctx.fbo = 0;
+    }
+    if(g_ctx.color_tex) {
+        glDeleteTextures(1, &g_ctx.color_tex);
+        g_ctx.color_tex = 0;
+    }
+    if(g_ctx.stencil_rbo) {
+        glDeleteRenderbuffers(1, &g_ctx.stencil_rbo);
+        g_ctx.stencil_rbo = 0;
+    }
+    deinit_egl(&g_ctx);
 }
 
 static bool init_egl(nanovg_test_ctx_t * ctx)

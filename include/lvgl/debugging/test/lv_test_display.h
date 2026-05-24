@@ -51,6 +51,12 @@ lv_display_t * lv_test_display_create(int32_t hor_res, int32_t ver_res);
  * @return          the created display, or NULL on failure
  */
 lv_display_t * lv_test_display_nanovg_create(int32_t hor_res, int32_t ver_res);
+
+/**
+ * Clean up EGL/GL resources after lv_deinit() has destroyed the NanoVG draw unit.
+ * Must be called from lv_test_deinit() after lv_deinit().
+ */
+void lv_test_display_nanovg_cleanup(void);
 #endif
 
 /**********************

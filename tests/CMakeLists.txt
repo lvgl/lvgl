@@ -175,7 +175,11 @@ elseif (OPTIONS_TEST_NANOVG)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs_nanovg/")
     add_definitions(-DLV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE=1)
-    message(STATUS "NanoVG headless rendering test enabled")
+    # Verify EGL/GLESv2 are available at configure time
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(EGL REQUIRED egl)
+    pkg_check_modules(GLESV2 REQUIRED glesv2)
+    message(STATUS "NanoVG headless rendering test enabled (EGL + GLESv2 found)")
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
@@ -574,9 +578,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
 	    endif()
 	endif()
 
-    if(OPTIONS_TEST_NANOVG)
-        target_link_libraries(${test_name} PRIVATE EGL GLESv2)
-    endif()
+    # EGL/GLESv2 already linked via lvgl PUBLIC for OPTIONS_TEST_NANOVG
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
