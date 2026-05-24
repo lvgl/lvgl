@@ -440,6 +440,57 @@ static int nvglu__compute_kernel(int radius, int max_taps, int step_px,
     return tap_count;
 }
 
+/* Bilinear-optimized kernel: merge adjacent discrete tap pairs into single
+ * HW-filtered fetches. Halves texture bandwidth at slight quality cost.
+ * Returns bilinear tap count (excluding center). */
+static int nvglu__compute_kernel_bilinear(int radius, int step_px,
+                                          float * weights, float * offsets)
+{
+    float sigma = (float)radius / 3.0f;
+    if(sigma < 1.0f) sigma = 1.0f;
+    float inv2s2 = 1.0f / (2.0f * sigma * sigma);
+
+    /* Compute discrete weights for up to 16 taps */
+    int n = radius < NVGLU_BLUR_MAX_TAPS ? radius : NVGLU_BLUR_MAX_TAPS;
+    float dw[NVGLU_BLUR_MAX_TAPS + 1];
+    float total = 0.0f;
+    int i;
+    for(i = 0; i <= n; i++) {
+        float x = (float)(i * step_px);
+        dw[i] = expf(-x * x * inv2s2);
+        total += (i == 0) ? dw[i] : (2.0f * dw[i]);
+    }
+    if(total > 0.0f) {
+        float inv = 1.0f / total;
+        for(i = 0; i <= n; i++) dw[i] *= inv;
+    }
+
+    /* Center tap */
+    weights[0] = dw[0];
+    offsets[0] = 0.0f;
+
+    /* Merge pairs: (1,2), (3,4), ... */
+    int bi = 0;
+    for(i = 1; i <= n; i += 2) {
+        float w1 = dw[i];
+        float w2 = (i + 1 <= n) ? dw[i + 1] : 0.0f;
+        float wsum = w1 + w2;
+        if(wsum < 1e-10f) break;
+        bi++;
+        weights[bi] = wsum;
+        float p1 = (float)(i * step_px);
+        float p2 = (float)((i + 1) * step_px);
+        offsets[bi] = (p1 * w1 + p2 * w2) / wsum;
+    }
+
+    /* Zero remaining */
+    for(i = bi + 1; i <= NVGLU_BLUR_MAX_TAPS; i++) {
+        weights[i] = 0.0f;
+        offsets[i] = 0.0f;
+    }
+    return bi;
+}
+
 NVGLUblurState * nvgluCreateBlurState(void)
 {
 #ifdef NANOVG_FBO_VALID
@@ -490,14 +541,22 @@ int nvgluBlurRegion(NVGLUblurState * state, NVGcontext * ctx, NVGLUframebuffer *
         if(!state->capture_tex) return -1;
     }
 
-    // Compute kernel
-    int max_taps = (params->quality == NVGLU_BLUR_QUALITY_SPEED) ? 8 : NVGLU_BLUR_MAX_TAPS;
-    int step_px = (radius + max_taps - 1) / max_taps;
-    if(step_px < 1) step_px = 1;
-
+    // Compute kernel — speed mode uses bilinear merging (half the fetches)
     float weights[NVGLU_BLUR_MAX_TAPS + 1];
     float offsets[NVGLU_BLUR_MAX_TAPS + 1];
-    int tap_count = nvglu__compute_kernel(radius, max_taps, step_px, weights, offsets);
+    int tap_count;
+
+    if(params->quality == NVGLU_BLUR_QUALITY_SPEED) {
+        int step_px = (radius + 8 - 1) / 8;
+        if(step_px < 1) step_px = 1;
+        tap_count = nvglu__compute_kernel_bilinear(radius, step_px, weights, offsets);
+    }
+    else {
+        int max_taps = NVGLU_BLUR_MAX_TAPS;
+        int step_px = (radius + max_taps - 1) / max_taps;
+        if(step_px < 1) step_px = 1;
+        tap_count = nvglu__compute_kernel(radius, max_taps, step_px, weights, offsets);
+    }
 
     // Setup GL state
 #if NVGLU_BLUR_NEEDS_VAO
