@@ -164,21 +164,12 @@ static void nanovg_delete_event_cb(lv_event_t * e)
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
     free(draw_buf->unaligned_data);
 
-    /* Cleanup GL resources */
-    if(g_ctx.fbo) {
-        glDeleteFramebuffers(1, &g_ctx.fbo);
-        g_ctx.fbo = 0;
-    }
-    if(g_ctx.color_tex) {
-        glDeleteTextures(1, &g_ctx.color_tex);
-        g_ctx.color_tex = 0;
-    }
-    if(g_ctx.stencil_rbo) {
-        glDeleteRenderbuffers(1, &g_ctx.stencil_rbo);
-        g_ctx.stencil_rbo = 0;
-    }
-
-    deinit_egl(&g_ctx);
+    /* NOTE: Do NOT destroy EGL context or GL resources here.
+     * lv_deinit() deletes displays before draw units, so the NanoVG
+     * draw unit's delete_cb may still execute GL calls after this.
+     * EGL cleanup is deferred to lv_deinit() -> draw_delete -> NVG_CTX_DELETE,
+     * which happens after all GL work is done. The OS will reclaim
+     * EGL/GL resources when the process exits (test runner). */
 }
 
 static bool init_egl(nanovg_test_ctx_t * ctx)
@@ -325,6 +316,19 @@ static bool init_fbo(nanovg_test_ctx_t * ctx)
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if(status != GL_FRAMEBUFFER_COMPLETE) {
         LV_LOG_ERROR("FBO incomplete: 0x%x", status);
+        /* Clean up partially created GL objects */
+        if(ctx->stencil_rbo) {
+            glDeleteRenderbuffers(1, &ctx->stencil_rbo);
+            ctx->stencil_rbo = 0;
+        }
+        if(ctx->color_tex) {
+            glDeleteTextures(1, &ctx->color_tex);
+            ctx->color_tex = 0;
+        }
+        if(ctx->fbo) {
+            glDeleteFramebuffers(1, &ctx->fbo);
+            ctx->fbo = 0;
+        }
         return false;
     }
 

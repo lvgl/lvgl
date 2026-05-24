@@ -195,10 +195,16 @@
     #endif
 #endif
 
-/* NanoVG is tested separately via OPTIONS_TEST_NANOVG with full
- * runtime rendering validation. No need to compile it here. */
+/* NanoVG compile check: keep enabled for build-only configs (OPTIONS_FULL_32BIT)
+ * to catch compile errors. Runtime testing is done via OPTIONS_TEST_NANOVG. */
 #ifndef LV_USE_NANOVG
-    #define LV_USE_NANOVG      0
+    #if !defined(NON_AMD64_BUILD) && !defined(_MSC_VER) && !defined(_WIN32)
+        #define LV_USE_NANOVG      1
+        #define LV_USE_DRAW_NANOVG 1
+    #else
+        #define LV_USE_NANOVG      0
+        #define LV_USE_DRAW_NANOVG 0
+    #endif
 #endif
 #ifndef LV_USE_DRAW_NANOVG
     #define LV_USE_DRAW_NANOVG 0
