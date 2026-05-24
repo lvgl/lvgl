@@ -270,11 +270,10 @@ static const char * nvglu__blur_vs_src =
     "    gl_Position = vec4(a_pos, 0.0, 1.0);\n"
     "}\n";
 
-/* Bilinear-optimized fragment shader: each texture fetch samples between
- * two texels, merging two discrete taps into one HW-filtered read.
- * u_offsets[i] = bilinear offset in texels (pre-divided by tex size on CPU)
- * u_weights[i] = combined weight for that bilinear sample
- * u_weights[0] = center tap weight (sampled at base) */
+/* Fragment shader with per-tap offsets.
+ * u_offsets[i] = sample offset in texels (multiplied by u_step on GPU)
+ * u_weights[i] = weight for that sample
+ * u_weights[0] / u_offsets[0] = center tap */
 static const char * nvglu__blur_fs_src =
     NVGLU_BLUR_FS_HEADER
     "uniform sampler2D u_tex;\n"
@@ -282,13 +281,13 @@ static const char * nvglu__blur_fs_src =
     "uniform vec4 u_src_uv;\n"
     "uniform vec4 u_recolor;\n"
     "uniform int u_tap_count;\n"
-    "uniform float u_weights[9];\n"
-    "uniform float u_offsets[9];\n"
+    "uniform float u_weights[17];\n"
+    "uniform float u_offsets[17];\n"
     "varying vec2 v_uv;\n"
     "void main() {\n"
     "    vec2 base = u_src_uv.xy + v_uv * u_src_uv.zw;\n"
     "    vec4 sum = texture2D(u_tex, base) * u_weights[0];\n"
-    "    for(int i = 1; i <= 8; i++) {\n"
+    "    for(int i = 1; i <= 16; i++) {\n"
     "        if(i > u_tap_count) break;\n"
     "        vec2 off = u_step * u_offsets[i];\n"
     "        sum += texture2D(u_tex, base + off) * u_weights[i];\n"
@@ -405,66 +404,40 @@ static void nvglu__ensure_capture(NVGLUblurState * s, int w, int h)
     s->capture_h = h;
 }
 
-/* Compute bilinear-optimized weights and offsets.
- * Takes N discrete Gaussian taps and merges adjacent pairs into
- * bilinear samples: offset = (pos_a * w_a + pos_b * w_b) / (w_a + w_b)
- * This halves the number of texture fetches with identical results.
- *
- * Output: bilinear_weights[0] = center weight
- *         bilinear_weights[1..tap_count_out] = merged pair weights
- *         bilinear_offsets[1..tap_count_out] = merged pair offsets (in texels * step_px)
- * Returns the number of bilinear taps (excluding center). */
-static int nvglu__compute_bilinear_kernel(int radius, int discrete_taps, int step_px,
-                                          float * bilinear_weights, float * bilinear_offsets)
+/* Compute discrete Gaussian kernel weights and offsets.
+ * Output: weights[0] = center, weights[1..tap_count] = symmetric taps
+ *         offsets[i] = sample position in texels (i * step_px)
+ * Returns tap_count. */
+static int nvglu__compute_kernel(int radius, int max_taps, int step_px,
+                                 float * weights, float * offsets)
 {
     float sigma = (float)radius / 3.0f;
     if(sigma < 1.0f) sigma = 1.0f;
     float inv2s2 = 1.0f / (2.0f * sigma * sigma);
 
-    /* First compute discrete weights */
-    float dw[NVGLU_BLUR_MAX_TAPS * 2 + 1]; /* max discrete taps */
+    int tap_count = radius < max_taps ? radius : max_taps;
+    if(tap_count < 1) tap_count = 1;
+
     float total = 0.0f;
     int i;
-    int n = discrete_taps;
-    if(n > NVGLU_BLUR_MAX_TAPS * 2) n = NVGLU_BLUR_MAX_TAPS * 2;
-
-    for(i = 0; i <= n; i++) {
+    for(i = 0; i <= tap_count; i++) {
         float x = (float)(i * step_px);
-        dw[i] = expf(-x * x * inv2s2);
-        total += (i == 0) ? dw[i] : (2.0f * dw[i]);
+        float w = expf(-x * x * inv2s2);
+        weights[i] = w;
+        offsets[i] = x;
+        total += (i == 0) ? w : (2.0f * w);
     }
     /* Normalize */
     if(total > 0.0f) {
         float inv = 1.0f / total;
-        for(i = 0; i <= n; i++) dw[i] *= inv;
+        for(i = 0; i <= tap_count; i++) weights[i] *= inv;
     }
-
-    /* Center tap */
-    bilinear_weights[0] = dw[0];
-    bilinear_offsets[0] = 0.0f;
-
-    /* Merge pairs: (1,2), (3,4), (5,6), ... */
-    int bi = 0;
-    for(i = 1; i <= n; i += 2) {
-        float w1 = dw[i];
-        float w2 = (i + 1 <= n) ? dw[i + 1] : 0.0f;
-        float wsum = w1 + w2;
-        if(wsum < 1e-10f) break;
-        bi++;
-        bilinear_weights[bi] = wsum;
-        /* Bilinear offset: weighted average of the two tap positions */
-        float pos1 = (float)(i * step_px);
-        float pos2 = (float)((i + 1) * step_px);
-        bilinear_offsets[bi] = (pos1 * w1 + pos2 * w2) / wsum;
+    /* Zero remaining */
+    for(i = tap_count + 1; i <= NVGLU_BLUR_MAX_TAPS; i++) {
+        weights[i] = 0.0f;
+        offsets[i] = 0.0f;
     }
-
-    /* Zero remaining slots */
-    for(i = bi + 1; i <= 8; i++) {
-        bilinear_weights[i] = 0.0f;
-        bilinear_offsets[i] = 0.0f;
-    }
-
-    return bi;
+    return tap_count;
 }
 
 NVGLUblurState * nvgluCreateBlurState(void)
@@ -517,17 +490,14 @@ int nvgluBlurRegion(NVGLUblurState * state, NVGcontext * ctx, NVGLUframebuffer *
         if(!state->capture_tex) return -1;
     }
 
-    // Compute bilinear kernel
-    // Use more discrete taps for quality, fewer for speed
-    int discrete_taps = (params->quality == NVGLU_BLUR_QUALITY_SPEED) ? 8 : NVGLU_BLUR_MAX_TAPS;
-    if(radius < discrete_taps) discrete_taps = radius;
-    if(discrete_taps < 1) discrete_taps = 1;
-    int step_px = (radius + discrete_taps - 1) / discrete_taps;
+    // Compute kernel
+    int max_taps = (params->quality == NVGLU_BLUR_QUALITY_SPEED) ? 8 : NVGLU_BLUR_MAX_TAPS;
+    int step_px = (radius + max_taps - 1) / max_taps;
     if(step_px < 1) step_px = 1;
 
-    float weights[9];
-    float offsets[9];
-    int tap_count = nvglu__compute_bilinear_kernel(radius, discrete_taps, step_px, weights, offsets);
+    float weights[NVGLU_BLUR_MAX_TAPS + 1];
+    float offsets[NVGLU_BLUR_MAX_TAPS + 1];
+    int tap_count = nvglu__compute_kernel(radius, max_taps, step_px, weights, offsets);
 
     // Setup GL state
 #if NVGLU_BLUR_NEEDS_VAO
@@ -544,8 +514,8 @@ int nvgluBlurRegion(NVGLUblurState * state, NVGcontext * ctx, NVGLUframebuffer *
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(state->loc_tex, 0);
     glUniform1i(state->loc_tap_count, tap_count);
-    glUniform1fv(state->loc_weights, 9, weights);
-    glUniform1fv(state->loc_offsets, 9, offsets);
+    glUniform1fv(state->loc_weights, NVGLU_BLUR_MAX_TAPS + 1, weights);
+    glUniform1fv(state->loc_offsets, NVGLU_BLUR_MAX_TAPS + 1, offsets);
 
     glDisable(GL_BLEND);
     glDisable(GL_STENCIL_TEST);
