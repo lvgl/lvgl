@@ -139,6 +139,7 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
     search_key.image_flags = image_flags;
     search_key.src = src;
     search_key.src_type = lv_image_src_get_type(src);
+    search_key.image_handle = -1;  /* Mark as not yet created */
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->image_cache, &search_key, NULL);
     if(cache_node_entry == NULL) {
@@ -294,14 +295,19 @@ static void image_free_cb(image_item_t * item, void * user_data)
     LV_UNUSED(user_data);
     LV_PROFILER_DRAW_BEGIN;
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
+
+    /* Only free item->src if create_cb succeeded (image_handle >= 0 means
+     * strdup was executed). When create_cb fails (unsupported format etc.),
+     * item->src still points to the caller's pointer — must not free it. */
+    bool created = (item->image_handle >= 0);
+
     nvgDeleteImage(item->u->vg, item->image_handle);
     item->image_handle = -1;
 
-    if(item->src_type == LV_IMAGE_SRC_FILE) {
+    if(item->src_type == LV_IMAGE_SRC_FILE && created) {
         lv_free((void *)item->src);
-        item->src = NULL;
     }
-
+    item->src = NULL;
     item->src_type = LV_IMAGE_SRC_UNKNOWN;
 
     LV_PROFILER_DRAW_END;
@@ -336,10 +342,12 @@ static void image_cache_drop_collect_cb(void * elem)
     /* Skip entries with invalid/NULL src (already freed or not yet initialized) */
     if(item->src == NULL) return;
 
-    lv_image_src_t src_type = lv_image_src_get_type(src);
-
-    if((src_type == LV_IMAGE_SRC_FILE && lv_strcmp(item->src, src) == 0)
-       || (src_type == LV_IMAGE_SRC_VARIABLE && item->src == src)) {
+    /* Use the entry's own src_type to decide comparison method.
+     * Using the incoming src's type would incorrectly strcmp on VARIABLE entries
+     * whose src pointer may have been freed by lv_draw_buf_destroy(). */
+    if((item->src_type == LV_IMAGE_SRC_FILE && lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE
+        && lv_strcmp(item->src, src) == 0)
+       || (item->src_type == LV_IMAGE_SRC_VARIABLE && item->src == src)) {
         image_item_t * drop_item = lv_ll_ins_tail(&item->u->image_drop_ll);
         LV_ASSERT_MALLOC(drop_item);
         *drop_item = *item;
