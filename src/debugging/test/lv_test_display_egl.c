@@ -242,7 +242,8 @@ static bool init_egl(egl_test_ctx_t * ctx)
 
     eglBindAPI(EGL_OPENGL_ES_API);
 
-    /* Choose config with pbuffer support */
+    /* Choose config with pbuffer support, stencil for NanoVG clipping,
+     * and 4x MSAA for GPU antialiasing (matching lv_sdl_egl.c config) */
     EGLint config_attribs[] = {
         EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
@@ -250,6 +251,9 @@ static bool init_egl(egl_test_ctx_t * ctx)
         EGL_GREEN_SIZE, 8,
         EGL_BLUE_SIZE, 8,
         EGL_ALPHA_SIZE, 8,
+        EGL_STENCIL_SIZE, 8,
+        EGL_SAMPLE_BUFFERS, 1,
+        EGL_SAMPLES, 4,
         EGL_NONE
     };
 
