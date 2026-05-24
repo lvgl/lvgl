@@ -671,17 +671,19 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     theme->base.ext_data.data = NULL;
 #endif
 
+    /*Remove the callback before triggering style refresh to prevent
+     *resolution_change_event_cb from re-entering lv_theme_default_init
+     *during lv_obj_report_style_change. Re-added below.*/
+    lv_display_remove_event_cb_with_user_data(new_disp, resolution_change_event_cb, theme);
+
     style_init(theme);
+
+    theme->inited = true;
 
     if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
         lv_obj_report_style_change(NULL);
     }
 
-    theme->inited = true;
-
-    /*Re-initialize the styles if the resolution changes as a different display size might
-     *result in different paddings */
-    lv_display_remove_event_cb_with_user_data(new_disp, resolution_change_event_cb, theme);
     lv_display_add_event_cb(new_disp, resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED, theme);
 
     return (lv_theme_t *) theme;
@@ -1239,9 +1241,8 @@ static void resolution_change_event_cb(lv_event_t * e)
     lv_display_t * disp = lv_event_get_target(e);
     my_theme_t * theme = lv_event_get_user_data(e);
 
-    lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary, theme->base.flags,
-                          theme->base.font_normal);
-
+    lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary,
+                          theme->base.flags & MODE_DARK, theme->base.font_normal);
 }
 
 #endif
