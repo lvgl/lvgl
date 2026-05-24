@@ -380,6 +380,7 @@
         "text": "string",
         "translation_tag": "string",
         "dot_begin": "int",
+        "max_lines": "int",
         "sel_start": "int",
         "sel_end": "int",
         "size_cache": "point",
