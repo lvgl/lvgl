@@ -562,12 +562,18 @@ int nvgluBlurRegion(NVGLUblurState * state, NVGcontext * ctx, NVGLUframebuffer *
 
     // Save GL state that we modify
     GLint prev_program = 0, prev_fbo = 0, prev_vbo = 0, prev_tex = 0;
+    GLint prev_active_tex = 0;
     GLint prev_viewport[4] = {0};
     GLboolean prev_blend, prev_scissor, prev_depth, prev_stencil, prev_cull;
     GLboolean prev_colormask[4];
+#if NVGLU_BLUR_NEEDS_VAO
+    GLint prev_vao = 0;
+    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prev_vao);
+#endif
     glGetIntegerv(GL_CURRENT_PROGRAM, &prev_program);
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_fbo);
     glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prev_vbo);
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &prev_active_tex);
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev_tex);
     glGetIntegerv(GL_VIEWPORT, prev_viewport);
     prev_blend = glIsEnabled(GL_BLEND);
@@ -675,10 +681,11 @@ int nvgluBlurRegion(NVGLUblurState * state, NVGcontext * ctx, NVGLUframebuffer *
     glDisableVertexAttribArray((GLuint)state->attr_pos);
     glDisableVertexAttribArray((GLuint)state->attr_uv);
 #if NVGLU_BLUR_NEEDS_VAO
-    glBindVertexArray(0);
+    glBindVertexArray((GLuint)prev_vao);
 #endif
     glUseProgram((GLuint)prev_program);
     glBindBuffer(GL_ARRAY_BUFFER, (GLuint)prev_vbo);
+    glActiveTexture((GLenum)prev_active_tex);
     glBindTexture(GL_TEXTURE_2D, (GLuint)prev_tex);
     glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)prev_fbo);
     glViewport(prev_viewport[0], prev_viewport[1], prev_viewport[2], prev_viewport[3]);
