@@ -1,5 +1,5 @@
 /**
- * @file lv_test_display_nanovg.c
+ * @file lv_test_display_egl.c
  *
  * Headless EGL display for NanoVG unit testing.
  * Creates an EGL context with pbuffer surface and FBO for off-screen rendering.
@@ -49,27 +49,27 @@ typedef struct {
     GLuint stencil_rbo;
     int32_t width;
     int32_t height;
-} nanovg_test_ctx_t;
+} egl_test_ctx_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void nanovg_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
-static void nanovg_delete_event_cb(lv_event_t * e);
-static bool init_egl(nanovg_test_ctx_t * ctx);
-static bool init_fbo(nanovg_test_ctx_t * ctx);
-static void deinit_egl(nanovg_test_ctx_t * ctx);
+static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
+static void egl_delete_event_cb(lv_event_t * e);
+static bool init_egl(egl_test_ctx_t * ctx);
+static bool init_fbo(egl_test_ctx_t * ctx);
+static void deinit_egl(egl_test_ctx_t * ctx);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static nanovg_test_ctx_t g_ctx;
+static egl_test_ctx_t g_ctx;
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_test_display_nanovg_create(int32_t hor_res, int32_t ver_res)
+lv_display_t * lv_test_display_egl_create(int32_t hor_res, int32_t ver_res)
 {
     lv_memzero(&g_ctx, sizeof(g_ctx));
     g_ctx.width = hor_res;
@@ -110,15 +110,15 @@ lv_display_t * lv_test_display_nanovg_create(int32_t hor_res, int32_t ver_res)
                      lv_draw_buf_align(buf, LV_COLOR_FORMAT_XRGB8888), buf_size);
     _state.draw_buf.unaligned_data = buf;
     lv_display_set_draw_buffers(disp, &_state.draw_buf, NULL);
-    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
 
-    lv_display_set_flush_cb(disp, nanovg_flush_cb);
-    lv_display_add_event_cb(disp, nanovg_delete_event_cb, LV_EVENT_DELETE, NULL);
+    lv_display_set_flush_cb(disp, egl_flush_cb);
+    lv_display_add_event_cb(disp, egl_delete_event_cb, LV_EVENT_DELETE, NULL);
 
     /* Initialize NanoVG draw unit - this requires an active GL context */
     lv_draw_nanovg_init();
 
-    LV_LOG_INFO("NanoVG headless test display created (%dx%d)", (int)hor_res, (int)ver_res);
+    LV_LOG_INFO("EGL headless test display created (%dx%d)", (int)hor_res, (int)ver_res);
     return disp;
 }
 
@@ -130,7 +130,7 @@ lv_display_t * lv_test_display_nanovg_create(int32_t hor_res, int32_t ver_res)
  * Flush callback: read pixels from FBO back into the LVGL draw buffer.
  * This makes the rendered content available for screenshot comparison.
  */
-static void nanovg_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
     LV_UNUSED(area);
     LV_UNUSED(color_p);
@@ -162,7 +162,7 @@ static void nanovg_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t
     lv_display_flush_ready(disp);
 }
 
-static void nanovg_delete_event_cb(lv_event_t * e)
+static void egl_delete_event_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_target(e);
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
@@ -172,11 +172,11 @@ static void nanovg_delete_event_cb(lv_event_t * e)
     /* NOTE: Do NOT destroy EGL context or GL resources here.
      * lv_deinit() deletes displays before draw units, so the NanoVG
      * draw unit's delete_cb may still execute GL calls after this.
-     * Cleanup is done via lv_test_display_nanovg_cleanup() called
+     * Cleanup is done via lv_test_display_egl_cleanup() called
      * from lv_test_deinit() after lv_deinit(). */
 }
 
-void lv_test_display_nanovg_cleanup(void)
+void lv_test_display_egl_cleanup(void)
 {
     /* Called after lv_deinit() when NanoVG draw unit is already destroyed */
     if(g_ctx.fbo) {
@@ -194,7 +194,7 @@ void lv_test_display_nanovg_cleanup(void)
     deinit_egl(&g_ctx);
 }
 
-static bool init_egl(nanovg_test_ctx_t * ctx)
+static bool init_egl(egl_test_ctx_t * ctx)
 {
     /* Try EGL device platform first (works without display server).
      * Use eglGetProcAddress to get extension functions dynamically,
@@ -311,7 +311,7 @@ static bool init_egl(nanovg_test_ctx_t * ctx)
     return true;
 }
 
-static bool init_fbo(nanovg_test_ctx_t * ctx)
+static bool init_fbo(egl_test_ctx_t * ctx)
 {
     /* Create FBO with color texture and stencil renderbuffer */
     glGenFramebuffers(1, &ctx->fbo);
@@ -358,7 +358,7 @@ static bool init_fbo(nanovg_test_ctx_t * ctx)
     return true;
 }
 
-static void deinit_egl(nanovg_test_ctx_t * ctx)
+static void deinit_egl(egl_test_ctx_t * ctx)
 {
     if(ctx->egl_display != EGL_NO_DISPLAY) {
         eglMakeCurrent(ctx->egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);

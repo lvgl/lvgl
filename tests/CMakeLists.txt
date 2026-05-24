@@ -175,8 +175,6 @@ elseif (OPTIONS_TEST_NANOVG)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs_nanovg/")
     add_definitions(-DLV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE=1)
-    # GPU rendering has minor floating-point precision differences between runs
-    add_definitions(-DREF_IMG_TOLERANCE=2)
     # Verify EGL/GLESv2 are available at configure time
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(EGL REQUIRED egl)

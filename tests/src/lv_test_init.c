@@ -19,9 +19,9 @@ void lv_test_init(void)
 #endif
 
 #if defined(LV_USE_DRAW_NANOVG) && LV_USE_DRAW_NANOVG && defined(LV_USE_NANOVG_TEST_HEADLESS) && LV_USE_NANOVG_TEST_HEADLESS
-    lv_display_t * nanovg_disp = lv_test_display_nanovg_create(LV_TEST_DISPLAY_HOR_RES, LV_TEST_DISPLAY_VER_RES);
-    if(!nanovg_disp) {
-        printf("FATAL: NanoVG headless display creation failed\n");
+    lv_display_t * egl_disp = lv_test_display_egl_create(LV_TEST_DISPLAY_HOR_RES, LV_TEST_DISPLAY_VER_RES);
+    if(!egl_disp) {
+        printf("FATAL: EGL headless display creation failed\n");
         assert(false);
     }
 #else
@@ -54,7 +54,7 @@ void lv_test_deinit(void)
 
 #if defined(LV_USE_DRAW_NANOVG) && LV_USE_DRAW_NANOVG && defined(LV_USE_NANOVG_TEST_HEADLESS) && LV_USE_NANOVG_TEST_HEADLESS
     /* Clean up EGL/GL resources after NanoVG draw unit is destroyed */
-    lv_test_display_nanovg_cleanup();
+    lv_test_display_egl_cleanup();
 #endif
 }
 
