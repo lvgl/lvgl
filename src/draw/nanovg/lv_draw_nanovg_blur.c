@@ -60,6 +60,12 @@ void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, con
 {
     if(dsc->blur_radius <= 0) return;
 
+    if(dsc->blur_radius > 256) {
+        LV_LOG_WARN("nanovg blur: radius %d exceeds backend limit (256), skipping",
+                    (int)dsc->blur_radius);
+        return;
+    }
+
     LV_PROFILER_DRAW_BEGIN;
 
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
@@ -67,7 +73,7 @@ void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, con
     NVGLUblurState * state = (NVGLUblurState *)u->blur_state;
 
     if(state == NULL) {
-        LV_LOG_ERROR("nanovg blur: state not initialized");
+        LV_LOG_WARN("nanovg blur: state not initialized (FBO not supported?), skipping");
         LV_PROFILER_DRAW_END;
         return;
     }

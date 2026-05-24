@@ -387,7 +387,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
-    LV_UNUSED(draw_unit);
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL:
@@ -407,7 +407,11 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 #if LV_USE_3DTEXTURE
         case LV_DRAW_TASK_TYPE_3D:
 #endif
+            break;
+
         case LV_DRAW_TASK_TYPE_BLUR:
+            /* Only accept blur if FBO support is available (blur_state was created) */
+            if(u->blur_state == NULL) return 0;
             break;
 
         default:
