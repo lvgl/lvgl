@@ -353,17 +353,6 @@ static lv_freetype_outline_t outline_create(
     lv_freetype_outline_event_param_t param;
     lv_memzero(&param, sizeof(param));
 
-    lv_freetype_outline_t outline;
-
-    res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
-    outline = param.outline;
-
-    if(res != LV_RESULT_OK || !outline) {
-        LV_LOG_ERROR("Outline object create failed");
-        LV_PROFILER_FONT_END;
-        return NULL;
-    }
-
     FT_Outline glyph_outline;
     /* decompose glyph */
     glyph_outline = face->glyph->outline;
@@ -403,6 +392,17 @@ static lv_freetype_outline_t outline_create(
 
     param.sizes.data_size = vectors * 2;
     param.sizes.segments_size = segments;
+
+    lv_freetype_outline_t outline;
+
+    res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
+    outline = param.outline;
+
+    if(res != LV_RESULT_OK || !outline) {
+        LV_LOG_ERROR("Outline object create failed");
+        LV_PROFILER_FONT_END;
+        return NULL;
+    }
 
     /* Run outline decompose again to fill outline data */
     error = FT_Outline_Decompose(&glyph_outline, &outline_funcs, outline);
