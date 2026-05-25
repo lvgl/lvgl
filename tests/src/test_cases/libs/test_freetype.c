@@ -12,14 +12,6 @@
     #define EXT_NAME ".lp32.png"
 #endif
 
-#define OPTION_GENERATE_OUTLINE_DATA 0
-
-/*
- * Generated vector ops string can use https://w-mai.github.io/vegravis/
- * to visualize the outline data.
- **/
-#define OPTION_GENERATE_VECTOR_OPS_STRING 0
-
 static const char * UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_CN =
     "鉴于对人类家庭所有成员的固有尊严及其平等的和不移的权利的承认，乃是世界自由、正义与和平的基础...";
 static const char * UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_EN =
@@ -27,10 +19,7 @@ static const char * UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_EN =
 static const char * UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_JP =
     "人間の家族のすべての構成員の固有の尊厳と平等で譲渡不能な権利とを承認することは、自由と正義と平和の基礎である...";
 
-#if OPTION_GENERATE_VECTOR_OPS_STRING
-static void vegravis_generate_vector_ops_string(lv_freetype_outline_event_param_t * param, char * buf,
-                                                uint32_t buf_len);
-#endif
+
 
 void setUp(void)
 {
@@ -233,40 +222,6 @@ void test_freetype_render_outline(void)
 {
     test_freetype_with_render_mode(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, "libs/freetype_render_outline" EXT_NAME);
 }
-
-#if OPTION_GENERATE_VECTOR_OPS_STRING
-static void vegravis_generate_vector_ops_string(lv_freetype_outline_event_param_t * param, char * buf, uint32_t buf_len)
-{
-    float x, y, p1x, p1y, p2x, p2y;
-
-    x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
-    y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
-    p1x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.x);
-    p1y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.y);
-    p2x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control2.x);
-    p2y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control2.y);
-
-    switch(param->type) {
-        case LV_FREETYPE_OUTLINE_MOVE_TO:
-            lv_snprintf(buf, buf_len, "MOVE, %f, %f, ", x, x);
-            break;
-        case LV_FREETYPE_OUTLINE_LINE_TO:
-            lv_snprintf(buf, buf_len, "LINE, %f, %f, ", x, y);
-            break;
-        case LV_FREETYPE_OUTLINE_CONIC_TO:
-            lv_snprintf(buf, buf_len, "QUAD, %f, %f, %f, %f, ", p1x, p1y, x, y);
-            break;
-        case LV_FREETYPE_OUTLINE_CUBIC_TO:
-            lv_snprintf(buf, buf_len, "CUBI, %f, %f, %f, %f, %f, %f, ", p1x, p1y, p2x, p2y, x, y);
-            break;
-        case LV_FREETYPE_OUTLINE_END:
-            lv_snprintf(buf, buf_len, "END, ");
-            break;
-        default:
-            break;
-    }
-}
-#endif
 
 /**
  * Test kerning functionality with scalable FreeType fonts.
