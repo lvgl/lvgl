@@ -18,8 +18,8 @@ Most widgets need many XML examples and zero or one C-only example.
 
 ## Good examples to copy
 
-- XML: [`widgets/arc/arc_set_angles/lv_example_arc_set_angles.xml`](widgets/arc/arc_set_angles/lv_example_arc_set_angles.xml)
-- XML with data binding: [`widgets/slider/slider_bind_value/lv_example_slider_bind_value.xml`](widgets/slider/slider_bind_value/lv_example_slider_bind_value.xml)
+- XML: [`widgets/arc/lv_example_arc_set_angles.xml`](widgets/arc/lv_example_arc_set_angles.xml)
+- XML with data binding: [`widgets/slider/lv_example_slider_bind_value.xml`](widgets/slider/lv_example_slider_bind_value.xml)
 - C-only: [`widgets/arc/lv_example_arc_event.c`](widgets/arc/lv_example_arc_event.c)
 
 ## Generating the C

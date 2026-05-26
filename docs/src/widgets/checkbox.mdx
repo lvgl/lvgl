@@ -18,7 +18,7 @@ To set static text, use <ApiLink name="lv_checkbox_set_text_static" display="lv_
 way, only a pointer to `txt` will be stored. The provided text buffer must remain
 available for the lifetime of the Checkbox.
 
-<LvglExample name="lv_example_checkbox_text" path="widgets/checkbox/checkbox_text/lv_example_checkbox_text" />
+<LvglExample name="lv_example_checkbox_text" path="widgets/checkbox/lv_example_checkbox_text" />
 
 ## Check, uncheck, disable
 
@@ -32,7 +32,7 @@ lv_obj_add_state(cb, LV_STATE_DISABLED);
 
 Read it back with <ApiLink name="lv_obj_has_state" display="lv_obj_has_state(cb, LV_STATE_CHECKED)" />.
 
-<LvglExample name="lv_example_checkbox_states" path="widgets/checkbox/checkbox_states/lv_example_checkbox_states" />
+<LvglExample name="lv_example_checkbox_states" path="widgets/checkbox/lv_example_checkbox_states" />
 
 ## Styling
 
@@ -40,7 +40,7 @@ Two parts: <ApiLink name="LV_PART_MAIN" /> (the label/text area; `pad_column` co
 the gap to the tickbox) and <ApiLink name="LV_PART_INDICATOR" /> (the tickbox itself —
 its default size matches the font height; padding scales it).
 
-<LvglExample name="lv_example_checkbox_styling" path="widgets/checkbox/checkbox_styling/lv_example_checkbox_styling" />
+<LvglExample name="lv_example_checkbox_styling" path="widgets/checkbox/lv_example_checkbox_styling" />
 
 The headline pattern is state-aware styling on the indicator: one style
 attached with `selector="indicator"` for the default look, a second one
@@ -63,7 +63,7 @@ any event callback.
 
 - <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked(obj, &subject)" />
 
-<LvglExample name="lv_example_checkbox_bind_checked" path="widgets/checkbox/checkbox_bind_checked/lv_example_checkbox_bind_checked" />
+<LvglExample name="lv_example_checkbox_bind_checked" path="widgets/checkbox/lv_example_checkbox_bind_checked" />
 
 ## Events
 
