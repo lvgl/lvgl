@@ -141,6 +141,11 @@ jobs:
           --fail-on-warning \
           --reporter github
 
+      - name: Convert xml files to md
+        run: |
+            mkdir -p /tmp/xml
+            python3 docs/xml_to_md.py examples /tmp/xml --source-base https://github.com/lvgl/lvgl/blob/${{ github.sha }}/examples
+
       - name: Retrieve version
         id: version
         run: |
@@ -152,9 +157,16 @@ jobs:
           (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true'))
         run: |
           git clone https://lvgl-bot:${{ secrets.LVGL_BOT_TOKEN }}@github.com/lvgl/open-docs.git /tmp/open-docs
+
           rm -rf /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}
+          rm -rf /tmp/open-docs/xml/${{ steps.version.outputs.VERSION_NAME }}
+
           mkdir -p /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}
+          mkdir -p /tmp/open-docs/xml/${{ steps.version.outputs.VERSION_NAME }}
+
           cp -r docs/. /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}/
+          cp -r /tmp/xml/. /tmp/open-docs/xml/${{ steps.version.outputs.VERSION_NAME }}/
+
           cd /tmp/open-docs
           git config user.name lvgl-bot
           git config user.email lvgl-bot@users.noreply.github.com
@@ -168,12 +180,22 @@ jobs:
           (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true'))
         run: |
           git clone https://lvgl-bot:${{ secrets.LVGL_BOT_TOKEN }}@github.com/lvgl/open-docs.git /tmp/open-docs-latest
+
           rm -rf /tmp/open-docs-latest/latest
           rm -rf /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}
+          rm -rf /tmp/open-docs-latest/xml/latest
+          rm -rf /tmp/open-docs-latest/xml/${{ steps.version.outputs.VERSION_NAME }}
+
           mkdir -p /tmp/open-docs-latest/latest
           mkdir -p /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}
+          mkdir -p /tmp/open-docs-latest/xml/latest
+          mkdir -p /tmp/open-docs-latest/xml/${{ steps.version.outputs.VERSION_NAME }}
+
           cp -r docs/. /tmp/open-docs-latest/latest/
           cp -r docs/. /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}/
+          cp -r /tmp/xml/. /tmp/open-docs-latest/xml/latest
+          cp -r /tmp/xml/. /tmp/open-docs-latest/xml/${{ steps.version.outputs.VERSION_NAME }}/
+
           cd /tmp/open-docs-latest
           git config user.name lvgl-bot
           git config user.email lvgl-bot@users.noreply.github.com
