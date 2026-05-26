@@ -71,6 +71,25 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
                    lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir);
 
+/**
+ * Write a text
+ * @param coords coordinates of the label
+ * @param mask the label will be drawn only in this area
+ * @param style pointer to a style
+ * @param opa_scale scale down all opacities by the factor
+ * @param txt text to write
+ * @param len length of text
+ * @param flag settings for the text from 'txt_flag_t' enum
+ * @param offset text offset in x and y direction (NULL if unused)
+ * @param sel_start start index of selected area (`LV_DRAW_LABEL_NO_TXT_SEL` if none)
+ * @param hint pointer to a `lv_draw_label_hint_t` variable.
+ * It is managed by the drawer to speed up the drawing of very long texts (thousands of lines).
+ * @param bidi_dir base direction of the text
+ */
+void lv_draw_label_strview(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
+                   const char * txt, uint32_t len, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
+                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir);
+
 /**********************
  *      MACROS
  **********************/

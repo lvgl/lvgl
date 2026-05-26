@@ -514,7 +514,7 @@ lv_label_align_t lv_label_get_align(const lv_obj_t * label)
     if(align == LV_LABEL_ALIGN_AUTO) {
 #if LV_USE_BIDI
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
-        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(ext->text);
+        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(ext->text, UINT32_MAX);
 
         if(base_dir == LV_BIDI_DIR_LTR) align = LV_LABEL_ALIGN_LEFT;
         else if (base_dir == LV_BIDI_DIR_RTL) align = LV_LABEL_ALIGN_RIGHT;
@@ -605,7 +605,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
         max_w = LV_COORD_MAX;
     }
 
-    uint16_t byte_id = lv_txt_encoded_get_byte_id(txt, char_id);
+    uint16_t byte_id = lv_txt_encoded_get_byte_id(txt, UINT32_MAX, char_id);
 
     /*Search the line of the index letter */;
     while(txt[new_line_start] != '\0') {
@@ -634,14 +634,14 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
         bidi_txt =  &txt[line_start];
     }
     else {
-        uint16_t line_char_id = lv_txt_encoded_get_char_id(&txt[line_start], byte_id - line_start);
+        uint16_t line_char_id = lv_txt_encoded_get_char_id(&txt[line_start], UINT32_MAX, byte_id - line_start);
 
         bool is_rtl;
         char *mutable_bidi_txt;
         uint16_t visual_char_pos = lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start, lv_obj_get_base_dir(label), line_char_id, &is_rtl);
         bidi_txt = mutable_bidi_txt;
         if (is_rtl) visual_char_pos++;
-        visual_byte_pos = lv_txt_encoded_get_byte_id(bidi_txt, visual_char_pos);
+        visual_byte_pos = lv_txt_encoded_get_byte_id(bidi_txt, UINT32_MAX, visual_char_pos);
     }
 #else
     bidi_txt = &txt[line_start];
@@ -715,7 +715,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
             /* Include the NULL terminator in the last line */
             uint32_t tmp = new_line_start;
             uint32_t letter;
-            letter = lv_txt_encoded_prev(txt, &tmp);
+            letter = lv_txt_encoded_prev(txt, UINT32_MAX, &tmp);
             if(letter != '\n' && txt[new_line_start] == '\0' ) new_line_start++;
             break;
         }
@@ -756,10 +756,10 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     if(new_line_start > 0) {
         while(i + line_start < new_line_start) {
             /* Get the current letter.*/
-            letter = lv_txt_encoded_next(bidi_txt, &i);
+            letter = lv_txt_encoded_next(bidi_txt, UINT32_MAX, &i);
 
             /*Get the next letter too for kerning*/
-            letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
+            letter_next = lv_txt_encoded_next(&bidi_txt[i], UINT32_MAX, NULL);
 
             /*Handle the recolor command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -783,13 +783,13 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 #if LV_USE_BIDI
     /*Handle Bidi*/
     bool is_rtl;
-    logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL, txt_len, lv_obj_get_base_dir(label), lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);
+    logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL, txt_len, lv_obj_get_base_dir(label), lv_txt_encoded_get_char_id(bidi_txt, UINT32_MAX, i), &is_rtl);
     if (is_rtl) logical_pos++;
 #else
-    logical_pos = lv_txt_encoded_get_char_id(bidi_txt, i);
+    logical_pos = lv_txt_encoded_get_char_id(bidi_txt, UINT32_MAX, i);
 #endif
 
-    return  logical_pos + lv_txt_encoded_get_char_id(txt, line_start);
+    return logical_pos + lv_txt_encoded_get_char_id(txt, UINT32_MAX, line_start);
 }
 
 /**
@@ -896,10 +896,10 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
         while(i <= new_line_start - 1) {
             /* Get the current letter
              * Be careful 'i' already points to the next character */
-            letter = lv_txt_encoded_next(txt, &i);
+            letter = lv_txt_encoded_next(txt, UINT32_MAX, &i);
 
             /*Get the next letter for kerning*/
-            letter_next = lv_txt_encoded_next(&txt[i], NULL);
+            letter_next = lv_txt_encoded_next(&txt[i], UINT32_MAX, NULL);
 
             /*Handle the recolor command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -954,7 +954,7 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
     if(ext->text == NULL) return;
 
     if(pos == LV_LABEL_POS_LAST) {
-        pos = lv_txt_get_encoded_length(ext->text);
+        pos = lv_txt_get_encoded_length(ext->text, UINT32_MAX);
     }
 
     lv_txt_ins(ext->text, pos, txt);
@@ -1295,7 +1295,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     } else if(ext->long_mode == LV_LABEL_LONG_DOT) {
         if(size.y <= lv_obj_get_height(label)) { /*No dots are required, the text is short enough*/
             ext->dot_end = LV_LABEL_DOT_END_INV;
-        } else if(lv_txt_get_encoded_length(ext->text) <= LV_LABEL_DOT_NUM) { /*Don't turn to dots all the characters*/
+        } else if(lv_txt_get_encoded_length(ext->text, UINT32_MAX) <= LV_LABEL_DOT_NUM) { /*Don't turn to dots all the characters*/
             ext->dot_end = LV_LABEL_DOT_END_INV;
         } else {
             lv_point_t p;
@@ -1311,7 +1311,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
             /*Be sure there is space for the dots*/
             size_t txt_len = strlen(ext->text);
-            uint32_t byte_id     = lv_txt_encoded_get_byte_id(ext->text, letter_id);
+            uint32_t byte_id     = lv_txt_encoded_get_byte_id(ext->text, txt_len, letter_id);
             while(byte_id + LV_LABEL_DOT_NUM > txt_len) {
                 byte_id -= lv_txt_encoded_size(&ext->text[byte_id]);
                 letter_id--;
@@ -1323,7 +1323,7 @@ static void lv_label_refr_text(lv_obj_t * label)
             uint8_t len          = 0;
             for(i = 0; i <= LV_LABEL_DOT_NUM; i++) {
                 len += lv_txt_encoded_size(&ext->text[byte_id]);
-                lv_txt_encoded_next(ext->text, &byte_id);
+                lv_txt_encoded_next(ext->text, txt_len, &byte_id);
             }
 
             if(lv_label_set_dot_tmp(label, &ext->text[byte_id_ori], len)) {
@@ -1353,7 +1353,7 @@ static void lv_label_revert_dots(lv_obj_t * label)
     if(ext->long_mode != LV_LABEL_LONG_DOT) return;
     if(ext->dot_end == LV_LABEL_DOT_END_INV) return;
     uint32_t letter_i = ext->dot_end - LV_LABEL_DOT_NUM;
-    uint32_t byte_i   = lv_txt_encoded_get_byte_id(ext->text, letter_i);
+    uint32_t byte_i   = lv_txt_encoded_get_byte_id(ext->text, UINT32_MAX, letter_i);
 
     /*Restore the characters*/
     uint8_t i      = 0;

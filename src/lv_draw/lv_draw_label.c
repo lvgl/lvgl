@@ -43,7 +43,6 @@ typedef uint8_t cmd_state_t;
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 /**
  * Write a text
  * @param coords coordinates of the label
@@ -62,11 +61,33 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
                    lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir)
 {
+    lv_draw_label_strview(coords, mask, style, opa_scale, txt, UINT32_MAX, flag, offset, sel, hint, bidi_dir);
+}
+
+/**
+ * Write a text
+ * @param coords coordinates of the label
+ * @param mask the label will be drawn only in this area
+ * @param style pointer to a style
+ * @param opa_scale scale down all opacities by the factor
+ * @param txt text to write
+ * @param len length of text
+ * @param flag settings for the text from 'txt_flag_t' enum
+ * @param offset text offset in x and y direction (NULL if unused)
+ * @param sel_start start index of selected area (`LV_DRAW_LABEL_NO_TXT_SEL` if none)
+ * @param hint pointer to a `lv_draw_label_hint_t` variable.
+ * It is managed by the drawer to speed up the drawing of very long texts (thousands of lines).
+ * @param bidi_dir base direction of the text
+ */
+void lv_draw_label_strview(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
+                   const char * txt, uint32_t len, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
+                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir)
+{
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
 
     /*No need to waste processor time if string is empty*/
-    if (txt[0] == '\0')  return;
+    if (len == 0 || txt[0] == '\0')  return;
 
     if((flag & LV_TXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
@@ -74,7 +95,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     } else {
         /*If EXAPND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
-        lv_txt_get_size(&p, txt, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX,
+        lv_txt_get_size_strview(&p, txt, len, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX,
                 flag);
         w = p.x;
     }
@@ -114,13 +135,13 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     }
 
 
-    uint32_t line_end = line_start + lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
+    uint32_t line_end = line_start + lv_txt_get_next_line_strview(&txt[line_start], len - line_start, font, style->text.letter_space, w, flag);
 
     /*Go the first visible line*/
     while(pos.y + line_height < mask->y1) {
         /*Go to next line*/
         line_start = line_end;
-        line_end += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
+        line_end += lv_txt_get_next_line_strview(&txt[line_start], len - line_start, font, style->text.letter_space, w, flag);
         pos.y += line_height;
 
         /*Save at the threshold coordinate*/
@@ -130,7 +151,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             hint->coord_y    = coords->y1;
         }
 
-        if(txt[line_start] == '\0') return;
+        if(line_start >= len || txt[line_start] == '\0') return;
     }
 
     /*Align to middle*/
@@ -170,7 +191,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     sel_style.body.main_color = sel_style.body.grad_color = style->text.sel_color;
 
     /*Write out all lines*/
-    while(txt[line_start] != '\0') {
+    while(line_start < len && txt[line_start] != '\0') {
         if(offset != NULL) {
             pos.x += x_ofs;
         }
@@ -191,16 +212,16 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             uint16_t logical_char_pos = 0;
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
 #if LV_USE_BIDI
-                logical_char_pos = lv_txt_encoded_get_char_id(txt, line_start);
-                uint16_t t = lv_txt_encoded_get_char_id(bidi_txt, i);
+                logical_char_pos = lv_txt_encoded_get_char_id(txt, len, line_start);
+                uint16_t t = lv_txt_encoded_get_char_id(bidi_txt, line_end - line_start, i);
                 logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, bidi_dir, t, NULL);
 #else
-                logical_char_pos = lv_txt_encoded_get_char_id(txt, line_start + i);
+                logical_char_pos = lv_txt_encoded_get_char_id(txt, len, line_start + i);
 #endif
             }
 
-            letter      = lv_txt_encoded_next(bidi_txt, &i);
-            letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
+            letter      = lv_txt_encoded_next(bidi_txt, line_end - line_start, &i);
+            letter_next = lv_txt_encoded_next(&bidi_txt[i], line_end - line_start - i, NULL);
 
 
             /*Handle the re-color command*/
@@ -265,7 +286,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         }
         /*Go to next line*/
         line_start = line_end;
-        line_end += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
+        line_end += lv_txt_get_next_line_strview(&txt[line_start], len - line_start, font, style->text.letter_space, w, flag);
 
         pos.x = coords->x1;
         /*Align to middle*/

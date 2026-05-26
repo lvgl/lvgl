@@ -77,6 +77,21 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
                      lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
 
 /**
+ * Get size of a text
+ * @param size_res pointer to a 'point_t' variable to store the result
+ * @param text pointer to a text
+ * @param len length of text
+ * @param font pointer to font of the text
+ * @param letter_space letter space of the text
+ * @param line_space line space of the text
+ * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
+ * line breaks
+ * @param flags settings for the text from 'txt_flag_t' enum
+ */
+void lv_txt_get_size_strview(lv_point_t * size_res, const char * text, uint32_t len, const lv_font_t * font,
+                     lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
+
+/**
  * Get the next line of text. Check line length and break chars too.
  * @param txt a '\0' terminated string
  * @param font pointer to a font
@@ -89,6 +104,21 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  */
 uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space, lv_coord_t max_width,
                               lv_txt_flag_t flag);
+
+/**
+ * Get the next line of text. Check line length and break chars too.
+ * @param txt string
+ * @param len length of string
+ * @param font pointer to a font
+ * @param letter_space letter space
+ * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
+ * line breaks
+ * @param flags settings for the text from 'txt_flag_type' enum
+ * @return the index of the first char of the new line (in byte index not letter index. With UTF-8
+ * they are different)
+ */
+uint16_t lv_txt_get_next_line_strview(const char * txt, uint32_t len, const lv_font_t * font, lv_coord_t letter_space,
+                              lv_coord_t max_width, lv_txt_flag_t flag);
 
 /**
  * Give the length of a text with a given font
@@ -164,48 +194,53 @@ extern uint32_t (*lv_txt_encoded_conv_wc)(uint32_t c);
 
 /**
  * Decode the next encoded character from a string.
- * @param txt pointer to '\0' terminated string
+ * @param txt pointer string
+ * @param len length of string
  * @param i start index in 'txt' where to start.
  *                After the call it will point to the next encoded char in 'txt'.
  *                NULL to use txt[0] as index
  * @return the decoded Unicode character or 0 on invalid data code
  */
-extern uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *);
+extern uint32_t (*lv_txt_encoded_next)(const char *, uint32_t, uint32_t *);
 
 /**
  * Get the previous encoded character form a string.
- * @param txt pointer to '\0' terminated string
+ * @param txt pointer string
+ * @param len length of string
  * @param i_start index in 'txt' where to start. After the call it will point to the previous
  * encoded char in 'txt'.
  * @return the decoded Unicode character or 0 on invalid data
  */
-extern uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *);
+extern uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t, uint32_t *);
 
 /**
  * Convert a letter index (in an the encoded text) to byte index.
  * E.g. in UTF-8 "AÁRT" index of 'R' is 2 but start at byte 3 because 'Á' is 2 bytes long
- * @param txt a '\0' terminated UTF-8 string
+ * @param txt UTF-8 string
+ * @param len length of string
  * @param enc_id letter index
  * @return byte index of the 'enc_id'th letter
  */
-extern uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t);
+extern uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t, uint32_t);
 
 /**
  * Convert a byte index (in an encoded text) to character index.
  * E.g. in UTF-8 "AÁRT" index of 'R' is 2 but start at byte 3 because 'Á' is 2 bytes long
- * @param txt a '\0' terminated UTF-8 string
+ * @param txt UTF-8 string
+ * @param len length of string
  * @param byte_id byte index
  * @return character index of the letter at 'byte_id'th position
  */
-extern uint32_t (*lv_txt_encoded_get_char_id)(const char *, uint32_t);
+extern uint32_t (*lv_txt_encoded_get_char_id)(const char *, uint32_t, uint32_t);
 
 /**
  * Get the number of characters (and NOT bytes) in a string.
  * E.g. in UTF-8 "ÁBC" is 3 characters (but 4 bytes)
- * @param txt a '\0' terminated char string
+ * @param txt char string
+ * @param len length of string
  * @return number of characters
  */
-extern uint32_t (*lv_txt_get_encoded_length)(const char *);
+extern uint32_t (*lv_txt_get_encoded_length)(const char *, uint32_t);
 
 /**********************
  *      MACROS

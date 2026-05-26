@@ -846,7 +846,7 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             uint32_t letter_cnt = 0;
             uint32_t letter;
             for(letter_cnt = 0; letter_cnt < letter_i; letter_cnt++) {
-                letter = lv_txt_encoded_next(txt, &i);
+                letter = lv_txt_encoded_next(txt, UINT32_MAX, &i);
                 /*Count he lines to reach the clicked letter. But ignore the last '\n' because it
                  * still belongs to the clicked line*/
                 if(letter == '\n' && i_prev != letter_i) new_opt++;
