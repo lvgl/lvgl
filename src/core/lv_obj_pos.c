@@ -16,7 +16,6 @@
 #include "../display/lv_display_private.h"
 #include "lv_refr_private.h"
 #include "../core/lv_global.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

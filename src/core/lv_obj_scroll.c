@@ -11,7 +11,6 @@
 #include "../misc/lv_anim_private.h"
 #include "lv_obj_private.h"
 #include "../indev/lv_indev_scroll.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

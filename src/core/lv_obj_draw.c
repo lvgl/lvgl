@@ -9,7 +9,6 @@
 #include "lv_obj_draw_private.h"
 #include "../lvgl_public.h"
 #include "lv_obj_private.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

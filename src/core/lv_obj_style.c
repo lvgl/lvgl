@@ -14,7 +14,6 @@
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "lv_observer_private.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

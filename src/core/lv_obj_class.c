@@ -10,7 +10,6 @@
 #include "../lvgl_public.h"
 #include "lv_obj_private.h"
 #include "../display/lv_display_private.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
