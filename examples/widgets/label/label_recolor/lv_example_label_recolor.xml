@@ -7,11 +7,12 @@
  label widgets.
 -->
 <screen>
-	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+	<view>
 		<!-- 💡 Adjust inline #RRGGBB segments to recolor different words and ranges in one label. -->
 		<!-- Recolor-enabled label using inline #RRGGBB color commands -->
-		<lv_label name="label"
-			width="90%"
+		<lv_label
+			name="label"
+			align="center"
 			recolor="true"
 			text="Write a #ff0000 red# word, a #00a000 green# word, and a #0000ff blue# word."
 		/>

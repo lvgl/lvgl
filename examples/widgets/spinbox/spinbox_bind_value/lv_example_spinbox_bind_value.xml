@@ -8,10 +8,11 @@
  and a graphical indicator both refer to the same underlying quantity.
 -->
 <screen>
-	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+	<view>
 		<!-- 💡 Tap the spinbox arrows; the arc follows because both bind to `subject_value`. -->
-		<lv_arc name="arc" width="160" height="160" bind_value="subject_value">
-			<lv_spinbox name="spinbox"
+		<lv_arc name="arc" width="160" height="160" bind_value="subject_value" align="center">
+			<lv_spinbox
+				name="spinbox"
 				width="80"
 				digit_count="3"
 				min_value="0"

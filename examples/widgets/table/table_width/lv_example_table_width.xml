@@ -12,7 +12,7 @@
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
 		<!-- 💡 Edit the `width` values to redistribute horizontal space between columns. -->
 		<lv_table name="table" row_count="3" column_count="3">
-			<lv_table-column column="0" width="50px" />
+			<lv_table-column column="0" width="60px" />
 			<lv_table-column column="1" width="180px" />
 			<lv_table-column column="2" width="80px" />
 

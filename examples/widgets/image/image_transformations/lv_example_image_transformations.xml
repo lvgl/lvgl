@@ -9,7 +9,7 @@
  at render time, no extra image variants needed.
 -->
 <screen>
-	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="16">
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_track_place="center">
 		<!-- 💡 Edit `rotation`, the `scale_*` pair, or `pivot_*` to compare against the unmodified copy on the left. -->
 
 		<lv_image name="image_1" src="img_example_lvgl_logo" />

@@ -12,10 +12,15 @@
 <screen>
 	<view>
 		<!-- 💡 Hold any letter key and watch the magnified pop-over appear above. -->
-		<lv_textarea name="textarea" align="top_mid" y="10" width="90%" height="60"
-			one_line="true" placeholder_text="Press and hold a key" />
+		<lv_textarea
+			name="textarea"
+			align="top_mid"
+			y="10"
+			width="90%"
+			one_line="true"
+			placeholder_text="Press and hold a key"
+		/>
 
-		<lv_keyboard name="keyboard" align="bottom_mid" width="100%" height="40%"
-			mode="text_lower" popovers="true" />
+		<lv_keyboard name="keyboard" align="bottom_mid" width="100%" height="60%" mode="text_lower" popovers="true" />
 	</view>
 </screen>

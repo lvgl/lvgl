@@ -9,12 +9,19 @@
  `spinbox_rollover` for the wraparound variant.
 -->
 <screen>
-	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+	<view>
 		<!-- 💡 Edit `step` to 5 or 10; each press now changes by that delta until a bound is hit. -->
-		<lv_spinbox name="spinbox" width="160"
+		<lv_label text="Use the arrows to change the value" align="center" y="-50" />
+
+		<lv_spinbox
+			name="spinbox"
+			width="160"
 			digit_count="3"
 			value="25"
-			min_value="0" max_value="100"
-			step="1" />
+			min_value="0"
+			max_value="100"
+			step="3"
+			align="center"
+		/>
 	</view>
 </screen>

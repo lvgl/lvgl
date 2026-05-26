@@ -7,14 +7,12 @@
  the pointer almost instantly — useful for fine-tuning versus quick-jump knobs.
 -->
 <screen>
-	<view>
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_track_place="center">
 		<!-- 💡 Drag each arc quickly: lower change_rate responds more slowly, higher change_rate tracks your pointer faster. -->
 		<!-- Slower response arc -->
 		<lv_arc name="arc_1"
-			align="left_mid"
-			x="10"
-			width="96"
-			height="96"
+			width="120"
+			height="120"
 			bg_start_angle="135"
 			bg_end_angle="45"
 			change_rate="40"
@@ -25,10 +23,8 @@
 
 		<!-- Faster response arc -->
 		<lv_arc name="arc_2"
-			align="right_mid"
-			x="-10"
-			width="96"
-			height="96"
+			width="120"
+			height="120"
 			bg_start_angle="135"
 			bg_end_angle="45"
 			change_rate="360"

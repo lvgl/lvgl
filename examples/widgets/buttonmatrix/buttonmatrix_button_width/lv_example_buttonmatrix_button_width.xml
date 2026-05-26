@@ -18,7 +18,7 @@
 		<lv_buttonmatrix name="buttonmatrix"
 			align="center"
 			width="90%"
-			height="120"
+			height="140"
 			map="'A' 'B' 'C' '&#10;' 'x1' 'x2' 'x3'"
 			ctrl_map="none none none width_1 width_2 width_3"
 		/>

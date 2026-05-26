@@ -11,15 +11,35 @@
 	<view>
 		<!-- 💡 Click each dropdown: each list pops toward the screen edge defined by its dir attribute. -->
 		<!-- Default: list opens downward -->
-		<lv_dropdown name="dropdown_1" align="top_mid" y="10" options="Apple&#10;Banana&#10;Orange&#10;Melon" />
+		<lv_dropdown name="dropdown_1" align="top_mid" y="20" options="Apple&#10;Banana&#10;Orange&#10;Melon" />
 
 		<!-- List opens upward -->
-		<lv_dropdown name="dropdown_2" align="bottom_mid" y="-10" dir="top" options="Apple&#10;Banana&#10;Orange&#10;Melon" />
+		<lv_dropdown
+			name="dropdown_2"
+			align="bottom_mid"
+			y="-20"
+			dir="top"
+			options="Apple&#10;Banana&#10;Orange&#10;Melon"
+		/>
 
 		<!-- List opens to the right -->
-		<lv_dropdown name="dropdown_3" align="left_mid" x="10" width="80" dir="right" options="Apple&#10;Banana&#10;Orange&#10;Melon" />
+		<lv_dropdown
+			name="dropdown_3"
+			align="left_mid"
+			x="20"
+			width="80"
+			dir="right"
+			options="Apple&#10;Banana&#10;Orange&#10;Melon"
+		/>
 
 		<!-- List opens to the left -->
-		<lv_dropdown name="dropdown_4" align="right_mid" x="-10" width="80" dir="left" options="Apple&#10;Banana&#10;Orange&#10;Melon" />
+		<lv_dropdown
+			name="dropdown_4"
+			align="right_mid"
+			x="-20"
+			width="80"
+			dir="left"
+			options="Apple&#10;Banana&#10;Orange&#10;Melon"
+		/>
 	</view>
 </screen>

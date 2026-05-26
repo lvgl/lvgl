@@ -13,17 +13,22 @@
 	</consts>
 	<styles>
 		<!-- Unfilled background ring: soft neutral track -->
-		<style name="style_track" arc_color="0xe2e8f0" arc_width="14" arc_rounded="true" />
+		<style name="style_bg" arc_color="#accent" arc_width="14" arc_opa="20%" arc_rounded="true" />
 		<!-- Active ring: accent progress -->
-		<style name="style_progress" arc_color="#accent" arc_width="14" arc_rounded="true" />
+		<style name="style_indicator" arc_color="#accent" arc_width="14" arc_rounded="true" />
 	</styles>
 
-	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="12"
+	>
 		<!-- 💡 Change `arc_width` or either `arc_color`; track and progress restyle independently. -->
 		<lv_arc name="arc" width="160" height="160" min_value="0" max_value="100" value="68">
-			<style name="style_track" selector="main" />
-			<style name="style_progress" selector="indicator" />
-			<lv_label name="label" align="center" text="68%" />
+			<style name="style_bg" selector="main" />
+			<style name="style_indicator" selector="indicator" />
 		</lv_arc>
 	</view>
 </screen>

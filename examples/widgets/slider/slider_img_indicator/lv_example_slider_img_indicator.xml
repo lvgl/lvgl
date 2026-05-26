@@ -34,7 +34,7 @@
 			<style name="style_slider_indicator" selector="indicator" />
 			<style name="style_slider_knob" selector="knob" />
 		</lv_slider>
+		<lv_label name="label" bind_text="subject_value2" bind_text-fmt="%d"/>
 
-		<lv_label name="label" bind_text="subject_value2" bind_text-fmt="%d" style_text_font="font_example_large"/>
 	</view>
 </screen>

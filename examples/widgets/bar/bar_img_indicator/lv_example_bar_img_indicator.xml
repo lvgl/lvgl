@@ -30,17 +30,17 @@
 			style_pad_column="12"
 			style_bg_opa="0"
 			style_border_width="0"
-			width="150"
+			width="180"
 			height="content"
 		>
 			<lv_button name="button_1">
-				<lv_label name="label_1" align="center" text="-"  style_text_font="font_example_large"/>
+				<lv_label name="label_1" align="center" text="-"  />
 				<subject_increment_event subject="subject_value2" trigger="clicked" step="-1"/>
 				<subject_increment_event subject="subject_value2" trigger="long_pressed_repeat"  step="-1"/>
 			</lv_button>
-			<lv_label name="label_2" bind_text="subject_value2" style_text_font="font_example_large"/>
+			<lv_label name="label_2" bind_text="subject_value2" />
 			<lv_button name="button_2">
-				<lv_label name="label_3" align="center" text="+"  style_text_font="font_example_large"/>
+				<lv_label name="label_3" align="center" text="+"  />
 				<subject_increment_event subject="subject_value2" trigger="clicked"  step="1"/>
 				<subject_increment_event subject="subject_value2" trigger="long_pressed_repeat" step="1" />
 			</lv_button>

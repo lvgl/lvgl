@@ -10,7 +10,7 @@
  the arc to fill the widget.
 -->
 <screen>
-	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="32">
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_track_place="center">
 		<!-- 💡 Lower `anim_duration` to spin faster; raise `arc_sweep` to make the moving segment longer. -->
 
 		<!-- Long arc, medium speed -->

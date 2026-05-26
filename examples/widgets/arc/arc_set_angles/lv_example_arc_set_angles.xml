@@ -8,14 +8,13 @@
  not tied to a numeric value.
 -->
 <screen>
-	<view>
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_track_place="center">
 		<!-- 💡 Edit start_angle/end_angle directly to draw any indicator span independent of value and mode. -->
 		<!-- Value-driven indicator arc -->
-		<lv_arc name="arc_1"
-			align="left_mid"
-			x="10"
-			width="96"
-			height="96"
+		<lv_arc
+			name="arc_1"
+			width="120"
+			height="120"
 			bg_start_angle="135"
 			bg_end_angle="45"
 			min_value="100"
@@ -26,15 +25,15 @@
 		</lv_arc>
 
 		<!-- Indicator angle set explicitly; value/mode are ignored for indicator drawing -->
-		<lv_arc name="arc_2"
-			align="right_mid"
-			x="-10"
-			width="96"
-			height="96"
+		<lv_arc
+			name="arc_2"
+			width="120"
+			height="120"
 			bg_start_angle="135"
 			bg_end_angle="45"
 			start_angle="210"
 			end_angle="330"
+			style_bg_opa-knob="0%"
 		>
 			<lv_label name="label_2" align="center" text="angles" />
 		</lv_arc>

@@ -9,20 +9,37 @@
  layout.
 -->
 <screen>
-	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="20">
+	<view
+		flex_flow="column"
+		style_flex_main_place="space_evenly"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+	>
 		<!-- 💡 Edit either range; labels rescale automatically because tick count stays fixed. -->
 		<!-- 0..100 — typical percent scale -->
-		<lv_scale name="scale_1" width="260" height="60"
+		<lv_scale
+			name="scale_1"
+			width="260"
+			height="60"
 			mode="horizontal_bottom"
-			total_tick_count="11" major_tick_every="2"
+			total_tick_count="11"
+			major_tick_every="2"
 			label_show="true"
-			min_value="0" max_value="100" />
+			min_value="0"
+			max_value="100"
+		/>
 
 		<!-- -50..50 — a centred range, e.g. for offset values -->
-		<lv_scale name="scale_2" width="260" height="60"
+		<lv_scale
+			name="scale_2"
+			width="260"
+			height="60"
 			mode="horizontal_bottom"
-			total_tick_count="11" major_tick_every="2"
+			total_tick_count="11"
+			major_tick_every="2"
 			label_show="true"
-			min_value="-50" max_value="50" />
+			min_value="-50"
+			max_value="50"
+		/>
 	</view>
 </screen>

@@ -10,22 +10,21 @@
 <screen>
 	<styles>
 		<!-- Indicator, any state: gradient fill -->
-		<style name="style_indicator"
+		<style
+			name="style_indicator"
 			bg_opa="100%"
 			bg_color="0x8b5cf6"
 			bg_grad_color="0xec4899"
 			bg_grad_dir="hor"
-			radius="10" />
+			radius="10"
+		/>
 		<!-- Indicator, pressed only: soft glow -->
-		<style name="style_indicator_pressed"
-			shadow_color="0xec4899"
-			shadow_width="18"
-			shadow_spread="2" />
+		<style name="style_indicator_pressed" shadow_color="0xec4899" shadow_width="18" shadow_spread="2" />
 	</styles>
 
-	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="20">
+	<view>
 		<!-- 💡 Press and hold the slider: the indicator keeps its gradient but gains the pressed glow. -->
-		<lv_slider name="slider" width="220" height="16" min_value="0" max_value="100" value="65">
+		<lv_slider name="slider" align="center" width="220" height="16" min_value="0" max_value="100" value="65">
 			<style name="style_indicator" selector="indicator" />
 			<style name="style_indicator_pressed" selector="pressed|indicator" />
 		</lv_slider>

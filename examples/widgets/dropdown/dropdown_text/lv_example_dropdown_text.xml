@@ -10,9 +10,16 @@
 	<view>
 		<!-- 💡 Set text to make the button always show that fixed label, regardless of which option is picked. -->
 		<!-- Without text the button reflects the selected option -->
-		<lv_dropdown name="dropdown_1" align="left_mid" x="14" width="110" options="Cut&#10;Copy&#10;Paste" />
+		<lv_dropdown name="dropdown_1" align="center" x="-100" width="110" options="Cut&#10;Copy&#10;Paste" />
 
 		<!-- text='Menu' overrides the displayed option -->
-		<lv_dropdown name="dropdown_2" align="right_mid" x="-14" width="110" text="Menu" options="Cut&#10;Copy&#10;Paste" />
+		<lv_dropdown
+			name="dropdown_2"
+			align="center"
+			x="100"
+			width="110"
+			text="Menu"
+			options="Cut&#10;Copy&#10;Paste"
+		/>
 	</view>
 </screen>

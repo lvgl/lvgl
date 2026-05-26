@@ -8,13 +8,19 @@
  should be able to step from 23 → 0 without re-entering the value.
 -->
 <screen>
-	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+	<view>
 		<!-- 💡 Increment past 23; the value wraps to 0 because `rollover="true"`. -->
-		<lv_spinbox name="spinbox" width="160"
+		<lv_label text="Use the arrows to change the value" align="center" y="-50" />
+		<lv_spinbox
+			name="spinbox"
+			width="160"
 			digit_count="2"
 			value="22"
-			min_value="0" max_value="23"
+			min_value="0"
+			max_value="23"
 			step="1"
-			rollover="true" />
+			align="center"
+			rollover="true"
+		/>
 	</view>
 </screen>

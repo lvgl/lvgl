@@ -9,7 +9,7 @@
  switch inside a wide row.
 -->
 <screen>
-	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_pad_column="32">
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_cross_place="center" style_flex_track_place="center">
 		<!-- 💡 Swap `orientation` on either switch to compare auto-derived vs explicit layouts. -->
 
 		<lv_switch name="sw_1" width="60" height="30" orientation="horizontal" checked="true" />
