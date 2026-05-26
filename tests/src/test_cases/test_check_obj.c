@@ -5,7 +5,7 @@
 /* 2. Prevent lv_conf_internal.h from re-including the conf */
 #define LV_CONF_SKIP
 #include "../lvgl.h"
-#include "./test_cases/test_check_obj_impl.h"
+#include "test_cases/test_check_obj_impl.h"
 
 void setUp(void)
 {

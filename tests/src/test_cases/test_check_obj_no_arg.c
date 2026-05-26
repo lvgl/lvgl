@@ -4,7 +4,7 @@
 #define LV_USE_CHECK_ARG 0
 #define LV_CONF_SKIP
 #include "../lvgl.h"
-#include "test_check_obj_impl.h"
+#include "test_cases/test_check_obj_impl.h"
 
 void setUp(void)
 {
