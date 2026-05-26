@@ -20,7 +20,7 @@
 			style_grid_column_dsc_array="60 60 60"
 			style_grid_row_dsc_array="40 40"
 			style_layout="grid"
-			width="100%"
+			width="280"
 			height="content"
 		>
 			<!-- Parent grid item (column 0, row 0) -->

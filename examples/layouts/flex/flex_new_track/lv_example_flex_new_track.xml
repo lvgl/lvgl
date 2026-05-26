@@ -17,7 +17,7 @@
 		<!-- A row-wrap container holds 7 items grouped into 2 tracks.
 		     The sixth item is forced to start in a new tracks -->
 		<!-- Demo container showing explicit new-track start -->
-		<lv_obj name="container" flex_flow="row_wrap" width="100%" height="content">
+		<lv_obj name="container" flex_flow="row_wrap" width="90%" height="content">
 			<!-- Track 1 -->
 			<lv_label name="label_1" style_bg_color="0x3498db" text="Mon">
 				<style name="style_day" />

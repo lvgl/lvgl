@@ -12,7 +12,7 @@
 		<!-- Demo row mixing normal and ignore_layout items.
 		     The red item uses ignore_layout="true", so Flex skips it;
 		     it keeps its manual x/y position and the other items are laid out normally. -->
-		<lv_obj name="container" flex_flow="row" width="100%" height="150">
+		<lv_obj name="container" flex_flow="row" width="90%" height="150">
 			<lv_button name="button_1" height="content">
 				<lv_label name="label_1" text="Item A" align="center" />
 			</lv_button>

@@ -17,7 +17,7 @@
 			style_grid_column_align="space_between"
 			style_grid_row_align="end"
 			style_layout="grid"
-			width="100%"
+			width="300"
 			height="180"
 		>
 			<!-- First row -->

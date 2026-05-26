@@ -14,7 +14,7 @@
 		     "A" gets 1 portion, "B" gets 2 portions of the free space.
 		     Try changing the style_flex_grow values to see the effect. -->
 		<!-- Demo row for grow behavior -->
-		<lv_obj name="container" flex_flow="row" width="100%" height="content">
+		<lv_obj name="container" flex_flow="row" width="90%" height="content">
 			<!-- Fixed-width item on the left -->
 			<lv_button name="button_1" width="50" height="content">
 				<lv_label name="label_1" text="Fix" align="center" />

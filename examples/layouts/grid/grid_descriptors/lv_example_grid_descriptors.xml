@@ -15,7 +15,7 @@
 			style_grid_column_dsc_array="70 70 70"
 			style_grid_row_dsc_array="44 44"
 			style_layout="grid"
-			width="100%"
+			width="400"
 			height="content"
 		>
 			<!-- Row 0 cells -->
