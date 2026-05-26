@@ -70,7 +70,7 @@ def convert_file(src: str, out_path: str, source: str | None) -> None:
         os.makedirs(parent, exist_ok=True)
 
     with open(out_path, "w", encoding="utf-8") as f:
-        f.write(to_markdown(xml, os.path.basename(src), source))
+        f.write(to_markdown(xml, src, source))
 
 
 def convert_tree(src_dir: str, out_dir: str, source_base: str | None) -> int:
@@ -78,7 +78,7 @@ def convert_tree(src_dir: str, out_dir: str, source_base: str | None) -> int:
     the folder structure. Only folders that contain XML are created. Returns the
     number of files converted. The source tree is left untouched."""
     converted = 0
-    for root, _dirs, files in os.walk(src_dir):
+    for root, _, files in os.walk(src_dir):
         for name in files:
             if not name.lower().endswith(".xml"):
                 continue
@@ -143,7 +143,7 @@ def main() -> None:
         if not src.lower().endswith(".xml"):
             print(f"Not an .xml file: {src}", file=sys.stderr)
             sys.exit(1)
-        source = build_source(source_base, os.path.basename(src))
+        source = build_source(source_base, src)
         if len(args) == 2:
             # Explicit destination given: keep the source, write .md there.
             out_path = args[1]
