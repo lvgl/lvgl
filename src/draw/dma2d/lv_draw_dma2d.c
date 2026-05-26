@@ -253,8 +253,8 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                      && dsc->recolor_opa <= LV_OPA_MIN
                      && dsc->skew_y == 0
                      && dsc->skew_x == 0
-                     && dsc->scale_x == 256
-                     && dsc->scale_y == 256
+                     && dsc->scale_x == LV_SCALE_NONE
+                     && dsc->scale_y == LV_SCALE_NONE
                      && dsc->rotation == 0
                      && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
                      && (dsc->header.cf == LV_COLOR_FORMAT_ARGB8888
