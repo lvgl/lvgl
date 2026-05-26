@@ -144,7 +144,7 @@ jobs:
       - name: Convert xml files to md
         run: |
             mkdir -p /tmp/xml
-            python3 docs/xml_to_md.py examples /tmp/xml --source-base https://github.com/lvgl/lvgl/blob/master/examples
+            python3 docs/xml_to_md.py examples /tmp/xml --source-base https://github.com/lvgl/lvgl/blob/${{ github.sha }}/examples
 
       - name: Retrieve version
         id: version
@@ -165,7 +165,7 @@ jobs:
           mkdir -p /tmp/open-docs/xml/${{ steps.version.outputs.VERSION_NAME }}
 
           cp -r docs/. /tmp/open-docs/${{ steps.version.outputs.VERSION_NAME }}/
-          cp -r /tmp/xml/ /tmp/open-docs/xml/${{ steps.version.outputs.VERSION_NAME }}/
+          cp -r /tmp/xml/. /tmp/open-docs/xml/${{ steps.version.outputs.VERSION_NAME }}/
 
           cd /tmp/open-docs
           git config user.name lvgl-bot
@@ -193,8 +193,8 @@ jobs:
 
           cp -r docs/. /tmp/open-docs-latest/latest/
           cp -r docs/. /tmp/open-docs-latest/${{ steps.version.outputs.VERSION_NAME }}/
-          cp -r /tmp/xml/ /tmp/open-docs-latest/xml/latest
-          cp -r /tmp/xml/ /tmp/open-docs-latest/xml/${{ steps.version.outputs.VERSION_NAME }}/
+          cp -r /tmp/xml/. /tmp/open-docs-latest/xml/latest
+          cp -r /tmp/xml/. /tmp/open-docs-latest/xml/${{ steps.version.outputs.VERSION_NAME }}/
 
           cd /tmp/open-docs-latest
           git config user.name lvgl-bot
