@@ -193,11 +193,10 @@ extern "C" {
 #define lv_example_scale_5         lv_example_scale_modes
 #define lv_example_scale_6         lv_example_scale_needles
 #define lv_example_scale_7         lv_example_scale_range
-#define lv_example_scale_8         lv_example_scale_round_modes
-#define lv_example_scale_9         lv_example_scale_styling
-#define lv_example_scale_10        lv_example_scale_sunset_sunrise
-#define lv_example_scale_11        lv_example_scale_ticks
-#define lv_example_scale_12        lv_example_scale_bind_section
+#define lv_example_scale_8         lv_example_scale_styling
+#define lv_example_scale_9         lv_example_scale_sunset_sunrise
+#define lv_example_scale_10        lv_example_scale_ticks
+#define lv_example_scale_11        lv_example_scale_bind_section
 
 /* scroll */
 #define lv_example_scroll_1        lv_example_scroll_chain
