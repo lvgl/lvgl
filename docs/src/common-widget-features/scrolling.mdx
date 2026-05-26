@@ -64,31 +64,6 @@ scrollbar is placed on the left side. `base_dir` is inherited, so it can be set
 on the <ApiLink name="LV_PART_SCROLLBAR" /> part, on the Widget's
 `LV_PART_MAIN`, or on any parent.
 
-## Scrolling events
-
-The following events are emitted while scrolling:
-
-- <ApiLink name="LV_EVENT_SCROLL_BEGIN" /> — scrolling has begun. The event
-  parameter is `NULL` or an `lv_anim_t *` scroll-animation descriptor that may
-  be modified.
-- <ApiLink name="LV_EVENT_SCROLL_END" /> — scrolling has ended.
-- <ApiLink name="LV_EVENT_SCROLL" /> — the scroll position changed; sent on
-  every position change.
-
-<LvglExample name="lv_example_scroll_events" path="scroll/lv_example_scroll_events" />
-
-Any scroll coordinate can be read from the callback (see
-[Scrolling programmatically](#scrolling-programmatically)) to drive other UI.
-
-### Transforming children while scrolling
-
-<LvglExample name="lv_example_scroll_translate" path="scroll/lv_example_scroll_translate" />
-
-Because `LV_EVENT_SCROLL` fires on every position change, the handler can
-reposition or restyle children relative to the viewport — here each child is
-projected onto a circle and faded with distance, an effect the declarative
-style layer cannot express.
-
 ## Scrollable
 
 <LvglExample name="lv_example_scroll_scrollable" path="scroll/scroll_scrollable/lv_example_scroll_scrollable" />
@@ -193,6 +168,32 @@ The current position is read with:
 - <ApiLink name="lv_obj_get_scroll_x" display="lv_obj_get_scroll_x(widget)" /> / <ApiLink name="lv_obj_get_scroll_y" display="lv_obj_get_scroll_y(widget)" /> — pixels scrolled past the left/top edge.
 - <ApiLink name="lv_obj_get_scroll_top" display="lv_obj_get_scroll_top(widget)" /> / <ApiLink name="lv_obj_get_scroll_bottom" display="lv_obj_get_scroll_bottom(widget)" /> — pixels available above/below the view.
 - <ApiLink name="lv_obj_get_scroll_left" display="lv_obj_get_scroll_left(widget)" /> / <ApiLink name="lv_obj_get_scroll_right" display="lv_obj_get_scroll_right(widget)" /> — pixels available left/right of the view.
+
+
+## Scrolling events
+
+The following events are emitted while scrolling:
+
+- <ApiLink name="LV_EVENT_SCROLL_BEGIN" /> — scrolling has begun. The event
+  parameter is `NULL` or an `lv_anim_t *` scroll-animation descriptor that may
+  be modified.
+- <ApiLink name="LV_EVENT_SCROLL_END" /> — scrolling has ended.
+- <ApiLink name="LV_EVENT_SCROLL" /> — the scroll position changed; sent on
+  every position change.
+
+<LvglExample name="lv_example_scroll_events" path="scroll/lv_example_scroll_events" />
+
+Any scroll coordinate can be read from the callback (see
+[Scrolling programmatically](#scrolling-programmatically)) to drive other UI.
+
+### Transforming children while scrolling
+
+<LvglExample name="lv_example_scroll_translate" path="scroll/lv_example_scroll_translate" />
+
+Because `LV_EVENT_SCROLL` fires on every position change, the handler can
+reposition or restyle children relative to the viewport — here each child is
+projected onto a circle and faded with distance, an effect the declarative
+style layer cannot express.
 
 ## Scrolling patterns
 
