@@ -485,13 +485,13 @@ lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 
 bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
-    if(obj == NULL) return false;
+    LV_CHECK_ARG(obj != NULL, return false);
     return obj->class_p == class_p;
 }
 
 bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
-    if(obj == NULL) return false;
+    LV_CHECK_ARG(obj != NULL, return false);
 
     const lv_obj_class_t * obj_class = obj->class_p;
     while(obj_class) {
