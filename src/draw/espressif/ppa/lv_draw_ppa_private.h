@@ -84,6 +84,7 @@ static inline bool ppa_src_cf_supported(lv_color_format_t cf)
 
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
             is_cf_supported = true;
@@ -112,6 +113,31 @@ static inline bool ppa_dest_cf_supported(lv_color_format_t cf)
     return is_cf_supported;
 }
 
+static inline bool ppa_srm_src_cf_supported(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static inline bool ppa_srm_dest_cf_supported(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_ARGB8888:
+            return true;
+        default:
+            return false;
+    }
+}
+
 static inline ppa_fill_color_mode_t lv_color_format_to_ppa_fill(lv_color_format_t lv_fmt)
 {
     switch(lv_fmt) {
@@ -134,6 +160,7 @@ static inline ppa_blend_color_mode_t lv_color_format_to_ppa_blend(lv_color_forma
         case LV_COLOR_FORMAT_RGB888:
             return PPA_BLEND_COLOR_MODE_RGB888;
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
             return PPA_BLEND_COLOR_MODE_ARGB8888;
         default:
             return PPA_BLEND_COLOR_MODE_RGB565;
@@ -147,6 +174,7 @@ static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t 
             return PPA_SRM_COLOR_MODE_RGB565;
         case LV_COLOR_FORMAT_RGB888:
             return PPA_SRM_COLOR_MODE_RGB888;
+        case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
             return PPA_SRM_COLOR_MODE_ARGB8888;
         default:
