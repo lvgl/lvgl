@@ -11,7 +11,7 @@ LVGL v9.5.0 continues expanding MPU capabilities while maintaining the lightness
 
 - **Blur and Drop Shadow**. Native software blur and drop shadow support work on all targets without requiring a GPU. Drop shadows add depth to overlays and cards; blur enables frosted-glass effects and background dimming. [Learn more](/common-widget-features/styles/style-properties).
 - **Wayland Driver Rewrite**. Complete rewrite with SHM backend supporting double-buffered direct mode rendering and a new EGL backend for hardware-accelerated OpenGL. [Learn more](/integration/embedded_linux/drivers/wayland).
-- **NanoVG Rendering Backend**. Complete OpenGL draw unit providing GPU-accelerated vector rendering, anti-aliased shapes, and compositing. Auto-initializes when OpenGL context is available. [Learn more](/integration/embedded_linux/nanovg).
+- **NanoVG Rendering Backend**. Complete OpenGL draw unit providing GPU-accelerated vector rendering, anti-aliased shapes, and compositing. Auto-initializes when OpenGL context is available. [Learn more](/integration/embedded_linux/draw_units/draw_nanovg).
 - **Bézier Curved Charts**. New `LV_CHART_TYPE_CURVE` draws smooth Bézier curves between data points. Requires `LV_USE_VECTOR_GRAPHICS` and a compatible draw unit (VGLite, NanoVG or Software with ThorVG). [Learn more](/widgets/chart).
 
 ##### GPU Acceleration & Performance
