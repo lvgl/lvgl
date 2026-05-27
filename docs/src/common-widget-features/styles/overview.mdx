@@ -9,7 +9,7 @@ variable which can hold properties like border width, font, text color and so on
 It's similar to a `class` in CSS.
 
 - Styles can be assigned to Widgets to change their appearance. Upon assignment, the
-  target part (pseudo-element_ in CSS) and target state (pseudo-class_ in CSS) can be
+  target part (pseudo-element in CSS) and target state (pseudo-class in CSS) can be
   specified. For example one can add `style_blue` to the knob of a slider when it's
   in pressed state.
 - The same style can be used by any number of Widgets.
@@ -25,11 +25,11 @@ It's similar to a `class` in CSS.
   specified in a Widget.
 - Widgets can also have [local styles](/common-widget-features/styles/local_styles) with higher precedence than
   "normal" styles.
-- Unlike CSS (where pseudo-classes_ describe different states, e.g. `:focus`), in
+- Unlike CSS (where pseudo-classes describe different states, e.g. `:focus`), in
   LVGL a property is assigned to a given state.
 - Transitions can be applied when the Widget changes state.
 
-For the full list of style properties click [here](/common-widget-features/styles/style-properties).
+See the [full list of style properties](/common-widget-features/styles/style-properties).
 
 ## States
 
@@ -58,58 +58,32 @@ A style can be added to any state or state combination. For example, setting a
 different background color for the default and pressed states. If a property is not
 defined in a state the best matching state's property will be used. Typically this
 means the property with <ApiLink name="LV_STATE_DEFAULT" /> is used. If the property is
-not set even for the default state the default value will be used. (See later)
+not set even for the default state the default value will be used.
 
-Since <ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_STATE_DEFAULT" /> both have
-zero values, you can simply pass `0` as the `selector` argument instead of
-`LV_PART_MAIN | LV_STATE_DEFAULT` as a shortcut when adding styles to an object.
+### What "best matching" means
 
-### What does the "best matching state's property" mean?
+Each state's precedence equals its value in the list above — a higher value wins. When
+a property isn't set for the current state, the value from the highest-precedence
+matching state is used; if none matches, the default state's value (or the global
+default) applies.
 
-States have a precedence which is shown by their value (see in the above list). A
-higher value means higher precedence. To determine which state's property to use let's
-take an example. Imagine the background color is defined like this:
+For example, with `bg_color` white in `LV_STATE_DEFAULT`, gray in `LV_STATE_PRESSED`
+(0x0020) and red in `LV_STATE_FOCUSED` (0x0002):
 
-- <ApiLink name="LV_STATE_DEFAULT" />: white
-- <ApiLink name="LV_STATE_PRESSED" />: gray
-- <ApiLink name="LV_STATE_FOCUSED" />: red
+- Pressed → gray (0x0020 beats default's 0x0000).
+- Focused → red.
+- Focused + pressed → gray (pressed outranks focused).
+- `LV_STATE_PRESSED | LV_STATE_FOCUSED` set to rose → rose (0x0022 beats either alone).
+- Checked → white (no checked value, so it falls back to default).
 
-1. Initially the Widget is in the default state, so it's a simple case: the property is
-   perfectly defined in the Widget's current state as white.
-2. When the Widget is pressed there are 2 related properties: default with white
-   (default is related to every state) and pressed with gray. The pressed state has
-   0x0020 precedence which is higher than the default state's 0x0000 precedence, so
-   gray color will be used.
-3. When the Widget has focus the same thing happens as in pressed state and red color
-   will be used. (Focused state has higher precedence than default state).
-4. When the Widget has focus and pressed both gray and red would work, but the pressed
-   state has higher precedence than focused so gray color will be used.
-5. It's possible to set e.g. rose color for
-   <ApiLink name="LV_STATE_PRESSED" display="LV_STATE_PRESSED | LV_STATE_FOCUSED" />. In this case, this combined state
-   has 0x0020 + 0x0002 = 0x0022 precedence, which is higher than the pressed state's
-   precedence so rose color would be used.
-6. When the Widget is in the checked state there is no property to set the background
-   color for this state. So for lack of a better option, the Widget remains white from
-   the default state's property.
-
-Some practical notes:
-
-- The precedence (value) of states is quite intuitive, and it's something the user
-  would expect naturally. Example: if a Widget has focus the user will still want to
-  see if it's pressed, therefore the pressed state has a higher precedence. If the
-  focused state had a higher precedence it would overwrite the pressed color.
-- If you want to set a property for all states (e.g. red background color) just set it
-  for the default state. If the Widget can't find a property for its current state it
-  will fall back to the default state's property.
-- Use ORed states to describe the properties for complex cases (e.g. pressed + checked
-  + focused).
-- It might be a good idea to use different style elements for different states. For
-  example, finding background colors for released, pressed, checked + pressed,
-  focused, focused + pressed, focused + pressed + checked, etc. states is quite
-  difficult. Instead, for example, use the background color for pressed and checked
-  states and indicate the focused state with a different border color.
+The ordering is intentional: a pressed Widget should still look pressed while focused.
+To cover every state, set the property in the default state. For combinations that are
+hard to enumerate, vary one part per state (e.g. background color for pressed/checked,
+border color for focused).
 
 ## Cascading Styles
+
+<LvglExample name="lv_example_style_multiple" path="styles/style_multiple/lv_example_style_multiple" />
 
 It's not required to set all the properties in one style. It's possible to add more
 styles to a Widget and have the latter added style modify or extend appearance. For
@@ -144,6 +118,8 @@ So if a button is pressed, and the text color comes from a parent, the pressed t
 color will be used.
 
 ## Parts
+
+<LvglExample name="lv_example_style_parts_states" path="styles/style_parts_states/lv_example_style_parts_states" />
 
 Widgets can be composed of *parts* which may each have their own styles.
 
@@ -180,24 +156,17 @@ zero values, you can simply pass `0` as the `selector` argument instead of
 
 ## Properties Requiring New Layers
 
-If the `opa`, `blend_mode`, `transform_angle`, or `transform_zoom` properties
-are set to a non-default value LVGL creates a snapshot of the widget and its children
-in order to blend the whole widget with the set opacity, blend mode and transformation
-properties.
+<LvglExample name="lv_example_style_opacity_transform" path="styles/style_opacity_transform/lv_example_style_opacity_transform" />
 
-These properties have this effect only on the `MAIN` part of the widget.
+Setting `opa`, `blend_mode`, `transform_angle`, or `transform_zoom` to a non-default
+value on the `MAIN` part makes LVGL snapshot the Widget and its children into an
+intermediate *layer* so the whole Widget is blended together.
 
-The created snapshot is called "intermediate layer" or simply "layer". If only `opa`
-and/or `blend_mode` is set to a non-default value LVGL can build the layer from
-smaller chunks. The size of these chunks can be configured by the following properties
-in `lv_conf.h`:
+If only `opa` and/or `blend_mode` is set, the layer is built from smaller chunks sized
+by these `lv_conf.h` options (transformations force a single full-size layer):
 
-- <ApiLink name="LV_LAYER_SIMPLE_BUF_SIZE" />: [bytes] the optimal target buffer size.
-  LVGL will try to allocate this size of memory.
-- <ApiLink name="LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE" />: [bytes] used if
-  <ApiLink name="LV_LAYER_SIMPLE_BUF_SIZE" /> couldn't be allocated.
-
-If transformation properties were also used the layer cannot be rendered in chunks
+- <ApiLink name="LV_LAYER_SIMPLE_BUF_SIZE" /> — target chunk buffer size in bytes.
+- <ApiLink name="LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE" /> — used if the above can't be allocated.
 
 ## Typical Background Properties
 
@@ -213,88 +182,28 @@ background properties" are the properties being referred to:
 - Width and height transformation
 - X and Y translation
 
-## Examples
+## Effects
 
-### Size styles
+Examples that combine several style properties for a visual effect.
+Per-property examples are on the
+[Style Properties](/common-widget-features/styles/style-properties) page.
 
-<LvglExample name="lv_example_style_1" path="styles/lv_example_style_1" />
+### Conic gradient knob
 
-### Background styles
+<LvglExample name="lv_example_style_gradient_conic" path="styles/lv_example_style_gradient_conic" />
 
-<LvglExample name="lv_example_style_2" path="styles/lv_example_style_2" />
+### Radial gradient background
 
-### Border styles
+<LvglExample name="lv_example_style_gradient_radial" path="styles/lv_example_style_gradient_radial" />
 
-<LvglExample name="lv_example_style_3" path="styles/lv_example_style_3" />
+### Gradient button backgrounds
 
-### Outline styles
+<LvglExample name="lv_example_style_gradient_buttons" path="styles/lv_example_style_gradient_buttons" />
 
-<LvglExample name="lv_example_style_4" path="styles/lv_example_style_4" />
+### Modal overlay
 
-### Shadow styles
+<LvglExample name="lv_example_style_modal" path="styles/lv_example_style_modal" />
 
-<LvglExample name="lv_example_style_5" path="styles/lv_example_style_5" />
+### Interactive transform
 
-### Image styles
-
-<LvglExample name="lv_example_style_6" path="styles/lv_example_style_6" />
-
-### Arc styles
-
-<LvglExample name="lv_example_style_7" path="styles/lv_example_style_7" />
-
-### Text styles
-
-<LvglExample name="lv_example_style_8" path="styles/lv_example_style_8" />
-
-### Line styles
-
-<LvglExample name="lv_example_style_9" path="styles/lv_example_style_9" />
-
-### Drop shadow styles
-
-<LvglExample name="lv_example_style_10" path="styles/lv_example_style_10" />
-
-### Transition
-
-<LvglExample name="lv_example_style_11" path="styles/lv_example_style_11" />
-
-### Using multiple styles
-
-<LvglExample name="lv_example_style_12" path="styles/lv_example_style_12" />
-
-### Local styles
-
-<LvglExample name="lv_example_style_13" path="styles/lv_example_style_13" />
-
-### Add styles to parts and states
-
-<LvglExample name="lv_example_style_14" path="styles/lv_example_style_14" />
-
-### Extending the current theme
-
-<LvglExample name="lv_example_style_15" path="styles/lv_example_style_15" />
-
-### Opacity and Transformations
-
-<LvglExample name="lv_example_style_16" path="styles/lv_example_style_16" />
-
-### Metallic knob with conic gradient
-
-<LvglExample name="lv_example_style_17" path="styles/lv_example_style_17" />
-
-### Radial gradient as background
-
-<LvglExample name="lv_example_style_18" path="styles/lv_example_style_18" />
-
-### Gradients for button background
-
-<LvglExample name="lv_example_style_19" path="styles/lv_example_style_19" />
-
-### Test between recolor style or full background modal
-
-<LvglExample name="lv_example_style_20" path="styles/lv_example_style_20" />
-
-### Transform style
-
-<LvglExample name="lv_example_style_21" path="styles/lv_example_style_21" />
+<LvglExample name="lv_example_style_transform_card" path="styles/lv_example_style_transform_card" />

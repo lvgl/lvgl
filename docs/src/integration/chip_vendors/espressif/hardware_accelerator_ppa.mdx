@@ -88,10 +88,10 @@ void app_main(void)
 
 ### Benchmarking
 
-When running the `lv_demo_benchmark` from LVGL the user can compare the performance when 
-the PPA is enabled versus the pure software rendering, by using the latest version of the 
+When running the `lv_demo_benchmark` from LVGL the user can compare the performance when
+the PPA is enabled versus the pure software rendering, by using the latest version of the
 LVGL and LVGL port component it can be observed an average saving of 30% of the rendering
-time for draw tasks that are image and rectangle fill. On some cases for pure filling on 
+time for draw tasks that are image and rectangle fill. On some cases for pure filling on
 integer multiples of the display size it is possible to observe up 9x of speed increase when
 the PPA is enabled.
 
@@ -104,28 +104,27 @@ the initial cause for that according to the PPA section from reference manual is
 ## Using the Espressif LVGL component PPA features
 
 The Espressif IDF LVGL port component also offers hardware acceleration
-for the display operations, that is it, once the LVGL render completes 
+for the display operations, that is it, once the LVGL render completes
 an operation and the draw buffer is already handled to the display driver,
-the Espressif component can optionally perform mirror and rotation of 
+the Espressif component can optionally perform mirror and rotation of
 the rendered data using hardware assistance.
 
 The LVGL display driver for Espressif operates by reading the
 descriptor of the drawn data to check if rotation and mirror are flags
 set on the data properties, in positive case, before sending the data
-to the display, the mirror and rotation are performed first using the 
+to the display, the mirror and rotation are performed first using the
 PPA rotation and mirror client.
 
 When compared to pure software rotation, using the PPA to rotate the objects
-can save up 40% of rendering time in average, while keeping the CPU in idle 
+can save up 40% of rendering time in average, while keeping the CPU in idle
 saving power, or using it to perform other tasks, PPA rotation is asynchronous,
 and once started it will signal the application using its dedicated interrupt.
 
 To enable such behavior on the display driver, the PPA acceleration should
 be set on the project `sdkconfig.defaults` via the symbol `CONFIG_LVGL_PORT_ENABLE_PPA`,
-setting it to true will make the hardware assistance for image rotation and mirroring 
+setting it to true will make the hardware assistance for image rotation and mirroring
 automatic. No extra code is required.
 
-Please notice that such option can be set via menuconfig using the 
+Please notice that such option can be set via menuconfig using the
 standard IDF command for configuration: `idf.py menuconfig`.
 
-## API

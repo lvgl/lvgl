@@ -18,7 +18,7 @@ extern "C" {
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 
 /*********************
  *      DEFINES

@@ -1291,9 +1291,9 @@ static inline int32_t lv_obj_get_style_blur_radius(const lv_obj_t * obj, lv_part
 }
 
 /**
- * If `true` the background of the widget will be blurred. The part should have < 100%
- * opacity to make it visible. If `false` the given part will be blurred when it's
- * rendered but before drawing the children.
+ * If `true` the background of the widget will be blurred. The part should have less
+ * than 100% opacity to make it visible. If `false` the given part will be blurred
+ * when it's rendered but before drawing the children.
  * Default: `false`, inherited: No, layout: No, ext. draw: No.
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
@@ -3042,9 +3042,9 @@ void lv_obj_set_style_text_leading_trim(lv_obj_t * obj, lv_text_leading_trim_t v
 void lv_obj_set_style_blur_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 
 /**
- * If `true` the background of the widget will be blurred. The part should have < 100%
- * opacity to make it visible. If `false` the given part will be blurred when it's
- * rendered but before drawing the children.
+ * If `true` the background of the widget will be blurred. The part should have less
+ * than 100% opacity to make it visible. If `false` the given part will be blurred
+ * when it's rendered but before drawing the children.
  * Default: `false`, inherited: No, layout: No, ext. draw: No.
  * @param  obj        Pointer to Widget
  * @param  value      Value to submit

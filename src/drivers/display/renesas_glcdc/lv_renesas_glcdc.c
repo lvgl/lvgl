@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_RENESAS_GLCDC
 
@@ -27,15 +27,15 @@
 #endif /*_RENESAS_RA_*/
 
 #ifdef _RENESAS_RA_
-    #include "LVGL_thread.h"
+    #include <LVGL_thread.h>
 #else /* RX */
-    #include "hal_data.h"
-    #include "platform.h"
-    #include "r_glcdc_rx_if.h"
-    #include "r_glcdc_rx_pinset.h"
+    #include <hal_data.h>
+    #include <platform.h>
+    #include <r_glcdc_rx_if.h>
+    #include <r_glcdc_rx_pinset.h>
 #endif /*_RENESAS_RA_*/
 
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
 

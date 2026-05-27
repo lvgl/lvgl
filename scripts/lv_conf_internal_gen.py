@@ -83,6 +83,10 @@ fout.write(
 #define LV_NANOVG_BACKEND_GLES2     3
 #define LV_NANOVG_BACKEND_GLES3     4
 
+#define LV_CHECK_ARG_LOG_MODE_NONE    0
+#define LV_CHECK_ARG_LOG_MODE_MINIMAL 1
+#define LV_CHECK_ARG_LOG_MODE_VERBOSE 2
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -107,7 +111,7 @@ fout.write(
     #elif defined(LV_CONF_INCLUDE_SIMPLE)         /* Or simply include lv_conf.h is enabled. */
         #include "lv_conf.h"
     #else
-        #include "../../lv_conf.h"                /* Else assume lv_conf.h is next to the lvgl folder. */
+        #include "../../../../lv_conf.h"                /* Else assume lv_conf.h is next to the lvgl folder. */
     #endif
     #if !defined(LV_CONF_H) && !defined(LV_CONF_SUPPRESS_DEFINE_CHECK)
         /* #include will sometimes silently fail when __has_include is used */
@@ -338,6 +342,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define _CRT_SECURE_NO_WARNINGS
     #endif
 #endif  /*defined(LV_CONF_SKIP)*/
+
+#ifndef LV_CHECK_ARG_LOG_MODE
+    #define LV_CHECK_ARG_LOG_MODE   0
+#endif
 
 #endif  /*LV_CONF_INTERNAL_H*/
 '''

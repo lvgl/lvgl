@@ -1,0 +1,40 @@
+<!--
+ @title Arc rotation offset
+ @brief Rotate the whole dial around its center.
+
+ The rotation attribute shifts both background and indicator angles by the same amount,
+ keeping their relative span. The two arcs share the same bg_start_angle, bg_end_angle,
+ and value, so only the rotation offset distinguishes them visually.
+-->
+<screen>
+	<view>
+		<!-- 💡 Adjust rotation while keeping bg_start_angle/bg_end_angle fixed to see the whole dial rotate around its center. -->
+		<!-- Arc rotated by 45 degrees -->
+		<lv_arc name="arc_1"
+			align="left_mid"
+			x="10"
+			width="90"
+			height="90"
+			bg_start_angle="0"
+			bg_end_angle="270"
+			rotation="45"
+			value="60"
+		>
+			<lv_label name="label_1" align="center" text="rot=45" />
+		</lv_arc>
+
+		<!-- Arc rotated by 135 degrees -->
+		<lv_arc name="arc_2"
+			align="right_mid"
+			x="-10"
+			width="90"
+			height="90"
+			bg_start_angle="0"
+			bg_end_angle="270"
+			rotation="135"
+			value="60"
+		>
+			<lv_label name="label_2" align="center" text="rot=135" />
+		</lv_arc>
+	</view>
+</screen>

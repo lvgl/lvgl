@@ -11,7 +11,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_TEST && defined(LV_USE_TEST_SCREENSHOT_COMPARE) && LV_USE_TEST_SCREENSHOT_COMPARE
 
@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
+#include LV_STDARG_INCLUDE
 #include <errno.h>
 #include "../../libs/lodepng/lodepng.h"
 

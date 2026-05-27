@@ -57,9 +57,9 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
 
 void lv_obj_class_init_obj(lv_obj_t * obj);
 
-bool lv_obj_is_editable(lv_obj_t * obj);
+bool lv_obj_is_editable(const lv_obj_t * obj);
 
-bool lv_obj_is_group_def(lv_obj_t * obj);
+bool lv_obj_is_group_def(const lv_obj_t * obj);
 
 #if LV_USE_EXT_DATA
 /**

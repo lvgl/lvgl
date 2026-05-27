@@ -29,7 +29,7 @@
 #ifndef GLAD_GL_H_
 #define GLAD_GL_H_
 
-#include "../../../../../lv_public_api.h"
+#include "../../../../../lvgl_public.h"
 
 #if LV_USE_OPENGLES && !LV_USE_EGL
 
@@ -2251,7 +2251,7 @@ typedef void (*GLADpostcallback)(void *ret, const char *name, GLADapiproc apipro
 #define GL_ZOOM_Y 0x0D17
 
 
-#include <KHR/khrplatform.h>
+#include "../KHR/khrplatform.h"
 typedef unsigned int GLenum;
 typedef unsigned char GLboolean;
 typedef unsigned int GLbitfield;

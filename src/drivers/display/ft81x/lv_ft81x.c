@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_FT81X
 
 #include "lv_ft81x_defines.h"

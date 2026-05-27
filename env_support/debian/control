@@ -1,0 +1,81 @@
+Source: lvgl
+Section: libdevel
+Priority: optional
+Maintainer: André Costa <andre@lvgl.io>
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake (>= 3.11),
+ ninja-build,
+ python3,
+ pkg-config,
+ python3-kconfiglib,
+ python3-venv,
+ python3-pcpp,
+ libwebp-dev,
+ libevdev-dev,
+ libdrm-dev,
+ libgbm-dev,
+ wayland-protocols,
+ libwayland-bin,
+ libwayland-dev,
+ libegl-dev,
+ libxkbcommon-dev,
+ libfastgltf-dev,
+ libsdl2-dev,
+ libsdl2-image-dev,
+ libfreetype-dev,
+Standards-Version: 4.6.2
+Homepage: https://github.com/lvgl/lvgl
+Rules-Requires-Root: no
+
+Package: liblvgl-sdl2-dev
+Architecture: any
+Depends:
+ ${misc:Depends},
+Description: Light and Versatile Graphics Library (SDL2 config) - development files
+ LVGL built with SDL2 input and display backend, software rendering.
+ This package contains headers, static library, and CMake config files.
+ Suitable for development purposes.
+
+Package: liblvgl-sdl2-3d-dev
+Architecture: any
+Depends:
+ ${misc:Depends},
+Description: Light and Versatile Graphics Library (SDL2 + 3D config) - development files
+ LVGL built with SDL2 input and display backend and fastgltf 3D model loading.
+ This package contains headers, static library, and CMake config files.
+ Suitable for development purposes.
+
+Package: liblvgl-drm-dev
+Architecture: any
+Depends:
+ ${misc:Depends},
+ libdrm-dev,
+Description: Light and Versatile Graphics Library (DRM config) - development files
+ LVGL built with DRM display backend and evdev input, software rendering.
+ This package contains headers, static library, and CMake config files.
+
+Package: liblvgl-drm-3d-dev
+Architecture: any
+Depends:
+ ${misc:Depends},
+ libdrm-dev,
+Description: Light and Versatile Graphics Library (DRM + 3D config) - development files
+ LVGL built with DRM display backend, evdev input and fastgltf 3D model loading.
+ This package contains headers, static library, and CMake config files.
+
+Package: liblvgl-wayland-dev
+Architecture: any
+Depends:
+ ${misc:Depends},
+Description: Light and Versatile Graphics Library (Wayland config) - development files
+ LVGL built with Wayland display and input backend, software rendering.
+ This package contains headers, static library, and CMake config files.
+
+Package: liblvgl-wayland-3d-dev
+Architecture: any
+Depends:
+ ${misc:Depends},
+Description: Light and Versatile Graphics Library (Wayland + 3D config) - development files
+ LVGL built with Wayland display and input backend and fastgltf 3D model loading.
+ This package contains headers, static library, and CMake config files.

@@ -12,6 +12,8 @@ Widget that generates and displays QR Codes using the library.
 
 ## Usage
 
+<LvglExample name="lv_example_qrcode_basic" path="libs/qrcode/qrcode_basic/lv_example_qrcode_basic" />
+
 Enable <ApiLink name="LV_USE_QRCODE" /> in `lv_conf.h` by setting its value to `1`.
 
 Use <ApiLink name="lv_qrcode_create" /> to create the QR-Code Widget.  Then use
@@ -27,10 +29,3 @@ call <ApiLink name="lv_qrcode_update" /> again to update the QR Code.
 - QR Codes with less data are smaller, but they are scaled by an integer
    value to best fit to the given size.
 
-## Example
-
-### Create a QR Code
-
-<LvglExample name="lv_example_qrcode_1" path="libs/qrcode/lv_example_qrcode_1" />
-
-## API

@@ -13,6 +13,7 @@
 
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
 
 #if LV_USE_LABEL == 0
@@ -251,28 +252,28 @@ lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * obj)
 
 lv_obj_t * lv_msgbox_get_header(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->header;
 }
 
 lv_obj_t * lv_msgbox_get_footer(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->footer;
 }
 
 lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->content;
 }
 
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->title;
 }

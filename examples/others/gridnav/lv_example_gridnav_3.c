@@ -19,7 +19,7 @@ static void cont_sub_event_cb(lv_event_t * e)
  * @brief Outer gridnav wraps buttons and two sub-containers, one scrollable and one enter-to-focus.
  *
  * The outer container registers with
- * `LV_GRIDNAV_CTRL_ROLLOVER | LV_GRIDNAV_CTRL_SCROLL_FIRST` so arrow keys scroll
+ * `(lv_gridnav_ctrl_t)(LV_GRIDNAV_CTRL_ROLLOVER | LV_GRIDNAV_CTRL_SCROLL_FIRST)` so arrow keys scroll
  * a long text child before moving focus. It holds two buttons, a scrollable sub
  * container with placeholder text, and a second sub container that has its own
  * gridnav. The inner gridnav's `LV_EVENT_KEY` handler calls `lv_group_focus_obj`

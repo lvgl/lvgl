@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_opengles_egl.h"
-#include <stdint.h>
+#include LV_STDBOOL_INCLUDE
 
 #if LV_USE_EGL
 
@@ -16,7 +16,7 @@
 #include <string.h>
 #include "lv_opengles_debug.h"
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "glad/include/glad/egl.h"
 #include "lv_opengles_private.h"
 #include "lv_opengles_egl_private.h"

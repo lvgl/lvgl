@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
@@ -14,7 +14,7 @@
 #include <string.h>
 #include <xf86drmMode.h>
 #include <stdlib.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <gbm.h>
 #include <drm_fourcc.h>
 #include <xf86drm.h>
@@ -640,8 +640,17 @@ static drmModeModeInfo * drm_get_mode(lv_drm_ctx_t * ctx)
 {
     LV_ASSERT_NULL(ctx->drm_connector);
     if(ctx->mode_select_cb) {
-        size_t mode_index = ctx->mode_select_cb(ctx->display, (lv_linux_drm_mode_t *)ctx->drm_connector->modes,
-                                                (size_t)ctx->drm_connector->count_modes);
+        lv_linux_drm_mode_t * modes = lv_malloc(sizeof(lv_linux_drm_mode_t) * ctx->drm_connector->count_modes);
+        if(!modes) {
+            LV_LOG_WARN("Failed to allocate memory for drm modes");
+            return NULL;
+        }
+        for(int i = 0; i < ctx->drm_connector->count_modes; i++) {
+            modes[i].mode_info = &ctx->drm_connector->modes[i];
+        }
+        size_t mode_index = ctx->mode_select_cb(ctx->display, modes, (size_t)ctx->drm_connector->count_modes);
+        lv_free(modes);
+
         if(mode_index >= (size_t)ctx->drm_connector->count_modes) {
             LV_LOG_ERROR("Failed to select drm mode. User select callback return an invalid mode index");
             return NULL;

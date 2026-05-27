@@ -60,33 +60,33 @@ in `lv_conf.h`.
 The object hierarchy of a freshly-created File Explorer looks like this:
 
 - `File Explorer`:  occupies full area of parent Widget, typically a Screen (Flex-Flow COLUMN)
-  
+
   - `Container`:  occupies full area of File Explorer (Flex grow 1)
-  
+
     - `Quick-Access Panel`:
-  
+
       - `Device List`:  grows to accommodate children
-  
+
         - `File System`:  button
-  
+
       - `Places List`:  grows to accommodate children
-  
+
         - `HOME`:  button
         - `Video`:  button
         - `Pictures`:  button
         - `Music`:  button
         - `Documents`:  button
-  
+
     - `Browser Panel`:
-  
+
       - `Header`:  14% of `Browser Panel` height
-  
+
         - `Current Path`:  label
-  
+
       - `File Table`:  with 1 column, 86% of `Browser Panel` height
-  
+
   - Fields:
-  
+
     - `home_dir` = NULL
     - `video_dir` = NULL
     - `pictures_dir` = NULL
@@ -150,11 +150,11 @@ These are the possible sorting methods:
 ## Events
 
 - <ApiLink name="LV_EVENT_READY" /> Sent when a directory is opened, which can happen:
-  
+
   - when the File Explorer is initially opened,
   - after a user clicks on a `Quick-Access Panel` navigation button, and
   - after the user clicks on a directory displayed in the `Browser Panel`.
-  
+
   You can use it to, for example, customize the file sort.
 - <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent once when any item (file) in the
   `Browser Panel`'s file list is clicked.
@@ -198,4 +198,3 @@ through functions such as <ApiLink name="strcpy" /> and <ApiLink name="strcat" /
 
 <LvglExample name="lv_example_file_explorer_3" path="others/file_explorer/lv_example_file_explorer_3" />
 
-## API

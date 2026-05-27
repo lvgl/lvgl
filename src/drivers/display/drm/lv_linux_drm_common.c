@@ -7,12 +7,13 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_LINUX_DRM
 
 #include <dirent.h>
 #include <xf86drmMode.h>
+#include "lv_linux_drm_private.h"
 
 /*********************
  *      DEFINES
@@ -95,7 +96,7 @@ int32_t lv_linux_drm_mode_get_horizontal_resolution(const lv_linux_drm_mode_t * 
     if(!mode) {
         return 0;
     }
-    return mode->hdisplay;
+    return mode->mode_info->hdisplay;
 }
 
 int32_t lv_linux_drm_mode_get_vertical_resolution(const lv_linux_drm_mode_t * mode)
@@ -103,7 +104,7 @@ int32_t lv_linux_drm_mode_get_vertical_resolution(const lv_linux_drm_mode_t * mo
     if(!mode) {
         return 0;
     }
-    return mode->vdisplay;
+    return mode->mode_info->vdisplay;
 }
 
 int32_t lv_linux_drm_mode_get_refresh_rate(const lv_linux_drm_mode_t * mode)
@@ -111,7 +112,7 @@ int32_t lv_linux_drm_mode_get_refresh_rate(const lv_linux_drm_mode_t * mode)
     if(!mode) {
         return 0;
     }
-    return mode->vrefresh;
+    return mode->mode_info->vrefresh;
 }
 
 bool lv_linux_drm_mode_is_preferred(const lv_linux_drm_mode_t * mode)
@@ -119,7 +120,15 @@ bool lv_linux_drm_mode_is_preferred(const lv_linux_drm_mode_t * mode)
     if(!mode) {
         return false;
     }
-    return (mode->type & DRM_MODE_TYPE_PREFERRED) != 0;
+    return (mode->mode_info->type & DRM_MODE_TYPE_PREFERRED) != 0;
+}
+
+void * lv_linux_drm_mode_get_raw(const lv_linux_drm_mode_t * mode)
+{
+    if(!mode) {
+        return NULL;
+    }
+    return mode->mode_info;
 }
 
 #endif /*LV_USE_LINUX_DRM*/

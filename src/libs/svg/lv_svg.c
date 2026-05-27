@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #if LV_USE_SVG
 
 #include "lv_svg_token.h"

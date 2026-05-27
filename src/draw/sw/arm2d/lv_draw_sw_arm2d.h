@@ -16,7 +16,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #include "../../../misc/lv_area_private.h"
 #include "../../../draw/lv_draw_private.h"
 #include "../../../draw/lv_draw_image_private.h"
@@ -24,8 +24,8 @@ extern "C" {
 #if LV_USE_DRAW_ARM2D_SYNC
 
 #define __ARM_2D_IMPL__
-#include "arm_2d.h"
-#include "__arm_2d_impl.h"
+#include <arm_2d.h>
+#include <__arm_2d_impl.h>
 
 #if defined(__IS_COMPILER_ARM_COMPILER_5__)
 #pragma diag_suppress 174,177,188,68,513,144,1296

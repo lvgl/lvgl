@@ -59,7 +59,12 @@ def create_argument_parser() -> argparse.ArgumentParser:
 def run_git_command(args: List[str], cwd: str = ".") -> str:
     """Run git command and return output"""
     result = subprocess.run(
-        ["git"] + args, capture_output=True, text=True, cwd=cwd, check=True
+        ["git"] + args,
+        capture_output=True,
+        cwd=cwd,
+        check=True,
+        encoding="utf-8",
+        errors="replace",
     )
     return result.stdout
 

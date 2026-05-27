@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #if LV_USE_QNX
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 #include <stdlib.h>

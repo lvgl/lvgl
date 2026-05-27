@@ -11,7 +11,7 @@
 
 #if LV_USE_NUTTX && LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "../../misc/lv_profiler_builtin_private.h"
 #include "../../core/lv_global.h"
 #include <fcntl.h>

@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../../draw/lv_draw_label_private.h"
 #include "../../core/lv_obj_private.h"
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_LABEL
 
@@ -36,6 +36,7 @@ struct _lv_label_t {
 #endif /*LV_USE_TRANSLATION*/
     char dot[LV_LABEL_DOT_NUM + 1]; /**< Bytes that have been replaced with dots */
     uint32_t dot_begin;  /**< Offset where bytes have been replaced with dots */
+    int32_t max_lines;
 
 #if LV_LABEL_LONG_TXT_HINT
     lv_draw_label_hint_t hint;

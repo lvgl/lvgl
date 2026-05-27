@@ -1,5 +1,5 @@
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include "../../../osal/lv_os_private.h"
@@ -13,7 +13,7 @@
 #include "../VGLiteKernel/vg_lite_hal.h"
 #include "../VGLiteKernel/vg_lite_hw.h"
 
-#include <stdarg.h>
+#include LV_STDARG_INCLUDE
 
 static void sleep(uint32_t msec)
 {

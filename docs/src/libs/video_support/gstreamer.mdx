@@ -79,63 +79,65 @@ Follow the official GStreamer documentation to install its development libraries
 ## Setup
 
 1. **Install Dependencies**
-   
+
    Install the GStreamer development libraries for your platform as shown in the Dependencies section above.
 2. **Enable GStreamer Support**
-   
+
    Set <ApiLink name="LV_USE_GSTREAMER" /> to `1` in `lv_conf.h`.
 3. **CMake Integration**
-   
+
    **Option 1: Direct linking with LVGL (Recommended)**
-   
-   .. code-block:: cmake
-   
-        find_package(PkgConfig REQUIRED)
-   
-        # Find GStreamer packages
-        pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
-        pkg_check_modules(GSTREAMER_VIDEO REQUIRED gstreamer-video-1.0)
-        pkg_check_modules(GSTREAMER_APP REQUIRED gstreamer-app-1.0)
-   
-        # Link with LVGL
-        target_include_directories(lvgl PUBLIC
-            $\{GSTREAMER_INCLUDE_DIRS\}
-            $\{GSTREAMER_VIDEO_INCLUDE_DIRS\}
-            $\{GSTREAMER_APP_INCLUDE_DIRS\})
-        target_link_libraries(lvgl PUBLIC
-            $\{GSTREAMER_LIBRARIES\}
-            $\{GSTREAMER_VIDEO_LIBRARIES\}
-            $\{GSTREAMER_APP_LIBRARIES\})
+
+    ```cmake
+    find_package(PkgConfig REQUIRED)
+
+    # Find GStreamer packages
+    pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+    pkg_check_modules(GSTREAMER_VIDEO REQUIRED gstreamer-video-1.0)
+    pkg_check_modules(GSTREAMER_APP REQUIRED gstreamer-app-1.0)
+
+    # Link with LVGL
+    target_include_directories(lvgl PUBLIC
+    		$\{GSTREAMER_INCLUDE_DIRS\}
+    		$\{GSTREAMER_VIDEO_INCLUDE_DIRS\}
+    		$\{GSTREAMER_APP_INCLUDE_DIRS\})
+    target_link_libraries(lvgl PUBLIC
+    		$\{GSTREAMER_LIBRARIES\}
+    		$\{GSTREAMER_VIDEO_LIBRARIES\}
+    		$\{GSTREAMER_APP_LIBRARIES\})
+    ```
+
 4. **Manual Compilation with pkg-config**
-   
+
    You can also compile manually using pkg-config to query the necessary flags:
-   
-   .. code-block:: bash
-   
-        # Get compilation flags
-        gcc $(pkg-config --cflags --libs gstreamer-1.0 gstreamer-video-1.0 gstreamer-app-1.0)          -o your_app your_app.c lvgl.a
+
+    ```bash
+    # Get compilation flags
+    gcc $(pkg-config --cflags --libs gstreamer-1.0 gstreamer-video-1.0 gstreamer-app-1.0)          -o your_app your_app.c lvgl.a
+    ```
+
 5. **Basic Setup Example**
-   
-   .. code-block:: c
-   
-        int main(void)
-        \{
-            /* Initialize LVGL */
-            lv_init();
-   
-            /* Setup display driver */
-            lv_display_t *display = lv_display_create(800, 480);
-            /* ... configure display driver ... */
-   
-            /* Create and run your GStreamer application */
-            lv_example_gstreamer_1();
-   
-            while (1) \{
-                lv_timer_handler();
-            \}
-   
-            return 0;
-        \}
+
+    ```c
+    int main(void)
+    {
+        /* Initialize LVGL */
+        lv_init();
+
+        /* Setup display driver */
+        lv_display_t *display = lv_display_create(800, 480);
+        /* ... configure display driver ... */
+
+        /* Create and run your GStreamer application */
+        lv_example_gstreamer_1();
+
+        while (1) {
+        	lv_timer_handler();
+        }
+
+        return 0;
+    }
+    ```
 
 ## Usage
 
@@ -332,4 +334,3 @@ Then, in your LVGL application, configure WebRTC by passing the signalling serve
 
 <LvglExample name="lv_example_gstreamer_1" path="libs/gstreamer/lv_example_gstreamer_1" />
 
-## API

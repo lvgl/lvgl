@@ -134,7 +134,7 @@ into a single call.
 from a Widget, and `lv_draw_rect(layer, &dsc, area)` draws the rectangle in a
 specified area.
 
-<LvglExample name="lv_example_canvas_3" path="widgets/canvas/lv_example_canvas_3" />
+<LvglExample name="lv_example_canvas_rectangle" path="widgets/canvas/lv_example_canvas_rectangle" />
 
 ## Fill Draw Descriptor
 
@@ -387,7 +387,7 @@ Functions for image drawing:
 - <ApiLink name="lv_draw_image" display="lv_draw_image(layer, &dsc, area)" /> creates a task to draw an image in a given area.
 - <ApiLink name="lv_draw_task_get_image_dsc" display="lv_draw_task_get_image_dsc(draw_task)" /> retrieves the image descriptor from a task.
 
-<LvglExample name="lv_example_canvas_6" path="widgets/canvas/lv_example_canvas_6" />
+<LvglExample name="lv_example_canvas_image" path="widgets/canvas/lv_example_canvas_image" />
 
 <LvglExample name="lv_example_style_6" path="styles/lv_example_style_6" />
 
@@ -445,7 +445,7 @@ This iterates through all characters, calculates their positions, and calls the
 callback for rendering each character.  For callback details, see
 <ApiLink name="lv_draw_glyph_cb_t" />.
 
-<LvglExample name="lv_example_canvas_4" path="widgets/canvas/lv_example_canvas_4" />
+<LvglExample name="lv_example_canvas_label" path="widgets/canvas/lv_example_canvas_label" />
 
 <LvglExample name="lv_example_style_8" path="styles/lv_example_style_8" />
 
@@ -472,7 +472,7 @@ Functions for arc drawing:
 - <ApiLink name="lv_draw_arc" display="lv_draw_arc(layer, &dsc)" /> creates a task to render an arc.
 - <ApiLink name="lv_draw_task_get_arc_dsc" display="lv_draw_task_get_arc_dsc(draw_task)" /> retrieves arc descriptor from task.
 
-<LvglExample name="lv_example_canvas_5" path="widgets/canvas/lv_example_canvas_5" />
+<LvglExample name="lv_example_canvas_arc" path="widgets/canvas/lv_example_canvas_arc" />
 
 <LvglExample name="lv_example_style_7" path="styles/lv_example_style_7" />
 
@@ -508,7 +508,7 @@ Functions for line drawing:
   to call a callback which draws a line between two points. This way it doesn't matter if
   `p1, p2` or `points` were used as it calls the `callback` as needed.
 
-<LvglExample name="lv_example_canvas_7" path="widgets/canvas/lv_example_canvas_7" />
+<LvglExample name="lv_example_canvas_line" path="widgets/canvas/lv_example_canvas_line" />
 
 <LvglExample name="lv_example_style_9" path="styles/lv_example_style_9" />
 
@@ -529,7 +529,7 @@ Functions for triangle drawing:
 - <ApiLink name="lv_draw_triangle" display="lv_draw_triangle(layer, &dsc)" /> creates a task to draw a triangle.
 - <ApiLink name="lv_draw_task_get_triangle_dsc" display="lv_draw_task_get_triangle_dsc(draw_task)" /> retrieves triangle descriptor.
 
-<LvglExample name="lv_example_canvas_9" path="widgets/canvas/lv_example_canvas_9" />
+<LvglExample name="lv_example_canvas_triangle" path="widgets/canvas/lv_example_canvas_triangle" />
 
 ## Blur Draw Descriptor
 
@@ -547,7 +547,7 @@ Functions for blur drawing:
 - <ApiLink name="lv_draw_blur" display="lv_draw_blur(layer, &dsc, area)" /> creates a task to blur an area.
 - <ApiLink name="lv_draw_task_get_blur_dsc" display="lv_draw_task_get_blur_dsc(draw_task)" /> retrieves blur descriptor.
 
-<LvglExample name="lv_example_canvas_10" path="widgets/canvas/lv_example_canvas_10" />
+<LvglExample name="lv_example_canvas_blur" path="widgets/canvas/lv_example_canvas_blur" />
 
 ## Drop Shadow Draw Descriptor
 
@@ -602,7 +602,7 @@ lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 ```
 
 1. Set the shape of the path. The following show a few simple functions for that:
-   
+
    - <ApiLink name="lv_vector_path_clear" />: Clear all lines, arcs, and curves from a path
    - <ApiLink name="lv_vector_path_move_to" />: Move to a point without drawing any lines
    - <ApiLink name="lv_vector_path_line_to" />: Add a line to the path from last point to the point
@@ -611,7 +611,7 @@ lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
    - <ApiLink name="lv_vector_path_arc_to" />: Add ellipse arc to the path from last point to the point
    - <ApiLink name="lv_vector_path_close" />: Close the sub path by connecting the first and last point
 2. Set the stroke and fill settings on the draw descriptor for the given path. Use functions like:
-   
+
    - <ApiLink name="lv_draw_vector_dsc_set_stroke_color" />: Set stroke color for a descriptor.
    - <ApiLink name="lv_draw_vector_dsc_set_stroke_opa" />: Set stroke opacity for a descriptor
    - <ApiLink name="lv_draw_vector_dsc_set_stroke_width" />: Set stroke width for a descriptor.
@@ -646,22 +646,22 @@ There are several options to mask parts of a layer, Widget, or drawing:
    Similar to rectangles, images can also be rendered with a `radius`.  Since
    layer drawing and image drawing are handled the same way, this works for
    layers as well.
-   
+
    You can draw various content on a layer and then render the layer with a
    `clip_radius`, masking out all the content on the corners.
 3. **Rectangle Mask Draw Task**:
    A special Draw Task can mask out a rectangle from a layer by setting the alpha
    channel of certain pixels to 0.  To achieve this:
-   
+
    - Create an <ApiLink name="lv_draw_mask_rect_dsc_t" /> descriptor.
    - Set `area`, `radius`, and `keep_outside` parameters. If
      `keep_outside` is set to 1, areas outside of `area` remain unchanged.
      Otherwise, they are cleared.
    - Call <ApiLink name="lv_draw_mask_rect" display="lv_draw_mask_rect(layer, &dsc)" />.
-   
+
    Note: The layer must have a color format with an alpha channel, typically
    <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />.
-   
+
    In most cases, the *"Clip Radius of Images"* method is better because it
    blends the layer with a radius mask on the fly, avoiding a dedicated masking
    step. However, the *"Rectangle Mask Draw Task"* is useful when multiple areas
@@ -674,14 +674,14 @@ There are several options to mask parts of a layer, Widget, or drawing:
    Using `..._style_bitmap_mask` or `bitmap_mask` in
    <ApiLink name="lv_draw_image_dsc_t" /> allows setting an A8 or L8 image as a mask
    for an image/layer during blending.
-   
+
    - Limitation:  The mask always aligns to the center, and only one bitmap mask can
      be used for an image/layer.
    - When `..._style_bitmap_mask` is used, LVGL automatically creates a layer,
      renders the Widgets there, and applies the bitmap mask during blending.
    - Alternatively, the `bitmap_mask` property in the draw descriptor can be
      used directly for image drawing.
-   
+
    By using the Canvas Widget with an <ApiLink name="LV_COLOR_FORMAT_L8" /> buffer,
    bitmap masks can be rendered dynamically.
 
@@ -689,4 +689,3 @@ There are several options to mask parts of a layer, Widget, or drawing:
 
 <LvglExample name="lv_example_roller_3" path="widgets/roller/lv_example_roller_3" />
 
-## API

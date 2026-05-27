@@ -112,6 +112,8 @@ typedef uint8_t lv_style_prop_t;
 
 typedef struct _lv_obj_class_t lv_obj_class_t;
 
+typedef struct _lv_delete_dsc_t lv_delete_dsc_t;
+
 typedef struct _lv_group_t lv_group_t;
 
 typedef struct _lv_display_t lv_display_t;
@@ -418,7 +420,7 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #ifndef LV_NORETURN
 #if defined(PYCPARSER)
 #define LV_NORETURN
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__IAR_SYSTEMS_ICC__)
 #define LV_NORETURN __attribute__((noreturn))
 #elif defined(_MSC_VER)
 #define LV_NORETURN __declspec(noreturn)
@@ -428,7 +430,7 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #endif /* LV_NORETURN not defined */
 
 #ifndef LV_UNREACHABLE
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__IAR_SYSTEMS_ICC__)
 #define LV_UNREACHABLE() __builtin_unreachable()
 #elif defined(_MSC_VER)
 #define LV_UNREACHABLE() __assume(0)
@@ -440,6 +442,63 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #ifndef LV_ARRAYLEN
 #define LV_ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
 #endif /*LV_ARRAYLEN*/
+
+/**
+ * Mark a function as deprecated so the compiler emits a warning at every call site.
+ *
+ * Usage — functions:
+ * @code
+ *   LV_DEPRECATED("Use lv_foo_new() instead")
+ *   void lv_foo_old(void);
+ * @endcode
+ *
+ * Usage — macros: wrap the macro body with LV_DEPRECATED_MACRO_WARN() so the
+ * warning fires when the macro is expanded:
+ * @code
+ *   #define MY_OLD_MACRO(x)  (LV_DEPRECATED_MACRO_WARN("MY_OLD_MACRO is deprecated"), (x))
+ * @endcode
+ */
+#ifndef LV_DEPRECATED
+#if defined(PYCPARSER)
+#define LV_DEPRECATED(msg)
+#elif defined(__GNUC__) || defined(__clang__) || defined(__IAR_SYSTEMS_ICC__)
+#define LV_DEPRECATED(msg) __attribute__((deprecated(msg)))
+#elif defined(_MSC_VER)
+#define LV_DEPRECATED(msg) __declspec(deprecated(msg))
+#else
+#define LV_DEPRECATED(msg)
+#endif
+#endif /* LV_DEPRECATED not defined */
+
+/**
+ * Helper used inside deprecated macro bodies to emit a compiler warning at the
+ * expansion site in user code.
+ *
+ * Works by declaring a local typedef tagged as deprecated and immediately using
+ * it, which triggers the warning without any runtime overhead.
+ *
+ * Example:
+ * @code
+ *   #define MY_OLD_MACRO(x) \
+ *       do { LV_DEPRECATED_MACRO_WARN("MY_OLD_MACRO is deprecated, use MY_NEW_MACRO"); \
+ *            (x); } while(0)
+ * @endcode
+ */
+#if defined(PYCPARSER)
+#define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
+#elif defined(__GNUC__) || defined(__clang__) || defined(__IAR_SYSTEMS_ICC__)
+#define LV_DEPRECATED_MACRO_WARN(msg) \
+do { \
+typedef int __attribute__((deprecated(msg))) __lv_deprecated_t; \
+__lv_deprecated_t __lv_deprecated_dummy; \
+(void)__lv_deprecated_dummy; \
+} while(0)
+#else
+/* Fallback: no warning, but the macro still compiles */
+#define LV_DEPRECATED_MACRO_WARN(msg) ((void)0)
+#endif
+
+
 
 #ifdef __cplusplus
 } /*extern "C"*/

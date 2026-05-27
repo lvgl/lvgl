@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_draw_private.h"
+#include "../lvgl_public.h"
 #include "lv_obj_private.h"
 
 /*********************
@@ -44,6 +45,8 @@ static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_b
 
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -166,6 +169,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -207,6 +212,8 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_ds
 
 void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -249,6 +256,8 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_ds
 
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -292,6 +301,8 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_
 
 void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -330,6 +341,8 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
 
 void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc)
 {
+    LV_CHECK_ARG(draw_dsc != NULL, return);
+
     LV_PROFILER_DRAW_BEGIN;
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -394,7 +407,7 @@ int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
     LV_PROFILER_DRAW_BEGIN;
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     int32_t s_old = lv_obj_get_ext_draw_size(obj);
     int32_t s_new = 0;
@@ -420,12 +433,15 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 
 int32_t lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return 0);
+
     if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;
 }
 
 lv_layer_type_t lv_obj_get_layer_type(const lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return LV_LAYER_TYPE_NONE);
 
     if(obj->spec_attr) return (lv_layer_type_t)obj->spec_attr->layer_type;
     else return LV_LAYER_TYPE_NONE;

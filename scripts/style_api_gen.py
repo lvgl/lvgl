@@ -5,7 +5,7 @@
 - lvgl/include/lvgl/core/lv_style_gen.h
 - lvgl/src/core/lv_obj_style_gen.c
 - lvgl/src/misc/lv_style_gen.c
-- lvgl/docs/src/common-widget-features/styles/style-properties.rst
+- lvgl/docs/src/common-widget-features/styles/style-properties.mdx
 
 This script effectively "factors out" what would be duplicate code and
 documentation in all 5 of the above files, into 1 place:  below.
@@ -18,7 +18,8 @@ import sys
 # =========================================================================
 
 props = [
-{'section': 'Size and Position', 'dsc':'Properties related to size, position, alignment and layout of Widgets.' },
+{'section': 'Size and Position', 'dsc':'Properties related to size, position, alignment and layout of Widgets.',
+ 'example': 'lv_example_style_size_position', 'example_path': 'styles/style_size_position/lv_example_style_size_position', 'example_kind': 'xml' },
 {'name': 'WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':'Widget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets width of Widget. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area."},
@@ -107,7 +108,8 @@ props = [
   'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
   'dsc': "Skew Widget vertically. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
 
-{'section': 'Padding', 'dsc' : "Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML."},
+{'section': 'Padding', 'dsc' : "Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML.",
+ 'example': 'lv_example_style_padding', 'example_path': 'styles/style_padding/lv_example_style_padding', 'example_kind': 'xml'},
 {'name': 'PAD_TOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding on the top. It makes the content area smaller in this direction."},
@@ -136,7 +138,8 @@ props = [
 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Pad text labels away from the scale ticks/remainder of the ``LV_PART_``."},
 
-{'section': 'Margin', 'dsc' : "Properties to describe spacing around a Widget. Very similar to the margin properties in HTML."},
+{'section': 'Margin', 'dsc' : "Properties to describe spacing around a Widget. Very similar to the margin properties in HTML.",
+ 'example': 'lv_example_style_margin', 'example_path': 'styles/style_margin/lv_example_style_margin', 'example_kind': 'xml'},
 {'name': 'MARGIN_TOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets margin on the top. Widget will keep this space from its siblings in layouts."},
@@ -153,7 +156,8 @@ props = [
   'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets margin on the right. Widget will keep this space from its siblings in layouts."},
 
-{'section': 'Background', 'dsc':'Properties to describe the background color and image of Widget.' },
+{'section': 'Background', 'dsc':'Properties to describe the background color and image of Widget.',
+ 'example': 'lv_example_style_background', 'example_path': 'styles/style_background/lv_example_style_background', 'example_kind': 'xml' },
 {'name': 'BG_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t', 'default':'`0xffffff`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set background color of Widget."},
@@ -210,7 +214,8 @@ props = [
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "If enabled the background image will be tiled. Possible values are `true` or `false`."},
 
-{'section': 'Border', 'dsc':'Properties to describe the borders' },
+{'section': 'Border', 'dsc':'Properties to describe the borders',
+ 'example': 'lv_example_style_border', 'example_path': 'styles/style_border/lv_example_style_border', 'example_kind': 'xml' },
 {'name': 'BORDER_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set color of the border."},
@@ -231,7 +236,8 @@ props = [
 'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets whether the border should be drawn before or after the children are drawn. `true`: after children, `false`: before children."},
 
-{'section': 'Outline', 'dsc':'Properties to describe the outline. It\'s like a border but drawn outside of the rectangles.' },
+{'section': 'Outline', 'dsc':'Properties to describe the outline. It\'s like a border but drawn outside of the rectangles.',
+ 'example': 'lv_example_style_outline', 'example_path': 'styles/style_outline/lv_example_style_outline', 'example_kind': 'xml' },
 {'name': 'OUTLINE_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set width of outline in pixels."},
@@ -248,7 +254,8 @@ props = [
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set padding of outline, i.e. the gap between Widget and the outline."},
 
-{'section': 'Shadow', 'dsc':'Properties to describe the shadow drawn under the rectangles.' },
+{'section': 'Shadow', 'dsc':'Properties to describe the shadow drawn under the rectangles.',
+ 'example': 'lv_example_style_shadow', 'example_path': 'styles/style_shadow/lv_example_style_shadow', 'example_kind': 'xml' },
 {'name': 'SHADOW_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set width of the shadow in pixels. The value should be >= 0."},
@@ -273,7 +280,8 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set opacity of shadow. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
-{'section': 'Image', 'dsc':'Properties to describe the images' },
+{'section': 'Image', 'dsc':'Properties to describe the images',
+ 'example': 'lv_example_style_image', 'example_path': 'styles/lv_example_style_image', 'example_kind': 'c' },
 {'name': 'IMAGE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
@@ -290,7 +298,8 @@ props = [
  'style_type': 'ptr',   'var_type': 'const lv_image_colorkey_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set image colorkey definition. The lv_image_colorkey_t contains two color values: `high_color` and `low_color`. the color of pixels ranging from `low_color` to `high_color` will be transparent."},
 
-{'section': 'Line', 'dsc':'Properties to describe line-like Widgets' },
+{'section': 'Line', 'dsc':'Properties to describe line-like Widgets',
+ 'example': 'lv_example_style_line', 'example_path': 'styles/lv_example_style_line', 'example_kind': 'c' },
 {'name': 'LINE_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set width of lines in pixels."},
@@ -315,7 +324,8 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set opacity of lines."},
 
-{'section': 'Arc', 'dsc':'TODO' },
+{'section': 'Arc', 'dsc':'Properties to describe the Arc Widget',
+ 'example': 'lv_example_style_arc', 'example_path': 'styles/style_arc/lv_example_style_arc', 'example_kind': 'xml' },
 {'name': 'ARC_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set width (thickness) of arcs in pixels."},
@@ -336,7 +346,8 @@ props = [
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set an image from which arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file."},
 
-{'section': 'Text', 'dsc':'Properties to describe the properties of text. All these properties are inherited.' },
+{'section': 'Text', 'dsc':'Properties to describe the properties of text. All these properties are inherited.',
+ 'example': 'lv_example_style_text', 'example_path': 'styles/style_text/lv_example_style_text', 'example_kind': 'xml' },
 {'name': 'TEXT_COLOR',
 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 1, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Sets color of text."},
@@ -381,20 +392,22 @@ props = [
  'style_type': 'num',  'var_type': 'lv_text_leading_trim_t',  'default':'`LV_TEXT_LEADING_TRIM_NONE`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the text leading trim mode. Removes empty space above and/or below text based on font metrics (cap-height, x-height, baseline). Similar to CSS `text-box-trim`. Possible values are `LV_TEXT_LEADING_TRIM_NONE/CAPITAL_BASELINE/LOWER_BASELINE/CAPITAL/LOWER`."},
 
-{'section': 'Blur', 'dsc':'Blur the widget or its background' },
+{'section': 'Blur', 'dsc':'Blur the widget or its background',
+ 'example': 'lv_example_style_blur', 'example_path': 'styles/style_blur/lv_example_style_blur', 'example_kind': 'xml' },
 {'name': 'BLUR_RADIUS',
  'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets the intensity of blurring. Applied on each lv_part separately before the children are rendered."},
 
 {'name': 'BLUR_BACKDROP',
  'style_type': 'num',   'var_type': 'bool',  'default':'`false`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "If `true` the background of the widget will be blurred. The part should have < 100% opacity to make it visible. If `false` the given part will be blurred when it's rendered but before drawing the children."},
+ 'dsc': "If `true` the background of the widget will be blurred. The part should have less than 100% opacity to make it visible. If `false` the given part will be blurred when it's rendered but before drawing the children."},
 
 {'name': 'BLUR_QUALITY',
  'style_type': 'num',   'var_type': 'lv_blur_quality_t',  'default':'`LV_BLUR_QUALITY_AUTO`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically."},
 
-{'section': 'Drop Shadow', 'dsc':'Take an A8 snapshot of the given part and blur it.' },
+{'section': 'Drop Shadow', 'dsc':'Take an A8 snapshot of the given part and blur it.',
+ 'example': 'lv_example_style_drop_shadow', 'example_path': 'styles/lv_example_style_drop_shadow', 'example_kind': 'c' },
 
 {'name': 'DROP_SHADOW_RADIUS',
  'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
@@ -420,7 +433,8 @@ props = [
  'style_type': 'num',   'var_type': 'lv_blur_quality_t',  'default':'`LV_BLUR_QUALITY_PRECISION`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically."},
 
-{'section': 'Miscellaneous', 'dsc':'Mixed properties for various purposes.' },
+{'section': 'Miscellaneous', 'dsc':'Mixed properties for various purposes.',
+ 'example': 'lv_example_style_opacity_transform', 'example_path': 'styles/style_opacity_transform/lv_example_style_opacity_transform', 'example_kind': 'xml' },
 
 {'name': 'RADIUS',
  'style_type': 'num', 'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -491,7 +505,8 @@ props = [
  'style_type': 'num',   'var_type': 'uint32_t', 'default':'`256`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
  'dsc': "Adjust sensitivity for rotary encoders in 1/256 unit. It means, 128: slow down the rotary to half, 512: speeds up to double, 256: no change."},
 
-{'section': 'Flex', 'dsc':'Flex layout properties.',  'guard':'LV_USE_FLEX'},
+{'section': 'Flex', 'dsc':'Flex layout properties.',  'guard':'LV_USE_FLEX',
+ 'example': 'lv_example_flex_flow', 'example_path': 'layouts/flex/flex_flow/lv_example_flex_flow', 'example_kind': 'xml'},
 
 
 {'name': 'FLEX_FLOW',
@@ -519,7 +534,8 @@ props = [
 
 
 
-{'section': 'Grid', 'dsc':'Grid layout properties.', 'guard':'LV_USE_GRID'},
+{'section': 'Grid', 'dsc':'Grid layout properties.', 'guard':'LV_USE_GRID',
+ 'example': 'lv_example_grid_descriptors', 'example_path': 'layouts/grid/grid_descriptors/lv_example_grid_descriptors', 'example_kind': 'xml'},
 
 
 {'name': 'GRID_COLUMN_DSC_ARRAY',
@@ -585,11 +601,14 @@ HEADING = f'''\
 
 '''
 
-RST_HEADING = f'''\
-.. **********************************************************************
-..                            DO NOT EDIT
-.. This file is automatically generated by "{_cfg_this_script}"
-.. **********************************************************************'''
+MDX_HEADING = f'''---
+title: Style Properties
+description: LVGL style property reference.
+---
+{{/* **********************************************************************
+                           DO NOT EDIT
+   This file is automatically generated by "{_cfg_this_script}"
+   ********************************************************************** */}}'''
 
 
 # =========================================================================
@@ -883,34 +902,39 @@ def local_style_set_h(p):
 def docs(p):
     if "section" in p:
         print()
-        print(p['section'])
-        print("-" * len(p['section']))
+        print(f"## {p['section']}")
         print()
         print(p['dsc'])
+        if 'example' in p:
+            print()
+            print(f'<LvglExample name="{p["example"]}" path="{p["example_path"]}" />')
         return
 
-    li_style = "style='display:inline-block; margin-right: 20px; margin-left: 0px"
-
     dsc = word_wrapped_description(p['dsc'], in_a_comment=False)
-
-    print()
     name = p["name"].lower()
-    print(name)
-    print("~" * len(name))
-    print()
-    print(dsc)
 
     if 'default' in p:
-        d, i, L, e = extra_info(p)
+        d, i, l, e = extra_info(p)
+        # Convert the inherited/layout/extDraw strings to JSX booleans/values
+        inherited_val = "true" if i.strip().lower() == "yes" else "false"
+        layout_val    = "true" if l.strip().lower() == "yes" else "false"
+        ext_draw_val  = "true" if e.strip().lower() == "yes" else "false"
         print()
-        print(".. raw:: html")
+        print(f'<StyleProperty')
+        print(f'  name="{name}"')
+        print(f'  default="{d}"')
+        print(f'  inherited={{{inherited_val}}}')
+        print(f'  layout={{{layout_val}}}')
+        print(f'  extDraw={{{ext_draw_val}}}')
+        print(f'>')
+        print(dsc)
+        print(f'</StyleProperty>')
+    else:
+        # No default info — just emit the description as plain text under a heading
         print()
-        print("  <ul>")
-        print("  <li " + li_style + "'><strong>Default</strong> " + d + "</li>")
-        print("  <li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
-        print("  <li " + li_style + "'><strong>Layout</strong> " + L + "</li>")
-        print("  <li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
-        print("  </ul>")
+        print(f"### {name}")
+        print()
+        print(dsc)
 
 
 def guard_proc(p):
@@ -984,7 +1008,7 @@ print('#endif /* LV_OBJ_STYLE_GEN_H */')
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
 
 print(HEADING)
-print('#include "../lv_public_api.h"')
+print('#include "../lvgl_public.h"')
 print()
 
 for prop in props:
@@ -998,7 +1022,7 @@ guard_close()
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.c', 'w')
 
 print(HEADING)
-print('#include "../lv_public_api.h"')
+print('#include "../lvgl_public.h"')
 print()
 
 for prop in props:
@@ -1042,16 +1066,12 @@ print('''\
 print('#endif /* LV_STYLE_GEN_H */')
 
 # -------------------------------------------------------------------------
-# style-properties.rst
+# style-properties.mdx
 # -------------------------------------------------------------------------
-sys.stdout = open(base_dir + '/../docs/src/common-widget-features/styles/style-properties.rst', 'w')
+sys.stdout = open(base_dir + '/../docs/src/common-widget-features/styles/style-properties.mdx', 'w')
 
-print(RST_HEADING)
-print('.. _style_properties:')
+print(MDX_HEADING)
 print()
-print('================')
-print('Style Properties')
-print('================')
 
 for prop in props:
     docs(prop)

@@ -169,7 +169,7 @@
 #define LV_DRAW_THREAD_PRIO LV_THREAD_PRIO_HIGH
 
 #define LV_USE_DRAW_SW 1
-#if LV_USE_DRAW_SW == 1
+#if LV_USE_DRAW_SW
     /*
      * Selectively disable color format support in order to reduce code size.
      * NOTE: some features use certain color formats internally, e.g.
@@ -517,15 +517,44 @@
  * Check arg
  *-----------*/
 
-/** Enable LV_CHECK_ARG macro to validate function arguments at runtime.
- * When enabled, failed checks log a warning and execute the specified action.
+/** When enabled, LV_CHECK_ARG checks validate function arguments
+ * at runtime. Failed checks log a warning and execute the specified
+ * action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+ * Disabling this is not recommended unless extreme care is taken and only
+ * in very resource constrained environments where it can be absolutely
+ * ensured that invariants are never violated.
+ *
  * 0: Disable all LV_CHECK_ARG checks (checks compile to nothing)
  * 1: Enable LV_CHECK_ARG checks */
 #define LV_USE_CHECK_ARG 1
 
-/** If enabled, also call LV_ASSERT_HANDLER when an LV_CHECK_ARG check fails.
+#if LV_USE_CHECK_ARG
+    /** If enabled, also call LV_ASSERT_HANDLER when an LV_CHECK_ARG check fails.
+     * Requires LV_USE_CHECK_ARG to be enabled. */
+    #define LV_CHECK_ARG_ASSERT_ON_FAIL 0
+
+    #if LV_USE_LOG
+        /** Controls what is logged when an LV_CHECK_ARG check fails.
+         * Any mode other than NONE also requires LV_USE_LOG; if LV_USE_LOG is 0
+         * no output is produced regardless of this setting.
+         *
+         * LV_CHECK_ARG_LOG_MODE_NONE    (0): No log output.
+         * LV_CHECK_ARG_LOG_MODE_MINIMAL (1): Log "Check failed" only (file/line from LV_LOG_WARN).
+         * LV_CHECK_ARG_LOG_MODE_VERBOSE (2): Log "Check failed: <cond>" plus caller-supplied message. */
+        #define LV_CHECK_ARG_LOG_MODE LV_CHECK_ARG_LOG_MODE_VERBOSE
+    #endif
+#endif
+
+/** If enabled, LV_CHECK_OBJ will also verify that the object has the expected class.
+ * When disabled the class check is skipped even if the class argument is supplied.
  * Requires LV_USE_CHECK_ARG to be enabled. */
-#define LV_CHECK_ARG_ASSERT_ON_FAIL 0
+#define LV_USE_CHECK_OBJ_CLASSTYPE 1
+
+/** If enabled, LV_CHECK_OBJ will also verify that the object is still part of the
+ * widget tree (lv_obj_is_valid). When disabled the validity check is skipped even
+ * if the associated argument is supplied.
+ * Requires LV_USE_CHECK_ARG to be enabled. */
+#define LV_USE_CHECK_OBJ_VALIDITY 1
 
 /*-------------
  * Debug

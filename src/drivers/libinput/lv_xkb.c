@@ -12,7 +12,7 @@
 #if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
 
 #include <errno.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

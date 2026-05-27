@@ -17,7 +17,6 @@ extern "C" {
 #include "../../display/lv_display.h"
 
 #if LV_USE_LINUX_DRM
-#include <xf86drmMode.h>
 
 /*********************
  *      DEFINES
@@ -27,7 +26,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef drmModeModeInfo lv_linux_drm_mode_t;
+/**
+ * DRM display mode information.
+ * Contains the essential display parameters for mode selection.
+ */
+typedef struct _lv_linux_drm_mode_t lv_linux_drm_mode_t;
 
 /**
  * Callback function type for selecting a DRM display mode
@@ -117,6 +120,14 @@ int32_t lv_linux_drm_mode_get_refresh_rate(const lv_linux_drm_mode_t * mode);
  * @return true if this is the preferred/native mode, false otherwise
  */
 bool lv_linux_drm_mode_is_preferred(const lv_linux_drm_mode_t * mode);
+
+/**
+ * Get the underlying DRM mode object.
+ * @param mode pointer to the DRM mode object
+ * @return pointer to the underlying drmModeModeInfo, or NULL if mode is invalid.
+ *         Requires including <xf86drmMode.h> to dereference.
+ */
+void * lv_linux_drm_mode_get_raw(const lv_linux_drm_mode_t * mode);
 
 /**********************
  *      MACROS

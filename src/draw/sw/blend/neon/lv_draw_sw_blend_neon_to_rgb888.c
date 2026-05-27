@@ -10,7 +10,7 @@
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
 
 #include "../lv_draw_sw_blend_private.h"
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <arm_neon.h>
 
 /*********************

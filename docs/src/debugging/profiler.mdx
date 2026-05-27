@@ -30,39 +30,40 @@ To enable the profiler, set <ApiLink name="LV_USE_PROFILER" /> in `lv_conf.h` an
    
    - Recommended configuration in **Arduino** environments:
    
-     .. code-block:: c
-   
-        static uint64_t my_get_tick_cb(void)
-        \{
-            /* Use the microsecond time stamp provided by Arduino */
-            return micros();
-        \}
-   
-        void my_profiler_init(void)
-        \{
-            lv_profiler_builtin_config_t config;
-            lv_profiler_builtin_config_init(&config);
-            config.tick_per_sec = 1000000; /* One second is equal to 1000000 microseconds */
-            config.tick_get_cb = my_get_tick_cb;
-            lv_profiler_builtin_init(&config);
-        \}
+```c   
+static uint64_t my_get_tick_cb(void)
+{
+    /* Use the microsecond time stamp provided by Arduino */
+    return micros();
+}
+
+void my_profiler_init(void)
+{
+    lv_profiler_builtin_config_t config;
+    lv_profiler_builtin_config_init(&config);
+    config.tick_per_sec = 1000000; /* One second is equal to 1000000 microseconds */
+    config.tick_get_cb = my_get_tick_cb;
+    lv_profiler_builtin_init(&config);
+}
+```
+
 4. Log output configuration: LVGL uses the <ApiLink name="LV_LOG" /> interface by default to output trace information. If you want to use another interface to output log information (e.g. stdout), you can redirect the log output using the following code:
    
-   .. code-block:: c
-   
-        static void my_log_print_cb(const char * buf)
-        \{
-            printf("%s", buf);
-        \}
-   
-        void my_profiler_init(void)
-        \{
-            lv_profiler_builtin_config_t config;
-            lv_profiler_builtin_config_init(&config);
-            ... /* other configurations */
-            config.flush_cb = my_log_print_cb;
-            lv_profiler_builtin_init(&config);
-        \}
+```c   
+static void my_log_print_cb(const char * buf)
+{
+    printf("%s", buf);
+}
+
+void my_profiler_init(void)
+{
+    lv_profiler_builtin_config_t config;
+    lv_profiler_builtin_config_init(&config);
+    /* other configurations ... */
+    config.flush_cb = my_log_print_cb;
+    lv_profiler_builtin_init(&config);
+}
+```
 
 ### Run the test scenario
 

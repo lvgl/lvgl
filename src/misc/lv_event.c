@@ -484,3 +484,4 @@ static lv_event_dsc_t ** event_array_at(lv_event_list_t * list, uint32_t index)
 {
     return lv_array_at(&list->array, index);
 }
+

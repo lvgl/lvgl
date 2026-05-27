@@ -13,7 +13,7 @@ such layers are:
 - clipped corners (a bit-mask application)
 - layered opacity
 - transformations
-  
+
     - scale
     - skew
     - rotation
@@ -119,7 +119,7 @@ in each case:
     In `LV_EVENT_DRAW_MAIN/POST_BEGIN/...` events the Widget is being rendered to a
     layer of the display or another temporary layer created earlier during rendering.
     The current target layer can be retrieved using <ApiLink name="lv_event_get_layer" display="lv_event_get_layer(e)" />.
-   
+
     It also possible to create new layers in these events, but the previous layer is
     also required since it will be the parent layer in <ApiLink name="lv_draw_layer" />.
 2. **Modifying the created Draw Tasks**:
@@ -127,30 +127,31 @@ in each case:
     `lv_draw_rect/label/etc` can be modified.  It's not required to know the current
     layer to modify a draw task.  However, if something new also needs to be drawn with
     `lv_draw_rect/label/etc` the current layer is also required.
-   
+
     The current layer can be read from the `base` draw descriptor.  For example:
-   
-    .. code-block:: c
-   
-        /* In LV_EVENT_DRAW_TASK_ADDED */
-        lv_draw_task_t * t = lv_event_get_draw_task(e);
-        lv_draw_base_dsc_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
-   
-        lv_layer_t * current_layer = draw_dsc.layer;
+
+```c
+/* In LV_EVENT_DRAW_TASK_ADDED */
+lv_draw_task_t * t = lv_event_get_draw_task(e);
+lv_draw_base_dsc_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
+
+lv_layer_t * current_layer = draw_dsc.layer;
+```
+
 3. **Draw to the Canvas Widget**:
     The canvas itself doesn't store a layer, but one can be easily created and used
     like this:
-   
-    .. code-block:: c
-   
-        /* Initialize a layer */
-        lv_layer_t layer;
-        lv_canvas_init_layer(canvas, &layer);
-   
-        /* Draw something here */
-   
-        /* Wait until the rendering is ready */
-        lv_canvas_finish_layer(canvas, &layer);
+
+```c
+/* Initialize a layer */
+lv_layer_t layer;
+lv_canvas_init_layer(canvas, &layer);
+
+/* Draw something here */
+
+/* Wait until the rendering is ready */
+lv_canvas_finish_layer(canvas, &layer);
+```
 
 ## Creating a New Layer
 
@@ -207,4 +208,3 @@ The total memory available for layers at once is controlled by
 <ApiLink name="LV_DRAW_LAYER_MAX_MEMORY" /> in `lv_conf.h`.  If set to `0`, there is no
 limit.
 
-## API

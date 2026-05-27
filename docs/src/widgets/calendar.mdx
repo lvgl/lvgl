@@ -20,7 +20,7 @@ To make the Calendar flexible, by default it does not show the current
 year or month. Instead, there are optional "headers" that can be
 attached to the calendar.
 
-## Parts and Styles
+## Styling
 
 The calendar Widget uses the [Button Matrix](/widgets/buttonmatrix)
 Widget under the hood to arrange the days into a matrix.
@@ -30,28 +30,28 @@ Widget under the hood to arrange the days into a matrix.
 - <ApiLink name="LV_PART_ITEMS" /> Refers to dates and day names. Button matrix
   control flags are set to differentiate the buttons and a custom drawer event is
   added to modify the properties of the buttons as follows:
-  
+
   - day names have no border, no background and are drawn with a gray color
   - days of the previous and next month have the <ApiLink name="LV_BUTTONMATRIX_CTRL_DISABLED" /> flag
   - today has a thicker border with the theme's primary color - highlighted days have some opacity with the theme's primary color.
 
-## Usage
+<LvglExample name="lv_example_calendar_basic" path="widgets/calendar/calendar_basic/lv_example_calendar_basic" />
 
-Some functions use the <ApiLink name="lv_calendar_date_t" /> type which is a structure
-with `year`, `month` and `day` fields.
+Some functions use the <ApiLink name="lv_calendar_date_t" /> type which is a
+structure with `year`, `month` and `day` fields.
 
-### Current date
+## Current date
 
 To set the current date (today), use the
 <ApiLink name="lv_calendar_set_today_date" display="lv_calendar_set_today_date(calendar, year, month, day)" /> function.
 `month` needs to be in 1..12 range and `day` in 1..31 range.
 
-### Month shown
+## Month shown
 
 To set the shown date, use
 <ApiLink name="lv_calendar_set_month_shown" display="lv_calendar_set_month_shown(calendar, year, month)" />
 
-### Highlighted days
+## Highlighted days
 
 The list of highlighted dates should be stored in a
 <ApiLink name="lv_calendar_date_t" /> array and applied to the Calendar by calling
@@ -59,7 +59,14 @@ The list of highlighted dates should be stored in a
 Only the array's pointer will be saved so the array should be have static or
 global scope.
 
-### Names of days
+Highlighted dates aren't yet exposed through XML attributes (the dates need
+a static array that outlives the widget). This C example also wires an
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> callback that logs the tapped date — the typical
+pattern for picking a day:
+
+<LvglExample name="lv_example_calendar_highlighted_days" path="widgets/calendar/lv_example_calendar_highlighted_days" />
+
+## Names of days
 
 The names of the days can be adjusted with
 <ApiLink name="lv_calendar_set_day_names" display="lv_calendar_set_day_names(calendar, day_names)" /> where `day_names`
@@ -67,7 +74,12 @@ looks like `const char * day_names[7] = {"Su", "Mo", ...};` Only the
 pointer of the day names is saved so the array should have static or
 global scope.
 
-### Custom year list
+```c
+static const char * day_names[7] = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
+lv_calendar_set_day_names(calendar, day_names);
+```
+
+## Custom year list
 
 Set a custom year list with <ApiLink name="lv_calendar_header_dropdown_set_year_list" display="lv_calendar_header_dropdown_set_year_list(calendar, years_list)" />
 where `years_list` is a pointer to the custom years list. It can be a constant string
@@ -77,19 +89,17 @@ Drop-Down List Widget via <ApiLink name="lv_dropdown_set_options" /> so the pass
 pointer can be supplied by a local variable or buffer and does not need to persist
 beyond the call.
 
-### Chinese calendar
+```c
+lv_calendar_header_dropdown_set_year_list(calendar, "2026\n2025\n2024\n2023");
+```
 
-The Chinese calendar is a traditional cultural tool that integrates elements
-such as the lunar calendar, solar terms, and traditional festivals. It is
-widely used in Chinese social life, helping people understand the dates of
-the lunar calendar, arrange festival activities, and inherit the excellent
-traditional culture of the Chinese nation. Whether in families, businesses,
-or education, the Chinese calendar plays an irreplaceable role, enabling
-people to better understand and appreciate the charm of Chinese traditional
-culture.
+## Chinese calendar
 
-If you want to use the Chinese calendar, please
-use <ApiLink name="lv_calendar_set_chinese_mode" display="lv_calendar_set_chinese_mode(calendar, true)" /> to enable it.
+<ApiLink name="lv_calendar_set_chinese_mode" display="lv_calendar_set_chinese_mode(calendar, true)" /> adds lunar-date and
+solar-term annotations alongside each Gregorian day. Requires
+<ApiLink name="LV_USE_CALENDAR_CHINESE" /> and a CJK font.
+
+<LvglExample name="lv_example_calendar_chinese" path="widgets/calendar/lv_example_calendar_chinese" />
 
 ## Events
 
@@ -128,15 +138,3 @@ current year and month.
 
 <ApiLink name="lv_calendar_add_header_dropdown" display="lv_calendar_add_header_dropdown(calendar)" /> creates a header that
 contains 2 Drop-Drown List Widgets for the year and month.
-
-## Examples
-
-### Calendar with header
-
-<LvglExample name="lv_example_calendar_1" path="widgets/calendar/lv_example_calendar_1" />
-
-### Chinese calendar
-
-<LvglExample name="lv_example_calendar_2" path="widgets/calendar/lv_example_calendar_2" />
-
-## API

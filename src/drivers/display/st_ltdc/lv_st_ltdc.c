@@ -7,13 +7,13 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_ST_LTDC
 
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
 #include "../../../osal/lv_os_private.h"
-#include "main.h"
+#include <main.h>
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
     #if LV_USE_DRAW_DMA2D

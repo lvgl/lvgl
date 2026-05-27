@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 #include "lv_draw_buf_convert.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON

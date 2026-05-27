@@ -1,0 +1,738 @@
+{
+  "_comment": "Widget spec overrides: summary templates, primary fields, enum names. Generator merges with auto-detected field types.",
+  "lv_3dtexture": {
+    "_auto": {
+      "fields": {
+        "id": "int",
+        "h_flip": "bool",
+        "v_flip": "bool"
+      }
+    }
+  },
+  "lv_animimg": {
+    "_auto": {
+      "fields": {
+        "dsc": "pointer",
+        "pic_count": "int"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "pic_count"
+    ]
+  },
+  "lv_arc": {
+    "_auto": {
+      "fields": {
+        "rotation": "int",
+        "indic_angle_start": "int",
+        "indic_angle_end": "int",
+        "bg_angle_start": "int",
+        "bg_angle_end": "int",
+        "value": "int",
+        "min_value": "int",
+        "max_value": "int",
+        "dragging": "bool",
+        "type": "enum:2",
+        "min_close": "bool",
+        "in_out": "bool",
+        "chg_rate": "int",
+        "last_tick": "int",
+        "last_angle": "int",
+        "knob_offset": "int"
+      }
+    },
+    "summary_tpl": "{value} [{min_value}..{max_value}]",
+    "primary": [
+      "value",
+      "min_value",
+      "max_value",
+      "rotation",
+      "type"
+    ],
+    "enums": {
+      "type": [
+        "NORMAL",
+        "SYMMETRIC",
+        "REVERSE"
+      ]
+    }
+  },
+  "lv_arclabel": {
+    "_auto": {
+      "fields": {
+        "text": "string",
+        "dot_begin": "int",
+        "angle_start": "int",
+        "angle_size": "int",
+        "offset": "int",
+        "radius": "int",
+        "center_offset": "point",
+        "dir": "int",
+        "text_align_v": "int",
+        "text_align_h": "int",
+        "static_txt": "bool",
+        "recolor": "bool",
+        "overflow": "enum:2",
+        "end_overlap": "bool"
+      }
+    },
+    "summary_tpl": "{text}",
+    "primary": [
+      "text",
+      "angle_start",
+      "angle_size",
+      "radius",
+      "dir"
+    ],
+    "enums": {
+      "dir": [
+        "CW",
+        "CCW"
+      ],
+      "overflow": [
+        "VISIBLE",
+        "ELLIPSIS",
+        "CLIP"
+      ]
+    }
+  },
+  "lv_bar": {
+    "_auto": {
+      "fields": {
+        "cur_value": "int",
+        "min_value": "int",
+        "max_value": "int",
+        "start_value": "int",
+        "indic_area": "area",
+        "val_reversed": "bool",
+        "mode": "enum:3",
+        "orientation": "enum:3"
+      }
+    },
+    "summary_tpl": "{cur_value}/{max_value}",
+    "primary": [
+      "cur_value",
+      "min_value",
+      "max_value",
+      "start_value",
+      "mode"
+    ],
+    "enums": {
+      "mode": [
+        "NORMAL",
+        "SYMMETRICAL",
+        "RANGE"
+      ],
+      "orientation": [
+        "AUTO",
+        "HORIZONTAL",
+        "VERTICAL"
+      ]
+    }
+  },
+  "lv_button": {
+    "_auto": {
+      "fields": {}
+    }
+  },
+  "lv_buttonmatrix": {
+    "_auto": {
+      "fields": {
+        "map_p": "pointer",
+        "button_areas": "pointer",
+        "ctrl_bits": "pointer",
+        "btn_cnt": "int",
+        "row_cnt": "int",
+        "btn_id_sel": "int",
+        "one_check": "bool",
+        "auto_free_map": "bool"
+      }
+    },
+    "summary_tpl": "{btn_cnt} btns",
+    "primary": [
+      "btn_cnt",
+      "row_cnt",
+      "btn_id_sel",
+      "one_check"
+    ]
+  },
+  "lv_calendar": {
+    "_auto": {
+      "fields": {
+        "btnm": "pointer",
+        "highlighted_dates": "pointer",
+        "highlighted_dates_num": "int",
+        "use_chinese_calendar": "bool"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "today",
+      "showed_date",
+      "use_chinese_calendar"
+    ]
+  },
+  "lv_canvas": {
+    "_auto": {
+      "fields": {
+        "draw_buf": "pointer"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "draw_buf"
+    ]
+  },
+  "lv_chart": {
+    "_auto": {
+      "fields": {
+        "pressed_point_id": "int",
+        "hdiv_cnt": "int",
+        "vdiv_cnt": "int",
+        "point_cnt": "int",
+        "type": "enum:4",
+        "update_mode": "enum:2"
+      }
+    },
+    "summary_tpl": "{point_cnt}pts",
+    "primary": [
+      "point_cnt",
+      "hdiv_cnt",
+      "vdiv_cnt",
+      "type"
+    ],
+    "enums": {
+      "type": [
+        "NONE",
+        "LINE",
+        "BAR",
+        "SCATTER"
+      ],
+      "update_mode": [
+        "SHIFT",
+        "CIRCULAR"
+      ]
+    }
+  },
+  "lv_checkbox": {
+    "_auto": {
+      "fields": {
+        "txt": "string",
+        "static_txt": "bool"
+      }
+    },
+    "summary_tpl": "{txt}",
+    "primary": [
+      "txt",
+      "static_txt"
+    ]
+  },
+  "lv_dropdown": {
+    "_auto": {
+      "fields": {
+        "list": "pointer",
+        "text": "string",
+        "symbol": "pointer",
+        "options": "string",
+        "option_cnt": "int",
+        "sel_opt_id": "int",
+        "sel_opt_id_orig": "int",
+        "pr_opt_id": "int",
+        "dir": "enum:4",
+        "static_options": "bool",
+        "selected_highlight": "bool",
+        "static_text": "bool"
+      }
+    },
+    "summary_tpl": "sel={sel_opt_id}/{option_cnt}",
+    "primary": [
+      "options",
+      "option_cnt",
+      "sel_opt_id",
+      "dir"
+    ],
+    "enums": {
+      "dir": [
+        "TOP",
+        "BOTTOM",
+        "LEFT",
+        "RIGHT"
+      ]
+    }
+  },
+  "lv_dropdown_list": {
+    "_auto": {
+      "fields": {
+        "dropdown": "pointer"
+      }
+    }
+  },
+  "lv_image": {
+    "_auto": {
+      "fields": {
+        "src": "pointer",
+        "bitmap_mask_src": "pointer",
+        "offset": "point",
+        "w": "int",
+        "h": "int",
+        "rotation": "int",
+        "scale_x": "int",
+        "scale_y": "int",
+        "pivot": "point",
+        "src_type": "enum:2",
+        "cf": "enum:5",
+        "antialias": "bool",
+        "align": "enum:4",
+        "blend_mode": "enum:4"
+      }
+    },
+    "summary_tpl": "{w}×{h}",
+    "primary": [
+      "src",
+      "w",
+      "h",
+      "rotation",
+      "scale_x",
+      "scale_y",
+      "align"
+    ],
+    "enums": {
+      "src_type": [
+        "VARIABLE",
+        "FILE",
+        "SYMBOL"
+      ],
+      "align": [
+        "DEFAULT",
+        "TOP_LEFT",
+        "TOP_MID",
+        "TOP_RIGHT",
+        "BOTTOM_LEFT",
+        "BOTTOM_MID",
+        "BOTTOM_RIGHT",
+        "LEFT_MID",
+        "RIGHT_MID",
+        "CENTER",
+        "STRETCH",
+        "TILE"
+      ],
+      "blend_mode": [
+        "NORMAL",
+        "ADDITIVE",
+        "SUBTRACTIVE",
+        "MULTIPLY"
+      ]
+    }
+  },
+  "lv_imagebutton": {
+    "_auto": {
+      "fields": {}
+    }
+  },
+  "lv_ime_pinyin": {
+    "_auto": {
+      "fields": {
+        "kb": "pointer",
+        "cand_panel": "pointer",
+        "dict": "pointer",
+        "cand_str": "string",
+        "k9_py_ll_pos": "int",
+        "k9_legal_py_count": "int",
+        "k9_input_str_len": "int",
+        "ta_count": "int",
+        "cand_num": "int",
+        "py_page": "int",
+        "mode": "int"
+      }
+    }
+  },
+  "lv_keyboard": {
+    "_auto": {
+      "fields": {
+        "ta": "pointer",
+        "mode": "int",
+        "popovers": "bool"
+      }
+    },
+    "summary_tpl": "mode={mode}",
+    "primary": [
+      "ta",
+      "mode",
+      "popovers"
+    ],
+    "enums": {
+      "mode": [
+        "TEXT_LOWER",
+        "TEXT_UPPER",
+        "SPECIAL",
+        "NUMBER",
+        "USER_1",
+        "USER_2",
+        "USER_3",
+        "USER_4"
+      ]
+    }
+  },
+  "lv_label": {
+    "_auto": {
+      "fields": {
+        "text": "string",
+        "translation_tag": "string",
+        "dot_begin": "int",
+        "max_lines": "int",
+        "sel_start": "int",
+        "sel_end": "int",
+        "size_cache": "point",
+        "offset": "point",
+        "long_mode": "enum:4",
+        "static_txt": "bool",
+        "recolor": "bool",
+        "expand": "bool",
+        "invalid_size_cache": "bool",
+        "need_refr_text": "bool",
+        "text_size": "point"
+      }
+    },
+    "summary_tpl": "{text}",
+    "primary": [
+      "text",
+      "long_mode",
+      "recolor",
+      "static_txt"
+    ],
+    "enums": {
+      "long_mode": [
+        "WRAP",
+        "DOT",
+        "SCROLL",
+        "CLIP",
+        "SCROLL_CIRCULAR"
+      ]
+    }
+  },
+  "lv_led": {
+    "_auto": {
+      "fields": {
+        "color": "color",
+        "bright": "int"
+      }
+    },
+    "summary_tpl": "bright={bright}",
+    "primary": [
+      "color",
+      "bright"
+    ]
+  },
+  "lv_line": {
+    "_auto": {
+      "fields": {
+        "point_num": "int",
+        "y_inv": "bool",
+        "point_array_is_mutable": "bool"
+      }
+    }
+  },
+  "lv_menu": {
+    "_auto": {
+      "fields": {
+        "storage": "pointer",
+        "main": "pointer",
+        "main_page": "pointer",
+        "main_header": "pointer",
+        "main_header_title": "pointer",
+        "sidebar": "pointer",
+        "sidebar_page": "pointer",
+        "sidebar_header": "pointer",
+        "sidebar_header_title": "pointer",
+        "selected_tab": "pointer",
+        "cur_depth": "int",
+        "prev_depth": "int",
+        "sidebar_generated": "bool",
+        "mode_header": "enum:3",
+        "mode_root_back_btn": "enum:2"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "cur_depth",
+      "sidebar_generated"
+    ]
+  },
+  "lv_menu_page": {
+    "_auto": {
+      "fields": {
+        "title": "string",
+        "static_title": "bool"
+      }
+    },
+    "summary_tpl": "{title}",
+    "primary": [
+      "title",
+      "static_title"
+    ]
+  },
+  "lv_msgbox": {
+    "_auto": {
+      "fields": {
+        "header": "pointer",
+        "content": "pointer",
+        "footer": "pointer",
+        "title": "pointer"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "header",
+      "content",
+      "footer",
+      "title"
+    ]
+  },
+  "lv_roller": {
+    "_auto": {
+      "fields": {
+        "option_cnt": "int",
+        "sel_opt_id": "int",
+        "sel_opt_id_ori": "int",
+        "inf_page_cnt": "int",
+        "mode": "enum:2",
+        "moved": "bool"
+      }
+    },
+    "summary_tpl": "sel={sel_opt_id}/{option_cnt}",
+    "primary": [
+      "option_cnt",
+      "sel_opt_id",
+      "mode"
+    ],
+    "enums": {
+      "mode": [
+        "NORMAL",
+        "INFINITE"
+      ]
+    }
+  },
+  "lv_scale": {
+    "_auto": {
+      "fields": {
+        "txt_src": "pointer",
+        "mode": "int",
+        "range_min": "int",
+        "range_max": "int",
+        "total_tick_count": "enum:15",
+        "major_tick_every": "enum:15",
+        "label_enabled": "bool",
+        "post_draw": "bool",
+        "draw_ticks_on_top": "bool",
+        "angle_range": "int",
+        "rotation": "int",
+        "custom_label_cnt": "int",
+        "last_tick_width": "int",
+        "first_tick_width": "int"
+      }
+    },
+    "summary_tpl": "{range_min}..{range_max}",
+    "primary": [
+      "mode",
+      "range_min",
+      "range_max",
+      "total_tick_count",
+      "angle_range",
+      "rotation"
+    ],
+    "enums": {
+      "mode": [
+        "HORIZONTAL_TOP",
+        "HORIZONTAL_BOTTOM",
+        "VERTICAL_LEFT",
+        "VERTICAL_RIGHT",
+        "ROUND_INNER",
+        "ROUND_OUTER"
+      ]
+    }
+  },
+  "lv_slider": {
+    "_auto": {
+      "fields": {
+        "left_knob_area": "area",
+        "right_knob_area": "area",
+        "pressed_point": "point",
+        "value_to_set": "pointer",
+        "dragging": "bool",
+        "left_knob_focus": "bool"
+      }
+    },
+    "summary_tpl": "{cur_value}/{max_value}",
+    "primary": [
+      "cur_value",
+      "min_value",
+      "max_value",
+      "mode",
+      "dragging"
+    ]
+  },
+  "lv_spangroup": {
+    "_auto": {
+      "fields": {
+        "lines": "int",
+        "indent": "int",
+        "cache_w": "int",
+        "cache_h": "int",
+        "overflow": "bool",
+        "refresh": "bool"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "lines",
+      "indent"
+    ]
+  },
+  "lv_spinbox": {
+    "_auto": {
+      "fields": {
+        "value": "int",
+        "range_max": "int",
+        "range_min": "int",
+        "step": "int",
+        "digit_count": "enum:4",
+        "dec_point_pos": "enum:4",
+        "rollover": "bool",
+        "digit_step_dir": "enum:2"
+      }
+    },
+    "summary_tpl": "{value}",
+    "primary": [
+      "value",
+      "range_min",
+      "range_max",
+      "step",
+      "digit_count",
+      "dec_point_pos"
+    ]
+  },
+  "lv_spinner": {
+    "_auto": {
+      "fields": {
+        "duration": "int",
+        "angle": "int"
+      }
+    },
+    "summary_tpl": "{duration}ms",
+    "primary": [
+      "duration",
+      "angle"
+    ]
+  },
+  "lv_switch": {
+    "_auto": {
+      "fields": {
+        "anim_state": "int",
+        "orientation": "enum:3"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "anim_state",
+      "orientation"
+    ],
+    "enums": {
+      "orientation": [
+        "AUTO",
+        "HORIZONTAL",
+        "VERTICAL"
+      ]
+    }
+  },
+  "lv_table": {
+    "_auto": {
+      "fields": {
+        "col_cnt": "int",
+        "row_cnt": "int",
+        "cell_data": "pointer",
+        "row_h": "pointer",
+        "col_w": "pointer",
+        "col_act": "int",
+        "row_act": "int"
+      }
+    },
+    "summary_tpl": "{col_cnt}×{row_cnt}",
+    "primary": [
+      "col_cnt",
+      "row_cnt",
+      "col_act",
+      "row_act"
+    ]
+  },
+  "lv_tabview": {
+    "_auto": {
+      "fields": {
+        "tab_cur": "int",
+        "tab_pos": "int",
+        "tab_bar_size": "int"
+      }
+    },
+    "summary_tpl": "tab={tab_cur}",
+    "primary": [
+      "tab_cur",
+      "tab_pos",
+      "tab_bar_size"
+    ]
+  },
+  "lv_textarea": {
+    "_auto": {
+      "fields": {
+        "label": "pointer",
+        "placeholder_txt": "string",
+        "placeholder_txt_size": "point",
+        "pwd_tmp": "string",
+        "pwd_bullet": "string",
+        "accepted_chars": "string",
+        "max_length": "int",
+        "pwd_show_time": "int",
+        "sel_start": "int",
+        "sel_end": "int",
+        "text_sel_in_prog": "bool",
+        "text_sel_en": "bool",
+        "pwd_mode": "bool",
+        "one_line": "bool",
+        "static_accepted_chars": "bool"
+      }
+    },
+    "summary_tpl": "{placeholder_txt}",
+    "primary": [
+      "placeholder_txt",
+      "max_length",
+      "pwd_show_time",
+      "accepted_chars"
+    ]
+  },
+  "lv_tileview": {
+    "_auto": {
+      "fields": {
+        "tile_act": "pointer"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "tile_act"
+    ]
+  },
+  "lv_tileview_tile": {
+    "_auto": {
+      "fields": {
+        "dir": "int"
+      }
+    },
+    "summary_tpl": "",
+    "primary": [
+      "dir"
+    ]
+  },
+  "lv_win": {
+    "_auto": {
+      "fields": {}
+    }
+  }
+}

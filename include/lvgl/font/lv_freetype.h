@@ -60,7 +60,7 @@ typedef enum {
     LV_FREETYPE_OUTLINE_CONIC_TO,
 } lv_freetype_outline_type_t;
 
-/* Only path string is required */
+/** Only path string is required */
 typedef const char lv_freetype_font_src_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_freetype_font_class;
@@ -101,7 +101,9 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info);
  * @param style font style(see lv_freetype_font_style_t for details).
  * @return Created font, or NULL on failure.
  */
-lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
+lv_font_t * lv_freetype_font_create(const char * pathname,
+                                    lv_freetype_font_render_mode_t render_mode,
+                                    uint32_t size,
                                     lv_freetype_font_style_t style);
 
 /**

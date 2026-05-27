@@ -27,7 +27,7 @@
 #ifndef VG_LITE_TYPE_H
 #define VG_LITE_TYPE_H
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #if __KERNEL__

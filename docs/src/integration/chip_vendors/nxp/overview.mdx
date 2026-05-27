@@ -290,10 +290,11 @@ VGLite draw unit for processing.
   Set <ApiLink name="LV_USE_VGLITE_BLIT_SPLIT" /> to `1`.
   Enabling the blit split workaround will mitigate any quality degradation issue
   on screen's dimension > 352 pixels.
-  
-  .. code-block:: c
-  
-      #define VGLITE_BLIT_SPLIT_THR 352
+
+```c
+#define VGLITE_BLIT_SPLIT_THR 352
+```
+
 - By default, the blit split threshold is set to 352. Blits with width or height
   higher than this value will be done in multiple steps. Value must be multiple
   of stride alignment in px. For most color formats, the alignment is 16px

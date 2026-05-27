@@ -17,7 +17,7 @@ is set programmatically, the content will become scrollable.
 The message box can be modal (blocking clicks on the rest of the screen)
 or not modal.
 
-## Parts and Styles
+## Styling
 
 The message box is built from other Widgets, so you can check these
 Widgets' documentation for details.
@@ -26,15 +26,13 @@ Widgets' documentation for details.
 - Buttons: [Button (lv_button)](/widgets/button)
 - Title and content text: [Label (lv_label)](/widgets/label)
 
-## Usage
-
-### Create a message box
+## Create a message box
 
 <ApiLink name="lv_msgbox_create" display="lv_msgbox_create(parent)" /> creates a message box.
 If `parent` is `NULL` the message box will be modal, and will use the
 [Default Display](/main-modules/display/setup)'s Top [Layer](/main-modules/display/screen_layers) as a parent.
 
-### Adding buttons
+## Adding buttons
 
 If you want to add an [OK] or [Cancel] or other buttons for the
 user to have a choice of responses, add each button using the
@@ -49,7 +47,7 @@ Buttons can also be added to the header if desired with
 <ApiLink name="lv_msgbox_add_header_button" display="lv_msgbox_add_header_button(msgbox, symbol)" />.
 Buttons so added are added to the right end of the header.
 
-### Getting the parts
+## Getting the parts
 
 The building blocks of the message box can be obtained using the
 following functions:
@@ -72,7 +70,7 @@ lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * msgbox, const void * symbol);
 lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * msgbox, const char * text);
 ```
 
-### Close the message box
+## Close the message box
 
 <ApiLink name="lv_msgbox_close" display="lv_msgbox_close(msgbox)" /> closes (deletes) the message box.
 
@@ -103,14 +101,12 @@ Learn more about [Keys](/main-modules/indev/keypad).
 
 ### Simple Message box
 
-<LvglExample name="lv_example_msgbox_1" path="widgets/msgbox/lv_example_msgbox_1" />
+<LvglExample name="lv_example_msgbox_modal" path="widgets/msgbox/lv_example_msgbox_modal" />
 
 ### Scrolling and styled Message box
 
-<LvglExample name="lv_example_msgbox_2" path="widgets/msgbox/lv_example_msgbox_2" />
+<LvglExample name="lv_example_msgbox_settings" path="widgets/msgbox/lv_example_msgbox_settings" />
 
 ### Message box with blurred background
 
-<LvglExample name="lv_example_msgbox_3" path="widgets/msgbox/lv_example_msgbox_3" />
-
-## API
+<LvglExample name="lv_example_msgbox_blur" path="widgets/msgbox/lv_example_msgbox_blur" />

@@ -798,9 +798,9 @@ void lv_style_set_text_leading_trim(lv_style_t * style, lv_text_leading_trim_t v
 void lv_style_set_blur_radius(lv_style_t * style, int32_t value);
 
 /**
- * If `true` the background of the widget will be blurred. The part should have < 100%
- * opacity to make it visible. If `false` the given part will be blurred when it's
- * rendered but before drawing the children.
+ * If `true` the background of the widget will be blurred. The part should have less
+ * than 100% opacity to make it visible. If `false` the given part will be blurred
+ * when it's rendered but before drawing the children.
  * Default: `false`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
  * @param  value   Value to submit
@@ -2110,9 +2110,9 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
     }
 
 /**
- * If `true` the background of the widget will be blurred. The part should have < 100%
- * opacity to make it visible. If `false` the given part will be blurred when it's
- * rendered but before drawing the children.
+ * If `true` the background of the widget will be blurred. The part should have less
+ * than 100% opacity to make it visible. If `false` the given part will be blurred
+ * when it's rendered but before drawing the children.
  * Default: `false`, inherited: No, layout: No, ext. draw: No.
  * @param  val   Value to submit
  */

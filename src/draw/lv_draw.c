@@ -10,7 +10,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_public_api.h"
+#include "../lvgl_public.h"
 #include "../misc/lv_area_private.h"
 #include "../misc/lv_event_private.h"
 #include "lv_draw_private.h"
@@ -558,6 +558,11 @@ void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_d
     lv_draw_blur_dsc_init(&blur_dsc);
     blur_dsc.blur_radius = base->drop_shadow_blur_radius;
     blur_dsc.quality = base->drop_shadow_quality;
+    /* Forward the shadow color so backends that bake the recolor into the
+     * blur pass (e.g. NanoVG, where the subsequent layer composite cannot
+     * easily apply recolor to a pre-existing FBO image) can pick it up. */
+    blur_dsc.base.drop_shadow_color = base->drop_shadow_color;
+    blur_dsc.base.drop_shadow_opa   = base->drop_shadow_opa;
     lv_draw_blur(drop_shadow_layer, &blur_dsc, &drop_shadow_layer->buf_area);
 
     lv_area_move(&drop_shadow_area, base->drop_shadow_ofs_x, base->drop_shadow_ofs_y);

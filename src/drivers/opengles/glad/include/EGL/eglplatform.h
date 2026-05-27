@@ -1,7 +1,7 @@
 #ifndef __eglplatform_h_
 #define __eglplatform_h_
 
-#include "../../../../../lv_public_api.h"
+#include "../../../../../lvgl_public.h"
 #if LV_USE_OPENGLES
 
 /*
@@ -18,7 +18,7 @@
  * https://www.github.com/KhronosGroup/EGL-Registry/
  */
 
-#include <KHR/khrplatform.h>
+#include "../KHR/khrplatform.h"
 
 /* Macros used in EGL function prototype declarations.
  *

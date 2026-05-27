@@ -38,6 +38,9 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef void(*lv_delete_cb_t)(void * user_data);
+
 /**
  * On/Off features controlling the object's behavior.
  * OR-ed values are possible
@@ -353,6 +356,37 @@ bool lv_obj_is_valid(const lv_obj_t * obj);
 void lv_obj_null_on_delete(lv_obj_t ** obj_ptr);
 
 /**
+ * Attach a delete callback to an object.
+ *
+ * The registered callback will be automatically invoked with `user_data` as
+ * its argument when the object is deleted, allowing associated resources to
+ * be released or any other cleanup logic to be executed by the callback.
+ *
+ * This is a utility function that simplifies attaching an `LV_EVENT_DELETE`
+ * event callback to `obj` and passing `user_data` to that callback when the
+ * object is deleted.
+ *
+ * The `lv_delete_dsc_t` returned by this function is automatically released when
+ * the object is deleted as well.
+ *
+ * @param obj       Pointer to the LVGL object to attach the delete callback to.
+ * @param cb        The delete callback function to register.
+ * @param user_data     User data pointer passed to `cb` when the object is deleted.
+ *
+ * @return      Pointer to the delete descriptor or NULL if the operation failed.
+ */
+lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void * user_data);
+
+/**
+ * Detach a delete callback from an object.
+ *
+ * Removes a delete descriptor previously created via @ref lv_obj_add_delete_cb
+ *
+ * @param dsc   Pointer to the delete descriptor. Passing NULL results in a no-op
+ */
+void lv_obj_remove_delete_cb(lv_delete_dsc_t * dsc);
+
+/**
  * Add an event handler to a widget that will load a screen on a trigger.
  * @param obj           pointer to widget which should load the screen
  * @param trigger       an event code, e.g. `LV_EVENT_CLICKED`
@@ -472,14 +506,27 @@ void lv_objid_builtin_destroy(void);
  **********************/
 
 #if LV_USE_ASSERT_OBJ
-#  define LV_ASSERT_OBJ(obj_p, obj_class)                                                               \
-    do {                                                                                                \
-        LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
-        LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
-        LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
+  /**
+   * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
+   *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
+   *             and executes the supplied action, which is safer in production.
+   */
+  #define LV_ASSERT_OBJ(obj_p, obj_class)                                                             \
+    do {                                                                                              \
+      LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");             \
+      LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
+      LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
+      LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
     } while(0)
 # else
-#  define LV_ASSERT_OBJ(obj_p, obj_class) LV_ASSERT_NULL(obj_p)
+  /**
+   * @deprecated Use `LV_CHECK_OBJ(obj, return)` instead.
+   */
+  #define LV_ASSERT_OBJ(obj_p, obj_class) \
+    do { \
+      LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead."); \
+      LV_ASSERT_NULL(obj_p); \
+    } while(0)
 #endif
 
 #if LV_USE_LOG && LV_LOG_TRACE_OBJ_CREATE

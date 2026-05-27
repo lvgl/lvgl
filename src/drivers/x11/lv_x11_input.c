@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_X11
 
 #include <string.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 

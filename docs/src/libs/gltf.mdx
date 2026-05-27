@@ -40,9 +40,9 @@ LVGL's glTF implementation provides comprehensive 3D rendering capabilities:
 - Image-Based Lighting (IBL) for realistic environmental lighting
 - Punctual lighting support with animated light sources
 - Physically Based Rendering (PBR) materials with full texture support:
-  
+
   * Diffuse/albedo textures
-  * Roughness and metallic workflow textures  
+  * Roughness and metallic workflow textures
   * Normal maps for surface detail
   * Ambient occlusion textures
 
@@ -71,12 +71,12 @@ LVGL's glTF implementation provides comprehensive 3D rendering capabilities:
 ### Rendering Quality
 
 - Configurable antialiasing with multiple modes:
-  
+
   * Always-on for consistent quality
-  * Always-off for maximum performance  
+  * Always-off for maximum performance
   * Auto-on that activates when scene movement stops
 - Flexible background rendering:
-  
+
   * Environment-based backgrounds using IBL
   * Solid color backgrounds
   * Transparent backgrounds for overlay effects
@@ -122,7 +122,7 @@ set(FASTGLTF_DIFFUSE_TRANSMISSION_SUPPORT
     CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(fastgltf)
 
-# Fetch libwebp library  
+# Fetch libwebp library
 FetchContent_Declare(
   webp
   GIT_REPOSITORY https://github.com/webmproject/libwebp
@@ -301,7 +301,7 @@ lv_gltf_model_node_set_scale_z(node, 2.0f);
 
 ##### Reading Node Properties
 
-For performance reasons, the node properties are only calculated during rendering. 
+For performance reasons, the node properties are only calculated during rendering.
 In order to read them, you must first register an event callback.
 
 This event callback will be called every time the node properties change.
@@ -319,17 +319,17 @@ static void node_value_cb(lv_event_t * e)
     lv_gltf_model_node_get_euler_rotation(e, &rotation);
     lv_gltf_model_node_get_scale(e, &scale);
 
-    LV_LOG_USER("Local Position: %.2f, %.2f, %.2f\n", 
+    LV_LOG_USER("Local Position: %.2f, %.2f, %.2f\n",
                 position.x, position.y, position.z);
 }
 
 /* Register the callback */
-lv_gltf_model_node_add_event_cb(node, node_value_cb, 
+lv_gltf_model_node_add_event_cb(node, node_value_cb,
                                 LV_EVENT_VALUE_CHANGED, NULL);
 ```
 
 If you need world-space coordinates (position in global scene coordinates rather than relative to parent),
-use the world position variant. This involves complex matrix calculations during the rendering phase which 
+use the world position variant. This involves complex matrix calculations during the rendering phase which
 will impact performance:
 
 ```c
@@ -340,7 +340,7 @@ static void node_world_value_cb(lv_event_t * e)
     lv_gltf_model_node_get_local_position(e, &local_pos);
     lv_gltf_model_node_get_world_position(e, &world_pos);
 
-    LV_LOG_USER("Local: %.2f, %.2f, %.2f\n", 
+    LV_LOG_USER("Local: %.2f, %.2f, %.2f\n",
                 local_pos.x, local_pos.y, local_pos.z);
     LV_LOG_USER("World: %.2f, %.2f, %.2f\n",
                 world_pos.x, world_pos.y, world_pos.z);
@@ -376,7 +376,7 @@ Access nodes by index, numeric path or path:
 ```c
 /* Get by index */
 lv_gltf_model_node_t * root = lv_gltf_model_node_get_by_index(model, 0);
-lv_gltf_model_node_t * last_node = lv_gltf_model_node_get_by_index(model, lv_gltf_model_get_node_count(model) - 1); 
+lv_gltf_model_node_t * last_node = lv_gltf_model_node_get_by_index(model, lv_gltf_model_get_node_count(model) - 1);
 
 /* Get by path (hierarchical node names from your 3D editor) */
 lv_gltf_model_node_t * cursor = lv_gltf_model_node_get_by_path(model, "/cursor");
@@ -527,4 +527,3 @@ Animation speeds use integer values to avoid floating-point arithmetic:
 
 <LvglExample name="lv_example_gltf_3" path="libs/gltf/lv_example_gltf_3" />
 
-## API

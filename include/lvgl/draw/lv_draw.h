@@ -22,7 +22,7 @@ extern "C" {
 #include "../lv_types.h"
 #include "../core/lv_style.h"
 #include "../font/lv_text.h"
-#include "../debugging/lv_profiler.h"
+#include "../debugging/profiler/lv_profiler.h"
 #include "../core/lv_matrix.h"
 #include "../core/lv_event.h"
 #include "lv_draw_buf.h"

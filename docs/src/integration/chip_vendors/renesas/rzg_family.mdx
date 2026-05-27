@@ -23,9 +23,10 @@ Supported boards in the RZ/G Family:
   See the [v8-to-v9 Migration Guide](https://docs.lvgl.io/9.0/CHANGELOG.html#migration-guide) for things you will need to address.
 - Clone the ready-to-use repository for your selected board:
   
-  .. code-block:: shell
   
-      git clone https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit --recurse-submodules
+```bash
+    git clone https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit --recurse-submodules
+```
 
 Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
@@ -34,9 +35,9 @@ Downloading the `.zip` from GitHub doesn't work as it doesn't download the submo
 - Stop any automatically started demos (on G2UL run `systemctl stop demo-launcher` in the terminal).
 - Run the project:
   
-  .. code-block:: shell
-  
-      ./lvgl_demo_benchmark
+```bash
+    ./lvgl_demo_benchmark
+```
 
 ### Modify the project
 
@@ -67,9 +68,9 @@ LVGL statically for customizability and to port the LVGL v9 benchmark from LVGL 
   versions of LVGL include the optimal OpenGL driver.
 - Clone the ready-to-use repository:
   
-  .. code-block:: shell
-  
-      git clone https://github.com/lvgl/lv_port_renesas_rz-g3e-evkit --recurse-submodules
+```bash
+    git clone https://github.com/lvgl/lv_port_renesas_rz-g3e-evkit --recurse-submodules
+```
 
 Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
@@ -78,9 +79,9 @@ Downloading the `.zip` from GitHub doesn't work as it doesn't download the submo
 - Stop the Wayland desktop if using the OpenGL, DRM, or fbdev drivers. Run `systemctl stop weston` in the terminal.
 - Run the project:
   
-  .. code-block:: shell
-  
-      ./lvglsim
+```bash
+./lvglsim
+```
 
 ### Modify the project
 

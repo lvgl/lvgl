@@ -45,6 +45,10 @@
 #define LV_NANOVG_BACKEND_GLES2     3
 #define LV_NANOVG_BACKEND_GLES3     4
 
+#define LV_CHECK_ARG_LOG_MODE_NONE    0
+#define LV_CHECK_ARG_LOG_MODE_MINIMAL 1
+#define LV_CHECK_ARG_LOG_MODE_VERBOSE 2
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -69,7 +73,7 @@
     #elif defined(LV_CONF_INCLUDE_SIMPLE)         /* Or simply include lv_conf.h is enabled. */
         #include "lv_conf.h"
     #else
-        #include "../../lv_conf.h"                /* Else assume lv_conf.h is next to the lvgl folder. */
+        #include "../../../../lv_conf.h"                /* Else assume lv_conf.h is next to the lvgl folder. */
     #endif
     #if !defined(LV_CONF_H) && !defined(LV_CONF_SUPPRESS_DEFINE_CHECK)
         /* #include will sometimes silently fail when __has_include is used */
@@ -424,7 +428,7 @@
         #define LV_USE_DRAW_SW 1
     #endif
 #endif
-#if LV_USE_DRAW_SW == 1
+#if LV_USE_DRAW_SW
     /*
      * Selectively disable color format support in order to reduce code size.
      * NOTE: some features use certain color formats internally, e.g.
@@ -1500,8 +1504,13 @@
  * Check arg
  *-----------*/
 
-/** Enable LV_CHECK_ARG macro to validate function arguments at runtime.
- * When enabled, failed checks log a warning and execute the specified action.
+/** When enabled, LV_CHECK_ARG checks validate function arguments
+ * at runtime. Failed checks log a warning and execute the specified
+ * action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+ * Disabling this is not recommended unless extreme care is taken and only
+ * in very resource constrained environments where it can be absolutely
+ * ensured that invariants are never violated.
+ *
  * 0: Disable all LV_CHECK_ARG checks (checks compile to nothing)
  * 1: Enable LV_CHECK_ARG checks */
 #ifndef LV_USE_CHECK_ARG
@@ -1516,13 +1525,63 @@
     #endif
 #endif
 
-/** If enabled, also call LV_ASSERT_HANDLER when an LV_CHECK_ARG check fails.
+#if LV_USE_CHECK_ARG
+    /** If enabled, also call LV_ASSERT_HANDLER when an LV_CHECK_ARG check fails.
+     * Requires LV_USE_CHECK_ARG to be enabled. */
+    #ifndef LV_CHECK_ARG_ASSERT_ON_FAIL
+        #ifdef CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL
+            #define LV_CHECK_ARG_ASSERT_ON_FAIL CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL
+        #else
+            #define LV_CHECK_ARG_ASSERT_ON_FAIL 0
+        #endif
+    #endif
+
+    #if LV_USE_LOG
+        /** Controls what is logged when an LV_CHECK_ARG check fails.
+         * Any mode other than NONE also requires LV_USE_LOG; if LV_USE_LOG is 0
+         * no output is produced regardless of this setting.
+         *
+         * LV_CHECK_ARG_LOG_MODE_NONE    (0): No log output.
+         * LV_CHECK_ARG_LOG_MODE_MINIMAL (1): Log "Check failed" only (file/line from LV_LOG_WARN).
+         * LV_CHECK_ARG_LOG_MODE_VERBOSE (2): Log "Check failed: <cond>" plus caller-supplied message. */
+        #ifndef LV_CHECK_ARG_LOG_MODE
+            #ifdef CONFIG_LV_CHECK_ARG_LOG_MODE
+                #define LV_CHECK_ARG_LOG_MODE CONFIG_LV_CHECK_ARG_LOG_MODE
+            #else
+                #define LV_CHECK_ARG_LOG_MODE LV_CHECK_ARG_LOG_MODE_VERBOSE
+            #endif
+        #endif
+    #endif
+#endif
+
+/** If enabled, LV_CHECK_OBJ will also verify that the object has the expected class.
+ * When disabled the class check is skipped even if the class argument is supplied.
  * Requires LV_USE_CHECK_ARG to be enabled. */
-#ifndef LV_CHECK_ARG_ASSERT_ON_FAIL
-    #ifdef CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL
-        #define LV_CHECK_ARG_ASSERT_ON_FAIL CONFIG_LV_CHECK_ARG_ASSERT_ON_FAIL
+#ifndef LV_USE_CHECK_OBJ_CLASSTYPE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
+            #define LV_USE_CHECK_OBJ_CLASSTYPE CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
+        #else
+            #define LV_USE_CHECK_OBJ_CLASSTYPE 0
+        #endif
     #else
-        #define LV_CHECK_ARG_ASSERT_ON_FAIL 0
+        #define LV_USE_CHECK_OBJ_CLASSTYPE 1
+    #endif
+#endif
+
+/** If enabled, LV_CHECK_OBJ will also verify that the object is still part of the
+ * widget tree (lv_obj_is_valid). When disabled the validity check is skipped even
+ * if the associated argument is supplied.
+ * Requires LV_USE_CHECK_ARG to be enabled. */
+#ifndef LV_USE_CHECK_OBJ_VALIDITY
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_CHECK_OBJ_VALIDITY
+            #define LV_USE_CHECK_OBJ_VALIDITY CONFIG_LV_USE_CHECK_OBJ_VALIDITY
+        #else
+            #define LV_USE_CHECK_OBJ_VALIDITY 0
+        #endif
+    #else
+        #define LV_USE_CHECK_OBJ_VALIDITY 1
     #endif
 #endif
 
@@ -5025,5 +5084,9 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define _CRT_SECURE_NO_WARNINGS
     #endif
 #endif  /*defined(LV_CONF_SKIP)*/
+
+#ifndef LV_CHECK_ARG_LOG_MODE
+    #define LV_CHECK_ARG_LOG_MODE   0
+#endif
 
 #endif  /*LV_CONF_INTERNAL_H*/

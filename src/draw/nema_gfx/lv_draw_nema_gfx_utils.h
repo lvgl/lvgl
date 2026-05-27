@@ -39,7 +39,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_public_api.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_NEMA_GFX
 #include "../sw/lv_draw_sw.h"

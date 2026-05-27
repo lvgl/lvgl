@@ -231,7 +231,7 @@ const char * lv_subject_get_string(lv_subject_t * subject);
  * @param subject   pointer to Subject
  * @return          pointer to buffer containing previous value
  * @note            NULL will be returned if NULL was passed in `lv_subject_init_string()`
- *                  as `prev_buf`.
+ *                  as `prev_buf` or if `subject` is NULL or not of string type.
  */
 const char * lv_subject_get_previous_string(lv_subject_t * subject);
 

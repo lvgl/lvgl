@@ -1,7 +1,7 @@
 #ifndef __khrplatform_h_
 #define __khrplatform_h_
 
-#include "../../../../../lv_public_api.h"
+#include "../../../../../lvgl_public.h"
 #if LV_USE_OPENGLES
 /*
 ** Copyright (c) 2008-2018 The Khronos Group Inc.

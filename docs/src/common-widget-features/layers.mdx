@@ -54,7 +54,7 @@ There are three explicit ways to change a Widget's layer position (Z-order) amon
 Widgets that share the same parent:
 
 - Use <ApiLink name="lv_obj_move_to_index" display="lv_obj_move_to_index(widget, idx)" /> to move a Widget to a new index.
-  
+
   :0:                Background
   :child_count - 1:  Foreground
   :&lt; 0:              Count down from the top (-1 = topmost).
@@ -65,4 +65,3 @@ Widgets that share the same parent:
 - When <ApiLink name="lv_obj_set_parent" display="lv_obj_set_parent(widget, new_parent)" /> is used, `widget` will
   become the foremost child of `new_parent`.
 
-## API

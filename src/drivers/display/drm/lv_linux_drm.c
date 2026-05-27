@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_LINUX_DRM && !LV_LINUX_DRM_USE_EGL
 
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>

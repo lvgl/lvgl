@@ -1,7 +1,7 @@
 #ifndef LV_GLTFDATA_HPP
 #define LV_GLTFDATA_HPP
 
-#include "../../../lv_public_api.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_GLTF
 

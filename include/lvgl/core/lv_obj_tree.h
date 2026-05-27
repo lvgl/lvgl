@@ -151,20 +151,20 @@ lv_obj_t * lv_obj_get_child_by_type(const lv_obj_t * obj, int32_t idx,
 
 /**
  * Return a sibling of an object
- * @param obj       pointer to an object whose sibling should be get
+ * @param obj       pointer to an object whose sibling should be get. The object needs to be registered as a child of its parent.
  * @param idx       0: `obj` itself
  *                  -1: the first older sibling
  *                  -2: the next older sibling
  *                  1: the first younger sibling
  *                  2: the next younger sibling
  *                  etc
- * @return          pointer to the requested sibling  or NULL if there is no such sibling
+* @return          pointer to the requested sibling  or NULL if there is no such sibling - would navigate outside the array of children using the index (get the -3rd sibling of the second child of the parent)
  */
 lv_obj_t * lv_obj_get_sibling(const lv_obj_t * obj, int32_t idx);
 
 /**
  * Return a sibling of an object. Consider the siblings only with a given type.
- * @param obj       pointer to an object whose sibling should be get
+ * @param obj       pointer to an object whose sibling should be get. The object needs to be registered as a child of its parent.
  * @param idx       0: `obj` itself
  *                  -1: the first older sibling
  *                  -2: the next older sibling
@@ -172,7 +172,7 @@ lv_obj_t * lv_obj_get_sibling(const lv_obj_t * obj, int32_t idx);
  *                  2: the next younger sibling
  *                  etc
  * @param class_p   the type of the children to check
- * @return          pointer to the requested sibling  or NULL if there is no such sibling
+ * @return          pointer to the requested sibling  or NULL if there is no such sibling or would navigate outside the array of children using the index (get the -3rd sibling of the second child of the parent)
  */
 lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx,
                                       const lv_obj_class_t * class_p);

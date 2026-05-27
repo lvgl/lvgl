@@ -5,7 +5,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_public_api.h"
+#include "../lvgl_public.h"
 #include "../core/lv_global.h"
 
 #if LV_USE_OS == LV_OS_PTHREAD

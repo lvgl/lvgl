@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_3dtexture_private.h"
+#include "../../lvgl_public.h"
 #if LV_USE_3DTEXTURE
 
 #include "../../core/lv_obj_class_private.h"
@@ -64,7 +65,7 @@ lv_obj_t * lv_3dtexture_create(lv_obj_t * parent)
 
 void lv_3dtexture_set_src(lv_obj_t * obj, lv_3dtexture_id_t id)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_3dtexture_t * tex = (lv_3dtexture_t *)obj;
     tex->id = id;
@@ -72,7 +73,7 @@ void lv_3dtexture_set_src(lv_obj_t * obj, lv_3dtexture_id_t id)
 
 void lv_3dtexture_set_flip(lv_obj_t * obj, bool h_flip, bool v_flip)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_3dtexture_t * tex = (lv_3dtexture_t *)obj;
 

@@ -36,18 +36,36 @@ All these common and versatile features are introduced in the
 In HTML terms, think of it as a `<div>`, a very versatile building block that,
 with some CSS and JS, can become almost anything.
 
+## Data binding
+
+Every widget inherits the Base Widget's binding helpers, which let a Subject
+drive styles, flags, or states declaratively. The most common one is
+`bind_style`: attach a named style to a widget only while a Subject equals a
+reference value — perfect for theme switches and "mode" toggles. See the
+[Observer](/main-modules/observer/observer) page for an introduction to the
+underlying mechanism.
+
+- <ApiLink name="lv_obj_bind_style" display="lv_obj_bind_style(obj, &style, selector, &subject, ref_value)" />
+- <ApiLink name="lv_obj_bind_flag_if_eq" display="lv_obj_bind_flag_if_eq(obj, &subject, flag, ref_value)" /> and the matching `_not_eq`/`_gt`/`_ge`/`_lt`/`_le` variants
+- <ApiLink name="lv_obj_bind_state_if_eq" display="lv_obj_bind_state_if_eq(obj, &subject, state, ref_value)" /> and the matching `_not_eq`/`_gt`/`_ge`/`_lt`/`_le` variants
+
+<LvglExample name="lv_example_obj_bind_style" path="widgets/obj/obj_bind_style/lv_example_obj_bind_style" />
+
 ## Examples
-
-### Base objects with custom styles
-
-<LvglExample name="lv_example_obj_1" path="widgets/obj/lv_example_obj_1" />
 
 ### Make an object draggable
 
-<LvglExample name="lv_example_obj_2" path="widgets/obj/lv_example_obj_2" />
+Interactive drag-to-move is driven from an `LV_EVENT_PRESSING` callback,
+which reads the input device's motion vector and feeds it back through
+`lv_obj_set_pos`. There's no XML attribute for "drag with the pointer", so
+this lives in C.
 
-### Transform object using a 3x3 matrix
+<LvglExample name="lv_example_obj_draggable" path="widgets/obj/lv_example_obj_draggable" />
 
-<LvglExample name="lv_example_obj_3" path="widgets/obj/lv_example_obj_3" />
+### Transform an object with a 3x3 matrix
 
-## API
+A timer ticks the rotation and scale of the object via `lv_obj_set_transform`.
+This needs `LV_DRAW_TRANSFORM_USE_MATRIX` and an animation loop, neither of
+which is reachable from XML attributes — the C example shows the full setup.
+
+<LvglExample name="lv_example_obj_transform" path="widgets/obj/lv_example_obj_transform" />
