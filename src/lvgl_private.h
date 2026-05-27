@@ -31,6 +31,8 @@
 #include "draw/convert/neon/lv_draw_buf_convert_neon.h"
 #include "draw/dma2d/lv_draw_dma2d.h"
 #include "draw/dma2d/lv_draw_dma2d_private.h"
+#include "draw/espressif/dma2d/lv_draw_esp_dma2d.h"
+#include "draw/espressif/dma2d/lv_draw_esp_dma2d_private.h"
 #include "draw/espressif/ppa/lv_draw_ppa.h"
 #include "draw/espressif/ppa/lv_draw_ppa_private.h"
 #include "draw/eve/lv_draw_eve.h"
