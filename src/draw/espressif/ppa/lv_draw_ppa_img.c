@@ -18,7 +18,7 @@ static bool ppa_rotation_to_srm_angle(int32_t rotation, ppa_srm_rotation_angle_t
 static bool ppa_transform_requested(const lv_draw_image_dsc_t * draw_dsc);
 
 
-void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
+void LV_ATTRIBUTE_FAST_MEM lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                                            const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
@@ -26,7 +26,7 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     lv_draw_image_normal_helper(t, dsc, coords, lv_draw_img_ppa_core, NULL);
 }
 
-void lv_draw_ppa_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
+void LV_ATTRIBUTE_FAST_MEM lv_draw_ppa_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                                              const lv_area_t * coords)
 {
     lv_layer_t * layer_to_draw = (lv_layer_t *)dsc->src;
@@ -39,7 +39,7 @@ void lv_draw_ppa_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     lv_draw_ppa_img(t, &new_draw_dsc, coords);
 }
 
-static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void LV_ATTRIBUTE_FAST_MEM lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                                        const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                                        const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
 {
@@ -204,7 +204,7 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     }
 }
 
-static bool ppa_rotation_to_srm_angle(int32_t rotation, ppa_srm_rotation_angle_t * angle_out)
+static bool LV_ATTRIBUTE_FAST_MEM ppa_rotation_to_srm_angle(int32_t rotation, ppa_srm_rotation_angle_t * angle_out)
 {
     int32_t r = rotation % 3600;
     if(r < 0) r += 3600;
@@ -227,7 +227,7 @@ static bool ppa_rotation_to_srm_angle(int32_t rotation, ppa_srm_rotation_angle_t
     }
 }
 
-static bool ppa_transform_requested(const lv_draw_image_dsc_t * draw_dsc)
+static bool LV_ATTRIBUTE_FAST_MEM ppa_transform_requested(const lv_draw_image_dsc_t * draw_dsc)
 {
     return (draw_dsc->rotation != 0 ||
             draw_dsc->scale_x != LV_SCALE_NONE ||

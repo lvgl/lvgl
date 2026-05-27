@@ -11,7 +11,7 @@
 #include <esp_cache.h>
 #include <esp_heap_caps.h>
 
-static void fill_dma_desc_2d(dma2d_descriptor_t * desc,
+static void LV_ATTRIBUTE_FAST_MEM fill_dma_desc_2d(dma2d_descriptor_t * desc,
                                                    void * buf,
                                                    uint32_t pic_w, uint32_t pic_h,
                                                    uint32_t block_w, uint32_t block_h,
@@ -34,7 +34,7 @@ static void fill_dma_desc_2d(dma2d_descriptor_t * desc,
     desc->next = NULL;
 }
 
-static bool dma2d_copy_done_cb(dma2d_channel_handle_t dma2d_chan, dma2d_event_data_t * event_data,
+static bool LV_ATTRIBUTE_FAST_MEM dma2d_copy_done_cb(dma2d_channel_handle_t dma2d_chan, dma2d_event_data_t * event_data,
                                                      void * user_data)
 {
     LV_UNUSED(dma2d_chan);
@@ -45,7 +45,7 @@ static bool dma2d_copy_done_cb(dma2d_channel_handle_t dma2d_chan, dma2d_event_da
     return (x_higher_priority_task_woken == pdTRUE);
 }
 
-static bool dma2d_copy_job_picked_cb(uint32_t num_chans,
+static bool LV_ATTRIBUTE_FAST_MEM dma2d_copy_job_picked_cb(uint32_t num_chans,
                                                            const dma2d_trans_channel_info_t * dma2d_chans, void * user_data)
 {
     lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *)user_data;
@@ -83,7 +83,7 @@ static bool dma2d_copy_job_picked_cb(uint32_t num_chans,
     return false;
 }
 
-esp_err_t lv_draw_esp_dma2d_blit(lv_draw_dma2d_unit_t * u,
+esp_err_t LV_ATTRIBUTE_FAST_MEM lv_draw_esp_dma2d_blit(lv_draw_dma2d_unit_t * u,
                                                        const void * src_buf, uint32_t src_pic_w, uint32_t src_pic_h,
                                                        uint32_t src_x, uint32_t src_y,
                                                        void * dst_buf, uint32_t dst_pic_w, uint32_t dst_pic_h,

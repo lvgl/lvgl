@@ -36,7 +36,7 @@ static dma2d_data_burst_length_t burst_length_from_config(void);
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_esp_dma2d_init(void)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_esp_dma2d_init(void)
 {
     lv_draw_dma2d_unit_t * u = lv_draw_create_unit(sizeof(lv_draw_dma2d_unit_t));
     LV_ASSERT_NULL(u);
@@ -80,12 +80,12 @@ void lv_draw_esp_dma2d_init(void)
     };
 }
 
-void lv_draw_esp_dma2d_deinit(void)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_esp_dma2d_deinit(void)
 {
     /* No global deinit required */
 }
 
-bool lv_draw_esp_dma2d_task_supported(const lv_draw_task_t * t, bool * is_convert)
+bool LV_ATTRIBUTE_FAST_MEM lv_draw_esp_dma2d_task_supported(const lv_draw_task_t * t, bool * is_convert)
 {
     if(t == NULL) return false;
     const lv_draw_image_dsc_t * dsc = t->draw_dsc;
@@ -119,7 +119,7 @@ bool lv_draw_esp_dma2d_task_supported(const lv_draw_task_t * t, bool * is_conver
     return true;
 }
 
-void lv_draw_esp_dma2d_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+void LV_ATTRIBUTE_FAST_MEM lv_draw_esp_dma2d_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                                    const lv_area_t * coords)
 {
     lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
@@ -134,7 +134,7 @@ void lv_draw_esp_dma2d_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * dra
 *   STATIC FUNCTIONS
 **********************/
 
-static bool image_task_basic_supported(const lv_draw_image_dsc_t * dsc)
+static bool LV_ATTRIBUTE_FAST_MEM image_task_basic_supported(const lv_draw_image_dsc_t * dsc)
 {
     if(dsc->clip_radius != 0) return false;
     if(dsc->bitmap_mask_src != NULL) return false;
@@ -149,7 +149,7 @@ static bool image_task_basic_supported(const lv_draw_image_dsc_t * dsc)
     return true;
 }
 
-static dma2d_data_burst_length_t burst_length_from_config(void)
+static dma2d_data_burst_length_t LV_ATTRIBUTE_FAST_MEM burst_length_from_config(void)
 {
     switch(LV_ESP_DMA2D_BURST_LENGTH) {
         case 8:
@@ -167,7 +167,7 @@ static dma2d_data_burst_length_t burst_length_from_config(void)
     }
 }
 
-static int32_t dma2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
+static int32_t LV_ATTRIBUTE_FAST_MEM dma2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
 {
     LV_UNUSED(draw_unit);
     bool is_convert = false;
@@ -180,7 +180,7 @@ static int32_t dma2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * t)
     return 1;
 }
 
-static int32_t dma2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static int32_t LV_ATTRIBUTE_FAST_MEM dma2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *)draw_unit;
     if(u->task_act) return LV_DRAW_UNIT_IDLE;
@@ -202,7 +202,7 @@ static int32_t dma2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     return 1;
 }
 
-static int32_t dma2d_delete(lv_draw_unit_t * draw_unit)
+static int32_t LV_ATTRIBUTE_FAST_MEM dma2d_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *)draw_unit;
     if(u->tx_desc) free(u->tx_desc);
@@ -213,7 +213,7 @@ static int32_t dma2d_delete(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
-static void dma2d_execute_drawing(lv_draw_dma2d_unit_t * u)
+static void LV_ATTRIBUTE_FAST_MEM dma2d_execute_drawing(lv_draw_dma2d_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
     lv_layer_t * layer = t->target_layer;

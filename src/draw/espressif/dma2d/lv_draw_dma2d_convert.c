@@ -7,7 +7,7 @@
 
 #if LV_USE_ESP_DMA2D
 
-bool lv_draw_esp_dma2d_cf_info(lv_color_format_t cf, lv_draw_dma2d_cf_info_t * info)
+bool LV_ATTRIBUTE_FAST_MEM lv_draw_esp_dma2d_cf_info(lv_color_format_t cf, lv_draw_dma2d_cf_info_t * info)
 {
     if(info == NULL) return false;
 
@@ -27,7 +27,7 @@ bool lv_draw_esp_dma2d_cf_info(lv_color_format_t cf, lv_draw_dma2d_cf_info_t * i
     }
 }
 
-bool lv_draw_esp_dma2d_tx_csc_option(lv_color_format_t src_cf, lv_color_format_t dst_cf,
+bool LV_ATTRIBUTE_FAST_MEM lv_draw_esp_dma2d_tx_csc_option(lv_color_format_t src_cf, lv_color_format_t dst_cf,
                                                            dma2d_csc_tx_option_t * option)
 {
     if(option == NULL) return false;

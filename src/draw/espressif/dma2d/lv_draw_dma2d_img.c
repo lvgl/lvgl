@@ -11,14 +11,14 @@ static void lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc
                                      const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                      const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 
-void lv_draw_esp_dma2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+void LV_ATTRIBUTE_FAST_MEM lv_draw_esp_dma2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                                    const lv_area_t * coords)
 {
     if(draw_dsc->opa <= (lv_opa_t)LV_OPA_MIN) return;
     lv_draw_image_normal_helper(t, draw_dsc, coords, lv_draw_dma2d_image_core, NULL);
 }
 
-static void lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+static void LV_ATTRIBUTE_FAST_MEM lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                                            const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                                            const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
 {

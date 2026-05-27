@@ -29,7 +29,7 @@ static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * a
 /**********************
  *   GLOBAL FUNCTIONS
  *********************/
-void lv_draw_buf_ppa_init_handlers(void)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_buf_ppa_init_handlers(void)
 {
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
     handlers->invalidate_cache_cb = invalidate_cache;
@@ -39,7 +39,7 @@ void lv_draw_buf_ppa_init_handlers(void)
  *   STATIC FUNCTIONS
  *********************/
 
-static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
+static void LV_ATTRIBUTE_FAST_MEM invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     esp_cache_msync(draw_buf->data, draw_buf->data_size, ESP_CACHE_MSYNC_FLAG_DIR_C2M | ESP_CACHE_MSYNC_FLAG_TYPE_DATA);
 }

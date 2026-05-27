@@ -33,7 +33,7 @@ static bool ppa_rotation_supported(int32_t rotation);
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_ppa_init(void)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_ppa_init(void)
 {
     esp_err_t res;
     ppa_client_config_t cfg = {0};
@@ -78,7 +78,7 @@ void lv_draw_ppa_init(void)
     LV_ASSERT(res == ESP_OK);
 }
 
-void lv_draw_ppa_deinit(void)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_ppa_deinit(void)
 {
     /* No global deinit required */
 }
@@ -86,7 +86,7 @@ void lv_draw_ppa_deinit(void)
 /**********************
 *   STATIC FUNCTIONS
 **********************/
-static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
+static int32_t LV_ATTRIBUTE_FAST_MEM ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
     const lv_draw_dsc_base_t * base = (lv_draw_dsc_base_t *)t->draw_dsc;
@@ -179,7 +179,7 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     }
 }
 
-static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static int32_t LV_ATTRIBUTE_FAST_MEM ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
     if(u->task_act) {
@@ -203,7 +203,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     return 1;
 }
 
-static int32_t ppa_delete(lv_draw_unit_t * draw_unit)
+static int32_t LV_ATTRIBUTE_FAST_MEM ppa_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
     ppa_unregister_client(u->srm_client);
@@ -212,7 +212,7 @@ static int32_t ppa_delete(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
-static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
+static void LV_ATTRIBUTE_FAST_MEM ppa_execute_drawing(lv_draw_ppa_unit_t * u)
 {
     lv_draw_task_t * t         = u->task_act;
     lv_layer_t * layer         = t->target_layer;
@@ -242,7 +242,7 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
     }
 }
 
-static bool ppa_rotation_supported(int32_t rotation)
+static bool LV_ATTRIBUTE_FAST_MEM ppa_rotation_supported(int32_t rotation)
 {
     int32_t r = rotation % 3600;
     if(r < 0) r += 3600;
