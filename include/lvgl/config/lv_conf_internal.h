@@ -1174,11 +1174,36 @@
             #define LV_USE_PPA_IMG      0
         #endif
     #endif
+    #ifndef LV_USE_PPA_TRANSFORM
+        #ifdef CONFIG_LV_USE_PPA_TRANSFORM
+            #define LV_USE_PPA_TRANSFORM CONFIG_LV_USE_PPA_TRANSFORM
+        #else
+            #define LV_USE_PPA_TRANSFORM 0
+        #endif
+    #endif
     #ifndef LV_PPA_BURST_LENGTH
         #ifdef CONFIG_LV_PPA_BURST_LENGTH
             #define LV_PPA_BURST_LENGTH CONFIG_LV_PPA_BURST_LENGTH
         #else
             #define LV_PPA_BURST_LENGTH    128
+        #endif
+    #endif
+#endif
+
+/** Use Espressif DMA2D for copy and format conversion */
+#ifndef LV_USE_ESP_DMA2D
+    #ifdef CONFIG_LV_USE_ESP_DMA2D
+        #define LV_USE_ESP_DMA2D CONFIG_LV_USE_ESP_DMA2D
+    #else
+        #define LV_USE_ESP_DMA2D 0
+    #endif
+#endif
+#if LV_USE_ESP_DMA2D
+    #ifndef LV_ESP_DMA2D_BURST_LENGTH
+        #ifdef CONFIG_LV_ESP_DMA2D_BURST_LENGTH
+            #define LV_ESP_DMA2D_BURST_LENGTH CONFIG_LV_ESP_DMA2D_BURST_LENGTH
+        #else
+            #define LV_ESP_DMA2D_BURST_LENGTH 64
         #endif
     #endif
 #endif

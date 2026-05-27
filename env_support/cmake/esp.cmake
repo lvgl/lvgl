@@ -57,6 +57,9 @@ else()
 
   if(${target} STREQUAL "esp32p4")
     list(APPEND IDF_COMPONENTS esp_driver_ppa esp_mm)
+    if(CONFIG_LV_USE_ESP_DMA2D)
+      list(APPEND IDF_COMPONENTS esp_hw_support)
+    endif()
   endif()
 
   if(CONFIG_LV_USE_FS_FATFS)

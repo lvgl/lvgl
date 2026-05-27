@@ -631,6 +631,23 @@ menu "LVGL configuration"
 		bool "Use Espressif's PPA accelerator for ESP SoCs"
 		default n
 
+		config LV_USE_PPA_TRANSFORM
+		bool "Use Espressif PPA SRM for image/layer transform (rotate/scale/mirror)"
+		default n
+		depends on LV_USE_PPA
+
+		config LV_USE_ESP_DMA2D
+		bool "Use Espressif's DMA2D for copy and format conversion"
+		default n
+		depends on IDF_TARGET_ESP32P4
+
+		config LV_ESP_DMA2D_BURST_LENGTH
+		int "DMA2D burst length in bytes"
+		depends on LV_USE_ESP_DMA2D
+		default 64
+		help
+			Supported values are 8, 16, 32, 64 and 128.
+
 		config LV_USE_PPA_IMG
 		bool "Use Espressif's PPA accelerator for Image draw"
 		default n
