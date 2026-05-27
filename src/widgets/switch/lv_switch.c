@@ -95,7 +95,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent)
 
 void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientation)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     sw->orientation = orientation;
@@ -108,7 +108,7 @@ void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientati
 
 lv_switch_orientation_t lv_switch_get_orientation(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     return sw->orientation;
@@ -308,7 +308,7 @@ static void lv_switch_anim_completed(lv_anim_t * a)
  */
 static void lv_switch_trigger_anim(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     /*If the widget is not rendered yet show state changes immediately*/
     if(!obj->rendered) return;
 

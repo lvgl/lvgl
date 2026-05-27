@@ -12,6 +12,7 @@
 #if LV_USE_SPINBOX
 
 #include "../../core/lv_obj_class_private.h"
+#include "../../lvgl_public.h"
 #include "../../core/lv_observer_private.h"
 
 /*Check dependencies*/
@@ -125,7 +126,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * parent)
 
 void lv_spinbox_set_value(lv_obj_t * obj, int32_t v)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     if(v > spinbox->range_max) v = spinbox->range_max;
@@ -138,7 +139,7 @@ void lv_spinbox_set_value(lv_obj_t * obj, int32_t v)
 
 void lv_spinbox_set_rollover(lv_obj_t * obj, bool rollover)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     spinbox->rollover = rollover;
@@ -146,7 +147,7 @@ void lv_spinbox_set_rollover(lv_obj_t * obj, bool rollover)
 
 void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t sep_pos)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT) digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
@@ -167,7 +168,7 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t 
 
 void lv_spinbox_set_digit_count(lv_obj_t * obj, uint32_t digit_count)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT) digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
@@ -179,7 +180,7 @@ void lv_spinbox_set_digit_count(lv_obj_t * obj, uint32_t digit_count)
 
 void lv_spinbox_set_dec_point_pos(lv_obj_t * obj, uint32_t dec_point_pos)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     spinbox->dec_point_pos = dec_point_pos;
@@ -189,7 +190,7 @@ void lv_spinbox_set_dec_point_pos(lv_obj_t * obj, uint32_t dec_point_pos)
 
 void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     spinbox->step = step;
@@ -198,7 +199,7 @@ void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step)
 
 void lv_spinbox_set_range(lv_obj_t * obj, int32_t min_value, int32_t max_value)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     spinbox->range_max = max_value;
@@ -212,7 +213,7 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t min_value, int32_t max_value)
 
 void lv_spinbox_set_min_value(lv_obj_t * obj, int32_t min_value)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     spinbox->range_min = min_value;
@@ -224,7 +225,7 @@ void lv_spinbox_set_min_value(lv_obj_t * obj, int32_t min_value)
 
 void lv_spinbox_set_max_value(lv_obj_t * obj, int32_t max_value)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     spinbox->range_max = max_value;
@@ -236,7 +237,7 @@ void lv_spinbox_set_max_value(lv_obj_t * obj, int32_t max_value)
 
 void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint32_t pos)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
@@ -250,7 +251,7 @@ void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint32_t pos)
 
 void lv_spinbox_set_digit_step_direction(lv_obj_t * obj, lv_dir_t direction)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     spinbox->digit_step_dir = direction;
 
@@ -262,7 +263,7 @@ void lv_spinbox_set_digit_step_direction(lv_obj_t * obj, lv_dir_t direction)
 
 int32_t lv_spinbox_get_value(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     return spinbox->value;
@@ -270,7 +271,7 @@ int32_t lv_spinbox_get_value(lv_obj_t * obj)
 
 int32_t lv_spinbox_get_step(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     return spinbox->step;
@@ -282,7 +283,7 @@ int32_t lv_spinbox_get_step(lv_obj_t * obj)
 
 void lv_spinbox_step_next(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     const int32_t new_step = spinbox->step / 10;
@@ -293,7 +294,7 @@ void lv_spinbox_step_next(lv_obj_t * obj)
 
 void lv_spinbox_step_prev(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
@@ -305,7 +306,7 @@ void lv_spinbox_step_prev(lv_obj_t * obj)
 
 bool lv_spinbox_get_rollover(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     return spinbox->rollover;
@@ -313,42 +314,42 @@ bool lv_spinbox_get_rollover(lv_obj_t * obj)
 
 uint32_t lv_spinbox_get_digit_count(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     return spinbox->digit_count;
 }
 
 uint32_t lv_spinbox_get_dec_point_pos(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     return spinbox->dec_point_pos;
 }
 
 int32_t lv_spinbox_get_min_value(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     return spinbox->range_min;
 }
 
 int32_t lv_spinbox_get_max_value(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     return spinbox->range_max;
 }
 
 lv_dir_t lv_spinbox_get_digit_step_direction(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     return spinbox->digit_step_dir;
 }
 
 void lv_spinbox_increment(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     int32_t v = spinbox->value;
@@ -377,7 +378,7 @@ void lv_spinbox_increment(lv_obj_t * obj)
 
 void lv_spinbox_decrement(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     int32_t v = spinbox->value;

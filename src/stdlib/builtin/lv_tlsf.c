@@ -2,6 +2,7 @@
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #include "lv_tlsf_private.h"
+#include "../../lvgl_public.h"
 
 #undef  printf
 #define printf LV_LOG_ERROR

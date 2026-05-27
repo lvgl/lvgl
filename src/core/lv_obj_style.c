@@ -7,13 +7,13 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_private.h"
+#include "../lvgl_public.h"
 #include "../misc/lv_anim_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_class_private.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "lv_observer_private.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -247,7 +247,7 @@ void lv_obj_report_style_change(lv_style_t * style)
 
 void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     if(!style_refr) return;
 
@@ -412,7 +412,7 @@ lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop,
 
 bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     uint32_t i;
     /*Find the style*/
