@@ -104,7 +104,7 @@ function(lvgl_link_pkg_config)
   foreach(_target IN LISTS ARG_TARGETS)
     target_link_libraries(lvgl ${SCOPE} $<BUILD_INTERFACE:${_target}>)
     get_target_property(_inc_dirs ${_target} INTERFACE_INCLUDE_DIRECTORIES)
-    foreach(_dir in LISTS _inc_dirs)
+    foreach(_dir IN LISTS _inc_dirs)
       target_include_directories(
         lvgl ${SCOPE} $<BUILD_INTERFACE:${_dir}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
