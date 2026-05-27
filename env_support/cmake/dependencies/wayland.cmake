@@ -19,14 +19,16 @@ option(LV_USE_PKG_CONFIG_WAYLAND "Resolve Wayland via pkg-config"
 if(LV_USE_FIND_PACKAGE_WAYLAND)
   find_package(Wayland QUIET)
   if(Wayland_FOUND)
-    set(WAYLAND_FOUND 1)
     message(STATUS "lvgl: Wayland: found via find_package")
+    set(WAYLAND_FOUND 1)
+    set(TARGETS Wayland::Client Wayland::Cursor)
+    if(CONFIG_LV_WAYLAND_USE_EGL)
+      list(APPEND TARGETS Wayland::Egl)
+    endif()
     lvgl_link_packages(
       PRIVATE
       TARGETS
-      Wayland::Client
-      Wayland::Cursor
-      Wayland::Egl
+      ${TARGETS}
       CMAKE_PACKAGE
       ${CMAKE_PACKAGE_NAME}
       PKG_CONFIG
