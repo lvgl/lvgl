@@ -54,6 +54,7 @@ extern "C" {
 
 struct _lv_pending_t;
 struct NVGLUframebuffer;
+struct NVGLUblurState;
 
 typedef struct _lv_draw_nanovg_unit_t {
     lv_draw_unit_t base_unit;
@@ -71,6 +72,8 @@ typedef struct _lv_draw_nanovg_unit_t {
     struct _lv_pending_t * letter_pending;
 
     lv_cache_t * fbo_cache;
+
+    struct NVGLUblurState * blur_state;
 } lv_draw_nanovg_unit_t;
 
 /**********************
@@ -192,6 +195,26 @@ void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t 
  * @return the image handle
  */
 int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb);
+
+/**
+ * Initialize the blur draw unit state on the given nanovg unit
+ * @param u pointer to the nanovg unit
+ */
+void lv_draw_nanovg_blur_init(lv_draw_nanovg_unit_t * u);
+
+/**
+ * Deinitialize the blur draw unit state on the given nanovg unit
+ * @param u pointer to the nanovg unit
+ */
+void lv_draw_nanovg_blur_deinit(lv_draw_nanovg_unit_t * u);
+
+/**
+ * Apply a separable gaussian blur to the current layer using a fragment shader
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a blur descriptor
+ * @param coords the coordinates of the area to blur
+ */
+void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
 
 #if LV_USE_VECTOR_GRAPHIC
 /**
