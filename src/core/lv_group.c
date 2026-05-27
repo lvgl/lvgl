@@ -191,20 +191,16 @@ void lv_group_remove_obj(lv_obj_t * obj)
     if(g->obj_focus && *g->obj_focus == obj) {
         if(g->frozen) g->frozen = 0;
 
-        /*If this is the only object in the group then focus to nothing.*/
-        if(lv_ll_get_head(&g->obj_ll) == g->obj_focus && lv_ll_get_tail(&g->obj_ll) == g->obj_focus) {
-            lv_obj_send_event(*g->obj_focus, LV_EVENT_DEFOCUSED, get_indev(g));
-        }
-        /*If there more objects in the group then focus to the next/prev object*/
-        else {
+        /*If there are more objects in the group, try to move focus to the next/prev object*/
+        if(lv_ll_get_head(&g->obj_ll) != g->obj_focus || lv_ll_get_tail(&g->obj_ll) != g->obj_focus) {
             lv_group_refocus(g);
         }
     }
 
-    /*If the focuses object is still the same then it was the only object in the group but it will
-     *be deleted. Set the `obj_focus` to NULL to get back to the initial state of the group with
-     *zero objects*/
+    /*If the focused object is still the one being removed (either it was the only object,
+     *or refocus couldn't find a focusable candidate), defocus it and clear the focus.*/
     if(g->obj_focus && *g->obj_focus == obj) {
+        lv_obj_send_event(*g->obj_focus, LV_EVENT_DEFOCUSED, get_indev(g));
         g->obj_focus = NULL;
     }
 

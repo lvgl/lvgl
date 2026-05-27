@@ -152,4 +152,39 @@ void test_group_focus_obj_that_was_previously_unfocused(void)
     TEST_ASSERT_EQUAL_UINT32(1U, final_focused_a);
 }
 
+void test_group_remove_focused_obj_sends_defocused_when_others_unfocusable(void)
+{
+    lv_obj_t * screen = lv_screen_active();
+    lv_group_t * group = lv_group_create();
+
+    lv_obj_t * obj_hidden  = lv_obj_create(screen);
+    lv_obj_t * obj_disabled = lv_obj_create(screen);
+    lv_obj_t * obj_focused = lv_obj_create(screen);
+
+    lv_group_add_obj(group, obj_hidden);
+    lv_group_add_obj(group, obj_disabled);
+    lv_group_add_obj(group, obj_focused);
+
+    lv_obj_add_flag(obj_hidden, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_state(obj_disabled, LV_STATE_DISABLED);
+
+    lv_group_focus_obj(obj_focused);
+    TEST_ASSERT_EQUAL_PTR(lv_group_get_focused(group), obj_focused);
+
+    uint32_t defocused_count = 0;
+    lv_obj_add_event_cb(obj_focused, count_defocused_cb, LV_EVENT_DEFOCUSED, &defocused_count);
+
+    lv_group_remove_obj(obj_focused);
+
+    uint32_t final_count = defocused_count;
+
+    lv_obj_delete(obj_hidden);
+    lv_obj_delete(obj_disabled);
+    lv_obj_delete(obj_focused);
+    lv_group_delete(group);
+
+    TEST_ASSERT_EQUAL_UINT32(1U, final_count);
+}
+
+
 #endif
