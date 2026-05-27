@@ -50,6 +50,7 @@
 #include "core/lv_translation.h"
 #include "debugging/lv_assert.h"
 #include "debugging/lv_check_arg.h"
+#include "debugging/lv_check_obj.h"
 #include "debugging/lv_monkey.h"
 #include "debugging/lv_sysmon.h"
 #include "debugging/profiler/lv_profiler.h"

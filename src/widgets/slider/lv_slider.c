@@ -14,6 +14,7 @@
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../lvgl_public.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../core/lv_observer_private.h"
 
@@ -128,7 +129,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent)
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     return slider->dragging;

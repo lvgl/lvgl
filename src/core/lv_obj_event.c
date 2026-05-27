@@ -7,11 +7,11 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_event_private.h"
+#include "../lvgl_public.h"
 #include "lv_obj_event_private.h"
 #include "lv_obj_class_private.h"
 #include "lv_obj_private.h"
 #include "../indev/lv_indev_private.h"
-#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -51,7 +51,7 @@ lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void *
 {
     LV_CHECK_ARG(obj != NULL, return LV_RESULT_OK);
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     lv_event_t e;
     e.current_target = obj;
@@ -106,7 +106,7 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
     LV_CHECK_ARG(event_cb != NULL, return NULL);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     if(!lv_obj_allocate_spec_attr(obj)) {
         return NULL;
