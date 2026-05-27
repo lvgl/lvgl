@@ -230,8 +230,7 @@ target_include_directories(lvgl SYSTEM PUBLIC
     $<BUILD_INTERFACE:${LVGL_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CONF_INC_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 # Propagate the compiler definitions set on LVGL to the rest of the targets
@@ -275,7 +274,7 @@ if(CONFIG_LV_BUILD_EXAMPLES)
     add_library(lvgl::examples ALIAS lvgl_examples)
     target_include_directories(lvgl_examples SYSTEM PUBLIC
         $<BUILD_INTERFACE:${LVGL_ROOT_DIR}/examples>
-        $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
     set_target_properties(lvgl_examples PROPERTIES COMPILE_DEFINITIONS "${COMP_DEF}")
     target_link_libraries(lvgl_examples PRIVATE lvgl)
@@ -291,7 +290,7 @@ if(CONFIG_LV_BUILD_DEMOS)
     add_library(lvgl::demos ALIAS lvgl_demos)
     target_include_directories(lvgl_demos SYSTEM PUBLIC
         $<BUILD_INTERFACE:${LVGL_ROOT_DIR}/demos>
-        $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
     set_target_properties(lvgl_demos PROPERTIES COMPILE_DEFINITIONS "${COMP_DEF}")
     target_link_libraries(lvgl_demos PRIVATE lvgl)
