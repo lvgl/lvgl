@@ -127,7 +127,6 @@ endfunction()
 
 # No find_package nor pkgconfig support. Links targets normally 
 # Only registers PKG_LIB_PRIVATE for .pc Libs.private
-# Nothing exported to CMake consumers
 function(lvgl_link_raw)
   set(multiValueArgs TARGETS PKG_LIB_PRIVATE)
   cmake_parse_arguments(ARG "" "" "${multiValueArgs}" ${ARGN})
@@ -138,5 +137,6 @@ function(lvgl_link_raw)
 
   if(ARG_PKG_LIB_PRIVATE)
     lvgl_add_pkg_libs_private(${ARG_PKG_LIB_PRIVATE})
+    lvgl_add_cmake_raw_libs(${ARG_PKG_LIB_PRIVATE})
   endif()
 endfunction()
