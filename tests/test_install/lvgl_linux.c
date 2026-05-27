@@ -16,6 +16,6 @@ int main(void)
 
     while(1) {
         uint32_t ms = lv_timer_handler();
-        lv_sleep_ms(ms * 1000);
+        lv_sleep_ms(ms);
     }
 }
