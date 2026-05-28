@@ -873,7 +873,7 @@ menu "LVGL configuration"
 				help
 					When enabled, LV_CHECK_OBJ verifies that the object has the
 					expected class (lv_obj_has_class). When disabled, the class
-					check is skipped even if a class argument is supplied.
+					check is skipped (LV_CHECK_OBJ collapses to a NULL check).
 
 			config LV_USE_CHECK_OBJ_VALIDITY
 				bool "Enable widget-tree validity check in LV_CHECK_OBJ"
@@ -881,20 +881,21 @@ menu "LVGL configuration"
 				depends on LV_USE_CHECK_ARG
 				help
 					When enabled, LV_CHECK_OBJ also verifies that the object is
-					still part of the widget tree (lv_obj_is_valid). When disabled,
-					the validity check is skipped even if the associated argument
-					is supplied.
+					still part of the widget tree (lv_obj_belongs_to_display). When
+					disabled, the validity check is skipped (only the class/NULL
+					check remains).
 
 			config LV_USE_CHECK_OBJ_PARENT_LINK
-				bool "Enable parent-link consistency check in lv_obj_is_valid"
+				bool "Enable parent-link consistency check in lv_obj_belongs_to_display"
 				default n
 				depends on LV_USE_CHECK_OBJ_VALIDITY
 				help
-					When enabled, lv_obj_is_valid verifies — while walking up the
-					parent chain — that each parent's children array actually contains
-					the child. This catches corruption where a child's parent pointer
-					disagrees with the parent's children list. Slower than the basic
-					reachability check (O(siblings) per level instead of O(1)).
+					When enabled, lv_obj_belongs_to_display verifies — while walking
+					up the parent chain — that each parent's children array actually
+					contains the child. This catches corruption where a child's
+					parent pointer disagrees with the parent's children list. Slower
+					than the basic reachability check (O(siblings) per level instead
+					of O(1)).
 
 			config LV_CHECK_ARG_LOG_MODE
 				int

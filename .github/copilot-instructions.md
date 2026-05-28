@@ -23,7 +23,7 @@ Code must be portable, memory-efficient, and bare-metal safe.
 ## Embedded Performance (flag in hot paths)
 
 - No heap allocation in draw loops, event handlers, timer callbacks
-- Avoid `lv_obj_is_valid()` in internal callbacks — walks entire object tree
+- Avoid `lv_obj_belongs_to_display()` in internal callbacks — walks parent chain plus scans display screen lists
 - `lv_free(NULL)` is safe — no redundant NULL check before it
 
 ## Naming & Style
