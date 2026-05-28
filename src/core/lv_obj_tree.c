@@ -624,6 +624,8 @@ int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * cl
 
 void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
 {
+    LV_CHECK_ARG(cb != NULL, return);
+
     walk_core(start_obj, cb, user_data);
 }
 
