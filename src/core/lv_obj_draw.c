@@ -361,6 +361,8 @@ void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_
 
 int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 {
+    LV_CHECK_ARG(obj != NULL, return 0);
+
     LV_PROFILER_DRAW_BEGIN;
     int32_t s = 0;
 
