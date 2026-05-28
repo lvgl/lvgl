@@ -33,9 +33,11 @@ void lv_example_scroll_events(void)
 
     lv_obj_t * label = lv_label_create(scr);
     lv_label_set_text(label, "Scroll the panel");
+    lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 10);
 
     lv_obj_t * panel = lv_obj_create(scr);
     lv_obj_set_size(panel, 240, 170);
+    lv_obj_center(panel);
     lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_COLUMN);
     lv_obj_add_event_cb(panel, scroll_event_cb, LV_EVENT_SCROLL, label);
 

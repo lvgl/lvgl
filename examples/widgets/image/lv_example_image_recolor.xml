@@ -1,0 +1,30 @@
+<!--
+ @title Image recolor
+ @brief Mix a tint into an image; a slider drives the recolor intensity live via `bind_style_prop`.
+
+ The image's MAIN part exposes `image_recolor` (the colour to mix in) and
+ `image_recolor_opa` (the intensity, 0..255). Here `image_recolor` is set
+ statically and `image_recolor_opa` is bound to `subject_opa` through
+ `<bind_style_prop>`. Dragging the slider — which is also bound to
+ `subject_opa` — rewrites the subject and the binding pushes the new
+ intensity into the style, so the image retints in real time without any
+ event callback.
+-->
+<screen>
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 Drag the slider; the logo's tint fades in and out as `subject_opa` (0..255) moves. -->
+		<lv_image name="image" src="img_example_lvgl_logo" style_image_recolor-main="0x6366f1">
+			<bind_style_prop prop="image_recolor_opa" selector="main" subject="subject_opa" />
+		</lv_image>
+
+		<lv_slider name="slider" width="240" min_value="0" max_value="255" bind_value="subject_opa" />
+
+		<lv_label name="label" bind_text="subject_opa" bind_text-fmt="recolor_opa = %d / 255" />
+	</view>
+</screen>

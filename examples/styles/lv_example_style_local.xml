@@ -1,0 +1,48 @@
+<!--
+ @title Local style override
+ @brief Local properties — including state selectors — beat the shared style.
+
+ All three buttons share `style_shared` (indigo, dark border, radius).
+ "Override" adds a plain local `style_bg_color`, so it is always pink.
+ "On press" adds a state-scoped local `style_bg_color-pressed`, so it
+ turns green only while held. Both keep the shared border, showing local
+ styles — and local *state* selectors — have the highest precedence.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- Shared style applied to every button -->
+		<style
+			name="style_shared"
+			radius="14"
+			bg_opa="100%"
+			bg_color="#accent"
+			border_width="3"
+			border_color="0x312e81"
+			pad_all="14"
+			text_color="0xffffff"
+		/>
+	</styles>
+
+	<view flex_flow="row" style_flex_main_place="center" style_flex_track_place="center">
+		<!-- 💡 "Override" is always pink; press "On press" — its `style_bg_color-pressed` wins only while held. Borders never change. -->
+		<lv_button name="button_1" width="95">
+			<style name="style_shared" />
+			<lv_label name="label_1" align="center" text="Shared" />
+		</lv_button>
+
+		<!-- Plain local override: fill always wins over the shared style -->
+		<lv_button name="button_2" width="95" style_bg_color="0xec4899">
+			<style name="style_shared" />
+			<lv_label name="label_2" align="center" text="Override" />
+		</lv_button>
+
+		<!-- Local state selector: overrides the fill only while pressed -->
+		<lv_button name="button_3" width="95" style_bg_color-pressed="0x10b981">
+			<style name="style_shared" />
+			<lv_label name="label_3" align="center" text="On press" />
+		</lv_button>
+	</view>
+</screen>

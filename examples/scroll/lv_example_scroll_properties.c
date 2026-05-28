@@ -41,7 +41,7 @@ static void add_flag_row(lv_obj_t * parent, const char * title, lv_obj_flag_t fl
 void lv_example_scroll_properties(void)
 {
     lv_obj_t * panel = lv_obj_create(lv_screen_active());
-    lv_obj_set_size(panel, lv_pct(80), lv_pct(95));
+    lv_obj_set_size(panel, 300, 220);
     lv_obj_center(panel);
     lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_COLUMN);
 

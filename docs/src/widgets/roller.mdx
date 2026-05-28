@@ -11,7 +11,7 @@ the other items due to different styles applied to it.
 
 ## Setting the list items
 
-<LvglExample name="lv_example_roller_options" path="widgets/roller/roller_options/lv_example_roller_options" />
+<LvglExample name="lv_example_roller_options" path="widgets/roller/lv_example_roller_options" />
 
 <ApiLink name="lv_roller_set_options" display="lv_roller_set_options(roller, &quot;First\nSecond\nThird&quot;, LV_ROLLER_MODE_NORMAL)" />
 sets the items; `\n` separates them. Use <ApiLink name="LV_ROLLER_MODE_INFINITE" /> for a
@@ -28,7 +28,7 @@ Select programmatically with <ApiLink name="lv_roller_set_selected" display="lv_
 
 ## Visible rows
 
-<LvglExample name="lv_example_roller_visible_rows" path="widgets/roller/roller_visible_rows/lv_example_roller_visible_rows" />
+<LvglExample name="lv_example_roller_visible_rows" path="widgets/roller/lv_example_roller_visible_rows" />
 
 <ApiLink name="lv_roller_set_visible_row_count" display="lv_roller_set_visible_row_count(roller, n)" /> sets how many list rows are
 visible. The pixel height is derived from the current font and spacing —
@@ -50,7 +50,7 @@ call this again after any change to those styles.
    the Roller).  Besides the typical background properties, it uses text style
    properties to change the appearance of the text of the selected item.
 
-<LvglExample name="lv_example_roller_styling" path="widgets/roller/roller_styling/lv_example_roller_styling" />
+<LvglExample name="lv_example_roller_styling" path="widgets/roller/lv_example_roller_styling" />
 
 Roller has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the listbox
 background and unselected items) and <ApiLink name="LV_PART_SELECTED" /> (the
@@ -81,7 +81,7 @@ subjects are supported.
 To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
 
 
-<LvglExample name="lv_example_roller_bind_value" path="widgets/roller/roller_bind_value/lv_example_roller_bind_value" />
+<LvglExample name="lv_example_roller_bind_value" path="widgets/roller/lv_example_roller_bind_value" />
 
 ## Fade mask via draw events
 

@@ -1,0 +1,37 @@
+<!--
+ @title Background gradient
+ @brief Blend two colors vertically and shift where the blend happens.
+
+ `bg_color` and `bg_grad_color` are the two stops; `bg_grad_dir="ver"`
+ blends top-to-bottom. `bg_main_stop="80"` keeps the indigo solid only
+ briefly and `bg_grad_stop="220"` stretches the blend almost to the
+ bottom, so most of the card is transition rather than flat color.
+-->
+<screen>
+	<styles>
+		<!-- Indigo→pink vertical blend with a matching glow -->
+		<style
+			name="style_grad"
+			radius="20"
+			bg_opa="100%"
+			bg_color="0x6366f1"
+			bg_grad_color="0xec4899"
+			bg_grad_dir="ver"
+			bg_main_stop="80"
+			bg_grad_stop="220"
+			shadow_color="0x6366f1"
+			shadow_width="26"
+			shadow_offset_y="10"
+			shadow_opa="70"
+			text_color="0xffffff"
+		/>
+	</styles>
+
+	<view>
+		<!-- 💡 Slide `bg_main_stop`/`bg_grad_stop` (0..255) to move where the indigo→pink blend starts and ends. -->
+		<lv_obj name="container" width="210" height="150" align="center">
+			<style name="style_grad" />
+			<lv_label name="label" align="center" text="Gradient" />
+		</lv_obj>
+	</view>
+</screen>

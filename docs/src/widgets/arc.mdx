@@ -10,7 +10,7 @@ The Arc consists of a background and a foreground arc. The foreground
 
 ## Value and range
 
-<LvglExample name="lv_example_arc_value_range" path="widgets/arc/arc_value_range/lv_example_arc_value_range" />
+<LvglExample name="lv_example_arc_value_range" path="widgets/arc/lv_example_arc_value_range" />
 
 A new value can be set using <ApiLink name="lv_arc_set_value" display="lv_arc_set_value(arc, new_value)" />. The
 value is interpreted in a range (minimum and maximum values) which can
@@ -31,14 +31,14 @@ the range [0..360].
 
 ## Rotation
 
-<LvglExample name="lv_example_arc_rotation" path="widgets/arc/arc_rotation/lv_example_arc_rotation" />
+<LvglExample name="lv_example_arc_rotation" path="widgets/arc/lv_example_arc_rotation" />
 
 An offset to the 0-degree position can be added with
 <ApiLink name="lv_arc_set_rotation" display="lv_arc_set_rotation(arc, deg)" />.
 
 ## Mode
 
-<LvglExample name="lv_example_arc_mode" path="widgets/arc/arc_mode/lv_example_arc_mode" />
+<LvglExample name="lv_example_arc_mode" path="widgets/arc/lv_example_arc_mode" />
 
 The Arc can be one of the following modes:
 
@@ -53,7 +53,7 @@ is changed by pointer input (finger, mouse, etc.).
 
 ## Change rate
 
-<LvglExample name="lv_example_arc_change_rate" path="widgets/arc/arc_change_rate/lv_example_arc_change_rate" />
+<LvglExample name="lv_example_arc_change_rate" path="widgets/arc/lv_example_arc_change_rate" />
 
 When the Arc's value is changed by pointer input (finger, mouse, etc.), the rate of
 its change is limited according to its *change rate*.  Change rate is defined in
@@ -73,7 +73,7 @@ degrees/second units and can be set with
    size is the same as the indicator's width. Larger padding makes it
    larger, smaller padding makes it smaller.
 
-<LvglExample name="lv_example_arc_styling" path="widgets/arc/arc_styling/lv_example_arc_styling" />
+<LvglExample name="lv_example_arc_styling" path="widgets/arc/lv_example_arc_styling" />
 
 Arc's three parts — <ApiLink name="LV_PART_MAIN" /> (background ring),
 <ApiLink name="LV_PART_INDICATOR" /> (active arc), and
@@ -87,7 +87,7 @@ or apply one-off tweaks with local `style_*` attributes on the
 
 ### Image indicator
 
-<LvglExample name="lv_example_arc_img_indicator" path="widgets/arc/arc_img_indicator/lv_example_arc_img_indicator" />
+<LvglExample name="lv_example_arc_img_indicator" path="widgets/arc/lv_example_arc_img_indicator" />
 
 Setting `arc_image_src` on a part replaces the solid `arc_color` with pixels
 sampled from a bitmap. The image is centred on the arc's centre point and the
@@ -107,7 +107,7 @@ relative to the end of the Arc.  The knob offset can be set by
 
 ## Setting indicator programmatically
 
-<LvglExample name="lv_example_arc_set_angles" path="widgets/arc/arc_set_angles/lv_example_arc_set_angles" />
+<LvglExample name="lv_example_arc_set_angles" path="widgets/arc/lv_example_arc_set_angles" />
 
 Set the indicator angle directly with:
 
@@ -151,7 +151,7 @@ event of the Arc.
 
 ## Pie chart from arcs
 
-<LvglExample name="lv_example_arc_pie_chart" path="widgets/arc/arc_pie_chart/lv_example_arc_pie_chart" />
+<LvglExample name="lv_example_arc_pie_chart" path="widgets/arc/lv_example_arc_pie_chart" />
 
 A pie chart is built from several arcs that share the same centre. Each arc
 carves out one slice via `bg_start_angle`/`bg_end_angle`, fixes `value` to
@@ -186,7 +186,7 @@ when <ApiLink name="LV_USE_FLOAT" /> is enabled.
 To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
 
 
-<LvglExample name="lv_example_arc_bind_value" path="widgets/arc/arc_bind_value/lv_example_arc_bind_value" />
+<LvglExample name="lv_example_arc_bind_value" path="widgets/arc/lv_example_arc_bind_value" />
 
 ## Events
 

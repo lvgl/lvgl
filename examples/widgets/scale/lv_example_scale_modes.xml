@@ -1,0 +1,99 @@
+<!--
+ @title Scale linear modes
+ @brief Horizontal and vertical scales, ticks on either side of the rail.
+
+ Linear scales come in four flavours: `horizontal_top` / `horizontal_bottom`
+ lay the rail across and put ticks above or below it; `vertical_left` /
+ `vertical_right` rotate the same idea 90°. The four scales below share the
+ same tick count and value range so the only visible difference is layout.
+-->
+<screen>
+	<view>
+		<!-- 💡 Swap `mode` between the four `horizontal_*`/`vertical_*` values to compare layouts. -->
+
+		<lv_scale
+			name="scale_1"
+			width="120"
+			height="30"
+			mode="horizontal_top"
+			total_tick_count="11"
+			major_tick_every="2"
+			label_show="true"
+			min_value="0"
+			max_value="100"
+			align="left_mid"
+			y="20"
+			x="20"
+		/>
+
+		<lv_scale
+			name="scale_2"
+			width="120"
+			height="30"
+			mode="horizontal_bottom"
+			total_tick_count="11"
+			major_tick_every="2"
+			label_show="true"
+			min_value="0"
+			max_value="100"
+			align="left_mid"
+			y="-20"
+			x="20"
+		/>
+
+		<lv_scale
+			name="scale_3"
+			width="120"
+			height="120"
+			mode="round_outer"
+			total_tick_count="11"
+			major_tick_every="2"
+			label_show="true"
+			min_value="0"
+			max_value="100"
+			align="center"
+		/>
+
+
+		<lv_scale
+			name="scale_4"
+			width="90"
+			height="90"
+			mode="round_inner"
+			total_tick_count="11"
+			major_tick_every="2"
+			label_show="true"
+			min_value="0"
+			max_value="100"
+			align="center"
+		/>
+
+		<lv_scale
+			name="scale_5"
+			width="30"
+			height="160"
+			mode="vertical_left"
+			total_tick_count="11"
+			major_tick_every="2"
+			label_show="true"
+			min_value="0"
+			max_value="100"
+			align="right_mid"
+			x="-20"
+		/>
+
+		<lv_scale
+			name="scale_6"
+			width="30"
+			height="160"
+			mode="vertical_right"
+			total_tick_count="11"
+			major_tick_every="2"
+			label_show="true"
+			min_value="0"
+			max_value="100"
+			align="right_mid"
+			x="-60"
+		/>
+	</view>
+</screen>

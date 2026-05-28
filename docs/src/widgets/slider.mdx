@@ -11,7 +11,7 @@ can be vertical or horizontal.
 
 ## Value, range and orientation
 
-<LvglExample name="lv_example_slider_value_range_orientation" path="widgets/slider/slider_value_range_orientation/lv_example_slider_value_range_orientation" />
+<LvglExample name="lv_example_slider_value_range_orientation" path="widgets/slider/lv_example_slider_value_range_orientation" />
 
 Defaults: `value` = 0, range = `[0..100]`, horizontal orientation,
 width/height roughly 2"/0.1" (scaled by <ApiLink name="LV_DPI_DEF" />).
@@ -26,14 +26,14 @@ width/height roughly 2"/0.1" (scaled by <ApiLink name="LV_DPI_DEF" />).
 
 ## Reversed direction
 
-<LvglExample name="lv_example_slider_reversed_direction" path="widgets/slider/slider_reversed_direction/lv_example_slider_reversed_direction" />
+<LvglExample name="lv_example_slider_reversed_direction" path="widgets/slider/lv_example_slider_reversed_direction" />
 
 Swap `min` and `max` to reverse the fill direction without changing
 orientation — useful for right-to-left progress or top-down level meters.
 
 ## Modes
 
-<LvglExample name="lv_example_slider_modes" path="widgets/slider/slider_modes/lv_example_slider_modes" />
+<LvglExample name="lv_example_slider_modes" path="widgets/slider/lv_example_slider_modes" />
 
 The Slider can be in one of the following modes:
 
@@ -59,7 +59,7 @@ The mode can be changed with <ApiLink name="lv_slider_set_mode" display="lv_slid
    with side length equal to the smaller dimension of the Slider.  The knob can be
    made larger with the `padding` values.  Padding values can be asymmetric as well.
 
-<LvglExample name="lv_example_slider_styling" path="widgets/slider/slider_styling/lv_example_slider_styling" />
+<LvglExample name="lv_example_slider_styling" path="widgets/slider/lv_example_slider_styling" />
 
 Slider has three parts: <ApiLink name="LV_PART_MAIN" /> (track),
 <ApiLink name="LV_PART_INDICATOR" /> (filled portion), and
@@ -74,7 +74,7 @@ MAIN.
 
 ### Image indicator
 
-<LvglExample name="lv_example_slider_img_indicator" path="widgets/slider/slider_img_indicator/lv_example_slider_img_indicator" />
+<LvglExample name="lv_example_slider_img_indicator" path="widgets/slider/lv_example_slider_img_indicator" />
 
 Setting `bg_image_src` on a part adds a bitmap on top of the solid fill,
 clipped to the part's current bounds. The track
@@ -114,13 +114,13 @@ the subject moves the knob. Integer and float subjects are both supported.
 To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
 
 
-<LvglExample name="lv_example_slider_bind_value" path="widgets/slider/slider_bind_value/lv_example_slider_bind_value" />
+<LvglExample name="lv_example_slider_bind_value" path="widgets/slider/lv_example_slider_bind_value" />
 
 A Slider's value can also drive another widget's state via the generic
 `bind_state_if_*` helpers — handy for guards like "disable submit when the
 value exceeds a threshold".
 
-<LvglExample name="lv_example_slider_bind_state" path="widgets/slider/slider_bind_state/lv_example_slider_bind_state" />
+<LvglExample name="lv_example_slider_bind_state" path="widgets/slider/lv_example_slider_bind_state" />
 
 ## Events
 

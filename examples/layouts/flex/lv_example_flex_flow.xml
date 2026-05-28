@@ -1,0 +1,57 @@
+<!--
+ @title Flex flow
+ @brief Arrange children with a flex flow direction.
+
+ A single row_wrap container holds enough buttons to overflow one line, so wrapping kicks
+ in. Try other flex_flow values (row, column, row_reverse, column_wrap_reverse) to see
+ how item order and wrap direction change with the same set of children.
+-->
+<screen>
+	<view>
+		<!-- 💡 Adjust flex_flow (row, column, row_wrap, row_reverse) to see how item order and wrapping change. -->
+		<!-- Try other values for flex_flow, such as "row", "column", "column_wrap_reverse" -->
+		<!-- Demo container with row wrapping -->
+		<lv_obj align="center" flex_flow="row_wrap" width="90%" height="50%" name="example_flex_flow">
+			<!-- Item sequence to visualize wrapping -->
+			<lv_button name="button_1">
+				<lv_label name="label_1" text="First" />
+			</lv_button>
+
+			<lv_button name="button_2">
+				<lv_label name="label_2" text="Second" />
+			</lv_button>
+
+			<lv_button name="button_3">
+				<lv_label name="label_3" text="Third" />
+			</lv_button>
+
+			<lv_button name="button_4">
+				<lv_label name="label_4" text="Forth" />
+			</lv_button>
+
+			<lv_button name="button_5">
+				<lv_label name="label_5" text="Fifth" />
+			</lv_button>
+
+			<lv_button name="button_6">
+				<lv_label name="label_6" text="Sixth" />
+			</lv_button>
+
+			<lv_button name="button_7">
+				<lv_label name="label_7" text="Seventh" />
+			</lv_button>
+
+			<lv_button name="button_8">
+				<lv_label name="label_8" text="Eighth" />
+			</lv_button>
+
+			<lv_button name="button_9">
+				<lv_label name="label_9" text="Ninth" />
+			</lv_button>
+
+			<lv_button name="button_10">
+				<lv_label name="label_10" text="Tenth" />
+			</lv_button>
+		</lv_obj>
+	</view>
+</screen>

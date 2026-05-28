@@ -55,6 +55,18 @@ ROOT_METADATA = {"project.xml", "globals.xml"}
 # folders.
 TOPICS_WITHOUT_LV_USE = {"scroll", "styles", "obj"}
 
+# Categories that group several independent topics, each with its own
+# `LV_USE_<TOPIC>` macro and `lv_example_<topic>.h` header. For these the
+# topic folder is `examples/<category>/<topic>`. Every other category is
+# itself a single topic (e.g. `scroll`, `styles`), so its topic folder is
+# `examples/<category>`.
+#
+# Widget examples are flat (`widgets/<topic>/lv_example_*.xml`); `layouts`
+# and `libs` still nest a feature folder
+# (`<category>/<topic>/<feature>/lv_example_*.xml`). Resolving the topic by
+# category rather than by directory depth handles both layouts uniformly.
+MULTI_TOPIC_CATEGORIES = {"widgets", "layouts", "libs"}
+
 
 def find_example_xmls() -> list[Path]:
     """Return every example XML under `examples/` worth processing.
@@ -135,12 +147,22 @@ def generate_one(xml_path: Path, cli_path: str) -> bool:
 
 
 def _topic_dir_for(xml: Path) -> Path:
-    """Return the topic folder for an XML (the parent of its containing dir).
+    """Return the topic folder for an example XML.
 
-    Convention: examples live as `<topic>/<feature>/lv_example_<...>.xml`,
-    so the topic folder is two levels up from the XML file itself.
+    The topic folder owns the shared `lv_example_<topic>.h` header and maps
+    to the `LV_USE_<TOPIC>` build guard. For a multi-topic category
+    (`widgets`/`layouts`/`libs`) it is `examples/<category>/<topic>`;
+    otherwise the category folder itself is the topic. Computed from the
+    category, not the directory depth, so flat widget examples
+    (`widgets/<topic>/lv_example_*.xml`) and still-nested layouts/libs
+    (`<category>/<topic>/<feature>/...`) both resolve correctly.
     """
-    return xml.parent.parent
+    if EXAMPLES_DIR not in xml.parents:
+        return xml.parent
+    parts = xml.relative_to(EXAMPLES_DIR).parts
+    if parts[0] in MULTI_TOPIC_CATEGORIES and len(parts) >= 3:
+        return EXAMPLES_DIR / parts[0] / parts[1]
+    return EXAMPLES_DIR / parts[0]
 
 
 def _guard_expr_for(xml_path: Path) -> str:
@@ -196,10 +218,11 @@ def wrap_with_build_guard(xml_path: Path, c_path: Path) -> None:
 # comes from a `.c` file actually present in the widget's folder — there is
 # no marker / preserved-region machinery.
 #
-# Convention used to map `.c` file → prototype:
-#   * `<topic>/lv_example_<stem>.c`            → C-only example.
-#   * `<topic>/<feature>/lv_example_<stem>.c`  → XML-generated example.
-# Both map to `void lv_example_<stem>(void)`.
+# Convention used to map `.c` file → prototype. Both forms map to
+# `void lv_example_<stem>(void)`:
+#   * `<topic>/lv_example_<stem>.c`            → directly in the topic folder
+#     (every widget example, plus C-only examples anywhere).
+#   * `<topic>/<feature>/lv_example_<stem>.c`  → still-nested layouts/libs.
 HEADER_TEMPLATE = """\
 /**
  * @file {header_name}
@@ -226,15 +249,15 @@ extern "C" {{
 def _collect_prototypes(topic_dir: Path) -> list[str]:
     """Return prototype lines for every `.c` example under `topic_dir`.
 
-    XML-generated examples sit in feature subfolders; legacy C-only
-    examples sit directly in the widget folder. Both use the bare file
-    stem as the function name (`void <stem>(void)`) and appear in the same
-    header so consumers don't have to know which is which.
+    Examples sit either directly in the topic folder (every widget example
+    and any C-only example) or in a feature subfolder (still-nested
+    layouts/libs). Both globs are unioned so the header lists them all,
+    each using the bare file stem as the function name (`void <stem>(void)`).
     """
-    xml_stems = {c.stem for c in topic_dir.glob("*/lv_example_*.c")}
-    legacy_stems = {c.stem for c in topic_dir.glob("lv_example_*.c")}
+    nested_stems = {c.stem for c in topic_dir.glob("*/lv_example_*.c")}
+    direct_stems = {c.stem for c in topic_dir.glob("lv_example_*.c")}
 
-    return [f"void {stem}(void);" for stem in sorted(xml_stems | legacy_stems)]
+    return [f"void {stem}(void);" for stem in sorted(nested_stems | direct_stems)]
 
 
 def write_topic_headers(touched: list[Path]) -> list[Path]:
