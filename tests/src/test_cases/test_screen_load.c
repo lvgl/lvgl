@@ -51,7 +51,7 @@ void test_screen_load_with_delete_no_crash(void)
     /*Check for the screens status after the transition*/
     TEST_ASSERT_NULL(screen_with_anim_1);
     TEST_ASSERT_NULL(screen_with_anim_2);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(screen_with_anim_3));
+    TEST_ASSERT_TRUE(lv_obj_belongs_to_display(screen_with_anim_3));
 }
 
 void test_screen_load_with_delete_no_crash2(void)
@@ -90,7 +90,7 @@ void test_screen_load_with_delete_no_crash2(void)
     TEST_ASSERT_NULL(screen_with_anim_1);
     TEST_ASSERT_NULL(screen_with_anim_2);
     TEST_ASSERT_NULL(screen_with_anim_3);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(screen_with_anim_4));
+    TEST_ASSERT_TRUE(lv_obj_belongs_to_display(screen_with_anim_4));
 }
 
 static bool screen_1_unloaded_called = false;
@@ -140,7 +140,7 @@ void test_screen_load_with_delete_event(void)
     TEST_ASSERT_NULL(screen_with_anim_1);
     TEST_ASSERT_NULL(screen_with_anim_2);
     TEST_ASSERT_NULL(screen_with_anim_3);
-    TEST_ASSERT_TRUE(lv_obj_is_valid(screen_with_anim_4));
+    TEST_ASSERT_TRUE(lv_obj_belongs_to_display(screen_with_anim_4));
 }
 
 static size_t display_screen_load_start = 0;
