@@ -885,6 +885,17 @@ menu "LVGL configuration"
 					the validity check is skipped even if the associated argument
 					is supplied.
 
+			config LV_USE_CHECK_OBJ_PARENT_LINK
+				bool "Enable parent-link consistency check in lv_obj_is_valid"
+				default n
+				depends on LV_USE_CHECK_OBJ_VALIDITY
+				help
+					When enabled, lv_obj_is_valid verifies — while walking up the
+					parent chain — that each parent's children array actually contains
+					the child. This catches corruption where a child's parent pointer
+					disagrees with the parent's children list. Slower than the basic
+					reachability check (O(siblings) per level instead of O(1)).
+
 			config LV_CHECK_ARG_LOG_MODE
 				int
 				depends on LV_USE_CHECK_ARG

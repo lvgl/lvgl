@@ -1593,6 +1593,23 @@
     #endif
 #endif
 
+/** If enabled, lv_obj_is_valid will verify — while walking up the parent chain —
+ * that each parent's children array actually contains the child.
+ * This catches corruption where a child's parent pointer disagrees with the
+ * parent's children list. Slower than the basic reachability check (O(siblings)
+ * per level instead of O(1)). Requires LV_USE_CHECK_OBJ_VALIDITY to have effect. */
+#ifndef LV_USE_CHECK_OBJ_PARENT_LINK
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
+            #define LV_USE_CHECK_OBJ_PARENT_LINK CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
+        #else
+            #define LV_USE_CHECK_OBJ_PARENT_LINK 0
+        #endif
+    #else
+        #define LV_USE_CHECK_OBJ_PARENT_LINK 0
+    #endif
+#endif
+
 /*-------------
  * Debug
  *-----------*/

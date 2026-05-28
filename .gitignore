@@ -21,3 +21,4 @@ config.h
 defconfig
 env/*
 docs-venv
+build_check
