@@ -1599,12 +1599,8 @@
  * parent's children list. Slower than the basic reachability check (O(siblings)
  * per level instead of O(1)). Requires LV_USE_CHECK_OBJ_VALIDITY to have effect. */
 #ifndef LV_USE_CHECK_OBJ_PARENT_LINK
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
-            #define LV_USE_CHECK_OBJ_PARENT_LINK CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
-        #else
-            #define LV_USE_CHECK_OBJ_PARENT_LINK 0
-        #endif
+    #ifdef CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
+        #define LV_USE_CHECK_OBJ_PARENT_LINK CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
     #else
         #define LV_USE_CHECK_OBJ_PARENT_LINK 0
     #endif
