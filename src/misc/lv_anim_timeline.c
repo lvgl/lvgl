@@ -47,7 +47,7 @@ lv_anim_timeline_t * lv_anim_timeline_create(void)
 
 void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
 
     lv_anim_timeline_pause(at);
 
@@ -57,7 +57,8 @@ void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 
 void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv_anim_t * a)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
+    LV_CHECK_ARG(a != NULL, return);
 
     at->anim_dsc_cnt++;
     at->anim_dsc = lv_realloc(at->anim_dsc, at->anim_dsc_cnt * sizeof(lv_anim_timeline_dsc_t));
@@ -70,7 +71,7 @@ void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv
 
 uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return 0);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     uint32_t repeat = at->repeat_count;
@@ -107,38 +108,38 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
 
 void lv_anim_timeline_pause(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
 
     lv_anim_delete(at, anim_timeline_exec_cb);
 }
 
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
     at->reverse = reverse;
 }
 
 void lv_anim_timeline_set_delay(lv_anim_timeline_t * at, uint32_t delay)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
     at->delay = delay;
 }
 
 void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
     at->repeat_count = cnt;
 }
 
 void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
     at->repeat_delay = delay;
 }
 
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     uint32_t act_time = lv_map(progress, 0, LV_ANIM_TIMELINE_PROGRESS_MAX, 0, playtime);
@@ -147,13 +148,13 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 
 void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return);
     at->user_data = user_data;
 }
 
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return 0);
 
     uint32_t playtime = 0;
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
@@ -171,44 +172,46 @@ uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 
 bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return false);
     return at->reverse;
 }
 
 
 uint32_t lv_anim_timeline_get_delay(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return 0);
     return at->delay;
 }
 
 uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return 0);
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     return lv_map(at->act_time, 0, playtime, 0, LV_ANIM_TIMELINE_PROGRESS_MAX);
 }
 
 uint32_t lv_anim_timeline_get_repeat_count(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return 0);
     return  at->repeat_count;
 }
 
 uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return 0);
     return  at->repeat_delay;
 }
 
 void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_CHECK_ARG(at != NULL, return NULL);
     return at->user_data;
 }
 
 void lv_anim_timeline_merge(lv_anim_timeline_t * dest, const lv_anim_timeline_t * src, int32_t delay)
 {
+    LV_CHECK_ARG(dest != NULL, return);
+    LV_CHECK_ARG(src != NULL, return);
     uint32_t i;
     for(i = 0; i < src->anim_dsc_cnt; i++) {
         uint32_t anim_delay = src->anim_dsc[i].start_time + delay;
