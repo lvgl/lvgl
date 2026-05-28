@@ -1,0 +1,23 @@
+<!--
+ @title Label set text with newlines
+ @brief Insert explicit line breaks into a label's text.
+
+ In XML attributes the &#10; entity produces a newline; using two of them in a row leaves
+ a blank line between paragraphs. The second label demonstrates that the text attribute
+ also accepts plain text with no escaping for normal characters.
+-->
+<screen>
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 Adjust text and line breaks (&#10;) to test multi-line layout and spacing. -->
+		<!-- Label with explicit newline characters -->
+		<lv_label name="label_1" text="First line&#10;Second line&#10;&#10;Fourth line" />
+		<!-- Plain label for comparison -->
+		<lv_label name="label_2" text="Just a normal single line text." />
+	</view>
+</screen>

@@ -1,0 +1,31 @@
+<!--
+ @title Slider reversed direction
+ @brief Flip the fill direction by swapping min and max.
+
+ The two sliders are identical except that the second one declares min_value greater
+ than max_value. Swapping the two reverses the fill direction and the sign of motion
+ without touching orientation, styling, or layout.
+-->
+<screen>
+	<consts>
+		<color name="text_color" value="0x013992" />
+	</consts>
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 Reverse min/max to flip slider direction without changing orientation. -->
+		<!-- Forward direction: range 0..100 -->
+		<lv_slider name="slider_1" width="90%" height="20" min_value="0" max_value="100" value="30">
+			<lv_label name="label_1" align="center" text="0..100" style_text_color="#text_color" />
+		</lv_slider>
+
+		<!-- Reverse direction: range 100..0 -->
+		<lv_slider name="slider_2" width="90%" height="20" min_value="100" max_value="0" value="30">
+			<lv_label name="label_2" align="center" text="100..0" style_text_color="#text_color" />
+		</lv_slider>
+	</view>
+</screen>

@@ -18,7 +18,7 @@ the buttons with encoder and keyboard navigation as well.
 
 ## Button map
 
-<LvglExample name="lv_example_buttonmatrix_map" path="widgets/buttonmatrix/buttonmatrix_map/lv_example_buttonmatrix_map" />
+<LvglExample name="lv_example_buttonmatrix_map" path="widgets/buttonmatrix/lv_example_buttonmatrix_map" />
 
 <ApiLink name="lv_buttonmatrix_set_map" display="lv_buttonmatrix_set_map(bm, map)" /> assigns the button labels. The `map`
 is a `const char *` array terminated by `NULL` or `""`. A `"\n"` entry
@@ -31,7 +31,7 @@ lv_buttonmatrix_set_map(bm, map);
 
 ## Button widths
 
-<LvglExample name="lv_example_buttonmatrix_button_width" path="widgets/buttonmatrix/buttonmatrix_button_width/lv_example_buttonmatrix_button_width" />
+<LvglExample name="lv_example_buttonmatrix_button_width" path="widgets/buttonmatrix/lv_example_buttonmatrix_button_width" />
 
 <ApiLink name="lv_buttonmatrix_set_button_width" display="lv_buttonmatrix_set_button_width(bm, id, w)" /> makes a button take up `w`
 units of the row, similar to CSS `flex-grow`. `w` is in 1..15; default
@@ -53,7 +53,7 @@ Each button carries a bitmask of `LV_BUTTONMATRIX_CTRL_*` flags:
 | `RECOLOR` | Enable `#rrggbb …#` colour codes in the button text. |
 | `CUSTOM_1`, `CUSTOM_2` | Free for application use. |
 
-<LvglExample name="lv_example_buttonmatrix_button_ctrl" path="widgets/buttonmatrix/buttonmatrix_button_ctrl/lv_example_buttonmatrix_button_ctrl" />
+<LvglExample name="lv_example_buttonmatrix_button_ctrl" path="widgets/buttonmatrix/lv_example_buttonmatrix_button_ctrl" />
 
 Set or clear flags per button with
 <ApiLink name="lv_buttonmatrix_set_button_ctrl" display="lv_buttonmatrix_set_button_ctrl(bm, id, flags)" /> and `_clear_button_ctrl(...)`.
@@ -64,7 +64,7 @@ plus any control flags.
 
 ## Popover
 
-<LvglExample name="lv_example_buttonmatrix_popover" path="widgets/buttonmatrix/buttonmatrix_popover/lv_example_buttonmatrix_popover" />
+<LvglExample name="lv_example_buttonmatrix_popover" path="widgets/buttonmatrix/lv_example_buttonmatrix_popover" />
 
 The <ApiLink name="LV_BUTTONMATRIX_CTRL_POPOVER" /> flag shows the pressed button's
 text in a magnified popover above the finger, mirroring the on-screen keyboard
@@ -72,7 +72,7 @@ convention so the user can still read what they are pressing.
 
 ## Recolor
 
-<LvglExample name="lv_example_buttonmatrix_recolor" path="widgets/buttonmatrix/buttonmatrix_recolor/lv_example_buttonmatrix_recolor" />
+<LvglExample name="lv_example_buttonmatrix_recolor" path="widgets/buttonmatrix/lv_example_buttonmatrix_recolor" />
 
 The <ApiLink name="LV_BUTTONMATRIX_CTRL_RECOLOR" /> flag enables the same
 `#RRGGBB ... #` inline color syntax used by <ApiLink name="lv_label" /> recoloring, so individual
@@ -80,7 +80,7 @@ words or characters in a button's text can be colored without per-button styles.
 
 ## One checked
 
-<LvglExample name="lv_example_buttonmatrix_one_checked" path="widgets/buttonmatrix/buttonmatrix_one_checked/lv_example_buttonmatrix_one_checked" />
+<LvglExample name="lv_example_buttonmatrix_one_checked" path="widgets/buttonmatrix/lv_example_buttonmatrix_one_checked" />
 
 The "One-checked" feature can be enabled with
 <ApiLink name="lv_buttonmatrix_set_one_checked" display="lv_buttonmatrix_set_one_checked(btn_matrix, true)" /> to allow only one button to
@@ -94,7 +94,7 @@ be checked at a time.
 - <ApiLink name="LV_PART_ITEMS" /> The buttons all use the text and typical background
    style properties except translations and transformations.
 
-<LvglExample name="lv_example_buttonmatrix_styling" path="widgets/buttonmatrix/buttonmatrix_styling/lv_example_buttonmatrix_styling" />
+<LvglExample name="lv_example_buttonmatrix_styling" path="widgets/buttonmatrix/lv_example_buttonmatrix_styling" />
 
 Button Matrix has two stylable parts: <ApiLink name="LV_PART_MAIN" />
 (the container) and <ApiLink name="LV_PART_ITEMS" /> (each virtual

@@ -26,16 +26,14 @@ be any of these values:
 - <ApiLink name="LV_SCALE_MODE_ROUND_INNER" />
 - <ApiLink name="LV_SCALE_MODE_ROUND_OUTER" />
 
-<LvglExample name="lv_example_scale_modes" path="widgets/scale/scale_modes/lv_example_scale_modes" />
-
 The round variants additionally honour `angle_range` (the sweep in degrees)
 and `rotation` (offset of the first tick from 3 o'clock):
 
-<LvglExample name="lv_example_scale_round_modes" path="widgets/scale/scale_round_modes/lv_example_scale_round_modes" />
+<LvglExample name="lv_example_scale_modes" path="widgets/scale/lv_example_scale_modes" />
 
 ## Setting range
 
-<LvglExample name="lv_example_scale_range" path="widgets/scale/scale_range/lv_example_scale_range" />
+<LvglExample name="lv_example_scale_range" path="widgets/scale/lv_example_scale_range" />
 
 A Scale starts its life with a default numeric range of [0..100] and a default
 angular range of 270.  You can change these ranges with:
@@ -54,7 +52,7 @@ to paint them on top instead.
 
 ## Configuring ticks
 
-<LvglExample name="lv_example_scale_ticks" path="widgets/scale/scale_ticks/lv_example_scale_ticks" />
+<LvglExample name="lv_example_scale_ticks" path="widgets/scale/lv_example_scale_ticks" />
 
 - <ApiLink name="lv_scale_set_total_tick_count" display="lv_scale_set_total_tick_count(scale, n)" /> — total number of ticks drawn.
 - <ApiLink name="lv_scale_set_major_tick_every" display="lv_scale_set_major_tick_every(scale, n)" /> — every Nth tick is a major one.
@@ -105,7 +103,7 @@ Three stylable parts:
 
 ![Scale](/_static/images/scale.png)
 
-<LvglExample name="lv_example_scale_styling" path="widgets/scale/scale_styling/lv_example_scale_styling" />
+<LvglExample name="lv_example_scale_styling" path="widgets/scale/lv_example_scale_styling" />
 
 Use line-family properties (`line_color`/`line_width`/`line_opa`) on each
 part. <ApiLink name="LV_PART_INDICATOR" /> also picks up text properties for the numeric
@@ -155,7 +153,7 @@ move that end of the section band. Only integer subjects are supported.
 - <ApiLink name="lv_scale_bind_section_min_value" display="lv_scale_bind_section_min_value(scale, section1, &subject)" />
 - <ApiLink name="lv_scale_bind_section_max_value" display="lv_scale_bind_section_max_value(scale, section1, &subject)" />
 
-<LvglExample name="lv_example_scale_bind_section" path="widgets/scale/scale_bind_section/lv_example_scale_bind_section" />
+<LvglExample name="lv_example_scale_bind_section" path="widgets/scale/lv_example_scale_bind_section" />
 
 ### Styling Sections
 

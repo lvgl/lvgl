@@ -17,7 +17,6 @@ void lv_example_scale_label_recolor(void);
 void lv_example_scale_modes(void);
 void lv_example_scale_needles(void);
 void lv_example_scale_range(void);
-void lv_example_scale_round_modes(void);
 void lv_example_scale_styling(void);
 void lv_example_scale_sunset_sunrise(void);
 void lv_example_scale_ticks(void);

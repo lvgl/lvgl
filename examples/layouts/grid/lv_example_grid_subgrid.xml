@@ -1,0 +1,86 @@
+<!--
+ @title Grid sub-grid
+ @brief Nest a grid inside a cell of a parent grid.
+
+ The outer grid defines 3x2 tracks, and an inner grid occupies a 2x2 area within it. The
+ inner grid intentionally omits its own column/row descriptors so it inherits the parent
+ tracks, keeping its cells aligned with the outer grid's columns and rows.
+-->
+<screen>
+	<styles>
+		<!-- Shared style for parent and sub-grid tiles -->
+		<style name="style_tile" bg_opa="100%" text_color="0xffffff" pad_all="6" radius="4" />
+	</styles>
+
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="8">
+		<!-- Screen title label -->
+		<!-- 💡 Adjust descriptors, spans, and colors to explore sub-grid behavior. -->
+		<!-- Parent grid container -->
+		<lv_obj name="container_1"
+			style_grid_column_dsc_array="60 60 60"
+			style_grid_row_dsc_array="40 40"
+			style_layout="grid"
+			width="280"
+			height="content"
+		>
+			<!-- Parent grid item (column 0, row 0) -->
+			<!-- Label in the parent grid: left tile -->
+			<lv_label name="label_1" style_grid_cell_column_pos="0" style_grid_cell_row_pos="0" style_bg_color="0x1f77b4" text="P0,0">
+				<style name="style_tile" />
+			</lv_label>
+
+			<!-- Sub-grid container spanning 2 columns and 2 rows
+                 Do not set the grid descriptor to let them inherit the parent tracks -->
+			<lv_obj name="container_2"
+				style_grid_cell_x_align="stretch"
+				style_grid_cell_column_pos="1"
+				style_grid_cell_column_span="2"
+				style_grid_cell_y_align="stretch"
+				style_grid_cell_row_pos="0"
+				style_grid_cell_row_span="2"
+				style_layout="grid"
+				style_pad_all="4"
+			>
+				<!-- Sub-grid label at local cell (0,0) -->
+				<lv_label name="label_2"
+					style_grid_cell_column_pos="0"
+					style_grid_cell_row_pos="0"
+					style_bg_color="0x2ca02c"
+					text="S0,0"
+				>
+					<style name="style_tile" />
+				</lv_label>
+
+				<!-- Sub-grid label at local cell (1,0) -->
+				<lv_label name="label_3"
+					style_grid_cell_column_pos="1"
+					style_grid_cell_row_pos="0"
+					style_bg_color="0xff7f0e"
+					text="S1,0"
+				>
+					<style name="style_tile" />
+				</lv_label>
+
+				<!-- Sub-grid label at local cell (0,1) -->
+				<lv_label name="label_4"
+					style_grid_cell_column_pos="0"
+					style_grid_cell_row_pos="1"
+					style_bg_color="0xd62728"
+					text="S0,1"
+				>
+					<style name="style_tile" />
+				</lv_label>
+
+				<!-- Sub-grid label at local cell (1,1) -->
+				<lv_label name="label_5"
+					style_grid_cell_column_pos="1"
+					style_grid_cell_row_pos="1"
+					style_bg_color="0x9467bd"
+					text="S1,1"
+				>
+					<style name="style_tile" />
+				</lv_label>
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>
