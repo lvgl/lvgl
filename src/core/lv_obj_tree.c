@@ -737,8 +737,14 @@ static void obj_delete_core(lv_obj_t * obj)
         lv_obj_remove_child(obj->parent, obj);
     }
 
-    /*Null the parent pointer before freeing so lv_obj_is_valid can detect deletion
-     *without needing LV_USE_CHECK_OBJ_PARENT_LINK.*/
+    /*Clear the parent pointer so that, if the freed memory happens to still be
+     *readable, lv_obj_belongs_to_display has a better chance of rejecting it
+     *(the chain will terminate at NULL and miss every display's screen list).
+     *
+     *WARNING: reading any field of a freed object is use-after-free and
+     *undefined behavior. Callers MUST NOT rely on this for UAF detection;
+     *the allocator is free to reuse, scribble over, or unmap the memory at
+     *any point. This is a defensive hint only, not a guarantee.*/
     obj->parent = NULL;
 
     /*Free the object itself*/
