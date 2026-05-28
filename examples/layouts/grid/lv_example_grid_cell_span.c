@@ -38,12 +38,12 @@ void lv_example_grid_cell_span(void)
 
     /* Main grid container for alignment and span cases */
     lv_obj_t * container_1 = lv_obj_create(screen);
-    static const int32_t container_1_style_grid_column_dsc_array_0[] = {70, 70, 70, LV_GRID_TEMPLATE_LAST};
+    static const int32_t container_1_style_grid_column_dsc_array_0[] = {90, 90, 90, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_column_dsc_array(container_1, container_1_style_grid_column_dsc_array_0, 0);
-    static const int32_t container_1_style_grid_row_dsc_array_1[] = {44, 44, 44, LV_GRID_TEMPLATE_LAST};
+    static const int32_t container_1_style_grid_row_dsc_array_1[] = {60, 60, 60, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_row_dsc_array(container_1, container_1_style_grid_row_dsc_array_1, 0);
     lv_obj_set_style_layout(container_1, LV_LAYOUT_GRID, 0);
-    lv_obj_set_size(container_1, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container_1, lv_pct(90), LV_SIZE_CONTENT);
     /* Cell aligned to start/start */
     lv_obj_t * container_2 = lv_obj_create(container_1);
     lv_obj_set_style_grid_cell_x_align(container_2, LV_GRID_ALIGN_START, 0);

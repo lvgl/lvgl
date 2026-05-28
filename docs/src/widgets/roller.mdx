@@ -1,13 +1,13 @@
 ---
 title: "Roller (lv_roller)"
-description: Roller allows the end user to select an item from a list by scrolling through it. The item in the middle is the selected item and normally stands out from the other items due to different styles ap...
+description: "Pick an item from a vertical list by scrolling. The item in the middle is the selected one and is usually styled to stand out."
 ---
 
 ## Overview
 
-Roller allows the end user to select an item from a list by scrolling through it.
-The item in the middle is the selected item and normally stands out from
-the other items due to different styles applied to it.
+A Roller lets the user pick an item from a vertical list by scrolling
+through it. The item in the middle is the selected one and is usually
+styled to stand out from the others.
 
 ## Setting the list items
 
@@ -94,22 +94,16 @@ the layer the roller is being drawn into:
 
 ## Events
 
-- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when a new list item is selected.
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent went when a new list item is selected.
 
 <LvglExample name="lv_example_roller_event" path="widgets/roller/lv_example_roller_event" />
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
 - `LV_KEY_RIGHT/DOWN` Select next option
 - `LV_KEY_LEFT/UP` Select previous option
-- <ApiLink name="LY_KEY_ENTER" /> Accept the selected option (sends <ApiLink name="LV_EVENT_VALUE_CHANGED" /> event)
+- <ApiLink name="LV_KEY_ENTER" /> Accept the selected option (sends <ApiLink name="LV_EVENT_VALUE_CHANGED" /> event)
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

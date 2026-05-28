@@ -1,15 +1,15 @@
 ---
 title: "Switch (lv_switch)"
-description: "Switch Widgets look like little sliders and are used to display, and optionally modify, a value that can be \"on\" or \"off\"."
+description: "A small slider showing an on/off value. Click or tap to toggle."
 ---
 
 ## Overview
 
-Switch Widgets look like little sliders and are used to display, and optionally
-modify, a value that can be "on" or "off".
+A Switch looks like a small slider. It shows — and lets the user toggle —
+an on/off value.
 
-By default, a Switch is oriented horizontally. Its orientation will be vertical
-if you set `width` &lt; `height`.
+A Switch is horizontal by default. It turns vertical when `height` is
+greater than `width`.
 
 ## Change state
 
@@ -67,15 +67,11 @@ Padding controls the relative sizes of these parts:
 
 ## Events
 
-- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when Switch changes state.
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sis sent sent when Switch changes state.
 
 <LvglExample name="lv_example_switch_event" path="widgets/switch/lv_example_switch_event" />
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
@@ -83,6 +79,4 @@ Learn more about [events](/common-widget-features/events).
 - `LV_KEY_DOWN/LEFT` Turns Switch OFF
 - <ApiLink name="LV_KEY_ENTER" /> Toggles the Switch
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

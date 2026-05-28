@@ -43,7 +43,7 @@ void lv_example_grid_ignore_layout(void)
     static const int32_t container_style_grid_row_dsc_array_1[] = {42, 42, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_row_dsc_array(container, container_style_grid_row_dsc_array_1, 0);
     lv_obj_set_style_layout(container, LV_LAYOUT_GRID, 0);
-    lv_obj_set_size(container, lv_pct(100), 120);
+    lv_obj_set_size(container, 280, 120);
     lv_obj_t * label_1 = lv_label_create(container);
     lv_obj_set_style_grid_cell_column_pos(label_1, 0, 0);
     lv_obj_set_style_grid_cell_row_pos(label_1, 0, 0);

@@ -39,6 +39,10 @@ void lv_example_arc_bind_value(void)
     lv_obj_set_size(arc, 160, 160);
     lv_arc_bind_value(arc, &subject_value);
     lv_obj_set_flag(arc, LV_OBJ_FLAG_CLICKABLE, false);
+    lv_obj_set_style_bg_opa(arc, (255 * 0 / 100), LV_PART_KNOB);
+    lv_obj_t * lv_label_0 = lv_label_create(arc);
+    lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
+    lv_label_bind_text(lv_label_0, &subject_value, "%d %%");
 
     lv_obj_t * slider = lv_slider_create(screen);
     lv_obj_set_width(slider, 220);

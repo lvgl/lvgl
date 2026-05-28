@@ -1,18 +1,16 @@
 ---
 title: "Table (lv_table)"
-description: "Tables are built from rows, columns, and cells containing text."
+description: "A lightweight grid of text cells. Only the strings are stored; cells are drawn on the fly."
 ---
 
 ## Overview
 
-Tables are built from rows, columns, and cells containing text.
+A Table is a grid of rows, columns, and text cells. It is lightweight
+because no widgets are created for the cells — they are drawn on the fly.
 
-The Table Widget is very lightweight because only the text strings are stored.
-No real Widgets are created for cells --- they are just drawn on the fly.
-
-The Table is added to the default group (if one is set).
-Table is an editable Widget, allowing selection of a cell with encoder and keyboard
-navigation as well.
+Tables are added to the default group (if one is set). A Table is an
+editable widget: cells can be selected with encoder or keyboard input as
+well as with a pointer.
 
 ## Set cell value
 
@@ -96,20 +94,13 @@ lv_obj_add_event_cb(table, table_delete_cb, LV_EVENT_DELETE, NULL);
 
 ## Events
 
-- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when a new cell is selected with
-   keys.
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent when a new cell is selected with keys.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
-The following *Keys* are processed by Table Widgets:
-
-- `LV_KEY_RIGHT/LEFT/UP/DOWN/` Select a cell.
+`LV_KEY_RIGHT/LEFT/UP/DOWN/` select a cell.
 
 Note that, as usual, the state of <ApiLink name="LV_KEY_ENTER" /> is translated to
 `LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
@@ -118,9 +109,7 @@ Note that, as usual, the state of <ApiLink name="LV_KEY_ENTER" /> is translated 
 currently selected cell. Row and column will be set to
 <ApiLink name="LV_TABLE_CELL_NONE" /> if no cell is selected.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
 
 ## Examples
 

@@ -46,7 +46,7 @@ void lv_example_grid_rtl(void)
     static const int32_t container_1_style_grid_row_dsc_array_1[] = {38, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_row_dsc_array(container_1, container_1_style_grid_row_dsc_array_1, 0);
     lv_obj_set_style_layout(container_1, LV_LAYOUT_GRID, 0);
-    lv_obj_set_size(container_1, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container_1, 280, LV_SIZE_CONTENT);
     lv_obj_t * label_2 = lv_label_create(container_1);
     lv_obj_set_style_grid_cell_column_pos(label_2, 0, 0);
     lv_obj_set_style_grid_cell_row_pos(label_2, 0, 0);
@@ -79,7 +79,7 @@ void lv_example_grid_rtl(void)
     static const int32_t container_2_style_grid_row_dsc_array_3[] = {38, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_row_dsc_array(container_2, container_2_style_grid_row_dsc_array_3, 0);
     lv_obj_set_style_layout(container_2, LV_LAYOUT_GRID, 0);
-    lv_obj_set_size(container_2, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container_2, 280, LV_SIZE_CONTENT);
     lv_obj_t * label_6 = lv_label_create(container_2);
     lv_obj_set_style_grid_cell_column_pos(label_6, 0, 0);
     lv_obj_set_style_grid_cell_row_pos(label_6, 0, 0);

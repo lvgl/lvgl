@@ -28,7 +28,7 @@ void lv_example_grid_descriptors(void)
     static const int32_t container_style_grid_row_dsc_array_1[] = {44, 44, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_row_dsc_array(container, container_style_grid_row_dsc_array_1, 0);
     lv_obj_set_style_layout(container, LV_LAYOUT_GRID, 0);
-    lv_obj_set_size(container, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container, 400, LV_SIZE_CONTENT);
     /* Row 0 cells */
     lv_obj_t * label_1 = lv_label_create(container);
     lv_obj_set_style_grid_cell_x_align(label_1, LV_GRID_ALIGN_STRETCH, 0);

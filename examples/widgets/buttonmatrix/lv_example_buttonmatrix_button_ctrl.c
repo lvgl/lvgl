@@ -21,7 +21,7 @@ void lv_example_buttonmatrix_button_ctrl(void)
     /* One row with four differently-flagged buttons */
     lv_obj_t * buttonmatrix = lv_buttonmatrix_create(screen);
     lv_obj_set_align(buttonmatrix, LV_ALIGN_CENTER);
-    lv_obj_set_size(buttonmatrix, lv_pct(90), 60);
+    lv_obj_set_size(buttonmatrix, lv_pct(90), 80);
     static const char * buttonmatrix_map_0[] = {"Normal", "Checked", "Disabled", "Hidden", NULL};
     lv_buttonmatrix_set_map(buttonmatrix, buttonmatrix_map_0);
     static const lv_buttonmatrix_ctrl_t buttonmatrix_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_NONE, (lv_buttonmatrix_ctrl_t)(LV_BUTTONMATRIX_CTRL_CHECKABLE | LV_BUTTONMATRIX_CTRL_CHECKED), LV_BUTTONMATRIX_CTRL_DISABLED, LV_BUTTONMATRIX_CTRL_HIDDEN};

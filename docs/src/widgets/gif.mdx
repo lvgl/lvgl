@@ -1,13 +1,13 @@
 ---
 title: "GIF (lv_gif)"
-description: "The GIF Widget displays animated GIF images using the AnimatedGIF decoder library."
+description: "Display animated GIFs through the AnimatedGIF decoder library."
 ---
 
 ## Overview
 
-The GIF Widget displays animated GIF images using the
+The GIF widget displays animated GIFs using the
 [AnimatedGIF](https://github.com/bitbank2/AnimatedGIF/tree/master) library.
-Enable it in `lv_conf.h` by setting <ApiLink name="LV_USE_GIF" /> to `1`.
+Enable it by setting <ApiLink name="LV_USE_GIF" /> to `1` in `lv_conf.h`.
 
 ## Image source
 
@@ -67,8 +67,6 @@ RGB565 = 2 bytes/pixel, RGB888 = 3, ARGB8888 = 4.
 
 ## Events
 
-- <ApiLink name="LV_EVENT_READY" /> Emitted when the animation completes its last frame.
+<ApiLink name="LV_EVENT_READY" /> is emitted when the animation completes its last frame.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-</Callout>

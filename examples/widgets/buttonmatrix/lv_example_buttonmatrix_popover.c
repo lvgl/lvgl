@@ -21,7 +21,7 @@ void lv_example_buttonmatrix_popover(void)
     /* Keyboard-style row with popover enabled on every button */
     lv_obj_t * buttonmatrix = lv_buttonmatrix_create(screen);
     lv_obj_set_align(buttonmatrix, LV_ALIGN_CENTER);
-    lv_obj_set_size(buttonmatrix, lv_pct(90), 60);
+    lv_obj_set_size(buttonmatrix, lv_pct(90), 80);
     static const char * buttonmatrix_map_0[] = {"Q", "W", "E", "R", "T", "Y", NULL};
     lv_buttonmatrix_set_map(buttonmatrix, buttonmatrix_map_0);
     static const lv_buttonmatrix_ctrl_t buttonmatrix_ctrl_map_1[] = {LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER, LV_BUTTONMATRIX_CTRL_POPOVER};

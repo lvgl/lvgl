@@ -1,29 +1,18 @@
 ---
 title: "Chart (lv_chart)"
-description: Chart Widgets are used to visualize data.
+description: Visualize data as lines, curves, bars, stacked bars, or scatter plots.
 ---
 
 ## Overview
 
-Chart Widgets are used to visualize data.
+Charts visualize numeric data. They support:
 
-Charts have:
-
-- 0 or more background division lines (horizontal and vertical),
-- 4 internal axes, any of which can be used to specify scale for a data series,
-- a `point_count` (default 10) that applies to all data series added,
-- 0 or more data series (you can add or remove them at any time),
-- 0 or more cursors (you can add or remove them at any time),
-- update mode (modifies behavior of <ApiLink name="lv_chart_set_next_value" /> if you use it).
-
-Charts can:
-
-- display flexible axes with ticks and text
-- show precise locations of points or other locations on chart with cursors
-- show or hide individual data series
-- show or hide individual data points
-- show or hide cursors
-- scroll and zoom
+- Multiple data series, added and removed at any time
+- Up to four built-in axes (left/right Y, bottom/top X)
+- Optional background division lines, cursors, and per-point markers
+- Live updates through several update modes
+- Scrolling and zooming
+- Showing or hiding individual series, points, and cursors
 
 ## Chart Basics
 
@@ -293,16 +282,4 @@ division lines:
    <ApiLink name="lv_chart_get_pressed_point" display="lv_chart_get_pressed_point(chart)" /> returns the zero-based index of
    the pressed point.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Chart Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

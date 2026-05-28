@@ -40,15 +40,14 @@ void lv_example_bar_bind_value(void)
     lv_obj_set_size(bar, lv_pct(90), 20);
     lv_bar_bind_value(bar, &subject_value);
 
-    lv_obj_t * label_1 = lv_label_create(screen);
-    lv_label_bind_text(label_1, &subject_value, "%d%%");
-
     lv_obj_t * container = lv_obj_create(screen);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_flex_cross_place(container, LV_FLEX_ALIGN_CENTER, 0);
+    lv_obj_set_style_flex_main_place(container, LV_FLEX_ALIGN_SPACE_BETWEEN, 0);
     lv_obj_set_style_pad_column(container, 12, 0);
     lv_obj_set_style_bg_opa(container, 0, 0);
     lv_obj_set_style_border_width(container, 0, 0);
-    lv_obj_set_size(container, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_size(container, 180, LV_SIZE_CONTENT);
     lv_obj_t * button_1 = lv_button_create(container);
     lv_obj_t * label_2 = lv_label_create(button_1);
     lv_obj_set_align(label_2, LV_ALIGN_CENTER);
@@ -64,6 +63,9 @@ void lv_example_bar_bind_value(void)
     lv_obj_set_subject_increment_event_min_value(button_1, subject_increment_event_1, 0);
     lv_obj_set_subject_increment_event_max_value(button_1, subject_increment_event_1, 100);
     lv_obj_set_subject_increment_event_rollover(button_1, subject_increment_event_1, true);
+
+    lv_obj_t * label_1 = lv_label_create(container);
+    lv_label_bind_text(label_1, &subject_value, "%d%%");
 
     lv_obj_t * button_2 = lv_button_create(container);
     lv_obj_t * label_3 = lv_label_create(button_2);

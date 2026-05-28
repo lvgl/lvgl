@@ -25,10 +25,8 @@ void lv_example_label_styling(void)
         lv_style_set_bg_opa(&style_badge, (255 * 100 / 100));
         lv_style_set_bg_color(&style_badge, lv_color_hex(0x6366f1));
         lv_style_set_radius(&style_badge, 100);
-        lv_style_set_pad_left(&style_badge, 14);
-        lv_style_set_pad_right(&style_badge, 14);
-        lv_style_set_pad_top(&style_badge, 4);
-        lv_style_set_pad_bottom(&style_badge, 4);
+        lv_style_set_pad_hor(&style_badge, 14);
+        lv_style_set_pad_ver(&style_badge, 6);
         lv_style_set_text_color(&style_badge, lv_color_hex(0xffffff));
 
         inited = true;
