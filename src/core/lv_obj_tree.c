@@ -737,6 +737,10 @@ static void obj_delete_core(lv_obj_t * obj)
         lv_obj_remove_child(obj->parent, obj);
     }
 
+    /*Null the parent pointer before freeing so lv_obj_is_valid can detect deletion
+     *without needing LV_USE_CHECK_OBJ_PARENT_LINK.*/
+    obj->parent = NULL;
+
     /*Free the object itself*/
     lv_free(obj);
 }
