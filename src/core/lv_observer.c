@@ -222,6 +222,8 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value)
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
     LV_CHECK_ARG(subject != NULL, return);
+    LV_CHECK_ARG(buf != NULL, return);
+    LV_CHECK_ARG(value != NULL, return);
 
     lv_memzero(subject, sizeof(lv_subject_t));
     lv_strlcpy(buf, value, size);
@@ -239,6 +241,7 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 {
     LV_CHECK_ARG(subject != NULL, return);
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
+    LV_CHECK_ARG(buf != NULL, return);
 
     if(subject->size == 0) return;
     if(subject->prev_value.pointer) {
@@ -254,6 +257,7 @@ void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
 {
     LV_CHECK_ARG(subject != NULL, return);
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
+    LV_CHECK_ARG(format != NULL, return);
 
     if(subject->size < 1U) return;
 
@@ -381,6 +385,8 @@ void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], 
 
 lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)
 {
+    LV_CHECK_ARG(subject != NULL, return NULL);
+
     if(subject->type != LV_SUBJECT_TYPE_GROUP) {
         LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_GROUP");
         return NULL;
@@ -394,7 +400,7 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 
 void lv_subject_deinit(lv_subject_t * subject)
 {
-    if(!subject) return;
+    LV_CHECK_ARG(subject != NULL, return);
 
     lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {
