@@ -422,6 +422,8 @@ void lv_obj_update_layout(const lv_obj_t * obj)
 
 void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     lv_obj_set_style_align(obj, align, 0);
 }
 
@@ -689,6 +691,7 @@ int32_t lv_obj_get_content_height(const lv_obj_t * obj)
 
 void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 {
+    LV_CHECK_ARG(area != NULL, return);
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_obj_get_coords(obj, area);
@@ -1046,6 +1049,7 @@ void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], siz
                                   lv_obj_point_transform_flag_t flags)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(points != NULL || count == 0, return);
 
     lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
     bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
@@ -1297,14 +1301,16 @@ int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, 
 
 void lv_obj_center(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
     lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
 }
 
 void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix)
 {
-#if LV_DRAW_TRANSFORM_USE_MATRIX
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
+#if LV_DRAW_TRANSFORM_USE_MATRIX
     if(!matrix) {
         lv_obj_reset_transform(obj);
         return;
@@ -1340,8 +1346,9 @@ void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix)
 
 void lv_obj_reset_transform(lv_obj_t * obj)
 {
-#if LV_DRAW_TRANSFORM_USE_MATRIX
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
     if(!obj->spec_attr) {
         return;
     }
@@ -1369,8 +1376,9 @@ void lv_obj_reset_transform(lv_obj_t * obj)
 
 const lv_matrix_t * lv_obj_get_transform(const lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+
 #if LV_DRAW_TRANSFORM_USE_MATRIX
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     if(obj->spec_attr) {
         return obj->spec_attr->matrix;
     }
