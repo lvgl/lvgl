@@ -76,7 +76,7 @@ lv_group_t * lv_group_create(void)
 
 void lv_group_delete(lv_group_t * group)
 {
-    if(group == NULL) return;
+    LV_CHECK_ARG(group != NULL, return);
 
     /*Defocus the currently focused object*/
     if(group->obj_focus != NULL) {
@@ -180,6 +180,8 @@ void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2)
 
 void lv_group_remove_obj(lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return);
+
     lv_group_t * g = lv_obj_get_group(obj);
     if(g == NULL) return;
 
