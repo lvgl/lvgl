@@ -278,7 +278,7 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
 
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     const lv_obj_t * par = obj;
     const lv_obj_t * act_par;
@@ -293,7 +293,7 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
 
 lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     const lv_obj_t * scr;
 
@@ -315,14 +315,14 @@ lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
 
 lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     return obj->parent;
 }
 
 lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t idx)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     if(obj->spec_attr == NULL) return NULL;
 
@@ -454,7 +454,7 @@ void lv_obj_set_name_static(lv_obj_t * obj, const char * name)
 
 const char * lv_obj_get_name(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     if(obj->spec_attr == NULL) return NULL;
     else return obj->spec_attr->name;
@@ -529,7 +529,7 @@ void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size)
 
 lv_obj_t * lv_obj_get_child_by_name(const lv_obj_t * parent, const char * path)
 {
-    LV_CHECK_OBJ(parent, MY_CLASS, return 0);
+    LV_CHECK_OBJ(parent, MY_CLASS, return NULL);
     LV_CHECK_ARG(path != NULL, return NULL);
     LV_CHECK_ARG(parent->spec_attr != NULL, return NULL);
 
@@ -585,7 +585,7 @@ lv_obj_t * lv_obj_find_by_name(const lv_obj_t * parent, const char * name)
 
 int32_t lv_obj_get_index(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return -1);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return -1;
@@ -602,8 +602,8 @@ int32_t lv_obj_get_index(const lv_obj_t * obj)
 
 int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
-    LV_CHECK_ARG(class_p != NULL, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return -1);
+    LV_CHECK_ARG(class_p != NULL, return -1);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return 0xFFFFFFFF;
