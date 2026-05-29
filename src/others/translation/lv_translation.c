@@ -216,8 +216,8 @@ lv_result_t lv_translation_add_language(lv_translation_pack_t * pack, const char
 
 int32_t lv_translation_get_language_index(lv_translation_pack_t * pack, const char * lang_name)
 {
-    LV_CHECK_ARG(pack != NULL, return 0);
-    LV_CHECK_ARG(lang_name != NULL, return 0);
+    LV_CHECK_ARG(pack != NULL, return -1);
+    LV_CHECK_ARG(lang_name != NULL, return -1);
     uint32_t i;
     for(i = 0; i < pack->language_cnt; i++) {
         if(lv_streq(pack->languages[i], lang_name)) return (int32_t)i;
