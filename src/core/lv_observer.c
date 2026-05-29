@@ -223,6 +223,7 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
 {
     LV_CHECK_ARG(subject != NULL, return);
     LV_CHECK_ARG(buf != NULL, return);
+    LV_CHECK_ARG(size > 0, return);
     LV_CHECK_ARG(value != NULL, return);
 
     lv_memzero(subject, sizeof(lv_subject_t));
@@ -508,7 +509,7 @@ void lv_observer_remove(lv_observer_t * observer)
 void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(subject != NULL, return);
+    /* subject == NULL is documented as valid: remove from ALL subjects */
     /*
      * Look for the `observer` that connects `obj` and `subject`
      * Since the obj is associated with the subject,
@@ -693,6 +694,7 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
     LV_CHECK_ARG(obj != NULL, return);
     LV_CHECK_ARG(subject != NULL, return);
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
+    LV_CHECK_ARG(value != NULL, return);
 
     subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_string_user_data_t));
     if(user_data == NULL) {
