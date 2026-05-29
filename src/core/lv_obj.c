@@ -574,7 +574,7 @@ lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
 void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_obj_t * screen,
                                   lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(screen != NULL, return, "can't load a non-existing screen");
     LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
 
@@ -593,7 +593,7 @@ void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_ob
 void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_screen_create_cb_t screen_create_cb,
                                     lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(screen_create_cb != NULL, return);
     LV_CHECK_ARG(duration > 0 || anim_type == LV_SCREEN_LOAD_ANIM_NONE, return);
 
@@ -612,7 +612,7 @@ void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_anim_timeline_t * at, uint32_t delay,
                                     bool reverse)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(at != NULL, return);
 
     timeline_play_dsc_t * dsc = lv_malloc(sizeof(timeline_play_dsc_t));
@@ -628,20 +628,20 @@ void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
 
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     obj->user_data = user_data;
 }
 
 void * lv_obj_get_user_data(lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     return obj->user_data;
 }
 
 lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void * user_data)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_CHECK_ARG(cb != NULL, return NULL);
 
     lv_delete_dsc_t * dsc = lv_malloc(sizeof(*dsc));
