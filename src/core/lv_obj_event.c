@@ -49,7 +49,7 @@ static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * ar
 
 lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 {
-    LV_CHECK_ARG(obj != NULL, return LV_RESULT_OK);
+    LV_CHECK_ARG(obj != NULL, return LV_RESULT_INVALID);
 
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
@@ -149,7 +149,6 @@ bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc)
 uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
     LV_CHECK_ARG(obj != NULL, return 0);
-    LV_CHECK_ARG(event_cb != NULL, return 0);
 
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t removed_count = 0;
@@ -159,7 +158,7 @@ uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 
     for(i = event_cnt - 1; i >= 0; i--) {
         lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
-        if(dsc && dsc->cb == event_cb) {
+        if(dsc && (event_cb == NULL || dsc->cb == event_cb)) {
             lv_obj_remove_event(obj, i);
             removed_count++;
         }
