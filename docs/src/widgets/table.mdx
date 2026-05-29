@@ -115,11 +115,9 @@ Learn more about [Keys](/main-modules/indev/keypad).
 
 ### Scrollable 200-item list with per-row toggle
 
-Pure XML can't yet draw custom rendering into individual cells, so this
-example stays in C. It builds a 200-row table inside a scrollable parent,
-attaches an <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> callback that paints a switch-style
+It builds a 200-row table inside a scrollable parent, attaches an
+<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> callback that paints a switch-style
 toggle in the second column based on the row's `CUSTOM_1` cell control flag,
-and toggles that flag from <ApiLink name="LV_EVENT_VALUE_CHANGED" />. A footer label reports
-the row count and the memory cost of building the table.
+and toggles that flag from <ApiLink name="LV_EVENT_VALUE_CHANGED" />.
 
 <LvglExample name="lv_example_table_scrollable_list" path="widgets/table/lv_example_table_scrollable_list" />
