@@ -128,7 +128,7 @@ static int32_t calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t 
 
 int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop)
 {
-    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     LV_CHECK_ARG(prop == LV_STYLE_WIDTH || prop == LV_STYLE_MIN_WIDTH || prop == LV_STYLE_MAX_WIDTH, return 0);
 
     return calc_dynamic_width(obj, prop, NULL);
@@ -174,7 +174,7 @@ static int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t
 
 int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop)
 {
-    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     LV_CHECK_ARG(prop == LV_STYLE_HEIGHT || prop == LV_STYLE_MIN_HEIGHT || prop == LV_STYLE_MAX_HEIGHT, return 0);
 
     return calc_dynamic_height(obj, prop, NULL);
@@ -182,7 +182,7 @@ int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop)
 
 bool lv_obj_refr_size(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     /*If the width or height is set by a layout do not modify them*/
     if(obj->w_layout && obj->h_layout) return false;
@@ -437,7 +437,6 @@ void lv_obj_align(lv_obj_t * obj, lv_align_t align, int32_t x_ofs, int32_t y_ofs
 void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, int32_t x_ofs, int32_t y_ofs)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_CHECK_OBJ(base, MY_CLASS, return);
 
     lv_obj_update_layout(obj);
     if(base == NULL) base = lv_obj_get_parent(obj);
@@ -762,7 +761,7 @@ int32_t lv_obj_get_style_clamped_height(lv_obj_t * obj)
 
 bool lv_obj_is_style_any_width_content(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     int32_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
     int32_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
@@ -772,7 +771,7 @@ bool lv_obj_is_style_any_width_content(lv_obj_t * obj)
 
 bool lv_obj_is_style_any_height_content(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     int32_t h = lv_obj_get_style_height(obj, LV_PART_MAIN);
     int32_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
@@ -782,7 +781,7 @@ bool lv_obj_is_style_any_height_content(lv_obj_t * obj)
 
 bool lv_obj_is_width_min(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     int32_t minw = lv_obj_calc_dynamic_width(obj, LV_STYLE_MIN_WIDTH);
     int32_t w = lv_obj_get_width(obj);
@@ -791,7 +790,7 @@ bool lv_obj_is_width_min(lv_obj_t * obj)
 
 bool lv_obj_is_height_min(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     int32_t minh = lv_obj_calc_dynamic_height(obj, LV_STYLE_MIN_HEIGHT);
     int32_t h = lv_obj_get_height(obj);
@@ -800,7 +799,7 @@ bool lv_obj_is_height_min(lv_obj_t * obj)
 
 bool lv_obj_is_width_max(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     int32_t maxw = lv_obj_calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH);
     int32_t w = lv_obj_get_width(obj);
@@ -809,7 +808,7 @@ bool lv_obj_is_width_max(lv_obj_t * obj)
 
 bool lv_obj_is_height_max(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     int32_t maxh = lv_obj_calc_dynamic_height(obj, LV_STYLE_MAX_HEIGHT);
     int32_t h = lv_obj_get_height(obj);
@@ -818,7 +817,7 @@ bool lv_obj_is_height_max(lv_obj_t * obj)
 
 bool lv_obj_refresh_self_size(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     if(!lv_obj_is_style_any_width_content(obj) && !lv_obj_is_style_any_height_content(obj))
         return false;
@@ -1138,7 +1137,7 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
 lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_CHECK_ARG(area != NULL, return LV_RESULT_INVALID);
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
 
     lv_display_t * disp   = lv_obj_get_display(obj);
     if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
@@ -1152,7 +1151,7 @@ lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
 lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
 
     lv_display_t * disp = lv_obj_get_display(obj);
     if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
@@ -1228,7 +1227,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 
 bool lv_obj_is_visible(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     lv_area_t obj_coords;
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);
