@@ -238,6 +238,7 @@ uint16_t lv_anim_count_running(void)
 
 uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time)
 {
+    LV_CHECK_ARG(speed != 0, return 0);
 
     if(speed > 10000) {
         LV_LOG_WARN("speed is truncated to 10000 (was %"LV_PRIu32")", speed);
@@ -263,11 +264,13 @@ uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_t
 
 uint32_t lv_anim_speed(uint32_t speed)
 {
+    LV_CHECK_ARG(speed != 0, return 0);
     return lv_anim_speed_clamped(speed, 0, 10000);
 }
 
 uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end)
 {
+    LV_CHECK_ARG(speed != 0, return 0);
     uint32_t d = LV_ABS(start - end);
     uint32_t time = (d * 1000) / speed;
 
