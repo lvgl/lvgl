@@ -45,6 +45,7 @@ static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_b
 
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -169,6 +170,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -212,6 +214,7 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_ds
 
 void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -256,6 +259,7 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_ds
 
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -301,6 +305,7 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_
 
 void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -341,6 +346,7 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
 
 void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -361,7 +367,7 @@ void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_
 
 int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 {
-    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     LV_PROFILER_DRAW_BEGIN;
     int32_t s = 0;
