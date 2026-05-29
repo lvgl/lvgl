@@ -265,7 +265,8 @@ bool lv_matrix_is_identity_or_translation(const lv_matrix_t * matrix)
 
 void lv_matrix_transpose(const lv_matrix_t * src, lv_matrix_t * dst)
 {
-    if(src == NULL || dst == NULL) return;
+    LV_CHECK_ARG(src != NULL, return);
+    LV_CHECK_ARG(dst != NULL, return);
 
     if(src == dst) {
         /* In-place transposition: 3 swaps, minimal stack usage */
