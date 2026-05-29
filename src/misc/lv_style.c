@@ -357,7 +357,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
         return;
     }
 
-    LV_ASSERT(prop != LV_STYLE_PROP_INV);
+    LV_CHECK_ARG(prop != LV_STYLE_PROP_INV, return);
     LV_PROFILER_STYLE_BEGIN;
     lv_style_prop_t * props;
     int32_t i;
