@@ -31,7 +31,11 @@ typedef struct _my_theme_t my_theme_t;
 #define BORDER_W_DIS     0
 #define BORDER_W_FOCUS   1
 #define BORDER_W_EDIT    2
+// Maximum value of border width, used to adjust padding to prevent layout shift
+#define BORDER_W_MAX 3
+
 #define PAD_DEF          4
+
 
 /**********************
  *      TYPEDEFS
@@ -105,7 +109,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
     lv_style_set_border_color(&theme->styles.card, COLOR_FG);
     lv_style_set_radius(&theme->styles.card, 2);
     lv_style_set_border_width(&theme->styles.card, BORDER_W_NORMAL);
-    lv_style_set_pad_all(&theme->styles.card, PAD_DEF);
+    lv_style_set_pad_all(&theme->styles.card, PAD_DEF + BORDER_W_MAX - BORDER_W_NORMAL);
     lv_style_set_pad_gap(&theme->styles.card, PAD_DEF);
     lv_style_set_text_color(&theme->styles.card, COLOR_FG);
     lv_style_set_line_width(&theme->styles.card, 2);
@@ -117,6 +121,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
 
     style_init_reset(&theme->styles.pr);
     lv_style_set_border_width(&theme->styles.pr, BORDER_W_PR);
+    lv_style_set_pad_all(&theme->styles.pr, PAD_DEF + BORDER_W_MAX - BORDER_W_PR);
 
     style_init_reset(&theme->styles.inv);
     lv_style_set_bg_opa(&theme->styles.inv, LV_OPA_COVER);
@@ -129,16 +134,20 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
 
     style_init_reset(&theme->styles.disabled);
     lv_style_set_border_width(&theme->styles.disabled, BORDER_W_DIS);
+    lv_style_set_pad_all(&theme->styles.disabled, PAD_DEF + BORDER_W_MAX - BORDER_W_DIS);
 
     style_init_reset(&theme->styles.focus);
     lv_style_set_outline_width(&theme->styles.focus, 1);
     lv_style_set_outline_pad(&theme->styles.focus, BORDER_W_FOCUS);
+    lv_style_set_pad_all(&theme->styles.focus, PAD_DEF + BORDER_W_MAX - BORDER_W_FOCUS);
 
     style_init_reset(&theme->styles.edit);
     lv_style_set_outline_width(&theme->styles.edit, BORDER_W_EDIT);
+    lv_style_set_pad_all(&theme->styles.edit, PAD_DEF + BORDER_W_MAX - BORDER_W_EDIT);
 
     style_init_reset(&theme->styles.large_border);
     lv_style_set_border_width(&theme->styles.large_border, BORDER_W_EDIT);
+    lv_style_set_pad_all(&theme->styles.large_border, PAD_DEF + BORDER_W_MAX - BORDER_W_EDIT);
 
     style_init_reset(&theme->styles.pad_gap);
     lv_style_set_pad_gap(&theme->styles.pad_gap, PAD_DEF);
@@ -459,6 +468,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.radius_circle, LV_PART_KNOB);
         lv_obj_add_style(obj, &theme->styles.focus, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &theme->styles.edit, LV_STATE_EDITED);
+    }
+#endif
+
+#if LV_USE_SPINNER
+    else if(lv_obj_check_type(obj, &lv_spinner_class)) {
+        lv_obj_add_style(obj, &theme->styles.card, LV_PART_INDICATOR);
     }
 #endif
 
