@@ -1,4 +1,5 @@
 git
+ccache
 gcc
 gcc-multilib
 g++-multilib

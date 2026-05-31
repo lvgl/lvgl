@@ -133,6 +133,9 @@ run_args=(
     --platform "$PLATFORM"
     --user "$(id -u):$(id -g)"
     -e HOME=/tmp
+    # Persist the ccache across runs. The repo is bind-mounted at /work, so a
+    # cache dir beneath it survives the --rm container without an extra mount.
+    -e CCACHE_DIR=/work/tests/.ccache
     -v "$REPO_ROOT":/work
     -w /work
 )

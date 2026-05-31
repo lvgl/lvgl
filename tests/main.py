@@ -133,8 +133,16 @@ def build_tests(options_name, build_type, clean):
         created_build_dir = True
     os.chdir(build_dir)
     if created_build_dir:
-        subprocess.check_call(['cmake', '-GNinja', '-DCMAKE_BUILD_TYPE=%s' % build_type,
-                               '-D%s=1' % options_name, '..'])
+        cmake_args = ['cmake', '-GNinja', '-DCMAKE_BUILD_TYPE=%s' % build_type,
+                      '-D%s=1' % options_name]
+        # Use ccache as a compiler launcher when available. This dramatically
+        # speeds up rebuilds across the build matrix and repeated invocations
+        # (notably under emulation), and is a no-op when ccache is absent.
+        if shutil.which('ccache'):
+            cmake_args += ['-DCMAKE_C_COMPILER_LAUNCHER=ccache',
+                           '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache']
+        cmake_args.append('..')
+        subprocess.check_call(cmake_args)
     subprocess.check_call(['cmake', '--build', build_dir,
                            '--parallel', str(os.cpu_count())])
 
