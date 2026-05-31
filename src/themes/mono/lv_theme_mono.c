@@ -39,7 +39,7 @@ typedef struct _my_theme_t my_theme_t;
 // the padding as well to prevent layout shift.
 #define EXPAND_BORDER(style, state)  \
     lv_style_set_border_width(&(style), BORDER_W_ ## state); \
-    lv_style_set_pad_all(&(style), PAD_DEF + BORDER_W_MAX - BORDER_W_ ## state)
+    lv_style_set_pad_all(&(style), PAD_DEF + BORDER_W_NORMAL - BORDER_W_ ## state )
 
 
 
@@ -117,7 +117,8 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
     lv_style_set_bg_color(&theme->styles.card, COLOR_BG);
     lv_style_set_border_color(&theme->styles.card, COLOR_FG);
     lv_style_set_radius(&theme->styles.card, 2);
-    EXPAND_BORDER(theme->styles.card, NORMAL);
+    lv_style_set_border_width(&theme->styles.card, BORDER_W_NORMAL);
+    lv_style_set_pad_all(&theme->styles.card, PAD_DEF);
     lv_style_set_pad_gap(&theme->styles.card, PAD_DEF);
     lv_style_set_text_color(&theme->styles.card, COLOR_FG);
     lv_style_set_line_width(&theme->styles.card, 2);
@@ -144,13 +145,13 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
 
     style_init_reset(&theme->styles.focus);
     lv_style_set_outline_width(&theme->styles.focus, 1);
-    EXPAND_BORDER(theme->styles.focus, FOCUS);
+    lv_style_set_outline_pad(&theme->styles.focus, BORDER_W_FOCUS);
 
     style_init_reset(&theme->styles.edit);
-    EXPAND_BORDER(theme->styles.edit, EDIT);
+    lv_style_set_outline_width(&theme->styles.edit, BORDER_W_EDIT);
 
     style_init_reset(&theme->styles.large_border);
-    EXPAND_BORDER(theme->styles.large_border, EDIT);
+    lv_style_set_border_width(&theme->styles.large_border, BORDER_W_EDIT);
 
     style_init_reset(&theme->styles.pad_gap);
     lv_style_set_pad_gap(&theme->styles.pad_gap, PAD_DEF);
