@@ -26,6 +26,8 @@ typedef struct _my_theme_t my_theme_t;
 #define COLOR_FG      dark_bg ? lv_color_white() : lv_color_black()
 #define COLOR_BG      dark_bg ? lv_color_black() : lv_color_white()
 
+#define SPINNER_WIDTH    8
+
 #define BORDER_W_NORMAL  1
 #define BORDER_W_PR      3
 #define BORDER_W_DIS     0
@@ -36,10 +38,12 @@ typedef struct _my_theme_t my_theme_t;
 #define PAD_DEF          4
 
 // when using border width changes to provided feedback, adjust
-// the padding as well to prevent layout shift.
+// the padding as well to prevent layout shift. All widths must be <= PAD_DEF
 #define EXPAND_BORDER(style, state)  \
-    lv_style_set_border_width(&(style), BORDER_W_ ## state); \
-    lv_style_set_pad_all(&(style), PAD_DEF + BORDER_W_NORMAL - BORDER_W_ ## state )
+    do { \
+        lv_style_set_border_width(&(style), BORDER_W_ ## state); \
+        lv_style_set_pad_all(&(style), PAD_DEF + BORDER_W_NORMAL - BORDER_W_ ## state); \
+    } while(0)
 
 
 
@@ -175,7 +179,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
 #if LV_USE_SPINNER
     style_init_reset(&theme->styles.spinner_indic);
     lv_style_set_arc_color(&theme->styles.spinner_indic, COLOR_FG);
-    lv_style_set_arc_width(&theme->styles.spinner_indic, 8);
+    lv_style_set_arc_width(&theme->styles.spinner_indic, SPINNER_WIDTH);
     lv_style_set_arc_rounded(&theme->styles.spinner_indic, true);
 #endif
 
