@@ -1,0 +1,19 @@
+---
+title: Extending/Combining Displays
+description: "To mirror the image of a display to another display, you don't need to use multi-display support. Just transfer the buffer received in the first display's Flush Callback to the other display as well."
+---
+
+## Mirroring a Display
+
+To mirror the image of a display to another display, you don't need to use
+multi-display support. Just transfer the buffer received in the first display's
+[Flush Callback](/main-modules/display/setup) to the other display as well.
+
+## Splitting an Image
+
+You can create a larger virtual display from an array of smaller ones.
+You can create it by:
+
+1. setting the resolution of the displays to the large display's resolution;
+2. in [Flush Callback](/main-modules/display/setup), truncate and modify the `area` parameter for each display; and
+3. send the buffer's content to each real display with the truncated area.

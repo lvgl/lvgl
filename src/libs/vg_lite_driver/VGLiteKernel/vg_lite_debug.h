@@ -28,7 +28,7 @@
 #ifndef VG_LITE_DEBUG_H
 #define VG_LITE_DEBUG_H
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include "vg_lite_kernel.h"

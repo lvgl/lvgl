@@ -4,16 +4,16 @@
  * Driver for NXP's ELCD
  */
 
-#include "lv_nxp_elcdif.h"
+#include "../../../lvgl_public.h"
 
-#if LV_USE_NXP_ELCDIF == 1
+#if LV_USE_NXP_ELCDIF
 /*********************
  *      INCLUDES
  *********************/
 #include "../../../display/lv_display_private.h"
-#include "fsl_video_common.h"
-#include "fsl_elcdif.h"
-#include "fsl_cache.h"
+#include <fsl_video_common.h>
+#include <fsl_elcdif.h>
+#include <fsl_cache.h>
 
 /*********************
  *      DEFINES

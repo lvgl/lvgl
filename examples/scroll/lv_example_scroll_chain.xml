@@ -1,0 +1,31 @@
+<!--
+ @title Scroll chaining
+ @brief A nested scrollable can stop scrolling from propagating to its parent.
+
+ The outer panel scrolls, and it contains an inner scrollable box that
+ also overflows. By default, reaching the inner box's edge would "chain"
+ the remaining scroll to the outer panel. Setting `scroll_chain="false"`
+ on the inner box breaks that link, so scrolling stops at the box and
+ the outer panel does not move.
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
+		<!-- 💡 Scroll inside the inner box: at its edge the outer panel stays put because `scroll_chain="false"`. -->
+		<!-- Outer scrollable panel -->
+		<lv_obj name="container_1" width="240" height="180" flex_flow="column" style_pad_row="8">
+			<lv_button name="button_1" width="100%"><lv_label name="label_1" align="center" text="Outer 1" /></lv_button>
+
+			<!-- Inner scrollable box; chaining to the parent disabled -->
+			<lv_obj name="container_2" width="100%" height="90" flex_flow="column" style_pad_row="6" scroll_chain="false" style_border_color="0x9429ff" style_border_width="2">
+				<lv_button name="button_2" width="100%"><lv_label name="label_2" align="center" text="Inner 1" /></lv_button>
+				<lv_button name="button_3" width="100%"><lv_label name="label_3" align="center" text="Inner 2" /></lv_button>
+				<lv_button name="button_4" width="100%"><lv_label name="label_4" align="center" text="Inner 3" /></lv_button>
+				<lv_button name="button_5" width="100%"><lv_label name="label_5" align="center" text="Inner 4" /></lv_button>
+			</lv_obj>
+
+			<lv_button name="button_6" width="100%"><lv_label name="label_6" align="center" text="Outer 2" /></lv_button>
+			<lv_button name="button_7" width="100%"><lv_label name="label_7" align="center" text="Outer 3" /></lv_button>
+			<lv_button name="button_8" width="100%"><lv_label name="label_8" align="center" text="Outer 4" /></lv_button>
+		</lv_obj>
+	</view>
+</screen>

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_dma2d.h"
+#include "../../lvgl_public.h"
 #if LV_USE_DRAW_DMA2D
 
 #include "../lv_draw_private.h"
@@ -128,10 +128,7 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_dma2d_opaque_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32_t h, int32_t stride);
 void lv_draw_dma2d_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32_t h, int32_t stride);
-void lv_draw_dma2d_opaque_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                                const lv_area_t * coords);
 void lv_draw_dma2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                          const lv_area_t * coords);
 lv_draw_dma2d_output_cf_t lv_draw_dma2d_cf_to_dma2d_output_cf(lv_color_format_t cf);

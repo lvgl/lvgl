@@ -10,15 +10,14 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_canvas_private.h"
+
+#if LV_USE_CANVAS
+
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_CANVAS != 0
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
+#include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
-#include "../../core/lv_refr.h"
-#include "../../display/lv_display.h"
-#include "../../stdlib/lv_string.h"
 #include "../../misc/cache/lv_cache.h"
 /*********************
  *      DEFINES
@@ -69,7 +68,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent)
 
 void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_color_format_t cf)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
@@ -88,7 +87,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
 
 void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(draw_buf);
 
     if(!draw_buf->handlers) {
@@ -110,7 +109,7 @@ void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 
 void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv_opa_t opa)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_draw_buf_t * draw_buf = canvas->draw_buf;
@@ -187,7 +186,7 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
 
 void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
@@ -203,7 +202,7 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
 
 lv_draw_buf_t * lv_canvas_get_draw_buf(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     return canvas->draw_buf;
@@ -211,7 +210,9 @@ lv_draw_buf_t * lv_canvas_get_draw_buf(lv_obj_t * obj)
 
 lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return (lv_color32_t) {
+        0
+    });
 
     lv_color32_t ret = { 0 };
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
@@ -265,7 +266,7 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
 
 lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     return (lv_image_dsc_t *)canvas->draw_buf;
@@ -273,7 +274,7 @@ lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * obj)
 
 const void * lv_canvas_get_buf(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf)
@@ -289,7 +290,7 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
 void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * src_buf,
                         const lv_area_t * src_area)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(src_buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
@@ -302,7 +303,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
 
 void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_draw_buf_t * draw_buf = canvas->draw_buf;

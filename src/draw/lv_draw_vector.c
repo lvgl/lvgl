@@ -16,9 +16,6 @@
     #error "LV_USE_VECTOR_GRAPHIC requires (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE or (LV_USE_NEMA_GFX and LV_USE_NEMA_VG) or LV_USE_DRAW_NANOVG"
 #endif
 
-#include "../misc/lv_ll.h"
-#include "../misc/lv_types.h"
-#include "../stdlib/lv_string.h"
 #include <math.h>
 #include <float.h>
 

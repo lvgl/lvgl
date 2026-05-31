@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+CONFIGS = sdl2 sdl2-3d drm drm-3d wayland wayland-3d
+
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_auto_configure:
+	mkdir -p $(CURDIR)/debian/pcpp
+	ln -sf /usr/bin/pcpp-python $(CURDIR)/debian/pcpp/pcpp
+	export PATH=$(CURDIR)/debian/pcpp:$$PATH; \
+	for config in $(CONFIGS); do \
+	    cmake -B build-$$config \
+	        -DCMAKE_INSTALL_PREFIX=/usr \
+	        -DCMAKE_BUILD_TYPE=Release \
+	        -DLV_BUILD_USE_KCONFIG=ON \
+	        -DLV_BUILD_DEFCONFIG_PATH=$(CURDIR)/configs/$${config}_defconfig \
+	        -GNinja ; \
+	done
+
+override_dh_auto_build:
+	for config in $(CONFIGS); do \
+	    cmake --build build-$$config ; \
+	done
+
+override_dh_auto_install:
+	for config in $(CONFIGS); do \
+	    DESTDIR=$(CURDIR)/debian/liblvgl-$${config}-dev \
+	        cmake --install build-$$config ; \
+	done
+
+override_dh_auto_test:
+	# no tests

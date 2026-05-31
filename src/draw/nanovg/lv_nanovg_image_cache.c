@@ -15,7 +15,8 @@
 #include "lv_nanovg_utils.h"
 #include "../lv_image_decoder_private.h"
 #include "../../misc/lv_pending.h"
-#include "../../misc/lv_iter.h"
+#include "../../misc/cache/lv_cache_entry.h"
+#include "../../misc/cache/class/lv_cache_lru_rb.h"
 
 /*********************
 *      DEFINES

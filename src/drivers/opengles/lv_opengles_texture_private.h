@@ -14,11 +14,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OPENGLES
-
-#include "lv_opengles_texture.h"
 
 /*********************
  *      DEFINES

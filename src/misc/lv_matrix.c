@@ -7,15 +7,13 @@
  *      INCLUDES
  *********************/
 
-#include "lv_matrix.h"
+#include "../lvgl_public.h"
 
 #if LV_USE_MATRIX
 
-#include "../stdlib/lv_string.h"
-#include "lv_math.h"
 #include <math.h>
 #include <float.h>
-#include "../misc/lv_log.h"
+
 /*********************
  *      DEFINES
  *********************/

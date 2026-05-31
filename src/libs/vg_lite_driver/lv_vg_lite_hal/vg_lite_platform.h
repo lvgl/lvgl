@@ -1,11 +1,11 @@
 #ifndef VG_LITE_PLATFORM_H
 #define VG_LITE_PLATFORM_H
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
-#include "stdint.h"
-#include "stdlib.h"
+#include LV_STDINT_INCLUDE
+#include <stdlib.h>
 #include <stdio.h>
 #include "../VGLiteKernel/vg_lite_debug.h"
 #include "../VGLiteKernel/vg_lite_type.h"

@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_image_decoder_private.h"
-#include "../misc/lv_assert.h"
-#include "../draw/lv_draw_image.h"
-#include "../misc/lv_ll.h"
-#include "../misc/lv_profiler.h"
-#include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
+#include "../misc/cache/lv_cache.h"
+#include "../misc/cache/instance/lv_image_cache.h"
+#include "../misc/cache/instance/lv_image_header_cache.h"
+#include "../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES

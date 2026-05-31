@@ -11,7 +11,6 @@
 
 #if LV_USE_DRAW_NANOVG
 
-#include "../../draw/lv_draw_mask.h"
 #include "lv_nanovg_utils.h"
 
 /*********************

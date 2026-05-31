@@ -5,11 +5,11 @@
 extern "C" {
 #endif
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_GLTF
+
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
-#include "../../../misc/lv_types.h"
 
 
 typedef struct {

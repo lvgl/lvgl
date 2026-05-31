@@ -1,0 +1,56 @@
+<!--
+ @title Scale styling
+ @brief Style the main rail, minor ticks, and major ticks (with labels) independently.
+
+ A scale has three drawable parts: `MAIN` (the rail line/arc), `ITEMS`
+ (every minor tick) and `INDICATOR` (every major tick *plus* its label).
+ Each is targeted by `selector="main"`, `selector="items"`, and
+ `selector="indicator"`. Line-family properties (`line_color`/`line_width`/
+ `line_opa`) drive ticks and rail; text properties on `INDICATOR` style the
+ numeric labels. Keep the indicator line thicker than items to make
+ major/minor visually distinguishable.
+
+ The major-tick labels can also be rotated by the indicator's
+ `transform_rotation` style — `style_transform_rotation-indicator="300"`
+ (units of 0.1°, so 300 = 30°) tilts every label by 30°. Use this when
+ dense labels would otherwise overlap.
+-->
+<screen>
+	<styles>
+		<style name="style_scale_main" line_color="0x6b7280" line_width="2" />
+		<style name="style_scale_items" line_color="0x9ca3af" line_width="1" />
+		<style
+			name="style_scale_indicator"
+			line_color="0x6366f1"
+			line_width="3"
+			text_color="0x6366f1"
+			transform_rotation="300"
+			pad_bottom="8"
+		/>
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 Recolour the three named styles to see exactly which part each selector targets; bump `transform_rotation-indicator` to tilt labels further. -->
+		<lv_scale
+			name="scale"
+			width="280"
+			height="80"
+			mode="horizontal_bottom"
+			total_tick_count="21"
+			major_tick_every="4"
+			label_show="true"
+			min_value="0"
+			max_value="100"
+		>
+			<style name="style_scale_main" selector="main" />
+			<style name="style_scale_items" selector="items" />
+			<style name="style_scale_indicator" selector="indicator" />
+		</lv_scale>
+	</view>
+</screen>

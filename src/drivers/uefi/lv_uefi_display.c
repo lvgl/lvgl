@@ -7,12 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
+#include "lv_uefi_private.h"
 
 #if LV_USE_UEFI
-
-#include "lv_uefi_display.h"
-#include "lv_uefi_private.h"
 
 #if LV_COLOR_DEPTH != 32
     #error [lv_uefi] Unsupported LV_COLOR_DEPTH.

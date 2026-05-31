@@ -12,14 +12,12 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_draw_eve_private.h"
+
 #if LV_USE_DRAW_EVE
 
-#include "../../misc/lv_math.h"
-#include "../../stdlib/lv_mem.h"
 #include "../../misc/lv_area_private.h"
-#include "../../misc/lv_color.h"
-#include "../../stdlib/lv_string.h"
 #include "lv_eve.h"
 
 /*********************

@@ -14,8 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../display/lv_display.h"
-#include "../../indev/lv_indev.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_WINDOWS
 

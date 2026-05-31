@@ -6,12 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_fs_private.h"
 
-#include "../misc/lv_assert.h"
-#include "../misc/lv_profiler.h"
-#include "../stdlib/lv_string.h"
-#include "lv_ll.h"
+#include "lv_fs_private.h"
 #include "../core/lv_global.h"
 
 /*********************

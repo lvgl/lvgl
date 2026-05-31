@@ -10,12 +10,10 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_GLTF
 
-#include "lv_gltf.h"
-#include "../../../misc/lv_types.h"
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../widgets/3dtexture/lv_3dtexture_private.h"
 #include "../gltf_data/lv_gltf_data_internal.h"

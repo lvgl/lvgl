@@ -16,8 +16,8 @@ def fmt_cb(cb) -> str:
 
 
 def ptr_or_none(val) -> Optional[str]:
-    """Convert pointer to hex string or None if NULL."""
-    if not val.is_ok:
+    """Convert pointer to hex string or None if NULL/missing."""
+    if val is None or not val.is_ok:
         return None
     addr = int(val)
     return hex(addr) if addr else None

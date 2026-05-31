@@ -21,10 +21,9 @@
     #endif
 #endif
 
-#include "lv_wayland_private.h"
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include LV_STDDEF_INCLUDE
+#include LV_STDINT_INCLUDE
+#include LV_STDBOOL_INCLUDE
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>

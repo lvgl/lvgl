@@ -1,0 +1,57 @@
+name: Build .deb packages
+
+on:
+  push:
+    branches: [ master ]
+  pull_request: 
+    branches: [ master ]
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+# We use Docker here because launchpad builders run offline, using Docker makes it easy 
+# to block networking requests and making sure things continue to build properly without
+# access to internet
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build builder image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: env_support/debian/Dockerfile
+          push: false
+          load: true
+          tags: deb-builder:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Prepare folder
+        run: |
+          # Debian folder needs to sit directly in the top directory
+          mv env_support/debian .
+          rm -rf .devcontainer .git .github demos docs examples tests zephyr
+
+      - name: Build packages (offline)
+        run: |
+          docker run --rm --network none \
+              -v $(pwd):/workspace \
+              -w /workspace \
+              deb-builder:latest \
+              bash -c "dpkg-buildpackage -b -d -uc -us && mkdir debian-result-packages && mv ../*.deb debian-result-packages"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lvgl-deb-packages-${{ github.sha }}
+          path: debian-result-packages/*

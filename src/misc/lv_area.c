@@ -6,11 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "../lvgl_public.h"
 #include "../core/lv_global.h"
 
 #include "lv_area_private.h"
-#include "lv_math.h"
 
 /*********************
  *      DEFINES

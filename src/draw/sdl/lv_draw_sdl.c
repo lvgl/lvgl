@@ -12,8 +12,6 @@
 #include "lv_draw_sdl.h"
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
-#include "../../drivers/sdl/lv_sdl_window.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_area_private.h"
 

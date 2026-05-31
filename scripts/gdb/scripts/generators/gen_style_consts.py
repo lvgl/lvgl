@@ -4,13 +4,14 @@
 import re
 from pathlib import Path
 
+LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
 LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
 GDB_ROOT = Path(__file__).parent.parent.parent
 OUTPUT = GDB_ROOT / "lvglgdb" / "lvgl" / "misc" / "lv_style_consts.py"
 
-STYLE_H = LVGL_SRC / "misc" / "lv_style.h"
-OBJ_STYLE_H = LVGL_SRC / "core" / "lv_obj_style.h"
-STYLE_GEN_H = LVGL_SRC / "misc" / "lv_style_gen.h"
+STYLE_H = LVGL_INC / "core" / "lv_style.h"
+OBJ_STYLE_H = LVGL_INC / "core" / "lv_obj_style.h"
+STYLE_GEN_H = LVGL_INC / "core" / "lv_style_gen.h"
 
 SKIP_PROPS = {
     "LV_STYLE_PROP_INV",

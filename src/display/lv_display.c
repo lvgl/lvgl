@@ -6,22 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../display/lv_display_private.h"
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_anim_private.h"
 #include "../draw/lv_draw_private.h"
 #include "../core/lv_obj_private.h"
-#include "lv_display.h"
-#include "../misc/lv_math.h"
 #include "../core/lv_refr_private.h"
-#include "../stdlib/lv_string.h"
-#include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
-#include "../debugging/sysmon/lv_sysmon.h"
-
-#if LV_USE_DRAW_SW
-    #include "../draw/sw/lv_draw_sw.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -562,6 +554,14 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
     disp->render_mode = render_mode;
+}
+
+
+lv_display_flush_cb_t lv_display_get_flush_cb(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return NULL;
+    return disp->flush_cb;
 }
 
 void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb)

@@ -4,7 +4,7 @@
  * @file lv_dropdown_properties.c
  */
 
-#include "../dropdown/lv_dropdown.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

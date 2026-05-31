@@ -6,24 +6,18 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_dropdown_private.h"
+
+#if LV_USE_DROPDOWN
+
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj.h"
-#if LV_USE_DROPDOWN != 0
-
-#include "../../misc/lv_assert.h"
+#include "../../lvgl_public.h"
 #include "../../draw/lv_draw_private.h"
-#include "../../core/lv_group.h"
-#include "../../indev/lv_indev.h"
-#include "../../display/lv_display.h"
-#include "../../font/lv_symbol_def.h"
-#include "../../misc/lv_anim.h"
-#include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -164,7 +158,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent)
 
 void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(!dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
         return;
@@ -185,7 +179,7 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 
 void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     if(dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
@@ -202,7 +196,7 @@ void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
 
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
@@ -250,7 +244,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
@@ -280,7 +274,7 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(option);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
@@ -353,7 +347,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 
 void lv_dropdown_clear_options(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->options == NULL) return;
 
@@ -371,7 +365,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
 
 void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->sel_opt_id == sel_opt) return;
@@ -388,7 +382,7 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
 
 void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->dir == dir) return;
@@ -400,7 +394,7 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
 
 void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     dropdown->symbol = symbol;
@@ -409,7 +403,7 @@ void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol)
 
 void lv_dropdown_set_selected_highlight(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     dropdown->selected_highlight = en;
@@ -422,7 +416,7 @@ void lv_dropdown_set_selected_highlight(lv_obj_t * obj, bool en)
 
 lv_obj_t * lv_dropdown_get_list(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     return dropdown->list;
@@ -430,7 +424,7 @@ lv_obj_t * lv_dropdown_get_list(lv_obj_t * obj)
 
 const char * lv_dropdown_get_text(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     return dropdown->text;
@@ -438,7 +432,7 @@ const char * lv_dropdown_get_text(lv_obj_t * obj)
 
 const char * lv_dropdown_get_options(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     return dropdown->options == NULL ? "" : dropdown->options;
@@ -446,7 +440,7 @@ const char * lv_dropdown_get_options(const lv_obj_t * obj)
 
 uint32_t lv_dropdown_get_selected(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -455,7 +449,7 @@ uint32_t lv_dropdown_get_selected(const lv_obj_t * obj)
 
 uint32_t lv_dropdown_get_option_count(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -464,7 +458,7 @@ uint32_t lv_dropdown_get_option_count(const lv_obj_t * obj)
 
 void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -522,21 +516,21 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
 
 const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     return dropdown->symbol;
 }
 
 bool lv_dropdown_get_selected_highlight(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     return dropdown->selected_highlight;
 }
 
 lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     return dropdown->dir;
 }
@@ -547,7 +541,7 @@ lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
 
 void lv_dropdown_open(lv_obj_t * dropdown_obj)
 {
-    LV_ASSERT_OBJ(dropdown_obj, MY_CLASS);
+    LV_CHECK_OBJ(dropdown_obj, MY_CLASS, return);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
@@ -645,7 +639,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
 
 void lv_dropdown_close(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_obj_remove_state(obj, LV_STATE_CHECKED);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
@@ -658,7 +652,7 @@ void lv_dropdown_close(lv_obj_t * obj)
 
 bool lv_dropdown_is_open(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     return lv_obj_has_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN) ? false : true;
@@ -786,8 +780,8 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     if(code == LV_EVENT_FOCUSED) {
-        lv_group_t * g             = lv_obj_get_group(obj);
-        bool editing               = lv_group_get_editing(g);
+        lv_group_t * g = lv_obj_get_group(obj);
+        const bool editing = g && lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
 
         /*Encoders need special handling*/

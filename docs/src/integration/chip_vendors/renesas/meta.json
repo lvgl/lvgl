@@ -1,0 +1,13 @@
+{
+  "title": "Renesas",
+  "pages": [
+    "built_in_drivers",
+    "ra_family",
+    "rx_family",
+    "rzg_family",
+    "rza_family",
+    "supported_boards",
+    "glcdc",
+    "dave2d_gpu"
+  ]
+}

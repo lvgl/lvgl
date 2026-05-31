@@ -4,7 +4,7 @@
  * @file lv_tabview_properties.c
  */
 
-#include "../tabview/lv_tabview.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

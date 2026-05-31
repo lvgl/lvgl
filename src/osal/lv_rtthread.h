@@ -16,7 +16,7 @@ extern "C" {
 #if LV_USE_OS == LV_OS_RTTHREAD
 
 #include <rtthread.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 
 /*********************
  *      DEFINES

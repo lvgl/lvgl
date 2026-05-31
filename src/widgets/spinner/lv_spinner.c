@@ -8,11 +8,21 @@
  *********************/
 
 #include "lv_spinner_private.h"
+#include "../../lvgl_public.h"
 #if LV_USE_SPINNER
 
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj_property.h"
+
+/*Check dependencies*/
+#if LV_USE_ARC == 0
+    #error "lv_spinner: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC  1) "
+#endif
+
+/*Check dependencies*/
+#if LV_USE_ARC == 0
+    #error "lv_spinner: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC  1) "
+#endif
 
 /*********************
  *      DEFINES
@@ -76,7 +86,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent)
 
 void lv_spinner_set_anim_params(lv_obj_t * obj, uint32_t t, uint32_t angle)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinner_t * spinner = (lv_spinner_t *)obj;
 
     spinner->duration = t;
@@ -107,7 +117,7 @@ void lv_spinner_set_anim_params(lv_obj_t * obj, uint32_t t, uint32_t angle)
 
 void lv_spinner_set_anim_duration(lv_obj_t * obj, uint32_t t)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinner_t * spinner = (lv_spinner_t *)obj;
 
     lv_spinner_set_anim_params(obj, t, spinner->angle);
@@ -115,7 +125,7 @@ void lv_spinner_set_anim_duration(lv_obj_t * obj, uint32_t t)
 
 void lv_spinner_set_arc_sweep(lv_obj_t * obj, uint32_t angle)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spinner_t * spinner = (lv_spinner_t *)obj;
 
     lv_spinner_set_anim_params(obj, spinner->duration, angle);
@@ -123,14 +133,14 @@ void lv_spinner_set_arc_sweep(lv_obj_t * obj, uint32_t angle)
 
 uint32_t lv_spinner_get_anim_duration(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinner_t * spinner = (lv_spinner_t *)obj;
     return spinner->duration;
 }
 
 uint32_t lv_spinner_get_arc_sweep(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spinner_t * spinner = (lv_spinner_t *)obj;
     return spinner->angle;
 }

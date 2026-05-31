@@ -18,7 +18,7 @@
 #if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <stdlib.h>
-#include "g2d.h"
+#include <g2d.h>
 #include "../../../misc/lv_area_private.h"
 #include "lv_g2d_buf_map.h"
 #include "lv_g2d_utils.h"

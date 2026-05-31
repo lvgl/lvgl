@@ -1,0 +1,25 @@
+<!--
+ @title Table merge cells
+ @brief Span a cell across two columns by setting the `merge_right` control flag.
+
+ The `ctrl` attribute on `<lv_table-cell>` takes one or more flags joined
+ with `|`. `merge_right` extends the cell into the column immediately to
+ its right, hiding that neighbour's content — the header row here merges
+ column 0 into column 1 so the title spans both quarters. To span more
+ than two columns, chain `merge_right` on each adjacent cell except the
+ last. `text_crop` is a useful companion flag when a long value would
+ overflow the merged cell.
+-->
+<screen>
+	<view >
+		<!-- 💡 Add a third column plus another `merge_right` on the header to span it; without the chain the title stops at column 1. -->
+		<lv_table name="table" align="center">
+			<!-- 2-column table; the header spans both columns via a single merge_right -->
+			<lv_table-cell row="0" column="0" value="Quarterly summary" ctrl="merge_right" />
+			<lv_table-cell row="1" column="0" value="Q1" />
+			<lv_table-cell row="1" column="1" value="Q2" />
+			<lv_table-cell row="2" column="0" value="120" />
+			<lv_table-cell row="2" column="1" value="145" />
+		</lv_table>
+	</view>
+</screen>

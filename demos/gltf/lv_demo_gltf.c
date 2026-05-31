@@ -11,7 +11,6 @@
 
 #if LV_USE_DEMO_GLTF
 
-#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -569,7 +568,7 @@ static void style_dropdown(lv_obj_t * dropdown)
     lv_obj_set_style_bg_color(dropdown, lv_color_hex(0x404040), LV_PART_MAIN);
     lv_obj_set_style_bg_grad_color(dropdown, lv_color_hex(0x4A4A4A), LV_PART_MAIN);
     lv_obj_set_style_text_color(dropdown, lv_color_white(), LV_PART_MAIN);
-    lv_obj_t * dropdown_list = ((lv_dropdown_t *)dropdown)->list;
+    lv_obj_t * dropdown_list = lv_dropdown_get_list(dropdown);
     lv_obj_set_style_clip_corner(dropdown_list, false, LV_PART_MAIN);
 }
 

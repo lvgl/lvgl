@@ -6,18 +6,16 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_x11.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_X11
 
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include "../../core/lv_obj_pos.h"
-#include "../../core/lv_refr.h"
 
 /*********************
  *      DEFINES

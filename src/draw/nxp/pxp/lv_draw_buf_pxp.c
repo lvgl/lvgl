@@ -21,7 +21,7 @@
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 
-#include "lvgl_support.h"
+#include <lvgl_support.h>
 
 /*********************
  *      DEFINES

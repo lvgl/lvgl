@@ -7,13 +7,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from enum_parser import parse_enum, generate_dict_module
 
-LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
+LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
 OUTPUT = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "core" / "lv_observer_consts.py"
 
 
 def main():
     subject_types = parse_enum(
-        LVGL_SRC / "core" / "lv_observer.h",
+        LVGL_INC / "core" / "lv_observer.h",
         "lv_subject_type_t",
         "LV_SUBJECT_TYPE_",
     )

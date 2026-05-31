@@ -6,11 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_tileview_private.h"
-#include "../../core/lv_obj_class_private.h"
-#include "../../indev/lv_indev.h"
-#include "../../indev/lv_indev_private.h"
+
 #if LV_USE_TILEVIEW
+
+#include "../../core/lv_obj_class_private.h"
+#include "../../indev/lv_indev_private.h"
 
 /*********************
  *      DEFINES

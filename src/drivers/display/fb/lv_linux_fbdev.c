@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linux_fbdev.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_LINUX_FBDEV
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <stddef.h>
+#include LV_STDDEF_INCLUDE
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/mman.h>

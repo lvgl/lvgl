@@ -4,7 +4,7 @@
  * @file lv_spinner_properties.c
  */
 
-#include "../spinner/lv_spinner.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

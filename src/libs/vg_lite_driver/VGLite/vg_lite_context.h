@@ -25,14 +25,14 @@
 *
 *****************************************************************************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <stddef.h>
+#include LV_STDINT_INCLUDE
+#include LV_STDDEF_INCLUDE
 #include <math.h>
 #include "../inc/vg_lite.h"
 #include "../VGLiteKernel/vg_lite_kernel.h"

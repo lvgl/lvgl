@@ -6,15 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_x11.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_X11
 
 #include <string.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include "../../widgets/image/lv_image.h"
 
 /*********************
  *      DEFINES
