@@ -1,20 +1,18 @@
 ---
 title: "Drop-Down List (lv_dropdown)"
-description: "The Drop-Down List allows the user to select a value from a list."
+description: "Let the user pick a value from a list that opens on click and closes after the choice."
 ---
 
 ## Overview
 
-The Drop-Down List allows the user to select a value from a list.
+A Drop-Down List lets the user pick a value from a list.
 
-The Drop-Down List is closed by default and displays a single value or
-predefined text. When activated (by click on the Drop-Down List), a list
-is created from which the user may select one item. When the user
-selects a new value, the list is deleted again.
+It is closed by default and shows a single value or a fixed label. When
+the user clicks it, the list opens; after a pick, the list closes again.
 
-The Drop-down list is added to the default group (if one is set).
-The Drop-down list is an editable Widget allowing list-item selection via
-encoder or keyboard navigation as well.
+A Drop-Down is added to the default group (if one is set). It is an
+editable widget — items can also be selected with an encoder or a
+keyboard.
 
 ## List items
 
@@ -62,8 +60,8 @@ shows that string regardless of selection. Pass `NULL` to revert.
 
 ## Styling
 
-The widget has two parts: the **button** (always visible) and the **list**
-(shown while open). Each part has its own selectors:
+The widget has two parts: the **button** (opens the list when clicked)
+and the **list** (shown while open). Each part has its own selectors:
 
 **Button**
 
@@ -75,9 +73,12 @@ The widget has two parts: the **button** (always visible) and the **list**
 
 - <ApiLink name="LV_PART_MAIN" /> — list background. `max_height` caps the open list size.
 - <ApiLink name="LV_PART_SCROLLBAR" /> — scrollbar.
-- <ApiLink name="LV_PART_SELECTED" /> — the highlighted/pressed option row.
+- <ApiLink name="LV_PART_SELECTED" /> — the highlighted/pressed option:
+  -  <ApiLink name="LV_STATE_CHECKED" /> — used for the currently active option
+  -  <ApiLink name="LV_STATE_PRESSED" /> — used for the option is being pressed by touch or
+     the Enter key is being pressed
 
-To restyle the list, grab it and add a style:
+To restyle the list, just get it, and add a style:
 
 ```c
 lv_obj_t * list = lv_dropdown_get_list(dd);
@@ -86,16 +87,6 @@ lv_obj_add_style(list, &my_style, LV_PART_SELECTED);
 
 <LvglExample name="lv_example_dropdown_styling" path="widgets/dropdown/lv_example_dropdown_styling" />
 
-The dropdown's primary surface is <ApiLink name="LV_PART_MAIN" /> — the
-tap target the user sees when the list is closed. It accepts the full
-background stack: `bg_color`, `radius`, `border_*`, `outline_*`,
-`shadow_*`, `pad_*`, and `text_*`. Combine with states for visual
-feedback: `selector="main|focused"`, `selector="main|pressed"`, or
-`selector="main|checked"` (CHECKED is set automatically while the list
-is open). The popup list is a separate object — style it via
-<ApiLink name="lv_dropdown_get_list" display="lv_dropdown_get_list(dropdown)" /> in C; XML styling of the open list
-itself is not available. Local `style_*` props on the `<lv_dropdown>`
-tag target MAIN.
 
 ## Data binding
 
@@ -124,11 +115,7 @@ To show the value live in a label next to the widget, attach a label and call <A
 
 <LvglExample name="lv_example_dropdown_event" path="widgets/dropdown/lv_example_dropdown_event" />
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
@@ -137,6 +124,4 @@ Learn more about [events](/common-widget-features/events).
 - <ApiLink name="LV_KEY_ENTER" /> Apply selected list item (sends
    <ApiLink name="LV_EVENT_VALUE_CHANGED" /> event and closes Drop-Down List).
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

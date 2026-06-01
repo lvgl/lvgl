@@ -50,7 +50,7 @@ void lv_example_buttonmatrix_styling(void)
 
     /* Weekday matrix with one-checked semantics + styled items */
     lv_obj_t * buttonmatrix = lv_buttonmatrix_create(screen);
-    lv_obj_set_size(buttonmatrix, lv_pct(90), 60);
+    lv_obj_set_size(buttonmatrix, lv_pct(90), 80);
     static const char * buttonmatrix_map_0[] = {"M", "T", "W", "T", "F", "S", "S", NULL};
     lv_buttonmatrix_set_map(buttonmatrix, buttonmatrix_map_0);
     lv_buttonmatrix_set_one_checked(buttonmatrix, true);

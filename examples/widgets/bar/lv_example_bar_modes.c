@@ -27,7 +27,7 @@ void lv_example_bar_modes(void)
 
     /* Normal mode */
     lv_obj_t * bar_1 = lv_bar_create(screen);
-    lv_obj_set_size(bar_1, lv_pct(90), 16);
+    lv_obj_set_size(bar_1, lv_pct(90), 20);
     lv_bar_set_mode(bar_1, LV_BAR_MODE_NORMAL);
     lv_bar_set_min_value(bar_1, 0);
     lv_bar_set_max_value(bar_1, 100);
@@ -39,7 +39,7 @@ void lv_example_bar_modes(void)
 
     /* Symmetrical mode around zero */
     lv_obj_t * bar_2 = lv_bar_create(screen);
-    lv_obj_set_size(bar_2, lv_pct(90), 16);
+    lv_obj_set_size(bar_2, lv_pct(90), 20);
     lv_bar_set_mode(bar_2, LV_BAR_MODE_SYMMETRICAL);
     lv_bar_set_min_value(bar_2, -100);
     lv_bar_set_max_value(bar_2, 100);
@@ -51,7 +51,7 @@ void lv_example_bar_modes(void)
 
     /* Range mode with start and end values */
     lv_obj_t * bar_3 = lv_bar_create(screen);
-    lv_obj_set_size(bar_3, lv_pct(90), 16);
+    lv_obj_set_size(bar_3, lv_pct(90), 20);
     lv_bar_set_mode(bar_3, LV_BAR_MODE_RANGE);
     lv_bar_set_min_value(bar_3, 0);
     lv_bar_set_max_value(bar_3, 100);

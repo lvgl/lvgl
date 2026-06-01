@@ -46,7 +46,7 @@ void lv_example_textarea_cursor(void)
 
     /* Block cursor */
     lv_obj_t * textarea_1 = lv_textarea_create(screen);
-    lv_obj_set_width(textarea_1, lv_pct(90));
+    lv_obj_set_width(textarea_1, lv_pct(60));
     lv_textarea_set_one_line(textarea_1, true);
     lv_textarea_set_text(textarea_1, "Block");
     lv_textarea_set_cursor_pos(textarea_1, 2);
@@ -55,7 +55,7 @@ void lv_example_textarea_cursor(void)
 
     /* Bar cursor */
     lv_obj_t * textarea_2 = lv_textarea_create(screen);
-    lv_obj_set_width(textarea_2, lv_pct(90));
+    lv_obj_set_width(textarea_2, lv_pct(60));
     lv_textarea_set_one_line(textarea_2, true);
     lv_textarea_set_text(textarea_2, "Bar");
     lv_textarea_set_cursor_pos(textarea_2, 2);

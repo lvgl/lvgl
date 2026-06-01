@@ -22,7 +22,8 @@ void lv_example_flex_internal_padding(void)
     if(!inited) {
         lv_style_init(&style_tag);
         lv_style_set_bg_opa(&style_tag, (255 * 100 / 100));
-        lv_style_set_pad_all(&style_tag, 8);
+        lv_style_set_pad_ver(&style_tag, 12);
+        lv_style_set_pad_hor(&style_tag, 18);
         lv_style_set_radius(&style_tag, 4);
 
         inited = true;
@@ -40,9 +41,9 @@ void lv_example_flex_internal_padding(void)
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_style_pad_column(container, 10, 0);
     lv_obj_set_style_pad_row(container, 30, 0);
-    lv_obj_set_size(container, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container, lv_pct(90), LV_SIZE_CONTENT);
     lv_obj_t * label_1 = lv_label_create(container);
-    lv_obj_set_style_bg_color(label_1, lv_color_hex(0x4a90d9), 0);
+    lv_obj_set_style_bg_color(label_1, lv_color_hex(0x5e9ee3), 0);
     lv_label_set_text(label_1, "HTML");
     lv_obj_add_style(label_1, &style_tag, 0);
 
@@ -70,5 +71,20 @@ void lv_example_flex_internal_padding(void)
     lv_obj_set_style_bg_color(label_6, lv_color_hex(0x16a085), 0);
     lv_label_set_text(label_6, "Rust");
     lv_obj_add_style(label_6, &style_tag, 0);
+
+    lv_obj_t * label_7 = lv_label_create(container);
+    lv_obj_set_style_bg_color(label_7, lv_color_hex(0xd8da19), 0);
+    lv_label_set_text(label_7, "Java");
+    lv_obj_add_style(label_7, &style_tag, 0);
+
+    lv_obj_t * label_8 = lv_label_create(container);
+    lv_obj_set_style_bg_color(label_8, lv_color_hex(0x18d99e), 0);
+    lv_label_set_text(label_8, "PHP");
+    lv_obj_add_style(label_8, &style_tag, 0);
+
+    lv_obj_t * label_9 = lv_label_create(container);
+    lv_obj_set_style_bg_color(label_9, lv_color_hex(0xeb4c9e), 0);
+    lv_label_set_text(label_9, "Zig");
+    lv_obj_add_style(label_9, &style_tag, 0);
 }
 #endif

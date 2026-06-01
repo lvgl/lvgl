@@ -1,15 +1,16 @@
 ---
 title: "Text Area (lv_textarea)"
-description: "The Text Area is a base widget with a Label (lv_label) and a cursor on it. Text or characters can be added to it."
+description: "Editable text field with a cursor. Supports wrapping, scrolling, one-line and password modes."
 ---
 
 ## Overview
 
-The Text Area is a [base widget](/widgets/base_widget) with a [Label (lv_label)](/widgets/label) and a cursor on
-it.  Text or characters can be added to it.  Long lines are wrapped and when the
-text becomes long enough, the Text Area can be scrolled.
+A Text Area is a [base widget](/widgets/base_widget) holding a
+[Label](/widgets/label) and a cursor. You can add or remove text and
+characters. Long lines wrap, and when the text gets too long the area
+becomes scrollable.
 
-One-line mode and password modes are supported.
+One-line mode and password mode are also supported.
 
 ## Adding text
 
@@ -169,30 +170,24 @@ style and a `selector`:
 
 ## Events
 
-- <ApiLink name="LV_EVENT_INSERT" /> Sent right before a character or text is
-   inserted. The event parameter is the text about to be inserted.
-   <ApiLink name="lv_textarea_set_insert_replace" display="lv_textarea_set_insert_replace(textarea, &quot;New text&quot;)" /> can be called
-   from within that event to replace the text to be inserted.  The contents of the
-   buffer passed must be survive long enough for the call to `lv_timer_handler()`
-   that is driving the event to return (after which the Text Area's label will have
-   copied the text).  So it should not be a local buffer (created on the stack)
-   where its contents will be destroyed before that happens.  Passing `""` means "do
-   not insert anything".
+- <ApiLink name="LV_EVENT_INSERT" /> Sent just before a character or text is
+   inserted. The event parameter is the text about to be inserted. From the
+   handler you can call
+   <ApiLink name="lv_textarea_set_insert_replace" display="lv_textarea_set_insert_replace(textarea, &quot;New text&quot;)" />
+   to replace it, or pass `""` to skip the insertion. The buffer must stay
+   valid until the current `lv_timer_handler()` call returns — don't pass
+   a stack-allocated string.
 - <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when the content of the Text Area
    has changed.
 - <ApiLink name="LV_EVENT_READY" /> Sent when <ApiLink name="LV_KEY_ENTER" /> is
    pressed (or sent) to a one-line Text Area.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-</Callout>
 
 ## Keys
 
 - `LV_KEY_UP/DOWN/LEFT/RIGHT` Move the cursor
 - `Any character` Add the character to the current cursor position
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
 

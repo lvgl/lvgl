@@ -1,14 +1,11 @@
 ---
 title: "Label (lv_label)"
+description: "Display text with optional wrapping, scrolling, recoloring, and selection."
 ---
-
-<br />
-
-<hr />
 
 ## Overview
 
-A Label is the Widget used to display text.
+A Label is the widget used to display text.
 
 ## Set text
 
@@ -182,20 +179,7 @@ As usual with format strings, `%%` is used to get `%`. For example `%d%%`
 
 ## Events
 
-No special events are sent by Label Widgets.  By default, Label Widgets are created
-without the LV_OBJ_FLAG_CLICKABLE flag, but you can add it to make a Label Widget
-emit LV_EVENT_CLICKED events if desired.
+By default, Label Widgets are created without the  <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag,
+but you can add it to make the Widget detect and send events <ApiLink name="LV_EVENT_CLICKED" />.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Label Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

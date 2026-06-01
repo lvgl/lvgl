@@ -38,14 +38,10 @@ void lv_example_style_parts_states(void)
     }
 
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 20, 0);
 
     /* 💡 Press and hold the slider: the indicator keeps its gradient but gains the pressed glow. */
     lv_obj_t * slider = lv_slider_create(screen);
+    lv_obj_set_align(slider, LV_ALIGN_CENTER);
     lv_obj_set_size(slider, 220, 16);
     lv_slider_set_min_value(slider, 0);
     lv_slider_set_max_value(slider, 100);

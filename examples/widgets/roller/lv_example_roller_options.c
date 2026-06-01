@@ -21,7 +21,7 @@ void lv_example_roller_options(void)
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
     lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_SPACE_EVENLY, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_column(screen, 32, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
 
     /* Normal: bounded scrolling */
     lv_obj_t * roller_1 = lv_roller_create(screen);

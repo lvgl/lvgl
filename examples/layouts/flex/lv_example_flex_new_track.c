@@ -37,7 +37,7 @@ void lv_example_flex_new_track(void)
     /* Demo container showing explicit new-track start */
     lv_obj_t * container = lv_obj_create(screen);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_size(container, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container, lv_pct(90), LV_SIZE_CONTENT);
     /* Track 1 */
     lv_obj_t * label_1 = lv_label_create(container);
     lv_obj_set_style_bg_color(label_1, lv_color_hex(0x3498db), 0);

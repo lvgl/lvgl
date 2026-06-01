@@ -33,21 +33,16 @@ void lv_example_style_image(void)
         lv_style_set_border_color(&style_img, ACCENT);
         lv_style_set_image_recolor(&style_img, ACCENT);
         lv_style_set_image_recolor_opa(&style_img, (255 * 50 / 100));
-        lv_style_set_transform_rotation(&style_img, 300);
 
         inited = true;
     }
 
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 The bitmap is tinted and rotated by style alone; lower `image_recolor_opa` to fade the tint or change `transform_rotation`. */
     lv_obj_t * image = lv_image_create(screen);
     lv_image_set_src(image, &img_example_lvgl_logo);
+    lv_obj_set_align(image, LV_ALIGN_CENTER);
     lv_obj_add_style(image, &style_img, 0);
 }
 #endif

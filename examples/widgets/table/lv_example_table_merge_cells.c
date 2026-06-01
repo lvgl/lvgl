@@ -20,14 +20,10 @@
 void lv_example_table_merge_cells(void)
 {
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Add a third column plus another `merge_right` on the header to span it; without the chain the title stops at column 1. */
     lv_obj_t * table = lv_table_create(screen);
+    lv_obj_set_align(table, LV_ALIGN_CENTER);
     lv_table_set_cell_value(table, 0, 0, "Quarterly summary");
     lv_table_set_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     lv_table_set_cell_value(table, 1, 0, "Q1");
