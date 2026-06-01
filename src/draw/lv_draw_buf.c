@@ -347,9 +347,16 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
     LV_PROFILER_DRAW_BEGIN;
     if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_ALLOCATED)) {
         LV_ASSERT_NULL(draw_buf->handlers);
+        LV_ASSERT_FORMAT_MSG(draw_buf->header.magic == LV_IMAGE_HEADER_MAGIC,
+                             "Invalid draw buf magic: 0x%02X", draw_buf->header.magic);
 
         const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
         draw_buf_free(handlers, draw_buf->unaligned_data);
+        draw_buf->unaligned_data = NULL;
+        draw_buf->data = NULL;
+
+        /*Poison the magic before freeing so UAF access can be detected*/
+        draw_buf->header.magic = LV_IMAGE_HEADER_DEADBEEF;
         lv_free(draw_buf);
     }
     else {
