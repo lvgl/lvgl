@@ -697,7 +697,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
 
 void lv_obj_scrollbar_invalidate(lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_area_t hor_area;
     lv_area_t ver_area;
@@ -711,7 +711,7 @@ void lv_obj_scrollbar_invalidate(lv_obj_t * obj)
 
 void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     /*Be sure the bottom side is not remains scrolled in*/
     /*With snapping the content can't be scrolled in*/
