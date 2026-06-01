@@ -37,20 +37,16 @@ void lv_example_table_styling(void)
         lv_style_set_border_color(&style_table_items, lv_color_hex(0xe5e7eb));
         lv_style_set_border_width(&style_table_items, 1);
         lv_style_set_pad_all(&style_table_items, 8);
-        lv_style_set_text_color(&style_table_items, lv_color_hex(0x111827));
+        lv_style_set_text_color(&style_table_items, lv_color_hex(0x1345b0));
 
         inited = true;
     }
 
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Recolour `style_table_items` to apply a different look to every cell at once. */
     lv_obj_t * table = lv_table_create(screen);
+    lv_obj_set_align(table, LV_ALIGN_CENTER);
     lv_table_set_row_count(table, 3);
     lv_table_set_column_count(table, 2);
     lv_table_set_cell_value(table, 0, 0, "Metric");

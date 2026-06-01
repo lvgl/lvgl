@@ -24,7 +24,7 @@ void lv_example_flex_grow(void)
     /* Demo row for grow behavior */
     lv_obj_t * container = lv_obj_create(screen);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
-    lv_obj_set_size(container, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container, lv_pct(90), LV_SIZE_CONTENT);
     /* Fixed-width item on the left */
     lv_obj_t * button_1 = lv_button_create(container);
     lv_obj_set_size(button_1, 50, LV_SIZE_CONTENT);

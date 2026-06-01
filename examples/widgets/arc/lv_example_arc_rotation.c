@@ -16,12 +16,13 @@
 void lv_example_arc_rotation(void)
 {
     lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_SPACE_EVENLY, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
 
     /* Arc rotated by 45 degrees */
     lv_obj_t * arc_1 = lv_arc_create(screen);
-    lv_obj_set_align(arc_1, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(arc_1, 10);
-    lv_obj_set_size(arc_1, 90, 90);
+    lv_obj_set_size(arc_1, 120, 120);
     lv_arc_set_bg_start_angle(arc_1, 0);
     lv_arc_set_bg_end_angle(arc_1, 270);
     lv_arc_set_rotation(arc_1, 45);
@@ -32,9 +33,7 @@ void lv_example_arc_rotation(void)
 
     /* Arc rotated by 135 degrees */
     lv_obj_t * arc_2 = lv_arc_create(screen);
-    lv_obj_set_align(arc_2, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_x(arc_2, -10);
-    lv_obj_set_size(arc_2, 90, 90);
+    lv_obj_set_size(arc_2, 120, 120);
     lv_arc_set_bg_start_angle(arc_2, 0);
     lv_arc_set_bg_end_angle(arc_2, 270);
     lv_arc_set_rotation(arc_2, 135);

@@ -26,7 +26,7 @@ void lv_example_flex_ignore_layout(void)
        it keeps its manual x/y position and the other items are laid out normally. */
     lv_obj_t * container = lv_obj_create(screen);
     lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW);
-    lv_obj_set_size(container, lv_pct(100), 150);
+    lv_obj_set_size(container, lv_pct(90), 150);
     lv_obj_t * button_1 = lv_button_create(container);
     lv_obj_set_height(button_1, LV_SIZE_CONTENT);
     lv_obj_t * label_1 = lv_label_create(button_1);

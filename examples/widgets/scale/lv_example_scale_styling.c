@@ -43,6 +43,8 @@ void lv_example_scale_styling(void)
         lv_style_set_line_color(&style_scale_indicator, lv_color_hex(0x6366f1));
         lv_style_set_line_width(&style_scale_indicator, 3);
         lv_style_set_text_color(&style_scale_indicator, lv_color_hex(0x6366f1));
+        lv_style_set_transform_rotation(&style_scale_indicator, 300);
+        lv_style_set_pad_bottom(&style_scale_indicator, 8);
 
         inited = true;
     }
@@ -63,7 +65,6 @@ void lv_example_scale_styling(void)
     lv_scale_set_label_show(scale, true);
     lv_scale_set_min_value(scale, 0);
     lv_scale_set_max_value(scale, 100);
-    lv_obj_set_style_transform_rotation(scale, 300, LV_PART_INDICATOR);
     lv_obj_add_style(scale, &style_scale_main, LV_PART_MAIN);
     lv_obj_add_style(scale, &style_scale_items, LV_PART_ITEMS);
     lv_obj_add_style(scale, &style_scale_indicator, LV_PART_INDICATOR);

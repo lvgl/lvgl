@@ -1,12 +1,12 @@
 ---
 title: "Arc (lv_arc)"
-description: "The Arc consists of a background and a foreground arc. The foreground (indicator) can be touch-adjusted."
+description: "Background arc with a foreground indicator the user can drag with touch."
 ---
 
 ## Overview
 
-The Arc consists of a background and a foreground arc. The foreground
-(indicator) can be touch-adjusted.
+An Arc has a background arc and a foreground (indicator) arc. The
+indicator can be dragged with touch input to change the value.
 
 ## Value and range
 
@@ -197,17 +197,11 @@ To show the value live in a label next to the widget, attach a label and call <A
 
 To update another widget on every value change without an event callback, bind both widgets to the same Subject — see the Data binding section above.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
 - `LV_KEY_RIGHT/UP` Increases value by one.
 - `LV_KEY_LEFT/DOWN` Decreases value by one.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

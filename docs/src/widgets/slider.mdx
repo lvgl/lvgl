@@ -1,13 +1,12 @@
 ---
 title: "Slider (lv_slider)"
-description: "The Slider Widget looks like a Bar (lv_bar) supplemented with a knob. The knob can be dragged to set the Slider's value."
+description: "A Bar with a draggable knob the user moves to set the value. Horizontal or vertical."
 ---
 
 ## Overview
 
-The Slider Widget looks like a [Bar (lv_bar)](/widgets/bar) supplemented with
-a knob. The knob can be dragged to set the Slider's value. Like Bar, a Slider
-can be vertical or horizontal.
+The Slider looks like a [Bar](/widgets/bar) with a knob. Drag the knob to
+set the value. Like Bar, a Slider can be vertical or horizontal.
 
 ## Value, range and orientation
 
@@ -133,17 +132,11 @@ value exceeds a threshold".
 
 To update another widget on every value change without an event callback, bind both widgets to the same Subject — see the Data binding section above.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
 - `LV_KEY_UP/RIGHT` Increment Slider's value by 1.
 - `LV_KEY_DOWN/LEFT` Decrement Slider's value by 1.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

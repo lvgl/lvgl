@@ -21,16 +21,13 @@
 void lv_example_table_rows_columns(void)
 {
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Bump `row_count` past what fits on screen — the table scrolls; the empty cells stay in place because they're part of the grid. */
     lv_obj_t * table = lv_table_create(screen);
+    lv_obj_set_align(table, LV_ALIGN_CENTER);
     lv_table_set_row_count(table, 10);
     lv_table_set_column_count(table, 2);
+    lv_obj_set_height(table, lv_pct(90));
     lv_table_set_cell_value(table, 0, 0, "A");
     lv_table_set_cell_value(table, 0, 1, "B");
     lv_table_set_cell_value(table, 2, 1, "middle");
