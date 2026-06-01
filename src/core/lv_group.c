@@ -254,7 +254,8 @@ void lv_group_focus_obj(lv_obj_t * obj)
     lv_obj_t ** i;
     LV_LL_READ(&g->obj_ll, i) {
         if(*i == obj) {
-            if(g->obj_focus != NULL && obj != *g->obj_focus) {  /*Do not defocus if the same object needs to be focused again*/
+            if(g->obj_focus != NULL) {
+                if(*g->obj_focus == obj) break;  // Refocusing same object
                 lv_result_t res = lv_obj_send_event(*g->obj_focus, LV_EVENT_DEFOCUSED, get_indev(g));
                 if(res != LV_RESULT_OK) return;
                 lv_obj_invalidate(*g->obj_focus);
@@ -262,12 +263,10 @@ void lv_group_focus_obj(lv_obj_t * obj)
 
             g->obj_focus = i;
 
-            if(g->obj_focus != NULL) {
-                if(g->focus_cb) g->focus_cb(g);
-                lv_result_t res = lv_obj_send_event(*g->obj_focus, LV_EVENT_FOCUSED, get_indev(g));
-                if(res != LV_RESULT_OK) return;
-                lv_obj_invalidate(*g->obj_focus);
-            }
+            if(g->focus_cb) g->focus_cb(g);
+            lv_result_t res = lv_obj_send_event(*g->obj_focus, LV_EVENT_FOCUSED, get_indev(g));
+            if(res != LV_RESULT_OK) return;
+            lv_obj_invalidate(*g->obj_focus);
             break;
         }
     }
