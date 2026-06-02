@@ -192,7 +192,7 @@ void lv_timer_set_cb(lv_timer_t * timer, lv_timer_cb_t timer_cb)
 
 void lv_timer_delete(lv_timer_t * timer)
 {
-    LV_CHECK_ARG(timer != NULL, return);
+    if(timer == NULL) return;
     lv_ll_remove(timer_ll_p, timer);
     state.timer_deleted = true;
 
