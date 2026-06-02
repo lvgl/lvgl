@@ -49,8 +49,6 @@ static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * ar
 
 lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 {
-    LV_CHECK_ARG(obj != NULL, return LV_RESULT_INVALID);
-
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     lv_event_t e;
@@ -105,7 +103,6 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 
 lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
     LV_CHECK_ARG(event_cb != NULL, return NULL);
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
