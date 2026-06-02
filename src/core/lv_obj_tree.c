@@ -57,7 +57,6 @@ void lv_obj_delete(lv_obj_t * obj)
     if(obj->is_deleting) return;
 
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_obj_invalidate(obj);
 
     lv_obj_t * par = lv_obj_get_parent(obj);
@@ -142,7 +141,6 @@ void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
 
 void lv_obj_delete_async(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_async_call(lv_obj_delete_async_cb, obj);
 }
 
@@ -153,11 +151,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     if(obj->parent == NULL) {
         LV_LOG_WARN("Can't set the parent of a screen");
-        return;
-    }
-
-    if(parent == NULL) {
-        LV_LOG_WARN("Can't set parent == NULL to an object");
         return;
     }
 
@@ -326,18 +319,15 @@ lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t idx)
 
     if(obj->spec_attr == NULL) return NULL;
 
-    uint32_t idu;
     if(idx < 0) {
         idx = obj->spec_attr->child_cnt + idx;
         if(idx < 0) return NULL;
-        idu = (uint32_t) idx;
-    }
-    else {
-        idu = idx;
     }
 
-    if(idu >= obj->spec_attr->child_cnt) return NULL;
-    else return obj->spec_attr->children[idx];
+    uint32_t idu = (uint32_t) idx;
+
+    if(idu < obj->spec_attr->child_cnt) return obj->spec_attr->children[idu];
+    else return NULL;
 }
 
 lv_obj_t * lv_obj_get_child_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
@@ -807,7 +797,7 @@ static void dump_tree_core(lv_obj_t * obj, int32_t depth)
 
 static lv_obj_t * lv_obj_get_first_not_deleting_child(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT(obj != NULL);
 
     if(obj->spec_attr == NULL) return NULL;
 
