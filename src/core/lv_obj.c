@@ -508,13 +508,13 @@ bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 
 const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL);
+    LV_CHECK_ARG(obj != NULL, return NULL); // Can't use LV_CHECK_OBJ here, it could cause an infinite recursion loop.
     return obj->class_p;
 }
 
 bool lv_obj_is_valid(const lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return false);
+    LV_CHECK_ARG(obj != NULL, return false);  // Can't use LV_CHECK_OBJ here, it could cause an infinite recursion loop.
 
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
@@ -680,7 +680,7 @@ void lv_obj_remove_delete_cb(lv_delete_dsc_t * dsc)
 
 static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_ASSERT(obj != NULL);
 
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
@@ -717,7 +717,7 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return);
+    LV_ASSERT(obj != NULL);
 
     LV_UNUSED(class_p);
 
@@ -1191,9 +1191,10 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
  */
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 {
+    LV_ASSERT(obj != NULL);
+
     if(obj->state == new_state) return;
 
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_state_t prev_state = obj->state;
 
@@ -1421,7 +1422,7 @@ static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj)
 
 static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_property_t * prop)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
+    LV_ASSERT(obj != NULL);
 
     if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
@@ -1446,7 +1447,7 @@ static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_prop
 
 static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_property_t * prop)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
+    LV_ASSERT(obj != NULL);
     if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
         prop->id = id;
