@@ -39,7 +39,8 @@ static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_t
 static lv_result_t obj_invalidate_area_internal(const lv_display_t * disp, const lv_obj_t * obj,
                                                 const lv_area_t * area);
 static bool has_blur(const lv_obj_t * obj);
-
+static int32_t calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t * content_width);
+static int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t * content_height);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -88,88 +89,12 @@ void lv_obj_set_y(lv_obj_t * obj, int32_t y)
     }
 }
 
-/**
- * @brief Calculates the width in pixels of an LVGL object based on its style and parent for a given width `prop`.
- * @param obj Pointer to the LVGL object whose width is being calculated.
- * @param prop Which style width to calculate for. Valid values are: LV_STYLE_WIDTH, LV_STYLE_MIN_WIDTH, or
- * LV_STYLE_MAX_WIDTH.
- * @param content_width Pointer to an integer storing the object's content width to prevent unnecessary recalculation.
- * If negative or NULL and width is `LV_SIZE_CONTENT`, it will be calculated.
- * @return The computed width for the object:
- * @note If the style width is a fixed value, that value is returned.
- * @note If the style width is `LV_SIZE_CONTENT`, the content width is calculated and returned.
- * @note If the style width is a `LV_PCT()`, the percentage is applied to the parent's width.
- */
-static int32_t calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_width)
-{
-    LV_ASSERT(prop == LV_STYLE_WIDTH || prop == LV_STYLE_MIN_WIDTH || prop == LV_STYLE_MAX_WIDTH);
-
-    int32_t width = lv_obj_get_style_prop(obj, 0, prop).num;
-
-    if(width == LV_SIZE_CONTENT) {
-        if(content_width == NULL) {
-            width = calc_content_width(obj);
-        }
-        else {
-            if(*content_width < 0) {
-                *content_width = calc_content_width(obj);
-            }
-            width = *content_width;
-        }
-    }
-    else if(LV_COORD_IS_PCT(width)) {
-        lv_obj_t * parent = lv_obj_get_parent(obj);
-        int32_t parent_w = lv_obj_get_content_width(parent);
-        width = (LV_COORD_GET_PCT(width) * parent_w) / 100;
-        width -= lv_obj_get_style_margin_left(obj, LV_PART_MAIN) + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
-    }
-    return width;
-}
-
 int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     LV_CHECK_ARG(prop == LV_STYLE_WIDTH || prop == LV_STYLE_MIN_WIDTH || prop == LV_STYLE_MAX_WIDTH, return 0);
 
     return calc_dynamic_width(obj, prop, NULL);
-}
-
-/**
- * @brief Calculates the height in pixels of an LVGL object based on its style and parent for a given height `prop`.
- * @param obj Pointer to the LVGL object whose height is being calculated.
- * @param prop Which style height to calculate for. Valid values are: LV_STYLE_HEIGHT, LV_STYLE_MIN_HEIGHT, or
- * LV_STYLE_MAX_HEIGHT.
- * @param content_height Pointer to an integer storing the object's content height to prevent unnecessary recalculation.
- * If negative or NULL and height is `LV_SIZE_CONTENT`, it will be calculated.
- * @return The computed height for the object:
- * @note If the style height is a fixed value, that value is returned.
- * @note If the style height is `LV_SIZE_CONTENT`, the content height is calculated and returned.
- * @note If the style height is a `LV_PCT()`, the percentage is applied to the parent's height.
- */
-static int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_height)
-{
-    LV_ASSERT(prop == LV_STYLE_HEIGHT || prop == LV_STYLE_MIN_HEIGHT || prop == LV_STYLE_MAX_HEIGHT);
-
-    int32_t height = lv_obj_get_style_prop(obj, 0, prop).num;
-
-    if(height == LV_SIZE_CONTENT) {
-        if(content_height == NULL) {
-            height = calc_content_height(obj);
-        }
-        else {
-            if(*content_height < 0) {
-                *content_height = calc_content_height(obj);
-            }
-            height = *content_height;
-        }
-    }
-    else if(LV_COORD_IS_PCT(height)) {
-        lv_obj_t * parent = lv_obj_get_parent(obj);
-        int32_t parent_h = lv_obj_get_content_height(parent);
-        height = (LV_COORD_GET_PCT(height) * parent_h) / 100;
-        height -= lv_obj_get_style_margin_top(obj, LV_PART_MAIN) + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
-    }
-    return height;
 }
 
 int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop)
@@ -441,14 +366,19 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, in
     lv_obj_update_layout(obj);
     if(base == NULL) base = lv_obj_get_parent(obj);
 
-    LV_CHECK_OBJ(base, MY_CLASS, return);
+    if(base == NULL) {
+        LV_LOG_WARN("lv_obj_align_to: base is NULL");
+        return;
+    }
 
     int32_t x = 0;
     int32_t y = 0;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-
-    LV_CHECK_OBJ(parent, MY_CLASS, return);
+    if(parent == NULL) {
+        LV_LOG_WARN("lv_obj_align_to: parent is NULL");
+        return;
+    }
 
     int32_t pleft = lv_obj_get_style_space_left(parent, LV_PART_MAIN);
     int32_t ptop = lv_obj_get_style_space_top(parent, LV_PART_MAIN);
@@ -1735,5 +1665,81 @@ static bool has_blur(const lv_obj_t * obj)
     }
 
     return false;
-
 }
+
+/**
+ * @brief Calculates the width in pixels of an LVGL object based on its style and parent for a given width `prop`.
+ * @param obj Pointer to the LVGL object whose width is being calculated.
+ * @param prop Which style width to calculate for. Valid values are: LV_STYLE_WIDTH, LV_STYLE_MIN_WIDTH, or
+ * LV_STYLE_MAX_WIDTH.
+ * @param content_width Pointer to an integer storing the object's content width to prevent unnecessary recalculation.
+ * If negative or NULL and width is `LV_SIZE_CONTENT`, it will be calculated.
+ * @return The computed width for the object:
+ * @note If the style width is a fixed value, that value is returned.
+ * @note If the style width is `LV_SIZE_CONTENT`, the content width is calculated and returned.
+ * @note If the style width is a `LV_PCT()`, the percentage is applied to the parent's width.
+ */
+static int32_t calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_width)
+{
+    LV_ASSERT(prop == LV_STYLE_WIDTH || prop == LV_STYLE_MIN_WIDTH || prop == LV_STYLE_MAX_WIDTH);
+
+    int32_t width = lv_obj_get_style_prop(obj, 0, prop).num;
+
+    if(width == LV_SIZE_CONTENT) {
+        if(content_width == NULL) {
+            width = calc_content_width(obj);
+        }
+        else {
+            if(*content_width < 0) {
+                *content_width = calc_content_width(obj);
+            }
+            width = *content_width;
+        }
+    }
+    else if(LV_COORD_IS_PCT(width)) {
+        lv_obj_t * parent = lv_obj_get_parent(obj);
+        int32_t parent_w = lv_obj_get_content_width(parent);
+        width = (LV_COORD_GET_PCT(width) * parent_w) / 100;
+        width -= lv_obj_get_style_margin_left(obj, LV_PART_MAIN) + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+    }
+    return width;
+}
+
+/**
+ * @brief Calculates the height in pixels of an LVGL object based on its style and parent for a given height `prop`.
+ * @param obj Pointer to the LVGL object whose height is being calculated.
+ * @param prop Which style height to calculate for. Valid values are: LV_STYLE_HEIGHT, LV_STYLE_MIN_HEIGHT, or
+ * LV_STYLE_MAX_HEIGHT.
+ * @param content_height Pointer to an integer storing the object's content height to prevent unnecessary recalculation.
+ * If negative or NULL and height is `LV_SIZE_CONTENT`, it will be calculated.
+ * @return The computed height for the object:
+ * @note If the style height is a fixed value, that value is returned.
+ * @note If the style height is `LV_SIZE_CONTENT`, the content height is calculated and returned.
+ * @note If the style height is a `LV_PCT()`, the percentage is applied to the parent's height.
+ */
+static int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_height)
+{
+    LV_ASSERT(prop == LV_STYLE_HEIGHT || prop == LV_STYLE_MIN_HEIGHT || prop == LV_STYLE_MAX_HEIGHT);
+
+    int32_t height = lv_obj_get_style_prop(obj, 0, prop).num;
+
+    if(height == LV_SIZE_CONTENT) {
+        if(content_height == NULL) {
+            height = calc_content_height(obj);
+        }
+        else {
+            if(*content_height < 0) {
+                *content_height = calc_content_height(obj);
+            }
+            height = *content_height;
+        }
+    }
+    else if(LV_COORD_IS_PCT(height)) {
+        lv_obj_t * parent = lv_obj_get_parent(obj);
+        int32_t parent_h = lv_obj_get_content_height(parent);
+        height = (LV_COORD_GET_PCT(height) * parent_h) / 100;
+        height -= lv_obj_get_style_margin_top(obj, LV_PART_MAIN) + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
+    }
+    return height;
+}
+
