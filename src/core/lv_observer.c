@@ -93,7 +93,7 @@ static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 #if LV_USE_EXT_DATA
 void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
 {
-    LV_CHECK_ARG(subject != NULL, return, "Can't attach external user data and destructor callback to a NULL subject");
+    LV_CHECK_ARG(subject != NULL, return);
 
     subject->ext_data.data = data;
     subject->ext_data.free_cb = free_cb;
@@ -482,7 +482,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 
 void lv_observer_remove(lv_observer_t * observer)
 {
-    LV_CHECK_ARG(observer != NULL, return);
+    if(observer == NULL) return;
 
     if(observer->for_obj && observer->target) {
         lv_obj_remove_event_cb_with_user_data(observer->target, unsubscribe_on_delete_cb, observer);
@@ -510,6 +510,7 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_CHECK_ARG(obj != NULL, return);
     /* subject == NULL is documented as valid: remove from ALL subjects */
+
     /*
      * Look for the `observer` that connects `obj` and `subject`
      * Since the obj is associated with the subject,
