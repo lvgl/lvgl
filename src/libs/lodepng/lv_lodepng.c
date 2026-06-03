@@ -91,7 +91,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
     lv_image_src_t src_type = dsc->src_type;          /*Get the source type*/
 
     if(src_type == LV_IMAGE_SRC_FILE || src_type == LV_IMAGE_SRC_VARIABLE) {
-        uint32_t * size;
+        const uint8_t * size;
         static const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
         uint8_t buf[24];
 
@@ -108,13 +108,13 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 
             if(lv_memcmp(buf, magic, sizeof(magic)) != 0) return LV_RESULT_INVALID;
 
-            size = (uint32_t *)&buf[16];
+            size = &buf[16];
         }
         /*If it's a PNG file in a  C array...*/
         else {
             const lv_image_dsc_t * img_dsc = dsc->src;
             const uint32_t data_size = img_dsc->data_size;
-            size = ((uint32_t *)img_dsc->data) + 4;
+            size = img_dsc->data + 16;
 
             if(data_size < sizeof(magic)) return LV_RESULT_INVALID;
             if(lv_memcmp(img_dsc->data, magic, sizeof(magic)) != 0) return LV_RESULT_INVALID;
@@ -122,9 +122,13 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 
         /*Save the data in the header*/
         header->cf = LV_COLOR_FORMAT_ARGB8888;
-        /*The width and height are stored in Big endian format so convert them to little endian*/
-        header->w = (int32_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
-        header->h = (int32_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
+
+        /*The width and height are stored in Big endian format*/
+        uint32_t width = (size[0] << 24) + (size[1] << 16) + (size[2] << 8) + size[3];
+        uint32_t height = (size[4] << 24) + (size[5] << 16) + (size[6] << 8) + size[7];
+
+        header->w = width;
+        header->h = height;
 
         return LV_RESULT_OK;
     }
