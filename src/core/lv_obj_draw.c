@@ -441,7 +441,7 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 
 int32_t lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;
@@ -449,7 +449,7 @@ int32_t lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 
 lv_layer_type_t lv_obj_get_layer_type(const lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return LV_LAYER_TYPE_NONE);
+    LV_CHECK_OBJ(obj, MY_CLASS, return LV_LAYER_TYPE_NONE);
 
     if(obj->spec_attr) return (lv_layer_type_t)obj->spec_attr->layer_type;
     else return LV_LAYER_TYPE_NONE;
