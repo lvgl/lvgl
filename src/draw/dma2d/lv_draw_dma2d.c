@@ -12,6 +12,7 @@
 
 #include "../sw/lv_draw_sw.h"
 #include "../../misc/lv_area_private.h"
+#include "../lv_draw_buf_private.h"
 
 #if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
     #include <zephyr/kernel.h>
@@ -46,6 +47,10 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 #if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
     static void zephyr_dma2d_irq_handler(void *);
 #endif
+#if LV_DRAW_DMA2D_CACHE
+    static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+    static void flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -62,9 +67,24 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+void lv_draw_buf_dma2d_init_handlers(void)
+{
+#if LV_DRAW_DMA2D_CACHE
+    lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    lv_draw_buf_handlers_t * font_handlers = lv_draw_buf_get_font_handlers();
+    lv_draw_buf_handlers_t * image_handlers = lv_draw_buf_get_image_handlers();
+    handlers->invalidate_cache_cb = invalidate_cache;
+    handlers->flush_cache_cb = flush_cache;
+    font_handlers->invalidate_cache_cb = invalidate_cache;
+    font_handlers->flush_cache_cb = flush_cache;
+    image_handlers->invalidate_cache_cb = invalidate_cache;
+    image_handlers->flush_cache_cb = flush_cache;
+#endif
+}
 
 void lv_draw_dma2d_init(void)
 {
+    lv_draw_buf_dma2d_init_handlers();
     lv_draw_dma2d_unit_t * draw_dma2d_unit = lv_draw_create_unit(sizeof(lv_draw_dma2d_unit_t));
     draw_dma2d_unit->base_unit.evaluate_cb = evaluate_cb;
     draw_dma2d_unit->base_unit.dispatch_cb = dispatch_cb;
@@ -255,21 +275,64 @@ void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuratio
                 ;
 }
 
+
 #if LV_DRAW_DMA2D_CACHE
-void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area)
+static void __invalidate_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area,
+                                     bool flush)
 {
-    if(SCB->CCR & SCB_CCR_DC_Msk) {
-        SCB_InvalidateDCache_by_Addr((uint32_t *)mem_area->first_byte,
-                                     mem_area->stride * mem_area->height);
+    LV_ASSERT(draw_buf != NULL);
+    LV_ASSERT(area != NULL);
+
+    const lv_image_header_t * header = &draw_buf->header;
+    uint32_t stride = header->stride;
+    lv_color_format_t cf = header->cf;
+
+    uint32_t bpp = lv_color_format_get_bpp(cf);
+    int32_t lines = lv_area_get_height(area);
+
+    if(lines <= 0 || bpp == 0U || stride == 0U) {
+        return;
+    }
+
+    /* As area coordinates, x1, x2 and y1 are always expected to be values > 0 */
+    LV_ASSERT(area->x1 >= 0);
+    LV_ASSERT(area->x2 >= 0);
+    LV_ASSERT(area->y1 >= 0);
+    LV_ASSERT(area->x2 >= area->x1);
+
+    uint64_t start_bit = (uint64_t)(uint32_t)area->x1 * (uint64_t)bpp;
+    uint64_t end_bit = (uint64_t)((uint32_t)area->x2 + 1U) * (uint64_t)bpp;
+    uint32_t start_byte = (uint32_t)(start_bit >> 3);
+    uint32_t end_byte = (uint32_t)((end_bit + 7U) >> 3);
+    int32_t bytes_to_flush_per_line = (int32_t)(end_byte - start_byte);
+    uint8_t * address = draw_buf->data + start_byte + (stride * (uint32_t)area->y1);
+    int32_t i = 0;
+
+    if(bytes_to_flush_per_line <= 0) {
+        return;
+    }
+
+    for(i = 0; i < lines; i++) {
+        if(SCB->CCR & SCB_CCR_DC_Msk) {
+            if(flush) {
+                SCB_CleanDCache_by_Addr(address, bytes_to_flush_per_line);
+            }
+            else {
+                SCB_InvalidateDCache_by_Addr(address, bytes_to_flush_per_line);
+            }
+        }
+        address += stride;
     }
 }
 
-void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area)
+static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
-    if(SCB->CCR & SCB_CCR_DC_Msk) {
-        SCB_CleanDCache_by_Addr((uint32_t *)mem_area->first_byte,
-                                mem_area->stride * mem_area->height);
-    }
+    __invalidate_flush_cache(draw_buf, area, false);
+}
+
+static void flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
+{
+    __invalidate_flush_cache(draw_buf, area, true);
 }
 #endif
 
@@ -372,17 +435,26 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return 1;
     }
 
+    int32_t x = 0 - t->target_layer->buf_area.x1;
+    int32_t y = 0 - t->target_layer->buf_area.y1;
+
+    draw_dma2d_unit->last_clipped_area = clipped_coords;
+    lv_area_move(&draw_dma2d_unit->last_clipped_area, x, y);
+
+    /* Flush cache before drawing. This is a no-op when DMA2D_CACHE is disabled */
+    lv_draw_buf_flush_cache(layer->draw_buf, &draw_dma2d_unit->last_clipped_area);
+
     if(t->type == LV_DRAW_TASK_TYPE_FILL) {
         lv_draw_fill_dsc_t * dsc = t->draw_dsc;
 
-        void * dest = lv_draw_layer_go_to_xy(layer,
-                                             clipped_coords.x1 - layer->buf_area.x1,
-                                             clipped_coords.y1 - layer->buf_area.y1);
+        void * dest = lv_draw_layer_go_to_xy(layer, draw_dma2d_unit->last_clipped_area.x1,
+                                             draw_dma2d_unit->last_clipped_area.y1);
 
         lv_draw_dma2d_fill(t, dest,
                            lv_area_get_width(&clipped_coords),
                            lv_area_get_height(&clipped_coords),
-                           lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
+                           lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area),
+                                                       dsc->base.layer->color_format));
     }
     else if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
         lv_draw_dma2d_image(t, t->draw_dsc, &t->area);
@@ -425,9 +497,9 @@ static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
 
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u)
 {
-#if LV_DRAW_DMA2D_CACHE
-    lv_draw_dma2d_invalidate_cache(&u->writing_area);
-#endif
+    /* Invalidate cache after drawing. This is a no-op when DMA2D_CACHE is disabled */
+    lv_draw_buf_invalidate_cache(u->task_act->target_layer->draw_buf, &u->last_clipped_area);
+
     u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
 }
