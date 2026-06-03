@@ -385,7 +385,7 @@ static void anim_timer(lv_timer_t * param)
                 int32_t new_value;
                 new_value = a->path_cb(a);
 
-                if(new_value != a->current_value) {
+                if(new_value != a->current_value || a->act_time >= a->time) {
                     a->current_value = new_value;
                     /*Apply the calculated value*/
                     if(a->exec_cb) a->exec_cb(a->var, new_value);
