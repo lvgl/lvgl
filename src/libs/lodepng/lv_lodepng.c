@@ -127,6 +127,9 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         uint32_t width = (size[0] << 24) + (size[1] << 16) + (size[2] << 8) + size[3];
         uint32_t height = (size[4] << 24) + (size[5] << 16) + (size[6] << 8) + size[7];
 
+        /*Avoid attempting to load images LVGL cannot use*/
+        if(width > UINT16_MAX || height > UINT16_MAX) return LV_RESULT_INVALID;
+
         header->w = width;
         header->h = height;
 
