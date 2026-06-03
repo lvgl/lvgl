@@ -36,7 +36,7 @@ extern "C" {
 #define LV_ARCH_64
 
 /*Otherwise use compiler-dependent means to determine arch size*/
-#elif defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined (__aarch64__)
+#elif defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) || defined (__aarch64__) || defined(__loongarch_lp64) || (defined(__riscv) && __riscv_xlen == 64)
 #define LV_ARCH_64
 
 #endif
