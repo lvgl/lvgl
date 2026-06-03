@@ -19,7 +19,7 @@
 
 #include "EVE_Hal.h"
 #include "EVE_CoCmd.h"
-#include "Esd_GpuAlloc.h"
+#include "EVE_GpuAlloc.h"
 
 /*********************
  *      DEFINES
@@ -41,7 +41,7 @@ typedef struct {
 typedef struct {
     lv_display_t * disp;
     EVE_HalContext * hal;
-    Esd_GpuAlloc * alloc;
+    EVE_GpuAlloc * alloc;
     bool flash_ready;
     uint32_t flash_size_bytes;
     lv_fs_drv_t fs_drv;
@@ -75,7 +75,7 @@ void lv_fs_eve5_flash_init(lv_display_t * disp)
     if(disp == NULL) return;
 
     EVE_HalContext *hal = lv_eve5_get_hal(disp);
-    Esd_GpuAlloc *alloc = lv_eve5_get_allocator(disp);
+    EVE_GpuAlloc *alloc = lv_eve5_get_allocator(disp);
 
     if(hal == NULL || alloc == NULL) {
         LV_LOG_ERROR("EVE5 HAL or allocator not available for flash driver");
@@ -308,8 +308,8 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
     lv_eve5_hal_lock(ctx->disp);
 #endif
 
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(ctx->alloc, aligned_num, GA_ALIGN_4);
-    uint32_t ramg_addr = Esd_GpuAlloc_Get(ctx->alloc, handle);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(ctx->alloc, aligned_num, GA_ALIGN_4);
+    uint32_t ramg_addr = EVE_GpuAlloc_Get(ctx->alloc, handle);
 
     if(ramg_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate %u bytes in RAM_G for flash read", aligned_num);
@@ -323,7 +323,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
     EVE_CoCmd_flashRead(ctx->hal, ramg_addr, aligned_src, aligned_num);
     if(!EVE_Cmd_waitFlush(ctx->hal)) {
         LV_LOG_ERROR("CMD_FLASHREAD failed (src=0x%08X, num=%u)", aligned_src, aligned_num);
-        Esd_GpuAlloc_Free(ctx->alloc, handle);
+        EVE_GpuAlloc_Free(ctx->alloc, handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(ctx->disp);
 #endif
@@ -332,7 +332,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
     }
 
     EVE_Hal_rdMem(ctx->hal, buf, ramg_addr + head_pad, to_read);
-    Esd_GpuAlloc_Free(ctx->alloc, handle);
+    EVE_GpuAlloc_Free(ctx->alloc, handle);
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(ctx->disp);
@@ -415,7 +415,7 @@ bool lv_eve5_flash_is_path(const char * path)
  * IMAGE LOADING
  **********************/
 
-bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
+bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
                               uint32_t * width, uint32_t * height, uint32_t * format,
                               uint32_t * image_offset, uint32_t * palette_offset)
 {
@@ -452,7 +452,7 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     }
 
     EVE_HalContext *phost = s_ctx.hal;
-    Esd_GpuAlloc *alloc = s_ctx.alloc;
+    EVE_GpuAlloc *alloc = s_ctx.alloc;
 
 #if LV_USE_OS
     lv_eve5_hal_lock(s_ctx.disp);
@@ -480,8 +480,8 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
         header_read_size = ALIGN_DOWN(s_ctx.flash_size_bytes - flash_addr, 4);
     }
 
-    Esd_GpuHandle temp_handle = Esd_GpuAlloc_Alloc(alloc, header_read_size, GA_ALIGN_4);
-    uint32_t temp_addr = Esd_GpuAlloc_Get(alloc, temp_handle);
+    EVE_GpuHandle temp_handle = EVE_GpuAlloc_Alloc(alloc, header_read_size, GA_ALIGN_4);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
     if(temp_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate temp RAM_G for flash header read");
 #if LV_USE_OS
@@ -493,7 +493,7 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     EVE_CoCmd_flashRead(phost, temp_addr, flash_addr, header_read_size);
     if(!EVE_Cmd_waitFlush(phost)) {
         LV_LOG_ERROR("CMD_FLASHREAD failed for header at 0x%08X", flash_addr);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -503,7 +503,7 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     uint8_t header_buf[1024];
     uint32_t header_size = header_read_size < sizeof(header_buf) ? header_read_size : sizeof(header_buf);
     EVE_Hal_rdMem(phost, header_buf, temp_addr, header_size);
-    Esd_GpuAlloc_Free(alloc, temp_handle);
+    EVE_GpuAlloc_Free(alloc, temp_handle);
 
     uint32_t img_w = 0, img_h = 0;
     bool parsed;
@@ -535,8 +535,8 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t decoded_size = (uint32_t)(decoded_stride * (int32_t)img_h);
 
     uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(phost) ? 0 : GA_GC_FLAG);
-    Esd_GpuHandle final_handle = Esd_GpuAlloc_Alloc(alloc, decoded_size, alloc_flags);
-    uint32_t final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
+    EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, decoded_size, alloc_flags);
+    uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", decoded_size);
 #if LV_USE_OS
@@ -573,7 +573,7 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
 
     if(!ok) {
         LV_LOG_ERROR("CMD_LOADIMAGE from flash failed for %s", path);
-        Esd_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -582,7 +582,7 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
 
     EVE_Hal_requestFenceBeforeSwap(phost);
 
-    uint32_t alloc_base = Esd_GpuAlloc_Get(alloc, final_handle);
+    uint32_t alloc_base = EVE_GpuAlloc_Get(alloc, final_handle);
     uint32_t img_ofs = (out_source >= alloc_base) ? (out_source - alloc_base) : 0;
     uint32_t pal_ofs = GA_INVALID;
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
@@ -598,7 +598,7 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t pal_end = (pal_ofs != GA_INVALID) ? (pal_ofs + 256 * 4) : 0;
     uint32_t actual_size = img_end > pal_end ? img_end : pal_end;
     if(actual_size < decoded_size) {
-        Esd_GpuAlloc_Truncate(alloc, final_handle, actual_size);
+        EVE_GpuAlloc_Truncate(alloc, final_handle, actual_size);
     }
 
 #if LV_USE_OS
@@ -616,7 +616,7 @@ bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
     return true;
 }
 
-Esd_GpuAlloc * lv_eve5_flash_get_allocator(void)
+EVE_GpuAlloc * lv_eve5_flash_get_allocator(void)
 {
     return s_ctx.alloc;
 }
@@ -629,9 +629,9 @@ void lv_fs_eve5_flash_init(lv_display_t * disp)          { (void)disp; }
 void lv_fs_eve5_flash_deinit(void)                        {}
 bool lv_eve5_flash_ready(void)                            { return false; }
 bool lv_eve5_flash_is_path(const char * path)             { (void)path; return false; }
-Esd_GpuAlloc * lv_eve5_flash_get_allocator(void)          { return NULL; }
+EVE_GpuAlloc * lv_eve5_flash_get_allocator(void)          { return NULL; }
 
-bool lv_eve5_flash_load_image(const char * path, Esd_GpuHandle *handle,
+bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
                               uint32_t * width, uint32_t * height, uint32_t * format,
                               uint32_t * image_offset, uint32_t * palette_offset)
 {

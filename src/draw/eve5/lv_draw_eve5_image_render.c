@@ -50,7 +50,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     int32_t src_w, src_h;
     int32_t layout_h;
     uint32_t palette_addr = GA_INVALID;
-    Esd_GpuHandle child_handle = GA_HANDLE_INVALID;
+    EVE_GpuHandle child_handle = GA_HANDLE_INVALID;
 
     /* Resolve bitmap source */
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
@@ -69,7 +69,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             return;
         }
         child_handle = child_vr->gpu_handle;
-        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
+        ram_g_addr = EVE_GpuAlloc_Get(u->allocator, child_handle);
         if(ram_g_addr == GA_INVALID) {
             LV_LOG_WARN("EVE5: Child layer %p texture invalid", (void *)child_layer);
             return;
@@ -79,7 +79,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         eve_stride = (int32_t)child_vr->stride;
         layout_h = src_h;
         if(child_vr->palette_offset != GA_INVALID) {
-            uint32_t base = Esd_GpuAlloc_Get(u->allocator, child_handle);
+            uint32_t base = EVE_GpuAlloc_Get(u->allocator, child_handle);
             palette_addr = base + child_vr->palette_offset;
         }
     }

@@ -266,7 +266,7 @@ uint8_t * lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t * u,
 /**
  * Render a task via SW fallback with caching.
  */
-Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u,
+EVE_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u,
                                             const lv_draw_task_t * t,
                                             int32_t * out_w, int32_t * out_h,
                                             uint32_t * out_stride,
@@ -284,7 +284,7 @@ Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u,
     uint32_t dsc_size;
     const void * dsc_data = lv_draw_eve5_sw_get_dsc_cache_data(t, &dsc_size);
 
-    Esd_GpuHandle cached_handle;
+    EVE_GpuHandle cached_handle;
     uint32_t cached_stride;
 
     if(lv_draw_eve5_sw_cache_lookup(u, t->type, buf_w, buf_h,
@@ -303,12 +303,12 @@ Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u,
     }
 
     uint32_t eve_stride;
-    Esd_GpuHandle handle = lv_draw_eve5_hal_upload_texture(u, buf_data,
+    EVE_GpuHandle handle = lv_draw_eve5_hal_upload_texture(u, buf_data,
                                                            buf_w, buf_h,
                                                            &eve_stride);
     lv_free(buf_data);
 
-    if(Esd_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
+    if(EVE_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
         return GA_HANDLE_INVALID;
     }
 
@@ -335,9 +335,9 @@ void lv_draw_eve5_sw_render_task(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     uint32_t tex_stride;
     bool from_cache;
 
-    Esd_GpuHandle handle = lv_draw_eve5_sw_render_cached(u, t, &tex_w, &tex_h, &tex_stride, &from_cache);
+    EVE_GpuHandle handle = lv_draw_eve5_sw_render_cached(u, t, &tex_w, &tex_h, &tex_stride, &from_cache);
 
-    uint32_t addr = Esd_GpuAlloc_Get(u->allocator, handle);
+    uint32_t addr = EVE_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: SW fallback failed for task type %d", t->type);
         return;

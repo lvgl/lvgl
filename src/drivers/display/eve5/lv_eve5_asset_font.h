@@ -39,7 +39,7 @@ extern "C" {
 #if LV_USE_EVE5
 
 #include "EVE_Hal.h"
-#include "Esd_GpuAlloc.h"
+#include "EVE_GpuAlloc.h"
 
 /**********************
  *      DEFINES

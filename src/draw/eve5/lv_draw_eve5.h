@@ -22,7 +22,7 @@ extern "C" {
 #if LV_USE_DRAW_EVE5
 
 #include "EVE_Hal.h"
-#include "Esd_GpuAlloc.h"
+#include "EVE_GpuAlloc.h"
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -33,7 +33,7 @@ extern "C" {
  * @param hal       pointer to initialized EVE HAL context
  * @param allocator pointer to GPU memory allocator
  */
-void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator);
+void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator);
 
 /**
  * Deinitialize the EVE5 draw unit.

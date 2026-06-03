@@ -22,7 +22,7 @@ extern "C" {
 #if LV_USE_EVE5
 
 #include "EVE_Hal.h"
-#include "Esd_GpuAlloc.h"
+#include "EVE_GpuAlloc.h"
 
 /*********************
  *      DEFINES
@@ -71,7 +71,7 @@ typedef enum {
  */
 typedef struct {
     lv_draw_buf_vram_res_t base;       /**< Must be first member */
-    Esd_GpuHandle gpu_handle;          /**< RAM_G allocation handle (GA_HANDLE_INVALID when is_swapchain) */
+    EVE_GpuHandle gpu_handle;          /**< RAM_G allocation handle (GA_HANDLE_INVALID when is_swapchain) */
     uint16_t eve_format;               /**< EVE bitmap format (ARGB8, RGB565, etc.) */
     uint32_t stride;                   /**< Bytes per row in RAM_G */
     int32_t width;                     /**< Image width in pixels */
@@ -107,7 +107,7 @@ typedef struct {
  * @param allocator pointer to GPU memory allocator
  * @return          pointer to the created display, or NULL on failure
  */
-lv_display_t * lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator);
+lv_display_t * lv_eve5_create(EVE_HalContext *hal, EVE_GpuAlloc *allocator);
 
 /**
  * Create an EVE5 (BT820) display with a specific render mode.
@@ -121,7 +121,7 @@ lv_display_t * lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator);
  * @param mode      initial rendering mode
  * @return          pointer to the created display, or NULL on failure
  */
-lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
+lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, EVE_GpuAlloc *allocator,
                                  lv_eve5_render_mode_t mode);
 
 /**
@@ -201,7 +201,7 @@ static inline lv_display_t * lv_eve5_disp_from_hal(EVE_HalContext * hal)
  * @param disp pointer to an EVE5 display
  * @return     pointer to GPU allocator, or NULL if invalid
  */
-Esd_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp);
+EVE_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp);
 
 /**
  * Detach the GPU handle from a draw_buf's vram_res, transferring ownership
@@ -222,7 +222,7 @@ Esd_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp);
  * @return           true if a handle was detached, false if no VRAM residency
  *                   (or it was the swapchain descriptor)
  */
-bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, Esd_GpuHandle *out_handle,
+bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, EVE_GpuHandle *out_handle,
                                uint16_t *out_format, uint32_t *out_stride);
 
 /*--------------------

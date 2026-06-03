@@ -260,12 +260,12 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
     lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
 
     /* Corner texture (64×64 L8 = 4KB) */
-    uint32_t corner_addr = Esd_GpuAlloc_Get(u->allocator, slot->corner_handle);
+    uint32_t corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
     if(corner_addr == GA_INVALID) {
         uint32_t corner_bytes = SHADOW_TEX_SIZE * SHADOW_TEX_SIZE;
 
-        slot->corner_handle = Esd_GpuAlloc_Alloc(u->allocator, corner_bytes, 0);
-        corner_addr = Esd_GpuAlloc_Get(u->allocator, slot->corner_handle);
+        slot->corner_handle = EVE_GpuAlloc_Alloc(u->allocator, corner_bytes, 0);
+        corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
 
         if(corner_addr == GA_INVALID) {
             LV_LOG_ERROR("EVE5: Failed to allocate shadow corner texture");
@@ -275,7 +275,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
         uint8_t * buf = lv_malloc(corner_bytes);
         if(!buf) {
             LV_LOG_ERROR("EVE5: Failed to allocate corner generation buffer");
-            Esd_GpuAlloc_Free(u->allocator, slot->corner_handle);
+            EVE_GpuAlloc_Free(u->allocator, slot->corner_handle);
             slot->corner_handle = GA_HANDLE_INVALID;
             return false;
         }
@@ -290,12 +290,12 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
     }
 
     /* Edge texture (64×1 L8 = 64 bytes, aligned to 4) */
-    uint32_t edge_addr = Esd_GpuAlloc_Get(u->allocator, slot->edge_handle);
+    uint32_t edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
     if(edge_addr == GA_INVALID) {
         uint32_t edge_bytes = ALIGN_UP(SHADOW_TEX_SIZE, 4);
 
-        slot->edge_handle = Esd_GpuAlloc_Alloc(u->allocator, edge_bytes, 0);
-        edge_addr = Esd_GpuAlloc_Get(u->allocator, slot->edge_handle);
+        slot->edge_handle = EVE_GpuAlloc_Alloc(u->allocator, edge_bytes, 0);
+        edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
 
         if(edge_addr == GA_INVALID) {
             LV_LOG_ERROR("EVE5: Failed to allocate shadow edge texture");
@@ -305,7 +305,7 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
         uint8_t * buf = lv_malloc(edge_bytes);
         if(!buf) {
             LV_LOG_ERROR("EVE5: Failed to allocate edge generation buffer");
-            Esd_GpuAlloc_Free(u->allocator, slot->edge_handle);
+            EVE_GpuAlloc_Free(u->allocator, slot->edge_handle);
             slot->edge_handle = GA_HANDLE_INVALID;
             return false;
         }
@@ -372,8 +372,8 @@ void lv_draw_eve5_hal_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_tas
     }
 
     lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
-    uint32_t corner_addr = Esd_GpuAlloc_Get(u->allocator, slot->corner_handle);
-    uint32_t edge_addr = Esd_GpuAlloc_Get(u->allocator, slot->edge_handle);
+    uint32_t corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
+    uint32_t edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
 
     if(corner_addr == GA_INVALID || edge_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Shadow textures evicted unexpectedly");
@@ -611,8 +611,8 @@ void lv_draw_eve5_alpha_draw_box_shadow(lv_draw_eve5_unit_t * u, const lv_draw_t
     if(ratio_idx >= EVE5_SHADOW_TEX_SIZE) ratio_idx = EVE5_SHADOW_TEX_SIZE - 1;
 
     lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
-    uint32_t corner_addr = Esd_GpuAlloc_Get(u->allocator, slot->corner_handle);
-    uint32_t edge_addr = Esd_GpuAlloc_Get(u->allocator, slot->edge_handle);
+    uint32_t corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
+    uint32_t edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
 
     if(corner_addr == GA_INVALID || edge_addr == GA_INVALID) return;
 

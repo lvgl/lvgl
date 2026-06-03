@@ -259,7 +259,7 @@ uint8_t lv_draw_eve5_asset_font_resolve(lv_draw_eve5_unit_t * u, const lv_font_t
     void * owner = lv_eve5_asset_font_get_owner_internal(font);
     if(owner == NULL) return 0xFFu;
 
-    /* Always Esd_GpuAlloc_Get the current address — never cache the
+    /* Always EVE_GpuAlloc_Get the current address — never cache the
      * address itself, only the value we last bound (for change detection).
      * Get is the canonical way to ask the allocator "where does this
      * handle live right now" and the address must come fresh every time. */

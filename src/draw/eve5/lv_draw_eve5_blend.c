@@ -55,8 +55,8 @@ static void copy_src_alpha(EVE_HalContext *phost, uint32_t src_addr,
                            uint32_t stride, int32_t w, int32_t h);
 static void splat_alpha_to_channel(EVE_HalContext *phost, int32_t w, int32_t h,
                                    uint8_t r_mask, uint8_t g_mask, uint8_t b_mask);
-static bool composite_over_dst(lv_draw_eve5_unit_t * u, Esd_GpuHandle *out_result,
-                               uint32_t dst_addr, Esd_GpuHandle temp_handle,
+static bool composite_over_dst(lv_draw_eve5_unit_t * u, EVE_GpuHandle *out_result,
+                               uint32_t dst_addr, EVE_GpuHandle temp_handle,
                                bool temp_is_premultiplied,
                                int32_t aligned_w, int32_t aligned_h,
                                int32_t w, int32_t h, uint32_t stride, uint32_t buf_size);
@@ -146,22 +146,22 @@ static void splat_alpha_to_channel(EVE_HalContext *phost, int32_t w, int32_t h,
  *   produces raw values, alpha copied separately).
  *   Uses blend(SRC_ALPHA, ONE_MINUS_SRC_ALPHA) to apply coverage.
  */
-static bool composite_over_dst(lv_draw_eve5_unit_t * u, Esd_GpuHandle *out_result,
-                               uint32_t dst_addr, Esd_GpuHandle temp_handle,
+static bool composite_over_dst(lv_draw_eve5_unit_t * u, EVE_GpuHandle *out_result,
+                               uint32_t dst_addr, EVE_GpuHandle temp_handle,
                                bool temp_is_premultiplied,
                                int32_t aligned_w, int32_t aligned_h,
                                int32_t w, int32_t h, uint32_t stride, uint32_t buf_size)
 {
     EVE_HalContext *phost = u->hal;
 
-    uint32_t temp_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
     if(temp_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
 
-    Esd_GpuHandle result_handle = Esd_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
-    uint32_t result_addr = Esd_GpuAlloc_Get(u->allocator, result_handle);
+    EVE_GpuHandle result_handle = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    uint32_t result_addr = EVE_GpuAlloc_Get(u->allocator, result_handle);
     if(result_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
         return false;
@@ -200,7 +200,7 @@ static bool composite_over_dst(lv_draw_eve5_unit_t * u, Esd_GpuHandle *out_resul
 
     {
         EVE_CmdSync sync = EVE_Cmd_sync(phost);
-        Esd_GpuAlloc_DeferredFree(u->allocator, temp_handle, sync);
+        EVE_GpuAlloc_DeferredFree(u->allocator, temp_handle, sync);
     }
 
     *out_result = result_handle;
@@ -312,8 +312,8 @@ static bool composite_over_dst(lv_draw_eve5_unit_t * u, Esd_GpuHandle *out_resul
  * 2 DL cycles: channel math + composite.
  */
 bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                                 Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
-                                 Esd_GpuHandle *out_result)
+                                 EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
+                                 EVE_GpuHandle *out_result)
 {
     EVE_HalContext *phost = u->hal;
     int32_t w = lv_area_get_width(&layer->buf_area);
@@ -323,15 +323,15 @@ bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint32_t stride = aw * 4;
     uint32_t buf_size = stride * ah;
 
-    uint32_t dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
-    uint32_t src_addr = Esd_GpuAlloc_Get(u->allocator, src_handle);
+    uint32_t dst_addr = EVE_GpuAlloc_Get(u->allocator, dst_handle);
+    uint32_t src_addr = EVE_GpuAlloc_Get(u->allocator, src_handle);
     if(dst_addr == GA_INVALID || src_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
 
-    Esd_GpuHandle temp = Esd_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
-    uint32_t temp_addr = Esd_GpuAlloc_Get(u->allocator, temp);
+    EVE_GpuHandle temp = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);
     if(temp_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
         return false;
@@ -350,8 +350,8 @@ bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
  * 2 DL cycles: channel math + composite.
  */
 bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                                    Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
-                                    Esd_GpuHandle *out_result)
+                                    EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
+                                    EVE_GpuHandle *out_result)
 {
     EVE_HalContext *phost = u->hal;
     int32_t w = lv_area_get_width(&layer->buf_area);
@@ -361,15 +361,15 @@ bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint32_t stride = aw * 4;
     uint32_t buf_size = stride * ah;
 
-    uint32_t dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
-    uint32_t src_addr = Esd_GpuAlloc_Get(u->allocator, src_handle);
+    uint32_t dst_addr = EVE_GpuAlloc_Get(u->allocator, dst_handle);
+    uint32_t src_addr = EVE_GpuAlloc_Get(u->allocator, src_handle);
     if(dst_addr == GA_INVALID || src_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
 
-    Esd_GpuHandle temp = Esd_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
-    uint32_t temp_addr = Esd_GpuAlloc_Get(u->allocator, temp);
+    EVE_GpuHandle temp = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp);
     if(temp_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
         return false;
@@ -390,8 +390,8 @@ bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
  * 4 DL cycles: subtract(dst,src) + subtract(src,dst) + add + composite.
  */
 bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                                   Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
-                                   Esd_GpuHandle *out_result)
+                                   EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
+                                   EVE_GpuHandle *out_result)
 {
     EVE_HalContext *phost = u->hal;
     int32_t w = lv_area_get_width(&layer->buf_area);
@@ -401,16 +401,16 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint32_t stride = aw * 4;
     uint32_t buf_size = stride * ah;
 
-    uint32_t dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
-    uint32_t src_addr = Esd_GpuAlloc_Get(u->allocator, src_handle);
+    uint32_t dst_addr = EVE_GpuAlloc_Get(u->allocator, dst_handle);
+    uint32_t src_addr = EVE_GpuAlloc_Get(u->allocator, src_handle);
     if(dst_addr == GA_INVALID || src_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
 
     /* DL1: temp1.c = max(dst.c - src.c, 0) */
-    Esd_GpuHandle temp1 = Esd_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
-    uint32_t temp1_addr = Esd_GpuAlloc_Get(u->allocator, temp1);
+    EVE_GpuHandle temp1 = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    uint32_t temp1_addr = EVE_GpuAlloc_Get(u->allocator, temp1);
     if(temp1_addr == GA_INVALID) {
         *out_result = GA_HANDLE_INVALID;
         return false;
@@ -422,10 +422,10 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     finish_channel_dl(phost);
 
     /* DL2: temp2.c = max(src.c - dst.c, 0) */
-    Esd_GpuHandle temp2 = Esd_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
-    uint32_t temp2_addr = Esd_GpuAlloc_Get(u->allocator, temp2);
+    EVE_GpuHandle temp2 = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    uint32_t temp2_addr = EVE_GpuAlloc_Get(u->allocator, temp2);
     if(temp2_addr == GA_INVALID) {
-        Esd_GpuAlloc_PendingFree(u->allocator, temp1);
+        EVE_GpuAlloc_PendingFree(u->allocator, temp1);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -436,21 +436,21 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     finish_channel_dl(phost);
 
     /* Re-resolve addresses after DL2 (allocator may have moved things) */
-    temp1_addr = Esd_GpuAlloc_Get(u->allocator, temp1);
-    temp2_addr = Esd_GpuAlloc_Get(u->allocator, temp2);
+    temp1_addr = EVE_GpuAlloc_Get(u->allocator, temp1);
+    temp2_addr = EVE_GpuAlloc_Get(u->allocator, temp2);
     if(temp1_addr == GA_INVALID || temp2_addr == GA_INVALID) {
-        Esd_GpuAlloc_PendingFree(u->allocator, temp1);
-        Esd_GpuAlloc_PendingFree(u->allocator, temp2);
+        EVE_GpuAlloc_PendingFree(u->allocator, temp1);
+        EVE_GpuAlloc_PendingFree(u->allocator, temp2);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
 
     /* DL3: temp3.c = temp1.c + temp2.c = abs(dst.c - src.c) */
-    Esd_GpuHandle temp3 = Esd_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
-    uint32_t temp3_addr = Esd_GpuAlloc_Get(u->allocator, temp3);
+    EVE_GpuHandle temp3 = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
+    uint32_t temp3_addr = EVE_GpuAlloc_Get(u->allocator, temp3);
     if(temp3_addr == GA_INVALID) {
-        Esd_GpuAlloc_PendingFree(u->allocator, temp1);
-        Esd_GpuAlloc_PendingFree(u->allocator, temp2);
+        EVE_GpuAlloc_PendingFree(u->allocator, temp1);
+        EVE_GpuAlloc_PendingFree(u->allocator, temp2);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -462,8 +462,8 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     {
         EVE_CmdSync sync = EVE_Cmd_sync(phost);
-        Esd_GpuAlloc_DeferredFree(u->allocator, temp1, sync);
-        Esd_GpuAlloc_DeferredFree(u->allocator, temp2, sync);
+        EVE_GpuAlloc_DeferredFree(u->allocator, temp1, sync);
+        EVE_GpuAlloc_DeferredFree(u->allocator, temp2, sync);
     }
 
     /* DL4: composite temp3 over dst */

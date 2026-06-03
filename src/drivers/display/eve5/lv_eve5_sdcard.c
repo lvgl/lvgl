@@ -22,7 +22,7 @@
 #include "EVE_CoCmd.h"
 #include "EVE_CoCmd_Ext.h"
 #include "EVE_MediaFifo.h"
-#include "Esd_GpuAlloc.h"
+#include "EVE_GpuAlloc.h"
 
 /*********************
  *      DEFINES
@@ -37,7 +37,7 @@
  **********************/
 
 typedef struct {
-    Esd_GpuHandle gpu_handle;  /**< RAM_G handle (GA_HANDLE_INVALID if not loaded or stolen) */
+    EVE_GpuHandle gpu_handle;  /**< RAM_G handle (GA_HANDLE_INVALID if not loaded or stolen) */
     uint32_t size;
     uint32_t pos;
     char * path;               /**< Non-NULL = deferred load pending */
@@ -52,7 +52,7 @@ typedef struct {
 typedef struct {
     lv_display_t * disp;
     EVE_HalContext * hal;
-    Esd_GpuAlloc * alloc;
+    EVE_GpuAlloc * alloc;
     bool sd_attached;
     lv_fs_drv_t fs_drv;
 } eve5_sdcard_ctx_t;
@@ -88,7 +88,7 @@ void lv_fs_eve5_sdcard_init(lv_display_t * disp)
     if(disp == NULL) return;
 
     EVE_HalContext *hal = lv_eve5_get_hal(disp);
-    Esd_GpuAlloc *alloc = lv_eve5_get_allocator(disp);
+    EVE_GpuAlloc *alloc = lv_eve5_get_allocator(disp);
 
     if(hal == NULL || alloc == NULL) {
         LV_LOG_ERROR("EVE5 HAL or allocator not available");
@@ -240,8 +240,8 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 
     if(file != NULL) {
         if(ctx != NULL && ctx->alloc != NULL
-           && Esd_GpuAlloc_Get(ctx->alloc, file->gpu_handle) != GA_INVALID) {
-            Esd_GpuAlloc_Free(ctx->alloc, file->gpu_handle);
+           && EVE_GpuAlloc_Get(ctx->alloc, file->gpu_handle) != GA_INVALID) {
+            EVE_GpuAlloc_Free(ctx->alloc, file->gpu_handle);
         }
         if(file->path != NULL) {
             lv_free(file->path);
@@ -270,7 +270,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
         }
     }
 
-    uint32_t ramg_addr = Esd_GpuAlloc_Get(ctx->alloc, file->gpu_handle);
+    uint32_t ramg_addr = EVE_GpuAlloc_Get(ctx->alloc, file->gpu_handle);
     if(ramg_addr == GA_INVALID) {
         if(br) *br = 0;
         return LV_FS_RES_FS_ERR;
@@ -400,8 +400,8 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     EVE_HalContext *phost = ctx->hal;
 
     /* CMD_FSDIR requires 32-byte alignment (BT820) */
-    Esd_GpuHandle gpu_handle = Esd_GpuAlloc_AlignedAlloc(ctx->alloc, LV_EVE5_SDCARD_DIR_BUFFER_SIZE, 0, 32);
-    uint32_t ramg_addr = Esd_GpuAlloc_Get(ctx->alloc, gpu_handle);
+    EVE_GpuHandle gpu_handle = EVE_GpuAlloc_AlignedAlloc(ctx->alloc, LV_EVE5_SDCARD_DIR_BUFFER_SIZE, 0, 32);
+    uint32_t ramg_addr = EVE_GpuAlloc_Get(ctx->alloc, gpu_handle);
     if(ramg_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate RAM_G space for directory listing");
 #if LV_USE_OS
@@ -415,7 +415,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     uint32_t result = EVE_CoCmd_fsDir(phost, ramg_addr, LV_EVE5_SDCARD_DIR_BUFFER_SIZE, full_path);
     if(result != 0) {
         LV_LOG_WARN("Directory read failed with code %u: %s", result, full_path);
-        Esd_GpuAlloc_Free(ctx->alloc, gpu_handle);
+        EVE_GpuAlloc_Free(ctx->alloc, gpu_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(ctx->disp);
 #endif
@@ -424,10 +424,10 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
         return NULL;
     }
 
-    ramg_addr = Esd_GpuAlloc_Get(ctx->alloc, gpu_handle);
+    ramg_addr = EVE_GpuAlloc_Get(ctx->alloc, gpu_handle);
     EVE_Hal_rdMem(phost, dir->listing, ramg_addr, LV_EVE5_SDCARD_DIR_BUFFER_SIZE);
 
-    Esd_GpuAlloc_Free(ctx->alloc, gpu_handle);
+    EVE_GpuAlloc_Free(ctx->alloc, gpu_handle);
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(ctx->disp);
@@ -547,8 +547,8 @@ static bool ensure_file_loaded(eve5_sdcard_ctx_t * ctx, eve5_file_t * file)
     EVE_HalContext *phost = ctx->hal;
 
     /* CMD_FSREAD requires 32-byte alignment (BT820) */
-    Esd_GpuHandle gpu_handle = Esd_GpuAlloc_AlignedAlloc(ctx->alloc, file->size, 0, 32);
-    uint32_t ramg_addr = Esd_GpuAlloc_Get(ctx->alloc, gpu_handle);
+    EVE_GpuHandle gpu_handle = EVE_GpuAlloc_AlignedAlloc(ctx->alloc, file->size, 0, 32);
+    uint32_t ramg_addr = EVE_GpuAlloc_Get(ctx->alloc, gpu_handle);
 
     if(ramg_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate %u bytes in RAM_G for %s", file->size, file->path);
@@ -562,7 +562,7 @@ static bool ensure_file_loaded(eve5_sdcard_ctx_t * ctx, eve5_file_t * file)
     uint32_t result = EVE_CoCmd_fsRead(phost, ramg_addr, file->path);
     if(result == 0xFFFFFFFF) {
         LV_LOG_ERROR("Failed to read file from SD card: %s", file->path);
-        Esd_GpuAlloc_Free(ctx->alloc, gpu_handle);
+        EVE_GpuAlloc_Free(ctx->alloc, gpu_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(ctx->disp);
 #endif
@@ -620,7 +620,7 @@ static bool ensure_sd_attached(eve5_sdcard_ctx_t * ctx)
  * After this call, the caller owns the GPU handle and must free it.
  * The file handle should be closed afterward (no further reads possible).
  */
-bool lv_eve5_sdcard_steal_ramg(void * file_p, Esd_GpuAlloc ** alloc, Esd_GpuHandle *handle, uint32_t * size)
+bool lv_eve5_sdcard_steal_ramg(void * file_p, EVE_GpuAlloc ** alloc, EVE_GpuHandle *handle, uint32_t * size)
 {
     eve5_file_t * file = (eve5_file_t *)file_p;
 
@@ -634,7 +634,7 @@ bool lv_eve5_sdcard_steal_ramg(void * file_p, Esd_GpuAlloc ** alloc, Esd_GpuHand
         }
     }
 
-    if(Esd_GpuAlloc_Get(s_ctx.alloc, file->gpu_handle) == GA_INVALID) {
+    if(EVE_GpuAlloc_Get(s_ctx.alloc, file->gpu_handle) == GA_INVALID) {
         LV_LOG_WARN("Cannot steal RAM_G: already stolen or freed");
         return false;
     }
@@ -677,7 +677,7 @@ bool lv_eve5_sdcard_is_path(const char * path)
  * 4. CMD_LOADIMAGE with OPT_MEDIAFIFO (RAM_G to RAM_G decode)
  * 5. Free temporary allocation
  */
-bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
+bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
                                uint32_t * width, uint32_t * height, uint32_t * format,
                                uint32_t * image_offset, uint32_t * palette_offset)
 {
@@ -704,7 +704,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     }
 
     EVE_HalContext *phost = s_ctx.hal;
-    Esd_GpuAlloc *alloc = s_ctx.alloc;
+    EVE_GpuAlloc *alloc = s_ctx.alloc;
 
 #if LV_USE_OS
     lv_eve5_hal_lock(s_ctx.disp);
@@ -722,7 +722,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t loadimage_opts = OPT_NODL;
     if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
 
-    Esd_GpuHandle final_handle;
+    EVE_GpuHandle final_handle;
     uint32_t final_addr;
     uint32_t allocated_size;
     /* Post-load metadata, populated by each branch via CMD_GETIMAGE. */
@@ -771,8 +771,8 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t decoded_stride = ((q_w * 4u) + 3u) & ~3u;
     allocated_size = decoded_stride * q_h;
 
-    final_handle = Esd_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
-    final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
+    final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
+    final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
 #if LV_USE_OS
@@ -785,7 +785,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
                                                &out_fmt, &out_source, &out_w, &out_h, &out_palette);
     if(load_res != 0) {
         LV_LOG_ERROR("CMD_LOADIMAGE failed for %s (code %u)", sd_path, (unsigned)load_res);
-        Esd_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -813,8 +813,8 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     /* Allocate temporary space for compressed file.
      * CMD_FSREAD requires 32-byte alignment, MEDIAFIFO requires 4-byte size alignment. */
     uint32_t fifo_size = (file_size + 3) & ~3U;
-    Esd_GpuHandle temp_handle = Esd_GpuAlloc_AlignedAlloc(alloc, fifo_size, 0, 32);
-    uint32_t temp_addr = Esd_GpuAlloc_Get(alloc, temp_handle);
+    EVE_GpuHandle temp_handle = EVE_GpuAlloc_AlignedAlloc(alloc, fifo_size, 0, 32);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
     if(temp_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate temporary RAM_G for compressed file (%u bytes)", fifo_size);
 #if LV_USE_OS
@@ -826,7 +826,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t result = EVE_CoCmd_fsRead(phost, temp_addr, sd_path);
     if(result != 0) {
         LV_LOG_ERROR("CMD_FSREAD failed with code %u: %s", result, sd_path);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -836,7 +836,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     /* Parse header for dimensions */
     uint8_t header_buf[1024];
     uint32_t header_size = file_size < sizeof(header_buf) ? file_size : sizeof(header_buf);
-    temp_addr = Esd_GpuAlloc_Get(alloc, temp_handle);
+    temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
     EVE_Hal_rdMem(phost, header_buf, temp_addr, header_size);
 
     uint32_t img_width = 0, img_height = 0;
@@ -850,7 +850,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
 
     if(!parsed || img_width == 0 || img_height == 0) {
         LV_LOG_ERROR("Failed to parse image header: %s", path);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -861,11 +861,11 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t decoded_stride = ((img_width * 4) + 3) & ~3U;
     allocated_size = decoded_stride * img_height;
 
-    final_handle = Esd_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
-    final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
+    final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
+    final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -874,11 +874,11 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
 
     EVE_MediaFifo_close(phost);
 
-    temp_addr = Esd_GpuAlloc_Get(alloc, temp_handle);
+    temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
     if(!EVE_MediaFifo_set(phost, temp_addr, fifo_size)) {
         LV_LOG_ERROR("Failed to set up media FIFO");
-        Esd_GpuAlloc_Free(alloc, final_handle);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -891,8 +891,8 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     if(!EVE_Cmd_waitFlush(phost)) {
         LV_LOG_ERROR("CMD_LOADIMAGE failed");
         EVE_MediaFifo_close(phost);
-        Esd_GpuAlloc_Free(alloc, final_handle);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -900,7 +900,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     }
 
     EVE_MediaFifo_close(phost);
-    Esd_GpuAlloc_Free(alloc, temp_handle);
+    EVE_GpuAlloc_Free(alloc, temp_handle);
 
     /* CMD_GETIMAGE reads the decoded image's actual source/format/dims.
      * (The wrapper-based patch path above folds this into loadImage_fs.) */
@@ -911,7 +911,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     EVE_Hal_requestFenceBeforeSwap(phost);
 
     /* Compute offsets from allocation base */
-    uint32_t alloc_base = Esd_GpuAlloc_Get(alloc, final_handle);
+    uint32_t alloc_base = EVE_GpuAlloc_Get(alloc, final_handle);
     uint32_t img_ofs = (out_source >= alloc_base) ? (out_source - alloc_base) : 0;
     uint32_t pal_ofs = GA_INVALID;
     if(out_fmt == PALETTEDARGB8 && out_palette >= alloc_base) {
@@ -925,7 +925,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     uint32_t pal_end = (pal_ofs != GA_INVALID) ? (pal_ofs + 256 * 4) : 0;
     uint32_t actual_size = img_end > pal_end ? img_end : pal_end;
     if(actual_size < allocated_size) {
-        Esd_GpuAlloc_Truncate(alloc, final_handle, actual_size);
+        EVE_GpuAlloc_Truncate(alloc, final_handle, actual_size);
     }
 
 #if LV_USE_OS
@@ -943,7 +943,7 @@ bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
     return true;
 }
 
-Esd_GpuAlloc * lv_eve5_sdcard_get_allocator(void)
+EVE_GpuAlloc * lv_eve5_sdcard_get_allocator(void)
 {
     return s_ctx.alloc;
 }
@@ -999,16 +999,16 @@ void lv_fs_eve5_sdcard_init(lv_display_t * disp)         { (void)disp; }
 void lv_fs_eve5_sdcard_deinit(void)                       {}
 bool lv_eve5_sdcard_ready(void)                           { return false; }
 bool lv_eve5_sdcard_is_path(const char * path)            { (void)path; return false; }
-Esd_GpuAlloc * lv_eve5_sdcard_get_allocator(void)         { return NULL; }
+EVE_GpuAlloc * lv_eve5_sdcard_get_allocator(void)         { return NULL; }
 
-bool lv_eve5_sdcard_steal_ramg(void * file_p, Esd_GpuAlloc ** alloc,
-                               Esd_GpuHandle *handle, uint32_t * size)
+bool lv_eve5_sdcard_steal_ramg(void * file_p, EVE_GpuAlloc ** alloc,
+                               EVE_GpuHandle *handle, uint32_t * size)
 {
     (void)file_p; (void)alloc; (void)handle; (void)size;
     return false;
 }
 
-bool lv_eve5_sdcard_load_image(const char * path, Esd_GpuHandle *handle,
+bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
                                uint32_t * width, uint32_t * height, uint32_t * format,
                                uint32_t * image_offset, uint32_t * palette_offset)
 {

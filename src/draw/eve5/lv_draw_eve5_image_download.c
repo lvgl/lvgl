@@ -91,7 +91,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
 {
     if(buf->data == NULL) return false;
 
-    uint32_t gpu_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle);
+    uint32_t gpu_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle);
     if(gpu_addr == GA_INVALID) return false;
     gpu_addr += vr->source_offset;
 
@@ -220,7 +220,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
 
                 /* Download palette */
                 if(vr->palette_offset != GA_INVALID) {
-                    uint32_t pal_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) + vr->palette_offset;
+                    uint32_t pal_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) + vr->palette_offset;
                     EVE_Hal_rdMem(u->hal, buf->data, pal_addr, src_palette_bytes);
                 }
                 else {
@@ -262,7 +262,7 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
                 uint32_t palette_bytes = 256 * sizeof(lv_color32_t);
 
                 if(vr->palette_offset != GA_INVALID) {
-                    uint32_t pal_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) + vr->palette_offset;
+                    uint32_t pal_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) + vr->palette_offset;
                     EVE_Hal_rdMem(u->hal, buf->data, pal_addr, palette_bytes);
                 }
                 else {

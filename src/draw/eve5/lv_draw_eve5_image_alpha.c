@@ -169,15 +169,15 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
         lv_eve5_vram_res_t * child_vr = eve5_get_vram_res(child_layer);
         if(child_vr == NULL) return;
         if(!child_vr->has_content) return;
-        Esd_GpuHandle child_handle = child_vr->gpu_handle;
-        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, child_handle);
+        EVE_GpuHandle child_handle = child_vr->gpu_handle;
+        ram_g_addr = EVE_GpuAlloc_Get(u->allocator, child_handle);
         if(ram_g_addr == GA_INVALID) return;
         ram_g_addr += child_vr->source_offset;
         eve_format = child_vr->eve_format;
         eve_stride = (int32_t)child_vr->stride;
         layout_h = src_h;
         if(child_vr->palette_offset != GA_INVALID) {
-            uint32_t base = Esd_GpuAlloc_Get(u->allocator, child_handle);
+            uint32_t base = EVE_GpuAlloc_Get(u->allocator, child_handle);
             palette_addr = base + child_vr->palette_offset;
         }
     }

@@ -3,11 +3,11 @@
  *
  * Pre-BT820 transient-allocation scratch ring.
  *
- * The EVE HAL ships two GPU allocators behind the Esd_GpuAlloc API. The
+ * The EVE HAL ships two GPU allocators behind the EVE_GpuAlloc API. The
  * pre-BT820 variant caps the total number of live allocation handles at 64;
  * a frame with a couple of dozen gradients can blow past that on its own,
  * and a sustained UI burns through the slot count faster than the deferred-
- * free pipeline reclaims them. The BT820 variant (Esd_GpuAlloc5) is purpose-
+ * free pipeline reclaims them. The BT820 variant (EVE_GpuAlloc5) is purpose-
  * built for high-count allocations on the chip's larger memory and isn't
  * subject to the same ceiling.
  *
@@ -54,14 +54,14 @@ void lv_draw_eve5_ring_init(lv_draw_eve5_unit_t * u)
     r->curr_start = 0;
     r->safe_until = 0;
 
-    /* BT820+ uses Esd_GpuAlloc5, which doesn't have the 64-handle cap, so
+    /* BT820+ uses EVE_GpuAlloc5, which doesn't have the 64-handle cap, so
      * gradients can keep using the allocator directly. Skip the ring. */
     if(EVE_Hal_supportRenderTarget(u->hal)) return;
 
-    r->handle = Esd_GpuAlloc_Alloc(u->allocator, LV_DRAW_EVE5_RING_SIZE, GA_ALIGN_128);
-    r->base = Esd_GpuAlloc_Get(u->allocator, r->handle);
+    r->handle = EVE_GpuAlloc_Alloc(u->allocator, LV_DRAW_EVE5_RING_SIZE, GA_ALIGN_128);
+    r->base = EVE_GpuAlloc_Get(u->allocator, r->handle);
     if(r->base == GA_INVALID) {
-        LV_LOG_WARN("EVE5: scratch ring alloc failed (%u bytes); gradients will fall back to Esd_GpuAlloc",
+        LV_LOG_WARN("EVE5: scratch ring alloc failed (%u bytes); gradients will fall back to EVE_GpuAlloc",
                     (unsigned)LV_DRAW_EVE5_RING_SIZE);
         r->handle = GA_HANDLE_INVALID;
         return;
@@ -74,7 +74,7 @@ void lv_draw_eve5_ring_deinit(lv_draw_eve5_unit_t * u)
 {
     lv_draw_eve5_ring_t * r = &u->scratch_ring;
     if(r->base != GA_INVALID && r->handle.Id != GA_HANDLE_INVALID.Id) {
-        Esd_GpuAlloc_Free(u->allocator, r->handle);
+        EVE_GpuAlloc_Free(u->allocator, r->handle);
     }
     r->handle = GA_HANDLE_INVALID;
     r->base = GA_INVALID;

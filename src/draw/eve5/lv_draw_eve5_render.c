@@ -526,14 +526,14 @@ void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t * u, lv_layer_t * lay
  *
  * Returns GpuHandle for the L8 texture (or GA_HANDLE_INVALID on failure).
  */
-Esd_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                               int32_t aligned_w, int32_t aligned_h,
                                               int32_t w, int32_t h,
                                               const lv_draw_eve5_slice_t * slice)
 {
-    Esd_GpuHandle l8_handle = lv_draw_eve5_hal_init_l8_rendertarget(u,
+    EVE_GpuHandle l8_handle = lv_draw_eve5_hal_init_l8_rendertarget(u,
                                                                     aligned_w, aligned_h, w, h);
-    if(Esd_GpuAlloc_Get(u->allocator, l8_handle) == GA_INVALID) {
+    if(EVE_GpuAlloc_Get(u->allocator, l8_handle) == GA_INVALID) {
         return GA_HANDLE_INVALID;
     }
 

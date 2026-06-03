@@ -59,7 +59,7 @@
  * TYPES
  **********************/
 typedef struct {
-    Esd_GpuHandle handle;
+    EVE_GpuHandle handle;
     int32_t w, h;       /**< Logical pixel dimensions */
     int32_t aw, ah;     /**< 16-byte aligned dimensions for render target */
     int32_t sigma_sq;   /**< Accumulated variance in original pixels, 8x-scaled */
@@ -508,7 +508,7 @@ static bool gaussian_9tap_pass(lv_draw_eve5_unit_t * u,
  * Modifies dst_handle in place.
  */
 bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                                Esd_GpuHandle dst_handle, const lv_draw_task_t * blur_task)
+                                EVE_GpuHandle dst_handle, const lv_draw_task_t * blur_task)
 {
     EVE_HalContext *phost = u->hal;
     const lv_draw_blur_dsc_t * dsc = blur_task->draw_dsc;
@@ -550,7 +550,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     int32_t layer_ah = ALIGN_UP(layer_h, 16);
     uint32_t layer_stride = (uint32_t)layer_aw * 4;
 
-    uint32_t dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
+    uint32_t dst_addr = EVE_GpuAlloc_Get(u->allocator, dst_handle);
     if(dst_addr == GA_INVALID) return false;
 
     /* Convert blur_radius to sigma^2 (8x-scaled for precision).
@@ -595,8 +595,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     /* Phase 1: Extract blur region with edge padding */
     uint32_t extract_size = (uint32_t)paw * 4 * (uint32_t)pah;
-    Esd_GpuHandle extract_handle = Esd_GpuAlloc_Alloc(u->allocator, extract_size, GA_ALIGN_128);
-    uint32_t extract_addr = Esd_GpuAlloc_Get(u->allocator, extract_handle);
+    EVE_GpuHandle extract_handle = EVE_GpuAlloc_Alloc(u->allocator, extract_size, GA_ALIGN_128);
+    uint32_t extract_addr = EVE_GpuAlloc_Get(u->allocator, extract_handle);
     if(extract_addr == GA_INVALID) {
         LV_LOG_ERROR("EVE5 gaussian: failed to allocate extraction buffer (%"PRIu32" bytes)", extract_size);
         return false;
@@ -685,10 +685,10 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     int32_t temp_aw = (n_tiers_est > 0) ? ALIGN_UP((pw + 1) / 2, 16) : paw;
     int32_t temp_ah = ALIGN_UP(ph, 16);
     uint32_t temp_size = (uint32_t)temp_aw * 4 * (uint32_t)temp_ah;
-    Esd_GpuHandle temp_handle = Esd_GpuAlloc_Alloc(u->allocator, temp_size, GA_ALIGN_128);
-    if(Esd_GpuAlloc_Get(u->allocator, temp_handle) == GA_INVALID) {
+    EVE_GpuHandle temp_handle = EVE_GpuAlloc_Alloc(u->allocator, temp_size, GA_ALIGN_128);
+    if(EVE_GpuAlloc_Get(u->allocator, temp_handle) == GA_INVALID) {
         LV_LOG_WARN("EVE5 gaussian: failed to allocate temp buffer");
-        Esd_GpuAlloc_PendingFree(u->allocator, extract_handle);
+        EVE_GpuAlloc_PendingFree(u->allocator, extract_handle);
         return true;
     }
 
@@ -721,8 +721,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         int32_t next_ah = ALIGN_UP(next_h, 16);
 
         uint32_t level_size = (uint32_t)next_aw * 4 * (uint32_t)next_ah;
-        Esd_GpuHandle level_handle = Esd_GpuAlloc_Alloc(u->allocator, level_size, GA_ALIGN_128);
-        if(Esd_GpuAlloc_Get(u->allocator, level_handle) == GA_INVALID) {
+        EVE_GpuHandle level_handle = EVE_GpuAlloc_Alloc(u->allocator, level_size, GA_ALIGN_128);
+        if(EVE_GpuAlloc_Get(u->allocator, level_handle) == GA_INVALID) {
             LV_LOG_WARN("EVE5 gaussian: failed to allocate pyramid level %"PRId32, tier);
             break;
         }
@@ -732,9 +732,9 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         int32_t h_aw = ALIGN_UP(h_w, 16);
         int32_t h_ah = ALIGN_UP(h_h, 16);
 
-        uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, prev->handle);
-        uint32_t t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-        uint32_t lev_addr = Esd_GpuAlloc_Get(u->allocator, level_handle);
+        uint32_t prev_addr = EVE_GpuAlloc_Get(u->allocator, prev->handle);
+        uint32_t t_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
+        uint32_t lev_addr = EVE_GpuAlloc_Get(u->allocator, level_handle);
         if(prev_addr == GA_INVALID || t_addr == GA_INVALID || lev_addr == GA_INVALID) break;
 
         /* H blur + 2x downsample */
@@ -743,8 +743,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                            true, true,
                            BINOM_W_OUTER, BINOM_W_INNER, BINOM_W_CENTER);
 
-        t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-        lev_addr = Esd_GpuAlloc_Get(u->allocator, level_handle);
+        t_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
+        lev_addr = EVE_GpuAlloc_Get(u->allocator, level_handle);
         if(t_addr == GA_INVALID || lev_addr == GA_INVALID) break;
 
         /* V blur + 2x downsample */
@@ -800,12 +800,12 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
                 if(has_blur) {
                     uint32_t extra_size = (uint32_t)prev->aw * 4 * (uint32_t)prev->ah;
-                    Esd_GpuHandle extra_handle = Esd_GpuAlloc_Alloc(u->allocator, extra_size, GA_ALIGN_128);
+                    EVE_GpuHandle extra_handle = EVE_GpuAlloc_Alloc(u->allocator, extra_size, GA_ALIGN_128);
 
-                    if(Esd_GpuAlloc_Get(u->allocator, extra_handle) != GA_INVALID) {
-                        uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, prev->handle);
-                        uint32_t t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-                        uint32_t ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
+                    if(EVE_GpuAlloc_Get(u->allocator, extra_handle) != GA_INVALID) {
+                        uint32_t prev_addr = EVE_GpuAlloc_Get(u->allocator, prev->handle);
+                        uint32_t t_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
+                        uint32_t ex_addr = EVE_GpuAlloc_Get(u->allocator, extra_handle);
 
                         if(prev_addr != GA_INVALID && t_addr != GA_INVALID && ex_addr != GA_INVALID) {
                             bool final_ok = false;
@@ -816,8 +816,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                                    true,
                                                    ew_o4, ew_o3, ew_i2, ew_i1, ew_center);
 
-                                t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-                                ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
+                                t_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
+                                ex_addr = EVE_GpuAlloc_Get(u->allocator, extra_handle);
 
                                 if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
                                     gaussian_9tap_pass(u, t_addr, prev->aw * 4, prev->h,
@@ -833,8 +833,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                                    true,
                                                    ew_outer3, ew_middle, ew_inner7, ew_center);
 
-                                t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-                                ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
+                                t_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
+                                ex_addr = EVE_GpuAlloc_Get(u->allocator, extra_handle);
 
                                 if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
                                     gaussian_7tap_pass(u, t_addr, prev->aw * 4, prev->h,
@@ -851,8 +851,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                                    true, false,
                                                    ew_outer, ew_inner, ew_center);
 
-                                t_addr = Esd_GpuAlloc_Get(u->allocator, temp_handle);
-                                ex_addr = Esd_GpuAlloc_Get(u->allocator, extra_handle);
+                                t_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
+                                ex_addr = EVE_GpuAlloc_Get(u->allocator, extra_handle);
 
                                 if(t_addr != GA_INVALID && ex_addr != GA_INVALID) {
                                     gaussian_5tap_pass(u, t_addr, prev->aw * 4, prev->h,
@@ -873,7 +873,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                 n_levels++;
                             }
                             else {
-                                Esd_GpuAlloc_PendingFree(u->allocator, extra_handle);
+                                EVE_GpuAlloc_PendingFree(u->allocator, extra_handle);
                             }
                         }
                     }
@@ -883,20 +883,20 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
     if(n_levels < 1) {
-        Esd_GpuAlloc_PendingFree(u->allocator, extract_handle);
-        Esd_GpuAlloc_PendingFree(u->allocator, temp_handle);
+        EVE_GpuAlloc_PendingFree(u->allocator, extract_handle);
+        EVE_GpuAlloc_PendingFree(u->allocator, temp_handle);
         return true;
     }
 
     /* Phase 4: Composite back to layer (bilinear upscale from deepest level) */
     int32_t final_idx = n_levels - 1;
 
-    dst_addr = Esd_GpuAlloc_Get(u->allocator, dst_handle);
+    dst_addr = EVE_GpuAlloc_Get(u->allocator, dst_handle);
     if(dst_addr == GA_INVALID) goto cleanup;
 
     {
         gauss_level_t * final_lev = &levels[final_idx];
-        uint32_t final_addr = Esd_GpuAlloc_Get(u->allocator, final_lev->handle);
+        uint32_t final_addr = EVE_GpuAlloc_Get(u->allocator, final_lev->handle);
         if(final_addr == GA_INVALID) goto cleanup;
 
         uint32_t scale_x = (uint32_t)final_lev->w * 256 / (uint32_t)pw;
@@ -964,10 +964,10 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
 cleanup:
-    Esd_GpuAlloc_PendingFree(u->allocator, extract_handle);
-    Esd_GpuAlloc_PendingFree(u->allocator, temp_handle);
+    EVE_GpuAlloc_PendingFree(u->allocator, extract_handle);
+    EVE_GpuAlloc_PendingFree(u->allocator, temp_handle);
     for(int32_t i = 1; i < n_levels; i++) {
-        Esd_GpuAlloc_PendingFree(u->allocator, levels[i].handle);
+        EVE_GpuAlloc_PendingFree(u->allocator, levels[i].handle);
     }
 
     return true;

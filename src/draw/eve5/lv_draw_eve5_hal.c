@@ -199,8 +199,8 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
-    if(Esd_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
+    if(EVE_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
         LV_LOG_WARN("EVE5 VRAM alloc failed (%ux%u fmt=%d, %u bytes)", w, h, eve_fmt, size);
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
@@ -210,7 +210,7 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
 
     lv_eve5_vram_res_t * vr = lv_malloc_zeroed(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
-        Esd_GpuAlloc_Free(u->allocator, handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
@@ -263,7 +263,7 @@ static void eve5_vram_free_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     /* PendingFree: the texture may still be referenced by an in-flight
      * display list. FlushPending at the next finish_layer will assign
      * the sync value and UpdateFree will reclaim the memory. */
-    Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+    EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
@@ -294,7 +294,7 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
         lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-        uint32_t gpu_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle);
+        uint32_t gpu_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle);
         if(gpu_addr == GA_INVALID) {
 #if LV_USE_OS
             lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
@@ -444,7 +444,7 @@ static bool eve5_vram_check_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
      * sentinel that resolves to the current back buffer, not an allocator handle. */
     if(vr->is_swapchain) return true;
 
-    return Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID;
+    return EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID;
 }
 
 void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
@@ -477,7 +477,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
      * exactly Width × Height with stride = Width × 3 (no row alignment — see
      * EVE_Util.c bootup), so we use unaligned dimensions.
      *
-     * Future improvement: allocate the backbuffers via Esd_GpuAlloc with
+     * Future improvement: allocate the backbuffers via EVE_GpuAlloc with
      * GA_VERYLARGE_FLAG | GA_FIXED_FLAG and override REG_SC0_PTR0/PTR1 at create
      * time. That would also make per-frame triple buffering possible.
      */
@@ -507,7 +507,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                  * intermediate (typically ARGB8). Blit it as the starting content;
                  * format conversion ARGB8 → swapchain RGB8 happens implicitly at
                  * the render-engine output. */
-                uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, slice->prev_handle);
+                uint32_t prev_addr = EVE_GpuAlloc_Get(u->allocator, slice->prev_handle);
                 if(prev_addr != GA_INVALID) {
                     uint16_t prev_fmt = slice->prev_eve_format ? slice->prev_eve_format : sc_vr->eve_format;
                     uint32_t prev_stride = slice->prev_stride ? slice->prev_stride : sc_vr->stride;
@@ -528,7 +528,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                     EVE_CoDl_end(phost);
                     EVE_CoDl_restoreContext(phost);
 
-                    Esd_GpuAlloc_PendingFree(u->allocator, slice->prev_handle);
+                    EVE_GpuAlloc_PendingFree(u->allocator, slice->prev_handle);
                 }
                 else {
                     EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
@@ -601,8 +601,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         if(realloc_needed) {
             uint32_t needed_size = needed_stride * (uint32_t)aligned_h;
             /* PendingFree: previous buffer may be referenced by a prior frame's compositing DL */
-            Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
-            vr->gpu_handle = Esd_GpuAlloc_Alloc(u->allocator, needed_size, GA_ALIGN_128);
+            EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+            vr->gpu_handle = EVE_GpuAlloc_Alloc(u->allocator, needed_size, GA_ALIGN_128);
             vr->eve_format = target_eve_fmt;
             vr->stride = needed_stride;
             vr->source_offset = 0;
@@ -611,7 +611,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             vr->has_content = false;
         }
 
-        ram_g_addr = Esd_GpuAlloc_Get(u->allocator, vr->gpu_handle);
+        ram_g_addr = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle);
         if(ram_g_addr != GA_INVALID) {
             aligned_w = vr->stride / target_bpp;
             if(layer->draw_buf && lv_draw_buf_has_flag(layer->draw_buf,
@@ -666,7 +666,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     /* Sentinel check: prev_handle is GA_HANDLE_INVALID when no previous slice was assigned */
     else if(slice->prev_handle.Id != GA_HANDLE_INVALID.Id) {
         /* Previous slice output: blit as starting point (always premultiplied) */
-        uint32_t prev_addr = Esd_GpuAlloc_Get(u->allocator, slice->prev_handle);
+        uint32_t prev_addr = EVE_GpuAlloc_Get(u->allocator, slice->prev_handle);
         if(prev_addr != GA_INVALID) {
             EVE_CoDl_clearColorRgb(u->hal, 0, 0, 0);
             EVE_CoDl_clearColorA(u->hal, is_screen ? 255 : 0);
@@ -691,7 +691,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             u->canvas_orig_w = w;
             u->canvas_orig_h = h;
 
-            Esd_GpuAlloc_PendingFree(u->allocator, slice->prev_handle);
+            EVE_GpuAlloc_PendingFree(u->allocator, slice->prev_handle);
         }
         else {
             EVE_CoDl_clearColorRgb(u->hal, 0, 0, 0);
@@ -709,12 +709,12 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         uint16_t src_format = existing_format;
         uint32_t src_stride = existing_stride;
 
-        Esd_GpuHandle old_handle = GA_HANDLE_INVALID;
+        EVE_GpuHandle old_handle = GA_HANDLE_INVALID;
         bool have_old_handle = false;
 
         uint32_t new_size = aligned_w * aligned_h * target_bpp;
-        Esd_GpuHandle new_handle = Esd_GpuAlloc_Alloc(u->allocator, new_size, GA_ALIGN_128);
-        uint32_t new_addr = Esd_GpuAlloc_Get(u->allocator, new_handle);
+        EVE_GpuHandle new_handle = EVE_GpuAlloc_Alloc(u->allocator, new_size, GA_ALIGN_128);
+        uint32_t new_addr = EVE_GpuAlloc_Get(u->allocator, new_handle);
 
         if(new_addr == GA_INVALID) {
             LV_LOG_ERROR("EVE5: Failed to allocate buffer for canvas incremental render");
@@ -729,7 +729,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             old_handle = vr->gpu_handle;
             have_old_handle = true;
             if(vr->palette_offset != GA_INVALID) {
-                uint32_t old_base = Esd_GpuAlloc_Get(u->allocator, old_handle);
+                uint32_t old_base = EVE_GpuAlloc_Get(u->allocator, old_handle);
                 if(old_base != GA_INVALID) src_palette = old_base + vr->palette_offset;
             }
             vr->gpu_handle = new_handle;
@@ -784,7 +784,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoDl_restoreContext(u->hal);
 
         if(have_old_handle) {
-            Esd_GpuAlloc_PendingFree(u->allocator, old_handle);
+            EVE_GpuAlloc_PendingFree(u->allocator, old_handle);
         }
 
         LV_LOG_INFO("EVE5: Blitting existing layer content (%"PRId32"x%"PRId32" fmt=%d) from 0x%08X to 0x%08X",
@@ -830,7 +830,7 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_CoCmd_graphicsFinish(u->hal);
 
     EVE_CmdSync sync = EVE_Cmd_sync(u->hal);
-    Esd_GpuAlloc_FlushPending(u->allocator, sync);
+    EVE_GpuAlloc_FlushPending(u->allocator, sync);
 
     /* In FULL mode the screen layer renders directly into SWAPCHAIN_0, so the
      * CMD_SWAP above is the actual frame swap. Record the sync so a runtime
@@ -850,15 +850,15 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
  * Allocate L8 texture and start DL cycle for alpha rendering.
  * Returns GpuHandle (GA_HANDLE_INVALID on failure).
  */
-Esd_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
+EVE_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
                                                     int32_t aligned_w, int32_t aligned_h,
                                                     int32_t w, int32_t h)
 {
     EVE_HalContext *phost = u->hal;
 
     uint32_t l8_size = (uint32_t)aligned_w * aligned_h;
-    Esd_GpuHandle l8_handle = Esd_GpuAlloc_Alloc(u->allocator, l8_size, GA_ALIGN_128);
-    uint32_t l8_addr = Esd_GpuAlloc_Get(u->allocator, l8_handle);
+    EVE_GpuHandle l8_handle = EVE_GpuAlloc_Alloc(u->allocator, l8_size, GA_ALIGN_128);
+    uint32_t l8_addr = EVE_GpuAlloc_Get(u->allocator, l8_handle);
 
     if(l8_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate L8 alpha render target (%"PRId32"x%"PRId32")",
@@ -915,7 +915,7 @@ void lv_draw_eve5_hal_finish_l8_rendertarget(lv_draw_eve5_unit_t * u)
     EVE_CoCmd_graphicsFinish(u->hal);
 
     EVE_CmdSync l8_sync = EVE_Cmd_sync(u->hal);
-    Esd_GpuAlloc_FlushPending(u->allocator, l8_sync);
+    EVE_GpuAlloc_FlushPending(u->allocator, l8_sync);
 }
 
 /**
@@ -967,7 +967,7 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     LV_UNUSED(u); LV_UNUSED(layer); LV_UNUSED(is_screen); LV_UNUSED(rendered_count);
 }
 
-Esd_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
+EVE_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
                                                     int32_t aligned_w, int32_t aligned_h,
                                                     int32_t w, int32_t h)
 {
@@ -995,7 +995,7 @@ void lv_draw_eve5_hal_blit_l8_to_alpha(lv_draw_eve5_unit_t * u, uint32_t l8_addr
  * TEXTURE DRAWING (SW fallback compositing)
  **********************/
 
-Esd_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u,
+EVE_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u,
                                               const uint8_t * buf_data,
                                               int32_t buf_w, int32_t buf_h,
                                               uint32_t * out_stride)
@@ -1003,8 +1003,8 @@ Esd_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u,
     uint32_t eve_stride = ALIGN_UP(buf_w * 4, 4);
     uint32_t eve_size = eve_stride * buf_h;
 
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, eve_size, GA_ALIGN_4);
-    uint32_t ram_g_addr = Esd_GpuAlloc_Get(u->allocator, handle);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, eve_size, GA_ALIGN_4);
+    uint32_t ram_g_addr = EVE_GpuAlloc_Get(u->allocator, handle);
 
     if(ram_g_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate texture (%"PRIu32" bytes)", eve_size);
@@ -1082,9 +1082,9 @@ void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u,
     EVE_CoDl_end(u->hal);
 }
 
-bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t * u, Esd_GpuHandle handle)
+bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t * u, EVE_GpuHandle handle)
 {
-    return (Esd_GpuAlloc_Get(u->allocator, handle) != GA_INVALID);
+    return (EVE_GpuAlloc_Get(u->allocator, handle) != GA_INVALID);
 }
 #endif /* LV_DRAW_EVE5_SW_FALLBACK */
 

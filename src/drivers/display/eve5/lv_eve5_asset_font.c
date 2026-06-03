@@ -12,7 +12,7 @@
  *        CMD_QUERYASSET + CMD_GETPROPS — no RAM_G round-trip.
  *      - SRC_SDCARD (legacy): CMD_FSREAD the whole file into a temp
  *        RAM_G buffer, read back the header. Warns at load time.
- *   2. Allocate AssetSize bytes in RAM_G via Esd_GpuAlloc (4-byte aligned).
+ *   2. Allocate AssetSize bytes in RAM_G via EVE_GpuAlloc (4-byte aligned).
  *   3. Issue CMD_LOADASSET with the destination address; source data is
  *      either streamed into the command FIFO from a pre-read host buffer
  *      (lv_fs path), pointed at via CMD_FLASHSOURCE + OPT_FLASH, sourced
@@ -51,7 +51,7 @@
 #include "EVE_CoCmd_Ext.h"
 #include "EVE_GpuTypes.h"
 #include "EVE_MediaFifo.h"
-#include "Esd_GpuAlloc.h"
+#include "EVE_GpuAlloc.h"
 
 /**********************
  *      TYPEDEFS
@@ -60,14 +60,14 @@
 typedef struct {
     lv_font_dsc_base_t base;
     EVE_HalContext * hal;
-    Esd_GpuAlloc * allocator;
-    Esd_GpuHandle gpu_handle;
+    EVE_GpuAlloc * allocator;
+    EVE_GpuHandle gpu_handle;
     uint32_t first_character;
     /* Draw-time state: cached_handle persists the bitmap handle so the
      * same identity is used across frames, and last_bound_addr tracks
      * what address we last bound via CMD_SETFONT2 — both must match the
      * current allocator state before the bind can be reused. The address
-     * is *always* re-queried via Esd_GpuAlloc_Get; it must never be
+     * is *always* re-queried via EVE_GpuAlloc_Get; it must never be
      * cached for use, only for change detection. */
     uint8_t cached_handle;       /**< 0xFF = none */
     uint32_t last_bound_addr;    /**< GA_INVALID = no prior bind */
@@ -85,11 +85,11 @@ static bool issue_loadasset_from_buffer(EVE_HalContext * phost,
                                         uint32_t dst_addr);
 static bool issue_loadasset_from_flash(EVE_HalContext * phost, uint32_t flash_addr,
                                        uint32_t dst_addr);
-static bool probe_flash_asset_size(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
+static bool probe_flash_asset_size(EVE_HalContext * phost, EVE_GpuAlloc * alloc,
                                    uint32_t flash_addr, uint32_t * out_size);
 
-static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
-                                   const char * path, Esd_GpuHandle * out_handle,
+static bool load_asset_from_sdcard(EVE_HalContext * phost, EVE_GpuAlloc * alloc,
+                                   const char * path, EVE_GpuHandle * out_handle,
                                    uint32_t * out_asset_size);
 static const char * strip_lvgl_drive_letter(const char * path);
 
@@ -114,7 +114,7 @@ lv_font_t * lv_eve5_asset_font_create(lv_display_t * disp,
     if(disp == NULL || info == NULL) return NULL;
 
     EVE_HalContext * phost = lv_eve5_get_hal(disp);
-    Esd_GpuAlloc * allocator = lv_eve5_get_allocator(disp);
+    EVE_GpuAlloc * allocator = lv_eve5_get_allocator(disp);
     if(phost == NULL || allocator == NULL) return NULL;
 
     if(EVE_CHIPID < EVE_BT820) {
@@ -126,7 +126,7 @@ lv_font_t * lv_eve5_asset_font_create(lv_display_t * disp,
     uint8_t * file_buffer = NULL;   /* SRC_FILE: pre-read outside lock */
     uint32_t file_size = 0;
     bool ok = false;
-    Esd_GpuHandle handle = GA_HANDLE_INVALID;
+    EVE_GpuHandle handle = GA_HANDLE_INVALID;
     uint32_t dst_addr = GA_INVALID;
     lv_font_t * font = NULL;
 
@@ -222,7 +222,7 @@ lv_font_t * lv_eve5_asset_font_create(lv_display_t * disp,
             stream_ok = load_asset_from_sdcard(phost, allocator, info->path,
                                                &handle, &asset_size);
             if(stream_ok) {
-                dst_addr = Esd_GpuAlloc_Get(allocator, handle);
+                dst_addr = EVE_GpuAlloc_Get(allocator, handle);
             }
             break;
 
@@ -235,8 +235,8 @@ lv_font_t * lv_eve5_asset_font_create(lv_display_t * disp,
              * the load address into coprocessor RAM. A defragger move
              * would invalidate all of those. 4-byte alignment is enough
              * since the relocator emits 4-byte-aligned BITMAP_SOURCE. */
-            handle = Esd_GpuAlloc_Alloc(allocator, asset_size, GA_ALIGN_4 | GA_FIXED_FLAG);
-            dst_addr = Esd_GpuAlloc_Get(allocator, handle);
+            handle = EVE_GpuAlloc_Alloc(allocator, asset_size, GA_ALIGN_4 | GA_FIXED_FLAG);
+            dst_addr = EVE_GpuAlloc_Get(allocator, handle);
             if(dst_addr == GA_INVALID) {
                 LV_LOG_WARN("EVE5 asset font: RAM_G alloc failed (%u bytes)", (unsigned)asset_size);
                 goto unlock_out;
@@ -310,8 +310,8 @@ lv_font_t * lv_eve5_asset_font_create(lv_display_t * disp,
 
 unlock_out:
     if(!ok && handle.Id != GA_HANDLE_INVALID.Id
-       && Esd_GpuAlloc_Get(allocator, handle) != GA_INVALID) {
-        Esd_GpuAlloc_Free(allocator, handle);
+       && EVE_GpuAlloc_Get(allocator, handle) != GA_INVALID) {
+        EVE_GpuAlloc_Free(allocator, handle);
     }
 #if LV_USE_OS
     lv_eve5_hal_unlock(disp);
@@ -325,8 +325,8 @@ void lv_eve5_asset_font_destroy(lv_font_t * font)
     if(!lv_eve5_is_asset_font(font)) return;
     lv_eve5_asset_font_dsc_t * dsc = (lv_eve5_asset_font_dsc_t *)font->dsc;
     if(dsc != NULL) {
-        if(dsc->allocator != NULL && Esd_GpuAlloc_Get(dsc->allocator, dsc->gpu_handle) != GA_INVALID) {
-            Esd_GpuAlloc_Free(dsc->allocator, dsc->gpu_handle);
+        if(dsc->allocator != NULL && EVE_GpuAlloc_Get(dsc->allocator, dsc->gpu_handle) != GA_INVALID) {
+            EVE_GpuAlloc_Free(dsc->allocator, dsc->gpu_handle);
         }
         lv_eve5_font_block_free(&dsc->block);
         lv_free(dsc);
@@ -339,7 +339,7 @@ uint32_t lv_eve5_asset_font_get_address(const lv_font_t * font)
     if(!lv_eve5_is_asset_font(font)) return GA_INVALID;
     const lv_eve5_asset_font_dsc_t * dsc = (const lv_eve5_asset_font_dsc_t *)font->dsc;
     if(dsc == NULL || dsc->allocator == NULL) return GA_INVALID;
-    return Esd_GpuAlloc_Get(dsc->allocator, dsc->gpu_handle);
+    return EVE_GpuAlloc_Get(dsc->allocator, dsc->gpu_handle);
 }
 
 uint32_t lv_eve5_asset_font_get_first_char(const lv_font_t * font)
@@ -484,22 +484,22 @@ static bool issue_loadasset_from_flash(EVE_HalContext * phost, uint32_t flash_ad
 /* Read the 12-byte EVE_Gpu_AssetHeader from flash via CMD_FLASHREAD into a
  * temporary RAM_G slot, then read it back to host. Caller holds the HAL
  * mutex. CMD_FLASHREAD requires src 64-aligned, num multiple of 4. */
-static bool probe_flash_asset_size(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
+static bool probe_flash_asset_size(EVE_HalContext * phost, EVE_GpuAlloc * alloc,
                                    uint32_t flash_addr, uint32_t * out_size)
 {
     const uint32_t hdr_size_aligned = 16u; /* 12 bytes padded */
-    Esd_GpuHandle tmp = Esd_GpuAlloc_Alloc(alloc, hdr_size_aligned, GA_ALIGN_4);
-    uint32_t tmp_addr = Esd_GpuAlloc_Get(alloc, tmp);
+    EVE_GpuHandle tmp = EVE_GpuAlloc_Alloc(alloc, hdr_size_aligned, GA_ALIGN_4);
+    uint32_t tmp_addr = EVE_GpuAlloc_Get(alloc, tmp);
     if(tmp_addr == GA_INVALID) return false;
 
     EVE_CoCmd_flashRead(phost, tmp_addr, flash_addr, hdr_size_aligned);
     if(!EVE_Cmd_waitFlush(phost)) {
-        Esd_GpuAlloc_Free(alloc, tmp);
+        EVE_GpuAlloc_Free(alloc, tmp);
         return false;
     }
     EVE_Gpu_AssetHeader hdr;
     EVE_Hal_rdMem(phost, (uint8_t *)&hdr, tmp_addr, sizeof(hdr));
-    Esd_GpuAlloc_Free(alloc, tmp);
+    EVE_GpuAlloc_Free(alloc, tmp);
     if(hdr.Signature != EVE_GPU_ASSET_SIGNATURE) return false;
     *out_size = hdr.AssetSize;
     return true;
@@ -527,8 +527,8 @@ static const char * strip_lvgl_drive_letter(const char * path)
  * because the firmware reopens the file per scan.
  *
  * Caller holds the HAL mutex. */
-static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
-                                   const char * path, Esd_GpuHandle * out_handle,
+static bool load_asset_from_sdcard(EVE_HalContext * phost, EVE_GpuAlloc * alloc,
+                                   const char * path, EVE_GpuHandle * out_handle,
                                    uint32_t * out_asset_size)
 {
     if(!EVE_Hal_supportSdCard(phost)) {
@@ -559,8 +559,8 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
     }
 
     /* GA_FIXED_FLAG pins the allocation (see SRC_FILE/SRC_FLASH branch). */
-    Esd_GpuHandle final_handle = Esd_GpuAlloc_Alloc(alloc, asset_size, GA_ALIGN_4 | GA_FIXED_FLAG);
-    uint32_t final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
+    EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, asset_size, GA_ALIGN_4 | GA_FIXED_FLAG);
+    uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5 asset font: SD final RAM_G alloc failed (%u bytes)",
                     (unsigned)asset_size);
@@ -570,7 +570,7 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
     uint32_t load_res = EVE_CoCmd_loadAsset_fs(phost, final_addr, sd_path, 0);
     if(load_res != 0) {
         LV_LOG_ERROR("EVE5 asset font: SD CMD_LOADASSET failed for %s (code %u)", path, (unsigned)load_res);
-        Esd_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
         return false;
     }
     EVE_Hal_requestFenceBeforeSwap(phost);
@@ -595,8 +595,8 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
  * avoids the intermediate copy.
  *
  * Caller holds the HAL mutex. */
-static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
-                                   const char * path, Esd_GpuHandle * out_handle,
+static bool load_asset_from_sdcard(EVE_HalContext * phost, EVE_GpuAlloc * alloc,
+                                   const char * path, EVE_GpuHandle * out_handle,
                                    uint32_t * out_asset_size)
 {
     LV_LOG_WARN("EVE5 asset font: SD load uses intermediate RAM_G buffer "
@@ -625,8 +625,8 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
     /* CMD_FSREAD requires 32-byte alignment, MEDIAFIFO requires 4-byte size
      * alignment. Round up for both. */
     uint32_t fifo_size = (file_size + 3u) & ~3u;
-    Esd_GpuHandle temp_handle = Esd_GpuAlloc_AlignedAlloc(alloc, fifo_size, 0, 32);
-    uint32_t temp_addr = Esd_GpuAlloc_Get(alloc, temp_handle);
+    EVE_GpuHandle temp_handle = EVE_GpuAlloc_AlignedAlloc(alloc, fifo_size, 0, 32);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
     if(temp_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5 asset font: SD temp RAM_G alloc failed (%u bytes)", fifo_size);
         return false;
@@ -634,46 +634,46 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
 
     if(EVE_CoCmd_fsRead(phost, temp_addr, sd_path) != 0) {
         LV_LOG_WARN("EVE5 asset font: CMD_FSREAD failed for %s", path);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
         return false;
     }
 
     /* Peek the 12-byte header to learn the inflated AssetSize. */
-    temp_addr = Esd_GpuAlloc_Get(alloc, temp_handle);
+    temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
     EVE_Gpu_AssetHeader hdr;
     EVE_Hal_rdMem(phost, (uint8_t *)&hdr, temp_addr, sizeof(hdr));
     if(hdr.Signature != EVE_GPU_ASSET_SIGNATURE) {
         LV_LOG_WARN("EVE5 asset font: bad SD asset signature 0x%08X in %s",
                     (unsigned)hdr.Signature, path);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
         return false;
     }
     if(hdr.AssetSize == 0 || hdr.AssetSize > (64u * 1024u * 1024u)) {
         LV_LOG_WARN("EVE5 asset font: implausible SD AssetSize %u", (unsigned)hdr.AssetSize);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
         return false;
     }
 
     /* GA_FIXED_FLAG pins the allocation (see SRC_FILE/SRC_FLASH branch
      * above). 4-byte alignment is sufficient for the relocated
      * BITMAP_SOURCE pointers. */
-    Esd_GpuHandle final_handle = Esd_GpuAlloc_Alloc(alloc, hdr.AssetSize, GA_ALIGN_4 | GA_FIXED_FLAG);
-    uint32_t final_addr = Esd_GpuAlloc_Get(alloc, final_handle);
+    EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, hdr.AssetSize, GA_ALIGN_4 | GA_FIXED_FLAG);
+    uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5 asset font: SD final RAM_G alloc failed (%u bytes)",
                     (unsigned)hdr.AssetSize);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
         return false;
     }
 
     /* MEDIAFIFO points at the temp buffer; data is already there from
      * CMD_FSREAD, so we set REG_MEDIAFIFO_WRITE to file_size directly. */
     EVE_MediaFifo_close(phost);
-    temp_addr = Esd_GpuAlloc_Get(alloc, temp_handle);
+    temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
     if(!EVE_MediaFifo_set(phost, temp_addr, fifo_size)) {
         LV_LOG_WARN("EVE5 asset font: MediaFIFO set failed");
-        Esd_GpuAlloc_Free(alloc, final_handle);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
         return false;
     }
     EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
@@ -681,8 +681,8 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
     if(phost->CmdFault) {
         LV_LOG_ERROR("EVE5 asset font: coprocessor fault before SD CMD_LOADASSET");
         EVE_MediaFifo_close(phost);
-        Esd_GpuAlloc_Free(alloc, final_handle);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
         return false;
     }
 
@@ -692,14 +692,14 @@ static bool load_asset_from_sdcard(EVE_HalContext * phost, Esd_GpuAlloc * alloc,
 
     if(!flushed) {
         LV_LOG_ERROR("EVE5 asset font: SD CMD_LOADASSET failed for %s", path);
-        Esd_GpuAlloc_Free(alloc, final_handle);
-        Esd_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
         return false;
     }
     EVE_Hal_requestFenceBeforeSwap(phost);
 
     /* Temp buffer was synchronously consumed by waitFlush — safe to free. */
-    Esd_GpuAlloc_Free(alloc, temp_handle);
+    EVE_GpuAlloc_Free(alloc, temp_handle);
 
     *out_handle = final_handle;
     *out_asset_size = hdr.AssetSize;

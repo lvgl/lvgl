@@ -249,10 +249,10 @@ static bool upload_whole_font(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc
 
     /* On pre-BT820 the GPU allocator caps live handles at 64 — flag font
      * allocations as GC so the allocator can reclaim them when out-of-RAM_G
-     * pressure hits. BT820+ uses Esd_GpuAlloc5 which has no such cap. */
+     * pressure hits. BT820+ uses EVE_GpuAlloc5 which has no such cap. */
     uint32_t flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, total_size, flags);
-    uint32_t base_addr = Esd_GpuAlloc_Get(u->allocator, handle);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, total_size, flags);
+    uint32_t base_addr = EVE_GpuAlloc_Get(u->allocator, handle);
     if(base_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate whole font (%"PRIu32" bytes, %"PRIu32" glyphs)",
                     total_size, glyph_count);
@@ -261,7 +261,7 @@ static bool upload_whole_font(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_dsc
 
     uint32_t * offsets = lv_malloc(glyph_count * sizeof(uint32_t));
     if(!offsets) {
-        Esd_GpuAlloc_Free(u->allocator, handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
         return false;
     }
 
@@ -308,14 +308,14 @@ static bool upload_single_glyph(lv_draw_eve5_unit_t * u, const lv_font_fmt_txt_d
     uint32_t glyph_size = stride * g->box_h;
 
     uint32_t flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, glyph_size, flags);
-    uint32_t addr = Esd_GpuAlloc_Get(u->allocator, handle);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, glyph_size, flags);
+    uint32_t addr = EVE_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) return false;
 
     const uint8_t * glyph_bitmap = &font_dsc->glyph_bitmap[g->bitmap_index];
     if(!glyph_bitmap_to_ramg_aligned(u, addr, glyph_bitmap, g->box_w, g->box_h,
                                      stride, font_dsc->stride, bpp)) {
-        Esd_GpuAlloc_Free(u->allocator, handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
         return false;
     }
 
@@ -350,13 +350,13 @@ void lv_draw_eve5_vram_font_free(lv_draw_unit_t * draw_unit, lv_font_dsc_base_t 
 
     /* Early exit: gpu_handle is GA_HANDLE_INVALID when never assigned (sentinel) */
     if(fv->whole_font && fv->gpu_handle.Id != GA_HANDLE_INVALID.Id) {
-        Esd_GpuAlloc_Free(u->allocator, fv->gpu_handle);
+        EVE_GpuAlloc_Free(u->allocator, fv->gpu_handle);
     }
     if(fv->glyph_handles) {
         for(uint32_t i = 0; i < fv->glyph_count; i++) {
             /* Early exit: glyph_handles[i] is GA_HANDLE_INVALID when never loaded (sentinel) */
             if(fv->glyph_handles[i].Id != GA_HANDLE_INVALID.Id) {
-                Esd_GpuAlloc_Free(u->allocator, fv->glyph_handles[i]);
+                EVE_GpuAlloc_Free(u->allocator, fv->glyph_handles[i]);
             }
         }
     }
@@ -396,7 +396,7 @@ lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
             fv = NULL;
         }
         else if(fv->whole_font) {
-            if(Esd_GpuAlloc_Get(u->allocator, fv->gpu_handle) != GA_INVALID) {
+            if(EVE_GpuAlloc_Get(u->allocator, fv->gpu_handle) != GA_INVALID) {
                 return fv;
             }
             font_list_remove(u, fv);
@@ -455,7 +455,7 @@ lv_draw_eve5_font_vram_t * lv_draw_eve5_font_ensure(lv_draw_eve5_unit_t * u,
     }
 
     fv->whole_font = false;
-    fv->glyph_handles = lv_malloc(fv->glyph_count * sizeof(Esd_GpuHandle));
+    fv->glyph_handles = lv_malloc(fv->glyph_count * sizeof(EVE_GpuHandle));
     if(!fv->glyph_handles) {
         lv_free(fv);
         ((lv_font_dsc_base_t *)font->dsc)->vram_res = NULL;
@@ -488,17 +488,17 @@ uint32_t lv_draw_eve5_font_get_glyph(lv_draw_eve5_unit_t * u,
 
     if(fv->whole_font) {
         if(fv->glyph_offsets[gid] == GA_INVALID) return GA_INVALID;
-        uint32_t base = Esd_GpuAlloc_Get(u->allocator, fv->gpu_handle);
+        uint32_t base = EVE_GpuAlloc_Get(u->allocator, fv->gpu_handle);
         if(base == GA_INVALID) return GA_INVALID;
         return base + fv->glyph_offsets[gid];
     }
 
-    uint32_t addr = Esd_GpuAlloc_Get(u->allocator, fv->glyph_handles[gid]);
+    uint32_t addr = EVE_GpuAlloc_Get(u->allocator, fv->glyph_handles[gid]);
     if(addr != GA_INVALID) return addr;
 
     if(!upload_single_glyph(u, font_dsc, fv, gid)) return GA_INVALID;
 
-    return Esd_GpuAlloc_Get(u->allocator, fv->glyph_handles[gid]);
+    return EVE_GpuAlloc_Get(u->allocator, fv->glyph_handles[gid]);
 }
 
 /**********************
@@ -554,7 +554,7 @@ static bool font_generic_grow(lv_draw_eve5_font_vram_t * fv, uint32_t gid)
     if(needed <= fv->glyph_count) return true;
 
     uint32_t new_count = needed < 64 ? 64 : ALIGN_UP(needed, 64);
-    Esd_GpuHandle *new_handles = lv_realloc(fv->glyph_handles, new_count * sizeof(Esd_GpuHandle));
+    EVE_GpuHandle *new_handles = lv_realloc(fv->glyph_handles, new_count * sizeof(EVE_GpuHandle));
     if(!new_handles) return false;
 
     for(uint32_t i = fv->glyph_count; i < new_count; i++) {
@@ -584,7 +584,7 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
 
     if(!font_generic_grow(fv, gid)) return GA_INVALID;
 
-    uint32_t addr = Esd_GpuAlloc_Get(u->allocator, fv->glyph_handles[gid]);
+    uint32_t addr = EVE_GpuAlloc_Get(u->allocator, fv->glyph_handles[gid]);
     if(addr != GA_INVALID) return addr;
 
     const lv_draw_buf_t * glyph_data = lv_font_get_glyph_bitmap(glyph_dsc->g, glyph_dsc->_draw_buf);
@@ -592,8 +592,8 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
 
     uint32_t glyph_size = eve_stride * g_h;
     uint32_t flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, glyph_size, flags);
-    addr = Esd_GpuAlloc_Get(u->allocator, handle);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, glyph_size, flags);
+    addr = EVE_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) return GA_INVALID;
 
     uint32_t src_stride = glyph_data->header.stride;
@@ -606,7 +606,7 @@ static uint32_t font_get_generic_glyph(lv_draw_eve5_unit_t * u,
         /* Zero-pad each row to EVE stride alignment */
         uint8_t * row_buf = lv_malloc(eve_stride);
         if(row_buf == NULL) {
-            Esd_GpuAlloc_Free(u->allocator, handle);
+            EVE_GpuAlloc_Free(u->allocator, handle);
             return GA_INVALID;
         }
         for(int32_t y = 0; y < g_h; y++) {

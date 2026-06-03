@@ -107,7 +107,7 @@ void lv_draw_eve5_release_image_source(eve5_resolved_image_t * resolved)
 bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
                                       uint32_t * ram_g_addr, uint16_t * eve_format,
                                       int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
-                                      Esd_GpuHandle *out_handle, uint32_t * out_palette_addr)
+                                      EVE_GpuHandle *out_handle, uint32_t * out_palette_addr)
 {
     if(lv_image_src_get_type(src) != LV_IMAGE_SRC_FILE) {
         return false;
@@ -204,8 +204,8 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 #endif
 
     uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, decoded_size, alloc_flags);
-    uint32_t addr = Esd_GpuAlloc_Get(u->allocator, handle);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, decoded_size, alloc_flags);
+    uint32_t addr = EVE_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate %u bytes for decoded image", decoded_size);
 #if LV_USE_OS
@@ -219,7 +219,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 
     if(phost->CmdFault) {
         LV_LOG_ERROR("EVE5: Coprocessor fault before CMD_LOADIMAGE");
-        Esd_GpuAlloc_Free(u->allocator, handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
@@ -273,7 +273,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     lv_fs_close(&file);
 
     if(!success) {
-        Esd_GpuAlloc_Free(u->allocator, handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
@@ -282,7 +282,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 
     if(!EVE_Cmd_waitFlush(phost)) {
         LV_LOG_ERROR("EVE5: CMD_LOADIMAGE failed for %s", path);
-        Esd_GpuAlloc_Free(u->allocator, handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
@@ -325,7 +325,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         if(out_fmt == PALETTEDARGB8) {
             if(!out_palette_addr) {
                 LV_LOG_INFO("EVE5 HW_DECODE: PALETTEDARGB8 not supported by caller, falling back to SW for %s", path);
-                Esd_GpuAlloc_Free(u->allocator, handle);
+                EVE_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
                 lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
@@ -368,13 +368,13 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     /* Trim allocation to actual size */
     uint32_t index_size = (uint32_t)(decoded_stride * (int32_t)img_h);
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
-    uint32_t palette_offset = (out_fmt == PALETTEDARGB8) ? (uint32_t)(addr - Esd_GpuAlloc_Get(u->allocator, handle)) : 0;
+    uint32_t palette_offset = (out_fmt == PALETTEDARGB8) ? (uint32_t)(addr - EVE_GpuAlloc_Get(u->allocator, handle)) : 0;
 #else
     uint32_t palette_offset = 0;
 #endif
     uint32_t actual_size = palette_offset + index_size;
     if(actual_size < decoded_size) {
-        Esd_GpuAlloc_Truncate(u->allocator, handle, actual_size);
+        EVE_GpuAlloc_Truncate(u->allocator, handle, actual_size);
     }
 
 #if LV_USE_OS
@@ -402,7 +402,7 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * src,
                                         uint32_t * ram_g_addr, uint16_t * eve_format,
                                         int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
-                                        Esd_GpuHandle *out_handle, uint32_t * out_palette_addr)
+                                        EVE_GpuHandle *out_handle, uint32_t * out_palette_addr)
 {
     if(lv_image_src_get_type(src) != LV_IMAGE_SRC_FILE) {
         return false;
@@ -418,7 +418,7 @@ bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * sr
         return false;
     }
 
-    Esd_GpuHandle handle;
+    EVE_GpuHandle handle;
     uint32_t img_w, img_h, img_fmt, img_offset, pal_offset;
 
     bool ok = lv_eve5_sdcard_load_image(path, &handle, &img_w, &img_h, &img_fmt, &img_offset, &pal_offset);
@@ -427,7 +427,7 @@ bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * sr
         return false;
     }
 
-    uint32_t alloc_base = Esd_GpuAlloc_Get(u->allocator, handle);
+    uint32_t alloc_base = EVE_GpuAlloc_Get(u->allocator, handle);
     if(alloc_base == GA_INVALID) {
         LV_LOG_WARN("EVE5: SD card load succeeded but RAM_G address invalid");
         return false;
@@ -456,7 +456,7 @@ bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * sr
 bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src,
                                        uint32_t * ram_g_addr, uint16_t * eve_format,
                                        int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
-                                       Esd_GpuHandle *out_handle, uint32_t * out_palette_addr)
+                                       EVE_GpuHandle *out_handle, uint32_t * out_palette_addr)
 {
     if(lv_image_src_get_type(src) != LV_IMAGE_SRC_FILE) {
         return false;
@@ -472,7 +472,7 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src
         return false;
     }
 
-    Esd_GpuHandle handle;
+    EVE_GpuHandle handle;
     uint32_t img_w, img_h, img_fmt, img_offset, pal_offset;
 
     bool ok = lv_eve5_flash_load_image(path, &handle, &img_w, &img_h, &img_fmt, &img_offset, &pal_offset);
@@ -481,7 +481,7 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src
         return false;
     }
 
-    uint32_t alloc_base = Esd_GpuAlloc_Get(u->allocator, handle);
+    uint32_t alloc_base = EVE_GpuAlloc_Get(u->allocator, handle);
     if(alloc_base == GA_INVALID) {
         LV_LOG_WARN("EVE5: Flash load succeeded but RAM_G address invalid");
         return false;
@@ -657,7 +657,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     uint16_t eve_format = RGB565;
 #endif
     int32_t eve_stride = 0, src_w = 0, src_h = 0;
-    Esd_GpuHandle handle = GA_HANDLE_INVALID;
+    EVE_GpuHandle handle = GA_HANDLE_INVALID;
     bool loaded = false;
 
 #if LV_USE_FS_EVE5_SDCARD
@@ -721,7 +721,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     }
 
     /* Compute handle-relative offsets (defrag-safe) */
-    uint32_t alloc_base = Esd_GpuAlloc_Get(u->allocator, handle);
+    uint32_t alloc_base = EVE_GpuAlloc_Get(u->allocator, handle);
     uint32_t source_offset = (alloc_base != GA_INVALID && ram_g_addr >= alloc_base)
                              ? (ram_g_addr - alloc_base) : 0;
     uint32_t pal_offset = (palette_addr != GA_INVALID && alloc_base != GA_INVALID && palette_addr >= alloc_base)
@@ -731,7 +731,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
 
     lv_eve5_vram_res_t * vr = lv_malloc_zeroed(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
-        Esd_GpuAlloc_Free(u->allocator, handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
         return LV_RESULT_INVALID;
     }
     vr->base.unit = (lv_draw_unit_t *)u;
@@ -751,7 +751,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     lv_draw_buf_t * decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     if(decoded == NULL) {
         lv_free(vr);
-        Esd_GpuAlloc_Free(u->allocator, handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
         return LV_RESULT_INVALID;
     }
     decoded->header.magic = LV_IMAGE_HEADER_MAGIC;

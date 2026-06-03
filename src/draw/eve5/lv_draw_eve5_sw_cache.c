@@ -78,7 +78,7 @@ bool lv_draw_eve5_sw_cache_lookup(lv_draw_eve5_unit_t * u,
                                   lv_draw_task_type_t type,
                                   int32_t w, int32_t h,
                                   const void * dsc_data, uint32_t dsc_size,
-                                  Esd_GpuHandle *out_handle,
+                                  EVE_GpuHandle *out_handle,
                                   uint32_t * out_stride)
 {
     lv_draw_eve5_sw_cache_t * cache = &u->sw_cache;
@@ -118,7 +118,7 @@ void lv_draw_eve5_sw_cache_insert(lv_draw_eve5_unit_t * u,
                                   lv_draw_task_type_t type,
                                   int32_t w, int32_t h,
                                   const void * dsc_data, uint32_t dsc_size,
-                                  Esd_GpuHandle handle,
+                                  EVE_GpuHandle handle,
                                   uint32_t eve_stride)
 {
     lv_draw_eve5_sw_cache_t * cache = &u->sw_cache;
@@ -230,9 +230,9 @@ static void free_entry(lv_draw_eve5_unit_t * u, lv_draw_eve5_sw_cache_entry_t * 
         entry->dsc_data = NULL;
     }
 
-    if(Esd_GpuAlloc_Get(u->allocator, entry->handle) != GA_INVALID) {
+    if(EVE_GpuAlloc_Get(u->allocator, entry->handle) != GA_INVALID) {
         /* PendingFree: evicted texture may still be in an in-flight display list */
-        Esd_GpuAlloc_PendingFree(u->allocator, entry->handle);
+        EVE_GpuAlloc_PendingFree(u->allocator, entry->handle);
     }
 
     entry->valid = false;

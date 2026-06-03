@@ -32,7 +32,7 @@
  **********************/
 
 typedef struct {
-    Esd_GpuHandle handle;
+    EVE_GpuHandle handle;
     lv_area_t area;
     /* Source format and stride captured at flush time. The HW path's tile VRAM
      * format follows the layer's color format (typically the display's natural
@@ -46,7 +46,7 @@ typedef struct {
 
 typedef struct {
     EVE_HalContext * hal;
-    Esd_GpuAlloc * allocator;
+    EVE_GpuAlloc * allocator;
     /* frame_buffer_0/1 mirror the *active* swapchain config (what the
      * coprocessor will sample on the next CMD_SWAP). In FULL mode they're the
      * two original HAL-boot buffers (proper double buffer). In PARTIAL mode
@@ -124,12 +124,12 @@ static void apply_render_mode(lv_display_t * disp, lv_eve5_render_mode_t mode);
  * GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
+lv_display_t * lv_eve5_create(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
 {
     return lv_eve5_create_ex(hal, allocator, LV_EVE5_RENDER_MODE_PARTIAL);
 }
 
-lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
+lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, EVE_GpuAlloc *allocator,
                                  lv_eve5_render_mode_t mode)
 {
     EVE_HalContext *phost = hal;
@@ -241,8 +241,8 @@ lv_display_t * lv_eve5_create_ex(EVE_HalContext *hal, Esd_GpuAlloc *allocator,
     /* Initialize GPU allocator */
     allocator->TotalMemorySize = RAM_G_SIZE;
     allocator->TotalReserved = RAM_G_SIZE - RAM_G_AVAILABLE;
-    Esd_GpuAlloc_SetGen(allocator, EVE_GEN);
-    Esd_GpuAlloc_Reset(allocator);
+    EVE_GpuAlloc_SetGen(allocator, EVE_GEN);
+    EVE_GpuAlloc_Reset(allocator);
 
     /* TODO: Handle REG_SC0_RESET on coprocessor error to avoid missed SWAPs */
 
@@ -292,7 +292,7 @@ EVE_HalContext * lv_eve5_get_hal(lv_display_t * disp)
     return drvr ? drvr->hal : NULL;
 }
 
-Esd_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp)
+EVE_GpuAlloc * lv_eve5_get_allocator(lv_display_t * disp)
 {
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
     return drvr ? drvr->allocator : NULL;
@@ -312,7 +312,7 @@ void lv_eve5_hal_unlock(lv_display_t * disp)
 }
 #endif
 
-bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, Esd_GpuHandle *out_handle,
+bool lv_eve5_detach_gpu_handle(lv_draw_buf_t * buf, EVE_GpuHandle *out_handle,
                                uint16_t *out_format, uint32_t *out_stride)
 {
     if(buf == NULL || buf->vram_res == NULL) return false;
@@ -659,7 +659,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 #endif
 
         EVE_CmdSync completed = EVE_Cmd_syncCompleted(drvr->hal);
-        Esd_GpuAlloc_UpdateFree(drvr->allocator, completed);
+        EVE_GpuAlloc_UpdateFree(drvr->allocator, completed);
 #if LV_USE_OS
         lv_mutex_unlock(&drvr->hal_mutex);
 #endif
@@ -698,7 +698,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
      * format and stride too — tile VRAM is allocated in the layer's color
      * format (RGB565 / RGB8 / ARGB8 depending on LV_COLOR_DEPTH and any
      * promotion flags), and the compositor must sample it with that format. */
-    Esd_GpuHandle handle = GA_HANDLE_INVALID;
+    EVE_GpuHandle handle = GA_HANDLE_INVALID;
     uint16_t region_format = 0;
     uint32_t region_stride = 0;
     bool is_gpu_rendered = false;
@@ -713,8 +713,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
          * display's native LVGL format (EVE_SW_BITMAP_FORMAT) packed tight. */
         uint32_t size = (w * h) * SW_BYTES_PER_PIXEL;
 
-        handle = Esd_GpuAlloc_Alloc(drvr->allocator, size, GA_ALIGN_4);
-        uint32_t gpu_addr = Esd_GpuAlloc_Get(drvr->allocator, handle);
+        handle = EVE_GpuAlloc_Alloc(drvr->allocator, size, GA_ALIGN_4);
+        uint32_t gpu_addr = EVE_GpuAlloc_Get(drvr->allocator, handle);
 
         if(gpu_addr != GA_INVALID) {
             EVE_Hal_wrMem(phost, gpu_addr, px_map, size);
@@ -795,7 +795,7 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
     /* Composite each updated region */
     for(int i = 0; i < drvr->pending_count; i++) {
         rendered_region_t * region = &drvr->pending_regions[i];
-        uint32_t gpu_addr = Esd_GpuAlloc_Get(drvr->allocator, region->handle);
+        uint32_t gpu_addr = EVE_GpuAlloc_Get(drvr->allocator, region->handle);
 
         if(gpu_addr == GA_INVALID) {
             LV_LOG_WARN("EVE5 composite: region %d handle invalid", i);
@@ -831,7 +831,7 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
 
     /* Queue region textures for deferred free */
     for(int i = 0; i < drvr->pending_count; i++) {
-        Esd_GpuAlloc_DeferredFree(drvr->allocator,
+        EVE_GpuAlloc_DeferredFree(drvr->allocator,
                                   drvr->pending_regions[i].handle, sync);
     }
     drvr->pending_count = 0;
@@ -844,7 +844,7 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
 
     /* Process completed deferred frees */
     EVE_CmdSync completed = EVE_Cmd_syncCompleted(phost);
-    Esd_GpuAlloc_UpdateFree(drvr->allocator,
+    EVE_GpuAlloc_UpdateFree(drvr->allocator,
                             completed); /* FIXME: Idle callback in EVE_Cmd_syncCompleted should handle this (running out of sync ids?) */
 }
 #endif /* EVE_SUPPORT_RENDERTARGET — composite_to_framebuffer */
@@ -881,8 +881,8 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
     uint32_t stride = (uint32_t)W * FB_BYTES_PER_PIXEL;
     uint32_t size = stride * (uint32_t)H;
 
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(drvr->allocator, size, GA_ALIGN_4);
-    uint32_t gpu_addr = Esd_GpuAlloc_Get(drvr->allocator, handle);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(drvr->allocator, size, GA_ALIGN_4);
+    uint32_t gpu_addr = EVE_GpuAlloc_Get(drvr->allocator, handle);
     if(gpu_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5 FULL SW: temp VRAM alloc failed (%u bytes)", size);
         return;
@@ -927,7 +927,7 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
     }
     drvr->last_frame_sync = sync;
 
-    Esd_GpuAlloc_DeferredFree(drvr->allocator, handle, sync);
+    EVE_GpuAlloc_DeferredFree(drvr->allocator, handle, sync);
 }
 #endif /* EVE_SUPPORT_RENDERTARGET — full_mode_sw_present */
 

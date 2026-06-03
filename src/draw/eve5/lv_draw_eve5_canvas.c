@@ -139,7 +139,7 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
         }
         else {
             /* PendingFree: previous canvas content may be in an in-flight display list */
-            Esd_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+            EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
         }
 
         *vr = *src_vr;

@@ -408,7 +408,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     /* Check vram_res for image already uploaded to GPU */
     lv_eve5_vram_res_t * existing = eve5_get_image_vram_res(img_dsc);
     if(existing != NULL) {
-        uint32_t addr = Esd_GpuAlloc_Get(u->allocator, existing->gpu_handle);
+        uint32_t addr = EVE_GpuAlloc_Get(u->allocator, existing->gpu_handle);
         if(addr != GA_INVALID) {
             existing->width = img_dsc->header.w;
             existing->height = img_dsc->header.h;
@@ -454,8 +454,8 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     /* Allocate RAM_G space. On pre-BT820 the allocator caps live handles at 64;
      * flag image source uploads as GC so they can be reclaimed under pressure. */
     uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
-    Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, palette_size + eve_size, alloc_flags);
-    uint32_t base_addr = Esd_GpuAlloc_Get(u->allocator, handle);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, palette_size + eve_size, alloc_flags);
+    uint32_t base_addr = EVE_GpuAlloc_Get(u->allocator, handle);
 
     if(base_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate image in RAM_G (%u bytes)", palette_size + eve_size);
@@ -523,7 +523,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                         uint8_t * tmp_buf = lv_malloc(eve_stride);
                         if(!tmp_buf) {
                             LV_LOG_ERROR("EVE5: Failed to allocate index expansion buffer");
-                            Esd_GpuAlloc_Free(u->allocator, handle);
+                            EVE_GpuAlloc_Free(u->allocator, handle);
                             return NULL;
                         }
 
@@ -574,7 +574,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                         uint8_t * tmp_buf = lv_malloc(eve_stride);
                         if(!tmp_buf) {
                             LV_LOG_ERROR("EVE5: Failed to allocate ARGB4 expansion buffer");
-                            Esd_GpuAlloc_Free(u->allocator, handle);
+                            EVE_GpuAlloc_Free(u->allocator, handle);
                             return NULL;
                         }
 
@@ -616,7 +616,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                     uint8_t * tmp_buf = lv_malloc(eve_stride);
                     if(!tmp_buf) {
                         LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
-                        Esd_GpuAlloc_Free(u->allocator, handle);
+                        EVE_GpuAlloc_Free(u->allocator, handle);
                         return NULL;
                     }
 
@@ -655,7 +655,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                     uint8_t * tmp_buf = lv_malloc(eve_stride);
                     if(!tmp_buf) {
                         LV_LOG_ERROR("EVE5: Failed to allocate conversion buffer");
-                        Esd_GpuAlloc_Free(u->allocator, handle);
+                        EVE_GpuAlloc_Free(u->allocator, handle);
                         return NULL;
                     }
 
@@ -665,7 +665,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                                                      src_buf + y * src_stride, tmp_buf, src_w)) {
                             LV_LOG_ERROR("EVE5: No row conversion for cf=%d eve_fmt=%d", src_cf, eve_format);
                             lv_free(tmp_buf);
-                            Esd_GpuAlloc_Free(u->allocator, handle);
+                            EVE_GpuAlloc_Free(u->allocator, handle);
                             return NULL;
                         }
                         EVE_Hal_wrMem(u->hal, ram_g_addr + y * eve_stride, tmp_buf, eve_stride);
@@ -675,7 +675,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
                 }
 
             default:
-                Esd_GpuAlloc_Free(u->allocator, handle);
+                EVE_GpuAlloc_Free(u->allocator, handle);
                 return NULL;
         }
 
@@ -686,7 +686,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     /* Allocate and attach vram_res to the image descriptor */
     lv_eve5_vram_res_t * vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
-        Esd_GpuAlloc_PendingFree(u->allocator, handle);
+        EVE_GpuAlloc_PendingFree(u->allocator, handle);
         return NULL;
     }
 

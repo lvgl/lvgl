@@ -114,8 +114,8 @@ extern "C" {
 #endif
 
 /* Pre-BT820 scratch ring for gradient bitmaps. The pre-BT820 GPU allocator
- * (the variant of Esd_GpuAlloc used on FT80X..BT81X) caps live allocation
- * handles at 64; a frame with many gradients trips it. BT820 uses Esd_GpuAlloc5
+ * (the variant of EVE_GpuAlloc used on FT80X..BT81X) caps live allocation
+ * handles at 64; a frame with many gradients trips it. BT820 uses EVE_GpuAlloc5
  * which doesn't have that ceiling. The ring takes one allocator handle up
  * front and serves an unbounded number of frame-local gradient uploads from
  * it; read/write cursors advance with CMD_SWAP so the section being scanned
@@ -167,9 +167,9 @@ typedef struct lv_draw_eve5_font_vram_t {
     lv_draw_buf_vram_res_t base;    /**< Must be first member (.unit = owning draw unit) */
     struct lv_draw_eve5_font_vram_t * prev; /**< Intrusive list: previous resident font */
     struct lv_draw_eve5_font_vram_t * next; /**< Intrusive list: next resident font */
-    Esd_GpuHandle gpu_handle;       /**< Whole-font: single GPU allocation. Per-glyph: GA_HANDLE_INVALID */
+    EVE_GpuHandle gpu_handle;       /**< Whole-font: single GPU allocation. Per-glyph: GA_HANDLE_INVALID */
     uint32_t * glyph_offsets;       /**< Whole-font: per-gid byte offset into gpu_handle. Per-glyph: NULL */
-    Esd_GpuHandle * glyph_handles;  /**< Per-glyph: per-gid handle array. Whole-font: NULL */
+    EVE_GpuHandle * glyph_handles;  /**< Per-glyph: per-gid handle array. Whole-font: NULL */
     uint32_t glyph_count;           /**< Array size for glyph_offsets or glyph_handles */
     uint8_t bpp;                    /**< Bits per pixel (1/2/4/8) */
     bool whole_font;                /**< true = single allocation, false = per-glyph handles */
@@ -184,7 +184,7 @@ typedef struct {
     lv_draw_task_type_t type;
     int32_t w;
     int32_t h;
-    Esd_GpuHandle handle;
+    EVE_GpuHandle handle;
     uint32_t eve_stride;
     uint32_t last_used_frame;
     bool valid;
@@ -199,8 +199,8 @@ typedef struct {
 
 /* Shadow texture slot, one per ratio index */
 typedef struct {
-    Esd_GpuHandle corner_handle;
-    Esd_GpuHandle edge_handle;
+    EVE_GpuHandle corner_handle;
+    EVE_GpuHandle edge_handle;
 } lv_draw_eve5_shadow_slot_t;
 
 /* Pre-BT820 transient-allocation ring (currently used only for gradient bitmaps).
@@ -212,7 +212,7 @@ typedef struct {
  * would push that delta past ring_size. base == GA_INVALID on chips that
  * don't use the ring (BT820+). */
 typedef struct {
-    Esd_GpuHandle handle;
+    EVE_GpuHandle handle;
     uint32_t base;
     uint32_t size;
     uint32_t write_abs;
@@ -247,7 +247,7 @@ typedef struct {
 typedef struct {
     lv_draw_task_t * start;     /**< First task in slice (NULL = layer->draw_task_head) */
     lv_draw_task_t * end;       /**< Exclusive end (NULL = all remaining) */
-    Esd_GpuHandle prev_handle;  /**< Previous slice render output (GA_HANDLE_INVALID = none) */
+    EVE_GpuHandle prev_handle;  /**< Previous slice render output (GA_HANDLE_INVALID = none) */
     bool isolated;              /**< Force clear to (0,0,0,0): ignore canvas content and prev_handle */
     /* Format of the prev_handle bitmap when blitted as the new slice's base. When 0,
      * matches the new slice's render-target format. Used for full-mode screen slicing
@@ -324,7 +324,7 @@ static inline uint8_t lv_draw_eve5_rom_font_max(EVE_HalContext * phost)
 typedef struct {
     lv_draw_unit_t base_unit;
     EVE_HalContext * hal;
-    Esd_GpuAlloc * allocator;
+    EVE_GpuAlloc * allocator;
 
     /* Asset caches */
     lv_draw_eve5_font_vram_t * font_list; /**< Head of intrusive list of resident fonts */
@@ -396,10 +396,10 @@ static inline lv_eve5_vram_res_t * eve5_get_image_vram_res(const lv_image_dsc_t 
     return (lv_eve5_vram_res_t *)img->vram_res;
 }
 
-static inline void eve5_vram_res_resolve(Esd_GpuAlloc *alloc, const lv_eve5_vram_res_t * vr,
+static inline void eve5_vram_res_resolve(EVE_GpuAlloc *alloc, const lv_eve5_vram_res_t * vr,
                                          uint32_t * out_addr, uint32_t * out_palette_addr)
 {
-    uint32_t base = Esd_GpuAlloc_Get(alloc, vr->gpu_handle);
+    uint32_t base = EVE_GpuAlloc_Get(alloc, vr->gpu_handle);
     if(base != GA_INVALID) {
         *out_addr = base + vr->source_offset;
         *out_palette_addr = (vr->palette_offset != GA_INVALID) ? (base + vr->palette_offset) : GA_INVALID;
@@ -596,10 +596,10 @@ void lv_draw_eve5_sw_cache_deinit(lv_draw_eve5_unit_t * u);
 void lv_draw_eve5_sw_cache_new_frame(lv_draw_eve5_unit_t * u);
 bool lv_draw_eve5_sw_cache_lookup(lv_draw_eve5_unit_t * u, lv_draw_task_type_t type,
                                   int32_t w, int32_t h, const void * dsc_data, uint32_t dsc_size,
-                                  Esd_GpuHandle *out_handle, uint32_t * out_stride);
+                                  EVE_GpuHandle *out_handle, uint32_t * out_stride);
 void lv_draw_eve5_sw_cache_insert(lv_draw_eve5_unit_t * u, lv_draw_task_type_t type,
                                   int32_t w, int32_t h, const void * dsc_data, uint32_t dsc_size,
-                                  Esd_GpuHandle handle, uint32_t eve_stride);
+                                  EVE_GpuHandle handle, uint32_t eve_stride);
 void lv_draw_eve5_sw_cache_drop(lv_draw_eve5_unit_t * u, lv_draw_task_type_t type,
                                 int32_t w, int32_t h, const void * dsc_data, uint32_t dsc_size);
 #endif
@@ -623,7 +623,7 @@ bool lv_draw_eve5_convert_row(lv_color_format_t lv_cf, uint16_t eve_fmt,
                               const uint8_t * src_row, uint8_t * dst_row, int32_t w);
 
 /* Scratch ring (pre-BT820 only). init/deinit are no-ops on BT820+ where
- * Esd_GpuAlloc handles short-lived allocations directly. */
+ * EVE_GpuAlloc handles short-lived allocations directly. */
 void lv_draw_eve5_ring_init(lv_draw_eve5_unit_t * u);
 void lv_draw_eve5_ring_deinit(lv_draw_eve5_unit_t * u);
 /** Allocate `size` bytes from the ring with `align`-byte alignment.
@@ -637,12 +637,12 @@ void lv_draw_eve5_ring_swap(lv_draw_eve5_unit_t * u);
  * TEXTURE API
  **********************/
 
-Esd_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u, const uint8_t * buf_data,
+EVE_GpuHandle lv_draw_eve5_hal_upload_texture(lv_draw_eve5_unit_t * u, const uint8_t * buf_data,
                                               int32_t buf_w, int32_t buf_h, uint32_t * out_stride);
 void lv_draw_eve5_hal_draw_texture(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                                    uint32_t ram_g_addr, int32_t tex_w, int32_t tex_h,
                                    uint32_t eve_stride, const lv_area_t * draw_area);
-bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t * u, Esd_GpuHandle handle);
+bool lv_draw_eve5_hal_check_texture(lv_draw_eve5_unit_t * u, EVE_GpuHandle handle);
 #endif
 
 /**********************
@@ -661,19 +661,19 @@ void lv_draw_eve5_register_image_decoder(lv_draw_eve5_unit_t * unit);
 bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
                                       uint32_t * ram_g_addr, uint16_t * eve_format,
                                       int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
-                                      Esd_GpuHandle *out_handle, uint32_t * out_palette_addr);
+                                      EVE_GpuHandle *out_handle, uint32_t * out_palette_addr);
 #endif
 #if LV_USE_FS_EVE5_SDCARD
 bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * src,
                                         uint32_t * ram_g_addr, uint16_t * eve_format,
                                         int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
-                                        Esd_GpuHandle *out_handle, uint32_t * out_palette_addr);
+                                        EVE_GpuHandle *out_handle, uint32_t * out_palette_addr);
 #endif
 #if LV_USE_FS_EVE5_FLASH
 bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src,
                                        uint32_t * ram_g_addr, uint16_t * eve_format,
                                        int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
-                                       Esd_GpuHandle *out_handle, uint32_t * out_palette_addr);
+                                       EVE_GpuHandle *out_handle, uint32_t * out_palette_addr);
 #endif
 
 /**********************
@@ -686,7 +686,7 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer, 
                                    int rendered_count);
 
 /* L8 render-target alpha pass */
-Esd_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
+EVE_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
                                                     int32_t aligned_w, int32_t aligned_h,
                                                     int32_t w, int32_t h);
 void lv_draw_eve5_hal_finish_l8_rendertarget(lv_draw_eve5_unit_t * u);
@@ -750,7 +750,7 @@ bool lv_draw_eve5_line_should_use_hv_opt(const lv_draw_task_t * t, const lv_draw
 #if EVE5_USE_RENDERTARGET_ALPHA
 void lv_draw_eve5_check_alpha_recovery(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                        const lv_draw_eve5_slice_t * slice);
-Esd_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
+EVE_GpuHandle lv_draw_eve5_render_alpha_to_l8(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                               int32_t aligned_w, int32_t aligned_h,
                                               int32_t w, int32_t h,
                                               const lv_draw_eve5_slice_t * slice);
@@ -793,18 +793,18 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
 
 /* Gaussian blur (separable 5/7/9-tap pyramid, see lv_draw_eve5_gaussian.c) */
 bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                                Esd_GpuHandle dst_handle, const lv_draw_task_t * blur_task);
+                                EVE_GpuHandle dst_handle, const lv_draw_task_t * blur_task);
 
 /* Blend mode support (MULTIPLY, SUBTRACTIVE, DIFFERENCE) */
 bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                                 Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
-                                 Esd_GpuHandle *out_result);
+                                 EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
+                                 EVE_GpuHandle *out_result);
 bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                                    Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
-                                    Esd_GpuHandle *out_result);
+                                    EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
+                                    EVE_GpuHandle *out_result);
 bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
-                                   Esd_GpuHandle dst_handle, Esd_GpuHandle src_handle,
-                                   Esd_GpuHandle *out_result);
+                                   EVE_GpuHandle dst_handle, EVE_GpuHandle src_handle,
+                                   EVE_GpuHandle *out_result);
 
 /* Bitmap mask, applied at child layer finish */
 void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
@@ -815,7 +815,7 @@ void lv_draw_eve5_apply_bitmap_mask(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 const void * lv_draw_eve5_sw_get_dsc_cache_data(const lv_draw_task_t * t, uint32_t * out_size);
 uint8_t * lv_draw_eve5_sw_render_to_buffer(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                                            int32_t buf_w, int32_t buf_h);
-Esd_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
+EVE_GpuHandle lv_draw_eve5_sw_render_cached(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t,
                                             int32_t * out_w, int32_t * out_h,
                                             uint32_t * out_stride, bool *out_from_cache);
 void lv_draw_eve5_sw_render_task(lv_draw_eve5_unit_t * u, const lv_draw_task_t * t);
