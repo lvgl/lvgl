@@ -315,7 +315,6 @@ lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
 
 lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj)
 {
-    if(obj == NULL) return NULL;
     LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     return obj->parent;
@@ -651,8 +650,6 @@ void lv_obj_dump_tree(lv_obj_t * start_obj)
 
 static void lv_obj_delete_async_cb(void * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
-
     lv_obj_delete(obj);
 }
 
