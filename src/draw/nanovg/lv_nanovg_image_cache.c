@@ -32,7 +32,6 @@ typedef struct {
 
     /* key */
     lv_draw_buf_t src_buf;
-    lv_color32_t color;
     int image_flags;
 
     /* for drop search */
@@ -100,7 +99,6 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u)
 
 int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
                                      const void * src,
-                                     lv_color32_t color,
                                      int image_flags,
                                      lv_image_header_t * header)
 {
@@ -138,7 +136,6 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
     image_item_t search_key = { 0 };
     search_key.u = u;
     search_key.src_buf = *decoded;
-    search_key.color = color;
     search_key.image_flags = image_flags;
     search_key.src = src;
     search_key.src_type = lv_image_src_get_type(src);
@@ -314,13 +311,6 @@ static lv_cache_compare_res_t image_compare_cb(const image_item_t * lhs, const i
 {
     if(lhs->image_flags != rhs->image_flags) {
         return lhs->image_flags > rhs->image_flags ? 1 : -1;
-    }
-
-    uint32_t lhs_color = *(uint32_t *)&lhs->color;
-    uint32_t rhs_color = *(uint32_t *)&rhs->color;
-
-    if(lhs_color != rhs_color) {
-        return lhs_color > rhs_color ? 1 : -1;
     }
 
     int cmp_res = lv_memcmp(&lhs->src_buf, &rhs->src_buf, sizeof(lv_draw_buf_t));
