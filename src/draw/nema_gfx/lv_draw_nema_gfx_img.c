@@ -134,7 +134,7 @@ static void _draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * d
         if(dsc->bitmap_mask_src->header.cf == LV_COLOR_FORMAT_A8 || dsc->bitmap_mask_src->header.cf == LV_COLOR_FORMAT_L8) {
             blending_mode |= NEMA_BLOP_STENCIL_TXTY;
             const lv_image_dsc_t * mask = dsc->bitmap_mask_src;
-            const void * mask_buf = mask->data;
+            const uint8_t * mask_buf = mask->data;
 
             const lv_area_t * image_area;
             lv_area_t mask_area;
