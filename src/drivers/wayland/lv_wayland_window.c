@@ -56,7 +56,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_wl_window_t * window = lv_ll_ins_tail(&lv_wl_ctx.window_ll);
     LV_ASSERT_MALLOC(window);
     if(!window) {
-        LV_LOG_ERROR("Failed to allocate memory fo window");
+        LV_LOG_ERROR("Failed to allocate memory for window");
         goto alloc_window_err;
     }
 

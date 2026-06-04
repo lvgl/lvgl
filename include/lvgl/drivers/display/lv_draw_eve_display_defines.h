@@ -219,7 +219,7 @@ extern "C" {
 
 /* Fonts */
 #define LV_EVE_EVE_NUMCHAR_PERFONT     ((uint32_t) 128UL)  /* number of font characters per bitmap handle */
-#define LV_EVE_EVE_FONT_TABLE_SIZE     ((uint32_t) 148UL)  /* size of the font table - utilized for loopup by the graphics engine */
+#define LV_EVE_EVE_FONT_TABLE_SIZE     ((uint32_t) 148UL)  /* size of the font table - utilized for lookup by the graphics engine */
 #define LV_EVE_EVE_FONT_TABLE_POINTER  ((uint32_t) 0xFFFFCUL) /* pointer to the inbuilt font tables starting from bitmap handle 16 */
 
 /* Audio sample type defines */
