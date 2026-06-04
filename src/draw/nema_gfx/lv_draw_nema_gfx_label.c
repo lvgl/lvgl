@@ -338,7 +338,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
                 return;
 
             const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
-            const void * mask_buf;
+            const uint8_t * mask_buf;
             uint32_t src_cf;
             lv_area_t mask_area = *glyph_draw_dsc->letter_coords;
 
