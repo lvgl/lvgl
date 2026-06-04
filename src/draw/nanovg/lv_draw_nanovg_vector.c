@@ -98,7 +98,7 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
         case LV_VECTOR_DRAW_STYLE_PATTERN: {
                 const lv_draw_image_dsc_t * img_dsc = &fill_dsc->img_dsc;
                 lv_image_header_t header;
-                int image_handle = lv_nanovg_image_cache_get_handle(u, img_dsc->src, 0, &header);
+                int image_handle = lv_nanovg_image_cache_get_handle(u, img_dsc->src, lv_color_hex(0), 0, 0, &header);
                 if(image_handle < 0) {
                     LV_PROFILER_DRAW_END;
                     return;
