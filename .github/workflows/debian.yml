@@ -51,7 +51,7 @@ jobs:
               bash -c "dpkg-buildpackage -b -d -uc -us && mkdir debian-result-packages && mv ../*.deb debian-result-packages"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lvgl-deb-packages-${{ github.sha }}
           path: debian-result-packages/*
