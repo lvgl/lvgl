@@ -196,8 +196,6 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     }
 #endif /* LV_LINUX_FBDEV_BSD */
 
-    LV_LOG_INFO("%dx%d, %dbpp", dsc->vinfo.xres, dsc->vinfo.yres, dsc->vinfo.bits_per_pixel);
-
     /* AD5M and some other devices report incorrect bits_per_pixel via VSCREENINFO.
      * The stride (line_length) is always correct, so calculate true bpp from it.
      * Example: AD5M reports 16bpp but stride=3200 for 800px width = 4 bytes/pixel = 32bpp */
@@ -221,6 +219,9 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
         LV_LOG_INFO("bits_per_pixel %d retained; stride-derived bpp %u ignored (zero or non-standard)",
                     dsc->vinfo.bits_per_pixel, stride_bpp);
     }
+
+    /* Log the resolution after any bits_per_pixel correction so it reflects the value actually used */
+    LV_LOG_INFO("%dx%d, %dbpp", dsc->vinfo.xres, dsc->vinfo.yres, dsc->vinfo.bits_per_pixel);
 
     /* Figure out the size of the screen in bytes*/
     dsc->screensize =  dsc->finfo.smem_len;/*finfo.line_length * vinfo.yres;*/
@@ -325,24 +326,28 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
 void lv_linux_fbdev_set_skip_unblank(lv_display_t * disp, bool skip)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->skip_unblank = skip;
 }
 
 void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->force_refresh = enabled;
 }
 
 void lv_linux_fbdev_set_swap_rb(lv_display_t * disp, bool enabled)
 {
+    LV_CHECK_ARG(disp != NULL, return);
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->swap_rb = enabled;
 }
 
 bool lv_linux_fbdev_get_swap_rb(lv_display_t * disp)
 {
+    LV_CHECK_ARG(disp != NULL, return false);
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     return dsc->swap_rb;
 }
