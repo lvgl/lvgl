@@ -1482,7 +1482,7 @@ static void add_text(lv_obj_t * obj, const char * txt)
     }
 
     lv_obj_update_layout(obj);
-    lv_textarea_scroll_to_cusor_pos(obj, ta->cursor.pos);
+    lv_textarea_scroll_to_cursor_pos(obj, ta->cursor.pos);
     refr_cursor_area(obj);
     /*Move the cursor after the new character*/
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
