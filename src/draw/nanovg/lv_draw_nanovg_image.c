@@ -88,8 +88,8 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
             }
         }
 
-        image_handle = lv_nanovg_image_cache_get_handle(u, dsc->src,
-                                                        image_flags, NULL);
+
+        image_handle = lv_nanovg_image_cache_get_handle(u, dsc->src, dsc->recolor, dsc->recolor_opa, image_flags, NULL);
     }
 
     if(image_handle < 0) {
@@ -135,6 +135,16 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
 
     NVGpaint paint = nvgImagePattern(u->vg, img_ofs_x, img_ofs_y, img_w, img_h, 0, image_handle,
                                      dsc->opa / (float)LV_OPA_COVER);
+
+    /* completly paint the texture, this only works reliably if the item was previously stored as an alpha texture*/
+    if(dsc->recolor_opa >= LV_OPA_MAX) {
+        paint.innerColor = nvgRGBAf(dsc->recolor.red   / 255.0f,
+                                    dsc->recolor.green / 255.0f,
+                                    dsc->recolor.blue  / 255.0f,
+                                    dsc->opa / (float)LV_OPA_COVER);
+        paint.outerColor = paint.innerColor;
+    }
+
     nvgFillPaint(u->vg, paint);
     nvgFill(u->vg);
 

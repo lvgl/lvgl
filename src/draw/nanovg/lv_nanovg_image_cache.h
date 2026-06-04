@@ -56,6 +56,8 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u);
  */
 int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
                                      const void * src,
+                                     lv_color_t recolor,
+                                     lv_opa_t recolor_opa,
                                      int image_flags,
                                      lv_image_header_t * header);
 

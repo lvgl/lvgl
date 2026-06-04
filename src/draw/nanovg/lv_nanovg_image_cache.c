@@ -33,6 +33,8 @@ typedef struct {
     /* key */
     lv_draw_buf_t src_buf;
     int image_flags;
+    lv_color_t recolor;
+    lv_opa_t recolor_opa;
 
     /* for drop search */
     const void * src;
@@ -47,6 +49,10 @@ typedef struct {
 **********************/
 
 static void image_cache_release_cb(void * entry, void * user_data);
+
+static uint8_t * create(image_item_t * item, enum NVGtexture * nvg_texture);
+static uint8_t * create_full_recolor(image_item_t * item, enum NVGtexture * nvg_texture);
+
 static bool image_create_cb(image_item_t * item, void * user_data);
 static void image_free_cb(image_item_t * item, void * user_data);
 static lv_cache_compare_res_t image_compare_cb(const image_item_t * lhs, const image_item_t * rhs);
@@ -99,6 +105,8 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u)
 
 int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
                                      const void * src,
+                                     lv_color_t recolor,
+                                     lv_opa_t recolor_opa,
                                      int image_flags,
                                      lv_image_header_t * header)
 {
@@ -138,6 +146,9 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
     search_key.src_buf = *decoded;
     search_key.image_flags = image_flags;
     search_key.src = src;
+    /* clamp to LV_OPA_MAX so we only cache one recolor instance */
+    search_key.recolor_opa = recolor_opa > LV_OPA_MAX ? LV_OPA_MAX : recolor_opa;
+    search_key.recolor = recolor;
     search_key.src_type = lv_image_src_get_type(src);
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->image_cache, &search_key, NULL);
@@ -207,36 +218,89 @@ static void image_cache_release_cb(void * entry, void * user_data)
     lv_cache_release(cache, * entry_p, NULL);
 }
 
-static bool image_create_cb(image_item_t * item, void * user_data)
+static uint8_t * create_full_recolor(image_item_t * item, enum NVGtexture * nvg_texture)
 {
-    LV_UNUSED(user_data);
+    LV_ASSERT(item->recolor_opa == LV_OPA_MAX);
     const uint32_t w = item->src_buf.header.w;
     const uint32_t h = item->src_buf.header.h;
     const lv_color_format_t cf = item->src_buf.header.cf;
     const uint32_t stride = item->src_buf.header.stride;
-    enum NVGtexture nvg_tex_type = NVG_TEXTURE_BGRA;
 
+    /* only store alpha as the image needs to be recolored*/
+    *nvg_texture = NVG_TEXTURE_ALPHA;
+
+    lv_draw_buf_t * tmp_buf = lv_nanovg_reshape_global_image(item->u, LV_COLOR_FORMAT_A8, w, h);
+    if(!tmp_buf) {
+        LV_LOG_ERROR("Failed to allocate temp buffer for image conversion");
+        return NULL;
+    }
+
+    uint8_t * a8_data = lv_draw_buf_goto_xy(tmp_buf, 0, 0);
+    uint8_t * src = (uint8_t *)item->src_buf.data;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            for(uint32_t y = 0; y < h; y++) {
+                uint8_t * src_row = src + y * stride;
+                uint8_t * dst_row = a8_data + y * w;
+
+                for(uint32_t x = 0; x < w; x++) {
+                    dst_row[x] = src_row[x * 4 + 3];
+                }
+            }
+            break;
+        case LV_COLOR_FORMAT_RGB565A8:
+            for(uint32_t y = 0; y < h; y++) {
+                uint8_t * src_row = src + y * stride;
+                uint8_t * dst_row = a8_data + y * w;
+                for(uint32_t x = 0; x < w; x++) {
+                    dst_row[x] = src[stride * h + y * (stride / 2) + x];
+                }
+            }
+            break;
+        default:
+            LV_LOG_WARN("unsupported format 0x%02x", cf);
+        /* no alpha*/
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            lv_memset(a8_data, 0xFF, w * h);
+            break;
+    }
+    return a8_data;
+}
+
+static uint8_t * create(image_item_t * item, enum NVGtexture * nvg_texture)
+{
+    LV_ASSERT(item->recolor_opa < LV_OPA_MAX);
+    const uint32_t w = item->src_buf.header.w;
+    const uint32_t h = item->src_buf.header.h;
+    const lv_color_format_t cf = item->src_buf.header.cf;
+    const uint32_t stride = item->src_buf.header.stride;
     /* Determine texture type and pixel size based on color format */
     switch(cf) {
         case LV_COLOR_FORMAT_A8:
-            nvg_tex_type = NVG_TEXTURE_ALPHA;
+            *nvg_texture = NVG_TEXTURE_ALPHA;
             break;
 
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-            nvg_tex_type = NVG_TEXTURE_BGRA;
+            *nvg_texture = NVG_TEXTURE_BGRA;
             break;
 
         case LV_COLOR_FORMAT_XRGB8888:
-            nvg_tex_type = NVG_TEXTURE_BGRX;
+            *nvg_texture = NVG_TEXTURE_BGRX;
             break;
 
         case LV_COLOR_FORMAT_RGB888:
-            nvg_tex_type = NVG_TEXTURE_BGR;
+            *nvg_texture = NVG_TEXTURE_BGR;
             break;
 
         case LV_COLOR_FORMAT_RGB565:
-            nvg_tex_type = NVG_TEXTURE_RGB565;
+            *nvg_texture = NVG_TEXTURE_RGB565;
             break;
 
         default:
@@ -244,36 +308,56 @@ static bool image_create_cb(image_item_t * item, void * user_data)
             return false;
     }
 
-    void * data = NULL;
 
-    /* Check if stride is tightly packed */
-    uint32_t tight_stride = (w * lv_color_format_get_bpp(cf) + 7) >> 3;
-    if(stride == tight_stride) {
-        /* Stride matches, use source buffer directly (zero-copy) */
-        data = lv_draw_buf_goto_xy(&item->src_buf, 0, 0);
-        LV_LOG_TRACE("Image stride matches: %" LV_PRIu32, stride);
-    }
-    else {
-        /* Stride doesn't match, need to copy with tight alignment */
-        lv_draw_buf_t * tmp_buf = lv_nanovg_reshape_global_image(item->u, cf, w, h);
-        if(!tmp_buf) {
-            LV_LOG_ERROR("Failed to allocate temp buffer for stride conversion");
-            return false;
-        }
-
-        lv_draw_buf_copy(tmp_buf, NULL, &item->src_buf, NULL);
-        data = lv_draw_buf_goto_xy(tmp_buf, 0, 0);
-        LV_LOG_TRACE("Image stride converted: %" LV_PRIu32 " -> %" LV_PRIu32, stride, tight_stride);
-    }
-
-    int flags = item->image_flags;
     if(cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
        || lv_draw_buf_has_flag(&item->src_buf, LV_IMAGE_FLAGS_PREMULTIPLIED)) {
-        flags |= NVG_IMAGE_PREMULTIPLIED;
+        item->image_flags |= NVG_IMAGE_PREMULTIPLIED;
     }
 
+    if(item->recolor_opa <= LV_OPA_MIN) {
+        /* Check if stride is tightly packed */
+        uint32_t tight_stride = (w * lv_color_format_get_bpp(cf) + 7) >> 3;
+        if(stride == tight_stride) {
+            /* Stride matches, use source buffer directly (zero-copy) */
+            LV_LOG_TRACE("Image stride matches: %" LV_PRIu32, stride);
+            return lv_draw_buf_goto_xy(&item->src_buf, 0, 0);
+        }
+    }
+
+    /* Stride doesn't match, need to copy with tight alignment */
+    lv_draw_buf_t * tmp_buf = lv_nanovg_reshape_global_image(item->u, cf, w, h);
+    if(!tmp_buf) {
+        LV_LOG_ERROR("Failed to allocate temp buffer for stride conversion");
+        return false;
+    }
+
+    LV_LOG_TRACE("Image stride converted: %" LV_PRIu32 " -> %" LV_PRIu32, stride, tight_stride);
+    if(item->recolor_opa <= LV_OPA_MIN) {
+        lv_draw_buf_copy(tmp_buf, NULL, &item->src_buf, NULL);
+    }
+    else {
+        lv_draw_buf_recolor(tmp_buf, &item->src_buf, item->recolor, item->recolor_opa);
+    }
+    return lv_draw_buf_goto_xy(tmp_buf, 0, 0);
+}
+
+static bool image_create_cb(image_item_t * item, void * user_data)
+{
+    LV_UNUSED(user_data);
+    const uint32_t w = item->src_buf.header.w;
+    const uint32_t h = item->src_buf.header.h;
+    const lv_opa_t recolor_opa = item->recolor_opa;
+    const lv_color_format_t cf = item->src_buf.header.cf;
+    const uint32_t stride = item->src_buf.header.stride;
+
+    LV_ASSERT_MSG(recolor_opa <= LV_OPA_MAX,
+                  "Expected to have recolor opa clamped to LV_OPA_MAX to avoid creating multiple cache entries for a fully recolored image");
+
+    enum NVGtexture nvg_texture;
+    uint8_t * data = recolor_opa == LV_OPA_MAX ? create_full_recolor(item, &nvg_texture) : create(item, &nvg_texture);
+
     LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImage");
-    int image_handle = nvgCreateImage(item->u->vg, w, h, flags, nvg_tex_type, data);
+    int image_handle = nvgCreateImage(item->u->vg, w, h, item->image_flags, nvg_texture, data);
     LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
 
     if(image_handle < 0) {
@@ -311,6 +395,16 @@ static lv_cache_compare_res_t image_compare_cb(const image_item_t * lhs, const i
 {
     if(lhs->image_flags != rhs->image_flags) {
         return lhs->image_flags > rhs->image_flags ? 1 : -1;
+    }
+
+    if(lhs->recolor_opa != rhs->recolor_opa) {
+        return lhs->recolor_opa > rhs->recolor_opa ? 1 : -1;
+    }
+
+    int32_t lhs_recolor = lv_color_to_int(lhs->recolor);
+    int32_t rhs_recolor = lv_color_to_int(rhs->recolor);
+    if(lhs_recolor != rhs_recolor) {
+        return lhs_recolor > rhs_recolor ? 1 : -1;
     }
 
     int cmp_res = lv_memcmp(&lhs->src_buf, &rhs->src_buf, sizeof(lv_draw_buf_t));
