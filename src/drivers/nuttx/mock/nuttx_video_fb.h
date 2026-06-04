@@ -171,7 +171,7 @@ extern "C" {
 #define FB_NO_OVERLAY         -1
 
 #ifdef CONFIG_FB_OVERLAY
-#  define FB_ACCL_TRANSP      0x01        /* Hardware tranparency support */
+#  define FB_ACCL_TRANSP      0x01        /* Hardware transparency support */
 #  define FB_ACCL_CHROMA      0x02        /* Hardware chromakey support */
 #  define FB_ACCL_COLOR       0x04        /* Hardware color support */
 #  define FB_ACCL_AREA        0x08        /* Hardware support area selection */
