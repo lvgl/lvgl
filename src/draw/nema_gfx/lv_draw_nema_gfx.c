@@ -339,6 +339,10 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
         default:
             break;
     }
+
+#if !LV_USE_OS
+    nema_cl_wait(&(u->cl));
+#endif
 }
 
 static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit)
