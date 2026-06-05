@@ -50,14 +50,12 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u);
  * @brief Get the image handle from the cache, create a new one if not found
  * @param u pointer to the nanovg unit
  * @param src the source image data
- * @param color the color to apply
  * @param image_flags the image flags
  * @param header the image header to fill (can be NULL)
  * @return the image handle, or -1 on failure
  */
 int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
                                      const void * src,
-                                     lv_color32_t color,
                                      int image_flags,
                                      lv_image_header_t * header);
 
