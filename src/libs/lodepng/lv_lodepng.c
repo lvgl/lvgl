@@ -125,8 +125,8 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         header->cf = LV_COLOR_FORMAT_ARGB8888;
 
         /*The width and height are stored in Big endian format*/
-        uint32_t width = ((uint32_t)size[0] << 24) + ((uint32_t)size[1] << 16) + (size[2] << 8) + size[3];
-        uint32_t height = ((uint32_t)size[4] << 24) + ((uint32_t)size[5] << 16) + (size[6] << 8) + size[7];
+        uint32_t width = ((uint32_t)size[0] << 24) + ((uint32_t)size[1] << 16) + ((uint32_t)size[2] << 8) + (uint32_t)size[3];
+        uint32_t height = ((uint32_t)size[4] << 24) + ((uint32_t)size[5] << 16) + ((uint32_t)size[6] << 8) + (uint32_t)size[7];
 
         /*Avoid attempting to load images LVGL cannot use*/
         if(width > UINT16_MAX || height > UINT16_MAX) return LV_RESULT_INVALID;
