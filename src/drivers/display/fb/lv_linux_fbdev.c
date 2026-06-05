@@ -200,8 +200,16 @@ lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
      * The stride (line_length) is always correct, so calculate true bpp from it.
      * Example: AD5M reports 16bpp but stride=3200 for 800px width = 4 bytes/pixel = 32bpp */
     uint32_t stride_bpp = 0;
-    if(dsc->vinfo.xres > 0) {
-        stride_bpp = (dsc->finfo.line_length * 8) / dsc->vinfo.xres;
+    /* Use the virtual (padded) width when available; some framebuffers pad each
+     * line to xres_virtual, so xres alone yields an inflated bpp. The BSD
+     * fb_var_info shim has no xres_virtual field, so fall back to xres there. */
+#if LV_LINUX_FBDEV_BSD
+    uint32_t xres_for_stride = dsc->vinfo.xres;
+#else
+    uint32_t xres_for_stride = dsc->vinfo.xres_virtual > 0 ? dsc->vinfo.xres_virtual : dsc->vinfo.xres;
+#endif
+    if(xres_for_stride > 0) {
+        stride_bpp = (dsc->finfo.line_length * 8) / xres_for_stride;
     }
 
     /* Only override if stride_bpp is a standard depth (avoids false positives
@@ -491,11 +499,21 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     uint8_t * swap_buf = NULL;
     if(dsc->swap_rb) {
         if(!dsc->swap_line_buf || dsc->swap_line_buf_size < line_bytes) {
-            dsc->swap_line_buf = lv_realloc(dsc->swap_line_buf, line_bytes);
-            LV_ASSERT_MALLOC(dsc->swap_line_buf);
-            dsc->swap_line_buf_size = line_bytes;
+            /* Use a temp pointer so a NULL return doesn't leak the old buffer
+             * or wrongly update the cached size. */
+            uint8_t * tmp = lv_realloc(dsc->swap_line_buf, line_bytes);
+            if(tmp == NULL) {
+                LV_ASSERT_MALLOC(tmp);
+                /* Keep the old buffer; skip the R/B swap this frame rather than
+                 * crash. swap_buf stays NULL, so the unswapped data is written. */
+                LV_LOG_WARN("Failed to (re)allocate swap line buffer; skipping R/B swap this frame");
+            }
+            else {
+                dsc->swap_line_buf = tmp;
+                dsc->swap_line_buf_size = line_bytes;
+            }
         }
-        swap_buf = dsc->swap_line_buf;
+        swap_buf = dsc->swap_line_buf && dsc->swap_line_buf_size >= line_bytes ? dsc->swap_line_buf : NULL;
     }
 
     if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
