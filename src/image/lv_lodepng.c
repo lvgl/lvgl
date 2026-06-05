@@ -114,10 +114,11 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         else {
             const lv_image_dsc_t * img_dsc = dsc->src;
             const uint32_t data_size = img_dsc->data_size;
-            size = img_dsc->data + 16;
 
-            if(data_size < sizeof(magic)) return LV_RESULT_INVALID;
+            if(data_size < sizeof(buf)) return LV_RESULT_INVALID;
             if(lv_memcmp(img_dsc->data, magic, sizeof(magic)) != 0) return LV_RESULT_INVALID;
+
+            size = img_dsc->data + 16;
         }
 
         /*Save the data in the header*/
