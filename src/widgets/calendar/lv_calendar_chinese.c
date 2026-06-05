@@ -372,8 +372,7 @@ static const char * check_solar_term(uint16_t year, uint8_t month, uint8_t day)
     for(i = 0; i < range_end_num; i++) {
         uint8_t right = char_count_len * (range_end_num - i - 1);
         uint64_t x = data >> right;
-        uint8_t c = 1 << char_count_len; /* 4 */
-        offsets[i] = (uint8_t)(x % c);
+        offsets[i] = (uint8_t)(x & 0x3u);
     }
 
     /* Check whether the date is any solar term. */
