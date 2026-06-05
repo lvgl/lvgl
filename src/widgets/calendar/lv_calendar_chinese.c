@@ -177,10 +177,10 @@ const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)
     lv_calendar_chinese_t chinese_calendar;
     const char * solar_term_name;
 
-    lv_calendar_gregorian_to_chinese(gregorian, &chinese_calendar);
-
     if(gregorian->year > 2099 || gregorian->year < 1901)
         return NULL;
+
+    lv_calendar_gregorian_to_chinese(gregorian, &chinese_calendar);
 
     len = sizeof(festivals_base_chinese) / sizeof(lv_calendar_festival_t);
     for(i = 0; i < len; i++) {
