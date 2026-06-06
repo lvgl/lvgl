@@ -90,6 +90,9 @@
 #if LV_USE_DRAW_EVE
     #include "draw/eve/lv_draw_eve.h"
 #endif
+#if LV_USE_SIFLI_EPIC
+    #include "draw/sifli/epic/lv_draw_sifli_epic.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -283,6 +286,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_EVE
     lv_draw_eve_init();
+#endif
+
+#if LV_USE_SIFLI_EPIC
+    lv_draw_sifli_epic_init();
 #endif
 
     lv_obj_style_init();
@@ -503,6 +510,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_SW
     lv_draw_sw_deinit();
+#endif
+
+#if LV_USE_SIFLI_EPIC
+    lv_draw_sifli_epic_deinit();
 #endif
 
     lv_draw_deinit();

@@ -382,6 +382,24 @@ menu "LVGL configuration"
 			default ""
 			depends on LV_DRAW_SW_ASM_CUSTOM
 
+		config LV_USE_SIFLI_EPIC
+			bool "Enable SiFli EPIC hardware acceleration"
+			default n
+			help
+				Enable the SiFli EPIC draw unit. This backend accelerates a subset
+				of LVGL draw tasks in hardware and can fall back to software rendering
+				for unsupported operations.
+
+		config LV_USE_SIFLI_EPIC_DRAW_THREAD
+			bool "Use additional draw thread for SiFli EPIC processing"
+			depends on LV_USE_SIFLI_EPIC && !LV_OS_NONE
+			default y
+
+		config LV_USE_SIFLI_EPIC_ASSERT
+			bool "Enable SiFli EPIC asserts"
+			depends on LV_USE_SIFLI_EPIC
+			default n
+
 		config LV_USE_PXP
 		bool "Use NXP's PXP on iMX RTxxx platforms"
 		default n
