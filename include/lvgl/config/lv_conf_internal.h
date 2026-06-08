@@ -696,6 +696,22 @@
         #endif
     #endif
 
+    /** Control of the cache support within NEMA GFX */
+    #ifndef LV_NEMA_USE_CACHE
+        #ifdef CONFIG_LV_NEMA_USE_CACHE
+            #define LV_NEMA_USE_CACHE CONFIG_LV_NEMA_USE_CACHE
+        #else
+            #define LV_NEMA_USE_CACHE 0
+        #endif
+    #endif
+    #ifndef LV_NEMA_CACHE_HAL_INCLUDE
+        #ifdef CONFIG_LV_NEMA_CACHE_HAL_INCLUDE
+            #define LV_NEMA_CACHE_HAL_INCLUDE CONFIG_LV_NEMA_CACHE_HAL_INCLUDE
+        #else
+            #define LV_NEMA_CACHE_HAL_INCLUDE <stm32u5xx_hal.h>
+        #endif
+    #endif
+
     /** Select which NemaGFX HAL to use. Possible options:
      * - LV_NEMA_HAL_CUSTOM
      * - LV_NEMA_HAL_STM32 */
@@ -4961,6 +4977,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #ifndef LV_USE_VG_LITE_THORVG
     #define LV_USE_VG_LITE_THORVG 0
+#endif
+
+#ifndef LV_NEMA_USE_CACHE
+    #define LV_NEMA_USE_CACHE 0
 #endif
 
 /* Set some defines if a dependency is disabled. */
