@@ -562,7 +562,7 @@ lv_result_t lv_draw_buf_recolor(lv_draw_buf_t * dest, lv_draw_buf_t * src, lv_co
             break;
 
         case LV_COLOR_FORMAT_RGB565_SWAPPED: {
-                uint16_t color16 = lv_color_to_u16(color);
+                uint16_t color16 = lv_color_swap_16(lv_color_to_u16(color));
                 if(opa >= LV_OPA_MAX) {
                     for(int32_t y = 0; y < h; y++) {
                         uint16_t * dest_row = (uint16_t *)(dest_data + y * dest_stride);
