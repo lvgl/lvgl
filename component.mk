@@ -21,8 +21,6 @@ COMPONENT_SRCDIRS := . \
                   src/draw/stm32_dma2d \
                   src/draw/sw \
                   src/draw/sw/blend \
-                  src/draw/sifli \
-                  src/draw/sifli/epic \
                   src/draw/swm342_dma2d \
                   src/others \
                   src/layouts \
