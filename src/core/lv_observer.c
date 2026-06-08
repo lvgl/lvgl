@@ -93,7 +93,7 @@ static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 #if LV_USE_EXT_DATA
 void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
 {
-    LV_CHECK_ARG(subject != NULL, return, "Can't attach external user data and destructor callback to a NULL subject");
+    LV_CHECK_ARG(subject != NULL, return);
 
     subject->ext_data.data = data;
     subject->ext_data.free_cb = free_cb;
@@ -222,6 +222,9 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value)
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
     LV_CHECK_ARG(subject != NULL, return);
+    LV_CHECK_ARG(buf != NULL, return);
+    LV_CHECK_ARG(size > 0, return);
+    LV_CHECK_ARG(value != NULL, return);
 
     lv_memzero(subject, sizeof(lv_subject_t));
     lv_strlcpy(buf, value, size);
@@ -239,6 +242,7 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 {
     LV_CHECK_ARG(subject != NULL, return);
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
+    LV_CHECK_ARG(buf != NULL, return);
 
     if(subject->size == 0) return;
     if(subject->prev_value.pointer) {
@@ -254,6 +258,7 @@ void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
 {
     LV_CHECK_ARG(subject != NULL, return);
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
+    LV_CHECK_ARG(format != NULL, return);
 
     if(subject->size < 1U) return;
 
@@ -381,6 +386,8 @@ void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], 
 
 lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)
 {
+    LV_CHECK_ARG(subject != NULL, return NULL);
+
     if(subject->type != LV_SUBJECT_TYPE_GROUP) {
         LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_GROUP");
         return NULL;
@@ -394,7 +401,7 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 
 void lv_subject_deinit(lv_subject_t * subject)
 {
-    if(!subject) return;
+    LV_CHECK_ARG(subject != NULL, return);
 
     lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {
@@ -475,7 +482,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 
 void lv_observer_remove(lv_observer_t * observer)
 {
-    LV_CHECK_ARG(observer != NULL, return);
+    if(observer == NULL) return;
 
     if(observer->for_obj && observer->target) {
         lv_obj_remove_event_cb_with_user_data(observer->target, unsubscribe_on_delete_cb, observer);
@@ -502,7 +509,8 @@ void lv_observer_remove(lv_observer_t * observer)
 void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_CHECK_ARG(obj != NULL, return);
-    LV_CHECK_ARG(subject != NULL, return);
+    /* subject == NULL is documented as valid: remove from ALL subjects */
+
     /*
      * Look for the `observer` that connects `obj` and `subject`
      * Since the obj is associated with the subject,
@@ -687,6 +695,7 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
     LV_CHECK_ARG(obj != NULL, return);
     LV_CHECK_ARG(subject != NULL, return);
     LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
+    LV_CHECK_ARG(value != NULL, return);
 
     subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_string_user_data_t));
     if(user_data == NULL) {
