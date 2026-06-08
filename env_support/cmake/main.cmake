@@ -1,3 +1,4 @@
+include(GNUInstallDirs)
 include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
 
 ############################## OPTIONS ######################################
@@ -299,7 +300,6 @@ endif()
 
 ############################## INSTALLATION ######################################
 
-include(GNUInstallDirs)
 
 # Install public headers
 install(
