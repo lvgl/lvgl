@@ -132,8 +132,8 @@ EPIC_ColorDef lv_color_to_epic_color(lv_color_t color, lv_opa_t opa)
     return c;
 }
 
-uint32_t lv_epic_setup_layers(EPIC_LayerConfigTypeDef *epic_bg_layer,
-                              EPIC_LayerConfigTypeDef *epic_output_layer,
+uint32_t lv_epic_setup_layers(EPIC_LayerConfigTypeDef * epic_bg_layer,
+                              EPIC_LayerConfigTypeDef * epic_output_layer,
                               lv_draw_task_t * draw_task,
                               const lv_area_t * coords)
 {
