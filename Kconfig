@@ -891,6 +891,7 @@ menu "EPIC"
 
 		config LV_USE_SIFLI_EPIC
 			bool "Enable SiFli EPIC hardware acceleration"
+			depends on LV_USE_DRAW_SW
 			default n
 			help
 				Enable the SiFli EPIC draw unit. This backend accelerates a subset

@@ -182,6 +182,14 @@ static int32_t _epic_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    if(task->target_layer == NULL) {
+        return 0;
+    }
+
+    if(!lv_epic_cf_supported(task->target_layer->color_format, 0)) {
+        return 0;
+    }
+
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * draw_dsc = (const lv_draw_fill_dsc_t *)task->draw_dsc;
@@ -381,11 +389,9 @@ static int32_t _epic_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         }
     }
     else {
-        /* Fake unsupported tasks as ready */
+        /* Only EPIC unit available - let it handle or properly report inability */
         if(task->preferred_draw_unit_id != DRAW_UNIT_ID_SIFLI_EPIC) {
-            task->state = LV_DRAW_TASK_STATE_FINISHED;
-            lv_draw_dispatch_request();
-            return 1;
+            return LV_DRAW_UNIT_IDLE;
         }
     }
 
