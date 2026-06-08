@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../lvgl_public.h"
 #include "lv_draw_buf_private.h"
 #include "../core/lv_global.h"
 #include "../misc/lv_area_private.h"
@@ -500,6 +501,167 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
 
     LV_PROFILER_DRAW_END;
     return res;
+}
+
+lv_result_t lv_draw_buf_recolor(lv_draw_buf_t * dest, lv_draw_buf_t * src, lv_color_t color, lv_opa_t opa)
+{
+    LV_CHECK_ARG(src != NULL, return LV_RESULT_INVALID);
+
+    if(opa <= LV_OPA_MIN) return LV_RESULT_OK;
+
+    if(dest != NULL) {
+        LV_CHECK_ARG(dest->header.h == src->header.h, return LV_RESULT_INVALID);
+        LV_CHECK_ARG(dest->header.w == src->header.w, return LV_RESULT_INVALID);
+        LV_CHECK_ARG(dest->header.cf == src->header.cf, return LV_RESULT_INVALID);
+        LV_CHECK_ARG((dest->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) != 0, return LV_RESULT_INVALID);
+    }
+    else {
+        LV_CHECK_ARG((src->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) != 0, return LV_RESULT_INVALID);
+        /* in-place recolor */
+        dest = src;
+    }
+
+    const lv_color_format_t cf = dest->header.cf;
+    const int32_t dest_stride = dest->header.stride;
+    const int32_t src_stride = src->header.stride;
+    const int32_t w = dest->header.w;
+    const int32_t h = dest->header.h;
+    uint8_t * src_data = src->data;
+    uint8_t * dest_data = dest->data;
+
+    const lv_opa_t mix_inv = 255 - opa;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB565A8: {
+                uint16_t color16 = lv_color_to_u16(color);
+                if(opa >= LV_OPA_MAX) {
+                    for(int32_t y = 0; y < h; y++) {
+                        uint16_t * dest_row = (uint16_t *)(dest_data + y * dest_stride);
+                        for(int32_t x = 0; x < w; x++)
+                            dest_row[x] = color16;
+                    }
+                }
+                else {
+                    uint16_t c_mult[3] = {
+                        (color.blue  >> 3) * opa,
+                        (color.green >> 2) * opa,
+                        (color.red   >> 3) * opa,
+                    };
+                    for(int32_t y = 0; y < h; y++) {
+                        uint16_t * src_row  = (uint16_t *)(src_data  + y * src_stride);
+                        uint16_t * dest_row = (uint16_t *)(dest_data + y * dest_stride);
+                        for(int32_t x = 0; x < w; x++) {
+                            dest_row[x] = (((c_mult[2] + ((src_row[x] >> 11) & 0x1F) * mix_inv) << 3) & 0xF800) +
+                                          (((c_mult[1] + ((src_row[x] >> 5)  & 0x3F) * mix_inv) >> 3) & 0x07E0) +
+                                          ((c_mult[0] + (src_row[x] & 0x1F) * mix_inv) >> 8);
+                        }
+                    }
+                }
+            }
+            break;
+
+        case LV_COLOR_FORMAT_RGB565_SWAPPED: {
+                uint16_t color16 = lv_color_to_u16(color);
+                if(opa >= LV_OPA_MAX) {
+                    for(int32_t y = 0; y < h; y++) {
+                        uint16_t * dest_row = (uint16_t *)(dest_data + y * dest_stride);
+                        for(int32_t x = 0; x < w; x++)
+                            dest_row[x] = color16;
+                    }
+                }
+                else {
+                    uint16_t c_mult[3] = {
+                        (color.blue  >> 3) * opa,
+                        (color.green >> 2) * opa,
+                        (color.red   >> 3) * opa,
+                    };
+                    for(int32_t y = 0; y < h; y++) {
+                        uint16_t * src_row  = (uint16_t *)(src_data  + y * src_stride);
+                        uint16_t * dest_row = (uint16_t *)(dest_data + y * dest_stride);
+                        for(int32_t x = 0; x < w; x++) {
+                            dest_row[x] = lv_color_swap_16((((c_mult[2] + ((lv_color_swap_16(src_row[x]) >> 11) & 0x1F) * mix_inv) << 3) & 0xF800) +
+                                                           (((c_mult[1] + ((lv_color_swap_16(src_row[x]) >> 5)  & 0x3F) * mix_inv) >> 3) & 0x07E0) +
+                                                           ((c_mult[0] + (lv_color_swap_16(src_row[x]) & 0x1F) * mix_inv) >> 8));
+                        }
+                    }
+                }
+            }
+            break;
+
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888: {
+                uint32_t px_size = lv_color_format_get_size(cf);
+                if(opa >= LV_OPA_MAX) {
+                    for(int32_t y = 0; y < h; y++) {
+                        uint8_t * src_row  = src_data  + y * src_stride;
+                        uint8_t * dest_row = dest_data + y * dest_stride;
+                        for(int32_t x = 0; x < w; x++, src_row += px_size, dest_row += px_size) {
+                            dest_row[0] = color.blue;
+                            dest_row[1] = color.green;
+                            dest_row[2] = color.red;
+                            if(cf == LV_COLOR_FORMAT_ARGB8888) dest_row[3] = src_row[3];
+                        }
+                    }
+                }
+                else {
+                    uint16_t c_mult[3] = {
+                        color.blue  * opa,
+                        color.green * opa,
+                        color.red   * opa,
+                    };
+                    for(int32_t y = 0; y < h; y++) {
+                        uint8_t * src_row  = src_data  + y * src_stride;
+                        uint8_t * dest_row = dest_data + y * dest_stride;
+                        for(int32_t x = 0; x < w; x++, src_row += px_size, dest_row += px_size) {
+                            dest_row[0] = (c_mult[0] + src_row[0] * mix_inv) >> 8;
+                            dest_row[1] = (c_mult[1] + src_row[1] * mix_inv) >> 8;
+                            dest_row[2] = (c_mult[2] + src_row[2] * mix_inv) >> 8;
+                            if(cf == LV_COLOR_FORMAT_ARGB8888) dest_row[3] = src_row[3];
+                        }
+                    }
+                }
+            }
+            break;
+
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED: {
+                uint32_t px_size = lv_color_format_get_size(cf);
+                uint16_t c_mult[3] = {
+                    color.blue  * opa,
+                    color.green * opa,
+                    color.red   * opa,
+                };
+                for(int32_t y = 0; y < h; y++) {
+                    uint8_t * src_row  = src_data  + y * src_stride;
+                    uint8_t * dest_row = dest_data + y * dest_stride;
+                    for(int32_t x = 0; x < w; x++, src_row += px_size, dest_row += px_size) {
+                        uint8_t alpha = src_row[3];
+                        if(alpha > 0) {
+                            uint16_t reciprocal = (255 * 256) / alpha;
+                            uint8_t b = (src_row[0] * reciprocal) >> 8;
+                            uint8_t g = (src_row[1] * reciprocal) >> 8;
+                            uint8_t r = (src_row[2] * reciprocal) >> 8;
+                            dest_row[0] = ((c_mult[0] + b * mix_inv) >> 8) * alpha >> 8;
+                            dest_row[1] = ((c_mult[1] + g * mix_inv) >> 8) * alpha >> 8;
+                            dest_row[2] = ((c_mult[2] + r * mix_inv) >> 8) * alpha >> 8;
+                        }
+                        else {
+                            dest_row[0] = src_row[0];
+                            dest_row[1] = src_row[1];
+                            dest_row[2] = src_row[2];
+                        }
+                        dest_row[3] = alpha;
+                    }
+                }
+            }
+            break;
+
+        default:
+            LV_LOG_WARN("lv_draw_buf_recolor: unsupported color format 0x%02x", cf);
+            return LV_RESULT_INVALID;
+    }
+    return LV_RESULT_OK;
 }
 
 void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color)
