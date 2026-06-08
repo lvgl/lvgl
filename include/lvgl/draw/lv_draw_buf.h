@@ -314,6 +314,15 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride);
  */
 lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 
+/**
+ * Apply recolor to a draw buffer.
+ * @param dest  destination buffer. If NULL, recolor is applied in-place to src.
+ * @param src   source buffer
+ * @param color recolor color
+ * @param opa   recolor opacity (LV_OPA_MIN<= no change, >=LV_OPA_MAX full replace)
+ */
+lv_result_t lv_draw_buf_recolor(lv_draw_buf_t * dest, lv_draw_buf_t * src, lv_color_t color, lv_opa_t opa);
+
 
 /**
  * Check if a draw buffer has a given flag.
