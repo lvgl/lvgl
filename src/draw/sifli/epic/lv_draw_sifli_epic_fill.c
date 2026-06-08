@@ -107,7 +107,8 @@ void lv_draw_sifli_epic_fill(lv_draw_task_t * task)
         param.color_mode = epic_cf;
         param.width = lv_area_get_width(&blend_area);
         param.height = lv_area_get_height(&blend_area);
-        param.total_width = layer->draw_buf ? lv_epic_stride_to_width(layer->draw_buf->header.stride, dest_cf) : lv_area_get_width(&layer->buf_area);
+        param.total_width = layer->draw_buf ? lv_epic_stride_to_width(layer->draw_buf->header.stride,
+                                                                       dest_cf) : lv_area_get_width(&layer->buf_area);
         /* Setup gradient colors */
         if(grad_dir == LV_GRAD_DIR_VER) {
             /* Vertical gradient */
