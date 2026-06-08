@@ -166,9 +166,9 @@ void lv_epic_invalidate_cache_range(const void * data, uint32_t size);
 bool lv_epic_is_cached_ram(uint32_t start, uint32_t len);
 
 HAL_StatusTypeDef lv_epic_fill(EPIC_LayerConfigTypeDef * input_layers, uint8_t input_layer_cnt,
-EPIC_LayerConfigTypeDef * output_layer);
+                               EPIC_LayerConfigTypeDef * output_layer);
 HAL_StatusTypeDef lv_epic_blend(EPIC_LayerConfigTypeDef * input_layers, uint8_t input_layer_cnt,
-EPIC_LayerConfigTypeDef * output_layer);
+                                EPIC_LayerConfigTypeDef * output_layer);
 HAL_StatusTypeDef lv_epic_fill_grad(EPIC_GradCfgTypeDef * param);
 
 /**********************
