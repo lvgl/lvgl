@@ -195,6 +195,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     image_dsc.opa = glyph_draw_dsc->opa;
                     image_dsc.src = glyph_draw_dsc->glyph_data;
                     image_dsc.rotation = glyph_draw_dsc->rotation;
+                    image_dsc.pivot = glyph_draw_dsc->pivot;
                     lv_draw_vg_lite_img(t, &image_dsc, glyph_draw_dsc->letter_coords, false);
                 }
                 break;
