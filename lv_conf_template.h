@@ -247,6 +247,10 @@
      */
     #define LV_USE_NEMA_LIB LV_NEMA_LIB_NONE
 
+    /** Control of the cache support within NEMA GFX */
+    #define LV_NEMA_USE_CACHE 0
+    #define LV_NEMA_CACHE_HAL_INCLUDE <stm32u5xx_hal.h>
+
     /** Select which NemaGFX HAL to use. Possible options:
      * - LV_NEMA_HAL_CUSTOM
      * - LV_NEMA_HAL_STM32 */

@@ -32,7 +32,6 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_draw_nema_gfx.h"
 
 #if LV_USE_NEMA_GFX
@@ -75,6 +74,10 @@ static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit);
 
 static int32_t nema_gfx_wait_for_finish(lv_draw_unit_t * draw_unit);
 
+static void nema_gfx_init_handlers(lv_draw_buf_handlers_t * handlers);
+
+static void lv_draw_buf_nema_gfx_init_handlers(void);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -92,6 +95,8 @@ void lv_draw_nema_gfx_init(void)
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = lv_draw_create_unit(sizeof(lv_draw_nema_gfx_unit_t));
     /*Initialize NemaGFX*/
     nema_init();
+
+    lv_draw_buf_nema_gfx_init_handlers();
 
     draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
     draw_nema_gfx_unit->base_unit.evaluate_cb = nema_gfx_evaluate;
@@ -129,6 +134,20 @@ void lv_draw_nema_gfx_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static void nema_gfx_init_handlers(lv_draw_buf_handlers_t * handlers)
+{
+#if LV_NEMA_USE_CACHE
+    handlers->invalidate_cache_cb = lv_draw_nema_gfx_invalidate_cache;
+    handlers->flush_cache_cb = lv_draw_nema_gfx_flush_cache;
+#endif
+}
+
+static void lv_draw_buf_nema_gfx_init_handlers(void)
+{
+    nema_gfx_init_handlers(lv_draw_buf_get_handlers());
+    nema_gfx_init_handlers(lv_draw_buf_get_font_handlers());
+    nema_gfx_init_handlers(lv_draw_buf_get_image_handlers());
+}
 
 static int32_t nema_gfx_wait_for_finish(lv_draw_unit_t * draw_unit)
 {
@@ -304,6 +323,24 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
     /* remember draw unit for access to unit's context */
     t->draw_unit = (lv_draw_unit_t *)u;
 
+    lv_layer_t * layer = t->target_layer;
+    lv_area_t clipped_area;
+    int32_t x;
+    int32_t y;
+
+    if(!lv_area_intersect(&clipped_area,  &t->area, &t->clip_area)) {
+        /* Nothing to do */
+        return;
+    }
+
+    x = 0 - t->target_layer->buf_area.x1;
+    y = 0 - t->target_layer->buf_area.y1;
+
+    lv_area_move(&clipped_area, x, y);
+
+    /* Clean cache */
+    lv_draw_buf_flush_cache(layer->draw_buf, &clipped_area);
+
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_nema_gfx_fill(t, t->draw_dsc, &t->area);
@@ -343,6 +380,9 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
 #if !LV_USE_OS
     nema_cl_wait(&(u->cl));
 #endif
+
+    /* Invalidate cache */
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
 }
 
 static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit)

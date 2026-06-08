@@ -50,6 +50,7 @@
 #include "draw/nanovg/lv_nanovg_math.h"
 #include "draw/nanovg/lv_nanovg_utils.h"
 #include "draw/nema_gfx/lv_draw_nema_gfx.h"
+#include "draw/nema_gfx/lv_draw_nema_gfx_cache.h"
 #include "draw/nema_gfx/lv_draw_nema_gfx_utils.h"
 #include "draw/nema_gfx/lv_nema_gfx_path.h"
 #include "draw/nxp/g2d/lv_draw_g2d.h"
