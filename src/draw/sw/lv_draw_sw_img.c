@@ -80,6 +80,9 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
 static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_buf, int32_t src_stride,
                     lv_color_format_t cf, const lv_draw_image_dsc_t * draw_dsc);
 
+static void do_draw_buf_recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_buf, int32_t src_stride,
+                                lv_color_format_t cf, const lv_draw_image_dsc_t * draw_dsc);
+
 static void colorkey_and_recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_buf, int32_t src_stride,
                                  lv_color_format_t cf, const lv_draw_image_dsc_t * draw_dsc, lv_draw_sw_blend_dsc_t * blend_dsc);
 
@@ -783,184 +786,54 @@ static void colorkey_and_recolor(lv_area_t relative_area, uint8_t * src_buf, uin
     }
 }
 
+static void do_draw_buf_recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_buf, int32_t src_stride,
+                                lv_color_format_t cf, const lv_draw_image_dsc_t * draw_dsc)
+{
+
+    int32_t w = lv_area_get_width(&relative_area);
+    uint32_t px_size = lv_color_format_get_size(cf);
+    lv_draw_buf_t src;
+    lv_draw_buf_t dest;
+    lv_memzero(&src, sizeof(src));
+    src.header.cf     = cf;
+    src.header.stride = src_stride;
+    src.header.w      = lv_area_get_width(&relative_area);
+    src.header.h      = lv_area_get_height(&relative_area);
+    src.data          = src_buf + relative_area.y1 * src_stride + relative_area.x1 * px_size;
+    src.header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
+
+    dest = src;
+    dest.header.stride = w * px_size;
+    dest.data = dest_buf;
+
+    lv_draw_buf_recolor(&dest, &src, draw_dsc->recolor, draw_dsc->recolor_opa);
+}
+
 static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_buf, int32_t src_stride,
                     lv_color_format_t cf, const lv_draw_image_dsc_t * draw_dsc)
 {
-    int32_t w = lv_area_get_width(&relative_area);
-    int32_t h = lv_area_get_height(&relative_area);
-
-    /*Apply recolor*/
-    lv_color_t color = draw_dsc->recolor;
-    lv_opa_t mix = draw_dsc->recolor_opa;
-    lv_opa_t mix_inv = 255 - mix;
-
-    if(cf == LV_COLOR_FORMAT_RGB565A8 || cf == LV_COLOR_FORMAT_RGB565) {
+    if((cf == LV_COLOR_FORMAT_RGB565A8 || cf == LV_COLOR_FORMAT_RGB565)) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_RECOLOR(dest_buf, relative_area, color, mix)) {
-            const uint8_t * src_buf_tmp = src_buf + src_stride * relative_area.y1 + relative_area.x1 * 2;
-            int32_t img_stride_px = src_stride / 2;
-
-            uint16_t * buf16_src = (uint16_t *)src_buf_tmp;
-            uint16_t * buf16_dest = (uint16_t *)dest_buf;
-            uint16_t color16 = lv_color_to_u16(color);
-            if(mix >= LV_OPA_MAX) {
-                int32_t y;
-                for(y = 0; y < h; y++) {
-                    int32_t x;
-                    for(x = 0; x < w; x++) {
-                        *buf16_dest = color16;
-                        buf16_dest++;
-                    }
-                    buf16_src += img_stride_px;
-                }
-            }
-            else {
-                uint16_t c_mult[3];
-                c_mult[0] = (color.blue >> 3) * mix;
-                c_mult[1] = (color.green >> 2) * mix;
-                c_mult[2] = (color.red >> 3) * mix;
-
-                int32_t y;
-                for(y = 0; y < h; y++) {
-                    int32_t x;
-                    for(x = 0; x < w; x++) {
-                        *buf16_dest = (((c_mult[2] + ((buf16_src[x] >> 11) & 0x1F) * mix_inv) << 3) & 0xF800) +
-                                      (((c_mult[1] + ((buf16_src[x] >> 5) & 0x3F) * mix_inv) >> 3) & 0x07E0) +
-                                      ((c_mult[0] + (buf16_src[x] & 0x1F) * mix_inv) >> 8);
-                        buf16_dest++;
-                    }
-                    buf16_src += img_stride_px;
-                }
-            }
+            do_draw_buf_recolor(relative_area, src_buf, dest_buf, src_stride, cf, draw_dsc);
         }
     }
     else if(cf == LV_COLOR_FORMAT_RGB565_SWAPPED) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_SWAPPED_RECOLOR(dest_buf, relative_area, color, mix)) {
-            const uint8_t * src_buf_tmp = src_buf + src_stride * relative_area.y1 + relative_area.x1 * 2;
-            int32_t img_stride_px = src_stride / 2;
-
-            uint16_t * buf16_src = (uint16_t *)src_buf_tmp;
-            uint16_t * buf16_dest = (uint16_t *)dest_buf;
-            uint16_t color16 = lv_color_to_u16(color);
-            if(mix >= LV_OPA_MAX) {
-                int32_t y;
-                for(y = 0; y < h; y++) {
-                    int32_t x;
-                    for(x = 0; x < w; x++) {
-                        *buf16_dest = color16;
-                        buf16_dest++;
-                    }
-                    buf16_src += img_stride_px;
-                }
-            }
-            else {
-                uint16_t c_mult[3];
-                c_mult[0] = (color.blue >> 3) * mix;
-                c_mult[1] = (color.green >> 2) * mix;
-                c_mult[2] = (color.red >> 3) * mix;
-
-                int32_t y;
-                for(y = 0; y < h; y++) {
-                    int32_t x;
-                    for(x = 0; x < w; x++) {
-                        *buf16_dest = lv_color_swap_16((((c_mult[2] + ((lv_color_swap_16(buf16_src[x]) >> 11) & 0x1F) * mix_inv) << 3) & 0xF800)
-                                                       +
-                                                       (((c_mult[1] + ((lv_color_swap_16(buf16_src[x]) >> 5) & 0x3F) * mix_inv) >> 3) & 0x07E0) +
-                                                       ((c_mult[0] + (lv_color_swap_16(buf16_src[x]) & 0x1F) * mix_inv) >> 8));
-                        buf16_dest++;
-                    }
-                    buf16_src += img_stride_px;
-                }
-            }
+            do_draw_buf_recolor(relative_area, src_buf, dest_buf, src_stride, cf, draw_dsc);
         }
     }
     else if(cf == LV_COLOR_FORMAT_RGB888 || cf == LV_COLOR_FORMAT_XRGB8888 || cf == LV_COLOR_FORMAT_ARGB8888) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_RECOLOR(dest_buf, relative_area, color, mix, cf)) {
-            uint32_t px_size = lv_color_format_get_size(cf);
-            src_buf += src_stride * relative_area.y1 + relative_area.x1 * px_size;
-            if(mix >= LV_OPA_MAX) {
-                int32_t y;
-                for(y = 0; y < h; y++) {
-                    int32_t x;
-                    for(x = 0; x < w; x++) {
-                        dest_buf[0] = color.blue;
-                        dest_buf[1] = color.green;
-                        dest_buf[2] = color.red;
-                        if(cf == LV_COLOR_FORMAT_ARGB8888) dest_buf[3] = src_buf[3];
-                        src_buf += px_size;
-                        dest_buf += px_size;
-                    }
-                    src_buf += src_stride - w * px_size;
-                }
-            }
-            else {
-                uint16_t c_mult[3];
-                c_mult[0] = color.blue * mix;
-                c_mult[1] = color.green * mix;
-                c_mult[2] = color.red * mix;
-                int32_t y;
-                for(y = 0; y < h; y++) {
-                    int32_t x;
-                    for(x = 0; x < w; x++) {
-                        dest_buf[0] = (c_mult[0] + (src_buf[0] * mix_inv)) >> 8;
-                        dest_buf[1] = (c_mult[1] + (src_buf[1] * mix_inv)) >> 8;
-                        dest_buf[2] = (c_mult[2] + (src_buf[2] * mix_inv)) >> 8;
-                        if(cf == LV_COLOR_FORMAT_ARGB8888) dest_buf[3] = src_buf[3];
-                        src_buf += px_size;
-                        dest_buf += px_size;
-                    }
-                    src_buf += src_stride - w * px_size;
-                }
-            }
+            do_draw_buf_recolor(relative_area, src_buf, dest_buf, src_stride, cf, draw_dsc);
         }
     }
     else if(cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_RECOLOR(dest_buf, relative_area, color, mix, cf)) {
-            uint32_t px_size = lv_color_format_get_size(cf);
-            src_buf += src_stride * relative_area.y1 + relative_area.x1 * px_size;
-
-            uint16_t c_mult[3];
-            c_mult[0] = color.blue * mix;
-            c_mult[1] = color.green * mix;
-            c_mult[2] = color.red * mix;
-
-            int32_t y;
-            for(y = 0; y < h; y++) {
-                int32_t x;
-                for(x = 0; x < w; x++) {
-                    uint8_t alpha = src_buf[3];
-
-                    if(alpha > 0) {
-                        /* Step 1: Unpremultiply (convert to non-premultiplied RGB) */
-                        uint16_t reciprocal = (255 * 256) / alpha;
-                        uint8_t r = (src_buf[2] * reciprocal) >> 8;
-                        uint8_t g = (src_buf[1] * reciprocal) >> 8;
-                        uint8_t b = (src_buf[0] * reciprocal) >> 8;
-
-                        /* Step 2: Apply recoloring */
-                        r = (c_mult[2] + (r * mix_inv)) >> 8;
-                        g = (c_mult[1] + (g * mix_inv)) >> 8;
-                        b = (c_mult[0] + (b * mix_inv)) >> 8;
-
-                        /* Step 3: Premultiply again */
-                        dest_buf[0] = (b * alpha) >> 8;
-                        dest_buf[1] = (g * alpha) >> 8;
-                        dest_buf[2] = (r * alpha) >> 8;
-                    }
-                    else {
-                        /* If alpha is 0, just copy the pixel as is */
-                        dest_buf[0] = src_buf[0];
-                        dest_buf[1] = src_buf[1];
-                        dest_buf[2] = src_buf[2];
-                    }
-
-                    dest_buf[3] = alpha; /* Keep original alpha*/
-
-                    src_buf += px_size;
-                    dest_buf += px_size;
-                }
-                src_buf += src_stride - w * px_size;
-            }
+            do_draw_buf_recolor(relative_area, src_buf, dest_buf, src_stride, cf, draw_dsc);
         }
+    }
+    else {
+        do_draw_buf_recolor(relative_area, src_buf, dest_buf, src_stride, cf, draw_dsc);
     }
 }
 
