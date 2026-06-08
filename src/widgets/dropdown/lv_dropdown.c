@@ -54,6 +54,8 @@ static void list_press_handler(lv_obj_t * page);
 static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y);
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en);
 static lv_obj_t * get_label(const lv_obj_t * obj);
+static void remove_options_translation_tag(lv_obj_t * obj);
+static void remove_text_translation_tag(lv_obj_t * obj);
 
 #if LV_USE_OBSERVER
     static void dropdown_value_changed_event_cb(lv_event_t * e);
@@ -159,8 +161,11 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent)
 void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    remove_text_translation_tag(obj);
+
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(!dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
+    if(!dropdown->static_text && dropdown->text && text && lv_streq(dropdown->text, text)) {
         return;
     }
 
@@ -180,9 +185,12 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * text)
 void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    remove_text_translation_tag(obj);
+
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    if(dropdown->static_text && dropdown->text && text && lv_strcmp(dropdown->text, text) == 0) {
+    if(dropdown->static_text && dropdown->text && text && lv_streq(dropdown->text, text)) {
         return;
     }
 
@@ -193,6 +201,29 @@ void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
 
     refresh_size(obj);
 }
+
+
+#if LV_USE_TRANSLATION
+void lv_dropdown_set_text_translation_tag(lv_obj_t * obj, const char * tag)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    lv_dropdown_t * dropdown = (lv_label_t *)obj;
+    if(!tag || tag[0] == '\0') {
+        return;
+    }
+    char * new_tag = lv_strdup(tag);
+    LV_ASSERT_MALLOC(new_tag);
+    if(!new_tag) {
+        LV_LOG_WARN("Failed to allocate memory for new tag");
+        return;
+    }
+    if(dropdown->text_translation_tag) {
+        lv_free(dropdown->text_translation_tag);
+    }
+    dropdown->text_translation_tag = new_tag;
+    lv_dropdown_set_text(obj, lv_tr(tag));
+}
+#endif /*LV_USE_TRANSLATION*/
 
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 {
@@ -247,8 +278,9 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(options);
 
-    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    remove_options_translation_tag(obj);
 
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     /*Count the '\n'-s to determine the number of options*/
     dropdown->option_cnt = 0;
     uint32_t i;
@@ -276,6 +308,8 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(option);
+
+    remove_options_translation_tag(obj);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -345,11 +379,37 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
         lv_obj_invalidate(dropdown->list);
 }
 
-void lv_dropdown_clear_options(lv_obj_t * obj)
+#if LV_USE_TRANSLATION
+void lv_dropdown_set_options_translation_tag(lv_obj_t * obj, const char * tag)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+    if(!tag || tag[0] == '\0') {
+        return;
+    }
+    char * new_tag = lv_strdup(tag);
+    LV_ASSERT_MALLOC(new_tag);
+    if(!new_tag) {
+        LV_LOG_WARN("Failed to allocate memory for new tag");
+        return;
+    }
+    if(dropdown->text_options_tag) {
+        lv_free(dropdown->text_options_tag);
+    }
+    dropdown->text_options_tag = new_tag;
+    lv_dropdown_set_options(obj, lv_tr(tag));
+}
+#endif /*LV_USE_TRANSLATION*/
+
+void lv_dropdown_clear_options(lv_obj_t * obj)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    remove_options_translation_tag(obj);
+
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->options == NULL) return;
+
 
     if(dropdown->static_options == 0)
         lv_free(dropdown->options);
@@ -1375,6 +1435,30 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
     if(dropdown->list == NULL) return NULL;
 
     return lv_obj_get_child(dropdown->list, 0);
+}
+
+static void remove_options_translation_tag(lv_obj_t * obj)
+{
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+#if LV_USE_TRANSLATION
+    /* Remove translation tag so we don't update the text automatically if the language changes*/
+    if(dropdown->options_translation_tag) {
+        lv_free(dropdown->options_translation_tag);
+        dropdown->options_translation_tag = NULL;
+    }
+#endif /*LV_USE_TRANSLATION*/
+}
+
+static void remove_text_translation_tag(lv_obj_t * obj)
+{
+    lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
+#if LV_USE_TRANSLATION
+    /* Remove translation tag so we don't update the text automatically if the language changes*/
+    if(dropdown->text_translation_tag) {
+        lv_free(dropdown->text_translation_tag);
+        dropdown->text_translation_tag = NULL;
+    }
+#endif /*LV_USE_TRANSLATION*/
 }
 
 #if LV_USE_OBSERVER
