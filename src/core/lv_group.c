@@ -180,6 +180,8 @@ void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2)
 
 void lv_group_remove_obj(lv_obj_t * obj)
 {
+    LV_CHECK_ARG(obj != NULL, return);
+
     lv_group_t * g = lv_obj_get_group(obj);
     if(g == NULL) return;
 
