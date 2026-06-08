@@ -203,7 +203,10 @@ class MicroPython_Test(unittest.TestCase):
         image = Image.open(IMG_PATH)
         res_img = image.convert('RGB')
         image.close()
-        res_data = list(res_img.getdata())
+        try:
+            res_data = list(res_img.get_flattened_data())
+        except AttributeError:
+            res_data = list(res_img.getdata())
         res_img.close()
 
         with open(TEST_PATH, 'rb') as f:
