@@ -252,7 +252,7 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
     unsigned png_height;            /*Not used, just required by the decoder*/
     lv_draw_buf_t * decoded = NULL;
 
-    /*Decode the image in ARGB8888 */
+    /*Decode the image in RGBA8888 */
     unsigned error = lodepng_decode32((unsigned char **)&decoded, &png_width, &png_height, png_data, png_data_size);
     if(error) {
         LV_LOG_WARN("error %u: %s", error, lodepng_error_text(error));
@@ -260,15 +260,15 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
         return NULL;
     }
 
-    /*Convert the image to the system's color depth*/
+    /*Convert the image to LVGLv9's BGRA8888 */
     convert_color_depth(decoded->data,  png_width * png_height);
 
     return decoded;
 }
 
 /**
- * If the display is not in 32 bit format (ARGB888) then convert the image to the current color depth
- * @param img the ARGB888 image
+ * Convert subpixel order from LodePNG to LVGL
+ * @param img the LodePNG RGBA8888 image to be converted in-place to LVGL BGRA8888
  * @param px_cnt number of pixels in `img`
  */
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)
