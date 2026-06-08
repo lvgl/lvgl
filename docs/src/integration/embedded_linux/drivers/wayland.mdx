@@ -144,7 +144,7 @@ the required protocols at build time.
 #define V_RES (480)
 
 /* Create a display */
-lv_disp_t * disp = lv_wayland_window_create(H_RES, V_RES, "Window Title", close_cb);
+lv_display_t * disp = lv_wayland_window_create(H_RES, V_RES, "Window Title", close_cb);
 ```
 
 As part of the above call, the Wayland driver will register four input devices
@@ -158,6 +158,31 @@ for each display:
 Handles for input devices of each display can be obtained using
 `lv_wayland_get_indev_keyboard()`, `lv_wayland_get_indev_touchscreen()`,
 `lv_wayland_get_indev_pointer()` and `lv_wayland_get_indev_pointeraxis()` respectively.
+
+### Input Groups
+
+To enable keyboard and encoder navigation, create a group and assign the relevant input devices to it:
+
+```c
+
+/* Create a group and set it as default */
+lv_group_t * g = lv_group_create();
+lv_group_set_default(g);
+
+/* Assign keyboard and encoder to the group */
+lv_indev_t * kb  = lv_wayland_get_indev_keyboard(disp);
+lv_indev_t * enc = lv_wayland_get_indev_pointeraxis(disp);
+lv_indev_set_group(kb,  g);
+lv_indev_set_group(enc, g);
+```
+
+Once a group is set as default, any focusable widget created afterwards is automatically added to it,
+allowing keyboard arrows and encoder rotation to move focus between widgets, and Enter/encoder click to activate them.
+
+<Callout type="warning" title="Check display before querying input devices">
+    <ApiLink name="lv_wayland_get_indev_keyboard" /> and <ApiLink name="lv_wayland_get_indev_pointeraxis" /> both return 
+    `NULL` if called before the display is fully initialised always check that the return disp is non-NULL before querying its input devices.
+</Callout>
 
 ### Fullscreen mode
 
