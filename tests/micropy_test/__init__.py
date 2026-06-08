@@ -322,7 +322,10 @@ class MicroPython_Test(unittest.TestCase):
             img = image.convert('RGB')
             image.close()
 
-            byte_data = list(img.getdata())
+            try:
+                byte_data = list(img.get_flattened_data())
+            except AttributeError:
+                byte_data = list(img.getdata())
             img.save(os.path.join(ARTIFACT_PATH, f'frame.png'), 'PNG')
             img.close()
 
