@@ -859,12 +859,12 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
  * @param obj   pointer to an object
  * @return      true if the root of `obj`'s parent chain is a registered screen
  */
-bool lv_obj_belongs_to_display(const lv_obj_t * obj);
+bool lv_obj_is_in_widget_tree(const lv_obj_t * obj);
 
 /**
- * @deprecated Use `lv_obj_belongs_to_display` instead.
+ * @deprecated Use `lv_obj_is_in_widget_tree` instead.
  */
-LV_DEPRECATED("Use lv_obj_belongs_to_display instead")
+LV_DEPRECATED("Use lv_obj_is_in_widget_tree instead")
 bool lv_obj_is_valid(const lv_obj_t * obj);
 
 /**
@@ -1038,7 +1038,7 @@ void lv_objid_builtin_destroy(void);
         LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");                  \
         LV_ASSERT_INTERNAL(obj_p != NULL, "");                                                               \
         LV_ASSERT_INTERNAL(lv_obj_has_class(obj_p, obj_class) == true, "");                                  \
-        LV_ASSERT_INTERNAL(lv_obj_belongs_to_display(obj_p) == true, "");                                    \
+        LV_ASSERT_INTERNAL(lv_obj_is_in_widget_tree(obj_p) == true, "");                                     \
     } while(0)
 # else
 /**
