@@ -675,8 +675,10 @@ uint16_t lv_evdev_get_raw_key(lv_event_t * e)
     uint32_t key = lv_event_get_key(e);
 
     if(key > 0xFFFF) {
-        LV_LOG_WARN("key is not an LV_KEY");
         return (uint16_t)(key - 0xFFFF);
+    }
+    else {
+        LV_LOG_WARN("key is an LV_KEY");
     }
 
     return 0;
