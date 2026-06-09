@@ -137,6 +137,5 @@ function(lvgl_link_raw)
 
   if(ARG_PKG_LIB_PRIVATE)
     lvgl_add_pkg_libs_private(${ARG_PKG_LIB_PRIVATE})
-    lvgl_add_cmake_raw_libs(${ARG_PKG_LIB_PRIVATE})
   endif()
 endfunction()
