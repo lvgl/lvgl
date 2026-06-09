@@ -93,10 +93,10 @@ void key_event_cb(lv_event_t *e)
 lv_indev_add_event_cb(keyboard, key_event_cb, LV_EVENT_KEY, NULL);
 ```
 
-LVGL automatically converts direction keys to LV_KEY_XXX, for other keys
-you can get their value by querying lv_evdev_get_raw_key in a LV_EVENT_KEY handler.
+LVGL automatically converts direction keys to `LV_KEY_XXX, for other keys
+you can get their value by querying <ApiLink name="lv_evdev_get_raw_key" /> in a `LV_EVENT_KEY handler.
 
-Also the event callback needs to check for lv_evdev_is_raw_key before calling lv_evdev_get_raw_key
+Also the event callback needs to check for <ApiLink name="lv_evdev_is_raw_key" /> before calling <ApiLink name="lv_evdev_get_raw_key" />.
 
 ```c
 
