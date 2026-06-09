@@ -662,15 +662,20 @@ void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_
 
 bool lv_evdev_is_raw_key(lv_event_t * e)
 {
+    LV_CHECK_ARG(e != NULL, return false);
+
     uint32_t key = lv_event_get_key(e);
     return (key > 0xFFFF);
 }
 
 uint16_t lv_evdev_get_raw_key(lv_event_t * e)
 {
+    LV_CHECK_ARG(e != NULL, return 0);
+
     uint32_t key = lv_event_get_key(e);
 
     if(key > 0xFFFF) {
+        LV_LOG_WARN("key is not an LV_KEY");
         return (uint16_t)(key - 0xFFFF);
     }
 
