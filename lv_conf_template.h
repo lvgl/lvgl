@@ -555,12 +555,12 @@
 #define LV_USE_CHECK_OBJ_CLASSTYPE 0
 
 /** If enabled, LV_CHECK_OBJ will also verify that the object is still part of the
- * widget tree (lv_obj_belongs_to_display). When disabled the validity check is skipped
+ * widget tree (lv_obj_is_in_widget_tree). When disabled the validity check is skipped
  * (only the class/NULL check remains).
  * Requires LV_USE_CHECK_ARG to be enabled. */
 #define LV_USE_CHECK_OBJ_VALIDITY 0
 
-/** If enabled, lv_obj_belongs_to_display will verify — while walking up the parent chain —
+/** If enabled, lv_obj_is_in_widget_tree will verify — while walking up the parent chain —
  * that each parent's children array actually contains the child.
  * This catches corruption where a child's parent pointer disagrees with the
  * parent's children list. Slower than the basic reachability check (O(siblings)

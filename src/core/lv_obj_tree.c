@@ -738,7 +738,7 @@ static void obj_delete_core(lv_obj_t * obj)
     }
 
     /*Clear the parent pointer so that, if the freed memory happens to still be
-     *readable, lv_obj_belongs_to_display has a better chance of rejecting it
+     *readable, lv_obj_is_in_widget_tree has a better chance of rejecting it
      *(the chain will terminate at NULL and miss every display's screen list).
      *
      *WARNING: reading any field of a freed object is use-after-free and

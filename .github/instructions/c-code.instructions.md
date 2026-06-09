@@ -24,7 +24,7 @@ applyTo: "src/**/*.c,src/**/*.h"
 
 - No heap allocation in hot paths (draw loops, event handlers, timer callbacks)
 - Prefer stack allocation for small temporary buffers
-- Avoid `lv_obj_belongs_to_display()` in internal callbacks — it walks up the parent chain and scans every display's screen list
+- Avoid `lv_obj_is_in_widget_tree()` in internal callbacks — it walks up the parent chain and scans every display's screen list
 - Cache-friendly access: sequential over random
 - Struct member ordering: pointers first, then int32_t, then smaller types/bitfields — minimizes padding
 
