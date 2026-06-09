@@ -118,6 +118,25 @@ void lv_log_add(lv_log_level_t level, const char * file, int line,
 #  endif
 #endif
 
+
+#ifndef LV_LOG_WARN_ONCE
+#  if LV_LOG_LEVEL <= LV_LOG_LEVEL_WARN
+#    define LV_LOG_WARN_ONCE(...) do { \
+        static int warned = 0; \
+        if(!warned) { \
+            warned = 1; \
+            lv_log_add(LV_LOG_LEVEL_WARN, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__); \
+        } \
+    } while(0)
+#  else
+#    define LV_LOG_WARN_ONCE(...) do {}while(0)
+#  endif
+#endif
+
+#ifndef LV_LOG_DEPRECATED
+#define LV_LOG_DEPRECATED(msg) LV_LOG_WARN_ONCE("Deprecated: " msg)
+#endif
+
 #ifndef LV_LOG_ERROR
 #  if LV_LOG_LEVEL <= LV_LOG_LEVEL_ERROR
 #    define LV_LOG_ERROR(...) lv_log_add(LV_LOG_LEVEL_ERROR, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
@@ -151,9 +170,12 @@ void lv_log_add(lv_log_level_t level, const char * file, int line,
 #define LV_LOG_TRACE(...) do {}while(0)
 #define LV_LOG_INFO(...) do {}while(0)
 #define LV_LOG_WARN(...) do {}while(0)
+#define LV_LOG_WARN_ONCE(...) do {}while(0)
 #define LV_LOG_ERROR(...) do {}while(0)
 #define LV_LOG_USER(...) do {}while(0)
 #define LV_LOG(...) do {}while(0)
+
+#define LV_LOG_DEPRECATED(_) do {}while(0)
 
 #endif /*LV_USE_LOG*/
 

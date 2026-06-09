@@ -89,6 +89,7 @@ static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_s
  **********************/
 
 #if LV_USE_OBJ_PROPERTY
+LV_DEPRECATIONS_IGNORE_BEGIN
 static const lv_property_ops_t lv_span_properties[] = {
     {
         .id = LV_PROPERTY_SPAN_ALIGN,
@@ -116,6 +117,7 @@ static const lv_property_ops_t lv_span_properties[] = {
         .getter = lv_spangroup_get_max_lines,
     },
 };
+LV_DEPRECATIONS_IGNORE_END
 #endif
 
 const lv_obj_class_t lv_spangroup_class  = {
@@ -342,7 +344,7 @@ void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_styl
 
 void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
-    LV_LOG_WARN("DEPRECATED. Use the text_align style property instead");
+    LV_LOG_DEPRECATED("use the text_align style property instead");
 
     lv_obj_set_style_text_align(obj, align, LV_PART_MAIN);
 }
@@ -370,7 +372,7 @@ void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent)
 
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 {
-    LV_LOG_WARN("DEPRECATED, set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping");
+    LV_LOG_DEPRECATED("set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping");
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     if(mode >= LV_SPAN_MODE_LAST) return;

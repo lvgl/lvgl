@@ -439,17 +439,18 @@ void lv_obj_set_id(lv_obj_t * obj, void * id);
 void * lv_obj_get_id(const lv_obj_t * obj);
 
 /**
- * DEPRECATED IDs are used only to print the widget trees.
- * To find a widget use `lv_obj_find_by_name`
  *
  * Get the child object by its id.
  * It will check children and grandchildren recursively.
  * Function `lv_obj_id_compare` is used to matched obj id with given id.
  *
+ * @deprecated IDs are used only to print the widget trees. To find a widget use `lv_obj_find_by_name`
+ *
  * @param obj       pointer to an object
  * @param id        the id of the child object
  * @return          pointer to the child object or NULL if not found
  */
+LV_DEPRECATED("IDs are used only to print the widget trees. To find a widget use lv_obj_find_by_name")
 lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id);
 
 /**
@@ -506,26 +507,26 @@ void lv_objid_builtin_destroy(void);
  **********************/
 
 #if LV_USE_ASSERT_OBJ
-  /**
-   * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
-   *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
-   *             and executes the supplied action, which is safer in production.
-   */
-  #define LV_ASSERT_OBJ(obj_p, obj_class)                                                             \
+/**
+ * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
+ *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
+ *             and executes the supplied action, which is safer in production.
+ */
+#define LV_ASSERT_OBJ(obj_p, obj_class)                                                             \
     do {                                                                                              \
-      LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");             \
-      LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
-      LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
-      LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
+        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");             \
+        LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
+        LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
+        LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
     } while(0)
 # else
-  /**
-   * @deprecated Use `LV_CHECK_OBJ(obj, return)` instead.
-   */
-  #define LV_ASSERT_OBJ(obj_p, obj_class) \
+/**
+ * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
+ */
+#define LV_ASSERT_OBJ(obj_p, obj_class) \
     do { \
-      LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead."); \
-      LV_ASSERT_NULL(obj_p); \
+        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead."); \
+        LV_ASSERT_NULL(obj_p); \
     } while(0)
 #endif
 

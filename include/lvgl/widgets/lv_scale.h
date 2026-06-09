@@ -273,6 +273,7 @@ void lv_scale_set_section_max_value(lv_obj_t * scale, lv_scale_section_t * secti
  * @param part                the part of the Scale the style will apply to, e.g. LV_PART_INDICATOR
  * @param section_part_style  pointer to style to apply
  */
+LV_DEPRECATED("use lv_scale_set_section_style_main/indicator/items instead")
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style);
 
 /**
