@@ -146,7 +146,9 @@ void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard)
 static void keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_wl_seat_keyboard_t * kbdata = lv_indev_get_driver_data(indev);
-    LV_ASSERT(kbdata != NULL);
+    if(!kbdata) {
+        return;
+    }
 
     if(kbdata->event_count == 0) {
         return;
