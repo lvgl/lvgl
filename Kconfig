@@ -868,7 +868,7 @@ menu "LVGL configuration"
 
 			config LV_USE_CHECK_OBJ_CLASSTYPE
 				bool "Enable class check in LV_CHECK_OBJ"
-				default y if !LV_CONF_MINIMAL
+				default n
 				depends on LV_USE_CHECK_ARG
 				help
 					When enabled, LV_CHECK_OBJ verifies that the object has the
@@ -877,7 +877,7 @@ menu "LVGL configuration"
 
 			config LV_USE_CHECK_OBJ_VALIDITY
 				bool "Enable widget-tree validity check in LV_CHECK_OBJ"
-				default y if !LV_CONF_MINIMAL
+				default n
 				depends on LV_USE_CHECK_ARG
 				help
 					When enabled, LV_CHECK_OBJ also verifies that the object is

@@ -1574,14 +1574,10 @@
  * When disabled the class check is skipped even if the class argument is supplied.
  * Requires LV_USE_CHECK_ARG to be enabled. */
 #ifndef LV_USE_CHECK_OBJ_CLASSTYPE
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
-            #define LV_USE_CHECK_OBJ_CLASSTYPE CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
-        #else
-            #define LV_USE_CHECK_OBJ_CLASSTYPE 0
-        #endif
+    #ifdef CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
+        #define LV_USE_CHECK_OBJ_CLASSTYPE CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
     #else
-        #define LV_USE_CHECK_OBJ_CLASSTYPE 1
+        #define LV_USE_CHECK_OBJ_CLASSTYPE 0
     #endif
 #endif
 
@@ -1590,14 +1586,10 @@
  * if the associated argument is supplied.
  * Requires LV_USE_CHECK_ARG to be enabled. */
 #ifndef LV_USE_CHECK_OBJ_VALIDITY
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_CHECK_OBJ_VALIDITY
-            #define LV_USE_CHECK_OBJ_VALIDITY CONFIG_LV_USE_CHECK_OBJ_VALIDITY
-        #else
-            #define LV_USE_CHECK_OBJ_VALIDITY 0
-        #endif
+    #ifdef CONFIG_LV_USE_CHECK_OBJ_VALIDITY
+        #define LV_USE_CHECK_OBJ_VALIDITY CONFIG_LV_USE_CHECK_OBJ_VALIDITY
     #else
-        #define LV_USE_CHECK_OBJ_VALIDITY 1
+        #define LV_USE_CHECK_OBJ_VALIDITY 0
     #endif
 #endif
 
