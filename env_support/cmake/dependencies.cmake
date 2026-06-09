@@ -1,8 +1,10 @@
 include(FetchContent)
 
-set(FETCHCONTENT_BASE_DIR
-    "${CMAKE_SOURCE_DIR}/.deps"
-    CACHE PATH "Directory for fetched dependencies" FORCE)
+if(NOT DEFINED FETCHCONTENT_BASE_DIR)
+  set(FETCHCONTENT_BASE_DIR
+      "${CMAKE_SOURCE_DIR}/.deps"
+      CACHE PATH "Directory for fetched dependencies" FORCE)
+endif()
 
 find_package(PkgConfig)
 
