@@ -28,7 +28,9 @@
 static lv_result_t event_send_core(lv_event_t * e);
 static bool event_is_bubbled(lv_event_t * e);
 static bool event_is_trickled(lv_event_t * e);
-static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * arr, uint32_t len);
+#if LV_USE_CHECK_ARG
+    static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * arr, uint32_t len);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -200,6 +202,7 @@ lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
 lv_indev_t * lv_event_get_indev(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
+#if LV_USE_CHECK_ARG
     static const lv_event_code_t indev_codes[] = {
         LV_EVENT_PRESSED,           LV_EVENT_PRESSING,          LV_EVENT_PRESS_LOST,
         LV_EVENT_SHORT_CLICKED,     LV_EVENT_LONG_PRESSED,      LV_EVENT_LONG_PRESSED_REPEAT,
@@ -209,6 +212,7 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
         LV_EVENT_FOCUSED,           LV_EVENT_DEFOCUSED,         LV_EVENT_LEAVE,
         LV_EVENT_HOVER_OVER,        LV_EVENT_HOVER_LEAVE,
     };
+#endif
     LV_CHECK_ARG(event_code_in_array(e->code, indev_codes, sizeof(indev_codes) / sizeof(indev_codes[0])),
                  return NULL, "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
@@ -217,10 +221,12 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
 lv_layer_t * lv_event_get_layer(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return NULL);
+#if LV_USE_CHECK_ARG
     static const lv_event_code_t draw_codes[] = {
         LV_EVENT_DRAW_MAIN,     LV_EVENT_DRAW_MAIN_BEGIN,   LV_EVENT_DRAW_MAIN_END,
         LV_EVENT_DRAW_POST,     LV_EVENT_DRAW_POST_BEGIN,   LV_EVENT_DRAW_POST_END,
     };
+#endif
     LV_CHECK_ARG(event_code_in_array(e->code, draw_codes, sizeof(draw_codes) / sizeof(draw_codes[0])),
                  return NULL, "invalid event code %" LV_PRId32, (int32_t)e->code);
     return lv_event_get_param(e);
@@ -450,6 +456,7 @@ static bool event_is_trickled(lv_event_t * e)
     }
 }
 
+#if LV_USE_CHECK_ARG
 static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * arr, uint32_t len)
 {
     uint32_t i;
@@ -458,3 +465,4 @@ static bool event_code_in_array(lv_event_code_t code, const lv_event_code_t * ar
     }
     return false;
 }
+#endif
