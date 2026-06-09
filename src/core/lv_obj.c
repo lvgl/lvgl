@@ -508,13 +508,13 @@ bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 
 const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return NULL); // Can't use LV_CHECK_OBJ here, it could cause an infinite recursion loop.
+    LV_CHECK_ARG(obj != NULL, return NULL);  /* Can't use LV_CHECK_OBJ here, it could cause an infinite recursion loop. */
     return obj->class_p;
 }
 
 bool lv_obj_is_valid(const lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return false);  // Can't use LV_CHECK_OBJ here, it could cause an infinite recursion loop.
+    LV_CHECK_ARG(obj != NULL, return false);   /* Can't use LV_CHECK_OBJ here, it could cause an infinite recursion loop. */
 
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
