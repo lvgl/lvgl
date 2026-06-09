@@ -391,14 +391,14 @@ void test_ime_pinyin_kb_validity(void)
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
 
     lv_obj_t * retrieved = lv_ime_pinyin_get_kb(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_belongs_to_display(retrieved));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(retrieved));
 }
 
 /* Test cand_panel object validity */
 void test_ime_pinyin_cand_panel_validity(void)
 {
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_belongs_to_display(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 }
 
 /* Test getter functions */
@@ -414,7 +414,7 @@ void test_ime_pinyin_getters(void)
     /* Test get_cand_panel */
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
     TEST_ASSERT_NOT_NULL(cand_panel);
-    TEST_ASSERT_TRUE(lv_obj_belongs_to_display(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 
     /* Test get_dict (should return default dict) */
     const lv_pinyin_dict_t * dict = lv_ime_pinyin_get_dict(g_pinyin_ime);
@@ -431,7 +431,7 @@ void test_ime_pinyin_edge_cases(void)
 
     /* Verify cand_panel is valid */
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(g_pinyin_ime);
-    TEST_ASSERT_TRUE(lv_obj_belongs_to_display(cand_panel));
+    TEST_ASSERT_TRUE(lv_obj_is_in_widget_tree(cand_panel));
 }
 
 /* Test rendering with default dictionary */

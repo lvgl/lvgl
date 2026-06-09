@@ -597,11 +597,11 @@ static void lv_ime_pinyin_destructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    if(pinyin_ime->kb != NULL)
-        lv_obj_delete(pinyin_ime->kb);
+    lv_obj_delete(pinyin_ime->kb);
+    pinyin_ime->kb = NULL;
 
-    if(pinyin_ime->cand_panel != NULL)
-        lv_obj_delete(pinyin_ime->cand_panel);
+    lv_obj_delete(pinyin_ime->cand_panel);
+    pinyin_ime->cand_panel = NULL;
 
 #if LV_IME_PINYIN_USE_K9_MODE
     lv_ll_clear(&pinyin_ime->k9_legal_py_ll);
