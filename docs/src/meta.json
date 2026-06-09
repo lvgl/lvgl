@@ -12,6 +12,7 @@
     "libs",
     "debugging",
     "guides",
+    "migration-v10",
     "contributing",
     "api",
     "api-private",

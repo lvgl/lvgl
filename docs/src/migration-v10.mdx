@@ -1,0 +1,176 @@
+---
+title: Migrating from v9 to v10
+description: How to update your LVGL v9 project to v10, covering all breaking changes and deprecations introduced across the v9.x series.
+---
+
+{/*
+  CONTRIBUTOR GUIDE
+  -----------------
+  Add an entry here in the same PR where you introduce a breaking change
+  or deprecation.
+
+  Structure:
+  - Top-level sections: ## Widgets, ## Core, ## Drawing, etc.
+  - Second level: ### lv_foo  (the widget or module)
+  - Entries: a short bullet per changed symbol, with before/after code if helpful.
+*/}
+
+<Callout type="info" title="v9.6 is the last v9 release">
+  LVGL v9.6 is the final release in the v9 series. All symbols marked
+  `LV_DEPRECATED` are removed in v10.0.
+</Callout>
+
+---
+
+## Core
+
+### Argument checking
+
+LVGL v9.6 standardizes public-API argument validation. `LV_ASSERT_OBJ` is
+replaced by <ApiLink name="LV_CHECK_OBJ" />, which logs a warning and lets the
+caller recover gracefully instead of halting the program.
+
+```c
+/* Before */
+LV_ASSERT_OBJ(obj, &lv_label_class);
+/* After */
+LV_CHECK_OBJ(obj, &lv_label_class, return);
+```
+
+#### What `LV_CHECK_OBJ` actually checks
+
+The macro is layered — each layer is independently configurable in `lv_conf.h`:
+
+| Layer | Guard | What it checks |
+|---|---|---|
+| Base | `LV_USE_CHECK_ARG` | Enables the whole system; when `0` all three macros expand to nothing. |
+| Class | `LV_USE_CHECK_OBJ_CLASSTYPE` | `lv_obj_has_class(obj, cls)` — verifies the object is the expected widget type. |
+| Validity | `LV_USE_CHECK_OBJ_VALIDITY` | `lv_obj_is_valid(obj)` — verifies the object is still part of the live widget tree. |
+
+All three layers default to `0` (disabled). Enable them selectively:
+
+```c
+/* lv_conf.h */
+#define LV_USE_CHECK_ARG           1   /* master switch */
+#define LV_USE_CHECK_OBJ_CLASSTYPE 1   /* also check class type */
+#define LV_USE_CHECK_OBJ_VALIDITY  1   /* also check widget-tree membership */
+```
+
+When `LV_USE_CHECK_OBJ_CLASSTYPE` is `0`, `LV_CHECK_OBJ` still performs a
+NULL check; when `LV_USE_CHECK_OBJ_VALIDITY` is `0`, it still performs the
+class check (if enabled). The checks are cumulative.
+
+<Callout type="warning" title="Enable only during development">
+  `lv_obj_is_valid()` walks the widget tree and `lv_obj_has_class()` traverses
+  the class hierarchy — both add non-trivial overhead on every call site.
+  Leave `LV_USE_CHECK_OBJ_CLASSTYPE` and `LV_USE_CHECK_OBJ_VALIDITY` at `0`
+  in production builds.
+</Callout>
+
+#### Failure behavior
+
+Two further options control what happens when a check fails:
+
+```c
+/* lv_conf.h */
+
+/* Also call LV_ASSERT_HANDLER (halts / breakpoints like the old assert). */
+#define LV_CHECK_ARG_ASSERT_ON_FAIL  0
+
+/* How much to log when a check fails (requires LV_USE_LOG = 1). */
+/* LV_CHECK_ARG_LOG_MODE_NONE    (0) – no output                               */
+/* LV_CHECK_ARG_LOG_MODE_MINIMAL (1) – "Check failed" + file/line              */
+/* LV_CHECK_ARG_LOG_MODE_VERBOSE (2) – "Check failed: <cond>" + caller message */
+#define LV_CHECK_ARG_LOG_MODE  LV_CHECK_ARG_LOG_MODE_VERBOSE
+```
+
+Setting `LV_CHECK_ARG_ASSERT_ON_FAIL 1` restores the hard-abort behavior of
+`LV_ASSERT_OBJ`, which can be useful during a debugging session.
+`LV_CHECK_ARG_LOG_MODE` has no effect when `LV_USE_LOG` is `0`.
+
+See the [Argument Checking](contributing/assertions/#argument-checking) docs for
+the full <ApiLink name="LV_CHECK_ARG" /> and <ApiLink name="LV_CHECK_OBJ" /> API
+if you need finer control.
+
+### lv_obj
+
+- `lv_obj_find_by_id()` is deprecated, use `lv_obj_find_by_name()` instead:
+  ```c
+  /* Before */
+  lv_obj_t * obj = lv_obj_find_by_id(parent, my_id);
+
+  /* After */
+  lv_obj_t * obj = lv_obj_find_by_name(parent, "my_widget");
+  ```
+
+---
+
+## Widgets
+
+### lv_span
+
+- `lv_spangroup_set_align()` is deprecated, use the `text_align` style property instead:
+  ```c
+  /* Before */
+  lv_spangroup_set_align(obj, LV_TEXT_ALIGN_CENTER);
+
+  /* After */
+  lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+  ```
+
+- `lv_spangroup_set_mode()` is deprecated, control expanding/wrapping by setting the widget width instead:
+  ```c
+  /* Before */
+  lv_spangroup_set_mode(obj, LV_SPAN_MODE_EXPAND);
+
+  /* After — LV_SIZE_CONTENT expands to fit, a fixed value wraps */
+  lv_obj_set_width(obj, LV_SIZE_CONTENT);
+  ```
+
+### lv_textarea
+
+- `lv_textarea_set_align()` is deprecated, use the `text_align` style property instead:
+  ```c
+  /* Before */
+  lv_textarea_set_align(obj, LV_TEXT_ALIGN_CENTER);
+
+  /* After */
+  lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+  ```
+
+### lv_scale
+
+- `lv_scale_section_set_style()` is deprecated, use the per-part setters instead:
+  ```c
+  /* Before */
+  lv_scale_section_set_style(section, LV_PART_MAIN,      &my_style);
+  lv_scale_section_set_style(section, LV_PART_INDICATOR, &my_style);
+  lv_scale_section_set_style(section, LV_PART_ITEMS,     &my_style);
+
+  /* After */
+  lv_scale_set_section_style_main(scale,      section, &my_style);
+  lv_scale_set_section_style_indicator(scale, section, &my_style);
+  lv_scale_set_section_style_items(scale,     section, &my_style);
+  ```
+
+---
+
+## Drawing
+
+### lv_draw_buf
+
+- `lv_image_buf_set_palette()` is deprecated, use `lv_draw_buf_set_palette()` instead.
+- `lv_image_buf_free()` is deprecated, use `lv_draw_buf_destroy()` instead.
+
+### lv_snapshot
+
+- `lv_snapshot_free()` is deprecated, use `lv_draw_buf_destroy()` directly instead.
+- `lv_snapshot_take_to_buf()` is deprecated, use `lv_snapshot_take_to_draw_buf()` instead:
+
+```c
+  /* Before */
+  lv_snapshot_take_to_buf(obj, cf, dsc, buf, buf_size);
+  /* After */
+  lv_snapshot_take_to_draw_buf(obj, cf, draw_buf);
+  lv_draw_buf_destroy(draw_buf);
+```
