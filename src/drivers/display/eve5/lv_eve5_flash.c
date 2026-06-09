@@ -530,9 +530,12 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
         return false;
     }
 
-    /* Allocate decoded image buffer (worst case ARGB8) */
-    int32_t decoded_stride = ALIGN_UP((int32_t)(img_w * 4), 4);
-    uint32_t decoded_size = (uint32_t)(decoded_stride * (int32_t)img_h);
+    /* Allocate decoded image buffer: worst case ARGB8, or paletted output
+     * (palette plus w*h indices; 1024-byte palette for PALETTEDARGB8) —
+     * larger for images under ~342 pixels. */
+    uint32_t decoded_size = img_w * 4 * img_h;
+    uint32_t paletted_size = 256 * 4 + img_w * img_h;
+    if(paletted_size > decoded_size) decoded_size = paletted_size;
 
     uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(phost) ? 0 : GA_GC_FLAG);
     EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, decoded_size, alloc_flags);

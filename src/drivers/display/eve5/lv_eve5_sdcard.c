@@ -766,10 +766,12 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
         return false;
     }
 
-    /* Worst-case decoded size: ARGB8 (4 bpp), 4-byte aligned stride.
-     * Matches the legacy path's allocation strategy. */
-    uint32_t decoded_stride = ((q_w * 4u) + 3u) & ~3u;
-    allocated_size = decoded_stride * q_h;
+    /* Worst-case decoded size: ARGB8 (4 bpp), or for PALETTEDARGB8 a
+     * 1024-byte palette plus w*h indices — larger for images under
+     * ~342 pixels. Matches the legacy path's allocation strategy. */
+    allocated_size = q_w * 4u * q_h;
+    uint32_t paletted_size = 256u * 4u + q_w * q_h;
+    if(paletted_size > allocated_size) allocated_size = paletted_size;
 
     final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
     final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
@@ -857,9 +859,12 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
         return false;
     }
 
-    /* Worst case decoded size: ARGB8 (4 bpp), 4-byte aligned stride */
-    uint32_t decoded_stride = ((img_width * 4) + 3) & ~3U;
-    allocated_size = decoded_stride * img_height;
+    /* Worst case decoded size: ARGB8 (4 bpp), or for PALETTEDARGB8 a
+     * 1024-byte palette plus w*h indices — larger for images under
+     * ~342 pixels. */
+    allocated_size = img_width * 4 * img_height;
+    uint32_t paletted_size = 256 * 4 + img_width * img_height;
+    if(paletted_size > allocated_size) allocated_size = paletted_size;
 
     final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
     final_addr = EVE_GpuAlloc_Get(alloc, final_handle);

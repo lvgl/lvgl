@@ -195,9 +195,13 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         return false;
     }
 
-    /* Allocate for worst case (ARGB8); actual format determined after decode */
-    int32_t decoded_stride = ALIGN_UP((int32_t)(img_w * 4), 4);
+    /* Allocate for worst case; actual format determined after decode.
+     * Paletted output is a palette (1024 bytes for PALETTEDARGB8) plus w*h
+     * indices, which exceeds the ARGB8 size for images under ~342 pixels. */
+    int32_t decoded_stride = (int32_t)(img_w * 4);
     uint32_t decoded_size = (uint32_t)(decoded_stride * (int32_t)img_h);
+    uint32_t paletted_size = 256 * 4 + img_w * img_h;
+    if(paletted_size > decoded_size) decoded_size = paletted_size;
 
 #if LV_USE_OS
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
@@ -439,7 +443,8 @@ bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * sr
     *src_h = (int32_t)img_h;
 
     int32_t bpp = eve5_format_bpp(img_fmt);
-    *eve_stride = ALIGN_UP((int32_t)img_w * bpp, 4);
+    /* HW decoder output stride = width * bpp (packed, no padding) */
+    *eve_stride = (int32_t)img_w * bpp;
     if(out_handle) *out_handle = handle;
     if(out_palette_addr) *out_palette_addr = (pal_offset != GA_INVALID) ? (alloc_base + pal_offset) : GA_INVALID;
 
@@ -493,7 +498,8 @@ bool lv_draw_eve5_try_load_flash_image(lv_draw_eve5_unit_t * u, const void * src
     *src_h = (int32_t)img_h;
 
     int32_t bpp = eve5_format_bpp(img_fmt);
-    *eve_stride = ALIGN_UP((int32_t)img_w * bpp, 4);
+    /* HW decoder output stride = width * bpp (packed, no padding) */
+    *eve_stride = (int32_t)img_w * bpp;
     if(out_handle) *out_handle = handle;
     if(out_palette_addr) *out_palette_addr = (pal_offset != GA_INVALID) ? (alloc_base + pal_offset) : GA_INVALID;
 
