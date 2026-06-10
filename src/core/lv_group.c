@@ -172,7 +172,7 @@ void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2)
         else if((*obj_i) == obj2)(*obj_i) = obj1;
     }
 
-    // Swap the focus as well.
+    /* Swap the focus as well. */
     lv_obj_t * focused = lv_group_get_focused(g1);
     if(focused == obj1) lv_group_focus_obj(obj2);
     else if(focused == obj2) lv_group_focus_obj(obj1);
