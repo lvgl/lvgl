@@ -196,8 +196,7 @@ void lv_style_init(lv_style_t * style)
 
 void lv_style_reset(lv_style_t * style)
 {
-    LV_CHECK_ARG(style != NULL, return);
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 
     if(style->prop_cnt != 255) lv_free(style->values_and_props);
     lv_memzero(style, sizeof(lv_style_t));
@@ -295,8 +294,7 @@ lv_style_prop_t lv_style_get_num_custom_props(void)
 
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
-    LV_CHECK_ARG(style != NULL, return false);
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
 
     if(lv_style_is_const(style)) {
         LV_LOG_ERROR("Cannot remove prop from const style");
@@ -349,8 +347,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
-    LV_CHECK_ARG(style != NULL, return);
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 
     if(lv_style_is_const(style)) {
         LV_LOG_ERROR("Cannot set property of constant style");
@@ -508,8 +505,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 
 bool lv_style_is_empty(const lv_style_t * style)
 {
-    LV_CHECK_ARG(style != NULL, return false);
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
 
     return style->prop_cnt == 0;
 }
