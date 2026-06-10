@@ -112,7 +112,7 @@ static int _evdev_process_key(uint16_t code)
         case KEY_END:
             return LV_KEY_END;
         default:
-            return 0;
+            return code + 0xFFFF;
     }
 }
 
@@ -658,6 +658,30 @@ void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_
     dsc->min_y = min_y;
     dsc->max_x = max_x;
     dsc->max_y = max_y;
+}
+
+bool lv_evdev_is_raw_key(lv_event_t * e)
+{
+    LV_CHECK_ARG(e != NULL, return false);
+
+    uint32_t key = lv_event_get_key(e);
+    return (key > 0xFFFF);
+}
+
+uint16_t lv_evdev_get_raw_key(lv_event_t * e)
+{
+    LV_CHECK_ARG(e != NULL, return 0);
+
+    uint32_t key = lv_event_get_key(e);
+
+    if(key > 0xFFFF) {
+        return (uint16_t)(key - 0xFFFF);
+    }
+    else {
+        LV_LOG_WARN("key is an LV_KEY");
+    }
+
+    return 0;
 }
 
 void lv_evdev_delete(lv_indev_t * indev)
