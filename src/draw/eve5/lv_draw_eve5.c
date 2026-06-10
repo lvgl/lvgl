@@ -735,10 +735,10 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     if(is_full_screen_sliced) {
                         /* Free the unused-fresh ARGB8 buffer (was reserved for the
                          * "next" slice that never happened — the tail goes to
-                         * SWAPCHAIN_0 instead). */
-                        if(EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID) {
-                            EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
-                        }
+                         * SWAPCHAIN_0 instead). No guard Get: it would re-stamp
+                         * the entry to the upcoming epoch and defer the release
+                         * past the tail slice; ScopedFree validates internally. */
+                        EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
                         /* Restore swapchain state on vr and layer */
                         vr->is_swapchain = saved_is_swapchain;
                         vr->gpu_handle = saved_gpu_handle;
@@ -980,9 +980,9 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
              *   on "no visible tasks" and skip the prev blit we need.) */
             if(cursor == NULL) {
                 if(is_full_screen_sliced) {
-                    if(EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID) {
-                        EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
-                    }
+                    /* No guard Get: it would re-stamp the entry and defer the
+                     * release; ScopedFree validates internally. */
+                    EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
                     vr->is_swapchain = saved_is_swapchain;
                     vr->gpu_handle = saved_gpu_handle;
                     vr->eve_format = saved_eve_format;

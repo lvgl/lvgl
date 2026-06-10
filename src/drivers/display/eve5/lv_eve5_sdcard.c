@@ -239,8 +239,9 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
     eve5_file_t * file = (eve5_file_t *)file_p;
 
     if(file != NULL) {
-        if(ctx != NULL && ctx->alloc != NULL
-           && EVE_GpuAlloc_Get(ctx->alloc, file->gpu_handle) != GA_INVALID) {
+        if(ctx != NULL && ctx->alloc != NULL) {
+            /* Free validates the handle internally — no-op when the file was
+             * never loaded or the allocation was stolen. */
             EVE_GpuAlloc_Free(ctx->alloc, file->gpu_handle);
         }
         if(file->path != NULL) {

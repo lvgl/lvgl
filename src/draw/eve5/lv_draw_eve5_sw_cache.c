@@ -230,10 +230,10 @@ static void free_entry(lv_draw_eve5_unit_t * u, lv_draw_eve5_sw_cache_entry_t * 
         entry->dsc_data = NULL;
     }
 
-    if(EVE_GpuAlloc_Get(u->allocator, entry->handle) != GA_INVALID) {
-        /* ScopedFree: evicted texture may still be in an in-flight display list */
-        EVE_GpuAlloc_ScopedFree(u->allocator, entry->handle);
-    }
+    /* ScopedFree: evicted texture may still be in an in-flight display list.
+     * No guard Get — it would re-stamp the entry into the current frame's
+     * scope and defer the release by a frame; ScopedFree validates internally. */
+    EVE_GpuAlloc_ScopedFree(u->allocator, entry->handle);
 
     entry->valid = false;
 }

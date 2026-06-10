@@ -309,8 +309,10 @@ lv_font_t * lv_eve5_asset_font_create(lv_display_t * disp,
     ok = true;
 
 unlock_out:
-    if(!ok && handle.Id != GA_HANDLE_INVALID.Id
-       && EVE_GpuAlloc_Get(allocator, handle) != GA_INVALID) {
+    if(!ok && handle.Id != GA_HANDLE_INVALID.Id) {
+        /* Plain Free: the load was flushed synchronously and the block was
+         * never bound to a bitmap handle, so nothing in flight samples it.
+         * Free validates the handle internally. */
         EVE_GpuAlloc_Free(allocator, handle);
     }
 #if LV_USE_OS
@@ -325,8 +327,11 @@ void lv_eve5_asset_font_destroy(lv_font_t * font)
     if(!lv_eve5_is_asset_font(font)) return;
     lv_eve5_asset_font_dsc_t * dsc = (lv_eve5_asset_font_dsc_t *)font->dsc;
     if(dsc != NULL) {
-        if(dsc->allocator != NULL && EVE_GpuAlloc_Get(dsc->allocator, dsc->gpu_handle) != GA_INVALID) {
-            EVE_GpuAlloc_Free(dsc->allocator, dsc->gpu_handle);
+        if(dsc->allocator != NULL) {
+            /* ScopedFree: an in-flight DL may still sample the font block
+             * through its CMD_SETFONT2 bind; the resolve-time Gets stamped
+             * the last referencing scope, which gates the release. */
+            EVE_GpuAlloc_ScopedFree(dsc->allocator, dsc->gpu_handle);
         }
         lv_eve5_font_block_free(&dsc->block);
         lv_free(dsc);

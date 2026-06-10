@@ -137,7 +137,8 @@ static void splat_alpha_to_channel(EVE_HalContext *phost, int32_t w, int32_t h,
 
 /**
  * Composite temp over dst into a new result buffer.
- * Allocates result buffer; caller owns it on success.
+ * Allocates result buffer; caller owns it on success. Consumes temp_handle:
+ * scoped-freed on success and on result-allocation failure.
  *
  * @param temp_is_premultiplied  true: temp RGB is already scaled by alpha
  *   (MULTIPLY — product of premultiplied src inherits coverage scaling).
@@ -163,6 +164,7 @@ static bool composite_over_dst(lv_draw_eve5_unit_t * u, EVE_GpuHandle *out_resul
     EVE_GpuHandle result_handle = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
     uint32_t result_addr = EVE_GpuAlloc_Get(u->allocator, result_handle);
     if(result_addr == GA_INVALID) {
+        EVE_GpuAlloc_ScopedFree(u->allocator, temp_handle);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
