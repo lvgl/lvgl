@@ -772,6 +772,10 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
 
     uint32_t read_fb = drvr->current_fb == 0 ? drvr->frame_buffer_1 : drvr->frame_buffer_0;
 
+    /* Epoch scope for the compositor DL segment: the region texture Gets
+     * below stamp it, gating their scoped frees on this frame's sync */
+    EVE_GpuAlloc_OpenScope(drvr->allocator);
+
     EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, FB_BITMAP_FORMAT, phost->Width, phost->Height);
     EVE_CoCmd_dlStart(phost);
     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
@@ -829,12 +833,13 @@ static void composite_to_framebuffer(lv_eve5_driver_t * drvr)
 
     drvr->current_fb = (drvr->current_fb == 0) ? 1 : 0;
 
-    /* Queue region textures for deferred free */
+    /* Region textures release once the compositor scope retires */
     for(int i = 0; i < drvr->pending_count; i++) {
-        EVE_GpuAlloc_DeferredFree(drvr->allocator,
-                                  drvr->pending_regions[i].handle, sync);
+        EVE_GpuAlloc_ScopedFree(drvr->allocator, drvr->pending_regions[i].handle);
     }
     drvr->pending_count = 0;
+
+    EVE_GpuAlloc_CloseScope(drvr->allocator, sync);
 
     /* Wait for previous frame before reusing its resources */
     if(drvr->last_frame_sync != EVE_CMD_SYNC_INVALID) {
@@ -891,6 +896,10 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
     EVE_Hal_wrMem(phost, gpu_addr, px_map, size);
     EVE_Hal_requestFenceBeforeSwap(phost);
 
+    /* Epoch scope for the present DL segment; the temp bitmap's alloc/Get
+     * above carries the about-to-be-minted epoch, gating its scoped free */
+    EVE_GpuAlloc_OpenScope(drvr->allocator);
+
     /* SWAPCHAIN_0 is a BT820+ render-target sentinel. On non-RT chips, just
      * open a DL — CMD_SWAP at the end rotates the implicit framebuffer. */
     if(EVE_Hal_supportRenderTarget(phost)) {
@@ -927,7 +936,9 @@ static void full_mode_sw_present(lv_eve5_driver_t * drvr, const lv_area_t * area
     }
     drvr->last_frame_sync = sync;
 
-    EVE_GpuAlloc_DeferredFree(drvr->allocator, handle, sync);
+    /* Temp bitmap releases once the present scope retires */
+    EVE_GpuAlloc_ScopedFree(drvr->allocator, handle);
+    EVE_GpuAlloc_CloseScope(drvr->allocator, sync);
 }
 #endif /* EVE_SUPPORT_RENDERTARGET — full_mode_sw_present */
 

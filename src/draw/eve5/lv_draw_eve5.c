@@ -826,6 +826,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     prev = EVE_GpuAlloc_Alloc(u->allocator, sz, GA_ALIGN_128);
                     uint32_t pa = EVE_GpuAlloc_Get(u->allocator, prev);
                     if(pa != GA_INVALID) {
+                        /* Clear-only DL: samples no allocator-managed memory,
+                         * so no epoch scope is needed around this segment */
                         EVE_CoCmd_renderTarget(u->hal, pa, ARGB8, aw, ah);
                         EVE_CoCmd_dlStart(u->hal);
                         EVE_CoDl_clearColorRgb(u->hal, 0, 0, 0);
@@ -904,6 +906,11 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                         uint32_t src_addr = EVE_GpuAlloc_Get(u->allocator, src_handle);
 
                         if(result_addr != GA_INVALID && prev_addr != GA_INVALID && src_addr != GA_INVALID) {
+                            /* Epoch scope for the fallback composite segment;
+                             * the prev/src Gets above carry its epoch, gating
+                             * their scoped frees below on this DL's sync */
+                            EVE_GpuAlloc_OpenScope(u->allocator);
+
                             EVE_CoCmd_renderTarget(u->hal, result_addr, ARGB8, baw, bah);
                             EVE_CoCmd_dlStart(u->hal);
                             EVE_CoDl_scissorXY(u->hal, 0, 0);
@@ -935,6 +942,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                             EVE_CoDl_display(u->hal);
                             EVE_CoCmd_swap(u->hal);
                             EVE_CoCmd_graphicsFinish(u->hal);
+
+                            EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(u->hal));
                         }
                         else {
                             result = GA_HANDLE_INVALID;
@@ -1382,8 +1391,11 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
     /* Tell the display driver this frame's swap was the screen swap, so
      * flush_cb's FULL-mode HW branch reclaims deferred frees instead of
-     * trying to upload a SW-rendered px_map. */
-    lv_eve5_record_frame_sync(disp, sync);
+     * trying to upload a SW-rendered px_map. EVE_CMD_SYNC_INVALID is
+     * correct only while this path drains the frame host-side (the
+     * waitFlush above); a pipelined NORT loop must place a sync marker
+     * after CMD_SWAP and record that instead. */
+    lv_eve5_record_frame_sync(disp, EVE_CMD_SYNC_INVALID);
 
     EVE5_LOG("EVE5 NORT: === RENDER END layer=%p rendered=%d ===",
              (void *)layer, rendered_count);

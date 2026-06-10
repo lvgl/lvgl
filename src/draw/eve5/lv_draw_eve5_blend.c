@@ -198,10 +198,8 @@ static bool composite_over_dst(lv_draw_eve5_unit_t * u, EVE_GpuHandle *out_resul
 
     finish_channel_dl(phost);
 
-    {
-        EVE_CmdSync sync = EVE_Cmd_sync(phost);
-        EVE_GpuAlloc_DeferredFree(u->allocator, temp_handle, sync);
-    }
+    /* Released at the enclosing op scope's close sync */
+    EVE_GpuAlloc_ScopedFree(u->allocator, temp_handle);
 
     *out_result = result_handle;
     return true;
@@ -337,12 +335,18 @@ bool lv_draw_eve5_blend_multiply(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
+    /* One epoch scope covers all of this op's DL segments; the temps'
+     * stamps gate their scoped frees on the op's close sync. */
+    EVE_GpuAlloc_OpenScope(u->allocator);
+
     begin_channel_dl(phost, temp_addr, aw, ah, w, h);
     FOR_EACH_CHANNEL(CHANNEL_MULTIPLY, phost, dst_addr, src_addr, stride, w, h);
     copy_src_alpha(phost, src_addr, stride, w, h);
     finish_channel_dl(phost);
 
-    return composite_over_dst(u, out_result, dst_addr, temp, true, aw, ah, w, h, stride, buf_size);
+    bool ok = composite_over_dst(u, out_result, dst_addr, temp, true, aw, ah, w, h, stride, buf_size);
+    EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
+    return ok;
 }
 
 /**
@@ -375,12 +379,17 @@ bool lv_draw_eve5_blend_subtractive(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
+    /* One epoch scope covers all of this op's DL segments */
+    EVE_GpuAlloc_OpenScope(u->allocator);
+
     begin_channel_dl(phost, temp_addr, aw, ah, w, h);
     FOR_EACH_CHANNEL(CHANNEL_SUBTRACT, phost, dst_addr, src_addr, stride, w, h);
     copy_src_alpha(phost, src_addr, stride, w, h);
     finish_channel_dl(phost);
 
-    return composite_over_dst(u, out_result, dst_addr, temp, false, aw, ah, w, h, stride, buf_size);
+    bool ok = composite_over_dst(u, out_result, dst_addr, temp, false, aw, ah, w, h, stride, buf_size);
+    EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
+    return ok;
 }
 
 /**
@@ -416,6 +425,9 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
+    /* One epoch scope covers all four of this op's DL segments */
+    EVE_GpuAlloc_OpenScope(u->allocator);
+
     begin_channel_dl(phost, temp1_addr, aw, ah, w, h);
     FOR_EACH_CHANNEL(CHANNEL_SUBTRACT, phost, dst_addr, src_addr, stride, w, h);
     copy_src_alpha(phost, src_addr, stride, w, h);
@@ -426,6 +438,7 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     uint32_t temp2_addr = EVE_GpuAlloc_Get(u->allocator, temp2);
     if(temp2_addr == GA_INVALID) {
         EVE_GpuAlloc_ScopedFree(u->allocator, temp1);
+        EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -441,6 +454,7 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     if(temp1_addr == GA_INVALID || temp2_addr == GA_INVALID) {
         EVE_GpuAlloc_ScopedFree(u->allocator, temp1);
         EVE_GpuAlloc_ScopedFree(u->allocator, temp2);
+        EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -451,6 +465,7 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     if(temp3_addr == GA_INVALID) {
         EVE_GpuAlloc_ScopedFree(u->allocator, temp1);
         EVE_GpuAlloc_ScopedFree(u->allocator, temp2);
+        EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -460,14 +475,14 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     copy_src_alpha(phost, src_addr, stride, w, h);
     finish_channel_dl(phost);
 
-    {
-        EVE_CmdSync sync = EVE_Cmd_sync(phost);
-        EVE_GpuAlloc_DeferredFree(u->allocator, temp1, sync);
-        EVE_GpuAlloc_DeferredFree(u->allocator, temp2, sync);
-    }
+    /* Released at the op scope's close sync */
+    EVE_GpuAlloc_ScopedFree(u->allocator, temp1);
+    EVE_GpuAlloc_ScopedFree(u->allocator, temp2);
 
     /* DL4: composite temp3 over dst */
-    return composite_over_dst(u, out_result, dst_addr, temp3, false, aw, ah, w, h, stride, buf_size);
+    bool ok = composite_over_dst(u, out_result, dst_addr, temp3, false, aw, ah, w, h, stride, buf_size);
+    EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
+    return ok;
 }
 
 #endif /* EVE_SUPPORT_RENDERTARGET */

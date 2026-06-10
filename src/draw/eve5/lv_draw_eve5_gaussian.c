@@ -602,6 +602,11 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         return false;
     }
 
+    /* One epoch scope covers every DL segment of this blur op (extract,
+     * pyramid passes, final composite); the pyramid temps' scoped frees
+     * release once the op's close sync retires. */
+    EVE_GpuAlloc_OpenScope(u->allocator);
+
     {
         uint32_t src_ofs = (uint32_t)by1 * layer_stride + (uint32_t)bx1 * 4;
 
@@ -689,6 +694,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     if(EVE_GpuAlloc_Get(u->allocator, temp_handle) == GA_INVALID) {
         LV_LOG_WARN("EVE5 gaussian: failed to allocate temp buffer");
         EVE_GpuAlloc_ScopedFree(u->allocator, extract_handle);
+        EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
         return true;
     }
 
@@ -885,6 +891,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     if(n_levels < 1) {
         EVE_GpuAlloc_ScopedFree(u->allocator, extract_handle);
         EVE_GpuAlloc_ScopedFree(u->allocator, temp_handle);
+        EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
         return true;
     }
 
@@ -969,6 +976,8 @@ cleanup:
     for(int32_t i = 1; i < n_levels; i++) {
         EVE_GpuAlloc_ScopedFree(u->allocator, levels[i].handle);
     }
+
+    EVE_GpuAlloc_CloseScope(u->allocator, EVE_Cmd_sync(phost));
 
     return true;
 }
