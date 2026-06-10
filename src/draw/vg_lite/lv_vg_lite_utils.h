@@ -183,19 +183,50 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
  */
 bool lv_vg_lite_matrix_transform_area(lv_area_t * dest, const vg_lite_matrix_t * matrix, const lv_area_t * src);
 
+/**
+ * Check if the fractional part of a float is near 0.5 (pixel boundary).
+ *
+ * When using VG_LITE_FILTER_POINT, the GPU samples at pixel centers.
+ * The initial sample coordinate c_step = 0.5 * step + translate.
+ * If the fractional part of translate is exactly 0.5, the sample
+ * lands on a pixel boundary where hardware rounding is ambiguous.
+ * Use a threshold around 0.5 to catch this case and force bilinear
+ * filtering for correct results.
+ *
+ * The threshold 0.1 means: frac in [0.4, 0.6] is considered "near half".
+ * Values like 0.25 and 0.75 (frac distance to 0.5 = 0.25) are safe.
+ */
+static inline bool lv_vg_lite_float_frac_near_half(float v)
+{
+    float frac = v - (float)(int32_t)v;
+    if(frac < 0.0f) frac += 1.0f;
+    return (frac > 0.4f) && (frac < 0.6f);
+}
+
 static inline bool lv_vg_lite_matrix_has_transform(const vg_lite_matrix_t * matrix)
 {
     /**
-     * When the rotation angle is 0 or 180 degrees,
+     * When the rotation angle is 0 or 180 degrees and
+     * the translation does not land on a pixel boundary (x.5),
      * it is considered that there is no transformation.
      */
-    return !((matrix->m[0][0] == 1.0f || matrix->m[0][0] == -1.0f) &&
-             matrix->m[0][1] == 0.0f &&
-             matrix->m[1][0] == 0.0f &&
-             (matrix->m[1][1] == 1.0f || matrix->m[1][1] == -1.0f) &&
-             matrix->m[2][0] == 0.0f &&
-             matrix->m[2][1] == 0.0f &&
-             matrix->m[2][2] == 1.0f);
+    if(!((matrix->m[0][0] == 1.0f || matrix->m[0][0] == -1.0f) &&
+         matrix->m[0][1] == 0.0f &&
+         matrix->m[1][0] == 0.0f &&
+         (matrix->m[1][1] == 1.0f || matrix->m[1][1] == -1.0f) &&
+         matrix->m[2][0] == 0.0f &&
+         matrix->m[2][1] == 0.0f &&
+         matrix->m[2][2] == 1.0f)) {
+        return true;
+    }
+
+    /* Check if translation has fractional part near 0.5 (pixel boundary) */
+    if(lv_vg_lite_float_frac_near_half(matrix->m[0][2]) ||
+       lv_vg_lite_float_frac_near_half(matrix->m[1][2])) {
+        return true;
+    }
+
+    return false;
 }
 
 static inline vg_lite_filter_t lv_vg_lite_matrix_get_filter(const vg_lite_matrix_t * matrix)
