@@ -334,6 +334,12 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
     lv_draw_buf_set_flag(new_buf, draw_buf->header.flags | LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED);
 
 #if LV_USE_DRAW_VRAM
+    /*A duplicate is not cache-backed: nothing re-creates its content if the
+     *VRAM backing is discarded, so it must not inherit reloadability.*/
+    lv_draw_buf_clear_flag(new_buf, LV_IMAGE_FLAGS_RELOADABLE);
+#endif
+
+#if LV_USE_DRAW_VRAM
     /*If source is VRAM-resident, try a VRAM-side duplicate to avoid a CPU round trip*/
     if(draw_buf->vram_res != NULL) {
         lv_draw_unit_t * unit = draw_buf->vram_res->unit;

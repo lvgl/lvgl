@@ -314,6 +314,13 @@ lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
     lv_image_cache_data_t * cached_data;
     cached_data = lv_cache_entry_get_data(cache_entry);
 
+#if LV_USE_DRAW_VRAM
+    /*Cache-backed content is reloadable: the lookup validates VRAM backing
+     *and drops dead entries for a fresh decode, so VRAM-capable draw units
+     *may discard the backing under memory pressure.*/
+    lv_draw_buf_set_flag((lv_draw_buf_t *)decoded, LV_IMAGE_FLAGS_RELOADABLE);
+#endif
+
     /*Set the cache entry to decoder data*/
     cached_data->decoded = decoded;
     if(cached_data->src_type == LV_IMAGE_SRC_FILE) {
