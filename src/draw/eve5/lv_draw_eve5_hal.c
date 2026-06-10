@@ -195,11 +195,21 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     uint32_t aligned_h = ALIGN_UP(h, 16);
     uint32_t size = aligned_w * aligned_h * bpp;
 
+    /* Reloadable content (decoder-cache-backed images uploaded through the
+     * MODIFIABLE residency branch) is GC-flagged: evictable under allocation
+     * pressure. The cache lookup validates the handle and re-decodes dropped
+     * entries. Unique content (canvas buffers, layer render targets) stays
+     * unflagged and pinned. */
+    uint32_t alloc_flags = GA_ALIGN_128;
+    if(lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_RELOADABLE)) {
+        alloc_flags |= GA_GC_FLAG;
+    }
+
 #if LV_USE_OS
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, size, alloc_flags);
     if(EVE_GpuAlloc_Get(u->allocator, handle) == GA_INVALID) {
         LV_LOG_WARN("EVE5 VRAM alloc failed (%ux%u fmt=%d, %u bytes)", w, h, eve_fmt, size);
 #if LV_USE_OS
