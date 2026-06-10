@@ -537,7 +537,10 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
     uint32_t paletted_size = 256 * 4 + img_w * img_h;
     if(paletted_size > decoded_size) decoded_size = paletted_size;
 
-    uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(phost) ? 0 : GA_GC_FLAG);
+    /* GC-flagged: decoded images self-heal through the decoder cache when
+     * the handle goes invalid (sweep on pre-BT820, pressure eviction on
+     * BT820+) */
+    uint32_t alloc_flags = GA_ALIGN_4 | GA_GC_FLAG;
     EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, decoded_size, alloc_flags);
     uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {

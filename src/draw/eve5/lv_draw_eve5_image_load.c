@@ -207,7 +207,10 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
+    /* GC-flagged: decoded images self-heal through the decoder cache when
+     * the handle goes invalid (sweep on pre-BT820, pressure eviction on
+     * BT820+) */
+    uint32_t alloc_flags = GA_ALIGN_4 | GA_GC_FLAG;
     EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, decoded_size, alloc_flags);
     uint32_t addr = EVE_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) {

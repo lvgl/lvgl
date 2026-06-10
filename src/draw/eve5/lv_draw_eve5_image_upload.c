@@ -451,9 +451,12 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     }
 #endif
 
-    /* Allocate RAM_G space. On pre-BT820 the allocator caps live handles at 64;
-     * flag image source uploads as GC so they can be reclaimed under pressure. */
-    uint32_t alloc_flags = GA_ALIGN_4 | (EVE_Hal_supportRenderTarget(u->hal) ? 0 : GA_GC_FLAG);
+    /* Allocate RAM_G space. GC-flagged: image sources re-upload on demand
+     * when the handle goes invalid (the existing-vram_res check above frees
+     * the stale descriptor and falls through to a fresh upload). Pre-BT820
+     * the sweep reclaims unused images (that allocator also caps live
+     * handles at 64); BT820+ evicts them under allocation pressure. */
+    uint32_t alloc_flags = GA_ALIGN_4 | GA_GC_FLAG;
     EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, palette_size + eve_size, alloc_flags);
     uint32_t base_addr = EVE_GpuAlloc_Get(u->allocator, handle);
 

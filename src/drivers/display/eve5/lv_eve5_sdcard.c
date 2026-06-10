@@ -773,7 +773,9 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     uint32_t paletted_size = 256u * 4u + q_w * q_h;
     if(paletted_size > allocated_size) allocated_size = paletted_size;
 
-    final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
+    /* GC-flagged: decoded images self-heal through the decoder cache when
+     * the handle goes invalid (pressure eviction; SD commands are BT820+) */
+    final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4 | GA_GC_FLAG);
     final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
@@ -866,7 +868,9 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     uint32_t paletted_size = 256 * 4 + img_width * img_height;
     if(paletted_size > allocated_size) allocated_size = paletted_size;
 
-    final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4);
+    /* GC-flagged: decoded images self-heal through the decoder cache when
+     * the handle goes invalid (pressure eviction; SD commands are BT820+) */
+    final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4 | GA_GC_FLAG);
     final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);

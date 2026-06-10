@@ -259,12 +259,14 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
 
     lv_draw_eve5_shadow_slot_t * slot = &u->shadow_slots[ratio_idx];
 
-    /* Corner texture (64×64 L8 = 4KB) */
+    /* Corner texture (64×64 L8 = 4KB). GC-flagged: this function regenerates
+     * the texture whenever the handle goes invalid (sweep on pre-BT820,
+     * pressure eviction on BT820+). */
     uint32_t corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
     if(corner_addr == GA_INVALID) {
         uint32_t corner_bytes = SHADOW_TEX_SIZE * SHADOW_TEX_SIZE;
 
-        slot->corner_handle = EVE_GpuAlloc_Alloc(u->allocator, corner_bytes, 0);
+        slot->corner_handle = EVE_GpuAlloc_Alloc(u->allocator, corner_bytes, GA_GC_FLAG);
         corner_addr = EVE_GpuAlloc_Get(u->allocator, slot->corner_handle);
 
         if(corner_addr == GA_INVALID) {
@@ -289,12 +291,13 @@ static bool ensure_shadow_textures(lv_draw_eve5_unit_t * u, int32_t ratio_idx)
                     ratio_idx, corner_addr);
     }
 
-    /* Edge texture (64×1 L8 = 64 bytes, aligned to 4) */
+    /* Edge texture (64×1 L8 = 64 bytes, aligned to 4). GC-flagged like the
+     * corner texture above. */
     uint32_t edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
     if(edge_addr == GA_INVALID) {
         uint32_t edge_bytes = ALIGN_UP(SHADOW_TEX_SIZE, 4);
 
-        slot->edge_handle = EVE_GpuAlloc_Alloc(u->allocator, edge_bytes, 0);
+        slot->edge_handle = EVE_GpuAlloc_Alloc(u->allocator, edge_bytes, GA_GC_FLAG);
         edge_addr = EVE_GpuAlloc_Get(u->allocator, slot->edge_handle);
 
         if(edge_addr == GA_INVALID) {

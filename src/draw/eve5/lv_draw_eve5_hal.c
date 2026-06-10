@@ -490,6 +490,10 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             u->canvas_orig_addr = GA_INVALID;
             u->canvas_orig_palette = GA_INVALID;
 
+            /* Epoch scope: assets resolved while building this DL stay pinned
+             * against pressure eviction until finish_layer's sync completes. */
+            EVE_GpuAlloc_OpenScope(u->allocator);
+
             EVE_CoCmd_renderTarget(phost, SWAPCHAIN_0, sc_vr->eve_format, sw, sh);
             EVE_CoCmd_dlStart(phost);
             EVE_CoDl_scissorXY(phost, 0, 0);
@@ -632,6 +636,9 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         }
         else {
             LV_LOG_ERROR("EVE5: VRAM handle invalid for layer %p", (void *)layer);
+            /* vram_res stays attached, so the caller proceeds to
+             * finish_layer; open the scope to keep its CloseScope paired. */
+            EVE_GpuAlloc_OpenScope(u->allocator);
             return;
         }
     }
@@ -647,6 +654,13 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             lv_draw_buf_set_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
         }
     }
+
+    /* Epoch scope: assets resolved while building this DL stay pinned
+     * against pressure eviction until finish_layer's sync completes.
+     * Contract: a scope is open on exit iff vram_res is attached — the
+     * caller invokes finish_layer (whose CloseScope pairs with this)
+     * exactly when vram_res is non-NULL. */
+    EVE_GpuAlloc_OpenScope(u->allocator);
 
     EVE_CoCmd_renderTarget(u->hal, ram_g_addr, target_eve_fmt, aligned_w, aligned_h);
     EVE_CoCmd_dlStart(u->hal);
@@ -830,6 +844,12 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_CoCmd_graphicsFinish(u->hal);
 
     EVE_CmdSync sync = EVE_Cmd_sync(u->hal);
+
+    /* Close the epoch scope opened in init_layer. The sync follows the
+     * graphicsFinish, so its completion implies the render engine finished
+     * sampling everything this layer's DL referenced. */
+    EVE_GpuAlloc_CloseScope(u->allocator, sync);
+
     EVE_GpuAlloc_FlushPending(u->allocator, sync);
 
     /* In FULL mode the screen layer renders directly into SWAPCHAIN_0, so the
@@ -868,6 +888,9 @@ EVE_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
 
     LV_LOG_INFO("EVE5: L8 alpha RT allocated at 0x%08X (%"PRId32"x%"PRId32")",
                 l8_addr, aligned_w, aligned_h);
+
+    /* Epoch scope for the alpha pass DL; closed by finish_l8_rendertarget */
+    EVE_GpuAlloc_OpenScope(u->allocator);
 
     EVE_CoCmd_renderTarget(phost, l8_addr, L8, aligned_w, aligned_h);
     EVE_CoCmd_dlStart(phost);
@@ -915,6 +938,7 @@ void lv_draw_eve5_hal_finish_l8_rendertarget(lv_draw_eve5_unit_t * u)
     EVE_CoCmd_graphicsFinish(u->hal);
 
     EVE_CmdSync l8_sync = EVE_Cmd_sync(u->hal);
+    EVE_GpuAlloc_CloseScope(u->allocator, l8_sync);
     EVE_GpuAlloc_FlushPending(u->allocator, l8_sync);
 }
 
