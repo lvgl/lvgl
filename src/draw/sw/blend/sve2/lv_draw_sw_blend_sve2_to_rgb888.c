@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_blend_sve2_to_rgb888.h"
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_SVE2
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_SVE2 && defined(__ARM_FEATURE_SVE2)
 
 #include "../lv_draw_sw_blend_private.h"
 #include LV_STDINT_INCLUDE
