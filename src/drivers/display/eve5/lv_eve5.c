@@ -631,8 +631,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
      *       to a temp VRAM, draw it into SWAPCHAIN_0, CMD_SWAP, and defer-free
      *       the temp.
      *
-     * Sub-layer (opa_layered) draw_bufs go vram_free_cb → PendingFree →
-     * FlushPending (via finish_layer's sync) → DeferredFree. The actual handle
+     * Sub-layer (opa_layered) draw_bufs go vram_free_cb → ScopedFree, gated
+     * on the referencing epoch scope retiring. The actual handle
      * reclamation only happens in UpdateFree, which PARTIAL does inside
      * composite_to_framebuffer; FULL has no compositor, so we call it here on
      * both HW and SW paths or VRAM exhausts after a few seconds of layered

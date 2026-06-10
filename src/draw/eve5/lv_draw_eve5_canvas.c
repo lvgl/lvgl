@@ -126,7 +126,7 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
 
     /* Copy the GPU allocation descriptor to the canvas draw_buf.
      * The handle is shared with the source (image cache or decoder cache).
-     * This is safe: if either side frees via PendingFree, the other detects
+     * This is safe: if either side frees via ScopedFree, the other detects
      * the dead handle via vram_check_cb and self-heals. */
     {
         lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
@@ -138,8 +138,8 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
             layer->draw_buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
         }
         else {
-            /* PendingFree: previous canvas content may be in an in-flight display list */
-            EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+            /* ScopedFree: previous canvas content may be in an in-flight display list */
+            EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
         }
 
         *vr = *src_vr;

@@ -84,7 +84,7 @@ typedef struct {
                                             (gpu_handle is GA_HANDLE_INVALID). SWAPCHAIN_0 is resolved by the
                                             render engine to the current back buffer (one of REG_SC0_PTR0/PTR1).
                                             Backbuffer lifetime is tied to scanout (not render-engine sync), so
-                                            this vram_res must not be PendingFree'd while it's still scanout source. */
+                                            this vram_res must not be ScopedFree'd while it's still scanout source. */
 } lv_eve5_vram_res_t;
 
 typedef struct {

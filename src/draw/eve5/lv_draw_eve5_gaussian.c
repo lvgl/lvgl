@@ -688,7 +688,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_GpuHandle temp_handle = EVE_GpuAlloc_Alloc(u->allocator, temp_size, GA_ALIGN_128);
     if(EVE_GpuAlloc_Get(u->allocator, temp_handle) == GA_INVALID) {
         LV_LOG_WARN("EVE5 gaussian: failed to allocate temp buffer");
-        EVE_GpuAlloc_PendingFree(u->allocator, extract_handle);
+        EVE_GpuAlloc_ScopedFree(u->allocator, extract_handle);
         return true;
     }
 
@@ -873,7 +873,7 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                                 n_levels++;
                             }
                             else {
-                                EVE_GpuAlloc_PendingFree(u->allocator, extra_handle);
+                                EVE_GpuAlloc_ScopedFree(u->allocator, extra_handle);
                             }
                         }
                     }
@@ -883,8 +883,8 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
     if(n_levels < 1) {
-        EVE_GpuAlloc_PendingFree(u->allocator, extract_handle);
-        EVE_GpuAlloc_PendingFree(u->allocator, temp_handle);
+        EVE_GpuAlloc_ScopedFree(u->allocator, extract_handle);
+        EVE_GpuAlloc_ScopedFree(u->allocator, temp_handle);
         return true;
     }
 
@@ -964,10 +964,10 @@ bool lv_draw_eve5_gaussian_blur(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     }
 
 cleanup:
-    EVE_GpuAlloc_PendingFree(u->allocator, extract_handle);
-    EVE_GpuAlloc_PendingFree(u->allocator, temp_handle);
+    EVE_GpuAlloc_ScopedFree(u->allocator, extract_handle);
+    EVE_GpuAlloc_ScopedFree(u->allocator, temp_handle);
     for(int32_t i = 1; i < n_levels; i++) {
-        EVE_GpuAlloc_PendingFree(u->allocator, levels[i].handle);
+        EVE_GpuAlloc_ScopedFree(u->allocator, levels[i].handle);
     }
 
     return true;

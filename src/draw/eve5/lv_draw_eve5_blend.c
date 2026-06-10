@@ -425,7 +425,7 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_GpuHandle temp2 = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
     uint32_t temp2_addr = EVE_GpuAlloc_Get(u->allocator, temp2);
     if(temp2_addr == GA_INVALID) {
-        EVE_GpuAlloc_PendingFree(u->allocator, temp1);
+        EVE_GpuAlloc_ScopedFree(u->allocator, temp1);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -439,8 +439,8 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     temp1_addr = EVE_GpuAlloc_Get(u->allocator, temp1);
     temp2_addr = EVE_GpuAlloc_Get(u->allocator, temp2);
     if(temp1_addr == GA_INVALID || temp2_addr == GA_INVALID) {
-        EVE_GpuAlloc_PendingFree(u->allocator, temp1);
-        EVE_GpuAlloc_PendingFree(u->allocator, temp2);
+        EVE_GpuAlloc_ScopedFree(u->allocator, temp1);
+        EVE_GpuAlloc_ScopedFree(u->allocator, temp2);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }
@@ -449,8 +449,8 @@ bool lv_draw_eve5_blend_difference(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
     EVE_GpuHandle temp3 = EVE_GpuAlloc_Alloc(u->allocator, buf_size, GA_ALIGN_128);
     uint32_t temp3_addr = EVE_GpuAlloc_Get(u->allocator, temp3);
     if(temp3_addr == GA_INVALID) {
-        EVE_GpuAlloc_PendingFree(u->allocator, temp1);
-        EVE_GpuAlloc_PendingFree(u->allocator, temp2);
+        EVE_GpuAlloc_ScopedFree(u->allocator, temp1);
+        EVE_GpuAlloc_ScopedFree(u->allocator, temp2);
         *out_result = GA_HANDLE_INVALID;
         return false;
     }

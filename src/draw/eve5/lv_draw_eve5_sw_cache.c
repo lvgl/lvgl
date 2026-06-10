@@ -231,8 +231,8 @@ static void free_entry(lv_draw_eve5_unit_t * u, lv_draw_eve5_sw_cache_entry_t * 
     }
 
     if(EVE_GpuAlloc_Get(u->allocator, entry->handle) != GA_INVALID) {
-        /* PendingFree: evicted texture may still be in an in-flight display list */
-        EVE_GpuAlloc_PendingFree(u->allocator, entry->handle);
+        /* ScopedFree: evicted texture may still be in an in-flight display list */
+        EVE_GpuAlloc_ScopedFree(u->allocator, entry->handle);
     }
 
     entry->valid = false;

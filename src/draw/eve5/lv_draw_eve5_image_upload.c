@@ -689,7 +689,7 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     /* Allocate and attach vram_res to the image descriptor */
     lv_eve5_vram_res_t * vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
     if(vr == NULL) {
-        EVE_GpuAlloc_PendingFree(u->allocator, handle);
+        EVE_GpuAlloc_ScopedFree(u->allocator, handle);
         return NULL;
     }
 

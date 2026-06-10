@@ -525,7 +525,7 @@ static void eve5_render_slice(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                 lv_draw_eve5_hal_blit_l8_to_alpha(u, alpha_rt_addr,
                                                   alpha_rt_aw, alpha_rt_ah,
                                                   alpha_rt_w, alpha_rt_h);
-                EVE_GpuAlloc_PendingFree(u->allocator, alpha_rt_handle);
+                EVE_GpuAlloc_ScopedFree(u->allocator, alpha_rt_handle);
             }
             else
 #endif
@@ -737,7 +737,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                          * "next" slice that never happened — the tail goes to
                          * SWAPCHAIN_0 instead). */
                         if(EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID) {
-                            EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+                            EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
                         }
                         /* Restore swapchain state on vr and layer */
                         vr->is_swapchain = saved_is_swapchain;
@@ -941,8 +941,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                         }
                     }
 
-                    EVE_GpuAlloc_PendingFree(u->allocator, prev);
-                    EVE_GpuAlloc_PendingFree(u->allocator, src_handle);
+                    EVE_GpuAlloc_ScopedFree(u->allocator, prev);
+                    EVE_GpuAlloc_ScopedFree(u->allocator, src_handle);
 
                     /* Sentinel: result is specifically GA_HANDLE_INVALID when blend was not attempted or failed */
                     if(result.Id != GA_HANDLE_INVALID.Id) {
@@ -954,8 +954,8 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                     }
                 }
                 else {
-                    EVE_GpuAlloc_PendingFree(u->allocator, prev);
-                    EVE_GpuAlloc_PendingFree(u->allocator, src_handle);
+                    EVE_GpuAlloc_ScopedFree(u->allocator, prev);
+                    EVE_GpuAlloc_ScopedFree(u->allocator, src_handle);
                     prev = GA_HANDLE_INVALID;
                 }
 
@@ -972,7 +972,7 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
             if(cursor == NULL) {
                 if(is_full_screen_sliced) {
                     if(EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID) {
-                        EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+                        EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
                     }
                     vr->is_swapchain = saved_is_swapchain;
                     vr->gpu_handle = saved_gpu_handle;
@@ -1012,13 +1012,11 @@ static void eve5_render_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
                         EVE_CoDl_display(phost);
                         EVE_CoCmd_swap(phost);
                         EVE_CoCmd_graphicsFinish(phost);
-                        EVE_CmdSync sync = EVE_Cmd_sync(phost);
-                        EVE_GpuAlloc_FlushPending(u->allocator, sync);
                     }
                 }
                 else if(prev.Id != GA_HANDLE_INVALID.Id) {
                     if(vr != NULL) {
-                        EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+                        EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
                         vr->gpu_handle = prev;
                         vr->has_content = true;
                     }
@@ -1340,12 +1338,9 @@ static void eve5_render_layer_nort(lv_draw_eve5_unit_t * u, lv_layer_t * layer)
 
     EVE_CoDl_display(phost);
     EVE_CoCmd_swap(phost);
-    /* CMD_GRAPHICSFINISH is BT820-only. On previous gens CMD_SWAP itself is
-     * blocking — the coprocessor stalls until the swap completes — so the
-     * subsequent CMD_SYNC marker is already past the rendered frame. */
-
-    EVE_CmdSync sync = EVE_Cmd_sync(phost);
-    EVE_GpuAlloc_FlushPending(u->allocator, sync);
+    /* No sync marker needed here: this is the pre-BT820 NORT path, where the
+     * allocator is GA3 — frees ride the Update sweep below, not the sync
+     * pipeline. (CMD_SWAP itself is blocking on these gens anyway.) */
 
     /* Advance the scratch ring's in-use boundary to match the just-issued
      * CMD_SWAP. The frame we just built is now the "currently scanned out"

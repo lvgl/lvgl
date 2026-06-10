@@ -270,10 +270,10 @@ static void eve5_vram_free_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    /* PendingFree: the texture may still be referenced by an in-flight
-     * display list. FlushPending at the next finish_layer will assign
-     * the sync value and UpdateFree will reclaim the memory. */
-    EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+    /* ScopedFree: the texture may still be referenced by an in-flight
+     * display list. UpdateFree reclaims the memory once the referencing
+     * epoch scope retires. */
+    EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
@@ -542,7 +542,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                     EVE_CoDl_end(phost);
                     EVE_CoDl_restoreContext(phost);
 
-                    EVE_GpuAlloc_PendingFree(u->allocator, slice->prev_handle);
+                    EVE_GpuAlloc_ScopedFree(u->allocator, slice->prev_handle);
                 }
                 else {
                     EVE_CoDl_clearColorRgb(phost, 0, 0, 0);
@@ -614,8 +614,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
                               || (vr->stride * (uint32_t)aligned_h > vr->base.size);
         if(realloc_needed) {
             uint32_t needed_size = needed_stride * (uint32_t)aligned_h;
-            /* PendingFree: previous buffer may be referenced by a prior frame's compositing DL */
-            EVE_GpuAlloc_PendingFree(u->allocator, vr->gpu_handle);
+            /* ScopedFree: previous buffer may be referenced by a prior frame's compositing DL */
+            EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
             vr->gpu_handle = EVE_GpuAlloc_Alloc(u->allocator, needed_size, GA_ALIGN_128);
             vr->eve_format = target_eve_fmt;
             vr->stride = needed_stride;
@@ -715,7 +715,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             u->canvas_orig_w = w;
             u->canvas_orig_h = h;
 
-            EVE_GpuAlloc_PendingFree(u->allocator, slice->prev_handle);
+            EVE_GpuAlloc_ScopedFree(u->allocator, slice->prev_handle);
         }
         else {
             EVE_CoDl_clearColorRgb(u->hal, 0, 0, 0);
@@ -808,7 +808,7 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_CoDl_restoreContext(u->hal);
 
         if(have_old_handle) {
-            EVE_GpuAlloc_PendingFree(u->allocator, old_handle);
+            EVE_GpuAlloc_ScopedFree(u->allocator, old_handle);
         }
 
         LV_LOG_INFO("EVE5: Blitting existing layer content (%"PRId32"x%"PRId32" fmt=%d) from 0x%08X to 0x%08X",
@@ -857,10 +857,9 @@ void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
 
     /* Close the epoch scope opened in init_layer. The sync follows the
      * graphicsFinish, so its completion implies the render engine finished
-     * sampling everything this layer's DL referenced. */
+     * sampling everything this layer's DL referenced. Scoped frees issued
+     * during the layer release once this epoch retires. */
     EVE_GpuAlloc_CloseScope(u->allocator, sync);
-
-    EVE_GpuAlloc_FlushPending(u->allocator, sync);
 
     /* In FULL mode the screen layer renders directly into SWAPCHAIN_0, so the
      * CMD_SWAP above is the actual frame swap. Record the sync so a runtime
@@ -949,7 +948,6 @@ void lv_draw_eve5_hal_finish_l8_rendertarget(lv_draw_eve5_unit_t * u)
 
     EVE_CmdSync l8_sync = EVE_Cmd_sync(u->hal);
     EVE_GpuAlloc_CloseScope(u->allocator, l8_sync);
-    EVE_GpuAlloc_FlushPending(u->allocator, l8_sync);
 }
 
 /**
