@@ -82,6 +82,8 @@
 #include "draw/sw/blend/neon/lv_blend_neon.h"
 #include "draw/sw/blend/neon/lv_draw_sw_blend_neon_to_rgb565.h"
 #include "draw/sw/blend/neon/lv_draw_sw_blend_neon_to_rgb888.h"
+#include "draw/sw/blend/sve2/lv_blend_sve2.h"
+#include "draw/sw/blend/sve2/lv_draw_sw_blend_sve2_to_rgb888.h"
 #include "draw/sw/blend/riscv_v/lv_blend_riscv_v.h"
 #include "draw/sw/blend/riscv_v/lv_blend_riscv_v_private.h"
 #include "draw/sw/blend/riscv_v/lv_blend_riscv_vector_emulation.h"
