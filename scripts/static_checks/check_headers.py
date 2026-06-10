@@ -123,6 +123,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "algorithm",
     "arm_2d.h",
     "arm_neon.h",
+    "arm_sve.h",
     "assert.h",
     "atomic.h",
     "bsp_api.h",
