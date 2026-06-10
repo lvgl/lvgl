@@ -9,7 +9,7 @@ on:
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each PR
 concurrency:
-  group: ${{ github.ref }}-${{ github.workflow }} 
+  group: ${{ github.ref }}-${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
       # ------------------------------------------------------------------
       # - All #includes inside must be valid relative paths.
       # - Angle-bracket includes must be in the explicit allow-list
-      #   - see `ALLOWED_EXTERNAL_HEADERS` in `scripts/static_checks/check_headers.py` 
+      #   - see `ALLOWED_EXTERNAL_HEADERS` in `scripts/static_checks/check_headers.py`
       # - forbidden headers (stdint.h etc.) must use LV_*_INCLUDE macros.
       # ------------------------------------------------------------------
       - name: "Check: include path validity + angle-bracket policy"
@@ -67,7 +67,7 @@ jobs:
         run: python scripts/static_checks/check_headers.py deprecated
 
       # ------------------------------------------------------------------
-      # Every header file inside `src` must use `lvgl_public.h` to access 
+      # Every header file inside `src` must use `lvgl_public.h` to access
       # the public API
       # ------------------------------------------------------------------
       - name: "Check: no direct public include from source files"
@@ -85,6 +85,16 @@ jobs:
         run: python scripts/static_checks/check_lv_types.py
 
       # ------------------------------------------------------------------
+      # C sources/headers must use block comments (/* */), not //.
+      # Scoped per-module while the conversion is rolled out; widen the
+      # path list as each module is cleaned.
+      # ------------------------------------------------------------------
+      - name: "Check: no // comments in C sources (src/core)"
+        id: comments
+        continue-on-error: true
+        run: python scripts/static_checks/check_comments.py src/core
+
+      # ------------------------------------------------------------------
       # Final gate – fail the job if any step above failed.
       # This gives us full output from every check before failing.
       # ------------------------------------------------------------------
@@ -96,7 +106,8 @@ jobs:
           steps.allowed-list.outcome          == 'failure' ||
           steps.direct-public-include.outcome == 'failure' ||
           steps.deprecated.outcome            == 'failure' ||
-          steps.lv_types.outcome              == 'failure'
+          steps.lv_types.outcome              == 'failure' ||
+          steps.comments.outcome              == 'failure'
         run: |
           echo "Policy check results:"
           echo "---------------------"
@@ -117,6 +128,7 @@ jobs:
           print_result "direct-public-include" "${{ steps.direct-public-include.outcome }}"
           print_result "deprecated"            "${{ steps.deprecated.outcome }}"
           print_result "lv_types"              "${{ steps.lv_types.outcome }}"
+          print_result "comments"              "${{ steps.comments.outcome }}"
 
           echo "---------------------"
           echo "One or more policy checks failed. See above for details."
