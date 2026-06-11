@@ -11,7 +11,7 @@
 
 #include "../lv_draw_sw_blend_private.h"
 #include LV_STDINT_INCLUDE
-#include <arm_sve2.h>
+#include <arm_sve.h>
 
 /*********************
  *      DEFINES
