@@ -65,6 +65,11 @@ static inline int32_t eve5_format_bpp(uint32_t eve_format)
         case RGB565:
         case ARGB1555:
         case ARGB4:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+        case YCBCR: /* 2x2 block format: line stride is 2 bytes/pixel, but each
+                     * stored line covers two display rows (1 byte/pixel surface
+                     * total — see eve5_rt_surface_size for sizing) */
+#endif
             return 2;
         case L8:
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)

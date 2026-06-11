@@ -166,6 +166,7 @@ void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
     unit->hal = hal;
     unit->allocator = allocator;
     unit->rendering_in_progress = false;
+    unit->alloc_canvas_hint = false;
     unit->font_list = NULL;
 
 #if LV_DRAW_EVE5_SW_FALLBACK
@@ -344,7 +345,21 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(queued_count > 0 && layer->all_tasks_added && blocked_count == 0 && waiting_count == 0) {
         EVE5_LOG("EVE5: -> Rendering %d queued tasks atomically", queued_count);
 
+#if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
+        /* Tell vram_alloc_cb whether this buffer belongs to a canvas layer
+         * (draw_buf-backed, parentless, not the screen), so the opaque-canvas
+         * YCBCR policy applies on the first allocation instead of through an
+         * init_layer realloc. */
+        {
+            lv_display_t * hint_disp = lv_eve5_disp_from_hal(u->hal);
+            u->alloc_canvas_hint = (layer->draw_buf != NULL && layer->parent == NULL
+                                    && (hint_disp == NULL || layer != hint_disp->layer_head));
+        }
+#endif
         lv_draw_layer_alloc_buf(layer, draw_unit);
+#if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
+        u->alloc_canvas_hint = false;
+#endif
 
         t = layer->draw_task_head;
         while(t) {

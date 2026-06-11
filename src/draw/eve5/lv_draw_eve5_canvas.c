@@ -69,6 +69,18 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
 {
     if(!layer->draw_buf) return false;
 
+#if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
+    /* Opaque canvases render into YCBCR targets; adopting the decoder's
+     * RGB/paletted allocation would bypass the re-encode, so the direct
+     * path is disabled for them. Canvases with alpha keep their exact-RGB
+     * targets and the zero-copy adoption stays available. Mirrors the
+     * target format selection in vram_alloc_cb / init_layer. */
+    if(EVE_Hal_supportRenderTarget(u->hal)
+       && !lv_color_format_has_alpha((lv_color_format_t)layer->draw_buf->header.cf)) {
+        return false;
+    }
+#endif
+
     /* Skip direct load for canvases with existing GPU content.
      * The render path handles incremental updates; direct load replaces everything. */
     lv_eve5_vram_res_t * existing_vr = eve5_get_vram_res(layer);

@@ -113,6 +113,20 @@ extern "C" {
 #define LV_DRAW_EVE5_OPAQUE_LAYER_RGB8 0
 #endif
 
+/* Render opaque canvas layers into YCBCR render targets (BT820+ only).
+ * YCBCR is a 2x2-pixel block format (4 bytes per block: line stride is
+ * 2 bytes/pixel, each stored line covers two display rows) — 1 byte per
+ * pixel total. Large opaque canvases — e.g. the photo slides
+ * lv_demo_high_res preloads — shrink to half of RGB565 and a third of
+ * RGB8, at photographic quality. Side effects: the canvas direct-image
+ * shortcut is disabled for opaque canvases (an adopted decoder allocation
+ * would be RGB/paletted, so their content always re-encodes through the
+ * render pipeline; canvases with alpha keep zero-copy adoption), and SW
+ * migration/download of a YCBCR canvas is not supported. */
+#ifndef LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
+#define LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR 0
+#endif
+
 /* Pre-BT820 scratch ring for gradient bitmaps. The pre-BT820 GPU allocator
  * (the variant of EVE_GpuAlloc used on FT80X..BT81X) caps live allocation
  * handles at 64; a frame with many gradients trips it. BT820 uses EVE_GpuAlloc5
@@ -344,6 +358,12 @@ typedef struct {
     /* Re-entrancy guard for SW fallback */
     bool rendering_in_progress;
 
+    /* Dispatch-scoped hint: the next vram_alloc_cb is allocating a canvas
+     * layer's buffer (draw_buf-backed, parentless, not the screen). Set
+     * around lv_draw_layer_alloc_buf in dispatch so the opaque-canvas
+     * YCBCR policy can pick the right format on first allocation. */
+    bool alloc_canvas_hint;
+
     /* Box shadow texture cache */
     lv_draw_eve5_shadow_slot_t shadow_slots[EVE5_SHADOW_TEX_SIZE];
 
@@ -432,17 +452,18 @@ static inline bool eve5_fill_border_area_match(const lv_area_t * fill_area, cons
  *   - L1/L2/L4/L8 (luminance is sampled as alpha by EVE — varies per pixel)
  *
  * Formats classed as "no alpha" (sampled alpha == 1 everywhere):
- *   - RGB332, RGB565, PALETTED565, RGB6, RGB8
+ *   - RGB332, RGB565, PALETTED565, RGB6, RGB8, YCBCR
  *
- * Specialty formats (TEXT8X8, TEXTVGA, BARGRAPH, GLFORMAT, YCBCR) fall into
- * the default and return true; they don't appear in image-source paths.
+ * Specialty formats (TEXT8X8, TEXTVGA, BARGRAPH, GLFORMAT) fall into the
+ * default and return true; they don't appear in image-source paths. YCBCR
+ * does appear as a source (opaque canvas render targets) and is opaque.
  */
 static inline bool lv_draw_eve5_format_has_alpha(uint16_t eve_format)
 {
     if(eve_format == RGB332 || eve_format == RGB565 || eve_format == PALETTED565)
         return false;
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
-    if(eve_format == RGB8 || eve_format == RGB6)
+    if(eve_format == RGB8 || eve_format == RGB6 || eve_format == YCBCR)
         return false;
 #endif
     return true;
@@ -471,6 +492,19 @@ static inline void set_palette_if_needed(EVE_HalContext *phost, uint16_t eve_for
 static inline bool eve5_is_extended_format(uint16_t eve_format)
 {
     return eve_format > GLFORMAT;
+}
+
+/** Byte size of a render-target surface for a given line stride and
+ *  16-aligned height. YCBCR stores 4 bytes per 2x2 pixel quad: the line
+ *  stride is 2 bytes per pixel, but each stored line covers two display
+ *  rows, so the surface totals 1 byte per pixel. All other formats are
+ *  plain stride * height. */
+static inline uint32_t eve5_rt_surface_size(uint16_t eve_format, uint32_t stride, uint32_t aligned_h)
+{
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
+    if(eve_format == YCBCR) return stride * aligned_h / 2;
+#endif
+    return stride * aligned_h;
 }
 
 /**

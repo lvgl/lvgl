@@ -95,6 +95,17 @@ bool lv_draw_eve5_download_image(lv_draw_eve5_unit_t * u,
     if(gpu_addr == GA_INVALID) return false;
     gpu_addr += vr->source_offset;
 
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    /* YCBCR surfaces (opaque canvas render targets under
+     * LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR) have no host-side decode here; fail
+     * loudly so ensure_resident migration reports the limitation instead of
+     * silently producing black. */
+    if(vr->eve_format == YCBCR) {
+        LV_LOG_WARN("EVE5: download from YCBCR surface not supported");
+        return false;
+    }
+#endif
+
     int32_t w = buf->header.w;
     int32_t h = buf->header.h;
     lv_color_format_t lv_cf = (lv_color_format_t)buf->header.cf;

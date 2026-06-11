@@ -191,9 +191,22 @@ static bool eve5_vram_alloc_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
     }
 #endif
 
+#if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR && defined(EVE_SUPPORT_RENDERTARGET)
+    /* Opaque canvas: render into YCBCR, a 2x2-pixel block format (4 bytes
+     * per block: line stride = 2 bytes/pixel, each stored line covers two
+     * display rows, 1 byte/pixel surface total). Canvas identity comes from
+     * the dispatch hint — only buffers allocated for a parentless,
+     * non-screen layer qualify. Overrides the RGB8 promotion above. */
+    if(u->alloc_canvas_hint && EVE_Hal_supportRenderTarget(u->hal)
+       && !lv_color_format_has_alpha(cf)) {
+        eve_fmt = YCBCR;
+        bpp = 2; /* Line-stride bytes per pixel; sizing accounts for row pairing */
+    }
+#endif
+
     uint32_t aligned_w = ALIGN_UP(w, 16);
     uint32_t aligned_h = ALIGN_UP(h, 16);
-    uint32_t size = aligned_w * aligned_h * bpp;
+    uint32_t size = eve5_rt_surface_size(eve_fmt, aligned_w * bpp, aligned_h);
 
     /* Reloadable content (decoder-cache-backed images uploaded through the
      * MODIFIABLE residency branch) is GC-flagged: evictable under allocation
@@ -597,6 +610,21 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
             target_bpp = 3;
         }
 #endif
+
+#if LV_DRAW_EVE5_OPAQUE_CANVAS_YCBCR
+        /* Opaque canvas layers (draw_buf-backed, parentless, not the screen
+         * — is_screen is false in this branch) render into YCBCR, a
+         * 2x2-pixel block format (line stride = 2 bytes/pixel, surface
+         * totals 1 byte/pixel; see eve5_rt_surface_size). Overrides the
+         * RGB8 promotion. Matches the vram_alloc_cb hint path so the first
+         * allocation already lands in the right format. */
+        if(EVE_Hal_supportRenderTarget(u->hal)
+           && layer->draw_buf != NULL && layer->parent == NULL
+           && !lv_color_format_has_alpha(target_lv_cf)) {
+            target_eve_fmt = YCBCR;
+            target_bpp = 2; /* Line-stride bytes per pixel */
+        }
+#endif
     }
 
     lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
@@ -611,9 +639,9 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         uint32_t needed_stride = (uint32_t)aligned_w * target_bpp;
         bool realloc_needed = (vr->eve_format != target_eve_fmt)
                               || (vr->stride < needed_stride)
-                              || (vr->stride * (uint32_t)aligned_h > vr->base.size);
+                              || (eve5_rt_surface_size(vr->eve_format, vr->stride, (uint32_t)aligned_h) > vr->base.size);
         if(realloc_needed) {
-            uint32_t needed_size = needed_stride * (uint32_t)aligned_h;
+            uint32_t needed_size = eve5_rt_surface_size(target_eve_fmt, needed_stride, (uint32_t)aligned_h);
             /* ScopedFree: previous buffer may be referenced by a prior frame's compositing DL */
             EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
             vr->gpu_handle = EVE_GpuAlloc_Alloc(u->allocator, needed_size, GA_ALIGN_128);
@@ -736,7 +764,8 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t * u, lv_layer_t * layer,
         EVE_GpuHandle old_handle = GA_HANDLE_INVALID;
         bool have_old_handle = false;
 
-        uint32_t new_size = aligned_w * aligned_h * target_bpp;
+        uint32_t new_size = eve5_rt_surface_size(target_eve_fmt,
+                                                 (uint32_t)aligned_w * target_bpp, (uint32_t)aligned_h);
         EVE_GpuHandle new_handle = EVE_GpuAlloc_Alloc(u->allocator, new_size, GA_ALIGN_128);
         uint32_t new_addr = EVE_GpuAlloc_Get(u->allocator, new_handle);
 
