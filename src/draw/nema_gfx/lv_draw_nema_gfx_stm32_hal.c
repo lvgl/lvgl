@@ -9,16 +9,13 @@
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #if LV_USE_NEMA_GFX
 
 #if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
 
 #include "lv_draw_nema_gfx_utils.h"
 
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_string.h"
 #include "../../osal/lv_os_private.h"
 
 #include <assert.h>

@@ -1,0 +1,128 @@
+---
+title: "Menu (lv_menu)"
+description: "Multi-level menu widget. Handles navigation between pages automatically and reports page changes and clicks."
+---
+
+## Overview
+
+The Menu widget builds multi-level menus. It handles navigation between
+pages automatically and lets you react to page changes and item clicks.
+
+## Styling
+
+A Menu is made of standard building blocks — a main container, an optional
+sidebar, headers, back buttons, and one or more pages. Each block is a
+regular widget, so styling follows the same rules as
+[Base Widget](/widgets/base_widget), [Button](/widgets/button), and
+[Image](/widgets/image). See *Create a Menu* below for the full tree.
+
+## Create a Menu
+
+<ApiLink name="lv_menu_create" display="lv_menu_create(parent)" /> creates a new empty Menu.
+
+This creates a Menu Widget with this object hierarchy:
+
+- Menu: <ApiLink name="lv_menu_t" />
+
+  - Hidden Sub-Page Storage: <ApiLink name="lv_obj_t" />
+  - Main container: <ApiLink name="lv_menu_main_cont_class" />
+
+    - Main header: <ApiLink name="lv_menu_main_header_cont_class" />
+
+      - Back button: [Button (lv_button)](/widgets/button)
+
+        - Back button icon: [Image (lv_image)](/widgets/image)
+
+      - Main header title: [Label (lv_label)](/widgets/label) (default hidden)
+
+Note that no sidebar is created. You can create one later if you wish.
+
+## Header mode
+
+The following header modes exist:
+
+- <ApiLink name="LV_MENU_HEADER_TOP_FIXED" /> Header is positioned at the top.  (default)
+- <ApiLink name="LV_MENU_HEADER_TOP_UNFIXED" /> Header is positioned at the top and can be scrolled out of view.
+- <ApiLink name="LV_MENU_HEADER_BOTTOM_FIXED" /> Header is positioned at the bottom.
+
+You can set header modes with <ApiLink name="lv_menu_set_mode_header" display="lv_menu_set_mode_header(menu, LV_MENU_HEADER...)" />.
+
+## Root back button mode
+
+The following root back button modes exist:
+
+- <ApiLink name="LV_MENU_ROOT_BACK_BTN_DISABLED" />  (default)
+- <ApiLink name="LV_MENU_ROOT_BACK_BTN_ENABLED" />
+
+You can set root back button modes with
+<ApiLink name="lv_menu_set_mode_root_back_button" display="lv_menu_set_mode_root_back_button(menu, LV_MENU_ROOT_BACK_BTN...)" />.
+
+## Create a Menu Page
+
+<ApiLink name="lv_menu_page_create" display="lv_menu_page_create(menu, title)" /> creates a new empty Menu Page. You
+can add any Widgets to the Page.
+
+## Set a Menu Page in the main area
+
+Once a Menu Page has been created, you can set it to the main area with
+<ApiLink name="lv_menu_set_page" display="lv_menu_set_page(menu, page)" />. `NULL` to clear main and clear Menu
+history.
+
+## Set a Menu Page in the sidebar
+
+Once a Menu Page has been created, you can set it to the sidebar with
+<ApiLink name="lv_menu_set_sidebar_page" display="lv_menu_set_sidebar_page(menu, page)" />. `NULL` to clear sidebar.
+
+## Linking between Menu Pages
+
+If you have, for instance, created a button obj in the main Page. When you
+click the button Widget, you want it to open up a new Page, use
+<ApiLink name="lv_menu_set_load_page_event" display="lv_menu_set_load_page_event(menu, btn, new page)" />.
+
+## Create a Menu container, section, separator
+
+The following objects can be created so that it is easier to style the
+Menu:
+
+- <ApiLink name="lv_menu_cont_create" display="lv_menu_cont_create(parent_page)" /> creates a new empty container.
+- <ApiLink name="lv_menu_section_create" display="lv_menu_section_create(parent_page)" /> creates a new empty section.
+- <ApiLink name="lv_menu_separator_create" display="lv_menu_separator_create(parent_page)" /> creates a separator.
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when a Page is shown.
+
+   -  <ApiLink name="lv_menu_get_cur_main_page" display="lv_menu_get_cur_main_page(menu)" /> returns a pointer to Menu Page
+      that is currently displayed in the main container.
+   -  <ApiLink name="lv_menu_get_cur_sidebar_page" display="lv_menu_get_cur_sidebar_page(menu)" /> returns a pointer to Menu
+      Page that is currently displayed in the sidebar container.
+- <ApiLink name="LV_EVENT_CLICKED" /> Sent when a back button in a header from either
+   main or sidebar is clicked. <ApiLink name="LV_OBJ_FLAG_EVENT_BUBBLE" /> is enabled
+   on the buttons so you can add events to the Menu itself.
+
+   -  <ApiLink name="lv_menu_back_button_is_root" display="lv_menu_back_button_is_root(menu, button)" /> to check if button is root
+      back button.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Examples
+
+### Simple Menu
+
+<LvglExample name="lv_example_menu_sub_page" path="widgets/menu/lv_example_menu_sub_page" />
+
+### Simple Menu with root btn
+
+<LvglExample name="lv_example_menu_root_back_button" path="widgets/menu/lv_example_menu_root_back_button" />
+
+### Simple Menu with custom header
+
+<LvglExample name="lv_example_menu_custom_back_button" path="widgets/menu/lv_example_menu_custom_back_button" />
+
+### Simple Menu with floating btn to add new menu page
+
+<LvglExample name="lv_example_menu_floating_button" path="widgets/menu/lv_example_menu_floating_button" />
+
+### Complex Menu
+
+<LvglExample name="lv_example_menu_sidebar" path="widgets/menu/lv_example_menu_sidebar" />

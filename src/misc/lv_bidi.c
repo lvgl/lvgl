@@ -6,11 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_bidi_private.h"
 #include "lv_text_private.h"
-#include "lv_types.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
 
 #if LV_USE_BIDI
 
@@ -101,9 +99,14 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_base_dir_t base_dir
 }
 
 /**
- * Auto-detect the direction of a text based on the first strong character
+ * Auto-detect the base direction of a text by scanning all strong characters.
+ * RTL takes priority: if any RTL strong character is found, `LV_BASE_DIR_RTL` is returned
+ * immediately. Otherwise, `LV_BASE_DIR_LTR` is returned if any LTR strong character is found.
+ * If no strong character is present, falls back to `LV_BIDI_BASE_DIR_DEF` (except when
+ * `LV_BIDI_BASE_DIR_DEF` is `LV_BASE_DIR_AUTO`, in which case `LV_BASE_DIR_LTR` is used).
  * @param txt the text to process
- * @return `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL`
+ * @return `LV_BASE_DIR_RTL`, `LV_BASE_DIR_LTR`, or the configured `LV_BIDI_BASE_DIR_DEF`
+ *         (with `LV_BASE_DIR_LTR` used when `LV_BIDI_BASE_DIR_DEF == LV_BASE_DIR_AUTO`)
  */
 lv_base_dir_t lv_bidi_detect_base_dir(const char * txt)
 {

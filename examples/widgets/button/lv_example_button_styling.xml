@@ -1,0 +1,55 @@
+<!--
+ @title Button styling
+ @brief State-aware colors, rounded corners, shadow, and a pressed outline.
+
+ A single named style sets the resting look (rounded corners, soft shadow, a base
+ color). Separate styles attached with `selector="pressed"` and `selector="checked"`
+ swap the background color, lift the shadow, and add an outline so the rendered
+ button changes appearance when the user interacts with it.
+-->
+<screen>
+	<styles>
+		<!-- Resting look: shape, default fill, soft drop shadow -->
+		<style name="style_button"
+			bg_opa="100%" bg_color="0x3b82f6"
+			radius="12"
+			shadow_color="0x1e3a8a" shadow_width="14" shadow_offset_y="4" shadow_opa="120"
+			text_color="0xffffff" pad_all="10" />
+		<!-- Pressed: darker fill, sharper border, shadow tucked in -->
+		<style name="style_button_pressed"
+			bg_color="0x1d4ed8"
+			shadow_offset_y="1" shadow_width="6"
+			outline_color="0x60a5fa" outline_width="3" outline_pad="2" outline_opa="100%" />
+		<!-- Checked: accent fill, brighter shadow halo -->
+		<style name="style_button_checked"
+			bg_color="0x16a34a"
+			shadow_color="0x14532d" shadow_width="20" shadow_opa="160" />
+	</styles>
+
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="20">
+		<!-- 💡 Press or toggle a button to see the state-specific style swap in. -->
+		<!-- Default button (resting style only) -->
+		<lv_button name="button_1" width="180" height="48">
+			<style name="style_button" />
+			<style name="style_button_pressed" selector="pressed" />
+			<lv_label name="label_1" align="center" text="Press me" />
+		</lv_button>
+
+		<!-- Checkable button: swaps to the checked style on toggle -->
+		<lv_button name="button_2" width="180" height="48" checkable="true">
+			<style name="style_button" />
+			<style name="style_button_pressed" selector="pressed" />
+			<style name="style_button_checked" selector="checked" />
+			<lv_label name="label_2" align="center" text="Toggle me" />
+		</lv_button>
+
+		<!-- Local style_* overrides: pure-CSS-style attribute styling, no named block needed -->
+		<lv_button name="button_3" width="180" height="48"
+			style_bg_color="0xf59e0b" style_bg_opa="100%"
+			style_radius="24"
+			style_border_color="0x78350f" style_border_width="2"
+			style_text_color="0x451a03" style_pad_all="10">
+			<lv_label name="label_3" align="center" text="Local props" />
+		</lv_button>
+	</view>
+</screen>

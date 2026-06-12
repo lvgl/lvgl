@@ -1,0 +1,40 @@
+<!--
+ @title Margin
+ @brief Reserve space around one item on top of the layout's own gaps.
+
+ The row sets `style_pad_column="8"` between chips. The middle chip adds
+ `style_margin_left="24"` and `style_margin_right="24"`, so it sits
+ visibly further from its neighbors than the 8 px flex gap — margin
+ reserves space around a Widget without changing the Widget's size.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- Neutral chip -->
+		<style name="style_chip" radius="10" bg_opa="100%" bg_color="0xe2e8f0" pad_all="14" />
+		<!-- Accent chip carrying the extra margin -->
+		<style
+			name="style_chip_accent"
+			radius="10"
+			bg_opa="100%"
+			bg_color="#accent"
+			pad_all="14"
+			text_color="0xffffff"
+		/>
+	</styles>
+
+	<view flex_flow="row" style_flex_main_place="center" style_flex_track_place="center">
+		<!-- 💡 Change the middle chip's `style_margin_left`/`style_margin_right`; the side chips stay put, the gap grows. -->
+		<lv_label name="label_1" text="A">
+			<style name="style_chip" />
+		</lv_label>
+		<lv_label name="label_2" text="B" style_margin_left="48" style_margin_right="24">
+			<style name="style_chip_accent" />
+		</lv_label>
+		<lv_label name="label_3" text="C">
+			<style name="style_chip" />
+		</lv_label>
+	</view>
+</screen>

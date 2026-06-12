@@ -3,16 +3,14 @@
  *
  */
 
-#include "lv_wayland_keyboard.h"
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
 
-#include "lv_wayland_private.h"
 #include <sys/mman.h>
 #include <unistd.h>
 #include <wayland-client-protocol.h>
 #include <xkbcommon/xkbcommon.h>
-#include "../../misc/lv_log.h"
 
 /*********************
  *      INCLUDES
@@ -45,20 +43,25 @@ static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard
 static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint32_t serial, uint32_t time,
                                 uint32_t key, uint32_t state);
 
+#ifdef WL_KEYBOARD_REPEAT_INFO_SINCE_VERSION
+    static void keyboard_handle_repeat_info(void * data, struct wl_keyboard * wl_keyboard, int32_t rate, int32_t delay);
+#endif
+
 static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-static struct xkb_context * xkb_context;
-
 static const struct wl_keyboard_listener keyboard_listener = {
-    .keymap    = keyboard_handle_keymap,
-    .enter     = keyboard_handle_enter,
-    .leave     = keyboard_handle_leave,
-    .key       = keyboard_handle_key,
-    .modifiers = keyboard_handle_modifiers,
+    .keymap      = keyboard_handle_keymap,
+    .enter       = keyboard_handle_enter,
+    .leave       = keyboard_handle_leave,
+    .key         = keyboard_handle_key,
+    .modifiers   = keyboard_handle_modifiers,
+#ifdef WL_KEYBOARD_REPEAT_INFO_SINCE_VERSION
+    .repeat_info = keyboard_handle_repeat_info,
+#endif
 };
 
 /**********************
@@ -104,7 +107,9 @@ lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat
         LV_LOG_WARN("Failed to get seat keyboard");
         return NULL;
     }
-    if(!xkb_context && !(xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS))) {
+
+    struct xkb_context * xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+    if(!xkb_context) {
         LV_LOG_WARN("Failed to create xkb context");
         return NULL;
     }
@@ -118,6 +123,7 @@ lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat
     wl_keyboard_add_listener(keyboard, &keyboard_listener, NULL);
     wl_keyboard_set_user_data(keyboard, wl_seat_keyboard);
 
+    wl_seat_keyboard->xkb_context = xkb_context;
     wl_seat_keyboard->wl_keyboard = keyboard;
     lv_wayland_update_indevs(keyboard_read, wl_seat_keyboard);
 
@@ -126,6 +132,10 @@ lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat
 void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard)
 {
     lv_wayland_update_indevs(keyboard_read, NULL);
+    wl_keyboard_destroy(seat_keyboard->wl_keyboard);
+    xkb_context_unref(seat_keyboard->xkb_context);
+    xkb_keymap_unref(seat_keyboard->xkb_keymap);
+    xkb_state_unref(seat_keyboard->xkb_state);
     lv_free(seat_keyboard);
 }
 
@@ -162,7 +172,7 @@ static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard, u
     }
 
     /* Set up XKB keymap */
-    struct xkb_keymap * keymap = xkb_keymap_new_from_string(xkb_context, map_str, XKB_KEYMAP_FORMAT_TEXT_V1, 0);
+    struct xkb_keymap * keymap = xkb_keymap_new_from_string(kbdata->xkb_context, map_str, XKB_KEYMAP_FORMAT_TEXT_V1, 0);
     munmap(map_str, size);
     close(fd);
 
@@ -250,6 +260,17 @@ static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard
 
     xkb_state_update_mask(kbdata->xkb_state, mods_depressed, mods_latched, mods_locked, 0, 0, group);
 }
+
+#ifdef WL_KEYBOARD_REPEAT_INFO_SINCE_VERSION
+static void keyboard_handle_repeat_info(void * data, struct wl_keyboard * wl_keyboard, int32_t rate, int32_t delay)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(wl_keyboard);
+    LV_UNUSED(rate);
+    LV_UNUSED(delay);
+}
+#endif
+
 static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key)
 {
 

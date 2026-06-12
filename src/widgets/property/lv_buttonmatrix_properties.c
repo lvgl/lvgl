@@ -4,7 +4,7 @@
  * @file lv_buttonmatrix_properties.c
  */
 
-#include "../buttonmatrix/lv_buttonmatrix.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

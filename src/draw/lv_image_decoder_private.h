@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_image_decoder.h"
+
 #include "../misc/cache/lv_cache.h"
 
 /*********************
@@ -132,6 +132,10 @@ void lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_coun
  * Deinitialize the image decoder module
  */
 void lv_image_decoder_deinit(void);
+
+lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
+                                                 lv_image_cache_data_t * search_key,
+                                                 const lv_draw_buf_t * decoded, void * user_data);
 
 /**********************
  *      MACROS

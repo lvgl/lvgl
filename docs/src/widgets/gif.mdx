@@ -1,0 +1,72 @@
+---
+title: "GIF (lv_gif)"
+description: "Display animated GIFs through the AnimatedGIF decoder library."
+---
+
+## Overview
+
+The GIF widget displays animated GIFs using the
+[AnimatedGIF](https://github.com/bitbank2/AnimatedGIF/tree/master) library.
+Enable it by setting <ApiLink name="LV_USE_GIF" /> to `1` in `lv_conf.h`.
+
+## Image source
+
+<LvglExample name="lv_example_gif_src" path="libs/gif/lv_example_gif_src" />
+
+The example above shows the same bulb GIF loaded two ways: from an embedded
+`lv_image_dsc_t` array (left) and from a file path (right).
+
+<ApiLink name="lv_gif_set_src" display="lv_gif_set_src(widget, src)" /> works like <ApiLink name="lv_image_set_src" />,
+accepting image descriptors (<ApiLink name="lv_image_dsc_t" />) or file paths:
+
+```c
+lv_gif_set_src(widget, "S:path/to/example.gif");
+```
+
+A file system driver must be registered to open images from files — see
+[File System (lv_fs_drv)](/main-modules/fs).
+
+## Color format
+
+<ApiLink name="lv_gif_set_color_format" display="lv_gif_set_color_format(widget, color_format)" /> sets the GIF
+framebuffer color format. The default is <ApiLink name="LV_COLOR_FORMAT_ARGB8888" /> (required for
+transparency). Matching the display's color format avoids a conversion step
+during rendering. Call this before <ApiLink name="lv_gif_set_src" /> to avoid allocating the
+default ARGB8888 framebuffer first.
+
+Supported formats:
+
+- <ApiLink name="LV_COLOR_FORMAT_RGB565" />
+- <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED" />
+- <ApiLink name="LV_COLOR_FORMAT_RGB888" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />
+
+## Converting GIF files to C arrays
+
+```bash
+python ./scripts/LVGLImage.py --cf RAW --ofmt C -o . --name my_gif_image_array input.gif
+```
+
+```c
+LV_IMAGE_DECLARE(my_gif_image_array);
+lv_obj_t * img = lv_gif_create(lv_screen_active());
+lv_gif_set_color_format(img, LV_COLOR_FORMAT_ARGB8888);
+lv_gif_set_src(img, &my_gif_image_array);
+```
+
+## Memory requirements
+
+Displaying a GIF animation requires ~25 kB of RAM plus
+`(pixel_size + 1) × width × height` bytes for the framebuffer.
+RGB565 = 2 bytes/pixel, RGB888 = 3, ARGB8888 = 4.
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> A background rectangle that uses the [typical
+  background style properties](/common-widget-features/styles/overview).
+
+## Events
+
+<ApiLink name="LV_EVENT_READY" /> is emitted when the animation completes its last frame.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.

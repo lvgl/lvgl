@@ -5,9 +5,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_mem.h"
+
+#include "../../lvgl_public.h"
+
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_CLIB
-#include "../../stdlib/lv_mem.h"
+
 #include <stdlib.h>
 
 /*********************

@@ -1,0 +1,102 @@
+<!--
+ @title Grid RTL
+ @brief Reverse column order with style_base_dir.
+
+ Both grids declare the same three columns and the same children. Setting style_base_dir
+ to rtl on the second grid flips the column order, so cell 0 appears on the right
+ without changing how children are referenced or ordered in XML.
+-->
+<screen>
+	<styles>
+		<!-- Shared style for numbered badges -->
+		<style name="style_badge" bg_opa="100%" text_color="0xffffff" pad_all="6" radius="4" />
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="8"
+	>
+		<!-- 💡 Switch style_base_dir between ltr and rtl to see column order flip. -->
+		<!-- LTR reference block -->
+		<lv_label name="label_1" text="LTR (default):" />
+		<lv_obj
+			name="container_1"
+			style_grid_column_dsc_array="40 40 40"
+			style_grid_row_dsc_array="38"
+			style_layout="grid"
+			width="280"
+			height="content"
+		>
+			<lv_label
+				name="label_2"
+				style_grid_cell_column_pos="0"
+				style_grid_cell_row_pos="0"
+				style_bg_color="0x3498db"
+				text="0"
+			>
+				<style name="style_badge" />
+			</lv_label>
+			<lv_label
+				name="label_3"
+				style_grid_cell_column_pos="1"
+				style_grid_cell_row_pos="0"
+				style_bg_color="0x2ecc71"
+				text="1"
+			>
+				<style name="style_badge" />
+			</lv_label>
+			<lv_label
+				name="label_4"
+				style_grid_cell_column_pos="2"
+				style_grid_cell_row_pos="0"
+				style_bg_color="0xe74c3c"
+				text="2"
+			>
+				<style name="style_badge" />
+			</lv_label>
+		</lv_obj>
+
+		<!-- RTL block with identical children -->
+		<lv_label name="label_5" text="RTL:" />
+		<lv_obj
+			name="container_2"
+			style_base_dir="rtl"
+			style_grid_column_dsc_array="40 40 40"
+			style_grid_row_dsc_array="38"
+			style_layout="grid"
+			width="280"
+			height="content"
+		>
+			<lv_label
+				name="label_6"
+				style_grid_cell_column_pos="0"
+				style_grid_cell_row_pos="0"
+				style_bg_color="0x3498db"
+				text="0"
+			>
+				<style name="style_badge" />
+			</lv_label>
+			<lv_label
+				name="label_7"
+				style_grid_cell_column_pos="1"
+				style_grid_cell_row_pos="0"
+				style_bg_color="0x2ecc71"
+				text="1"
+			>
+				<style name="style_badge" />
+			</lv_label>
+			<lv_label
+				name="label_8"
+				style_grid_cell_column_pos="2"
+				style_grid_cell_row_pos="0"
+				style_bg_color="0xe74c3c"
+				text="2"
+			>
+				<style name="style_badge" />
+			</lv_label>
+		</lv_obj>
+	</view>
+</screen>

@@ -7,14 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "lv_opengles_texture.h"
+#include "../../lvgl_public.h"
+
 #if LV_USE_OPENGLES
 
 #include "lv_opengles_debug.h"
-#include "lv_opengles_driver.h"
 
-#include "../../misc/lv_types.h"
-#include "../../stdlib/lv_mem.h"
 #include "lv_opengles_private.h"
 #include "lv_opengles_texture_private.h"
 #include "../../display/lv_display_private.h"

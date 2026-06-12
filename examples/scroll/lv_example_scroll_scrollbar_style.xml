@@ -1,0 +1,32 @@
+<!--
+ @title Styling the scrollbar
+ @brief Restyle the SCROLLBAR part into a thick, rounded, coloured bar.
+
+ The scrollbar is the `scrollbar` part of any scrollable Widget. A named
+ style attached with `selector="scrollbar"` overrides its `width`
+ (thickness), `radius`, fill colour/opacity and `pad_right` (gap from
+ the edge). `scrollbar_mode="on"` keeps it visible so the styling is
+ always seen.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x9429ff" />
+	</consts>
+	<styles>
+		<!-- The scrollbar part: thick rounded accent bar inset from the edge -->
+		<style name="style_scrollbar" width="10" radius="5" bg_color="#accent" bg_opa="100%" pad_right="4" pad_top="4" />
+	</styles>
+
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
+		<!-- 💡 Drag the panel — the wide blue rounded bar is the styled `scrollbar` part. -->
+		<lv_obj name="container" width="240" height="160" flex_flow="column" style_pad_row="8" scrollbar_mode="on">
+			<style name="style_scrollbar" selector="scrollbar" />
+			<lv_button name="button_1" width="100%"><lv_label name="label_1" align="center" text="Row 1" /></lv_button>
+			<lv_button name="button_2" width="100%"><lv_label name="label_2" align="center" text="Row 2" /></lv_button>
+			<lv_button name="button_3" width="100%"><lv_label name="label_3" align="center" text="Row 3" /></lv_button>
+			<lv_button name="button_4" width="100%"><lv_label name="label_4" align="center" text="Row 4" /></lv_button>
+			<lv_button name="button_5" width="100%"><lv_label name="label_5" align="center" text="Row 5" /></lv_button>
+			<lv_button name="button_6" width="100%"><lv_label name="label_6" align="center" text="Row 6" /></lv_button>
+		</lv_obj>
+	</view>
+</screen>

@@ -53,6 +53,18 @@ static void dd_event_handler(lv_event_t * e)
 }
 #endif
 
+/**
+ * @title Quick access toggle and sort control
+ * @brief File explorer with a header button to hide quick access and a dropdown to change sort mode.
+ *
+ * Adds a checkable button and a dropdown into the file explorer's header
+ * (`lv_file_explorer_get_header`). Toggling the button adds or removes
+ * `LV_OBJ_FLAG_HIDDEN` on the quick access panel returned by
+ * `lv_file_explorer_get_quick_access_area`. The dropdown switches between
+ * `LV_EXPLORER_SORT_NONE` and `LV_EXPLORER_SORT_KIND` via
+ * `lv_file_explorer_set_sort`. A separate `LV_EVENT_ALL` handler logs the current
+ * path and selected file name.
+ */
 void lv_example_file_explorer_2(void)
 {
     lv_obj_t * file_explorer = lv_file_explorer_create(lv_screen_active());

@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_layout.h"
+
 #include "lv_layout_private.h"
 #include "../core/lv_global.h"
 

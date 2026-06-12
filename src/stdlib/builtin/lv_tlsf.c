@@ -1,11 +1,8 @@
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #include "lv_tlsf_private.h"
-#include "../../stdlib/lv_string.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_types.h"
+#include "../../lvgl_public.h"
 
 #undef  printf
 #define printf LV_LOG_ERROR

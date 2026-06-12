@@ -1,0 +1,53 @@
+---
+title: "Window (lv_win)"
+description: "A header (like a title bar) with a title and buttons, plus a content area below."
+---
+
+## Overview
+
+The Window widget is built from a header (like a title bar) with a title
+and optional buttons, plus a content area below.
+
+## Create a Window
+
+<ApiLink name="lv_win_create" display="lv_win_create(parent)" /> creates a Window that is initially
+composed of the following Widget structure:
+
+- Background (a [base widget](/widgets/base_widget), the main window container), is set up to be a
+  Flex-Flow container that flows its contained Widgets vertically
+  (<ApiLink name="LV_FLEX_FLOW_COLUMN" />).
+- Header (like a title bar) is initially empty, and is a Flex-Flow container set up
+  to flow its contained Widgets horizontally (<ApiLink name="LV_FLEX_FLOW_ROW" />),
+  left to right.  The Header occupies the full width of the Background (its parent)
+  and the top approximately 1/2 inch (according to <ApiLink name="LV_DPI_DEF" />).
+- Content Area (a [base widget](/widgets/base_widget)) occupies the full width of the Background (its
+  parent) the remainder of the available Background area below the Header.  It is
+  *not itself* a Flex-Flow container, but you can make it so if you wish.  See
+  [Flex](/common-widget-features/layouts/flex) for details.
+
+## Title and buttons
+
+Add buttons and labels to the header with the two helpers below. Items are
+placed left to right in the order they are added; either function can be
+called any number of times.
+
+- <ApiLink name="lv_win_add_title" display="lv_win_add_title(win, &quot;The title&quot;)" />
+  adds a label to the header. Its long mode is
+  <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> (text that is too wide ends with `...`)
+  and its `flex_grow` is `1`, so it takes the remaining space and pushes any
+  later buttons to the right end. If you add more than one title, the labels
+  share the free space equally — change `flex_grow` to weight them
+  differently. See [Flex](/common-widget-features/layouts/flex) for details.
+- <ApiLink name="lv_win_add_button" display="lv_win_add_button(win, icon, button_width)" />
+  adds a button of the given width that fills the header height. If `icon`
+  is not `NULL`, it is used as an image centered on the button — any valid
+  image source works, e.g. <ApiLink name="LV_SYMBOL_CLOSE" /> for an `x`. The
+  returned pointer lets you attach event callbacks.
+
+## Getting the parts
+
+<ApiLink name="lv_win_get_header" display="lv_win_get_header(win)" /> returns a pointer to the header,
+<ApiLink name="lv_win_get_content" display="lv_win_get_content(win)" /> returns a pointer to the content container
+to which the content of the window can be added.
+
+<LvglExample name="lv_example_win_toolbar" path="widgets/win/lv_example_win_toolbar" />

@@ -44,7 +44,18 @@ static void slider_prg_event_handler(lv_event_t * e)
 }
 
 /**
- * Create an animation timeline
+ * @title Animation timeline with transport controls
+ * @brief Drive staggered grow animations through a timeline the user can pause or scrub.
+ *
+ * Three 90x70 objects are laid out in a flex row with a checkable Start
+ * button, a Pause button, and a progress slider ranged to
+ * `LV_ANIM_TIMELINE_PROGRESS_MAX`. An `lv_anim_timeline_t` schedules width
+ * and height animations for each object (`lv_anim_path_overshoot` for width
+ * and `lv_anim_path_ease_out` for height, each 300 ms) starting at offsets
+ * 0, 200, and 400 ms, plus a linear 700 ms animation that sweeps the
+ * slider. The Start button toggles forward and reverse playback via
+ * `lv_anim_timeline_set_reverse`, Pause calls `lv_anim_timeline_pause`, and
+ * dragging the slider calls `lv_anim_timeline_set_progress`.
  */
 void lv_example_anim_timeline_1(void)
 {

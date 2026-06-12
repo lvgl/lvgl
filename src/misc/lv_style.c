@@ -6,12 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_style_private.h"
+
+#include "../lvgl_public.h"
 #include "../core/lv_global.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
-#include "lv_assert.h"
-#include "lv_types.h"
 
 /*********************
  *      DEFINES
@@ -167,6 +164,7 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROP
 #endif
     [LV_STYLE_IMAGE_COLORKEY]         = 0,
 
+    [LV_STYLE_TEXT_LEADING_TRIM] =     LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
 };
 
 /**********************

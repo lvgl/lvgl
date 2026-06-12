@@ -1,0 +1,33 @@
+---
+title: Transitions
+description: "By default, when a Widget changes state (e.g."
+---
+
+## Overview
+
+By default, when a Widget changes state the new properties are applied immediately.
+A transition instead animates the change — e.g. on press a button's background color
+fades to the pressed color over 300 ms.
+
+<LvglExample name="lv_example_style_transition" path="styles/lv_example_style_transition" />
+
+Transition parameters are stored in the style and set per state — the duration, delay,
+animation path (easing function) and the list of properties to animate. Defining them
+per state controls each direction independently: a 100 ms time in the pressed state
+and 500 ms in the default state enters the pressed look quickly and returns slowly.
+
+To describe a transition, an <ApiLink name="lv_style_transition_dsc_t" /> variable needs to be
+initialized and added to a style:
+
+```c
+/* Only its pointer is saved so must static, global or dynamically allocated */
+static const lv_style_prop_t trans_props[] = {
+                                            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
+                                            0, /* End marker */
+};
+
+static lv_style_transition_dsc_t trans1;
+lv_style_transition_dsc_init(&trans1, trans_props, lv_anim_path_ease_out, duration_ms, delay_ms);
+
+lv_style_set_transition(&style1, &trans1);
+```

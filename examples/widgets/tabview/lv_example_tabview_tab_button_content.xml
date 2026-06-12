@@ -1,0 +1,34 @@
+<!--
+ @title Tab view tab-button content
+ @brief Attach a child widget to a specific tab button via `<lv_tabview-tab_button>`.
+
+ `<lv_tabview-tab_button index="N">` selects the implicit tab button at the
+ given index so additional children can be parented to it after the tab has
+ been created. Both tab buttons here pick up a small `lv_switch` beside the
+ caption — handy for inline toggles or status indicators without having to
+ build a custom tab bar from scratch. The tab elements come first so the
+ buttons exist by the time the `_button` references attach to them.
+-->
+<screen>
+	<view>
+		<!-- 💡 Tap the switch inside a tab button — it lives on the tab button itself, not on the tab content. -->
+		<lv_tabview name="tabview" width="100%" height="100%">
+			<lv_tabview-tab text="WiFi">
+				<lv_label name="label_1" align="center" text="WiFi tab content" />
+			</lv_tabview-tab>
+			<lv_tabview-tab text="Bluetooth">
+				<lv_label name="label_2" align="center" text="Bluetooth tab content" />
+			</lv_tabview-tab>
+
+			<!-- Switch parented to the first tab's button -->
+			<lv_tabview-tab_button index="0">
+				<lv_switch name="sw_1" width="40" height="20" ignore_layout="true" align="right_mid" x="-10" />
+			</lv_tabview-tab_button>
+
+			<!-- Switch parented to the second tab's button -->
+			<lv_tabview-tab_button index="1">
+				<lv_switch name="sw_2" width="40" height="20" ignore_layout="true" align="right_mid" x="-10" />
+			</lv_tabview-tab_button>
+		</lv_tabview>
+	</view>
+</screen>

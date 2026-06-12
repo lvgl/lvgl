@@ -6,12 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_gridnav.h"
+#include "../lvgl_public.h"
 #if LV_USE_GRIDNAV
 
-#include "../misc/lv_assert.h"
-#include "../misc/lv_math.h"
-#include "../indev/lv_indev.h"
 #include "../core/lv_obj_private.h"
 
 /*********************

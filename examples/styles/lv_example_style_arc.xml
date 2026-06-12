@@ -1,0 +1,34 @@
+<!--
+ @title Arc stroke
+ @brief Style the arc's ring and indicator into a modern progress dial.
+
+ `arc_width` and `arc_rounded="true"` give both parts a thick, round-capped
+ stroke. On `selector="main"` `arc_color` is a light neutral track; on
+ `selector="indicator"` it is the accent, so the same three properties
+ produce a clean circular-progress look.
+-->
+<screen>
+	<consts>
+		<color name="accent" value="0x6366f1" />
+	</consts>
+	<styles>
+		<!-- Unfilled background ring: soft neutral track -->
+		<style name="style_bg" arc_color="#accent" arc_width="14" arc_opa="20%" arc_rounded="true" />
+		<!-- Active ring: accent progress -->
+		<style name="style_indicator" arc_color="#accent" arc_width="14" arc_rounded="true" />
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="12"
+	>
+		<!-- 💡 Change `arc_width` or either `arc_color`; track and progress restyle independently. -->
+		<lv_arc name="arc" width="160" height="160" min_value="0" max_value="100" value="68">
+			<style name="style_bg" selector="main" />
+			<style name="style_indicator" selector="indicator" />
+		</lv_arc>
+	</view>
+</screen>

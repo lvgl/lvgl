@@ -17,7 +17,6 @@
 #include <drm/drm_fourcc.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../../misc/lv_types.h"
 #include <string.h>
 #include "../../draw/nxp/g2d/lv_g2d_utils.h"
 #include <stdio.h>
@@ -190,6 +189,7 @@ static void wl_g2d_deinit(void * backend_ctx)
     }
     if(ctx->handler) {
         zwp_linux_dmabuf_v1_destroy(ctx->handler);
+        ctx->handler = NULL;
     }
 }
 
@@ -382,7 +382,7 @@ static void buffer_release(void * data, struct wl_buffer * buffer)
 
 static void create_succeeded(void * data, struct zwp_linux_buffer_params_v1 * params, struct wl_buffer * new_buffer)
 {
-    LV_LOG_TRACE("Buffer created successfuly");
+    LV_LOG_TRACE("Buffer created successfully");
     lv_wl_buffer_t * buffer = data;
     buffer->wl_buffer = new_buffer;
 

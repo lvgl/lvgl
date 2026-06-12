@@ -148,6 +148,31 @@ static void test_widgets(const char * img_name)
     lv_obj_clean(scr_act);
 }
 
+void test_theme_default_resolution_change_no_recursion(void)
+{
+    lv_theme_t * theme = lv_theme_default_init(NULL,
+                                               lv_palette_main(LV_PALETTE_BLUE),
+                                               lv_palette_main(LV_PALETTE_RED),
+                                               true, LV_FONT_DEFAULT);
+    lv_display_set_theme(NULL, theme);
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Resolution change test");
+    lv_button_create(lv_screen_active());
+
+    lv_display_set_resolution(NULL, 320, 240);
+
+    TEST_ASSERT_NOT_NULL(lv_screen_active());
+    TEST_ASSERT_TRUE(lv_theme_default_is_inited());
+
+    lv_display_set_resolution(NULL, 800, 480);
+
+    TEST_ASSERT_NOT_NULL(lv_screen_active());
+    TEST_ASSERT_TRUE(lv_theme_default_is_inited());
+
+    lv_obj_clean(lv_screen_active());
+}
+
 void test_theme_default(void)
 {
     TEST_ASSERT_TRUE(lv_theme_default_is_inited());

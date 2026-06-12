@@ -3,7 +3,7 @@
  *
  */
 
-#include "lv_wayland_pointer.h"
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
 
@@ -13,7 +13,6 @@
 #include <wayland-cursor.h>
 #include <xkbcommon/xkbcommon.h>
 #include <linux/input-event-codes.h>
-#include "lv_wayland_private.h"
 
 /*********************
  *      INCLUDES
@@ -50,11 +49,13 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
 static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer, uint32_t time, uint32_t axis,
                                 wl_fixed_t value);
 
+#ifdef WL_POINTER_FRAME_SINCE_VERSION
+    static void pointer_handle_frame(void * data, struct wl_pointer * pointer);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static struct wl_cursor_theme * cursor_theme = NULL;
 
 static const struct wl_pointer_listener pointer_listener = {
     .enter  = pointer_handle_enter,
@@ -62,6 +63,9 @@ static const struct wl_pointer_listener pointer_listener = {
     .motion = pointer_handle_motion,
     .button = pointer_handle_button,
     .axis   = pointer_handle_axis,
+#ifdef WL_POINTER_FRAME_SINCE_VERSION
+    .frame  = pointer_handle_frame,
+#endif
 };
 
 /**********************
@@ -118,7 +122,9 @@ lv_wl_seat_pointer_t * lv_wayland_seat_pointer_create(struct wl_seat * seat, str
 {
     LV_ASSERT_NULL(seat);
     LV_ASSERT_NULL(surface);
-    if(!cursor_theme && !(cursor_theme = wl_cursor_theme_load(NULL, 32, lv_wl_ctx.wl_shm))) {
+
+    struct wl_cursor_theme * cursor_theme = wl_cursor_theme_load(NULL, 32, lv_wl_ctx.wl_shm);
+    if(!cursor_theme) {
         LV_LOG_WARN("Failed to load cursor theme for pointer");
         return NULL;
     }
@@ -126,6 +132,7 @@ lv_wl_seat_pointer_t * lv_wayland_seat_pointer_create(struct wl_seat * seat, str
     struct wl_pointer * pointer = wl_seat_get_pointer(seat);
     if(!pointer) {
         LV_LOG_WARN("Failed to get seat pointer");
+        wl_cursor_theme_destroy(cursor_theme);
         return NULL;
     }
 
@@ -133,11 +140,14 @@ lv_wl_seat_pointer_t * lv_wayland_seat_pointer_create(struct wl_seat * seat, str
     LV_ASSERT_MALLOC(wl_seat_pointer);
     if(!wl_seat_pointer) {
         LV_LOG_WARN("Failed to allocate memory for wayland pointer");
+        wl_pointer_destroy(pointer);
+        wl_cursor_theme_destroy(cursor_theme);
         return NULL;
     }
     wl_pointer_add_listener(pointer, &pointer_listener, NULL);
     wl_pointer_set_user_data(pointer, wl_seat_pointer);
 
+    wl_seat_pointer->cursor_theme = cursor_theme;
     wl_seat_pointer->cursor_surface = surface;
     wl_seat_pointer->wl_pointer = pointer;
     lv_wayland_update_indevs(pointer_read, wl_seat_pointer);
@@ -151,6 +161,7 @@ void lv_wayland_seat_pointer_delete(lv_wl_seat_pointer_t * seat_pointer)
     lv_wayland_update_indevs(pointer_read, NULL);
     lv_wayland_update_indevs(pointeraxis_read, NULL);
     wl_pointer_destroy(seat_pointer->wl_pointer);
+    wl_cursor_theme_destroy(seat_pointer->cursor_theme);
     lv_free(seat_pointer);
 }
 
@@ -192,7 +203,7 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
     seat_pointer->point.x = pos_x;
     seat_pointer->point.y = pos_y;
 
-    struct wl_cursor * wl_cursor = wl_cursor_theme_get_cursor(cursor_theme, LV_WAYLAND_DEFAULT_CURSOR_NAME);
+    struct wl_cursor * wl_cursor = wl_cursor_theme_get_cursor(seat_pointer->cursor_theme, LV_WAYLAND_DEFAULT_CURSOR_NAME);
     struct wl_cursor_image * cursor_image = wl_cursor->images[0];
 
     wl_pointer_set_cursor(pointer, serial, seat_pointer->cursor_surface, cursor_image->hotspot_x, cursor_image->hotspot_y);
@@ -258,5 +269,15 @@ static void pointer_handle_axis(void * data, struct wl_pointer * pointer, uint32
     }
     seat_pointer->wheel_diff += diff;
 }
+
+#ifdef WL_POINTER_FRAME_SINCE_VERSION
+static void pointer_handle_frame(void * data, struct wl_pointer * pointer)
+{
+    LV_UNUSED(data);
+    LV_UNUSED(pointer);
+    lv_wayland_indevs_ready(pointer_read);
+    lv_wayland_indevs_ready(pointeraxis_read);
+}
+#endif
 
 #endif /* LV_USE_WAYLAND */

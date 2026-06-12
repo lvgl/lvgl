@@ -11,7 +11,6 @@
 
 #if LV_USE_DEMO_GLTF
 
-#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -324,7 +323,7 @@ static void create_background_panel(lv_obj_t * panel)
     lv_obj_t * background_dropdown = add_dropdown_to_row(bg_row);
     style_dropdown(background_dropdown);
 
-    lv_dropdown_set_options(background_dropdown, "Solid Color\nEnvironnement");
+    lv_dropdown_set_options(background_dropdown, "Solid Color\nEnvironment");
     lv_dropdown_bind_value(background_dropdown, &background_subject);
 
     lv_obj_t * env_brightness_title = add_title_to_row(bg_row, "");
@@ -341,13 +340,13 @@ static void create_background_panel(lv_obj_t * panel)
     lv_obj_t * background_blur_title = add_title_to_row(bg_row, "");
     lv_label_bind_text(background_blur_title, &background_blur_subject, "Background Blur %d");
 
-    lv_obj_t * backgorund_blur_slider = lv_slider_create(bg_row);
-    lv_slider_bind_value(backgorund_blur_slider, &background_blur_subject);
-    lv_obj_set_width(backgorund_blur_slider, LV_PCT(100));
-    lv_slider_set_min_value(backgorund_blur_slider, 0);
-    lv_slider_set_max_value(backgorund_blur_slider, 100);
+    lv_obj_t * background_blur_slider = lv_slider_create(bg_row);
+    lv_slider_bind_value(background_blur_slider, &background_blur_subject);
+    lv_obj_set_width(background_blur_slider, LV_PCT(100));
+    lv_slider_set_min_value(background_blur_slider, 0);
+    lv_slider_set_max_value(background_blur_slider, 100);
 
-    style_slider(backgorund_blur_slider, SLIDER_COLOR);
+    style_slider(background_blur_slider, SLIDER_COLOR);
 
 }
 
@@ -569,7 +568,7 @@ static void style_dropdown(lv_obj_t * dropdown)
     lv_obj_set_style_bg_color(dropdown, lv_color_hex(0x404040), LV_PART_MAIN);
     lv_obj_set_style_bg_grad_color(dropdown, lv_color_hex(0x4A4A4A), LV_PART_MAIN);
     lv_obj_set_style_text_color(dropdown, lv_color_white(), LV_PART_MAIN);
-    lv_obj_t * dropdown_list = ((lv_dropdown_t *)dropdown)->list;
+    lv_obj_t * dropdown_list = lv_dropdown_get_list(dropdown);
     lv_obj_set_style_clip_corner(dropdown_list, false, LV_PART_MAIN);
 }
 

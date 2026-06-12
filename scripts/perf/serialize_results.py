@@ -52,7 +52,7 @@ There are 3 possibilities when handling these files
     In this case we create a new `file1.mpk` with a single history entry.
 
 3. `file1.mpk` exists but `file1.json` doesn't: Happens when an old config isn't tested anymore for any reason.
-    In this case we simpyl copy the old `file1.mpk`
+    In this case we simply copy the old `file1.mpk`
 """
 
 import argparse
@@ -141,7 +141,7 @@ def main():
 
     # Keep old mpk files
     for mpk_file in input_mpk:
-        print(f"Couldn't find new reults to add to {mpk_file}. Copying it")
+        print(f"Couldn't find new results to add to {mpk_file}. Copying it")
         mpk_path = path(input_folder, mpk_file)
         output_path = path(output_folder, mpk_file)
         shutil.copy2(mpk_path, output_path)

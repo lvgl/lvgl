@@ -1,0 +1,207 @@
+---
+title: "Arc (lv_arc)"
+description: "Background arc with a foreground indicator the user can drag with touch."
+---
+
+## Overview
+
+An Arc has a background arc and a foreground (indicator) arc. The
+indicator can be dragged with touch input to change the value.
+
+## Value and range
+
+<LvglExample name="lv_example_arc_value_range" path="widgets/arc/lv_example_arc_value_range" />
+
+A new value can be set using <ApiLink name="lv_arc_set_value" display="lv_arc_set_value(arc, new_value)" />. The
+value is interpreted in a range (minimum and maximum values) which can
+be modified with <ApiLink name="lv_arc_set_range" display="lv_arc_set_range(arc, min, max)" />. The default range
+is 0..100.
+
+The indicator Arc is drawn on the main part's Arc. Thus, if the value is
+set to maximum, the indicator Arc will cover the entire "background" Arc.
+To set the start and end angle of the background Arc use any of these functions:
+
+- <ApiLink name="lv_arc_set_bg_start_angle" display="lv_arc_set_bg_start_angle(arc, angle)" />
+- <ApiLink name="lv_arc_set_bg_end_angle" display="lv_arc_set_bg_end_angle(arc, angle)" />
+- <ApiLink name="lv_arc_set_bg_angles" display="lv_arc_set_bg_angles(arc, start_angle, end_angle)" />
+
+Zero degrees is at the middle right (3 o'clock) of the Widget and the
+degrees increasing in the clockwise direction.  The angle values should be in
+the range [0..360].
+
+## Rotation
+
+<LvglExample name="lv_example_arc_rotation" path="widgets/arc/lv_example_arc_rotation" />
+
+An offset to the 0-degree position can be added with
+<ApiLink name="lv_arc_set_rotation" display="lv_arc_set_rotation(arc, deg)" />.
+
+## Mode
+
+<LvglExample name="lv_example_arc_mode" path="widgets/arc/lv_example_arc_mode" />
+
+The Arc can be one of the following modes:
+
+- <ApiLink name="LV_ARC_MODE_NORMAL" /> Indicator Arc is drawn clockwise from minimum to current value.
+- <ApiLink name="LV_ARC_MODE_REVERSE" /> Indicator Arc is drawn counter-clockwise
+  from maximum to current value.
+- <ApiLink name="LV_ARC_MODE_SYMMETRICAL" /> Indicator Arc is drawn from middle point to current value.
+
+The mode can be set by <ApiLink name="lv_arc_set_mode" display="lv_arc_set_mode(arc, LV_ARC_MODE_...)" /> and
+has no effect until angle is set by <ApiLink name="lv_arc_set_value" /> or value of the Arc
+is changed by pointer input (finger, mouse, etc.).
+
+## Change rate
+
+<LvglExample name="lv_example_arc_change_rate" path="widgets/arc/lv_example_arc_change_rate" />
+
+When the Arc's value is changed by pointer input (finger, mouse, etc.), the rate of
+its change is limited according to its *change rate*.  Change rate is defined in
+degrees/second units and can be set with
+<ApiLink name="lv_arc_set_change_rate" display="lv_arc_set_change_rate(arc, rate)" />
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> Draws a background using the typical background
+   style properties and an arc using the Arc style properties. The Arc's
+   size and position will respect the *padding* style properties.
+- <ApiLink name="LV_PART_INDICATOR" /> Draws another Arc using the *Arc* style
+   properties. Its padding values are interpreted relative to the
+   background Arc.
+- <ApiLink name="LV_PART_KNOB" /> Draws a handle on the end of the indicator using all
+   background properties and padding values. With zero padding the knob
+   size is the same as the indicator's width. Larger padding makes it
+   larger, smaller padding makes it smaller.
+
+<LvglExample name="lv_example_arc_styling" path="widgets/arc/lv_example_arc_styling" />
+
+Arc's three parts — <ApiLink name="LV_PART_MAIN" /> (background ring),
+<ApiLink name="LV_PART_INDICATOR" /> (active arc), and
+<ApiLink name="LV_PART_KNOB" /> — are styled independently. Use the
+`arc_*` style properties (`arc_color`, `arc_width`, `arc_rounded`,
+`arc_opa`) for the two rings; the knob is a fill and accepts the full
+`bg_*`, `border_*`, `shadow_*`, and `pad_*` stack. Attach a named style
+via `selector="main"`, `selector="indicator"`, or `selector="knob"`,
+or apply one-off tweaks with local `style_*` attributes on the
+`<lv_arc>` tag.
+
+### Image indicator
+
+<LvglExample name="lv_example_arc_img_indicator" path="widgets/arc/lv_example_arc_img_indicator" />
+
+Setting `arc_image_src` on a part replaces the solid `arc_color` with pixels
+sampled from a bitmap. The image is centred on the arc's centre point and the
+arc shape is used as a mask, so any graphic painted in the ring zone of the
+image appears clipped to the arc band. Assign different bitmaps to
+<ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_PART_INDICATOR" /> to
+texture both the background ring and the active sweep independently.
+
+- <ApiLink name="lv_obj_set_style_arc_image_src" display="lv_obj_set_style_arc_image_src(arc, src, selector)" />
+
+## Knob offset
+
+Changing the knob offset allows the location of the knob to be moved
+relative to the end of the Arc.  The knob offset can be set by
+<ApiLink name="lv_arc_set_knob_offset" display="lv_arc_set_knob_offset(arc, offset_angle)" />, and will only be visible if
+<ApiLink name="LV_PART_KNOB" /> is visible.
+
+## Setting indicator programmatically
+
+<LvglExample name="lv_example_arc_set_angles" path="widgets/arc/lv_example_arc_set_angles" />
+
+Set the indicator angle directly with:
+
+- <ApiLink name="lv_arc_set_start_angle" display="lv_arc_set_start_angle(arc, angle)" />
+- <ApiLink name="lv_arc_set_end_angle" display="lv_arc_set_end_angle(arc, angle)" />
+- <ApiLink name="lv_arc_set_angles" display="lv_arc_set_angles(arc, start, end)" />
+
+When set this way, `value` and `mode` are ignored — pick either the
+value-based or the angle-based API, don't mix.
+
+To make the arc display-only, hide the knob and disable clicks:
+
+```c
+lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+```
+
+## Interactive area
+
+By default the whole bounding box of the arc accepts input. Enabling
+<ApiLink name="LV_OBJ_FLAG_ADV_HITTEST" /> narrows the hit area to the band between the
+start and end angles, with a <ApiLink name="lv_dpx" display="lv_dpx(50)" /> tolerance at each end.
+<ApiLink name="lv_obj_set_ext_click_area" /> extends the sensitive area outward (or, with
+advanced hit-test, both inward and outward).
+
+## Place another Widget on the knob
+
+<LvglExample name="lv_example_arc_knob_widget" path="widgets/arc/lv_example_arc_knob_widget" />
+
+Another Widget can be positioned according to the current position of
+the Arc in order to follow the Arc's current value (angle). To do this
+use <ApiLink name="lv_arc_align_obj_to_angle" display="lv_arc_align_obj_to_angle(arc, widget_to_align, radius_offset)" />.
+
+Similarly
+<ApiLink name="lv_arc_rotate_obj_to_angle" display="lv_arc_rotate_obj_to_angle(arc, widget_to_rotate, radius_offset)" /> can be
+used to rotate the Widget to the current value of the Arc.
+
+A typical use case is to call these functions in the `VALUE_CHANGED`
+event of the Arc.
+
+
+## Pie chart from arcs
+
+<LvglExample name="lv_example_arc_pie_chart" path="widgets/arc/lv_example_arc_pie_chart" />
+
+A pie chart is built from several arcs that share the same centre. Each arc
+carves out one slice via `bg_start_angle`/`bg_end_angle`, fixes `value` to
+`max_value` so the coloured indicator fills the slice end-to-end, and uses an
+`arc_width` on <ApiLink name="LV_PART_INDICATOR" /> that is large enough to reach the centre
+— this turns the band into a solid wedge. Hide the bg track and the knob
+(opacity 0 on <ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_PART_KNOB" />) so nothing else is drawn.
+The slice colours are set with `style_arc_color` on the indicator part.
+
+Set `arc_rounded="false"` on the indicator: rounded end caps add a curved
+overshoot to each slice, which produces a visible gap where two slices
+meet. Square end caps let adjacent slices share their seam pixels
+exactly. The example factors the three shared bits (invisible MAIN track,
+square-ended INDICATOR, invisible KNOB) into named styles so each slice
+only declares its own angles and colour.
+
+## Data binding
+
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+An Arc binds its value to a Subject. The link is two-way: dragging the
+arc updates the subject, and any application-side write into the subject
+moves the indicator. Integer subjects are supported, plus float subjects
+when <ApiLink name="LV_USE_FLOAT" /> is enabled.
+
+- <ApiLink name="lv_arc_bind_value" display="lv_arc_bind_value(arc, &subject)" />
+
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+
+
+<LvglExample name="lv_example_arc_bind_value" path="widgets/arc/lv_example_arc_bind_value" />
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> sent when Arc is pressed/dragged to
+   a new value.
+
+<LvglExample name="lv_example_arc_event" path="widgets/arc/lv_example_arc_event" />
+
+To update another widget on every value change without an event callback, bind both widgets to the same Subject — see the Data binding section above.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_RIGHT/UP` Increases value by one.
+- `LV_KEY_LEFT/DOWN` Decreases value by one.
+
+Learn more about [Keys](/main-modules/indev/keypad).

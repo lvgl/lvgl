@@ -6,16 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_os_private.h"
 
 #if LV_USE_OS == LV_OS_SDL2
 
 #include <errno.h>
-#include "../misc/lv_log.h"
-
-#ifndef __linux__
-    #include "../misc/lv_timer.h"
-#endif
 
 /*********************
  *      DEFINES

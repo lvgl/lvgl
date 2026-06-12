@@ -1,6 +1,6 @@
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence
-* @kisvegabor @AndreCostaaa @FASTSHIFT
+* @kisvegabor @AndreCostaaa @axos88 @FASTSHIFT
 
 demos/gltf @AndreCostaaa
 examples/libs/gltf @AndreCostaaa

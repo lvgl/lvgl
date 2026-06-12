@@ -1,0 +1,61 @@
+---
+title: "Image Button (lv_imagebutton)"
+description: "Like Button, but draws user-defined images per state instead of a plain rectangle."
+---
+
+## Overview
+
+The Image Button behaves like a regular [Button](/widgets/button), but
+draws user-defined images for each state instead of a plain rectangle.
+
+You can set a left, middle, and right image. The middle image is tiled to
+fill the widget's width.
+
+## Image sources
+
+<LvglExample name="lv_example_imagebutton_transition" path="widgets/imagebutton/lv_example_imagebutton_transition" />
+
+To set the images for a state, use
+<ApiLink name="lv_imagebutton_set_src" display="lv_imagebutton_set_src(imagebutton, LV_IMAGEBUTTON_STATE_..., src_left, src_mid, src_right)" />.
+
+The image sources work the same as described in the [Image Widget](/widgets/image)
+except that "Symbols" are not supported. Any of the sources can be `NULL`.
+If only `src_mid` is set, the widget width is set automatically to the image width.
+If all three are set, width must be set explicitly with <ApiLink name="lv_obj_set_width" />.
+
+The possible states are:
+
+- <ApiLink name="LV_IMAGEBUTTON_STATE_RELEASED" />
+- <ApiLink name="LV_IMAGEBUTTON_STATE_PRESSED" />
+- <ApiLink name="LV_IMAGEBUTTON_STATE_DISABLED" />
+- <ApiLink name="LV_IMAGEBUTTON_STATE_CHECKED_RELEASED" />
+- <ApiLink name="LV_IMAGEBUTTON_STATE_CHECKED_PRESSED" />
+- <ApiLink name="LV_IMAGEBUTTON_STATE_CHECKED_DISABLED" />
+
+Images set for <ApiLink name="LV_IMAGEBUTTON_STATE_RELEASED" /> are used as fallback for any
+state that has no sources assigned.
+
+## Setting state programmatically
+
+Use <ApiLink name="lv_imagebutton_set_state" display="lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)" />
+instead of the regular <ApiLink name="lv_obj_add_state" /> / <ApiLink name="lv_obj_remove_state" />.
+
+## Styling
+
+<ApiLink name="LV_PART_MAIN" /> Refers to the image(s). If background style
+properties are used, a rectangle is drawn behind the Image Button.
+
+## Events
+
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent when the CHECKED state is toggled.
+Requires the <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> flag to be set.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_RIGHT/UP` Go to CHECKED state if <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> is enabled.
+- `LV_KEY_LEFT/DOWN` Go to un-CHECKED state if <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> is enabled.
+- <ApiLink name="LV_KEY_ENTER" /> Clicks the Image Button.
+
+Learn more about [Keys](/main-modules/indev/keypad).

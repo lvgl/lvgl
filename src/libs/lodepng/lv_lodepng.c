@@ -6,12 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../draw/lv_image_decoder_private.h"
-#include "../../../lvgl.h"
-#include "../../core/lv_global.h"
+
+#include "../../lvgl_public.h"
+
 #if LV_USE_LODEPNG
 
-#include "lv_lodepng.h"
+#include "../../draw/lv_image_decoder_private.h"
+#include "../../core/lv_global.h"
+
 #include "lodepng.h"
 #include <stdlib.h>
 
@@ -89,7 +91,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
     lv_image_src_t src_type = dsc->src_type;          /*Get the source type*/
 
     if(src_type == LV_IMAGE_SRC_FILE || src_type == LV_IMAGE_SRC_VARIABLE) {
-        uint32_t * size;
+        const uint8_t * size;
         static const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
         uint8_t buf[24];
 
@@ -106,13 +108,13 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 
             if(lv_memcmp(buf, magic, sizeof(magic)) != 0) return LV_RESULT_INVALID;
 
-            size = (uint32_t *)&buf[16];
+            size = &buf[16];
         }
         /*If it's a PNG file in a  C array...*/
         else {
             const lv_image_dsc_t * img_dsc = dsc->src;
             const uint32_t data_size = img_dsc->data_size;
-            size = ((uint32_t *)img_dsc->data) + 4;
+            size = img_dsc->data + 16;
 
             if(data_size < sizeof(magic)) return LV_RESULT_INVALID;
             if(lv_memcmp(img_dsc->data, magic, sizeof(magic)) != 0) return LV_RESULT_INVALID;
@@ -120,9 +122,16 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 
         /*Save the data in the header*/
         header->cf = LV_COLOR_FORMAT_ARGB8888;
-        /*The width and height are stored in Big endian format so convert them to little endian*/
-        header->w = (int32_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
-        header->h = (int32_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
+
+        /*The width and height are stored in Big endian format*/
+        uint32_t width = (size[0] << 24) + (size[1] << 16) + (size[2] << 8) + size[3];
+        uint32_t height = (size[4] << 24) + (size[5] << 16) + (size[6] << 8) + size[7];
+
+        /*Avoid attempting to load images LVGL cannot use*/
+        if(width > UINT16_MAX || height > UINT16_MAX) return LV_RESULT_INVALID;
+
+        header->w = width;
+        header->h = height;
 
         return LV_RESULT_OK;
     }
@@ -243,7 +252,7 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
     unsigned png_height;            /*Not used, just required by the decoder*/
     lv_draw_buf_t * decoded = NULL;
 
-    /*Decode the image in ARGB8888 */
+    /*Decode the image in RGBA8888 */
     unsigned error = lodepng_decode32((unsigned char **)&decoded, &png_width, &png_height, png_data, png_data_size);
     if(error) {
         LV_LOG_WARN("error %u: %s", error, lodepng_error_text(error));
@@ -251,15 +260,15 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
         return NULL;
     }
 
-    /*Convert the image to the system's color depth*/
+    /*Convert the image to LVGLv9's BGRA8888 */
     convert_color_depth(decoded->data,  png_width * png_height);
 
     return decoded;
 }
 
 /**
- * If the display is not in 32 bit format (ARGB888) then convert the image to the current color depth
- * @param img the ARGB888 image
+ * Convert subpixel order from LodePNG to LVGL
+ * @param img the LodePNG RGBA8888 image to be converted in-place to LVGL BGRA8888
  * @param px_cnt number of pixels in `img`
  */
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)

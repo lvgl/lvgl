@@ -6,20 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_wayland_window.h"
+
+#include "lv_wayland_private.h"
 
 #if LV_USE_WAYLAND
 
-#include "../../lv_init.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lv_wayland_private.h"
-#include "lv_wayland_private.h"
-#include "lv_wayland_pointer.h"
-#include "lv_wayland_pointer_axis.h"
-#include "lv_wayland_touch.h"
-#include "lv_wayland_keyboard.h"
 
 /*********************
  *      DEFINES
@@ -62,7 +56,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_wl_window_t * window = lv_ll_ins_tail(&lv_wl_ctx.window_ll);
     LV_ASSERT_MALLOC(window);
     if(!window) {
-        LV_LOG_ERROR("Failed to allocate memory fo window");
+        LV_LOG_ERROR("Failed to allocate memory for window");
         goto alloc_window_err;
     }
 
@@ -173,8 +167,7 @@ void lv_wayland_window_close(lv_display_t * display)
         return;
     }
     window->close_cb = NULL;
-    lv_wayland_window_delete(window);
-    lv_wayland_deinit();
+    lv_display_delete(window->lv_disp);
 }
 
 bool lv_wayland_window_is_open(lv_display_t * disp)
@@ -274,6 +267,22 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
         return;
     }
 
+    lv_display_delete(window->lv_disp);
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void delete_event(lv_event_t * e)
+{
+    lv_display_t * display = lv_event_get_target(e);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+
+    if(window == NULL) {
+        return;
+    }
+
     if(window->close_cb) {
         window->close_cb(window->lv_disp);
     }
@@ -293,13 +302,12 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
     wl_backend_ops.deinit_display(window->backend_display_data, window->lv_disp);
     window->backend_display_data = NULL;
 
-    /* Set the driver data to NULL before calling display delete
-     * so that the delete event doesn't do anything*/
-    lv_display_set_driver_data(window->lv_disp, NULL);
-    lv_display_delete(window->lv_disp);
-
+    if(LV_WAYLAND_DIRECT_EXIT) {
+        lv_display_set_driver_data(window->lv_disp, NULL);
+    }
 
     lv_ll_remove(&lv_wl_ctx.window_ll, window);
+    lv_free(window);
 
     if(LV_WAYLAND_DIRECT_EXIT && lv_ll_is_empty(&lv_wl_ctx.window_ll)) {
         /* lv_deinit will deinit the wayland driver*/
@@ -308,16 +316,6 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
     }
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static void delete_event(lv_event_t * e)
-{
-    lv_display_t * display = lv_event_get_target(e);
-    lv_wl_window_t * window = lv_display_get_driver_data(display);
-    lv_wayland_window_delete(window);
-}
 
 static void refr_start_event(lv_event_t * e)
 {

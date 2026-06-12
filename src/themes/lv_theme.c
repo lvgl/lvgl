@@ -10,7 +10,6 @@
 #include "../core/lv_obj_private.h"
 #include "../core/lv_obj_style_private.h"
 #include "../core/lv_obj_class_private.h"
-#include "../../lvgl.h"
 
 /*********************
  *      DEFINES

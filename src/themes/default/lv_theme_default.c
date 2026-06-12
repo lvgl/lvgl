@@ -6,12 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h" /*To see all the widgets*/
+#include "../../lvgl_public.h"
 
 #if LV_USE_THEME_DEFAULT
 
 #include "../lv_theme_private.h"
-#include "../../misc/lv_color.h"
 #include "../../core/lv_global.h"
 
 /*********************
@@ -283,9 +282,9 @@ static void style_init(my_theme_t * theme)
     lv_style_set_bg_color(&theme->styles.btn, theme->color_grey);
     if(!(theme->base.flags & MODE_DARK)) {
         lv_style_set_shadow_color(&theme->styles.btn, lv_palette_main(LV_PALETTE_GREY));
-        lv_style_set_shadow_width(&theme->styles.btn, LV_DPX(3));
+        lv_style_set_shadow_width(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, 3));
         lv_style_set_shadow_opa(&theme->styles.btn, LV_OPA_50);
-        lv_style_set_shadow_offset_y(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, LV_DPX(4)));
+        lv_style_set_shadow_offset_y(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, 3));
     }
     lv_style_set_text_color(&theme->styles.btn, theme->color_text);
     lv_style_set_pad_hor(&theme->styles.btn, PAD_DEF);
@@ -611,10 +610,10 @@ static void style_init(my_theme_t * theme)
 #if LV_USE_SCALE
     style_init_reset(&theme->styles.scale);
     lv_style_set_line_color(&theme->styles.scale, theme->color_text);
-    lv_style_set_line_width(&theme->styles.scale, LV_DPX(2));
+    lv_style_set_line_width(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 2));
     lv_style_set_arc_color(&theme->styles.scale, theme->color_text);
-    lv_style_set_arc_width(&theme->styles.scale, LV_DPX(2));
-    lv_style_set_length(&theme->styles.scale, LV_DPX(6));
+    lv_style_set_arc_width(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 2));
+    lv_style_set_length(&theme->styles.scale, LV_DPX_CALC(theme->disp_dpi, 6));
 #endif
 }
 
@@ -672,17 +671,19 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     theme->base.ext_data.data = NULL;
 #endif
 
+    /*Remove the callback before triggering style refresh to prevent
+     *resolution_change_event_cb from re-entering lv_theme_default_init
+     *during lv_obj_report_style_change. Re-added below.*/
+    lv_display_remove_event_cb_with_user_data(new_disp, resolution_change_event_cb, theme);
+
     style_init(theme);
+
+    theme->inited = true;
 
     if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
         lv_obj_report_style_change(NULL);
     }
 
-    theme->inited = true;
-
-    /*Re-initialize the styles if the resolution changes as a different display size might
-     *result in different paddings */
-    lv_display_remove_event_cb_with_user_data(new_disp, resolution_change_event_cb, theme);
     lv_display_add_event_cb(new_disp, resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED, theme);
 
     return (lv_theme_t *) theme;
@@ -746,6 +747,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
     if(lv_obj_check_type(obj, &lv_obj_class)) {
 #if LV_USE_TABVIEW
+        lv_obj_t * grandparent = lv_obj_get_parent(parent);
         /*Tabview content area*/
         if(lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_child(parent, 1) == obj) {
             return;
@@ -758,7 +760,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             return;
         }
         /*Tabview pages*/
-        else if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
+        else if(grandparent && lv_obj_check_type(grandparent, &lv_tabview_class)) {
             lv_obj_add_style(obj, &theme->styles.pad_normal, 0);
             lv_obj_add_style(obj, &theme->styles.rotary_scroll, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
@@ -1239,9 +1241,8 @@ static void resolution_change_event_cb(lv_event_t * e)
     lv_display_t * disp = lv_event_get_target(e);
     my_theme_t * theme = lv_event_get_user_data(e);
 
-    lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary, theme->base.flags,
-                          theme->base.font_normal);
-
+    lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary,
+                          theme->base.flags & MODE_DARK, theme->base.font_normal);
 }
 
 #endif

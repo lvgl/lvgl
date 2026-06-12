@@ -9,6 +9,17 @@
 
 static lv_font_manager_t * g_font_manager = NULL;
 
+/**
+ * @title Font manager with a FreeType source
+ * @brief Register a TTF path with the font manager and render a label with it.
+ *
+ * `lv_font_manager_create(8)` builds a manager with an 8-slot recycling cache.
+ * `lv_font_manager_add_src_static` maps the name `"Lato-Regular"` to
+ * `Lato-Regular.ttf` through `lv_freetype_font_class`. `lv_font_manager_create_font`
+ * then resolves that name at size 24 with `LV_FREETYPE_FONT_RENDER_MODE_BITMAP`,
+ * `LV_FREETYPE_FONT_STYLE_NORMAL`, and `LV_FONT_KERNING_NONE`. The returned font
+ * is applied as the text font of a centered label reading "Hello Font Manager!".
+ */
 void lv_example_font_manager_1(void)
 {
     /* Create font manager, with 8 fonts recycling buffers */

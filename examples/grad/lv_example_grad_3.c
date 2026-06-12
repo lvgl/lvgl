@@ -59,9 +59,19 @@ static void end_event_cb(lv_event_t * e)
 }
 
 /**
- * Play with the radial gradient
- * Adjust the end circle and focal point position.
- * The radius of the end circle and an focal point are hardcoded in the example.
+ * @title Radial gradient with draggable centers
+ * @brief Drag two bullets to move the focal point and the end circle of a radial gradient.
+ *
+ * A centered 80% by 80% object carries a two-stop radial gradient built
+ * with `lv_grad_init_stops`, `lv_grad_radial_init` (end circle centered at
+ * 100, 100 with edge at 200, 100), and `lv_grad_radial_set_focal` at
+ * (50, 50). Two small buttons mark the focal point and the end circle
+ * center; their `LV_EVENT_PRESSING` callbacks read the pointer and write
+ * `dsc->params.radial.focal` (with `focal_extent` offset by 10) or
+ * `dsc->params.radial.end` (with `end_extent` offset by 100) before
+ * invalidating the parent. When `LV_USE_DRAW_SW_COMPLEX_GRADIENTS` is
+ * disabled, the example instead shows a single label noting the
+ * dependency.
  */
 void lv_example_grad_3(void)
 {

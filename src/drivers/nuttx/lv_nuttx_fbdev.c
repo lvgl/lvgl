@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_nuttx_fbdev.h"
+#include "../../lvgl_public.h"
 #if LV_USE_NUTTX
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <stddef.h>
+#include LV_STDDEF_INCLUDE
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -25,7 +25,6 @@
     #include "mock/nuttx_video_fb.h"
 #endif
 
-#include "../../../lvgl.h"
 #include "../../lvgl_private.h"
 
 /*********************

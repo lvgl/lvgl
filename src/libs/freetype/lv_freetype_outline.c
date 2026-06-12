@@ -7,11 +7,13 @@
  *      INCLUDES
  *********************/
 
+#include "../../lvgl_public.h"
 #include "../../misc/lv_event_private.h"
-#include "../../lvgl.h"
 #include "lv_freetype_private.h"
 
 #if LV_USE_FREETYPE
+
+#include "../../misc/cache/lv_cache_entry.h"
 
 /*********************
  *      DEFINES
@@ -128,7 +130,7 @@ static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, 
                              dsc->cache_node->face,
                              node->glyph_index,
                              dsc->cache_node->ref_size,
-                             dsc->style & LV_FREETYPE_FONT_STYLE_BOLD ? 1 : 0);
+                             (dsc->style & LV_FREETYPE_FONT_STYLE_BOLD) && !FT_HAS_MULTIPLE_MASTERS(dsc->cache_node->face) ? 1 : 0);
     lv_mutex_unlock(&dsc->cache_node->face_lock);
 
     if(!outline) {
@@ -351,17 +353,6 @@ static lv_freetype_outline_t outline_create(
     lv_freetype_outline_event_param_t param;
     lv_memzero(&param, sizeof(param));
 
-    lv_freetype_outline_t outline;
-
-    res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
-    outline = param.outline;
-
-    if(res != LV_RESULT_OK || !outline) {
-        LV_LOG_ERROR("Outline object create failed");
-        LV_PROFILER_FONT_END;
-        return NULL;
-    }
-
     FT_Outline glyph_outline;
     /* decompose glyph */
     glyph_outline = face->glyph->outline;
@@ -401,6 +392,17 @@ static lv_freetype_outline_t outline_create(
 
     param.sizes.data_size = vectors * 2;
     param.sizes.segments_size = segments;
+
+    lv_freetype_outline_t outline;
+
+    res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
+    outline = param.outline;
+
+    if(res != LV_RESULT_OK || !outline) {
+        LV_LOG_ERROR("Outline object create failed");
+        LV_PROFILER_FONT_END;
+        return NULL;
+    }
 
     /* Run outline decompose again to fill outline data */
     error = FT_Outline_Decompose(&glyph_outline, &outline_funcs, outline);

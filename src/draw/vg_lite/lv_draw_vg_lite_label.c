@@ -61,6 +61,8 @@ static void bitmap_cache_release_cb(void * entry, void * user_data);
 
 static void outline_iter_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len);
 static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
+static inline bool init_buffer_from_glyph_dsc(vg_lite_buffer_t * buffer, lv_font_glyph_dsc_t * g_dsc);
+
 #if LV_USE_FREETYPE
     static void freetype_outline_event_cb(lv_event_t * e);
 #endif /* LV_USE_FREETYPE */
@@ -141,27 +143,6 @@ void lv_draw_vg_lite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
  *   STATIC FUNCTIONS
  **********************/
 
-static inline bool init_buffer_from_glyph_dsc(vg_lite_buffer_t * buffer, lv_font_glyph_dsc_t * g_dsc)
-{
-    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap(g_dsc);
-    if(!glyph_bitmap) {
-        return false;
-    }
-
-    if(!LV_VG_LITE_IS_ALIGNED(glyph_bitmap, 16)) {
-        LV_LOG_WARN("Glyph data %p is not aligned to 16 bytes", glyph_bitmap);
-        return false;
-    }
-
-    if(!LV_VG_LITE_IS_ALIGNED(g_dsc->stride, 16)) {
-        LV_LOG_WARN("Glyph stride %" LV_PRIu32 " is not aligned to 16 bytes", g_dsc->stride);
-        return false;
-    }
-
-    lv_vg_lite_buffer_init(buffer, glyph_bitmap, g_dsc->box_w, g_dsc->box_h, g_dsc->stride, VG_LITE_A8, false);
-    return true;
-}
-
 static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                            lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
@@ -175,10 +156,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A8: {
                     const lv_font_t * resolved_font = glyph_draw_dsc->g->resolved_font;
                     vg_lite_buffer_t src_buf;
-                    if(lv_font_has_static_bitmap(resolved_font)) {
-                        if(!init_buffer_from_glyph_dsc(&src_buf, glyph_draw_dsc->g)) {
-                            return;
-                        }
+                    if(lv_font_has_static_bitmap(resolved_font) && init_buffer_from_glyph_dsc(&src_buf, glyph_draw_dsc->g)) {
                     }
                     else {
                         if(resolved_font->release_glyph) {
@@ -217,6 +195,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     image_dsc.opa = glyph_draw_dsc->opa;
                     image_dsc.src = glyph_draw_dsc->glyph_data;
                     image_dsc.rotation = glyph_draw_dsc->rotation;
+                    image_dsc.pivot = glyph_draw_dsc->pivot;
                     lv_draw_vg_lite_img(t, &image_dsc, glyph_draw_dsc->letter_coords, false);
                 }
                 break;
@@ -250,6 +229,28 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
         lv_vg_lite_flush(u);
     }
 }
+
+static inline bool init_buffer_from_glyph_dsc(vg_lite_buffer_t * buffer, lv_font_glyph_dsc_t * g_dsc)
+{
+    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap(g_dsc);
+    if(!glyph_bitmap) {
+        return false;
+    }
+
+    if(!LV_VG_LITE_IS_ALIGNED(glyph_bitmap, 16)) {
+        LV_LOG_WARN("Glyph data %p is not aligned to 16 bytes", glyph_bitmap);
+        return false;
+    }
+
+    if(g_dsc->stride == 0 || !LV_VG_LITE_IS_ALIGNED(g_dsc->stride, 16)) {
+        LV_LOG_WARN("Glyph stride %" LV_PRIu32 " is not aligned to 16 bytes", g_dsc->stride);
+        return false;
+    }
+
+    lv_vg_lite_buffer_init(buffer, glyph_bitmap, g_dsc->box_w, g_dsc->box_h, g_dsc->stride, VG_LITE_A8, false);
+    return true;
+}
+
 
 static inline void convert_letter_matrix(vg_lite_matrix_t * matrix, const lv_draw_glyph_dsc_t * dsc)
 {
@@ -637,8 +638,18 @@ static void freetype_outline_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
     switch(code) {
-        case LV_EVENT_CREATE:
-            param->outline = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+        case LV_EVENT_CREATE: {
+                lv_vg_lite_path_t * path = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+                param->outline = path;
+
+                /* Pre-allocate path memory using sizes info to avoid realloc during decompose */
+                if(param->sizes.segments_size > 0) {
+                    const uint8_t fmt_len = lv_vg_lite_path_format_len(PATH_DATA_COORD_FORMAT);
+                    /* Each segment has 1 op code, plus all coordinate data, plus 1 end op */
+                    const size_t total_size = (param->sizes.segments_size + param->sizes.data_size + 1) * fmt_len;
+                    lv_vg_lite_path_reserve_space(path, total_size);
+                }
+            }
             break;
         case LV_EVENT_DELETE:
             if(param->outline) lv_vg_lite_path_destroy(param->outline);

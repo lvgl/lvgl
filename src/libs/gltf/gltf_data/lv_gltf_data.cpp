@@ -12,10 +12,6 @@
 #if LV_USE_GLTF
 
 #include <fastgltf/tools.hpp>
-#include "../../../misc/lv_assert.h"
-#include "../../../core/lv_obj_pos.h"
-#include "../../../misc/lv_timer.h"
-
 
 /*********************
  *      DEFINES

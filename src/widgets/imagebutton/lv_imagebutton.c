@@ -7,16 +7,14 @@
  *      INCLUDES
  *********************/
 #include "lv_imagebutton_private.h"
+
+#if LV_USE_IMAGEBUTTON
+
 #include "../../misc/lv_area_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-
-
-#if LV_USE_IMAGEBUTTON != 0
-
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -75,7 +73,7 @@ lv_obj_t * lv_imagebutton_create(lv_obj_t * parent)
 void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left, const void * src_mid,
                             const void * src_right)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
 
@@ -92,7 +90,7 @@ void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const 
 
 void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     update_src_info(&imagebutton->src_left[state], src_left);
@@ -101,7 +99,7 @@ void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, c
 
 void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_right)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     update_src_info(&imagebutton->src_right[state], src_right);
@@ -110,7 +108,7 @@ void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, 
 
 void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_mid)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     update_src_info(&imagebutton->src_mid[state], src_mid);
@@ -119,7 +117,7 @@ void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, co
 
 void lv_imagebutton_set_state(lv_obj_t * obj, lv_imagebutton_state_t state)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     lv_state_t obj_state = LV_STATE_DEFAULT;
     if(state == LV_IMAGEBUTTON_STATE_PRESSED ||
@@ -143,7 +141,7 @@ void lv_imagebutton_set_state(lv_obj_t * obj, lv_imagebutton_state_t state)
 
 const void * lv_imagebutton_get_src_left(lv_obj_t * obj, lv_imagebutton_state_t state)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
 
@@ -152,7 +150,7 @@ const void * lv_imagebutton_get_src_left(lv_obj_t * obj, lv_imagebutton_state_t 
 
 const void * lv_imagebutton_get_src_middle(lv_obj_t * obj, lv_imagebutton_state_t state)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
 
     return imagebutton->src_mid[state].img_src;
@@ -160,7 +158,7 @@ const void * lv_imagebutton_get_src_middle(lv_obj_t * obj, lv_imagebutton_state_
 
 const void * lv_imagebutton_get_src_right(lv_obj_t * obj, lv_imagebutton_state_t state)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
 
     return imagebutton->src_right[state].img_src;
@@ -334,7 +332,7 @@ static lv_imagebutton_state_t suggest_state(lv_obj_t * obj, lv_imagebutton_state
 
 static lv_imagebutton_state_t get_state(const lv_obj_t * imagebutton)
 {
-    LV_ASSERT_OBJ(imagebutton, MY_CLASS);
+    LV_CHECK_OBJ(imagebutton, MY_CLASS, return 0);
 
     lv_state_t obj_state = lv_obj_get_state(imagebutton);
 

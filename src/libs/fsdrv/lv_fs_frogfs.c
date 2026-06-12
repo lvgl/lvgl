@@ -12,7 +12,6 @@
 
 #include "../frogfs/include/frogfs/frogfs.h"
 #include "../../core/lv_global.h"
-#include "../../misc/lv_ll.h"
 
 #if !LV_FS_IS_VALID_LETTER(LV_FS_FROGFS_LETTER)
     #error "Invalid drive letter"

@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_grad.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

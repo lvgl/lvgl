@@ -6,12 +6,12 @@
 #ifndef LV_OPENGL_SHADER_INTERNAL_H
 #define LV_OPENGL_SHADER_INTERNAL_H
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_OPENGLES
+
 #include "../lv_opengles_private.h"
 #include "../lv_opengles_debug.h"
-#include "../../../misc/lv_types.h"
 #include "../../../misc/lv_rb_private.h"
 
 #ifdef __cplusplus

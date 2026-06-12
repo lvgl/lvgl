@@ -54,8 +54,19 @@ static void end_event_cb(lv_event_t * e)
 }
 
 /**
- * Play with the linear gradient.
- * Adjust the 2 point in between the a linear gradient can be drawn (can be skew as well)
+ * @title Linear gradient with draggable endpoints
+ * @brief Drag two bullets to reposition the start and end points of a skewable linear gradient.
+ *
+ * A centered 80% by 80% object carries a two-stop linear gradient
+ * (red at the start, transparent green at the end) built with
+ * `lv_grad_init_stops` and `lv_grad_linear_init` from (100, 100) to
+ * (200, 150) using `LV_GRAD_EXTEND_PAD`. Two small buttons mark the
+ * endpoints; their `LV_EVENT_PRESSING` callbacks read the pointer with
+ * `lv_indev_get_point`, reposition the handle, and write
+ * `dsc->params.linear.start` or `dsc->params.linear.end` before
+ * invalidating the parent. When `LV_USE_DRAW_SW_COMPLEX_GRADIENTS` is
+ * disabled, the example instead shows a single label noting the
+ * dependency.
  */
 void lv_example_grad_2(void)
 {

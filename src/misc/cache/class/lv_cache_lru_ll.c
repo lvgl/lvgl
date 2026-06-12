@@ -46,12 +46,7 @@
 
 #include "lv_cache_lru_ll.h"
 #include "../lv_cache_entry.h"
-#include "../../../stdlib/lv_sprintf.h"
-#include "../../../stdlib/lv_string.h"
-#include "../../lv_ll.h"
-
-#include "../../lv_iter.h"
-#include "../../lv_assert.h"
+#include "../../lv_iter_private.h"
 
 /*********************
  *      DEFINES

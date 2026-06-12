@@ -7,10 +7,8 @@
  *      INCLUDES
  *********************/
 
-#include "lv_assert.h"
-
-#include "lv_circle_buf.h"
-#include "lv_array.h"
+#include "lv_circle_buf_private.h"
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

@@ -3,7 +3,12 @@
 #if LV_USE_RLOTTIE
 
 /**
- * Load an lottie animation from flash
+ * @title Rlottie animation from array
+ * @brief Play a Lottie animation decoded from a JSON byte array in flash.
+ *
+ * `lv_rlottie_create_from_raw` builds a 100x100 Lottie widget from the
+ * externally declared `lv_example_rlottie_approve` JSON data, and the
+ * widget is centered on the active screen.
  */
 void lv_example_rlottie_1(void)
 {

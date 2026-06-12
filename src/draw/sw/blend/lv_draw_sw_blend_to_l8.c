@@ -12,11 +12,6 @@
 #if LV_DRAW_SW_SUPPORT_L8
 
 #include "lv_draw_sw_blend_private.h"
-#include "../../../misc/lv_math.h"
-#include "../../../display/lv_display.h"
-#include "../../../core/lv_refr.h"
-#include "../../../misc/lv_color.h"
-#include "../../../stdlib/lv_string.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     #include "neon/lv_blend_neon.h"
@@ -330,7 +325,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_l8(lv_draw_sw_blend_image_d
             break;
 #endif
         default:
-            LV_LOG_WARN("Not supported source color format");
+            LV_LOG_WARN("Not supported source color format 0x%02X", dsc->src_color_format);
             break;
     }
 }

@@ -1,0 +1,127 @@
+---
+title: "Drop-Down List (lv_dropdown)"
+description: "Let the user pick a value from a list that opens on click and closes after the choice."
+---
+
+## Overview
+
+A Drop-Down List lets the user pick a value from a list.
+
+It is closed by default and shows a single value or a fixed label. When
+the user clicks it, the list opens; after a pick, the list closes again.
+
+A Drop-Down is added to the default group (if one is set). It is an
+editable widget — items can also be selected with an encoder or a
+keyboard.
+
+## List items
+
+<ApiLink name="lv_dropdown_set_options" display="lv_dropdown_set_options(dd, &quot;First\nSecond\nThird&quot;)" /> — items separated
+by `\n`. The string is copied. Use `_set_options_static` to skip the copy
+when the string lives in flash (cannot be combined with `_add_option`).
+<ApiLink name="lv_dropdown_add_option" display="lv_dropdown_add_option(dd, &quot;New&quot;, pos)" /> inserts at index `pos`.
+<ApiLink name="lv_dropdown_set_selected" display="lv_dropdown_set_selected(dd, id)" /> picks the active option by index.
+
+## Get selected option
+
+- <ApiLink name="lv_dropdown_get_selected" display="lv_dropdown_get_selected(dd)" /> returns the index.
+- <ApiLink name="lv_dropdown_get_selected_str" display="lv_dropdown_get_selected_str(dd, buf, size)" /> copies the option text
+  into `buf`.
+
+## Direction
+
+<ApiLink name="lv_dropdown_set_dir" display="lv_dropdown_set_dir(dd, LV_DIR_…)" /> chooses which side the list opens
+toward (default <ApiLink name="LV_DIR_BOTTOM" />). Lists that would fall off the screen
+are clamped to the edge automatically.
+
+<LvglExample name="lv_example_dropdown_direction" path="widgets/dropdown/lv_example_dropdown_direction" />
+
+## Symbol
+
+Add an indicator glyph (typically an arrow) with <ApiLink name="lv_dropdown_set_symbol" />.
+It's rendered on the right by default; on the left when direction is
+<ApiLink name="LV_DIR_LEFT" />.
+
+```c
+lv_dropdown_set_symbol(dropdown, LV_SYMBOL_DOWN);
+```
+
+## Show selected
+
+By default the button shows the selected option. Set a fixed label with
+<ApiLink name="lv_dropdown_set_text" display="lv_dropdown_set_text(dd, &quot;Menu&quot;)" /> (or `_set_text_static`) and the button
+shows that string regardless of selection. Pass `NULL` to revert.
+
+<LvglExample name="lv_example_dropdown_text" path="widgets/dropdown/lv_example_dropdown_text" />
+
+## Programmatically open/close
+
+<ApiLink name="lv_dropdown_open" display="lv_dropdown_open(dd)" /> and <ApiLink name="lv_dropdown_close" display="lv_dropdown_close(dd)" />.
+
+## Styling
+
+The widget has two parts: the **button** (opens the list when clicked)
+and the **list** (shown while open). Each part has its own selectors:
+
+**Button**
+
+- <ApiLink name="LV_PART_MAIN" /> — background + text of the closed button. Picks up
+  <ApiLink name="LV_STATE_CHECKED" /> while the list is open.
+- <ApiLink name="LV_PART_INDICATOR" /> — the symbol set with <ApiLink name="lv_dropdown_set_symbol" />.
+
+**List** (accessed via <ApiLink name="lv_dropdown_get_list" display="lv_dropdown_get_list(dd)" />)
+
+- <ApiLink name="LV_PART_MAIN" /> — list background. `max_height` caps the open list size.
+- <ApiLink name="LV_PART_SCROLLBAR" /> — scrollbar.
+- <ApiLink name="LV_PART_SELECTED" /> — the highlighted/pressed option:
+  -  <ApiLink name="LV_STATE_CHECKED" /> — used for the currently active option
+  -  <ApiLink name="LV_STATE_PRESSED" /> — used for the option is being pressed by touch or
+     the Enter key is being pressed
+
+To restyle the list, just get it, and add a style:
+
+```c
+lv_obj_t * list = lv_dropdown_get_list(dd);
+lv_obj_add_style(list, &my_style, LV_PART_SELECTED);
+```
+
+<LvglExample name="lv_example_dropdown_styling" path="widgets/dropdown/lv_example_dropdown_styling" />
+
+
+## Data binding
+
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+A Drop-Down binds its selected index to a Subject. The link is two-way:
+picking an option updates the subject, and an application-side write into
+the subject moves the selection. Only integer subjects are supported.
+
+- <ApiLink name="lv_dropdown_bind_value" display="lv_dropdown_bind_value(dropdown, &subject)" />
+
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+
+
+<LvglExample name="lv_example_dropdown_bind_value" path="widgets/dropdown/lv_example_dropdown_bind_value" />
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when a new option is selected or the list is opened/closed.
+- <ApiLink name="LV_EVENT_CANCEL" /> Sent when list is closed.
+- <ApiLink name="LV_EVENT_READY" /> Sent when list is opened.
+
+<LvglExample name="lv_example_dropdown_event" path="widgets/dropdown/lv_example_dropdown_event" />
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_RIGHT/DOWN` Select next list item.
+- `LV_KEY_LEFT/UP` Select previous list item.
+- <ApiLink name="LV_KEY_ENTER" /> Apply selected list item (sends
+   <ApiLink name="LV_EVENT_VALUE_CHANGED" /> event and closes Drop-Down List).
+
+Learn more about [Keys](/main-modules/indev/keypad).
