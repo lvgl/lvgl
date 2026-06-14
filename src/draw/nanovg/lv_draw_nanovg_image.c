@@ -135,6 +135,17 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
 
     NVGpaint paint = nvgImagePattern(u->vg, img_ofs_x, img_ofs_y, img_w, img_h, 0, image_handle,
                                      dsc->opa / (float)LV_OPA_COVER);
+
+    /* GPU-side recolor: tint the image in the fragment shader. The original
+     * texture stays untouched and shared in the cache, so recolor animations
+     * cost only a uniform update instead of a per-frame CPU recolor + upload. */
+    if(dsc->recolor_opa > LV_OPA_MIN) {
+        paint.recolor = nvgRGBAf(dsc->recolor.red   / 255.0f,
+                                 dsc->recolor.green / 255.0f,
+                                 dsc->recolor.blue  / 255.0f,
+                                 dsc->recolor_opa   / 255.0f);
+    }
+
     nvgFillPaint(u->vg, paint);
     nvgFill(u->vg);
 
@@ -212,6 +223,12 @@ static void fill_repeat_tile_image(
                 lv_nanovg_path_append_rect(u->vg, img_ofs_x, img_ofs_y, img_w, img_h, 0);
                 NVGpaint paint = nvgImagePattern(u->vg, img_ofs_x, img_ofs_y, img_w, img_h, 0, image_handle,
                                                  dsc->opa / (float)LV_OPA_COVER);
+                if(dsc->recolor_opa > LV_OPA_MIN) {
+                    paint.recolor = nvgRGBAf(dsc->recolor.red   / 255.0f,
+                                             dsc->recolor.green / 255.0f,
+                                             dsc->recolor.blue  / 255.0f,
+                                             dsc->recolor_opa   / 255.0f);
+                }
                 nvgFillPaint(u->vg, paint);
                 nvgFill(u->vg);
             }
