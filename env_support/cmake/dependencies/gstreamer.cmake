@@ -3,7 +3,7 @@
 # ============================================================
 set(CMAKE_PACKAGE_NAME "GStreamer")
 set(PKG_CONFIG_NAME "gstreamer-1.0" "gstreamer-video-1.0" "gstreamer-app-1.0")
-set(PKG_LIB_PRIVATE "-lgstreamer-1.0 -lgstreamer-video-1.0 -lgstreamer-app-1.0")
+set(PKG_LIB_PRIVATE "-lgstreamer-1.0 -lgstvideo-1.0 -lgstapp-1.0")
 
 option(LV_USE_FIND_PACKAGE_GSTREAMER "Resolve GStreamer via find_package"
        ${LV_USE_FIND_PACKAGE})
