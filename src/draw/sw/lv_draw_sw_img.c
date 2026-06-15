@@ -14,14 +14,8 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../display/lv_display.h"
 #include "../../display/lv_display_private.h"
-#include "../../misc/lv_log.h"
 #include "../../core/lv_refr_private.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_color.h"
-#include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
@@ -205,10 +199,10 @@ void lv_draw_sw_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                       const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
-        lv_draw_image_normal_helper(t, draw_dsc, coords, img_draw_core);
+        lv_draw_image_normal_helper(t, draw_dsc, coords, img_draw_core, NULL);
     }
     else {
-        lv_draw_image_tiled_helper(t, draw_dsc, coords, img_draw_core);
+        lv_draw_image_tiled_helper(t, draw_dsc, coords, img_draw_core, NULL);
     }
 }
 
@@ -412,7 +406,7 @@ static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
         buf_stride = 1;
     }
     buf_h = MAX_BUF_SIZE / buf_stride;
-    if(buf_h > blend_h) buf_h = blend_h;
+    buf_h = LV_CLAMP(1, buf_h, blend_h);
     tmp_buf = lv_malloc(buf_stride * buf_h);
     LV_ASSERT_MALLOC(tmp_buf);
     if(!tmp_buf) {
@@ -501,13 +495,19 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
     if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
         uint32_t buf_stride = blend_w * 3;
         buf_h = MAX_BUF_SIZE / buf_stride;
-        if(buf_h > blend_h) buf_h = blend_h;
+        buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h);
+    }
+    else if(cf_final == LV_COLOR_FORMAT_AL88) {
+        uint32_t buf_stride = blend_w;
+        buf_h = MAX_BUF_SIZE / (buf_stride * 2);
+        buf_h = LV_CLAMP(1, buf_h, blend_h);
+        transformed_buf = lv_malloc(buf_stride * buf_h * 2);
     }
     else {
         uint32_t buf_stride = blend_w * lv_color_format_get_size(cf_final);
         buf_h = MAX_BUF_SIZE / buf_stride;
-        if(buf_h > blend_h) buf_h = blend_h;
+        buf_h = LV_CLAMP(1, buf_h, blend_h);
         transformed_buf = lv_malloc(buf_stride * buf_h);
     }
     LV_ASSERT_MALLOC(transformed_buf);
@@ -528,6 +528,15 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
         blend_dsc.mask_buf = transformed_buf + blend_w * 2 * buf_h;
         blend_dsc.mask_stride = blend_w;
         blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
+    }
+    else if(cf_final == LV_COLOR_FORMAT_AL88) {
+        /*AL88 images will be blended as L8 + mask*/
+        blend_dsc.src_stride = blend_w;
+        blend_dsc.mask_area = &blend_area;
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+        blend_dsc.mask_buf = transformed_buf + blend_w * buf_h;
+        blend_dsc.mask_stride = blend_w;
+        blend_dsc.src_color_format = LV_COLOR_FORMAT_L8;
     }
     else if(cf_final == LV_COLOR_FORMAT_A8) {
         blend_dsc.mask_buf = transformed_buf;
@@ -570,7 +579,10 @@ static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t 
         if(blend_area.y2 > y_last) {
             blend_area.y2 = y_last;
             if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-                blend_dsc.mask_buf =  transformed_buf + blend_w * 2 * lv_area_get_height(&blend_area);
+                blend_dsc.mask_buf = transformed_buf + blend_w * 2 * lv_area_get_height(&blend_area);
+            }
+            else if(cf_final == LV_COLOR_FORMAT_AL88) {
+                blend_dsc.mask_buf = transformed_buf + blend_w * lv_area_get_height(&blend_area);
             }
         }
     }

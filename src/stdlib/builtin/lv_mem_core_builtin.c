@@ -5,15 +5,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_mem.h"
+
+#include "../../lvgl_public.h"
+
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #include "lv_tlsf.h"
-#include "../lv_string.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_ll.h"
-#include "../../misc/lv_math.h"
 #include "../../osal/lv_os_private.h"
 #include "../../core/lv_global.h"
 
@@ -182,7 +179,7 @@ void lv_free_core(void * p)
 #endif
 
 #if LV_MEM_ADD_JUNK
-    lv_memset(p, 0xbb, lv_tlsf_block_size(data));
+    lv_memset(p, 0xbb, lv_tlsf_block_size(p));
 #endif
     size_t size = lv_tlsf_block_size(p);
     lv_tlsf_free(state.tlsf, p);

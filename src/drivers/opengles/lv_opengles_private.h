@@ -14,12 +14,13 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OPENGLES
 
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_color.h"
+#if !LV_USE_MATRIX
+#error "LV_USE_OPENGLES requires LV_USE_MATRIX"
+#endif
 
 #if LV_USE_EGL
 #include "glad/include/glad/gles2.h"
@@ -82,7 +83,7 @@ extern "C" {
 #endif
 
 /* In Desktop GL GL_RGB565 is not supported. Use RGB instead */
-#if LV_USE_GLFW
+#if !LV_USE_EGL
 #define GL_RGB565 GL_RGB
 #endif
 
@@ -111,19 +112,35 @@ extern "C" {
  **********************/
 
 typedef struct {
+    unsigned int texture;
+    const lv_area_t * texture_area;
+    lv_opa_t opa;
+    int32_t disp_w;
+    int32_t disp_h;
+    const lv_area_t * texture_clip_area;
     bool h_flip;
     bool v_flip;
     bool rb_swap;
+    lv_color_t fill_color;
+    bool blend_opt;
+    const lv_matrix_t * matrix;
 } lv_opengles_render_params_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool flipRB);
+/**
+ * Initialize the render parameters with default values
+ * @param params pointer to an initialized `lv_opengles_render_params_t` struct
+ */
+void lv_opengles_render_params_init(lv_opengles_render_params_t * params);
 
+/**
+ * Render the content of the window/framebuffer using OpenGL
+ * @param params pointer to an initialized `lv_opengles_render_params_t` struct
+ */
+void lv_opengles_render(const lv_opengles_render_params_t * params);
 
 /**
  * Render a texture using alternate blending mode, with red and blue channels flipped in the shader.

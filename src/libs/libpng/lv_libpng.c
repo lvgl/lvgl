@@ -6,11 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../draw/lv_image_decoder_private.h"
-#include "../../../lvgl.h"
+
+#include "../../lvgl_public.h"
+
 #if LV_USE_LIBPNG
 
-#include "lv_libpng.h"
+#include "../../draw/lv_image_decoder_private.h"
 #include <png.h>
 #include <string.h>
 #include "../../core/lv_global.h"

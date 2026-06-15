@@ -13,11 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_SVG
-
-#include "../../draw/lv_image_decoder.h"
 
 /*********************
  *      DEFINES

@@ -13,12 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_EGL
 
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_color.h"
 #include "lv_opengles_private.h"
 #include "lv_opengles_egl.h"
 
@@ -40,6 +38,7 @@ struct  _lv_egl_config {
     EGLint stencil;
     EGLint samples;
     EGLint surface_type;
+    EGLint renderable_type;
     EGLint r_bits;
     EGLint g_bits;
     EGLint b_bits;

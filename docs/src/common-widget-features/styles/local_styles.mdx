@@ -1,0 +1,34 @@
+---
+title: Local Styles
+description: "In addition to \"normal\" styles, Widgets can also store local styles. This concept is similar to inline styles in CSS (e."
+---
+
+<LvglExample name="lv_example_style_local" path="styles/lv_example_style_local" />
+
+In addition to "normal" styles, Widgets can also store local styles, similar to inline
+styles in CSS (e.g. `<div style="color:red">`). Local styles can't be shared between
+Widgets; they are allocated automatically and freed when the Widget is deleted. Unlike
+CSS inline styles, they can be assigned to states (pseudo-classes) and parts
+(pseudo-elements).
+
+To set a local property use functions like
+`lv_obj_set_style_<property_name>(widget, <value>, <selector>);` For example:
+
+```c
+lv_obj_set_style_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
+```
+
+## Binding Local Styles
+
+By using <ApiLink name="lv_obj_bind_style_prop" />, it's possible to bind a style property
+to a [Subject](/main-modules/observer/observer)'s value.
+
+It's a great way to map every slider's color or opacity to a subject and control it
+externally.
+
+For example:
+
+```c
+lv_obj_bind_style_prop(slider1, LV_STYLE_BG_OPA, LV_PART_MAIN, &subject_bg_opa);
+lv_obj_bind_style_prop(slider1, LV_STYLE_BG_COLOR, LV_PART_INDICATOR, &subject_bg_color);
+```

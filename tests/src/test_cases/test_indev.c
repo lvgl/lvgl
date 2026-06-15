@@ -122,4 +122,82 @@ void test_indev_long_pressed(void)
     TEST_ASSERT_EQUAL_UINT32(1, long_pressed_cnt);
 }
 
+static void indev_scroll_press_event_cb(lv_event_t * e)
+{
+    uint32_t * pressed_count = lv_event_get_user_data(e);
+
+    switch(lv_event_get_code(e)) {
+        case LV_EVENT_PRESSED:
+            (*pressed_count)++;
+            break;
+        default:
+            break;
+    }
+}
+
+static void indev_scroll_press_lost_event_cb(lv_event_t * e)
+{
+    uint32_t * press_lost_count = lv_event_get_user_data(e);
+
+    switch(lv_event_get_code(e)) {
+        case LV_EVENT_PRESS_LOST:
+            (*press_lost_count)++;
+            break;
+        default:
+            break;
+    }
+}
+
+void test_indev_scroll_between_two_buttons_with_and_without_press_lock(void)
+{
+    uint32_t pressed_count_1 = 0;
+    uint32_t pressed_lost_count_1 = 0;
+    uint32_t pressed_count_2 = 0;
+    uint32_t pressed_lost_count_2 = 0;
+
+    lv_obj_t * btn1 = lv_button_create(lv_screen_active());
+    lv_obj_remove_flag(btn1, LV_OBJ_FLAG_PRESS_LOCK);
+    lv_obj_set_size(btn1, 120, 100);
+    lv_obj_set_pos(btn1, 300, 200);
+    lv_obj_add_event_cb(btn1, indev_scroll_press_event_cb, LV_EVENT_PRESSED,
+                        &pressed_count_1);
+    lv_obj_add_event_cb(btn1, indev_scroll_press_lost_event_cb,
+                        LV_EVENT_PRESS_LOST, &pressed_lost_count_1);
+
+    lv_obj_t * btn2 = lv_button_create(lv_screen_active());
+    lv_obj_set_style_bg_color(btn2, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_obj_set_size(btn2, 120, 100);
+    lv_obj_set_pos(btn2, 900, 200);
+    lv_obj_add_event_cb(btn2, indev_scroll_press_event_cb, LV_EVENT_PRESSED,
+                        &pressed_count_2);
+    lv_obj_add_event_cb(btn2, indev_scroll_press_lost_event_cb,
+                        LV_EVENT_PRESS_LOST, &pressed_lost_count_2);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("scroll_initial.png");
+
+    lv_test_mouse_move_to(350, 250);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    TEST_ASSERT_EQUAL_UINT32(1, pressed_count_1);
+
+    lv_test_mouse_move_by(-300, 0);
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(1000);
+    TEST_ASSERT_EQUAL_UINT32(1, pressed_lost_count_1);
+    TEST_ASSERT_EQUAL_SCREENSHOT("scroll_after.png");
+
+    lv_test_mouse_move_to(750, 250);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    TEST_ASSERT_EQUAL_UINT32(1, pressed_count_2);
+
+    lv_test_mouse_move_by(300, 0);
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(1000);
+    TEST_ASSERT_EQUAL_UINT32(0, pressed_lost_count_2);
+    TEST_ASSERT_EQUAL_SCREENSHOT("scroll_initial.png");
+}
+
 #endif

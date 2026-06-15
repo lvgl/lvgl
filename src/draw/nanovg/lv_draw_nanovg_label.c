@@ -17,7 +17,7 @@
 #include "../lv_draw_image_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_pending.h"
-#include "../../libs/freetype/lv_freetype.h"
+#include "../../font/lv_font_private.h"
 
 /*********************
 *      DEFINES
@@ -137,7 +137,7 @@ void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, c
 **********************/
 
 static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, lv_area_t * letter_area,
-                                   lv_area_t * cliped_area)
+                                   lv_area_t * clipped_area)
 {
     *letter_area = *dsc->letter_coords;
 
@@ -158,7 +158,7 @@ static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t
         lv_area_move(letter_area, dsc->letter_coords->x1, dsc->letter_coords->y1);
     }
 
-    if(!lv_area_intersect(cliped_area, &t->clip_area, letter_area)) {
+    if(!lv_area_intersect(clipped_area, &t->clip_area, letter_area)) {
         return false;
     }
 
@@ -206,7 +206,6 @@ static inline int letter_get_image_handle(lv_draw_nanovg_unit_t * u, lv_font_gly
     letter_item_t search_key = { 0 };
     search_key.u = u;
     search_key.g_dsc = *g_dsc;
-    search_key.g_dsc.entry = NULL; /* Exclude the cache entry from the key */
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->letter_cache, &search_key, NULL);
     if(cache_node_entry == NULL) {
@@ -256,14 +255,18 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
         return false;
     }
 
-    if(!lv_font_get_glyph_bitmap(g_dsc, image_buf)) {
+    const lv_draw_buf_t * bitmap_draw_buf = (const lv_draw_buf_t *)lv_font_get_glyph_bitmap(g_dsc, image_buf);
+    if(!bitmap_draw_buf) {
         LV_PROFILER_DRAW_END;
         return false;
     }
 
     LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImage");
-    item->image_handle = nvgCreateImage(item->u->vg, w, h, 0, NVG_TEXTURE_ALPHA, lv_draw_buf_goto_xy(image_buf, 0, 0));
+    item->image_handle = nvgCreateImage(item->u->vg, w, h, 0, NVG_TEXTURE_ALPHA, lv_draw_buf_goto_xy(bitmap_draw_buf, 0,
+                                                                                                     0));
     LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
+
+    lv_font_glyph_release_draw_data(g_dsc);
 
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
     LV_PROFILER_DRAW_END;
@@ -282,12 +285,7 @@ static void letter_free_cb(letter_item_t * item, void * user_data)
 
 static lv_cache_compare_res_t letter_compare_cb(const letter_item_t * lhs, const letter_item_t * rhs)
 {
-    int cmp_res = lv_memcmp(&lhs->g_dsc, &rhs->g_dsc, sizeof(lv_font_glyph_dsc_t));
-    if(cmp_res != 0) {
-        return cmp_res > 0 ? 1 : -1;
-    }
-
-    return 0;
+    return lv_font_glyph_dsc_compare(&lhs->g_dsc, &rhs->g_dsc);
 }
 
 

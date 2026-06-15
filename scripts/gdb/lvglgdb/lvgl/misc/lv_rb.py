@@ -1,28 +1,27 @@
 from typing import Union
 import gdb
 
-from lvglgdb.value import Value
+from lvglgdb.value import CorruptedError, Value, ValueInput
 
 
 class LVRedBlackTree(Value):
     """LVGL red-black tree iterator"""
 
-    def __init__(
-        self, rb: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str] = None
-    ):
-        # Convert to Value first if needed
-        if isinstance(rb, int):
-            rb = Value(rb).cast("lv_rb_t", ptr=True)
-            if rb is None:
-                raise ValueError("Failed to cast pointer to lv_rb_t")
-        elif isinstance(rb, gdb.Value) and not isinstance(rb, Value):
-            rb = Value(rb)
-        elif not rb:
-            raise ValueError("Invalid red-black tree")
-        super().__init__(rb)
+    _DISPLAY_SPEC = {
+        "info": [
+            ("_title", lambda d: "Red-Black Tree Info:"),
+            ("Address", "addr"),
+            ("Node Size", "size"),
+            ("Node Count", "node_count"),
+            ("_skip_if", "datatype", None, ("Data Type", "datatype")),
+        ],
+        "table": [],
+        "empty_msg": "",
+    }
 
+    def __init__(self, rb: ValueInput, datatype: Union[gdb.Type, str] = None):
+        super().__init__(Value.normalize(rb, "lv_rb_t"))
         self.lv_rb_node_t = gdb.lookup_type("lv_rb_node_t").pointer()
-
         self.datatype = (
             gdb.lookup_type(datatype).pointer()
             if isinstance(datatype, str)
@@ -80,55 +79,16 @@ class LVRedBlackTree(Value):
             return data.cast(self.datatype)
         return data
 
-    def format_data(self, data):
-        """Format data for display - simple GDB style"""
-        if data is None:
-            return "None"
+    def snapshot(self):
+        from lvglgdb.lvgl.snapshot import Snapshot
 
-        try:
-            ptr_addr = f"0x{int(data):x}"
-        except:
-            return str(data)
-
-        if self.datatype and data:
-            try:
-                struct_data = data.dereference()
-                return f"{ptr_addr} -> {struct_data}"
-            except:
-                pass
-
-        return ptr_addr
-
-    def print_info(self):
-        """Dump basic tree information"""
-        print(f"Red-Black Tree Info:")
-        print(f"  Size: {int(self.size)}")
-        print(f"  Node Count: {len(self)}")
-        print(f"  Root: {self.root}")
-        if self.root:
-            root_color = "Red" if int(self.root.color) == 0 else "Black"
-            print(f"  Root Color: {root_color}")
-        if self.datatype:
-            print(f"  Data Type: {self.datatype}")
-
-    def print_tree(self, max_items=10):
-        """Print tree data in a readable format"""
-        print(f"Red-Black Tree Contents ({len(self)} total items):")
-
-        count = 0
-        for i, data in enumerate(self):
-            if count >= max_items:
-                print(f"  ... showing first {max_items} of {len(self)} items")
-                break
-
-            formatted = self.format_data(data)
-            print(f"  [{i}] {formatted}")
-            count += 1
-
-        if count == 0:
-            print("  (empty)")
-        elif count < len(self):
-            print(f"  ... {len(self) - count} more items not shown")
+        d = {
+            "addr": hex(int(self)),
+            "size": int(self.size),
+            "node_count": len(self),
+            "datatype": str(self.datatype) if self.datatype else None,
+        }
+        return Snapshot(d, source=self, display_spec=self._DISPLAY_SPEC)
 
 
 class LVRedBlackTreeIterator:
@@ -147,7 +107,7 @@ class LVRedBlackTreeIterator:
 
         data = self.tree.get_data(self.current)
 
-        # Move to next node (in-order traversal)
+        # Advance to next node (in-order traversal)
         if self.current.right:
             self.current = self.tree.minimum_from(self.current.right)
         else:
@@ -157,6 +117,8 @@ class LVRedBlackTreeIterator:
                 parent = parent.parent
             self.current = parent
 
+        if data is None:
+            return self.__next__()
         return data
 
     def __str__(self):
@@ -169,15 +131,9 @@ class LVRedBlackTreeIterator:
             data = self.tree.get_data(current)
             if data:
                 return f"LVRedBlackTreeIterator(current={data})"
-        except:
+        except CorruptedError:
             pass
 
         return f"LVRedBlackTreeIterator(current=0x{int(current):x})"
 
 
-def dump_rb_info(
-    rb: Union[Value, gdb.Value, int], datatype: Union[gdb.Type, str] = None
-):
-    """Dump red-black tree information"""
-    tree = LVRedBlackTree(rb, datatype=datatype)
-    tree.print_info()

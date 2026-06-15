@@ -14,11 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_obj.h"
-
-#if LV_USE_EXT_DATA
-#include "../lvgl_private.h"
-#endif
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES
@@ -32,7 +28,7 @@ extern "C" {
  * Special, rarely used attributes.
  * They are allocated automatically if any elements is set.
  */
-struct _lv_obj_spec_attr_t {
+typedef struct _lv_obj_spec_attr_t {
     lv_obj_t ** children;           /**< Store the pointer of the children in an array.*/
     lv_group_t * group_p;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
@@ -54,7 +50,9 @@ struct _lv_obj_spec_attr_t {
     uint16_t scroll_dir : 4;        /**< The allowed scroll direction(s), see `lv_dir_t`*/
     uint16_t layer_type : 2;        /**< Cache the layer type here. Element of lv_intermediate_layer_type_t */
     uint16_t name_static : 1;        /**< 1: `name` was not dynamically allocated */
-};
+} lv_obj_spec_attr_t;
+
+
 
 struct _lv_obj_t {
 #if LV_USE_EXT_DATA
@@ -85,6 +83,7 @@ struct _lv_obj_t {
     uint16_t h_ignore_size : 1; /* ignore this obj when calculating content height of parent */
     uint16_t w_ignore_size : 1; /* ignore this obj when calculating content width of parent */
     uint16_t is_deleting : 1;
+    uint16_t radio_button : 1; /**< Allow only one RADIO_BUTTON sibling to be checked*/
 
     /** The widget is rendered at least once already.
      * It's used to skip initial animations and transitions. */
@@ -94,6 +93,16 @@ struct _lv_obj_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Allocate special data for an object if not allocated yet.
+ * @param obj   pointer to an object
+ * @return the spec_attr created or NULL if something went wrong
+ */
+lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj);
+
+lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child);
+void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child);
 
 /**********************
  *      MACROS

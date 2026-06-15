@@ -69,6 +69,12 @@ set(LVGL_TEST_OPTIONS_VG_LITE
     -Wno-dangling-pointer # workaround for thorvg dangling-pointer warning
 )
 
+set(LVGL_TEST_OPTIONS_RISCV_V
+    -DLV_TEST_OPTION=5
+    -DLVGL_CI_USING_SYS_HEAP
+    -DLV_USE_DRAW_SW_ASM=LV_DRAW_SW_ASM_RISCV_V
+)
+
 set(LVGL_TEST_OPTIONS_SDL
     -DLV_TEST_OPTION=7
 )
@@ -149,6 +155,13 @@ elseif (OPTIONS_TEST_VG_LITE)
         # Set a tolerance value for the VG-Lite tests.
         add_definitions(-DREF_IMG_TOLERANCE=9)
     endif()
+elseif (OPTIONS_TEST_RISCV_V)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_RISCV_V} ${SANITIZE_AND_COVERAGE_OPTIONS})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
+    message(STATUS "RISC-V Vector (RVV) software emulation test enabled")
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
@@ -255,7 +268,7 @@ endif()
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 
 # Include lvgl project file.
-# Set LV_BUILD_CONF_PATH so os_desktop.cmake knows about it before compiling lvgl
+# Set LV_BUILD_CONF_PATH so main.cmake knows about it before compiling lvgl
 # Used to preprocess lv_conf_internal.h with the test config
 set(LV_BUILD_CONF_PATH "${LVGL_TEST_DIR}/src/lv_test_conf.h" CACHE STRING "set test configuration")
 
@@ -283,7 +296,7 @@ if (TARGET lvgl_demos)
 endif()
 
 
-# LVGL_CONF_DIR and LVGL_CONF_PATH are normalized and set by os_desktop.cmake
+# LVGL_CONF_DIR and LVGL_CONF_PATH are normalized and set by main.cmake
 
 set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/src>
@@ -368,10 +381,8 @@ if(NOT WIN32)
     pkg_check_modules(wayland_client wayland-client)
 
     if (wayland_client_FOUND)
-        pkg_check_modules(wayland-cursor REQUIRED wayland-cursor)
-        pkg_check_modules(xkbcommon REQUIRED xkbcommon)
-
-        link_libraries(wayland-client wayland-cursor xkbcommon)
+        pkg_check_modules(WAYLAND REQUIRED wayland-cursor wayland-client wayland-egl xkbcommon)
+        link_libraries(${WAYLAND_LIBRARIES})
 
         # Add auto generated source required for XDG shell
         include_directories("${LVGL_TEST_DIR}/wayland_protocols")

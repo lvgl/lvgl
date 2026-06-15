@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_windows_display.h"
+#include "../../lvgl_public.h"
 #if LV_USE_WINDOWS
 
 #include "lv_windows_context.h"

@@ -6,22 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../display/lv_display_private.h"
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_anim_private.h"
 #include "../draw/lv_draw_private.h"
 #include "../core/lv_obj_private.h"
-#include "lv_display.h"
-#include "../misc/lv_math.h"
 #include "../core/lv_refr_private.h"
-#include "../stdlib/lv_string.h"
-#include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
-#include "../debugging/sysmon/lv_sysmon.h"
-
-#if LV_USE_DRAW_SW
-    #include "../draw/sw/lv_draw_sw.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -32,13 +24,25 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum {
+    LV_LOAD_SCREEN_RESULT_OK,
+    LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED,
+    LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED,
+    LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED,
+    LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED,
+} lv_load_screen_result_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static bool old_screen_deleted(lv_load_screen_result_t res);
+static bool new_screen_deleted(lv_load_screen_result_t res);
+
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
 static void update_resolution(lv_display_t * disp);
-static bool load_new_screen(lv_obj_t * scr);
+static void screen_event_delete_cb(lv_event_t * e);
+static lv_load_screen_result_t load_new_screen(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
 static void opa_scale_anim(void * obj, int32_t v);
 static void set_x_anim(void * obj, int32_t v);
@@ -552,6 +556,14 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
     disp->render_mode = render_mode;
 }
 
+
+lv_display_flush_cb_t lv_display_get_flush_cb(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return NULL;
+    return disp->flush_cb;
+}
+
 void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb)
 {
     if(disp == NULL) disp = lv_display_get_default();
@@ -566,6 +578,22 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
     if(disp == NULL) return;
 
     disp->flush_wait_cb = wait_cb;
+}
+
+void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->sync_cb = sync_cb;
+}
+
+void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t wait_cb)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->sync_wait_cb = wait_cb;
 }
 
 void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format)
@@ -649,6 +677,16 @@ LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
 {
     return disp->flushing_last;
+}
+
+LV_ATTRIBUTE_SYNC_READY void lv_display_sync_ready(lv_display_t * disp)
+{
+    disp->syncing = 0;
+}
+
+LV_ATTRIBUTE_SYNC_READY bool lv_display_sync_is_last(lv_display_t * disp)
+{
+    return disp->syncing_last;
 }
 
 bool lv_display_is_double_buffered(lv_display_t * disp)
@@ -772,9 +810,15 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
         d->prev_scr = d->act_scr;
         act_scr = d->scr_to_load; /*Active screen changed.*/
-
-        if(load_new_screen(d->scr_to_load)) {
+        lv_load_screen_result_t res = load_new_screen(d->scr_to_load);
+        if(res == LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED) {
+            return;
+        }
+        if(old_screen_deleted(res)) {
             d->prev_scr = NULL;
+        }
+        if(new_screen_deleted(res)) {
+            return;
         }
     }
 
@@ -800,8 +844,14 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
-        bool old_screen_deleted = load_new_screen(new_scr);
-        if(!old_screen_deleted && auto_del && act_scr) {
+        lv_load_screen_result_t res = load_new_screen(new_scr);
+        if(res == LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED) {
+            return;
+        }
+        if(new_screen_deleted(res)) {
+            d->act_scr = NULL;
+        }
+        if(!old_screen_deleted(res) && auto_del && act_scr) {
             lv_obj_delete(act_scr);
         }
         return;
@@ -907,11 +957,12 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
  * OTHERS
  *--------------------*/
 
-void lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+lv_event_dsc_t * lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter,
+                                         void * user_data)
 {
     LV_ASSERT_NULL(disp);
 
-    lv_event_add(&disp->event_list, event_cb, filter, user_data);
+    return lv_event_add(&disp->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_display_get_event_count(lv_display_t * disp)
@@ -927,7 +978,7 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 
 }
 
-bool lv_display_delete_event(lv_display_t * disp, uint32_t index)
+bool lv_display_remove_event(lv_display_t * disp, uint32_t index)
 {
     LV_ASSERT_NULL(disp);
 
@@ -945,7 +996,7 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
     for(i = event_cnt - 1; i >= 0; i--) {
         lv_event_dsc_t * dsc = lv_display_get_event_dsc(disp, i);
         if(dsc && dsc->cb == event_cb && dsc->user_data == user_data) {
-            lv_display_delete_event(disp, i);
+            lv_display_remove_event(disp, i);
             removed_count ++;
         }
     }
@@ -1327,6 +1378,15 @@ void lv_display_set_external_data(lv_display_t * disp, void * data, void (* free
  *   STATIC FUNCTIONS
  **********************/
 
+static bool old_screen_deleted(lv_load_screen_result_t res)
+{
+    return res == LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED || res == LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED;
+}
+static bool new_screen_deleted(lv_load_screen_result_t res)
+{
+    return res == LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED || res == LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED;
+}
+
 static void update_resolution(lv_display_t * disp)
 {
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
@@ -1370,8 +1430,29 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
     return LV_OBJ_TREE_WALK_NEXT;
 }
 
-/* Returns true if the old screen was deleted while loading the new screen*/
-static bool load_new_screen(lv_obj_t * scr)
+static void screen_event_delete_cb(lv_event_t * e)
+{
+    lv_obj_t ** screen_var = lv_event_get_user_data(e);
+    *screen_var = NULL;
+}
+
+/**
+ * Load a new screen and report the result.
+ *
+ * @param scr  the screen object to load; must not be NULL
+ * @return     a value of ::lv_load_screen_result_t indicating the outcome:
+ *             - LV_LOAD_SCREEN_RESULT_OK: the new screen was loaded successfully;
+ *               both the old and new screens remain valid.
+ *             - LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED: the old screen was
+ *               deleted while loading the new screen, but the new screen remains valid.
+ *             - LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED: the new screen was
+ *               deleted during loading/unloading events; the old screen remains valid.
+ *             - LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED: both the old and new
+ *               screens were deleted during the operation.
+ *             - LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED: the display was deleted
+ *               while processing screen load/unload events.
+ */
+static lv_load_screen_result_t load_new_screen(lv_obj_t * scr)
 {
     /*scr must not be NULL, but d->act_scr might be*/
     LV_ASSERT_NULL(scr);
@@ -1381,27 +1462,60 @@ static bool load_new_screen(lv_obj_t * scr)
     LV_ASSERT_NULL(d);
 
     lv_obj_t * old_scr = d->act_scr;
-    bool old_screen_deleted = false;
+    /* Attach an event delete cb to the screen so we know if the screen is deleted during an event*/
     if(old_scr) {
-        if(lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL) == LV_RESULT_INVALID) {
-            old_screen_deleted = true;
+        lv_obj_add_event_cb(old_scr, screen_event_delete_cb, LV_EVENT_DELETE, &old_scr);
+    }
+    lv_obj_add_event_cb(scr, screen_event_delete_cb, LV_EVENT_DELETE, &scr);
+
+    if(old_scr) {
+        if(lv_display_send_event(d, LV_EVENT_SCREEN_UNLOAD_START, old_scr) == LV_RESULT_INVALID) {
+            return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+        }
+        if(old_scr && lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL) == LV_RESULT_INVALID) {
             old_scr = NULL;
         }
     }
-    lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+
+    if(lv_display_send_event(d, LV_EVENT_SCREEN_LOAD_START, scr) == LV_RESULT_INVALID) {
+        return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+    }
+
+    if(scr && lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL) == LV_RESULT_INVALID) {
+        scr = NULL;
+    }
 
     d->act_scr = scr;
     d->scr_to_load = NULL;
 
-    lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
+    if(scr && lv_display_send_event(d, LV_EVENT_SCREEN_LOADED, scr) == LV_RESULT_INVALID) {
+        return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+    }
+
+    if(scr && lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL) == LV_RESULT_INVALID) {
+        d->act_scr = NULL;
+        scr = NULL;
+    }
+
     if(old_scr) {
-        if(lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL) == LV_RESULT_INVALID) {
-            old_screen_deleted = true;
+        if(lv_display_send_event(d, LV_EVENT_SCREEN_UNLOADED, old_scr) == LV_RESULT_INVALID) {
+            return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+        }
+        if(old_scr && lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL) == LV_RESULT_INVALID) {
+            old_scr = NULL;
         }
     }
 
-    lv_obj_invalidate(scr);
-    return old_screen_deleted;
+    if(scr) {
+        lv_obj_invalidate(scr);
+        lv_obj_remove_event_cb(scr, screen_event_delete_cb);
+    }
+
+    if(!old_scr) {
+        return scr ? LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED : LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED;
+    }
+    lv_obj_remove_event_cb(old_scr, screen_event_delete_cb);
+    return scr ? LV_LOAD_SCREEN_RESULT_OK : LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED;
 }
 
 static void scr_load_anim_start(lv_anim_t * a)

@@ -13,12 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
-#include "lv_group.h"
-
-#if LV_USE_EXT_DATA
-#include "../lvgl_private.h"
-#endif
+#include "../lvgl_public.h"
 
 /*********************
  *      DEFINES

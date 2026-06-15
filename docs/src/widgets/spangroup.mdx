@@ -1,0 +1,132 @@
+---
+title: "Spangroup (lv_spangroup)"
+description: "Display rich text where each part (Span) has its own font, color, and size."
+---
+
+## Overview
+
+A Spangroup displays rich text. Unlike a Label, each Span inside the group
+has its own text, font, color, and size. Spans can be added or removed at
+any time.
+
+## Create spans
+
+Add each needed Span to a Spangroup like this:
+
+```c
+lv_span_t * span = lv_spangroup_new_span(spangroup);
+```
+
+## Set text
+
+After a Span is created, use the following functions to set its text
+and style properties:
+
+- <ApiLink name="lv_span_set_text" display="lv_span_set_text(span, &quot;text&quot;)" />
+- <ApiLink name="lv_style_set_" display="lv_style_set_&lt;property_name>(&span->style, value)" />
+
+Example of the latter:  <ApiLink name="lv_style_set_text_color" display="lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED))" />.
+
+If the Spangroup Widget's `mode != LV_SPAN_MODE_FIXED` call
+<ApiLink name="lv_spangroup_refr_mode" display="lv_spangroup_refr_mode(spangroup)" /> after you have modifying any of its
+Spans to ensure it is redrawn appropriately.
+
+## Retrieving a Span child
+
+Spangroups store their children differently from normal Widgets, so
+normal functions for getting children won't work.
+
+<ApiLink name="lv_spangroup_get_child" display="lv_spangroup_get_child(spangroup, id)" /> returns the Span at index `id`.
+Negative indices count from the end (`-1` = last, `-2` = second to last).
+
+To resolve a span from a screen coordinate — for example the point where
+the Spangroup was clicked — use
+<ApiLink name="lv_spangroup_get_span_by_point" display="lv_spangroup_get_span_by_point(spangroup, &point)" />.
+The example below makes the group clickable and logs the text of whichever
+span was hit.
+
+<LvglExample name="lv_example_span_hittest" path="widgets/span/lv_example_span_hittest" />
+
+## Child count
+
+Use <ApiLink name="lv_spangroup_get_span_count" display="lv_spangroup_get_span_count(spangroup)" /> to get
+the number of contained Spans.
+
+## Removing a Span
+
+You can remove a Span at any time during the Spangroup's life using the function
+<ApiLink name="lv_spangroup_delete_span" display="lv_spangroup_delete_span(spangroup, span)" />.
+
+## Text align
+
+Like the Label Widget, a Spangroup can be set to one the following text-alignment modes:
+
+- <ApiLink name="LV_TEXT_ALIGN_LEFT" /> Align text to left.
+- <ApiLink name="LV_TEXT_ALIGN_CENTER" /> Center text.
+- <ApiLink name="LV_TEXT_ALIGN_RIGHT" /> Align text to right edge.
+- <ApiLink name="LV_TEXT_ALIGN_AUTO" /> Align auto.
+
+Use function <ApiLink name="lv_spangroup_set_align" display="lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_...)" />
+to set text alignment.
+
+## Modes
+
+**DEPRECATED**, set the width to <ApiLink name="LV_SIZE_CONTENT" /> or fixed value to control expanding/wrapping.
+
+A Spangroup can be set to one the following modes:
+
+- <ApiLink name="LV_SPAN_MODE_FIXED" /> Fixes its size.
+- <ApiLink name="LV_SPAN_MODE_EXPAND" /> Expand size to text size but stay on one line.
+- <ApiLink name="LV_SPAN_MODE_BREAK" /> Keep width; break lines that are too long and auto-expand height.
+
+Use <ApiLink name="lv_spangroup_set_mode" display="lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK)" /> to set its mode.
+
+## Overflow
+
+A Spangroup can be set to handle text overflow in one of the following ways:
+
+- <ApiLink name="LV_SPAN_OVERFLOW_CLIP" /> truncates text at the limit of the area.
+- <ApiLink name="LV_SPAN_OVERFLOW_ELLIPSIS" /> display an ellipsis (`...`) when text overflows the area.
+
+Use <ApiLink name="lv_spangroup_set_overflow" display="lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)" /> to set
+the Spangroup's overflow mode.
+
+## First line indent
+
+Use <ApiLink name="lv_spangroup_set_indent" display="lv_spangroup_set_indent(spangroup, 20)" /> to set the indent of the
+first line. All modes support pixel units. In addition, <ApiLink name="LV_SPAN_MODE_FIXED" />
+and <ApiLink name="LV_SPAN_MODE_BREAK" /> modes support percentage units as well
+(e.g. `lv_pct(10)`).
+
+## Lines
+
+Use <ApiLink name="lv_spangroup_set_max_lines" display="lv_spangroup_set_max_lines(spangroup, 10)" /> to set the maximum number
+of lines to be displayed in <ApiLink name="LV_SPAN_MODE_BREAK" /> mode. A negative
+value indicates no limit.
+
+
+## Styling
+
+<ApiLink name="LV_PART_MAIN" /> Spangroup has only one part.
+
+<LvglExample name="lv_example_span_styling" path="widgets/span/lv_example_span_styling" />
+
+
+## Data binding
+
+A Span binds its text to a Subject. The link is one-way (Subject →
+Widget) — the binding works like Label-text binding, except both the
+Spangroup and the Span need to be specified in the bind call:
+
+<ApiLink name="lv_spangroup_bind_span_text" display="lv_spangroup_bind_span_text(spangroup, span1, &subject, format_string)" />
+
+Note that before calling <ApiLink name="lv_spangroup_delete_span" />, <ApiLink name="lv_observer_remove" />
+needs to be called manually as LVGL can't remove the binding automatically.
+
+
+## Events
+
+By default, Spangroup Widgets are created without the  <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag,
+but you can add it to make the Widget detect and send events <ApiLink name="LV_EVENT_CLICKED" />.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.

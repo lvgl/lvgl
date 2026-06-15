@@ -15,9 +15,9 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_obj_private.h"
-#include "lv_button.h"
+#include "../../lvgl_public.h"
 
-#if LV_USE_BUTTON != 0
+#if LV_USE_BUTTON
 
 /*********************
  *      DEFINES

@@ -86,6 +86,7 @@ void lv_draw_dave2d_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
     p[1].y -= 1;
     p[2].y -= 1;
 
+    d2_u8 current_alpha = d2_getalpha(u->d2_handle);
     current_alpha_mode = d2_getalphamode(u->d2_handle);
 
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
@@ -149,6 +150,7 @@ void lv_draw_dave2d_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
                  flags);
 
     d2_setalphamode(u->d2_handle, current_alpha_mode);
+    d2_setalpha(u->d2_handle, current_alpha);
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);

@@ -7,22 +7,21 @@
  *      INCLUDES
  *********************/
 #include "lv_slider_private.h"
+
+#if LV_USE_SLIDER
+
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_SLIDER != 0
-
-#include "../../misc/lv_assert.h"
-#include "../../core/lv_group.h"
-#include "../../indev/lv_indev.h"
+#include "../../lvgl_public.h"
 #include "../../indev/lv_indev_private.h"
-#include "../../display/lv_display.h"
-#include "../../draw/lv_draw.h"
-#include "../../stdlib/lv_string.h"
-#include "../../misc/lv_math.h"
-#include "../image/lv_image.h"
 #include "../../core/lv_observer_private.h"
+
+/*Check dependencies*/
+#if LV_USE_BAR == 0
+    #error "lv_slider: lv_bar is required. Enable it in lv_conf.h (LV_USE_BAR 1)"
+#endif
 
 /*********************
  *      DEFINES
@@ -130,7 +129,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent)
 
 bool lv_slider_is_dragged(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
     return slider->dragging;

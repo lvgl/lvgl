@@ -8,18 +8,14 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
+
 #if LV_USE_OPENGLES
+
 #include "lv_opengl_shader_internal.h"
-#include "../../../misc/lv_assert.h"
-#include "../../../misc/lv_log.h"
-#include "../../../misc/lv_rb.h"
-#include "../../../misc/lv_types.h"
-#include "../../../stdlib/lv_mem.h"
-#include "../../../stdlib/lv_sprintf.h"
+#include "../../../misc/lv_rb_private.h"
 #include "../lv_opengles_private.h"
 #include "../lv_opengles_debug.h"
-#include "../../../stdlib/lv_string.h"
 
 #include <string.h>
 

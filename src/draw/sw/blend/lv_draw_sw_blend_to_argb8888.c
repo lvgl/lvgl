@@ -12,11 +12,6 @@
 #if LV_DRAW_SW_SUPPORT_ARGB8888
 
 #include "lv_draw_sw_blend_private.h"
-#include "../../../misc/lv_math.h"
-#include "../../../display/lv_display.h"
-#include "../../../core/lv_refr.h"
-#include "../../../misc/lv_color.h"
-#include "../../../stdlib/lv_string.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     #include "neon/lv_blend_neon.h"
@@ -389,7 +384,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_argb8888(lv_draw_sw_blend_i
             break;
 #endif
         default:
-            LV_LOG_WARN("Not supported source color format");
+            LV_LOG_WARN("Not supported source color format 0x%02X", dsc->src_color_format);
             break;
     }
 }
@@ -609,7 +604,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_ARGB8888(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x++, src_x++) {
-                        dest_buf_c32[dest_x].alpha = src_buf_l8[src_x];
+                        dest_buf_c32[dest_x].alpha = 0xff;
                         dest_buf_c32[dest_x].red = src_buf_l8[src_x];
                         dest_buf_c32[dest_x].green = src_buf_l8[src_x];
                         dest_buf_c32[dest_x].blue = src_buf_l8[src_x];

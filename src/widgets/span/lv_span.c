@@ -7,13 +7,13 @@
  *      INCLUDES
  *********************/
 #include "lv_span_private.h"
+
+#if LV_USE_SPAN
+
 #include "../../misc/lv_area_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
-
-#if LV_USE_SPAN != 0
-
-#include "../../misc/lv_assert.h"
+#include "../../lvgl_public.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_bidi_private.h"
 #include "../../core/lv_observer_private.h"
@@ -164,7 +164,7 @@ lv_span_t * lv_spangroup_add_span(lv_obj_t * obj)
         return NULL;
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_span_t * span = lv_ll_ins_tail(&spans->child_ll);
     LV_ASSERT_MALLOC(span);
@@ -184,7 +184,7 @@ void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
         return;
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_span_t * cur_span;
     LV_LL_READ(&spans->child_ll, cur_span) {
@@ -217,7 +217,7 @@ void lv_span_set_text(lv_span_t * span, const char * text)
     size_t text_alloc_len = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    text_alloc_len = lv_text_ap_calc_bytes_count(text);
+    text_alloc_len = lv_text_ap_strlen(text) + 1;
 #else
     text_alloc_len = lv_strlen(text) + 1;
 #endif
@@ -287,7 +287,7 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
     span->static_flag = 1;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    size_t text_alloc_len = lv_text_ap_calc_bytes_count(text);
+    size_t text_alloc_len = lv_text_ap_strlen(text) + 1;
     span->txt = lv_malloc(text_alloc_len);
     LV_ASSERT_MALLOC(span->txt)
     lv_text_ap_proc(text, span->txt);
@@ -332,7 +332,7 @@ void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char
 
 void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_style_t * style)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(span);
 
     lv_style_copy(&span->style, style);
@@ -349,7 +349,7 @@ void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align)
 
 void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->overflow == overflow) return;
     if(overflow >= LV_SPAN_OVERFLOW_LAST) return;
@@ -359,7 +359,7 @@ void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
 
 void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->indent == indent) return;
 
@@ -371,7 +371,7 @@ void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent)
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 {
     LV_LOG_WARN("DEPRECATED, set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping");
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     if(mode >= LV_SPAN_MODE_LAST) return;
 
@@ -401,7 +401,7 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 
 void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     spans->lines = lines;
 
@@ -428,7 +428,7 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
         return NULL;
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     lv_ll_t * linked_list = &spans->child_ll;
 
@@ -461,13 +461,13 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
 
 uint32_t lv_spangroup_get_span_count(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     if(obj == NULL) {
         return 0;
     }
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return lv_ll_get_len(&(spans->child_ll));
 }
@@ -479,21 +479,21 @@ lv_text_align_t lv_spangroup_get_align(lv_obj_t * obj)
 
 lv_span_overflow_t lv_spangroup_get_overflow(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->overflow;
 }
 
 int32_t lv_spangroup_get_indent(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->indent;
 }
 
 lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
         return LV_SPAN_MODE_EXPAND;
@@ -511,7 +511,7 @@ lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
 
 int32_t lv_spangroup_get_max_lines(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->lines;
 }
@@ -519,7 +519,7 @@ int32_t lv_spangroup_get_max_lines(lv_obj_t * obj)
 
 int32_t lv_spangroup_get_max_line_height(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     int32_t max_line_h = 0;
@@ -537,7 +537,7 @@ int32_t lv_spangroup_get_max_line_height(lv_obj_t * obj)
 
 uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     if(lv_ll_get_head(&spans->child_ll) == NULL) {
@@ -572,7 +572,7 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width)
 
 int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(lv_ll_get_head(&spans->child_ll) == NULL || width <= 0) {
         return 0;
@@ -1230,15 +1230,20 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
         {
             lv_snippet_t * last_snippet = lv_get_snippet(item_cnt - 1);
             int32_t next_line_h = last_snippet->line_h;
-            if(last_snippet->txt[last_snippet->bytes] == '\0') {
+            bool has_more_content = last_snippet->txt[last_snippet->bytes] != '\0';
+            if(!has_more_content) {
                 next_line_h = 0;
                 lv_span_t * next_span = lv_ll_get_next(&spans->child_ll, last_snippet->span);
+                while(next_span && (!next_span->txt || next_span->txt[0] == '\0')) {
+                    next_span = lv_ll_get_next(&spans->child_ll, next_span);
+                }
                 if(next_span && next_span->txt && next_span->txt[0]) { /* have the next line */
                     next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
+                    has_more_content = true;
                 }
             }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
-                ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
+                ellipsis_valid = has_more_content && spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
                 is_end_line = true;
             }
         }

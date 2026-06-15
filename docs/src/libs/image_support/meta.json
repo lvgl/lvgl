@@ -1,0 +1,16 @@
+{
+  "title": "Image Support",
+  "pages": [
+    "bmp",
+    "gif",
+    "libjpeg_turbo",
+    "libpng",
+    "lodepng",
+    "libwebp",
+    "lz4",
+    "rle",
+    "rlottie",
+    "svg",
+    "tjpgd"
+  ]
+}

@@ -59,7 +59,7 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
 - Source: https://github.com/RudolphRiedel/FT800-FT813
 
 **AnimatedGIF (GIF decoder library)**
-- Path: src/libs/gif/AnimatedGIF
+- Path: src/libs/gif
 - Source: https://github.com/bitbank2/AnimatedGIF
 
 **FrogFS (read-only filesystem)**

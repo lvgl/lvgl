@@ -4,6 +4,13 @@
  */
 
 /*********************
+ *      INCLUDES
+ *********************/
+#include "../../../lvgl_public.h"
+
+#if LV_USE_RENESAS_GLCDC
+
+/*********************
  *PLATFORM ABSTRACTION
  *********************/
 
@@ -19,23 +26,16 @@
     #define DISPLAY_BUFFER_STRIDE_BYTES_INPUT0  LCD_CH0_IN_GR2_LINEOFFSET
 #endif /*_RENESAS_RA_*/
 
-/*********************
- *      INCLUDES
- *********************/
-#include "lv_renesas_glcdc.h"
-
-#if LV_USE_RENESAS_GLCDC
-
 #ifdef _RENESAS_RA_
-    #include "LVGL_thread.h"
+    #include <LVGL_thread.h>
 #else /* RX */
-    #include "hal_data.h"
-    #include "platform.h"
-    #include "r_glcdc_rx_if.h"
-    #include "r_glcdc_rx_pinset.h"
+    #include <hal_data.h>
+    #include <platform.h>
+    #include <r_glcdc_rx_if.h>
+    #include <r_glcdc_rx_pinset.h>
 #endif /*_RENESAS_RA_*/
 
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
 

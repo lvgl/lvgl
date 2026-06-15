@@ -159,7 +159,7 @@ void test_obj_flag_radio_button(void)
     for(uint32_t i = 0; i < 5; i++) {
         cb[i] = lv_checkbox_create(scr);
         lv_obj_set_y(cb[i], i * 50);
-        lv_obj_add_flag(cb[i], LV_OBJ_FLAG_RADIO_BUTTON);
+        lv_obj_set_radio_button(cb[i], true);
         lv_group_add_obj(g, cb[i]);
         lv_obj_add_event_cb(cb[i], event_cb, LV_EVENT_VALUE_CHANGED, &called[i]);
         called[i] = 0;
@@ -235,6 +235,16 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
 
+}
+
+void test_obj_flag_parent_hidden(void)
+{
+    /* #10083: Ensure that adding and removing screen flags don't make lvgl crash*/
+    lv_obj_add_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN);
+    TEST_ASSERT_TRUE(lv_obj_has_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN));
+    lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN);
+    TEST_ASSERT_FALSE(lv_obj_has_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN));
+    TEST_PASS();
 }
 
 #endif

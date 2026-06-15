@@ -1,0 +1,51 @@
+---
+title: "Tile View (lv_tileview)"
+description: "A container of tiles arranged in a grid. The user moves between tiles by swiping."
+---
+
+## Overview
+
+Tile View is a container whose children — called *tiles* — sit on a grid.
+The user swipes to move between tiles, and you can disable swiping per
+tile in any direction.
+
+When the Tile View is the size of the screen, the result feels like a
+smartwatch home screen.
+
+## Styling
+
+The Tile View is built from a [base widget](/widgets/base_widget) container and
+[base widget](/widgets/base_widget) tiles.
+
+The parts and styles work the same as for [base widget](/widgets/base_widget).
+
+## Add a tile
+
+<ApiLink name="lv_tileview_add_tile" display="lv_tileview_add_tile(tileview, col_id, row_id, dir)" /> creates a new
+tile on the `col_id`-th column and `row_id`-th row. `dir` can be
+`LV_DIR_LEFT/RIGHT/TOP/BOTTOM/HOR/VER/ALL` or OR-ed values to enable
+moving to the adjacent tiles in the given direction by swiping.
+
+The returned value is a pointer to the tile (a [base widget](/widgets/base_widget)) on which the
+content of the tab can be created.
+
+## Change tile
+
+The Tile View can scroll to a specified tile with
+<ApiLink name="lv_tileview_set_tile" display="lv_tileview_set_tile(tileview, tile, LV_ANIM_ON/OFF)" /> or
+<ApiLink name="lv_tileview_set_tile_by_index" display="lv_tileview_set_tile_by_index(tileview, col_id, row_id, LV_ANIM_ON/OFF)" />.
+
+## Events
+
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent after a new tile is displayed by scrolling.
+
+<ApiLink name="lv_tileview_get_tile_active" display="lv_tileview_get_tile_active(tileview)" /> can be used
+within the event to get a pointer to the newly-displayed tile.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Example
+
+### Tileview with content
+
+<LvglExample name="lv_example_tileview_l_shape" path="widgets/tileview/lv_example_tileview_l_shape" />

@@ -17,7 +17,6 @@
 #else
     #include "../../libs/thorvg/thorvg_capi.h"
 #endif
-#include "../../stdlib/lv_string.h"
 #include "blend/lv_draw_sw_blend_private.h"
 #include "blend/lv_draw_sw_blend_to_rgb565.h"
 #include "blend/lv_draw_sw_blend_to_rgb888.h"

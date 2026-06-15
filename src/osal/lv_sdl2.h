@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #if LV_USE_OS == LV_OS_SDL2
 #include <SDL2/SDL.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 
 /*********************
  *      DEFINES

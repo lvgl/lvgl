@@ -1,0 +1,120 @@
+---
+title: "Spinbox (lv_spinbox)"
+description: "Edit an integer digit by digit, with a configurable number of digits and an optional fixed decimal point."
+---
+
+## Overview
+
+A Spinbox shows an integer as a decimal number with a configurable
+number of digits and an optional fixed decimal point. The value is
+changed with keys or API calls. Under the hood it is a
+[Text Area](/widgets/textarea) extended to view and edit a numeric value
+with configurable limits.
+
+## Value, range and step
+
+<LvglExample name="lv_example_spinbox_value" path="widgets/spinbox/lv_example_spinbox_value" />
+
+- <ApiLink name="lv_spinbox_set_value" display="lv_spinbox_set_value(spinbox, 1234)" /> sets a new value for the Spinbox.
+- <ApiLink name="lv_spinbox_increment" display="lv_spinbox_increment(spinbox)" /> and <ApiLink name="lv_spinbox_decrement" display="lv_spinbox_decrement(spinbox)" />
+  increments/decrements the value of the Spinbox according to the currently-selected digit.
+- <ApiLink name="lv_spinbox_set_range" display="lv_spinbox_set_range(spinbox, -1000, 2500)" /> sets its range. If the
+  value is changed by <ApiLink name="lv_spinbox_set_value" display="lv_spinbox_set_value(spinbox)" />, by *Keys*,
+  by <ApiLink name="lv_spinbox_increment" display="lv_spinbox_increment(spinbox)" /> or <ApiLink name="lv_spinbox_decrement" display="lv_spinbox_decrement(spinbox)" />
+  this range will be respected.
+- <ApiLink name="lv_spinbox_set_step" display="lv_spinbox_set_step(spinbox, 100)" /> sets which digit to change on
+  increment/decrement. Only multiples of ten can be set.
+- <ApiLink name="lv_spinbox_set_cursor_pos" display="lv_spinbox_set_cursor_pos(spinbox, 1)" /> sets the cursor to a specific
+  digit to change on increment/decrement. Position '0' sets the cursor to
+  the least significant digit.
+
+If an encoder is used as input device, the selected digit is shifted to
+the right by default whenever the encoder button is clicked. To change this behavior to shifting
+to the left, the <ApiLink name="lv_spinbox_set_digit_step_direction" display="lv_spinbox_set_digit_step_direction(spinbox, LV_DIR_LEFT)" /> can be used.
+
+## Format
+
+<LvglExample name="lv_example_spinbox_format" path="widgets/spinbox/lv_example_spinbox_format" />
+
+<ApiLink name="lv_spinbox_set_digit_format" display="lv_spinbox_set_digit_format(spinbox, digit_count, separator_position)" />
+sets the number format. `digit_count` is the total number of digits to display.
+`separator_position` is the number of leading digits before the decimal point.
+Pass 0 for `separator_position` to display no decimal point.
+
+## Rollover
+
+<LvglExample name="lv_example_spinbox_rollover" path="widgets/spinbox/lv_example_spinbox_rollover" />
+
+<ApiLink name="lv_spinbox_set_rollover" display="lv_spinbox_set_rollover(spinbox, true/false)" /> enables/disables
+rollover mode. If either the minimum or maximum value is reached with
+rollover enabled, and the user attempts to continue changing the value in
+the same direction, the value will change to the other limit.  If rollover
+is disabled the value will stop at the minimum or maximum value.
+
+## Side buttons with hold-to-repeat
+
+XML can declare a spinbox but not the +/- buttons that drive it from
+<ApiLink name="LV_EVENT_SHORT_CLICKED" /> and <ApiLink name="LV_EVENT_LONG_PRESSED_REPEAT" />. This C example
+wires two square buttons either side of the spinbox: a short click steps the
+selected digit by one, and holding a button keeps repeating
+<ApiLink name="lv_spinbox_increment" />/`_decrement`.
+
+<LvglExample name="lv_example_spinbox_with_buttons" path="widgets/spinbox/lv_example_spinbox_with_buttons" />
+
+## Styling
+
+Spinbox's parts are identical to those of [Text Area](/widgets/textarea).
+
+<LvglExample name="lv_example_spinbox_styling" path="widgets/spinbox/lv_example_spinbox_styling" />
+
+Spinbox has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the box
+itself — background, border, radius, padding, and the digits themselves)
+and <ApiLink name="LV_PART_CURSOR" /> (the highlight that marks the
+currently editable digit).
+
+A few practical notes for the cursor look:
+
+- `bg_opa="0"` plus a coloured `border_*` frames the active digit without
+  drawing a filled bar over it.
+- Setting `text_opa="0"` on the cursor prevents it from re-painting the
+  digit on top of MAIN's render — useful when the cursor is purely a frame.
+- `pad_ver` (or `pad_all`) on the cursor adds breathing room around the
+  glyph so the frame doesn't hug the text edges.
+- `text_letter_space` on MAIN spreads the digits apart so the cursor's
+  frame visually surrounds a single digit rather than two crowded ones.
+
+## Data binding
+
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+A Spinbox binds its value to a Subject. The link is two-way: editing the
+spinbox updates the subject, and an application-side write into the
+subject moves the displayed digits. Only integer subjects are supported.
+
+- <ApiLink name="lv_spinbox_bind_value" display="lv_spinbox_bind_value(spinbox, &subject)" />
+
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+
+
+<LvglExample name="lv_example_spinbox_bind_value" path="widgets/spinbox/lv_example_spinbox_bind_value" />
+
+## Events
+
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent when value has changed.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_LEFT/RIGHT` With *Keypad* move the cursor left/right. With
+  *Encoder* decrement/increment the selected digit.
+- `LV_KEY_UP/DOWN` With *Keypad* and *Encoder* increment/decrement
+  the value.
+- <ApiLink name="LV_KEY_ENTER" /> With *Encoder*, move focus to next digit.  If focus
+  is on last digit, focus moves to first digit.
+
+Learn more about [Keys](/main-modules/indev/keypad).

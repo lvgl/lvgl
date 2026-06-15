@@ -1,0 +1,19 @@
+<!--
+ @title Switch states
+ @brief Pre-set the on/off state, and show what `disabled` looks like.
+
+ A switch is a special toggle button: clicking it flips between unchecked
+ and checked. The `checked="true"` attribute sets the initial state at
+ creation; `disabled="true"` greys the widget out and blocks interaction.
+ To react to changes in code, attach an `LV_EVENT_VALUE_CHANGED` callback
+ (not shown here — see the docs for the C-side API).
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
+		<!-- 💡 Toggle either of the first two switches by clicking; the disabled ones won't respond. -->
+		<lv_switch name="sw_1" />
+		<lv_switch name="sw_2" checked="true" />
+		<lv_switch name="sw_3" disabled="true" />
+		<lv_switch name="sw_4" disabled="true" checked="true" />
+	</view>
+</screen>

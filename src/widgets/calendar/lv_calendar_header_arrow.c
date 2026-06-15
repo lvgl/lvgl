@@ -6,15 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../../core/lv_obj_class_private.h"
-#include "lv_calendar_header_arrow.h"
+
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_ARROW
 
-#include "lv_calendar.h"
-#include "../button/lv_button.h"
-#include "../label/lv_label.h"
-#include "../../layouts/flex/lv_flex.h"
-#include "../../misc/lv_assert.h"
 
 /*********************
  *      DEFINES

@@ -1,6 +1,15 @@
 #include "../../lv_examples.h"
 #if LV_USE_MONKEY && LV_BUILD_EXAMPLES
 
+/**
+ * @title Encoder monkey input
+ * @brief Feed random encoder steps into a new default group for focus testing.
+ *
+ * The config is set to `LV_INDEV_TYPE_ENCODER` with a 50 to 500 ms period and
+ * input range of -5 to 5. A fresh `lv_group_t` is created, bound to the
+ * monkey's indev with `lv_indev_set_group`, and installed as the default
+ * group. `lv_monkey_set_enable` then starts the random encoder events.
+ */
 void lv_example_monkey_2(void)
 {
     /*Create encoder monkey test*/

@@ -7,11 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_private.h"
-#include "../core/lv_obj.h"
-#include "../stdlib/lv_string.h"
 #include "../misc/lv_utils.h"
-#include "lv_obj_property.h"
 #include "lv_obj_class_private.h"
+#include "../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY
 
@@ -108,7 +106,8 @@ static int property_name_compare(const void * ref, const void * element);
 
 lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
 {
-    LV_ASSERT(obj && value);
+    LV_CHECK_ARG(obj != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(value != NULL, return LV_RESULT_INVALID);
 
     uint32_t index = LV_PROPERTY_ID_INDEX(value->id);
     if(value->id == LV_PROPERTY_ID_INVALID || index > LV_PROPERTY_ID_ANY) {
@@ -126,6 +125,9 @@ lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
 
 lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, uint32_t count)
 {
+    LV_CHECK_ARG(obj != NULL, return LV_RESULT_INVALID);
+    LV_CHECK_ARG(value != NULL, return LV_RESULT_INVALID);
+
     for(uint32_t i = 0; i < count; i++) {
         lv_result_t result = lv_obj_set_property(obj, &value[i]);
         if(result != LV_RESULT_OK) {
@@ -138,6 +140,10 @@ lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, u
 
 lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
 {
+    LV_CHECK_ARG(obj != NULL, return (lv_property_t) {
+        .id = LV_PROPERTY_ID_INVALID
+    });
+
     lv_result_t result;
     lv_property_t value = { 0 };
 
@@ -150,9 +156,9 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
     }
 
     if(index < LV_PROPERTY_ID_START) {
-        lv_obj_get_local_style_prop(obj, index, &value.style, 0);
+        value.style = lv_obj_get_style_prop(obj, LV_PART_MAIN, index);
         value.id = id;
-        value.selector = 0;
+        value.selector = LV_PART_MAIN | obj->state;
         return value;
     }
 
@@ -163,8 +169,12 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
     return value;
 }
 
-lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector)
+lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, lv_part_t part)
 {
+    LV_CHECK_ARG(obj != NULL, return (lv_property_t) {
+        .id = LV_PROPERTY_ID_INVALID
+    });
+
     lv_property_t value;
     uint32_t index = LV_PROPERTY_ID_INDEX(id);
 
@@ -175,14 +185,15 @@ lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_
         return value;
     }
 
-    lv_obj_get_local_style_prop(obj, id, &value.style, selector);
+    value.style = lv_obj_get_style_prop(obj, part, index);
     value.id = id;
-    value.selector = selector;
+    value.selector = part | obj->state;
     return value;
 }
 
 lv_prop_id_t lv_style_property_get_id(const char * name)
 {
+    LV_CHECK_ARG(name != NULL, return LV_PROPERTY_ID_INVALID);
 #if LV_USE_OBJ_PROPERTY_NAME
     lv_property_name_t * found;
     /*Check style property*/
@@ -197,6 +208,8 @@ lv_prop_id_t lv_style_property_get_id(const char * name)
 
 lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char * name)
 {
+    LV_CHECK_ARG(clz != NULL, return LV_PROPERTY_ID_INVALID);
+    LV_CHECK_ARG(name != NULL, return LV_PROPERTY_ID_INVALID);
 #if LV_USE_OBJ_PROPERTY_NAME
     const lv_property_name_t * names;
     lv_property_name_t * found;
@@ -210,7 +223,7 @@ lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char
     found = lv_utils_bsearch(name, names, clz->names_count, sizeof(lv_property_name_t), property_name_compare);
     if(found) return found->id;
 #else
-    LV_UNUSED(obj);
+    LV_UNUSED(clz);
     LV_UNUSED(name);
     LV_UNUSED(property_name_compare);
 #endif
@@ -219,7 +232,10 @@ lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char
 
 lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name)
 {
+    LV_CHECK_ARG(obj != NULL, return LV_PROPERTY_ID_INVALID);
+    LV_CHECK_ARG(name != NULL, return LV_PROPERTY_ID_INVALID);
 #if LV_USE_OBJ_PROPERTY_NAME
+
     const lv_obj_class_t * clz;
     lv_prop_id_t id;
 

@@ -1,0 +1,41 @@
+<!--
+ @title Arc with explicit indicator angles
+ @brief Drive the indicator directly via start_angle and end_angle.
+
+ The left arc draws the indicator the usual way, from value, mode, and range. The right
+ arc sets start_angle and end_angle explicitly, which overrides the value-based drawing.
+ This is handy for static graphics or custom dial layouts where the indicator span is
+ not tied to a numeric value.
+-->
+<screen>
+	<view flex_flow="row" style_flex_main_place="space_evenly" style_flex_track_place="center">
+		<!-- 💡 Edit start_angle/end_angle directly to draw any indicator span independent of value and mode. -->
+		<!-- Value-driven indicator arc -->
+		<lv_arc
+			name="arc_1"
+			width="120"
+			height="120"
+			bg_start_angle="135"
+			bg_end_angle="45"
+			min_value="100"
+			max_value="200"
+			value="145"
+		>
+			<lv_label name="label_1" align="center" text="value" />
+		</lv_arc>
+
+		<!-- Indicator angle set explicitly; value/mode are ignored for indicator drawing -->
+		<lv_arc
+			name="arc_2"
+			width="120"
+			height="120"
+			bg_start_angle="135"
+			bg_end_angle="45"
+			start_angle="210"
+			end_angle="330"
+			style_bg_opa-knob="0%"
+		>
+			<lv_label name="label_2" align="center" text="angles" />
+		</lv_arc>
+	</view>
+</screen>

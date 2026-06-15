@@ -6,16 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../draw/lv_draw_private.h"
-#include "../../core/lv_obj_draw_private.h"
-#include "lv_snapshot.h"
+
+#include "../../lvgl_public.h"
 #if LV_USE_SNAPSHOT
 
-#include <stdbool.h>
-#include "../../display/lv_display.h"
+#include "../../draw/lv_draw_private.h"
+#include "../../core/lv_obj_draw_private.h"
+#include LV_STDBOOL_INCLUDE
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
 #include "../../core/lv_obj_private.h"
 
 /*********************
@@ -171,6 +170,8 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
             parent = lv_obj_get_parent(parent);
         }
     }
+
+    layer.all_tasks_added = true;
 
     while(layer.draw_task_head) {
         lv_draw_dispatch_wait_for_request();

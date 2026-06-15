@@ -18,7 +18,7 @@
 #if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <math.h>
-#include "g2d.h"
+#include <g2d.h>
 #include "../../../misc/lv_area_private.h"
 #include "../../lv_draw_image_private.h"
 #include "../../lv_image_decoder_private.h"
@@ -82,9 +82,9 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     bool is_tiled = (dsc->tile != 0);
 
     if(is_tiled)
-        lv_draw_image_tiled_helper(t, dsc, coords, _g2d_draw_core_cb);
+        lv_draw_image_tiled_helper(t, dsc, coords, _g2d_draw_core_cb, NULL);
     else
-        lv_draw_image_normal_helper(t, dsc, coords, _g2d_draw_core_cb);
+        lv_draw_image_normal_helper(t, dsc, coords, _g2d_draw_core_cb, NULL);
 }
 
 /**********************

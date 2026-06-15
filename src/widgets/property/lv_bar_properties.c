@@ -4,7 +4,7 @@
  * @file lv_bar_properties.c
  */
 
-#include "../bar/lv_bar.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

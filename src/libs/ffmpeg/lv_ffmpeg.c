@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_ffmpeg_private.h"
+#include "../../lvgl_public.h"
 #if LV_USE_FFMPEG != 0
 #include "../../draw/lv_image_decoder_private.h"
 #include "../../draw/lv_draw_buf_private.h"
@@ -168,7 +169,7 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent)
 
 lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
     lv_result_t res = LV_RESULT_INVALID;
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
@@ -208,6 +209,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     player->imgdsc.data_size = data_size;
     player->imgdsc.header.cf = cf;
     player->imgdsc.header.stride = stride;
+    player->imgdsc.header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
     player->imgdsc.data = data;
 
     lv_image_set_src(&player->img.obj, &(player->imgdsc));
@@ -231,7 +233,7 @@ failed:
 
 void lv_ffmpeg_player_set_cmd(lv_obj_t * obj, lv_ffmpeg_player_cmd_t cmd)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(!player->ffmpeg_ctx) {
@@ -270,14 +272,14 @@ void lv_ffmpeg_player_set_cmd(lv_obj_t * obj, lv_ffmpeg_player_cmd_t cmd)
 
 void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
     player->auto_restart = en;
 }
 
 void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * name)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
     if(player->decoder_name) {
         lv_free((void *)player->decoder_name);
@@ -673,6 +675,7 @@ static int ffmpeg_get_image_header(lv_image_decoder_dsc_t * dsc,
         header->h = video_dec_ctx->height;
         header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
         header->stride = header->w * lv_color_format_get_size(header->cf);
+        header->flags = LV_IMAGE_FLAGS_MODIFIABLE;
 
         ret = 0;
     }

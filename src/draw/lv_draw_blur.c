@@ -6,10 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_draw_private.h"
-#include "lv_draw_blur.h"
-#include "../misc/lv_types.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

@@ -10,7 +10,7 @@
 #include "lv_gltf_data_internal.hpp"
 
 #if LV_USE_GLTF
-#include "../../../misc/lv_array.h"
+
 /*********************
  *      DEFINES
  *********************/

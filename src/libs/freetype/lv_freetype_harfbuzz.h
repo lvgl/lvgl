@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../../include/lvgl/lvgl.h"
 
 #if LV_USE_FREETYPE && LV_USE_HARFBUZZ
 

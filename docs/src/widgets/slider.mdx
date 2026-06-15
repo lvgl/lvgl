@@ -1,0 +1,142 @@
+---
+title: "Slider (lv_slider)"
+description: "A Bar with a draggable knob the user moves to set the value. Horizontal or vertical."
+---
+
+## Overview
+
+The Slider looks like a [Bar](/widgets/bar) with a knob. Drag the knob to
+set the value. Like Bar, a Slider can be vertical or horizontal.
+
+## Value, range and orientation
+
+<LvglExample name="lv_example_slider_value_range_orientation" path="widgets/slider/lv_example_slider_value_range_orientation" />
+
+Defaults: `value` = 0, range = `[0..100]`, horizontal orientation,
+width/height roughly 2"/0.1" (scaled by <ApiLink name="LV_DPI_DEF" />).
+
+- <ApiLink name="lv_slider_set_value" display="lv_slider_set_value(slider, v, LV_ANIM_ON/OFF)" /> — animation length
+  comes from the `anim_time` style.
+- <ApiLink name="lv_slider_set_range" display="lv_slider_set_range(slider, min, max)" /> — pass `min > max` to flip
+  the drawing direction (e.g. `100..0` for a right-to-left fill).
+- <ApiLink name="lv_slider_set_orientation" display="lv_slider_set_orientation(slider, LV_SLIDER_ORIENTATION_*)" /> —
+  `AUTO`/`HORIZONTAL`/`VERTICAL`. The default `AUTO` picks based on
+  `width`/`height`.
+
+## Reversed direction
+
+<LvglExample name="lv_example_slider_reversed_direction" path="widgets/slider/lv_example_slider_reversed_direction" />
+
+Swap `min` and `max` to reverse the fill direction without changing
+orientation — useful for right-to-left progress or top-down level meters.
+
+## Modes
+
+<LvglExample name="lv_example_slider_modes" path="widgets/slider/lv_example_slider_modes" />
+
+The Slider can be in one of the following modes:
+
+- <ApiLink name="LV_SLIDER_MODE_NORMAL" /> A normal Slider as described above (default)
+- <ApiLink name="LV_SLIDER_SYMMETRICAL" /> Draw the indicator from the zero value to
+  current value. Requires negative minimum range and positive maximum range.
+- <ApiLink name="LV_SLIDER_RANGE" /> Allows setting the start value as well by
+  <ApiLink name="lv_slider_set_start_value" display="lv_slider_set_start_value(slider, new_value, LV_ANIM_ON/OFF)" />. The start
+  value must always be smaller than the end value.
+
+The mode can be changed with <ApiLink name="lv_slider_set_mode" display="lv_slider_set_mode(slider, LV_SLIDER_MODE_...)" />
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> The background of the Slider. Uses the
+   [typical background style properties](/common-widget-features/styles/overview). `padding` makes
+   the indicator smaller in the respective direction.
+- <ApiLink name="LV_PART_INDICATOR" /> The indicator that shows the current state of
+   the Slider; also uses the [typical background style properties](/common-widget-features/styles/overview).
+- <ApiLink name="LV_PART_KNOB" /> A rectangle (or circle) drawn at the current value;
+   also uses the [typical background style properties](/common-widget-features/styles/overview) to
+   describe the knob(s).  By default, the knob is round (radius-style can modify this)
+   with side length equal to the smaller dimension of the Slider.  The knob can be
+   made larger with the `padding` values.  Padding values can be asymmetric as well.
+
+<LvglExample name="lv_example_slider_styling" path="widgets/slider/lv_example_slider_styling" />
+
+Slider has three parts: <ApiLink name="LV_PART_MAIN" /> (track),
+<ApiLink name="LV_PART_INDICATOR" /> (filled portion), and
+<ApiLink name="LV_PART_KNOB" />. Each accepts the full background style
+stack — `bg_color`, `bg_grad_color` + `bg_grad_dir` for gradients,
+`radius`, `border_*`, `outline_*`, `shadow_*`, and `pad_*`. Attach
+named styles with `selector="main"`, `selector="indicator"`, or
+`selector="knob"`. Combine part and state to get interactive feedback,
+e.g. `selector="pressed|knob"` to highlight the knob only while it is
+being dragged. Local `style_*` props on the `<lv_slider>` tag target
+MAIN.
+
+### Image indicator
+
+<LvglExample name="lv_example_slider_img_indicator" path="widgets/slider/lv_example_slider_img_indicator" />
+
+Setting `bg_image_src` on a part adds a bitmap on top of the solid fill,
+clipped to the part's current bounds. The track
+image shows the full width at all times; the indicator image is revealed
+left-to-right as the knob moves. Assign different bitmaps to
+<ApiLink name="LV_PART_MAIN" /> and <ApiLink name="LV_PART_INDICATOR" /> to texture
+both independently.
+
+- <ApiLink name="lv_obj_set_style_bg_image_src" display="lv_obj_set_style_bg_image_src(slider, src, selector)" />
+
+## Knob-only mode
+
+Normally, the Slider can be adjusted either by dragging the knob, or by
+clicking on the Slider bar. In the latter case the knob moves to the
+point clicked and the Slider value changes accordingly. In some cases it is
+desirable to set the Slider to react on dragging the knob only. This
+feature is enabled by adding the <ApiLink name="LV_OBJ_FLAG_ADV_HITTEST" /> flag:
+<ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(slider, LV_OBJ_FLAG_ADV_HITTEST)" />.
+
+Any extended click area (set by <ApiLink name="lv_obj_set_ext_click_area" display="lv_obj_set_ext_click_area(slider, value)" />)
+increases the knob's click area.
+
+## Data binding
+
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+A Slider binds its integer value to a Subject. The link is two-way: the
+end user's drag updates the subject, and any application-side write into
+the subject moves the knob. Integer and float subjects are both supported.
+
+- <ApiLink name="lv_slider_bind_value" display="lv_slider_bind_value(slider, &subject)" />
+
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+
+
+<LvglExample name="lv_example_slider_bind_value" path="widgets/slider/lv_example_slider_bind_value" />
+
+A Slider's value can also drive another widget's state via the generic
+`bind_state_if_*` helpers — handy for guards like "disable submit when the
+value exceeds a threshold".
+
+<LvglExample name="lv_example_slider_bind_state" path="widgets/slider/lv_example_slider_bind_state" />
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent while the Slider is being dragged or
+   changed with keys. The event is sent continuously while the Slider is
+   being dragged.
+- <ApiLink name="LV_EVENT_RELEASED" /> Sent once when Slider is released.
+
+<LvglExample name="lv_example_slider_event" path="widgets/slider/lv_example_slider_event" />
+
+To update another widget on every value change without an event callback, bind both widgets to the same Subject — see the Data binding section above.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_UP/RIGHT` Increment Slider's value by 1.
+- `LV_KEY_DOWN/LEFT` Decrement Slider's value by 1.
+
+Learn more about [Keys](/main-modules/indev/keypad).

@@ -11,7 +11,6 @@
 
 #if LV_USE_DRAW_NANOVG
 
-#include "../../display/lv_display.h"
 #include "../../core/lv_refr_private.h"
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
@@ -115,6 +114,7 @@ void lv_draw_nanovg_init(void)
     lv_nanovg_image_cache_init(unit);
     lv_nanovg_fbo_cache_init(unit);
     lv_draw_nanovg_label_init(unit);
+    lv_draw_nanovg_blur_init(unit);
 }
 
 int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb)
@@ -184,7 +184,7 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_nanovg_line(t, t->draw_dsc);
+            lv_draw_line_iterate(t, t->draw_dsc, lv_draw_nanovg_line);
             break;
 
         case LV_DRAW_TASK_TYPE_ARC:
@@ -204,6 +204,17 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             lv_draw_nanovg_vector(t, t->draw_dsc);
             break;
 #endif
+
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_TASK_TYPE_3D:
+            lv_draw_nanovg_3d(t, t->draw_dsc, &t->area);
+            break;
+#endif
+
+        case LV_DRAW_TASK_TYPE_BLUR:
+            lv_draw_nanovg_blur(t, t->draw_dsc, &t->area);
+            break;
+
         default:
             LV_LOG_ERROR("unknown draw task type: %d", t->type);
             break;
@@ -336,6 +347,11 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     if(u->current_layer != layer) {
+        /* Flush any draws still queued for the previous layer before
+         * rebinding to the new layer's FBO. Otherwise those queued draws
+         * get rerouted to the new FBO when nvgEndFrame is eventually
+         * called (and the previous layer ends up missing them). */
+        lv_nanovg_end_frame(u);
         on_layer_changed(layer);
         u->current_layer = layer;
     }
@@ -365,7 +381,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
-    LV_UNUSED(draw_unit);
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL:
@@ -382,6 +398,14 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
 #endif
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_TASK_TYPE_3D:
+#endif
+            break;
+
+        case LV_DRAW_TASK_TYPE_BLUR:
+            /* Only accept blur if FBO support is available (blur_state was created) */
+            if(u->blur_state == NULL) return 0;
             break;
 
         default:
@@ -401,6 +425,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_nanovg_unit_t * unit = (lv_draw_nanovg_unit_t *)draw_unit;
+    lv_draw_nanovg_blur_deinit(unit);
     lv_draw_nanovg_label_deinit(unit);
     lv_nanovg_fbo_cache_deinit(unit);
     lv_nanovg_image_cache_deinit(unit);

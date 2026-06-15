@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #if LV_USE_THORVG_INTERNAL
 
 /* This Source Code Form is subject to the terms of the Mozilla Public

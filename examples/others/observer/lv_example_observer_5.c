@@ -19,11 +19,18 @@ static lv_subject_t fw_download_percent_subject;
 static lv_subject_t fw_update_status_subject;
 
 /**
- * Show how to handle a complete firmware update process with observers.
- * Normally it's hard to implement a firmware update process because in some cases
- *   - the App needs to was for the UI (wait for a button press)
- *   - the UI needs to wait for the App (connecting or downloading)
- * With observers these complex mechanisms can be implemented a simple and clean way.
+ * @title Firmware update state machine
+ * @brief Drive a window through its update states using two int subjects.
+ *
+ * `fw_update_status_subject` holds an `lv_fw_update_state_t` value and
+ * `fw_download_percent_subject` tracks progress. A start button opens an
+ * `lv_win` whose observer renders the appropriate content: a spinner for
+ * connecting, an arc plus percentage label bound with `lv_arc_bind_value`
+ * and `lv_label_bind_text` for downloading, and a restart button for ready.
+ * A separate app-side observer spawns `lv_timer_t` instances that simulate
+ * the 2-second connect and a 50 ms per-step download. The window's close
+ * button pushes `FW_UPDATE_STATE_CANCEL`, which the observer uses to delete
+ * the window.
  */
 void lv_example_observer_5(void)
 {

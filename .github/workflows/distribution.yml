@@ -1,0 +1,90 @@
+name: Validate pkg-config and CMake config
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  validate-config:
+    name: ${{ matrix.method }} (${{ matrix.config }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [linux, linux-3d]
+        method: [pkgconfig, cmake]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y software-properties-common
+          sudo add-apt-repository ppa:andrecosta/fastgltf
+
+          sudo apt-get update  && sudo apt-get install -y  \
+                                  cmake \
+                                  ninja-build \
+                                  python3 \
+                                  pkg-config \
+                                  python3-kconfiglib \
+                                  python3-venv \
+                                  python3-pcpp \
+                                  libwebp-dev \
+                                  libevdev-dev \
+                                  libdrm-dev \
+                                  libgbm-dev \
+                                  wayland-protocols \
+                                  libwayland-bin \
+                                  libwayland-dev \
+                                  libegl-dev \
+                                  libxkbcommon-dev \
+                                  libsimdjson-dev \
+                                  libfastgltf-dev \
+                                  libsdl2-dev \
+                                  libsdl2-image-dev \
+                                  libfreetype-dev
+
+      - name: Build and install LVGL
+        run: |
+          cmake -B build \
+                -GNinja \
+                -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/lvgl-install \
+                -DLV_BUILD_USE_KCONFIG=ON \
+                -DLV_BUILD_DEFCONFIG_PATH=configs/${{ matrix.config }}_defconfig
+
+          cmake --build build
+          cmake --install build
+
+      - name: Test pkg-config flags resolve correctly
+        if: matrix.method == 'pkgconfig'
+        run: |
+          export PKG_CONFIG_PATH=${{ github.workspace }}/lvgl-install/lib/pkgconfig:$PKG_CONFIG_PATH
+          pkg-config --exists lvgl
+          pkg-config --modversion lvgl
+          # Compile and link the same test binary using pkg-config output
+          g++ tests/test_install/lvgl_${{ matrix.config }}.c -o main \
+            $(pkg-config --cflags --libs --static lvgl)
+
+      - name: Test CMake find_package resolves correctly
+        if: matrix.method == 'cmake'
+        run: |
+          # Write a minimal CMakeLists.txt that consumes LVGL as an external package
+          mkdir -p /tmp/consumer
+          cat > /tmp/consumer/CMakeLists.txt << 'EOF'
+          cmake_minimum_required(VERSION 3.14)
+          project(lvgl_consumer)
+          set(CMAKE_PREFIX_PATH "${{ github.workspace }}/lvgl-install")
+          find_package(lvgl REQUIRED)
+          add_executable(main lvgl_${{ matrix.config }}.c)
+          target_link_libraries(main PRIVATE lvgl::lvgl)
+          EOF
+          cp tests/test_install/lvgl_${{ matrix.config }}.c /tmp/consumer/
+          cmake -B /tmp/consumer/build /tmp/consumer
+          cmake --build /tmp/consumer/build -j$(nproc)

@@ -5,13 +5,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+
+#include "../../lvgl_public.h"
+
 #if LV_USE_STDLIB_STRING == LV_STDLIB_BUILTIN
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_math.h"
-#include "../../stdlib/lv_string.h"
-#include "../../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES

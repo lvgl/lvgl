@@ -6,17 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_msgbox_private.h"
-#include "../../core/lv_obj_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_MSGBOX
 
-#include "../label/lv_label.h"
-#include "../image/lv_image.h"
-#include "../../misc/lv_assert.h"
-#include "../../display/lv_display.h"
-#include "../../layouts/flex/lv_flex.h"
-#include "../../stdlib/lv_string.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../lvgl_public.h"
+#include "../../misc/lv_text_private.h"
 
 #if LV_USE_LABEL == 0
     #error "lv_mbox: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
@@ -202,6 +200,20 @@ lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text)
     return label;
 }
 
+lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...)
+{
+    lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
+
+    va_list args;
+    va_start(args, fmt);
+    lv_obj_t * label = lv_label_create(mbox->content);
+    lv_label_set_text_vfmt(label, fmt, args);
+    lv_obj_set_width(label, lv_pct(100));
+    va_end(args);
+
+    return label;
+}
+
 lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
 {
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
@@ -240,28 +252,28 @@ lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * obj)
 
 lv_obj_t * lv_msgbox_get_header(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->header;
 }
 
 lv_obj_t * lv_msgbox_get_footer(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->footer;
 }
 
 lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->content;
 }
 
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     return mbox->title;
 }

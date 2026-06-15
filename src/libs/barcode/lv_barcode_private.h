@@ -14,10 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../widgets/canvas/lv_canvas_private.h"
-#include "lv_barcode.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_BARCODE
+
+#include "../../widgets/canvas/lv_canvas_private.h"
 
 /*********************
  *      DEFINES

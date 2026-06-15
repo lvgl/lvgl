@@ -13,10 +13,7 @@
 
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_types.h"
 #include "../../core/lv_refr_private.h"
-#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -235,7 +232,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             uint8_t * buf_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_1_bytes_init(sum, buf_line_end, sample_len_limited, - px_size * skip_cnt);
+            blur_1_bytes_init(sum, buf_line_end, sample_len_limited, -(int32_t)px_size * skip_cnt);
             buf_prev = buf_line_end[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
@@ -324,7 +321,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             volatile uint8_t * buf_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_3_bytes_init(sum, buf_line_end, sample_len_limited, - px_size * skip_cnt);
+            blur_3_bytes_init(sum, buf_line_end, sample_len_limited, -(int32_t)px_size * skip_cnt);
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum, buf_line_end, intensity);

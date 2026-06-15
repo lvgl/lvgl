@@ -14,18 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_DRAW_NANOVG
-#include "../lv_draw.h"
+
 #include "../lv_draw_private.h"
-#include "../../draw/lv_draw_vector.h"
-#include "../../draw/lv_draw_arc.h"
-#include "../../draw/lv_draw_rect.h"
-#include "../../draw/lv_draw_image.h"
-#include "../../draw/lv_draw_label.h"
-#include "../../draw/lv_draw_line.h"
-#include "../../draw/lv_draw_triangle.h"
 #include "../../misc/lv_area_private.h"
 
 #if !LV_USE_NANOVG
@@ -61,6 +54,7 @@ extern "C" {
 
 struct _lv_pending_t;
 struct NVGLUframebuffer;
+struct NVGLUblurState;
 
 typedef struct _lv_draw_nanovg_unit_t {
     lv_draw_unit_t base_unit;
@@ -78,11 +72,23 @@ typedef struct _lv_draw_nanovg_unit_t {
     struct _lv_pending_t * letter_pending;
 
     lv_cache_t * fbo_cache;
+
+    struct NVGLUblurState * blur_state;
 } lv_draw_nanovg_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+#if LV_USE_3DTEXTURE
+/**
+ * Draw 3D texture on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a 3D draw descriptor
+ * @param coords the coordinates of the 3D texture
+ */
+void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+#endif
 
 /**
  * Draw arc on a NanoVG context
@@ -190,6 +196,26 @@ void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t 
  */
 int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb);
 
+/**
+ * Initialize the blur draw unit state on the given nanovg unit
+ * @param u pointer to the nanovg unit
+ */
+void lv_draw_nanovg_blur_init(lv_draw_nanovg_unit_t * u);
+
+/**
+ * Deinitialize the blur draw unit state on the given nanovg unit
+ * @param u pointer to the nanovg unit
+ */
+void lv_draw_nanovg_blur_deinit(lv_draw_nanovg_unit_t * u);
+
+/**
+ * Apply a separable gaussian blur to the current layer using a fragment shader
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a blur descriptor
+ * @param coords the coordinates of the area to blur
+ */
+void lv_draw_nanovg_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
+
 #if LV_USE_VECTOR_GRAPHIC
 /**
  * Draw vector graphics on a NanoVG context
@@ -240,10 +266,10 @@ void lv_nanovg_draw_grad_helper(
  *      MACROS
  **********************/
 
+#endif /*LV_USE_DRAW_NANOVG*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
-
-#endif /*LV_USE_DRAW_NANOVG*/
 
 #endif /*LV_DRAW_NANOVG_PRIVATE_H*/

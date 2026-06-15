@@ -1,0 +1,140 @@
+---
+title: "Button Matrix (lv_buttonmatrix)"
+description: "A lightweight way to display many buttons in rows and columns. The buttons are drawn on the fly instead of being created as separate widgets, so memory use stays low."
+---
+
+## Overview
+
+Button Matrix shows many buttons in rows and columns. It is lightweight
+because the buttons are not created as separate widgets — they are
+drawn on the fly. Each button takes only eight extra bytes, instead of
+the ~100–150 bytes a real [Button](/widgets/button) plus the ~100 bytes
+a [Label](/widgets/label) would use.
+
+A new Button Matrix is added to the default group (if one is set). It
+is an editable widget: buttons can be selected and clicked with an
+encoder or keyboard too.
+
+## Button map
+
+<LvglExample name="lv_example_buttonmatrix_map" path="widgets/buttonmatrix/lv_example_buttonmatrix_map" />
+
+<ApiLink name="lv_buttonmatrix_set_map" display="lv_buttonmatrix_set_map(bm, map)" /> assigns the button labels. The `map`
+is a `const char *` array terminated by `NULL` or `""`. A `"\n"` entry
+starts a new row; buttons in a row share width evenly by default.
+
+```c
+const char * map[] = {"1", "2", "\n", "OK", ""};
+lv_buttonmatrix_set_map(bm, map);
+```
+
+## Button widths
+
+<LvglExample name="lv_example_buttonmatrix_button_width" path="widgets/buttonmatrix/lv_example_buttonmatrix_button_width" />
+
+<ApiLink name="lv_buttonmatrix_set_button_width" display="lv_buttonmatrix_set_button_width(bm, id, w)" /> makes a button take up `w`
+units of the row, similar to CSS `flex-grow`. `w` is in 1..15; default
+1. A row with widths `{1, 2}` splits 1/3 + 2/3.
+
+## Control flags
+
+Each button carries a bitmask of `LV_BUTTONMATRIX_CTRL_*` flags:
+
+| Flag | Effect |
+|---|---|
+| `HIDDEN` | Don't draw the button but keep its slot in the layout. |
+| `NO_REPEAT` | Don't emit <ApiLink name="LV_EVENT_LONG_PRESSED_REPEAT" /> while held. |
+| `DISABLED` | Block input; render in <ApiLink name="LV_STATE_DISABLED" />. |
+| `CHECKABLE` | Toggle <ApiLink name="LV_STATE_CHECKED" /> on click. |
+| `CHECKED` | Start in the checked state. |
+| `CLICK_TRIG` | Fire <ApiLink name="LV_EVENT_VALUE_CHANGED" /> on click instead of press. |
+| `POPOVER` | Show the button text in a magnified pop-over while pressed. |
+| `RECOLOR` | Enable `#rrggbb …#` colour codes in the button text. |
+| `CUSTOM_1`, `CUSTOM_2` | Free for application use. |
+
+<LvglExample name="lv_example_buttonmatrix_button_ctrl" path="widgets/buttonmatrix/lv_example_buttonmatrix_button_ctrl" />
+
+Set or clear flags per button with
+<ApiLink name="lv_buttonmatrix_set_button_ctrl" display="lv_buttonmatrix_set_button_ctrl(bm, id, flags)" /> and `_clear_button_ctrl(...)`.
+`_all` variants apply to every button at once. For a whole-matrix
+initial setup, <ApiLink name="lv_buttonmatrix_set_ctrl_map" display="lv_buttonmatrix_set_ctrl_map(bm, ctrl_map)" /> takes an array
+the same size as the button map, each element OR'd from a width (1..15)
+plus any control flags.
+
+## Popover
+
+<LvglExample name="lv_example_buttonmatrix_popover" path="widgets/buttonmatrix/lv_example_buttonmatrix_popover" />
+
+The <ApiLink name="LV_BUTTONMATRIX_CTRL_POPOVER" /> flag shows the pressed button's
+text in a magnified popover above the finger, mirroring the on-screen keyboard
+convention so the user can still read what they are pressing.
+
+## Recolor
+
+<LvglExample name="lv_example_buttonmatrix_recolor" path="widgets/buttonmatrix/lv_example_buttonmatrix_recolor" />
+
+The <ApiLink name="LV_BUTTONMATRIX_CTRL_RECOLOR" /> flag enables the same
+`#RRGGBB ... #` inline color syntax used by <ApiLink name="lv_label" /> recoloring, so individual
+words or characters in a button's text can be colored without per-button styles.
+
+## One checked
+
+<LvglExample name="lv_example_buttonmatrix_one_checked" path="widgets/buttonmatrix/lv_example_buttonmatrix_one_checked" />
+
+The "One-checked" feature can be enabled with
+<ApiLink name="lv_buttonmatrix_set_one_checked" display="lv_buttonmatrix_set_one_checked(btn_matrix, true)" /> to allow only one button to
+be checked at a time.
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> The background of the Button Matrix, uses the
+   typical background style properties. `pad_row` and `pad_column`
+   sets the space between the buttons.
+- <ApiLink name="LV_PART_ITEMS" /> The buttons all use the text and typical background
+   style properties except translations and transformations.
+
+<LvglExample name="lv_example_buttonmatrix_styling" path="widgets/buttonmatrix/lv_example_buttonmatrix_styling" />
+
+Button Matrix has two stylable parts: <ApiLink name="LV_PART_MAIN" />
+(the container) and <ApiLink name="LV_PART_ITEMS" /> (each virtual
+button). Style them separately with `selector="main"` and
+`selector="items"`, and combine with states using
+`selector="items|checked"`, `selector="items|pressed"`, or
+`selector="items|focused"` to recolor only the affected button.
+The container accepts the full background stack including `pad_row`
+and `pad_column` for the gaps between buttons; items use the same
+`bg_*`, `border_*`, `radius`, and `text_*` properties as a regular
+button. Local `style_*` props on the `<lv_buttonmatrix>` tag apply to
+MAIN.
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" />: Sent when a button is pressed/released or
+   repeated after long press. The event parameter is set to the ID of
+   the pressed/released button.
+
+<ApiLink name="lv_buttonmatrix_get_selected_button" display="lv_buttonmatrix_get_selected_button(btn_matrix)" /> returns the index of the button
+most recently released (the button with focus) or <ApiLink name="LV_BUTTONMATRIX_BUTTON_NONE" />
+if no such button was found.
+
+<ApiLink name="lv_buttonmatrix_get_button_text" display="lv_buttonmatrix_get_button_text(btn_matrix, button_id)" /> returns a pointer
+to the text of the button specified by zero-based index `button_id`.
+
+<LvglExample name="lv_example_buttonmatrix_event" path="widgets/buttonmatrix/lv_example_buttonmatrix_event" />
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_RIGHT/UP/LEFT/RIGHT` To navigate among the buttons to
+   select one
+- <ApiLink name="LV_KEY_ENTER" /> To press/release the selected button
+
+Note that long pressing the Button Matrix with an encoder can mean to
+enter/leave edit mode and simply long pressing a button to make it
+repeat as well. To avoid this contradiction, add
+<ApiLink name="lv_buttonmatrix_set_button_ctrl_all" display="lv_buttonmatrix_set_button_ctrl_all(btn_matrix, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT)" />
+to the Button Matrix if used with an encoder.  This disables the repeat feature so
+the button will not be activated upon leaving edit mode.
+
+Learn more about [Keys](/main-modules/indev/keypad).

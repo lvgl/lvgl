@@ -235,6 +235,8 @@ void test_display_triple_buffer(void)
 {
     lv_display_t * disp = lv_display_create(480, 320);
     lv_display_set_flush_cb(disp, dummy_flush_cb);
+    TEST_ASSERT_EQUAL_PTR(lv_display_get_flush_cb(disp), dummy_flush_cb);
+
     lv_draw_buf_t * buf1 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
     lv_draw_buf_t * buf2 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
     lv_draw_buf_t * buf3 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
@@ -516,7 +518,7 @@ void test_display_layers(void)
         lv_layer_sys(),
     };
 
-    static const lv_palette_t paletts[] = {
+    static const lv_palette_t palettes[] = {
         LV_PALETTE_RED,
         LV_PALETTE_GREEN,
         LV_PALETTE_BLUE,
@@ -534,7 +536,7 @@ void test_display_layers(void)
         lv_obj_t * obj = lv_obj_create(parents[i]);
         lv_obj_align(obj, LV_ALIGN_CENTER, 20 * i, 20 * i);
         lv_obj_set_style_opa(obj, LV_OPA_50, LV_PART_MAIN);
-        lv_obj_set_style_bg_color(obj, lv_palette_main(paletts[i]), LV_PART_MAIN);
+        lv_obj_set_style_bg_color(obj, lv_palette_main(palettes[i]), LV_PART_MAIN);
 
         lv_obj_t * label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "%s", layer_names[i]);

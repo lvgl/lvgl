@@ -584,45 +584,51 @@ static void chart_event_cb(lv_event_t * e)
             lv_obj_get_coords(obj, &obj_coords);
             const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
             if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
+            lv_point_precise_t p1;
+            lv_point_precise_t p2;
+            int32_t i;
+            for(i = 0; i < draw_line_dsc->point_cnt - 1; i++) {
+                p1 = draw_line_dsc->points[i];
+                p2 = draw_line_dsc->points[i + 1];
+                lv_draw_triangle_dsc_t tri_dsc;
+                lv_draw_triangle_dsc_init(&tri_dsc);
+                tri_dsc.p[0].x = (int32_t)p1.x;
+                tri_dsc.p[0].y = (int32_t)p1.y;
+                tri_dsc.p[1].x = (int32_t)p2.x;
+                tri_dsc.p[1].y = (int32_t)p2.y;
+                tri_dsc.p[2].x = (int32_t)(p1.y < p2.y ? p1.x : p2.x);
+                tri_dsc.p[2].y = (int32_t)LV_MAX(p1.y, p2.y);
+                tri_dsc.grad.dir = LV_GRAD_DIR_VER;
 
-            lv_draw_triangle_dsc_t tri_dsc;
-            lv_draw_triangle_dsc_init(&tri_dsc);
-            tri_dsc.p[0].x = (int32_t)draw_line_dsc->p1.x;
-            tri_dsc.p[0].y = (int32_t)draw_line_dsc->p1.y;
-            tri_dsc.p[1].x = (int32_t)draw_line_dsc->p2.x;
-            tri_dsc.p[1].y = (int32_t)draw_line_dsc->p2.y;
-            tri_dsc.p[2].x = (int32_t)(draw_line_dsc->p1.y < draw_line_dsc->p2.y ? draw_line_dsc->p1.x : draw_line_dsc->p2.x);
-            tri_dsc.p[2].y = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
-            tri_dsc.grad.dir = LV_GRAD_DIR_VER;
+                int32_t full_h = lv_obj_get_height(obj);
+                int32_t fract_upper = (int32_t)(LV_MIN(p1.y, p2.y) - obj_coords.y1) * 255 / full_h;
+                int32_t fract_lower = (int32_t)(LV_MAX(p1.y, p2.y) - obj_coords.y1) * 255 / full_h;
+                tri_dsc.grad.stops[0].color = lv_chart_get_series_color(obj, ser);
+                tri_dsc.grad.stops[0].opa = 255 - fract_upper;
+                tri_dsc.grad.stops[0].frac = 0;
+                tri_dsc.grad.stops[1].color = lv_chart_get_series_color(obj, ser);
+                tri_dsc.grad.stops[1].opa = 255 - fract_lower;
+                tri_dsc.grad.stops[1].frac = 255;
 
-            int32_t full_h = lv_obj_get_height(obj);
-            int32_t fract_uppter = (int32_t)(LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj_coords.y1) * 255 / full_h;
-            int32_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj_coords.y1) * 255 / full_h;
-            tri_dsc.grad.stops[0].color = lv_chart_get_series_color(obj, ser);
-            tri_dsc.grad.stops[0].opa = 255 - fract_uppter;
-            tri_dsc.grad.stops[0].frac = 0;
-            tri_dsc.grad.stops[1].color = lv_chart_get_series_color(obj, ser);
-            tri_dsc.grad.stops[1].opa = 255 - fract_lower;
-            tri_dsc.grad.stops[1].frac = 255;
+                lv_draw_triangle(base_dsc->layer, &tri_dsc);
 
-            lv_draw_triangle(base_dsc->layer, &tri_dsc);
+                lv_draw_rect_dsc_t rect_dsc;
+                lv_draw_rect_dsc_init(&rect_dsc);
+                rect_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
+                rect_dsc.bg_grad.stops[0].color = lv_chart_get_series_color(obj, ser);
+                rect_dsc.bg_grad.stops[0].frac = 0;
+                rect_dsc.bg_grad.stops[0].opa = 255 - fract_lower;
+                rect_dsc.bg_grad.stops[1].color = lv_chart_get_series_color(obj, ser);
+                rect_dsc.bg_grad.stops[1].frac = 255;
+                rect_dsc.bg_grad.stops[1].opa = 0;
 
-            lv_draw_rect_dsc_t rect_dsc;
-            lv_draw_rect_dsc_init(&rect_dsc);
-            rect_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
-            rect_dsc.bg_grad.stops[0].color = lv_chart_get_series_color(obj, ser);
-            rect_dsc.bg_grad.stops[0].frac = 0;
-            rect_dsc.bg_grad.stops[0].opa = 255 - fract_lower;
-            rect_dsc.bg_grad.stops[1].color = lv_chart_get_series_color(obj, ser);
-            rect_dsc.bg_grad.stops[1].frac = 255;
-            rect_dsc.bg_grad.stops[1].opa = 0;
-
-            lv_area_t rect_area;
-            rect_area.x1 = (int32_t)draw_line_dsc->p1.x;
-            rect_area.x2 = (int32_t)draw_line_dsc->p2.x;
-            rect_area.y1 = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
-            rect_area.y2 = (int32_t)obj_coords.y2;
-            lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
+                lv_area_t rect_area;
+                rect_area.x1 = (int32_t)p1.x;
+                rect_area.x2 = (int32_t)p2.x;
+                rect_area.y1 = (int32_t)LV_MAX(p1.y, p2.y);
+                rect_area.y2 = (int32_t)obj_coords.y2;
+                lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
+            }
         }
 
         bool add_value = false;

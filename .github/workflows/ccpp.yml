@@ -141,13 +141,16 @@ jobs:
           git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
           MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
           echo "Merge-base: $MB"
-          python scripts/check_gcov_coverage.py --commit="${MB}...${{ github.event.pull_request.head.sha }}"
+          python scripts/check_gcov_coverage.py \
+            --commit="${MB}...${{ github.event.pull_request.head.sha }}" \
+            --fail-under=50 \
+            --min-lines=5
         else
           echo "Not a pull request, skipping code coverage analysis."
         fi
     - name: Archive screenshot errors
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: screenshot-errors-amd64
         path: |
@@ -173,7 +176,7 @@ jobs:
 
     - name: Upload untracked reference images
       if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: Untracked Reference Images
         path: untracked_ref_imgs.zip
@@ -186,7 +189,7 @@ jobs:
 
     - name: Upload coverage reports as artifacts
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: coverage-reports-${{ matrix.build_config }}
         path: tests/report/

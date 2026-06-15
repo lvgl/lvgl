@@ -6,15 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_x11.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_X11
 
 #include <string.h>
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include "../../widgets/image/lv_image.h"
 
 /*********************
  *      DEFINES
@@ -163,6 +162,7 @@ static void x11_inp_event_handler(lv_timer_t * t)
                             case XK_KP_Delete:
                                 xd->kb_buffer[len] = LV_KEY_DEL;
                                 break;
+                            case XK_Return:
                             case XK_KP_Enter:
                                 xd->kb_buffer[len] = LV_KEY_ENTER;
                                 break;

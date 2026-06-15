@@ -9,11 +9,13 @@
 
 #include "lv_gstreamer_internal.h"
 
+#include "../../lvgl_public.h"
 #if LV_USE_GSTREAMER
 
 #include <glib.h>
 #include <gst/gstelementfactory.h>
 #include "../../core/lv_obj_class_private.h"
+#include "../../misc/lv_event_private.h"
 
 /*********************
  *      DEFINES
@@ -41,10 +43,13 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer user_data);
 static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data);
 static void gstreamer_timer_cb(lv_timer_t * timer);
-static void gstreamer_poll_bus(lv_gstreamer_t * streamer);
+static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer);
 static void gstreamer_update_frame(lv_gstreamer_t * streamer);
 static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
                                                       const lv_gstreamer_pipeline_element_t * elements, size_t element_count);
+static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state);
+static bool gstreamer_element_has_property(GstElement * element, const char * property_name);
+static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value);
 
 /**********************
  *  STATIC VARIABLES
@@ -98,7 +103,7 @@ lv_obj_t * lv_gstreamer_create(lv_obj_t * parent)
 
 lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, const char * property, const char * source)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(factory_name);
 
     if(!obj || !factory_name) {
@@ -133,31 +138,53 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     }
 
     if(property != NULL && source != NULL) {
-        g_object_set(G_OBJECT(head), property, source, NULL);
+        /* LV_GSTREAMER_PROPERTY_WEBRTCSRC is a child-proxy property path */
+        if(lv_streq(property, LV_GSTREAMER_PROPERTY_WEBRTCSRC)) {
+            if(!gstreamer_set_child_proxy_string(head, property, source)) {
+                gst_object_unref(pipeline);
+                LV_LOG_ERROR("Failed to set '%s' via child proxy", property);
+                return LV_RESULT_INVALID;
+            }
+        }
+        else {
+            g_object_set(G_OBJECT(head), property, source, NULL);
+        }
     }
 
     /* The uri decode source element will automatically handle parsing and decoding for us
      * for other source types, we need to add a parser and a decoder ourselves element*/
     if(!lv_streq(LV_GSTREAMER_FACTORY_URI_DECODE, factory_name)) {
-        GstElement * decodebin = gst_element_factory_make("decodebin", "lv_gstreamer_decodebin");
-        if(!decodebin) {
-            gst_object_unref(pipeline);
-            LV_LOG_ERROR("Failed to create decodebin element");
-            return LV_RESULT_INVALID;
+        /* webrtcsrc plugins require its own handling to be able to connect on the first available video stream */
+        if(lv_streq(LV_GSTREAMER_FACTORY_WEBRTCSRC, factory_name)) {
+            LV_LOG_INFO("Setting up webrtc pipeline");
+            if(gstreamer_element_has_property(head, "connect-to-first-producer")) {
+                g_object_set(G_OBJECT(head), "connect-to-first-producer", TRUE, NULL);
+            }
+            else {
+                LV_LOG_WARN("webrtcsrc property 'connect-to-first-producer' is not available in this plugin build");
+            }
         }
-        if(!gst_bin_add(GST_BIN(pipeline), decodebin)) {
-            gst_object_unref(decodebin);
-            gst_object_unref(pipeline);
-            LV_LOG_ERROR("Failed to add decodebin element to pipeline");
-            return LV_RESULT_INVALID;
-        }
+        else {
+            GstElement * decodebin = gst_element_factory_make("decodebin", "lv_gstreamer_decodebin");
+            if(!decodebin) {
+                gst_object_unref(pipeline);
+                LV_LOG_ERROR("Failed to create decodebin element");
+                return LV_RESULT_INVALID;
+            }
+            if(!gst_bin_add(GST_BIN(pipeline), decodebin)) {
+                gst_object_unref(decodebin);
+                gst_object_unref(pipeline);
+                LV_LOG_ERROR("Failed to add decodebin element to pipeline");
+                return LV_RESULT_INVALID;
+            }
 
-        if(!gst_element_link(head, decodebin)) {
-            gst_object_unref(pipeline);
-            LV_LOG_ERROR("Failed to link source with parsebin elements");
-            return LV_RESULT_INVALID;
+            if(!gst_element_link(head, decodebin)) {
+                gst_object_unref(pipeline);
+                LV_LOG_ERROR("Failed to link source with parsebin elements");
+                return LV_RESULT_INVALID;
+            }
+            head = decodebin;
         }
-        head = decodebin;
     }
 
     /* At this point we don't yet know the input format
@@ -172,7 +199,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
 
 void lv_gstreamer_play(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     if(!obj) {
         return;
     }
@@ -184,12 +211,14 @@ void lv_gstreamer_play(lv_obj_t * obj)
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_PLAYING);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to play pipeline");
+        return;
     }
+    gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_PLAY);
 }
 
 void lv_gstreamer_pause(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     if(!obj) {
         return;
     }
@@ -202,12 +231,14 @@ void lv_gstreamer_pause(lv_obj_t * obj)
 
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to pause pipeline");
+        return;
     }
+    gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_PAUSE);
 }
 
 void lv_gstreamer_stop(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     if(!obj) {
         return;
     }
@@ -219,11 +250,13 @@ void lv_gstreamer_stop(lv_obj_t * obj)
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_READY);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to stop pipeline");
+        return;
     }
+    gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_STOP);
 }
 void lv_gstreamer_set_position(lv_obj_t * obj, uint32_t position)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     if(!obj) {
         return;
     }
@@ -243,7 +276,7 @@ void lv_gstreamer_set_position(lv_obj_t * obj, uint32_t position)
 
 uint32_t lv_gstreamer_get_duration(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->pipeline) {
@@ -260,7 +293,7 @@ uint32_t lv_gstreamer_get_duration(lv_obj_t * obj)
 
 uint32_t lv_gstreamer_get_position(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->pipeline) {
@@ -277,7 +310,7 @@ uint32_t lv_gstreamer_get_position(lv_obj_t * obj)
 
 lv_gstreamer_state_t lv_gstreamer_get_state(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->pipeline) {
@@ -308,7 +341,7 @@ lv_gstreamer_state_t lv_gstreamer_get_state(lv_obj_t * obj)
 void lv_gstreamer_set_volume(lv_obj_t * obj, uint8_t volume)
 {
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->audio_volume) {
@@ -320,7 +353,7 @@ void lv_gstreamer_set_volume(lv_obj_t * obj, uint8_t volume)
 
 uint8_t lv_gstreamer_get_volume(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->audio_volume) {
@@ -336,7 +369,7 @@ uint8_t lv_gstreamer_get_volume(lv_obj_t * obj)
 void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
 {
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
     if(!streamer->pipeline) {
@@ -362,6 +395,15 @@ void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
     }
 }
 
+lv_gstreamer_stream_state_t lv_gstreamer_get_stream_state(lv_event_t * e)
+{
+    if(!e || e->code != LV_EVENT_STATE_CHANGED) {
+        LV_LOG_WARN("Invalid event");
+        return -1;
+    }
+    return *(lv_gstreamer_stream_state_t *)lv_event_get_param(e);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -383,7 +425,7 @@ static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void gstreamer_poll_bus(lv_gstreamer_t * streamer)
+static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
 {
     GstBus * bus = gst_element_get_bus(streamer->pipeline);
     GstMessage * msg;
@@ -395,13 +437,29 @@ static void gstreamer_poll_bus(lv_gstreamer_t * streamer)
                     GError * err;
                     gchar * debug;
                     gst_message_parse_error(msg, &err, &debug);
-                    LV_LOG_ERROR("GStreamer error: %s", err->message);
+                    GstObject * src = GST_MESSAGE_SRC(msg);
+                    const gchar * name = NULL;
+                    if(src != NULL) {
+                        name = GST_OBJECT_NAME(src);
+                    }
+                    if(!name) {
+                        name = "unknown";
+                    }
+                    LV_LOG_ERROR("GStreamer error from %s: %s", name, err->message);
+                    if(debug && debug[0] != '\0') {
+                        LV_LOG_ERROR("GStreamer error details: %s", debug);
+                    }
                     g_error_free(err);
                     g_free(debug);
                     break;
                 }
             case GST_MESSAGE_EOS:
-                LV_LOG_INFO("End of stream");
+                if(gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_END) == LV_RESULT_INVALID) {
+                    /* Object deleted inside event handler */
+                    gst_object_unref(bus);
+                    gst_message_unref(msg);
+                    return LV_RESULT_INVALID;
+                }
                 break;
             case GST_MESSAGE_STATE_CHANGED: {
                     GstState old_state, new_state;
@@ -417,6 +475,7 @@ static void gstreamer_poll_bus(lv_gstreamer_t * streamer)
         gst_message_unref(msg);
     }
     gst_object_unref(bus);
+    return LV_RESULT_OK;
 }
 
 static void gstreamer_update_frame(lv_gstreamer_t * streamer)
@@ -459,6 +518,7 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
             .header = {
                 .magic = LV_IMAGE_HEADER_MAGIC,
                 .cf = IMAGE_FORMAT,
+                .flags = LV_IMAGE_FLAGS_MODIFIABLE,
                 .h = GST_VIDEO_INFO_HEIGHT(&streamer->video_info),
                 .w = GST_VIDEO_INFO_WIDTH(&streamer->video_info),
                 .stride = GST_VIDEO_INFO_PLANE_STRIDE(&streamer->video_info, 0),
@@ -469,6 +529,11 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     /* We send the event AFTER setting the image source so that users can query the
      * resolution on this specific event callback */
     if(first_frame) {
+        if(gstreamer_send_state_changed(streamer, LV_GSTREAMER_STREAM_STATE_START) == LV_RESULT_INVALID) {
+            /* Object deleted inside event handler */
+            return;
+        }
+        /*Send READY event for backwards compatibility with v9.4*/
         lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_READY, streamer);
     }
 
@@ -481,7 +546,9 @@ static void gstreamer_timer_cb(lv_timer_t * timer)
         return;
     }
 
-    gstreamer_poll_bus(streamer);
+    if(gstreamer_poll_bus(streamer) == LV_RESULT_INVALID) {
+        return;
+    }
     gstreamer_update_frame(streamer);
 }
 
@@ -500,8 +567,15 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     if(streamer->last_sample) {
         gst_sample_unref(streamer->last_sample);
     }
+    if(streamer->frame_queue) {
+        GstSample * sample;
+        while((sample = g_async_queue_try_pop(streamer->frame_queue)) != NULL) {
+            gst_sample_unref(sample);
+        }
+        g_async_queue_unref(streamer->frame_queue);
+        streamer->frame_queue = NULL;
+    }
     lv_timer_delete(streamer->gstreamer_timer);
-    g_async_queue_unref(streamer->frame_queue);
 }
 
 static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
@@ -525,11 +599,50 @@ static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
     return LV_RESULT_OK;
 }
 
+static bool gstreamer_element_has_property(GstElement * element, const char * property_name)
+{
+    LV_ASSERT_NULL(element);
+    LV_ASSERT_NULL(property_name);
+
+    GObjectClass * klass = G_OBJECT_GET_CLASS(element);
+    return g_object_class_find_property(klass, property_name) != NULL;
+}
+
+static bool gstreamer_set_child_proxy_string(GstElement * element, const char * property_name, const char * value)
+{
+    LV_ASSERT_NULL(element);
+    LV_ASSERT_NULL(property_name);
+    LV_ASSERT_NULL(value);
+
+    if(!GST_IS_CHILD_PROXY(element)) {
+        LV_LOG_WARN("Element does not support child proxy for property '%s'", property_name);
+        return false;
+    }
+
+    GObject * target = NULL;
+    GParamSpec * pspec = NULL;
+    if(!gst_child_proxy_lookup(GST_CHILD_PROXY(element), property_name, &target, &pspec)) {
+        LV_LOG_WARN("Property '%s' not found in child proxy", property_name);
+        return false;
+    }
+
+    if(target) {
+        g_object_unref(target);
+    }
+
+    GValue gvalue = G_VALUE_INIT;
+    g_value_init(&gvalue, G_TYPE_STRING);
+    g_value_set_string(&gvalue, value);
+    gst_child_proxy_set_property(GST_CHILD_PROXY(element), property_name, &gvalue);
+    g_value_unset(&gvalue);
+    return true;
+}
+
 static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer user_data)
 {
     LV_UNUSED(element);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)user_data;
-    GstCaps * caps = gst_pad_get_current_caps(pad);
+    GstCaps * caps = gst_pad_query_caps(pad, NULL);
 
     GstStructure * structure = gst_caps_get_structure(caps, 0);
     const gchar * name = gst_structure_get_name(structure);
@@ -638,5 +751,10 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
 
     g_async_queue_push(streamer->frame_queue, sample);
     return GST_FLOW_OK;
+}
+
+static lv_result_t gstreamer_send_state_changed(lv_gstreamer_t * streamer, lv_gstreamer_stream_state_t state)
+{
+    return lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_STATE_CHANGED, &state);
 }
 #endif

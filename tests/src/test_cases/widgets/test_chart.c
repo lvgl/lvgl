@@ -4,6 +4,12 @@
 
 #include "unity/unity.h"
 
+#ifndef NON_AMD64_BUILD
+    #define EXT_NAME ".lp64.png"
+#else
+    #define EXT_NAME ".lp32.png"
+#endif
+
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * chart = NULL;
 
@@ -217,6 +223,56 @@ void test_chart_scatter(void)
     lv_chart_set_next_value2(chart, ser, 100, 20);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_scatter.png");
+}
+void test_chart_curve(void)
+{
+#if LV_USE_VECTOR_GRAPHIC
+    /*Create a chart*/
+    lv_obj_set_size(chart, 400, 300);
+    lv_obj_center(chart);
+    lv_obj_set_style_bg_opa(chart, LV_OPA_50, LV_PART_INDICATOR);
+    lv_obj_set_style_line_dash_gap(chart, 5, LV_PART_ITEMS);
+    lv_obj_set_style_line_dash_width(chart, 10, LV_PART_ITEMS);
+    lv_chart_set_type(chart, LV_CHART_TYPE_CURVE);
+    lv_chart_set_point_count(chart, 15);
+
+    lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_SECONDARY_Y);
+
+    lv_chart_set_next_value(chart, ser1, 10);
+    lv_chart_set_next_value(chart, ser1, 20);
+    lv_chart_set_next_value(chart, ser1, 30);
+    lv_chart_set_next_value(chart, ser1, 80);
+    lv_chart_set_next_value(chart, ser1, 90);
+    lv_chart_set_next_value(chart, ser1, 90);
+    lv_chart_set_next_value(chart, ser1, 90);
+    lv_chart_set_next_value(chart, ser1, 10);
+    lv_chart_set_next_value(chart, ser1, 20);
+    lv_chart_set_next_value(chart, ser1, 10);
+    lv_chart_set_next_value(chart, ser1, 40);
+    lv_chart_set_next_value(chart, ser1, 60);
+    lv_chart_set_next_value(chart, ser1, 60);
+    lv_chart_set_next_value(chart, ser1, 40);
+    lv_chart_set_next_value(chart, ser1, 45);
+
+    lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
+    lv_chart_set_next_value(chart, ser2, 40);
+    lv_chart_set_next_value(chart, ser2, 50);
+    lv_chart_set_next_value(chart, ser2, 60);
+    lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
+    lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
+    lv_chart_set_next_value(chart, ser2, 80);
+    lv_chart_set_next_value(chart, ser2, 80);
+    lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
+    lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
+    lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
+    lv_chart_set_next_value(chart, ser2, 45);
+    lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
+    lv_chart_set_next_value(chart, ser2, 55);
+    lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_curve" EXT_NAME);
+#endif /*LV_USE_VECTOR_GRAPHIC*/
 }
 
 void test_chart_properties(void)

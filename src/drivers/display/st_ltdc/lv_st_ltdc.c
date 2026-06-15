@@ -7,14 +7,13 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 #if LV_USE_ST_LTDC
 
-#include "lv_st_ltdc.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
 #include "../../../osal/lv_os_private.h"
-#include "main.h"
+#include <main.h>
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
     #if LV_USE_DRAW_DMA2D
@@ -211,10 +210,15 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 #endif
         }
         else {
+#if LV_USE_DRAW_SW
             uint32_t area_stride = px_size * area_width;
             lv_draw_sw_rotate(px_map, first_pixel, area_width, area_height, area_stride, fb_stride, rotation, cf);
             clean_dcache();
             g_data.disp_flushed_in_flush_cb[layer_idx] = true;
+#else
+            LV_LOG_WARN("LV_USE_DRAW_SW needs to be enabled to rotate the display's content");
+            g_data.disp_flushed_in_flush_cb[layer_idx] = true;
+#endif
         }
     }
 }

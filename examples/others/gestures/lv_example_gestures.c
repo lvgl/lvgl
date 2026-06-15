@@ -69,8 +69,16 @@ static uint32_t label_y;
 
 
 /**
- * Entry point it creates the screen, and the label
- * Set event callbacks on the label
+ * @title Pinch, rotate, and two-finger swipe
+ * @brief Transform a 300x300 rectangle with three `LV_EVENT_GESTURE` callbacks.
+ *
+ * A clickable label styled as a 300x300 rectangle is centered on the screen.
+ * Three callbacks are attached on `LV_EVENT_GESTURE`: one handles
+ * `LV_INDEV_GESTURE_PINCH` and rescales the rectangle between 0.4x and 2.0x via
+ * `lv_event_get_pinch_scale`, one handles `LV_INDEV_GESTURE_ROTATE` and applies
+ * `lv_obj_set_style_transform_rotation` around the pivot, and one handles
+ * `LV_INDEV_GESTURE_TWO_FINGERS_SWIPE` and writes the direction and distance
+ * into the label text.
  */
 void lv_example_gestures(void)
 {

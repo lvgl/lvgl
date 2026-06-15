@@ -1,0 +1,185 @@
+---
+title: "Label (lv_label)"
+description: "Display text with optional wrapping, scrolling, recoloring, and selection."
+---
+
+## Overview
+
+A Label is the widget used to display text.
+
+## Set text
+
+| Function | Behaviour |
+|---|---|
+| <ApiLink name="lv_label_set_text" display="lv_label_set_text(label, str)" /> | Copies `str` into a dynamically allocated buffer. `str` doesn't need to outlive the call. |
+| <ApiLink name="lv_label_set_text_fmt" display="lv_label_set_text_fmt(label, fmt, ...)" /> | `printf`-style formatting — e.g. <ApiLink name="lv_label_set_text_fmt" display="lv_label_set_text_fmt(label, &quot;Value: %d&quot;, 15)" />. |
+| <ApiLink name="lv_label_set_text_static" display="lv_label_set_text_static(label, buf)" /> | Stores the pointer; `buf` must outlive the label. Pass `const` strings or a long-lived buffer. |
+
+<Callout type="warn">
+For fast-changing labels (e.g. live readouts), prefer
+<ApiLink name="lv_label_set_text_static" /> over <ApiLink name="lv_label_set_text" /> — the latter forces a
+realloc whenever the string length changes. Don't pass `const` strings to
+`_set_text_static` when <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> is active; that mode
+edits the buffer in place and will crash on ROM strings.
+</Callout>
+
+## Set translation tag
+
+When using LVGL's translation module, you can bind a translation tag to a label directly with <ApiLink name="lv_label_set_translation_tag" display="lv_label_set_translation_tag(label, tag)" />.
+After this function is called, future changes to the language will automatically update the label's text to display the corresponding translation
+for that tag in the new language.
+
+<LvglExample name="lv_example_label_translation" path="widgets/label/lv_example_label_translation" />
+
+## Newline
+
+<LvglExample name="lv_example_label_set_text_newline" path="widgets/label/lv_example_label_set_text_newline" />
+
+Newline characters are handled automatically by the Label Widget. You
+can use `\n` to make a line break. For example:
+`"line1\nline2\n\nline4"`
+
+## Long modes
+
+<LvglExample name="lv_example_label_long_mode" path="widgets/label/lv_example_label_long_mode" />
+
+With default <ApiLink name="LV_SIZE_CONTENT" /> sizing a label grows to fit its text. When
+width or height is fixed, the long mode picks how overflow is handled
+(set with <ApiLink name="lv_label_set_long_mode" />):
+
+| Mode | Behaviour |
+|---|---|
+| <ApiLink name="LV_LABEL_LONG_MODE_WRAP" /> (default) | Wrap to next line. With <ApiLink name="LV_SIZE_CONTENT" /> height the label grows; otherwise overflow is clipped. |
+| <ApiLink name="LV_LABEL_LONG_MODE_DOTS" /> | Trim to fit and append `…`. **Edits the buffer in place** — `_set_text_static` needs a writable buffer for this mode. |
+| <ApiLink name="LV_LABEL_LONG_MODE_SCROLL" /> | Scroll the overflow back-and-forth. Horizontal takes precedence over vertical. |
+| <ApiLink name="LV_LABEL_LONG_MODE_SCROLL_CIRCULAR" /> | Scroll continuously in one direction. Same horizontal-first rule. |
+| <ApiLink name="LV_LABEL_LONG_MODE_CLIP" /> | Clip the overflow. |
+
+## Text recolor
+
+<LvglExample name="lv_example_label_recolor" path="widgets/label/lv_example_label_recolor" />
+
+In the text, you can use commands to recolor parts of the text.
+For example: `Write a #ff0000 red# word`. This feature can be enabled
+individually for each label by <ApiLink name="lv_label_set_recolor" display="lv_label_set_recolor(label, en)" />
+function. In the context of word-wrapped text, any Recoloring started on a
+line will be terminated at the end of the line where the line is wrapped if it
+was not already terminated by an ending `#` in the text.
+
+## Text selection
+
+<LvglExample name="lv_example_label_text_selection" path="widgets/label/lv_example_label_text_selection" />
+
+If enabled by <ApiLink name="LV_LABEL_TEXT_SELECTION" /> part of the text can be
+selected. It's similar to when you use your mouse on a PC to select
+text. The whole mechanism (click and select the text as you drag your
+finger/mouse) is implemented in [Text Area (lv_textarea)](/widgets/textarea) and
+the Label Widget only allows programmatic text selection with
+<ApiLink name="lv_label_get_text_selection_start" display="lv_label_get_text_selection_start(label, start_char_index)" /> and
+<ApiLink name="lv_label_get_text_selection_end" display="lv_label_get_text_selection_end(label, end_char_index)" />.
+
+## Text alignment
+
+<LvglExample name="lv_example_label_text_align" path="widgets/label/lv_example_label_text_align" />
+
+To horizontally align the lines of a Label the `text_align` style property can be used with
+<ApiLink name="lv_obj_set_style_text_align" /> or <ApiLink name="lv_style_set_text_align" />,
+passing one of the `LV_TEXT_ALIGN_...` enumeration values.
+Note that this has a visible effect only if:
+
+- the Label Widget's width is larger than the width of the longest line of text, and
+- the text has multiple lines with different line lengths.
+
+## Very long text
+
+LVGL can efficiently handle very long (e.g. > 40k characters) Labels by
+saving some extra data (~12 bytes) to speed up drawing. To enable this
+feature, set <ApiLink name="LV_LABEL_LONG_TXT_HINT" /> to `1` in `lv_conf.h`.
+
+## Custom scrolling animations
+
+Some aspects of the scrolling animations in long modes
+<ApiLink name="LV_LABEL_LONG_SCROLL" /> and <ApiLink name="LV_LABEL_LONG_SCROLL_CIRCULAR" /> can be
+customized by setting the Label's animation style property, using
+<ApiLink name="lv_style_set_anim" />.
+It will be treated as a template which will be used to create the scroll animations.
+
+## Symbols
+
+The Labels can display symbols alongside letters (or on their own). Read
+the [Overview](/main-modules/fonts/overview) section to learn more about symbols.
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> Uses the [typical background](/common-widget-features/styles/overview) and
+  text properties. Padding values can be used to add space between
+  the text and the edges of the Label's background.
+- <ApiLink name="LV_PART_SCROLLBAR" /> The scrollbar that is shown when the text is
+  larger than the Widget's size.
+- <ApiLink name="LV_PART_SELECTED" /> Tells the style of the
+  [selected text](/widgets/label). Only `text_color` and `bg_color` style
+  properties can be used.
+
+<LvglExample name="lv_example_label_styling" path="widgets/label/lv_example_label_styling" />
+
+A Label is mostly text but inherits the full base-widget background
+stack. `bg_color` + `bg_opa` + `radius` + `pad_*` turn a label into a
+chip or pill; add `border_*`, `outline_*`, and `shadow_*` for cards or
+call-outs. `text_color`, `text_font`, and `text_align` control the
+glyphs. Use a named `<style>` block when the look is reused across
+multiple labels (e.g. a "badge" style), or set local `style_*` props
+directly on the `<lv_label>` tag for one-off variations.
+
+## Data binding
+
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+A Label binds its text to a Subject. The link is one-way (Subject →
+Widget) because labels aren't editable. The Subject can be a string,
+pointer, integer, or float, and is rendered into the label's text as
+follows:
+
+| Field | Description |
+|-------|-------------|
+| `string Subject` | Subject's string is used to directly update the Label's text. |
+| `pointer Subject` | If NULL is passed as the `format_string` argument when subscribing, the Subject's pointer value is assumed to point to a NUL-terminated string and is used to directly update the Label's text. See [The ``format_string`` Argument](/widgets/label) for other options. |
+| `integer Subject` | Subject's integer value is used with the `format_string` argument. See [The ``format_string`` Argument](/widgets/label) for details. |
+| `float Subject` | Subject's float value is used with the `format_string` argument. Requires <ApiLink name="LV_USE_FLOAT" />. See [The ``format_string`` Argument](/widgets/label) for details. |
+
+- <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, format_string)" />
+
+<LvglExample name="lv_example_label_bind_text" path="widgets/label/lv_example_label_bind_text" />
+
+#### The `format_string` Argument
+
+The `format_string` argument is optional and if provided, must contain exactly 1
+printf-like format specifier and be one of the following:
+
+| Field | Description |
+|-------|-------------|
+| `string or pointer Subject` | "%s" to format the new pointer value as a string or "%p" to format the pointer as a pointer (typically the pointer's address value is spelled out with 4, 8 or 16 hexadecimal characters depending on the platform). |
+| `integer Subject` | "%d" format specifier (`"%" PRIdxx` --- a cross-platform equivalent where `xx` can be `8`, `16`, `32` or `64`, depending on the platform). |
+| `float Subject` | "%f" format specifier, e.g. "%0.2f", to display two digits after the decimal point. |
+
+If `NULL` is passed for the `format_string` argument:
+
+| Field | Description |
+|-------|-------------|
+| `string or pointer Subject` | Updates expect the pointer to point to a NUL-terminated string. |
+| `integer Subject` | The Label will simply display the number. Equivalent to "%d". |
+| `float Subject` | The Label will display the value with "%0.1f" format string. |
+
+**Example:**  "%d °C"
+
+As usual with format strings, `%%` is used to get `%`. For example `%d%%`
+
+## Events
+
+By default, Label Widgets are created without the  <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag,
+but you can add it to make the Widget detect and send events <ApiLink name="LV_EVENT_CLICKED" />.
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.

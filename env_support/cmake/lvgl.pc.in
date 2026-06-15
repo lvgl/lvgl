@@ -1,0 +1,13 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+
+Name: lvgl
+Description: Light and Versatile Graphics Library
+URL: https://lvgl.io/
+Version: @LVGL_VERSION@
+Requires: @LVGL_PKG_REQUIRES@
+Requires.private: @LVGL_PKG_REQUIRES_PRIVATE@
+Cflags: -I${includedir}
+Libs: -L${libdir} -llvgl @LVGL_PKG_LIBS@
+Libs.private: @LVGL_PKG_LIBS_PRIVATE@

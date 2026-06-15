@@ -7,12 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
+#include "lv_uefi_private.h"
 
 #if LV_USE_UEFI
-
-#include "lv_uefi_display.h"
-#include "lv_uefi_private.h"
 
 #if LV_COLOR_DEPTH != 32
     #error [lv_uefi] Unsupported LV_COLOR_DEPTH.
@@ -228,7 +225,7 @@ static void _display_flush_cb(lv_display_t * display, const lv_area_t * area, ui
         goto error;
     }
 
-    if((uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
+    if((uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->VerticalResolution) {
         LV_LOG_ERROR("[lv_uefi] Invalid lv_display_flush_cb call (invalid height).");
         goto error;
     }

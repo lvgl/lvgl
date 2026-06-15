@@ -1,26 +1,18 @@
-/******************************************************************
+/*
  * @file lv_indev_gesture.c
- *
- * Recognize gestures that consist of multiple touch events
- *
- * Copyright (c) 2024 EDGEMTech Ltd
- *
- * Author EDGEMTech Ltd. (erik.tagirov@edgemtech.ch)
- *
- ******************************************************************/
+ */
 
 /********************
  *      INCLUDES
  ********************/
 
-#include "lv_indev_private.h"
-#include "../misc/lv_event_private.h"
+#include "lv_indev_gesture_private.h"
 
 #if LV_USE_GESTURE_RECOGNITION
 
 #include <math.h>
-#include "lv_indev_gesture.h"
-#include "lv_indev_gesture_private.h"
+#include "lv_indev_private.h"
+#include "../misc/lv_event_private.h"
 
 /********************
  *      DEFINES
@@ -492,7 +484,7 @@ void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * r
                 to be higher than the threshold to pass it as recognized */
                 gesture_calculate_factors(r->info, 2);
                 dist = SQUARE_SUM(r->info->delta_x, r->info->delta_y);
-                if(dist > SQUARE(lv_indev_active()->gesture_limit)) {
+                if(dist > SQUARE(lv_indev_active()->gesture_min_distance)) {
                     r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
                 }
                 break;
@@ -541,7 +533,7 @@ void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data
     lv_indev_gesture_type_t type;
 
     /* First check if a recognizer state is RECOGNIZED or ENDED. *
-     * In that case, call its recongizer function and reset the other*/
+     * In that case, call its recognizer function and reset the other */
     type = get_first_recognized_or_ended_gesture(indev);
     if(type != LV_INDEV_GESTURE_NONE) {
 
