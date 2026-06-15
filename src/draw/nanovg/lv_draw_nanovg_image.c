@@ -30,6 +30,7 @@
 **********************/
 
 static void image_dsc_to_matrix(lv_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
+static inline void apply_recolor(NVGpaint * paint, const lv_draw_image_dsc_t * dsc);
 static bool is_power_of_2(uint32_t num);
 static void fill_repeat_tile_image(
     lv_draw_nanovg_unit_t * u,
@@ -135,6 +136,8 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
 
     NVGpaint paint = nvgImagePattern(u->vg, img_ofs_x, img_ofs_y, img_w, img_h, 0, image_handle,
                                      dsc->opa / (float)LV_OPA_COVER);
+    apply_recolor(&paint, dsc);
+
     nvgFillPaint(u->vg, paint);
     nvgFill(u->vg);
 
@@ -144,6 +147,24 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
 /**********************
 *   STATIC FUNCTIONS
 **********************/
+
+/**
+ * Apply GPU-side recolor to an image paint. The recolor is performed in the
+ * fragment shader, so the original texture stays untouched and shared in the
+ * cache; recolor animations only cost a uniform update instead of a per-frame
+ * CPU recolor + texture upload.
+ */
+static inline void apply_recolor(NVGpaint * paint, const lv_draw_image_dsc_t * dsc)
+{
+    if(dsc->recolor_opa <= LV_OPA_MIN) {
+        return;
+    }
+
+    paint->recolor = nvgRGBA(dsc->recolor.red,
+                             dsc->recolor.green,
+                             dsc->recolor.blue,
+                             dsc->recolor_opa);
+}
 
 static void image_dsc_to_matrix(lv_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
 {
@@ -212,6 +233,7 @@ static void fill_repeat_tile_image(
                 lv_nanovg_path_append_rect(u->vg, img_ofs_x, img_ofs_y, img_w, img_h, 0);
                 NVGpaint paint = nvgImagePattern(u->vg, img_ofs_x, img_ofs_y, img_w, img_h, 0, image_handle,
                                                  dsc->opa / (float)LV_OPA_COVER);
+                apply_recolor(&paint, dsc);
                 nvgFillPaint(u->vg, paint);
                 nvgFill(u->vg);
             }
