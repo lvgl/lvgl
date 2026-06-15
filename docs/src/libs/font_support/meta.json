@@ -2,6 +2,7 @@
   "title": "Font Support",
   "pages": [
     "freetype",
+    "harfbuzz",
     "tiny_ttf"
   ]
 }

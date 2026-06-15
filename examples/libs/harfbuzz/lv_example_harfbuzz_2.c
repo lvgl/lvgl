@@ -26,7 +26,8 @@ static lv_obj_t * add_script_section(lv_obj_t * parent, const lv_font_t * font,
 }
 
 /**
- * Render Bengali, Telugu, and Thai text with HarfBuzz shaping.
+ * @title HarfBuzz: Bengali, Telugu, Thai
+ * @brief Render Bengali, Telugu, and Thai text with HarfBuzz shaping.
  *
  * Each script exercises a different shaping mechanism:
  *   - Bengali : left-matra reordering and stroke-fused conjuncts

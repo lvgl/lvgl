@@ -9,7 +9,8 @@
 #endif
 
 /**
- * Render Hindi (Devanagari) text with HarfBuzz shaping.
+ * @title HarfBuzz: Devanagari (Hindi)
+ * @brief Render Hindi (Devanagari) text with HarfBuzz shaping.
  *
  * Devanagari requires text shaping because consonants combine into conjuncts,
  * vowel signs (matras) reorder around base characters, and half-forms are
