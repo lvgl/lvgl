@@ -18,9 +18,6 @@ extern "C" {
 
 #if LV_USE_FREETYPE && LV_USE_HARFBUZZ
 
-#include "../../font/lv_font.h"
-#include "../../misc/lv_bidi.h"
-
 /*********************
  *      DEFINES
  *********************/
