@@ -57,7 +57,6 @@ void lv_obj_delete(lv_obj_t * obj)
     if(obj->is_deleting) return;
 
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_obj_invalidate(obj);
 
     lv_obj_t * par = lv_obj_get_parent(obj);
@@ -142,7 +141,6 @@ void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
 
 void lv_obj_delete_async(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_async_call(lv_obj_delete_async_cb, obj);
 }
 
@@ -153,11 +151,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     if(obj->parent == NULL) {
         LV_LOG_WARN("Can't set the parent of a screen");
-        return;
-    }
-
-    if(parent == NULL) {
-        LV_LOG_WARN("Can't set parent == NULL to an object");
         return;
     }
 
@@ -278,7 +271,7 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
 
 lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     const lv_obj_t * par = obj;
     const lv_obj_t * act_par;
@@ -293,7 +286,7 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
 
 lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     const lv_obj_t * scr;
 
@@ -315,29 +308,26 @@ lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
 
 lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     return obj->parent;
 }
 
 lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t idx)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     if(obj->spec_attr == NULL) return NULL;
 
-    uint32_t idu;
     if(idx < 0) {
         idx = obj->spec_attr->child_cnt + idx;
         if(idx < 0) return NULL;
-        idu = (uint32_t) idx;
-    }
-    else {
-        idu = idx;
     }
 
-    if(idu >= obj->spec_attr->child_cnt) return NULL;
-    else return obj->spec_attr->children[idx];
+    uint32_t idu = (uint32_t) idx;
+
+    if(idu < obj->spec_attr->child_cnt) return obj->spec_attr->children[idu];
+    else return NULL;
 }
 
 lv_obj_t * lv_obj_get_child_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
@@ -454,7 +444,7 @@ void lv_obj_set_name_static(lv_obj_t * obj, const char * name)
 
 const char * lv_obj_get_name(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     if(obj->spec_attr == NULL) return NULL;
     else return obj->spec_attr->name;
@@ -529,7 +519,7 @@ void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size)
 
 lv_obj_t * lv_obj_get_child_by_name(const lv_obj_t * parent, const char * path)
 {
-    LV_CHECK_OBJ(parent, MY_CLASS, return 0);
+    LV_CHECK_OBJ(parent, MY_CLASS, return NULL);
     LV_CHECK_ARG(path != NULL, return NULL);
     LV_CHECK_ARG(parent->spec_attr != NULL, return NULL);
 
@@ -585,7 +575,7 @@ lv_obj_t * lv_obj_find_by_name(const lv_obj_t * parent, const char * name)
 
 int32_t lv_obj_get_index(const lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return -1);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return -1;
@@ -602,8 +592,8 @@ int32_t lv_obj_get_index(const lv_obj_t * obj)
 
 int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
-    LV_CHECK_ARG(class_p != NULL, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return -1);
+    LV_CHECK_ARG(class_p != NULL, return -1);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return 0xFFFFFFFF;
@@ -624,6 +614,8 @@ int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * cl
 
 void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
 {
+    LV_CHECK_ARG(cb != NULL, return);
+
     walk_core(start_obj, cb, user_data);
 }
 
@@ -805,7 +797,7 @@ static void dump_tree_core(lv_obj_t * obj, int32_t depth)
 
 static lv_obj_t * lv_obj_get_first_not_deleting_child(lv_obj_t * obj)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+    LV_ASSERT(obj != NULL);
 
     if(obj->spec_attr == NULL) return NULL;
 
