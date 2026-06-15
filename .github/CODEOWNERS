@@ -1,6 +1,6 @@
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence
-* @kisvegabor @AndreCostaaa @axos88 @FASTSHIFT
+* @kisvegabor @AndreCostaaa @axos88
 
 demos/gltf @AndreCostaaa
 examples/libs/gltf @AndreCostaaa
@@ -12,10 +12,9 @@ src/drivers/display/drm @AndreCostaaa
 src/drivers/display/fb @AndreCostaaa
 src/drivers/evdev @AndreCostaaa
 src/drivers/libinput @AndreCostaaa
-src/drivers/nuttx @FASTSHIFT @XuNeo
 src/drivers/sdl @kisvegabor
 src/drivers/wayland @AndreCostaaa
 src/libs/gltf @AndreCostaaa
 src/libs/gstreamer @AndreCostaaa
 src/libs/tiny_ttf @AndreCostaaa
-src/misc/cache @AndreCostaaa @FASTSHIFT
+src/misc/cache @AndreCostaaa
