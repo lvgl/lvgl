@@ -108,6 +108,10 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 #if LV_USE_PPA_IMG
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                /* Common constraints shared by the plain blend, scale (SRM) and
+                 * rotation paths. Scale and rotation are no longer required to be
+                 * identity here: the PPA SRM engine handles arbitrary scaling and
+                 * 90-degree rotation steps (see the dispatch below). */
                 if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
                      && dsc->clip_radius == 0
                      && dsc->bitmap_mask_src == NULL
@@ -118,15 +122,19 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      && dsc->opa >= (lv_opa_t)LV_OPA_MAX
                      && dsc->skew_y == 0
                      && dsc->skew_x == 0
-                     && dsc->scale_x == 256
-                     && dsc->scale_y == 256
-                     && dsc->rotation == 0
                      && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
                      && (dsc->header.cf == LV_COLOR_FORMAT_RGB888
                          || dsc->header.cf == LV_COLOR_FORMAT_RGB565)
                      && (dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
                          || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
                     return 0;
+                }
+
+                /* PPA SRM can only rotate in exact 90-degree steps. */
+                if(dsc->rotation != 0) {
+                    int32_t angle = dsc->rotation % 3600;
+                    if(angle < 0) angle += 3600;
+                    if(angle != 900 && angle != 1800 && angle != 2700) return 0;
                 }
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
@@ -189,10 +197,23 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
             lv_draw_ppa_fill(t, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
             lv_draw_buf_invalidate_cache(buf, &area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &area);
-            lv_draw_buf_invalidate_cache(buf, &area);
-            break;
+        case LV_DRAW_TASK_TYPE_IMAGE: {
+                lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
+#if LV_USE_PPA_IMG
+                if(img_dsc->rotation != 0) {
+                    lv_draw_ppa_img_rotate(t, img_dsc, &t->area);
+                }
+                else if(img_dsc->scale_x != LV_SCALE_NONE || img_dsc->scale_y != LV_SCALE_NONE) {
+                    lv_draw_ppa_img_srm(t, img_dsc, &t->area);
+                }
+                else
+#endif
+                {
+                    lv_draw_ppa_img(t, img_dsc, &area);
+                }
+                lv_draw_buf_invalidate_cache(buf, &area);
+                break;
+            }
         default:
             break;
     }
