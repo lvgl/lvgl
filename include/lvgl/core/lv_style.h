@@ -720,43 +720,14 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t lv_style_const_prop_id_inv
  *      MACROS
  **********************/
 
-/**
- * Evaluate to true if `style_p`'s sentinel marker is intact, i.e. the style was
- * initialized by `lv_style_init()` and is not corrupted. Always true when
- * LV_USE_ASSERT_STYLE is disabled, because the sentinel field is absent then.
- *
- * Intended for use inside LV_CHECK_ARG, combined with a NULL check so the
- * dereference is short-circuited for NULL pointers:
- * @code
- *   LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
- * @endcode
- */
 #if LV_USE_ASSERT_STYLE
-#  define LV_STYLE_SENTINEL_OK(style_p) ((style_p)->sentinel == LV_STYLE_SENTINEL_VALUE)
-#else
-#  define LV_STYLE_SENTINEL_OK(style_p) (true)
-#endif
-
-#if LV_USE_ASSERT_STYLE
-/**
- * @deprecated Use `LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return ...)`
- *             instead. `LV_ASSERT_STYLE` aborts on failure; `LV_CHECK_ARG` logs a
- *             warning and executes the supplied action, which is safer in production.
- */
 #  define LV_ASSERT_STYLE(style_p)                                                                            \
     do {                                                                                                      \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_STYLE is deprecated. Use LV_CHECK_ARG instead.");                 \
         LV_ASSERT_MSG(style_p != NULL, "The style is NULL");                                                  \
         LV_ASSERT_MSG(style_p->sentinel == LV_STYLE_SENTINEL_VALUE, "Style is not initialized or corrupted"); \
     } while(0)
 #else
-/**
- * @deprecated Use `LV_CHECK_ARG(style != NULL, return ...)` instead.
- */
-#  define LV_ASSERT_STYLE(style_p)                                                                 \
-    do {                                                                                           \
-        LV_DEPRECATED_MACRO_WARN("LV_ASSERT_STYLE is deprecated. Use LV_CHECK_ARG instead.");      \
-    } while(0)
+#  define LV_ASSERT_STYLE(p) do{}while(0)
 #endif
 
 #ifdef __cplusplus
