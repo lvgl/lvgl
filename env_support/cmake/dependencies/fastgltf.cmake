@@ -1,23 +1,29 @@
+# ============================================================
+# fastgltf Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "fastgltf")
+set(PKG_LIB_PRIVATE "-lfastgltf")
+
 option(LV_USE_FIND_PACKAGE_FASTGLTF "Resolve fastgltf via find_package"
        ${LV_USE_FIND_PACKAGE})
-option(LV_USE_PKG_CONFIG_FASTGLTF "Resolve fastgltf via pkg-config"
-       ${LV_USE_PKG_CONFIG})
 option(LV_FETCH_FASTGLTF "Fetch fastgltf from source" ${LV_FETCH_DEPENDENCIES})
 
 if(LV_USE_FIND_PACKAGE_FASTGLTF)
-  find_package(fastgltf QUIET)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(fastgltf_FOUND)
     message(STATUS "lvgl: fastgltf: found via find_package")
-    target_link_libraries(lvgl PRIVATE fastgltf::fastgltf)
-    return()
-  endif()
-endif()
-
-if(LV_USE_PKG_CONFIG_FASTGLTF AND PkgConfig_FOUND)
-  pkg_check_modules(fastgltf IMPORTED_TARGET QUIET fastgltf)
-  if(fastgltf_FOUND)
-    message(STATUS "lvgl: fastgltf: found via pkg-config")
-    target_link_libraries(lvgl PRIVATE PkgConfig::fastgltf)
+    # Note: fastgltf doesn't have pkg-config support
+    lvgl_link_packages(
+      PRIVATE
+      TARGETS
+      fastgltf::fastgltf
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
+    # Since fastgltf doesn't have pkg-config support we need to specify its
+    # dependencies in order for pkg-config to work
+    lvgl_add_pkg_libs_private("-lsimdjson")
     return()
   endif()
 endif()
@@ -51,4 +57,4 @@ set(FASTGLTF_DIFFUSE_TRANSMISSION_SUPPORT
 
 FetchContent_MakeAvailable(fastgltf)
 
-target_link_libraries(lvgl PRIVATE fastgltf::fastgltf)
+lvgl_link_raw(PRIVATE TARGETS fastgltf::fastgltf PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

@@ -1,3 +1,10 @@
+# ============================================================
+# libpng Configuration
+# ============================================================
+set(CMAKE_PACKAGE_NAME "PNG")
+set(PKG_CONFIG_NAME "libpng")
+set(PKG_LIB_PRIVATE "-lpng")
+
 option(LV_USE_FIND_PACKAGE_PNG "Resolve libpng via find_package"
        ${LV_USE_FIND_PACKAGE})
 option(LV_USE_PKG_CONFIG_PNG "Resolve libpng via pkg-config"
@@ -5,19 +12,35 @@ option(LV_USE_PKG_CONFIG_PNG "Resolve libpng via pkg-config"
 option(LV_FETCH_PNG "Fetch libpng from source" ${LV_FETCH_DEPENDENCIES})
 
 if(LV_USE_FIND_PACKAGE_PNG)
-  find_package(PNG QUIET)
+  find_package(${CMAKE_PACKAGE_NAME} QUIET)
   if(PNG_FOUND)
     message(STATUS "lvgl: libpng: found via find_package")
-    target_link_libraries(lvgl PRIVATE PNG::PNG)
+    lvgl_link_packages(
+      PRIVATE
+      TARGETS
+      PNG::PNG
+      CMAKE_PACKAGE
+      ${CMAKE_PACKAGE_NAME}
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
 
 if(LV_USE_PKG_CONFIG_PNG AND PkgConfig_FOUND)
-  pkg_check_modules(LIBPNG IMPORTED_TARGET QUIET libpng)
+  pkg_check_modules(LIBPNG IMPORTED_TARGET QUIET ${PKG_CONFIG_NAME})
   if(LIBPNG_FOUND)
     message(STATUS "lvgl: libpng: found via pkg-config")
-    target_link_libraries(lvgl PRIVATE PkgConfig::LIBPNG)
+    lvgl_link_pkg_config(
+      PRIVATE
+      TARGETS
+      PkgConfig::LIBPNG
+      PKG_CONFIG
+      ${PKG_CONFIG_NAME}
+      PKG_LIB_PRIVATE
+      ${PKG_LIB_PRIVATE})
     return()
   endif()
 endif()
@@ -51,4 +74,4 @@ set(PNG_TOOLS
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libpng)
-target_link_libraries(lvgl PRIVATE png_static)
+lvgl_link_raw(TARGETS png_static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
