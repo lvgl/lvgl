@@ -145,7 +145,7 @@ void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
 
     if(dsc->img_src) {
         lv_image_header_t header;
-        int image_handle = lv_nanovg_image_cache_get_handle(u, dsc->img_src, 0, &header);
+        int image_handle = lv_nanovg_image_cache_get_handle(u, dsc->img_src, 0, &header, true);
         if(image_handle < 0) {
             LV_PROFILER_DRAW_END;
             return;
