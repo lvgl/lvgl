@@ -17,8 +17,6 @@ extern "C" {
 #include "../../../lvgl_public.h"
 #include "../../../misc/lv_area_private.h"
 
-#include <math.h>
-
 /*********************
  *      DEFINES
  *********************/
@@ -106,15 +104,22 @@ static inline lv_draw_ppa_srm_block_t lv_draw_ppa_srm_calc_block(
     int32_t src_bx = (int32_t)(((float)r.visible_area.x1 - virt_x) / sx);
     int32_t src_by = (int32_t)(((float)r.visible_area.y1 - virt_y) / sy);
 
-    /* ceilf gives the ideal source block; floorf clamp keeps PPA happy.
-     * The PPA may render 1 pixel short — the caller fixes that afterwards. */
-    uint32_t src_bw = (uint32_t)ceilf((float)r.clip_w / sx);
-    uint32_t src_bh = (uint32_t)ceilf((float)r.clip_h / sy);
+    /* Ceil gives the ideal source block; the floor clamp keeps PPA happy.
+     * The PPA may render 1 pixel short — the caller fixes that afterwards.
+     * All operands are non-negative here, so ceil/floor are plain integer
+     * truncation (+ a fractional bump for ceil); this avoids a <math.h>
+     * dependency that breaks freestanding builds (e.g. UEFI). */
+    float bw_f = (float)r.clip_w / sx;
+    float bh_f = (float)r.clip_h / sy;
+    uint32_t src_bw = (uint32_t)bw_f;
+    uint32_t src_bh = (uint32_t)bh_f;
+    if((float)src_bw < bw_f) src_bw++;
+    if((float)src_bh < bh_f) src_bh++;
 
     uint32_t avail_w = (uint32_t)(buf_w - r.dest_area.x1);
     uint32_t avail_h = (uint32_t)(buf_h - r.dest_area.y1);
-    uint32_t max_src_bw = (uint32_t)floorf((float)avail_w / sx);
-    uint32_t max_src_bh = (uint32_t)floorf((float)avail_h / sy);
+    uint32_t max_src_bw = (uint32_t)((float)avail_w / sx);
+    uint32_t max_src_bh = (uint32_t)((float)avail_h / sy);
     r.gap_right  = (src_bw > max_src_bw);
     r.gap_bottom = (src_bh > max_src_bh);
     if(src_bw > max_src_bw) src_bw = max_src_bw;
