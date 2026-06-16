@@ -1,0 +1,60 @@
+config LV_USE_NEMA_GFX
+	bool "Use NemaGFX acceleration"
+	default n
+	select LV_DRAW_HAS_VECTOR_SUPPORT
+
+if LV_USE_NEMA_GFX
+
+config LV_NEMA_USE_CACHE
+	bool "Cache handling of NemaGFX"
+	default n
+
+config LV_NEMA_CACHE_HAL_INCLUDE
+	string "NemaGFX Cache HAL include"
+	default "stm32u5xx_hal.h"
+	depends on LV_NEMA_USE_CACHE
+
+choice LV_USE_NEMA_LIB
+	prompt "NemaGFX static library"
+	default LV_NEMA_LIB_NONE
+
+	config LV_NEMA_LIB_NONE
+		bool "LV_NEMA_LIB_NONE"
+	config LV_NEMA_LIB_M33_REVC
+		bool "LV_NEMA_LIB_M33_REVC"
+	config LV_NEMA_LIB_M33_NEMAPVG
+		bool "LV_NEMA_LIB_M33_NEMAPVG"
+	config LV_NEMA_LIB_M55
+		bool "LV_NEMA_LIB_M55"
+	config LV_NEMA_LIB_M7
+		bool "LV_NEMA_LIB_M7"
+endchoice
+
+choice LV_USE_NEMA_HAL
+	prompt "NemaGFX HAL"
+	default LV_NEMA_HAL_CUSTOM
+
+	config LV_NEMA_HAL_CUSTOM
+		bool "LV_NEMA_HAL_CUSTOM"
+	config LV_NEMA_HAL_STM32
+		bool "LV_NEMA_HAL_STM32"
+endchoice
+
+config LV_NEMA_STM32_HAL_INCLUDE
+	string "NemaGFX STM32 HAL include"
+	default "stm32u5xx_hal.h"
+	depends on LV_NEMA_HAL_STM32
+
+config LV_USE_NEMA_VG
+	bool "Enable NemaVG operations"
+	default n
+
+config LV_NEMA_GFX_MAX_RESX
+	int "NemaVG max horizontal resolution"
+	default 800
+
+config LV_NEMA_GFX_MAX_RESY
+	int "NemaVG max vertical resolution"
+	default 600
+
+endif

@@ -1831,20 +1831,6 @@
     #endif
 #endif
 
-/** Align VG_LITE buffers on this number of bytes.
- *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
-#ifndef LV_ATTRIBUTE_MEM_ALIGN_SIZE
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
-            #define LV_ATTRIBUTE_MEM_ALIGN_SIZE CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
-        #else
-            #define LV_ATTRIBUTE_MEM_ALIGN_SIZE 0
-        #endif
-    #else
-        #define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
-    #endif
-#endif
-
 /** Will be added where memory needs to be aligned (with -Os data might not be aligned to boundary by default).
  *  E.g. __attribute__((aligned(4)))*/
 #ifndef LV_ATTRIBUTE_MEM_ALIGN

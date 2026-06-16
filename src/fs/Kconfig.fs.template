@@ -1,0 +1,24 @@
+## Kconfig.template.fs
+# Parameters (set before sourcing):
+#   LV_FS_DRV      - uppercase driver name (e.g. STDIO)
+#   LV_FS_DRV_STR  - human-readable name (e.g. "stdio")
+
+config LV_USE_FS_$(LV_FS_DRV)
+	bool "File system on top of $(LV_FS_DRV_STR)"
+
+if LV_USE_FS_$(LV_FS_DRV)
+
+config LV_FS_$(LV_FS_DRV)_LETTER
+	int "Driver-identifier letter for $(LV_FS_DRV_STR) (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_$(LV_FS_DRV)_PATH
+	string "Working directory for $(LV_FS_DRV_STR)"
+	default ""
+
+config LV_FS_$(LV_FS_DRV)_CACHE_SIZE
+	int "Read cache size in bytes for $(LV_FS_DRV_STR) (0 = disabled)"
+	default 0
+
+endif # LV_USE_FS_$(LV_FS_DRV)

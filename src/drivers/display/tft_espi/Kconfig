@@ -1,0 +1,3 @@
+config LV_USE_TFT_ESPI
+	bool "Use TFT_eSPI driver"
+	default n

@@ -1,0 +1,81 @@
+config LV_USE_SDL
+	bool "Use SDL to open window on PC and handle mouse and keyboard"
+	default n
+
+if LV_USE_SDL
+
+config LV_SDL_INCLUDE_PATH
+	string "SDL include path"
+	default "SDL2/SDL.h"
+
+choice
+	prompt "SDL rendering mode"
+	default LV_SDL_RENDER_MODE_DIRECT
+	help
+		LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance
+
+	config LV_SDL_RENDER_MODE_PARTIAL
+		bool "Use the buffer(s) to render the screen is smaller parts"
+
+	config LV_SDL_RENDER_MODE_DIRECT
+		bool "Only the changed areas will be updated with 2 screen sized buffers"
+
+	config LV_SDL_RENDER_MODE_FULL
+		bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
+endchoice
+
+choice
+	prompt "SDL buffer size"
+	default LV_SDL_SINGLE_BUFFER
+
+	config LV_SDL_SINGLE_BUFFER
+		bool "One screen-sized buffer"
+
+	config LV_SDL_DOUBLE_BUFFER
+		bool "Two screen-sized buffer"
+		depends on !LV_SDL_RENDER_MODE_PARTIAL
+
+	config LV_SDL_CUSTOM_BUFFER
+		bool "Custom-sized buffer"
+		depends on LV_SDL_RENDER_MODE_PARTIAL
+endchoice
+
+config LV_SDL_BUFFER_COUNT
+	int
+	default 0 if LV_SDL_CUSTOM_BUFFER
+	default 1 if LV_SDL_SINGLE_BUFFER
+	default 2 if LV_SDL_DOUBLE_BUFFER
+
+config LV_SDL_BUF_COUNT
+	int
+	default LV_SDL_BUFFER_COUNT
+
+config LV_SDL_ACCELERATED
+	bool "Use hardware acceleration"
+	default y
+
+config LV_SDL_FULLSCREEN
+	bool "SDL fullscreen"
+	default n
+
+config LV_SDL_DIRECT_EXIT
+	bool "Exit the application when all SDL windows are closed"
+	default y
+
+choice
+	prompt "SDL mousewheel mode"
+	default LV_SDL_MOUSEWHEEL_MODE_ENCODER
+
+	config LV_SDL_MOUSEWHEEL_MODE_ENCODER
+		bool "The mousewheel emulates an encoder input device"
+
+	config LV_SDL_MOUSEWHEEL_MODE_CROWN
+		bool "The mousewheel emulates a smart watch crown"
+endchoice
+
+config LV_SDL_MOUSEWHEEL_MODE
+	int
+	default 0 if LV_SDL_MOUSEWHEEL_MODE_ENCODER
+	default 1 if LV_SDL_MOUSEWHEEL_MODE_CROWN
+
+endif #LV_USE_SDL

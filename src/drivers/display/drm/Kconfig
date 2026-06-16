@@ -1,0 +1,23 @@
+config LV_USE_LINUX_DRM
+	bool "Use Linux DRM device"
+	default n
+
+if LV_USE_LINUX_DRM
+
+config LV_USE_LINUX_DRM_EGL
+	bool "Use EGL (OpenGL ES, hardware-accelerated) for Linux DRM"
+	select LV_USE_LINUX_DRM_GBM_BUFFERS
+	select LV_USE_OPENGLES
+	select LV_USE_EGL
+	default n
+	help
+	  Hardware-accelerated rendering via OpenGL ES 2.0 and EGL.
+	  Requires OpenGL ES 2.0 on the target hardware and linking with
+	  -lEGL. Compatible with LVGL 3D/glTF rendering.
+	  Automatically enables GBM buffer support.
+
+config LV_USE_LINUX_DRM_GBM_BUFFERS
+	bool "Use MESA GBM for Linux DRM DMA buffers"
+	default n
+
+endif # LV_USE_LINUX_DRM

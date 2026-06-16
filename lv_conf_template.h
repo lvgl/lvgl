@@ -658,10 +658,6 @@
 /** Define a custom attribute for `lv_display_sync_ready` function */
 #define LV_ATTRIBUTE_SYNC_READY
 
-/** Align VG_LITE buffers on this number of bytes.
- *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
-#define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
-
 /** Will be added where memory needs to be aligned (with -Os data might not be aligned to boundary by default).
  *  E.g. __attribute__((aligned(4)))*/
 #define LV_ATTRIBUTE_MEM_ALIGN

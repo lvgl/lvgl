@@ -17,6 +17,7 @@ extern "C" {
 
 #if LV_USE_TINY_TTF
 
+#include "lv_font.h"
 #include "../lv_types.h"
 
 /*********************

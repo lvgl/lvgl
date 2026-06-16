@@ -1,0 +1,15 @@
+config LV_USE_LIBINPUT
+	bool "Use libinput input driver"
+	default n
+
+if LV_USE_LIBINPUT
+
+config LV_LIBINPUT_BSD
+	bool "Use the BSD variant of the libinput input driver"
+	default n
+
+config LV_LIBINPUT_XKB
+	bool "Enable full keyboard support via XKB"
+	default n
+
+endif #LV_USE_LIBINPUT

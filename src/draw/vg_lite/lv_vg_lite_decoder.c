@@ -13,7 +13,7 @@
 
 #include "lv_vg_lite_utils.h"
 #include "../../core/lv_global.h"
-#include "../lv_image_decoder_private.h"
+#include "../../image/lv_image_decoder_private.h"
 
 /*********************
  *      DEFINES

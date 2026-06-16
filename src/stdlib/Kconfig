@@ -1,0 +1,68 @@
+choice
+	prompt "Malloc functions source"
+	default LV_USE_BUILTIN_MALLOC
+
+config LV_USE_BUILTIN_MALLOC
+	bool "LVGL's built in implementation"
+
+config LV_USE_CLIB_MALLOC
+	bool "Standard C functions malloc/realloc/free"
+
+config LV_USE_MICROPYTHON_MALLOC
+	bool "MicroPython functions malloc/realloc/free"
+
+config LV_USE_RTTHREAD_MALLOC
+	bool "RTThread functions malloc/realloc/free"
+
+config LV_USE_CUSTOM_MALLOC
+	bool "Implement the functions externally"
+
+endchoice # "Malloc functions"
+
+choice
+	prompt "String functions source"
+	default LV_USE_BUILTIN_STRING
+
+config LV_USE_BUILTIN_STRING
+	bool "LVGL's built in implementation"
+
+config LV_USE_CLIB_STRING
+	bool "Standard C functions memcpy/memset/strlen/strcpy"
+
+config LV_USE_CUSTOM_STRING
+	bool "Implement the functions externally"
+
+endchoice # "String functions"
+
+choice
+	prompt "Sprintf functions source"
+	default LV_USE_BUILTIN_SPRINTF
+
+config LV_USE_BUILTIN_SPRINTF
+	bool "LVGL's built in implementation"
+
+config LV_USE_CLIB_SPRINTF
+	bool "Standard C functions vsnprintf"
+
+config LV_USE_CUSTOM_SPRINTF
+	bool "Implement the functions externally"
+
+endchoice # "Sprintf functions"
+
+if LV_USE_BUILTIN_MALLOC
+
+config LV_MEM_SIZE_KILOBYTES
+	int "Size of the memory used by `lv_malloc()` in kilobytes (>= 2kB)"
+	default 64
+	depends on LV_USE_BUILTIN_MALLOC
+
+config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
+	int "Size of the memory expand for `lv_malloc()` in kilobytes"
+	default 0
+	depends on LV_USE_BUILTIN_MALLOC
+
+config LV_MEM_ADR
+	hex "Address for the memory pool instead of allocating it as a normal array. 0: unused"
+	default 0x0
+
+endif #LV_USE_BUILTIN_MALLOC

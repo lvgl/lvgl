@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../../draw/lv_image_decoder_private.h"
+#include "../../../image/lv_image_decoder_private.h"
 #include "../../../core/lv_global.h"
 
 #include "../lv_cache_entry.h"

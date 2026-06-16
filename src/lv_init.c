@@ -9,9 +9,9 @@
 
 #include "lvgl_public.h"
 #include "misc/lv_timer_private.h"
-#include "misc/lv_profiler_builtin_private.h"
+#include "debugging/profiler/lv_profiler_builtin_private.h"
 #include "misc/lv_anim_private.h"
-#include "draw/lv_image_decoder_private.h"
+#include "image/lv_image_decoder_private.h"
 #include "draw/lv_draw_buf_private.h"
 #include "core/lv_refr_private.h"
 #include "core/lv_obj_style_private.h"
@@ -20,13 +20,13 @@
 #include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout_private.h"
-#include "misc/lv_fs_private.h"
+#include "fs/lv_fs_private.h"
 #include "osal/lv_os_private.h"
 #include "debugging/sysmon/lv_sysmon_private.h"
 #include "drivers/wayland/lv_wayland_private.h"
 
 #if LV_USE_SVG
-    #include "libs/svg/lv_svg_decoder.h"
+    #include "image/svg/lv_svg_decoder.h"
 #endif
 
 #if LV_USE_NEMA_GFX

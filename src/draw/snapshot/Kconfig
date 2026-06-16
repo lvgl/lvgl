@@ -1,0 +1,3 @@
+config LV_USE_SNAPSHOT
+	bool "Enable API to take snapshot"
+	default n

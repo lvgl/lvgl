@@ -1,0 +1,112 @@
+config LV_CONF_SKIP
+	bool "Check this to skip using lv_conf.h"
+	default y
+
+config LV_USE_PRIVATE_API
+	bool "Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default"
+	default n
+
+if LV_USE_PRIVATE_API
+
+config LV_ENABLE_GLOBAL_CUSTOM
+	bool "Enable 'lv_global' customization"
+
+config LV_GLOBAL_CUSTOM_INCLUDE
+	string "Header to include for the custom 'lv_global' function"
+	depends on LV_ENABLE_GLOBAL_CUSTOM
+	default "lv_global.h"
+endif #LV_USE_PRIVATE_API
+
+menu "Asserts"
+	config LV_USE_ASSERT_NULL
+		bool "Check if the parameter is NULL. (Very fast, recommended)"
+		default y
+
+	config LV_USE_ASSERT_MALLOC
+		bool "Checks if the memory is successfully allocated or no. (Very fast, recommended)"
+		default y
+
+	config LV_USE_ASSERT_STYLE
+		bool "Check if the styles are properly initialized. (Very fast, recommended)"
+
+	config LV_USE_ASSERT_MEM_INTEGRITY
+		bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
+
+	config LV_USE_ASSERT_OBJ
+		bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
+
+	config LV_ASSERT_HANDLER_INCLUDE
+		string "Header to include for the custom assert function"
+		default "assert.h"
+		help
+			Add a custom handler when assert happens e.g. to restart the MCU
+endmenu
+
+menu "Argument Checks"
+	config LV_USE_CHECK_ARG
+		bool "Enable LV_CHECK_ARG macro for runtime argument validation"
+		default y
+		help
+			When enabled, LV_CHECK_ARG checks validate function arguments
+			at runtime. Failed checks log a warning and execute the specified
+			action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+			Disabling this is not recommended unless extreme care is taken and only
+			in very resource constrained environments where it can be absolutely
+			ensured that invariants are never violated.
+
+	if LV_USE_CHECK_ARG
+
+	config LV_CHECK_ARG_ASSERT_ON_FAIL
+		bool "Call assert handler on LV_CHECK_ARG failure"
+		default n
+		help
+			When enabled, LV_ASSERT_HANDLER is also invoked when an
+			LV_CHECK_ARG check fails, before the action is executed.
+
+	choice
+		prompt "Log behavior on LV_CHECK_ARG failure"
+		default LV_CHECK_ARG_LOG_MODE_VERBOSE if LV_USE_LOG
+		default LV_CHECK_ARG_LOG_MODE_NONE if !LV_USE_LOG
+		help
+			Controls what is logged when an LV_CHECK_ARG check fails.
+			MINIMAL and VERBOSE modes require LV_USE_LOG to be enabled;
+			selecting either when LV_USE_LOG is disabled will cause a
+			compile-time error.
+
+		config LV_CHECK_ARG_LOG_MODE_NONE
+			bool "None: no log output on failure"
+
+		config LV_CHECK_ARG_LOG_MODE_MINIMAL
+			bool "Minimal: log 'Check failed' only (file/line from LV_LOG_WARN)"
+			depends on LV_USE_LOG
+
+		config LV_CHECK_ARG_LOG_MODE_VERBOSE
+			bool "Verbose: log 'Check failed: <cond>' plus caller-supplied message"
+			depends on LV_USE_LOG
+
+	endchoice
+
+	config LV_CHECK_ARG_LOG_MODE
+		int
+		default 0 if LV_CHECK_ARG_LOG_MODE_NONE
+		default 1 if LV_CHECK_ARG_LOG_MODE_MINIMAL
+		default 2 if LV_CHECK_ARG_LOG_MODE_VERBOSE
+
+	config LV_USE_CHECK_OBJ_CLASSTYPE
+		bool "Enable class check in LV_CHECK_OBJ"
+		default n
+		help
+			When enabled, LV_CHECK_OBJ verifies that the object has the
+			expected class (lv_obj_has_class). When disabled, the class
+			check is skipped even if a class argument is supplied.
+
+	config LV_USE_CHECK_OBJ_VALIDITY
+		bool "Enable widget-tree validity check in LV_CHECK_OBJ"
+		default n
+		help
+			When enabled, LV_CHECK_OBJ also verifies that the object is
+			still part of the widget tree (lv_obj_is_valid). When disabled,
+			the validity check is skipped even if the associated argument
+			is supplied.
+	endif
+endmenu

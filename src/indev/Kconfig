@@ -1,0 +1,8 @@
+config LV_USE_GRIDNAV
+	bool "Enable grid navigation"
+	default n
+
+config LV_USE_GESTURE_RECOGNITION
+	bool "Enable the multi-touch gesture recognition feature"
+	select LV_USE_FLOAT
+	default n

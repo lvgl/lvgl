@@ -1,0 +1,26 @@
+config LV_USE_OPENGLES
+	bool "Use LVGL's OpenGL Driver"
+	select LV_USE_MATRIX
+	default n
+
+if LV_USE_OPENGLES
+
+config LV_USE_OPENGLES_DEBUG
+	bool "Enable debug mode for OpenGL"
+	default n
+
+
+endif # LV_USE_OPENGLES
+
+config LV_USE_EGL
+	def_bool n
+	help
+	  Selected automatically when a backend requiring EGL is enabled
+	  (e.g. LV_USE_WAYLAND_BACKEND_EGL, LV_USE_LINUX_DRM_EGL).
+
+config LV_USE_GLFW
+	bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
+	default n
+	select LV_USE_OPENGLES
+	depends on !LV_USE_EGL
+

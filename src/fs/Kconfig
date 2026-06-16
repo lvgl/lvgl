@@ -1,0 +1,60 @@
+config LV_FS_DEFAULT_DRIVER_LETTER
+	int "Default drive letter (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+	help
+	  Setting a default drive letter allows skipping the driver
+	  prefix in filepaths.
+
+LV_FS_DRV = STDIO
+LV_FS_DRV_STR = stdio
+rsource "Kconfig.fs.template"
+
+LV_FS_DRV = POSIX
+LV_FS_DRV_STR = POSIX
+rsource "Kconfig.fs.template"
+
+LV_FS_DRV = WIN32
+LV_FS_DRV_STR = Win32
+rsource "Kconfig.fs.template"
+
+LV_FS_DRV = FATFS
+LV_FS_DRV_STR = FatFS
+rsource "Kconfig.fs.template"
+
+LV_FS_DRV = LITTLEFS
+LV_FS_DRV_STR = littlefs
+rsource "Kconfig.fs.template"
+
+LV_FS_DRV = ARDUINO_ESP_LITTLEFS
+LV_FS_DRV_STR = Arduino ESP littlefs
+rsource "Kconfig.fs.template"
+
+LV_FS_DRV = ARDUINO_SD
+LV_FS_DRV_STR = Arduino SD
+rsource "Kconfig.fs.template"
+
+LV_FS_DRV = UEFI
+LV_FS_DRV_STR = UEFI
+rsource "Kconfig.fs.template"
+
+LV_FS_DRV = FROGFS
+LV_FS_DRV_STR = FrogFS
+rsource "Kconfig.fs.template"
+
+# MEMFS is inlined here as it's memory-mapped and has no working directory path
+config LV_USE_FS_MEMFS
+	bool "File system on top of memory-mapped API"
+
+if LV_USE_FS_MEMFS
+
+config LV_FS_MEMFS_LETTER
+	int "Driver-identifier letter for memfs (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_MEMFS_CACHE_SIZE
+	int "Read cache size in bytes for memfs (0 = disabled)"
+	default 0
+
+endif # LV_USE_FS_MEMFS

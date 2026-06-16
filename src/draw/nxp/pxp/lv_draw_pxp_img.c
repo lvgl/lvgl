@@ -20,7 +20,7 @@
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 #include "../../lv_draw_image_private.h"
-#include "../../lv_image_decoder_private.h"
+#include "../../../image/lv_image_decoder_private.h"
 
 #include <math.h>
 

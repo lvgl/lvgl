@@ -1,0 +1,3 @@
+config LV_BUILD_EXAMPLES
+	bool "Enable the examples to be built"
+	default y
