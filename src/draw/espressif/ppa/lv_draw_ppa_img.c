@@ -5,15 +5,12 @@
 
 #include "lv_draw_ppa_private.h"
 #include "lv_draw_ppa.h"
+#include "lv_draw_ppa_srm.h"
 
 #if LV_USE_PPA
 
 #include "../../lv_draw_image_private.h"
 #include "../../lv_image_decoder_private.h"
-
-#if LV_USE_PPA_IMG
-    #include <math.h>
-#endif
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
@@ -133,9 +130,10 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     lv_draw_buf_t * dest_buf  = layer->draw_buf;
 
     /* coords = image rect at 1:1 scale (may extend off-screen).
-     * Intersect with the render tile to get the actual visible clip. */
+     * Skip the decode entirely if nothing intersects the render tile. */
     lv_area_t visible_area;
     if(!lv_area_intersect(&visible_area, coords, &layer->buf_area)) return;
+    LV_UNUSED(visible_area);
 
     lv_image_decoder_dsc_t decoder_dsc;
     lv_image_decoder_args_t dec_args;
@@ -158,51 +156,17 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
         return;
     }
 
-    float sx = (dsc->scale_x != LV_SCALE_NONE) ? ((float)dsc->scale_x / 256.0f) : 1.0f;
-    float sy = (dsc->scale_y != LV_SCALE_NONE) ? ((float)dsc->scale_y / 256.0f) : 1.0f;
-
     uint32_t src_w = decoded->header.w;
     uint32_t src_h = decoded->header.h;
 
-    /* Virtual image origin: pivot stays fixed on screen as scale changes.
-     * coords->x1/y1 = image top-left at 1:1 scale. */
-    float virt_x = (float)coords->x1 + (float)dsc->pivot.x * (1.0f - sx);
-    float virt_y = (float)coords->y1 + (float)dsc->pivot.y * (1.0f - sy);
-
-    /* Visible clip dimensions and buffer-local destination (always non-negative) */
-    int32_t clip_w = lv_area_get_width(&visible_area);
-    int32_t clip_h = lv_area_get_height(&visible_area);
-
-    lv_area_t dest_area;
-    lv_area_copy(&dest_area, &visible_area);
-    lv_area_move(&dest_area, -layer->buf_area.x1, -layer->buf_area.y1);
-
-    /* Map visible tile top-left back into source image space */
-    int32_t src_bx = (int32_t)(((float)visible_area.x1 - virt_x) / sx);
-    int32_t src_by = (int32_t)(((float)visible_area.y1 - virt_y) / sy);
-
-    /* ceilf gives the ideal source block; floorf clamp keeps PPA happy.
-     * The PPA may render 1 pixel short — we fix that after the call. */
-    uint32_t src_bw = (uint32_t)ceilf((float)clip_w / sx);
-    uint32_t src_bh = (uint32_t)ceilf((float)clip_h / sy);
-
-    uint32_t avail_w = (uint32_t)(dest_buf->header.w - dest_area.x1);
-    uint32_t avail_h = (uint32_t)(dest_buf->header.h - dest_area.y1);
-    uint32_t max_src_bw = (uint32_t)floorf((float)avail_w / sx);
-    uint32_t max_src_bh = (uint32_t)floorf((float)avail_h / sy);
-    bool gap_right  = (src_bw > max_src_bw);
-    bool gap_bottom = (src_bh > max_src_bh);
-    if(src_bw > max_src_bw) src_bw = max_src_bw;
-    if(src_bh > max_src_bh) src_bh = max_src_bh;
-
-    if(src_bx < 0 || src_by < 0 ||
-       (uint32_t)src_bx >= src_w || (uint32_t)src_by >= src_h) {
-        lv_image_decoder_close(&decoder_dsc);
-        return;
-    }
-    if((uint32_t)src_bx + src_bw > src_w) src_bw = src_w - (uint32_t)src_bx;
-    if((uint32_t)src_by + src_bh > src_h) src_bh = src_h - (uint32_t)src_by;
-    if(src_bw == 0 || src_bh == 0) {
+    /* Map the visible render tile back onto a PPA source block.
+     * Pure geometry, shared with the host unit test (lv_draw_ppa_srm.h). */
+    lv_draw_ppa_srm_block_t blk = lv_draw_ppa_srm_calc_block(
+                                      coords, &layer->buf_area,
+                                      (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
+                                      (int32_t)src_w, (int32_t)src_h,
+                                      dsc->scale_x, dsc->scale_y, dsc->pivot.x, dsc->pivot.y);
+    if(!blk.draw) {
         lv_image_decoder_close(&decoder_dsc);
         return;
     }
@@ -224,23 +188,23 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     cfg.in.buffer         = (void *)decoded->data;
     cfg.in.pic_w          = src_w;
     cfg.in.pic_h          = src_h;
-    cfg.in.block_w        = src_bw;
-    cfg.in.block_h        = src_bh;
-    cfg.in.block_offset_x = (uint32_t)src_bx;
-    cfg.in.block_offset_y = (uint32_t)src_by;
+    cfg.in.block_w        = (uint32_t)blk.block_w;
+    cfg.in.block_h        = (uint32_t)blk.block_h;
+    cfg.in.block_offset_x = (uint32_t)blk.block_x;
+    cfg.in.block_offset_y = (uint32_t)blk.block_y;
     cfg.in.srm_cm         = lv_color_format_to_ppa_srm(src_cf);
 
     cfg.out.buffer         = dest_buf->data;
     cfg.out.buffer_size    = aligned_size;
     cfg.out.pic_w          = dest_buf->header.w;
     cfg.out.pic_h          = dest_buf->header.h;
-    cfg.out.block_offset_x = (uint32_t)dest_area.x1;
-    cfg.out.block_offset_y = (uint32_t)dest_area.y1;
+    cfg.out.block_offset_x = (uint32_t)blk.dest_area.x1;
+    cfg.out.block_offset_y = (uint32_t)blk.dest_area.y1;
     cfg.out.srm_cm         = lv_color_format_to_ppa_srm(dest_cf);
 
     cfg.rotation_angle    = PPA_SRM_ROTATION_ANGLE_0;
-    cfg.scale_x           = sx;
-    cfg.scale_y           = sy;
+    cfg.scale_x           = blk.scale_x;
+    cfg.scale_y           = blk.scale_y;
     cfg.mirror_x          = false;
     cfg.mirror_y          = false;
     cfg.rgb_swap          = false;
@@ -252,34 +216,34 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     esp_err_t ret = ppa_do_scale_rotate_mirror(u->srm_client, &cfg);
     if(ret != ESP_OK) {
         LV_LOG_WARN("PPA SRM scale failed: %d (src %ux%u scale %.2f/%.2f)",
-                    (int)ret, src_w, src_h, (double)sx, (double)sy);
+                    (int)ret, src_w, src_h, (double)blk.scale_x, (double)blk.scale_y);
     }
 
     /* PPA floorf rounding leaves a 1-pixel gap at right/bottom edges.
      * Fill it by duplicating the last rendered column/row.
      * Must invalidate CPU cache first: PPA wrote via DMA, CPU cache is stale. */
-    if(ret == ESP_OK && (gap_right || gap_bottom)) {
+    if(ret == ESP_OK && (blk.gap_right || blk.gap_bottom)) {
         esp_cache_msync(dest_buf->data, aligned_size,
                         ESP_CACHE_MSYNC_FLAG_DIR_M2C | ESP_CACHE_MSYNC_FLAG_UNALIGNED);
 
         uint8_t * base = dest_buf->data;
         uint32_t stride = dest_buf->header.w * out_bpp;
 
-        if(gap_right && clip_w >= 2) {
-            uint32_t col = dest_area.x1 + (uint32_t)clip_w - 1;
+        if(blk.gap_right && blk.clip_w >= 2) {
+            uint32_t col = blk.dest_area.x1 + (uint32_t)blk.clip_w - 1;
             uint32_t col_prev = col - 1;
-            for(int32_t y = 0; y < clip_h; y++) {
-                uint32_t row_off = (dest_area.y1 + (uint32_t)y) * stride;
+            for(int32_t y = 0; y < blk.clip_h; y++) {
+                uint32_t row_off = (blk.dest_area.y1 + (uint32_t)y) * stride;
                 lv_memcpy(base + row_off + col * out_bpp,
                           base + row_off + col_prev * out_bpp, out_bpp);
             }
         }
-        if(gap_bottom && clip_h >= 2) {
-            uint32_t row = dest_area.y1 + (uint32_t)clip_h - 1;
+        if(blk.gap_bottom && blk.clip_h >= 2) {
+            uint32_t row = blk.dest_area.y1 + (uint32_t)blk.clip_h - 1;
             uint32_t row_prev = row - 1;
-            lv_memcpy(base + row * stride + dest_area.x1 * out_bpp,
-                      base + row_prev * stride + dest_area.x1 * out_bpp,
-                      (uint32_t)clip_w * out_bpp);
+            lv_memcpy(base + row * stride + blk.dest_area.x1 * out_bpp,
+                      base + row_prev * stride + blk.dest_area.x1 * out_bpp,
+                      (uint32_t)blk.clip_w * out_bpp);
         }
 
         esp_cache_msync(dest_buf->data, aligned_size,
