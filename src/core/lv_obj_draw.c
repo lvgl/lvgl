@@ -31,6 +31,8 @@ static lv_color32_t image_apply_layer_recolor(const lv_obj_t * obj, lv_part_t pa
 
 static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_base_t * base_dsc);
 
+static void set_ext_draw_size_event_cb(lv_event_t * e);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -364,6 +366,13 @@ void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_
     LV_PROFILER_DRAW_END;
 }
 
+void lv_obj_set_ext_draw_size(lv_obj_t * obj, int32_t size)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    lv_obj_remove_event_cb(obj, set_ext_draw_size_event_cb);
+    lv_obj_add_event_cb(obj, set_ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, (void *)(lv_uintptr_t)size);
+}
 
 int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 {
@@ -532,4 +541,10 @@ static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_b
 
         base_dsc->drop_shadow_quality = lv_obj_get_style_drop_shadow_quality(obj, part);
     }
+}
+
+static void set_ext_draw_size_event_cb(lv_event_t * e)
+{
+    int32_t size = (int32_t)(lv_uintptr_t)lv_event_get_user_data(e);
+    lv_event_set_ext_draw_size(e, size);
 }
