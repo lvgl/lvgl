@@ -251,18 +251,12 @@ static void _epic_interrupt_deinit(void)
 
 static void _epic_run(void)
 {
-#if defined(__ZEPHYR__) && LV_USE_OS
-    /* Zephyr lv_thread_sync_t is backed by k_sem. If a previous EPIC job
-     * completes before lv_epic_wait() starts waiting, the completion token can
-     * remain pending and spuriously wake the next job. Reset it here so each
-     * hardware run only observes its own completion signal. */
-    k_sem_reset(&epic_sync);
-#elif LV_USE_OS == LV_OS_RTTHREAD
-    /* rt_sem is counting. If EPIC completes before lv_epic_wait() starts
-     * waiting, the completion token can remain queued and spuriously wake the
-     * next operation. Reset it here so each hardware run consumes only its own
-     * completion signal. */
-    (void)rt_sem_control(epic_sync.sem, RT_IPC_CMD_RESET, RT_NULL);
+#if LV_USE_OS
+    /* Reset completion token from any previous EPIC job so the next wait only
+     * observes the current run's completion signal. Using LVGL's thread-sync
+     * API ensures cross-platform compatibility without accessing OS internals. */
+    (void)lv_thread_sync_delete(&epic_sync);
+    (void)lv_thread_sync_init(&epic_sync);
 #endif
     epic_idle = false;
 }
