@@ -381,18 +381,9 @@ static int32_t _epic_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return 0;
     }
 
-    /* Check if we have multiple draw units */
-    if(lv_draw_get_unit_count() > 1) {
-        /* Let the SW unit draw this task if not preferred for EPIC */
-        if(task->preferred_draw_unit_id != DRAW_UNIT_ID_SIFLI_EPIC) {
-            return LV_DRAW_UNIT_IDLE;
-        }
-    }
-    else {
-        /* Only EPIC unit available - let it handle or properly report inability */
-        if(task->preferred_draw_unit_id != DRAW_UNIT_ID_SIFLI_EPIC) {
-            return LV_DRAW_UNIT_IDLE;
-        }
+    /* Let the SW unit draw this task if not preferred for EPIC */
+    if(task->preferred_draw_unit_id != DRAW_UNIT_ID_SIFLI_EPIC) {
+        return LV_DRAW_UNIT_IDLE;
     }
 
     /* Allocate buffer for layer */
