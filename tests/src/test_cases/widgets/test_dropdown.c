@@ -558,4 +558,120 @@ void test_dropdown_content_size()
     lv_dropdown_set_selected(dd, 2);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_content_size_3.png");
 }
+
+#if LV_USE_TRANSLATION
+void test_dropdown_text_translation_tag(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_text_translation_tag(dd, "tiger");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("The Tiger", lv_dropdown_get_text(dd));
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Der Tiger", lv_dropdown_get_text(dd));
+
+    lv_translation_set_language("es");
+    TEST_ASSERT_EQUAL_STRING("El Tigre", lv_dropdown_get_text(dd));
+
+    /* Unknown language translates to the tag */
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING("tiger", lv_dropdown_get_text(dd));
+}
+
+void test_dropdown_options_translation_tag(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"animals", NULL};
+    static const char * const languages[]    = {"en", "de", NULL};
+    static const char * const translations[] = { "Dog\nLion", "Hund\nLowe" };
+    lv_translation_add_static(languages, tags, translations);
+
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("Dog\nLion", lv_dropdown_get_options(dd));
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Hund\nLowe", lv_dropdown_get_options(dd));
+
+    /* Unknown language translates to the tag */
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING("animals", lv_dropdown_get_options(dd));
+}
+
+void test_dropdown_setting_text_disables_translation(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_text_translation_tag(dd, "tiger");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Der Tiger", lv_dropdown_get_text(dd));
+
+    /* Using set text should unbind the translation tag*/
+    lv_dropdown_set_text(dd, "Hello world");
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("Hello world", lv_dropdown_get_text(dd));
+
+    lv_dropdown_set_text_translation_tag(dd, "tiger");
+    TEST_ASSERT_EQUAL_STRING("The Tiger", lv_dropdown_get_text(dd));
+
+    /* Using set text static should unbind the translation tag*/
+    lv_dropdown_set_text_static(dd, "Hello world");
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Hello world", lv_dropdown_get_text(dd));
+}
+
+void test_dropdown_setting_options_disables_translation(void)
+{
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"animals", NULL};
+    static const char * const languages[]    = {"en", "de", NULL};
+    static const char * const translations[] = { "Dog\nLion", "Hund\nLowe" };
+    lv_translation_add_static(languages, tags, translations);
+
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("Hund\nLowe", lv_dropdown_get_options(dd));
+
+    /* Using set options should unbind the translation tag*/
+    lv_dropdown_set_options(dd, "One\nTwo");
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("One\nTwo", lv_dropdown_get_options(dd));
+
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+    TEST_ASSERT_EQUAL_STRING("Dog\nLion", lv_dropdown_get_options(dd));
+
+    /* Using set options static should unbind the translation tag*/
+    lv_dropdown_set_options_static(dd, "One\nTwo");
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("One\nTwo", lv_dropdown_get_options(dd));
+
+    /* Adding/clearing options should unbind the translation tag*/
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+    lv_dropdown_add_option(dd, "Bear", LV_DROPDOWN_POS_LAST);
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING("Hund\nLowe\nBear", lv_dropdown_get_options(dd));
+
+    lv_dropdown_set_options_translation_tag(dd, "animals");
+    lv_dropdown_clear_options(dd);
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING("", lv_dropdown_get_options(dd));
+}
+#endif /*LV_USE_TRANSLATION*/
 #endif
