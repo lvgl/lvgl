@@ -396,8 +396,7 @@ static int32_t _epic_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     /* Allocate buffer for layer */
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL) {
+    if(lv_draw_layer_alloc_buf(layer) == NULL) {
         EPIC_ASSERT_MSG(false, "EPIC: Failed to allocate layer draw buffer");
         return LV_DRAW_UNIT_IDLE;
     }
