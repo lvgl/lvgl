@@ -372,7 +372,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             if(is_raw_bitmap && (glyph_draw_dsc->format <= LV_FONT_GLYPH_FORMAT_A4)) {
                 nema_bind_src_tex((uintptr_t)(mask_buf), w * h, 1, src_cf, glyph_draw_dsc->g->stride, NEMA_FILTER_PS);
                 nema_matrix3x3_t m = {
-                    {1,    w,   -x - (y * w) - (0.5 * w)},
+                    {1,    w,   -x - (y * w) - (0.5f * w)},
                     {0,    1,                   0},
                     {0,    0,                   1}
                 };
