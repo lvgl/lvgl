@@ -696,6 +696,13 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
                                       uint32_t * ram_g_addr, uint16_t * eve_format,
                                       int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
                                       EVE_GpuHandle *out_handle, uint32_t * out_palette_addr);
+/* Load a raw/deflate/asset bitmap described by a ".esdm" metadata sidecar.
+ * Dispatches to the EVE SD card (raw coprocessor FS commands) or the host
+ * lv_fs by path. Returns false when no usable sidecar is present. */
+bool lv_draw_eve5_try_load_esdm_image(lv_draw_eve5_unit_t * u, const void * src,
+                                      uint32_t * ram_g_addr, uint16_t * eve_format,
+                                      int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
+                                      EVE_GpuHandle *out_handle, uint32_t * out_palette_addr);
 #endif
 #if LV_USE_FS_EVE5_SDCARD
 bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * src,

@@ -81,6 +81,60 @@ static inline int32_t eve5_format_bpp(uint32_t eve_format)
     }
 }
 
+/**********************
+ * ESDM METADATA SIDECAR
+ *
+ * Binary metadata sidecar placed next to an asset file: for "image.raw" the
+ * sidecar is "image.raw.esdm". Provides the EVE bitmap format, dimensions,
+ * stride, and load method that a raw/compressed asset file does not carry
+ * itself. Mirrors the ESD Core "BMP" record (see esd_core/Esd_BitmapInfo.c
+ * and IMAGE_FORMATS.md). Only the BMP type is consumed here.
+ **********************/
+
+/** Metadata sidecar filename extension (matches EVE_METADATA_FILE_EXT). */
+#define EVE5_ESDM_EXT     ".esdm"
+#define EVE5_ESDM_EXT_LEN 5
+/** Largest metadata sidecar we read (matches ESD ESD_METADATA_MAX). */
+#define EVE5_ESDM_MAX     64
+/** Size of a complete BMP metadata record (12-byte header + 44 type bytes). */
+#define EVE5_ESDM_BMP_SIZE 56
+
+/** Resource compression / load method (matches ESD Esd_ResourceCompression). */
+#define EVE5_ESDM_RAW     0  /**< Uncompressed; direct copy / CMD_FSREAD */
+#define EVE5_ESDM_DEFLATE 1  /**< Deflate compressed; CMD_INFLATE */
+#define EVE5_ESDM_IMAGE   2  /**< JPEG/PNG; CMD_LOADIMAGE (handled by the .jpg/.png path) */
+#define EVE5_ESDM_ASSET   3  /**< Relocatable .reloc asset; CMD_LOADASSET */
+
+/** Parsed BMP-type metadata sidecar. */
+typedef struct {
+    uint8_t  compression;     /**< EVE5_ESDM_* load method */
+    uint8_t  ext_len;         /**< Length of the resource file's extension (e.g. 4 for ".raw") */
+    uint32_t raw_size;        /**< Uncompressed bitmap data size in bytes (excludes the palette) */
+    int32_t  width;
+    int32_t  height;
+    int32_t  stride;          /**< Row stride in bytes */
+    uint32_t format;          /**< EVE bitmap format enum value */
+    uint16_t palette_size;    /**< Palette sidecar file size in bytes (0 = not paletted) */
+    char     palette_ext[11]; /**< Palette filename suffix, NUL-terminated (empty = use ".pal.raw") */
+    uint16_t cells;
+    bool     has_swizzle;     /**< BT815+ swizzle enable flag (not applied by the LVGL driver) */
+    uint8_t  swizzle_r, swizzle_g, swizzle_b, swizzle_a;
+} eve5_esdm_bmp_t;
+
+/** Parse a BMP-type .esdm sidecar buffer. Returns false if it isn't a valid
+ *  version-1 "BMP" record with positive width/height/stride. */
+bool eve5_parse_esdm_bmp(const uint8_t * data, uint32_t size, eve5_esdm_bmp_t * out);
+
+/** Build "<path>.esdm" into @p out. Returns false if it doesn't fit. */
+bool eve5_esdm_meta_path(const char * path, char * out, uint32_t out_size);
+
+/** Build the palette sidecar path for a paletted resource: strips @p ext_len
+ *  trailing characters from @p path and appends @p pal_ext, or ".pal.raw" when
+ *  @p pal_ext is empty (the converter leaves the metadata field blank). Returns
+ *  false if @p ext_len exceeds the path length or the result doesn't fit. */
+bool eve5_esdm_palette_path(const char * path, uint8_t ext_len, const char * pal_ext,
+                            char * out, uint32_t out_size);
+
 #endif /* LV_USE_EVE5 */
 
 #ifdef __cplusplus

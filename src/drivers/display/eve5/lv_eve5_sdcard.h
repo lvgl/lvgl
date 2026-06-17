@@ -165,6 +165,54 @@ EVE_GpuAlloc * lv_eve5_sdcard_get_allocator(void);
  */
 bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32_t * height);
 
+/**
+ * Read an image file's ".esdm" metadata sidecar from the SD card into a host
+ * buffer, using raw coprocessor filesystem commands.
+ *
+ * This deliberately bypasses the LVGL SD card filesystem driver: opening the
+ * sidecar through lv_fs would disturb the coprocessor's open-file state for an
+ * image file the LVGL decoder framework already has open.
+ *
+ * @param path      Image path including drive letter (e.g. "S:/sword.l8.raw");
+ *                  ".esdm" is appended internally.
+ * @param buf       Destination host buffer for the metadata bytes.
+ * @param buf_size  Size of @p buf (sidecar files are <= 64 bytes).
+ * @param out_read  [out, optional] Number of bytes read.
+ * @return          true if the sidecar existed and was read.
+ */
+bool lv_eve5_sdcard_read_esdm(const char * path, uint8_t * buf, uint32_t buf_size,
+                              uint32_t * out_read);
+
+/**
+ * Load a raw / deflate / relocatable-asset bitmap from the SD card directly to
+ * RAM_G, using its ".esdm" metadata sidecar for the EVE bitmap format and
+ * geometry. Uses raw coprocessor commands (CMD_FSREAD / CMD_INFLATE2 /
+ * CMD_LOADASSET via the *_fs helpers), bypassing the LVGL SD filesystem driver.
+ *
+ * For paletted formats the palette sidecar ("<base>.pal.raw" by convention) is
+ * loaded contiguously ahead of the index data in the same allocation, matching
+ * the driver's PALETTEDARGB8 memory layout.
+ *
+ * Image-compressed sidecars (JPEG/PNG, compression == EVE5_ESDM_IMAGE) are
+ * declined here — those load through the regular ".jpg"/".png" path.
+ *
+ * The caller owns the returned GPU handle and must free it via
+ * EVE_GpuAlloc_Free(lv_eve5_sdcard_get_allocator(), handle).
+ *
+ * @param path            Image path including drive letter (e.g. "S:/sword.l8.raw").
+ * @param handle          [out] GPU allocation handle.
+ * @param width           [out] Image width.
+ * @param height          [out] Image height.
+ * @param format          [out] EVE bitmap format.
+ * @param stride          [out] Row stride in bytes.
+ * @param image_offset    [out] Bitmap data offset from the handle base.
+ * @param palette_offset  [out] Palette offset from the handle base (GA_INVALID if none).
+ * @return                true on success.
+ */
+bool lv_eve5_sdcard_load_esdm(const char * path, EVE_GpuHandle *handle,
+                              uint32_t * width, uint32_t * height, uint32_t * format,
+                              int32_t * stride, uint32_t * image_offset, uint32_t * palette_offset);
+
 /**********************
  *      MACROS
  **********************/

@@ -1001,6 +1001,173 @@ bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32
 #endif
 }
 
+/**********************
+ * ESDM SIDECAR LOADING
+ **********************/
+
+bool lv_eve5_sdcard_read_esdm(const char * path, uint8_t * buf, uint32_t buf_size, uint32_t * out_read)
+{
+    if(out_read) *out_read = 0;
+    if(path == NULL || buf == NULL || buf_size == 0) return false;
+    if(s_ctx.hal == NULL || s_ctx.alloc == NULL) return false;
+
+    /* Build "<path>.esdm", then strip the drive letter for the coprocessor FS. */
+    char meta_path[LV_FS_MAX_PATH_LENGTH];
+    if(!eve5_esdm_meta_path(path, meta_path, sizeof(meta_path))) return false;
+    const char * sd_path = meta_path;
+    if(meta_path[0] != '\0' && meta_path[1] == ':' && (meta_path[2] == '/' || meta_path[2] == '\\')) {
+        sd_path = meta_path + 2;
+    }
+
+    EVE_HalContext * phost = s_ctx.hal;
+    bool ok = false;
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(s_ctx.disp);
+#endif
+    if(ensure_sd_attached(&s_ctx)) {
+        uint32_t fsize = EVE_CoCmd_fsSize(phost, sd_path);
+        if(fsize != 0xFFFFFFFFu && fsize != 0 && fsize <= buf_size) {
+            /* CMD_FSREAD destination must be 32-byte aligned. */
+            uint32_t aligned = (fsize + 31u) & ~31u;
+            EVE_GpuHandle h = EVE_GpuAlloc_AlignedAlloc(s_ctx.alloc, aligned, 0, 32);
+            uint32_t addr = EVE_GpuAlloc_Get(s_ctx.alloc, h);
+            if(addr != GA_INVALID) {
+                if(EVE_CoCmd_fsRead(phost, addr, sd_path) == 0) {
+                    addr = EVE_GpuAlloc_Get(s_ctx.alloc, h);
+                    EVE_Hal_rdMem(phost, buf, addr, fsize);
+                    if(out_read) *out_read = fsize;
+                    ok = true;
+                }
+                EVE_GpuAlloc_Free(s_ctx.alloc, h);
+            }
+        }
+    }
+#if LV_USE_OS
+    lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+
+    return ok;
+}
+
+bool lv_eve5_sdcard_load_esdm(const char * path, EVE_GpuHandle *handle,
+                              uint32_t * width, uint32_t * height, uint32_t * format,
+                              int32_t * stride, uint32_t * image_offset, uint32_t * palette_offset)
+{
+    if(path == NULL || handle == NULL) return false;
+    if(s_ctx.hal == NULL || s_ctx.alloc == NULL) return false;
+
+    /* Read + parse the metadata sidecar (raw FS read, no lv_fs). */
+    uint8_t meta[EVE5_ESDM_MAX];
+    uint32_t meta_read = 0;
+    if(!lv_eve5_sdcard_read_esdm(path, meta, sizeof(meta), &meta_read)) return false;
+    eve5_esdm_bmp_t bmp;
+    if(!eve5_parse_esdm_bmp(meta, meta_read, &bmp)) return false;
+
+    /* JPEG/PNG sidecars load through the regular image path. */
+    if(bmp.compression == EVE5_ESDM_IMAGE) return false;
+    if(bmp.has_swizzle) {
+        LV_LOG_WARN("EVE5 esdm: bitmap swizzle not applied for %s", path);
+    }
+
+    EVE_HalContext * phost = s_ctx.hal;
+    EVE_GpuAlloc * alloc = s_ctx.alloc;
+
+    /* Strip drive letters for the coprocessor FS. */
+    const char * img_path = path;
+    if(path[0] != '\0' && path[1] == ':' && (path[2] == '/' || path[2] == '\\')) img_path = path + 2;
+
+    bool paletted = (bmp.palette_size > 0);
+    char pal_path_buf[LV_FS_MAX_PATH_LENGTH];
+    const char * pal_path = NULL;
+    if(paletted) {
+        if(!eve5_esdm_palette_path(path, bmp.ext_len, bmp.palette_ext, pal_path_buf, sizeof(pal_path_buf))) {
+            LV_LOG_WARN("EVE5 esdm: cannot derive palette path for %s", path);
+            return false;
+        }
+        pal_path = pal_path_buf;
+        if(pal_path[0] != '\0' && pal_path[1] == ':' && (pal_path[2] == '/' || pal_path[2] == '\\')) pal_path += 2;
+    }
+
+    /* Palette (if any) precedes the bitmap data in one contiguous allocation,
+     * matching the driver's PALETTEDARGB8 layout. Keep the bitmap region
+     * 32-byte aligned for CMD_FSREAD. */
+    uint32_t pal_region = paletted ? (((uint32_t)bmp.palette_size + 31u) & ~31u) : 0;
+    uint32_t data_bytes = (bmp.compression == EVE5_ESDM_ASSET && bmp.raw_size)
+                          ? bmp.raw_size : (uint32_t)(bmp.stride * bmp.height);
+    uint32_t alloc_size = pal_region + data_bytes;
+
+    bool ok = false;
+    uint32_t img_ofs = pal_region;
+    uint32_t pal_ofs = GA_INVALID;
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(s_ctx.disp);
+#endif
+    if(ensure_sd_attached(&s_ctx)) {
+        /* GC-flagged: raw assets re-load on demand through the decoder cache. */
+        EVE_GpuHandle h = EVE_GpuAlloc_AlignedAlloc(alloc, alloc_size, GA_GC_FLAG, 32);
+        uint32_t base = EVE_GpuAlloc_Get(alloc, h);
+        if(base != GA_INVALID) {
+            bool loaded = true;
+
+            if(paletted) {
+                if(EVE_CoCmd_fsRead(phost, base, pal_path) != 0) {
+                    LV_LOG_WARN("EVE5 esdm: palette read failed: %s", pal_path);
+                    loaded = false;
+                }
+                else {
+                    pal_ofs = 0;
+                }
+            }
+
+            if(loaded) {
+                uint32_t dst = base + pal_region;
+                switch(bmp.compression) {
+                    case EVE5_ESDM_RAW:
+                        loaded = (EVE_CoCmd_fsRead(phost, dst, img_path) == 0);
+                        break;
+                    case EVE5_ESDM_DEFLATE:
+                        loaded = (EVE_CoCmd_inflate_fs(phost, dst, img_path, 0) == 0);
+                        break;
+                    case EVE5_ESDM_ASSET:
+                        loaded = (EVE_CoCmd_loadAsset_fs(phost, dst, img_path, 0) == 0);
+                        break;
+                    default:
+                        loaded = false;
+                        break;
+                }
+            }
+
+            if(loaded) {
+                EVE_Hal_requestFenceBeforeSwap(phost);
+                *handle = h;
+                ok = true;
+            }
+            else {
+                EVE_GpuAlloc_Free(alloc, h);
+            }
+        }
+    }
+#if LV_USE_OS
+    lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+
+    if(!ok) return false;
+
+    if(width) *width = (uint32_t)bmp.width;
+    if(height) *height = (uint32_t)bmp.height;
+    if(format) *format = bmp.format;
+    if(stride) *stride = bmp.stride;
+    if(image_offset) *image_offset = img_ofs;
+    if(palette_offset) *palette_offset = pal_ofs;
+
+    LV_LOG_INFO("EVE5 esdm: loaded %s (%dx%d fmt=%u stride=%d comp=%u%s)",
+                path, (int)bmp.width, (int)bmp.height, (unsigned)bmp.format,
+                (int)bmp.stride, (unsigned)bmp.compression, paletted ? " paletted" : "");
+    return true;
+}
+
 #elif LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
 
 /* Linker stubs for chips without BT820 SD-card command support. */
@@ -1030,6 +1197,22 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
 bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32_t * height)
 {
     (void)path; (void)width; (void)height;
+    return false;
+}
+
+bool lv_eve5_sdcard_read_esdm(const char * path, uint8_t * buf, uint32_t buf_size, uint32_t * out_read)
+{
+    (void)path; (void)buf; (void)buf_size;
+    if(out_read) *out_read = 0;
+    return false;
+}
+
+bool lv_eve5_sdcard_load_esdm(const char * path, EVE_GpuHandle *handle,
+                              uint32_t * width, uint32_t * height, uint32_t * format,
+                              int32_t * stride, uint32_t * image_offset, uint32_t * palette_offset)
+{
+    (void)path; (void)handle; (void)width; (void)height; (void)format;
+    (void)stride; (void)image_offset; (void)palette_offset;
     return false;
 }
 

@@ -399,6 +399,263 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
                 path, (unsigned)img_w, (unsigned)img_h, (unsigned)out_fmt, (int)decoded_stride, (int)bpp);
     return true;
 }
+
+/**********************
+ * ESDM SIDECAR LOADING
+ *
+ * A ".esdm" metadata sidecar lets a raw / deflate / relocatable-asset bitmap
+ * load directly to RAM_G in its native EVE format, skipping CMD_LOADIMAGE
+ * decode. The sidecar supplies the EVE bitmap format, dimensions, stride, and
+ * load method (see IMAGE_FORMATS.md and esd_core/Esd_BitmapInfo.c).
+ *
+ * EVE SD card images use raw coprocessor FS commands (in lv_eve5_sdcard.c) for
+ * both the sidecar and the data, deliberately never touching the LVGL SD
+ * filesystem driver — opening the sidecar through lv_fs would invalidate the
+ * coprocessor open-file state for the image the decoder framework already holds.
+ * Host images read the sidecar and data through lv_fs.
+ **********************/
+
+/* Read exactly @p max_bytes of a host file into RAM_G via direct memory writes.
+ * Caller holds the HAL lock; the file is on the host filesystem (SD/flash paths
+ * are dispatched elsewhere), so lv_fs reads don't re-enter the HAL mutex. */
+static bool eve5_esdm_host_read_raw(lv_draw_eve5_unit_t * u, const char * path,
+                                    uint32_t dst, uint32_t max_bytes)
+{
+    lv_fs_file_t f;
+    if(lv_fs_open(&f, path, LV_FS_MODE_RD) != LV_FS_RES_OK) return false;
+
+    uint8_t chunk[4096];
+    uint32_t done = 0;
+    bool ok = true;
+    while(done < max_bytes) {
+        uint32_t want = max_bytes - done;
+        if(want > sizeof(chunk)) want = sizeof(chunk);
+        uint32_t got = 0;
+        if(lv_fs_read(&f, chunk, want, &got) != LV_FS_RES_OK || got == 0) {
+            ok = false;
+            break;
+        }
+        EVE_Hal_wrMem(u->hal, dst + done, chunk, got);
+        done += got;
+    }
+    lv_fs_close(&f);
+    return ok && (done == max_bytes);
+}
+
+/* Stream a host file through the command FIFO behind a CMD_INFLATE (deflate) or
+ * CMD_LOADASSET (relocatable asset) header. Caller holds the HAL lock. */
+static bool eve5_esdm_host_stream(lv_draw_eve5_unit_t * u, const char * path,
+                                  bool is_asset, uint32_t dst)
+{
+    EVE_HalContext * phost = u->hal;
+    if(phost->CmdFault) return false;
+
+    /* Open the source before issuing the command: once the header is in the
+     * FIFO the coprocessor blocks waiting for the data we have to stream. */
+    lv_fs_file_t f;
+    if(lv_fs_open(&f, path, LV_FS_MODE_RD) != LV_FS_RES_OK) return false;
+
+    if(is_asset) {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        EVE_Cmd_wr32(phost, CMD_LOADASSET);
+        EVE_Cmd_wr32(phost, dst);
+        EVE_Cmd_wr32(phost, 0);  /* options: 0 = data follows in command buffer */
+#else
+        lv_fs_close(&f);
+        return false;  /* CMD_LOADASSET is BT820+ */
+#endif
+    }
+    else {
+        EVE_CoCmd_inflate(phost, dst);  /* CMD_INFLATE(2); data follows */
+    }
+
+    uint8_t chunk[8192];
+    bool ok = true;
+    for(;;) {
+        uint32_t got = 0;
+        if(lv_fs_read(&f, chunk, sizeof(chunk), &got) != LV_FS_RES_OK) {
+            ok = false;
+            break;
+        }
+        if(got == 0) break;
+        uint32_t padded = (got + 3u) & ~3u;
+        if(padded > got) lv_memzero(chunk + got, padded - got);
+        if(!EVE_Cmd_wrMem(phost, chunk, padded)) {
+            ok = false;
+            break;
+        }
+    }
+    lv_fs_close(&f);
+
+    if(!ok) return false;
+    return EVE_Cmd_waitFlush(phost);
+}
+
+/* Read + parse the ".esdm" sidecar for @p path. SD card sidecars use raw
+ * coprocessor FS commands (bypassing the LVGL SD driver); host sidecars use
+ * lv_fs. Returns false if no valid BMP sidecar exists. */
+static bool eve5_probe_esdm(const char * path, eve5_esdm_bmp_t * out)
+{
+    uint8_t meta[EVE5_ESDM_MAX];
+    uint32_t got = 0;
+
+#if LV_USE_FS_EVE5_FLASH
+    if(lv_eve5_flash_is_path(path)) return false;
+#endif
+#if LV_USE_FS_EVE5_SDCARD
+    if(lv_eve5_sdcard_is_path(path)) {
+        if(!lv_eve5_sdcard_read_esdm(path, meta, sizeof(meta), &got)) return false;
+        return eve5_parse_esdm_bmp(meta, got, out);
+    }
+#endif
+
+    char meta_path[256];
+    if(!eve5_esdm_meta_path(path, meta_path, sizeof(meta_path))) return false;
+    lv_fs_file_t f;
+    if(lv_fs_open(&f, meta_path, LV_FS_MODE_RD) != LV_FS_RES_OK) return false;
+    lv_fs_read(&f, meta, sizeof(meta), &got);
+    lv_fs_close(&f);
+    return eve5_parse_esdm_bmp(meta, got, out);
+}
+
+/* Host filesystem branch of the esdm loader.
+ * HAL mutex: expects UNLOCKED on entry, locks internally, returns UNLOCKED. */
+static bool eve5_load_esdm_host(lv_draw_eve5_unit_t * u, const char * path,
+                                uint32_t * ram_g_addr, uint16_t * eve_format,
+                                int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
+                                EVE_GpuHandle *out_handle, uint32_t * out_palette_addr)
+{
+    char meta_path[256];
+    if(!eve5_esdm_meta_path(path, meta_path, sizeof(meta_path))) return false;
+
+    lv_fs_file_t mf;
+    if(lv_fs_open(&mf, meta_path, LV_FS_MODE_RD) != LV_FS_RES_OK) return false;
+    uint8_t meta[EVE5_ESDM_MAX];
+    uint32_t got = 0;
+    lv_fs_read(&mf, meta, sizeof(meta), &got);
+    lv_fs_close(&mf);
+
+    eve5_esdm_bmp_t bmp;
+    if(!eve5_parse_esdm_bmp(meta, got, &bmp)) return false;
+    if(bmp.compression == EVE5_ESDM_IMAGE) return false;  /* use the .jpg/.png path */
+    if(bmp.has_swizzle) {
+        LV_LOG_WARN("EVE5 esdm: bitmap swizzle not applied for %s", path);
+    }
+
+    bool paletted = (bmp.palette_size > 0);
+    char pal_path[256];
+    if(paletted && !eve5_esdm_palette_path(path, bmp.ext_len, bmp.palette_ext, pal_path, sizeof(pal_path))) {
+        LV_LOG_WARN("EVE5 esdm: cannot derive palette path for %s", path);
+        return false;
+    }
+
+    /* Palette (if any) precedes the bitmap in one contiguous allocation,
+     * matching the driver's PALETTEDARGB8 layout. */
+    uint32_t pal_region = paletted ? (((uint32_t)bmp.palette_size + 31u) & ~31u) : 0;
+    uint32_t data_bytes = (bmp.compression == EVE5_ESDM_ASSET && bmp.raw_size)
+                          ? bmp.raw_size : (uint32_t)(bmp.stride * bmp.height);
+    uint32_t alloc_size = pal_region + data_bytes;
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
+#endif
+
+    bool ok = false;
+    uint32_t pal_ofs = GA_INVALID;
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, alloc_size, GA_ALIGN_4 | GA_GC_FLAG);
+    uint32_t base = EVE_GpuAlloc_Get(u->allocator, handle);
+    if(base != GA_INVALID) {
+        bool loaded = true;
+
+        if(paletted) {
+            loaded = eve5_esdm_host_read_raw(u, pal_path, base, bmp.palette_size);
+            if(loaded) pal_ofs = 0;
+            else LV_LOG_WARN("EVE5 esdm: palette read failed: %s", pal_path);
+        }
+
+        if(loaded) {
+            uint32_t dst = base + pal_region;
+            switch(bmp.compression) {
+                case EVE5_ESDM_RAW:
+                    loaded = eve5_esdm_host_read_raw(u, path, dst, data_bytes);
+                    break;
+                case EVE5_ESDM_DEFLATE:
+                    loaded = eve5_esdm_host_stream(u, path, false, dst);
+                    break;
+                case EVE5_ESDM_ASSET:
+                    loaded = eve5_esdm_host_stream(u, path, true, dst);
+                    break;
+                default:
+                    loaded = false;
+                    break;
+            }
+        }
+
+        if(loaded) {
+            EVE_Hal_requestFenceBeforeSwap(u->hal);
+            ok = true;
+        }
+        else {
+            EVE_GpuAlloc_Free(u->allocator, handle);
+        }
+    }
+
+#if LV_USE_OS
+    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
+#endif
+
+    if(!ok) return false;
+
+    *ram_g_addr = base + pal_region;
+    *eve_format = (uint16_t)bmp.format;
+    *eve_stride = bmp.stride;
+    *src_w = bmp.width;
+    *src_h = bmp.height;
+    if(out_handle) *out_handle = handle;
+    if(out_palette_addr) *out_palette_addr = (pal_ofs != GA_INVALID) ? (base + pal_ofs) : GA_INVALID;
+
+    LV_LOG_INFO("EVE5 esdm: loaded %s (%dx%d fmt=%u stride=%d comp=%u%s)",
+                path, (int)bmp.width, (int)bmp.height, (unsigned)bmp.format,
+                (int)bmp.stride, (unsigned)bmp.compression, paletted ? " paletted" : "");
+    return true;
+}
+
+bool lv_draw_eve5_try_load_esdm_image(lv_draw_eve5_unit_t * u, const void * src,
+                                      uint32_t * ram_g_addr, uint16_t * eve_format,
+                                      int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
+                                      EVE_GpuHandle *out_handle, uint32_t * out_palette_addr)
+{
+    if(lv_image_src_get_type(src) != LV_IMAGE_SRC_FILE) return false;
+    const char * path = (const char *)src;
+
+#if LV_USE_FS_EVE5_FLASH
+    /* Flash resources are addressed, not named — no sidecar applies. */
+    if(lv_eve5_flash_is_path(path)) return false;
+#endif
+
+#if LV_USE_FS_EVE5_SDCARD
+    if(lv_eve5_sdcard_is_path(path)) {
+        EVE_GpuHandle handle;
+        uint32_t w = 0, h = 0, fmt = 0, img_ofs = 0, pal_ofs = GA_INVALID;
+        int32_t stride = 0;
+        if(!lv_eve5_sdcard_load_esdm(path, &handle, &w, &h, &fmt, &stride, &img_ofs, &pal_ofs))
+            return false;
+        uint32_t base = EVE_GpuAlloc_Get(u->allocator, handle);
+        if(base == GA_INVALID) return false;
+        *ram_g_addr = base + img_ofs;
+        *eve_format = (uint16_t)fmt;
+        *eve_stride = stride;
+        *src_w = (int32_t)w;
+        *src_h = (int32_t)h;
+        if(out_handle) *out_handle = handle;
+        if(out_palette_addr) *out_palette_addr = (pal_ofs != GA_INVALID) ? (base + pal_ofs) : GA_INVALID;
+        return true;
+    }
+#endif
+
+    return eve5_load_esdm_host(u, path, ram_g_addr, eve_format, eve_stride, src_w, src_h,
+                               out_handle, out_palette_addr);
+}
 #endif /* EVE5_HW_IMAGE_DECODE */
 
 #if LV_USE_FS_EVE5_SDCARD
@@ -600,7 +857,20 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
 
     bool is_jpeg = (lv_strcmp(ext, "jpg") == 0) || (lv_strcmp(ext, "jpeg") == 0);
     bool is_png = (lv_strcmp(ext, "png") == 0);
-    if(!is_jpeg && !is_png) return LV_RESULT_INVALID;
+    if(!is_jpeg && !is_png) {
+        /* Non-image extension: accept it only if a usable ".esdm" sidecar
+         * describes a raw/deflate/asset bitmap. Image-compressed sidecars
+         * (JPEG/PNG payloads) need a .jpg/.png extension to reach the
+         * CMD_LOADIMAGE path, so they are declined here. */
+        eve5_esdm_bmp_t bmp;
+        if(!eve5_probe_esdm(fn, &bmp)) return LV_RESULT_INVALID;
+        if(bmp.compression == EVE5_ESDM_IMAGE) return LV_RESULT_INVALID;
+        header->cf = LV_COLOR_FORMAT_RAW;
+        header->w = bmp.width;
+        header->h = bmp.height;
+        header->stride = bmp.stride;
+        return LV_RESULT_OK;
+    }
 
     uint32_t w = 0, h = 0;
 
@@ -653,9 +923,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     const char * path = (const char *)dsc->src;
 
     bool is_jpeg, is_png;
-    if(!eve5_is_jpeg_or_png(path, &is_jpeg, &is_png)) {
-        return LV_RESULT_INVALID;
-    }
+    bool is_image_ext = eve5_is_jpeg_or_png(path, &is_jpeg, &is_png);
 
     uint32_t ram_g_addr = GA_INVALID, palette_addr = GA_INVALID;
     /* Initial format placeholder; the chosen loader fills in the actual EVE
@@ -669,23 +937,32 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     EVE_GpuHandle handle = GA_HANDLE_INVALID;
     bool loaded = false;
 
-#if LV_USE_FS_EVE5_SDCARD
-    if(!loaded) {
-        loaded = lv_draw_eve5_try_load_sdcard_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                                    &eve_stride, &src_w, &src_h, &handle, &palette_addr);
+    if(!is_image_ext) {
+        /* Non-image extension: a ".esdm" sidecar drives a direct raw / deflate /
+         * asset load in the bitmap's native EVE format (SD card and host both
+         * handled, SD bypassing the LVGL filesystem driver). */
+        loaded = lv_draw_eve5_try_load_esdm_image(u, dsc->src, &ram_g_addr, &eve_format,
+                                                  &eve_stride, &src_w, &src_h, &handle, &palette_addr);
     }
+    else {
+#if LV_USE_FS_EVE5_SDCARD
+        if(!loaded) {
+            loaded = lv_draw_eve5_try_load_sdcard_image(u, dsc->src, &ram_g_addr, &eve_format,
+                                                        &eve_stride, &src_w, &src_h, &handle, &palette_addr);
+        }
 #endif
 
 #if LV_USE_FS_EVE5_FLASH
-    if(!loaded) {
-        loaded = lv_draw_eve5_try_load_flash_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                                   &eve_stride, &src_w, &src_h, &handle, &palette_addr);
-    }
+        if(!loaded) {
+            loaded = lv_draw_eve5_try_load_flash_image(u, dsc->src, &ram_g_addr, &eve_format,
+                                                       &eve_stride, &src_w, &src_h, &handle, &palette_addr);
+        }
 #endif
 
-    if(!loaded) {
-        loaded = lv_draw_eve5_try_load_file_image(u, dsc->src, &ram_g_addr, &eve_format,
-                                                  &eve_stride, &src_w, &src_h, &handle, &palette_addr);
+        if(!loaded) {
+            loaded = lv_draw_eve5_try_load_file_image(u, dsc->src, &ram_g_addr, &eve_format,
+                                                      &eve_stride, &src_w, &src_h, &handle, &palette_addr);
+        }
     }
 
     if(!loaded) {
