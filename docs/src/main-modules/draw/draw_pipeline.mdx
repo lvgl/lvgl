@@ -116,6 +116,9 @@ As the current clip area always changes as LVGL traverses the widget tree, the c
 area is saved in each draw task. This clip area should be considered by the draw units
 too, for example, to mask out only a smaller part of an image to be blended.
 
+<ApiLink name="lv_obj_set_ext_draw_size"/> combined with <ApiLink name="LV_OBJ_FLAG_OVERFLOW_VISIBLE"/>
+can be used to increase the widget's clip area, allowing the children to overflow.
+
 ## Draw Task Evaluation
 
 When each [Draw Task](/main-modules/draw/draw_pipeline) is created, each existing Draw Unit is
