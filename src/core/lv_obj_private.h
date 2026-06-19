@@ -175,6 +175,15 @@ lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj);
 lv_result_t lv_obj_add_child(lv_obj_t * parent, lv_obj_t * child);
 void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child);
 
+/**
+ * Expand the display's invalidated areas to cover blur objects whose background
+ * changed. It's called once per frame and invalidates the full extent of every
+ * blur object that overlaps an invalidated area, repeating the walk until a
+ * pass adds no new areas to cover transitive blur-over-blur cases.
+ * @param disp  pointer to a display
+ */
+void lv_obj_invalidate_expand_blur(lv_display_t * disp);
+
 /**********************
  *      MACROS
  **********************/
