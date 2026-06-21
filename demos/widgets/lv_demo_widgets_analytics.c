@@ -24,6 +24,8 @@
  **********************/
 
 static void scale1_indic1_anim_cb(void * var, int32_t v);
+static void scale1_indic2_anim_cb(void * var, int32_t v);
+static void scale1_indic3_anim_cb(void * var, int32_t v);
 static void scale2_timer_cb(lv_timer_t * timer);
 static void scale3_anim_cb(void * var, int32_t v);
 static void scale3_size_changed_event_cb(lv_event_t * e);
@@ -174,7 +176,7 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
 
-    lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
+    lv_anim_set_exec_cb(&a, scale1_indic2_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 2600);
     lv_anim_set_reverse_duration(&a, 3200);
@@ -190,7 +192,7 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
     lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
 
-    lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
+    lv_anim_set_exec_cb(&a, scale1_indic3_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 2800);
     lv_anim_set_reverse_duration(&a, 1800);
@@ -355,6 +357,24 @@ static void scale1_indic1_anim_cb(void * var, int32_t v)
     lv_obj_t * card = lv_obj_get_parent(scale1);
     lv_obj_t * label = lv_obj_get_child(card, -5);
     lv_label_set_text_fmt(label, "Revenue: %"LV_PRId32" %%", v);
+}
+
+static void scale1_indic2_anim_cb(void * var, int32_t v)
+{
+    lv_arc_set_value(var, v);
+
+    lv_obj_t * card = lv_obj_get_parent(scale1);
+    lv_obj_t * label = lv_obj_get_child(card, -3);
+    lv_label_set_text_fmt(label, "Sales: %"LV_PRId32" %%", v);
+}
+
+static void scale1_indic3_anim_cb(void * var, int32_t v)
+{
+    lv_arc_set_value(var, v);
+
+    lv_obj_t * card = lv_obj_get_parent(scale1);
+    lv_obj_t * label = lv_obj_get_child(card, -1);
+    lv_label_set_text_fmt(label, "Costs: %"LV_PRId32" %%", v);
 }
 
 static void scale2_timer_cb(lv_timer_t * timer)
