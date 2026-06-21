@@ -79,7 +79,7 @@ const lv_obj_class_t lv_spinner_class = {
 
 lv_obj_t * lv_spinner_create(lv_obj_t * parent)
 {
-    lv_obj_t * obj = lv_obj_class_create_obj(&lv_spinner_class, parent);
+    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
 }
