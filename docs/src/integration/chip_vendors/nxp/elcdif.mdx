@@ -3,19 +3,19 @@ title: NXP eLCDIF
 description: "eLCDIF is a peripheral that is provided on some of the NXP devices capable to drive display panels through the RGB interface, it supports different color depths and, on MIPI-DSI capable devices, it..."
 ---
 
-### Overview
+## Overview
 
 eLCDIF is a peripheral that is provided on some of the NXP devices capable to drive display panels through
 the RGB interface, it supports different color depths and, on MIPI-DSI capable devices, its output ca be
 directed to the MIPI display physical interface. The LVGL's NXP eLCDIF driver is responsible to bind the
 NXP MCUx SDK low-level driver to the LVGL display subsystem.
 
-### Prerequisites
+## Prerequisites
 
 - This driver relies on the presence of the MCUx SDK from NXP in the same project
 - Activate the driver by setting <ApiLink name="LV_USE_NXP_ELCDIF" /> to `1` in your *"lv_conf.h"*.
 
-### Usage
+## Usage
 
 The LVGL driver for eLCDIF assumes the platform already configured the display low-level driver,
 set the pin-mux, clocks, etc. It also requires the base address of the peripheral and configuration

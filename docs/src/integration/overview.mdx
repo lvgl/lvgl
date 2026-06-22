@@ -112,7 +112,7 @@ commands. Here is a list of some useful commands:
 - `alldefconfig`: Creates a .config with all default values.
 - `genconfig`: Generates a C header from the config, following `autoconf.h` format.
 
-##### Usage
+#### Usage
 
 1. Install the prerequisites using `scripts/install_prerequisites.sh/bat`.
 2. Create the configuration (.config)
@@ -125,7 +125,7 @@ menuconfig
 Make changes to the config and exit using `Esc` or `Q`, and save your configuration.
 The `.config` file is now created and lists the configuration values.
 
-1. Run CMake with the `-DLV_USE_KCONFIG=ON` flag:
+3. Run CMake with the `-DLV_USE_KCONFIG=ON` flag:
 
 ```bash
 cd <lvgl_repo>
@@ -232,7 +232,7 @@ If `LV_USE_OS` is set, <ApiLink name="lv_sleep_ms" /> will be the sleep function
 provided by the operating system, otherwise it will fall back to a blocking delay.
 Of course, you can use any custom delay, wait, or sleep functions instead.
 
-##### Sleep Management
+#### Sleep Management
 
 To better control the delay/sleep time, <ApiLink name="lv_timer_handler" />
 returns the remaining time until the next timer:

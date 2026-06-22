@@ -3,16 +3,16 @@ title: evdev
 description: "The Linux event device (evdev) is a hardware-independent API that gives access to input events from, for example, a mouse or touchscreen. It is exposed via the Linux device file system interface."
 ---
 
-### Overview
+## Overview
 
 The Linux event device (evdev) is a hardware-independent API that gives access to input events from,
 for example, a mouse or touchscreen. It is exposed via the Linux device file system interface.
 
-### Prerequisites
+## Prerequisites
 
 Your system has an input device configured (usually under `/dev/input/` such as `/dev/input/event0`).
 
-### Configuring the driver
+## Configuring the driver
 
 Enable the Linux LVGL evdev driver support in `lv_conf.h`.
 
@@ -20,7 +20,7 @@ Enable the Linux LVGL evdev driver support in `lv_conf.h`.
 #define LV_USE_EVDEV 1
 ```
 
-### Usage
+## Usage
 
 To set up an event input, first create an input device with `lv_edev_create` setting it to the correct Linux event device.
 Then link this to the LVGL display with `lv_indev_set_display`.
@@ -37,7 +37,7 @@ lv_display_t * disp = lv_linux_fbdev_create();
 lv_linux_fbdev_set_file(disp, "/dev/fb0");
 ```
 
-### Locating your input device
+## Locating your input device
 
 If you can't determine your input device, first run
 
@@ -51,7 +51,7 @@ Try:
 
 `$evtest /dev/input/event1` replacing `eventX` with your event device from above.
 
-### Automatic input device discovery
+## Automatic input device discovery
 
 There is support for automatically finding and adding input devices in `/dev/input/`. New devices will automatically be added
 when they are connected. To enable this feature, you can simply call <ApiLink name="lv_evdev_discovery_start" display="lv_evdev_discovery_start(NULL, NULL)" />.

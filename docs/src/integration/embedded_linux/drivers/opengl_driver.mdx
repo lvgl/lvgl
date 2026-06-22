@@ -3,16 +3,16 @@ title: OpenGL Driver
 description: The OpenGL display driver is a generic driver that creates textures for embedding LVGL content in other applications. The goal is to create textures that people can embed in other applications.
 ---
 
-### Overview
+## Overview
 
 The **OpenGL** display driver is a generic driver that creates textures for embedding
 LVGL content in other applications. The goal is to create textures that people can
 embed in other applications. The OpenGL context must be created by the user or they
 can use GLFW or EGL as backends.
 
-### Getting Started with OpenGL
+## Getting Started with OpenGL
 
-##### Prerequisites
+### Prerequisites
 
 An OpenGL context must be created before using the OpenGL driver. You can create this using:
 
@@ -20,15 +20,15 @@ An OpenGL context must be created before using the OpenGL driver. You can create
 - EGL (see [EGL driver](/integration/embedded_linux/drivers/egl))
 - Your own OpenGL context management
 
-##### Configure OpenGL Driver
+### Configure OpenGL Driver
 
-1. Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
-   
+Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig:
+
 ```c
 #define LV_USE_OPENGLES  1
 ```
 
-##### Basic Usage
+### Basic Usage
 
 ```c
 #include "lvgl/lvgl.h"
@@ -88,7 +88,7 @@ int main()
 }
 ```
 
-### OpenGL Texture Caching Renderer
+## OpenGL Texture Caching Renderer
 
 There is a renderer in LVGL which caches software-rendered areas as OpenGL textures.
 The textures are retrieved from the cache and reused when there is a match.
@@ -98,7 +98,7 @@ The performance will be drastically improved in most cases.
 #define LV_USE_DRAW_OPENGLES 1
 ```
 
-##### Known Limitations
+### Known Limitations
 
 - Performance will be the same or slightly worse if the drawn areas are never found in the cache
   due to Widgets with continuously varying colors or shapes. One example is a label whose color

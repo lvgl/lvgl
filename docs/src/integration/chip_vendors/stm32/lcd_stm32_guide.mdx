@@ -3,7 +3,7 @@ title: SPI Display Driver Creation for STM32
 description: Here is how you can drive a RGB565 240x320 SPI display using STM32 HAL SPI. You can use direct or partial mode.
 ---
 
-### Display Driver
+## Display Driver
 
 Here is how you can drive a RGB565 240x320 SPI display using STM32 HAL SPI.
 You can use direct or partial mode. Single-buffered direct is shown in this example.
@@ -44,7 +44,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
 Performance can be improved by using DMA with double buffering.
 
-### Touch indev
+## Touch indev
 
 In your initialization code, create the touch screen indev.
 

@@ -6,10 +6,10 @@ description: "The Wayland driver provides integration between LVGL and Wayland-b
 ## Overview
 
 The Wayland [driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/wayland) provides integration between LVGL and Wayland-based systems,
-allowing LVGL applications to render directly into a Wayland surface and handle keyboard, mouse and touch input. This makes it suitable 
+allowing LVGL applications to render directly into a Wayland surface and handle keyboard, mouse and touch input. This makes it suitable
 for production deployments, such as kiosk interfaces, control panels, or other embedded GUIs where Wayland is the display server.
 
-In addition to production use, the driver is also useful for development on linux desktop environments, offering a convenient way to simulate and validate 
+In addition to production use, the driver is also useful for development on linux desktop environments, offering a convenient way to simulate and validate
 your LVGL applications without dedicated hardware. It serves as an alternative to the X11 and SDL2 drivers.
 
 ## Dependencies
@@ -72,13 +72,13 @@ enabling GPU-accelerated graphics on Wayland compositors that support the necess
 To enable the EGL backend:
 
 1. Enable OpenGL ES support in your LVGL configuration:
-   
+
     ```c
     #define LV_USE_OPENGLES 1
     ```
 
 2. Link your application with the `wayland-egl` library (add to your build system):
-   
+
     ```bash
     -lwayland-egl
     ```
@@ -106,25 +106,25 @@ The G2D backend leverages NXP's hardware-accelerated 2D graphics engine availabl
 To enable the G2D backend:
 
 1. Enable G2D support in your LVGL configuration:
-   
+
     ```c
     #define LV_USE_G2D 1
     #define LV_USE_DRAW_G2D 1
     ```
 
 2. Link your application with the `g2d` library (add to your build system):
-   
+
     ```bash
     -lg2d
     ```
 
 ## Configuring the wayland driver
 
-1. Enable the wayland driver in `lv_conf.h`
+Enable the wayland driver in `lv_conf.h`:
 
-    ```c
-    #define LV_USE_WAYLAND  1
-    ```
+```c
+#define LV_USE_WAYLAND  1
+```
 
 ## Reference Project
 
@@ -180,7 +180,7 @@ Once a group is set as default, any focusable widget created afterwards is autom
 allowing keyboard arrows and encoder rotation to move focus between widgets, and Enter/encoder click to activate them.
 
 <Callout type="warning" title="Check display before querying input devices">
-    <ApiLink name="lv_wayland_get_indev_keyboard" /> and <ApiLink name="lv_wayland_get_indev_pointeraxis" /> both return 
+    <ApiLink name="lv_wayland_get_indev_keyboard" /> and <ApiLink name="lv_wayland_get_indev_pointeraxis" /> both return
     `NULL` if called before the display is fully initialised always check that the return disp is non-NULL before querying its input devices.
 </Callout>
 
@@ -210,7 +210,7 @@ display, where the `display` parameter specifies the physical display number (ty
 
 ```c
 /* Assign to physical display 0 and full screen on that display */
-lv_wayland_assign_physical_display(disp, 0);  
+lv_wayland_assign_physical_display(disp, 0);
 lv_wayland_window_set_fullscreen(window, true);
 ```
 

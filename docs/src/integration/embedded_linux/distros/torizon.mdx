@@ -12,7 +12,7 @@ instead of building and maintaining a custom distribution.
 This guide explains how to create a docker image containing LVGL and a simple demo
 application that can be deployed on any Toradex device running TorizonOS.
 
-### Prerequisites
+## Prerequisites
 
 To follow this guide you obviously need to have a Toradex SoM along with a carrier board.
 More information is available on the Toradex [website](https://www.toradex.com/computer-on-modules).
@@ -25,7 +25,7 @@ this guide. Also Docker needs to be present on the development host.
 The [Toradex documentation](https://developer.toradex.com) is a helpful resource. This article contains many references
 to it.
 
-### Board setup
+## Board setup
 
 Begin by installing TorizonOS by using the Toradex Easy Installer.
 Follow the official bring-up [guides](https://developer.toradex.com/quickstart/bringup/).
@@ -37,16 +37,16 @@ The address is displayed in the bottom right corner. It will be used later.
 
 Once the setup is complete, the device will boot into TorizonOS.
 
-### VS Code extension
+## VS Code extension
 
-Toradex provides a [VS Code extension](https://developer.toradex.com/torizon/application-development/ide-extension/) that offers a collection of templates used 
+Toradex provides a [VS Code extension](https://developer.toradex.com/torizon/application-development/ide-extension/) that offers a collection of templates used
 to configure and automate the tasks needed to cross-compile applications and build Docker images.
 
 These templates now include support for LVGL applications, available as one of the [partner templates](https://github.com/torizon/vscode-torizon-templates?tab=readme-ov-file#partner-templates).
 
 This guide explains how to perform those operations manually.
 
-### Creating the Docker image
+## Creating the Docker image
 
 To build a Torizon container for ARM on your development machine, you need to enable Docker emulation.
 Run the following commands to enable it:
@@ -156,7 +156,7 @@ lvgl_app                  latest    2967a34a9e74   2 minutes ago    118MB
 
 Alongside the image name, you'll also find its ID (`2967a34a9e74` in this example). This will be useful for later.
 
-### Deploying the container image to the device
+## Deploying the container image to the device
 
 The image is now ready to be deployed on the device. There are several ways to perform
 this task.
@@ -221,14 +221,14 @@ Start the container like so, using the image ID:
 docker run --device /dev/fb0:/dev/fb0 <IMAGE_ID>
 ```
 
-### Conclusion
+## Conclusion
 
 You now have a running LVGL application. Where to go from here?
 
 - You are now ready to build your LVGL application for Torizon OS.
   It is recommended to get familiar with VSCode IDE extension
   as it will simplify your workflow.
-  
+
   If you are a VSCode user, it is the best way to develop for Torizon OS. If you use
   another editor or IDE you can always
   write scripts to automate the building/pushing/pulling operations.

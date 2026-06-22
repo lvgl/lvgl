@@ -25,11 +25,11 @@ Supported boards in the RA Family:
   repositories, recursive updating of the git submodules is no longer needed.
 - JLink is used for debugging, it can be downloaded [here](https://www.segger.com/downloads/jlink/).
 - Clone the ready-to-use repository for your selected board, for FSP version prior to 6.0:
-  
+
     ```bash
         git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1_gcc.git --recurse-submodules
     ```
-  
+
   Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
 - Clone the ready-to-use repository for your selected board, for FSP version from 6.0 and above:
@@ -42,29 +42,26 @@ Supported boards in the RA Family:
   `General` / `Existing projects into workspace`.
 - Select the cloned folder and press `Finish`.
 - Double-click on `configuration.xml`. This will activate the `Configuration Window`.
-  
+
   Renesas' Flexible Software Package (FSP) includes BSP and HAL layer support extended
   with multiple RTOS variants and other middleware stacks.  The components will be
   available via code generation, including the entry point in *"main.c"*.
-  
+
   Press `Generate Project Content` in the top right corner.
-  
-  .. image:: /_static/images/renesas/generate.png
-     :alt: Code generation with FSP
+
+  ![Code generation with FSP](/_static/images/renesas/generate.png)
 - Build the project by pressing `Ctrl` + `Alt` + `B`
 - Click the Debug button (![img_debug_btn](/_static/images/renesas/debug_btn.png)). If prompted with `Debug Configurations`,
   on the `Debugger` tab select the `J-Link ARM` as `Debug hardware` and the proper
   IC as `Target Device`:
-  
+
   - `R7FA8D1BH` for EK-RA8D1
-  
-    .. image:: /_static/images/renesas/debug_ra8.png
-       :alt: Debugger parameters for RA8
-  
+
+    ![Debugger parameters for RA8](/_static/images/renesas/debug_ra8.png)
+
   - `R7FA6M3AH` for EK-RA6M3G
-  
-    .. image:: /_static/images/renesas/debug_ra6.png
-       :alt: Debugger parameters for RA6
+
+    ![Debugger parameters for RA6](/_static/images/renesas/debug_ra6.png)
 
 <Callout type="info">
 On EK-RA8D1 boards, the `SW1` DIP switch 7 (in the middle of the board) should be

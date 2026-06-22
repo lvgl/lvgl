@@ -138,7 +138,7 @@ bitbake-layers show-layers
 - networking-layer
 - meta-python
 
-# Build for RaspberryPi3 64
+## Build for RaspberryPi3 64
 
 The available machine configurations for Raspberrypi can be listed like this
 
@@ -168,8 +168,6 @@ Everything is setup, time to build the image:
 ```c
 bitbake core-image-base
 ```
-
-=====================
 
 Let's go through the build folders to understand what happened.
 
@@ -603,7 +601,7 @@ Until this section, everything was already done for you. We used existing
 recipes. The objective here is to create a recipe from scratch and to add the
 generated binary in the image.
 
-# Create a layer
+### Create a layer
 
 First, create a layer and add it to the configuration file
 
@@ -625,7 +623,7 @@ directory tree should look like the following
         └── example_0.1.bb
 ```
 
-# Create a recipe
+### Create a recipe
 
 Following this structure, create a folder containing the recipes to build 1
 or multiple applications using lvgl
@@ -668,7 +666,7 @@ do_install() {
 
 The sources come from `lv_port_linux` repository. We apply 2 patches to modify the `CMakeLists.txt` and `lv_conf.h`.
 
-### Patch 1
+#### Patch 1
 
 Create the first patch file
 
@@ -790,7 +788,7 @@ index 62a834f..58fbe7a 100644
 2.34.1
 ```
 
-### Patch 2
+#### Patch 2
 
 Create the first patch file
 
@@ -848,7 +846,7 @@ target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR})
 2.34.1
 ```
 
-# Build the recipe
+### Build the recipe
 
 You should now be able to see the recipe listing the existing recipes
 
