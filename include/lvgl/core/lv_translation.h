@@ -82,7 +82,7 @@ const char * lv_translation_get_language(void);
  * @return          the translation
  * @note            fallback rules:
  *                      - if the tag is found on the selected language return it
- *                      - if the tag is not found on the selected language, use the fist language
+ *                      - if the tag is not found on the selected language, use the first language
  *                      - if the tag is not found on the first language, return the tag
  */
 const char * lv_translation_get(const char * tag);
