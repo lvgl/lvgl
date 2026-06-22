@@ -78,6 +78,10 @@ static void call_delete_cb(lv_event_t * e);
     static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj);
 #endif
 
+#if LV_USE_OBJ_ID
+    static lv_obj_t * obj_find_by_id(const lv_obj_t * obj, const void * id);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -549,25 +553,10 @@ void * lv_obj_get_id(const lv_obj_t * obj)
 lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
 {
     LV_CHECK_ARG(id != NULL, return NULL);
-
-    LV_LOG_WARN("DEPRECATED: IDs are used only to print the widget trees. To find a widget use obj_name");
-
+    LV_LOG_DEPRECATED("IDs are used only to print the widget trees. To find a widget use obj_name");
     if(obj == NULL) obj = lv_display_get_screen_active(NULL);
     if(obj == NULL) return NULL;
-
-    uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_count(obj);
-
-    for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = obj->spec_attr->children[i];
-
-        if(lv_obj_id_compare(child->id, id) == 0) return child;
-        lv_obj_t * found = lv_obj_find_by_id(child, id);
-
-        if(found != NULL) return found;
-    }
-
-    return NULL;
+    return obj_find_by_id(obj, id);
 }
 #endif
 
@@ -1470,3 +1459,17 @@ static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_prop
     }
 }
 #endif /*LV_USE_OBJ_PROPERTY*/
+
+#if LV_USE_OBJ_ID
+static lv_obj_t * obj_find_by_id(const lv_obj_t * obj, const void * id)
+{
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
+    for(uint32_t i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = obj->spec_attr->children[i];
+        if(lv_obj_id_compare(child->id, id) == 0) return child;
+        lv_obj_t * found = obj_find_by_id(child, id);
+        if(found != NULL) return found;
+    }
+    return NULL;
+}
+#endif
