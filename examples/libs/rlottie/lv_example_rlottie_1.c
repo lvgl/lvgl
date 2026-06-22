@@ -6,6 +6,8 @@
  * @title Rlottie animation from array
  * @brief Play a Lottie animation decoded from a JSON byte array in flash.
  *
+ * @deprecated rlottie is deprecated. Use the `lv_lottie` widget instead.
+ *
  * `lv_rlottie_create_from_raw` builds a 100x100 Lottie widget from the
  * externally declared `lv_example_rlottie_approve` JSON data, and the
  * widget is centered on the active screen.
@@ -13,7 +15,9 @@
 void lv_example_rlottie_1(void)
 {
     extern const uint8_t lv_example_rlottie_approve[];
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * lottie = lv_rlottie_create_from_raw(lv_screen_active(), 100, 100, (const char *)lv_example_rlottie_approve);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_center(lottie);
 }
 
