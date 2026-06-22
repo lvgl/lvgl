@@ -3,6 +3,9 @@
 #include "../../src/themes/lv_theme_private.h"
 #include "unity/unity.h"
 
+/*The themes are tested on the deprecated `lv_menu`, `lv_list` and `lv_win` widgets too.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -239,5 +242,7 @@ void test_theme_simple(void)
     TEST_ASSERT_FALSE(lv_theme_simple_is_inited());
     TEST_ASSERT_NULL(lv_theme_simple_get());
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

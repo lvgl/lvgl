@@ -3,6 +3,9 @@
 #include "../../lvgl_private.h"
 #include "unity/unity.h"
 
+/* These tests exercise the deprecated lv_menu widget on purpose. */
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 void setUp(void)
 {
 }
@@ -709,5 +712,7 @@ void test_menu_selected_tab_clear_without_sidebar(void)
 
     lv_refr_now(NULL);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif
