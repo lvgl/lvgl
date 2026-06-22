@@ -5,6 +5,14 @@ description: "A vertical container into which buttons and text rows can be added
 
 ## Overview
 
+<Callout type="warning" title="Deprecated">
+The `lv_list` widget is deprecated and kept only for backward compatibility. A
+list is just a flex container with a column flow, so build one directly from
+`lv_obj` with a `LV_FLEX_FLOW_COLUMN` layout instead. See the
+[`lv_example_flex_list`](/common-widget-features/layouts/flex#building-a-list)
+example for a starting point.
+</Callout>
+
 The List is a vertical container. You add full-width buttons and text rows
 to it; the layout takes care of stacking them.
 

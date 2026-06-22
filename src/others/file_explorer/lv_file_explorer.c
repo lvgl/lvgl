@@ -313,7 +313,9 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*Two lists of quick access bar*/
     lv_obj_t * btn;
     /*list 1*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     explorer->list_device = lv_list_create(explorer->quick_access_area);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(explorer->list_device, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(lv_list_add_text(explorer->list_device, "DEVICE"), lv_palette_main(LV_PALETTE_ORANGE), 0);
 
@@ -321,7 +323,9 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
 
     /*list 2*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     explorer->list_places = lv_list_create(explorer->quick_access_area);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(explorer->list_places, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(lv_list_add_text(explorer->list_places, "PLACES"), lv_palette_main(LV_PALETTE_LIME), 0);
 

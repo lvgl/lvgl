@@ -279,8 +279,9 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 18:
+            LV_DEPRECATIONS_IGNORE_BEGIN
             obj = lv_list_create(main_page);
-            {
+            LV_DEPRECATIONS_IGNORE_END {
                 lv_obj_t * b;
                 b = lv_list_add_button(obj, LV_SYMBOL_OK, "1. Some very long text to scroll");
                 auto_delete(b, 10);

@@ -121,7 +121,9 @@ static void test_widgets(const char * img_name)
     lv_obj_t * keyboard = lv_keyboard_create(scr_act);
     lv_obj_set_size(keyboard, 300, 150);
 
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * list = lv_list_create(scr_act);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(list, 100, 100);
     lv_list_add_text(list, "List item");
     lv_list_add_button(list, LV_SYMBOL_OK, "List button");
