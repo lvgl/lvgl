@@ -20,7 +20,7 @@ config LV_OBJ_ID_AUTO_ASSIGN
 
 config LV_USE_OBJ_ID_BUILTIN
 	bool "Use builtin method to deal with obj ID"
-	default n
+	default y
 
 endif #LV_USE_OBJ_ID
 
@@ -32,7 +32,7 @@ if LV_USE_OBJ_PROPERTY
 
 config LV_USE_OBJ_PROPERTY_NAME
 	bool "Use name to access property"
-	default n
+	default y
 	help
 		Add a name table to every widget class, so the property can be accessed by name.
 		Note, the const table will increase flash usage.
@@ -75,4 +75,3 @@ config LV_USE_TRANSLATION
 config LV_USE_COLOR_FILTER
 	bool "Enable color filter style"
 	default n
-

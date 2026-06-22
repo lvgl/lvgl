@@ -37,7 +37,7 @@ config LV_VG_LITE_GRAD_CACHE_CNT
 
 config LV_VG_LITE_STROKE_CACHE_CNT
 	int "VG-Lite stroke maximum cache number."
-	default 8
+	default 32
 
 config LV_VG_LITE_BITMAP_FONT_CACHE_CNT
 	int "VG-Lite unaligned bitmap font maximum cache number."

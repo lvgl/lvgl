@@ -5,7 +5,7 @@ config LV_USE_DRAW_G2D
 if LV_USE_DRAW_G2D
 
 config LV_G2D_HASH_TABLE_SIZE
-	bool "Maximum number of buffers that can be stored for G2D draw unit."
+	int "Maximum number of buffers that can be stored for G2D draw unit."
 	default 50
 	help
 		Includes the frame buffers and assets.
@@ -17,7 +17,7 @@ config LV_USE_G2D_DRAW_THREAD
 
 config LV_USE_G2D_ASSERT
 	bool "Enable G2D asserts"
-	depends on LV_USE_G2D
+	depends on LV_USE_DRAW_G2D
 	default n
 
 endif

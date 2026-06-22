@@ -4663,14 +4663,10 @@
 #endif
 #if LV_USE_OPENGLES
     #ifndef LV_USE_OPENGLES_DEBUG
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_OPENGLES_DEBUG
-                #define LV_USE_OPENGLES_DEBUG CONFIG_LV_USE_OPENGLES_DEBUG
-            #else
-                #define LV_USE_OPENGLES_DEBUG 0
-            #endif
+        #ifdef CONFIG_LV_USE_OPENGLES_DEBUG
+            #define LV_USE_OPENGLES_DEBUG CONFIG_LV_USE_OPENGLES_DEBUG
         #else
-            #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
+            #define LV_USE_OPENGLES_DEBUG        0    /**< Enable or disable debug for opengles */
         #endif
     #endif
 #endif
