@@ -116,6 +116,20 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[])
     if(map == NULL) return;
 
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
+
+    /*Remember the on-screen position of the selected button. Changing the map changes which
+     *button each index refers to, so the selection is restored by position below to avoid the
+     *highlight jumping to an unrelated button.*/
+    bool had_sel = btnm->btn_id_sel != LV_BUTTONMATRIX_BUTTON_NONE && btnm->btn_id_sel < btnm->btn_cnt;
+    lv_point_t sel_center;
+    if(had_sel) {
+        lv_area_t obj_cords;
+        lv_obj_get_coords(obj, &obj_cords);
+        const lv_area_t * a = &btnm->button_areas[btnm->btn_id_sel];
+        sel_center.x = obj_cords.x1 + a->x1 + (lv_area_get_width(a) >> 1);
+        sel_center.y = obj_cords.y1 + a->y1 + (lv_area_get_height(a) >> 1);
+    }
+
     if(btnm->auto_free_map) free_map(btnm);
     btnm->auto_free_map = 0;
 
@@ -124,6 +138,17 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[])
     btnm->map_p = map;
 
     update_map(obj);
+
+    /*Restore the selection on the button now occupying the previous selection's position*/
+    if(had_sel) {
+        uint32_t new_sel = get_button_from_point(obj, &sel_center);
+        if(new_sel != LV_BUTTONMATRIX_BUTTON_NONE &&
+           (button_is_hidden(btnm->ctrl_bits[new_sel]) || button_is_inactive(btnm->ctrl_bits[new_sel]))) {
+            new_sel = LV_BUTTONMATRIX_BUTTON_NONE;
+        }
+        btnm->btn_id_sel = new_sel;
+        invalidate_button_area(obj, btnm->btn_id_sel);
+    }
 }
 
 void lv_buttonmatrix_set_ctrl_map(lv_obj_t * obj, const lv_buttonmatrix_ctrl_t ctrl_map[])
