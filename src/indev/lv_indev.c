@@ -1783,7 +1783,7 @@ static void indev_click_focus(lv_indev_t * indev)
 * Handle the gesture of indev_proc_p->pointer.act_obj
 * @param indev pointer to an input device state
 */
-void indev_gesture(lv_indev_t * indev)
+static void indev_gesture(lv_indev_t * indev)
 {
     if(indev->pointer.scroll_obj) return;
     if(indev->pointer.gesture_sent) return;
