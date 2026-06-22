@@ -33,7 +33,7 @@ void main(void)
 
     /* LVGL will render to this 1/10 screen sized buffer for 2 bytes/pixel */
     static uint8_t buf[320 * 240 / 10 * 2];
-    lv_display_set_buffers(display, buf, NULL, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(display, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* This callback will display the rendered image */
     lv_display_set_flush_cb(display, my_flush_cb);
