@@ -36,7 +36,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_roller_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller_mode_t mode);
+static void remove_options_translation_tag(lv_obj_t * obj);
 static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 static void draw_label(lv_event_t * e);
@@ -80,6 +83,7 @@ static const lv_property_ops_t lv_roller_properties[] = {
 
 const lv_obj_class_t lv_roller_class = {
     .constructor_cb = lv_roller_constructor,
+    .destructor_cb = lv_roller_destructor,
     .event_cb = lv_roller_event,
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_DPI_DEF,
@@ -123,6 +127,34 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_ASSERT_NULL(options);
 
+    remove_options_translation_tag(obj);
+    set_options_internal(obj, options, mode);
+}
+
+#if LV_USE_TRANSLATION
+void lv_roller_set_options_translation_tag(lv_obj_t * obj, const char * tag, lv_roller_mode_t mode)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    lv_roller_t * roller = (lv_roller_t *)obj;
+    if(!tag || tag[0] == '\0') {
+        return;
+    }
+    char * new_tag = lv_strdup(tag);
+    LV_ASSERT_MALLOC(new_tag);
+    if(!new_tag) {
+        LV_LOG_WARN("Failed to allocate memory for new tag");
+        return;
+    }
+    if(roller->options_translation_tag) {
+        lv_free(roller->options_translation_tag);
+    }
+    roller->options_translation_tag = new_tag;
+    set_options_internal(obj, lv_tr(tag), mode);
+}
+#endif /*LV_USE_TRANSLATION*/
+
+static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
+{
     lv_roller_t * roller = (lv_roller_t *)obj;
     lv_obj_t * label = get_label(obj);
 
@@ -378,6 +410,32 @@ static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_LOG_TRACE("finished");
 }
 
+static void lv_roller_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+#if LV_USE_TRANSLATION
+    lv_roller_t * roller = (lv_roller_t *)obj;
+    lv_free(roller->options_translation_tag);
+    roller->options_translation_tag = NULL;
+#else
+    LV_UNUSED(obj);
+#endif /*LV_USE_TRANSLATION*/
+}
+
+static void remove_options_translation_tag(lv_obj_t * obj)
+{
+#if LV_USE_TRANSLATION
+    lv_roller_t * roller = (lv_roller_t *)obj;
+    /* Remove translation tag so we don't update the options automatically if the language changes*/
+    if(roller->options_translation_tag) {
+        lv_free(roller->options_translation_tag);
+        roller->options_translation_tag = NULL;
+    }
+#else
+    LV_UNUSED(obj);
+#endif /*LV_USE_TRANSLATION*/
+}
+
 static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
@@ -505,6 +563,19 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST) {
         draw_main(e);
     }
+#if LV_USE_TRANSLATION
+    else if(code == LV_EVENT_TRANSLATION_LANGUAGE_CHANGED) {
+        if(roller->options_translation_tag) {
+
+            uint32_t prev_sel = roller->sel_opt_id;
+            set_options_internal(obj, lv_tr(roller->options_translation_tag), roller->mode);
+
+            roller->sel_opt_id = LV_MIN(prev_sel, roller->option_cnt - 1);
+            roller->sel_opt_id_ori = roller->sel_opt_id;
+
+        }
+    }
+#endif /*LV_USE_TRANSLATION*/
 }
 
 static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e)

@@ -20,6 +20,16 @@ circular roller.
 Select programmatically with <ApiLink name="lv_roller_set_selected" display="lv_roller_set_selected(roller, id, LV_ANIM_ON)" />
 (index) or `_set_selected_str(roller, str, LV_ANIM_ON)` (option text).
 
+## Set translation tag
+
+When using LVGL's [translation module](/main-modules/translation), you can bind a translation tag to the roller's
+options with <ApiLink name="lv_roller_set_options_translation_tag" display="lv_roller_set_options_translation_tag(roller, tag, mode)" />.
+After binding, future changes to the language will automatically update the options to display the corresponding
+translation for that tag in the new language. The translation should contain the options in a `\n` separated list,
+e.g. `"One\nTwo\nThree"`.
+
+Calling <ApiLink name="lv_roller_set_options" /> afterwards removes the binding.
+
 ## Get selected option
 
 - <ApiLink name="lv_roller_get_selected" display="lv_roller_get_selected(roller)" /> returns the index.
