@@ -244,6 +244,32 @@ void lv_draw_eve5_rom_font_invalidate(lv_draw_eve5_unit_t * u)
 }
 
 /*********************
+ * COPROCESSOR RESET HOOK
+ *
+ * Dispatched from lv_eve5_reset_coprocessor — the display driver's full_buf
+ * vram_res holds the back pointer to the EVE5 draw unit set by
+ * lv_eve5_link_draw_unit. Matching DRAW_UNIT_ID_EVE5 guards against being
+ * called with someone else's draw unit (LVGL doesn't tag units by owner).
+ * Asset fonts don't need an explicit pass: their cached_handle's owner is
+ * now NULL, so the next resolve's handle_check fails and re-binds via
+ * CMD_SETFONT2.
+ *********************/
+
+void lv_draw_eve5_handle_coprocessor_reset(struct _lv_draw_unit_t * draw_unit)
+{
+    if(draw_unit == NULL) return;
+    lv_draw_unit_t * du = (lv_draw_unit_t *)draw_unit;
+    if(du->name == NULL) return;
+    /* Same identity check the display driver could do — keeps the public
+     * API decoupled from the internal struct shape. Both RT (EVE5_BT820)
+     * and NORT (EVE_NORT) dispatch paths use the same lv_draw_eve5_unit_t. */
+    if(lv_strcmp(du->name, "EVE5_BT820") != 0 && lv_strcmp(du->name, "EVE_NORT") != 0) return;
+
+    lv_draw_eve5_unit_t * u = (lv_draw_eve5_unit_t *)du;
+    lv_draw_eve5_rom_font_invalidate(u);
+}
+
+/*********************
  * ASSET FONT BINDING
  *
  * Asset fonts share the bitmap handle pool with ROM fonts. The asset

@@ -223,78 +223,116 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     }
 
     EVE_HalContext *phost = u->hal;
+    lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
 
-    if(phost->CmdFault) {
-        LV_LOG_ERROR("EVE5: Coprocessor fault before CMD_LOADIMAGE");
+    /* Stage the compressed file in RAM_G and feed CMD_LOADIMAGE through
+     * MediaFifo (OPT_MEDIAFIFO) so the decoder reads from an isolated
+     * buffer rather than the cocmd FIFO. Trailing bytes past the
+     * decoder's end-of-stream get dropped instead of being interpreted
+     * as commands, defending against malformed or attacker-crafted PNG/JPEG. */
+    uint32_t fifo_size = (file_size + 3u) & ~3u;
+    EVE_GpuHandle temp_handle = EVE_GpuAlloc_AlignedAlloc(u->allocator, fifo_size, 0, 32);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
+    if(temp_addr == GA_INVALID) {
+        LV_LOG_WARN("EVE5: Failed to allocate %u-byte MediaFifo buffer for %s",
+                    fifo_size, path);
         EVE_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
+        lv_eve5_hal_unlock(disp);
 #endif
         lv_fs_close(&file);
         return false;
     }
 
-    /* OPT_TRUECOLOR is BT820-only — it requests RGB8/ARGB8 output instead of
-     * the default RGB565/ARGB4 (which avoids gradient banding). On earlier
-     * gens those output formats don't exist, so we drop the flag and accept
-     * the default 16bpp output. */
-    uint32_t loadimage_opts = OPT_NODL;
-    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
-
-    EVE_Cmd_wr32(phost, CMD_LOADIMAGE);
-    EVE_Cmd_wr32(phost, addr);
-    EVE_Cmd_wr32(phost, loadimage_opts);
-
-    /* Stream file data while holding HAL lock.
+    /* Stream the file into temp_addr (file → host chunk → RAM_G).
      * SD card and flash paths are excluded above, so lv_fs_read won't hit
      * an EVE FS driver that would deadlock on the non-recursive HAL mutex. */
+    lv_fs_seek(&file, 0, LV_FS_SEEK_SET);
     uint8_t chunk_buf[8192];
+    uint32_t write_offset = 0;
     uint32_t remaining = file_size;
     bool success = true;
-
-    while(remaining > 0 && success) {
+    while(remaining > 0) {
         uint32_t chunk_size = remaining > sizeof(chunk_buf) ? sizeof(chunk_buf) : remaining;
         uint32_t bytes_read = 0;
-
         res = lv_fs_read(&file, chunk_buf, chunk_size, &bytes_read);
         if(res != LV_FS_RES_OK || bytes_read == 0) {
             LV_LOG_ERROR("EVE5: File read error at offset %u", file_size - remaining);
             success = false;
             break;
         }
-
+        EVE_Hal_wrMem(phost, temp_addr + write_offset, chunk_buf, bytes_read);
+        write_offset += bytes_read;
         remaining -= bytes_read;
-
-        uint32_t padded_size = (bytes_read + 3) & ~3U;
-        if(padded_size > bytes_read) {
-            lv_memzero(chunk_buf + bytes_read, padded_size - bytes_read);
-        }
-
-        if(!EVE_Cmd_wrMem(phost, chunk_buf, padded_size)) {
-            LV_LOG_ERROR("EVE5: Command buffer write failed");
-            success = false;
-            break;
-        }
     }
-
     lv_fs_close(&file);
 
     if(!success) {
+        EVE_GpuAlloc_Free(u->allocator, temp_handle);
         EVE_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
+        lv_eve5_hal_unlock(disp);
 #endif
         return false;
     }
 
-    if(!EVE_Cmd_waitFlush(phost)) {
-        LV_LOG_ERROR("EVE5: CMD_LOADIMAGE failed for %s", path);
+    /* Wrap MediaFifo over the populated buffer and stamp REG_MEDIAFIFO_WRITE
+     * with the actual byte count so the coprocessor sees a fully-populated
+     * fifo (same trick the legacy SD load uses after CMD_FSREAD). */
+    EVE_MediaFifo_close(phost);
+    if(!EVE_MediaFifo_set(phost, temp_addr, fifo_size)) {
+        LV_LOG_ERROR("EVE5: MediaFifo setup failed for %s", path);
+        EVE_GpuAlloc_Free(u->allocator, temp_handle);
         EVE_GpuAlloc_Free(u->allocator, handle);
 #if LV_USE_OS
-        lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
+        lv_eve5_hal_unlock(disp);
 #endif
         return false;
     }
+    EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
+
+    /* OPT_TRUECOLOR is BT820-only — it requests RGB8/ARGB8 output instead of
+     * the default RGB565/ARGB4 (which avoids gradient banding). On earlier
+     * gens those output formats don't exist, so we drop the flag and accept
+     * the default 16bpp output. */
+    uint32_t loadimage_opts = OPT_NODL | OPT_MEDIAFIFO;
+    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
+
+    /* Drain the FIFO so any subsequent fault is attributable to CMD_LOADIMAGE
+     * itself, not stale queued work; bracket with SuppressErrorOverlay so the
+     * HAL's debug overlay doesn't flash for an isolated fault we'll reset
+     * immediately. Mirrors Esd_LoadResourceEx / Esd_LoadBitmapEx. */
+    if(!EVE_Cmd_waitFlush(phost)) {
+        LV_LOG_ERROR("EVE5: Pre-load flush failed for %s", path);
+        EVE_MediaFifo_close(phost);
+        EVE_GpuAlloc_Free(u->allocator, temp_handle);
+        EVE_GpuAlloc_Free(u->allocator, handle);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = true;
+
+    EVE_CoCmd_loadImage(phost, addr, loadimage_opts);
+    bool decoded = EVE_Cmd_waitFlush(phost);
+
+    EVE_MediaFifo_close(phost);
+    EVE_GpuAlloc_Free(u->allocator, temp_handle);
+
+    if(!decoded) {
+        LV_LOG_ERROR("EVE5: CMD_LOADIMAGE failed for %s", path);
+        EVE_GpuAlloc_Free(u->allocator, handle);
+        /* Narrow reset: the pre-flush isolated this fault, so we can recover
+         * the coprocessor without disturbing any earlier successful work. */
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(disp);
+        phost->SuppressErrorOverlay = false;
+#if LV_USE_OS
+        lv_eve5_hal_unlock(disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = false;
 
     EVE_Hal_requestFenceBeforeSwap(phost);
 
@@ -442,53 +480,107 @@ static bool eve5_esdm_host_read_raw(lv_draw_eve5_unit_t * u, const char * path,
     return ok && (done == max_bytes);
 }
 
-/* Stream a host file through the command FIFO behind a CMD_INFLATE (deflate) or
- * CMD_LOADASSET (relocatable asset) header. Caller holds the HAL lock. */
+/* Stage a host file in RAM_G and feed CMD_INFLATE2 (deflate) or CMD_LOADASSET
+ * (relocatable asset) through MediaFifo (OPT_MEDIAFIFO). Same safety model
+ * as the .jpg/.png CMD_LOADIMAGE path: the compressed body never co-mingles
+ * with the cocmd FIFO, and a load fault is narrowly recovered by
+ * lv_eve5_reset_coprocessor. Caller holds the HAL lock. */
 static bool eve5_esdm_host_stream(lv_draw_eve5_unit_t * u, const char * path,
                                   bool is_asset, uint32_t dst)
 {
-    EVE_HalContext * phost = u->hal;
-    if(phost->CmdFault) return false;
+#if !((EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET))
+    if(is_asset) return false;  /* CMD_LOADASSET is BT820+ */
+#endif
 
-    /* Open the source before issuing the command: once the header is in the
-     * FIFO the coprocessor blocks waiting for the data we have to stream. */
+    EVE_HalContext * phost = u->hal;
+    lv_display_t * disp = lv_eve5_disp_from_hal(phost);
+
+    /* Discover file size, then read the body into a RAM_G temp buffer.
+     * Caller already holds the HAL lock, so lv_fs must be host-side only
+     * (the EVE5 SD/flash FS drivers would deadlock on re-entry). */
     lv_fs_file_t f;
     if(lv_fs_open(&f, path, LV_FS_MODE_RD) != LV_FS_RES_OK) return false;
-
-    if(is_asset) {
-#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
-        EVE_Cmd_wr32(phost, CMD_LOADASSET);
-        EVE_Cmd_wr32(phost, dst);
-        EVE_Cmd_wr32(phost, 0);  /* options: 0 = data follows in command buffer */
-#else
+    uint32_t file_size = 0;
+    if(lv_fs_seek(&f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK
+       || lv_fs_tell(&f, &file_size) != LV_FS_RES_OK
+       || lv_fs_seek(&f, 0, LV_FS_SEEK_SET) != LV_FS_RES_OK
+       || file_size == 0) {
         lv_fs_close(&f);
-        return false;  /* CMD_LOADASSET is BT820+ */
-#endif
+        return false;
     }
-    else {
-        EVE_CoCmd_inflate(phost, dst);  /* CMD_INFLATE(2); data follows */
+
+    uint32_t fifo_size = (file_size + 3u) & ~3u;
+    EVE_GpuHandle temp_handle = EVE_GpuAlloc_AlignedAlloc(u->allocator, fifo_size, 0, 32);
+    uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
+    if(temp_addr == GA_INVALID) {
+        LV_LOG_WARN("EVE5 esdm: failed to allocate %u-byte MediaFifo buffer for %s",
+                    fifo_size, path);
+        lv_fs_close(&f);
+        return false;
     }
 
     uint8_t chunk[8192];
+    uint32_t write_offset = 0;
     bool ok = true;
     for(;;) {
         uint32_t got = 0;
-        if(lv_fs_read(&f, chunk, sizeof(chunk), &got) != LV_FS_RES_OK) {
-            ok = false;
-            break;
-        }
+        if(lv_fs_read(&f, chunk, sizeof(chunk), &got) != LV_FS_RES_OK) { ok = false; break; }
         if(got == 0) break;
-        uint32_t padded = (got + 3u) & ~3u;
-        if(padded > got) lv_memzero(chunk + got, padded - got);
-        if(!EVE_Cmd_wrMem(phost, chunk, padded)) {
-            ok = false;
-            break;
-        }
+        EVE_Hal_wrMem(phost, temp_addr + write_offset, chunk, got);
+        write_offset += got;
     }
     lv_fs_close(&f);
 
-    if(!ok) return false;
-    return EVE_Cmd_waitFlush(phost);
+    if(!ok || write_offset != file_size) {
+        EVE_GpuAlloc_Free(u->allocator, temp_handle);
+        return false;
+    }
+
+    EVE_MediaFifo_close(phost);
+    if(!EVE_MediaFifo_set(phost, temp_addr, fifo_size)) {
+        LV_LOG_ERROR("EVE5 esdm: MediaFifo setup failed for %s", path);
+        EVE_GpuAlloc_Free(u->allocator, temp_handle);
+        return false;
+    }
+    EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
+
+    /* Pre-flush + SuppressErrorOverlay so any fault is isolated to the
+     * just-issued load and the HAL's debug overlay doesn't flash for it. */
+    if(!EVE_Cmd_waitFlush(phost)) {
+        EVE_MediaFifo_close(phost);
+        EVE_GpuAlloc_Free(u->allocator, temp_handle);
+        return false;
+    }
+    phost->SuppressErrorOverlay = true;
+
+    if(is_asset) {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        EVE_CoCmd_loadAsset(phost, dst, OPT_MEDIAFIFO);
+#endif
+    }
+    else {
+        /* On BT81X CMD_INFLATE2 carries an options word (the original
+         * CMD_INFLATE doesn't); on BT820 the natural CMD_INFLATE opcode
+         * was renamed and now takes options like BT81X CMD_INFLATE2 did.
+         * EVE_CoCmd_inflate2 emits the right opcode via
+         * CMD_INFLATE2_COMPATIBILITY for either chip family — required so
+         * BT820 single-target builds (where the raw CMD_INFLATE2 macro is
+         * removed) still compile, and so we don't accidentally hit BT81X's
+         * data-follows CMD_INFLATE form. Works on BT815+. */
+        EVE_CoCmd_inflate2(phost, dst, OPT_MEDIAFIFO);
+    }
+    bool loaded = EVE_Cmd_waitFlush(phost);
+
+    EVE_MediaFifo_close(phost);
+    EVE_GpuAlloc_Free(u->allocator, temp_handle);
+
+    if(!loaded) {
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(disp);
+        phost->SuppressErrorOverlay = false;
+        return false;
+    }
+    phost->SuppressErrorOverlay = false;
+    return true;
 }
 
 /* Read + parse the ".esdm" sidecar for @p path. SD card sidecars use raw

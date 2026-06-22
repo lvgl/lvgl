@@ -176,6 +176,40 @@ void lv_eve5_record_frame_sync(lv_display_t * disp, EVE_CmdSync sync);
 void lv_eve5_request_invalidate(lv_display_t * disp);
 
 /**
+ * Reset the coprocessor narrowly after an isolated asset-load fault, and
+ * invalidate cached EVE5 state that no longer matches hardware.
+ *
+ * Asset loads (CMD_LOADIMAGE / CMD_LOADASSET / CMD_INFLATE / CMD_FSREAD /
+ * CMD_FLASHREAD) can fault on malformed or unsupported content. The load
+ * call sites flush the FIFO before each attempt so the fault is
+ * attributable to the just-issued command, then call this on a detected
+ * fault so later renders aren't blocked by a stale fault state.
+ *
+ * Calls EVE_Util_resetCoprocessor, dispatches the optional draw-unit
+ * cache-invalidation hook registered via
+ * lv_eve5_set_coprocessor_reset_handler (so bitmap handle pool / rom font
+ * cache / asset font bindings drop their now-stale state), then runs a
+ * SyncBarrier so deferred frees / open scopes whose close syncs never
+ * landed are released. Mirrors Esd_ResetCoprocessor.
+ */
+void lv_eve5_reset_coprocessor(lv_display_t * disp);
+
+/**
+ * Register a hook the display driver calls during lv_eve5_reset_coprocessor
+ * so a connected draw unit can drop cached bitmap-handle bindings (rom
+ * font cache, asset font slots) that no longer match the chip state after
+ * a narrow reset. The hook is invoked with the draw unit pointer stashed
+ * via lv_eve5_link_draw_unit. Pass NULL to clear. Safe to call multiple
+ * times.
+ *
+ * Kept separate from lv_eve5_link_draw_unit so the display side has no
+ * link-time dependency on draw-unit symbols — the draw unit's init
+ * function registers itself.
+ */
+void lv_eve5_set_coprocessor_reset_handler(lv_display_t * disp,
+                                           void (*handler)(struct _lv_draw_unit_t * draw_unit));
+
+/**
  * Get the EVE HAL context from the display
  * @param disp pointer to an EVE5 display
  * @return     pointer to EVE HAL context, or NULL if invalid

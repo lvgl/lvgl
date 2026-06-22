@@ -54,6 +54,17 @@ void lv_draw_eve5_set_enabled(bool enabled);
  */
 bool lv_draw_eve5_get_enabled(void);
 
+struct _lv_draw_unit_t;
+/**
+ * Coprocessor-reset hook: invalidates cached bitmap-handle bindings so the
+ * EVE5 draw unit re-issues CMD_ROMFONT / CMD_SETFONT2 on next text render.
+ * Called by lv_eve5_reset_coprocessor after EVE_Util_resetCoprocessor;
+ * safe to pass any lv_draw_unit_t (no-op when @p draw_unit is not the EVE5
+ * draw unit). Public so the display driver can dispatch without knowing
+ * the internal lv_draw_eve5_unit_t layout.
+ */
+void lv_draw_eve5_handle_coprocessor_reset(struct _lv_draw_unit_t * draw_unit);
+
 #endif /* LV_USE_DRAW_EVE5 */
 
 #ifdef __cplusplus

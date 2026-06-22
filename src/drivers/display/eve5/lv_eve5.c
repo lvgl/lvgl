@@ -73,6 +73,12 @@ typedef struct {
     /* Pending deferred screen invalidate; consumed by the REFR_READY handler. */
     bool invalidate_pending;
     lv_eve5_render_mode_t render_mode;
+    /* Optional hook the draw unit registers via
+     * lv_eve5_set_coprocessor_reset_handler so its bitmap-handle pool +
+     * rom/asset font caches drop their now-stale bindings after a narrow
+     * reset. Display driver doesn't know what the draw unit caches, just
+     * dispatches the hook with the stashed back pointer. */
+    void (*cop_reset_handler)(struct _lv_draw_unit_t * draw_unit);
     /* Both draw buffers are created at init and kept alive for the display's
      * lifetime so mode switching is allocation-free. Only one is bound to the
      * display via lv_display_set_draw_buffers at any given time. */
@@ -395,6 +401,48 @@ void lv_eve5_request_invalidate(lv_display_t * disp)
     lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
     if(drvr == NULL) return;
     drvr->invalidate_pending = true;
+}
+
+void lv_eve5_reset_coprocessor(lv_display_t * disp)
+{
+    if(disp == NULL) return;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL || drvr->hal == NULL) return;
+
+    /* Caller has already detected phost->CmdFault and called us with the
+     * HAL mutex held — EVE_Util_resetCoprocessor talks to the chip. */
+    EVE_Util_resetCoprocessor(drvr->hal);
+
+    /* Dispatch the registered draw-unit cache-invalidation hook. The
+     * coprocessor's bitmap-handle table is empty after reset, so any
+     * cached "rom font 27 owns handle Y" / "asset font dsc owns handle Z"
+     * entry the draw unit holds would otherwise route CMD_TEXT through an
+     * unbound handle on next render. The hook is registered via
+     * lv_eve5_set_coprocessor_reset_handler so this file stays
+     * free of any draw-unit-specific dependency. */
+    if(drvr->cop_reset_handler != NULL
+       && drvr->full_buf != NULL && drvr->full_buf->vram_res != NULL) {
+        lv_draw_unit_t * du = drvr->full_buf->vram_res->unit;
+        if(du != NULL) drvr->cop_reset_handler(du);
+    }
+
+    /* Open scopes whose close syncs never landed (the faulted DL segment)
+     * keep stamping their entries forever; SyncBarrier retires them along
+     * with the deferred-free queue. Mirrors Esd_ResetCoprocessor. */
+    if(drvr->allocator != NULL) EVE_GpuAlloc_SyncBarrier(drvr->allocator);
+
+    /* Bookkeeping: any pending swapchain sync we were waiting on is gone. */
+    drvr->last_frame_sync = EVE_CMD_SYNC_INVALID;
+    drvr->full_frame_hw_rendered = false;
+}
+
+void lv_eve5_set_coprocessor_reset_handler(lv_display_t * disp,
+                                           void (*handler)(struct _lv_draw_unit_t * draw_unit))
+{
+    if(disp == NULL) return;
+    lv_eve5_driver_t * drvr = lv_display_get_driver_data(disp);
+    if(drvr == NULL) return;
+    drvr->cop_reset_handler = handler;
 }
 
 /**********************

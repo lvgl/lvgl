@@ -413,9 +413,9 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
         return NULL;
     }
 
-    uint32_t result = EVE_CoCmd_fsDir(phost, ramg_addr, LV_EVE5_SDCARD_DIR_BUFFER_SIZE, full_path);
-    if(result != 0) {
-        LV_LOG_WARN("Directory read failed with code %u: %s", result, full_path);
+    /* Pre-flush + SuppressErrorOverlay so a CMD_FSDIR fault is isolated to
+     * this attempt and lv_eve5_reset_coprocessor can recover narrowly. */
+    if(!EVE_Cmd_waitFlush(phost)) {
         EVE_GpuAlloc_Free(ctx->alloc, gpu_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(ctx->disp);
@@ -424,6 +424,22 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
         lv_free(dir);
         return NULL;
     }
+    phost->SuppressErrorOverlay = true;
+
+    uint32_t result = EVE_CoCmd_fsDir(phost, ramg_addr, LV_EVE5_SDCARD_DIR_BUFFER_SIZE, full_path);
+    if(result != 0) {
+        LV_LOG_WARN("Directory read failed with code %u: %s", result, full_path);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(ctx->disp);
+        EVE_GpuAlloc_Free(ctx->alloc, gpu_handle);
+        phost->SuppressErrorOverlay = false;
+#if LV_USE_OS
+        lv_eve5_hal_unlock(ctx->disp);
+#endif
+        lv_free(dir->listing);
+        lv_free(dir);
+        return NULL;
+    }
+    phost->SuppressErrorOverlay = false;
 
     ramg_addr = EVE_GpuAlloc_Get(ctx->alloc, gpu_handle);
     EVE_Hal_rdMem(phost, dir->listing, ramg_addr, LV_EVE5_SDCARD_DIR_BUFFER_SIZE);
@@ -560,15 +576,31 @@ static bool ensure_file_loaded(eve5_sdcard_ctx_t * ctx, eve5_file_t * file)
     }
 
     LV_LOG_USER("Loading file to RAM_G: %s (size=%u, addr=0x%08X)", file->path, file->size, ramg_addr);
-    uint32_t result = EVE_CoCmd_fsRead(phost, ramg_addr, file->path);
-    if(result == 0xFFFFFFFF) {
-        LV_LOG_ERROR("Failed to read file from SD card: %s", file->path);
+
+    /* Pre-flush + SuppressErrorOverlay isolate a CMD_FSREAD fault (corrupt
+     * FAT, bad sector, ...) to this attempt so lv_eve5_reset_coprocessor
+     * can recover narrowly without losing later renders. */
+    if(!EVE_Cmd_waitFlush(phost)) {
         EVE_GpuAlloc_Free(ctx->alloc, gpu_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(ctx->disp);
 #endif
         return false;
     }
+    phost->SuppressErrorOverlay = true;
+
+    uint32_t result = EVE_CoCmd_fsRead(phost, ramg_addr, file->path);
+    if(result == 0xFFFFFFFF) {
+        LV_LOG_ERROR("Failed to read file from SD card: %s", file->path);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(ctx->disp);
+        EVE_GpuAlloc_Free(ctx->alloc, gpu_handle);
+        phost->SuppressErrorOverlay = false;
+#if LV_USE_OS
+        lv_eve5_hal_unlock(ctx->disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = false;
     LV_LOG_USER("Loaded file to RAM_G: %s (result=%u)", file->path, result);
 
     /* File may be handed to the graphics engine via lv_eve5_sdcard_steal_ramg() */
@@ -748,11 +780,22 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
      * CMD_LOADIMAGE will actually produce. We use the queried dimensions
      * to allocate worst-case ARGB8; the post-load CMD_GETIMAGE (folded
      * into loadImage_fs via out_* outputs) returns the actual format and
-     * lets the truncate step below trim any slack. */
+     * lets the truncate step below trim any slack.
+     * Pre-flush + SuppressErrorOverlay isolate any fault to this scan. */
+    if(!EVE_Cmd_waitFlush(phost)) {
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = true;
+
     uint32_t q_w = 0, q_h = 0;
     uint32_t q_res = EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &q_w, &q_h, NULL);
     if(q_res != 0) {
         LV_LOG_ERROR("CMD_QUERYIMAGE failed for %s (code %u)", sd_path, (unsigned)q_res);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -761,6 +804,7 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     if(q_w == 0 || q_h == 0) {
         LV_LOG_ERROR("Implausible CMD_QUERYIMAGE result for %s (w=%u h=%u)",
                      sd_path, (unsigned)q_w, (unsigned)q_h);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -780,6 +824,18 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
+        phost->SuppressErrorOverlay = false;
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    /* Re-flush so CMD_LOADIMAGE's fault (if any) is also isolated from the
+     * preceding query, not lumped with it. */
+    if(!EVE_Cmd_waitFlush(phost)) {
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -790,12 +846,15 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
                                                &out_fmt, &out_source, &out_w, &out_h, &out_palette);
     if(load_res != 0) {
         LV_LOG_ERROR("CMD_LOADIMAGE failed for %s (code %u)", sd_path, (unsigned)load_res);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
         EVE_GpuAlloc_Free(alloc, final_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
+    phost->SuppressErrorOverlay = false;
 
 #else  /* EVE_COCMD_PATCH_QUERY */
 
@@ -806,9 +865,21 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     LV_LOG_WARN("EVE5 SD image load uses intermediate RAM_G buffer "
                 "(define EVE_COCMD_PATCH_QUERY=1 for zero-copy CMD_QUERYIMAGE path)");
 
+    /* Pre-flush + SuppressErrorOverlay isolate CMD_FSSIZE / CMD_FSREAD
+     * faults so lv_eve5_reset_coprocessor can recover narrowly. */
+    if(!EVE_Cmd_waitFlush(phost)) {
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = true;
+
     uint32_t file_size = EVE_CoCmd_fsSize(phost, sd_path);
     if(file_size == 0xFFFFFFFF || file_size == 0) {
         LV_LOG_ERROR("File not found or empty: %s", sd_path);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -822,6 +893,7 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     uint32_t temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
     if(temp_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate temporary RAM_G for compressed file (%u bytes)", fifo_size);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -831,7 +903,9 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     uint32_t result = EVE_CoCmd_fsRead(phost, temp_addr, sd_path);
     if(result != 0) {
         LV_LOG_ERROR("CMD_FSREAD failed with code %u: %s", result, sd_path);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
         EVE_GpuAlloc_Free(alloc, temp_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -876,6 +950,7 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
         EVE_GpuAlloc_Free(alloc, temp_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -889,6 +964,7 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
         LV_LOG_ERROR("Failed to set up media FIFO");
         EVE_GpuAlloc_Free(alloc, final_handle);
         EVE_GpuAlloc_Free(alloc, temp_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -897,17 +973,33 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     /* Data already in RAM_G from CMD_FSREAD, just set write pointer */
     EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
 
-    EVE_CoCmd_loadImage(phost, final_addr, OPT_MEDIAFIFO | loadimage_opts);
+    /* Re-flush so the CMD_LOADIMAGE fault (if any) is isolated from the
+     * FSREAD/MediaFifo setup. */
     if(!EVE_Cmd_waitFlush(phost)) {
-        LV_LOG_ERROR("CMD_LOADIMAGE failed");
         EVE_MediaFifo_close(phost);
         EVE_GpuAlloc_Free(alloc, final_handle);
         EVE_GpuAlloc_Free(alloc, temp_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
+
+    EVE_CoCmd_loadImage(phost, final_addr, OPT_MEDIAFIFO | loadimage_opts);
+    if(!EVE_Cmd_waitFlush(phost)) {
+        LV_LOG_ERROR("CMD_LOADIMAGE failed");
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
+        EVE_MediaFifo_close(phost);
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, temp_handle);
+        phost->SuppressErrorOverlay = false;
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = false;
 
     EVE_MediaFifo_close(phost);
     EVE_GpuAlloc_Free(alloc, temp_handle);
@@ -983,10 +1075,18 @@ bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32
     lv_eve5_hal_lock(s_ctx.disp);
 #endif
 
-    if(ensure_sd_attached(&s_ctx)
-       && EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &qw, &qh, NULL) == 0
-       && qw != 0 && qh != 0) {
-        ok = true;
+    /* Pre-flush + SuppressErrorOverlay isolate a CMD_QUERYIMAGE fault
+     * (corrupt JPEG/PNG header, etc.) to this attempt. */
+    if(ensure_sd_attached(&s_ctx) && EVE_Cmd_waitFlush(phost)) {
+        phost->SuppressErrorOverlay = true;
+        uint32_t r = EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &qw, &qh, NULL);
+        if(r == 0 && qw != 0 && qh != 0) {
+            ok = true;
+        }
+        else if(phost->CmdFault) {
+            lv_eve5_reset_coprocessor(s_ctx.disp);
+        }
+        phost->SuppressErrorOverlay = false;
     }
 
 #if LV_USE_OS
@@ -1025,8 +1125,12 @@ bool lv_eve5_sdcard_read_esdm(const char * path, uint8_t * buf, uint32_t buf_siz
 #if LV_USE_OS
     lv_eve5_hal_lock(s_ctx.disp);
 #endif
-    if(ensure_sd_attached(&s_ctx)) {
+    /* Pre-flush + SuppressErrorOverlay isolate FSSIZE / FSREAD faults so
+     * a missing/corrupt sidecar can't leave the coprocessor in a bad state. */
+    if(ensure_sd_attached(&s_ctx) && EVE_Cmd_waitFlush(phost)) {
+        phost->SuppressErrorOverlay = true;
         uint32_t fsize = EVE_CoCmd_fsSize(phost, sd_path);
+        bool fault_after_size = phost->CmdFault;
         if(fsize != 0xFFFFFFFFu && fsize != 0 && fsize <= buf_size) {
             /* CMD_FSREAD destination must be 32-byte aligned. */
             uint32_t aligned = (fsize + 31u) & ~31u;
@@ -1042,6 +1146,10 @@ bool lv_eve5_sdcard_read_esdm(const char * path, uint8_t * buf, uint32_t buf_siz
                 EVE_GpuAlloc_Free(s_ctx.alloc, h);
             }
         }
+        if(!ok && (fault_after_size || phost->CmdFault)) {
+            lv_eve5_reset_coprocessor(s_ctx.disp);
+        }
+        phost->SuppressErrorOverlay = false;
     }
 #if LV_USE_OS
     lv_eve5_hal_unlock(s_ctx.disp);
@@ -1104,7 +1212,11 @@ bool lv_eve5_sdcard_load_esdm(const char * path, EVE_GpuHandle *handle,
 #if LV_USE_OS
     lv_eve5_hal_lock(s_ctx.disp);
 #endif
-    if(ensure_sd_attached(&s_ctx)) {
+    /* Pre-flush + SuppressErrorOverlay isolate any palette/body load fault
+     * (corrupt deflate stream, mis-relocated asset, ...) so the coprocessor
+     * can be recovered narrowly via lv_eve5_reset_coprocessor. */
+    if(ensure_sd_attached(&s_ctx) && EVE_Cmd_waitFlush(phost)) {
+        phost->SuppressErrorOverlay = true;
         /* GC-flagged: raw assets re-load on demand through the decoder cache. */
         EVE_GpuHandle h = EVE_GpuAlloc_AlignedAlloc(alloc, alloc_size, GA_GC_FLAG, 32);
         uint32_t base = EVE_GpuAlloc_Get(alloc, h);
@@ -1122,20 +1234,27 @@ bool lv_eve5_sdcard_load_esdm(const char * path, EVE_GpuHandle *handle,
             }
 
             if(loaded) {
-                uint32_t dst = base + pal_region;
-                switch(bmp.compression) {
-                    case EVE5_ESDM_RAW:
-                        loaded = (EVE_CoCmd_fsRead(phost, dst, img_path) == 0);
-                        break;
-                    case EVE5_ESDM_DEFLATE:
-                        loaded = (EVE_CoCmd_inflate_fs(phost, dst, img_path, 0) == 0);
-                        break;
-                    case EVE5_ESDM_ASSET:
-                        loaded = (EVE_CoCmd_loadAsset_fs(phost, dst, img_path, 0) == 0);
-                        break;
-                    default:
-                        loaded = false;
-                        break;
+                /* Re-flush so the body's fault is isolated from the
+                 * palette FSREAD that preceded it. */
+                if(!EVE_Cmd_waitFlush(phost)) {
+                    loaded = false;
+                }
+                else {
+                    uint32_t dst = base + pal_region;
+                    switch(bmp.compression) {
+                        case EVE5_ESDM_RAW:
+                            loaded = (EVE_CoCmd_fsRead(phost, dst, img_path) == 0);
+                            break;
+                        case EVE5_ESDM_DEFLATE:
+                            loaded = (EVE_CoCmd_inflate_fs(phost, dst, img_path, 0) == 0);
+                            break;
+                        case EVE5_ESDM_ASSET:
+                            loaded = (EVE_CoCmd_loadAsset_fs(phost, dst, img_path, 0) == 0);
+                            break;
+                        default:
+                            loaded = false;
+                            break;
+                    }
                 }
             }
 
@@ -1145,9 +1264,11 @@ bool lv_eve5_sdcard_load_esdm(const char * path, EVE_GpuHandle *handle,
                 ok = true;
             }
             else {
+                if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
                 EVE_GpuAlloc_Free(alloc, h);
             }
         }
+        phost->SuppressErrorOverlay = false;
     }
 #if LV_USE_OS
     lv_eve5_hal_unlock(s_ctx.disp);

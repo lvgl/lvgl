@@ -320,9 +320,9 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
         return LV_FS_RES_FS_ERR;
     }
 
-    EVE_CoCmd_flashRead(ctx->hal, ramg_addr, aligned_src, aligned_num);
+    /* Pre-flush + SuppressErrorOverlay isolate a CMD_FLASHREAD fault to
+     * this read so lv_eve5_reset_coprocessor can recover narrowly. */
     if(!EVE_Cmd_waitFlush(ctx->hal)) {
-        LV_LOG_ERROR("CMD_FLASHREAD failed (src=0x%08X, num=%u)", aligned_src, aligned_num);
         EVE_GpuAlloc_Free(ctx->alloc, handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(ctx->disp);
@@ -330,6 +330,21 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
         if(br) *br = 0;
         return LV_FS_RES_FS_ERR;
     }
+    ctx->hal->SuppressErrorOverlay = true;
+
+    EVE_CoCmd_flashRead(ctx->hal, ramg_addr, aligned_src, aligned_num);
+    if(!EVE_Cmd_waitFlush(ctx->hal)) {
+        LV_LOG_ERROR("CMD_FLASHREAD failed (src=0x%08X, num=%u)", aligned_src, aligned_num);
+        if(ctx->hal->CmdFault) lv_eve5_reset_coprocessor(ctx->disp);
+        EVE_GpuAlloc_Free(ctx->alloc, handle);
+        ctx->hal->SuppressErrorOverlay = false;
+#if LV_USE_OS
+        lv_eve5_hal_unlock(ctx->disp);
+#endif
+        if(br) *br = 0;
+        return LV_FS_RES_FS_ERR;
+    }
+    ctx->hal->SuppressErrorOverlay = false;
 
     EVE_Hal_rdMem(ctx->hal, buf, ramg_addr + head_pad, to_read);
     EVE_GpuAlloc_Free(ctx->alloc, handle);
@@ -490,10 +505,23 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
         return false;
     }
 
+    /* Pre-flush + SuppressErrorOverlay isolate CMD_FLASHREAD / CMD_LOADIMAGE
+     * faults so a corrupt flash region can't leave the coprocessor stuck. */
+    if(!EVE_Cmd_waitFlush(phost)) {
+        EVE_GpuAlloc_Free(alloc, temp_handle);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = true;
+
     EVE_CoCmd_flashRead(phost, temp_addr, flash_addr, header_read_size);
     if(!EVE_Cmd_waitFlush(phost)) {
         LV_LOG_ERROR("CMD_FLASHREAD failed for header at 0x%08X", flash_addr);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
         EVE_GpuAlloc_Free(alloc, temp_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -524,6 +552,7 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
 
     if(!parsed || img_w == 0 || img_h == 0) {
         LV_LOG_ERROR("Failed to parse image header from flash at 0x%08X", flash_addr);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -545,6 +574,18 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
     uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
         LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", decoded_size);
+        phost->SuppressErrorOverlay = false;
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    /* Re-flush so the CMD_LOADIMAGE fault (if any) is isolated from the
+     * preceding header read. */
+    if(!EVE_Cmd_waitFlush(phost)) {
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -579,12 +620,15 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
 
     if(!ok) {
         LV_LOG_ERROR("CMD_LOADIMAGE from flash failed for %s", path);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
         EVE_GpuAlloc_Free(alloc, final_handle);
+        phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
+    phost->SuppressErrorOverlay = false;
 
     EVE_Hal_requestFenceBeforeSwap(phost);
 

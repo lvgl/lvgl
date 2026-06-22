@@ -188,9 +188,14 @@ void lv_draw_eve5_init(EVE_HalContext *hal, EVE_GpuAlloc *allocator)
     /* Wire the draw unit into the display's full_buf vram_res so LVGL can
      * dispatch vram callbacks (vram_check, vram_free, etc.). lv_eve5_create*
      * stashed the display on hal->UserContext for exactly this lookup —
-     * one display per HAL context per draw unit. */
+     * one display per HAL context per draw unit. Also register the
+     * coprocessor-reset cache-invalidation hook so the display driver can
+     * dispatch into us on a narrow reset without depending on this unit's
+     * header. */
     if(hal != NULL && hal->UserContext != NULL) {
-        lv_eve5_link_draw_unit((lv_display_t *)hal->UserContext, &unit->base_unit);
+        lv_display_t * disp = (lv_display_t *)hal->UserContext;
+        lv_eve5_link_draw_unit(disp, &unit->base_unit);
+        lv_eve5_set_coprocessor_reset_handler(disp, lv_draw_eve5_handle_coprocessor_reset);
     }
 
     LV_LOG_INFO("EVE5: Draw unit initialized, ID=%d", DRAW_UNIT_ID_EVE5);
