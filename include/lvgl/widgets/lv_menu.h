@@ -26,6 +26,16 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * @deprecated The `lv_menu` widget is deprecated and kept only for backward
+ * compatibility. A menu is page navigation over base widgets: pages built from
+ * `lv_obj` and a back button that swaps the visible page. Build it directly
+ * instead. See the `lv_example_menu_navigation` example. All `lv_menu_*` functions
+ * below are deprecated.
+ */
+#define LV_MENU_DEPRECATED_MSG \
+    "lv_menu is deprecated; build menu navigation from base widgets instead. See the lv_example_menu_navigation example."
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -66,7 +76,10 @@ enum __lv_property_menu_id_t {
  * Create a menu object
  * @param parent    pointer to an object, it will be the parent of the new menu
  * @return          pointer to the created menu
+ * @deprecated The `lv_menu` widget is deprecated. Build menu navigation from base
+ *             widgets instead. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_create(lv_obj_t * parent);
 
 /**
@@ -78,28 +91,36 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent);
  * @param menu      pointer to menu object.
  * @param title     pointer to text for title in header (NULL to not display title)
  * @return          pointer to the created menu page
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_page_create(lv_obj_t * menu, char const * const title);
 
 /**
  * Create a menu cont object
  * @param parent    pointer to a menu page or menu section object, it will be the parent of the new menu cont object
  * @return          pointer to the created menu cont
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_cont_create(lv_obj_t * parent);
 
 /**
  * Create a menu section object
  * @param parent    pointer to a menu page object, it will be the parent of the new menu section object
  * @return          pointer to the created menu section
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_section_create(lv_obj_t * parent);
 
 /**
  * Create a menu separator object
  * @param parent    pointer to a menu page object, it will be the parent of the new menu separator object
  * @return          pointer to the created menu separator
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_separator_create(lv_obj_t * parent);
 /*=====================
  * Setter functions
@@ -108,14 +129,18 @@ lv_obj_t * lv_menu_separator_create(lv_obj_t * parent);
  * Set menu page to display in main
  * @param obj       pointer to the menu
  * @param page      pointer to the menu page to set (NULL to clear main and clear menu history)
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page);
 
 /**
  * Set menu page title
  * @param page      pointer to the menu page
  * @param title     pointer to text for title in header (NULL to not display title)
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 void lv_menu_set_page_title(lv_obj_t * page, char const * const title);
 
 /**
@@ -123,28 +148,36 @@ void lv_menu_set_page_title(lv_obj_t * page, char const * const title);
  * has to be 'alive' while the page exists.
  * @param page      pointer to the menu page
  * @param title     pointer to text for title in header (NULL to not display title)
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 void lv_menu_set_page_title_static(lv_obj_t * page, char const * const title);
 
 /**
  * Set menu page to display in sidebar
  * @param obj       pointer to the menu
  * @param page      pointer to the menu page to set (NULL to clear sidebar)
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 void lv_menu_set_sidebar_page(lv_obj_t * obj, lv_obj_t * page);
 
 /**
  * Set the how the header should behave and its position
  * @param obj       pointer to a menu
  * @param mode      LV_MENU_HEADER_TOP_FIXED/TOP_UNFIXED/BOTTOM_FIXED
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 void lv_menu_set_mode_header(lv_obj_t * obj, lv_menu_mode_header_t mode);
 
 /**
  * Set whether back button should appear at root
  * @param obj       pointer to a menu
  * @param mode      LV_MENU_ROOT_BACK_BUTTON_DISABLED/ENABLED
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 void lv_menu_set_mode_root_back_button(lv_obj_t * obj, lv_menu_mode_root_back_button_t mode);
 
 /**
@@ -152,7 +185,9 @@ void lv_menu_set_mode_root_back_button(lv_obj_t * obj, lv_menu_mode_root_back_bu
  * @param menu      pointer to the menu
  * @param obj       pointer to the obj
  * @param page      pointer to the page to load when obj is clicked
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * page);
 
 /*=====================
@@ -162,42 +197,54 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
 * Get a pointer to menu page that is currently displayed in main
 * @param obj        pointer to the menu
 * @return           pointer to current page
+* @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
 */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_get_cur_main_page(lv_obj_t * obj);
 
 /**
 * Get a pointer to menu page that is currently displayed in sidebar
 * @param obj        pointer to the menu
 * @return           pointer to current page
+* @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
 */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_get_cur_sidebar_page(lv_obj_t * obj);
 
 /**
 * Get a pointer to main header obj
 * @param obj        pointer to the menu
 * @return           pointer to main header obj
+* @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
 */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_get_main_header(lv_obj_t * obj);
 
 /**
 * Get a pointer to main header back btn obj
 * @param obj        pointer to the menu
 * @return           pointer to main header back btn obj
+* @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
 */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_get_main_header_back_button(lv_obj_t * obj);
 
 /**
 * Get a pointer to sidebar header obj
 * @param obj        pointer to the menu
 * @return           pointer to sidebar header obj
+* @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
 */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_get_sidebar_header(lv_obj_t * obj);
 
 /**
 * Get a pointer to sidebar header obj
 * @param obj        pointer to the menu
 * @return           pointer to sidebar header back btn obj
+* @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
 */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_get_sidebar_header_back_button(lv_obj_t * obj);
 
 /**
@@ -205,27 +252,35 @@ lv_obj_t * lv_menu_get_sidebar_header_back_button(lv_obj_t * obj);
  * @param menu      pointer to the menu
  * @param obj       pointer to the back button
  * @return          true if it is a root back btn
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 bool lv_menu_back_button_is_root(lv_obj_t * menu, lv_obj_t * obj);
 
 /**
  * Get the header mode of the menu
  * @param obj       pointer to a menu
  * @return          LV_MENU_HEADER_TOP_FIXED/TOP_UNFIXED/BOTTOM_FIXED
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_menu_mode_header_t lv_menu_get_mode_header(lv_obj_t * obj);
 
 /**
  * Get the root back button mode of the menu
  * @param obj       pointer to a menu
  * @return          LV_MENU_ROOT_BACK_BUTTON_DISABLED/ENABLED
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_menu_mode_root_back_button_t lv_menu_get_mode_root_back_button(lv_obj_t * obj);
 
 /**
  * Clear menu history
  * @param obj       pointer to the menu
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 void lv_menu_clear_history(lv_obj_t * obj);
 
 /**********************
