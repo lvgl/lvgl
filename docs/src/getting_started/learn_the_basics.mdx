@@ -1,111 +1,23 @@
 ---
 title: Learn the Basics
-description: "LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use mobile-phone-like graphical elements,..."
+description: "Learn how to use LVGL in a few minutes"
 ---
 
-## Overview
 
-LVGL (Light and Versatile Graphics Library) is a free and open-source graphics
-library providing everything you need to create an embedded GUI with easy-to-use
-mobile-phone-like graphical elements, beautiful visual effects, and a low memory
-footprint.
+In LVGL you dynamically create and delete screens and widgets to build up your UI. Styles, animations, event handlers, and data bindings
+can also be added to make the UI look better and connect it easily to an application.
 
-You can think of LVGL as a collection of C and H files that can be dropped into
-any project to add UI capabilities to the product.
 
-With the help of consistent and easy-to-learn API functions you can create widgets
-(buttons, sliders, charts, etc), style them, add events, layouts, or animations.
+## Display
 
-Based on these settings LVGL will render an image (either by using its built-in
-software rendering engine or a GPU) and will call a callback function to show
-the rendered image on the display. This callback function is the main interface
-between LVGL and the display. Most of the porting-related work is focused on
-writing such a callback in an effective way.
-
-This chapter will show the basics to give an idea about how LVGL works and how it can be used.
-For more details about each feature visit that feature's dedicated documentation page.
-
-### LVGL Integration Overview
-
-The following is an overview of how to integrate LVGL into your project.  Complete
-details are available at [Overview](/integration/overview).
-
-| Field | Description |
-|-------|-------------|
-| `Driver Initialization` | It is the user's responsibility to set up the clock, timers, peripherals, etc. |
-| `Call lv_init()` | Initialize LVGL itself. |
-| `Create display and input devices` | Create display(s) (<ApiLink name="lv_display_t" />) and input device(s) (<ApiLink name="lv_indev_t" />) and set up their callbacks. |
-| `Create the UI` | Call LVGL functions to create screens, widgets, styles, animations, events, etc. |
-| `Call lv_timer_handler() in a loop` | This handles all the LVGL-related tasks: - refresh display(s), - read input devices, - fire events based on user input (and other things), - run any animations, and - run user-created timers. |
-
-##### Example
-
-This is just a brief example of how to add LVGL to a new project. For more details
-check out [Integration Overview](/integration/overview).
-
-```c
-void main(void)
-{
-    your_driver_init();
-
-    lv_init();
-
-    lv_tick_set_cb(my_get_millis);
-
-    lv_display_t * display = lv_display_create(320, 240);
-
-    /* LVGL will render to this 1/10 screen sized buffer for 2 bytes/pixel */
-    static uint8_t buf[320 * 240 / 10 * 2];
-    lv_display_set_buffers(display, buf, NULL, LV_DISPLAY_RENDER_MODE_PARTIAL);
-
-    /* This callback will display the rendered image */
-    lv_display_set_flush_cb(display, my_flush_cb);
-
-    /* Create widgets */
-    lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "Hello LVGL!");
-
-    /* Make LVGL periodically execute its tasks */
-    while(1) {
-        /* Provide updates to currently-displayed Widgets here. */
-        lv_timer_handler();
-        my_sleep(5);  /*Wait 5 milliseconds before processing LVGL timer again*/
-    }
-}
-
-/* Return the elapsed milliseconds since startup.
- * It needs to be implemented by the user */
-uint32_t my_get_millis(void)
-{
-    return my_tick_ms;
-}
-
-/* Copy rendered image to screen.
- * This needs to be implemented by the user. */
-void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_buf)
-{
-    /* Show the rendered image on the display */
-    my_display_update(area, px_buf);
-
-    /* Indicate that the buffer is available.
-     * If DMA were used, call in the DMA complete interrupt. */
-    lv_display_flush_ready();
-}
-```
-
-## Displays
-
-*Display* refers to the actual hardware. In order to connect LVGL to the hardware an <ApiLink name="lv_display_t" />
+A *Display* refers to the actual hardware. In order to connect LVGL to the hardware an <ApiLink name="lv_display_t" />
 object needs to be created and initialized.
 
-LVGL has built-in support for many built-in drivers (see [Integration](/integration)), but it's easy to initialize a
-display from scratch as well (as shown above).
+See the [Quick porting guide](/getting_started/porting).
 
-LVGL also handles multiple displays at once.
+## Screen
 
-## Screens
-
-A *Screen* is an LVGL widget created on a *Display*. It's a logical container for other widgets. A display can
+Screens are LVGL widgets created on a *Display*. They are logical containers for other widgets. A display can
 have multiple screens, but there is always one active screen, which can be retrieved by using <ApiLink name="lv_screen_active" />.
 It returns an `lv_obj_t *` pointer. See [Active Screen](/common-widget-features/screens) for more information.
 
@@ -287,8 +199,7 @@ font is specified on the widget or one of its parents.
 
 ### Local styles
 
-Local style properties also can be added to Widgets. This creates a
-style which resides inside the Widget and is used only by that Widget:
+Local style properties can also be added to Widgets. The local style properties affect only the targeted widget.
 
 ```c
 lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
@@ -296,9 +207,9 @@ lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | L
 
 See [Styles](/common-widget-features/styles) for full details.
 
-## Subjects and Observers
+## Data bindings
 
-Subjects and Observers are powerful tools to easily create data bindings.
+To realize data bindings, LVGL uses the Subject/Observer pattern.
 
 Subjects are global <ApiLink name="lv_subject_t" /> variables that store integer, color, string, etc. values.
 
@@ -311,7 +222,7 @@ For some widgets, helper functions make it simple to connect them to subjects. E
 <ApiLink name="lv_slider_bind_value" />, <ApiLink name="lv_label_bind_text" />.
 
 In general, using subjects and observers is a way to connect various parts of the UI and make them dynamically
-react to application data changes—or allow the application to react to UI changes.
+react to application data changes, or allow the application to react to UI changes.
 
 ```c
 static void label_observer_cb(lv_observer_t * observer, lv_subject_t * subject)

@@ -7,19 +7,18 @@ description: "LVGL is available on GitHub: https://github.com/lvgl/lvgl."
 
 ### Clone or Download
 
-LVGL is available on GitHub: https://github.com/lvgl/lvgl.
+If you would like to integrate LVGL yourself you can get it from GitHub: https://github.com/lvgl/lvgl.
 
-You can clone it or
-[Download](https://github.com/lvgl/lvgl/archive/refs/heads/master.zip)
-the latest version of the library from GitHub.
+You can clone it or [Download](https://github.com/lvgl/lvgl/archive/refs/heads/master.zip)
+the latest version as a ZIP.
 
-In this case, you can copy the `lvgl` into your project, use a
-built-in display driver or write your own, and compile LVGL with the
+
+If you download LVGL yourself you need to save it into your project folder so that it can be compiled with the
 rest of your source code.
 
 ### Frameworks and Package Registries
 
-LVGL is also available as:
+LVGL is also available in various frameworks and registries where most of the integration work is already done:
 
 - [Arduino library](/integration/frameworks/arduino)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
@@ -30,9 +29,6 @@ LVGL is also available as:
 - [RT-Thread RTOS](/integration/rtos/rt-thread)
 - CMSIS-Pack
 - [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
-
-Usually, LVGL is ready to use in these frameworks. You can also find a description
-at [Integration](/integration).
 
 ### Folder Structure
 
@@ -81,24 +77,16 @@ lv_conf.h
 other files and folders in your project
 ```
 
-1. Set the <ApiLink name="LV_CONF_INCLUDE_SIMPLE" /> define to your compiler
-
-options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for GCC compiler) and set the
+1. Set the <ApiLink name="LV_CONF_INCLUDE_SIMPLE" /> define to your compiler options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for GCC compiler) and set the
 include path manually (e.g. `-I../include/gui`). In this case, LVGL
 will attempt to include `lv_conf.h` simply with `#include "lv_conf.h"`
 instead of `lvgl/lvgl.h`.
 
-1. Set a custom path via the <ApiLink name="LV_CONF_PATH" /> define.
+2. Set a custom path via the <ApiLink name="LV_CONF_PATH" /> define. For example: `-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"`.
 
-For example: `-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"`.
+3. Delete some settings from `lv_conf.h` and set them via compile options. For example: `-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1`.
 
-1. Delete some settings from `lv_conf.h` and set them via compile options.
-
-For example: `-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1`.
-
-1. To fully skip `lv_conf.h` and use only compiler options (see point 3),
-
-define <ApiLink name="LV_CONF_SKIP" /> as a compiler option. Unset options will get a
+4. To fully skip `lv_conf.h` and use only compiler options (see point 3), define <ApiLink name="LV_CONF_SKIP" /> as a compiler option. Unset options will get a
 default value which is the same as the content of `lv_conf_template.h`.
 
 ### Kconfig
