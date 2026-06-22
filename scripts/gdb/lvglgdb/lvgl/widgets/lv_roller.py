@@ -6,6 +6,7 @@ Do not edit manually. Regenerate from the GDB script root with:
 """
 
 from lvglgdb.lvgl.core.lv_obj import LVObject
+from ._helpers import safe_string
 
 
 class LVRoller(LVObject):
@@ -36,6 +37,11 @@ class LVRoller(LVObject):
         return int(self._wv.safe_field("inf_page_cnt", 0))
 
     @property
+    def options_translation_tag(self):
+        """Translation tag for the options"""
+        return safe_string(self._wv, "options_translation_tag")
+
+    @property
     def mode(self):
         return int(self._wv.safe_field("mode", 0))
 
@@ -51,6 +57,7 @@ class LVRoller(LVObject):
         d["sel_opt_id"] = self.sel_opt_id
         d["sel_opt_id_ori"] = self.sel_opt_id_ori
         d["inf_page_cnt"] = self.inf_page_cnt
+        d["options_translation_tag"] = self.options_translation_tag
         d["mode"] = self.mode
         d["moved"] = self.moved
         s['widget_data'] = d
