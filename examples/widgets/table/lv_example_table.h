@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 void lv_example_table_cells(void);
+void lv_example_table_file_browser(void);
 void lv_example_table_merge_cells(void);
 void lv_example_table_rows_columns(void);
 void lv_example_table_scroll(void);
