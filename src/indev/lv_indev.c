@@ -181,7 +181,7 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
         return lv_ll_get_next(indev_ll_head, indev);
 }
 
-void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
+static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_PROFILER_INDEV_BEGIN;
     lv_memzero(data, sizeof(lv_indev_data_t));
