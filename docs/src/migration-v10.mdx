@@ -43,7 +43,7 @@ The macro is layered — each layer is independently configurable in `lv_conf.h`
 
 | Layer | Guard | What it checks |
 |---|---|---|
-| Base | `LV_USE_CHECK_ARG` | Enables the whole system; when `0` all three macros expand to nothing. |
+| Base | `LV_USE_CHECK_ARG` | Enables the whole system; when 0 all three macros expand to nothing. Also enables NULL checks on all arguments regardless of whether Class or Validity guards are set. |
 | Class | `LV_USE_CHECK_OBJ_CLASSTYPE` | `lv_obj_has_class(obj, cls)` — verifies the object is the expected widget type. |
 | Validity | `LV_USE_CHECK_OBJ_VALIDITY` | `lv_obj_is_valid(obj)` — verifies the object is still part of the live widget tree. |
 
