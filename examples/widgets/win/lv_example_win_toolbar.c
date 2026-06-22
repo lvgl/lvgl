@@ -12,6 +12,9 @@ static void event_handler(lv_event_t * e)
  * @title Window with title and toolbar buttons
  * @brief A window whose header carries three symbol buttons over a scrollable label body.
  *
+ * @deprecated The `lv_win` widget is deprecated. See `lv_example_flex_win` for the
+ * recommended way to build a window from a flex container.
+ *
  * `lv_win_create` fills the active screen and `lv_win_add_button`
  * places a 40 px `LV_SYMBOL_LEFT`, a 40 px `LV_SYMBOL_RIGHT`, and a
  * 60 px `LV_SYMBOL_CLOSE` button on the header around a
@@ -22,7 +25,9 @@ static void event_handler(lv_event_t * e)
  */
 void lv_example_win_toolbar(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * win = lv_win_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_t * btn;
     btn = lv_win_add_button(win, LV_SYMBOL_LEFT, 40);
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);

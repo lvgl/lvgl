@@ -20,6 +20,15 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * @deprecated The `lv_win` widget is deprecated and kept only for backward
+ * compatibility. A window is just a flex column with a header bar and a content
+ * area, so build one directly from `lv_obj` instead. See the `lv_example_flex_win`
+ * example for a starting point.
+ */
+#define LV_WIN_DEPRECATED_MSG \
+    "lv_win is deprecated; build a window from a flex column instead. See the lv_example_flex_win example."
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_win_class;
 
 /**********************
@@ -30,7 +39,9 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_win_class;
  * Create a window widget
  * @param parent    pointer to a parent widget
  * @return          the created window
+ * @deprecated Use a flex column with a header and content area instead. See `lv_example_flex_win`.
  */
+LV_DEPRECATED(LV_WIN_DEPRECATED_MSG)
 lv_obj_t * lv_win_create(lv_obj_t * parent);
 
 /**
@@ -38,6 +49,7 @@ lv_obj_t * lv_win_create(lv_obj_t * parent);
  * @param obj       pointer to a window widget
  * @param txt       the text of the title
  * @return          the widget where the content of the title can be created
+ * @deprecated The `lv_win` widget is deprecated. See `lv_example_flex_win`.
  */
 lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt);
 
@@ -47,6 +59,7 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt);
  * @param icon      an icon to be displayed on the button
  * @param btn_w     width of the button
  * @return          the widget where the content of the button can be created
+ * @deprecated The `lv_win` widget is deprecated. See `lv_example_flex_win`.
  */
 lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w);
 
@@ -54,6 +67,7 @@ lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w);
  * Get the header of the window
  * @param win       pointer to a window widget
  * @return          the header of the window
+ * @deprecated The `lv_win` widget is deprecated. See `lv_example_flex_win`.
  */
 lv_obj_t * lv_win_get_header(lv_obj_t * win);
 
@@ -61,6 +75,7 @@ lv_obj_t * lv_win_get_header(lv_obj_t * win);
  * Get the content of the window
  * @param win       pointer to a window widget
  * @return          the content of the window
+ * @deprecated The `lv_win` widget is deprecated. See `lv_example_flex_win`.
  */
 lv_obj_t * lv_win_get_content(lv_obj_t * win);
 /**********************

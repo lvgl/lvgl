@@ -50,7 +50,9 @@ void lv_example_observer_5(void)
 static void fw_update_btn_clicked_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * win = lv_win_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(win, lv_pct(90), lv_pct(90));
     lv_obj_set_height(lv_win_get_header(win), 40);
     lv_obj_set_style_radius(win, 8, 0);

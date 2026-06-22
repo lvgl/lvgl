@@ -18,6 +18,7 @@ void lv_example_flex_internal_padding(void);
 void lv_example_flex_list(void);
 void lv_example_flex_new_track(void);
 void lv_example_flex_rtl(void);
+void lv_example_flex_win(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/
