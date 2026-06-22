@@ -170,6 +170,15 @@ placed from right to left.
 
 You can easily build a list using a column flex with 100% wide buttons and text.
 
+## Building a window
+
+<LvglExample name="lv_example_flex_win" path="layouts/flex/lv_example_flex_win" />
+
+A window is a column flex too: a fixed-height header row on top and a content area
+below that grows to fill the rest with
+<ApiLink name="lv_obj_set_flex_grow" display="lv_obj_set_flex_grow(content, 1)" />.
+The title label grows so the header buttons are pushed to the right edge.
+
 ## Forcing a New Track
 
 <LvglExample name="lv_example_flex_new_track" path="layouts/flex/lv_example_flex_new_track" />
