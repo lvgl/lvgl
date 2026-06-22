@@ -148,6 +148,7 @@ endmenu
 
 rsource "nxp/pxp/Kconfig"
 rsource "nxp/g2d/Kconfig"
+rsource "espressif/ppa/Kconfig"
 rsource "renesas/dave2d/Kconfig"
 rsource "sdl/Kconfig"
 rsource "dma2d/Kconfig"

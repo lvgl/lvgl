@@ -14,4 +14,28 @@ config LV_LIBINPUT_XKB
 	bool "Enable full keyboard support via XKB"
 	default n
 
+if LV_LIBINPUT_XKB
+# XKB keymap, split into its parts (all plain strings).
+# `setxkbmap -query` can help find the right values for your keyboard.
+config LV_LIBINPUT_XKB_KEY_MAP_RULES
+	string "XKB rules"
+	default ""
+
+config LV_LIBINPUT_XKB_KEY_MAP_MODEL
+	string "XKB model"
+	default "pc101"
+
+config LV_LIBINPUT_XKB_KEY_MAP_LAYOUT
+	string "XKB layout"
+	default "us"
+
+config LV_LIBINPUT_XKB_KEY_MAP_VARIANT
+	string "XKB variant"
+	default ""
+
+config LV_LIBINPUT_XKB_KEY_MAP_OPTIONS
+	string "XKB options"
+	default ""
+endif # LV_LIBINPUT_XKB
+
 endif #LV_USE_LIBINPUT

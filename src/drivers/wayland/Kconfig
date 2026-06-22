@@ -10,19 +10,22 @@ config LV_WAYLAND_DIRECT_EXIT
 	bool "Deinitialize LVGL and quit the application when the last wayland window closes"
 	default y
 
-choice LV_WAYLAND_BACKEND
+# Anonymous choice: emits one bool per backend (LV_WAYLAND_USE_*) while still
+# enforcing that exactly one backend is selected.  The C code and CMake query
+# these LV_WAYLAND_USE_* flags individually.
+choice
 	prompt "Rendering backend"
-	default LV_WAYLAND_BACKEND_SHM
+	default LV_WAYLAND_USE_SHM
 	help
 	  Select the rendering backend used by the Wayland driver.
 
-config LV_WAYLAND_BACKEND_SHM
+config LV_WAYLAND_USE_SHM
 	bool "SHM (Shared Memory)"
 	help
 	  Default backend. Uses wl_shm for double-buffered direct rendering.
 	  Compatible with all Wayland compositors; no special hardware required.
 
-config LV_WAYLAND_BACKEND_EGL
+config LV_WAYLAND_USE_EGL
 	bool "EGL (OpenGL ES, hardware-accelerated)"
 	select LV_USE_OPENGLES
 	select LV_USE_EGL
@@ -31,7 +34,7 @@ config LV_WAYLAND_BACKEND_EGL
 	  Requires OpenGL ES 2.0 on the target hardware and linking with
 	  wayland-egl (-lwayland-egl). Compatible with 3D/glTF rendering.
 
-config LV_WAYLAND_BACKEND_G2D
+config LV_WAYLAND_USE_G2D
 	bool "G2D (NXP i.MX hardware accelerator)"
 	select LV_USE_DRAW_G2D
 	help

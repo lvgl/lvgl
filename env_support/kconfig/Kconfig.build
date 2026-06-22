@@ -40,6 +40,12 @@ menu "Asserts"
 		default "assert.h"
 		help
 			Add a custom handler when assert happens e.g. to restart the MCU
+
+	config LV_ASSERT_HANDLER
+		string "Action to take when an assertion fails"
+		default "while(1);"
+		help
+			Code executed when an assertion fails. The default halts execution.
 endmenu
 
 menu "Argument Checks"

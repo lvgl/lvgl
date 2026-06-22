@@ -47,6 +47,15 @@ config LV_NEMA_STM32_HAL_INCLUDE
 	default "stm32u5xx_hal.h"
 	depends on LV_NEMA_HAL_STM32
 
+config LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+	string "Attribute/section for the NemaGFX GPU memory pool"
+	default ""
+	depends on LV_NEMA_HAL_STM32
+	help
+		Set it to e.g. __attribute__((section("Nemagfx_Memory_Pool_Buffer")))
+		and define the section in the linker script if the GPU memory needs
+		to be in a specific (e.g. non-cached) region.
+
 config LV_USE_NEMA_VG
 	bool "Enable NemaVG operations"
 	default n

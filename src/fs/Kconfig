@@ -34,13 +34,27 @@ LV_FS_DRV = ARDUINO_SD
 LV_FS_DRV_STR = Arduino SD
 rsource "Kconfig.fs.template"
 
-LV_FS_DRV = UEFI
-LV_FS_DRV_STR = UEFI
-rsource "Kconfig.fs.template"
+# UEFI and FrogFS are inlined (letter only): they have no working directory
+# path or read cache, so the full Kconfig.fs.template does not apply.
+config LV_USE_FS_UEFI
+	bool "File system on top of UEFI"
 
-LV_FS_DRV = FROGFS
-LV_FS_DRV_STR = FrogFS
-rsource "Kconfig.fs.template"
+if LV_USE_FS_UEFI
+config LV_FS_UEFI_LETTER
+	int "Driver-identifier letter for UEFI (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+endif # LV_USE_FS_UEFI
+
+config LV_USE_FS_FROGFS
+	bool "File system on top of FrogFS"
+
+if LV_USE_FS_FROGFS
+config LV_FS_FROGFS_LETTER
+	int "Driver-identifier letter for FrogFS (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+endif # LV_USE_FS_FROGFS
 
 # MEMFS is inlined here as it's memory-mapped and has no working directory path
 config LV_USE_FS_MEMFS

@@ -237,6 +237,13 @@ choice LV_FONT_DEFAULT
 		select LV_FONT_UNSCII_16
 endchoice
 
+config LV_FONT_CUSTOM_DECLARE
+	string "Declaration of custom fonts to make globally available"
+	default ""
+	help
+		Optionally declare custom fonts here, e.g.
+		LV_FONT_DECLARE(my_font_1) LV_FONT_DECLARE(my_font_2)
+
 config LV_FONT_FMT_TXT_LARGE
 	bool "Enable it if you have fonts with a lot of characters"
 	help

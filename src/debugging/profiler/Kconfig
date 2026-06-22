@@ -31,6 +31,22 @@ endif #LV_USE_PROFILER_BUILTIN
 
 if LV_USE_PROFILER
 
+config LV_PROFILER_BEGIN
+	string "Profiler start-point function"
+	default "LV_PROFILER_BUILTIN_BEGIN"
+
+config LV_PROFILER_END
+	string "Profiler end-point function"
+	default "LV_PROFILER_BUILTIN_END"
+
+config LV_PROFILER_BEGIN_TAG
+	string "Profiler start-point function with a custom tag"
+	default "LV_PROFILER_BUILTIN_BEGIN_TAG"
+
+config LV_PROFILER_END_TAG
+	string "Profiler end-point function with a custom tag"
+	default "LV_PROFILER_BUILTIN_END_TAG"
+
 config LV_PROFILER_LAYOUT
 	bool "Enable layout profiler"
 	default y

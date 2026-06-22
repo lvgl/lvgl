@@ -6,9 +6,18 @@ config LV_USE_SYSMON
 
 if LV_USE_SYSMON
 
+config LV_SYSMON_GET_IDLE
+	string "Function returning the idle percentage"
+	default "lv_os_get_idle_percent"
+
 config LV_SYSMON_PROC_IDLE_AVAILABLE
 	bool "Enable process idle measurement"
 	default n
+
+config LV_SYSMON_GET_PROC_IDLE
+	string "Function returning the application's idle percentage"
+	default "lv_os_get_proc_idle_percent"
+	depends on LV_SYSMON_PROC_IDLE_AVAILABLE
 
 config LV_USE_PERF_MONITOR
 	bool "Show CPU usage and FPS count"
