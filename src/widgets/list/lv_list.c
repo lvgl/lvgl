@@ -14,6 +14,9 @@
 
 #include "../../core/lv_obj_class_private.h"
 
+/*The `lv_list` API is deprecated as a whole and its functions call each other.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 /*********************
  *      DEFINES
  *********************/
@@ -63,6 +66,7 @@ const lv_obj_class_t lv_list_text_class = {
 
 lv_obj_t * lv_list_create(lv_obj_t * parent)
 {
+    LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
@@ -72,6 +76,7 @@ lv_obj_t * lv_list_create(lv_obj_t * parent)
 
 lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 {
+    LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
 
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS_TEXT, list);
@@ -82,6 +87,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 
 lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
 {
+    LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS_BUTTON, list);
     lv_obj_class_init_obj(obj);
@@ -106,6 +112,7 @@ lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * t
 
 const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
 {
+    LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_UNUSED(list);
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_count(btn); i++) {
@@ -121,6 +128,7 @@ const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
 
 void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
 {
+    LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_UNUSED(list);
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_count(btn); i++) {
@@ -136,6 +144,7 @@ void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
 
 lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag)
 {
+    LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
 
     lv_obj_t * obj = lv_list_add_text(list, NULL);
@@ -145,6 +154,7 @@ lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag)
 
 lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon, const char * tag)
 {
+    LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
 
     lv_obj_t * obj = lv_list_add_button(list, icon, "");
@@ -155,6 +165,7 @@ lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon
 
 void lv_list_set_button_translation_tag(lv_obj_t * list, lv_obj_t * btn, const char * tag)
 {
+    LV_LOG_DEPRECATED(LV_LIST_DEPRECATED_MSG);
     LV_UNUSED(list);
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_count(btn); i++) {
@@ -171,5 +182,7 @@ void lv_list_set_button_translation_tag(lv_obj_t * list, lv_obj_t * btn, const c
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif /*LV_USE_LIST*/
