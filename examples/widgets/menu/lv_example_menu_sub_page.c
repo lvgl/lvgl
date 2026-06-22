@@ -5,6 +5,8 @@
  * @title Basic menu with sub page
  * @brief A three-item main page whose third entry opens a hidden sub page.
  *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
+ *
  * A display-sized `lv_menu` holds a main page with three
  * `lv_menu_cont` items labeled `Item 1`, `Item 2`, and
  * `Item 3 (Click me!)`. A separate sub page created with
@@ -15,7 +17,9 @@
 void lv_example_menu_sub_page(void)
 {
     /*Create a menu object*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * menu = lv_menu_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));
     lv_obj_center(menu);
 

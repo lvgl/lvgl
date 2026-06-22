@@ -10,6 +10,7 @@
 extern "C" {
 #endif
 
+void lv_example_menu_navigation(void);
 void lv_example_menu_sub_page(void);
 void lv_example_menu_root_back_button(void);
 void lv_example_menu_custom_back_button(void);

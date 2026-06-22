@@ -136,7 +136,9 @@ static void test_widgets(const char * img_name)
 
     lv_led_create(scr_act);
 
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * menu = lv_menu_create(scr_act);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(menu, 100, 100);
 
     lv_spinner_create(scr_act);

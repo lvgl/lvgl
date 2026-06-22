@@ -132,6 +132,7 @@ void lv_menu_clear_history(lv_obj_t * obj);
 
 lv_obj_t * lv_menu_create(lv_obj_t * parent)
 {
+    LV_LOG_DEPRECATED(LV_MENU_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
