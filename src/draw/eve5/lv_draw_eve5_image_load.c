@@ -21,12 +21,72 @@
 #if LV_USE_DRAW_EVE5
 
 #include "../lv_image_decoder_private.h"
+#include "../../misc/cache/instance/lv_image_header_cache.h"
 #if LV_USE_FS_EVE5_SDCARD
     #include "../../drivers/display/eve5/lv_eve5_sdcard.h"
 #endif
 #if LV_USE_FS_EVE5_FLASH
     #include "../../drivers/display/eve5/lv_eve5_flash.h"
 #endif
+
+/**********************
+ * HW-DECODE BAD-PATH CACHE
+ **********************/
+
+/* LVGL commits to whichever decoder's info_cb returns OK first and caches
+ * that commitment in its header cache. If our open_cb later fails (e.g.
+ * BT820 firmware rejects an L1 PNG with "unsupported PNG in
+ * cmd_loadimage"), LVGL doesn't fall back — every subsequent open of the
+ * same path hits the header cache and re-enters our failing open_cb. We
+ * also can't peek file contents in info_cb to predict failure (on SD that
+ * would force the lazy whole-file load CMD_QUERYIMAGE exists to avoid).
+ *
+ * The bad-path cache breaks the loop: open_cb's failure path marks the
+ * path here and drops LVGL's header-cache entry. The next info_cb sees
+ * the mark and returns INVALID, so LVGL iterates onward and the SW
+ * decoder (LodePNG, etc.) gets the commit. The mark also turns "QUERY
+ * runs once per image" into a real invariant — without it CMD_QUERYIMAGE
+ * would re-run from info_cb every frame on the failure path. Round-robin
+ * eviction handles aging if many distinct bad paths show up. */
+#define EVE5_DECODER_BAD_CACHE_SIZE 32
+#define EVE5_DECODER_BAD_PATH_MAX   128
+
+static struct {
+    char paths[EVE5_DECODER_BAD_CACHE_SIZE][EVE5_DECODER_BAD_PATH_MAX];
+    uint32_t next_slot;
+} s_eve5_bad_paths;
+
+static bool eve5_decoder_is_path_bad(const char * path)
+{
+    if(path == NULL) return false;
+    for(uint32_t i = 0; i < EVE5_DECODER_BAD_CACHE_SIZE; i++) {
+        if(s_eve5_bad_paths.paths[i][0] != 0
+           && lv_strcmp(s_eve5_bad_paths.paths[i], path) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void eve5_decoder_mark_path_bad(const char * path)
+{
+    if(path == NULL) return;
+    if(eve5_decoder_is_path_bad(path)) return;
+
+    /* Prefer an empty slot first so the first 32 distinct failures all
+     * stick before round-robin eviction starts. */
+    for(uint32_t i = 0; i < EVE5_DECODER_BAD_CACHE_SIZE; i++) {
+        if(s_eve5_bad_paths.paths[i][0] == 0) {
+            lv_strncpy(s_eve5_bad_paths.paths[i], path, EVE5_DECODER_BAD_PATH_MAX);
+            s_eve5_bad_paths.paths[i][EVE5_DECODER_BAD_PATH_MAX - 1] = '\0';
+            return;
+        }
+    }
+
+    lv_strncpy(s_eve5_bad_paths.paths[s_eve5_bad_paths.next_slot], path, EVE5_DECODER_BAD_PATH_MAX);
+    s_eve5_bad_paths.paths[s_eve5_bad_paths.next_slot][EVE5_DECODER_BAD_PATH_MAX - 1] = '\0';
+    s_eve5_bad_paths.next_slot = (s_eve5_bad_paths.next_slot + 1) % EVE5_DECODER_BAD_CACHE_SIZE;
+}
 
 /**********************
  * IMAGE SOURCE RESOLUTION
@@ -945,6 +1005,12 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
     if(dsc->src_type != LV_IMAGE_SRC_FILE) return LV_RESULT_INVALID;
 
     const char * fn = dsc->src;
+
+    /* Known-bad: a prior open_cb attempt at this path failed HW LOAD.
+     * Decline so LVGL falls through to the SW decoder. Cheap O(32) compare
+     * vs. the cost of re-running QUERY+LOAD and re-faulting the chip. */
+    if(eve5_decoder_is_path_bad(fn)) return LV_RESULT_INVALID;
+
     const char * ext = lv_fs_get_ext(fn);
 
     bool is_jpeg = (lv_strcmp(ext, "jpg") == 0) || (lv_strcmp(ext, "jpeg") == 0);
@@ -967,10 +1033,12 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
     uint32_t w = 0, h = 0;
 
 #if LV_USE_FS_EVE5_SDCARD
-    /* Prefer CMD_QUERYIMAGE for SD-card-rooted paths so we don't trigger
-     * the SD card driver's lazy whole-file load (lv_fs_read → fs_read →
-     * ensure_file_loaded). Falls through to the host-side header parse
-     * if the patch isn't built in or the firmware path fails. */
+    /* SD path: CMD_QUERYIMAGE is the only probe we want. lv_fs_read on an
+     * SD path would force the lazy whole-file load (ensure_file_loaded
+     * via CMD_FSREAD), which QUERY exists to avoid. Decline cleanly on
+     * QUERY failure (missing file, malformed sig, firmware reject) so
+     * LVGL falls through to the SW decoder — which has to lv_fs_read the
+     * file anyway, but only when SW decode is actually required. */
     if(lv_eve5_sdcard_is_path(fn)) {
         if(lv_eve5_sdcard_query_image_dims(fn, &w, &h)) {
             header->cf = LV_COLOR_FORMAT_RAW;
@@ -979,9 +1047,17 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
             header->stride = (int32_t)(w * 3);
             return LV_RESULT_OK;
         }
+        return LV_RESULT_INVALID;
     }
 #endif
 
+    /* Non-SD path: header peek is cheap. Parse dimensions, and for PNG
+     * additionally screen out IHDR color_type / bit_depth combinations
+     * BT820's CMD_LOADIMAGE rejects ("unsupported PNG in cmd_loadimage"),
+     * so LVGL falls through to the SW decoder without ever entering a
+     * fault/reset cycle. SD paths can't do this — CMD_QUERYIMAGE returns
+     * only w/h, not color type — so they rely on the reactive bad-path
+     * cache populated from open_cb failures. */
     uint8_t buf[1024];
     uint32_t bytes_read = 0;
     lv_fs_read(&dsc->file, buf, sizeof(buf), &bytes_read);
@@ -993,6 +1069,27 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
     }
     else {
         ok = eve5_parse_png_dimensions(buf, bytes_read, &w, &h);
+        /* IHDR at bytes 16-28: w(16-19), h(20-23), bit_depth(24), color_type(25).
+         * BT820 firmware accepts bit_depth 8 only (1/2/4-bit PNGs — grayscale
+         * AND indexed — and 16-bit-per-channel PNGs are rejected by
+         * cmd_loadimage with "unsupported PNG"). At bit_depth 8 the supported
+         * color types are 0 (L8 grayscale), 2 (RGB24), 3 (PALETTEDARGB8 from
+         * 256-color palette), 6 (RGBA32). color_type 4 (gray+alpha) is
+         * conservatively declined here. Anything declined falls through to
+         * the SW decoder without entering a fault/reset cycle. */
+        if(ok && bytes_read >= 26) {
+            uint8_t bit_depth = buf[24];
+            uint8_t color_type = buf[25];
+            bool hw_supported = (bit_depth == 8) &&
+                (color_type == 0 || color_type == 2
+                 || color_type == 3 || color_type == 6);
+            if(!hw_supported) {
+                LV_LOG_INFO("EVE5 decoder: declining PNG color_type=%u bit_depth=%u for %s"
+                            " (HW unsupported), SW decoder will handle",
+                            (unsigned)color_type, (unsigned)bit_depth, fn);
+                return LV_RESULT_INVALID;
+            }
+        }
     }
 
     if(!ok || w == 0 || h == 0) return LV_RESULT_INVALID;
@@ -1013,6 +1110,14 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
 
     lv_draw_eve5_unit_t * u = s_decoder_unit;
     const char * path = (const char *)dsc->src;
+
+    /* Snapshot fault state on entry: if the chip was already faulted
+     * (something outside our load guards faulted between the frame-boundary
+     * catch and now), every helper's pre-flush will fail in cascade and
+     * loaded ends up false — but that's a chip-state failure, not a
+     * file-content failure, and marking the path bad would be a false
+     * negative. Only mark on failures observed against a clean chip. */
+    bool pre_existing_fault = (u->hal != NULL && u->hal->CmdFault);
 
     bool is_jpeg, is_png;
     bool is_image_ext = eve5_is_jpeg_or_png(path, &is_jpeg, &is_png);
@@ -1058,6 +1163,23 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     }
 
     if(!loaded) {
+        /* Only persist the verdict if the chip was clean on entry —
+         * otherwise the failure is attributable to the chip state, not
+         * the file, and the next attempt should re-evaluate this path
+         * against a recovered chip rather than route it to SW forever.
+         * (Frame-boundary fault catch will have reset by then.) */
+        if(!pre_existing_fault) {
+            /* Mark the path so info_cb declines on next attempt (header
+             * probe / QUERY won't run again for it), and drop LVGL's
+             * stale header-cache entry that ties this path to our
+             * decoder. Together this routes the next
+             * lv_image_decoder_open to the SW decoder, breaking the
+             * perpetual retry of our failed HW LOAD. The earlier narrow
+             * reset (in the loader's fault guard) already recovered the
+             * chip — this is just decoder-chain bookkeeping. */
+            eve5_decoder_mark_path_bad(path);
+            lv_image_header_cache_drop(path);
+        }
         return LV_RESULT_INVALID;
     }
 

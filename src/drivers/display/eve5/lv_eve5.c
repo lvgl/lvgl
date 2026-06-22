@@ -708,6 +708,19 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
         EVE_CmdSync completed = EVE_Cmd_syncCompleted(drvr->hal);
         EVE_GpuAlloc_UpdateFree(drvr->allocator, completed);
+
+        /* Frame-boundary fault catch. The loader guards isolate faults to
+         * their own attempts; if CmdFault is still set here, something
+         * outside our load guards (a non-loader coprocessor command in the
+         * compositor, screen DL, SW present, or external code) faulted the
+         * chip. Reset narrowly and queue a full-screen invalidate so the
+         * next refresh rebuilds the screen from scratch — otherwise later
+         * frames would silently fail. */
+        if(drvr->hal->CmdFault) {
+            LV_LOG_WARN("EVE5: coprocessor fault detected at FULL frame boundary — narrow reset");
+            lv_eve5_reset_coprocessor(disp);
+            drvr->invalidate_pending = true;
+        }
 #if LV_USE_OS
         lv_mutex_unlock(&drvr->hal_mutex);
 #endif
@@ -797,6 +810,19 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
     if(lv_display_flush_is_last(disp)) {
         composite_to_framebuffer(drvr);
+
+        /* Frame-boundary fault catch. The loader guards isolate faults to
+         * their own attempts; if CmdFault is still set here, something
+         * outside our load guards (a non-loader coprocessor command in the
+         * compositor, a tile DL, or external code) faulted the chip.
+         * Reset narrowly and queue a full-screen invalidate so the next
+         * refresh rebuilds the screen from scratch — otherwise later
+         * frames would silently fail. */
+        if(phost->CmdFault) {
+            LV_LOG_WARN("EVE5: coprocessor fault detected at PARTIAL frame boundary — narrow reset");
+            lv_eve5_reset_coprocessor(disp);
+            drvr->invalidate_pending = true;
+        }
     }
 
 #if LV_USE_OS
