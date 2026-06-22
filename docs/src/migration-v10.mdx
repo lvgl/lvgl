@@ -174,3 +174,15 @@ if you need finer control.
   lv_snapshot_take_to_draw_buf(obj, cf, draw_buf);
   lv_draw_buf_destroy(draw_buf);
 ```
+
+---
+
+## Others
+
+### lv_file_explorer
+
+- The `lv_file_explorer` widget is deprecated. A file explorer is a path header
+  plus a table of directory entries read with the [`lv_fs`](main-modules/fs) API,
+  so build it directly instead. See the
+  [`lv_example_table_file_browser`](widgets/table#building-a-file-explorer) example
+  for a starting point.

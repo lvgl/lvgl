@@ -57,6 +57,8 @@ static void dd_event_handler(lv_event_t * e)
  * @title Quick access toggle and sort control
  * @brief File explorer with a header button to hide quick access and a dropdown to change sort mode.
  *
+ * @deprecated The `lv_file_explorer` widget is deprecated. See `lv_example_table_file_browser`.
+ *
  * Adds a checkable button and a dropdown into the file explorer's header
  * (`lv_file_explorer_get_header`). Toggling the button adds or removes
  * `LV_OBJ_FLAG_HIDDEN` on the quick access panel returned by
@@ -67,7 +69,9 @@ static void dd_event_handler(lv_event_t * e)
  */
 void lv_example_file_explorer_2(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * file_explorer = lv_file_explorer_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
 
 #if LV_USE_FS_WIN32
     /* Note to Windows users:  the initial "C:" on these paths corresponds to

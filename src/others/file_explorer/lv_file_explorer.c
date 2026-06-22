@@ -79,6 +79,7 @@ const lv_obj_class_t lv_file_explorer_class = {
 
 lv_obj_t * lv_file_explorer_create(lv_obj_t * parent)
 {
+    LV_LOG_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);

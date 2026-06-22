@@ -3,6 +3,14 @@ title: File Explorer
 description: "lv_file_explorer provides a UI enabling the end user to browse the contents of a file system. Its main area is called the \"Browsing Area\" and provides the list of files contained in the currently-v..."
 ---
 
+<Callout type="warning" title="Deprecated">
+The `lv_file_explorer` widget is deprecated and kept only for backward
+compatibility. A file explorer is a path header plus a table of directory entries
+read with the [`lv_fs`](/main-modules/fs) API, so build it directly instead. See
+the [`lv_example_table_file_browser`](/widgets/table#building-a-file-explorer)
+example for a starting point.
+</Callout>
+
 `lv_file_explorer` provides a UI enabling the end user to browse the contents of a
 file system.  Its main area is called the "Browsing Area" and provides the list of
 files contained in the currently-viewed directory.
@@ -185,6 +193,12 @@ You can also save the obtained **path** and **file** name into an array
 through functions such as <ApiLink name="strcpy" /> and <ApiLink name="strcat" /> for later use.
 
 ## Examples
+
+<Callout type="warning" title="Deprecated">
+The examples below use the deprecated `lv_file_explorer` widget. For new code,
+prefer building a file browser from a table and the `lv_fs` API, as shown in
+[`lv_example_table_file_browser`](/widgets/table#building-a-file-explorer).
+</Callout>
 
 ### Simple File Explorer
 
