@@ -10,6 +10,9 @@
 
 #if LV_USE_DEMO_KEYPAD_AND_ENCODER
 
+/*The demo shows the deprecated `lv_list` widget too.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 /*********************
  *      DEFINES
  *********************/
@@ -213,5 +216,7 @@ static void ta_event_cb(lv_event_t * e)
         lv_obj_set_height(tv, LV_VER_RES);
     }
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif

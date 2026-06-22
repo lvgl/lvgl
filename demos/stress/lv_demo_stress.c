@@ -9,6 +9,10 @@
 #include "lv_demo_stress.h"
 
 #if LV_USE_DEMO_STRESS
+
+/*The stressed widget set contains the deprecated `lv_list` and `lv_win` widgets.*/
+LV_DEPRECATIONS_IGNORE_BEGIN
+
 /*********************
  *      DEFINES
  *********************/
@@ -456,5 +460,7 @@ static void arc_set_end_angle_anim(void * obj, int32_t v)
 {
     lv_arc_set_end_angle(obj, v);
 }
+
+LV_DEPRECATIONS_IGNORE_END
 
 #endif /* LV_USE_DEMO_STRESS */
