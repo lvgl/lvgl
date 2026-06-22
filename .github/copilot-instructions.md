@@ -14,11 +14,11 @@ Code must be portable, memory-efficient, and bare-metal safe.
 - Global variables not in `lv_global_t` — must use `LV_GLOBAL_DEFAULT()`
 - Test headers included in production source (`#include "lv_test_..."` in `src/`)
 - Missing `LV_CHECK_ARG(...)` on arguments of public API functions
-- Missing `LV_CHECK_OBJ(obj, cls, action)` for `lv_obj_t *` parameters in public API functions
+- Missing `LV_CHECK_OBJ(obj, cls, action)` for `lv_obj_t *`/`const lv_obj_t *` parameters in public API functions
 
 ## Argument Checking Contract
 - Public API functions use `LV_CHECK_ARG`/`LV_CHECK_OBJ` as the sole argument-safety mechanism
-- When `LV_USE_CHECK_ARG=0` checks compile out by design. Do not flag missing unconditional `NULL` guards; passing invalid args with checks disabled is caller UB, not a library defect
+- When `LV_USE_CHECK_ARG=0` checks compile out by design. Do not flag missing unconditional `NULL` guards; passing invalid args with checks disabled is caller undefined behavior, not a library defect
 
 ## Embedded Performance (flag in hot paths)
 
