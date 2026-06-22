@@ -3,6 +3,8 @@ config LV_USE_DRAW_OPENGLES
 	default n
 	select LV_USE_OPENGLES
 	select LV_DRAW_HAS_3D_SUPPORT
+	help
+		Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES
 
 if LV_USE_DRAW_OPENGLES
 

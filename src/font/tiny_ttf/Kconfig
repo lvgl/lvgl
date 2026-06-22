@@ -1,6 +1,8 @@
 config LV_USE_TINY_TTF
 	bool "Enable Tiny TTF decoder"
 	default n
+	help
+		Built-in TTF decoder
 if LV_USE_TINY_TTF
 config LV_TINY_TTF_FILE_SUPPORT
 	bool "Enable loading Tiny TTF data from files"

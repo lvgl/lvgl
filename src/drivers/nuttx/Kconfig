@@ -1,6 +1,8 @@
 config LV_USE_NUTTX
 	bool "Use Nuttx to open window and handle touchscreen"
 	default n
+	help
+		Use Nuttx to open window and handle touchscreen
 
 if LV_USE_NUTTX
 

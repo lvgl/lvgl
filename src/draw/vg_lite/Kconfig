@@ -3,6 +3,8 @@ config LV_USE_DRAW_VG_LITE
 	default n
 	select LV_USE_MATRIX
 	select LV_DRAW_HAS_VECTOR_SUPPORT
+	help
+		Use VG-Lite GPU.
 
 if LV_USE_DRAW_VG_LITE
 

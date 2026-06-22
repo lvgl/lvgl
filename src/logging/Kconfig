@@ -1,5 +1,7 @@
 config LV_USE_LOG
 	bool "Enable the log module"
+	help
+		Enable log module
 
 if LV_USE_LOG
 

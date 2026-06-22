@@ -21,3 +21,5 @@ rsource "x11/Kconfig"
 config LV_USE_NANOVG
 	bool "NanoVG library"
 	default n
+	help
+		Enable NanoVG (vector graphics library)

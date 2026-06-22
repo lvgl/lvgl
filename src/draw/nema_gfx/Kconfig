@@ -2,6 +2,8 @@ config LV_USE_NEMA_GFX
 	bool "Use NemaGFX acceleration"
 	default n
 	select LV_DRAW_HAS_VECTOR_SUPPORT
+	help
+		Use TSi's aka (Think Silicon) NemaGFX
 
 if LV_USE_NEMA_GFX
 

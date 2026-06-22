@@ -1,6 +1,8 @@
 config LV_BUILD_DEMOS
 	bool "Build demos"
 	default y
+	help
+		Build the demos
 
 if LV_BUILD_DEMOS
 

@@ -1,6 +1,8 @@
 config LV_USE_WAYLAND
 	bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
 	default n
+	help
+		Use Wayland to open a window and handle input on Linux or BSD desktops
 
 if LV_USE_WAYLAND
 

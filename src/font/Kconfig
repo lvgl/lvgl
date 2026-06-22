@@ -13,6 +13,8 @@ endchoice
 config LV_TXT_BREAK_CHARS
 	string "Can break (wrap) texts on these chars"
 	default " ,.;:-_)}"
+	help
+		While rendering text strings, break (wrap) text on these chars.
 
 config LV_TXT_LINE_BREAK_LONG_LEN
 	int "Line break long length"
@@ -38,6 +40,8 @@ config LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
 config LV_TXT_COLOR_CMD
 	string "The control character to use for signalling text recoloring"
 	default "\#"
+	help
+		The control character to use for signaling text recoloring
 
 config LV_USE_BIDI
 	bool "Support bidirectional texts"
@@ -80,6 +84,9 @@ config LV_USE_ARABIC_PERSIAN_CHARS
 menu "Built-in Fonts"
 	config LV_FONT_MONTSERRAT_8
 		bool "Enable Montserrat 8"
+		help
+			Montserrat fonts with ASCII range and some symbols using bpp = 4
+			https://fonts.google.com/specimen/Montserrat
 	config LV_FONT_MONTSERRAT_10
 		bool "Enable Montserrat 10"
 	config LV_FONT_MONTSERRAT_12
@@ -134,6 +141,8 @@ menu "Built-in Fonts"
 	config LV_FONT_UNSCII_8
 		bool "Enable UNSCII 8 (Perfect monospace font)"
 		default y if LV_CONF_MINIMAL
+		help
+			Pixel perfect monospaced fonts
 	config LV_FONT_UNSCII_16
 		bool "Enable UNSCII 16 (Perfect monospace font)"
 endmenu
@@ -237,23 +246,33 @@ config LV_FONT_FMT_TXT_LARGE
 
 config LV_USE_FONT_COMPRESSED
 	bool "Sets support for compressed fonts"
+	help
+		Enables/disables support for compressed fonts.
 
 config LV_USE_FONT_PLACEHOLDER
 	bool "Enable drawing placeholders when glyph dsc is not found"
 	default y
+	help
+		Enable drawing placeholders when glyph dsc is not found.
 
 config LV_USE_FONT_MANAGER
 	bool "Enable Font manager"
 	default n
+	help
+		Enable Font manager
 
 config LV_FONT_MANAGER_NAME_MAX_LEN
 	int "Font manager name max length"
 	depends on LV_USE_FONT_MANAGER
 	default 32
+	help
+		Font manager name max length
 
 config LV_USE_IMGFONT
 	bool "Support using images as font in label or span widgets"
 	default n
+	help
+		Support using images as font in label or span widgets
 
 rsource "freetype/Kconfig"
 rsource "tiny_ttf/Kconfig"

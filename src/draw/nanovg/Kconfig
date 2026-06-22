@@ -5,6 +5,9 @@ config LV_USE_DRAW_NANOVG
         select LV_USE_MATRIX
 	select LV_DRAW_HAS_VECTOR_SUPPORT
 	select LV_DRAW_HAS_3D_SUPPORT
+	help
+		Use NanoVG Renderer
+		- Requires LV_USE_NANOVG, LV_USE_MATRIX.
 
 if LV_USE_DRAW_NANOVG
 

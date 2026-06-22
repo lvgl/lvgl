@@ -1,6 +1,8 @@
 config LV_USE_PROFILER
 	bool "Runtime performance profiler"
 	default n
+	help
+		Enable runtime performance profiler
 
 config LV_USE_PROFILER_BUILTIN
 	bool "Enable the built-in profiler"

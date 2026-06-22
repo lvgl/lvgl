@@ -1,6 +1,8 @@
 config LV_USE_LINUX_DRM
 	bool "Use Linux DRM device"
 	default n
+	help
+		Driver for /dev/dri/card
 
 if LV_USE_LINUX_DRM
 

@@ -1,6 +1,8 @@
 config LV_USE_PPA
 bool "Use Espressif's PPA accelerator for ESP SoCs"
 default n
+help
+	Draw using espressif PPA accelerator
 
 if LV_USE_PPA
 

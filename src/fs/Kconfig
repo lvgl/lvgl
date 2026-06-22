@@ -45,6 +45,8 @@ rsource "Kconfig.fs.template"
 # MEMFS is inlined here as it's memory-mapped and has no working directory path
 config LV_USE_FS_MEMFS
 	bool "File system on top of memory-mapped API"
+	help
+		API for memory-mapped file access.
 
 if LV_USE_FS_MEMFS
 

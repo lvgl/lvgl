@@ -168,8 +168,14 @@ choice
 	default LV_USE_THORVG_INTERNAL
 	config LV_USE_THORVG_INTERNAL
 		bool "Use ThorVG internal"
+		help
+			Enable ThorVG (vector graphics library) from the src/libs folder.
+			Requires LV_USE_VECTOR_GRAPHIC
 	config LV_USE_THORVG_EXTERNAL
 		bool "Use ThorVG external"
+		help
+			Enable ThorVG by assuming that its installed and linked to the project
+			Requires LV_USE_VECTOR_GRAPHIC
 endchoice
 
 endif #LV_USE_DRAW_SW

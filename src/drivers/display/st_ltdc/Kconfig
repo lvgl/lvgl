@@ -1,6 +1,8 @@
 config LV_USE_ST_LTDC
 	bool "Driver for ST LTDC"
 	default n
+	help
+		Driver for ST LTDC
 
 if LV_USE_ST_LTDC
 

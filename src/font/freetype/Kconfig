@@ -1,6 +1,8 @@
 config LV_USE_FREETYPE
 	bool "FreeType library"
 	default n
+	help
+		FreeType library
 
 if LV_USE_FREETYPE
 

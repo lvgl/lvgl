@@ -1,6 +1,14 @@
 config LV_WIDGETS_HAS_DEFAULT_VALUE
 	bool "Widgets has default value"
 	default y
+	help
+		Causes these widgets to be given default values at creation time.
+		- lv_buttonmatrix_t:  Get default maps:  {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""}, else map not set.
+		- lv_checkbox_t    :  String label set to "Check box", else set to empty string.
+		- lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
+		- lv_roller_t      :  Options set to "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", else no values are set.
+		- lv_label_t       :  Text set to "Text", else empty string.
+		- lv_arclabel_t   :  Text set to "Arced Text", else empty string.
 
 config LV_USE_3DTEXTURE
 	bool "3D Texture"
@@ -25,6 +33,8 @@ config LV_USE_BAR
 config LV_USE_BARCODE
 	bool "Barcode library"
 	select LV_USE_CANVAS
+	help
+		Barcode code library
 
 config LV_USE_BUTTON
 	bool "Button"
@@ -57,6 +67,9 @@ config LV_USE_DROPDOWN
 config LV_USE_FFMPEG
 	bool "FFmpeg player widget"
 	default n
+	help
+		FFmpeg library for image decoding and playing videos.
+		Supports all major image formats so do not enable other image decoder with it.
 
 if LV_USE_FFMPEG
 
@@ -75,6 +88,8 @@ endif #LV_USE_FFMPEG
 
 config LV_USE_GIF
 	bool "GIF decoder library"
+	help
+		GIF decoder library
 
 config LV_GIF_CACHE_DECODE_DATA
 	bool "Use extra 16KB RAM to cache decoded data to accelerate"
@@ -84,11 +99,15 @@ config LV_USE_GLTF
 	bool "glTF support"
 	select LV_USE_3DTEXTURE
 	depends on LV_DRAW_HAS_3D_SUPPORT
+	help
+		Requires `LV_USE_3DTEXTURE = 1`
 
 config LV_USE_GSTREAMER
 	bool "GStreamer widget"
 	select LV_USE_IMAGE
 	default n
+	help
+		GStreamer library
 
 config LV_USE_IMAGE
 	bool "Image"
@@ -138,10 +157,14 @@ config LV_USE_MSGBOX
 config LV_USE_QRCODE
 	bool "QR code library"
 	select LV_USE_CANVAS
+	help
+		QR code library
 
 config LV_USE_RLOTTIE
 	bool "Lottie library. Deprecated see LV_USE_LOTTIE"
 	default n
+	help
+		Rlottie library
 
 config LV_USE_ROLLER
 	bool "Roller"

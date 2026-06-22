@@ -1,6 +1,8 @@
 config LV_USE_LINUX_FBDEV
 	bool "Use Linux framebuffer device"
 	default n
+	help
+		Driver for /dev/fb
 
 if LV_USE_LINUX_FBDEV
 

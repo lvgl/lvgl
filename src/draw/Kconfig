@@ -24,6 +24,8 @@ menu "Color Settings"
 		default 16 if LV_COLOR_DEPTH_16
 		default 24 if LV_COLOR_DEPTH_24
 		default 32 if LV_COLOR_DEPTH_32
+		help
+			Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)
 
 	config LV_COLOR_MIX_ROUND_OFS
 		int "Adjust color mix functions rounding"

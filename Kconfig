@@ -53,6 +53,8 @@ menu "LVGL"
 	menu "Compiler Settings"
 		config LV_BIG_ENDIAN_SYSTEM
 			bool "For big endian systems set to 1"
+			help
+				For big endian systems set to 1
 
 		config LV_ATTRIBUTE_MEM_ALIGN
 			string "Alignment attribute"

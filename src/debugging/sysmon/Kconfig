@@ -1,6 +1,8 @@
 config LV_USE_SYSMON
 	bool "Enable system monitor component"
 	default n
+	help
+		Enable system monitor component
 
 if LV_USE_SYSMON
 

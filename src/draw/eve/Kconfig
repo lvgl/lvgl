@@ -1,6 +1,8 @@
 config LV_USE_DRAW_EVE
 	bool "Use EVE FT81X GPU."
 	default n
+	help
+		Use EVE FT81X GPU.
 
 if LV_USE_DRAW_EVE
 

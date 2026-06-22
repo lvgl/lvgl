@@ -6,6 +6,8 @@ config LV_USE_ST7735
 	bool "Use ST7735 LCD driver"
 	default n
 	select LV_USE_GENERIC_MIPI
+	help
+		Drivers for LCD devices connected via SPI/parallel port
 
 config LV_USE_ST7789
 	bool "Use ST7789 LCD driver"

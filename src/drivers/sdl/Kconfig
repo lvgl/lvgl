@@ -1,6 +1,8 @@
 config LV_USE_SDL
 	bool "Use SDL to open window on PC and handle mouse and keyboard"
 	default n
+	help
+		Use SDL to open window on PC and handle mouse and keyboard.
 
 if LV_USE_SDL
 

@@ -1,6 +1,8 @@
 config LV_USE_LIBINPUT
 	bool "Use libinput input driver"
 	default n
+	help
+		Driver for libinput input devices
 
 if LV_USE_LIBINPUT
 

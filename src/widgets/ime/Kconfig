@@ -2,6 +2,8 @@ config LV_USE_IME_PINYIN
 	bool "Enable Pinyin input method"
 	default n
 	select LV_USE_KEYBOARD
+	help
+		Enable Pinyin input method
 
 if LV_USE_IME_PINYIN
 
