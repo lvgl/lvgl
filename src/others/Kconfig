@@ -19,6 +19,9 @@ config LV_FILE_EXPLORER_QUICK_ACCESS
 	bool "Enable quick access bar"
 	default y
 	help
-		This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+		This can save some memory, but not much.
+		After the quick access bar is created, it can be hidden
+		by clicking the button at the top left corner of
+		the browsing area, which is very useful for small screen devices.
 
 endif #LV_USE_FILE_EXPLORER
