@@ -468,7 +468,19 @@ static bool eve5_vram_check_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
      * sentinel that resolves to the current back buffer, not an allocator handle. */
     if(vr->is_swapchain) return true;
 
-    return EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID;
+    /* HAL lock around Get: on GA5 the call stamps the entry's last-referencing
+     * epoch scope, which the release/eviction decision later consults. LVGL
+     * invokes vram_check_cb from ensure_resident paths outside our dispatch,
+     * so without the lock an unsynchronized Get here can race the scope state
+     * being mutated by the render/composite paths. */
+#if LV_USE_OS
+    lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
+#endif
+    bool resident = EVE_GpuAlloc_Get(u->allocator, vr->gpu_handle) != GA_INVALID;
+#if LV_USE_OS
+    lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
+#endif
+    return resident;
 }
 
 void lv_draw_eve5_register_vram_callbacks(lv_draw_eve5_unit_t * u)
