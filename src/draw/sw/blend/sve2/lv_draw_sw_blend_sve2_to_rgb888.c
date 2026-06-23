@@ -32,6 +32,44 @@
 /**********************
  *      MACROS
  **********************/
+
+#define lv_sve_rgb32_stride_impl(ma_sve_chn_iterator, ...)    \
+    lv_sve_stride_loop_rgb32(uStride, vTailPred)              \
+    {                                                         \
+                                                              \
+        svuint16x4_t vSourceLow16x4 = svundef4_u16();         \
+        svuint16x4_t vSourceHigh16x4 = svundef4_u16();        \
+                                                              \
+        svuint16x4_t vTargetLow16x4 = svundef4_u16();         \
+        svuint16x4_t vTargetHigh16x4 = svundef4_u16();        \
+                                                              \
+        svld4ub_u16(vTailPred,                                \
+                    (uint8_t *)pwSource,                      \
+                    &vSourceLow16x4,                          \
+                    &vSourceHigh16x4);                        \
+                                                              \
+        svld4ub_u16(vTailPred,                                \
+                    (uint8_t *)pwTarget,                      \
+                    &vTargetLow16x4,                          \
+                    &vTargetHigh16x4);                        \
+                                                              \
+        /* process low half */                                \
+        ma_sve_chn_iterator(vSourceLow16x4, vTargetLow16x4,   \
+                            __VA_ARGS__);                     \
+                                                              \
+        /* process high half */                               \
+        ma_sve_chn_iterator(vSourceHigh16x4, vTargetHigh16x4, \
+                            __VA_ARGS__);                     \
+                                                              \
+        svst4ub_u16(vTailPred,                                \
+                    (uint8_t *)pwTarget,                      \
+                    vTargetLow16x4,                           \
+                    vTargetHigh16x4);                         \
+                                                              \
+        pwSource += sve_iteration_advance;                    \
+        pwTarget += sve_iteration_advance;                    \
+    }
+
 #define lv_sve_rgb32_no_alpha_stride_impl(                    \
     ma_alpha_idx,                                             \
     ma_sve_chn_iterator,                                      \
@@ -79,6 +117,65 @@
         pwTarget += sve_iteration_advance;                    \
     }
 
+#define lv_sve_rgb32_no_src_stride_impl(                      \
+    ma_sve_chn_iterator,                                      \
+    ma_vSource16x4,                                           \
+    ...)                                                      \
+    lv_sve_stride_loop_rgb32(uStride, vTailPred) {            \
+                                                              \
+        svuint16x4_t vTargetLow16x4 = svundef4_u16();         \
+        svuint16x4_t vTargetHigh16x4 = svundef4_u16();        \
+                                                              \
+        svld4ub_u16(vTailPred,                                \
+                    (uint8_t *)pwTarget,                      \
+                    &vTargetLow16x4,                          \
+                    &vTargetHigh16x4);                        \
+                                                              \
+        /* process low half */                                \
+        ma_sve_chn_iterator(ma_vSource16x4, vTargetLow16x4,   \
+                            __VA_ARGS__);                     \
+                                                              \
+        /* process high half */                               \
+        ma_sve_chn_iterator(ma_vSource16x4, vTargetHigh16x4,  \
+                            __VA_ARGS__);                     \
+                                                              \
+        svst4ub_u16(vTailPred,                                \
+                    (uint8_t *)pwTarget,                      \
+                    vTargetLow16x4,                           \
+                    vTargetHigh16x4);                         \
+                                                              \
+        pwTarget += sve_iteration_advance;                    \
+    }
+
+#define lv_sve_rgb24_no_src_stride_impl(                      \
+    ma_sve_chn_iterator,                                      \
+    ma_vSource16x3,                                           \
+    ...)                                                      \
+    lv_sve_stride_loop_rgb24(uStride, vTailPred) {            \
+                                                              \
+        svuint16x3_t vTargetLow16x3 = svundef3_u16();         \
+        svuint16x3_t vTargetHigh16x3= svundef3_u16();         \
+                                                              \
+        svld3ub_u16(vTailPred,                                \
+                    (uint8_t *)pchTarget,                     \
+                    &vTargetLow16x3,                          \
+                    &vTargetHigh16x3);                        \
+                                                              \
+        /* process low half */                                \
+        ma_sve_chn_iterator(ma_vSource16x3, vTargetLow16x3,   \
+                            __VA_ARGS__);                     \
+                                                              \
+        /* process high half */                               \
+        ma_sve_chn_iterator(ma_vSource16x3, vTargetHigh16x3,  \
+                            __VA_ARGS__);                     \
+                                                              \
+        svst3ub_u16(vTailPred,                                \
+                    (uint8_t *)pchTarget,                     \
+                    vTargetLow16x3,                           \
+                    vTargetHigh16x3);                         \
+                                                              \
+        pchTarget += sve_iteration_advance * 3;               \
+    }
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -163,20 +260,24 @@ static inline
 void lv_sve_cccn888_stride_fill_colour_with_opacity( 
                                         uint32_t *LV_RESTRICT pwTarget,
                                         size_t uStride,
-                                        uint32_t wColour,
+                                        svuint16x4_t vColour16x4,
                                         uint16_t hwOpacity)
 {
-    size_t n = 0;
-
-    svuint32_t vColour = svdup_u32(wColour);
-    do {
-        svbool_t vTailPred = svwhilelt_b32((uint32_t)n, (uint32_t)uStride);
-
-        svst1_u32(vTailPred, pwTarget, vColour);
-
-        pwTarget += svlenu32();
-        n += svlenu32();
-    } while (n < uStride);
+    lv_sve_rgb32_no_src_stride_impl(
+        lv_sve_pixel_u16x4_foreach_chn,
+        vColour16x4,
+        {
+            if (3 == sve_src_chn_idx) {
+                sve_target_u16 = sve_source_u16;
+            }
+            else {
+                sve_target_u16 = lv_sve_chn_blend_with_opacity( 
+                                                        sve_source_u16, 
+                                                        sve_target_u16, 
+                                                        hwOpacity);
+            }
+        }
+    )
 }
 
 LV_NONNULL(1)
@@ -184,19 +285,19 @@ static inline
 void lv_sve_ccc888_stride_fill_colour_with_opacity(  
                                         uint8_t *LV_RESTRICT pchTarget,
                                         size_t uStride,
-                                        svuint8x3_t tPixel8x3,
+                                        svuint16x3_t tPixel16x3,
                                         uint16_t hwOpacity)
 {
-    size_t n = 0;
-
-    do {
-        svbool_t vTailPred = svwhilelt_b8((uint32_t)n, (uint32_t)uStride);
-
-        svst3_u8(vTailPred, pchTarget, tPixel8x3);
-
-        pchTarget += svlenu8() * 3;
-        n += svlenu8();
-    } while (n < uStride);
+    lv_sve_rgb24_no_src_stride_impl(
+        lv_sve_pixel_ccc_foreach_chn,
+        tPixel16x3,
+        {
+            sve_target_u16 = lv_sve_chn_blend_with_opacity( 
+                                                    sve_source_u16, 
+                                                    sve_target_u16, 
+                                                    hwOpacity);
+        }
+    )
 }
 
 lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa(lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
@@ -213,38 +314,41 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa(lv_draw_sw_blend_fill
     opa += opa == 255;
 
     if (3 == dest_px_size) {
-        svuint8x3_t vPixels = svcreate3_u8( svdup_u8(dsc->color.blue), 
-                                            svdup_u8(dsc->color.green), 
-                                            svdup_u8(dsc->color.red));
+        svuint16x3_t vColour16x3 = svcreate3_u16(svdup_u16(dsc->color.blue), 
+                                                 svdup_u16(dsc->color.green), 
+                                                 svdup_u16(dsc->color.red));
 
         for(int32_t y = 0; y < h; y++) {
 
             lv_sve_ccc888_stride_fill_colour_with_opacity(
                                                     dest_buf_8, 
                                                     w, 
-                                                    vPixels,
+                                                    vColour16x3,
                                                     opa);
 
             dest_buf_8 += dest_stride;
         }
     }
     else if (4 == dest_px_size) {
-        uint32_t wColour = lv_color_to_u32(dsc->color);
+        svuint16x4_t vColour16x4 = svcreate4_u16(
+            svdup_u16(dsc->color.blue),
+            svdup_u16(dsc->color.green),
+            svdup_u16(dsc->color.red),
+            svdup_u16(0xFF));
+
         for(int32_t y = 0; y < h; y++) {
             
             lv_sve_cccn888_stride_fill_colour_with_opacity( 
                                                     (uint32_t *)dest_buf_8,
                                                     w, 
-                                                    wColour,
+                                                    vColour16x4,
                                                     opa);
 
             dest_buf_8 += dest_stride;
         }
-
-        return LV_RES_OK;
     }
 
-    return LV_RESULT_INVALID;
+    return LV_RES_OK;
 }
 
 lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_mask(lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)

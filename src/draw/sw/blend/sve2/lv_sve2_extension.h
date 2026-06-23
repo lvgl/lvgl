@@ -21,7 +21,7 @@
 #define svlens32() svlenu32()
 #define svlens64() svlenu64()
 
-#define lv_sve_stride_loop_accc8888(ma_stride_size, ma_pred_name)       \
+#define lv_sve_stride_loop_accc8888(ma_stride_size, ma_pred_name)        \
     for (svbool_t ma_pred_name, *pTemp = &ma_pred_name;                  \
          pTemp != NULL;                                                  \
          pTemp = NULL)                                                   \
@@ -34,10 +34,26 @@
              });                                                         \
              SVE_SAFE_NAME(n) += sve_iteration_advance)
 
-#define lv_sve_stride_loop_rgb32(ma_stride_size, ma_pred_name) \
+#define lv_sve_stride_loop_rgb32(ma_stride_size, ma_pred_name)           \
     lv_sve_stride_loop_accc8888(ma_stride_size, ma_pred_name)
 
-#define lv_sve_stride_loop_rgb16(ma_stride_size, ma_pred_name)           \
+#define lv_sve_stride_loop_ccc888(ma_stride_size, ma_pred_name)          \
+    for (svbool_t ma_pred_name, *pTemp = &ma_pred_name;                  \
+         pTemp != NULL;                                                  \
+         pTemp = NULL)                                                   \
+        for (size_t SVE_SAFE_NAME(n) = 0,                                \
+                    sve_iteration_advance = svlenu8();                   \
+             ({                                                          \
+                 ma_pred_name = svwhilelt_b8((int32_t)SVE_SAFE_NAME(n),  \
+                                             (int32_t)(ma_stride_size)); \
+                 SVE_SAFE_NAME(n) < (ma_stride_size);                    \
+             });                                                         \
+             SVE_SAFE_NAME(n) += sve_iteration_advance)
+
+#define lv_sve_stride_loop_rgb24(ma_stride_size, ma_pred_name)            \
+    lv_sve_stride_loop_ccc888(ma_stride_size, ma_pred_name)
+
+#define lv_sve_stride_loop_rgb16(ma_stride_size, ma_pred_name)            \
     for (svbool_t ma_pred_name, *pTemp = &ma_pred_name;                   \
          pTemp != NULL;                                                   \
          pTemp = NULL)                                                    \
@@ -50,7 +66,7 @@
              });                                                          \
              SVE_SAFE_NAME(n) += sve_iteration_advance)
 
-#define lv_sve_pixel_ccc_foreach_chn(ma_source_u16x3,                    \
+#define lv_sve_pixel_ccc_foreach_chn( ma_source_u16x3,                    \
                                       ma_target_u16x3,                    \
                                       ...)                                \
     do {                                                                  \
@@ -88,7 +104,7 @@
         } while (0);                                                      \
     } while (0)
 
-#define lv_sve_pixel_accc_foreach_chn012(ma_source_u16x4,                \
+#define lv_sve_pixel_accc_foreach_chn012( ma_source_u16x4,                \
                                           ma_target_u16x4,                \
                                           ...)                            \
     do {                                                                  \
@@ -126,7 +142,7 @@
         } while (0);                                                      \
     } while (0)
 
-#define lv_sve_pixel_accc_foreach_chn(ma_source_u16x4,                   \
+#define lv_sve_pixel_accc_foreach_chn( ma_source_u16x4,                   \
                                        ma_target_u16x4,                   \
                                        ...)                               \
     do {                                                                  \
@@ -178,7 +194,7 @@
         } while (0);                                                      \
     } while (0)
 
-#define lv_sve_pixel_u16x4_foreach_chn(ma_source_u16x4,                  \
+#define lv_sve_pixel_u16x4_foreach_chn( ma_source_u16x4,                  \
                                         ma_target_u16x4,                  \
                                         ...)                              \
     do {                                                                  \
@@ -872,9 +888,82 @@ static inline void svst4ub_u16(svbool_t vPredu8,
 }
 #endif
 
+
+#if defined(__GNUC__) && !defined(__clang__)
+#define svld3ub_u16(ma_pred,                                                                                         \
+                    ma_src_ptr,                                                                                      \
+                    ma_svuint16x3_low_ptr,                                                                           \
+                    ma_svuint16x3_high_ptr)                                                                          \
+    do {                                                                                                             \
+        svuint8x3_t vInput8x3 = svld3_u8((ma_pred), (ma_src_ptr));                                                   \
+                                                                                                                     \
+        *(ma_svuint16x3_low_ptr) = svset3_u16(*(ma_svuint16x3_low_ptr), 0, svunpklo_u16(svget3_u8(vInput8x3, 0)));   \
+        *(ma_svuint16x3_low_ptr) = svset3_u16(*(ma_svuint16x3_low_ptr), 1, svunpklo_u16(svget3_u8(vInput8x3, 1)));   \
+        *(ma_svuint16x3_low_ptr) = svset3_u16(*(ma_svuint16x3_low_ptr), 2, svunpklo_u16(svget3_u8(vInput8x3, 2)));   \
+                                                                                                                     \
+        *(ma_svuint16x3_high_ptr) = svset3_u16(*(ma_svuint16x3_high_ptr), 0, svunpkhi_u16(svget3_u8(vInput8x3, 0))); \
+        *(ma_svuint16x3_high_ptr) = svset3_u16(*(ma_svuint16x3_high_ptr), 1, svunpkhi_u16(svget3_u8(vInput8x3, 1))); \
+        *(ma_svuint16x3_high_ptr) = svset3_u16(*(ma_svuint16x3_high_ptr), 2, svunpkhi_u16(svget3_u8(vInput8x3, 2))); \
+    } while (0)
+
+#define svst3ub_u16(ma_pred,                                                                 \
+                    ma_dst_ptr,                                                              \
+                    ma_svuint16x3_low,                                                       \
+                    ma_svuint16x3_high)                                                      \
+    do {                                                                                     \
+        svuint8_t vCH0u8 = svuzp1_u8(svreinterpret_u8(svget3_u16((ma_svuint16x3_low), 0)),   \
+                                     svreinterpret_u8(svget3_u16((ma_svuint16x3_high), 0))); \
+                                                                                             \
+        svuint8_t vCH1u8 = svuzp1_u8(svreinterpret_u8(svget3_u16((ma_svuint16x3_low), 1)),   \
+                                     svreinterpret_u8(svget3_u16((ma_svuint16x3_high), 1))); \
+                                                                                             \
+        svuint8_t vCH2u8 = svuzp1_u8(svreinterpret_u8(svget3_u16((ma_svuint16x3_low), 2)),   \
+                                     svreinterpret_u8(svget3_u16((ma_svuint16x3_high), 2))); \
+                                                                                             \
+        svst3_u8((ma_pred), (ma_dst_ptr), svcreate3_u8(vCH0u8, vCH1u8, vCH2u8));             \
+    } while (0)
+#else
+
+LV_NONNULL(2, 3, 4)
+static inline void svld3ub_u16(svbool_t vPredu8,
+                               uint8_t *pchSource,
+                               svuint16x3_t *pvLow,
+                               svuint16x3_t *pvHigh)
+{
+    svuint8x3_t vInput8x3 = svld3_u8(vPredu8, pchSource);
+
+    *pvLow = svset3_u16(*pvLow, 0, svunpklo_u16(svget3_u8(vInput8x3, 0)));
+    *pvLow = svset3_u16(*pvLow, 1, svunpklo_u16(svget3_u8(vInput8x3, 1)));
+    *pvLow = svset3_u16(*pvLow, 2, svunpklo_u16(svget3_u8(vInput8x3, 2)));
+
+    *pvHigh = svset3_u16(*pvHigh, 0, svunpkhi_u16(svget3_u8(vInput8x3, 0)));
+    *pvHigh = svset3_u16(*pvHigh, 1, svunpkhi_u16(svget3_u8(vInput8x3, 1)));
+    *pvHigh = svset3_u16(*pvHigh, 2, svunpkhi_u16(svget3_u8(vInput8x3, 2)));
+}
+
+LV_NONNULL(2)
+static inline void svst3ub_u16(svbool_t vPredu8,
+                               uint8_t *pchTarget,
+                               svuint16x3_t vLow,
+                               svuint16x3_t vHigh)
+{
+
+    svuint8_t vCH0u8 = svuzp1_u8(svreinterpret_u8(svget3_u16(vLow, 0)),
+                                 svreinterpret_u8(svget3_u16(vHigh, 0)));
+
+    svuint8_t vCH1u8 = svuzp1_u8(svreinterpret_u8(svget3_u16(vLow, 1)),
+                                 svreinterpret_u8(svget3_u16(vHigh, 1)));
+
+    svuint8_t vCH2u8 = svuzp1_u8(svreinterpret_u8(svget3_u16(vLow, 2)),
+                                 svreinterpret_u8(svget3_u16(vHigh, 2)));
+
+    svst3_u8(vPredu8, pchTarget, svcreate3_u8(vCH0u8, vCH1u8, vCH2u8));
+}
+#endif
+
 /*! \note the Element range of vMask is [0, 0xFF]
  */
-static inline svuint16_t lv_sve_chn_blend_with_mask(svuint16_t vSource,
+static inline svuint16_t lv_sve_chn_blend_with_mask( svuint16_t vSource,
                                                      svuint16_t vTarget,
                                                      svuint16_t vMask)
 {
@@ -916,7 +1005,7 @@ static inline svuint16_t lv_sve_chn_blend_with_mask_fast(svuint16_t vSource,
 
 /*! \note the hwOpacity range [0, 0x100]
  */
-static inline svuint16_t lv_sve_chn_blend_with_opacity(svuint16_t vSource,
+static inline svuint16_t lv_sve_chn_blend_with_opacity( svuint16_t vSource,
                                                         svuint16_t vTarget,
                                                         uint16_t hwOpacity)
 {
@@ -924,12 +1013,12 @@ static inline svuint16_t lv_sve_chn_blend_with_opacity(svuint16_t vSource,
     // vTarget = vSource * vOpacity + vTarget * (256 - vOpacity);
 
     svuint16_t vTemp0 = svmul_n_u16_m(svptrue_b16(), vSource, hwOpacity);
-    svuint16_t vTemp1 = svmul_n_u16_m(svptrue_b16(),
-                                      vTarget,
-                                      256 - hwOpacity);
-    vTarget = svadd_u16_m(svptrue_b16(), vTemp0, vTemp1);
+    vTemp0 = svmla_n_u16_m( svptrue_b16(), 
+                            vTemp0,
+                            vTarget,
+                            256 - hwOpacity);
 
-    return svlsr_n_u16_m(svptrue_b16(), vTarget, 8); // vTarget >> 8;
+    return svlsr_n_u16_m(svptrue_b16(), vTemp0, 8);
 }
 
 /*! \note the hwOpacity range [0, 0x100]
