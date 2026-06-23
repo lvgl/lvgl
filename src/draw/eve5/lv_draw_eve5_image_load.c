@@ -407,6 +407,314 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 }
 
 /**********************
+ * LVGL .bin DIRECT LOAD
+ *
+ * LVGL's `.bin` is just a 12-byte header (lv_image_header_t — see LVGL_BIN_FORMAT.md)
+ * plus a body whose byte layout matches the in-memory layout LVGL would use for the
+ * same lv_color_format_t. For every CF whose pixel encoding is the same as an EVE
+ * bitmap format we can stream the body straight into RAM_G — no CPU decode, no
+ * CMD_LOADIMAGE, no LVGL bin decoder.
+ *
+ * Bypassing LVGL's bin decoder also sidesteps the LV_BIN_DECODER_RAM_LOAD=0
+ * holes (L8 / AL88 / ARGB1555 / ARGB4444 / ARGB2222 / ARGB8888_PREMULTIPLIED
+ * have no get_area_cb path). The EVE5 driver doesn't need that path at all
+ * because the bytes are already in the format the chip samples.
+ **********************/
+
+/* All LVGL CFs that lv_draw_eve5_upload_image_to_gpu can convert and upload.
+ * The bin loader uses this both as the gate for claiming a file and to decide
+ * between the SD zero-copy path (subset that's a direct memcpy from LVGL body
+ * bytes to the EVE format) and the upload-machinery fallback (the rest). */
+bool lv_draw_eve5_lvgl_bin_cf_supported(uint8_t lv_cf)
+{
+    switch((lv_color_format_t)lv_cf) {
+        /* Direct-copy CFs (covered by SD zero-copy on stride match): */
+        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_A1:
+        case LV_COLOR_FORMAT_A2:
+        case LV_COLOR_FORMAT_A4:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+        case LV_COLOR_FORMAT_ARGB2222:
+#endif
+        /* Conversion-required CFs that lv_draw_eve5_get_eve_format_info /
+         * lv_draw_eve5_upload_image_to_gpu already handle correctly: */
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_I4:
+        case LV_COLOR_FORMAT_I8:
+            return true;
+        /* AL88: no EVE equivalent and not handled by the upload mapping —
+         * declined here so the LVGL bin decoder + SW renderer can pick it up. */
+        default:
+            return false;
+    }
+}
+
+/* True if the LVGL bin body bytes are already in the EVE bitmap format that
+ * lv_draw_eve5_get_eve_format_info would map to, with no conversion required.
+ * Stride match is checked separately (see the caller). */
+static bool eve5_lvgl_bin_cf_direct_copy(lv_color_format_t lv_cf)
+{
+    switch(lv_cf) {
+        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_A1:
+        case LV_COLOR_FORMAT_A4:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+            return true;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+        case LV_COLOR_FORMAT_A2:           /* L2 from FT810+ (we're BT820) */
+        case LV_COLOR_FORMAT_ARGB2222:     /* ARGB2 on BT820+ */
+        case LV_COLOR_FORMAT_RGB888:       /* RGB8 on BT820+ */
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            return true;
+#endif
+        default:
+            return false;
+    }
+}
+
+/* Map an LVGL direct-copy CF to its EVE bitmap format. Called only for CFs
+ * eve5_lvgl_bin_cf_direct_copy returned true on. */
+static uint16_t eve5_lvgl_bin_cf_to_eve_format(lv_color_format_t lv_cf, bool * is_premul)
+{
+    switch(lv_cf) {
+        case LV_COLOR_FORMAT_L8:        return L8;
+        case LV_COLOR_FORMAT_A1:        return L1;
+        case LV_COLOR_FORMAT_A2:        return L2;
+        case LV_COLOR_FORMAT_A4:        return L4;
+        case LV_COLOR_FORMAT_A8:        return L8;
+        case LV_COLOR_FORMAT_RGB565:    return RGB565;
+        case LV_COLOR_FORMAT_ARGB1555:  return ARGB1555;
+        case LV_COLOR_FORMAT_ARGB4444:  return ARGB4;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+        case LV_COLOR_FORMAT_ARGB2222:  return ARGB2;
+        case LV_COLOR_FORMAT_RGB888:    return RGB8;
+        case LV_COLOR_FORMAT_ARGB8888:  return ARGB8;
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            *is_premul = true;
+            return ARGB8;
+#endif
+        default:                        return 0;  /* unreachable */
+    }
+}
+
+/* EVE bitmap stride for a CF and width — same formula as the upload uses
+ * (lv_draw_eve5_get_eve_format_info), 4-byte-aligned. The SD zero-copy path
+ * needs LVGL's on-disk stride to match this exactly. */
+static uint32_t eve5_lvgl_bin_eve_stride(lv_color_format_t lv_cf, uint32_t w)
+{
+    uint32_t bpp = lv_color_format_get_bpp(lv_cf);
+    return ((w * bpp + 7u) / 8u + 3u) & ~3u;
+}
+
+bool lv_draw_eve5_try_load_lvgl_bin_image(lv_draw_eve5_unit_t * u, const void * src,
+                                          uint32_t * ram_g_addr, uint16_t * eve_format,
+                                          int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
+                                          EVE_GpuHandle * out_handle, uint32_t * out_palette_addr,
+                                          lv_color_format_t * out_lv_cf,
+                                          bool * out_is_premultiplied)
+{
+    if(lv_image_src_get_type(src) != LV_IMAGE_SRC_FILE) return false;
+    const char * path = (const char *)src;
+    if(!eve5_has_extension(path, ".bin")) return false;
+
+    /* Header read before any chip ops. For an SD path lv_fs_read implicitly
+     * triggers ensure_file_loaded → the whole file lands in RAM_G; for a host
+     * path it just pulls bytes from disk. Either way we get the 12-byte
+     * lv_image_header_t into a host buffer. */
+    lv_fs_file_t file;
+    if(lv_fs_open(&file, path, LV_FS_MODE_RD) != LV_FS_RES_OK) {
+        LV_LOG_WARN("EVE5 bin: open failed: %s", path);
+        return false;
+    }
+
+    lv_image_header_t header;
+    uint32_t rn = 0;
+    if(lv_fs_read(&file, &header, sizeof(header), &rn) != LV_FS_RES_OK
+       || rn != sizeof(header)
+       || header.magic != LV_IMAGE_HEADER_MAGIC
+       || (header.flags & LV_IMAGE_FLAGS_COMPRESSED)
+       || !lv_draw_eve5_lvgl_bin_cf_supported((uint8_t)header.cf)) {
+        lv_fs_close(&file);
+        return false;
+    }
+
+    lv_color_format_t lv_cf = (lv_color_format_t)header.cf;
+    uint32_t w = header.w;
+    uint32_t h = header.h;
+    uint32_t lvgl_stride = header.stride;
+    bool is_premul = (header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) != 0
+                     || lv_cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+
+    if(w == 0 || h == 0 || lvgl_stride == 0) {
+        lv_fs_close(&file);
+        return false;
+    }
+
+    EVE_HalContext * phost = u->hal;
+    lv_display_t * disp = lv_eve5_disp_from_hal(phost);
+
+    /* SD ZERO-COPY PATH
+     * The SD FS driver's ensure_file_loaded has CMD_FSREAD'd the whole bin into
+     * RAM_G to satisfy our header read above. If the bin's CF is one whose
+     * body bytes are already in the target EVE format (direct copy) and the
+     * LVGL stride matches what get_eve_format_info would compute, we can
+     * steal that RAM_G allocation and point the bitmap source at
+     * `base + 12 + palette_bytes` — no host bounce, no second SD read, no
+     * format conversion. The 12-byte header sits unused at the start of the
+     * allocation (negligible waste). */
+#if LV_USE_FS_EVE5_SDCARD
+    if(lv_eve5_sdcard_is_path(path)
+       && eve5_lvgl_bin_cf_direct_copy(lv_cf)
+       && lvgl_stride == eve5_lvgl_bin_eve_stride(lv_cf, w)) {
+
+        EVE_GpuAlloc * steal_alloc = NULL;
+        EVE_GpuHandle steal_handle = GA_HANDLE_INVALID;
+        uint32_t steal_size = 0;
+        if(lv_eve5_sdcard_steal_ramg(file.file_d, &steal_alloc, &steal_handle, &steal_size)) {
+            lv_fs_close(&file);
+
+            bool premul_out = is_premul;
+            uint16_t fmt = eve5_lvgl_bin_cf_to_eve_format(lv_cf, &premul_out);
+
+#if LV_USE_OS
+            lv_eve5_hal_lock(disp);
+#endif
+            uint32_t base = EVE_GpuAlloc_Get(steal_alloc, steal_handle);
+#if LV_USE_OS
+            lv_eve5_hal_unlock(disp);
+#endif
+            if(base == GA_INVALID) {
+                EVE_GpuAlloc_Free(steal_alloc, steal_handle);
+                return false;
+            }
+
+            uint32_t palette_bytes = 0;  /* direct-copy list excludes indexed */
+            *ram_g_addr = base + sizeof(lv_image_header_t) + palette_bytes;
+            *eve_format = fmt;
+            *eve_stride = (int32_t)lvgl_stride;
+            *src_w = (int32_t)w;
+            *src_h = (int32_t)h;
+            if(out_handle) *out_handle = steal_handle;
+            if(out_palette_addr) {
+                *out_palette_addr = palette_bytes > 0 ? base + sizeof(lv_image_header_t) : GA_INVALID;
+            }
+            if(out_lv_cf) *out_lv_cf = lv_cf;
+            if(out_is_premultiplied) *out_is_premultiplied = premul_out;
+
+            LV_LOG_INFO("EVE5 bin: SD zero-copy %s (%ux%u lvcf=0x%02x → eve_fmt=%u stride=%u%s)",
+                        path, (unsigned)w, (unsigned)h, (unsigned)lv_cf,
+                        (unsigned)fmt, (unsigned)lvgl_stride, premul_out ? " premul" : "");
+            return true;
+        }
+        /* Steal failed (file already stolen or freed) — drop through to the
+         * host-buffer + upload path below, which will re-read the file. */
+    }
+#endif
+
+    /* GENERAL PATH — host buffer + upload machinery
+     * Route through lv_draw_eve5_upload_image_to_gpu so every CF the upload
+     * mapping handles (RGB565_SWAPPED byte swap, XRGB8888 X→A, RGB565A8 plane
+     * split, I1/I2/I4/I8 palette expansion, etc.) works without duplicating
+     * that conversion code here. */
+    uint32_t file_size = 0;
+    if(lv_fs_seek(&file, 0, LV_FS_SEEK_END) != LV_FS_RES_OK
+       || lv_fs_tell(&file, &file_size) != LV_FS_RES_OK
+       || file_size <= sizeof(header)
+       || lv_fs_seek(&file, sizeof(header), LV_FS_SEEK_SET) != LV_FS_RES_OK) {
+        lv_fs_close(&file);
+        return false;
+    }
+    uint32_t body_size = file_size - sizeof(header);
+
+    uint8_t * body = lv_malloc(body_size);
+    if(body == NULL) {
+        LV_LOG_WARN("EVE5 bin: host buffer alloc failed (%u bytes) for %s",
+                    (unsigned)body_size, path);
+        lv_fs_close(&file);
+        return false;
+    }
+
+    if(lv_fs_read(&file, body, body_size, &rn) != LV_FS_RES_OK || rn != body_size) {
+        LV_LOG_WARN("EVE5 bin: body read failed for %s", path);
+        lv_free(body);
+        lv_fs_close(&file);
+        return false;
+    }
+    lv_fs_close(&file);
+
+    /* Synthetic image dsc: upload only reads from data + header, never
+     * touches reserved / vram_res fields outside the attach step. */
+    lv_image_dsc_t synth;
+    lv_memzero(&synth, sizeof(synth));
+    synth.header = header;
+    synth.data = body;
+    synth.data_size = body_size;
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(disp);
+#endif
+    lv_eve5_vram_res_t * up_vr = lv_draw_eve5_upload_image_to_gpu(u, &synth);
+#if LV_USE_OS
+    lv_eve5_hal_unlock(disp);
+#endif
+
+    lv_free(body);
+
+    if(up_vr == NULL) {
+        LV_LOG_WARN("EVE5 bin: upload failed for %s (lvcf=0x%02x)",
+                    path, (unsigned)lv_cf);
+        return false;
+    }
+
+    /* Transfer the gpu_handle to the caller and free the upload's vram_res
+     * shell — decoder_open builds its own vram_res with the same handle. */
+    EVE_GpuHandle handle = up_vr->gpu_handle;
+    uint16_t eve_fmt = up_vr->eve_format;
+    uint32_t up_stride = up_vr->stride;
+    int32_t up_w = up_vr->width;
+    int32_t up_h = up_vr->height;
+    uint32_t up_src_off = up_vr->source_offset;
+    uint32_t up_pal_off = up_vr->palette_offset;
+    lv_free(up_vr);
+
+    uint32_t base = EVE_GpuAlloc_Get(u->allocator, handle);
+    if(base == GA_INVALID) {
+        EVE_GpuAlloc_Free(u->allocator, handle);
+        return false;
+    }
+
+    *ram_g_addr = base + up_src_off;
+    *eve_format = eve_fmt;
+    *eve_stride = (int32_t)up_stride;
+    *src_w = up_w;
+    *src_h = up_h;
+    if(out_handle) *out_handle = handle;
+    if(out_palette_addr) *out_palette_addr = (up_pal_off != GA_INVALID) ? base + up_pal_off : GA_INVALID;
+    if(out_lv_cf) *out_lv_cf = lv_cf;
+    if(out_is_premultiplied) *out_is_premultiplied = is_premul;
+
+    LV_LOG_INFO("EVE5 bin: upload %s (%ux%u lvcf=0x%02x → eve_fmt=%u stride=%u%s)",
+                path, (unsigned)up_w, (unsigned)up_h, (unsigned)lv_cf,
+                (unsigned)eve_fmt, (unsigned)up_stride, is_premul ? " premul" : "");
+    return true;
+}
+
+/**********************
  * ESDM SIDECAR LOADING
  *
  * A ".esdm" metadata sidecar lets a raw / deflate / relocatable-asset bitmap
@@ -944,6 +1252,34 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
     const char * ext = lv_fs_get_ext(fn);
     bool is_jpeg = (lv_strcmp(ext, "jpg") == 0) || (lv_strcmp(ext, "jpeg") == 0);
     bool is_png = (lv_strcmp(ext, "png") == 0);
+    bool is_bin = (lv_strcmp(ext, "bin") == 0);
+    if(is_bin) {
+        /* LVGL .bin: read the 12-byte header and claim it when we have a path
+         * (SD zero-copy / upload-machinery fallback) that can serve it. SD
+         * pre-loads the whole file as a side effect of the header read here —
+         * decoder_open does the same to set up steal_ramg or refill a host
+         * buffer (two SD reads for the same file in the worst case; the second
+         * one is the price for a stateless per-decoder dispatch). */
+        lv_fs_file_t bin_file;
+        if(lv_fs_open(&bin_file, fn, LV_FS_MODE_RD) != LV_FS_RES_OK) {
+            return LV_RESULT_INVALID;
+        }
+        lv_image_header_t bin_hdr;
+        uint32_t rn = 0;
+        bool ok = lv_fs_read(&bin_file, &bin_hdr, sizeof(bin_hdr), &rn) == LV_FS_RES_OK
+                  && rn == sizeof(bin_hdr)
+                  && bin_hdr.magic == LV_IMAGE_HEADER_MAGIC;
+        lv_fs_close(&bin_file);
+        if(!ok) return LV_RESULT_INVALID;
+        if(bin_hdr.flags & LV_IMAGE_FLAGS_COMPRESSED) return LV_RESULT_INVALID;
+        if(!lv_draw_eve5_lvgl_bin_cf_supported((uint8_t)bin_hdr.cf)) return LV_RESULT_INVALID;
+        header->cf = bin_hdr.cf;
+        header->w = bin_hdr.w;
+        header->h = bin_hdr.h;
+        header->stride = bin_hdr.stride;
+        header->flags = bin_hdr.flags;
+        return LV_RESULT_OK;
+    }
     if(!is_jpeg && !is_png) {
         /* Non-image extension: accept it only if a usable ".esdm" sidecar
          * describes a raw/deflate/asset bitmap. Image-compressed sidecars
@@ -1044,6 +1380,7 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
 
     bool is_jpeg, is_png;
     bool is_image_ext = eve5_is_jpeg_or_png(path, &is_jpeg, &is_png);
+    bool is_bin_ext = eve5_has_extension(path, ".bin");
 
     uint32_t ram_g_addr = GA_INVALID, palette_addr = GA_INVALID;
     /* Initial format placeholder; the chosen loader fills in the actual EVE
@@ -1056,8 +1393,23 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     int32_t eve_stride = 0, src_w = 0, src_h = 0;
     EVE_GpuHandle handle = GA_HANDLE_INVALID;
     bool loaded = false;
+    /* Overrides populated only by the .bin loader. UNKNOWN means: fall back to
+     * eve_format_to_lv_cf inference (the EVE-native label) for the cache CF
+     * and leave is_premultiplied / sample_as_luminance at the chip-default
+     * (false). */
+    lv_color_format_t bin_lv_cf = LV_COLOR_FORMAT_UNKNOWN;
+    bool bin_is_premultiplied = false;
 
-    if(!is_image_ext) {
+    if(is_bin_ext) {
+        /* LVGL .bin → direct RAM_G stream in the declared EVE-native format,
+         * bypassing LVGL's bin decoder entirely. Lets us validate EVE5 against
+         * the SW reference renderer on the same files (toggle LV_USE_DRAW_EVE5
+         * in the demo's main.c to unregister the EVE5 decoder + draw unit). */
+        loaded = lv_draw_eve5_try_load_lvgl_bin_image(u, dsc->src, &ram_g_addr, &eve_format,
+                                                     &eve_stride, &src_w, &src_h, &handle, &palette_addr,
+                                                     &bin_lv_cf, &bin_is_premultiplied);
+    }
+    else if(!is_image_ext) {
         /* Non-image extension: a ".esdm" sidecar drives a direct raw / deflate /
          * asset load in the bitmap's native EVE format (SD card and host both
          * handled, SD bypassing the LVGL filesystem driver). */
@@ -1166,17 +1518,21 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     vr->height = src_h;
     vr->source_offset = source_offset;
     vr->palette_offset = pal_offset;
-    vr->is_premultiplied = false;
+    /* HW-decoded L# is alpha (LVGL A#); only the .bin loader can carry an
+     * explicit luminance / premultiplied declaration through, and only when
+     * the source said so. Everything else stays at the chip-native default. */
+    vr->is_premultiplied = bin_is_premultiplied;
+    vr->sample_as_luminance = (bin_lv_cf == LV_COLOR_FORMAT_L8);
     vr->has_content = true;
-    /* EVE-produced L# buffers (HW PNG/JPEG decode of grayscale, palette
-     * promotion above) are reported back to LVGL as A# — EVE's L# sampling
-     * IS alpha. No swizzle needed; sample_as_luminance is reserved for LVGL
-     * sources that explicitly declared LV_COLOR_FORMAT_L8 luminance semantics
-     * (see the upload path). */
-    vr->sample_as_luminance = false;
     /* is_swapchain stays zero — only the driver-owned full_buf vr sets it. */
 
-    lv_color_format_t lv_cf = eve_format_to_lv_cf(eve_format);
+    /* For .bin sources, the user picked the LVGL CF — preserve that intent so
+     * widget code that switches on header.cf (e.g. A# vs L8) sees the
+     * authored format. For HW-decoded JPEG/PNG/ESDM the EVE format is the
+     * source of truth and we map it back honestly via eve_format_to_lv_cf. */
+    lv_color_format_t lv_cf = (bin_lv_cf != LV_COLOR_FORMAT_UNKNOWN)
+                              ? bin_lv_cf
+                              : eve_format_to_lv_cf(eve_format);
     lv_draw_buf_t * decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     if(decoded == NULL) {
         lv_free(vr);

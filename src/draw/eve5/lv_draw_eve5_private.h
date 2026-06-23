@@ -744,6 +744,34 @@ bool lv_draw_eve5_try_load_esdm_image(lv_draw_eve5_unit_t * u, const void * src,
                                       uint32_t * ram_g_addr, uint16_t * eve_format,
                                       int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
                                       EVE_GpuHandle *out_handle, uint32_t * out_palette_addr);
+/* Load an LVGL `.bin` image to RAM_G. Two paths:
+ *  - SD bins whose CF is direct-copy (LVGL body bytes already match the EVE
+ *    bitmap format) and whose LVGL stride matches the EVE-computed stride:
+ *    the SD FS driver's pre-load already put the whole file in RAM_G, so we
+ *    steal that allocation via lv_eve5_sdcard_steal_ramg and aim the bitmap
+ *    source at `base + 12 + palette_bytes`. Zero host bounce, no second SD
+ *    read. The 12-byte header sits unused at the start of the allocation.
+ *  - Everything else (non-SD paths, conversion-required CFs, stride mismatch,
+ *    or a failed steal): the body is read into a host buffer and handed to
+ *    lv_draw_eve5_upload_image_to_gpu via a synthetic lv_image_dsc_t. That
+ *    reuses every per-CF conversion the upload mapping already implements
+ *    (RGB565_SWAPPED byte swap, XRGB8888 X→A, RGB565A8 plane split, I1/I2/I4
+ *    palette expansion to PALETTEDARGB8, etc.).
+ *
+ * Bypasses LVGL's bin decoder entirely on the EVE5 path — works regardless
+ * of LV_BIN_DECODER_RAM_LOAD. The caller (decoder_open) builds vram_res
+ * around the returned gpu_handle, threading @p *out_lv_cf and
+ * @p *out_is_premultiplied through. */
+bool lv_draw_eve5_try_load_lvgl_bin_image(lv_draw_eve5_unit_t * u, const void * src,
+                                          uint32_t * ram_g_addr, uint16_t * eve_format,
+                                          int32_t * eve_stride, int32_t * src_w, int32_t * src_h,
+                                          EVE_GpuHandle *out_handle, uint32_t * out_palette_addr,
+                                          lv_color_format_t * out_lv_cf,
+                                          bool * out_is_premultiplied);
+/* Returns true if the LVGL color format code can be loaded by
+ * lv_draw_eve5_try_load_lvgl_bin_image on the current chip. Used by
+ * decoder_info to claim or decline .bin files before any I/O. */
+bool lv_draw_eve5_lvgl_bin_cf_supported(uint8_t lv_cf);
 #endif
 #if LV_USE_FS_EVE5_SDCARD
 bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * src,
