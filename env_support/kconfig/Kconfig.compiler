@@ -1,0 +1,56 @@
+config LV_BIG_ENDIAN_SYSTEM
+	bool "For big endian systems set to 1"
+	help
+		For big endian systems set to 1
+
+config LV_ATTRIBUTE_MEM_ALIGN
+	string "Alignment attribute"
+	default ""
+	help
+        	Added where memory needs to be aligned. With -Os, data might not be
+		aligned to the required boundary by default.
+		E.g. __attribute__((aligned(4)))
+
+config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+	bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
+	help
+		Set this option to configure IRAM as LV_ATTRIBUTE_FAST_MEM
+
+config LV_ATTRIBUTE_TICK_INC
+	string "Custom attribute for the lv_tick_inc function"
+	default ""
+
+config LV_ATTRIBUTE_TIMER_HANDLER
+	string "Custom attribute for the lv_timer_handler function"
+	default ""
+
+config LV_ATTRIBUTE_FLUSH_READY
+	string "Custom attribute for the lv_display_flush_ready function"
+	default ""
+
+config LV_ATTRIBUTE_SYNC_READY
+	string "Custom attribute for the lv_display_sync_ready function"
+	default ""
+
+config LV_ATTRIBUTE_LARGE_CONST
+	string "Attribute to mark large constant arrays, e.g. for font bitmaps"
+	default ""
+
+config LV_ATTRIBUTE_LARGE_RAM_ARRAY
+	string "Compiler prefix for a large array declaration in RAM"
+	default ""
+
+config LV_ATTRIBUTE_FAST_MEM
+	string "Place performance critical functions into a faster memory (e.g. RAM)"
+	default ""
+
+config LV_ATTRIBUTE_EXTERN_DATA
+	string "Prefix all global extern data with this"
+	default ""
+
+config LV_EXPORT_CONST_INT
+	string "Body of the LV_EXPORT_CONST_INT(int_value) macro"
+	default "struct _silence_gcc_warning"
+	help
+		Used to export LV_<CONST> integer constants to bindings
+		such as MicroPython. The default just prevents a GCC warning.
