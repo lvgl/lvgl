@@ -3,8 +3,12 @@
  *
  * EVE5 (BT820) Image Private Utilities
  *
- * Image header parsing, file extension checking, and EVE bitmap format
- * queries. Shared between the EVE5 draw unit and display/filesystem drivers.
+ * File extension check, EVE bitmap format BPP, and `.esdm` metadata sidecar
+ * parsing. Shared between the EVE5 draw unit and display/filesystem drivers.
+ *
+ * Image header parsing and sizing has moved to eve_extras' EVE_ResourceProbe /
+ * EVE_ResourceQuery — those handle JPEG / PNG / AVI / RELOC uniformly with
+ * chip-aware format prediction, and the LVGL driver drives them directly.
  *
  * Copyright (C) 2025-2026  Bridgetek Pte Ltd
  * Author: Jan Boon <jan.boon@kaetemi.be>
@@ -25,18 +29,6 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-
-/**********************
- * IMAGE HEADER PARSING
- **********************/
-
-/** Parse JPEG header to extract image dimensions (SOF0/SOF2 markers). */
-bool eve5_parse_jpeg_dimensions(const uint8_t * data, uint32_t size,
-                                uint32_t * width, uint32_t * height);
-
-/** Parse PNG IHDR chunk to extract image dimensions. */
-bool eve5_parse_png_dimensions(const uint8_t * data, uint32_t size,
-                               uint32_t * width, uint32_t * height);
 
 /**********************
  * FILE EXTENSION CHECK

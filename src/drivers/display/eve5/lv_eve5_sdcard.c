@@ -23,6 +23,8 @@
 #include "EVE_CoCmd_Ext.h"
 #include "EVE_MediaFifo.h"
 #include "EVE_GpuAlloc.h"
+#include "EVE_ResourceProbe.h"
+#include "EVE_ResourceQuery.h"
 
 /*********************
  *      DEFINES
@@ -73,6 +75,15 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 
 static bool ensure_sd_attached(eve5_sdcard_ctx_t * ctx);
 static bool ensure_file_loaded(eve5_sdcard_ctx_t * ctx, eve5_file_t * file);
+
+/* Hook EVE_queryResource_fs's fault recovery into the driver's narrow
+ * coprocessor reset (which also retires deferred frees and invalidates the
+ * draw unit's bitmap-handle bindings). */
+static void sdcard_query_reset_cb(EVE_HalContext * phost, void * userdata)
+{
+    (void)phost;
+    lv_eve5_reset_coprocessor((lv_display_t *)userdata);
+}
 
 /**********************
  *  STATIC VARIABLES
@@ -717,27 +728,25 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     if(path == NULL || handle == NULL || width == NULL || height == NULL || format == NULL) {
         return false;
     }
-
     if(s_ctx.hal == NULL || s_ctx.alloc == NULL) {
         LV_LOG_ERROR("EVE5 SD card driver not initialized");
         return false;
     }
 
-    bool is_jpeg = eve5_has_extension(path, ".jpg") || eve5_has_extension(path, ".jpeg");
-    bool is_png = eve5_has_extension(path, ".png");
-    if(!is_jpeg && !is_png) {
+    bool is_jpeg, is_png;
+    if(!eve5_is_jpeg_or_png(path, &is_jpeg, &is_png)) {
         LV_LOG_WARN("Unsupported image format (not JPEG/PNG): %s", path);
         return false;
     }
 
-    /* Skip drive letter prefix for SD card commands */
+    /* Strip drive letter for the coprocessor FS commands */
     const char * sd_path = path;
     if(path[1] == ':' && (path[2] == '/' || path[2] == '\\')) {
         sd_path = path + 2;
     }
 
-    EVE_HalContext *phost = s_ctx.hal;
-    EVE_GpuAlloc *alloc = s_ctx.alloc;
+    EVE_HalContext * phost = s_ctx.hal;
+    EVE_GpuAlloc * alloc = s_ctx.alloc;
 
 #if LV_USE_OS
     lv_eve5_hal_lock(s_ctx.disp);
@@ -751,141 +760,68 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
         return false;
     }
 
-    /* OPT_TRUECOLOR is BT820-only — defaults to RGB565/ARGB4 on earlier gens. */
-    uint32_t loadimage_opts = OPT_NODL;
-    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
+    /* Pass OPT_TRUECOLOR so the chip predicts the same decoded format it will
+     * produce at load time (ARGB8 / RGB8 / PALETTEDARGB8 instead of the
+     * default RGB565 / ARGB4). The query then reports the exact RAM_G
+     * allocation we need. */
+    uint32_t opts = OPT_TRUECOLOR;
 
-    EVE_GpuHandle final_handle;
-    uint32_t final_addr;
-    uint32_t allocated_size;
-    /* Post-load metadata, populated by each branch via CMD_GETIMAGE. */
-    uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
-
-#if EVE_COCMD_PATCH_QUERY
-    /* Zero-copy fast path: CMD_QUERYIMAGE reports the image dimensions
-     * without writing to RAM_G, replacing the host-side JPEG/PNG header
-     * parse. CMD_LOADIMAGE(OPT_FS) then decodes straight from the SD card
-     * into the destination — no intermediate compressed buffer, no
-     * MediaFIFO setup. We still allocate worst-case ARGB8 from the
-     * queried w/h because the query does not honor OPT_TRUECOLOR (only
-     * w/h are reliable); the post-load CMD_GETIMAGE truncate trims slack.
-     * The is_jpeg/is_png check above already gated this to formats
-     * CMD_QUERYIMAGE supports. */
-    LV_UNUSED(is_png);
-    LV_UNUSED(is_jpeg);
-
-    /* Only w/h from CMD_QUERYIMAGE are reliable. The query does not honor
-     * OPT_TRUECOLOR (and likely other format-affecting options), so its
-     * reported byte size / format / palette size can differ from what
-     * CMD_LOADIMAGE will actually produce. We use the queried dimensions
-     * to allocate worst-case ARGB8; the post-load CMD_GETIMAGE (folded
-     * into loadImage_fs via out_* outputs) returns the actual format and
-     * lets the truncate step below trim any slack.
-     * Pre-flush + SuppressErrorOverlay isolate any fault to this scan. */
-    if(!EVE_Cmd_waitFlush(phost)) {
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-    phost->SuppressErrorOverlay = true;
-
-    uint32_t q_w = 0, q_h = 0, q_size = 0, q_fmt = 0, q_palette = 0;
-    uint32_t q_res = EVE_CoCmd_queryImage_fs(phost, sd_path, 0,
-                                             &q_size, &q_fmt, &q_w, &q_h, &q_palette);
-    LV_LOG_USER("EVE5 SD QUERYIMAGE %s -> res=%u size=%u fmt=%u w=%u h=%u palette=%u",
-                sd_path, (unsigned)q_res, (unsigned)q_size, (unsigned)q_fmt,
-                (unsigned)q_w, (unsigned)q_h, (unsigned)q_palette);
-    if(q_res != 0) {
-        LV_LOG_ERROR("CMD_QUERYIMAGE failed for %s (code %u)", sd_path, (unsigned)q_res);
-        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-    if(q_w == 0 || q_h == 0) {
-        LV_LOG_ERROR("Implausible CMD_QUERYIMAGE result for %s (w=%u h=%u)",
-                     sd_path, (unsigned)q_w, (unsigned)q_h);
-        phost->SuppressErrorOverlay = false;
+    /* Query: dimensions, exact decoded size, EVE bitmap format, palette size.
+     * preferCmd=true picks CMD_QUERYIMAGE_fs on BT820+ with the patch_queryassets
+     * firmware (zero RAM_G round-trip); otherwise the query stages the file via
+     * CMD_FSREAD into RAM_G and drives EVE_probeResource on the bytes. When the
+     * SW fallback runs the staging handle is handed back so we can reuse the
+     * compressed bytes for the CMD_LOADIMAGE pass via OPT_MEDIAFIFO — no
+     * second SD read. */
+    EVE_ResourceInfo info;
+    EVE_GpuHandle staging = GA_HANDLE_INVALID;
+    uint32_t staging_size = 0;
+    if(!EVE_queryResource_fs(phost, alloc, sd_path, opts, /*preferCmd*/ true,
+                             sdcard_query_reset_cb, s_ctx.disp,
+                             &staging, &staging_size, &info)) {
+        LV_LOG_WARN("EVE5 SD: queryResource failed for %s", path);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
 
-    /* DEBUG: mandatory reset after every successful CMD_QUERYIMAGE — testing
-     * whether the residual firmware state from the patched query is what
-     * poisons later coprocessor work. The subsequent CMD_LOADIMAGE_fs reissues
-     * its own CMD_FSSOURCE so resetting between them is safe. */
-    LV_LOG_USER("EVE5 SD QUERYIMAGE %s: mandatory reset after query", sd_path);
-    phost->SuppressErrorOverlay = false;
-    lv_eve5_reset_coprocessor(s_ctx.disp);
-    phost->SuppressErrorOverlay = true;
+    if(info.Type != EVE_RESOURCE_JPEG && info.Type != EVE_RESOURCE_PNG) {
+        LV_LOG_WARN("EVE5 SD: %s isn't a JPEG/PNG (type=%u)", path, (unsigned)info.Type);
+        if(staging.Id != GA_HANDLE_INVALID.Id) EVE_GpuAlloc_Free(alloc, staging);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
 
-    /* Worst-case decoded size: ARGB8 (4 bpp), or for PALETTEDARGB8 a
-     * 1024-byte palette plus w*h indices — larger for images under
-     * ~342 pixels. Matches the legacy path's allocation strategy. */
-    allocated_size = q_w * 4u * q_h;
-    uint32_t paletted_size = 256u * 4u + q_w * q_h;
-    if(paletted_size > allocated_size) allocated_size = paletted_size;
+    if(!(info.Flags & EVE_RESOURCE_FLAG_HARDWARE_LOADABLE)) {
+        LV_LOG_INFO("EVE5 SD: %s not HW-decodable on this chip", path);
+        if(staging.Id != GA_HANDLE_INVALID.Id) EVE_GpuAlloc_Free(alloc, staging);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
 
     /* GC-flagged: decoded images self-heal through the decoder cache when
-     * the handle goes invalid (pressure eviction; SD commands are BT820+) */
-    final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4 | GA_GC_FLAG);
-    final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
+     * the handle goes invalid (pressure eviction; SD commands are BT820+). */
+    EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, info.Size, GA_ALIGN_4 | GA_GC_FLAG);
+    uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
     if(final_addr == GA_INVALID) {
-        LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
-        phost->SuppressErrorOverlay = false;
+        LV_LOG_ERROR("EVE5 SD: failed to allocate %u bytes for %s", (unsigned)info.Size, path);
+        if(staging.Id != GA_HANDLE_INVALID.Id) EVE_GpuAlloc_Free(alloc, staging);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
 
-    /* Re-flush so CMD_LOADIMAGE's fault (if any) is also isolated from the
-     * preceding query, not lumped with it. */
+    /* Pre-flush + SuppressErrorOverlay isolate a CMD_LOADIMAGE fault to this
+     * attempt so lv_eve5_reset_coprocessor can recover narrowly. */
     if(!EVE_Cmd_waitFlush(phost)) {
         EVE_GpuAlloc_Free(alloc, final_handle);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    uint32_t load_res = EVE_CoCmd_loadImage_fs(phost, final_addr, sd_path, loadimage_opts,
-                                               &out_fmt, &out_source, &out_w, &out_h, &out_palette);
-    LV_LOG_USER("EVE5 SD LOADIMAGE %s -> res=%u alloc_base=0x%08X opts=0x%08X "
-                "source=0x%08X fmt=%u w=%u h=%u palette=0x%08X",
-                sd_path, (unsigned)load_res, (unsigned)final_addr, (unsigned)loadimage_opts,
-                (unsigned)out_source, (unsigned)out_fmt, (unsigned)out_w, (unsigned)out_h,
-                (unsigned)out_palette);
-    if(load_res != 0) {
-        LV_LOG_ERROR("CMD_LOADIMAGE failed for %s (code %u)", sd_path, (unsigned)load_res);
-        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
-        EVE_GpuAlloc_Free(alloc, final_handle);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-    phost->SuppressErrorOverlay = false;
-
-#else  /* EVE_COCMD_PATCH_QUERY */
-
-    /* Legacy intermediate-buffer path: CMD_FSREAD the whole compressed
-     * file into a temp RAM_G slot, host-parse the header for dimensions,
-     * allocate worst-case decoded buffer, then CMD_LOADIMAGE(OPT_MEDIAFIFO).
-     * Use EVE_COCMD_PATCH_QUERY=1 for the zero-copy CMD_QUERYIMAGE path. */
-    LV_LOG_WARN("EVE5 SD image load uses intermediate RAM_G buffer "
-                "(define EVE_COCMD_PATCH_QUERY=1 for zero-copy CMD_QUERYIMAGE path)");
-
-    /* Pre-flush + SuppressErrorOverlay isolate CMD_FSSIZE / CMD_FSREAD
-     * faults so lv_eve5_reset_coprocessor can recover narrowly. */
-    if(!EVE_Cmd_waitFlush(phost)) {
+        if(staging.Id != GA_HANDLE_INVALID.Id) EVE_GpuAlloc_Free(alloc, staging);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -893,243 +829,72 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     }
     phost->SuppressErrorOverlay = true;
 
-    uint32_t file_size = EVE_CoCmd_fsSize(phost, sd_path);
-    if(file_size == 0xFFFFFFFF || file_size == 0) {
-        LV_LOG_ERROR("File not found or empty: %s", sd_path);
-        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
+    bool load_ok = false;
+    uint32_t loadimage_opts = OPT_NODL | opts;
+
+    if(staging.Id == GA_HANDLE_INVALID.Id) {
+        /* CMD path was taken by the query (BT820+ patched firmware) — load
+         * directly from SD via CMD_LOADIMAGE_fs. No intermediate buffer. */
+#if EVE_COCMD_PATCH_QUERY
+        uint32_t r = EVE_CoCmd_loadImage_fs(phost, final_addr, sd_path, loadimage_opts,
+                                            NULL, NULL, NULL, NULL, NULL);
+        load_ok = (r == 0);
 #endif
-        return false;
-    }
-
-    /* Allocate temporary space for compressed file.
-     * CMD_FSREAD requires 32-byte alignment, MEDIAFIFO requires 4-byte size alignment. */
-    uint32_t fifo_size = (file_size + 3) & ~3U;
-    EVE_GpuHandle temp_handle = EVE_GpuAlloc_AlignedAlloc(alloc, fifo_size, 0, 32);
-    uint32_t temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
-    if(temp_addr == GA_INVALID) {
-        LV_LOG_ERROR("Failed to allocate temporary RAM_G for compressed file (%u bytes)", fifo_size);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    uint32_t result = EVE_CoCmd_fsRead(phost, temp_addr, sd_path);
-    if(result != 0) {
-        LV_LOG_ERROR("CMD_FSREAD failed with code %u: %s", result, sd_path);
-        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
-        EVE_GpuAlloc_Free(alloc, temp_handle);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    /* Parse header for dimensions */
-    uint8_t header_buf[1024];
-    uint32_t header_size = file_size < sizeof(header_buf) ? file_size : sizeof(header_buf);
-    temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
-    EVE_Hal_rdMem(phost, header_buf, temp_addr, header_size);
-
-    uint32_t img_width = 0, img_height = 0;
-    bool parsed;
-    if(is_jpeg) {
-        parsed = eve5_parse_jpeg_dimensions(header_buf, header_size, &img_width, &img_height);
     }
     else {
-        parsed = eve5_parse_png_dimensions(header_buf, header_size, &img_width, &img_height);
+        /* SW query path: the staging buffer holds the compressed file. Re-publish
+         * it as a MediaFIFO so CMD_LOADIMAGE decodes directly into the
+         * destination — no second SD read. */
+        uint32_t staging_addr = EVE_GpuAlloc_Get(alloc, staging);
+        if(staging_addr != GA_INVALID) {
+            uint32_t fifo_size = (staging_size + 3u) & ~3u;
+            EVE_MediaFifo_close(phost);
+            if(EVE_MediaFifo_set(phost, staging_addr, fifo_size)) {
+                EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, staging_size);
+                EVE_CoCmd_loadImage(phost, final_addr, OPT_MEDIAFIFO | loadimage_opts);
+                load_ok = EVE_Cmd_waitFlush(phost);
+                EVE_MediaFifo_close(phost);
+            }
+        }
+        EVE_GpuAlloc_Free(alloc, staging);
     }
 
-    if(!parsed || img_width == 0 || img_height == 0) {
-        LV_LOG_ERROR("Failed to parse image header: %s", path);
-        EVE_GpuAlloc_Free(alloc, temp_handle);
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    /* Worst case decoded size: ARGB8 (4 bpp), or for PALETTEDARGB8 a
-     * 1024-byte palette plus w*h indices — larger for images under
-     * ~342 pixels. */
-    allocated_size = img_width * 4 * img_height;
-    uint32_t paletted_size = 256 * 4 + img_width * img_height;
-    if(paletted_size > allocated_size) allocated_size = paletted_size;
-
-    /* GC-flagged: decoded images self-heal through the decoder cache when
-     * the handle goes invalid (pressure eviction; SD commands are BT820+) */
-    final_handle = EVE_GpuAlloc_Alloc(alloc, allocated_size, GA_ALIGN_4 | GA_GC_FLAG);
-    final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
-    if(final_addr == GA_INVALID) {
-        LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", allocated_size);
-        EVE_GpuAlloc_Free(alloc, temp_handle);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    EVE_MediaFifo_close(phost);
-
-    temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
-    if(!EVE_MediaFifo_set(phost, temp_addr, fifo_size)) {
-        LV_LOG_ERROR("Failed to set up media FIFO");
-        EVE_GpuAlloc_Free(alloc, final_handle);
-        EVE_GpuAlloc_Free(alloc, temp_handle);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-    /* Data already in RAM_G from CMD_FSREAD, just set write pointer */
-    EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
-
-    /* Re-flush so the CMD_LOADIMAGE fault (if any) is isolated from the
-     * FSREAD/MediaFifo setup. */
-    if(!EVE_Cmd_waitFlush(phost)) {
-        EVE_MediaFifo_close(phost);
-        EVE_GpuAlloc_Free(alloc, final_handle);
-        EVE_GpuAlloc_Free(alloc, temp_handle);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    EVE_CoCmd_loadImage(phost, final_addr, OPT_MEDIAFIFO | loadimage_opts);
-    if(!EVE_Cmd_waitFlush(phost)) {
-        LV_LOG_ERROR("CMD_LOADIMAGE failed");
+    if(!load_ok) {
+        LV_LOG_ERROR("EVE5 SD: CMD_LOADIMAGE failed for %s", path);
         if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
-        EVE_MediaFifo_close(phost);
-        EVE_GpuAlloc_Free(alloc, final_handle);
-        EVE_GpuAlloc_Free(alloc, temp_handle);
         phost->SuppressErrorOverlay = false;
+        EVE_GpuAlloc_Free(alloc, final_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
     phost->SuppressErrorOverlay = false;
-
-    EVE_MediaFifo_close(phost);
-    EVE_GpuAlloc_Free(alloc, temp_handle);
-
-    /* CMD_GETIMAGE reads the decoded image's actual source/format/dims.
-     * (The wrapper-based patch path above folds this into loadImage_fs.) */
-    EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
-
-#endif /* EVE_COCMD_PATCH_QUERY */
-
     EVE_Hal_requestFenceBeforeSwap(phost);
-
-    /* Compute offsets from allocation base */
-    uint32_t alloc_base = EVE_GpuAlloc_Get(alloc, final_handle);
-    uint32_t img_ofs = (out_source >= alloc_base) ? (out_source - alloc_base) : 0;
-    uint32_t pal_ofs = GA_INVALID;
-    if(out_fmt == PALETTEDARGB8 && out_palette >= alloc_base) {
-        pal_ofs = out_palette - alloc_base;
-    }
-
-    /* Trim allocation to actual decoded size */
-    int32_t bpp = eve5_format_bpp(out_fmt);
-    uint32_t index_size = out_w * (uint32_t)bpp * out_h;
-    uint32_t img_end = img_ofs + index_size;
-    uint32_t pal_end = (pal_ofs != GA_INVALID) ? (pal_ofs + 256 * 4) : 0;
-    uint32_t actual_size = img_end > pal_end ? img_end : pal_end;
-    LV_LOG_USER("EVE5 SD POSTLOAD %s img_ofs=%u pal_ofs=0x%08X bpp=%d "
-                "stride=%u index_size=%u actual_size=%u allocated_size=%u trim=%d",
-                path, (unsigned)img_ofs, (unsigned)pal_ofs, (int)bpp,
-                (unsigned)(out_w * (uint32_t)bpp), (unsigned)index_size,
-                (unsigned)actual_size, (unsigned)allocated_size,
-                (int)(actual_size < allocated_size));
-    if(actual_size < allocated_size) {
-        EVE_GpuAlloc_Truncate(alloc, final_handle, actual_size);
-    }
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(s_ctx.disp);
 #endif
 
+    /* BT820 paletted layout is palette-front: palette (PaletteSize bytes) at
+     * base+0, decoded bitmap at base+PaletteSize. PaletteSize == 0 for
+     * non-paletted formats (RGB8 / ARGB8 / RGB565 / L8 / ...). */
     *handle = final_handle;
-    *width = out_w;
-    *height = out_h;
-    *format = out_fmt;
-    if(image_offset) *image_offset = img_ofs;
-    if(palette_offset) *palette_offset = pal_ofs;
+    *width = info.Width;
+    *height = info.Height;
+    *format = info.Format;
+    if(image_offset) *image_offset = info.PaletteSize;
+    if(palette_offset) *palette_offset = (info.PaletteSize > 0) ? 0u : GA_INVALID;
 
-    LV_LOG_INFO("Loaded image: %s (%ux%u, format=%u)", path, out_w, out_h, out_fmt);
+    LV_LOG_INFO("EVE5 SD: loaded %s (%ux%u fmt=%u size=%u palette=%u)",
+                path, (unsigned)info.Width, (unsigned)info.Height,
+                (unsigned)info.Format, (unsigned)info.Size, (unsigned)info.PaletteSize);
     return true;
 }
 
 EVE_GpuAlloc * lv_eve5_sdcard_get_allocator(void)
 {
     return s_ctx.alloc;
-}
-
-bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32_t * height)
-{
-#if !EVE_COCMD_PATCH_QUERY
-    LV_UNUSED(path);
-    LV_UNUSED(width);
-    LV_UNUSED(height);
-    return false;
-#else
-    if(path == NULL || width == NULL || height == NULL) return false;
-    if(s_ctx.hal == NULL) return false;
-
-    /* Strip drive letter prefix for SD card commands */
-    const char * sd_path = path;
-    if(path[1] == ':' && (path[2] == '/' || path[2] == '\\')) {
-        sd_path = path + 2;
-    }
-
-    EVE_HalContext * phost = s_ctx.hal;
-    bool ok = false;
-    uint32_t qw = 0, qh = 0;
-
-#if LV_USE_OS
-    lv_eve5_hal_lock(s_ctx.disp);
-#endif
-
-    /* Pre-flush + SuppressErrorOverlay isolate a CMD_QUERYIMAGE fault
-     * (corrupt JPEG/PNG header, etc.) to this attempt. */
-    if(ensure_sd_attached(&s_ctx) && EVE_Cmd_waitFlush(phost)) {
-        phost->SuppressErrorOverlay = true;
-        uint32_t r = EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &qw, &qh, NULL);
-        bool faulted = phost->CmdFault;
-        LV_LOG_USER("EVE5 SD QUERY_DIMS %s -> r=%u w=%u h=%u fault=%d",
-                    sd_path, (unsigned)r, (unsigned)qw, (unsigned)qh, (int)faulted);
-        if(r == 0 && qw != 0 && qh != 0) {
-            ok = true;
-        }
-        phost->SuppressErrorOverlay = false;
-
-        /* DEBUG: mandatory reset after every CMD_QUERYIMAGE — testing whether
-         * the residual firmware state from the patched query is what poisons
-         * later coprocessor work, regardless of whether the query reported
-         * a fault. Probes residual decoder state that survives query exit. */
-        LV_LOG_USER("EVE5 SD QUERY_DIMS %s: mandatory reset after query", sd_path);
-        lv_eve5_reset_coprocessor(s_ctx.disp);
-    }
-
-#if LV_USE_OS
-    lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-
-    if(ok) {
-        *width = qw;
-        *height = qh;
-    }
-    return ok;
-#endif
 }
 
 /**********************
@@ -1343,12 +1108,6 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
 {
     (void)path; (void)handle; (void)width; (void)height;
     (void)format; (void)image_offset; (void)palette_offset;
-    return false;
-}
-
-bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32_t * height)
-{
-    (void)path; (void)width; (void)height;
     return false;
 }
 

@@ -22,6 +22,8 @@
 
 #include "../lv_image_decoder_private.h"
 #include "../../misc/cache/instance/lv_image_header_cache.h"
+#include "EVE_ResourceProbe.h"
+#include "EVE_ResourceQuery.h"
 #if LV_USE_FS_EVE5_SDCARD
     #include "../../drivers/display/eve5/lv_eve5_sdcard.h"
 #endif
@@ -187,81 +189,82 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     }
 #endif
 
-    bool is_jpeg = eve5_has_extension(path, ".jpg") || eve5_has_extension(path, ".jpeg");
-    bool is_png = eve5_has_extension(path, ".png");
-    if(!is_jpeg && !is_png) {
+    bool is_jpeg, is_png;
+    if(!eve5_is_jpeg_or_png(path, &is_jpeg, &is_png)) {
         return false;
     }
+    LV_UNUSED(is_jpeg);
+    LV_UNUSED(is_png);
+
+    EVE_HalContext * phost = u->hal;
 
     lv_fs_file_t file;
-    lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_RD);
-    if(res != LV_FS_RES_OK) {
+    if(lv_fs_open(&file, path, LV_FS_MODE_RD) != LV_FS_RES_OK) {
         LV_LOG_WARN("EVE5: Failed to open file: %s", path);
         return false;
     }
 
-    /* Read header for dimension parsing */
-    uint8_t header_buf[1024];
-    uint32_t header_read = 0;
-    res = lv_fs_read(&file, header_buf, sizeof(header_buf), &header_read);
-    if(res != LV_FS_RES_OK || header_read < 24) {
-        LV_LOG_WARN("EVE5: Failed to read file header: %s", path);
+    /* Discover file size up front: we need it for the RAM_G staging buffer
+     * and to bound the probe loop. */
+    uint32_t file_size = 0;
+    if(lv_fs_seek(&file, 0, LV_FS_SEEK_END) != LV_FS_RES_OK
+       || lv_fs_tell(&file, &file_size) != LV_FS_RES_OK
+       || file_size == 0
+       || lv_fs_seek(&file, 0, LV_FS_SEEK_SET) != LV_FS_RES_OK) {
+        LV_LOG_WARN("EVE5: file size discovery failed for %s", path);
         lv_fs_close(&file);
         return false;
     }
 
-    uint32_t img_w = 0, img_h = 0;
-    bool parsed;
-    if(is_jpeg) {
-        parsed = eve5_parse_jpeg_dimensions(header_buf, header_read, &img_w, &img_h);
+    /* Probe the header: exact decoded size, EVE bitmap format, palette size,
+     * and HARDWARE_LOADABLE gate. The probe is incremental — feed chunks
+     * until it returns done (1) or invalid (-1). Most JPEG/PNG headers
+     * complete on the first chunk; indexed PNGs may scan to PLTE. The
+     * HARDWARE_LOADABLE flag replaces the manual color_type / bit_depth
+     * screening that used to gate PNGs the chip can't decode. */
+    EVE_ResourceProbe probe;
+    EVE_initProbe(&probe);
+    EVE_ResourceInfo info;
+    int probe_status = 0;
+    {
+        uint8_t probe_buf[1024];
+        uint32_t bytes_left = file_size;
+        while(bytes_left > 0) {
+            uint32_t want = bytes_left > sizeof(probe_buf) ? sizeof(probe_buf) : bytes_left;
+            uint32_t got = 0;
+            if(lv_fs_read(&file, probe_buf, want, &got) != LV_FS_RES_OK || got == 0) break;
+            probe_status = EVE_probeResource(&probe, EVE_CHIPID, probe_buf, got,
+                                             OPT_TRUECOLOR, &info);
+            bytes_left -= got;
+            if(probe_status != 0) break;
+        }
     }
-    else {
-        parsed = eve5_parse_png_dimensions(header_buf, header_read, &img_w, &img_h);
-    }
-
-    if(is_png && header_read >= 26) {
-        uint8_t bit_depth = header_buf[24];
-        uint8_t color_type = header_buf[25];
-        const char * ct_str = "unknown";
-        if(color_type == 0) ct_str = "grayscale";
-        else if(color_type == 2) ct_str = "RGB";
-        else if(color_type == 3) ct_str = "indexed";
-        else if(color_type == 4) ct_str = "gray+alpha";
-        else if(color_type == 6) ct_str = "RGBA";
-        (void)bit_depth;
-        (void)ct_str;
-        LV_LOG_INFO("EVE5 HW_DECODE: PNG %s: %ux%u depth=%u color_type=%u(%s)",
-                    path, img_w, img_h, bit_depth, color_type, ct_str);
-    }
-    else if(is_jpeg) {
-        LV_LOG_INFO("EVE5 HW_DECODE: JPEG %s: %ux%u", path, img_w, img_h);
-    }
-
-    if(!parsed || img_w == 0 || img_h == 0) {
-        LV_LOG_WARN("EVE5: Failed to parse image dimensions: %s", path);
+    if(probe_status != 1
+       || (info.Type != EVE_RESOURCE_JPEG && info.Type != EVE_RESOURCE_PNG)
+       || !(info.Flags & EVE_RESOURCE_FLAG_HARDWARE_LOADABLE)) {
+        LV_LOG_INFO("EVE5: %s declined for HW decode (probe=%d type=%u flags=0x%02x)",
+                    path, probe_status, (unsigned)info.Type, (unsigned)info.Flags);
         lv_fs_close(&file);
         return false;
     }
+    LV_LOG_INFO("EVE5 HW_DECODE: %s %ux%u fmt=%u size=%u palette=%u",
+                path, (unsigned)info.Width, (unsigned)info.Height,
+                (unsigned)info.Format, (unsigned)info.Size, (unsigned)info.PaletteSize);
 
-    lv_fs_seek(&file, 0, LV_FS_SEEK_END);
-    uint32_t file_pos = 0;
-    lv_fs_tell(&file, &file_pos);
-    uint32_t file_size = file_pos;
-    lv_fs_seek(&file, 0, LV_FS_SEEK_SET);
-
-    if(file_size == 0) {
-        LV_LOG_WARN("EVE5: Empty file: %s", path);
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+    /* PALETTEDARGB8 callers must accept a separate palette address. */
+    if(info.Format == PALETTEDARGB8 && out_palette_addr == NULL) {
+        LV_LOG_INFO("EVE5 HW_DECODE: %s is PALETTEDARGB8 but caller didn't supply palette out", path);
         lv_fs_close(&file);
         return false;
     }
+#endif
 
-    /* Allocate for worst case; actual format determined after decode.
-     * Paletted output is a palette (1024 bytes for PALETTEDARGB8) plus w*h
-     * indices, which exceeds the ARGB8 size for images under ~342 pixels. */
-    int32_t decoded_stride = (int32_t)(img_w * 4);
-    uint32_t decoded_size = (uint32_t)(decoded_stride * (int32_t)img_h);
-    uint32_t paletted_size = 256 * 4 + img_w * img_h;
-    if(paletted_size > decoded_size) decoded_size = paletted_size;
+    /* Rewind for the full file read into the MediaFIFO staging buffer. */
+    if(lv_fs_seek(&file, 0, LV_FS_SEEK_SET) != LV_FS_RES_OK) {
+        lv_fs_close(&file);
+        return false;
+    }
 
 #if LV_USE_OS
     lv_eve5_hal_lock(lv_eve5_disp_from_hal(u->hal));
@@ -269,12 +272,11 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 
     /* GC-flagged: decoded images self-heal through the decoder cache when
      * the handle goes invalid (sweep on pre-BT820, pressure eviction on
-     * BT820+) */
-    uint32_t alloc_flags = GA_ALIGN_4 | GA_GC_FLAG;
-    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, decoded_size, alloc_flags);
+     * BT820+). Allocated at the exact predicted size — no post-load truncate. */
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, info.Size, GA_ALIGN_4 | GA_GC_FLAG);
     uint32_t addr = EVE_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) {
-        LV_LOG_WARN("EVE5: Failed to allocate %u bytes for decoded image", decoded_size);
+        LV_LOG_WARN("EVE5: Failed to allocate %u bytes for decoded image", (unsigned)info.Size);
 #if LV_USE_OS
         lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
@@ -282,14 +284,13 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         return false;
     }
 
-    EVE_HalContext *phost = u->hal;
     lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
 
     /* Stage the compressed file in RAM_G and feed CMD_LOADIMAGE through
      * MediaFifo (OPT_MEDIAFIFO) so the decoder reads from an isolated
-     * buffer rather than the cocmd FIFO. Trailing bytes past the
-     * decoder's end-of-stream get dropped instead of being interpreted
-     * as commands, defending against malformed or attacker-crafted PNG/JPEG. */
+     * buffer rather than the cocmd FIFO. Trailing bytes past the decoder's
+     * end-of-stream get dropped instead of being interpreted as commands —
+     * defends against malformed or attacker-crafted PNG/JPEG. */
     uint32_t fifo_size = (file_size + 3u) & ~3u;
     EVE_GpuHandle temp_handle = EVE_GpuAlloc_AlignedAlloc(u->allocator, fifo_size, 0, 32);
     uint32_t temp_addr = EVE_GpuAlloc_Get(u->allocator, temp_handle);
@@ -304,10 +305,9 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         return false;
     }
 
-    /* Stream the file into temp_addr (file → host chunk → RAM_G).
-     * SD card and flash paths are excluded above, so lv_fs_read won't hit
-     * an EVE FS driver that would deadlock on the non-recursive HAL mutex. */
-    lv_fs_seek(&file, 0, LV_FS_SEEK_SET);
+    /* Stream the file into temp_addr. SD card and flash paths are excluded
+     * above, so lv_fs_read won't hit an EVE FS driver that would deadlock
+     * on the non-recursive HAL mutex. */
     uint8_t chunk_buf[8192];
     uint32_t write_offset = 0;
     uint32_t remaining = file_size;
@@ -315,8 +315,8 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     while(remaining > 0) {
         uint32_t chunk_size = remaining > sizeof(chunk_buf) ? sizeof(chunk_buf) : remaining;
         uint32_t bytes_read = 0;
-        res = lv_fs_read(&file, chunk_buf, chunk_size, &bytes_read);
-        if(res != LV_FS_RES_OK || bytes_read == 0) {
+        if(lv_fs_read(&file, chunk_buf, chunk_size, &bytes_read) != LV_FS_RES_OK
+           || bytes_read == 0) {
             LV_LOG_ERROR("EVE5: File read error at offset %u", file_size - remaining);
             success = false;
             break;
@@ -336,9 +336,6 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         return false;
     }
 
-    /* Wrap MediaFifo over the populated buffer and stamp REG_MEDIAFIFO_WRITE
-     * with the actual byte count so the coprocessor sees a fully-populated
-     * fifo (same trick the legacy SD load uses after CMD_FSREAD). */
     EVE_MediaFifo_close(phost);
     if(!EVE_MediaFifo_set(phost, temp_addr, fifo_size)) {
         LV_LOG_ERROR("EVE5: MediaFifo setup failed for %s", path);
@@ -350,13 +347,6 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         return false;
     }
     EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, file_size);
-
-    /* OPT_TRUECOLOR is BT820-only — it requests RGB8/ARGB8 output instead of
-     * the default RGB565/ARGB4 (which avoids gradient banding). On earlier
-     * gens those output formats don't exist, so we drop the flag and accept
-     * the default 16bpp output. */
-    uint32_t loadimage_opts = OPT_NODL | OPT_MEDIAFIFO;
-    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
 
     /* Drain the FIFO so any subsequent fault is attributable to CMD_LOADIMAGE
      * itself, not stale queued work; bracket with SuppressErrorOverlay so the
@@ -374,6 +364,9 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     }
     phost->SuppressErrorOverlay = true;
 
+    uint32_t loadimage_opts = OPT_NODL | OPT_MEDIAFIFO;
+    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
+
     EVE_CoCmd_loadImage(phost, addr, loadimage_opts);
     bool decoded = EVE_Cmd_waitFlush(phost);
 
@@ -383,8 +376,6 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     if(!decoded) {
         LV_LOG_ERROR("EVE5: CMD_LOADIMAGE failed for %s", path);
         EVE_GpuAlloc_Free(u->allocator, handle);
-        /* Narrow reset: the pre-flush isolated this fault, so we can recover
-         * the coprocessor without disturbing any earlier successful work. */
         if(phost->CmdFault) lv_eve5_reset_coprocessor(disp);
         phost->SuppressErrorOverlay = false;
 #if LV_USE_OS
@@ -393,108 +384,25 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
         return false;
     }
     phost->SuppressErrorOverlay = false;
-
     EVE_Hal_requestFenceBeforeSwap(phost);
-
-    /* Query format from the coprocessor. CMD_GETIMAGE (returning source/fmt/w/h/palette
-     * in one call) is BT817+. On earlier chips we use CMD_GETIMAGE_FORMAT, which falls
-     * back to reading the format word from a hardcoded coprocessor RAM address
-     * (0x3097e8) for backward compat — see EVE_CoCmd_IO.c. Earlier-gen output formats
-     * are not paletted-with-separate-address, so we use the addr we passed to
-     * CMD_LOADIMAGE for the source and the parsed JPEG/PNG dimensions for w/h. */
-    uint32_t out_source = 0, out_fmt = 0, out_w = 0, out_h = 0, out_palette = 0;
-    bool got_image = false;
-
-#if (EVE_SUPPORT_CHIPID >= EVE_BT817)
-    if(EVE_CHIPID >= EVE_BT817) {
-        got_image = EVE_CoCmd_getImage(phost, &out_source, &out_fmt, &out_w, &out_h, &out_palette);
-        LV_LOG_INFO("EVE5 HW_DECODE: getImage: source=0x%08x fmt=%u w=%u h=%u palette=0x%08x (alloc=0x%08x)",
-                    out_source, out_fmt, out_w, out_h, out_palette, addr);
-    }
-    else
-#endif
-    {
-        got_image = EVE_CoCmd_getImage_format(phost, &out_fmt);
-        out_source = addr;
-        out_w = img_w;
-        out_h = img_h;
-        out_palette = 0;
-        LV_LOG_INFO("EVE5 HW_DECODE: getImage_format: fmt=%u (header w=%u h=%u alloc=0x%08x)",
-                    out_fmt, img_w, img_h, addr);
-    }
-
-    if(got_image) {
-        /* For PALETTEDARGB8, CMD_LOADIMAGE stores palette at alloc start.
-         * PALETTEDARGB8 is BT820-only — pre-BT820 builds skip this branch. */
-#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
-        if(out_fmt == PALETTEDARGB8) {
-            if(!out_palette_addr) {
-                LV_LOG_INFO("EVE5 HW_DECODE: PALETTEDARGB8 not supported by caller, falling back to SW for %s", path);
-                EVE_GpuAlloc_Free(u->allocator, handle);
-#if LV_USE_OS
-                lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
-#endif
-                return false;
-            }
-            *out_palette_addr = out_palette;
-            addr = out_source;
-        }
-        else
-#endif
-        {
-            if(out_source != addr) {
-                LV_LOG_WARN("EVE5 HW_DECODE: source mismatch: getImage=0x%08x alloc=0x%08x for %s",
-                            out_source, addr, path);
-                addr = out_source;
-            }
-            if(out_palette_addr) *out_palette_addr = GA_INVALID;
-        }
-        if(out_w != img_w || out_h != img_h) {
-            LV_LOG_WARN("EVE5 HW_DECODE: size changed: header=%ux%u getImage=%ux%u for %s",
-                        img_w, img_h, out_w, out_h, path);
-        }
-        img_w = out_w;
-        img_h = out_h;
-    }
-    else {
-        LV_LOG_WARN("EVE5 HW_DECODE: getImage failed for %s, assuming RGB565 %ux%u", path, img_w, img_h);
-        out_fmt = RGB565;
-        if(out_palette_addr) *out_palette_addr = GA_INVALID;
-    }
-
-    /* HW decoder output stride = width * bpp (packed, no padding) */
-    int32_t bpp = eve5_format_bpp(out_fmt);
-    decoded_stride = (int32_t)(img_w * bpp);
-
-    LV_LOG_INFO("EVE5 HW_DECODE: final: fmt=%u bpp=%d stride=%d size=%u (worst-case was %u) for %s",
-                out_fmt, bpp, (int)decoded_stride,
-                (unsigned)(decoded_stride * (int32_t)img_h), decoded_size, path);
-
-    /* Trim allocation to actual size */
-    uint32_t index_size = (uint32_t)(decoded_stride * (int32_t)img_h);
-#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
-    uint32_t palette_offset = (out_fmt == PALETTEDARGB8) ? (uint32_t)(addr - EVE_GpuAlloc_Get(u->allocator, handle)) : 0;
-#else
-    uint32_t palette_offset = 0;
-#endif
-    uint32_t actual_size = palette_offset + index_size;
-    if(actual_size < decoded_size) {
-        EVE_GpuAlloc_Truncate(u->allocator, handle, actual_size);
-    }
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    *ram_g_addr = addr;
-    *eve_format = (uint16_t)out_fmt;
-    *eve_stride = decoded_stride;
-    *src_w = (int32_t)img_w;
-    *src_h = (int32_t)img_h;
+    /* Layout: palette-front. Palette (PaletteSize bytes) at base+0, decoded
+     * bitmap at base+PaletteSize. PaletteSize == 0 for non-paletted formats. */
+    *ram_g_addr = addr + info.PaletteSize;
+    *eve_format = (uint16_t)info.Format;
+    *eve_stride = (int32_t)info.Stride;
+    *src_w = (int32_t)info.Width;
+    *src_h = (int32_t)info.Height;
     if(out_handle) *out_handle = handle;
+    if(out_palette_addr) *out_palette_addr = (info.PaletteSize > 0) ? addr : GA_INVALID;
 
-    LV_LOG_INFO("EVE5: HW decoded %s (%ux%u fmt=%u stride=%d bpp=%d) via CMD_LOADIMAGE",
-                path, (unsigned)img_w, (unsigned)img_h, (unsigned)out_fmt, (int)decoded_stride, (int)bpp);
+    LV_LOG_INFO("EVE5: HW decoded %s (%ux%u fmt=%u stride=%d) via CMD_LOADIMAGE",
+                path, (unsigned)info.Width, (unsigned)info.Height,
+                (unsigned)info.Format, (int)info.Stride);
     return true;
 }
 
@@ -976,6 +884,15 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const 
 
 static lv_draw_eve5_unit_t * s_decoder_unit;
 
+/* Hook EVE_queryResource_*'s fault recovery into lv_eve5_reset_coprocessor so
+ * the SD/flash query paths get the same narrow reset (with bitmap-handle
+ * pool / rom font cache invalidation) that the regular loader paths use. */
+static void decoder_query_reset_cb(EVE_HalContext * phost, void * userdata)
+{
+    (void)phost;
+    lv_eve5_reset_coprocessor((lv_display_t *)userdata);
+}
+
 static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt)
 {
     switch(eve_fmt) {
@@ -1003,6 +920,7 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
     LV_UNUSED(decoder);
 
     if(dsc->src_type != LV_IMAGE_SRC_FILE) return LV_RESULT_INVALID;
+    if(s_decoder_unit == NULL) return LV_RESULT_INVALID;
 
     const char * fn = dsc->src;
 
@@ -1012,7 +930,6 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
     if(eve5_decoder_is_path_bad(fn)) return LV_RESULT_INVALID;
 
     const char * ext = lv_fs_get_ext(fn);
-
     bool is_jpeg = (lv_strcmp(ext, "jpg") == 0) || (lv_strcmp(ext, "jpeg") == 0);
     bool is_png = (lv_strcmp(ext, "png") == 0);
     if(!is_jpeg && !is_png) {
@@ -1029,76 +946,70 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
         header->stride = bmp.stride;
         return LV_RESULT_OK;
     }
+    LV_UNUSED(is_jpeg);
+    LV_UNUSED(is_png);
 
-    uint32_t w = 0, h = 0;
+    lv_draw_eve5_unit_t * u = s_decoder_unit;
+    EVE_HalContext * phost = u->hal;
+    EVE_ResourceInfo info;
 
 #if LV_USE_FS_EVE5_SDCARD
-    /* SD path: CMD_QUERYIMAGE is the only probe we want. lv_fs_read on an
-     * SD path would force the lazy whole-file load (ensure_file_loaded
-     * via CMD_FSREAD), which QUERY exists to avoid. Decline cleanly on
-     * QUERY failure (missing file, malformed sig, firmware reject) so
-     * LVGL falls through to the SW decoder — which has to lv_fs_read the
-     * file anyway, but only when SW decode is actually required. */
+    /* SD path: drive EVE_queryResource_fs(preferCmd=true, ga=NULL) so the
+     * on-chip CMD_QUERYIMAGE_fs is used when the patch_queryassets firmware
+     * is present, and SW fallback (whole-file CMD_FSREAD into staging) is
+     * refused — info() only wants a fast metadata probe. lv_fs_read on an
+     * SD path would force the lazy whole-file load (ensure_file_loaded via
+     * CMD_FSREAD), which the CMD query exists to avoid. */
     if(lv_eve5_sdcard_is_path(fn)) {
-        if(lv_eve5_sdcard_query_image_dims(fn, &w, &h)) {
-            header->cf = LV_COLOR_FORMAT_RAW;
-            header->w = (int32_t)w;
-            header->h = (int32_t)h;
-            header->stride = (int32_t)(w * 3);
-            return LV_RESULT_OK;
+        if(!lv_eve5_sdcard_ready()) return LV_RESULT_INVALID;
+
+        const char * sd_path = fn;
+        if(fn[1] == ':' && (fn[2] == '/' || fn[2] == '\\')) sd_path = fn + 2;
+
+        lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
+#if LV_USE_OS
+        lv_eve5_hal_lock(disp);
+#endif
+        bool ok = EVE_queryResource_fs(u->hal, NULL, sd_path, OPT_TRUECOLOR,
+                                       /*preferCmd*/ true,
+                                       decoder_query_reset_cb, disp,
+                                       NULL, NULL, &info);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(disp);
+#endif
+        if(!ok) return LV_RESULT_INVALID;
+    }
+    else
+#endif
+    {
+        /* Non-SD path: drive EVE_probeResource over chunked lv_fs reads.
+         * The HARDWARE_LOADABLE flag from the probe replaces the manual
+         * PNG color_type / bit_depth screening — same gate, same chipId-
+         * derived decision, derived in one place. */
+        EVE_ResourceProbe probe;
+        EVE_initProbe(&probe);
+        int probe_status = 0;
+        uint8_t buf[1024];
+        for(;;) {
+            uint32_t got = 0;
+            if(lv_fs_read(&dsc->file, buf, sizeof(buf), &got) != LV_FS_RES_OK || got == 0) break;
+            probe_status = EVE_probeResource(&probe, EVE_CHIPID, buf, got,
+                                             OPT_TRUECOLOR, &info);
+            if(probe_status != 0) break;
         }
+        if(probe_status != 1) return LV_RESULT_INVALID;
+    }
+
+    if(info.Type != EVE_RESOURCE_JPEG && info.Type != EVE_RESOURCE_PNG) return LV_RESULT_INVALID;
+    if(!(info.Flags & EVE_RESOURCE_FLAG_HARDWARE_LOADABLE)) {
+        LV_LOG_INFO("EVE5 decoder: declining %s (probe says not HW-decodable on this chip)", fn);
         return LV_RESULT_INVALID;
     }
-#endif
-
-    /* Non-SD path: header peek is cheap. Parse dimensions, and for PNG
-     * additionally screen out IHDR color_type / bit_depth combinations
-     * BT820's CMD_LOADIMAGE rejects ("unsupported PNG in cmd_loadimage"),
-     * so LVGL falls through to the SW decoder without ever entering a
-     * fault/reset cycle. SD paths can't do this — CMD_QUERYIMAGE returns
-     * only w/h, not color type — so they rely on the reactive bad-path
-     * cache populated from open_cb failures. */
-    uint8_t buf[1024];
-    uint32_t bytes_read = 0;
-    lv_fs_read(&dsc->file, buf, sizeof(buf), &bytes_read);
-    if(bytes_read < 24) return LV_RESULT_INVALID;
-
-    bool ok;
-    if(is_jpeg) {
-        ok = eve5_parse_jpeg_dimensions(buf, bytes_read, &w, &h);
-    }
-    else {
-        ok = eve5_parse_png_dimensions(buf, bytes_read, &w, &h);
-        /* IHDR at bytes 16-28: w(16-19), h(20-23), bit_depth(24), color_type(25).
-         * BT820 firmware accepts bit_depth 8 only (1/2/4-bit PNGs — grayscale
-         * AND indexed — and 16-bit-per-channel PNGs are rejected by
-         * cmd_loadimage with "unsupported PNG"). At bit_depth 8 the supported
-         * color types are 0 (L8 grayscale), 2 (RGB24), 3 (PALETTEDARGB8 from
-         * 256-color palette), 6 (RGBA32). color_type 4 (gray+alpha) is
-         * conservatively declined here. Anything declined falls through to
-         * the SW decoder without entering a fault/reset cycle. */
-        if(ok && bytes_read >= 26) {
-            uint8_t bit_depth = buf[24];
-            uint8_t color_type = buf[25];
-            bool hw_supported = (bit_depth == 8) &&
-                (color_type == 0 || color_type == 2
-                 || color_type == 3 || color_type == 6);
-            if(!hw_supported) {
-                LV_LOG_INFO("EVE5 decoder: declining PNG color_type=%u bit_depth=%u for %s"
-                            " (HW unsupported), SW decoder will handle",
-                            (unsigned)color_type, (unsigned)bit_depth, fn);
-                return LV_RESULT_INVALID;
-            }
-        }
-    }
-
-    if(!ok || w == 0 || h == 0) return LV_RESULT_INVALID;
 
     header->cf = LV_COLOR_FORMAT_RAW;
-    header->w = (int32_t)w;
-    header->h = (int32_t)h;
-    header->stride = (int32_t)(w * 3);
-
+    header->w = (int32_t)info.Width;
+    header->h = (int32_t)info.Height;
+    header->stride = (int32_t)info.Stride;
     return LV_RESULT_OK;
 }
 

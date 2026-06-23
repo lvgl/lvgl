@@ -58,13 +58,11 @@ typedef enum {
     LV_EVE5_ASSET_FONT_SRC_FILE = 0,
     /** Load from the BT820 SD card. Bypasses LVGL I/O. Path may include
      *  an LVGL drive-letter prefix (e.g. "S:/foo.reloc"); it's stripped
-     *  before the EVE FS commands. Two implementations selected at
-     *  compile time:
-     *    - EVE_COCMD_PATCH_QUERY=1: zero-copy via CMD_FSSOURCE +
-     *      CMD_QUERYASSET + CMD_GETPROPS + CMD_LOADASSET(OPT_FS).
-     *    - Otherwise (legacy): CMD_FSREAD the whole file into a temp
-     *      RAM_G buffer, peek the EVE_Gpu_AssetHeader, then
-     *      CMD_LOADASSET(OPT_MEDIAFIFO) from the temp. Logs a warning. */
+     *  before the EVE FS commands. Sizing comes from EVE_queryResource_fs
+     *  (CMD_QUERYASSET_fs on patched BT820+ firmware, SW probe over a
+     *  CMD_FSREAD'd staging buffer otherwise); the actual load is then
+     *  zero-copy CMD_LOADASSET(OPT_FS) when the CMD path was used, or
+     *  MediaFIFO reuse of the staging buffer when the SW path was used. */
     LV_EVE5_ASSET_FONT_SRC_SDCARD,
     /** Zero-copy load from EVE QSPI flash via CMD_FLASHSOURCE +
      *  CMD_LOADASSET(OPT_FLASH). flash_address must be 64-byte aligned. */

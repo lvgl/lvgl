@@ -20,6 +20,8 @@
 #include "EVE_Hal.h"
 #include "EVE_CoCmd.h"
 #include "EVE_GpuAlloc.h"
+#include "EVE_ResourceProbe.h"
+#include "EVE_ResourceQuery.h"
 
 /*********************
  *      DEFINES
@@ -60,6 +62,15 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 
 static bool ensure_flash_ready(eve5_flash_ctx_t * ctx);
 static uint32_t parse_flash_addr(const char * path);
+
+/* Hook EVE_queryResource_flash's fault recovery into the driver's narrow
+ * coprocessor reset (retires deferred frees, drops cached bitmap-handle
+ * bindings on the connected draw unit). */
+static void flash_query_reset_cb(EVE_HalContext * phost, void * userdata)
+{
+    (void)phost;
+    lv_eve5_reset_coprocessor((lv_display_t *)userdata);
+}
 
 /**********************
  *  STATIC VARIABLES
@@ -437,7 +448,6 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
     if(path == NULL || handle == NULL || width == NULL || height == NULL || format == NULL) {
         return false;
     }
-
     if(s_ctx.hal == NULL || s_ctx.alloc == NULL) {
         LV_LOG_ERROR("EVE5 flash driver not initialized");
         return false;
@@ -453,21 +463,20 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
         LV_LOG_ERROR("Invalid flash address in path: %s", path);
         return false;
     }
-
     if((flash_addr & 63) != 0) {
-        LV_LOG_ERROR("Flash address 0x%08X not 64-byte aligned (required for CMD_FLASHSOURCE)", flash_addr);
+        LV_LOG_ERROR("Flash address 0x%08X not 64-byte aligned (required for CMD_FLASHSOURCE)",
+                     flash_addr);
         return false;
     }
 
-    bool is_jpeg = eve5_has_extension(path, ".jpg") || eve5_has_extension(path, ".jpeg");
-    bool is_png = eve5_has_extension(path, ".png");
-    if(!is_jpeg && !is_png) {
+    bool is_jpeg, is_png;
+    if(!eve5_is_jpeg_or_png(path, &is_jpeg, &is_png)) {
         LV_LOG_WARN("Unsupported image format (not JPEG/PNG): %s", path);
         return false;
     }
 
-    EVE_HalContext *phost = s_ctx.hal;
-    EVE_GpuAlloc *alloc = s_ctx.alloc;
+    EVE_HalContext * phost = s_ctx.hal;
+    EVE_GpuAlloc * alloc = s_ctx.alloc;
 
 #if LV_USE_OS
     lv_eve5_hal_lock(s_ctx.disp);
@@ -482,33 +491,69 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
     }
 
     if(flash_addr >= s_ctx.flash_size_bytes) {
-        LV_LOG_ERROR("Flash address 0x%08X exceeds flash size 0x%08X", flash_addr, s_ctx.flash_size_bytes);
+        LV_LOG_ERROR("Flash address 0x%08X exceeds flash size 0x%08X",
+                     flash_addr, s_ctx.flash_size_bytes);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
 
-    /* Read header for dimension parsing */
-    uint32_t header_read_size = 1024;
-    if(flash_addr + header_read_size > s_ctx.flash_size_bytes) {
-        header_read_size = ALIGN_DOWN(s_ctx.flash_size_bytes - flash_addr, 4);
-    }
+    /* Query: dimensions, exact decoded size, EVE format, palette size,
+     * HW-loadable gate. preferCmd=true picks CMD_QUERYIMAGE_flash on BT820+
+     * with the patch_queryassets firmware (no RAM_G round-trip); otherwise
+     * the wrapper chunks CMD_FLASHREAD into a small RAM_G staging buffer and
+     * drives EVE_probeResource on the bytes. `scan_limit` bounds the SW scan
+     * to the flash extent that's actually addressable — the probe normally
+     * completes well within the first chunk for any real JPEG/PNG header. */
+    uint32_t opts = OPT_TRUECOLOR;
+    uint32_t scan_limit = s_ctx.flash_size_bytes - flash_addr;
+    EVE_ResourceType hint = is_jpeg ? EVE_RESOURCE_JPEG : EVE_RESOURCE_PNG;
 
-    EVE_GpuHandle temp_handle = EVE_GpuAlloc_Alloc(alloc, header_read_size, GA_ALIGN_4);
-    uint32_t temp_addr = EVE_GpuAlloc_Get(alloc, temp_handle);
-    if(temp_addr == GA_INVALID) {
-        LV_LOG_ERROR("Failed to allocate temp RAM_G for flash header read");
+    EVE_ResourceInfo info;
+    if(!EVE_queryResource_flash(phost, alloc, (int32_t)flash_addr, scan_limit,
+                                hint, opts, /*preferCmd*/ true,
+                                flash_query_reset_cb, s_ctx.disp,
+                                &info)) {
+        LV_LOG_WARN("EVE5 flash: queryResource failed for %s", path);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
     }
 
-    /* Pre-flush + SuppressErrorOverlay isolate CMD_FLASHREAD / CMD_LOADIMAGE
-     * faults so a corrupt flash region can't leave the coprocessor stuck. */
+    if(info.Type != EVE_RESOURCE_JPEG && info.Type != EVE_RESOURCE_PNG) {
+        LV_LOG_WARN("EVE5 flash: %s isn't a JPEG/PNG (type=%u)", path, (unsigned)info.Type);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    if(!(info.Flags & EVE_RESOURCE_FLAG_HARDWARE_LOADABLE)) {
+        LV_LOG_INFO("EVE5 flash: %s not HW-decodable on this chip", path);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    /* GC-flagged: decoded images self-heal through the decoder cache when
+     * the handle goes invalid (sweep on pre-BT820, pressure eviction on BT820+). */
+    EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, info.Size, GA_ALIGN_4 | GA_GC_FLAG);
+    uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
+    if(final_addr == GA_INVALID) {
+        LV_LOG_ERROR("EVE5 flash: failed to allocate %u bytes for %s",
+                     (unsigned)info.Size, path);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    /* Pre-flush + SuppressErrorOverlay isolate the CMD_LOADIMAGE_flash_ex fault. */
     if(!EVE_Cmd_waitFlush(phost)) {
-        EVE_GpuAlloc_Free(alloc, temp_handle);
+        EVE_GpuAlloc_Free(alloc, final_handle);
 #if LV_USE_OS
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
@@ -516,110 +561,12 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
     }
     phost->SuppressErrorOverlay = true;
 
-    EVE_CoCmd_flashRead(phost, temp_addr, flash_addr, header_read_size);
-    if(!EVE_Cmd_waitFlush(phost)) {
-        LV_LOG_ERROR("CMD_FLASHREAD failed for header at 0x%08X", flash_addr);
-        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
-        EVE_GpuAlloc_Free(alloc, temp_handle);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    uint8_t header_buf[1024];
-    uint32_t header_size = header_read_size < sizeof(header_buf) ? header_read_size : sizeof(header_buf);
-    EVE_Hal_rdMem(phost, header_buf, temp_addr, header_size);
-    EVE_GpuAlloc_Free(alloc, temp_handle);
-
-    uint32_t img_w = 0, img_h = 0;
-    bool parsed;
-    if(is_jpeg) {
-        parsed = eve5_parse_jpeg_dimensions(header_buf, header_size, &img_w, &img_h);
-    }
-    else {
-        parsed = eve5_parse_png_dimensions(header_buf, header_size, &img_w, &img_h);
-    }
-
-    if(is_png && header_size >= 26) {
-        LV_LOG_INFO("PNG %s: %ux%u depth=%u color_type=%u",
-                    path, img_w, img_h, header_buf[24], header_buf[25]);
-    }
-    else if(is_jpeg) {
-        LV_LOG_INFO("JPEG %s: %ux%u", path, img_w, img_h);
-    }
-
-    if(!parsed || img_w == 0 || img_h == 0) {
-        LV_LOG_ERROR("Failed to parse image header from flash at 0x%08X", flash_addr);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    /* Allocate decoded image buffer: worst case ARGB8, or paletted output
-     * (palette plus w*h indices; 1024-byte palette for PALETTEDARGB8) —
-     * larger for images under ~342 pixels. */
-    uint32_t decoded_size = img_w * 4 * img_h;
-    uint32_t paletted_size = 256 * 4 + img_w * img_h;
-    if(paletted_size > decoded_size) decoded_size = paletted_size;
-
-    /* GC-flagged: decoded images self-heal through the decoder cache when
-     * the handle goes invalid (sweep on pre-BT820, pressure eviction on
-     * BT820+) */
-    uint32_t alloc_flags = GA_ALIGN_4 | GA_GC_FLAG;
-    EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, decoded_size, alloc_flags);
-    uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
-    if(final_addr == GA_INVALID) {
-        LV_LOG_ERROR("Failed to allocate decoded image buffer (%u bytes)", decoded_size);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    /* Re-flush so the CMD_LOADIMAGE fault (if any) is isolated from the
-     * preceding header read. */
-    if(!EVE_Cmd_waitFlush(phost)) {
-        EVE_GpuAlloc_Free(alloc, final_handle);
-        phost->SuppressErrorOverlay = false;
-#if LV_USE_OS
-        lv_eve5_hal_unlock(s_ctx.disp);
-#endif
-        return false;
-    }
-
-    /* OPT_TRUECOLOR is BT820-only — earlier gens decode to RGB565/ARGB4.
-     * The wrapper bakes in OPT_FLASH | OPT_NODL plus the BT820 CMD_NOP
-     * early-return workaround, and chooses CMD_GETIMAGE vs CMD_GETIMAGE_FORMAT
-     * based on which outputs are requested. */
-    uint32_t loadimage_opts = 0;
-    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
-
-    uint32_t out_source = final_addr;     /* BT815/816: CMD_GETIMAGE unavailable, source = alloc base */
-    uint32_t out_fmt = 0;
-    uint32_t out_w = img_w;               /* BT815/816: dims from JPEG/PNG header parse */
-    uint32_t out_h = img_h;
-    uint32_t out_palette = GA_INVALID;
-    bool ok;
-
-#if (EVE_SUPPORT_CHIPID >= EVE_BT817) || defined(EVE_MULTI_GRAPHICS_TARGET)
-    if(EVE_CHIPID >= EVE_BT817) {
-        ok = EVE_CoCmd_loadImage_flash_ex(phost, final_addr, flash_addr, loadimage_opts,
-                                          &out_fmt, &out_source, &out_w, &out_h, &out_palette);
-    }
-    else
-#endif
-    {
-        ok = EVE_CoCmd_loadImage_flash_ex(phost, final_addr, flash_addr, loadimage_opts,
-                                          &out_fmt, NULL, NULL, NULL, NULL);
-    }
-
+    /* Zero-copy decode straight from flash into the destination. The wrapper
+     * bakes in OPT_FLASH | OPT_NODL and the BT820 CMD_NOP early-return workaround. */
+    bool ok = EVE_CoCmd_loadImage_flash_ex(phost, final_addr, flash_addr, opts,
+                                           NULL, NULL, NULL, NULL, NULL);
     if(!ok) {
-        LV_LOG_ERROR("CMD_LOADIMAGE from flash failed for %s", path);
+        LV_LOG_ERROR("EVE5 flash: CMD_LOADIMAGE failed for %s", path);
         if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
         EVE_GpuAlloc_Free(alloc, final_handle);
         phost->SuppressErrorOverlay = false;
@@ -629,40 +576,24 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
         return false;
     }
     phost->SuppressErrorOverlay = false;
-
     EVE_Hal_requestFenceBeforeSwap(phost);
-
-    uint32_t alloc_base = EVE_GpuAlloc_Get(alloc, final_handle);
-    uint32_t img_ofs = (out_source >= alloc_base) ? (out_source - alloc_base) : 0;
-    uint32_t pal_ofs = GA_INVALID;
-#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
-    if(out_fmt == PALETTEDARGB8 && out_palette >= alloc_base) {
-        pal_ofs = out_palette - alloc_base;
-    }
-#endif
-
-    /* Trim allocation to actual decoded size */
-    int32_t bpp = eve5_format_bpp(out_fmt);
-    uint32_t index_size = out_w * (uint32_t)bpp * out_h;
-    uint32_t img_end = img_ofs + index_size;
-    uint32_t pal_end = (pal_ofs != GA_INVALID) ? (pal_ofs + 256 * 4) : 0;
-    uint32_t actual_size = img_end > pal_end ? img_end : pal_end;
-    if(actual_size < decoded_size) {
-        EVE_GpuAlloc_Truncate(alloc, final_handle, actual_size);
-    }
 
 #if LV_USE_OS
     lv_eve5_hal_unlock(s_ctx.disp);
 #endif
 
+    /* Paletted layout is palette-front: palette (PaletteSize bytes) at base+0,
+     * decoded bitmap at base+PaletteSize. PaletteSize == 0 for non-paletted. */
     *handle = final_handle;
-    *width = out_w;
-    *height = out_h;
-    *format = out_fmt;
-    if(image_offset) *image_offset = img_ofs;
-    if(palette_offset) *palette_offset = pal_ofs;
+    *width = info.Width;
+    *height = info.Height;
+    *format = info.Format;
+    if(image_offset) *image_offset = info.PaletteSize;
+    if(palette_offset) *palette_offset = (info.PaletteSize > 0) ? 0u : GA_INVALID;
 
-    LV_LOG_INFO("Loaded flash image %s (%ux%u, format=%u)", path, out_w, out_h, out_fmt);
+    LV_LOG_INFO("EVE5 flash: loaded %s (%ux%u fmt=%u size=%u palette=%u)",
+                path, (unsigned)info.Width, (unsigned)info.Height,
+                (unsigned)info.Format, (unsigned)info.Size, (unsigned)info.PaletteSize);
     return true;
 }
 
