@@ -6,18 +6,9 @@ config LV_USE_SYSMON
 
 if LV_USE_SYSMON
 
-config LV_SYSMON_GET_IDLE
-	string "Function returning the idle percentage"
-	default "lv_os_get_idle_percent"
-
 config LV_SYSMON_PROC_IDLE_AVAILABLE
 	bool "Enable process idle measurement"
 	default n
-
-config LV_SYSMON_GET_PROC_IDLE
-	string "Function returning the application's idle percentage"
-	default "lv_os_get_proc_idle_percent"
-	depends on LV_SYSMON_PROC_IDLE_AVAILABLE
 
 config LV_USE_PERF_MONITOR
 	bool "Show CPU usage and FPS count"
@@ -82,5 +73,20 @@ choice
 	config LV_MEM_MONITOR_ALIGN_CENTER
 		bool "Center"
 endchoice
+
+config LV_SYSMON_CUSTOM_HEADER
+	string "Path to custom sysmon header"
+	default ""
+	help
+	  Optional header to override system monitor idle measurement macros.
+
+	  LV_SYSMON_GET_IDLE
+	    Expression returning the CPU idle percentage (0-100) since last call.
+	    e.g. my_rtos_get_idle_percent()
+
+	  LV_SYSMON_GET_PROC_IDLE
+	    Expression returning per-process idle percentage, if supported by
+	    the RTOS. Requires LV_SYSMON_PROC_IDLE_AVAILABLE to be enabled
+	    e.g. my_rtos_get_proc_idle_percent()
 
 endif #LV_USE_SYSMON

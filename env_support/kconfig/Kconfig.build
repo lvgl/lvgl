@@ -35,17 +35,17 @@ menu "Asserts"
 	config LV_USE_ASSERT_OBJ
 		bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
 
-	config LV_ASSERT_HANDLER_INCLUDE
-		string "Header to include for the custom assert function"
-		default "assert.h"
+	config LV_ASSERT_CUSTOM_HANDLER
+		string "Path to custom assert handler header"
+		default ""
 		help
-			Add a custom handler when assert happens e.g. to restart the MCU
+		  Optional header to override assert-related macros.
 
-	config LV_ASSERT_HANDLER
-		string "Action to take when an assertion fails"
-		default "while(1);"
-		help
-			Code executed when an assertion fails. The default halts execution.
+		  LV_ASSERT_HANDLER
+		    Statement to execute when an assertion fails. By default calls
+		    LV_ASSERT_HANDLER_INCLUDE and halts.
+		    e.g. my_assert_failed(__FILE__, __LINE__);
+
 endmenu
 
 menu "Argument Checks"

@@ -237,12 +237,16 @@ choice LV_FONT_DEFAULT
 		select LV_FONT_UNSCII_16
 endchoice
 
-config LV_FONT_CUSTOM_DECLARE
-	string "Declaration of custom fonts to make globally available"
+config LV_FONT_CUSTOM_HEADER
+	string "Path to custom font declaration header"
 	default ""
 	help
-		Optionally declare custom fonts here, e.g.
-		LV_FONT_DECLARE(my_font_1) LV_FONT_DECLARE(my_font_2)
+	  Optional header to override font-related macros.
+
+	  LV_FONT_CUSTOM_DECLARE
+	    Declare additional fonts that LVGL should know about. Useful when
+	    fonts are defined in user code and referenced by name in styles.
+	    e.g. LV_FONT_DECLARE(my_font_16) LV_FONT_DECLARE(my_font_24)
 
 config LV_FONT_FMT_TXT_LARGE
 	bool "Enable it if you have fonts with a lot of characters"
@@ -280,6 +284,7 @@ config LV_USE_IMGFONT
 	default n
 	help
 		Support using images as font in label or span widgets
+
 
 rsource "freetype/Kconfig"
 rsource "tiny_ttf/Kconfig"

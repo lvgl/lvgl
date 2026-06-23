@@ -125,10 +125,6 @@ def main():
     print(kconf.write_config(args.config_out))
     print(kconf.write_autoconf(args.header_out))
 
-    # Some string options hold C code (attributes, header names, function
-    # bodies) and must be emitted unquoted; write_autoconf quotes all strings.
-    dequote_raw_string_configs(args.header_out)
-
     # Write the list of parsed Kconfig files to a file
     write_kconfig_filenames(kconf, args.kconfig_list_out)
 
@@ -280,51 +276,6 @@ def promptless(sym):
     # multiple locations, we need to check all locations.
 
     return not any(node.prompt for node in sym.nodes)
-
-
-# String options whose value is C code rather than literal text, so the
-# `CONFIG_*` macro must be emitted without the surrounding quotes.  Keep this in
-# sync with `is_raw_string()` in scripts/generators/generate_lv_conf.py.
-_RAW_STRING_NAMES = {
-    "LV_ASSERT_HANDLER",
-    "LV_FONT_DEFAULT",
-    "LV_FONT_CUSTOM_DECLARE",
-    "LV_EXPORT_CONST_INT",
-    "LV_SYSMON_GET_IDLE",
-    "LV_SYSMON_GET_PROC_IDLE",
-    "LV_PROFILER_BEGIN",
-    "LV_PROFILER_END",
-    "LV_PROFILER_BEGIN_TAG",
-    "LV_PROFILER_END_TAG",
-    "LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM",
-}
-
-
-def _is_raw_string(name):
-    return (
-        name.startswith("LV_ATTRIBUTE_")
-        or name.endswith("_INCLUDE")
-        or name in _RAW_STRING_NAMES
-    )
-
-
-def dequote_raw_string_configs(header_path):
-    # Rewrite `#define CONFIG_LV_X "code"` as `#define CONFIG_LV_X code` for the
-    # raw-string options, so that e.g. an attribute or `#include` argument is
-    # usable as C rather than a string literal.  An empty value yields a bare
-    # `#define CONFIG_LV_X`.
-    line_re = re.compile(r'^(#define\s+CONFIG_(LV_[A-Z0-9_]+)\s+)"(.*)"\s*$')
-    out = []
-    with open(header_path) as f:
-        for line in f:
-            m = line_re.match(line.rstrip("\n"))
-            if m and _is_raw_string(m.group(2)):
-                value = m.group(3).replace('\\"', '"').replace("\\\\", "\\")
-                out.append((m.group(1) + value).rstrip() + "\n")
-            else:
-                out.append(line)
-    with open(header_path, "w") as f:
-        f.writelines(out)
 
 
 def write_kconfig_filenames(kconf, kconfig_list_path):

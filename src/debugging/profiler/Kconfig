@@ -31,21 +31,28 @@ endif #LV_USE_PROFILER_BUILTIN
 
 if LV_USE_PROFILER
 
-config LV_PROFILER_BEGIN
-	string "Profiler start-point function"
-	default "LV_PROFILER_BUILTIN_BEGIN"
+config LV_PROFILER_CUSTOM_HEADER
+	string "Path to custom profiler header"
+	default ""
+	help
+	  Optional header to override profiler hook macros. All four should be
+	  defined together — partial definitions will cause build errors.
 
-config LV_PROFILER_END
-	string "Profiler end-point function"
-	default "LV_PROFILER_BUILTIN_END"
+	  LV_PROFILER_BEGIN
+	    Called at the start of a profiled scope (no tag).
+	    e.g. my_profiler_begin()
 
-config LV_PROFILER_BEGIN_TAG
-	string "Profiler start-point function with a custom tag"
-	default "LV_PROFILER_BUILTIN_BEGIN_TAG"
+	  LV_PROFILER_END
+	    Called at the end of a profiled scope (no tag).
+	    e.g. my_profiler_end()
 
-config LV_PROFILER_END_TAG
-	string "Profiler end-point function with a custom tag"
-	default "LV_PROFILER_BUILTIN_END_TAG"
+	  LV_PROFILER_BEGIN_TAG
+	    Called at the start of a profiled scope with a string tag.
+	    e.g. my_profiler_begin_tag(tag)
+
+	  LV_PROFILER_END_TAG
+	    Called at the end of a profiled scope with a string tag.
+	    e.g. my_profiler_end_tag(tag)
 
 config LV_PROFILER_LAYOUT
 	bool "Enable layout profiler"
