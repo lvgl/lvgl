@@ -277,6 +277,21 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
             *bits_per_pixel = 8;
             break;
 
+        /* LVGL AL88 (lv_color16a_t: byte 0 = L, byte 1 = A) is byte-for-byte
+         * identical to EVE LA8. LA1/LA2/LA4/LA8 (format codes 24-27) came in
+         * with EVE3 (BT815+); pre-BT815 has no equivalent so the upload
+         * declines and the LVGL bin decoder / SW renderer takes over. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        case LV_COLOR_FORMAT_AL88:
+            if(EVE_CHIPID >= EVE_BT815) {
+                *eve_format = LA8;
+                *bits_per_pixel = 16;
+                break;
+            }
+            LV_LOG_WARN("EVE5: AL88 / LA8 needs BT815+ (chipid=%u)", (unsigned)EVE_CHIPID);
+            return false;
+#endif
+
         case LV_COLOR_FORMAT_ARGB2222:
             *eve_format = ARGB2;
             *bits_per_pixel = 8;

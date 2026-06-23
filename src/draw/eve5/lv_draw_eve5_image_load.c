@@ -437,6 +437,9 @@ bool lv_draw_eve5_lvgl_bin_cf_supported(uint8_t lv_cf)
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        case LV_COLOR_FORMAT_AL88:           /* EVE LA8 (BT815+); declined at runtime if chipid < BT815 */
+#endif
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
@@ -453,8 +456,6 @@ bool lv_draw_eve5_lvgl_bin_cf_supported(uint8_t lv_cf)
         case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_I8:
             return true;
-        /* AL88: no EVE equivalent and not handled by the upload mapping —
-         * declined here so the LVGL bin decoder + SW renderer can pick it up. */
         default:
             return false;
     }
@@ -474,6 +475,10 @@ static bool eve5_lvgl_bin_cf_direct_copy(lv_color_format_t lv_cf)
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
             return true;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        case LV_COLOR_FORMAT_AL88:         /* LA8 from BT815+ */
+            return EVE_CHIPID >= EVE_BT815;
+#endif
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         case LV_COLOR_FORMAT_A2:           /* L2 from FT810+ (we're BT820) */
         case LV_COLOR_FORMAT_ARGB2222:     /* ARGB2 on BT820+ */
@@ -500,6 +505,9 @@ static uint16_t eve5_lvgl_bin_cf_to_eve_format(lv_color_format_t lv_cf, bool * i
         case LV_COLOR_FORMAT_RGB565:    return RGB565;
         case LV_COLOR_FORMAT_ARGB1555:  return ARGB1555;
         case LV_COLOR_FORMAT_ARGB4444:  return ARGB4;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        case LV_COLOR_FORMAT_AL88:      return LA8;
+#endif
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         case LV_COLOR_FORMAT_ARGB2222:  return ARGB2;
         case LV_COLOR_FORMAT_RGB888:    return RGB8;
