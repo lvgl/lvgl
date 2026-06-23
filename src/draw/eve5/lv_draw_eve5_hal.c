@@ -398,6 +398,7 @@ static bool eve5_vram_upload_cb(lv_draw_unit_t * draw_unit, lv_draw_buf_t * buf)
             }
             vr->is_premultiplied = lv_draw_buf_has_flag(buf, LV_IMAGE_FLAGS_PREMULTIPLIED)
                                    || buf->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+            vr->sample_as_luminance = (buf->header.cf == LV_COLOR_FORMAT_L8);
             vr->has_content = true;
             EVE_Hal_requestFenceBeforeSwap(u->hal);
         }

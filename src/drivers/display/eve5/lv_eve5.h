@@ -80,6 +80,16 @@ typedef struct {
     uint32_t palette_offset;           /**< Offset from alloc base to palette LUT (GA_INVALID if none) */
     bool is_premultiplied;             /**< True if GPU content is premultiplied alpha */
     bool has_content;                  /**< True after first render; incremental renders must preserve existing content */
+    bool sample_as_luminance;          /**< Source semantics are luminance-as-RGB (LVGL LV_COLOR_FORMAT_L8 today;
+                                            sub-byte luminance assets in the future). EVE samples L1/L2/L4/L8 as
+                                            (R=255, G=255, B=255, A=value) — alpha-only with white RGB; luminance
+                                            semantics need (R=G=B=value, A=255). When this flag is set the image
+                                            draw paths put the chip in GLFORMAT mode with
+                                            BITMAP_SWIZZLE(ALPHA,ALPHA,ALPHA,ONE) — the stored value lives in the
+                                            sample's ALPHA channel, so ALPHA gets routed to all RGB outputs while
+                                            alpha is forced to 1. Distinguishes from LVGL A1-A8 sources
+                                            (sample_as_luminance=false) which map to EVE L1-L8 and render
+                                            correctly as alpha by default. Requires BT815+ (BITMAP_SWIZZLE). */
     bool is_swapchain;                 /**< True for the full-mode screen draw_buf: render target is SWAPCHAIN_0
                                             (gpu_handle is GA_HANDLE_INVALID). SWAPCHAIN_0 is resolved by the
                                             render engine to the current back buffer (one of REG_SC0_PTR0/PTR1).

@@ -915,7 +915,7 @@ static void draw_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(u->hal, addr);
         set_palette_if_needed(u->hal, vr->eve_format, palette_addr);
-        eve5_set_bitmap_layout(u->hal, vr->eve_format, (int32_t)vr->stride, g_h);
+        eve5_set_image_bitmap_layout(u->hal, vr->eve_format, (int32_t)vr->stride, g_h, vr->sample_as_luminance);
         EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, g_w, g_h);
         EVE_CoDl_bitmapTransform_identity(u->hal);
 
@@ -1026,7 +1026,7 @@ static void alpha_glyph_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc,
         EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
         EVE_CoDl_bitmapSource(u->hal, addr);
         set_palette_if_needed(u->hal, vr->eve_format, palette_addr);
-        eve5_set_bitmap_layout(u->hal, vr->eve_format, (int32_t)vr->stride, g_h);
+        eve5_set_image_bitmap_layout(u->hal, vr->eve_format, (int32_t)vr->stride, g_h, vr->sample_as_luminance);
         EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, g_w, g_h);
         EVE_CoDl_bitmapTransform_identity(u->hal);
 

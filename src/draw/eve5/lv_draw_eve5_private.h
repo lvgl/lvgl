@@ -525,6 +525,47 @@ static inline void eve5_set_bitmap_layout(EVE_HalContext *phost, uint16_t eve_fo
     }
 }
 
+/**
+ * Image-source bitmap layout with luminance-vs-alpha compensation for L# sources.
+ *
+ * When @p sample_as_luminance is set and @p eve_format is L1 / L2 / L4 / L8, the
+ * chip is put in GLFORMAT mode with BITMAP_SWIZZLE(ALPHA, ALPHA, ALPHA, ONE) —
+ * the stored value, which EVE delivers in the sample's ALPHA channel (RGB is a
+ * constant 255 for the L# formats — reading RED gives 1, not the value), is
+ * routed to all three RGB channels with alpha forced to 1. Restores
+ * luminance-as-RGB (A=255) semantics on top of EVE's default L# sampling
+ * (alpha-only with white RGB). Requires BITMAP_SWIZZLE (BT815+). On older
+ * chips the flag is ignored and the source renders with the alpha-as-luminance
+ * behavior.
+ *
+ * LVGL only has L8 as a luminance format (no L1/L2/L4), so the sub-byte branches
+ * are reachable only via non-LVGL sources (e.g. an .esdm-described raw L# asset
+ * authored as luminance, once the loader propagates that intent). LVGL A1-A8
+ * sources stay unflagged and render correctly through the default L# path
+ * (alpha-only matches EVE L# sampling).
+ *
+ * Every other case (extended formats, RGB / ARGB / paletted sources, or
+ * sample_as_luminance=false) falls through to eve5_set_bitmap_layout.
+ */
+static inline void eve5_set_image_bitmap_layout(EVE_HalContext *phost,
+                                                uint16_t eve_format,
+                                                int32_t stride, int32_t height,
+                                                bool sample_as_luminance)
+{
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+    if(sample_as_luminance && EVE_CHIPID >= EVE_BT815
+       && (eve_format == L8 || eve_format == L4 || eve_format == L2 || eve_format == L1)) {
+        EVE_CoDl_bitmapLayout(phost, GLFORMAT, stride, height);
+        EVE_CoDl_bitmapExtFormat(phost, eve_format);
+        EVE_CoDl_bitmapSwizzle(phost, ALPHA, ALPHA, ALPHA, ONE);
+        return;
+    }
+#else
+    (void)sample_as_luminance;
+#endif
+    eve5_set_bitmap_layout(phost, eve_format, stride, height);
+}
+
 /* Alpha repair tracking: call for fully opaque fills (records largest) */
 static inline void lv_draw_eve5_track_alpha_opaque(lv_draw_eve5_unit_t * u,
                                                    int32_t x1, int32_t y1,

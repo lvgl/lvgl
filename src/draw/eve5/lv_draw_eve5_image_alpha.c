@@ -49,7 +49,8 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t * u,
                                            int32_t layout_h,
                                            int32_t src_w, int32_t src_h,
                                            int32_t img_x, int32_t img_y,
-                                           uint32_t palette_addr)
+                                           uint32_t palette_addr,
+                                           bool sample_as_luminance)
 {
     EVE_HalContext *phost = u->hal;
     lv_layer_t * layer = t->target_layer;
@@ -82,7 +83,7 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t * u,
     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(phost, ram_g_addr);
     set_palette_if_needed(phost, eve_format, palette_addr);
-    eve5_set_bitmap_layout(phost, eve_format, eve_stride, layout_h);
+    eve5_set_image_bitmap_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance);
     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
     if(dsc->tile) {
         int32_t tile_w = lv_area_get_width(&dsc->image_area);
@@ -159,6 +160,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
     int32_t src_w, src_h;
     int32_t layout_h;
     uint32_t palette_addr = GA_INVALID;
+    bool sample_as_luminance = false;
 
     /* Resolve bitmap source */
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
@@ -176,6 +178,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
         eve_format = child_vr->eve_format;
         eve_stride = (int32_t)child_vr->stride;
         layout_h = src_h;
+        sample_as_luminance = child_vr->sample_as_luminance;
         if(child_vr->palette_offset != GA_INVALID) {
             uint32_t base = EVE_GpuAlloc_Get(u->allocator, child_handle);
             palette_addr = base + child_vr->palette_offset;
@@ -191,6 +194,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
         src_w = img->width;
         src_h = img->height;
         layout_h = src_h;
+        sample_as_luminance = img->sample_as_luminance;
     }
 
     int32_t x = t->area.x1 - layer->buf_area.x1;
@@ -304,7 +308,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
                     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
                     EVE_CoDl_bitmapSource(phost, ram_g_addr);
                     set_palette_if_needed(phost, eve_format, palette_addr);
-                    eve5_set_bitmap_layout(phost, eve_format, eve_stride, layout_h);
+                    eve5_set_image_bitmap_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance);
                     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
                     if(dsc->tile) {
                         int32_t tile_w = lv_area_get_width(&dsc->image_area);
@@ -378,7 +382,8 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
             EVE_CoDl_saveContext(phost);
             has_colorkey_gate = alpha_pass_build_colorkey_gate(
                                     u, t, dsc, ram_g_addr, eve_format, eve_stride,
-                                    layout_h, src_w, src_h, x, y, palette_addr);
+                                    layout_h, src_w, src_h, x, y, palette_addr,
+                                    sample_as_luminance);
             if(!has_colorkey_gate) {
                 EVE_CoDl_restoreContext(phost);
                 return;
@@ -470,7 +475,7 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(phost, ram_g_addr);
     set_palette_if_needed(phost, eve_format, palette_addr);
-    eve5_set_bitmap_layout(phost, eve_format, eve_stride, layout_h);
+    eve5_set_image_bitmap_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance);
     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
     if(dsc->tile) {
         int32_t tile_w = lv_area_get_width(&dsc->image_area);

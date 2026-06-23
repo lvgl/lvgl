@@ -1156,6 +1156,12 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     vr->palette_offset = pal_offset;
     vr->is_premultiplied = false;
     vr->has_content = true;
+    /* HW PNG/JPEG decode produces EVE L8 only for grayscale sources (PNG ct=0,
+     * JPEG OPT_MONO, or the grayscale-palette promotion above). Tag those as
+     * luminance so the image draw paths apply the swizzle that restores
+     * R=G=B=value, A=1 — matching LVGL's L8 semantics on top of EVE's
+     * alpha-with-white default L8 sampling. */
+    vr->sample_as_luminance = (eve_format == L8);
     /* is_swapchain stays zero — only the driver-owned full_buf vr sets it. */
 
     lv_color_format_t lv_cf = eve_format_to_lv_cf(eve_format);

@@ -50,6 +50,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     int32_t src_w, src_h;
     int32_t layout_h;
     uint32_t palette_addr = GA_INVALID;
+    bool sample_as_luminance = false;
     EVE_GpuHandle child_handle = GA_HANDLE_INVALID;
 
     /* Resolve bitmap source */
@@ -78,6 +79,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         eve_format = child_vr->eve_format;
         eve_stride = (int32_t)child_vr->stride;
         layout_h = src_h;
+        sample_as_luminance = child_vr->sample_as_luminance;
         if(child_vr->palette_offset != GA_INVALID) {
             uint32_t base = EVE_GpuAlloc_Get(u->allocator, child_handle);
             palette_addr = base + child_vr->palette_offset;
@@ -93,6 +95,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         src_w = img->width;
         src_h = img->height;
         layout_h = src_h;
+        sample_as_luminance = img->sample_as_luminance;
     }
 
     /* Load bitmap mask if set */
@@ -186,7 +189,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
     EVE_CoDl_bitmapSource(u->hal, ram_g_addr);
     set_palette_if_needed(u->hal, eve_format, palette_addr);
-    eve5_set_bitmap_layout(u->hal, eve_format, eve_stride, layout_h);
+    eve5_set_image_bitmap_layout(u->hal, eve_format, eve_stride, layout_h, sample_as_luminance);
     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
     if(dsc->tile) {
         int32_t tile_w = lv_area_get_width(&dsc->image_area);
@@ -273,7 +276,7 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoDl_bitmapHandle(phost, EVE_CO_SCRATCH_HANDLE);
             EVE_CoDl_bitmapSource(phost, ram_g_addr);
             set_palette_if_needed(phost, eve_format, palette_addr);
-            eve5_set_bitmap_layout(phost, eve_format, eve_stride, layout_h);
+            eve5_set_image_bitmap_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance);
             if(dsc->tile) {
                 int32_t tile_w = lv_area_get_width(&dsc->image_area);
                 int32_t tile_h = lv_area_get_height(&dsc->image_area);

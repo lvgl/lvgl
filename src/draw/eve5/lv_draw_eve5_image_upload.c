@@ -704,6 +704,10 @@ lv_eve5_vram_res_t * lv_draw_eve5_upload_image_to_gpu(lv_draw_eve5_unit_t * u,
     vr->source_offset = palette_size;
     vr->palette_offset = (palette_size > 0) ? 0 : GA_INVALID;
     vr->has_content = true;
+    /* LVGL L8 source is luminance-as-RGB; EVE samples L8 as alpha-with-white.
+     * Set the flag so the image draw paths apply the swizzle. LVGL A8 stays
+     * unflagged — A8 source semantics match EVE L8's default sampling. */
+    vr->sample_as_luminance = (src_cf == LV_COLOR_FORMAT_L8);
 
     /* If the application crashes here, it's likely that img_dsc is declared const */
     img_dsc->vram_res = (struct _lv_draw_buf_vram_res_t *)vr;
