@@ -150,15 +150,18 @@ extern "C" {
  *******************/
 
 #ifdef CONFIG_LV_MEM_SIZE_KILOBYTES
-#  if(CONFIG_LV_MEM_SIZE_KILOBYTES < 2)
-#    error "LV_MEM_SIZE >= 2kB is required"
-#  endif
-
-#  define CONFIG_LV_MEM_SIZE (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
+#warning "LV_MEM_SIZE_KILOBYTES is deprecated, use LV_MEM_SIZE instead (value in bytes)"
+#ifndef CONFIG_LV_MEM_SIZE
+#define CONFIG_LV_MEM_SIZE (LV_MEM_SIZE_KILOBYTES * 1024U)
+#else
+#warning "Both LV_MEM_SIZE and LV_MEM_SIZE_KILOBYTES are defined. Using LV_MEM_SIZE"
+#endif
+#undef CONFIG_LV_MEM_SIZE_KILOBYTES
 #endif
 
 #ifdef CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
-#  define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
+#warning "LV_MEM_POOL_EXPAND_SIZE_KILOBYTES is deprecated, set the full memory size with LV_MEM_SIZE instead (value in bytes)"
+#define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
 #endif
 
 /*------------------
