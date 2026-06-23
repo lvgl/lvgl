@@ -943,7 +943,12 @@ EVE_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
     EVE_CoDl_scissorSize(phost, w, h);
 
     /* Canvas: blit existing alpha as base luminance.
-     * BITMAP_SWIZZLE routes alpha to RGB so L8 target captures it as luminance. */
+     * BITMAP_SWIZZLE routes alpha to RGB so L8 target captures it as luminance.
+     * GLFORMAT swizzle is BT815+; on pre-BT815 single-target builds the whole
+     * canvas-prime block compiles out. The L8 RT starts blank in that case —
+     * which doesn't render correctly, but the function is already a no-op on
+     * pre-BT820 anyway since CMD_RENDERTARGET isn't supported. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
     if(u->canvas_orig_addr != GA_INVALID) {
         EVE_CoDl_saveContext(phost);
         EVE_CoDl_blendFunc(phost, ONE, ZERO);
@@ -963,6 +968,7 @@ EVE_GpuHandle lv_draw_eve5_hal_init_l8_rendertarget(lv_draw_eve5_unit_t * u,
         EVE_CoDl_end(phost);
         EVE_CoDl_restoreContext(phost);
     }
+#endif
 
     EVE_CoDl_colorArgb_ex(phost, 0xFFFFFFFF);
     EVE_CoDl_blendFunc(phost, SRC_ALPHA, ONE_MINUS_SRC_ALPHA);

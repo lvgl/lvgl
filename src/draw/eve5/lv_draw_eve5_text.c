@@ -90,8 +90,10 @@ static uint32_t bpp_to_eve_format(uint8_t bpp)
     switch(bpp) {
         case 1:
             return L1;
+#if (EVE_SUPPORT_CHIPID >= EVE_FT810) || defined(EVE_MULTI_GRAPHICS_TARGET)
         case 2:
             return L2;
+#endif
         case 4:
             return L4;
         case 8:

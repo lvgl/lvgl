@@ -437,8 +437,8 @@ bool lv_draw_eve5_lvgl_bin_cf_supported(uint8_t lv_cf)
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
-#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
-        case LV_COLOR_FORMAT_AL88:           /* EVE LA8 (BT815+); declined at runtime if chipid < BT815 */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        case LV_COLOR_FORMAT_AL88:           /* EVE LA8 (BT820+); declined at runtime if chipid < BT820 */
 #endif
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
         case LV_COLOR_FORMAT_RGB888:
@@ -463,29 +463,43 @@ bool lv_draw_eve5_lvgl_bin_cf_supported(uint8_t lv_cf)
 
 /* True if the LVGL bin body bytes are already in the EVE bitmap format that
  * lv_draw_eve5_get_eve_format_info would map to, with no conversion required.
- * Stride match is checked separately (see the caller). */
-static bool eve5_lvgl_bin_cf_direct_copy(lv_color_format_t lv_cf)
+ * Stride match is checked separately (see the caller). @p phost is needed for
+ * the multi-target EVE_CHIPID expansion.
+ *
+ * Generation thresholds per the chip "Bitmap formats" matrix:
+ *   codes 0-11 (ARGB1555 / L1 / L4 / L8 / RGB332 / ARGB2 / ARGB4 / RGB565,
+ *               plus PALETTED / TEXT8X8 / TEXTVGA / BARGRAPH): every chip
+ *   codes 14-17 (PALETTED565 / 4444 / 8 / L2): FT810+
+ *   code  31    (GLFORMAT): BT815+
+ *   codes 19-28 (RGB8 / ARGB8 / PALETTEDARGB8 / RGB6 / ARGB6 / LA1-LA8 /
+ *               YCBCR): BT820+
+ */
+static bool eve5_lvgl_bin_cf_direct_copy(EVE_HalContext * phost, lv_color_format_t lv_cf)
 {
+    LV_UNUSED(phost);
     switch(lv_cf) {
-        case LV_COLOR_FORMAT_L8:
-        case LV_COLOR_FORMAT_A1:
-        case LV_COLOR_FORMAT_A4:
-        case LV_COLOR_FORMAT_A8:
-        case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_ARGB1555:
-        case LV_COLOR_FORMAT_ARGB4444:
+        /* Codes 0-11: available on every chip. */
+        case LV_COLOR_FORMAT_L8:        /* L8 = 3 */
+        case LV_COLOR_FORMAT_A1:        /* L1 = 1 */
+        case LV_COLOR_FORMAT_A4:        /* L4 = 2 */
+        case LV_COLOR_FORMAT_A8:        /* L8 = 3 */
+        case LV_COLOR_FORMAT_RGB565:    /* RGB565 = 7 */
+        case LV_COLOR_FORMAT_ARGB1555:  /* ARGB1555 = 0 */
+        case LV_COLOR_FORMAT_ARGB4444:  /* ARGB4 = 6 */
+        case LV_COLOR_FORMAT_ARGB2222:  /* ARGB2 = 5 */
             return true;
-#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
-        case LV_COLOR_FORMAT_AL88:         /* LA8 from BT815+ */
-            return EVE_CHIPID >= EVE_BT815;
-#endif
-#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
-        case LV_COLOR_FORMAT_A2:           /* L2 from FT810+ (we're BT820) */
-        case LV_COLOR_FORMAT_ARGB2222:     /* ARGB2 on BT820+ */
-        case LV_COLOR_FORMAT_RGB888:       /* RGB8 on BT820+ */
+        /* A2 → L2 (code 17). FT810+; pre-FT810 the upload falls back to L4
+         * with bit-replication, so direct-copy isn't valid there. */
+        case LV_COLOR_FORMAT_A2:
+            return EVE_CHIPID >= EVE_FT810;
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
+        /* RGB8 (19), ARGB8 (20), LA8 (27). BT820+ — pre-BT820 the upload
+         * either converts to 16bpp (RGB8/ARGB8) or declines (LA8). */
+        case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-            return true;
+        case LV_COLOR_FORMAT_AL88:
+            return EVE_CHIPID >= EVE_BT820;
 #endif
         default:
             return false;
@@ -499,13 +513,15 @@ static uint16_t eve5_lvgl_bin_cf_to_eve_format(lv_color_format_t lv_cf, bool * i
     switch(lv_cf) {
         case LV_COLOR_FORMAT_L8:        return L8;
         case LV_COLOR_FORMAT_A1:        return L1;
+#if (EVE_SUPPORT_CHIPID >= EVE_FT810) || defined(EVE_MULTI_GRAPHICS_TARGET)
         case LV_COLOR_FORMAT_A2:        return L2;
+#endif
         case LV_COLOR_FORMAT_A4:        return L4;
         case LV_COLOR_FORMAT_A8:        return L8;
         case LV_COLOR_FORMAT_RGB565:    return RGB565;
         case LV_COLOR_FORMAT_ARGB1555:  return ARGB1555;
         case LV_COLOR_FORMAT_ARGB4444:  return ARGB4;
-#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
         case LV_COLOR_FORMAT_AL88:      return LA8;
 #endif
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
@@ -587,7 +603,7 @@ bool lv_draw_eve5_try_load_lvgl_bin_image(lv_draw_eve5_unit_t * u, const void * 
      * allocation (negligible waste). */
 #if LV_USE_FS_EVE5_SDCARD
     if(lv_eve5_sdcard_is_path(path)
-       && eve5_lvgl_bin_cf_direct_copy(lv_cf)
+       && eve5_lvgl_bin_cf_direct_copy(phost, lv_cf)
        && lvgl_stride == eve5_lvgl_bin_eve_stride(lv_cf, w)) {
 
         EVE_GpuAlloc * steal_alloc = NULL;
@@ -1209,7 +1225,24 @@ static void decoder_query_reset_cb(EVE_HalContext * phost, void * userdata)
     lv_eve5_reset_coprocessor((lv_display_t *)userdata);
 }
 
-static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt)
+/* Map an EVE bitmap format back to its LVGL color format equivalent for the
+ * decoded buffer's header.cf.
+ *
+ * @p prefer_luminance_for_l8 disambiguates the L8 ↔ {LVGL L8, LVGL A8} pair:
+ *   - true  → L8 ⇒ LV_COLOR_FORMAT_L8 (luminance-as-RGB intent). Used for the
+ *             HW JPEG/PNG path because PNG ct=0 / JPEG OPT_MONO / grayscale-
+ *             palette promotion all carry a grayscale-image intent. The
+ *             draw-time BITMAP_SWIZZLE(ALPHA,ALPHA,ALPHA,ONE) restores
+ *             luminance-RGB sampling on top of EVE's alpha-with-white L8.
+ *   - false → L8 ⇒ LV_COLOR_FORMAT_A8 (alpha-only intent). Used for the
+ *             .esdm raw-asset path: native EVE bitmaps in L# format are
+ *             alpha-only by EVE's sampling rules (R=255, G=255, B=255,
+ *             A=value), and the converter that produced them already treated
+ *             them as alpha masks.
+ *
+ * Sub-byte L1/L2/L4 always map to A1/A2/A4 — LVGL has no sub-byte luminance
+ * format, and the typical sub-byte source on EVE is an alpha mask anyway. */
+static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt, bool prefer_luminance_for_l8)
 {
     switch(eve_fmt) {
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820)
@@ -1222,18 +1255,14 @@ static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt)
 #endif
         case RGB565:
             return LV_COLOR_FORMAT_RGB565;
-        /* EVE's native L# sampling produces (R=255, G=255, B=255, A=value) —
-         * alpha-only with white RGB. That matches LVGL's A# (alpha) semantic,
-         * not LVGL's L8 (luminance-as-RGB) semantic. Buffers coming out of EVE
-         * in L# format are honest A# buffers; LVGL L8 sources go through the
-         * upload path which sets vr->sample_as_luminance to apply the
-         * luminance swizzle at draw time. */
         case L8:
-            return LV_COLOR_FORMAT_A8;
+            return prefer_luminance_for_l8 ? LV_COLOR_FORMAT_L8 : LV_COLOR_FORMAT_A8;
         case L4:
             return LV_COLOR_FORMAT_A4;
+#if (EVE_SUPPORT_CHIPID >= EVE_FT810) || defined(EVE_MULTI_GRAPHICS_TARGET)
         case L2:
             return LV_COLOR_FORMAT_A2;
+#endif
         case L1:
             return LV_COLOR_FORMAT_A1;
         default:
@@ -1526,21 +1555,27 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     vr->height = src_h;
     vr->source_offset = source_offset;
     vr->palette_offset = pal_offset;
-    /* HW-decoded L# is alpha (LVGL A#); only the .bin loader can carry an
-     * explicit luminance / premultiplied declaration through, and only when
-     * the source said so. Everything else stays at the chip-native default. */
     vr->is_premultiplied = bin_is_premultiplied;
-    vr->sample_as_luminance = (bin_lv_cf == LV_COLOR_FORMAT_L8);
     vr->has_content = true;
     /* is_swapchain stays zero — only the driver-owned full_buf vr sets it. */
 
-    /* For .bin sources, the user picked the LVGL CF — preserve that intent so
-     * widget code that switches on header.cf (e.g. A# vs L8) sees the
-     * authored format. For HW-decoded JPEG/PNG/ESDM the EVE format is the
-     * source of truth and we map it back honestly via eve_format_to_lv_cf. */
+    /* Resolve the LVGL color format the decoded buffer carries:
+     *   - .bin source: respect the bin header's CF verbatim (LVGL L8 / A8 /
+     *     ARGB8888_PREMULTIPLIED etc. — the user's authored intent).
+     *   - HW JPEG / PNG: L8 means a grayscale image (PNG ct=0, JPEG OPT_MONO,
+     *     grayscale-palette promotion). Map L8 → LVGL L8 so the draw-time
+     *     swizzle renders it as luminance-RGB.
+     *   - ESDM raw asset: L# is a native EVE bitmap authored as an alpha
+     *     mask. Map L8 → LVGL A8 so it renders as alpha by EVE's default
+     *     sampling, with no swizzle.
+     *
+     * is_image_ext (set up at the top of decoder_open) discriminates the
+     * JPEG/PNG path from the ESDM path. Drive sample_as_luminance off the
+     * resolved LVGL CF so the bin and HW-luminance paths share the swizzle. */
     lv_color_format_t lv_cf = (bin_lv_cf != LV_COLOR_FORMAT_UNKNOWN)
                               ? bin_lv_cf
-                              : eve_format_to_lv_cf(eve_format);
+                              : eve_format_to_lv_cf(eve_format, /*prefer_luminance_for_l8*/ is_image_ext);
+    vr->sample_as_luminance = (lv_cf == LV_COLOR_FORMAT_L8);
     lv_draw_buf_t * decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     if(decoded == NULL) {
         lv_free(vr);

@@ -460,9 +460,13 @@ static inline bool eve5_fill_border_area_match(const lv_area_t * fill_area, cons
  */
 static inline bool lv_draw_eve5_format_has_alpha(uint16_t eve_format)
 {
-    if(eve_format == RGB332 || eve_format == RGB565 || eve_format == PALETTED565)
+    if(eve_format == RGB332 || eve_format == RGB565)
         return false;
-#if (EVE_SUPPORT_CHIPID >= EVE_BT820)
+#if (EVE_SUPPORT_CHIPID >= EVE_FT810) || defined(EVE_MULTI_GRAPHICS_TARGET)
+    if(eve_format == PALETTED565)
+        return false;
+#endif
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
     if(eve_format == RGB8 || eve_format == RGB6 || eve_format == YCBCR)
         return false;
 #endif
@@ -488,10 +492,17 @@ static inline void set_palette_if_needed(EVE_HalContext *phost, uint16_t eve_for
 
 /** Check if an EVE bitmap format requires GLFORMAT + BITMAP_EXT_FORMAT mode.
  *  Legacy formats (ARGB8, RGB565, L8, etc.) fit in the 5-bit layout field (0-30).
- *  Extended formats (ASTC, etc.) exceed this range and need GLFORMAT (31). */
+ *  Extended formats (ASTC, etc.) exceed this range and need GLFORMAT (31).
+ *  GLFORMAT itself is BT815+ — pre-BT815 builds never see extended formats,
+ *  so the answer is always false. */
 static inline bool eve5_is_extended_format(uint16_t eve_format)
 {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
     return eve_format > GLFORMAT;
+#else
+    (void)eve_format;
+    return false;
+#endif
 }
 
 /** Byte size of a render-target surface for a given line stride and
@@ -511,16 +522,21 @@ static inline uint32_t eve5_rt_surface_size(uint16_t eve_format, uint32_t stride
  * Set bitmap layout with correct GLFORMAT handling.
  * Extended formats (ASTC, etc.) use GLFORMAT + BITMAP_EXT_FORMAT + identity swizzle.
  * Legacy formats use the format code directly in the layout byte.
+ * Pre-BT815 builds have no GLFORMAT and never produce extended-format bitmaps,
+ * so the extended branch compiles out.
  */
 static inline void eve5_set_bitmap_layout(EVE_HalContext *phost, uint16_t eve_format,
                                           int32_t stride, int32_t height)
 {
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
     if(eve5_is_extended_format(eve_format)) {
         EVE_CoDl_bitmapLayout(phost, GLFORMAT, stride, height);
         EVE_CoDl_bitmapExtFormat(phost, eve_format);
         EVE_CoDl_bitmapSwizzle(phost, RED, GREEN, BLUE, ALPHA);
     }
-    else {
+    else
+#endif
+    {
         EVE_CoDl_bitmapLayout(phost, (uint8_t)eve_format, stride, height);
     }
 }

@@ -255,11 +255,14 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
         case LV_COLOR_FORMAT_A2:
             /* L2 was added in EVE2 (FT810+). FT800/FT801 only have L1 and L4 — fall
              * back to L4 with 2bpp→4bpp bit-replication so 0/1/2/3 → 0/5/A/F. */
+#if (EVE_SUPPORT_CHIPID >= EVE_FT810) || defined(EVE_MULTI_GRAPHICS_TARGET)
             if(EVE_CHIPID >= EVE_FT810) {
                 *eve_format = L2;
                 *bits_per_pixel = 2;
             }
-            else {
+            else
+#endif
+            {
                 *eve_format = L4;
                 *bits_per_pixel = 4;
                 *needs_conversion = true;
@@ -278,17 +281,19 @@ bool lv_draw_eve5_get_eve_format_info(EVE_HalContext *hal,
             break;
 
         /* LVGL AL88 (lv_color16a_t: byte 0 = L, byte 1 = A) is byte-for-byte
-         * identical to EVE LA8. LA1/LA2/LA4/LA8 (format codes 24-27) came in
-         * with EVE3 (BT815+); pre-BT815 has no equivalent so the upload
-         * declines and the LVGL bin decoder / SW renderer takes over. */
-#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
+         * identical to EVE LA8. Per the chip "Bitmap formats" matrix any code
+         * above L2 (17) is BT820+, and LA8 (27) is inside the BT_82X_ENABLE
+         * block in EVE_GpuDefs.h — pre-BT820 single-target builds don't have
+         * the symbol. Pre-BT820 declines so the LVGL bin decoder / SW renderer
+         * takes over. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
         case LV_COLOR_FORMAT_AL88:
-            if(EVE_CHIPID >= EVE_BT815) {
+            if(EVE_CHIPID >= EVE_BT820) {
                 *eve_format = LA8;
                 *bits_per_pixel = 16;
                 break;
             }
-            LV_LOG_WARN("EVE5: AL88 / LA8 needs BT815+ (chipid=%u)", (unsigned)EVE_CHIPID);
+            LV_LOG_WARN("EVE5: AL88 / LA8 needs BT820+ (chipid=%u)", (unsigned)EVE_CHIPID);
             return false;
 #endif
 

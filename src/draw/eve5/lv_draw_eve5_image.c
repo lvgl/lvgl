@@ -115,7 +115,10 @@ void build_colorkey_stencil(EVE_HalContext *phost,
      * in BT815. On earlier chips the swizzle calls silently no-op and the per-
      * channel routing the stencil build relies on doesn't happen. Skip the whole
      * stencil setup so the caller's clear-stencil + EQUAL-6 punch becomes a
-     * no-op — colorkey filtering is disabled but the bitmap still renders. */
+     * no-op — colorkey filtering is disabled but the bitmap still renders.
+     * On pre-BT815 single-target builds GLFORMAT itself is undeclared, so the
+     * body is compile-time eliminated as well. */
+#if (EVE_SUPPORT_CHIPID >= EVE_BT815) || defined(EVE_MULTI_GRAPHICS_TARGET)
     if(EVE_CHIPID < EVE_BT815) {
         LV_LOG_INFO("EVE5: colorkey unsupported on chipid=%u (need BT815+ for swizzle)", (unsigned)EVE_CHIPID);
         return;
@@ -177,6 +180,16 @@ void build_colorkey_stencil(EVE_HalContext *phost,
     else {
         EVE_CoDl_bitmapLayout(phost, (uint8_t)eve_format, eve_stride, layout_h);
     }
+#else
+    (void)phost;
+    (void)colorkey;
+    (void)eve_format;
+    (void)eve_stride;
+    (void)layout_h;
+    (void)vx;
+    (void)vy;
+    LV_LOG_INFO("EVE5: colorkey path requires BT815+ at compile time");
+#endif
 }
 
 /**********************
