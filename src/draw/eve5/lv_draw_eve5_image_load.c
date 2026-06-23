@@ -906,8 +906,20 @@ static lv_color_format_t eve_format_to_lv_cf(uint16_t eve_fmt)
 #endif
         case RGB565:
             return LV_COLOR_FORMAT_RGB565;
+        /* EVE's native L# sampling produces (R=255, G=255, B=255, A=value) —
+         * alpha-only with white RGB. That matches LVGL's A# (alpha) semantic,
+         * not LVGL's L8 (luminance-as-RGB) semantic. Buffers coming out of EVE
+         * in L# format are honest A# buffers; LVGL L8 sources go through the
+         * upload path which sets vr->sample_as_luminance to apply the
+         * luminance swizzle at draw time. */
         case L8:
-            return LV_COLOR_FORMAT_L8;
+            return LV_COLOR_FORMAT_A8;
+        case L4:
+            return LV_COLOR_FORMAT_A4;
+        case L2:
+            return LV_COLOR_FORMAT_A2;
+        case L1:
+            return LV_COLOR_FORMAT_A1;
         default:
             return LV_COLOR_FORMAT_ARGB8888;
     }
@@ -1156,12 +1168,12 @@ static lv_result_t eve5_decoder_open(lv_image_decoder_t * decoder,
     vr->palette_offset = pal_offset;
     vr->is_premultiplied = false;
     vr->has_content = true;
-    /* HW PNG/JPEG decode produces EVE L8 only for grayscale sources (PNG ct=0,
-     * JPEG OPT_MONO, or the grayscale-palette promotion above). Tag those as
-     * luminance so the image draw paths apply the swizzle that restores
-     * R=G=B=value, A=1 — matching LVGL's L8 semantics on top of EVE's
-     * alpha-with-white default L8 sampling. */
-    vr->sample_as_luminance = (eve_format == L8);
+    /* EVE-produced L# buffers (HW PNG/JPEG decode of grayscale, palette
+     * promotion above) are reported back to LVGL as A# — EVE's L# sampling
+     * IS alpha. No swizzle needed; sample_as_luminance is reserved for LVGL
+     * sources that explicitly declared LV_COLOR_FORMAT_L8 luminance semantics
+     * (see the upload path). */
+    vr->sample_as_luminance = false;
     /* is_swapchain stays zero — only the driver-owned full_buf vr sets it. */
 
     lv_color_format_t lv_cf = eve_format_to_lv_cf(eve_format);
