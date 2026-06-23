@@ -16,7 +16,15 @@ extern "C" {
 #include "../config/lv_conf_internal.h"
 #include "../logging/lv_log.h"
 #include "../stdlib/lv_mem.h"
+
+#ifdef LV_ASSERT_HANDLER_INCLUDE
+#warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside"
 #include LV_ASSERT_HANDLER_INCLUDE
+#endif
+
+#ifndef LV_ASSERT_HANDLER
+#define LV_ASSERT_HANDLER while(1); /*halt by default*/
+#endif
 
 /*********************
  *      DEFINES
