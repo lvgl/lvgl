@@ -3,7 +3,7 @@ config LV_BIG_ENDIAN_SYSTEM
 	help
 		For big endian systems set to 1
 
-config LV_ATTRIBUTE_CUSTOM_HEADER
+config LV_ATTRIBUTE_CUSTOM_INCLUDE
 	string "Path to custom attributes header"
 	default ""
 	help

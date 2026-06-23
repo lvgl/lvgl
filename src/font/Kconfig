@@ -237,7 +237,7 @@ choice LV_FONT_DEFAULT
 		select LV_FONT_UNSCII_16
 endchoice
 
-config LV_FONT_CUSTOM_HEADER
+config LV_FONT_CUSTOM_INCLUDE
 	string "Path to custom font declaration header"
 	default ""
 	help

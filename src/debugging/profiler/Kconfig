@@ -31,7 +31,7 @@ endif #LV_USE_PROFILER_BUILTIN
 
 if LV_USE_PROFILER
 
-config LV_PROFILER_CUSTOM_HEADER
+config LV_PROFILER_CUSTOM_INCLUDE
 	string "Path to custom profiler header"
 	default ""
 	help

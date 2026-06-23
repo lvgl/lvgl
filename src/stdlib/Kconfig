@@ -51,15 +51,19 @@ endchoice # "Sprintf functions"
 
 if LV_USE_BUILTIN_MALLOC
 
+config LV_MEM_SIZE
+	int "Size of the memory used by `lv_malloc()` in bytes (Needs to be at least 2kB (2048))"
+	default 65536
+
 config LV_MEM_SIZE_KILOBYTES
-	int "Size of the memory used by `lv_malloc()` in kilobytes (>= 2kB)"
-	default 64
-	depends on LV_USE_BUILTIN_MALLOC
+	int "Memory size (KB) [DEPRECATED: use LV_MEM_SIZE]"
+	help
+	  Deprecated. Use LV_MEM_SIZE (in bytes) instead.
 
 config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
-	int "Size of the memory expand for `lv_malloc()` in kilobytes"
-	default 0
-	depends on LV_USE_BUILTIN_MALLOC
+	int "Size of the memory expand for `lv_malloc()` in kilobytes [DEPRECATED: use LV_MEM_SIZE directly]"
+	help
+	  Deprecated. Modify LV_MEM_SIZE (in bytes) directly instead.
 
 config LV_MEM_ADR
 	hex "Address for the memory pool instead of allocating it as a normal array. 0: unused"

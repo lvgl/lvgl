@@ -35,15 +35,15 @@ menu "Asserts"
 	config LV_USE_ASSERT_OBJ
 		bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
 
-	config LV_ASSERT_CUSTOM_HANDLER
+	config LV_ASSERT_CUSTOM_INCLUDE
 		string "Path to custom assert handler header"
-		default ""
+		default "stdint.h"
 		help
 		  Optional header to override assert-related macros.
 
 		  LV_ASSERT_HANDLER
-		    Statement to execute when an assertion fails. By default calls
-		    LV_ASSERT_HANDLER_INCLUDE and halts.
+		    Statement to execute when an assertion fails.
+		    e.g. my_assert_failed(__FILE__, __LINE__);
 
 endmenu
 
