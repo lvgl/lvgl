@@ -15,8 +15,7 @@
 
 #include "lv_pxp_osa.h"
 
-#if LV_USE_PXP
-#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
+#if LV_USE_DRAW_PXP
 #include "lv_pxp_utils.h"
 #include "../../../osal/lv_os_private.h"
 #include <fsl_pxp.h>
@@ -183,5 +182,4 @@ static void _pxp_wait(void)
 #endif
 }
 
-#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
-#endif /*LV_USE_PXP*/
+#endif /*LV_USE_DRAW_PXP*/

@@ -44,7 +44,6 @@ menu "Asserts"
 		  LV_ASSERT_HANDLER
 		    Statement to execute when an assertion fails. By default calls
 		    LV_ASSERT_HANDLER_INCLUDE and halts.
-		    e.g. my_assert_failed(__FILE__, __LINE__);
 
 endmenu
 

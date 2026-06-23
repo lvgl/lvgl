@@ -15,7 +15,6 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <math.h>
 #include <g2d.h>
@@ -309,4 +308,3 @@ static void _g2d_blit_two_steps(void * handle, struct g2d_surface * dst_surf, st
     g2d_disable(handle, G2D_BLEND);
 }
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/
