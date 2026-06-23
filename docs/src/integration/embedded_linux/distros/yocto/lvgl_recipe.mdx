@@ -21,8 +21,7 @@ liblz4-tool file locales libacl1
 
 <Callout type="info">
 For host package requirements on all supported Linux distributions, see the
-[Required Packages for the Build Host](https://docs.yoctoproject.org/
-ref-manual/system-requirements.html#required-packages-for-the-build-host)
+[Required Packages for the Build Host](https://docs.yoctoproject.org/ref-manual/system-requirements.html#required-packages-for-the-build-host)
 section in the Yocto Project Reference Manual.
 </Callout>
 
@@ -192,9 +191,9 @@ There are some key folders:
 - **images**: it contains the images that can be flashed or deployed to
    the target device. Files like the Linux kernel, root filesystem (e.g.,
    .ext4, .tar.gz, .squashfs), bootloaders (e.g., U-Boot), and other
-   bootable images for the device are found here. t's organized by the
+   bootable images for the device are found here. It's organized by the
    machine (or target board) for which the image was built.
-- **rmp/deb/ipk**: These folders contain the individual software packages
+- **rpm/deb/ipk**: These folders contain the individual software packages
    generated during the build, in the specified package format (RPM, DEB,
    or IPK). These packages are typically created when you're building your
    Yocto project with package management support enabled. These can later
@@ -280,7 +279,6 @@ There is a recipe in `meta-openembedded` since `honister`.
 | nanbield (Yocto Project 4.3) | lvgl 8.3.10 |
 | mickledore (Yocto Project 4.2) | lvgl 8.1.0 |
 | langdale (Yocto Project 4.1) | lvgl 8.1.0 |
-| langdale (Yocto Project 4.1) | lvgl 8.1.0 |
 | kirkstone (Yocto Project 4.0) | lvgl 8.0.3 |
 
 In this guide, we are on the `scarthgap` branch, so we are using lvgl 9.1.0.
@@ -289,8 +287,7 @@ Let's dive into this recipe to understand what is done. The objective is to add
 this library as a shared object in the target rootfs, and also to generate a
 SDK with lvgl.
 
-This is the path of lvgl recipes: `lvgl_yocto_guide/sources/meta-openembedded/
-meta-oe/recipes-graphics/lvgl`
+This is the path of lvgl recipes: `lvgl_yocto_guide/sources/meta-openembedded/meta-oe/recipes-graphics/lvgl`
 
 Here is the architecture of lvgl recipes folder:
 
@@ -413,11 +410,9 @@ The fetch Repo address has to be stored in **SRC_URI** variable. In
 When the fetch task has been completed, you can find the fetched sources in
    `build/downloads`.
 
-For this recipe, you will find a new folder here: `lvgl_yocto_guide
-   build/downloads/git2/github.com.lvgl.lvgl`.
+For this recipe, you will find a new folder here: `lvgl_yocto_guide/build/downloads/git2/github.com.lvgl.lvgl`.
 
-You can also find the folder architecture created in `lvgl_yocto_guide/
-   build/tmp/work/cortexa53-poky-linux/lvgl` but these folders are empty since
+You can also find the folder architecture created in `lvgl_yocto_guide/build/tmp/work/cortexa53-poky-linux/lvgl` but these folders are empty since
    only the fetch was done.
 
 Unpack (do_unpack)
@@ -464,8 +459,7 @@ In this case, it creates a build directory, It invokes CMake to configure
    recipe. It generates Makefiles or project files needed for the build. Also,
    there are operations added in the task in `lv-conf.inc`.
 
-So at the end of the task, in the `lvgl_yocto_guide/build/tmp/work/
-   cortexa53-poky-linux/lvgl/9.1.0`, you will find a `build` folder that was
+So at the end of the task, in the `lvgl_yocto_guide/build/tmp/work/cortexa53-poky-linux/lvgl/9.1.0`, you will find a `build` folder that was
    generated running the CMake command, but nothing is built yet. Also, the
    sysroots have everything required to build lvgl library.
 
@@ -486,7 +480,7 @@ If there are any compilation steps, then these steps are define in
 Like in the previous task, this is handle by `inherit cmake`.
 
 In the build folder, you can now see the built library. The `.so` files
-   are available in `lvgl_yocto_guide/build/tmp/work/ cortexa53-poky-linux/lvgl/9.1.0/build/lib`.
+   are available in `lvgl_yocto_guide/build/tmp/work/cortexa53-poky-linux/lvgl/9.1.0/build/lib`.
 
 After this task has been completed, everything is ready to be installed.
 
@@ -521,14 +515,13 @@ TOOLCHAIN_HOST_TASK:append = " lvgl"
 This will add the lvgl library in the generated image, and it will also add
 the library to the host SDK we will generate later on.
 
-With these modifications, you can now run the image recipe again::
+With these modifications, you can now run the image recipe again:
 
 bitbake core-image-base
 
-This will execute all the previous described tasks.
+This will execute all the previously described tasks.
 
-If everything went well, you should now found this file `build/tmp/deploy/
-rpm/cortexa53/lvgl-9.1.0-r0.cortexa53.rpm` and other rpm files related to
+If everything went well, you should now find this file `build/tmp/deploy/rpm/cortexa53/lvgl-9.1.0-r0.cortexa53.rpm` and other rpm files related to
 lvgl.
 </Callout>
 
@@ -551,7 +544,7 @@ purposes, particularly in embedded development:
       Developers don't need to manually install and configure tools and
       libraries; everything needed is included in the SDK.
     - **Consistent Build Environment**: The SDK ensures that developers are
-      working with the same versions of and tools used in the Yocto
+      working with the same versions of libraries and tools used in the Yocto
       build, which helps to avoid compatibility issues and ensures that
       applications will behave as expected on the target device.
 
@@ -578,7 +571,7 @@ If you want to ensure the SDK was generated with lvgl being installed, go to
 the path you extracted the SDK and find all lvgl files:
 
 ```bash
-cd /opt/poky/5.0.4/sysroots/cortexa53-poky-linux
+cd /opt/poky/sdk-with-lvgl/sysroots/cortexa53-poky-linux
 find . -name "*lvgl*"
 ```
 
@@ -587,7 +580,7 @@ The `.so` files you will find will depend on the LVGL configuration you used.
 Now to use the SDK environment and cross-compile an application:
 
 ```bash
-source /opt/poke/5.0.4/environment-setup-cortexa53-poky-linux
+source /opt/poky/sdk-with-lvgl/environment-setup-cortexa53-poky-linux
 ```
 
 <Callout type="info">
@@ -790,7 +783,7 @@ index 62a834f..58fbe7a 100644
 
 #### Patch 2
 
-Create the first patch file
+Create the second patch file
 
 ```c
 touch 0002-adapt-CMakeLists-file-to-compile-and-link-fbdev.patch

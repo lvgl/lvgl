@@ -19,7 +19,7 @@ See the [Quick porting guide](/getting_started/porting).
 
 Screens are LVGL widgets created on a *Display*. They are logical containers for other widgets. A display can
 have multiple screens, but there is always one active screen, which can be retrieved by using <ApiLink name="lv_screen_active" />.
-It returns an `lv_obj_t *` pointer. See [Active Screen](/common-widget-features/screens) for more information.
+It returns an <ApiLink name="lv_obj_t" display="lv_obj_t *" /> pointer. See [Active Screen](/common-widget-features/screens) for more information.
 
 The most common way to create a screen is by creating a [Base widget](/widgets/base_widget) with a `NULL` parent. E.g.
 
@@ -64,9 +64,9 @@ lv_obj_set_size(my_button1, lv_pct(100), LV_SIZE_CONTENT);
 lv_obj_align(my_button1, LV_ALIGN_RIGHT_MID, -20, 0);
 
 lv_obj_t * my_label1 = lv_label_create(my_button1);
-lv_label_set_text_fmt(my_label1, "Click me!");
-lv_obj_set_style_text_color(my_label1, lv_color_hex(0xff0000), 0);
+lv_label_set_text(my_label1, "Click me!");
 /* Make the text red */
+lv_obj_set_style_text_color(my_label1, lv_color_hex(0xff0000), 0);
 ```
 
 To see the full API for any widget, see its documentation at [All Widgets](/widgets), or check
@@ -119,7 +119,7 @@ has only one part called <ApiLink name="LV_PART_MAIN" />. However, a
 [Slider (lv_slider)](/widgets/slider) has <ApiLink name="LV_PART_MAIN" />, <ApiLink name="LV_PART_INDICATOR" />
 and <ApiLink name="LV_PART_KNOB" />.
 
-By using parts you can apply different [styles](/getting_started/learn_the_basics) to the parts
+By using parts you can apply different [styles](/common-widget-features/styles) to the parts
 of a widget.
 
 Read the Widget's documentation to learn which parts it uses.
@@ -162,7 +162,7 @@ lv_obj_remove_state(widget, LV_STATE_...);
 Styles are carried in <ApiLink name="lv_style_t" /> objects. They contain properties such as
 background color, border width, font, etc.
 
-The styles can be added to a widget's given [Part](/getting_started/learn_the_basics) and [State](/getting_started/learn_the_basics).
+The styles can be added to a widget's given [Part](/common-widget-features/parts_and_states) and [State](/common-widget-features/parts_and_states).
 Only their pointer is saved in the Widgets so they need to be defined as static or global variables.
 
 Before using a style it needs to be initialized with <ApiLink name="lv_style_init" display="lv_style_init(&style1)" />.

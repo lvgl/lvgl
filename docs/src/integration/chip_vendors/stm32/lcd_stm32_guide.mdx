@@ -7,6 +7,7 @@ description: Here is how you can drive a RGB565 240x320 SPI display using STM32 
 
 Here is how you can drive a RGB565 240x320 SPI display using STM32 HAL SPI.
 You can use direct or partial mode. Single-buffered direct is shown in this example.
+See the [Display](/main-modules/display) module for general background on LVGL displays.
 
 In your initialization code, create the display and set the buffers and flush callback.
 
@@ -46,7 +47,7 @@ Performance can be improved by using DMA with double buffering.
 
 ## Touch indev
 
-In your initialization code, create the touch screen indev.
+In your initialization code, create the touch screen [input device](/main-modules/indev).
 
 ```c
 lv_indev_t * indev = lv_indev_create();

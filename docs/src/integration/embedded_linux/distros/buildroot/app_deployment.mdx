@@ -11,7 +11,7 @@ application using LVGL running on the board.
 ### Update RootFS
 
 Depending on the application, it might be necessary to update the rootfs. Let's
-take as example the compilation of LVGL with DRM. The system must have
+take as example the compilation of LVGL with [DRM](/integration/embedded_linux/drivers/drm). The system must have
 `libdrm` installed.
 
 ```bash
@@ -93,7 +93,7 @@ export LDFLAGS="--sysroot=${SYSROOT}"
 ### Build the application
 
 The environment is now set up, and we're ready to build an application using
-the [lv_benchmark` repository that is inspired from `lv_port_linux](https://github.com/lvgl/lv_port_linux).
+the [`lv_benchmark`](https://github.com/EDGEMTech/lv_benchmark) repository, which is inspired by [`lv_port_linux`](https://github.com/lvgl/lv_port_linux).
 
 Navigate back to the root of the project and clone the repository:
 

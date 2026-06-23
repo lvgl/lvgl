@@ -78,7 +78,7 @@ These commands create the project directory and the `Dockerfile`.
 `git` is used to download the `lv_port_linux` and `lvgl` repositories from Github.
 
 <Callout type="info">
-By default, `lv_port_linux` is configured to use the legacy framebuffer device
+By default, `lv_port_linux` is configured to use the legacy [framebuffer](/integration/embedded_linux/drivers/fbdev) device
 `/dev/fb0`. It is also possible to use another rendering backend by enabling the
 correct options in `lv_port_linux/lv_conf.h`.
 </Callout>
@@ -131,10 +131,10 @@ The `Dockerfile` acts like a recipe to build two images:  `build` and `deploy`.
 
 First it downloads the necessary packages to build the simulator using Debian's package manager `apt-get`.
 
-After compilation, the resulting executable is written to `lv_port_linux/bin/lvglsim`.
+After compilation, the resulting executable is written to `/app/build/bin/lvglsim`.
 
 The `deploy` image will be deployed on the device.
-The executable created in the previous image is copied to the `/usr/bin` directory of the current image.
+The executable created in the previous image is copied to the `/usr/lvgl_widgets` path of the current image.
 
 This creates a smaller image that does not include the tool chain and the build dependencies.
 
@@ -191,7 +191,7 @@ Get the IP address of the development host and open a remote shell on the device
 ```sh
 sudo su # When prompted type in the password of the torizon user
 
-# Be sure to replace set the IP address of your host instead
+# Be sure to set the IP address of your host instead
 cat << heredoc > /etc/docker/daemon.json
 {
      "insecure-registries" : ["<IP_ADDR_OF_DEVELOPMENT_HOST>:5000"]

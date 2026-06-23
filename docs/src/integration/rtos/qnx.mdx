@@ -30,7 +30,7 @@ a static library.
 
 ### Include LVGL in Your Project
 
-Follow the generic instructions for getting started with LVGL. After copying
+Follow the generic instructions for [getting started](/getting_started/porting) with LVGL. After copying
 `lv_conf_template.h` to  `lv_conf.h` make the following changes to the latter:
 
 1. Enable QNX support:
@@ -120,7 +120,7 @@ main(int argc, char **argv)
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Hello world");
-    lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
     /* Run the event loop until it exits. */

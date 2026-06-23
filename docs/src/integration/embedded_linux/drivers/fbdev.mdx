@@ -25,8 +25,8 @@ mode.
 
 ## Usage
 
-To set up a framebuffer-based display, first create a display with `lv_linux_fbdev_create`. Afterwards set the framebuffer device
-node on the display (usually this is `/dev/fb0`).
+To set up a framebuffer-based display, first create a display with <ApiLink name="lv_linux_fbdev_create" />. Afterwards set the framebuffer device
+node on the display with <ApiLink name="lv_linux_fbdev_set_file" /> (usually this is `/dev/fb0`).
 
 ```c
 lv_display_t *disp = lv_linux_fbdev_create();
@@ -35,7 +35,7 @@ lv_linux_fbdev_set_file(disp, "/dev/fb0");
 
 If your screen stays black or only draws partially, you can try enabling direct
 rendering via <ApiLink name="LV_DISPLAY_RENDER_MODE_DIRECT" />. Additionally, you can
-activate a force refresh mode with `lv_linux_fbdev_set_force_refresh(true)`. This
+activate a force refresh mode with <ApiLink name="lv_linux_fbdev_set_force_refresh" />. This
 usually has a performance impact though and shouldn't be enabled unless really needed.
 
 ## Hide the cursor

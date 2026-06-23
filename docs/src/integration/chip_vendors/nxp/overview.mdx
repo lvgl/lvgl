@@ -30,27 +30,27 @@ additional integration work is required.
 
 Depending on the RT platform used, the acceleration can be done by NXP PXP
 (PiXel Pipeline) and/or the Verisilicon GPU through an API named VGLite. Each
-accelerator has its own context that allows them to be used individually as well
+accelerator has its own context that allows them to be used individually as well as
 simultaneously (in LVGL multithreading mode).
 
 ## HW acceleration for NXP iMX platforms
 
 On MPU platforms, the acceleration can be done (hardware independent) by NXP G2D
 library. This accelerator has its own context that allows them to be used
-individually as well simultaneously with the CPU (in LVGL multithreading mode).
+individually as well as simultaneously with the CPU (in LVGL multithreading mode).
 
 ### PXP accelerator
 
 #### Basic configuration:
 
 - Select NXP PXP engine in "lv_conf.h": Set <ApiLink name="LV_USE_PXP" /> to `1`.
-- In order to use PXP as a draw unit, select in "lv_conf.h": Set <ApiLink name="LV_USE_DRAW_PXP" /> to `1`.
+- In order to use PXP as a [draw unit](/main-modules/draw), select in "lv_conf.h": Set <ApiLink name="LV_USE_DRAW_PXP" /> to `1`.
 - In order to use PXP to rotate the screen, select in "lv_conf.h": Set <ApiLink name="LV_USE_ROTATE_PXP" /> to `1`.
 - Enable PXP asserts in "lv_conf.h": Set <ApiLink name="LV_USE_PXP_ASSERT" /> to `1`.
   There are few PXP assertions that can stop the program execution in case the
   <ApiLink name="LV_ASSERT_HANDLER" /> is set to `while(1);` (Halt by default). Else,
   there will be logged just an error message via `LV_LOG_ERROR`.
-- If <ApiLink name="SDK_OS_FREE_RTOS" /> symbol is defined, FreeRTOS implementation
+- If `SDK_OS_FREE_RTOS` symbol is defined, FreeRTOS implementation
   will be used, otherwise bare metal code will be included.
 
 #### Basic initialization:
@@ -74,7 +74,7 @@ draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
 draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
 ```
 
-and an addition thread `_pxp_render_thread_cb()` will be spawned in order to
+and an additional thread `_pxp_render_thread_cb()` will be spawned in order to
 handle the supported draw tasks.
 
 ```c
@@ -88,7 +88,7 @@ and the PXP drawing task will get executed on the same LVGL main thread.
 
 `_pxp_evaluate()` will get called after each task is being created and will
 analyze if the task is supported by PXP or not. If it is supported, then an
-preferred score and the draw unit id will be set to the task. An `score` equal
+preferred score and the draw unit id will be set to the task. A `score` equal
 to `100` is the default CPU score. Smaller score means that PXP is capable of
 drawing it faster.
 
@@ -179,17 +179,17 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
 #### PXP default configuration:
 
 - Implementation depends on multiple OS-specific functions. The struct
-  <ApiLink name="pxp_cfg_t" /> with callback pointers is used as a parameter for the
+  `pxp_cfg_t` with callback pointers is used as a parameter for the
   <ApiLink name="lv_pxp_init" /> function. Default implementation for
   FreeRTOS in lv_pxp_osa.c.
 
-   - <ApiLink name="pxp_interrupt_init" />: Initialize PXP interrupt (HW setup,
+   - `pxp_interrupt_init`: Initialize PXP interrupt (HW setup,
      OS setup)
-   - <ApiLink name="pxp_interrupt_deinit" />: Deinitialize PXP interrupt (HW setup,
+   - `pxp_interrupt_deinit`: Deinitialize PXP interrupt (HW setup,
      OS setup)
-   - <ApiLink name="pxp_run" />: Start PXP job. Use OS-specific mechanism to block
+   - `pxp_run`: Start PXP job. Use OS-specific mechanism to block
      drawing thread.
-   - <ApiLink name="pxp_wait" />: Wait for PXP completion.
+   - `pxp_wait`: Wait for PXP completion.
 
 ### VGLite accelerator
 
@@ -201,7 +201,7 @@ task or suspend the CPU for power savings.
 #### Basic configuration:
 
 - Select NXP VGLite engine in "lv_conf.h": Set <ApiLink name="LV_USE_DRAW_VGLITE" /> to
-  `1`. <ApiLink name="SDK_OS_FREE_RTOS" /> symbol needs to be defined so that FreeRTOS
+  `1`. `SDK_OS_FREE_RTOS` symbol needs to be defined so that FreeRTOS
   driver osal implementation will be enabled.
 - Enable VGLite asserts in "lv_conf.h": Set <ApiLink name="LV_USE_VGLITE_ASSERT" /> to
   `1`.
@@ -260,7 +260,7 @@ draw_vglite_unit->base_unit.dispatch_cb = _vglite_dispatch;
 draw_vglite_unit->base_unit.delete_cb = _vglite_delete;
 ```
 
-and an addition thread `_vglite_render_thread_cb()` will be spawned in order to
+and an additional thread `_vglite_render_thread_cb()` will be spawned in order to
 handle the supported draw tasks.
 
 ```c
@@ -274,7 +274,7 @@ and the VGLite drawing task will get executed on the same LVGL main thread.
 
 `_vglite_evaluate()` will get called after each task is being created and will
 analyze if the task is supported by VGLite or not. If it is supported, then an
-preferred score and the draw unit id will be set to the task. An `score` equal
+preferred score and the draw unit id will be set to the task. A `score` equal
 to `100` is the default CPU score. Smaller score means that VGLite is capable of
 drawing it faster.
 
@@ -351,8 +351,8 @@ switch(t->type) {
 All the below operation can be done in addition with optional opacity.
 
 - Fill area with color (w/ radius or gradient).
-- Blit source image (any format from `_vglite_src_cf_supported()) over
-  destination (any format from vglite_dest_cf_supported()`).
+- Blit source image (any format from `_vglite_src_cf_supported()`) over
+  destination (any format from `vglite_dest_cf_supported()`).
 - Recolor source image.
 - Scale and rotate (any decimal degree) source image.
 - Blending layers (w/ same supported formats as blitting).
@@ -370,7 +370,7 @@ All the below operation can be done in addition with optional opacity.
   buffer address alignment to be 32 bytes for RGB565 and 64 bytes for ARGB8888.
 - For pixel engine (PE) destination, the alignment should be 64 bytes for all
   tiled (4x4) buffer layouts. The pixel engine has no additional alignment
-  requirement for linear buffer layouts (<ApiLink name="VG_LITE_LINEAR" />).
+  requirement for linear buffer layouts (`VG_LITE_LINEAR`).
 
 #### Project setup:
 
@@ -406,7 +406,7 @@ All the below operation can be done in addition with optional opacity.
 #### Basic initialization:
 
 G2D draw initialization is done automatically in <ApiLink name="lv_init" /> once the
-G2D is enabled as a draw unit , no user code is required:
+G2D is enabled as a draw unit, no user code is required:
 
 ```c
 #if LV_USE_DRAW_G2D
@@ -424,12 +424,12 @@ draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
 draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
 ```
 
-and an addition thread `_g2d_render_thread_cb()` will be spawned in order to
+and an additional thread `_g2d_render_thread_cb()` will be spawned in order to
 handle the supported draw tasks.
 
 ```c
 #if LV_USE_G2D_DRAW_THREAD
-  lv_thread_init(&draw_g2d_unit->thread, LV_THREAD_PRIO_HIGH, _g2d_render_thread_cb, 2 * 1024, draw_g2d_unit);
+  lv_thread_init(&draw_g2d_unit->thread, "g2ddraw", LV_THREAD_PRIO_HIGH, _g2d_render_thread_cb, 2 * 1024, draw_g2d_unit);
 #endif
 ```
 
@@ -438,7 +438,7 @@ and the G2D drawing task will get executed on the same LVGL main thread.
 
 `_g2d_evaluate()` will get called after each task is being created and will
 analyze if the task is supported by G2D or not. If it is supported, then an
-preferred score and the draw unit id will be set to the task. An `score` equal
+preferred score and the draw unit id will be set to the task. A `score` equal
 to `100` is the default CPU score. Smaller score means that G2D is capable of
 drawing it faster.
 
@@ -455,7 +455,7 @@ available for other operations while the G2D is running. Linux OS is required to
 block the LVGL drawing thread and switch to another task or suspend the CPU for
 power savings.
 
-Supported draw tasks are available in "src/draw/nx/g2d/lv_draw_g2d.c":
+Supported draw tasks are available in "src/draw/nxp/g2d/lv_draw_g2d.c":
 
 ```c
 switch(t->type) {

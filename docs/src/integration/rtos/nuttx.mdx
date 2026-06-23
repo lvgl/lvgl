@@ -165,7 +165,7 @@ nsh> lvgldemo
 The example app called `lvgldemo` uses LVGL's NuttX integration
 to run the demos in NuttX.
 
-https://github.com/apache/nuttx-apps/tree/master/examples/lvgldemo
+[examples/lvgldemo](https://github.com/apache/nuttx-apps/tree/master/examples/lvgldemo)
 
 It is used by all LVGL defconfigs. See `sim:lvgl_fb` and `sim:lvgl_lcd`.
 
@@ -224,7 +224,7 @@ to allocate from the NuttX global heap or use its own.
 NuttX tries to be POSIX compliant where possible, meaning it supports
 pthreads (POSIX threads). To enable OS features in LVGL on NuttX,
 set <ApiLink name="LV_USE_OS" /> to <ApiLink name="LV_OS_PTHREAD" />.
-The main reason for enabling OS features is for multi-core rendering.
+The main reason for enabling OS features is for [multi-core rendering](/main-modules/draw/draw_units).
 See <ApiLink name="LV_DRAW_SW_DRAW_UNIT_CNT" />. Otherwise there is no case
 for setting it.
 

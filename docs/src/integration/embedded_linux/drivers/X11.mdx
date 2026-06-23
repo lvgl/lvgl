@@ -53,7 +53,7 @@ The X11 driver uses XLib to access the linux window manager.
         // or
         #define LV_X11_RENDER_MODE_DIRECT  1  /* LV_DISPLAY_RENDER_MODE_DIRECT, not recommended for X11 driver */
         // or
-        #define LV_X11_RENDER_MODE_DULL    1  /* LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver */
+        #define LV_X11_RENDER_MODE_FULL    1  /* LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver */
         ```
 
 ## Usage
@@ -95,7 +95,7 @@ static void on_close_cb(lv_event_t * e)
 {
     ...
 
-    terminate = true;
+    terminated = true;
 }
 #endif
 

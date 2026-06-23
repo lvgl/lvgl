@@ -41,11 +41,11 @@ To add Arm2D to your project, follow these steps:
 6. The CMSIS DSP library also needs to be added to the project. You can use CMSIS-PACKS or add it manually.
 7. For better performance, enable `LTO` (Link Time Optimization) and use `-Omax` or `-Ofast`.
 8. Arm2D tries to read/write multiple data with a single instruction. Therefore, it's important to use the fastest memory (e.g., `BSS` or `TCM`) for LVGL's buffer to avoid memory bandwidth bottlenecks.
-9. Enable `LV_USE_DRAW_ARM2D_SYNC 1` and `LV_USE_DRAW_SW_ASM LV_DRAW_SW_ASM_HELIUM` in `lv_conf.h`.
+9. Enable <ApiLink name="LV_USE_DRAW_ARM2D_SYNC" /> and set <ApiLink name="LV_USE_DRAW_SW_ASM" /> to <ApiLink name="LV_DRAW_SW_ASM_HELIUM" /> in `lv_conf.h`.
 
 ## Neon Acceleration
 
-Some ARM Cortex-A and Cortex-R processors with the ARMv7 architecture and every ARM Cortex-A and Cortex-R processor from the ARMv8 architecture support the `Neon SIMD <https://www.arm.com/technologies/neon>` instruction set.
+Some ARM Cortex-A and Cortex-R processors with the ARMv7 architecture and every ARM Cortex-A and Cortex-R processor from the ARMv8 architecture support the [Neon SIMD](https://www.arm.com/technologies/neon) instruction set.
 LVGL has built-in support to improve the performance of software rendering by utilizing Neon instructions.
 
 ## Architecture Support

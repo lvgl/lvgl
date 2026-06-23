@@ -69,7 +69,7 @@ CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY=y
 CONFIG_SPIRAM_RODATA=y
 ```
 
-These options can reside on the IDF project `sdkconfig.defaults`, the last option
+These options can reside on the IDF project `sdkconfig.defaults`.
 
 ## Application crashes when enabling PPA
 
@@ -89,7 +89,7 @@ cache L1 line size, that is it, set its value to `64` instead of the default of 
 CONFIG_LV_DRAW_BUF_ALIGN=64
 ```
 
-## EPS32-P4 monitor log reports buffer underrun and frame-rate decreases
+## ESP32-P4 monitor log reports buffer underrun and frame-rate decreases
 
 In cases when the PSRAM is enabled and the PPA is used, it is common to see
 frame-rate degradation followed by a message on the log that reports the display
@@ -222,8 +222,8 @@ Some ESP file systems provide automatic generation from a host folder using CMak
      }
 
      lv_obj_t * obj = lv_image_create(lv_screen_active());
-     lv_image_set_src(widget, "A:/spiffs/logo.bin");
-     lv_obj_center(widget);
+     lv_image_set_src(obj, "A:/spiffs/logo.bin");
+     lv_obj_center(obj);
   }
   ```
 - **Build and flash**

@@ -13,10 +13,10 @@ A more detailed description is available at [Overview](/integration/overview).
 
 The main steps are the following:
 1. **Driver Initialization**:  It is the user's responsibility to set up the clock, timers, peripherals, etc.
-2. **Call `lv_init()`**: Initialize LVGL itself.
+2. **Call <ApiLink name="lv_init" display="lv_init()" />**: Initialize LVGL itself.
 3. **Create display and input devices and set up the tick**:  Create display(s) (<ApiLink name="lv_display_t" />) and input device(s) (<ApiLink name="lv_indev_t" />) and set up their callbacks.
 4. **Create the UI**:  Call LVGL functions to create screens, widgets, styles, animations, events, etc.
-5. **Call `lv_timer_handler()` in a loop**: This handles all the LVGL-related tasks, such as refreshing display(s), reading input devices, firing events based on user input, running animations, and running user-created timers.
+5. **Call <ApiLink name="lv_timer_handler" display="lv_timer_handler()" /> in a loop**: This handles all the LVGL-related tasks, such as refreshing display(s), reading input devices, firing events based on user input, running animations, and running user-created timers.
 
 This is just a brief example of how to add LVGL to a new project.
 
@@ -66,7 +66,7 @@ void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_buf)
 
     /* Indicate that the buffer is available.
      * If DMA were used, call in the DMA complete interrupt. */
-    lv_display_flush_ready();
+    lv_display_flush_ready(disp);
 }
 ```
 

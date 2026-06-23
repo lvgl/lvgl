@@ -54,9 +54,9 @@ other RTOS tasks while a DMA2D transfer is ongoing, do the following:
 
 ## Interop with LTDC and NeoChrom
 
-DMA2D usage can be freely mixed with LTDC usage as long as <ApiLink name="LV_ST_LTDC_USE_DMA2D_FLUSH" />
+DMA2D usage can be freely mixed with [LTDC](/integration/chip_vendors/stm32/ltdc) usage as long as <ApiLink name="LV_ST_LTDC_USE_DMA2D_FLUSH" />
 is **not** enabled. LTDC will use the DMA2D peripheral for flushing, if that is enabled.
 
-NeoChrom and DMA2D may be enabled at the same time. They are both draw units
+[NeoChrom](/integration/chip_vendors/stm32/neochrom) and DMA2D may be enabled at the same time. They are both draw units
 and they will both independently accept draw tasks.
 
