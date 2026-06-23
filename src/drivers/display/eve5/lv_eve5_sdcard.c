@@ -790,8 +790,12 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     }
     phost->SuppressErrorOverlay = true;
 
-    uint32_t q_w = 0, q_h = 0;
-    uint32_t q_res = EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &q_w, &q_h, NULL);
+    uint32_t q_w = 0, q_h = 0, q_size = 0, q_fmt = 0, q_palette = 0;
+    uint32_t q_res = EVE_CoCmd_queryImage_fs(phost, sd_path, 0,
+                                             &q_size, &q_fmt, &q_w, &q_h, &q_palette);
+    LV_LOG_USER("EVE5 SD QUERYIMAGE %s -> res=%u size=%u fmt=%u w=%u h=%u palette=%u",
+                sd_path, (unsigned)q_res, (unsigned)q_size, (unsigned)q_fmt,
+                (unsigned)q_w, (unsigned)q_h, (unsigned)q_palette);
     if(q_res != 0) {
         LV_LOG_ERROR("CMD_QUERYIMAGE failed for %s (code %u)", sd_path, (unsigned)q_res);
         if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
@@ -810,6 +814,15 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
 #endif
         return false;
     }
+
+    /* DEBUG: mandatory reset after every successful CMD_QUERYIMAGE — testing
+     * whether the residual firmware state from the patched query is what
+     * poisons later coprocessor work. The subsequent CMD_LOADIMAGE_fs reissues
+     * its own CMD_FSSOURCE so resetting between them is safe. */
+    LV_LOG_USER("EVE5 SD QUERYIMAGE %s: mandatory reset after query", sd_path);
+    phost->SuppressErrorOverlay = false;
+    lv_eve5_reset_coprocessor(s_ctx.disp);
+    phost->SuppressErrorOverlay = true;
 
     /* Worst-case decoded size: ARGB8 (4 bpp), or for PALETTEDARGB8 a
      * 1024-byte palette plus w*h indices — larger for images under
@@ -844,6 +857,11 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
 
     uint32_t load_res = EVE_CoCmd_loadImage_fs(phost, final_addr, sd_path, loadimage_opts,
                                                &out_fmt, &out_source, &out_w, &out_h, &out_palette);
+    LV_LOG_USER("EVE5 SD LOADIMAGE %s -> res=%u alloc_base=0x%08X opts=0x%08X "
+                "source=0x%08X fmt=%u w=%u h=%u palette=0x%08X",
+                sd_path, (unsigned)load_res, (unsigned)final_addr, (unsigned)loadimage_opts,
+                (unsigned)out_source, (unsigned)out_fmt, (unsigned)out_w, (unsigned)out_h,
+                (unsigned)out_palette);
     if(load_res != 0) {
         LV_LOG_ERROR("CMD_LOADIMAGE failed for %s (code %u)", sd_path, (unsigned)load_res);
         if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
@@ -1026,6 +1044,12 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     uint32_t img_end = img_ofs + index_size;
     uint32_t pal_end = (pal_ofs != GA_INVALID) ? (pal_ofs + 256 * 4) : 0;
     uint32_t actual_size = img_end > pal_end ? img_end : pal_end;
+    LV_LOG_USER("EVE5 SD POSTLOAD %s img_ofs=%u pal_ofs=0x%08X bpp=%d "
+                "stride=%u index_size=%u actual_size=%u allocated_size=%u trim=%d",
+                path, (unsigned)img_ofs, (unsigned)pal_ofs, (int)bpp,
+                (unsigned)(out_w * (uint32_t)bpp), (unsigned)index_size,
+                (unsigned)actual_size, (unsigned)allocated_size,
+                (int)(actual_size < allocated_size));
     if(actual_size < allocated_size) {
         EVE_GpuAlloc_Truncate(alloc, final_handle, actual_size);
     }
@@ -1080,13 +1104,20 @@ bool lv_eve5_sdcard_query_image_dims(const char * path, uint32_t * width, uint32
     if(ensure_sd_attached(&s_ctx) && EVE_Cmd_waitFlush(phost)) {
         phost->SuppressErrorOverlay = true;
         uint32_t r = EVE_CoCmd_queryImage_fs(phost, sd_path, 0, NULL, NULL, &qw, &qh, NULL);
+        bool faulted = phost->CmdFault;
+        LV_LOG_USER("EVE5 SD QUERY_DIMS %s -> r=%u w=%u h=%u fault=%d",
+                    sd_path, (unsigned)r, (unsigned)qw, (unsigned)qh, (int)faulted);
         if(r == 0 && qw != 0 && qh != 0) {
             ok = true;
         }
-        else if(phost->CmdFault) {
-            lv_eve5_reset_coprocessor(s_ctx.disp);
-        }
         phost->SuppressErrorOverlay = false;
+
+        /* DEBUG: mandatory reset after every CMD_QUERYIMAGE — testing whether
+         * the residual firmware state from the patched query is what poisons
+         * later coprocessor work, regardless of whether the query reported
+         * a fault. Probes residual decoder state that survives query exit. */
+        LV_LOG_USER("EVE5 SD QUERY_DIMS %s: mandatory reset after query", sd_path);
+        lv_eve5_reset_coprocessor(s_ctx.disp);
     }
 
 #if LV_USE_OS
