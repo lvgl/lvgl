@@ -75,24 +75,24 @@ endif #LV_USE_BUILTIN_MALLOC
 # the value: it is emitted verbatim (unquoted) as the #include argument.
 config LV_STDINT_INCLUDE
 	string "Header for integer types (stdint)"
-	default "<stdint.h>"
+	default "stdint.h"
 
 config LV_STDDEF_INCLUDE
 	string "Header for standard definitions (stddef)"
-	default "<stddef.h>"
+	default "stddef.h"
 
 config LV_STDBOOL_INCLUDE
 	string "Header for boolean types (stdbool)"
-	default "<stdbool.h>"
+	default "stdbool.h"
 
 config LV_INTTYPES_INCLUDE
 	string "Header for fixed-width integer format macros (inttypes)"
-	default "<inttypes.h>"
+	default "inttypes.h"
 
 config LV_LIMITS_INCLUDE
 	string "Header for implementation limits (limits)"
-	default "<limits.h>"
+	default "limits.h"
 
 config LV_STDARG_INCLUDE
 	string "Header for variadic argument handling (stdarg)"
-	default "<stdarg.h>"
+	default "stdarg.h"
