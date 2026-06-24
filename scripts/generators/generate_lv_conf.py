@@ -729,6 +729,46 @@ INTERNAL_FOOTER = r"""
  * End of parsing lv_conf_template.h
  -----------------------------------*/
 
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
+#endif
+
+#ifndef LV_ATTRIBUTE_TICK_INC
+#define LV_ATTRIBUTE_TICK_INC
+#endif
+
+#ifndef LV_ATTRIBUTE_TIMER_HANDLER
+#define LV_ATTRIBUTE_TIMER_HANDLER
+#endif
+
+#ifndef LV_ATTRIBUTE_FLUSH_READY
+#define LV_ATTRIBUTE_FLUSH_READY
+#endif
+
+#ifndef LV_ATTRIBUTE_SYNC_READY
+#define LV_ATTRIBUTE_SYNC_READY
+#endif
+
+#ifndef LV_ATTRIBUTE_LARGE_CONST
+#define LV_ATTRIBUTE_LARGE_CONST
+#endif
+
+#ifndef LV_ATTRIBUTE_LARGE_RAM_ARRAY
+#define LV_ATTRIBUTE_LARGE_RAM_ARRAY
+#endif
+
+#ifndef LV_ATTRIBUTE_FAST_MEM
+#define LV_ATTRIBUTE_FAST_MEM
+#endif
+
+#ifndef LV_ATTRIBUTE_EXTERN_DATA
+#define LV_ATTRIBUTE_EXTERN_DATA
+#endif
+
+#ifndef LV_EXPORT_CONST_INT
+#define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
+#endif
+
 /*Fix inconsistent name*/
 #define LV_USE_ANIMIMAGE LV_USE_ANIMIMG
 
