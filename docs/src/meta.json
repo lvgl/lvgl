@@ -2,7 +2,6 @@
   "pages": [
     "introduction",
     "getting_started",
-    "examples",
     "integration",
     "main-modules",
     "common-widget-features",
@@ -11,12 +10,9 @@
     "auxiliary-modules",
     "libs",
     "debugging",
-    "guides",
-    "migration-v10",
+    "examples",
     "contributing",
     "api",
-    "api-private",
-    "CHANGELOG",
-    "deprecated"
+    "changelog"
   ]
 }

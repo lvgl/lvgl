@@ -1,4 +1,4 @@
-name: Build Docs 
+name: Build Docs
 
 on:
   workflow_dispatch: # allow manual triggering
@@ -96,11 +96,11 @@ jobs:
             doxygen
 
       # Tool used to convert Doxygen XML to .mdx API pages
-      - name: Install doxymark 
+      - name: Install doxymark
         run: |
           npm install github:mutahharmkhan/doxymark#multi-root-prefix
 
-      # Generate Documentation API pages 
+      # Generate Documentation API pages
       - name: Generate API pages
         run: |
             npx doxymark \
@@ -113,10 +113,10 @@ jobs:
             --root api-private=./src \
             --source-url-for api=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/include/lvgl \
             --source-url-for api-private=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src \
-            --root-title api=API \
-            --root-title 'api-private=API Private' \
+            --root-title 'api-public=Public API' \
+            --root-title 'api-private=Private API' \
             --drop-empty-files
-            rm -rf docs/doxygen 
+            rm -rf docs/doxygen
 
       - name: Install Example Documentation
         run: npm i @lvgl/examples-generator
