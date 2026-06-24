@@ -456,10 +456,20 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    /*Call the ancestor's event handler*/
+    /*
+     * Call the ancestor's (textarea's) event handler for everything EXCEPT
+     * LV_EVENT_KEY. The textarea's key handler unconditionally forwards any
+     * non-navigation code (e.g. LV_KEY_ESC, LV_KEY_NEXT, LV_KEY_PREV) to
+     * lv_textarea_add_char, which paints control symbols into the spinbox
+     * text. The spinbox processes LV_EVENT_KEY itself below; the textarea
+     * has no useful response to a key event arriving at a numeric spinbox.
+     * See lvgl#10135.
+     */
     lv_result_t res = LV_RESULT_OK;
-    res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RESULT_OK) return;
+    if(lv_event_get_code(e) != LV_EVENT_KEY) {
+        res = lv_obj_event_base(MY_CLASS, e);
+        if(res != LV_RESULT_OK) return;
+    }
 
     const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_current_target(e);
