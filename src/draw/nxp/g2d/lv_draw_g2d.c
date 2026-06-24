@@ -11,6 +11,7 @@
 
 #include "lv_draw_g2d.h"
 
+#if LV_USE_DRAW_G2D
 #include "../../../misc/lv_area_private.h"
 #include <g2d.h>
 #include "lv_g2d_buf_map.h"
@@ -113,7 +114,6 @@ void lv_draw_g2d_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if LV_USE_DRAW_G2D
 static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
@@ -355,6 +355,6 @@ static void _g2d_render_thread_cb(void * ptr)
     lv_thread_sync_delete(&thread_dsc->sync);
     LV_LOG_INFO("Exit G2D draw thread.");
 }
-#endif
+#endif /*LV_USE_G2D_DRAW_THREAD*/
 
 #endif /*LV_USE_DRAW_G2D */
