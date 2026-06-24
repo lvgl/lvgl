@@ -41,6 +41,11 @@ typedef struct {
     uint8_t frag_pct;   /**< Amount of fragmentation */
 } lv_mem_monitor_t;
 
+/**
+ * Out of memory event
+ */
+typedef void (*lv_mem_oom_event)(size_t new_size);
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -152,6 +157,12 @@ lv_result_t lv_mem_test(void);
  *              the result of the analysis will be stored here
  */
 void lv_mem_monitor(lv_mem_monitor_t * mon_p);
+
+/**
+ * Register an out of memory event handler
+ * @param oom_p will be called when out of memory
+ */
+void lv_mem_register_oom(lv_mem_oom_event oom_p);
 
 /**********************
  *      MACROS
