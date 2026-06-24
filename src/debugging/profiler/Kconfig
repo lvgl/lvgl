@@ -23,36 +23,35 @@ config LV_USE_PROFILER_BUILTIN_POSIX
 	bool "Enable POSIX profiler port"
 	default n
 
-config LV_PROFILER_INCLUDE
-	string "Header to include for the profiler"
-	default "lvgl/debugging/profiler/lv_profiler_builtin.h"
 
 endif #LV_USE_PROFILER_BUILTIN
 
 if LV_USE_PROFILER
 
-config LV_PROFILER_CUSTOM_INCLUDE
-	string "Path to custom profiler header"
-	default ""
+config LV_PROFILER_INCLUDE
+	string "Header to include for the profiler"
+	default "lvgl/debugging/profiler/lv_profiler_builtin.h"
 	help
-	  Optional header to override profiler hook macros. All four should be
-	  defined together — partial definitions will cause build errors.
+	  Path to a header that defines the following profiler hook macros:
 
 	  LV_PROFILER_BEGIN
-	    Called at the start of a profiled scope (no tag).
-	    e.g. my_profiler_begin()
+	    Called at the start of a profiled scope.
+	    e.g. #define LV_PROFILER_BEGIN  my_profiler_begin()
 
 	  LV_PROFILER_END
-	    Called at the end of a profiled scope (no tag).
-	    e.g. my_profiler_end()
+	    Called at the end of a profiled scope.
+	    e.g. #define LV_PROFILER_END    my_profiler_end()
 
-	  LV_PROFILER_BEGIN_TAG
+	  LV_PROFILER_BEGIN_TAG(tag)
 	    Called at the start of a profiled scope with a string tag.
-	    e.g. my_profiler_begin_tag(tag)
+	    e.g. #define LV_PROFILER_BEGIN_TAG(tag)  my_profiler_begin_tag(tag)
 
-	  LV_PROFILER_END_TAG
+	  LV_PROFILER_END_TAG(tag)
 	    Called at the end of a profiled scope with a string tag.
-	    e.g. my_profiler_end_tag(tag)
+	    e.g. #define LV_PROFILER_END_TAG(tag)    my_profiler_end_tag(tag)
+
+	  The default header provides these via the built-in profiler.
+	  Set this to your own header to use a custom profiler backend.
 
 config LV_PROFILER_LAYOUT
 	bool "Enable layout profiler"
