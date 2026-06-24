@@ -33,6 +33,46 @@ config LV_SUNDAY_STR
 
 endmenu
 
+menu "Month names configuration"
+	depends on LV_USE_CALENDAR
+config LV_JANUARY_STR
+	string "String for January"
+	default "January"
+config LV_FEBRUARY_STR
+	string "String for February"
+	default "February"
+config LV_MARCH_STR
+	string "String for March"
+	default "March"
+config LV_APRIL_STR
+	string "String for April"
+	default "April"
+config LV_MAY_STR
+	string "String for May"
+	default "May"
+config LV_JUNE_STR
+	string "String for June"
+	default "June"
+config LV_JULY_STR
+	string "String for July"
+	default "July"
+config LV_AUGUST_STR
+	string "String for August"
+	default "August"
+config LV_SEPTEMBER_STR
+	string "String for September"
+	default "September"
+config LV_OCTOBER_STR
+	string "String for October"
+	default "October"
+config LV_NOVEMBER_STR
+	string "String for November"
+	default "November"
+config LV_DECEMBER_STR
+	string "String for December"
+	default "December"
+endmenu
+
 config LV_USE_CALENDAR_HEADER_ARROW
 	bool "Use calendar header arrow"
 	default y
