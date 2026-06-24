@@ -279,8 +279,13 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
 
     /* GC-flagged: decoded images self-heal through the decoder cache when
      * the handle goes invalid (sweep on pre-BT820, pressure eviction on
-     * BT820+). Allocated at the exact predicted size — no post-load truncate. */
-    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, info.Size, GA_ALIGN_4 | GA_GC_FLAG);
+     * BT820+). CMD_LOADIMAGE writes in 32-byte units and the chip's sampling
+     * unit assumes 32-byte source alignment, so both base and size must be
+     * 32-aligned. A misaligned source produces a uniform N-pixel right shift
+     * on byte-per-pixel formats like PALETTEDARGB8 where the chip rounds the
+     * source address down. */
+    uint32_t alloc_size = (info.Size + 31u) & ~31u;
+    EVE_GpuHandle handle = EVE_GpuAlloc_Alloc(u->allocator, alloc_size, GA_ALIGN_32 | GA_GC_FLAG);
     uint32_t addr = EVE_GpuAlloc_Get(u->allocator, handle);
     if(addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate %u bytes for decoded image", (unsigned)info.Size);
