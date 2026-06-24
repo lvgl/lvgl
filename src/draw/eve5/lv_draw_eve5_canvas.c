@@ -136,33 +136,53 @@ bool lv_draw_eve5_try_canvas_direct_image(lv_draw_eve5_unit_t * u, lv_layer_t * 
         return false;
     }
 
-    /* Copy the GPU allocation descriptor to the canvas draw_buf.
-     * The handle is shared with the source (image cache or decoder cache).
-     * This is safe: if either side frees via ScopedFree, the other detects
-     * the dead handle via vram_check_cb and self-heals. */
-    {
-        lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+    /* STEAL the GPU allocation from the source: the canvas takes sole
+     * ownership of the handle. Sharing would be unsound — a canvas can be
+     * drawn onto (mutating bytes the cached source still believes it owns)
+     * and source decoder-cache entries can be evicted at any time (killing
+     * the canvas's only reference to its own pixels). Canvases have no
+     * recovery path: their content lives in VRAM with no CPU shadow that
+     * could be re-uploaded. The loaded image is the side that can self-heal
+     * — after the steal, src_vr->gpu_handle is invalidated, and on the next
+     * use the LVGL decoder cache's residency check (lv_image_decoder.c, the
+     * vram_check_cb hook) fails for that entry, drops it, and re-decodes
+     * fresh. */
+    lv_eve5_vram_res_t * vr = eve5_get_vram_res(layer);
+    if(vr == NULL) {
+        vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
         if(vr == NULL) {
-            vr = lv_malloc(sizeof(lv_eve5_vram_res_t));
-            if(vr == NULL) {
-                return false;
-            }
-            layer->draw_buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
+            return false;
         }
-        else {
-            /* ScopedFree: previous canvas content may be in an in-flight display list */
-            EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
-        }
-
-        *vr = *src_vr;
-        vr->base.unit = (lv_draw_unit_t *)u;
-        vr->is_premultiplied = false;
-        vr->has_content = true;
+        layer->draw_buf->vram_res = (lv_draw_buf_vram_res_t *)vr;
+    }
+    else {
+        /* ScopedFree: previous canvas content may be in an in-flight display list */
+        EVE_GpuAlloc_ScopedFree(u->allocator, vr->gpu_handle);
     }
 
-    LV_LOG_INFO("EVE5: Canvas direct image %p: fmt=%d stride=%u %dx%d handle=%d",
-                (void *)layer, src_vr->eve_format, src_vr->stride,
-                (int)layer_w, (int)layer_h, (int)src_vr->gpu_handle.Id);
+    *vr = *src_vr;
+    vr->base.unit = (lv_draw_unit_t *)u;
+    vr->is_premultiplied = false;
+    vr->has_content = true;
+
+    /* Decoder allocations are born GC-flagged (reloadable on demand via the
+     * decoder cache). The canvas has no reload path — clear the eviction-tier
+     * flags so pressure eviction can't reclaim our pixels out from under us. */
+    EVE_GpuAlloc_UpdateFlags(u->allocator, vr->gpu_handle, GA_GC_FLAG | GA_LOW_FLAG, 0);
+
+    /* Steal: clear the source's GPU descriptor so the cached draw_buf's
+     * eventual vram_free_cb can't ScopedFree the handle we just took.
+     * vram_check_cb on the (now-empty) source will return false → the
+     * decoder cache drops the entry → next open re-decodes. */
+    src_vr->gpu_handle = GA_HANDLE_INVALID;
+    src_vr->source_offset = 0;
+    src_vr->palette_offset = GA_INVALID;
+    src_vr->base.size = 0;
+    src_vr->has_content = false;
+
+    LV_LOG_INFO("EVE5: Canvas direct image %p: fmt=%d stride=%u %dx%d handle=%d (stolen)",
+                (void *)layer, vr->eve_format, vr->stride,
+                (int)layer_w, (int)layer_h, (int)vr->gpu_handle.Id);
 
     /* QUEUED → FINISHED (skipping IN_PROGRESS since handled synchronously) */
     image_task->state = LV_DRAW_TASK_STATE_FINISHED;
