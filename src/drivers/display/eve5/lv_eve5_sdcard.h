@@ -38,6 +38,7 @@ extern "C" {
 #if LV_USE_EVE5 && LV_USE_FS_EVE5_SDCARD
 
 #include "EVE_GpuAlloc.h"
+#include "EVE_ResourceProbe.h"
 
 /*********************
  *      DEFINES
@@ -139,6 +140,34 @@ bool lv_eve5_sdcard_is_path(const char * path);
 bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
                                uint32_t * width, uint32_t * height, uint32_t * format,
                                uint32_t * image_offset, uint32_t * palette_offset);
+
+/**
+ * Variant that loads a JPEG/PNG from a caller-supplied pre-staged compressed
+ * buffer plus pre-resolved EVE_ResourceInfo. Used when info_cb already paid
+ * the CMD_FSREAD whole-file staging cost and resolved the metadata via
+ * EVE_queryResource_fs; passing the same staging here re-publishes it as a
+ * MediaFIFO and runs CMD_LOADIMAGE directly, with no second SD round-trip.
+ *
+ * Takes ownership of @p staging — frees it on both success and failure paths.
+ *
+ * @param path            Image path (used only for log messages).
+ * @param staging         GPU handle of the compressed staging buffer.
+ * @param staging_size    Byte count of valid data in the staging buffer.
+ * @param info            Pre-resolved EVE_ResourceInfo (Format/Size/PaletteSize).
+ * @param handle          [out] Final decoded GPU allocation handle.
+ * @param width           [out] Image width.
+ * @param height          [out] Image height.
+ * @param format          [out] EVE bitmap format.
+ * @param image_offset    [out] Bitmap data offset from the handle base.
+ * @param palette_offset  [out] Palette offset from the handle base (GA_INVALID if none).
+ * @return                true on success.
+ */
+bool lv_eve5_sdcard_load_image_staged(const char * path,
+                                      EVE_GpuHandle staging, uint32_t staging_size,
+                                      const EVE_ResourceInfo * info,
+                                      EVE_GpuHandle * handle,
+                                      uint32_t * width, uint32_t * height, uint32_t * format,
+                                      uint32_t * image_offset, uint32_t * palette_offset);
 
 /**
  * Get the GPU allocator used by the SD card driver.

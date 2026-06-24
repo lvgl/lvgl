@@ -475,19 +475,38 @@ static inline bool lv_draw_eve5_format_has_alpha(uint16_t eve_format)
 
 static inline void set_palette_if_needed(EVE_HalContext *phost, uint16_t eve_format, uint32_t palette_addr)
 {
-    /* PALETTEDARGB8 is BT820-only (EVE5). The macro itself is undefined on
-     * pre-BT820 single-target builds, hence the compile-time guard; the
-     * runtime EVE_GEN check covers multi-target builds running on older
-     * hardware where the format identifier is reserved. */
+    if(palette_addr == GA_INVALID) {
+        (void)phost;
+        (void)eve_format;
+        return;
+    }
+
+    /* All CMD_LOADIMAGE-decoded paletted formats sample through
+     * REG_PALETTE_SOURCE:
+     *   PALETTED565  (fmt=14, FT810+): indexed PNG decode on EVE3/EVE4
+     *   PALETTED4444 (fmt=15, FT810+): indexed PNG +tRNS on EVE3/EVE4
+     *   PALETTEDARGB8 (fmt=21, BT820+): indexed PNG decode on EVE5
+     * Without this set, BT815/BT817 indexed PNGs read stale palette data
+     * (black or alpha-zero garbage, depending on the prior state) — that
+     * was the case before this branch was added. */
+    bool needs_palette = false;
+#if (EVE_SUPPORT_CHIPID >= EVE_FT810) || defined(EVE_MULTI_GRAPHICS_TARGET)
+    if(EVE_CHIPID >= EVE_FT810 && (eve_format == PALETTED565 || eve_format == PALETTED4444)) {
+        needs_palette = true;
+    }
+#endif
 #if (EVE_SUPPORT_CHIPID >= EVE_BT820) || defined(EVE_MULTI_GRAPHICS_TARGET)
-    if(EVE_GEN >= EVE5 && eve_format == PALETTEDARGB8 && palette_addr != GA_INVALID) {
+    if(EVE_GEN >= EVE5 && eve_format == PALETTEDARGB8) {
+        needs_palette = true;
+    }
+#endif
+    if(needs_palette) {
         EVE_CoDl_paletteSource(phost, palette_addr);
     }
-#else
-    (void)phost;
-    (void)eve_format;
-    (void)palette_addr;
-#endif
+    else {
+        (void)phost;
+        (void)eve_format;
+    }
 }
 
 /** Check if an EVE bitmap format requires GLFORMAT + BITMAP_EXT_FORMAT mode.

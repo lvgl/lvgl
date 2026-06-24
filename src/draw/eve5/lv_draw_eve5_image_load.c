@@ -156,6 +156,13 @@ void lv_draw_eve5_release_image_source(eve5_resolved_image_t * resolved)
 }
 
 #if EVE5_HW_IMAGE_DECODE
+
+/* Defined in the decoder section below. Forward-declared here because the
+ * SD loader (lv_draw_eve5_try_load_sdcard_image, this block) consumes the
+ * info→open staging handoff installed by eve5_decoder_info. */
+static bool eve5_pending_staging_take(const char * path, EVE_GpuHandle * out_handle,
+                                      uint32_t * out_size, EVE_ResourceInfo * out_info);
+
 /**********************
  * HARDWARE IMAGE LOADING (LVGL FS)
  **********************/
@@ -390,15 +397,29 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     lv_eve5_hal_unlock(lv_eve5_disp_from_hal(u->hal));
 #endif
 
-    /* Layout: palette-front. Palette (PaletteSize bytes) at base+0, decoded
-     * bitmap at base+PaletteSize. PaletteSize == 0 for non-paletted formats. */
-    *ram_g_addr = addr + info.PaletteSize;
+    /* Paletted layout is generation-dependent — derive from the probe's
+     * EVE_RESOURCE_FLAG_PALETTE_AFTER_DATA bit rather than assuming
+     * palette-front. EVE3/BT820 = palette-front (palette at base, image at
+     * base+PaletteSize); EVE4 = palette-after (image at base, palette at
+     * base+stride*h). Non-paletted formats (RGB8/ARGB8/RGB565/L8/...) have
+     * PaletteSize == 0 and resolve to image-at-base / palette = GA_INVALID. */
     *eve_format = (uint16_t)info.Format;
     *eve_stride = (int32_t)info.Stride;
     *src_w = (int32_t)info.Width;
     *src_h = (int32_t)info.Height;
     if(out_handle) *out_handle = handle;
-    if(out_palette_addr) *out_palette_addr = (info.PaletteSize > 0) ? addr : GA_INVALID;
+    if(info.PaletteSize == 0) {
+        *ram_g_addr = addr;
+        if(out_palette_addr) *out_palette_addr = GA_INVALID;
+    }
+    else if(info.Flags & EVE_RESOURCE_FLAG_PALETTE_AFTER_DATA) {
+        *ram_g_addr = addr;
+        if(out_palette_addr) *out_palette_addr = addr + (uint32_t)info.Stride * info.Height;
+    }
+    else {
+        *ram_g_addr = addr + info.PaletteSize;
+        if(out_palette_addr) *out_palette_addr = addr;
+    }
 
     LV_LOG_INFO("EVE5: HW decoded %s (%ux%u fmt=%u stride=%d) via CMD_LOADIMAGE",
                 path, (unsigned)info.Width, (unsigned)info.Height,
@@ -1076,8 +1097,28 @@ bool lv_draw_eve5_try_load_sdcard_image(lv_draw_eve5_unit_t * u, const void * sr
 
     EVE_GpuHandle handle;
     uint32_t img_w, img_h, img_fmt, img_offset, pal_offset;
+    bool ok;
 
-    bool ok = lv_eve5_sdcard_load_image(path, &handle, &img_w, &img_h, &img_fmt, &img_offset, &pal_offset);
+    /* Fast path: info_cb already CMD_FSREAD-staged the compressed file and
+     * resolved EVE_ResourceInfo via EVE_queryResource_fs (SW fallback when
+     * the patch isn't loaded). Take ownership of the staged buffer and run
+     * CMD_LOADIMAGE OPT_MEDIAFIFO against it — no second SD read. The
+     * staged variant always frees the staging handle, win or lose. */
+    EVE_GpuHandle staged = GA_HANDLE_INVALID;
+    uint32_t staged_size = 0;
+    EVE_ResourceInfo staged_info;
+    if(eve5_pending_staging_take(path, &staged, &staged_size, &staged_info)) {
+        ok = lv_eve5_sdcard_load_image_staged(path, staged, staged_size, &staged_info,
+                                              &handle, &img_w, &img_h, &img_fmt,
+                                              &img_offset, &pal_offset);
+    }
+    else {
+        /* No staged input — either info_cb wasn't called (e.g., loaders
+         * invoked outside the LVGL decoder framework) or the patched CMD
+         * path was used (no staging produced). Re-query + load. */
+        ok = lv_eve5_sdcard_load_image(path, &handle, &img_w, &img_h, &img_fmt,
+                                       &img_offset, &pal_offset);
+    }
 
     if(!ok) {
         return false;
@@ -1216,6 +1257,77 @@ lv_eve5_vram_res_t * lv_draw_eve5_resolve_to_gpu(lv_draw_eve5_unit_t * u, const 
 
 static lv_draw_eve5_unit_t * s_decoder_unit;
 
+/**********************
+ * INFO→OPEN STAGING HANDOFF
+ **********************/
+
+/* Single-slot handoff for the EVE-SD info→open transition. When the
+ * patch_queryassets firmware patch isn't loaded (or isn't compiled in),
+ * info_cb's EVE_queryResource_fs SW fallback CMD_FSREAD-stages the whole
+ * compressed file into RAM_G to drive the host probe. Without this slot,
+ * open_cb's lv_eve5_sdcard_load_image would query (and stage) AGAIN — a
+ * second SD round-trip for the same bytes. The slot lets open_cb take
+ * ownership of the staged buffer and run CMD_LOADIMAGE OPT_MEDIAFIFO
+ * against it directly via lv_eve5_sdcard_load_image_staged.
+ *
+ * LVGL calls open_cb immediately after the info_cb that produced
+ * LV_RESULT_OK on the same dsc, with no interleaved info_cbs from other
+ * decoders, so a single slot suffices. eve5_pending_staging_set is the
+ * only write path; it frees the prior staging before installing a new
+ * one. eve5_pending_staging_take wipes the slot on hit so a later open
+ * for a different path can't accidentally consume a stale handle. */
+typedef struct {
+    char path[EVE5_DECODER_BAD_PATH_MAX];
+    EVE_GpuHandle handle;
+    uint32_t size;
+    EVE_ResourceInfo info;
+} eve5_pending_staging_t;
+
+static eve5_pending_staging_t s_pending_staging = { {0}, GA_HANDLE_INIT, 0, {0} };
+
+static void eve5_pending_staging_clear(void)
+{
+    if(s_pending_staging.handle.Id != GA_HANDLE_INVALID.Id && s_decoder_unit != NULL) {
+        EVE_GpuAlloc_Free(s_decoder_unit->allocator, s_pending_staging.handle);
+    }
+    s_pending_staging.path[0] = '\0';
+    s_pending_staging.handle = GA_HANDLE_INVALID;
+    s_pending_staging.size = 0;
+}
+
+static void eve5_pending_staging_set(const char * path, EVE_GpuHandle handle,
+                                     uint32_t size, const EVE_ResourceInfo * info)
+{
+    /* Always free a prior staging before installing a new one — never leak. */
+    eve5_pending_staging_clear();
+    if(path == NULL || handle.Id == GA_HANDLE_INVALID.Id) return;
+    lv_strncpy(s_pending_staging.path, path, EVE5_DECODER_BAD_PATH_MAX);
+    s_pending_staging.path[EVE5_DECODER_BAD_PATH_MAX - 1] = '\0';
+    s_pending_staging.handle = handle;
+    s_pending_staging.size = size;
+    s_pending_staging.info = *info;
+}
+
+/* On hit, wipes the slot WITHOUT freeing the handle — ownership transfers
+ * to the caller, which is responsible for freeing (either consuming via
+ * lv_eve5_sdcard_load_image_staged, which frees on both success and
+ * failure paths, or freeing directly). The slot must be wiped because the
+ * caller now owns the only reference; leaving it indexed would cause a
+ * double-free on the next eve5_pending_staging_clear. */
+static bool eve5_pending_staging_take(const char * path, EVE_GpuHandle * out_handle,
+                                      uint32_t * out_size, EVE_ResourceInfo * out_info)
+{
+    if(path == NULL || s_pending_staging.handle.Id == GA_HANDLE_INVALID.Id) return false;
+    if(lv_strcmp(s_pending_staging.path, path) != 0) return false;
+    *out_handle = s_pending_staging.handle;
+    *out_size = s_pending_staging.size;
+    *out_info = s_pending_staging.info;
+    s_pending_staging.path[0] = '\0';
+    s_pending_staging.handle = GA_HANDLE_INVALID;
+    s_pending_staging.size = 0;
+    return true;
+}
+
 /* Hook EVE_queryResource_*'s fault recovery into lv_eve5_reset_coprocessor so
  * the SD/flash query paths get the same narrow reset (with bitmap-handle
  * pool / rom font cache invalidation) that the regular loader paths use. */
@@ -1339,12 +1451,15 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
     EVE_ResourceInfo info;
 
 #if LV_USE_FS_EVE5_SDCARD
-    /* SD path: drive EVE_queryResource_fs(preferCmd=true, ga=NULL) so the
-     * on-chip CMD_QUERYIMAGE_fs is used when the patch_queryassets firmware
-     * is present, and SW fallback (whole-file CMD_FSREAD into staging) is
-     * refused — info() only wants a fast metadata probe. lv_fs_read on an
-     * SD path would force the lazy whole-file load (ensure_file_loaded via
-     * CMD_FSREAD), which the CMD query exists to avoid. */
+    /* SD path: drive EVE_queryResource_fs(preferCmd=true, ga=u->allocator).
+     * When the patch_queryassets firmware patch is present, the CMD path
+     * (CMD_QUERYIMAGE_fs) runs and no staging is produced — outStaging stays
+     * GA_HANDLE_INVALID and info_cb completes with no RAM_G touched. When
+     * the patch is absent, the SW fallback CMD_FSREAD-stages the whole
+     * compressed file into RAM_G to drive the host probe; the staging
+     * handle is handed back via outStagingHandle/outStagingSize and stashed
+     * for open_cb to consume via lv_eve5_sdcard_load_image_staged — no
+     * second SD round-trip. */
     if(lv_eve5_sdcard_is_path(fn)) {
         if(!lv_eve5_sdcard_ready()) return LV_RESULT_INVALID;
 
@@ -1352,17 +1467,30 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
         if(fn[1] == ':' && (fn[2] == '/' || fn[2] == '\\')) sd_path = fn + 2;
 
         lv_display_t * disp = lv_eve5_disp_from_hal(u->hal);
+        EVE_GpuHandle staging = GA_HANDLE_INVALID;
+        uint32_t staging_size = 0;
 #if LV_USE_OS
         lv_eve5_hal_lock(disp);
 #endif
-        bool ok = EVE_queryResource_fs(u->hal, NULL, sd_path, OPT_TRUECOLOR,
+        bool ok = EVE_queryResource_fs(u->hal, u->allocator, sd_path, OPT_TRUECOLOR,
                                        /*preferCmd*/ true,
                                        decoder_query_reset_cb, disp,
-                                       NULL, NULL, &info);
+                                       &staging, &staging_size, &info);
 #if LV_USE_OS
         lv_eve5_hal_unlock(disp);
 #endif
-        if(!ok) return LV_RESULT_INVALID;
+        if(!ok) {
+            /* Defensive: SW fallback returns false without populating
+             * staging out-params, but if a future change ever paths through
+             * here with a live staging, free it rather than leak. */
+            if(staging.Id != GA_HANDLE_INVALID.Id) {
+                EVE_GpuAlloc_Free(u->allocator, staging);
+            }
+            return LV_RESULT_INVALID;
+        }
+        /* Hand staging (if any) to open_cb. Set replaces any prior slot
+         * contents, freeing the previous handle — no leak on repeat info_cb. */
+        eve5_pending_staging_set(fn, staging, staging_size, &info);
     }
     else
 #endif

@@ -876,19 +876,147 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     lv_eve5_hal_unlock(s_ctx.disp);
 #endif
 
-    /* BT820 paletted layout is palette-front: palette (PaletteSize bytes) at
-     * base+0, decoded bitmap at base+PaletteSize. PaletteSize == 0 for
-     * non-paletted formats (RGB8 / ARGB8 / RGB565 / L8 / ...). */
+    /* Paletted layout is generation-dependent. EVE3 (BT815/6) and BT820 use
+     * palette-FRONT (palette at base, image at base+PaletteSize). EVE4
+     * (BT817/8) uses palette-AFTER (image at base, palette at base+stride*h).
+     * The probe / query path encodes the chip's choice via
+     * EVE_RESOURCE_FLAG_PALETTE_AFTER_DATA — derive offsets from it instead
+     * of hard-coding palette-front. (This BT820-gated function only sees the
+     * flag clear in practice, but mirroring the probe's contract keeps the
+     * code correct under any future caller / multi-target lift.) */
     *handle = final_handle;
     *width = info.Width;
     *height = info.Height;
     *format = info.Format;
-    if(image_offset) *image_offset = info.PaletteSize;
-    if(palette_offset) *palette_offset = (info.PaletteSize > 0) ? 0u : GA_INVALID;
+    if(info.PaletteSize == 0) {
+        if(image_offset) *image_offset = 0;
+        if(palette_offset) *palette_offset = GA_INVALID;
+    }
+    else if(info.Flags & EVE_RESOURCE_FLAG_PALETTE_AFTER_DATA) {
+        if(image_offset) *image_offset = 0;
+        if(palette_offset) *palette_offset = info.Stride * info.Height;
+    }
+    else {
+        if(image_offset) *image_offset = info.PaletteSize;
+        if(palette_offset) *palette_offset = 0;
+    }
 
     LV_LOG_INFO("EVE5 SD: loaded %s (%ux%u fmt=%u size=%u palette=%u)",
                 path, (unsigned)info.Width, (unsigned)info.Height,
                 (unsigned)info.Format, (unsigned)info.Size, (unsigned)info.PaletteSize);
+    return true;
+}
+
+bool lv_eve5_sdcard_load_image_staged(const char * path,
+                                      EVE_GpuHandle staging, uint32_t staging_size,
+                                      const EVE_ResourceInfo * info,
+                                      EVE_GpuHandle * handle,
+                                      uint32_t * width, uint32_t * height, uint32_t * format,
+                                      uint32_t * image_offset, uint32_t * palette_offset)
+{
+    if(path == NULL || info == NULL || handle == NULL
+       || width == NULL || height == NULL || format == NULL) {
+        if(s_ctx.alloc != NULL) EVE_GpuAlloc_Free(s_ctx.alloc, staging);
+        return false;
+    }
+    if(s_ctx.hal == NULL || s_ctx.alloc == NULL) {
+        return false;
+    }
+    if(staging.Id == GA_HANDLE_INVALID.Id || staging_size == 0) {
+        return false;
+    }
+
+    EVE_HalContext * phost = s_ctx.hal;
+    EVE_GpuAlloc * alloc = s_ctx.alloc;
+
+#if LV_USE_OS
+    lv_eve5_hal_lock(s_ctx.disp);
+#endif
+
+    /* GC-flagged final allocation, sized from the caller's resolved info. */
+    EVE_GpuHandle final_handle = EVE_GpuAlloc_Alloc(alloc, info->Size, GA_ALIGN_4 | GA_GC_FLAG);
+    uint32_t final_addr = EVE_GpuAlloc_Get(alloc, final_handle);
+    if(final_addr == GA_INVALID) {
+        LV_LOG_ERROR("EVE5 SD staged: failed to allocate %u bytes for %s",
+                     (unsigned)info->Size, path);
+        EVE_GpuAlloc_Free(alloc, staging);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    uint32_t staging_addr = EVE_GpuAlloc_Get(alloc, staging);
+    if(staging_addr == GA_INVALID) {
+        LV_LOG_ERROR("EVE5 SD staged: staging handle invalid for %s", path);
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, staging);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+
+    /* Pre-flush + SuppressErrorOverlay so a CMD_LOADIMAGE fault is isolated. */
+    if(!EVE_Cmd_waitFlush(phost)) {
+        EVE_GpuAlloc_Free(alloc, final_handle);
+        EVE_GpuAlloc_Free(alloc, staging);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = true;
+
+    bool load_ok = false;
+    uint32_t fifo_size = (staging_size + 3u) & ~3u;
+    EVE_MediaFifo_close(phost);
+    if(EVE_MediaFifo_set(phost, staging_addr, fifo_size)) {
+        EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, staging_size);
+        EVE_CoCmd_loadImage(phost, final_addr, OPT_NODL | OPT_MEDIAFIFO | OPT_TRUECOLOR);
+        load_ok = EVE_Cmd_waitFlush(phost);
+        EVE_MediaFifo_close(phost);
+    }
+    EVE_GpuAlloc_Free(alloc, staging);
+
+    if(!load_ok) {
+        LV_LOG_ERROR("EVE5 SD staged: CMD_LOADIMAGE failed for %s", path);
+        if(phost->CmdFault) lv_eve5_reset_coprocessor(s_ctx.disp);
+        phost->SuppressErrorOverlay = false;
+        EVE_GpuAlloc_Free(alloc, final_handle);
+#if LV_USE_OS
+        lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+        return false;
+    }
+    phost->SuppressErrorOverlay = false;
+    EVE_Hal_requestFenceBeforeSwap(phost);
+
+#if LV_USE_OS
+    lv_eve5_hal_unlock(s_ctx.disp);
+#endif
+
+    /* Same flag-aware layout resolution as lv_eve5_sdcard_load_image. */
+    *handle = final_handle;
+    *width = info->Width;
+    *height = info->Height;
+    *format = info->Format;
+    if(info->PaletteSize == 0) {
+        if(image_offset) *image_offset = 0;
+        if(palette_offset) *palette_offset = GA_INVALID;
+    }
+    else if(info->Flags & EVE_RESOURCE_FLAG_PALETTE_AFTER_DATA) {
+        if(image_offset) *image_offset = 0;
+        if(palette_offset) *palette_offset = info->Stride * info->Height;
+    }
+    else {
+        if(image_offset) *image_offset = info->PaletteSize;
+        if(palette_offset) *palette_offset = 0;
+    }
+
+    LV_LOG_INFO("EVE5 SD staged: loaded %s (%ux%u fmt=%u size=%u palette=%u)",
+                path, (unsigned)info->Width, (unsigned)info->Height,
+                (unsigned)info->Format, (unsigned)info->Size, (unsigned)info->PaletteSize);
     return true;
 }
 
@@ -1108,6 +1236,18 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
 {
     (void)path; (void)handle; (void)width; (void)height;
     (void)format; (void)image_offset; (void)palette_offset;
+    return false;
+}
+
+bool lv_eve5_sdcard_load_image_staged(const char * path,
+                                      EVE_GpuHandle staging, uint32_t staging_size,
+                                      const EVE_ResourceInfo * info,
+                                      EVE_GpuHandle * handle,
+                                      uint32_t * width, uint32_t * height, uint32_t * format,
+                                      uint32_t * image_offset, uint32_t * palette_offset)
+{
+    (void)path; (void)staging; (void)staging_size; (void)info; (void)handle;
+    (void)width; (void)height; (void)format; (void)image_offset; (void)palette_offset;
     return false;
 }
 
