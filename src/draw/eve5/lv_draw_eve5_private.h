@@ -257,6 +257,43 @@ typedef struct {
 #endif
 } image_skew_t;
 
+/* EVE REPEAT wrap mode masks against next_pow2(BITMAP_SIZE_H) - 1, so it only
+ * samples correctly when the source bitmap dimensions are powers of two.
+ * For non-POW2 sources under tile rendering we fall back to BORDER wrap with
+ * source-sized BITMAP_SIZE and stamp the bitmap nx*ny times across the tile
+ * area; the active scissor (set to clip_area) clips the trailing overflow. */
+static inline bool eve5_is_pow2_u32(uint32_t v)
+{
+    return v != 0u && (v & (v - 1u)) == 0u;
+}
+
+static inline bool eve5_image_tile_needs_stamps(int32_t src_w, int32_t src_h)
+{
+    return !(eve5_is_pow2_u32((uint32_t)src_w) && eve5_is_pow2_u32((uint32_t)src_h));
+}
+
+/* Emit a grid of vertex2f_0 stamps covering tile_w x tile_h with src_w x src_h
+ * tiles. Caller has issued EVE_CoDl_begin(BITMAPS) and set bitmapSize with
+ * BORDER/BORDER + source dimensions. */
+static inline void eve5_image_tile_emit_stamps(EVE_HalContext * phost,
+                                               int32_t draw_x, int32_t draw_y,
+                                               int32_t tile_w, int32_t tile_h,
+                                               int32_t src_w, int32_t src_h)
+{
+    if(src_w <= 0 || src_h <= 0) {
+        EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+        return;
+    }
+    int32_t nx = (tile_w + src_w - 1) / src_w; if(nx < 1) nx = 1;
+    int32_t ny = (tile_h + src_h - 1) / src_h; if(ny < 1) ny = 1;
+    for(int32_t j = 0; j < ny; j++) {
+        int32_t vy = draw_y + j * src_h;
+        for(int32_t i = 0; i < nx; i++) {
+            EVE_CoDl_vertex2f_0(phost, draw_x + i * src_w, vy);
+        }
+    }
+}
+
 /* Render slice: defines a task range and optional previous slice output */
 typedef struct {
     lv_draw_task_t * start;     /**< First task in slice (NULL = layer->draw_task_head) */

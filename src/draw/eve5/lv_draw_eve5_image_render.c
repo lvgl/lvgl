@@ -191,10 +191,17 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
     set_palette_if_needed(u->hal, eve_format, palette_addr);
     eve5_set_image_bitmap_layout(u->hal, eve_format, eve_stride, layout_h, sample_as_luminance);
     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
-    if(dsc->tile) {
-        int32_t tile_w = lv_area_get_width(&dsc->image_area);
-        int32_t tile_h = lv_area_get_height(&dsc->image_area);
-        EVE_CoDl_bitmapSize(u->hal, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
+    bool tile_stamps = dsc->tile && eve5_image_tile_needs_stamps(src_w, src_h);
+    bool has_any_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE
+                              || dsc->scale_y != LV_SCALE_NONE
+                              || dsc->skew_x != 0 || dsc->skew_y != 0);
+    /* dsc->image_area is the first-tile origin (src-sized); t->area is the full
+     * fill region. Extent runs from image_area corner to t->area's far edge. */
+    int32_t tile_extent_w = dsc->tile ? (t->area.x2 - dsc->image_area.x1 + 1) : 0;
+    int32_t tile_extent_h = dsc->tile ? (t->area.y2 - dsc->image_area.y1 + 1) : 0;
+    if(dsc->tile && !tile_stamps) {
+        EVE_CoDl_bitmapSize(u->hal, bmp_filter, REPEAT, REPEAT,
+                            LV_MIN(tile_extent_w, 2048), LV_MIN(tile_extent_h, 2048));
     }
     else {
         EVE_CoDl_bitmapSize(u->hal, bmp_filter, BORDER, BORDER, src_w, src_h);
@@ -277,10 +284,9 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoDl_bitmapSource(phost, ram_g_addr);
             set_palette_if_needed(phost, eve_format, palette_addr);
             eve5_set_image_bitmap_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance);
-            if(dsc->tile) {
-                int32_t tile_w = lv_area_get_width(&dsc->image_area);
-                int32_t tile_h = lv_area_get_height(&dsc->image_area);
-                EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
+            if(dsc->tile && !tile_stamps) {
+                EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT,
+                                    LV_MIN(tile_extent_w, 2048), LV_MIN(tile_extent_h, 2048));
             }
             else {
                 EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER, src_w, src_h);
@@ -363,7 +369,14 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoDl_colorA(phost, dsc->opa);
             EVE_CoDl_blendFunc(phost, ZERO, SRC_ALPHA);
             EVE_CoDl_begin(phost, BITMAPS);
-            EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+            if(tile_stamps && !has_any_transform) {
+                eve5_image_tile_emit_stamps(phost, draw_x, draw_y,
+                                            tile_extent_w, tile_extent_h,
+                                            src_w, src_h);
+            }
+            else {
+                EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+            }
             EVE_CoDl_end(phost);
         }
 
@@ -394,7 +407,14 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             }
             EVE_CoDl_colorA(phost, 255);
             EVE_CoDl_begin(phost, BITMAPS);
-            EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+            if(tile_stamps && !has_any_transform) {
+                eve5_image_tile_emit_stamps(phost, draw_x, draw_y,
+                                            tile_extent_w, tile_extent_h,
+                                            src_w, src_h);
+            }
+            else {
+                EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+            }
             EVE_CoDl_end(phost);
         }
         else if(dsc->recolor_opa > LV_OPA_MIN) {
@@ -412,7 +432,14 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
                 else
                     EVE_CoDl_blendFunc(phost, DST_ALPHA, ONE_MINUS_DST_ALPHA);
                 EVE_CoDl_begin(phost, BITMAPS);
-                EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+                if(tile_stamps && !has_any_transform) {
+                    eve5_image_tile_emit_stamps(phost, draw_x, draw_y,
+                                                tile_extent_w, tile_extent_h,
+                                                src_w, src_h);
+                }
+                else {
+                    EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+                }
                 EVE_CoDl_end(phost);
             }
 
@@ -442,7 +469,14 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
             EVE_CoDl_colorRgb(phost, 255, 255, 255);
             EVE_CoDl_colorA(phost, 255);
             EVE_CoDl_begin(phost, BITMAPS);
-            EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+            if(tile_stamps && !has_any_transform) {
+                eve5_image_tile_emit_stamps(phost, draw_x, draw_y,
+                                            tile_extent_w, tile_extent_h,
+                                            src_w, src_h);
+            }
+            else {
+                EVE_CoDl_vertex2f_0(phost, draw_x, draw_y);
+            }
             EVE_CoDl_end(phost);
         }
 
@@ -609,7 +643,14 @@ void lv_draw_eve5_hal_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_task_t *
         }
 
         EVE_CoDl_begin(u->hal, BITMAPS);
-        EVE_CoDl_vertex2f_0(u->hal, draw_vx, draw_vy);
+        if(tile_stamps && !has_transform && !has_skew) {
+            eve5_image_tile_emit_stamps(u->hal, draw_vx, draw_vy,
+                                        tile_extent_w, tile_extent_h,
+                                        src_w, src_h);
+        }
+        else {
+            EVE_CoDl_vertex2f_0(u->hal, draw_vx, draw_vy);
+        }
         EVE_CoDl_end(u->hal);
 
         if(has_skew || has_colorkey || has_transform) {

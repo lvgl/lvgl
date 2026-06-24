@@ -85,10 +85,12 @@ static bool alpha_pass_build_colorkey_gate(lv_draw_eve5_unit_t * u,
     set_palette_if_needed(phost, eve_format, palette_addr);
     eve5_set_image_bitmap_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance);
     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
-    if(dsc->tile) {
-        int32_t tile_w = lv_area_get_width(&dsc->image_area);
-        int32_t tile_h = lv_area_get_height(&dsc->image_area);
-        EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
+    bool tile_stamps = dsc->tile && eve5_image_tile_needs_stamps(src_w, src_h);
+    int32_t tile_extent_w = dsc->tile ? (t->area.x2 - dsc->image_area.x1 + 1) : 0;
+    int32_t tile_extent_h = dsc->tile ? (t->area.y2 - dsc->image_area.y1 + 1) : 0;
+    if(dsc->tile && !tile_stamps) {
+        EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT,
+                            LV_MIN(tile_extent_w, 2048), LV_MIN(tile_extent_h, 2048));
     }
     else {
         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER, src_w, src_h);
@@ -310,10 +312,12 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
                     set_palette_if_needed(phost, eve_format, palette_addr);
                     eve5_set_image_bitmap_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance);
                     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
-                    if(dsc->tile) {
-                        int32_t tile_w = lv_area_get_width(&dsc->image_area);
-                        int32_t tile_h = lv_area_get_height(&dsc->image_area);
-                        EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
+                    bool tile_stamps = dsc->tile && eve5_image_tile_needs_stamps(src_w, src_h);
+                    int32_t tile_extent_w = dsc->tile ? (t->area.x2 - dsc->image_area.x1 + 1) : 0;
+                    int32_t tile_extent_h = dsc->tile ? (t->area.y2 - dsc->image_area.y1 + 1) : 0;
+                    if(dsc->tile && !tile_stamps) {
+                        EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT,
+                                            LV_MIN(tile_extent_w, 2048), LV_MIN(tile_extent_h, 2048));
                     }
                     else {
                         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER, src_w, src_h);
@@ -366,7 +370,14 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
                     }
 
                     EVE_CoDl_begin(phost, BITMAPS);
-                    EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
+                    if(tile_stamps && !has_transform && !has_skew) {
+                        eve5_image_tile_emit_stamps(phost, draw_vx, draw_vy,
+                                                    tile_extent_w, tile_extent_h,
+                                                    src_w, src_h);
+                    }
+                    else {
+                        EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
+                    }
                     EVE_CoDl_end(phost);
                 }
 
@@ -477,10 +488,12 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
     set_palette_if_needed(phost, eve_format, palette_addr);
     eve5_set_image_bitmap_layout(phost, eve_format, eve_stride, layout_h, sample_as_luminance);
     uint8_t bmp_filter = dsc->antialias ? BILINEAR : NEAREST;
-    if(dsc->tile) {
-        int32_t tile_w = lv_area_get_width(&dsc->image_area);
-        int32_t tile_h = lv_area_get_height(&dsc->image_area);
-        EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT, tile_w, tile_h);
+    bool tile_stamps = dsc->tile && eve5_image_tile_needs_stamps(src_w, src_h);
+    int32_t tile_extent_w = dsc->tile ? (t->area.x2 - dsc->image_area.x1 + 1) : 0;
+    int32_t tile_extent_h = dsc->tile ? (t->area.y2 - dsc->image_area.y1 + 1) : 0;
+    if(dsc->tile && !tile_stamps) {
+        EVE_CoDl_bitmapSize(phost, bmp_filter, REPEAT, REPEAT,
+                            LV_MIN(tile_extent_w, 2048), LV_MIN(tile_extent_h, 2048));
     }
     else {
         EVE_CoDl_bitmapSize(phost, bmp_filter, BORDER, BORDER, src_w, src_h);
@@ -550,7 +563,14 @@ void lv_draw_eve5_hal_alpha_draw_image(lv_draw_eve5_unit_t * u, const lv_draw_ta
     EVE_CoDl_colorA(phost, dsc->opa);
 
     EVE_CoDl_begin(phost, BITMAPS);
-    EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
+    if(tile_stamps && !has_transform && !has_skew) {
+        eve5_image_tile_emit_stamps(phost, draw_vx, draw_vy,
+                                    tile_extent_w, tile_extent_h,
+                                    src_w, src_h);
+    }
+    else {
+        EVE_CoDl_vertex2f_0(phost, draw_vx, draw_vy);
+    }
     EVE_CoDl_end(phost);
 
     if(has_skew || has_colorkey || has_transform) {
