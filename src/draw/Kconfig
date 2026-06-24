@@ -75,6 +75,13 @@ config LV_DRAW_BUF_ALIGN
 	help
 	Align the start address of draw_buf addresses to this bytes.
 
+config LV_USE_MATRIX
+	bool "Enable matrix support"
+	default n
+	select LV_USE_FLOAT
+	help
+		Enable matrix support
+
 config LV_DRAW_TRANSFORM_USE_MATRIX
 	bool "Using matrix for transformations"
 	default n

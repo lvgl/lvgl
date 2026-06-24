@@ -77,14 +77,6 @@ config LV_USE_FLOAT
 	help
 		Use `float` as `lv_value_precise_t`
 
-config LV_USE_MATRIX
-	bool "Enable matrix support"
-	default n
-	select LV_USE_FLOAT
-	help
-		Enable matrix support
-		- Requires `LV_USE_FLOAT = 1`
-
 config LV_USE_OBSERVER
 	bool "Observer"
 	default y
