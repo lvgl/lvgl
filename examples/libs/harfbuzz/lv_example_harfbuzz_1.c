@@ -17,14 +17,18 @@
  * used for consonant clusters.  Without shaping, the characters appear
  * disconnected and incorrectly ordered.
  *
- * Requires: NotoSansDevanagari-Regular.ttf in the working directory
- * (download from https://fonts.google.com/noto/specimen/Noto+Sans+Devanagari)
+ * The font NotoSansDevanagari-Regular.subset.ttf is bundled in this folder, a
+ * subset of Noto Sans Devanagari (https://fonts.google.com/noto/specimen/Noto+Sans+Devanagari)
+ * containing only the glyphs this example renders.  Regenerate it with:
+ *   fonttools subset NotoSansDevanagari-Regular.ttf --layout-features='*' \
+ *       --no-glyph-names --no-hinting --desubroutinize \
+ *       --text="<the strings drawn below>"
  */
 void lv_example_harfbuzz_1(void)
 {
     /*Create a Devanagari font*/
     lv_font_t * font_hindi = lv_freetype_font_create(
-                                 PATH_PREFIX "NotoSansDevanagari-Regular.ttf",
+                                 PATH_PREFIX "lvgl/examples/libs/harfbuzz/NotoSansDevanagari-Regular.subset.ttf",
                                  LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 32,
                                  LV_FREETYPE_FONT_STYLE_NORMAL);
 

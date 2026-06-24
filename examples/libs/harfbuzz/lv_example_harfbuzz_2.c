@@ -34,27 +34,31 @@ static lv_obj_t * add_script_section(lv_obj_t * parent, const lv_font_t * font,
  *   - Telugu  : below-base vertical consonant stacking
  *   - Thai    : above-base / below-base mark stacking (no conjuncts)
  *
- * Requires the following fonts in the working directory
- * (download from https://fonts.google.com/noto):
- *   - NotoSansBengali-Regular.ttf
- *   - NotoSansTelugu-Regular.ttf
- *   - NotoSansThai-Regular.ttf
+ * The fonts are bundled in this folder as subsets of the full Noto Sans
+ * families (https://fonts.google.com/noto), each containing only the glyphs
+ * this example renders.  Regenerate one with, e.g.:
+ *   fonttools subset NotoSansBengali-Regular.ttf --layout-features='*' \
+ *       --no-glyph-names --no-hinting --desubroutinize \
+ *       --text="<the strings drawn below>"
+ *   - NotoSansBengali-Regular.subset.ttf
+ *   - NotoSansTelugu-Regular.subset.ttf
+ *   - NotoSansThai-Regular.subset.ttf
  */
 void lv_example_harfbuzz_2(void)
 {
     /*Create fonts for each script*/
     lv_font_t * font_bengali = lv_freetype_font_create(
-                                   PATH_PREFIX "NotoSansBengali-Regular.ttf",
+                                   PATH_PREFIX "lvgl/examples/libs/harfbuzz/NotoSansBengali-Regular.subset.ttf",
                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 30,
                                    LV_FREETYPE_FONT_STYLE_NORMAL);
 
     lv_font_t * font_telugu = lv_freetype_font_create(
-                                  PATH_PREFIX "NotoSansTelugu-Regular.ttf",
+                                  PATH_PREFIX "lvgl/examples/libs/harfbuzz/NotoSansTelugu-Regular.subset.ttf",
                                   LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 30,
                                   LV_FREETYPE_FONT_STYLE_NORMAL);
 
     lv_font_t * font_thai = lv_freetype_font_create(
-                                PATH_PREFIX "NotoSansThai-Regular.ttf",
+                                PATH_PREFIX "lvgl/examples/libs/harfbuzz/NotoSansThai-Regular.subset.ttf",
                                 LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 30,
                                 LV_FREETYPE_FONT_STYLE_NORMAL);
 
@@ -65,8 +69,8 @@ void lv_example_harfbuzz_2(void)
         if(font_thai)    lv_freetype_font_delete(font_thai);
         lv_obj_t * lbl = lv_label_create(lv_screen_active());
         lv_label_set_text(lbl, "Font file(s) not found.\n"
-                          "Download NotoSansBengali, NotoSansTelugu,\n"
-                          "and NotoSansThai from Google Fonts.");
+                          "Run this example from the LVGL root so the bundled\n"
+                          "fonts in examples/libs/harfbuzz/ can be found.");
         lv_obj_center(lbl);
         return;
     }
