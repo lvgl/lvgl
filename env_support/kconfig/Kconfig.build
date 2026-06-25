@@ -10,11 +10,38 @@ if LV_USE_PRIVATE_API
 
 config LV_ENABLE_GLOBAL_CUSTOM
 	bool "Enable 'lv_global' customization"
+	help
+	  By default, LVGL stores all runtime state in a single static
+	  'lv_global_t' variable, sufficient for most single-display
+	  single-threaded applications.
+
+	  Enable this if you need multiple independent LVGL instances in
+	  the same process, for example:
+	    - Multiple physical displays with separate render loops
+	    - Per-thread LVGL contexts on an RTOS (FreeRTOS, Zephyr, etc.)
+	    - Hot-swappable or sandboxed UI instances
+
+	  When enabled, every LVGL internal access to global state goes
+	  through LV_GLOBAL_CUSTOM() instead of a static variable. You
+	  must implement 'lv_global_t *lv_global_default(void)' to return
+	  the correct instance for the current context (e.g. by thread-local
+	  storage or a guarded pointer switch).
+
+	  Returning NULL from that function is safe; LVGL will treat the
+	  library as uninitialized for that context.
 
 config LV_GLOBAL_CUSTOM_INCLUDE
 	string "Header to include for the custom 'lv_global' function"
 	depends on LV_ENABLE_GLOBAL_CUSTOM
 	default "lv_global.h"
+	help
+	  Path to the header that declares:
+	    lv_global_t *lv_global_default(void);
+
+	  This header is included wherever LVGL needs to resolve the
+	  LV_GLOBAL_DEFAULT() macro. Keep it lightweight, it is included
+	  in performance-critical paths.
+
 endif #LV_USE_PRIVATE_API
 
 menu "Asserts"
@@ -37,13 +64,13 @@ menu "Asserts"
 
 	config LV_ASSERT_CUSTOM_INCLUDE
 		string "Path to custom assert handler header"
-		default "stdint.h"
+		default ""
 		help
 		  Optional header to override assert-related macros.
 
 		  LV_ASSERT_HANDLER
 		    Statement to execute when an assertion fails.
-		    e.g. my_assert_failed(__FILE__, __LINE__);
+		    e.g. #define LV_ASSERT_HANDLER my_assert_failed(__FILE__, __LINE__);
 
 endmenu
 
