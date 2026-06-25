@@ -40,21 +40,21 @@ from kconfiglib import MenuNode
 
 try:
     from kconfiglib import (
-        Kconfig,
-        Symbol,
-        Choice,
+        AND,
+        BOOL,
+        COMMENT,
+        HEX,
+        INT,
         MENU,
         NOT,
-        COMMENT,
-        BOOL,
-        TRISTATE,
-        INT,
-        HEX,
         STRING,
+        TRISTATE,
+        Choice,
+        Kconfig,
+        Symbol,
         expr_str,
         expr_value,
         split_expr,
-        AND,
     )
 except ImportError:
     sys.exit("kconfiglib is required.  Run: pip install kconfiglib")
@@ -105,52 +105,6 @@ IGNORE_SYMBOLS: set[str] = {
 # three selectors, so members must have distinct names), map them here:
 #   frozenset(member names) -> (macro, {member: token} or None for identity)
 ENUM_CHOICES: dict = {
-    frozenset(
-        {
-            "LV_USE_BUILTIN_MALLOC",
-            "LV_USE_CLIB_MALLOC",
-            "LV_USE_MICROPYTHON_MALLOC",
-            "LV_USE_RTTHREAD_MALLOC",
-            "LV_USE_CUSTOM_MALLOC",
-        }
-    ): (
-        "LV_USE_STDLIB_MALLOC",
-        {
-            "LV_USE_BUILTIN_MALLOC": "LV_STDLIB_BUILTIN",
-            "LV_USE_CLIB_MALLOC": "LV_STDLIB_CLIB",
-            "LV_USE_MICROPYTHON_MALLOC": "LV_STDLIB_MICROPYTHON",
-            "LV_USE_RTTHREAD_MALLOC": "LV_STDLIB_RTTHREAD",
-            "LV_USE_CUSTOM_MALLOC": "LV_STDLIB_CUSTOM",
-        },
-    ),
-    frozenset(
-        {
-            "LV_USE_BUILTIN_STRING",
-            "LV_USE_CLIB_STRING",
-            "LV_USE_CUSTOM_STRING",
-        }
-    ): (
-        "LV_USE_STDLIB_STRING",
-        {
-            "LV_USE_BUILTIN_STRING": "LV_STDLIB_BUILTIN",
-            "LV_USE_CLIB_STRING": "LV_STDLIB_CLIB",
-            "LV_USE_CUSTOM_STRING": "LV_STDLIB_CUSTOM",
-        },
-    ),
-    frozenset(
-        {
-            "LV_USE_BUILTIN_SPRINTF",
-            "LV_USE_CLIB_SPRINTF",
-            "LV_USE_CUSTOM_SPRINTF",
-        }
-    ): (
-        "LV_USE_STDLIB_SPRINTF",
-        {
-            "LV_USE_BUILTIN_SPRINTF": "LV_STDLIB_BUILTIN",
-            "LV_USE_CLIB_SPRINTF": "LV_STDLIB_CLIB",
-            "LV_USE_CUSTOM_SPRINTF": "LV_STDLIB_CUSTOM",
-        },
-    ),
     frozenset(
         {
             "LV_LOG_LEVEL_TRACE",
@@ -300,13 +254,13 @@ OS_OPTIONS: dict = {
     "LV_OS_CUSTOM": "255",
 }
 
-STDLIB_OPTIONS: dict = {
-    "LV_STDLIB_BUILTIN": "0",
-    "LV_STDLIB_CLIB": "1",
-    "LV_STDLIB_MICROPYTHON": "2",
-    "LV_STDLIB_RTTHREAD": "3",
-    "LV_STDLIB_CUSTOM": "255",
-}
+# STDLIB_OPTIONS: dict = {
+#     "LV_STDLIB_BUILTIN": "0",
+#     "LV_STDLIB_CLIB": "1",
+#     "LV_STDLIB_MICROPYTHON": "2",
+#     "LV_STDLIB_RTTHREAD": "3",
+#     "LV_STDLIB_CUSTOM": "255",
+# }
 
 DRAW_SW_ASM_OPTIONS: dict = {
     "LV_DRAW_SW_ASM_NONE": "0",
@@ -375,7 +329,7 @@ BUILTIN_FONTS: dict = {
 # (section comment, token->value table); emission order is significant.
 CONFIG_OPTION_GROUPS: list = [
     ("OS Options", OS_OPTIONS),
-    ("Standard Library Options", STDLIB_OPTIONS),
+    # ("Standard Library Options", STDLIB_OPTIONS),
     ("Draw SW ASM Options", DRAW_SW_ASM_OPTIONS),
     ("NemaGFX Options", NEMA_LIB_OPTIONS),
     (None, NEMA_HAL_OPTIONS),
@@ -385,14 +339,20 @@ CONFIG_OPTION_GROUPS: list = [
 ]
 
 
-def render_config_options() -> str:
+def render_config_options(kconf: Kconfig = None) -> str:
     """Render the "Config options" constant block for lv_conf_internal.h.
 
     Each group becomes ``#define <token> <value>`` lines with the value column
-    aligned within the group, groups separated by a blank line.
+    aligned within the group, groups separated by a blank line.  Hard-coded
+    groups (tokens that live in C headers, e.g. ``LV_ALIGN_*``) come first;
+    no-prompt int-constant enum tokens defined in Kconfig are appended,
+    grouped by their enclosing menu.
     """
+    groups = list(CONFIG_OPTION_GROUPS)
+    if kconf is not None:
+        groups += enum_token_groups(kconf)
     blocks = []
-    for comment, options in CONFIG_OPTION_GROUPS:
+    for comment, options in groups:
         width = max(len(name) for name in options)
         lines = []
         if comment:
@@ -420,6 +380,32 @@ def c_comment(text: str, indent: str) -> list[str]:
     return out
 
 
+def is_enum_token(sym: Symbol) -> bool:
+    """True if *sym* is a named enum token: a no-prompt int/hex constant with a
+    single unconditional literal default (e.g. ``LV_STDLIB_BUILTIN -> 0``).
+
+    These represent symbolic enum values; when another config defaults to one we
+    emit the token *name* rather than its resolved integer.  A computed symbol
+    (multiple/conditional defaults, or one that points at another config) is not
+    a token and is resolved to its value instead."""
+    if sym.type not in (INT, HEX):
+        return False
+    if any(node.prompt for node in sym.nodes):
+        return False
+    if len(sym.defaults) != 1:
+        return False
+    value, cond = sym.defaults[0]
+    # kconfiglib models a numeric literal default (`default 0`) as an undefined
+    # symbol whose name is the literal text, not as an `is_constant` symbol.
+    if not (isinstance(value, Symbol) and not value.nodes):
+        return False
+    try:
+        int(value.name, 0)
+    except (ValueError, TypeError):
+        return False
+    return cond is sym.kconfig.y
+
+
 def define_value(sym: Symbol) -> str:
     """Return the C literal for a symbol's *own* default value.
 
@@ -439,16 +425,24 @@ def define_value(sym: Symbol) -> str:
         if all(expr_value(x) > 0 for x in rest):
             if t in (BOOL, TRISTATE):
                 return "1" if expr_value(value) > 0 else "0"
-            # An int/hex default that points at another *config* symbol (e.g.
-            # LV_SDL_BUF_COUNT defaults to the computed LV_SDL_BUFFER_COUNT) is
-            # resolved to that symbol's concrete value, not its name.  Numeric
-            # literals are also Symbols but have no int/hex type, so they fall
-            # through to expr_str() below and are emitted verbatim.
+            # An int/hex default that points at another *config* symbol falls
+            # into two cases:
+            #  - A *named enum token* (no-prompt int constant with a single
+            #    unconditional literal default, e.g. LV_STDLIB_BUILTIN): emit
+            #    the token *name* so lv_conf.h stays human-readable and matches
+            #    the symbolic value the user picks.
+            #  - A *computed* symbol (e.g. LV_SDL_BUF_COUNT -> LV_SDL_BUFFER_COUNT,
+            #    whose value is itself derived from conditional defaults): resolve
+            #    to its concrete value, since it has no meaningful name to emit.
+            # Numeric literals are also Symbols but have no int/hex type, so they
+            # fall through to expr_str() below and are emitted verbatim.
             if (
                 t in (INT, HEX)
                 and isinstance(value, Symbol)
                 and value.type in (INT, HEX)
             ):
+                if is_enum_token(value):
+                    return value.name
                 return define_value(value)
             s = expr_str(value)
             if t == HEX:
@@ -463,6 +457,62 @@ def define_value(sym: Symbol) -> str:
     if t == HEX:
         return "0x0"
     return "0"
+
+
+def enum_derived_choice(sym: Symbol):
+    """If *sym* is an enum-derived int — every default has the form
+    ``<enum-token> if <choice-member>`` over a single choice — return
+    ``(choice, {member_name: token_name})``; otherwise ``None``.
+
+    This is the structural replacement for the old hard-coded ``ENUM_CHOICES``
+    map: the link between the derived macro (e.g. ``LV_USE_STDLIB_MALLOC``) and
+    its selector choice is recovered from the Kconfig defaults, so we can attach
+    the choice's "Possible values" doc to the macro."""
+    if sym.type not in (INT, HEX) or not sym.defaults:
+        return None
+    choice = None
+    tokenmap: dict = {}
+    for value, cond in sym.defaults:
+        if not (isinstance(value, Symbol) and is_enum_token(value)):
+            return None
+        if not (isinstance(cond, Symbol) and cond.choice is not None):
+            return None
+        if choice is None:
+            choice = cond.choice
+        elif cond.choice is not choice:
+            return None
+        tokenmap[cond.name] = value.name
+    return (choice, tokenmap) if choice is not None else None
+
+
+def enum_token_groups(kconf: Kconfig) -> list:
+    """Group the enum tokens *referenced by an enum-derived config* by their
+    enclosing menu title, so they can be rendered into the internal "Config
+    options" block straight from Kconfig instead of a hard-coded Python table.
+    Returns a list of ``(menu_title, {token_name: value})`` in definition order.
+
+    Only tokens actually selected among by a derived macro (e.g. the
+    ``LV_STDLIB_*`` family behind ``LV_USE_STDLIB_MALLOC``) qualify; unrelated
+    no-prompt int constants such as ``LVGL_VERSION_*`` are left to their own
+    headers."""
+    referenced: set = set()
+    for s in kconf.unique_defined_syms:
+        derived = enum_derived_choice(s)
+        if derived:
+            referenced.update(derived[1].values())
+    groups: dict = {}
+    for s in kconf.unique_defined_syms:
+        if s.name not in referenced or not is_enum_token(s):
+            continue
+        title = ""
+        node = s.nodes[0].parent
+        while node is not None and node is not kconf.top_node:
+            if node.prompt:
+                title = node.prompt[0]
+                break
+            node = node.parent
+        groups.setdefault(title, {})[s.name] = s.str_value
+    return list(groups.items())
 
 
 # ============================================================================
@@ -532,6 +582,17 @@ class Emitter:
                 continue
             for _, cond in s.defaults:
                 _collect_expr_syms(cond, self.selector_members)
+        # Map each enum-choice member to its (derived macro, token) so a guard
+        # like `if LV_USE_BUILTIN_MALLOC` (which only resolves on the Kconfig
+        # path) is rewritten to `#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN`,
+        # which resolves on both the Kconfig and the hand-edited lv_conf.h paths.
+        self.enum_member_guard: dict = {}
+        for s in kconf.unique_defined_syms:
+            derived = enum_derived_choice(s)
+            if derived:
+                _, tokenmap = derived
+                for member, token in tokenmap.items():
+                    self.enum_member_guard[member] = (s.name, token)
 
     # -- conditional blocks ------------------------------------------------
 
@@ -556,11 +617,13 @@ class Emitter:
                 seen.add(k)
                 deduped.append(t)
         wanted = deduped
-        wanted_keys = [term_key(t) for t in wanted]
+        # Render each term to the exact C condition text we track on the stack,
+        # so open/close comparisons are apples-to-apples.
+        wanted_conds = [self._render_cond(t) for t in wanted]
 
         # Close any open conditions that are no longer wanted (from the top).
         popped = False
-        while self.cond_stack and self.cond_stack[-1] not in wanted_keys:
+        while self.cond_stack and self.cond_stack[-1] not in wanted_conds:
             text = self.cond_stack.pop()
             self.out.append(f"#endif /*{text}*/")
             popped = True
@@ -569,43 +632,40 @@ class Emitter:
             self.out.append("")
 
         # Open the conditions that are wanted but not yet open.
-        for term in wanted:
-            choice_name = None
-            operator = None
-            k = term_key(term)
+        for cond in wanted_conds:
+            if cond not in self.cond_stack:
+                self.out.append(f"#if {cond}")
+                self.cond_stack.append(cond)
 
-            if isinstance(term, tuple) and (
-                term[0] == NOT and term[1].choice is not None
-            ):
-                # depends on !FOO
-                # where FOO is part of a choice config
-                # we need to export #if CHOICE != XXX
-                sym = term[1]
-                assert sym.choice.name
-                choice_name = sym.choice.name
-                assert k[0] == "!"
-                k = k[1:]
-                operator = "!="
-            elif (
-                isinstance(term, Symbol)
-                and term.choice is not None
-                and term.choice.name
-            ):
-                # depends on FOO
-                # where FOO is part of a choice config
-                # we need to export #if CHOICE == XXX
-                choice_name = term.choice.name
-                operator = "=="
-            if k == "LV_USE_BUILTIN_MALLOC":
-                print("LV_USE_BUILTIN_MALLOC")
+    def _render_cond(self, term) -> str:
+        """Render a dependency term to its C `#if` condition text.
 
-            if k not in self.cond_stack:
-                condition = k
-                if choice_name:
-                    condition = f"{choice_name} {operator} {k}"
-
-                self.out.append(f"#if {condition}")
-                self.cond_stack.append(condition)
+        A choice member is expressed against the enum it belongs to, so the
+        guard resolves on both config paths:
+          - members of a *derived-macro* choice -> `MACRO == TOKEN`
+            (e.g. `LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN`);
+          - members of a *named* choice         -> `CHOICE == MEMBER`.
+        Other terms keep their plain symbol/expression text."""
+        if (
+            isinstance(term, tuple)
+            and term[0] == NOT
+            and isinstance(term[1], Symbol)
+        ):
+            sym = term[1]
+            if sym.name in self.enum_member_guard:
+                macro, token = self.enum_member_guard[sym.name]
+                return f"{macro} != {token}"
+            if sym.choice is not None and sym.choice.name:
+                return f"{sym.choice.name} != {sym.name}"
+            return f"!{sym.name}"
+        if isinstance(term, Symbol):
+            if term.name in self.enum_member_guard:
+                macro, token = self.enum_member_guard[term.name]
+                return f"{macro} == {token}"
+            if term.choice is not None and term.choice.name:
+                return f"{term.choice.name} == {term.name}"
+            return term.name
+        return term_key(term)
 
     def _close_all_conditions(self):
         while self.cond_stack:
@@ -662,10 +722,22 @@ class Emitter:
         # Choice members are emitted as part of the choice itself.
         if sym.choice is not None:
             return
+        # Enum tokens (no-prompt int constants) are plumbing: they go into the
+        # internal "Config options" block, not the public template body.
+        if is_enum_token(sym):
+            return
         # Ignore deprecated configs
         if node.help is not None and node.help.startswith("Deprecated"):
             return
-        self._emit_define(node, sym.name, define_value(sym), base_keys)
+        # An enum-derived macro inherits its selector choice's "Possible values"
+        # doc (the role the old ENUM_CHOICES table filled).
+        doc = None
+        derived = enum_derived_choice(sym)
+        if derived:
+            choice, tokenmap = derived
+            cnode = choice.nodes[0] if choice.nodes else node
+            doc = self._choice_doc(cnode, list(choice.syms), tokenmap)
+        self._emit_define(node, sym.name, define_value(sym), base_keys, doc=doc)
 
     def emit_choice(self, node, base_keys: set[str]):
         choice: Choice = node.item
@@ -1080,9 +1152,13 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 """
 
 
-def template_to_internal(template_text: str) -> str:
+def template_to_internal(template_text: str, kconf: Kconfig = None) -> str:
     """Transform generated lv_conf_template.h text into lv_conf_internal.h."""
-    out = [INTERNAL_PREAMBLE.replace("__CONFIG_OPTIONS__", render_config_options())]
+    out = [
+        INTERNAL_PREAMBLE.replace(
+            "__CONFIG_OPTIONS__", render_config_options(kconf)
+        )
+    ]
     started = False
     for line in template_text.splitlines():
         if not started:
@@ -1313,7 +1389,7 @@ def main():
 
     if args.internal:
         with open(args.internal, "w") as f:
-            f.write(template_to_internal(text))
+            f.write(template_to_internal(text, kconf))
         print(f"wrote {args.internal}", file=sys.stderr)
 
     if args.template:
@@ -1334,7 +1410,8 @@ if __name__ == "__main__":
     try:
         main()
     except Exception:
-        import pdb, traceback
+        import pdb
+        import traceback
 
         traceback.print_exc()  # shows the real traceback
         pdb.post_mortem()  # drops into pdb AT the crash site
