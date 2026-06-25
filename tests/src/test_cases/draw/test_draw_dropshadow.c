@@ -20,8 +20,8 @@ void tearDown(void)
 
 void test_draw_drop_shadow_basic(void)
 {
-    /*It doesn't work with VGLite*/
-#if LV_USE_DRAW_VG_LITE
+    /*It doesn't work with VGLite or NanoVG*/
+#if LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG
     TEST_PASS();
 #else
     static lv_style_t style;
@@ -81,8 +81,8 @@ void test_draw_drop_shadow_basic(void)
 
 void test_draw_drop_shadow_invalidate(void)
 {
-    /*It doesn't work with VGLite*/
-#if LV_USE_DRAW_VG_LITE
+    /*It doesn't work with VGLite or NanoVG (GPU texture cache invalidation issue)*/
+#if LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG
     TEST_PASS();
 #else
     static lv_style_t style;

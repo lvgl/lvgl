@@ -79,6 +79,12 @@ set(LVGL_TEST_OPTIONS_SDL
     -DLV_TEST_OPTION=7
 )
 
+set(LVGL_TEST_OPTIONS_NANOVG
+    -DLV_TEST_OPTION=8
+    -DLVGL_CI_USING_SYS_HEAP
+    ${SANITIZE_AND_COVERAGE_OPTIONS}
+)
+
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
     -DLV_TEST_OPTION=1
 )
@@ -162,6 +168,18 @@ elseif (OPTIONS_TEST_RISCV_V)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs/")
     message(STATUS "RISC-V Vector (RVV) software emulation test enabled")
+elseif (OPTIONS_TEST_NANOVG)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_NANOVG})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs_nanovg/")
+    add_definitions(-DLV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE=1)
+    # Verify EGL/GLESv2 are available at configure time
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(EGL REQUIRED egl)
+    pkg_check_modules(GLESV2 REQUIRED glesv2)
+    message(STATUS "NanoVG headless rendering test enabled (EGL + GLESv2 found)")
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
@@ -276,6 +294,11 @@ include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:C>: ${LVGL_C_COMPILE_OPTIONS}>)
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${LVGL_CXX_COMPILE_OPTIONS}>)
 target_compile_definitions(lvgl PUBLIC LV_BUILD_TEST)
+
+# Link EGL and GLESv2 for NanoVG headless test
+if(OPTIONS_TEST_NANOVG)
+    target_link_libraries(lvgl PUBLIC EGL GLESv2)
+endif()
 if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
     target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:ASM>:${LVGL_C_COMPILE_OPTIONS}>)
 endif()
@@ -549,9 +572,13 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     endif()
 
 	if (NOT $ENV{NON_AMD64_BUILD})
-	    target_link_libraries(${test_name} PRIVATE
-    	        ${OPENGL_LIBRARIES} glfw)
+	    if (NOT OPTIONS_TEST_NANOVG)
+	        target_link_libraries(${test_name} PRIVATE
+    	            ${OPENGL_LIBRARIES} glfw)
+	    endif()
 	endif()
+
+    # EGL/GLESv2 already linked via lvgl PUBLIC for OPTIONS_TEST_NANOVG
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
@@ -560,6 +587,11 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         NAME ${test_name}
         WORKING_DIRECTORY ${LVGL_TEST_DIR}
         COMMAND ${test_name})
+
+    if(OPTIONS_TEST_NANOVG)
+        set_tests_properties(${test_name} PROPERTIES
+            ENVIRONMENT "LSAN_OPTIONS=suppressions=${LVGL_TEST_DIR}/lsan-nanovg.supp")
+    endif()
 endforeach( test_case_fname ${TEST_CASE_FILES} )
 
 add_custom_target(run
