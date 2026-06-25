@@ -34,7 +34,8 @@ import argparse
 import os
 import re
 import sys
-import textwrap
+
+from kconfiglib import MenuNode
 
 try:
     from kconfiglib import (
@@ -42,6 +43,8 @@ try:
         Symbol,
         Choice,
         MENU,
+        EQUAL,
+        NOT,
         COMMENT,
         BOOL,
         TRISTATE,
@@ -60,32 +63,6 @@ except ImportError:
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
-
-# Order of the top-level menus (groups) in the generated file.  Match against
-# the menu prompt text.  Any group found in the Kconfig tree but missing from
-# this list is appended at the end (and a notice is printed to stderr), so a
-# newly added menu is never silently dropped.
-GROUP_ORDER: list[str] = [
-    "Memory and Standard Library",
-    "Operating System (OS)",
-    "Rendering Configuration",
-    "Logging",
-    "Debugging",
-    "Core",
-    "Input Devices",
-    "Feature Configuration",
-    "Compiler Settings",
-    "Text & Font Settings",
-    "Widgets",
-    "Themes",
-    "Layouts",
-    "Image Settings",
-    "File System",
-    "Drivers",
-    "Build",
-    "Examples",
-    "Demos",
-]
 
 # Symbols that must never appear in the template.  These are internal
 # capability flags (set via `select`), build-system-only switches, or pure
@@ -121,39 +98,6 @@ IGNORE_SYMBOLS: set[str] = {
 }
 
 
-# String symbols whose value is C code (an attribute, a header name, a function
-# name, an initializer) rather than literal text.  These are emitted *without*
-# the surrounding quotes - e.g. Kconfig `default "__attribute__((aligned(4)))"`
-# becomes `#define LV_ATTRIBUTE_MEM_ALIGN __attribute__((aligned(4)))`, and an
-# empty default becomes a bare `#define LV_ATTRIBUTE_MEM_ALIGN`.
-def is_raw_string(name: str) -> bool:
-    return (
-        name.startswith("LV_ATTRIBUTE_")
-        or name.endswith("_INCLUDE")
-        or name in {
-            "LV_ASSERT_HANDLER",
-            "LV_FONT_DEFAULT",
-            "LV_FONT_CUSTOM_DECLARE",
-            "LV_EXPORT_CONST_INT",
-            "LV_SYSMON_GET_IDLE",
-            "LV_SYSMON_GET_PROC_IDLE",
-            "LV_PROFILER_BEGIN",
-            "LV_PROFILER_END",
-            "LV_PROFILER_BEGIN_TAG",
-            "LV_PROFILER_END_TAG",
-            "LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM",
-        }
-    )
-
-
-# Function-like macros: name -> parameter list appended after the macro name.
-# The macro *body* still comes from the (raw) Kconfig string value, so e.g.
-# `#define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning`.
-FUNCTION_LIKE_MACROS: dict = {
-    "LV_EXPORT_CONST_INT": "(int_value)",
-}
-
-
 # Some choices map to a single enum-valued macro instead of one bool per member
 # (the `LV_USE_OS LV_OS_NONE` pattern).  When the choice is *named* and its
 # member symbols are already the enum tokens, this is automatic.  When the
@@ -161,89 +105,222 @@ FUNCTION_LIKE_MACROS: dict = {
 # three selectors, so members must have distinct names), map them here:
 #   frozenset(member names) -> (macro, {member: token} or None for identity)
 ENUM_CHOICES: dict = {
-    frozenset({
-        "LV_USE_BUILTIN_MALLOC", "LV_USE_CLIB_MALLOC", "LV_USE_MICROPYTHON_MALLOC",
-        "LV_USE_RTTHREAD_MALLOC", "LV_USE_CUSTOM_MALLOC",
-    }): ("LV_USE_STDLIB_MALLOC", {
-        "LV_USE_BUILTIN_MALLOC": "LV_STDLIB_BUILTIN",
-        "LV_USE_CLIB_MALLOC": "LV_STDLIB_CLIB",
-        "LV_USE_MICROPYTHON_MALLOC": "LV_STDLIB_MICROPYTHON",
-        "LV_USE_RTTHREAD_MALLOC": "LV_STDLIB_RTTHREAD",
-        "LV_USE_CUSTOM_MALLOC": "LV_STDLIB_CUSTOM",
-    }),
-    frozenset({
-        "LV_USE_BUILTIN_STRING", "LV_USE_CLIB_STRING", "LV_USE_CUSTOM_STRING",
-    }): ("LV_USE_STDLIB_STRING", {
-        "LV_USE_BUILTIN_STRING": "LV_STDLIB_BUILTIN",
-        "LV_USE_CLIB_STRING": "LV_STDLIB_CLIB",
-        "LV_USE_CUSTOM_STRING": "LV_STDLIB_CUSTOM",
-    }),
-    frozenset({
-        "LV_USE_BUILTIN_SPRINTF", "LV_USE_CLIB_SPRINTF", "LV_USE_CUSTOM_SPRINTF",
-    }): ("LV_USE_STDLIB_SPRINTF", {
-        "LV_USE_BUILTIN_SPRINTF": "LV_STDLIB_BUILTIN",
-        "LV_USE_CLIB_SPRINTF": "LV_STDLIB_CLIB",
-        "LV_USE_CUSTOM_SPRINTF": "LV_STDLIB_CUSTOM",
-    }),
-    frozenset({
-        "LV_LOG_LEVEL_TRACE", "LV_LOG_LEVEL_INFO", "LV_LOG_LEVEL_WARN",
-        "LV_LOG_LEVEL_ERROR", "LV_LOG_LEVEL_USER", "LV_LOG_LEVEL_NONE",
-    }): ("LV_LOG_LEVEL", None),
-    frozenset({
-        "LV_DRAW_SW_ASM_NONE", "LV_DRAW_SW_ASM_NEON", "LV_DRAW_SW_ASM_HELIUM",
-        "LV_DRAW_SW_ASM_RISCV_V", "LV_DRAW_SW_ASM_CUSTOM",
-    }): ("LV_USE_DRAW_SW_ASM", None),
-    frozenset({
-        "LV_BIDI_DIR_LTR", "LV_BIDI_DIR_RTL", "LV_BIDI_DIR_AUTO",
-    }): ("LV_BIDI_BASE_DIR_DEF", {
-        "LV_BIDI_DIR_LTR": "LV_BASE_DIR_LTR",
-        "LV_BIDI_DIR_RTL": "LV_BASE_DIR_RTL",
-        "LV_BIDI_DIR_AUTO": "LV_BASE_DIR_AUTO",
-    }),
-    frozenset({
-        "LV_CHECK_ARG_LOG_MODE_NONE", "LV_CHECK_ARG_LOG_MODE_MINIMAL",
-        "LV_CHECK_ARG_LOG_MODE_VERBOSE",
-    }): ("LV_CHECK_ARG_LOG_MODE", None),
-    frozenset({
-        "LV_SDL_RENDER_MODE_PARTIAL", "LV_SDL_RENDER_MODE_DIRECT",
-        "LV_SDL_RENDER_MODE_FULL",
-    }): ("LV_SDL_RENDER_MODE", {
-        "LV_SDL_RENDER_MODE_PARTIAL": "LV_DISPLAY_RENDER_MODE_PARTIAL",
-        "LV_SDL_RENDER_MODE_DIRECT": "LV_DISPLAY_RENDER_MODE_DIRECT",
-        "LV_SDL_RENDER_MODE_FULL": "LV_DISPLAY_RENDER_MODE_FULL",
-    }),
-    frozenset({
-        "LV_LINUX_FBDEV_RENDER_MODE_PARTIAL", "LV_LINUX_FBDEV_RENDER_MODE_DIRECT",
-        "LV_LINUX_FBDEV_RENDER_MODE_FULL",
-    }): ("LV_LINUX_FBDEV_RENDER_MODE", {
-        "LV_LINUX_FBDEV_RENDER_MODE_PARTIAL": "LV_DISPLAY_RENDER_MODE_PARTIAL",
-        "LV_LINUX_FBDEV_RENDER_MODE_DIRECT": "LV_DISPLAY_RENDER_MODE_DIRECT",
-        "LV_LINUX_FBDEV_RENDER_MODE_FULL": "LV_DISPLAY_RENDER_MODE_FULL",
-    }),
-    frozenset({
-        "LV_SDL_MOUSEWHEEL_MODE_ENCODER", "LV_SDL_MOUSEWHEEL_MODE_CROWN",
-    }): ("LV_SDL_MOUSEWHEEL_MODE", None),
+    frozenset(
+        {
+            "LV_USE_BUILTIN_MALLOC",
+            "LV_USE_CLIB_MALLOC",
+            "LV_USE_MICROPYTHON_MALLOC",
+            "LV_USE_RTTHREAD_MALLOC",
+            "LV_USE_CUSTOM_MALLOC",
+        }
+    ): (
+        "LV_USE_STDLIB_MALLOC",
+        {
+            "LV_USE_BUILTIN_MALLOC": "LV_STDLIB_BUILTIN",
+            "LV_USE_CLIB_MALLOC": "LV_STDLIB_CLIB",
+            "LV_USE_MICROPYTHON_MALLOC": "LV_STDLIB_MICROPYTHON",
+            "LV_USE_RTTHREAD_MALLOC": "LV_STDLIB_RTTHREAD",
+            "LV_USE_CUSTOM_MALLOC": "LV_STDLIB_CUSTOM",
+        },
+    ),
+    frozenset(
+        {
+            "LV_USE_BUILTIN_STRING",
+            "LV_USE_CLIB_STRING",
+            "LV_USE_CUSTOM_STRING",
+        }
+    ): (
+        "LV_USE_STDLIB_STRING",
+        {
+            "LV_USE_BUILTIN_STRING": "LV_STDLIB_BUILTIN",
+            "LV_USE_CLIB_STRING": "LV_STDLIB_CLIB",
+            "LV_USE_CUSTOM_STRING": "LV_STDLIB_CUSTOM",
+        },
+    ),
+    frozenset(
+        {
+            "LV_USE_BUILTIN_SPRINTF",
+            "LV_USE_CLIB_SPRINTF",
+            "LV_USE_CUSTOM_SPRINTF",
+        }
+    ): (
+        "LV_USE_STDLIB_SPRINTF",
+        {
+            "LV_USE_BUILTIN_SPRINTF": "LV_STDLIB_BUILTIN",
+            "LV_USE_CLIB_SPRINTF": "LV_STDLIB_CLIB",
+            "LV_USE_CUSTOM_SPRINTF": "LV_STDLIB_CUSTOM",
+        },
+    ),
+    frozenset(
+        {
+            "LV_LOG_LEVEL_TRACE",
+            "LV_LOG_LEVEL_INFO",
+            "LV_LOG_LEVEL_WARN",
+            "LV_LOG_LEVEL_ERROR",
+            "LV_LOG_LEVEL_USER",
+            "LV_LOG_LEVEL_NONE",
+        }
+    ): ("LV_LOG_LEVEL", None),
+    frozenset(
+        {
+            "LV_DRAW_SW_ASM_NONE",
+            "LV_DRAW_SW_ASM_NEON",
+            "LV_DRAW_SW_ASM_HELIUM",
+            "LV_DRAW_SW_ASM_RISCV_V",
+            "LV_DRAW_SW_ASM_CUSTOM",
+        }
+    ): ("LV_USE_DRAW_SW_ASM", None),
+    frozenset(
+        {
+            "LV_BIDI_DIR_LTR",
+            "LV_BIDI_DIR_RTL",
+            "LV_BIDI_DIR_AUTO",
+        }
+    ): (
+        "LV_BIDI_BASE_DIR_DEF",
+        {
+            "LV_BIDI_DIR_LTR": "LV_BASE_DIR_LTR",
+            "LV_BIDI_DIR_RTL": "LV_BASE_DIR_RTL",
+            "LV_BIDI_DIR_AUTO": "LV_BASE_DIR_AUTO",
+        },
+    ),
+    frozenset(
+        {
+            "LV_CHECK_ARG_LOG_MODE_NONE",
+            "LV_CHECK_ARG_LOG_MODE_MINIMAL",
+            "LV_CHECK_ARG_LOG_MODE_VERBOSE",
+        }
+    ): ("LV_CHECK_ARG_LOG_MODE", None),
+    frozenset(
+        {
+            "LV_SDL_RENDER_MODE_PARTIAL",
+            "LV_SDL_RENDER_MODE_DIRECT",
+            "LV_SDL_RENDER_MODE_FULL",
+        }
+    ): (
+        "LV_SDL_RENDER_MODE",
+        {
+            "LV_SDL_RENDER_MODE_PARTIAL": "LV_DISPLAY_RENDER_MODE_PARTIAL",
+            "LV_SDL_RENDER_MODE_DIRECT": "LV_DISPLAY_RENDER_MODE_DIRECT",
+            "LV_SDL_RENDER_MODE_FULL": "LV_DISPLAY_RENDER_MODE_FULL",
+        },
+    ),
+    frozenset(
+        {
+            "LV_LINUX_FBDEV_RENDER_MODE_PARTIAL",
+            "LV_LINUX_FBDEV_RENDER_MODE_DIRECT",
+            "LV_LINUX_FBDEV_RENDER_MODE_FULL",
+        }
+    ): (
+        "LV_LINUX_FBDEV_RENDER_MODE",
+        {
+            "LV_LINUX_FBDEV_RENDER_MODE_PARTIAL": "LV_DISPLAY_RENDER_MODE_PARTIAL",
+            "LV_LINUX_FBDEV_RENDER_MODE_DIRECT": "LV_DISPLAY_RENDER_MODE_DIRECT",
+            "LV_LINUX_FBDEV_RENDER_MODE_FULL": "LV_DISPLAY_RENDER_MODE_FULL",
+        },
+    ),
+    frozenset(
+        {
+            "LV_SDL_MOUSEWHEEL_MODE_ENCODER",
+            "LV_SDL_MOUSEWHEEL_MODE_CROWN",
+        }
+    ): ("LV_SDL_MOUSEWHEEL_MODE", None),
     # Performance / memory monitor screen position -> LV_ALIGN_* tokens.
-    frozenset({f"LV_PERF_MONITOR_ALIGN_{p}" for p in (
-        "TOP_LEFT", "TOP_MID", "TOP_RIGHT", "BOTTOM_LEFT", "BOTTOM_MID",
-        "BOTTOM_RIGHT", "LEFT_MID", "RIGHT_MID", "CENTER",
-    )}): ("LV_USE_PERF_MONITOR_POS", {
-        f"LV_PERF_MONITOR_ALIGN_{p}": f"LV_ALIGN_{p}" for p in (
-            "TOP_LEFT", "TOP_MID", "TOP_RIGHT", "BOTTOM_LEFT", "BOTTOM_MID",
-            "BOTTOM_RIGHT", "LEFT_MID", "RIGHT_MID", "CENTER",
-        )
-    }),
-    frozenset({f"LV_MEM_MONITOR_ALIGN_{p}" for p in (
-        "TOP_LEFT", "TOP_MID", "TOP_RIGHT", "BOTTOM_LEFT", "BOTTOM_MID",
-        "BOTTOM_RIGHT", "LEFT_MID", "RIGHT_MID", "CENTER",
-    )}): ("LV_USE_MEM_MONITOR_POS", {
-        f"LV_MEM_MONITOR_ALIGN_{p}": f"LV_ALIGN_{p}" for p in (
-            "TOP_LEFT", "TOP_MID", "TOP_RIGHT", "BOTTOM_LEFT", "BOTTOM_MID",
-            "BOTTOM_RIGHT", "LEFT_MID", "RIGHT_MID", "CENTER",
-        )
-    }),
+    frozenset(
+        {
+            f"LV_PERF_MONITOR_ALIGN_{p}"
+            for p in (
+                "TOP_LEFT",
+                "TOP_MID",
+                "TOP_RIGHT",
+                "BOTTOM_LEFT",
+                "BOTTOM_MID",
+                "BOTTOM_RIGHT",
+                "LEFT_MID",
+                "RIGHT_MID",
+                "CENTER",
+            )
+        }
+    ): (
+        "LV_USE_PERF_MONITOR_POS",
+        {
+            f"LV_PERF_MONITOR_ALIGN_{p}": f"LV_ALIGN_{p}"
+            for p in (
+                "TOP_LEFT",
+                "TOP_MID",
+                "TOP_RIGHT",
+                "BOTTOM_LEFT",
+                "BOTTOM_MID",
+                "BOTTOM_RIGHT",
+                "LEFT_MID",
+                "RIGHT_MID",
+                "CENTER",
+            )
+        },
+    ),
+    frozenset(
+        {
+            f"LV_MEM_MONITOR_ALIGN_{p}"
+            for p in (
+                "TOP_LEFT",
+                "TOP_MID",
+                "TOP_RIGHT",
+                "BOTTOM_LEFT",
+                "BOTTOM_MID",
+                "BOTTOM_RIGHT",
+                "LEFT_MID",
+                "RIGHT_MID",
+                "CENTER",
+            )
+        }
+    ): (
+        "LV_USE_MEM_MONITOR_POS",
+        {
+            f"LV_MEM_MONITOR_ALIGN_{p}": f"LV_ALIGN_{p}"
+            for p in (
+                "TOP_LEFT",
+                "TOP_MID",
+                "TOP_RIGHT",
+                "BOTTOM_LEFT",
+                "BOTTOM_MID",
+                "BOTTOM_RIGHT",
+                "LEFT_MID",
+                "RIGHT_MID",
+                "CENTER",
+            )
+        },
+    ),
 }
 
+BUILTIN_FONTS: dict = {
+    "LV_FONT_DEFAULT_MONTSERRAT_8": "&lv_font_montserrat_8",
+    "LV_FONT_DEFAULT_MONTSERRAT_10": "&lv_font_montserrat_10",
+    "LV_FONT_DEFAULT_MONTSERRAT_12": "&lv_font_montserrat_12",
+    "LV_FONT_DEFAULT_MONTSERRAT_14": "&lv_font_montserrat_14",
+    "LV_FONT_DEFAULT_MONTSERRAT_16": "&lv_font_montserrat_16",
+    "LV_FONT_DEFAULT_MONTSERRAT_18": "&lv_font_montserrat_18",
+    "LV_FONT_DEFAULT_MONTSERRAT_20": "&lv_font_montserrat_20",
+    "LV_FONT_DEFAULT_MONTSERRAT_22": "&lv_font_montserrat_22",
+    "LV_FONT_DEFAULT_MONTSERRAT_24": "&lv_font_montserrat_24",
+    "LV_FONT_DEFAULT_MONTSERRAT_26": "&lv_font_montserrat_26",
+    "LV_FONT_DEFAULT_MONTSERRAT_28": "&lv_font_montserrat_28",
+    "LV_FONT_DEFAULT_MONTSERRAT_30": "&lv_font_montserrat_30",
+    "LV_FONT_DEFAULT_MONTSERRAT_32": "&lv_font_montserrat_32",
+    "LV_FONT_DEFAULT_MONTSERRAT_34": "&lv_font_montserrat_34",
+    "LV_FONT_DEFAULT_MONTSERRAT_36": "&lv_font_montserrat_36",
+    "LV_FONT_DEFAULT_MONTSERRAT_38": "&lv_font_montserrat_38",
+    "LV_FONT_DEFAULT_MONTSERRAT_40": "&lv_font_montserrat_40",
+    "LV_FONT_DEFAULT_MONTSERRAT_42": "&lv_font_montserrat_42",
+    "LV_FONT_DEFAULT_MONTSERRAT_44": "&lv_font_montserrat_44",
+    "LV_FONT_DEFAULT_MONTSERRAT_46": "&lv_font_montserrat_46",
+    "LV_FONT_DEFAULT_MONTSERRAT_48": "&lv_font_montserrat_48",
+    "LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED": "&lv_font_montserrat_28_compressed",
+    "LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW": "&lv_font_dejavu_16_persian_hebrew",
+    "LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK": "&lv_font_source_han_sans_sc_14_cjk",
+    "LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK": "&lv_font_source_han_sans_sc_16_cjk",
+    "LV_FONT_DEFAULT_UNSCII_8": "&lv_font_unscii_8",
+    "LV_FONT_DEFAULT_UNSCII_16": "&lv_font_unscii_16",
+}
 
 # ============================================================================
 # RENDERING HELPERS
@@ -285,20 +362,22 @@ def define_value(sym: Symbol) -> str:
             # resolved to that symbol's concrete value, not its name.  Numeric
             # literals are also Symbols but have no int/hex type, so they fall
             # through to expr_str() below and are emitted verbatim.
-            if t in (INT, HEX) and isinstance(value, Symbol) and value.type in (INT, HEX):
+            if (
+                t in (INT, HEX)
+                and isinstance(value, Symbol)
+                and value.type in (INT, HEX)
+            ):
                 return define_value(value)
             s = expr_str(value)
             if t == HEX:
                 return s if s.startswith("0x") else f"0x{s}"
-            if t == STRING:
-                raw = s[1:-1] if s.startswith('"') and s.endswith('"') else s
-                return raw if is_raw_string(sym.name) else f'"{raw}"'
             return s
+
     # No (matching) default.
     if t in (BOOL, TRISTATE):
         return "0"
     if t == STRING:
-        return "" if is_raw_string(sym.name) else '""'
+        return '""'
     if t == HEX:
         return "0x0"
     return "0"
@@ -356,8 +435,9 @@ class Emitter:
     def __init__(self, kconf: Kconfig):
         self.kconf = kconf
         self.out: list[str] = []
-        # Stack of currently-open `#if` conditions, as (key, text) tuples.
-        self.cond_stack: list[tuple[str, str]] = []
+        # Stack of currently-open `#if` conditions, as the text following the `#if`.
+        # e.g. "FOO" for `#if FOO`
+        self.cond_stack: list[str] = []
         # Symbols already written (a symbol may be defined in several nodes).
         self.emitted: set[str] = set()
         # Names referenced in the default conditions of int/hex symbols.  A
@@ -368,7 +448,7 @@ class Emitter:
         for s in kconf.unique_defined_syms:
             if s.type not in (INT, HEX):
                 continue
-            for _value, cond in s.defaults:
+            for _, cond in s.defaults:
                 _collect_expr_syms(cond, self.selector_members)
 
     # -- conditional blocks ------------------------------------------------
@@ -397,22 +477,57 @@ class Emitter:
         wanted_keys = [term_key(t) for t in wanted]
 
         # Close any open conditions that are no longer wanted (from the top).
-        while self.cond_stack and self.cond_stack[-1][0] not in wanted_keys:
-            _, text = self.cond_stack.pop()
+        popped = False
+        while self.cond_stack and self.cond_stack[-1] not in wanted_keys:
+            text = self.cond_stack.pop()
             self.out.append(f"#endif /*{text}*/")
+            popped = True
+
+        if popped:
+            self.out.append("")
 
         # Open the conditions that are wanted but not yet open.
-        open_keys = {k for k, _ in self.cond_stack}
         for term in wanted:
+            choice_name = None
+            operator = None
             k = term_key(term)
-            if k not in open_keys:
-                self.out.append(f"#if {k}")
-                self.cond_stack.append((k, k))
+
+            if isinstance(term, tuple) and (
+                term[0] == NOT and term[1].choice is not None
+            ):
+                # depends on !FOO
+                # where FOO is part of a choice config
+                # we need to export #if CHOICE != XXX
+                sym = term[1]
+                assert sym.choice.name
+                choice_name = sym.choice.name
+                assert k[0] == "!"
+                k = k[1:]
+                operator = "!="
+            elif (
+                isinstance(term, Symbol)
+                and term.choice is not None
+                and term.choice.name
+            ):
+                # depends on FOO
+                # where FOO is part of a choice config
+                # we need to export #if CHOICE == XXX
+                choice_name = term.choice.name
+                operator = "=="
+
+            if k not in self.cond_stack:
+                condition = k
+                if choice_name:
+                    condition = f"{choice_name} {operator} {k}"
+
+                self.out.append(f"#if {condition}")
+                self.cond_stack.append(condition)
 
     def _close_all_conditions(self):
         while self.cond_stack:
-            _, text = self.cond_stack.pop()
-            self.out.append(f"#endif /*{text}*/")
+            cond = self.cond_stack.pop()
+            self.out.append(f"#endif /*{cond}*/")
+        self.out.append("")
 
     # -- symbol / choice emission -----------------------------------------
 
@@ -430,8 +545,7 @@ class Emitter:
             doc = node.help or (node.prompt[0] if node.prompt else "")
         if doc:
             self.out += c_comment(doc, "")
-        display = name + FUNCTION_LIKE_MACROS.get(name, "")
-        self.out.append(f"#define {display} {value}")
+        self.out.append(f"#define {name} {value}")
         self.out.append("")
 
     @staticmethod
@@ -464,6 +578,9 @@ class Emitter:
         # Choice members are emitted as part of the choice itself.
         if sym.choice is not None:
             return
+        # Ignore deprecated configs
+        if node.help is not None and node.help.startswith("Deprecated"):
+            return
         self._emit_define(node, sym.name, define_value(sym), base_keys)
 
     def emit_choice(self, node, base_keys: set[str]):
@@ -493,8 +610,9 @@ class Emitter:
         if choice.name:
             sel = choice_default(choice)
             doc = self._choice_doc(node, members, None)
-            self._emit_define(node, choice.name, sel.name if sel else "0",
-                              base_keys, doc=doc)
+            self._emit_define(
+                node, choice.name, sel.name if sel else "0", base_keys, doc=doc
+            )
             return
 
         # 4) Selector choice backing a computed int (e.g. the SINGLE/DOUBLE/
@@ -534,14 +652,10 @@ class Emitter:
                     self.walk(node.list, base_keys)
             node = node.next
 
-    def emit_group(self, menu_node):
+    def emit_group(self, menu_node: MenuNode):
         title = menu_node.prompt[0] if menu_node.prompt else ""
         base_keys = {term_key(t) for t in dep_terms(menu_node.dep)}
-        banner = (
-            "/*" + "=" * 76 + "\n"
-            f" * {title.upper()}\n"
-            " *" + "=" * 76 + "*/"
-        )
+        banner = "/*" + "=" * 76 + "\n" f" * {title.upper()}\n" " *" + "=" * 76 + "*/"
         self.out.append(banner)
         self.out.append("")
         if menu_node.list:
@@ -555,7 +669,7 @@ class Emitter:
 # ============================================================================
 
 
-def collect_groups(kconf: Kconfig):
+def collect_groups(kconf: Kconfig) -> dict[str, MenuNode]:
     """Return {title: menu_node} for the top-level menus under the root."""
     groups = {}
     # The root "LVGL" menu is the single child of top_node.
@@ -571,25 +685,10 @@ def collect_groups(kconf: Kconfig):
     return groups
 
 
-def ordered_groups(groups: dict):
-    order = []
-    for title in GROUP_ORDER:
-        if title in groups:
-            order.append(title)
-    leftover = [t for t in groups if t not in GROUP_ORDER]
-    for t in leftover:
-        print(f"notice: group {t!r} not in GROUP_ORDER, appended at end",
-              file=sys.stderr)
-    return order + leftover
-
-
 HEADER = """\
 /**
- * @file lv_conf_template.h
+ * @file lv_conf.h
  * Configuration file for v{ver}
- *
- * GENERATED from the Kconfig tree by scripts/generators/generate_lv_conf.py.
- * Do not edit by hand; edit the Kconfig files and re-run the generator.
  */
 
 /*
@@ -607,7 +706,7 @@ HEADER = """\
 #define LV_CONF_H
 
 /* If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
-#if  0 && defined(__ASSEMBLY__)
+#if 0 && defined(__ASSEMBLY__)
 #include "my_include.h"
 #endif
 """
@@ -950,8 +1049,8 @@ def template_to_internal(template_text: str) -> str:
         m = re.match(r"^(\s*)#\s*(?:undef|define)\s+(\S+).*$", line)
         if m:
             indent = m.group(1)
-            lhs = m.group(2)                                   # keeps macro params
-            name = re.sub(r"\(.*?\)", "", lhs, count=1)        # bare name for guards
+            lhs = m.group(2)  # keeps macro params
+            name = re.sub(r"\(.*?\)", "", lhs, count=1)  # bare name for guards
             body = line.lstrip()
             upper = name.upper()
             # A default value of 1 needs the extra LV_KCONFIG_PRESENT layer: an
@@ -994,13 +1093,18 @@ def version_string(kconf: Kconfig) -> str:
     def val(name, default):
         s = kconf.syms.get(name)
         return s.str_value if s else default
+
     return f"{val('LVGL_VERSION_MAJOR', '9')}.{val('LVGL_VERSION_MINOR', '0')}.{val('LVGL_VERSION_PATCH', '0')}"
 
 
 def main():
     ap = argparse.ArgumentParser(allow_abbrev=False)
-    ap.add_argument("kconfig", nargs="?", default="Kconfig",
-                    help="Top-level Kconfig file (default: Kconfig)")
+    ap.add_argument(
+        "kconfig",
+        nargs="?",
+        default="Kconfig",
+        help="Top-level Kconfig file (default: Kconfig)",
+    )
     ap.add_argument("--template", help="Write lv_conf_template.h to this path")
     ap.add_argument("--internal", help="Write lv_conf_internal.h to this path")
     ap.add_argument("--srctree", help="Source root for resolving sources")
@@ -1009,21 +1113,17 @@ def main():
     srctree = args.srctree or os.path.dirname(os.path.abspath(args.kconfig)) or "."
     os.environ["srctree"] = srctree
 
-    kconf = Kconfig(args.kconfig, warn_to_stderr=True, suppress_traceback=True)
+    kconf = Kconfig(args.kconfig, warn_to_stderr=True, suppress_traceback=False)
 
     groups = collect_groups(kconf)
     em = Emitter(kconf)
-    for title in ordered_groups(groups):
-        em.emit_group(groups[title])
+    for k, group in groups.items():
+        if k == "Demos":
+            print("demos")
+        em.emit_group(group)
 
     body = "\n".join(em.out)
-    text = (
-        HEADER.format(ver=version_string(kconf))
-        + "\n"
-        + body
-        + "\n"
-        + FOOTER
-    )
+    text = HEADER.format(ver=version_string(kconf)) + "\n" + body + "\n" + FOOTER
 
     if args.internal:
         with open(args.internal, "w") as f:
