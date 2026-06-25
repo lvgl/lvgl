@@ -1187,7 +1187,8 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 
     lv_state_t prev_state = obj->state;
 
-    lv_style_state_cmp_t cmp_res = lv_obj_style_state_compare(obj, prev_state, new_state);
+    lv_part_t changed_part = LV_PART_ANY;
+    lv_style_state_cmp_t cmp_res = lv_obj_style_state_compare(obj, prev_state, new_state, &changed_part);
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == LV_STYLE_STATE_CMP_SAME) {
         obj->state = new_state;
@@ -1257,7 +1258,14 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 
     lv_free(ts);
 
-    if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW) {
+    if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW && changed_part == LV_PART_SCROLLBAR) {
+        /*A redraw-only change confined to the scrollbar: refresh just that part.
+         *lv_obj_refresh_style() skips the child-subtree refresh for
+         *LV_PART_SCROLLBAR, avoiding a full-subtree style cascade. This is safe
+         *because the scrollbar is drawn by lv_obj and has no styled children.*/
+        lv_obj_refresh_style(obj, LV_PART_SCROLLBAR, LV_STYLE_PROP_ANY);
+    }
+    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW) {
         /*Invalidation is not enough, e.g. layer type needs to be updated too*/
         lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
     }
