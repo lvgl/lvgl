@@ -229,11 +229,25 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
      * complete on the first chunk; indexed PNGs may scan to PLTE. The
      * HARDWARE_LOADABLE flag replaces the manual color_type / bit_depth
      * screening that used to gate PNGs the chip can't decode. */
-    EVE_ResourceProbe probe;
-    EVE_initProbe(&probe);
     EVE_ResourceInfo info;
+    uint32_t probe_opts = OPT_TRUECOLOR;
     int probe_status = 0;
-    {
+    /* Two-pass probe to capture single-channel JPEGs: pass 1 with OPT_TRUECOLOR
+     * (default for HW decode); if the source is a grayscale JPEG (Type=JPEG,
+     * Channels=1), pass 2 with OPT_MONO so Size/Stride/Format predict the L8
+     * decode (half the RAM_G footprint of ARGB8) and the load picks up the
+     * matching option. L8 from JPEG renders as opaque luminance through the
+     * existing eve_format_to_lv_cf(L8, prefer_luminance_for_l8=true) mapping
+     * in the open path. PNG color_type=0 already decodes to L8 without
+     * promotion (fillPng) and is unaffected here. */
+    for(int pass = 0; pass < 2; ++pass) {
+        EVE_ResourceProbe probe;
+        EVE_initProbe(&probe);
+        if(lv_fs_seek(&file, 0, LV_FS_SEEK_SET) != LV_FS_RES_OK) {
+            lv_fs_close(&file);
+            return false;
+        }
+        probe_status = 0;
         uint8_t probe_buf[1024];
         uint32_t bytes_left = file_size;
         while(bytes_left > 0) {
@@ -241,10 +255,19 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
             uint32_t got = 0;
             if(lv_fs_read(&file, probe_buf, want, &got) != LV_FS_RES_OK || got == 0) break;
             probe_status = EVE_probeResource(&probe, EVE_CHIPID, probe_buf, got,
-                                             OPT_TRUECOLOR, &info);
+                                             probe_opts, &info);
             bytes_left -= got;
             if(probe_status != 0) break;
         }
+        if(probe_status != 1) break;
+        if(pass == 0
+           && info.Type == EVE_RESOURCE_JPEG
+           && info.Channels == 1
+           && probe_opts != OPT_MONO) {
+            probe_opts = OPT_MONO;
+            continue;
+        }
+        break;
     }
     if(probe_status != 1
        || (info.Type != EVE_RESOURCE_JPEG && info.Type != EVE_RESOURCE_PNG)
@@ -377,7 +400,8 @@ bool lv_draw_eve5_try_load_file_image(lv_draw_eve5_unit_t * u, const void * src,
     phost->SuppressErrorOverlay = true;
 
     uint32_t loadimage_opts = OPT_NODL | OPT_MEDIAFIFO;
-    if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
+    if(probe_opts & OPT_MONO) loadimage_opts |= OPT_MONO;
+    else if(EVE_Hal_supportRenderTarget(phost)) loadimage_opts |= OPT_TRUECOLOR;
 
     EVE_CoCmd_loadImage(phost, addr, loadimage_opts);
     bool decoded = EVE_Cmd_waitFlush(phost);
@@ -1481,6 +1505,26 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
                                        /*preferCmd*/ true,
                                        decoder_query_reset_cb, disp,
                                        &staging, &staging_size, &info);
+        /* Grayscale JPEG: re-query with OPT_MONO to pick up the L8 prediction;
+         * adopt only on success, keep the first staging otherwise. */
+        if(ok && info.Type == EVE_RESOURCE_JPEG && info.Channels == 1) {
+            EVE_ResourceInfo info_mono;
+            EVE_GpuHandle staging_mono = GA_HANDLE_INVALID;
+            uint32_t staging_size_mono = 0;
+            if(EVE_queryResource_fs(u->hal, u->allocator, sd_path, OPT_MONO,
+                                    /*preferCmd*/ true,
+                                    decoder_query_reset_cb, disp,
+                                    &staging_mono, &staging_size_mono, &info_mono)
+               && (info_mono.Flags & EVE_RESOURCE_FLAG_HARDWARE_LOADABLE)) {
+                if(staging.Id != GA_HANDLE_INVALID.Id) EVE_GpuAlloc_Free(u->allocator, staging);
+                info = info_mono;
+                staging = staging_mono;
+                staging_size = staging_size_mono;
+            }
+            else if(staging_mono.Id != GA_HANDLE_INVALID.Id) {
+                EVE_GpuAlloc_Free(u->allocator, staging_mono);
+            }
+        }
 #if LV_USE_OS
         lv_eve5_hal_unlock(disp);
 #endif
@@ -1503,17 +1547,32 @@ static lv_result_t eve5_decoder_info(lv_image_decoder_t * decoder,
         /* Non-SD path: drive EVE_probeResource over chunked lv_fs reads.
          * The HARDWARE_LOADABLE flag from the probe replaces the manual
          * PNG color_type / bit_depth screening — same gate, same chipId-
-         * derived decision, derived in one place. */
-        EVE_ResourceProbe probe;
-        EVE_initProbe(&probe);
+         * derived decision, derived in one place.
+         * Two-pass for grayscale-JPEG auto-promote (see try_load_file_image). */
+        uint32_t probe_opts = OPT_TRUECOLOR;
         int probe_status = 0;
-        uint8_t buf[1024];
-        for(;;) {
-            uint32_t got = 0;
-            if(lv_fs_read(&dsc->file, buf, sizeof(buf), &got) != LV_FS_RES_OK || got == 0) break;
-            probe_status = EVE_probeResource(&probe, EVE_CHIPID, buf, got,
-                                             OPT_TRUECOLOR, &info);
-            if(probe_status != 0) break;
+        for(int pass = 0; pass < 2; ++pass) {
+            EVE_ResourceProbe probe;
+            EVE_initProbe(&probe);
+            if(lv_fs_seek(&dsc->file, 0, LV_FS_SEEK_SET) != LV_FS_RES_OK) break;
+            probe_status = 0;
+            uint8_t buf[1024];
+            for(;;) {
+                uint32_t got = 0;
+                if(lv_fs_read(&dsc->file, buf, sizeof(buf), &got) != LV_FS_RES_OK || got == 0) break;
+                probe_status = EVE_probeResource(&probe, EVE_CHIPID, buf, got,
+                                                 probe_opts, &info);
+                if(probe_status != 0) break;
+            }
+            if(probe_status != 1) break;
+            if(pass == 0
+               && info.Type == EVE_RESOURCE_JPEG
+               && info.Channels == 1
+               && probe_opts != OPT_MONO) {
+                probe_opts = OPT_MONO;
+                continue;
+            }
+            break;
         }
         if(probe_status != 1) return LV_RESULT_INVALID;
     }

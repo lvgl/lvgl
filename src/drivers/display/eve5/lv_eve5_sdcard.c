@@ -763,7 +763,10 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
     /* Pass OPT_TRUECOLOR so the chip predicts the same decoded format it will
      * produce at load time (ARGB8 / RGB8 / PALETTEDARGB8 instead of the
      * default RGB565 / ARGB4). The query then reports the exact RAM_G
-     * allocation we need. */
+     * allocation we need. Single-channel JPEGs are re-queried with OPT_MONO
+     * below so they decode to L8 (half the RAM_G of ARGB8) and render as
+     * opaque luminance through the EVE5 image decoder's L8 → LV_COLOR_FORMAT_L8
+     * mapping. */
     uint32_t opts = OPT_TRUECOLOR;
 
     /* Query: dimensions, exact decoded size, EVE bitmap format, palette size.
@@ -784,6 +787,29 @@ bool lv_eve5_sdcard_load_image(const char * path, EVE_GpuHandle *handle,
         lv_eve5_hal_unlock(s_ctx.disp);
 #endif
         return false;
+    }
+
+    /* Grayscale JPEG auto-promote: re-query with OPT_MONO for the L8 prediction
+     * (half the RAM_G of ARGB8). Re-query first; only adopt on success so the
+     * first staging stays valid on rejection. CMD path runs CMD_QUERYIMAGE_fs
+     * again with no SD round-trip; SW path re-stages the file bytes. */
+    if(info.Type == EVE_RESOURCE_JPEG && info.Channels == 1) {
+        EVE_ResourceInfo info_mono;
+        EVE_GpuHandle staging_mono = GA_HANDLE_INVALID;
+        uint32_t staging_size_mono = 0;
+        if(EVE_queryResource_fs(phost, alloc, sd_path, OPT_MONO, /*preferCmd*/ true,
+                                sdcard_query_reset_cb, s_ctx.disp,
+                                &staging_mono, &staging_size_mono, &info_mono)
+           && (info_mono.Flags & EVE_RESOURCE_FLAG_HARDWARE_LOADABLE)) {
+            if(staging.Id != GA_HANDLE_INVALID.Id) EVE_GpuAlloc_Free(alloc, staging);
+            info = info_mono;
+            staging = staging_mono;
+            staging_size = staging_size_mono;
+            opts = OPT_MONO;
+        }
+        else if(staging_mono.Id != GA_HANDLE_INVALID.Id) {
+            EVE_GpuAlloc_Free(alloc, staging_mono);
+        }
     }
 
     if(info.Type != EVE_RESOURCE_JPEG && info.Type != EVE_RESOURCE_PNG) {
@@ -970,10 +996,15 @@ bool lv_eve5_sdcard_load_image_staged(const char * path,
 
     bool load_ok = false;
     uint32_t fifo_size = (staging_size + 3u) & ~3u;
+    /* Derive the decode option from the caller's resolved info: JPEG predicted
+     * to L8 came from a grayscale-JPEG re-probe in info_cb (with OPT_MONO),
+     * so load with OPT_MONO to match. Everything else takes OPT_TRUECOLOR. */
+    uint32_t decode_opt = (info->Type == EVE_RESOURCE_JPEG && info->Format == L8)
+                              ? OPT_MONO : OPT_TRUECOLOR;
     EVE_MediaFifo_close(phost);
     if(EVE_MediaFifo_set(phost, staging_addr, fifo_size)) {
         EVE_Hal_wr32(phost, REG_MEDIAFIFO_WRITE, staging_size);
-        EVE_CoCmd_loadImage(phost, final_addr, OPT_NODL | OPT_MEDIAFIFO | OPT_TRUECOLOR);
+        EVE_CoCmd_loadImage(phost, final_addr, OPT_NODL | OPT_MEDIAFIFO | decode_opt);
         load_ok = EVE_Cmd_waitFlush(phost);
         EVE_MediaFifo_close(phost);
     }

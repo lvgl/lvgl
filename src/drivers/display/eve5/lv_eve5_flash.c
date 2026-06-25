@@ -522,6 +522,21 @@ bool lv_eve5_flash_load_image(const char * path, EVE_GpuHandle *handle,
         return false;
     }
 
+    /* Grayscale JPEG auto-promote: re-query with OPT_MONO so info reflects the
+     * L8 decode and opts carries OPT_MONO into the load. Silent fall-back when
+     * the chip rejects the option. */
+    if(info.Type == EVE_RESOURCE_JPEG && info.Channels == 1) {
+        EVE_ResourceInfo info_mono;
+        if(EVE_queryResource_flash(phost, alloc, (int32_t)flash_addr, scan_limit,
+                                   hint, OPT_MONO, /*preferCmd*/ true,
+                                   flash_query_reset_cb, s_ctx.disp,
+                                   &info_mono)
+           && (info_mono.Flags & EVE_RESOURCE_FLAG_HARDWARE_LOADABLE)) {
+            info = info_mono;
+            opts = OPT_MONO;
+        }
+    }
+
     if(info.Type != EVE_RESOURCE_JPEG && info.Type != EVE_RESOURCE_PNG) {
         LV_LOG_WARN("EVE5 flash: %s isn't a JPEG/PNG (type=%u)", path, (unsigned)info.Type);
 #if LV_USE_OS
