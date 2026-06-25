@@ -69,8 +69,4 @@ config LV_FS_MEMFS_LETTER
 	range 0 90
 	default 0
 
-config LV_FS_MEMFS_CACHE_SIZE
-	int "Read cache size in bytes for memfs (0 = disabled)"
-	default 0
-
 endif # LV_USE_FS_MEMFS
