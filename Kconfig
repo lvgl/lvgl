@@ -12,13 +12,13 @@ menu "LVGL"
 		int
 		default 0
 
-	menu "Build"
-		rsource "env_support/kconfig/Kconfig.build"
-	endmenu 
-
 	menu "Memory and Standard Library"
 		rsource "src/stdlib/Kconfig"
 	endmenu 
+
+	menu "Operating System (OS)"
+		rsource "src/osal/Kconfig"
+	endmenu
 
 	menu "Rendering Configuration"
 		rsource "src/draw/Kconfig"
@@ -26,10 +26,6 @@ menu "LVGL"
 
 	menu "Input Devices"
 		rsource "src/indev/Kconfig"
-	endmenu
-
-	menu "Operating System (OS)"
-		rsource "src/osal/Kconfig"
 	endmenu
 
 	menu "Core"
@@ -76,9 +72,14 @@ menu "LVGL"
 		rsource "src/others/Kconfig"
 	endmenu
 
+	menu "Build"
+		rsource "env_support/kconfig/Kconfig.build"
+	endmenu 
+
 	menu "Compiler Settings"
 		rsource "env_support/kconfig/Kconfig.compiler"
 	endmenu
+
 
 	menu "Examples"
 		rsource "examples/Kconfig"
