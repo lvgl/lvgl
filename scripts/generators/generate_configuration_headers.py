@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-generate_lv_conf.py
+generate_configuration_headers.py
 ====================
-Generate ``lv_conf_template.h`` from LVGL's Kconfig tree.
+Generate ``lv_conf_template.h``, ``lv_conf_internal.h`` and ``lv_conf_kconfig.h``
+from LVGL's Kconfig tree.
 
 The Kconfig tree is the single source of truth for the set of options, their
 default values, their help texts and their dependency structure.  This script
@@ -43,7 +44,6 @@ try:
         Symbol,
         Choice,
         MENU,
-        EQUAL,
         NOT,
         COMMENT,
         BOOL,
@@ -172,20 +172,6 @@ ENUM_CHOICES: dict = {
     ): ("LV_USE_DRAW_SW_ASM", None),
     frozenset(
         {
-            "LV_BIDI_DIR_LTR",
-            "LV_BIDI_DIR_RTL",
-            "LV_BIDI_DIR_AUTO",
-        }
-    ): (
-        "LV_BIDI_BASE_DIR_DEF",
-        {
-            "LV_BIDI_DIR_LTR": "LV_BASE_DIR_LTR",
-            "LV_BIDI_DIR_RTL": "LV_BASE_DIR_RTL",
-            "LV_BIDI_DIR_AUTO": "LV_BASE_DIR_AUTO",
-        },
-    ),
-    frozenset(
-        {
             "LV_CHECK_ARG_LOG_MODE_NONE",
             "LV_CHECK_ARG_LOG_MODE_MINIMAL",
             "LV_CHECK_ARG_LOG_MODE_VERBOSE",
@@ -292,6 +278,70 @@ ENUM_CHOICES: dict = {
     ),
 }
 
+# ============================================================================
+# CONFIG-OPTION CONSTANTS
+# ============================================================================
+# Symbolic tokens that enum-style options (and LV_FONT_DEFAULT) expand to.  They
+# are emitted verbatim into the "Config options" block at the top of
+# lv_conf_internal.h, so both the lv_conf.h path (`#define LV_USE_OS LV_OS_NONE`)
+# and the Kconfig bridge (`#define CONFIG_LV_USE_OS LV_OS_NONE`) resolve through
+# the same table.  Each group is `token -> C value`; CONFIG_OPTION_GROUPS fixes
+# the emission order and the optional section comment.
+
+OS_OPTIONS: dict = {
+    "LV_OS_NONE": "0",
+    "LV_OS_PTHREAD": "1",
+    "LV_OS_FREERTOS": "2",
+    "LV_OS_CMSIS_RTOS2": "3",
+    "LV_OS_RTTHREAD": "4",
+    "LV_OS_WINDOWS": "5",
+    "LV_OS_MQX": "6",
+    "LV_OS_SDL2": "7",
+    "LV_OS_CUSTOM": "255",
+}
+
+STDLIB_OPTIONS: dict = {
+    "LV_STDLIB_BUILTIN": "0",
+    "LV_STDLIB_CLIB": "1",
+    "LV_STDLIB_MICROPYTHON": "2",
+    "LV_STDLIB_RTTHREAD": "3",
+    "LV_STDLIB_CUSTOM": "255",
+}
+
+DRAW_SW_ASM_OPTIONS: dict = {
+    "LV_DRAW_SW_ASM_NONE": "0",
+    "LV_DRAW_SW_ASM_NEON": "1",
+    "LV_DRAW_SW_ASM_HELIUM": "2",
+    "LV_DRAW_SW_ASM_RISCV_V": "3",
+    "LV_DRAW_SW_ASM_CUSTOM": "255",
+}
+
+NEMA_LIB_OPTIONS: dict = {
+    "LV_NEMA_LIB_NONE": "0",
+    "LV_NEMA_LIB_M33_REVC": "1",
+    "LV_NEMA_LIB_M33_NEMAPVG": "2",
+    "LV_NEMA_LIB_M55": "3",
+    "LV_NEMA_LIB_M7": "4",
+}
+
+NEMA_HAL_OPTIONS: dict = {
+    "LV_NEMA_HAL_CUSTOM": "0",
+    "LV_NEMA_HAL_STM32": "1",
+}
+
+NANOVG_BACKEND_OPTIONS: dict = {
+    "LV_NANOVG_BACKEND_GL2": "1",
+    "LV_NANOVG_BACKEND_GL3": "2",
+    "LV_NANOVG_BACKEND_GLES2": "3",
+    "LV_NANOVG_BACKEND_GLES3": "4",
+}
+
+CHECK_ARG_LOG_MODE_OPTIONS: dict = {
+    "LV_CHECK_ARG_LOG_MODE_NONE": "0",
+    "LV_CHECK_ARG_LOG_MODE_MINIMAL": "1",
+    "LV_CHECK_ARG_LOG_MODE_VERBOSE": "2",
+}
+
 BUILTIN_FONTS: dict = {
     "LV_FONT_DEFAULT_MONTSERRAT_8": "&lv_font_montserrat_8",
     "LV_FONT_DEFAULT_MONTSERRAT_10": "&lv_font_montserrat_10",
@@ -321,6 +371,38 @@ BUILTIN_FONTS: dict = {
     "LV_FONT_DEFAULT_UNSCII_8": "&lv_font_unscii_8",
     "LV_FONT_DEFAULT_UNSCII_16": "&lv_font_unscii_16",
 }
+
+# (section comment, token->value table); emission order is significant.
+CONFIG_OPTION_GROUPS: list = [
+    ("OS Options", OS_OPTIONS),
+    ("Standard Library Options", STDLIB_OPTIONS),
+    ("Draw SW ASM Options", DRAW_SW_ASM_OPTIONS),
+    ("NemaGFX Options", NEMA_LIB_OPTIONS),
+    (None, NEMA_HAL_OPTIONS),
+    ("NanoVG Options", NANOVG_BACKEND_OPTIONS),
+    ("Check Arg Options", CHECK_ARG_LOG_MODE_OPTIONS),
+    ("Built-in font selectors for LV_FONT_DEFAULT", BUILTIN_FONTS),
+]
+
+
+def render_config_options() -> str:
+    """Render the "Config options" constant block for lv_conf_internal.h.
+
+    Each group becomes ``#define <token> <value>`` lines with the value column
+    aligned within the group, groups separated by a blank line.
+    """
+    blocks = []
+    for comment, options in CONFIG_OPTION_GROUPS:
+        width = max(len(name) for name in options)
+        lines = []
+        if comment:
+            lines.append(f"/* {comment} */")
+        lines += [
+            f"#define {name.ljust(width)}   {value}" for name, value in options.items()
+        ]
+        blocks.append("\n".join(lines))
+    return "\n\n".join(blocks)
+
 
 # ============================================================================
 # RENDERING HELPERS
@@ -514,6 +596,8 @@ class Emitter:
                 # we need to export #if CHOICE == XXX
                 choice_name = term.choice.name
                 operator = "=="
+            if k == "LV_USE_BUILTIN_MALLOC":
+                print("LV_USE_BUILTIN_MALLOC")
 
             if k not in self.cond_stack:
                 condition = k
@@ -685,6 +769,10 @@ def collect_groups(kconf: Kconfig) -> dict[str, MenuNode]:
     return groups
 
 
+# ============================================================================
+# lv_conf_template.h Generation
+# ============================================================================
+
 HEADER = """\
 /**
  * @file lv_conf.h
@@ -721,12 +809,8 @@ FOOTER = """\
 
 
 # ============================================================================
-# lv_conf_internal.h GENERATION
+# lv_conf_internal.h Generation
 # ============================================================================
-#
-# Adapted from scripts/lv_conf_internal_gen.py: wrap every `#define` from the
-# template in an `#ifndef NAME / #ifdef CONFIG_NAME / #else <default>` ladder so
-# that lv_conf.h, Kconfig, or the built-in default each take precedence in turn.
 
 INTERNAL_PREAMBLE = """\
 /**
@@ -740,45 +824,7 @@ INTERNAL_PREAMBLE = """\
 /* clang-format off */
 
 /* Config options */
-#define LV_OS_NONE          0
-#define LV_OS_PTHREAD       1
-#define LV_OS_FREERTOS      2
-#define LV_OS_CMSIS_RTOS2   3
-#define LV_OS_RTTHREAD      4
-#define LV_OS_WINDOWS       5
-#define LV_OS_MQX           6
-#define LV_OS_SDL2          7
-#define LV_OS_CUSTOM        255
-
-#define LV_STDLIB_BUILTIN           0
-#define LV_STDLIB_CLIB              1
-#define LV_STDLIB_MICROPYTHON       2
-#define LV_STDLIB_RTTHREAD          3
-#define LV_STDLIB_CUSTOM            255
-
-#define LV_DRAW_SW_ASM_NONE             0
-#define LV_DRAW_SW_ASM_NEON             1
-#define LV_DRAW_SW_ASM_HELIUM           2
-#define LV_DRAW_SW_ASM_RISCV_V          3
-#define LV_DRAW_SW_ASM_CUSTOM           255
-
-#define LV_NEMA_LIB_NONE            0
-#define LV_NEMA_LIB_M33_REVC        1
-#define LV_NEMA_LIB_M33_NEMAPVG     2
-#define LV_NEMA_LIB_M55             3
-#define LV_NEMA_LIB_M7              4
-
-#define LV_NEMA_HAL_CUSTOM          0
-#define LV_NEMA_HAL_STM32           1
-
-#define LV_NANOVG_BACKEND_GL2       1
-#define LV_NANOVG_BACKEND_GL3       2
-#define LV_NANOVG_BACKEND_GLES2     3
-#define LV_NANOVG_BACKEND_GLES3     4
-
-#define LV_CHECK_ARG_LOG_MODE_NONE    0
-#define LV_CHECK_ARG_LOG_MODE_MINIMAL 1
-#define LV_CHECK_ARG_LOG_MODE_VERBOSE 2
+__CONFIG_OPTIONS__
 
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
@@ -1036,7 +1082,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 def template_to_internal(template_text: str) -> str:
     """Transform generated lv_conf_template.h text into lv_conf_internal.h."""
-    out = [INTERNAL_PREAMBLE]
+    out = [INTERNAL_PREAMBLE.replace("__CONFIG_OPTIONS__", render_config_options())]
     started = False
     for line in template_text.splitlines():
         if not started:
@@ -1089,6 +1135,147 @@ def template_to_internal(template_text: str) -> str:
     return "".join(out)
 
 
+# ============================================================================
+# lv_conf_kconfig.h  (the CONFIG_*  ->  enum/token bridge)
+# ============================================================================
+
+KCONFIG_BRIDGE_PREAMBLE = """\
+/**
+ * GENERATED FILE, DO NOT EDIT IT!
+ * @file lv_conf_kconfig.h
+ * Configs that need special handling when LVGL is used with Kconfig
+ */
+
+#ifndef LV_CONF_KCONFIG_H
+#define LV_CONF_KCONFIG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef LV_CONF_KCONFIG_EXTERNAL_INCLUDE
+#include LV_CONF_KCONFIG_EXTERNAL_INCLUDE
+#else
+
+#ifdef ESP_PLATFORM
+#include "sdkconfig.h"
+#include "esp_attr.h"
+#endif
+
+#ifdef __NuttX__
+#include <nuttx/config.h>
+/*
+ * Make sure version number in Kconfig file is correctly set.
+ * Mismatch can happen when user manually copy lvgl/Kconfig file to their project, like what NuttX does.
+ */
+#include "../lv_version.h"
+
+#if CONFIG_LVGL_VERSION_MAJOR != LVGL_VERSION_MAJOR || CONFIG_LVGL_VERSION_MINOR != LVGL_VERSION_MINOR \\
+        || CONFIG_LVGL_VERSION_PATCH != LVGL_VERSION_PATCH
+#warning "Version mismatch between Kconfig and lvgl/lv_version.h"
+#endif
+#elif defined(__RTTHREAD__)
+#define LV_CONF_INCLUDE_SIMPLE
+#include <lv_rt_thread_conf.h>
+#endif
+
+#endif /*LV_CONF_KCONFIG_EXTERNAL_INCLUDE*/
+
+"""
+
+# Deprecated *_KILOBYTES options: not Kconfig choices, kept verbatim.
+KCONFIG_BRIDGE_DEPRECATIONS = """\
+
+/*******************
+ * LV_MEM_SIZE
+ *******************/
+
+#ifdef CONFIG_LV_MEM_SIZE_KILOBYTES
+#warning "LV_MEM_SIZE_KILOBYTES is deprecated, use LV_MEM_SIZE instead (value in bytes)"
+#ifndef CONFIG_LV_MEM_SIZE
+#define CONFIG_LV_MEM_SIZE (LV_MEM_SIZE_KILOBYTES * 1024U)
+#else
+#warning "Both LV_MEM_SIZE and LV_MEM_SIZE_KILOBYTES are defined. Using LV_MEM_SIZE"
+#endif
+#undef CONFIG_LV_MEM_SIZE_KILOBYTES
+#endif
+
+#ifdef CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
+#warning "LV_MEM_POOL_EXPAND_SIZE_KILOBYTES is deprecated, set the full memory size with LV_MEM_SIZE instead (value in bytes)"
+#define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
+#endif
+"""
+
+KCONFIG_BRIDGE_FOOTER = """\
+
+#ifdef __cplusplus
+} /*extern "C"*/
+#endif
+
+#endif /*LV_CONF_KCONFIG_H*/
+"""
+
+
+def kconfig_bridge_body(kconf: Kconfig) -> str:
+    """Render the CONFIG_<member> -> CONFIG_<macro> <token> ladders.
+
+    Only enum-valued choices need a bridge: ENUM_CHOICES entries (member names
+    differ from the tokens) and named choices whose members already are the
+    tokens.  Value-alias int symbols (LV_COLOR_DEPTH), anonymous 0/1 choices
+    (THORVG, LZ4, Wayland) and computed-int selectors (buffer counts) need none
+    -- this mirrors emit_choice()'s cases 2/4/5.
+    """
+    blocks = []
+    seen: dict[str, list] = {}
+    for choice in kconf.unique_choices:
+        members = list(choice.syms)
+        member_names = frozenset(s.name for s in members)
+        enum = ENUM_CHOICES.get(member_names)
+        if enum:
+            macro, tokenmap = enum
+            pairs = [
+                (s.name, tokenmap.get(s.name, s.name) if tokenmap else s.name)
+                for s in members
+            ]
+        elif choice.name and choice.name in kconf.syms:
+            continue  # value-alias int symbol
+        elif choice.name:
+            macro = choice.name
+            pairs = [(s.name, s.name) for s in members]
+        else:
+            continue  # anonymous bools / computed-int selector
+
+        if macro in seen:
+            raise SystemExit(
+                f"duplicate bridge macro {macro}: members {[p[0] for p in pairs]} "
+                f"collide with {seen[macro]} -- check for duplicate Kconfig choices"
+            )
+        seen[macro] = [p[0] for p in pairs]
+
+        lines = ["/*******************", f" * {macro}", " *******************/"]
+        for i, (member, token) in enumerate(pairs):
+            guard = (
+                f"#ifdef CONFIG_{member}"
+                if i == 0
+                else f"#elif defined(CONFIG_{member})"
+            )
+            lines.append(guard)
+            lines.append(f"#  define CONFIG_{macro} {token}")
+        lines.append("#endif")
+        blocks.append("\n".join(lines))
+    return "\n\n".join(blocks)
+
+
+def generate_kconfig_bridge(kconf: Kconfig) -> str:
+    return (
+        KCONFIG_BRIDGE_PREAMBLE
+        + kconfig_bridge_body(kconf)
+        + "\n"
+        + KCONFIG_BRIDGE_DEPRECATIONS
+        + KCONFIG_BRIDGE_FOOTER
+    )
+
+
 def version_string(kconf: Kconfig) -> str:
     def val(name, default):
         s = kconf.syms.get(name)
@@ -1107,6 +1294,7 @@ def main():
     )
     ap.add_argument("--template", help="Write lv_conf_template.h to this path")
     ap.add_argument("--internal", help="Write lv_conf_internal.h to this path")
+    ap.add_argument("--bridge", help="Write lv_conf_kconfig.h to this path")
     ap.add_argument("--srctree", help="Source root for resolving sources")
     args = ap.parse_args()
 
@@ -1117,9 +1305,7 @@ def main():
 
     groups = collect_groups(kconf)
     em = Emitter(kconf)
-    for k, group in groups.items():
-        if k == "Demos":
-            print("demos")
+    for group in groups.values():
         em.emit_group(group)
 
     body = "\n".join(em.out)
@@ -1135,9 +1321,20 @@ def main():
             f.write(text)
         print(f"wrote {args.template}", file=sys.stderr)
 
-    if not args.template and not args.internal:
+    if args.bridge:
+        with open(args.bridge, "w") as f:
+            f.write(generate_kconfig_bridge(kconf))
+        print(f"wrote {args.bridge}", file=sys.stderr)
+
+    if not args.template and not args.internal and not args.bridge:
         sys.stdout.write(text)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        import pdb, traceback
+
+        traceback.print_exc()  # shows the real traceback
+        pdb.post_mortem()  # drops into pdb AT the crash site
