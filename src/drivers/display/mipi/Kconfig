@@ -1,6 +1,10 @@
 config LV_USE_GENERIC_MIPI
 	bool "Generic MIPI driver"
 	default n
+	help
+		Generic MIPI driver for LCD devices connected via SPI or parallel
+		port. Use this if your specific LCD controller is not listed among
+		the dedicated drivers below.
 
 config LV_USE_ST7735
 	bool "Use ST7735 LCD driver"
