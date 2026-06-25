@@ -43,7 +43,7 @@
 #endif
 
 #define XKB_RULE_NAMES  (struct xkb_rule_names) { \
-        .rules = LV_LIBINPUT_XKB_RULES, \ .model = LV_LIBINPUT_XKB_MODEL, \ .layout = LV_LIBINPUT_XKB_LAYOUT, \ .variant = LV_LIBINPUT_XKB_VARIANT, \ .options = RULE_NAMES_OPTIONS}
+        .rules = LV_LIBINPUT_XKB_RULES, .model = LV_LIBINPUT_XKB_MODEL, .layout = LV_LIBINPUT_XKB_LAYOUT, .variant = LV_LIBINPUT_XKB_VARIANT, .options = RULE_NAMES_OPTIONS}
 #endif
 
 /*********************
