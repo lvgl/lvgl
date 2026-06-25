@@ -47,7 +47,7 @@ config LV_NEMA_STM32_HAL_INCLUDE
 	default "stm32u5xx_hal.h"
 	depends on LV_NEMA_HAL_STM32
 
-config LV_NEMA_CUSTOM_HEADER
+config LV_NEMA_CUSTOM_INCLUDE
 	string "Path to custom NemaGFX attribute header"
 	default ""
 	depends on LV_NEMA_HAL_STM32
