@@ -601,8 +601,8 @@ static inline lv_result_t lv_draw_sw_image_helium(
                     );
 
             } 
-    #endif
         }
+    #endif
         else {
             break;
         }
