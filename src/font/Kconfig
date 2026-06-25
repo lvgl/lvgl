@@ -63,19 +63,6 @@ choice LV_BIDI_BASE_DIR_DEF
 		bool "Auto detect"
 endchoice
 
-choice
-	prompt "Set the default BIDI direction"
-	default LV_BIDI_DIR_AUTO
-	depends on LV_USE_BIDI
-
-	config LV_BIDI_DIR_LTR
-		bool "Left-to-Right"
-	config LV_BIDI_DIR_RTL
-		bool "Right-to-Left"
-	config LV_BIDI_DIR_AUTO
-		bool "Detect texts base direction"
-endchoice
-
 config LV_USE_ARABIC_PERSIAN_CHARS
 	bool "Enable Arabic/Persian processing"
 	help

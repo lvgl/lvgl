@@ -11,9 +11,6 @@ config LV_USE_CLIB_MALLOC
 config LV_USE_MICROPYTHON_MALLOC
 	bool "MicroPython functions malloc/realloc/free"
 
-config LV_USE_RTTHREAD_MALLOC
-	bool "RTThread functions malloc/realloc/free"
-
 config LV_USE_CUSTOM_MALLOC
 	bool "Implement the functions externally"
 
