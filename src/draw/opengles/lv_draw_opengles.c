@@ -21,6 +21,8 @@
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../misc/lv_area_private.h"
+#include "../../draw/sw/lv_draw_sw_mask_private.h"
+#include "../../draw/lv_draw_mask.h"
 
 /*********************
  *      DEFINES
@@ -57,6 +59,7 @@ static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data
 
 static void blend_texture_layer(lv_draw_task_t * t);
 static void draw_from_cached_texture(lv_draw_task_t * t);
+static void execute_mask_rect(lv_draw_opengles_unit_t * u, lv_draw_task_t * t);
 
 static void execute_drawing(lv_draw_opengles_unit_t * u);
 
@@ -613,6 +616,134 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     LV_PROFILER_DRAW_END;
 }
 
+/* Apply a rounded-corner clip mask directly to a layer's GPU texture.
+ * The mask is computed on the CPU (glReadPixels → SW mask → glTexSubImage2D).
+ * Only the alpha channel is modified; RGB is untouched.
+ * This mirrors lv_draw_sw_mask_rect but operates on an OpenGLES texture whose
+ * Y-axis is flipped relative to LVGL's top-down coordinate system. */
+static void execute_mask_rect(lv_draw_opengles_unit_t * u, lv_draw_task_t * t)
+{
+    const lv_draw_mask_rect_dsc_t * dsc = (const lv_draw_mask_rect_dsc_t *)t->draw_dsc;
+    lv_layer_t * layer = t->target_layer;
+    unsigned int texture = layer_get_texture(layer);
+    if(!texture) return;
+
+    int32_t w = lv_area_get_width(&layer->buf_area);
+    int32_t h = lv_area_get_height(&layer->buf_area);
+
+    uint8_t * pixels = lv_malloc((uint32_t)w * (uint32_t)h * 4u);
+    if(!pixels) return;
+
+    /* Read the current texture pixels into CPU memory (RGBA, bottom-up). */
+    unsigned int fbo = get_framebuffer(u);
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, fbo));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0));
+    GL_CALL(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels));
+
+    /* Work in layer-relative coordinates. */
+    lv_area_t mask_area = dsc->area;
+    lv_area_move(&mask_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
+    lv_area_t clip_area = t->clip_area;
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
+    /* Clear the four rectangular strips outside the mask area (same as SW path). */
+    if(!dsc->keep_outside) {
+        lv_area_t clear;
+
+        /* top */
+        lv_area_set(&clear, clip_area.x1, clip_area.y1, clip_area.x2, mask_area.y1 - 1);
+        for(int32_t y = clear.y1; y <= clear.y2; y++) {
+            if(y < 0 || y >= h) continue;
+            int32_t gl_y = h - 1 - y;
+            for(int32_t x = clear.x1; x <= clear.x2; x++) {
+                if(x < 0 || x >= w) continue;
+                pixels[(gl_y * w + x) * 4 + 3] = 0;
+            }
+        }
+
+        /* bottom */
+        lv_area_set(&clear, clip_area.x1, mask_area.y2 + 1, clip_area.x2, clip_area.y2);
+        for(int32_t y = clear.y1; y <= clear.y2; y++) {
+            if(y < 0 || y >= h) continue;
+            int32_t gl_y = h - 1 - y;
+            for(int32_t x = clear.x1; x <= clear.x2; x++) {
+                if(x < 0 || x >= w) continue;
+                pixels[(gl_y * w + x) * 4 + 3] = 0;
+            }
+        }
+
+        /* left */
+        lv_area_set(&clear, clip_area.x1, mask_area.y1, mask_area.x1 - 1, mask_area.y2);
+        for(int32_t y = clear.y1; y <= clear.y2; y++) {
+            if(y < 0 || y >= h) continue;
+            int32_t gl_y = h - 1 - y;
+            for(int32_t x = clear.x1; x <= clear.x2; x++) {
+                if(x < 0 || x >= w) continue;
+                pixels[(gl_y * w + x) * 4 + 3] = 0;
+            }
+        }
+
+        /* right */
+        lv_area_set(&clear, mask_area.x2 + 1, mask_area.y1, clip_area.x2, mask_area.y2);
+        for(int32_t y = clear.y1; y <= clear.y2; y++) {
+            if(y < 0 || y >= h) continue;
+            int32_t gl_y = h - 1 - y;
+            for(int32_t x = clear.x1; x <= clear.x2; x++) {
+                if(x < 0 || x >= w) continue;
+                pixels[(gl_y * w + x) * 4 + 3] = 0;
+            }
+        }
+    }
+
+    /* Apply the rounded-corner mask to the edge pixels. */
+    lv_area_t draw_area;
+    if(lv_area_intersect(&draw_area, &mask_area, &clip_area)) {
+        int32_t draw_w = lv_area_get_width(&draw_area);
+        lv_opa_t * mask_buf = lv_malloc((uint32_t)draw_w);
+        if(mask_buf) {
+            lv_draw_sw_mask_radius_param_t param;
+            lv_draw_sw_mask_radius_init(&param, &mask_area, dsc->radius, false);
+            void * masks[2] = {&param, NULL};
+
+            for(int32_t y = draw_area.y1; y <= draw_area.y2; y++) {
+                lv_memset(mask_buf, 0xff, (uint32_t)draw_w);
+                lv_draw_sw_mask_res_t res = lv_draw_sw_mask_apply(masks, mask_buf, draw_area.x1, y, draw_w);
+
+                if(res == LV_DRAW_SW_MASK_RES_FULL_COVER) continue;
+
+                int32_t gl_y = h - 1 - y;
+                uint8_t * row = pixels + gl_y * w * 4;
+
+                if(res == LV_DRAW_SW_MASK_RES_TRANSP) {
+                    for(int32_t x = draw_area.x1; x <= draw_area.x2; x++) {
+                        row[x * 4 + 3] = 0;
+                    }
+                }
+                else {
+                    for(int32_t x = draw_area.x1; x <= draw_area.x2; x++) {
+                        uint8_t m = mask_buf[x - draw_area.x1];
+                        if(m != LV_OPA_COVER) {
+                            row[x * 4 + 3] = (uint8_t)(((uint16_t)row[x * 4 + 3] * m) >> 8);
+                        }
+                    }
+                }
+            }
+
+            lv_draw_sw_mask_free_param(&param);
+            lv_free(mask_buf);
+        }
+    }
+
+    /* Upload the modified pixels back to the GPU texture. */
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
+    GL_CALL(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+    lv_free(pixels);
+}
+
 static void execute_drawing(lv_draw_opengles_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
@@ -694,6 +825,10 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
             }
         case LV_DRAW_TASK_TYPE_LAYER: {
                 blend_texture_layer(t);
+                return;
+            }
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE: {
+                execute_mask_rect(u, t);
                 return;
             }
 #if LV_USE_3DTEXTURE
