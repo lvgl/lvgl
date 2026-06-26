@@ -26,31 +26,26 @@ choice
 		bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
 endchoice
 
+config LV_SDL_BUF_COUNT
+	int "Number of screen-sized buffers (1 or 2)"
+	range 1 2
+	default 1
+
+# Deprecated buffer-count selection, kept so existing defconfigs that set
+# CONFIG_LV_SDL_SINGLE_BUFFER / CONFIG_LV_SDL_DOUBLE_BUFFER still parse.
+# `optional` so a fresh config selects nothing and LV_SDL_BUF_COUNT keeps its
+# own default (no spurious deprecation warning). Mapped to LV_SDL_BUF_COUNT in
+# lv_conf_kconfig.h.
 choice
-	prompt "SDL buffer size"
-	default LV_SDL_SINGLE_BUFFER
+	prompt "SDL buffer count [DEPRECATED: use LV_SDL_BUF_COUNT]"
+	optional
 
 	config LV_SDL_SINGLE_BUFFER
 		bool "One screen-sized buffer"
 
 	config LV_SDL_DOUBLE_BUFFER
-		bool "Two screen-sized buffer"
-		depends on !LV_SDL_RENDER_MODE_PARTIAL
-
-	config LV_SDL_CUSTOM_BUFFER
-		bool "Custom-sized buffer"
-		depends on LV_SDL_RENDER_MODE_PARTIAL
+		bool "Two screen-sized buffers"
 endchoice
-
-config LV_SDL_BUFFER_COUNT
-	int
-	default 0 if LV_SDL_CUSTOM_BUFFER
-	default 1 if LV_SDL_SINGLE_BUFFER
-	default 2 if LV_SDL_DOUBLE_BUFFER
-
-config LV_SDL_BUF_COUNT
-	int
-	default LV_SDL_BUFFER_COUNT
 
 config LV_SDL_ACCELERATED
 	bool "Use hardware acceleration"

@@ -388,6 +388,20 @@ KCONFIG_BRIDGE_DEPRECATIONS = """\
 #warning "LV_MEM_POOL_EXPAND_SIZE_KILOBYTES is deprecated, set the full memory size with LV_MEM_SIZE instead (value in bytes)"
 #define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
 #endif
+
+/*******************
+ * LV_SDL_BUF_COUNT
+ *******************/
+
+#if defined(CONFIG_LV_SDL_SINGLE_BUFFER)
+#warning "LV_SDL_SINGLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
+#undef CONFIG_LV_SDL_BUF_COUNT
+#define CONFIG_LV_SDL_BUF_COUNT 1
+#elif defined(CONFIG_LV_SDL_DOUBLE_BUFFER)
+#warning "LV_SDL_DOUBLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
+#undef CONFIG_LV_SDL_BUF_COUNT
+#define CONFIG_LV_SDL_BUF_COUNT 2
+#endif
 """
 
 KCONFIG_BRIDGE_FOOTER = """\

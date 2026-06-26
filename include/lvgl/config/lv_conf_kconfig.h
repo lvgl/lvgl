@@ -216,6 +216,20 @@ extern "C" {
 #define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
 #endif
 
+/*******************
+ * LV_SDL_BUF_COUNT
+ *******************/
+
+#if defined(CONFIG_LV_SDL_SINGLE_BUFFER)
+#warning "LV_SDL_SINGLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
+#undef CONFIG_LV_SDL_BUF_COUNT
+#define CONFIG_LV_SDL_BUF_COUNT 1
+#elif defined(CONFIG_LV_SDL_DOUBLE_BUFFER)
+#warning "LV_SDL_DOUBLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
+#undef CONFIG_LV_SDL_BUF_COUNT
+#define CONFIG_LV_SDL_BUF_COUNT 2
+#endif
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

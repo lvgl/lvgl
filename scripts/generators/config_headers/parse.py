@@ -84,7 +84,10 @@ IGNORE_SYMBOLS: set[str] = {
     "LV_CONF_SKIP",
     "LV_USE_THORVG_EXTERNAL",  # derived (= LV_USE_THORVG && !INTERNAL) in the internal footer
     "LV_USE_LZ4_EXTERNAL",  # derived (= LV_USE_LZ4 || !INTERNAL) in the internal footer
-    "LV_SDL_BUFFER_COUNT",  # internal raw count; LV_SDL_BUF_COUNT is the alias
+    # Deprecated SDL buffer-count choice: mapped to LV_SDL_BUF_COUNT by the
+    # lv_conf_kconfig.h shim, so kept out of the generated headers.
+    "LV_SDL_SINGLE_BUFFER",
+    "LV_SDL_DOUBLE_BUFFER",
     "LV_WAYLAND_USE_SHM",  # Wayland backend: resolved in the internal footer
     "LV_WAYLAND_USE_EGL",
     "LV_WAYLAND_USE_G2D",

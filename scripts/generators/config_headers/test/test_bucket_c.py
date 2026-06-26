@@ -1,19 +1,22 @@
-"""Bucket C: computed-int alias (LV_SDL_BUF_COUNT) and the font pointer table."""
+"""Bucket C: the LV_SDL_BUF_COUNT direct int + deprecated choice, and the font
+pointer table."""
 
 from config_headers.config_entry import EnumChoice, IntConfig
 
 
-def test_computed_int_alias_resolves_to_value(entries):
-    # No prompt, default references a computed int -> emit the resolved value,
-    # not the bare symbol name.  Single buffer is the default here -> 1.
+def test_buf_count_is_a_plain_int(entries):
+    # LV_SDL_BUF_COUNT is now a direct int with its own default (no indirection).
     buf = entries["LV_SDL_BUF_COUNT"]
     assert isinstance(buf, IntConfig)
     assert buf.value == "1"
     assert buf.emit_template()[-1] == "#define LV_SDL_BUF_COUNT 1"
 
 
-def test_raw_count_symbol_stays_ignored(entries):
-    assert "LV_SDL_BUFFER_COUNT" not in entries
+def test_deprecated_buffer_choice_members_stay_ignored(entries):
+    # Kept only for defconfig compatibility, mapped via the lv_conf_kconfig.h
+    # shim -> excluded from the generated headers.
+    assert "LV_SDL_SINGLE_BUFFER" not in entries
+    assert "LV_SDL_DOUBLE_BUFFER" not in entries
 
 
 def test_font_default_emits_token(entries):

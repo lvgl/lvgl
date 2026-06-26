@@ -851,7 +851,7 @@
 #define LV_TXT_ENC LV_TXT_ENC_UTF8
 
 /** While rendering text strings, break (wrap) text on these chars. */
-#define LV_TXT_BREAK_CHARS " ,.;:-_)}"
+#define LV_TXT_BREAK_CHARS " ,.;:-_)]}"
 
 /** If a word is at least this long, will break wherever 'prettiest'.
  *  To disable, set to a value <= 0.
@@ -970,7 +970,7 @@
 #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK 0
 
 /** Pixel perfect monospaced fonts */
-#define LV_FONT_UNSCII_8 1
+#define LV_FONT_UNSCII_8 0
 
 /** Enable UNSCII 16 (Perfect monospace font) */
 #define LV_FONT_UNSCII_16 0
@@ -1694,7 +1694,8 @@
  */
 #define LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
 
-#define LV_SDL_BUF_COUNT 0
+/** Number of screen-sized buffers (1 or 2) */
+#define LV_SDL_BUF_COUNT 1
 
 /** Use hardware acceleration */
 #define LV_SDL_ACCELERATED 1

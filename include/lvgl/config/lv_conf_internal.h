@@ -1925,14 +1925,10 @@
 #endif
 
 #ifndef LV_FONT_UNSCII_8
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_FONT_UNSCII_8
-            #define LV_FONT_UNSCII_8 CONFIG_LV_FONT_UNSCII_8
-        #else
-            #define LV_FONT_UNSCII_8 0
-        #endif
+    #ifdef CONFIG_LV_FONT_UNSCII_8
+        #define LV_FONT_UNSCII_8 CONFIG_LV_FONT_UNSCII_8
     #else
-        #define LV_FONT_UNSCII_8 1
+        #define LV_FONT_UNSCII_8 0
     #endif
 #endif
 
@@ -3348,7 +3344,7 @@
     #ifdef CONFIG_LV_SDL_BUF_COUNT
         #define LV_SDL_BUF_COUNT CONFIG_LV_SDL_BUF_COUNT
     #else
-        #define LV_SDL_BUF_COUNT 0
+        #define LV_SDL_BUF_COUNT 1
     #endif
 #endif
 

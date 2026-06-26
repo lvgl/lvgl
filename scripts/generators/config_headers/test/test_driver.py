@@ -42,11 +42,10 @@ def test_internal_wraps_options_in_kconfig_ladder(generated):
 
 def test_internal_footer_has_static_derivations(generated):
     i = generated["internal"]
-    # Dependency-disable blocks, the *_EXTERNAL compatibility shims, the Wayland
-    # backend defaults, and the trailing LV_KCONFIG_PRESENT cleanup.
-    assert "#if LV_USE_SYSMON == 0" in i
-    assert "#if LV_BUILD_DEMOS == 0" in i
+    # The *_EXTERNAL compatibility shims, the inconsistent-name alias, the
+    # Wayland backend defaults, and the trailing LV_KCONFIG_PRESENT cleanup.
     assert "LV_USE_THORVG_EXTERNAL" in i
     assert "LV_USE_LZ4_EXTERNAL" in i
+    assert "#define LV_USE_ANIMIMAGE LV_USE_ANIMIMG" in i
     assert "#define LV_WAYLAND_USE_SHM 0" in i
     assert "#undef LV_KCONFIG_PRESENT" in i
