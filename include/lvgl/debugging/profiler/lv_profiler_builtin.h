@@ -26,8 +26,8 @@ extern "C" {
 
 #define LV_PROFILER_BEGIN_TAG(tag)  lv_profiler_builtin_write((tag), 'B')
 #define LV_PROFILER_END_TAG(tag)    lv_profiler_builtin_write((tag), 'E')
-#define LV_PROFILER_BEGIN           LV_PROFILER_BUILTIN_BEGIN_TAG(__func__)
-#define LV_PROFILER_END             LV_PROFILER_BUILTIN_END_TAG(__func__)
+#define LV_PROFILER_BEGIN           LV_PROFILER_BEGIN_TAG(__func__)
+#define LV_PROFILER_END             LV_PROFILER_END_TAG(__func__)
 
 /**********************
  *      TYPEDEFS
