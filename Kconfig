@@ -80,7 +80,6 @@ menu "LVGL"
 		rsource "env_support/kconfig/Kconfig.compiler"
 	endmenu
 
-
 	menu "Examples"
 		rsource "examples/Kconfig"
 	endmenu

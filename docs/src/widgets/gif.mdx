@@ -65,6 +65,30 @@ RGB565 = 2 bytes/pixel, RGB888 = 3, ARGB8888 = 4.
 - <ApiLink name="LV_PART_MAIN" /> A background rectangle that uses the [typical
   background style properties](/common-widget-features/styles/overview).
 
+## Maximum GIF Size
+
+By default, LVGL accepts GIF images up to 480 × 32768 pixels.
+If a GIF exceeds either limit, it will be rejected with a ``GIF_TOO_LARGE`` error.
+
+The limits can be changed in ``lv_conf.h``. ``LV_GIF_MAX_WIDTH`` also controls the
+size of an internal line buffer embedded in every GIF widget instance, so raising it
+increases RAM usage by ``(new_width - 480)`` bytes per widget. ``LV_GIF_MAX_HEIGHT``
+is a validation-only check and has no memory cost.
+
+To support wider GIFs (e.g. on a 800px-wide display):
+
+```c
+#define LV_GIF_MAX_WIDTH  800
+#define LV_GIF_MAX_HEIGHT 480
+```
+
+To tighten the limits on a very constrained device:
+
+```c
+#define LV_GIF_MAX_WIDTH  320
+#define LV_GIF_MAX_HEIGHT 240
+```
+
 ## Events
 
 <ApiLink name="LV_EVENT_READY" /> is emitted when the animation completes its last frame.

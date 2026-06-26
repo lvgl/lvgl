@@ -1253,6 +1253,16 @@
 /** Use extra 16KB RAM to cache decoded data to accelerate */
 #define LV_GIF_CACHE_DECODE_DATA 0
 
+/** Increasing this value will consume more memory.
+ *  GIFs wider than this are rejected
+ */
+#define LV_GIF_MAX_WIDTH 480
+
+/** This value has no impact on memory usage
+ *  GIFs taller than this are rejected
+ */
+#define LV_GIF_MAX_HEIGHT 32768
+
 #endif /*LV_USE_GIF*/
 
 #if LV_DRAW_HAS_3D_SUPPORT

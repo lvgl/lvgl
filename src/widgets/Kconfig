@@ -95,6 +95,22 @@ config LV_GIF_CACHE_DECODE_DATA
 	bool "Use extra 16KB RAM to cache decoded data to accelerate"
 	depends on LV_USE_GIF
 
+config LV_GIF_MAX_WIDTH
+	int "Maximum GIF canvas width in pixels"
+	depends on LV_USE_GIF
+	default 480
+	help 
+		Increasing this value will consume more memory.
+		GIFs wider than this are rejected
+
+config LV_GIF_MAX_HEIGHT
+	int "Maximum GIF canvas height in pixels"
+	depends on LV_USE_GIF
+	default 32768
+	help 
+		This value has no impact on memory usage
+		GIFs taller than this are rejected
+
 config LV_USE_GLTF
 	bool "glTF support"
 	select LV_USE_3DTEXTURE

@@ -2486,6 +2486,22 @@
     #endif
 #endif
 
+#ifndef LV_GIF_MAX_WIDTH
+    #ifdef CONFIG_LV_GIF_MAX_WIDTH
+        #define LV_GIF_MAX_WIDTH CONFIG_LV_GIF_MAX_WIDTH
+    #else
+        #define LV_GIF_MAX_WIDTH 480
+    #endif
+#endif
+
+#ifndef LV_GIF_MAX_HEIGHT
+    #ifdef CONFIG_LV_GIF_MAX_HEIGHT
+        #define LV_GIF_MAX_HEIGHT CONFIG_LV_GIF_MAX_HEIGHT
+    #else
+        #define LV_GIF_MAX_HEIGHT 32768
+    #endif
+#endif
+
 #ifndef LV_USE_GLTF
     #ifdef CONFIG_LV_USE_GLTF
         #define LV_USE_GLTF CONFIG_LV_USE_GLTF
