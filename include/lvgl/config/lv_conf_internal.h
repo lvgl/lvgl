@@ -4580,7 +4580,7 @@
 
 /* Derived capability flags (set via Kconfig `select`). */
 #ifndef LV_DRAW_HAS_VECTOR_SUPPORT
-    #if ((LV_USE_THORVG && LV_USE_DRAW_SW) || LV_USE_DRAW_VG_LITE || LV_USE_NEMA_GFX || LV_USE_DRAW_NANOVG)
+    #if ((LV_USE_THORVG && LV_USE_DRAW_SW) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_VG && LV_USE_NEMA_GFX) || LV_USE_DRAW_NANOVG)
         #define LV_DRAW_HAS_VECTOR_SUPPORT 1
     #else
         #define LV_DRAW_HAS_VECTOR_SUPPORT 0
