@@ -5115,8 +5115,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_DEMO_MUSIC_AUTO_PLAY requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
 #endif
 
-#if LV_USE_DEMO_RENDER && !(LV_BUILD_DEMOS)
-    #error "LV_USE_DEMO_RENDER requires LV_BUILD_DEMOS (Kconfig depends on)"
+#if LV_USE_DEMO_RENDER && !(LV_USE_GRID && LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_RENDER requires LV_USE_GRID && LV_BUILD_DEMOS (Kconfig depends on)"
 #endif
 
 #if LV_USE_DEMO_STRESS && !(LV_BUILD_DEMOS)

@@ -2366,8 +2366,11 @@
 
 #endif /*LV_USE_DEMO_MUSIC*/
 
+#if LV_USE_GRID
 /** Render test for each primitives. Requires at least 480x272 display */
 #define LV_USE_DEMO_RENDER 0
+
+#endif /*LV_USE_GRID*/
 
 /** Stress test for LVGL */
 #define LV_USE_DEMO_STRESS 0
