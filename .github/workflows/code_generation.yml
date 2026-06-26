@@ -29,7 +29,16 @@ jobs:
           python-version: 3.12
 
       - name: Install dependencies
-        run: python3 -m pip install kconfiglib
+        run: python3 -m pip install kconfiglib pytest
+
+      # ------------------------------------------------------------------
+      # Unit tests for the config-headers generator itself.
+      # ------------------------------------------------------------------
+      - name: "Test: config headers generator"
+        id: config-headers-tests
+        continue-on-error: true
+        working-directory: scripts/generators
+        run: python3 -m pytest config_headers/test/ -q
 
       # ------------------------------------------------------------------
       # Config headers: lv_conf_template.h, lv_conf_internal.h and
@@ -55,9 +64,10 @@ jobs:
       # This gives us full output from every generator before failing.
       # New generators: add a step above and a line here.
       # ------------------------------------------------------------------
-      - name: "Gate: fail if any generated file is out of date"
+      - name: "Gate: fail if any generator check failed"
         if: |
-          steps.config-headers.outcome == 'failure'
+          steps.config-headers-tests.outcome == 'failure' ||
+          steps.config-headers.outcome       == 'failure'
         run: |
           echo "Code generation results:"
           echo "------------------------"
@@ -71,8 +81,9 @@ jobs:
             fi
           }
 
-          print_result "config-headers" "${{ steps.config-headers.outcome }}"
+          print_result "config-headers-tests" "${{ steps.config-headers-tests.outcome }}"
+          print_result "config-headers"       "${{ steps.config-headers.outcome }}"
 
           echo "------------------------"
-          echo "One or more generated files are out of date or failed to generate. See above for details."
+          echo "A generator test failed, or a generated file is out of date. See above for details."
           exit 1
