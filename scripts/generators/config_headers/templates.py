@@ -170,6 +170,25 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
     #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
 #endif /*defined(LV_X11_RENDER_MODE_FULL) && LV_X11_RENDER_MODE_FULL*/
 
+/*
+ *  Before, the VG-Lite GPU was chosen with LV_VG_LITE_HAL_GPU_SERIES (a bare
+ *  token such as gc255) and LV_VG_LITE_HAL_GPU_REVISION (a hex revision), which
+ *  were pasted into the options include path.  For v9.x these are replaced by the
+ *  LV_VG_LITE_GPU choice.  Map the old hex revisions (each unique to one series)
+ *  to it; anything else falls back to the GC255 default.
+ */
+#if defined(LV_VG_LITE_HAL_GPU_REVISION)
+    #warning LV_VG_LITE_HAL_GPU_SERIES/LV_VG_LITE_HAL_GPU_REVISION are deprecated and will be removed in a future release. Select your GPU with LV_VG_LITE_GPU instead.
+    #undef LV_VG_LITE_GPU
+    #if LV_VG_LITE_HAL_GPU_REVISION == 0x423
+        #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC555_0X423
+    #elif LV_VG_LITE_HAL_GPU_REVISION == 0x1003
+        #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
+    #else
+        #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC255_0X40A
+    #endif
+#endif /*defined(LV_VG_LITE_HAL_GPU_REVISION)*/
+
 /*----------------------------------
  * End of compatibility block
  -----------------------------------*/

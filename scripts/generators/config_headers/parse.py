@@ -59,6 +59,8 @@ MEMBER_IS_TOKEN: set[str] = {
     "LV_NANOVG_BACKEND",  # LV_NANOVG_BACKEND_*
     "LV_CHECK_ARG_LOG_MODE",  # LV_CHECK_ARG_LOG_MODE_*
     "LV_SDL_MOUSEWHEEL_MODE",  # LV_SDL_MOUSEWHEEL_MODE_* owned by a C header
+    "LV_VG_LITE_GPU",  # LV_VG_LITE_GPU_* defined into lv_conf_internal.h; the
+    # VG-Lite options dispatch header compares against these tokens
 }
 
 # Enum tokens that already exist in LVGL's C headers; referenced by name but

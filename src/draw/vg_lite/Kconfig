@@ -66,14 +66,38 @@ config LV_USE_VG_LITE_DRIVER
 	default n
 
 	if LV_USE_VG_LITE_DRIVER
-	config LV_VG_LITE_HAL_GPU_SERIES
-		string "VG-Lite GPU series"
-		default "gc255"
-	
-	config LV_VG_LITE_HAL_GPU_REVISION
-		hex "VG-Lite GPU revision"
-		default 0x40
-	
+	# The GPU series + revision selects which
+	# VGLite/Series/<series>/<revision>/vg_lite_options.h is included. A
+	# free-form string/hex pair can't be represented in Kconfig (the include
+	# path needs unquoted tokens), so the supported GPUs are offered as a choice
+	# and mapped to the include in VGLite/vg_lite_options.h.
+	choice
+		prompt "VG-Lite GPU (series and revision)"
+		default LV_VG_LITE_GPU_GC255_0X40A
+
+		config LV_VG_LITE_GPU_GC255_0X40A
+			bool "GC255 (revision 0x40A)"
+		config LV_VG_LITE_GPU_GC355_0X0_1215
+			bool "GC355 (revision 0x0_1215)"
+		config LV_VG_LITE_GPU_GC355_0X0_1216
+			bool "GC355 (revision 0x0_1216)"
+		config LV_VG_LITE_GPU_GC555_0X423
+			bool "GC555 (revision 0x423)"
+		config LV_VG_LITE_GPU_GC555_0X423_ECO
+			bool "GC555 (revision 0x423 ECO)"
+		config LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
+			bool "GCNanoUltraV (revision 0x1003)"
+	endchoice
+
+	config LV_VG_LITE_GPU
+		int
+		default 0 if LV_VG_LITE_GPU_GC255_0X40A
+		default 1 if LV_VG_LITE_GPU_GC355_0X0_1215
+		default 2 if LV_VG_LITE_GPU_GC355_0X0_1216
+		default 3 if LV_VG_LITE_GPU_GC555_0X423
+		default 4 if LV_VG_LITE_GPU_GC555_0X423_ECO
+		default 5 if LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
+
 	config LV_VG_LITE_HAL_GPU_BASE_ADDRESS
 		hex "VG-Lite GPU base address"
 		default 0x40240000

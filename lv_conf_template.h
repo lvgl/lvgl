@@ -366,11 +366,16 @@
 #define LV_USE_VG_LITE_DRIVER 0
 
 #if LV_USE_VG_LITE_DRIVER
-/** VG-Lite GPU series */
-#define LV_VG_LITE_HAL_GPU_SERIES "gc255"
-
-/** VG-Lite GPU revision */
-#define LV_VG_LITE_HAL_GPU_REVISION 0x40
+/** VG-Lite GPU (series and revision)
+ *  Possible values:
+ *  - LV_VG_LITE_GPU_GC255_0X40A: GC255 (revision 0x40A)
+ *  - LV_VG_LITE_GPU_GC355_0X0_1215: GC355 (revision 0x0_1215)
+ *  - LV_VG_LITE_GPU_GC355_0X0_1216: GC355 (revision 0x0_1216)
+ *  - LV_VG_LITE_GPU_GC555_0X423: GC555 (revision 0x423)
+ *  - LV_VG_LITE_GPU_GC555_0X423_ECO: GC555 (revision 0x423 ECO)
+ *  - LV_VG_LITE_GPU_GCNANOULTRAV_0X1003: GCNanoUltraV (revision 0x1003)
+ */
+#define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC255_0X40A
 
 /** VG-Lite GPU base address */
 #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
