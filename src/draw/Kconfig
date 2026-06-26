@@ -34,8 +34,7 @@ menu "Color Settings"
 
 	config LV_COLOR_MIX_ROUND_OFS
 		int "Adjust color mix functions rounding"
-		default 128 if !LV_COLOR_DEPTH_32
-		default 0 if LV_COLOR_DEPTH_32
+		default 0
 		range 0 254
 		help
 			0: no adjustment, get the integer part of the result (round down)

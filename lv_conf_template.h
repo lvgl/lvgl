@@ -136,7 +136,7 @@
  *  192: round up from x.25
  *  254: round up
  */
-#define LV_COLOR_MIX_ROUND_OFS 128
+#define LV_COLOR_MIX_ROUND_OFS 0
 
 /** Default display refresh, input device read and animation step period. */
 #define LV_DEF_REFR_PERIOD 33
