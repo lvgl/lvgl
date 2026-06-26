@@ -378,6 +378,26 @@
     #endif
 #endif
 
+#ifndef LV_USE_THORVG
+    #ifdef CONFIG_LV_USE_THORVG
+        #define LV_USE_THORVG CONFIG_LV_USE_THORVG
+    #else
+        #define LV_USE_THORVG 0
+    #endif
+#endif
+
+#ifndef LV_USE_THORVG_INTERNAL
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+            #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+        #else
+            #define LV_USE_THORVG_INTERNAL 0
+        #endif
+    #else
+        #define LV_USE_THORVG_INTERNAL 1
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -611,26 +631,6 @@
         #define LV_DRAW_SW_ASM_CUSTOM_INCLUDE CONFIG_LV_DRAW_SW_ASM_CUSTOM_INCLUDE
     #else
         #define LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
-    #endif
-#endif
-
-#ifndef LV_USE_THORVG
-    #ifdef CONFIG_LV_USE_THORVG
-        #define LV_USE_THORVG CONFIG_LV_USE_THORVG
-    #else
-        #define LV_USE_THORVG 0
-    #endif
-#endif
-
-#ifndef LV_USE_THORVG_INTERNAL
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_THORVG_INTERNAL
-            #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
-        #else
-            #define LV_USE_THORVG_INTERNAL 0
-        #endif
-    #else
-        #define LV_USE_THORVG_INTERNAL 1
     #endif
 #endif
 
@@ -4603,20 +4603,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #undef LV_KCONFIG_PRESENT
 
-/* Disable VGLite drivers if VGLite drawing is disabled */
-#ifndef LV_USE_VG_LITE_DRIVER
-    #define LV_USE_VG_LITE_DRIVER 0
-#endif
-
-#ifndef LV_USE_VG_LITE_THORVG
-    #define LV_USE_VG_LITE_THORVG 0
-#endif
-
-#ifndef LV_NEMA_USE_CACHE
-    #define LV_NEMA_USE_CACHE 0
-#endif
-
-/* Set some defines if a dependency is disabled. */
 #if LV_USE_WAYLAND
     /* Backend is selected explicitly (Kconfig choice or lv_conf.h).  EGL/G2D are
      * resolved first; SHM is the fallback only when neither is selected, so the
@@ -4660,32 +4646,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LINUX_DRM_USE_EGL 0
 #endif /*LV_USE_LINUX_DRM*/
 
-#if LV_USE_SYSMON == 0
-    #define LV_USE_PERF_MONITOR 0
-    #define LV_USE_MEM_MONITOR 0
-    #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
-#endif /*LV_USE_SYSMON*/
-
-#if LV_USE_PERF_MONITOR == 0
-    #define LV_USE_PERF_MONITOR_LOG_MODE 0
-#endif /*LV_USE_PERF_MONITOR*/
-
-#if LV_BUILD_DEMOS == 0
-    #define LV_USE_DEMO_WIDGETS 0
-    #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
-    #define LV_USE_DEMO_BENCHMARK 0
-    #define LV_USE_DEMO_RENDER 0
-    #define LV_USE_DEMO_STRESS 0
-    #define LV_USE_DEMO_MUSIC 0
-    #define LV_USE_DEMO_VECTOR_GRAPHIC  0
-    #define LV_USE_DEMO_FLEX_LAYOUT     0
-    #define LV_USE_DEMO_MULTILANG       0
-    #define LV_USE_DEMO_EBIKE           0
-    #define LV_USE_DEMO_HIGH_RES        0
-    #define LV_USE_DEMO_SMARTWATCH      0
-    #define LV_USE_DEMO_GLTF            0
-#endif /* LV_BUILD_DEMOS */
-
 #if LV_USE_SDL && LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
     #define LV_SDL_USE_EGL 1
 #else
@@ -4724,6 +4684,436 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #ifndef LV_CHECK_ARG_LOG_MODE
     #define LV_CHECK_ARG_LOG_MODE   0
+#endif
+
+/* Kconfig enforces `depends on` / `select`; these checks catch a
+ * hand-written lv_conf.h that violates them. */
+#if LV_OS_IDLE_PERCENT_CUSTOM && !(LV_USE_OS == LV_OS_FREERTOS)
+    #error "LV_OS_IDLE_PERCENT_CUSTOM requires LV_OS_FREERTOS (Kconfig depends on)"
+#endif
+
+#if (LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES) && !LV_USE_MATRIX
+    #error "LV_USE_MATRIX must be enabled: Kconfig selects it from LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES"
+#endif
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX && !(LV_USE_MATRIX)
+    #error "LV_DRAW_TRANSFORM_USE_MATRIX requires LV_USE_MATRIX (Kconfig depends on)"
+#endif
+
+#if ((LV_USE_SVG && LV_DRAW_HAS_VECTOR_SUPPORT) || (LV_USE_LOTTIE && LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG) || (LV_USE_DEMO_VECTOR_GRAPHIC && LV_DRAW_HAS_VECTOR_SUPPORT && LV_BUILD_DEMOS)) && !LV_USE_VECTOR_GRAPHIC
+    #error "LV_USE_VECTOR_GRAPHIC must be enabled: Kconfig selects it from (LV_USE_SVG && LV_DRAW_HAS_VECTOR_SUPPORT) || (LV_USE_LOTTIE && LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG) || (LV_USE_DEMO_VECTOR_GRAPHIC && LV_DRAW_HAS_VECTOR_SUPPORT && LV_BUILD_DEMOS)"
+#endif
+
+#if (LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE) && !LV_USE_THORVG
+    #error "LV_USE_THORVG must be enabled: Kconfig selects it from LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE"
+#endif
+
+#if LV_USE_DRAW_ARM2D_SYNC && !(LV_USE_DRAW_SW)
+    #error "LV_USE_DRAW_ARM2D_SYNC requires LV_USE_DRAW_SW (Kconfig depends on)"
+#endif
+
+#if LV_USE_NATIVE_HELIUM_ASM && !(LV_USE_DRAW_SW)
+    #error "LV_USE_NATIVE_HELIUM_ASM requires LV_USE_DRAW_SW (Kconfig depends on)"
+#endif
+
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS && !(LV_USE_DRAW_SW)
+    #error "LV_USE_DRAW_SW_COMPLEX_GRADIENTS requires LV_USE_DRAW_SW (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_USE_GPU_INIT && !(LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_USE_GPU_INIT requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_USE_ASSERT && !(LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_USE_ASSERT requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_DISABLE_VLC_OP_CLOSE && !(LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_DISABLE_VLC_OP_CLOSE requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT && !(LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET && !(LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_USE_VG_LITE_DRIVER && !(LV_USE_DRAW_VG_LITE)
+    #error "LV_USE_VG_LITE_DRIVER requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_USE_VG_LITE_THORVG && !(LV_USE_DRAW_VG_LITE)
+    #error "LV_USE_VG_LITE_THORVG requires LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT && !(LV_USE_VG_LITE_THORVG && LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT requires LV_USE_VG_LITE_THORVG && LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_THORVG_YUV_SUPPORT && !(LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_THORVG_YUV_SUPPORT requires LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT && !(LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT requires LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_VG_LITE_THORVG_THREAD_RENDER && !(LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE)
+    #error "LV_VG_LITE_THORVG_THREAD_RENDER requires LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE (Kconfig depends on)"
+#endif
+
+#if LV_NEMA_USE_CACHE && !(LV_USE_NEMA_GFX)
+    #error "LV_NEMA_USE_CACHE requires LV_USE_NEMA_GFX (Kconfig depends on)"
+#endif
+
+#if LV_USE_NEMA_VG && !(LV_USE_NEMA_GFX)
+    #error "LV_USE_NEMA_VG requires LV_USE_NEMA_GFX (Kconfig depends on)"
+#endif
+
+#if LV_USE_ROTATE_PXP && !(LV_USE_DRAW_PXP)
+    #error "LV_USE_ROTATE_PXP requires LV_USE_DRAW_PXP (Kconfig depends on)"
+#endif
+
+#if LV_USE_PXP_ASSERT && !(LV_USE_DRAW_PXP && LV_USE_DRAW_PXP)
+    #error "LV_USE_PXP_ASSERT requires LV_USE_DRAW_PXP && LV_USE_DRAW_PXP (Kconfig depends on)"
+#endif
+
+#if (LV_WAYLAND_USE_G2D) && !LV_USE_DRAW_G2D
+    #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_WAYLAND_USE_G2D && <choice>"
+#endif
+
+#if LV_USE_G2D_ASSERT && !(LV_USE_DRAW_G2D && LV_USE_DRAW_G2D)
+    #error "LV_USE_G2D_ASSERT requires LV_USE_DRAW_G2D && LV_USE_DRAW_G2D (Kconfig depends on)"
+#endif
+
+#if LV_USE_PPA_IMG && !(LV_USE_PPA)
+    #error "LV_USE_PPA_IMG requires LV_USE_PPA (Kconfig depends on)"
+#endif
+
+#if LV_USE_DRAW_DMA2D_INTERRUPT && !(LV_USE_DRAW_DMA2D)
+    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
+#endif
+
+#if (LV_USE_MATRIX || LV_USE_GESTURE_RECOGNITION) && !LV_USE_FLOAT
+    #error "LV_USE_FLOAT must be enabled: Kconfig selects it from LV_USE_MATRIX || LV_USE_GESTURE_RECOGNITION"
+#endif
+
+#if LV_LOG_PRINTF && !(LV_USE_LOG)
+    #error "LV_LOG_PRINTF requires LV_USE_LOG (Kconfig depends on)"
+#endif
+
+#if LV_THEME_DEFAULT_DARK && !(LV_USE_THEME_DEFAULT)
+    #error "LV_THEME_DEFAULT_DARK requires LV_USE_THEME_DEFAULT (Kconfig depends on)"
+#endif
+
+#if LV_USE_LZ4_INTERNAL && !(LV_USE_LZ4)
+    #error "LV_USE_LZ4_INTERNAL requires LV_USE_LZ4 (Kconfig depends on)"
+#endif
+
+#if (LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST) && !LV_USE_LODEPNG
+    #error "LV_USE_LODEPNG must be enabled: Kconfig selects it from LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST"
+#endif
+
+#if LV_USE_SVG && !(LV_DRAW_HAS_VECTOR_SUPPORT)
+    #error "LV_USE_SVG requires LV_DRAW_HAS_VECTOR_SUPPORT (Kconfig depends on)"
+#endif
+
+#if LV_USE_SVG_ANIMATION && !(LV_USE_SVG)
+    #error "LV_USE_SVG_ANIMATION requires LV_USE_SVG (Kconfig depends on)"
+#endif
+
+#if LV_USE_SVG_DEBUG && !(LV_USE_SVG)
+    #error "LV_USE_SVG_DEBUG requires LV_USE_SVG (Kconfig depends on)"
+#endif
+
+#if LV_FREETYPE_USE_LVGL_PORT && !(LV_USE_FREETYPE)
+    #error "LV_FREETYPE_USE_LVGL_PORT requires LV_USE_FREETYPE (Kconfig depends on)"
+#endif
+
+#if LV_TINY_TTF_FILE_SUPPORT && !(LV_USE_TINY_TTF)
+    #error "LV_TINY_TTF_FILE_SUPPORT requires LV_USE_TINY_TTF (Kconfig depends on)"
+#endif
+
+#if (LV_USE_GLTF && LV_DRAW_HAS_3D_SUPPORT) && !LV_USE_3DTEXTURE
+    #error "LV_USE_3DTEXTURE must be enabled: Kconfig selects it from LV_USE_GLTF && LV_DRAW_HAS_3D_SUPPORT"
+#endif
+
+#if LV_USE_3DTEXTURE && !(LV_DRAW_HAS_3D_SUPPORT)
+    #error "LV_USE_3DTEXTURE requires LV_DRAW_HAS_3D_SUPPORT (Kconfig depends on)"
+#endif
+
+#if (LV_USE_SLIDER) && !LV_USE_BAR
+    #error "LV_USE_BAR must be enabled: Kconfig selects it from LV_USE_SLIDER"
+#endif
+
+#if LV_CALENDAR_WEEK_STARTS_MONDAY && !(LV_USE_CALENDAR)
+    #error "LV_CALENDAR_WEEK_STARTS_MONDAY requires LV_USE_CALENDAR (Kconfig depends on)"
+#endif
+
+#if LV_USE_CALENDAR_CHINESE && !(LV_USE_CALENDAR)
+    #error "LV_USE_CALENDAR_CHINESE requires LV_USE_CALENDAR (Kconfig depends on)"
+#endif
+
+#if (LV_USE_BARCODE || LV_USE_QRCODE) && !LV_USE_CANVAS
+    #error "LV_USE_CANVAS must be enabled: Kconfig selects it from LV_USE_BARCODE || LV_USE_QRCODE"
+#endif
+
+#if LV_FFMPEG_DUMP_FORMAT && !(LV_USE_FFMPEG)
+    #error "LV_FFMPEG_DUMP_FORMAT requires LV_USE_FFMPEG (Kconfig depends on)"
+#endif
+
+#if LV_FFMPEG_PLAYER_USE_LV_FS && !(LV_USE_FFMPEG)
+    #error "LV_FFMPEG_PLAYER_USE_LV_FS requires LV_USE_FFMPEG (Kconfig depends on)"
+#endif
+
+#if LV_GIF_CACHE_DECODE_DATA && !(LV_USE_GIF)
+    #error "LV_GIF_CACHE_DECODE_DATA requires LV_USE_GIF (Kconfig depends on)"
+#endif
+
+#if LV_USE_GLTF && !(LV_DRAW_HAS_3D_SUPPORT)
+    #error "LV_USE_GLTF requires LV_DRAW_HAS_3D_SUPPORT (Kconfig depends on)"
+#endif
+
+#if (LV_USE_CANVAS || LV_USE_GSTREAMER) && !LV_USE_IMAGE
+    #error "LV_USE_IMAGE must be enabled: Kconfig selects it from LV_USE_CANVAS || LV_USE_GSTREAMER"
+#endif
+
+#if (LV_USE_IME_PINYIN) && !LV_USE_KEYBOARD
+    #error "LV_USE_KEYBOARD must be enabled: Kconfig selects it from LV_USE_IME_PINYIN"
+#endif
+
+#if (LV_USE_DROPDOWN || LV_USE_IMAGE || LV_USE_ROLLER || LV_USE_TEXTAREA) && !LV_USE_LABEL
+    #error "LV_USE_LABEL must be enabled: Kconfig selects it from LV_USE_DROPDOWN || LV_USE_IMAGE || LV_USE_ROLLER || LV_USE_TEXTAREA"
+#endif
+
+#if LV_USE_LOTTIE && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG)
+    #error "LV_USE_LOTTIE requires LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG (Kconfig depends on)"
+#endif
+
+#if LV_USE_LINUX_DRM_EGL && !(LV_USE_LINUX_DRM)
+    #error "LV_USE_LINUX_DRM_EGL requires LV_USE_LINUX_DRM (Kconfig depends on)"
+#endif
+
+#if (LV_USE_LINUX_DRM_EGL && LV_USE_LINUX_DRM) && !LV_USE_LINUX_DRM_GBM_BUFFERS
+    #error "LV_USE_LINUX_DRM_GBM_BUFFERS must be enabled: Kconfig selects it from LV_USE_LINUX_DRM_EGL && LV_USE_LINUX_DRM"
+#endif
+
+#if LV_USE_LINUX_DRM_GBM_BUFFERS && !(LV_USE_LINUX_DRM)
+    #error "LV_USE_LINUX_DRM_GBM_BUFFERS requires LV_USE_LINUX_DRM (Kconfig depends on)"
+#endif
+
+#if LV_LINUX_FBDEV_BSD && !(LV_USE_LINUX_FBDEV)
+    #error "LV_LINUX_FBDEV_BSD requires LV_USE_LINUX_FBDEV (Kconfig depends on)"
+#endif
+
+#if (LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341 || LV_USE_NV3007) && !LV_USE_GENERIC_MIPI
+    #error "LV_USE_GENERIC_MIPI must be enabled: Kconfig selects it from LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341 || LV_USE_NV3007"
+#endif
+
+#if LV_ST_LTDC_USE_DMA2D_FLUSH && !(!LV_USE_DRAW_DMA2D && LV_USE_ST_LTDC)
+    #error "LV_ST_LTDC_USE_DMA2D_FLUSH requires !LV_USE_DRAW_DMA2D && LV_USE_ST_LTDC (Kconfig depends on)"
+#endif
+
+#if LV_LIBINPUT_BSD && !(LV_USE_LIBINPUT)
+    #error "LV_LIBINPUT_BSD requires LV_USE_LIBINPUT (Kconfig depends on)"
+#endif
+
+#if LV_LIBINPUT_XKB && !(LV_USE_LIBINPUT)
+    #error "LV_LIBINPUT_XKB requires LV_USE_LIBINPUT (Kconfig depends on)"
+#endif
+
+#if LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP && !(LV_USE_NUTTX)
+    #error "LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP requires LV_USE_NUTTX (Kconfig depends on)"
+#endif
+
+#if LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP && !(LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP && LV_USE_NUTTX)
+    #error "LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP requires LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP && LV_USE_NUTTX (Kconfig depends on)"
+#endif
+
+#if LV_USE_NUTTX_LIBUV && !(LV_USE_NUTTX)
+    #error "LV_USE_NUTTX_LIBUV requires LV_USE_NUTTX (Kconfig depends on)"
+#endif
+
+#if LV_USE_NUTTX_CUSTOM_INIT && !(LV_USE_NUTTX)
+    #error "LV_USE_NUTTX_CUSTOM_INIT requires LV_USE_NUTTX (Kconfig depends on)"
+#endif
+
+#if LV_USE_NUTTX_LCD && !(LV_USE_NUTTX)
+    #error "LV_USE_NUTTX_LCD requires LV_USE_NUTTX (Kconfig depends on)"
+#endif
+
+#if LV_USE_NUTTX_TOUCHSCREEN && !(LV_USE_NUTTX)
+    #error "LV_USE_NUTTX_TOUCHSCREEN requires LV_USE_NUTTX (Kconfig depends on)"
+#endif
+
+#if LV_USE_NUTTX_MOUSE && !(LV_USE_NUTTX)
+    #error "LV_USE_NUTTX_MOUSE requires LV_USE_NUTTX (Kconfig depends on)"
+#endif
+
+#if LV_USE_NUTTX_TRACE_FILE && !(LV_USE_PROFILER_BUILTIN && LV_USE_NUTTX)
+    #error "LV_USE_NUTTX_TRACE_FILE requires LV_USE_PROFILER_BUILTIN && LV_USE_NUTTX (Kconfig depends on)"
+#endif
+
+#if (LV_USE_DRAW_OPENGLES || (LV_USE_LINUX_DRM_EGL && LV_USE_LINUX_DRM) || (LV_USE_GLFW && !LV_USE_EGL) || LV_WAYLAND_USE_EGL) && !LV_USE_OPENGLES
+    #error "LV_USE_OPENGLES must be enabled: Kconfig selects it from LV_USE_DRAW_OPENGLES || (LV_USE_LINUX_DRM_EGL && LV_USE_LINUX_DRM) || (LV_USE_GLFW && !LV_USE_EGL) || (LV_WAYLAND_USE_EGL && <choice>)"
+#endif
+
+#if LV_USE_OPENGLES_DEBUG && !(LV_USE_OPENGLES)
+    #error "LV_USE_OPENGLES_DEBUG requires LV_USE_OPENGLES (Kconfig depends on)"
+#endif
+
+#if LV_USE_GLFW && !(!LV_USE_EGL)
+    #error "LV_USE_GLFW requires !LV_USE_EGL (Kconfig depends on)"
+#endif
+
+#if LV_SDL_FULLSCREEN && !(LV_USE_SDL)
+    #error "LV_SDL_FULLSCREEN requires LV_USE_SDL (Kconfig depends on)"
+#endif
+
+#if LV_UEFI_USE_MEMORY_SERVICES && !(LV_USE_UEFI)
+    #error "LV_UEFI_USE_MEMORY_SERVICES requires LV_USE_UEFI (Kconfig depends on)"
+#endif
+
+#if LV_USE_WINDOWS && !(LV_USE_OS == LV_OS_WINDOWS)
+    #error "LV_USE_WINDOWS requires LV_OS_WINDOWS (Kconfig depends on)"
+#endif
+
+#if (LV_USE_DRAW_NANOVG) && !LV_USE_NANOVG
+    #error "LV_USE_NANOVG must be enabled: Kconfig selects it from LV_USE_DRAW_NANOVG"
+#endif
+
+#if LV_SYSMON_PROC_IDLE_AVAILABLE && !(LV_USE_SYSMON)
+    #error "LV_SYSMON_PROC_IDLE_AVAILABLE requires LV_USE_SYSMON (Kconfig depends on)"
+#endif
+
+#if LV_USE_PERF_MONITOR && !(LV_USE_SYSMON)
+    #error "LV_USE_PERF_MONITOR requires LV_USE_SYSMON (Kconfig depends on)"
+#endif
+
+#if LV_USE_PERF_MONITOR_LOG_MODE && !(LV_USE_PERF_MONITOR && LV_USE_SYSMON)
+    #error "LV_USE_PERF_MONITOR_LOG_MODE requires LV_USE_PERF_MONITOR && LV_USE_SYSMON (Kconfig depends on)"
+#endif
+
+#if LV_USE_MEM_MONITOR && !(LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_USE_SYSMON)
+    #error "LV_USE_MEM_MONITOR requires LV_USE_BUILTIN_MALLOC && LV_USE_SYSMON (Kconfig depends on)"
+#endif
+
+#if (LV_USE_PROFILER_BUILTIN) && !LV_USE_PROFILER
+    #error "LV_USE_PROFILER must be enabled: Kconfig selects it from LV_USE_PROFILER_BUILTIN"
+#endif
+
+#if LV_USE_PROFILER_BUILTIN_POSIX && !(LV_USE_PROFILER_BUILTIN)
+    #error "LV_USE_PROFILER_BUILTIN_POSIX requires LV_USE_PROFILER_BUILTIN (Kconfig depends on)"
+#endif
+
+#if LV_PROFILER_STYLE && !(LV_USE_PROFILER)
+    #error "LV_PROFILER_STYLE requires LV_USE_PROFILER (Kconfig depends on)"
+#endif
+
+#if LV_USE_TEST_SCREENSHOT_COMPARE && !(LV_USE_TEST)
+    #error "LV_USE_TEST_SCREENSHOT_COMPARE requires LV_USE_TEST (Kconfig depends on)"
+#endif
+
+#if LV_ENABLE_GLOBAL_CUSTOM && !(LV_USE_PRIVATE_API)
+    #error "LV_ENABLE_GLOBAL_CUSTOM requires LV_USE_PRIVATE_API (Kconfig depends on)"
+#endif
+
+#if LV_CHECK_ARG_ASSERT_ON_FAIL && !(LV_USE_CHECK_ARG)
+    #error "LV_CHECK_ARG_ASSERT_ON_FAIL requires LV_USE_CHECK_ARG (Kconfig depends on)"
+#endif
+
+#if LV_USE_CHECK_OBJ_CLASSTYPE && !(LV_USE_CHECK_ARG)
+    #error "LV_USE_CHECK_OBJ_CLASSTYPE requires LV_USE_CHECK_ARG (Kconfig depends on)"
+#endif
+
+#if LV_USE_CHECK_OBJ_VALIDITY && !(LV_USE_CHECK_ARG)
+    #error "LV_USE_CHECK_OBJ_VALIDITY requires LV_USE_CHECK_ARG (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_BENCHMARK && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_BENCHMARK requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_DEMO_BENCHMARK_ALIGNED_FONTS && !(LV_USE_DEMO_BENCHMARK && LV_BUILD_DEMOS)
+    #error "LV_DEMO_BENCHMARK_ALIGNED_FONTS requires LV_USE_DEMO_BENCHMARK && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_GLTF && !(LV_USE_GLTF && LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_GLTF requires LV_USE_GLTF && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_KEYPAD_AND_ENCODER && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_KEYPAD_AND_ENCODER requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_MUSIC && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_MUSIC requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_DEMO_MUSIC_SQUARE && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
+    #error "LV_DEMO_MUSIC_SQUARE requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_DEMO_MUSIC_LANDSCAPE && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
+    #error "LV_DEMO_MUSIC_LANDSCAPE requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_DEMO_MUSIC_ROUND && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
+    #error "LV_DEMO_MUSIC_ROUND requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_DEMO_MUSIC_LARGE && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
+    #error "LV_DEMO_MUSIC_LARGE requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_DEMO_MUSIC_AUTO_PLAY && !(LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS)
+    #error "LV_DEMO_MUSIC_AUTO_PLAY requires LV_USE_DEMO_MUSIC && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_RENDER && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_RENDER requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_STRESS && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_STRESS requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_VECTOR_GRAPHIC && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_VECTOR_GRAPHIC requires LV_DRAW_HAS_VECTOR_SUPPORT && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if (LV_USE_DEMO_BENCHMARK && LV_BUILD_DEMOS) && !LV_USE_DEMO_WIDGETS
+    #error "LV_USE_DEMO_WIDGETS must be enabled: Kconfig selects it from LV_USE_DEMO_BENCHMARK && LV_BUILD_DEMOS"
+#endif
+
+#if LV_USE_DEMO_WIDGETS && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_WIDGETS requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_FLEX_LAYOUT && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_FLEX_LAYOUT requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_MULTILANG && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_MULTILANG requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_SMARTWATCH && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_SMARTWATCH requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_EBIKE && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_EBIKE requires LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_DEMO_EBIKE_PORTRAIT && !(LV_USE_DEMO_EBIKE && LV_BUILD_DEMOS)
+    #error "LV_DEMO_EBIKE_PORTRAIT requires LV_USE_DEMO_EBIKE && LV_BUILD_DEMOS (Kconfig depends on)"
+#endif
+
+#if LV_USE_DEMO_HIGH_RES && !(LV_BUILD_DEMOS)
+    #error "LV_USE_DEMO_HIGH_RES requires LV_BUILD_DEMOS (Kconfig depends on)"
 #endif
 
 #endif  /*LV_CONF_INTERNAL_H*/

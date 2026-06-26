@@ -152,7 +152,10 @@
 /** Align the start address of draw_buf addresses to this bytes. */
 #define LV_DRAW_BUF_ALIGN 4
 
-/** Enable matrix support */
+/** Enable matrix support
+ *
+ *  Enable: LV_USE_FLOAT
+ */
 #define LV_USE_MATRIX 0
 
 #if LV_USE_MATRIX
@@ -193,11 +196,23 @@
 
 #endif /*LV_USE_OS != LV_OS_NONE*/
 
-/** Enable drawing support vector graphic APIs. */
+/** Enable drawing support vector graphic APIs.
+ *
+ *  Enable: LV_USE_MATRIX
+ */
 #define LV_USE_VECTOR_GRAPHIC 0
 
 /** Enable API to take snapshot for object */
 #define LV_USE_SNAPSHOT 0
+
+/** ThorVG library for vector graphics support */
+#define LV_USE_THORVG 0
+
+#if LV_USE_THORVG
+/** Internal ThorVG library bundled with LVGL */
+#define LV_USE_THORVG_INTERNAL 1
+
+#endif /*LV_USE_THORVG*/
 
 /** Required to draw anything on the screen. */
 #define LV_USE_DRAW_SW 1
@@ -300,18 +315,12 @@
 #define LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
 
 #endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM*/
-
-/** ThorVG library for vector graphics support */
-#define LV_USE_THORVG 0
-
-#if LV_USE_THORVG
-/** Internal ThorVG library bundled with LVGL */
-#define LV_USE_THORVG_INTERNAL 1
-
-#endif /*LV_USE_THORVG*/
 #endif /*LV_USE_DRAW_SW*/
 
-/** Use VG-Lite GPU. */
+/** Use VG-Lite GPU.
+ *
+ *  Enable: LV_USE_MATRIX
+ */
 #define LV_USE_DRAW_VG_LITE 0
 
 #if LV_USE_DRAW_VG_LITE
@@ -371,6 +380,8 @@
 /** Use thorvg to simulate VG-Lite hardware behavior, it's useful
  *  for debugging and testing on PC simulator. Enable LV_USE_THORVG,
  *  Either internal ThorVG or external ThorVG library is required.
+ *
+ *  Enable: LV_USE_THORVG
  */
 #define LV_USE_VG_LITE_THORVG 0
 
@@ -534,7 +545,10 @@
 
 #endif /*LV_USE_DRAW_EVE*/
 
-/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES */
+/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES
+ *
+ *  Enable: LV_USE_OPENGLES
+ */
 #define LV_USE_DRAW_OPENGLES 0
 
 #if LV_USE_DRAW_OPENGLES
@@ -545,6 +559,8 @@
 
 /** Use NanoVG Renderer
  *  - Requires LV_USE_NANOVG, LV_USE_MATRIX.
+ *
+ *  Enable: LV_USE_NANOVG, LV_USE_MATRIX
  */
 #define LV_USE_DRAW_NANOVG 0
 
@@ -576,6 +592,8 @@
 
 /** Enable the multi-touch gesture recognition feature
  *  Gesture recognition requires the use of floats
+ *
+ *  Enable: LV_USE_FLOAT
  */
 #define LV_USE_GESTURE_RECOGNITION 0
 
@@ -804,6 +822,8 @@
 #if LV_DRAW_HAS_VECTOR_SUPPORT
 /** SVG library
  *  - Requires `LV_USE_VECTOR_GRAPHIC = 1`
+ *
+ *  Enable: LV_USE_VECTOR_GRAPHIC
  */
 #define LV_USE_SVG 0
 
@@ -1105,7 +1125,10 @@
 /** Bar */
 #define LV_USE_BAR 1
 
-/** Barcode code library */
+/** Barcode code library
+ *
+ *  Enable: LV_USE_CANVAS
+ */
 #define LV_USE_BARCODE 0
 
 /** Button */
@@ -1189,7 +1212,10 @@
 
 #endif /*LV_USE_CALENDAR*/
 
-/** Canvas */
+/** Canvas
+ *
+ *  Enable: LV_USE_IMAGE
+ */
 #define LV_USE_CANVAS 1
 
 /** Chart */
@@ -1198,7 +1224,10 @@
 /** Check Box */
 #define LV_USE_CHECKBOX 1
 
-/** Drop down list */
+/** Drop down list
+ *
+ *  Enable: LV_USE_LABEL
+ */
 #define LV_USE_DROPDOWN 1
 
 /** FFmpeg library for image decoding and playing videos.
@@ -1227,21 +1256,33 @@
 #endif /*LV_USE_GIF*/
 
 #if LV_DRAW_HAS_3D_SUPPORT
-/** Requires `LV_USE_3DTEXTURE = 1` */
+/** Requires `LV_USE_3DTEXTURE = 1`
+ *
+ *  Enable: LV_USE_3DTEXTURE
+ */
 #define LV_USE_GLTF 0
 
 #endif /*LV_DRAW_HAS_3D_SUPPORT*/
 
-/** GStreamer library */
+/** GStreamer library
+ *
+ *  Enable: LV_USE_IMAGE
+ */
 #define LV_USE_GSTREAMER 0
 
-/** Image */
+/** Image
+ *
+ *  Enable: LV_USE_LABEL
+ */
 #define LV_USE_IMAGE 1
 
 /** ImageButton */
 #define LV_USE_IMAGEBUTTON 1
 
-/** Enable Pinyin input method */
+/** Enable Pinyin input method
+ *
+ *  Enable: LV_USE_KEYBOARD
+ */
 #define LV_USE_IME_PINYIN 0
 
 #if LV_USE_IME_PINYIN
@@ -1292,9 +1333,14 @@
 #define LV_USE_LIST 1
 
 #if LV_DRAW_HAS_VECTOR_SUPPORT
-/** Enable Lottie animations */
+#if LV_USE_THORVG
+/** Enable Lottie animations
+ *
+ *  Enable: LV_USE_VECTOR_GRAPHIC
+ */
 #define LV_USE_LOTTIE 0
 
+#endif /*LV_USE_THORVG*/
 #endif /*LV_DRAW_HAS_VECTOR_SUPPORT*/
 
 /** Menu */
@@ -1303,19 +1349,28 @@
 /** Msgbox */
 #define LV_USE_MSGBOX 1
 
-/** QR code library */
+/** QR code library
+ *
+ *  Enable: LV_USE_CANVAS
+ */
 #define LV_USE_QRCODE 0
 
 /** Rlottie library */
 #define LV_USE_RLOTTIE 0
 
-/** Roller */
+/** Roller
+ *
+ *  Enable: LV_USE_LABEL
+ */
 #define LV_USE_ROLLER 1
 
 /** Scale */
 #define LV_USE_SCALE 1
 
-/** Slider */
+/** Slider
+ *
+ *  Enable: LV_USE_BAR
+ */
 #define LV_USE_SLIDER 1
 
 /** Span */
@@ -1336,7 +1391,10 @@
 /** Switch */
 #define LV_USE_SWITCH 1
 
-/** Text area */
+/** Text area
+ *
+ *  Enable: LV_USE_LABEL
+ */
 #define LV_USE_TEXTAREA 1
 
 #if LV_USE_TEXTAREA
@@ -1371,6 +1429,8 @@
  *  Requires OpenGL ES 2.0 on the target hardware and linking with
  *  -lEGL. Compatible with LVGL 3D/glTF rendering.
  *  Automatically enables GBM buffer support.
+ *
+ *  Enable: LV_USE_LINUX_DRM_GBM_BUFFERS, LV_USE_OPENGLES
  */
 #define LV_USE_LINUX_DRM_EGL 0
 
@@ -1425,19 +1485,34 @@
  */
 #define LV_USE_GENERIC_MIPI 0
 
-/** Drivers for LCD devices connected via SPI/parallel port */
+/** Drivers for LCD devices connected via SPI/parallel port
+ *
+ *  Enable: LV_USE_GENERIC_MIPI
+ */
 #define LV_USE_ST7735 0
 
-/** Use ST7789 LCD driver */
+/** Use ST7789 LCD driver
+ *
+ *  Enable: LV_USE_GENERIC_MIPI
+ */
 #define LV_USE_ST7789 0
 
-/** Use ST7796 LCD driver */
+/** Use ST7796 LCD driver
+ *
+ *  Enable: LV_USE_GENERIC_MIPI
+ */
 #define LV_USE_ST7796 0
 
-/** Use ILI9341 LCD driver */
+/** Use ILI9341 LCD driver
+ *
+ *  Enable: LV_USE_GENERIC_MIPI
+ */
 #define LV_USE_ILI9341 0
 
-/** Use NV3007 LCD driver */
+/** Use NV3007 LCD driver
+ *
+ *  Enable: LV_USE_GENERIC_MIPI
+ */
 #define LV_USE_NV3007 0
 
 /** Driver for NXP ELCDIF */
@@ -1565,6 +1640,8 @@
 
 /** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
  *  - Requires LV_USE_MATRIX.
+ *
+ *  Enable: LV_USE_MATRIX
  */
 #define LV_USE_OPENGLES 0
 
@@ -1575,7 +1652,10 @@
 #endif /*LV_USE_OPENGLES*/
 
 #if !LV_USE_EGL
-/** Use GLFW to open window on PC and handle mouse and keyboard. */
+/** Use GLFW to open window on PC and handle mouse and keyboard.
+ *
+ *  Enable: LV_USE_OPENGLES
+ */
 #define LV_USE_GLFW 0
 
 #endif /*!LV_USE_EGL*/
@@ -1893,7 +1973,10 @@
 /** Enable runtime performance profiler */
 #define LV_USE_PROFILER 0
 
-/** Enable the built-in profiler */
+/** Enable the built-in profiler
+ *
+ *  Enable: LV_USE_PROFILER
+ */
 #define LV_USE_PROFILER_BUILTIN 0
 
 #if LV_USE_PROFILER_BUILTIN
@@ -1973,6 +2056,8 @@
 #if LV_USE_TEST
 /** Enable `lv_test_screenshot_compare`.
  *  Requires lodepng and a few MB of extra RAM.
+ *
+ *  Enable: LV_USE_LODEPNG
  */
 #define LV_USE_TEST_SCREENSHOT_COMPARE 0
 
@@ -2215,7 +2300,10 @@
 #define LV_BUILD_DEMOS 1
 
 #if LV_BUILD_DEMOS
-/** Benchmark your system */
+/** Benchmark your system
+ *
+ *  Enable: LV_FONT_MONTSERRAT_14, LV_FONT_MONTSERRAT_20, LV_FONT_MONTSERRAT_24, LV_FONT_MONTSERRAT_26, LV_USE_DEMO_WIDGETS
+ */
 #define LV_USE_DEMO_BENCHMARK 0
 
 #if LV_USE_DEMO_BENCHMARK
@@ -2261,7 +2349,10 @@
 #define LV_USE_DEMO_STRESS 0
 
 #if LV_DRAW_HAS_VECTOR_SUPPORT
-/** vector graphic demo */
+/** vector graphic demo
+ *
+ *  Enable: LV_USE_VECTOR_GRAPHIC
+ */
 #define LV_USE_DEMO_VECTOR_GRAPHIC 0
 
 #endif /*LV_DRAW_HAS_VECTOR_SUPPORT*/
