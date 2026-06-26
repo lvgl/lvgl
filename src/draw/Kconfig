@@ -71,13 +71,13 @@ config LV_DRAW_BUF_STRIDE_ALIGN
 	int "Buffer stride alignment"
 	default 1
 	help
-	Align the stride of all layers and images to this bytes.
+	Align the stride of all layers and images to this many bytes.
 
 config LV_DRAW_BUF_ALIGN
 	int "Buffer address alignment"
 	default 4
 	help
-	Align the start address of draw_buf addresses to this bytes.
+	Align the start address of draw_buf addresses to this many bytes.
 
 config LV_USE_MATRIX
 	bool "Enable matrix support"
