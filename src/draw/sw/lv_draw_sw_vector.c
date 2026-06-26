@@ -12,10 +12,10 @@
 #include "lv_draw_sw.h"
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-#if LV_USE_THORVG_EXTERNAL
-    #include <thorvg_capi.h>
-#else
+#if LV_USE_THORVG_INTERNAL
     #include "../../libs/thorvg/thorvg_capi.h"
+#else
+    #include <thorvg_capi.h>
 #endif
 #include "blend/lv_draw_sw_blend_private.h"
 #include "blend/lv_draw_sw_blend_to_rgb565.h"

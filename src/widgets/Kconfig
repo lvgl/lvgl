@@ -142,6 +142,7 @@ config LV_USE_LOTTIE
 	bool "Lottie"
 	default n
 	depends on LV_DRAW_HAS_VECTOR_SUPPORT
+	depends on LV_USE_THORVG # we require thorvg lottie parser
 	select LV_USE_VECTOR_GRAPHIC
 	help
 		Enable Lottie animations

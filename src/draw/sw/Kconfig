@@ -156,14 +156,4 @@ config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 	default ""
 	depends on LV_DRAW_SW_ASM_CUSTOM
 
-config LV_USE_THORVG
-	bool "ThorVG library for vector graphics support"
-	default n
-	select LV_DRAW_HAS_VECTOR_SUPPORT
-
-config LV_USE_THORVG_INTERNAL
-	bool "Internal ThorVG library bundled with LVGL"
-	default y
-	depends on LV_USE_THORVG
-
 endif #LV_USE_DRAW_SW

@@ -140,6 +140,17 @@ config LV_USE_VECTOR_GRAPHIC
 
 rsource "snapshot/Kconfig"
 
+config LV_USE_THORVG
+	bool "ThorVG library for vector graphics support"
+	default n
+	select LV_DRAW_HAS_VECTOR_SUPPORT if LV_USE_DRAW_SW
+
+config LV_USE_THORVG_INTERNAL
+	bool "Internal ThorVG library bundled with LVGL"
+	default y
+	depends on LV_USE_THORVG
+
+
 # These are menus because they contain a lot of configuration options
 menu "Software Rendering (SW)"
 rsource "sw/Kconfig"
