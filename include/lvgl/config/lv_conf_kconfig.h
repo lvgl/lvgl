@@ -230,6 +230,17 @@ extern "C" {
 #define CONFIG_LV_SDL_BUF_COUNT 2
 #endif
 
+/*******************
+ * LV_GLOBAL_USE_CUSTOM_INCLUDE
+ *******************/
+
+#if defined(CONFIG_LV_ENABLE_GLOBAL_CUSTOM)
+#warning "LV_ENABLE_GLOBAL_CUSTOM is deprecated, use LV_GLOBAL_USE_CUSTOM_INCLUDE instead"
+#ifndef CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE
+#define CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE CONFIG_LV_ENABLE_GLOBAL_CUSTOM
+#endif
+#endif
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

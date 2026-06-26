@@ -133,9 +133,17 @@ menu "Built-in Fonts"
 		bool "Enable UNSCII 16 (Perfect monospace font)"
 endmenu
 
+config LV_FONT_USE_CUSTOM_INCLUDE
+	bool "Include a custom font declaration header"
+	default n
+	help
+	  Include the header given by LV_FONT_CUSTOM_INCLUDE to declare custom
+	  fonts (LV_FONT_CUSTOM_DECLARE) or override font-related macros.
+
 config LV_FONT_CUSTOM_INCLUDE
 	string "Path to custom font declaration header"
 	default ""
+	depends on LV_FONT_USE_CUSTOM_INCLUDE
 	help
 	  Optional header to override font-related macros.
 

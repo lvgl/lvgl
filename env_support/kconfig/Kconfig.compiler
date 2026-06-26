@@ -3,9 +3,17 @@ config LV_BIG_ENDIAN_SYSTEM
 	help
 		For big endian systems set to 1
 
+config LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
+	bool "Include a custom attributes header"
+	default n
+	help
+	  Include the header given by LV_ATTRIBUTE_CUSTOM_INCLUDE to override the
+	  LV_ATTRIBUTE_* macros for your platform.
+
 config LV_ATTRIBUTE_CUSTOM_INCLUDE
 	string "Path to custom attributes header"
 	default ""
+	depends on LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
 	help
 	  Optional header to override LV_ATTRIBUTE_* macros for your platform.
 	  Leave empty to use defaults (all expand to nothing).

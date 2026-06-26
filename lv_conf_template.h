@@ -446,6 +446,15 @@
 /** NemaGFX STM32 HAL include */
 #define LV_NEMA_STM32_HAL_INCLUDE "stm32u5xx_hal.h"
 
+/** Include the header given by LV_NEMA_CUSTOM_INCLUDE to override
+ *  NemaGFX/STM32 HAL-specific macros such as
+ *  LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM.
+ */
+#define LV_NEMA_USE_CUSTOM_INCLUDE 0
+
+#endif /*LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32*/
+
+#if LV_NEMA_USE_CUSTOM_INCLUDE
 /** Optional header to override NemaGFX/STM32 HAL-specific macros.
  *
  *  LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
@@ -456,7 +465,7 @@
  */
 #define LV_NEMA_CUSTOM_INCLUDE ""
 
-#endif /*LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32*/
+#endif /*LV_NEMA_USE_CUSTOM_INCLUDE*/
 
 /** Enable NemaVG operations */
 #define LV_USE_NEMA_VG 0
@@ -980,6 +989,12 @@
 /** Enable UNSCII 16 (Perfect monospace font) */
 #define LV_FONT_UNSCII_16 0
 
+/** Include the header given by LV_FONT_CUSTOM_INCLUDE to declare custom
+ *  fonts (LV_FONT_CUSTOM_DECLARE) or override font-related macros.
+ */
+#define LV_FONT_USE_CUSTOM_INCLUDE 0
+
+#if LV_FONT_USE_CUSTOM_INCLUDE
 /** Optional header to override font-related macros.
  *
  *  Typical use is to declare extra fonts through LV_FONT_CUSTOM_DECLARE:
@@ -989,6 +1004,8 @@
  *      #define LV_FONT_DEFAULT         &my_font_24
  */
 #define LV_FONT_CUSTOM_INCLUDE ""
+
+#endif /*LV_FONT_USE_CUSTOM_INCLUDE*/
 
 /** Enable this to set LV_FONT_DEFAULT to a font you define yourself
  *  rather than one of the built-in fonts below. When enabled, the
@@ -1971,6 +1988,12 @@
 
 #endif /*LV_USE_MEM_MONITOR*/
 
+/** Include the header given by LV_SYSMON_CUSTOM_INCLUDE to override system
+ *  monitor macros such as LV_SYSMON_GET_IDLE.
+ */
+#define LV_SYSMON_USE_CUSTOM_INCLUDE 0
+
+#if LV_SYSMON_USE_CUSTOM_INCLUDE
 /** Optional header to override system monitor idle measurement macros.
  *
  *  LV_SYSMON_GET_IDLE
@@ -1984,6 +2007,7 @@
  */
 #define LV_SYSMON_CUSTOM_INCLUDE ""
 
+#endif /*LV_SYSMON_USE_CUSTOM_INCLUDE*/
 #endif /*LV_USE_SYSMON*/
 
 /** Enable runtime performance profiler */
@@ -2153,9 +2177,9 @@
  *  Returning NULL from that function is safe; LVGL will treat the
  *  library as uninitialized for that context.
  */
-#define LV_ENABLE_GLOBAL_CUSTOM 0
+#define LV_GLOBAL_USE_CUSTOM_INCLUDE 0
 
-#if LV_ENABLE_GLOBAL_CUSTOM
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE || LV_ENABLE_GLOBAL_CUSTOM
 /** Path to the header that declares:
  *    lv_global_t *lv_global_default(void);
  *
@@ -2165,7 +2189,7 @@
  */
 #define LV_GLOBAL_CUSTOM_INCLUDE "lv_global.h"
 
-#endif /*LV_ENABLE_GLOBAL_CUSTOM*/
+#endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE || LV_ENABLE_GLOBAL_CUSTOM*/
 #endif /*LV_USE_PRIVATE_API*/
 
 /** Check if the parameter is NULL. (Very fast, recommended) */
@@ -2184,11 +2208,11 @@
 #define LV_USE_ASSERT_OBJ 0
 
 /** Use LV_ASSERT_CUSTOM_INCLUDE to define the path to a file defining a
- *  custoM LV_ASSERT_HANDLER
+ *  custom LV_ASSERT_HANDLER
  */
-#define LV_USE_CUSTOM_ASSERT 0
+#define LV_ASSERT_USE_CUSTOM_INCLUDE 0
 
-#if LV_USE_CUSTOM_ASSERT
+#if LV_ASSERT_USE_CUSTOM_INCLUDE
 /** Optional header to override assert-related macros.
  *
  *  LV_ASSERT_HANDLER
@@ -2197,7 +2221,7 @@
  */
 #define LV_ASSERT_CUSTOM_INCLUDE ""
 
-#endif /*LV_USE_CUSTOM_ASSERT*/
+#endif /*LV_ASSERT_USE_CUSTOM_INCLUDE*/
 
 /** When enabled, LV_CHECK_ARG checks validate function arguments
  *  at runtime. Failed checks log a warning and execute the specified
@@ -2248,6 +2272,12 @@
 /** For big endian systems set to 1 */
 #define LV_BIG_ENDIAN_SYSTEM 0
 
+/** Include the header given by LV_ATTRIBUTE_CUSTOM_INCLUDE to override the
+ *  LV_ATTRIBUTE_* macros for your platform.
+ */
+#define LV_ATTRIBUTE_USE_CUSTOM_INCLUDE 0
+
+#if LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
 /** Optional header to override LV_ATTRIBUTE_* macros for your platform.
  *  Leave empty to use defaults (all expand to nothing).
  *
@@ -2305,6 +2335,7 @@
  */
 #define LV_ATTRIBUTE_CUSTOM_INCLUDE ""
 
+#endif /*LV_ATTRIBUTE_USE_CUSTOM_INCLUDE*/
 
 
 /*============================================================================

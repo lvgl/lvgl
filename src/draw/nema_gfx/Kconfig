@@ -59,10 +59,19 @@ config LV_NEMA_STM32_HAL_INCLUDE
 	default "stm32u5xx_hal.h"
 	depends on LV_NEMA_HAL_STM32
 
+config LV_NEMA_USE_CUSTOM_INCLUDE
+	bool "Include a custom NemaGFX attribute header"
+	default n
+	depends on LV_NEMA_HAL_STM32
+	help
+	  Include the header given by LV_NEMA_CUSTOM_INCLUDE to override
+	  NemaGFX/STM32 HAL-specific macros such as
+	  LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM.
+
 config LV_NEMA_CUSTOM_INCLUDE
 	string "Path to custom NemaGFX attribute header"
 	default ""
-	depends on LV_NEMA_HAL_STM32
+	depends on LV_NEMA_USE_CUSTOM_INCLUDE
 	help
 	  Optional header to override NemaGFX/STM32 HAL-specific macros.
 

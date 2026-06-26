@@ -22,10 +22,8 @@ extern "C" {
 #include LV_ASSERT_HANDLER_INCLUDE
 #endif
 
-#if LV_USE_CUSTOM_ASSERT
-#include LV_ASSERT_CUSTOM_INCLUDE
-#endif
-
+/* LV_ASSERT_CUSTOM_INCLUDE (gated by LV_ASSERT_USE_CUSTOM_INCLUDE) is included
+ * from lv_conf_internal.h, so the custom LV_ASSERT_HANDLER is already defined. */
 #ifndef LV_ASSERT_HANDLER
 #define LV_ASSERT_HANDLER while(1); /*halt by default*/
 #endif

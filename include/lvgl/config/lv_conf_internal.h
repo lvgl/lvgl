@@ -874,6 +874,14 @@
     #endif
 #endif
 
+#ifndef LV_NEMA_USE_CUSTOM_INCLUDE
+    #ifdef CONFIG_LV_NEMA_USE_CUSTOM_INCLUDE
+        #define LV_NEMA_USE_CUSTOM_INCLUDE CONFIG_LV_NEMA_USE_CUSTOM_INCLUDE
+    #else
+        #define LV_NEMA_USE_CUSTOM_INCLUDE 0
+    #endif
+#endif
+
 #ifndef LV_NEMA_CUSTOM_INCLUDE
     #ifdef CONFIG_LV_NEMA_CUSTOM_INCLUDE
         #define LV_NEMA_CUSTOM_INCLUDE CONFIG_LV_NEMA_CUSTOM_INCLUDE
@@ -1937,6 +1945,14 @@
         #define LV_FONT_UNSCII_16 CONFIG_LV_FONT_UNSCII_16
     #else
         #define LV_FONT_UNSCII_16 0
+    #endif
+#endif
+
+#ifndef LV_FONT_USE_CUSTOM_INCLUDE
+    #ifdef CONFIG_LV_FONT_USE_CUSTOM_INCLUDE
+        #define LV_FONT_USE_CUSTOM_INCLUDE CONFIG_LV_FONT_USE_CUSTOM_INCLUDE
+    #else
+        #define LV_FONT_USE_CUSTOM_INCLUDE 0
     #endif
 #endif
 
@@ -3836,6 +3852,14 @@
     #endif
 #endif
 
+#ifndef LV_SYSMON_USE_CUSTOM_INCLUDE
+    #ifdef CONFIG_LV_SYSMON_USE_CUSTOM_INCLUDE
+        #define LV_SYSMON_USE_CUSTOM_INCLUDE CONFIG_LV_SYSMON_USE_CUSTOM_INCLUDE
+    #else
+        #define LV_SYSMON_USE_CUSTOM_INCLUDE 0
+    #endif
+#endif
+
 #ifndef LV_SYSMON_CUSTOM_INCLUDE
     #ifdef CONFIG_LV_SYSMON_CUSTOM_INCLUDE
         #define LV_SYSMON_CUSTOM_INCLUDE CONFIG_LV_SYSMON_CUSTOM_INCLUDE
@@ -4140,11 +4164,11 @@
     #endif
 #endif
 
-#ifndef LV_ENABLE_GLOBAL_CUSTOM
-    #ifdef CONFIG_LV_ENABLE_GLOBAL_CUSTOM
-        #define LV_ENABLE_GLOBAL_CUSTOM CONFIG_LV_ENABLE_GLOBAL_CUSTOM
+#ifndef LV_GLOBAL_USE_CUSTOM_INCLUDE
+    #ifdef CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE
+        #define LV_GLOBAL_USE_CUSTOM_INCLUDE CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE
     #else
-        #define LV_ENABLE_GLOBAL_CUSTOM 0
+        #define LV_GLOBAL_USE_CUSTOM_INCLUDE 0
     #endif
 #endif
 
@@ -4204,11 +4228,11 @@
     #endif
 #endif
 
-#ifndef LV_USE_CUSTOM_ASSERT
-    #ifdef CONFIG_LV_USE_CUSTOM_ASSERT
-        #define LV_USE_CUSTOM_ASSERT CONFIG_LV_USE_CUSTOM_ASSERT
+#ifndef LV_ASSERT_USE_CUSTOM_INCLUDE
+    #ifdef CONFIG_LV_ASSERT_USE_CUSTOM_INCLUDE
+        #define LV_ASSERT_USE_CUSTOM_INCLUDE CONFIG_LV_ASSERT_USE_CUSTOM_INCLUDE
     #else
-        #define LV_USE_CUSTOM_ASSERT 0
+        #define LV_ASSERT_USE_CUSTOM_INCLUDE 0
     #endif
 #endif
 
@@ -4275,6 +4299,14 @@
         #define LV_BIG_ENDIAN_SYSTEM CONFIG_LV_BIG_ENDIAN_SYSTEM
     #else
         #define LV_BIG_ENDIAN_SYSTEM 0
+    #endif
+#endif
+
+#ifndef LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
+    #ifdef CONFIG_LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
+        #define LV_ATTRIBUTE_USE_CUSTOM_INCLUDE CONFIG_LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
+    #else
+        #define LV_ATTRIBUTE_USE_CUSTOM_INCLUDE 0
     #endif
 #endif
 
@@ -4574,6 +4606,18 @@
     #endif /*LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC255_0X40A*/
 #endif /*defined(LV_VG_LITE_HAL_GPU_REVISION)*/
 
+/*
+ *  LV_ENABLE_GLOBAL_CUSTOM was renamed to LV_GLOBAL_USE_CUSTOM_INCLUDE to follow
+ *  the LV_*_USE_CUSTOM_INCLUDE convention.  Map the old name to the new one.
+ */
+#if defined(LV_ENABLE_GLOBAL_CUSTOM) && LV_ENABLE_GLOBAL_CUSTOM
+#if !LV_GLOBAL_USE_CUSTOM_INCLUDE
+    #warning LV_ENABLE_GLOBAL_CUSTOM is deprecated and will be removed in a future release. Use LV_GLOBAL_USE_CUSTOM_INCLUDE instead.
+    #undef LV_GLOBAL_USE_CUSTOM_INCLUDE
+    #define LV_GLOBAL_USE_CUSTOM_INCLUDE 1
+#endif /*!LV_GLOBAL_USE_CUSTOM_INCLUDE*/
+#endif /*defined(LV_ENABLE_GLOBAL_CUSTOM) && LV_ENABLE_GLOBAL_CUSTOM*/
+
 /*----------------------------------
  * End of compatibility block
  -----------------------------------*/
@@ -4593,6 +4637,27 @@
     #else
         #define LV_DRAW_HAS_3D_SUPPORT 0
     #endif
+#endif
+
+/* Optional user headers (LV_*_USE_CUSTOM_INCLUDE) overriding config macros. */
+#if LV_NEMA_USE_CUSTOM_INCLUDE
+    #include LV_NEMA_CUSTOM_INCLUDE
+#endif
+
+#if LV_FONT_USE_CUSTOM_INCLUDE
+    #include LV_FONT_CUSTOM_INCLUDE
+#endif
+
+#if LV_SYSMON_USE_CUSTOM_INCLUDE
+    #include LV_SYSMON_CUSTOM_INCLUDE
+#endif
+
+#if LV_ASSERT_USE_CUSTOM_INCLUDE
+    #include LV_ASSERT_CUSTOM_INCLUDE
+#endif
+
+#if LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
+    #include LV_ATTRIBUTE_CUSTOM_INCLUDE
 #endif
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
@@ -4809,6 +4874,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_NEMA_USE_CACHE && !(LV_USE_NEMA_GFX)
     #error "LV_NEMA_USE_CACHE requires LV_USE_NEMA_GFX (Kconfig depends on)"
+#endif
+
+#if LV_NEMA_USE_CUSTOM_INCLUDE && !(LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32 && LV_USE_NEMA_GFX)
+    #error "LV_NEMA_USE_CUSTOM_INCLUDE requires LV_NEMA_HAL_STM32 && LV_USE_NEMA_GFX (Kconfig depends on)"
 #endif
 
 #if LV_USE_NEMA_VG && !(LV_USE_NEMA_GFX)
@@ -5043,6 +5112,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_MEM_MONITOR requires LV_USE_BUILTIN_MALLOC && LV_USE_SYSMON (Kconfig depends on)"
 #endif
 
+#if LV_SYSMON_USE_CUSTOM_INCLUDE && !(LV_USE_SYSMON)
+    #error "LV_SYSMON_USE_CUSTOM_INCLUDE requires LV_USE_SYSMON (Kconfig depends on)"
+#endif
+
 #if (LV_USE_PROFILER_BUILTIN) && !LV_USE_PROFILER
     #error "LV_USE_PROFILER must be enabled: Kconfig selects it from LV_USE_PROFILER_BUILTIN"
 #endif
@@ -5059,8 +5132,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_TEST_SCREENSHOT_COMPARE requires LV_USE_TEST (Kconfig depends on)"
 #endif
 
-#if LV_ENABLE_GLOBAL_CUSTOM && !(LV_USE_PRIVATE_API)
-    #error "LV_ENABLE_GLOBAL_CUSTOM requires LV_USE_PRIVATE_API (Kconfig depends on)"
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE && !(LV_USE_PRIVATE_API)
+    #error "LV_GLOBAL_USE_CUSTOM_INCLUDE requires LV_USE_PRIVATE_API (Kconfig depends on)"
 #endif
 
 #if LV_CHECK_ARG_ASSERT_ON_FAIL && !(LV_USE_CHECK_ARG)

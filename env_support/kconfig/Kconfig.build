@@ -8,8 +8,8 @@ config LV_USE_PRIVATE_API
 
 if LV_USE_PRIVATE_API
 
-config LV_ENABLE_GLOBAL_CUSTOM
-	bool "Enable 'lv_global' customization"
+config LV_GLOBAL_USE_CUSTOM_INCLUDE
+	bool "Enable 'lv_global' customization via a custom header"
 	help
 	  By default, LVGL stores all runtime state in a single static
 	  'lv_global_t' variable, sufficient for most single-display
@@ -30,9 +30,17 @@ config LV_ENABLE_GLOBAL_CUSTOM
 	  Returning NULL from that function is safe; LVGL will treat the
 	  library as uninitialized for that context.
 
+# Deprecated former name of LV_GLOBAL_USE_CUSTOM_INCLUDE. Kept so existing
+# defconfigs that set CONFIG_LV_ENABLE_GLOBAL_CUSTOM still parse; mapped to the
+# new option in lv_conf_kconfig.h. Excluded from the generated headers via
+# IGNORE_SYMBOLS.
+config LV_ENABLE_GLOBAL_CUSTOM
+	bool "[DEPRECATED: use LV_GLOBAL_USE_CUSTOM_INCLUDE]"
+	default n
+
 config LV_GLOBAL_CUSTOM_INCLUDE
 	string "Header to include for the custom 'lv_global' function"
-	depends on LV_ENABLE_GLOBAL_CUSTOM
+	depends on LV_GLOBAL_USE_CUSTOM_INCLUDE || LV_ENABLE_GLOBAL_CUSTOM
 	default "lv_global.h"
 	help
 	  Path to the header that declares:
@@ -62,17 +70,17 @@ menu "Asserts"
 	config LV_USE_ASSERT_OBJ
 		bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
 
-	config LV_USE_CUSTOM_ASSERT
+	config LV_ASSERT_USE_CUSTOM_INCLUDE
 		bool "Use a custom path to define an assertion handler"
 		default n
 		help
 		  Use LV_ASSERT_CUSTOM_INCLUDE to define the path to a file defining a
-		  custoM LV_ASSERT_HANDLER
+		  custom LV_ASSERT_HANDLER
 
 	config LV_ASSERT_CUSTOM_INCLUDE
 		string "Path to custom assert handler header"
 		default ""
-		depends on LV_USE_CUSTOM_ASSERT
+		depends on LV_ASSERT_USE_CUSTOM_INCLUDE
 		help
 		  Optional header to override assert-related macros.
 

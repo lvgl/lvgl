@@ -110,6 +110,53 @@ A macro that has to be pasted into an include path *as a bare token* (not a full
 quoted path) cannot be represented as a Kconfig string at all — use a choice
 instead (see the VG-Lite example under [Deprecating](#deprecating-or-renaming-an-option)).
 
+### Optional user header (custom include)
+
+To let a user pull in a header that overrides config macros, follow the
+**`LV_<X>_USE_CUSTOM_INCLUDE`** (bool gate) + **`LV_<X>_CUSTOM_INCLUDE`** (string
+path) convention:
+
+```kconfig
+config LV_SYSMON_USE_CUSTOM_INCLUDE
+	bool "Include a custom sysmon header"
+	default n
+
+config LV_SYSMON_CUSTOM_INCLUDE
+	string "Path to custom sysmon header"
+	default ""
+	depends on LV_SYSMON_USE_CUSTOM_INCLUDE
+```
+
+When both exist, the generator emits the include centrally in
+`lv_conf_internal.h`, so no source file has to:
+
+```c
+#if LV_SYSMON_USE_CUSTOM_INCLUDE
+    #include LV_SYSMON_CUSTOM_INCLUDE
+#endif
+```
+
+The header is included early (before the rest of LVGL, and before the
+`INTERNAL_FOOTER` attribute fallbacks), so it can `#define` overrides that source
+reads through an `#ifndef`/`#ifdef` fallback (e.g. `LV_SYSMON_GET_IDLE`,
+`LV_ATTRIBUTE_*`, `LV_ASSERT_HANDLER`, `LV_FONT_CUSTOM_DECLARE`).
+
+Two escape hatches:
+
+- An option that gates its include differently (e.g. `LV_OS_CUSTOM_INCLUDE`,
+  included by `lv_os_private.h` only when `LV_USE_OS == LV_OS_CUSTOM`) simply
+  omits the `_USE_CUSTOM_INCLUDE` companion and is left to its own subsystem.
+- An option that follows the naming but whose header needs LVGL types (so it
+  can't be included this early) is listed in `INCLUDED_BY_SUBSYSTEM` in `emit.py`
+  and included by its subsystem instead. `LV_GLOBAL_CUSTOM_INCLUDE` is the one
+  case: it declares `lv_global_default()` (needs `lv_global_t`) and is included by
+  `lv_global.h` after the type is defined.
+
+The generator **enforces** the gate: a `LV_<X>_CUSTOM_INCLUDE` with no
+`LV_<X>_USE_CUSTOM_INCLUDE` companion is an error, unless it is listed in
+`CUSTOM_INCLUDE_NO_GATE` (the enum-gated ones above). This is what catches a new
+custom-include that forgot its gate.
+
 ### Multi-value option (choice)
 
 > For a two-way on/off, use a plain `bool`, not a choice.

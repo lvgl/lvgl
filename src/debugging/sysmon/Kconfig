@@ -74,9 +74,17 @@ choice
 		bool "Center"
 endchoice
 
+config LV_SYSMON_USE_CUSTOM_INCLUDE
+	bool "Include a custom sysmon header"
+	default n
+	help
+	  Include the header given by LV_SYSMON_CUSTOM_INCLUDE to override system
+	  monitor macros such as LV_SYSMON_GET_IDLE.
+
 config LV_SYSMON_CUSTOM_INCLUDE
 	string "Path to custom sysmon header"
 	default ""
+	depends on LV_SYSMON_USE_CUSTOM_INCLUDE
 	help
 	  Optional header to override system monitor idle measurement macros.
 

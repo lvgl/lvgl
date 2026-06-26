@@ -268,7 +268,7 @@ typedef struct _lv_global_t {
  *      MACROS
  **********************/
 
-#if LV_ENABLE_GLOBAL_CUSTOM
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE
 #include LV_GLOBAL_CUSTOM_INCLUDE
 
 #ifndef LV_GLOBAL_CUSTOM
@@ -283,7 +283,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern lv_global_t lv_global;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-#if LV_ENABLE_GLOBAL_CUSTOM
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE
 /**
  * Get the default global object for current thread
  * @return  pointer to the default global object

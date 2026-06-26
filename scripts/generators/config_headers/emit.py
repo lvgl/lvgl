@@ -333,6 +333,54 @@ def generate_bridge(kconf: Kconfig, entries) -> str:
     )
 
 
+def custom_includes(entries) -> list[tuple[str, str]]:
+    """``(gate, path)`` pairs following the custom-include convention: a string
+    option ``LV_<X>_CUSTOM_INCLUDE`` with a companion bool ``LV_<X>_USE_CUSTOM_INCLUDE``.
+
+    These are optional user headers that override config macros (the sysmon /
+    font / nema pattern).  The internal header ``#include``s ``path`` when ``gate``
+    is set, so individual source files don't each have to.  An option that lacks
+    the companion bool (e.g. the enum-gated ``LV_OS_CUSTOM_INCLUDE``) is left to
+    its own subsystem and not auto-included here."""
+    names = {e.name for e in entries}
+    out: list[tuple[str, str]] = []
+    suffix = "_CUSTOM_INCLUDE"
+    for e in entries:
+        n = e.name
+        if not (n.endswith(suffix) and not n.endswith("_USE" + suffix)):
+            continue
+        if n in CUSTOM_INCLUDE_NO_GATE:
+            continue  # gated by its subsystem via an enum, no companion bool
+        gate = n[: -len(suffix)] + "_USE" + suffix
+        if gate not in names:
+            raise SystemExit(
+                f"{n}: missing companion gate {gate}. Add a bool "
+                f"`config {gate}`, or list {n} in CUSTOM_INCLUDE_NO_GATE if it "
+                f"is gated some other way."
+            )
+        if n in INCLUDED_BY_SUBSYSTEM:
+            continue  # has a gate but its subsystem does the include (see below)
+        out.append((gate, n))
+    return out
+
+
+# Custom-include configs that intentionally have NO `_USE_CUSTOM_INCLUDE` gate:
+# their subsystem decides when to include them via an enum (e.g.
+# `LV_USE_OS == LV_OS_CUSTOM`).  Listed so the missing-gate check doesn't flag
+# them.
+CUSTOM_INCLUDE_NO_GATE: set[str] = {
+    "LV_OS_CUSTOM_INCLUDE",
+    "LV_DRAW_SW_ASM_CUSTOM_INCLUDE",
+}
+
+# Custom-include configs that DO follow the gate convention but are *not*
+# auto-included here because their subsystem includes them at a specific point.
+# LV_GLOBAL_CUSTOM_INCLUDE declares lv_global_default() (needs lv_global_t) and
+# defaults to "lv_global.h", so lv_global.h includes it after the type exists;
+# pulling it into lv_conf_internal.h (before any LVGL type) would not compile.
+INCLUDED_BY_SUBSYSTEM: set[str] = {"LV_GLOBAL_CUSTOM_INCLUDE"}
+
+
 def generate_internal(kconf: Kconfig, entries) -> str:
     em = _body(kconf, "internal", entries)
     options = render_config_options(entries)
@@ -344,6 +392,21 @@ def generate_internal(kconf: Kconfig, entries) -> str:
         for flag in em.deferred:
             deferred += flag.emit_internal()
             deferred.append("")
+
+    # Optional user headers that override config macros: include each one (once
+    # both its gate and path are defined) so source files don't have to.
+    custom_inc: list[str] = []
+    ci = custom_includes(entries)
+    if ci:
+        custom_inc.append("")
+        custom_inc.append(
+            "/* Optional user headers (LV_*_USE_CUSTOM_INCLUDE) overriding config macros. */"
+        )
+        for gate, path in ci:
+            custom_inc.append(f"#if {gate}")
+            custom_inc.append(f"    #include {path}")
+            custom_inc.append("#endif")
+            custom_inc.append("")
 
     # Replay Kconfig `select` / `depends on` as #error guards on the lv_conf.h
     # path.  Emitted after the footer derivations so checks may reference symbols
@@ -368,6 +431,7 @@ def generate_internal(kconf: Kconfig, entries) -> str:
         + templates.INTERNAL_COMPATIBILITY_BLOCK
         + "\n"
         + "\n".join(deferred)
+        + "\n".join(custom_inc)
         + templates.INTERNAL_FOOTER
         + "\n".join(guards)
         + templates.INTERNAL_CLOSE

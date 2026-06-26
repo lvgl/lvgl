@@ -83,7 +83,7 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_ENABLE_GLOBAL_CUSTOM == 0
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE == 0
     lv_global_t lv_global;
 #endif
 
@@ -143,7 +143,7 @@ static inline void lv_cleanup_devices(lv_global_t * global)
 
 bool lv_is_initialized(void)
 {
-#if LV_ENABLE_GLOBAL_CUSTOM
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE
     if(LV_GLOBAL_DEFAULT()) return lv_initialized;
     else return false;
 #else
