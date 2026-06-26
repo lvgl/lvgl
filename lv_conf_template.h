@@ -300,17 +300,16 @@
 #define LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
 
 #endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM*/
+
+/** ThorVG library for vector graphics support */
+#define LV_USE_THORVG 0
+
+#if LV_USE_THORVG
+/** Internal ThorVG library bundled with LVGL */
+#define LV_USE_THORVG_INTERNAL 1
+
+#endif /*LV_USE_THORVG*/
 #endif /*LV_USE_DRAW_SW*/
-
-/** Enable ThorVG (vector graphics library) from the src/libs folder.
- *  Requires LV_USE_VECTOR_GRAPHIC
- */
-#define LV_USE_THORVG_INTERNAL 0
-
-/** Enable ThorVG by assuming that its installed and linked to the project
- *  Requires LV_USE_VECTOR_GRAPHIC
- */
-#define LV_USE_THORVG_EXTERNAL 0
 
 /** Use VG-Lite GPU. */
 #define LV_USE_DRAW_VG_LITE 0
@@ -768,11 +767,14 @@
 /** RLE decompress library */
 #define LV_USE_RLE 0
 
+/** Enable LZ4 compress/decompress lib */
+#define LV_USE_LZ4 0
+
+#if LV_USE_LZ4
 /** Use lvgl built-in LZ4 lib */
 #define LV_USE_LZ4_INTERNAL 0
 
-/** Use external LZ4 library */
-#define LV_USE_LZ4_EXTERNAL 0
+#endif /*LV_USE_LZ4*/
 
 /** Decode bin images to RAM */
 #define LV_BIN_DECODER_RAM_LOAD 0
@@ -1394,11 +1396,11 @@
 
 #define LV_LINUX_FBDEV_BUFFER_COUNT 0
 
-#if LV_LINUX_FBDEV_CUSTOM_BUFFER
+#if LV_LINUX_FBDEV_BUFFER_COUNT == 0
 /** Custom partial buffer size (in number of rows) */
 #define LV_LINUX_FBDEV_BUFFER_SIZE 60
 
-#endif /*LV_LINUX_FBDEV_CUSTOM_BUFFER*/
+#endif /*LV_LINUX_FBDEV_BUFFER_COUNT == 0*/
 
 /** Framebuffer device supports mmap */
 #define LV_LINUX_FBDEV_MMAP 1
@@ -1522,13 +1524,13 @@
 
 #define LV_NUTTX_LCD_BUFFER_COUNT 0
 
-#if LV_NUTTX_LCD_CUSTOM_BUFFER
+#if LV_NUTTX_LCD_BUFFER_COUNT == 0
 #if LV_USE_NUTTX_LCD
 /** Custom partial buffer size (in number of rows) */
 #define LV_NUTTX_LCD_BUFFER_SIZE 60
 
 #endif /*LV_USE_NUTTX_LCD*/
-#endif /*LV_NUTTX_LCD_CUSTOM_BUFFER*/
+#endif /*LV_NUTTX_LCD_BUFFER_COUNT == 0*/
 
 /** Use NuttX touchscreen driver */
 #define LV_USE_NUTTX_TOUCHSCREEN 0
@@ -1659,22 +1661,15 @@
 /** Exit the application when all X11 windows have been closed */
 #define LV_X11_DIRECT_EXIT 1
 
+/** X11 device render mode
+ *  Possible values:
+ *  - LV_DISPLAY_RENDER_MODE_PARTIAL: Partial render mode (preferred)
+ *  - LV_DISPLAY_RENDER_MODE_DIRECT: Direct render mode
+ *  - LV_DISPLAY_RENDER_MODE_FULL: Full render mode
+ */
+#define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
+
 #endif /*LV_USE_X11*/
-
-/** Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM.
- *  Appr. 1/10 screen size buffer(s) are used.
- */
-#define LV_X11_RENDER_MODE_PARTIAL 0
-
-/** The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image. Only the changed ares will be updated.
- *  With 2 buffers the buffers' content are kept in sync automatically and in flush_cb only address change is required.
- */
-#define LV_X11_RENDER_MODE_DIRECT 0
-
-/** Always redraw the whole screen even if only one pixel has been changed.
- *  With 2 buffers in flush_cb only and address change is required.
- */
-#define LV_X11_RENDER_MODE_FULL 0
 
 /** Enable NanoVG (vector graphics library) */
 #define LV_USE_NANOVG 0
