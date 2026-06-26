@@ -1,0 +1,321 @@
+---
+title: Adding Configuration Options
+description: "How LVGL's configuration headers are generated from Kconfig, and the patterns to follow when adding or changing a config option."
+---
+
+LVGL's configuration is driven by **Kconfig**. The Kconfig tree is the single
+source of truth: the three configuration headers users see are *generated* from
+it and must never be edited by hand.
+
+| Generated file | Purpose |
+| --- | --- |
+| `lv_conf_template.h` | The public template a user copies to `lv_conf.h`. One commented `#define` per user-facing option. |
+| `include/lvgl/config/lv_conf_internal.h` | Applies a default to every option (the `#ifndef NAME … #define NAME <default>` ladders), plus the compatibility and consistency blocks. |
+| `include/lvgl/config/lv_conf_kconfig.h` | The bridge that maps some `CONFIG_*` (from `menuconfig`/`autoconf.h`) to the macros LVGL's code expects. |
+
+Each `#define` therefore has two valid sources at build time: the user's
+`lv_conf.h` (hand-written) or Kconfig (`CONFIG_*` via the bridge). **Every
+pattern below must resolve correctly on both paths.**
+
+The generator lives in `scripts/generators/config_headers/`:
+
+- `parse.py` — classifies each Kconfig node into a typed entry (the policy tables live here).
+- `config_entry.py` — one class per option *kind*; each knows how it renders to each surface.
+- `emit.py` — assembles the whole files (banners, `#if` nesting, the constant block, the consistency `#error`s).
+- `templates.py` — the static, hand-maintained text blocks (preamble, footer, compatibility block, bridge boilerplate).
+
+---
+
+## Where Kconfig lives
+
+Kconfig is split per directory and stitched together with `rsource`. Add a new
+option in the `Kconfig` of the subsystem it belongs to (e.g. a widget option
+goes in `src/widgets/Kconfig`). If you create a new `Kconfig` file, make sure a
+parent `rsource`s it, or its symbols will silently never appear.
+
+## Regenerating the headers
+
+After **any** change to a `Kconfig` file or to the generator, regenerate and
+commit the three headers:
+
+```bash
+cd 
+python3 scripts/generators/config_headers.py Kconfig \
+  --template lv_conf_template.h \
+  --internal include/lvgl/config/lv_conf_internal.h \
+  --bridge   include/lvgl/config/lv_conf_kconfig.h
+```
+
+Then run the generator's tests:
+
+```bash
+cd scripts/generators
+python3 -m pytest config_headers/test/
+```
+
+The PR that changes Kconfig and the PR's regenerated headers must land together,
+otherwise the build and the Kconfig disagree. This is automatically checked by CI.
+
+---
+
+## Adding an option
+
+### Boolean
+
+A plain on/off feature. Always give it a `default` and a `help`.
+
+```kconfig
+config LV_USE_LOG
+	bool "Enable the log module"
+	default y
+	help
+		Enable the log module and the LV_LOG_* macros
+```
+
+In C, guard with the value form `#if LV_USE_LOG`, never `#ifdef` — the macro is
+*always* defined (to `0` or `1`) by `lv_conf_internal.h`.
+
+### Integer / hex
+
+```kconfig
+config LV_DEF_REFR_PERIOD
+	int "Default refresh period (ms)"
+	default 33
+```
+
+Use `hex` for addresses/masks. An int always has a value, so the internal ladder
+is unconditional.
+
+### String
+
+```kconfig
+config LV_TXT_BREAK_CHARS
+	string "Can break (wrap) texts on these chars"
+	default " ,.;:-_)}"
+```
+
+**Include paths are a special case.** A macro that is `#include`d (an
+`*_INCLUDE` / attribute / assert-handler symbol) must expand to an *unquoted*
+token, but Kconfig stores strings quoted. These symbols are recognised by the
+build tooling and de-quoted when written. Store the brackets in the default:
+
+```kconfig
+config LV_OS_CUSTOM_INCLUDE
+	string "Custom OS include header"
+	default ""
+	depends on LV_OS_CUSTOM
+```
+
+A macro that has to be pasted into an include path *as a bare token* (not a full
+quoted path) cannot be represented as a Kconfig string at all — use a choice
+instead (see the VG-Lite example under [Deprecating](#deprecating-or-renaming-an-option)).
+
+### Multi-value option (choice)
+
+> For a two-way on/off, use a plain `bool`, not a choice.
+
+There are two supported shapes. Pick by **what the C code needs the macro to
+be**.
+
+**Named choice — the macro is one of a set of tokens that already exist in a C
+header.** The generated macro expands to the selected member name; the member
+tokens (e.g. `LV_TXT_ENC_UTF8`) are defined in LVGL's C headers, so the
+generator does not redefine them.
+
+```kconfig
+choice LV_TXT_ENC
+	prompt "Select a character encoding for strings"
+	default LV_TXT_ENC_UTF8
+
+	config LV_TXT_ENC_UTF8
+		bool "UTF8"
+	config LV_TXT_ENC_ASCII
+		bool "ASCII"
+endchoice
+```
+
+→ `#define LV_TXT_ENC LV_TXT_ENC_UTF8`, and the bridge maps
+`CONFIG_LV_TXT_ENC_UTF8` → `CONFIG_LV_TXT_ENC LV_TXT_ENC_UTF8`.
+
+**Enum-as-int — the macro must be an integer the code compares with `==` / `<`,
+and the tokens are owned by LVGL config (not an existing header).** Pair the
+choice with a same-named `int` whose `default` lists a numeric token per member,
+then add the macro name to `MEMBER_IS_TOKEN` in `parse.py`. The generator emits
+`#define LV_OS_PTHREAD 1` (etc.) into the "Config options" block and
+`#define LV_USE_OS LV_OS_PTHREAD` for the selection.
+
+```kconfig
+choice LV_USE_OS
+	prompt "Default operating system to use"
+	default LV_OS_NONE
+	config LV_OS_NONE
+		bool "0: NONE"
+	config LV_OS_PTHREAD
+		bool "1: PTHREAD"
+	# …
+endchoice
+
+config LV_USE_OS
+	int
+	default 0 if LV_OS_NONE
+	default 1 if LV_OS_PTHREAD
+	# …
+```
+
+```python
+# parse.py
+MEMBER_IS_TOKEN = {
+    "LV_USE_OS",
+    # …add the new macro here
+}
+```
+
+Anonymous choices whose members map to *differently named* C-header tokens
+(render modes, monitor positions) are handled by `CHOICE_TOKEN_MAP` in
+`parse.py`. Avoid adding new ones — the generator deliberately raises an error
+for an un-standardised anonymous choice rather than guessing.
+
+---
+
+## Dependencies and selects
+
+LVGL re-states Kconfig's `depends on` / `select` on the hand-written `lv_conf.h`
+path, because a user editing `lv_conf.h` can break a constraint that Kconfig
+would never allow. **It does not silently auto-fix — it emits a `#error`** so the
+mistake surfaces at compile time. Just write normal Kconfig:
+
+```kconfig
+config LV_USE_SLIDER
+	bool "Slider"
+	select LV_USE_BAR        # slider needs the bar widget
+
+config LV_USE_LOTTIE
+	bool "Lottie"
+	depends on LV_USE_THORVG # lottie needs ThorVG
+```
+
+The generator then adds, in `lv_conf_internal.h`:
+
+```c
+#if (LV_USE_SLIDER) && !LV_USE_BAR
+    #error "LV_USE_BAR must be enabled: Kconfig selects it from LV_USE_SLIDER"
+#endif
+#if LV_USE_LOTTIE && !(… LV_USE_THORVG)
+    #error "LV_USE_LOTTIE requires … (Kconfig depends on)"
+#endif
+```
+
+and documents the forward `select` in the template comment:
+
+```c
+/** Slider
+ *
+ *  Enable: LV_USE_BAR
+ */
+#define LV_USE_SLIDER 1
+```
+
+Notes:
+
+- `depends on` is **not** repeated in the template comment — the template already
+  wraps the option in the matching `#if` block, so the dependency is visible.
+- Only *user-facing* options are checked/listed; an internal flag a user can't
+  set is filtered out.
+- Depends checks are emitted only for options that **default off**, so the
+  default / `LV_CONF_SKIP` build never `#error`s on a sub-option that defaults on
+  while its parent is off. Keep this in mind: a default-on option's `depends on`
+  is not enforced on the `lv_conf.h` path.
+
+### Internal capability flags
+
+A flag that is *only* ever set via `select` (no prompt) is derived in the
+internal header from the things that select it — never offered to the user.
+
+```kconfig
+config LV_DRAW_HAS_VECTOR_SUPPORT
+	bool          # no prompt
+```
+
+→ `#define LV_DRAW_HAS_VECTOR_SUPPORT 1` iff one of its selectors is on.
+
+---
+
+## Deprecating or renaming an option
+
+When you remove or rename a symbol, keep old configs working. Two shim sites,
+depending on which build path the old config came from:
+
+1. **`lv_conf_kconfig.h` (`KCONFIG_BRIDGE_DEPRECATIONS` in `templates.py`)** — for
+   old **defconfigs** (`CONFIG_*`). Operate on the `CONFIG_*` macro so the
+   internal ladder picks up the result.
+
+   ```c
+   #if defined(CONFIG_LV_SDL_SINGLE_BUFFER)
+   #warning "LV_SDL_SINGLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
+   #undef CONFIG_LV_SDL_BUF_COUNT
+   #define CONFIG_LV_SDL_BUF_COUNT 1
+   #endif
+   ```
+
+2. **`lv_conf_internal.h` compatibility block (`INTERNAL_COMPATIBILITY_BLOCK`)** —
+   for old hand-written **`lv_conf.h`** symbols. Operate on the final macro,
+   `#warning` + `#undef` + redefine.
+
+   ```c
+   #if defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL
+   #if !LV_USE_THORVG
+       #warning LV_USE_THORVG_EXTERNAL is deprecated …
+       #undef LV_USE_THORVG
+       #define LV_USE_THORVG 1
+   #endif
+   #endif
+   ```
+
+Supporting tools in `parse.py`:
+
+- **`IGNORE_SYMBOLS`** — symbols that exist in Kconfig but must *not* appear in
+  the generated headers (internal raw counts, symbols handled entirely by a
+  shim). To retire a `choice` while keeping old defconfigs valid, keep the choice
+  but mark it `optional` (so a fresh config selects nothing and emits no
+  spurious deprecation warning) and add its members to `IGNORE_SYMBOLS`; map them
+  in the bridge shim. *(See the `LV_SDL_BUF_COUNT` change.)*
+- A bracketed `[DEPRECATED …]` prompt (or a help text starting with
+  `Deprecated`) keeps an option out of the public template.
+
+**Worked example — VG-Lite GPU.** The GPU was selected with
+`LV_VG_LITE_HAL_GPU_SERIES` (a bare token like `gc255`) pasted into an include
+path — impossible to represent as a Kconfig string. It was replaced with an
+`LV_VG_LITE_GPU` enum-as-int choice (one member per supported series/revision);
+`VGLite/vg_lite_options.h` maps the token to the right include with
+`#if LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC255_0X40A`, and the old symbols are
+remapped in the compatibility block.
+
+---
+
+## Behind the scenes (tables to know)
+
+All policy lives in `parse.py`:
+
+- `MEMBER_IS_TOKEN` — choices whose macro should expand to the member *name* (an
+  emitted int token) rather than a bare number.
+- `HEADER_OWNED_TOKEN_PREFIXES` — tokens that already exist in a C header, so the
+  generator references but never redefines them.
+- `CHOICE_TOKEN_MAP` — anonymous choices whose members map to renamed C-header
+  tokens.
+- `IGNORE_SYMBOLS` — symbols excluded from all generated output.
+
+And in `templates.py`: `BUILTIN_FONTS` (the `LV_FONT_DEFAULT_*` → `&lv_font_*`
+pointer table — the one piece of data that can't come from Kconfig).
+
+---
+
+## Checklist for a new option
+
+1. Add the `config`/`choice` to the right `Kconfig` (with `default` + `help`).
+2. For an enum-as-int choice, add its macro to `MEMBER_IS_TOKEN`.
+3. Guard C code with `#if NAME` (value form), and `NAME == TOKEN` for enums.
+4. Express real dependencies with `depends on` / `select` — let the generator
+   produce the `#error` guards.
+5. If you renamed/removed a symbol, add a shim (and `IGNORE_SYMBOLS` if needed).
+6. Regenerate the three headers and run `pytest config_headers/test/`.
+7. Commit the Kconfig change and the regenerated headers together.
