@@ -155,6 +155,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "freertos/atomic.h",
     "freertos/semphr.h",
     "freertos/task.h",
+    "freetype/config/ftheader.h",
     "fsl_cache.h",
     "fsl_elcdif.h",
     "fsl_pxp.h",
