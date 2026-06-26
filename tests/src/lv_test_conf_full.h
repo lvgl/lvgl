@@ -47,8 +47,8 @@
 #define LV_USE_FONT_COMPRESSED  1
 #define LV_USE_BIDI 1
 #define LV_USE_ARABIC_PERSIAN_CHARS 1
+#define LV_USE_SYSMON               1
 #define LV_USE_PERF_MONITOR         1
-#define LV_USE_MEM_MONITOR          1
 #define LV_LABEL_TEXT_SELECTION     1
 
 #define LV_USE_CALENDAR_CHINESE 1
@@ -99,11 +99,10 @@
 #define LV_USE_FILE_EXPLORER    1
 #define LV_USE_TINY_TTF         1
 #define LV_TINY_TTF_FILE_SUPPORT 1
-#define LV_USE_SYSMON           1
-#define LV_USE_MEM_MONITOR      1
-#define LV_USE_PERF_MONITOR     1
 #define LV_USE_SNAPSHOT         1
+#define LV_USE_THORVG       1
 #define LV_USE_THORVG_INTERNAL  1
+#define LV_USE_LZ4          1
 #define LV_USE_LZ4_INTERNAL     1
 #define LV_USE_VECTOR_GRAPHIC   1
 #define LV_USE_SVG              1
@@ -111,6 +110,7 @@
 #define LV_USE_SVG_DEBUG        1
 #define LV_USE_PROFILER         1
 #define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
+#define LV_USE_PROFILER_BUILTIN 1
 #define LV_USE_PROFILER_BUILTIN_POSIX 1
 #define LV_USE_GRIDNAV          1
 #define LV_USE_XML              1
@@ -175,6 +175,7 @@
     #define LV_USE_WAYLAND  1
 #endif
 
+#define LV_USE_GENERIC_MIPI 1
 #define LV_USE_ILI9341      1
 #define LV_USE_ST7735       1
 #define LV_USE_ST7789       1

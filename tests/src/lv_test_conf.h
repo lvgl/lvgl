@@ -32,6 +32,7 @@ extern "C" {
 #define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
 #define LV_OBJ_STYLE_CACHE      1
 #define LV_BIN_DECODER_RAM_LOAD 0
+#define LV_USE_MEM_MONITOR      1
 #endif
 
 #ifdef MICROPYTHON
