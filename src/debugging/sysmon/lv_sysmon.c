@@ -23,7 +23,7 @@ extern uint32_t LV_SYSMON_GET_IDLE(void);
 
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
     #ifndef LV_SYSMON_GET_PROC_IDLE
-        #define LV_SYSMON_GET_IDLE lv_os_get_proc_idle_percent
+        #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
     #endif
     extern uint32_t LV_SYSMON_GET_PROC_IDLE(void);
 #endif
