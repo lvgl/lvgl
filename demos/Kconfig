@@ -1,3 +1,4 @@
+menu "Demos"
 config LV_BUILD_DEMOS
 	bool "Build demos"
 	default y
@@ -36,3 +37,4 @@ rsource "widgets/Kconfig"
 	config LV_USE_DEMO_HIGH_RES
 		bool "High resolution demo"
 endif
+endmenu

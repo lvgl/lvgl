@@ -80,12 +80,11 @@ menu "LVGL"
 		rsource "env_support/kconfig/Kconfig.compiler"
 	endmenu
 
-	menu "Examples"
-		rsource "examples/Kconfig"
-	endmenu
-
-	menu "Demos"
-		rsource "demos/Kconfig"
-	endmenu
+	# Examples and Demos define their own menu because it might be desirable
+	# to not include examples and demos folders for some LVGL builds
+	# This is also why we use `orsource` here. So that the build doesn't fail
+	# if the file doesn't exist
+	orsource "examples/Kconfig"
+	orsource "demos/Kconfig"
 
 endmenu
