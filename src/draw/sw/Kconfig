@@ -157,25 +157,13 @@ config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 	depends on LV_DRAW_SW_ASM_CUSTOM
 
 config LV_USE_THORVG
-	bool "ThorVG library"
+	bool "ThorVG library for vector graphics support"
 	default n
 	select LV_DRAW_HAS_VECTOR_SUPPORT
 
-choice
-	prompt "ThorVG Version to use"
+config LV_USE_THORVG_INTERNAL
+	bool "Internal ThorVG library bundled with LVGL"
+	default y
 	depends on LV_USE_THORVG
-
-	default LV_USE_THORVG_INTERNAL
-	config LV_USE_THORVG_INTERNAL
-		bool "Use ThorVG internal"
-		help
-			Enable ThorVG (vector graphics library) from the src/libs folder.
-			Requires LV_USE_VECTOR_GRAPHIC
-	config LV_USE_THORVG_EXTERNAL
-		bool "Use ThorVG external"
-		help
-			Enable ThorVG by assuming that its installed and linked to the project
-			Requires LV_USE_VECTOR_GRAPHIC
-endchoice
 
 endif #LV_USE_DRAW_SW

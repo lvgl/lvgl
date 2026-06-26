@@ -21,21 +21,13 @@ config LV_USE_RLE
 
 config LV_USE_LZ4
 	bool "Enable LZ4 compress/decompress lib"
+	default n
 
-choice
-	prompt "Choose lvgl built-in LZ4 lib or external lib"
+config LV_USE_LZ4_INTERNAL
+	bool "Use lvgl built-in LZ4 lib"
 	depends on LV_USE_LZ4
-	default LV_USE_LZ4_INTERNAL
-
-	config LV_USE_LZ4_INTERNAL
-		bool "Use lvgl built-in LZ4 lib"
-		help
-			Use lvgl built-in LZ4 lib
-	config LV_USE_LZ4_EXTERNAL
-		bool "Use external LZ4 library"
-		help
-			Use external LZ4 library
-endchoice
+	help
+		Use lvgl built-in LZ4 lib
 
 config LV_BIN_DECODER_RAM_LOAD
 	bool "Decode whole image to RAM when using the bin decoder"
