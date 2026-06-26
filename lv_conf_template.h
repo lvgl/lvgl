@@ -146,10 +146,10 @@
  */
 #define LV_DPI_DEF 130
 
-/** Align the stride of all layers and images to this bytes. */
+/** Align the stride of all layers and images to this many bytes. */
 #define LV_DRAW_BUF_STRIDE_ALIGN 1
 
-/** Align the start address of draw_buf addresses to this bytes. */
+/** Align the start address of draw_buf addresses to this many bytes. */
 #define LV_DRAW_BUF_ALIGN 4
 
 /** Enable matrix support
@@ -505,7 +505,7 @@
 
 #endif /*LV_USE_DRAW_G2D*/
 
-/** Draw using espressif PPA accelerator */
+/** Draw using Espressif PPA accelerator */
 #define LV_USE_PPA 0
 
 #if LV_USE_PPA
