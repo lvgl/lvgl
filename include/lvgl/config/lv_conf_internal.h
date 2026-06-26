@@ -9,6 +9,43 @@
 /* clang-format off */
 
 /* Config options */
+/* Built-in font selectors for LV_FONT_DEFAULT */
+#define LV_FONT_DEFAULT_MONTSERRAT_8                &lv_font_montserrat_8
+#define LV_FONT_DEFAULT_MONTSERRAT_10               &lv_font_montserrat_10
+#define LV_FONT_DEFAULT_MONTSERRAT_12               &lv_font_montserrat_12
+#define LV_FONT_DEFAULT_MONTSERRAT_14               &lv_font_montserrat_14
+#define LV_FONT_DEFAULT_MONTSERRAT_16               &lv_font_montserrat_16
+#define LV_FONT_DEFAULT_MONTSERRAT_18               &lv_font_montserrat_18
+#define LV_FONT_DEFAULT_MONTSERRAT_20               &lv_font_montserrat_20
+#define LV_FONT_DEFAULT_MONTSERRAT_22               &lv_font_montserrat_22
+#define LV_FONT_DEFAULT_MONTSERRAT_24               &lv_font_montserrat_24
+#define LV_FONT_DEFAULT_MONTSERRAT_26               &lv_font_montserrat_26
+#define LV_FONT_DEFAULT_MONTSERRAT_28               &lv_font_montserrat_28
+#define LV_FONT_DEFAULT_MONTSERRAT_30               &lv_font_montserrat_30
+#define LV_FONT_DEFAULT_MONTSERRAT_32               &lv_font_montserrat_32
+#define LV_FONT_DEFAULT_MONTSERRAT_34               &lv_font_montserrat_34
+#define LV_FONT_DEFAULT_MONTSERRAT_36               &lv_font_montserrat_36
+#define LV_FONT_DEFAULT_MONTSERRAT_38               &lv_font_montserrat_38
+#define LV_FONT_DEFAULT_MONTSERRAT_40               &lv_font_montserrat_40
+#define LV_FONT_DEFAULT_MONTSERRAT_42               &lv_font_montserrat_42
+#define LV_FONT_DEFAULT_MONTSERRAT_44               &lv_font_montserrat_44
+#define LV_FONT_DEFAULT_MONTSERRAT_46               &lv_font_montserrat_46
+#define LV_FONT_DEFAULT_MONTSERRAT_48               &lv_font_montserrat_48
+#define LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED    &lv_font_montserrat_28_compressed
+#define LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW    &lv_font_dejavu_16_persian_hebrew
+#define LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK   &lv_font_source_han_sans_sc_14_cjk
+#define LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK   &lv_font_source_han_sans_sc_16_cjk
+#define LV_FONT_DEFAULT_UNSCII_8                    &lv_font_unscii_8
+#define LV_FONT_DEFAULT_UNSCII_16                   &lv_font_unscii_16
+
+/* Memory and Standard Library */
+#define LV_STDLIB_BUILTIN       0
+#define LV_STDLIB_CLIB          1
+#define LV_STDLIB_MICROPYTHON   2
+#define LV_STDLIB_RTTHREAD      3
+#define LV_STDLIB_CUSTOM        255
+
+/* Default operating system to use */
 #define LV_OS_NONE          0
 #define LV_OS_PTHREAD       1
 #define LV_OS_FREERTOS      2
@@ -19,35 +56,34 @@
 #define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
 
-#define LV_STDLIB_BUILTIN           0
-#define LV_STDLIB_CLIB              1
-#define LV_STDLIB_MICROPYTHON       2
-#define LV_STDLIB_RTTHREAD          3
-#define LV_STDLIB_CUSTOM            255
+/* Asm mode in sw draw */
+#define LV_DRAW_SW_ASM_NONE      0
+#define LV_DRAW_SW_ASM_NEON      1
+#define LV_DRAW_SW_ASM_HELIUM    2
+#define LV_DRAW_SW_ASM_RISCV_V   3
+#define LV_DRAW_SW_ASM_CUSTOM    255
 
-#define LV_DRAW_SW_ASM_NONE             0
-#define LV_DRAW_SW_ASM_NEON             1
-#define LV_DRAW_SW_ASM_HELIUM           2
-#define LV_DRAW_SW_ASM_RISCV_V          3
-#define LV_DRAW_SW_ASM_CUSTOM           255
+/* NemaGFX static library */
+#define LV_NEMA_LIB_NONE          0
+#define LV_NEMA_LIB_M33_REVC      1
+#define LV_NEMA_LIB_M33_NEMAPVG   2
+#define LV_NEMA_LIB_M55           3
+#define LV_NEMA_LIB_M7            4
 
-#define LV_NEMA_LIB_NONE            0
-#define LV_NEMA_LIB_M33_REVC        1
-#define LV_NEMA_LIB_M33_NEMAPVG     2
-#define LV_NEMA_LIB_M55             3
-#define LV_NEMA_LIB_M7              4
+/* NemaGFX HAL */
+#define LV_NEMA_HAL_CUSTOM   0
+#define LV_NEMA_HAL_STM32    1
 
-#define LV_NEMA_HAL_CUSTOM          0
-#define LV_NEMA_HAL_STM32           1
+/* NanoVG OpenGL backend */
+#define LV_NANOVG_BACKEND_GL2     1
+#define LV_NANOVG_BACKEND_GL3     2
+#define LV_NANOVG_BACKEND_GLES2   3
+#define LV_NANOVG_BACKEND_GLES3   4
 
-#define LV_NANOVG_BACKEND_GL2       1
-#define LV_NANOVG_BACKEND_GL3       2
-#define LV_NANOVG_BACKEND_GLES2     3
-#define LV_NANOVG_BACKEND_GLES3     4
-
-#define LV_CHECK_ARG_LOG_MODE_NONE    0
-#define LV_CHECK_ARG_LOG_MODE_MINIMAL 1
-#define LV_CHECK_ARG_LOG_MODE_VERBOSE 2
+/* Log behavior on LV_CHECK_ARG failure */
+#define LV_CHECK_ARG_LOG_MODE_NONE      0
+#define LV_CHECK_ARG_LOG_MODE_MINIMAL   1
+#define LV_CHECK_ARG_LOG_MODE_VERBOSE   2
 
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
@@ -104,7 +140,7 @@
  *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
  *  - LV_STDLIB_CLIB: Standard C functions malloc/realloc/free
  *  - LV_STDLIB_MICROPYTHON: MicroPython functions malloc/realloc/free
- *  - LV_STDLIB_RTTHREAD: RTThread functions malloc/realloc/free
+ *  - LV_STDLIB_RTTHREAD: RT-Thread functions malloc/realloc/free
  *  - LV_STDLIB_CUSTOM: Implement the functions externally
  */
 #ifndef LV_USE_STDLIB_MALLOC
@@ -119,6 +155,7 @@
  *  Possible values:
  *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
  *  - LV_STDLIB_CLIB: Standard C functions memcpy/memset/strlen/strcpy
+ *  - LV_STDLIB_RTTHREAD: RT-Thread functions rt_memcpy/rt_memset/rt_strlen/rt_strcpy
  *  - LV_STDLIB_CUSTOM: Implement the functions externally
  */
 #ifndef LV_USE_STDLIB_STRING
@@ -132,7 +169,8 @@
 /** Sprintf functions source
  *  Possible values:
  *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
- *  - LV_STDLIB_CLIB: Standard C functions vsnprintf
+ *  - LV_STDLIB_CLIB: Standard C function vsnprintf
+ *  - LV_STDLIB_RTTHREAD: RT-Thread function rt_vsnprintf
  *  - LV_STDLIB_CUSTOM: Implement the functions externally
  */
 #ifndef LV_USE_STDLIB_SPRINTF
@@ -143,7 +181,7 @@
     #endif
 #endif
 
-#if LV_USE_BUILTIN_MALLOC
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 /** Size of the memory used by `lv_malloc()` in bytes (Needs to be at least 2kB (2048)) */
 #ifndef LV_MEM_SIZE
     #ifdef CONFIG_LV_MEM_SIZE
@@ -162,7 +200,7 @@
     #endif
 #endif
 
-#endif /*LV_USE_BUILTIN_MALLOC*/
+#endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
 /** Header for integer types (stdint) */
 #ifndef LV_STDINT_INCLUDE
@@ -273,9 +311,6 @@
     #endif
 #endif
 
-#endif /*LV_USE_OS == LV_OS_FREERTOS*/
-
-#if LV_USE_OS == LV_OS_FREERTOS
 /** Enable this to provide a custom implementation of lv_os_get_idle_percent.
  *  This is useful for multi-core systems where the default
  *  FreeRTOS implementation might not sufficiently track idle time across all cores.
@@ -416,9 +451,6 @@
     #endif
 #endif
 
-#endif /*LV_USE_OS != LV_OS_NONE*/
-
-#if LV_USE_OS != LV_OS_NONE
 /** Thread priority controls the relative importance of the drawing threads.
  *  Values correspond to lv_thread_prio_t enum in lv_os.h:
  *  0: LV_THREAD_PRIO_LOWEST
@@ -1078,9 +1110,6 @@
     #endif
 #endif
 
-#endif /*LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32*/
-
-#if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
 /** Optional header to override NemaGFX/STM32 HAL-specific macros.
  *
  *  LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
@@ -4751,7 +4780,7 @@
 
 #endif /*LV_USE_PERF_MONITOR*/
 
-#if LV_USE_BUILTIN_MALLOC
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 /** Show the used memory and the memory fragmentation */
 #ifndef LV_USE_MEM_MONITOR
     #ifdef CONFIG_LV_USE_MEM_MONITOR
@@ -4761,7 +4790,7 @@
     #endif
 #endif
 
-#endif /*LV_USE_BUILTIN_MALLOC*/
+#endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
 #if LV_USE_MEM_MONITOR
 /** Memory monitor position

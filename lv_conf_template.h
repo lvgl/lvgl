@@ -31,7 +31,7 @@
  *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
  *  - LV_STDLIB_CLIB: Standard C functions malloc/realloc/free
  *  - LV_STDLIB_MICROPYTHON: MicroPython functions malloc/realloc/free
- *  - LV_STDLIB_RTTHREAD: RTThread functions malloc/realloc/free
+ *  - LV_STDLIB_RTTHREAD: RT-Thread functions malloc/realloc/free
  *  - LV_STDLIB_CUSTOM: Implement the functions externally
  */
 #define LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN
@@ -40,6 +40,7 @@
  *  Possible values:
  *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
  *  - LV_STDLIB_CLIB: Standard C functions memcpy/memset/strlen/strcpy
+ *  - LV_STDLIB_RTTHREAD: RT-Thread functions rt_memcpy/rt_memset/rt_strlen/rt_strcpy
  *  - LV_STDLIB_CUSTOM: Implement the functions externally
  */
 #define LV_USE_STDLIB_STRING LV_STDLIB_BUILTIN
@@ -47,19 +48,20 @@
 /** Sprintf functions source
  *  Possible values:
  *  - LV_STDLIB_BUILTIN: LVGL's built in implementation
- *  - LV_STDLIB_CLIB: Standard C functions vsnprintf
+ *  - LV_STDLIB_CLIB: Standard C function vsnprintf
+ *  - LV_STDLIB_RTTHREAD: RT-Thread function rt_vsnprintf
  *  - LV_STDLIB_CUSTOM: Implement the functions externally
  */
 #define LV_USE_STDLIB_SPRINTF LV_STDLIB_BUILTIN
 
-#if LV_USE_BUILTIN_MALLOC
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 /** Size of the memory used by `lv_malloc()` in bytes (Needs to be at least 2kB (2048)) */
 #define LV_MEM_SIZE 65536
 
 /** Address for the memory pool instead of allocating it as a normal array. 0: unused */
 #define LV_MEM_ADR 0x0
 
-#endif /*LV_USE_BUILTIN_MALLOC*/
+#endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
 /** Header for integer types (stdint) */
 #define LV_STDINT_INCLUDE "stdint.h"
@@ -112,9 +114,6 @@
  */
 #define LV_USE_FREERTOS_TASK_NOTIFY 1
 
-#endif /*LV_USE_OS == LV_OS_FREERTOS*/
-
-#if LV_USE_OS == LV_OS_FREERTOS
 /** Enable this to provide a custom implementation of lv_os_get_idle_percent.
  *  This is useful for multi-core systems where the default
  *  FreeRTOS implementation might not sufficiently track idle time across all cores.
@@ -179,9 +178,6 @@
 /** If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more. */
 #define LV_DRAW_THREAD_STACK_SIZE 8192
 
-#endif /*LV_USE_OS != LV_OS_NONE*/
-
-#if LV_USE_OS != LV_OS_NONE
 /** Thread priority controls the relative importance of the drawing threads.
  *  Values correspond to lv_thread_prio_t enum in lv_os.h:
  *  0: LV_THREAD_PRIO_LOWEST
@@ -435,9 +431,6 @@
 /** NemaGFX STM32 HAL include */
 #define LV_NEMA_STM32_HAL_INCLUDE "stm32u5xx_hal.h"
 
-#endif /*LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32*/
-
-#if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
 /** Optional header to override NemaGFX/STM32 HAL-specific macros.
  *
  *  LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
@@ -1864,11 +1857,11 @@
 
 #endif /*LV_USE_PERF_MONITOR*/
 
-#if LV_USE_BUILTIN_MALLOC
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 /** Show the used memory and the memory fragmentation */
 #define LV_USE_MEM_MONITOR 0
 
-#endif /*LV_USE_BUILTIN_MALLOC*/
+#endif /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
 #if LV_USE_MEM_MONITOR
 /** Memory monitor position
