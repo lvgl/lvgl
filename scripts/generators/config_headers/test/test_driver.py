@@ -1,0 +1,48 @@
+"""Smoke tests for the whole-file driver (emit.py).
+
+Asserts that each config type lands in the right surface of the assembled
+files - not exact layout (that's the per-type tests' job)."""
+
+
+def test_template_has_scalars_and_enum_macros(generated):
+    t = generated["template"]
+    assert "#define LV_USE_WAYLAND 0" in t
+    assert "#define LV_DEF_REFR_PERIOD 33" in t
+    assert "#define LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN" in t
+    assert "#define LV_USE_OS LV_OS_NONE" in t
+    assert "#define LV_COLOR_DEPTH 16" in t
+
+
+def test_template_excludes_derived_flag(generated):
+    # Internal capability flags are never offered to the user.
+    assert "LV_DRAW_HAS_VECTOR_SUPPORT" not in generated["template"]
+
+
+def test_internal_has_config_options_block(generated):
+    i = generated["internal"]
+    # Enum tokens are defined once, near the top (deduped across the trio).
+    assert "#define LV_STDLIB_BUILTIN" in i
+    assert "#define LV_OS_NONE" in i
+    # Header-owned tokens are NOT redefined.
+    assert "#define LV_LOG_LEVEL_WARN" not in i
+
+
+def test_internal_defers_derived_flag_to_footer(generated):
+    i = generated["internal"]
+    assert "#if (LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG)" in i
+    # ... and it comes after the body's option ladders.
+    assert i.index("LV_DRAW_HAS_VECTOR_SUPPORT") > i.index("LV_USE_WAYLAND")
+
+
+def test_internal_wraps_options_in_kconfig_ladder(generated):
+    assert "#ifdef CONFIG_LV_USE_WAYLAND" in generated["internal"]
+
+
+def test_internal_footer_has_static_derivations(generated):
+    i = generated["internal"]
+    # Dependency-disable block, INTERNAL||EXTERNAL combos, Wayland backend.
+    assert "#if LV_USE_LOG == 0" in i
+    assert "#ifndef LV_USE_THORVG" in i
+    assert "#ifndef LV_USE_LZ4" in i
+    assert "#define LV_WAYLAND_USE_SHM 0" in i
+    assert "#undef LV_KCONFIG_PRESENT" in i
