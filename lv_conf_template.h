@@ -2183,6 +2183,12 @@
 /** Check NULL, the object's type and existence (e.g. not deleted). (Slow) */
 #define LV_USE_ASSERT_OBJ 0
 
+/** Use LV_ASSERT_CUSTOM_INCLUDE to define the path to a file defining a
+ *  custoM LV_ASSERT_HANDLER
+ */
+#define LV_USE_CUSTOM_ASSERT 0
+
+#if LV_ASSERT_USE_CUSTOM
 /** Optional header to override assert-related macros.
  *
  *  LV_ASSERT_HANDLER
@@ -2190,6 +2196,8 @@
  *    e.g. #define LV_ASSERT_HANDLER my_assert_failed(__FILE__, __LINE__);
  */
 #define LV_ASSERT_CUSTOM_INCLUDE ""
+
+#endif /*LV_ASSERT_USE_CUSTOM*/
 
 /** When enabled, LV_CHECK_ARG checks validate function arguments
  *  at runtime. Failed checks log a warning and execute the specified

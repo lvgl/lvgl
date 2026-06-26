@@ -62,9 +62,17 @@ menu "Asserts"
 	config LV_USE_ASSERT_OBJ
 		bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
 
+	config LV_USE_CUSTOM_ASSERT
+		bool "Use a custom path to define an assertion handler"
+		default n
+		help
+		  Use LV_ASSERT_CUSTOM_INCLUDE to define the path to a file defining a
+		  custoM LV_ASSERT_HANDLER
+
 	config LV_ASSERT_CUSTOM_INCLUDE
 		string "Path to custom assert handler header"
 		default ""
+		depends on LV_ASSERT_USE_CUSTOM
 		help
 		  Optional header to override assert-related macros.
 

@@ -22,6 +22,10 @@ extern "C" {
 #include LV_ASSERT_HANDLER_INCLUDE
 #endif
 
+#if LV_USE_CUSTOM_ASSERT
+#include LV_ASSERT_CUSTOM_INCLUDE
+#endif
+
 #ifndef LV_ASSERT_HANDLER
 #define LV_ASSERT_HANDLER while(1); /*halt by default*/
 #endif
