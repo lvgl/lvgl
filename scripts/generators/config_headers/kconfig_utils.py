@@ -13,7 +13,8 @@ from kconfiglib import (
     BOOL,
     HEX,
     INT,
-    STRING,
+    NOT,
+    OR,
     TRISTATE,
     Choice,
     Symbol,
@@ -171,6 +172,118 @@ def rev_dep_expr(sym) -> str | None:
     if _expr_has_choice(sym.rev_dep):
         return None
     return expr_str(sym.rev_dep)
+
+
+def _is_user_facing(sym) -> bool:
+    """True if *sym* has a prompt on some node, i.e. it is an option the user can
+    set.  No-prompt symbols (internal capability flags like
+    ``LV_DRAW_HAS_VECTOR_SUPPORT``) are derived, never set by hand."""
+    return bool(getattr(sym, "nodes", None)) and any(n.prompt for n in sym.nodes)
+
+
+def constraint_lines(item) -> str:
+    """A comment suffix documenting what *item* pulls in via Kconfig ``select``.
+
+    Returns ``"\\n\\nEnable: <targets>"`` listing the *user-facing* options this
+    one auto-enables, or ``""`` if there are none.  Surfaced in
+    ``lv_conf_template.h`` so a hand-written ``lv_conf.h`` knows to enable them
+    too.  ``depends on`` is intentionally omitted: the template already wraps
+    each option in the matching ``#if`` block, so its dependencies are visible
+    from the nesting.  Hidden (no-prompt) select targets are dropped - the user
+    can't enable an internal flag by hand."""
+    if getattr(item, "kconfig", None) is None:
+        return ""
+    targets = [
+        expr_str(target)
+        for target, _cond in (getattr(item, "selects", None) or [])
+        if _is_user_facing(target)
+    ]
+    if not targets:
+        return ""
+    return "\n\nEnable: " + ", ".join(targets)
+
+
+def collect_sym_refs(expr, acc: set) -> None:
+    """Collect every ``Symbol`` object referenced anywhere in *expr*."""
+    if isinstance(expr, Symbol):
+        acc.add(expr)
+    elif isinstance(expr, tuple):
+        for sub in expr[1:]:
+            collect_sym_refs(sub, acc)
+
+
+def _render_bool_expr(expr, guard):
+    """Render a Kconfig bool expression to ``(c_text, precedence)`` or ``None``.
+
+    Precedence is ``3`` for an atom, ``2`` for ``&&``, ``1`` for ``||`` - used
+    to parenthesize only where C semantics (or readability) require it.
+
+    * a choice *member* listed in *guard* (member -> ``(macro, token)``) renders
+      as ``<macro> == <token>``, valid on both the Kconfig and lv_conf.h paths;
+    * a bare ``Choice`` term (a member's implicit "this choice is active" dep)
+      renders to nothing and is dropped from its enclosing ``&&`` / ``||``;
+    * ``&&`` / ``||`` / ``!`` map directly to C; comparisons fall back to
+      ``expr_str`` (already C-compatible).
+    """
+    if isinstance(expr, Choice):
+        return None
+    if isinstance(expr, Symbol):
+        kconf = expr.kconfig
+        if expr is kconf.y:
+            return ("1", 3)
+        if expr is kconf.n:
+            return ("0", 3)
+        if expr.name in guard:
+            macro, token = guard[expr.name]
+            return (f"{macro} == {token}", 3)
+        if expr.choice is not None and expr.choice.name:
+            return (f"{expr.choice.name} == {expr.name}", 3)
+        return (expr.name, 3)
+    op = expr[0]
+    if op == NOT:
+        inner = _render_bool_expr(expr[1], guard)
+        if inner is None:
+            return None
+        text, prec = inner
+        if prec < 3 or " " in text:
+            text = f"({text})"
+        return (f"!{text}", 3)
+    if op in (AND, OR):
+        left = _render_bool_expr(expr[1], guard)
+        right = _render_bool_expr(expr[2], guard)
+        # A dropped Choice operand leaves the other side standing alone.
+        if left is None:
+            return right
+        if right is None:
+            return left
+        myprec = 2 if op == AND else 1
+        sep = "&&" if op == AND else "||"
+
+        def wrap(piece):
+            text, prec = piece
+            # parens for correctness, plus &&-groups inside || for clarity
+            if prec < myprec or (op == OR and prec == 2):
+                return f"({text})"
+            return text
+
+        return (f"{wrap(left)} {sep} {wrap(right)}", myprec)
+    # comparisons (==, <, ...): kconfiglib already renders C-compatible text.
+    return (expr_str(expr), 3)
+
+
+def rev_dep_c_expr(expr, guard=None) -> str | None:
+    """Render a reverse-dependency expression as a C condition.
+
+    Like :func:`rev_dep_expr` but choice-aware: bare ``Choice`` terms (a
+    member's implicit "this choice is active" dep, e.g. the anonymous Wayland
+    backend choice) are dropped instead of making the whole expression
+    inexpressible.  A named-choice member can be rewritten via *guard* into
+    ``<macro> == <token>``, but callers must only do so when the macro is
+    integer-valued (it is not for the font-default choice - see
+    :func:`config_headers.emit.select_guards`).  Returns ``None`` only if the
+    whole expression renders to nothing."""
+    rendered = _render_bool_expr(expr, guard or {})
+    return rendered[0] if rendered else None
 
 
 def c_comment(text: str) -> list[str]:

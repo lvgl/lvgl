@@ -20,7 +20,9 @@ def test_stdlib_parses_as_enum_choice(entries):
 
 def test_stdlib_emit_template(entries):
     malloc = entries["LV_USE_STDLIB_MALLOC"]
-    assert malloc.emit_template()[-1] == "#define LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN"
+    assert (
+        malloc.emit_template()[-1] == "#define LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN"
+    )
 
 
 def test_stdlib_emit_internal_options_defines_tokens(entries):

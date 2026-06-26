@@ -14,8 +14,10 @@ def test_template_has_scalars_and_enum_macros(generated):
 
 
 def test_template_excludes_derived_flag(generated):
-    # Internal capability flags are never offered to the user.
-    assert "LV_DRAW_HAS_VECTOR_SUPPORT" not in generated["template"]
+    # Internal capability flags are never offered to the user as their own
+    # option (they may still be named in a "Select:" comment of what selects
+    # them, which is fine - that is documentation, not a #define).
+    assert "#define LV_DRAW_HAS_VECTOR_SUPPORT" not in generated["template"]
 
 
 def test_internal_has_config_options_block(generated):
@@ -40,9 +42,11 @@ def test_internal_wraps_options_in_kconfig_ladder(generated):
 
 def test_internal_footer_has_static_derivations(generated):
     i = generated["internal"]
-    # Dependency-disable block, INTERNAL||EXTERNAL combos, Wayland backend.
-    assert "#if LV_USE_LOG == 0" in i
-    assert "#ifndef LV_USE_THORVG" in i
-    assert "#ifndef LV_USE_LZ4" in i
+    # Dependency-disable blocks, the *_EXTERNAL compatibility shims, the Wayland
+    # backend defaults, and the trailing LV_KCONFIG_PRESENT cleanup.
+    assert "#if LV_USE_SYSMON == 0" in i
+    assert "#if LV_BUILD_DEMOS == 0" in i
+    assert "LV_USE_THORVG_EXTERNAL" in i
+    assert "LV_USE_LZ4_EXTERNAL" in i
     assert "#define LV_WAYLAND_USE_SHM 0" in i
     assert "#undef LV_KCONFIG_PRESENT" in i

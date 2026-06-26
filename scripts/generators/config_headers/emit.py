@@ -10,11 +10,17 @@ blocks, the constant "Config options" block, and the static preamble/footer.
 
 from __future__ import annotations
 
-from kconfiglib import COMMENT, MENU, NOT, Choice, Kconfig, Symbol
+from kconfiglib import COMMENT, MENU, NOT, Choice, Kconfig, Symbol, expr_str
 
 from . import templates
-from .config_entry import DerivedFlag, EnumChoice
-from .kconfig_utils import dep_terms, term_key
+from .config_entry import BoolConfig, ConstraintCheck, DerivedFlag, EnumChoice
+from .kconfig_utils import (
+    bool_default,
+    collect_sym_refs,
+    dep_terms,
+    rev_dep_c_expr,
+    term_key,
+)
 from .parse import classify, enum_backed_choices
 
 
@@ -31,14 +37,7 @@ class Emitter:
         self.deferred: list[DerivedFlag] = []  # internal: emitted after the body
         # member symbol -> (macro, token): rewrites a `#if <member>` guard (only
         # valid on the Kconfig path) into `<macro> == <token>` (valid on both).
-        # Only EnumChoice members need this; BoolGroupChoice members are real
-        # #defines, so a `#if <member>` guard already resolves on both paths.
-        self.guard: dict[str, tuple[str, str]] = {}
-        for e in entries:
-            if isinstance(e, EnumChoice):
-                for m in e.members:
-                    if m.member_name:
-                        self.guard[m.member_name] = (e.name, m.token)
+        self.guard: dict[str, tuple[str, str]] = enum_guard_map(entries)
 
     # -- conditional blocks -------------------------------------------------
 
@@ -151,6 +150,95 @@ def collect_groups(kconf: Kconfig) -> list:
 
 
 # ----------------------------------------------------------------------------
+# Constraint checks (#error guards for Kconfig depends/select on the lv_conf.h
+# path - Kconfig already enforces these; this only catches hand-written configs)
+# ----------------------------------------------------------------------------
+
+
+def enum_guard_map(entries) -> dict:
+    """Map each enum choice *member* symbol to ``(macro, token)`` so a bare
+    ``#if <member>`` can be rewritten into ``<macro> == <token>`` - valid on
+    both the Kconfig and lv_conf.h paths."""
+    guard: dict[str, tuple[str, str]] = {}
+    for e in entries:
+        if isinstance(e, EnumChoice):
+            for m in e.members:
+                if m.member_name:
+                    guard[m.member_name] = (e.name, m.token)
+    return guard
+
+
+def _refs_pointer_token(refs, guard) -> bool:
+    """True if any referenced symbol is an enum member whose token is a *pointer*
+    (the ``LV_FONT_DEFAULT_*`` font selectors): ``<macro> == <token>`` is then a
+    pointer comparison the C preprocessor can't evaluate, so the check that needs
+    it can't be expressed and must be skipped.  Integer-valued members (the
+    ``LV_OS_*`` family etc.) are fine."""
+    for r in refs:
+        gm = guard.get(r.name)
+        if gm and gm[1] in templates.BUILTIN_FONTS:
+            return True
+    return False
+
+
+def constraint_checks(entries) -> list[ConstraintCheck]:
+    """Build the ``#error`` guards that replay Kconfig ``select`` / ``depends on``
+    on the hand-written ``lv_conf.h`` path.  Only :class:`BoolConfig` options are
+    guarded (the constraint is "this on/off option needs ...").
+
+    * **select**: something ``select``s the option, so enabling the selector
+      requires the option on -> error when ``(selectors) && !option``.
+    * **depends on**: the option needs its dependency met -> error when
+      ``option && !(deps)``.  Restricted to options that *default off*: a
+      default-on sub-option (e.g. ``LV_LOG_TRACE_*``) emits ``1`` even when its
+      parent feature is off - because ``bool_default`` strips ``depends on`` -
+      which would make the default/``LV_CONF_SKIP`` build error spuriously.  A
+      default-off option emits ``0``, so its check can only fire when the user
+      explicitly turns it on - exactly the case worth catching.
+    """
+    guard = enum_guard_map(entries)
+    checks: list[ConstraintCheck] = []
+    for e in entries:
+        if not isinstance(e, BoolConfig) or e.node is None:
+            continue
+        sym = e.node.item
+        kn = sym.kconfig.n
+
+        # select: enabling a selector requires this option to be on
+        if sym.rev_dep is not kn:
+            refs: set = set()
+            collect_sym_refs(sym.rev_dep, refs)
+            sel = rev_dep_c_expr(sym.rev_dep, guard)
+            if sel is not None and not _refs_pointer_token(refs, guard):
+                checks.append(
+                    ConstraintCheck(
+                        sym.name,
+                        f"({sel}) && !{sym.name}",
+                        f"{sym.name} must be enabled: Kconfig selects it from "
+                        f"{expr_str(sym.rev_dep)}",
+                        node=e.node,
+                    )
+                )
+
+        # depends on: the option may only be enabled if its dependency is met
+        dd = sym.direct_dep
+        if dd is not sym.kconfig.y and dd is not kn and bool_default(sym) == "0":
+            refs = set()
+            collect_sym_refs(dd, refs)
+            dep = rev_dep_c_expr(dd, guard)
+            if dep is not None and not _refs_pointer_token(refs, guard):
+                checks.append(
+                    ConstraintCheck(
+                        sym.name,
+                        f"{sym.name} && !({dep})",
+                        f"{sym.name} requires {expr_str(dd)} (Kconfig depends on)",
+                        node=e.node,
+                    )
+                )
+    return checks
+
+
+# ----------------------------------------------------------------------------
 # Config-options block (constant enum tokens / font pointers)
 # ----------------------------------------------------------------------------
 
@@ -257,6 +345,21 @@ def generate_internal(kconf: Kconfig, entries) -> str:
             deferred += flag.emit_internal()
             deferred.append("")
 
+    # Replay Kconfig `select` / `depends on` as #error guards on the lv_conf.h
+    # path.  Emitted after the footer derivations so checks may reference symbols
+    # computed there (e.g. the Wayland/EGL backend flags).
+    guards: list[str] = []
+    checks = constraint_checks(entries)
+    if checks:
+        guards.append("")
+        guards.append(
+            "/* Kconfig enforces `depends on` / `select`; these checks catch a"
+        )
+        guards.append(" * hand-written lv_conf.h that violates them. */")
+        for c in checks:
+            guards += c.emit_internal()
+            guards.append("")
+
     return (
         preamble
         + "\n"
@@ -266,4 +369,6 @@ def generate_internal(kconf: Kconfig, entries) -> str:
         + "\n"
         + "\n".join(deferred)
         + templates.INTERNAL_FOOTER
+        + "\n".join(guards)
+        + templates.INTERNAL_CLOSE
     )

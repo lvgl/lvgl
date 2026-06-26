@@ -19,7 +19,10 @@ def test_raw_count_symbol_stays_ignored(entries):
 def test_font_default_emits_token(entries):
     font = entries["LV_FONT_DEFAULT"]
     assert isinstance(font, EnumChoice)
-    assert font.emit_template()[-1] == "#define LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_14"
+    assert (
+        font.emit_template()[-1]
+        == "#define LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_14"
+    )
 
 
 def test_font_pointer_table_in_internal_options(generated):
@@ -27,5 +30,7 @@ def test_font_pointer_table_in_internal_options(generated):
 
     i = generated["internal"]
     # token -> pointer, with the column padded to the widest font name.
-    assert re.search(r"#define LV_FONT_DEFAULT_MONTSERRAT_14\s+&lv_font_montserrat_14\b", i)
+    assert re.search(
+        r"#define LV_FONT_DEFAULT_MONTSERRAT_14\s+&lv_font_montserrat_14\b", i
+    )
     assert re.search(r"#define LV_FONT_DEFAULT_UNSCII_8\s+&lv_font_unscii_8\b", i)

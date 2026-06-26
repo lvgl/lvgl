@@ -17,7 +17,13 @@ to it.
 
 from __future__ import annotations
 
-from .kconfig_utils import bool_default, c_comment, doc_text, scalar_default
+from .kconfig_utils import (
+    bool_default,
+    c_comment,
+    constraint_lines,
+    doc_text,
+    scalar_default,
+)
 
 
 class ConfigEntry:
@@ -53,6 +59,11 @@ class ConfigEntry:
 
     def emit_kconfig(self) -> list[str]:
         return []
+
+    def _constraint_doc(self) -> str:
+        """Comment suffix documenting this option's Kconfig selects
+        (``Enable: ...``), or ``""`` if it has none."""
+        return constraint_lines(self.node.item) if self.node is not None else ""
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.name!r})"
@@ -90,7 +101,9 @@ class ScalarConfig(ConfigEntry):
         self.value = value
 
     def emit_template(self) -> list[str]:
-        return c_comment(self.doc) + [f"#define {self.name} {self.value}"]
+        return c_comment(self.doc + self._constraint_doc()) + [
+            f"#define {self.name} {self.value}"
+        ]
 
     def emit_internal(self) -> list[str]:
         return _plain_ladder(self.name, self.value)
@@ -181,40 +194,34 @@ class DerivedFlag(ConfigEntry):
         ]
 
 
-# def _join_blocks(blocks: list[list[str]]) -> list[str]:
-#     """Concatenate line-blocks, separating non-empty ones with a blank line."""
-#     out: list[str] = []
-#     for block in blocks:
-#         if not block:
-#             continue
-#         if out:
-#             out.append("")
-#         out += block
-#     return out
-#
-#
-# class BoolGroupChoice(ConfigEntry):
-#     """An anonymous ``choice`` of mutually-exclusive bool members, emitted as
-#     one ``0/1`` define per member (the THORVG / LZ4 ``INTERNAL`` vs
-#     ``EXTERNAL`` pattern).
-#
-#     There is no enum macro or token - each member is an ordinary
-#     :class:`BoolConfig`, with the selected default at ``1`` and the rest at
-#     ``0`` (so the selected member reuses the ``LV_KCONFIG_PRESENT`` ladder).
-#     On the Kconfig path ``autoconf`` emits each member directly, so
-#     :meth:`emit_kconfig` is empty.
-#     """
-#
-#     def __init__(self, name: str, members: list["BoolConfig"], *, node=None):
-#         super().__init__(name, node=node)
-#         self.members = members
-#
-#     def emit_template(self) -> list[str]:
-#         return _join_blocks([m.emit_template() for m in self.members])
-#
-#     def emit_internal(self) -> list[str]:
-#         return _join_blocks([m.emit_internal() for m in self.members])
-#
+class ConstraintCheck(ConfigEntry):
+    """A compile-time ``#error`` that guards a Kconfig ``depends on`` / ``select``
+    constraint on the hand-written ``lv_conf.h`` path.
+
+    Kconfig already enforces these (a `select` auto-enables the target; a
+    ``depends on`` makes the option unselectable when unmet), so on the Kconfig
+    path the constraint always holds.  But a user editing ``lv_conf.h`` by hand
+    can break it - e.g. enable ``LV_USE_LOTTIE`` without ``LV_USE_THORVG``, or
+    enable ``LV_USE_SLIDER`` while turning ``LV_USE_BAR`` off.  Rather than
+    silently fixing it (which would hide the mistake and could surprise the
+    user), we emit an ``#error`` so the build fails with an explanatory message.
+
+    *condition* is the ``#if`` expression that is true exactly when the
+    constraint is *violated*; *message* is shown to the user.  Emitted near the
+    end of the internal header, where every referenced symbol is defined.
+    """
+
+    def __init__(self, name: str, condition: str, message: str, *, node=None):
+        super().__init__(name, node=node)
+        self.condition = condition
+        self.message = message
+
+    def emit_internal(self) -> list[str]:
+        return [
+            f"#if {self.condition}",
+            f'    #error "{self.message}"',
+            f"#endif",
+        ]
 
 
 class EnumMember:
@@ -275,7 +282,9 @@ class EnumChoice(ConfigEntry):
         self.needs_bridge = needs_bridge
 
     def emit_template(self) -> list[str]:
-        return c_comment(self.doc) + [f"#define {self.name} {self.selected_token}"]
+        return c_comment(self.doc + self._constraint_doc()) + [
+            f"#define {self.name} {self.selected_token}"
+        ]
 
     def emit_internal(self) -> list[str]:
         # The derived int always has a value under Kconfig (a choice always

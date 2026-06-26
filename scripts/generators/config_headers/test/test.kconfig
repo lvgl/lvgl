@@ -137,7 +137,7 @@ config LV_DRAW_HAS_VECTOR_SUPPORT
 	bool
 	default n
 
-# --- Bucket B1: named choice with NO derived int, member == token -------------
+# --- Named choice with NO derived int, member == token -------------
 # Tokens (LV_TXT_ENC_*) live in a C header; emit one macro, define nothing.
 choice LV_TXT_ENC
 	prompt "Select a character encoding for strings"
@@ -148,7 +148,7 @@ choice LV_TXT_ENC
 		bool "ASCII"
 endchoice
 
-# --- Bucket B2: anonymous choice, member != token (CHOICE_TOKEN_MAP) ----------
+# --- Anonymous choice, member != token (CHOICE_TOKEN_MAP) ----------
 # Members LV_SDL_RENDER_MODE_* map to header tokens LV_DISPLAY_RENDER_MODE_*.
 choice
 	prompt "SDL rendering mode"
@@ -161,16 +161,12 @@ choice
 		bool "Full mode"
 endchoice
 
-# --- Bucket A: ignored (internal raw count) and deprecated --------------------
-config LV_SDL_BUFFER_COUNT
-	int
-	default 1
-
+# --- Deprecated Symbols -----------------------------------------------------
 config LV_MEM_SIZE_KILOBYTES
 	int "Memory size (KB) [DEPRECATED: use LV_MEM_SIZE]"
 	default 0
 
-# --- Bucket C: computed-int alias (LV_SDL_BUF_COUNT pattern) -------------------
+# --- Computed-int alias (LV_SDL_BUF_COUNT pattern) -------------------
 # A bare int whose default references a computed int; resolves to the value.
 choice
 	prompt "SDL buffer size"
@@ -190,7 +186,7 @@ config LV_SDL_BUF_COUNT
 	int
 	default LV_SDL_BUFFER_COUNT
 
-# --- Bucket C: font default (named choice; tokens map to pointers) ------------
+# --- Font default (named choice; tokens map to pointers) handled via special logic ------------
 choice LV_FONT_DEFAULT
 	prompt "Default font"
 	default LV_FONT_DEFAULT_MONTSERRAT_14

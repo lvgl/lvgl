@@ -18,7 +18,6 @@ from kconfiglib import BOOL, HEX, INT, STRING, TRISTATE, Choice, Kconfig, Symbol
 
 from .config_entry import (
     BoolConfig,
-    # BoolGroupChoice,
     ConfigEntry,
     DerivedFlag,
     EnumChoice,
@@ -32,7 +31,6 @@ from .kconfig_utils import (
     doc_text,
     int_const_value,
     is_int_const,
-    member_description,
     resolve_int_value,
     rev_dep_expr,
     term_key,
@@ -338,29 +336,7 @@ def enum_backed_choices(kconf: Kconfig) -> set:
     return out
 
 
-# def _build_bool_group(choice, node) -> BoolGroupChoice | None:
-#     """An anonymous bool choice (THORVG/LZ4): one 0/1 bool per member, the
-#     selected default at 1.  Named non-enum choices are not handled yet."""
-#     if choice.name:
-#         return None
-#     # Use the *active* selection (no default fallback): when the choice is
-#     # gated off, kconfiglib reports no selection, so every member reads 0 -
-#     # matching how a disabled feature's members appear in the snapshot.
-#     selected = choice.selection
-#     members = []
-#     m = node.list
-#     while m:
-#         if isinstance(m.item, Symbol):
-#             value = "1" if m.item is selected else "0"
-#             members.append(BoolConfig(m.item.name, value, node=m, doc=doc_text(m)))
-#         m = m.next
-#     if not members:
-#         return None
-#     name = node.prompt[0] if node.prompt else members[0].name
-#     return BoolGroupChoice(name, members, node=node)
-
-
-def classify(node, enum_choices: set = frozenset()) -> ConfigEntry | None:
+def classify(node, enum_choices: frozenset = frozenset()) -> ConfigEntry | None:
     """Map a single Kconfig ``MenuNode`` to a typed ``ConfigEntry``.
 
     *enum_choices* is the set from :func:`enum_backed_choices`; a choice in it

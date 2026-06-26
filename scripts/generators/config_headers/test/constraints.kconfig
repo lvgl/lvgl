@@ -1,0 +1,59 @@
+# Fixture for the ConstraintCheck mechanism: Kconfig `select` / `depends on`
+# replayed as #error guards on the hand-written lv_conf.h path.
+
+# --- select: AAA selects BBB -> check that BBB is on whenever AAA is ----------
+config LV_USE_AAA
+	bool "AAA"
+	default n
+	select LV_USE_BBB
+
+config LV_USE_BBB
+	bool "BBB"
+	default n
+
+# --- depends on, default-off: EEE needs AAA -> check (skip-mode safe) ---------
+config LV_USE_EEE
+	bool "EEE"
+	default n
+	depends on LV_USE_AAA
+
+# --- depends on, default-ON: FFF needs AAA -> NO check -----------------------
+# bool_default strips `depends on`, so FFF emits 1 even when AAA is off; a check
+# would fire spuriously under LV_CONF_SKIP, so default-on options are skipped.
+config LV_USE_FFF
+	bool "FFF"
+	default y
+	depends on LV_USE_AAA
+
+# --- select via a font-default (pointer token) member -> EXCLUDED ------------
+# LV_FONT_DEFAULT_MONTSERRAT_14 expands to a font pointer, so the rewritten
+# `LV_FONT_DEFAULT == LV_FONT_DEFAULT_MONTSERRAT_14` is not preprocessor-
+# evaluable; the select check for LV_FONT_X must be skipped.
+config LV_FONT_X
+	bool "Font X"
+	default n
+
+choice LV_FONT_DEFAULT
+	prompt "Default font"
+	default LV_FONT_DEFAULT_MONTSERRAT_14
+	config LV_FONT_DEFAULT_MONTSERRAT_14
+		bool "Montserrat 14"
+		select LV_FONT_X
+	config LV_FONT_DEFAULT_UNSCII_8
+		bool "UNSCII 8"
+endchoice
+
+# --- DerivedFlag (no prompt, set only via select) -> NOT a ConstraintCheck ----
+config LV_USE_DDD
+	bool "DDD"
+	default n
+	select LV_HAS_CAP
+
+config LV_HAS_CAP
+	bool
+	default n
+
+# --- plain bool, no constraints ---------------------------------------------
+config LV_USE_PLAIN
+	bool "Plain"
+	default n

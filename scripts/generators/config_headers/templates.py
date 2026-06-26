@@ -227,20 +227,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #undef LV_KCONFIG_PRESENT
 
-/* Disable VGLite drivers if VGLite drawing is disabled */
-#ifndef LV_USE_VG_LITE_DRIVER
-    #define LV_USE_VG_LITE_DRIVER 0
-#endif
-
-#ifndef LV_USE_VG_LITE_THORVG
-    #define LV_USE_VG_LITE_THORVG 0
-#endif
-
-#ifndef LV_NEMA_USE_CACHE
-    #define LV_NEMA_USE_CACHE 0
-#endif
-
-/* Set some defines if a dependency is disabled. */
 #if LV_USE_WAYLAND
     /* Backend is selected explicitly (Kconfig choice or lv_conf.h).  EGL/G2D are
      * resolved first; SHM is the fallback only when neither is selected, so the
@@ -284,32 +270,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LINUX_DRM_USE_EGL 0
 #endif /*LV_USE_LINUX_DRM*/
 
-#if LV_USE_SYSMON == 0
-    #define LV_USE_PERF_MONITOR 0
-    #define LV_USE_MEM_MONITOR 0
-    #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
-#endif /*LV_USE_SYSMON*/
-
-#if LV_USE_PERF_MONITOR == 0
-    #define LV_USE_PERF_MONITOR_LOG_MODE 0
-#endif /*LV_USE_PERF_MONITOR*/
-
-#if LV_BUILD_DEMOS == 0
-    #define LV_USE_DEMO_WIDGETS 0
-    #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
-    #define LV_USE_DEMO_BENCHMARK 0
-    #define LV_USE_DEMO_RENDER 0
-    #define LV_USE_DEMO_STRESS 0
-    #define LV_USE_DEMO_MUSIC 0
-    #define LV_USE_DEMO_VECTOR_GRAPHIC  0
-    #define LV_USE_DEMO_FLEX_LAYOUT     0
-    #define LV_USE_DEMO_MULTILANG       0
-    #define LV_USE_DEMO_EBIKE           0
-    #define LV_USE_DEMO_HIGH_RES        0
-    #define LV_USE_DEMO_SMARTWATCH      0
-    #define LV_USE_DEMO_GLTF            0
-#endif /* LV_BUILD_DEMOS */
-
 #if LV_USE_SDL && LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
     #define LV_SDL_USE_EGL 1
 #else
@@ -349,7 +309,12 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #ifndef LV_CHECK_ARG_LOG_MODE
     #define LV_CHECK_ARG_LOG_MODE   0
 #endif
+"""
 
+# Closing guard of lv_conf_internal.h.  Kept separate from INTERNAL_FOOTER so the
+# generated `select` guards can be emitted between the footer derivations and the
+# final `#endif`.
+INTERNAL_CLOSE = """
 #endif  /*LV_CONF_INTERNAL_H*/
 """
 

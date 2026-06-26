@@ -28,7 +28,10 @@ def test_mapped_choice_uses_macro_and_mapped_tokens(entries):
     assert isinstance(mode, EnumChoice)
     # ...and the selected member maps to the header token.
     assert mode.selected_token == "LV_DISPLAY_RENDER_MODE_DIRECT"
-    assert mode.emit_template()[-1] == "#define LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT"
+    assert (
+        mode.emit_template()[-1]
+        == "#define LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT"
+    )
 
 
 def test_mapped_choice_members_do_not_leak_as_bools(entries):
