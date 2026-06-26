@@ -72,7 +72,7 @@ menu "Asserts"
 	config LV_ASSERT_CUSTOM_INCLUDE
 		string "Path to custom assert handler header"
 		default ""
-		depends on LV_ASSERT_USE_CUSTOM
+		depends on LV_USE_CUSTOM_ASSERT
 		help
 		  Optional header to override assert-related macros.
 
