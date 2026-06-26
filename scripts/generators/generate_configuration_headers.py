@@ -82,12 +82,6 @@ IGNORE_SYMBOLS: set[str] = {
     # from the INTERNAL/EXTERNAL bools; not part of the public lv_conf.h surface.
     "LV_USE_THORVG",
     "LV_USE_LZ4",
-    # Numeric Kconfig aliases of choices that the template expresses
-    # symbolically (e.g. `LV_LOG_LEVEL_WARN` rather than `2`).  See ENUM_CHOICES.
-    "LV_LOG_LEVEL",
-    "LV_USE_DRAW_SW_ASM",
-    "LV_CHECK_ARG_LOG_MODE",
-    "LV_SDL_MOUSEWHEEL_MODE",
     # Internal "raw" count that the public LV_SDL_BUF_COUNT alias mirrors.
     "LV_SDL_BUFFER_COUNT",
     # Wayland backend bools are handled in the internal-header footer (gated by
@@ -105,32 +99,6 @@ IGNORE_SYMBOLS: set[str] = {
 # three selectors, so members must have distinct names), map them here:
 #   frozenset(member names) -> (macro, {member: token} or None for identity)
 ENUM_CHOICES: dict = {
-    frozenset(
-        {
-            "LV_LOG_LEVEL_TRACE",
-            "LV_LOG_LEVEL_INFO",
-            "LV_LOG_LEVEL_WARN",
-            "LV_LOG_LEVEL_ERROR",
-            "LV_LOG_LEVEL_USER",
-            "LV_LOG_LEVEL_NONE",
-        }
-    ): ("LV_LOG_LEVEL", None),
-    frozenset(
-        {
-            "LV_DRAW_SW_ASM_NONE",
-            "LV_DRAW_SW_ASM_NEON",
-            "LV_DRAW_SW_ASM_HELIUM",
-            "LV_DRAW_SW_ASM_RISCV_V",
-            "LV_DRAW_SW_ASM_CUSTOM",
-        }
-    ): ("LV_USE_DRAW_SW_ASM", None),
-    frozenset(
-        {
-            "LV_CHECK_ARG_LOG_MODE_NONE",
-            "LV_CHECK_ARG_LOG_MODE_MINIMAL",
-            "LV_CHECK_ARG_LOG_MODE_VERBOSE",
-        }
-    ): ("LV_CHECK_ARG_LOG_MODE", None),
     frozenset(
         {
             "LV_SDL_RENDER_MODE_PARTIAL",
@@ -159,12 +127,6 @@ ENUM_CHOICES: dict = {
             "LV_LINUX_FBDEV_RENDER_MODE_FULL": "LV_DISPLAY_RENDER_MODE_FULL",
         },
     ),
-    frozenset(
-        {
-            "LV_SDL_MOUSEWHEEL_MODE_ENCODER",
-            "LV_SDL_MOUSEWHEEL_MODE_CROWN",
-        }
-    ): ("LV_SDL_MOUSEWHEEL_MODE", None),
     # Performance / memory monitor screen position -> LV_ALIGN_* tokens.
     frozenset(
         {
@@ -235,66 +197,11 @@ ENUM_CHOICES: dict = {
 # ============================================================================
 # CONFIG-OPTION CONSTANTS
 # ============================================================================
-# Symbolic tokens that enum-style options (and LV_FONT_DEFAULT) expand to.  They
-# are emitted verbatim into the "Config options" block at the top of
-# lv_conf_internal.h, so both the lv_conf.h path (`#define LV_USE_OS LV_OS_NONE`)
-# and the Kconfig bridge (`#define CONFIG_LV_USE_OS LV_OS_NONE`) resolve through
-# the same table.  Each group is `token -> C value`; CONFIG_OPTION_GROUPS fixes
-# the emission order and the optional section comment.
-
-OS_OPTIONS: dict = {
-    "LV_OS_NONE": "0",
-    "LV_OS_PTHREAD": "1",
-    "LV_OS_FREERTOS": "2",
-    "LV_OS_CMSIS_RTOS2": "3",
-    "LV_OS_RTTHREAD": "4",
-    "LV_OS_WINDOWS": "5",
-    "LV_OS_MQX": "6",
-    "LV_OS_SDL2": "7",
-    "LV_OS_CUSTOM": "255",
-}
-
-# STDLIB_OPTIONS: dict = {
-#     "LV_STDLIB_BUILTIN": "0",
-#     "LV_STDLIB_CLIB": "1",
-#     "LV_STDLIB_MICROPYTHON": "2",
-#     "LV_STDLIB_RTTHREAD": "3",
-#     "LV_STDLIB_CUSTOM": "255",
-# }
-
-DRAW_SW_ASM_OPTIONS: dict = {
-    "LV_DRAW_SW_ASM_NONE": "0",
-    "LV_DRAW_SW_ASM_NEON": "1",
-    "LV_DRAW_SW_ASM_HELIUM": "2",
-    "LV_DRAW_SW_ASM_RISCV_V": "3",
-    "LV_DRAW_SW_ASM_CUSTOM": "255",
-}
-
-NEMA_LIB_OPTIONS: dict = {
-    "LV_NEMA_LIB_NONE": "0",
-    "LV_NEMA_LIB_M33_REVC": "1",
-    "LV_NEMA_LIB_M33_NEMAPVG": "2",
-    "LV_NEMA_LIB_M55": "3",
-    "LV_NEMA_LIB_M7": "4",
-}
-
-NEMA_HAL_OPTIONS: dict = {
-    "LV_NEMA_HAL_CUSTOM": "0",
-    "LV_NEMA_HAL_STM32": "1",
-}
-
-NANOVG_BACKEND_OPTIONS: dict = {
-    "LV_NANOVG_BACKEND_GL2": "1",
-    "LV_NANOVG_BACKEND_GL3": "2",
-    "LV_NANOVG_BACKEND_GLES2": "3",
-    "LV_NANOVG_BACKEND_GLES3": "4",
-}
-
-CHECK_ARG_LOG_MODE_OPTIONS: dict = {
-    "LV_CHECK_ARG_LOG_MODE_NONE": "0",
-    "LV_CHECK_ARG_LOG_MODE_MINIMAL": "1",
-    "LV_CHECK_ARG_LOG_MODE_VERBOSE": "2",
-}
+# Symbolic tokens that LV_FONT_DEFAULT expands to, emitted verbatim into the
+# "Config options" block at the top of lv_conf_internal.h.  Enum-style options
+# (LV_USE_OS, LV_USE_DRAW_SW_ASM, ...) used to live here too, but their token
+# int-values are now derived from Kconfig int-alias configs (see
+# INT_ALIAS_ENUMS / int_alias_token_groups); only the font selectors remain.
 
 BUILTIN_FONTS: dict = {
     "LV_FONT_DEFAULT_MONTSERRAT_8": "&lv_font_montserrat_8",
@@ -326,15 +233,10 @@ BUILTIN_FONTS: dict = {
     "LV_FONT_DEFAULT_UNSCII_16": "&lv_font_unscii_16",
 }
 
-# (section comment, token->value table); emission order is significant.
+# (section comment, token->value table); emission order is significant.  Enum
+# token values are derived from Kconfig (see int_alias_token_groups /
+# enum_token_groups); only the font selectors remain hard-coded here.
 CONFIG_OPTION_GROUPS: list = [
-    ("OS Options", OS_OPTIONS),
-    # ("Standard Library Options", STDLIB_OPTIONS),
-    ("Draw SW ASM Options", DRAW_SW_ASM_OPTIONS),
-    ("NemaGFX Options", NEMA_LIB_OPTIONS),
-    (None, NEMA_HAL_OPTIONS),
-    ("NanoVG Options", NANOVG_BACKEND_OPTIONS),
-    ("Check Arg Options", CHECK_ARG_LOG_MODE_OPTIONS),
     ("Built-in font selectors for LV_FONT_DEFAULT", BUILTIN_FONTS),
 ]
 
@@ -351,6 +253,7 @@ def render_config_options(kconf: Kconfig = None) -> str:
     groups = list(CONFIG_OPTION_GROUPS)
     if kconf is not None:
         groups += enum_token_groups(kconf)
+        groups += int_alias_token_groups(kconf)
     blocks = []
     for comment, options in groups:
         width = max(len(name) for name in options)
@@ -504,15 +407,117 @@ def enum_token_groups(kconf: Kconfig) -> list:
     for s in kconf.unique_defined_syms:
         if s.name not in referenced or not is_enum_token(s):
             continue
-        title = ""
-        node = s.nodes[0].parent
-        while node is not None and node is not kconf.top_node:
-            if node.prompt:
-                title = node.prompt[0]
-                break
-            node = node.parent
-        groups.setdefault(title, {})[s.name] = s.str_value
+        groups.setdefault(_enclosing_menu_title(s.nodes[0], kconf), {})[
+            s.name
+        ] = s.str_value
     return list(groups.items())
+
+
+def _enclosing_menu_title(node, kconf: Kconfig) -> str:
+    """The prompt of the nearest enclosing menu/choice, used to title a
+    Kconfig-derived "Config options" group."""
+    p = node.parent
+    while p is not None and p is not kconf.top_node:
+        if p.prompt:
+            return p.prompt[0]
+        p = p.parent
+    return ""
+
+
+# Token families that already exist in LVGL's C headers (e.g. lv_log.h,
+# lv_sdl_window.h).  We reference them by name but never (re)define them in the
+# generated headers.
+HEADER_OWNED_TOKEN_PREFIXES = (
+    "LV_LOG_LEVEL_",
+    "LV_SDL_MOUSEWHEEL_MODE_",
+)
+
+
+def is_header_owned_token(name: str) -> bool:
+    return name.startswith(HEADER_OWNED_TOKEN_PREFIXES)
+
+
+# Int-alias enum macros (member==token): the macro emits the selected member
+# name and the members are the enum tokens, with values from the alias literals
+# (e.g. LV_USE_DRAW_SW_ASM over LV_DRAW_SW_ASM_*).  Listed explicitly because the
+# shape alone can't distinguish them from a numeric value-alias whose members
+# merely *select a number* (LV_COLOR_DEPTH -> 16) or a computed selector
+# (LV_SDL_BUFFER_COUNT).  Only the names are hard-coded; members, tokens and
+# their values are all derived from Kconfig.
+INT_ALIAS_ENUMS: set = {
+    "LV_USE_DRAW_SW_ASM",
+    "LV_SDL_MOUSEWHEEL_MODE",
+    "LV_LOG_LEVEL",
+    "LV_CHECK_ARG_LOG_MODE",
+    "LV_USE_OS",
+    "LV_USE_NEMA_LIB",
+    "LV_USE_NEMA_HAL",
+    "LV_NANOVG_BACKEND",
+}
+
+
+def int_alias_members(sym: Symbol):
+    """If *sym* is an int/hex config whose every default is
+    ``<int-literal> if <member>`` over a single choice (so the member name *is*
+    the enum token), return ``(choice, {member_name: literal})``; else ``None``.
+
+    The member==token sibling of `enum_derived_choice`.  The enclosing ``if`` is
+    AND-folded by kconfiglib into every default condition, so strip the symbol's
+    own direct dependencies (as `define_value` does) before isolating the member."""
+    if sym.type not in (INT, HEX) or not sym.defaults:
+        return None
+    dd_keys = {term_key(x) for x in dep_terms(sym.direct_dep)}
+    choice = None
+    values: dict = {}
+    for value, cond in sym.defaults:
+        if not (isinstance(value, Symbol) and not value.nodes):
+            return None
+        try:
+            int(value.name, 0)
+        except (ValueError, TypeError):
+            return None
+        rest = [x for x in dep_terms(cond) if term_key(x) not in dd_keys]
+        if len(rest) != 1:
+            return None
+        member = rest[0]
+        if not (isinstance(member, Symbol) and member.choice is not None):
+            return None
+        if choice is None:
+            choice = member.choice
+        elif member.choice is not choice:
+            return None
+        values[member.name] = value.name
+    return (choice, values) if choice is not None else None
+
+
+def int_alias_enum_choices(kconf: Kconfig) -> dict:
+    """``{macro_name: (choice, {member: value})}`` for the allow-listed int-alias
+    enum macros that resolve cleanly against the current Kconfig.
+
+    Iterates in Kconfig definition order (not INT_ALIAS_ENUMS set order) so the
+    generated output is deterministic across interpreter runs."""
+    out: dict = {}
+    for sym in kconf.unique_defined_syms:
+        if sym.name not in INT_ALIAS_ENUMS:
+            continue
+        m = int_alias_members(sym)
+        if m:
+            out[sym.name] = m
+    return out
+
+
+def int_alias_token_groups(kconf: Kconfig) -> list:
+    """Config-options groups for int-alias enum members (member==token), with
+    values from the alias literals.  Header-owned token families are skipped."""
+    groups: dict = {}
+    for macro, (choice, values) in int_alias_enum_choices(kconf).items():
+        cnode = choice.nodes[0]
+        title = cnode.prompt[0] if cnode.prompt else _enclosing_menu_title(cnode, kconf)
+        for member, value in values.items():
+            if is_header_owned_token(member):
+                continue
+            groups.setdefault(title, {})[member] = value
+    return [(t, opts) for t, opts in groups.items() if opts]
 
 
 # ============================================================================
@@ -593,6 +598,13 @@ class Emitter:
                 _, tokenmap = derived
                 for member, token in tokenmap.items():
                     self.enum_member_guard[member] = (s.name, token)
+        # Int-alias enum macros (member==token), e.g. LV_USE_DRAW_SW_ASM over
+        # LV_DRAW_SW_ASM_*.  The macro emits the selected member symbolically;
+        # its members guard nothing extra (the member symbol == the token).
+        self.int_alias: dict = int_alias_enum_choices(kconf)
+        for macro, (_, values) in self.int_alias.items():
+            for member in values:
+                self.enum_member_guard.setdefault(member, (macro, member))
 
     # -- conditional blocks ------------------------------------------------
 
@@ -646,11 +658,7 @@ class Emitter:
             (e.g. `LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN`);
           - members of a *named* choice         -> `CHOICE == MEMBER`.
         Other terms keep their plain symbol/expression text."""
-        if (
-            isinstance(term, tuple)
-            and term[0] == NOT
-            and isinstance(term[1], Symbol)
-        ):
+        if isinstance(term, tuple) and term[0] == NOT and isinstance(term[1], Symbol):
             sym = term[1]
             if sym.name in self.enum_member_guard:
                 macro, token = self.enum_member_guard[sym.name]
@@ -728,6 +736,17 @@ class Emitter:
             return
         # Ignore deprecated configs
         if node.help is not None and node.help.startswith("Deprecated"):
+            return
+        # Int-alias enum macro (member==token): emit the selected member name
+        # symbolically with the choice's "Possible values" doc, rather than the
+        # numeric value define_value() would resolve from the literal defaults.
+        if sym.name in self.int_alias:
+            choice, _ = self.int_alias[sym.name]
+            sel = choice_default(choice)
+            doc = self._choice_doc(choice.nodes[0], list(choice.syms), None)
+            self._emit_define(
+                node, sym.name, sel.name if sel else "0", base_keys, doc=doc
+            )
             return
         # An enum-derived macro inherits its selector choice's "Possible values"
         # doc (the role the old ENUM_CHOICES table filled).
@@ -1155,9 +1174,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 def template_to_internal(template_text: str, kconf: Kconfig = None) -> str:
     """Transform generated lv_conf_template.h text into lv_conf_internal.h."""
     out = [
-        INTERNAL_PREAMBLE.replace(
-            "__CONFIG_OPTIONS__", render_config_options(kconf)
-        )
+        INTERNAL_PREAMBLE.replace("__CONFIG_OPTIONS__", render_config_options(kconf))
     ]
     started = False
     for line in template_text.splitlines():
@@ -1266,7 +1283,7 @@ KCONFIG_BRIDGE_DEPRECATIONS = """\
  * LV_MEM_SIZE
  *******************/
 
-#ifdef CONFIG_LV_MEM_SIZE_KILOBYTES
+#if defined(CONFIG_LV_MEM_SIZE_KILOBYTES) && CONFIG_LV_MEM_SIZE_KILOBYTES > 0
 #warning "LV_MEM_SIZE_KILOBYTES is deprecated, use LV_MEM_SIZE instead (value in bytes)"
 #ifndef CONFIG_LV_MEM_SIZE
 #define CONFIG_LV_MEM_SIZE (LV_MEM_SIZE_KILOBYTES * 1024U)
@@ -1276,7 +1293,7 @@ KCONFIG_BRIDGE_DEPRECATIONS = """\
 #undef CONFIG_LV_MEM_SIZE_KILOBYTES
 #endif
 
-#ifdef CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
+#if defined(CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES) && CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES > 0
 #warning "LV_MEM_POOL_EXPAND_SIZE_KILOBYTES is deprecated, set the full memory size with LV_MEM_SIZE instead (value in bytes)"
 #define CONFIG_LV_MEM_POOL_EXPAND_SIZE (CONFIG_LV_MEM_POOL_EXPAND_SIZE_KILOBYTES * 1024U)
 #endif
