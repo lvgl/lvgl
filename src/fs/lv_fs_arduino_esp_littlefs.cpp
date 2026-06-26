@@ -1,8 +1,7 @@
 #include "lv_fs_private.h"
-#include "../core/lv_global.h"
 #if LV_USE_FS_ARDUINO_ESP_LITTLEFS
 
-#include "../../core/lv_global.h"
+#include "../core/lv_global.h"
 #include <LittleFS.h>
 
 #if !LV_FS_IS_VALID_LETTER(LV_FS_ARDUINO_ESP_LITTLEFS_LETTER)
