@@ -22,6 +22,18 @@ choice LV_USE_OS
 		bool "255: CUSTOM"
 endchoice
 
+config LV_USE_OS
+	int
+	default 0 if LV_OS_NONE
+	default 1 if LV_OS_PTHREAD
+	default 2 if LV_OS_FREERTOS
+	default 3 if LV_OS_CMSIS_RTOS2
+	default 4 if LV_OS_RTTHREAD
+	default 5 if LV_OS_WINDOWS
+	default 6 if LV_OS_MQX
+	default 7 if LV_OS_SDL2
+	default 255 if LV_OS_CUSTOM
+
 config LV_OS_CUSTOM_INCLUDE
 	string "Custom OS include header"
 	default ""

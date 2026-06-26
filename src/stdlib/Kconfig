@@ -105,11 +105,13 @@ config LV_MEM_SIZE
 
 config LV_MEM_SIZE_KILOBYTES
 	int "Memory size (KB) [DEPRECATED: use LV_MEM_SIZE]"
+	default 0
 	help
 	  Deprecated. Use LV_MEM_SIZE (in bytes) instead.
 
 config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
 	int "Size of the memory expand for `lv_malloc()` in kilobytes [DEPRECATED: use LV_MEM_SIZE directly]"
+	default 0
 	help
 	  Deprecated. Modify LV_MEM_SIZE (in bytes) directly instead.
 

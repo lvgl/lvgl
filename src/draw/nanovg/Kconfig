@@ -27,6 +27,13 @@ choice LV_NANOVG_BACKEND
 		bool "OpenGL ES 3.0+"
 endchoice
 
+config LV_NANOVG_BACKEND
+	int
+	default 1 if LV_NANOVG_BACKEND_GL2
+	default 2 if LV_NANOVG_BACKEND_GL3
+	default 3 if LV_NANOVG_BACKEND_GLES2
+	default 4 if LV_NANOVG_BACKEND_GLES3
+
 config LV_NANOVG_IMAGE_CACHE_CNT
 	int "Draw image texture cache count"
 	default 128
