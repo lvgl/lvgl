@@ -16,7 +16,7 @@ config LV_USE_OPENGLES_DEBUG
 endif # LV_USE_OPENGLES
 
 config LV_USE_EGL
-	def_bool n
+	bool n
 	help
 	  Selected automatically when a backend requiring EGL is enabled
 	  (e.g. LV_USE_WAYLAND_BACKEND_EGL, LV_USE_LINUX_DRM_EGL).
