@@ -1236,9 +1236,13 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
     }
     else {
         uint16_t res = 0;
+        bool skip_transparent = mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_ADDITIVE;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *) dest_buf_u16;
             for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
+                lv_opa_t src_opa = src_buf_u8[src_x + 3];
+                if(skip_transparent && src_opa == LV_OPA_TRANSP) continue;
+
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
                         res = (LV_MIN(dest_buf_c16[dest_x].red + (src_buf_u8[src_x + 2] >> 3), 31)) << 11;
@@ -1266,15 +1270,15 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                 }
 
                 if(mask_buf == NULL && opa >= LV_OPA_MAX) {
-                    dest_buf_u16[dest_x] = lv_color_16_16_mix(res, dest_buf_u16[dest_x], src_buf_u8[src_x + 3]);
+                    dest_buf_u16[dest_x] = lv_color_16_16_mix(res, dest_buf_u16[dest_x], src_opa);
                 }
                 else if(mask_buf == NULL && opa < LV_OPA_MAX) {
-                    dest_buf_u16[dest_x] = lv_color_16_16_mix(res, dest_buf_u16[dest_x], LV_OPA_MIX2(opa, src_buf_u8[src_x + 3]));
+                    dest_buf_u16[dest_x] = lv_color_16_16_mix(res, dest_buf_u16[dest_x], LV_OPA_MIX2(opa, src_opa));
                 }
                 else {
                     if(opa >= LV_OPA_MAX) dest_buf_u16[dest_x] = lv_color_16_16_mix(res, dest_buf_u16[dest_x], mask_buf[dest_x]);
                     else dest_buf_u16[dest_x] = lv_color_16_16_mix(res, dest_buf_u16[dest_x], LV_OPA_MIX3(mask_buf[dest_x], opa,
-                                                                                                              src_buf_u8[src_x + 3]));
+                                                                                                              src_opa));
                 }
             }
 
