@@ -21,6 +21,7 @@ from .kconfig_utils import (
     bool_default,
     c_comment,
     doc_text,
+    rev_dep_c_expr,
     scalar_default,
     select_lines,
 )
@@ -64,6 +65,16 @@ class ConfigEntry:
         """Comment suffix documenting this option's Kconfig selects
         (``Enable: ...``), or ``""`` if it has none."""
         return select_lines(self.node.item) if self.node is not None else ""
+
+    def depends_on_c(self) -> str | None:
+        """C condition from this option's `depends on`, or None if unconditional."""
+        if self.node is None:
+            return None
+        sym = self.node.item
+        dep = getattr(sym, "direct_dep", None)
+        if dep is None or dep is sym.kconfig.y:
+            return None
+        return rev_dep_c_expr(dep)
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.name!r})"
@@ -128,8 +139,10 @@ class BoolConfig(ScalarConfig):
         return cls(sym.name, bool_default(sym), node=node, doc=doc_text(node))
 
     def emit_internal(self) -> list[str]:
-        if self.value != "1":
-            return _plain_ladder(self.name, self.value)
+        # Force export as 0 in kconfig if the setting has any dependencies
+        if self.value != "1" or self.depends_on_c() is not None:
+            return _plain_ladder(self.name, "0")
+
         name = self.name
         upper = name.upper()
         return [
