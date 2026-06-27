@@ -181,7 +181,7 @@ def _is_user_facing(sym) -> bool:
     return bool(getattr(sym, "nodes", None)) and any(n.prompt for n in sym.nodes)
 
 
-def constraint_lines(item) -> str:
+def select_lines(item) -> str:
     """A comment suffix documenting what *item* pulls in via Kconfig ``select``.
 
     Returns ``"\\n\\nEnable: <targets>"`` listing the *user-facing* options this

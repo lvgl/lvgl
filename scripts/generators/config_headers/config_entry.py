@@ -20,9 +20,9 @@ from __future__ import annotations
 from .kconfig_utils import (
     bool_default,
     c_comment,
-    constraint_lines,
     doc_text,
     scalar_default,
+    select_lines,
 )
 
 
@@ -60,10 +60,10 @@ class ConfigEntry:
     def emit_kconfig(self) -> list[str]:
         return []
 
-    def _constraint_doc(self) -> str:
+    def _select_doc(self) -> str:
         """Comment suffix documenting this option's Kconfig selects
         (``Enable: ...``), or ``""`` if it has none."""
-        return constraint_lines(self.node.item) if self.node is not None else ""
+        return select_lines(self.node.item) if self.node is not None else ""
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.name!r})"
@@ -101,7 +101,7 @@ class ScalarConfig(ConfigEntry):
         self.value = value
 
     def emit_template(self) -> list[str]:
-        return c_comment(self.doc + self._constraint_doc()) + [
+        return c_comment(self.doc + self._select_doc()) + [
             f"#define {self.name} {self.value}"
         ]
 
@@ -282,7 +282,7 @@ class EnumChoice(ConfigEntry):
         self.needs_bridge = needs_bridge
 
     def emit_template(self) -> list[str]:
-        return c_comment(self.doc + self._constraint_doc()) + [
+        return c_comment(self.doc + self._select_doc()) + [
             f"#define {self.name} {self.selected_token}"
         ]
 
