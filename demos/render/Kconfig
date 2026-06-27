@@ -1,5 +1,5 @@
 config LV_USE_DEMO_RENDER
 	bool "Render test for each primitives. Requires at least 480x272 display"
-	depends on LV_USE_GRID
+	select LV_USE_GRID
 	default n
 

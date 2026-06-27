@@ -116,7 +116,7 @@ config LV_USE_GLTF
 	select LV_USE_3DTEXTURE
 	depends on LV_DRAW_HAS_3D_SUPPORT
 	help
-		Requires `LV_USE_3DTEXTURE = 1`
+		Enables parsing and rendering of 3D models (.gltf/.glb).
 
 config LV_USE_GSTREAMER
 	bool "GStreamer widget"

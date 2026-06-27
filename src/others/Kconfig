@@ -7,9 +7,10 @@ config LV_USE_FRAGMENT
 config LV_USE_FILE_EXPLORER
 	bool "Enable file explorer"
 	default n
+	select LV_USE_TABLE
 	help
 		Enable file explorer.
-		- Requires: lv_table
+
 if LV_USE_FILE_EXPLORER
 config LV_FILE_EXPLORER_PATH_MAX_LEN
 	int "Maximum length of path"

@@ -6,11 +6,11 @@ config LV_USE_TEST
 if LV_USE_TEST
 
 config LV_USE_TEST_SCREENSHOT_COMPARE
-	bool "Enable `lv_test_screenshot_compare`. Requires lodepng and a few MB of extra RAM."
+	bool "Screenshot Compare"
 	select LV_USE_LODEPNG
 	help
 		Enable `lv_test_screenshot_compare`.
-		Requires lodepng and a few MB of extra RAM.
+		Requires a few MB of extra RAM.
 
 config LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
 	bool "Create a reference image by default if it does not exist"

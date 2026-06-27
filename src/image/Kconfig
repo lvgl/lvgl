@@ -73,7 +73,6 @@ config LV_USE_SVG
 	select LV_USE_VECTOR_GRAPHIC
 	help
 		SVG library
-		- Requires `LV_USE_VECTOR_GRAPHIC = 1`
 
 if LV_USE_SVG
 config LV_USE_SVG_ANIMATION

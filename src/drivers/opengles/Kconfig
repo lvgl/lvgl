@@ -4,7 +4,6 @@ config LV_USE_OPENGLES
 	default n
 	help
 		Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
-		- Requires LV_USE_MATRIX.
 
 if LV_USE_OPENGLES
 
@@ -16,10 +15,8 @@ config LV_USE_OPENGLES_DEBUG
 endif # LV_USE_OPENGLES
 
 config LV_USE_EGL
-	bool n
-	help
-	  Selected automatically when a backend requiring EGL is enabled
-	  (e.g. LV_USE_WAYLAND_BACKEND_EGL, LV_USE_LINUX_DRM_EGL).
+	bool
+	default n
 
 config LV_USE_GLFW
 	bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
