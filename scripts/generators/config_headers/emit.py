@@ -10,7 +10,9 @@ blocks, the constant "Config options" block, and the static preamble/footer.
 
 from __future__ import annotations
 
-from kconfiglib import COMMENT, MENU, NOT, Choice, Kconfig, Symbol, expr_str
+import re
+
+from kconfiglib import COMMENT, MENU, NOT, Choice, Kconfig, Symbol
 
 from . import templates
 from .config_entry import BoolConfig, ConstraintCheck, DerivedFlag, EnumChoice
@@ -215,7 +217,7 @@ def constraint_checks(entries) -> list[ConstraintCheck]:
                         sym.name,
                         f"({sel}) && !{sym.name}",
                         f"{sym.name} must be enabled: Kconfig selects it from "
-                        f"{expr_str(sym.rev_dep)}",
+                        f"{sel}",
                         node=e.node,
                     )
                 )
@@ -231,7 +233,7 @@ def constraint_checks(entries) -> list[ConstraintCheck]:
                     ConstraintCheck(
                         sym.name,
                         f"{sym.name} && !({dep})",
-                        f"{sym.name} requires {expr_str(dd)} (Kconfig depends on)",
+                        f"{sym.name} requires {dep} (Kconfig depends on)",
                         node=e.node,
                     )
                 )
@@ -381,6 +383,32 @@ CUSTOM_INCLUDE_NO_GATE: set[str] = {
 INCLUDED_BY_SUBSYSTEM: set[str] = {"LV_GLOBAL_CUSTOM_INCLUDE"}
 
 
+def _order_deferred(flags):
+    """Order derived flags so one referencing another is emitted after it.
+
+    Most derived flags reference only ordinary options (defined earlier in the
+    body), but some aggregate other derived flags - e.g. LV_USE_EGL is the OR of
+    the per-driver LV_*_USE_EGL flags.  Since a ``#if`` needs every macro already
+    defined, emit referenced flags first (stable topological order)."""
+    names = {f.name for f in flags}
+
+    def refs(f):
+        toks = set(re.findall(r"[A-Za-z_]\w*", f.selectors_expr or ""))
+        return {t for t in toks if t in names and t != f.name}
+
+    ordered, done, remaining = [], set(), list(flags)
+    while remaining:
+        ready = [f for f in remaining if refs(f) <= done]
+        if not ready:  # cycle (shouldn't happen): emit the rest as-is
+            ordered.extend(remaining)
+            break
+        for f in ready:
+            ordered.append(f)
+            done.add(f.name)
+            remaining.remove(f)
+    return ordered
+
+
 def generate_internal(kconf: Kconfig, entries) -> str:
     em = _body(kconf, "internal", entries)
     options = render_config_options(entries)
@@ -388,8 +416,27 @@ def generate_internal(kconf: Kconfig, entries) -> str:
 
     deferred: list[str] = []
     if em.deferred:
-        deferred.append("/* Derived capability flags (set via Kconfig `select`). */")
         for flag in em.deferred:
+            # Re-render the selector now that the enum guard map exists: a flag
+            # selected by a choice *member* (e.g. LV_WAYLAND_USE_EGL, set by the
+            # Wayland EGL backend member) must render as `LV_<X>_BACKEND == ..._<Y>`
+            # - valid on both config paths - not the bare member name (which is
+            # only defined on the Kconfig path).  classify() can't do this: the
+            # guard map is built from all entries, which don't exist yet then.
+            if flag.node is not None:
+                sym = flag.node.item
+                sel = rev_dep_c_expr(sym.rev_dep, em.guard)
+                # AND-in the flag's own dependency (its enclosing `if` / `depends
+                # on`, e.g. LV_USE_WAYLAND).  A `select` ignores the target's
+                # deps, so rev_dep alone would read 1 even when the driver is off
+                # - e.g. LV_WAYLAND_USE_SHM, whose LV_WAYLAND_BACKEND defaults to
+                # the SHM token regardless of LV_USE_WAYLAND.
+                dep = rev_dep_c_expr(sym.direct_dep, em.guard)
+                if sel is not None and dep is not None and dep != "1":
+                    sel = f"({sel}) && ({dep})"
+                flag.selectors_expr = sel
+        deferred.append("/* Derived capability flags (set via Kconfig `select`). */")
+        for flag in _order_deferred(em.deferred):
             deferred += flag.emit_internal()
             deferred.append("")
 

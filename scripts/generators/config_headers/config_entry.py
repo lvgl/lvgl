@@ -121,14 +121,7 @@ class ScalarConfig(ConfigEntry):
 
 
 class BoolConfig(ScalarConfig):
-    """A plain on/off option, e.g. ``LV_USE_WAYLAND``.
-
-    A default of ``1`` needs the extra ``LV_KCONFIG_PRESENT`` layer: when
-    Kconfig is in use an *unset* bool emits no ``CONFIG_<name>`` at all and so
-    must read as ``0``, not the LVGL default of ``1``.  A default-``0`` bool
-    has no such ambiguity (absent macro means ``0`` on both paths) and uses the
-    plain ladder.
-    """
+    """A plain on/off option, e.g. ``LV_USE_WAYLAND``."""
 
     def __init__(self, name: str, value: str, *, node=None, doc: str = ""):
         assert value in ("0", "1")
@@ -138,11 +131,10 @@ class BoolConfig(ScalarConfig):
     def from_symbol(cls, sym, node) -> "BoolConfig":
         return cls(sym.name, bool_default(sym), node=node, doc=doc_text(node))
 
-    def emit_internal(self) -> list[str]:
-        # Force export as 0 in kconfig if the setting has any dependencies
-        if self.value != "1" or self.depends_on_c() is not None:
-            return _plain_ladder(self.name, "0")
-
+    def _default_on_ladder(self) -> list[str]:
+        """The ``LV_KCONFIG_PRESENT`` ladder for a default-``1`` bool: ``1`` on
+        the hand-written ``lv_conf.h`` path, ``CONFIG_<name>``-or-``0`` under
+        Kconfig (an unset bool emits no ``CONFIG_<name>``, so it must read 0)."""
         name = self.name
         upper = name.upper()
         return [
@@ -158,6 +150,27 @@ class BoolConfig(ScalarConfig):
             f"    #endif",
             f"#endif",
         ]
+
+    def emit_internal(self) -> list[str]:
+        # Force export as 0 in kconfig if the setting has any dependencies
+        if self.value != "1" or self.depends_on_c() is not None:
+            return _plain_ladder(self.name, "0")
+        return self._default_on_ladder()
+
+
+class LegacyBoolConfig(BoolConfig):
+    """A legacy boolean config
+    The difference with deprecated is that legacy configs are still exported
+    and we always respect the config's default value."""
+
+    def __init__(self, name: str, value: str, *, node=None, doc: str = ""):
+        super().__init__(name, value, node=node, doc=doc)
+
+    def emit_internal(self) -> list[str]:
+        # Always export the correct value even if it has a dependency
+        if self.value != "1":
+            return _plain_ladder(self.name, self.value)
+        return self._default_on_ladder()
 
 
 class IntConfig(ScalarConfig):

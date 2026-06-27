@@ -137,6 +137,57 @@ config LV_DRAW_HAS_VECTOR_SUPPORT
 	bool
 	default n
 
+# --- Driver rendering backend (the LV_<DRIVER>_BACKEND pattern) ----------------
+# A LV_<DRIVER>_BACKEND enum choice the user picks; each member `select`s a
+# hidden per-backend LV_<DRIVER>_USE_* flag (emitted as a DerivedFlag rewritten
+# to `LV_<DRIVER>_BACKEND == ..._<X>` via the guard) plus the capability configs
+# it needs.  LV_USE_EGL aggregates the per-driver EGL flags (ordering).  The
+# deprecated LV_<DRIVER>_AUTO_BACKEND is a LegacyBoolConfig: default-on even
+# though it is gated.  Real names so they fall under MEMBER_IS_TOKEN /
+# LEGACY_DEFAULT_ON.
+config LV_USE_OPENGLES
+	bool "Use LVGL's OpenGL Driver"
+	default n
+
+config LV_USE_EGL
+	bool
+
+config LV_USE_LINUX_DRM
+	bool "Use Linux DRM device"
+	default n
+
+if LV_USE_LINUX_DRM
+
+choice
+	prompt "Rendering backend"
+	default LV_LINUX_DRM_BACKEND_FBDEV
+	depends on !LV_LINUX_DRM_AUTO_BACKEND
+	config LV_LINUX_DRM_BACKEND_FBDEV
+		bool "Dumb buffers (no GPU)"
+	config LV_LINUX_DRM_BACKEND_EGL
+		bool "EGL (OpenGL ES, hardware-accelerated)"
+		# `depends on` (not just `select`) to exercise the per-member "requires"
+		# note; a single-select macro isn't #if-gated per member in the template.
+		depends on LV_USE_DRAW_NANOVG
+		select LV_LINUX_DRM_USE_EGL
+		select LV_USE_OPENGLES
+endchoice
+
+config LV_LINUX_DRM_BACKEND
+	int
+	default 0 if LV_LINUX_DRM_BACKEND_FBDEV
+	default 1 if LV_LINUX_DRM_BACKEND_EGL
+
+config LV_LINUX_DRM_USE_EGL
+	bool
+	select LV_USE_EGL
+
+config LV_LINUX_DRM_AUTO_BACKEND
+	bool "Auto-select the DRM backend (legacy)"
+	default y
+
+endif # LV_USE_LINUX_DRM
+
 # --- Named choice with NO derived int, member == token -------------
 # Tokens (LV_TXT_ENC_*) live in a C header; emit one macro, define nothing.
 choice LV_TXT_ENC

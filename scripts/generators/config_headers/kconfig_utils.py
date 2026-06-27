@@ -1,7 +1,12 @@
-"""Small helpers over kconfiglib expressions and C rendering.
+"""Small helpers for reading kconfiglib options and turning them into C text.
 
-Kept dependency-free of our own model so both the parse and emit layers can use
-them without import cycles.
+Kconfig stores each option as an object carrying dependencies, defaults, and
+expressions.  These helpers pull out the useful bits (an option's default
+value, what it depends on, what it pulls in) and render them as the text that
+goes into the generated config headers.
+
+No imports from our own model, so both the parse and emit layers can use them
+without import cycles.
 """
 
 from __future__ import annotations
@@ -25,25 +30,27 @@ from kconfiglib import (
 
 
 def dep_terms(expr) -> list:
-    """AND-split a dependency expression into its individual terms."""
+    """Flat list of the individual terms in an ``A && B && C`` dependency
+    (here ``[A, B, C]``).  ``[]`` for no expression."""
     if expr is None:
         return []
     return [t for t in split_expr(expr, AND) if t is not None]
 
 
 def term_key(term) -> str:
-    """Stable identity for a dependency term, so terms can be compared/diffed."""
+    """A string id for one dependency term, used to compare two terms for
+    equality."""
     return expr_str(term)
 
 
 def bool_default(sym) -> str:
-    """Return ``"1"`` / ``"0"`` for a bool/tristate symbol's *own* default.
+    """An on/off option's own default, as ``"1"`` or ``"0"``.
 
-    The symbol's ``depends on`` / enclosing ``if`` is AND-folded by kconfiglib
-    into the condition of every default; we strip those terms back out so an
-    option inside ``if LV_USE_X`` still reports the value it would take when
-    that feature is on (not the dependency-suppressed 0).  Conditional defaults
-    (``default y if C``) are still evaluated against the current config.
+    Kconfig secretly glues an option's ``depends on`` onto every one of its
+    defaults, so an option under ``if LV_USE_X`` would read as 0 whenever
+    ``LV_USE_X`` is off.  We strip that glued-on dependency back off to report
+    the value the option takes when its feature is on.  Other conditions on a
+    default (``default y if C``) are still checked against the current config.
     """
     assert sym.type in (BOOL, TRISTATE)
     dd_keys = {term_key(x) for x in dep_terms(sym.direct_dep)}
@@ -55,15 +62,13 @@ def bool_default(sym) -> str:
 
 
 def resolve_int_value(sym) -> str:
-    """Resolve an int/hex symbol to its concrete C value against the current
-    config (with the symbol's own direct deps stripped).
+    """An int/hex option's value as C text (e.g. ``"32"`` or ``"0x40"``).
 
-    Unlike emitting a token *name*, this evaluates each ``default ... if <cond>``
-    in order and returns the first whose condition holds.  When none holds - a
-    gated-off computed count such as ``LV_LINUX_FBDEV_BUFFER_COUNT`` while the
-    driver is disabled - it returns ``0``, matching the default snapshot.
-    References to another int/hex *config* (``LV_SDL_BUF_COUNT`` ->
-    ``LV_SDL_BUFFER_COUNT``) are chased through."""
+    Checks each ``default N if <cond>`` in order (ignoring the option's own
+    ``depends on``) and returns the first that applies.  A default pointing at
+    another int/hex option is followed through to its value.  When nothing
+    applies - e.g. a count gated off because its driver is disabled - returns
+    ``0`` (``0x0`` for hex)."""
     dd_keys = {term_key(x) for x in dep_terms(sym.direct_dep)}
     for value, cond in sym.defaults:
         rest = [x for x in dep_terms(cond) if term_key(x) not in dd_keys]
@@ -78,11 +83,12 @@ def resolve_int_value(sym) -> str:
 
 
 def scalar_default(sym) -> str:
-    """Return the C literal for an int/hex/string symbol's *own* default.
+    """An int/hex/string option's own default, as a C literal.
 
-    Int/hex go through :func:`resolve_int_value` (gating-aware).  Strings keep
-    their quotes (``expr_str`` includes them) and strip the symbol's own deps so
-    a gated option still reports the value it takes when its feature is on.
+    Numbers go through :func:`resolve_int_value`.  Strings keep their quotes
+    (``"foo"``); as with the other defaults, the option's own ``depends on`` is
+    stripped so a gated option reports the value it takes when its feature is
+    on.
     """
     if sym.type in (INT, HEX):
         return resolve_int_value(sym)
@@ -95,7 +101,8 @@ def scalar_default(sym) -> str:
 
 
 def doc_text(node) -> str:
-    """The documentation string for a node: its help, else its prompt."""
+    """An option's documentation text: its help, or its short prompt if there
+    is no help, or ``""``."""
     if node.help:
         return node.help
     if node.prompt:
@@ -104,10 +111,10 @@ def doc_text(node) -> str:
 
 
 def is_int_const(sym) -> bool:
-    """True if *sym* is a named enum-token constant: a no-prompt int/hex config
-    with a single unconditional literal default (e.g. ``LV_STDLIB_BUILTIN`` ->
-    ``0``).  When an enum's derived int defaults to one of these, we emit the
-    token *name* rather than its number."""
+    """True if *sym* is a named token standing for a fixed number: no prompt,
+    one unconditional literal default (e.g. ``LV_STDLIB_BUILTIN`` = ``0``).
+    These are the enum tokens; when an enum picks one we emit its *name*, not
+    the number."""
     if sym.type not in (INT, HEX):
         return False
     if any(node.prompt for node in sym.nodes):
@@ -127,13 +134,13 @@ def is_int_const(sym) -> bool:
 
 
 def int_const_value(sym) -> str:
-    """The literal value of an :func:`is_int_const` symbol, as text."""
+    """The number an :func:`is_int_const` token stands for, as text."""
     return sym.defaults[0][0].name
 
 
 def choice_default(choice):
-    """The choice's selected member, or its default member when inactive (so a
-    gated choice still reports a sensible selection rather than nothing)."""
+    """The selected member of a "pick one" group.  If the group is gated off,
+    the member it would default to - never nothing."""
     if choice.selection:
         return choice.selection
     dd_keys = {term_key(x) for x in dep_terms(getattr(choice, "direct_dep", None))}
@@ -145,66 +152,71 @@ def choice_default(choice):
 
 
 def member_description(member) -> str:
-    """A choice member's human description: its prompt with any leading
-    ``"<n>: "`` ordinal stripped (e.g. ``"1: PTHREAD"`` -> ``"PTHREAD"``)."""
+    """A choice member's human name: its prompt with any leading ``"<n>: "``
+    ordinal removed (``"1: PTHREAD"`` -> ``"PTHREAD"``)."""
     if not (member.nodes and member.nodes[0].prompt):
         return ""
     return re.sub(r"^\s*\d+\s*:\s*", "", member.nodes[0].prompt[0]).strip()
 
 
-def _expr_has_choice(expr) -> bool:
-    """True if a Kconfig expression mentions a ``Choice`` (renders as the
-    non-C-expressible ``<choice>`` token, e.g. a member's implicit dep)."""
-    if isinstance(expr, Choice):
-        return True
-    if isinstance(expr, tuple):
-        return any(_expr_has_choice(x) for x in expr[1:])
-    return False
-
-
-def rev_dep_expr(sym) -> str | None:
-    """The C condition for what ``select``s *sym* (its reverse dependencies),
-    or ``None`` if nothing selects it or the expression isn't C-expressible
-    (mentions a choice).  ``&&`` / ``||`` / ``!`` are identical in Kconfig and
-    C, so ``expr_str`` is directly usable."""
-    if sym.rev_dep is sym.kconfig.n:
-        return None
-    if _expr_has_choice(sym.rev_dep):
-        return None
-    return expr_str(sym.rev_dep)
-
-
 def _is_user_facing(sym) -> bool:
-    """True if *sym* has a prompt on some node, i.e. it is an option the user can
-    set.  No-prompt symbols (internal capability flags like
-    ``LV_DRAW_HAS_VECTOR_SUPPORT``) are derived, never set by hand."""
+    """True if a user can set *sym* by hand (it has a prompt).  No-prompt
+    options - internal flags like ``LV_DRAW_HAS_VECTOR_SUPPORT`` - are derived,
+    never set directly."""
     return bool(getattr(sym, "nodes", None)) and any(n.prompt for n in sym.nodes)
 
 
-def select_lines(item) -> str:
-    """A comment suffix documenting what *item* pulls in via Kconfig ``select``.
+def select_targets(item) -> list[str]:
+    """The user-settable options *item* auto-enables via ``select`` (by name).
 
-    Returns ``"\\n\\nEnable: <targets>"`` listing the *user-facing* options this
-    one auto-enables, or ``""`` if there are none.  Surfaced in
-    ``lv_conf_template.h`` so a hand-written ``lv_conf.h`` knows to enable them
-    too.  ``depends on`` is intentionally omitted: the template already wraps
-    each option in the matching ``#if`` block, so its dependencies are visible
-    from the nesting.  Hidden (no-prompt) select targets are dropped - the user
-    can't enable an internal flag by hand."""
+    Internal (no-prompt) targets are skipped - they can't be enabled by hand, so
+    documenting them would only confuse."""
     if getattr(item, "kconfig", None) is None:
-        return ""
-    targets = [
+        return []
+    return [
         expr_str(target)
         for target, _cond in (getattr(item, "selects", None) or [])
         if _is_user_facing(target)
     ]
-    if not targets:
-        return ""
-    return "\n\nEnable: " + ", ".join(targets)
+
+
+def select_lines(item) -> str:
+    """A comment listing the options *item* auto-enables (via ``select``).
+
+    Returns ``"\\n\\nEnable: <targets>"`` naming the user-settable options this
+    one turns on, or ``""`` if none.  Shown in ``lv_conf_template.h`` so a
+    hand-written ``lv_conf.h`` knows to enable them too.  Dependencies
+    (``depends on``) are left out - the template already nests each option in
+    its matching ``#if``, so they're visible from the structure."""
+    targets = select_targets(item)
+    return "\n\nEnable: " + ", ".join(targets) if targets else ""
+
+
+def member_requires(member, choice) -> str | None:
+    """A choice *member*'s own ``depends on`` as a C condition, or ``None``.
+
+    The choice's ambient dependencies (its enclosing ``if`` / ``depends on``,
+    e.g. ``LV_USE_SDL``) and the implicit "this choice is active" term are
+    stripped, leaving just what the member itself requires (e.g. the SDL EGL
+    backend's ``LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG``).  Surfaced in the
+    "Possible values" doc because a single-select macro is not ``#if``-gated per
+    member in the template, so the requirement is invisible from nesting."""
+    ambient = {term_key(x) for x in dep_terms(getattr(choice, "direct_dep", None))}
+    rest = [
+        x
+        for x in dep_terms(getattr(member, "direct_dep", None))
+        if term_key(x) not in ambient and not isinstance(x, Choice)
+    ]
+    if not rest:
+        return None
+    expr = rest[0]
+    for term in rest[1:]:
+        expr = (AND, expr, term)
+    return rev_dep_c_expr(expr)
 
 
 def collect_sym_refs(expr, acc: set) -> None:
-    """Collect every ``Symbol`` object referenced anywhere in *expr*."""
+    """Add every option referenced anywhere in *expr* to the set *acc*."""
     if isinstance(expr, Symbol):
         acc.add(expr)
     elif isinstance(expr, tuple):
@@ -213,17 +225,18 @@ def collect_sym_refs(expr, acc: set) -> None:
 
 
 def _render_bool_expr(expr, guard):
-    """Render a Kconfig bool expression to ``(c_text, precedence)`` or ``None``.
+    """Turn a Kconfig bool expression into C text.
 
-    Precedence is ``3`` for an atom, ``2`` for ``&&``, ``1`` for ``||`` - used
-    to parenthesize only where C semantics (or readability) require it.
+    Returns ``(c_text, precedence)``, or ``None`` if it renders to nothing.
+    Precedence (atom ``3``, ``&&`` ``2``, ``||`` ``1``) tells the caller where
+    parentheses are needed to keep the C meaning correct.
 
-    * a choice *member* listed in *guard* (member -> ``(macro, token)``) renders
-      as ``<macro> == <token>``, valid on both the Kconfig and lv_conf.h paths;
-    * a bare ``Choice`` term (a member's implicit "this choice is active" dep)
-      renders to nothing and is dropped from its enclosing ``&&`` / ``||``;
-    * ``&&`` / ``||`` / ``!`` map directly to C; comparisons fall back to
-      ``expr_str`` (already C-compatible).
+    * ``&&`` / ``||`` / ``!`` map straight to C; comparisons (``==``, ``<``, ...)
+      already render as valid C;
+    * a "pick one" member listed in *guard* (member -> ``(macro, token)``)
+      becomes ``<macro> == <token>``, which works on both config paths;
+    * a bare group term (a member's implicit "this group is active" dependency)
+      renders to nothing and drops out of its enclosing ``&&`` / ``||``.
     """
     if isinstance(expr, Choice):
         return None
@@ -272,22 +285,21 @@ def _render_bool_expr(expr, guard):
 
 
 def rev_dep_c_expr(expr, guard=None) -> str | None:
-    """Render a reverse-dependency expression as a C condition.
+    """Render any bool expression as a C condition (the workhorse wrapper).
 
-    Like :func:`rev_dep_expr` but choice-aware: bare ``Choice`` terms (a
-    member's implicit "this choice is active" dep, e.g. the anonymous Wayland
-    backend choice) are dropped instead of making the whole expression
-    inexpressible.  A named-choice member can be rewritten via *guard* into
-    ``<macro> == <token>``, but callers must only do so when the macro is
-    integer-valued (it is not for the font-default choice - see
-    :func:`config_headers.emit.select_guards`).  Returns ``None`` only if the
-    whole expression renders to nothing."""
+    When the expression mentions a "pick one" group it drops the bare group
+    term (e.g. the anonymous Wayland backend choice) and keeps the rest, rather
+    than giving up.  A named group member can be rewritten into
+    ``<macro> == <token>`` via *guard* - but only when that macro is
+    integer-valued (not the font-default choice; see
+    :func:`config_headers.emit.select_guards`).  ``None`` only if the whole
+    thing renders to nothing."""
     rendered = _render_bool_expr(expr, guard or {})
     return rendered[0] if rendered else None
 
 
 def c_comment(text: str) -> list[str]:
-    """Render *text* (possibly multi-line) as a Doxygen-style block comment."""
+    """Wrap *text* (one or more lines) in a Doxygen ``/** ... */`` block."""
     lines = [ln.rstrip() for ln in text.strip("\n").split("\n")]
     if not lines or lines == [""]:
         return []

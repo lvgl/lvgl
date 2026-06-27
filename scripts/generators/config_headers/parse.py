@@ -23,16 +23,20 @@ from .config_entry import (
     EnumChoice,
     EnumMember,
     IntConfig,
+    LegacyBoolConfig,
     StringConfig,
 )
 from .kconfig_utils import (
+    bool_default,
     choice_default,
     dep_terms,
     doc_text,
     int_const_value,
     is_int_const,
+    member_requires,
     resolve_int_value,
-    rev_dep_expr,
+    rev_dep_c_expr,
+    select_targets,
     term_key,
 )
 
@@ -57,6 +61,9 @@ MEMBER_IS_TOKEN: set[str] = {
     "LV_USE_NEMA_LIB",  # LV_NEMA_LIB_*
     "LV_USE_NEMA_HAL",  # LV_NEMA_HAL_*
     "LV_NANOVG_BACKEND",  # LV_NANOVG_BACKEND_*
+    "LV_WAYLAND_BACKEND",  # LV_WAYLAND_BACKEND_* (SHM/EGL/G2D)
+    "LV_LINUX_DRM_BACKEND",  # LV_LINUX_DRM_BACKEND_* (FBDEV/GBM/EGL)
+    "LV_SDL_BACKEND",  # LV_SDL_BACKEND_* (SW/TEXTURE/EGL)
     "LV_CHECK_ARG_LOG_MODE",  # LV_CHECK_ARG_LOG_MODE_*
     "LV_SDL_MOUSEWHEEL_MODE",  # LV_SDL_MOUSEWHEEL_MODE_* owned by a C header
     "LV_VG_LITE_GPU",  # LV_VG_LITE_GPU_* defined into lv_conf_internal.h; the
@@ -93,9 +100,6 @@ IGNORE_SYMBOLS: set[str] = {
     # Deprecated former name of LV_GLOBAL_USE_CUSTOM_INCLUDE: mapped by the
     # lv_conf_kconfig.h shim, kept only so old defconfigs parse.
     "LV_ENABLE_GLOBAL_CUSTOM",
-    "LV_WAYLAND_USE_SHM",  # Wayland backend: resolved in the internal footer
-    "LV_WAYLAND_USE_EGL",
-    "LV_WAYLAND_USE_G2D",
 }
 
 
@@ -157,6 +161,16 @@ def _is_deprecated(node) -> bool:
     if "[DEPRECATED" in prompt.upper():
         return True
     return bool(node.help) and node.help.lstrip().startswith("Deprecated")
+
+
+def _is_legacy(node) -> bool:
+    """A config kept only for backwards compatibility, flagged by a ``(legacy)``
+    marker in its prompt.  Unlike a *deprecated* config (dropped from the
+    headers), a legacy config is still emitted - a default-on legacy bool becomes
+    a :class:`LegacyBoolConfig` so it stays 1 on the hand-written ``lv_conf.h``
+    path even when gated (e.g. the auto-backend-select flags)."""
+    prompt = node.prompt[0] if node.prompt else ""
+    return "(legacy)" in prompt.lower()
 
 
 def load(path: str, srctree: str | None = None) -> Kconfig:
@@ -241,14 +255,22 @@ def _enum_doc(choice, resolved) -> str:
         pre = re.match(r"^([^:]+):\s*(.*)$", desc)
         if pre and _norm(pre.group(1)) in _norm(em.token):
             desc = pre.group(2).strip()
-        if (
+        if not (
             desc
             and _norm(desc) not in _norm(em.token)
             and _norm(em.token) not in _norm(desc)
         ):
-            lines.append(f"- {em.token}: {desc}")
-        else:
-            lines.append(f"- {em.token}")
+            desc = ""
+        notes = []
+        requires = member_requires(member, choice)
+        if requires:
+            notes.append(f"requires {requires}")
+        enables = select_targets(member)
+        if enables:
+            notes.append("enable: " + ", ".join(enables))
+        suffix = f" ({'; '.join(notes)})" if notes else ""
+        bullet = f"- {em.token}: {desc}" if desc else f"- {em.token}"
+        lines.append(bullet + suffix)
     return "\n".join(lines)
 
 
@@ -375,11 +397,15 @@ def classify(node, enum_choices: frozenset = frozenset()) -> ConfigEntry | None:
         return enum
 
     # Internal capability flags are no-prompt bools set via `select`; derived
-    # from their reverse-deps.  Also runs before the prompt gate.
+    # from their reverse-deps.  Also runs before the prompt gate.  rev_dep_c_expr
+    # is choice-aware: a flag selected by a choice member (e.g. LV_USE_EGL, set
+    # by the Wayland EGL backend) carries a bare <choice> term that it drops,
+    # rather than leaving the flag unclassified and silently dropped.
     if item.type in (BOOL, TRISTATE) and not node.prompt:
-        expr = rev_dep_expr(item)
-        if expr is not None:
-            return DerivedFlag(item.name, expr, node=node)
+        if item.rev_dep is not item.kconfig.n:
+            expr = rev_dep_c_expr(item.rev_dep)
+            if expr is not None:
+                return DerivedFlag(item.name, expr, node=node)
 
     if item.type in (INT, HEX):
         # Enum-token constants (LV_STDLIB_BUILTIN -> 0) are plumbing: defined in
@@ -394,6 +420,8 @@ def classify(node, enum_choices: frozenset = frozenset()) -> ConfigEntry | None:
     if not node.prompt:
         return None
     if item.type == BOOL:
+        if _is_legacy(node):
+            return LegacyBoolConfig.from_symbol(item, node)
         return BoolConfig.from_symbol(item, node)
     if item.type == STRING:
         return StringConfig.from_symbol(item, node)

@@ -42,10 +42,19 @@ def test_internal_wraps_options_in_kconfig_ladder(generated):
 
 def test_internal_footer_has_static_derivations(generated):
     i = generated["internal"]
-    # The *_EXTERNAL compatibility shims, the inconsistent-name alias, the
-    # Wayland backend defaults, and the trailing LV_KCONFIG_PRESENT cleanup.
+    # The *_EXTERNAL compatibility shims, the inconsistent-name alias, and the
+    # trailing LV_KCONFIG_PRESENT cleanup.
     assert "LV_USE_THORVG_EXTERNAL" in i
     assert "LV_USE_LZ4_EXTERNAL" in i
     assert "#define LV_USE_ANIMIMAGE LV_USE_ANIMIMG" in i
-    assert "#define LV_WAYLAND_USE_SHM 0" in i
     assert "#undef LV_KCONFIG_PRESENT" in i
+
+
+def test_internal_has_legacy_autobackend_shim(generated):
+    i = generated["internal"]
+    # The deprecated auto-select flag stays default-on despite its dependency
+    # (LegacyBoolConfig), and the compatibility shim infers the legacy backend.
+    assert "#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND" in i
+    # default-on ladder (1 on the lv_conf.h path) even though it is gated.
+    drm_auto = i[i.index("#ifndef LV_LINUX_DRM_AUTO_BACKEND") :]
+    assert "#define LV_LINUX_DRM_AUTO_BACKEND 1" in drm_auto[:400]

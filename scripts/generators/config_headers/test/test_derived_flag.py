@@ -1,6 +1,6 @@
 """Unit tests for DerivedFlag (internal capability flags set via `select`)."""
 
-from config_headers.config_entry import BoolConfig, DerivedFlag
+from config_headers.config_entry import BoolConfig, DerivedFlag, LegacyBoolConfig
 
 
 def test_selected_flag_parses_as_derived_flag(entries):
@@ -38,3 +38,21 @@ def test_selectors_are_still_normal_bool_options(entries):
     # The options that `select` the flag remain ordinary user-facing bools.
     assert isinstance(entries["LV_USE_DRAW_VG_LITE"], BoolConfig)
     assert isinstance(entries["LV_USE_DRAW_NANOVG"], BoolConfig)
+
+
+def test_per_backend_flag_is_derived(entries):
+    # A hidden per-backend flag selected by a choice member is a DerivedFlag.
+    # (Its guard-rewritten `<macro> == <token>` body is asserted in test_driver,
+    # since the rewrite happens at emit time when the guard map exists.)
+    assert isinstance(entries["LV_LINUX_DRM_USE_EGL"], DerivedFlag)
+
+
+def test_legacy_autobackend_is_default_on_despite_dependency(entries):
+    # The deprecated auto-select flag is gated by LV_USE_LINUX_DRM, so a normal
+    # BoolConfig would be forced to 0 on the lv_conf.h path; LegacyBoolConfig
+    # keeps it default-on there instead.
+    auto = entries["LV_LINUX_DRM_AUTO_BACKEND"]
+    assert isinstance(auto, LegacyBoolConfig)
+    body = "\n".join(auto.emit_internal())
+    assert "#ifdef LV_KCONFIG_PRESENT" in body  # default-on ladder, not plain-0
+    assert "#define LV_LINUX_DRM_AUTO_BACKEND 1" in body

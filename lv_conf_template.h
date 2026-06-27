@@ -559,7 +559,7 @@
 
 #endif /*LV_USE_DRAW_EVE*/
 
-/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES
+/** Draw using cached OpenGLES textures.
  *
  *  Enable: LV_USE_OPENGLES
  */
@@ -572,7 +572,6 @@
 #endif /*LV_USE_DRAW_OPENGLES*/
 
 /** Use NanoVG Renderer
- *  - Requires LV_USE_NANOVG, LV_USE_MATRIX.
  *
  *  Enable: LV_USE_NANOVG, LV_USE_MATRIX
  */
@@ -835,7 +834,6 @@
 
 #if LV_DRAW_HAS_VECTOR_SUPPORT
 /** SVG library
- *  - Requires `LV_USE_VECTOR_GRAPHIC = 1`
  *
  *  Enable: LV_USE_VECTOR_GRAPHIC
  */
@@ -1024,33 +1022,33 @@
 #if !LV_USE_CUSTOM_FONT_DEFAULT
 /** Select theme default text font
  *  Possible values:
- *  - LV_FONT_DEFAULT_MONTSERRAT_8
- *  - LV_FONT_DEFAULT_MONTSERRAT_10
- *  - LV_FONT_DEFAULT_MONTSERRAT_12
- *  - LV_FONT_DEFAULT_MONTSERRAT_14
- *  - LV_FONT_DEFAULT_MONTSERRAT_16
- *  - LV_FONT_DEFAULT_MONTSERRAT_18
- *  - LV_FONT_DEFAULT_MONTSERRAT_20
- *  - LV_FONT_DEFAULT_MONTSERRAT_22
- *  - LV_FONT_DEFAULT_MONTSERRAT_24
- *  - LV_FONT_DEFAULT_MONTSERRAT_26
- *  - LV_FONT_DEFAULT_MONTSERRAT_28
- *  - LV_FONT_DEFAULT_MONTSERRAT_30
- *  - LV_FONT_DEFAULT_MONTSERRAT_32
- *  - LV_FONT_DEFAULT_MONTSERRAT_34
- *  - LV_FONT_DEFAULT_MONTSERRAT_36
- *  - LV_FONT_DEFAULT_MONTSERRAT_38
- *  - LV_FONT_DEFAULT_MONTSERRAT_40
- *  - LV_FONT_DEFAULT_MONTSERRAT_42
- *  - LV_FONT_DEFAULT_MONTSERRAT_44
- *  - LV_FONT_DEFAULT_MONTSERRAT_46
- *  - LV_FONT_DEFAULT_MONTSERRAT_48
- *  - LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED
- *  - LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW: Dejavu 16 Persian, Hebrew, Arabic letters
- *  - LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK
- *  - LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK
- *  - LV_FONT_DEFAULT_UNSCII_8: UNSCII 8 (Perfect monospace font)
- *  - LV_FONT_DEFAULT_UNSCII_16: UNSCII 16 (Perfect monospace font)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_8 (enable: LV_FONT_MONTSERRAT_8)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_10 (enable: LV_FONT_MONTSERRAT_10)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_12 (enable: LV_FONT_MONTSERRAT_12)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_14 (enable: LV_FONT_MONTSERRAT_14)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_16 (enable: LV_FONT_MONTSERRAT_16)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_18 (enable: LV_FONT_MONTSERRAT_18)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_20 (enable: LV_FONT_MONTSERRAT_20)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_22 (enable: LV_FONT_MONTSERRAT_22)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_24 (enable: LV_FONT_MONTSERRAT_24)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_26 (enable: LV_FONT_MONTSERRAT_26)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_28 (enable: LV_FONT_MONTSERRAT_28)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_30 (enable: LV_FONT_MONTSERRAT_30)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_32 (enable: LV_FONT_MONTSERRAT_32)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_34 (enable: LV_FONT_MONTSERRAT_34)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_36 (enable: LV_FONT_MONTSERRAT_36)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_38 (enable: LV_FONT_MONTSERRAT_38)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_40 (enable: LV_FONT_MONTSERRAT_40)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_42 (enable: LV_FONT_MONTSERRAT_42)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_44 (enable: LV_FONT_MONTSERRAT_44)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_46 (enable: LV_FONT_MONTSERRAT_46)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_48 (enable: LV_FONT_MONTSERRAT_48)
+ *  - LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED (enable: LV_FONT_MONTSERRAT_28_COMPRESSED)
+ *  - LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW: Dejavu 16 Persian, Hebrew, Arabic letters (enable: LV_FONT_DEJAVU_16_PERSIAN_HEBREW)
+ *  - LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK (enable: LV_FONT_SOURCE_HAN_SANS_SC_14_CJK)
+ *  - LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK (enable: LV_FONT_SOURCE_HAN_SANS_SC_16_CJK)
+ *  - LV_FONT_DEFAULT_UNSCII_8: UNSCII 8 (Perfect monospace font) (enable: LV_FONT_UNSCII_8)
+ *  - LV_FONT_DEFAULT_UNSCII_16: UNSCII 16 (Perfect monospace font) (enable: LV_FONT_UNSCII_16)
  */
 #define LV_FONT_DEFAULT LV_FONT_DEFAULT_MONTSERRAT_14
 
@@ -1288,7 +1286,7 @@
 #endif /*LV_USE_GIF*/
 
 #if LV_DRAW_HAS_3D_SUPPORT
-/** Requires `LV_USE_3DTEXTURE = 1`
+/** Enables parsing and rendering of 3D models (.gltf/.glb).
  *
  *  Enable: LV_USE_3DTEXTURE
  */
@@ -1457,17 +1455,20 @@
 #define LV_USE_LINUX_DRM 0
 
 #if LV_USE_LINUX_DRM
-/** Hardware-accelerated rendering via OpenGL ES 2.0 and EGL.
- *  Requires OpenGL ES 2.0 on the target hardware and linking with
- *  -lEGL. Compatible with LVGL 3D/glTF rendering.
- *  Automatically enables GBM buffer support.
- *
- *  Enable: LV_USE_LINUX_DRM_GBM_BUFFERS, LV_USE_OPENGLES
+/** Legacy behavior, kept for backwards compatibility and slated for removal.
+ *  While set, the backend is inferred from LV_USE_OPENGLES (EGL when OpenGLES
+ *  is enabled).  Disable this and pick a backend explicitly via the Linux DRM
+ *  "Rendering backend" choice.
  */
-#define LV_USE_LINUX_DRM_EGL 0
+#define LV_LINUX_DRM_AUTO_BACKEND 1
 
-/** Use MESA GBM for Linux DRM DMA buffers */
-#define LV_USE_LINUX_DRM_GBM_BUFFERS 0
+/** Select how the Linux DRM driver presents rendered frames.
+ *  Possible values:
+ *  - LV_LINUX_DRM_BACKEND_FBDEV: Dumb buffers (no GPU)
+ *  - LV_LINUX_DRM_BACKEND_GBM: GBM DMA buffers
+ *  - LV_LINUX_DRM_BACKEND_EGL: EGL (OpenGL ES, hardware-accelerated) (enable: LV_USE_OPENGLES)
+ */
+#define LV_LINUX_DRM_BACKEND LV_LINUX_DRM_BACKEND_FBDEV
 
 #endif /*LV_USE_LINUX_DRM*/
 
@@ -1671,7 +1672,6 @@
 #endif /*LV_USE_NUTTX*/
 
 /** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
- *  - Requires LV_USE_MATRIX.
  *
  *  Enable: LV_USE_MATRIX
  */
@@ -1707,6 +1707,21 @@
 #if LV_USE_SDL
 /** SDL include path */
 #define LV_SDL_INCLUDE_PATH "SDL2/SDL.h"
+
+/** Legacy behavior, kept for backwards compatibility and slated for removal.
+ *  While set, EGL is inferred the legacy way (OpenGLES enabled with an OpenGL
+ *  draw unit).  Disable this and pick a backend explicitly via the SDL
+ *  "Rendering backend" choice.
+ */
+#define LV_SDL_AUTO_BACKEND 1
+
+/** Select how the SDL driver presents rendered frames.
+ *  Possible values:
+ *  - LV_SDL_BACKEND_SW: Software (SDL surface)
+ *  - LV_SDL_BACKEND_TEXTURE: Cached SDL textures (enable: LV_USE_DRAW_SDL)
+ *  - LV_SDL_BACKEND_EGL: EGL (OpenGL ES, hardware-accelerated) (requires LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
+ */
+#define LV_SDL_BACKEND LV_SDL_BACKEND_SW
 
 /** LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance
  *  Possible values:
@@ -1755,6 +1770,21 @@
 #if LV_USE_WAYLAND
 /** Deinitialize LVGL and quit the application when the last wayland window closes */
 #define LV_WAYLAND_DIRECT_EXIT 1
+
+/** Legacy behavior, kept for backwards compatibility and slated for removal.
+ *  While set, the backend defaults to SHM and any LV_WAYLAND_USE_* set directly
+ *  in lv_conf.h is honored.  Disable this and pick a backend explicitly via the
+ *  Wayland "Rendering backend" choice.
+ */
+#define LV_WAYLAND_AUTO_BACKEND 1
+
+/** Select the rendering backend used by the Wayland driver.
+ *  Possible values:
+ *  - LV_WAYLAND_BACKEND_SHM: SHM (Shared Memory)
+ *  - LV_WAYLAND_BACKEND_EGL: EGL (OpenGL ES, hardware-accelerated) (enable: LV_USE_OPENGLES)
+ *  - LV_WAYLAND_BACKEND_G2D: G2D (NXP i.MX hardware accelerator) (enable: LV_USE_DRAW_G2D)
+ */
+#define LV_WAYLAND_BACKEND LV_WAYLAND_BACKEND_SHM
 
 #endif /*LV_USE_WAYLAND*/
 
@@ -2095,7 +2125,7 @@
 
 #if LV_USE_TEST
 /** Enable `lv_test_screenshot_compare`.
- *  Requires lodepng and a few MB of extra RAM.
+ *  Requires a few MB of extra RAM.
  *
  *  Enable: LV_USE_LODEPNG
  */
@@ -2132,7 +2162,8 @@
 #define LV_USE_FRAGMENT 0
 
 /** Enable file explorer.
- *  - Requires: lv_table
+ *
+ *  Enable: LV_USE_TABLE
  */
 #define LV_USE_FILE_EXPLORER 0
 
@@ -2244,8 +2275,8 @@
  *  compile-time error.
  *  Possible values:
  *  - LV_CHECK_ARG_LOG_MODE_NONE: no log output on failure
- *  - LV_CHECK_ARG_LOG_MODE_MINIMAL: log 'Check failed' only (file/line from LV_LOG_WARN)
- *  - LV_CHECK_ARG_LOG_MODE_VERBOSE: log 'Check failed: <cond>' plus caller-supplied message
+ *  - LV_CHECK_ARG_LOG_MODE_MINIMAL: log 'Check failed' only (file/line from LV_LOG_WARN) (requires LV_USE_LOG)
+ *  - LV_CHECK_ARG_LOG_MODE_VERBOSE: log 'Check failed: <cond>' plus caller-supplied message (requires LV_USE_LOG)
  */
 #define LV_CHECK_ARG_LOG_MODE LV_CHECK_ARG_LOG_MODE_NONE
 
@@ -2397,11 +2428,11 @@
 
 #endif /*LV_USE_DEMO_MUSIC*/
 
-#if LV_USE_GRID
-/** Render test for each primitives. Requires at least 480x272 display */
+/** Render test for each primitives. Requires at least 480x272 display
+ *
+ *  Enable: LV_USE_GRID
+ */
 #define LV_USE_DEMO_RENDER 0
-
-#endif /*LV_USE_GRID*/
 
 /** Stress test for LVGL */
 #define LV_USE_DEMO_STRESS 0

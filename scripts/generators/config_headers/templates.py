@@ -205,6 +205,63 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
 #endif /*!LV_GLOBAL_USE_CUSTOM_INCLUDE*/
 #endif /*defined(LV_ENABLE_GLOBAL_CUSTOM) && LV_ENABLE_GLOBAL_CUSTOM*/
 
+/*
+ *  Legacy backend inference for the Linux DRM and SDL drivers.  Historically the
+ *  EGL backend was turned on automatically from LV_USE_OPENGLES; for v9.x each
+ *  driver gets an explicit LV_<DRIVER>_BACKEND choice instead.  While the
+ *  deprecated LV_<DRIVER>_AUTO_BACKEND is set (its default) we reproduce the old
+ *  inference here and pre-define the per-driver flag, so the Derived-capability
+ *  ladder below (which is #ifndef-guarded) leaves it untouched.  Runs before that
+ *  ladder.  The #warning only fires when inference actually turns EGL on.
+ */
+#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND
+    #ifndef LV_LINUX_DRM_USE_EGL
+        #if LV_USE_OPENGLES
+            #warning LV_LINUX_DRM_AUTO_BACKEND is deprecated and will be removed in a future release. Set it to 0 and select a backend with LV_LINUX_DRM_BACKEND.
+            #define LV_LINUX_DRM_USE_EGL 1
+        #else
+            #define LV_LINUX_DRM_USE_EGL 0
+        #endif
+    #endif
+    #ifndef LV_USE_LINUX_DRM_GBM_BUFFERS
+        #define LV_USE_LINUX_DRM_GBM_BUFFERS LV_LINUX_DRM_USE_EGL
+    #endif
+#endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND*/
+
+#if LV_USE_SDL && LV_SDL_AUTO_BACKEND
+    #ifndef LV_SDL_USE_EGL
+        #if LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
+            #warning LV_SDL_AUTO_BACKEND is deprecated and will be removed in a future release. Set it to 0 and select a backend with LV_SDL_BACKEND.
+            #define LV_SDL_USE_EGL 1
+        #else
+            #define LV_SDL_USE_EGL 0
+        #endif
+    #endif
+#endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
+
+/* Wayland never inferred its backend from LV_USE_OPENGLES; the legacy interface
+ * was setting LV_WAYLAND_USE_* directly.  While LV_WAYLAND_AUTO_BACKEND is set we
+ * honor any such define, default to SHM, and keep the three mutually exclusive.
+ * The #warning fires only if a legacy LV_WAYLAND_USE_* was set by hand. */
+#if LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND
+    #if defined(LV_WAYLAND_USE_EGL) || defined(LV_WAYLAND_USE_G2D) || defined(LV_WAYLAND_USE_SHM)
+        #warning Setting LV_WAYLAND_USE_* directly is deprecated and will be removed in a future release. Set LV_WAYLAND_AUTO_BACKEND to 0 and select a backend with LV_WAYLAND_BACKEND.
+    #endif
+    #ifndef LV_WAYLAND_USE_EGL
+        #define LV_WAYLAND_USE_EGL 0
+    #endif
+    #ifndef LV_WAYLAND_USE_G2D
+        #define LV_WAYLAND_USE_G2D 0
+    #endif
+    #ifndef LV_WAYLAND_USE_SHM
+        #if LV_WAYLAND_USE_EGL || LV_WAYLAND_USE_G2D
+            #define LV_WAYLAND_USE_SHM 0
+        #else
+            #define LV_WAYLAND_USE_SHM 1
+        #endif
+    #endif
+#endif /*LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND*/
+
 /*----------------------------------
  * End of compatibility block
  -----------------------------------*/
@@ -261,63 +318,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
 #undef LV_KCONFIG_PRESENT
-
-#if LV_USE_WAYLAND
-    /* Backend is selected explicitly (Kconfig choice or lv_conf.h).  EGL/G2D are
-     * resolved first; SHM is the fallback only when neither is selected, so the
-     * three remain mutually exclusive. */
-    #ifndef LV_WAYLAND_USE_EGL
-        #ifdef CONFIG_LV_WAYLAND_USE_EGL
-            #define LV_WAYLAND_USE_EGL CONFIG_LV_WAYLAND_USE_EGL
-        #else
-            #define LV_WAYLAND_USE_EGL 0
-        #endif
-    #endif
-    #ifndef LV_WAYLAND_USE_G2D
-        #ifdef CONFIG_LV_WAYLAND_USE_G2D
-            #define LV_WAYLAND_USE_G2D CONFIG_LV_WAYLAND_USE_G2D
-        #else
-            #define LV_WAYLAND_USE_G2D 0
-        #endif
-    #endif
-    #ifndef LV_WAYLAND_USE_SHM
-        #ifdef CONFIG_LV_WAYLAND_USE_SHM
-            #define LV_WAYLAND_USE_SHM CONFIG_LV_WAYLAND_USE_SHM
-        #elif LV_WAYLAND_USE_EGL || LV_WAYLAND_USE_G2D
-            #define LV_WAYLAND_USE_SHM 0
-        #else
-            #define LV_WAYLAND_USE_SHM 1
-        #endif
-    #endif
-#else
-    #define LV_WAYLAND_USE_SHM 0
-    #define LV_WAYLAND_USE_EGL 0
-    #define LV_WAYLAND_USE_G2D 0
-#endif
-
-#if LV_USE_LINUX_DRM
-    #if LV_USE_OPENGLES
-        #define LV_LINUX_DRM_USE_EGL 1
-    #else
-        #define LV_LINUX_DRM_USE_EGL 0
-    #endif /* LV_USE_OPENGLES */
-#else
-    #define LV_LINUX_DRM_USE_EGL 0
-#endif /*LV_USE_LINUX_DRM*/
-
-#if LV_USE_SDL && LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
-    #define LV_SDL_USE_EGL 1
-#else
-    #define LV_SDL_USE_EGL 0
-#endif
-
-#ifndef LV_USE_EGL
-    #if LV_LINUX_DRM_USE_EGL || LV_WAYLAND_USE_EGL || LV_SDL_USE_EGL
-        #define LV_USE_EGL 1
-    #else
-        #define LV_USE_EGL 0
-    #endif
-#endif /* LV_USE_EGL */
 
 
 #if LV_USE_OS
