@@ -26,8 +26,10 @@ jobs:
 
       - name: Build LVGL
         run: |
-          defconfig configs/ci/install/${{ matrix.api }}_api_config
-          cmake -B build -GNinja -DLV_BUILD_USE_KCONFIG=ON -DCMAKE_INSTALL_PREFIX=lvgl-${{ matrix.api }}-install
+          cmake -B build -GNinja \
+            -DLV_BUILD_USE_KCONFIG=ON \
+            -DLV_BUILD_DEFCONFIG_PATH=configs/ci/install/${{ matrix.api }}_api_config \
+            -DCMAKE_INSTALL_PREFIX=lvgl-${{ matrix.api }}-install 
           cmake --build build
           cmake --install build
 
