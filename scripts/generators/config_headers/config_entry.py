@@ -137,6 +137,22 @@ class BoolConfig(ScalarConfig):
         Kconfig (an unset bool emits no ``CONFIG_<name>``, so it must read 0)."""
         name = self.name
         upper = name.upper()
+        deps = self.depends_on_c()
+        if deps:
+            return [
+                f"#ifndef {name}",
+                f"    #ifdef LV_KCONFIG_PRESENT",
+                f"        #ifdef CONFIG_{upper}",
+                f"            #define {name} CONFIG_{upper}",
+                f"        #else",
+                f"            #define {name} 0",
+                f"        #endif",
+                f"    #else",
+                f"          #define {name} {deps}",
+                f"    #endif",
+                f"#endif",
+            ]
+
         return [
             f"#ifndef {name}",
             f"    #ifdef LV_KCONFIG_PRESENT",
@@ -153,8 +169,8 @@ class BoolConfig(ScalarConfig):
 
     def emit_internal(self) -> list[str]:
         # Force export as 0 in kconfig if the setting has any dependencies
-        if self.value != "1" or self.depends_on_c() is not None:
-            return _plain_ladder(self.name, "0")
+        if self.value == "0":
+            return _plain_ladder(self.name, self.value)
         return self._default_on_ladder()
 
 

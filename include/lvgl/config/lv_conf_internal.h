@@ -264,10 +264,14 @@
 #endif
 
 #ifndef LV_USE_FREERTOS_TASK_NOTIFY
-    #ifdef CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
-        #define LV_USE_FREERTOS_TASK_NOTIFY CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+            #define LV_USE_FREERTOS_TASK_NOTIFY CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+        #else
+            #define LV_USE_FREERTOS_TASK_NOTIFY 0
+        #endif
     #else
-        #define LV_USE_FREERTOS_TASK_NOTIFY 0
+          #define LV_USE_FREERTOS_TASK_NOTIFY LV_USE_OS == LV_OS_FREERTOS
     #endif
 #endif
 
@@ -406,10 +410,14 @@
 #endif
 
 #ifndef LV_USE_THORVG_INTERNAL
-    #ifdef CONFIG_LV_USE_THORVG_INTERNAL
-        #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+            #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+        #else
+            #define LV_USE_THORVG_INTERNAL 0
+        #endif
     #else
-        #define LV_USE_THORVG_INTERNAL 0
+          #define LV_USE_THORVG_INTERNAL LV_USE_THORVG
     #endif
 #endif
 
@@ -426,90 +434,134 @@
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_RGB565
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565
-        #define LV_DRAW_SW_SUPPORT_RGB565 CONFIG_LV_DRAW_SW_SUPPORT_RGB565
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565
+            #define LV_DRAW_SW_SUPPORT_RGB565 CONFIG_LV_DRAW_SW_SUPPORT_RGB565
+        #else
+            #define LV_DRAW_SW_SUPPORT_RGB565 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_RGB565 0
+          #define LV_DRAW_SW_SUPPORT_RGB565 LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
-        #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+            #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        #else
+            #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 0
+          #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_RGB565A8
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
-        #define LV_DRAW_SW_SUPPORT_RGB565A8 CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
+            #define LV_DRAW_SW_SUPPORT_RGB565A8 CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
+        #else
+            #define LV_DRAW_SW_SUPPORT_RGB565A8 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_RGB565A8 0
+          #define LV_DRAW_SW_SUPPORT_RGB565A8 LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_RGB888
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB888
-        #define LV_DRAW_SW_SUPPORT_RGB888 CONFIG_LV_DRAW_SW_SUPPORT_RGB888
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB888
+            #define LV_DRAW_SW_SUPPORT_RGB888 CONFIG_LV_DRAW_SW_SUPPORT_RGB888
+        #else
+            #define LV_DRAW_SW_SUPPORT_RGB888 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_RGB888 0
+          #define LV_DRAW_SW_SUPPORT_RGB888 LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_XRGB8888
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888
-        #define LV_DRAW_SW_SUPPORT_XRGB8888 CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888
+            #define LV_DRAW_SW_SUPPORT_XRGB8888 CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888
+        #else
+            #define LV_DRAW_SW_SUPPORT_XRGB8888 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_XRGB8888 0
+          #define LV_DRAW_SW_SUPPORT_XRGB8888 LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_ARGB8888
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888
-        #define LV_DRAW_SW_SUPPORT_ARGB8888 CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888
+            #define LV_DRAW_SW_SUPPORT_ARGB8888 CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888
+        #else
+            #define LV_DRAW_SW_SUPPORT_ARGB8888 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_ARGB8888 0
+          #define LV_DRAW_SW_SUPPORT_ARGB8888 LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
-        #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+            #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        #else
+            #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 0
+          #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_L8
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_L8
-        #define LV_DRAW_SW_SUPPORT_L8 CONFIG_LV_DRAW_SW_SUPPORT_L8
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_L8
+            #define LV_DRAW_SW_SUPPORT_L8 CONFIG_LV_DRAW_SW_SUPPORT_L8
+        #else
+            #define LV_DRAW_SW_SUPPORT_L8 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_L8 0
+          #define LV_DRAW_SW_SUPPORT_L8 LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_AL88
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_AL88
-        #define LV_DRAW_SW_SUPPORT_AL88 CONFIG_LV_DRAW_SW_SUPPORT_AL88
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_AL88
+            #define LV_DRAW_SW_SUPPORT_AL88 CONFIG_LV_DRAW_SW_SUPPORT_AL88
+        #else
+            #define LV_DRAW_SW_SUPPORT_AL88 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_AL88 0
+          #define LV_DRAW_SW_SUPPORT_AL88 LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_A8
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_A8
-        #define LV_DRAW_SW_SUPPORT_A8 CONFIG_LV_DRAW_SW_SUPPORT_A8
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_A8
+            #define LV_DRAW_SW_SUPPORT_A8 CONFIG_LV_DRAW_SW_SUPPORT_A8
+        #else
+            #define LV_DRAW_SW_SUPPORT_A8 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_A8 0
+          #define LV_DRAW_SW_SUPPORT_A8 LV_USE_DRAW_SW
     #endif
 #endif
 
 #ifndef LV_DRAW_SW_SUPPORT_I1
-    #ifdef CONFIG_LV_DRAW_SW_SUPPORT_I1
-        #define LV_DRAW_SW_SUPPORT_I1 CONFIG_LV_DRAW_SW_SUPPORT_I1
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_I1
+            #define LV_DRAW_SW_SUPPORT_I1 CONFIG_LV_DRAW_SW_SUPPORT_I1
+        #else
+            #define LV_DRAW_SW_SUPPORT_I1 0
+        #endif
     #else
-        #define LV_DRAW_SW_SUPPORT_I1 0
+          #define LV_DRAW_SW_SUPPORT_I1 LV_USE_DRAW_SW
     #endif
 #endif
 
@@ -546,10 +598,14 @@
 #endif
 
 #ifndef LV_DRAW_SW_COMPLEX
-    #ifdef CONFIG_LV_DRAW_SW_COMPLEX
-        #define LV_DRAW_SW_COMPLEX CONFIG_LV_DRAW_SW_COMPLEX
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_SW_COMPLEX
+            #define LV_DRAW_SW_COMPLEX CONFIG_LV_DRAW_SW_COMPLEX
+        #else
+            #define LV_DRAW_SW_COMPLEX 0
+        #endif
     #else
-        #define LV_DRAW_SW_COMPLEX 0
+          #define LV_DRAW_SW_COMPLEX LV_USE_DRAW_SW
     #endif
 #endif
 
@@ -634,10 +690,14 @@
 #endif
 
 #ifndef LV_VG_LITE_USE_BOX_SHADOW
-    #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-        #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+            #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+        #else
+            #define LV_VG_LITE_USE_BOX_SHADOW 0
+        #endif
     #else
-        #define LV_VG_LITE_USE_BOX_SHADOW 0
+          #define LV_VG_LITE_USE_BOX_SHADOW LV_USE_DRAW_VG_LITE
     #endif
 #endif
 
@@ -754,10 +814,14 @@
 #endif
 
 #ifndef LV_VG_LITE_THORVG_16PIXELS_ALIGN
-    #ifdef CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
-        #define LV_VG_LITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+            #define LV_VG_LITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+        #else
+            #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
+        #endif
     #else
-        #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
+          #define LV_VG_LITE_THORVG_16PIXELS_ALIGN LV_USE_VG_LITE_THORVG && LV_USE_DRAW_VG_LITE
     #endif
 #endif
 
@@ -890,10 +954,14 @@
 #endif
 
 #ifndef LV_USE_PXP_DRAW_THREAD
-    #ifdef CONFIG_LV_USE_PXP_DRAW_THREAD
-        #define LV_USE_PXP_DRAW_THREAD CONFIG_LV_USE_PXP_DRAW_THREAD
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_PXP_DRAW_THREAD
+            #define LV_USE_PXP_DRAW_THREAD CONFIG_LV_USE_PXP_DRAW_THREAD
+        #else
+            #define LV_USE_PXP_DRAW_THREAD 0
+        #endif
     #else
-        #define LV_USE_PXP_DRAW_THREAD 0
+          #define LV_USE_PXP_DRAW_THREAD !(LV_USE_OS == LV_OS_NONE) && LV_USE_DRAW_PXP
     #endif
 #endif
 
@@ -994,10 +1062,14 @@
 #endif
 
 #ifndef LV_USE_G2D_DRAW_THREAD
-    #ifdef CONFIG_LV_USE_G2D_DRAW_THREAD
-        #define LV_USE_G2D_DRAW_THREAD CONFIG_LV_USE_G2D_DRAW_THREAD
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_G2D_DRAW_THREAD
+            #define LV_USE_G2D_DRAW_THREAD CONFIG_LV_USE_G2D_DRAW_THREAD
+        #else
+            #define LV_USE_G2D_DRAW_THREAD 0
+        #endif
     #else
-        #define LV_USE_G2D_DRAW_THREAD 0
+          #define LV_USE_G2D_DRAW_THREAD !(LV_USE_OS == LV_OS_NONE) && LV_USE_DRAW_G2D
     #endif
 #endif
 
@@ -1118,18 +1190,26 @@
 #endif
 
 #ifndef LV_OBJ_ID_AUTO_ASSIGN
-    #ifdef CONFIG_LV_OBJ_ID_AUTO_ASSIGN
-        #define LV_OBJ_ID_AUTO_ASSIGN CONFIG_LV_OBJ_ID_AUTO_ASSIGN
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_OBJ_ID_AUTO_ASSIGN
+            #define LV_OBJ_ID_AUTO_ASSIGN CONFIG_LV_OBJ_ID_AUTO_ASSIGN
+        #else
+            #define LV_OBJ_ID_AUTO_ASSIGN 0
+        #endif
     #else
-        #define LV_OBJ_ID_AUTO_ASSIGN 0
+          #define LV_OBJ_ID_AUTO_ASSIGN LV_USE_OBJ_ID
     #endif
 #endif
 
 #ifndef LV_USE_OBJ_ID_BUILTIN
-    #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
-        #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
+            #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+        #else
+            #define LV_USE_OBJ_ID_BUILTIN 0
+        #endif
     #else
-        #define LV_USE_OBJ_ID_BUILTIN 0
+          #define LV_USE_OBJ_ID_BUILTIN LV_USE_OBJ_ID
     #endif
 #endif
 
@@ -1142,10 +1222,14 @@
 #endif
 
 #ifndef LV_USE_OBJ_PROPERTY_NAME
-    #ifdef CONFIG_LV_USE_OBJ_PROPERTY_NAME
-        #define LV_USE_OBJ_PROPERTY_NAME CONFIG_LV_USE_OBJ_PROPERTY_NAME
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OBJ_PROPERTY_NAME
+            #define LV_USE_OBJ_PROPERTY_NAME CONFIG_LV_USE_OBJ_PROPERTY_NAME
+        #else
+            #define LV_USE_OBJ_PROPERTY_NAME 0
+        #endif
     #else
-        #define LV_USE_OBJ_PROPERTY_NAME 0
+          #define LV_USE_OBJ_PROPERTY_NAME LV_USE_OBJ_PROPERTY
     #endif
 #endif
 
@@ -1224,90 +1308,134 @@
 #endif
 
 #ifndef LV_LOG_USE_TIMESTAMP
-    #ifdef CONFIG_LV_LOG_USE_TIMESTAMP
-        #define LV_LOG_USE_TIMESTAMP CONFIG_LV_LOG_USE_TIMESTAMP
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_USE_TIMESTAMP
+            #define LV_LOG_USE_TIMESTAMP CONFIG_LV_LOG_USE_TIMESTAMP
+        #else
+            #define LV_LOG_USE_TIMESTAMP 0
+        #endif
     #else
-        #define LV_LOG_USE_TIMESTAMP 0
+          #define LV_LOG_USE_TIMESTAMP LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_USE_FILE_LINE
-    #ifdef CONFIG_LV_LOG_USE_FILE_LINE
-        #define LV_LOG_USE_FILE_LINE CONFIG_LV_LOG_USE_FILE_LINE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_USE_FILE_LINE
+            #define LV_LOG_USE_FILE_LINE CONFIG_LV_LOG_USE_FILE_LINE
+        #else
+            #define LV_LOG_USE_FILE_LINE 0
+        #endif
     #else
-        #define LV_LOG_USE_FILE_LINE 0
+          #define LV_LOG_USE_FILE_LINE LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_MEM
-    #ifdef CONFIG_LV_LOG_TRACE_MEM
-        #define LV_LOG_TRACE_MEM CONFIG_LV_LOG_TRACE_MEM
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_MEM
+            #define LV_LOG_TRACE_MEM CONFIG_LV_LOG_TRACE_MEM
+        #else
+            #define LV_LOG_TRACE_MEM 0
+        #endif
     #else
-        #define LV_LOG_TRACE_MEM 0
+          #define LV_LOG_TRACE_MEM LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_TIMER
-    #ifdef CONFIG_LV_LOG_TRACE_TIMER
-        #define LV_LOG_TRACE_TIMER CONFIG_LV_LOG_TRACE_TIMER
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_TIMER
+            #define LV_LOG_TRACE_TIMER CONFIG_LV_LOG_TRACE_TIMER
+        #else
+            #define LV_LOG_TRACE_TIMER 0
+        #endif
     #else
-        #define LV_LOG_TRACE_TIMER 0
+          #define LV_LOG_TRACE_TIMER LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_INDEV
-    #ifdef CONFIG_LV_LOG_TRACE_INDEV
-        #define LV_LOG_TRACE_INDEV CONFIG_LV_LOG_TRACE_INDEV
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_INDEV
+            #define LV_LOG_TRACE_INDEV CONFIG_LV_LOG_TRACE_INDEV
+        #else
+            #define LV_LOG_TRACE_INDEV 0
+        #endif
     #else
-        #define LV_LOG_TRACE_INDEV 0
+          #define LV_LOG_TRACE_INDEV LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_DISP_REFR
-    #ifdef CONFIG_LV_LOG_TRACE_DISP_REFR
-        #define LV_LOG_TRACE_DISP_REFR CONFIG_LV_LOG_TRACE_DISP_REFR
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_DISP_REFR
+            #define LV_LOG_TRACE_DISP_REFR CONFIG_LV_LOG_TRACE_DISP_REFR
+        #else
+            #define LV_LOG_TRACE_DISP_REFR 0
+        #endif
     #else
-        #define LV_LOG_TRACE_DISP_REFR 0
+          #define LV_LOG_TRACE_DISP_REFR LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_EVENT
-    #ifdef CONFIG_LV_LOG_TRACE_EVENT
-        #define LV_LOG_TRACE_EVENT CONFIG_LV_LOG_TRACE_EVENT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_EVENT
+            #define LV_LOG_TRACE_EVENT CONFIG_LV_LOG_TRACE_EVENT
+        #else
+            #define LV_LOG_TRACE_EVENT 0
+        #endif
     #else
-        #define LV_LOG_TRACE_EVENT 0
+          #define LV_LOG_TRACE_EVENT LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_OBJ_CREATE
-    #ifdef CONFIG_LV_LOG_TRACE_OBJ_CREATE
-        #define LV_LOG_TRACE_OBJ_CREATE CONFIG_LV_LOG_TRACE_OBJ_CREATE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_OBJ_CREATE
+            #define LV_LOG_TRACE_OBJ_CREATE CONFIG_LV_LOG_TRACE_OBJ_CREATE
+        #else
+            #define LV_LOG_TRACE_OBJ_CREATE 0
+        #endif
     #else
-        #define LV_LOG_TRACE_OBJ_CREATE 0
+          #define LV_LOG_TRACE_OBJ_CREATE LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_LAYOUT
-    #ifdef CONFIG_LV_LOG_TRACE_LAYOUT
-        #define LV_LOG_TRACE_LAYOUT CONFIG_LV_LOG_TRACE_LAYOUT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_LAYOUT
+            #define LV_LOG_TRACE_LAYOUT CONFIG_LV_LOG_TRACE_LAYOUT
+        #else
+            #define LV_LOG_TRACE_LAYOUT 0
+        #endif
     #else
-        #define LV_LOG_TRACE_LAYOUT 0
+          #define LV_LOG_TRACE_LAYOUT LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_ANIM
-    #ifdef CONFIG_LV_LOG_TRACE_ANIM
-        #define LV_LOG_TRACE_ANIM CONFIG_LV_LOG_TRACE_ANIM
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_ANIM
+            #define LV_LOG_TRACE_ANIM CONFIG_LV_LOG_TRACE_ANIM
+        #else
+            #define LV_LOG_TRACE_ANIM 0
+        #endif
     #else
-        #define LV_LOG_TRACE_ANIM 0
+          #define LV_LOG_TRACE_ANIM LV_USE_LOG
     #endif
 #endif
 
 #ifndef LV_LOG_TRACE_CACHE
-    #ifdef CONFIG_LV_LOG_TRACE_CACHE
-        #define LV_LOG_TRACE_CACHE CONFIG_LV_LOG_TRACE_CACHE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LOG_TRACE_CACHE
+            #define LV_LOG_TRACE_CACHE CONFIG_LV_LOG_TRACE_CACHE
+        #else
+            #define LV_LOG_TRACE_CACHE 0
+        #endif
     #else
-        #define LV_LOG_TRACE_CACHE 0
+          #define LV_LOG_TRACE_CACHE LV_USE_LOG
     #endif
 #endif
 
@@ -1338,10 +1466,14 @@
 #endif
 
 #ifndef LV_THEME_DEFAULT_GROW
-    #ifdef CONFIG_LV_THEME_DEFAULT_GROW
-        #define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_THEME_DEFAULT_GROW
+            #define LV_THEME_DEFAULT_GROW CONFIG_LV_THEME_DEFAULT_GROW
+        #else
+            #define LV_THEME_DEFAULT_GROW 0
+        #endif
     #else
-        #define LV_THEME_DEFAULT_GROW 0
+          #define LV_THEME_DEFAULT_GROW LV_USE_THEME_DEFAULT
     #endif
 #endif
 
@@ -1446,10 +1578,14 @@
 #endif
 
 #ifndef LV_USE_LZ4_INTERNAL
-    #ifdef CONFIG_LV_USE_LZ4_INTERNAL
-        #define LV_USE_LZ4_INTERNAL CONFIG_LV_USE_LZ4_INTERNAL
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_LZ4_INTERNAL
+            #define LV_USE_LZ4_INTERNAL CONFIG_LV_USE_LZ4_INTERNAL
+        #else
+            #define LV_USE_LZ4_INTERNAL 0
+        #endif
     #else
-        #define LV_USE_LZ4_INTERNAL 0
+          #define LV_USE_LZ4_INTERNAL LV_USE_LZ4
     #endif
 #endif
 
@@ -1940,10 +2076,14 @@
 #endif
 
 #ifndef LV_FREETYPE_CACHE_FT_GLYPH_L1
-    #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_L1
-        #define LV_FREETYPE_CACHE_FT_GLYPH_L1 CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_L1
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_L1
+            #define LV_FREETYPE_CACHE_FT_GLYPH_L1 CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_L1
+        #else
+            #define LV_FREETYPE_CACHE_FT_GLYPH_L1 0
+        #endif
     #else
-        #define LV_FREETYPE_CACHE_FT_GLYPH_L1 0
+          #define LV_FREETYPE_CACHE_FT_GLYPH_L1 LV_USE_OS == LV_OS_NONE && LV_USE_FREETYPE
     #endif
 #endif
 
@@ -2258,18 +2398,26 @@
 #endif
 
 #ifndef LV_USE_CALENDAR_HEADER_ARROW
-    #ifdef CONFIG_LV_USE_CALENDAR_HEADER_ARROW
-        #define LV_USE_CALENDAR_HEADER_ARROW CONFIG_LV_USE_CALENDAR_HEADER_ARROW
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_CALENDAR_HEADER_ARROW
+            #define LV_USE_CALENDAR_HEADER_ARROW CONFIG_LV_USE_CALENDAR_HEADER_ARROW
+        #else
+            #define LV_USE_CALENDAR_HEADER_ARROW 0
+        #endif
     #else
-        #define LV_USE_CALENDAR_HEADER_ARROW 0
+          #define LV_USE_CALENDAR_HEADER_ARROW LV_USE_CALENDAR
     #endif
 #endif
 
 #ifndef LV_USE_CALENDAR_HEADER_DROPDOWN
-    #ifdef CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
-        #define LV_USE_CALENDAR_HEADER_DROPDOWN CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
+            #define LV_USE_CALENDAR_HEADER_DROPDOWN CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN
+        #else
+            #define LV_USE_CALENDAR_HEADER_DROPDOWN 0
+        #endif
     #else
-        #define LV_USE_CALENDAR_HEADER_DROPDOWN 0
+          #define LV_USE_CALENDAR_HEADER_DROPDOWN LV_USE_CALENDAR
     #endif
 #endif
 
@@ -2434,10 +2582,14 @@
 #endif
 
 #ifndef LV_IME_PINYIN_USE_K9_MODE
-    #ifdef CONFIG_LV_IME_PINYIN_USE_K9_MODE
-        #define LV_IME_PINYIN_USE_K9_MODE CONFIG_LV_IME_PINYIN_USE_K9_MODE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_IME_PINYIN_USE_K9_MODE
+            #define LV_IME_PINYIN_USE_K9_MODE CONFIG_LV_IME_PINYIN_USE_K9_MODE
+        #else
+            #define LV_IME_PINYIN_USE_K9_MODE 0
+        #endif
     #else
-        #define LV_IME_PINYIN_USE_K9_MODE 0
+          #define LV_IME_PINYIN_USE_K9_MODE LV_USE_IME_PINYIN
     #endif
 #endif
 
@@ -2450,10 +2602,14 @@
 #endif
 
 #ifndef LV_IME_PINYIN_USE_DEFAULT_DICT
-    #ifdef CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
-        #define LV_IME_PINYIN_USE_DEFAULT_DICT CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+            #define LV_IME_PINYIN_USE_DEFAULT_DICT CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+        #else
+            #define LV_IME_PINYIN_USE_DEFAULT_DICT 0
+        #endif
     #else
-        #define LV_IME_PINYIN_USE_DEFAULT_DICT 0
+          #define LV_IME_PINYIN_USE_DEFAULT_DICT LV_USE_IME_PINYIN
     #endif
 #endif
 
@@ -2490,18 +2646,26 @@
 #endif
 
 #ifndef LV_LABEL_TEXT_SELECTION
-    #ifdef CONFIG_LV_LABEL_TEXT_SELECTION
-        #define LV_LABEL_TEXT_SELECTION CONFIG_LV_LABEL_TEXT_SELECTION
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LABEL_TEXT_SELECTION
+            #define LV_LABEL_TEXT_SELECTION CONFIG_LV_LABEL_TEXT_SELECTION
+        #else
+            #define LV_LABEL_TEXT_SELECTION 0
+        #endif
     #else
-        #define LV_LABEL_TEXT_SELECTION 0
+          #define LV_LABEL_TEXT_SELECTION LV_USE_LABEL
     #endif
 #endif
 
 #ifndef LV_LABEL_LONG_TXT_HINT
-    #ifdef CONFIG_LV_LABEL_LONG_TXT_HINT
-        #define LV_LABEL_LONG_TXT_HINT CONFIG_LV_LABEL_LONG_TXT_HINT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LABEL_LONG_TXT_HINT
+            #define LV_LABEL_LONG_TXT_HINT CONFIG_LV_LABEL_LONG_TXT_HINT
+        #else
+            #define LV_LABEL_LONG_TXT_HINT 0
+        #endif
     #else
-        #define LV_LABEL_LONG_TXT_HINT 0
+          #define LV_LABEL_LONG_TXT_HINT LV_USE_LABEL
     #endif
 #endif
 
@@ -2779,7 +2943,7 @@
             #define LV_LINUX_DRM_AUTO_BACKEND 0
         #endif
     #else
-        #define LV_LINUX_DRM_AUTO_BACKEND 1
+          #define LV_LINUX_DRM_AUTO_BACKEND LV_USE_LINUX_DRM
     #endif
 #endif
 
@@ -2832,10 +2996,14 @@
 #endif
 
 #ifndef LV_LINUX_FBDEV_MMAP
-    #ifdef CONFIG_LV_LINUX_FBDEV_MMAP
-        #define LV_LINUX_FBDEV_MMAP CONFIG_LV_LINUX_FBDEV_MMAP
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LINUX_FBDEV_MMAP
+            #define LV_LINUX_FBDEV_MMAP CONFIG_LV_LINUX_FBDEV_MMAP
+        #else
+            #define LV_LINUX_FBDEV_MMAP 0
+        #endif
     #else
-        #define LV_LINUX_FBDEV_MMAP 0
+          #define LV_LINUX_FBDEV_MMAP LV_USE_LINUX_FBDEV
     #endif
 #endif
 
@@ -3016,10 +3184,14 @@
 #endif
 
 #ifndef LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
-    #ifdef CONFIG_LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
-        #define LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT CONFIG_LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
+            #define LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT CONFIG_LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
+        #else
+            #define LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT 0
+        #endif
     #else
-        #define LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT 0
+          #define LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT LV_LIBINPUT_XKB && LV_USE_LIBINPUT
     #endif
 #endif
 
@@ -3207,7 +3379,7 @@
             #define LV_SDL_AUTO_BACKEND 0
         #endif
     #else
-        #define LV_SDL_AUTO_BACKEND 1
+          #define LV_SDL_AUTO_BACKEND LV_USE_SDL
     #endif
 #endif
 
@@ -3236,10 +3408,14 @@
 #endif
 
 #ifndef LV_SDL_ACCELERATED
-    #ifdef CONFIG_LV_SDL_ACCELERATED
-        #define LV_SDL_ACCELERATED CONFIG_LV_SDL_ACCELERATED
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_SDL_ACCELERATED
+            #define LV_SDL_ACCELERATED CONFIG_LV_SDL_ACCELERATED
+        #else
+            #define LV_SDL_ACCELERATED 0
+        #endif
     #else
-        #define LV_SDL_ACCELERATED 0
+          #define LV_SDL_ACCELERATED LV_USE_SDL
     #endif
 #endif
 
@@ -3252,10 +3428,14 @@
 #endif
 
 #ifndef LV_SDL_DIRECT_EXIT
-    #ifdef CONFIG_LV_SDL_DIRECT_EXIT
-        #define LV_SDL_DIRECT_EXIT CONFIG_LV_SDL_DIRECT_EXIT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_SDL_DIRECT_EXIT
+            #define LV_SDL_DIRECT_EXIT CONFIG_LV_SDL_DIRECT_EXIT
+        #else
+            #define LV_SDL_DIRECT_EXIT 0
+        #endif
     #else
-        #define LV_SDL_DIRECT_EXIT 0
+          #define LV_SDL_DIRECT_EXIT LV_USE_SDL
     #endif
 #endif
 
@@ -3300,10 +3480,14 @@
 #endif
 
 #ifndef LV_WAYLAND_DIRECT_EXIT
-    #ifdef CONFIG_LV_WAYLAND_DIRECT_EXIT
-        #define LV_WAYLAND_DIRECT_EXIT CONFIG_LV_WAYLAND_DIRECT_EXIT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_WAYLAND_DIRECT_EXIT
+            #define LV_WAYLAND_DIRECT_EXIT CONFIG_LV_WAYLAND_DIRECT_EXIT
+        #else
+            #define LV_WAYLAND_DIRECT_EXIT 0
+        #endif
     #else
-        #define LV_WAYLAND_DIRECT_EXIT 0
+          #define LV_WAYLAND_DIRECT_EXIT LV_USE_WAYLAND
     #endif
 #endif
 
@@ -3315,7 +3499,7 @@
             #define LV_WAYLAND_AUTO_BACKEND 0
         #endif
     #else
-        #define LV_WAYLAND_AUTO_BACKEND 1
+          #define LV_WAYLAND_AUTO_BACKEND LV_USE_WAYLAND
     #endif
 #endif
 
@@ -3344,18 +3528,26 @@
 #endif
 
 #ifndef LV_X11_DOUBLE_BUFFER
-    #ifdef CONFIG_LV_X11_DOUBLE_BUFFER
-        #define LV_X11_DOUBLE_BUFFER CONFIG_LV_X11_DOUBLE_BUFFER
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_X11_DOUBLE_BUFFER
+            #define LV_X11_DOUBLE_BUFFER CONFIG_LV_X11_DOUBLE_BUFFER
+        #else
+            #define LV_X11_DOUBLE_BUFFER 0
+        #endif
     #else
-        #define LV_X11_DOUBLE_BUFFER 0
+          #define LV_X11_DOUBLE_BUFFER LV_USE_X11
     #endif
 #endif
 
 #ifndef LV_X11_DIRECT_EXIT
-    #ifdef CONFIG_LV_X11_DIRECT_EXIT
-        #define LV_X11_DIRECT_EXIT CONFIG_LV_X11_DIRECT_EXIT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_X11_DIRECT_EXIT
+            #define LV_X11_DIRECT_EXIT CONFIG_LV_X11_DIRECT_EXIT
+        #else
+            #define LV_X11_DIRECT_EXIT 0
+        #endif
     #else
-        #define LV_X11_DIRECT_EXIT 0
+          #define LV_X11_DIRECT_EXIT LV_USE_X11
     #endif
 #endif
 
@@ -3764,10 +3956,14 @@
 #endif
 
 #ifndef LV_PROFILER_BUILTIN_DEFAULT_ENABLE
-    #ifdef CONFIG_LV_PROFILER_BUILTIN_DEFAULT_ENABLE
-        #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE CONFIG_LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+            #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE CONFIG_LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+        #else
+            #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 0
+        #endif
     #else
-        #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 0
+          #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE LV_USE_PROFILER_BUILTIN
     #endif
 #endif
 
@@ -3788,58 +3984,86 @@
 #endif
 
 #ifndef LV_PROFILER_LAYOUT
-    #ifdef CONFIG_LV_PROFILER_LAYOUT
-        #define LV_PROFILER_LAYOUT CONFIG_LV_PROFILER_LAYOUT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_LAYOUT
+            #define LV_PROFILER_LAYOUT CONFIG_LV_PROFILER_LAYOUT
+        #else
+            #define LV_PROFILER_LAYOUT 0
+        #endif
     #else
-        #define LV_PROFILER_LAYOUT 0
+          #define LV_PROFILER_LAYOUT LV_USE_PROFILER
     #endif
 #endif
 
 #ifndef LV_PROFILER_REFR
-    #ifdef CONFIG_LV_PROFILER_REFR
-        #define LV_PROFILER_REFR CONFIG_LV_PROFILER_REFR
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_REFR
+            #define LV_PROFILER_REFR CONFIG_LV_PROFILER_REFR
+        #else
+            #define LV_PROFILER_REFR 0
+        #endif
     #else
-        #define LV_PROFILER_REFR 0
+          #define LV_PROFILER_REFR LV_USE_PROFILER
     #endif
 #endif
 
 #ifndef LV_PROFILER_DRAW
-    #ifdef CONFIG_LV_PROFILER_DRAW
-        #define LV_PROFILER_DRAW CONFIG_LV_PROFILER_DRAW
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_DRAW
+            #define LV_PROFILER_DRAW CONFIG_LV_PROFILER_DRAW
+        #else
+            #define LV_PROFILER_DRAW 0
+        #endif
     #else
-        #define LV_PROFILER_DRAW 0
+          #define LV_PROFILER_DRAW LV_USE_PROFILER
     #endif
 #endif
 
 #ifndef LV_PROFILER_INDEV
-    #ifdef CONFIG_LV_PROFILER_INDEV
-        #define LV_PROFILER_INDEV CONFIG_LV_PROFILER_INDEV
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_INDEV
+            #define LV_PROFILER_INDEV CONFIG_LV_PROFILER_INDEV
+        #else
+            #define LV_PROFILER_INDEV 0
+        #endif
     #else
-        #define LV_PROFILER_INDEV 0
+          #define LV_PROFILER_INDEV LV_USE_PROFILER
     #endif
 #endif
 
 #ifndef LV_PROFILER_DECODER
-    #ifdef CONFIG_LV_PROFILER_DECODER
-        #define LV_PROFILER_DECODER CONFIG_LV_PROFILER_DECODER
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_DECODER
+            #define LV_PROFILER_DECODER CONFIG_LV_PROFILER_DECODER
+        #else
+            #define LV_PROFILER_DECODER 0
+        #endif
     #else
-        #define LV_PROFILER_DECODER 0
+          #define LV_PROFILER_DECODER LV_USE_PROFILER
     #endif
 #endif
 
 #ifndef LV_PROFILER_FONT
-    #ifdef CONFIG_LV_PROFILER_FONT
-        #define LV_PROFILER_FONT CONFIG_LV_PROFILER_FONT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_FONT
+            #define LV_PROFILER_FONT CONFIG_LV_PROFILER_FONT
+        #else
+            #define LV_PROFILER_FONT 0
+        #endif
     #else
-        #define LV_PROFILER_FONT 0
+          #define LV_PROFILER_FONT LV_USE_PROFILER
     #endif
 #endif
 
 #ifndef LV_PROFILER_FS
-    #ifdef CONFIG_LV_PROFILER_FS
-        #define LV_PROFILER_FS CONFIG_LV_PROFILER_FS
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_FS
+            #define LV_PROFILER_FS CONFIG_LV_PROFILER_FS
+        #else
+            #define LV_PROFILER_FS 0
+        #endif
     #else
-        #define LV_PROFILER_FS 0
+          #define LV_PROFILER_FS LV_USE_PROFILER
     #endif
 #endif
 
@@ -3852,26 +4076,38 @@
 #endif
 
 #ifndef LV_PROFILER_TIMER
-    #ifdef CONFIG_LV_PROFILER_TIMER
-        #define LV_PROFILER_TIMER CONFIG_LV_PROFILER_TIMER
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_TIMER
+            #define LV_PROFILER_TIMER CONFIG_LV_PROFILER_TIMER
+        #else
+            #define LV_PROFILER_TIMER 0
+        #endif
     #else
-        #define LV_PROFILER_TIMER 0
+          #define LV_PROFILER_TIMER LV_USE_PROFILER
     #endif
 #endif
 
 #ifndef LV_PROFILER_CACHE
-    #ifdef CONFIG_LV_PROFILER_CACHE
-        #define LV_PROFILER_CACHE CONFIG_LV_PROFILER_CACHE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_CACHE
+            #define LV_PROFILER_CACHE CONFIG_LV_PROFILER_CACHE
+        #else
+            #define LV_PROFILER_CACHE 0
+        #endif
     #else
-        #define LV_PROFILER_CACHE 0
+          #define LV_PROFILER_CACHE LV_USE_PROFILER
     #endif
 #endif
 
 #ifndef LV_PROFILER_EVENT
-    #ifdef CONFIG_LV_PROFILER_EVENT
-        #define LV_PROFILER_EVENT CONFIG_LV_PROFILER_EVENT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_PROFILER_EVENT
+            #define LV_PROFILER_EVENT CONFIG_LV_PROFILER_EVENT
+        #else
+            #define LV_PROFILER_EVENT 0
+        #endif
     #else
-        #define LV_PROFILER_EVENT 0
+          #define LV_PROFILER_EVENT LV_USE_PROFILER
     #endif
 #endif
 
@@ -3892,10 +4128,14 @@
 #endif
 
 #ifndef LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
-    #ifdef CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
-        #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+            #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+        #else
+            #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 0
+        #endif
     #else
-        #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 0
+          #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST
     #endif
 #endif
 
@@ -3962,10 +4202,14 @@
 #endif
 
 #ifndef LV_FILE_EXPLORER_QUICK_ACCESS
-    #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
-        #define LV_FILE_EXPLORER_QUICK_ACCESS CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
+            #define LV_FILE_EXPLORER_QUICK_ACCESS CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
+        #else
+            #define LV_FILE_EXPLORER_QUICK_ACCESS 0
+        #endif
     #else
-        #define LV_FILE_EXPLORER_QUICK_ACCESS 0
+          #define LV_FILE_EXPLORER_QUICK_ACCESS LV_USE_FILE_EXPLORER
     #endif
 #endif
 
