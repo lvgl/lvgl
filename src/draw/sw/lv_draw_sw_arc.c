@@ -25,8 +25,6 @@ static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, l
 /*********************
  *      DEFINES
  *********************/
-#define SPLIT_RADIUS_LIMIT 10  /*With radius greater than this the arc will drawn in quarters. A quarter is drawn only if there is arc in it*/
-#define SPLIT_ANGLE_GAP_LIMIT 60  /*With small gaps in the arc don't bother with splitting because there is nothing to skip.*/
 
 /**********************
  *      TYPEDEFS
@@ -82,6 +80,12 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
     area_in.y1 += dsc->width;
     area_in.x2 -= dsc->width;
     area_in.y2 -= dsc->width;
+
+    /*Optimization: Minimize clipped area*/
+    lv_area_t arc_area;
+    lv_draw_arc_get_area(dsc->center.x, dsc->center.y, dsc->radius, dsc->start_angle, dsc->end_angle,
+                         width, dsc->rounded, &arc_area);
+    if(!lv_area_intersect(&clipped_area, &clipped_area, &arc_area)) return;
 
     int32_t start_angle = (int32_t)dsc->start_angle;
     int32_t end_angle = (int32_t)dsc->end_angle;

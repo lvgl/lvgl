@@ -42,7 +42,7 @@ static void lv_arc_draw(lv_event_t * e);
 static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void inv_arc_area(lv_obj_t * arc, lv_value_precise_t start_angle, lv_value_precise_t end_angle, lv_part_t part);
 static void inv_knob_area(lv_obj_t * obj);
-static void get_knob_inv_area(lv_obj_t * obj, lv_area_t * area);
+static bool get_knob_inv_area(lv_obj_t * obj, lv_area_t * area);
 static void get_center(const lv_obj_t * obj, lv_point_t * center, int32_t * arc_r);
 static lv_value_precise_t get_angle(const lv_obj_t * obj);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, int32_t r, lv_area_t * knob_area);
@@ -182,18 +182,20 @@ void lv_arc_set_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precis
     if(start > 360) start -= 360;
     if(end > 360) end -= 360;
 
+    bool visible = lv_obj_is_visible(obj);
+
     /*Snapshot for invalidation*/
     lv_value_precise_t old_start = arc->indic_angle_start;
     lv_value_precise_t old_end = arc->indic_angle_end;
     lv_area_t old_knob_area;
-    get_knob_inv_area(obj, &old_knob_area);
+    bool knob_visible = visible && get_knob_inv_area(obj, &old_knob_area);
 
     /*Apply the change*/
     arc->indic_angle_start = start;
     arc->indic_angle_end = end;
 
     /*Invalidation*/
-    if(lv_obj_is_visible(obj)) {
+    if(visible) {
         /*Area swept by the start angle*/
         lv_value_precise_t start_old_delta = end - old_start;
         lv_value_precise_t start_new_delta = end - start;
@@ -213,8 +215,10 @@ void lv_arc_set_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precis
         else if(end_old_delta < end_new_delta) inv_arc_area(obj, old_end, end, LV_PART_INDICATOR);
 
         /*Knob*/
-        lv_obj_invalidate_area(obj, &old_knob_area);
-        inv_knob_area(obj);
+        if(knob_visible) {
+            lv_obj_invalidate_area(obj, &old_knob_area);
+            inv_knob_area(obj);
+        }
     }
 }
 
@@ -906,8 +910,19 @@ static void inv_arc_area(lv_obj_t * obj, lv_value_precise_t start_angle, lv_valu
     lv_obj_invalidate_area(obj, &inv_area);
 }
 
-static void get_knob_inv_area(lv_obj_t * obj, lv_area_t * area)
+static bool get_knob_inv_area(lv_obj_t * obj, lv_area_t * area)
 {
+    if(lv_obj_get_style_bg_opa(obj, LV_PART_KNOB) <= LV_OPA_MIN &&
+       lv_obj_get_style_bg_image_src(obj, LV_PART_KNOB) == NULL &&
+       lv_obj_get_style_border_opa(obj, LV_PART_KNOB) <= LV_OPA_MIN &&
+       lv_obj_get_style_border_width(obj, LV_PART_KNOB) <= 0 &&
+       lv_obj_get_style_outline_opa(obj, LV_PART_KNOB) <= LV_OPA_MIN &&
+       lv_obj_get_style_outline_width(obj, LV_PART_KNOB) <= 0 &&
+       lv_obj_get_style_shadow_opa(obj, LV_PART_KNOB) <= LV_OPA_MIN &&
+       lv_obj_get_style_shadow_width(obj, LV_PART_KNOB) <= 0) {
+        return false;
+    }
+
     lv_point_t c;
     int32_t r;
     get_center(obj, &c, &r);
@@ -919,13 +934,14 @@ static void get_knob_inv_area(lv_obj_t * obj, lv_area_t * area)
     if(knob_extra_size > 0) {
         lv_area_increase(area, knob_extra_size, knob_extra_size);
     }
+
+    return true;
 }
 
 static void inv_knob_area(lv_obj_t * obj)
 {
     lv_area_t a;
-    get_knob_inv_area(obj, &a);
-    lv_obj_invalidate_area(obj, &a);
+    if(get_knob_inv_area(obj, &a)) lv_obj_invalidate_area(obj, &a);
 }
 
 static void get_center(const lv_obj_t * obj, lv_point_t * center, int32_t * arc_r)
