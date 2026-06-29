@@ -54,7 +54,7 @@ void test_clip_corner_1(void)
     create_panel(100, false);
 
     lv_obj_t * cont = create_panel(0, true);
-    lv_obj_add_flag(cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    lv_obj_set_flex_in_new_track(cont, true);
     create_panel(10, true);
     create_panel(30, true);
     create_panel(100, true);

@@ -17,7 +17,7 @@ void test_event_trickle_basic(void)
 {
     /*Create a parent container*/
     lv_obj_t * parent = lv_obj_create(lv_screen_active());
-    lv_obj_add_flag(parent, LV_OBJ_FLAG_EVENT_TRICKLE);
+    lv_obj_set_event_trickle(parent, true);
     lv_obj_add_event_cb(parent, test_event_cb, LV_EVENT_CLICKED, NULL);
 
     /*Create children*/
@@ -45,7 +45,7 @@ void test_event_trickle_stop(void)
 {
     /*Create a parent container*/
     lv_obj_t * parent = lv_obj_create(lv_screen_active());
-    lv_obj_add_flag(parent, LV_OBJ_FLAG_EVENT_TRICKLE);
+    lv_obj_set_event_trickle(parent, true);
 
     /*Add event handler that stops trickle down*/
     lv_obj_add_event_cb(parent, test_event_cb, LV_EVENT_CLICKED, NULL);

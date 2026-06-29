@@ -156,7 +156,7 @@ void test_indev_scroll_between_two_buttons_with_and_without_press_lock(void)
     uint32_t pressed_lost_count_2 = 0;
 
     lv_obj_t * btn1 = lv_button_create(lv_screen_active());
-    lv_obj_remove_flag(btn1, LV_OBJ_FLAG_PRESS_LOCK);
+    lv_obj_set_press_lock(btn1, false);
     lv_obj_set_size(btn1, 120, 100);
     lv_obj_set_pos(btn1, 300, 200);
     lv_obj_add_event_cb(btn1, indev_scroll_press_event_cb, LV_EVENT_PRESSED,

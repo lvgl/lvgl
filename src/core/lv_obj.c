@@ -203,6 +203,126 @@ static const lv_property_ops_t lv_obj_properties[] = {
         .getter = lv_obj_get_index,
     },
     {
+        .id = LV_PROPERTY_OBJ_HIDDEN,
+        .setter = lv_obj_set_hidden,
+        .getter = lv_obj_is_hidden,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_CLICKABLE,
+        .setter = lv_obj_set_clickable,
+        .getter = lv_obj_is_clickable,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_CLICK_FOCUSABLE,
+        .setter = lv_obj_set_click_focusable,
+        .getter = lv_obj_is_click_focusable,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_CHECKABLE,
+        .setter = lv_obj_set_checkable,
+        .getter = lv_obj_is_checkable,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLLABLE,
+        .setter = lv_obj_set_scrollable,
+        .getter = lv_obj_is_scrollable,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_ELASTIC,
+        .setter = lv_obj_set_scroll_elastic,
+        .getter = lv_obj_is_scroll_elastic,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_MOMENTUM,
+        .setter = lv_obj_set_scroll_momentum,
+        .getter = lv_obj_is_scroll_momentum,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_ONE,
+        .setter = lv_obj_set_scroll_one,
+        .getter = lv_obj_is_scroll_one,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_CHAIN_HOR,
+        .setter = lv_obj_set_scroll_chain_hor,
+        .getter = lv_obj_is_scroll_chain_hor,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_CHAIN_VER,
+        .setter = lv_obj_set_scroll_chain_ver,
+        .getter = lv_obj_is_scroll_chain_ver,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_ON_FOCUS,
+        .setter = lv_obj_set_scroll_on_focus,
+        .getter = lv_obj_is_scroll_on_focus,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_WITH_ARROW,
+        .setter = lv_obj_set_scroll_with_arrow,
+        .getter = lv_obj_is_scroll_with_arrow,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SNAPPABLE,
+        .setter = lv_obj_set_snappable,
+        .getter = lv_obj_is_snappable,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_PRESS_LOCK,
+        .setter = lv_obj_set_press_lock,
+        .getter = lv_obj_is_press_lock,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_EVENT_BUBBLE,
+        .setter = lv_obj_set_event_bubble,
+        .getter = lv_obj_is_event_bubble,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_GESTURE_BUBBLE,
+        .setter = lv_obj_set_gesture_bubble,
+        .getter = lv_obj_is_gesture_bubble,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_ADV_HITTEST,
+        .setter = lv_obj_set_adv_hittest,
+        .getter = lv_obj_is_adv_hittest,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_IGNORE_LAYOUT,
+        .setter = lv_obj_set_ignore_layout,
+        .getter = lv_obj_is_ignore_layout,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_FLOATING,
+        .setter = lv_obj_set_floating,
+        .getter = lv_obj_is_floating,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SEND_DRAW_TASK_EVENTS,
+        .setter = lv_obj_set_send_draw_task_events,
+        .getter = lv_obj_is_send_draw_task_events,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_OVERFLOW_VISIBLE,
+        .setter = lv_obj_set_overflow_visible,
+        .getter = lv_obj_is_overflow_visible,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_EVENT_TRICKLE,
+        .setter = lv_obj_set_event_trickle,
+        .getter = lv_obj_is_event_trickle,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_STATE_TRICKLE,
+        .setter = lv_obj_set_state_trickle,
+        .getter = lv_obj_is_state_trickle,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_FLEX_IN_NEW_TRACK,
+        .setter = lv_obj_set_flex_in_new_track,
+        .getter = lv_obj_is_flex_in_new_track,
+    },
+    {
         .id = LV_PROPERTY_ID_ANY,
         .setter = lv_obj_set_any,
         .getter = lv_obj_get_any,
@@ -257,18 +377,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
 
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
+    LV_LOG_DEPRECATED("use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, true).");
+
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-
-    LV_LOG_WARN("Object flags are deprecated. Use dedicated API functions instead");
-
-    if(lv_obj_has_flag(obj, f)) /*Check if all flags are set*/
-        return;
-
 
     if(f >= LV_OBJ_FLAG_LAYOUT_1) lv_obj_allocate_spec_attr(obj);
 
     /* If all requested flags are already set, do nothing */
+    LV_DEPRECATIONS_IGNORE_BEGIN
     if(lv_obj_has_flag(obj, f)) return;
+    LV_DEPRECATIONS_IGNORE_END
 
     if(f & LV_OBJ_FLAG_HIDDEN)               lv_obj_set_hidden(obj, true);
     if(f & LV_OBJ_FLAG_CLICKABLE)            lv_obj_set_clickable(obj, true);
@@ -311,9 +429,9 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
 void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_LOG_DEPRECATED("use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, false).");
 
-    LV_LOG_WARN("Object flags are deprecated. Use dedicated API functions instead");
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
 
     if(f >= LV_OBJ_FLAG_LAYOUT_1) lv_obj_allocate_spec_attr(obj);
 
@@ -359,12 +477,14 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
 void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
 {
+    LV_LOG_DEPRECATED("use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, en).");
+
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    LV_LOG_WARN("Object flags are deprecated. Use dedicated API functions instead");
-
+    LV_DEPRECATIONS_IGNORE_BEGIN
     if(v) lv_obj_add_flag(obj, f);
     else lv_obj_remove_flag(obj, f);
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 
@@ -542,7 +662,7 @@ void lv_obj_set_ignore_layout(lv_obj_t * obj, bool en)
 void lv_obj_set_floating(lv_obj_t * obj, bool en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-   
+
     if(obj->floating == en) return;
 
     bool was_on_layout = lv_obj_is_layout_positioned(obj);
@@ -645,9 +765,9 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v)
 
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
 {
-    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+    LV_LOG_DEPRECATED("use the dedicated lv_obj_is_<flag>() getters instead, e.g. lv_obj_is_hidden(obj).");
 
-    LV_LOG_WARN("Object flags are deprecated. Use dedicated API functions instead");
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
     if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;;
 
@@ -688,10 +808,9 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
 
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
 {
+    LV_LOG_DEPRECATED("use the dedicated lv_obj_is_<flag>() getters instead, e.g. lv_obj_is_hidden(obj).");
+
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
-
-    LV_LOG_WARN("Object flags are deprecated. Use dedicated API functions instead");
-
 
     if((f & LV_OBJ_FLAG_HIDDEN) && obj->hidden) return true;
     if((f & LV_OBJ_FLAG_CLICKABLE) && obj->clickable) return true;
@@ -1549,7 +1668,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 if(res != LV_RESULT_OK) return;
             }
         }
-        else if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_WITH_ARROW) && !lv_obj_is_editable(obj)) {
+        else if(lv_obj_is_scrollable(obj) && lv_obj_is_scroll_with_arrow(obj) && !lv_obj_is_editable(obj)) {
             /*scroll by keypad or encoder*/
             lv_anim_enable_t anim_enable = LV_ANIM_OFF;
             int32_t sl = lv_obj_get_scroll_left(obj);
@@ -1906,9 +2025,13 @@ static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_prop
     LV_ASSERT(obj != NULL);
 
     if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
+        /*The flag properties are kept for backward compatibility; the dedicated
+         *per-flag setters are registered as normal properties (see lv_obj_properties).*/
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
+        LV_DEPRECATIONS_IGNORE_BEGIN
         if(prop->num) lv_obj_add_flag(obj, flag);
         else lv_obj_remove_flag(obj, flag);
+        LV_DEPRECATIONS_IGNORE_END
         return LV_RESULT_OK;
     }
     else if(id >= LV_PROPERTY_OBJ_STATE_START && id <= LV_PROPERTY_OBJ_STATE_END) {
@@ -1932,7 +2055,9 @@ static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_prop
     if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
         prop->id = id;
+        LV_DEPRECATIONS_IGNORE_BEGIN
         prop->num = lv_obj_has_flag_any(obj, flag);
+        LV_DEPRECATIONS_IGNORE_END
         return LV_RESULT_OK;
     }
     else if(id >= LV_PROPERTY_OBJ_STATE_START && id <= LV_PROPERTY_OBJ_STATE_END) {

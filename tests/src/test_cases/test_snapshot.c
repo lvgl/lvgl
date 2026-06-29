@@ -176,7 +176,7 @@ void test_snapshot_take_snapshot_multiple_widgets(void)
     lv_obj_set_style_border_width(obj_4, 0, 0);
     lv_obj_set_style_bg_color(obj_4, lv_color_hex3(0x0ff), 0);
     lv_obj_align(obj_4, LV_ALIGN_BOTTOM_MID, 0, 0);
-    lv_obj_add_flag(obj_4, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(obj_4, true);
 
     lv_obj_t * obj_5 = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj_5, 100, 100);

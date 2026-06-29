@@ -124,7 +124,7 @@ void test_switch_should_trigger_value_changed_event_only_once(void)
 /* See #2785 for context */
 void test_switch_should_state_change_when_event_bubbling_is_enabled(void)
 {
-    lv_obj_add_flag(sw, LV_OBJ_FLAG_EVENT_BUBBLE);
+    lv_obj_set_event_bubble(sw, true);
     mouse_click_on_switch();
 
     TEST_ASSERT(lv_obj_has_state(sw, LV_STATE_CHECKED));

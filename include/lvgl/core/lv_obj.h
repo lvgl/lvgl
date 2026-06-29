@@ -173,6 +173,33 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, CHILD_COUNT,                LV_PROPERTY_TYPE_INT,       72),
     LV_PROPERTY_ID(OBJ, INDEX,                      LV_PROPERTY_TYPE_INT,       73),
 
+    /*Dedicated boolean properties backing the per-flag setters/getters.
+     *The OBJ_FLAG_* properties above are kept for backward compatibility.*/
+    LV_PROPERTY_ID(OBJ, HIDDEN,                     LV_PROPERTY_TYPE_BOOL,      74),
+    LV_PROPERTY_ID(OBJ, CLICKABLE,                  LV_PROPERTY_TYPE_BOOL,      75),
+    LV_PROPERTY_ID(OBJ, CLICK_FOCUSABLE,            LV_PROPERTY_TYPE_BOOL,      76),
+    LV_PROPERTY_ID(OBJ, CHECKABLE,                  LV_PROPERTY_TYPE_BOOL,      77),
+    LV_PROPERTY_ID(OBJ, SCROLLABLE,                 LV_PROPERTY_TYPE_BOOL,      78),
+    LV_PROPERTY_ID(OBJ, SCROLL_ELASTIC,             LV_PROPERTY_TYPE_BOOL,      79),
+    LV_PROPERTY_ID(OBJ, SCROLL_MOMENTUM,            LV_PROPERTY_TYPE_BOOL,      80),
+    LV_PROPERTY_ID(OBJ, SCROLL_ONE,                 LV_PROPERTY_TYPE_BOOL,      81),
+    LV_PROPERTY_ID(OBJ, SCROLL_CHAIN_HOR,           LV_PROPERTY_TYPE_BOOL,      82),
+    LV_PROPERTY_ID(OBJ, SCROLL_CHAIN_VER,           LV_PROPERTY_TYPE_BOOL,      83),
+    LV_PROPERTY_ID(OBJ, SCROLL_ON_FOCUS,            LV_PROPERTY_TYPE_BOOL,      84),
+    LV_PROPERTY_ID(OBJ, SCROLL_WITH_ARROW,          LV_PROPERTY_TYPE_BOOL,      85),
+    LV_PROPERTY_ID(OBJ, SNAPPABLE,                  LV_PROPERTY_TYPE_BOOL,      86),
+    LV_PROPERTY_ID(OBJ, PRESS_LOCK,                 LV_PROPERTY_TYPE_BOOL,      87),
+    LV_PROPERTY_ID(OBJ, EVENT_BUBBLE,               LV_PROPERTY_TYPE_BOOL,      88),
+    LV_PROPERTY_ID(OBJ, GESTURE_BUBBLE,             LV_PROPERTY_TYPE_BOOL,      89),
+    LV_PROPERTY_ID(OBJ, ADV_HITTEST,                LV_PROPERTY_TYPE_BOOL,      90),
+    LV_PROPERTY_ID(OBJ, IGNORE_LAYOUT,              LV_PROPERTY_TYPE_BOOL,      91),
+    LV_PROPERTY_ID(OBJ, FLOATING,                   LV_PROPERTY_TYPE_BOOL,      92),
+    LV_PROPERTY_ID(OBJ, SEND_DRAW_TASK_EVENTS,      LV_PROPERTY_TYPE_BOOL,      93),
+    LV_PROPERTY_ID(OBJ, OVERFLOW_VISIBLE,           LV_PROPERTY_TYPE_BOOL,      94),
+    LV_PROPERTY_ID(OBJ, EVENT_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      95),
+    LV_PROPERTY_ID(OBJ, STATE_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      96),
+    LV_PROPERTY_ID(OBJ, FLEX_IN_NEW_TRACK,          LV_PROPERTY_TYPE_BOOL,      97),
+
     LV_PROPERTY_OBJ_END,
 };
 #endif
@@ -201,14 +228,18 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent);
  * Set one or more flags
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to set.
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, true)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, true).")
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Remove one or more flags
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to clear.
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, false)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, false).")
 void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
@@ -216,7 +247,9 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to update.
  * @param v     true: add the flags; false: remove the flags
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, en)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, en).")
 void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
 
 /** Make the object hidden. (Like it wasn't there at all)

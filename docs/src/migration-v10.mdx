@@ -103,6 +103,27 @@ if you need finer control.
   lv_obj_t * obj = lv_obj_find_by_name(parent, "my_widget");
   ```
 
+- The generic flag API — `lv_obj_add_flag()`, `lv_obj_remove_flag()`,
+  `lv_obj_set_flag()`, `lv_obj_has_flag()` and `lv_obj_has_flag_any()` — is
+  deprecated. Each flag now has a dedicated setter (`lv_obj_set_<flag>(obj, en)`)
+  and getter (`lv_obj_is_<flag>(obj)`):
+  ```c
+  /* Before */
+  lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+  lv_obj_set_flag(obj, LV_OBJ_FLAG_SCROLLABLE, en);
+  bool h = lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN);
+
+  /* After */
+  lv_obj_set_hidden(obj, true);
+  lv_obj_set_clickable(obj, false);
+  lv_obj_set_scrollable(obj, en);
+  bool h = lv_obj_is_hidden(obj);
+  ```
+  The custom-bit flags (`LV_OBJ_FLAG_LAYOUT_2`, `LV_OBJ_FLAG_WIDGET_1/2`,
+  `LV_OBJ_FLAG_USER_1`–`4`) have no dedicated setter; keep using the generic
+  functions for those.
+
 ---
 
 ## Widgets

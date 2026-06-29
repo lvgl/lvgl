@@ -39,8 +39,8 @@ void test_textarea_should_have_valid_documented_default_values(void)
 
     /* Horizontal slider */
     TEST_ASSERT_TRUE(objw >= objh);
-    TEST_ASSERT_FALSE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN));
-    TEST_ASSERT_FALSE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLLABLE));
+    TEST_ASSERT_FALSE((lv_obj_is_scroll_chain_hor(slider) && lv_obj_is_scroll_chain_ver(slider)));
+    TEST_ASSERT_FALSE(lv_obj_is_scrollable(slider));
 }
 
 void test_slider_event_keys_right_and_up_increment_value_by_one(void)
@@ -322,7 +322,7 @@ void test_slider_scroll_chain_horizontal(void)
     lv_obj_send_event(slider, LV_EVENT_RELEASED, NULL);
 
     /* Horizontal ptr should allow vertical scroll chain */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
+    TEST_ASSERT_TRUE(lv_obj_is_scroll_chain_ver(slider));
 }
 
 void test_slider_scroll_chain_vertical(void)
@@ -335,7 +335,7 @@ void test_slider_scroll_chain_vertical(void)
     lv_obj_send_event(slider, LV_EVENT_RELEASED, NULL);
 
     /* Vertical ptr should allow horizontal scroll chain */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
+    TEST_ASSERT_TRUE(lv_obj_is_scroll_chain_hor(slider));
 }
 
 void test_slider_range_mode_key_decrement_left_value(void)
