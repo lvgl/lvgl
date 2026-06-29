@@ -241,6 +241,15 @@ extern "C" {
 #endif
 #endif
 
+/*******************
+ * LV_CONF_MINIMAL
+ *******************/
+
+#if defined(CONFIG_LV_CONF_MINIMAL)
+#warning "LV_CONF_MINIMAL has been removed and no longer has any effect. Start from configs/defconfigs/minimal.defconfig instead."
+#undef CONFIG_LV_CONF_MINIMAL
+#endif
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

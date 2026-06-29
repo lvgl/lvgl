@@ -143,8 +143,12 @@ the footprint of your application.
 # Size of the memory region from which lvgl memory is allocated
 CONFIG_LV_Z_MEM_POOL_SIZE=8192
 
-# Do not include every widget/theme by default, enable them as needed.
-CONFIG_LV_CONF_MINIMAL=y
+# Do not include every widget/theme by default, disable what you don't need
+# and enable them as needed. For the smallest footprint, start from the
+# minimal preset in configs/defconfigs/minimal.defconfig.
+# CONFIG_LV_USE_FLEX=n
+# CONFIG_LV_USE_GRID=n
+# CONFIG_LV_USE_THEME_DEFAULT=n
 ```
 
 Overlays can be used to enable/disable features for specific boards or build

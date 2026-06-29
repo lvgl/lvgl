@@ -448,6 +448,15 @@ KCONFIG_BRIDGE_DEPRECATIONS = """\
 #define CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE CONFIG_LV_ENABLE_GLOBAL_CUSTOM
 #endif
 #endif
+
+/*******************
+ * LV_CONF_MINIMAL
+ *******************/
+
+#if defined(CONFIG_LV_CONF_MINIMAL)
+#warning "LV_CONF_MINIMAL has been removed and no longer has any effect. Start from configs/defconfigs/minimal.defconfig instead."
+#undef CONFIG_LV_CONF_MINIMAL
+#endif
 """
 
 KCONFIG_BRIDGE_FOOTER = """\

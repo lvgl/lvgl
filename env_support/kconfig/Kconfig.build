@@ -2,6 +2,14 @@ config LV_CONF_SKIP
 	bool "Check this to skip using lv_conf.h"
 	default y
 
+config LV_CONF_MINIMAL
+	bool "LVGL minimal configuration [DEPRECATED: use the minimal defconfig]"
+	default n
+	help
+	  Deprecated and no longer functional. The minimal preset is now a
+	  defconfig: configs/defconfigs/minimal.defconfig. Setting this has no
+	  effect on the generated configuration and triggers a build warning.
+
 config LV_USE_PRIVATE_API
 	bool "Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default"
 	default n
