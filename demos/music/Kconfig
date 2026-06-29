@@ -14,9 +14,11 @@ config LV_DEMO_MUSIC_LANDSCAPE
 config LV_DEMO_MUSIC_ROUND
 	bool "Enable Round"
 	default n
+
 config LV_DEMO_MUSIC_LARGE
 	bool "Enable Large"
 	default n
+
 config LV_DEMO_MUSIC_AUTO_PLAY
 	bool "Enable Auto play"
 	default n
