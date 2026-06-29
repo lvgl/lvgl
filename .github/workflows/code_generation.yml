@@ -54,6 +54,7 @@ jobs:
             --internal include/lvgl/config/lv_conf_internal.h \
             --bridge   include/lvgl/config/lv_conf_kconfig.h
           git diff --exit-code -- \
+            Kconfig \
             lv_conf_template.h \
             include/lvgl/config/lv_conf_internal.h \
             include/lvgl/config/lv_conf_kconfig.h \

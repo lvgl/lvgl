@@ -26,8 +26,8 @@ description: How to update your LVGL v9 project to v10, covering all breaking ch
 
 Starting with v9.6, LVGL's configuration was overhauled. [Kconfig](https://github.com/lvgl/lvgl/blob/master/Kconfig)
 is now the **single source of truth** for every configuration option. The files
-you actually use — `lv_conf_template.h` (the file you copy to `lv_conf.h`), the
-internal headers that apply defaults, and the `CONFIG_*` bridge — are all
+you actually use, `lv_conf_template.h` (the file you copy to `lv_conf.h`), the
+internal headers that apply defaults, and the `CONFIG_*` bridge, are all
 *generated* from the Kconfig tree, so the three ways of configuring LVGL
 (`lv_conf.h`, Kconfig, and compiler `-D` defines) can no longer drift apart.
 
@@ -44,10 +44,10 @@ internal headers that apply defaults, and the `CONFIG_*` bridge — are all
 The practical effects when you upgrade:
 
 - Options now appear in a consistent order with consistent comments, and every
-  option's default matches the Kconfig default exactly.
+  option's default matches the `Kconfig` default exactly.
 - A few options were renamed or restructured (see below). Old names still work
-  for now — they emit a `#warning` at compile time and are automatically mapped
-  to the new option — but they are **removed in v10.0**, so update them.
+  for now, they produce warnings or errors at compile time but they will be
+  **removed in v10.0**, so update them.
 
 The simplest way to migrate an existing `lv_conf.h` is to copy the new
 `lv_conf_template.h` over a fresh `lv_conf.h` and re-apply your changes, or to
@@ -56,27 +56,29 @@ the deprecation `#warning`s listed below.
 
 ### Minimal configuration
 
-The `LV_CONF_MINIMAL` switch — which disabled most widgets, themes, layouts and
+The `LV_CONF_MINIMAL` switch, which disabled most widgets, themes, layouts and
 fonts in one go — has been **removed**. A one-off switch like this doesn't fit a
 Kconfig-driven model, where presets are expressed as *defconfigs*. The minimal
-preset now lives at `configs/defconfigs/minimal.defconfig`:
+preset now lives at `configs/defconfigs/empty.defconfig`:
 
 ```bash
 # Build LVGL from the minimal preset
-cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/minimal.defconfig
+cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/empty.defconfig
 ```
 
 If you set `LV_CONF_MINIMAL` (in `lv_conf.h` or Kconfig) you'll get a build
-warning. Start from the minimal defconfig and re-enable only what you need, or —
-on the `lv_conf.h` path — simply disable the widgets/themes/layouts you don't
-use directly.
+warning. Start from the "empty" defconfig and re-enable only what you need.
 
 ### Renamed and restructured options
 
 Every old name below **still compiles** for now: it emits a `#warning` at build
 time and continues to work (it is mapped to its replacement, or still honored in
-place), and is **removed in v10.0**. Watch your build log after upgrading and
-update each one the warning points at.
+place), and is **removed in v10.0**.
+
+Some settings may produce errors, in this case we mention what to define so that you
+freely move around from v9.6 to previous v9 versions without warnings/errors.
+
+Watch your build log after upgrading and update each one the warning points at.
 
 #### Memory
 

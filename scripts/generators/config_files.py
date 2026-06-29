@@ -40,7 +40,6 @@ ROOT_FILES = [
 
 
 def parse_kconfig_content(path):
-    print(path)
     with open(path, "r") as f:
         lines = f.readlines()
 
