@@ -1,3 +1,9 @@
+config LV_USE_G2D
+	bool "Use G2D (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_G2D]"
+	default n
+	help
+	  Deprecated and non-functional. Use LV_USE_DRAW_G2D instead.
+
 config LV_USE_DRAW_G2D
 	bool "Use G2D for drawing."
 	default n
