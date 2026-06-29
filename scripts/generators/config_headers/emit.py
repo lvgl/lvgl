@@ -351,8 +351,6 @@ def custom_includes(entries) -> list[tuple[str, str]]:
         n = e.name
         if not (n.endswith(suffix) and not n.endswith("_USE" + suffix)):
             continue
-        if n in CUSTOM_INCLUDE_NO_GATE:
-            continue  # gated by its subsystem via an enum, no companion bool
         gate = n[: -len(suffix)] + "_USE" + suffix
         if gate not in names:
             raise SystemExit(
@@ -365,15 +363,6 @@ def custom_includes(entries) -> list[tuple[str, str]]:
         out.append((gate, n))
     return out
 
-
-# Custom-include configs that intentionally have NO `_USE_CUSTOM_INCLUDE` gate:
-# their subsystem decides when to include them via an enum (e.g.
-# `LV_USE_OS == LV_OS_CUSTOM`).  Listed so the missing-gate check doesn't flag
-# them.
-CUSTOM_INCLUDE_NO_GATE: set[str] = {
-    "LV_OS_CUSTOM_INCLUDE",
-    "LV_DRAW_SW_ASM_CUSTOM_INCLUDE",
-}
 
 # Custom-include configs that DO follow the gate convention but are *not*
 # auto-included here because their subsystem includes them at a specific point.

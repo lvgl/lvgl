@@ -178,6 +178,7 @@ choice LV_USE_OS
 		bool "7: SDL2"
 	config LV_OS_CUSTOM
 		bool "255: CUSTOM"
+		select LV_OS_USE_CUSTOM_INCLUDE
 endchoice
 
 config LV_USE_OS
@@ -192,11 +193,13 @@ config LV_USE_OS
 	default 7 if LV_OS_SDL2
 	default 255 if LV_OS_CUSTOM
 
+config LV_OS_USE_CUSTOM_INCLUDE
+	bool
+
 config LV_OS_CUSTOM_INCLUDE
 	string "Custom OS include header"
 	default ""
 	depends on LV_OS_CUSTOM
-
 
 if LV_OS_FREERTOS
 menu "FreeRTOS Configuration"
@@ -527,6 +530,7 @@ choice LV_USE_DRAW_SW_ASM
 		bool "3: RISC-V Vector"
 	config LV_DRAW_SW_ASM_CUSTOM
 		bool "255: CUSTOM"
+		select LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE
 endchoice
 
 config LV_USE_DRAW_SW_ASM
@@ -536,6 +540,9 @@ config LV_USE_DRAW_SW_ASM
 	default 2 if LV_DRAW_SW_ASM_HELIUM
 	default 3 if LV_DRAW_SW_ASM_RISCV_V
 	default 255 if LV_DRAW_SW_ASM_CUSTOM
+
+config LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE
+	bool
 
 config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 	string "Set the custom asm include file"

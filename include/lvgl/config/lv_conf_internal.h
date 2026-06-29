@@ -4727,6 +4727,14 @@
  -----------------------------------*/
 
 /* Derived capability flags (set via Kconfig `select`). */
+#ifndef LV_OS_USE_CUSTOM_INCLUDE
+    #if (LV_USE_OS == LV_OS_CUSTOM)
+        #define LV_OS_USE_CUSTOM_INCLUDE 1
+    #else
+        #define LV_OS_USE_CUSTOM_INCLUDE 0
+    #endif
+#endif
+
 #ifndef LV_DRAW_HAS_VECTOR_SUPPORT
     #if ((LV_USE_THORVG && LV_USE_DRAW_SW) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_VG && LV_USE_NEMA_GFX) || LV_USE_DRAW_NANOVG)
         #define LV_DRAW_HAS_VECTOR_SUPPORT 1
@@ -4740,6 +4748,14 @@
         #define LV_DRAW_HAS_3D_SUPPORT 1
     #else
         #define LV_DRAW_HAS_3D_SUPPORT 0
+    #endif
+#endif
+
+#ifndef LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE
+    #if ((LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM) && (LV_USE_DRAW_SW))
+        #define LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE 1
+    #else
+        #define LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE 0
     #endif
 #endif
 
@@ -4800,6 +4816,14 @@
 #endif
 
 /* Optional user headers (LV_*_USE_CUSTOM_INCLUDE) overriding config macros. */
+#if LV_OS_USE_CUSTOM_INCLUDE
+    #include LV_OS_CUSTOM_INCLUDE
+#endif
+
+#if LV_DRAW_SW_ASM_USE_CUSTOM_INCLUDE
+    #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+#endif
+
 #if LV_NEMA_USE_CUSTOM_INCLUDE
     #include LV_NEMA_CUSTOM_INCLUDE
 #endif

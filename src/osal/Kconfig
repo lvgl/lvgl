@@ -21,6 +21,7 @@ choice LV_USE_OS
 		bool "7: SDL2"
 	config LV_OS_CUSTOM
 		bool "255: CUSTOM"
+		select LV_OS_USE_CUSTOM_INCLUDE
 endchoice
 
 config LV_USE_OS
@@ -35,11 +36,13 @@ config LV_USE_OS
 	default 7 if LV_OS_SDL2
 	default 255 if LV_OS_CUSTOM
 
+config LV_OS_USE_CUSTOM_INCLUDE
+	bool
+
 config LV_OS_CUSTOM_INCLUDE
 	string "Custom OS include header"
 	default ""
 	depends on LV_OS_CUSTOM
-
 
 if LV_OS_FREERTOS
 menu "FreeRTOS Configuration"
