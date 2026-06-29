@@ -1,62 +1,60 @@
 ---
 title: "2D Direct Memory Access (DMA2D) Support"
-description: "Some chips from Espressif such as the ESP32-P4 family features a peripheral that enhances the copy of 2-D data from a place to another, including output this 2-D data to other peripherals."
+description: "ESP32-P4 can accelerate LVGL image/layer copy and RGB565/RGB888 format conversion using DMA2D draw unit."
 ---
 
 ## Overview
 
-Some chips from Espressif such as the ESP32-P4 family features a peripheral
-that enhances the copy of 2-D data from a place to another, including output
-this 2-D data to other peripherals.
+ESP32-P4 includes a 2D Direct Memory Access peripheral (DMA2D) that can speed up
+2D block transfers and selected color conversions.
 
-This peripheral is the 2-D direct memory access, or DMA2D, the Espressif 
-SDK, the IDF, offers a full featured driver for the DMA2D that is automatically
-enabled on the supported chips.
+In LVGL, the Espressif DMA2D draw unit can be used for:
 
-One of its primary role is to serve as support for the Pixel Processor Accelerator
-the PPA, being used to copy the source image data to the desired PPA client splitting
-these data into fixed size blocks, called bursts. Also the DMA2D is used to pick the
-output chunks from the PPA client and copy over to the destination buffer, or the display
-frame-buffer.
+- `IMAGE` and `LAYER` draw tasks that are simple blit operations.
+- RGB format conversion between `RGB565` and `RGB888`.
 
-More information about PPA can be found in: [PPA (Pixel Processing Accelerator) Support](/integration/chip_vendors/espressif/hardware_accelerator_ppa).
+The unit is designed to coexist with software rendering and PPA:
 
-### Interacting to the DMA2D
+- DMA2D targets copy/convert paths.
+- PPA targets fill/blend paths.
+- SW renderer remains the fallback for unsupported cases.
 
-The LVGL does not interact directly to the DMA2D, instead, the Espressif LVGL port component
-display driver uses the DMA2D to copy the target drawn buffer to the display buffer without CPU
-intervention. Even though this option is available the user is responsible to explicitly enable
-it on the display driver of the LVGL port component.
+More information about PPA can be found in
+[PPA (Pixel Processing Accelerator) Support](/integration/chip_vendors/espressif/hardware_accelerator_ppa).
 
-To enabling it the user should set on its `sdkconfig.defaults` the `CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR`, 
-which will tell the driver to use the DMA2D to optimize transfer. Please notice that enabling
-this option will be only available when using the PSRAM memory and double buffer mode, otherwise
-a compiler error will be raised.
+## Enabling DMA2D draw unit in LVGL
 
-If the user is configuring the display manually, it is possible to enable the DMA2D in runtime by
-setting the DMA2D flag to true:
+Enable DMA2D draw unit in your ESP-IDF project `sdkconfig.defaults`:
 
 ```c
-/* Gets the default configuration for the MIPI display controller */
-esp_lcd_dpi_panel_config_t dpi_config = EK79007_1024_600_PANEL_60HZ_CONFIG(LCD_COLOR_PIXEL_FORMAT_RGB888);
-
-/* Explicitly set the DMA2D to assist the buffer transfer */
-dpi_config.flags.use_dma2d = true;
-
-ek79007_vendor_config_t vendor_config = {
-    .mipi_config = {
-        .dsi_bus = mipi_dsi_bus,
-        .dpi_config = &dpi_config,
-    },
-};
-
-esp_lcd_panel_dev_config_t lcd_dev_config = {
-    .reset_gpio_num = UI_FIRMWARE_PIN_NUM_LCD_RST,
-    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
-    .bits_per_pixel = 24,
-    .vendor_config = &vendor_config,
-};
-
-/* Configures and enable the display */
-ESP_ERROR_CHECK(esp_lcd_new_panel_ek79007(mipi_dbi_io, &lcd_dev_config, &mipi_dpi_panel));
+CONFIG_LV_USE_ESP_DMA2D=y
+CONFIG_LV_ESP_DMA2D_BURST_LENGTH=64
+CONFIG_LV_DRAW_BUF_ALIGN=64
 ```
+
+After rebuilding, LVGL will automatically evaluate tasks and dispatch compatible ones to DMA2D.
+
+## Supported use cases
+
+Current Espressif DMA2D draw unit supports:
+
+- `LV_DRAW_TASK_TYPE_IMAGE` and `LV_DRAW_TASK_TYPE_LAYER`
+- no rotation/scale/skew
+- no recolor
+- no tiling
+- no bitmap mask
+- blend mode `NORMAL` with full opacity
+- color formats:
+  - source: `RGB565`, `RGB888`
+  - destination: `RGB565`, `RGB888`
+  - conversion: `RGB565 <-> RGB888`
+
+Unsupported operations automatically fall back to the software draw unit.
+
+## Notes about display DMA2D
+
+Besides the LVGL draw unit, some display pipelines may also use DMA2D at driver level
+for frame-buffer movement/tear avoidance.
+
+That driver-level DMA2D path is independent from LVGL draw-unit dispatching, and both can be
+enabled in the same project as long as memory bandwidth is sufficient for the use case.

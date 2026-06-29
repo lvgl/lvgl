@@ -8,8 +8,8 @@
 
 #if LV_USE_PPA
 
-void lv_draw_ppa_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc,
-                      const lv_area_t * coords)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_ppa_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc,
+                                            const lv_area_t * coords)
 {
     ppa_fill_oper_config_t fill_cfg = {0};
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)t->draw_unit;

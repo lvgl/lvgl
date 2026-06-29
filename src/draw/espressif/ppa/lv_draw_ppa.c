@@ -27,12 +27,13 @@ static int32_t ppa_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t ppa_delete(lv_draw_unit_t * draw_unit);
 static void  ppa_execute_drawing(lv_draw_ppa_unit_t * u);
+static bool ppa_rotation_supported(int32_t rotation);
 
 /**********************
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_ppa_init(void)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_ppa_init(void)
 {
     esp_err_t res;
     ppa_client_config_t cfg = {0};
@@ -77,7 +78,7 @@ void lv_draw_ppa_init(void)
     LV_ASSERT(res == ESP_OK);
 }
 
-void lv_draw_ppa_deinit(void)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_ppa_deinit(void)
 {
     /* No global deinit required */
 }
@@ -85,7 +86,7 @@ void lv_draw_ppa_deinit(void)
 /**********************
 *   STATIC FUNCTIONS
 **********************/
-static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
+static int32_t LV_ATTRIBUTE_FAST_MEM ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
     const lv_draw_dsc_base_t * base = (lv_draw_dsc_base_t *)t->draw_dsc;
@@ -105,29 +106,66 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 return 1;
             }
 
-#if LV_USE_PPA_IMG
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
-                     && dsc->clip_radius == 0
-                     && dsc->bitmap_mask_src == NULL
-                     && dsc->sup == NULL
-                     && dsc->tile == 0
-                     && dsc->blend_mode == LV_BLEND_MODE_NORMAL
-                     && dsc->recolor_opa <= LV_OPA_MIN
-                     && dsc->opa >= (lv_opa_t)LV_OPA_MAX
-                     && dsc->skew_y == 0
-                     && dsc->skew_x == 0
-                     && dsc->scale_x == 256
-                     && dsc->scale_y == 256
-                     && dsc->rotation == 0
-                     && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
-                     && (dsc->header.cf == LV_COLOR_FORMAT_RGB888
-                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565)
-                     && (dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
-                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
-                    return 0;
+                bool common_ok = dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
+                                 && dsc->clip_radius == 0
+                                 && dsc->bitmap_mask_src == NULL
+                                 && dsc->sup == NULL
+                                 && dsc->tile == 0
+                                 && dsc->blend_mode == LV_BLEND_MODE_NORMAL
+                                 && dsc->recolor_opa <= LV_OPA_MIN
+                                 && dsc->opa >= (lv_opa_t)LV_OPA_MAX
+                                 && dsc->skew_y == 0
+                                 && dsc->skew_x == 0
+                                 && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE;
+                if(!common_ok) return 0;
+
+                bool is_identity = (dsc->scale_x == LV_SCALE_NONE && dsc->scale_y == LV_SCALE_NONE && dsc->rotation == 0);
+                bool clip_is_full = lv_area_is_equal(&t->area, &t->clip_area);
+
+                bool ppa_ok = false;
+#if LV_USE_PPA_IMG
+                if(is_identity && ppa_src_cf_supported(dsc->header.cf) && ppa_dest_cf_supported(dsc->base.layer->color_format)) {
+                    ppa_ok = true;
                 }
+#endif
+#if LV_USE_PPA_TRANSFORM
+                if(!ppa_ok && clip_is_full
+                   && ppa_rotation_supported(dsc->rotation)
+                   && ppa_srm_src_cf_supported(dsc->header.cf)
+                   && ppa_srm_dest_cf_supported(dsc->base.layer->color_format)) {
+                    ppa_ok = true;
+                }
+#endif
+                if(!ppa_ok) return 0;
+
+                if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
+                    t->preference_score = DRAW_UNIT_PPA_PREF_SCORE;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PPA;
+                }
+                return 1;
+            }
+#if LV_USE_PPA_TRANSFORM
+        case LV_DRAW_TASK_TYPE_LAYER: {
+                lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                lv_layer_t * src_layer = (lv_layer_t *)dsc->src;
+                if(src_layer == NULL || src_layer->draw_buf == NULL) return 0;
+
+                bool common_ok = dsc->clip_radius == 0
+                                 && dsc->bitmap_mask_src == NULL
+                                 && dsc->sup == NULL
+                                 && dsc->tile == 0
+                                 && dsc->blend_mode == LV_BLEND_MODE_NORMAL
+                                 && dsc->recolor_opa <= LV_OPA_MIN
+                                 && dsc->opa >= (lv_opa_t)LV_OPA_MAX
+                                 && dsc->skew_y == 0
+                                 && dsc->skew_x == 0
+                                 && lv_area_is_equal(&t->area, &t->clip_area)
+                                 && ppa_rotation_supported(dsc->rotation)
+                                 && ppa_srm_src_cf_supported(src_layer->draw_buf->header.cf)
+                                 && ppa_srm_dest_cf_supported(dsc->base.layer->color_format);
+                if(!common_ok) return 0;
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
                     t->preference_score = DRAW_UNIT_PPA_PREF_SCORE;
@@ -141,7 +179,7 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     }
 }
 
-static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static int32_t LV_ATTRIBUTE_FAST_MEM ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
     if(u->task_act) {
@@ -165,7 +203,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     return 1;
 }
 
-static int32_t ppa_delete(lv_draw_unit_t * draw_unit)
+static int32_t LV_ATTRIBUTE_FAST_MEM ppa_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
     ppa_unregister_client(u->srm_client);
@@ -174,7 +212,7 @@ static int32_t ppa_delete(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
-static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
+static void LV_ATTRIBUTE_FAST_MEM ppa_execute_drawing(lv_draw_ppa_unit_t * u)
 {
     lv_draw_task_t * t         = u->task_act;
     lv_layer_t * layer         = t->target_layer;
@@ -193,9 +231,22 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
             lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &area);
             lv_draw_buf_invalidate_cache(buf, &area);
             break;
+#if LV_USE_PPA_TRANSFORM
+        case LV_DRAW_TASK_TYPE_LAYER:
+            lv_draw_ppa_layer(t, (lv_draw_image_dsc_t *)t->draw_dsc, &area);
+            lv_draw_buf_invalidate_cache(buf, &area);
+            break;
+#endif
         default:
             break;
     }
+}
+
+static bool LV_ATTRIBUTE_FAST_MEM ppa_rotation_supported(int32_t rotation)
+{
+    int32_t r = rotation % 3600;
+    if(r < 0) r += 3600;
+    return (r == 0 || r == 900 || r == 1800 || r == 2700);
 }
 
 #endif /*LV_USE_PPA*/

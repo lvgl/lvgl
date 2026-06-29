@@ -35,6 +35,7 @@ DRAW_TASK_STATE_NAMES = {
 DRAW_UNIT_TYPE_NAMES = {
     "DAVE2D": "lv_draw_dave2d_unit_t",
     "DMA2D": "lv_draw_dma2d_unit_t",
+    "ESP_DMA2D": "lv_draw_dma2d_unit_t",
     "ESP_PPA": "lv_draw_ppa_unit_t",
     "G2D": "lv_draw_g2d_unit_t",
     "NANOVG": "lv_draw_nanovg_unit_t",

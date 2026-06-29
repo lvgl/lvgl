@@ -89,6 +89,25 @@ cache L1 line size, that is it, set its value to `64` instead of the default of 
 CONFIG_LV_DRAW_BUF_ALIGN=64
 ```
 
+## DMA2D image copy/conversion warnings
+
+When enabling `CONFIG_LV_USE_ESP_DMA2D`, a common symptom of misconfiguration is seeing
+repeated `esp_cache_msync` alignment errors and DMA2D draw warnings in monitor logs.
+
+For stable operation, make sure:
+
+```c
+CONFIG_LV_USE_ESP_DMA2D=y
+CONFIG_LV_ESP_DMA2D_BURST_LENGTH=64
+CONFIG_LV_DRAW_BUF_ALIGN=64
+```
+
+Notes:
+
+- `CONFIG_LV_DRAW_BUF_ALIGN` should match cache line size on ESP32-P4 (64 bytes).
+- DMA2D draw unit only accelerates eligible tasks; unsupported ones automatically fall back to SW.
+- If your application is memory-bandwidth bound, reduce burst size or limit simultaneous DMA-heavy paths.
+
 ## EPS32-P4 monitor log reports buffer underrun and frame-rate decreases
 
 In cases when the PSRAM is enabled and the PPA is used, it is common to see

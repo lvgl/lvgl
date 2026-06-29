@@ -417,7 +417,14 @@
 #define LV_USE_PPA  0
 #if LV_USE_PPA
     #define LV_USE_PPA_IMG      0
+    #define LV_USE_PPA_TRANSFORM 0
     #define LV_PPA_BURST_LENGTH    128
+#endif
+
+/** Use Espressif DMA2D for copy and format conversion */
+#define LV_USE_ESP_DMA2D 0
+#if LV_USE_ESP_DMA2D
+    #define LV_ESP_DMA2D_BURST_LENGTH 64
 #endif
 
 /* Use EVE FT81X GPU. */

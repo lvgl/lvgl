@@ -60,6 +60,9 @@
 #if LV_USE_PPA
     #include "draw/espressif/ppa/lv_draw_ppa.h"
 #endif
+#if LV_USE_ESP_DMA2D
+    #include "draw/espressif/dma2d/lv_draw_esp_dma2d.h"
+#endif
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
 #endif
@@ -250,6 +253,10 @@ void lv_init(void)
 
 #if LV_USE_PPA
     lv_draw_ppa_init();
+#endif
+
+#if LV_USE_ESP_DMA2D
+    lv_draw_esp_dma2d_init();
 #endif
 
 #if LV_USE_WINDOWS
@@ -474,6 +481,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_DMA2D
     lv_draw_dma2d_deinit();
+#endif
+
+#if LV_USE_ESP_DMA2D
+    lv_draw_esp_dma2d_deinit();
 #endif
 
 #if LV_USE_DRAW_OPENGLES
