@@ -38,10 +38,6 @@ config LV_GLOBAL_USE_CUSTOM_INCLUDE
 	  Returning NULL from that function is safe; LVGL will treat the
 	  library as uninitialized for that context.
 
-# Deprecated former name of LV_GLOBAL_USE_CUSTOM_INCLUDE. Kept so existing
-# defconfigs that set CONFIG_LV_ENABLE_GLOBAL_CUSTOM still parse; mapped to the
-# new option in lv_conf_kconfig.h. Excluded from the generated headers via
-# IGNORE_SYMBOLS.
 config LV_ENABLE_GLOBAL_CUSTOM
 	bool "[DEPRECATED: use LV_GLOBAL_USE_CUSTOM_INCLUDE]"
 	default n

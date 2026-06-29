@@ -18,7 +18,7 @@ extern "C" {
 #include "../stdlib/lv_mem.h"
 
 /* only warn if the new config is not set, this way the user can have both enabled and the new version takes precedence*/
-#if defined(LV_ASSERT_HANDLER_INCLUDE) && !defined(LV_ASSERT_HANDLER_CUSTOM_INCLUDE)
+#if defined(LV_ASSERT_HANDLER_INCLUDE)
 #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside"
 #include LV_ASSERT_HANDLER_INCLUDE
 #endif
