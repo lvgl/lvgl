@@ -9,12 +9,12 @@ import subprocess
 benchmark_configs = {
     "perf32b": {
         "description": "Benchmark config ARM (so3) Emulated - 32 bit",
-        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b:main",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b@sha256:f4326e11c63004b8d6ded8a30a8b9bf96bca5f2d70f926b90231a4d80bd58208",
         "defaults_file": "lv_conf_perf32b.defaults",
     },
     "perf64b": {
         "description": "Benchmark config ARM (so3) Emulated - 64 bit",
-        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b:main",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b@sha256:681d5a7f099305b500d24f83350b68ff49758100137e9c09c01233d9c08a013b",
         "defaults_file": "lv_conf_perf64b.defaults",
     },
 }
@@ -221,10 +221,12 @@ def run_benchmark(config_name: str, pull: bool) -> None:
     def volume(src, dst):
         return ["-v", f"{src}:{dst}"]
 
+    # The Infrabase images nest the repo at /so3, so the user space lives at
+    # /so3/so3/usr (kernel at /so3/so3/so3). All mount targets use that path.
     def so3_usr_lib(path):
-        return f"/so3/usr/lib/{path}"
+        return f"/so3/so3/usr/lib/{path}"
 
-    so3_usr_build = "/so3/usr/build"
+    so3_usr_build = "/so3/so3/usr/build"
     persistence_dir = "/persistence"
     container_name = get_container_name(config_name)
     build_dir = get_build_dir(config_name)

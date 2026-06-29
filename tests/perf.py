@@ -12,12 +12,12 @@ from typing import Optional
 perf_test_options = {
     "OPTIONS_TEST_PERF_32B": {
         "description": "Perf test config ARM (so3) Emulated - 32 bit",
-        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b:main",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b@sha256:f4326e11c63004b8d6ded8a30a8b9bf96bca5f2d70f926b90231a4d80bd58208",
         "config": "lv_test_perf_conf.h",
     },
     "OPTIONS_TEST_PERF_64B": {
         "description": "Perf test config ARM (so3) Emulated - 64 bit",
-        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b:main",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b@sha256:681d5a7f099305b500d24f83350b68ff49758100137e9c09c01233d9c08a013b",
         "config": "lv_test_perf_conf.h",
     },
 }
@@ -499,16 +499,18 @@ def run_tests(
     def volume(src, dst):
         return ["-v", f"{src}:{dst}"]
 
+    # The Infrabase images nest the repo at /so3, so the user space lives at
+    # /so3/so3/usr (kernel at /so3/so3/so3). All mount targets use that path.
     def so3_usr_src(path):
-        return f"/so3/usr/src/{path}"
+        return f"/so3/so3/usr/src/{path}"
 
     def so3_usr_lib(path):
-        return f"/so3/usr/lib/{path}"
+        return f"/so3/so3/usr/lib/{path}"
 
     def so3_usr_out(path):
-        return f"/so3/usr/out/{path}"
+        return f"/so3/so3/usr/out/{path}"
 
-    so3_usr_build = f"/so3/usr/build"
+    so3_usr_build = f"/so3/so3/usr/build"
     persistence_dir = f"/persistence"
     container_name = get_container_name(options_name)
     build_dir = get_build_dir(options_name)
@@ -539,7 +541,7 @@ def run_tests(
         volume(lvgl_private_h_path, so3_usr_lib("lvgl/lvgl_private.h")),
         # We also need to add the current "lvgl.h" and mount it in the correct path
         # As there's a `#include "../../lvgl.h"` in the `unity_support.h` file
-        volume(lvgl_h_path, "/so3/usr/lvgl.h"),
+        volume(lvgl_h_path, "/so3/so3/usr/lvgl.h"),
         # Mount the test sources (test cases and runners)
         volume(test_src_dir, so3_usr_src("test_src")),
         # Mount the test framework
