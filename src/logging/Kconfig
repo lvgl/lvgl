@@ -1,3 +1,4 @@
+menu "Logging"
 config LV_USE_LOG
 	bool "Enable the log module"
 	help
@@ -87,3 +88,4 @@ config LV_LOG_TRACE_CACHE
 	
 
 endif
+endmenu

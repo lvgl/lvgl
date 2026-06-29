@@ -1,3 +1,4 @@
+menu "Compiler Settings"
 config LV_BIG_ENDIAN_SYSTEM
 	bool "For big endian systems set to 1"
 	help
@@ -70,3 +71,4 @@ config LV_ATTRIBUTE_CUSTOM_INCLUDE
 	    Leave undefined if not using a binding.
 	    e.g. mp_rom_map_elem_t entry = {MP_ROM_QSTR(MP_QSTR_##int_value), MP_ROM_INT(int_value)}
 
+endmenu #"Compiler Settings"

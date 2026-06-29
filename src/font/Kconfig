@@ -1,3 +1,4 @@
+menu "Text & Font Settings"
 choice LV_TXT_ENC
 	prompt "Select a character encoding for strings"
 	help
@@ -298,6 +299,6 @@ config LV_USE_IMGFONT
 		Support using images as font in label or span widgets
 
 
-source "$LVGL_DIR/src/font/freetype/Kconfig"
-source "$LVGL_DIR/src/font/tiny_ttf/Kconfig"
-
+rsource "freetype/Kconfig"
+rsource "tiny_ttf/Kconfig"
+endmenu

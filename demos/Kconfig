@@ -1,3 +1,4 @@
+menu "Demos"
 config LV_BUILD_DEMOS
 	bool "Build demos"
 	default y
@@ -6,14 +7,14 @@ config LV_BUILD_DEMOS
 
 if LV_BUILD_DEMOS
 
-source "$LVGL_DIR/demos/benchmark/Kconfig"
-source "$LVGL_DIR/demos/gltf/Kconfig"
-source "$LVGL_DIR/demos/keypad_encoder/Kconfig"
-source "$LVGL_DIR/demos/music/Kconfig"
-source "$LVGL_DIR/demos/render/Kconfig"
-source "$LVGL_DIR/demos/stress/Kconfig"
-source "$LVGL_DIR/demos/vector_graphic/Kconfig"
-source "$LVGL_DIR/demos/widgets/Kconfig"
+rsource "benchmark/Kconfig"
+rsource "gltf/Kconfig"
+rsource "keypad_encoder/Kconfig"
+rsource "music/Kconfig"
+rsource "render/Kconfig"
+rsource "stress/Kconfig"
+rsource "vector_graphic/Kconfig"
+rsource "widgets/Kconfig"
 
 	config LV_USE_DEMO_FLEX_LAYOUT
 		bool "Flex layout previewer"
@@ -36,4 +37,4 @@ source "$LVGL_DIR/demos/widgets/Kconfig"
 	config LV_USE_DEMO_HIGH_RES
 		bool "High resolution demo"
 endif
-
+endmenu #"Demos"

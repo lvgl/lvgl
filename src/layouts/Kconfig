@@ -1,3 +1,5 @@
+menu "Layouts"
+
 config LV_USE_FLEX
 	bool "A layout similar to Flexbox in CSS"
 	default y
@@ -9,3 +11,4 @@ config LV_USE_GRID
 	default y
 	help
 		A layout similar to Grid in CSS.
+endmenu

@@ -1,14 +1,14 @@
-
+menu "Debugging"
 menu "System Monitoring"
-	source "$LVGL_DIR/src/debugging/sysmon/Kconfig"
+	rsource "sysmon/Kconfig"
 endmenu
 
 menu "Profiler"
-	source "$LVGL_DIR/src/debugging/profiler/Kconfig"
+	rsource "profiler/Kconfig"
 endmenu
 
 menu "Test Utilities"
-	source "$LVGL_DIR/src/debugging/test/Kconfig"
+	rsource "test/Kconfig"
 
 	config LV_USE_MONKEY
 		bool "Enable Monkey test"
@@ -34,4 +34,5 @@ config LV_USE_PARALLEL_DRAW_DEBUG
 	help
 		Also add the index number of the draw unit on white background.
 		For layers add the index number of the draw unit on black background.
+endmenu
 endmenu

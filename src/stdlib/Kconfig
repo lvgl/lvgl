@@ -1,3 +1,5 @@
+menu "Memory and Standard Library"
+
 config LV_STDLIB_BUILTIN
 	int
 	default 0
@@ -149,3 +151,4 @@ config LV_LIMITS_INCLUDE
 config LV_STDARG_INCLUDE
 	string "Header for variadic argument handling (stdarg)"
 	default "stdarg.h"
+endmenu

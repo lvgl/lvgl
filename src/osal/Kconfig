@@ -1,3 +1,4 @@
+menu "Operating System (OS)"
 choice LV_USE_OS
 	prompt "Default operating system to use"
 	default LV_OS_NONE
@@ -39,10 +40,13 @@ config LV_OS_CUSTOM_INCLUDE
 	default ""
 	depends on LV_OS_CUSTOM
 
+
+if LV_OS_FREERTOS
+menu "FreeRTOS Configuration"
+
 config LV_USE_FREERTOS_TASK_NOTIFY
 	bool "Use RTOS task with a direct notification for synchronization"
 	default y
-	depends on LV_OS_FREERTOS
 help
 	Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
 	than unblocking a task using an intermediary object such as a binary semaphore.
@@ -51,8 +55,10 @@ help
 config LV_OS_IDLE_PERCENT_CUSTOM
 	bool "Custom idle percentage calculation"
 	default n
-	depends on LV_OS_FREERTOS
 	help
 		Enable this to provide a custom implementation of lv_os_get_idle_percent.
 		This is useful for multi-core systems where the default
 		FreeRTOS implementation might not sufficiently track idle time across all cores.
+endmenu
+endif #LV_OS_FREERTOS
+endmenu

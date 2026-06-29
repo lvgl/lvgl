@@ -1,3 +1,5 @@
+menu "Image Settings"
+
 config LV_CACHE_DEF_SIZE
 	int "Default image cache size in bytes. 0 to disable caching"
 	default 0
@@ -83,3 +85,5 @@ config LV_USE_SVG_DEBUG
 	bool "Enable SVG debug logs"
 	default n
 endif #LV_USE_SVG
+
+endmenu

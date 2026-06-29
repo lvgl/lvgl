@@ -1,3 +1,5 @@
+menu "Widgets"
+
 config LV_WIDGETS_HAS_DEFAULT_VALUE
 	bool "Widgets has default value"
 	default y
@@ -44,7 +46,7 @@ config LV_USE_BUTTONMATRIX
 	bool "Button matrix"
 	default y
 
-source "$LVGL_DIR/src/widgets/calendar/Kconfig"
+rsource "calendar/Kconfig"
 
 config LV_USE_CANVAS
 	bool "Canvas"
@@ -134,13 +136,13 @@ config LV_USE_IMAGEBUTTON
 	bool "ImageButton"
 	default y
 
-source "$LVGL_DIR/src/widgets/ime/Kconfig"
+rsource "ime/Kconfig"
 
 config LV_USE_KEYBOARD
 	bool "Keyboard"
 	default y
 
-source "$LVGL_DIR/src/widgets/label/Kconfig"
+rsource "label/Kconfig"
 
 config LV_USE_LED
 	bool "LED"
@@ -243,3 +245,4 @@ config LV_USE_TILEVIEW
 config LV_USE_WIN
 	bool "Win"
 	default y
+endmenu

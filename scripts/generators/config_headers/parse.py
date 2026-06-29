@@ -161,9 +161,9 @@ def _is_deprecated(node) -> bool:
     return bool(node.help) and node.help.lstrip().startswith("Deprecated")
 
 
-def load(path: str, srctree: str | None = None) -> Kconfig:
+def load(path: str) -> Kconfig:
     """Parse a Kconfig file into a kconfiglib ``Kconfig`` object."""
-    os.environ["srctree"] = srctree or os.path.dirname(os.path.abspath(path)) or "."
+    os.environ["srctree"] = os.path.dirname(os.path.abspath(path)) or "."
     return Kconfig(path, warn_to_stderr=False, suppress_traceback=True)
 
 

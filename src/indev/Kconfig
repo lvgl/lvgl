@@ -1,3 +1,4 @@
+menu "Input Devices"
 config LV_USE_GRIDNAV
 	bool "Enable grid navigation"
 	default n
@@ -11,3 +12,5 @@ config LV_USE_GESTURE_RECOGNITION
 	help
 		Enable the multi-touch gesture recognition feature
 		Gesture recognition requires the use of floats
+
+endmenu

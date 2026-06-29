@@ -1,3 +1,5 @@
+menu "Core"
+
 config LV_OBJ_STYLE_CACHE
 	bool "Use cache to speed up getting object style properties"
 	default n
@@ -94,3 +96,4 @@ config LV_USE_COLOR_FILTER
 	help
 		Enable color filter style
 
+endmenu #"Core"

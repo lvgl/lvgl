@@ -1,3 +1,4 @@
+menu "Others"
 config LV_USE_FRAGMENT
 	bool "Enable lv_obj fragment"
 	default n
@@ -26,3 +27,5 @@ config LV_FILE_EXPLORER_QUICK_ACCESS
 		the browsing area, which is very useful for small screen devices.
 
 endif #LV_USE_FILE_EXPLORER
+
+endmenu

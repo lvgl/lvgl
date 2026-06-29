@@ -1,3 +1,5 @@
+menu "Themes"
+
 config LV_USE_THEME_DEFAULT
 	bool "A simple, impressive and very complete theme"
 	default y
@@ -30,4 +32,4 @@ config LV_USE_THEME_MONO
 	default y
 	help
 		A theme designed for monochrome displays
-
+endmenu
