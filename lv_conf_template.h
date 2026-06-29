@@ -55,7 +55,7 @@
 #define LV_USE_STDLIB_SPRINTF LV_STDLIB_BUILTIN
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-/** Size of the memory used by `lv_malloc()` in bytes (Needs to be at least 2kB (2048)) */
+/** Memory size in bytes (Needs to be at least 2kB (2048)) */
 #define LV_MEM_SIZE 65536
 
 /** Address for the memory pool instead of allocating it as a normal array. 0: unused */
@@ -344,19 +344,19 @@
  */
 #define LV_VG_LITE_GRAD_CACHE_CNT 32
 
-/** VG-Lite stroke maximum cache number. */
+/** VG-Lite stroke maximum cache number */
 #define LV_VG_LITE_STROKE_CACHE_CNT 32
 
-/** VG-Lite unaligned bitmap font maximum cache number. */
+/** VG-Lite unaligned bitmap font maximum cache number */
 #define LV_VG_LITE_BITMAP_FONT_CACHE_CNT 256
 
 /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) */
 #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
 
-/** Disable linear gradient extension for some older versions of drivers. */
+/** Disable linear gradient extension for some older versions of drivers */
 #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 
-/** Disable blit rectangular offset to resolve certain hardware errors. */
+/** Disable blit rectangular offset to resolve certain hardware errors */
 #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET 0
 
 /** Maximum path dump print length (in points) */
@@ -411,6 +411,9 @@
 
 #endif /*LV_USE_VG_LITE_THORVG*/
 #endif /*LV_USE_DRAW_VG_LITE*/
+
+/** Use Renesas Dave2D on RA  platforms. */
+#define LV_USE_DRAW_DAVE2D 0
 
 /** Use TSi's aka (Think Silicon) NemaGFX */
 #define LV_USE_NEMA_GFX 0
@@ -496,24 +499,6 @@
 
 #endif /*LV_USE_DRAW_PXP*/
 
-/** Use G2D for drawing. */
-#define LV_USE_DRAW_G2D 0
-
-#if LV_USE_DRAW_G2D
-/** Includes the frame buffers and assets. */
-#define LV_G2D_HASH_TABLE_SIZE 50
-
-#if LV_USE_OS != LV_OS_NONE
-/** Use additional draw thread for G2D processing */
-#define LV_USE_G2D_DRAW_THREAD 1
-
-#endif /*LV_USE_OS != LV_OS_NONE*/
-
-/** Enable G2D asserts */
-#define LV_USE_G2D_ASSERT 0
-
-#endif /*LV_USE_DRAW_G2D*/
-
 /** Draw using Espressif PPA accelerator */
 #define LV_USE_PPA 0
 
@@ -525,12 +510,6 @@
 #define LV_PPA_BURST_LENGTH 128
 
 #endif /*LV_USE_PPA*/
-
-/** Use Renesas Dave2D on RA  platforms. */
-#define LV_USE_DRAW_DAVE2D 0
-
-/** Uses SDL renderer API */
-#define LV_USE_DRAW_SDL 0
 
 /** Accelerate blends, fills, image decoding, etc. with STM32 DMA2D. */
 #define LV_USE_DRAW_DMA2D 0
@@ -559,17 +538,23 @@
 
 #endif /*LV_USE_DRAW_EVE*/
 
-/** Draw using cached OpenGLES textures.
- *
- *  Enable: LV_USE_OPENGLES
- */
-#define LV_USE_DRAW_OPENGLES 0
+/** Use G2D for drawing */
+#define LV_USE_DRAW_G2D 0
 
-#if LV_USE_DRAW_OPENGLES
-/** OpenGLES texture cache count */
-#define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+#if LV_USE_DRAW_G2D
+/** Includes the frame buffers and assets. */
+#define LV_G2D_HASH_TABLE_SIZE 50
 
-#endif /*LV_USE_DRAW_OPENGLES*/
+#if LV_USE_OS != LV_OS_NONE
+/** Use additional draw thread for G2D processing */
+#define LV_USE_G2D_DRAW_THREAD 1
+
+#endif /*LV_USE_OS != LV_OS_NONE*/
+
+/** Enable G2D asserts */
+#define LV_USE_G2D_ASSERT 0
+
+#endif /*LV_USE_DRAW_G2D*/
 
 /** Use NanoVG Renderer
  *
@@ -595,6 +580,22 @@
 
 #endif /*LV_USE_DRAW_NANOVG*/
 
+/** Draw using cached OpenGLES textures.
+ *
+ *  Enable: LV_USE_OPENGLES
+ */
+#define LV_USE_DRAW_OPENGLES 0
+
+#if LV_USE_DRAW_OPENGLES
+/** OpenGLES texture cache count */
+#define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+
+#endif /*LV_USE_DRAW_OPENGLES*/
+
+/** Uses SDL renderer API */
+#define LV_USE_DRAW_SDL 0
+
+
 
 /*============================================================================
  * INPUT DEVICES
@@ -619,7 +620,7 @@
 /** Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
 #define LV_OBJ_STYLE_CACHE 0
 
-/** Enable support widget names */
+/** Enable support for widget names */
 #define LV_USE_OBJ_NAME 0
 
 /** Add `id` field to `lv_obj_t` */
@@ -2120,7 +2121,7 @@
 
 #endif /*LV_USE_PROFILER*/
 
-/** Enable emulated input devices, time emulation, and screenshot compares. */
+/** Enable emulated input devices, time emulation, and screenshot compares */
 #define LV_USE_TEST 0
 
 #if LV_USE_TEST

@@ -777,6 +777,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_DRAW_DAVE2D
+    #ifdef CONFIG_LV_USE_DRAW_DAVE2D
+        #define LV_USE_DRAW_DAVE2D CONFIG_LV_USE_DRAW_DAVE2D
+    #else
+        #define LV_USE_DRAW_DAVE2D 0
+    #endif
+#endif
+
 #ifndef LV_USE_NEMA_GFX
     #ifdef CONFIG_LV_USE_NEMA_GFX
         #define LV_USE_NEMA_GFX CONFIG_LV_USE_NEMA_GFX
@@ -897,38 +905,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_DRAW_G2D
-    #ifdef CONFIG_LV_USE_DRAW_G2D
-        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
-    #else
-        #define LV_USE_DRAW_G2D 0
-    #endif
-#endif
-
-#ifndef LV_G2D_HASH_TABLE_SIZE
-    #ifdef CONFIG_LV_G2D_HASH_TABLE_SIZE
-        #define LV_G2D_HASH_TABLE_SIZE CONFIG_LV_G2D_HASH_TABLE_SIZE
-    #else
-        #define LV_G2D_HASH_TABLE_SIZE 50
-    #endif
-#endif
-
-#ifndef LV_USE_G2D_DRAW_THREAD
-    #ifdef CONFIG_LV_USE_G2D_DRAW_THREAD
-        #define LV_USE_G2D_DRAW_THREAD CONFIG_LV_USE_G2D_DRAW_THREAD
-    #else
-        #define LV_USE_G2D_DRAW_THREAD 0
-    #endif
-#endif
-
-#ifndef LV_USE_G2D_ASSERT
-    #ifdef CONFIG_LV_USE_G2D_ASSERT
-        #define LV_USE_G2D_ASSERT CONFIG_LV_USE_G2D_ASSERT
-    #else
-        #define LV_USE_G2D_ASSERT 0
-    #endif
-#endif
-
 #ifndef LV_USE_PPA
     #ifdef CONFIG_LV_USE_PPA
         #define LV_USE_PPA CONFIG_LV_USE_PPA
@@ -950,22 +926,6 @@
         #define LV_PPA_BURST_LENGTH CONFIG_LV_PPA_BURST_LENGTH
     #else
         #define LV_PPA_BURST_LENGTH 128
-    #endif
-#endif
-
-#ifndef LV_USE_DRAW_DAVE2D
-    #ifdef CONFIG_LV_USE_DRAW_DAVE2D
-        #define LV_USE_DRAW_DAVE2D CONFIG_LV_USE_DRAW_DAVE2D
-    #else
-        #define LV_USE_DRAW_DAVE2D 0
-    #endif
-#endif
-
-#ifndef LV_USE_DRAW_SDL
-    #ifdef CONFIG_LV_USE_DRAW_SDL
-        #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
-    #else
-        #define LV_USE_DRAW_SDL 0
     #endif
 #endif
 
@@ -1017,19 +977,35 @@
     #endif
 #endif
 
-#ifndef LV_USE_DRAW_OPENGLES
-    #ifdef CONFIG_LV_USE_DRAW_OPENGLES
-        #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES
+#ifndef LV_USE_DRAW_G2D
+    #ifdef CONFIG_LV_USE_DRAW_G2D
+        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
     #else
-        #define LV_USE_DRAW_OPENGLES 0
+        #define LV_USE_DRAW_G2D 0
     #endif
 #endif
 
-#ifndef LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
-    #ifdef CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
-        #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+#ifndef LV_G2D_HASH_TABLE_SIZE
+    #ifdef CONFIG_LV_G2D_HASH_TABLE_SIZE
+        #define LV_G2D_HASH_TABLE_SIZE CONFIG_LV_G2D_HASH_TABLE_SIZE
     #else
-        #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+        #define LV_G2D_HASH_TABLE_SIZE 50
+    #endif
+#endif
+
+#ifndef LV_USE_G2D_DRAW_THREAD
+    #ifdef CONFIG_LV_USE_G2D_DRAW_THREAD
+        #define LV_USE_G2D_DRAW_THREAD CONFIG_LV_USE_G2D_DRAW_THREAD
+    #else
+        #define LV_USE_G2D_DRAW_THREAD 0
+    #endif
+#endif
+
+#ifndef LV_USE_G2D_ASSERT
+    #ifdef CONFIG_LV_USE_G2D_ASSERT
+        #define LV_USE_G2D_ASSERT CONFIG_LV_USE_G2D_ASSERT
+    #else
+        #define LV_USE_G2D_ASSERT 0
     #endif
 #endif
 
@@ -1062,6 +1038,30 @@
         #define LV_NANOVG_LETTER_CACHE_CNT CONFIG_LV_NANOVG_LETTER_CACHE_CNT
     #else
         #define LV_NANOVG_LETTER_CACHE_CNT 512
+    #endif
+#endif
+
+#ifndef LV_USE_DRAW_OPENGLES
+    #ifdef CONFIG_LV_USE_DRAW_OPENGLES
+        #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES
+    #else
+        #define LV_USE_DRAW_OPENGLES 0
+    #endif
+#endif
+
+#ifndef LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+    #ifdef CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+        #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+    #else
+        #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+    #endif
+#endif
+
+#ifndef LV_USE_DRAW_SDL
+    #ifdef CONFIG_LV_USE_DRAW_SDL
+        #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
+    #else
+        #define LV_USE_DRAW_SDL 0
     #endif
 #endif
 
@@ -4508,7 +4508,7 @@
 #endif
 
 #ifndef LV_DRAW_HAS_3D_SUPPORT
-    #if (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
+    #if (LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES)
         #define LV_DRAW_HAS_3D_SUPPORT 1
     #else
         #define LV_DRAW_HAS_3D_SUPPORT 0
@@ -4767,6 +4767,14 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_PXP_ASSERT requires LV_USE_DRAW_PXP && LV_USE_DRAW_PXP (Kconfig depends on)"
 #endif
 
+#if LV_USE_PPA_IMG && !(LV_USE_PPA)
+    #error "LV_USE_PPA_IMG requires LV_USE_PPA (Kconfig depends on)"
+#endif
+
+#if LV_USE_DRAW_DMA2D_INTERRUPT && !(LV_USE_DRAW_DMA2D)
+    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
+#endif
+
 #if (LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && !LV_USE_DRAW_G2D
     #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D"
 #endif
@@ -4775,16 +4783,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_G2D_ASSERT requires LV_USE_DRAW_G2D && LV_USE_DRAW_G2D (Kconfig depends on)"
 #endif
 
-#if LV_USE_PPA_IMG && !(LV_USE_PPA)
-    #error "LV_USE_PPA_IMG requires LV_USE_PPA (Kconfig depends on)"
-#endif
-
 #if (LV_SDL_BACKEND == LV_SDL_BACKEND_TEXTURE) && !LV_USE_DRAW_SDL
     #error "LV_USE_DRAW_SDL must be enabled: Kconfig selects it from LV_SDL_BACKEND == LV_SDL_BACKEND_TEXTURE"
-#endif
-
-#if LV_USE_DRAW_DMA2D_INTERRUPT && !(LV_USE_DRAW_DMA2D)
-    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
 #endif
 
 #if (LV_USE_MATRIX || LV_USE_GESTURE_RECOGNITION) && !LV_USE_FLOAT
