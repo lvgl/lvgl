@@ -26,6 +26,7 @@ config LV_USE_LZ4
 config LV_USE_LZ4_INTERNAL
 	bool "Use lvgl built-in LZ4 lib"
 	depends on LV_USE_LZ4
+	default y
 	help
 		Use lvgl built-in LZ4 lib
 
