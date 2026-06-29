@@ -1899,9 +1899,6 @@
 /** Working directory for littlefs */
 #define LV_FS_LITTLEFS_PATH ""
 
-/** Read cache size in bytes for littlefs (0 = disabled) */
-#define LV_FS_LITTLEFS_CACHE_SIZE 0
-
 #endif /*LV_USE_FS_LITTLEFS*/
 
 /** File system on top of Arduino ESP littlefs */
@@ -1914,9 +1911,6 @@
 /** Working directory for Arduino ESP littlefs */
 #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""
 
-/** Read cache size in bytes for Arduino ESP littlefs (0 = disabled) */
-#define LV_FS_ARDUINO_ESP_LITTLEFS_CACHE_SIZE 0
-
 #endif /*LV_USE_FS_ARDUINO_ESP_LITTLEFS*/
 
 /** File system on top of Arduino SD */
@@ -1928,9 +1922,6 @@
 
 /** Working directory for Arduino SD */
 #define LV_FS_ARDUINO_SD_PATH ""
-
-/** Read cache size in bytes for Arduino SD (0 = disabled) */
-#define LV_FS_ARDUINO_SD_CACHE_SIZE 0
 
 #endif /*LV_USE_FS_ARDUINO_SD*/
 

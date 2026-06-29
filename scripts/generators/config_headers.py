@@ -29,6 +29,10 @@ def main(argv=None) -> int:
 
     # abspath so kconfiglib doesn't join a relative path onto $srctree twice.
     kconfig_path = os.path.abspath(args.kconfig)
+    lvgl_dir = os.path.dirname(kconfig_path)
+    if not "LVGL_DIR" in os.environ:
+        os.environ["LVGL_DIR"] = lvgl_dir
+
     kconf = load(kconfig_path, args.srctree)
     entries = parse_entries(kconf)
 
