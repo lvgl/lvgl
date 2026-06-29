@@ -2,7 +2,7 @@ config LV_USE_DRAW_NANOVG
 	bool "Use NanoVG Renderer."
 	default n
 	select LV_USE_NANOVG
-        select LV_USE_MATRIX
+	select LV_USE_MATRIX
 	select LV_DRAW_HAS_VECTOR_SUPPORT
 	select LV_DRAW_HAS_3D_SUPPORT
 	help
