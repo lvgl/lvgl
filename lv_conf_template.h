@@ -1806,7 +1806,7 @@
 
 /** X11 device render mode
  *  Possible values:
- *  - LV_DISPLAY_RENDER_MODE_PARTIAL: Partial render mode (preferred)
+ *  - LV_DISPLAY_RENDER_MODE_PARTIAL: Partial render mode
  *  - LV_DISPLAY_RENDER_MODE_DIRECT: Direct render mode
  *  - LV_DISPLAY_RENDER_MODE_FULL: Full render mode
  */
