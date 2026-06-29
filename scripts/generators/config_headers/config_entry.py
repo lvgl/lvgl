@@ -174,21 +174,6 @@ class BoolConfig(ScalarConfig):
         return self._default_on_ladder()
 
 
-class LegacyBoolConfig(BoolConfig):
-    """A legacy boolean config
-    The difference with deprecated is that legacy configs are still exported
-    and we always respect the config's default value."""
-
-    def __init__(self, name: str, value: str, *, node=None, doc: str = ""):
-        super().__init__(name, value, node=node, doc=doc)
-
-    def emit_internal(self) -> list[str]:
-        # Always export the correct value even if it has a dependency
-        if self.value != "1":
-            return _plain_ladder(self.name, self.value)
-        return self._default_on_ladder()
-
-
 class IntConfig(ScalarConfig):
     """An int or hex valued option, e.g. ``LV_DEF_REFR_PERIOD`` or a ``hex``
     address.  Ints always emit a ``CONFIG_<name>`` under Kconfig (they always

@@ -52,9 +52,6 @@ def test_internal_footer_has_static_derivations(generated):
 
 def test_internal_has_legacy_autobackend_shim(generated):
     i = generated["internal"]
-    # The deprecated auto-select flag stays default-on despite its dependency
-    # (LegacyBoolConfig), and the compatibility shim infers the legacy backend.
     assert "#if LV_USE_LINUX_DRM && LV_LINUX_DRM_AUTO_BACKEND" in i
-    # default-on ladder (1 on the lv_conf.h path) even though it is gated.
     drm_auto = i[i.index("#ifndef LV_LINUX_DRM_AUTO_BACKEND") :]
-    assert "#define LV_LINUX_DRM_AUTO_BACKEND 1" in drm_auto[:400]
+    assert "#define LV_LINUX_DRM_AUTO_BACKEND LV_USE_LINUX_DRM" in drm_auto[:400]

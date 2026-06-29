@@ -23,11 +23,9 @@ from .config_entry import (
     EnumChoice,
     EnumMember,
     IntConfig,
-    LegacyBoolConfig,
     StringConfig,
 )
 from .kconfig_utils import (
-    bool_default,
     choice_default,
     dep_terms,
     doc_text,
@@ -161,16 +159,6 @@ def _is_deprecated(node) -> bool:
     if "[DEPRECATED" in prompt.upper():
         return True
     return bool(node.help) and node.help.lstrip().startswith("Deprecated")
-
-
-def _is_legacy(node) -> bool:
-    """A config kept only for backwards compatibility, flagged by a ``(legacy)``
-    marker in its prompt.  Unlike a *deprecated* config (dropped from the
-    headers), a legacy config is still emitted - a default-on legacy bool becomes
-    a :class:`LegacyBoolConfig` so it stays 1 on the hand-written ``lv_conf.h``
-    path even when gated (e.g. the auto-backend-select flags)."""
-    prompt = node.prompt[0] if node.prompt else ""
-    return "(legacy)" in prompt.lower()
 
 
 def load(path: str, srctree: str | None = None) -> Kconfig:
@@ -420,8 +408,6 @@ def classify(node, enum_choices: frozenset = frozenset()) -> ConfigEntry | None:
     if not node.prompt:
         return None
     if item.type == BOOL:
-        if _is_legacy(node):
-            return LegacyBoolConfig.from_symbol(item, node)
         return BoolConfig.from_symbol(item, node)
     if item.type == STRING:
         return StringConfig.from_symbol(item, node)
