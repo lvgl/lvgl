@@ -1,0 +1,158 @@
+---
+title: Configuring LVGL
+description: "How to configure LVGL: lv_conf.h, Kconfig, compiler defines, and ready-made presets (defconfigs)."
+---
+
+LVGL has many compile-time settings that let you
+
+- set default values (color depth, refresh period, memory size, …)
+- enable or disable Widgets
+- enable GPU and rendering backends
+- enable third-party library support
+- enable operating-system support
+- and much more
+
+This page explains the ways to configure LVGL and when to use each.
+
+## Source of truth
+
+Under the hood, [Kconfig](https://github.com/lvgl/lvgl/blob/master/Kconfig) is
+the **single source of truth** for every option. The files you actually edit —
+`lv_conf_template.h` (the file you copy to `lv_conf.h`) and the internal headers
+that apply the defaults — are *generated* from the Kconfig tree, so all the
+configuration methods stay in sync and share the same defaults.
+
+You don't need Kconfig to configure LVGL — a hand-written `lv_conf.h` is the
+default and is fully supported. Kconfig matters when LVGL is built inside a
+project that already uses it (Zephyr, ESP-IDF, NuttX, …) or when you want to
+drive LVGL's own CMake build from a `defconfig`.
+
+There are three ways to configure LVGL, and they can be mixed:
+
+1. **`lv_conf.h`** — a header where you adjust `#define`s. The default for most projects.
+2. **Kconfig** — when LVGL is part of a Kconfig-based build, or built standalone with `-DLV_USE_KCONFIG=ON`.
+3. **Compiler defines** — values passed on the command line (e.g. `-DLV_COLOR_DEPTH=32`).
+
+Contributors adding or changing an option should follow
+[Adding Configuration Options](/contributing/configuration).
+
+## `lv_conf.h`
+
+When setting up a project for the first time, copy `lvgl/lv_conf_template.h` to
+`lv_conf.h` next to the `lvgl` folder, change the first `#if 0` to `1` to enable
+the file's content, and set <ApiLink name="LV_COLOR_DEPTH" /> to match your
+display panel. Adjust the other options as needed — every option is documented
+by a comment in the file.
+
+The layout should look like this:
+
+```c
+lvgl/
+lv_conf.h
+other files and folders in your project
+```
+
+LVGL needs to be able to find `lv_conf.h`. There are a few ways to arrange that:
+
+1. Keep `lv_conf.h` one level **above** the `lvgl` folder (the default). LVGL
+   includes it as `../../lv_conf.h`.
+2. Define <ApiLink name="LV_CONF_INCLUDE_SIMPLE" /> (e.g. `-DLV_CONF_INCLUDE_SIMPLE`)
+   and add `lv_conf.h`'s folder to your include path. LVGL then includes it
+   simply as `#include "lv_conf.h"`.
+3. Point <ApiLink name="LV_CONF_PATH" /> at the file, e.g.
+   `-DLV_CONF_PATH="/home/joe/my_project/my_conf.h"`.
+
+You can also remove some settings from `lv_conf.h` and pass them as compiler
+defines instead (e.g. `-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1`); any option not
+set in `lv_conf.h` keeps its default.
+
+To skip `lv_conf.h` entirely and rely only on defines, define
+<ApiLink name="LV_CONF_SKIP" />. Every unset option then takes the default it
+has in `lv_conf_template.h`.
+
+<Callout type="info" title="Upgrading lv_conf.h">
+  Because `lv_conf_template.h` is regenerated each release, the easiest way to
+  pick up new options is to copy the new template over a fresh `lv_conf.h` and
+  re-apply your changes, or run `scripts/generate_lv_conf.py`. Watch the
+  compiler output for deprecation `#warning`s after upgrading — see the
+  [migration guide](/migration-v10#configuration).
+</Callout>
+
+## Kconfig
+
+When LVGL is integrated into a larger Kconfig-based project, that project's
+tooling configures LVGL by including LVGL's
+[Kconfig file](https://github.com/lvgl/lvgl/blob/master/Kconfig). For example,
+under ESP-IDF you configure it with `idf.py menuconfig`.
+
+LVGL can also be configured via Kconfig on its own when built as a static
+library with CMake. It uses [`kconfiglib`](https://github.com/ulfalizer/Kconfiglib),
+a Python port of Kconfig that works across platforms and ships some useful CLI
+commands:
+
+- `menuconfig` — console menu to edit configuration values.
+- `guiconfig` — graphical version (needs `tkinter`).
+- `savedefconfig` — save the current `.config` as a minimal `defconfig` (only the non-default values).
+- `alldefconfig` — produce a `.config` with every default value.
+- `genconfig` — generate a C header (`autoconf.h` style) from the config.
+
+### Building with Kconfig
+
+1. Install the prerequisites with `scripts/install_prerequisites.sh` (or `.bat`).
+2. Create the configuration:
+
+   ```bash
+   cd <lvgl_repo>
+   menuconfig   # make your changes, then save and exit with Esc/Q
+   ```
+
+   This writes a `.config` file listing your configuration values.
+
+3. Run CMake with `-DLV_USE_KCONFIG=ON`:
+
+   ```bash
+   cd <lvgl_repo>
+   cmake -B build -DLV_USE_KCONFIG=ON
+   cmake --build build
+   ```
+
+## Presets (defconfigs)
+
+A `defconfig` is a small file that records only the options that differ from the
+defaults — a reusable, named starting point. This is the Kconfig-native way to
+express a "preset" (the kind of thing the old `LV_CONF_MINIMAL` switch used to
+do).
+
+Some ready-made defconfigs live in `configs/defconfigs/`. Build from one with
+`-DLV_DEFCONFIG_PATH`:
+
+```bash
+cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/minimal.defconfig
+cmake --build build
+```
+
+### Minimal configuration
+
+`configs/defconfigs/minimal.defconfig` strips LVGL to its smallest sensible
+footprint: no widgets, themes, layouts, demos or examples, ASCII text encoding,
+and a single tiny built-in font. Use it as a starting point and re-enable only
+what you need.
+
+<Callout type="info" title="Replaces LV_CONF_MINIMAL">
+  Earlier versions had an `LV_CONF_MINIMAL` switch. It has been removed in favor
+  of this defconfig — see the [migration guide](/migration-v10#minimal-configuration).
+</Callout>
+
+### Creating your own preset
+
+Configure LVGL the way you want, then save it as a defconfig:
+
+```bash
+cd <lvgl_repo>
+menuconfig                                  # make your changes
+savedefconfig                               # writes ./defconfig (non-default values only)
+cp defconfig configs/defconfigs/my_defconfig
+# Build LVGL from it
+cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/my_defconfig
+cmake --build build
+```
