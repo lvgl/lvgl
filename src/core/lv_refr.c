@@ -501,7 +501,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
     LV_CHECK_ARG(obj != NULL, return);
 
     if(lv_obj_is_hidden(obj)) return;
- 
+
     /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/
     const lv_opa_t opa_layered = lv_obj_get_style_opa_layered(obj, LV_PART_MAIN);
     if(opa_layered <= LV_OPA_MIN) return;

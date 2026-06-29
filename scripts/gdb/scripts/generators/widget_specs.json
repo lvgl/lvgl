@@ -478,7 +478,8 @@
         "header": "pointer",
         "content": "pointer",
         "footer": "pointer",
-        "title": "pointer"
+        "title": "pointer",
+        "auto_parent": "bool"
       }
     },
     "summary_tpl": "",
