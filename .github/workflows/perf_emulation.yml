@@ -48,11 +48,11 @@ jobs:
         include:
         - image_type: 32b
           image_version : |
-            latest@sha256:f4326e11c63004b8d6ded8a30a8b9bf96bca5f2d70f926b90231a4d80bd58208
+            latest@sha256:8d977ad76d3893bae23e9bfda3217390afe24ba448852edd7579fb8e5fa38a23
           config : lv_conf_perf32b
         - image_type: 64b
           image_version: |
-            latest@sha256:681d5a7f099305b500d24f83350b68ff49758100137e9c09c01233d9c08a013b
+            latest@sha256:1d3674adb634be728d79ffeff37e55183d3d9d228cd536266fa5db444ee0ce77
           config : lv_conf_perf64b
     steps:
       - name: Checkout

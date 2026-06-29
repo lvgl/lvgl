@@ -9,12 +9,12 @@ import subprocess
 benchmark_configs = {
     "perf32b": {
         "description": "Benchmark config ARM (so3) Emulated - 32 bit",
-        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b@sha256:f4326e11c63004b8d6ded8a30a8b9bf96bca5f2d70f926b90231a4d80bd58208",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b@sha256:8d977ad76d3893bae23e9bfda3217390afe24ba448852edd7579fb8e5fa38a23",
         "defaults_file": "lv_conf_perf32b.defaults",
     },
     "perf64b": {
         "description": "Benchmark config ARM (so3) Emulated - 64 bit",
-        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b@sha256:681d5a7f099305b500d24f83350b68ff49758100137e9c09c01233d9c08a013b",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b@sha256:1d3674adb634be728d79ffeff37e55183d3d9d228cd536266fa5db444ee0ce77",
         "defaults_file": "lv_conf_perf64b.defaults",
     },
 }
