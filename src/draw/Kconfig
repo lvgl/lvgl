@@ -142,7 +142,7 @@ config LV_USE_VECTOR_GRAPHIC
 		Enable drawing support vector graphic APIs.
 
 
-rsource "snapshot/Kconfig"
+source "$LVGL_DIR/src/draw/snapshot/Kconfig"
 
 config LV_USE_THORVG
 	bool "ThorVG library for vector graphics support"
@@ -157,49 +157,49 @@ config LV_USE_THORVG_INTERNAL
 
 # These are menus because they contain a lot of configuration options
 menu "Software Rendering (SW)"
-rsource "sw/Kconfig"
+source "$LVGL_DIR/src/draw/sw/Kconfig"
 endmenu
 
 menu "VGLite"
-rsource "vg_lite/Kconfig"
+source "$LVGL_DIR/src/draw/vg_lite/Kconfig"
 endmenu
 
 menu "DAVE/2D"
-rsource "renesas/dave2d/Kconfig"
+source "$LVGL_DIR/src/draw/renesas/dave2d/Kconfig"
 endmenu
 
 menu "Nema GFX"
-rsource "nema_gfx/Kconfig"
+source "$LVGL_DIR/src/draw/nema_gfx/Kconfig"
 endmenu
 
 menu "NXP PXP"
-rsource "nxp/pxp/Kconfig"
+source "$LVGL_DIR/src/draw/nxp/pxp/Kconfig"
 endmenu
 
 menu "ESP32 PPA"
-rsource "espressif/ppa/Kconfig"
+source "$LVGL_DIR/src/draw/espressif/ppa/Kconfig"
 endmenu
 
 menu "DMA2D"
-rsource "dma2d/Kconfig"
+source "$LVGL_DIR/src/draw/dma2d/Kconfig"
 endmenu
 
 menu "EVE"
-rsource "eve/Kconfig"
+source "$LVGL_DIR/src/draw/eve/Kconfig"
 endmenu
 
 menu "NXP G2D"
-rsource "nxp/g2d/Kconfig"
+source "$LVGL_DIR/src/draw/nxp/g2d/Kconfig"
 endmenu
 
 menu "NanoVG (OpenGL Shaders)"
-rsource "nanovg/Kconfig"
+source "$LVGL_DIR/src/draw/nanovg/Kconfig"
 endmenu
 
 menu "OpenGL Textures"
-rsource "opengles/Kconfig"
+source "$LVGL_DIR/src/draw/opengles/Kconfig"
 endmenu
 
 menu "SDL Textures"
-rsource "sdl/Kconfig"
+source "$LVGL_DIR/src/draw/sdl/Kconfig"
 endmenu 

@@ -298,6 +298,6 @@ config LV_USE_IMGFONT
 		Support using images as font in label or span widgets
 
 
-rsource "freetype/Kconfig"
-rsource "tiny_ttf/Kconfig"
+source "$LVGL_DIR/src/font/freetype/Kconfig"
+source "$LVGL_DIR/src/font/tiny_ttf/Kconfig"
 

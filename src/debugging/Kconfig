@@ -1,14 +1,14 @@
 
 menu "System Monitoring"
-	rsource "sysmon/Kconfig"
+	source "$LVGL_DIR/src/debugging/sysmon/Kconfig"
 endmenu
 
 menu "Profiler"
-	rsource "profiler/Kconfig"
+	source "$LVGL_DIR/src/debugging/profiler/Kconfig"
 endmenu
 
 menu "Test Utilities"
-	rsource "test/Kconfig"
+	source "$LVGL_DIR/src/debugging/test/Kconfig"
 
 	config LV_USE_MONKEY
 		bool "Enable Monkey test"

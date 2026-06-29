@@ -12,79 +12,83 @@ menu "LVGL"
 		int
 		default 0
 
+	config LVGL_DIR
+		string
+		option env="LVGL_DIR"
+
 	menu "Memory and Standard Library"
-		rsource "src/stdlib/Kconfig"
+		source "$LVGL_DIR/src/stdlib/Kconfig"
 	endmenu 
 
 	menu "Operating System (OS)"
-		rsource "src/osal/Kconfig"
+		source "$LVGL_DIR/src/osal/Kconfig"
 	endmenu
 
 	menu "Rendering Configuration"
-		rsource "src/draw/Kconfig"
+		source "$LVGL_DIR/src/draw/Kconfig"
 	endmenu
 
 	menu "Input Devices"
-		rsource "src/indev/Kconfig"
+		source "$LVGL_DIR/src/indev/Kconfig"
 	endmenu
 
 	menu "Core"
-		rsource "src/core/Kconfig"
+		source "$LVGL_DIR/src/core/Kconfig"
 	endmenu
 
 	menu "Logging"
-		rsource "src/logging/Kconfig"
+		source "$LVGL_DIR/src/logging/Kconfig"
 	endmenu
 
 	menu "Themes"
-		rsource "src/themes/Kconfig"
+		source "$LVGL_DIR/src/themes/Kconfig"
 	endmenu
 
 	menu "Layouts"
-		rsource "src/layouts/Kconfig"
+		source "$LVGL_DIR/src/layouts/Kconfig"
 	endmenu
 	
 	menu "Image Settings"
-		rsource "src/image/Kconfig"
+		source "$LVGL_DIR/src/image/Kconfig"
 	endmenu
 
 	menu "Text & Font Settings"
-		rsource "src/font/Kconfig"
+		source "$LVGL_DIR/src/font/Kconfig"
 	endmenu
 
 	menu "Widgets"
-		rsource "src/widgets/Kconfig"
+		source "$LVGL_DIR/src/widgets/Kconfig"
 	endmenu
 
 	menu "Drivers"
-		rsource "src/drivers/Kconfig"
+		source "$LVGL_DIR/src/drivers/Kconfig"
 	endmenu
 
 	menu "File System"
-		rsource "src/fs/Kconfig"
+		source "$LVGL_DIR/src/fs/Kconfig"
 	endmenu
 
 	menu "Debugging"
-		rsource "src/debugging/Kconfig"
+		source "$LVGL_DIR/src/debugging/Kconfig"
 	endmenu
 
 	menu "Others"
-		rsource "src/others/Kconfig"
+		source "$LVGL_DIR/src/others/Kconfig"
 	endmenu
 
 	menu "Build"
-		rsource "env_support/kconfig/Kconfig.build"
+		source "$LVGL_DIR/env_support/kconfig/Kconfig.build"
 	endmenu 
 
 	menu "Compiler Settings"
-		rsource "env_support/kconfig/Kconfig.compiler"
+		source "$LVGL_DIR/env_support/kconfig/Kconfig.compiler"
 	endmenu
 
-	# Examples and Demos define their own menu because it might be desirable
-	# to not include examples and demos folders for some LVGL builds
-	# This is also why we use `orsource` here. So that the build doesn't fail
-	# if the file doesn't exist
-	orsource "examples/Kconfig"
-	orsource "demos/Kconfig"
+	menu "Examples"
+		source "$LVGL_DIR/examples/Kconfig"
+	endmenu
 
+	menu "Demos"
+		source "$LVGL_DIR/demos/Kconfig"
+	endmenu
 endmenu

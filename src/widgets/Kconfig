@@ -44,7 +44,7 @@ config LV_USE_BUTTONMATRIX
 	bool "Button matrix"
 	default y
 
-rsource "calendar/Kconfig"
+source "$LVGL_DIR/src/widgets/calendar/Kconfig"
 
 config LV_USE_CANVAS
 	bool "Canvas"
@@ -134,13 +134,13 @@ config LV_USE_IMAGEBUTTON
 	bool "ImageButton"
 	default y
 
-rsource "ime/Kconfig"
+source "$LVGL_DIR/src/widgets/ime/Kconfig"
 
 config LV_USE_KEYBOARD
 	bool "Keyboard"
 	default y
 
-rsource "label/Kconfig"
+source "$LVGL_DIR/src/widgets/label/Kconfig"
 
 config LV_USE_LED
 	bool "LED"
