@@ -804,7 +804,7 @@
 
 #if LV_USE_LZ4
 /** Use lvgl built-in LZ4 lib */
-#define LV_USE_LZ4_INTERNAL 0
+#define LV_USE_LZ4_INTERNAL 1
 
 #endif /*LV_USE_LZ4*/
 

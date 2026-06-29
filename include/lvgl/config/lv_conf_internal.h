@@ -4803,10 +4803,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_GRID must be enabled: Kconfig selects it from LV_USE_DEMO_RENDER && LV_BUILD_DEMOS"
 #endif
 
-#if LV_USE_LZ4_INTERNAL && !(LV_USE_LZ4)
-    #error "LV_USE_LZ4_INTERNAL requires LV_USE_LZ4 (Kconfig depends on)"
-#endif
-
 #if (LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST) && !LV_USE_LODEPNG
     #error "LV_USE_LODEPNG must be enabled: Kconfig selects it from LV_USE_TEST_SCREENSHOT_COMPARE && LV_USE_TEST"
 #endif
