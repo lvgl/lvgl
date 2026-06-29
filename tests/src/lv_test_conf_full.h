@@ -1,5 +1,6 @@
 #ifndef LV_TEST_CONF_FULL_H
 #define LV_TEST_CONF_FULL_H
+#define LV_CHECK_ARG_LOG_MODE LV_CHECK_ARG_LOG_MODE_VERBOSE
 
 #define LV_MEM_SIZE                     (32 * 1024 * 1024)
 #define LV_DRAW_SW_SHADOW_CACHE_SIZE    8
