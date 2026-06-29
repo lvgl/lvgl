@@ -511,11 +511,20 @@ lv_style_value_t lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t
     return v;
 }
 
-lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
+lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2,
+                                                lv_part_t * changed_part)
 {
     LV_CHECK_ARG(obj != NULL, return LV_STYLE_STATE_CMP_SAME);
 
     lv_style_state_cmp_t res = LV_STYLE_STATE_CMP_SAME;
+
+    /*Accumulate which part the differing styles belong to: the lone differing
+     *part, or LV_PART_ANY once styles from more than one part differ. Reported
+     *via changed_part so the caller can scope the refresh to a single part.
+     *diff_part_found is needed as a separate flag because a style's part can
+     *itself be LV_PART_ANY, so LV_PART_ANY can't double as "none seen yet".*/
+    lv_part_t diff_part = LV_PART_ANY;
+    bool diff_part_found = false;
 
     /*Are there any new styles for the new state?*/
     uint32_t i;
@@ -527,6 +536,17 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
         bool valid1 = state_act & (~state1) ? false : true;
         bool valid2 = state_act & (~state2) ? false : true;
         if(valid1 != valid2) {
+            /*Record this differing style's part: keep it if it's the only one
+             *seen so far, otherwise collapse to LV_PART_ANY (more than one part).*/
+            lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
+            if(!diff_part_found) {
+                diff_part = part_act;
+                diff_part_found = true;
+            }
+            else if(part_act != diff_part) {
+                diff_part = LV_PART_ANY;
+            }
+
             const lv_style_t * style = obj->styles[i].style;
             lv_style_value_t v;
             /*If there is layout difference on the main part, return immediately. There is no more serious difference*/
@@ -549,6 +569,9 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
             else if(lv_style_get_prop(style, LV_STYLE_BORDER_WIDTH, &v)) layout_diff = true;
 
             if(layout_diff) {
+                /*Returning early, so the full set of changed parts is unknown:
+                 *report LV_PART_ANY rather than a possibly-incomplete part.*/
+                if(changed_part) *changed_part = LV_PART_ANY;
                 return LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             }
 
@@ -571,6 +594,7 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
         }
     }
 
+    if(changed_part) *changed_part = diff_part;
     return res;
 }
 
