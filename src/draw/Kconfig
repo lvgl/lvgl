@@ -164,16 +164,42 @@ menu "VGLite"
 rsource "vg_lite/Kconfig"
 endmenu
 
+menu "DAVE/2D"
+rsource "renesas/dave2d/Kconfig"
+endmenu
+
 menu "Nema GFX"
 rsource "nema_gfx/Kconfig"
 endmenu
 
+menu "NXP PXP"
 rsource "nxp/pxp/Kconfig"
-rsource "nxp/g2d/Kconfig"
+endmenu
+
+menu "ESP32 PPA"
 rsource "espressif/ppa/Kconfig"
-rsource "renesas/dave2d/Kconfig"
-rsource "sdl/Kconfig"
+endmenu
+
+menu "DMA2D"
 rsource "dma2d/Kconfig"
+endmenu
+
+menu "EVE"
 rsource "eve/Kconfig"
-rsource "opengles/Kconfig"
+endmenu
+
+menu "NXP G2D"
+rsource "nxp/g2d/Kconfig"
+endmenu
+
+menu "NanoVG (OpenGL Shaders)"
 rsource "nanovg/Kconfig"
+endmenu
+
+menu "OpenGL Textures"
+rsource "opengles/Kconfig"
+endmenu
+
+menu "SDL Textures"
+rsource "sdl/Kconfig"
+endmenu 

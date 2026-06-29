@@ -99,8 +99,10 @@ config LV_USE_STDLIB_SPRINTF
 
 if LV_USE_BUILTIN_MALLOC
 
+menu "Builtin Malloc Settings"
+
 config LV_MEM_SIZE
-	int "Size of the memory used by `lv_malloc()` in bytes (Needs to be at least 2kB (2048))"
+	int "Memory size in bytes (Needs to be at least 2kB (2048))"
 	default 65536
 
 config LV_MEM_SIZE_KILOBYTES
@@ -118,6 +120,7 @@ config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
 config LV_MEM_ADR
 	hex "Address for the memory pool instead of allocating it as a normal array. 0: unused"
 	default 0x0
+endmenu
 
 endif #LV_USE_BUILTIN_MALLOC
 
