@@ -3,14 +3,26 @@
 
 static lv_obj_t * list;
 
+typedef void (*scroll_flag_setter_t)(lv_obj_t *, bool);
+
+static const struct {
+    const char * title;
+    scroll_flag_setter_t setter;
+} scroll_flags[] = {
+    { "Scrollable",      lv_obj_set_scrollable },
+    { "Scroll chain",    lv_obj_set_scroll_chain },
+    { "Elastic scroll",  lv_obj_set_scroll_elastic },
+    { "Scroll momentum", lv_obj_set_scroll_momentum },
+};
+
 static void flag_switch_cb(lv_event_t * e)
 {
     lv_obj_t * sw = lv_event_get_target_obj(e);
-    lv_obj_flag_t flag = (lv_obj_flag_t)(lv_uintptr_t)lv_event_get_user_data(e);
-    lv_obj_set_flag(list, flag, lv_obj_has_state(sw, LV_STATE_CHECKED));
+    uint32_t idx = (uint32_t)(lv_uintptr_t)lv_event_get_user_data(e);
+    scroll_flags[idx].setter(list, lv_obj_has_state(sw, LV_STATE_CHECKED));
 }
 
-static void add_flag_row(lv_obj_t * parent, const char * title, lv_obj_flag_t flag)
+static void add_flag_row(lv_obj_t * parent, uint32_t idx)
 {
     lv_obj_t * row = lv_obj_create(parent);
     lv_obj_remove_style_all(row);
@@ -19,13 +31,13 @@ static void add_flag_row(lv_obj_t * parent, const char * title, lv_obj_flag_t fl
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * label = lv_label_create(row);
-    lv_label_set_text(label, title);
+    lv_label_set_text(label, scroll_flags[idx].title);
     lv_obj_set_flex_grow(label, 1);
 
     lv_obj_t * sw = lv_switch_create(row);
     lv_obj_add_state(sw, LV_STATE_CHECKED);          /* flags start enabled */
-    lv_obj_add_flag(list, flag);
-    lv_obj_add_event_cb(sw, flag_switch_cb, LV_EVENT_VALUE_CHANGED, (void *)(lv_uintptr_t)flag);
+    scroll_flags[idx].setter(list, true);
+    lv_obj_add_event_cb(sw, flag_switch_cb, LV_EVENT_VALUE_CHANGED, (void *)(lv_uintptr_t)idx);
 }
 
 /**
@@ -34,9 +46,10 @@ static void add_flag_row(lv_obj_t * parent, const char * title, lv_obj_flag_t fl
  *
  * These four flags change how a Widget reacts to scrolling but only show
  * their effect through interaction, so one example covers them together.
- * A scrollable list sits above four switches; each switch adds or removes
- * its flag on the list with `lv_obj_set_flag`, so the change can be felt
- * immediately by dragging the list.
+ * A scrollable list sits above four switches; each switch toggles the
+ * corresponding behaviour on the list with its dedicated setter (e.g.
+ * `lv_obj_set_scrollable`), so the change can be felt immediately by dragging
+ * the list.
  */
 void lv_example_scroll_properties(void)
 {
@@ -56,10 +69,9 @@ void lv_example_scroll_properties(void)
         lv_obj_center(label);
     }
 
-    add_flag_row(panel, "Scrollable", LV_OBJ_FLAG_SCROLLABLE);
-    add_flag_row(panel, "Scroll chain", LV_OBJ_FLAG_SCROLL_CHAIN);
-    add_flag_row(panel, "Elastic scroll", LV_OBJ_FLAG_SCROLL_ELASTIC);
-    add_flag_row(panel, "Scroll momentum", LV_OBJ_FLAG_SCROLL_MOMENTUM);
+    for(uint32_t i = 0; i < sizeof(scroll_flags) / sizeof(scroll_flags[0]); i++) {
+        add_flag_row(panel, i);
+    }
 }
 
 #endif

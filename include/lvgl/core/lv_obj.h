@@ -439,13 +439,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
  */
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
 
-
-/** Allow only one RADIO_BUTTON sibling to be checked
- * @param obj     pointer to a widget
- * @param en      enable or disable radio button behavior
- */
-void lv_obj_set_radio_button(lv_obj_t * obj, bool en);
-
 /*=======================
  * Getter functions
  *======================*/
@@ -631,12 +624,6 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj);
  * @return          true: `obj` is in `state`; false: `obj` is not in `state`
  */
 bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
-
-/** Get whether the object is a radio button
- * @param obj     pointer to a widget
- * @return        true if radio button behavior is enabled
- */
-bool lv_obj_is_radio_button(const lv_obj_t * obj);
 
 /**
  * Get the group of the object

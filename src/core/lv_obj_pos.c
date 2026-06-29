@@ -294,7 +294,7 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
-    if(obj->hidden || obj->ignore_layout || obj->floating) return false;
+    if(lv_obj_is_hidden(obj) || lv_obj_is_ignore_layout(obj) || lv_obj_is_floating(obj)) return false;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return false;
@@ -1195,7 +1195,7 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
     LV_CHECK_ARG(point != NULL, return false);
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
-    
+
     if(!lv_obj_is_clickable(obj)) return false;
 
     lv_area_t a;

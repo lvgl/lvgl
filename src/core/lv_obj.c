@@ -523,6 +523,7 @@ void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 
 void lv_obj_set_clickable(lv_obj_t * obj, bool en)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     obj->clickable = en;
 
 }

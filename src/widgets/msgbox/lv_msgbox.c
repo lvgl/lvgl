@@ -279,6 +279,7 @@ lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 
 void lv_msgbox_close(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->auto_parent) lv_obj_delete(lv_obj_get_parent(obj));
     else lv_obj_delete(obj);
@@ -286,6 +287,7 @@ void lv_msgbox_close(lv_obj_t * obj)
 
 void lv_msgbox_close_async(lv_obj_t * obj)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->auto_parent) lv_obj_delete_async(lv_obj_get_parent(obj));
     else lv_obj_delete_async(obj);

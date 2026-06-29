@@ -118,7 +118,7 @@ void lv_sysmon_show_performance(lv_display_t * disp)
         lv_display_add_event_cb(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
     }
 
-    lv_obj_set_hidden(disp->perf_label, LV_USE_PERF_MONITOR_LOG_MODE ? true : false);
+    lv_obj_set_hidden(disp->perf_label, LV_USE_PERF_MONITOR_LOG_MODE);
 }
 
 void lv_sysmon_hide_performance(lv_display_t * disp)

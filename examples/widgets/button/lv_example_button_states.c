@@ -32,7 +32,7 @@ void lv_example_button_states(void)
     /* Checkable, starts checked */
     lv_obj_t * button_2 = lv_button_create(screen);
     lv_obj_set_size(button_2, 160, 40);
-    lv_obj_set_flag(button_2, LV_OBJ_FLAG_CHECKABLE, true);
+    lv_obj_set_checkable(button_2, true);
     lv_obj_set_state(button_2, LV_STATE_CHECKED, true);
     lv_obj_t * label_2 = lv_label_create(button_2);
     lv_obj_set_align(label_2, LV_ALIGN_CENTER);

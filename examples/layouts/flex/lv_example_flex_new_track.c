@@ -66,7 +66,7 @@ void lv_example_flex_new_track(void)
 
     /* Track 2 — forced onto a new track */
     lv_obj_t * label_6 = lv_label_create(container);
-    lv_obj_set_flag(label_6, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK, true);
+    lv_obj_set_flex_in_new_track(label_6, true);
     lv_obj_set_style_bg_color(label_6, lv_color_hex(0xe74c3c), 0);
     lv_label_set_text(label_6, "Sat");
     lv_obj_add_style(label_6, &style_day, 0);
