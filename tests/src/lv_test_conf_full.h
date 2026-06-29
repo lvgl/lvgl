@@ -142,6 +142,8 @@
 
 #ifndef LV_USE_LINUX_DRM
     #define LV_USE_LINUX_DRM    1
+    #define LV_LINUX_DRM_AUTO_BACKEND 0
+    #define LV_LINUX_DRM_BACKEND LV_LINUX_DRM_BACKEND_FBDEV
 #endif
 
 #ifndef LV_USE_LINUX_FBDEV
@@ -173,6 +175,8 @@
 
 #ifndef LV_USE_WAYLAND
     #define LV_USE_WAYLAND  1
+    #define LV_WAYLAND_AUTO_BACKEND 0
+    #define LV_WAYLAND_BACKEND LV_WAYLAND_BACKEND_SHM
 #endif
 
 #define LV_USE_GENERIC_MIPI 1
