@@ -17,7 +17,7 @@ choice
 	default LV_X11_RENDER_MODE_PARTIAL
 
 	config LV_X11_RENDER_MODE_PARTIAL
-		bool "Partial render mode (preferred)"
+		bool "Partial render mode"
 		help
 			Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM.
 			Appr. 1/10 screen size buffer(s) are used.
