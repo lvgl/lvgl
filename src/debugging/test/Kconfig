@@ -1,7 +1,7 @@
 config LV_USE_TEST
-	bool "Enable emulated input devices, time emulation, and screenshot compares."
+	bool "Enable emulated input devices, time emulation, and screenshot compares"
 	help
-		Enable emulated input devices, time emulation, and screenshot compares.
+		Enable emulated input devices, time emulation, and screenshot compares
 
 if LV_USE_TEST
 

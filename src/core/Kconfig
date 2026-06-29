@@ -5,13 +5,13 @@ config LV_OBJ_STYLE_CACHE
 		Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties
 
 config LV_USE_OBJ_NAME
-	bool "Enable support widget names"
+	bool "Widget names (lv_obj_set_name)"
 	default n
 	help
-		Enable support widget names
+		Enable support for widget names
 
 config LV_USE_OBJ_ID
-	bool "Add id field to obj"
+	bool "Widget id (lv_obj_set_id)"
 	default n
 	help
 		Add `id` field to `lv_obj_t`
@@ -84,12 +84,12 @@ config LV_USE_OBSERVER
 		Enable an observer pattern implementation
 
 config LV_USE_TRANSLATION
-	bool "Enable text translation support"
+	bool "Text translation"
 	help
 		Enable text translation support
 
 config LV_USE_COLOR_FILTER
-	bool "Enable color filter style"
+	bool "Color filter style"
 	default n
 	help
 		Enable color filter style

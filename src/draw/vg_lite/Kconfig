@@ -30,7 +30,7 @@ config LV_VG_LITE_USE_BOX_SHADOW
 		but does not guarantee the same rendering quality as the software.
 
 config LV_VG_LITE_GRAD_CACHE_CNT
-	int "VG-Lite gradient maximum cache number."
+	int "VG-Lite gradient maximum cache number"
 	default 32
 	help
 		The memory usage of a single gradient:
@@ -38,11 +38,11 @@ config LV_VG_LITE_GRAD_CACHE_CNT
 			radial: radius * 4K bytes.
 
 config LV_VG_LITE_STROKE_CACHE_CNT
-	int "VG-Lite stroke maximum cache number."
+	int "VG-Lite stroke maximum cache number"
 	default 32
 
 config LV_VG_LITE_BITMAP_FONT_CACHE_CNT
-	int "VG-Lite unaligned bitmap font maximum cache number."
+	int "VG-Lite unaligned bitmap font maximum cache number"
 	default 256
 
 config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
@@ -50,11 +50,11 @@ config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
 	default n
 
 config LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
-	bool "Disable linear gradient extension for some older versions of drivers."
+	bool "Disable linear gradient extension for some older versions of drivers"
 	default n
 
 config LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
-	bool "Disable blit rectangular offset to resolve certain hardware errors."
+	bool "Disable blit rectangular offset to resolve certain hardware errors"
 	default n
 
 config LV_VG_LITE_PATH_DUMP_MAX_LEN

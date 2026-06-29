@@ -5,13 +5,13 @@ config LV_USE_G2D
 	  Deprecated and non-functional. Use LV_USE_DRAW_G2D instead.
 
 config LV_USE_DRAW_G2D
-	bool "Use G2D for drawing."
+	bool "Use G2D for drawing"
 	default n
 
 if LV_USE_DRAW_G2D
 
 config LV_G2D_HASH_TABLE_SIZE
-	int "Maximum number of buffers that can be stored for G2D draw unit."
+	int "Maximum number of buffers that can be stored for G2D draw unit"
 	default 50
 	help
 		Includes the frame buffers and assets.
