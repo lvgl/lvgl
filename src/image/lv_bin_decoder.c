@@ -13,9 +13,9 @@
 
 #if LV_USE_LZ4
     #if LV_USE_LZ4_INTERNAL
-        #include <lz4.h>
-    #else
         #include "../libs/lz4/lz4.h"
+    #else
+        #include <lz4.h>
     #endif /*LV_USE_LZ4_INTERNAL*/
 #endif /*LV_USE_LZ4*/
 
