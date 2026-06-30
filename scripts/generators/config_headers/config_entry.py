@@ -132,9 +132,21 @@ class BoolConfig(ScalarConfig):
         return cls(sym.name, bool_default(sym), node=node, doc=doc_text(node))
 
     def _default_on_ladder(self) -> list[str]:
-        """The ``LV_KCONFIG_PRESENT`` ladder for a default-``1`` bool: ``1`` on
-        the hand-written ``lv_conf.h`` path, ``CONFIG_<name>``-or-``0`` under
-        Kconfig (an unset bool emits no ``CONFIG_<name>``, so it must read 0)."""
+        """
+        Settings enabled by default need some special handling:
+
+        First of all, we need to ensure we only define it to '1' if all of its dependencies
+        are met else we could end up with a case where `LV_USE_THORVG_INTERNAL` is enabled
+        while `LV_USE_THORVG` is disabled forcing us to check for
+        `#if LV_USE_THORVG && LV_USE_THORVG_INTERNAL` in the source code instead of the more
+        straightforward way `#if LV_USE_THORVG_INTERNAL`.
+
+        On Kconfig side, even if by default the configuration is enabled, Kconfig won't export a
+        CONFIG_XXX macro for disabled configs.
+        e.g. disabling LV_USE_LABEL in kconfig will not produce `#define CONFIG_LV_USE_LABEL 0`,
+        in fact, it won't produce a #define at all so we need to handle this by checking if we're using
+        Kconfig, and if so, we set it to 0 by default.
+        """
         name = self.name
         upper = name.upper()
         deps = self.depends_on_c()
