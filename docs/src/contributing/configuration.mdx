@@ -44,11 +44,7 @@ After **any** change to a `Kconfig` file or to the generator, regenerate and
 commit the three headers:
 
 ```bash
-cd 
-python3 scripts/generators/config_files.py \
-  --template lv_conf_template.h \
-  --internal include/lvgl/config/lv_conf_internal.h \
-  --bridge   include/lvgl/config/lv_conf_kconfig.h
+python3 scripts/generators/config_files.py
 ```
 
 Then run the generator's tests:

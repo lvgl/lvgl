@@ -49,10 +49,7 @@ jobs:
         id: config-headers
         continue-on-error: true
         run: |
-          python3 scripts/generators/config_files.py \
-            --template lv_conf_template.h \
-            --internal include/lvgl/config/lv_conf_internal.h \
-            --bridge   include/lvgl/config/lv_conf_kconfig.h
+          python3 scripts/generators/config_files.py
           git diff --exit-code -- \
             Kconfig \
             lv_conf_template.h \
