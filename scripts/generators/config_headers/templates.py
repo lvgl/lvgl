@@ -98,6 +98,36 @@ __CONFIG_OPTIONS__
     #define LV_KCONFIG_PRESENT
 #endif
 
+/* 
+ * Detect if the user is using the new calendar day/month configuration
+ * in order to avoid warnings for users that have migrated.
+ */
+#ifdef LV_MONDAY_STR
+#define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 1
+#else
+#define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 0
+#endif
+
+/* 
+ * Detect if the user is using the new calendar day/month configuration
+ * in order to avoid warnings for users that have migrated.
+ */
+#ifdef LV_JANUARY_STR
+#define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 1
+#else
+#define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 0
+#endif
+
+/* 
+ * Detect if the user is using the xkb keymap configuration
+ * in order to avoid warnings for users that have migrated.
+ */
+#ifdef LV_LIBINPUT_XKB_RULES
+#define LV_LIBINPUT_XKB_DISABLE_KEY_MAP 1
+#else
+#define LV_LIBINPUT_XKB_DISABLE_KEY_MAP 0
+#endif
+
 /*----------------------------------
  * Start parsing lv_conf_template.h
  -----------------------------------*/

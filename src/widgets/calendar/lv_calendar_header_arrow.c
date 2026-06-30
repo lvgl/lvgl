@@ -38,7 +38,7 @@ const lv_obj_class_t lv_calendar_header_arrow_class = {
     .height_def = LV_DPI_DEF / 3,
     .name = "lv_calendar_header_arrow",
 };
-#ifdef LV_CALENDAR_DEFAULT_MONTH_NAMES
+#if defined(LV_CALENDAR_DEFAULT_MONTH_NAMES) && !LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 
 #warning "LV_CALENDAR_DEFAULT_MONTH_NAMES is deprecated and will be removed in the next release. Use LV_JANUARY_STR, LV_FEBRUARY_STR,... to set each month name"
 static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
 #else
