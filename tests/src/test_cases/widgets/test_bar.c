@@ -622,4 +622,80 @@ void test_bar_properties(void)
 #endif
 }
 
+void test_bar_large_range_cur_value_no_overflow(void)
+{
+    /* Prevent int32 overflow when indic_w * (cur-min) > INT32_MAX */
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 16000000, LV_ANIM_OFF);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    int32_t indic_w = lv_area_get_width(&ptr->indic_area);
+    TEST_ASSERT_TRUE(indic_w > 300);
+}
+
+void test_bar_large_range_start_value_no_overflow(void)
+{
+    /* Prevent int32 overflow for start_value pixel position */
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_mode(g_bar, LV_BAR_MODE_RANGE);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 19000000, LV_ANIM_OFF);
+    lv_bar_set_start_value(g_bar, 12000000, LV_ANIM_OFF);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    TEST_ASSERT_TRUE(ptr->indic_area.x1 > 200);
+}
+
+void test_bar_safe_values_preserved(void)
+{
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 2000000, LV_ANIM_OFF);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    int32_t indic_w = lv_area_get_width(&ptr->indic_area);
+    TEST_ASSERT_TRUE(indic_w > 30 && indic_w < 150);
+}
+
+void test_bar_large_range_cur_value_anim_no_overflow(void)
+{
+    /* Prevent int32 overflow during cur_value animation */
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 2000000, LV_ANIM_OFF);
+    lv_refr_now(NULL);
+
+    lv_bar_set_value(g_bar, 14000000, LV_ANIM_ON);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    TEST_ASSERT_TRUE(lv_area_get_width(&ptr->indic_area) > 300);
+}
+
+void test_bar_large_range_start_value_anim_no_overflow(void)
+{
+    /* Prevent int32 overflow during start_value animation */
+    lv_obj_set_size(g_bar, 600, 24);
+    lv_bar_set_mode(g_bar, LV_BAR_MODE_RANGE);
+    lv_bar_set_range(g_bar, 0, 20000000);
+    lv_bar_set_value(g_bar, 19000000, LV_ANIM_OFF);
+    lv_bar_set_start_value(g_bar, 2000000, LV_ANIM_OFF);
+    lv_refr_now(NULL);
+
+    lv_bar_set_start_value(g_bar, 10000000, LV_ANIM_ON);
+    lv_obj_update_layout(g_bar);
+    lv_refr_now(NULL);
+
+    lv_bar_t * ptr = (lv_bar_t *)g_bar;
+    TEST_ASSERT_TRUE(ptr->indic_area.x1 > 200);
+}
+
 #endif
