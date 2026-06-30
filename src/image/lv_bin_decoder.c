@@ -1032,6 +1032,122 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 #endif
 }
 
+static lv_result_t decode_indexed_line_i1(const lv_color32_t * palette, int32_t x,
+                                          int32_t w_px, const uint8_t * in, lv_color32_t * out)
+{
+    /*8 pixels per byte, MSB first (bit 7 is the left-most pixel)*/
+    in += x >> 3;
+    int32_t shift = 7 - (x & 0x7);
+
+    int32_t i = 0;
+
+    /*Head: consume the rest of the first byte so the main loop starts byte-aligned.
+     *Skipped entirely when x is already byte-aligned (shift == 7).*/
+    if(shift != 7) {
+        uint8_t byte = *in++;
+        while(shift >= 0 && i < w_px) {
+            out[i++] = palette[(byte >> shift) & 0x1];
+            shift--;
+        }
+    }
+
+    /*Body: one full byte -> 8 pixels per iteration, fully unrolled.
+     *No per-pixel branch or shift bookkeeping, so the compiler can pipeline it.*/
+    for(; i + 8 <= w_px; i += 8) {
+        uint8_t byte = *in++;
+        out[i + 0] = palette[(byte >> 7) & 0x1];
+        out[i + 1] = palette[(byte >> 6) & 0x1];
+        out[i + 2] = palette[(byte >> 5) & 0x1];
+        out[i + 3] = palette[(byte >> 4) & 0x1];
+        out[i + 4] = palette[(byte >> 3) & 0x1];
+        out[i + 5] = palette[(byte >> 2) & 0x1];
+        out[i + 6] = palette[(byte >> 1) & 0x1];
+        out[i + 7] = palette[(byte >> 0) & 0x1];
+    }
+
+    /*Tail: the remaining 1..7 pixels of the last partial byte.*/
+    if(i < w_px) {
+        uint8_t byte = *in;
+        shift = 7;
+        for(; i < w_px; i++) {
+            out[i] = palette[(byte >> shift) & 0x1];
+            shift--;
+        }
+    }
+
+    return LV_RESULT_OK;
+}
+
+
+static lv_result_t decode_indexed_line_i2(const lv_color32_t * palette, int32_t x,
+                                          int32_t w_px, const uint8_t * in, lv_color32_t * out)
+{
+    /*4 pixels per byte, MSB first: bits 6-7, 4-5, 2-3, 0-1.*/
+    in += x >> 2;
+    int32_t shift = 6 - 2 * (x & 0x3);
+
+    int32_t i = 0;
+
+    /*Head: consume the rest of the first byte so the main loop starts byte-aligned.
+     *Skipped entirely when x is already byte-aligned (shift == 6).*/
+    if(shift != 6) {
+        uint8_t byte = *in++;
+        while(shift >= 0 && i < w_px) {
+            out[i++] = palette[(byte >> shift) & 0x3];
+            shift -= 2;
+        }
+    }
+
+    /*Body: one full byte -> 4 pixels per iteration, fully unrolled.*/
+    for(; i + 4 <= w_px; i += 4) {
+        uint8_t byte = *in++;
+        out[i + 0] = palette[(byte >> 6) & 0x3];
+        out[i + 1] = palette[(byte >> 4) & 0x3];
+        out[i + 2] = palette[(byte >> 2) & 0x3];
+        out[i + 3] = palette[(byte >> 0) & 0x3];
+    }
+
+    /*Tail: the remaining 1..3 pixels of the last partial byte.*/
+    if(i < w_px) {
+        uint8_t byte = *in;
+        shift = 6;
+        for(; i < w_px; i++) {
+            out[i] = palette[(byte >> shift) & 0x3];
+            shift -= 2;
+        }
+    }
+
+    return LV_RESULT_OK;
+}
+
+static lv_result_t decode_indexed_line_i4(const lv_color32_t * palette, int32_t x,
+                                          int32_t w_px, const uint8_t * in, lv_color32_t * out)
+{
+    /*2 pixels per byte: high nibble (bits 4-7) is the left pixel, low nibble (bits 0-3) the right.*/
+    in += x >> 1;
+
+    int32_t i = 0;
+
+    /*Head: if x is odd we start mid-byte at the low nibble; consume it to byte-align.*/
+    if((x & 0x1) && i < w_px) {
+        out[i++] = palette[*in++ & 0x0F];
+    }
+
+    /*Body: one full byte -> 2 pixels per iteration, unrolled.*/
+    for(; i + 2 <= w_px; i += 2) {
+        uint8_t byte = *in++;
+        out[i + 0] = palette[byte >> 4];
+        out[i + 1] = palette[byte & 0x0F];
+    }
+
+    /*Tail: one pixel left -> high nibble of the last byte.*/
+    if(i < w_px) {
+        out[i] = palette[*in >> 4];
+    }
+
+    return LV_RESULT_OK;
+}
+
 static lv_result_t decode_indexed_line_i8(const lv_color32_t * palette, int32_t x,
                                           int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
@@ -1047,46 +1163,18 @@ static lv_result_t decode_indexed_line_i8(const lv_color32_t * palette, int32_t 
 static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
                                        int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
-    uint8_t px_size;
-    uint16_t mask;
-
-    int8_t shift   = 0;
     switch(color_format) {
         case LV_COLOR_FORMAT_I1:
-            px_size = 1;
-            in += x / 8;                /*8pixel per byte*/
-            shift = 7 - (x & 0x7);
-            break;
+            return decode_indexed_line_i1(palette, x, w_px, in, out);
         case LV_COLOR_FORMAT_I2:
-            px_size = 2;
-            in += x / 4;                /*4pixel per byte*/
-            shift = 6 - 2 * (x & 0x3);
-            break;
+            return decode_indexed_line_i2(palette, x, w_px, in, out);
         case LV_COLOR_FORMAT_I4:
-            px_size = 4;
-            in += x / 2;                /*2pixel per byte*/
-            shift = 4 - 4 * (x & 0x1);
-            break;
+            return decode_indexed_line_i4(palette, x, w_px, in, out);
         case LV_COLOR_FORMAT_I8:
             return decode_indexed_line_i8(palette, x, w_px, in, out);
         default:
             return LV_RESULT_INVALID;
     }
-
-    mask   = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
-
-    int32_t i;
-    for(i = 0; i < w_px; i++) {
-        uint8_t val_act = (*in >> shift) & mask;
-        out[i] = palette[val_act];
-
-        shift -= px_size;
-        if(shift < 0) {
-            shift = 8 - px_size;
-            in++;
-        }
-    }
-    return LV_RESULT_OK;
 }
 
 static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, uint32_t btr, uint32_t * br)
