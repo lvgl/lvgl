@@ -231,17 +231,6 @@ extern "C" {
 #endif
 
 /*******************
- * LV_GLOBAL_USE_CUSTOM_INCLUDE
- *******************/
-
-#if defined(CONFIG_LV_ENABLE_GLOBAL_CUSTOM)
-#warning "LV_ENABLE_GLOBAL_CUSTOM is deprecated, use LV_GLOBAL_USE_CUSTOM_INCLUDE instead"
-#ifndef CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE
-#define CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE CONFIG_LV_ENABLE_GLOBAL_CUSTOM
-#endif
-#endif
-
-/*******************
  * LV_CONF_MINIMAL
  *******************/
 

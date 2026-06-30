@@ -194,18 +194,6 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
 #endif /*defined(LV_VG_LITE_HAL_GPU_REVISION)*/
 
 /*
- *  LV_ENABLE_GLOBAL_CUSTOM was renamed to LV_GLOBAL_USE_CUSTOM_INCLUDE to follow
- *  the LV_*_USE_CUSTOM_INCLUDE convention.  Map the old name to the new one.
- */
-#if defined(LV_ENABLE_GLOBAL_CUSTOM) && LV_ENABLE_GLOBAL_CUSTOM
-#if !LV_GLOBAL_USE_CUSTOM_INCLUDE
-    #warning LV_ENABLE_GLOBAL_CUSTOM is deprecated and will be removed in a future release. Use LV_GLOBAL_USE_CUSTOM_INCLUDE instead.
-    #undef LV_GLOBAL_USE_CUSTOM_INCLUDE
-    #define LV_GLOBAL_USE_CUSTOM_INCLUDE 1
-#endif /*!LV_GLOBAL_USE_CUSTOM_INCLUDE*/
-#endif /*defined(LV_ENABLE_GLOBAL_CUSTOM) && LV_ENABLE_GLOBAL_CUSTOM*/
-
-/*
  *  Legacy backend inference for the Linux DRM and SDL drivers.  Historically the
  *  EGL backend was turned on automatically from LV_USE_OPENGLES; for v9.x each
  *  driver gets an explicit LV_<DRIVER>_BACKEND choice instead.  While the
@@ -436,17 +424,6 @@ KCONFIG_BRIDGE_DEPRECATIONS = """\
 #warning "LV_SDL_DOUBLE_BUFFER is deprecated, use LV_SDL_BUF_COUNT instead"
 #undef CONFIG_LV_SDL_BUF_COUNT
 #define CONFIG_LV_SDL_BUF_COUNT 2
-#endif
-
-/*******************
- * LV_GLOBAL_USE_CUSTOM_INCLUDE
- *******************/
-
-#if defined(CONFIG_LV_ENABLE_GLOBAL_CUSTOM)
-#warning "LV_ENABLE_GLOBAL_CUSTOM is deprecated, use LV_GLOBAL_USE_CUSTOM_INCLUDE instead"
-#ifndef CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE
-#define CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE CONFIG_LV_ENABLE_GLOBAL_CUSTOM
-#endif
 #endif
 
 /*******************

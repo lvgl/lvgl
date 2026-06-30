@@ -4203,6 +4203,14 @@
     #endif
 #endif
 
+#ifndef LV_ENABLE_GLOBAL_CUSTOM
+    #ifdef CONFIG_LV_ENABLE_GLOBAL_CUSTOM
+        #define LV_ENABLE_GLOBAL_CUSTOM CONFIG_LV_ENABLE_GLOBAL_CUSTOM
+    #else
+        #define LV_ENABLE_GLOBAL_CUSTOM 0
+    #endif
+#endif
+
 #ifndef LV_GLOBAL_USE_CUSTOM_INCLUDE
     #ifdef CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE
         #define LV_GLOBAL_USE_CUSTOM_INCLUDE CONFIG_LV_GLOBAL_USE_CUSTOM_INCLUDE
@@ -4652,18 +4660,6 @@
         #endif
     #endif /*LV_VG_LITE_GPU == LV_VG_LITE_GPU_GC255_0X40A*/
 #endif /*defined(LV_VG_LITE_HAL_GPU_REVISION)*/
-
-/*
- *  LV_ENABLE_GLOBAL_CUSTOM was renamed to LV_GLOBAL_USE_CUSTOM_INCLUDE to follow
- *  the LV_*_USE_CUSTOM_INCLUDE convention.  Map the old name to the new one.
- */
-#if defined(LV_ENABLE_GLOBAL_CUSTOM) && LV_ENABLE_GLOBAL_CUSTOM
-#if !LV_GLOBAL_USE_CUSTOM_INCLUDE
-    #warning LV_ENABLE_GLOBAL_CUSTOM is deprecated and will be removed in a future release. Use LV_GLOBAL_USE_CUSTOM_INCLUDE instead.
-    #undef LV_GLOBAL_USE_CUSTOM_INCLUDE
-    #define LV_GLOBAL_USE_CUSTOM_INCLUDE 1
-#endif /*!LV_GLOBAL_USE_CUSTOM_INCLUDE*/
-#endif /*defined(LV_ENABLE_GLOBAL_CUSTOM) && LV_ENABLE_GLOBAL_CUSTOM*/
 
 /*
  *  Legacy backend inference for the Linux DRM and SDL drivers.  Historically the
@@ -5311,8 +5307,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_TEST_SCREENSHOT_COMPARE requires LV_USE_TEST (Kconfig depends on)"
 #endif
 
-#if LV_GLOBAL_USE_CUSTOM_INCLUDE && !(LV_USE_PRIVATE_API)
-    #error "LV_GLOBAL_USE_CUSTOM_INCLUDE requires LV_USE_PRIVATE_API (Kconfig depends on)"
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE && !(LV_ENABLE_GLOBAL_CUSTOM)
+    #error "LV_GLOBAL_USE_CUSTOM_INCLUDE requires LV_ENABLE_GLOBAL_CUSTOM (Kconfig depends on)"
 #endif
 
 #if LV_CHECK_ARG_ASSERT_ON_FAIL && !(LV_USE_CHECK_ARG)

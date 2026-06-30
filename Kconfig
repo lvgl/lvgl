@@ -3278,10 +3278,9 @@ config LV_USE_PRIVATE_API
 	bool "Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default"
 	default n
 
-if LV_USE_PRIVATE_API
-
-config LV_GLOBAL_USE_CUSTOM_INCLUDE
-	bool "Enable 'lv_global' customization via a custom header"
+config LV_ENABLE_GLOBAL_CUSTOM
+	bool "Enable 'lv_global' customization"
+	default n
 	help
 	  By default, LVGL stores all runtime state in a single static
 	  'lv_global_t' variable, sufficient for most single-display
@@ -3302,13 +3301,17 @@ config LV_GLOBAL_USE_CUSTOM_INCLUDE
 	  Returning NULL from that function is safe; LVGL will treat the
 	  library as uninitialized for that context.
 
-config LV_ENABLE_GLOBAL_CUSTOM
-	bool "[DEPRECATED: use LV_GLOBAL_USE_CUSTOM_INCLUDE]"
-	default n
+if LV_ENABLE_GLOBAL_CUSTOM
+
+config LV_GLOBAL_USE_CUSTOM_INCLUDE
+	bool "Provide 'lv_global_default()' from a custom header"
+	help
+	  Use a custom header for the declaration of:
+	  	lv_global_t *lv_global_default(void);
 
 config LV_GLOBAL_CUSTOM_INCLUDE
 	string "Header to include for the custom 'lv_global' function"
-	depends on LV_GLOBAL_USE_CUSTOM_INCLUDE || LV_ENABLE_GLOBAL_CUSTOM
+	depends on LV_GLOBAL_USE_CUSTOM_INCLUDE
 	default "lv_global.h"
 	help
 	  Path to the header that declares:
@@ -3318,7 +3321,7 @@ config LV_GLOBAL_CUSTOM_INCLUDE
 	  LV_GLOBAL_DEFAULT() macro. Keep it lightweight, it is included
 	  in performance-critical paths.
 
-endif #LV_USE_PRIVATE_API
+endif #LV_ENABLE_GLOBAL_CUSTOM
 
 menu "Asserts"
 	config LV_USE_ASSERT_NULL

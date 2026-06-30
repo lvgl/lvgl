@@ -95,9 +95,6 @@ IGNORE_SYMBOLS: set[str] = {
     # lv_conf_kconfig.h shim, so kept out of the generated headers.
     "LV_SDL_SINGLE_BUFFER",
     "LV_SDL_DOUBLE_BUFFER",
-    # Deprecated former name of LV_GLOBAL_USE_CUSTOM_INCLUDE: mapped by the
-    # lv_conf_kconfig.h shim, kept only so old defconfigs parse.
-    "LV_ENABLE_GLOBAL_CUSTOM",
 }
 
 

@@ -2180,7 +2180,6 @@
 /** Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default */
 #define LV_USE_PRIVATE_API 0
 
-#if LV_USE_PRIVATE_API
 /** By default, LVGL stores all runtime state in a single static
  *  'lv_global_t' variable, sufficient for most single-display
  *  single-threaded applications.
@@ -2200,9 +2199,15 @@
  *  Returning NULL from that function is safe; LVGL will treat the
  *  library as uninitialized for that context.
  */
+#define LV_ENABLE_GLOBAL_CUSTOM 0
+
+#if LV_ENABLE_GLOBAL_CUSTOM
+/** Use a custom header for the declaration of:
+ *        lv_global_t *lv_global_default(void);
+ */
 #define LV_GLOBAL_USE_CUSTOM_INCLUDE 0
 
-#if LV_GLOBAL_USE_CUSTOM_INCLUDE || LV_ENABLE_GLOBAL_CUSTOM
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE
 /** Path to the header that declares:
  *    lv_global_t *lv_global_default(void);
  *
@@ -2212,8 +2217,8 @@
  */
 #define LV_GLOBAL_CUSTOM_INCLUDE "lv_global.h"
 
-#endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE || LV_ENABLE_GLOBAL_CUSTOM*/
-#endif /*LV_USE_PRIVATE_API*/
+#endif /*LV_GLOBAL_USE_CUSTOM_INCLUDE*/
+#endif /*LV_ENABLE_GLOBAL_CUSTOM*/
 
 /** Check if the parameter is NULL. (Very fast, recommended) */
 #define LV_USE_ASSERT_NULL 1

@@ -73,7 +73,7 @@ static void check_stack_size(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if LV_GLOBAL_USE_CUSTOM_INCLUDE
+#if LV_ENABLE_GLOBAL_CUSTOM
 
 static int lv_nuttx_tlskey = -1;
 
