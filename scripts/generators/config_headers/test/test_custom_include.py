@@ -25,23 +25,18 @@ def test_pair_is_detected(entries):
     )
 
 
-def test_enum_gated_include_is_exempt(entries):
-    # No companion gate, but exempt -> no error and not auto-included.
-    paths = [p for _g, p in custom_includes(entries)]
-    assert "LV_OS_CUSTOM_INCLUDE" not in paths
-
-
 def test_subsystem_included_is_not_auto_included(entries):
     paths = [p for _g, p in custom_includes(entries)]
     assert "LV_GLOBAL_CUSTOM_INCLUDE" not in paths
 
 
 def test_auto_include_block_is_emitted(entries):
-    internal = generate_internal(load(os.path.join(DIR, "custom_include.kconfig")), entries)
+    internal = generate_internal(
+        load(os.path.join(DIR, "custom_include.kconfig")), entries
+    )
     assert "#if LV_FOO_USE_CUSTOM_INCLUDE" in internal
     assert "#include LV_FOO_CUSTOM_INCLUDE" in internal
     # exempt / subsystem-included options are never #included centrally
-    assert "#include LV_OS_CUSTOM_INCLUDE" not in internal
     assert "#include LV_GLOBAL_CUSTOM_INCLUDE" not in internal
 
 

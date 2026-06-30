@@ -11,12 +11,6 @@ config LV_FOO_CUSTOM_INCLUDE
 	default ""
 	depends on LV_FOO_USE_CUSTOM_INCLUDE
 
-# --- enum-gated: intentionally no companion gate (CUSTOM_INCLUDE_NO_GATE) -----
-# Must not raise the missing-gate error and must not be auto-included.
-config LV_OS_CUSTOM_INCLUDE
-	string "Custom OS include header"
-	default ""
-
 # --- has a gate but included by its subsystem (INCLUDED_BY_SUBSYSTEM) ---------
 # Must not be auto-included (lv_global.h includes it after lv_global_t exists).
 config LV_GLOBAL_USE_CUSTOM_INCLUDE

@@ -3,9 +3,6 @@
 from config_headers.config_entry import EnumChoice
 
 
-# -- B1: named choice, member == token ---------------------------------------
-
-
 def test_named_choice_emits_single_macro(entries):
     enc = entries["LV_TXT_ENC"]
     assert isinstance(enc, EnumChoice)
@@ -17,9 +14,6 @@ def test_named_choice_defines_no_tokens_and_needs_bridge(entries):
     enc = entries["LV_TXT_ENC"]
     assert enc.emit_internal_options() == []  # header-owned tokens
     assert enc.needs_bridge is True  # no derived int → autoconf needs a bridge
-
-
-# -- B2: anonymous choice, member != token (override map) --------------------
 
 
 def test_mapped_choice_uses_macro_and_mapped_tokens(entries):
@@ -38,9 +32,6 @@ def test_mapped_choice_members_do_not_leak_as_bools(entries):
     # The raw LV_SDL_RENDER_MODE_* members must not appear as their own entries.
     assert "LV_SDL_RENDER_MODE_PARTIAL" not in entries
     assert "LV_SDL_RENDER_MODE_DIRECT" not in entries
-
-
-# -- A: ignored / deprecated -------------------------------------------------
 
 
 def test_ignored_symbol_is_dropped(entries):

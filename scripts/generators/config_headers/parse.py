@@ -435,6 +435,6 @@ def parse_entries(kconf: Kconfig) -> list[ConfigEntry]:
     return entries
 
 
-def parse(path: str, srctree: str | None = None) -> list[ConfigEntry]:
+def parse(path: str) -> list[ConfigEntry]:
     """Load *path* and return every recognised config entry, in tree order."""
-    return parse_entries(load(path, srctree))
+    return parse_entries(load(path))
