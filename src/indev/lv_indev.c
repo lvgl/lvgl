@@ -703,6 +703,29 @@ void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap
     indev->key_remap_cb = remap_cb;
 }
 
+void lv_indev_set_ccw(lv_indev_t * indev)
+{
+    LV_CHECK_ARG(indev != NULL, return);
+    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return);
+    indev->pointer.ccw_rotation = 1;
+}
+
+
+void lv_indev_clear_ccw(lv_indev_t * indev)
+{
+    LV_CHECK_ARG(indev != NULL, return);
+    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return);
+    indev->pointer.ccw_rotation = 0;
+}
+
+
+bool lv_indev_get_ccw(const lv_indev_t * indev)
+{
+    LV_CHECK_ARG(indev != NULL, return false);
+    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return false);
+    return (indev->pointer.ccw_rotation != 0);
+}
+
 #if LV_USE_EXT_DATA
 void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data))
 {
@@ -731,7 +754,12 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    lv_display_rotate_point(i->disp, &data->point);
+    if(lv_indev_get_ccw(i)) {
+        lv_display_rotate_point_ccw(i->disp, &data->point);
+    }
+    else {
+        lv_display_rotate_point(i->disp, &data->point);
+    }
 
     /*Simple sanity check*/
     if(data->point.x < 0) {
