@@ -1,6 +1,6 @@
 """Smoke tests for the whole-file driver (emit.py).
 
-Asserts that each config type lands in the right surface of the assembled
+Asserts that each config type lands in the right target of the assembled
 files - not exact layout (that's the per-type tests' job)."""
 
 

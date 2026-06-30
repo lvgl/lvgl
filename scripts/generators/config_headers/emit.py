@@ -27,11 +27,12 @@ from .parse import classify, enum_backed_choices
 
 
 class Emitter:
-    """Renders one surface (``"template"`` or ``"internal"``) of the tree."""
+    """Renders one target (``"template"``, ``"internal") of the tree."""
 
-    def __init__(self, kconf: Kconfig, surface: str, entries):
+    def __init__(self, kconf: Kconfig, target: str, entries):
+        assert target in ("internal", "template")
         self.kconf = kconf
-        self.surface = surface
+        self.target = target
         self.enum_choices = enum_backed_choices(kconf)
         self.out: list[str] = []
         self.cond_stack: list[str] = []
@@ -96,17 +97,17 @@ class Emitter:
         # Derived flags reference operands defined later in the file, so in the
         # internal header they are deferred to the footer, not emitted inline.
         if isinstance(entry, DerivedFlag):
-            if self.surface == "internal":
+            if self.target == "internal":
                 self.deferred.append(entry)
             return
         lines = (
             entry.emit_template()
-            if self.surface == "template"
+            if self.target == "template"
             else entry.emit_internal()
         )
         if not lines:
             return
-        if self.surface != "internal":
+        if self.target != "internal":
             self._sync_conditions(dep_terms(node.dep), base_keys)
         self.out += lines
         self.out.append("")
@@ -286,8 +287,8 @@ def render_config_options(entries) -> str:
 # ----------------------------------------------------------------------------
 
 
-def _body(kconf: Kconfig, surface: str, entries) -> Emitter:
-    em = Emitter(kconf, surface, entries)
+def _body(kconf: Kconfig, target: str, entries) -> Emitter:
+    em = Emitter(kconf, target, entries)
     groups = collect_groups(kconf)
     if groups:
         for group in groups:

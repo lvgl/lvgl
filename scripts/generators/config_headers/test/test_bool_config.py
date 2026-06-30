@@ -58,7 +58,7 @@ def test_bool_emit_internal_default_on_uses_kconfig_present(entries):
     ]
 
 
-def test_bool_emits_nothing_on_other_surfaces(entries):
+def test_bool_emits_nothing_on_other_targets(entries):
     wayland = entries["LV_USE_WAYLAND"]
     assert wayland.emit_internal_options() == []
     assert wayland.emit_kconfig() == []

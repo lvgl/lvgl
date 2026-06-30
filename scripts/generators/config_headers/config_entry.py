@@ -2,7 +2,7 @@
 
 Each ``ConfigEntry`` subclass corresponds to one *kind* of config (a plain
 bool, a single-select enum, an internal capability flag, ...).  A subclass owns
-the knowledge of how that kind renders onto each of the four output surfaces:
+the knowledge of how that kind renders onto each of the four output targets:
 
 * :meth:`emit_template`         - the public ``lv_conf_template.h`` body.
 * :meth:`emit_internal`         - the ``lv_conf_internal.h`` default ladder.
@@ -11,7 +11,7 @@ the knowledge of how that kind renders onto each of the four output surfaces:
 * :meth:`emit_kconfig`          - the ``lv_conf_kconfig.h`` ``CONFIG_*`` bridge.
 
 Each method returns a list of lines (no trailing newline).  The base class
-returns ``[]`` for every surface, so a subclass only overrides what is special
+returns ``[]`` for every target, so a subclass only overrides what is special
 to it.
 """
 
@@ -46,8 +46,7 @@ class ConfigEntry:
         self.node = node
         self.doc = doc
 
-    # -- the four output surfaces -----------------------------------------
-    # Defaults: emit nothing.  Subclasses override only what applies to them.
+    # -- the four output targets -----------------------------------------
 
     def emit_template(self) -> list[str]:
         return []

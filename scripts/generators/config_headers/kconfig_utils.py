@@ -198,9 +198,8 @@ def member_requires(member, choice) -> str | None:
     The choice's ambient dependencies (its enclosing ``if`` / ``depends on``,
     e.g. ``LV_USE_SDL``) and the implicit "this choice is active" term are
     stripped, leaving just what the member itself requires (e.g. the SDL EGL
-    backend's ``LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG``).  Surfaced in the
-    "Possible values" doc because a single-select macro is not ``#if``-gated per
-    member in the template, so the requirement is invisible from nesting."""
+    backend's ``LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG``).
+    """
     ambient = {term_key(x) for x in dep_terms(getattr(choice, "direct_dep", None))}
     rest = [
         x
