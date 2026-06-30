@@ -404,20 +404,9 @@ def generate_internal(kconf: Kconfig, entries) -> str:
     deferred: list[str] = []
     if em.deferred:
         for flag in em.deferred:
-            # Re-render the selector now that the enum guard map exists: a flag
-            # selected by a choice *member* (e.g. LV_WAYLAND_USE_EGL, set by the
-            # Wayland EGL backend member) must render as `LV_<X>_BACKEND == ..._<Y>`
-            # - valid on both config paths - not the bare member name (which is
-            # only defined on the Kconfig path).  classify() can't do this: the
-            # guard map is built from all entries, which don't exist yet then.
             if flag.node is not None:
                 sym = flag.node.item
                 sel = rev_dep_c_expr(sym.rev_dep, em.guard)
-                # AND-in the flag's own dependency (its enclosing `if` / `depends
-                # on`, e.g. LV_USE_WAYLAND).  A `select` ignores the target's
-                # deps, so rev_dep alone would read 1 even when the driver is off
-                # - e.g. LV_WAYLAND_USE_SHM, whose LV_WAYLAND_BACKEND defaults to
-                # the SHM token regardless of LV_USE_WAYLAND.
                 dep = rev_dep_c_expr(sym.direct_dep, em.guard)
                 if sel is not None and dep is not None and dep != "1":
                     sel = f"({sel}) && ({dep})"
