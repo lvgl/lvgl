@@ -42,14 +42,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Pinned by digest to the SO3 6.2.0 nested-layout images (built from the
+        # :lvgl Dockerfiles). The digests and the /so3/so3/usr mount paths in the
+        # "Run Benchmark Demo" step below must always change together.
         include:
         - image_type: 32b
           image_version : |
-            main@sha256:61e287d63b19a503cc4505c13bd93f5e05e19513a947feb048d75662c398c862
+            latest@sha256:8d977ad76d3893bae23e9bfda3217390afe24ba448852edd7579fb8e5fa38a23
           config : lv_conf_perf32b
         - image_type: 64b
           image_version: |
-            main@sha256:e8663d9c138e98b78d12cc8ad056b7d4b0cc4ad233c6f54202e40ce7606c2670
+            latest@sha256:1d3674adb634be728d79ffeff37e55183d3d9d228cd536266fa5db444ee0ce77
           config : lv_conf_perf64b
     steps:
       - name: Checkout
@@ -69,8 +72,8 @@ jobs:
           docker run -t --privileged \
             --name so3-lvperf \
             -v /dev:/dev \
-            -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/usr/lib/lv_conf.h \
-            -v $(pwd):/so3/usr/lib/lvgl \
+            -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/so3/usr/lib/lv_conf.h \
+            -v $(pwd):/so3/so3/usr/lib/lvgl \
             -v $(pwd)/scripts/perf/lvperf_dependencies.sh:/so3/install_dependencies.sh \
             ghcr.io/smartobjectoriented/so3-lvperf${{matrix.image_type}}:${{matrix.image_version}}
 
