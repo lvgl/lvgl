@@ -24,6 +24,7 @@ config LV_FS_STDIO_PATH
 config LV_FS_STDIO_CACHE_SIZE
 	int "Read cache size in bytes for stdio (0 = disabled)"
 	default 0
+	range 0 4294967295
 
 endif # LV_USE_FS_STDIO
 
@@ -44,6 +45,7 @@ config LV_FS_POSIX_PATH
 config LV_FS_POSIX_CACHE_SIZE
 	int "Read cache size in bytes for POSIX (0 = disabled)"
 	default 0
+	range 0 4294967295
 
 endif # LV_USE_FS_POSIX
 
@@ -64,6 +66,7 @@ config LV_FS_WIN32_PATH
 config LV_FS_WIN32_CACHE_SIZE
 	int "Read cache size in bytes for Win32 (0 = disabled)"
 	default 0
+	range 0 4294967295
 
 endif # LV_USE_FS_WIN32
 
@@ -84,6 +87,7 @@ config LV_FS_FATFS_PATH
 config LV_FS_FATFS_CACHE_SIZE
 	int "Read cache size in bytes for FatFS (0 = disabled)"
 	default 0
+	range 0 4294967295
 
 endif # LV_USE_FS_FATFS
 
@@ -105,6 +109,7 @@ config LV_FS_LITTLEFS_PATH
 #config LV_FS_LITTLEFS_CACHE_SIZE
 #	int "Read cache size in bytes for littlefs (0 = disabled)"
 #	default 0
+#	range 0 4294967295
 
 endif # LV_USE_FS_LITTLEFS
 
@@ -126,6 +131,7 @@ config LV_FS_ARDUINO_ESP_LITTLEFS_PATH
 #config LV_FS_ARDUINO_ESP_LITTLEFS_CACHE_SIZE
 #	int "Read cache size in bytes for Arduino ESP littlefs (0 = disabled)"
 #	default 0
+#	range 0 4294967295
 
 endif # LV_USE_FS_ARDUINO_ESP_LITTLEFS
 
@@ -147,6 +153,7 @@ config LV_FS_ARDUINO_SD_PATH
 #config LV_FS_ARDUINO_SD_CACHE_SIZE
 #	int "Read cache size in bytes for Arduino SD (0 = disabled)"
 #	default 0
+#	range 0 4294967295
 
 endif # LV_USE_FS_ARDUINO_SD
 
