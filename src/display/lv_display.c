@@ -1301,6 +1301,9 @@ void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point)
 
 void lv_display_rotate_point_ccw(lv_display_t * disp, lv_point_t * point)
 {
+    LV_CHECK_ARG(disp != NULL, return);
+    LV_CHECK_ARG(point != NULL, return);
+    
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
     if(rotation == LV_DISPLAY_ROTATION_0) return;

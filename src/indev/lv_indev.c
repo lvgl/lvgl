@@ -703,35 +703,26 @@ void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap
     indev->key_remap_cb = remap_cb;
 }
 
-void lv_indev_set_ccw_pointer(lv_indev_t * indev)
+void lv_indev_set_ccw(lv_indev_t * indev)
 {
-    if(!indev) {
-        LV_LOG_WARN("Can't set CCW rotation processing on a NULL indev");
-        return;
-    }
-
+    LV_CHECK_ARG(indev != NULL, return);
+    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return);
     indev->pointer.ccw_rotation = 1;
 }
 
 
-void lv_indev_clear_ccw_pointer(lv_indev_t * indev)
+void lv_indev_clear_ccw(lv_indev_t * indev)
 {
-    if(!indev) {
-        LV_LOG_WARN("Can't clear CCW rotation processing on a NULL indev");
-        return;
-    }
-
+    LV_CHECK_ARG(indev != NULL, return);
+    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return);
     indev->pointer.ccw_rotation = 0;
 }
 
 
-bool lv_indev_get_ccw_pointer(const lv_indev_t * indev)
+bool lv_indev_get_ccw(const lv_indev_t * indev)
 {
-    if(!indev) {
-        LV_LOG_WARN("Can't get CCW rotation setting for a NULL indev");
-        return false;
-    }
-
+    LV_CHECK_ARG(indev != NULL, return);
+    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return);
     return (indev->pointer.ccw_rotation != 0);
 }
 
