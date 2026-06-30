@@ -51,18 +51,18 @@ The practical effects when you upgrade:
 
 The simplest way to migrate an existing `lv_conf.h` is to copy the new
 `lv_conf_template.h` over a fresh `lv_conf.h` and re-apply your changes, or to
-re-run `scripts/generate_lv_conf.py`. Either way, watch the compiler output for
-the deprecation `#warning`s listed below.
+re-run `scripts/generate_lv_conf.py` if you're using `lv_conf.defaults`. Either way,
+watch the compiler output for the deprecation `#warning`s listed below.
 
 ### Minimal configuration
 
-The `LV_CONF_MINIMAL` switch, which disabled most widgets, themes, layouts and
-fonts in one go — has been **removed**. A one-off switch like this doesn't fit a
+The `LV_CONF_MINIMAL` switch, which disabled all widgets, themes, layouts and
+fonts in one go, has been **removed**. A one-off switch like this doesn't fit a
 Kconfig-driven model, where presets are expressed as *defconfigs*. The minimal
 preset now lives at `configs/defconfigs/empty.defconfig`:
 
 ```bash
-# Build LVGL from the minimal preset
+# Build LVGL from the empty preset
 cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/empty.defconfig
 ```
 
@@ -75,10 +75,7 @@ Every old name below **still compiles** for now: it emits a `#warning` at build
 time and continues to work (it is mapped to its replacement, or still honored in
 place), and is **removed in v10.0**.
 
-Some settings may produce errors, in this case we mention what to define so that you
-freely move around from v9.6 to previous v9 versions without warnings/errors.
-
-Watch your build log after upgrading and update each one the warning points at.
+Watch your build log after upgrading and update each one the warning/error points at.
 
 #### Memory
 
@@ -101,48 +98,97 @@ Watch your build log after upgrading and update each one the warning points at.
 |---|---|
 | `LV_DRAW_THREAD_STACKSIZE` | `LV_DRAW_THREAD_STACK_SIZE` |
 
-#### Third-party libraries
+Here's the updated section with a clearer callout:
+
+#### LZ4 / ThorVG
 
 `LZ4` and `ThorVG` no longer have separate `_INTERNAL`/`_EXTERNAL` enables.
-Enable the library and pick the source with the `_INTERNAL` flag:
+Instead, enable the library itself with `LV_USE_LZ4` / `LV_USE_THORVG`,
+and use the `_INTERNAL` flag to choose between the bundled source and an externally provided one:
 
 | Removed | Replacement |
 |---|---|
 | `LV_USE_LZ4_EXTERNAL` | `LV_USE_LZ4` = 1 and `LV_USE_LZ4_INTERNAL` = 0 |
 | `LV_USE_THORVG_EXTERNAL` | `LV_USE_THORVG` = 1 and `LV_USE_THORVG_INTERNAL` = 0 |
 
+<Callout type="warning">
+    If your project previously had `LV_USE_THORVG_INTERNAL` enabled (with no `LV_USE_THORVG_EXTERNAL`), you must now also enable `LV_USE_THORVG`.
+    Leaving `LV_USE_THORVG` disabled while `LV_USE_THORVG_INTERNAL` is enabled will result in a build error.
+    The same applies to `LV_USE_LZ4` and `LV_USE_LZ4_INTERNAL`.
+</Callout>
+
+#### GPU (VG-Lite)
+Here's a clearer version with the possible values spelled out:
+
+---
+
 #### GPU (VG-Lite)
 
-The VG-Lite GPU is now chosen with a single `LV_VG_LITE_GPU` option instead of a
-free-form series/revision pair:
+The VG-Lite GPU is now chosen with a single `LV_VG_LITE_GPU` option instead of a free-form series/revision pair.
+Set it to one of the predefined GPU/revision combinations:
 
 | Removed | Replacement |
 |---|---|
 | `LV_VG_LITE_HAL_GPU_SERIES` | `LV_VG_LITE_GPU` |
 | `LV_VG_LITE_HAL_GPU_REVISION` | `LV_VG_LITE_GPU` |
 
+`LV_VG_LITE_GPU` accepts one of the following values:
+
+| Value | GPU | Revision |
+|---|---|---|
+| `LV_VG_LITE_GPU_GC255_0X40A` | GC255 | 0x40A |
+| `LV_VG_LITE_GPU_GC355_0X0_1215` | GC355 | 0x0_1215 |
+| `LV_VG_LITE_GPU_GC355_0X0_1216` | GC355 | 0x0_1216 |
+| `LV_VG_LITE_GPU_GC555_0X423` | GC555 | 0x423 |
+| `LV_VG_LITE_GPU_GC555_0X423_ECO` | GC555 | 0x423 ECO |
+| `LV_VG_LITE_GPU_GCNANOULTRAV_0X1003` | GCNanoUltraV | 0x1003 |
+
 #### Drivers
 
-Each backend-selecting driver now exposes an explicit `LV_<DRIVER>_BACKEND`
-choice instead of inferring the backend automatically.
+Each backend-selecting driver (SDL, Wayland and DRM) now expose an explicit `LV_<DRIVER>_BACKEND` choice instead of inferring the backend automatically.
 
-- **SDL** — buffer count is now a single integer; the backend is explicit:
+The `LV_<DRIVER>_AUTO_BACKEND` flags (enabled by default) exist purely to ease migration: they let LVGL reproduce the old auto-detected backend so existing projects
+don't silently switch to a different backend on update simply because they never set one explicitly. Leaving an `_AUTO_BACKEND` flag enabled triggers a build-time warning.
+These flags are not meant to be relied on going forward and will be removed for v10, every project should set its backend explicitly with `LV_<DRIVER>_BACKEND` and then
+disable the corresponding `_AUTO_BACKEND` flag to silence the warning.
+
+- **SDL** — while `LV_SDL_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` and (`LV_USE_DRAW_NANOVG` or `LV_USE_DRAW_OPENGLES`) are enabled,
+otherwise Textures when `LV_USE_DRAW_SDL` is enabled, otherwise Software. Set `LV_SDL_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_SDL_BACKEND`:
+
+  | Value | Backend |
+  |---|---|
+  | `LV_SDL_BACKEND_SW` | Software (SDL surface) |
+  | `LV_SDL_BACKEND_TEXTURE` | Cached SDL textures (enable: `LV_USE_DRAW_SDL`) |
+  | `LV_SDL_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; requires `LV_USE_DRAW_OPENGLES` or `LV_USE_DRAW_NANOVG`) |
+
+  On Kconfig's side, buffer count is now a single integer instead of two separate flags:
 
   | Removed | Replacement |
   |---|---|
   | `LV_SDL_SINGLE_BUFFER` | `LV_SDL_BUF_COUNT` = 1 |
   | `LV_SDL_DOUBLE_BUFFER` | `LV_SDL_BUF_COUNT` = 2 |
-  | `LV_SDL_AUTO_BACKEND` | set to 0 and select `LV_SDL_BACKEND` |
 
-- **Linux DRM** — `LV_LINUX_DRM_AUTO_BACKEND`: set to 0 and select a backend
-  with `LV_LINUX_DRM_BACKEND`.
+- **Linux DRM** — while `LV_LINUX_DRM_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` is enabled, otherwise FBDEV.
+Set `LV_LINUX_DRM_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_LINUX_DRM_BACKEND`:
 
-- **Wayland** — setting `LV_WAYLAND_USE_EGL` / `LV_WAYLAND_USE_G2D` /
-  `LV_WAYLAND_USE_SHM` directly is deprecated. Set `LV_WAYLAND_AUTO_BACKEND` to
-  0 and select a backend with `LV_WAYLAND_BACKEND`.
+  | Value | Backend |
+  |---|---|
+  | `LV_LINUX_DRM_BACKEND_FBDEV` | Dumb buffers (no GPU) |
+  | `LV_LINUX_DRM_BACKEND_GBM` | GBM DMA buffers |
+  | `LV_LINUX_DRM_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) |
 
-- **X11** — render mode is now a single value mapped onto the standard
-  `LV_DISPLAY_RENDER_MODE_*` constants:
+  `LV_USE_LINUX_DRM_GBM_BUFFERS` is no longer a user-facing setting. It is now set internally and automatically enabled whenever the `EGL` or `GBM` backend is selected; it should no longer be set directly in `lv_conf.h`.
+
+- **Wayland** — while `LV_WAYLAND_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` is enabled, otherwise G2D when `LV_USE_DRAW_G2D` is enabled, otherwise SHM.
+Set `LV_WAYLAND_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_WAYLAND_BACKEND`:
+
+  | Value | Backend |
+  |---|---|
+  | `LV_WAYLAND_BACKEND_SHM` | SHM (Shared Memory) |
+  | `LV_WAYLAND_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) |
+  | `LV_WAYLAND_BACKEND_G2D` | G2D (NXP i.MX hardware accelerator; enable: `LV_USE_DRAW_G2D`) |
+
+- **X11** — render mode (unrelated to backend selection) is now a single value mapped onto the standard `LV_DISPLAY_RENDER_MODE_*` constants:
 
   | Removed | Replacement |
   |---|---|
@@ -154,13 +200,13 @@ choice instead of inferring the backend automatically.
 
 The two array macros became individual short strings, so each name is now a plain
 Kconfig-settable string and you can localize one without redefining the whole
-array. `LV_CALENDAR_WEEK_STARTS_MONDAY` is unchanged — ordering is handled
+array. `LV_CALENDAR_WEEK_STARTS_MONDAY` is unchanged, ordering is handled
 internally. The old array macros still work (with a `#warning`).
 
 | Removed | Replacement |
 |---|---|
-| `LV_CALENDAR_DEFAULT_DAY_NAMES` | `LV_MONDAY_STR` … `LV_SUNDAY_STR` |
-| `LV_CALENDAR_DEFAULT_MONTH_NAMES` | `LV_JANUARY_STR` … `LV_DECEMBER_STR` |
+| `LV_CALENDAR_DEFAULT_DAY_NAMES` | `LV_MONDAY_STR` ... `LV_SUNDAY_STR` |
+| `LV_CALENDAR_DEFAULT_MONTH_NAMES` | `LV_JANUARY_STR` ... `LV_DECEMBER_STR` |
 
 #### libinput XKB keymap
 
@@ -212,15 +258,22 @@ include/enable names were renamed (each still works with a `#warning`):
 | `LV_ENABLE_GLOBAL_CUSTOM` | `LV_GLOBAL_USE_CUSTOM_INCLUDE` |
 | `LV_ASSERT_HANDLER_INCLUDE` | `LV_ASSERT_CUSTOM_INCLUDE` (enable with `LV_ASSERT_USE_CUSTOM_INCLUDE`) |
 
+If you still rely on the old `LV_ASSERT_HANDLER_INCLUDE` and can't migrate
+immediately, you can silence the deprecation warning with
+`LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING`. This only suppresses the
+compiler warning, `LV_ASSERT_HANDLER_INCLUDE` itself still works the same
+way. New projects should use `lLV_ASSERT_CUSTOM_INCLUDE` and define their
+custom assertion handler directly instead.
+
 A related effect: `lv_conf_template.h` no longer prints an empty stub for every
 overridable macro (`LV_ATTRIBUTE_*`, `LV_PROFILER_*`, `LV_EXPORT_CONST_INT`,
-`LV_ASSERT_HANDLER`, …). They are **not removed** — define them in `lv_conf.h`
+`LV_ASSERT_HANDLER`, ...). They are **not removed** — define them in `lv_conf.h`
 or via a `*_CUSTOM_INCLUDE` and LVGL still picks them up; they just default to
 empty/no-op otherwise.
 
 ### No-op options kept for compatibility
 
-`LV_USE_PXP` and `LV_USE_G2D` never enabled drawing on their own — you always
+`LV_USE_PXP` and `LV_USE_G2D` never enabled drawing on their own, you always
 also needed `LV_USE_DRAW_PXP` / `LV_USE_DRAW_G2D`. They are kept as **deprecated
 no-ops** (and excluded from the generated headers) purely so existing
 `defconfig`s that set `CONFIG_LV_USE_PXP` / `CONFIG_LV_USE_G2D` keep loading.
