@@ -1,28 +1,11 @@
-
-#
-# Text & fonts
-#
-CONFIG_LV_TXT_ENC_ASCII=y
-# CONFIG_LV_FONT_MONTSERRAT_14 is not set
-CONFIG_LV_FONT_UNSCII_8=y
-CONFIG_LV_FONT_DEFAULT_UNSCII_8=y
-
-#
-# Layouts
-#
-# CONFIG_LV_USE_FLEX is not set
-# CONFIG_LV_USE_GRID is not set
-
-#
-# Themes
-#
 # CONFIG_LV_USE_THEME_DEFAULT is not set
 # CONFIG_LV_USE_THEME_SIMPLE is not set
 # CONFIG_LV_USE_THEME_MONO is not set
-
-#
-# Widgets
-#
+# CONFIG_LV_USE_FLEX is not set
+# CONFIG_LV_USE_GRID is not set
+CONFIG_LV_TXT_ENC_ASCII=y
+# CONFIG_LV_FONT_MONTSERRAT_14 is not set
+CONFIG_LV_FONT_DEFAULT_UNSCII_8=y
 # CONFIG_LV_WIDGETS_HAS_DEFAULT_VALUE is not set
 # CONFIG_LV_USE_ANIMIMG is not set
 # CONFIG_LV_USE_ARC is not set
@@ -56,9 +39,5 @@ CONFIG_LV_FONT_DEFAULT_UNSCII_8=y
 # CONFIG_LV_USE_TABVIEW is not set
 # CONFIG_LV_USE_TILEVIEW is not set
 # CONFIG_LV_USE_WIN is not set
-
-#
-# Build
-#
 # CONFIG_LV_BUILD_EXAMPLES is not set
 # CONFIG_LV_BUILD_DEMOS is not set
