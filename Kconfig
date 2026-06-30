@@ -830,7 +830,6 @@ config LV_USE_PXP_DRAW_THREAD
 
 config LV_USE_PXP_ASSERT
 	bool "Enable PXP asserts"
-	depends on LV_USE_DRAW_PXP
 
 endif
 endmenu
