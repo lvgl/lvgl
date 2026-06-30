@@ -4727,6 +4727,62 @@
  -----------------------------------*/
 
 /* Derived capability flags (set via Kconfig `select`). */
+#ifndef LV_OS_USE_PTHREAD
+    #if (LV_USE_OS == LV_OS_PTHREAD)
+        #define LV_OS_USE_PTHREAD 1
+    #else
+        #define LV_OS_USE_PTHREAD 0
+    #endif
+#endif
+
+#ifndef LV_OS_USE_FREERTOS
+    #if (LV_USE_OS == LV_OS_FREERTOS)
+        #define LV_OS_USE_FREERTOS 1
+    #else
+        #define LV_OS_USE_FREERTOS 0
+    #endif
+#endif
+
+#ifndef LV_OS_USE_CMSIS_RTOS2
+    #if (LV_USE_OS == LV_OS_CMSIS_RTOS2)
+        #define LV_OS_USE_CMSIS_RTOS2 1
+    #else
+        #define LV_OS_USE_CMSIS_RTOS2 0
+    #endif
+#endif
+
+#ifndef LV_OS_USE_RTTHREAD
+    #if (LV_USE_OS == LV_OS_RTTHREAD)
+        #define LV_OS_USE_RTTHREAD 1
+    #else
+        #define LV_OS_USE_RTTHREAD 0
+    #endif
+#endif
+
+#ifndef LV_OS_USE_WINDOWS
+    #if (LV_USE_OS == LV_OS_WINDOWS)
+        #define LV_OS_USE_WINDOWS 1
+    #else
+        #define LV_OS_USE_WINDOWS 0
+    #endif
+#endif
+
+#ifndef LV_OS_USE_MQX
+    #if (LV_USE_OS == LV_OS_MQX)
+        #define LV_OS_USE_MQX 1
+    #else
+        #define LV_OS_USE_MQX 0
+    #endif
+#endif
+
+#ifndef LV_OS_USE_SDL2
+    #if (LV_USE_OS == LV_OS_SDL2)
+        #define LV_OS_USE_SDL2 1
+    #else
+        #define LV_OS_USE_SDL2 0
+    #endif
+#endif
+
 #ifndef LV_OS_USE_CUSTOM_INCLUDE
     #if (LV_USE_OS == LV_OS_CUSTOM)
         #define LV_OS_USE_CUSTOM_INCLUDE 1
