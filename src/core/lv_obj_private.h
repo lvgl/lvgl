@@ -50,7 +50,7 @@ typedef struct _lv_obj_spec_attr_t {
     uint16_t scroll_dir : 4;        /**< The allowed scroll direction(s), see `lv_dir_t`*/
     uint16_t layer_type : 2;        /**< Cache the layer type here. Element of lv_intermediate_layer_type_t */
     uint16_t name_static : 1;       /**< 1: `name` was not dynamically allocated */
-    uint16_t user_bits : 8;         /**< Store custom flags */
+    uint16_t user_flags : 8;         /**< Store custom flags */
 } lv_obj_spec_attr_t;
 
 

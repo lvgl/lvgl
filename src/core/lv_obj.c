@@ -411,14 +411,14 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
     if(f & LV_OBJ_FLAG_OVERFLOW_VISIBLE)      lv_obj_set_overflow_visible(obj, true);
     if(f & LV_OBJ_FLAG_EVENT_TRICKLE)         lv_obj_set_event_trickle(obj, true);
     if(f & LV_OBJ_FLAG_STATE_TRICKLE)         lv_obj_set_state_trickle(obj, true);
-    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_bits |= 1 << 0;
-    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_bits |= 1 << 1;
-    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_bits |= 1 << 2;
-    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_bits |= 1 << 3;
-    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_bits |= 1 << 4;
-    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_bits |= 1 << 5;
-    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_bits |= 1 << 6;
-    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_bits |= 1 << 7;
+    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_flags |= 1 << 0;
+    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_flags |= 1 << 1;
+    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_flags |= 1 << 2;
+    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_flags |= 1 << 3;
+    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_flags |= 1 << 4;
+    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_flags |= 1 << 5;
+    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_flags |= 1 << 6;
+    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_flags |= 1 << 7;
 
     if((f & LV_OBJ_FLAG_LAYOUT_1) || (f & LV_OBJ_FLAG_LAYOUT_2)) {
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
@@ -459,14 +459,14 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
     if(f & LV_OBJ_FLAG_OVERFLOW_VISIBLE)      lv_obj_set_overflow_visible(obj, false);
     if(f & LV_OBJ_FLAG_EVENT_TRICKLE)         lv_obj_set_event_trickle(obj, false);
     if(f & LV_OBJ_FLAG_STATE_TRICKLE)         lv_obj_set_state_trickle(obj, false);
-    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_bits &= ~(1 << 0);
-    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_bits &= ~(1 << 1);
-    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_bits &= ~(1 << 2);
-    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_bits &= ~(1 << 3);
-    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_bits &= ~(1 << 4);
-    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_bits &= ~(1 << 5);
-    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_bits &= ~(1 << 6);
-    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_bits &= ~(1 << 7);
+    if(f & LV_OBJ_FLAG_LAYOUT_1)              obj->spec_attr->user_flags &= ~(1 << 0);
+    if(f & LV_OBJ_FLAG_LAYOUT_2)              obj->spec_attr->user_flags &= ~(1 << 1);
+    if(f & LV_OBJ_FLAG_WIDGET_1)              obj->spec_attr->user_flags &= ~(1 << 2);
+    if(f & LV_OBJ_FLAG_WIDGET_2)              obj->spec_attr->user_flags &= ~(1 << 3);
+    if(f & LV_OBJ_FLAG_USER_1)                obj->spec_attr->user_flags &= ~(1 << 4);
+    if(f & LV_OBJ_FLAG_USER_2)                obj->spec_attr->user_flags &= ~(1 << 5);
+    if(f & LV_OBJ_FLAG_USER_3)                obj->spec_attr->user_flags &= ~(1 << 6);
+    if(f & LV_OBJ_FLAG_USER_4)                obj->spec_attr->user_flags &= ~(1 << 7);
 
     if((f & LV_OBJ_FLAG_LAYOUT_1) || (f & LV_OBJ_FLAG_LAYOUT_2)) {
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
@@ -710,17 +710,17 @@ void lv_obj_set_flex_in_new_track(lv_obj_t * obj, bool en)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
 
-    /*For backward compatibility use it as an LV_OBJ_FLAG_LAYOUT_1
+    /*TODO For backward compatibility use it as an LV_OBJ_FLAG_LAYOUT_1
      *It will have its own bit in lv_obj_t after v9.5*/
     if(en) {
         /*Need to allocate spec_attr to set the bit*/
         lv_obj_allocate_spec_attr(obj);
-        obj->spec_attr->user_bits |= 1 << 0;
+        obj->spec_attr->user_flags |= 1 << 0;
     }
     else {
         /*If spec_attr is not allocated,
          *its not needed to clear it as 0 is the default value*/
-        if(obj->spec_attr) obj->spec_attr->user_bits &= ~(1 << 0);
+        if(obj->spec_attr) obj->spec_attr->user_flags &= ~(1 << 0);
     }
 
     lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
@@ -795,14 +795,14 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
     if((f & LV_OBJ_FLAG_OVERFLOW_VISIBLE) && !obj->overflow_visible) return false;
     if((f & LV_OBJ_FLAG_EVENT_TRICKLE) && !obj->event_trickle) return false;
     if((f & LV_OBJ_FLAG_STATE_TRICKLE) && !obj->state_trickle) return false;
-    if((f & LV_OBJ_FLAG_LAYOUT_1) && !(obj->spec_attr->user_bits & (1 << 0))) return false;
-    if((f & LV_OBJ_FLAG_LAYOUT_2) && !(obj->spec_attr->user_bits & (1 << 1))) return false;
-    if((f & LV_OBJ_FLAG_WIDGET_1) && !(obj->spec_attr->user_bits & (1 << 2))) return false;
-    if((f & LV_OBJ_FLAG_WIDGET_2) && !(obj->spec_attr->user_bits & (1 << 3))) return false;
-    if((f & LV_OBJ_FLAG_USER_1) && !(obj->spec_attr->user_bits & (1 << 4))) return false;
-    if((f & LV_OBJ_FLAG_USER_2) && !(obj->spec_attr->user_bits & (1 << 5))) return false;
-    if((f & LV_OBJ_FLAG_USER_3) && !(obj->spec_attr->user_bits & (1 << 6))) return false;
-    if((f & LV_OBJ_FLAG_USER_4) && !(obj->spec_attr->user_bits & (1 << 7))) return false;
+    if((f & LV_OBJ_FLAG_LAYOUT_1) && !(obj->spec_attr->user_flags & (1 << 0))) return false;
+    if((f & LV_OBJ_FLAG_LAYOUT_2) && !(obj->spec_attr->user_flags & (1 << 1))) return false;
+    if((f & LV_OBJ_FLAG_WIDGET_1) && !(obj->spec_attr->user_flags & (1 << 2))) return false;
+    if((f & LV_OBJ_FLAG_WIDGET_2) && !(obj->spec_attr->user_flags & (1 << 3))) return false;
+    if((f & LV_OBJ_FLAG_USER_1) && !(obj->spec_attr->user_flags & (1 << 4))) return false;
+    if((f & LV_OBJ_FLAG_USER_2) && !(obj->spec_attr->user_flags & (1 << 5))) return false;
+    if((f & LV_OBJ_FLAG_USER_3) && !(obj->spec_attr->user_flags & (1 << 6))) return false;
+    if((f & LV_OBJ_FLAG_USER_4) && !(obj->spec_attr->user_flags & (1 << 7))) return false;
 
     return true;
 }
@@ -839,14 +839,14 @@ bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
 
     if(f >= LV_OBJ_FLAG_LAYOUT_1 && obj->spec_attr == NULL) return false;
 
-    if((f & LV_OBJ_FLAG_LAYOUT_1) && (obj->spec_attr->user_bits & (1 << 0))) return true;
-    if((f & LV_OBJ_FLAG_LAYOUT_2) && (obj->spec_attr->user_bits & (1 << 1))) return true;
-    if((f & LV_OBJ_FLAG_WIDGET_1) && (obj->spec_attr->user_bits & (1 << 2))) return true;
-    if((f & LV_OBJ_FLAG_WIDGET_2) && (obj->spec_attr->user_bits & (1 << 3))) return true;
-    if((f & LV_OBJ_FLAG_USER_1) && (obj->spec_attr->user_bits & (1 << 4))) return true;
-    if((f & LV_OBJ_FLAG_USER_2) && (obj->spec_attr->user_bits & (1 << 5))) return true;
-    if((f & LV_OBJ_FLAG_USER_3) && (obj->spec_attr->user_bits & (1 << 6))) return true;
-    if((f & LV_OBJ_FLAG_USER_4) && (obj->spec_attr->user_bits & (1 << 7))) return true;
+    if((f & LV_OBJ_FLAG_LAYOUT_1) && (obj->spec_attr->user_flags & (1 << 0))) return true;
+    if((f & LV_OBJ_FLAG_LAYOUT_2) && (obj->spec_attr->user_flags & (1 << 1))) return true;
+    if((f & LV_OBJ_FLAG_WIDGET_1) && (obj->spec_attr->user_flags & (1 << 2))) return true;
+    if((f & LV_OBJ_FLAG_WIDGET_2) && (obj->spec_attr->user_flags & (1 << 3))) return true;
+    if((f & LV_OBJ_FLAG_USER_1) && (obj->spec_attr->user_flags & (1 << 4))) return true;
+    if((f & LV_OBJ_FLAG_USER_2) && (obj->spec_attr->user_flags & (1 << 5))) return true;
+    if((f & LV_OBJ_FLAG_USER_3) && (obj->spec_attr->user_flags & (1 << 6))) return true;
+    if((f & LV_OBJ_FLAG_USER_4) && (obj->spec_attr->user_flags & (1 << 7))) return true;
 
     return false;
 }
@@ -1004,7 +1004,7 @@ bool lv_obj_is_flex_in_new_track(const lv_obj_t * obj)
      *It will have it's on bin in lv_obj_t after v9.5*/
     if(obj->spec_attr == NULL) return false;
 
-    return obj->spec_attr->user_bits & (1 << 0);
+    return obj->spec_attr->user_flags & (1 << 0);
 }
 
 
@@ -1230,11 +1230,33 @@ void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
     obj->user_data = user_data;
 }
 
+void lv_obj_set_user_flag(lv_obj_t * obj, uint32_t bit, bool v)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(bit < 4, return);
+
+    lv_obj_spec_attr_t * spec_attr = lv_obj_allocate_spec_attr(obj);
+    LV_ASSERT_MALLOC(spec_attr);
+    if(spec_attr == NULL) return;
+
+    if(v) spec_attr->user_flags |= 1 << (bit + 4);
+    else spec_attr->user_flags &= ~(1 << (bit + 4));
+}
+
 void * lv_obj_get_user_data(lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     return obj->user_data;
+}
+
+bool lv_obj_get_user_flag(lv_obj_t * obj, uint32_t bit)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return false);
+    LV_CHECK_ARG(bit < 4, return false);
+
+    if(obj->spec_attr == NULL) return false;
+    else return (obj->spec_attr->user_flags & 1 << (bit + 4)) ? true : false;
 }
 
 lv_delete_dsc_t * lv_obj_add_delete_cb(lv_obj_t * obj, lv_delete_cb_t cb, void * user_data)

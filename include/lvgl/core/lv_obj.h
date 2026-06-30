@@ -439,6 +439,14 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
  */
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
 
+/**
+ * Set one of the 4 flags available for the user
+ * @param obj   pointer to an object
+ * @param bit	the index of the bit (0..3)
+ * @param v		the value of the bit, true or false
+ */
+void lv_obj_set_user_flag(lv_obj_t * obj, uint32_t bit, bool v);
+
 /*=======================
  * Getter functions
  *======================*/
@@ -448,7 +456,9 @@ void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
  * @return      true: all flags are set; false: not all flags are set
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_is_hidden(obj)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
@@ -456,7 +466,9 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
  * @return      true: at least one flag is set; false: none of the flags are set
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
 
 /** Get whether the object is hidden
@@ -638,6 +650,14 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj);
  * @return      the pointer to the user_data of the object
  */
 void * lv_obj_get_user_data(lv_obj_t * obj);
+
+/**
+ * Get the value of one of the 4 flags available for the user
+ * @param obj   pointer to an object
+ * @param bit	the index of the bit (0..3)
+ * @return		the value of the bit, true or false
+ */
+bool lv_obj_get_user_flag(lv_obj_t * obj, uint32_t bit);
 
 /*=======================
  * Other functions
