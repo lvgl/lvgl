@@ -33,7 +33,7 @@ lv_conf.h
 LVGL needs to be able to find `lv_conf.h`. There are a few ways to arrange that:
 
 1. Keep `lv_conf.h` one level **above** the `lvgl` folder (the default). LVGL
-   includes it as `../../lv_conf.h`.
+   includes it as `../lv_conf.h`.
 2. Define <ApiLink name="LV_CONF_INCLUDE_SIMPLE" /> (e.g. `-DLV_CONF_INCLUDE_SIMPLE`)
    and add `lv_conf.h`'s folder to your include path. LVGL then includes it
    simply as `#include "lv_conf.h"`.
@@ -49,11 +49,31 @@ To skip `lv_conf.h` entirely and rely only on defines, define
 has in `lv_conf_template.h`.
 
 <Callout type="info" title="Upgrading lv_conf.h">
-  Because `lv_conf_template.h` is regenerated each release, the easiest way to
-  pick up new options is to copy the new template over a fresh `lv_conf.h` and
-  re-apply your changes, or run `scripts/generate_lv_conf.py`. Watch the
-  compiler output for deprecation `#warning`s after upgrading.
+  A new `lv_conf_template.h` comes with each release. To get the new options,
+  you have two choices: copy the new template over a fresh `lv_conf.h` and add
+  your changes again, or use the `lv_conf.defaults` format (see below). After
+  upgrading, check the compiler output for deprecation `#warning`s.
 </Callout>
+
+### LVGL Defaults
+
+Every release, the `lv_conf_template.h` file changes a little. This can make
+updating your own `lv_conf.h` tedious. To make updates easier, you can keep your
+settings in a small text file instead. We call this format "LVGL Defaults".
+
+A `lv_conf.defaults` file lists one option per line, each with its value:
+
+```txt
+LV_COLOR_DEPTH 32
+LV_USE_OBJ_NAME 1
+...
+```
+
+You only need to list the options you want to change. When you upgrade LVGL,
+run `scripts/generate_lv_conf.py`. It reads your `lv_conf.defaults` file, takes
+the newest `lv_conf_template.h`, applies your values on top of it, and writes a
+fresh `lv_conf.h`. This way your settings are always combined with the latest
+template, so you don't have to merge changes by hand.
 
 ## Kconfig
 
