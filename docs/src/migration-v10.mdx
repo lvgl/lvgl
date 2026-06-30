@@ -98,8 +98,6 @@ Watch your build log after upgrading and update each one the warning/error point
 |---|---|
 | `LV_DRAW_THREAD_STACKSIZE` | `LV_DRAW_THREAD_STACK_SIZE` |
 
-Here's the updated section with a clearer callout:
-
 #### LZ4 / ThorVG
 
 `LZ4` and `ThorVG` no longer have separate `_INTERNAL`/`_EXTERNAL` enables.
@@ -116,11 +114,6 @@ and use the `_INTERNAL` flag to choose between the bundled source and an externa
     Leaving `LV_USE_THORVG` disabled while `LV_USE_THORVG_INTERNAL` is enabled will result in a build error.
     The same applies to `LV_USE_LZ4` and `LV_USE_LZ4_INTERNAL`.
 </Callout>
-
-#### GPU (VG-Lite)
-Here's a clearer version with the possible values spelled out:
-
----
 
 #### GPU (VG-Lite)
 
@@ -145,7 +138,7 @@ Set it to one of the predefined GPU/revision combinations:
 
 #### Drivers
 
-Each backend-selecting driver (SDL, Wayland and DRM) now expose an explicit `LV_<DRIVER>_BACKEND` choice instead of inferring the backend automatically.
+Each backend-selecting driver (SDL, Wayland and DRM) now exposes an explicit `LV_<DRIVER>_BACKEND` choice instead of inferring the backend automatically.
 
 The `LV_<DRIVER>_AUTO_BACKEND` flags (enabled by default) exist purely to ease migration: they let LVGL reproduce the old auto-detected backend so existing projects
 don't silently switch to a different backend on update simply because they never set one explicitly. Leaving an `_AUTO_BACKEND` flag enabled triggers a build-time warning.
@@ -262,7 +255,7 @@ If you still rely on the old `LV_ASSERT_HANDLER_INCLUDE` and can't migrate
 immediately, you can silence the deprecation warning with
 `LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING`. This only suppresses the
 compiler warning, `LV_ASSERT_HANDLER_INCLUDE` itself still works the same
-way. New projects should use `lLV_ASSERT_CUSTOM_INCLUDE` and define their
+way. New projects should use `LV_ASSERT_CUSTOM_INCLUDE` and define their
 custom assertion handler directly instead.
 
 A related effect: `lv_conf_template.h` no longer prints an empty stub for every

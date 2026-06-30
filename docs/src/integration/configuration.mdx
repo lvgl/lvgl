@@ -19,7 +19,7 @@ This page explains the ways to configure LVGL and when to use each.
 When setting up a project for the first time, copy `lvgl/lv_conf_template.h` to
 `lv_conf.h` next to the `lvgl` folder, change the first `#if 0` to `1` to enable
 the file's content, and set <ApiLink name="LV_COLOR_DEPTH" /> to match your
-display panel. Adjust the other options as needed, every option is documented
+display panel. Adjust the other options as needed. Every option is documented
 by a comment in the file.
 
 The layout should look like this:
@@ -116,7 +116,7 @@ what you need.
 
 <Callout type="info" title="Replaces LV_CONF_MINIMAL">
   Earlier versions had an `LV_CONF_MINIMAL` switch. It has been removed in favor
-  of this defconfig, see the [migration guide](/migration-v10#minimal-configuration).
+  of this defconfig. See the [migration guide](/migration-v10#minimal-configuration).
 </Callout>
 
 ### Creating your own preset
