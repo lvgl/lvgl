@@ -47,22 +47,21 @@ directories to your project and enable them in `lv_conf.h` or `Kconfig`
 
 ## Configuration
 
-LVGL has many compile-time settings — color depth, which Widgets are built, GPU
+LVGL has many compile-time settings: color depth, which Widgets are built, GPU
 and rendering backends, third-party libraries, OS support, and more. They can be
 set in three ways that can be mixed:
 
-1. `lv_conf.h` — a header where `#define`s are adjusted (the default).
-2. Kconfig — when LVGL is part of a Kconfig-based build, or built standalone with CMake.
-3. Compiler defines — values passed on the command line (e.g. `-DLV_COLOR_DEPTH=32`).
+1. **`lv_conf.h`**: a header where `#define`s are adjusted (the default).
+2. **Kconfig**: when LVGL is part of a Kconfig-based build, or built standalone with CMake.
+3. **Compiler defines**: values passed on the command line (e.g. `-DLV_COLOR_DEPTH=32`).
 
-Under the hood, Kconfig is the single source of truth: `lv_conf_template.h` (the
-file you copy) and the internal headers that apply defaults are *generated* from
-the [Kconfig](https://github.com/lvgl/lvgl/blob/master/Kconfig) tree, so the
-methods stay in sync.
+When setting up a project for the first time, copy `lvgl/lv_conf_template.h` to
+`lv_conf.h` next to the `lvgl` folder, change the first `#if 0` to `1` to enable
+the file's content, and set <ApiLink name="LV_COLOR_DEPTH" /> to match your
+display panel. Adjust the other options as needed, every option is documented
+by a comment in the file.
 
-For the full details — setting up `lv_conf.h`, building with Kconfig, and
-ready-made presets such as the minimal configuration — see
-[Configuring LVGL](/integration/configuration).
+For the full details see [Configuring LVGL](/integration/configuration).
 
 ## Connecting to Hardware
 
