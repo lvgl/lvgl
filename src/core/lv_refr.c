@@ -414,6 +414,8 @@ void lv_display_refr_timer(lv_timer_t * tmr)
         goto refr_finish;
     }
 
+    /*Expand the invalidated areas for blur objects before joining them*/
+    lv_obj_invalidate_expand_blur(disp_refr);
     lv_refr_join_area();
     refr_sync_areas();
     refr_invalid_areas();
@@ -618,17 +620,11 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
  **********************/
 
 /**
- * Expand the invalidated areas for blur objects, then join the areas which have
- * got common parts
+ * Join the areas which has got common parts
  */
 static void lv_refr_join_area(void)
 {
     LV_PROFILER_REFR_BEGIN;
-
-    /*Expand before joining so any blur object whose background changed is
-     *invalidated and then merged in along with the rest.*/
-    lv_obj_invalidate_expand_blur(disp_refr);
-
     uint32_t join_from;
     uint32_t join_in;
     lv_area_t joined_area;
