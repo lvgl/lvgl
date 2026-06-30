@@ -3341,6 +3341,18 @@ menu "Asserts"
 	config LV_USE_ASSERT_OBJ
 		bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
 
+	config LV_ASSERT_HANDLER_INCLUDE
+		string "Assert handler include [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"
+		default ""
+		help
+		  [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]
+		  Add a custom handler when assert happens e.g. to restart the MCU
+		  Optional header to override assert-related macros.
+
+	config LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE
+		bool
+		default y if LV_ASSERT_HANDLER_INCLUDE != ""
+
 	config LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
 		bool "Disable LV_ASSERT_HANDLER_INCLUDE deprecated warning"
 		default n

@@ -217,6 +217,15 @@ extern "C" {
 #endif
 
 /*******************
+ * LV_ASSERT_HANDLER_INCLUDE
+ *******************/
+
+#if defined(CONFIG_LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE) && CONFIG_LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE
+#warning LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE instead.
+#define LV_ASSERT_HANDLER_INCLUDE CONFIG_LV_ASSERT_HANDLER_INCLUDE
+#endif
+
+/*******************
  * LV_SDL_BUF_COUNT
  *******************/
 
