@@ -388,9 +388,7 @@ def _order_deferred(flags):
     ordered, done, remaining = [], set(), list(flags)
     while remaining:
         ready = [f for f in remaining if refs(f) <= done]
-        if not ready:  # cycle (shouldn't happen): emit the rest as-is
-            ordered.extend(remaining)
-            break
+        assert ready
         for f in ready:
             ordered.append(f)
             done.add(f.name)
