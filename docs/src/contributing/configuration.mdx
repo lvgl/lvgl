@@ -294,16 +294,10 @@ and documents the forward `select` in the template comment:
 #define LV_USE_SLIDER 1
 ```
 
-Notes:
-
-- `depends on` is **not** repeated in the template comment, the template already
-  wraps the option in the matching `#if` block, so the dependency is visible.
-- Only *user-facing* options are checked/listed; an internal flag a user can't
-  set is filtered out.
-- Depends checks are emitted only for options that **default off**, so the
-  default / `LV_CONF_SKIP` build never `#error`s on a sub-option that defaults on
-  while its parent is off. Keep this in mind: a default-on option's `depends on`
-  is not enforced on the `lv_conf.h` path.
+<Callout type="info" title="How `depends on` is handled">
+Since the template wraps options in `#if` blocks based on the option dependencies,
+`depends on` clauses are **not** repeated in the template comment
+</Callout>
 
 ### Internal capability flags
 
