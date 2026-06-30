@@ -77,41 +77,98 @@ template, so you don't have to merge changes by hand.
 
 ## Kconfig
 
-When LVGL is integrated into a larger Kconfig-based project, that project's
-tooling configures LVGL by including LVGL's
-[Kconfig file](https://github.com/lvgl/lvgl/blob/master/Kconfig). For example,
-under ESP-IDF you configure it with `idf.py menuconfig`.
+Another way to configure LVGL is with
+[Kconfig](https://docs.kernel.org/kbuild/kconfig-language.html). Kconfig is a
+configuration system first made for the Linux kernel. It is now also used by
+many RTOSes and tools, such as ESP-IDF, Zephyr and NuttX.
 
-LVGL can also be configured via Kconfig on its own when built as a static
-library with CMake. It uses [`kconfiglib`](https://github.com/ulfalizer/Kconfiglib),
-a Python port of Kconfig that works across platforms and ships some useful CLI
-commands:
+A few terms are useful to know:
 
-- `menuconfig` — console menu to edit configuration values.
-- `guiconfig` — graphical version (needs `tkinter`).
-- `savedefconfig` — save the current `.config` as a minimal `defconfig` (only the non-default values).
-- `alldefconfig` — produce a `.config` with every default value.
+- **`Kconfig`** — the file that lists all the options you can set. LVGL ships
+  [its own `Kconfig` file](https://github.com/lvgl/lvgl/blob/master/Kconfig).
+- **`.config`** — your full configuration. It holds a value for every option.
+- **`defconfig`** — a short config that stores only the options you changed from
+  their defaults. It is a handy, reusable "preset" (see [Presets](#presets-defconfigs)).
+
+When LVGL is part of a bigger Kconfig-based project. In that case the parent
+project's tools configure LVGL for you by including LVGL's `Kconfig` file.
+For example, under ESP-IDF you run `idf.py menuconfig`. The details depend on
+the project, so they are not covered here.
+
+The rest of this page explains how to configure LVGL on its own, without another tool wrapping it.
+
+### Installing the tools
+
+LVGL uses [`kconfiglib`](https://pypi.org/project/kconfiglib/), a Python port
+of Kconfig that works on every platform.
+
+The easiest way to use it is by installing it in a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate     # Windows: .venv\Scripts\activate
+
+pip install kconfiglib
+```
+
+Inside the virtual environment you get these commands:
+
+- `menuconfig` — edit the configuration in a console menu.
+- `guiconfig` — same, but graphical (needs `tkinter`).
+- `savedefconfig` — save the current `.config` as a small `defconfig` (only the
+  non-default values).
+- `alldefconfig` — make a `.config` with every default value.
 - `genconfig` — generate a C header (`autoconf.h` style) from the config.
 
-### Building with Kconfig
+With the tools installed you can now use them in two ways:
 
-1. Install the prerequisites with `scripts/install_prerequisites.sh` (or `.bat`).
-2. Create the configuration:
+#### Option 1: Generate a header file from your `.config`
 
-   ```bash
+Here you let Kconfig create a normal `.h` file and tell LVGL to include it. 
+
+1. Create your configuration:
+
+```bash
    cd <lvgl_repo>
-   menuconfig   # make your changes, then save and exit with Esc/Q
-   ```
+   menuconfig        # make your changes, then save and exit with Esc/Q
+```
 
-   This writes a `.config` file listing your configuration values.
+   This writes a `.config` file.
 
-3. Run CMake with `-DLV_USE_KCONFIG=ON`:
+2. Turn it into a header:
 
-   ```bash
-   cd <lvgl_repo>
-   cmake -B build -DLV_USE_KCONFIG=ON
-   cmake --build build
-   ```
+```bash
+   genconfig         # writes config.h
+```
+
+3. Tell LVGL to include that header by defining
+   `LV_CONF_KCONFIG_EXTERNAL_INCLUDE` and pointing it at the
+   file:
+
+```bash
+   -DLV_CONF_KCONFIG_EXTERNAL_INCLUDE="/path/to/lvgl-repo/config.h"
+```
+
+#### Option 2: Use LVGL's CMake integration
+
+Here LVGL's CMake reads your `.config` (or a `defconfig`) for you.
+
+To build with a `.config` you made with `menuconfig`:
+
+```bash
+cd <lvgl_repo>
+menuconfig                                  # creates .config
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON
+cmake --build build
+```
+
+To build straight from a `defconfig` preset, also set `LV_BUILD_DEFCONFIG_PATH`:
+
+```bash
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON \
+      -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/sdl2.defconfig
+cmake --build build
+```
 
 ## Presets (defconfigs)
 
@@ -119,11 +176,20 @@ A `defconfig` is a small file that records only the options that differ from the
 defaults, a reusable, named starting point. This is the Kconfig-native way to
 express a "preset".
 
-Some ready-made defconfigs live in `configs/defconfigs/`. Build from one with
-`-DLV_DEFCONFIG_PATH`:
+Some ready-made defconfigs live in `configs/defconfigs/`.
+
+Use one of them as a starting point for your project:
 
 ```bash
-cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/sdl2.defconfig
+cd <lvgl_repo>
+defconfig configs/defconfigs/sdl2.defconfig # generates a .config from the sdl2 preset
+menuconfig # update it so it fits your projects needs
+```
+
+Or build diretly from one with `-DLV_BUILD_DEFCONFIG_PATH`:
+
+```bash
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/sdl2.defconfig
 cmake --build build
 ```
 
@@ -152,3 +218,7 @@ cp defconfig configs/defconfigs/my_defconfig
 cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/my_defconfig
 cmake --build build
 ```
+
+## Under the hood
+
+See [Contributing](/contributing/configuration) to learn more about how LVGL's configuration system is defined under the hood.

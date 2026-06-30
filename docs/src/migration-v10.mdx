@@ -63,7 +63,7 @@ preset now lives at `configs/defconfigs/empty.defconfig`:
 
 ```bash
 # Build LVGL from the empty preset
-cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/empty.defconfig
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/empty.defconfig
 ```
 
 If you set `LV_CONF_MINIMAL` (in `lv_conf.h` or Kconfig) you'll get a build
