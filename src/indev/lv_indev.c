@@ -721,8 +721,8 @@ void lv_indev_clear_ccw(lv_indev_t * indev)
 
 bool lv_indev_get_ccw(const lv_indev_t * indev)
 {
-    LV_CHECK_ARG(indev != NULL, return);
-    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return);
+    LV_CHECK_ARG(indev != NULL, return false);
+    LV_CHECK_ARG(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER, return false);
     return (indev->pointer.ccw_rotation != 0);
 }
 
