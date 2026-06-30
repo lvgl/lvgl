@@ -12,7 +12,6 @@
 #if defined(__linux__)
 
 #include "../core/lv_global.h"
-#include "../misc/lv_log.h"
 #include "lv_linux.h"
 #include <stdio.h>
 #include <string.h>

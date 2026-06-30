@@ -15,9 +15,9 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_obj_private.h"
-#include "lv_ime_pinyin.h"
+#include "../../lvgl_public.h"
 
-#if LV_USE_IME_PINYIN != 0
+#if LV_USE_IME_PINYIN
 
 /*********************
  *      DEFINES

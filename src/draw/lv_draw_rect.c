@@ -6,13 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_rect_private.h"
+
 #include "lv_draw_private.h"
-#include "../core/lv_obj.h"
-#include "../misc/lv_assert.h"
 #include "../misc/lv_text_private.h"
-#include "../core/lv_obj_event.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -55,6 +51,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->border_opa = LV_OPA_COVER;
     dsc->shadow_opa = LV_OPA_COVER;
     dsc->border_side = LV_BORDER_SIDE_FULL;
+    dsc->base.dsc_size = sizeof(lv_draw_rect_dsc_t);
 }
 
 void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc)

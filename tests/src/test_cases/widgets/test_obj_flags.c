@@ -15,11 +15,6 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-static void ext_draw_size_event_cb(lv_event_t * e)
-{
-    lv_event_set_ext_draw_size(e, 100);
-}
-
 static void btn_clicked_event_cb(lv_event_t * e)
 {
     uint32_t * cnt = lv_event_get_user_data(e);
@@ -33,7 +28,7 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_set_style_bg_color(obj_main, lv_palette_main(LV_PALETTE_RED), 0);
     lv_obj_add_flag(obj_main, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
     lv_obj_center(obj_main);
-    lv_obj_add_event_cb(obj_main, ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, NULL);
+    lv_obj_set_ext_draw_size(obj_main, 100);
 
     lv_obj_t * obj_child_1 = lv_obj_create(obj_main);
     lv_obj_set_size(obj_child_1, 200, 200);
@@ -56,7 +51,7 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_set_style_bg_color(obj_child_2, lv_palette_main(LV_PALETTE_ORANGE), 0);
     lv_obj_add_flag(obj_child_2, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
     lv_obj_align(obj_child_2, LV_ALIGN_RIGHT_MID, 100, 0);
-    lv_obj_add_event_cb(obj_child_2, ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, NULL);
+    lv_obj_set_ext_draw_size(obj_child_2, 100);
 
     lv_obj_t * btn_2 = lv_button_create(obj_child_2);
     lv_obj_set_size(btn_2, 100, 100);
@@ -235,6 +230,16 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
 
+}
+
+void test_obj_flag_parent_hidden(void)
+{
+    /* #10083: Ensure that adding and removing screen flags don't make lvgl crash*/
+    lv_obj_add_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN);
+    TEST_ASSERT_TRUE(lv_obj_has_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN));
+    lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN);
+    TEST_ASSERT_FALSE(lv_obj_has_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN));
+    TEST_PASS();
 }
 
 #endif

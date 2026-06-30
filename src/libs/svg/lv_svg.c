@@ -6,12 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_svg.h"
+#include "../../lvgl_public.h"
 #if LV_USE_SVG
-
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_log.h"
-#include "../../stdlib/lv_mem.h"
 
 #include "lv_svg_token.h"
 #include "lv_svg_parser.h"

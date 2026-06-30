@@ -10,9 +10,6 @@
 
 #if LV_USE_OS == LV_OS_RTTHREAD
 
-#include "../misc/lv_log.h"
-#include "../misc/lv_timer.h"
-
 /*********************
  *      DEFINES
  *********************/
@@ -138,6 +135,14 @@ lv_result_t lv_thread_sync_init(lv_thread_sync_t * sync)
         LV_LOG_WARN("create semaphore failed");
         return LV_RESULT_INVALID;
     }
+
+    rt_err_t ret = rt_sem_control(sync->sem, RT_IPC_CMD_SET_VLIMIT, (void *)1);
+    if(ret) {
+        LV_LOG_WARN("Error: %d", ret);
+        rt_sem_delete(sync->sem);
+        sync->sem = RT_NULL;
+        return LV_RESULT_INVALID;
+    }
     else {
         return LV_RESULT_OK;
     }
@@ -158,7 +163,7 @@ lv_result_t lv_thread_sync_wait(lv_thread_sync_t * sync)
 lv_result_t lv_thread_sync_signal(lv_thread_sync_t * sync)
 {
     rt_err_t ret = rt_sem_release(sync->sem);
-    if(ret) {
+    if(ret && ret != -RT_EFULL) {
         LV_LOG_WARN("Error: %d", ret);
         return LV_RESULT_INVALID;
     }

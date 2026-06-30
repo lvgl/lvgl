@@ -9,15 +9,10 @@
 #include "lv_gltf_view_internal.h"
 #if LV_USE_GLTF
 
-#include "fastgltf/types.hpp"
+#include <fastgltf/types.hpp>
 #include "../gltf_data/lv_gltf_data_internal.hpp"
 #include "../gltf_data/lv_gltf_data_internal.h"
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
-#include "../../../misc/lv_array.h"
-#include "../../../misc/lv_assert.h"
-#include "../../../misc/lv_types.h"
-#include "../../../stdlib/lv_sprintf.h"
-#include "../../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

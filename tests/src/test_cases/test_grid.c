@@ -122,4 +122,59 @@ void test_grid_rtl(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("grid_rtl.png");
 }
 
+
+void test_grid_no_crash_on_invalid_settings(void)
+{
+    /*Should't crash because of these*/
+
+    /*No col/row descriptors on screen*/
+    lv_obj_t * scr = lv_obj_create(NULL);
+    lv_screen_load(scr);
+    lv_obj_set_style_layout(scr, LV_LAYOUT_GRID, 0);
+    lv_refr_now(NULL);
+
+    /*No col/row descriptors on a widget*/
+    lv_obj_t * cont = lv_obj_create(scr);
+    lv_obj_set_style_layout(cont, LV_LAYOUT_GRID, 0);
+    lv_refr_now(NULL);
+
+    /*Set a cell without having row/col descriptor on the parent*/
+    lv_obj_set_grid_cell(cont, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 0, 1);
+    lv_refr_now(NULL);
+
+    /*Add grid descriptors*/
+    const int32_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    const int32_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    lv_obj_set_grid_dsc_array(cont, col_dsc, row_dsc);
+    lv_refr_now(NULL);
+
+    lv_obj_t * label = lv_label_create(cont);
+
+    /*Zero span*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 0, 0, LV_GRID_ALIGN_CENTER, 0, 0);
+    lv_refr_now(NULL);
+
+    /*Too large span*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 0, 20, LV_GRID_ALIGN_CENTER, 0, 30);
+    lv_refr_now(NULL);
+
+    /*Negative span*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 0, -50, LV_GRID_ALIGN_CENTER, 0, -20);
+    lv_refr_now(NULL);
+
+    /*Too large position*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 30, 1, LV_GRID_ALIGN_CENTER, 20, 1);
+    lv_refr_now(NULL);
+
+    /*Negative position*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, -100, 1, LV_GRID_ALIGN_CENTER, -20, 1);
+    lv_refr_now(NULL);
+
+    /*Valid settings*/
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_CENTER, 1, 2, LV_GRID_ALIGN_CENTER, 0, 1);
+    lv_refr_now(NULL);
+    TEST_PASS();
+}
+
+
 #endif

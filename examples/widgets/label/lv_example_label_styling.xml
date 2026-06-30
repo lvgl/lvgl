@@ -1,0 +1,58 @@
+<!--
+ @title Label styling
+ @brief Decorate labels with background, padding, border, outline, and shadow.
+
+ A label is just text, but it inherits the full background/border/outline/shadow stack
+ from the base widget. The named "badge" style turns a label into a pill via radius +
+ padding + bg color; the second label demonstrates the same effect built purely from
+ local `style_*` attributes for a one-off look.
+-->
+<screen>
+	<styles>
+		<!-- Pill badge: rounded background, padding, contrasting text -->
+		<style
+			name="style_badge"
+			bg_opa="100%"
+			bg_color="0x6366f1"
+			radius="100"
+			pad_hor="14"
+			pad_ver="6"
+			text_color="0xffffff"
+		/>
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+		style_pad_row="16"
+	>
+		<!-- 💡 Tweak the style props to turn a plain label into a badge, banner, or call-out. -->
+		<!-- Named-style pill badge -->
+		<lv_label name="label_1" text="NEW">
+			<style name="style_badge" />
+		</lv_label>
+
+		<!-- Local-style call-out: border + outline halo + shadow + padding -->
+		<lv_label
+			name="label_2"
+			text="Heads up"
+			style_bg_opa="100%"
+			style_bg_color="0xfef3c7"
+			style_text_color="0x92400e"
+			style_border_color="0xf59e0b"
+			style_border_width="2"
+			style_radius="8"
+			style_pad_all="10"
+			style_outline_color="0xf59e0b"
+			style_outline_width="3"
+			style_outline_pad="3"
+			style_outline_opa="80"
+			style_shadow_color="0x78350f"
+			style_shadow_width="14"
+			style_shadow_offset_y="3"
+			style_shadow_opa="100"
+		/>
+	</view>
+</screen>

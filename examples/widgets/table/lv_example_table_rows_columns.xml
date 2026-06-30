@@ -1,0 +1,25 @@
+<!--
+ @title Table rows and columns
+ @brief Set the table dimensions explicitly so the grid is sized before cells are placed.
+
+ `row_count` and `column_count` give the table its shape. Cells without
+ declared values still occupy a slot in the grid, so the visible empty
+ rows in the example are part of the layout, not leftover space. Here a
+ 10×2 grid is declared and only a handful of cells are populated — the
+ gaps between them stay rendered as empty cells. Resizing the row/column
+ counts grows or shrinks the grid; cells outside the new bounds simply
+ don't render. When the row count is tall enough that the grid no longer
+ fits the widget's height, the table becomes scrollable.
+-->
+<screen>
+	<view>
+		<!-- 💡 Bump `row_count` past what fits on screen — the table scrolls; the empty cells stay in place because they're part of the grid. -->
+		<lv_table name="table" align="center" row_count="10" column_count="2" height="90%">
+			<lv_table-cell row="0" column="0" value="A" />
+			<lv_table-cell row="0" column="1" value="B" />
+			<lv_table-cell row="2" column="1" value="middle" />
+			<lv_table-cell row="8" column="0" value="8th" />
+			<lv_table-cell row="9" column="0" value="last row" />
+		</lv_table>
+	</view>
+</screen>

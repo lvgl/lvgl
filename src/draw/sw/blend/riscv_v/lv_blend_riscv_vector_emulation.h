@@ -25,12 +25,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "../../../../lv_conf_internal.h"
+#include "../../../../lvgl_public.h"
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_RISCV_V
 
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <string.h>
-#include <stddef.h>
+#include LV_STDDEF_INCLUDE
 
 /* ============================================================================
  * Vector Type Definitions

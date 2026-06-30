@@ -11,7 +11,6 @@
 
 #if LV_USE_DEMO_GLTF
 
-#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -40,18 +39,24 @@ typedef struct {
     lv_obj_t * label;
 } play_pause_event_data_t;
 
-typedef void (*lv_gltf_set_float_fn)(lv_obj_t *, float);
-typedef void (*lv_gltf_set_int_fn)(lv_obj_t *, uint32_t);
+typedef void (*lv_gltf_set_float_cb_t)(lv_obj_t *, float);
+typedef void (*lv_gltf_set_int_cb_t)(lv_obj_t *, uint32_t);
+typedef void (*lv_gltf_model_set_int_fn)(lv_gltf_model_t *, uint32_t);
 
 typedef union {
     void * ptr;
-    lv_gltf_set_float_fn fn;
+    lv_gltf_set_float_cb_t cb;
 } lv_gltf_set_float_fn_union_t;
 
 typedef union {
     void * ptr;
-    lv_gltf_set_int_fn fn;
+    lv_gltf_set_int_cb_t cb;
 } lv_gltf_set_int_fn_union_t;
+
+typedef union {
+    void * ptr;
+    lv_gltf_set_int_cb_t cb;
+} lv_gltf_model_set_int_fn_union_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -77,6 +82,7 @@ static lv_obj_t * add_dropdown_to_row(lv_obj_t * row);
 static void viewer_observer_float_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void viewer_observer_int_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void animation_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void animation_speed_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void style_dropdown(lv_obj_t * dropdown);
 static void style_slider(lv_obj_t * slider, lv_color_t accent_color);
 static void style_control_panel(lv_obj_t * panel);
@@ -85,16 +91,15 @@ static void style_control_panel(lv_obj_t * panel);
  *  STATIC VARIABLES
  **********************/
 
-static lv_gltf_set_float_fn_union_t pitch_fn = { .fn = lv_gltf_set_pitch };
-static lv_gltf_set_float_fn_union_t yaw_fn = { .fn = lv_gltf_set_yaw };
-static lv_gltf_set_float_fn_union_t distance_fn = { .fn = lv_gltf_set_distance };
-static lv_gltf_set_int_fn_union_t camera_fn = { .fn = lv_gltf_set_camera };
-static lv_gltf_set_int_fn_union_t animation_speed_fn = { .fn = lv_gltf_set_animation_speed };
-static lv_gltf_set_int_fn_union_t background_mode_fn = { .fn = lv_gltf_set_background_mode };
-static lv_gltf_set_int_fn_union_t antialiasing_mode_fn = { .fn = lv_gltf_set_antialiasing_mode };
+static lv_gltf_set_float_fn_union_t pitch_fn = { .cb = lv_gltf_set_pitch };
+static lv_gltf_set_float_fn_union_t yaw_fn = { .cb = lv_gltf_set_yaw };
+static lv_gltf_set_float_fn_union_t distance_fn = { .cb = lv_gltf_set_distance };
+static lv_gltf_set_int_fn_union_t camera_fn = { .cb = lv_gltf_set_camera };
+static lv_gltf_set_int_fn_union_t background_mode_fn = { .cb = lv_gltf_set_background_mode };
+static lv_gltf_set_int_fn_union_t antialiasing_mode_fn = { .cb = lv_gltf_set_antialiasing_mode };
 
-static lv_gltf_set_int_fn_union_t env_brightness_fn = { .fn = lv_gltf_set_env_brightness };
-static lv_gltf_set_int_fn_union_t bg_blur_fn = { .fn = lv_gltf_set_background_blur };
+static lv_gltf_set_int_fn_union_t env_brightness_fn = { .cb = lv_gltf_set_env_brightness };
+static lv_gltf_set_int_fn_union_t bg_blur_fn = { .cb = lv_gltf_set_background_blur };
 
 static lv_subject_t yaw_subject;
 static lv_subject_t pitch_subject;
@@ -165,7 +170,7 @@ static void init_subjects(lv_obj_t * viewer)
     lv_subject_add_observer_obj(&distance_subject, viewer_observer_float_cb, viewer, distance_fn.ptr);
 
     lv_subject_add_observer(&animation_subject, animation_observer_cb, viewer);
-    lv_subject_add_observer_obj(&animation_speed_subject, viewer_observer_int_cb, viewer, animation_speed_fn.ptr);
+    lv_subject_add_observer(&animation_speed_subject, animation_speed_observer_cb, viewer);
 
     lv_subject_add_observer_obj(&background_subject, viewer_observer_int_cb, viewer, background_mode_fn.ptr);
     lv_subject_add_observer_obj(&env_brightness_subject, viewer_observer_int_cb, viewer, env_brightness_fn.ptr);
@@ -318,7 +323,7 @@ static void create_background_panel(lv_obj_t * panel)
     lv_obj_t * background_dropdown = add_dropdown_to_row(bg_row);
     style_dropdown(background_dropdown);
 
-    lv_dropdown_set_options(background_dropdown, "Solid Color\nEnvironnement");
+    lv_dropdown_set_options(background_dropdown, "Solid Color\nEnvironment");
     lv_dropdown_bind_value(background_dropdown, &background_subject);
 
     lv_obj_t * env_brightness_title = add_title_to_row(bg_row, "");
@@ -335,13 +340,13 @@ static void create_background_panel(lv_obj_t * panel)
     lv_obj_t * background_blur_title = add_title_to_row(bg_row, "");
     lv_label_bind_text(background_blur_title, &background_blur_subject, "Background Blur %d");
 
-    lv_obj_t * backgorund_blur_slider = lv_slider_create(bg_row);
-    lv_slider_bind_value(backgorund_blur_slider, &background_blur_subject);
-    lv_obj_set_width(backgorund_blur_slider, LV_PCT(100));
-    lv_slider_set_min_value(backgorund_blur_slider, 0);
-    lv_slider_set_max_value(backgorund_blur_slider, 100);
+    lv_obj_t * background_blur_slider = lv_slider_create(bg_row);
+    lv_slider_bind_value(background_blur_slider, &background_blur_subject);
+    lv_obj_set_width(background_blur_slider, LV_PCT(100));
+    lv_slider_set_min_value(background_blur_slider, 0);
+    lv_slider_set_max_value(background_blur_slider, 100);
 
-    style_slider(backgorund_blur_slider, SLIDER_COLOR);
+    style_slider(background_blur_slider, SLIDER_COLOR);
 
 }
 
@@ -497,7 +502,7 @@ static void viewer_observer_float_cb(lv_observer_t * observer, lv_subject_t * su
     float value = lv_subject_get_float(subject);
     lv_gltf_set_float_fn_union_t fn_union = { .ptr = lv_observer_get_user_data(observer) };
 
-    fn_union.fn(viewer, value);
+    fn_union.cb(viewer, value);
 }
 
 static void viewer_observer_int_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -506,7 +511,7 @@ static void viewer_observer_int_cb(lv_observer_t * observer, lv_subject_t * subj
     lv_gltf_set_int_fn_union_t fn_union = { .ptr = lv_observer_get_user_data(observer) };
 
     lv_obj_t * viewer = lv_observer_get_target_obj(observer);
-    fn_union.fn(viewer, value);
+    fn_union.cb(viewer, value);
 }
 
 static void animation_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -516,6 +521,15 @@ static void animation_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     lv_gltf_model_t * model = lv_gltf_get_primary_model(viewer);
 
     lv_gltf_model_play_animation(model, value);
+}
+
+static void animation_speed_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    int value = lv_subject_get_int(subject);
+    lv_obj_t * viewer = lv_observer_get_user_data(observer);
+    lv_gltf_model_t * model = lv_gltf_get_primary_model(viewer);
+
+    lv_gltf_model_set_animation_speed(model, value);
 }
 static void style_slider(lv_obj_t * slider, lv_color_t accent_color)
 {
@@ -554,7 +568,7 @@ static void style_dropdown(lv_obj_t * dropdown)
     lv_obj_set_style_bg_color(dropdown, lv_color_hex(0x404040), LV_PART_MAIN);
     lv_obj_set_style_bg_grad_color(dropdown, lv_color_hex(0x4A4A4A), LV_PART_MAIN);
     lv_obj_set_style_text_color(dropdown, lv_color_white(), LV_PART_MAIN);
-    lv_obj_t * dropdown_list = ((lv_dropdown_t *)dropdown)->list;
+    lv_obj_t * dropdown_list = lv_dropdown_get_list(dropdown);
     lv_obj_set_style_clip_corner(dropdown_list, false, LV_PART_MAIN);
 }
 

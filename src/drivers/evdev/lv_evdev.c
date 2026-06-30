@@ -23,17 +23,9 @@
     #include <linux/input.h>
     #include <sys/inotify.h>
 #endif /*BSD*/
+
 #include "../../core/lv_global.h"
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_async.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
-#include "../../display/lv_display.h"
 #include "../../display/lv_display_private.h"
-#include "../../widgets/image/lv_image.h"
-#include "../../indev/lv_indev_gesture.h"
 
 /*********************
  *      DEFINES
@@ -120,7 +112,7 @@ static int _evdev_process_key(uint16_t code)
         case KEY_END:
             return LV_KEY_END;
         default:
-            return 0;
+            return code + 0xFFFF;
     }
 }
 
@@ -666,6 +658,30 @@ void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_
     dsc->min_y = min_y;
     dsc->max_x = max_x;
     dsc->max_y = max_y;
+}
+
+bool lv_evdev_is_raw_key(lv_event_t * e)
+{
+    LV_CHECK_ARG(e != NULL, return false);
+
+    uint32_t key = lv_event_get_key(e);
+    return (key > 0xFFFF);
+}
+
+uint16_t lv_evdev_get_raw_key(lv_event_t * e)
+{
+    LV_CHECK_ARG(e != NULL, return 0);
+
+    uint32_t key = lv_event_get_key(e);
+
+    if(key > 0xFFFF) {
+        return (uint16_t)(key - 0xFFFF);
+    }
+    else {
+        LV_LOG_WARN("key is an LV_KEY");
+    }
+
+    return 0;
 }
 
 void lv_evdev_delete(lv_indev_t * indev)

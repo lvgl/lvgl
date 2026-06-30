@@ -564,6 +564,7 @@ static bool linear_ext_grad_create(grad_item_t * item, vg_lite_color_ramp_t * co
 
     LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_update_linear_grad");
     vg_lite_error_t err = VG_LITE_SUCCESS;
+    vg_lite_identity(vg_lite_get_linear_grad_matrix(&item->vg.linear_ext));
     LV_VG_LITE_CHECK_ERROR(err = vg_lite_update_linear_grad(&item->vg.linear_ext), {
         lv_vg_lite_ext_linear_gradient_dump_info(&item->vg.linear_ext);
     });

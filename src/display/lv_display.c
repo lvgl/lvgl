@@ -6,22 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../display/lv_display_private.h"
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_anim_private.h"
 #include "../draw/lv_draw_private.h"
 #include "../core/lv_obj_private.h"
-#include "lv_display.h"
-#include "../misc/lv_math.h"
 #include "../core/lv_refr_private.h"
-#include "../stdlib/lv_string.h"
-#include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
-#include "../debugging/sysmon/lv_sysmon.h"
-
-#if LV_USE_DRAW_SW
-    #include "../draw/sw/lv_draw_sw.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -564,6 +556,14 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
     disp->render_mode = render_mode;
 }
 
+
+lv_display_flush_cb_t lv_display_get_flush_cb(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return NULL;
+    return disp->flush_cb;
+}
+
 void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb)
 {
     if(disp == NULL) disp = lv_display_get_default();
@@ -578,6 +578,22 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
     if(disp == NULL) return;
 
     disp->flush_wait_cb = wait_cb;
+}
+
+void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->sync_cb = sync_cb;
+}
+
+void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t wait_cb)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->sync_wait_cb = wait_cb;
 }
 
 void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format)
@@ -661,6 +677,16 @@ LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
 {
     return disp->flushing_last;
+}
+
+LV_ATTRIBUTE_SYNC_READY void lv_display_sync_ready(lv_display_t * disp)
+{
+    disp->syncing = 0;
+}
+
+LV_ATTRIBUTE_SYNC_READY bool lv_display_sync_is_last(lv_display_t * disp)
+{
+    return disp->syncing_last;
 }
 
 bool lv_display_is_double_buffered(lv_display_t * disp)
@@ -931,11 +957,12 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
  * OTHERS
  *--------------------*/
 
-void lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+lv_event_dsc_t * lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter,
+                                         void * user_data)
 {
     LV_ASSERT_NULL(disp);
 
-    lv_event_add(&disp->event_list, event_cb, filter, user_data);
+    return lv_event_add(&disp->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_display_get_event_count(lv_display_t * disp)
@@ -951,7 +978,7 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 
 }
 
-bool lv_display_delete_event(lv_display_t * disp, uint32_t index)
+bool lv_display_remove_event(lv_display_t * disp, uint32_t index)
 {
     LV_ASSERT_NULL(disp);
 
@@ -969,7 +996,7 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
     for(i = event_cnt - 1; i >= 0; i--) {
         lv_event_dsc_t * dsc = lv_display_get_event_dsc(disp, i);
         if(dsc && dsc->cb == event_cb && dsc->user_data == user_data) {
-            lv_display_delete_event(disp, i);
+            lv_display_remove_event(disp, i);
             removed_count ++;
         }
     }

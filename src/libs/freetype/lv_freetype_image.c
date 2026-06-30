@@ -13,6 +13,8 @@
 #if LV_USE_FREETYPE
 
 #include "../../core/lv_global.h"
+#include "../../misc/cache/lv_cache.h"
+#include "../../misc/cache/lv_cache_entry.h"
 
 #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
 
@@ -190,6 +192,7 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     if(!data->draw_buf) {
         LV_LOG_WARN("Could not create draw buffer");
         FT_Done_Glyph(glyph);
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
         LV_PROFILER_FONT_END;
         return false;
     }

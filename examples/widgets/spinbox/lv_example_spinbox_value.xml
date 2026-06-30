@@ -1,0 +1,27 @@
+<!--
+ @title Spinbox value, range, and step
+ @brief Pin the initial value, clamp it to a numeric range, and set the per-step delta.
+
+ `value` is the starting number shown in the spinbox. `min_value`/`max_value`
+ clamp every adjustment — pressing the increment past the maximum stays at
+ the maximum. `step` is how much each key/press changes the value. With
+ `rollover="false"` (the default) the value sticks at the bounds; see
+ `spinbox_rollover` for the wraparound variant.
+-->
+<screen>
+	<view>
+		<!-- 💡 Edit `step` to 5 or 10; each press now changes by that delta until a bound is hit. -->
+		<lv_label text="Use the arrows to change the value" align="center" y="-50" />
+
+		<lv_spinbox
+			name="spinbox"
+			width="160"
+			digit_count="3"
+			value="25"
+			min_value="0"
+			max_value="100"
+			step="3"
+			align="center"
+		/>
+	</view>
+</screen>

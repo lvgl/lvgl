@@ -7,12 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "../../draw/lv_image_decoder_private.h"
-#include "../../../lvgl.h"
+#include "../../lvgl_public.h"
+
 #if LV_USE_TJPGD
 
+#include "../../draw/lv_image_decoder_private.h"
 #include "tjpgd.h"
-#include "lv_tjpgd.h"
 #include "../../misc/lv_fs_private.h"
 #include <string.h>
 
@@ -107,9 +107,14 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         const char * fn = src;
         const char * ext = lv_fs_get_ext(fn);
         if((lv_strcmp(ext, "jpg") == 0) || (lv_strcmp(ext, "jpeg") == 0)) {
-            uint8_t workb[TJPGD_WORKBUFF_SIZE];
+            uint8_t * workb = lv_malloc(TJPGD_WORKBUFF_SIZE);
+            if(!workb) {
+                LV_LOG_WARN("failed to allocate memory for buffer");
+                return LV_RESULT_INVALID;
+            }
             JDEC jd;
             JRESULT rc = jd_prepare(&jd, input_func, workb, TJPGD_WORKBUFF_SIZE, &dsc->file);
+            lv_free(workb);
             if(rc) {
                 LV_LOG_WARN("jd_prepare error: %d", rc);
                 return LV_RESULT_INVALID;
@@ -200,6 +205,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_free(f);
         lv_free(workb_temp);
         lv_free(jd);
+        LV_LOG_WARN("jd_prepare error: %d", rc);
         return LV_RESULT_INVALID;
     }
 
@@ -240,7 +246,10 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         else {
             lv_fs_seek(jd->device, 0, LV_FS_SEEK_SET);
             JRESULT rc = jd_prepare(jd, input_func, jd->pool_original, (size_t)TJPGD_WORKBUFF_SIZE, jd->device);
-            if(rc) return LV_RESULT_INVALID;
+            if(rc) {
+                LV_LOG_WARN("jd_prepare error: %d", rc);
+                return LV_RESULT_INVALID;
+            }
         }
         decoded->data = jd->workbuf;
         decoded->header = dsc->header;
@@ -268,17 +277,26 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     JRESULT rc;
     if(jd->nrst && jd->rst++ == jd->nrst) {
         rc = jd_restart(jd, jd->rsc++);
-        if(rc != JDR_OK) return LV_RESULT_INVALID;
+        if(rc != JDR_OK) {
+            LV_LOG_WARN("jd_restart error: %d", rc);
+            return LV_RESULT_INVALID;
+        }
         jd->rst = 1;
     }
 
     /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
     rc = jd_mcu_load(jd);
-    if(rc != JDR_OK) return LV_RESULT_INVALID;
+    if(rc != JDR_OK) {
+        LV_LOG_WARN("jd_mcu_load error: %d", rc);
+        return LV_RESULT_INVALID;
+    }
 
     /* Output the MCU (YCbCr to RGB, scaling and output) */
     rc = jd_mcu_output(jd, NULL, decoded_area->x1, decoded_area->y1);
-    if(rc != JDR_OK) return LV_RESULT_INVALID;
+    if(rc != JDR_OK) {
+        LV_LOG_WARN("jd_mcu_output error: %d", rc);
+        return LV_RESULT_INVALID;
+    }
 
     return LV_RESULT_OK;
 }
@@ -301,7 +319,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
 static int is_jpg(const uint8_t * raw_data, size_t len)
 {
-    const uint8_t jpg_signature[] = {0xFF, 0xD8, 0xFF,  0xE0,  0x00,  0x10, 0x4A,  0x46, 0x49, 0x46};
+    const uint8_t jpg_signature[] = {0xFF, 0xD8, 0xFF};
     if(len < sizeof(jpg_signature)) return false;
     return memcmp(jpg_signature, raw_data, sizeof(jpg_signature)) == 0;
 }

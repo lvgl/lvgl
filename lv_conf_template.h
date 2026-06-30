@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.5.0
+ * Configuration file for v9.6.0-dev
  */
 
 /*
@@ -119,6 +119,9 @@
      * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
      */
     #define LV_USE_FREERTOS_TASK_NOTIFY 1
+
+    /* Enable this to provide a custom implementation of lv_os_get_idle_percent. */
+    #define LV_OS_IDLE_PERCENT_CUSTOM 0
 #endif
 
 /*========================
@@ -166,7 +169,7 @@
 #define LV_DRAW_THREAD_PRIO LV_THREAD_PRIO_HIGH
 
 #define LV_USE_DRAW_SW 1
-#if LV_USE_DRAW_SW == 1
+#if LV_USE_DRAW_SW
     /*
      * Selectively disable color format support in order to reduce code size.
      * NOTE: some features use certain color formats internally, e.g.
@@ -244,6 +247,10 @@
      */
     #define LV_USE_NEMA_LIB LV_NEMA_LIB_NONE
 
+    /** Control of the cache support within NEMA GFX */
+    #define LV_NEMA_USE_CACHE 0
+    #define LV_NEMA_CACHE_HAL_INCLUDE <stm32u5xx_hal.h>
+
     /** Select which NemaGFX HAL to use. Possible options:
      * - LV_NEMA_HAL_CUSTOM
      * - LV_NEMA_HAL_STM32 */
@@ -292,9 +299,6 @@
 #if LV_USE_G2D
     /** Use G2D for drawing. **/
     #define LV_USE_DRAW_G2D 1
-
-    /** Use G2D to rotate display. **/
-    #define LV_USE_ROTATE_G2D 0
 
     /** Maximum number of buffers that can be stored for G2D draw unit.
      *  Includes the frame buffers and assets. */
@@ -514,6 +518,49 @@
 #define LV_ASSERT_HANDLER while(1);     /**< Halt by default */
 
 /*-------------
+ * Check arg
+ *-----------*/
+
+/** When enabled, LV_CHECK_ARG checks validate function arguments
+ * at runtime. Failed checks log a warning and execute the specified
+ * action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+ * Disabling this is not recommended unless extreme care is taken and only
+ * in very resource constrained environments where it can be absolutely
+ * ensured that invariants are never violated.
+ *
+ * 0: Disable all LV_CHECK_ARG checks (checks compile to nothing)
+ * 1: Enable LV_CHECK_ARG checks */
+#define LV_USE_CHECK_ARG 1
+
+#if LV_USE_CHECK_ARG
+    /** If enabled, also call LV_ASSERT_HANDLER when an LV_CHECK_ARG check fails.
+     * Requires LV_USE_CHECK_ARG to be enabled. */
+    #define LV_CHECK_ARG_ASSERT_ON_FAIL 0
+
+    #if LV_USE_LOG
+        /** Controls what is logged when an LV_CHECK_ARG check fails.
+         * Any mode other than NONE also requires LV_USE_LOG; if LV_USE_LOG is 0
+         * no output is produced regardless of this setting.
+         *
+         * LV_CHECK_ARG_LOG_MODE_NONE    (0): No log output.
+         * LV_CHECK_ARG_LOG_MODE_MINIMAL (1): Log "Check failed" only (file/line from LV_LOG_WARN).
+         * LV_CHECK_ARG_LOG_MODE_VERBOSE (2): Log "Check failed: <cond>" plus caller-supplied message. */
+        #define LV_CHECK_ARG_LOG_MODE LV_CHECK_ARG_LOG_MODE_VERBOSE
+    #endif
+#endif
+
+/** If enabled, LV_CHECK_OBJ will also verify that the object has the expected class.
+ * When disabled the class check is skipped even if the class argument is supplied.
+ * Requires LV_USE_CHECK_ARG to be enabled. */
+#define LV_USE_CHECK_OBJ_CLASSTYPE 0
+
+/** If enabled, LV_CHECK_OBJ will also verify that the object is still part of the
+ * widget tree (lv_obj_is_valid). When disabled the validity check is skipped even
+ * if the associated argument is supplied.
+ * Requires LV_USE_CHECK_ARG to be enabled. */
+#define LV_USE_CHECK_OBJ_VALIDITY 0
+
+/*-------------
  * Debug
  *-----------*/
 
@@ -607,6 +654,9 @@
 
 /** Define a custom attribute for `lv_display_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
+
+/** Define a custom attribute for `lv_display_sync_ready` function */
+#define LV_ATTRIBUTE_SYNC_READY
 
 /** Align VG_LITE buffers on this number of bytes.
  *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
@@ -1003,6 +1053,14 @@
 #if LV_USE_GIF
     /** GIF decoder accelerate */
     #define LV_GIF_CACHE_DECODE_DATA 0
+    /** Maximum GIF canvas width in pixels.
+     *  GIFs wider than this value will be rejected with GIF_TOO_LARGE.
+     *  Decrease this value to save RAM. */
+    #define LV_GIF_MAX_WIDTH 480
+    /** Maximum GIF canvas height in pixels.
+     *  GIFs taller than this value will be rejected with GIF_TOO_LARGE.
+     *  Decrease this value to save RAM. */
+    #define LV_GIF_MAX_HEIGHT 32768
 #endif
 
 /** GStreamer library */
@@ -1029,6 +1087,13 @@
     /** Cache count of glyphs in FreeType, i.e. number of glyphs that can be cached.
      *  The higher the value, the more memory will be used. */
     #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
+
+    /** Enable L1 glyph metrics cache for FreeType.
+     *  A per-font, lock-free, 2-way set-associative cache that accelerates
+     *  repeated glyph metric lookups.  Automatically disabled when an OS is
+     *  configured (LV_USE_OS != LV_OS_NONE) because the cache is not
+     *  thread-safe. */
+    #define LV_FREETYPE_CACHE_FT_GLYPH_L1 1
 #endif
 
 /** Built-in TTF decoder */

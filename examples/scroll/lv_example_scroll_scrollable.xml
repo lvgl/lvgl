@@ -1,0 +1,33 @@
+<!--
+ @title Disabling scrolling
+ @brief Clearing the SCROLLABLE flag clips overflowing content instead of scrolling it.
+
+ Both panels hold the same overflowing column of buttons. The left one
+ keeps the default behaviour and scrolls. The right one sets
+ `scrollable="false"`, so the flag is cleared: the extra content is
+ simply clipped and the panel cannot be scrolled at all.
+-->
+<screen>
+	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="12">
+		<!-- 💡 Left panel scrolls; the right has `scrollable="false"` so the same content is just clipped. -->
+		<lv_obj name="container_1" width="100%" height="160" flex_flow="row" style_flex_main_place="center" style_pad_column="16">
+			<!-- Default: scrollable -->
+			<lv_obj name="container_2" width="130" height="100%" flex_flow="column" style_pad_row="8">
+				<lv_label name="label_1" text="scrollable" />
+				<lv_button name="button_1" width="100%"><lv_label name="label_2" align="center" text="A" /></lv_button>
+				<lv_button name="button_2" width="100%"><lv_label name="label_3" align="center" text="B" /></lv_button>
+				<lv_button name="button_3" width="100%"><lv_label name="label_4" align="center" text="C" /></lv_button>
+				<lv_button name="button_4" width="100%"><lv_label name="label_5" align="center" text="D" /></lv_button>
+			</lv_obj>
+
+			<!-- Flag cleared: content is clipped, no scrolling -->
+			<lv_obj name="container_3" width="130" height="100%" flex_flow="column" style_pad_row="8" scrollable="false" style_border_color="0x9429ff" style_border_width="2">
+				<lv_label name="label_6" text="clipped" />
+				<lv_button name="button_5" width="100%"><lv_label name="label_7" align="center" text="A" /></lv_button>
+				<lv_button name="button_6" width="100%"><lv_label name="label_8" align="center" text="B" /></lv_button>
+				<lv_button name="button_7" width="100%"><lv_label name="label_9" align="center" text="C" /></lv_button>
+				<lv_button name="button_8" width="100%"><lv_label name="label_10" align="center" text="D" /></lv_button>
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>

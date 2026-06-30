@@ -6,14 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_text_private.h"
 #include "lv_text_ap.h"
-#include "lv_math.h"
-#include "lv_log.h"
-#include "lv_assert.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
-#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -525,7 +520,7 @@ char * lv_text_set_text_vfmt(const char * fmt, va_list ap)
     lv_vsnprintf(raw_txt, len + 1, fmt, ap);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = lv_text_ap_calc_bytes_count(raw_txt);
+    size_t len_ap = lv_text_ap_strlen(raw_txt);
     text = lv_malloc(len_ap + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {

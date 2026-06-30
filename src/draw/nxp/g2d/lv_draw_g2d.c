@@ -13,7 +13,7 @@
 
 #if LV_USE_G2D
 #include "../../../misc/lv_area_private.h"
-#include "g2d.h"
+#include <g2d.h>
 #include "lv_g2d_buf_map.h"
 #include "lv_g2d_utils.h"
 
@@ -358,5 +358,5 @@ static void _g2d_render_thread_cb(void * ptr)
 }
 #endif
 
-#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_DRAW_G2D */
 #endif /*LV_USE_G2D*/

@@ -88,17 +88,12 @@ void lv_eve_primitive(uint8_t context)
 
 void lv_eve_scissor(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
-    if(x1 != scissor_x1 || y1 != scissor_y1) {
-        int16_t adjusted_x1 = x1 > 0 ? x1 - 1 : 0;
-        int16_t adjusted_y1 = y1 > 0 ? y1 - 1 : 0;
-        EVE_cmd_dl_burst(SCISSOR_XY(adjusted_x1, adjusted_y1));
+    if(x1 != scissor_x1 || y1 != scissor_y1 || x2 != scissor_x2 || y2 != scissor_y2) {
+        EVE_cmd_dl_burst(SCISSOR_XY(x1, y1));
         scissor_x1 = x1;
         scissor_y1 = y1;
-    }
-
-    if(x2 != scissor_x2 || y2 != scissor_y2) {
-        uint16_t w = x2 - x1 + 3;
-        uint16_t h = y2 - y1 + 3;
+        uint16_t w = x2 - x1 + 1;
+        uint16_t h = y2 - y1 + 1;
         EVE_cmd_dl_burst(SCISSOR_SIZE(w, h));
         scissor_x2 = x2;
         scissor_y2 = y2;
@@ -200,6 +195,13 @@ void lv_eve_draw_rect_simple(int16_t coord_x1, int16_t coord_y1, int16_t coord_x
     lv_eve_primitive(LV_EVE_PRIMITIVE_RECTS);
     if(radius > 1) {
         lv_eve_line_width(radius * 16);
+    }
+    if(radius > 0) {
+        /* With radius 1, the EVE engine draws one half-opacity
+         * pixel outline around the rectangle. Subtracting one
+         * here ensures that the full-opacity rectangle reaches
+         * the coordinate pixels we were passed in. */
+        radius--;
     }
 
     lv_eve_vertex_2f(coord_x1 + radius, coord_y1 + radius);

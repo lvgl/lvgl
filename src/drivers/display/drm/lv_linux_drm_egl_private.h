@@ -15,15 +15,15 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
 #include <xf86drmMode.h>
+#include "lv_linux_drm_private.h"
 #include "../../opengles/lv_opengles_texture_private.h"
 #include "../../opengles/lv_opengles_egl.h"
 #include "../../opengles/lv_opengles_egl_private.h"
-#include "lv_linux_drm.h"
 
 /*********************
  *      DEFINES

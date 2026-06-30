@@ -1,0 +1,109 @@
+---
+title: "Roller (lv_roller)"
+description: "Pick an item from a vertical list by scrolling. The item in the middle is the selected one and is usually styled to stand out."
+---
+
+## Overview
+
+A Roller lets the user pick an item from a vertical list by scrolling
+through it. The item in the middle is the selected one and is usually
+styled to stand out from the others.
+
+## Setting the list items
+
+<LvglExample name="lv_example_roller_options" path="widgets/roller/lv_example_roller_options" />
+
+<ApiLink name="lv_roller_set_options" display="lv_roller_set_options(roller, &quot;First\nSecond\nThird&quot;, LV_ROLLER_MODE_NORMAL)" />
+sets the items; `\n` separates them. Use <ApiLink name="LV_ROLLER_MODE_INFINITE" /> for a
+circular roller.
+
+Select programmatically with <ApiLink name="lv_roller_set_selected" display="lv_roller_set_selected(roller, id, LV_ANIM_ON)" />
+(index) or `_set_selected_str(roller, str, LV_ANIM_ON)` (option text).
+
+## Get selected option
+
+- <ApiLink name="lv_roller_get_selected" display="lv_roller_get_selected(roller)" /> returns the index.
+- <ApiLink name="lv_roller_get_selected_str" display="lv_roller_get_selected_str(roller, buf, size)" /> copies the option text
+  into `buf`.
+
+## Visible rows
+
+<LvglExample name="lv_example_roller_visible_rows" path="widgets/roller/lv_example_roller_visible_rows" />
+
+<ApiLink name="lv_roller_set_visible_row_count" display="lv_roller_set_visible_row_count(roller, n)" /> sets how many list rows are
+visible. The pixel height is derived from the current font and spacing —
+call this again after any change to those styles.
+
+## Styling
+
+- <ApiLink name="LV_PART_MAIN" /> The background of the roller uses the [typical
+   background](/common-widget-features/styles/overview) and text style properties.
+
+   - Style `text_line_space` adjusts the space between list items.
+     Use <ApiLink name="lv_obj_set_style_text_line_space" /> to set this value.
+
+   - When the Roller is scrolled and doesn't stop exactly on an item, it will
+     automatically scroll to the nearest valid item in `anim_time`
+     milliseconds as specified in the `anim_duration` style.  Use
+     <ApiLink name="lv_obj_set_style_anim_duration" /> to set this value.
+- <ApiLink name="LV_PART_SELECTED" /> The selected item (displayed in the  middle of
+   the Roller).  Besides the typical background properties, it uses text style
+   properties to change the appearance of the text of the selected item.
+
+<LvglExample name="lv_example_roller_styling" path="widgets/roller/lv_example_roller_styling" />
+
+Roller has two stylable parts: <ApiLink name="LV_PART_MAIN" /> (the listbox
+background and unselected items) and <ApiLink name="LV_PART_SELECTED" /> (the
+highlighted row in the middle). Attach a named `<style>` with
+`selector="main"` or `selector="selected"` to target a part, or set local
+`style_*` props on the `<lv_roller>` tag (those target MAIN).
+
+`text_line_space` on MAIN is doing double duty: it sets the spacing between
+list rows *and* the height of the selected band, because the indicator always
+sits in the gap between two items. Increase `text_line_space` when you want
+a chunkier highlighted row without computing a separate selected-area height.
+
+## Data binding
+
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+A Roller binds its selected index to a Subject. The link is two-way:
+scrolling to a new option updates the subject, and an application-side
+write into the subject snaps the roller to that index. Only integer
+subjects are supported.
+
+- <ApiLink name="lv_roller_bind_value" display="lv_roller_bind_value(roller, &subject)" />
+
+To show the value live in a label next to the widget, attach a label and call <ApiLink name="lv_label_bind_text" display="lv_label_bind_text(label, &subject, &quot;%d&quot;)" /> — the format string accepts any printf-style specifier (XML: `bind_text` + `bind_text-fmt`).
+
+
+<LvglExample name="lv_example_roller_bind_value" path="widgets/roller/lv_example_roller_bind_value" />
+
+## Fade mask via draw events
+
+XML can style the parts but can't paint a soft gradient over them. To fade
+the top and bottom edges of the roller, attach an
+<ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> handler and blit a pre-rendered alpha mask onto
+the layer the roller is being drawn into:
+
+<LvglExample name="lv_example_roller_fade_mask" path="widgets/roller/lv_example_roller_fade_mask" />
+
+## Events
+
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent sent when a new list item is selected.
+
+<LvglExample name="lv_example_roller_event" path="widgets/roller/lv_example_roller_event" />
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+- `LV_KEY_RIGHT/DOWN` Select next option
+- `LV_KEY_LEFT/UP` Select previous option
+- <ApiLink name="LV_KEY_ENTER" /> Accept the selected option (sends <ApiLink name="LV_EVENT_VALUE_CHANGED" /> event)
+
+Learn more about [Keys](/main-modules/indev/keypad).

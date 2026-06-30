@@ -7,12 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
+#include "lv_uefi_private.h"
 
 #if LV_USE_UEFI
-
-#include "lv_uefi_context.h"
-#include "lv_uefi_private.h"
 
 /*********************
  *      DEFINES

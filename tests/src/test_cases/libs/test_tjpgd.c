@@ -8,6 +8,11 @@
 void setUp(void)
 {
     /* Function run before every test */
+    /* Temporarily remove other JPEG decoders to make sure tjpegd is used */
+    lv_libjpeg_turbo_deinit();
+#if LV_USE_FFMPEG
+    lv_ffmpeg_deinit();
+#endif
 }
 
 void tearDown(void)

@@ -12,12 +12,12 @@ from typing import Optional
 perf_test_options = {
     "OPTIONS_TEST_PERF_32B": {
         "description": "Perf test config ARM (so3) Emulated - 32 bit",
-        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b:main",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b@sha256:8d977ad76d3893bae23e9bfda3217390afe24ba448852edd7579fb8e5fa38a23",
         "config": "lv_test_perf_conf.h",
     },
     "OPTIONS_TEST_PERF_64B": {
         "description": "Perf test config ARM (so3) Emulated - 64 bit",
-        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b:main",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b@sha256:1d3674adb634be728d79ffeff37e55183d3d9d228cd536266fa5db444ee0ce77",
         "config": "lv_test_perf_conf.h",
     },
 }
@@ -26,10 +26,10 @@ lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 def main() -> bool:
-    epilog = """This program runs LVGL perfomance tests
-    In order to provide timing consitency between host computers,
-    these runs are run in an ARM emulated environnement inside QEMU.
-    For the runtime environnement, SO3 is used which is a lightweight, ARM-based 
+    epilog = """This program runs LVGL performance tests
+    In order to provide timing consistency between host computers,
+    these runs are run in an ARM emulated environment inside QEMU.
+    For the runtime environment, SO3 is used which is a lightweight, ARM-based 
     operating system.
     Right now, this script requires a host linux computer as we depend on
     `losetup` which is used to set up and control loop devices.
@@ -499,16 +499,18 @@ def run_tests(
     def volume(src, dst):
         return ["-v", f"{src}:{dst}"]
 
+    # The Infrabase images nest the repo at /so3, so the user space lives at
+    # /so3/so3/usr (kernel at /so3/so3/so3). All mount targets use that path.
     def so3_usr_src(path):
-        return f"/so3/usr/src/{path}"
+        return f"/so3/so3/usr/src/{path}"
 
     def so3_usr_lib(path):
-        return f"/so3/usr/lib/{path}"
+        return f"/so3/so3/usr/lib/{path}"
 
     def so3_usr_out(path):
-        return f"/so3/usr/out/{path}"
+        return f"/so3/so3/usr/out/{path}"
 
-    so3_usr_build = f"/so3/usr/build"
+    so3_usr_build = f"/so3/so3/usr/build"
     persistence_dir = f"/persistence"
     container_name = get_container_name(options_name)
     build_dir = get_build_dir(options_name)
@@ -520,6 +522,7 @@ def run_tests(
     test_src_dir = os.path.join(build_dir, "test_src")
     main_cmakelists = os.path.join(build_dir, "CMakeLists.txt")
     lvgl_src_dir = os.path.join(lvgl_test_dir, "..", "src")
+    lvgl_include_dir = os.path.join(lvgl_test_dir, "..", "include")
     lv_conf_path = os.path.join(lvgl_test_dir, "src", lv_conf_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
     lvgl_private_h_path = os.path.join(lvgl_test_dir, "..", "lvgl_private.h")
@@ -531,13 +534,14 @@ def run_tests(
         # It is also the reason we only support linux for now.
         volume("/dev", "/dev"),
         # Replace container's lvgl source and lv_conf
+        volume(lvgl_include_dir, so3_usr_lib("lvgl/include")),
         volume(lvgl_src_dir, so3_usr_lib("lvgl/src")),
         volume(lv_conf_path, so3_usr_lib("lv_conf.h")),
         volume(lvgl_h_path, so3_usr_lib("lvgl/lvgl.h")),
         volume(lvgl_private_h_path, so3_usr_lib("lvgl/lvgl_private.h")),
         # We also need to add the current "lvgl.h" and mount it in the correct path
         # As there's a `#include "../../lvgl.h"` in the `unity_support.h` file
-        volume(lvgl_h_path, "/so3/usr/lvgl.h"),
+        volume(lvgl_h_path, "/so3/so3/usr/lvgl.h"),
         # Mount the test sources (test cases and runners)
         volume(test_src_dir, so3_usr_src("test_src")),
         # Mount the test framework

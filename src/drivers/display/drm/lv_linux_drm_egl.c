@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_linux_drm.h"
+#include "../../../lvgl_public.h"
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
@@ -14,22 +14,15 @@
 #include <string.h>
 #include <xf86drmMode.h>
 #include <stdlib.h>
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #include <gbm.h>
 #include <drm_fourcc.h>
 #include <xf86drm.h>
 #include <time.h>
 #include <unistd.h>
 #include "lv_linux_drm_egl_private.h"
-#include "../../../draw/lv_draw_buf.h"
 #include "../../opengles/lv_opengles_debug.h"
-
-#include "../../opengles/lv_opengles_driver.h"
-#include "../../opengles/lv_opengles_texture.h"
 #include "../../opengles/lv_opengles_private.h"
-
-#include "../../../stdlib/lv_string.h"
-#include "../../../display/lv_display.h"
 
 /**********************
  *      TYPEDEFS
@@ -134,7 +127,6 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int
     }
 
     lv_display_set_flush_cb(display, flush_cb);
-    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
 
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
@@ -595,11 +587,14 @@ static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t
 
     for(size_t i = 0; i < config_count; ++i) {
         lv_color_format_t config_cf = lv_opengles_egl_color_format_from_egl_config(&configs[i]);
-        if(configs[i].max_width >= target_w &&
-           configs[i].max_height >= target_h &&
-           config_cf == target_cf &&
-           configs[i].surface_type & EGL_WINDOW_BIT
-          ) {
+        const bool resolution_matches = configs[i].max_width >= target_w &&
+                                        configs[i].max_height >= target_h;
+        const bool is_nanovg_compatible = (configs[i].renderable_type & EGL_OPENGL_ES2_BIT) != 0 &&
+                                          configs[i].stencil == 8 && configs[i].samples == 4;
+        const bool is_window = (configs[i].surface_type & EGL_WINDOW_BIT) != 0;
+        const bool is_compatible_with_draw_unit = is_nanovg_compatible || !LV_USE_DRAW_NANOVG;
+
+        if(is_window && resolution_matches && config_cf == target_cf && is_compatible_with_draw_unit) {
             LV_LOG_TRACE("Choosing config %zu", i);
             return i;
         }
@@ -645,8 +640,17 @@ static drmModeModeInfo * drm_get_mode(lv_drm_ctx_t * ctx)
 {
     LV_ASSERT_NULL(ctx->drm_connector);
     if(ctx->mode_select_cb) {
-        size_t mode_index = ctx->mode_select_cb(ctx->display, (lv_linux_drm_mode_t *)ctx->drm_connector->modes,
-                                                (size_t)ctx->drm_connector->count_modes);
+        lv_linux_drm_mode_t * modes = lv_malloc(sizeof(lv_linux_drm_mode_t) * ctx->drm_connector->count_modes);
+        if(!modes) {
+            LV_LOG_WARN("Failed to allocate memory for drm modes");
+            return NULL;
+        }
+        for(int i = 0; i < ctx->drm_connector->count_modes; i++) {
+            modes[i].mode_info = &ctx->drm_connector->modes[i];
+        }
+        size_t mode_index = ctx->mode_select_cb(ctx->display, modes, (size_t)ctx->drm_connector->count_modes);
+        lv_free(modes);
+
         if(mode_index >= (size_t)ctx->drm_connector->count_modes) {
             LV_LOG_ERROR("Failed to select drm mode. User select callback return an invalid mode index");
             return NULL;

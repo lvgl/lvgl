@@ -1,8 +1,3 @@
-#include "lv_indev_private.h"
-#include "../misc/lv_event_private.h"
-#include "../misc/lv_area_private.h"
-#include "../misc/lv_anim_private.h"
-#include "../core/lv_obj_draw_private.h"
 /**
  * @file lv_indev.c
  *
@@ -11,19 +6,18 @@
 /*********************
  *      INCLUDES
  ********************/
+
+#include "lv_indev_private.h"
+#include "../misc/lv_event_private.h"
+#include "../misc/lv_area_private.h"
+#include "../misc/lv_anim_private.h"
+#include "../core/lv_obj_draw_private.h"
 #include "lv_indev_scroll.h"
-#include "lv_indev_gesture.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_obj_private.h"
-#include "../core/lv_group.h"
-#include "../core/lv_refr.h"
 
-#include "../tick/lv_tick.h"
 #include "../misc/lv_timer_private.h"
-#include "../misc/lv_math.h"
-#include "../misc/lv_profiler.h"
-#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -187,7 +181,7 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
         return lv_ll_get_next(indev_ll_head, indev);
 }
 
-void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
+static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_PROFILER_INDEV_BEGIN;
     lv_memzero(data, sizeof(lv_indev_data_t));
@@ -199,12 +193,8 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
         data->point.y = indev->pointer.last_raw_point.y;
     }
     /*Similarly set at least the last key in case of the user doesn't set it on release*/
-    else if(indev->type == LV_INDEV_TYPE_KEYPAD) {
+    else if(indev->type == LV_INDEV_TYPE_KEYPAD || indev->type == LV_INDEV_TYPE_ENCODER) {
         data->key = indev->keypad.last_key;
-    }
-    /*For compatibility assume that used button was enter (encoder push)*/
-    else if(indev->type == LV_INDEV_TYPE_ENCODER) {
-        data->key = LV_KEY_ENTER;
     }
 
     if(indev->read_cb) {
@@ -651,11 +641,12 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     else return NULL;
 }
 
-void lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+lv_event_dsc_t * lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter,
+                                       void * user_data)
 {
     LV_ASSERT_NULL(indev);
 
-    lv_event_add(&indev->event_list, event_cb, filter, user_data);
+    return lv_event_add(&indev->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_indev_get_event_count(lv_indev_t * indev)
@@ -850,7 +841,18 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     uint32_t prev_key = i->keypad.last_key;
     i->keypad.last_key = data->key;
 
-    lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL);
+    /*Save the previous state so we can detect state changes below and also set the last state now
+     *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
+     *for the next time*/
+    lv_indev_state_t prev_state = i->keypad.last_state;
+    i->keypad.last_state = data->state;
+
+
+    if(prev_key != data->key ||  prev_state != data->state) {
+        if(lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL) == LV_RESULT_INVALID) {
+            return;
+        }
+    }
 
     lv_group_t * g = i->group;
 
@@ -863,12 +865,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
 
     const bool is_enabled = (g == NULL) || !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-
-    /*Save the previous state so we can detect state changes below and also set the last state now
-     *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
-     *for the next time*/
-    uint32_t prev_state             = i->keypad.last_state;
-    i->keypad.last_state = data->state;
 
     /*Key press happened*/
     if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_RELEASED) {
@@ -1497,15 +1493,20 @@ static void indev_proc_release(lv_indev_t * indev)
         lv_obj_t ** last = &indev->pointer.last_hovered;
         lv_obj_t * hovered = pointer_search_obj(lv_display_get_default(), &indev->pointer.act_point);
         if(*last != hovered) {
-            lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev);
-            if(indev_reset_check(indev)) return;
-            lv_indev_send_event(indev, LV_EVENT_HOVER_OVER, hovered);
-            if(indev_reset_check(indev)) return;
 
-            lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev);
-            if(indev_reset_check(indev)) return;
-            lv_indev_send_event(indev, LV_EVENT_HOVER_LEAVE, *last);
-            if(indev_reset_check(indev)) return;
+            if(hovered) {
+                lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev);
+                if(indev_reset_check(indev)) return;
+                lv_indev_send_event(indev, LV_EVENT_HOVER_OVER, hovered);
+                if(indev_reset_check(indev)) return;
+            }
+
+            if(*last) {
+                lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev);
+                if(indev_reset_check(indev)) return;
+                lv_indev_send_event(indev, LV_EVENT_HOVER_LEAVE, *last);
+                if(indev_reset_check(indev)) return;
+            }
             *last = hovered;
         }
     }
@@ -1730,6 +1731,16 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->pointer.gesture_sum.x     = 0;
         indev->pointer.gesture_sum.y     = 0;
         indev->reset_query                     = 0;
+        if(indev->type == LV_INDEV_TYPE_ENCODER) {
+            /* Before v9.6, LV_INDEV_TYPE_ENCODER set LV_KEY_ENTER as the last key on EVERY frame.
+             * This required users to store and re-feed the last key to LVGL each frame.
+             * From v9.6 onward, we no longer reset the key every frame to simplify the user's
+             * implementation. However, this can cause compatibility issues for users who never
+             * explicitly set the key, as it was previously always defaulting to LV_KEY_ENTER.
+             * To maintain compatibility, we initialize the key to LV_KEY_ENTER here.
+             */
+            indev->keypad.last_key = LV_KEY_ENTER;
+        }
         indev->stop_processing_query           = 0;
         indev_obj_act                               = NULL;
     }
@@ -1759,8 +1770,10 @@ static void indev_click_focus(lv_indev_t * indev)
         /*The object are not in group*/
         else {
             if(indev->pointer.last_pressed != indev_obj_act) {
-                lv_obj_send_event(indev->pointer.last_pressed, LV_EVENT_DEFOCUSED, indev_act);
-                if(indev_reset_check(indev)) return;
+                if(indev->pointer.last_pressed) {
+                    lv_obj_send_event(indev->pointer.last_pressed, LV_EVENT_DEFOCUSED, indev_act);
+                    if(indev_reset_check(indev)) return;
+                }
 
                 lv_obj_send_event(indev_obj_act, LV_EVENT_FOCUSED, indev_act);
                 if(indev_reset_check(indev)) return;
@@ -1807,7 +1820,7 @@ static void indev_click_focus(lv_indev_t * indev)
 * Handle the gesture of indev_proc_p->pointer.act_obj
 * @param indev pointer to an input device state
 */
-void indev_gesture(lv_indev_t * indev)
+static void indev_gesture(lv_indev_t * indev)
 {
     if(indev->pointer.scroll_obj) return;
     if(indev->pointer.gesture_sent) return;
@@ -1944,8 +1957,10 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
         }
     }
 
-    lv_obj_send_event(indev_obj_act, code, param);
-    if(indev_reset_check(indev)) return LV_RESULT_INVALID;
+    if(indev_obj_act) {
+        lv_obj_send_event(indev_obj_act, code, param);
+        if(indev_reset_check(indev)) return LV_RESULT_INVALID;
+    }
 
     return LV_RESULT_OK;
 }

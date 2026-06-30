@@ -21,10 +21,9 @@
     #endif
 #endif
 
-#include "lv_wayland_private.h"
-#include <stddef.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include LV_STDDEF_INCLUDE
+#include LV_STDINT_INCLUDE
+#include LV_STDBOOL_INCLUDE
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
@@ -158,12 +157,6 @@ void lv_wayland_deinit(void)
         return;
     }
 
-    lv_wl_window_t * window = NULL;
-
-    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
-        lv_wayland_window_delete(window);
-    }
-
     lv_wayland_xdg_deinit();
 
     if(is_wayland_initialized) {
@@ -178,6 +171,18 @@ void lv_wayland_deinit(void)
     if(lv_wl_ctx.wl_registry) {
         wl_registry_destroy(lv_wl_ctx.wl_registry);
         lv_wl_ctx.wl_registry = NULL;
+    }
+
+    if(lv_wl_ctx.wl_shm) {
+        wl_shm_destroy(lv_wl_ctx.wl_shm);
+        lv_wl_ctx.wl_shm = NULL;
+    }
+
+    for(uint8_t i = 0; i < lv_wl_ctx.wl_output_count; ++i) {
+        if(lv_wl_ctx.physical_outputs[i].wl_output) {
+            wl_output_destroy(lv_wl_ctx.physical_outputs[i].wl_output);
+            lv_wl_ctx.physical_outputs[i].wl_output = NULL;
+        }
     }
 
     if(lv_wl_ctx.wl_compositor) {

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "../../lv_conf_internal.h"
+#include "../../lvgl_public.h"
 #if LV_USE_THORVG_INTERNAL
 
 #ifndef _TVG_MATH_H_

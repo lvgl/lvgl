@@ -4,7 +4,7 @@
  * @file lv_animimage_properties.c
  */
 
-#include "../animimage/lv_animimage.h"
+#include "../../lvgl_public.h"
 
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 

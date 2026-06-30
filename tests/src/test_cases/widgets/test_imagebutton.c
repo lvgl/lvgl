@@ -17,7 +17,7 @@ void tearDown(void)
 void test_imagebutton_basic_appearance(void)
 {
     /**
-     * from lv_example_imagebutton_1
+     * from lv_example_imagebutton_transition
     */
 
     LV_IMAGE_DECLARE(imagebutton_left);

@@ -9,7 +9,6 @@
 #include "../../../misc/lv_area_private.h"
 #include "lv_draw_sw_blend_private.h"
 #include "../../lv_draw_private.h"
-#include "../lv_draw_sw.h"
 #if LV_DRAW_SW_SUPPORT_A8
     #include "lv_draw_sw_blend_to_a8.h"
 #endif

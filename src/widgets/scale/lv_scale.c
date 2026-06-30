@@ -6,17 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_scale_private.h"
-#include "../../core/lv_obj_private.h"
-#include "../../core/lv_obj_class_private.h"
-#if LV_USE_SCALE != 0
+#include "../../lvgl_public.h"
 
-#include "../../core/lv_group.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
+#if LV_USE_SCALE
+
+#include "lv_scale_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../core/lv_observer_private.h"
-#include "../../draw/lv_draw_arc.h"
+#include "../../core/lv_obj_class_private.h"
 
 /*********************
  *      DEFINES
@@ -32,6 +29,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
+#if LV_USE_OBSERVER
+typedef struct {
+    lv_obj_t * needle_line;
+    int32_t needle_length;
+} bind_element_needle_t;
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -77,6 +80,8 @@ static void needle_deleted_cb(lv_event_t * e);
 #if LV_USE_OBSERVER
     static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+    static void scale_line_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+    static void scale_image_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif /*LV_USE_OBSERVER*/
 
 /**********************
@@ -169,7 +174,7 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent)
 
 void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->mode = mode;
@@ -179,7 +184,7 @@ void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode)
 
 void lv_scale_set_total_tick_count(lv_obj_t * obj, uint32_t total_tick_count)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->total_tick_count = total_tick_count;
@@ -189,7 +194,7 @@ void lv_scale_set_total_tick_count(lv_obj_t * obj, uint32_t total_tick_count)
 
 void lv_scale_set_major_tick_every(lv_obj_t * obj, uint32_t major_tick_every)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->major_tick_every = major_tick_every;
@@ -199,7 +204,7 @@ void lv_scale_set_major_tick_every(lv_obj_t * obj, uint32_t major_tick_every)
 
 void lv_scale_set_label_show(lv_obj_t * obj, bool show_label)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->label_enabled = show_label;
@@ -209,7 +214,7 @@ void lv_scale_set_label_show(lv_obj_t * obj, bool show_label)
 
 void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->range_min = min;
@@ -220,7 +225,7 @@ void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 
 void lv_scale_set_min_value(lv_obj_t * obj, int32_t min)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
     if(scale->range_min == min) return;
     scale->range_min = min;
@@ -230,7 +235,7 @@ void lv_scale_set_min_value(lv_obj_t * obj, int32_t min)
 
 void lv_scale_set_max_value(lv_obj_t * obj, int32_t max)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
     if(scale->range_max == max) return;
     scale->range_max = max;
@@ -240,7 +245,7 @@ void lv_scale_set_max_value(lv_obj_t * obj, int32_t max)
 
 void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->angle_range = angle_range;
@@ -250,7 +255,7 @@ void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range)
 
 void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
     int32_t normalized_angle = rotation;
 
@@ -275,7 +280,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     int32_t needle_length_x, needle_length_y;
     lv_point_precise_t * needle_line_points = NULL;
 
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
     if((scale->mode != LV_SCALE_MODE_ROUND_INNER) &&
        (scale->mode != LV_SCALE_MODE_ROUND_OUTER)) {
@@ -353,7 +358,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
 void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value)
 {
     int32_t angle;
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
     if((scale->mode != LV_SCALE_MODE_ROUND_INNER) &&
        (scale->mode != LV_SCALE_MODE_ROUND_OUTER)) {
@@ -376,7 +381,7 @@ void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int3
 
 void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[])
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->txt_src = txt_src;
@@ -393,7 +398,7 @@ void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[])
 
 void lv_scale_set_post_draw(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->post_draw = en;
@@ -403,7 +408,7 @@ void lv_scale_set_post_draw(lv_obj_t * obj, bool en)
 
 void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->draw_ticks_on_top = en;
@@ -413,7 +418,7 @@ void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en)
 
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
 
     lv_scale_t * scale = (lv_scale_t *)obj;
     lv_scale_section_t * section = lv_ll_ins_head(&scale->section_ll);
@@ -434,7 +439,7 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
 
 void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, int32_t min, int32_t max)
 {
-    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_CHECK_OBJ(scale, MY_CLASS, return);
     LV_ASSERT_NULL(section);
 
     lv_scale_set_section_min_value(scale, section, min);
@@ -443,7 +448,7 @@ void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, 
 
 void lv_scale_set_section_min_value(lv_obj_t * scale, lv_scale_section_t * section, int32_t min)
 {
-    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_CHECK_OBJ(scale, MY_CLASS, return);
     LV_ASSERT_NULL(section);
 
     if(section->range_min == min) return;
@@ -453,7 +458,7 @@ void lv_scale_set_section_min_value(lv_obj_t * scale, lv_scale_section_t * secti
 
 void lv_scale_set_section_max_value(lv_obj_t * scale, lv_scale_section_t * section, int32_t max)
 {
-    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_CHECK_OBJ(scale, MY_CLASS, return);
     LV_ASSERT_NULL(section);
 
     if(section->range_max == max) return;
@@ -472,7 +477,7 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32
 
 void lv_scale_set_section_style_main(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style)
 {
-    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_CHECK_OBJ(scale, MY_CLASS, return);
     LV_ASSERT_NULL(section);
 
     section->main_style = style;
@@ -481,7 +486,7 @@ void lv_scale_set_section_style_main(lv_obj_t * scale, lv_scale_section_t * sect
 
 void lv_scale_set_section_style_indicator(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style)
 {
-    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_CHECK_OBJ(scale, MY_CLASS, return);
     LV_ASSERT_NULL(section);
 
     section->indicator_style = style;
@@ -490,7 +495,7 @@ void lv_scale_set_section_style_indicator(lv_obj_t * scale, lv_scale_section_t *
 
 void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style)
 {
-    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_CHECK_OBJ(scale, MY_CLASS, return);
     LV_ASSERT_NULL(section);
 
     section->items_style = style;
@@ -499,7 +504,7 @@ void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * sec
 
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style)
 {
-    LV_LOG_WARN("Deprecated, use lv_scale_set_section_style_main/indicator/items instead");
+    LV_LOG_DEPRECATED("use lv_scale_set_section_style_main/indicator/items instead");
 
     if(NULL == section) return;
 
@@ -580,7 +585,7 @@ int32_t lv_scale_get_range_max_value(lv_obj_t * obj)
 lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_ASSERT_NULL(section);
 
     if(subject->type != LV_SUBJECT_TYPE_INT) {
@@ -596,7 +601,7 @@ lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section
 lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
     LV_ASSERT_NULL(section);
 
     if(subject->type != LV_SUBJECT_TYPE_INT) {
@@ -605,6 +610,55 @@ lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section
     }
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_max_value_observer_cb, obj, section);
+
+    return observer;
+}
+
+lv_observer_t * lv_scale_bind_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                                lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_NULL(needle_line);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    bind_element_needle_t * user_data = lv_zalloc(sizeof(bind_element_needle_t));
+    if(user_data == NULL) {
+        LV_LOG_WARN("Couldn't allocate user_data");
+        LV_ASSERT_MALLOC(user_data);
+        return NULL;
+    }
+
+    user_data->needle_line = needle_line;
+    user_data->needle_length = needle_length;
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_line_needle_value_observer_cb, obj, user_data);
+    if(observer == NULL) {
+        LV_LOG_WARN("Couldn't create observer");
+        lv_free(user_data);
+        return NULL;
+    }
+    observer->auto_free_user_data = 1;
+
+    return observer;
+}
+
+lv_observer_t * lv_scale_bind_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_CHECK_OBJ(obj, MY_CLASS, return NULL);
+    LV_ASSERT_NULL(needle_img);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_image_needle_value_observer_cb, obj, needle_img);
 
     return observer;
 }
@@ -849,6 +903,9 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     else { /* Add label with mapped values */
         lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+        /* LVGL guarantees it will copy the label text if the text is local*/
+        /* TODO: get rid of text_local and this suppression*/
+        /*cppcheck-suppress autoVariables*/
         label_dsc->text = text_buffer;
         label_dsc->text_local = 1;
     }
@@ -960,9 +1017,17 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
 
     const uint32_t total_tick_count = scale->total_tick_count;
 
-    if(total_tick_count <= 1) return;
     /* Not supported in round modes */
     if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) return;
+
+    /* Reset compensation when scale has 1 or less ticks on vertical and horizontal scales */
+    if(total_tick_count <= 1) {
+        /* Store initial tick width to be used in the main line drawing */
+        scale_store_main_line_tick_width_compensation(obj, 0U, false, 0U, 0U);
+
+        /* Store last tick width to be used in the main line drawing */
+        scale_store_main_line_tick_width_compensation(obj, total_tick_count, false, 0U, 0U);
+    }
 
     /* Major tick style */
     lv_draw_line_dsc_t major_tick_dsc;
@@ -1017,8 +1082,6 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(event);
-
-    if(scale->total_tick_count <= 1) return;
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
@@ -1885,6 +1948,19 @@ static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_sub
 {
     lv_scale_section_t * section = observer->user_data;
     lv_scale_set_section_max_value(observer->target, section, subject->value.num);
+}
+
+static void scale_line_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    bind_element_needle_t * bind_element = observer->user_data;
+    lv_scale_set_line_needle_value(observer->target, bind_element->needle_line, bind_element->needle_length,
+                                   subject->value.num);
+}
+
+static void scale_image_needle_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * needle_img = observer->user_data;
+    lv_scale_set_image_needle_value(observer->target, needle_img, subject->value.num);
 }
 
 #endif /*LV_USE_OBSERVER*/

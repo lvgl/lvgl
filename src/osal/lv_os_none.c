@@ -7,11 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_conf_internal.h"
+#include "../lvgl_public.h"
 #if LV_USE_OS == LV_OS_NONE
 
 #include "lv_os_private.h"
-#include "../misc/lv_timer.h"
 
 /*********************
  *      DEFINES

@@ -1,0 +1,87 @@
+---
+title: "Checkbox (lv_checkbox)"
+description: "A tick box with a label. Clicking it toggles the tick on or off."
+---
+
+## Overview
+
+A Checkbox is a tick box with a label next to it. Clicking the widget
+toggles the tick on or off.
+
+## Text
+
+The text can be modified with
+<ApiLink name="lv_checkbox_set_text" display="lv_checkbox_set_text(cb, &quot;New text&quot;)" /> and will be
+dynamically allocated.
+
+To set static text, use <ApiLink name="lv_checkbox_set_text_static" display="lv_checkbox_set_text_static(cb, txt)" />. This
+way, only a pointer to `txt` will be stored. The provided text buffer must remain
+available for the lifetime of the Checkbox.
+
+<LvglExample name="lv_example_checkbox_text" path="widgets/checkbox/lv_example_checkbox_text" />
+
+## Check, uncheck, disable
+
+Toggle programmatically with the generic state helpers:
+
+```c
+lv_obj_add_state(cb, LV_STATE_CHECKED);
+lv_obj_remove_state(cb, LV_STATE_CHECKED);
+lv_obj_add_state(cb, LV_STATE_DISABLED);
+```
+
+Read it back with <ApiLink name="lv_obj_has_state" display="lv_obj_has_state(cb, LV_STATE_CHECKED)" />.
+
+<LvglExample name="lv_example_checkbox_states" path="widgets/checkbox/lv_example_checkbox_states" />
+
+## Styling
+
+Two parts: <ApiLink name="LV_PART_MAIN" /> (the label/text area; `pad_column` controls
+the gap to the tickbox) and <ApiLink name="LV_PART_INDICATOR" /> (the tickbox itself —
+its default size matches the font height; padding scales it).
+
+<LvglExample name="lv_example_checkbox_styling" path="widgets/checkbox/lv_example_checkbox_styling" />
+
+The headline pattern is state-aware styling on the indicator: one style
+attached with `selector="indicator"` for the default look, a second one
+with `selector="indicator|checked"` to swap colours when the box is
+ticked.
+
+## Data binding
+
+Data bindings connect a widget property to a piece of global data — a
+[Subject](/main-modules/observer/observer). When the subject's value
+changes, every widget bound to it updates automatically; and an
+interactive widget can write back into the subject so other subscribers
+see the new value.
+
+A Checkbox's checked state is exposed via the generic <ApiLink name="lv_obj_bind_checked" />.
+The link is two-way: flipping the box writes 0/1 into the int subject, and
+assigning the subject toggles the box. Pair it with `bind_flag_if_*` /
+`bind_state_if_*` on other widgets to react to that flag without writing
+any event callback.
+
+- <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked(obj, &subject)" />
+
+<LvglExample name="lv_example_checkbox_bind_checked" path="widgets/checkbox/lv_example_checkbox_bind_checked" />
+
+## Events
+
+- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when Checkbox is toggled.
+
+<LvglExample name="lv_example_checkbox_event" path="widgets/checkbox/lv_example_checkbox_event" />
+
+Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
+
+## Keys
+
+The following *Keys* are processed by Checkbox:
+
+- `LV_KEY_RIGHT/UP` Go to CHECKED state if Checkbox is enabled
+- `LV_KEY_LEFT/DOWN` Go to non-CHECKED state if Checkbox is enabled
+- <ApiLink name="LV_KEY_ENTER" /> Clicks the Checkbox and toggles its value.
+
+Note that, as usual, the state of <ApiLink name="LV_KEY_ENTER" /> is translated to
+`LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
+
+Learn more about [Keys](/main-modules/indev/keypad).

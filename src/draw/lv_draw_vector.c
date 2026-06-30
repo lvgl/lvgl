@@ -16,9 +16,6 @@
     #error "LV_USE_VECTOR_GRAPHIC requires (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE or (LV_USE_NEMA_GFX and LV_USE_NEMA_VG) or LV_USE_DRAW_NANOVG"
 #endif
 
-#include "../misc/lv_ll.h"
-#include "../misc/lv_types.h"
-#include "../stdlib/lv_string.h"
 #include <math.h>
 #include <float.h>
 
@@ -389,8 +386,6 @@ void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area
 
 void lv_vector_path_append_rectangle(lv_vector_path_t * path, float x, float y, float w, float h, float rx, float ry)
 {
-    if(w <= 0.0f || h <= 0.0f) return;
-
     float hw = w * 0.5f;
     float hh = h * 0.5f;
 

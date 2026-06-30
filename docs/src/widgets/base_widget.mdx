@@ -1,0 +1,71 @@
+---
+title: "Base Widget (lv_obj)"
+description: "The root widget that every other widget inherits from. Provides position, size, layout, styles, events, and more."
+---
+
+The most fundamental of all widgets is the Base Widget, on which all other widgets
+are based. From an object-oriented perspective, think of the Base Widget as the
+widget class from which all other widgets inherit.
+
+By this mechanism, all widgets carry the features of the Base Widget. Therefore, the
+functions and functionalities of the Base Widget can be used with other widgets as
+well. For example: <ApiLink name="lv_obj_set_width" display="lv_obj_set_width(slider, 100)" />.
+
+Although it's just a simple rectangle, the Base Widget is the most powerful widget,
+as it supports all the features that other widgets can use.
+
+The Base Widget can have:
+
+- [Children](/common-widget-features/tree)
+- [Position and Size](/common-widget-features/coordinates)
+- [Layouts](/common-widget-features/layouts)
+- [Styles](/common-widget-features/styles)
+- [Events](/common-widget-features/events)
+- [Data bindings](/main-modules/observer)
+- [Flags](/common-widget-features/flags)
+- [Parts and States](/common-widget-features/parts_and_states)
+- And many more
+
+A Slider widget, for example, uses these features to realize slider-like behavior,
+but it’s all based on the same style, event, layout, and other concepts supported by
+the Base Widget.
+
+All these common and versatile features are introduced in the
+[Common Widget Features](/common-widget-features) chapter.
+
+In HTML terms, think of it as a `<div>`, a very versatile building block that,
+with some CSS and JS, can become almost anything.
+
+## Data binding
+
+Every widget inherits the Base Widget's binding helpers, which let a Subject
+drive styles, flags, or states declaratively. The most common one is
+`bind_style`: attach a named style to a widget only while a Subject equals a
+reference value — perfect for theme switches and "mode" toggles. See the
+[Observer](/main-modules/observer/observer) page for an introduction to the
+underlying mechanism.
+
+- <ApiLink name="lv_obj_bind_style" display="lv_obj_bind_style(obj, &style, selector, &subject, ref_value)" />
+- <ApiLink name="lv_obj_bind_flag_if_eq" display="lv_obj_bind_flag_if_eq(obj, &subject, flag, ref_value)" /> and the matching `_not_eq`/`_gt`/`_ge`/`_lt`/`_le` variants
+- <ApiLink name="lv_obj_bind_state_if_eq" display="lv_obj_bind_state_if_eq(obj, &subject, state, ref_value)" /> and the matching `_not_eq`/`_gt`/`_ge`/`_lt`/`_le` variants
+
+<LvglExample name="lv_example_obj_bind_style" path="widgets/obj/lv_example_obj_bind_style" />
+
+## Examples
+
+### Make an object draggable
+
+Interactive drag-to-move is driven from an `LV_EVENT_PRESSING` callback,
+which reads the input device's motion vector and feeds it back through
+`lv_obj_set_pos`. There's no XML attribute for "drag with the pointer", so
+this lives in C.
+
+<LvglExample name="lv_example_obj_draggable" path="widgets/obj/lv_example_obj_draggable" />
+
+### Transform an object with a 3x3 matrix
+
+A timer ticks the rotation and scale of the object via `lv_obj_set_transform`.
+This needs `LV_DRAW_TRANSFORM_USE_MATRIX` and an animation loop, neither of
+which is reachable from XML attributes — the C example shows the full setup.
+
+<LvglExample name="lv_example_obj_transform" path="widgets/obj/lv_example_obj_transform" />

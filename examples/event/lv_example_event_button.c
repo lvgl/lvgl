@@ -25,7 +25,14 @@ static void event_cb(lv_event_t * e)
 }
 
 /**
- * Handle multiple events
+ * @title Handle multiple button events
+ * @brief Report the most recent button event on a second label.
+ *
+ * A centered button with a `Click me!` label is paired with an info label
+ * on the active screen. A single callback subscribed with `LV_EVENT_ALL`
+ * switches on `lv_event_get_code` and writes the name of the latest event
+ * (`LV_EVENT_PRESSED`, `LV_EVENT_CLICKED`, `LV_EVENT_LONG_PRESSED`,
+ * `LV_EVENT_LONG_PRESSED_REPEAT`) into the info label.
  */
 void lv_example_event_button(void)
 {

@@ -12,11 +12,6 @@
 #if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
 
 #include "lv_draw_sw_blend_private.h"
-#include "../../../misc/lv_math.h"
-#include "../../../display/lv_display.h"
-#include "../../../core/lv_refr.h"
-#include "../../../misc/lv_color.h"
-#include "../../../stdlib/lv_string.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     #include "neon/lv_blend_neon.h"
@@ -446,7 +441,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_rgb565_swapped(lv_draw_sw_b
             break;
 #endif
         default:
-            LV_LOG_WARN("Not supported source color format");
+            LV_LOG_WARN("Not supported source color format 0x%02X", dsc->src_color_format);
             break;
     }
 }
@@ -1371,7 +1366,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_RGB565_SWAPPED(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
-                        /*For the trivial case use the premultipled image as it is.
+                        /*For the trivial case use the premultiplied image as it is.
                          *For the other cases unpremultiply as another alpha also needs to be applied.*/
                         dest_buf_u16[dest_x] = lv_color_swap_16(lv_color_24_16_mix_premult(&src_buf_u8[src_x],
                                                                                            lv_color_swap_16(dest_buf_u16[dest_x]), src_buf_u8[src_x + 3]));

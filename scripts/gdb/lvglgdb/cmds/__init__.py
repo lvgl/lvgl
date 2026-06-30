@@ -1,9 +1,19 @@
 import gdb
 
-from .core import DumpObj
+from .core import DumpObj, DumpIndev, DumpGroup, InfoObjClass, InfoSubject
 from .display import DumpDisplayBuf
-from .draw import InfoDrawUnit
-from .misc import InfoStyle, DumpCache
+from .draw import InfoDrawUnit, DumpDrawTask
+from .misc import (
+    InfoStyle,
+    DumpCache,
+    CheckPrefix,
+    CheckCache,
+    DumpAnim,
+    DumpTimer,
+    DumpImageDecoder,
+    DumpFsDrv,
+)
+from .dashboard import DumpDashboard
 from .debugger import Debugger
 from .drivers import Lvglobal
 
@@ -23,10 +33,24 @@ Debugger()
 DumpObj()
 DumpDisplayBuf()
 DumpCache()
+CheckPrefix()
+CheckCache()
+DumpAnim()
+DumpTimer()
+DumpImageDecoder()
+DumpFsDrv()
+DumpIndev()
+DumpGroup()
+DumpDrawTask()
 
 # Infos
 InfoStyle()
 InfoDrawUnit()
+InfoObjClass()
+InfoSubject()
 
 # Drivers
 Lvglobal()
+
+# Dashboard
+DumpDashboard()

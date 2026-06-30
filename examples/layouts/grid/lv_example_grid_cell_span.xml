@@ -1,0 +1,103 @@
+<!--
+ @title Grid cell span and alignment
+ @brief Position cells inside their track and span multiple tracks.
+
+ The first row uses different style_grid_cell_x_align / y_align values to show start,
+ center, and end placement within a cell. Two further items use column_span and row_span
+ to occupy multiple tracks at once, demonstrating how a single child can cover several
+ cells of the grid.
+-->
+<screen>
+	<styles>
+		<!-- Shared card style for compact text blocks -->
+		<style name="style_card" bg_color="0xf6f6f6" bg_opa="100%" pad_all="6" radius="6" />
+	</styles>
+
+	<view
+		flex_flow="column"
+		style_flex_main_place="center"
+		style_flex_cross_place="center"
+		style_flex_track_place="center"
+	>
+		<!-- 💡 Adjust style_grid_cell_*_span and *_align values to test spanning and per-cell alignment behaviors. -->
+		<!-- Main grid container for alignment and span cases -->
+		<lv_obj
+			name="container_1"
+			style_grid_column_dsc_array="90 90 90"
+			style_grid_row_dsc_array="60 60 60"
+			style_layout="grid"
+			width="90%"
+			height="content"
+		>
+			<!-- Cell aligned to start/start -->
+			<lv_obj
+				name="container_2"
+				style_grid_cell_x_align="start"
+				style_grid_cell_column_pos="0"
+				style_grid_cell_y_align="start"
+				style_grid_cell_row_pos="0"
+				width="content"
+				height="content"
+			>
+				<style name="style_card" />
+				<lv_label name="label_1" text="start/start" />
+			</lv_obj>
+
+			<!-- Cell aligned to center/center -->
+			<lv_obj
+				name="container_3"
+				style_grid_cell_x_align="center"
+				style_grid_cell_column_pos="1"
+				style_grid_cell_y_align="center"
+				style_grid_cell_row_pos="0"
+				width="content"
+				height="content"
+			>
+				<style name="style_card" />
+				<lv_label name="label_2" text="center" />
+			</lv_obj>
+
+			<!-- Cell aligned to end/end -->
+			<lv_obj
+				name="container_4"
+				style_grid_cell_x_align="end"
+				style_grid_cell_column_pos="2"
+				style_grid_cell_y_align="end"
+				style_grid_cell_row_pos="0"
+				width="content"
+				height="content"
+			>
+				<style name="style_card" />
+				<lv_label name="label_3" text="end/end" />
+			</lv_obj>
+
+			<!-- Item spanning two columns -->
+			<lv_obj
+				name="container_5"
+				style_grid_cell_x_align="stretch"
+				style_grid_cell_column_pos="1"
+				style_grid_cell_column_span="2"
+				style_grid_cell_y_align="stretch"
+				style_grid_cell_row_pos="1"
+				style_bg_color="0xd8ecff"
+				style_bg_opa="100%"
+			>
+				<lv_label name="label_4" text="span 2 columns" align="center" />
+			</lv_obj>
+
+			<!-- Item spanning two rows -->
+			<lv_obj
+				name="container_6"
+				style_grid_cell_x_align="stretch"
+				style_grid_cell_column_pos="0"
+				style_grid_cell_y_align="stretch"
+				style_grid_cell_row_pos="1"
+				style_grid_cell_row_span="2"
+				style_bg_color="0xffe8cc"
+				style_bg_opa="100%"
+			>
+				<lv_label name="label_5" text="span&#10;2 rows" align="center" />
+			</lv_obj>
+		</lv_obj>
+	</view>
+</screen>

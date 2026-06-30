@@ -12,12 +12,7 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_math.h"
-#include "../../stdlib/lv_mem.h"
 #include "../../misc/lv_area_private.h"
-#include "../../misc/lv_color.h"
-#include "../../stdlib/lv_string.h"
-#include "../lv_draw_triangle_private.h"
 #include "lv_draw_sw_grad.h"
 
 /*********************
@@ -135,6 +130,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
     blend_dsc.mask_area = &blend_area;
     blend_dsc.mask_stride = 0;
     blend_dsc.blend_mode = LV_BLEND_MODE_NORMAL;
+    blend_dsc.src_stride = 0;
     blend_dsc.src_buf = NULL;
 
     lv_grad_dir_t grad_dir = dsc->grad.dir;
