@@ -5015,8 +5015,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_ROTATE_PXP requires LV_USE_DRAW_PXP (Kconfig depends on)"
 #endif
 
-#if LV_USE_PXP_ASSERT && !(LV_USE_DRAW_PXP && LV_USE_DRAW_PXP)
-    #error "LV_USE_PXP_ASSERT requires LV_USE_DRAW_PXP && LV_USE_DRAW_PXP (Kconfig depends on)"
+#if LV_USE_PXP_ASSERT && !(LV_USE_DRAW_PXP)
+    #error "LV_USE_PXP_ASSERT requires LV_USE_DRAW_PXP (Kconfig depends on)"
 #endif
 
 #if LV_USE_PPA_IMG && !(LV_USE_PPA)
