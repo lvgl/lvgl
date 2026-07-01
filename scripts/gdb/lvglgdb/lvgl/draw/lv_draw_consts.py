@@ -44,5 +44,10 @@ DRAW_UNIT_TYPE_NAMES = {
     "SDL": "lv_draw_sdl_unit_t",
     "SW": "lv_draw_sw_unit_t",
     "SW_ARM2D": "lv_draw_sw_unit_t",
+    "SW_CUSTOM": "lv_draw_sw_unit_t",
+    "SW_HELIUM": "lv_draw_sw_unit_t",
+    "SW_NEON": "lv_draw_sw_unit_t",
+    "SW_RISCV_V": "lv_draw_sw_unit_t",
+    "SW_SVE2": "lv_draw_sw_unit_t",
     "VG_LITE": "lv_draw_vg_lite_unit_t",
 }
