@@ -27,7 +27,7 @@ from .parse import classify, enum_backed_choices
 
 
 class Emitter:
-    """Renders one target (``"template"``, ``"internal") of the tree."""
+    """Renders one target (``"template"``, ``"internal"``) of the tree."""
 
     def __init__(self, kconf: Kconfig, target: str, entries):
         assert target in ("internal", "template")
