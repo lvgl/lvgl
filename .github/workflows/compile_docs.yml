@@ -105,16 +105,16 @@ jobs:
         run: |
             npx doxymark \
             --input docs/doxygen/xml \
-            --output docs/src \
-            --index docs/src/api-index.json \
+            --output docs/src/api \
+            --index docs/src/api/api-index.json \
             --preset fumadocs \
             --auto-group \
-            --root api-public=./include/lvgl \
-            --root api-private=./src \
-            --source-url-for api=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/include/lvgl \
-            --source-url-for api-private=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src \
-            --root-title 'api-public=Public API' \
-            --root-title 'api-private=Private API' \
+            --root public=./include/lvgl \
+            --root private=./src \
+            --source-url-for public=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/include/lvgl \
+            --source-url-for private=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src \
+            --root-title 'public=Public API' \
+            --root-title 'private=Private API' \
             --drop-empty-files
             rm -rf docs/doxygen
 

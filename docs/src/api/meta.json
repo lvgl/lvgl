@@ -1,7 +1,7 @@
 {
   "pages": [
-    "api-public",
-    "api-private",
+    "public",
+    "private",
     "deprecated"
   ]
 }
