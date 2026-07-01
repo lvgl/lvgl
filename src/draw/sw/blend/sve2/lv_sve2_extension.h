@@ -1052,6 +1052,9 @@ static inline svuint16_t lv_sve_chn_blend_with_mask_and_opacity(svuint16_t vSour
                                 svmul_n_u16_m(svptrue_b16(), vMask, hwOpacity),
                                 8));
 
+    return lv_sve_chn_blend_with_mask(vSource, vTarget, vMask);
+
+#if 0
     // vTarget = vSource * vMask + vTarget * (256 - vMask);
     svuint16_t vTemp0 = svmul_u16_m(svptrue_b16(), vSource, vMask);
     svuint16_t vTemp1 = svmul_u16_m(svptrue_b16(),
@@ -1062,6 +1065,27 @@ static inline svuint16_t lv_sve_chn_blend_with_mask_and_opacity(svuint16_t vSour
     vTarget = svadd_u16_m(svptrue_b16(), vTemp0, vTemp1);
 
     return svlsr_n_u16_m(svptrue_b16(), vTarget, 8); // vTarget >> 8;
+#endif
+}
+
+/*! \note the Element range of vMask is [0, 0xFF]
+ *  \note the hwOpacity range [0, 0x100]
+ */
+static inline svuint16_t lv_sve_chn_blend_with_mask_and_opacity_fast(
+                                                                 svuint16_t vSource,
+                                                                 svuint16_t vTarget,
+                                                                 svuint16_t vMask,
+                                                                 uint16_t hwOpacity)
+{
+    vMask = svsel(svcmpeq_n_u16(svptrue_b16(), vMask, 255),
+                  svdup_u16(hwOpacity),
+                  //(vMask * hwOpacity) >> 8,
+                  svlsr_n_u16_m(svptrue_b16(),
+                                svmul_n_u16_m(svptrue_b16(), vMask, hwOpacity),
+                                8));
+
+    return lv_sve_chn_blend_with_mask_fast(vSource, vTarget, vMask);
+
 }
 
 /*! \note the Element range of vMask0/1 is [0, 0xFF]
