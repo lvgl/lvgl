@@ -68,23 +68,8 @@ MEMBER_IS_TOKEN: set[str] = {
     # VG-Lite options dispatch header compares against these tokens
 }
 
-# Symbols that must never appear in the template: build-system-only switches,
-# internal raw counts mirrored by a public alias, and members handled specially
-# in the internal footer (Wayland backend).  Version numbers go in the file
-# header, not the body.
-IGNORE_SYMBOLS: set[str] = {
-    "LVGL_VERSION_MAJOR",
-    "LVGL_VERSION_MINOR",
-    "LVGL_VERSION_PATCH",
-    "LV_CONF_SKIP",
-    "LV_USE_THORVG_EXTERNAL",  # derived (= LV_USE_THORVG && !INTERNAL) in the internal footer
-    "LV_USE_LZ4_EXTERNAL",  # derived (= LV_USE_LZ4 || !INTERNAL) in the internal footer
-    # Deprecated SDL buffer-count choice: mapped to LV_SDL_BUF_COUNT by the
-    # lv_conf_kconfig.h shim, so kept out of the generated headers.
-    "LV_SDL_SINGLE_BUFFER",
-    "LV_SDL_DOUBLE_BUFFER",
-}
-
+# Symbols that must never appear in the lv_conf_template.h
+IGNORE_SYMBOLS: set[str] = {"LV_CONF_SKIP"}
 
 # Bucket B2: anonymous choices whose members map to tokens that live in LVGL's
 # C headers, with member != token.  Keyed by the member-name frozenset (the
