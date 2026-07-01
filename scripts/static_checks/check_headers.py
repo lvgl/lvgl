@@ -113,7 +113,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "LittleFS.h",
     "Pre_Include_Global.h",
     "SD.h",
-    "SDL2/SDL.h",
+    #"SDL2/SDL.h",
     "SDL2/SDL_syswm.h",
     "SPI.h",
     "TFT_eSPI.h",
