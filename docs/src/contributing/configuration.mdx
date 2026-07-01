@@ -363,15 +363,12 @@ Supporting tools in `parse.py`:
 All policy lives in `parse.py`:
 
 - `MEMBER_IS_TOKEN` — choices whose macro should expand to the member *name* (an
-  emitted int token) rather than a bare number.
-- `HEADER_OWNED_TOKEN_PREFIXES` — tokens that already exist in a C header, so the
-  generator references but never redefines them.
+  emitted int token) rather than a bare number. See [Enum as Integer Choices](#Enum-as-Integer-Choices-(Config-Options))
 - `CHOICE_TOKEN_MAP` — anonymous choices whose members map to renamed C-header
-  tokens.
-- `IGNORE_SYMBOLS` — symbols excluded from all generated output.
+  tokens. See (Anonymous Choices)(#Anonymous-Choices)
 
-And in `templates.py`: `BUILTIN_FONTS` (the `LV_FONT_DEFAULT_*` → `&lv_font_*`
-pointer table — the one piece of data that can't come from Kconfig).
+And in `templates.py`: `BUILTIN_FONTS` (the `LV_FONT_DEFAULT_*`, `&lv_font_*`
+pointer table, the one piece of data that can't come from Kconfig).
 
 ---
 
