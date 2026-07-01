@@ -307,6 +307,8 @@ def _build_choice(choice, node) -> EnumChoice | None:  # | BoolGroupChoice :
     members = [m for m in choice.syms if m.name not in IGNORE_SYMBOLS]
     if not members:
         return None
+    if _is_deprecated(node):
+        return None
     member_names = frozenset(m.name for m in members)
 
     override = CHOICE_TOKEN_MAP.get(member_names)
