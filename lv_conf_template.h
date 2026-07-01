@@ -1386,6 +1386,9 @@
  */
 #define LV_USE_QRCODE 0
 
+/** Rlottie library (Deprecated: use LV_USE_LOTTIE instead) */
+#define LV_USE_RLOTTIE 0
+
 /** Roller
  *
  *  Enable: LV_USE_LABEL

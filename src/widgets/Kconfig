@@ -180,10 +180,10 @@ config LV_USE_QRCODE
 		QR code library
 
 config LV_USE_RLOTTIE
-	bool "Lottie library. [DEPRECATED: use LV_USE_LOTTIE]"
+	bool "Lottie library. Deprecated: use LV_USE_LOTTIE instead"
 	default n
 	help
-		Rlottie library
+		Rlottie library (Deprecated: use LV_USE_LOTTIE instead)
 
 config LV_USE_ROLLER
 	bool "Roller"
