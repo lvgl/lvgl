@@ -41,12 +41,13 @@ from .kconfig_utils import (
 # ----------------------------------------------------------------------------
 # Enum-choice classification policy
 # ----------------------------------------------------------------------------
-# Some derived-int choices use bare-literal defaults (`default 1 if LV_OS_PTHREAD`)
-# yet must emit the *member name* as the enum token, not the number - they are
-# structurally identical to a numeric value-alias like LV_COLOR_DEPTH (which DOES
-# emit the number), so the difference cannot be inferred and is named here.
+# Some choices use literal values e.g. (`default 1 if LV_OS_PTHREAD`)
+# but they must emit the member name as the token and not the number
+# (#define LV_USE_OS LV_OS_PTHREAD instead of #define LV_USE_OS 1)
+# These follow the same structure as LV_COLOR_DEPTH where LV_COLOR_DEPTH is exported
+# as the raw number (#define LV_COLOR_DEPTH 16)
 #
-# TODO(v10): migrate these to the stdlib shape - reference named int-const token
+# TODO:(v10) migrate these to the stdlib shape - reference named int-const token
 # configs (`config LV_OS_PTHREAD / int / default 1`) instead of bare literals,
 # after which the named-const reference IS the signal and this set can be
 # deleted.  Deferred to the v10 major because freeing the token name requires
@@ -71,11 +72,11 @@ MEMBER_IS_TOKEN: set[str] = {
 # Symbols that must never appear in the lv_conf_template.h
 IGNORE_SYMBOLS: set[str] = {"LV_CONF_SKIP"}
 
-# Bucket B2: anonymous choices whose members map to tokens that live in LVGL's
+# Anonymous choices whose members map to tokens that live in LVGL's
 # C headers, with member != token.  Keyed by the member-name frozenset (the
 # choice is anonymous, so there is no choice name to key on); value is
-# (emitted macro, {member: token}).  The TODO(v10) note on MEMBER_IS_TOKEN
-# applies here too - these could become structural with named int-consts.
+# (emitted macro, {member: token}).
+# TODO:(v10) the note on MEMBER_IS_TOKEN also applies here
 _ALIGN = (
     "TOP_LEFT",
     "TOP_MID",
