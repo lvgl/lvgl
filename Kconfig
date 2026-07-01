@@ -2595,10 +2595,10 @@ choice
 	optional
 
 	config LV_SDL_SINGLE_BUFFER
-		bool "One screen-sized buffer"
+		bool "One screen-sized buffer [DEPRECATED: set LV_SDL_BUF_COUNT to 1]"
 
 	config LV_SDL_DOUBLE_BUFFER
-		bool "Two screen-sized buffers"
+		bool "Two screen-sized buffers [DEPRECATED: set LV_SDL_BUF_COUNT to 2]"
 endchoice
 
 config LV_SDL_ACCELERATED
