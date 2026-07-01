@@ -88,6 +88,14 @@
 #define LV_NANOVG_BACKEND_GLES2   3
 #define LV_NANOVG_BACKEND_GLES3   4
 
+/* Default log verbosity */
+#define LV_LOG_LEVEL_TRACE   0
+#define LV_LOG_LEVEL_INFO    1
+#define LV_LOG_LEVEL_WARN    2
+#define LV_LOG_LEVEL_ERROR   3
+#define LV_LOG_LEVEL_USER    4
+#define LV_LOG_LEVEL_NONE    5
+
 /* Rendering backend */
 #define LV_LINUX_DRM_BACKEND_FBDEV   0
 #define LV_LINUX_DRM_BACKEND_GBM     1
@@ -97,6 +105,10 @@
 #define LV_SDL_BACKEND_SW        0
 #define LV_SDL_BACKEND_TEXTURE   1
 #define LV_SDL_BACKEND_EGL       2
+
+/* SDL mousewheel mode */
+#define LV_SDL_MOUSEWHEEL_MODE_ENCODER   0
+#define LV_SDL_MOUSEWHEEL_MODE_CROWN     1
 
 /* Rendering backend */
 #define LV_WAYLAND_BACKEND_SHM   0
