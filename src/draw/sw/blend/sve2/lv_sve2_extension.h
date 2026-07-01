@@ -3,7 +3,7 @@
  *
  */
 
-#if !defined(LV_SVE2_EXTENSION_H) //&& (defined(__ARM_FEATURE_SVE2) && __ARM_FEATURE_SVE2)
+#if !defined(LV_SVE2_EXTENSION_H) && (defined(__ARM_FEATURE_SVE2) && __ARM_FEATURE_SVE2)
 #define LV_SVE2_EXTENSION_H
 
 #include "lv_sve2_util.h"
