@@ -179,8 +179,6 @@
         pchTarget += sve_iteration_advance * 3;               \
     }
 
-/* *INDENT-ON* */
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -188,8 +186,8 @@
 LV_NONNULL(1)
 static inline
 void lv_sve_cccn888_stride_fill_colour(uint32_t * LV_RESTRICT pwTarget,
-                                        size_t uStride,
-                                        uint32_t wColour)
+                                       size_t uStride,
+                                       uint32_t wColour)
 {
     size_t n = 0;
 
@@ -207,8 +205,8 @@ void lv_sve_cccn888_stride_fill_colour(uint32_t * LV_RESTRICT pwTarget,
 LV_NONNULL(1)
 static inline
 void lv_sve_ccc888_stride_fill_colour(uint8_t * LV_RESTRICT pchTarget,
-                                        size_t uStride,
-                                        svuint8x3_t tPixel8x3)
+                                      size_t uStride,
+                                      svuint8x3_t tPixel8x3)
 {
     size_t n = 0;
 
@@ -234,8 +232,8 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888(lv_draw_sw_blend_fill_dsc_t * 
 
     if(3 == dest_px_size) {
         svuint8x3_t vPixels = svcreate3_u8(svdup_u8(dsc->color.blue),
-                                            svdup_u8(dsc->color.green),
-                                            svdup_u8(dsc->color.red));
+                                           svdup_u8(dsc->color.green),
+                                           svdup_u8(dsc->color.red));
 
         for(int32_t y = 0; y < h; y++) {
 
@@ -249,8 +247,8 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888(lv_draw_sw_blend_fill_dsc_t * 
         for(int32_t y = 0; y < h; y++) {
 
             lv_sve_cccn888_stride_fill_colour((uint32_t *)dest_buf_8,
-                                                w,
-                                                wColour);
+                                              w,
+                                              wColour);
 
             dest_buf_8 += dest_stride;
         }
@@ -269,13 +267,12 @@ void lv_sve_cccn888_stride_fill_colour_with_opacity(
 {
     lv_sve_rgb32_no_src_stride_impl(
         lv_sve_pixel_accc_foreach_chn012,
-    vColour16x4, {
-        sve_target_u16 = lv_sve_chn_blend_with_opacity(
-            sve_source_u16,
-            sve_target_u16,
-            hwOpacity);
-    }
-    )
+        vColour16x4, {
+            sve_target_u16 = lv_sve_chn_blend_with_opacity(
+                sve_source_u16,
+                sve_target_u16,
+                hwOpacity);
+        });
 }
 
 LV_NONNULL(1)
@@ -288,13 +285,12 @@ void lv_sve_ccc888_stride_fill_colour_with_opacity(
 {
     lv_sve_rgb24_no_src_stride_impl(
         lv_sve_pixel_ccc_foreach_chn,
-    tPixel16x3, {
-        sve_target_u16 = lv_sve_chn_blend_with_opacity(
-            sve_source_u16,
-            sve_target_u16,
-            hwOpacity);
-    }
-    )
+        tPixel16x3, {
+            sve_target_u16 = lv_sve_chn_blend_with_opacity(
+                sve_source_u16,
+                sve_target_u16,
+                hwOpacity);
+        });
 }
 
 lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa(lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
@@ -312,8 +308,8 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa(lv_draw_sw_blend_fill
 
     if(3 == dest_px_size) {
         svuint16x3_t vColour16x3 = svcreate3_u16(svdup_u16(dsc->color.blue),
-                                                    svdup_u16(dsc->color.green),
-                                                    svdup_u16(dsc->color.red));
+                                                 svdup_u16(dsc->color.green),
+                                                 svdup_u16(dsc->color.red));
 
         for(int32_t y = 0; y < h; y++) {
 
@@ -328,10 +324,10 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa(lv_draw_sw_blend_fill
     }
     else if(4 == dest_px_size) {
         svuint16x4_t vColour16x4 = svcreate4_u16(
-            svdup_u16(dsc->color.blue),
-            svdup_u16(dsc->color.green),
-            svdup_u16(dsc->color.red),
-            svdup_u16(0xFF));
+                                        svdup_u16(dsc->color.blue),
+                                        svdup_u16(dsc->color.green),
+                                        svdup_u16(dsc->color.red),
+                                        svdup_u16(0xFF));
 
         for(int32_t y = 0; y < h; y++) {
 
@@ -1267,7 +1263,8 @@ lv_result_t lv_draw_sw_blend_sve2_l8_to_rgb888_with_opa_mask(lv_draw_sw_blend_im
 }
 
 
-lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
+lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, 
+                                                   uint32_t dest_px_size)
 {
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
@@ -1282,7 +1279,8 @@ lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888(lv_draw_sw_blend_image_dsc_t 
 
     return LV_RESULT_INVALID;
 }
-lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_opa(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
+lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_opa(lv_draw_sw_blend_image_dsc_t * dsc, 
+                                                            uint32_t dest_px_size)
 {
 
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
@@ -1299,7 +1297,8 @@ lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_opa(lv_draw_sw_blend_ima
 
     return LV_RESULT_INVALID;
 }
-lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_mask(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
+lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_mask(lv_draw_sw_blend_image_dsc_t * dsc, 
+                                                             uint32_t dest_px_size)
 {
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
@@ -1316,7 +1315,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_mask(lv_draw_sw_blend_im
 
     return LV_RESULT_INVALID;
 }
-lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc,
+lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_opa_mask(   lv_draw_sw_blend_image_dsc_t * dsc,
                                                                     uint32_t dest_px_size)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
@@ -1333,7 +1332,8 @@ lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_opa_mask(lv_draw_sw_blen
 
     return LV_RESULT_INVALID;
 }
-lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size,
+lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888( lv_draw_sw_blend_image_dsc_t * dsc, 
+                                                    uint32_t dest_px_size,
                                                     uint32_t src_px_size)
 {
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
@@ -1356,7 +1356,8 @@ lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888(lv_draw_sw_blend_image_dsc_t 
     return LV_RESULT_INVALID;
 }
 
-lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_opa(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size,
+lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_opa(lv_draw_sw_blend_image_dsc_t * dsc, 
+                                                            uint32_t dest_px_size,
                                                             uint32_t src_px_size)
 {
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
@@ -1377,7 +1378,8 @@ lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_opa(lv_draw_sw_blend_ima
 
     return LV_RESULT_INVALID;
 }
-lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_mask(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size,
+lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_mask(   lv_draw_sw_blend_image_dsc_t * dsc, 
+                                                                uint32_t dest_px_size,
                                                                 uint32_t src_px_size)
 {
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
@@ -1528,6 +1530,8 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888(lv_draw_sw_ble
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/* *INDENT-ON* */
 
 
 #endif /* LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_SVE2*/
