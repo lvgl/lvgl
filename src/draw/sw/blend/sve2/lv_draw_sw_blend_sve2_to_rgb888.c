@@ -264,18 +264,13 @@ void lv_sve_cccn888_stride_fill_colour_with_opacity(
                                         uint16_t hwOpacity)
 {
     lv_sve_rgb32_no_src_stride_impl(
-        lv_sve_pixel_u16x4_foreach_chn,
+        lv_sve_pixel_accc_foreach_chn012,
         vColour16x4,
         {
-            if (3 == sve_src_chn_idx) {
-                sve_target_u16 = sve_source_u16;
-            }
-            else {
-                sve_target_u16 = lv_sve_chn_blend_with_opacity( 
-                                                        sve_source_u16, 
-                                                        sve_target_u16, 
-                                                        hwOpacity);
-            }
+            sve_target_u16 = lv_sve_chn_blend_with_opacity( 
+                                                    sve_source_u16, 
+                                                    sve_target_u16, 
+                                                    hwOpacity);
         }
     )
 }
@@ -351,6 +346,104 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa(lv_draw_sw_blend_fill
     return LV_RES_OK;
 }
 
+LV_NONNULL(1)
+static inline
+void lv_sve_cccn888_stride_fill_colour_with_mask( 
+                                        uint32_t *LV_RESTRICT pwTarget,
+                                        const uint8_t *LV_RESTRICT pchMask,
+                                        size_t uStride,
+                                        svuint16x4_t vColour16x4)
+{
+    lv_sve_stride_loop_rgb32(uStride, vTailPred) {            
+                                                              
+        svuint16x4_t vTargetLow16x4 = svundef4_u16();         
+        svuint16x4_t vTargetHigh16x4 = svundef4_u16();        
+                                                              
+        svld4ub_u16(vTailPred,                                
+                    (uint8_t *)pwTarget,                      
+                    &vTargetLow16x4,                          
+                    &vTargetHigh16x4);
+
+        svuint8_t vu8Mask = svld1_u8(vTailPred, pchMask);
+                                                              
+        /* process low half */
+        svuint16_t vMaskLow = svunpklo_u16(vu8Mask);                                
+        lv_sve_pixel_accc_foreach_chn012(vColour16x4, vTargetLow16x4,   
+        {
+            sve_target_u16 = lv_sve_chn_blend_with_mask_fast( 
+                                                    sve_source_u16, 
+                                                    sve_target_u16, 
+                                                    vMaskLow);
+        });                     
+                                                              
+        /* process high half */         
+        svuint16_t vMaskHigh = svunpkhi_u16(vu8Mask);                      
+        lv_sve_pixel_accc_foreach_chn012(vColour16x4, vTargetHigh16x4,  
+        {
+            sve_target_u16 = lv_sve_chn_blend_with_mask_fast( 
+                                                    sve_source_u16, 
+                                                    sve_target_u16, 
+                                                    vMaskHigh);
+        });                     
+                                                              
+        svst4ub_u16(vTailPred,                                
+                    (uint8_t *)pwTarget,                      
+                    vTargetLow16x4,                           
+                    vTargetHigh16x4);                         
+                                                              
+        pwTarget += sve_iteration_advance;                    
+    }
+}
+
+LV_NONNULL(1)
+static inline
+void lv_sve_ccc888_stride_fill_colour_with_mask(  
+                                        uint8_t *LV_RESTRICT pchTarget,
+                                        const uint8_t *LV_RESTRICT pchMask,
+                                        size_t uStride,
+                                        svuint16x3_t tPixel16x3)
+{
+    lv_sve_stride_loop_rgb24(uStride, vTailPred) {            
+                                                              
+        svuint16x3_t vTargetLow16x3 = svundef3_u16();         
+        svuint16x3_t vTargetHigh16x3 = svundef3_u16();        
+                                                              
+        svld3ub_u16(vTailPred,                                
+                    (uint8_t *)pchTarget,                      
+                    &vTargetLow16x3,                          
+                    &vTargetHigh16x3);
+
+        svuint8_t vu8Mask = svld1_u8(vTailPred, pchMask);
+                                                              
+        /* process low half */
+        svuint16_t vMaskLow = svunpklo_u16(vu8Mask);                                
+        lv_sve_pixel_ccc_foreach_chn(tPixel16x3, vTargetLow16x3,   
+        {
+            sve_target_u16 = lv_sve_chn_blend_with_mask_fast( 
+                                                    sve_source_u16, 
+                                                    sve_target_u16, 
+                                                    vMaskLow);
+        });                     
+                                                              
+        /* process high half */         
+        svuint16_t vMaskHigh = svunpkhi_u16(vu8Mask);                      
+        lv_sve_pixel_ccc_foreach_chn(tPixel16x3, vTargetHigh16x3,  
+        {
+            sve_target_u16 = lv_sve_chn_blend_with_mask_fast( 
+                                                    sve_source_u16, 
+                                                    sve_target_u16, 
+                                                    vMaskHigh);
+        });                     
+                                                              
+        svst3ub_u16(vTailPred,                                
+                    pchTarget,                      
+                    vTargetLow16x3,                           
+                    vTargetHigh16x3);                         
+                                                              
+        pchTarget += sve_iteration_advance * 3;                    
+    }
+}
+
 lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_mask(lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
 {
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
@@ -359,11 +452,47 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_mask(lv_draw_sw_blend_fil
     const int32_t w = dsc->dest_w;
     const int32_t h = dsc->dest_h;
     const int32_t dest_stride = dsc->dest_stride;
+    uint8_t * dest_buf_8 = dsc->dest_buf;
     const int32_t mask_stride = dsc->mask_stride;
     const uint8_t * mask_buf_8 = dsc->mask_buf;
 
-    
-    return LV_RESULT_INVALID;
+    if (3 == dest_px_size) {
+        svuint16x3_t vColour16x3 = svcreate3_u16(svdup_u16(dsc->color.blue), 
+                                                 svdup_u16(dsc->color.green), 
+                                                 svdup_u16(dsc->color.red));
+
+        for(int32_t y = 0; y < h; y++) {
+
+            lv_sve_ccc888_stride_fill_colour_with_mask( dest_buf_8, 
+                                                        mask_buf_8,
+                                                        w, 
+                                                        vColour16x3);
+
+            dest_buf_8 += dest_stride;
+            mask_buf_8 += mask_stride;
+        }
+    }
+    else if (4 == dest_px_size) {
+        svuint16x4_t vColour16x4 = svcreate4_u16(
+            svdup_u16(dsc->color.blue),
+            svdup_u16(dsc->color.green),
+            svdup_u16(dsc->color.red),
+            svdup_u16(0xFF));
+
+        for(int32_t y = 0; y < h; y++) {
+            
+            lv_sve_cccn888_stride_fill_colour_with_mask( 
+                                                    (uint32_t *)dest_buf_8,
+                                                    mask_buf_8,
+                                                    w, 
+                                                    vColour16x4);
+
+            dest_buf_8 += dest_stride;
+            mask_buf_8 += mask_stride;
+        }
+    }
+
+    return LV_RES_OK;
 }
 
 lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa_mask(lv_draw_sw_blend_fill_dsc_t * dsc,
