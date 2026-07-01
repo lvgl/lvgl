@@ -1584,7 +1584,7 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask(
                         (uint16_t *)phwSource, 
                         &vSourceLow16x3, 
                         &vSourceHigh16x3);
-                    
+
         svuint8_t vu8Mask = svld1_u8(vTailPred, pchMask);
 
         /* process low half */
@@ -1759,7 +1759,7 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask_and_opacity(
                         (uint16_t *)phwSource, 
                         &vSourceLow16x3, 
                         &vSourceHigh16x3);
-                    
+
         svuint8_t vu8Mask = svld1_u8(vTailPred, pchMask);
 
         /* process low half */
