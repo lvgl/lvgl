@@ -12,6 +12,7 @@ static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, u
     LV_UNUSED(user_data);
 
     LV_IMAGE_DECLARE(emoji_F617);
+    LV_IMAGE_DECLARE(emoji_F600);
 
     if(unicode < 0xF000) return NULL;
 
@@ -19,11 +20,7 @@ static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, u
         return &emoji_F617;
     }
     else if(unicode == 0xF600) {
-#if LV_USE_FFMPEG
-        return "lvgl/examples/assets/emoji/F600.png";
-#else
-        return "A:lvgl/examples/assets/emoji/F600.png";
-#endif
+        return &emoji_F600;
     }
 
     return NULL;
