@@ -8,8 +8,7 @@
 
 #include "lv_sve2_util.h"
 #include <arm_sve.h>
-#include <stdint.h>
-
+#include LV_STDINT_INCLUDE
 
 #define svlenu8()  svcntb_pat(SV_ALL)
 #define svlenu16() (svcntb_pat(SV_ALL) / sizeof(uint16_t))
