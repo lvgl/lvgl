@@ -22,11 +22,13 @@ def test_template_excludes_derived_flag(generated):
 
 def test_internal_has_config_options_block(generated):
     i = generated["internal"]
-    # Enum tokens are defined once, near the top (deduped across the trio).
+    # Enum tokens are defined once, near the top: ConstToken constants and the
+    # inline MEMBER_IS_TOKEN choice tokens.
     assert "#define LV_STDLIB_BUILTIN" in i
     assert "#define LV_OS_NONE" in i
-    # Header-owned tokens are NOT redefined.
-    assert "#define LV_LOG_LEVEL_WARN" not in i
+    # LV_LOG_LEVEL_* are member == token values defined into the header (no C
+    # header owns them), like LV_OS_*.
+    assert "#define LV_LOG_LEVEL_WARN" in i
 
 
 def test_internal_defers_derived_flag_to_footer(generated):

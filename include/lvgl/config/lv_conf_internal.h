@@ -38,12 +38,13 @@
 #define LV_FONT_DEFAULT_UNSCII_8                    &lv_font_unscii_8
 #define LV_FONT_DEFAULT_UNSCII_16                   &lv_font_unscii_16
 
-/* Malloc functions source */
+/* Named constants */
 #define LV_STDLIB_BUILTIN       0
 #define LV_STDLIB_CLIB          1
 #define LV_STDLIB_MICROPYTHON   2
 #define LV_STDLIB_RTTHREAD      3
 #define LV_STDLIB_CUSTOM        255
+#define LV_LOG_LEVEL_NUM        5
 
 /* Default operating system to use */
 #define LV_OS_NONE          0

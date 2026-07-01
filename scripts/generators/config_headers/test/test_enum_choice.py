@@ -5,7 +5,7 @@
 * LV_COLOR_DEPTH - value-alias, emits the bare number
 """
 
-from config_headers.config_entry import EnumChoice
+from config_headers.config_entry import ConstToken, EnumChoice
 
 
 # -- stdlib: named-const tokens ----------------------------------------------
@@ -25,14 +25,16 @@ def test_stdlib_emit_template(entries):
     )
 
 
-def test_stdlib_emit_internal_options_defines_tokens(entries):
+def test_stdlib_tokens_are_const_tokens(entries):
+    # The named tokens are their own `int / default N` configs, so they are
+    # classified as ConstTokens and defined once in the options block; the choice
+    # only *references* them by name and defines nothing itself.
+    builtin = entries["LV_STDLIB_BUILTIN"]
+    assert isinstance(builtin, ConstToken)
+    assert builtin.emit_internal_options() == ["#define LV_STDLIB_BUILTIN 0"]
+
     malloc = entries["LV_USE_STDLIB_MALLOC"]
-    assert malloc.emit_internal_options() == [
-        "/* Malloc functions source */",
-        "#define LV_STDLIB_BUILTIN   0",
-        "#define LV_STDLIB_CLIB      1",
-        "#define LV_STDLIB_CUSTOM    255",
-    ]
+    assert malloc.emit_internal_options() == []
 
 
 def test_stdlib_emit_internal_ladder(entries):

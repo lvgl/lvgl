@@ -19,6 +19,7 @@ from kconfiglib import BOOL, HEX, INT, STRING, TRISTATE, Choice, Kconfig, Symbol
 from .config_entry import (
     BoolConfig,
     ConfigEntry,
+    ConstToken,
     DerivedFlag,
     EnumChoice,
     EnumMember,
@@ -55,7 +56,7 @@ from .kconfig_utils import (
 # which breaks embedded users' Kconfig configs.
 MEMBER_IS_TOKEN: set[str] = {
     "LV_USE_OS",  # tokens LV_OS_* are defined into lv_conf_internal.h
-    "LV_LOG_LEVEL",  # tokens LV_LOG_LEVEL_* are owned by lv_log.h (not defined)
+    "LV_LOG_LEVEL",  # LV_LOG_LEVEL_* defined into lv_conf_internal.h
     "LV_USE_DRAW_SW_ASM",  # LV_DRAW_SW_ASM_* defined into lv_conf_internal.h
     "LV_USE_NEMA_LIB",  # LV_NEMA_LIB_*
     "LV_USE_NEMA_HAL",  # LV_NEMA_HAL_*
@@ -70,7 +71,14 @@ MEMBER_IS_TOKEN: set[str] = {
 }
 
 # Symbols that must never appear in the lv_conf_template.h
-IGNORE_SYMBOLS: set[str] = {"LV_CONF_SKIP"}
+IGNORE_SYMBOLS: set[str] = {
+    # Only makes sense when the user is using kconfig
+    "LV_CONF_SKIP",
+    # Defined in `lv_version.h`
+    "LVGL_VERSION_MAJOR",
+    "LVGL_VERSION_MINOR",
+    "LVGL_VERSION_PATCH",
+}
 
 # Anonymous choices whose members map to tokens that live in LVGL's
 # C headers, with member != token.  Keyed by the member-name frozenset (the
@@ -171,17 +179,14 @@ def _derived_enum(sym):
 def _member_token(macro: str, member, value):
     """Resolve one derived-enum member to its emitted ``EnumMember``.
 
-    * default value is a named int-const  -> emit the const's name + value
-      (stdlib: ``LV_STDLIB_BUILTIN``).
-    * macro is in ``MEMBER_IS_TOKEN``      -> emit the *member* name; value is
-      the bare literal (``LV_USE_OS`` -> ``LV_OS_PTHREAD``).
-    * otherwise (plain value-alias)        -> emit the literal number itself,
-      nothing to define (``LV_COLOR_DEPTH`` -> ``16``).
+    * macro is in ``MEMBER_IS_TOKEN``  -> emit the *member* name; value is the
+      bare literal, defined here (``LV_USE_OS`` -> ``LV_OS_PTHREAD`` = ``1``).
+    * otherwise                        -> reference the default symbol by name,
+      defining nothing.  It is either a bare number (value-alias, ``LV_COLOR_DEPTH``
+      -> ``16``) or a named :class:`ConstToken` already defined in the options
+      block (stdlib, ``LV_STDLIB_BUILTIN``).
     """
-    if isinstance(value, Symbol) and is_int_const(value):
-        token = value.name
-        em = EnumMember(token, int_const_value(value), True, member.name)
-    elif macro in MEMBER_IS_TOKEN:
+    if macro in MEMBER_IS_TOKEN:
         token = member.name
         em = EnumMember(token, value.name, True, member.name)
     else:
@@ -369,10 +374,11 @@ def classify(node, enum_choices: frozenset = frozenset()) -> ConfigEntry | None:
                 return DerivedFlag(item.name, expr, node=node)
 
     if item.type in (INT, HEX):
-        # Enum-token constants (LV_STDLIB_BUILTIN -> 0) are plumbing: defined in
-        # the options block via their EnumChoice, never on their own here.
+        # A promptless int/hex with a single literal default is a named constant
+        # (LV_STDLIB_BUILTIN -> 0): define it in the options block at the top,
+        # where the enum choices that reference it by name can see it.
         if is_int_const(item):
-            return None
+            return ConstToken(item.name, int_const_value(item), node=node)
         # Any other int/hex is emitted - including no-prompt computed aliases
         # like LV_SDL_BUF_COUNT (the prompt gate below would wrongly drop it).
         return IntConfig.from_symbol(item, node)

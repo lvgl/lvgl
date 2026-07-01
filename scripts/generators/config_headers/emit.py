@@ -15,7 +15,13 @@ import re
 from kconfiglib import COMMENT, MENU, NOT, Choice, Kconfig, Symbol
 
 from . import templates
-from .config_entry import BoolConfig, ConstraintCheck, DerivedFlag, EnumChoice
+from .config_entry import (
+    BoolConfig,
+    ConstraintCheck,
+    ConstToken,
+    DerivedFlag,
+    EnumChoice,
+)
 from .kconfig_utils import (
     bool_default,
     collect_sym_refs,
@@ -247,13 +253,15 @@ def constraint_checks(entries) -> list[ConstraintCheck]:
 
 
 def render_config_options(entries) -> str:
-    """The constant ``#define`` block at the top of lv_conf_internal.h.
+    """The constant ``#define`` block at the top of lv_conf_internal.h: built-in
+    font pointers, the named integer constants (:class:`ConstToken`, e.g.
+    ``LV_STDLIB_BUILTIN 0``), and the enum tokens whose values live inline in a
+    ``MEMBER_IS_TOKEN`` choice (``LV_OS_*``, ``LV_NEMA_*``, ...).
 
-    Enum tokens that must be defined (e.g. ``LV_STDLIB_BUILTIN 0``) are pulled
-    from every :class:`EnumChoice`, de-duplicated by token name so the stdlib
-    trio's shared tokens appear once.
+    Each token is produced by exactly one entry - a ``ConstToken`` is defined by
+    its own config, and the remaining enum tokens belong to a single choice - so
+    there is nothing to de-duplicate.
     """
-    seen: set[str] = set()
     blocks: list[str] = []
 
     # The font pointer table (the only non-Kconfig data) comes first.
@@ -266,19 +274,23 @@ def render_config_options(entries) -> str:
         )
     )
 
+    # Named integer constants (LV_STDLIB_BUILTIN -> 0, LV_LOG_LEVEL_NUM -> 5).
+    consts = [e for e in entries if isinstance(e, ConstToken)]
+    if consts:
+        cwidth = max(len(e.name) for e in consts)
+        blocks.append(
+            "\n".join(
+                ["/* Named constants */"]
+                + [f"#define {e.name.ljust(cwidth)}   {e.value}" for e in consts]
+            )
+        )
+
+    # Enum tokens whose values live inline in the choice (LV_OS_*, LV_NEMA_*).
     for e in entries:
-        if not isinstance(e, EnumChoice):
-            continue
-        defs = [
-            (m.token, m.value) for m in e.members if m.define and m.token not in seen
-        ]
-        if not defs:
-            continue
-        seen.update(t for t, _ in defs)
-        width = max(len(t) for t, _ in defs)
-        lines = [f"/* {e.options_title} */"] if e.options_title else []
-        lines += [f"#define {t.ljust(width)}   {v}" for t, v in defs]
-        blocks.append("\n".join(lines))
+        if isinstance(e, EnumChoice):
+            lines = e.emit_internal_options()
+            if lines:
+                blocks.append("\n".join(lines))
     return "\n\n".join(blocks)
 
 

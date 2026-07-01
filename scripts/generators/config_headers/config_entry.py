@@ -204,6 +204,28 @@ class StringConfig(ScalarConfig):
         return cls(sym.name, scalar_default(sym), node=node, doc=doc_text(node))
 
 
+class ConstToken(ConfigEntry):
+    """A named integer constant emitted as a bare ``#define <name> <value>`` in
+    the internal "Config options" block (e.g. ``LV_STDLIB_BUILTIN`` -> ``0``).
+
+    These are promptless ``int``/``hex`` configs with a single literal default
+    (see :func:`kconfig_utils.is_int_const`).  They are plumbing: an
+    :class:`EnumChoice` may expand to one of them by *name*
+    (``#define LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN``), so they must be defined
+    ahead of the body, unconditionally - a dependency from an enclosing ``if`` is
+    intentionally ignored, the constant is always defined.  They are not
+    user-facing, so they appear in neither the public template nor the
+    ``CONFIG_`` bridge - only the options block.
+    """
+
+    def __init__(self, name: str, value: str, *, node=None):
+        super().__init__(name, node=node)
+        self.value = value
+
+    def emit_internal_options(self) -> list[str]:
+        return [f"#define {self.name} {self.value}"]
+
+
 class DerivedFlag(ConfigEntry):
     """An internal capability flag set via Kconfig ``select`` (e.g.
     ``LV_DRAW_HAS_VECTOR_SUPPORT``, selected by the vector-capable draw units).

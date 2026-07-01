@@ -1,8 +1,9 @@
-"""EnumChoice whose tokens are owned by a C header (LV_LOG_LEVEL).
+"""EnumChoice with bare-literal defaults and member == token (LV_LOG_LEVEL).
 
-Member name == token (like LV_USE_OS), but the LV_LOG_LEVEL_* tokens already
-exist in lv_log.h, so the macro emits the member name while the options block
-must stay empty (re-defining them would clash with the header).
+Same shape as LV_USE_OS: the derived int defaults to bare numbers
+(``default 2 if LV_LOG_LEVEL_WARN``), the macro expands to the member name, and
+the LV_LOG_LEVEL_* tokens are defined into the options block - no C header
+defines them, so lv_conf_internal.h must.
 """
 
 from config_headers.config_entry import EnumChoice
@@ -19,10 +20,16 @@ def test_log_level_emit_template_uses_member_name(entries):
     assert log.emit_template()[-1] == "#define LV_LOG_LEVEL LV_LOG_LEVEL_WARN"
 
 
-def test_log_level_defines_no_tokens(entries):
-    # Header-owned: lv_log.h defines LV_LOG_LEVEL_*, so we emit nothing here.
+def test_log_level_defines_tokens(entries):
+    # No C header defines LV_LOG_LEVEL_*, so the choice defines them (member ==
+    # token, bare-literal values) - exactly like LV_USE_OS.
     log = entries["LV_LOG_LEVEL"]
-    assert log.emit_internal_options() == []
+    assert log.emit_internal_options() == [
+        "/* Default log verbosity */",
+        "#define LV_LOG_LEVEL_TRACE   0",
+        "#define LV_LOG_LEVEL_WARN    2",
+        "#define LV_LOG_LEVEL_NONE    5",
+    ]
 
 
 def test_log_level_internal_ladder_uses_member_name(entries):

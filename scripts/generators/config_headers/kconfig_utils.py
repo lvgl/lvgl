@@ -111,17 +111,18 @@ def doc_text(node) -> str:
 
 
 def is_int_const(sym) -> bool:
-    """True if *sym* is a named token standing for a fixed number: no prompt,
-    one unconditional literal default (e.g. ``LV_STDLIB_BUILTIN`` = ``0``).
-    These are the enum tokens; when an enum picks one we emit its *name*, not
-    the number."""
+    """True if *sym* is a named token standing for a fixed number: no prompt and
+    a single literal default (e.g. ``LV_STDLIB_BUILTIN`` = ``0``).  These are
+    emitted as bare ``#define``s in the internal "Config options" block; when an
+    enum picks one we emit its *name*, not the number.
+    """
     if sym.type not in (INT, HEX):
         return False
     if any(node.prompt for node in sym.nodes):
         return False
     if len(sym.defaults) != 1:
         return False
-    value, cond = sym.defaults[0]
+    value, _cond = sym.defaults[0]
     # A numeric literal default is modelled as an undefined symbol whose name is
     # the literal text, not as an ``is_constant`` symbol.
     if not (isinstance(value, Symbol) and not value.nodes):
@@ -130,7 +131,7 @@ def is_int_const(sym) -> bool:
         int(value.name, 0)
     except (ValueError, TypeError):
         return False
-    return cond is sym.kconfig.y
+    return True
 
 
 def int_const_value(sym) -> str:

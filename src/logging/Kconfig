@@ -35,6 +35,10 @@ config LV_LOG_LEVEL
 	default 4 if LV_LOG_LEVEL_USER
 	default 5 if LV_LOG_LEVEL_NONE
 
+config LV_LOG_LEVEL_NUM
+	int 
+	default 5
+
 config LV_LOG_PRINTF
 	bool "Print the log with 'printf'"
 	default n
