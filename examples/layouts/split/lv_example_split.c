@@ -47,7 +47,7 @@ void lv_example_split(void)
 {
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, lv_pct(100), lv_pct(100));
-    lv_obj_remove_flag(cont, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(cont, false);
     lv_obj_set_style_pad_all(cont, 0, 0);
     lv_obj_set_style_border_width(cont, 0, 0);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
@@ -64,8 +64,7 @@ void lv_example_split(void)
     /* Divider: the draggable handle */
     lv_obj_t * divider = lv_obj_create(cont);
     lv_obj_set_size(divider, SPLIT_DIVIDER_W, lv_pct(100));
-    lv_obj_remove_flag(divider, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(divider, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_scrollable(divider, false);
     lv_obj_set_style_radius(divider, 0, 0);
     lv_obj_set_style_border_width(divider, 0, 0);
     lv_obj_set_style_bg_color(divider, lv_palette_main(LV_PALETTE_GREY), 0);
