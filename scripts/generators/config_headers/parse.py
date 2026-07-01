@@ -317,7 +317,9 @@ def _build_choice(choice, node) -> EnumChoice | None:  # | BoolGroupChoice :
     elif choice.name:
         macro, tokenmap = choice.name, None
     else:
-        raise ValueError("Invalid choice config. Use a standardized choice instead")
+        raise ValueError(
+            f"Invalid choice config:\n{choice}\n Use a standardized choice instead"
+        )
 
     resolved = []
     for member in members:
