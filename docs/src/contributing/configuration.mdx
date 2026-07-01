@@ -61,8 +61,7 @@ python3 scripts/generators/config_files.py
 Then run the generator's tests:
 
 ```bash
-cd scripts/generators
-python3 -m pytest config_headers/test/
+python3 -m pytest scripts/generators/config_headers/test/
 ```
 
 CI checks the generated files and the generator's tests automatically.
@@ -397,5 +396,5 @@ In order to deprecate a symbol:
 4. Express real dependencies with `depends on` / `select`, let the generator
    produce the `#error` guards.
 5. If you renamed/removed a symbol, add a compatibility shim.
-6. Regenerate the four files and run `pytest scripts/generators/config_headers/test/`.
+6. Regenerate the four files `python scripts/generators/config_files.py` and run `pytest scripts/generators/config_headers/test/`.
 7. Commit the Kconfig change and the regenerated files together.
