@@ -17,11 +17,6 @@ extern "C" {
 #include "../logging/lv_log.h"
 #include "../stdlib/lv_mem.h"
 
-#if defined(LV_ASSERT_HANDLER_INCLUDE) && !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
-#warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
-#include LV_ASSERT_HANDLER_INCLUDE
-#endif
-
 /* LV_ASSERT_CUSTOM_INCLUDE (gated by LV_ASSERT_USE_CUSTOM_INCLUDE) is included
  * from lv_conf_internal.h, so the custom LV_ASSERT_HANDLER is already defined. */
 #ifndef LV_ASSERT_HANDLER
