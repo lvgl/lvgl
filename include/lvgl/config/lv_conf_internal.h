@@ -2795,14 +2795,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_RLOTTIE
-    #ifdef CONFIG_LV_USE_RLOTTIE
-        #define LV_USE_RLOTTIE CONFIG_LV_USE_RLOTTIE
-    #else
-        #define LV_USE_RLOTTIE 0
-    #endif
-#endif
-
 #ifndef LV_USE_ROLLER
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_ROLLER

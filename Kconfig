@@ -2046,7 +2046,7 @@ config LV_USE_QRCODE
 		QR code library
 
 config LV_USE_RLOTTIE
-	bool "Lottie library. Deprecated see LV_USE_LOTTIE"
+	bool "Lottie library. [DEPRECATED: use LV_USE_LOTTIE]"
 	default n
 	help
 		Rlottie library
