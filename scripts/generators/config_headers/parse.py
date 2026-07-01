@@ -68,18 +68,6 @@ MEMBER_IS_TOKEN: set[str] = {
     # VG-Lite options dispatch header compares against these tokens
 }
 
-# Enum tokens that already exist in LVGL's C headers; referenced by name but
-# never (re)defined in the generated "Config options" block.
-HEADER_OWNED_TOKEN_PREFIXES = (
-    "LV_LOG_LEVEL_",
-    "LV_SDL_MOUSEWHEEL_MODE_",
-)
-
-
-def _is_header_owned(token: str) -> bool:
-    return token.startswith(HEADER_OWNED_TOKEN_PREFIXES)
-
-
 # Symbols that must never appear in the template: build-system-only switches,
 # internal raw counts mirrored by a public alias, and members handled specially
 # in the internal footer (Wayland backend).  Version numbers go in the file
@@ -206,12 +194,10 @@ def _member_token(macro: str, member, value):
     """
     if isinstance(value, Symbol) and is_int_const(value):
         token = value.name
-        em = EnumMember(
-            token, int_const_value(value), not _is_header_owned(token), member.name
-        )
+        em = EnumMember(token, int_const_value(value), True, member.name)
     elif macro in MEMBER_IS_TOKEN:
         token = member.name
-        em = EnumMember(token, value.name, not _is_header_owned(token), member.name)
+        em = EnumMember(token, value.name, True, member.name)
     else:
         em = EnumMember(value.name, None, False, member.name)
     return member, em
