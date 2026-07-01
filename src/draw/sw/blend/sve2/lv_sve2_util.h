@@ -6,6 +6,8 @@
 #ifndef LV_SVE2_UTIL_H
 #define LV_SVE2_UTIL_H
 
+/* *INDENT-OFF* */
+
 #undef SVE_0_CONNECT2
 #undef SVE_0_CONNECT3
 #undef SVE_0_CONNECT4
@@ -191,4 +193,7 @@
 #ifndef MIN
 #   define MIN(a, b) ((a) > (b) ? (b) : (a))
 #endif
+
+/* *INDENT-ON* */
+
 #endif /* LV_SVE2_UTIL_H */

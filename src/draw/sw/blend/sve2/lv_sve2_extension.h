@@ -10,6 +10,8 @@
 #include <arm_sve.h>
 #include LV_STDINT_INCLUDE
 
+/* *INDENT-OFF* */
+
 #define svlenu8()  svcntb_pat(SV_ALL)
 #define svlenu16() (svcntb_pat(SV_ALL) / sizeof(uint16_t))
 #define svlenu32() (svcntb_pat(SV_ALL) / sizeof(uint32_t))
@@ -1250,5 +1252,7 @@ static inline svuint16_t lv_sve_chn_blend_with_3masks_and_opacity(
 
     return svlsr_n_u16_m(svptrue_b16(), vTarget, 8); // vTarget >> 8;
 }
+
+/* *INDENT-ON* */
 
 #endif /* LV_SVE2_EXTENSION_H */
