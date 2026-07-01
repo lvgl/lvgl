@@ -82,7 +82,7 @@ void lv_draw_sw_init(void)
     draw_sw_unit->base_unit.evaluate_cb = evaluate;
     draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
 
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON;
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
     draw_sw_unit->base_unit.name = "SW_NEON";
 #elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && LV_USE_DRAW_ARM2D_SYNC
     draw_sw_unit->base_unit.name = "SW_ARM2D";
