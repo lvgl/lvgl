@@ -676,9 +676,9 @@ void lv_sve_gray8_stride_blend_to_cccn888(
 
         /* process high half */
         svuint16_t vSourceHigh = svunpkhi_u16(vu8Source);
-        vTargetLow16x4 = svset4(vTargetHigh16x4, 0, vSourceHigh);
-        vTargetLow16x4 = svset4(vTargetHigh16x4, 1, vSourceHigh);
-        vTargetLow16x4 = svset4(vTargetHigh16x4, 2, vSourceHigh);
+        vTargetHigh16x4 = svset4(vTargetHigh16x4, 0, vSourceHigh);
+        vTargetHigh16x4 = svset4(vTargetHigh16x4, 1, vSourceHigh);
+        vTargetHigh16x4 = svset4(vTargetHigh16x4, 2, vSourceHigh);
 
         svst4ub_u16(vTailPred,
                     (uint8_t *)pwTarget,
