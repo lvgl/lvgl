@@ -24,7 +24,7 @@ static void btn_event_cb(lv_event_t * e)
  * `LV_EVENT_ALL` and on `LV_EVENT_CLICKED` the callback updates its child
  * label with `lv_label_set_text_fmt` to show an incrementing counter.
  */
-void lv_example_get_started_2(void)
+void lv_example_get_started_button(void)
 {
     lv_obj_t * btn = lv_button_create(lv_screen_active());     /*Add a button the current screen*/
     lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/

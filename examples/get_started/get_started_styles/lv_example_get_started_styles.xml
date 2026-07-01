@@ -1,0 +1,51 @@
+<!--
+ @title Styles from scratch for buttons
+ @brief Build named button styles, then add a pressed state and an accent variant.
+
+ `style_button` is the shared base: a rounded vertical grey gradient with a thin
+ translucent border. The first button adds `style_button_pressed` on the
+ `pressed` selector so its gradient darkens while held. The second stacks
+ `style_button_red` to repaint only the gradient and sets a local circular
+ radius, showing how a small style plus one local property re-skins a button
+ without redefining the base.
+-->
+<screen>
+	<styles>
+		<!-- Shared base look: rounded grey vertical gradient with a thin border -->
+		<style name="style_button"
+			radius="10"
+			bg_opa="100%"
+			bg_color="0xeeeeee"
+			bg_grad_color="0x9e9e9e"
+			bg_grad_dir="ver"
+			border_color="0x000000"
+			border_opa="20%"
+			border_width="2"
+			text_color="0x000000" />
+		<!-- Pressed state: darker gradient stops -->
+		<style name="style_button_pressed"
+			bg_color="0xbdbdbd"
+			bg_grad_color="0x757575" />
+		<!-- Accent variant: repaint only the gradient red -->
+		<style name="style_button_red"
+			bg_color="0xf44336"
+			bg_grad_color="0xffcdd2" />
+	</styles>
+
+	<view>
+		<!-- 💡 Hold the first button to see `style_button_pressed` darken its gradient. -->
+		<!-- Base style + a pressed-state override -->
+		<lv_button name="button_1" align="center" y="-35" width="120" height="50">
+			<style name="style_button" />
+			<style name="style_button_pressed" selector="pressed" />
+			<lv_label name="label_1" align="center" text="Button" />
+		</lv_button>
+
+		<!-- Base + accent variant + a local circular radius -->
+		<lv_button name="button_2" align="center" y="35" width="120" height="50" style_radius="25">
+			<style name="style_button" />
+			<style name="style_button_red" />
+			<lv_label name="label_2" align="center" text="Button 2" />
+		</lv_button>
+	</view>
+</screen>
