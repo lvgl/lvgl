@@ -317,8 +317,8 @@ HEADER_CHECK_WHITELIST: set[str] = {
     "libs/lodepng/lodepng.c",
     "libs/gltf/stb_image/stb_image.h",
     "libs/gltf/gltf_view/assets/lv_gltf_view_shader.c",
-    "src/draw/sw/blend/sve2/lv_sve2_extension.h",
-    "src/draw/sw/blend/sve2/lv_sve2_util.h",
+    "draw/sw/blend/sve2/lv_sve2_extension.h",
+    "draw/sw/blend/sve2/lv_sve2_util.h",
 }
 # Regex helpers
 INCLUDE_ANGLE_RE = re.compile(r"#\s*include\s*<([^>]+)>")
