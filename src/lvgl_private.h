@@ -33,6 +33,8 @@
 #include "draw/dma2d/lv_draw_dma2d_private.h"
 #include "draw/espressif/ppa/lv_draw_ppa.h"
 #include "draw/espressif/ppa/lv_draw_ppa_private.h"
+#include "draw/espressif/ppa/lv_draw_ppa_srm.h"
+#include "draw/espressif/ppa/lv_draw_ppa_rot.h"
 #include "draw/eve/lv_draw_eve.h"
 #include "draw/eve/lv_draw_eve_private.h"
 #include "draw/eve/lv_draw_eve_ram_g.h"
