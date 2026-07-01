@@ -25,7 +25,9 @@ static void event_handler(lv_event_t * e)
 void lv_example_list_sections(void)
 {
     /*Create a list*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     list1 = lv_list_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(list1, 180, 220);
     lv_obj_center(list1);
 

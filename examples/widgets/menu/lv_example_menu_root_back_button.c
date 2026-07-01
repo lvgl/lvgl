@@ -18,6 +18,8 @@ static void back_event_handler(lv_event_t * e)
  * @title Menu with root back button
  * @brief A menu whose always-visible root back button pops a message box when tapped.
  *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
+ *
  * `lv_menu_set_mode_root_back_button` turns on
  * `LV_MENU_ROOT_BACK_BUTTON_ENABLED` so the back button remains on
  * the header at the top of the navigation stack. The main page holds
@@ -29,7 +31,9 @@ static void back_event_handler(lv_event_t * e)
  */
 void lv_example_menu_root_back_button(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * menu = lv_menu_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_menu_set_mode_root_back_button(menu, LV_MENU_ROOT_BACK_BUTTON_ENABLED);
     lv_obj_add_event_cb(menu, back_event_handler, LV_EVENT_CLICKED, menu);
     lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));

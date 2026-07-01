@@ -153,6 +153,29 @@ if you need finer control.
   lv_scale_set_section_style_items(scale,     section, &my_style);
   ```
 
+### lv_menu
+
+- The `lv_menu` widget is deprecated. A menu is page navigation over base widgets
+  — pages built from `lv_obj` and a back button that swaps the visible page — so
+  build it directly instead. See the
+  [`lv_example_menu_navigation`](widgets/menu#building-a-menu-without-lv_menu)
+  example for a starting point.
+
+### lv_list
+
+- The `lv_list` widget is deprecated. A list is just a flex container with a
+  column flow, so build one directly from `lv_obj` with a `LV_FLEX_FLOW_COLUMN`
+  layout instead. See the
+  [`lv_example_flex_list`](common-widget-features/layouts/flex#building-a-list)
+  example for a starting point.
+
+### lv_win
+
+- The `lv_win` widget is deprecated. A window is just a flex column with a header
+  bar and a content area, so build one directly from `lv_obj` instead. See the
+  [`lv_example_flex_win`](common-widget-features/layouts/flex#building-a-window)
+  example for a starting point.
+
 ---
 
 ## Drawing
@@ -174,3 +197,24 @@ if you need finer control.
   lv_snapshot_take_to_draw_buf(obj, cf, draw_buf);
   lv_draw_buf_destroy(draw_buf);
 ```
+
+---
+
+## Others
+
+### lv_file_explorer
+
+- The `lv_file_explorer` widget is deprecated. A file explorer is a path header
+  plus a table of directory entries read with the [`lv_fs`](main-modules/fs) API,
+  so build it directly instead. See the
+  [`lv_example_table_file_browser`](widgets/table#building-a-file-explorer) example
+  for a starting point.
+
+---
+
+## Libraries
+
+### rlottie
+
+- The rlottie player is deprecated. Use the [`lv_lottie`](widgets/lottie) widget
+  instead.

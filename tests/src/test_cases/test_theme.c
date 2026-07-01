@@ -69,7 +69,9 @@ static void test_widgets(const char * img_name)
     lv_obj_set_size(tabview, 100, 100);
     lv_tabview_add_tab(tabview, "Tab 1");
 
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * win = lv_win_create(scr_act);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(win, 100, 100);
     lv_win_add_title(win, "Window");
     lv_win_add_button(win, LV_SYMBOL_CLOSE, 20);
@@ -121,7 +123,9 @@ static void test_widgets(const char * img_name)
     lv_obj_t * keyboard = lv_keyboard_create(scr_act);
     lv_obj_set_size(keyboard, 300, 150);
 
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * list = lv_list_create(scr_act);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(list, 100, 100);
     lv_list_add_text(list, "List item");
     lv_list_add_button(list, LV_SYMBOL_OK, "List button");
@@ -136,7 +140,9 @@ static void test_widgets(const char * img_name)
 
     lv_led_create(scr_act);
 
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * menu = lv_menu_create(scr_act);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(menu, 100, 100);
 
     lv_spinner_create(scr_act);

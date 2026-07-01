@@ -20,6 +20,8 @@ static lv_obj_t * create_switch(lv_obj_t * parent,
  * @title Settings menu with sidebar mode
  * @brief A full Settings screen with sidebar navigation and a switch that toggles between sidebar and stacked modes.
  *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
+ *
  * A root page named `Settings` lists Mechanics, Sound, Display, and
  * About entries inside `lv_menu_section` groups, with a Menu mode row
  * that holds a `lv_switch` to flip between sidebar and stacked
@@ -33,7 +35,9 @@ static lv_obj_t * create_switch(lv_obj_t * parent,
  */
 void lv_example_menu_sidebar(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * menu = lv_menu_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
 
     lv_color_t bg_color = lv_obj_get_style_bg_color(menu, LV_PART_MAIN);
     if(lv_color_brightness(bg_color) > 127) {

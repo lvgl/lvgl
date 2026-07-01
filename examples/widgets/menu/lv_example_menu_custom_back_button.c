@@ -5,6 +5,8 @@
  * @title Customized back button header
  * @brief A menu with a labeled "Back" button in the header and three titled sub pages.
  *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
+ *
  * `lv_menu_get_main_header_back_button` returns the default back
  * button, and a child `lv_label` adds the text `Back` next to its
  * icon. The main page lists three items, each wired with
@@ -14,7 +16,9 @@
 void lv_example_menu_custom_back_button(void)
 {
     /*Create a menu object*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * menu = lv_menu_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));
     lv_obj_center(menu);
 

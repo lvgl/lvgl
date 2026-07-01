@@ -111,6 +111,20 @@ currently selected cell. Row and column will be set to
 
 Learn more about [Keys](/main-modules/indev/keypad).
 
+## Building a file explorer
+
+<LvglExample name="lv_example_table_file_browser" path="widgets/table/lv_example_table_file_browser" />
+
+A table can also be used to create a simple file explorer. In the example the table has 2 columns:
+a shorter one for an icon, and a longer one for the file/folder name.
+
+The contents of a directory are listed with the [`lv_fs`](/main-modules/fs) APIs
+(`lv_fs_dir_open`/`lv_fs_dir_read`/`lv_fs_dir_close`). Note that a file-system driver
+(e.g. <ApiLink name="LV_USE_FS_STDIO" />) needs to be enabled in `lv_conf.h`.
+
+The example also contains a few extra features, like a quick access sidebar.
+
+
 ## Examples
 
 ### Scrollable 200-item list with per-row toggle

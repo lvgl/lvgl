@@ -5,6 +5,14 @@ description: "Multi-level menu widget. Handles navigation between pages automati
 
 ## Overview
 
+<Callout type="warning" title="Deprecated">
+The `lv_menu` widget is deprecated and kept only for backward compatibility. A
+menu is page navigation over base widgets — pages built from `lv_obj` and a back
+button that swaps the visible page — so build it directly instead. See the
+[`lv_example_menu_navigation`](#building-a-menu-without-lv_menu) example for a
+starting point.
+</Callout>
+
 The Menu widget builds multi-level menus. It handles navigation between
 pages automatically and lets you react to page changes and item clicks.
 
@@ -105,7 +113,21 @@ Menu:
 
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
 
+## Building a menu without lv_menu
+
+<LvglExample name="lv_example_menu_navigation" path="widgets/menu/lv_example_menu_navigation" />
+
+Since `lv_menu` is deprecated, this example shows the recommended approach: pages
+are `lv_obj` containers stacked in a content area, only one shown at a time by
+toggling `LV_OBJ_FLAG_HIDDEN`. A header back button returns to the root page. The
+small `menu_*` helpers mirror the parts of the old API you actually need.
+
 ## Examples
+
+<Callout type="warning" title="Deprecated">
+The examples below use the deprecated `lv_menu` widget. Prefer the approach in
+[Building a menu without lv_menu](#building-a-menu-without-lv_menu) for new code.
+</Callout>
 
 ### Simple Menu
 
