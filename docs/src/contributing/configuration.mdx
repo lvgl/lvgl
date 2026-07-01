@@ -346,13 +346,7 @@ depending on which build path the old config came from:
 
 Supporting tools in `parse.py`:
 
-- **`IGNORE_SYMBOLS`** — symbols that exist in Kconfig but must *not* appear in
-  the generated headers (internal raw counts, symbols handled entirely by a
-  shim). To retire a `choice` while keeping old defconfigs valid, keep the choice
-  but mark it `optional` (so a fresh config selects nothing and emits no
-  spurious deprecation warning) and add its members to `IGNORE_SYMBOLS`; map them
-  in the bridge shim. *(See the `LV_SDL_BUF_COUNT` change.)*
-- A bracketed `[DEPRECATED …]` prompt (or a help text starting with
+- A bracketed `[DEPRECATED ...]` prompt (or a help text starting with
   `Deprecated`) keeps an option out of the public template (`_is_deprecated` in
   `parse.py`).
 
@@ -363,9 +357,9 @@ Supporting tools in `parse.py`:
 All policy lives in `parse.py`:
 
 - `MEMBER_IS_TOKEN` — choices whose macro should expand to the member *name* (an
-  emitted int token) rather than a bare number. See [Enum as Integer Choices](#Enum-as-Integer-Choices-(Config-Options))
+  emitted int token) rather than a bare number. See [Enum as Integer Choices](#enum-as-integer-choices-config-options)
 - `CHOICE_TOKEN_MAP` — anonymous choices whose members map to renamed C-header
-  tokens. See (Anonymous Choices)(#Anonymous-Choices)
+  tokens. See [Anonymous Choices](#anonymous-choices)
 
 And in `templates.py`: `BUILTIN_FONTS` (the `LV_FONT_DEFAULT_*`, `&lv_font_*`
 pointer table, the one piece of data that can't come from Kconfig).

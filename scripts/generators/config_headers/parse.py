@@ -124,8 +124,8 @@ CHOICE_TOKEN_MAP: dict = {
 def _is_deprecated(node) -> bool:
     """A config formally flagged deprecated - kept out of the template (handled
     by the bridge shims).  Matches the bracketed ``[DEPRECATED ...]`` prompt
-    convention or a help text that *opens* with "Deprecated"; a prompt that
-    merely mentions the word in prose (e.g. LV_USE_RLOTTIE) is not skipped."""
+    convention or a help text that *opens* with "Deprecated"
+    """
     prompt = node.prompt[0] if node.prompt else ""
     if "[DEPRECATED" in prompt.upper():
         return True
