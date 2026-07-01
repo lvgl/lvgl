@@ -680,15 +680,15 @@ void lv_sve_gray8_stride_blend_to_cccn888(
                                                               
         /* process low half */
         svuint16_t vSourceLow = svunpklo_u16(vu8Source);
-        svset4(vTargetLow16x4, 0, vSourceLow);
-        svset4(vTargetLow16x4, 1, vSourceLow);
-        svset4(vTargetLow16x4, 2, vSourceLow);
+        vTargetLow16x4 = svset4(vTargetLow16x4, 0, vSourceLow);
+        vTargetLow16x4 = svset4(vTargetLow16x4, 1, vSourceLow);
+        vTargetLow16x4 = svset4(vTargetLow16x4, 2, vSourceLow);
                                                                    
         /* process high half */         
         svuint16_t vSourceHigh = svunpkhi_u16(vu8Source);
-        svset4(vTargetHigh16x4, 0, vSourceHigh);
-        svset4(vTargetHigh16x4, 1, vSourceHigh);
-        svset4(vTargetHigh16x4, 2, vSourceHigh);                   
+        vTargetLow16x4 = svset4(vTargetHigh16x4, 0, vSourceHigh);
+        vTargetLow16x4 = svset4(vTargetHigh16x4, 1, vSourceHigh);
+        vTargetLow16x4 = svset4(vTargetHigh16x4, 2, vSourceHigh);                   
                                                               
         svst4ub_u16(vTailPred,                                
                     (uint8_t *)pwTarget,                      
@@ -721,15 +721,15 @@ void lv_sve_gray8_stride_blend_to_ccc888(
                                                               
         /* process low half */
         svuint16_t vSourceLow = svunpklo_u16(vu8Source);
-        svset3(vTargetLow16x3, 0, vSourceLow);
-        svset3(vTargetLow16x3, 1, vSourceLow);
-        svset3(vTargetLow16x3, 2, vSourceLow);
+        vTargetLow16x3 = svset3(vTargetLow16x3, 0, vSourceLow);
+        vTargetLow16x3 = svset3(vTargetLow16x3, 1, vSourceLow);
+        vTargetLow16x3 = svset3(vTargetLow16x3, 2, vSourceLow);
                                                               
         /* process high half */         
         svuint16_t vSourceHigh = svunpkhi_u16(vu8Source);
-        svset3(vTargetHigh16x3, 0, vSourceHigh);
-        svset3(vTargetHigh16x3, 1, vSourceHigh);
-        svset3(vTargetHigh16x3, 2, vSourceHigh);                 
+        vTargetHigh16x3 = svset3(vTargetHigh16x3, 0, vSourceHigh);
+        vTargetHigh16x3 = svset3(vTargetHigh16x3, 1, vSourceHigh);
+        vTargetHigh16x3 = svset3(vTargetHigh16x3, 2, vSourceHigh);                 
                                                               
         svst3ub_u16(vTailPred,                                
                     pchTarget,                      
