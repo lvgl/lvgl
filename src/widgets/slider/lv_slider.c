@@ -602,7 +602,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
             new_value = p.x - (obj->coords.x1 + bg_left);
         }
         if(indic_w) {
-            new_value = (new_value * range + indic_w / 2) / indic_w;
+            new_value = (int32_t)(((int64_t)new_value * range + indic_w / 2) / indic_w);
             new_value += slider->bar.min_value;
         }
     }
@@ -621,7 +621,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
             new_value = p.y - (obj->coords.y2 + bg_bottom);
             new_value = -new_value;
         }
-        new_value = (new_value * range + indic_h / 2) / indic_h;
+        new_value = (int32_t)(((int64_t)new_value * range + indic_h / 2) / indic_h);
         new_value += slider->bar.min_value;
     }
 
