@@ -7,19 +7,18 @@ description: "LVGL is available on GitHub: https://github.com/lvgl/lvgl."
 
 ### Clone or Download
 
-LVGL is available on GitHub: https://github.com/lvgl/lvgl.
+If you would like to integrate LVGL yourself you can get it from GitHub: https://github.com/lvgl/lvgl.
 
-You can clone it or
-[Download](https://github.com/lvgl/lvgl/archive/refs/heads/master.zip)
-the latest version of the library from GitHub.
+You can clone it or [Download](https://github.com/lvgl/lvgl/archive/refs/heads/master.zip)
+the latest version as a ZIP.
 
-In this case, you can copy the `lvgl` into your project, use a
-built-in display driver or write your own, and compile LVGL with the
+
+If you download LVGL yourself you need to save it into your project folder so that it can be compiled with the
 rest of your source code.
 
 ### Frameworks and Package Registries
 
-LVGL is also available as:
+LVGL is also available in various frameworks and registries where most of the integration work is already done:
 
 - [Arduino library](/integration/frameworks/arduino)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
@@ -30,9 +29,6 @@ LVGL is also available as:
 - [RT-Thread RTOS](/integration/rtos/rt-thread)
 - CMSIS-Pack
 - [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
-
-Usually, LVGL is ready to use in these frameworks. You can also find a description
-at [Integration](/integration).
 
 ### Folder Structure
 
@@ -81,24 +77,16 @@ lv_conf.h
 other files and folders in your project
 ```
 
-1. Set the <ApiLink name="LV_CONF_INCLUDE_SIMPLE" /> define to your compiler
-
-options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for GCC compiler) and set the
+1. Set the <ApiLink name="LV_CONF_INCLUDE_SIMPLE" /> define to your compiler options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for GCC compiler) and set the
 include path manually (e.g. `-I../include/gui`). In this case, LVGL
 will attempt to include `lv_conf.h` simply with `#include "lv_conf.h"`
 instead of `lvgl/lvgl.h`.
 
-1. Set a custom path via the <ApiLink name="LV_CONF_PATH" /> define.
+2. Set a custom path via the <ApiLink name="LV_CONF_PATH" /> define. For example: `-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"`.
 
-For example: `-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"`.
+3. Delete some settings from `lv_conf.h` and set them via compile options. For example: `-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1`.
 
-1. Delete some settings from `lv_conf.h` and set them via compile options.
-
-For example: `-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1`.
-
-1. To fully skip `lv_conf.h` and use only compiler options (see point 3),
-
-define <ApiLink name="LV_CONF_SKIP" /> as a compiler option. Unset options will get a
+4. To fully skip `lv_conf.h` and use only compiler options (see point 3), define <ApiLink name="LV_CONF_SKIP" /> as a compiler option. Unset options will get a
 default value which is the same as the content of `lv_conf_template.h`.
 
 ### Kconfig
@@ -124,7 +112,7 @@ commands. Here is a list of some useful commands:
 - `alldefconfig`: Creates a .config with all default values.
 - `genconfig`: Generates a C header from the config, following `autoconf.h` format.
 
-##### Usage
+#### Usage
 
 1. Install the prerequisites using `scripts/install_prerequisites.sh/bat`.
 2. Create the configuration (.config)
@@ -137,7 +125,7 @@ menuconfig
 Make changes to the config and exit using `Esc` or `Q`, and save your configuration.
 The `.config` file is now created and lists the configuration values.
 
-1. Run CMake with the `-DLV_USE_KCONFIG=ON` flag:
+3. Run CMake with the `-DLV_USE_KCONFIG=ON` flag:
 
 ```bash
 cd <lvgl_repo>
@@ -181,13 +169,13 @@ everything from scratch is also simple. The process can be read in the following
 
 1. Include `lvgl/lvgl.h`
 2. Initialize your hardware (clock, peripherals, etc.)
-3. Call `lv_init()` to initialize LVGL
+3. Call <ApiLink name="lv_init" display="lv_init()" /> to initialize LVGL
 
 ### Tick Interface
 
-Set the tick for LVGL by calling `lv_tick_inc(x)` in a timer interrupt every
+Set the tick for LVGL by calling <ApiLink name="lv_tick_inc" display="lv_tick_inc(x)" /> in a timer interrupt every
 `x` milliseconds, or set a callback that returns the milliseconds elapsed
-since startup with `lv_tick_set_cb(my_cb)`. Many platforms have built-in
+since startup with <ApiLink name="lv_tick_set_cb" display="lv_tick_set_cb(my_cb)" />. Many platforms have built-in
 functions that can be used as they are. For example:
 
 - SDL:  `lv_tick_set_cb(SDL_GetTicks);`
@@ -200,14 +188,14 @@ functions that can be used as they are. For example:
 
 ### Displays and Input Devices
 
-Create a **Display** (`lv_display`), set the buffers, and the flush callback.
+Create a **Display** (<ApiLink name="lv_display_t" display="lv_display" />), set the buffers, and the flush callback.
 In practice, this means implementing a single function that can show the rendered
 image on the screen. It is called a `flush` callback. To learn more about
 buffering options, see implementation examples and learn more about all the
 features in [Display (lv_display)](/main-modules/display).
 
 Add **Input devices** if needed (touchpad, external buttons, keyboard, etc.) by
-creating `lv_indev`s. To do so, a single `read` callback needs to be implemented
+creating <ApiLink name="lv_indev_t" display="lv_indev" />s. To do so, a single `read` callback needs to be implemented
 which returns the state of the given input device. Read more about the input device
 types, their features, and check the examples at [Input devices (lv_indev)](/main-modules/indev).
 
@@ -244,7 +232,7 @@ If `LV_USE_OS` is set, <ApiLink name="lv_sleep_ms" /> will be the sleep function
 provided by the operating system, otherwise it will fall back to a blocking delay.
 Of course, you can use any custom delay, wait, or sleep functions instead.
 
-##### Sleep Management
+#### Sleep Management
 
 To better control the delay/sleep time, <ApiLink name="lv_timer_handler" />
 returns the remaining time until the next timer:
@@ -456,8 +444,8 @@ void other_thread(void)
 ## Multiple Instances
 
 It is possible to run multiple, independent instances of LVGL in the same firmware.
-To enable its multi-instance feature, set <ApiLink name="LV_GLOBAL_CUSTOM" /> in `lv_conf.h
-and provide a custom function to <ApiLink name="lv_global_default" /> using thread` or
+To enable its multi-instance feature, set <ApiLink name="LV_GLOBAL_CUSTOM" /> in `lv_conf.h`
+and provide a custom function to <ApiLink name="lv_global_default" /> using `__thread` or
 `pthread_key_t`. This allows running multiple LVGL instances by storing LVGL's
 global variables in TLS (Thread-Local Storage).
 

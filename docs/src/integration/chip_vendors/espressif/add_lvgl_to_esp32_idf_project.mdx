@@ -28,7 +28,7 @@ In case you do not want to use esp_lvgl_port, you can add [LVGL component](https
 idf.py add-dependency "lvgl/lvgl^9.*"
 ```
 
-Adjust the [^9.*` part to match your LVGL version requirement. More information on version specifications can be found in the `IDF Component Manager documentation](https://docs.espressif.com/projects/idf-component-manager/en/latest/reference/versioning.html#range-specifications). During the next build, the LVGL component will be fetched from the component registry and added to the project.
+Adjust the `^9.*` part to match your LVGL version requirement. More information on version specifications can be found in the [IDF Component Manager documentation](https://docs.espressif.com/projects/idf-component-manager/en/latest/reference/versioning.html#range-specifications). During the next build, the LVGL component will be fetched from the component registry and added to the project.
 
 **Advanced usage: Use LVGL as local component**
 
@@ -44,7 +44,7 @@ All components from `${project_dir}/components` are automatically added to the b
 
 ### Display Integration
 
-For a successful LVGL project, you will need a display driver and optionally a touch driver. Espressif provides these drivers that are built on its [esp_lcd](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/lcd/index.html) component.
+For a successful LVGL project, you will need a [display](/main-modules/display) driver and optionally a touch driver. Espressif provides these drivers that are built on its [esp_lcd](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/lcd/index.html) component.
 
 - esp_lcd natively supports some [basic displays](https://github.com/espressif/esp-idf/tree/master/components/esp_lcd/src)
 - Other displays are maintained in [esp-bsp repository](https://github.com/espressif/esp-bsp/tree/master/components/lcd) and are uploaded to ESP Registry
@@ -63,7 +63,7 @@ idf.py add-dependency "espressif/esp_lcd_gc9a01^2.0.0"
 To configure LVGL, launch the configuration menu with `idf.py menuconfig` in your project root directory. Navigate to `Component config` and then `LVGL configuration`.
 
 Additionally the user can make the current LVGL settings permanent, or default, for the current
-project, all that is needed is to create a file on the project root called 
+project, all that is needed is to create a file on the project root called
 `sdkconfig.defaults` and move the `CONFIG_LV_` symbols to that file.
 
 It is possible to create a per-chip default configuration files by creating a
@@ -73,13 +73,13 @@ IDF project.
 
 ### Starting the LVGL component
 
-Once the IDF project and the LVGL component have been configured, all 
+Once the IDF project and the LVGL component have been configured, all
 the early initialization process inside of the code will be ready to use, however
-the user should manually start the LVGL subsystem for IDF by calling `bsp_display_start()`, 
+the user should manually start the LVGL subsystem for IDF by calling `bsp_display_start()`,
 or `lvgl_port_init()` if LVGL was manually configured, for example without using
 the `esp_bsp` component.
 
-After calling this function, LVGL will be running in the background; that is, 
+After calling this function, LVGL will be running in the background; that is,
 unlike the usual approach, there is no need to periodically call <ApiLink name="lv_timer_handler" />,
 this function is called by a background task managed by the IDF.
 

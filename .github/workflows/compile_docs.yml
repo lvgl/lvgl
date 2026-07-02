@@ -1,4 +1,4 @@
-name: Build Docs 
+name: Build Docs
 
 on:
   workflow_dispatch: # allow manual triggering
@@ -23,6 +23,7 @@ on:
       - 'lv_version.h'
       - 'lvgl.h'
       - '.github/workflows/compile_docs.yml'
+      - 'include/**'
   push:
     branches:
       - master
@@ -39,6 +40,7 @@ on:
       - 'lv_version.h'
       - 'lvgl.h'
       - '.github/workflows/compile_docs.yml'
+      - 'include/**'
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each PR
@@ -96,27 +98,28 @@ jobs:
             doxygen
 
       # Tool used to convert Doxygen XML to .mdx API pages
-      - name: Install doxymark 
+      - name: Install doxymark
         run: |
-          npm install github:mutahharmkhan/doxymark#multi-root-prefix
+          npm install github:mutahharmkhan/doxymark#lvgl
 
-      # Generate Documentation API pages 
+      # Generate Documentation API pages
       - name: Generate API pages
         run: |
             npx doxymark \
             --input docs/doxygen/xml \
-            --output docs/src \
-            --index docs/src/api-index.json \
+            --output docs/src/api \
+            --index docs/src/api/api-index.json \
             --preset fumadocs \
             --auto-group \
-            --root api=./include/lvgl \
-            --root api-private=./src \
-            --source-url-for api=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/include/lvgl \
-            --source-url-for api-private=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src \
-            --root-title api=API \
-            --root-title 'api-private=API Private' \
-            --drop-empty-files
-            rm -rf docs/doxygen 
+            --root public=./include/lvgl \
+            --root private=./src \
+            --source-url-for public=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/include/lvgl \
+            --source-url-for private=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src \
+            --root-title 'public=Public API' \
+            --root-title 'private=Private API' \
+            --drop-empty-files \
+			--url-prefix api
+            rm -rf docs/doxygen
 
       - name: Install Example Documentation
         run: npm i @lvgl/examples-generator

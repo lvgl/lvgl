@@ -1,0 +1,89 @@
+---
+title: Porting overview
+description: "Learn the basics about how to port LVGL to any hardware"
+---
+
+
+
+## Quick start
+
+The following is an overview of how to integrate LVGL into your project.
+A more detailed description is available at [Overview](/integration/overview).
+
+
+The main steps are the following:
+1. **Driver Initialization**:  It is the user's responsibility to set up the clock, timers, peripherals, etc.
+2. **Call <ApiLink name="lv_init" display="lv_init()" />**: Initialize LVGL itself.
+3. **Create display and input devices and set up the tick**:  Create display(s) (<ApiLink name="lv_display_t" />) and input device(s) (<ApiLink name="lv_indev_t" />) and set up their callbacks.
+4. **Create the UI**:  Call LVGL functions to create screens, widgets, styles, animations, events, etc.
+5. **Call <ApiLink name="lv_timer_handler" display="lv_timer_handler()" /> in a loop**: This handles all the LVGL-related tasks, such as refreshing display(s), reading input devices, firing events based on user input, running animations, and running user-created timers.
+
+This is just a brief example of how to add LVGL to a new project.
+
+```c
+void main(void)
+{
+    your_driver_init();
+
+    lv_init();
+
+    lv_tick_set_cb(my_get_millis);
+
+    lv_display_t * display = lv_display_create(320, 240);
+
+    /* LVGL will render to this 1/10 screen sized buffer for 2 bytes/pixel */
+    static uint8_t buf[320 * 240 / 10 * 2];
+    lv_display_set_buffers(display, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+    /* This callback will display the rendered image */
+    lv_display_set_flush_cb(display, my_flush_cb);
+
+    /* Create widgets */
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Hello LVGL!");
+
+    /* Make LVGL periodically execute its tasks */
+    while(1) {
+        /* Provide updates to currently-displayed Widgets here. */
+        lv_timer_handler();
+        my_sleep(5);  /*Wait 5 milliseconds before processing LVGL timer again*/
+    }
+}
+
+/* Return the elapsed milliseconds since startup.
+ * It needs to be implemented by the user */
+uint32_t my_get_millis(void)
+{
+    return my_tick_ms;
+}
+
+/* Copy rendered image to screen.
+ * This needs to be implemented by the user. */
+void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_buf)
+{
+    /* Show the rendered image on the display */
+    my_display_update(area, px_buf);
+
+    /* Indicate that the buffer is available.
+     * If DMA were used, call in the DMA complete interrupt. */
+    lv_display_flush_ready(disp);
+}
+```
+
+## Drivers
+
+### Custom driver
+
+By writing a custom `flush_cb` for your display and `read_cb` for the input devices you can easily create
+your own drivers. Learn more in the [Integration](/integration/overview#connecting-to-hardware) section.
+
+
+## Built-in drivers
+
+LVGL comes with many built-in drivers for display controllers (like ILI9341, ST7789, etc.), Linux drivers (like Wayland, DRM, etc.),
+(RT)OS support (FreeRTOS, NuttX, Linux, etc.), and GPUs (Dave2D, VG-Lite, OpenGL ES, etc.).
+
+These just need to be enabled in `lv_conf.h` to use them right away. Learn more about the built-in drivers in
+the [Integration](/integration/overview#connecting-to-hardware) section.
+
+

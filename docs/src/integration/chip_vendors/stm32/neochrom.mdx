@@ -28,7 +28,7 @@ Enable the renderer by setting <ApiLink name="LV_USE_NEMA_GFX" /> to `1` in
 lv_conf.h.
 
 Set <ApiLink name="LV_USE_NEMA_LIB" /> to the correct version for the core in
-your MCU. If left as `LV_NEMA_LIB_NONE`, M33 RevC will be assumed.
+your MCU. If left as <ApiLink name="LV_NEMA_LIB_NONE" />, M33 RevC will be assumed.
 
 If using <ApiLink name="LV_USE_NEMA_VG" />,
 set <ApiLink name="LV_NEMA_GFX_MAX_RESX" /> and <ApiLink name="LV_NEMA_GFX_MAX_RESY" />
@@ -137,9 +137,9 @@ const lv_image_dsc_t img_demo_widgets_avatar_tsc6a = {
 
 ## Interop with the LTDC driver and the DMA2D Draw Unit
 
-NeoChrom can be enabled at the same time as LTDC. They will not interfere
+NeoChrom can be enabled at the same time as [LTDC](/integration/chip_vendors/stm32/ltdc). They will not interfere
 with each other at all.
 
-NeoChrom and DMA2D may be enabled at the same time. They are both draw units
+NeoChrom and [DMA2D](/integration/chip_vendors/stm32/dma2d_gpu) may be enabled at the same time. They are both draw units
 and they will both independently accept draw tasks.
 

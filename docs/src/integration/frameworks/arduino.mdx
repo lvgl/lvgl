@@ -12,7 +12,7 @@ For example ESP32 is a good candidate to create UI's with LVGL.
 
 If you are using the Arduino GIGA Display Shield (docs [here](https://docs.arduino.cc/hardware/giga-display-shield)), use the [Arduino_H7_Video](https://github.com/arduino/ArduinoCore-mbed/tree/main/libraries/Arduino_H7_Video) library, included in the Arduino Mbed OS board package ([here](https://github.com/arduino/ArduinoCore-mbed)), which provides built-in LVGL compatibility.
 
-### Get the LVGL Arduino library
+## Get the LVGL Arduino library
 
 LVGL can be installed via the Arduino IDE Library Manager or as a .ZIP library.
 
@@ -20,16 +20,16 @@ You can [Download](https://github.com/lvgl/lvgl/archive/refs/heads/master.zip)
 the latest version of LVGL from GitHub and simply copy it to Arduino's
 library folder.
 
-### Set up drivers
+## Set up drivers
 
 To get started, the recommended option is to use the LovyanGFX
-library as the TFT driver, since it makes testing much easier. 
-You’ll need to create a display configuration file, such as [my_display.hpp`
-similar to the example in `LovyanGFX user_setting.ino](https://github.com/lovyan03/LovyanGFX/blob/master/examples/HowToUse/2_user_setting/2_user_setting.ino)
-In the Arduino IDE, you can create a new tab and name it [my_display.hpp` and paste the content of your configuration file there.
-If you prefer not to use LovyanGFX, you can integrate other graphics libraries as well by implementing a wrapper class in the same way LovyanGFX is handled; 
-`lv_lgfx_user.hpp](https://github.com/lvgl/lvgl/blob/master/src/drivers/display/lovyan_gfx/lv_lgfx_user.hpp)
-provides a good example of this. Once your configuration file 
+library as the TFT driver, since it makes testing much easier.
+You’ll need to create a display configuration file, such as `my_display.hpp`,
+similar to the example in [LovyanGFX's `user_setting.ino`](https://github.com/lovyan03/LovyanGFX/blob/master/examples/HowToUse/2_user_setting/2_user_setting.ino).
+In the Arduino IDE, you can create a new tab and name it `my_display.hpp` and paste the content of your configuration file there.
+If you prefer not to use LovyanGFX, you can integrate other graphics libraries as well by implementing a wrapper class in the same way LovyanGFX is handled;
+[`lv_lgfx_user.hpp`](https://github.com/lvgl/lvgl/blob/master/src/drivers/display/lovyan_gfx/lv_lgfx_user.hpp)
+provides a good example of this. Once your configuration file
 is ready, update `lv_conf.h` to include it, for example:
 
 ```c
@@ -42,7 +42,7 @@ is ready, update `lv_conf.h` to include it, for example:
 ```
 
 Alternatively, you can use [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI) library.
-To make it work, set up `TFT_eSPI` according to your 
+To make it work, set up `TFT_eSPI` according to your
 TFT display type via editing either:
 
 - `User_Setup.h`
@@ -50,7 +50,7 @@ TFT display type via editing either:
 
 Both files are located in `TFT_eSPI` library's folder.
 
-### Configure LVGL
+## Configure LVGL
 
 LVGL has its own configuration file called `lv_conf.h`. When LVGL is
 installed, follow these configuration steps:
@@ -71,15 +71,13 @@ arduino
    |-lv_conf.h
 ```
 
------------------------
-
 Take a look at [LVGL_Arduino.ino](https://github.com/lvgl/lvgl/blob/master/examples/arduino/LVGL_Arduino/LVGL_Arduino.ino)
 to see how to initialize LVGL. `TFT_eSPI` is used as the display driver.
 
-In the INO file you can see how to register a display and a touchpad for
-LVGL and call an example.
+In the INO file you can see how to register a [display](/main-modules/display) and a
+[touchpad](/main-modules/indev) for LVGL and call an example.
 
-### Use the examples and demos
+## Use the examples and demos
 
 Note that, there is no dedicated INO file for every example. Instead,
 you can load an example by calling an `lv_example_...` function. For
@@ -87,9 +85,9 @@ example <ApiLink name="lv_example_btn_1" />.
 
 | Field | Description |
 |-------|-------------|
-| `important` | Due to some the limitations of Arduino's build system you need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`. |
+| `important` | Due to some limitations of Arduino's build system you need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`. |
 
-### Debugging and logging
+## Debugging and logging
 
 LVGL can display debug information in case of trouble. In the
 `LVGL_Arduino.ino` example there is a `my_print` method, which sends
@@ -99,7 +97,7 @@ section `log settings`:
 
 ```c
 /* Log settings */
-#define USE_LV_LOG      1   /* Enable/disable the log module */
+#define LV_USE_LOG      1   /* Enable/disable the log module */
 #if LV_USE_LOG
 /* How important log should be added:
  * LV_LOG_LEVEL_TRACE       A lot of logs to give detailed information
