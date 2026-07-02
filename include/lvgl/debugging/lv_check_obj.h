@@ -63,7 +63,7 @@ extern "C" {
      */
     #define LV_CHECK_OBJ_VALID(obj, cls, action) \
       LV_CHECK_OBJ_CLASS(obj, cls, action); \
-      LV_CHECK_ARG(lv_obj_is_valid(obj), action);
+      LV_CHECK_ARG(lv_obj_is_in_widget_tree(obj), action);
 #else
     #define LV_CHECK_OBJ_VALID(obj, cls, action) LV_CHECK_OBJ_CLASS(obj, cls, action);
 #endif

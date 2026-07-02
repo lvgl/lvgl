@@ -60,7 +60,6 @@ static void lv_obj_draw(lv_event_t * e);
 static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
-static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
 static void lv_obj_children_add_state(lv_obj_t * obj, lv_state_t state);
 static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state);
@@ -70,6 +69,7 @@ static void screen_create_on_trigger_event_cb(lv_event_t * e);
 static void play_timeline_on_trigger_event_cb(lv_event_t * e);
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
 static void call_delete_cb(lv_event_t * e);
+static bool parent_contains_child(const lv_obj_t * parent, const lv_obj_t * child);
 
 #if LV_USE_OBJ_PROPERTY
     static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
@@ -1125,23 +1125,33 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj)
     return obj->class_p;
 }
 
-bool lv_obj_is_valid(const lv_obj_t * obj)
+bool lv_obj_is_in_widget_tree(const lv_obj_t * obj)
 {
     LV_CHECK_ARG(obj != NULL, return false);   /* Can't use LV_CHECK_OBJ here, it could cause an infinite recursion loop. */
 
+    const lv_obj_t * current = obj;
+
+    while(current->parent != NULL) {
+        LV_ASSERT(parent_contains_child(current->parent, current));
+        current = current->parent;
+    }
+
+    /* current is now a screen (parent == NULL); verify it belongs to a display */
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
         uint32_t i;
         for(i = 0; i < disp->screen_cnt; i++) {
-            if(disp->screens[i] == obj) return true;
-            bool found = obj_valid_child(disp->screens[i], obj);
-            if(found) return true;
+            if(disp->screens[i] == current) return true;
         }
-
         disp = lv_display_get_next(disp);
     }
 
     return false;
+}
+
+bool lv_obj_is_valid(const lv_obj_t * obj)
+{
+    return lv_obj_is_in_widget_tree(obj);
 }
 
 void lv_obj_null_on_delete(lv_obj_t ** obj_ptr)
@@ -1940,27 +1950,6 @@ static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
-static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
-{
-    /*Check all children of `parent`*/
-    uint32_t child_cnt = 0;
-    if(parent->spec_attr) child_cnt = parent->spec_attr->child_cnt;
-    uint32_t i;
-    for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = parent->spec_attr->children[i];
-        if(child == obj_to_find) {
-            return true;
-        }
-
-        /*Check the children*/
-        bool found = obj_valid_child(child, obj_to_find);
-        if(found) {
-            return true;
-        }
-    }
-    return false;
-}
-
 static void null_on_delete_cb(lv_event_t * e)
 {
     lv_obj_t ** obj_ptr = lv_event_get_user_data(e);
@@ -2034,6 +2023,23 @@ static void call_delete_cb(lv_event_t * e)
     dsc->cb(dsc->user_data);
     lv_obj_remove_delete_cb(dsc);
 }
+
+static bool parent_contains_child(const lv_obj_t * parent, const lv_obj_t * child)
+{
+#if LV_USE_CHECK_OBJ_PARENT_LINK
+    uint32_t child_cnt = parent->spec_attr ? parent->spec_attr->child_cnt : 0;
+    uint32_t i;
+    for(i = 0; i < child_cnt; i++) {
+        if(parent->spec_attr->children[i] == child) return true;
+    }
+    return false;
+#else
+    LV_UNUSED(parent);
+    LV_UNUSED(child);
+    return true;
+#endif
+}
+
 
 #if LV_USE_OBJ_PROPERTY
 static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj)
