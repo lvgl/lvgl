@@ -3,6 +3,14 @@ title: Flags
 description: Some widget attributes can be enabled or disabled using lv_obj_add_flag and lv_obj_remove_flag.
 ---
 
+<Callout type="warning" title="Deprecating Flags">
+Flags are deprecated in LVGL v9.6 and will be removed in LVGL v10.
+Use a dedicated function instead, such as <ApiLink name="lv_obj_set_hidden"/>.
+
+<ApiLink name="lv_obj_set_user_flag"/> and <ApiLink name="lv_obj_get_user_flag"/>
+can be used to replace `LV_OBJ_FLAG_USER_1-4`.
+</Callout>
+
 Some widget attributes can be enabled or disabled using
 <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(widget, LV_OBJ_FLAG_...)" /> and
 <ApiLink name="lv_obj_remove_flag" display="lv_obj_remove_flag(widget, LV_OBJ_FLAG_...)" />.

@@ -94,7 +94,7 @@ void test_wrap_grow_min_width(void)
         lv_obj_set_flex_grow(obj, grow);
 
         if(i == 9) {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            lv_obj_set_flex_in_new_track(obj, true);
         }
 
         lv_obj_t * label = lv_label_create(obj);
@@ -124,7 +124,7 @@ void test_wrap_grow_min_width_content(void)
         }
 
         if(i == 12) {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            lv_obj_set_flex_in_new_track(obj, true);
         }
 
         lv_obj_t * label = lv_label_create(obj);
@@ -149,7 +149,7 @@ void test_wrap_grow_min_width_pct(void)
         lv_obj_set_flex_grow(obj, grow);
 
         if(i == 9) {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            lv_obj_set_flex_in_new_track(obj, true);
         }
 
         lv_obj_t * label = lv_label_create(obj);
@@ -174,7 +174,7 @@ void test_wrap_grow_max_width_content(void)
         lv_obj_set_flex_grow(obj, grow);
 
         if(i == 9) {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            lv_obj_set_flex_in_new_track(obj, true);
         }
 
         lv_obj_t * label = lv_label_create(obj);
@@ -199,7 +199,7 @@ void test_wrap_grow_max_width_pct(void)
         lv_obj_set_flex_grow(obj, grow);
 
         if(i == 9) {
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            lv_obj_set_flex_in_new_track(obj, true);
         }
 
         lv_obj_t * label = lv_label_create(obj);
@@ -704,7 +704,7 @@ static lv_obj_t * cont_row_5_create(void)
 
 static void hide(lv_obj_t * cont, uint32_t idx)
 {
-    lv_obj_add_flag(lv_obj_get_child(cont, idx), LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(lv_obj_get_child(cont, idx), true);
 }
 
 void test_flex_hide_items(void)
@@ -756,7 +756,7 @@ void test_flex_hide_item_first_grow(void)
 
     lv_obj_t * label1 = lv_label_create(cont);
     lv_label_set_text(label1, "Hidden");
-    lv_obj_set_flag(label1, LV_OBJ_FLAG_HIDDEN, true);
+    lv_obj_set_hidden(label1, true);
     lv_obj_set_style_bg_color(label1, lv_color_hex3(0xf00), 0);
     lv_obj_set_style_bg_opa(label1, LV_OPA_30, 0);
 
