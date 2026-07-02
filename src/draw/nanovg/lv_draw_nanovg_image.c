@@ -89,8 +89,8 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
             }
         }
 
-        image_handle = lv_nanovg_image_cache_get_handle(u, dsc->src,
-                                                        image_flags, NULL);
+        image_handle = lv_nanovg_image_cache_get_handle(u, dsc->src, image_flags, NULL,
+                                                        (dsc->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) == 0);
     }
 
     if(image_handle < 0) {

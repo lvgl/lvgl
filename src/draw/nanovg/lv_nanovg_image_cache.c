@@ -46,8 +46,10 @@ typedef struct {
 *  STATIC PROTOTYPES
 **********************/
 
+static bool create_image_item(image_item_t * item);
+
 static void image_cache_release_cb(void * entry, void * user_data);
-static bool image_create_cb(image_item_t * item, void * user_data);
+static inline bool image_create_cb(image_item_t * item, void * user_data);
 static void image_free_cb(image_item_t * item, void * user_data);
 static lv_cache_compare_res_t image_compare_cb(const image_item_t * lhs, const image_item_t * rhs);
 static void image_cache_drop_collect_cb(void * elem);
@@ -100,7 +102,7 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u)
 int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
                                      const void * src,
                                      int image_flags,
-                                     lv_image_header_t * header)
+                                     lv_image_header_t * header, bool cache)
 {
     LV_PROFILER_DRAW_BEGIN;
 
@@ -133,14 +135,20 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
         *header = decoder_dsc.header;
     }
 
-    image_item_t search_key = { 0 };
-    search_key.u = u;
-    search_key.src_buf = *decoded;
-    search_key.image_flags = image_flags;
-    search_key.src = src;
-    search_key.src_type = lv_image_src_get_type(src);
+    image_item_t item = { 0 };
+    item.u = u;
+    item.src_buf = *decoded;
+    item.image_flags = image_flags;
+    item.src = src;
+    item.src_type = lv_image_src_get_type(src);
 
-    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->image_cache, &search_key, NULL);
+    if(!cache) {
+        create_image_item(&item);
+        LV_PROFILER_DRAW_END;
+        return item.image_handle;
+    }
+
+    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->image_cache, &item, NULL);
     if(cache_node_entry == NULL) {
         /* check if the cache is full */
         size_t free_size = lv_cache_get_free_size(u->image_cache, NULL);
@@ -149,7 +157,7 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
             lv_nanovg_end_frame(u);
         }
 
-        cache_node_entry = lv_cache_acquire_or_create(u->image_cache, &search_key, NULL);
+        cache_node_entry = lv_cache_acquire_or_create(u->image_cache, &item, NULL);
         if(cache_node_entry == NULL) {
             LV_LOG_ERROR("image cache creating failed");
             lv_image_decoder_close(&decoder_dsc);
@@ -162,9 +170,7 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
 
     /* Add the new entry to the pending list */
     lv_pending_add(u->image_pending, &cache_node_entry);
-
     image_item_t * image_item = lv_cache_entry_get_data(cache_node_entry);
-
     LV_PROFILER_DRAW_END;
     return image_item->image_handle;
 }
@@ -207,14 +213,20 @@ static void image_cache_release_cb(void * entry, void * user_data)
     lv_cache_release(cache, * entry_p, NULL);
 }
 
-static bool image_create_cb(image_item_t * item, void * user_data)
+static inline bool image_create_cb(image_item_t * item, void * user_data)
 {
     LV_UNUSED(user_data);
+    return create_image_item(item);
+}
+
+static bool create_image_item(image_item_t * item)
+{
     const uint32_t w = item->src_buf.header.w;
     const uint32_t h = item->src_buf.header.h;
     const lv_color_format_t cf = item->src_buf.header.cf;
     const uint32_t stride = item->src_buf.header.stride;
     enum NVGtexture nvg_tex_type = NVG_TEXTURE_BGRA;
+    item->image_handle = -1;
 
     /* Determine texture type and pixel size based on color format */
     switch(cf) {
