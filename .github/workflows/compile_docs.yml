@@ -23,6 +23,7 @@ on:
       - 'lv_version.h'
       - 'lvgl.h'
       - '.github/workflows/compile_docs.yml'
+      - 'include/**'
   push:
     branches:
       - master
