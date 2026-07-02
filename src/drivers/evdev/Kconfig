@@ -1,0 +1,5 @@
+config LV_USE_EVDEV
+	bool "Use evdev input driver"
+	default n
+	help
+		Driver for evdev input devices

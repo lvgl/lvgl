@@ -1,0 +1,209 @@
+menu "Build"
+
+config LVGL_VERSION_MAJOR
+	int
+	default 9
+config LVGL_VERSION_MINOR
+	int
+	default 6
+config LVGL_VERSION_PATCH
+	int
+	default 0
+
+config LV_CONF_SKIP
+	bool "Check this to skip using lv_conf.h"
+	default y
+
+config LV_CONF_MINIMAL
+	bool "LVGL minimal configuration [DEPRECATED: use the minimal defconfig]"
+	default n
+	help
+	  Deprecated and no longer functional. The minimal preset is now a
+	  defconfig: configs/defconfigs/minimal.defconfig. Setting this has no
+	  effect on the generated configuration and triggers a build warning.
+
+config LV_USE_PRIVATE_API
+	bool "Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default"
+	default n
+
+config LV_ENABLE_GLOBAL_CUSTOM
+	bool "Enable 'lv_global' customization"
+	default n
+	help
+	  By default, LVGL stores all runtime state in a single static
+	  'lv_global_t' variable, sufficient for most single-display
+	  single-threaded applications.
+
+	  Enable this if you need multiple independent LVGL instances in
+	  the same process, for example:
+	    - Multiple physical displays with separate render loops
+	    - Per-thread LVGL contexts on an RTOS (FreeRTOS, Zephyr, etc.)
+	    - Hot-swappable or sandboxed UI instances
+
+	  When enabled, every LVGL internal access to global state goes
+	  through LV_GLOBAL_CUSTOM() instead of a static variable. You
+	  must implement 'lv_global_t *lv_global_default(void)' to return
+	  the correct instance for the current context (e.g. by thread-local
+	  storage or a guarded pointer switch).
+
+	  Returning NULL from that function is safe; LVGL will treat the
+	  library as uninitialized for that context.
+
+if LV_ENABLE_GLOBAL_CUSTOM
+
+config LV_GLOBAL_USE_CUSTOM_INCLUDE
+	bool "Provide 'lv_global_default()' from a custom header"
+	help
+	  Use a custom header for the declaration of:
+	  	lv_global_t *lv_global_default(void);
+
+config LV_GLOBAL_CUSTOM_INCLUDE
+	string "Header to include for the custom 'lv_global' function"
+	depends on LV_GLOBAL_USE_CUSTOM_INCLUDE
+	default "lv_global.h"
+	help
+	  Path to the header that declares:
+	    lv_global_t *lv_global_default(void);
+
+	  This header is included wherever LVGL needs to resolve the
+	  LV_GLOBAL_DEFAULT() macro. Keep it lightweight, it is included
+	  in performance-critical paths.
+
+endif #LV_ENABLE_GLOBAL_CUSTOM
+
+menu "Asserts"
+	config LV_USE_ASSERT_NULL
+		bool "Check if the parameter is NULL. (Very fast, recommended)"
+		default y
+
+	config LV_USE_ASSERT_MALLOC
+		bool "Checks if the memory is successfully allocated or no. (Very fast, recommended)"
+		default y
+
+	config LV_USE_ASSERT_STYLE
+		bool "Check if the styles are properly initialized. (Very fast, recommended)"
+
+	config LV_USE_ASSERT_MEM_INTEGRITY
+		bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
+
+	config LV_USE_ASSERT_OBJ
+		bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
+
+	config LV_ASSERT_HANDLER_INCLUDE
+		string "Assert handler include [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]"
+		default ""
+		help
+		  [DEPRECATED: use LV_ASSERT_CUSTOM_INCLUDE]
+		  Add a custom handler when assert happens e.g. to restart the MCU
+		  Optional header to override assert-related macros.
+
+	config LV_WARN_ABOUT_ASSERT_HANDLER_INCLUDE
+		bool
+		default y if LV_ASSERT_HANDLER_INCLUDE != ""
+
+	config LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
+		bool "Disable LV_ASSERT_HANDLER_INCLUDE deprecated warning"
+		default n
+		help
+		  Disable warning saying `LV_ASSERT_HANDLER_INCLUDE` is deprecated.
+		  This setting allows you to keep using old LVGL versions which rely on
+		  LV_ASSERT_HANDLER_INCLUDE without triggering a compiler warning.
+
+		  LV_ASSERT_HANDLER_INCLUDE has been deprecated in favor of the new approach:
+		  define LV_ASSERT_CUSTOM_INCLUDE with the header path, and place the
+		  LV_ASSERT_HANDLER macro definition inside that header instead.
+
+		  Only enable this if you are maintaining compatibility with existing code
+		  that uses LV_ASSERT_HANDLER_INCLUDE and cannot migrate immediately.
+		  New projects should use LV_ASSERT_CUSTOM_INCLUDE and LV_ASSERT_HANDLER
+		  directly.
+
+	config LV_ASSERT_USE_CUSTOM_INCLUDE
+		bool "Use a custom path to define an assertion handler"
+		default n
+		help
+		  Use LV_ASSERT_CUSTOM_INCLUDE to define the path to a file defining a
+		  custom LV_ASSERT_HANDLER
+
+	config LV_ASSERT_CUSTOM_INCLUDE
+		string "Path to custom assert handler header"
+		default ""
+		depends on LV_ASSERT_USE_CUSTOM_INCLUDE
+		help
+		  Optional header to override assert-related macros.
+
+		  LV_ASSERT_HANDLER
+		    Statement to execute when an assertion fails.
+		    e.g. #define LV_ASSERT_HANDLER my_assert_failed(__FILE__, __LINE__);
+
+endmenu
+
+menu "Argument Checks"
+	config LV_USE_CHECK_ARG
+		bool "Enable LV_CHECK_ARG macro for runtime argument validation"
+		default y
+		help
+			When enabled, LV_CHECK_ARG checks validate function arguments
+			at runtime. Failed checks log a warning and execute the specified
+			action. When disabled, all LV_CHECK_ARG checks compile to nothing.
+			Disabling this is not recommended unless extreme care is taken and only
+			in very resource constrained environments where it can be absolutely
+			ensured that invariants are never violated.
+
+	if LV_USE_CHECK_ARG
+
+	config LV_CHECK_ARG_ASSERT_ON_FAIL
+		bool "Call assert handler on LV_CHECK_ARG failure"
+		default n
+		help
+			When enabled, LV_ASSERT_HANDLER is also invoked when an
+			LV_CHECK_ARG check fails, before the action is executed.
+
+	choice
+		prompt "Log behavior on LV_CHECK_ARG failure"
+		default LV_CHECK_ARG_LOG_MODE_VERBOSE if LV_USE_LOG
+		default LV_CHECK_ARG_LOG_MODE_NONE if !LV_USE_LOG
+		help
+			Controls what is logged when an LV_CHECK_ARG check fails.
+			MINIMAL and VERBOSE modes require LV_USE_LOG to be enabled;
+			selecting either when LV_USE_LOG is disabled will cause a
+			compile-time error.
+
+		config LV_CHECK_ARG_LOG_MODE_NONE
+			bool "None: no log output on failure"
+
+		config LV_CHECK_ARG_LOG_MODE_MINIMAL
+			bool "Minimal: log 'Check failed' only (file/line from LV_LOG_WARN)"
+			depends on LV_USE_LOG
+
+		config LV_CHECK_ARG_LOG_MODE_VERBOSE
+			bool "Verbose: log 'Check failed: <cond>' plus caller-supplied message"
+			depends on LV_USE_LOG
+
+	endchoice
+
+	config LV_CHECK_ARG_LOG_MODE
+		int
+		default 0 if LV_CHECK_ARG_LOG_MODE_NONE
+		default 1 if LV_CHECK_ARG_LOG_MODE_MINIMAL
+		default 2 if LV_CHECK_ARG_LOG_MODE_VERBOSE
+
+	config LV_USE_CHECK_OBJ_CLASSTYPE
+		bool "Enable class check in LV_CHECK_OBJ"
+		default n
+		help
+			When enabled, LV_CHECK_OBJ verifies that the object has the
+			expected class (lv_obj_has_class). When disabled, the class
+			check is skipped even if a class argument is supplied.
+
+	config LV_USE_CHECK_OBJ_VALIDITY
+		bool "Enable widget-tree validity check in LV_CHECK_OBJ"
+		default n
+		help
+			When enabled, LV_CHECK_OBJ also verifies that the object is
+			still part of the widget tree (lv_obj_is_valid). When disabled,
+			the validity check is skipped even if the associated argument
+			is supplied.
+	endif
+endmenu
+endmenu #"Build"

@@ -1,0 +1,97 @@
+config LV_USE_NEMA_GFX
+	bool "Use NemaGFX acceleration"
+	default n
+	help
+		Use TSi's aka (Think Silicon) NemaGFX
+
+if LV_USE_NEMA_GFX
+
+config LV_NEMA_USE_CACHE
+	bool "Cache handling of NemaGFX"
+	default n
+
+config LV_NEMA_CACHE_HAL_INCLUDE
+	string "NemaGFX Cache HAL include"
+	default "stm32u5xx_hal.h"
+	depends on LV_NEMA_USE_CACHE
+
+choice LV_USE_NEMA_LIB
+	prompt "NemaGFX static library"
+	default LV_NEMA_LIB_NONE
+
+	config LV_NEMA_LIB_NONE
+		bool "LV_NEMA_LIB_NONE"
+	config LV_NEMA_LIB_M33_REVC
+		bool "LV_NEMA_LIB_M33_REVC"
+	config LV_NEMA_LIB_M33_NEMAPVG
+		bool "LV_NEMA_LIB_M33_NEMAPVG"
+	config LV_NEMA_LIB_M55
+		bool "LV_NEMA_LIB_M55"
+	config LV_NEMA_LIB_M7
+		bool "LV_NEMA_LIB_M7"
+endchoice
+
+config LV_USE_NEMA_LIB
+	int
+	default 0 if LV_NEMA_LIB_NONE
+	default 1 if LV_NEMA_LIB_M33_REVC
+	default 2 if LV_NEMA_LIB_M33_NEMAPVG
+	default 3 if LV_NEMA_LIB_M55
+	default 4 if LV_NEMA_LIB_M7
+
+choice LV_USE_NEMA_HAL
+	prompt "NemaGFX HAL"
+	default LV_NEMA_HAL_CUSTOM
+
+	config LV_NEMA_HAL_CUSTOM
+		bool "LV_NEMA_HAL_CUSTOM"
+	config LV_NEMA_HAL_STM32
+		bool "LV_NEMA_HAL_STM32"
+endchoice
+
+config LV_USE_NEMA_HAL
+	int
+	default 0 if LV_NEMA_HAL_CUSTOM
+	default 1 if LV_NEMA_HAL_STM32
+
+config LV_NEMA_STM32_HAL_INCLUDE
+	string "NemaGFX STM32 HAL include"
+	default "stm32u5xx_hal.h"
+	depends on LV_NEMA_HAL_STM32
+
+config LV_NEMA_USE_CUSTOM_INCLUDE
+	bool "Include a custom NemaGFX attribute header"
+	default n
+	depends on LV_NEMA_HAL_STM32
+	help
+	  Include the header given by LV_NEMA_CUSTOM_INCLUDE to override
+	  NemaGFX/STM32 HAL-specific macros such as
+	  LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM.
+
+config LV_NEMA_CUSTOM_INCLUDE
+	string "Path to custom NemaGFX attribute header"
+	default ""
+	depends on LV_NEMA_USE_CUSTOM_INCLUDE
+	help
+	  Optional header to override NemaGFX/STM32 HAL-specific macros.
+
+	  LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM
+	    Attribute applied to the NemaGFX memory pool on STM32 targets.
+	    Used to place the pool in a specific RAM region accessible by
+	    the NemaGFX DMA.
+	    e.g. __attribute__((section(".nema_pool")))
+
+config LV_USE_NEMA_VG
+	bool "Enable NemaVG operations"
+	select LV_DRAW_HAS_VECTOR_SUPPORT
+	default n
+
+config LV_NEMA_GFX_MAX_RESX
+	int "NemaVG max horizontal resolution"
+	default 800
+
+config LV_NEMA_GFX_MAX_RESY
+	int "NemaVG max vertical resolution"
+	default 600
+
+endif

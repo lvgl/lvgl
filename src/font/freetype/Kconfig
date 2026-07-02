@@ -1,0 +1,25 @@
+config LV_USE_FREETYPE
+	bool "FreeType library"
+	default n
+	help
+		FreeType library
+
+if LV_USE_FREETYPE
+
+config LV_FREETYPE_USE_LVGL_PORT
+	bool "Use LVGL memory and file system porting for FreeType"
+	default n
+	help
+		When enabled, FreeType will use LVGL's memory allocator and file system
+		abstraction instead of the platform defaults.
+
+config LV_FREETYPE_CACHE_FT_GLYPH_CNT
+	int "The maximum number of Glyph in count"
+	default 256
+
+config LV_FREETYPE_CACHE_FT_GLYPH_L1
+	bool "Enable L1 glyph metrics cache (lock-free, single-thread only)"
+	depends on LV_OS_NONE
+	default y
+
+endif #LV_USE_FREETYPE

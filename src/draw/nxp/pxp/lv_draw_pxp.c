@@ -15,8 +15,7 @@
 
 #include "lv_draw_pxp.h"
 
-#if LV_USE_PXP
-#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
+#if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 #include "../../../core/lv_global.h"
@@ -167,7 +166,6 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if LV_USE_DRAW_PXP
 static inline bool _pxp_src_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
@@ -487,7 +485,5 @@ static void _pxp_render_thread_cb(void * ptr)
     lv_thread_sync_delete(&u->sync);
     LV_LOG_INFO("Exit PXP draw thread.");
 }
-#endif
+#endif /*LV_USE_PXP_DRAW_THREAD*/
 #endif /*LV_USE_DRAW_PXP*/
-#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
-#endif /*LV_USE_PXP*/

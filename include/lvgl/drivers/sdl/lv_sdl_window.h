@@ -27,10 +27,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/* Possible values of LV_SDL_MOUSEWHEEL_MODE */
-#define LV_SDL_MOUSEWHEEL_MODE_ENCODER  0  /* The mousewheel emulates an encoder input device*/
-#define LV_SDL_MOUSEWHEEL_MODE_CROWN    1  /* The mousewheel emulates a smart watch crown*/
-
 /**********************
  *      TYPEDEFS
  **********************/

@@ -15,13 +15,12 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <math.h>
 #include <g2d.h>
 #include "../../../misc/lv_area_private.h"
 #include "../../lv_draw_image_private.h"
-#include "../../lv_image_decoder_private.h"
+#include "../../../image/lv_image_decoder_private.h"
 #include "lv_g2d_utils.h"
 #include "lv_g2d_buf_map.h"
 
@@ -309,4 +308,3 @@ static void _g2d_blit_two_steps(void * handle, struct g2d_surface * dst_surf, st
     g2d_disable(handle, G2D_BLEND);
 }
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/

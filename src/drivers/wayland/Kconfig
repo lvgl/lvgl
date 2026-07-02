@@ -1,0 +1,70 @@
+config LV_USE_WAYLAND
+	bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
+	default n
+	help
+		Use Wayland to open a window and handle input on Linux or BSD desktops
+
+if LV_USE_WAYLAND
+
+config LV_WAYLAND_DIRECT_EXIT
+	bool "Deinitialize LVGL and quit the application when the last wayland window closes"
+	default y
+
+config LV_WAYLAND_AUTO_BACKEND
+	bool "Auto-select the Wayland backend (legacy)"
+	default y
+	help
+	  Legacy behavior, kept for backwards compatibility and slated for removal.
+	  While set, the backend defaults to SHM and any LV_WAYLAND_USE_* set directly
+	  in lv_conf.h is honored.  Disable this and pick a backend explicitly via the
+	  Wayland "Rendering backend" choice.
+
+choice
+	prompt "Rendering backend"
+	default LV_WAYLAND_BACKEND_SHM
+	depends on !LV_WAYLAND_AUTO_BACKEND
+	help
+	  Select the rendering backend used by the Wayland driver.
+
+	config LV_WAYLAND_BACKEND_SHM
+		bool "SHM (Shared Memory)"
+		select LV_WAYLAND_USE_SHM
+		help
+		  Default backend.  Uses wl_shm for double-buffered direct rendering.
+		  Compatible with all Wayland compositors; no special hardware required.
+
+	config LV_WAYLAND_BACKEND_EGL
+		bool "EGL (OpenGL ES, hardware-accelerated)"
+		select LV_WAYLAND_USE_EGL
+		select LV_USE_OPENGLES
+		help
+		  Hardware-accelerated rendering via OpenGL ES 2.0 and EGL.
+		  Requires OpenGL ES 2.0 on the target hardware and linking with
+		  wayland-egl (-lwayland-egl).  Compatible with 3D/glTF rendering.
+
+	config LV_WAYLAND_BACKEND_G2D
+		bool "G2D (NXP i.MX hardware accelerator)"
+		select LV_WAYLAND_USE_G2D
+		select LV_USE_DRAW_G2D
+		help
+		  Hardware-accelerated 2D rendering via NXP's G2D engine.
+		  Supports NXP i.MX6/i.MX8 platforms with G2D library installed.
+endchoice
+
+config LV_WAYLAND_BACKEND
+	int
+	default 0 if LV_WAYLAND_BACKEND_SHM
+	default 1 if LV_WAYLAND_BACKEND_EGL
+	default 2 if LV_WAYLAND_BACKEND_G2D
+
+config LV_WAYLAND_USE_SHM
+	bool
+
+config LV_WAYLAND_USE_EGL
+	bool
+	select LV_USE_EGL
+
+config LV_WAYLAND_USE_G2D
+	bool
+
+endif # LV_USE_WAYLAND

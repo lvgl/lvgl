@@ -1,0 +1,89 @@
+menu "Image Settings"
+
+config LV_CACHE_DEF_SIZE
+	int "Default image cache size in bytes. 0 to disable caching"
+	default 0
+	help
+		When using only built-in image formats, caching provides little benefit.
+		For complex image decoders (e.g. PNG or JPG), caching avoids repeatedly
+		opening and decoding the same images, at the cost of additional RAM usage.
+
+config LV_IMAGE_HEADER_CACHE_DEF_CNT
+	int "Default image header cache count. 0 to disable caching"
+	default 0
+	help
+		When using only built-in image formats, caching provides little benefit.
+		For complex image decoders (e.g. PNG or JPG), caching avoids repeatedly
+		reading image headers, at the cost of additional RAM usage.
+
+config LV_USE_RLE
+	bool "LVGL's version of RLE compression method"
+	help
+		RLE decompress library
+
+config LV_USE_LZ4
+	bool "Enable LZ4 compress/decompress lib"
+	default n
+
+config LV_USE_LZ4_INTERNAL
+	bool "Use lvgl built-in LZ4 lib"
+	depends on LV_USE_LZ4
+	default y
+	help
+		Use lvgl built-in LZ4 lib
+
+config LV_BIN_DECODER_RAM_LOAD
+	bool "Decode whole image to RAM when using the bin decoder"
+	default n
+	help
+		Decode bin images to RAM
+
+config LV_USE_LODEPNG
+	bool "PNG decoder library"
+	help
+		LODEPNG decoder library
+
+config LV_USE_LIBPNG
+	bool "PNG decoder (libpng) library"
+	help
+		PNG decoder(libpng) library
+
+config LV_USE_BMP
+	bool "BMP decoder library"
+	help
+		BMP decoder library
+
+config LV_USE_TJPGD
+	bool "TJPGD decoder library"
+	help
+		JPG + split JPG decoder library.
+		Split JPG is a custom format optimized for embedded systems.
+
+config LV_USE_LIBJPEG_TURBO
+	bool "libjpeg-turbo decoder library"
+	help
+		libjpeg-turbo decoder library.
+		- Supports complete JPEG specifications and high-performance JPEG decoding.
+
+config LV_USE_LIBWEBP
+	bool "WebP decoder library"
+	help
+		WebP decoder library
+
+config LV_USE_SVG
+	bool "SVG library"
+	depends on LV_DRAW_HAS_VECTOR_SUPPORT
+	select LV_USE_VECTOR_GRAPHIC
+	help
+		SVG library
+
+if LV_USE_SVG
+config LV_USE_SVG_ANIMATION
+	bool "SVG animation"
+
+config LV_USE_SVG_DEBUG
+	bool "Enable SVG debug logs"
+	default n
+endif #LV_USE_SVG
+
+endmenu

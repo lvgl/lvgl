@@ -43,111 +43,21 @@ directories to your project and enable them in `lv_conf.h` or `Kconfig`
 
 ## Configuration
 
-LVGL has several compile-time settings to
+LVGL has many compile-time settings: color depth, which Widgets are built, GPU
+and rendering backends, third-party libraries, OS support, and more. They can be
+set in three ways that can be mixed:
 
-- set default values
-- enable Widgets
-- enable GPU support
-- enable 3rd party library support
-- enable operating system support
-- and many more
+1. **`lv_conf.h`**: a header where `#define`s are adjusted (the default).
+2. **Kconfig**: when LVGL is part of a Kconfig-based build, or built standalone with CMake.
+3. **Compiler defines**: values passed on the command line (e.g. `-DLV_COLOR_DEPTH=32`).
 
-These compile-time settings can be configured in 3 ways:
+When setting up a project for the first time, copy `lvgl/lv_conf_template.h` to
+`lv_conf.h` next to the `lvgl` folder, change the first `#if 0` to `1` to enable
+the file's content, and set <ApiLink name="LV_COLOR_DEPTH" /> to match your
+display panel. Adjust the other options as needed, every option is documented
+by a comment in the file.
 
-1. `lv_conf.h`: a header file where `#define`s can be adjusted
-2. Kconfig
-3. Defines passed to the compiler (usually `-D...`)
-
-The above options can also be mixed.
-
-### lv_conf.h
-
-When setting up your project for the first time, copy `lvgl/lv_conf_template.h` to
-`lv_conf.h` next to the `lvgl` folder. Change the first `#if 0` to `1` to
-enable the file's content and set the <ApiLink name="LV_COLOR_DEPTH" /> define to align with
-the color depth used by your display panel.
-
-Regarding the other config options, see comments in `lv_conf.h`.
-
-The layout of the files should look like this:
-
-```c
-lvgl/
-lv_conf.h
-other files and folders in your project
-```
-
-1. Set the <ApiLink name="LV_CONF_INCLUDE_SIMPLE" /> define to your compiler options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for GCC compiler) and set the
-include path manually (e.g. `-I../include/gui`). In this case, LVGL
-will attempt to include `lv_conf.h` simply with `#include "lv_conf.h"`
-instead of `lvgl/lvgl.h`.
-
-2. Set a custom path via the <ApiLink name="LV_CONF_PATH" /> define. For example: `-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"`.
-
-3. Delete some settings from `lv_conf.h` and set them via compile options. For example: `-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1`.
-
-4. To fully skip `lv_conf.h` and use only compiler options (see point 3), define <ApiLink name="LV_CONF_SKIP" /> as a compiler option. Unset options will get a
-default value which is the same as the content of `lv_conf_template.h`.
-
-### Kconfig
-
-When Kconfig is used, LVGL is usually integrated into a larger project and
-this parent project's Kconfig tooling is used, where LVGL's
-[Kconfig file](https://github.com/lvgl/lvgl/blob/master/Kconfig) is
-included. For example, when LVGL is used in ESP-IDF, it can be configured in
-`idf.py menuconfig`.
-
-When LVGL is compiled to a static library, it might make sense to configure LVGL
-on its own via Kconfig as well. For now, this is only available using CMake.
-
-Under the hood, it uses `kconfiglib`, Kconfig's Python port to be able to use it
-across different platforms. `kconfiglib` offers the Python API and some CLI
-commands. Here is a list of some useful commands:
-
-- `menuconfig`: Opens a console menu interface to modify the configuration values.
-- `guiconfig` (needs `tkinter`): Opens a graphical interface to modify the
-  configuration values.
-- `savedefconfig`: Saves the current .config as a defconfig, listing only non-default
-  values.
-- `alldefconfig`: Creates a .config with all default values.
-- `genconfig`: Generates a C header from the config, following `autoconf.h` format.
-
-#### Usage
-
-1. Install the prerequisites using `scripts/install_prerequisites.sh/bat`.
-2. Create the configuration (.config)
-
-```bash
-cd <lvgl_repo>
-menuconfig
-```
-
-Make changes to the config and exit using `Esc` or `Q`, and save your configuration.
-The `.config` file is now created and lists the configuration values.
-
-3. Run CMake with the `-DLV_USE_KCONFIG=ON` flag:
-
-```bash
-cd <lvgl_repo>
-cmake -B build -DLV_USE_KCONFIG=ON
-cmake --build build
-```
-
-To use a `defconfig` file, one can use the
-`-DLV_DEFCONFIG_PATH=<path_to_defconfig>` flag.
-
-Some defconfigs are available in the `configs/defconfigs` folder. However, new
-`defconfig` files can also be created easily:
-
-```bash
-cd <lvgl_repo>
-menuconfig # make your changes to the default config
-savedefconfig
-cp defconfig configs/defconfigs/my_custom_defconfig # save it where you want
-# Then use it to build LVGL
-cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/my_custom_defconfig
-cmake --build build
-```
+For the full details see [Configuring LVGL](/integration/configuration).
 
 ## Connecting to Hardware
 

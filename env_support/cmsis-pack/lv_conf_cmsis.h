@@ -361,11 +361,9 @@
 
     /** Enable usage of the LVGL's built-in vg_lite driver */
     #if LV_USE_VG_LITE_DRIVER
-        /** Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
-        #define LV_VG_LITE_HAL_GPU_SERIES gc255
-
-        /** Used to pick the correct GPU revision header it depends on the vendor */
-        #define LV_VG_LITE_HAL_GPU_REVISION 0x40
+        /** Pick the GPU series + revision; maps to the matching
+         *  VGLite/Series/<series>/<revision>/vg_lite_options.h */
+        #define LV_VG_LITE_GPU LV_VG_LITE_GPU_GC255_0X40A
 
         /** Base memory address of the GPU IP it depends on SoC,
          *  default value is for NXP based devices */
@@ -533,8 +531,8 @@
  * Others
  *-----------*/
 
-#define LV_ENABLE_GLOBAL_CUSTOM 0
-#if LV_ENABLE_GLOBAL_CUSTOM
+#define LV_GLOBAL_USE_CUSTOM_INCLUDE 0
+#if LV_GLOBAL_USE_CUSTOM_INCLUDE
     /** Header to include for custom 'lv_global' function" */
     #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
 #endif

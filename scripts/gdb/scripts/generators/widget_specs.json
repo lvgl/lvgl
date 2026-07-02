@@ -131,6 +131,18 @@
       ]
     }
   },
+  "lv_barcode": {
+    "_auto": {
+      "fields": {
+        "dark_color": "color",
+        "light_color": "color",
+        "scale": "int",
+        "direction": "int",
+        "tiled": "bool",
+        "encoding": "int"
+      }
+    }
+  },
   "lv_button": {
     "_auto": {
       "fields": {}
@@ -265,6 +277,30 @@
     "_auto": {
       "fields": {
         "dropdown": "pointer"
+      }
+    }
+  },
+  "lv_ffmpeg_player": {
+    "_auto": {
+      "fields": {
+        "timer": "pointer",
+        "auto_restart": "bool",
+        "decoder_name": "string"
+      }
+    }
+  },
+  "lv_gstreamer": {
+    "_auto": {
+      "fields": {
+        "last_buffer": "pointer",
+        "last_sample": "pointer",
+        "pipeline": "pointer",
+        "audio_convert": "pointer",
+        "video_convert": "pointer",
+        "audio_volume": "pointer",
+        "gstreamer_timer": "pointer",
+        "frame_queue": "pointer",
+        "is_video_info_valid": "bool"
       }
     }
   },
@@ -489,6 +525,15 @@
       "footer",
       "title"
     ]
+  },
+  "lv_qrcode": {
+    "_auto": {
+      "fields": {
+        "dark_color": "color",
+        "light_color": "color",
+        "quiet_zone": "int"
+      }
+    }
   },
   "lv_roller": {
     "_auto": {

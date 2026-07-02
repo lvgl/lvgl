@@ -1,0 +1,51 @@
+config LV_USE_LIBINPUT
+	bool "Use libinput input driver"
+	default n
+	help
+		Driver for libinput input devices
+
+if LV_USE_LIBINPUT
+
+config LV_LIBINPUT_BSD
+	bool "Use the BSD variant of the libinput input driver"
+	default n
+
+config LV_LIBINPUT_XKB
+	bool "Enable full keyboard support via XKB"
+	default n
+
+if LV_LIBINPUT_XKB
+
+# `setxkbmap -query` can help find the right values for your keyboard.
+config LV_LIBINPUT_XKB_RULES
+	string "XKB rules"
+	default ""
+
+config LV_LIBINPUT_XKB_MODEL
+	string "XKB model"
+	default "pc101"
+
+config LV_LIBINPUT_XKB_LAYOUT
+	string "XKB layout"
+	default "us"
+
+config LV_LIBINPUT_XKB_VARIANT
+	string "XKB variant"
+	default ""
+
+config LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
+	bool "Use system default XKB options (pass NULL)"
+	default y
+	help
+	  If enabled, NULL is passed for XKB options, letting the system
+	  default apply (e.g. from XKB_DEFAULT_OPTIONS env var).
+	  If disabled, the string from LV_LIBINPUT_XKB_OPTIONS is used instead.
+
+config LV_LIBINPUT_XKB_OPTIONS
+	string "XKB options"
+	default ""
+	depends on !LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT
+
+endif # LV_LIBINPUT_XKB
+
+endif #LV_USE_LIBINPUT

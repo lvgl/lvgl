@@ -7,7 +7,13 @@
 #undef  printf
 #define printf LV_LOG_ERROR
 
-#define TLSF_MAX_POOL_SIZE (LV_MEM_SIZE + LV_MEM_POOL_EXPAND_SIZE)
+#ifdef LV_MEM_POOL_EXPAND_SIZE
+    #warning LV_MEM_POOL_EXPAND_SIZE is deprecated and will be removed in the next release. Use LV_MEM_SIZE to define LVGL pool size.
+    #define TLSF_MAX_POOL_SIZE (LV_MEM_SIZE + LV_MEM_POOL_EXPAND_SIZE)
+#else
+    #define TLSF_MAX_POOL_SIZE (LV_MEM_SIZE)
+#endif
+
 
 #if !defined(_DEBUG)
     #define _DEBUG 0

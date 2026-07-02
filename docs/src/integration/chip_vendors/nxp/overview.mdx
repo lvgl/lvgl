@@ -43,7 +43,6 @@ individually as well as simultaneously with the CPU (in LVGL multithreading mode
 
 #### Basic configuration:
 
-- Select NXP PXP engine in "lv_conf.h": Set <ApiLink name="LV_USE_PXP" /> to `1`.
 - In order to use PXP as a [draw unit](/main-modules/draw), select in "lv_conf.h": Set <ApiLink name="LV_USE_DRAW_PXP" /> to `1`.
 - In order to use PXP to rotate the screen, select in "lv_conf.h": Set <ApiLink name="LV_USE_ROTATE_PXP" /> to `1`.
 - Enable PXP asserts in "lv_conf.h": Set <ApiLink name="LV_USE_PXP_ASSERT" /> to `1`.
@@ -396,7 +395,7 @@ All the below operation can be done in addition with optional opacity.
 
 #### Basic configuration:
 
-- Select NXP G2D engine in "lv_conf.h": Set <ApiLink name="LV_USE_G2D" /> to `1`.
+- Select NXP G2D engine in "lv_conf.h": Set <ApiLink name="LV_USE_DRAW_G2D" /> to `1`.
 - In order to use G2D as a draw unit, select in "lv_conf.h": Set <ApiLink name="LV_USE_DRAW_G2D" /> to `1`.
 - Enable G2D asserts in "lv_conf.h": Set <ApiLink name="LV_USE_G2D_ASSERT" /> to `1`.
   There are few G2D assertions that can stop the program execution in case the

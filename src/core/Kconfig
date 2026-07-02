@@ -1,0 +1,99 @@
+menu "Core"
+
+config LV_OBJ_STYLE_CACHE
+	bool "Use cache to speed up getting object style properties"
+	default n
+	help
+		Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties
+
+config LV_USE_OBJ_NAME
+	bool "Widget names (lv_obj_set_name)"
+	default n
+	help
+		Enable support for widget names
+
+config LV_USE_OBJ_ID
+	bool "Widget id (lv_obj_set_id)"
+	default n
+	help
+		Add `id` field to `lv_obj_t`
+
+if LV_USE_OBJ_ID
+
+config LV_OBJ_ID_AUTO_ASSIGN
+	bool "Automatically assign an ID when obj is created"
+	default y
+	help
+		Automatically assign an ID when obj is created
+
+config LV_USE_OBJ_ID_BUILTIN
+	bool "Use builtin method to deal with obj ID"
+	default y
+	help
+		Use builtin obj ID handler functions:
+		- lv_obj_assign_id:       Called when a widget is created. Use a separate counter for each widget class as an ID.
+		- lv_obj_id_compare:      Compare the ID to decide if it matches with a requested value.
+		- lv_obj_stringify_id:    Return string-ified identifier, e.g. "button3".
+		- lv_obj_free_id:         Does nothing, as there is no memory allocation for the ID.
+		When disabled these functions needs to be implemented by the user.
+
+endif #LV_USE_OBJ_ID
+
+config LV_USE_OBJ_PROPERTY
+	bool "Use obj property set/get API"
+	default n
+	help
+		Use obj property set/get API.
+
+if LV_USE_OBJ_PROPERTY
+
+config LV_USE_OBJ_PROPERTY_NAME
+	bool "Use name to access property"
+	default y
+	help
+		Add a name table to every widget class, so the property can be accessed by name.
+		Note, the const table will increase flash usage.
+
+endif #LV_USE_OBJ_PROPERTY
+
+config LV_USE_EXT_DATA
+	bool "External data and destructor"
+	default n
+	help
+		Enable this option to activate external data and destructor functionality,
+		which assists in resource cleanup when objects are freed by either LVGL core
+		or applications. Currently supported features include:
+			- event
+			- object
+			- observer
+			- anim
+			- timer
+			- group
+			- display
+			- indev (input device)
+			- theme
+
+config LV_USE_FLOAT
+	bool "Use float as lv_value_precise_t"
+	default n
+	help
+		Use `float` as `lv_value_precise_t`
+
+config LV_USE_OBSERVER
+	bool "Observer"
+	default y
+	help
+		Enable an observer pattern implementation
+
+config LV_USE_TRANSLATION
+	bool "Text translation"
+	help
+		Enable text translation support
+
+config LV_USE_COLOR_FILTER
+	bool "Color filter style"
+	default n
+	help
+		Enable color filter style
+
+endmenu #"Core"

@@ -11,7 +11,6 @@
 
 #include "lv_g2d_buf_map.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <stdio.h>
 #include "lv_g2d_utils.h"
@@ -279,4 +278,3 @@ static void _map_free_list(unsigned long index, lv_array_t * list)
 }
 
 #endif /*LV_USE_DRAW_G2D*/
-#endif /*LV_USE_G2D*/

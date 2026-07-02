@@ -59,7 +59,16 @@ const lv_obj_class_t lv_calendar_class = {
     .name = "lv_calendar",
 };
 
+#if defined(LV_CALENDAR_DEFAULT_DAY_NAMES) && !LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES
+#warning "LV_CALENDAR_DEFAULT_DAY_NAMES is deprecated and will be removed in the next release. Use LV_MONDAY_STR, LV_TUESDAY_STR,... to set each week day name"
 static const char * day_names_def[7] = LV_CALENDAR_DEFAULT_DAY_NAMES;
+#else
+#if LV_CALENDAR_WEEK_STARTS_MONDAY
+static const char * day_names_def[7] = { LV_MONDAY_STR, LV_TUESDAY_STR, LV_WEDNESDAY_STR, LV_THURSDAY_STR, LV_FRIDAY_STR, LV_SATURDAY_STR, LV_SUNDAY_STR };
+#else
+static const char * day_names_def[7] = { LV_SUNDAY_STR, LV_MONDAY_STR, LV_TUESDAY_STR, LV_WEDNESDAY_STR, LV_THURSDAY_STR, LV_FRIDAY_STR, LV_SATURDAY_STR };
+#endif /*CONFIG_LV_CALENDAR_WEEK_STARTS_MONDAY*/
+#endif
 
 /**********************
  *      MACROS

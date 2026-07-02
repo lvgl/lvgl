@@ -9,7 +9,7 @@
 #if LV_USE_PPA
 
 #include "../../lv_draw_image_private.h"
-#include "../../lv_image_decoder_private.h"
+#include "../../../image/lv_image_decoder_private.h"
 
 static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,

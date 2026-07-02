@@ -1,0 +1,5 @@
+config LV_USE_NXP_ELCDIF
+	bool "Use NXP ELCDIF to generate display"
+	default n
+	help
+		Driver for NXP ELCDIF

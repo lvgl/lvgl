@@ -1,0 +1,28 @@
+config LV_USE_OPENGLES
+	bool "Use LVGL's OpenGL Driver"
+	select LV_USE_MATRIX
+	default n
+	help
+		Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
+
+if LV_USE_OPENGLES
+
+config LV_USE_OPENGLES_DEBUG
+	bool "Enable debug mode for OpenGL"
+	default n
+
+
+endif # LV_USE_OPENGLES
+
+config LV_USE_EGL
+	bool
+	default n
+
+config LV_USE_GLFW
+	bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
+	default n
+	select LV_USE_OPENGLES
+	depends on !LV_USE_EGL
+	help
+		Use GLFW to open window on PC and handle mouse and keyboard.
+

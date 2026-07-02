@@ -1,0 +1,304 @@
+menu "Text & Font Settings"
+choice LV_TXT_ENC
+	prompt "Select a character encoding for strings"
+	help
+		Select a character encoding for strings. Your IDE or editor should have the same character encoding.
+	default LV_TXT_ENC_UTF8
+
+	config LV_TXT_ENC_UTF8
+		bool "UTF8"
+	config LV_TXT_ENC_ASCII
+		bool "ASCII"
+endchoice
+
+config LV_TXT_BREAK_CHARS
+	string "Can break (wrap) texts on these chars"
+	default " ,.;:-_)]}"
+	help
+		While rendering text strings, break (wrap) text on these chars.
+
+config LV_TXT_LINE_BREAK_LONG_LEN
+	int "Line break long length"
+	default 0
+	help
+		If a word is at least this long, will break wherever 'prettiest'.
+		To disable, set to a value <= 0.
+
+config LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+	int "Min num chars before break"
+	default 3
+	depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
+	help
+		Minimum number of characters in a long word to put on a line before a break.
+
+config LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+	int "Min num chars after break"
+	default 3
+	depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
+	help
+		Minimum number of characters in a long word to put on a line after a break
+
+config LV_TXT_COLOR_CMD
+	string "The control character to use for signalling text recoloring"
+	default "\#"
+	help
+		The control character to use for signaling text recoloring
+
+config LV_USE_BIDI
+	bool "Support bidirectional texts"
+	help
+		Allows mixing Left-to-Right and Right-to-Left texts.
+		The direction will be processed according to the Unicode Bidirectional Algorithm:
+		https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
+
+choice LV_BIDI_BASE_DIR_DEF
+	prompt "Set the default BIDI base direction"
+	depends on LV_USE_BIDI
+	default LV_BASE_DIR_AUTO
+
+	config LV_BASE_DIR_LTR
+		bool "Left-to-Right"
+	config LV_BASE_DIR_RTL
+		bool "Right-to-Left"
+	config LV_BASE_DIR_AUTO
+		bool "Auto detect"
+endchoice
+
+config LV_USE_ARABIC_PERSIAN_CHARS
+	bool "Enable Arabic/Persian processing"
+	help
+		In these languages characters should be replaced with
+		another form based on their position in the text.
+menu "Built-in Fonts"
+	config LV_FONT_MONTSERRAT_8
+		bool "Enable Montserrat 8"
+		help
+			Montserrat fonts with ASCII range and some symbols using bpp = 4
+			https://fonts.google.com/specimen/Montserrat
+	config LV_FONT_MONTSERRAT_10
+		bool "Enable Montserrat 10"
+	config LV_FONT_MONTSERRAT_12
+		bool "Enable Montserrat 12"
+	config LV_FONT_MONTSERRAT_14
+		bool "Enable Montserrat 14"
+		default y
+	config LV_FONT_MONTSERRAT_16
+		bool "Enable Montserrat 16"
+	config LV_FONT_MONTSERRAT_18
+		bool "Enable Montserrat 18"
+	config LV_FONT_MONTSERRAT_20
+		bool "Enable Montserrat 20"
+	config LV_FONT_MONTSERRAT_22
+		bool "Enable Montserrat 22"
+	config LV_FONT_MONTSERRAT_24
+		bool "Enable Montserrat 24"
+	config LV_FONT_MONTSERRAT_26
+		bool "Enable Montserrat 26"
+	config LV_FONT_MONTSERRAT_28
+		bool "Enable Montserrat 28"
+	config LV_FONT_MONTSERRAT_30
+		bool "Enable Montserrat 30"
+	config LV_FONT_MONTSERRAT_32
+		bool "Enable Montserrat 32"
+	config LV_FONT_MONTSERRAT_34
+		bool "Enable Montserrat 34"
+	config LV_FONT_MONTSERRAT_36
+		bool "Enable Montserrat 36"
+	config LV_FONT_MONTSERRAT_38
+		bool "Enable Montserrat 38"
+	config LV_FONT_MONTSERRAT_40
+		bool "Enable Montserrat 40"
+	config LV_FONT_MONTSERRAT_42
+		bool "Enable Montserrat 42"
+	config LV_FONT_MONTSERRAT_44
+		bool "Enable Montserrat 44"
+	config LV_FONT_MONTSERRAT_46
+		bool "Enable Montserrat 46"
+	config LV_FONT_MONTSERRAT_48
+		bool "Enable Montserrat 48"
+
+	config LV_FONT_MONTSERRAT_28_COMPRESSED
+		bool "Enable Montserrat 28 compressed"
+	config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+		bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
+	config LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
+		bool "Enable SourceHanSansSC 14 CJK"
+	config LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
+		bool "Enable SourceHanSansSC 16 CJK"
+
+	config LV_FONT_UNSCII_8
+		bool "Enable UNSCII 8 (Perfect monospace font)"
+		help
+			Pixel perfect monospaced fonts
+	config LV_FONT_UNSCII_16
+		bool "Enable UNSCII 16 (Perfect monospace font)"
+endmenu
+
+config LV_FONT_USE_CUSTOM_INCLUDE
+	bool "Include a custom font declaration header"
+	default n
+	help
+	  Include the header given by LV_FONT_CUSTOM_INCLUDE to declare custom
+	  fonts (LV_FONT_CUSTOM_DECLARE) or override font-related macros.
+
+config LV_FONT_CUSTOM_INCLUDE
+	string "Path to custom font declaration header"
+	default ""
+	depends on LV_FONT_USE_CUSTOM_INCLUDE
+	help
+	  Optional header to override font-related macros.
+
+	  Typical use is to declare extra fonts through LV_FONT_CUSTOM_DECLARE:
+	      #define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(my_font_24)
+
+	  It can also be used to override the default font to a custom one:
+	      #define LV_FONT_DEFAULT         &my_font_24
+
+config LV_USE_CUSTOM_FONT_DEFAULT
+	bool "Provide a custom default font instead of using a built-in one"
+	default n
+	help
+		Enable this to set LV_FONT_DEFAULT to a font you define yourself
+		rather than one of the built-in fonts below. When enabled, the
+		built-in default-font selection is hidden, so you MUST define
+		LV_FONT_DEFAULT yourself, either:
+		  - from the build system, e.g. -DLV_FONT_DEFAULT='&my_font_24', or
+		  - in the header given by LV_FONT_CUSTOM_INCLUDE, e.g.
+		        #define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(my_font_24)
+		        #define LV_FONT_DEFAULT         &my_font_24
+			
+		If you do not, LV_FONT_DEFAULT falls back to a builtin font,
+		which is no longer compiled in, causing a link error.
+
+
+choice LV_FONT_DEFAULT
+	prompt "Select theme default text font"
+	default LV_FONT_DEFAULT_MONTSERRAT_14 
+	depends on !LV_USE_CUSTOM_FONT_DEFAULT
+	help
+		Select theme default text font
+
+	config LV_FONT_DEFAULT_MONTSERRAT_8
+		bool "Montserrat 8"
+		select LV_FONT_MONTSERRAT_8
+	config LV_FONT_DEFAULT_MONTSERRAT_10
+		bool "Montserrat 10"
+		select LV_FONT_MONTSERRAT_10
+	config LV_FONT_DEFAULT_MONTSERRAT_12
+		bool "Montserrat 12"
+		select LV_FONT_MONTSERRAT_12
+	config LV_FONT_DEFAULT_MONTSERRAT_14
+		bool "Montserrat 14"
+		select LV_FONT_MONTSERRAT_14
+	config LV_FONT_DEFAULT_MONTSERRAT_16
+		bool "Montserrat 16"
+		select LV_FONT_MONTSERRAT_16
+	config LV_FONT_DEFAULT_MONTSERRAT_18
+		bool "Montserrat 18"
+		select LV_FONT_MONTSERRAT_18
+	config LV_FONT_DEFAULT_MONTSERRAT_20
+		bool "Montserrat 20"
+		select LV_FONT_MONTSERRAT_20
+	config LV_FONT_DEFAULT_MONTSERRAT_22
+		bool "Montserrat 22"
+		select LV_FONT_MONTSERRAT_22
+	config LV_FONT_DEFAULT_MONTSERRAT_24
+		bool "Montserrat 24"
+		select LV_FONT_MONTSERRAT_24
+	config LV_FONT_DEFAULT_MONTSERRAT_26
+		bool "Montserrat 26"
+		select LV_FONT_MONTSERRAT_26
+	config LV_FONT_DEFAULT_MONTSERRAT_28
+		bool "Montserrat 28"
+		select LV_FONT_MONTSERRAT_28
+	config LV_FONT_DEFAULT_MONTSERRAT_30
+		bool "Montserrat 30"
+		select LV_FONT_MONTSERRAT_30
+	config LV_FONT_DEFAULT_MONTSERRAT_32
+		bool "Montserrat 32"
+		select LV_FONT_MONTSERRAT_32
+	config LV_FONT_DEFAULT_MONTSERRAT_34
+		bool "Montserrat 34"
+		select LV_FONT_MONTSERRAT_34
+	config LV_FONT_DEFAULT_MONTSERRAT_36
+		bool "Montserrat 36"
+		select LV_FONT_MONTSERRAT_36
+	config LV_FONT_DEFAULT_MONTSERRAT_38
+		bool "Montserrat 38"
+		select LV_FONT_MONTSERRAT_38
+	config LV_FONT_DEFAULT_MONTSERRAT_40
+		bool "Montserrat 40"
+		select LV_FONT_MONTSERRAT_40
+	config LV_FONT_DEFAULT_MONTSERRAT_42
+		bool "Montserrat 42"
+		select LV_FONT_MONTSERRAT_42
+	config LV_FONT_DEFAULT_MONTSERRAT_44
+		bool "Montserrat 44"
+		select LV_FONT_MONTSERRAT_44
+	config LV_FONT_DEFAULT_MONTSERRAT_46
+		bool "Montserrat 46"
+		select LV_FONT_MONTSERRAT_46
+	config LV_FONT_DEFAULT_MONTSERRAT_48
+		bool "Montserrat 48"
+		select LV_FONT_MONTSERRAT_48
+	config LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED
+		bool "Montserrat 28 compressed"
+		select LV_FONT_MONTSERRAT_28_COMPRESSED
+	config LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
+		bool "Dejavu 16 Persian, Hebrew, Arabic letters"
+		select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+	config LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK
+		bool "SourceHanSansSC 14 CJK"
+		select LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
+	config LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK
+		bool "SourceHanSansSC 16 CJK"
+		select LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
+	config LV_FONT_DEFAULT_UNSCII_8
+		bool "UNSCII 8 (Perfect monospace font)"
+		select LV_FONT_UNSCII_8
+	config LV_FONT_DEFAULT_UNSCII_16
+		bool "UNSCII 16 (Perfect monospace font)"
+		select LV_FONT_UNSCII_16
+endchoice
+
+config LV_FONT_FMT_TXT_LARGE
+	bool "Enable it if you have fonts with a lot of characters"
+	help
+		The limit depends on the font size, font face and format
+		but with > 10,000 characters if you see issues probably you
+		need to enable it.
+
+config LV_USE_FONT_COMPRESSED
+	bool "Sets support for compressed fonts"
+	help
+		Enables/disables support for compressed fonts.
+
+config LV_USE_FONT_PLACEHOLDER
+	bool "Enable drawing placeholders when glyph dsc is not found"
+	default y
+	help
+		Enable drawing placeholders when glyph dsc is not found.
+
+config LV_USE_FONT_MANAGER
+	bool "Enable Font manager"
+	default n
+	help
+		Enable Font manager
+
+config LV_FONT_MANAGER_NAME_MAX_LEN
+	int "Font manager name max length"
+	depends on LV_USE_FONT_MANAGER
+	default 32
+	help
+		Font manager name max length
+
+config LV_USE_IMGFONT
+	bool "Support using images as font in label or span widgets"
+	default n
+	help
+		Support using images as font in label or span widgets
+
+
+rsource "freetype/Kconfig"
+rsource "tiny_ttf/Kconfig"
+endmenu

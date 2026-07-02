@@ -1,0 +1,15 @@
+config LV_USE_DRAW_OPENGLES
+	bool "Draw using cached OpenGLES textures"
+	default n
+	select LV_USE_OPENGLES
+	select LV_DRAW_HAS_3D_SUPPORT
+	help
+		Draw using cached OpenGLES textures.
+
+if LV_USE_DRAW_OPENGLES
+
+config LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+	int "OpenGLES texture cache count"
+	default 64
+
+endif

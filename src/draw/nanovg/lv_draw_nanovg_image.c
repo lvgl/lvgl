@@ -14,7 +14,7 @@
 #include "lv_nanovg_utils.h"
 #include "lv_nanovg_math.h"
 #include "lv_nanovg_image_cache.h"
-#include "../lv_image_decoder_private.h"
+#include "../../image/lv_image_decoder_private.h"
 #include "../lv_draw_image_private.h"
 
 /*********************

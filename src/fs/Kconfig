@@ -1,0 +1,196 @@
+menu "File System"
+config LV_FS_DEFAULT_DRIVER_LETTER
+	int "Default drive letter (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+	help
+	  Setting a default drive letter allows skipping the driver
+	  prefix in filepaths.
+
+config LV_USE_FS_STDIO
+	bool "File system on top of stdio"
+
+if LV_USE_FS_STDIO
+
+config LV_FS_STDIO_LETTER
+	int "Driver-identifier letter for stdio (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_STDIO_PATH
+	string "Working directory for stdio"
+	default ""
+
+config LV_FS_STDIO_CACHE_SIZE
+	int "Read cache size in bytes for stdio (0 = disabled)"
+	default 0
+	range 0 4294967295
+
+endif # LV_USE_FS_STDIO
+
+config LV_USE_FS_POSIX
+	bool "File system on top of POSIX"
+
+if LV_USE_FS_POSIX
+
+config LV_FS_POSIX_LETTER
+	int "Driver-identifier letter for POSIX (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_POSIX_PATH
+	string "Working directory for POSIX"
+	default ""
+
+config LV_FS_POSIX_CACHE_SIZE
+	int "Read cache size in bytes for POSIX (0 = disabled)"
+	default 0
+	range 0 4294967295
+
+endif # LV_USE_FS_POSIX
+
+config LV_USE_FS_WIN32
+	bool "File system on top of Win32"
+
+if LV_USE_FS_WIN32
+
+config LV_FS_WIN32_LETTER
+	int "Driver-identifier letter for Win32 (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_WIN32_PATH
+	string "Working directory for Win32"
+	default ""
+
+config LV_FS_WIN32_CACHE_SIZE
+	int "Read cache size in bytes for Win32 (0 = disabled)"
+	default 0
+	range 0 4294967295
+
+endif # LV_USE_FS_WIN32
+
+config LV_USE_FS_FATFS
+	bool "File system on top of FatFS"
+
+if LV_USE_FS_FATFS
+
+config LV_FS_FATFS_LETTER
+	int "Driver-identifier letter for FatFS (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_FATFS_PATH
+	string "Working directory for FatFS"
+	default ""
+
+config LV_FS_FATFS_CACHE_SIZE
+	int "Read cache size in bytes for FatFS (0 = disabled)"
+	default 0
+	range 0 4294967295
+
+endif # LV_USE_FS_FATFS
+
+config LV_USE_FS_LITTLEFS
+	bool "File system on top of littlefs"
+
+if LV_USE_FS_LITTLEFS
+
+config LV_FS_LITTLEFS_LETTER
+	int "Driver-identifier letter for littlefs (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_LITTLEFS_PATH
+	string "Working directory for littlefs"
+	default ""
+
+# TODO:
+#config LV_FS_LITTLEFS_CACHE_SIZE
+#	int "Read cache size in bytes for littlefs (0 = disabled)"
+#	default 0
+#	range 0 4294967295
+
+endif # LV_USE_FS_LITTLEFS
+
+config LV_USE_FS_ARDUINO_ESP_LITTLEFS
+	bool "File system on top of Arduino ESP littlefs"
+
+if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+
+config LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
+	int "Driver-identifier letter for Arduino ESP littlefs (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+	string "Working directory for Arduino ESP littlefs"
+	default ""
+
+# TODO:
+#config LV_FS_ARDUINO_ESP_LITTLEFS_CACHE_SIZE
+#	int "Read cache size in bytes for Arduino ESP littlefs (0 = disabled)"
+#	default 0
+#	range 0 4294967295
+
+endif # LV_USE_FS_ARDUINO_ESP_LITTLEFS
+
+config LV_USE_FS_ARDUINO_SD
+	bool "File system on top of Arduino SD"
+
+if LV_USE_FS_ARDUINO_SD
+
+config LV_FS_ARDUINO_SD_LETTER
+	int "Driver-identifier letter for Arduino SD (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+config LV_FS_ARDUINO_SD_PATH
+	string "Working directory for Arduino SD"
+	default ""
+
+# TODO:
+#config LV_FS_ARDUINO_SD_CACHE_SIZE
+#	int "Read cache size in bytes for Arduino SD (0 = disabled)"
+#	default 0
+#	range 0 4294967295
+
+endif # LV_USE_FS_ARDUINO_SD
+
+# UEFI and FrogFS are inlined (letter only): they have no working directory
+# path or read cache, so the full Kconfig.fs.template does not apply.
+config LV_USE_FS_UEFI
+	bool "File system on top of UEFI"
+
+if LV_USE_FS_UEFI
+config LV_FS_UEFI_LETTER
+	int "Driver-identifier letter for UEFI (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+endif # LV_USE_FS_UEFI
+
+config LV_USE_FS_FROGFS
+	bool "File system on top of FrogFS"
+
+if LV_USE_FS_FROGFS
+config LV_FS_FROGFS_LETTER
+	int "Driver-identifier letter for FrogFS (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+endif # LV_USE_FS_FROGFS
+
+# MEMFS is inlined here as it's memory-mapped and has no working directory path
+config LV_USE_FS_MEMFS
+	bool "File system on top of memory-mapped API"
+	help
+		API for memory-mapped file access.
+
+if LV_USE_FS_MEMFS
+
+config LV_FS_MEMFS_LETTER
+	int "Driver-identifier letter for memfs (e.g. 65 for 'A', 0 = disabled)"
+	range 0 90
+	default 0
+
+endif # LV_USE_FS_MEMFS
+endmenu

@@ -1,0 +1,87 @@
+name: Code Generation
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  code-generation:
+    name: Code Generation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: python3 -m pip install kconfiglib pytest
+
+      # ------------------------------------------------------------------
+      # Unit tests for the config-headers generator itself.
+      # ------------------------------------------------------------------
+      - name: "Test: config headers generator"
+        id: config-headers-tests
+        continue-on-error: true
+        working-directory: scripts/generators
+        run: python3 -m pytest config_headers/test/ -q
+
+      # ------------------------------------------------------------------
+      # Config headers: lv_conf_template.h, lv_conf_internal.h and
+      # lv_conf_kconfig.h are generated from the Kconfig tree. Regenerate
+      # them and fail if the committed files differ.
+      # ------------------------------------------------------------------
+      - name: "Generate: config headers (Kconfig)"
+        id: config-headers
+        continue-on-error: true
+        run: |
+          python3 scripts/generators/config_files.py
+          git diff --exit-code -- \
+            Kconfig \
+            lv_conf_template.h \
+            include/lvgl/config/lv_conf_internal.h \
+            include/lvgl/config/lv_conf_kconfig.h \
+          || (echo "::error::Generated config headers are out of date. Run scripts/generators/config_headers.py and commit the result."; exit 1)
+
+      # ------------------------------------------------------------------
+      # Final gate – fail the job if any generator above is out of date.
+      # This gives us full output from every generator before failing.
+      # New generators: add a step above and a line here.
+      # ------------------------------------------------------------------
+      - name: "Gate: fail if any generator check failed"
+        if: |
+          steps.config-headers-tests.outcome == 'failure' ||
+          steps.config-headers.outcome       == 'failure'
+        run: |
+          echo "Code generation results:"
+          echo "------------------------"
+          print_result() {
+            local name="$1"
+            local outcome="$2"
+            if [ "$outcome" = "success" ]; then
+              echo "  ✅ $name"
+            else
+              echo "  ❌ $name"
+            fi
+          }
+
+          print_result "config-headers-tests" "${{ steps.config-headers-tests.outcome }}"
+          print_result "config-headers"       "${{ steps.config-headers.outcome }}"
+
+          echo "------------------------"
+          echo "A generator test failed, or a generated file is out of date. See above for details."
+          exit 1

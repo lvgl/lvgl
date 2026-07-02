@@ -1,0 +1,40 @@
+menu "Demos"
+config LV_BUILD_DEMOS
+	bool "Build demos"
+	default y
+	help
+		Build the demos
+
+if LV_BUILD_DEMOS
+
+rsource "benchmark/Kconfig"
+rsource "gltf/Kconfig"
+rsource "keypad_encoder/Kconfig"
+rsource "music/Kconfig"
+rsource "render/Kconfig"
+rsource "stress/Kconfig"
+rsource "vector_graphic/Kconfig"
+rsource "widgets/Kconfig"
+
+	config LV_USE_DEMO_FLEX_LAYOUT
+		bool "Flex layout previewer"
+		default n
+	config LV_USE_DEMO_MULTILANG
+		bool "multi-language demo"
+		default n
+
+	config LV_USE_DEMO_SMARTWATCH
+		bool "Smartwatch demo"
+
+	config LV_USE_DEMO_EBIKE
+		bool "Ebike demo"
+
+	config LV_DEMO_EBIKE_PORTRAIT
+		bool "Ebike portrait layout"
+		depends on LV_USE_DEMO_EBIKE
+		default n
+
+	config LV_USE_DEMO_HIGH_RES
+		bool "High resolution demo"
+endif
+endmenu #"Demos"

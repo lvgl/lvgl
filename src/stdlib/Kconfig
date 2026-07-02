@@ -1,0 +1,154 @@
+menu "Memory and Standard Library"
+
+config LV_STDLIB_BUILTIN
+	int
+	default 0
+
+config LV_STDLIB_CLIB
+	int
+	default 1
+
+config LV_STDLIB_MICROPYTHON
+	int
+	default 2
+
+config LV_STDLIB_RTTHREAD
+	int
+	default 3
+
+config LV_STDLIB_CUSTOM
+	int 
+	default 255
+
+choice
+	prompt "Malloc functions source"
+	default LV_USE_BUILTIN_MALLOC
+
+config LV_USE_BUILTIN_MALLOC
+	bool "LVGL's built in implementation"
+
+config LV_USE_CLIB_MALLOC
+	bool "Standard C functions malloc/realloc/free"
+
+config LV_USE_MICROPYTHON_MALLOC
+	bool "MicroPython functions malloc/realloc/free"
+
+config LV_USE_RTTHREAD_MALLOC
+	bool "RT-Thread functions malloc/realloc/free"
+
+config LV_USE_CUSTOM_MALLOC
+	bool "Implement the functions externally"
+
+endchoice # "Malloc functions"
+
+config LV_USE_STDLIB_MALLOC
+	int
+	default LV_STDLIB_BUILTIN 	if LV_USE_BUILTIN_MALLOC
+	default LV_STDLIB_CLIB 		if LV_USE_CLIB_MALLOC
+	default LV_STDLIB_MICROPYTHON 	if LV_USE_MICROPYTHON_MALLOC
+	default LV_STDLIB_RTTHREAD 	if LV_USE_RTTHREAD_MALLOC
+	default LV_STDLIB_CUSTOM 	if LV_USE_CUSTOM_MALLOC
+
+choice
+	prompt "String functions source"
+	default LV_USE_BUILTIN_STRING
+
+config LV_USE_BUILTIN_STRING
+	bool "LVGL's built in implementation"
+
+config LV_USE_CLIB_STRING
+	bool "Standard C functions memcpy/memset/strlen/strcpy"
+
+config LV_USE_RTTHREAD_STRING
+	bool "RT-Thread functions rt_memcpy/rt_memset/rt_strlen/rt_strcpy"
+
+config LV_USE_CUSTOM_STRING
+	bool "Implement the functions externally"
+
+endchoice
+
+config LV_USE_STDLIB_STRING
+	int
+	default LV_STDLIB_BUILTIN 	if LV_USE_BUILTIN_STRING
+	default LV_STDLIB_CLIB 		if LV_USE_CLIB_STRING
+	default LV_STDLIB_RTTHREAD 	if LV_USE_RTTHREAD_STRING
+	default LV_STDLIB_CUSTOM 	if LV_USE_CUSTOM_STRING
+
+choice
+	prompt "Sprintf functions source"
+	default LV_USE_BUILTIN_SPRINTF
+
+config LV_USE_BUILTIN_SPRINTF
+	bool "LVGL's built in implementation"
+
+config LV_USE_CLIB_SPRINTF
+	bool "Standard C function vsnprintf"
+
+config LV_USE_RTTHREAD_SPRINTF
+	bool "RT-Thread function rt_vsnprintf"
+
+config LV_USE_CUSTOM_SPRINTF
+	bool "Implement the functions externally"
+
+endchoice # "Sprintf functions"
+
+config LV_USE_STDLIB_SPRINTF
+	int
+	default LV_STDLIB_BUILTIN 	if LV_USE_BUILTIN_SPRINTF
+	default LV_STDLIB_CLIB 		if LV_USE_CLIB_SPRINTF
+	default LV_STDLIB_RTTHREAD 	if LV_USE_RTTHREAD_SPRINTF
+	default LV_STDLIB_CUSTOM 	if LV_USE_CUSTOM_SPRINTF
+
+if LV_USE_BUILTIN_MALLOC
+
+menu "Builtin Malloc Settings"
+
+config LV_MEM_SIZE
+	int "Memory size in bytes (Needs to be at least 2kB (2048))"
+	default 65536
+
+config LV_MEM_SIZE_KILOBYTES
+	int "Memory size (KB) [DEPRECATED: use LV_MEM_SIZE]"
+	default 0
+	help
+	  Deprecated. Use LV_MEM_SIZE (in bytes) instead.
+
+config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
+	int "Size of the memory expand for `lv_malloc()` in kilobytes [DEPRECATED: use LV_MEM_SIZE directly]"
+	default 0
+	help
+	  Deprecated. Modify LV_MEM_SIZE (in bytes) directly instead.
+
+config LV_MEM_ADR
+	hex "Address for the memory pool instead of allocating it as a normal array. 0: unused"
+	default 0x0
+endmenu
+
+endif #LV_USE_BUILTIN_MALLOC
+
+# Standard library headers LVGL includes.  Keep the angle brackets / quotes in
+# the value: it is emitted verbatim (unquoted) as the #include argument.
+config LV_STDINT_INCLUDE
+	string "Header for integer types (stdint)"
+	default "stdint.h"
+
+config LV_STDDEF_INCLUDE
+	string "Header for standard definitions (stddef)"
+	default "stddef.h"
+
+config LV_STDBOOL_INCLUDE
+	string "Header for boolean types (stdbool)"
+	default "stdbool.h"
+
+config LV_INTTYPES_INCLUDE
+	string "Header for fixed-width integer format macros (inttypes)"
+	default "inttypes.h"
+
+config LV_LIMITS_INCLUDE
+	string "Header for implementation limits (limits)"
+	default "limits.h"
+
+config LV_STDARG_INCLUDE
+	string "Header for variadic argument handling (stdarg)"
+	default "stdarg.h"
+endmenu

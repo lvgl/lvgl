@@ -8,6 +8,7 @@
     "dco",
     "coding_style",
     "assertions",
-    "deprecations"
+    "deprecations",
+    "configuration"
   ]
 }

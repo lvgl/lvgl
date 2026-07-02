@@ -22,6 +22,265 @@ description: How to update your LVGL v9 project to v10, covering all breaking ch
 
 ---
 
+## Configuration
+
+Starting with v9.6, LVGL's configuration was overhauled. [Kconfig](https://github.com/lvgl/lvgl/blob/master/Kconfig)
+is now the **single source of truth** for every configuration option. The files
+you actually use, `lv_conf_template.h` (the file you copy to `lv_conf.h`), the
+internal headers that apply defaults, and the `CONFIG_*` bridge, are all
+*generated* from the Kconfig tree, so the three ways of configuring LVGL
+(`lv_conf.h`, Kconfig, and compiler `-D` defines) can no longer drift apart.
+
+<Callout type="info" title="lv_conf.h is not going away">
+  Configuring LVGL with a hand-written `lv_conf.h` is still **fully supported**
+  and remains the default for most projects. Kconfig being the source of truth
+  is an internal change: `lv_conf_template.h` is now generated from it, but you
+  copy and edit it exactly as before.
+</Callout>
+
+### `lv_conf_template.h` overhaul
+
+`lv_conf_template.h` is now generated from Kconfig rather than hand-maintained.
+The practical effects when you upgrade:
+
+- Options now appear in a consistent order with consistent comments, and every
+  option's default matches the `Kconfig` default exactly.
+- A few options were renamed or restructured (see below). Old names still work
+  for now, they produce warnings or errors at compile time but they will be
+  **removed in v10.0**, so update them.
+
+The simplest way to migrate an existing `lv_conf.h` is to copy the new
+`lv_conf_template.h` over a fresh `lv_conf.h` and re-apply your changes, or to
+re-run `scripts/generate_lv_conf.py` if you're using `lv_conf.defaults`. Either way,
+watch the compiler output for the deprecation `#warning`s listed below.
+
+### Minimal configuration
+
+The `LV_CONF_MINIMAL` switch, which disabled all widgets, themes, layouts and
+fonts in one go, has been **removed**. A one-off switch like this doesn't fit a
+Kconfig-driven model, where presets are expressed as *defconfigs*. The minimal
+preset now lives at `configs/defconfigs/empty.defconfig`:
+
+```bash
+# Build LVGL from the empty preset
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/empty.defconfig
+```
+
+If you set `LV_CONF_MINIMAL` (in `lv_conf.h` or Kconfig) you'll get a build
+warning. Start from the "empty" defconfig and re-enable only what you need.
+
+### Renamed and restructured options
+
+Every old name below **still compiles** for now: it emits a `#warning` at build
+time and continues to work (it is mapped to its replacement, or still honored in
+place), and is **removed in v10.0**.
+
+Watch your build log after upgrading and update each one the warning/error points at.
+
+#### Memory
+
+| Removed | Replacement |
+|---|---|
+| `LV_MEM_SIZE_KILOBYTES` | `LV_MEM_SIZE` (value in **bytes**) |
+| `LV_MEM_POOL_EXPAND_SIZE_KILOBYTES` | `LV_MEM_SIZE` (set the full size in **bytes**) |
+| `LV_MEM_POOL_EXPAND_SIZE` | `LV_MEM_SIZE` (set the full pool size) |
+
+```c
+/* Before */
+#define LV_MEM_SIZE_KILOBYTES 64
+/* After */
+#define LV_MEM_SIZE (64 * 1024)
+```
+
+#### Threading
+
+| Removed | Replacement |
+|---|---|
+| `LV_DRAW_THREAD_STACKSIZE` | `LV_DRAW_THREAD_STACK_SIZE` |
+
+#### LZ4 / ThorVG
+
+`LZ4` and `ThorVG` no longer have separate `_INTERNAL`/`_EXTERNAL` enables.
+Instead, enable the library itself with `LV_USE_LZ4` / `LV_USE_THORVG`,
+and use the `_INTERNAL` flag to choose between the bundled source and an externally provided one:
+
+| Removed | Replacement |
+|---|---|
+| `LV_USE_LZ4_EXTERNAL` | `LV_USE_LZ4` = 1 and `LV_USE_LZ4_INTERNAL` = 0 |
+| `LV_USE_THORVG_EXTERNAL` | `LV_USE_THORVG` = 1 and `LV_USE_THORVG_INTERNAL` = 0 |
+
+<Callout type="warning">
+    If your project previously had `LV_USE_THORVG_INTERNAL` enabled (with no `LV_USE_THORVG_EXTERNAL`), you must now also enable `LV_USE_THORVG`.
+    Leaving `LV_USE_THORVG` disabled while `LV_USE_THORVG_INTERNAL` is enabled will result in a build error.
+    The same applies to `LV_USE_LZ4` and `LV_USE_LZ4_INTERNAL`.
+</Callout>
+
+#### GPU (VG-Lite)
+
+The VG-Lite GPU is now chosen with a single `LV_VG_LITE_GPU` option instead of a free-form series/revision pair.
+Set it to one of the predefined GPU/revision combinations:
+
+| Removed | Replacement |
+|---|---|
+| `LV_VG_LITE_HAL_GPU_SERIES` | `LV_VG_LITE_GPU` |
+| `LV_VG_LITE_HAL_GPU_REVISION` | `LV_VG_LITE_GPU` |
+
+`LV_VG_LITE_GPU` accepts one of the following values:
+
+| Value | GPU | Revision |
+|---|---|---|
+| `LV_VG_LITE_GPU_GC255_0X40A` | GC255 | 0x40A |
+| `LV_VG_LITE_GPU_GC355_0X0_1215` | GC355 | 0x0_1215 |
+| `LV_VG_LITE_GPU_GC355_0X0_1216` | GC355 | 0x0_1216 |
+| `LV_VG_LITE_GPU_GC555_0X423` | GC555 | 0x423 |
+| `LV_VG_LITE_GPU_GC555_0X423_ECO` | GC555 | 0x423 ECO |
+| `LV_VG_LITE_GPU_GCNANOULTRAV_0X1003` | GCNanoUltraV | 0x1003 |
+
+#### Drivers
+
+Each backend-selecting driver (SDL, Wayland and DRM) now exposes an explicit `LV_<DRIVER>_BACKEND` choice instead of inferring the backend automatically.
+
+The `LV_<DRIVER>_AUTO_BACKEND` flags (enabled by default) exist purely to ease migration: they let LVGL reproduce the old auto-detected backend so existing projects
+don't silently switch to a different backend on update simply because they never set one explicitly. Leaving an `_AUTO_BACKEND` flag enabled triggers a build-time warning.
+These flags are not meant to be relied on going forward and will be removed for v10, every project should set its backend explicitly with `LV_<DRIVER>_BACKEND` and then
+disable the corresponding `_AUTO_BACKEND` flag to silence the warning.
+
+- **SDL** — while `LV_SDL_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` and (`LV_USE_DRAW_NANOVG` or `LV_USE_DRAW_OPENGLES`) are enabled,
+otherwise Textures when `LV_USE_DRAW_SDL` is enabled, otherwise Software. Set `LV_SDL_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_SDL_BACKEND`:
+
+  | Value | Backend |
+  |---|---|
+  | `LV_SDL_BACKEND_SW` | Software (SDL surface) |
+  | `LV_SDL_BACKEND_TEXTURE` | Cached SDL textures (enable: `LV_USE_DRAW_SDL`) |
+  | `LV_SDL_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; requires `LV_USE_DRAW_OPENGLES` or `LV_USE_DRAW_NANOVG`) |
+
+  On Kconfig's side, buffer count is now a single integer instead of two separate flags:
+
+  | Removed | Replacement |
+  |---|---|
+  | `LV_SDL_SINGLE_BUFFER` | `LV_SDL_BUF_COUNT` = 1 |
+  | `LV_SDL_DOUBLE_BUFFER` | `LV_SDL_BUF_COUNT` = 2 |
+
+- **Linux DRM** — while `LV_LINUX_DRM_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` is enabled, otherwise FBDEV.
+Set `LV_LINUX_DRM_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_LINUX_DRM_BACKEND`:
+
+  | Value | Backend |
+  |---|---|
+  | `LV_LINUX_DRM_BACKEND_FBDEV` | Dumb buffers (no GPU) |
+  | `LV_LINUX_DRM_BACKEND_GBM` | GBM DMA buffers |
+  | `LV_LINUX_DRM_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) |
+
+  `LV_USE_LINUX_DRM_GBM_BUFFERS` is no longer a user-facing setting. It is now set internally and automatically enabled whenever the `EGL` or `GBM` backend is selected; it should no longer be set directly in `lv_conf.h`.
+
+- **Wayland** — while `LV_WAYLAND_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` is enabled, otherwise G2D when `LV_USE_DRAW_G2D` is enabled, otherwise SHM.
+Set `LV_WAYLAND_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_WAYLAND_BACKEND`:
+
+  | Value | Backend |
+  |---|---|
+  | `LV_WAYLAND_BACKEND_SHM` | SHM (Shared Memory) |
+  | `LV_WAYLAND_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) |
+  | `LV_WAYLAND_BACKEND_G2D` | G2D (NXP i.MX hardware accelerator; enable: `LV_USE_DRAW_G2D`) |
+
+- **X11** — render mode (unrelated to backend selection) is now a single value mapped onto the standard `LV_DISPLAY_RENDER_MODE_*` constants:
+
+  | Removed | Replacement |
+  |---|---|
+  | `LV_X11_RENDER_MODE_PARTIAL` | `LV_X11_RENDER_MODE` = `LV_DISPLAY_RENDER_MODE_PARTIAL` |
+  | `LV_X11_RENDER_MODE_DIRECT` | `LV_X11_RENDER_MODE` = `LV_DISPLAY_RENDER_MODE_DIRECT` |
+  | `LV_X11_RENDER_MODE_FULL` | `LV_X11_RENDER_MODE` = `LV_DISPLAY_RENDER_MODE_FULL` |
+
+#### Calendar day/month names
+
+The two array macros became individual short strings, so each name is now a plain
+Kconfig-settable string and you can localize one without redefining the whole
+array. `LV_CALENDAR_WEEK_STARTS_MONDAY` is unchanged, ordering is handled
+internally. The old array macros still work (with a `#warning`).
+
+| Removed | Replacement |
+|---|---|
+| `LV_CALENDAR_DEFAULT_DAY_NAMES` | `LV_MONDAY_STR` ... `LV_SUNDAY_STR` |
+| `LV_CALENDAR_DEFAULT_MONTH_NAMES` | `LV_JANUARY_STR` ... `LV_DECEMBER_STR` |
+
+#### libinput XKB keymap
+
+The single keymap struct became individual string options (again, so Kconfig can
+set each one). The old struct macro still works (with a `#warning`):
+
+| Removed | Replacement |
+|---|---|
+| `LV_LIBINPUT_XKB_KEY_MAP` | `LV_LIBINPUT_XKB_RULES`, `LV_LIBINPUT_XKB_MODEL`, `LV_LIBINPUT_XKB_LAYOUT`, `LV_LIBINPUT_XKB_VARIANT`, `LV_LIBINPUT_XKB_OPTIONS` |
+
+```c
+/* Before */
+#define LV_LIBINPUT_XKB_KEY_MAP { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
+
+/* After */
+#define LV_LIBINPUT_XKB_MODEL  "pc101"
+#define LV_LIBINPUT_XKB_LAYOUT "us"
+/* rules / variant / options default to "" */
+```
+
+### Macros that can't be set from Kconfig
+
+Some configuration values are function-like or expression macros — for example
+`LV_FONT_CUSTOM_DECLARE`, the custom `LV_ASSERT_HANDLER`, the `LV_ATTRIBUTE_*`
+hooks, and NemaGFX pool attributes. Kconfig only stores booleans, integers and
+strings, so it cannot hold these.
+
+**If you configure with `lv_conf.h`, nothing changes** — keep defining these
+macros inline exactly as before. `LV_FONT_CUSTOM_DECLARE`, `LV_ASSERT_HANDLER`,
+the attribute hooks, etc. are all still honored when defined in `lv_conf.h`.
+
+**If you configure with Kconfig**, you can't write such a macro as a Kconfig
+value, so each module now offers a `LV_<MODULE>_USE_CUSTOM_INCLUDE` switch plus a
+`LV_<MODULE>_CUSTOM_INCLUDE` path. Point it at a small header that defines the
+macros, e.g.:
+
+```c
+/* my_lvgl_extra.h, referenced by LV_FONT_CUSTOM_INCLUDE */
+#define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(my_font_24)
+#define LV_FONT_DEFAULT         &my_font_24
+```
+
+This pair exists for `FONT`, `ASSERT`, `ATTRIBUTE`, `SYSMON`, `NEMA` and the
+global custom include. As part of unifying this convention, a couple of old
+include/enable names were renamed (each still works with a `#warning`):
+
+| Removed | Replacement |
+|---|---|
+| `LV_ASSERT_HANDLER_INCLUDE` | `LV_ASSERT_CUSTOM_INCLUDE` (enable with `LV_ASSERT_USE_CUSTOM_INCLUDE`) |
+
+If you still rely on the old `LV_ASSERT_HANDLER_INCLUDE` and can't migrate
+immediately, you can silence the deprecation warning with
+`LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING`. This only suppresses the
+compiler warning, `LV_ASSERT_HANDLER_INCLUDE` itself still works the same
+way. New projects should use `LV_ASSERT_CUSTOM_INCLUDE` and define their
+custom assertion handler directly instead.
+
+A related effect: `lv_conf_template.h` no longer prints an empty stub for every
+overridable macro (`LV_ATTRIBUTE_*`, `LV_PROFILER_*`, `LV_EXPORT_CONST_INT`,
+`LV_ASSERT_HANDLER`, ...). They are **not removed** — define them in `lv_conf.h`
+or via a `*_CUSTOM_INCLUDE` and LVGL still picks them up; they just default to
+empty/no-op otherwise.
+
+### No-op options kept for compatibility
+
+`LV_USE_PXP` and `LV_USE_G2D` never enabled drawing on their own, you always
+also needed `LV_USE_DRAW_PXP` / `LV_USE_DRAW_G2D`. They are kept as **deprecated
+no-ops** (and excluded from the generated headers) purely so existing
+`defconfig`s that set `CONFIG_LV_USE_PXP` / `CONFIG_LV_USE_G2D` keep loading.
+They have no effect and emit no warning. Use the real switches:
+
+| No-op | Real switch |
+|---|---|
+| `LV_USE_PXP` | `LV_USE_DRAW_PXP` |
+| `LV_USE_G2D` | `LV_USE_DRAW_G2D` |
+
+See [Configuring LVGL](/integration/configuration) for the full picture of how
+configuration works now.
+
+---
+
 ## Core
 
 ### Argument checking

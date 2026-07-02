@@ -14,7 +14,7 @@ override_dh_auto_configure:
 	        -DCMAKE_INSTALL_PREFIX=/usr \
 	        -DCMAKE_BUILD_TYPE=Release \
 	        -DLV_BUILD_USE_KCONFIG=ON \
-	        -DLV_BUILD_DEFCONFIG_PATH=$(CURDIR)/configs/$${config}_defconfig \
+	        -DLV_BUILD_DEFCONFIG_PATH=$(CURDIR)/configs/defconfigs/$${config}.defconfig \
 	        -GNinja ; \
 	done
 

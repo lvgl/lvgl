@@ -57,7 +57,7 @@ jobs:
                 -GNinja \
                 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/lvgl-install \
                 -DLV_BUILD_USE_KCONFIG=ON \
-                -DLV_BUILD_DEFCONFIG_PATH=configs/${{ matrix.config }}_defconfig
+                -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/${{ matrix.config }}.defconfig
 
           cmake --build build
           cmake --install build

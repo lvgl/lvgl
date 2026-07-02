@@ -1,0 +1,29 @@
+config LV_USE_G2D
+	bool "Use G2D (legacy, no effect) [DEPRECATED: use LV_USE_DRAW_G2D]"
+	default n
+	help
+	  Deprecated and non-functional. Use LV_USE_DRAW_G2D instead.
+
+config LV_USE_DRAW_G2D
+	bool "Use G2D for drawing"
+	default n
+
+if LV_USE_DRAW_G2D
+
+config LV_G2D_HASH_TABLE_SIZE
+	int "Maximum number of buffers that can be stored for G2D draw unit"
+	default 50
+	help
+		Includes the frame buffers and assets.
+
+config LV_USE_G2D_DRAW_THREAD
+	bool "Use additional draw thread for G2D processing"
+	depends on !LV_OS_NONE
+	default y
+
+config LV_USE_G2D_ASSERT
+	bool "Enable G2D asserts"
+	depends on LV_USE_DRAW_G2D
+	default n
+
+endif

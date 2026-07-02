@@ -1,0 +1,3 @@
+config LV_USE_DEMO_STRESS
+	bool "Stress test for LVGL"
+	default n

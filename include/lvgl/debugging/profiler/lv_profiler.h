@@ -20,6 +20,8 @@ extern "C" {
 
 #include LV_PROFILER_INCLUDE
 
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -36,14 +38,20 @@ extern "C" {
  *      MACROS
  **********************/
 
-#else
-
+#ifndef LV_PROFILER_BEGIN
 #define LV_PROFILER_BEGIN
+#endif /*LV_PROFILER_BEGIN*/
+#ifndef LV_PROFILER_END
 #define LV_PROFILER_END
-#define LV_PROFILER_BEGIN_TAG(tag) LV_UNUSED(tag)
-#define LV_PROFILER_END_TAG(tag)   LV_UNUSED(tag)
+#endif /*LV_PROFILER_END*/
 
-#endif /*LV_USE_PROFILER*/
+#ifndef LV_PROFILER_BEGIN_TAG
+#define LV_PROFILER_BEGIN_TAG(tag) LV_UNUSED(tag)
+#endif /*LV_PROFILER_BEGIN_TAG*/
+
+#ifndef LV_PROFILER_END_TAG
+#define LV_PROFILER_END_TAG(tag)   LV_UNUSED(tag)
+#endif /*LV_PROFILER_END_TAG*/
 
 #if LV_USE_PROFILER && LV_PROFILER_LAYOUT
 #define LV_PROFILER_LAYOUT_BEGIN LV_PROFILER_BEGIN

@@ -103,8 +103,10 @@ static inline void test_check_obj_null_check_fail_impl(void)
     bool result = helper_null_check(NULL);
 #if LV_USE_CHECK_ARG
     TEST_ASSERT_FALSE(result);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed");
+#endif
 #else
     /* LV_CHECK_OBJ is a no-op: always returns true, never logs. */
     TEST_ASSERT_TRUE(result);
@@ -146,8 +148,11 @@ static inline void test_check_obj_class_null_still_fails_impl(void)
     bool result = helper_class_check(NULL, &lv_label_class);
 #if LV_USE_CHECK_ARG
     TEST_ASSERT_FALSE(result);
+
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed");
+#endif
 #else
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_FALSE(log_warned);
@@ -186,8 +191,10 @@ static inline void test_check_obj_validity_null_still_fails_impl(void)
     bool result = helper_validity_check(NULL, &lv_label_class);
 #if LV_USE_CHECK_ARG
     TEST_ASSERT_FALSE(result);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed");
+#endif
 #else
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_FALSE(log_warned);

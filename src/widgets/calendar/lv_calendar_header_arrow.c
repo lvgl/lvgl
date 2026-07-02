@@ -38,8 +38,12 @@ const lv_obj_class_t lv_calendar_header_arrow_class = {
     .height_def = LV_DPI_DEF / 3,
     .name = "lv_calendar_header_arrow",
 };
-
+#if defined(LV_CALENDAR_DEFAULT_MONTH_NAMES) && !LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES
+#warning "LV_CALENDAR_DEFAULT_MONTH_NAMES is deprecated and will be removed in the next release. Use LV_JANUARY_STR, LV_FEBRUARY_STR,... to set each month name"
 static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
+#else
+static const char * month_names_def[12] = { LV_JANUARY_STR, LV_FEBRUARY_STR, LV_MARCH_STR, LV_APRIL_STR, LV_MAY_STR, LV_JUNE_STR, LV_JULY_STR, LV_AUGUST_STR, LV_SEPTEMBER_STR, LV_OCTOBER_STR, LV_NOVEMBER_STR, LV_DECEMBER_STR };
+#endif
 
 /**********************
  *      MACROS

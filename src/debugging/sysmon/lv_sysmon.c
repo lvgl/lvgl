@@ -15,6 +15,19 @@
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 
+#ifndef LV_SYSMON_GET_IDLE
+    #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
+#endif
+
+extern uint32_t LV_SYSMON_GET_IDLE(void);
+
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
+    #ifndef LV_SYSMON_GET_PROC_IDLE
+        #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
+    #endif
+    extern uint32_t LV_SYSMON_GET_PROC_IDLE(void);
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -250,7 +263,6 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
 
 static void perf_dump_info(lv_display_t * disp)
 {
-    uint32_t LV_SYSMON_GET_IDLE(void);
 
     lv_sysmon_perf_info_t * info = &disp->perf_sysmon_info;
     info->calculated.run_cnt++;
@@ -265,7 +277,6 @@ static void perf_dump_info(lv_display_t * disp)
 
     info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
-    uint32_t LV_SYSMON_GET_PROC_IDLE(void);
     info->calculated.cpu_proc = 100 - LV_SYSMON_GET_PROC_IDLE();
 #endif /*LV_SYSMON_PROC_IDLE_AVAILABLE*/
     info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :

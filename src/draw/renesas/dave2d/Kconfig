@@ -1,0 +1,5 @@
+config LV_USE_DRAW_DAVE2D
+	bool "Use Renesas Dave2D on RA platforms"
+	default n
+	help
+		Use Renesas Dave2D on RA  platforms.

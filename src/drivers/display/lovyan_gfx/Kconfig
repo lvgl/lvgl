@@ -1,0 +1,13 @@
+config LV_USE_LOVYAN_GFX
+	bool "Use LovyanGFX driver"
+	default n
+	help
+		Interface for Lovyan_GFX
+
+if LV_USE_LOVYAN_GFX
+
+config LV_LGFX_USER_INCLUDE
+	string "Header for LovyanGFX user configuration"
+	default "lv_lgfx_user.hpp"
+
+endif #LV_USE_LOVYAN_GFX

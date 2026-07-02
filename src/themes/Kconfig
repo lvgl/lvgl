@@ -1,0 +1,35 @@
+menu "Themes"
+
+config LV_USE_THEME_DEFAULT
+	bool "A simple, impressive and very complete theme"
+	default y
+	help
+		A simple, impressive and very complete theme
+
+if LV_USE_THEME_DEFAULT
+config LV_THEME_DEFAULT_DARK
+	bool "Yes to set dark mode, No to set light mode"
+	default n
+
+config LV_THEME_DEFAULT_GROW
+	bool "Enable grow on press"
+	default y
+
+config LV_THEME_DEFAULT_TRANSITION_TIME
+	int "Default transition time in [ms]"
+	default 80
+
+endif #LV_USE_THEME_DEFAULT
+
+config LV_USE_THEME_SIMPLE
+	bool "A very simple theme that is a good starting point for a custom theme"
+	default y
+	help
+		A very simple theme that is a good starting point for a custom theme
+
+config LV_USE_THEME_MONO
+	bool "Monochrome theme, suitable for some E-paper & dot matrix displays"
+	default y
+	help
+		A theme designed for monochrome displays
+endmenu

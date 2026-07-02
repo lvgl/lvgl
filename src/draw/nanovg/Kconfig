@@ -1,0 +1,44 @@
+config LV_USE_DRAW_NANOVG
+	bool "Use NanoVG Renderer."
+	default n
+	select LV_USE_NANOVG
+	select LV_USE_MATRIX
+	select LV_DRAW_HAS_VECTOR_SUPPORT
+	select LV_DRAW_HAS_3D_SUPPORT
+	help
+		Use NanoVG Renderer
+
+if LV_USE_DRAW_NANOVG
+
+choice LV_NANOVG_BACKEND
+	prompt "NanoVG OpenGL backend"
+	default LV_NANOVG_BACKEND_GLES2
+	help
+		Select which OpenGL implementation to use for NanoVG rendering.
+
+	config LV_NANOVG_BACKEND_GL2
+		bool "OpenGL 2.0"
+	config LV_NANOVG_BACKEND_GL3
+		bool "OpenGL 3.0+"
+	config LV_NANOVG_BACKEND_GLES2
+		bool "OpenGL ES 2.0"
+	config LV_NANOVG_BACKEND_GLES3
+		bool "OpenGL ES 3.0+"
+endchoice
+
+config LV_NANOVG_BACKEND
+	int
+	default 1 if LV_NANOVG_BACKEND_GL2
+	default 2 if LV_NANOVG_BACKEND_GL3
+	default 3 if LV_NANOVG_BACKEND_GLES2
+	default 4 if LV_NANOVG_BACKEND_GLES3
+
+config LV_NANOVG_IMAGE_CACHE_CNT
+	int "Draw image texture cache count"
+	default 128
+
+config LV_NANOVG_LETTER_CACHE_CNT
+	int "Draw letter cache count"
+	default 512
+
+endif

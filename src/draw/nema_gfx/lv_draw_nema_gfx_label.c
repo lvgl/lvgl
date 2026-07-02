@@ -39,7 +39,7 @@
 #include "../../misc/lv_bidi_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../lvgl.h"
-#include "../../libs/freetype/lv_freetype_private.h"
+#include "../../font/freetype/lv_freetype_private.h"
 #include "../../core/lv_global.h"
 
 /*********************

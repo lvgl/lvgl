@@ -40,7 +40,8 @@ jobs:
         run: |
           # Debian folder needs to sit directly in the top directory
           mv env_support/debian .
-          rm -rf .devcontainer .git .github demos docs examples tests zephyr
+          rm -rf .devcontainer .git .github demos/* docs examples/* tests zephyr
+          touch {demos,examples}/Kconfig
 
       - name: Build packages (offline)
         run: |
