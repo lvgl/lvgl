@@ -173,6 +173,33 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, CHILD_COUNT,                LV_PROPERTY_TYPE_INT,       72),
     LV_PROPERTY_ID(OBJ, INDEX,                      LV_PROPERTY_TYPE_INT,       73),
 
+    /*Dedicated boolean properties backing the per-flag setters/getters.
+     *The OBJ_FLAG_* properties above are kept for backward compatibility.*/
+    LV_PROPERTY_ID(OBJ, HIDDEN,                     LV_PROPERTY_TYPE_BOOL,      74),
+    LV_PROPERTY_ID(OBJ, CLICKABLE,                  LV_PROPERTY_TYPE_BOOL,      75),
+    LV_PROPERTY_ID(OBJ, CLICK_FOCUSABLE,            LV_PROPERTY_TYPE_BOOL,      76),
+    LV_PROPERTY_ID(OBJ, CHECKABLE,                  LV_PROPERTY_TYPE_BOOL,      77),
+    LV_PROPERTY_ID(OBJ, SCROLLABLE,                 LV_PROPERTY_TYPE_BOOL,      78),
+    LV_PROPERTY_ID(OBJ, SCROLL_ELASTIC,             LV_PROPERTY_TYPE_BOOL,      79),
+    LV_PROPERTY_ID(OBJ, SCROLL_MOMENTUM,            LV_PROPERTY_TYPE_BOOL,      80),
+    LV_PROPERTY_ID(OBJ, SCROLL_ONE,                 LV_PROPERTY_TYPE_BOOL,      81),
+    LV_PROPERTY_ID(OBJ, SCROLL_CHAIN_HOR,           LV_PROPERTY_TYPE_BOOL,      82),
+    LV_PROPERTY_ID(OBJ, SCROLL_CHAIN_VER,           LV_PROPERTY_TYPE_BOOL,      83),
+    LV_PROPERTY_ID(OBJ, SCROLL_ON_FOCUS,            LV_PROPERTY_TYPE_BOOL,      84),
+    LV_PROPERTY_ID(OBJ, SCROLL_WITH_ARROW,          LV_PROPERTY_TYPE_BOOL,      85),
+    LV_PROPERTY_ID(OBJ, SNAPPABLE,                  LV_PROPERTY_TYPE_BOOL,      86),
+    LV_PROPERTY_ID(OBJ, PRESS_LOCK,                 LV_PROPERTY_TYPE_BOOL,      87),
+    LV_PROPERTY_ID(OBJ, EVENT_BUBBLE,               LV_PROPERTY_TYPE_BOOL,      88),
+    LV_PROPERTY_ID(OBJ, GESTURE_BUBBLE,             LV_PROPERTY_TYPE_BOOL,      89),
+    LV_PROPERTY_ID(OBJ, ADV_HITTEST,                LV_PROPERTY_TYPE_BOOL,      90),
+    LV_PROPERTY_ID(OBJ, IGNORE_LAYOUT,              LV_PROPERTY_TYPE_BOOL,      91),
+    LV_PROPERTY_ID(OBJ, FLOATING,                   LV_PROPERTY_TYPE_BOOL,      92),
+    LV_PROPERTY_ID(OBJ, SEND_DRAW_TASK_EVENTS,      LV_PROPERTY_TYPE_BOOL,      93),
+    LV_PROPERTY_ID(OBJ, OVERFLOW_VISIBLE,           LV_PROPERTY_TYPE_BOOL,      94),
+    LV_PROPERTY_ID(OBJ, EVENT_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      95),
+    LV_PROPERTY_ID(OBJ, STATE_TRICKLE,              LV_PROPERTY_TYPE_BOOL,      96),
+    LV_PROPERTY_ID(OBJ, FLEX_IN_NEW_TRACK,          LV_PROPERTY_TYPE_BOOL,      97),
+
     LV_PROPERTY_OBJ_END,
 };
 #endif
@@ -201,14 +228,18 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent);
  * Set one or more flags
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to set.
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, true)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, true).")
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Remove one or more flags
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to clear.
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, false)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, false).")
 void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
@@ -216,8 +247,166 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to update.
  * @param v     true: add the flags; false: remove the flags
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj, en)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_set_<flag>() setters instead, e.g. lv_obj_set_hidden(obj, en).")
 void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
+
+/** Make the object hidden. (Like it wasn't there at all)
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the hidden property
+ */
+void lv_obj_set_hidden(lv_obj_t * obj, bool en);
+
+/** Make the object clickable by the input devices
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the clickable property
+ */
+void lv_obj_set_clickable(lv_obj_t * obj, bool en);
+
+/** Add focused state to the object when clicked
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the click focusable property
+ */
+void lv_obj_set_click_focusable(lv_obj_t * obj, bool en);
+
+/** Toggle checked state when the object is clicked
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the checkable property
+ */
+void lv_obj_set_checkable(lv_obj_t * obj, bool en);
+
+/** Make the object scrollable
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the scrollable property
+ */
+void lv_obj_set_scrollable(lv_obj_t * obj, bool en);
+
+/** Allow scrolling inside but with slower speed
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the scroll elastic property
+ */
+void lv_obj_set_scroll_elastic(lv_obj_t * obj, bool en);
+
+/** Make the object scroll further when "thrown"
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the scroll momentum property
+ */
+void lv_obj_set_scroll_momentum(lv_obj_t * obj, bool en);
+
+/** Allow scrolling only one snappable child
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the scroll one property
+ */
+void lv_obj_set_scroll_one(lv_obj_t * obj, bool en);
+
+/** Allow propagating the scrolling in any directions to a parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable scroll chaining
+ */
+void lv_obj_set_scroll_chain(lv_obj_t * obj, bool en);
+
+/** Allow propagating the horizontal scroll to a parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable horizontal scroll chaining
+ */
+void lv_obj_set_scroll_chain_hor(lv_obj_t * obj, bool en);
+
+/** Allow propagating the vertical scroll to a parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable vertical scroll chaining
+ */
+void lv_obj_set_scroll_chain_ver(lv_obj_t * obj, bool en);
+
+/** Automatically scroll object to make it visible when focused
+ * @param obj     pointer to a widget
+ * @param en      enable or disable scroll on focus
+ */
+void lv_obj_set_scroll_on_focus(lv_obj_t * obj, bool en);
+
+/** Allow scrolling the focused object with arrow keys
+ * @param obj     pointer to a widget
+ * @param en      enable or disable scroll with arrow keys
+ */
+void lv_obj_set_scroll_with_arrow(lv_obj_t * obj, bool en);
+
+/** Allow snapping to this object if scroll snap is enabled on the parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the snappable property
+ */
+void lv_obj_set_snappable(lv_obj_t * obj, bool en);
+
+/** Keep the object pressed even if the press slid from the object
+ * @param obj     pointer to a widget
+ * @param en      enable or disable the press lock property
+ */
+void lv_obj_set_press_lock(lv_obj_t * obj, bool en);
+
+/** Propagate the events to the parent too
+ * @param obj     pointer to a widget
+ * @param en      enable or disable event bubbling
+ */
+void lv_obj_set_event_bubble(lv_obj_t * obj, bool en);
+
+/** Propagate the gestures to the parent
+ * @param obj     pointer to a widget
+ * @param en      enable or disable gesture bubbling
+ */
+void lv_obj_set_gesture_bubble(lv_obj_t * obj, bool en);
+
+/** Allow performing more accurate hit test
+ * @param obj     pointer to a widget
+ * @param en      enable or disable advanced hit testing
+ */
+void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
+
+/** Make the object not positioned by layouts
+ * @param obj     pointer to a widget
+ * @param en      enable or disable ignoring layout
+ */
+void lv_obj_set_ignore_layout(lv_obj_t * obj, bool en);
+
+/** Do not scroll the object when the parent scrolls and ignore layout
+ * @param obj     pointer to a widget
+ * @param en      enable or disable floating mode
+ */
+void lv_obj_set_floating(lv_obj_t * obj, bool en);
+
+/** Send LV_EVENT_DRAW_TASK_ADDED events
+ * @param obj     pointer to a widget
+ * @param en      enable or disable draw task events
+ */
+void lv_obj_set_send_draw_task_events(lv_obj_t * obj, bool en);
+
+/** Do not clip the children to the parent's extended draw size
+ * @param obj     pointer to a widget
+ * @param en      enable or disable overflow visibility
+ */
+void lv_obj_set_overflow_visible(lv_obj_t * obj, bool en);
+
+/** Propagate the events to the children too
+ * @param obj     pointer to a widget
+ * @param en      enable or disable event trickling
+ */
+void lv_obj_set_event_trickle(lv_obj_t * obj, bool en);
+
+/** Propagate the states to the children too
+ * @param obj     pointer to a widget
+ * @param en      enable or disable state trickling
+ */
+void lv_obj_set_state_trickle(lv_obj_t * obj, bool en);
+
+/** Allow only one RADIO_BUTTON sibling to be checked
+ * @param obj     pointer to a widget
+ * @param en      enable or disable radio button behavior
+ */
+void lv_obj_set_radio_button(lv_obj_t * obj, bool en);
+
+/** Start a new flex track on this item
+ * @param obj     pointer to a widget
+ * @param en      enable or disable new flex track
+ */
+void lv_obj_set_flex_in_new_track(lv_obj_t * obj, bool en);
 
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.
@@ -250,12 +439,13 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
  */
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
 
-
-/** Allow only one RADIO_BUTTON sibling to be checked
- * @param obj     pointer to a widget
- * @param en      enable or disable radio button behavior
+/**
+ * Set one of the 4 flags available for the user
+ * @param obj   pointer to an object
+ * @param bit	the index of the bit (0..3)
+ * @param v		the value of the bit, true or false
  */
-void lv_obj_set_radio_button(lv_obj_t * obj, bool en);
+void lv_obj_set_user_flag(lv_obj_t * obj, uint32_t bit, bool v);
 
 /*=======================
  * Getter functions
@@ -266,7 +456,9 @@ void lv_obj_set_radio_button(lv_obj_t * obj, bool en);
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
  * @return      true: all flags are set; false: not all flags are set
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_is_hidden(obj)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
@@ -274,8 +466,161 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
  * @return      true: at least one flag is set; false: none of the flags are set
+ * @deprecated  Use the dedicated per-flag setter instead, e.g. `lv_obj_set_hidden(obj)`.
  */
+LV_DEPRECATED("Use the dedicated lv_obj_is_<flag>() functions instead, e.g. lv_obj_is_hidden(obj).")
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
+
+/** Get whether the object is hidden
+ * @param obj     pointer to a widget
+ * @return        true if the object is hidden, false otherwise
+ */
+bool lv_obj_is_hidden(const lv_obj_t * obj);
+
+/** Get whether the object is clickable by input devices
+ * @param obj     pointer to a widget
+ * @return        true if the object is clickable
+ */
+bool lv_obj_is_clickable(const lv_obj_t * obj);
+
+/** Get whether the object gets focused when clicked
+ * @param obj     pointer to a widget
+ * @return        true if click focusable is enabled
+ */
+bool lv_obj_is_click_focusable(const lv_obj_t * obj);
+
+/** Get whether the object toggles checked state when clicked
+ * @param obj     pointer to a widget
+ * @return        true if the object is checkable
+ */
+bool lv_obj_is_checkable(const lv_obj_t * obj);
+
+/** Get whether the object is scrollable
+ * @param obj     pointer to a widget
+ * @return        true if the object is scrollable
+ */
+bool lv_obj_is_scrollable(const lv_obj_t * obj);
+
+/** Get whether elastic scrolling is enabled
+ * @param obj     pointer to a widget
+ * @return        true if scroll elastic is enabled
+ */
+bool lv_obj_is_scroll_elastic(const lv_obj_t * obj);
+
+/** Get whether scroll momentum is enabled
+ * @param obj     pointer to a widget
+ * @return        true if scroll momentum is enabled
+ */
+bool lv_obj_is_scroll_momentum(const lv_obj_t * obj);
+
+/** Get whether only one snappable child can be scrolled
+ * @param obj     pointer to a widget
+ * @return        true if scroll one is enabled
+ */
+bool lv_obj_is_scroll_one(const lv_obj_t * obj);
+
+/** Get whether horizontal scroll chaining is enabled
+ * @param obj     pointer to a widget
+ * @return        true if horizontal scroll chaining is enabled
+ */
+bool lv_obj_is_scroll_chain_hor(const lv_obj_t * obj);
+
+/** Get whether vertical scroll chaining is enabled
+ * @param obj     pointer to a widget
+ * @return        true if vertical scroll chaining is enabled
+ */
+bool lv_obj_is_scroll_chain_ver(const lv_obj_t * obj);
+
+/** Get whether the object auto-scrolls into view when focused
+ * @param obj     pointer to a widget
+ * @return        true if scroll on focus is enabled
+ */
+bool lv_obj_is_scroll_on_focus(const lv_obj_t * obj);
+
+/** Get whether the focused object can be scrolled with arrow keys
+ * @param obj     pointer to a widget
+ * @return        true if scroll with arrow keys is enabled
+ */
+bool lv_obj_is_scroll_with_arrow(const lv_obj_t * obj);
+
+/** Get whether the object is snappable by a scrolling parent
+ * @param obj     pointer to a widget
+ * @return        true if the object is snappable
+ */
+bool lv_obj_is_snappable(const lv_obj_t * obj);
+
+/** Get whether press lock is enabled
+ * @param obj     pointer to a widget
+ * @return        true if press lock is enabled
+ */
+bool lv_obj_is_press_lock(const lv_obj_t * obj);
+
+/** Get whether events bubble to the parent
+ * @param obj     pointer to a widget
+ * @return        true if event bubbling is enabled
+ */
+bool lv_obj_is_event_bubble(const lv_obj_t * obj);
+
+/** Get whether gestures bubble to the parent
+ * @param obj     pointer to a widget
+ * @return        true if gesture bubbling is enabled
+ */
+bool lv_obj_is_gesture_bubble(const lv_obj_t * obj);
+
+/** Get whether advanced hit testing is enabled
+ * @param obj     pointer to a widget
+ * @return        true if advanced hit testing is enabled
+ */
+bool lv_obj_is_adv_hittest(const lv_obj_t * obj);
+
+/** Get whether the object ignores layout positioning
+ * @param obj     pointer to a widget
+ * @return        true if ignore layout is enabled
+ */
+bool lv_obj_is_ignore_layout(const lv_obj_t * obj);
+
+/** Get whether the object is floating
+ * @param obj     pointer to a widget
+ * @return        true if floating mode is enabled
+ */
+bool lv_obj_is_floating(const lv_obj_t * obj);
+
+/** Get whether draw task events are sent
+ * @param obj     pointer to a widget
+ * @return        true if draw task events are enabled
+ */
+bool lv_obj_is_send_draw_task_events(const lv_obj_t * obj);
+
+/** Get whether overflow is visible outside the parent
+ * @param obj     pointer to a widget
+ * @return        true if overflow is visible
+ */
+bool lv_obj_is_overflow_visible(const lv_obj_t * obj);
+
+/** Get whether events trickle to the children
+ * @param obj     pointer to a widget
+ * @return        true if event trickling is enabled
+ */
+bool lv_obj_is_event_trickle(const lv_obj_t * obj);
+
+/** Get whether states trickle to the children
+ * @param obj     pointer to a widget
+ * @return        true if state trickling is enabled
+ */
+bool lv_obj_is_state_trickle(const lv_obj_t * obj);
+
+/** Get whether the object is a radio button
+ * @param obj     pointer to a widget
+ * @return        true if radio button behavior is enabled
+ */
+bool lv_obj_is_radio_button(const lv_obj_t * obj);
+
+/**
+ * Get whether the widget should be placed in a new flex track
+ * @param obj   pointer to a widget
+ * @return      true if flex in new track is enabled
+ */
+bool lv_obj_is_flex_in_new_track(const lv_obj_t * obj);
 
 /**
  * Get the state of an object
@@ -292,12 +637,6 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj);
  */
 bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
 
-/** Get whether the object is a radio button
- * @param obj     pointer to a widget
- * @return        true if radio button behavior is enabled
- */
-bool lv_obj_is_radio_button(const lv_obj_t * obj);
-
 /**
  * Get the group of the object
  * @param       obj pointer to an object
@@ -311,6 +650,14 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj);
  * @return      the pointer to the user_data of the object
  */
 void * lv_obj_get_user_data(lv_obj_t * obj);
+
+/**
+ * Get the value of one of the 4 flags available for the user
+ * @param obj   pointer to an object
+ * @param bit	the index of the bit (0..3)
+ * @return		the value of the bit, true or false
+ */
+bool lv_obj_get_user_flag(lv_obj_t * obj, uint32_t bit);
 
 /*=======================
  * Other functions

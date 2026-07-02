@@ -159,7 +159,7 @@ void test_group_remove_focused_obj_sends_defocused_when_others_unfocusable(void)
     lv_group_add_obj(group, obj_disabled);
     lv_group_add_obj(group, obj_focused);
 
-    lv_obj_add_flag(obj_hidden, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(obj_hidden, true);
     lv_obj_add_state(obj_disabled, LV_STATE_DISABLED);
 
     lv_group_focus_obj(obj_focused);

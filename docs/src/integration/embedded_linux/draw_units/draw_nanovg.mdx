@@ -3,7 +3,7 @@ title: NanoVG Draw Unit
 description: "NanoVG is a lightweight, antialiased 2D vector graphics library built on top of OpenGL/OpenGL ES. The NanoVG draw unit integrates NanoVG as a hardware-accelerated rendering backend for LVGL, provide..."
 ---
 
-# Introduction
+## Introduction
 
 NanoVG is a lightweight, antialiased 2D vector graphics library built on top of OpenGL/OpenGL ES.
 The NanoVG draw unit integrates NanoVG as a hardware-accelerated rendering backend for LVGL,
@@ -17,13 +17,13 @@ Unlike the software renderer, NanoVG leverages the GPU for:
 - Box shadows and gradients
 - Vector graphics support
 
-# Requirements
+## Requirements
 
 - OpenGL 2.0+ / OpenGL ES 2.0+ / OpenGL ES 3.0+
 - An initialized OpenGL context (via GLFW, EGL, or custom setup)
 - Stencil buffer support (8-bit recommended)
 
-# Configuration
+## Configuration
 
 Enable the NanoVG draw unit in `lv_conf.h`:
 
@@ -47,7 +47,7 @@ Enable the NanoVG draw unit in `lv_conf.h`:
 #define LV_NANOVG_FBO_CACHE_CNT    8   /* Framebuffer object cache entries */
 ```
 
-# Supported Features
+## Supported Features
 
 The NanoVG draw unit supports all standard LVGL drawing operations:
 
@@ -66,7 +66,7 @@ The NanoVG draw unit supports all standard LVGL drawing operations:
 | Canvas | Direct drawing to canvas buffers |
 | Vector Graphics | SVG-style path rendering (requires `LV_USE_VECTOR_GRAPHIC`) |
 
-# Supported Image Formats
+## Supported Image Formats
 
 NanoVG supports zero-copy texture upload for these LVGL color formats:
 
@@ -78,14 +78,14 @@ NanoVG supports zero-copy texture upload for these LVGL color formats:
 | `LV_COLOR_FORMAT_RGB888` | BGR→RGB swizzle | No alpha channel |
 | `LV_COLOR_FORMAT_RGB565` | Direct upload | Note: LVGL uses BGR565 layout |
 
-# Performance Tips
+## Performance Tips
 
 1. **Minimize Layer Usage**: Each layer requires a framebuffer object (FBO) switch
 2. **Use Premultiplied Alpha**: Set `LV_IMAGE_FLAGS_PREMULTIPLIED` for pre-processed images
 3. **Cache Static Content**: NanoVG caches textures automatically; avoid recreating images
 4. **Batch Similar Operations**: Group widgets with similar styles for better GPU batching
 
-# Limitations
+## Limitations
 
 - **Blur**: Not natively supported; Using this style will not affect the rendering results.
 - **Complex Gradients**: Limited to 2-color gradients (LVGL supports multi-stop)

@@ -6,10 +6,10 @@ description: "The Wayland driver provides integration between LVGL and Wayland-b
 ## Overview
 
 The Wayland [driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/wayland) provides integration between LVGL and Wayland-based systems,
-allowing LVGL applications to render directly into a Wayland surface and handle keyboard, mouse and touch input. This makes it suitable 
+allowing LVGL applications to render directly into a Wayland surface and handle keyboard, mouse and touch input. This makes it suitable
 for production deployments, such as kiosk interfaces, control panels, or other embedded GUIs where Wayland is the display server.
 
-In addition to production use, the driver is also useful for development on linux desktop environments, offering a convenient way to simulate and validate 
+In addition to production use, the driver is also useful for development on linux desktop environments, offering a convenient way to simulate and validate
 your LVGL applications without dedicated hardware. It serves as an alternative to the X11 and SDL2 drivers.
 
 ## Dependencies
@@ -64,7 +64,7 @@ enabling GPU-accelerated graphics on Wayland compositors that support the necess
 **Requirements:**
 
 - OpenGL ES 2.0 support on the target hardware
-- `LV_USE_OPENGLES` must be enabled in your LVGL configuration
+- <ApiLink name="LV_USE_OPENGLES" /> must be enabled in your LVGL configuration
 - Must link with the `wayland-egl` library
 
 **Usage:**
@@ -72,13 +72,13 @@ enabling GPU-accelerated graphics on Wayland compositors that support the necess
 To enable the EGL backend:
 
 1. Enable OpenGL ES support in your LVGL configuration:
-   
+
     ```c
     #define LV_USE_OPENGLES 1
     ```
 
 2. Link your application with the `wayland-egl` library (add to your build system):
-   
+
     ```bash
     -lwayland-egl
     ```
@@ -106,25 +106,25 @@ The G2D backend leverages NXP's hardware-accelerated 2D graphics engine availabl
 To enable the G2D backend:
 
 1. Enable G2D support in your LVGL configuration:
-   
+
     ```c
     #define LV_USE_G2D 1
     #define LV_USE_DRAW_G2D 1
     ```
 
 2. Link your application with the `g2d` library (add to your build system):
-   
+
     ```bash
     -lg2d
     ```
 
 ## Configuring the wayland driver
 
-1. Enable the wayland driver in `lv_conf.h`
+Enable the wayland driver in `lv_conf.h`:
 
-    ```c
-    #define LV_USE_WAYLAND  1
-    ```
+```c
+#define LV_USE_WAYLAND  1
+```
 
 ## Reference Project
 
@@ -134,9 +134,9 @@ the required protocols at build time.
 ## Getting started
 
 1. In `main.c` `#include "lv_drivers/wayland/wayland.h"`
-2. Enable the Wayland driver in `lv_conf.h` with `LV_USE_WAYLAND 1`
+2. Enable the Wayland driver in `lv_conf.h` with <ApiLink name="LV_USE_WAYLAND" /> set to `1`
 3. <ApiLink name="LV_COLOR_DEPTH" /> should be set either to `32` or `16` in `lv_conf.h`
-4. Add a display using `lv_wayland_window_create()`,
+4. Add a display using <ApiLink name="lv_wayland_window_create" />,
    possibly with a close callback to track the status of each display:
 
 ```c
@@ -180,42 +180,42 @@ Once a group is set as default, any focusable widget created afterwards is autom
 allowing keyboard arrows and encoder rotation to move focus between widgets, and Enter/encoder click to activate them.
 
 <Callout type="warning" title="Check display before querying input devices">
-    <ApiLink name="lv_wayland_get_indev_keyboard" /> and <ApiLink name="lv_wayland_get_indev_pointeraxis" /> both return 
-    `NULL` if called before the display is fully initialised always check that the return disp is non-NULL before querying its input devices.
+    <ApiLink name="lv_wayland_get_keyboard"/> and <ApiLink name="lv_wayland_get_pointeraxis"/> both return
+    `NULL` if called before the display is fully initialised. Always check that the returned display is non-`NULL` before querying its input devices.
 </Callout>
 
 ### Fullscreen mode
 
-To programmatically fullscreen the window, use the `lv_wayland_window_set_fullscreen()`
+To programmatically fullscreen the window, use the <ApiLink name="lv_wayland_window_set_fullscreen" />
 function respectively with `true` or `false` for the `fullscreen` argument.
 
 ### Maximized mode
 
 To programmatically maximize the window,
-use the `lv_wayland_window_set_maximized()` function respectively with `true`
+use the <ApiLink name="lv_wayland_window_set_maximized" /> function respectively with `true`
 or `false` for the `maximized` argument.
 
 ### Minimize window
 
-To programmatically minimize the window, use the `lv_wayland_window_set_minimized()` function.
+To programmatically minimize the window, use the <ApiLink name="lv_wayland_window_set_minimized" /> function.
 
 ### Physical display assignment
 
 When using multiple physical displays, you can control which display a fullscreen window
 appears on by assigning it to a specific physical display before entering fullscreen mode.
 
-Use `lv_wayland_assign_physical_display()` to assign a window to a particular physical
+Use <ApiLink name="lv_wayland_assign_physical_display" /> to assign a window to a particular physical
 display, where the `display` parameter specifies the physical display number (typically
 0, 1, 2, etc.):
 
 ```c
 /* Assign to physical display 0 and full screen on that display */
-lv_wayland_assign_physical_display(disp, 0);  
+lv_wayland_assign_physical_display(disp, 0);
 lv_wayland_window_set_fullscreen(window, true);
 ```
 
 To remove the physical display assignment and return to default behavior, use
-`lv_wayland_unassign_physical_display()`:
+<ApiLink name="lv_wayland_unassign_physical_display" />:
 
 ```c
 lv_wayland_unassign_physical_display(disp);
@@ -243,8 +243,8 @@ wayland-scanner client-header $SYSROOT/usr/share/wayland-protocols/stable/linux-
 wayland-scanner private-code $SYSROOT/usr/share/wayland-protocols/stable/linux-dmabuf/linux-dmabuf-v1.xml wayland_linux_dmabuf.c
 ```
 
-The resulting files can then be integrated into the project, it's better to re-run `wayland-scanner` on
-each build to ensure that the correct versions are generated, they must match the version of the `wayland-client`
+The resulting files can then be integrated into the project. It's better to re-run `wayland-scanner` on
+each build to ensure that the correct versions are generated; they must match the version of the `wayland-client`
 dynamically linked library installed on the system.
 
 ## Window Decorations

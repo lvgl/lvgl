@@ -32,6 +32,11 @@ class LVMsgbox(LVObject):
     def title(self):
         return ptr_or_none(self._wv.safe_field("title"))
 
+    @property
+    def auto_parent(self):
+        """Mark that the parent was automatically created"""
+        return int(self._wv.safe_field("auto_parent", 0))
+
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""
         s = super().snapshot(include_children=include_children, include_styles=include_styles)
@@ -40,5 +45,6 @@ class LVMsgbox(LVObject):
         d["content"] = self.content
         d["footer"] = self.footer
         d["title"] = self.title
+        d["auto_parent"] = self.auto_parent
         s['widget_data'] = d
         return s

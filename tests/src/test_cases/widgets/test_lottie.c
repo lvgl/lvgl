@@ -158,12 +158,12 @@ void test_lottie_no_jump_when_visible_again(void)
     lv_test_fast_forward(200);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_2.png");
 
-    lv_obj_add_flag(lottie, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(lottie, true);
     lv_test_fast_forward(300);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_1.png"); /*Empty screen*/
 
     /*Should be on the same frame*/
-    lv_obj_remove_flag(lottie, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(lottie, false);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_2.png");
 
     lv_test_fast_forward(750);

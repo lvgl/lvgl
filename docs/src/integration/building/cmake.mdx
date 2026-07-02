@@ -24,7 +24,7 @@ You need to install
 
 ### How to build this project using cmake
 
-##### Build with Command line
+#### Build with Command line
 
 The simplest way to build LVGL using cmake is to use the command line calls:
 
@@ -42,7 +42,7 @@ cmake -B build      # Configure phase
 cmake --build build # build phase
 ```
 
-##### Build with cmake presets
+#### Build with cmake presets
 
 Another way to build this project is to use the provided CMakePresets.json or pass options using the command line.
 The CMakePresets.json file describes some cmake configurations and build phase. It is a way to quickly use a set of
@@ -70,7 +70,7 @@ cmake --build --preset windows-base_dbg
 ctest --preset windows-base_dbg
 ```
 
-##### Build with IDE
+#### Build with IDE
 
 The recommended way for consuming CMakePresets is a CMakePresets aware IDE such as
 
@@ -80,7 +80,7 @@ The recommended way for consuming CMakePresets is a CMakePresets aware IDE such 
 
 Simply load this project into your IDE and select your desired preset and you are good to go.
 
-##### Build with CMake GUI
+#### Build with CMake GUI
 
 Open this project with CMake GUI and select your desired preset. When hitting the generate button,
 CMake will create solution files (for VS) or Ninja Files (for Linux Ninja Build)

@@ -189,7 +189,7 @@ void test_table_rendering(void)
 {
     lv_obj_center(table);
     lv_obj_add_event_cb(table, draw_part_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_send_draw_task_events(table, true);
     lv_obj_set_style_border_side(table, LV_BORDER_SIDE_FULL, LV_PART_ITEMS);
     lv_obj_set_style_pad_all(table, 10, LV_PART_ITEMS);
     lv_obj_set_style_border_width(table, 5, LV_PART_ITEMS);
