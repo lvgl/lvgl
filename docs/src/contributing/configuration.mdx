@@ -16,29 +16,30 @@ One script, `scripts/generators/config_files.py`, reads the Kconfig tree and
 generates the four files below. You never edit these by hand — you change Kconfig
 (or the generator), then re-run the script.
 
-### [Root Kconfig](https://github.com/lvgl/lvgl/blob/master/Kconfig)
+### Kconfig
 
-The root file the build reads. The generator concatenates every per-directory
+
+The root kconfig file, see [here](https://github.com/lvgl/lvgl/blob/master/Kconfig). The generator concatenates every per-directory
 `Kconfig` into this one file, so build systems that don't support [kconfiglib](https://pypi.org/project/kconfiglib/)
 extensions like `rsource` still work.
 
-### [Template (lv_conf_template.h)](https://github.com/lvgl/lvgl/blob/master/lv_conf_template.h)
+### lv_conf_template.h
 
-The starting point for users. They copy it to `lv_conf.h` and edit it. It carries
-one commented `#define` per option, so a user sees every option and its default
-in one place.
+The starting point for users, see [here](https://github.com/lvgl/lvgl/blob/master/lv_conf_template.h).
+The users copy it as `lv_conf.h` and edit it. It carries one commented `#define` per option, so a user sees every option and its default in one place.
 
-### [Internal (lv_conf_internal.h)](https://github.com/lvgl/lvgl/blob/master/include/lvgl/config/lv_conf_internal.h)
+### lv_conf_internal.h 
 
-The header LVGL's code actually includes. It gives **every** option a default, so
+The header LVGL's code actually includes internally, see [here](https://github.com/lvgl/lvgl/blob/master/include/lvgl/config/lv_conf_internal.h).
+It gives **every** option a default, so
 the code can just read a value instead of first checking whether the option is
 even defined. It also re-checks dependencies and defines helper tokens (e.g.
 `LV_OS_PTHREAD`) so a user can write `#define LV_USE_OS LV_OS_PTHREAD`.
 
-### [Kconfig Bridge (lv_conf_kconfig.h)](https://github.com/lvgl/lvgl/blob/master/include/lvgl/config/lv_conf_kconfig.h)
+### lv_conf_kconfig.h
 
 Used only on the Kconfig build path. It maps some `CONFIG_*` symbols (from `menuconfig` / `autoconf.h`)
-that need to be handled in a special way. See the file 
+that need to be handled in a special way. See [here](https://github.com/lvgl/lvgl/blob/master/include/lvgl/config/lv_conf_kconfig.h).
 
 ---
 
