@@ -118,7 +118,7 @@ jobs:
             --root-title 'public=Public API' \
             --root-title 'private=Private API' \
             --drop-empty-files \
-			--url-prefix api
+            --url-prefix api
             rm -rf docs/doxygen
 
       - name: Install Example Documentation
