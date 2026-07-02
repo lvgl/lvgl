@@ -99,7 +99,7 @@ jobs:
       # Tool used to convert Doxygen XML to .mdx API pages
       - name: Install doxymark
         run: |
-          npm install github:mutahharmkhan/doxymark#multi-root-prefix
+          npm install github:mutahharmkhan/doxymark#lvgl
 
       # Generate Documentation API pages
       - name: Generate API pages
@@ -116,7 +116,8 @@ jobs:
             --source-url-for private=https://github.com/lvgl/lvgl/tree/${{ github.sha }}/src \
             --root-title 'public=Public API' \
             --root-title 'private=Private API' \
-            --drop-empty-files
+            --drop-empty-files \
+			--url-prefix api
             rm -rf docs/doxygen
 
       - name: Install Example Documentation
