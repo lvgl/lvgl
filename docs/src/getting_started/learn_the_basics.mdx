@@ -18,7 +18,7 @@ See the [Quick porting guide](/getting_started/porting).
 ## Screen
 
 Screens are LVGL widgets created on a *Display*. They are logical containers for other widgets. A display can
-have multiple screens, but there is always one active screen, which can be retrieved by using <ApiLink name="lv_screen_active" />.
+have multiple screens, but there is always a single active screen, which can be retrieved by using <ApiLink name="lv_screen_active" />.
 It returns an <ApiLink name="lv_obj_t" display="lv_obj_t *" /> pointer. See [Active Screen](/common-widget-features/screens) for more information.
 
 The most common way to create a screen is by creating a [Base widget](/widgets/base_widget) with a `NULL` parent. E.g.
@@ -119,10 +119,10 @@ has only one part called <ApiLink name="LV_PART_MAIN" />. However, a
 [Slider (lv_slider)](/widgets/slider) has <ApiLink name="LV_PART_MAIN" />, <ApiLink name="LV_PART_INDICATOR" />
 and <ApiLink name="LV_PART_KNOB" />.
 
-By using parts you can apply different [styles](/common-widget-features/styles) to the parts
+By using [parts](/common-widget-features/parts_and_states) you can apply different [styles](/common-widget-features/styles) to the different parts
 of a widget.
 
-Read the Widget's documentation to learn which parts it uses.
+Read the specific Widget's documentation to learn which parts it uses.
 
 ### States
 
