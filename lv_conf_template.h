@@ -1094,6 +1094,10 @@
      *  configured (LV_USE_OS != LV_OS_NONE) because the cache is not
      *  thread-safe. */
     #define LV_FREETYPE_CACHE_FT_GLYPH_L1 1
+
+    /** HarfBuzz text shaping for complex scripts (e.g. Devanagari, Arabic).
+     *  Requires the HarfBuzz library to be installed. */
+    #define LV_USE_HARFBUZZ 0
 #endif
 
 /** Built-in TTF decoder */

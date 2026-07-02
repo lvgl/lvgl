@@ -2031,6 +2031,8 @@
               <files>
                 <!-- src/libs/freetype -->
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype.c" />
+                <file category="sourceC"    name="src/libs/freetype/lv_freetype_glyph.c" />
+                <file category="sourceC"    name="src/libs/freetype/lv_freetype_harfbuzz.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype_image.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype_outline.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_ftsystem.c" />
