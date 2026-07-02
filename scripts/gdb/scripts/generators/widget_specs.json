@@ -235,6 +235,8 @@
         "text": "string",
         "symbol": "pointer",
         "options": "string",
+        "text_translation_tag": "string",
+        "options_translation_tag": "string",
         "option_cnt": "int",
         "sel_opt_id": "int",
         "sel_opt_id_orig": "int",
