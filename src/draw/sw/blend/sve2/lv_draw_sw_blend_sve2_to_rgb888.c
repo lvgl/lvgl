@@ -388,6 +388,7 @@ void lv_sve_cccn888_stride_fill_colour_with_mask(
                     vTargetHigh16x4);
 
         pwTarget += sve_iteration_advance;
+        pchMask += sve_iteration_advance;
     }
 }
 
@@ -435,6 +436,7 @@ void lv_sve_ccc888_stride_fill_colour_with_mask(
                     vTargetHigh16x3);
 
         pchTarget += sve_iteration_advance * 3;
+        pchMask += sve_iteration_advance;
     }
 }
 
