@@ -443,6 +443,22 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #define LV_ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
 #endif /*LV_ARRAYLEN*/
 
+#ifndef LV_RESTRICT
+#if defined(__cplusplus)
+#define LV_RESTRICT __restrict
+#else
+#define LV_RESTRICT restrict
+#endif
+#endif
+
+#ifndef LV_NONNULL
+#if defined(__GNUC__) || defined(__clang__)
+#define LV_NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
+#else
+#define LV_NONNULL(...)
+#endif
+#endif
+
 /**
  * Mark a function as deprecated so the compiler emits a warning at every call site.
  *

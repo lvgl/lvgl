@@ -42,6 +42,7 @@ $(SRC_ROOT)/draw/sw/blend \
 $(SRC_ROOT)/draw/sw/blend/helium \
 $(SRC_ROOT)/draw/sw/blend/arm2d \
 $(SRC_ROOT)/draw/sw/blend/neon \
+$(SRC_ROOT)/draw/sw/blend/sve2 \
 $(SRC_ROOT)/misc \
 $(SRC_ROOT)/misc/cache \
 $(SRC_ROOT)/misc/cache/class \
