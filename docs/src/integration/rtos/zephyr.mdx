@@ -160,9 +160,9 @@ To optimize LVGL's performance, several `kconfig` options can be configured:
 - **CONFIG_LV_Z_VDB_ALIGN**: Ensures that the rendering buffer is properly aligned, which is critical for efficient memory access based on the color depth.
 - **CONFIG_LV_Z_VDB_CUSTOM_SECTION**: Allows rendering buffers to be placed in a custom memory section (e.g., `.lvgl_buf`), useful for leveraging specific memory types like tightly coupled or external memory to enhance performance.
 
-### Zephyr ≤ 3.7.0 Specific Options
+### Zephyr >= 3.7.0 Specific Options
 
-For Zephyr versions 3.7.0 and below, additional options are available to manage LVGL's frame flushing:
+For Zephyr versions 3.7.0 and above, additional options are available to manage LVGL's frame flushing:
 
 - **CONFIG_LV_Z_FLUSH_THREAD**: Enables flushing LVGL frames in a separate thread, allowing the main thread to continue rendering the next frame simultaneously. This option can be disabled if the performance gain is not needed.
 

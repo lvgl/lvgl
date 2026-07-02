@@ -180,7 +180,7 @@ Once a group is set as default, any focusable widget created afterwards is autom
 allowing keyboard arrows and encoder rotation to move focus between widgets, and Enter/encoder click to activate them.
 
 <Callout type="warning" title="Check display before querying input devices">
-    `lv_wayland_get_indev_keyboard()` and `lv_wayland_get_indev_pointeraxis()` both return
+    <ApiLink name="lv_wayland_get_indev_keyboard"/> and <ApiLink name="lv_wayland_get_indev_pointeraxis" both return
     `NULL` if called before the display is fully initialised. Always check that the returned display is non-`NULL` before querying its input devices.
 </Callout>
 
