@@ -17,6 +17,6 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - uses: arduino/arduino-lint-action@v2
+      - uses: arduino/arduino-lint-action@v3
         with:
           library-manager: update
