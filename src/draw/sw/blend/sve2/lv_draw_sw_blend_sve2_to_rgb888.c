@@ -36,7 +36,7 @@
 /* *INDENT-OFF* */
 
 #define lv_sve_rgb32_stride_impl(...)                         \
-    lv_sve_stride_loop_chn(uStride, vTailPred)                \
+    lv_sve_stride_loop_pixel(uStride, vTailPred)              \
     {                                                         \
                                                               \
         svuint16x4_t vSourceLow16x4 = svundef4_u16();         \
@@ -67,7 +67,7 @@
     }
 
 #define lv_sve_rgb24_stride_impl(...)                         \
-    lv_sve_stride_loop_chn(uStride, vTailPred)                \
+    lv_sve_stride_loop_pixel(uStride, vTailPred)              \
     {                                                         \
                                                               \
         svuint16x3_t vSourceLow16x3 = svundef3_u16();         \
@@ -98,7 +98,7 @@
     }
 
 #define lv_sve_rgb32_to_rgb24_stride_impl(...)                \
-    lv_sve_stride_loop_chn(uStride, vTailPred)                \
+    lv_sve_stride_loop_pixel(uStride, vTailPred)              \
     {                                                         \
         svuint16x4_t vSourceLow16x4 = svundef4_u16();         \
         svuint16x4_t vSourceHigh16x4 = svundef4_u16();        \
@@ -128,7 +128,7 @@
     }
 
 #define lv_sve_rgb24_to_rgb32_stride_impl(...)                \
-    lv_sve_stride_loop_chn(uStride, vTailPred)                \
+    lv_sve_stride_loop_pixel(uStride, vTailPred)              \
     {                                                         \
                                                               \
         svuint16x3_t vSourceLow16x3 = svundef3_u16();         \
@@ -162,7 +162,7 @@
     ma_alpha_idx,                                             \
     ma_sve_chn_iterator,                                      \
     ...)                                                      \
-    lv_sve_stride_loop_chn(uStride, vTailPred)                \
+    lv_sve_stride_loop_pixel(uStride, vTailPred)              \
     {                                                         \
                                                               \
         svuint16x4_t vSourceLow16x4 = svundef4_u16();         \
@@ -209,7 +209,7 @@
     ma_sve_chn_iterator,                                      \
     ma_vSource16x4,                                           \
     ...)                                                      \
-    lv_sve_stride_loop_chn(uStride, vTailPred) {              \
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {            \
                                                               \
         svuint16x4_t vTargetLow16x4 = svundef4_u16();         \
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();        \
@@ -239,7 +239,7 @@
     ma_sve_chn_iterator,                                      \
     ma_vSource16x3,                                           \
     ...)                                                      \
-    lv_sve_stride_loop_chn(uStride, vTailPred) {              \
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {            \
                                                               \
         svuint16x3_t vTargetLow16x3 = svundef3_u16();         \
         svuint16x3_t vTargetHigh16x3= svundef3_u16();         \
@@ -438,7 +438,7 @@ void lv_sve_cccn888_stride_fill_colour_with_mask(
     size_t uStride,
     svuint16x4_t vColour16x4)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -486,7 +486,7 @@ void lv_sve_ccc888_stride_fill_colour_with_mask(
     size_t uStride,
     svuint16x3_t tPixel16x3)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -586,7 +586,7 @@ void lv_sve_cccn888_stride_fill_colour_with_mask_and_opacity(
     svuint16x4_t vColour16x4,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -637,7 +637,7 @@ void lv_sve_ccc888_stride_fill_colour_with_mask_and_opacity(
     svuint16x3_t tPixel16x3,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -744,7 +744,7 @@ void lv_sve_gray8_stride_blend_to_cccn888(
     uint32_t * LV_RESTRICT pwTarget,
     size_t uStride)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -785,7 +785,7 @@ void lv_sve_gray8_stride_blend_to_ccc888(
     uint8_t * LV_RESTRICT pchTarget,
     size_t uStride)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -863,7 +863,7 @@ void lv_sve_gray8_stride_blend_to_cccn888_with_opacity(
     size_t uStride,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -919,7 +919,7 @@ void lv_sve_gray8_stride_blend_to_ccc888_with_opacity(
     size_t uStride,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -1017,7 +1017,7 @@ void lv_sve_gray8_stride_blend_to_cccn888_with_mask(
     uint32_t * LV_RESTRICT pwTarget,
     size_t uStride)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -1077,7 +1077,7 @@ void lv_sve_gray8_stride_blend_to_ccc888_with_mask(
     uint8_t * LV_RESTRICT pchTarget,
     size_t uStride)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -1183,7 +1183,7 @@ void lv_sve_gray8_stride_blend_to_cccn888_with_mask_and_opacity(
     size_t uStride,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -1246,7 +1246,7 @@ void lv_sve_gray8_stride_blend_to_ccc888_with_mask_and_opacity(
     size_t uStride,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -1358,7 +1358,7 @@ void lv_sve_rgb565_stride_blend_to_cccn888(
     uint32_t * LV_RESTRICT pwTarget,
     size_t uStride)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -1377,15 +1377,15 @@ void lv_sve_rgb565_stride_blend_to_cccn888(
                         &vSourceHigh16x3);
 
         /* process low half */
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x4( vSourceLow16x3, 
-                                                    vTargetLow16x4, 
+        lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceLow16x3, 
+                                                vTargetLow16x4, 
             {
                 sve_target_u16 = sve_source_u16;
             });
 
         /* process high half */
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x4( vSourceHigh16x3, 
-                                                    vTargetHigh16x4, 
+        lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceHigh16x3, 
+                                                vTargetHigh16x4, 
             {
                 sve_target_u16 = sve_source_u16;
             });
@@ -1407,7 +1407,7 @@ void lv_sve_rgb565_stride_blend_to_ccc888(
     uint8_t * LV_RESTRICT pchTarget,
     size_t uStride)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -1426,15 +1426,15 @@ void lv_sve_rgb565_stride_blend_to_ccc888(
                         &vSourceHigh16x3);
 
         /* process low half */
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x3( vSourceLow16x3, 
-                                                    vTargetLow16x3, 
+        lv_sve_pixel_ccc_foreach_chn( vSourceLow16x3, 
+                                      vTargetLow16x3, 
             {
                 sve_target_u16 = sve_source_u16;
             });
 
         /* process high half */
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x3( vSourceHigh16x3, 
-                                                    vTargetHigh16x3, 
+        lv_sve_pixel_ccc_foreach_chn(   vSourceHigh16x3, 
+                                        vTargetHigh16x3, 
             {
                 sve_target_u16 = sve_source_u16;
             });
@@ -1498,7 +1498,7 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_opacity(
     size_t uStride,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -1517,8 +1517,8 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_opacity(
                         &vSourceHigh16x3);
 
         /* process low half */
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x4( vSourceLow16x3, 
-                                                    vTargetLow16x4, 
+        lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceLow16x3, 
+                                                vTargetLow16x4, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_opacity_fast(
                                     sve_source_u16,
@@ -1527,8 +1527,8 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_opacity(
             });
 
         /* process high half */
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x4( vSourceHigh16x3, 
-                                                    vTargetHigh16x4, 
+        lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceHigh16x3, 
+                                                vTargetHigh16x4, 
         {
             sve_target_u16 = lv_sve_chn_blend_with_opacity_fast(
                                                     sve_source_u16,
@@ -1554,7 +1554,7 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_opacity(
     size_t uStride,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -1573,8 +1573,8 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_opacity(
                         &vSourceHigh16x3);
 
         /* process low half */
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x3( vSourceLow16x3, 
-                                                    vTargetLow16x3, 
+        lv_sve_pixel_ccc_foreach_chn(   vSourceLow16x3, 
+                                        vTargetLow16x3, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_opacity_fast(
                                     sve_source_u16,
@@ -1583,8 +1583,8 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_opacity(
             });
 
         /* process high half */
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x3( vSourceHigh16x3, 
-                                                    vTargetHigh16x3, 
+        lv_sve_pixel_ccc_foreach_chn(   vSourceHigh16x3, 
+                                        vTargetHigh16x3, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_opacity_fast(
                                     sve_source_u16,
@@ -1655,7 +1655,7 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask(
     uint32_t * LV_RESTRICT pwTarget,
     size_t uStride)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -1678,8 +1678,8 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask(
         /* process low half */
         svuint16_t vMaskLow = svunpklo_u16(vu8Mask);
 
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x4( vSourceLow16x3, 
-                                                    vTargetLow16x4, 
+        lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceLow16x3, 
+                                                vTargetLow16x4, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_mask_fast(
                                     sve_source_u16,
@@ -1690,8 +1690,8 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask(
         /* process high half */
         svuint16_t vMaskHigh = svunpkhi_u16(vu8Mask);
 
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x4( vSourceHigh16x3, 
-                                                    vTargetHigh16x4, 
+        lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceHigh16x3, 
+                                                vTargetHigh16x4, 
         {
             sve_target_u16 = lv_sve_chn_blend_with_mask_fast(
                                                     sve_source_u16,
@@ -1718,7 +1718,7 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_mask(
     uint8_t * LV_RESTRICT pchTarget,
     size_t uStride)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -1741,8 +1741,8 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_mask(
         /* process low half */
         svuint16_t vMaskLow = svunpklo_u16(vu8Mask);
 
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x3( vSourceLow16x3, 
-                                                    vTargetLow16x3, 
+        lv_sve_pixel_ccc_foreach_chn(   vSourceLow16x3, 
+                                        vTargetLow16x3, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_mask_fast(
                                     sve_source_u16,
@@ -1753,8 +1753,8 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_mask(
         /* process high half */
         svuint16_t vMaskHigh = svunpkhi_u16(vu8Mask);
 
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x3( vSourceHigh16x3, 
-                                                    vTargetHigh16x3, 
+        lv_sve_pixel_ccc_foreach_chn(   vSourceHigh16x3, 
+                                        vTargetHigh16x3, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_mask_fast(
                                     sve_source_u16,
@@ -1830,7 +1830,7 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask_and_opacity(
     size_t uStride,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x4_t vTargetLow16x4 = svundef4_u16();
         svuint16x4_t vTargetHigh16x4 = svundef4_u16();
@@ -1853,8 +1853,8 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask_and_opacity(
         /* process low half */
         svuint16_t vMaskLow = svunpklo_u16(vu8Mask);
 
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x4( vSourceLow16x3, 
-                                                    vTargetLow16x4, 
+        lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceLow16x3, 
+                                                vTargetLow16x4, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
                                     sve_source_u16,
@@ -1866,8 +1866,8 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask_and_opacity(
         /* process high half */
         svuint16_t vMaskHigh = svunpkhi_u16(vu8Mask);
 
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x4( vSourceHigh16x3, 
-                                                    vTargetHigh16x4, 
+        lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceHigh16x3, 
+                                                vTargetHigh16x4, 
         {
             sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
                                                     sve_source_u16,
@@ -1896,7 +1896,7 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_mask_and_opacity(
     size_t uStride,
     uint16_t hwOpacity)
 {
-    lv_sve_stride_loop_chn(uStride, vTailPred) {
+    lv_sve_stride_loop_pixel(uStride, vTailPred) {
 
         svuint16x3_t vTargetLow16x3 = svundef3_u16();
         svuint16x3_t vTargetHigh16x3 = svundef3_u16();
@@ -1919,8 +1919,8 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_mask_and_opacity(
         /* process low half */
         svuint16_t vMaskLow = svunpklo_u16(vu8Mask);
 
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x3( vSourceLow16x3, 
-                                                    vTargetLow16x3, 
+        lv_sve_pixel_ccc_foreach_chn(   vSourceLow16x3, 
+                                        vTargetLow16x3, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
                                     sve_source_u16,
@@ -1932,8 +1932,8 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_mask_and_opacity(
         /* process high half */
         svuint16_t vMaskHigh = svunpkhi_u16(vu8Mask);
 
-        lv_sve_pixel_rgb565_foreach_chn_argb_u16x3( vSourceHigh16x3, 
-                                                    vTargetHigh16x3, 
+        lv_sve_pixel_ccc_foreach_chn(   vSourceHigh16x3, 
+                                        vTargetHigh16x3, 
             {
                 sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
                                     sve_source_u16,
