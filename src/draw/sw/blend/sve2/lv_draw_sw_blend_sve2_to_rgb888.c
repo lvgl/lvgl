@@ -601,7 +601,7 @@ void lv_sve_cccn888_stride_fill_colour_with_mask_and_opacity(
         /* process low half */
         svuint16_t vMaskLow = svunpklo_u16(vu8Mask);
         lv_sve_pixel_ccca_foreach_chn012(vColour16x4, vTargetLow16x4, {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                 sve_source_u16,
                 sve_target_u16,
                 vMaskLow,
@@ -611,7 +611,7 @@ void lv_sve_cccn888_stride_fill_colour_with_mask_and_opacity(
         /* process high half */
         svuint16_t vMaskHigh = svunpkhi_u16(vu8Mask);
         lv_sve_pixel_ccca_foreach_chn012(vColour16x4, vTargetHigh16x4, {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                 sve_source_u16,
                 sve_target_u16,
                 vMaskHigh,
@@ -652,7 +652,7 @@ void lv_sve_ccc888_stride_fill_colour_with_mask_and_opacity(
         /* process low half */
         svuint16_t vMaskLow = svunpklo_u16(vu8Mask);
         lv_sve_pixel_ccc_foreach_chn(tPixel16x3, vTargetLow16x3, {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                 sve_source_u16,
                 sve_target_u16,
                 vMaskLow,
@@ -662,7 +662,7 @@ void lv_sve_ccc888_stride_fill_colour_with_mask_and_opacity(
         /* process high half */
         svuint16_t vMaskHigh = svunpkhi_u16(vu8Mask);
         lv_sve_pixel_ccc_foreach_chn(tPixel16x3, vTargetHigh16x3, {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                 sve_source_u16,
                 sve_target_u16,
                 vMaskHigh,
@@ -1204,7 +1204,7 @@ void lv_sve_gray8_stride_blend_to_cccn888_with_mask_and_opacity(
                                                 vSourceLow,
                                                 vSourceLow);
         lv_sve_pixel_ccca_foreach_chn012(vSourceLow16x4, vTargetLow16x4, {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                 sve_source_u16,
                                 sve_target_u16,
                                 vMaskLow,
@@ -1219,7 +1219,7 @@ void lv_sve_gray8_stride_blend_to_cccn888_with_mask_and_opacity(
                                                     vSourceHigh,
                                                     vSourceHigh);
         lv_sve_pixel_ccca_foreach_chn012(vSourceHigh16x4, vTargetHigh16x4, {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                                     sve_source_u16,
                                                     sve_target_u16,
                                                     vMaskHigh,
@@ -1267,7 +1267,7 @@ void lv_sve_gray8_stride_blend_to_ccc888_with_mask_and_opacity(
                                                 vSourceLow);
 
         lv_sve_pixel_ccc_foreach_chn(vSourceLow16x3, vTargetLow16x3, {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                 sve_source_u16,
                                 sve_target_u16,
                                 vMaskLow,
@@ -1282,7 +1282,7 @@ void lv_sve_gray8_stride_blend_to_ccc888_with_mask_and_opacity(
                                                     vSourceHigh);
 
         lv_sve_pixel_ccc_foreach_chn(vSourceHigh16x3, vTargetHigh16x3, {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                 sve_source_u16,
                                 sve_target_u16,
                                 vMaskHigh,
@@ -1856,7 +1856,7 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask_and_opacity(
         lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceLow16x3, 
                                                 vTargetLow16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskLow,
@@ -1869,7 +1869,7 @@ void lv_sve_rgb565_stride_blend_to_cccn888_with_mask_and_opacity(
         lv_sve_pixel_u16x3_foreach_chn_to_cccn( vSourceHigh16x3, 
                                                 vTargetHigh16x4, 
         {
-            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+            sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                                     sve_source_u16,
                                                     sve_target_u16,
                                                     vMaskHigh,
@@ -1922,7 +1922,7 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_mask_and_opacity(
         lv_sve_pixel_ccc_foreach_chn(   vSourceLow16x3, 
                                         vTargetLow16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskLow,
@@ -1935,7 +1935,7 @@ void lv_sve_rgb565_stride_blend_to_ccc888_with_mask_and_opacity(
         lv_sve_pixel_ccc_foreach_chn(   vSourceHigh16x3, 
                                         vTargetHigh16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskHigh,
@@ -2565,7 +2565,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_mask(lv_draw_sw_blend_im
     const int32_t dest_stride = dsc->dest_stride;
     const uint8_t * src_buf_8 = dsc->src_buf;
     const int32_t src_stride = dsc->src_stride;
-    const int32_t mask_stride = dsc->src_stride;
+    const int32_t mask_stride = dsc->mask_stride;
     const uint8_t * mask_buf_8 = dsc->mask_buf;
 
     if (dest_px_size == src_px_size) {
@@ -2655,7 +2655,7 @@ void lv_sve_ccc888_stride_blend_with_mask_and_opacity(
         lv_sve_pixel_ccc_foreach_chn(   vSourceLow16x3, 
                                         vTargetLow16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskLow,
@@ -2668,7 +2668,7 @@ void lv_sve_ccc888_stride_blend_with_mask_and_opacity(
         lv_sve_pixel_ccc_foreach_chn(   vSourceHigh16x3, 
                                         vTargetHigh16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskHigh,
@@ -2697,7 +2697,7 @@ void lv_sve_cccn888_stride_blend_with_mask_and_opacity(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceLow16x4, 
                                             vTargetLow16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskLow,
@@ -2710,7 +2710,7 @@ void lv_sve_cccn888_stride_blend_with_mask_and_opacity(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceHigh16x4, 
                                             vTargetHigh16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskHigh,
@@ -2740,7 +2740,7 @@ void lv_sve_cccn888_stride_blend_to_ccc888_with_mask_and_opacity(
                                             vSourceLow16x4, 
                                             vTargetLow16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskLow,
@@ -2754,7 +2754,7 @@ void lv_sve_cccn888_stride_blend_to_ccc888_with_mask_and_opacity(
                                             vSourceHigh16x4, 
                                             vTargetHigh16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskHigh,
@@ -2784,7 +2784,7 @@ void lv_sve_ccc888_stride_blend_to_cccn888_with_mask_and_opacity(
                                             vSourceLow16x3, 
                                             vTargetLow16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskLow,
@@ -2798,7 +2798,7 @@ void lv_sve_ccc888_stride_blend_to_cccn888_with_mask_and_opacity(
                                             vSourceHigh16x3, 
                                             vTargetHigh16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vMaskHigh,
@@ -2822,7 +2822,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_opa_mask(lv_draw_sw_blen
     const int32_t dest_stride = dsc->dest_stride;
     const uint8_t * src_buf_8 = dsc->src_buf;
     const int32_t src_stride = dsc->src_stride;
-    const int32_t mask_stride = dsc->src_stride;
+    const int32_t mask_stride = dsc->mask_stride;
     const uint8_t * mask_buf_8 = dsc->mask_buf;
     uint8_t opa    = dsc->opa;
     opa += opa == 255;
@@ -3022,7 +3022,7 @@ void lv_sve_ccca888_stride_blend_to_ccc888_with_opacity(
                                             vSourceLow16x4, 
                                             vTargetLow16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskLow,
@@ -3035,7 +3035,7 @@ void lv_sve_ccca888_stride_blend_to_ccc888_with_opacity(
                                             vSourceHigh16x4, 
                                             vTargetHigh16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskHigh,
@@ -3059,7 +3059,7 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_opacity(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceLow16x4, 
                                             vTargetLow16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskLow,
@@ -3071,7 +3071,7 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_opacity(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceHigh16x4, 
                                             vTargetHigh16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskHigh,
@@ -3144,7 +3144,7 @@ void lv_sve_ccca888_stride_blend_to_ccc888_with_mask(
                                             vSourceLow16x4, 
                                             vTargetLow16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_masks_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_masks(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskLow,
@@ -3158,7 +3158,7 @@ void lv_sve_ccca888_stride_blend_to_ccc888_with_mask(
                                             vSourceHigh16x4, 
                                             vTargetHigh16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_masks_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_masks(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskHigh,
@@ -3186,7 +3186,7 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_mask(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceLow16x4, 
                                             vTargetLow16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_masks_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_masks(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskLow,
@@ -3199,7 +3199,7 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_mask(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceHigh16x4, 
                                             vTargetHigh16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_masks_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_masks(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskHigh,
@@ -3221,7 +3221,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888_with_mask(lv_draw_sw_blend_i
     const int32_t dest_stride = dsc->dest_stride;
     const uint8_t * src_buf_8 = dsc->src_buf;
     const int32_t src_stride = dsc->src_stride;
-    const int32_t mask_stride = dsc->src_stride;
+    const int32_t mask_stride = dsc->mask_stride;
     const uint8_t * mask_buf_8 = dsc->mask_buf;
 
     if (3 == dest_px_size) {
@@ -3275,7 +3275,7 @@ void lv_sve_ccca888_stride_blend_to_ccc888_with_mask_and_opacity(
                                             vSourceLow16x4, 
                                             vTargetLow16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskLow,
@@ -3290,7 +3290,7 @@ void lv_sve_ccca888_stride_blend_to_ccc888_with_mask_and_opacity(
                                             vSourceHigh16x4, 
                                             vTargetHigh16x3, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskHigh,
@@ -3320,7 +3320,7 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_mask_and_opacity(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceLow16x4, 
                                             vTargetLow16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskLow,
@@ -3334,7 +3334,7 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_mask_and_opacity(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceHigh16x4, 
                                             vTargetHigh16x4, 
             {
-                sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity_fast(
+                sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity(
                                     sve_source_u16,
                                     sve_target_u16,
                                     vSoureMaskHigh,
@@ -3357,7 +3357,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888_with_opa_mask(lv_draw_sw_ble
     const int32_t dest_stride = dsc->dest_stride;
     const uint8_t * src_buf_8 = dsc->src_buf;
     const int32_t src_stride = dsc->src_stride;
-    const int32_t mask_stride = dsc->src_stride;
+    const int32_t mask_stride = dsc->mask_stride;
     const uint8_t * mask_buf_8 = dsc->mask_buf;
     uint8_t opa    = dsc->opa;
     opa += opa == 255;
