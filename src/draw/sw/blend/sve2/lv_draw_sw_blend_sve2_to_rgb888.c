@@ -2909,11 +2909,6 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888(lv_draw_sw_blend_image_dsc_t
     int32_t dest_stride        = dsc->dest_stride;
     int32_t src_stride         = dsc->src_stride;
 
-    /* Fallback to sw implementation*/
-    if(dest_px_size == 3) {
-        return LV_RESULT_INVALID;
-    }
-
 
     return LV_RESULT_INVALID;
 }
@@ -2929,11 +2924,6 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888_with_opa(lv_draw_sw_blend_im
     const int32_t dest_stride = dsc->dest_stride;
     const int32_t src_stride = dsc->src_stride;
     const uint8_t opa = dsc->opa;
-
-    /* Fallback to sw implementation*/
-    if(dest_px_size == 3) {
-        return LV_RESULT_INVALID;
-    }
 
 
     return LV_RESULT_INVALID;
@@ -2951,11 +2941,6 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888_with_mask(lv_draw_sw_blend_i
     const uint8_t * mask_buf_8 = dsc->mask_buf;
     const int32_t mask_stride = dsc->mask_stride;
 
-    /* Fallback to sw implementation*/
-    if(dest_px_size == 3) {
-        return LV_RESULT_INVALID;
-    }
-
 
     return LV_RESULT_INVALID;
 }
@@ -2972,11 +2957,6 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888_with_opa_mask(lv_draw_sw_ble
     const uint8_t * mask_buf_8 = dsc->mask_buf;
     const int32_t mask_stride = dsc->mask_stride;
 
-    /* Fallback to sw implementation*/
-    if(dest_px_size == 3) {
-        return LV_RESULT_INVALID;
-    }
-
 
     return LV_RESULT_INVALID;
 }
@@ -2992,10 +2972,54 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888(lv_draw_sw_ble
     int32_t dest_stride        = dsc->dest_stride;
     int32_t src_stride         = dsc->src_stride;
 
-    /* Fallback to sw implementation*/
-    if(dest_px_size == 3) {
-        return LV_RESULT_INVALID;
-    }
+
+    return LV_RESULT_INVALID;
+}
+
+lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888_with_opa(lv_draw_sw_blend_image_dsc_t * dsc,
+                                                                           uint32_t dest_px_size)
+{
+    LV_ASSERT(dsc->opa < LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf == NULL);
+    LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
+    int32_t w                  = dsc->dest_w;
+    int32_t h                  = dsc->dest_h;
+    int32_t dest_stride        = dsc->dest_stride;
+    int32_t src_stride         = dsc->src_stride;
+    uint16_t opa = dsc->opa;
+    opa += opa == 255;
+
+    return LV_RESULT_INVALID;
+}
+
+lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888_with_mask(lv_draw_sw_blend_image_dsc_t * dsc,
+                                                                            uint32_t dest_px_size)
+{
+    LV_ASSERT(dsc->opa < LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf == NULL);
+    LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
+    int32_t w                  = dsc->dest_w;
+    int32_t h                  = dsc->dest_h;
+    int32_t dest_stride        = dsc->dest_stride;
+    int32_t src_stride         = dsc->src_stride;
+    uint16_t opa = dsc->opa;
+    opa += opa == 255;
+
+    return LV_RESULT_INVALID;
+}
+
+lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc,
+                                                                                uint32_t dest_px_size)
+{
+    LV_ASSERT(dsc->opa < LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf == NULL);
+    LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
+    int32_t w                  = dsc->dest_w;
+    int32_t h                  = dsc->dest_h;
+    int32_t dest_stride        = dsc->dest_stride;
+    int32_t src_stride         = dsc->src_stride;
+    uint16_t opa = dsc->opa;
+    opa += opa == 255;
 
     return LV_RESULT_INVALID;
 }
