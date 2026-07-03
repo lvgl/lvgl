@@ -3059,7 +3059,6 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_opacity(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceLow16x4, 
                                             vTargetLow16x4, 
             {
-                
                 sve_target_u16 = lv_sve_chn_blend_with_mask_and_opacity_fast(
                                     sve_source_u16,
                                     sve_target_u16,
@@ -3187,7 +3186,6 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_mask(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceLow16x4, 
                                             vTargetLow16x4, 
             {
-                
                 sve_target_u16 = lv_sve_chn_blend_with_masks_fast(
                                     sve_source_u16,
                                     sve_target_u16,
@@ -3322,7 +3320,6 @@ void lv_sve_ccca888_stride_blend_to_cccn888_with_mask_and_opacity(
         lv_sve_pixel_ccca_foreach_chn012(   vSourceLow16x4, 
                                             vTargetLow16x4, 
             {
-                
                 sve_target_u16 = lv_sve_chn_blend_with_masks_and_opacity_fast(
                                     sve_source_u16,
                                     sve_target_u16,
