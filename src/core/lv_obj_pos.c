@@ -48,7 +48,6 @@ static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p
 static bool is_transformed(const lv_obj_t * obj);
 static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_tmp);
 static lv_result_t obj_invalidate_area_internal(const lv_obj_t * obj, const lv_area_t * area);
-static bool has_blur(const lv_obj_t * obj);
 static int32_t calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t * content_width);
 static int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t * content_height);
 static bool size_in_effect_is_pct(int32_t unclamped, int32_t min, int32_t max, int32_t size_style,
@@ -1035,11 +1034,16 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_
  * invalidated area. The walk repeats until a pass adds no new areas, which
  * catches transitive cases (a blur object overlapping another blur object
  * that overlaps an invalidated area).
+ *
+ * Each widget's blur status is cached in obj->has_blur and counted globally in
+ * blur_obj_cnt (see lv_obj_update_blur_status()), so the walk is skipped
+ * entirely while no widget has blur and costs one bit test per widget when it
+ * does run.
  */
 
 static lv_obj_tree_walk_res_t blur_expand_walk_cb(lv_obj_t * obj, void * user_data)
 {
-    if(!has_blur(obj)) return LV_OBJ_TREE_WALK_NEXT;
+    if(!obj->has_blur) return LV_OBJ_TREE_WALK_NEXT;
 
     /*invalidate_area_core() expects untransformed coordinates and applies the
      *transform itself*/
@@ -1077,6 +1081,9 @@ void lv_obj_invalidate_expand_blur(lv_display_t * disp)
 {
     if(disp->inv_p == 0) return;
 
+    /*There is nothing to expand if no widget has blur or drop shadow*/
+    if(LV_GLOBAL_DEFAULT()->blur_obj_cnt == 0) return;
+
     uint32_t prev_inv_p;
     do {
         prev_inv_p = disp->inv_p;
@@ -1104,7 +1111,7 @@ lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
     /*If there are blurred or drop-shadow parts the whole widget needs to be invalidated
      *as these can't be calculated partially. */
-    if(has_blur(obj)) return lv_obj_invalidate(obj);
+    if(obj->has_blur) return lv_obj_invalidate(obj);
     else return obj_invalidate_area_internal(obj, area);
 }
 
@@ -1651,34 +1658,6 @@ static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_t
 
     lv_result_t res = lv_inv_area(lv_obj_get_display(obj), area_tmp);
     return res;
-}
-
-static bool has_blur(const lv_obj_t * obj)
-{
-    const uint32_t group_blur = (uint32_t)1 << lv_style_get_prop_group(LV_STYLE_BLUR_RADIUS);
-    const uint32_t group_dropshadow = (uint32_t)1 << lv_style_get_prop_group(LV_STYLE_DROP_SHADOW_OPA);
-    const lv_state_t state = lv_obj_style_get_selector_state(lv_obj_get_state(obj));
-    const lv_state_t state_inv = ~state;
-    lv_style_value_t v;
-    uint32_t i;
-    for(i = 0; i < obj->style_cnt; i++) {
-        lv_obj_style_t * obj_style = &obj->styles[i];
-        if(obj_style->is_disabled) continue;
-
-        lv_state_t state_style = lv_obj_style_get_selector_state(obj->styles[i].selector);
-        if((state_style & state_inv)) continue;
-
-        if((obj_style->style->has_group & group_blur) &&
-           lv_style_get_prop_internal(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
-            if(v.num > 0) return true;
-        }
-        if((obj_style->style->has_group & group_dropshadow) &&
-           lv_style_get_prop_internal(obj_style->style, LV_STYLE_DROP_SHADOW_OPA, &v)) {
-            if(v.num > 0) return true;
-        }
-    }
-
-    return false;
 }
 
 /**

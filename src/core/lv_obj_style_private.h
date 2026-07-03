@@ -104,6 +104,14 @@ lv_style_value_t lv_obj_get_style_prop_internal(const lv_obj_t * obj, lv_part_t 
  */
 lv_style_value_t lv_obj_style_apply_color_filter_internal(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v);
 
+/**
+ * Update the cached blur status of a widget based on its current styles and
+ * state, and maintain the global count of widgets with blur (blur_obj_cnt in
+ * lv_global_t). The result will be stored in `obj->has_blur`.
+ * @param obj       the object whose blur status should be updated
+ */
+void lv_obj_update_blur_status(lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/

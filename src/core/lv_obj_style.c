@@ -68,6 +68,7 @@ static void trans_anim_cb(void * _tr, int32_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_completed_cb(lv_anim_t * a);
 static lv_layer_type_t calculate_layer_type(lv_obj_t * obj);
+static bool calculate_has_blur(lv_obj_t * obj);
 static void full_cache_refresh(lv_obj_t * obj, lv_part_t part);
 static void fade_anim_cb(void * obj, int32_t v);
 static void fade_in_anim_completed(lv_anim_t * a);
@@ -281,6 +282,11 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     /*Cache the layer type*/
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && is_layer_refr) {
         lv_obj_update_layer_type(obj);
+    }
+
+    /*Cache whether the widget has blur or drop shadow*/
+    if(prop == LV_STYLE_PROP_ANY || prop == LV_STYLE_BLUR_RADIUS || prop == LV_STYLE_DROP_SHADOW_OPA) {
+        lv_obj_update_blur_status(obj);
     }
 
     if(prop == LV_STYLE_PROP_ANY || is_ext_draw) {
@@ -709,6 +715,26 @@ void lv_obj_update_layer_type(lv_obj_t * obj)
             return;
         }
         obj->spec_attr->layer_type = layer_type;
+    }
+}
+
+void lv_obj_update_blur_status(lv_obj_t * obj)
+{
+    LV_CHECK_ARG(obj != NULL, return);
+
+    /*Deletion releases the count itself (see obj_delete_core())*/
+    if(obj->is_deleting) return;
+
+    bool has_blur = calculate_has_blur(obj);
+    if(has_blur == (bool)obj->has_blur) return;
+
+    obj->has_blur = has_blur;
+    if(has_blur) {
+        LV_GLOBAL_DEFAULT()->blur_obj_cnt++;
+    }
+    else {
+        LV_ASSERT(LV_GLOBAL_DEFAULT()->blur_obj_cnt > 0);
+        LV_GLOBAL_DEFAULT()->blur_obj_cnt--;
     }
 }
 
@@ -1305,6 +1331,37 @@ static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
     if(lv_obj_get_style_bitmap_mask_src_internal(obj, LV_PART_MAIN) != NULL) return LV_LAYER_TYPE_SIMPLE;
     if(lv_obj_get_style_blend_mode_internal(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
     return LV_LAYER_TYPE_NONE;
+}
+
+/*True if any style attached to the widget enables blur or a drop shadow in the
+ *widget's current state. The per-style has_group bitmask makes the common
+ *no-blur case a cheap scan.*/
+static bool calculate_has_blur(lv_obj_t * obj)
+{
+    const uint32_t group_blur = (uint32_t)1 << lv_style_get_prop_group(LV_STYLE_BLUR_RADIUS);
+    const uint32_t group_dropshadow = (uint32_t)1 << lv_style_get_prop_group(LV_STYLE_DROP_SHADOW_OPA);
+    const lv_state_t state = lv_obj_style_get_selector_state(lv_obj_get_state(obj));
+    const lv_state_t state_inv = ~state;
+    lv_style_value_t v;
+    uint32_t i;
+    for(i = 0; i < obj->style_cnt; i++) {
+        lv_obj_style_t * obj_style = &obj->styles[i];
+        if(obj_style->is_disabled) continue;
+
+        lv_state_t state_style = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        if((state_style & state_inv)) continue;
+
+        if((obj_style->style->has_group & group_blur) &&
+           lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
+            if(v.num > 0) return true;
+        }
+        if((obj_style->style->has_group & group_dropshadow) &&
+           lv_style_get_prop(obj_style->style, LV_STYLE_DROP_SHADOW_OPA, &v)) {
+            if(v.num > 0) return true;
+        }
+    }
+
+    return false;
 }
 
 static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)

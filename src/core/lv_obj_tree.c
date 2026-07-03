@@ -676,6 +676,14 @@ static void obj_delete_core(lv_obj_t * obj)
         return;
     }
 
+    /*Release the blur bookkeeping now: the style teardown below doesn't go
+     *through lv_obj_update_blur_status()*/
+    if(obj->has_blur) {
+        obj->has_blur = 0;
+        LV_ASSERT(LV_GLOBAL_DEFAULT()->blur_obj_cnt > 0);
+        LV_GLOBAL_DEFAULT()->blur_obj_cnt--;
+    }
+
     /*Clean registered event_cb*/
     if(obj->spec_attr) lv_event_remove_all(&(obj->spec_attr->event_list));
 
