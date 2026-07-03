@@ -22,23 +22,7 @@
 #define svlens32() svlenu32()
 #define svlens64() svlenu64()
 
-#define lv_sve_stride_loop_accc8888(ma_stride_size, ma_pred_name)        \
-    for (svbool_t ma_pred_name, *pTemp = &ma_pred_name;                  \
-         pTemp != NULL;                                                  \
-         pTemp = NULL)                                                   \
-        for (size_t SVE_SAFE_NAME(n) = 0,                                \
-                    sve_iteration_advance = svlenu32() * 4;              \
-             ({                                                          \
-                 ma_pred_name = svwhilelt_b8((int32_t)SVE_SAFE_NAME(n),  \
-                                             (int32_t)(ma_stride_size)); \
-                 SVE_SAFE_NAME(n) < (ma_stride_size);                    \
-             });                                                         \
-             SVE_SAFE_NAME(n) += sve_iteration_advance)
-
-#define lv_sve_stride_loop_rgb32(ma_stride_size, ma_pred_name)           \
-    lv_sve_stride_loop_accc8888(ma_stride_size, ma_pred_name)
-
-#define lv_sve_stride_loop_ccc888(ma_stride_size, ma_pred_name)          \
+#define lv_sve_stride_loop_chn(ma_stride_size, ma_pred_name)             \
     for (svbool_t ma_pred_name, *pTemp = &ma_pred_name;                  \
          pTemp != NULL;                                                  \
          pTemp = NULL)                                                   \
@@ -50,9 +34,6 @@
                  SVE_SAFE_NAME(n) < (ma_stride_size);                    \
              });                                                         \
              SVE_SAFE_NAME(n) += sve_iteration_advance)
-
-#define lv_sve_stride_loop_rgb24(ma_stride_size, ma_pred_name)            \
-    lv_sve_stride_loop_ccc888(ma_stride_size, ma_pred_name)
 
 #define lv_sve_stride_loop_rgb16(ma_stride_size, ma_pred_name)            \
     for (svbool_t ma_pred_name, *pTemp = &ma_pred_name;                   \
