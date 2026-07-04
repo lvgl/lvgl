@@ -892,7 +892,7 @@ static inline svuint16_t lv_sve_chn_premultiplied_blend_with_mask(svuint16_t vSo
     svuint16_t vTemp0 = svmul_u16_x(svptrue_b16(), vTarget, svsub_u16_m(svptrue_b16(),
                                                                         svdup_u16(255),
                                                                         vSourceMask));
-                        
+
     vTemp0 = svlsr_n_u16_x(svptrue_b16(), vTemp0, 8);
 
     return svadd_u16_x(svptrue_b16(), vSource, vTemp0);
