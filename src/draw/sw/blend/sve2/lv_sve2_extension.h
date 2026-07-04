@@ -885,26 +885,17 @@ static inline svuint16_t lv_sve_chn_blend_with_mask( svuint16_t vSource,
 
 /*! \note the Element range of vMask is [0, 0xFF]
  */
-static inline svuint16_t lv_sve_chn_premultiplied_blend_with_mask(
-                                                          svuint16_t vSource,
-                                                          svuint16_t vTarget,
-                                                          svuint16_t vReciprocal,
-                                                          svuint16_t vMask)
+static inline svuint16_t lv_sve_chn_premultiplied_blend_with_mask(svuint16_t vSource,
+                                                    svuint16_t vTarget,
+                                                    svuint16_t vSourceMask)
 {
-    vSource = svlsr_n_u16_x(svptrue_b16(),
-                            svmul_u16_x(svptrue_b16(), vSource, vReciprocal),
-                            8);
+    svuint16_t vTemp0 = svmul_u16_x(svptrue_b16(), vTarget, svsub_u16_m(svptrue_b16(),
+                                                                        svdup_u16(255),
+                                                                        vSourceMask));
+                        
+    vTemp0 = svlsr_n_u16_x(svptrue_b16(), vTemp0, 8);
 
-    // vTarget = vSource * vMask + vTarget * (255 - vMask);
-    svuint16_t vTemp0 = svmul_u16_m(svptrue_b16(), vSource, vMask);
-    vTemp0 = svmla_u16_m(svptrue_b16(),
-                         vTemp0,
-                         vTarget,
-                         svsub_u16_m(svptrue_b16(),
-                                     svdup_u16(255),
-                                     vMask));
-
-    return svlsr_n_u16_m(svptrue_b16(), vTemp0, 8); // vTarget >> 8;
+    return svadd_u16_x(svptrue_b16(), vSource, vTemp0);
 }
 
 /*! \note the Element range of vMask is [0, 0xFF]

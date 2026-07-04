@@ -3405,19 +3405,6 @@ void lv_sve_ccca8888_premultiplied_stride_blend_to_ccc888(
 
         /* process low half */
         svuint16_t vSoureMaskLow = svget4(vSourceLow16x4, 3);
-
-        svuint16_t vReciprocalLow;
-        do {
-            svuint32_t vu32Low = svunpklo_u32(vSoureMaskLow);
-            svuint32_t vu32High = svunpkhi_u32(vSoureMaskLow);
-
-            vu32Low = svdiv_u32_x(svptrue_b32(), svdup_u32(0xFF00), vu32Low); 
-            vu32High = svdiv_u32_x(svptrue_b32(), svdup_u32(0xFF00), vu32High); 
-
-            vReciprocalLow = svuzp1_u16(svreinterpret_u16_u32(vu32Low), 
-                                        svreinterpret_u16_u32(vu32High));
-        } while(0);
-
         lv_sve_pixel_u16x4_foreach_chn012_to_ccc(   
                                             vSourceLow16x4, 
                                             vTargetLow16x3, 
@@ -3425,25 +3412,11 @@ void lv_sve_ccca8888_premultiplied_stride_blend_to_ccc888(
                 sve_target_u16 = lv_sve_chn_premultiplied_blend_with_mask(
                                     sve_source_u16,
                                     sve_target_u16,
-                                    vReciprocalLow,
                                     vSoureMaskLow);
             });
 
         /* process high half */
         svuint16_t vSoureMaskHigh = svget4(vSourceHigh16x4, 3);
-
-        svuint16_t vReciprocalHigh;
-        do {
-            svuint32_t vu32Low = svunpklo_u32(vSoureMaskHigh);
-            svuint32_t vu32High = svunpkhi_u32(vSoureMaskHigh);
-
-            vu32Low = svdiv_u32_x(svptrue_b32(), svdup_u32(0xFF00), vu32Low); 
-            vu32High = svdiv_u32_x(svptrue_b32(), svdup_u32(0xFF00), vu32High); 
-
-            vReciprocalHigh = svuzp1_u16(svreinterpret_u16_u32(vu32Low), 
-                                        svreinterpret_u16_u32(vu32High));
-        } while(0);
-
         lv_sve_pixel_u16x4_foreach_chn012_to_ccc(   
                                             vSourceHigh16x4, 
                                             vTargetHigh16x3, 
@@ -3451,7 +3424,6 @@ void lv_sve_ccca8888_premultiplied_stride_blend_to_ccc888(
                 sve_target_u16 = lv_sve_chn_premultiplied_blend_with_mask(
                                     sve_source_u16,
                                     sve_target_u16,
-                                    vReciprocalHigh,
                                     vSoureMaskHigh);
             });
     );
@@ -3468,51 +3440,23 @@ void lv_sve_ccca8888_premultiplied_stride_blend_to_cccn888(
 
         /* process low half */
         svuint16_t vSoureMaskLow = svget4(vSourceLow16x4, 3);
-
-        svuint16_t vReciprocalLow;
-        do {
-            svuint32_t vu32Low = svunpklo_u32(vSoureMaskLow);
-            svuint32_t vu32High = svunpkhi_u32(vSoureMaskLow);
-
-            vu32Low = svdiv_u32_x(svptrue_b32(), svdup_u32(0xFF00), vu32Low); 
-            vu32High = svdiv_u32_x(svptrue_b32(), svdup_u32(0xFF00), vu32High); 
-
-            vReciprocalLow = svuzp1_u16(svreinterpret_u16_u32(vu32Low), 
-                                        svreinterpret_u16_u32(vu32High));
-        } while(0);
-
         lv_sve_pixel_ccca_foreach_chn012(   vSourceLow16x4, 
                                             vTargetLow16x4, 
             {
                 sve_target_u16 = lv_sve_chn_premultiplied_blend_with_mask(
                                     sve_source_u16,
                                     sve_target_u16,
-                                    vReciprocalLow,
                                     vSoureMaskLow);
             });
 
         /* process high half */
         svuint16_t vSoureMaskHigh = svget4(vSourceHigh16x4, 3);
-
-        svuint16_t vReciprocalHigh;
-        do {
-            svuint32_t vu32Low = svunpklo_u32(vSoureMaskHigh);
-            svuint32_t vu32High = svunpkhi_u32(vSoureMaskHigh);
-
-            vu32Low = svdiv_u32_x(svptrue_b32(), svdup_u32(0xFF00), vu32Low); 
-            vu32High = svdiv_u32_x(svptrue_b32(), svdup_u32(0xFF00), vu32High); 
-
-            vReciprocalHigh = svuzp1_u16(svreinterpret_u16_u32(vu32Low), 
-                                        svreinterpret_u16_u32(vu32High));
-        } while(0);
-
         lv_sve_pixel_ccca_foreach_chn012(   vSourceHigh16x4, 
                                             vTargetHigh16x4, 
             {
                 sve_target_u16 = lv_sve_chn_premultiplied_blend_with_mask(
                                     sve_source_u16,
                                     sve_target_u16,
-                                    vReciprocalHigh,
                                     vSoureMaskHigh);
             });
     );
