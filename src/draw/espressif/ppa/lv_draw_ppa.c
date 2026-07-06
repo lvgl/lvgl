@@ -199,7 +199,23 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
     lv_draw_buf_t * buf        = layer->draw_buf;
     lv_area_t area;
 
-    if(!lv_area_intersect(&area, &t->area, &t->clip_area)) return;
+    /* Transformed images (rotate / scale) write the transformed on-screen
+     * bounding box t->_real_area, which differs from the un-transformed t->area.
+     * Clip and invalidate THAT region so the guard does not skip a visible
+     * transformed image and the cache maintenance matches the pixels the PPA
+     * actually wrote. The individual paths still clamp to the buffer. */
+    const lv_area_t * task_area = &t->area;
+#if LV_USE_PPA_IMG
+    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+        const lv_draw_image_dsc_t * img_dsc = (const lv_draw_image_dsc_t *)t->draw_dsc;
+        if(img_dsc->rotation != 0 ||
+           img_dsc->scale_x != LV_SCALE_NONE || img_dsc->scale_y != LV_SCALE_NONE) {
+            task_area = &t->_real_area;
+        }
+    }
+#endif
+
+    if(!lv_area_intersect(&area, task_area, &t->clip_area)) return;
     lv_draw_buf_invalidate_cache(buf, &area);
 
     switch(t->type) {
@@ -210,11 +226,10 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
 #if LV_USE_PPA_IMG
-                /* Pass t->_real_area (the transformed on-screen bounding box),
-                 * NOT t->area (the un-transformed 1:1 image rect). The rotate
-                 * geometry needs the rotated box (its size is swapped for
+                /* Rotate/scale take the transformed box (t->_real_area): the
+                 * rotate geometry needs the rotated box (dims swapped for
                  * 90/270) and the scale geometry needs the scaled box as its
-                 * origin; using t->area collapses non-square rotations and
+                 * origin. Using t->area collapses non-square rotations and
                  * mis-places / drops down-scaled images. */
                 if(img_dsc->rotation != 0) {
                     lv_draw_ppa_img_rotate(t, img_dsc, &t->_real_area);
