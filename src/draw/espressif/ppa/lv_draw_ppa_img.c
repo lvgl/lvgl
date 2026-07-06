@@ -260,8 +260,6 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                             const lv_area_t * coords)
 {
-    LV_UNUSED(coords);
-
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
@@ -327,10 +325,18 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     uint32_t src_w = decoded->header.w;
     uint32_t src_h = decoded->header.h;
 
-    /* Compute destination area relative to layer buffer origin */
-    lv_area_t dest_area;
-    lv_area_copy(&dest_area, &t->area);
-    lv_area_move(&dest_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    /* Map the visible render tile back onto a PPA source block, clipping to the
+     * layer buffer. Pure geometry, shared with the host unit test
+     * (lv_draw_ppa_rot.h); also guarantees the destination stays inside the
+     * buffer so the PPA cannot write out of bounds. */
+    lv_draw_ppa_rot_block_t blk = lv_draw_ppa_rot_calc_block(
+                                      coords, &layer->buf_area,
+                                      (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
+                                      (int32_t)src_w, (int32_t)src_h, angle);
+    if(!blk.draw) {
+        lv_image_decoder_close(&decoder_dsc);
+        return;
+    }
 
     /* Flush decoded source buffer for PPA DMA access. Align size to cache
      * line; _UNALIGNED flag is only a safety net for the address. */
@@ -344,14 +350,14 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     ppa_srm_oper_config_t cfg;
     lv_memzero(&cfg, sizeof(cfg));
 
-    /* Input: full source image block */
+    /* Input: the source sub-block that maps onto the visible (clipped) tile. */
     cfg.in.buffer         = (void *)decoded->data;
     cfg.in.pic_w          = src_w;
     cfg.in.pic_h          = src_h;
-    cfg.in.block_w        = src_w;
-    cfg.in.block_h        = src_h;
-    cfg.in.block_offset_x = 0;
-    cfg.in.block_offset_y = 0;
+    cfg.in.block_w        = (uint32_t)blk.block_w;
+    cfg.in.block_h        = (uint32_t)blk.block_h;
+    cfg.in.block_offset_x = (uint32_t)blk.block_x;
+    cfg.in.block_offset_y = (uint32_t)blk.block_y;
     cfg.in.srm_cm         = lv_color_format_to_ppa_srm(src_cf);
 
     uint32_t out_bpp_r    = (dest_cf == LV_COLOR_FORMAT_RGB565) ? 2u :
@@ -364,13 +370,15 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     cfg.out.buffer_size    = aligned_size_r;
     cfg.out.pic_w          = dest_buf->header.w;
     cfg.out.pic_h          = dest_buf->header.h;
-    cfg.out.block_offset_x = (uint32_t)dest_area.x1;
-    cfg.out.block_offset_y = (uint32_t)dest_area.y1;
+    cfg.out.block_offset_x = (uint32_t)blk.dest_area.x1;
+    cfg.out.block_offset_y = (uint32_t)blk.dest_area.y1;
     cfg.out.srm_cm         = lv_color_format_to_ppa_srm(dest_cf);
 
     cfg.rotation_angle     = ppa_rot;
-    cfg.scale_x            = (dsc->scale_x != LV_SCALE_NONE) ? ((float)dsc->scale_x / 256.0f) : 1.0f;
-    cfg.scale_y            = (dsc->scale_y != LV_SCALE_NONE) ? ((float)dsc->scale_y / 256.0f) : 1.0f;
+    /* ppa_evaluate() rejects rotation combined with scaling, so this path is
+     * always 1:1 and the source-block geometry above assumes it. */
+    cfg.scale_x            = 1.0f;
+    cfg.scale_y            = 1.0f;
     cfg.mirror_x           = false;
     cfg.mirror_y           = false;
     cfg.rgb_swap           = false;
