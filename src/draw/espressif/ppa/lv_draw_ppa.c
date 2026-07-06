@@ -96,7 +96,8 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * dsc = (lv_draw_fill_dsc_t *)t->draw_dsc;
                 if((dsc->radius != 0 || dsc->grad.dir != LV_GRAD_DIR_NONE)) return 0;
-                if(dsc->opa <= (lv_opa_t)LV_OPA_MAX) return 0;
+                /* Only fully-opaque fills: the PPA fill writes solid pixels. */
+                if(dsc->opa < (lv_opa_t)LV_OPA_MAX) return 0;
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
                     t->preference_score = DRAW_UNIT_PPA_PREF_SCORE;
