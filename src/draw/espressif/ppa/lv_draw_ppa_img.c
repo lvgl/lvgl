@@ -121,7 +121,7 @@ static inline uint32_t lv_draw_ppa_align_size(uint32_t size)
 }
 
 void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                         const lv_area_t * coords)
+                         const lv_area_t * real_area)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN) return;
 
@@ -129,10 +129,10 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     lv_layer_t * layer        = t->target_layer;
     lv_draw_buf_t * dest_buf  = layer->draw_buf;
 
-    /* coords = image rect at 1:1 scale (may extend off-screen).
+    /* real_area = on-screen bounding box of the scaled image (t->_real_area).
      * Skip the decode entirely if nothing intersects the render tile. */
     lv_area_t visible_area;
-    if(!lv_area_intersect(&visible_area, coords, &layer->buf_area)) return;
+    if(!lv_area_intersect(&visible_area, real_area, &layer->buf_area)) return;
     LV_UNUSED(visible_area);
 
     lv_image_decoder_dsc_t decoder_dsc;
@@ -162,10 +162,10 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     /* Map the visible render tile back onto a PPA source block.
      * Pure geometry, shared with the host unit test (lv_draw_ppa_srm.h). */
     lv_draw_ppa_srm_block_t blk = lv_draw_ppa_srm_calc_block(
-                                      coords, &layer->buf_area,
+                                      real_area, &layer->buf_area,
                                       (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
                                       (int32_t)src_w, (int32_t)src_h,
-                                      dsc->scale_x, dsc->scale_y, dsc->pivot.x, dsc->pivot.y);
+                                      dsc->scale_x, dsc->scale_y);
     if(!blk.draw) {
         lv_image_decoder_close(&decoder_dsc);
         return;
@@ -258,7 +258,7 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
  * Uses the ESP32-P4 PPA Scale-Rotate-Mirror engine for zero-CPU-cost rotation.
  */
 void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                            const lv_area_t * coords)
+                            const lv_area_t * real_area)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
@@ -330,7 +330,7 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
      * (lv_draw_ppa_rot.h); also guarantees the destination stays inside the
      * buffer so the PPA cannot write out of bounds. */
     lv_draw_ppa_rot_block_t blk = lv_draw_ppa_rot_calc_block(
-                                      coords, &layer->buf_area,
+                                      real_area, &layer->buf_area,
                                       (int32_t)dest_buf->header.w, (int32_t)dest_buf->header.h,
                                       (int32_t)src_w, (int32_t)src_h, angle);
     if(!blk.draw) {

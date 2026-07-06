@@ -45,10 +45,12 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                      const lv_area_t * coords);
 
 #if LV_USE_PPA_IMG
+/* real_area is the transformed on-screen bounding box (t->_real_area): scaled
+ * for the SRM path, rotated (axes swapped for 90/270) for the rotate path. */
 void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                         const lv_area_t * coords);
+                         const lv_area_t * real_area);
 void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                            const lv_area_t * coords);
+                            const lv_area_t * real_area);
 #endif /* LV_USE_PPA_IMG */
 
 /**********************

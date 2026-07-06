@@ -57,14 +57,14 @@ typedef struct {
  * source sub-block that maps onto that window.
  *
  * Rotation convention: @p angle is the LVGL clockwise angle in 1/10-degree
- * units, already normalised to one of 900 / 1800 / 2700. @p coords is the
- * on-screen bounding box of the rotated image (LVGL's task area): for 90/270
- * its size is img_h x img_w, for 180 it is img_w x img_h. The block geometry
- * for the 90/270 steps assumes screen-space clockwise rotation; a maintainer
- * with P4 hardware can swap the 900/2700 cases if the rendered result is
- * mirrored, without affecting the clamping/safety guarantees.
+ * units, already normalised to one of 900 / 1800 / 2700. @p real_area is the
+ * transformed on-screen bounding box of the rotated image (LVGL's
+ * t->_real_area, NOT the un-rotated t->area): for 90/270 its size is
+ * img_h x img_w, for 180 it is img_w x img_h. The 90/270 axis mapping has been
+ * verified on ESP32-P4 hardware (square and non-square images, all four steps),
+ * so the 900/2700 cases are not mirrored.
  *
- * @param coords     on-screen bounding box of the rotated image (screen coords)
+ * @param real_area  transformed on-screen bounding box of the rotated image
  * @param buf_area   the layer buffer (render tile) area, in screen coordinates
  * @param buf_w      destination buffer width  in pixels
  * @param buf_h      destination buffer height in pixels
@@ -74,7 +74,7 @@ typedef struct {
  * @return           the computed block; check `.draw` before using the rest
  */
 static inline lv_draw_ppa_rot_block_t lv_draw_ppa_rot_calc_block(
-    const lv_area_t * coords, const lv_area_t * buf_area,
+    const lv_area_t * real_area, const lv_area_t * buf_area,
     int32_t buf_w, int32_t buf_h, int32_t img_w, int32_t img_h,
     int32_t angle)
 {
@@ -83,11 +83,11 @@ static inline lv_draw_ppa_rot_block_t lv_draw_ppa_rot_calc_block(
 
     /* Clip the rotated image to the render tile. */
     lv_area_t vis;
-    if(!lv_area_intersect(&vis, coords, buf_area)) return r;
+    if(!lv_area_intersect(&vis, real_area, buf_area)) return r;
 
     /* Offset of the visible window inside the full rotated output. */
-    int32_t out_dx = vis.x1 - coords->x1;
-    int32_t out_dy = vis.y1 - coords->y1;
+    int32_t out_dx = vis.x1 - real_area->x1;
+    int32_t out_dy = vis.y1 - real_area->y1;
     int32_t vw = lv_area_get_width(&vis);
     int32_t vh = lv_area_get_height(&vis);
 
@@ -96,7 +96,7 @@ static inline lv_draw_ppa_rot_block_t lv_draw_ppa_rot_calc_block(
     lv_area_move(&r.dest_area, -buf_area->x1, -buf_area->y1);
 
     /* Clamp the destination window to the buffer so the PPA never writes out
-     * of bounds, even if coords and buf_area disagree. */
+     * of bounds, even if real_area and buf_area disagree. */
     if(r.dest_area.x1 < 0 || r.dest_area.y1 < 0) return r;
     if(r.dest_area.x1 >= buf_w || r.dest_area.y1 >= buf_h) return r;
     if(r.dest_area.x1 + vw > buf_w) vw = buf_w - r.dest_area.x1;
