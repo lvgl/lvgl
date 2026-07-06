@@ -55,8 +55,6 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     lv_color_format_t dest_cf = draw_buf->header.cf;
     uint8_t * dest_buf = draw_buf->data;
 
-    extern const lv_image_dsc_t img_benchmark_lvgl_logo_rgb;
-
     ppa_blend_oper_config_t cfg = {
         .in_bg = {
             .buffer          = (void *)src_buf,
