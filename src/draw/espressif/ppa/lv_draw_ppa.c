@@ -135,6 +135,13 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                     int32_t angle = dsc->rotation % 3600;
                     if(angle < 0) angle += 3600;
                     if(angle != 900 && angle != 1800 && angle != 2700) return 0;
+
+                    /* Rotation combined with scaling is not supported: the dispatcher
+                     * routes any rotated task to the rotate path, which transforms the
+                     * full source block and does not reproduce the SRM clip/gap handling
+                     * needed for a scaled tile. Reject the combination so another draw
+                     * unit handles it instead of producing a wrong result. */
+                    if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) return 0;
                 }
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
