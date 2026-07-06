@@ -207,11 +207,17 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
 #if LV_USE_PPA_IMG
+                /* Pass t->_real_area (the transformed on-screen bounding box),
+                 * NOT t->area (the un-transformed 1:1 image rect). The rotate
+                 * geometry needs the rotated box (its size is swapped for
+                 * 90/270) and the scale geometry needs the scaled box as its
+                 * origin; using t->area collapses non-square rotations and
+                 * mis-places / drops down-scaled images. */
                 if(img_dsc->rotation != 0) {
-                    lv_draw_ppa_img_rotate(t, img_dsc, &t->area);
+                    lv_draw_ppa_img_rotate(t, img_dsc, &t->_real_area);
                 }
                 else if(img_dsc->scale_x != LV_SCALE_NONE || img_dsc->scale_y != LV_SCALE_NONE) {
-                    lv_draw_ppa_img_srm(t, img_dsc, &t->area);
+                    lv_draw_ppa_img_srm(t, img_dsc, &t->_real_area);
                 }
                 else
 #endif

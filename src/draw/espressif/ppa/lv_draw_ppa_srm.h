@@ -55,12 +55,14 @@ typedef struct {
 /**
  * Map a visible render tile back into PPA SRM source-block coordinates.
  *
- * Keeps the transform pivot fixed on screen as the scale changes, clamps the
- * source block to the image and to the destination buffer, and flags the
- * single-pixel right/bottom gap left by the PPA's floor-rounding so the caller
- * can patch it.
+ * Clamps the source block to the image and to the destination buffer, and flags
+ * the single-pixel right/bottom gap left by the PPA's floor-rounding so the
+ * caller can patch it.
  *
- * @param coords     image rectangle at 1:1 scale, in screen coordinates
+ * @param real_area  on-screen bounding box of the SCALED image (LVGL's
+ *                   transformed area, t->_real_area). Its top-left is the
+ *                   virtual image origin and its size is img * scale, so the
+ *                   transform pivot is already baked in.
  * @param buf_area   the layer buffer (render tile) area, in screen coordinates
  * @param buf_w      destination buffer width  in pixels
  * @param buf_h      destination buffer height in pixels
@@ -68,30 +70,30 @@ typedef struct {
  * @param img_h      decoded source image height in pixels
  * @param scale_x    horizontal scale, 256 (LV_SCALE_NONE) = 1:1
  * @param scale_y    vertical scale,   256 (LV_SCALE_NONE) = 1:1
- * @param pivot_x    transform pivot X relative to the image top-left
- * @param pivot_y    transform pivot Y relative to the image top-left
  * @return           the computed block; check `.draw` before using the rest
  */
 static inline lv_draw_ppa_srm_block_t lv_draw_ppa_srm_calc_block(
-    const lv_area_t * coords, const lv_area_t * buf_area,
+    const lv_area_t * real_area, const lv_area_t * buf_area,
     int32_t buf_w, int32_t buf_h, int32_t img_w, int32_t img_h,
-    int32_t scale_x, int32_t scale_y, int32_t pivot_x, int32_t pivot_y)
+    int32_t scale_x, int32_t scale_y)
 {
     lv_draw_ppa_srm_block_t r;
     lv_memzero(&r, sizeof(r));
 
-    /* coords = image rect at 1:1 scale (may extend off-screen).
-     * Intersect with the render tile to get the actual visible clip. */
-    if(!lv_area_intersect(&r.visible_area, coords, buf_area)) return r;
+    /* real_area = on-screen bounding box of the scaled image (may extend off
+     * screen). Intersect with the render tile to get the actual visible clip.
+     * Using the transformed box (not the 1:1 rect) is what keeps a downscaled,
+     * centered image from mapping to a negative source offset. */
+    if(!lv_area_intersect(&r.visible_area, real_area, buf_area)) return r;
 
     float sx = (scale_x != LV_SCALE_NONE) ? ((float)scale_x / 256.0f) : 1.0f;
     float sy = (scale_y != LV_SCALE_NONE) ? ((float)scale_y / 256.0f) : 1.0f;
     r.scale_x = sx;
     r.scale_y = sy;
 
-    /* Virtual image origin: pivot stays fixed on screen as scale changes. */
-    float virt_x = (float)coords->x1 + (float)pivot_x * (1.0f - sx);
-    float virt_y = (float)coords->y1 + (float)pivot_y * (1.0f - sy);
+    /* The scaled image's top-left on screen == the virtual source origin. */
+    float virt_x = (float)real_area->x1;
+    float virt_y = (float)real_area->y1;
 
     /* Visible clip dimensions and buffer-local destination (always non-negative) */
     r.clip_w = lv_area_get_width(&r.visible_area);
