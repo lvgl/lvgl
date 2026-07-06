@@ -164,12 +164,6 @@ static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t 
 }
 
 #define PPA_ALIGN_UP(x, align)  ((((x) + (align) - 1) / (align)) * (align))
-#define PPA_PTR_ALIGN_UP(p, align) \
-    ((void*)(((uintptr_t)(p) + (uintptr_t)((align) - 1)) & ~(uintptr_t)((align) - 1)))
-
-#define PPA_ALIGN_DOWN(x, align)  ((((x) - (align) - 1) / (align)) * (align))
-#define PPA_PTR_ALIGN_DOWN(p, align) \
-    ((void*)(((uintptr_t)(p) - (uintptr_t)((align) - 1)) & ~(uintptr_t)((align) - 1)))
 
 #endif /* LV_USE_PPA */
 
