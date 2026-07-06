@@ -203,6 +203,8 @@ void lv_draw_ppa_img_srm(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     cfg.rotation_angle    = PPA_SRM_ROTATION_ANGLE_0;
     cfg.scale_x           = blk.scale_x;
     cfg.scale_y           = blk.scale_y;
+    /* The PPA SRM engine can mirror, but lv_draw_image_dsc_t has no mirror/flip
+     * field, so LVGL never requests it for an image draw: keep it disabled. */
     cfg.mirror_x          = false;
     cfg.mirror_y          = false;
     cfg.rgb_swap          = false;
@@ -377,6 +379,8 @@ void lv_draw_ppa_img_rotate(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
      * always 1:1 and the source-block geometry above assumes it. */
     cfg.scale_x            = 1.0f;
     cfg.scale_y            = 1.0f;
+    /* No mirror: lv_draw_image_dsc_t has no mirror/flip field (see the SRM
+     * path), so LVGL never requests it. */
     cfg.mirror_x           = false;
     cfg.mirror_y           = false;
     cfg.rgb_swap           = false;
