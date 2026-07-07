@@ -1284,11 +1284,6 @@ bool lv_obj_is_in_widget_tree(const lv_obj_t * obj)
     return false;
 }
 
-bool lv_obj_is_valid(const lv_obj_t * obj)
-{
-    return lv_obj_is_in_widget_tree(obj);
-}
-
 void lv_obj_null_on_delete(lv_obj_t ** obj_ptr)
 {
     LV_CHECK_ARG(obj_ptr != NULL, return);
