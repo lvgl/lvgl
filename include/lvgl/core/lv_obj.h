@@ -705,12 +705,6 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
 bool lv_obj_is_in_widget_tree(const lv_obj_t * obj);
 
 /**
- * @deprecated Use `lv_obj_is_in_widget_tree` instead.
- */
-LV_DEPRECATED("Use lv_obj_is_in_widget_tree instead")
-bool lv_obj_is_valid(const lv_obj_t * obj);
-
-/**
  * Utility to set an object reference to NULL when it gets deleted.
  * The reference should be in a location that will not become invalid
  * during the object's lifetime, i.e. static or allocated.

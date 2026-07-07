@@ -31,6 +31,7 @@ extern "C" {
  **********************/
 
 #define lv_display_delete_event lv_display_remove_event
+#define lv_obj_is_valid lv_obj_is_in_widget_tree
 
 #ifdef __cplusplus
 } /*extern "C"*/
