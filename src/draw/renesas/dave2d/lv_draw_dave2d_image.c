@@ -107,6 +107,15 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     lv_area_move(&buffer_area, x, y);
     lv_area_move(&clipped_area, x, y);
 
+    /* Never let the GPU scissor exceed the target layer buffer. */
+    if(!lv_draw_dave2d_clip_to_layer_buf(&clipped_area, t->target_layer)) {
+#if LV_USE_OS
+        status = lv_mutex_unlock(u->pd2Mutex);
+        LV_ASSERT(LV_RESULT_OK == status);
+#endif
+        return;
+    }
+
     current_fill_mode = d2_getfillmode(u->d2_handle);
     a_texture_op      = d2_gettextureoperationa(u->d2_handle);
     r_texture_op      = d2_gettextureoperationr(u->d2_handle);
@@ -115,7 +124,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     src_blend_mode    = d2_getblendmodesrc(u->d2_handle);
     dst_blend_mode    = d2_getblendmodedst(u->d2_handle);
 
-#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if defined(ARM_CORTEX_M55_M85) || defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
 #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     d1_cacheblockflush(u->d2_handle, 0, src_buf,
                        img_stride * header->h); //Stride is in bytes, not pixels/texels
@@ -314,7 +323,12 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     d2_setalphablendmode(u->d2_handle, src_alpha_blend_mode, dst_alpha_blend_mode);
 
     if(NULL != p_intermediate_buf) {
-        lv_free(p_intermediate_buf);
+        /* The GPU writes into and reads back p_intermediate_buf from commands
+         * that are only executed at the next flush, which happens after this
+         * function returns. Defer the free until the GPU has consumed them,
+         * otherwise the pool reuses this memory and the deferred GPU write
+         * corrupts whatever now occupies it. */
+        lv_draw_dave2d_defer_free(p_intermediate_buf);
     }
 
 #if LV_USE_OS

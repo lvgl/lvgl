@@ -10,6 +10,8 @@
 
 #if LV_USE_DRAW_DAVE2D
 
+#include "../../../misc/lv_area_private.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -120,6 +122,18 @@ void d2_framebuffer_from_layer(d2_device * handle, lv_layer_t * layer)
                    (d2_u32)lv_area_get_width(&buffer_area),
                    (d2_u32)lv_area_get_height(&buffer_area),
                    lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(layer->color_format));
+}
+
+bool lv_draw_dave2d_clip_to_layer_buf(lv_area_t * clip, const lv_layer_t * layer)
+{
+    lv_area_t bounds;
+    bounds.x1 = 0;
+    bounds.y1 = 0;
+    bounds.x2 = lv_area_get_width(&layer->buf_area) - 1;
+    bounds.y2 = lv_area_get_height(&layer->buf_area) - 1;
+    /* Returns false (empty clip) when the task lies fully outside the current
+     * layer chunk; callers must skip drawing to avoid d2_border wraparound. */
+    return lv_area_intersect(clip, clip, &bounds);
 }
 
 bool lv_draw_dave2d_is_dest_cf_supported(lv_color_format_t cf)

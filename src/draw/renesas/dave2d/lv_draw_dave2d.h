@@ -81,6 +81,18 @@ typedef struct {
 
 void lv_draw_dave2d_init(void);
 
+/**
+ * Queue a heap buffer to be freed only after the next GPU flush.
+ * D/AVE 2D calls merely record commands into a render buffer; the GPU does not
+ * read/write the referenced buffers until d2_executerenderbuffer()/d2_flushframe()
+ * run, which (in the batched dispatch path) happens after the per-task
+ * execute_drawing() has returned. Freeing a GPU-referenced scratch buffer inside
+ * execute_drawing() therefore lets the pool reuse it before the GPU touches it,
+ * corrupting whatever now lives there. Use this instead of lv_free() for such
+ * buffers so the free is deferred until the commands have been consumed.
+ */
+void lv_draw_dave2d_defer_free(void * buf);
+
 void lv_draw_dave2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                           const lv_area_t * coords);
 

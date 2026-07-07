@@ -34,6 +34,15 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
     lv_area_move(&draw_area, x, y);
     lv_area_move(&coordinates, x, y);
 
+    /* Never let the GPU scissor exceed the target layer buffer. */
+    if(!lv_draw_dave2d_clip_to_layer_buf(&draw_area, t->target_layer)) {
+#if LV_USE_OS
+        status = lv_mutex_unlock(u->pd2Mutex);
+        LV_ASSERT(LV_RESULT_OK == status);
+#endif
+        return;
+    }
+
     d2_u8 current_alpha = d2_getalpha(u->d2_handle);
     d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
 

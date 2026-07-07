@@ -25,6 +25,16 @@
 #if (LV_DAVE2D_MAX_DRAW_PRESSURE < 256)
     #error "DRAW Pressure should be at least 256 otherwise the Dave engine may crash!"
 #endif
+
+/* Command batching accumulates GPU commands that reference layer/scratch
+ * buffers and executes them only at a later flush. That deferred window races
+ * with LVGL freeing/reusing those buffers, letting the GPU write pixel data
+ * over reused heap (intermittent USAGE/BUS/MPU faults in the "opa_layer"
+ * scene). Disabled by default; override with -DLV_DAVE2D_BATCHING=1 to restore
+ * batching. */
+#ifndef LV_DAVE2D_BATCHING
+    #define LV_DAVE2D_BATCHING 0
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -34,7 +44,7 @@
  **********************/
 
 static void execute_drawing(lv_draw_dave2d_unit_t * u);
-#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if defined(ARM_CORTEX_M55_M85) || defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
     #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
         static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
     #endif
@@ -66,6 +76,8 @@ static d2_renderbuffer * _renderbuffer;
 static d2_renderbuffer * _label_renderbuffer;
 
 static lv_ll_t  draw_tasks_on_dlist;
+/* Buffers referenced by queued GPU commands, to be freed after the next flush. */
+static lv_ll_t  deferred_free_ll;
 static uint32_t draw_pressure = 0;
 
 #if LV_USE_OS
@@ -107,6 +119,32 @@ void lv_draw_dave2d_init(void)
     draw_dave2d_unit->renderbuffer = _renderbuffer;
     draw_dave2d_unit->label_renderbuffer = _label_renderbuffer;
     lv_ll_init(&draw_tasks_on_dlist, sizeof(uintptr_t));
+    lv_ll_init(&deferred_free_ll, sizeof(void *));
+}
+
+void lv_draw_dave2d_defer_free(void * buf)
+{
+    if(buf == NULL) return;
+    void ** p_entry = lv_ll_ins_tail(&deferred_free_ll);
+    LV_ASSERT_MALLOC(p_entry);
+    if(p_entry == NULL) {
+        /* Can't track it for a deferred free; leaking is still safer than the
+         * use-after-free this function exists to prevent. */
+        return;
+    }
+    *p_entry = buf;
+}
+
+/* Free all buffers queued via lv_draw_dave2d_defer_free(). Must be called only
+ * after the GPU has consumed the pending commands (post d2_flushframe). */
+static void drain_deferred_frees(void)
+{
+    void ** p_entry;
+    while((p_entry = lv_ll_get_head(&deferred_free_ll)) != NULL) {
+        lv_free(*p_entry);
+        lv_ll_remove(&deferred_free_ll, p_entry);
+        lv_free(p_entry);
+    }
 }
 
 /**********************
@@ -116,7 +154,7 @@ void lv_draw_dave2d_init(void)
 static void lv_draw_buf_dave2d_init_handlers(void)
 {
 
-#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if defined(ARM_CORTEX_M55_M85) || defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
 #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
     handlers->invalidate_cache_cb = _dave2d_buf_invalidate_cache_cb;
@@ -124,7 +162,7 @@ static void lv_draw_buf_dave2d_init_handlers(void)
 #endif
 }
 
-#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if defined(ARM_CORTEX_M55_M85) || defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
 #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
 static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
@@ -143,7 +181,7 @@ static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, cons
     address = address + (area->x1 * (int32_t)bytes_per_pixel) + (stride * (uint32_t)area->y1);
 
     for(i = 0; i < lines; i++) {
-#if defined(RENESAS_CORTEX_M85)
+#if defined(ARM_CORTEX_M55_M85) || defined(RENESAS_CORTEX_M85)
         SCB_CleanInvalidateDCache_by_Addr(address, bytes_to_flush_per_line);
 #else /* _RENESAS_RZA_ */
         R_BSP_CACHE_CleanInvalidateRange((uint64_t) address, (uint64_t) bytes_to_flush_per_line);
@@ -408,7 +446,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     /*Disable the command buffer as a temporary fix to rendering issues. */
 #if 0
     deps = lv_draw_get_dependent_count(t);
-    if(deps > 0 || draw_pressure > 0) {
+    if(LV_DAVE2D_BATCHING && (deps > 0 || draw_pressure > 0)) {
         draw_pressure += deps;
         if(draw_pressure < LV_DAVE2D_MAX_DRAW_PRESSURE) {
             /* No other tasks are pressuring to get the current block
@@ -447,8 +485,16 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
         draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
         d2_selectrenderbuffer(_d2_handle, _renderbuffer);
         execute_drawing(draw_dave2d_unit);
-        d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
-        d2_flushframe(_d2_handle);
+        d2_s32 exec_result = d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
+        LV_ASSERT(D2_OK == exec_result);
+        d2_s32 flush_result = d2_flushframe(_d2_handle);
+        LV_ASSERT(D2_OK == flush_result);
+        /* Only release GPU-referenced scratch buffers once the flush has
+         * actually consumed the pending commands; draining on a failed flush
+         * would reintroduce the use-after-free this path guards against. */
+        if(D2_OK == exec_result && D2_OK == flush_result) {
+            drain_deferred_frees();
+        }
 
         draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
         draw_dave2d_unit->task_act = NULL;
@@ -465,6 +511,7 @@ static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit)
      * Dave and wait for its interrupt. (Dave2D driver is RTOS aware, no need for semaphores);
      */
     lv_draw_dave2d_unit_t * draw_dave2d_unit = (lv_draw_dave2d_unit_t *) draw_unit;
+    LV_UNUSED(draw_dave2d_unit);
 
     if(!draw_pressure) {
         /* It reached here because Dave2D Draw Unit was not suitable to take a task
@@ -487,7 +534,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     /* remember draw unit for access to unit's context */
     t->draw_unit = (lv_draw_unit_t *)u;
 
-#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if defined(ARM_CORTEX_M55_M85) || defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
 #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_layer_t * layer = t->target_layer;
     lv_area_t clipped_area;
@@ -546,7 +593,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
             break;
     }
 
-#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if defined(ARM_CORTEX_M55_M85) || defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
 #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
 #endif
@@ -630,14 +677,21 @@ void dave2d_execute_dlist_and_flush(void)
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
-    result = d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
-    LV_ASSERT(D2_OK == result);
+    d2_s32 exec_result = d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
+    LV_ASSERT(D2_OK == exec_result);
 
-    result = d2_flushframe(_d2_handle);
-    LV_ASSERT(D2_OK == result);
+    d2_s32 flush_result = d2_flushframe(_d2_handle);
+    LV_ASSERT(D2_OK == flush_result);
 
     result = d2_selectrenderbuffer(_d2_handle, _renderbuffer);
     LV_ASSERT(D2_OK == result);
+
+    /* Only release GPU-referenced scratch buffers once the flush has actually
+     * consumed the pending commands; draining on a failed flush would
+     * reintroduce the use-after-free this path guards against. */
+    if(D2_OK == exec_result && D2_OK == flush_result) {
+        drain_deferred_frees();
+    }
 
     while(false == lv_ll_is_empty(&draw_tasks_on_dlist)) {
         p_list_entry = lv_ll_get_tail(&draw_tasks_on_dlist);

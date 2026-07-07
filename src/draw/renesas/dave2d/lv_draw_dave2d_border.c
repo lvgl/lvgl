@@ -79,6 +79,15 @@ static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * oute
     lv_area_move(&local_outer_area, x, y);
     lv_area_move(&local_inner_area, x, y);
 
+    /* Never let the GPU scissor exceed the target layer buffer. */
+    if(!lv_draw_dave2d_clip_to_layer_buf(&clip_area, t->target_layer)) {
+#if LV_USE_OS
+        status = lv_mutex_unlock(u->pd2Mutex);
+        LV_ASSERT(LV_RESULT_OK == status);
+#endif
+        return;
+    }
+
     d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(color));
