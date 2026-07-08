@@ -44,11 +44,25 @@ You can check the list of available boards using:
 $ west boards
 ```
 
-After you chose a board you can build one of the LVGL demos for it. Here we are using the `native_posix`
-board, which allows for running the application on your posix compliant host system:
+After you chose a board you can build one of the LVGL demos for it. Here we are using the `native_sim`
+board, which allows for running the application on your host system. Select the demo you want to build
+via its Kconfig symbol. The available demos are:
+
+- `CONFIG_LV_Z_DEMO_MUSIC`
+- `CONFIG_LV_Z_DEMO_BENCHMARK`
+- `CONFIG_LV_Z_DEMO_STRESS`
+- `CONFIG_LV_Z_DEMO_WIDGETS`
+- `CONFIG_LV_Z_DEMO_KEYPAD_AND_ENCODER`
+- `CONFIG_LV_Z_DEMO_RENDER`
 
 ```bash
-$ west build -b native_posix samples/modules/lvgl/demos
+$ west build -b native_sim samples/modules/lvgl/demos -- -DCONFIG_LV_Z_DEMO_MUSIC=y
+```
+
+On a 64-bit host you will most likely want the 64-bit variant of the board:
+
+```bash
+$ west build -b native_sim/native/64 samples/modules/lvgl/demos -- -DCONFIG_LV_Z_DEMO_MUSIC=y
 ```
 
 To run the application on your host:
@@ -65,6 +79,153 @@ $ west flash
 
 If you want to build any of the other demo applications check out the samples
 [README](https://docs.zephyrproject.org/latest/samples/modules/lvgl/demos/README.html).
+
+### Board target naming
+
+The `-b` argument is a *board target*, which under Zephyr's
+[hardware model v2](https://docs.zephyrproject.org/latest/hardware/porting/board_porting.html)
+follows this convention:
+
+```text
+<board name>[@<revision>][/<SoC>[/<CPU cluster>][/<variant>]]
+```
+
+- **board name** – the board's unique identifier (e.g. `native_sim`, `nrf5340dk`).
+- **@revision** – optional hardware revision, such as `@1.2.0`, `@A`, or `@1`.
+- **SoC** – the System-on-Chip on the board (e.g. `nrf5340`). It can be omitted when the board has a single, single-core SoC.
+- **CPU cluster** – on multi-core SoCs, selects the core to build for (e.g. `cpuapp`).
+- **variant** – a build variant of the board, often used for security modes (e.g. `ns` for a non-secure TF-M build).
+
+So `native_sim/native/64` selects the `native_sim` board, its `native` SoC, and the `64` variant (64-bit host build), while a full target like `nrf5340dk@1.2.0/nrf5340/cpuapp/ns` pins the revision, SoC, core, and variant explicitly. You can list every available target with `west boards`.
+
+### Building for specific display boards
+
+The commands below build the music demo for some boards that have a display. On real
+hardware the display is attached through a *shield*, selected with `--shield`, so each
+command includes the matching board target and display shield. Swap `CONFIG_LV_Z_DEMO_MUSIC`
+for any of the other demo symbols listed above, and flash with `west flash` afterwards.
+
+Renesas EK-RA8D1 — MIPI DSI graphics expansion (RTK-MIPI-LCD-B-00000BE, ILI9806E, 480×854):
+
+```bash
+$ west build -b ek_ra8d1 --shield rtkmipilcdb00000be samples/modules/lvgl/demos -- -DCONFIG_LV_Z_DEMO_MUSIC=y
+```
+
+Renesas EK-RA8D2 — parallel graphics expansion (RTK-LCD-PAR1S-00001BE, GLCDC, 1024×600):
+
+```bash
+$ west build -b ek_ra8d2/r7ka8d2kflcac/cm85 --shield rtklcdpar1s00001be samples/modules/lvgl/demos -- -DCONFIG_LV_Z_DEMO_MUSIC=y
+```
+
+NXP MIMXRT700-EVK — MIPI DSI display (RK055HDMIPI4MA0, HX8394, 720×1280):
+
+```bash
+$ west build -b mimxrt700_evk/mimxrt798s/cm33_cpu0 --shield rk055hdmipi4ma0 samples/modules/lvgl/demos -- -DCONFIG_LV_Z_DEMO_MUSIC=y
+```
+
+<Callout type="info" title="RT700 GPU acceleration">
+The command above renders in software. Driving the RT700's VG-Lite GPU
+(`CONFIG_LV_USE_DRAW_VG_LITE`) needs additional glue that is not part of the upstream
+sample; use the [LVGL Zephyr starter project](https://github.com/lvgl/lv_zephyr), which
+ships it preconfigured.
+</Callout>
+
+Renesas EK-RA8P1 — MIPI DSI graphics expansion (RTK-MIPI-LCD-B-00000BE):
+
+```bash
+$ west build -b ek_ra8p1/r7ka8p1kflcac/cm85 --shield rtkmipilcdb00000be samples/modules/lvgl/demos -- -DCONFIG_LV_Z_DEMO_MUSIC=y
+```
+
+<Callout type="warn" title="EK-RA8P1 not verified">
+The EK-RA8P1 command is provided as a starting point but has not been validated against
+real hardware; the board target and shield may need adjustment.
+</Callout>
+
+<Callout type="info" title="EK-RA6M3">
+The Renesas EK-RA6M3 uses the RTK7EKA6M3B00001BU parallel display (GLCDC, 480×272), but
+its upstream Zephyr board DTS predates GLCDC support, so the `rtk7eka6m3b00001bu` shield
+cannot be applied to the plain sample above. Use the
+[LVGL Zephyr starter project](https://github.com/lvgl/lv_zephyr) — it supplies the
+required pre-shield devicetree overlay and selects the shield automatically:
+
+```bash
+$ west blobs fetch hal_renesas
+$ west build -p -b ek_ra6m3
+```
+</Callout>
+
+## LVGL Zephyr starter project
+
+If you would rather start from a ready-made application than the upstream samples, the
+[LVGL Zephyr starter project](https://github.com/lvgl/lv_zephyr) gets an LVGL app running —
+on your PC or on a supported development board — in minutes. It is a self-contained Zephyr
+[workspace application](https://docs.zephyrproject.org/latest/develop/application/index.html#zephyr-workspace-application):
+cloning it and running `west update` fetches Zephyr and every module needed to build, so
+you do **not** need a pre-existing Zephyr installation.
+
+### Prerequisites
+
+Follow steps 1–4 of the
+[Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
+to install the host dependencies (CMake, Python, devicetree compiler), `west`
+(`pip install west`), and the [Zephyr SDK](https://docs.zephyrproject.org/latest/develop/toolchains/zephyr_sdk.html).
+To run the simulator on your PC you also need SDL2 (`sudo apt install libsdl2-dev` on
+Ubuntu/Debian).
+
+### Set up the workspace
+
+```bash
+$ git clone https://github.com/lvgl/lv_zephyr.git
+$ cd lv_zephyr
+
+# Initialize the west workspace inside the repository and
+# download Zephyr + modules into deps/
+$ west init -l manifest
+$ west update
+```
+
+Everything stays inside your clone: the code you edit is tracked by git, and everything
+west downloads goes to the git-ignored `deps/` folder.
+
+<Callout type="info" title="Download size">
+`west update` downloads Zephyr and the vendor HALs for all supported boards (a few GB).
+If you only target one board, trim the `name-allowlist` in `manifest/west.yml` before
+running it.
+</Callout>
+
+### Run on your PC (simulator)
+
+```bash
+$ west build -b native_sim/native/64 -t run
+```
+
+A window opens showing the LVGL widgets demo: clicks act as touch input, and the Zephyr
+shell is available in the terminal.
+
+### Build and flash to a board
+
+Build for a supported board — the matching display shield is selected automatically, so
+no `--shield` flag is needed — then flash it:
+
+```bash
+$ west build -p -b ek_ra8d1
+$ west flash
+```
+
+Replace `ek_ra8d1` with your board target. Some boards need vendor HAL blobs fetched
+first (e.g. `west blobs fetch hal_renesas` for the EK-RA6M3, `west blobs fetch hal_espressif`
+for ESP32 boards). See the project's
+[BOARDS.md](https://github.com/lvgl/lv_zephyr/blob/main/BOARDS.md) for the full list of
+supported boards, their exact targets, and any per-board steps. You can also start a debug
+session with `west debug`.
+
+### Make it your own
+
+Start in `src/main.c`: replace the `lv_demo_widgets()` call in `create_ui()` with your own
+UI code. The display, input devices and LVGL itself are initialized automatically by Zephyr
+from the devicetree before `main()` runs. LVGL is configured through Kconfig (`prj.conf` or
+`west build -t menuconfig`) — enable widgets, fonts and features there, and tune
+`CONFIG_LV_Z_MEM_POOL_SIZE` / `CONFIG_LV_Z_VDB_SIZE` for performance vs. RAM.
 
 ## Leveraging Zephyr Features
 
@@ -160,17 +321,15 @@ To optimize LVGL's performance, several `kconfig` options can be configured:
 - **CONFIG_LV_Z_VDB_ALIGN**: Ensures that the rendering buffer is properly aligned, which is critical for efficient memory access based on the color depth.
 - **CONFIG_LV_Z_VDB_CUSTOM_SECTION**: Allows rendering buffers to be placed in a custom memory section (e.g., `.lvgl_buf`), useful for leveraging specific memory types like tightly coupled or external memory to enhance performance.
 
-### Zephyr >= 3.7.0 Specific Options
+### Flush Thread Options
 
-For Zephyr versions 3.7.0 and above, additional options are available to manage LVGL's frame flushing:
+Additional options are available to manage LVGL's frame flushing:
 
 - **CONFIG_LV_Z_FLUSH_THREAD**: Enables flushing LVGL frames in a separate thread, allowing the main thread to continue rendering the next frame simultaneously. This option can be disabled if the performance gain is not needed.
 
   - **CONFIG_LV_Z_FLUSH_THREAD_STACK_SIZE**: Specifies the stack size for the flush thread, with a default of 1024 bytes.
 
-  - **CONFIG_LV_Z_FLUSH_THREAD_PRIO**: Sets the priority of the flush thread, with a default priority of 0, indicating cooperative priority.
-
-For newer versions of Zephyr, the OSAL (Operating System Abstraction Layer) can be utilized, which takes care of the flushing.
+  - **CONFIG_LV_Z_FLUSH_THREAD_PRIORITY**: Sets the priority of the flush thread, with a default priority of -1, indicating a cooperative priority.
 
 ## Where can I find more information?
 
