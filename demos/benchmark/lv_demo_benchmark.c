@@ -1005,6 +1005,16 @@ static bool is_optimization_enabled(void)
             loop_not_optimizable();
         }
         t_unoptimized = lv_tick_elaps(t);
+
+        /*On some simulators (e.g. Zephyr's native_sim "inf_clock" model) the
+         *system tick only advances while the CPU is idle, so a busy loop like
+         *this never sees time elapse. In that case `t_unoptimized` stays 0 no
+         *matter how much work is done and the loop would never terminate.
+         *Detect it (a large amount of work with zero elapsed time) and give up
+         *measuring rather than hanging; assume optimizations are enabled.*/
+        if(t_unoptimized == 0 && max_cnt >= 1024) {
+            return true;
+        }
     } while(t_unoptimized < 50);
 
     /*Run the optimizable loop the same amount of times*/
