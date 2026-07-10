@@ -441,8 +441,12 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
-        if(roller->option_cnt <= 1) return;
-
+        /* Unlike PRESSED/PRESSING/KEY/ROTARY (which are only meaningful when there is
+         * more than one option to scroll/select between), release_handler() is also
+         * responsible for leaving edit mode on an encoder release. That part doesn't
+         * depend on option_cnt, so it must run even for a single-option roller -
+         * otherwise a roller with only one option can never leave edit mode once
+         * entered via the encoder. */
         release_handler(obj);
     }
     else if(code == LV_EVENT_FOCUSED) {
