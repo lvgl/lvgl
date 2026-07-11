@@ -57,6 +57,7 @@ enum {
     _RENDER_ATTR_STROKE_LINEJOIN    = (4 << 8),
     _RENDER_ATTR_STROKE_MITER_LIMIT = (4 << 9),
     _RENDER_ATTR_STROKE_DASH_ARRAY  = (4 << 10),
+    _RENDER_ATTR_OPACITY       = (4 << 11)
 };
 
 /**********************
@@ -883,17 +884,11 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             break;
         case LV_SVG_ATTR_OPACITY: {
                 if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
-                    obj->flags &= ~_RENDER_ATTR_FILL_OPACITY;
-                    obj->flags &= ~_RENDER_ATTR_STROKE_OPACITY;
+                    obj->flags &= ~_RENDER_ATTR_OPACITY;
                     return;
                 }
-                lv_opa_t opa = (lv_opa_t)(attr->value.fval * 255.0f);
-                dsc->fill_dsc.opa = opa;
-                obj->flags |= _RENDER_ATTR_FILL_OPACITY;
-                if(obj->flags & _RENDER_ATTR_STROKE) {
-                    dsc->stroke_dsc.opa = opa;
-                    obj->flags |= _RENDER_ATTR_STROKE_OPACITY;
-                }
+                dsc->opa = (lv_opa_t)(attr->value.fval * 255.0f);
+                obj->flags |= _RENDER_ATTR_OPACITY;
             }
             break;
         case LV_SVG_ATTR_STROKE_DASH_OFFSET:
@@ -1012,6 +1007,8 @@ static void _init_draw_dsc(lv_vector_path_ctx_t * dsc)
 
     dsc->blend_mode = LV_VECTOR_BLEND_SRC_OVER;
     lv_matrix_identity(&(dsc->matrix));
+
+    dsc->opa = LV_OPA_COVER;
 }
 
 static void _deinit_draw_dsc(lv_vector_path_ctx_t * dsc)
@@ -1036,6 +1033,7 @@ static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_
     lv_memcpy(&(dst->stroke_dsc.matrix), &(src->stroke_dsc.matrix), sizeof(lv_matrix_t));
 
     dst->blend_mode = src->blend_mode;
+    dst->opa = src->opa;
 }
 
 static void _copy_draw_dsc_from_ref(lv_draw_vector_dsc_t * dsc, const lv_svg_render_obj_t * obj)
@@ -1312,6 +1310,10 @@ static void _special_render(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_
     if(obj->flags & _RENDER_ATTR_STROKE_DASH_ARRAY) {
         lv_array_clear(&(dst->stroke_dsc.dash_pattern));
         lv_array_copy(&(dst->stroke_dsc.dash_pattern), &(src->stroke_dsc.dash_pattern));
+    }
+
+    if(obj->flags & _RENDER_ATTR_OPACITY) {
+        dst->opa = src->opa;
     }
 }
 

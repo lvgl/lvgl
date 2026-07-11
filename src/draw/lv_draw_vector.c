@@ -58,10 +58,11 @@
 static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_t * src)
 {
     lv_memcpy(&(dst->fill_dsc), &(src->fill_dsc), sizeof(lv_vector_fill_dsc_t));
+    dst->fill_dsc.opa = (lv_opa_t)(((uint16_t)src->fill_dsc.opa * src->opa) / 255);
 
     dst->stroke_dsc.style = src->stroke_dsc.style;
     dst->stroke_dsc.color = src->stroke_dsc.color;
-    dst->stroke_dsc.opa = src->stroke_dsc.opa;
+    dst->stroke_dsc.opa = (lv_opa_t)(((uint16_t)src->stroke_dsc.opa * src->opa) / 255);
     dst->stroke_dsc.width = src->stroke_dsc.width;
     dst->stroke_dsc.cap = src->stroke_dsc.cap;
     dst->stroke_dsc.join = src->stroke_dsc.join;
@@ -656,6 +657,7 @@ lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer)
     lv_matrix_identity(&(stroke_dsc->matrix)); /*identity matrix*/
 
     dsc->ctx->blend_mode = LV_VECTOR_BLEND_SRC_OVER;
+    dsc->ctx->opa = LV_OPA_100;
     dsc->ctx->scissor_area = layer->_clip_area;
     lv_matrix_identity(&(dsc->ctx->matrix)); /*identity matrix*/
     dsc->task_list = NULL;

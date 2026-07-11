@@ -86,6 +86,7 @@ struct _lv_vector_path_ctx_t {
     lv_matrix_t matrix;
     lv_vector_blend_t blend_mode;
     lv_area_t scissor_area;
+    lv_opa_t opa;
 };
 
 struct _lv_draw_vector_dsc_t {
