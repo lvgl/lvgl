@@ -887,7 +887,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                     obj->flags &= ~_RENDER_ATTR_OPACITY;
                     return;
                 }
-                dsc->opa = (lv_opa_t)(attr->value.fval * 255.0f);
+                dsc->opa = (lv_opa_t)(((uint16_t)dsc->opa * (lv_opa_t)(attr->value.fval * 255.0f)) / 255);
                 obj->flags |= _RENDER_ATTR_OPACITY;
             }
             break;
