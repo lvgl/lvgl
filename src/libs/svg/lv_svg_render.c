@@ -881,6 +881,21 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 }
             }
             break;
+        case LV_SVG_ATTR_OPACITY: {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                    obj->flags &= ~_RENDER_ATTR_FILL_OPACITY;
+                    obj->flags &= ~_RENDER_ATTR_STROKE_OPACITY;
+                    return;
+                }
+                lv_opa_t opa = (lv_opa_t)(attr->value.fval * 255.0f);
+                dsc->fill_dsc.opa = opa;
+                obj->flags |= _RENDER_ATTR_FILL_OPACITY;
+                if(obj->flags & _RENDER_ATTR_STROKE) {
+                    dsc->stroke_dsc.opa = opa;
+                    obj->flags |= _RENDER_ATTR_STROKE_OPACITY;
+                }
+            }
+            break;
         case LV_SVG_ATTR_STROKE_DASH_OFFSET:
             /* not support yet */
             break;
