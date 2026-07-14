@@ -73,10 +73,6 @@ static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_
 
     dst->blend_mode = src->blend_mode;
 
-    // Not used for now. Just stored for future use.
-    // Setting of opacity via `tvg_paint_set_opacity` has issues if the SVG icon has stroke
-    // and if opacity is less than 255.
-    dst->opa = src->opa;
     lv_memcpy(&(dst->matrix), &(src->matrix), sizeof(lv_matrix_t));
     lv_area_copy(&(dst->scissor_area), &(src->scissor_area));
 }
