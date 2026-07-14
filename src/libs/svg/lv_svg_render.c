@@ -700,9 +700,6 @@ static void _set_image_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * ds
         case LV_SVG_ATTR_WIDTH:
             image->width = attr->value.fval;
             break;
-        case LV_SVG_ATTR_OPACITY:
-            image->img_dsc.opa = (lv_opa_t)(attr->value.fval * 255.0f);
-            break;
         case LV_SVG_ATTR_XLINK_HREF: {
                 const char * xlink = attr->value.sval;
                 if(hal_funcs.load_image) {
@@ -887,7 +884,9 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                     obj->flags &= ~_RENDER_ATTR_OPACITY;
                     return;
                 }
-                dsc->opa = (lv_opa_t)((float)dsc->opa * attr->value.fval);
+                if(!(obj->flags & _RENDER_ATTR_OPACITY)) {
+                    dsc->opa = (lv_opa_t)((float)dsc->opa * attr->value.fval);
+                }
                 obj->flags |= _RENDER_ATTR_OPACITY;
             }
             break;
