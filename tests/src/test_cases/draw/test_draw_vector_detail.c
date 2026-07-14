@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 #include "src/misc/cache/instance/lv_image_cache.h"
 #include "unity/unity.h"
 
@@ -250,6 +251,85 @@ void test_draw_arc_path(void)
     draw_snapshot(SNAPSHOT_NAME(arc_path));
 
     /* Cleanup */
+    lv_vector_path_delete(path);
+    lv_draw_vector_dsc_delete(ctx);
+}
+
+void test_draw_vector_opacity_modulation(void)
+{
+    lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(&layer);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+
+    /* draw a filled rect with full fill opacity but 50% context opacity */
+    lv_draw_vector_dsc_set_fill_color(ctx, lv_color_make(0xFF, 0x00, 0x00));
+    lv_draw_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
+    lv_draw_vector_dsc_set_stroke_color(ctx, lv_color_make(0x00, 0x00, 0xFF));
+    lv_draw_vector_dsc_set_stroke_opa(ctx, LV_OPA_COVER);
+    lv_draw_vector_dsc_set_stroke_width(ctx, 5.0f);
+    ctx->ctx->opa = LV_OPA_50;
+
+    lv_area_t rect = {50, 50, 200, 200};
+    lv_vector_path_append_rect(path, &rect, 0, 0);
+    lv_draw_vector_dsc_add_path(ctx, path);
+
+    /* draw a second rect with full opacity for comparison */
+    lv_vector_path_clear(path);
+    ctx->ctx->opa = LV_OPA_COVER;
+    lv_area_t rect2 = {250, 50, 400, 200};
+    lv_vector_path_append_rect(path, &rect2, 0, 0);
+    lv_draw_vector_dsc_add_path(ctx, path);
+
+    draw_vector(ctx);
+    draw_snapshot(SNAPSHOT_NAME(opacity_modulation));
+
+    lv_vector_path_delete(path);
+    lv_draw_vector_dsc_delete(ctx);
+}
+
+void test_draw_vector_opacity_zero(void)
+{
+    lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(&layer);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+
+    /* set context opacity to 0 — both fill and stroke should become fully transparent */
+    lv_draw_vector_dsc_set_fill_color(ctx, lv_color_make(0xFF, 0x00, 0x00));
+    lv_draw_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
+    lv_draw_vector_dsc_set_stroke_color(ctx, lv_color_make(0x00, 0x00, 0xFF));
+    lv_draw_vector_dsc_set_stroke_opa(ctx, LV_OPA_COVER);
+    lv_draw_vector_dsc_set_stroke_width(ctx, 5.0f);
+    ctx->ctx->opa = LV_OPA_0;
+
+    lv_area_t rect = {50, 50, 200, 200};
+    lv_vector_path_append_rect(path, &rect, 0, 0);
+    lv_draw_vector_dsc_add_path(ctx, path);
+
+    /* result should be a blank white canvas */
+    draw_vector(ctx);
+    draw_snapshot(SNAPSHOT_NAME(opacity_zero));
+
+    lv_vector_path_delete(path);
+    lv_draw_vector_dsc_delete(ctx);
+}
+
+void test_draw_vector_opacity_full(void)
+{
+    lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(&layer);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+
+    /* default ctx->opa should be LV_OPA_COVER (255) — verify it doesn't alter rendering */
+    TEST_ASSERT_EQUAL_UINT8(LV_OPA_COVER, ctx->ctx->opa);
+
+    lv_draw_vector_dsc_set_fill_color(ctx, lv_color_make(0x00, 0xFF, 0x00));
+    lv_draw_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
+    lv_draw_vector_dsc_set_stroke_opa(ctx, LV_OPA_0);
+
+    lv_area_t rect = {50, 50, 200, 200};
+    lv_vector_path_append_rect(path, &rect, 0, 0);
+    lv_draw_vector_dsc_add_path(ctx, path);
+
+    draw_vector(ctx);
+    draw_snapshot(SNAPSHOT_NAME(opacity_full));
+
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(ctx);
 }

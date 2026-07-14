@@ -717,6 +717,104 @@ void test_draw_svg(void)
     draw_snapshot(SNAPSHOT_NAME(svg_viewport_3));
     lv_svg_node_delete(svg);
 }
+
+void test_draw_svg_opacity(void)
+{
+    lv_svg_render_init(&hal);
+
+    /* opacity on individual shapes */
+    const char * svg_opa_1 = \
+                             "<svg width=\"480\" height=\"480\">"
+                             "<rect fill=\"red\" x=\"50\" y=\"50\" width=\"150\" height=\"150\" opacity=\"0.5\"/>"
+                             "<circle fill=\"blue\" cx=\"300\" cy=\"125\" r=\"75\" opacity=\"0.5\"/>"
+                             "<rect fill=\"green\" x=\"50\" y=\"250\" width=\"150\" height=\"150\"/>"
+                             "</svg>";
+
+    lv_svg_node_t * svg = lv_svg_load_data(svg_opa_1, lv_strlen(svg_opa_1));
+    TEST_ASSERT_NOT_EQUAL(NULL, svg);
+    draw_svg(svg);
+    draw_snapshot(SNAPSHOT_NAME(svg_opa_1));
+    lv_svg_node_delete(svg);
+
+    /* opacity on stroked shape */
+    const char * svg_opa_2 = \
+                             "<svg width=\"480\" height=\"480\">"
+                             "<rect fill=\"none\" stroke=\"red\" stroke-width=\"10\""
+                             " x=\"50\" y=\"50\" width=\"150\" height=\"150\" opacity=\"0.5\"/>"
+                             "<rect fill=\"none\" stroke=\"red\" stroke-width=\"10\""
+                             " x=\"250\" y=\"50\" width=\"150\" height=\"150\"/>"
+                             "</svg>";
+
+    svg = lv_svg_load_data(svg_opa_2, lv_strlen(svg_opa_2));
+    TEST_ASSERT_NOT_EQUAL(NULL, svg);
+    draw_svg(svg);
+    draw_snapshot(SNAPSHOT_NAME(svg_opa_2));
+    lv_svg_node_delete(svg);
+}
+
+void test_draw_svg_opacity_inherit(void)
+{
+    lv_svg_render_init(&hal);
+
+    /* child with opacity="inherit" should use parent group opacity */
+    const char * svg_opa_inh = \
+                               "<svg width=\"480\" height=\"480\">"
+                               "<g opacity=\"0.5\">"
+                               "<rect fill=\"red\" x=\"50\" y=\"50\" width=\"150\" height=\"150\" opacity=\"inherit\"/>"
+                               "</g>"
+                               "<rect fill=\"red\" x=\"250\" y=\"50\" width=\"150\" height=\"150\"/>"
+                               "</svg>";
+
+    lv_svg_node_t * svg = lv_svg_load_data(svg_opa_inh, lv_strlen(svg_opa_inh));
+    TEST_ASSERT_NOT_EQUAL(NULL, svg);
+    draw_svg(svg);
+    draw_snapshot(SNAPSHOT_NAME(svg_opa_inh));
+    lv_svg_node_delete(svg);
+}
+
+void test_draw_svg_group_opacity(void)
+{
+    lv_svg_render_init(&hal);
+
+    /* group-level opacity applies to all children */
+    const char * svg_grp_opa = \
+                               "<svg width=\"480\" height=\"480\">"
+                               "<g opacity=\"0.5\">"
+                               "<rect fill=\"red\" x=\"50\" y=\"50\" width=\"150\" height=\"150\"/>"
+                               "<circle fill=\"blue\" cx=\"300\" cy=\"125\" r=\"75\"/>"
+                               "</g>"
+                               "<rect fill=\"green\" x=\"50\" y=\"280\" width=\"150\" height=\"150\"/>"
+                               "</svg>";
+
+    lv_svg_node_t * svg = lv_svg_load_data(svg_grp_opa, lv_strlen(svg_grp_opa));
+    TEST_ASSERT_NOT_EQUAL(NULL, svg);
+    draw_svg(svg);
+    draw_snapshot(SNAPSHOT_NAME(svg_grp_opa));
+    lv_svg_node_delete(svg);
+}
+
+void test_draw_svg_opacity_combined(void)
+{
+    lv_svg_render_init(&hal);
+
+    /* opacity combined with fill-opacity — per SVG spec these multiply:
+     * effective fill opa = opacity * fill-opacity = 0.5 * 0.5 = 0.25 */
+    const char * svg_opa_comb = \
+                                "<svg width=\"480\" height=\"480\">"
+                                "<rect fill=\"red\" x=\"50\" y=\"50\" width=\"150\" height=\"150\""
+                                " opacity=\"0.5\" fill-opacity=\"0.5\"/>"
+                                "<rect fill=\"red\" x=\"250\" y=\"50\" width=\"150\" height=\"150\""
+                                " fill-opacity=\"0.25\"/>"
+                                "<rect fill=\"red\" x=\"50\" y=\"280\" width=\"150\" height=\"150\"/>"
+                                "</svg>";
+
+    lv_svg_node_t * svg = lv_svg_load_data(svg_opa_comb, lv_strlen(svg_opa_comb));
+    TEST_ASSERT_NOT_EQUAL(NULL, svg);
+    draw_svg(svg);
+    draw_snapshot(SNAPSHOT_NAME(svg_opa_comb));
+    lv_svg_node_delete(svg);
+}
+
 #else
 
 void test_draw_svg(void)
