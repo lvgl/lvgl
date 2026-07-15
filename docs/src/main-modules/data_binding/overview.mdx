@@ -87,7 +87,7 @@ lv_label_bind_text(label_1, subject_1, "%d °C");
 lv_dropdown_bind_value(dropdown_1, &subject_2);
 ```
 
-When the subjects are needed they can be deleted or deinitialized:
+When the subjects are no longer needed they can be deleted or deinitialized:
 ```c
 /*If it was created with lv_subject_create()*/
 lv_subject_delete(subject_1);
