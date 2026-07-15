@@ -31,7 +31,7 @@ static char prev_buf[32];
 lv_subject_init_string(&title, buf, prev_buf, sizeof(buf), "Hello");
 ```
 
-The remaining types work the same way with <ApiLink name="lv_subject_init_float" display="lv_subject_init_float()" />,
+The remaining types work the same way with <ApiLink name="lv_subject_init_float" display="lv_subject_init_float()" /> (requires <ApiLink name="LV_USE_FLOAT"/>),
 <ApiLink name="lv_subject_init_pointer" display="lv_subject_init_pointer()" /> and
 <ApiLink name="lv_subject_init_color" display="lv_subject_init_color()" />.
 
@@ -40,6 +40,8 @@ If you'd rather keep a Subject on the heap instead of in a static variable,
 initializes one of the given type, and
 <ApiLink name="lv_subject_delete" display="lv_subject_delete(subject)" /> frees it
 again.
+The Subject is initialized with a zero default value (0 for int, 0.0 for float, `NULL` for pointer, black for color, no buffer for string, no list for groups)
+For string <ApiLink name="lv_subject_set_buf"/>, for groups <ApiLink name="lv_subject_set_group_list"/> should be called to set the buffer(s) or list.
 
 ## Reading and Writing the Value
 
@@ -58,7 +60,7 @@ Strings are copied into the Subject's own buffer, so update them with
 lv_subject_copy_string(&title, "Settings");
 ```
 
-Every type also has a `lv_subject_get_previous_...()` function (e.g.
+Every type (except groups) also has a `lv_subject_get_previous_...()` function (e.g.
 <ApiLink name="lv_subject_get_previous_int" />) that returns the value from before the
 last change, which is handy when a callback needs to compare old and new.
 
@@ -110,13 +112,15 @@ Other ready-made actions:
 
 - <ApiLink name="lv_obj_add_subject_increment_event" display="lv_obj_add_subject_increment_event(obj, &subject, trigger, step)" />
   adds `step` to the value (use a negative `step` to subtract). It returns a
-  descriptor you can bound further with
-  <ApiLink name="lv_obj_set_subject_increment_event_min_value" display="lv_obj_set_subject_increment_event__min_value()" />,
-  <ApiLink name="lv_obj_set_subject_increment_event_max_value" display="lv_obj_set_subject_increment_event__max_value()" /> and
-  <ApiLink name="lv_obj_set_subject_increment_event_rollover" display="lv_obj_set_subject_increment_event__rollover()" />.
+  descriptor you can adjust further with
+  <ApiLink name="lv_obj_set_subject_increment_event_min_value" display="lv_obj_set_subject_increment_event_min_value()" />,
+  <ApiLink name="lv_obj_set_subject_increment_event_max_value" display="lv_obj_set_subject_increment_event_max_value()" /> and
+  <ApiLink name="lv_obj_set_subject_increment_event_rollover" display="lv_obj_set_subject_increment_event_rollover()" />.
 - <ApiLink name="lv_obj_add_subject_set_int_event" display="lv_obj_add_subject_set_int_event()" />
   and <ApiLink name="lv_obj_add_subject_set_string_event" display="lv_obj_add_subject_set_string_event()" />
   write a fixed value on the trigger.
 
-These events stay attached to the Widget and are **not** removed when the Subject is
-de-initialized.
+<Callout type="warning">
+Do not de-initialize or delete a Subject while these events remain attached as their callbacks saved a pointer to the Subject.
+</Callout>
+

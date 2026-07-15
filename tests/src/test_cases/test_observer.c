@@ -444,12 +444,20 @@ void test_observer_color(void)
 }
 
 static int32_t group_observer_called;
+static int32_t group_value_sum;
 
 static void group_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(observer);
     LV_UNUSED(subject);
     group_observer_called++;
+
+    group_value_sum = 0;
+    uint32_t i;
+    for(i = 0; i < subject->size; i++) {
+        lv_subject_t * sub = ((lv_subject_t **)(subject->value.pointer))[i];
+        group_value_sum += lv_subject_get_int(sub);
+    }
 }
 
 void test_observer_group(void)
@@ -457,10 +465,16 @@ void test_observer_group(void)
     static lv_subject_t subject_main;
     static lv_subject_t subject_sub1;
     static lv_subject_t subject_sub2;
+    static lv_subject_t subject_sub3;
+    static lv_subject_t subject_sub4;
+    static lv_subject_t subject_sub5;
     static lv_subject_t * subject_list[2] = { &subject_sub1, &subject_sub2 };
 
     lv_subject_init_int(&subject_sub1, 1);
     lv_subject_init_int(&subject_sub2, 2);
+    lv_subject_init_int(&subject_sub3, 3);
+    lv_subject_init_int(&subject_sub4, 4);
+    lv_subject_init_int(&subject_sub5, 5);
 
     lv_subject_init_group(&subject_main, subject_list, 2);
     TEST_ASSERT_EQUAL_PTR(&subject_sub1,
@@ -475,12 +489,36 @@ void test_observer_group(void)
     group_observer_called = 0;
     lv_subject_add_observer(&subject_main, group_observer_cb, NULL);
     TEST_ASSERT_EQUAL(1, group_observer_called);
+    TEST_ASSERT_EQUAL(1 + 2, group_value_sum);
 
     lv_subject_set_int(&subject_sub1, 10);
     TEST_ASSERT_EQUAL(2, group_observer_called);
+    TEST_ASSERT_EQUAL(10 + 2, group_value_sum);
 
     lv_subject_set_int(&subject_sub2, 20);
     TEST_ASSERT_EQUAL(3, group_observer_called);
+    TEST_ASSERT_EQUAL(10 + 20, group_value_sum);
+
+
+    static lv_subject_t * subject_list_new[3] = { &subject_sub3, &subject_sub4, &subject_sub5 };
+    lv_subject_set_group_list(&subject_main, subject_list_new, 3);
+    TEST_ASSERT_EQUAL_PTR(&subject_sub3,
+                          lv_subject_get_group_element(&subject_main, 0));
+    TEST_ASSERT_EQUAL_PTR(&subject_sub4,
+                          lv_subject_get_group_element(&subject_main, 1));
+    TEST_ASSERT_EQUAL_PTR(&subject_sub5,
+                          lv_subject_get_group_element(&subject_main, 2));
+    TEST_ASSERT_EQUAL_PTR(NULL,
+                          lv_subject_get_group_element(&subject_main, 3));
+
+    group_observer_called = 0;
+    lv_subject_set_int(&subject_sub2, 10000); /* This should not trigger the group observer callback */
+    TEST_ASSERT_EQUAL(0, group_observer_called);
+    TEST_ASSERT_EQUAL(3 + 4 + 5, group_value_sum);
+
+    lv_subject_set_int(&subject_sub5, 50);
+    TEST_ASSERT_EQUAL(1, group_observer_called);
+    TEST_ASSERT_EQUAL(3 + 4 + 50, group_value_sum);
 }
 
 void test_observer_obj_flag_invalid_subject(void)

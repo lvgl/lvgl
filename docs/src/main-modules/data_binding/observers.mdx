@@ -28,11 +28,8 @@ lv_subject_add_observer(&temperature, temperature_cb, NULL);
 ```
 
 Often the Observer needs to update a specific object. Pass a Widget with
-<ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj()" />
-(or any other pointer with
-<ApiLink name="lv_subject_add_observer_with_target" display="lv_subject_add_observer_with_target()" />),
-then read it back in the callback with
-<ApiLink name="lv_observer_get_target_obj" display="lv_observer_get_target_obj()" />:
+<ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj()" />,
+then read it back in the callback with <ApiLink name="lv_observer_get_target_obj" display="lv_observer_get_target_obj()" />.
 
 ```c
 lv_subject_add_observer_obj(&temperature, label_cb, my_label, NULL);
@@ -44,10 +41,13 @@ static void label_cb(lv_observer_t * observer, lv_subject_t * subject)
 }
 ```
 
+In a generic case any other pointer can be passed as target with
+<ApiLink name="lv_subject_add_observer_with_target" display="lv_subject_add_observer_with_target()" /> and the
+target can be read back with <ApiLink name="lv_observer_get_target_obj" display="lv_observer_get_target()" />.
+
 ## Unsubscribing
 
-An Observer bound to a Widget is removed automatically when that Widget is deleted,
-so most of the time you don't need to do anything. Otherwise:
+An Observer bound to a Widget using <ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj()" /> is removed automatically when that Widget is deleted, so in this case you don't need to do anything. Otherwise:
 
 - <ApiLink name="lv_observer_remove" display="lv_observer_remove(observer)" /> removes a
   single Observer (use the pointer returned when subscribing).
