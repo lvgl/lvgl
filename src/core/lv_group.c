@@ -253,7 +253,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
     LV_LL_READ(&g->obj_ll, i) {
         if(*i == obj) {
             if(g->obj_focus != NULL) {
-                if(*g->obj_focus == obj) break;  // Refocusing same object
+                if(*g->obj_focus == obj) break;  /*Refocusing same object*/
                 lv_result_t res = lv_obj_send_event(*g->obj_focus, LV_EVENT_DEFOCUSED, get_indev(g));
                 if(res != LV_RESULT_OK) return;
                 lv_obj_invalidate(*g->obj_focus);

@@ -433,6 +433,7 @@ void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
     pinyin_ime->kb = kb;
+    lv_obj_null_on_delete(&pinyin_ime->kb);
     lv_obj_set_parent(obj, lv_obj_get_parent(kb));
     lv_obj_set_parent(pinyin_ime->cand_panel, lv_obj_get_parent(kb));
     lv_obj_add_event_cb(pinyin_ime->kb, lv_ime_pinyin_kb_event, LV_EVENT_VALUE_CHANGED, obj);
@@ -546,6 +547,7 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
 
     /* Init pinyin_ime->cand_panel */
     pinyin_ime->cand_panel = lv_buttonmatrix_create(lv_obj_get_parent(obj));
+    lv_obj_null_on_delete(&pinyin_ime->cand_panel);
     lv_buttonmatrix_set_map(pinyin_ime->cand_panel, (const char **)lv_btnm_def_pinyin_sel_map);
     lv_obj_set_size(pinyin_ime->cand_panel, LV_PCT(100), LV_PCT(5));
     lv_obj_set_hidden(pinyin_ime->cand_panel, true);
@@ -595,11 +597,11 @@ static void lv_ime_pinyin_destructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    if(lv_obj_is_valid(pinyin_ime->kb))
-        lv_obj_delete(pinyin_ime->kb);
+    lv_obj_delete(pinyin_ime->kb);
+    pinyin_ime->kb = NULL;
 
-    if(lv_obj_is_valid(pinyin_ime->cand_panel))
-        lv_obj_delete(pinyin_ime->cand_panel);
+    lv_obj_delete(pinyin_ime->cand_panel);
+    pinyin_ime->cand_panel = NULL;
 
 #if LV_IME_PINYIN_USE_K9_MODE
     lv_ll_clear(&pinyin_ime->k9_legal_py_ll);

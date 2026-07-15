@@ -1571,7 +1571,7 @@
 #endif
 
 /** If enabled, LV_CHECK_OBJ will also verify that the object has the expected class.
- * When disabled the class check is skipped even if the class argument is supplied.
+ * When disabled the class check is skipped (LV_CHECK_OBJ collapses to a NULL check).
  * Requires LV_USE_CHECK_ARG to be enabled. */
 #ifndef LV_USE_CHECK_OBJ_CLASSTYPE
     #ifdef CONFIG_LV_USE_CHECK_OBJ_CLASSTYPE
@@ -1582,14 +1582,27 @@
 #endif
 
 /** If enabled, LV_CHECK_OBJ will also verify that the object is still part of the
- * widget tree (lv_obj_is_valid). When disabled the validity check is skipped even
- * if the associated argument is supplied.
+ * widget tree (lv_obj_is_in_widget_tree). When disabled the validity check is skipped
+ * (only the class/NULL check remains).
  * Requires LV_USE_CHECK_ARG to be enabled. */
 #ifndef LV_USE_CHECK_OBJ_VALIDITY
     #ifdef CONFIG_LV_USE_CHECK_OBJ_VALIDITY
         #define LV_USE_CHECK_OBJ_VALIDITY CONFIG_LV_USE_CHECK_OBJ_VALIDITY
     #else
         #define LV_USE_CHECK_OBJ_VALIDITY 0
+    #endif
+#endif
+
+/** If enabled, lv_obj_is_in_widget_tree will verify — while walking up the parent chain —
+ * that each parent's children array actually contains the child.
+ * This catches corruption where a child's parent pointer disagrees with the
+ * parent's children list. Slower than the basic reachability check (O(siblings)
+ * per level instead of O(1)). Requires LV_USE_CHECK_OBJ_VALIDITY to have effect. */
+#ifndef LV_USE_CHECK_OBJ_PARENT_LINK
+    #ifdef CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
+        #define LV_USE_CHECK_OBJ_PARENT_LINK CONFIG_LV_USE_CHECK_OBJ_PARENT_LINK
+    #else
+        #define LV_USE_CHECK_OBJ_PARENT_LINK 0
     #endif
 #endif
 
