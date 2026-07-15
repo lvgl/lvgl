@@ -228,11 +228,9 @@ Any number of Observers can be created and be associated with a Widget this way.
 
 A copy of the pointer to the Widget can be retrieved by calling
 <ApiLink name="lv_observer_get_target_obj" display="lv_observer_get_target_obj(observer)" />, e.g. inside the callback function.
-Note that this function returns the stored pointer as a `lv_obj_t *` type, as
-opposed to the `void *` type returned by
-<ApiLink name="lv_observer_get_target_obj" display="lv_observer_get_target_obj(observer)" />.
-(<ApiLink name="lv_observer_get_target" display="lv_observer_get_target(observer)" /> can still be used if you need that
-pointer as a `void *` type for any reason, but in practice, this would be rare.)
+This returns the stored pointer as an `lv_obj_t *`, as opposed to the `void *`
+returned by <ApiLink name="lv_observer_get_target" display="lv_observer_get_target(observer)" /> (which can still be used if
+you need a `void *` for any reason, but in practice this is rare).
 
 ##### Unsubscribing from a Subject
 
@@ -321,86 +319,44 @@ static void all_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 ### Widget Binding
 
-The following methods of subscribing to an integer-type Subject associate the
-Observer with ONE of a Widget's properties as thought that property itself were the
-Observer.  Any of the following Widget properties can be thus bound to an Subject's
-integer value:
+Besides subscribing manually, a Widget's property can be bound directly to a
+Subject. Any number of bindings can be created for one Widget, and — like
+<ApiLink name="lv_subject_add_observer_obj" /> — each one is removed automatically
+when the Widget is deleted.
 
-- flag (or OR-ed combination of flags) from from the `LV_OBJ_FLAG_...` enumeration values;
-- state (or OR-ed combination of states) from the `LV_STATE_...` enumeration values;
-- text and/or integer values for
-    - Label
-    - Span;
-    - Arc
-    - Drop-Down
-    - Roller
-    - Slider
-    - Scale Section Min/Max values
+Flags, states, and the checked state are covered below. Values (a Label's text, an
+Arc / Slider / Roller / Drop-Down value, a Scale Section's min/max) are covered in
+the "Data binding" section of each widget's documentation, e.g.
+[Data binding for lv_label](/widgets/label).
 
-Any number of Observers can be created for a single Widget, each bound to ONE of
-the above properties.
+#### Flags and States
 
-For all of the `lv_..._bind_...()` functions covered below, they are similar to
-<ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj(&some_subject, some_observer_cb, widget, user_data)" />
-in that they create an Observer and associates the Widget with it.  What is different
-is that updates to the Widget's property thus bound are handled internally -- the
-user *does not supply callback functions* for any of these subscribing methods -- the
-callback methods are supplied by the Observer subsystem.
+To drive a Widget's flag from a boolean Subject (a value that is only ever `0` or
+non-zero), use <ApiLink name="lv_obj_bind_bool" />. The callback receives the value
+as a `bool`, so a dedicated per-flag setter can be passed directly:
 
-<Callout type="info">
-While the examples below show saving a reference to the created Observer objects
-for the various `lv_..._bind_...()` functions, it is not necessary to do so
-unless you need them for some purpose, because the created Observer objects will
-be automatically deleted when the Widget is deleted.
+```c
+lv_obj_bind_bool(widget, &subject, lv_obj_set_hidden);   /* hidden while non-zero */
+```
+
+For a state, or when the Subject must be compared to a reference value, add a custom
+Observer with <ApiLink name="lv_subject_add_observer_obj" /> and set the flag/state
+yourself:
+
+```c
+static void disabled_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * obj = lv_observer_get_target_obj(observer);
+    lv_obj_set_state(obj, LV_STATE_DISABLED, lv_subject_get_int(subject) > 80);
+}
+
+lv_subject_add_observer_obj(&subject, disabled_observer_cb, widget, NULL);
+```
+
+<Callout type="warning">
+The `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` functions are
+**deprecated** in favor of the two approaches above.
 </Callout>
-
-##### Any Widget Type
-
-#### Flags
-
-The following methods of subscribing to an integer Subject affect a Widget's flag (or
-OR-ed combination of flags).  When the subscribing occurs, and each time the
-Subject's value is changed thereafter, the Subject's value is compared with the
-specified reference value, and the specified flag(s) is (are):
-
-- SET when the Subject's integer value fulfills the indicated condition, and
-- CLEARED otherwise.
-
-Here are the functions that carry out this method of subscribing to a Subject.  The
-`flags` argument can contain a single, or bit-wise OR-ed combination of any of the
-`LV_OBJ_FLAG_...` enumeration values.
-
-| Field | Description |
-|-------|-------------|
-| `equal` | <ApiLink name="lv_obj_bind_flag_if_eq" display="lv_obj_bind_flag_if_eq(widget, &subject, flags, ref_value)" /> |
-| `not equal` | <ApiLink name="lv_obj_bind_flag_if_not_eq" display="lv_obj_bind_flag_if_not_eq(widget, &subject, flags, ref_value)" /> |
-| `greater than` | <ApiLink name="lv_obj_bind_flag_if_gt" display="lv_obj_bind_flag_if_gt(widget, &subject, flags, ref_value)" /> |
-| `greater than or equal` | <ApiLink name="lv_obj_bind_flag_if_ge" display="lv_obj_bind_flag_if_ge(widget, &subject, flags, ref_value)" /> |
-| `less than` | <ApiLink name="lv_obj_bind_flag_if_lt" display="lv_obj_bind_flag_if_lt(widget, &subject, flags, ref_value)" /> |
-| `less than or equal` | <ApiLink name="lv_obj_bind_flag_if_le" display="lv_obj_bind_flag_if_le(widget, &subject, flags, ref_value)" /> |
-
-#### States
-
-The following methods of subscribing to an integer Subject affect a Widget's states
-(or OR-ed combination of states).  When the subscribing occurs, and each time the
-Subject's value is changed thereafter, the Subject's value is compared with the
-specified reference value, and the specified state(s) is (are):
-
-- SET when the Subject's integer value fulfills the indicated condition, and
-- CLEARED otherwise.
-
-Here are the functions that carry out this method of subscribing to a Subject.  The
-`states` argument can contain a single, or bit-wise OR-ed combination of any of the
-`LV_STATE_...` enumeration values.
-
-| Field | Description |
-|-------|-------------|
-| `equal` | <ApiLink name="lv_obj_bind_state_if_eq" display="lv_obj_bind_state_if_eq(widget, &subject, states, ref_value)" /> |
-| `not equal` | <ApiLink name="lv_obj_bind_state_if_not_eq" display="lv_obj_bind_state_if_not_eq(widget, &subject, states, ref_value)" /> |
-| `greater than` | <ApiLink name="lv_obj_bind_state_if_gt" display="lv_obj_bind_state_if_gt(widget, &subject, states, ref_value)" /> |
-| `greater than or equal` | <ApiLink name="lv_obj_bind_state_if_ge" display="lv_obj_bind_state_if_ge(widget, &subject, states, ref_value)" /> |
-| `less than` | <ApiLink name="lv_obj_bind_state_if_lt" display="lv_obj_bind_state_if_lt(widget, &subject, states, ref_value)" /> |
-| `less than or equal` | <ApiLink name="lv_obj_bind_state_if_le" display="lv_obj_bind_state_if_le(widget, &subject, states, ref_value)" /> |
 
 #### Checked State
 
@@ -418,11 +374,6 @@ programmatic) interaction with the Widget that causes its
 Subject's value to be set to `1` or `0` respectively.
 
 - <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked(widget, &subject)" />
-
-##### Specific Widget Types
-
-To learn how to bind subjects to Arcs, Labels, Sliders, etc. visit the "Data binding"
-section of the given widget's documentation. For example: [Data binding for lv_label](/widgets/label).
 
 ### Change Subject on Event
 

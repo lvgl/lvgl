@@ -46,8 +46,15 @@ reference value — perfect for theme switches and "mode" toggles. See the
 underlying mechanism.
 
 - <ApiLink name="lv_obj_bind_style" display="lv_obj_bind_style(obj, &style, selector, &subject, ref_value)" />
-- <ApiLink name="lv_obj_bind_flag_if_eq" display="lv_obj_bind_flag_if_eq(obj, &subject, flag, ref_value)" /> and the matching `_not_eq`/`_gt`/`_ge`/`_lt`/`_le` variants
-- <ApiLink name="lv_obj_bind_state_if_eq" display="lv_obj_bind_state_if_eq(obj, &subject, state, ref_value)" /> and the matching `_not_eq`/`_gt`/`_ge`/`_lt`/`_le` variants
+- <ApiLink name="lv_obj_bind_bool" display="lv_obj_bind_bool(obj, &subject, set_flag_cb)" /> — drive a flag from a boolean Subject; a per-flag setter such as `lv_obj_set_hidden` can be passed directly
+- <ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj(&subject, observer_cb, obj, user_data)" /> — for a state, or when the Subject must be compared against a reference value
+
+<Callout type="warning">
+The `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` families are
+**deprecated**. Use <ApiLink name="lv_obj_bind_bool" /> for a boolean Subject, or
+<ApiLink name="lv_subject_add_observer_obj" /> with a custom Observer for a
+comparison. See the [Observer](/main-modules/observer/observer) page for details.
+</Callout>
 
 <LvglExample name="lv_example_obj_bind_style" path="widgets/obj/lv_example_obj_bind_style" />
 
