@@ -74,7 +74,7 @@
   - 30개 이상의 내장 [위젯](https://lvgl.io/docs/open/widgets): Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table 등 다수.
   - 어떤 상태에서든 위젯의 모든 부분을 커스터마이징할 수 있는 100개 이상의 스타일 속성을 갖춘 유연한 [스타일 시스템](https://lvgl.io/docs/open/common-widget-features/styles).
   - 위젯의 크기와 위치를 반응형으로 자동 조정하는 [Flexbox](https://lvgl.io/docs/open/common-widget-features/layouts/flex) 및 [Grid](https://lvgl.io/docs/open/common-widget-features/layouts/grid) 유사 레이아웃 엔진.
-  - UI를 애플리케이션과 손쉽게 연결하는 [데이터 바인딩](https://lvgl.io/docs/open/main-modules/observer).
+  - UI를 애플리케이션과 손쉽게 연결하는 [데이터 바인딩](https://lvgl.io/docs/open/main-modules/data_binding).
   - Mouse, Touchpad, Keypad, Keyboard, 외부 버튼, Encoder [입력 장치](https://lvgl.io/docs/open/main-modules/indev)를 지원합니다.
   - [다중 디스플레이](https://lvgl.io/docs/open/main-modules/display/overview#how-many-displays-can-lvgl-use) 지원.
 

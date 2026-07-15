@@ -21,7 +21,7 @@ The Base Widget can have:
 - [Layouts](/common-widget-features/layouts)
 - [Styles](/common-widget-features/styles)
 - [Events](/common-widget-features/events)
-- [Data bindings](/main-modules/observer)
+- [Data bindings](/main-modules/data_binding)
 - [Flags](/common-widget-features/flags)
 - [Parts and States](/common-widget-features/parts_and_states)
 - And many more
@@ -42,7 +42,7 @@ Every widget inherits the Base Widget's binding helpers, which let a Subject
 drive styles, flags, or states declaratively. The most common one is
 `bind_style`: attach a named style to a widget only while a Subject equals a
 reference value — perfect for theme switches and "mode" toggles. See the
-[Observer](/main-modules/observer/observer) page for an introduction to the
+[Observer](/main-modules/data_binding/observers) page for an introduction to the
 underlying mechanism.
 
 - <ApiLink name="lv_obj_bind_style" display="lv_obj_bind_style(obj, &style, selector, &subject, ref_value)" />
@@ -53,7 +53,7 @@ underlying mechanism.
 The `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` families are
 **deprecated**. Use <ApiLink name="lv_obj_bind_bool" /> for a boolean Subject, or
 <ApiLink name="lv_subject_add_observer_obj" /> with a custom Observer for a
-comparison. See the [Observer](/main-modules/observer/observer) page for details.
+comparison. See the [Observer](/main-modules/data_binding/observers) page for details.
 </Callout>
 
 <LvglExample name="lv_example_obj_bind_style" path="widgets/obj/lv_example_obj_bind_style" />

@@ -1,0 +1,145 @@
+---
+title: Observers
+description: Learn more about Observers.
+---
+
+An **Observer** watches one [Subject](/main-modules/data_binding/subjects) and runs a
+callback whenever that Subject's value changes. When you subscribe, the callback is
+also called once immediately, so the Observer can pick up the current value right
+away.
+
+A callback always has the same signature:
+
+```c
+static void temperature_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    int32_t t = lv_subject_get_int(subject);
+    LV_LOG_USER("Temperature is now %d", t);
+}
+```
+
+## Subscribing
+
+The simplest way to subscribe is <ApiLink name="lv_subject_add_observer" display="lv_subject_add_observer()" />.
+The third argument is free-form user data passed to the callback:
+
+```c
+lv_subject_add_observer(&temperature, temperature_cb, NULL);
+```
+
+Often the Observer needs to update a specific object. Pass a Widget with
+<ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj()" />
+(or any other pointer with
+<ApiLink name="lv_subject_add_observer_with_target" display="lv_subject_add_observer_with_target()" />),
+then read it back in the callback with
+<ApiLink name="lv_observer_get_target_obj" display="lv_observer_get_target_obj()" />:
+
+```c
+lv_subject_add_observer_obj(&temperature, label_cb, my_label, NULL);
+
+static void label_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * label = lv_observer_get_target_obj(observer);
+    lv_label_set_text_fmt(label, "%d °C", lv_subject_get_int(subject));
+}
+```
+
+## Unsubscribing
+
+An Observer bound to a Widget is removed automatically when that Widget is deleted,
+so most of the time you don't need to do anything. Otherwise:
+
+- <ApiLink name="lv_observer_remove" display="lv_observer_remove(observer)" /> removes a
+  single Observer (use the pointer returned when subscribing).
+- <ApiLink name="lv_obj_remove_from_subject" display="lv_obj_remove_from_subject(widget, subject)" />
+  removes a Widget's Observers (`subject` may be `NULL` to detach from all).
+- <ApiLink name="lv_subject_deinit" display="lv_subject_deinit(subject)" /> disconnects a
+  Subject from all of its Observers.
+
+## Binding a Widget to a Subject
+
+Besides subscribing by hand, a Widget's property can be bound to a Subject directly.
+Each binding is just an Observer, so it too is removed automatically when the Widget
+is deleted.
+
+### Flags
+
+To drive a flag from a `0`/non-zero Subject, use
+<ApiLink name="lv_obj_bind_bool" display="lv_obj_bind_bool()" />. Because the callback
+takes a `bool`, a dedicated per-flag setter can be passed straight in:
+
+```c
+lv_obj_bind_bool(widget, &subject, lv_obj_set_hidden);   /* hidden while non-zero */
+```
+
+### States
+
+There's no dedicated setter for a state, and states often depend on a comparison, so
+bind them with a small Observer of your own:
+
+```c
+static void disabled_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * obj = lv_observer_get_target_obj(observer);
+    lv_obj_set_state(obj, LV_STATE_DISABLED, lv_subject_get_int(subject) > 80);
+}
+
+lv_subject_add_observer_obj(&subject, disabled_cb, widget, NULL);
+```
+
+<Callout type="warning">
+The older `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` functions are
+**deprecated** in favor of the two approaches above.
+</Callout>
+
+### Checked state
+
+<ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked()" /> creates a
+**two-way** binding: the Widget's checked state follows the Subject (checked while
+non-zero), and clicking the Widget writes `1` or `0` back to the Subject.
+
+```c
+lv_obj_bind_checked(checkbox, &subject);
+```
+
+<LvglExample name="lv_example_checkbox_bind_checked" path="widgets/checkbox/lv_example_checkbox_bind_checked" />
+
+### Widget values
+
+A Widget's main value or text is bound with the widget's own `lv_<widget>_bind_...()`
+function, described under "Data binding" on each widget's page. A few examples:
+
+#### Label text
+
+<ApiLink name="lv_label_bind_text" display="lv_label_bind_text()" /> keeps a Label's
+text in sync with a Subject, optionally through a `printf`-style format string.
+
+<LvglExample name="lv_example_label_bind_text" path="widgets/label/lv_example_label_bind_text" />
+
+#### Slider value
+
+<ApiLink name="lv_slider_bind_value" display="lv_slider_bind_value()" /> ties a Slider's
+position to a Subject; dragging the Slider updates the Subject and vice versa.
+
+<LvglExample name="lv_example_slider_bind_value" path="widgets/slider/lv_example_slider_bind_value" />
+
+#### Arc value
+
+<ApiLink name="lv_arc_bind_value" display="lv_arc_bind_value()" /> keeps an Arc's value
+in sync with a Subject.
+
+<LvglExample name="lv_example_arc_bind_value" path="widgets/arc/lv_example_arc_bind_value" />
+
+#### Drop-down value
+
+<ApiLink name="lv_dropdown_bind_value" display="lv_dropdown_bind_value()" /> binds the
+selected option's index to a Subject.
+
+<LvglExample name="lv_example_dropdown_bind_value" path="widgets/dropdown/lv_example_dropdown_bind_value" />
+
+#### Roller value
+
+<ApiLink name="lv_roller_bind_value" display="lv_roller_bind_value()" /> binds the
+selected option's index to a Subject.
+
+<LvglExample name="lv_example_roller_bind_value" path="widgets/roller/lv_example_roller_bind_value" />

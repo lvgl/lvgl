@@ -1,0 +1,89 @@
+---
+title: Overview
+description: Get familiar with the data binding concept of LVGL.
+---
+
+## Concept
+
+The `lv_observer` module is an implementation of the Subject-Observer pattern used to
+realize data binding in LVGL.
+
+A **Subject** is a value being "observed", usually a global variable. It can store an
+integer, string, color, or other basic type.
+
+An **Observer** is attached (subscribed) to a Subject and gets notified whenever the
+Subject changes.
+
+This pattern separates the data from the places that consume it. Imagine a Subject
+that stores the temperature of a room: the sensor sets the value and doesn't need to
+know who uses it. Maybe a Label Widget is subscribed to update its text, maybe a popup
+is shown when the temperature is too high, maybe an I/O pin is set to `1` to start
+heating when it drops too low. Each subscriber only has to know that the Subject
+exists; it can subscribe to it and unsubscribe when it is deleted or no longer
+interested.
+
+## Quick Reference
+
+This section shows the basics briefly. Read the other pages in this section to learn
+all the details.
+
+The following Subject types are supported:
+
+- int
+- float (requires `LV_USE_FLOAT`)
+- string
+- color
+- pointer
+
+You can create a Subject in two ways:
+
+```c
+/*Create dynamically*/
+lv_subject_t * subject_1 = lv_subject_create(LV_SUBJECT_TYPE_INT);
+
+/*Or initialize a static/global variable*/
+static lv_subject_t subject_2;
+lv_subject_init_int(&subject_2, 10);   /*10 is the initial value*/
+```
+
+Set a Subject's value like below. This also notifies all subscribed Observers:
+
+```c
+lv_subject_set_int(subject_1, 20);
+```
+
+You can subscribe with an Observer callback:
+
+```c
+void my_observer(lv_observer_t * observer, lv_subject_t * subject)
+{
+    printf("New value: %d\n", lv_subject_get_int(subject));
+}
+
+lv_subject_add_observer(subject_1, my_observer, NULL);   /*3rd arg is optional user data*/
+```
+
+When you subscribe, the callback is called immediately to pick up the current value.
+
+You can also subscribe together with a Widget. This way the Observer is removed
+automatically when the Widget is deleted. This is convenient, because you don't need
+to check whether the Widget still exists. While it exists it gets updated; once deleted
+it unsubscribes itself.
+
+```c
+lv_subject_add_observer_obj(subject_1, my_observer, label_1, NULL);
+```
+
+Some Widgets also offer an API to easily create one- or two-way bindings. For example:
+
+```c
+/*Update the label when the Subject changes, using a format string*/
+lv_label_bind_text(label_1, subject_1, "%d °C");
+
+/*Keep the Subject and the selected drop-down option in sync (two-way)*/
+lv_dropdown_bind_value(dropdown_1, &subject_2);
+```
+
+That's it in short. Continue reading to learn more about
+[Subjects](/main-modules/data_binding/subjects) and
+[Observers](/main-modules/data_binding/observers).

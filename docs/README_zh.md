@@ -68,7 +68,7 @@
   - 30 多种内置[控件](https://lvgl.io/docs/open/widgets)：Button、Label、Slider、Chart、Keyboard、Meter、Arc、Table 等等。
   - 灵活的[样式系统](https://lvgl.io/docs/open/common-widget-features/styles)，拥有 100 多个样式属性，可在任何状态下定制控件的任何部分。
   - 类似 [Flexbox](https://lvgl.io/docs/open/common-widget-features/layouts/flex) 和 [Grid](https://lvgl.io/docs/open/common-widget-features/layouts/grid) 的布局引擎，可自动地响应式调整控件的尺寸和位置。
-  - [数据绑定](https://lvgl.io/docs/open/main-modules/observer)，可轻松将 UI 与应用程序连接起来。
+  - [数据绑定](https://lvgl.io/docs/open/main-modules/data_binding)，可轻松将 UI 与应用程序连接起来。
   - 支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器等[输入设备](https://lvgl.io/docs/open/main-modules/indev)。
   - 支持[多显示屏](https://lvgl.io/docs/open/main-modules/display/overview#how-many-displays-can-lvgl-use)。
 

@@ -67,6 +67,7 @@ struct _lv_subject_t {
     lv_subject_value_t min_value;        /**< Minimum value for min. int or float*/
     lv_subject_value_t max_value;        /**< Maximum value for max. int or float*/
     void * user_data;                    /**< Additional parameter, can be used freely by user */
+
     uint32_t type                 :  4;  /**< One of the LV_SUBJECT_TYPE_... values */
     uint32_t size                 : 24;  /**< String buffer size or group length */
     uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notification,
@@ -128,26 +129,19 @@ typedef void (*lv_obj_set_pointer_t)(lv_obj_t * obj, const void * value);
  * GLOBAL PROTOTYPES
  **********************/
 
-#if LV_USE_EXT_DATA
 /**
- * @brief Attaches external user data to an integer Subject with lifecycle management
- *
- * Associates arbitrary user-defined data with an LVGL observer and registers a destructor
- * callback that will be automatically invoked when the observer is deleted. This enables:
- * - Safe resource cleanup through the destructor mechanism
- * - Contextual data storage for observer callbacks
- * - Proper memory management for observer-related resources
- *
- * @param subject    pointer to Subject
- * @param data       User-defined data pointer to associate @nullable
- * @param free_cb    Cleanup function called when: @nullable
- *                   - Observer is explicitly deleted
- *                   - Observed object is deleted
- *                   - New data replaces current association
- *                   NULL indicates no cleanup required
+ * Create a new Subject of the specified type.
+ * @param type      type of the Subject
+ * @return          pointer to the created Subject
+ * @note            The Subject is allocated on the heap and must be freed with `lv_subject_delete()`.
  */
-void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data));
-#endif
+lv_subject_t * lv_subject_create(lv_subject_type_t type);
+
+/**
+ * Delete a Subject that we created with `lv_subject_create()`.
+ * @param subject   pointer to Subject
+ */
+void lv_subject_delete(lv_subject_t * subject);
 
 /**
  * Initialize an integer-type Subject.
@@ -249,6 +243,15 @@ void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value);
  * @note            A string Subject stores its own copy of the string, not just the pointer.
  */
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value);
+
+/**
+ * Set the buffer(s) for a string-type Subject to store its value.
+ * @param subject   pointer to Subject
+ * @param buf       pointer to buffer to store string
+ * @param prev_buf  pointer to buffer to store previous string; can be NULL if not used
+ * @param size      size of buffer(s)
+ */
+void lv_subject_set_buf(lv_subject_t * subject, char * buf, char * prev_buf, size_t size);
 
 /**
  * Copy a string to a Subject and notify Observers if it changed.
@@ -440,6 +443,28 @@ lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer);
  * @return              void pointer to saved user data
 */
 void * lv_observer_get_user_data(const lv_observer_t * observer);
+
+#if LV_USE_EXT_DATA
+
+/**
+ * @brief Attaches external user data to an integer Subject with lifecycle management
+ *
+ * Associates arbitrary user-defined data with an LVGL observer and registers a destructor
+ * callback that will be automatically invoked when the observer is deleted. This enables:
+ * - Safe resource cleanup through the destructor mechanism
+ * - Contextual data storage for observer callbacks
+ * - Proper memory management for observer-related resources
+ *
+ * @param subject    pointer to Subject
+ * @param data       User-defined data pointer to associate @nullable
+ * @param free_cb    Cleanup function called when: @nullable
+ *                   - Observer is explicitly deleted
+ *                   - Observed object is deleted
+ *                   - New data replaces current association
+ *                   NULL indicates no cleanup required
+ */
+void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data));
+#endif
 
 /**
  * Set Observer's user data.

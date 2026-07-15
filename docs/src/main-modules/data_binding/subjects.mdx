@@ -1,0 +1,122 @@
+---
+title: Subjects
+description: Learn more about Subjects.
+---
+
+A **Subject** is a value you can observe. When you change it, every
+[Observer](/main-modules/data_binding/observers) attached to it is notified
+automatically. A Subject can hold an integer, a float, a string, a pointer, a
+color, or a group of other Subjects.
+
+Keep a Subject in a static or global variable; it has to stay alive as long as
+anything observes it.
+
+## Creating a Subject
+
+Initialize a Subject with the function for its type. The last argument is the
+starting value:
+
+```c
+static lv_subject_t temperature;
+lv_subject_init_int(&temperature, 20);          /* integer, starts at 20 */
+```
+
+Strings need a buffer to live in (and an optional second buffer to remember the
+previous value):
+
+```c
+static lv_subject_t title;
+static char buf[32];
+static char prev_buf[32];
+lv_subject_init_string(&title, buf, prev_buf, sizeof(buf), "Hello");
+```
+
+The remaining types work the same way with <ApiLink name="lv_subject_init_float" display="lv_subject_init_float()" />,
+<ApiLink name="lv_subject_init_pointer" display="lv_subject_init_pointer()" /> and
+<ApiLink name="lv_subject_init_color" display="lv_subject_init_color()" />.
+
+If you'd rather keep a Subject on the heap instead of in a static variable,
+<ApiLink name="lv_subject_create" display="lv_subject_create(type)" /> allocates and
+initializes one of the given type, and
+<ApiLink name="lv_subject_delete" display="lv_subject_delete(subject)" /> frees it
+again.
+
+## Reading and Writing the Value
+
+Write a value with `lv_subject_set_...()`. This notifies the Observers, but only if
+the value actually changed. Read it back with `lv_subject_get_...()`:
+
+```c
+lv_subject_set_int(&temperature, 25);           /* notifies observers */
+int32_t t = lv_subject_get_int(&temperature);   /* -> 25 */
+```
+
+Strings are copied into the Subject's own buffer, so update them with
+<ApiLink name="lv_subject_copy_string" display="lv_subject_copy_string()" />:
+
+```c
+lv_subject_copy_string(&title, "Settings");
+```
+
+Every type also has a `lv_subject_get_previous_...()` function (e.g.
+<ApiLink name="lv_subject_get_previous_int" />) that returns the value from before the
+last change, which is handy when a callback needs to compare old and new.
+
+## Limiting the Range
+
+Integer and float Subjects can be clamped. Out-of-range values are pulled back in
+before the Observers are notified:
+
+```c
+lv_subject_set_min_value_int(&temperature, 0);
+lv_subject_set_max_value_int(&temperature, 100);
+```
+
+## Grouping Several Subjects
+
+Sometimes one thing depends on several values at once. A **group** Subject ties them
+together, so an Observer fires whenever *any* member changes.
+
+```c
+static lv_subject_t * list[3] = {&mode, &value, &unit};
+static lv_subject_t measurement;
+lv_subject_init_group(&measurement, list, 3);
+```
+
+In the callback, reach the members with
+<ApiLink name="lv_subject_get_group_element" display="lv_subject_get_group_element()" />:
+
+```c
+static void measurement_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * label = lv_observer_get_target(observer);
+    int32_t mode      = lv_subject_get_int(lv_subject_get_group_element(subject, 0));
+    int32_t value     = lv_subject_get_int(lv_subject_get_group_element(subject, 1));
+    const char * unit = lv_subject_get_pointer(lv_subject_get_group_element(subject, 2));
+    lv_label_set_text_fmt(label, "%s: %d %s", mode ? "Current" : "Voltage", value, unit);
+}
+```
+
+## Changing a Subject from the UI
+
+Instead of writing an event handler, you can let a Widget update a Subject directly.
+For example, toggle an integer between `0` and `1` when a button is clicked:
+
+```c
+lv_obj_add_subject_toggle_event(button, &enabled, LV_EVENT_CLICKED);
+```
+
+Other ready-made actions:
+
+- <ApiLink name="lv_obj_add_subject_increment_event" display="lv_obj_add_subject_increment_event(obj, &subject, trigger, step)" />
+  adds `step` to the value (use a negative `step` to subtract). It returns a
+  descriptor you can bound further with
+  <ApiLink name="lv_obj_set_subject_increment_event_min_value" display="lv_obj_set_subject_increment_event__min_value()" />,
+  <ApiLink name="lv_obj_set_subject_increment_event_max_value" display="lv_obj_set_subject_increment_event__max_value()" /> and
+  <ApiLink name="lv_obj_set_subject_increment_event_rollover" display="lv_obj_set_subject_increment_event__rollover()" />.
+- <ApiLink name="lv_obj_add_subject_set_int_event" display="lv_obj_add_subject_set_int_event()" />
+  and <ApiLink name="lv_obj_add_subject_set_string_event" display="lv_obj_add_subject_set_string_event()" />
+  write a fixed value on the trigger.
+
+These events stay attached to the Widget and are **not** removed when the Subject is
+de-initialized.

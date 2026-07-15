@@ -174,7 +174,7 @@ used. This is covered below.
 
 Alternately, if you want to bind a Subject's value to a Widget's property, one
 of the `lv_<widget_type>_bind_...()` functions can be used.  See
-[Widget Binding](/main-modules/observer/observer) for more details.
+[Widget Binding](/main-modules/data_binding) for more details.
 
 By using  `lv_obj_add_subject_...()` it's also possible to change a subject's value
 on a trigger. It's covered in [change subject on event](/widgets/scale)
@@ -220,7 +220,7 @@ Subject.  A copy of the pointer to that Widget is saved in the Observer's `targe
 field.  This works exactly like the above method except that when the Widget is
 deleted, the Observer thus created will be automatically unsubscribed from the
 Subject and deleted from the LVGL heap.  Note this is different from
-[Widget Binding](/main-modules/observer/observer).
+[Widget Binding](/main-modules/data_binding).
 
 lv_observer_t * observer =  <ApiLink name="lv_subject_add_observer_obj" display="lv_subject_add_observer_obj(&some_subject, some_observer_cb, widget, user_data)" />
 
@@ -247,7 +247,7 @@ from memory using any of the methods below, depending on the effect you want to 
       from all associated Subjects.
     - <ApiLink name="lv_subject_deinit" display="lv_subject_deinit(subject)" /> gracefully disconnects `subject` from
       all associated Observers and Widget events.  This includes subscriptions made
-      using any of the [Widget Binding](/main-modules/observer/observer) functions covered below.
+      using any of the [Widget Binding](/main-modules/data_binding) functions covered below.
     - <ApiLink name="lv_observer_delete" display="lv_observer_delete(observer)" /> deletes that specific Observer and
       gracefully disconnects it from its `subject` and any associated Widgets,
       where `observer` is the return value any of the above

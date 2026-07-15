@@ -100,15 +100,46 @@ static void set_pointer_observer(lv_observer_t * observer, lv_subject_t * subjec
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if LV_USE_EXT_DATA
-void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
+lv_subject_t * lv_subject_create(lv_subject_type_t type)
 {
-    LV_CHECK_ARG(subject != NULL, return);
+    lv_subject_t * subject = lv_malloc(sizeof(lv_subject_t));
+    LV_ASSERT_MALLOC(subject);
+    if(subject == NULL) return NULL;
 
-    subject->ext_data.data = data;
-    subject->ext_data.free_cb = free_cb;
-}
+    switch(type) {
+        case LV_SUBJECT_TYPE_INT:
+            lv_subject_init_int(subject, 0);
+            break;
+#if LV_USE_FLOAT
+        case LV_SUBJECT_TYPE_FLOAT:
+            lv_subject_init_float(subject, 0.0f);
+            break;
 #endif
+        case LV_SUBJECT_TYPE_STRING:
+            lv_subject_init_string(subject, NULL, NULL, 0, "");
+            break;
+        case LV_SUBJECT_TYPE_POINTER:
+            lv_subject_init_pointer(subject, NULL);
+            break;
+        case LV_SUBJECT_TYPE_COLOR:
+            lv_subject_init_color(subject, lv_color_black());
+            break;
+        default:
+            LV_LOG_WARN("Invalid subject type: %d", type);
+            break;
+    }
+
+    return subject;
+}
+
+void lv_subject_delete(lv_subject_t * subject)
+{
+    if(!subject) {
+        return;
+    }
+    lv_subject_deinit(subject);
+    lv_free(subject);
+}
 
 void lv_subject_init_int(lv_subject_t * subject, int32_t value)
 {
@@ -246,6 +277,21 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
     subject->prev_value.pointer = prev_buf;
 
     lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
+}
+
+void lv_subject_set_buf(lv_subject_t * subject, char * buf, char * prev_buf, size_t size)
+{
+    LV_CHECK_ARG(subject != NULL, return);
+    LV_CHECK_ARG(subject->type == LV_SUBJECT_TYPE_STRING, return);
+    LV_CHECK_ARG(buf != NULL, return);
+    LV_CHECK_ARG(size > 0, return);
+
+    lv_strlcpy(buf, subject->value.pointer, size);
+    lv_strlcpy(prev_buf, subject->prev_value.pointer, size);
+
+    subject->size = (uint32_t)size;
+    subject->value.pointer = buf;
+    subject->prev_value.pointer = prev_buf;
 }
 
 void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
@@ -445,7 +491,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
 
     observer->subject = subject;
     observer->cb = observer_cb;
-    observer->user_data = user_data;
+    observer->user_data.data = user_data;
     observer->target = obj;
     observer->for_obj = 1;
     /* subscribe to delete event of the object */
@@ -474,7 +520,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 
     observer->subject = subject;
     observer->cb = observer_cb;
-    observer->user_data = user_data;
+    observer->user_data.data = user_data;
     observer->target = target;
 
     /* Update Observer immediately. */
@@ -505,7 +551,7 @@ void lv_observer_delete(lv_observer_t * observer)
     lv_ll_remove(&(observer->subject->subs_ll), observer);
 
     if(observer->auto_free_user_data) {
-        lv_free(observer->user_data);
+        lv_free(observer->user_data.data);
     }
     lv_free(observer);
 }
@@ -568,6 +614,16 @@ void lv_subject_notify(lv_subject_t * subject)
         }
     } while(subject->notify_restart_query);
 }
+
+#if LV_USE_EXT_DATA
+void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
+{
+    LV_CHECK_ARG(subject != NULL, return);
+
+    subject->ext_data.data = data;
+    subject->ext_data.free_cb = free_cb;
+}
+#endif
 
 lv_subject_increment_dsc_t * lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject,
                                                                 lv_event_code_t trigger, int32_t step)
@@ -730,7 +786,11 @@ lv_observer_t * lv_obj_bind_bool(lv_obj_t * obj, lv_subject_t * subject, lv_obj_
     LV_CHECK_ARG(subject != NULL, return NULL);
     LV_CHECK_ARG(set_bool_cb != NULL, return NULL);
 
-    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_bool_observer, obj, set_bool_cb);
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_bool_observer, obj, NULL);
+
+    /* Passing a function pointer as void * user_data generates warning so set it here, and call the callback manually */
+    observable->user_data.cb = (void (*)(void))set_bool_cb;
+    set_bool_observer(observable, subject);
     return observable;
 }
 
@@ -740,7 +800,11 @@ lv_observer_t * lv_obj_bind_int(lv_obj_t * obj, lv_subject_t * subject, lv_obj_s
     LV_CHECK_ARG(subject != NULL, return NULL);
     LV_CHECK_ARG(set_int_cb != NULL, return NULL);
 
-    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_int_observer, obj, set_int_cb);
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_int_observer, obj, NULL);
+
+    /* Passing a function pointer as void * user_data generates warning so set it here, and call the callback manually */
+    observable->user_data.cb = (void (*)(void))set_int_cb;
+    set_int_observer(observable, subject);
     return observable;
 }
 
@@ -751,7 +815,11 @@ lv_observer_t * lv_obj_bind_float(lv_obj_t * obj, lv_subject_t * subject, lv_obj
     LV_CHECK_ARG(subject != NULL, return NULL);
     LV_CHECK_ARG(set_float_cb != NULL, return NULL);
 
-    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_float_observer, obj, set_float_cb);
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_float_observer, obj, NULL);
+
+    /* Passing a function pointer as void * user_data generates warning so set it here, and call the callback manually */
+    observable->user_data.cb = (void (*)(void))set_float_cb;
+    set_float_observer(observable, subject);
     return observable;
 }
 #endif
@@ -762,7 +830,11 @@ lv_observer_t * lv_obj_bind_string(lv_obj_t * obj, lv_subject_t * subject, lv_ob
     LV_CHECK_ARG(subject != NULL, return NULL);
     LV_CHECK_ARG(set_string_cb != NULL, return NULL);
 
-    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_string_observer, obj, set_string_cb);
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_string_observer, obj, NULL);
+
+    /* Passing a function pointer as void * user_data generates warning so set it here, and call the callback manually */
+    observable->user_data.cb = (void (*)(void))set_string_cb;
+    set_string_observer(observable, subject);
     return observable;
 }
 
@@ -772,7 +844,11 @@ lv_observer_t * lv_obj_bind_color(lv_obj_t * obj, lv_subject_t * subject, lv_obj
     LV_CHECK_ARG(subject != NULL, return NULL);
     LV_CHECK_ARG(set_color_cb != NULL, return NULL);
 
-    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_color_observer, obj, set_color_cb);
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_color_observer, obj, NULL);
+
+    /* Passing a function pointer as void * user_data generates warning so set it here, and call the callback manually */
+    observable->user_data.cb = (void (*)(void))set_color_cb;
+    set_color_observer(observable, subject);
     return observable;
 }
 
@@ -782,7 +858,11 @@ lv_observer_t * lv_obj_bind_pointer(lv_obj_t * obj, lv_subject_t * subject, lv_o
     LV_CHECK_ARG(subject != NULL, return NULL);
     LV_CHECK_ARG(set_pointer_cb != NULL, return NULL);
 
-    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_pointer_observer, obj, set_pointer_cb);
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, set_pointer_observer, obj, NULL);
+
+    /* Passing a function pointer as void * user_data generates warning so set it here, and call the callback manually */
+    observable->user_data.cb = (void (*)(void))set_pointer_cb;
+    set_pointer_observer(observable, subject);
     return observable;
 }
 
@@ -959,7 +1039,7 @@ void * lv_observer_get_user_data(const lv_observer_t * observer)
 {
     LV_CHECK_ARG(observer != NULL, return NULL);
 
-    return observer->user_data;
+    return observer->user_data.data;
 }
 
 void lv_observer_set_user_data(lv_observer_t * observer, void * user_data)
@@ -1072,7 +1152,7 @@ static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_ASSERT(observer != NULL);
     LV_UNUSED(subject);
-    lv_subject_t * subject_group = observer->user_data;
+    lv_subject_t * subject_group = observer->user_data.data;
     lv_subject_notify(subject_group);
 }
 
@@ -1112,7 +1192,7 @@ static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
 {
     LV_ASSERT(observer != NULL);
     LV_ASSERT(subject != NULL);
-    flag_and_cond_t * p = observer->user_data;
+    flag_and_cond_t * p = observer->user_data.data;
     LV_ASSERT(p != NULL);
 
     /* Initializing this keeps some compilers happy */
@@ -1145,7 +1225,7 @@ static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subje
 {
     LV_ASSERT(observer != NULL);
     LV_ASSERT(subject != NULL);
-    flag_and_cond_t * p = observer->user_data;
+    flag_and_cond_t * p = observer->user_data.data;
     LV_ASSERT(p != NULL);
 
     /* Initializing this keeps some compilers happy */
@@ -1234,48 +1314,46 @@ static void subject_set_string_free_user_data_event_cb(lv_event_t * e)
 static void set_bool_observer(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * obj = (lv_obj_t *)observer->target;
-    lv_obj_set_bool_t set_bool_cb = (lv_obj_set_bool_t)observer->user_data;
-    set_bool_cb(obj, subject->value.num);
+    lv_obj_set_bool_t set_bool_cb = (lv_obj_set_bool_t)observer->user_data.cb;
+    if(set_bool_cb) set_bool_cb(obj, subject->value.num);
 }
 
 static void set_int_observer(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * obj = (lv_obj_t *)observer->target;
-    lv_obj_set_int_t set_int_cb = (lv_obj_set_int_t)observer->user_data;
-    set_int_cb(obj, subject->value.num);
+    lv_obj_set_int_t set_int_cb = (lv_obj_set_int_t)observer->user_data.cb;
+    if(set_int_cb) set_int_cb(obj, subject->value.num);
 }
 
 #if LV_USE_FLOAT
 static void set_float_observer(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * obj = (lv_obj_t *)observer->target;
-    lv_obj_set_float_t set_float_cb = (lv_obj_set_float_t)observer->user_data;
-    set_float_cb(obj, subject->value.float_v);
+    lv_obj_set_float_t set_float_cb = (lv_obj_set_float_t)observer->user_data.cb;
+    if(set_float_cb) set_float_cb(obj, subject->value.float_v);
 }
 #endif /*LV_USE_FLOAT*/
 
 static void set_string_observer(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * obj = (lv_obj_t *)observer->target;
-    lv_obj_set_string_t set_string_cb = (lv_obj_set_string_t)observer->user_data;
-    set_string_cb(obj, subject->value.pointer);
+    lv_obj_set_string_t set_string_cb = (lv_obj_set_string_t)observer->user_data.cb;
+    if(set_string_cb) set_string_cb(obj, subject->value.pointer);
 }
 
 
 static void set_color_observer(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * obj = (lv_obj_t *)observer->target;
-    lv_obj_set_color_t set_color_cb = (lv_obj_set_color_t)observer->user_data;
-    set_color_cb(obj, subject->value.color);
+    lv_obj_set_color_t set_color_cb = (lv_obj_set_color_t)observer->user_data.cb;
+    if(set_color_cb) set_color_cb(obj, subject->value.color);
 }
 
 static void set_pointer_observer(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * obj = (lv_obj_t *)observer->target;
-    lv_obj_set_pointer_t set_pointer_cb = (lv_obj_set_pointer_t)observer->user_data;
-    set_pointer_cb(obj, subject->value.pointer);
+    lv_obj_set_pointer_t set_pointer_cb = (lv_obj_set_pointer_t)observer->user_data.cb;
+    if(set_pointer_cb) set_pointer_cb(obj, subject->value.pointer);
 }
-
-
 
 #endif /*LV_USE_OBSERVER*/
