@@ -42,16 +42,11 @@ You can create a Subject in two ways:
 /*Create dynamically*/
 lv_subject_t * subject_1 = lv_subject_create(LV_SUBJECT_TYPE_INT);
 
-/*Delete when the subject is not needed anymore*/
-lv_subject_delete(subject_1);
-
 
 /*Or initialize a static/global variable*/
 static lv_subject_t subject_2;
 lv_subject_init_int(&subject_2, 10);   /*10 is the initial value*/
 
-/*Free any internal resources when no needed anymore*/
-lv_subject_deinit(&subject_2);
 ```
 
 Set a Subject's value like below. This also notifies all subscribed Observers when the value changes.
@@ -90,6 +85,15 @@ lv_label_bind_text(label_1, subject_1, "%d °C");
 
 /*Keep the Subject and the selected drop-down option in sync (two-way)*/
 lv_dropdown_bind_value(dropdown_1, &subject_2);
+```
+
+When the subjects are needed they can be deleted or deinitialized:
+```c
+/*If it was created with lv_subject_create()*/
+lv_subject_delete(subject_1);
+
+/*If it was initialized with lv_subject_init_...()*/
+lv_subject_deinit(&subject_2);
 ```
 
 That's it in short. Continue reading to learn more about

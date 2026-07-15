@@ -48,7 +48,8 @@ For string <ApiLink name="lv_subject_set_buf"/>, for groups <ApiLink name="lv_su
 Write a value with `lv_subject_set_...()` (e.g. <ApiLink name="lv_subject_set_int"/>).
 
 Most value types notify Observers only when the value changes, however
-pointer Subjects notify on every set, and group Subjects notify when their members or group list changes.
+pointer Subjects notify on every set, group Subjects notify when their members or the group list changes, and strings
+when the previous buffer is also set.
 
 Read the current value back with `lv_subject_get_...()` (e.g. <ApiLink name="lv_subject_get_int"/>):
 
