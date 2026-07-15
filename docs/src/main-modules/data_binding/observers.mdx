@@ -43,7 +43,7 @@ static void label_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 In a generic case any other pointer can be passed as target with
 <ApiLink name="lv_subject_add_observer_with_target" display="lv_subject_add_observer_with_target()" /> and the
-target can be read back with <ApiLink name="lv_observer_get_target_obj" display="lv_observer_get_target()" />.
+target can be read back with <ApiLink name="lv_observer_get_target" display="lv_observer_get_target()" />.
 
 ## Unsubscribing
 
@@ -96,7 +96,9 @@ The older `lv_obj_bind_flag_if_*` and `lv_obj_bind_state_if_*` functions are
 
 <ApiLink name="lv_obj_bind_checked" display="lv_obj_bind_checked()" /> creates a
 **two-way** binding: the Widget's checked state follows the Subject (checked while
-non-zero), and clicking the Widget writes `1` or `0` back to the Subject.
+non-zero), and clicking the Widget writes `1` or `0` back to the Subject. The Widget
+should have <ApiLink name="lv_obj_set_checkable" display="lv_obj_set_checkable(obj, true)"/>
+to make it checkable.
 
 ```c
 lv_obj_bind_checked(checkbox, &subject);

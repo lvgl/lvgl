@@ -130,7 +130,7 @@ lv_subject_t * lv_subject_create(lv_subject_type_t type)
         default:
             LV_LOG_WARN("Invalid subject type: %d", type);
             lv_free(subject);
-            break;
+            return NULL;
     }
 
     return subject;
@@ -480,6 +480,11 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 void lv_subject_deinit(lv_subject_t * subject)
 {
     if(subject == NULL) return;
+
+    /*Unsubscribe all subjects from the group */
+    if(subject->type == LV_SUBJECT_TYPE_GROUP) {
+        lv_subject_set_group_list(subject, NULL, 0);
+    }
 
     lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {

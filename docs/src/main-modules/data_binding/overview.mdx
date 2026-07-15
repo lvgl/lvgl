@@ -42,12 +42,19 @@ You can create a Subject in two ways:
 /*Create dynamically*/
 lv_subject_t * subject_1 = lv_subject_create(LV_SUBJECT_TYPE_INT);
 
+/*Delete when the subject is not needed anymore*/
+lv_subject_delete(subject_1);
+
+
 /*Or initialize a static/global variable*/
 static lv_subject_t subject_2;
 lv_subject_init_int(&subject_2, 10);   /*10 is the initial value*/
+
+/*Free any internal resources when no needed anymore*/
+lv_subject_deinit(&subject_2);
 ```
 
-Set a Subject's value like below. This also notifies all subscribed Observers:
+Set a Subject's value like below. This also notifies all subscribed Observers when the value changes.
 
 ```c
 lv_subject_set_int(subject_1, 20);

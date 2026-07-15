@@ -45,8 +45,12 @@ For string <ApiLink name="lv_subject_set_buf"/>, for groups <ApiLink name="lv_su
 
 ## Reading and Writing the Value
 
-Write a value with `lv_subject_set_...()`. This notifies the Observers, but only if
-the value actually changed. Read it back with `lv_subject_get_...()`:
+Write a value with `lv_subject_set_...()` (e.g. <ApiLink name="lv_subject_set_int"/>).
+
+Most value types notify Observers only when the value changes, however
+pointer Subjects notify on every set, and group Subjects notify when their members or group list changes.
+
+Read the current value back with `lv_subject_get_...()` (e.g. <ApiLink name="lv_subject_get_int"/>):
 
 ```c
 lv_subject_set_int(&temperature, 25);           /* notifies observers */
@@ -116,7 +120,8 @@ Other ready-made actions:
   <ApiLink name="lv_obj_set_subject_increment_event_min_value" display="lv_obj_set_subject_increment_event_min_value()" />,
   <ApiLink name="lv_obj_set_subject_increment_event_max_value" display="lv_obj_set_subject_increment_event_max_value()" /> and
   <ApiLink name="lv_obj_set_subject_increment_event_rollover" display="lv_obj_set_subject_increment_event_rollover()" />.
-- <ApiLink name="lv_obj_add_subject_set_int_event" display="lv_obj_add_subject_set_int_event()" />
+- <ApiLink name="lv_obj_add_subject_set_int_event" display="lv_obj_add_subject_set_int_event()" />,
+  <ApiLink name="lv_obj_add_subject_set_float_event" display="lv_obj_add_subject_set_float_event()" /> (requires <ApiLink name="LV_USE_FLOAT"/>)
   and <ApiLink name="lv_obj_add_subject_set_string_event" display="lv_obj_add_subject_set_string_event()" />
   write a fixed value on the trigger.
 
