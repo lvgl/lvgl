@@ -102,7 +102,12 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
             /*Save the data in the header*/
             uint8_t headers[54];
 
-            lv_fs_read(&dsc->file, headers, 54, NULL);
+            uint32_t rn = 0;
+            lv_fs_res_t res = lv_fs_read(&dsc->file, headers, 54, &rn);
+            if(res != LV_FS_RES_OK || rn < 54) {
+                return LV_RESULT_INVALID;
+            }
+
             uint32_t w;
             uint32_t h;
             lv_memcpy(&w, headers + 18, 4);
