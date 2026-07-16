@@ -16,16 +16,46 @@ Widget that generates and displays QR Codes using the library.
 
 Enable <ApiLink name="LV_USE_QRCODE" /> in `lv_conf.h` by setting its value to `1`.
 
-Use <ApiLink name="lv_qrcode_create" /> to create the QR-Code Widget.  Then use
-<ApiLink name="lv_qrcode_update" /> to generate the QR Code on it.
+Use <ApiLink name="lv_qrcode_create" /> to create the QR-Code Widget.  Then set the
+data to encode with <ApiLink name="lv_qrcode_set_data" /> (for text) or
+<ApiLink name="lv_qrcode_set_data_binary" /> (for arbitrary binary data).
 
-If you need to re-modify the size and color, use
-<ApiLink name="lv_qrcode_set_size" /> and <ApiLink name="lv_qrcode_set_dark_color" /> or
-<ApiLink name="lv_qrcode_set_light_color" /> respectively, and then
-call <ApiLink name="lv_qrcode_update" /> again to update the QR Code.
+The appearance can be configured with <ApiLink name="lv_qrcode_set_size" />,
+<ApiLink name="lv_qrcode_set_dark_color" />, <ApiLink name="lv_qrcode_set_light_color" />
+and <ApiLink name="lv_qrcode_set_quiet_zone" />. These can be called in any order,
+before or after setting the data - the bitmap is regenerated automatically.
+
+### Deferred updating
+
+By default every change regenerates the QR Code bitmap right away. When several
+properties are changed at once this can be avoided: disable automatic updating
+with <ApiLink name="lv_qrcode_set_auto_update" /> `(obj, false)`, apply all the
+changes, then regenerate once with <ApiLink name="lv_qrcode_update" />.
+
+```c
+lv_qrcode_set_auto_update(qr, false);
+lv_qrcode_set_size(qr, 200);
+lv_qrcode_set_dark_color(qr, lv_color_hex(0x0000ff));
+lv_qrcode_set_data(qr, "https://lvgl.io");
+lv_qrcode_update(qr);   /* regenerate the bitmap once, with every change applied */
+```
+
+`lv_qrcode_update()` only regenerates when something changed, so calling it twice
+in a row costs no more than once; use <ApiLink name="lv_qrcode_force_update" /> to
+regenerate unconditionally (rarely needed). If updating is forgotten entirely, the
+bitmap is still regenerated automatically on the next redraw (and a warning is
+logged). Re-enabling automatic updating with `lv_qrcode_set_auto_update(obj, true)`
+also regenerates immediately if needed.
+
+The currently stored data can be read back as a string with
+<ApiLink name="lv_qrcode_get_data" />, or copied into a buffer (binary safe; returns
+the full size so truncation is detectable) with <ApiLink name="lv_qrcode_get_data_binary" />.
+Passing a `NULL` buffer to the latter just returns the stored size.
 
 ## Notes
 
 - QR Codes with less data are smaller, but they are scaled by an integer
    value to best fit to the given size.
+- Changing the color (dark or light) only updates the palette, so it is cheap
+   and never triggers a re-encode of the QR Code.
 
