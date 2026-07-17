@@ -358,6 +358,13 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_SCROLL);
             ENUM_CASE(EVENT_GESTURE);
             ENUM_CASE(EVENT_KEY);
+            ENUM_CASE(EVENT_KEY_PRESSED);
+            ENUM_CASE(EVENT_KEY_SHORT_CLICKED);
+            ENUM_CASE(EVENT_KEY_LONG_CLICKED);
+            ENUM_CASE(EVENT_KEY_LONG_PRESSED);
+            ENUM_CASE(EVENT_KEY_LONG_PRESSED_REPEAT);
+            ENUM_CASE(EVENT_KEY_CLICKED);
+            ENUM_CASE(EVENT_KEY_RELEASED);
             ENUM_CASE(EVENT_ROTARY);
             ENUM_CASE(EVENT_FOCUSED);
             ENUM_CASE(EVENT_DEFOCUSED);

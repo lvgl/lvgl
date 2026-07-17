@@ -209,6 +209,9 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
         LV_EVENT_CLICKED,           LV_EVENT_RELEASED,
         LV_EVENT_SCROLL_BEGIN,      LV_EVENT_SCROLL_END,        LV_EVENT_SCROLL,
         LV_EVENT_GESTURE,           LV_EVENT_KEY,
+        LV_EVENT_KEY_PRESSED,       LV_EVENT_KEY_SHORT_CLICKED, LV_EVENT_KEY_LONG_CLICKED,
+        LV_EVENT_KEY_LONG_PRESSED,  LV_EVENT_KEY_LONG_PRESSED_REPEAT,
+        LV_EVENT_KEY_CLICKED,       LV_EVENT_KEY_RELEASED,
         LV_EVENT_FOCUSED,           LV_EVENT_DEFOCUSED,         LV_EVENT_LEAVE,
         LV_EVENT_HOVER_OVER,        LV_EVENT_HOVER_LEAVE,
     };
@@ -243,10 +246,15 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e)
 uint32_t lv_event_get_key(lv_event_t * e)
 {
     LV_CHECK_ARG(e != NULL, return 0);
-    LV_CHECK_ARG(e->code == LV_EVENT_KEY, return 0,
+    LV_CHECK_ARG(LV_EVENT_KEY <= e->code && e->code <= LV_EVENT_KEY_RELEASED, return 0,
                  "invalid event code %" LV_PRId32, (int32_t)e->code);
-    uint32_t * k = lv_event_get_param(e);
-    return k ? *k : 0;
+
+    if(e->code == LV_EVENT_KEY) {
+        uint32_t * k = lv_event_get_param(e);
+        return k ? *k : 0;
+    }
+
+    return lv_indev_get_key(lv_indev_active());
 }
 
 int32_t lv_event_get_rotary_diff(lv_event_t * e)
