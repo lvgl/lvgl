@@ -123,6 +123,13 @@ The following event codes exist:
 - <ApiLink name="LV_EVENT_SCROLL" />: Scrolling
 - <ApiLink name="LV_EVENT_GESTURE" />: A gesture is detected. Get the gesture with <ApiLink name="lv_indev_get_gesture_dir" display="lv_indev_get_gesture_dir(lv_indev_active())" />
 - <ApiLink name="LV_EVENT_KEY" />: A key is sent to Widget. Get the key with <ApiLink name="lv_indev_get_key" display="lv_indev_get_key(lv_indev_active())" />
+- <ApiLink name="LV_EVENT_KEY_PRESSED" />: A key has been pressed.
+- <ApiLink name="LV_EVENT_KEY_SHORT_CLICKED" />: A key was pressed for less than `long_press_time`, then released.
+- <ApiLink name="LV_EVENT_KEY_LONG_CLICKED" />: A key was pressed for at least `long_press_time`, then released.
+- <ApiLink name="LV_EVENT_KEY_LONG_PRESSED" />: A key has been pressed for at least `long_press_time`.
+- <ApiLink name="LV_EVENT_KEY_LONG_PRESSED_REPEAT" />: Sent after `long_press_time` in every `long_press_repeat_time` ms while a key is pressed.
+- <ApiLink name="LV_EVENT_KEY_CLICKED" />: A key was pressed, then released, after either a short or a long press.
+- <ApiLink name="LV_EVENT_KEY_RELEASED" />: A key has been released.
 - <ApiLink name="LV_EVENT_FOCUSED" />: Widget received focus
 - <ApiLink name="LV_EVENT_DEFOCUSED" />: Widget is defocused
 - <ApiLink name="LV_EVENT_LEAVE" />: Widget is defocused but still selected
