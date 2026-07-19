@@ -248,6 +248,13 @@ follow some coding conventions:
 
 To learn more refer to the documentation of [MicroPython](/integration/bindings/micropython).
 
+## Memory Allocation Guidelines
+
+- **ALWAYS** use `lv_calloc` instead of manual multiplication when allocating arrays.
+- Always check for allocation failures.
+- Never assume memory allocation succeeds.
+- Use `lv_malloc` for single objects, and `lv_calloc` for arrays.
+
 ## Formatting
 
 Here is example to show bracket placement and use of white space:

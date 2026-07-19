@@ -165,4 +165,21 @@ void test_memcpy_unaligned(void)
     }
 }
 
+void test_calloc_overflow(void)
+{
+    TEST_ASSERT_NULL(lv_calloc((size_t)-1, 2));
+    TEST_ASSERT_NULL(lv_calloc((size_t)-1 / 2 + 1, 2));
+    TEST_ASSERT_NULL(lv_calloc(0, 100));
+    TEST_ASSERT_NULL(lv_calloc(100, 0));
+}
+
+void test_realloc_overflow(void)
+{
+    void * p = lv_malloc(100);
+    TEST_ASSERT_NOT_NULL(p);
+    TEST_ASSERT_NULL(lv_realloc(p, (size_t)-1));
+    TEST_ASSERT_NOT_NULL(p);
+    lv_free(p);
+}
+
 #endif

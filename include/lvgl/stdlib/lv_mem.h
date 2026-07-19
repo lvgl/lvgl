@@ -67,10 +67,14 @@ void lv_mem_remove_pool(lv_mem_pool_t pool);
 void * lv_malloc(size_t size);
 
 /**
- * Allocate a block of zeroed memory dynamically
- * @param num requested number of element to be allocated.
- * @param size requested size of each element in bytes.
- * @return pointer to allocated zeroed memory, or NULL on failure
+ * Allocate memory for an array and set to zero.
+ * @param num   number of elements
+ * @param size  size of each element
+ * @return      pointer to allocated memory, or NULL if:
+ *              - out of memory
+ *              - multiplication overflow
+ *              - requested size exceeds maximum allowed
+ *              - num or size is 0
  */
 void * lv_calloc(size_t num, size_t size);
 

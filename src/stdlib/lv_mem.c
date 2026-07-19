@@ -46,6 +46,14 @@ lv_result_t lv_mem_test_core(void);
 /**********************
  *      MACROS
  **********************/
+#ifndef SIZE_MAX
+    #define SIZE_MAX ((size_t)-1)
+#endif
+
+#ifndef LV_MEM_MAX_SIZE
+    #define LV_MEM_MAX_SIZE (SIZE_MAX / 4)
+#endif
+
 #if LV_USE_LOG && LV_LOG_TRACE_MEM
     #define LV_TRACE_MEM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
@@ -59,6 +67,10 @@ lv_result_t lv_mem_test_core(void);
 void * lv_malloc(size_t size)
 {
     LV_TRACE_MEM("allocating %lu bytes", (unsigned long)size);
+    if(size > LV_MEM_MAX_SIZE) {
+        LV_LOG_ERROR("malloc size too large: %zu", size);
+        return NULL;
+    }
     if(size == 0) {
         LV_TRACE_MEM("using zero_mem");
         return &zero_mem;
@@ -89,6 +101,10 @@ void * lv_malloc(size_t size)
 void * lv_malloc_zeroed(size_t size)
 {
     LV_TRACE_MEM("allocating %lu bytes", (unsigned long)size);
+    if(size > LV_MEM_MAX_SIZE) {
+        LV_LOG_ERROR("malloc_zeroed size too large: %zu", size);
+        return NULL;
+    }
     if(size == 0) {
         LV_TRACE_MEM("using zero_mem");
         return &zero_mem;
@@ -116,7 +132,19 @@ void * lv_malloc_zeroed(size_t size)
 void * lv_calloc(size_t num, size_t size)
 {
     LV_TRACE_MEM("allocating number of %zu each %zu bytes", num, size);
-    return lv_malloc_zeroed(num * size);
+    if(num == 0 || size == 0) {
+        return NULL;
+    }
+    if(size > SIZE_MAX / num) {
+        LV_LOG_ERROR("integer overflow in lv_calloc: %zu * %zu", num, size);
+        return NULL;
+    }
+    size_t total_size = num * size;
+    if(total_size > LV_MEM_MAX_SIZE) {
+        LV_LOG_ERROR("allocation too large: %zu", total_size);
+        return NULL;
+    }
+    return lv_malloc_zeroed(total_size);
 }
 
 void * lv_zalloc(size_t size)
@@ -145,6 +173,10 @@ void * lv_reallocf(void * data_p, size_t new_size)
 void * lv_realloc(void * data_p, size_t new_size)
 {
     LV_TRACE_MEM("reallocating %p with %lu size", data_p, (unsigned long)new_size);
+    if(new_size > LV_MEM_MAX_SIZE) {
+        LV_LOG_ERROR("realloc size too large: %zu", new_size);
+        return NULL;
+    }
     if(new_size == 0) {
         LV_TRACE_MEM("using zero_mem");
         lv_free(data_p);
