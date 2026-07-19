@@ -47,7 +47,7 @@ lv_result_t lv_mem_test_core(void);
  *      MACROS
  **********************/
 #ifndef SIZE_MAX
-    #define SIZE_MAX ((size_t)-1)
+    #define SIZE_MAX ((size_t) -1)
 #endif
 
 #ifndef LV_MEM_MAX_SIZE
