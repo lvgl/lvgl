@@ -121,6 +121,7 @@
 #include "drivers/sdl/lv_sdl_private.h"
 #include "drivers/uefi/lv_uefi_private.h"
 #include "drivers/wayland/lv_wayland_backend_private.h"
+#include "drivers/wayland/lv_wayland_dmabuf.h"
 #include "drivers/wayland/lv_wayland_private.h"
 #include "drivers/windows/lv_windows_context.h"
 #include "drivers/windows/lv_windows_input_private.h"
