@@ -41,6 +41,14 @@ if(CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS OR CONFIG_LV_LINUX_DRM_USE_EGL)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/gbm.cmake)
 endif()
 
+if(CONFIG_LV_WAYLAND_USE_EGL_DMABUF AND NOT CONFIG_LV_USE_LINUX_DRM)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/drm.cmake)
+endif()
+
+if(CONFIG_LV_WAYLAND_USE_EGL_DMABUF AND NOT (CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS OR CONFIG_LV_LINUX_DRM_USE_EGL))
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/gbm.cmake)
+endif()
+
 if(CONFIG_LV_USE_WAYLAND)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/wayland.cmake)
 endif()
