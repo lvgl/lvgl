@@ -381,6 +381,7 @@ static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc
         blend_area.y1 ++;
         blend_area.y2 ++;
     }
+    lv_draw_sw_mask_free_param(&mask_param);
     lv_free(mask_buf);
 
 }
