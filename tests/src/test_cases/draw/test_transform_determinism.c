@@ -4,6 +4,31 @@
 
 #include "unity/unity.h"
 
+/* This test targets the SW transform's area-independent partial rendering.
+ * With VG-Lite the image is drawn by the GPU which doesn't provide this
+ * guarantee, so the whole test is skipped in that case. */
+#if LV_USE_DRAW_VG_LITE
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_transform_partial_render_deterministic(void)
+{
+    TEST_PASS();
+}
+
+void test_transform_partial_render_deterministic_rgb565a8(void)
+{
+    TEST_PASS();
+}
+
+#else
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -81,5 +106,7 @@ void test_transform_partial_render_deterministic_rgb565a8(void)
     lv_image_set_scale(img, 333);
     invalidate_middle_and_compare(img);
 }
+
+#endif /*LV_USE_DRAW_VG_LITE*/
 
 #endif
