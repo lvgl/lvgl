@@ -8,6 +8,6 @@ URL: https://lvgl.io/
 Version: @LVGL_VERSION@
 Requires: @LVGL_PKG_REQUIRES@
 Requires.private: @LVGL_PKG_REQUIRES_PRIVATE@
-Cflags: -I${includedir}
+Cflags: -I${includedir} @LVGL_PKG_CFLAGS@
 Libs: -L${libdir} -llvgl @LVGL_PKG_LIBS@
 Libs.private: @LVGL_PKG_LIBS_PRIVATE@
