@@ -229,8 +229,30 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
 {
-    LV_ASSERT_NULL(array->data);
+    LV_ASSERT_NULL(array);
+    LV_ASSERT_NULL(other);
+
+    if(array == NULL || other == NULL) {
+        LV_LOG_ERROR("NULL pointer passed to lv_array_concat");
+        return LV_RESULT_INVALID;
+    }
+
+    if(array->element_size != other->element_size) {
+        LV_LOG_ERROR("Element size mismatch: %u vs %u",
+                     (unsigned int)array->element_size, (unsigned int)other->element_size);
+        return LV_RESULT_INVALID;
+    }
+
     uint32_t size = other->size;
+    if(size == 0) {
+        return LV_RESULT_OK;
+    }
+
+    if(UINT32_MAX - array->size < size) {
+        LV_LOG_ERROR("Array size overflow");
+        return LV_RESULT_INVALID;
+    }
+
     if(array->size + size > array->capacity) {
         /*array is full*/
         if(lv_array_resize(array, array->size + size) == false) {
