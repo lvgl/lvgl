@@ -1,0 +1,101 @@
+name: Memory Usage
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  ARM_TOOLCHAIN_URL: https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+  ARM_TOOLCHAIN_DIR: gcc-arm-none-eabi-10.3-2021.10
+
+jobs:
+  flash-usage-check:
+    name: Check memory usage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: python3 -m pip install kconfiglib pcpp
+
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Cache ARM toolchain
+        id: cache-toolchain
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.ARM_TOOLCHAIN_DIR }}
+          key: arm-toolchain-${{ env.ARM_TOOLCHAIN_DIR }}
+
+      - name: Download ARM toolchain
+        if: steps.cache-toolchain.outputs.cache-hit != 'true'
+        run: |
+          wget -q "${{ env.ARM_TOOLCHAIN_URL }}"
+          tar xjf "$(basename "${{ env.ARM_TOOLCHAIN_URL }}")"
+
+      - name: Add toolchain to PATH
+        run: echo "${{ github.workspace }}/${{ env.ARM_TOOLCHAIN_DIR }}/bin" >> "$GITHUB_PATH"
+
+      - name: Build and measure each configuration
+        id: measure
+        working-directory: tests/test_memory_usage
+        run: |
+          mkdir -p results
+          echo '{}' > results/size-results.json
+
+          for config in standard minimal; do
+            echo "== Building $config =="
+            cmake -S "$config" -B "$config/build" -GNinja \
+              -DCMAKE_TOOLCHAIN_FILE="$PWD/toolchain/arm-none-eabi.cmake"
+            cmake --build "$config/build"
+
+            SIZE_OUTPUT=$(arm-none-eabi-size "$config/build/main" | tail -1)
+            TEXT=$(echo "$SIZE_OUTPUT" | awk '{print $1}')
+            DATA=$(echo "$SIZE_OUTPUT" | awk '{print $2}')
+            BSS=$(echo "$SIZE_OUTPUT" | awk '{print $3}')
+            FLASH=$((TEXT + DATA))
+            RAM=$((DATA + BSS))
+
+            echo "$config flash=$FLASH ram=$RAM"
+
+            python3 - <<EOF
+            import json
+            with open("results/size-results.json") as f:
+                data = json.load(f)
+            data["$config"] = {"text": $TEXT, "data": $DATA, "bss": $BSS, "flash": $FLASH, "ram": $RAM}
+            with open("results/size-results.json", "w") as f:
+                json.dump(data, f, indent=2)
+            EOF
+          done
+
+          cat results/size-results.json
+
+      - name: Save PR metadata
+        if: github.event_name == 'pull_request'
+        working-directory: tests/test_memory_usage
+        run: |
+          echo "${{ github.event.pull_request.number }}" > results/pr_number.txt
+          echo "${{ github.event.pull_request.head.sha }}" > results/pr_sha.txt
+
+      - name: Upload results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flash-usage-results
+          path: tests/test_memory_usage/results/
+          retention-days: 14

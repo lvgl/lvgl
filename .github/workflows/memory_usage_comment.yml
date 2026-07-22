@@ -1,0 +1,229 @@
+name: Memory Usage Comment
+on:
+  workflow_run:
+    workflows: ["Memory Usage"]
+    types:
+      - completed
+
+permissions:
+  pull-requests: write
+  actions: read
+
+env:
+  ARM_TOOLCHAIN_URL: https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+  ARM_TOOLCHAIN_DIR: gcc-arm-none-eabi-10.3-2021.10
+
+jobs:
+  comment:
+    name: Post size comparison comment
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Download PR results artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: flash-usage-results
+          path: results/pr
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read PR number
+        id: pr
+        run: echo "number=$(cat results/pr/pr_number.txt)" >> "$GITHUB_OUTPUT"
+
+      # --- Try to get master's baseline from its last successful "Memory Usage" run ---
+      - name: Find latest successful master run
+        id: master_run
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "memory-usage.yml",
+              branch: "master",
+              status: "success",
+              per_page: 1,
+            });
+            if (data.workflow_runs.length > 0) {
+              core.setOutput("run_id", data.workflow_runs[0].id);
+            } else {
+              core.setOutput("run_id", "");
+            }
+
+      - name: Download master results artifact
+        id: master_artifact
+        if: steps.master_run.outputs.run_id != ''
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: flash-usage-results
+          path: results/master
+          run-id: ${{ steps.master_run.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check whether master baseline is available
+        id: check_master
+        run: |
+          if [ -f results/master/size-results.json ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # --- Fallback: no artifact found (or download failed) -> try building master ourselves ---
+      - name: Checkout master
+        if: steps.check_master.outputs.available == 'false'
+        uses: actions/checkout@v6
+        with:
+          ref: master
+          path: master-src
+
+      - name: Install Ninja (fallback build)
+        if: steps.check_master.outputs.available == 'false'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Cache ARM toolchain (fallback build)
+        if: steps.check_master.outputs.available == 'false'
+        id: cache-toolchain
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.ARM_TOOLCHAIN_DIR }}
+          key: arm-toolchain-${{ env.ARM_TOOLCHAIN_DIR }}
+
+      - name: Download ARM toolchain (fallback build)
+        if: steps.check_master.outputs.available == 'false' && steps.cache-toolchain.outputs.cache-hit != 'true'
+        run: |
+          wget -q "${{ env.ARM_TOOLCHAIN_URL }}"
+          tar xjf "$(basename "${{ env.ARM_TOOLCHAIN_URL }}")"
+
+      - name: Add toolchain to PATH (fallback build)
+        if: steps.check_master.outputs.available == 'false'
+        run: echo "${{ github.workspace }}/${{ env.ARM_TOOLCHAIN_DIR }}/bin" >> "$GITHUB_PATH"
+
+      - name: Build master from source
+        id: build_master
+        if: steps.check_master.outputs.available == 'false'
+        continue-on-error: true
+        working-directory: master-src/tests/test_memory_usage
+        run: |
+          mkdir -p ../../../results/master
+          echo '{}' > ../../../results/master/size-results.json
+
+          for config in standard minimal; do
+            cmake -S "$config" -B "$config/build" -GNinja \
+              -DCMAKE_TOOLCHAIN_FILE="$PWD/toolchain/arm-none-eabi.cmake"
+            cmake --build "$config/build"
+
+            SIZE_OUTPUT=$(arm-none-eabi-size "$config/build/main" | tail -1)
+            TEXT=$(echo "$SIZE_OUTPUT" | awk '{print $1}')
+            DATA=$(echo "$SIZE_OUTPUT" | awk '{print $2}')
+            BSS=$(echo "$SIZE_OUTPUT" | awk '{print $3}')
+            FLASH=$((TEXT + DATA))
+            RAM=$((DATA + BSS))
+
+            python3 - <<EOF
+            import json
+            with open("../../../results/master/size-results.json") as f:
+                data = json.load(f)
+            data["$config"] = {"text": $TEXT, "data": $DATA, "bss": $BSS, "flash": $FLASH, "ram": $RAM}
+            with open("../../../results/master/size-results.json", "w") as f:
+                json.dump(data, f, indent=2)
+            EOF
+          done
+
+      - name: Re-check master availability after fallback build
+        id: recheck_master
+        run: |
+          if [ -f results/master/size-results.json ] && [ "$(cat results/master/size-results.json)" != "{}" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build comment body
+        id: body
+        env:
+          MASTER_AVAILABLE: ${{ steps.check_master.outputs.available == 'true' || steps.recheck_master.outputs.available == 'true' }}
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json
+          import os
+
+          with open("results/pr/size-results.json") as f:
+              pr_data = json.load(f)
+
+          master_available = os.environ.get("MASTER_AVAILABLE") == "true"
+          master_data = {}
+          if master_available:
+              try:
+                  with open("results/master/size-results.json") as f:
+                      master_data = json.load(f)
+              except (FileNotFoundError, json.JSONDecodeError):
+                  master_available = False
+
+          lines = ["## 📦 Flash / RAM usage", ""]
+
+          if master_available and master_data:
+              lines.append("| Config | Flash (PR) | Flash (master) | Δ Flash | RAM (PR) | RAM (master) | Δ RAM |")
+              lines.append("|---|---|---|---|---|---|---|")
+              for config, sizes in pr_data.items():
+                  base = master_data.get(config)
+                  if base:
+                      d_flash = sizes["flash"] - base["flash"]
+                      d_ram = sizes["ram"] - base["ram"]
+                      d_flash_str = f"{'+' if d_flash >= 0 else ''}{d_flash} B"
+                      d_ram_str = f"{'+' if d_ram >= 0 else ''}{d_ram} B"
+                      lines.append(
+                          f"| {config} | {sizes['flash']} B | {base['flash']} B | {d_flash_str} | "
+                          f"{sizes['ram']} B | {base['ram']} B | {d_ram_str} |"
+                      )
+                  else:
+                      lines.append(f"| {config} | {sizes['flash']} B | n/a | n/a | {sizes['ram']} B | n/a | n/a |")
+          else:
+              lines.append("| Config | Flash (PR) | RAM (PR) |")
+              lines.append("|---|---|---|")
+              for config, sizes in pr_data.items():
+                  lines.append(f"| {config} | {sizes['flash']} B | {sizes['ram']} B |")
+              lines.append("")
+              lines.append("_Could not determine a master baseline for comparison "
+                            "(no artifact from master's last successful run, and a "
+                            "local build of master also failed)._")
+
+          body = "\n".join(lines)
+          print("body<<COMMENT_EOF")
+          print(body)
+          print("COMMENT_EOF")
+          EOF
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ steps.pr.outputs.number }};
+            const body = `${{ steps.body.outputs.body }}`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const marker = "## 📦 Flash / RAM usage";
+            const existing = comments.find(c => c.body.startsWith(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
