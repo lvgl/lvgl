@@ -209,14 +209,14 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
 
 bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 {
+    if(array == NULL) return false;
+
     if(array->inner_alloc == false) {
         LV_LOG_WARN("Cannot resize array with external buffer");
         return false;
     }
 
     uint8_t * data = lv_realloc(array->data, new_capacity * array->element_size);
-    LV_ASSERT_NULL(data);
-
     if(data == NULL) return false;
 
     array->data = data;
@@ -229,9 +229,6 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
 {
-    LV_ASSERT_NULL(array);
-    LV_ASSERT_NULL(other);
-
     if(array == NULL || other == NULL) {
         LV_LOG_ERROR("NULL pointer passed to lv_array_concat");
         return LV_RESULT_INVALID;
