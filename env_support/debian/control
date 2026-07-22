@@ -152,3 +152,53 @@ Depends:
 Description: Light and Versatile Graphics Library (Wayland + 3D config) - development files
  LVGL built with Wayland display and input backend and fastgltf 3D model loading.
  This package contains headers, static library, and CMake config files.
+
+Package: liblvgl-full-2d-dev
+Architecture: any
+Provides: liblvgl-dev (= ${binary:Version})
+Conflicts: liblvgl-dev
+Replaces: liblvgl-dev
+Depends:
+ ${misc:Depends},
+ libsdl2-dev,
+ libdrm-dev,
+ libevdev-dev,
+ libgbm-dev,
+ libwayland-dev,
+ libxkbcommon-dev,
+ libwebp-dev,
+ libjpeg-dev,
+ libpng-dev,
+ libfreetype-dev,
+ libgstreamer1.0-dev,
+ libgstreamer-plugins-base1.0-dev,
+Description: Light and Versatile Graphics Library (all backends) - development files
+ LVGL built with SDL2, DRM and Wayland display/input backends, software
+ rendering. This package contains headers, static library, and CMake config
+ files.
+
+Package: liblvgl-full-3d-dev
+Architecture: any
+Provides: liblvgl-dev (= ${binary:Version})
+Conflicts: liblvgl-dev
+Replaces: liblvgl-dev
+Depends:
+ ${misc:Depends},
+ libsdl2-dev,
+ libdrm-dev,
+ libevdev-dev,
+ libgbm-dev,
+ libegl-dev,
+ libwayland-dev,
+ libxkbcommon-dev,
+ libwebp-dev,
+ libjpeg-dev,
+ libpng-dev,
+ libfreetype-dev,
+ libfastgltf-dev,
+ libgstreamer1.0-dev,
+ libgstreamer-plugins-base1.0-dev,
+Description: Light and Versatile Graphics Library (all backends + 3D) - development files
+ LVGL built with SDL2, DRM and Wayland display/input backends and fastgltf
+ 3D model loading. This package contains headers, static library, and CMake config 
+ files.
