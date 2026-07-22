@@ -147,11 +147,12 @@ void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void
 
     /*Don't add the '.' and the extension if the extension is NULL*/
     if(ext == NULL) {
-        lv_snprintf(path->path, sizeof(path->path), "%c:%zu-%" LV_PRIu32, letter, (size_t) buf, size);
+        lv_snprintf(path->path, sizeof(path->path), "%c:%" LV_PRIuPTR "-%" LV_PRIu32, letter,
+                    (lv_uintptr_t)buf, size);
     }
     else {
-        lv_snprintf(path->path, sizeof(path->path), "%c:%zu-%" LV_PRIu32 ".%s", letter,
-                    (size_t) buf, size, ext);
+        lv_snprintf(path->path, sizeof(path->path), "%c:%" LV_PRIuPTR "-%" LV_PRIu32 ".%s", letter,
+                    (lv_uintptr_t)buf, size, ext);
     }
 }
 
