@@ -29,13 +29,13 @@ extern "C" {
 
 struct _lv_roller_t {
     lv_obj_t obj;
+#if LV_USE_TRANSLATION
+    char * options_translation_tag; /**< Translation tag for the options*/
+#endif
     uint32_t option_cnt;          /**< Number of options*/
     uint32_t sel_opt_id;          /**< Index of the current option*/
     uint32_t sel_opt_id_ori;      /**< Store the original index on focus*/
     uint32_t inf_page_cnt;        /**< Number of extra pages added to make the roller look infinite */
-#if LV_USE_TRANSLATION
-    char * options_translation_tag; /**< Translation tag for the options*/
-#endif
     lv_roller_mode_t mode : 2;
     uint32_t moved : 1;
 };
