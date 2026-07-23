@@ -47,8 +47,9 @@ if(NOT "${ret}" STREQUAL "0")
     message(FATAL_ERROR "command failed with return code: ${ret}")
 endif()
 
-# Re-configure (Re-execute all CMakeLists.txt code) when autoconf.h changes
-set_target_properties(lvgl PROPERTIES CMAKE_CONFIGURE_DEPENDS ${AUTOCONF_H})
+# Re-run CMake configuration (which regenerates autoconf.h) when the input
+# .config/defconfig changes, so that `cmake --build` picks up config edits.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${DOTCONFIG})
 
 # Set the variable that can be used by the CMakeLists.txt including this file
 set(KCONFIG_EXTERNAL_INCLUDE ${AUTOCONF_H})
