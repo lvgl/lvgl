@@ -223,7 +223,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
-    LV_ASSERT_NULL(options);
+    LV_CHECK_ARG(options, return);
 
     remove_options_translation_tag(obj);
 
