@@ -1419,6 +1419,10 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
     if(text) {
         copied_text = lv_strdup(text);
         LV_ASSERT_MALLOC(copied_text);
+        if(copied_text == NULL) {
+            LV_LOG_WARN("Couldn't save text.");
+            return;
+        }
     }
 
     if(!dropdown->static_text) lv_free(dropdown->text);
