@@ -13,6 +13,9 @@ option(LV_BUILD_USE_KCONFIG "Use Kconfig" OFF)
 set(LV_BUILD_DEFCONFIG_PATH "" CACHE PATH
     "Supply the default Kconfig configuration - used with Kconfig")
 
+set(LV_BUILD_DOTCONFIG_PATH "" CACHE PATH
+    "Path to .config path - used with Kconfig")
+
 option(LV_BUILD_SET_CONFIG_OPTS
     "Create variables from the definitions in lv_conf_internal.h"  OFF)
 

@@ -18,11 +18,11 @@ if(LV_BUILD_DEFCONFIG_PATH)
     else()
         set(DOTCONFIG ${LV_BUILD_DEFCONFIG_PATH})
     endif()
-
+elseif(LV_BUILD_DOTCONFIG_PATH)
+    set(DOTCONFIG ${LV_BUILD_DOTCONFIG_PATH})
 else()
     # Fallback - This will attempt to use a .config file inside of the LVGL directory
     set(DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
-
 endif()
 
 if (NOT EXISTS ${DOTCONFIG})
