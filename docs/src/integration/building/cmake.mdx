@@ -160,6 +160,13 @@ Dependency resolution is attempted in this order:
 2. `pkg-config` — uses the system's pkg-config tool (Linux/macOS)
 3. `FetchContent` — fetches and builds the dependency from source
 
+<Callout type="warning">
+If a required dependency is resolved via `FetchContent` instead of `find_package` or 
+`pkg-config`, later attempts to link against that library elsewhere on the system may fail. 
+Make sure every package required by your enabled features is available via one of the first 
+two options *before* creating an LVGL installation.
+</Callout>
+
 Each strategy can be disabled globally or per dependency. This is particularly useful for
 cross-compilation environments where system libraries should not be used.
 
