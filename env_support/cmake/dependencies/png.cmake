@@ -74,4 +74,4 @@ set(PNG_TOOLS
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libpng)
-lvgl_link_raw(TARGETS png_static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
+lvgl_link_fetched(TARGETS png_static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

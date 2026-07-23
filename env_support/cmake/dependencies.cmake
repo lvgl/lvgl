@@ -16,7 +16,7 @@ if(UNIX AND NOT PkgConfig_FOUND)
 endif()
 
 if(UNIX)
-  lvgl_link_raw(TARGETS m PKG_LIB_PRIVATE -lm)
+  lvgl_link_system_lib(TARGETS m PKG_LIB_PRIVATE -lm)
 endif()
 
 # ====== Draw Units ====== #

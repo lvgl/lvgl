@@ -102,4 +102,4 @@ set(SDL_DBUS
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(SDL2)
-lvgl_link_raw(TARGETS SDL2::SDL2-static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
+lvgl_link_fetched(TARGETS SDL2::SDL2-static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

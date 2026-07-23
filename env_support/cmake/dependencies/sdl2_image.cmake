@@ -70,4 +70,4 @@ set(SDL2IMAGE_INSTALL
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(SDL2_image)
-lvgl_link_raw(TARGETS SDL2_image::SDL2_image-static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
+lvgl_link_fetched(TARGETS SDL2_image::SDL2_image-static PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})

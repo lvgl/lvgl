@@ -125,9 +125,38 @@ function(lvgl_link_pkg_config)
   endif()
 endfunction()
 
-# No find_package nor pkgconfig support. Links targets normally 
-# Only registers PKG_LIB_PRIVATE for .pc Libs.private
-function(lvgl_link_raw)
+# Links targets fetched from source (FetchContent). No find_package nor
+# pkgconfig support. Only registers PKG_LIB_PRIVATE for .pc Libs.private.
+#
+# In the cmake path, we only set these for lvgl's BUILD_INTERFACE to
+# exclude them from lvgl's exported link interface.
+function(lvgl_link_fetched)
+  set(multiValueArgs TARGETS PKG_LIB_PRIVATE)
+  cmake_parse_arguments(ARG "" "" "${multiValueArgs}" ${ARGN})
+
+  set(SCOPE PRIVATE)
+  if(CONFIG_LV_USE_PRIVATE_API)
+    set(SCOPE PUBLIC)
+  endif()
+
+  if(ARG_TARGETS)
+    set(_targets)
+    foreach(_target IN LISTS ARG_TARGETS)
+      list(APPEND _targets $<BUILD_INTERFACE:${_target}>)
+    endforeach()
+    target_link_libraries(lvgl ${SCOPE} ${_targets})
+  endif()
+
+  if(ARG_PKG_LIB_PRIVATE)
+    lvgl_add_pkg_libs_private(${ARG_PKG_LIB_PRIVATE})
+  endif()
+endfunction()
+
+# Links a system library that is neither found via find_package/pkg-config nor
+# fetched from source (e.g. m). Unlike lvgl_link_fetched, these must stay
+# in lvgl's exported link interface so consumers of an installed lvgl link
+# against them too. Only registers PKG_LIB_PRIVATE for .pc Libs.private.
+function(lvgl_link_system_lib)
   set(multiValueArgs TARGETS PKG_LIB_PRIVATE)
   cmake_parse_arguments(ARG "" "" "${multiValueArgs}" ${ARGN})
 

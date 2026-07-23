@@ -69,4 +69,4 @@ set(GLFW_BUILD_EXAMPLES
     CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(glfw)
-lvgl_link_raw(TARGETS glfw PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
+lvgl_link_fetched(TARGETS glfw PKG_LIB_PRIVATE ${PKG_LIB_PRIVATE})
