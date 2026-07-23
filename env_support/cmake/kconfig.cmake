@@ -10,7 +10,7 @@ if(LV_BUILD_DEFCONFIG_PATH)
     # The supplied path can be relative - normalize it to absolute
     message(STATUS "Using defconfig: ${LV_BUILD_DEFCONFIG_PATH}")
 
-    if (NOT IS_ABSOLUTE ${CONF_PATH})
+    if (NOT IS_ABSOLUTE ${LV_BUILD_DEFCONFIG_PATH})
         file(REAL_PATH ${LV_BUILD_DEFCONFIG_PATH}
             DOTCONFIG BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
         message(STATUS "Converted to absolute path: ${DOTCONFIG}")
@@ -19,7 +19,16 @@ if(LV_BUILD_DEFCONFIG_PATH)
         set(DOTCONFIG ${LV_BUILD_DEFCONFIG_PATH})
     endif()
 elseif(LV_BUILD_DOTCONFIG_PATH)
-    set(DOTCONFIG ${LV_BUILD_DOTCONFIG_PATH})
+    message(STATUS "Using .config: ${LV_BUILD_DOTCONFIG_PATH}")
+
+    if (NOT IS_ABSOLUTE ${LV_BUILD_DOTCONFIG_PATH})
+        file(REAL_PATH ${LV_BUILD_DOTCONFIG_PATH}
+            DOTCONFIG BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
+        message(STATUS "Converted to absolute path: ${DOTCONFIG}")
+
+    else()
+        set(DOTCONFIG ${LV_BUILD_DOTCONFIG_PATH})
+    endif()
 else()
     # Fallback - This will attempt to use a .config file inside of the LVGL directory
     set(DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
