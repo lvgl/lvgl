@@ -1,7 +1,7 @@
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(KCONFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
 set(AUTOCONF_H ${CMAKE_CURRENT_BINARY_DIR}/autoconf.h)
-set(OUTPUT_DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
+set(OUTPUT_DOTCONFIG ${CMAKE_CURRENT_BINARY_DIR}/.config)
 set(KCONFIG_LIST_OUT ${CMAKE_CURRENT_BINARY_DIR}/kconfig_list)
 set(AUTO_CONF_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -21,8 +21,18 @@ if(LV_BUILD_DEFCONFIG_PATH)
 elseif(LV_BUILD_DOTCONFIG_PATH)
     set(DOTCONFIG ${LV_BUILD_DOTCONFIG_PATH})
 else()
-    # Fallback - This will attempt to use a .config file inside of the LVGL directory
-    set(DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
+    # No explicit config file set
+    # Search, in order:
+    #   1. the top-level project directory (matches where lv_conf.h is expected)
+    #   2. the LVGL source directory (standard Kconfig in-tree location)
+    #   3. the .config generated in the binary directory on a previous run
+    if(EXISTS ${CMAKE_SOURCE_DIR}/.config)
+        set(DOTCONFIG ${CMAKE_SOURCE_DIR}/.config)
+    elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.config)
+        set(DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
+    else()
+        set(DOTCONFIG ${OUTPUT_DOTCONFIG})
+    endif()
 endif()
 
 if (NOT EXISTS ${DOTCONFIG})
