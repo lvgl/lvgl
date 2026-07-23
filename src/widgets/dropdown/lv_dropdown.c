@@ -180,8 +180,7 @@ void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
         return;
     }
 
-    if(!dropdown->static_text)
-        lv_free(dropdown->text);
+    if(!dropdown->static_text) lv_free(dropdown->text);
     dropdown->static_text = 1;
     dropdown->text = (char *)text;
 
@@ -192,10 +191,11 @@ void lv_dropdown_set_text_static(lv_obj_t * obj, const char * text)
 void lv_dropdown_set_text_translation_tag(lv_obj_t * obj, const char * tag)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(tag, return);
+    LV_CHECK_ARG(tag[0] != '\0', return);
+
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(!tag || tag[0] == '\0') {
-        return;
-    }
+
     char * new_tag = lv_strdup(tag);
     LV_ASSERT_MALLOC(new_tag);
     if(!new_tag) {
@@ -330,10 +330,10 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 void lv_dropdown_set_options_translation_tag(lv_obj_t * obj, const char * tag)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
+    LV_CHECK_ARG(tag, return);
+    LV_CHECK_ARG(tag[0] != '\0', return);
+
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(!tag || tag[0] == '\0') {
-        return;
-    }
     char * new_tag = lv_strdup(tag);
     LV_ASSERT_MALLOC(new_tag);
     if(!new_tag) {
@@ -1407,6 +1407,9 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
 
 static void set_text_internal(lv_obj_t * obj, const char * text)
 {
+    LV_ASSERT(obj);
+    LV_ASSERT(text);
+
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(!dropdown->static_text && dropdown->text && text && lv_streq(dropdown->text, text)) {
         return;
@@ -1426,6 +1429,9 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
 
 static void set_options_internal(lv_obj_t * obj, const char * options)
 {
+    LV_ASSERT(obj);
+    LV_ASSERT(options);
+
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     /*Count the '\n'-s to determine the number of options*/
@@ -1449,7 +1455,6 @@ static void set_options_internal(lv_obj_t * obj, const char * options)
     }
 
     dropdown->options = lv_malloc(len);
-
     LV_ASSERT_MALLOC(dropdown->options);
     if(dropdown->options == NULL) return;
 
@@ -1471,6 +1476,8 @@ static void set_options_internal(lv_obj_t * obj, const char * options)
 
 static void remove_options_translation_tag(lv_obj_t * obj)
 {
+    LV_ASSERT(obj);
+
 #if LV_USE_TRANSLATION
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->options_translation_tag) {
@@ -1484,6 +1491,8 @@ static void remove_options_translation_tag(lv_obj_t * obj)
 
 static void remove_text_translation_tag(lv_obj_t * obj)
 {
+    LV_ASSERT(obj);
+
 #if LV_USE_TRANSLATION
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     if(dropdown->text_translation_tag) {
