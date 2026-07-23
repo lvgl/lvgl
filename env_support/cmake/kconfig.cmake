@@ -5,30 +5,22 @@ set(OUTPUT_DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
 set(KCONFIG_LIST_OUT ${CMAKE_CURRENT_BINARY_DIR}/kconfig_list)
 set(AUTO_CONF_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+# Normalizes INPUT_PATH to an absolute path (relative to CMAKE_SOURCE_DIR)
+macro(lv_normalize_config_path INPUT_PATH LABEL OUTPUT_VAR)
+    message(STATUS "Using ${LABEL}: ${${INPUT_PATH}}")
+    if(NOT IS_ABSOLUTE ${${INPUT_PATH}})
+        file(REAL_PATH ${${INPUT_PATH}} ${OUTPUT_VAR} BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
+        message(STATUS "Converted to absolute path: ${${OUTPUT_VAR}}")
+    else()
+        set(${OUTPUT_VAR} ${${INPUT_PATH}})
+    endif()
+endmacro()
+
 # Check if the user wants to use a defconfig, using the -DLV_BUILD_DEFCONFIG_PATH option
 if(LV_BUILD_DEFCONFIG_PATH)
-    # The supplied path can be relative - normalize it to absolute
-    message(STATUS "Using defconfig: ${LV_BUILD_DEFCONFIG_PATH}")
-
-    if (NOT IS_ABSOLUTE ${LV_BUILD_DEFCONFIG_PATH})
-        file(REAL_PATH ${LV_BUILD_DEFCONFIG_PATH}
-            DOTCONFIG BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
-        message(STATUS "Converted to absolute path: ${DOTCONFIG}")
-
-    else()
-        set(DOTCONFIG ${LV_BUILD_DEFCONFIG_PATH})
-    endif()
+    lv_normalize_config_path(LV_BUILD_DEFCONFIG_PATH "defconfig" DOTCONFIG)
 elseif(LV_BUILD_DOTCONFIG_PATH)
-    message(STATUS "Using .config: ${LV_BUILD_DOTCONFIG_PATH}")
-
-    if (NOT IS_ABSOLUTE ${LV_BUILD_DOTCONFIG_PATH})
-        file(REAL_PATH ${LV_BUILD_DOTCONFIG_PATH}
-            DOTCONFIG BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
-        message(STATUS "Converted to absolute path: ${DOTCONFIG}")
-
-    else()
-        set(DOTCONFIG ${LV_BUILD_DOTCONFIG_PATH})
-    endif()
+    lv_normalize_config_path(LV_BUILD_DOTCONFIG_PATH ".config" DOTCONFIG)
 else()
     # Fallback - This will attempt to use a .config file inside of the LVGL directory
     set(DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
