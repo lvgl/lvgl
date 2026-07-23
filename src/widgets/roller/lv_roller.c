@@ -948,8 +948,11 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     lv_point_transform(vect, -angle, scale_x, scale_y, &pivot, false);
 }
 
-void set_options_internal(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
+static void set_options_internal(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
 {
+    LV_ASSERT(obj);
+    LV_ASSERT(options);
+
     lv_roller_t * roller = (lv_roller_t *)obj;
     lv_obj_t * label = get_label(obj);
 
