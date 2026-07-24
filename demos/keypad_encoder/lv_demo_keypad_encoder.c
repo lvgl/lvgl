@@ -124,7 +124,9 @@ static void selectors_create(lv_obj_t * parent)
     obj = lv_roller_create(parent);
     lv_obj_set_scroll_on_focus(obj, true);
 
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * list = lv_list_create(parent);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_update_layout(list);
     if(lv_obj_get_height(list) > lv_obj_get_content_height(parent)) {
         lv_obj_set_height(list, lv_obj_get_content_height(parent));

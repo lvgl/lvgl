@@ -123,7 +123,9 @@ static void event_handler_swap(lv_event_t * e)
 void lv_example_list_reorder(void)
 {
     /*Create a list*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     list1 = lv_list_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(list1, lv_pct(60), lv_pct(100));
     lv_obj_set_style_pad_row(list1, 5, 0);
 
@@ -144,7 +146,9 @@ void lv_example_list_reorder(void)
     lv_obj_add_state(currentButton, LV_STATE_CHECKED);
 
     /*Create a second list with up and down buttons*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     list2 = lv_list_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(list2, lv_pct(40), lv_pct(100));
     lv_obj_align(list2, LV_ALIGN_TOP_RIGHT, 0, 0);
     lv_obj_set_flex_flow(list2, LV_FLEX_FLOW_COLUMN);

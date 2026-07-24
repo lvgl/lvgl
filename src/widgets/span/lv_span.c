@@ -1502,7 +1502,7 @@ static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_s
 
 static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    bind_element_string_t * user_data = observer->user_data;
+    bind_element_string_t * user_data = lv_observer_get_user_data(observer);
 
     if(user_data->fmt == NULL) {
         lv_spangroup_set_span_text(observer->target, user_data->element, subject->value.pointer);

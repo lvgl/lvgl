@@ -18,7 +18,9 @@ static void read_dir(void);
 void setUp(void)
 {
     active_screen = lv_screen_active();
+    LV_DEPRECATIONS_IGNORE_BEGIN
     file_explorer_obj = lv_file_explorer_create(active_screen);
+    LV_DEPRECATIONS_IGNORE_END
     file_explorer = (lv_file_explorer_t *)file_explorer_obj;
     file_table = (lv_table_t *)file_explorer->file_table;
 

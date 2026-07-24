@@ -26,6 +26,16 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * @deprecated The `lv_menu` widget is deprecated and kept only for backward
+ * compatibility. A menu is page navigation over base widgets: pages built from
+ * `lv_obj` and a back button that swaps the visible page. Build it directly
+ * instead. See the `lv_example_menu_navigation` example. All `lv_menu_*` functions
+ * below are deprecated.
+ */
+#define LV_MENU_DEPRECATED_MSG \
+    "lv_menu is deprecated; build menu navigation from base widgets instead. See the lv_example_menu_navigation example."
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -66,7 +76,10 @@ enum __lv_property_menu_id_t {
  * Create a menu object
  * @param parent    pointer to an object, it will be the parent of the new menu
  * @return          pointer to the created menu
+ * @deprecated The `lv_menu` widget is deprecated. Build menu navigation from base
+ *             widgets instead. See `lv_example_menu_navigation`.
  */
+LV_DEPRECATED(LV_MENU_DEPRECATED_MSG)
 lv_obj_t * lv_menu_create(lv_obj_t * parent);
 
 /**

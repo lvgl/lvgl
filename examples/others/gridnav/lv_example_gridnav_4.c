@@ -25,7 +25,9 @@ void lv_example_gridnav_4(void)
     /*It's assumed that the default group is set and
      *there is a keyboard indev*/
 
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * list = lv_list_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_gridnav_add(list, LV_GRIDNAV_CTRL_ROLLOVER);
     lv_obj_align(list, LV_ALIGN_LEFT_MID, 10, 0);
     lv_group_add_obj(lv_group_get_default(), list);

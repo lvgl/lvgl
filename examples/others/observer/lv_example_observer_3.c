@@ -36,10 +36,10 @@ typedef enum {
  * into `time_subject` via `lv_subject_init_group` so a single observer can
  * re-render the time label whenever any element changes. A "Set" button creates
  * a bottom container with two rollers and two dropdowns bound through
- * `lv_roller_bind_value` and `lv_dropdown_bind_value`; the AM/PM dropdown uses
- * `lv_obj_bind_state_if_eq` to disable itself in `TIME_FORMAT_24`. A second
- * observer on the format subject swaps the hour roller options between the 12
- * and 24 lists.
+ * `lv_roller_bind_value` and `lv_dropdown_bind_value`; the AM/PM dropdown adds an
+ * observer with `lv_subject_add_observer_obj` to disable itself in
+ * `TIME_FORMAT_24`. A second observer on the format subject swaps the hour roller
+ * options between the 12 and 24 lists.
  */
 void lv_example_observer_3(void)
 {
@@ -72,6 +72,13 @@ void lv_example_observer_3(void)
     lv_subject_set_int(&am_pm_subject, TIME_PM);
 }
 
+/*Disable the AM/PM dropdown while the 24-hour format is selected*/
+static void am_pm_disabled_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * obj = lv_observer_get_target_obj(observer);
+    lv_obj_set_state(obj, LV_STATE_DISABLED, lv_subject_get_int(subject) == TIME_FORMAT_24);
+}
+
 static void set_btn_clicked_event_cb(lv_event_t * e)
 {
     lv_obj_t * set_btn = lv_event_get_target_obj(e);
@@ -101,7 +108,7 @@ static void set_btn_clicked_event_cb(lv_event_t * e)
     lv_obj_t * am_pm_dropdown = lv_dropdown_create(cont);
     lv_dropdown_set_options(am_pm_dropdown, "am\npm");
     lv_dropdown_bind_value(am_pm_dropdown, &am_pm_subject);
-    lv_obj_bind_state_if_eq(am_pm_dropdown, &format_subject, LV_STATE_DISABLED, TIME_FORMAT_24);
+    lv_subject_add_observer_obj(&format_subject, am_pm_disabled_observer_cb, am_pm_dropdown, NULL);
     lv_obj_set_pos(am_pm_dropdown, 128, 48);
     lv_obj_set_width(am_pm_dropdown, 80);
 

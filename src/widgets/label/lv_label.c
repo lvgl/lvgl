@@ -1525,7 +1525,7 @@ static void calculate_x_coordinate(int32_t * x, const lv_text_align_t align, con
 
 static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    const char * fmt = observer->user_data;
+    const char * fmt = lv_observer_get_user_data(observer);
 
     if(fmt == NULL) {
         lv_label_set_text(observer->target, subject->value.pointer);

@@ -36,7 +36,9 @@ void lv_example_tileview_l_shape(void)
 
     /*Tile3: a list*/
     lv_obj_t * tile3 = lv_tileview_add_tile(tv, 1, 1, LV_DIR_LEFT);
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * list = lv_list_create(tile3);
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(list, LV_PCT(100), LV_PCT(100));
 
     lv_list_add_button(list, NULL, "One");

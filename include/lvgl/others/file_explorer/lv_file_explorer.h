@@ -22,6 +22,16 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * @deprecated The `lv_file_explorer` widget is deprecated and kept only for
+ * backward compatibility. A file explorer is a path header plus a table of
+ * directory entries read with the `lv_fs` API, so build it directly instead. See
+ * the `lv_example_table_file_browser` example. All `lv_file_explorer_*`
+ * functions below are deprecated.
+ */
+#define LV_FILE_EXPLORER_DEPRECATED_MSG \
+    "lv_file_explorer is deprecated; build a file browser from a table + lv_fs instead. See the lv_example_table_file_browser example."
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -51,6 +61,15 @@ extern const lv_obj_class_t lv_file_explorer_class;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Create a file explorer object
+ * @param parent    pointer to an object, it will be the parent of the new explorer
+ * @return          pointer to the created file explorer
+ * @deprecated The `lv_file_explorer` widget is deprecated. Build a file browser from
+ *             a table and the `lv_fs` API instead. See `lv_example_table_file_browser`.
+ */
+LV_DEPRECATED(LV_FILE_EXPLORER_DEPRECATED_MSG)
 lv_obj_t * lv_file_explorer_create(lv_obj_t * parent);
 
 /*=====================

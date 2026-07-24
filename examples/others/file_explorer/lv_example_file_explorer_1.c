@@ -22,6 +22,8 @@ static void file_explorer_event_handler(lv_event_t * e)
  * @title File explorer with quick access
  * @brief Open a file explorer on the active screen and log the selected path.
  *
+ * @deprecated The `lv_file_explorer` widget is deprecated. See `lv_example_table_file_browser`.
+ *
  * `lv_file_explorer_create` builds a full-screen browser, `lv_file_explorer_set_sort`
  * sorts entries by `LV_EXPLORER_SORT_KIND`, and `lv_file_explorer_open_dir` opens the
  * platform root (`"C:C:/"` on Win32 or `"A:/"` on the `lv_fs` Linux driver). When
@@ -31,7 +33,9 @@ static void file_explorer_event_handler(lv_event_t * e)
  */
 void lv_example_file_explorer_1(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_obj_t * file_explorer = lv_file_explorer_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_KIND);
 
 #if LV_USE_FS_WIN32

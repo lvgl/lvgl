@@ -32,6 +32,8 @@ static void float_button_event_cb(lv_event_t * e)
  * @title Menu with floating add button
  * @brief A circular floating button appends new items and matching sub pages.
  *
+ * @deprecated The `lv_menu` widget is deprecated. See `lv_example_menu_navigation`.
+ *
  * The menu starts with a single main-page item wired to a greeting
  * sub page. A circular `lv_button` flagged with
  * `LV_OBJ_FLAG_FLOATING` is anchored to the bottom-right corner with
@@ -44,7 +46,9 @@ static void float_button_event_cb(lv_event_t * e)
 void lv_example_menu_floating_button(void)
 {
     /*Create a menu object*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     menu = lv_menu_create(lv_screen_active());
+    LV_DEPRECATIONS_IGNORE_END
     lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));
     lv_obj_center(menu);
 

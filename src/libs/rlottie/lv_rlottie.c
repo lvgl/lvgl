@@ -64,6 +64,7 @@ static lv_rlottie_create_info_t create_info;
 
 lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t height, const char * path)
 {
+    LV_LOG_DEPRECATED(LV_RLOTTIE_DEPRECATED_MSG);
     create_info.width = width;
     create_info.height = height;
     create_info.path = path;
@@ -78,6 +79,7 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t
 
 lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, int32_t width, int32_t height, const char * rlottie_desc)
 {
+    LV_LOG_DEPRECATED(LV_RLOTTIE_DEPRECATED_MSG);
     create_info.width = width;
     create_info.height = height;
     create_info.rlottie_desc = rlottie_desc;

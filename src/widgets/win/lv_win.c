@@ -45,6 +45,7 @@ const lv_obj_class_t lv_win_class = {
 
 lv_obj_t * lv_win_create(lv_obj_t * parent)
 {
+    LV_LOG_DEPRECATED(LV_WIN_DEPRECATED_MSG);
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_win_class, parent);
     lv_obj_class_init_obj(obj);

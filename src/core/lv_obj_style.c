@@ -1413,7 +1413,7 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
 
 static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    bind_style_t * p = observer->user_data;
+    bind_style_t * p = lv_observer_get_user_data(observer);
 
     int32_t v = lv_subject_get_int(subject);
     bool dis = (v != p->value);
@@ -1422,7 +1422,7 @@ static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subj
 
 static void bind_style_prop_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    bind_style_prop_t * p = observer->user_data;
+    bind_style_prop_t * p = lv_observer_get_user_data(observer);
 
     lv_style_value_t style_v;
     if(subject->type == LV_SUBJECT_TYPE_INT) style_v.num = lv_subject_get_int(subject);

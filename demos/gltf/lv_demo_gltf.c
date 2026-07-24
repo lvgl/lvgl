@@ -191,6 +191,13 @@ static void create_control_panel(lv_obj_t * viewer)
     create_antialiasing_panel(control_panel);
 }
 
+/*Disable a manual camera slider while a predefined camera (index > 0) is selected*/
+static void disable_while_camera_selected_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * obj = lv_observer_get_target_obj(observer);
+    lv_obj_set_state(obj, LV_STATE_DISABLED, lv_subject_get_int(subject) > 0);
+}
+
 static void create_camera_panel(lv_obj_t * panel, lv_obj_t * viewer)
 {
 
@@ -241,9 +248,9 @@ static void create_camera_panel(lv_obj_t * panel, lv_obj_t * viewer)
     lv_slider_set_max_value(distance_slider, 25);
     style_slider(distance_slider, SLIDER_COLOR);
 
-    lv_obj_bind_state_if_gt(yaw_slider, &camera_subject, LV_STATE_DISABLED, 0);
-    lv_obj_bind_state_if_gt(pitch_slider, &camera_subject, LV_STATE_DISABLED, 0);
-    lv_obj_bind_state_if_gt(distance_slider, &camera_subject, LV_STATE_DISABLED, 0);
+    lv_subject_add_observer_obj(&camera_subject, disable_while_camera_selected_observer_cb, yaw_slider, NULL);
+    lv_subject_add_observer_obj(&camera_subject, disable_while_camera_selected_observer_cb, pitch_slider, NULL);
+    lv_subject_add_observer_obj(&camera_subject, disable_while_camera_selected_observer_cb, distance_slider, NULL);
 }
 
 static void create_animation_panel(lv_obj_t * panel, lv_obj_t * viewer)
