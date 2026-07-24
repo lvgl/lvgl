@@ -101,27 +101,10 @@ capabilities for glTF model visualization. See [3D/glTF Support](/integration/em
 
 #### DMA-BUF Software Fast-Path
 
-When the EGL backend is used for **software rendering** (i.e. no OpenGL ES draw
-unit such as `LV_USE_DRAW_OPENGLES` or `LV_USE_DRAW_NANOVG` is enabled), it
-automatically uses the Linux DMA-BUF protocol to present frames.
-
-The classic software path uploads the framebuffer to a texture and renders a
-full-screen quad into the EGL window surface, which is then presented with
-`eglSwapBuffers()`. The DMA-BUF fast-path instead uploads the framebuffer
-directly into a DMA-BUF backed texture whose `wl_buffer` is attached to the
-surface. This removes the extra quad pass and the swap copy, which improves
-software-rendering performance on platforms that support zero-copy buffer sharing.
-
-When a GPU draw unit is enabled, EGL renders on the GPU and is presented through
-the EGL surface as usual; the DMA-BUF fast-path is not compiled in that case.
-
-**Behavior:**
-
-- Enabled automatically for the EGL software-rendering path; no configuration required
-- Double buffered, using buffers shared with the compositor through `linux-dmabuf`
-- Transparent run-time fallback: if `zwp_linux_dmabuf_v1`, the DRM/GBM device, or
-  the pixel format is unavailable, the backend automatically uses the classic
-  software path instead
+When the EGL backend is used for software rendering, it automatically uses the
+Linux DMA-BUF protocol to present frames, improving performance on platforms
+that support zero-copy buffer sharing. If the required support is unavailable,
+the backend automatically falls back to the classic software path.
 
 **Requirements:**
 

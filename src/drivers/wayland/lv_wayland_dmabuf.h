@@ -16,7 +16,7 @@ extern "C" {
 
 #include "lv_wayland_private.h"
 
-#if LV_USE_WAYLAND && (LV_WAYLAND_USE_G2D || LV_WAYLAND_USE_EGL_DMABUF)
+#if LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF
 
 #include <wayland-client.h>
 #include LV_STDBOOL_INCLUDE
@@ -112,7 +112,7 @@ void lv_wayland_dmabuf_create_buffer(lv_wayland_dmabuf_ctx_t * ctx, lv_wayland_d
                                      int dmabuf_fd, uint32_t width, uint32_t height,
                                      uint32_t stride, uint32_t offset, uint32_t drm_cf);
 
-#endif /*LV_USE_WAYLAND && (LV_WAYLAND_USE_G2D || LV_WAYLAND_USE_EGL_DMABUF)*/
+#endif /*LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -18,9 +18,9 @@
 #include <wayland-egl.h>
 
 /* The DMA-BUF fast-path is a software-rendering optimization. lv_conf_internal.h
- * already derives LV_WAYLAND_USE_EGL_DMABUF internally and enables it only when
+ * already derives LV_WAYLAND_USE_DMABUF internally and enables it only when
  * no GPU draw unit is active, so it maps directly to the local guard below. */
-#if LV_WAYLAND_USE_EGL_DMABUF == 1
+#if LV_WAYLAND_USE_DMABUF == 1
     #define LV_WL_EGL_DMABUF_ENABLED 1
 #else
     #define LV_WL_EGL_DMABUF_ENABLED 0
@@ -75,24 +75,22 @@ typedef struct {
 #endif /*LV_WL_EGL_DMABUF_ENABLED*/
 
 typedef struct {
-    struct wl_egl_window * egl_window;
-    lv_opengles_egl_t * egl_ctx;
-
     /* Used by the classic path (GPU render target, or software upload target). */
     lv_opengles_texture_t texture;
 
+    struct wl_egl_window * egl_window;
+    lv_opengles_egl_t * egl_ctx;
+
 #if LV_WL_EGL_DMABUF_ENABLED
+    lv_wl_buffer_t buffers[LV_WL_EGL_BUF_COUNT];
+    /* Software draw buffers owned by this backend in DMA-BUF mode. */
+    uint8_t * sw_buf[2];
+    struct gbm_device * gbm_device;
+    int drm_fd;
+    uint8_t last_used;
     /* Set at init time once the DMA-BUF path has been confirmed available.
      * When false the classic software path above is used as a fallback. */
     bool use_dmabuf;
-
-    lv_wl_buffer_t buffers[LV_WL_EGL_BUF_COUNT];
-    int drm_fd;
-    struct gbm_device * gbm_device;
-    uint8_t last_used;
-
-    /* Software draw buffers owned by this backend in DMA-BUF mode. */
-    uint8_t * sw_buf[2];
 #endif
 } lv_wl_egl_display_data_t;
 
@@ -128,7 +126,6 @@ static bool egl_dmabuf_setup(lv_wl_egl_display_data_t * ddata, lv_display_t * di
 static bool egl_dmabuf_reinit_buffers(lv_wl_egl_display_data_t * ddata, lv_display_t * display,
                                       int32_t width, int32_t height);
 static void egl_dmabuf_teardown(lv_wl_egl_display_data_t * ddata);
-static void * egl_dmabuf_resize_fail(lv_wl_egl_display_data_t * ddata, lv_display_t * display);
 
 static lv_wl_buffer_t * get_next_buffer(lv_wl_egl_display_data_t * ddata);
 
@@ -345,8 +342,7 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     lv_wl_egl_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
     struct wl_surface * surface = lv_wayland_get_window_surface(disp);
 
-    /* ddata can be NULL if a previous resize failed and tore the display down */
-    if(!ddata || !surface) {
+    if(!surface) {
         lv_display_flush_ready(disp);
         return;
     }
@@ -481,20 +477,10 @@ static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display)
     LV_UNUSED(backend_ctx);
     lv_wl_egl_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
 
-    /* ddata is NULL if a previous DMA-BUF resize already tore the display down. */
-    if(!ddata) {
-        return NULL;
-    }
-
 #if LV_WL_EGL_DMABUF_ENABLED
     if(ddata->use_dmabuf) {
         int32_t width = lv_display_get_original_horizontal_resolution(display);
         int32_t height = lv_display_get_original_vertical_resolution(display);
-
-        if(!egl_dmabuf_reinit_buffers(ddata, display, width, height)) {
-            LV_LOG_ERROR("Failed to recreate DMA-BUF buffers for %dx%d", width, height);
-            return egl_dmabuf_resize_fail(ddata, display);
-        }
 
         lv_color_format_t cf = lv_display_get_color_format(display);
         uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
@@ -505,10 +491,17 @@ static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display)
         LV_ASSERT_MALLOC(buf1);
         LV_ASSERT_MALLOC(buf2);
         if(!buf1 || !buf2) {
-            LV_LOG_ERROR("Failed to allocate display buffer");
+            LV_LOG_ERROR("Failed to allocate display buffer for %dx%d", width, height);
             lv_free(buf1);
             lv_free(buf2);
-            return egl_dmabuf_resize_fail(ddata, display);
+            return ddata;
+        }
+
+        if(!egl_dmabuf_reinit_buffers(ddata, display, width, height)) {
+            LV_LOG_ERROR("Failed to recreate DMA-BUF buffers for %dx%d", width, height);
+            lv_free(buf1);
+            lv_free(buf2);
+            return ddata;
         }
 
         lv_free(ddata->sw_buf[0]);
@@ -749,26 +742,42 @@ static bool egl_dmabuf_setup(lv_wl_egl_display_data_t * ddata, lv_display_t * di
 static bool egl_dmabuf_reinit_buffers(lv_wl_egl_display_data_t * ddata, lv_display_t * display,
                                       int32_t width, int32_t height)
 {
-    for(int i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
-        delete_buffer(ddata->egl_ctx, &ddata->buffers[i]);
+    lv_wl_buffer_t new_buffers[LV_WL_EGL_BUF_COUNT];
+    lv_memset(new_buffers, 0, sizeof(new_buffers));
+    for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
+        new_buffers[i].dmabuf_fd = -1;
     }
 
     lv_color_format_t cf = lv_display_get_color_format(display);
-    for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
-        if(!init_buffer(&ctx, &ddata->buffers[i], width, height, cf, ddata)) {
-            egl_dmabuf_teardown(ddata);
-            return false;
-        }
+    bool ok = true;
+    for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT && ok; i++) {
+        ok = init_buffer(&ctx, &new_buffers[i], width, height, cf, ddata);
     }
-    ddata->last_used = 0;
 
-    wl_display_flush(lv_wl_ctx.wl_display);
-    wl_display_roundtrip(lv_wl_ctx.wl_display);
-    for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; ++i) {
-        if(!ddata->buffers[i].base.wl_buffer) {
-            return false;
+    if(ok) {
+        wl_display_flush(lv_wl_ctx.wl_display);
+        wl_display_roundtrip(lv_wl_ctx.wl_display);
+        for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
+            if(!new_buffers[i].base.wl_buffer) {
+                ok = false;
+                break;
+            }
         }
     }
+
+    if(!ok) {
+        for(int i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
+            delete_buffer(ddata->egl_ctx, &new_buffers[i]);
+        }
+        return false;
+    }
+
+    /* All new buffers are ready: it is now safe to release the old ones. */
+    for(int i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
+        delete_buffer(ddata->egl_ctx, &ddata->buffers[i]);
+    }
+    lv_memcpy(ddata->buffers, new_buffers, sizeof(new_buffers));
+    ddata->last_used = 0;
 
     return true;
 }
@@ -787,20 +796,6 @@ static void egl_dmabuf_teardown(lv_wl_egl_display_data_t * ddata)
         close(ddata->drm_fd);
         ddata->drm_fd = -1;
     }
-}
-
-static void * egl_dmabuf_resize_fail(lv_wl_egl_display_data_t * ddata, lv_display_t * display)
-{
-    /* egl_dmabuf_reinit_buffers() already released the old buffers, so ddata can
-     * no longer be flushed. Tear it down and report failure to the caller rather
-     * than returning a display with dangling wl_buffer / texture ids. */
-    lv_free(ddata->sw_buf[0]);
-    lv_free(ddata->sw_buf[1]);
-    ddata->sw_buf[0] = NULL;
-    ddata->sw_buf[1] = NULL;
-    egl_destroy_display_data(ddata);
-    lv_wayland_set_backend_display_data(display, NULL);
-    return NULL;
 }
 
 static lv_wl_buffer_t * get_next_buffer(lv_wl_egl_display_data_t * ddata)

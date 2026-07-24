@@ -151,7 +151,7 @@ endif()
 set(WAYLAND_PROTOCOL_SOURCES ${XDG_SHELL_SOURCE})
 
 # dmabuf (optional) - used by the G2D backend and by the Wayland EGL DMA-BUF fast-path
-if(CONFIG_LV_WAYLAND_USE_G2D OR CONFIG_LV_WAYLAND_USE_EGL_DMABUF)
+if(CONFIG_LV_WAYLAND_USE_DMABUF)
   set(DMABUF_XML "${PROTOCOL_ROOT}/stable/linux-dmabuf/linux-dmabuf-v1.xml")
   set(DMABUF_HEADER "${PROTOCOLS_DIR}/wayland_linux_dmabuf.h")
   set(DMABUF_SOURCE "${PROTOCOLS_DIR}/wayland_linux_dmabuf.c")

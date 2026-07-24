@@ -9,7 +9,7 @@
 
 #include "lv_wayland_dmabuf.h"
 
-#if LV_USE_WAYLAND && (LV_WAYLAND_USE_G2D || LV_WAYLAND_USE_EGL_DMABUF)
+#if LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF
 
 #include <string.h>
 #include <unistd.h>
@@ -334,4 +334,4 @@ static void dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dm
     }
 }
 
-#endif /*LV_USE_WAYLAND && (LV_WAYLAND_USE_G2D || LV_WAYLAND_USE_EGL_DMABUF)*/
+#endif /*LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF*/
