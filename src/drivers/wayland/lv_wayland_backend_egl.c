@@ -779,6 +779,12 @@ static bool egl_dmabuf_reinit_buffers(lv_wl_egl_display_data_t * ddata, lv_displ
     lv_memcpy(ddata->buffers, new_buffers, sizeof(new_buffers));
     ddata->last_used = 0;
 
+    for(int i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
+        if(ddata->buffers[i].base.wl_buffer) {
+            wl_buffer_set_user_data(ddata->buffers[i].base.wl_buffer, &ddata->buffers[i].base);
+        }
+    }
+
     return true;
 }
 
