@@ -87,6 +87,8 @@ typedef struct {
     uint8_t * sw_buf[2];
     struct gbm_device * gbm_device;
     int drm_fd;
+    int32_t width;
+    int32_t height;
     uint8_t last_used;
     /* Set at init time once the DMA-BUF path has been confirmed available.
      * When false the classic software path above is used as a fallback. */
@@ -494,6 +496,7 @@ static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display)
             LV_LOG_ERROR("Failed to allocate display buffer for %dx%d", width, height);
             lv_free(buf1);
             lv_free(buf2);
+            lv_display_set_resolution(display, ddata->width, ddata->height);
             return ddata;
         }
 
@@ -501,6 +504,7 @@ static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display)
             LV_LOG_ERROR("Failed to recreate DMA-BUF buffers for %dx%d", width, height);
             lv_free(buf1);
             lv_free(buf2);
+            lv_display_set_resolution(display, ddata->width, ddata->height);
             return ddata;
         }
 
@@ -718,10 +722,10 @@ static bool egl_dmabuf_setup(lv_wl_egl_display_data_t * ddata, lv_display_t * di
     }
 
     lv_color_format_t cf = lv_display_get_color_format(display);
+    bool ok = true;
     for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
         if(!init_buffer(&ctx, &ddata->buffers[i], width, height, cf, ddata)) {
-            egl_dmabuf_teardown(ddata);
-            return false;
+            ok = false;
         }
     }
     ddata->last_used = 0;
@@ -730,12 +734,18 @@ static bool egl_dmabuf_setup(lv_wl_egl_display_data_t * ddata, lv_display_t * di
     wl_display_roundtrip(lv_wl_ctx.wl_display);
     for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; ++i) {
         if(!ddata->buffers[i].base.wl_buffer) {
-            LV_LOG_ERROR("DMA-BUF creation failed");
-            egl_dmabuf_teardown(ddata);
-            return false;
+            ok = false;
         }
     }
 
+    if(!ok) {
+        LV_LOG_ERROR("DMA-BUF creation failed");
+        egl_dmabuf_teardown(ddata);
+        return false;
+    }
+
+    ddata->width = width;
+    ddata->height = height;
     return true;
 }
 
@@ -750,18 +760,17 @@ static bool egl_dmabuf_reinit_buffers(lv_wl_egl_display_data_t * ddata, lv_displ
 
     lv_color_format_t cf = lv_display_get_color_format(display);
     bool ok = true;
-    for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT && ok; i++) {
-        ok = init_buffer(&ctx, &new_buffers[i], width, height, cf, ddata);
+    for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
+        if(!init_buffer(&ctx, &new_buffers[i], width, height, cf, ddata)) {
+            ok = false;
+        }
     }
 
-    if(ok) {
-        wl_display_flush(lv_wl_ctx.wl_display);
-        wl_display_roundtrip(lv_wl_ctx.wl_display);
-        for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
-            if(!new_buffers[i].base.wl_buffer) {
-                ok = false;
-                break;
-            }
+    wl_display_flush(lv_wl_ctx.wl_display);
+    wl_display_roundtrip(lv_wl_ctx.wl_display);
+    for(size_t i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
+        if(!new_buffers[i].base.wl_buffer) {
+            ok = false;
         }
     }
 
@@ -778,6 +787,8 @@ static bool egl_dmabuf_reinit_buffers(lv_wl_egl_display_data_t * ddata, lv_displ
     }
     lv_memcpy(ddata->buffers, new_buffers, sizeof(new_buffers));
     ddata->last_used = 0;
+    ddata->width = width;
+    ddata->height = height;
 
     for(int i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
         if(ddata->buffers[i].base.wl_buffer) {
