@@ -49,7 +49,9 @@ jobs:
                                   libfastgltf-dev \
                                   libsdl2-dev \
                                   libsdl2-image-dev \
-                                  libfreetype-dev
+                                  libfreetype-dev \
+                                  libgstreamer1.0-dev \
+                                  libgstreamer-plugins-base1.0-dev
 
       - name: Build and install LVGL
         run: |
