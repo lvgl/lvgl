@@ -94,6 +94,8 @@ endif()
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
+set(CONF_PATH)
+
 if (NOT LV_BUILD_USE_KCONFIG)
 
     # Default - use the lv_conf.h configuration file
@@ -220,6 +222,12 @@ if (LV_BUILD_SET_CONFIG_OPTS)
 
     # This will set all CONFIG_LV_USE_* or CONFIG_LV_BUILD_* variables in cmake
     include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
+
+    # Regen lv_conf.cmake when lv_conf.h changes
+    if(CONF_PATH)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CONF_PATH})
+    endif()
+
     if(NOT CONFIG_LV_USE_PRIVATE_API AND (CONFIG_LV_BUILD_DEMOS OR CONFIG_LV_BUILD_EXAMPLES))
         message(STATUS "CONFIG_LV_USE_PRIVATE_API forcefully enabled because demos or examples are being built")
         set(CONFIG_LV_USE_PRIVATE_API ON CACHE BOOL "" FORCE)
