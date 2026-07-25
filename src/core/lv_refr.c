@@ -419,10 +419,9 @@ void lv_display_refr_timer(lv_timer_t * tmr)
     refr_invalid_areas();
 
     if(disp_refr->inv_p == 0) goto refr_finish;
-    /*In double buffered direct mode or if sync callback is set, save the updated areas.
+    /*In double buffered direct mode save the updated areas.
      *They will be used on the next call to synchronize the buffers.*/
-    if((lv_display_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) ||
-       disp_refr->sync_cb) {
+    if(lv_display_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
         uint32_t i;
         for(i = 0; i < disp_refr->inv_p; i++) {
             if(disp_refr->inv_area_joined[i])
@@ -661,11 +660,11 @@ static void lv_refr_join_area(void)
  */
 static void refr_sync_areas(void)
 {
-    /*Do not sync if not direct double buffered and no sync callback set*/
-    const bool auto_sync = disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT &&
-                           lv_display_is_double_buffered(disp_refr);
-    const bool user_sync = disp_refr->sync_cb != NULL;
-    if(!auto_sync && !user_sync) return;
+    /*Do not sync if not direct or double buffered*/
+    if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT) return;
+
+    /*Do not sync if not double buffered*/
+    if(!lv_display_is_double_buffered(disp_refr)) return;
 
     /*Do not sync if no sync areas*/
     if(lv_ll_is_empty(&disp_refr->sync_areas)) return;
@@ -717,21 +716,17 @@ static void refr_sync_areas(void)
     lv_draw_buf_t * off_screen2 = NULL;
     lv_draw_buf_t * on_screen = NULL;
 
-    /* Only compute buffer relationships when auto_sync (direct double-buffered) is used.
-     * When only user_sync is active, these pointers are not needed. */
-    if(auto_sync) {
-        if(disp_refr->buf_act == disp_refr->buf_1) {
-            off_screen2 = disp_refr->buf_2;
-            on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
-        }
-        else if(disp_refr->buf_act == disp_refr->buf_2) {
-            off_screen2 = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_1;
-            on_screen = disp_refr->buf_1;
-        }
-        else {
-            off_screen2 = disp_refr->buf_1;
-            on_screen = disp_refr->buf_2;
-        }
+    if(disp_refr->buf_act == disp_refr->buf_1) {
+        off_screen2 = disp_refr->buf_2;
+        on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
+    }
+    else if(disp_refr->buf_act == disp_refr->buf_2) {
+        off_screen2 = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_1;
+        on_screen = disp_refr->buf_1;
+    }
+    else {
+        off_screen2 = disp_refr->buf_1;
+        on_screen = disp_refr->buf_2;
     }
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
