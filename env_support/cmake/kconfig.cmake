@@ -5,7 +5,7 @@ set(OUTPUT_DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
 set(KCONFIG_LIST_OUT ${CMAKE_CURRENT_BINARY_DIR}/kconfig_list)
 set(AUTO_CONF_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-# Normalizes INPUT_PATH to an absolute path (relative to CMAKE_SOURCE_DIR)
+# Normalizes INPUT_PATH (which is relative to CMAKE_SOURCE_DIR) to an absolute path 
 macro(lv_normalize_config_path INPUT_PATH LABEL OUTPUT_VAR)
     message(STATUS "Using ${LABEL}: ${${INPUT_PATH}}")
     if(NOT IS_ABSOLUTE ${${INPUT_PATH}})
