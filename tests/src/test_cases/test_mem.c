@@ -165,4 +165,27 @@ void test_memcpy_unaligned(void)
     }
 }
 
+static bool assert_fired;
+static void test_assert_cb(void)
+{
+    assert_fired = true;
+}
+
+void test_calloc_overflow(void)
+{
+    void * p = lv_calloc(2, 4);
+    TEST_ASSERT_NOT_NULL(p);
+    lv_free(p);
+
+    extern void (*_lv_test_assert_fail_cb)(void);
+    _lv_test_assert_fail_cb = test_assert_cb;
+    assert_fired = false;
+
+    p = lv_calloc((size_t)-1, 2);
+    TEST_ASSERT_NULL(p);
+
+    _lv_test_assert_fail_cb = NULL;
+    TEST_ASSERT_TRUE(assert_fired);
+}
+
 #endif

@@ -153,6 +153,8 @@ lv_result_t lv_mem_test(void);
  */
 void lv_mem_monitor(lv_mem_monitor_t * mon_p);
 
+void * lv_malloc_zeroed_array(size_t num, size_t size);
+
 /**********************
  *      MACROS
  **********************/

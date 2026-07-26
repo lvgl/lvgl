@@ -38,7 +38,7 @@ void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size)
     array->capacity = capacity;
     array->element_size = element_size;
 
-    array->data = lv_malloc(capacity * element_size);
+    array->data = lv_malloc_zeroed_array(capacity, element_size);
     array->inner_alloc = true;
     LV_ASSERT_MALLOC(array->data);
 }
@@ -166,6 +166,11 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 {
     if(array->inner_alloc == false) {
         LV_LOG_WARN("Cannot resize array with external buffer");
+        return false;
+    }
+
+    LV_ASSERT_MSG(new_capacity == 0 || array->element_size <= SIZE_MAX / new_capacity, "lv_array capacity overflow");
+    if(new_capacity != 0 && array->element_size > SIZE_MAX / new_capacity) {
         return false;
     }
 

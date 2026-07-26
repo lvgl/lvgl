@@ -54,10 +54,17 @@ static void test_log_print_cb(lv_log_level_t level, const char * buf)
     TEST_PRINTF(buf);
 }
 
+void (*_lv_test_assert_fail_cb)(void) = NULL;
+
 void lv_test_assert_fail(void)
 {
     /*Flush the output*/
     fflush(stdout);
+
+    if(_lv_test_assert_fail_cb) {
+        _lv_test_assert_fail_cb();
+        return;
+    }
 
     /*Handle error on test*/
     assert(false);
