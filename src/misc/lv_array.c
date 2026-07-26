@@ -169,9 +169,11 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
         return false;
     }
 
-    LV_ASSERT_MSG(new_capacity == 0 || array->element_size <= SIZE_MAX / new_capacity, "lv_array capacity overflow");
-    if(new_capacity != 0 && array->element_size > SIZE_MAX / new_capacity) {
-        return false;
+    if(new_capacity != 0) {
+        LV_ASSERT_MSG(array->element_size <= SIZE_MAX / new_capacity, "lv_array capacity overflow");
+        if(array->element_size > SIZE_MAX / new_capacity) {
+            return false;
+        }
     }
 
     uint8_t * data = lv_realloc(array->data, new_capacity * array->element_size);
