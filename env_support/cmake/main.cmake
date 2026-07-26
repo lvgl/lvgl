@@ -95,11 +95,12 @@ add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
 set(CONF_PATH)
-
+include(${CMAKE_CURRENT_LIST_DIR}/lvgl_target_definitions.cmake)
 if (NOT LV_BUILD_USE_KCONFIG)
 
     # Default - use the lv_conf.h configuration file
-    target_compile_definitions(lvgl PUBLIC LV_KCONFIG_IGNORE)
+    lvgl_build_definitions(LV_KCONFIG_IGNORE)
+    lvgl_install_definitions(LV_KCONFIG_IGNORE)
 
     message(STATUS ${LV_BUILD_CONF_PATH})
 
@@ -115,7 +116,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
 
         get_filename_component(CONF_INC_DIR ${CONF_PATH} DIRECTORY)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_PATH="${CONF_PATH}")
+        lvgl_build_definitions("LV_CONF_PATH=\"${CONF_PATH}\"")
 
     elseif(LV_BUILD_CONF_DIR)
 
@@ -133,7 +134,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
 
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE)
+        lvgl_build_definitions(LV_CONF_INCLUDE_SIMPLE)
 
     else()
 
@@ -144,7 +145,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
         set(CONF_INC_DIR ${CMAKE_SOURCE_DIR})
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE)
+        lvgl_build_definitions(LV_CONF_INCLUDE_SIMPLE)
 
     endif()
 
@@ -152,6 +153,10 @@ if (NOT LV_BUILD_USE_KCONFIG)
     if (NOT EXISTS ${CONF_PATH})
         message(FATAL_ERROR "Configuration file: ${CONF_PATH} - not found")
     endif()
+
+    # The lv_conf.h used during the build is installed to <includedir>/lvgl/lv_conf.h
+    # (see the installation section), so the installed library is self-contained and
+    # consumers resolve it the same way as in the Kconfig case, via LV_CONF_PATH.
 
 else()
 
@@ -164,24 +169,29 @@ else()
     # generate_cmake_variables.py script.
     set(GEN_VARS_KCONFIG_MODE_FLAG --kconfig)
 
-    # If using Kconfig, we need to define additional definitions
-    target_compile_definitions(lvgl PUBLIC
-        "LV_CONF_SKIP"
-        "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${KCONFIG_EXTERNAL_INCLUDE}\"")
-
+    # If using Kconfig, we need to define additional build definitions
+    lvgl_build_definitions(
+      LV_CONF_SKIP
+      "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${KCONFIG_EXTERNAL_INCLUDE}\"")
 endif()
 
+
+
 if (LV_BUILD_LVGL_H_SYSTEM_INCLUDE)
-    target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SYSTEM)
+    lvgl_build_definitions(LV_LVGL_H_INCLUDE_SYSTEM)
 elseif(LV_BUILD_LVGL_H_SIMPLE_INCLUDE)
-    target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SIMPLE)
+    lvgl_build_definitions(LV_LVGL_H_INCLUDE_SIMPLE)
 endif()
 
 
 if (LV_BUILD_SET_CONFIG_OPTS)
     # Use the portable pcpp to preprocess lv_conf_internal.h
 
-    get_target_property(CONF_DEFINES lvgl COMPILE_DEFINITIONS)
+    # Use the definitions active during the build (recorded by
+    # lvgl_build_definitions). We can't use get_target_property(...
+    # COMPILE_DEFINITIONS) here because it returns raw generator-expression
+    # syntax (e.g. "$<BUILD_INTERFACE:LV_CONF_SKIP>") that pcpp can't parse.
+    get_property(CONF_DEFINES GLOBAL PROPERTY LVGL_BUILD_DEFINES)
 
     execute_process(
         COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
@@ -336,11 +346,20 @@ if(CONFIG_LV_USE_PRIVATE_API)
     ")
 endif()
 
-# When KConfig is used, copy the expanded conf header and rename it to lv_conf.h
+# Install lv_conf.h inside lvgl/config so its next to lv_conf_internal.h
+# and define LV_CONF_INCLUDE_SIMPLE so that it can be found
+lvgl_install_definitions(LV_CONF_INCLUDE_SIMPLE)
 if(LV_BUILD_USE_KCONFIG)
+    # Kconfig: install the expanded configuration header
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/config"
+        RENAME lv_conf.h)
+else()
+    # Non-kconfig: install the actual lv_conf.h used during the build
+    install(
+        FILES "${CONF_PATH}"
+	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/config"
         RENAME lv_conf.h)
 endif()
 
@@ -351,7 +370,9 @@ get_property(PKG_LIBS_PRIVATE GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
 get_property(CMAKE_PUBLIC_DEPS GLOBAL PROPERTY LVGL_CMAKE_PUBLIC_DEPS)
 get_property(CMAKE_PRIVATE_DEPS GLOBAL PROPERTY LVGL_CMAKE_PRIVATE_DEPS)
 get_property(CMAKE_RAW_LIBS GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS)
+get_property(PKG_CFLAGS GLOBAL PROPERTY LVGL_INSTALL_DEFINES)
 
+list(JOIN PKG_CFLAGS " " LVGL_PKG_CFLAGS)
 list(JOIN PKG_LIBS_PRIVATE " " LVGL_PKG_LIBS_PRIVATE)
 list(JOIN PKG_REQUIRES " " LVGL_PKG_REQUIRES)
 list(JOIN PKG_REQUIRES_PRIVATE " " LVGL_PKG_REQUIRES_PRIVATE)
