@@ -43,26 +43,33 @@
  * by the matching attach (the Zephyr analogue of the CMSIS named vector). The
  * interrupt priority comes from the device tree node. */
 
+/* The callback is written from thread context (attach/detach) and read from
+ * interrupt context (the trampoline), so it is volatile and read once into a
+ * local to keep the access well-defined. A pointer-sized store is atomic on
+ * Cortex-M, and detach disables the line before clearing it. */
+
 #if LV_IRQ_HAS_DMA2D
 
-static lv_irq_cb_t dma2d_cb;
+static volatile lv_irq_cb_t dma2d_cb;
 
 static void dma2d_trampoline(void * arg)
 {
+    lv_irq_cb_t cb = dma2d_cb;
     LV_UNUSED(arg);
-    if(dma2d_cb) dma2d_cb();
+    if(cb) cb();
 }
 
 #endif /*LV_IRQ_HAS_DMA2D*/
 
 #if LV_IRQ_HAS_PXP
 
-static lv_irq_cb_t pxp_cb;
+static volatile lv_irq_cb_t pxp_cb;
 
 static void pxp_trampoline(void * arg)
 {
+    lv_irq_cb_t cb = pxp_cb;
     LV_UNUSED(arg);
-    if(pxp_cb) pxp_cb();
+    if(cb) cb();
 }
 
 #endif /*LV_IRQ_HAS_PXP*/
@@ -75,6 +82,7 @@ static void pxp_trampoline(void * arg)
 
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb)
 {
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID, "callback must not be NULL");
     dma2d_cb = cb;
     IRQ_CONNECT(DT_IRQN(DT_NODELABEL(dma2d)), DT_IRQ(DT_NODELABEL(dma2d), priority),
                 dma2d_trampoline, NULL, 0);
@@ -95,6 +103,7 @@ lv_result_t lv_irq_detach_dma2d(void)
 
 lv_result_t lv_irq_attach_pxp(lv_irq_cb_t cb)
 {
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID, "callback must not be NULL");
     pxp_cb = cb;
     IRQ_CONNECT(DT_IRQN(DT_NODELABEL(pxp)), DT_IRQ(DT_NODELABEL(pxp), priority),
                 pxp_trampoline, NULL, 0);
