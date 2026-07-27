@@ -13,9 +13,12 @@ config LV_DRAW_DMA2D_HAL_INCLUDE
 config LV_USE_DRAW_DMA2D_INTERRUPT
 	bool "use the DMA2D transfer complete interrupt"
 	default n
+	depends on !LV_OS_NONE
 	help
-		if enabled, the user is required to call
-		`lv_draw_dma2d_transfer_complete_interrupt_handler`
-		upon receiving the DMA2D global interrupt
+		Run DMA2D asynchronously: the transfer-complete interrupt wakes the
+		draw unit instead of busy-polling. Requires an OS (for the completion
+		sync object) and an IRQ backend that provides DMA2D (LV_USE_IRQ). The
+		interrupt is wired by the selected IRQ backend (src/irqal); no manual
+		vector/handler wiring is needed.
 
 endif

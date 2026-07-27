@@ -14,13 +14,8 @@
 #include "../../misc/lv_area_private.h"
 #include "../lv_draw_buf_private.h"
 
-#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
-    #include <zephyr/kernel.h>
-    #include <zephyr/irq.h>
-#endif
-
 #if !LV_DRAW_DMA2D_ASYNC && LV_USE_DRAW_DMA2D_INTERRUPT
-    #warning LV_USE_DRAW_DMA2D_INTERRUPT is 1 but has no effect because LV_USE_OS is LV_OS_NONE
+    #warning LV_USE_DRAW_DMA2D_INTERRUPT is 1 but has no effect because LV_USE_OS is LV_OS_NONE or no IRQ backend provides DMA2D (LV_USE_IRQ)
 #endif
 
 /*********************
@@ -44,8 +39,8 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit);
     static int32_t wait_finish_cb(lv_draw_unit_t * u);
 #endif
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
-#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
-    static void zephyr_dma2d_irq_handler(void *);
+#if LV_DRAW_DMA2D_ASYNC
+    static void dma2d_irq_cb(void);
 #endif
 #if LV_DRAW_DMA2D_CACHE
     static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
@@ -118,19 +113,18 @@ void lv_draw_dma2d_init(void)
     /* disable dead time */
     DMA2D->AMTCR = 0;
 
-#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
-    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(dma2d)), DT_IRQ(DT_NODELABEL(dma2d), priority), zephyr_dma2d_irq_handler, NULL, 0);
-    irq_enable(DT_IRQN(DT_NODELABEL(dma2d)));
-#else
-    /* enable the interrupt */
-    NVIC_EnableIRQ(DMA2D_IRQn);
+#if LV_DRAW_DMA2D_ASYNC
+    /* register the transfer-complete interrupt through the IRQ abstraction layer */
+    lv_irq_attach_dma2d(dma2d_irq_cb);
 #endif
 }
 
 void lv_draw_dma2d_deinit(void)
 {
+#if LV_DRAW_DMA2D_ASYNC
     /* disable the interrupt */
-    NVIC_DisableIRQ(DMA2D_IRQn);
+    lv_irq_detach_dma2d();
+#endif
 
     /* disable the DMA2D clock */
 #if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
@@ -339,8 +333,9 @@ static void flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
-static void zephyr_dma2d_irq_handler(void *)
+#if LV_DRAW_DMA2D_ASYNC
+/* Called by the IRQ abstraction layer (src/irqal) when the DMA2D interrupt fires */
+static void dma2d_irq_cb(void)
 {
     /* Clear Transfer Complete flag */
     DMA2D->IFCR = DMA2D_IFCR_CTCIF;

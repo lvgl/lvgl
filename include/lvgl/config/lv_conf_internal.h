@@ -57,6 +57,11 @@
 #define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
 
+/* IRQ abstraction backend to use */
+#define LV_IRQ_NONE     0
+#define LV_IRQ_CMSIS    1
+#define LV_IRQ_ZEPHYR   2
+
 /* Asm mode in sw draw */
 #define LV_DRAW_SW_ASM_NONE      0
 #define LV_DRAW_SW_ASM_NEON      1
@@ -158,7 +163,7 @@
     #define LV_KCONFIG_PRESENT
 #endif
 
-/* 
+/*
  * Detect if the user is using the new calendar day/month configuration
  * in order to avoid warnings for users that have migrated.
  */
@@ -168,7 +173,7 @@
 #define LV_CALENDAR_DISABLE_DEFAULT_DAY_NAMES 0
 #endif
 
-/* 
+/*
  * Detect if the user is using the new calendar day/month configuration
  * in order to avoid warnings for users that have migrated.
  */
@@ -178,7 +183,7 @@
 #define LV_CALENDAR_DISABLE_DEFAULT_MONTH_NAMES 0
 #endif
 
-/* 
+/*
  * Detect if the user is using the xkb keymap configuration
  * in order to avoid warnings for users that have migrated.
  */
@@ -323,6 +328,52 @@
         #define LV_OS_IDLE_PERCENT_CUSTOM CONFIG_LV_OS_IDLE_PERCENT_CUSTOM
     #else
         #define LV_OS_IDLE_PERCENT_CUSTOM 0
+    #endif
+#endif
+
+
+
+/*============================================================================
+ * INTERRUPT HANDLING (IRQ)
+ *============================================================================*/
+
+#ifndef LV_USE_IRQ
+    #ifdef CONFIG_LV_USE_IRQ
+        #define LV_USE_IRQ CONFIG_LV_USE_IRQ
+    #else
+        #define LV_USE_IRQ LV_IRQ_NONE
+    #endif
+#endif
+
+#ifndef LV_IRQ_USE_CMSIS_INCLUDE
+    #ifdef CONFIG_LV_IRQ_USE_CMSIS_INCLUDE
+        #define LV_IRQ_USE_CMSIS_INCLUDE CONFIG_LV_IRQ_USE_CMSIS_INCLUDE
+    #else
+        #define LV_IRQ_USE_CMSIS_INCLUDE 0
+    #endif
+#endif
+
+#ifndef LV_IRQ_CMSIS_INCLUDE
+    #ifdef CONFIG_LV_IRQ_CMSIS_INCLUDE
+        #define LV_IRQ_CMSIS_INCLUDE CONFIG_LV_IRQ_CMSIS_INCLUDE
+    #else
+        #define LV_IRQ_CMSIS_INCLUDE ""
+    #endif
+#endif
+
+#ifndef LV_IRQ_CMSIS_SET_PRIORITY
+    #ifdef CONFIG_LV_IRQ_CMSIS_SET_PRIORITY
+        #define LV_IRQ_CMSIS_SET_PRIORITY CONFIG_LV_IRQ_CMSIS_SET_PRIORITY
+    #else
+        #define LV_IRQ_CMSIS_SET_PRIORITY 0
+    #endif
+#endif
+
+#ifndef LV_IRQ_CMSIS_PRIORITY
+    #ifdef CONFIG_LV_IRQ_CMSIS_PRIORITY
+        #define LV_IRQ_CMSIS_PRIORITY CONFIG_LV_IRQ_CMSIS_PRIORITY
+    #else
+        #define LV_IRQ_CMSIS_PRIORITY 255
     #endif
 #endif
 
@@ -4623,15 +4674,15 @@
  * Start of compatibility block
  -----------------------------------*/
 
-/*  
+/*
  *  TODO: Remove this for v10.
  */
 
 /*
  *  Before the user selected either LV_USE_LZ4_INTERNAL or LV_USE_LZ4_EXTERNAL
- *  For v9.6 LV_USE_LZ4_EXTERNAL doesn't exist anymore, instead the user 
+ *  For v9.6 LV_USE_LZ4_EXTERNAL doesn't exist anymore, instead the user
  *  enables LV_USE_LZ4 and disables LV_USE_LZ4_INTERNAL
- *  To support users using LV_USE_LZ4_EXTERNAL from before v9.6 we 
+ *  To support users using LV_USE_LZ4_EXTERNAL from before v9.6 we
  *  we enable LV_USE_LZ4 for them
  */
 #if defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL
@@ -4642,11 +4693,11 @@
 #endif /*!LV_USE_LZ4*/
 #endif /*defined(LV_USE_LZ4_EXTERNAL) && LV_USE_LZ4_EXTERNAL*/
 
-/*  
+/*
  *  Before the user selected either LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL
- *  For v9.6 LV_USE_THORVG_EXTERNAL doesn't exist anymore, instead the user 
+ *  For v9.6 LV_USE_THORVG_EXTERNAL doesn't exist anymore, instead the user
  *  enables LV_USE_THORVG and disables LV_USE_THORVG_INTERNAL
- *  To support users using LV_USE_THORVG_EXTERNAL from before v9.6 we 
+ *  To support users using LV_USE_THORVG_EXTERNAL from before v9.6 we
  *  we enable LV_USE_THORVG for them
  */
 #if defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL
@@ -4657,8 +4708,8 @@
 #endif /*!LV_USE_THORVG*/
 #endif /*defined(LV_USE_THORVG_EXTERNAL) && LV_USE_THORVG_EXTERNAL*/
 
-/*  
- *  Backward compatibility. Before the user selected either 
+/*
+ *  Backward compatibility. Before the user selected either
  *  LV_X11_RENDER_MODE_PARTIAL or LV_X11_RENDER_MODE_DIRECT or
  *  LV_X11_RENDER_MODE_FULL. For v9.6, this becomes a single choice:
  *  LV_X11_RENDER_MODE which maps to a LV_DISPLAY_RENDER_MODE value.
@@ -5028,6 +5079,14 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_OS_IDLE_PERCENT_CUSTOM requires LV_USE_OS == LV_OS_FREERTOS (Kconfig depends on)"
 #endif
 
+#if LV_IRQ_USE_CMSIS_INCLUDE && !(LV_USE_IRQ == LV_IRQ_CMSIS)
+    #error "LV_IRQ_USE_CMSIS_INCLUDE requires LV_USE_IRQ == LV_IRQ_CMSIS (Kconfig depends on)"
+#endif
+
+#if LV_IRQ_CMSIS_SET_PRIORITY && !(LV_USE_IRQ == LV_IRQ_CMSIS)
+    #error "LV_IRQ_CMSIS_SET_PRIORITY requires LV_USE_IRQ == LV_IRQ_CMSIS (Kconfig depends on)"
+#endif
+
 #if (LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES) && !LV_USE_MATRIX
     #error "LV_USE_MATRIX must be enabled: Kconfig selects it from LV_USE_VECTOR_GRAPHIC || LV_USE_DRAW_VG_LITE || LV_USE_DRAW_NANOVG || LV_USE_OPENGLES"
 #endif
@@ -5124,8 +5183,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_PPA_IMG requires LV_USE_PPA (Kconfig depends on)"
 #endif
 
-#if LV_USE_DRAW_DMA2D_INTERRUPT && !(LV_USE_DRAW_DMA2D)
-    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
+#if LV_USE_DRAW_DMA2D_INTERRUPT && !(!(LV_USE_OS == LV_OS_NONE) && LV_USE_DRAW_DMA2D)
+    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires !(LV_USE_OS == LV_OS_NONE) && LV_USE_DRAW_DMA2D (Kconfig depends on)"
 #endif
 
 #if (LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && !LV_USE_DRAW_G2D

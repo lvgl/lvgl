@@ -1,0 +1,57 @@
+menu "Interrupt Handling (IRQ)"
+choice LV_USE_IRQ
+	prompt "IRQ abstraction backend to use"
+	default LV_IRQ_NONE
+
+	config LV_IRQ_NONE
+		bool "NONE"
+	config LV_IRQ_CMSIS
+		bool "CMSIS"
+	config LV_IRQ_ZEPHYR
+		bool "ZEPHYR"
+endchoice
+
+config LV_USE_IRQ
+	int
+	default 0 if LV_IRQ_NONE
+	default 1 if LV_IRQ_CMSIS
+	default 2 if LV_IRQ_ZEPHYR
+
+if LV_IRQ_CMSIS
+config LV_IRQ_USE_CMSIS_INCLUDE
+	bool "Include a CMSIS/vendor device header to discover IRQ numbers"
+	default n
+	help
+		Enable to pull in a vendor/CMSIS device header (e.g. stm32h7xx.h) that
+		provides the IRQn_Type enumerators (PXP_IRQn, DMA2D_IRQn, ...) and the
+		NVIC_* helpers. Peripheral IRQ support is auto-detected from the symbols
+		this header defines.
+
+config LV_IRQ_CMSIS_INCLUDE
+	string "CMSIS/vendor device header"
+	default ""
+	depends on LV_IRQ_USE_CMSIS_INCLUDE
+
+config LV_IRQ_CMSIS_SET_PRIORITY
+	bool "Set the NVIC priority of irqal-managed interrupts"
+	default n
+	help
+		Enable on RTOS builds (e.g. FreeRTOS, or CMSIS-RTOS2 over an RTOS) where
+		the interrupt priority must sit at or below the kernel's syscall interrupt
+		priority ceiling, so the ISR may safely call the kernel's ...FromISR APIs
+		(lv_thread_sync_signal_isr uses one). Leave disabled on bare-metal, where
+		the reset-default priority is fine.
+
+config LV_IRQ_CMSIS_PRIORITY
+	int "NVIC priority value for irqal-managed interrupts"
+	default 255
+	depends on LV_IRQ_CMSIS_SET_PRIORITY
+	help
+		The value passed to NVIC_SetPriority. Defaults to 255, which NVIC_SetPriority
+		maps to the lowest preemption priority regardless of the implemented priority
+		bits (__NVIC_PRIO_BITS) - always safe to call ...FromISR from, at the cost of
+		latency. For best latency under FreeRTOS set it to
+		configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h may
+		define this symbolically; a Kconfig build takes a literal number).
+endif #LV_IRQ_CMSIS
+endmenu
