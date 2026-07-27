@@ -133,7 +133,7 @@ void * lv_calloc(size_t num, size_t size)
 {
     LV_TRACE_MEM("allocating number of %zu each %zu bytes", num, size);
     if(num == 0 || size == 0) {
-        return NULL;
+        return &zero_mem;
     }
     if(size > SIZE_MAX / num) {
         LV_LOG_ERROR("integer overflow in lv_calloc: %zu * %zu", num, size);

@@ -36,6 +36,8 @@ jobs:
       run: |
         git clone https://github.com/lvgl/lv_micropython.git .
         git checkout master
+        echo "CONFIG_TINYUSB_CDC_ENABLED=y" >> ports/esp32/boards/sdkconfig.base
+        echo "CONFIG_TINYUSB_CDC_EP_BUFSIZE=512" >> ports/esp32/boards/sdkconfig.base
 
     - name: Initialize LVGL bindings submodule
       run: git submodule update --init --recursive user_modules/lv_binding_micropython
