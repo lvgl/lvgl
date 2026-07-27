@@ -37,15 +37,18 @@ typedef void (*lv_irq_cb_t)(void);
  * GLOBAL PROTOTYPES
  **********************/
 
-/* One attach/detach pair per known peripheral IRQ. The declarations are
- * unconditional (public API); a definition exists only for peripherals the
- * selected backend actually provides (see LV_IRQ_HAS_* in the backend). Guard
- * call sites with the matching LV_IRQ_HAS_* macro so you never reference a
- * function the backend didn't define.
+/* One attach/detach pair per known peripheral IRQ, implemented by the selected
+ * IRQ backend (LV_USE_IRQ) for the peripherals the target actually provides.
+ * These are used mainly by LVGL's own GPU draw units. The declarations are
+ * unconditional, but a definition exists only when the selected backend covers
+ * that peripheral, so calling one the backend does not provide is a link error.
+ * To supply your own backend, select LV_IRQ_NONE and define the attach/detach
+ * functions you need (see src/irqal for the reference backends to copy).
  *
- * `attach` registers/enables the line so `cb()` is invoked when the IRQ fires;
- * `detach` disables it. The interrupt priority is sourced by the backend
- * (device tree on Zephyr, vendor config on CMSIS), not passed here. */
+ * `attach` registers/enables the line so `cb()` is invoked when the IRQ fires
+ * (in interrupt context); `detach` disables it. `cb` must not be NULL. The
+ * interrupt priority is sourced by the backend (device tree on Zephyr, vendor
+ * config on CMSIS), not passed here. */
 
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb);
 lv_result_t lv_irq_detach_dma2d(void);

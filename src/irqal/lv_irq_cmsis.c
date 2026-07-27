@@ -55,12 +55,18 @@ static void cmsis_enable_irq(IRQn_Type irqn)
 }
 #endif
 
+/* The callback is written from thread context (attach/detach) and read from
+ * interrupt context (the vector below), so it is volatile and read once into a
+ * local in the ISR to keep the access well-defined. A pointer-sized store is
+ * atomic on Cortex-M, and detach disables the line before clearing it. */
+
 #if LV_IRQ_HAS_DMA2D
 
-static lv_irq_cb_t dma2d_cb;
+static volatile lv_irq_cb_t dma2d_cb;
 
 lv_result_t lv_irq_attach_dma2d(lv_irq_cb_t cb)
 {
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID, "callback must not be NULL");
     dma2d_cb = cb;
     cmsis_enable_irq(DMA2D_IRQn);
     return LV_RESULT_OK;
@@ -76,17 +82,19 @@ lv_result_t lv_irq_detach_dma2d(void)
 void DMA2D_IRQHandler(void);
 void DMA2D_IRQHandler(void)
 {
-    if(dma2d_cb) dma2d_cb();
+    lv_irq_cb_t cb = dma2d_cb;
+    if(cb) cb();
 }
 
 #endif /*LV_IRQ_HAS_DMA2D*/
 
 #if LV_IRQ_HAS_PXP
 
-static lv_irq_cb_t pxp_cb;
+static volatile lv_irq_cb_t pxp_cb;
 
 lv_result_t lv_irq_attach_pxp(lv_irq_cb_t cb)
 {
+    LV_CHECK_ARG(cb != NULL, return LV_RESULT_INVALID, "callback must not be NULL");
     pxp_cb = cb;
     cmsis_enable_irq(PXP_IRQn);
     return LV_RESULT_OK;
@@ -102,7 +110,8 @@ lv_result_t lv_irq_detach_pxp(void)
 void PXP_IRQHandler(void);
 void PXP_IRQHandler(void)
 {
-    if(pxp_cb) pxp_cb();
+    lv_irq_cb_t cb = pxp_cb;
+    if(cb) cb();
 }
 
 #endif /*LV_IRQ_HAS_PXP*/
