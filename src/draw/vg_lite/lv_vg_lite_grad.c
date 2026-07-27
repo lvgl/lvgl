@@ -765,40 +765,47 @@ static lv_cache_compare_res_t grad_compare_cb(const grad_item_ref_t * lhs_ref, c
         return lhs->lv.spread > rhs->lv.spread ? 1 : -1;
     }
 
-    /* compare gradient parameters */
+    /* Compare gradient parameters.
+     * Use exact float comparison, NOT approximate (math_equal). This callback
+     * is the ordering key of a red-black tree, which requires a strict weak
+     * ordering: "equal" must be transitive. An epsilon based compare is not
+     * transitive (a==b, b==c, but a!=c for values spaced around the epsilon),
+     * which corrupts the tree ordering and breaks lookups. Coordinates coming
+     * from the same source produce identical bits, so exact compare matches
+     * reliably; near-but-not-equal coordinates are simply cached separately. */
     switch(lhs->type) {
         case GRAD_TYPE_LINEAR:
             /* no extra compare needed */
             break;
 
         case GRAD_TYPE_LINEAR_EXT:
-            if(!math_equal(lhs->lv.x1, rhs->lv.x1)) {
+            if(lhs->lv.x1 != rhs->lv.x1) {
                 return lhs->lv.x1 > rhs->lv.x1 ? 1 : -1;
             }
 
-            if(!math_equal(lhs->lv.y1, rhs->lv.y1)) {
+            if(lhs->lv.y1 != rhs->lv.y1) {
                 return lhs->lv.y1 > rhs->lv.y1 ? 1 : -1;
             }
 
-            if(!math_equal(lhs->lv.x2, rhs->lv.x2)) {
+            if(lhs->lv.x2 != rhs->lv.x2) {
                 return lhs->lv.x2 > rhs->lv.x2 ? 1 : -1;
             }
 
-            if(!math_equal(lhs->lv.y2, rhs->lv.y2)) {
+            if(lhs->lv.y2 != rhs->lv.y2) {
                 return lhs->lv.y2 > rhs->lv.y2 ? 1 : -1;
             }
             break;
 
         case GRAD_TYPE_RADIAL:
-            if(!math_equal(lhs->lv.cx, rhs->lv.cx)) {
+            if(lhs->lv.cx != rhs->lv.cx) {
                 return lhs->lv.cx > rhs->lv.cx ? 1 : -1;
             }
 
-            if(!math_equal(lhs->lv.cy, rhs->lv.cy)) {
+            if(lhs->lv.cy != rhs->lv.cy) {
                 return lhs->lv.cy > rhs->lv.cy ? 1 : -1;
             }
 
-            if(!math_equal(lhs->lv.cr, rhs->lv.cr)) {
+            if(lhs->lv.cr != rhs->lv.cr) {
                 return lhs->lv.cr > rhs->lv.cr ? 1 : -1;
             }
             break;

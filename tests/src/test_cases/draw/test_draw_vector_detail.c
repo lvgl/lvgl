@@ -2,6 +2,7 @@
 #include "../lvgl.h"
 #include "src/misc/cache/instance/lv_image_cache.h"
 #include "unity/unity.h"
+#include <float.h>
 
 static lv_layer_t layer;
 static lv_obj_t * canvas;
@@ -252,6 +253,111 @@ void test_draw_arc_path(void)
     /* Cleanup */
     lv_vector_path_delete(path);
     lv_draw_vector_dsc_delete(ctx);
+}
+
+/*
+ * Regression test: use-after-free in the vg_lite gradient cache.
+ *
+ * If grad_compare_cb() compares coordinates with an approximate float compare
+ * (fabsf(a-b) < FLT_EPSILON), the comparator is not a strict weak ordering:
+ * for x1 spaced by < FLT_EPSILON it falls through to y1, so three near-equal
+ * x1 with inverted y1 order violate transitivity (a==b, b==c, but a!=c). That
+ * corrupts the rb-tree ordering, a lookup can miss a node that is still linked,
+ * and the eviction path then frees the entry while leaving the node linked ->
+ * a later eviction touches freed memory.
+ *
+ * The coordinates below are a deterministic minimal trigger: x1 increases by
+ * ~0.4*FLT_EPSILON per step (adjacent pairs compare equal, spaced-apart pairs
+ * do not) while y1 zig-zags so near-equal neighbours invert. Drawing far more
+ * than LV_VG_LITE_GRAD_CACHE_CNT (32) distinct gradients forces eviction
+ * repeatedly. With exact comparison (and node-identity unlink) it passes.
+ */
+void test_draw_grad_cache_intransitive_uaf(void)
+{
+    /* Build the intransitive coordinate cluster:
+     *  - x1 starts sub-unit (~0.0086) and increases by ~0.4*FLT_EPSILON per
+     *    step, so adjacent x1 compare "equal" under an epsilon compare while
+     *    x1 two steps apart do not;
+     *  - y1 zig-zags with growing amplitude so near-equal x1 neighbours have
+     *    inverted y1 order, which is what breaks transitivity.
+     * Sub-unit x1 is essential: only there is 1 ULP smaller than FLT_EPSILON,
+     * so an epsilon compare actually merges distinct values. */
+    const int poison_cnt = 12;
+    float poison[12][2];
+    for(int i = 0; i < poison_cnt; i++) {
+        poison[i][0] = 0.0086612f + (float)i * (0.4f * FLT_EPSILON);
+        poison[i][1] = -11.7f + ((i & 1) ? 1e-4f : -1e-4f) * (float)(i + 1);
+    }
+
+#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
+    /* On real hardware the linear gradient EXT path is used (GRAD_TYPE_LINEAR_EXT),
+     * which is the only type whose comparator compares x1/y1/x2/y2 via math_equal.
+     * The ThorVG sim reports this feature as disabled by default, collapsing to
+     * GRAD_TYPE_LINEAR (coords not compared). Force it on so the test exercises
+     * the same comparison path that faulted on device. */
+    vg_lite_uint32_t saved_lin_ext = vg_lite_query_feature(gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT);
+    vg_lite_enable_feature(gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT, 1);
+#endif
+
+    lv_vector_dsc_t * ctx = lv_vector_dsc_create(&layer);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+
+    lv_gradient_stop_t stops[2];
+    lv_memzero(stops, sizeof(stops));
+    stops[0].color = lv_color_hex(0xff0000);
+    stops[0].opa = LV_OPA_COVER;
+    stops[0].frac = 0;
+    stops[1].color = lv_color_hex(0x0000ff);
+    stops[1].opa = LV_OPA_COVER;
+    stops[1].frac = 255;
+
+    lv_area_t rect = {10, 10, 60, 120};
+
+    /*
+     * Several rounds: each round draws the intransitive cluster plus enough
+     * distinct "filler" gradients to overflow the 32-entry grad cache and force
+     * eviction. Repeating re-inserts the poison keys so a dangling node created
+     * in one round is selected as a victim in a later round.
+     */
+    for(int round = 0; round < 6; round++) {
+        /* 1) the intransitive cluster */
+        for(int i = 0; i < poison_cnt; i++) {
+            lv_vector_path_clear(path);
+            lv_vector_path_append_rect(path, &rect, 0, 0);
+            lv_vector_dsc_set_fill_linear_gradient(ctx, poison[i][0], poison[i][1],
+                                                   0.0f, -0.25f);
+            lv_vector_dsc_set_fill_gradient_color_stops(ctx, stops, 2);
+            lv_vector_dsc_set_fill_gradient_spread(ctx, LV_VECTOR_GRADIENT_SPREAD_PAD);
+            lv_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
+            lv_vector_dsc_set_stroke_opa(ctx, LV_OPA_TRANSP);
+            lv_vector_dsc_add_path(ctx, path);
+            draw_vector(ctx);
+        }
+
+        /* 2) filler gradients to overflow the cache (> 32 distinct keys) */
+        for(int j = 0; j < 40; j++) {
+            lv_vector_path_clear(path);
+            lv_vector_path_append_rect(path, &rect, 0, 0);
+            lv_vector_dsc_set_fill_linear_gradient(ctx, (float)(j + 1), (float)(2 * j + 3),
+                                                   (float)(j + 5), (float)(3 * j + 7));
+            lv_vector_dsc_set_fill_gradient_color_stops(ctx, stops, 2);
+            lv_vector_dsc_set_fill_gradient_spread(ctx, LV_VECTOR_GRADIENT_SPREAD_PAD);
+            lv_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
+            lv_vector_dsc_set_stroke_opa(ctx, LV_OPA_TRANSP);
+            lv_vector_dsc_add_path(ctx, path);
+            draw_vector(ctx);
+        }
+    }
+
+    /* Reaching here without an abort/ASAN report means the cache no longer
+     * leaves dangling nodes on comparator-induced find failures. */
+
+    lv_vector_path_delete(path);
+    lv_vector_dsc_delete(ctx);
+
+#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
+    vg_lite_enable_feature(gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT, saved_lin_ext);
+#endif
 }
 
 #endif
