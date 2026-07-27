@@ -110,6 +110,86 @@ void test_malloc_failed(void)
 #endif
 }
 
+void test_malloc_size_overflow(void)
+{
+#ifdef LVGL_CI_USING_DEF_HEAP
+    uint32_t mem = lv_test_get_free_mem();
+
+    /* Aligning these up wraps around, which must not turn them into a tiny request */
+    for(size_t i = 0; i < 2 * lv_tlsf_align_size(); i++) {
+        TEST_ASSERT_NULL(lv_malloc(SIZE_MAX - i));
+        TEST_ASSERT_NULL(lv_malloc_zeroed(SIZE_MAX - i));
+    }
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+#endif
+}
+
+void test_realloc_size_overflow(void)
+{
+#ifdef LVGL_CI_USING_DEF_HEAP
+    const size_t len = 100;
+    uint32_t mem = lv_test_get_free_mem();
+
+    uint8_t * buf = lv_malloc(len);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_memset(buf, 0xA5, len);
+
+    for(size_t i = 0; i < 2 * lv_tlsf_align_size(); i++) {
+        TEST_ASSERT_NULL(lv_realloc(buf, SIZE_MAX - i));
+    }
+
+    /* Shrinking buf instead of failing would write a block header over its payload */
+    for(size_t i = 0; i < len; i++) {
+        TEST_ASSERT_EQUAL_UINT8(0xA5, buf[i]);
+    }
+
+    /* ...and would hand the trailing part of buf out to the next allocation */
+    uint8_t * other = lv_malloc(32);
+    TEST_ASSERT_NOT_NULL(other);
+    lv_memset(other, 0x5A, 32);
+    for(size_t i = 0; i < len; i++) {
+        TEST_ASSERT_EQUAL_UINT8(0xA5, buf[i]);
+    }
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+
+    lv_free(other);
+    lv_free(buf);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+#endif
+}
+
+void test_mem_add_pool_size_limits(void)
+{
+#ifdef LVGL_CI_USING_DEF_HEAP
+    const size_t overhead = lv_tlsf_pool_overhead();
+    const size_t block_max = lv_tlsf_block_size_max();
+    uint32_t mem = lv_test_get_free_mem();
+
+    void * pool_mem = malloc(overhead + block_max);
+    TEST_ASSERT_NOT_NULL(pool_mem);
+
+    /* A pool of exactly block_size_max would index sl_bitmap out of bounds */
+    TEST_ASSERT_NULL(lv_mem_add_pool(pool_mem, overhead + block_max));
+    TEST_ASSERT_NULL(lv_mem_add_pool(pool_mem, SIZE_MAX));
+    TEST_ASSERT_NULL(lv_mem_add_pool(pool_mem, overhead + lv_tlsf_block_size_min() - 1));
+    TEST_ASSERT_NULL(lv_mem_add_pool(pool_mem, 0));
+
+    /* One word less is the largest pool the range check accepts */
+    lv_mem_pool_t pool = lv_mem_add_pool(pool_mem, overhead + block_max - lv_tlsf_align_size());
+    TEST_ASSERT_NOT_NULL(pool);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+
+    lv_mem_remove_pool(pool);
+    free(pool_mem);
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+#endif
+}
+
 void test_mem_test(void)
 {
 #ifdef LVGL_CI_USING_DEF_HEAP
