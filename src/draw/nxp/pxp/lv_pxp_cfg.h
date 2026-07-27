@@ -37,9 +37,6 @@ extern "C" {
 /** PXP module instance to use*/
 #define PXP_ID PXP
 
-/** PXP interrupt line ID*/
-#define PXP_IRQ_ID PXP_IRQn
-
 /**********************
  *      TYPEDEFS
  **********************/
