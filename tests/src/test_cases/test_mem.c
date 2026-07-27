@@ -169,8 +169,10 @@ void test_calloc_overflow(void)
 {
     TEST_ASSERT_NULL(lv_calloc((size_t) -1, 2));
     TEST_ASSERT_NULL(lv_calloc((size_t) -1 / 2 + 1, 2));
-    TEST_ASSERT_NULL(lv_calloc(0, 100));
-    TEST_ASSERT_NULL(lv_calloc(100, 0));
+    void * zero_mem = lv_malloc_zeroed(0);
+    TEST_ASSERT_EQUAL_PTR(zero_mem, lv_calloc(0, 100));
+    TEST_ASSERT_EQUAL_PTR(zero_mem, lv_calloc(100, 0));
+    lv_free(zero_mem);
 }
 
 void test_realloc_overflow(void)
