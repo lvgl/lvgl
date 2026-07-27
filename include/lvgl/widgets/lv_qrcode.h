@@ -99,21 +99,17 @@ lv_result_t lv_qrcode_set_data_binary(lv_obj_t * obj, const void * data, uint32_
  * is disabled with `lv_qrcode_set_auto_update(obj, false)`, in which case call
  * this after setting the data/size/quiet zone to render everything at once.
  * When nothing changed since the last update this is a no-op, so two consecutive
- * calls cost no more than one. Use `lv_qrcode_force_update()` to regenerate
- * unconditionally.
+ * calls cost no more than one. A failed generation is not re-attempted (its outcome
+ * only changes when a property changes), but it is remembered: this keeps reporting
+ * LV_RESULT_INVALID instead of a success that never happened.
+ * @note To regenerate unconditionally (rarely needed, e.g. to retry after an
+ *       out-of-memory failure), set the object's `needs_update` field to `true` and
+ *       call this function afterwards. That field is private, so it requires
+ *       `LV_USE_PRIVATE_API` set to `1` in `lv_conf.h` and `lvgl_private.h` included.
  * @param obj pointer to a QR code object
  * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error (e.g. no data set)
  */
 lv_result_t lv_qrcode_update(lv_obj_t * obj);
-
-/**
- * Unconditionally (re)generate the QR code bitmap from the currently stored data,
- * even if nothing is marked as changed. Rarely needed - prefer `lv_qrcode_update()`,
- * which skips the work when the bitmap is already up to date.
- * @param obj pointer to a QR code object
- * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error (e.g. no data set)
- */
-lv_result_t lv_qrcode_force_update(lv_obj_t * obj);
 
 /**
  * Enable or disable quiet zone.

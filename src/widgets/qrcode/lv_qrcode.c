@@ -122,10 +122,18 @@ lv_result_t lv_qrcode_set_data(lv_obj_t * obj, const char * data)
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
     LV_CHECK_ARG(data != NULL, return LV_RESULT_INVALID, "data must not be NULL");
 
+    /*One byte of the limit is reserved for the NUL terminator stored below, so that
+     *the stored length stays within the same qrcodegen_BUFFER_LEN_MAX bound that
+     *lv_qrcode_set_data_binary() enforces*/
+    const size_t len = lv_strlen(data);
+    LV_CHECK_ARG(len <= qrcodegen_BUFFER_LEN_MAX - 1, return LV_RESULT_INVALID,
+                 "data length %u exceeds the maximum %u",
+                 (unsigned)len, (unsigned)(qrcodegen_BUFFER_LEN_MAX - 1));
+
     /*Store the string together with its NUL terminator. That extra byte both makes
      *the stored copy usable as a C string and lets it be told apart from binary data
      *(a string ends with a NUL and has no other NUL in it).*/
-    return lv_qrcode_set_data_binary(obj, data, lv_strlen(data) + 1);
+    return lv_qrcode_set_data_binary(obj, data, (uint32_t)len + 1);
 }
 
 lv_result_t lv_qrcode_set_data_binary(lv_obj_t * obj, const void * data, uint32_t data_len)
@@ -162,12 +170,9 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj)
     }
 
     return lv_qrcode_force_update(obj);
-}
+    if(!qrcode->needs_update) return qrcode->render_failed ? LV_RESULT_INVALID : LV_RESULT_OK;
 
-lv_result_t lv_qrcode_force_update(lv_obj_t * obj)
-{
-    LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
-    lv_result_t res = qrcode_render(obj);   /*clears needs_update*/
+    lv_result_t res = qrcode_render(obj);   /*clears needs_update, updates render_failed*/
     lv_obj_invalidate(obj);
     return res;
 }
@@ -242,6 +247,8 @@ static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     qrcode->data_len = 0;
     qrcode->auto_update = true;
     qrcode->needs_update = false;
+    /*No bitmap has been generated yet, so there is nothing valid to report*/
+    qrcode->render_failed = true;
 
     /*Set default size*/
     lv_qrcode_set_size(obj, LV_DPI_DEF);
@@ -317,8 +324,9 @@ static bool qrcode_store_data(lv_qrcode_t * qrcode, const void * data, uint32_t 
 {
     /*`data_len` bytes are copied verbatim. The caller decides what is stored:
      *the string setter includes the trailing NUL in `data_len`, the binary setter does not.
-     *The public setters keep `data_len` <= qrcodegen_BUFFER_LEN_MAX (+1 for a string's NUL) via
-     *LV_CHECK_ARG so it fits the 13-bit `data_len` field (only skipped when arg checks are disabled).*/
+     *Both public setters keep `data_len` <= qrcodegen_BUFFER_LEN_MAX via LV_CHECK_ARG (the string
+     *setter caps the string itself one byte lower to make room for the NUL), so it fits the
+     *12-bit `data_len` field. Only skipped when arg checks are disabled.*/
     uint8_t * new_data = lv_malloc(data_len);
     LV_ASSERT_MALLOC(new_data);
     if(new_data == NULL) return false;
@@ -370,8 +378,11 @@ static lv_result_t qrcode_render(lv_obj_t * obj)
 
     /*Clear the flag up front (not only on success): if the data can't be encoded
      *at this size/quiet zone the failure is permanent until a property changes, so
-     *leaving it set would make the draw-hook re-render and warn on every frame.*/
+     *leaving it set would make the draw-hook re-render and warn on every frame.
+     *Assume failure and clear `render_failed` only on the single success path, so
+     *that no early return can forget to record it.*/
     qrcode->needs_update = false;
+    qrcode->render_failed = true;
 
     if(qrcode->data == NULL) return LV_RESULT_INVALID;
 
@@ -397,16 +408,37 @@ static lv_result_t qrcode_render(lv_obj_t * obj)
     int32_t qr_version = qrcodegen_getMinFitVersion(qrcodegen_Ecc_MEDIUM, data_len);
     int32_t quiet_zone_scale = 0;
     if(qrcode->quiet_zone) qr_version = get_satisfied_size(qr_version, draw_buf->header.w, &quiet_zone_scale);
-    if(qr_version <= 0 || (qrcode->quiet_zone && quiet_zone_scale <= 0)) return LV_RESULT_INVALID;
+    if(qr_version <= 0) return LV_RESULT_INVALID;
 
     const int32_t qr_size = qrcodegen_version2size(qr_version);
     if(qr_size <= 0) return LV_RESULT_INVALID;
+
+    /*Integer number of canvas pixels per QR module. Validate both branches the same
+     *way: a scale of zero means the canvas is too small to hold even a 1:1 copy of
+     *the code, and drawing it would leave the bitmap blank. Reporting success for
+     *that would be indistinguishable from a QR code that was actually rendered.*/
     const int32_t scale = qrcode->quiet_zone ? quiet_zone_scale : draw_buf->header.w / qr_size;
+    if(scale <= 0) {
+        LV_LOG_ERROR("QR code size %d does not fit the %d px canvas%s",
+                     (int)qr_size, (int)draw_buf->header.w,
+                     qrcode->quiet_zone ? " with a quiet zone" : "");
+        return LV_RESULT_INVALID;
+    }
 
     uint8_t * qr0 = lv_malloc(qrcodegen_BUFFER_LEN_FOR_VERSION(qr_version));
     LV_ASSERT_MALLOC(qr0);
     uint8_t * data_tmp = lv_malloc(qrcodegen_BUFFER_LEN_FOR_VERSION(qr_version));
     LV_ASSERT_MALLOC(data_tmp);
+
+    /*Asserts can be compiled out, so check explicitly. `lv_free(NULL)` is a no-op,
+     *which makes this safe for a partially allocated pair as well.*/
+    if(qr0 == NULL || data_tmp == NULL) {
+        LV_LOG_ERROR("malloc failed for the QR code encoder buffers");
+        lv_free(qr0);
+        lv_free(data_tmp);
+        return LV_RESULT_INVALID;
+    }
+
     lv_memcpy(data_tmp, data, data_len);
 
     bool ok = qrcodegen_encodeBinary(data_tmp, data_len,
@@ -482,6 +514,8 @@ static lv_result_t qrcode_render(lv_obj_t * obj)
 
     lv_free(qr0);
     lv_free(data_tmp);
+
+    qrcode->render_failed = false;
     return LV_RESULT_OK;
 }
 

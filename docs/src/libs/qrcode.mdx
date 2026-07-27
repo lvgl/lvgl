@@ -41,9 +41,15 @@ lv_qrcode_update(qr);   /* regenerate the bitmap once, with every change applied
 ```
 
 `lv_qrcode_update()` only regenerates when something changed, so calling it twice
-in a row costs no more than once; use <ApiLink name="lv_qrcode_force_update" /> to
-regenerate unconditionally (rarely needed). If updating is forgotten entirely, the
-bitmap is still regenerated automatically on the next redraw (and a warning is
+in a row costs no more than once. A failed generation is not re-attempted - its
+outcome only changes when a property changes - but it is remembered, so the call
+keeps reporting `LV_RESULT_INVALID` instead of a success that never happened. To
+regenerate unconditionally (rarely needed, e.g. to retry after an out-of-memory
+failure), set the object's `needs_update` field to `true` and call
+<ApiLink name="lv_qrcode_update" /> afterwards. That field is private, so this
+requires <ApiLink name="LV_USE_PRIVATE_API" /> set to `1` in `lv_conf.h` and
+`lvgl_private.h` included. If updating is forgotten entirely,
+the bitmap is still regenerated automatically on the next redraw (and a warning is
 logged). Re-enabling automatic updating with `lv_qrcode_set_auto_update(obj, true)`
 also regenerates immediately if needed.
 
@@ -55,7 +61,11 @@ Passing a `NULL` buffer to the latter just returns the stored size.
 ## Notes
 
 - QR Codes with less data are smaller, but they are scaled by an integer
-   value to best fit to the given size.
+   value to best fit to the given size. If the size is too small to fit even one
+   pixel per QR Code module, the bitmap cannot be generated and
+   <ApiLink name="lv_qrcode_update" /> reports `LV_RESULT_INVALID`. Enabling the
+   quiet zone needs more room, so a size that works without it may be too small
+   with it.
 - Changing the color (dark or light) only updates the palette, so it is cheap
    and never triggers a re-encode of the QR Code.
 

@@ -392,8 +392,8 @@ if you need finer control.
   changed signature. `lv_qrcode_set_data()` keeps taking a string (source
   compatible), and a new `lv_qrcode_set_data_binary()` takes a buffer and length.
   `lv_qrcode_update()` no longer takes the data; it regenerates the bitmap from the
-  stored data (and is a no-op when nothing changed). Use `lv_qrcode_force_update()`
-  to regenerate unconditionally.
+  stored data (and is a no-op when nothing changed and the last generation
+  succeeded).
 
   ```c
   /* Before */
