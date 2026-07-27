@@ -1069,12 +1069,14 @@ void lv_obj_remove_child(lv_obj_t * parent, lv_obj_t * child)
         parent->spec_attr->child_cnt = 0;
         return;
     }
-
     parent->spec_attr->child_cnt--;
-    parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
-                                             parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    /* Reallocating a smaller size should never fail, so assert it here*/
-    LV_ASSERT_MALLOC(parent->spec_attr->children);
+    lv_obj_t ** new_children = lv_realloc(parent->spec_attr->children, parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    /* Reallocating a smaller size should never fail but just in case it's implemented as malloc + memcpy + free*/
+    if(!new_children) {
+        LV_LOG_INFO("Failed to shrink children array");
+        return;
+    }
+    parent->spec_attr->children = new_children;
 }
 
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
