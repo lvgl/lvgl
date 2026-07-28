@@ -59,6 +59,11 @@ docker run --rm -it -v $(pwd):/work lvgl_test_env "./tests/main.py"
 
 This ensures you are testing in a consistent environment with the same dependencies as the CI pipeline.
 
+There is a script which automates these steps: `scripts/run_tests_docker.sh`. It will build a Docker container and run tests in that. Run the script with `--help` for more detail.
+
+## Running tests  
+
+
 ## Running automatically
 
 GitHub's CI automatically runs these tests on pushes and pull requests to `master` and `release/v8.*` branches.
