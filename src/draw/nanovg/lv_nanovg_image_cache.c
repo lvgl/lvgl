@@ -46,8 +46,12 @@ typedef struct {
 *  STATIC PROTOTYPES
 **********************/
 
+static bool create_image_item(image_item_t * item);
+static int image_get_handle_uncached(struct _lv_draw_nanovg_unit_t * u, image_item_t * item, const void * src);
+
 static void image_cache_release_cb(void * entry, void * user_data);
-static bool image_create_cb(image_item_t * item, void * user_data);
+static void image_uncached_free_cb(void * obj, void * user_data);
+static inline bool image_create_cb(image_item_t * item, void * user_data);
 static void image_free_cb(image_item_t * item, void * user_data);
 static lv_cache_compare_res_t image_compare_cb(const image_item_t * lhs, const image_item_t * rhs);
 static void image_cache_drop_collect_cb(void * elem);
@@ -81,6 +85,11 @@ void lv_nanovg_image_cache_init(struct _lv_draw_nanovg_unit_t * u)
     u->image_pending = lv_pending_create(sizeof(lv_cache_entry_t *), 4);
     lv_pending_set_free_cb(u->image_pending, image_cache_release_cb, u->image_cache);
 
+    /* Non-cached (modifiable) images upload a fresh texture each frame; track their
+     * handles here so they're deleted at end of frame (same lifecycle as image_pending). */
+    u->image_uncached_pending = lv_pending_create(sizeof(int), 4);
+    lv_pending_set_free_cb(u->image_uncached_pending, image_uncached_free_cb, u);
+
     lv_ll_init(&u->image_drop_ll, sizeof(image_item_t));
 }
 
@@ -89,6 +98,9 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u)
     LV_ASSERT_NULL(u);
     LV_ASSERT(u->image_cache);
     LV_ASSERT(u->image_pending);
+
+    lv_pending_destroy(u->image_uncached_pending);
+    u->image_uncached_pending = NULL;
 
     lv_pending_destroy(u->image_pending);
     u->image_pending = NULL;
@@ -133,14 +145,25 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
         *header = decoder_dsc.header;
     }
 
-    image_item_t search_key = { 0 };
-    search_key.u = u;
-    search_key.src_buf = *decoded;
-    search_key.image_flags = image_flags;
-    search_key.src = src;
-    search_key.src_type = lv_image_src_get_type(src);
+    image_item_t item = { 0 };
+    item.u = u;
+    item.src_buf = *decoded;
+    item.image_flags = image_flags;
+    item.src = src;
+    item.src_type = lv_image_src_get_type(src);
+    item.image_handle = -1;  /* Mark as not yet created */
 
-    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->image_cache, &search_key, NULL);
+    /* Cache the GPU texture only for sources the image decoder cached (stable identity).
+     * "Use directly" sources (canvas/snapshot/lottie draw buffers) have no cache_entry:
+     * their pixels can change in place at the same address, so caching would go stale. */
+    if(!decoder_dsc.cache_entry) {
+        int image_handle = image_get_handle_uncached(u, &item, src);
+        lv_image_decoder_close(&decoder_dsc);
+        LV_PROFILER_DRAW_END;
+        return image_handle;
+    }
+
+    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->image_cache, &item, NULL);
     if(cache_node_entry == NULL) {
         /* check if the cache is full */
         size_t free_size = lv_cache_get_free_size(u->image_cache, NULL);
@@ -149,7 +172,7 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
             lv_nanovg_end_frame(u);
         }
 
-        cache_node_entry = lv_cache_acquire_or_create(u->image_cache, &search_key, NULL);
+        cache_node_entry = lv_cache_acquire_or_create(u->image_cache, &item, NULL);
         if(cache_node_entry == NULL) {
             LV_LOG_ERROR("image cache creating failed");
             lv_image_decoder_close(&decoder_dsc);
@@ -207,14 +230,54 @@ static void image_cache_release_cb(void * entry, void * user_data)
     lv_cache_release(cache, * entry_p, NULL);
 }
 
-static bool image_create_cb(image_item_t * item, void * user_data)
+static void image_uncached_free_cb(void * obj, void * user_data)
+{
+    int handle = *(int *)obj;
+    lv_draw_nanovg_unit_t * u = user_data;
+    if(handle > 0) {
+        nvgDeleteImage(u->vg, handle);
+    }
+}
+
+/**
+ * Create a one-off (non-cached) texture for a modifiable image. The texture is queued
+ * for deletion at the end of the frame so it doesn't leak. The caller owns closing the
+ * image decoder.
+ * @return the image handle, or -1 on failure
+ */
+static int image_get_handle_uncached(struct _lv_draw_nanovg_unit_t * u, image_item_t * item, const void * src)
+{
+    if(!create_image_item(item)) {
+        return -1;
+    }
+
+    /* Queue the fresh texture for deletion at end of frame. */
+    lv_pending_add(u->image_uncached_pending, &item->image_handle);
+
+    /* create_image_item() strdup's the path for FILE sources so a cached entry can own
+     * it. This item is not cached, so free that copy to avoid leaking it. */
+    if(item->src_type == LV_IMAGE_SRC_FILE && item->src != src) {
+        lv_free((void *)item->src);
+        item->src = NULL;
+    }
+
+    return item->image_handle;
+}
+
+static inline bool image_create_cb(image_item_t * item, void * user_data)
 {
     LV_UNUSED(user_data);
+    return create_image_item(item);
+}
+
+static bool create_image_item(image_item_t * item)
+{
     const uint32_t w = item->src_buf.header.w;
     const uint32_t h = item->src_buf.header.h;
     const lv_color_format_t cf = item->src_buf.header.cf;
     const uint32_t stride = item->src_buf.header.stride;
     enum NVGtexture nvg_tex_type = NVG_TEXTURE_BGRA;
+    item->image_handle = -1;
 
     /* Determine texture type and pixel size based on color format */
     switch(cf) {
@@ -276,7 +339,8 @@ static bool image_create_cb(image_item_t * item, void * user_data)
     int image_handle = nvgCreateImage(item->u->vg, w, h, flags, nvg_tex_type, data);
     LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
 
-    if(image_handle < 0) {
+    /* nvgCreateImage() returns 0 on failure in the GL backends; valid handles are > 0. */
+    if(image_handle <= 0) {
         return false;
     }
 
@@ -294,14 +358,20 @@ static void image_free_cb(image_item_t * item, void * user_data)
     LV_UNUSED(user_data);
     LV_PROFILER_DRAW_BEGIN;
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
-    nvgDeleteImage(item->u->vg, item->image_handle);
+
+    /* free_cb also runs for entries whose create_cb failed (e.g. unsupported format):
+     * those keep image_handle == -1 and a borrowed src pointer that must not be freed.
+     * nvgCreateImage() returns 0 on failure, so a created image always has handle > 0. */
+    bool created = (item->image_handle > 0);
+
+    nvgDeleteImage(item->u->vg, item->image_handle); /* safe no-op for invalid handles */
     item->image_handle = -1;
 
-    if(item->src_type == LV_IMAGE_SRC_FILE) {
+    /* For FILE entries src is strdup'd in create_cb, so only free it when create succeeded. */
+    if(item->src_type == LV_IMAGE_SRC_FILE && created) {
         lv_free((void *)item->src);
-        item->src = NULL;
     }
-
+    item->src = NULL;
     item->src_type = LV_IMAGE_SRC_UNKNOWN;
 
     LV_PROFILER_DRAW_END;
@@ -332,10 +402,16 @@ static void image_cache_drop_collect_cb(void * elem)
     image_item_t * item = elem;
     const void * src = item->u->image_drop_src;
     LV_ASSERT_NULL(src);
-    lv_image_src_t src_type = lv_image_src_get_type(src);
 
-    if((src_type == LV_IMAGE_SRC_FILE && lv_strcmp(item->src, src) == 0)
-       || (src_type == LV_IMAGE_SRC_VARIABLE && item->src == src)) {
+    /* A live cache entry always has a valid src (set in get_handle/create_cb). */
+    LV_ASSERT_NULL(item->src);
+
+    /* Use the entry's own src_type to decide comparison method.
+     * Using the incoming src's type would incorrectly strcmp on VARIABLE entries
+     * whose src pointer may have been freed by lv_draw_buf_destroy(). */
+    if((item->src_type == LV_IMAGE_SRC_FILE && lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE
+        && lv_strcmp(item->src, src) == 0)
+       || (item->src_type == LV_IMAGE_SRC_VARIABLE && item->src == src)) {
         image_item_t * drop_item = lv_ll_ins_tail(&item->u->image_drop_ll);
         LV_ASSERT_MALLOC(drop_item);
         *drop_item = *item;

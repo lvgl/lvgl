@@ -200,6 +200,13 @@ static void lv_lottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
 
+    /*Drop the cached image so a later widget reusing the same draw_buf address
+     *doesn't hit a stale entry (e.g. NanoVG's GPU texture keyed by the buffer).*/
+    const void * src = lv_image_get_src(obj);
+    if(src) {
+        lv_image_cache_drop(src);
+    }
+
     tvg_animation_del(lottie->tvg_anim);
     tvg_canvas_destroy(lottie->tvg_canvas);
 }

@@ -540,6 +540,11 @@ void test_snapshot_extreme_size_objects(void)
  * With fix: buf_h clamped to 1 -> completes normally. */
 void test_snapshot_rotated_large_bbox_no_overflow(void)
 {
+    /* This test shrinks the default display resolution, which the NanoVG headless
+     * test display (fixed-size FBO) does not support. */
+#if LV_USE_DRAW_NANOVG
+    TEST_PASS();
+#else
     lv_display_t * disp = lv_display_get_default();
 
     /* Save original resolution and shrink to 10x10.
@@ -577,6 +582,7 @@ void test_snapshot_rotated_large_bbox_no_overflow(void)
     lv_obj_delete(img);
     lv_draw_buf_destroy(src_buf);
     lv_display_set_resolution(disp, orig_hor, orig_ver);
+#endif /* LV_USE_DRAW_NANOVG */
 }
 
 #endif

@@ -39,3 +39,9 @@ libswscale-dev:i386
 libavutil-dev:i386
 libuv1-dev
 libuv1-dev:i386
+libegl-dev
+libgles-dev
+libgl1-mesa-dri
+libegl-dev:i386
+libgles-dev:i386
+libgl1-mesa-dri:i386

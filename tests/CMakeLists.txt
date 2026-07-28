@@ -79,6 +79,12 @@ set(LVGL_TEST_OPTIONS_SDL
     -DLV_TEST_OPTION=7
 )
 
+set(LVGL_TEST_OPTIONS_NANOVG
+    -DLV_TEST_OPTION=8
+    -DLVGL_CI_USING_SYS_HEAP
+    ${SANITIZE_AND_COVERAGE_OPTIONS}
+)
+
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
     -DLV_TEST_OPTION=1
 )
@@ -113,6 +119,40 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLVGL_CI_USING_DEF_HEAP
     ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
+
+# Set up the 32-bit (non-amd64) target BEFORE any pkg-config lookups or link tests so
+# that find_library/pkg_check_modules/check_c_source_compiles resolve libraries from the
+# i386 paths and build with the correct architecture instead of the default 64-bit one.
+if ($ENV{NON_AMD64_BUILD})
+    message("Non AMD64 target is specified")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
+    set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "search 32bit lib path firstly")
+    set(ENV{PKG_CONFIG_PATH} "/usr/lib/i386-linux-gnu/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+endif()
+
+# Verify EGL/GLESv2 actually link for the current architecture. pkg-config may still
+# hand back a wrong-arch .pc (e.g. the 64-bit one) when the i386 package is missing, and
+# that only fails at link time. This helper does a real compile+link with the discovered
+# flags and sets LVGL_NANOVG_GL_ARCH_OK accordingly.
+include(CheckCSourceCompiles)
+function(lvgl_nanovg_check_gl_arch)
+    if(NOT (EGL_FOUND AND GLESV2_FOUND))
+        set(LVGL_NANOVG_GL_ARCH_OK FALSE PARENT_SCOPE)
+        return()
+    endif()
+    set(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS}")
+    set(CMAKE_REQUIRED_INCLUDES ${EGL_INCLUDE_DIRS} ${GLESV2_INCLUDE_DIRS})
+    set(CMAKE_REQUIRED_LIBRARIES ${EGL_LDFLAGS} ${GLESV2_LDFLAGS})
+    check_c_source_compiles("
+        #include <EGL/egl.h>
+        #include <GLES2/gl2.h>
+        int main(void) { (void)eglGetError(); (void)glGetError(); return 0; }
+    " LVGL_NANOVG_GL_ARCH_LINK)
+    set(LVGL_NANOVG_GL_ARCH_OK ${LVGL_NANOVG_GL_ARCH_LINK} PARENT_SCOPE)
+endfunction()
 
 if (OPTIONS_SDL)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_SDL})
@@ -162,24 +202,44 @@ elseif (OPTIONS_TEST_RISCV_V)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs/")
     message(STATUS "RISC-V Vector (RVV) software emulation test enabled")
+elseif (OPTIONS_TEST_NANOVG)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_NANOVG})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs_nanovg/")
+    add_definitions(-DLV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE=1)
+    # Locate EGL/GLESv2 for the headless NanoVG test. Use IMPORTED_TARGET so the full
+    # pkg-config metadata (include dirs, lib paths, transitive deps) is propagated,
+    # matching the FFMPEG pattern below. Bare -lEGL/-lGLESv2 would drop custom SDK paths.
+    # PKG_CONFIG_PATH was already pointed at the i386 dir above for 32-bit builds, so this
+    # resolves to the correct architecture. The check is adaptive: if EGL/GLESv2 for the
+    # target architecture can't be found or linked, fail with an actionable message.
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(EGL IMPORTED_TARGET egl)
+    pkg_check_modules(GLESV2 IMPORTED_TARGET glesv2)
+
+    lvgl_nanovg_check_gl_arch()
+
+    if(NOT (EGL_FOUND AND GLESV2_FOUND AND LVGL_NANOVG_GL_ARCH_OK))
+        message(FATAL_ERROR
+            "OPTIONS_TEST_NANOVG requires EGL and GLESv2 libraries matching the build "
+            "architecture.\n"
+            "  EGL found:      ${EGL_FOUND}\n"
+            "  GLESv2 found:   ${GLESV2_FOUND}\n"
+            "  arch link test: ${LVGL_NANOVG_GL_ARCH_OK}\n"
+            "On a 32-bit (NON_AMD64_BUILD) build, install the i386 packages, e.g.:\n"
+            "  sudo apt-get install libegl-dev:i386 libgles-dev:i386 libgl1-mesa-dri:i386\n"
+            "or run this option on a 64-bit build only.")
+    endif()
+
+    message(STATUS "NanoVG headless rendering test enabled (EGL + GLESv2 found)")
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
 if ($ENV{NON_AMD64_BUILD})
     set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
-    message("Non AMD64 target is specified")
-
-    # Ensure 32-bit build
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
-endif()
-
-if ($ENV{NON_AMD64_BUILD})
-    set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "search 32bit lib path firstly")
-    set(ENV{PKG_CONFIG_PATH} "/usr/lib/i386-linux-gnu/pkgconfig:$ENV{PKG_CONFIG_PATH}")
 endif()
 
 # Options lvgl and examples are compiled with.
@@ -276,6 +336,12 @@ include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:C>: ${LVGL_C_COMPILE_OPTIONS}>)
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${LVGL_CXX_COMPILE_OPTIONS}>)
 target_compile_definitions(lvgl PUBLIC LV_BUILD_TEST)
+
+# Link EGL and GLESv2 for NanoVG headless test via pkg-config imported targets
+# so include/library paths from pkg-config are propagated to consumers of lvgl.
+if(OPTIONS_TEST_NANOVG)
+    target_link_libraries(lvgl PUBLIC PkgConfig::EGL PkgConfig::GLESV2)
+endif()
 if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
     target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:ASM>:${LVGL_C_COMPILE_OPTIONS}>)
 endif()
@@ -549,9 +615,13 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     endif()
 
 	if (NOT $ENV{NON_AMD64_BUILD})
-	    target_link_libraries(${test_name} PRIVATE
-    	        ${OPENGL_LIBRARIES} glfw)
+	    if (NOT OPTIONS_TEST_NANOVG)
+	        target_link_libraries(${test_name} PRIVATE
+    	            ${OPENGL_LIBRARIES} glfw)
+	    endif()
 	endif()
+
+    # EGL/GLESv2 already linked via lvgl PUBLIC for OPTIONS_TEST_NANOVG
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
@@ -560,6 +630,11 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         NAME ${test_name}
         WORKING_DIRECTORY ${LVGL_TEST_DIR}
         COMMAND ${test_name})
+
+    if(OPTIONS_TEST_NANOVG)
+        set_tests_properties(${test_name} PROPERTIES
+            ENVIRONMENT "LSAN_OPTIONS=suppressions=${LVGL_TEST_DIR}/lsan-nanovg.supp")
+    endif()
 endforeach( test_case_fname ${TEST_CASE_FILES} )
 
 add_custom_target(run
