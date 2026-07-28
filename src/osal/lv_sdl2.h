@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #if LV_USE_OS == LV_OS_SDL2
-#include LV_SDL_INCLUDE_PATH
+#include <SDL2/SDL.h>
 #include LV_STDBOOL_INCLUDE
 
 /*********************
