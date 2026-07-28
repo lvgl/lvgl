@@ -28,19 +28,19 @@ You need the following UEFI protocols available:
 #define LV_USE_UEFI  1
 ```
 
-- Enable the memory core functions, which are wrappers around `AllocatePool` and `FreePool` (using memory of type *EfiBootServicesData*) if you do not want to use your own implementations
+2. Enable the memory core functions, which are wrappers around `AllocatePool` and `FreePool` (using memory of type *EfiBootServicesData*) if you do not want to use your own implementations
 
 ```c
 #define LV_UEFI_USE_MEMORY_SERVICES  1
 ```
 
-1. Enable file system support for the volume the application was loaded from (defaults to drive letter `E`):
+3. Enable file system support for the volume the application was loaded from (defaults to drive letter `E`):
 
 ```c
 #define LV_USE_FS_UEFI  1
 ```
 
-1. Include UEFI type definitions. There are predefined includes for EDK2 and GNU-EFI:
+4. Include UEFI type definitions. There are predefined includes for EDK2 and GNU-EFI:
 
 ```c
 #define LV_USE_UEFI_INCLUDE <lvgl/src/drivers/uefi/lv_uefi_edk2.h>

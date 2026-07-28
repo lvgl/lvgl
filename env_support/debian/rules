@@ -1,6 +1,17 @@
 #!/usr/bin/make -f
+SHELL := /bin/bash
 
-CONFIGS = sdl2 sdl2-3d drm drm-3d wayland wayland-3d
+# config name => package directory under debian/
+CONFIG_ARRAY = declare -A PKGS=( \
+    [sdl2]=liblvgl-sdl2-dev \
+    [sdl2-3d]=liblvgl-sdl2-3d-dev \
+    [drm]=liblvgl-drm-dev \
+    [drm-3d]=liblvgl-drm-3d-dev \
+    [wayland]=liblvgl-wayland-dev \
+    [wayland-3d]=liblvgl-wayland-3d-dev \
+    [linux]=liblvgl-full-2d-dev \
+    [linux-3d]=liblvgl-full-3d-dev \
+)
 
 %:
 	dh $@ --buildsystem=cmake+ninja
@@ -8,26 +19,37 @@ CONFIGS = sdl2 sdl2-3d drm drm-3d wayland wayland-3d
 override_dh_auto_configure:
 	mkdir -p $(CURDIR)/debian/pcpp
 	ln -sf /usr/bin/pcpp-python $(CURDIR)/debian/pcpp/pcpp
+	$(CONFIG_ARRAY); \
 	export PATH=$(CURDIR)/debian/pcpp:$$PATH; \
-	for config in $(CONFIGS); do \
+	for config in "$${!PKGS[@]}"; do \
 	    cmake -B build-$$config \
 	        -DCMAKE_INSTALL_PREFIX=/usr \
 	        -DCMAKE_BUILD_TYPE=Release \
 	        -DLV_BUILD_USE_KCONFIG=ON \
-	        -DLV_BUILD_DEFCONFIG_PATH=$(CURDIR)/configs/$${config}_defconfig \
+	        -DLV_BUILD_DEFCONFIG_PATH=$(CURDIR)/configs/defconfigs/$${config}.defconfig \
 	        -GNinja ; \
 	done
 
 override_dh_auto_build:
-	for config in $(CONFIGS); do \
+	$(CONFIG_ARRAY); \
+	for config in "$${!PKGS[@]}"; do \
 	    cmake --build build-$$config ; \
 	done
 
 override_dh_auto_install:
-	for config in $(CONFIGS); do \
-	    DESTDIR=$(CURDIR)/debian/liblvgl-$${config}-dev \
+	$(CONFIG_ARRAY); \
+	for config in "$${!PKGS[@]}"; do \
+	    pkg="$${PKGS[$$config]}"; \
+	    DESTDIR=$(CURDIR)/debian/$$pkg \
 	        cmake --install build-$$config ; \
 	done
+
+override_dh_auto_clean:
+	$(CONFIG_ARRAY); \
+	for config in "$${!PKGS[@]}"; do \
+	    rm -rf build-$$config ; \
+	done
+	rm -rf $(CURDIR)/debian/pcpp
 
 override_dh_auto_test:
 	# no tests

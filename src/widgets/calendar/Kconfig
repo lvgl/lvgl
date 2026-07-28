@@ -1,0 +1,90 @@
+config LV_USE_CALENDAR
+	bool "Calendar"
+	default y
+
+if LV_USE_CALENDAR
+config LV_CALENDAR_WEEK_STARTS_MONDAY
+	bool "Calendar week starts monday"
+
+menu "Days name configuration"
+	depends on LV_USE_CALENDAR
+
+config LV_MONDAY_STR
+	string "Shortened string for Monday"
+	default "Mo"
+config LV_TUESDAY_STR
+	string "Shortened string for Tuesday"
+	default "Tu"
+config LV_WEDNESDAY_STR
+	string "Shortened string for Wednesday"
+	default "We"
+config LV_THURSDAY_STR
+	string "Shortened string for Thursday"
+	default "Th"
+config LV_FRIDAY_STR
+	string "Shortened string for Friday"
+	default "Fr"
+config LV_SATURDAY_STR
+	string "Shortened string for Saturday"
+	default "Sa"
+config LV_SUNDAY_STR
+	string "Shortened string for Sunday"
+	default "Su"
+
+endmenu
+
+menu "Month names configuration"
+	depends on LV_USE_CALENDAR
+config LV_JANUARY_STR
+	string "String for January"
+	default "January"
+config LV_FEBRUARY_STR
+	string "String for February"
+	default "February"
+config LV_MARCH_STR
+	string "String for March"
+	default "March"
+config LV_APRIL_STR
+	string "String for April"
+	default "April"
+config LV_MAY_STR
+	string "String for May"
+	default "May"
+config LV_JUNE_STR
+	string "String for June"
+	default "June"
+config LV_JULY_STR
+	string "String for July"
+	default "July"
+config LV_AUGUST_STR
+	string "String for August"
+	default "August"
+config LV_SEPTEMBER_STR
+	string "String for September"
+	default "September"
+config LV_OCTOBER_STR
+	string "String for October"
+	default "October"
+config LV_NOVEMBER_STR
+	string "String for November"
+	default "November"
+config LV_DECEMBER_STR
+	string "String for December"
+	default "December"
+endmenu
+
+config LV_USE_CALENDAR_HEADER_ARROW
+	bool "Use calendar header arrow"
+	default y
+
+config LV_USE_CALENDAR_HEADER_DROPDOWN
+	bool "Use calendar header dropdown"
+	default y
+
+config LV_USE_CALENDAR_CHINESE
+	bool "Use chinese calendar"
+	default n
+
+endif #LV_USE_CALENDAR
+	
+

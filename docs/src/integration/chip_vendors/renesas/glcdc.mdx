@@ -48,7 +48,7 @@ lv_display_set_default(disp);
 To use the driver in <ApiLink name="LV_DISPLAY_RENDER_MODE_PARTIAL" /> mode, an extra buffer must be allocated,
 preferably in the fastest available memory region.
 
-Buffer swapping can be activated by passing a second buffer of same size instead of the <ApiLink name="NULL" /> argument.
+Buffer swapping can be activated by passing a second buffer of same size instead of the `NULL` argument.
 
 ```c
 static lv_color_t partial_draw_buf[DISPLAY_HSIZE_INPUT0 * DISPLAY_VSIZE_INPUT0 / 10] BSP_PLACE_IN_SECTION(".sdram") BSP_ALIGN_VARIABLE(1024);
@@ -66,11 +66,11 @@ Partial mode can be activated via the macro in `src/board_init.c` file of the de
 Software based screen rotation is supported in partial mode. It uses the common API, no extra configuration is required:
 
 ```c
-lv_display_set_rotation(lv_display_get_default(), LV_DISP_ROTATION_90);
+lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_90);
 /* OR */
-lv_display_set_rotation(lv_display_get_default(), LV_DISP_ROTATION_180);
+lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_180);
 /* OR */
-lv_display_set_rotation(lv_display_get_default(), LV_DISP_ROTATION_270);
+lv_display_set_rotation(lv_display_get_default(), LV_DISPLAY_ROTATION_270);
 ```
 
 Make sure the heap is large enough, as a buffer with the same size as the partial buffer will be allocated.

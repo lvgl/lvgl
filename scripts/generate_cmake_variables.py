@@ -72,45 +72,11 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, d
     # as all the #define will be aligned on the left with a single space before the value
     for line in fin.read().splitlines():
 
-        # Treat the LV_USE_STDLIB_* configs in a special way, as we need
-        # to convert the define to full config with 1 value when enabled
-        if re.search(f'{CONFIG_PATTERN}_STDLIB', line):
-
-            parts = line.split()
-            if len(parts) < 3:
-                continue
-
-            name = parts[1]
-            value = parts[2].strip()
-
-            type = value.split("LV_STDLIB_")[1]
-
-            name = name.replace("STDLIB", type)
-
-            write_set_cmd(fout, f'{CONFIG_PREFIX}{name} 1', is_parent_scope)
-
-        # Treat the LV_USE_OS config in a special way, as we need
-        # to convert the define to full config with 1 value when enabled
-        elif re.search(f'{CONFIG_PATTERN}_OS', line):
-
-            parts = line.split()
-            if len(parts) < 3:
-                continue
-
-            name = parts[1]
-            value = parts[2].strip()
-
-            type = value.split("LV_OS")[1]
-
-            name += type
-
-            write_set_cmd(fout, f'{CONFIG_PREFIX}{name} 1', is_parent_scope)
-
         # For the rest of the configs, simply add CONFIG_ and write the name of the define
         # all LV_USE_* or LV_BUILD_* configs where the value is 0 or 1,
         # as these are the ones that are needed in cmake
         # To detect the configuration of LVGL to perform conditional compilation/linking
-        elif re.search(f'{CONFIG_PATTERN}.* +[01] *$', line):
+        if re.search(f'{CONFIG_PATTERN}.* +[01] *$', line):
 
             parts = line.split()
             if len(parts) < 3:

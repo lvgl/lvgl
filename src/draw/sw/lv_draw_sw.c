@@ -14,11 +14,11 @@
 #include "../../core/lv_global.h"
 #include "../../misc/lv_area_private.h"
 
-#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-    #if LV_USE_THORVG_EXTERNAL
-        #include <thorvg_capi.h>
-    #else
+#if LV_USE_THORVG
+    #if LV_USE_THORVG_INTERNAL
         #include "../../libs/thorvg/thorvg_capi.h"
+    #else
+        #include <thorvg_capi.h>
     #endif
 #endif
 

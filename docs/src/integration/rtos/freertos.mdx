@@ -5,10 +5,10 @@ description: "To enable LVGL's FreeRTOS support, just set LV_USE_OS LV_OS_FREERT
 
 ## Usage
 
-To enable LVGL's FreeRTOS support, just set `LV_USE_OS LV_OS_FREERTOS` in
-`lv_conf.h`. After this, LVGL:
+To enable LVGL's FreeRTOS support, just set <ApiLink name="LV_USE_OS" /> to
+<ApiLink name="LV_OS_FREERTOS" /> in `lv_conf.h`. After this, LVGL:
 
-- GPUs will yield the task while waiting for the GPU to complete (lowering CPU usage)
+- will yield the task while waiting for the GPU to complete (lowering CPU usage)
 - <ApiLink name="lv_os_get_idle_percent" /> will return the OS-aware CPU usage
 - <ApiLink name="lv_sleep_ms" /> will be a wrapper to `vTaskDelay`
 
@@ -38,10 +38,10 @@ implementation. Then, you can provide a custom implementation of
 
 ## Example: Custom implementation for ESP32 SMP
 
-For multi-core environments like the ESP32 (which uses dual-core SMP), the default 
-implementation might not track all idle tasks. Below is an example of a custom 
-implementation using `uxTaskGetSystemState()`. This requires 
-`configGENERATE_RUN_TIME_STATS` and `configUSE_TRACE_FACILITY` to be enabled 
+For multi-core environments like the ESP32 (which uses dual-core SMP), the default
+implementation might not track all idle tasks. Below is an example of a custom
+implementation using `uxTaskGetSystemState()`. This requires
+`configGENERATE_RUN_TIME_STATS` and `configUSE_TRACE_FACILITY` to be enabled
 in your `FreeRTOSConfig.h` (or via menuconfig for ESP-IDF).
 
 ```c

@@ -39,8 +39,8 @@ void test_textarea_should_have_valid_documented_default_values(void)
 
     /* Horizontal slider */
     TEST_ASSERT_TRUE(objw >= objh);
-    TEST_ASSERT_FALSE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN));
-    TEST_ASSERT_FALSE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLLABLE));
+    TEST_ASSERT_FALSE((lv_obj_is_scroll_chain_hor(slider) && lv_obj_is_scroll_chain_ver(slider)));
+    TEST_ASSERT_FALSE(lv_obj_is_scrollable(slider));
 }
 
 void test_slider_event_keys_right_and_up_increment_value_by_one(void)
@@ -322,7 +322,7 @@ void test_slider_scroll_chain_horizontal(void)
     lv_obj_send_event(slider, LV_EVENT_RELEASED, NULL);
 
     /* Horizontal ptr should allow vertical scroll chain */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_VER));
+    TEST_ASSERT_TRUE(lv_obj_is_scroll_chain_ver(slider));
 }
 
 void test_slider_scroll_chain_vertical(void)
@@ -335,7 +335,7 @@ void test_slider_scroll_chain_vertical(void)
     lv_obj_send_event(slider, LV_EVENT_RELEASED, NULL);
 
     /* Vertical ptr should allow horizontal scroll chain */
-    TEST_ASSERT_TRUE(lv_obj_has_flag(slider, LV_OBJ_FLAG_SCROLL_CHAIN_HOR));
+    TEST_ASSERT_TRUE(lv_obj_is_scroll_chain_hor(slider));
 }
 
 void test_slider_range_mode_key_decrement_left_value(void)
@@ -608,6 +608,68 @@ void test_slider_range_mode_vertical_rtl_drag_start_value_selection(void)
     assert_slider_drag_start_selection(slider_ver,
                                        (right_knob.x1 + right_knob.x2) / 2, right_knob.y1 - 20,
                                        &ptr_ver->bar.cur_value, -1);
+}
+
+void test_slider_large_range_drag_no_int32_overflow_horiz(void)
+{
+    /* Prevent int32 overflow during horizontal drag.
+     * 600px slider x range 20M → pixel * range > INT32_MAX for pixel > ~107. */
+    lv_obj_set_size(slider, 600, 20);
+    lv_obj_center(slider);
+    lv_slider_set_range(slider, 0, 20000000);
+    lv_slider_set_value(slider, 0, LV_ANIM_OFF);
+    lv_obj_update_layout(slider);
+    lv_refr_now(NULL);
+
+    /* Drag from center to right: pixel ~300 → value should be ~10M (not overflowed) */
+    lv_test_mouse_move_to_obj(slider);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_move_by(150, 0);  /* drag right ~50% more */
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    int32_t val = lv_slider_get_value(slider);
+    /* Value must NOT be 0 (overflow collapse). Should be in upper half of range. */
+    TEST_ASSERT_TRUE(val > 5000000);
+    TEST_ASSERT_TRUE(val <= 20000000);
+}
+
+void test_slider_large_range_drag_no_int32_overflow_vert(void)
+{
+    /* Prevent int32 overflow during vertical drag. */
+    lv_obj_set_size(slider, 20, 400);
+    lv_obj_center(slider);
+    lv_slider_set_range(slider, 0, 20000000);
+    lv_slider_set_value(slider, 0, LV_ANIM_OFF);
+    lv_obj_update_layout(slider);
+    lv_refr_now(NULL);
+
+    lv_test_mouse_move_to_obj(slider);
+    lv_test_mouse_press();
+    lv_test_wait(50);
+    lv_test_mouse_move_by(0, -100);
+    lv_test_wait(50);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    int32_t val = lv_slider_get_value(slider);
+    TEST_ASSERT_TRUE(val > 5000000);
+    TEST_ASSERT_TRUE(val <= 20000000);
+}
+
+void test_slider_large_range_key_up_increments(void)
+{
+    lv_obj_set_size(slider, 600, 20);
+    lv_slider_set_range(slider, 0, 20000000);
+    lv_slider_set_value(slider, 10000000, LV_ANIM_OFF);
+
+    uint32_t key = LV_KEY_RIGHT;
+    lv_obj_send_event(slider, LV_EVENT_KEY, (void *)&key);
+
+    int32_t val = lv_slider_get_value(slider);
+    TEST_ASSERT_TRUE(val > 10000000);
 }
 
 #endif

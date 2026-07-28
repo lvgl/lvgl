@@ -1,0 +1,13 @@
+config LV_USE_DEMO_BENCHMARK
+	bool "Benchmark your system"
+	default n
+	select LV_FONT_MONTSERRAT_14
+	select LV_FONT_MONTSERRAT_20
+	select LV_FONT_MONTSERRAT_24
+	select LV_FONT_MONTSERRAT_26
+	select LV_USE_DEMO_WIDGETS
+
+config LV_DEMO_BENCHMARK_ALIGNED_FONTS
+	depends on LV_USE_DEMO_BENCHMARK
+	bool "Use static aligned fonts"
+	default n

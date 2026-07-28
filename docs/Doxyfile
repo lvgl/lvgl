@@ -2062,6 +2062,7 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = DOXYGEN                         \
                          LV_CONF_PATH="../../lv_conf.h"  \
+                         __cplusplus=201103L             \
                          LV_ATTRIBUTE_TICK_INC=          \
                          LV_ATTRIBUTE_TIMER_HANDLER=     \
                          LV_ATTRIBUTE_FLUSH_READY=       \
@@ -2136,7 +2137,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_FS_UEFI=1                \
                          LV_USE_FS_WIN32=1               \
                          LV_USE_FT81X=1                  \
-                         LV_USE_G2D=1                    \
                          LV_USE_G2D_ASSERT=1             \
                          LV_USE_GENERIC_MIPI=1           \
                          LV_USE_GESTURE_RECOGNITION=1    \
@@ -2204,7 +2204,6 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_PROFILER=1               \
                          LV_USE_PROFILER_BUILTIN=1       \
                          LV_USE_PROFILER_BUILTIN_POSIX=1 \
-                         LV_USE_PXP=1                    \
                          LV_USE_PXP_ASSERT=1             \
                          LV_USE_QNX=1                    \
                          LV_USE_QRCODE=1                 \
@@ -2226,7 +2225,7 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_ST7735=1                 \
                          LV_USE_ST7789=1                 \
                          LV_USE_ST7796=1                 \
-                         LV_USE_STDLIB_MALLOC=1          \
+                         LV_USE_STDLIB_MALLOC=0          \
                          LV_USE_STDLIB_SPRINTF=1         \
                          LV_USE_STDLIB_STRING=1          \
                          LV_USE_SVG=1                    \
@@ -2258,7 +2257,8 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_WAYLAND=1                \
                          LV_USE_WIN=1                    \
                          LV_USE_WINDOWS=1                \
-                         LV_USE_X11=1
+                         LV_USE_X11=1                    \
+                         LV_LIBINPUT_XKB=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

@@ -16,6 +16,15 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
+static uint32_t keyboard_find_button(lv_obj_t * kb, const char * text)
+{
+    const char * txt;
+    for(uint32_t i = 0; (txt = lv_keyboard_get_button_text(kb, i)) != NULL; i++) {
+        if(lv_strcmp(txt, text) == 0) return i;
+    }
+    return LV_BUTTONMATRIX_BUTTON_NONE;
+}
+
 void test_keyboard_mode(void)
 {
     lv_obj_t * keyboard  = lv_keyboard_create(active_screen);
@@ -37,6 +46,29 @@ void test_keyboard_mode(void)
     lv_keyboard_set_mode(keyboard, LV_KEYBOARD_MODE_NUMBER);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/keyboard_4.png");
+}
+
+void test_keyboard_mode_switch_keeps_selection_in_place(void)
+{
+    /*Regression test for https://github.com/lvgl/lvgl/issues/10118:
+     *switching modes must keep the selection on the key in that position,
+     *not move it to an unrelated button (backspace).*/
+    lv_obj_t * keyboard = lv_keyboard_create(active_screen);
+    lv_obj_set_size(keyboard, LV_PCT(100), LV_PCT(50));
+    lv_keyboard_set_mode(keyboard, LV_KEYBOARD_MODE_SPECIAL);
+    lv_obj_update_layout(keyboard);
+
+    /*Select the "abc" mode-switch button and press it*/
+    uint32_t abc_btn = keyboard_find_button(keyboard, "abc");
+    TEST_ASSERT_NOT_EQUAL(LV_BUTTONMATRIX_BUTTON_NONE, abc_btn);
+    lv_buttonmatrix_set_selected_button(keyboard, abc_btn);
+    lv_obj_send_event(keyboard, LV_EVENT_VALUE_CHANGED, NULL);
+
+    /*The selection follows the position: it lands on the "ABC" toggle that
+     *took the "abc" button's spot, not the backspace key at the old index.*/
+    TEST_ASSERT_EQUAL_INT(LV_KEYBOARD_MODE_TEXT_LOWER, lv_keyboard_get_mode(keyboard));
+    uint32_t sel = lv_keyboard_get_selected_button(keyboard);
+    TEST_ASSERT_EQUAL_STRING("ABC", lv_keyboard_get_button_text(keyboard, sel));
 }
 
 void test_keyboard_properties(void)

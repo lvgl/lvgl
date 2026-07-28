@@ -181,6 +181,7 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROP
 
 void lv_style_init(lv_style_t * style)
 {
+    LV_CHECK_ARG(style != NULL, return);
 #if LV_USE_ASSERT_STYLE
     if(style->sentinel == LV_STYLE_SENTINEL_VALUE && style->prop_cnt > 1) {
         LV_LOG_WARN("Style might be already inited. (Potential memory leak)");
@@ -195,7 +196,7 @@ void lv_style_init(lv_style_t * style)
 
 void lv_style_reset(lv_style_t * style)
 {
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 
     if(style->prop_cnt != 255) lv_free(style->values_and_props);
     lv_memzero(style, sizeof(lv_style_t));
@@ -207,6 +208,8 @@ void lv_style_reset(lv_style_t * style)
 
 void lv_style_copy(lv_style_t * dst, const lv_style_t * src)
 {
+    LV_CHECK_ARG(dst != NULL, return);
+    LV_CHECK_ARG(src != NULL, return);
     if(lv_style_is_const(dst)) {
         LV_LOG_WARN("The destination can not be a constant style");
         return;
@@ -219,6 +222,8 @@ void lv_style_copy(lv_style_t * dst, const lv_style_t * src)
 
 void lv_style_merge(lv_style_t * dst, const lv_style_t * src)
 {
+    LV_CHECK_ARG(dst != NULL, return);
+    LV_CHECK_ARG(src != NULL, return);
     if(lv_style_is_const(dst)) {
         LV_LOG_WARN("The destination can not be a constant style");
         return;
@@ -289,7 +294,7 @@ lv_style_prop_t lv_style_get_num_custom_props(void)
 
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
 
     if(lv_style_is_const(style)) {
         LV_LOG_ERROR("Cannot remove prop from const style");
@@ -342,14 +347,14 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return);
 
     if(lv_style_is_const(style)) {
         LV_LOG_ERROR("Cannot set property of constant style");
         return;
     }
 
-    LV_ASSERT(prop != LV_STYLE_PROP_INV);
+    LV_CHECK_ARG(prop != LV_STYLE_PROP_INV, return);
     LV_PROFILER_STYLE_BEGIN;
     lv_style_prop_t * props;
     int32_t i;
@@ -397,12 +402,16 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
+    LV_CHECK_ARG(style != NULL, return LV_STYLE_RES_NOT_FOUND);
+    LV_CHECK_ARG(value != NULL, return LV_STYLE_RES_NOT_FOUND);
     return lv_style_get_prop_inlined(style, prop, value);
 }
 
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
                                   lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data)
 {
+    LV_CHECK_ARG(tr != NULL, return);
+    LV_CHECK_ARG(props != NULL, return);
     lv_memzero(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
     tr->path_xcb = path_cb == NULL ? lv_anim_path_linear : path_cb;
@@ -496,7 +505,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 
 bool lv_style_is_empty(const lv_style_t * style)
 {
-    LV_ASSERT_STYLE(style);
+    LV_CHECK_ARG(style != NULL && LV_STYLE_SENTINEL_OK(style), return false);
 
     return style->prop_cnt == 0;
 }

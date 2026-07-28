@@ -1014,12 +1014,15 @@ static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
     }
     if(p->inv) res = !res;
 
+    /*TODO: the flag binding API is deprecated separately; suppress the warning until then*/
+    LV_DEPRECATIONS_IGNORE_BEGIN
     if(res) {
         lv_obj_add_flag(observer->target, p->flag);
     }
     else {
         lv_obj_remove_flag(observer->target, p->flag);
     }
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject)

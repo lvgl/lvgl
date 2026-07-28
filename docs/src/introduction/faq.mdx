@@ -1,25 +1,32 @@
 ---
 title: FAQ
-description: "You can ask questions in the forum: https://forum.lvgl."
+description: "Check these questions and answers first to quickly solve common issues"
 ---
 
-## Where can I ask questions?
+## Where can I ask questions from the community?
 
-You can ask questions in the forum:  https://forum.lvgl.io/.
+You can ask questions in the [forum](https://forum.lvgl.io/).
 
 We use [GitHub issues](https://github.com/lvgl/lvgl/issues) for development related discussion.
 You should use them only if your question or issue is tightly related to the development of the library.
 
 Before posting a question, please read this FAQ section since you might find the answer to your issue here as well.
 
-## Is my MCU/hardware supported?
+## Where can I get professional support?
 
-Every MCU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the [Requirements](/introduction/requirements) is supported by LVGL.
+LVGL LTD, the company behind LVGL, provides UI development services, consultancy, and training. We also have a wide range of
+partners globally, so we can connect you with trusted local experts.
+
+Contact us via [lvgl@lvgl.io](mailto:lvgl@lvgl.io)
+
+## Is my MCU or MPU supported?
+
+Every MCU and MPU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the [Requirements](/introduction/requirements) is supported by LVGL.
 
 This includes:
 
-- "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, dsPIC33, PIC32, SWM341 etc.
-- Bluetooth, GSM, Wi-Fi modules like Nordic NRF, Espressif ESP32 and Raspberry Pi Pico W
+- "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, PIC32, TI AMxxx, etc.
+- Bluetooth, GSM, Wi-Fi modules like Nordic NRF, Espressif ESP32 and Raspberry Pi Pico
 - Linux with frame buffer device such as /dev/fb0. This includes Single-board computers like the Raspberry Pi
 - Anything else with a strong enough MCU and a peripheral to drive a display
 
@@ -42,26 +49,22 @@ See the [Display (lv_display)](/main-modules/display) section to learn more.
 ## LVGL doesn't start, randomly crashes or nothing is drawn on the display. What might be the problem?
 
 - Try increasing <ApiLink name="LV_MEM_SIZE" />.
-- Be sure your display works without LVGL. E.g. paint it to red on start up.
+- Be sure that your display works without LVGL. E.g. paint it to red on start up.
 - Enable [Logging](/debugging/log).
 - Enable assertions in `lv_conf.h` (`LV_USE_ASSERT_...`).
-- If you use an RTOS:
-  
-  * Increase the stack size of the task that calls <ApiLink name="lv_timer_handler" />.
-  * Be sure you are using one of the methods for thread management as described in [Operating Systems and Threads](/integration/overview).
+- If you use an RTOS, increase the stack size of the task that calls <ApiLink name="lv_timer_handler" />.
 
 ## My display driver is not called. What have I missed?
 
-Be sure you are calling <ApiLink name="lv_tick_inc" display="lv_tick_inc(x)" /> as prescribed in
-[Tick Interface](/integration/overview) and are calling <ApiLink name="lv_timer_handler" /> as prescribed in
-[Timer Handler](/integration/overview).
-
-Learn more in the [Tick Interface](/integration/overview) and [Timer Handler](/integration/overview) sections.
+Be sure you are calling <ApiLink name="lv_tick_inc" display="lv_tick_inc(x)" /> or have set
+<ApiLink name="lv_tick_set_cb" display="lv_tick_set_cb(my_cb)" /> as described in
+[Tick Interface](/integration/overview#tick-interface) and are calling <ApiLink name="lv_timer_handler" /> as described in
+[Timer Handler](/integration/overview#timer-handler).
 
 ## Why is the display driver called only once? Only the upper part of the display is refreshed.
 
-Be sure you are calling <ApiLink name="lv_display_flush_ready" display="lv_display_flush_ready(drv)" /> at the end of your
-"*display flush callback*" as per the [Flush Callback](/main-modules/display/setup) section.
+Be sure you are calling <ApiLink name="lv_display_flush_ready" display="lv_display_flush_ready(disp)" /> at the end of your
+"*display flush callback*" as per the [Flush Callback](/main-modules/display/setup#flush-callback) section.
 
 ## Why do I see only garbage on the screen?
 
@@ -90,28 +93,37 @@ for(i = 0; i < BUF_WIDTH; i++) {
 The configured LVGL color format is probably not compatible with your display's color
 format.  Check <ApiLink name="LV_COLOR_DEPTH" /> in *lv_conf.h*.
 
+If you're using a 16 bit (RGB565) display connected via SPI the bytes might be swapped. Try
+setting <ApiLink name="lv_display_set_color_format" display="lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565_SWAPPED)" />
+
+
 ## How do I speed up my UI?
 
-- Turn on compiler optimization and enable instruction- and data-caching if your MCU has them.
-- Increase the size of the display buffer.
-- Use two display buffers and flush the buffer with DMA (or similar peripheral) in the background.
+- Turn on compiler optimization
+- Enable instruction- and data-caching if your MCU has them.
 - Increase the clock speed of the SPI or parallel port if you use them to drive the display.
 - If your display has an SPI port consider changing to a model with a parallel interface because it has much higher throughput.
+- In case of [Partial rendering mode](/main-modules/display/setup#draw-buffers):
+    - Increase the size of the display buffer. 1/10 screen size is the minimum, but 1/5 is recommended
+    - Use two display buffers and flush the buffer with DMA (or similar peripheral) in the background.
+- If you have enough RAM use [Direct rendering mode](/main-modules/display/setup#draw-buffers) with 2 frame buffers and:
+    - Switch only the frame buffer address in the `flush_cb`
+    - Call <ApiLink name="lv_display_flush_ready" display="lv_display_flush_ready(display)"/> from the VSYNC ready interrupt, so that you are not blocking while waiting for the frame buffer switch
 - Keep the display buffer in internal RAM (not in external SRAM) because LVGL uses it a lot and it should have fast access time.
 - Consider minimizing LVGL CPU overhead by updating Widgets:
-  
-  - only once just before each display refresh, and
-  - only when it will change what the end user sees.
+  - Only once just before each display refresh, and
+  - Only when it will change what the end user sees.
 
 ## How do I reduce flash/ROM usage?
 
-You can disable unused features (such as animations, file system, GPU etc.) and widget types in *lv_conf.h*.
+You can disable unused features (such as widgets, file system, GPU etc.) and widget types in *lv_conf.h*.
 
 If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG and newer GCC versions.
 
 ## How do I reduce RAM usage?
 
-- Lower the size of the *Display buffer*.
+- In case of [Partial rendering mode](/main-modules/display/setup#draw-buffers) lower the size of the *Display buffer(s)*.
+- Switch to Partial rendering mode from Direct or Full rendering mode
 - Reduce <ApiLink name="LV_MEM_SIZE" /> in *lv_conf.h*. This memory is used when you create Widgets like buttons, labels, etc.
 - To work with lower <ApiLink name="LV_MEM_SIZE" /> you can create Widgets only when required and delete them when they are no longer needed.
 
@@ -119,5 +131,7 @@ If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` com
 
 To work with an operating system where tasks can interrupt each other (preemptively),
 you must ensure that no LVGL function call be called while another LVGL call is in
-progress.  There are several ways to do this.  See the [Operating Systems and Threads](/integration/overview) section to
+progress.  LVGL has built-in mechanisms to support this, and also has built-in support to use mainstream operating systems out of the box.
+
+There are several ways to do this.  See the [Operating Systems and Threads](/integration/overview#operating-system-support) section to
 learn more.

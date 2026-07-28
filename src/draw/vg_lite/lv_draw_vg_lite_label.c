@@ -18,7 +18,7 @@
 #include "lv_vg_lite_bitmap_font_cache.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_area_private.h"
-#include "../../libs/freetype/lv_freetype_private.h"
+#include "../../font/freetype/lv_freetype_private.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_image_private.h"
 

@@ -97,6 +97,7 @@ const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len)
     LV_CHECK_ARG(obj != NULL, return NULL);
     LV_CHECK_ARG(obj->class_p != NULL, return NULL);
     LV_CHECK_ARG(buf != NULL, return NULL);
+    LV_CHECK_ARG(len > 0, return NULL);
 
     const char * name = obj->class_p->name;
     if(name == NULL) name = "nameless";

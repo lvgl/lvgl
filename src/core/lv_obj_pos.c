@@ -294,7 +294,7 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
-    if(lv_obj_has_flag_any(obj, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING)) return false;
+    if(lv_obj_is_hidden(obj) || lv_obj_is_ignore_layout(obj) || lv_obj_is_floating(obj)) return false;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return false;
@@ -885,7 +885,7 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
     lv_obj_t * parent = obj->parent;
 
     if(parent) {
-        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_FLOATING)) {
+        if(lv_obj_is_floating(obj)) {
             x += parent->coords.x1;
             y += parent->coords.y1;
         }
@@ -956,7 +956,7 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        if(ignore_floating && lv_obj_has_flag(child, LV_OBJ_FLAG_FLOATING)) continue;
+        if(ignore_floating && lv_obj_is_floating(child)) continue;
         child->coords.x1 += x_diff;
         child->coords.y1 += y_diff;
         child->coords.x2 += x_diff;
@@ -1105,7 +1105,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     LV_CHECK_ARG(area != NULL, return false);
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
+    if(lv_obj_is_hidden(obj)) return false;
 
     /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
@@ -1135,11 +1135,11 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     while(parent != NULL) {
         /*If the parent is hidden then the child is hidden and won't be drawn*/
-        if(lv_obj_has_flag(parent, LV_OBJ_FLAG_HIDDEN)) return false;
+        if(lv_obj_is_hidden(parent)) return false;
 
         /*Truncate to the parent and if no common parts break*/
         lv_area_t parent_coords = parent->coords;
-        if(lv_obj_has_flag(parent, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        if(lv_obj_is_overflow_visible(parent)) {
             int32_t parent_ext_size = lv_obj_get_ext_draw_size(parent);
             lv_area_increase(&parent_coords, parent_ext_size, parent_ext_size);
         }
@@ -1196,14 +1196,14 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
     LV_CHECK_ARG(point != NULL, return false);
     LV_CHECK_OBJ(obj, MY_CLASS, return false);
 
-    if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) return false;
+    if(!lv_obj_is_clickable(obj)) return false;
 
     lv_area_t a;
     lv_obj_get_click_area(obj, &a);
     bool res = lv_area_is_point_on(&a, point, 0);
     if(res == false) return false;
 
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
+    if(lv_obj_is_adv_hittest(obj)) {
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
         hit_info.res = true;
@@ -1377,7 +1377,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
             for(i = 0; i < child_cnt; i++) {
                 int32_t child_res_tmp = LV_COORD_MIN;
                 lv_obj_t * child = obj->spec_attr->children[i];
-                if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING))
+                if(child->hidden || child->floating)
                     continue;
 
                 if(child->w_ignore_size)
@@ -1417,7 +1417,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
             for(i = 0; i < child_cnt; i++) {
                 int32_t child_res_tmp = LV_COORD_MIN;
                 lv_obj_t * child = obj->spec_attr->children[i];
-                if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
+                if(child->hidden || child->floating) continue;
 
                 if(child->w_ignore_size)
                     continue;
@@ -1485,8 +1485,7 @@ static int32_t calc_content_height(lv_obj_t * obj)
         for(i = 0; i < child_cnt; i++) {
             int32_t child_res_tmp = LV_COORD_MIN;
             lv_obj_t * child = obj->spec_attr->children[i];
-            if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING))
-                continue;
+            if(child->hidden || child->floating) continue;
 
             if(child->h_ignore_size)
                 continue;

@@ -1,0 +1,28 @@
+menu "Drivers"
+rsource "display/drm/Kconfig"
+rsource "display/fb/Kconfig"
+rsource "display/ft81x/Kconfig"
+rsource "display/lovyan_gfx/Kconfig"
+rsource "display/mipi/Kconfig"
+rsource "display/nxp_elcdif/Kconfig"
+rsource "display/renesas_glcdc/Kconfig"
+rsource "display/st_ltdc/Kconfig"
+rsource "display/tft_espi/Kconfig"
+rsource "evdev/Kconfig"
+rsource "libinput/Kconfig"
+rsource "nuttx/Kconfig"
+rsource "opengles/Kconfig"
+rsource "qnx/Kconfig"
+rsource "sdl/Kconfig"
+rsource "uefi/Kconfig"
+rsource "wayland/Kconfig"
+rsource "windows/Kconfig"
+rsource "x11/Kconfig"
+
+config LV_USE_NANOVG
+	bool "NanoVG library"
+	default n
+	help
+		Enable NanoVG (vector graphics library)
+
+endmenu

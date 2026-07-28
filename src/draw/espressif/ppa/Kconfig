@@ -1,0 +1,19 @@
+config LV_USE_PPA
+bool "Use Espressif's PPA accelerator for ESP SoCs"
+default n
+help
+	Draw using Espressif PPA accelerator
+
+if LV_USE_PPA
+
+config LV_USE_PPA_IMG
+bool "Use Espressif's PPA accelerator for Image draw"
+default n
+
+config LV_PPA_BURST_LENGTH
+int "PPA Burst length in bytes"
+default 128
+help
+	PPA burst length size in bytes.
+
+endif

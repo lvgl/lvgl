@@ -17,7 +17,7 @@ system with the fewest components.
 
 The ST7789 LCD controller
 [driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/display/st7789) is a
-platform-agnostic driver, based on the generic MIPI driver.  It implements
+platform-agnostic driver, based on the [generic MIPI driver](/integration/external_display_controllers/gen_mipi).  It implements
 display initialization, supports display rotation and implements the display flush
 callback.  The user needs to implement only two platform-specific functions to send a
 command or pixel data to the controller via SPI or parallel bus.  Typically these are
@@ -70,5 +70,5 @@ lv_display_t * lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_
                                 lv_st7789_send_cmd_cb_t send_cmd_cb, lv_st7789_send_color_cb_t send_color_cb);
 ```
 
-For additional details and a working example see the generic MIPI driver
-documentation.
+For additional details and a working example see the
+[generic MIPI driver](/integration/external_display_controllers/gen_mipi) documentation.

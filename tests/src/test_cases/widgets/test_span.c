@@ -123,10 +123,12 @@ void test_span_set_text_static_with_previous_text_overwrites(void)
 
 void test_spangroup_set_align(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     const lv_text_align_t align = LV_TEXT_ALIGN_CENTER;
     lv_spangroup_set_align(spangroup, align);
 
     TEST_ASSERT_EQUAL(align, lv_spangroup_get_align(spangroup));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_spangroup_set_overflow(void)
@@ -156,6 +158,7 @@ void test_spangroup_set_indent(void)
 
 void test_spangroup_set_mode(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_EXPAND, lv_spangroup_get_mode(spangroup));
 
@@ -164,13 +167,16 @@ void test_spangroup_set_mode(void)
 
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_FIXED);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_FIXED, lv_spangroup_get_mode(spangroup));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_spangroup_set_mode_invalid_parameter_mode_not_changed(void)
 {
+    LV_DEPRECATIONS_IGNORE_BEGIN
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_LAST);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_EXPAND, lv_spangroup_get_mode(spangroup));
+    LV_DEPRECATIONS_IGNORE_END
 }
 
 void test_spangroup_set_max_lines(void)
@@ -216,7 +222,7 @@ void test_spangroup_draw(void)
 {
     active_screen = lv_screen_active();
     spangroup = lv_spangroup_create(active_screen);
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+    lv_obj_set_height(spangroup, LV_SIZE_CONTENT);
     lv_obj_set_width(spangroup, 100);
     lv_span_t * span_1 = lv_spangroup_add_span(spangroup);
     lv_span_set_text(span_1, "This text is over 100 pixels width");
@@ -229,15 +235,16 @@ void test_spangroup_draw(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_02.png");
 
-    lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
+    lv_obj_set_style_text_align(spangroup, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_03.png");
 
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
+    lv_obj_set_size(spangroup, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_04.png");
 
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_FIXED);
+    lv_obj_set_width(spangroup, 100);
+    lv_obj_set_content_height(spangroup, 100);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_05.png");
 }
@@ -324,8 +331,7 @@ void test_spangroup_chinese_break_line(void)
 
     active_screen = lv_screen_active();
     spangroup = lv_spangroup_create(active_screen);
-    lv_obj_set_size(spangroup, LV_PCT(100), LV_PCT(100));
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+    lv_obj_set_size(spangroup, LV_PCT(100), LV_SIZE_CONTENT);
 
     lv_obj_set_style_text_font(spangroup, font, 0);
     lv_obj_set_style_border_width(spangroup, 2, 0);
@@ -388,7 +394,7 @@ void test_spangroup_get_span_coords(void)
     /* Set styles and properties for the span group */
     lv_obj_set_style_outline_width(spangroup, 1, 0);
     lv_spangroup_set_indent(spangroup, 20);
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+    lv_obj_set_height(spangroup, LV_SIZE_CONTENT);
     lv_obj_set_width(spangroup, 300);
     lv_obj_set_style_pad_all(spangroup, 20, LV_PART_MAIN);
 
@@ -489,7 +495,7 @@ void test_spangroup_set_right_align_on_overflow(void)
     lv_obj_set_width(spangroup, 180);
     lv_obj_set_height(spangroup, 30);
 
-    lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_RIGHT);
+    lv_obj_set_style_text_align(spangroup, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
 
     lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(span, "China is a beautiful country.");
@@ -527,7 +533,7 @@ void test_spangroup_rtl_mode_set_left_align(void)
     lv_obj_set_style_text_font(spangroup, &lv_font_dejavu_16_persian_hebrew, 0);
     lv_obj_set_style_base_dir(spangroup, LV_BASE_DIR_RTL, 0);
     lv_obj_set_size(spangroup, 300, lv_font_dejavu_16_persian_hebrew.line_height);
-    lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_LEFT);
+    lv_obj_set_style_text_align(spangroup, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN);
 
     lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(span, message);
@@ -546,7 +552,7 @@ void test_spangroup_rtl_mode_set_center_align(void)
     lv_obj_set_style_text_font(spangroup, &lv_font_dejavu_16_persian_hebrew, 0);
     lv_obj_set_style_base_dir(spangroup, LV_BASE_DIR_RTL, 0);
     lv_obj_set_size(spangroup, 300, lv_font_dejavu_16_persian_hebrew.line_height);
-    lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
+    lv_obj_set_style_text_align(spangroup, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
 
     lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(span, message);
@@ -571,9 +577,8 @@ void test_spangroup_set_line_space(void)
     active_screen = lv_screen_active();
     spangroup = lv_spangroup_create(active_screen);
     lv_obj_set_y(spangroup, -26);
-    lv_obj_set_width(spangroup, 300);
+    lv_obj_set_size(spangroup, 300, LV_SIZE_CONTENT);
     lv_obj_set_style_border_width(spangroup, 2, 0);
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
     lv_obj_set_style_text_line_space(spangroup, 2, 0);
     lv_obj_set_style_text_font(spangroup, font, 0);
 
@@ -668,7 +673,7 @@ void test_spangroup_ellipsis_not_shown_when_text_fits(void)
     lv_obj_set_style_text_font(spangroup1, font, 0);
     lv_obj_set_style_outline_width(spangroup1, 1, 0);
     lv_spangroup_set_overflow(spangroup1, LV_SPAN_OVERFLOW_ELLIPSIS);
-    lv_spangroup_set_mode(spangroup1, LV_SPAN_MODE_BREAK);
+    lv_obj_set_height(spangroup1, LV_SIZE_CONTENT);
 
     lv_span_t * span1 = lv_spangroup_add_span(spangroup1);
     lv_span_set_text(span1, "消息免打扰");
@@ -683,7 +688,8 @@ void test_spangroup_ellipsis_not_shown_when_text_fits(void)
     lv_obj_set_style_text_font(spangroup2, font, 0);
     lv_obj_set_style_outline_width(spangroup2, 1, 0);
     lv_spangroup_set_overflow(spangroup2, LV_SPAN_OVERFLOW_ELLIPSIS);
-    lv_spangroup_set_mode(spangroup2, LV_SPAN_MODE_BREAK);
+    lv_obj_set_height(spangroup2, LV_SIZE_CONTENT);
+
     lv_obj_set_y(spangroup2, 40);
     lv_obj_set_width(spangroup2, 250);
     lv_obj_set_style_max_height(spangroup2, constrained_h, 0);
@@ -716,10 +722,9 @@ void test_spangroup_ellipsis_multiline_truncated(void)
     int32_t line_h = lv_font_get_line_height(LV_FONT_DEFAULT);
 
     lv_obj_set_style_outline_width(spangroup, 1, 0);
-    lv_obj_set_width(spangroup, 100);
+    lv_obj_set_size(spangroup, 100, LV_SIZE_CONTENT);
     lv_obj_set_style_max_height(spangroup, line_h * 2, 0);
     lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_ELLIPSIS);
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
 
     lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text(span, "This text is long enough to wrap into three or more lines in a 100px container");

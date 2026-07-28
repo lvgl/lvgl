@@ -15,11 +15,6 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-static void ext_draw_size_event_cb(lv_event_t * e)
-{
-    lv_event_set_ext_draw_size(e, 100);
-}
-
 static void btn_clicked_event_cb(lv_event_t * e)
 {
     uint32_t * cnt = lv_event_get_user_data(e);
@@ -31,9 +26,9 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_t * obj_main = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj_main, 400, 300);
     lv_obj_set_style_bg_color(obj_main, lv_palette_main(LV_PALETTE_RED), 0);
-    lv_obj_add_flag(obj_main, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
+    lv_obj_set_overflow_visible(obj_main, true);
     lv_obj_center(obj_main);
-    lv_obj_add_event_cb(obj_main, ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, NULL);
+    lv_obj_set_ext_draw_size(obj_main, 100);
 
     lv_obj_t * obj_child_1 = lv_obj_create(obj_main);
     lv_obj_set_size(obj_child_1, 200, 200);
@@ -43,7 +38,7 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_t * btn_1 = lv_button_create(obj_child_1);
     lv_obj_set_size(btn_1, 100, 100);
     lv_obj_align(btn_1, LV_ALIGN_LEFT_MID, -75, 0);
-    lv_obj_remove_flag(btn_1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(btn_1, false);
     uint32_t cnt_1;
     lv_obj_add_event_cb(btn_1, btn_clicked_event_cb, LV_EVENT_CLICKED, &cnt_1);
 
@@ -54,14 +49,14 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_t * obj_child_2 = lv_obj_create(obj_main);
     lv_obj_set_size(obj_child_2, 200, 200);
     lv_obj_set_style_bg_color(obj_child_2, lv_palette_main(LV_PALETTE_ORANGE), 0);
-    lv_obj_add_flag(obj_child_2, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
+    lv_obj_set_overflow_visible(obj_child_2, true);
     lv_obj_align(obj_child_2, LV_ALIGN_RIGHT_MID, 100, 0);
-    lv_obj_add_event_cb(obj_child_2, ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, NULL);
+    lv_obj_set_ext_draw_size(obj_child_2, 100);
 
     lv_obj_t * btn_2 = lv_button_create(obj_child_2);
     lv_obj_set_size(btn_2, 100, 100);
     lv_obj_align(btn_2, LV_ALIGN_RIGHT_MID, 75, 0);
-    lv_obj_remove_flag(btn_2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(btn_2, false);
     uint32_t cnt_2;
     lv_obj_add_event_cb(btn_2, btn_clicked_event_cb, LV_EVENT_CLICKED, &cnt_2);
 
@@ -240,10 +235,10 @@ void test_obj_flag_radio_button(void)
 void test_obj_flag_parent_hidden(void)
 {
     /* #10083: Ensure that adding and removing screen flags don't make lvgl crash*/
-    lv_obj_add_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN);
-    TEST_ASSERT_TRUE(lv_obj_has_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN));
-    lv_obj_remove_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN);
-    TEST_ASSERT_FALSE(lv_obj_has_flag(lv_screen_active(), LV_OBJ_FLAG_HIDDEN));
+    lv_obj_set_hidden(lv_screen_active(), true);
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(lv_screen_active()));
+    lv_obj_set_hidden(lv_screen_active(), false);
+    TEST_ASSERT_FALSE(lv_obj_is_hidden(lv_screen_active()));
     TEST_PASS();
 }
 

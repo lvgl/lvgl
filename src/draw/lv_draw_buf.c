@@ -535,13 +535,13 @@ void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
 
 void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
 {
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
+    LV_LOG_DEPRECATED("Use lv_draw_buf_set_palette instead.");
     lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
 }
 
 void lv_image_buf_free(lv_image_dsc_t * dsc)
 {
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
+    LV_LOG_DEPRECATED("Use lv_draw_buf_destroy instead.");
     if(dsc != NULL) {
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);

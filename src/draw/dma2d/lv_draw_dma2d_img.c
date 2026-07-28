@@ -11,7 +11,7 @@
 #if LV_USE_DRAW_DMA2D
 
 #include "../lv_draw_image_private.h"
-#include "../lv_image_decoder_private.h"
+#include "../../image/lv_image_decoder_private.h"
 #include "../../misc/lv_area_private.h"
 
 /*********************

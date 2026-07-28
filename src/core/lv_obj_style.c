@@ -511,11 +511,20 @@ lv_style_value_t lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t
     return v;
 }
 
-lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
+lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2,
+                                                lv_part_t * changed_part)
 {
     LV_CHECK_ARG(obj != NULL, return LV_STYLE_STATE_CMP_SAME);
 
     lv_style_state_cmp_t res = LV_STYLE_STATE_CMP_SAME;
+
+    /*Accumulate which part the differing styles belong to: the lone differing
+     *part, or LV_PART_ANY once styles from more than one part differ. Reported
+     *via changed_part so the caller can scope the refresh to a single part.
+     *diff_part_found is needed as a separate flag because a style's part can
+     *itself be LV_PART_ANY, so LV_PART_ANY can't double as "none seen yet".*/
+    lv_part_t diff_part = LV_PART_ANY;
+    bool diff_part_found = false;
 
     /*Are there any new styles for the new state?*/
     uint32_t i;
@@ -527,6 +536,17 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
         bool valid1 = state_act & (~state1) ? false : true;
         bool valid2 = state_act & (~state2) ? false : true;
         if(valid1 != valid2) {
+            /*Record this differing style's part: keep it if it's the only one
+             *seen so far, otherwise collapse to LV_PART_ANY (more than one part).*/
+            lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
+            if(!diff_part_found) {
+                diff_part = part_act;
+                diff_part_found = true;
+            }
+            else if(part_act != diff_part) {
+                diff_part = LV_PART_ANY;
+            }
+
             const lv_style_t * style = obj->styles[i].style;
             lv_style_value_t v;
             /*If there is layout difference on the main part, return immediately. There is no more serious difference*/
@@ -549,6 +569,9 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
             else if(lv_style_get_prop(style, LV_STYLE_BORDER_WIDTH, &v)) layout_diff = true;
 
             if(layout_diff) {
+                /*Returning early, so the full set of changed parts is unknown:
+                 *report LV_PART_ANY rather than a possibly-incomplete part.*/
+                if(changed_part) *changed_part = LV_PART_ANY;
                 return LV_STYLE_STATE_CMP_DIFF_LAYOUT;
             }
 
@@ -571,6 +594,7 @@ lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state
         }
     }
 
+    if(changed_part) *changed_part = diff_part;
     return res;
 }
 
@@ -1328,6 +1352,7 @@ static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_sel
 
 static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool theme_only)
 {
+    LV_ASSERT(obj != NULL);
     lv_state_t state = lv_obj_style_get_selector_state(selector);
     lv_part_t part = lv_obj_style_get_selector_part(selector);
     lv_style_prop_t prop = LV_STYLE_PROP_ANY;
@@ -1337,47 +1362,58 @@ static void remove_style_core(lv_obj_t * obj, const lv_style_t * style, lv_style
         lv_obj_invalidate(obj);
     }
 
-    uint32_t i = 0;
+    uint32_t style_count = 0;
     bool deleted = false;
-    while(i <  obj->style_cnt) {
+
+    for(uint32_t i = 0; i < obj->style_cnt; i++) {
         lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
         lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
+
+        bool should_remove = true;
         if(theme_only && !obj->styles[i].is_theme) {
-            i++;
-            continue;
+            should_remove = false;
         }
-        if((state != LV_STATE_ANY && state_act != state) ||
-           (part != LV_PART_ANY && part_act != part) ||
-           (style != NULL && style != obj->styles[i].style)) {
-            i++;
+        else if((state != LV_STATE_ANY && state_act != state) ||
+                (part != LV_PART_ANY && part_act != part) ||
+                (style != NULL && style != obj->styles[i].style)) {
+            should_remove = false;
+        }
+
+        if(!should_remove) {
+            /*Keep this entry: copy it down to the current write position if needed*/
+            if(style_count != i) {
+                obj->styles[style_count] = obj->styles[i];
+            }
+            style_count++;
             continue;
         }
 
+        /*This entry is being removed*/
         if(obj->styles[i].is_trans) {
             trans_delete(obj, part, LV_STYLE_PROP_ANY, NULL);
         }
-
         if(obj->styles[i].is_local || obj->styles[i].is_trans) {
             if(obj->styles[i].style) lv_style_reset((lv_style_t *)obj->styles[i].style);
             lv_free((lv_style_t *)obj->styles[i].style);
             obj->styles[i].style = NULL;
         }
-
-        /*Shift the styles after `i` by one*/
-        uint32_t j;
-        for(j = i; j < (uint32_t)obj->style_cnt - 1 ; j++) {
-            obj->styles[j] = obj->styles[j + 1];
-        }
-
-        obj->style_cnt--;
-        obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
-
         deleted = true;
-        /*The style from the current `i` index is removed, so `i` points to the next style.
-         *Therefore it doesn't needs to be incremented*/
     }
 
-    if(deleted && prop != LV_STYLE_PROP_INV) {
+    if(!deleted) {
+        return;
+    }
+
+    obj->style_cnt = style_count;
+    if(style_count > 0) {
+        obj->styles = lv_realloc(obj->styles, style_count * sizeof(lv_obj_style_t));
+    }
+    else {
+        lv_free(obj->styles);
+        obj->styles = NULL;
+    }
+
+    if(prop != LV_STYLE_PROP_INV) {
         full_cache_refresh(obj, part);
         lv_obj_refresh_style(obj, part, prop);
     }

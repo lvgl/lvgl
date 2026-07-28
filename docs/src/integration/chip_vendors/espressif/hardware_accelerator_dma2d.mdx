@@ -9,11 +9,11 @@ Some chips from Espressif such as the ESP32-P4 family features a peripheral
 that enhances the copy of 2-D data from a place to another, including output
 this 2-D data to other peripherals.
 
-This peripheral is the 2-D direct memory access, or DMA2D, the Espressif 
+This peripheral is the 2-D direct memory access, or DMA2D, the Espressif
 SDK, the IDF, offers a full featured driver for the DMA2D that is automatically
 enabled on the supported chips.
 
-One of its primary role is to serve as support for the Pixel Processor Accelerator
+One of its primary roles is to serve as support for the Pixel Processor Accelerator
 the PPA, being used to copy the source image data to the desired PPA client splitting
 these data into fixed size blocks, called bursts. Also the DMA2D is used to pick the
 output chunks from the PPA client and copy over to the destination buffer, or the display
@@ -28,7 +28,7 @@ display driver uses the DMA2D to copy the target drawn buffer to the display buf
 intervention. Even though this option is available the user is responsible to explicitly enable
 it on the display driver of the LVGL port component.
 
-To enabling it the user should set on its `sdkconfig.defaults` the `CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR`, 
+To enabling it the user should set on its `sdkconfig.defaults` the `CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR`,
 which will tell the driver to use the DMA2D to optimize transfer. Please notice that enabling
 this option will be only available when using the PSRAM memory and double buffer mode, otherwise
 a compiler error will be raised.

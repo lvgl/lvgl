@@ -1,28 +1,39 @@
 set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(KCONFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
 set(AUTOCONF_H ${CMAKE_CURRENT_BINARY_DIR}/autoconf.h)
-set(OUTPUT_DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
+set(OUTPUT_DOTCONFIG ${CMAKE_CURRENT_BINARY_DIR}/.config)
 set(KCONFIG_LIST_OUT ${CMAKE_CURRENT_BINARY_DIR}/kconfig_list)
 set(AUTO_CONF_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+# Normalizes INPUT_PATH (which is relative to CMAKE_SOURCE_DIR) to an absolute path 
+macro(lv_normalize_config_path INPUT_PATH LABEL OUTPUT_VAR)
+    message(STATUS "Using ${LABEL}: ${${INPUT_PATH}}")
+    if(NOT IS_ABSOLUTE ${${INPUT_PATH}})
+        file(REAL_PATH ${${INPUT_PATH}} ${OUTPUT_VAR} BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
+        message(STATUS "Converted to absolute path: ${${OUTPUT_VAR}}")
+    else()
+        set(${OUTPUT_VAR} ${${INPUT_PATH}})
+    endif()
+endmacro()
+
 # Check if the user wants to use a defconfig, using the -DLV_BUILD_DEFCONFIG_PATH option
 if(LV_BUILD_DEFCONFIG_PATH)
-    # The supplied path can be relative - normalize it to absolute
-    message(STATUS "Using defconfig: ${LV_BUILD_DEFCONFIG_PATH}")
-
-    if (NOT IS_ABSOLUTE ${CONF_PATH})
-        file(REAL_PATH ${LV_BUILD_DEFCONFIG_PATH}
-            DOTCONFIG BASE_DIRECTORY ${CMAKE_SOURCE_DIR})
-        message(STATUS "Converted to absolute path: ${DOTCONFIG}")
-
-    else()
-        set(DOTCONFIG ${LV_BUILD_DEFCONFIG_PATH})
-    endif()
-
+    lv_normalize_config_path(LV_BUILD_DEFCONFIG_PATH "defconfig" DOTCONFIG)
+elseif(LV_BUILD_DOTCONFIG_PATH)
+    lv_normalize_config_path(LV_BUILD_DOTCONFIG_PATH ".config" DOTCONFIG)
 else()
-    # Fallback - This will attempt to use a .config file inside of the LVGL directory
-    set(DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
-
+    # No explicit config file set
+    # Search, in order:
+    #   1. the top-level project directory (matches where lv_conf.h is expected)
+    #   2. the LVGL source directory (standard Kconfig in-tree location)
+    #   3. the .config generated in the binary directory on a previous run
+    if(EXISTS ${CMAKE_SOURCE_DIR}/.config)
+        set(DOTCONFIG ${CMAKE_SOURCE_DIR}/.config)
+    elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.config)
+        set(DOTCONFIG ${CMAKE_CURRENT_SOURCE_DIR}/.config)
+    else()
+        set(DOTCONFIG ${OUTPUT_DOTCONFIG})
+    endif()
 endif()
 
 if (NOT EXISTS ${DOTCONFIG})
@@ -30,7 +41,8 @@ if (NOT EXISTS ${DOTCONFIG})
 endif()
 
 execute_process(
-    COMMAND ${Python_EXECUTABLE}
+    COMMAND ${CMAKE_COMMAND} -E env LVGL_DIR=${LVGL_ROOT_DIR}
+    ${Python_EXECUTABLE} 
     ${LVGL_ROOT_DIR}/scripts/kconfig.py
     ${LVGL_ROOT_DIR}/Kconfig
     ${OUTPUT_DOTCONFIG}
@@ -46,8 +58,9 @@ if(NOT "${ret}" STREQUAL "0")
     message(FATAL_ERROR "command failed with return code: ${ret}")
 endif()
 
-# Re-configure (Re-execute all CMakeLists.txt code) when autoconf.h changes
-set_target_properties(lvgl PROPERTIES CMAKE_CONFIGURE_DEPENDS ${AUTOCONF_H})
+# Re-run CMake configuration (which regenerates autoconf.h) when the input
+# .config/defconfig changes, so that `cmake --build` picks up config edits.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${DOTCONFIG})
 
 # Set the variable that can be used by the CMakeLists.txt including this file
 set(KCONFIG_EXTERNAL_INCLUDE ${AUTOCONF_H})

@@ -7,6 +7,8 @@
     "pull_requests",
     "dco",
     "coding_style",
-    "assertions"
+    "assertions",
+    "deprecations",
+    "configuration"
   ]
 }

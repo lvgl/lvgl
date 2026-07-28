@@ -1,0 +1,3 @@
+config LV_USE_FT81X
+	bool "Use ft81x EVE driver"
+	default n

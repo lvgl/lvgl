@@ -203,7 +203,7 @@ lv_draw_buf_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
 
 void lv_snapshot_free(lv_image_dsc_t * dsc)
 {
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy directly.");
+    LV_LOG_DEPRECATED("use lv_draw_buf_destroy directly");
     lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
 }
 
@@ -212,7 +212,7 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
                                     uint32_t buf_size)
 {
     lv_draw_buf_t draw_buf;
-    LV_LOG_WARN("Deprecated API, use lv_snapshot_take_to_draw_buf instead.");
+    LV_LOG_DEPRECATED("use lv_snapshot_take_to_draw_buf instead.");
     lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);
     lv_result_t res = lv_snapshot_take_to_draw_buf(obj, cf, &draw_buf);
     if(res == LV_RESULT_OK) {

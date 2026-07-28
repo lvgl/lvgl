@@ -97,32 +97,32 @@ static void selectors_create(lv_obj_t * parent)
     lv_table_set_cell_value(obj, 2, 1, "21");
     lv_table_set_cell_value(obj, 3, 0, "30");
     lv_table_set_cell_value(obj, 3, 1, "31");
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     obj = lv_calendar_create(parent);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     obj = lv_buttonmatrix_create(parent);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     obj = lv_checkbox_create(parent);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     obj = lv_slider_create(parent);
     lv_slider_set_range(obj, 0, 10);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     obj = lv_switch_create(parent);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     obj = lv_spinbox_create(parent);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     obj = lv_dropdown_create(parent);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     obj = lv_roller_create(parent);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_set_scroll_on_focus(obj, true);
 
     lv_obj_t * list = lv_list_create(parent);
     lv_obj_update_layout(list);
@@ -154,7 +154,7 @@ static void text_input_create(lv_obj_t * parent)
     lv_textarea_set_placeholder_text(ta2, "Type something");
 
     lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
-    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(kb, true);
 
     lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
     lv_obj_add_event_cb(ta2, ta_event_cb, LV_EVENT_ALL, kb);
@@ -201,7 +201,7 @@ static void ta_event_cb(lv_event_t * e)
 
     if(code == LV_EVENT_CLICKED && indev_type == LV_INDEV_TYPE_ENCODER) {
         lv_keyboard_set_textarea(kb, ta);
-        lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_hidden(kb, false);
         lv_group_focus_obj(kb);
         lv_group_set_editing(lv_obj_get_group(kb), kb != NULL);
         lv_obj_set_height(tv, LV_VER_RES / 2);
@@ -209,7 +209,7 @@ static void ta_event_cb(lv_event_t * e)
     }
 
     if(code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_set_hidden(kb, true);
         lv_obj_set_height(tv, LV_VER_RES);
     }
 }
