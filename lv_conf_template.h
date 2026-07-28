@@ -511,9 +511,9 @@
  */
 #define LV_USE_PPA_IMG 0
 
-#endif /*LV_USE_PPA*/
-
 #define LV_PPA_BURST_LENGTH 128
+
+#endif /*LV_USE_PPA*/
 
 /** Accelerate blends, fills and image decoding with the STM32 DMA2D peripheral. */
 #define LV_USE_DRAW_DMA2D 0
@@ -1493,7 +1493,7 @@
  */
 #define LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
 
-#define LV_LINUX_FBDEV_BUFFER_COUNT 0
+#define LV_LINUX_FBDEV_BUFFER_COUNT 1
 
 #if LV_LINUX_FBDEV_BUFFER_COUNT == 0
 /** Custom partial buffer size (rows) */
@@ -1964,14 +1964,14 @@
  * DEBUGGING
  *============================================================================*/
 
-/** Periodically collect CPU, FPS and memory statistics and show them in an
+/** Periodically collect CPU, FPS and memory statistics and optionally show them in an
  *  on-screen overlay.
  */
 #define LV_USE_SYSMON 0
 
 #if LV_USE_SYSMON
-/** The port provides a per-process idle percentage in addition to the
- *  system-wide one.
+/** The port provides `lv_os_get_proc_idle_percent` a per-process idle percentage
+ *  in addition to the system-wide one. LVGL provides a default one for linux systems.
  */
 #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
 

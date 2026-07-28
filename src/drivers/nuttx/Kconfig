@@ -38,7 +38,7 @@ config LV_USE_NUTTX_LCD
 choice
 	prompt "LCD buffer size"
 	depends on LV_USE_NUTTX_LCD
-	default LV_NUTTX_LCD_SINGLE_BUFFER
+	default LV_NUTTX_LCD_CUSTOM_BUFFER
 
 	config LV_NUTTX_LCD_SINGLE_BUFFER
 		bool "One screen-sized buffer"

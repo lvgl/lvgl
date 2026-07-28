@@ -2,7 +2,7 @@ config LV_USE_SYSMON
 	bool "System monitor"
 	default n
 	help
-		Periodically collect CPU, FPS and memory statistics and show them in an
+		Periodically collect CPU, FPS and memory statistics and optionally show them in an
 		on-screen overlay.
 
 if LV_USE_SYSMON
@@ -11,8 +11,8 @@ config LV_SYSMON_PROC_IDLE_AVAILABLE
 	bool "Per-process idle measurement"
 	default n
 	help
-		The port provides a per-process idle percentage in addition to the
-		system-wide one.
+		The port provides `lv_os_get_proc_idle_percent` a per-process idle percentage
+		in addition to the system-wide one. LVGL provides a default one for linux systems.
 
 config LV_USE_PERF_MONITOR
 	bool "Performance monitor"

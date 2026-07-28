@@ -902,11 +902,6 @@ config LV_USE_PPA_IMG
 		Let the PPA also draw images. Only simple cases qualify: unscaled,
 		unrotated, fully opaque and without masks.
 
-endif
-
-# A choice because the driver #errors on any other burst length. Deliberately not
-# gated on LV_USE_PPA: gating it would resolve the int to an invalid 0 whenever PPA
-# is off, which then fails to build as soon as PPA is turned on in a copied lv_conf.h.
 choice
 	prompt "PPA burst length (bytes)"
 	default LV_PPA_BURST_LENGTH_128
@@ -932,6 +927,7 @@ config LV_PPA_BURST_LENGTH
 	default 32 if LV_PPA_BURST_LENGTH_32
 	default 64 if LV_PPA_BURST_LENGTH_64
 	default 128 if LV_PPA_BURST_LENGTH_128
+endif
 endmenu
 
 menu "DMA2D"
@@ -1161,7 +1157,7 @@ config LV_USE_OBJ_ID_BUILTIN
 endif #LV_USE_OBJ_ID
 
 config LV_USE_OBJ_PROPERTY
-	bool "Widget properties"
+	bool "Generic widget property set/get API"
 	default n
 	help
 		Get and set any widget style or attribute through a single generic property ID based API.
@@ -2462,7 +2458,7 @@ config LV_USE_NUTTX_LCD
 choice
 	prompt "LCD buffer size"
 	depends on LV_USE_NUTTX_LCD
-	default LV_NUTTX_LCD_SINGLE_BUFFER
+	default LV_NUTTX_LCD_CUSTOM_BUFFER
 
 	config LV_NUTTX_LCD_SINGLE_BUFFER
 		bool "One screen-sized buffer"
@@ -3015,7 +3011,7 @@ config LV_USE_SYSMON
 	bool "System monitor"
 	default n
 	help
-		Periodically collect CPU, FPS and memory statistics and show them in an
+		Periodically collect CPU, FPS and memory statistics and optionally show them in an
 		on-screen overlay.
 
 if LV_USE_SYSMON
@@ -3024,8 +3020,8 @@ config LV_SYSMON_PROC_IDLE_AVAILABLE
 	bool "Per-process idle measurement"
 	default n
 	help
-		The port provides a per-process idle percentage in addition to the
-		system-wide one.
+		The port provides `lv_os_get_proc_idle_percent` a per-process idle percentage
+		in addition to the system-wide one. LVGL provides a default one for linux systems.
 
 config LV_USE_PERF_MONITOR
 	bool "Performance monitor"

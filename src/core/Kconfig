@@ -34,7 +34,7 @@ config LV_USE_OBJ_ID_BUILTIN
 endif #LV_USE_OBJ_ID
 
 config LV_USE_OBJ_PROPERTY
-	bool "Widget properties"
+	bool "Generic widget property set/get API"
 	default n
 	help
 		Get and set any widget style or attribute through a single generic property ID based API.
