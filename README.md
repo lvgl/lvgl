@@ -280,6 +280,9 @@ section of the documentation.
 
 Hundreds of people have already left their fingerprint on LVGL. Be one of them! See you here! 🙂
 
+## Tests
+
+For more information on running tests see README.md in the tests/ folder.
 
 ## License
 
