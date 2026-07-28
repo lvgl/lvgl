@@ -340,7 +340,7 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888(lv_draw_sw_blend_fill_dsc_t * 
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -427,7 +427,7 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa(lv_draw_sw_blend_fill
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -574,7 +574,7 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_mask(lv_draw_sw_blend_fil
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -734,7 +734,7 @@ lv_result_t lv_draw_sw_blend_sve2_color_to_rgb888_with_opa_mask(lv_draw_sw_blend
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -852,7 +852,7 @@ lv_result_t lv_draw_sw_blend_sve2_l8_to_rgb888(lv_draw_sw_blend_image_dsc_t * ds
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -1006,7 +1006,7 @@ lv_result_t lv_draw_sw_blend_sve2_l8_to_rgb888_with_opa(lv_draw_sw_blend_image_d
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -1348,7 +1348,7 @@ lv_result_t lv_draw_sw_blend_sve2_l8_to_rgb888_with_opa_mask(lv_draw_sw_blend_im
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -1487,7 +1487,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888(lv_draw_sw_blend_image_dsc_t 
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -1644,7 +1644,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_opa(lv_draw_sw_blend_ima
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -1818,7 +1818,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_mask(lv_draw_sw_blend_im
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -2001,7 +2001,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb565_to_rgb888_with_opa_mask(lv_draw_sw_blen
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -2174,7 +2174,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888(lv_draw_sw_blend_image_dsc_t 
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -2387,7 +2387,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_opa(lv_draw_sw_blend_ima
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -2632,7 +2632,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_mask(lv_draw_sw_blend_im
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -2895,7 +2895,7 @@ lv_result_t lv_draw_sw_blend_sve2_rgb888_to_rgb888_with_opa_mask(lv_draw_sw_blen
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -3003,7 +3003,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888(lv_draw_sw_blend_image_dsc_t
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -3121,7 +3121,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888_with_opa(lv_draw_sw_blend_im
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -3251,7 +3251,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888_with_mask(lv_draw_sw_blend_i
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -3391,7 +3391,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_to_rgb888_with_opa_mask(lv_draw_sw_ble
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -3499,7 +3499,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888(lv_draw_sw_ble
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -3673,7 +3673,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888_with_opa(lv_dr
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -3860,7 +3860,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888_with_mask(lv_d
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 LV_NONNULL(1)
@@ -4056,7 +4056,7 @@ lv_result_t lv_draw_sw_blend_sve2_argb888_premultiplied_to_rgb888_with_opa_mask(
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /**********************
