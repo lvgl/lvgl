@@ -240,8 +240,7 @@ void lv_test_display_egl_cleanup(void * egl_ctx)
 
 static bool init_egl(egl_test_ctx_t * ctx)
 {
-    /* Try EGL device platform first (works without display server).
-     * Use eglGetProcAddress to get extension functions dynamically,
+    /* Use eglGetProcAddress to get extension functions dynamically,
      * avoiding conflicts with glad macro redefinitions. */
     PFNEGLQUERYDEVICESEXTPROC query_devices_fn =
         (PFNEGLQUERYDEVICESEXTPROC)eglGetProcAddress("eglQueryDevicesEXT");
@@ -250,21 +249,21 @@ static bool init_egl(egl_test_ctx_t * ctx)
 
     ctx->egl_display = EGL_NO_DISPLAY;
 
-    if(query_devices_fn && get_platform_display_fn) {
+    /* Software rendering is deterministic and available wherever Mesa is installed, so it's tried first. */
+#ifdef EGL_PLATFORM_SURFACELESS_MESA
+    if(get_platform_display_fn) {
+        ctx->egl_display = get_platform_display_fn(EGL_PLATFORM_SURFACELESS_MESA, EGL_DEFAULT_DISPLAY, NULL);
+    }
+#endif
+
+    /* Fallback: EGL device platform (works without display server, but picks
+     * whichever GPU/vendor is enumerated first - not reproducible across machines) */
+    if(ctx->egl_display == EGL_NO_DISPLAY && query_devices_fn && get_platform_display_fn) {
         EGLDeviceEXT devices[4];
         EGLint num_devices = 0;
         if(query_devices_fn(4, devices, &num_devices) && num_devices > 0) {
             ctx->egl_display = get_platform_display_fn(EGL_PLATFORM_DEVICE_EXT, devices[0], NULL);
         }
-    }
-
-    /* Fallback: try surfaceless platform */
-    if(ctx->egl_display == EGL_NO_DISPLAY) {
-#ifdef EGL_PLATFORM_SURFACELESS_MESA
-        if(get_platform_display_fn) {
-            ctx->egl_display = get_platform_display_fn(EGL_PLATFORM_SURFACELESS_MESA, EGL_DEFAULT_DISPLAY, NULL);
-        }
-#endif
     }
 
     /* Last resort: default display */

@@ -97,7 +97,7 @@ typedef void * lv_user_data_t;
 #define  LV_COLOR_DEPTH     32
 #define  LV_DPI_DEF         160
 #define  LV_USE_NANOVG_TEST_HEADLESS 1
-#define  LV_USE_OPENGLES    0   /* Disable glad/opengles driver to avoid GL symbol conflicts with NanoVG */
+#define  LV_USE_OPENGLES    1
 #define  LV_USE_NANOVG      1
 #define  LV_USE_DRAW_NANOVG 1
 #undef   LV_DRAW_BUF_STRIDE_ALIGN
