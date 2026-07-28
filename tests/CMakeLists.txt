@@ -501,7 +501,6 @@ endif()
 # OpenGL ES is required for its driver
 if ($ENV{NON_AMD64_BUILD})
     message("Disable OpenGL, glfw3 for non-amd64 build")
-    add_definitions(-DLV_USE_OPENGLES=0)
 else()
     find_package(OpenGL)
     find_package(glfw3)
@@ -511,9 +510,6 @@ else()
         include_directories(${OPENGL_INCLUDE_DIR})
         include_directories(${GLFW_INCLUDE_DIRS})
         message("Enable LV_USE_OPENGLES")
-    else()
-        message("OpenGL, glfw3 not found, defaulting to 0")
-        add_definitions(-DLV_USE_OPENGLES=0)
     endif()
 endif()
 
@@ -633,7 +629,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
 
     if(OPTIONS_TEST_NANOVG)
         set_tests_properties(${test_name} PROPERTIES
-            ENVIRONMENT "LSAN_OPTIONS=suppressions=${LVGL_TEST_DIR}/lsan-nanovg.supp")
+            ENVIRONMENT "LSAN_OPTIONS=suppressions=${LVGL_TEST_DIR}/lsan-nanovg.supp:fast_unwind_on_malloc=0;__EGL_VENDOR_LIBRARY_FILENAMES=${LVGL_TEST_DIR}/egl_vendor_mesa_only.json")
     endif()
 endforeach( test_case_fname ${TEST_CASE_FILES} )
 
