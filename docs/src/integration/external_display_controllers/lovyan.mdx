@@ -19,8 +19,6 @@ The driver is a thin bridge between LVGL and LovyanGFX:
 - it maps LVGL display rotation to LovyanGFX rotation values `0` to `3`
 - when requested, it creates an LVGL pointer input device and reads touch data with `getTouch()`
 
-The driver implementation is in `src/drivers/display/lovyan_gfx/`.
-
 ## Prerequisites
 
 Add LovyanGFX to your project and create a LovyanGFX configuration header that
@@ -40,9 +38,6 @@ Enable the driver and point `LV_LGFX_USER_INCLUDE` at your configuration header:
 #define LV_USE_LOVYAN_GFX 1
 #define LV_LGFX_USER_INCLUDE "my_display.hpp"
 ```
-
-With Kconfig, enable `LV_USE_LOVYAN_GFX` and set `LV_LGFX_USER_INCLUDE` to the
-same header name.
 
 The selected header must be reachable from the compiler include path. For example,
 Arduino users often keep the header as another sketch tab, while PlatformIO users
@@ -83,21 +78,6 @@ public:
     LGFX();
 };
 ```
-
-Internally, LVGL calls these `LGFX` methods:
-
-- `init()`
-- `initDMA()`
-- `setRotation()`
-- `getRotation()`
-- `setBrightness()`
-- `startWrite()`
-- `fillScreen()`
-- `getStartCount()`
-- `pushImageDMA()`
-- `waitDMA()`
-- `width()` and `height()` for rotated touch coordinates
-- `getTouch()` when touch input is enabled
 
 If you wrap another graphics library behind an `LGFX`-compatible class, implement
 the same methods used by `lv_lovyan_gfx.cpp`.
