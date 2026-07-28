@@ -1,3 +1,5 @@
 config LV_USE_FT81X
-	bool "Use ft81x EVE driver"
+	bool "FT81X"
 	default n
+	help
+		Driver for FT81X EVE graphics controllers connected over SPI.

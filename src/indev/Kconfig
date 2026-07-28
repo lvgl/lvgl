@@ -1,16 +1,15 @@
 menu "Input Devices"
 config LV_USE_GRIDNAV
-	bool "Enable grid navigation"
+	bool "Grid navigation"
 	default n
 	help
-		Enable grid navigation
+		Move focus between a container's children with arrow keys, based on their position.
 
 config LV_USE_GESTURE_RECOGNITION
-	bool "Enable the multi-touch gesture recognition feature"
+	bool "Multi-touch gesture recognition"
 	select LV_USE_FLOAT
 	default n
 	help
-		Enable the multi-touch gesture recognition feature
-		Gesture recognition requires the use of floats
+		Detect pinch and rotate gestures from multi-touch input. Requires float support.
 
 endmenu

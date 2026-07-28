@@ -1,26 +1,26 @@
 config LV_USE_PROFILER
-	bool "Runtime performance profiler"
+	bool "Profiler"
 	default n
 	help
-		Enable runtime performance profiler
+		Instrument LVGL internals with trace hooks to measure runtime performance.
 
 config LV_USE_PROFILER_BUILTIN
-	bool "Enable the built-in profiler"
+	bool "Built-in profiler"
 	default n
 	select LV_USE_PROFILER
 
 if LV_USE_PROFILER_BUILTIN
 
 config LV_PROFILER_BUILTIN_BUF_SIZE
-	int "Default profiler trace buffer size in bytes"
+	int "Trace buffer size (bytes)"
 	default 16384
 
 config LV_PROFILER_BUILTIN_DEFAULT_ENABLE
-	bool "Enable built-in profiler by default"
+	bool "Start profiling at init"
 	default y
 
 config LV_USE_PROFILER_BUILTIN_POSIX
-	bool "Enable POSIX profiler port"
+	bool "POSIX port"
 	default n
 
 
@@ -29,7 +29,7 @@ endif #LV_USE_PROFILER_BUILTIN
 if LV_USE_PROFILER
 
 config LV_PROFILER_INCLUDE
-	string "Header to include for the profiler"
+	string "Profiler header"
 	default "lvgl/debugging/profiler/lv_profiler_builtin.h"
 	help
 	  Path to a header that defines the following profiler hook macros:
@@ -53,48 +53,52 @@ config LV_PROFILER_INCLUDE
 	  The default header provides these via the built-in profiler.
 	  Set this to your own header to use a custom profiler backend.
 
+menu "Profiled modules"
+
 config LV_PROFILER_LAYOUT
-	bool "Enable layout profiler"
+	bool "Layout"
 	default y
 
 config LV_PROFILER_REFR
-	bool "Enable disp refr profiler"
+	bool "Display refresh"
 	default y
 
 config LV_PROFILER_DRAW
-	bool "Enable draw profiler"
+	bool "Draw"
 	default y
 
 config LV_PROFILER_INDEV
-	bool "Enable indev profiler"
+	bool "Input devices"
 	default y
 
 config LV_PROFILER_DECODER
-	bool "Enable decoder profiler"
+	bool "Image decoder"
 	default y
 
 config LV_PROFILER_FONT
-	bool "Enable font profiler"
+	bool "Font"
 	default y
 
 config LV_PROFILER_FS
-	bool "Enable fs profiler"
+	bool "File system"
 	default y
 
 config LV_PROFILER_STYLE
-	bool "Enable style profiler"
+	bool "Style"
 	default n
 
 config LV_PROFILER_TIMER
-	bool "Enable timer profiler"
+	bool "Timer"
 	default y
 
 config LV_PROFILER_CACHE
-	bool "Enable cache profiler"
+	bool "Cache"
 	default y
 
 config LV_PROFILER_EVENT
-	bool "Enable event profiler"
+	bool "Events"
 	default y
+
+endmenu
 
 endif # LV_USE_PROFILER

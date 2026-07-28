@@ -1,5 +1,5 @@
 config LV_USE_SNAPSHOT
-	bool "Enable API to take snapshot"
+	bool "Snapshot"
 	default n
 	help
-		Enable API to take snapshot for object
+		Render a widget and its children into an image buffer with lv_snapshot_take().

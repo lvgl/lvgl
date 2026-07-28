@@ -46,7 +46,7 @@
 #define LV_STDLIB_CUSTOM        255
 #define LV_LOG_LEVEL_NUM        5
 
-/* Default operating system to use */
+/* Operating system */
 #define LV_OS_NONE          0
 #define LV_OS_PTHREAD       1
 #define LV_OS_FREERTOS      2
@@ -57,7 +57,7 @@
 #define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
 
-/* Asm mode in sw draw */
+/* SW assembly optimization */
 #define LV_DRAW_SW_ASM_NONE      0
 #define LV_DRAW_SW_ASM_NEON      1
 #define LV_DRAW_SW_ASM_HELIUM    2

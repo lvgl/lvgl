@@ -1,5 +1,5 @@
 config LV_USE_DEMO_VECTOR_GRAPHIC
-	bool "vector graphic demo"
+	bool "Vector graphic demo"
 	default n
 	depends on LV_DRAW_HAS_VECTOR_SUPPORT
 	select LV_USE_VECTOR_GRAPHIC

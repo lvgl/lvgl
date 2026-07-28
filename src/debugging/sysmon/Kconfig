@@ -1,18 +1,24 @@
 config LV_USE_SYSMON
-	bool "Enable system monitor component"
+	bool "System monitor"
 	default n
 	help
-		Enable system monitor component
+		Periodically collect CPU, FPS and memory statistics and show them in an
+		on-screen overlay.
 
 if LV_USE_SYSMON
 
 config LV_SYSMON_PROC_IDLE_AVAILABLE
-	bool "Enable process idle measurement"
+	bool "Per-process idle measurement"
 	default n
+	help
+		The port provides a per-process idle percentage in addition to the
+		system-wide one.
 
 config LV_USE_PERF_MONITOR
-	bool "Show CPU usage and FPS count"
+	bool "Performance monitor"
 	default n
+	help
+		Show the CPU usage and FPS count in a label on the screen.
 
 choice
 	prompt "Performance monitor position"
@@ -40,14 +46,18 @@ choice
 endchoice
 
 config LV_USE_PERF_MONITOR_LOG_MODE
-	bool "Prints performance data using log"
+	bool "Log performance data"
 	depends on LV_USE_PERF_MONITOR
 	default n
+	help
+		Print the performance data to the log instead of showing the on-screen label.
 
 config LV_USE_MEM_MONITOR
-	bool "Show the used memory and the memory fragmentation"
+	bool "Memory monitor"
 	default n
 	depends on LV_USE_BUILTIN_MALLOC
+	help
+		Show the used memory and the memory fragmentation in a label on the screen.
 
 choice
 	prompt "Memory monitor position"
@@ -75,7 +85,7 @@ choice
 endchoice
 
 config LV_SYSMON_USE_CUSTOM_INCLUDE
-	bool "Include a custom sysmon header"
+	bool "Custom sysmon header"
 	default n
 	help
 	  Include the header given by LV_SYSMON_CUSTOM_INCLUDE to override system

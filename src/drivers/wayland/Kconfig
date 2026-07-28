@@ -1,23 +1,24 @@
 config LV_USE_WAYLAND
-	bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
+	bool "Wayland"
 	default n
 	help
-		Use Wayland to open a window and handle input on Linux or BSD desktops
+		Open a window on a Wayland compositor on Linux or BSD and read mouse, keyboard and touch input.
 
 if LV_USE_WAYLAND
 
 config LV_WAYLAND_DIRECT_EXIT
-	bool "Deinitialize LVGL and quit the application when the last wayland window closes"
+	bool "Exit when the last window closes"
 	default y
+	help
+		LVGL is deinitialized before the application exits.
 
 config LV_WAYLAND_AUTO_BACKEND
 	bool "Auto-select the Wayland backend (legacy)"
 	default y
 	help
-	  Legacy behavior, kept for backwards compatibility and slated for removal.
-	  While set, the backend defaults to SHM and any LV_WAYLAND_USE_* set directly
-	  in lv_conf.h is honored.  Disable this and pick a backend explicitly via the
-	  Wayland "Rendering backend" choice.
+	  Legacy behavior, slated for removal: the backend defaults to SHM and any
+	  LV_WAYLAND_USE_* set directly in lv_conf.h is honored. Disable this and pick
+	  a backend explicitly in the "Rendering backend" choice.
 
 choice
 	prompt "Rendering backend"
@@ -30,7 +31,7 @@ choice
 		bool "SHM (Shared Memory)"
 		select LV_WAYLAND_USE_SHM
 		help
-		  Default backend.  Uses wl_shm for double-buffered direct rendering.
+		  Default backend, using wl_shm for double-buffered direct rendering.
 		  Compatible with all Wayland compositors; no special hardware required.
 
 	config LV_WAYLAND_BACKEND_EGL
@@ -38,9 +39,9 @@ choice
 		select LV_WAYLAND_USE_EGL
 		select LV_USE_OPENGLES
 		help
-		  Hardware-accelerated rendering via OpenGL ES 2.0 and EGL.
-		  Requires OpenGL ES 2.0 on the target hardware and linking with
-		  wayland-egl (-lwayland-egl).  Compatible with 3D/glTF rendering.
+		  Hardware-accelerated rendering via OpenGL ES 2.0 and EGL, compatible
+		  with LVGL 3D/glTF rendering. Requires OpenGL ES 2.0 on the target
+		  hardware and linking with wayland-egl (-lwayland-egl).
 
 	config LV_WAYLAND_BACKEND_G2D
 		bool "G2D (NXP i.MX hardware accelerator)"

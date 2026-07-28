@@ -1,29 +1,25 @@
 menu "Logging"
 config LV_USE_LOG
-	bool "Enable the log module"
-	help
-		Enable log module
+	bool "Logging"
 
 if LV_USE_LOG
 
 choice
-	bool "Default log verbosity" 
+	bool "Default log verbosity"
 	default LV_LOG_LEVEL_WARN
-	help
-		Specify how important log should be added.
 
 	config LV_LOG_LEVEL_TRACE
-		bool "LOG_LEVEL_TRACE: A lot of logs to give detailed information"
+		bool "Trace: detailed information about everything"
 	config LV_LOG_LEVEL_INFO
-		bool "LOG_LEVEL_INFO: Log important events"
+		bool "Info: important events"
 	config LV_LOG_LEVEL_WARN
-		bool "LOG_LEVEL_WARN: Log if something unwanted happened but didn't cause a problem"
+		bool "Warn: something unwanted happened but caused no problem"
 	config LV_LOG_LEVEL_ERROR
-		bool "LOG_LEVEL_ERROR: Only critical issues, when the system may fail"
+		bool "Error: critical issues where the system may fail"
 	config LV_LOG_LEVEL_USER
-		bool "LOG_LEVEL_USER: Only logs added by the user"
+		bool "User: only logs added by the user"
 	config LV_LOG_LEVEL_NONE
-		bool "LOG_LEVEL_NONE: Do not log anything"
+		bool "None: nothing is logged"
 endchoice
 
 config LV_LOG_LEVEL
@@ -43,53 +39,55 @@ config LV_LOG_PRINTF
 	bool "Print the log with 'printf'"
 	default n
 	help
-		Use printf for log output.
-		If not set the user needs to register a callback with `lv_log_register_print_cb`.
+		If not set, the user needs to register a callback with lv_log_register_print_cb().
 
 config LV_LOG_USE_TIMESTAMP
-	bool "Enable print timestamp"
+	bool "Add a timestamp to each log"
 	default y
-	
+
 config LV_LOG_USE_FILE_LINE
-	bool "Enable print file and line number"
+	bool "Add the file name and line number to each log"
 	default y
-	
+
+menu "Trace logs per module"
+
 config LV_LOG_TRACE_MEM
-	bool "Enable/Disable LV_LOG_TRACE in mem module"
+	bool "Memory"
 	default y
-	
+
 config LV_LOG_TRACE_TIMER
-	bool "Enable/Disable LV_LOG_TRACE in timer module"
+	bool "Timer"
 	default y
-	
+
 config LV_LOG_TRACE_INDEV
-	bool "Enable/Disable LV_LOG_TRACE in indev module"
+	bool "Input devices"
 	default y
-	
+
 config LV_LOG_TRACE_DISP_REFR
-	bool "Enable/Disable LV_LOG_TRACE in disp refr module"
+	bool "Display refresh"
 	default y
-	
+
 config LV_LOG_TRACE_EVENT
-	bool "Enable/Disable LV_LOG_TRACE in event module"
+	bool "Events"
 	default y
-	
+
 config LV_LOG_TRACE_OBJ_CREATE
-	bool "Enable/Disable LV_LOG_TRACE in obj create module"
+	bool "Widget creation"
 	default y
-	
+
 config LV_LOG_TRACE_LAYOUT
-	bool "Enable/Disable LV_LOG_TRACE in layout module"
+	bool "Layout"
 	default y
-	
+
 config LV_LOG_TRACE_ANIM
-	bool "Enable/Disable LV_LOG_TRACE in anim module"
+	bool "Animations"
 	default y
-	
+
 config LV_LOG_TRACE_CACHE
-	bool "Enable/Disable LV_LOG_TRACE in cache module"
+	bool "Cache"
 	default y
-	
+
+endmenu
 
 endif
 endmenu
