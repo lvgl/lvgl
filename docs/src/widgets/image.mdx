@@ -1,15 +1,12 @@
 ---
 title: "Image (lv_image)"
+description: "Display an image from flash (as a C array), from a file, or as a symbol glyph."
 ---
-
-<br />
-
-<hr />
 
 ## Overview
 
-Images are Widgets that display images from flash (as arrays) or
-from files. Images can also display symbols (`LV_SYMBOL_...`).
+The Image widget displays images from flash (as arrays) or from files.
+It can also display symbols (`LV_SYMBOL_...`).
 
 Using the [Image decoder interface](/main-modules/images/decoders), custom image formats
 can be supported as well.
@@ -161,20 +158,7 @@ widget at a new image descriptor. Only pointer subjects are supported.
 
 ## Events
 
-No special events are sent by Image Widgets.  By default, Image Widgets are created
-without the LV_OBJ_FLAG_CLICKABLE flag, but you can add it to make an Image Widget
-detect and emit LV_EVENT_CLICKED events if desired.
+By default, Image Widgets are created without the  <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag,
+but you can add it to make the Widget detect and send events <ApiLink name="LV_EVENT_CLICKED" />.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Image Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

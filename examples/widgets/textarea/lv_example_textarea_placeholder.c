@@ -24,15 +24,15 @@ void lv_example_textarea_placeholder(void)
 
     /* Empty: placeholder hint is shown */
     lv_obj_t * textarea_1 = lv_textarea_create(screen);
-    lv_obj_set_width(textarea_1, lv_pct(90));
+    lv_obj_set_width(textarea_1, lv_pct(60));
     lv_textarea_set_one_line(textarea_1, true);
-    lv_textarea_set_placeholder_text(textarea_1, "Search…");
+    lv_textarea_set_placeholder_text(textarea_1, "Search...");
 
     /* Filled: placeholder is hidden */
     lv_obj_t * textarea_2 = lv_textarea_create(screen);
-    lv_obj_set_width(textarea_2, lv_pct(90));
+    lv_obj_set_width(textarea_2, lv_pct(60));
     lv_textarea_set_one_line(textarea_2, true);
     lv_textarea_set_placeholder_text(textarea_2, "Search…");
-    lv_textarea_set_text(textarea_2, "lv_textarea");
+    lv_textarea_set_text(textarea_2, "Hello world!");
 }
 #endif

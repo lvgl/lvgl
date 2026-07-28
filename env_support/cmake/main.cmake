@@ -1,3 +1,4 @@
+include(GNUInstallDirs)
 include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
 
 ############################## OPTIONS ######################################
@@ -11,6 +12,9 @@ set(LV_BUILD_CONF_DIR "" CACHE PATH
 option(LV_BUILD_USE_KCONFIG "Use Kconfig" OFF)
 set(LV_BUILD_DEFCONFIG_PATH "" CACHE PATH
     "Supply the default Kconfig configuration - used with Kconfig")
+
+set(LV_BUILD_DOTCONFIG_PATH "" CACHE PATH
+    "Path to .config path - used with Kconfig")
 
 option(LV_BUILD_SET_CONFIG_OPTS
     "Create variables from the definitions in lv_conf_internal.h"  OFF)
@@ -90,10 +94,13 @@ endif()
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
+set(CONF_PATH)
+include(${CMAKE_CURRENT_LIST_DIR}/lvgl_target_definitions.cmake)
 if (NOT LV_BUILD_USE_KCONFIG)
 
     # Default - use the lv_conf.h configuration file
-    target_compile_definitions(lvgl PUBLIC LV_KCONFIG_IGNORE)
+    lvgl_build_definitions(LV_KCONFIG_IGNORE)
+    lvgl_install_definitions(LV_KCONFIG_IGNORE)
 
     message(STATUS ${LV_BUILD_CONF_PATH})
 
@@ -109,7 +116,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
 
         get_filename_component(CONF_INC_DIR ${CONF_PATH} DIRECTORY)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_PATH="${CONF_PATH}")
+        lvgl_build_definitions("LV_CONF_PATH=\"${CONF_PATH}\"")
 
     elseif(LV_BUILD_CONF_DIR)
 
@@ -127,7 +134,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
 
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE)
+        lvgl_build_definitions(LV_CONF_INCLUDE_SIMPLE)
 
     else()
 
@@ -138,7 +145,7 @@ if (NOT LV_BUILD_USE_KCONFIG)
         set(CONF_INC_DIR ${CMAKE_SOURCE_DIR})
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
 
-        target_compile_definitions(lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE)
+        lvgl_build_definitions(LV_CONF_INCLUDE_SIMPLE)
 
     endif()
 
@@ -146,6 +153,10 @@ if (NOT LV_BUILD_USE_KCONFIG)
     if (NOT EXISTS ${CONF_PATH})
         message(FATAL_ERROR "Configuration file: ${CONF_PATH} - not found")
     endif()
+
+    # The lv_conf.h used during the build is installed to <includedir>/lvgl/lv_conf.h
+    # (see the installation section), so the installed library is self-contained and
+    # consumers resolve it the same way as in the Kconfig case, via LV_CONF_PATH.
 
 else()
 
@@ -158,24 +169,29 @@ else()
     # generate_cmake_variables.py script.
     set(GEN_VARS_KCONFIG_MODE_FLAG --kconfig)
 
-    # If using Kconfig, we need to define additional definitions
-    target_compile_definitions(lvgl PUBLIC
-        "LV_CONF_SKIP"
-        "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${KCONFIG_EXTERNAL_INCLUDE}\"")
-
+    # If using Kconfig, we need to define additional build definitions
+    lvgl_build_definitions(
+      LV_CONF_SKIP
+      "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${KCONFIG_EXTERNAL_INCLUDE}\"")
 endif()
 
+
+
 if (LV_BUILD_LVGL_H_SYSTEM_INCLUDE)
-    target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SYSTEM)
+    lvgl_build_definitions(LV_LVGL_H_INCLUDE_SYSTEM)
 elseif(LV_BUILD_LVGL_H_SIMPLE_INCLUDE)
-    target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SIMPLE)
+    lvgl_build_definitions(LV_LVGL_H_INCLUDE_SIMPLE)
 endif()
 
 
 if (LV_BUILD_SET_CONFIG_OPTS)
     # Use the portable pcpp to preprocess lv_conf_internal.h
 
-    get_target_property(CONF_DEFINES lvgl COMPILE_DEFINITIONS)
+    # Use the definitions active during the build (recorded by
+    # lvgl_build_definitions). We can't use get_target_property(...
+    # COMPILE_DEFINITIONS) here because it returns raw generator-expression
+    # syntax (e.g. "$<BUILD_INTERFACE:LV_CONF_SKIP>") that pcpp can't parse.
+    get_property(CONF_DEFINES GLOBAL PROPERTY LVGL_BUILD_DEFINES)
 
     execute_process(
         COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
@@ -216,15 +232,32 @@ if (LV_BUILD_SET_CONFIG_OPTS)
 
     # This will set all CONFIG_LV_USE_* or CONFIG_LV_BUILD_* variables in cmake
     include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
+
+    # Regen lv_conf.cmake when lv_conf.h changes
+    if(CONF_PATH)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CONF_PATH})
+    endif()
+
+    if(NOT CONFIG_LV_USE_PRIVATE_API AND (CONFIG_LV_BUILD_DEMOS OR CONFIG_LV_BUILD_EXAMPLES))
+        message(STATUS "CONFIG_LV_USE_PRIVATE_API forcefully enabled because demos or examples are being built")
+        set(CONFIG_LV_USE_PRIVATE_API ON CACHE BOOL "" FORCE)
+    endif()
 endif()
 
+include(${CMAKE_CURRENT_LIST_DIR}/lvgl_link_libraries.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/dependencies.cmake)
 
 # Set the configuration inc dir for all targets created in this CMakeLists.txt
 # CMAKE_CURRENT_SOURCE_DIR is necessary because the assets include lvgl/lvgl.h ...
 include_directories(${CONF_INC_DIR} ${LVGL_INCLUDE_DIR} ${LVGL_INCLUDE_DIR}/lvgl)
 
-target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LVGL_INCLUDE_DIR} ${CONF_INC_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(lvgl SYSTEM PUBLIC
+    $<BUILD_INTERFACE:${LVGL_ROOT_DIR}>
+    $<BUILD_INTERFACE:${LVGL_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${CONF_INC_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
 # Propagate the compiler definitions set on LVGL to the rest of the targets
 # mentioned in this file
@@ -241,6 +274,12 @@ if(CONFIG_LV_USE_THORVG_INTERNAL)
     # This tells cmake to link lvgl with lvgl_thorvg
     # The linker will resolve all dependencies when dynamic linking 
     target_link_libraries(lvgl PRIVATE lvgl_thorvg)
+
+    # export lvgl_thorvg as a private library to pkg-config
+    get_property(current_libs GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
+    list(APPEND current_libs "-llvgl_thorvg")
+    set_property(GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE "${current_libs}")
+
     # During static linking, we need to create a cyclic dependency as thorvg also needs lvgl
     if (NOT BUILD_SHARED_LIBS)
         target_link_libraries(lvgl_thorvg PRIVATE lvgl)
@@ -259,18 +298,12 @@ if(CONFIG_LV_BUILD_EXAMPLES)
 
     add_library(lvgl_examples ${EXAMPLE_SOURCES})
     add_library(lvgl::examples ALIAS lvgl_examples)
-    target_include_directories(lvgl_examples SYSTEM PUBLIC ${LVGL_ROOT_DIR}/examples)
+    target_include_directories(lvgl_examples SYSTEM PUBLIC
+        $<BUILD_INTERFACE:${LVGL_ROOT_DIR}/examples>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    )
     set_target_properties(lvgl_examples PROPERTIES COMPILE_DEFINITIONS "${COMP_DEF}")
-
-    # This tells cmake to link lvgl with lvgl_examples
-    # PUBLIC allows code linking with LVGL to also use the library
-    # The linker will resolve all dependencies when dynamic linking 
-    target_link_libraries(lvgl PUBLIC lvgl_examples)
-
-    # During static linking, we need to create a cyclic dependency as the examples also needs lvgl
-    if (NOT BUILD_SHARED_LIBS)
-        target_link_libraries(lvgl_examples PRIVATE lvgl)
-    endif()
+    target_link_libraries(lvgl_examples PRIVATE lvgl)
 
 endif()
 
@@ -281,91 +314,121 @@ if(CONFIG_LV_BUILD_DEMOS)
 
     add_library(lvgl_demos ${DEMO_SOURCES})
     add_library(lvgl::demos ALIAS lvgl_demos)
-    target_include_directories(lvgl_demos SYSTEM PUBLIC ${LVGL_ROOT_DIR}/demos)
+    target_include_directories(lvgl_demos SYSTEM PUBLIC
+        $<BUILD_INTERFACE:${LVGL_ROOT_DIR}/demos>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    )
     set_target_properties(lvgl_demos PROPERTIES COMPILE_DEFINITIONS "${COMP_DEF}")
-
-    # This tells cmake to link lvgl with lvgl_examples
-    # PUBLIC allows code linking with LVGL to also use the library
-    # The linker will resolve all dependencies when dynamic linking 
-    target_link_libraries(lvgl PUBLIC lvgl_demos)
-
-    # During static linking, we need to create a cyclic dependency as the demos also needs lvgl
-    if (NOT BUILD_SHARED_LIBS)
-        # If static linking - demos depends on fonts defined in lvgl
-        # During dynamic linking, the linker is able to resolve everything
-        target_link_libraries(lvgl_demos PRIVATE lvgl)
-    endif()
+    target_link_libraries(lvgl_demos PRIVATE lvgl)
 
 endif()
 
 ############################## INSTALLATION ######################################
 
-# Install directory defaults
-if("${LIB_INSTALL_DIR}" STREQUAL "")
-    set(LIB_INSTALL_DIR "lib")
-endif()
-if("${RUNTIME_INSTALL_DIR}" STREQUAL "")
-    set(RUNTIME_INSTALL_DIR "bin")
-endif()
-if("${INC_INSTALL_DIR}" STREQUAL "")
-    set(INC_INSTALL_DIR "include")
-endif()
 
 # Install public headers
 install(
     DIRECTORY "${LVGL_ROOT_DIR}/include/lvgl"
-    DESTINATION "${INC_INSTALL_DIR}")
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 # Install private headers only if required
 if(CONFIG_LV_USE_PRIVATE_API)
     install(
         DIRECTORY "${LVGL_ROOT_DIR}/src/"
-        DESTINATION "${INC_INSTALL_DIR}/lvgl_private"
-        FILES_MATCHING PATTERN "*.h")
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl_private"
+        FILES_MATCHING PATTERN "*.h"
+    )
 
-    # In the source tree, `lvgl_public.h` includes the public API via "../include/lvgl/lvgl.h".
-    # When installed, `lvgl/` and `lvgl_private/` are siblings under `include/`, so the path
-    # is patched to "../lvgl/lvgl.h" to match the installed layout.
-    # No other changes are required to other files because the `lvgl_private` folder structure
-    # is the same as the one in `src` meaning that all other includes work, as long as all
-    # private header files always go through `lvgl_public.h` to include public API symbols
     install(CODE "
-	file(READ \"\${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/lvgl_private/lvgl_public.h\" content)
+        file(READ \"${CMAKE_INSTALL_FULL_INCLUDEDIR}/lvgl_private/lvgl_public.h\" content)
         string(REPLACE \"../include/lvgl/lvgl.h\" \"../lvgl/lvgl.h\" content \"\${content}\")
-        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/lvgl_private/lvgl_public.h\" \"\${content}\")
+        file(WRITE \"${CMAKE_INSTALL_FULL_INCLUDEDIR}/lvgl_private/lvgl_public.h\" \"\${content}\")
     ")
 endif()
 
-# When KConfig is used, copy the expanded conf header and rename it to lv_conf.h
+# Install lv_conf.h inside lvgl/config so its next to lv_conf_internal.h
+# and define LV_CONF_INCLUDE_SIMPLE so that it can be found
+lvgl_install_definitions(LV_CONF_INCLUDE_SIMPLE)
 if(LV_BUILD_USE_KCONFIG)
+    # Kconfig: install the expanded configuration header
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h"
-        DESTINATION "${INC_INSTALL_DIR}"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/config"
+        RENAME lv_conf.h)
+else()
+    # Non-kconfig: install the actual lv_conf.h used during the build
+    install(
+        FILES "${CONF_PATH}"
+	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl/config"
         RENAME lv_conf.h)
 endif()
 
-# Configure and install generated files
-configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc" @ONLY)
-configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/lv_version.h" @ONLY)
+# Collect accumulated dependencies
+get_property(PKG_REQUIRES GLOBAL PROPERTY LVGL_PKG_REQUIRES)
+get_property(PKG_REQUIRES_PRIVATE GLOBAL PROPERTY LVGL_PKG_REQUIRES_PRIVATE)
+get_property(PKG_LIBS_PRIVATE GLOBAL PROPERTY LVGL_PKG_LIBS_PRIVATE)
+get_property(CMAKE_PUBLIC_DEPS GLOBAL PROPERTY LVGL_CMAKE_PUBLIC_DEPS)
+get_property(CMAKE_PRIVATE_DEPS GLOBAL PROPERTY LVGL_CMAKE_PRIVATE_DEPS)
+get_property(CMAKE_RAW_LIBS GLOBAL PROPERTY LVGL_CMAKE_RAW_LIBS)
+get_property(PKG_CFLAGS GLOBAL PROPERTY LVGL_INSTALL_DEFINES)
+
+list(JOIN PKG_CFLAGS " " LVGL_PKG_CFLAGS)
+list(JOIN PKG_LIBS_PRIVATE " " LVGL_PKG_LIBS_PRIVATE)
+list(JOIN PKG_REQUIRES " " LVGL_PKG_REQUIRES)
+list(JOIN PKG_REQUIRES_PRIVATE " " LVGL_PKG_REQUIRES_PRIVATE)
+list(JOIN CMAKE_PUBLIC_DEPS ";" LVGL_CMAKE_PUBLIC_DEPS)
+list(JOIN CMAKE_PRIVATE_DEPS ";" LVGL_CMAKE_PRIVATE_DEPS)
+list(JOIN CMAKE_RAW_LIBS ";" LVGL_CMAKE_RAW_LIBS)
+
+if(LVGL_CMAKE_RAW_LIBS)
+	set_property(TARGET lvgl APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${LVGL_CMAKE_RAW_LIBS}")
+endif()
+
+# Generate and install pkg-config file
+configure_file(
+    "${CMAKE_CURRENT_LIST_DIR}/lvgl.pc.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
+    @ONLY
+)
 
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
-    DESTINATION "share/pkgconfig/")
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+)
 
-# Install library
-set_target_properties(lvgl
-    PROPERTIES
-        OUTPUT_NAME lvgl
-        VERSION ${LVGL_VERSION}
-        SOVERSION ${LVGL_SOVERSION}
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
+# Generate and install CMake config files
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_LIST_DIR}/lvglConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/lvglConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/lvglConfigVersion.cmake"
+    VERSION ${LVGL_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
 
 install(
-    TARGETS lvgl
-    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
-    LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}")
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/lvglConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/lvglConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
+)
+
+install(TARGETS lvgl
+    EXPORT lvglTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(EXPORT lvglTargets
+    NAMESPACE lvgl::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
+)
 
 # Install library thorvg
 if(CONFIG_LV_USE_THORVG_INTERNAL)
@@ -379,38 +442,36 @@ if(CONFIG_LV_USE_THORVG_INTERNAL)
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
         PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
-    install(
-        TARGETS lvgl_thorvg
-        ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
-        LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-        RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
-        PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+    install(TARGETS lvgl_thorvg
+        EXPORT lvglTargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 
 endif()
 
 if(CONFIG_LV_BUILD_DEMOS)
 
+    # Install demo headers (only if user enables demos)
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/demos"
-        DESTINATION "${INC_INSTALL_DIR}/lvgl"
-        FILES_MATCHING
-        PATTERN "*.h")
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl"
+        FILES_MATCHING PATTERN "*.h"
+    )
 
-    set_target_properties(
-        lvgl_demos
-        PROPERTIES OUTPUT_NAME lvgl_demos
-        VERSION ${LVGL_VERSION}
-        SOVERSION ${LVGL_SOVERSION}
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-        PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+    # Demo library target (if you build one)
+    install(TARGETS lvgl_demos
+	EXPORT lvglDemosTargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 
-    install(
-        TARGETS lvgl_demos
-        ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
-        LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-        RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
-        PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+    install(EXPORT lvglDemosTargets
+        NAMESPACE lvgl::
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
+    )
 
 endif()
 
@@ -418,25 +479,21 @@ if(CONFIG_LV_BUILD_EXAMPLES)
 
     install(
         DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples"
-        DESTINATION "${INC_INSTALL_DIR}/lvgl"
-        FILES_MATCHING
-        PATTERN "*.h")
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lvgl"
+        FILES_MATCHING PATTERN "*.h"
+    )
 
-    set_target_properties(
-        lvgl_examples
-        PROPERTIES OUTPUT_NAME lvgl_examples
-        VERSION ${LVGL_VERSION}
-        SOVERSION ${LVGL_SOVERSION}
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-        PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+    install(TARGETS lvgl_examples
+	EXPORT lvglExamplesTargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 
-    install(
-        TARGETS lvgl_examples
-        ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
-        LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-        RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
-        PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+    install(EXPORT lvglExamplesTargets
+        NAMESPACE lvgl::
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/lvgl"
+    )
 
 endif()
 

@@ -75,9 +75,14 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t p
  * @param obj
  * @param state1
  * @param state2
+ * @param changed_part  optional (may be NULL) out-param. Receives the part that
+ *                      the differing styles belong to, or `LV_PART_ANY` if more
+ *                      than one part differs (or none does). Lets the caller scope
+ *                      the refresh to a single part when possible.
  * @return
  */
-lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2);
+lv_style_state_cmp_t lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2,
+                                                lv_part_t * changed_part);
 
 /**
  * Update the layer type of a widget bayed on its current styles.

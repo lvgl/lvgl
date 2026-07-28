@@ -1,133 +1,212 @@
-
-<a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets/sponsor.png" height="32px"></a>
-
-<p align="right">
-  <a href="../README.md">English</a> |
-  <a href="./README_zh.md">中文</a> |
-  <b>Português do Brasil</b> |
-  <a href="./README_jp.md">日本語</a> |
+<p align="center">
+  <a href="https://lvgl.io/docs" title="Documentação">Docs</a> •
+  <a href="https://forum.lvgl.io" title="Fórum da comunidade">Fórum</a> •
+  <a href="https://blog.lvgl.io" title="Notícias e artigos">Blog</a> •
+  <a href="https://lvgl.io/services" title="Serviços profissionais">Serviços</a>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png" alt="spacer" width="250px" height="1px">
+  <a href="../README.md">EN</a> •
+  <a href="./README_zh.md">中文</a> •
+  <a href="./README_ja.md">日本語</a> •
+  <a href="./README_ko.md">한국어</a> •
+  <b>PT</b> •
   <a href="./README_he.md">עברית</a>
 </p>
+
 <p align="center">
-  <img src="https://lvgl.io/github-assets/logo-colored.png" width=300px>
+  <a href="https://lvgl.io"><img src="https://lvgl.io/github-assets/logo-colored.png" height=50px/></a>
+  <h1 align="center">Light and Versatile Graphics Library</h1>
 </p>
 
-<h1 align="center">LVGL - Light and Versatile Graphics Library</h1>
 <br/>
-<h1 align="center">LVGL - Biblioteca gráfica leve e versátil</h1>
-
 <br/>
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/kisvegabor/test/master/smartwatch_demo.gif">
+  <img src="https://github.com/user-attachments/assets/965e8b8b-d240-45ed-9744-bdd81785967d" height="220" alt="Demo de Ebike com gráficos vetoriais">
   &nbsp;
-  <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
+  <img src="https://github.com/user-attachments/assets/d83820ed-5448-494e-94c8-3ca1b4ddceb0" height="220" alt="Demo de ECG com modelo 3D animado">
 </div>
 
 <br/>
-
-
-<p align="center">
-  <a href="https://lvgl.io" title="Homepage of LVGL">Site</a> |
-  <a href="https://pro.lvgl.io" title="LVGL Pro XML based UI Editor">Editor LVGL Pro</a> |
-  <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Documentação</a> |
-  <a href="https://forum.lvgl.io" title="Get help and help others">Fórum</a> |
-  <a href="https://lvgl.io/demos" title="Demos running in your browser">Demos</a> |
-  <a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Serviços</a>
-</p>
-
+<br/>
 <br/>
 
-## 📒 Visão geral
+<p align="center">
+  <a href="#overview" title="O que é o LVGL">Visão geral</a> •
+  <a href="#features" title="O que o LVGL pode fazer">Recursos</a> •
+  <a href="#lvgl-pro" title="A cadeia de ferramentas profissional">LVGL Pro</a> •
+  <a href="#examples" title="Exemplos em C e XML">Exemplos</a> •
+  <a href="#integration" title="Como adicionar o LVGL ao seu projeto">Integração</a> •
+  <a href="#contributing" title="Como participar">Contribuindo</a> •
+  <a href="#license" title="Termos de licenciamento">Licença</a>
+</p>
 
-**LVGL** é uma biblioteca de UI gratuita e de código aberto que permite criar interfaces gráficas
-para qualquer MCU e MPU, de qualquer fabricante, em qualquer plataforma.
+<a id="overview"></a>
+## Visão geral
 
-**Requisitos**: o LVGL não possui dependências externas, o que facilita compilar para qualquer alvo moderno,
-desde pequenos MCUs até MPUs Linux multicore com suporte a 3D. Para uma UI simples, você precisa de ~100 kB de RAM,
-~200–300 kB de flash e um buffer de renderização com 1/10 do tamanho da tela.
+O **LVGL** é uma biblioteca de UI livre e de código aberto que permite criar interfaces gráficas de usuário
+para quaisquer MCUs e MPUs, de qualquer fabricante, em qualquer plataforma.
 
-**Para começar**, escolha um projeto pronto para uso no VSCode, Eclipse ou outro, e experimente o LVGL
-no seu PC. O código de UI do LVGL é totalmente independente de plataforma, então você pode reutilizá-lo
-nos seus alvos embarcados.
+**Requisitos**: o LVGL não possui dependências externas, o que facilita sua compilação para qualquer alvo moderno,
+de pequenos MCUs a MPUs multi-core baseados em Linux com suporte a 3D. Para uma UI *típica*, você precisa de apenas ~100kB de RAM,
+~200–300kB de flash e um buffer com 1/10 do tamanho da tela para renderização.
 
-**LVGL Pro** é um kit completo para ajudar você a criar, testar, compartilhar e entregar UIs com mais rapidez.
-Ele inclui um Editor XML onde você pode criar e testar componentes reutilizáveis,
-exportar código C ou carregar os XMLs em tempo de execução. Saiba mais aqui.
+**Ampla adoção**: fabricantes de chips (como NXP, Espressif, Renesas e assim por diante), projetos de RTOS (Zephyr, NuttX, etc.)
+e fabricantes de placas (Riverdi, Seeed Studio, VIEWE, Elecrow, etc.) já integraram o LVGL. Se uma placa de desenvolvimento tem um display, é muito provável
+que o fabricante também ofereça suporte ao LVGL.
 
-## 💡 Recursos
+**Ferramentas profissionais**: em vez de escrever código C, você pode acelerar e simplificar enormemente o desenvolvimento de UI usando o [LVGL Pro](#lvgl-pro), um kit de ferramentas completo com Editor, integração com Figma, Online Viewer e CLI. Ele exporta código C puro do LVGL a partir de XML, sem runtime extra ou mágica oculta. É gratuito para uso não comercial e avaliação.
 
-**Gratuito e portátil**
-  - Biblioteca totalmente em C (compatível com C++) sem dependências externas.
-  - Pode ser compilada para qualquer MCU ou MPU, com qualquer (RT)OS. Make, CMake e globbing simples são suportados.
-  - Suporta displays monocromáticos, ePaper, OLED, TFT e até monitores. [Displays](https://docs.lvgl.io/master/main-modules/display/index.html)
-  - Licença MIT, o que facilita o uso em projetos comerciais.
-  - Precisa de apenas 32 kB de RAM, 128 kB de Flash, um frame buffer e pelo menos um buffer de 1/10 da tela para renderização.
-  - Sistema operacional, memória externa e GPU são suportados, mas não obrigatórios.
+**Para começar**, navegue pelos [Exemplos](#examples), inicie um [projeto de Simulador](https://lvgl.io/docs/open/integration/pc), explore o [Online Viewer](https://viewer.lvgl.io/) do LVGL Pro, compile e execute uma UI em uma janela no [LVGL Pro](https://lvgl.io/docs/pro/integration/simulator) com um clique, ou mergulhe na nossa [documentação](https://lvgl.io/docs/open) pronta para IA. Basta clicar em [**Ask AI**](https://lvgl.io/docs/open)
+e perguntar qualquer coisa!
 
-**Widgets, estilos, layouts e mais**
-  - 30+ [Widgets](https://docs.lvgl.io/master/widgets/index.html) embutidos: Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table e muitos outros.
-  - [Sistema de estilos](https://docs.lvgl.io/master/common-widget-features/styles/index.html) flexível com ~100 propriedades para personalizar qualquer parte dos widgets em qualquer estado.
-  - Motores de layout tipo [Flexbox](https://docs.lvgl.io/master/common-widget-features/layouts/flex.html) e [Grid](https://docs.lvgl.io/master/common-widget-features/layouts/grid.html) para dimensionar e posicionar widgets de forma responsiva.
-  - Texto renderizado com codificação UTF-8, com suporte a CJK, tailandês, híndi, árabe e persa.
-  - [Data bindings](https://docs.lvgl.io/master/main-modules/observer/index.html) para conectar facilmente a UI ao aplicativo.
-  - Motor de renderização com suporte a animações, antialiasing, opacidade, rolagem suave, sombras, transformação de imagens e mais.
-  - [Poderoso motor de renderização 3D](https://docs.lvgl.io/master/libs/gltf.html) para exibir [modelos glTF](https://sketchfab.com/) com OpenGL.
-  - Suporte a mouse, touchpad, keypad, teclado, botões externos e encoder. [Dispositivos de entrada](https://docs.lvgl.io/master/main-modules/indev.html)
-  - Suporte a [múltiplos displays](https://docs.lvgl.io/master/main-modules/display/overview.html#how-many-displays-can-lvgl-use).
+<a id="features"></a>
+## Recursos
 
-## 📦️ Plataformas compatíveis
+**Livre, portátil e escalável**
+  - Uma biblioteca C totalmente portátil (compatível com C++) sem dependências externas.
+  - Pode ser compilada para qualquer MCU ou MPU, com qualquer (RT)OS. Make, CMake e globbing simples são todos suportados.
+  - Suporta displays monocromáticos, ePaper, OLED ou TFT, ou até monitores. [Displays](https://lvgl.io/docs/open/main-modules/display)
+  - Distribuída sob a licença MIT, então você pode usá-la facilmente em projetos comerciais também.
+  - No mínimo absoluto, precisa apenas de 32kB de RAM e 128kB de Flash, um frame buffer e pelo menos um buffer com 1/10 do tamanho da tela para renderização.
+  - OS, memória externa e GPU são suportados, mas não obrigatórios.
 
-O LVGL não possui dependências externas, por isso é fácil de compilar para qualquer dispositivo e também está disponível em vários gerenciadores de pacotes e RTOS:
+**Widgets, estilos, layouts e muito mais**
+  - Mais de 30 [Widgets](https://lvgl.io/docs/open/widgets) integrados: Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table e muitos outros.
+  - [Sistema de estilos](https://lvgl.io/docs/open/common-widget-features/styles) flexível com mais de 100 propriedades de estilo para personalizar qualquer parte dos widgets em qualquer estado.
+  - Motores de layout semelhantes a [Flexbox](https://lvgl.io/docs/open/common-widget-features/layouts/flex) e [Grid](https://lvgl.io/docs/open/common-widget-features/layouts/grid) para dimensionar e posicionar os widgets de forma responsiva automaticamente.
+  - [Data bindings](https://lvgl.io/docs/open/main-modules/observer) para conectar facilmente a UI à aplicação.
+  - Suporta Mouse, Touchpad, Keypad, Keyboard, botões externos e Encoder [dispositivos de entrada](https://lvgl.io/docs/open/main-modules/indev).
+  - Suporte a [múltiplos displays](https://lvgl.io/docs/open/main-modules/display/overview#how-many-displays-can-lvgl-use).
 
-- [Biblioteca Arduino](https://docs.lvgl.io/master/integration/framework/arduino.html)
-- [Pacote PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Biblioteca Zephyr](https://docs.lvgl.io/master/integration/os/zephyr.html)
-- [Componente ESP-IDF (ESP32)](https://components.espressif.com/components/lvgl/lvgl)
-- [Componente NXP MCUXpresso](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [Biblioteca NuttX](https://docs.lvgl.io/master/integration/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
-- CMSIS-Pack
-- [Pacote RIOT OS](https://doc.riot-os.org/group__pkg__lvgl.html#details)
+**Renderização**
+  - Motor de renderização 2D integrado com suporte a formas básicas, gradientes, anti-aliasing, opacidade, rolagem suave, sombras de caixa e projetadas, transformação de imagens, etc.
+  - [Motor de renderização 3D poderoso](https://lvgl.io/docs/open/libs/gltf) para exibir [modelos glTF](https://sketchfab.com/) com OpenGL.
+  - Suporte a gráficos vetoriais, SVG e Lottie.
+  - O texto é renderizado com codificação UTF-8, com suporte aos sistemas de escrita CJK, tailandês, hindi, árabe e persa.
+  - Suporte integrado a GPUs como VG-Lite, Dave2D, NeoChrome, OpenGL, etc.
 
-## 🚀 Editor LVGL Pro
+<a id="lvgl-pro"></a>
+## LVGL Pro
 
-O LVGL Pro é um conjunto completo para criar, testar, compartilhar e entregar UIs embarcadas com eficiência.
+Construir UIs em C funciona bem, mas se torna lento para iterar e mais difícil de manter consistente à medida que um projeto cresce.
+O [LVGL Pro](https://lvgl.io/pro) permite construir componentes e telas reutilizáveis visualmente, visualizar mudanças
+instantaneamente e gerenciar data bindings, traduções, animações e testes em um só lugar.
 
-Ele é composto por quatro ferramentas integradas:
+O Pro exporta código C puro do LVGL: o mesmo LVGL que você já usa, sem runtime extra ou dependência. Ele se encaixa
+em um projeto existente sem mudar a forma como você compila ou entrega.
 
-1. **Editor XML**: o coração do LVGL Pro. Um app de desktop para criar componentes e telas em XML, gerenciar data bindings, traduções, animações, testes e mais. Saiba mais sobre o [formato XML](https://docs.lvgl.io/master/xml/xml/index.html) e o [Editor](https://docs.lvgl.io/master/xml/editor/index.html).
-2. **Visualizador online**: execute o Editor no navegador, abra projetos do GitHub e compartilhe facilmente sem configurar um ambiente de desenvolvimento. Visite [https://viewer.lvgl.io](https://viewer.lvgl.io).
-3. **Ferramenta CLI**: gere código C e rode testes no CI/CD. Veja os detalhes [aqui](https://docs.lvgl.io/master/xml/tools/cli.html).
-4. **Plugin Figma**: sincronize e extraia estilos diretamente do Figma. Veja como funciona [aqui](https://docs.lvgl.io/master/xml/tools/figma.html).
+<p align="center">
+  <img height="500" alt="Construindo uma UI no editor LVGL Pro com pré-visualização ao vivo" src="https://github.com/user-attachments/assets/8cef0f05-0ff1-4766-8dfd-1d15e47f181a" />
+</p>
 
-Juntas, essas ferramentas permitem criar UIs com eficiência, testá-las com confiabilidade e colaborar com colegas e clientes.
+Você pode experimentá-lo no navegador em [viewer.lvgl.io](https://viewer.lvgl.io) sem instalar nada, ou
+[baixar o Editor](https://lvgl.io/pro#download) e usá-lo sob a licença gratuita Community.
 
-Saiba mais em https://pro.lvgl.io
+O LVGL Pro consiste em quatro ferramentas fortemente relacionadas:
 
-## 🤝 Serviços comerciais
+1. **Editor**: o coração do LVGL Pro. Um aplicativo desktop para construir componentes e telas em XML, gerenciar data bindings, traduções, animações, testes e muito mais. Saiba mais sobre o [Formato XML](https://lvgl.io/docs/pro/syntax) e os [Widgets](https://lvgl.io/docs/pro/built_in_widgets).
+2. **Online Viewer**: execute o Editor no seu navegador, abra projetos do GitHub e compartilhe facilmente sem configurar um ambiente de desenvolvimento. Visite [https://viewer.lvgl.io](https://viewer.lvgl.io).
+3. **Plugin do Figma**: mova um design do Figma para o LVGL Pro com um clique. Veja como funciona [aqui](https://lvgl.io/docs/pro/figma).
+4. **Ferramenta CLI**: gere código C e execute testes em CI/CD. Veja os detalhes [aqui](https://lvgl.io/docs/pro/cli).
 
-A LVGL LLC oferece vários tipos de serviços comerciais para apoiar o seu desenvolvimento de UI. Com mais de 15 anos de experiência em interfaces de usuário e gráficos, ajudamos você a levar sua UI para o próximo nível.
+As camadas Community e Evaluation são gratuitas para uso; consulte o [licenciamento](#license) para uso comercial.
 
-- **Design gráfico**: nossos designers internos são especialistas em criar visuais modernos e bonitos que combinam com seu produto e com as capacidades do hardware.
-- **Implementação de UI**: implementamos sua UI com base no design criado por você ou por nós. Vamos tirar o máximo do seu hardware e do LVGL. Se faltar algum recurso ou widget no LVGL, nós implementamos para você.
-- **Consultoria e suporte**: oferecemos consultoria para evitar erros caros e demorados durante o desenvolvimento da UI.
-- **Certificação de placas**: para empresas que oferecem placas de desenvolvimento ou kits prontos para produção, fornecemos certificação demonstrando como a placa roda o LVGL.
+<a id="examples"></a>
+## Exemplos
 
-Veja nossos [Demos](https://lvgl.io/demos) como referência. Para mais informações, acesse a [página de Serviços](https://lvgl.io/services).
+Você pode conferir mais de 100 exemplos em C e XML em https://lvgl.io/docs/open/examples
 
-[Entre em contato](https://lvgl.io/#contact) e conte como podemos ajudar.
+O [Online Viewer](https://viewer.lvgl.io/) do LVGL Pro também contém muitos tutoriais e os mesmos exemplos, com os quais você pode interagir de forma interativa.
 
-## 🧑‍💻 Integração do LVGL
+Como prévia, aqui está a mesma UI simples escrita em C e em XML:
 
-Integrar o LVGL é simples. Basta adicioná-lo ao projeto e compilar como você compila outros arquivos.
-Para configurar, copie `lv_conf_template.h` para `lv_conf.h`, habilite o primeiro `#if 0` e ajuste as configs conforme necessário.
-(A configuração padrão geralmente é suficiente.) Quando disponível, o LVGL também pode ser usado com Kconfig.
+<p align="center">
+  <img width="311" height="232" alt="Um botão centralizado que imprime quando clicado" src="https://github.com/user-attachments/assets/5948b485-e3f7-4a63-bb21-984381417c4a" />
+</p>
 
-Depois de incluído no projeto, você pode inicializar o LVGL e criar dispositivos de display e de entrada assim:
+<!-- GitHub renders fenced code blocks inside table cells, so this shows C and XML side by side. -->
+<table>
+<tr>
+<td width="50%">
 
 ```c
-#include "lvgl/lvgl.h" /*Defina LV_LVGL_H_INCLUDE_SIMPLE para incluir como "lvgl.h"*/
+static void button_clicked_cb(lv_event_t * e)
+{
+    printf("Clicked\n");
+}
+
+/* ... */
+
+lv_obj_t * button = lv_button_create(lv_screen_active());
+lv_obj_center(button);
+lv_obj_add_event_cb(button, button_clicked_cb,
+                    LV_EVENT_CLICKED, NULL);
+
+lv_obj_t * label = lv_label_create(button);
+lv_label_set_text(label, "Hello from LVGL!");
+```
+
+</td>
+<td width="50%">
+
+```xml
+<screen>
+  <view>
+    <lv_button align="center">
+      <event_cb callback="button_clicked_cb" />
+      <lv_label text="Hello from LVGL!" />
+    </lv_button>
+  </view>
+</screen>
+```
+
+</td>
+</tr>
+</table>
+
+O XML acima é com o que o [LVGL Pro](#lvgl-pro) trabalha: você constrói a tela visualmente e ele gera o C para você.
+
+<a id="integration"></a>
+## Integração
+
+O LVGL não possui dependências externas, então pode ser facilmente compilado para qualquer dispositivo. Ele vem com drivers integrados, está disponível em
+muitos gerenciadores de pacotes e RTOSes, e também é fácil de portar para qualquer novo dispositivo.
+
+### Pré-integrado
+
+- **Fabricantes de chips**: [ESP32](https://components.espressif.com/components/lvgl/lvgl), [componente NXP MCUXpresso](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY), [Renesas FSP](https://lvgl.io/docs/open/integration/chip/renesas), [STM32](https://lvgl.io/docs/open/integration/chip/stm32)
+
+- **RTOSes**: [Zephyr](https://lvgl.io/docs/open/integration/os/zephyr), [NuttX](https://lvgl.io/docs/open/integration/os/nuttx), [RT-Thread](https://lvgl.io/docs/open/integration/os/rt-thread)
+
+- **Frameworks**: [Arduino](https://lvgl.io/docs/open/integration/framework/arduino), [PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl), [CMSIS-Pack](https://lvgl.io/docs/open/integration/framework/cmsis-pack)
+
+- **Fabricantes de placas**: [Seeed Studio](https://www.seeedstudio.com), [Elecrow](https://www.elecrow.com/display/esp-hmi-display.html), [Riverdi](https://lvgl.io/docs/open/integration/boards/manufacturers/riverdi), [VIEWE](https://lvgl.io/docs/open/integration/boards/manufacturers/viewe), e [muitos outros](https://lvgl.io/boards)
+
+### Drivers integrados
+O LVGL vem com drivers prontos para uso, então em plataformas comuns você não precisa escrever o tratamento de display e entrada por conta própria:
+
+- **Simulador / desktop**: janelas [SDL](https://lvgl.io/docs/open/integration/pc/sdl), X11 e [Wayland](https://lvgl.io/docs/open/integration/embedded_linux/drivers/wayland) para desenvolver e pré-visualizar sua UI em um PC.
+- **Controladores de display**: LCDs MIPI-DBI/SPI genéricos ([ILI9341](https://lvgl.io/docs/open/integration/external_display_controllers/ili9341), ST7789 e similares), além de controladores de fabricantes como o [LTDC](https://lvgl.io/docs/open/integration/chip_vendors/stm32/ltdc) da ST e o [eLCDIF](https://lvgl.io/docs/open/integration/chip_vendors/nxp/elcdif) da NXP.
+- **Linux embarcado**: framebuffer (fbdev), DRM/KMS, Wayland e `libinput`/`evdev` para entrada de toque e ponteiro. Saiba mais [aqui](https://lvgl.io/docs/open/integration/embedded_linux).
+- **GPU / aceleradores**: VG-Lite, NXP PXP, ThinkSilicon NemaGFX, Arm-2D  e [OpenGL ES](https://lvgl.io/docs/open/integration/embedded_linux/drivers/opengl_driver)
+
+Veja a lista completa e os guias de configuração na [documentação de Integração](https://lvgl.io/docs/open/integration).
+
+### No LVGL Pro
+
+No LVGL Pro você pode criar projetos prontos para uso somente de UI, VSCode, Zephyr e Linux com um único clique.
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/5aadb850-6b40-49d1-ba96-2296041c7e27" />
+
+### Portando manualmente
+
+Integrar o LVGL é muito simples. Basta colocá-lo em qualquer projeto e compilá-lo como você compilaria outros arquivos.
+Para configurar o LVGL, copie `lv_conf_template.h` como `lv_conf.h`, habilite o primeiro `#if 0` e ajuste as configurações conforme necessário.
+(A configuração padrão geralmente é suficiente.) Se disponível, o LVGL também pode ser usado com Kconfig.
+
+Uma vez no projeto, você pode inicializar o LVGL e criar os dispositivos de display e entrada da seguinte forma:
+
+```c
+#include "lvgl/lvgl.h" /*Define LV_LVGL_H_INCLUDE_SIMPLE to include as "lvgl.h"*/
 
 #define TFT_HOR_RES 320
 #define TFT_VER_RES 240
@@ -139,7 +218,11 @@ static uint32_t my_tick_cb(void)
 
 static void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    /*Escreva px_map na área (x1..x2, y1..y2) do frame buffer ou do controlador externo*/
+    /*Write px_map to the area->x1, area->x2, area->y1, area->y2 area of the
+     *frame buffer or external display controller. */
+
+    /* signal LVGL that we're done */
+    lv_display_flush_ready(disp);
 }
 
 static void my_touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
@@ -157,220 +240,63 @@ void main(void)
 {
     my_hardware_init();
 
-    /*Inicialize o LVGL*/
+    /*Initialize LVGL*/
     lv_init();
 
-    /*Defina a fonte de tick em milissegundos para o LVGL controlar o tempo*/
+    /*Set millisecond-based tick source for LVGL so that it can track time.*/
     lv_tick_set_cb(my_tick_cb);
 
-    /*Crie um display onde telas e widgets serão adicionados*/
+    /*Create a display where screens and widgets can be added*/
     lv_display_t * display = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
 
-    /*Adicione buffers de renderização
-     *Aqui adicionamos um buffer parcial menor assumindo 16 bits (formato RGB565)*/
-    static uint8_t buf[TFT_HOR_RES * TFT_VER_RES / 10 * 2]; /* x2 por causa de 16 bits por pixel */
+    /*Add rendering buffers to the screen.
+     *Here adding a smaller partial buffer assuming 16-bit (RGB565 color format)*/
+    static uint8_t buf[TFT_HOR_RES * TFT_VER_RES / 10 * 2]; /* x2 because of 16-bit color depth */
     lv_display_set_buffers(display, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
-    /*Adicione o callback que faz o flush do conteúdo de `buf` quando renderizado*/
+    /*Add a callback that can flush the content from `buf` when it has been rendered*/
     lv_display_set_flush_cb(display, my_flush_cb);
 
-    /*Crie um dispositivo de entrada para toque*/
+    /*Create an input device for touch handling*/
     lv_indev_t * indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, my_touch_read_cb);
 
-    /*Drivers prontos, agora crie a UI*/
+    /*The drivers are in place; now we can create the UI*/
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Hello world");
     lv_obj_center(label);
 
-    /*Execute as tarefas do LVGL em loop*/
+    /*Execute the LVGL-related tasks in a loop*/
     while(1) {
         lv_timer_handler();
-        my_sleep_ms(5);         /*Espere um pouco para o sistema respirar*/
+        my_sleep_ms(5);         /*Wait a little to let the system breathe*/
     }
 }
 ```
 
-## 🤖 Exemplos
 
-Você pode conferir mais de 100 exemplos em https://docs.lvgl.io/master/examples.html
+<a id="contributing"></a>
+## Contribuindo
 
-O Visualizador Online também contém tutoriais para aprender XML com facilidade: https://viewer.lvgl.io/
+O LVGL é um projeto aberto, e as contribuições são muito bem-vindas. Existem muitas maneiras de contribuir, desde simplesmente falar sobre o seu projeto, escrever exemplos, melhorar a documentação, corrigir bugs, ou até mesmo hospedar o seu próprio projeto sob a organização LVGL.
 
-
-### Botão Hello World com evento
-
-<img width="311" height="232" alt="image" src="https://github.com/user-attachments/assets/5948b485-e3f7-4a63-bb21-984381417c4a" />
-
-<details>
-  <summary>C code</summary>
-
-  ```c
-static void button_clicked_cb(lv_event_t * e)
-{
-	printf("Clicked\n");
-}
-
-[...]
-
-  lv_obj_t * button = lv_button_create(lv_screen_active());
-  lv_obj_center(button);
-  lv_obj_add_event_cb(button, button_clicked_cb, LV_EVENT_CLICKED, NULL);
-
-  lv_obj_t * label = lv_label_create(button);
-  lv_label_set_text(label, "Hello from LVGL!");
-```
-</details>
-
-<details>
-  <summary>Em XML com o LVGL Pro</summary>
-
-```xml
-<screen>
-	<view>
-		<lv_button align="center">
-			<event_cb callback="button_clicked_cb" />
-			<lv_label text="Hello from LVGL!" />
-		</lv_button>
-	</view>
-</screen>
-```
-
-</details>
-
-### Slider estilizado com data binding
-
-<img width="314" height="233" alt="image" src="https://github.com/user-attachments/assets/268db1a0-946c-42e2-aee4-9550bdf5f4f9" />
-
-<details>
-  <summary>C code</summary>
-
-```c
-static void my_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
-{
-	printf("Slider value: %d\n", lv_subject_get_int(subject));
-}
-
-[...]
-
-static lv_subject_t subject_value;
-lv_subject_init_int(&subject_value, 35);
-lv_subject_add_observer(&subject_value, my_observer_cb, NULL);
-
-lv_style_t style_base;
-lv_style_init(&style_base);
-lv_style_set_bg_color(&style_base, lv_color_hex(0xff8800));
-lv_style_set_bg_opa(&style_base, 255);
-lv_style_set_radius(&style_base, 4);
-
-lv_obj_t * slider = lv_slider_create(lv_screen_active());
-lv_obj_center(slider);
-lv_obj_set_size(slider, lv_pct(80), 16);
-lv_obj_add_style(slider, &style_base, LV_PART_INDICATOR);
-lv_obj_add_style(slider, &style_base, LV_PART_KNOB);
-lv_obj_add_style(slider, &style_base, 0);
-lv_obj_set_style_bg_opa(slider, LV_OPA_50, 0);
-lv_obj_set_style_border_width(slider, 3, LV_PART_KNOB);
-lv_obj_set_style_border_color(slider, lv_color_hex3(0xfff), LV_PART_KNOB);
-lv_slider_bind_value(slider, &subject_value);
-
-lv_obj_t * label = lv_label_create(lv_screen_active());
-lv_obj_align(label, LV_ALIGN_CENTER, 0, -30);
-lv_label_bind_text(label, &subject_value, "Temperature: %d °C");
-```
-
-</details>
-
-<details>
-  <summary>Em XML com o LVGL Pro</summary>
-
-```xml
-<screen>
-	<styles>
-		<style name="style_base" bg_opa="100%" bg_color="0xff8800" radius="4" />
-		<style name="style_border" border_color="0xfff" border_width="3" />
-	</styles>
-
-	<view>
-		<lv_label bind_text="value" bind_text-fmt="Temperature: %d °C" align="center" y="-30" />
-		<lv_slider align="center" bind_value="value" style_bg_opa="30%">
-			<style name="style_base" />
-			<style name="style_base" selector="knob" />
-			<style name="style_base" selector="indicator" />
-			<style name="style_border" selector="knob" />
-		</lv_slider>
-	</view>
-</screen>
-```
-
-</details>
-
-### Checkboxes em um layout
-
-<img width="311" height="231" alt="image" src="https://github.com/user-attachments/assets/ba9af647-2ea1-4bc8-b53d-c7b43ce24b6e" />
-
-<details>
-  <summary>C code</summary>
-
-  ```c
-/*Crie uma nova tela e carregue-a*/
-lv_obj_t * scr = lv_obj_create(NULL);
-lv_screen_load(scr);
-
-/*Defina um layout em coluna*/
-lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_COLUMN);
-lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, /*Alinhamento vertical*/
-						   LV_FLEX_ALIGN_START,	       /*Alinhamento horizontal na trilha*/
-						   LV_FLEX_ALIGN_CENTER);      /*Alinhamento da trilha*/
-
-/*Crie 5 checkboxes*/
-const char * texts[5] = {"Input 1", "Input 2", "Input 3", "Output 1", "Output 2"};
-for(int i = 0; i < 5; i++) {
-	lv_obj_t * cb = lv_checkbox_create(scr);
-	lv_checkbox_set_text(cb, texts[i]);
-}
-
-/*Altere alguns estados*/
-lv_obj_add_state(lv_obj_get_child(scr, 1), LV_STATE_CHECKED);
-lv_obj_add_state(lv_obj_get_child(scr, 3), LV_STATE_DISABLED);
-```
-
-</details>
-
-<details>
-  <summary>Em XML com o LVGL Pro</summary>
-
-```xml
-<screen>
-	<view
-		flex_flow="column"
-		style_flex_main_place="space_evenly"
-		style_flex_cross_place="start"
-		style_flex_track_place="center"
-	>
-		<lv_checkbox text="Input 1"/>
-		<lv_checkbox text="Input 2"/>
-		<lv_checkbox text="Input 3" checked="true"/>
-		<lv_checkbox text="Output 1"/>
-		<lv_checkbox text="Output 2" disabled="true"/>
-   </view>
-</screen>
-```
-
-</details>
-
-
-## 🌟 Como contribuir
-
-O LVGL é um projeto aberto, e contribuições são muito bem-vindas. Há muitas formas de contribuir, desde falar sobre o seu projeto, escrever exemplos, melhorar a documentação, corrigir bugs, até hospedar seu próprio projeto na organização LVGL.
-
-Para uma descrição detalhada das oportunidades de contribuição, visite a seção [Contributing](https://docs.lvgl.io/master/contributing/index.html)
+Para uma descrição detalhada das oportunidades de contribuição, visite a seção [Contribuindo](https://lvgl.io/docs/open/contributing)
 da documentação.
 
-Mais de 600 pessoas já deixaram sua marca no LVGL. Junte-se a nós. Até breve 🙂
+Centenas de pessoas já deixaram sua marca no LVGL. Seja uma delas! Vejo você por aqui! 🙂
 
-<a href="https://github.com/lvgl/lvgl/graphs/contributors"> <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" /> </a>
 
-... e muitas outras.
+<a id="license"></a>
+## Licença
 
+A biblioteca LVGL é distribuída sob a **licença MIT**, então você pode usá-la livremente tanto em
+produtos de código aberto quanto comerciais sem royalties. Veja [`LICENCE.txt`](../LICENCE.txt).
+
+Todas as bibliotecas de terceiros incluídas no LVGL também são lançadas sob licenças compatíveis com a MIT,
+então você pode usar o LVGL e suas dependências com confiança.
+
+O **[LVGL Pro](https://lvgl.io/pro)** possui licenciamento separado:
+- As camadas **Community** e **Evaluation** são **gratuitas para uso não comercial**, perfeitas para
+  aprendizado, projetos de hobby e avaliação das ferramentas.
+- O uso comercial do LVGL Pro requer uma licença paga. Veja os [Preços e Detalhes](https://lvgl.io/pro#pricing).

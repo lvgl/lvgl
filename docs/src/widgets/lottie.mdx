@@ -1,19 +1,18 @@
 ---
 title: "Lottie (lv_lottie)"
-description: "The Lottie Widget is capable of parsing, rasterizing, and playing Lottie animations."
+description: "Play vector animations in the Lottie format — like a modern mix of SVG and GIF."
 ---
 
 ## Overview
 
-The Lottie Widget is capable of parsing, rasterizing, and playing [Lottie animations](https://lottiefiles.com).
+The Lottie widget parses, rasterizes, and plays
+[Lottie animations](https://lottiefiles.com) — vector animations that you
+can think of as a modern mix of SVG and GIF. Get them from sites like
+[lottiefiles.com](https://lottiefiles.com/) or build your own in tools
+like Adobe After Effects.
 
-The Lottie animations are vector-based animations. Think of them as the modern combination of SVG and GIF.
-
-The animations can be downloaded from various sources, such as [https://lottiefiles.com/](https://lottiefiles.com/)
-or you can create your own animations using, for example, Adobe After Effects.
-
-The Lottie Widget is based on [Canvas (lv_canvas)](/widgets/canvas) because in order to render the animation
-the user needs to provide a buffer where the current animation frame is stored.
+The widget is based on [Canvas](/widgets/canvas): each frame is rendered
+into a buffer that you provide.
 
 ## Styling
 
@@ -75,24 +74,6 @@ lv_anim_t * a = lv_lottie_get_anim(lottie)
 returns the LVGL animation which controls the
 Lottie animation. By default it is running infinitely at 60FPS however the LVGL animation
 can be freely adjusted.
-
-## Events
-
-No events are emitted by Lottie Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No keys are processed by Lottie Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
 
 ## Examples
 

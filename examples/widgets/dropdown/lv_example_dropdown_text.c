@@ -19,15 +19,15 @@ void lv_example_dropdown_text(void)
 
     /* Without text the button reflects the selected option */
     lv_obj_t * dropdown_1 = lv_dropdown_create(screen);
-    lv_obj_set_align(dropdown_1, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(dropdown_1, 14);
+    lv_obj_set_align(dropdown_1, LV_ALIGN_CENTER);
+    lv_obj_set_x(dropdown_1, -100);
     lv_obj_set_width(dropdown_1, 110);
     lv_dropdown_set_options(dropdown_1, "Cut\nCopy\nPaste");
 
     /* text='Menu' overrides the displayed option */
     lv_obj_t * dropdown_2 = lv_dropdown_create(screen);
-    lv_obj_set_align(dropdown_2, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_x(dropdown_2, -14);
+    lv_obj_set_align(dropdown_2, LV_ALIGN_CENTER);
+    lv_obj_set_x(dropdown_2, 100);
     lv_obj_set_width(dropdown_2, 110);
     lv_dropdown_set_text(dropdown_2, "Menu");
     lv_dropdown_set_options(dropdown_2, "Cut\nCopy\nPaste");

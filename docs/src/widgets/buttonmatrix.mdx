@@ -1,20 +1,19 @@
 ---
 title: "Button Matrix (lv_buttonmatrix)"
-description: "The Button Matrix Widget is a lightweight way to display multiple Buttons in rows and columns --- lightweight because the buttons are not actually created but just virtually drawn on the fly. With ..."
+description: "A lightweight way to display many buttons in rows and columns. The buttons are drawn on the fly instead of being created as separate widgets, so memory use stays low."
 ---
 
 ## Overview
 
-The Button Matrix Widget is a lightweight way to display multiple
-Buttons in rows and columns --- lightweight because the buttons are not
-actually created but just virtually drawn on the fly.  With Button Matrix,
-each button uses only eight extra bytes of memory instead of the ~100-150
-bytes a normal [Button](/widgets/button) Widget plus the 100 or so bytes
-for the [Label](/widgets/label) Widget.
+Button Matrix shows many buttons in rows and columns. It is lightweight
+because the buttons are not created as separate widgets — they are
+drawn on the fly. Each button takes only eight extra bytes, instead of
+the ~100–150 bytes a real [Button](/widgets/button) plus the ~100 bytes
+a [Label](/widgets/label) would use.
 
-New Button Matrix Widgets are added to the default group (if one is set).
-Additionally, Button Matrix is an editable Widget:  it allows selecting and clicking
-the buttons with encoder and keyboard navigation as well.
+A new Button Matrix is added to the default group (if one is set). It
+is an editable widget: buttons can be selected and clicked with an
+encoder or keyboard too.
 
 ## Button map
 
@@ -123,11 +122,7 @@ to the text of the button specified by zero-based index `button_id`.
 
 <LvglExample name="lv_example_buttonmatrix_event" path="widgets/buttonmatrix/lv_example_buttonmatrix_event" />
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
@@ -142,6 +137,4 @@ repeat as well. To avoid this contradiction, add
 to the Button Matrix if used with an encoder.  This disables the repeat feature so
 the button will not be activated upon leaving edit mode.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

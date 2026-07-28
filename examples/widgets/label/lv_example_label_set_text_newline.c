@@ -28,6 +28,6 @@ void lv_example_label_set_text_newline(void)
 
     /* Plain label for comparison */
     lv_obj_t * label_2 = lv_label_create(screen);
-    lv_label_set_text(label_2, "Text is set directly with the text attribute.");
+    lv_label_set_text(label_2, "Just a normal single line text.");
 }
 #endif

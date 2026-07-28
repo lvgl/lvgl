@@ -74,6 +74,9 @@ struct _lv_indev_t {
     /**< Long press time in milliseconds*/
     uint16_t long_press_time;
 
+    /**< Maximum time to detect double clicks in milliseconds*/
+    uint16_t double_click_time;
+
     /**< Repeated trigger period in long press [ms]*/
     uint16_t long_press_repeat_time;
 

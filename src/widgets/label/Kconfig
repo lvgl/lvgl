@@ -1,0 +1,19 @@
+config LV_USE_LABEL
+	bool "Label"
+	default y
+
+if LV_USE_LABEL
+
+config LV_LABEL_TEXT_SELECTION
+	bool "Enable selecting text of the label"
+	default y
+
+config LV_LABEL_LONG_TXT_HINT
+	bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts"
+	default y
+
+config LV_LABEL_WAIT_CHAR_COUNT
+	int "The count of wait chart"
+	default 3
+
+endif #LV_USE_LABEL

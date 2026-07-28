@@ -26,18 +26,18 @@ void lv_example_bar_orientation(void)
 
     /* Horizontal bar (auto orientation from width &gt; height) */
     lv_obj_t * bar_1 = lv_bar_create(screen);
-    lv_obj_set_size(bar_1, lv_pct(90), 16);
+    lv_obj_set_size(bar_1, lv_pct(90), 20);
     lv_bar_set_min_value(bar_1, 0);
     lv_bar_set_max_value(bar_1, 100);
     lv_bar_set_value(bar_1, 60, false);
     lv_obj_t * label_1 = lv_label_create(bar_1);
     lv_obj_set_align(label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(label_1, "horizontal");
+    lv_label_set_text(label_1, "Horizontal");
     lv_obj_set_style_text_color(label_1, TEXT_COLOR, 0);
 
     /* Explicit vertical orientation */
     lv_obj_t * bar_2 = lv_bar_create(screen);
-    lv_obj_set_size(bar_2, 18, 130);
+    lv_obj_set_size(bar_2, 20, 130);
     lv_bar_set_orientation(bar_2, LV_BAR_ORIENTATION_VERTICAL);
     lv_bar_set_min_value(bar_2, 0);
     lv_bar_set_max_value(bar_2, 100);

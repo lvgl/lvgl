@@ -1,17 +1,16 @@
 ---
 title: "Tile View (lv_tileview)"
-description: "The Tile View is a container Widget whose elements (called tiles) can be arranged in grid form. A user can navigate between the tiles by swiping."
+description: "A container of tiles arranged in a grid. The user moves between tiles by swiping."
 ---
 
 ## Overview
 
-The Tile View is a container Widget whose elements (called *tiles*) can
-be arranged in grid form. A user can navigate between the tiles by
-swiping. Any direction of swiping can be disabled on the tiles
-individually to not allow moving from one tile to another.
+Tile View is a container whose children — called *tiles* — sit on a grid.
+The user swipes to move between tiles, and you can disable swiping per
+tile in any direction.
 
-If the Tile View is screen sized, the user interface resembles what you
-may have seen on smartwatches.
+When the Tile View is the size of the screen, the result feels like a
+smartwatch home screen.
 
 ## Styling
 
@@ -38,23 +37,12 @@ The Tile View can scroll to a specified tile with
 
 ## Events
 
-- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent after a new tile is displayed by scrolling.
-   <ApiLink name="lv_tileview_get_tile_active" display="lv_tileview_get_tile_active(tileview)" /> can be used within the event to
-   get a pointer to the newly-displayed tile.
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent after a new tile is displayed by scrolling.
 
-<Callout type="info" title="Further Reading">
+<ApiLink name="lv_tileview_get_tile_active" display="lv_tileview_get_tile_active(tileview)" /> can be used
+within the event to get a pointer to the newly-displayed tile.
+
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Tileview Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
 
 ## Example
 

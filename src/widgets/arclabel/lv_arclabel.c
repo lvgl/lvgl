@@ -389,7 +389,9 @@ static void lv_arclabel_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     lv_arclabel_set_text_static(obj, LV_ARCLABEL_DEFAULT_TEXT);
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLL_CHAIN | LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_clickable(obj, false);
+    lv_obj_set_scroll_chain(obj, false);
+    lv_obj_set_scrollable(obj, false);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

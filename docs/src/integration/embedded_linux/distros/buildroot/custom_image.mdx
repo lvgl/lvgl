@@ -3,7 +3,7 @@ title: Custom Buildroot Image
 description: "Step-by-step guide to creating a custom Buildroot image, using the Raspberry Pi 4 as an example. Adaptable to other boards."
 ---
 
-# Custom image for buildroot
+## Custom image for buildroot
 
 This chapter offers a detailed guide for creating a custom image for the
 Raspberry Pi 4 (RPi4). Key Buildroot components and concepts will be
@@ -33,8 +33,7 @@ Each folder utility will be explained throughout the guide.
 
 ## Get Buildroot
 
-First, according to the [Builroot Manual](https://buildroot.org/downloads/
-manual/manual.html), Buildroot requires certain packages to be installed
+First, according to the [Buildroot Manual](https://buildroot.org/downloads/manual/manual.html), Buildroot requires certain packages to be installed
 before starting the build. Lets install them using Ubuntu's package manager.
 
 ```bash
@@ -58,7 +57,7 @@ cd buildroot
 make list-defconfigs | grep rasp
 ```
 
-There is a build available for RPi4 62 bits: `raspberrypi4_64_defconfig`.
+There is a build available for RPi4 64 bits: `raspberrypi4_64_defconfig`.
 
 You can also find all the configurations in the Buildroot repository
 `buildroot > configs`
@@ -131,7 +130,7 @@ the `build` folder, where the build process takes place. It includes files
 such as configuration files, source code, and object files that are generated
 as part of the build process.
 
-# host
+### host
 
 The `host` folder contains files and binaries that are built for the host
 system rather than the target system. This includes tools and utilities that
@@ -139,14 +138,14 @@ are needed to build packages or to run the build system itself. It may contain
 compilers, build tools, and libraries that are required to support the build
 process for the target.
 
-# images
+### images
 
 This directory holds the final output images generated for the target system,
 such as filesystem images, kernel images, or bootloader images. Depending on
 the configuration, you may find files like `rootfs.tar`, `zImage`,
 `uImage`, or others that are ready to be deployed onto the target hardware.
 
-# target
+### target
 
 The `target` folder contains the files that are specifically intended for the
 target system. This includes the root filesystem and any additional files that

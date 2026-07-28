@@ -206,6 +206,7 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time);
  * @param obj       pointer to a text area object
  * @param align     the align mode from ::lv_text_align_t
  */
+LV_DEPRECATED("Use text_align style property instead")
 void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align);
 
 /*=====================

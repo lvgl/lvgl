@@ -1,0 +1,143 @@
+config LV_USE_DRAW_VG_LITE
+	bool "Use VG-Lite GPU"
+	default n
+	select LV_USE_MATRIX
+	select LV_DRAW_HAS_VECTOR_SUPPORT
+	help
+		Use VG-Lite GPU.
+
+if LV_USE_DRAW_VG_LITE
+
+config LV_VG_LITE_USE_GPU_INIT
+	bool "Enable VG-Lite custom external 'gpu_init()' function"
+	default n
+
+config LV_VG_LITE_USE_ASSERT
+	bool "Enable VG-Lite assert"
+	default n
+
+config LV_VG_LITE_FLUSH_MAX_COUNT
+	int "VG-Lite flush commit trigger threshold"
+	default 8
+	help
+		GPU will try to batch these many draw tasks
+
+config LV_VG_LITE_USE_BOX_SHADOW
+	bool "Enable border to simulate shadow"
+	default y
+	help
+		which usually improves performance,
+		but does not guarantee the same rendering quality as the software.
+
+config LV_VG_LITE_GRAD_CACHE_CNT
+	int "VG-Lite gradient maximum cache number"
+	default 32
+	help
+		The memory usage of a single gradient:
+			linear: 4K bytes.
+			radial: radius * 4K bytes.
+
+config LV_VG_LITE_STROKE_CACHE_CNT
+	int "VG-Lite stroke maximum cache number"
+	default 32
+
+config LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+	int "VG-Lite unaligned bitmap font maximum cache number"
+	default 256
+
+config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
+	bool "Remove VLC_OP_CLOSE path instruction (Workaround for NXP)"
+	default n
+
+config LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
+	bool "Disable linear gradient extension for some older versions of drivers"
+	default n
+
+config LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+	bool "Disable blit rectangular offset to resolve certain hardware errors"
+	default n
+
+config LV_VG_LITE_PATH_DUMP_MAX_LEN
+	int "Maximum path dump print length (in points)"
+	default 1000
+
+config LV_USE_VG_LITE_DRIVER
+	bool "Use LVGL's built-in vg_lite driver"
+	default n
+
+	if LV_USE_VG_LITE_DRIVER
+	# The GPU series + revision selects which
+	# VGLite/Series/<series>/<revision>/vg_lite_options.h is included. A
+	# free-form string/hex pair can't be represented in Kconfig (the include
+	# path needs unquoted tokens), so the supported GPUs are offered as a choice
+	# and mapped to the include in VGLite/vg_lite_options.h.
+	choice
+		prompt "VG-Lite GPU (series and revision)"
+		default LV_VG_LITE_GPU_GC255_0X40A
+
+		config LV_VG_LITE_GPU_GC255_0X40A
+			bool "GC255 (revision 0x40A)"
+		config LV_VG_LITE_GPU_GC355_0X0_1215
+			bool "GC355 (revision 0x0_1215)"
+		config LV_VG_LITE_GPU_GC355_0X0_1216
+			bool "GC355 (revision 0x0_1216)"
+		config LV_VG_LITE_GPU_GC555_0X423
+			bool "GC555 (revision 0x423)"
+		config LV_VG_LITE_GPU_GC555_0X423_ECO
+			bool "GC555 (revision 0x423 ECO)"
+		config LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
+			bool "GCNanoUltraV (revision 0x1003)"
+	endchoice
+
+	config LV_VG_LITE_GPU
+		int
+		default 0 if LV_VG_LITE_GPU_GC255_0X40A
+		default 1 if LV_VG_LITE_GPU_GC355_0X0_1215
+		default 2 if LV_VG_LITE_GPU_GC355_0X0_1216
+		default 3 if LV_VG_LITE_GPU_GC555_0X423
+		default 4 if LV_VG_LITE_GPU_GC555_0X423_ECO
+		default 5 if LV_VG_LITE_GPU_GCNANOULTRAV_0X1003
+
+	config LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+		hex "VG-Lite GPU base address"
+		default 0x40240000
+	endif #LV_USE_VG_LITE_DRIVER
+
+config LV_USE_VG_LITE_THORVG
+	bool "VG-Lite Simulator"
+	default n
+	select LV_USE_THORVG
+	help
+		Use thorvg to simulate VG-Lite hardware behavior, it's useful
+		for debugging and testing on PC simulator. Enable LV_USE_THORVG,
+		Either internal ThorVG or external ThorVG library is required.
+
+if LV_USE_VG_LITE_THORVG
+
+config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+	bool "Enable LVGL blend mode support"
+	default n
+	depends on LV_USE_VG_LITE_THORVG
+
+config LV_VG_LITE_THORVG_YUV_SUPPORT
+	bool "Enable YUV color format support"
+	default n
+
+config LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+	bool "Enable linear gradient extension support"
+	default n
+
+config LV_VG_LITE_THORVG_16PIXELS_ALIGN
+	bool "Enable 16 pixels alignment"
+	default y
+
+config LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+	int "Buffer address alignment"
+	default 64
+
+config LV_VG_LITE_THORVG_THREAD_RENDER
+	bool "Enable multi-thread render"
+	default n
+
+endif #LV_USE_VG_LITE_THORVG
+endif #LV_USE_DRAW_VG_LITE

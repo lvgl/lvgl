@@ -180,6 +180,13 @@ void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time);
 void lv_indev_set_long_press_repeat_time(lv_indev_t * indev, uint16_t long_press_repeat_time);
 
 /**
+ * Set double click time to indev
+ * @param  indev              pointer to input device
+ * @param  double_click_time  double/triple click time in ms
+ */
+void lv_indev_set_double_click_time(lv_indev_t * indev, uint16_t double_click_time);
+
+/**
  * Set scroll limit to the input device
  * @param indev pointer to an input device
  * @param scroll_limit the number of pixels to slide before actually drag the object

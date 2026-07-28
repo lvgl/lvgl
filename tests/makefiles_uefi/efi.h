@@ -38,7 +38,7 @@
     typedef UINT32 UINTN;
     typedef INT32 INTN;
     typedef INT64 INTMAX;
-#elif defined(__aarch64__)
+#elif defined(__aarch64__) || defined(__loongarch_lp64) || (defined(__riscv) && __riscv_xlen == 64)
     typedef unsigned long long UINT64;
     typedef long long INT64;
     typedef unsigned int UINT32;

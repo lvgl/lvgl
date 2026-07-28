@@ -19,15 +19,11 @@
 void lv_example_calendar_basic(void)
 {
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Tap a day to select it; use the header arrows to jump between months. */
     lv_obj_t * calendar = lv_calendar_create(screen);
-    lv_obj_set_size(calendar, lv_pct(90), 200);
+    lv_obj_set_size(calendar, 300, 230);
+    lv_obj_set_align(calendar, LV_ALIGN_CENTER);
     lv_calendar_set_today_year(calendar, 2026);
     lv_calendar_set_today_month(calendar, 5);
     lv_calendar_set_today_day(calendar, 15);

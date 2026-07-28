@@ -28,7 +28,7 @@ void lv_example_span_hittest(void)
     lv_obj_set_width(spans, 240);
     lv_obj_set_height(spans, LV_SIZE_CONTENT);
     lv_obj_center(spans);
-    lv_obj_add_flag(spans, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(spans, true);
 
     lv_span_t * span = lv_spangroup_add_span(spans);
     lv_span_set_text(span, "Click any ");

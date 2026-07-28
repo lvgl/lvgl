@@ -41,7 +41,7 @@ void lv_example_flex_rtl(void)
 
     lv_obj_t * container_1 = lv_obj_create(screen);
     lv_obj_set_flex_flow(container_1, LV_FLEX_FLOW_ROW);
-    lv_obj_set_size(container_1, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container_1, lv_pct(90), LV_SIZE_CONTENT);
     lv_obj_t * label_2 = lv_label_create(container_1);
     lv_obj_set_style_bg_color(label_2, lv_color_hex(0x3498db), 0);
     lv_label_set_text(label_2, "First");
@@ -64,7 +64,7 @@ void lv_example_flex_rtl(void)
     lv_obj_t * container_2 = lv_obj_create(screen);
     lv_obj_set_flex_flow(container_2, LV_FLEX_FLOW_ROW);
     lv_obj_set_style_base_dir(container_2, LV_BASE_DIR_RTL, 0);
-    lv_obj_set_size(container_2, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container_2, lv_pct(90), LV_SIZE_CONTENT);
     lv_obj_t * label_6 = lv_label_create(container_2);
     lv_obj_set_style_bg_color(label_6, lv_color_hex(0x3498db), 0);
     lv_label_set_text(label_6, "First");

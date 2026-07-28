@@ -594,7 +594,7 @@ void test_menu_header_hidden_when_empty(void)
     lv_obj_t * header = lv_menu_get_main_header(menu);
     lv_refr_now(NULL);
 
-    TEST_ASSERT_TRUE(lv_obj_has_flag(header, LV_OBJ_FLAG_HIDDEN));
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(header));
 }
 
 void test_menu_group_focus(void)
@@ -680,7 +680,7 @@ void test_menu_sidebar_root_back_disabled(void)
     lv_refr_now(NULL);
 
     lv_obj_t * sidebar_back_btn = lv_menu_get_sidebar_header_back_button(menu);
-    TEST_ASSERT_TRUE(lv_obj_has_flag(sidebar_back_btn, LV_OBJ_FLAG_HIDDEN));
+    TEST_ASSERT_TRUE(lv_obj_is_hidden(sidebar_back_btn));
 }
 
 void test_menu_selected_tab_clear_without_sidebar(void)

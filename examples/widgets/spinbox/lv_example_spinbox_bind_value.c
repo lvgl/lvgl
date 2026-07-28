@@ -28,16 +28,12 @@ void lv_example_spinbox_bind_value(void)
     }
 
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Tap the spinbox arrows; the arc follows because both bind to `subject_value`. */
     lv_obj_t * arc = lv_arc_create(screen);
     lv_obj_set_size(arc, 160, 160);
     lv_arc_bind_value(arc, &subject_value);
+    lv_obj_set_align(arc, LV_ALIGN_CENTER);
     lv_obj_t * spinbox = lv_spinbox_create(arc);
     lv_obj_set_width(spinbox, 80);
     lv_spinbox_set_digit_count(spinbox, 3);

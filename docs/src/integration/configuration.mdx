@@ -1,0 +1,223 @@
+---
+title: Configuring LVGL
+description: "How to configure LVGL: lv_conf.h, Kconfig, compiler defines, and ready-made presets (defconfigs)."
+---
+
+LVGL has many compile-time settings that let you
+
+- set default values (color depth, refresh period, memory size, ...)
+- enable or disable Widgets
+- enable GPU and rendering backends
+- enable third-party library support
+- enable operating-system support
+- and much more
+
+This page explains the ways to configure LVGL and when to use each.
+
+## `lv_conf.h`
+
+When setting up a project for the first time, copy `lvgl/lv_conf_template.h` to
+`lv_conf.h` next to the `lvgl` folder, change the first `#if 0` to `1` to enable
+the file's content, and set <ApiLink name="LV_COLOR_DEPTH" /> to match your
+display panel. Adjust the other options as needed. Every option is documented
+by a comment in the file.
+
+The layout should look like this:
+
+```bash
+lvgl/
+lv_conf.h
+/* other files and folders in your project */
+```
+
+LVGL needs to be able to find `lv_conf.h`. There are a few ways to arrange that:
+
+1. Keep `lv_conf.h` one level **above** the `lvgl` folder (the default). LVGL
+   includes it as `../lv_conf.h`.
+2. Define <ApiLink name="LV_CONF_INCLUDE_SIMPLE" /> (e.g. `-DLV_CONF_INCLUDE_SIMPLE`)
+   and add `lv_conf.h`'s folder to your include path. LVGL then includes it
+   simply as `#include "lv_conf.h"`.
+3. Point <ApiLink name="LV_CONF_PATH" /> at the file, e.g.
+   `-DLV_CONF_PATH="/home/joe/my_project/my_conf.h"`.
+
+You can also remove some settings from `lv_conf.h` and pass them as compiler
+defines instead (e.g. `-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1`); any option not
+set in `lv_conf.h` keeps its default.
+
+To skip `lv_conf.h` entirely and rely only on defines, define
+<ApiLink name="LV_CONF_SKIP" />. Every unset option then takes the default it
+has in `lv_conf_template.h`.
+
+<Callout type="info" title="Upgrading lv_conf.h">
+  A new `lv_conf_template.h` comes with each release. To get the new options,
+  you have two choices: copy the new template over a fresh `lv_conf.h` and add
+  your changes again, or use the `lv_conf.defaults` format (see below). After
+  upgrading, check the compiler output for deprecation `#warning`s.
+</Callout>
+
+### LVGL Defaults
+
+Every release, the `lv_conf_template.h` file changes a little. This can make
+updating your own `lv_conf.h` tedious. To make updates easier, you can keep your
+settings in a small text file instead. We call this format "LVGL Defaults".
+
+A `lv_conf.defaults` file lists one option per line, each with its value:
+
+```txt
+LV_COLOR_DEPTH 32
+LV_USE_OBJ_NAME 1
+...
+```
+
+You only need to list the options you want to change. When you upgrade LVGL,
+run `scripts/generate_lv_conf.py`. It reads your `lv_conf.defaults` file, takes
+the newest `lv_conf_template.h`, applies your values on top of it, and writes a
+fresh `lv_conf.h`. This way your settings are always combined with the latest
+template, so you don't have to merge changes by hand.
+
+## Kconfig
+
+Another way to configure LVGL is with
+[Kconfig](https://docs.kernel.org/kbuild/kconfig-language.html). Kconfig is a
+configuration system first made for the Linux kernel. It is now also used by
+many RTOSes and tools, such as ESP-IDF, Zephyr and NuttX.
+
+A few terms are useful to know:
+
+- **`Kconfig`** — the file that lists all the options you can set. LVGL ships
+  [its own `Kconfig` file](https://github.com/lvgl/lvgl/blob/master/Kconfig).
+- **`.config`** — your full configuration. It holds a value for every option.
+- **`defconfig`** — a short config that stores only the options you changed from
+  their defaults. It is a handy, reusable "preset" (see [Presets](#presets-defconfigs)).
+
+When LVGL is part of a bigger Kconfig-based project. In that case the parent
+project's tools configure LVGL for you by including LVGL's `Kconfig` file.
+For example, under ESP-IDF you run `idf.py menuconfig`. The details depend on
+the project, so they are not covered here.
+
+The rest of this page explains how to configure LVGL on its own, without another tool wrapping it.
+
+### Installing the tools
+
+LVGL uses [`kconfiglib`](https://pypi.org/project/kconfiglib/), a Python port
+of Kconfig that works on every platform.
+
+The easiest way to use it is by installing it in a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate     # Windows: .venv\Scripts\activate
+pip install kconfiglib
+```
+
+Inside the virtual environment you get these commands:
+
+- `menuconfig` — edit the configuration in a console menu.
+- `guiconfig` — same, but graphical (needs `tkinter`).
+- `savedefconfig` — save the current `.config` as a small `defconfig` (only the
+  non-default values).
+- `alldefconfig` — make a `.config` with every default value.
+- `genconfig` — generate a C header (`autoconf.h` style) from the config.
+
+With the tools installed you can now use them in two ways:
+
+#### Option 1: Generate a header file from your `.config`
+
+Here you let Kconfig create a normal `.h` file and tell LVGL to include it. 
+
+1. Create your configuration:
+
+```bash
+   cd <lvgl_repo>
+   menuconfig        # make your changes, then save and exit with Esc/Q
+```
+
+   This writes a `.config` file.
+
+2. Turn it into a header:
+
+```bash
+   genconfig         # writes config.h
+```
+
+3. Tell LVGL to include that header by defining
+   `LV_CONF_KCONFIG_EXTERNAL_INCLUDE` and pointing it at the
+   file:
+
+```bash
+   -DLV_CONF_KCONFIG_EXTERNAL_INCLUDE="/path/to/lvgl-repo/config.h"
+```
+
+#### Option 2: Use LVGL's CMake integration
+
+Here LVGL's CMake reads your `.config` (or a `defconfig`) for you.
+
+To build with a `.config` you made with `menuconfig`:
+
+```bash
+cd <lvgl_repo>
+menuconfig                                  # creates .config
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON
+cmake --build build
+```
+
+To build straight from a `defconfig` preset, also set `LV_BUILD_DEFCONFIG_PATH`:
+
+```bash
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON \
+      -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/sdl2.defconfig
+cmake --build build
+```
+
+## Presets (defconfigs)
+
+A `defconfig` is a small file that records only the options that differ from the
+defaults, a reusable, named starting point. This is the Kconfig-native way to
+express a "preset".
+
+Some ready-made defconfigs live in `configs/defconfigs/`.
+
+Use one of them as a starting point for your project:
+
+```bash
+cd <lvgl_repo>
+defconfig configs/defconfigs/sdl2.defconfig # generates a .config from the sdl2 preset
+menuconfig # update it so it fits your projects needs
+```
+
+Or build diretly from one with `-DLV_BUILD_DEFCONFIG_PATH`:
+
+```bash
+cmake -B build -DLV_BUILD_USE_KCONFIG=ON -DLV_BUILD_DEFCONFIG_PATH=configs/defconfigs/sdl2.defconfig
+cmake --build build
+```
+
+### Empty configuration
+
+`configs/defconfigs/empty.defconfig` strips LVGL to its smallest sensible
+footprint: no widgets, themes, layouts, demos or examples, ASCII text encoding,
+and a single tiny built-in font. Use it as a starting point and re-enable only
+what you need.
+
+<Callout type="info" title="Replaces LV_CONF_MINIMAL">
+  Earlier versions had an `LV_CONF_MINIMAL` switch. It has been removed in favor
+  of this defconfig. See the [migration guide](/migration-v10#minimal-configuration).
+</Callout>
+
+### Creating your own preset
+
+Configure LVGL the way you want, then save it as a defconfig:
+
+```bash
+cd <lvgl_repo>
+menuconfig                                  # make your changes
+savedefconfig                               # writes ./defconfig (non-default values only)
+cp defconfig configs/defconfigs/my_defconfig
+# Build LVGL from it
+cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/my_defconfig
+cmake --build build
+```
+
+## Under the hood
+
+See [Contributing](/contributing/configuration) to learn more about how LVGL's configuration system is defined under the hood.

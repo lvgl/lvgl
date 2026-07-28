@@ -6,13 +6,13 @@
 #if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 /**
- * @title Roller bind value
- * @brief Roller bound to a subject; a button jumps it programmatically.
+ * @title Dropdown bind value
+ * @brief Dropdown bound to a subject; a button jumps it programmatically.
  *
- * The roller's `bind_value` is wired to `subject_index`. A "Wednesday" button uses
- * `subject_set_int_event` to write `3` into the subject on click — the roller
- * picks up the change and animates to that option without any direct call into
- * the roller widget.
+ * The dropdown's `bind_value` is wired to `subject_index`. A "Pick Cherry" button uses
+ * `subject_set_int_event` to write `2` into the subject on click — the dropdown
+ * picks up the change and updates the selection without any direct call into
+ * the dropdown widget.
  */
 void lv_example_dropdown_bind_value(void)
 {
@@ -32,20 +32,19 @@ void lv_example_dropdown_bind_value(void)
     lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_row(screen, 16, 0);
 
-    /* 💡 Scroll the roller, or click the button to snap to a fixed option through the subject. */
+    /* 💡 Open the dropdown to pick an option, or click the button to snap to a fixed one through the subject. */
     lv_obj_t * label_1 = lv_label_create(screen);
     lv_label_bind_text(label_1, &subject_index, "Selected option: %d");
 
-    lv_obj_t * roller = lv_roller_create(screen);
-    lv_obj_set_width(roller, 160);
-    lv_roller_set_visible_row_count(roller, 3);
-    lv_roller_set_options(roller, "Mon\nTue\nWed\nThu\nFri\nSat\nSun", LV_ROLLER_MODE_NORMAL);
-    lv_roller_bind_value(roller, &subject_index);
+    lv_obj_t * dropdown = lv_dropdown_create(screen);
+    lv_obj_set_width(dropdown, 160);
+    lv_dropdown_set_options(dropdown, "Apple\nBanana\nCherry\nDate\nElderberry");
+    lv_dropdown_bind_value(dropdown, &subject_index);
 
     lv_obj_t * button = lv_button_create(screen);
     lv_obj_t * label_2 = lv_label_create(button);
     lv_obj_set_align(label_2, LV_ALIGN_CENTER);
-    lv_label_set_text(label_2, "Jump to Wed");
+    lv_label_set_text(label_2, "Pick Cherry");
 
     lv_obj_add_subject_set_int_event(button, &subject_index, LV_EVENT_CLICKED, 2);
 }

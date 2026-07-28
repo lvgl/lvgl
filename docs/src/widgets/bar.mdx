@@ -1,15 +1,16 @@
 ---
 title: "Bar (lv_bar)"
-description: "The Bar Widget has a background and an indicator. The length of the indicator against the background indicates the Bar's current value."
+description: "Non-interactive progress bar with a background and an indicator whose length shows the current value."
 ---
 
 ## Overview
 
-The Bar Widget has a background and an indicator. The length of the
-indicator against the background indicates the Bar's current value.
+The Bar has a background and an indicator. The length of the indicator
+shows the current value.
 
-Both the start and end values of the Bar can be set. Changing the start value to a
-value other than the minimum value in its range adjusts the start position of the indicator.
+Both the start and end of the indicator can be set. Moving the start away
+from the minimum value lets the indicator begin somewhere in the middle of
+the bar.
 
 ## Orientation and size
 
@@ -93,21 +94,3 @@ To show the value live in a label next to the widget, attach a label and call <A
 
 
 <LvglExample name="lv_example_bar_bind_value" path="widgets/bar/lv_example_bar_bind_value" />
-
-## Events
-
-No special events are sent by Bar Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Bar Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

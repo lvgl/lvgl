@@ -15,12 +15,11 @@
 
 #include "lv_draw_pxp.h"
 
-#if LV_USE_PXP
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 #include "../../lv_draw_image_private.h"
-#include "../../lv_image_decoder_private.h"
+#include "../../../image/lv_image_decoder_private.h"
 
 #include <math.h>
 
@@ -339,4 +338,3 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t d
 }
 
 #endif /*LV_USE_DRAW_PXP*/
-#endif /*LV_USE_PXP*/

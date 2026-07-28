@@ -18,21 +18,22 @@
  */
 void lv_example_style_arc(void)
 {
-    static lv_style_t style_track;
-    static lv_style_t style_progress;
+    static lv_style_t style_bg;
+    static lv_style_t style_indicator;
 
     static bool inited = false;
 
     if(!inited) {
-        lv_style_init(&style_track);
-        lv_style_set_arc_color(&style_track, lv_color_hex(0xe2e8f0));
-        lv_style_set_arc_width(&style_track, 14);
-        lv_style_set_arc_rounded(&style_track, true);
+        lv_style_init(&style_bg);
+        lv_style_set_arc_color(&style_bg, ACCENT);
+        lv_style_set_arc_width(&style_bg, 14);
+        lv_style_set_arc_opa(&style_bg, (255 * 20 / 100));
+        lv_style_set_arc_rounded(&style_bg, true);
 
-        lv_style_init(&style_progress);
-        lv_style_set_arc_color(&style_progress, ACCENT);
-        lv_style_set_arc_width(&style_progress, 14);
-        lv_style_set_arc_rounded(&style_progress, true);
+        lv_style_init(&style_indicator);
+        lv_style_set_arc_color(&style_indicator, ACCENT);
+        lv_style_set_arc_width(&style_indicator, 14);
+        lv_style_set_arc_rounded(&style_indicator, true);
 
         inited = true;
     }
@@ -50,10 +51,7 @@ void lv_example_style_arc(void)
     lv_arc_set_min_value(arc, 0);
     lv_arc_set_max_value(arc, 100);
     lv_arc_set_value(arc, 68);
-    lv_obj_add_style(arc, &style_track, LV_PART_MAIN);
-    lv_obj_add_style(arc, &style_progress, LV_PART_INDICATOR);
-    lv_obj_t * label = lv_label_create(arc);
-    lv_obj_set_align(label, LV_ALIGN_CENTER);
-    lv_label_set_text(label, "68%");
+    lv_obj_add_style(arc, &style_bg, LV_PART_MAIN);
+    lv_obj_add_style(arc, &style_indicator, LV_PART_INDICATOR);
 }
 #endif

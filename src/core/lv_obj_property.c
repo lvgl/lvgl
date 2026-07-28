@@ -193,6 +193,7 @@ lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, lv_part
 
 lv_prop_id_t lv_style_property_get_id(const char * name)
 {
+    LV_CHECK_ARG(name != NULL, return LV_PROPERTY_ID_INVALID);
 #if LV_USE_OBJ_PROPERTY_NAME
     lv_property_name_t * found;
     /*Check style property*/
@@ -207,6 +208,8 @@ lv_prop_id_t lv_style_property_get_id(const char * name)
 
 lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char * name)
 {
+    LV_CHECK_ARG(clz != NULL, return LV_PROPERTY_ID_INVALID);
+    LV_CHECK_ARG(name != NULL, return LV_PROPERTY_ID_INVALID);
 #if LV_USE_OBJ_PROPERTY_NAME
     const lv_property_name_t * names;
     lv_property_name_t * found;
@@ -229,8 +232,9 @@ lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char
 
 lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name)
 {
-#if LV_USE_OBJ_PROPERTY_NAME
     LV_CHECK_ARG(obj != NULL, return LV_PROPERTY_ID_INVALID);
+    LV_CHECK_ARG(name != NULL, return LV_PROPERTY_ID_INVALID);
+#if LV_USE_OBJ_PROPERTY_NAME
 
     const lv_obj_class_t * clz;
     lv_prop_id_t id;

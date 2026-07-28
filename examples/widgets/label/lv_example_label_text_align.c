@@ -28,17 +28,20 @@ void lv_example_label_text_align(void)
     lv_obj_set_width(label_1, 220);
     lv_obj_set_style_text_align(label_1, LV_TEXT_ALIGN_LEFT, 0);
     lv_label_set_text(label_1, "Left aligned\nSecond line");
+    lv_obj_set_style_border_width(label_1, 1, 0);
 
     /* Center-aligned multi-line label */
     lv_obj_t * label_2 = lv_label_create(screen);
     lv_obj_set_width(label_2, 220);
     lv_obj_set_style_text_align(label_2, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(label_2, "Centered\nSecond line");
+    lv_obj_set_style_border_width(label_2, 1, 0);
 
     /* Right-aligned multi-line label */
     lv_obj_t * label_3 = lv_label_create(screen);
     lv_obj_set_width(label_3, 220);
     lv_obj_set_style_text_align(label_3, LV_TEXT_ALIGN_RIGHT, 0);
     lv_label_set_text(label_3, "Right aligned\nSecond line");
+    lv_obj_set_style_border_width(label_3, 1, 0);
 }
 #endif

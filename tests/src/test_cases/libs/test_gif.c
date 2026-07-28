@@ -75,7 +75,7 @@ void test_gif_decode_ignore_invisible(void)
 
     lv_gif_set_auto_pause_invisible(gif, true);
 
-    lv_obj_add_flag(gif, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(gif, true);
 
     lv_gif_set_src(gif, "A:src/test_assets/totoro_transparent.gif");
 
@@ -83,7 +83,7 @@ void test_gif_decode_ignore_invisible(void)
 
     lv_gif_set_auto_pause_invisible(gif, false);
 
-    lv_obj_remove_flag(gif, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(gif, false);
 
     lv_gif_set_src(gif, "A:src/test_assets/totoro_transparent.gif");
 

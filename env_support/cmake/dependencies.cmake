@@ -1,8 +1,10 @@
 include(FetchContent)
 
-set(FETCHCONTENT_BASE_DIR
-    "${CMAKE_SOURCE_DIR}/.deps"
-    CACHE PATH "Directory for fetched dependencies" FORCE)
+if(NOT DEFINED FETCHCONTENT_BASE_DIR)
+  set(FETCHCONTENT_BASE_DIR
+      "${CMAKE_SOURCE_DIR}/.deps"
+      CACHE PATH "Directory for fetched dependencies" FORCE)
+endif()
 
 find_package(PkgConfig)
 
@@ -11,6 +13,10 @@ if(UNIX AND NOT PkgConfig_FOUND)
     WARNING
       "pkg-config not found - system libraries will only be resolved via find_package. "
       "Install `pkg-config` to improve dependency detection.")
+endif()
+
+if(UNIX)
+  lvgl_link_system_lib(TARGETS m PKG_LIB_PRIVATE -lm)
 endif()
 
 # ====== Draw Units ====== #

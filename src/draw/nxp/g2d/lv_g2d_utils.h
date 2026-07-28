@@ -21,7 +21,6 @@ extern "C" {
  *********************/
 #include "../../../lvgl_public.h"
 
-#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include "../../sw/lv_draw_sw_private.h"
 #include <g2d.h>
@@ -72,7 +71,6 @@ void g2d_rotate(lv_draw_buf_t * buf1, lv_draw_buf_t * buf2, int32_t width, int32
  **********************/
 
 #endif /*LV_USE_DRAW_G2D */
-#endif /*LV_USE_G2D*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

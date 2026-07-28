@@ -1,12 +1,12 @@
 ---
 title: "List (lv_list)"
-description: The List Widget is basically a rectangle with vertical layout to which Buttons and Text can be added.
+description: "A vertical container into which buttons and text rows can be added."
 ---
 
 ## Overview
 
-The List Widget is basically a rectangle with vertical layout to which Buttons
-and Text can be added.
+The List is a vertical container. You add full-width buttons and text rows
+to it; the layout takes care of stacking them.
 
 ## Styling
 
@@ -34,24 +34,6 @@ The text is scrolled horizontally if it is longer than the button.
 <ApiLink name="lv_list_add_text" display="lv_list_add_text(list, text)" /> adds a text string.  This function returns a
 pointer to the label created, which you can use to, for example, change its text
 with one of the `lv_label_set_text...()` functions.
-
-## Events
-
-No special events are sent by List Widgets, but events can be sent by Buttons as usual.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by List Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
 
 ## Examples
 

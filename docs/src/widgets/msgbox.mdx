@@ -1,21 +1,19 @@
 ---
 title: "Message Box (lv_msgbox)"
-description: "Message boxes act as pop-ups. They are built from a content area with a helper to add text, an optional header (which can have a title, a close button, and other buttons), and an optional footer wi..."
+description: "Pop-up window with an optional header (title and buttons), a content area, and an optional footer with buttons."
 ---
 
 ## Overview
 
-Message boxes act as pop-ups. They are built from a content area
-with a helper to add text, an optional header (which can have
-a title, a close button, and other buttons), and an optional footer
+A Message Box is a pop-up built from a content area plus an optional
+header (title, close button, and extra buttons) and an optional footer
 with buttons.
 
-The text will be broken into multiple lines, and the height
-will be set automatically. If the height
-is set programmatically, the content will become scrollable.
+Text wraps onto multiple lines and the height adjusts automatically.
+Setting the height by hand makes the content scrollable instead.
 
 The message box can be modal (blocking clicks on the rest of the screen)
-or not modal.
+or non-modal.
 
 ## Styling
 
@@ -77,25 +75,6 @@ lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * msgbox, const char * text);
 <ApiLink name="lv_msgbox_close_async" display="lv_msgbox_close_async(msgbox)" /> closes (deletes) the message box
 asynchronously. This is useful if you want the message box to close the on
 the next call to `lv_timer_handler` instead of immediately.
-
-## Events
-
-No special events are sent by Message Box Widgets.
-See these Widgets' documentation for details:  [Button (lv_button)](/widgets/button) and [Label (lv_label)](/widgets/label).
-
-<Callout type="info" title="Further Reading">
-Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Message Box Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
 
 ## Examples
 

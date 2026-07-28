@@ -19,7 +19,6 @@ void lv_example_bar_img_indicator(void)
 {
     LV_IMAGE_DECLARE(img_bar_bg);
     LV_IMAGE_DECLARE(img_bar_indicator);
-    LV_FONT_DECLARE(font_example_large);
 
     static lv_style_t style_bar_track;
     static lv_style_t style_bar_indicator;
@@ -68,25 +67,22 @@ void lv_example_bar_img_indicator(void)
     lv_obj_set_style_pad_column(container, 12, 0);
     lv_obj_set_style_bg_opa(container, 0, 0);
     lv_obj_set_style_border_width(container, 0, 0);
-    lv_obj_set_size(container, 150, LV_SIZE_CONTENT);
+    lv_obj_set_size(container, 180, LV_SIZE_CONTENT);
     lv_obj_t * button_1 = lv_button_create(container);
     lv_obj_t * label_1 = lv_label_create(button_1);
     lv_obj_set_align(label_1, LV_ALIGN_CENTER);
     lv_label_set_text(label_1, "-");
-    lv_obj_set_style_text_font(label_1, &font_example_large, 0);
 
     lv_obj_add_subject_increment_event(button_1, &subject_value2, LV_EVENT_CLICKED, -1);
     lv_obj_add_subject_increment_event(button_1, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, -1);
 
     lv_obj_t * label_2 = lv_label_create(container);
     lv_label_bind_text(label_2, &subject_value2, NULL);
-    lv_obj_set_style_text_font(label_2, &font_example_large, 0);
 
     lv_obj_t * button_2 = lv_button_create(container);
     lv_obj_t * label_3 = lv_label_create(button_2);
     lv_obj_set_align(label_3, LV_ALIGN_CENTER);
     lv_label_set_text(label_3, "+");
-    lv_obj_set_style_text_font(label_3, &font_example_large, 0);
 
     lv_obj_add_subject_increment_event(button_2, &subject_value2, LV_EVENT_CLICKED, 1);
     lv_obj_add_subject_increment_event(button_2, &subject_value2, LV_EVENT_LONG_PRESSED_REPEAT, 1);

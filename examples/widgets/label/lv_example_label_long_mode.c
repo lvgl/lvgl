@@ -32,7 +32,7 @@ void lv_example_label_long_mode(void)
     lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
+    lv_obj_set_style_pad_row(screen, 12, 0);
 
     /* Wrap mode example */
     lv_obj_t * label_1 = lv_label_create(screen);

@@ -1,0 +1,5 @@
+config LV_USE_DRAW_SDL
+	bool "Draw using cached SDL textures"
+	default n
+	help
+	Uses SDL renderer API

@@ -1,2 +1,5 @@
 preview-build
 .cache.json
+*_gen*
+*.cmake
+*.txt

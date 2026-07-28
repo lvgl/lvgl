@@ -1,0 +1,122 @@
+config LV_USE_SDL
+	bool "Use SDL to open window on PC and handle mouse and keyboard"
+	default n
+	help
+		Use SDL to open window on PC and handle mouse and keyboard.
+
+if LV_USE_SDL
+
+config LV_SDL_INCLUDE_PATH
+	string "SDL include path"
+	default "SDL2/SDL.h"
+
+config LV_SDL_AUTO_BACKEND
+	bool "Auto-select the SDL backend (legacy)"
+	default y
+	help
+	  Legacy behavior, kept for backwards compatibility and slated for removal.
+	  While set, EGL is inferred the legacy way (OpenGLES enabled with an OpenGL
+	  draw unit).  Disable this and pick a backend explicitly via the SDL
+	  "Rendering backend" choice.
+
+choice
+	prompt "Rendering backend"
+	default LV_SDL_BACKEND_SW
+	depends on !LV_SDL_AUTO_BACKEND
+	help
+	  Select how the SDL driver presents rendered frames.
+
+	config LV_SDL_BACKEND_SW
+		bool "Software (SDL surface)"
+		help
+		  Render in software and upload via an SDL surface.
+
+	config LV_SDL_BACKEND_TEXTURE
+		bool "Cached SDL textures"
+		select LV_USE_DRAW_SDL
+		help
+		  Render into cached SDL textures.  Enables the SDL draw unit.
+
+	config LV_SDL_BACKEND_EGL
+		bool "EGL (OpenGL ES, hardware-accelerated)"
+		depends on LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
+		select LV_SDL_USE_EGL
+		help
+		  Present via an EGL/OpenGL ES context
+endchoice
+
+# Derived int → the single macro the codegen emits (LV_SDL_BACKEND).
+config LV_SDL_BACKEND
+	int
+	default 0 if LV_SDL_BACKEND_SW
+	default 1 if LV_SDL_BACKEND_TEXTURE
+	default 2 if LV_SDL_BACKEND_EGL
+
+# Hidden flag read by the C driver and (as CONFIG_*) by CMake.  Selected by the
+# EGL member → DerivedFlag that resolves to `LV_SDL_BACKEND == LV_SDL_BACKEND_EGL`.
+config LV_SDL_USE_EGL
+	bool
+	select LV_USE_EGL
+
+choice
+	prompt "SDL rendering mode"
+	default LV_SDL_RENDER_MODE_DIRECT
+	help
+		LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance
+
+	config LV_SDL_RENDER_MODE_PARTIAL
+		bool "Use the buffer(s) to render the screen is smaller parts"
+
+	config LV_SDL_RENDER_MODE_DIRECT
+		bool "Only the changed areas will be updated with 2 screen sized buffers"
+
+	config LV_SDL_RENDER_MODE_FULL
+		bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
+endchoice
+
+config LV_SDL_BUF_COUNT
+	int "Number of screen-sized buffers (1 or 2)"
+	range 1 2
+	default 1
+
+choice
+	prompt "SDL buffer count [DEPRECATED: use LV_SDL_BUF_COUNT]"
+	optional
+
+	config LV_SDL_SINGLE_BUFFER
+		bool "One screen-sized buffer [DEPRECATED: set LV_SDL_BUF_COUNT to 1]"
+
+	config LV_SDL_DOUBLE_BUFFER
+		bool "Two screen-sized buffers [DEPRECATED: set LV_SDL_BUF_COUNT to 2]"
+endchoice
+
+config LV_SDL_ACCELERATED
+	bool "Use hardware acceleration"
+	default y
+
+config LV_SDL_FULLSCREEN
+	bool "SDL fullscreen"
+	default n
+
+config LV_SDL_DIRECT_EXIT
+	bool "Exit the application when all SDL windows are closed"
+	default y
+
+choice
+	prompt "SDL mousewheel mode"
+	default LV_SDL_MOUSEWHEEL_MODE_ENCODER
+
+	config LV_SDL_MOUSEWHEEL_MODE_ENCODER
+		bool "The mousewheel emulates an encoder input device"
+
+	config LV_SDL_MOUSEWHEEL_MODE_CROWN
+		bool "The mousewheel emulates a smart watch crown"
+endchoice
+
+config LV_SDL_MOUSEWHEEL_MODE
+	int
+	default 0 if LV_SDL_MOUSEWHEEL_MODE_ENCODER
+	default 1 if LV_SDL_MOUSEWHEEL_MODE_CROWN
+
+
+endif #LV_USE_SDL

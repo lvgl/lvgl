@@ -33,7 +33,7 @@ void test_gesture_pinch(void)
     lv_memzero(&counts, sizeof(counts));
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_obj_add_flag(label, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_clickable(label, true);
     lv_obj_set_size(label, 320, 320);
     lv_obj_add_event_cb(label, gesture_event_cb, LV_EVENT_GESTURE, &counts);
 

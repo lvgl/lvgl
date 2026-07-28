@@ -31,6 +31,8 @@ static lv_color32_t image_apply_layer_recolor(const lv_obj_t * obj, lv_part_t pa
 
 static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_base_t * base_dsc);
 
+static void set_ext_draw_size_event_cb(lv_event_t * e);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -45,6 +47,7 @@ static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_b
 
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -169,6 +172,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -212,6 +216,7 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_ds
 
 void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -256,6 +261,7 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_ds
 
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -301,6 +307,7 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_
 
 void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -341,6 +348,7 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
 
 void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
     LV_CHECK_ARG(draw_dsc != NULL, return);
 
     LV_PROFILER_DRAW_BEGIN;
@@ -358,9 +366,18 @@ void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_
     LV_PROFILER_DRAW_END;
 }
 
+void lv_obj_set_ext_draw_size(lv_obj_t * obj, int32_t size)
+{
+    LV_CHECK_OBJ(obj, MY_CLASS, return);
+
+    lv_obj_remove_event_cb(obj, set_ext_draw_size_event_cb);
+    lv_obj_add_event_cb(obj, set_ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, (void *)(lv_uintptr_t)size);
+}
 
 int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 {
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
+
     LV_PROFILER_DRAW_BEGIN;
     int32_t s = 0;
 
@@ -433,7 +450,7 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 
 int32_t lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return 0);
+    LV_CHECK_OBJ(obj, MY_CLASS, return 0);
 
     if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;
@@ -441,7 +458,7 @@ int32_t lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 
 lv_layer_type_t lv_obj_get_layer_type(const lv_obj_t * obj)
 {
-    LV_CHECK_ARG(obj != NULL, return LV_LAYER_TYPE_NONE);
+    LV_CHECK_OBJ(obj, MY_CLASS, return LV_LAYER_TYPE_NONE);
 
     if(obj->spec_attr) return (lv_layer_type_t)obj->spec_attr->layer_type;
     else return LV_LAYER_TYPE_NONE;
@@ -524,4 +541,10 @@ static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_b
 
         base_dsc->drop_shadow_quality = lv_obj_get_style_drop_shadow_quality(obj, part);
     }
+}
+
+static void set_ext_draw_size_event_cb(lv_event_t * e)
+{
+    int32_t size = (int32_t)(lv_uintptr_t)lv_event_get_user_data(e);
+    lv_event_set_ext_draw_size(e, size);
 }

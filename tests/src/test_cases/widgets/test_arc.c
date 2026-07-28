@@ -165,7 +165,7 @@ void test_arc_click_area_with_adv_hittest(void)
     arc = lv_arc_create(lv_screen_active());
     lv_obj_set_size(arc, 100, 100);
     lv_obj_set_style_arc_width(arc, 10, 0);
-    lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_set_adv_hittest(arc, true);
     lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
     lv_obj_set_ext_click_area(arc, 5);
 
@@ -249,8 +249,8 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
     lv_obj_set_size(arc2, 100, 100);
     lv_arc_set_bg_angles(arc, 20, 160);
     lv_arc_set_bg_angles(arc2, 200, 340);
-    lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_add_flag(arc2, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_set_adv_hittest(arc, true);
+    lv_obj_set_adv_hittest(arc2, true);
     lv_arc_set_value(arc, 10);
     lv_arc_set_value(arc2, 10);
     lv_arc_set_rotation(arc, 355);

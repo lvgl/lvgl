@@ -191,4 +191,74 @@ void test_draw_letter_outline(void)
     test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'g', 1800, "draw/letter_outline_g_rotated_180.png");
 }
 
+static const void * test_imgfont_path_cb(const lv_font_t * font, uint32_t unicode, uint32_t unicode_next,
+                                         int32_t * offset_y, void * user_data)
+{
+    LV_UNUSED(font);
+    LV_UNUSED(unicode_next);
+    if(offset_y) *offset_y = 0;
+    if(unicode == 'X') return user_data;
+    return NULL;
+}
+
+void test_draw_letter_image_format_pivot(void)
+{
+    /*
+     * Regression test: vg_lite IMAGE format path was missing pivot in
+     * lv_draw_image_dsc_t, causing image glyphs to rotate around (0,0).
+     * Use screenshot comparison to detect pivot regression.
+     */
+    /* Create a properly aligned 20x20 red draw buf */
+    lv_draw_buf_t * dbuf = lv_draw_buf_create(20, 20, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(dbuf);
+    lv_draw_buf_clear(dbuf, NULL);
+    uint32_t stride = dbuf->header.stride;
+    for(int y = 0; y < 20; y++) {
+        uint8_t * row = dbuf->data + y * stride;
+        for(int x = 0; x < 20; x++) {
+            row[x * 4 + 0] = 0x00; /* B */
+            row[x * 4 + 1] = 0x00; /* G */
+            row[x * 4 + 2] = 0xFF; /* R */
+            row[x * 4 + 3] = 0xFF; /* A */
+        }
+    }
+
+    lv_font_t * imgfont = lv_imgfont_create(20, test_imgfont_path_cb, dbuf);
+    TEST_ASSERT_NOT_NULL(imgfont);
+
+    lv_obj_t * canvas = canvas_create(500, 360);
+    /* Fill canvas white so anti-aliasing edges blend cleanly */
+    lv_draw_buf_t * canvas_buf = lv_canvas_get_draw_buf(canvas);
+    lv_memset(canvas_buf->data, 0xFF, canvas_buf->header.stride * canvas_buf->header.h);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    lv_draw_letter_dsc_t dsc;
+    lv_draw_letter_dsc_init(&dsc);
+    dsc.font = imgfont;
+    dsc.color = lv_color_hex(0xFFFFFF);
+    dsc.unicode = 'X';
+
+    /* Draw at multiple rotations to make pivot error clearly visible */
+    const int32_t cx = 250, cy = 180, r = 60;
+    for(int i = 0; i < 8; i++) {
+        int32_t angle_deg = i * 45;
+        int32_t x = cx + (lv_trigo_cos(angle_deg) * r / 32767);
+        int32_t y = cy + (lv_trigo_sin(angle_deg) * r / 32767);
+        dsc.rotation = (angle_deg + 90) * 10;
+        lv_draw_letter(&layer, &dsc, &(lv_point_t) {
+            .x = x, .y = y
+        });
+    }
+
+    lv_canvas_finish_layer(canvas, &layer);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("draw/letter_image_pivot.png");
+
+    lv_draw_buf_destroy(dbuf);
+    lv_imgfont_destroy(imgfont);
+}
+
+
 #endif

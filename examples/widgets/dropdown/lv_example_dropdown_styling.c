@@ -57,5 +57,7 @@ void lv_example_dropdown_styling(void)
     lv_dropdown_set_options(dropdown, "Apple\nBanana\nCherry\nDate");
     lv_obj_add_style(dropdown, &style_dropdown_main, LV_PART_MAIN);
     lv_obj_add_style(dropdown, &style_dropdown_focused, LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_obj_t * lv_dropdown_list_0 = lv_dropdown_get_list(dropdown);
+    lv_obj_set_style_bg_color(lv_dropdown_list_0, lv_color_hex(0x6366f1), LV_PART_SELECTED | LV_STATE_CHECKED);
 }
 #endif

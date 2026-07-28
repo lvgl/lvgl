@@ -20,13 +20,13 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build builder image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: env_support/debian/Dockerfile
@@ -40,7 +40,8 @@ jobs:
         run: |
           # Debian folder needs to sit directly in the top directory
           mv env_support/debian .
-          rm -rf .devcontainer .git .github demos docs examples tests zephyr
+          rm -rf .devcontainer .git .github demos/* docs examples/* tests zephyr
+          touch {demos,examples}/Kconfig
 
       - name: Build packages (offline)
         run: |
@@ -51,7 +52,7 @@ jobs:
               bash -c "dpkg-buildpackage -b -d -uc -us && mkdir debian-result-packages && mv ../*.deb debian-result-packages"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lvgl-deb-packages-${{ github.sha }}
           path: debian-result-packages/*

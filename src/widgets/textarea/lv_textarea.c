@@ -58,7 +58,7 @@ static void draw_cursor(lv_event_t * e);
 static void auto_hide_characters(lv_obj_t * obj);
 static void auto_hide_characters_cancel(lv_obj_t * obj);
 static inline bool is_valid_but_non_printable_char(const uint32_t letter);
-static void lv_textarea_scroll_to_cusor_pos(lv_obj_t * obj, int32_t pos);
+static void lv_textarea_scroll_to_cursor_pos(lv_obj_t * obj, int32_t pos);
 static lv_result_t add_char(lv_obj_t * obj, uint32_t c);
 static void add_text(lv_obj_t * obj, const char * txt);
 static void set_cursor_pos_internal(lv_obj_t * obj, int32_t pos);
@@ -371,7 +371,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
     /*Position the label to make the cursor visible*/
     lv_obj_update_layout(obj);
 
-    lv_textarea_scroll_to_cusor_pos(obj, pos);
+    lv_textarea_scroll_to_cursor_pos(obj, pos);
 }
 
 void lv_textarea_set_cursor_click_pos(lv_obj_t * obj, bool en)
@@ -542,7 +542,7 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time)
 
 void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
-    LV_LOG_WARN("Deprecated: use the normal text_align style property instead");
+    LV_LOG_DEPRECATED("Use text_align style property instead");
     lv_obj_set_style_text_align(obj, align, 0);
 
     switch(align) {
@@ -848,8 +848,8 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_label_set_text(ta->label, "");
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_STYLE_CHANGED, NULL);
     lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_SIZE_CHANGED, NULL);
-    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+    lv_obj_set_scroll_on_focus(obj, true);
+    lv_obj_set_scroll_with_arrow(obj, false);
 
     lv_textarea_set_cursor_pos(obj, 0);
 
@@ -930,7 +930,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_SIZE_CHANGED || code == LV_EVENT_STYLE_CHANGED) {
         lv_textarea_t * ta = (lv_textarea_t *)obj;
-        lv_textarea_scroll_to_cusor_pos(obj, ta->cursor.pos);
+        lv_textarea_scroll_to_cursor_pos(obj, ta->cursor.pos);
     }
 }
 
@@ -1211,7 +1211,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
             ta->sel_start    = char_id_at_click;
             ta->sel_end      = LV_LABEL_TEXT_SELECTION_OFF;
             ta->text_sel_in_prog = 1;
-            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+            lv_obj_set_scroll_chain(obj, false);
         }
         else if(ta->text_sel_in_prog && code == LV_EVENT_PRESSING) {
             /*Input device may be moving. Store the end position*/
@@ -1219,7 +1219,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
         }
         else if(ta->text_sel_in_prog && (code == LV_EVENT_PRESS_LOST || code == LV_EVENT_RELEASED)) {
             /*Input device is released. Check if anything was selected.*/
-            lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+            lv_obj_set_scroll_chain(obj, true);
         }
     }
 
@@ -1406,7 +1406,7 @@ static inline bool is_valid_but_non_printable_char(const uint32_t letter)
     return false;
 }
 
-static void lv_textarea_scroll_to_cusor_pos(lv_obj_t * obj, int32_t pos)
+static void lv_textarea_scroll_to_cursor_pos(lv_obj_t * obj, int32_t pos)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
@@ -1482,7 +1482,7 @@ static void add_text(lv_obj_t * obj, const char * txt)
     }
 
     lv_obj_update_layout(obj);
-    lv_textarea_scroll_to_cusor_pos(obj, ta->cursor.pos);
+    lv_textarea_scroll_to_cursor_pos(obj, ta->cursor.pos);
     refr_cursor_area(obj);
     /*Move the cursor after the new character*/
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);

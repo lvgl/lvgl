@@ -42,7 +42,7 @@ void lv_example_image_recolor(void)
     /* 💡 Drag the slider; the logo's tint fades in and out as `subject_opa` (0..255) moves. */
     lv_obj_t * image = lv_image_create(screen);
     lv_image_set_src(image, &img_example_lvgl_logo);
-    lv_obj_set_style_image_recolor(image, lv_color_hex(0xef4444), LV_PART_MAIN);
+    lv_obj_set_style_image_recolor(image, lv_color_hex(0x6366f1), LV_PART_MAIN);
     lv_obj_bind_style_prop(image, LV_STYLE_IMAGE_RECOLOR_OPA, LV_PART_MAIN, &subject_opa);
 
     lv_obj_t * slider = lv_slider_create(screen);

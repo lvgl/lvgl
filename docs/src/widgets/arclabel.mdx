@@ -1,15 +1,19 @@
 ---
 title: "Arc Label (lv_arclabel)"
-description: "The Arc Label is a specialized widget designed to display text along an arc. It allows for flexible text placement and styling, making it suitable for applications where text needs to follow a curv..."
+description: "Display text along an arc — useful for gauges, dials, and other curved layouts."
 ---
 
 ## Overview
 
-The Arc Label is a specialized widget designed to display text along an arc. It allows for flexible text placement and styling, making it suitable for applications where text needs to follow a curved path, such as in gauges, dials, or custom interfaces. The widget supports various configurations, including text alignment, direction, radius adjustment, and color customization.
+The Arc Label displays text along an arc. Useful for gauges, dials, and any
+layout where the text needs to follow a curved path. You can set the text,
+direction, radius, alignment, and color.
 
 ## Styling
 
-- <ApiLink name="LV_PART_MAIN" /> Represents the main part of the Arc Label, including the arc path and the text rendered along it. The appearance of the text and the arc can be customized using typical text and background style properties.
+- <ApiLink name="LV_PART_MAIN" /> covers both the arc path and the text drawn
+  along it. Use the typical text and background style properties to change
+  the look.
 
 ## Text Management
 
@@ -53,15 +57,17 @@ Enable text recoloring with <ApiLink name="lv_arclabel_set_recolor" display="lv_
 
 ## Interactive Behavior
 
-By default, Arc Label is not clickable. To make it interactive, you would need to add custom event handling, as it does not inherit clickability by default.
+Arc Label is not clickable by default. Add the
+<ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag if you want it to receive
+input events.
 
 ## Events
 
-The Arc Label primarily inherits events from the base object class. It does not define specific events beyond those common to all widgets. You can attach custom event handlers to respond to interactions if needed.
+No special events. The widget inherits the events common to all widgets.
 
 ## Keys
 
-The Arc Label does not define specific key bindings beyond those inherited from the base object class. Keyboard navigation and interaction would require additional implementation.
+No special keys. Add the widget to a group if you need keypad input.
 
 ## Example
 

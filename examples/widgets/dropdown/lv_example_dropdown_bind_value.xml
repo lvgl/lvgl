@@ -1,21 +1,21 @@
 <!--
- @title Roller bind value
- @brief Roller bound to a subject; a button jumps it programmatically.
+ @title Dropdown bind value
+ @brief Dropdown bound to a subject; a button jumps it programmatically.
 
- The roller's `bind_value` is wired to `subject_index`. A "Wednesday" button uses
- `subject_set_int_event` to write `3` into the subject on click — the roller
- picks up the change and animates to that option without any direct call into
- the roller widget.
+ The dropdown's `bind_value` is wired to `subject_index`. A "Pick Cherry" button uses
+ `subject_set_int_event` to write `2` into the subject on click — the dropdown
+ picks up the change and updates the selection without any direct call into
+ the dropdown widget.
 -->
 <screen>
 	<view flex_flow="column" style_flex_main_place="center" style_flex_cross_place="center" style_flex_track_place="center" style_pad_row="16">
-		<!-- 💡 Scroll the roller, or click the button to snap to a fixed option through the subject. -->
+		<!-- 💡 Open the dropdown to pick an option, or click the button to snap to a fixed one through the subject. -->
 		<lv_label name="label_1" bind_text="subject_index" bind_text-fmt="Selected option: %d"/>
 
-		<lv_roller name="roller" width="160" visible_row_count="3" options="Mon&#10;Tue&#10;Wed&#10;Thu&#10;Fri&#10;Sat&#10;Sun" bind_value="subject_index" />
+		<lv_dropdown name="dropdown" width="160" options="Apple&#10;Banana&#10;Cherry&#10;Date&#10;Elderberry" bind_value="subject_index" />
 
 		<lv_button name="button">
-			<lv_label name="label_2" align="center" text="Jump to Wed" />
+			<lv_label name="label_2" align="center" text="Pick Cherry" />
 			<subject_set_int_event subject="subject_index" value="2" />
 		</lv_button>
 	</view>

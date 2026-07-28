@@ -5,8 +5,6 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES
 
-#define ACCENT lv_color_hex(0x9429ff)
-
 /**
  * @title Scrollbar mode
  * @brief Compare an always-hidden scrollbar with an always-visible one.
@@ -19,21 +17,6 @@
  */
 void lv_example_scroll_scrollbar_mode(void)
 {
-    static lv_style_t style_scrollbar;
-
-    static bool inited = false;
-
-    if(!inited) {
-        lv_style_init(&style_scrollbar);
-        lv_style_set_width(&style_scrollbar, 10);
-        lv_style_set_radius(&style_scrollbar, 5);
-        lv_style_set_bg_color(&style_scrollbar, ACCENT);
-        lv_style_set_bg_opa(&style_scrollbar, (255 * 100 / 100));
-        lv_style_set_pad_right(&style_scrollbar, 4);
-
-        inited = true;
-    }
-
     lv_obj_t * screen = lv_screen_active();
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
@@ -86,7 +69,8 @@ void lv_example_scroll_scrollbar_mode(void)
     lv_obj_set_flex_flow(container_3, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(container_3, 8, 0);
     lv_obj_set_scrollbar_mode(container_3, LV_SCROLLBAR_MODE_ON);
-    lv_obj_add_style(container_3, &style_scrollbar, LV_PART_SCROLLBAR);
+    lv_obj_set_style_bg_color(container_3, lv_color_hex(0x9429ff), LV_PART_SCROLLBAR);
+    lv_obj_set_style_bg_opa(container_3, (255 * 100 / 100), LV_PART_SCROLLBAR);
     lv_obj_t * label_6 = lv_label_create(container_3);
     lv_label_set_text(label_6, "mode: on");
 
