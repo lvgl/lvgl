@@ -62,8 +62,12 @@ The user include can provide `LGFX` in three ways:
   `lv_lovyan_gfx.cpp`.
 
 The shipped `lv_lgfx_user.hpp` contains a short example for each path. Copy it
-into your project or use it as the value of `LV_LGFX_USER_INCLUDE`, then enable
-exactly one of its options.
+into your project or use it as the value of `LV_LGFX_USER_INCLUDE`, then select
+the path with `LV_LGFX_TYPE`:
+
+```c
+#define LV_LGFX_TYPE LV_LGFX_USE_LOVYAN_BOARD
+```
 
 ## The `LGFX` Class
 
@@ -85,6 +89,7 @@ Internally, LVGL calls these `LGFX` methods:
 - `init()`
 - `initDMA()`
 - `setRotation()`
+- `getRotation()`
 - `setBrightness()`
 - `startWrite()`
 - `fillScreen()`

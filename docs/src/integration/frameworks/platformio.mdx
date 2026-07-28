@@ -137,6 +137,12 @@ In your `main.cpp`, initialize LVGL and the display driver:
 #include <Arduino.h>
 #include <lvgl.h>
 
+#define HOR_RES 320
+#define VER_RES 480
+#define BUF_SIZE (HOR_RES * 40 * 2)
+
+static uint8_t lv_buffer[BUF_SIZE];
+
 /* Tick source, tell LVGL how much time (milliseconds) has passed */
 static uint32_t my_tick(void)
 {
@@ -149,7 +155,8 @@ void setup() {
     lv_init();
     /* Set the tick callback */
     lv_tick_set_cb(my_tick);
-    /* Initialize and register your display driver before creating widgets */
+    /* Initialize and register the LovyanGFX display driver */
+    lv_lovyan_gfx_create(HOR_RES, VER_RES, lv_buffer, sizeof(lv_buffer), true);
 
     lv_obj_t *label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Hello PlatformIO, I'm LVGL!");
@@ -158,7 +165,7 @@ void setup() {
 }
 
 void loop() {
-    lv_timer_handler(); // Update the UI-
+    lv_timer_handler(); // Update the UI
     delay(5);
 }
 ```

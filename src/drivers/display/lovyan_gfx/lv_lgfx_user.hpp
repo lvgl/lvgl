@@ -20,14 +20,18 @@
  *    Implement an LGFX-compatible wrapper class with the methods used by
  *    lv_lovyan_gfx.cpp.
  *
- * Keep exactly one option enabled below.
+ * Select one option below.
  */
 
 #define LV_LGFX_USE_LOVYAN_BOARD 1
-#define LV_LGFX_USE_LOVYAN_DEVICE 0
-#define LV_LGFX_USE_CUSTOM_WRAPPER 0
+#define LV_LGFX_USE_LOVYAN_DEVICE 2
+#define LV_LGFX_USE_CUSTOM_WRAPPER 3
 
-#if LV_LGFX_USE_LOVYAN_BOARD
+#ifndef LV_LGFX_TYPE
+#define LV_LGFX_TYPE LV_LGFX_USE_LOVYAN_BOARD
+#endif
+
+#if LV_LGFX_TYPE == LV_LGFX_USE_LOVYAN_BOARD
 /* Define the matching LovyanGFX board macro before including LGFX_AUTODETECT.hpp
  * Examples: LGFX_M5STACK, LGFX_M5STACK_CORE2, LGFX_AUTODETECT.
  * See https://github.com/lovyan03/LovyanGFX#%E4%BD%BF%E3%81%84%E6%96%B9-how-to-use
@@ -40,7 +44,7 @@
 #include <LovyanGFX.hpp>
 #include <LGFX_AUTODETECT.hpp>
 
-#elif LV_LGFX_USE_LOVYAN_DEVICE
+#elif LV_LGFX_TYPE == LV_LGFX_USE_LOVYAN_DEVICE
 /**
  * LovyanGFX supports many display and touch drivers. If your hardware is supported, 
  * you can derive LGFX from lgfx::LGFX_Device and configure the panel in the constructor.
@@ -139,7 +143,7 @@ public:
     }
 };
 
-#elif LV_LGFX_USE_CUSTOM_WRAPPER
+#elif LV_LGFX_TYPE == LV_LGFX_USE_CUSTOM_WRAPPER
 /**
  * If your display is not supported by LovyanGFX, you can implement a wrapper class
  * with the methods used by lv_lovyan_gfx.cpp. The class must be default-constructible
@@ -239,7 +243,7 @@ public:
 };
 
 #else
-#error "Select one LV_LGFX_USE_* option in lv_lgfx_user.hpp"
+#error "Select a valid LV_LGFX_TYPE in lv_lgfx_user.hpp"
 #endif
 
 #endif /* LV_USE_LOVYAN_GFX */
