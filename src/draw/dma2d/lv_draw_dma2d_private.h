@@ -26,7 +26,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#if LV_USE_DRAW_DMA2D_INTERRUPT && LV_USE_OS && LV_IRQ_HAS_DMA2D
+#if LV_USE_OS && LV_IRQ_HAS_DMA2D
 #define LV_DRAW_DMA2D_ASYNC 1
 #else
 #define LV_DRAW_DMA2D_ASYNC 0

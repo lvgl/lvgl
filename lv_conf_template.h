@@ -566,16 +566,6 @@
 /** the header file for LVGL to include for DMA2D */
 #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
-#if LV_USE_OS != LV_OS_NONE
-/** Run DMA2D asynchronously: the transfer-complete interrupt wakes the
- *  draw unit instead of busy-polling. Requires an OS (for the completion
- *  sync object) and an IRQ backend that provides DMA2D (LV_USE_IRQ). The
- *  interrupt is wired by the selected IRQ backend (src/irqal); no manual
- *  vector/handler wiring is needed.
- */
-#define LV_USE_DRAW_DMA2D_INTERRUPT 0
-
-#endif /*LV_USE_OS != LV_OS_NONE*/
 #endif /*LV_USE_DRAW_DMA2D*/
 
 /** Use EVE FT81X GPU. */

@@ -1107,14 +1107,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_DRAW_DMA2D_INTERRUPT
-    #ifdef CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
-        #define LV_USE_DRAW_DMA2D_INTERRUPT CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
-    #else
-        #define LV_USE_DRAW_DMA2D_INTERRUPT 0
-    #endif
-#endif
-
 #ifndef LV_USE_DRAW_EVE
     #ifdef CONFIG_LV_USE_DRAW_EVE
         #define LV_USE_DRAW_EVE CONFIG_LV_USE_DRAW_EVE
@@ -5181,10 +5173,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_PPA_IMG && !(LV_USE_PPA)
     #error "LV_USE_PPA_IMG requires LV_USE_PPA (Kconfig depends on)"
-#endif
-
-#if LV_USE_DRAW_DMA2D_INTERRUPT && !(!(LV_USE_OS == LV_OS_NONE) && LV_USE_DRAW_DMA2D)
-    #error "LV_USE_DRAW_DMA2D_INTERRUPT requires !(LV_USE_OS == LV_OS_NONE) && LV_USE_DRAW_DMA2D (Kconfig depends on)"
 #endif
 
 #if (LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && !LV_USE_DRAW_G2D

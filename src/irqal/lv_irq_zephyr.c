@@ -56,7 +56,7 @@ static void dma2d_trampoline(void * arg)
 {
     lv_irq_cb_t cb = dma2d_cb;
     LV_UNUSED(arg);
-    if(cb) cb();
+    if(cb) cb(NULL);
 }
 
 #endif /*LV_IRQ_HAS_DMA2D*/
@@ -69,7 +69,7 @@ static void pxp_trampoline(void * arg)
 {
     lv_irq_cb_t cb = pxp_cb;
     LV_UNUSED(arg);
-    if(cb) cb();
+    if(cb) cb(NULL);
 }
 
 #endif /*LV_IRQ_HAS_PXP*/

@@ -83,7 +83,7 @@ void DMA2D_IRQHandler(void);
 void DMA2D_IRQHandler(void)
 {
     lv_irq_cb_t cb = dma2d_cb;
-    if(cb) cb();
+    if(cb) cb(NULL);
 }
 
 #endif /*LV_IRQ_HAS_DMA2D*/
@@ -111,7 +111,7 @@ void PXP_IRQHandler(void);
 void PXP_IRQHandler(void)
 {
     lv_irq_cb_t cb = pxp_cb;
-    if(cb) cb();
+    if(cb) cb(NULL);
 }
 
 #endif /*LV_IRQ_HAS_PXP*/
