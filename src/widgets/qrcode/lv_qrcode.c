@@ -163,13 +163,9 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj)
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
-    /*The bitmap is already up to date: keep two consecutive calls no more
-     *expensive than one. Report validity from whether any data is stored.*/
-    if(!qrcode->needs_update) {
-        return qrcode->data != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
-    }
-
-    return lv_qrcode_force_update(obj);
+    /*The bitmap is already up to date: keep two consecutive calls no more expensive
+     *than one. The outcome of the last generation is remembered, so skipping the work
+     *never turns a failure into a claim of success.*/
     if(!qrcode->needs_update) return qrcode->render_failed ? LV_RESULT_INVALID : LV_RESULT_OK;
 
     lv_result_t res = qrcode_render(obj);   /*clears needs_update, updates render_failed*/
