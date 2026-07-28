@@ -593,14 +593,6 @@
 /** Header that declares the DMA2D HAL API of the target STM32 family. */
 #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
 
-#if LV_USE_OS != LV_OS_NONE
-/** Run DMA2D transfers asynchronously instead of waiting for them. Needs an OS
- *  and an IRQ backend (LV_USE_IRQ) that provides DMA2D; the backend wires the
- *  transfer-complete interrupt, so no handler has to be called by hand.
- */
-#define LV_USE_DRAW_DMA2D_INTERRUPT 0
-
-#endif /*LV_USE_OS != LV_OS_NONE*/
 #endif /*LV_USE_DRAW_DMA2D*/
 
 /** Accelerate blends, fills, images and text with the EPIC (Enhanced

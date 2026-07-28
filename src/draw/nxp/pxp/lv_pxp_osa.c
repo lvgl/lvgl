@@ -60,7 +60,7 @@ static void _pxp_wait(void);
 /**
  * PXP completion callback, invoked by the IRQ abstraction layer (src/irqal).
  */
-static void _pxp_irq_cb(void);
+static void _pxp_irq_cb(void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -97,8 +97,10 @@ pxp_cfg_t * pxp_get_default_cfg(void)
 
 /* Called by the IRQ abstraction layer (src/irqal) when the PXP interrupt fires,
  * regardless of the underlying environment (Zephyr, CMSIS, ...). */
-static void _pxp_irq_cb(void)
+static void _pxp_irq_cb(void * user_data)
 {
+    LV_UNUSED(user_data); /* PXP completion carries no payload */
+
     if(kPXP_CompleteFlag & PXP_GetStatusFlags(PXP_ID)) {
         PXP_ClearStatusFlags(PXP_ID, kPXP_CompleteFlag);
 #if LV_USE_OS

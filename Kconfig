@@ -1042,15 +1042,6 @@ config LV_DRAW_DMA2D_HAL_INCLUDE
 	help
 		Header that declares the DMA2D HAL API of the target STM32 family.
 
-config LV_USE_DRAW_DMA2D_INTERRUPT
-	bool "Transfer complete interrupt"
-	default n
-	depends on !LV_OS_NONE
-	help
-		Run DMA2D transfers asynchronously instead of waiting for them. Needs an OS
-		and an IRQ backend (LV_USE_IRQ) that provides DMA2D; the backend wires the
-		transfer-complete interrupt, so no handler has to be called by hand.
-
 endif
 endmenu
 
