@@ -531,7 +531,12 @@
       "fields": {
         "dark_color": "color",
         "light_color": "color",
-        "quiet_zone": "int"
+        "data": "pointer",
+        "data_len": "enum:12",
+        "quiet_zone": "bool",
+        "auto_update": "bool",
+        "needs_update": "bool",
+        "render_failed": "bool"
       }
     }
   },
