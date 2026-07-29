@@ -55,7 +55,7 @@ else()
 
   set(IDF_COMPONENTS esp_timer log)
 
-  if(${target} STREQUAL "esp32p4")
+  if(${target} STREQUAL "esp32p4" OR ${target} STREQUAL "esp32s31")
     list(APPEND IDF_COMPONENTS esp_driver_ppa esp_mm)
   endif()
 
