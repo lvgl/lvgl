@@ -28,6 +28,20 @@ The size of cache can be changed at run-time with
 <ApiLink name="lv_cache_set_max_size" display="lv_cache_set_max_size(size_t size)" />,
 and retrieved with <ApiLink name="lv_cache_get_max_size" />.
 
+## Cache Metrics
+
+The decoded image cache exposes three byte metrics for the current LVGL global context:
+
+- <ApiLink name="lv_image_cache_get_max_size" />: configured cache quota in bytes.
+- <ApiLink name="lv_image_cache_get_size" />: cache-accounted decoded payload bytes for
+  currently indexed entries, not resident memory.
+- <ApiLink name="lv_image_cache_get_free_size" />: `max(max_size - size, 0)` in bytes.
+
+The metrics do not report system heap usage, cache metadata, or GPU cache usage. They are
+valid only after `lv_init()` and before `lv_deinit()`. The three calls are not atomic
+snapshots; follow LVGL's thread rules and use `lv_lock()`/`lv_unlock()` when calling them
+across threads.
+
 ## Value of Images
 
 When you use more images than available cache size, LVGL can't cache all the

@@ -137,6 +137,7 @@
 #include "image/lv_libpng.h"
 #include "image/lv_libwebp.h"
 #include "image/lv_lodepng.h"
+#include "image/lv_image_cache.h"
 #include "image/lv_image_decoder.h"
 #include "image/lv_svg.h"
 #include "image/lv_tjpgd.h"

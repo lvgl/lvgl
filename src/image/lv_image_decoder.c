@@ -10,7 +10,7 @@
 #include "lv_image_decoder_private.h"
 #include "../core/lv_global.h"
 #include "../misc/cache/lv_cache.h"
-#include "../misc/cache/instance/lv_image_cache.h"
+#include "../misc/cache/instance/lv_image_cache_private.h"
 #include "../misc/cache/instance/lv_image_header_cache.h"
 #include "../misc/cache/lv_cache_entry.h"
 

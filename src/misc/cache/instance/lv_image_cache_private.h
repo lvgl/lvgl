@@ -1,10 +1,10 @@
 /**
-* @file lv_image_cache.h
+ * @file lv_image_cache_private.h
 *
  */
 
-#ifndef LV_IMAGE_CACHE_H
-#define LV_IMAGE_CACHE_H
+#ifndef LV_IMAGE_CACHE_PRIVATE_H
+#define LV_IMAGE_CACHE_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,4 +80,4 @@ void lv_image_cache_dump(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_IMAGE_CACHE_H*/
+#endif /*LV_IMAGE_CACHE_PRIVATE_H*/

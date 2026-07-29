@@ -11,7 +11,7 @@
 #include "../../../core/lv_global.h"
 #include "../../../misc/lv_iter_private.h"
 
-#include "lv_image_cache.h"
+#include "lv_image_cache_private.h"
 #include "lv_image_header_cache.h"
 #include "../lv_cache_entry.h"
 
@@ -102,6 +102,24 @@ void lv_image_cache_drop(const void * src)
 bool lv_image_cache_is_enabled(void)
 {
     return lv_cache_is_enabled(img_cache_p);
+}
+
+size_t lv_image_cache_get_max_size(void)
+{
+    return lv_cache_get_max_size(img_cache_p, NULL);
+}
+
+size_t lv_image_cache_get_size(void)
+{
+    return lv_cache_get_size(img_cache_p, NULL);
+}
+
+size_t lv_image_cache_get_free_size(void)
+{
+    size_t max_size = lv_cache_get_max_size(img_cache_p, NULL);
+    size_t size = lv_cache_get_size(img_cache_p, NULL);
+
+    return max_size > size ? max_size - size : 0;
 }
 
 lv_iter_t * lv_image_cache_iter_create(void)

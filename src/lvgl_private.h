@@ -149,7 +149,7 @@
 #include "misc/cache/class/lv_cache_lru_rb.h"
 #include "misc/cache/class/lv_cache_sc_da.h"
 #include "misc/cache/instance/lv_cache_instance.h"
-#include "misc/cache/instance/lv_image_cache.h"
+#include "misc/cache/instance/lv_image_cache_private.h"
 #include "misc/cache/instance/lv_image_header_cache.h"
 #include "misc/cache/lv_cache.h"
 #include "misc/cache/lv_cache_entry.h"

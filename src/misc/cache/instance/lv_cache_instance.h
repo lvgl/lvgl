@@ -11,6 +11,6 @@
  *********************/
 
 #include "lv_image_header_cache.h"
-#include "lv_image_cache.h"
+#include "lv_image_cache_private.h"
 
 #endif //LV_CACHE_INSTANCE_H

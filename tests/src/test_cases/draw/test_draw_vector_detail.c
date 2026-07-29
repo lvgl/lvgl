@@ -1,6 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "src/misc/cache/instance/lv_image_cache.h"
+#include "src/misc/cache/instance/lv_image_cache_private.h"
 #include "unity/unity.h"
 
 static lv_layer_t layer;
