@@ -280,6 +280,7 @@ section of the documentation.
 
 Hundreds of people have already left their fingerprint on LVGL. Be one of them! See you here! 🙂
 
+
 ## License
 
 The LVGL library is distributed under the **MIT license**, so you can use it freely in both
