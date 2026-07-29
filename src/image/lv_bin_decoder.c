@@ -397,33 +397,24 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area)
 {
-    LV_UNUSED(decoder); /*Unused*/
-
+    LV_UNUSED(decoder);
     lv_color_format_t cf = dsc->header.cf;
-    /*Check if cf is supported*/
-
-    bool supported = LV_COLOR_FORMAT_IS_INDEXED(cf)
-                     || cf == LV_COLOR_FORMAT_ARGB8888  \
-                     || cf == LV_COLOR_FORMAT_XRGB8888  \
-                     || cf == LV_COLOR_FORMAT_RGB888    \
-                     || cf == LV_COLOR_FORMAT_RGB565    \
-                     || cf == LV_COLOR_FORMAT_RGB565_SWAPPED    \
-                     || cf == LV_COLOR_FORMAT_ARGB8565  \
-                     || cf == LV_COLOR_FORMAT_RGB565A8;
-    if(!supported) {
-        LV_LOG_WARN("CF: %d is not supported", cf);
-        return LV_RESULT_INVALID;
-    }
+    LV_CHECK_ARG(
+        LV_COLOR_FORMAT_IS_INDEXED(cf)
+        || cf == LV_COLOR_FORMAT_ARGB8888
+        || cf == LV_COLOR_FORMAT_XRGB8888
+        || cf == LV_COLOR_FORMAT_RGB888
+        || cf == LV_COLOR_FORMAT_RGB565
+        || cf == LV_COLOR_FORMAT_RGB565_SWAPPED
+        || cf == LV_COLOR_FORMAT_ARGB8565
+        || cf == LV_COLOR_FORMAT_RGB565A8,
+        return LV_RESULT_INVALID, "Unsupported color format 0x%02x", cf);
     LV_CHECK_ARG(full_area->x1 >= 0 && full_area->x2 < (int32_t)dsc->header.w && full_area->y1 >= 0 &&
                  full_area->y2 < (int32_t)dsc->header.h, return LV_RESULT_INVALID, "Area outside image bounds");
+    LV_CHECK_ARG(dsc->user_data, return LV_RESULT_INVALID, "decoder data unavailable")
 
     lv_fs_res_t res = LV_FS_RES_UNKNOWN;
     decoder_data_t * decoder_data = dsc->user_data;
-    if(decoder_data == NULL) {
-        LV_LOG_ERROR("Unexpected null decoder data");
-        return LV_RESULT_INVALID;
-    }
-
     lv_fs_file_t * f = decoder_data->f;
     uint32_t bpp = lv_color_format_get_bpp(cf);
     int32_t w_px = lv_area_get_width(full_area);
