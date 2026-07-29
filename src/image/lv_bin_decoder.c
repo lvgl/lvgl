@@ -414,6 +414,8 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         LV_LOG_WARN("CF: %d is not supported", cf);
         return LV_RESULT_INVALID;
     }
+    LV_CHECK_ARG(full_area->x1 >= 0 && full_area->x2 < (int32_t)dsc->header.w && full_area->y1 >= 0 &&
+                 full_area->y2 < (int32_t)dsc->header.h, return LV_RESULT_INVALID, "Area outside image bounds");
 
     lv_fs_res_t res = LV_FS_RES_UNKNOWN;
     decoder_data_t * decoder_data = dsc->user_data;
