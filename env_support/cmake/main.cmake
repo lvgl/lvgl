@@ -194,7 +194,7 @@ if (LV_BUILD_SET_CONFIG_OPTS)
     get_property(CONF_DEFINES GLOBAL PROPERTY LVGL_BUILD_DEFINES)
 
     execute_process(
-        COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
+        COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/build-tools/preprocess_lv_conf_internal.py
         --input ${LVGL_INCLUDE_DIR}/lvgl/config/lv_conf_internal.h
         --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
         --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h

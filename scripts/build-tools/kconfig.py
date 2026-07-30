@@ -21,6 +21,10 @@ import textwrap
 
 # Lvgl doesn't use tristate symbols. They're supported here just to make the
 # script a bit more generic.
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+KCONFIGLIB_PATH = os.path.join(SCRIPT_DIR, "third_party", "kconfiglib")
+sys.path.insert(0, KCONFIGLIB_PATH)
+
 from kconfiglib import (
     Kconfig,
     split_expr,
