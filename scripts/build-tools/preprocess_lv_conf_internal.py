@@ -78,8 +78,6 @@ def main():
 
     args = get_args()
 
-    assert args.cc is not None
-
     name, preprocess = select_backend(args.cc)
     print(f"Expanding the configuration with {name}")
 
