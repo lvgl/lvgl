@@ -33,6 +33,7 @@
     #include <stdlib.h>
     #include LV_STDINT_INCLUDE
     #include <unistd.h>
+    #include <poll.h>
     #include <gbm.h>
     #include <drm_fourcc.h>
     #include <xf86drm.h>
@@ -817,18 +818,42 @@ static void egl_dmabuf_teardown(lv_wl_egl_display_data_t * ddata)
 
 static lv_wl_buffer_t * get_next_buffer(lv_wl_egl_display_data_t * ddata)
 {
-    /* First, try to find a non-busy buffer */
-    for(int i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
-        int index = (ddata->last_used + i) % LV_WL_EGL_BUF_COUNT;
-        if(!ddata->buffers[index].base.busy) {
-            ddata->last_used = (index + 1) % LV_WL_EGL_BUF_COUNT;
-            return &ddata->buffers[index];
-        }
-    }
+    /* Try to find a non-busy buffer. If all buffers are still owned by the
+     * compositor (busy), wait for a wl_buffer.release event to clear one.
+     * Bounded to 500ms so a compositor that never releases one drops this frame. */
+    struct pollfd pfd = { .fd = wl_display_get_fd(lv_wl_ctx.wl_display), .events = POLLIN };
+    uint32_t remaining_ms = 500;
 
-    lv_wl_buffer_t * ret = &ddata->buffers[ddata->last_used];
-    ddata->last_used = (ddata->last_used + 1) % LV_WL_EGL_BUF_COUNT;
-    return ret;
+    for(;;) {
+        for(int i = 0; i < LV_WL_EGL_BUF_COUNT; i++) {
+            int index = (ddata->last_used + i) % LV_WL_EGL_BUF_COUNT;
+            if(!ddata->buffers[index].base.busy) {
+                ddata->last_used = (index + 1) % LV_WL_EGL_BUF_COUNT;
+                return &ddata->buffers[index];
+            }
+        }
+
+        if(remaining_ms == 0) {
+            LV_LOG_WARN("Timed out waiting for a free DMA-BUF buffer, dropping frame");
+            return NULL;
+        }
+
+        /* All buffers are busy: flush pending requests and wait (bounded) for
+         * the compositor to release one via a wl_buffer.release event. */
+        wl_display_flush(lv_wl_ctx.wl_display);
+        if(wl_display_prepare_read(lv_wl_ctx.wl_display) == 0) {
+            int step_ms = remaining_ms < 20 ? (int)remaining_ms : 20;
+            int ret = poll(&pfd, 1, step_ms);
+            remaining_ms -= step_ms;
+            if(ret > 0 && (pfd.revents & POLLIN)) {
+                wl_display_read_events(lv_wl_ctx.wl_display);
+            }
+            else {
+                wl_display_cancel_read(lv_wl_ctx.wl_display);
+            }
+        }
+        wl_display_dispatch_pending(lv_wl_ctx.wl_display);
+    }
 }
 
 static uint32_t lv_drm_cf_to_gbm_cf(uint32_t drm_cf)
