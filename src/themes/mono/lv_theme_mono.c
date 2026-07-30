@@ -37,8 +37,9 @@ typedef struct _my_theme_t my_theme_t;
 
 #define PAD_DEF          4
 
-// when using border width changes to provided feedback, adjust
-// the padding as well to prevent layout shift. All widths must be <= PAD_DEF
+/* when using border width changes to provided feedback, adjust
+ * the padding as well to prevent layout shift. All widths must be <= PAD_DEF */
+
 #define EXPAND_BORDER(style, state)  \
     do { \
         lv_style_set_border_width(&(style), BORDER_W_ ## state); \
