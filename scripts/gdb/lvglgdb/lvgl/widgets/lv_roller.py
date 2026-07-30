@@ -17,6 +17,11 @@ class LVRoller(LVObject):
         self._wv = self.cast("lv_roller_t", ptr=True) or self
 
     @property
+    def options_translation_tag(self):
+        """Translation tag for the options"""
+        return safe_string(self._wv, "options_translation_tag")
+
+    @property
     def option_cnt(self):
         """Number of options"""
         return int(self._wv.safe_field("option_cnt", 0))
@@ -37,11 +42,6 @@ class LVRoller(LVObject):
         return int(self._wv.safe_field("inf_page_cnt", 0))
 
     @property
-    def options_translation_tag(self):
-        """Translation tag for the options"""
-        return safe_string(self._wv, "options_translation_tag")
-
-    @property
     def mode(self):
         return int(self._wv.safe_field("mode", 0))
 
@@ -53,11 +53,11 @@ class LVRoller(LVObject):
         """Snapshot with widget-specific fields in widget_data."""
         s = super().snapshot(include_children=include_children, include_styles=include_styles)
         d = s.get('widget_data') or {}
+        d["options_translation_tag"] = self.options_translation_tag
         d["option_cnt"] = self.option_cnt
         d["sel_opt_id"] = self.sel_opt_id
         d["sel_opt_id_ori"] = self.sel_opt_id_ori
         d["inf_page_cnt"] = self.inf_page_cnt
-        d["options_translation_tag"] = self.options_translation_tag
         d["mode"] = self.mode
         d["moved"] = self.moved
         s['widget_data'] = d

@@ -538,11 +538,11 @@
   "lv_roller": {
     "_auto": {
       "fields": {
+        "options_translation_tag": "string",
         "option_cnt": "int",
         "sel_opt_id": "int",
         "sel_opt_id_ori": "int",
         "inf_page_cnt": "int",
-        "options_translation_tag": "string",
         "mode": "enum:2",
         "moved": "bool"
       }
