@@ -323,7 +323,7 @@ lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_
 
     const char * txt = lv_buttonmatrix_get_button_text(calendar->btnm, lv_buttonmatrix_get_selected_button(calendar->btnm));
 
-    if(txt[1] == 0) date->day = txt[0] - '0';
+    if(txt[1] == '\0' || text[1] == '\n') date->day = txt[0] - '0';
     else date->day = (txt[0] - '0') * 10 + (txt[1] - '0');
 
     date->year = calendar->showed_date.year;
