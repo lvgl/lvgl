@@ -17,10 +17,7 @@ CONFIG_ARRAY = declare -A PKGS=( \
 	dh $@ --buildsystem=cmake+ninja
 
 override_dh_auto_configure:
-	mkdir -p $(CURDIR)/debian/pcpp
-	ln -sf /usr/bin/pcpp-python $(CURDIR)/debian/pcpp/pcpp
 	$(CONFIG_ARRAY); \
-	export PATH=$(CURDIR)/debian/pcpp:$$PATH; \
 	for config in "$${!PKGS[@]}"; do \
 	    cmake -B build-$$config \
 	        -DCMAKE_INSTALL_PREFIX=/usr \
@@ -49,7 +46,6 @@ override_dh_auto_clean:
 	for config in "$${!PKGS[@]}"; do \
 	    rm -rf build-$$config ; \
 	done
-	rm -rf $(CURDIR)/debian/pcpp
 
 override_dh_auto_test:
 	# no tests

@@ -21,16 +21,20 @@ import textwrap
 
 # Lvgl doesn't use tristate symbols. They're supported here just to make the
 # script a bit more generic.
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+KCONFIGLIB_PATH = os.path.join(SCRIPT_DIR, "third_party", "kconfiglib")
+sys.path.insert(0, KCONFIGLIB_PATH)
+
 from kconfiglib import (
-    Kconfig,
-    split_expr,
-    expr_value,
-    expr_str,
-    BOOL,
-    TRISTATE,
-    TRI_TO_STR,
     AND,
+    BOOL,
     OR,
+    TRI_TO_STR,
+    TRISTATE,
+    Kconfig,
+    expr_str,
+    expr_value,
+    split_expr,
 )
 
 
@@ -134,13 +138,10 @@ def check_no_promptless_assign(kconf):
 
     for sym in kconf.unique_defined_syms:
         if sym.user_value is not None and promptless(sym):
-            err(
-                f"""\
+            err(f"""\
 {sym.name_and_loc} is assigned in a configuration file, but is not directly
 user-configurable (has no prompt). It gets its value indirectly from other
-symbols. """
-                + SYM_INFO_HINT.format(sym)
-            )
+symbols. """ + SYM_INFO_HINT.format(sym))
 
 
 def check_assigned_sym_values(kconf):
@@ -230,13 +231,10 @@ def check_assigned_choice_values(kconf):
     for choice in kconf.unique_choices:
         if choice.user_selection and choice.user_selection is not choice.selection:
 
-            warn(
-                f"""\
+            warn(f"""\
 The choice symbol {choice.user_selection.name_and_loc} was selected (set =y),
 but {choice.selection.name_and_loc if choice.selection else "no symbol"} ended
-up as the choice selection. """
-                + SYM_INFO_HINT.format(choice.user_selection)
-            )
+up as the choice selection. """ + SYM_INFO_HINT.format(choice.user_selection))
 
 
 # Hint on where to find symbol information. Used like

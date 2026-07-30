@@ -43,7 +43,7 @@ endif()
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E env LVGL_DIR=${LVGL_ROOT_DIR}
     ${Python_EXECUTABLE} 
-    ${LVGL_ROOT_DIR}/scripts/kconfig.py
+    ${LVGL_ROOT_DIR}/scripts/build-tools/kconfig.py
     ${LVGL_ROOT_DIR}/Kconfig
     ${OUTPUT_DOTCONFIG}
     ${AUTOCONF_H}

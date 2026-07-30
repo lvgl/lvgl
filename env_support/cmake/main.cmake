@@ -51,14 +51,14 @@ if (LV_BUILD_CONF_PATH AND LV_BUILD_CONF_DIR)
 endif()
 
 if (LV_BUILD_USE_KCONFIG)
-    # If Kconfig is used then enable PCPP
+    # If Kconfig is used then the configuration has to be expanded
     set(LV_BUILD_SET_CONFIG_OPTS ON)
 endif()
 
 if (LV_BUILD_SET_CONFIG_OPTS)
     # Python is required when LV_BUILD_SET_CONFIG_OPTS is enabled
-    # PCPP is used to pre-process lv_conf_internal.h and it avoids setting
-    # CONFIG_LV_USE or CONFIG_LV_BUILD options manually
+    # lv_conf_internal.h is pre-processed to avoid setting CONFIG_LV_USE
+    # or CONFIG_LV_BUILD options manually
     find_package(Python REQUIRED)
 endif()
 
@@ -185,20 +185,21 @@ endif()
 
 
 if (LV_BUILD_SET_CONFIG_OPTS)
-    # Use the portable pcpp to preprocess lv_conf_internal.h
+    # Use the C compiler of the build to preprocess lv_conf_internal.h
 
     # Use the definitions active during the build (recorded by
     # lvgl_build_definitions). We can't use get_target_property(...
     # COMPILE_DEFINITIONS) here because it returns raw generator-expression
-    # syntax (e.g. "$<BUILD_INTERFACE:LV_CONF_SKIP>") that pcpp can't parse.
+    # syntax (e.g. "$<BUILD_INTERFACE:LV_CONF_SKIP>") that the preprocessor
+    # can't parse.
     get_property(CONF_DEFINES GLOBAL PROPERTY LVGL_BUILD_DEFINES)
 
     execute_process(
-        COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
+        COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/build-tools/preprocess_lv_conf_internal.py
         --input ${LVGL_INCLUDE_DIR}/lvgl/config/lv_conf_internal.h
         --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
         --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
-        --workfolder ${CMAKE_CURRENT_BINARY_DIR}
+        --cc ${CMAKE_C_COMPILER}
         --defs ${CONF_DEFINES}
         --include ${LVGL_ROOT_DIR} ${CMAKE_SOURCE_DIR} ${LVGL_ROOT_DIR}/src ${CONF_INC_DIR}
         RESULT_VARIABLE ret
