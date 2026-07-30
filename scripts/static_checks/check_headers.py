@@ -173,7 +173,6 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "hal_data.h",
     "include/lv_mp_mem_custom_include.h",
     "intrin.h",
-    "jpegint.h",
     "jpeglib.h",
     "lfs.h",
     "libavcodec/avcodec.h",
