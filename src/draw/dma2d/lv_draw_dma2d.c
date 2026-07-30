@@ -14,15 +14,6 @@
 #include "../../misc/lv_area_private.h"
 #include "../lv_draw_buf_private.h"
 
-#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
-    #include <zephyr/kernel.h>
-    #include <zephyr/irq.h>
-#endif
-
-#if !LV_DRAW_DMA2D_ASYNC && LV_USE_DRAW_DMA2D_INTERRUPT
-    #warning LV_USE_DRAW_DMA2D_INTERRUPT is 1 but has no effect because LV_USE_OS is LV_OS_NONE
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -44,8 +35,8 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit);
     static int32_t wait_finish_cb(lv_draw_unit_t * u);
 #endif
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
-#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
-    static void zephyr_dma2d_irq_handler(void *);
+#if LV_DRAW_DMA2D_ASYNC
+    static void dma2d_irq_cb(void * user_data);
 #endif
 #if LV_DRAW_DMA2D_CACHE
     static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
@@ -118,19 +109,18 @@ void lv_draw_dma2d_init(void)
     /* disable dead time */
     DMA2D->AMTCR = 0;
 
-#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
-    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(dma2d)), DT_IRQ(DT_NODELABEL(dma2d), priority), zephyr_dma2d_irq_handler, NULL, 0);
-    irq_enable(DT_IRQN(DT_NODELABEL(dma2d)));
-#else
-    /* enable the interrupt */
-    NVIC_EnableIRQ(DMA2D_IRQn);
+#if LV_DRAW_DMA2D_ASYNC
+    /* register the transfer-complete interrupt through the IRQ abstraction layer */
+    lv_irq_attach_dma2d(dma2d_irq_cb);
 #endif
 }
 
 void lv_draw_dma2d_deinit(void)
 {
+#if LV_DRAW_DMA2D_ASYNC
     /* disable the interrupt */
-    NVIC_DisableIRQ(DMA2D_IRQn);
+    lv_irq_detach_dma2d();
+#endif
 
     /* disable the DMA2D clock */
 #if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
@@ -149,14 +139,12 @@ void lv_draw_dma2d_deinit(void)
 #endif
 }
 
-#if LV_USE_DRAW_DMA2D_INTERRUPT
 void lv_draw_dma2d_transfer_complete_interrupt_handler(void)
 {
 #if LV_DRAW_DMA2D_ASYNC
     lv_thread_sync_signal_isr(&g_unit->interrupt_signal);
 #endif
 }
-#endif
 
 lv_draw_dma2d_output_cf_t lv_draw_dma2d_cf_to_dma2d_output_cf(lv_color_format_t cf)
 {
@@ -269,7 +257,7 @@ void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuratio
 
     /* start the transfer (also set mode and enable transfer complete interrupt) */
     DMA2D->CR = DMA2D_CR_START | (((uint32_t) conf->mode) << DMA2D_CR_MODE_Pos)
-#if LV_USE_DRAW_DMA2D_INTERRUPT
+#if LV_DRAW_DMA2D_ASYNC
                 | DMA2D_CR_TCIE
 #endif
                 ;
@@ -339,9 +327,12 @@ static void flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
-static void zephyr_dma2d_irq_handler(void *)
+#if LV_DRAW_DMA2D_ASYNC
+/* Called by the IRQ abstraction layer (src/irqal) when the DMA2D interrupt fires */
+static void dma2d_irq_cb(void * user_data)
 {
+    LV_UNUSED(user_data); /* DMA2D transfer-complete carries no payload */
+
     /* Clear Transfer Complete flag */
     DMA2D->IFCR = DMA2D_IFCR_CTCIF;
 

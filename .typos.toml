@@ -8,6 +8,8 @@ extend-exclude = [
     "docs/src/_static/jquery.js",
     "libs/",
     "scripts/gen_json/create_fake_lib_c.py",
+    "scripts/generators/config_files.py",
+    "scripts/generators/config_headers/parse.py",
     "src/libs/",
     "zephyr/Kconfig",
 ]

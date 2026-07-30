@@ -124,6 +124,54 @@
 
 
 /*============================================================================
+ * INTERRUPT HANDLING (IRQ)
+ *============================================================================*/
+
+/** IRQ abstraction backend to use
+ *  Possible values:
+ *  - LV_IRQ_NONE
+ *  - LV_IRQ_CMSIS
+ *  - LV_IRQ_ZEPHYR
+ */
+#define LV_USE_IRQ LV_IRQ_NONE
+
+#if LV_USE_IRQ == LV_IRQ_CMSIS
+/** Enable to pull in a vendor/CMSIS device header (e.g. stm32h7xx.h) that
+ *  provides the IRQn_Type enumerators (PXP_IRQn, DMA2D_IRQn, ...) and the
+ *  NVIC_* helpers. Peripheral IRQ support is auto-detected from the symbols
+ *  this header defines.
+ */
+#define LV_IRQ_USE_CMSIS_INCLUDE 0
+
+#if LV_IRQ_USE_CMSIS_INCLUDE
+/** CMSIS/vendor device header */
+#define LV_IRQ_CMSIS_INCLUDE ""
+
+#endif /*LV_IRQ_USE_CMSIS_INCLUDE*/
+
+/** Enable on RTOS builds (e.g. FreeRTOS, or CMSIS-RTOS2 over an RTOS) where
+ *  the interrupt priority must sit at or below the kernel's syscall interrupt
+ *  priority ceiling, so the ISR may safely call the kernel's ...FromISR APIs
+ *  (lv_thread_sync_signal_isr uses one). Leave disabled on bare-metal, where
+ *  the reset-default priority is fine.
+ */
+#define LV_IRQ_CMSIS_SET_PRIORITY 0
+
+#if LV_IRQ_CMSIS_SET_PRIORITY
+/** The value passed to NVIC_SetPriority. Defaults to 255, which NVIC_SetPriority
+ *  maps to the lowest preemption priority regardless of the implemented priority
+ *  bits (__NVIC_PRIO_BITS) - always safe to call ...FromISR from, at the cost of
+ *  latency. For best latency under FreeRTOS set it to
+ *  configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h may
+ *  define this symbolically; a Kconfig build takes a literal number).
+ */
+#define LV_IRQ_CMSIS_PRIORITY 255
+
+#endif /*LV_IRQ_CMSIS_SET_PRIORITY*/
+#endif /*LV_USE_IRQ == LV_IRQ_CMSIS*/
+
+
+/*============================================================================
  * RENDERING CONFIGURATION
  *============================================================================*/
 
@@ -517,12 +565,6 @@
 #if LV_USE_DRAW_DMA2D
 /** the header file for LVGL to include for DMA2D */
 #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
-
-/** if enabled, the user is required to call
- *  `lv_draw_dma2d_transfer_complete_interrupt_handler`
- *  upon receiving the DMA2D global interrupt
- */
-#define LV_USE_DRAW_DMA2D_INTERRUPT 0
 
 #endif /*LV_USE_DRAW_DMA2D*/
 

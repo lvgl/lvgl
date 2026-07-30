@@ -38,11 +38,6 @@ extern "C" {
  **********************/
 
 /**
- * PXP device interrupt handler. Used to check PXP task completion status.
- */
-void PXP_IRQHandler(void);
-
-/**
  * Get the PXP default configuration.
  */
 pxp_cfg_t * pxp_get_default_cfg(void);

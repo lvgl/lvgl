@@ -18,15 +18,11 @@
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_utils.h"
 #include "../../../osal/lv_os_private.h"
+#include "../../../irqal/lv_irq_private.h"
 #include <fsl_pxp.h>
 
-#if defined(SDK_OS_FREE_RTOS)
-    #include <FreeRTOS.h>
-#endif
-
-#if defined(__ZEPHYR__)
-    #include <zephyr/kernel.h>
-    #include <zephyr/irq.h>
+#if !LV_IRQ_HAS_PXP
+    #error "PXP needs an IRQ backend that provides PXP (set LV_USE_IRQ to a backend whose platform exposes PXP - e.g. a Zephyr DT node or CMSIS PXP_IRQn - or supply a custom backend defining LV_IRQ_HAS_PXP)"
 #endif
 
 /*********************
@@ -61,12 +57,10 @@ static void _pxp_run(void);
  */
 static void _pxp_wait(void);
 
-#if defined(__ZEPHYR__)
-    /**
-    * Interrupt handler for Zephyr IRQ
-    */
-    static void _pxp_zephyr_irq_handler(void *);
-#endif
+/**
+ * PXP completion callback, invoked by the IRQ abstraction layer (src/irqal).
+ */
+static void _pxp_irq_cb(void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -92,8 +86,21 @@ static pxp_cfg_t _pxp_default_cfg = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void PXP_IRQHandler(void)
+pxp_cfg_t * pxp_get_default_cfg(void)
 {
+    return &_pxp_default_cfg;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+/* Called by the IRQ abstraction layer (src/irqal) when the PXP interrupt fires,
+ * regardless of the underlying environment (Zephyr, CMSIS, ...). */
+static void _pxp_irq_cb(void * user_data)
+{
+    LV_UNUSED(user_data); /* PXP completion carries no payload */
+
     if(kPXP_CompleteFlag & PXP_GetStatusFlags(PXP_ID)) {
         PXP_ClearStatusFlags(PXP_ID, kPXP_CompleteFlag);
 #if LV_USE_OS
@@ -104,22 +111,6 @@ void PXP_IRQHandler(void)
     }
 }
 
-pxp_cfg_t * pxp_get_default_cfg(void)
-{
-    return &_pxp_default_cfg;
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-#if defined(__ZEPHYR__)
-static void _pxp_zephyr_irq_handler(void *)
-{
-    PXP_IRQHandler();
-}
-#endif
-
 static void _pxp_interrupt_init(void)
 {
 #if LV_USE_OS
@@ -128,27 +119,16 @@ static void _pxp_interrupt_init(void)
     }
 #endif
 
-#if defined(__ZEPHYR__)
-    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(pxp)), CONFIG_LV_Z_PXP_INTERRUPT_PRIORITY, _pxp_zephyr_irq_handler, NULL, 0);
-    irq_enable(DT_IRQN(DT_NODELABEL(pxp)));
-#elif defined(SDK_OS_FREE_RTOS)
-    NVIC_SetPriority(PXP_IRQ_ID, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1);
-#endif
-
-#if !defined(__ZEPHYR__)
-    NVIC_EnableIRQ(PXP_IRQ_ID);
-#endif
+    /* register the PXP completion interrupt through the IRQ abstraction layer;
+     * the environment-specific wiring lives in src/irqal, not here */
+    lv_irq_attach_pxp(_pxp_irq_cb);
 
     ucPXPIdle = true;
 }
 
 static void _pxp_interrupt_deinit(void)
 {
-#if defined(__ZEPHYR__)
-    irq_disable(DT_IRQN(DT_NODELABEL(pxp)));
-#else
-    NVIC_DisableIRQ(PXP_IRQ_ID);
-#endif
+    lv_irq_detach_pxp();
 
 #if LV_USE_OS
     lv_thread_sync_delete(&pxp_sync);

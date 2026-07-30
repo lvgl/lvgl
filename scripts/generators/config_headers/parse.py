@@ -56,6 +56,7 @@ from .kconfig_utils import (
 # which breaks embedded users' Kconfig configs.
 MEMBER_IS_TOKEN: set[str] = {
     "LV_USE_OS",  # tokens LV_OS_* are defined into lv_conf_internal.h
+    "LV_USE_IRQ",  # tokens LV_IRQ_* are defined into lv_conf_internal.h
     "LV_LOG_LEVEL",  # LV_LOG_LEVEL_* defined into lv_conf_internal.h
     "LV_USE_DRAW_SW_ASM",  # LV_DRAW_SW_ASM_* defined into lv_conf_internal.h
     "LV_USE_NEMA_LIB",  # LV_NEMA_LIB_*

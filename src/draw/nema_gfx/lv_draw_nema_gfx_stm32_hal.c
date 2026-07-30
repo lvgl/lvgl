@@ -49,9 +49,7 @@ extern GPU2D_HandleTypeDef hgpu2d;
  *  STATIC PROTOTYPES
  **********************/
 
-#if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
-    static void GPU2D_CommandListCpltCallback(GPU2D_HandleTypeDef * hgpu2d, uint32_t CmdListID);
-#endif
+static void nema_gpu2d_completion_cb(void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -76,15 +74,11 @@ static lv_thread_sync_t sync;
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
-    static void GPU2D_CommandListCpltCallback(GPU2D_HandleTypeDef * hgpu2d, uint32_t CmdListID)
-#else
-    void HAL_GPU2D_CommandListCpltCallback(GPU2D_HandleTypeDef * hgpu2d, uint32_t CmdListID)
-#endif
+/* NemaGFX-side completion handler passed to lv_irq_attach_nema_gpu2d(): records
+ * which command list finished (from the forwarded pointer) and wakes waiters. */
+static void nema_gpu2d_completion_cb(void * user_data)
 {
-    LV_UNUSED(hgpu2d);
-
-    last_cl_id = CmdListID;
+    last_cl_id = *(uint32_t *)user_data;
     lv_thread_sync_signal_isr(&sync);
 }
 
@@ -94,11 +88,8 @@ int32_t nema_sys_init(void)
 
     lv_thread_sync_init(&sync);
 
-    /* Setup GPU2D Callback */
-#if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
-    /* Register Command List Complete Callback */
-    HAL_GPU2D_RegisterCommandListCpltCallback(&hgpu2d, GPU2D_CommandListCpltCallback);
-#endif
+    /* Route the GPU2D completion interrupt through the IRQ abstraction layer */
+    lv_irq_attach_nema_gpu2d(nema_gpu2d_completion_cb);
 
     /* Initialise Mem Space */
     error_code = tsi_malloc_init_pool_aligned(0, (void *)nemagfx_pool_mem, (uintptr_t)nemagfx_pool_mem,

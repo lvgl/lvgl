@@ -20,7 +20,7 @@ config LV_STDLIB_RTTHREAD
 	default 3
 
 config LV_STDLIB_CUSTOM
-	int 
+	int
 	default 255
 
 choice
@@ -254,6 +254,63 @@ config LV_OS_IDLE_PERCENT_CUSTOM
 endmenu
 endif #LV_OS_FREERTOS
 endmenu
+menu "Interrupt Handling (IRQ)"
+choice LV_USE_IRQ
+	prompt "IRQ abstraction backend to use"
+	default LV_IRQ_NONE
+
+	config LV_IRQ_NONE
+		bool "NONE"
+	config LV_IRQ_CMSIS
+		bool "CMSIS"
+	config LV_IRQ_ZEPHYR
+		bool "ZEPHYR"
+endchoice
+
+config LV_USE_IRQ
+	int
+	default 0 if LV_IRQ_NONE
+	default 1 if LV_IRQ_CMSIS
+	default 2 if LV_IRQ_ZEPHYR
+
+if LV_IRQ_CMSIS
+config LV_IRQ_USE_CMSIS_INCLUDE
+	bool "Include a CMSIS/vendor device header to discover IRQ numbers"
+	default n
+	help
+		Enable to pull in a vendor/CMSIS device header (e.g. stm32h7xx.h) that
+		provides the IRQn_Type enumerators (PXP_IRQn, DMA2D_IRQn, ...) and the
+		NVIC_* helpers. Peripheral IRQ support is auto-detected from the symbols
+		this header defines.
+
+config LV_IRQ_CMSIS_INCLUDE
+	string "CMSIS/vendor device header"
+	default ""
+	depends on LV_IRQ_USE_CMSIS_INCLUDE
+
+config LV_IRQ_CMSIS_SET_PRIORITY
+	bool "Set the NVIC priority of irqal-managed interrupts"
+	default n
+	help
+		Enable on RTOS builds (e.g. FreeRTOS, or CMSIS-RTOS2 over an RTOS) where
+		the interrupt priority must sit at or below the kernel's syscall interrupt
+		priority ceiling, so the ISR may safely call the kernel's ...FromISR APIs
+		(lv_thread_sync_signal_isr uses one). Leave disabled on bare-metal, where
+		the reset-default priority is fine.
+
+config LV_IRQ_CMSIS_PRIORITY
+	int "NVIC priority value for irqal-managed interrupts"
+	default 255
+	depends on LV_IRQ_CMSIS_SET_PRIORITY
+	help
+		The value passed to NVIC_SetPriority. Defaults to 255, which NVIC_SetPriority
+		maps to the lowest preemption priority regardless of the implemented priority
+		bits (__NVIC_PRIO_BITS) - always safe to call ...FromISR from, at the cost of
+		latency. For best latency under FreeRTOS set it to
+		configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 (a hand-written lv_conf.h may
+		define this symbolically; a Kconfig build takes a literal number).
+endif #LV_IRQ_CMSIS
+endmenu
 menu "Rendering Configuration"
 
 menu "Color Settings"
@@ -442,42 +499,42 @@ config LV_DRAW_SW_SUPPORT_RGB565A8
 config LV_DRAW_SW_SUPPORT_RGB888
 	bool "Enable support for RGB888 color format"
 	default y
-	
+
 
 config LV_DRAW_SW_SUPPORT_XRGB8888
 	bool "Enable support for XRGB8888 color format"
 	default y
-	
+
 
 config LV_DRAW_SW_SUPPORT_ARGB8888
 	bool "Enable support for ARGB8888 color format"
 	default y
-	
+
 
 config LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 	bool "Enable support for ARGB8888 premultiplied color format"
 	default y
-	
+
 
 config LV_DRAW_SW_SUPPORT_L8
 	bool "Enable support for L8 color format"
 	default y
-	
+
 
 config LV_DRAW_SW_SUPPORT_AL88
 	bool "Enable support for AL88 color format"
 	default y
-	
+
 
 config LV_DRAW_SW_SUPPORT_A8
 	bool "Enable support for A8 color format"
 	default y
-	
+
 
 config LV_DRAW_SW_SUPPORT_I1
 	bool "Enable support for I1 color format"
 	default y
-	
+
 
 config LV_DRAW_SW_I1_LUM_THRESHOLD
 	int "Luminance threshold for a pixel to be active"
@@ -521,7 +578,7 @@ config LV_GRADIENT_MAX_STOPS
 config LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 	bool "Enable drawing complex gradients in software"
 	default n
-	
+
 	help
 		0: do not enable complex gradients
 		1: enable complex gradients (linear at an angle, radial or conical)
@@ -548,7 +605,7 @@ config LV_DRAW_SW_CIRCLE_CACHE_SIZE
 choice LV_USE_DRAW_SW_ASM
 	prompt "Asm mode in sw draw"
 	default LV_DRAW_SW_ASM_NONE
-	
+
 	help
 		ASM mode to be used
 
@@ -900,15 +957,6 @@ if LV_USE_DRAW_DMA2D
 config LV_DRAW_DMA2D_HAL_INCLUDE
 	string "the header file for LVGL to include for DMA2D"
 	default "stm32h7xx_hal.h"
-
-config LV_USE_DRAW_DMA2D_INTERRUPT
-	bool "use the DMA2D transfer complete interrupt"
-	default n
-	help
-		if enabled, the user is required to call
-		`lv_draw_dma2d_transfer_complete_interrupt_handler`
-		upon receiving the DMA2D global interrupt
-
 endif
 endmenu
 
@@ -1037,7 +1085,7 @@ config LV_USE_DRAW_SDL
 	default n
 	help
 	Uses SDL renderer API
-endmenu 
+endmenu
 endmenu
 menu "Input Devices"
 config LV_USE_GRIDNAV
@@ -1163,7 +1211,7 @@ config LV_USE_LOG
 if LV_USE_LOG
 
 choice
-	bool "Default log verbosity" 
+	bool "Default log verbosity"
 	default LV_LOG_LEVEL_WARN
 	help
 		Specify how important log should be added.
@@ -1192,7 +1240,7 @@ config LV_LOG_LEVEL
 	default 5 if LV_LOG_LEVEL_NONE
 
 config LV_LOG_LEVEL_NUM
-	int 
+	int
 	default 5
 
 config LV_LOG_PRINTF
@@ -1205,47 +1253,47 @@ config LV_LOG_PRINTF
 config LV_LOG_USE_TIMESTAMP
 	bool "Enable print timestamp"
 	default y
-	
+
 config LV_LOG_USE_FILE_LINE
 	bool "Enable print file and line number"
 	default y
-	
+
 config LV_LOG_TRACE_MEM
 	bool "Enable/Disable LV_LOG_TRACE in mem module"
 	default y
-	
+
 config LV_LOG_TRACE_TIMER
 	bool "Enable/Disable LV_LOG_TRACE in timer module"
 	default y
-	
+
 config LV_LOG_TRACE_INDEV
 	bool "Enable/Disable LV_LOG_TRACE in indev module"
 	default y
-	
+
 config LV_LOG_TRACE_DISP_REFR
 	bool "Enable/Disable LV_LOG_TRACE in disp refr module"
 	default y
-	
+
 config LV_LOG_TRACE_EVENT
 	bool "Enable/Disable LV_LOG_TRACE in event module"
 	default y
-	
+
 config LV_LOG_TRACE_OBJ_CREATE
 	bool "Enable/Disable LV_LOG_TRACE in obj create module"
 	default y
-	
+
 config LV_LOG_TRACE_LAYOUT
 	bool "Enable/Disable LV_LOG_TRACE in layout module"
 	default y
-	
+
 config LV_LOG_TRACE_ANIM
 	bool "Enable/Disable LV_LOG_TRACE in anim module"
 	default y
-	
+
 config LV_LOG_TRACE_CACHE
 	bool "Enable/Disable LV_LOG_TRACE in cache module"
 	default y
-	
+
 
 endif
 endmenu
@@ -1555,14 +1603,14 @@ config LV_USE_CUSTOM_FONT_DEFAULT
 		  - in the header given by LV_FONT_CUSTOM_INCLUDE, e.g.
 		        #define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(my_font_24)
 		        #define LV_FONT_DEFAULT         &my_font_24
-			
+
 		If you do not, LV_FONT_DEFAULT falls back to a builtin font,
 		which is no longer compiled in, causing a link error.
 
 
 choice LV_FONT_DEFAULT
 	prompt "Select theme default text font"
-	default LV_FONT_DEFAULT_MONTSERRAT_14 
+	default LV_FONT_DEFAULT_MONTSERRAT_14
 	depends on !LV_USE_CUSTOM_FONT_DEFAULT
 	help
 		Select theme default text font
@@ -1867,7 +1915,7 @@ config LV_USE_CALENDAR_CHINESE
 	default n
 
 endif #LV_USE_CALENDAR
-	
+
 
 
 config LV_USE_CANVAS
@@ -1923,7 +1971,7 @@ config LV_GIF_MAX_WIDTH
 	int "Maximum GIF canvas width in pixels"
 	depends on LV_USE_GIF
 	default 480
-	help 
+	help
 		Increasing this value will consume more memory.
 		GIFs wider than this are rejected
 
@@ -1931,7 +1979,7 @@ config LV_GIF_MAX_HEIGHT
 	int "Maximum GIF canvas height in pixels"
 	depends on LV_USE_GIF
 	default 32768
-	help 
+	help
 		This value has no impact on memory usage
 		GIFs taller than this are rejected
 
@@ -2436,7 +2484,7 @@ config LV_NUTTX_LCD_BUFFER_SIZE
 	depends on LV_NUTTX_LCD_CUSTOM_BUFFER
 	depends on LV_USE_NUTTX_LCD
 	default 60
-	
+
 
 config LV_USE_NUTTX_TOUCHSCREEN
 	bool "Use NuttX touchscreen driver"
@@ -3195,7 +3243,7 @@ config LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
 	bool "Create a reference image by default if it does not exist"
 	default y
 	depends on LV_USE_TEST_SCREENSHOT_COMPARE
-	
+
 endif #LV_USE_TEST
 
 	config LV_USE_MONKEY
