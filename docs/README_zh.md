@@ -1,125 +1,199 @@
-<a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets/sponsor.png" height="32px"></a>
-
-<p align="right">
-  <a href="../README.md">English</a>  |  <b>中文</b> | <a href="./README_pt_BR.md">Português do Brasil</a> | <a href="./README_jp.md">日本語</a> | <a href="./README_he.md">עברית</a>
+<p align="center">
+  <a href="https://lvgl.io/docs" title="Documentation">文档</a> •
+  <a href="https://forum.lvgl.io" title="Community forum">论坛</a> •
+  <a href="https://blog.lvgl.io" title="News and articles">博客</a> •
+  <a href="https://lvgl.io/services" title="Professional services">服务</a>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png" alt="spacer" width="250px" height="1px">
+  <a href="../README.md">EN</a> •
+  <b>中文</b> •
+  <a href="./README_ja.md">日本語</a> •
+  <a href="./README_ko.md">한국어</a> •
+  <a href="./README_pt_BR.md">PT</a> •
+  <a href="./README_he.md">עברית</a>
 </p>
-<br>
 
 <p align="center">
-  <img src="https://lvgl.io/github-assets/logo-colored.png" width=300px>
-</p>
-
-
-<h1 align="center">
-  Light and Versatile Graphics Library
-</h1>
-
-<h1 align="center">
-  轻量级通用型图形库
-</h1>
-
-<div align="center">
-  <img src="https://raw.githubusercontent.com/kisvegabor/test/master/smartwatch_demo.gif">
-  &nbsp;
-  <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
-</div>
-
-<br>
-
-<p align="center">
-  <a href="https://lvgl.io" title="LVGL 官方网站">网站</a> |
-  <a href="https://pro.lvgl.io" title="LVGL Pro 基于 XML 的 UI 编辑器">LVGL Pro 编辑器</a> |
-  <a href="https://docs.lvgl.io/" title="包含 100+ 示例的详细文档">文档</a> |
-  <a href="https://forum.lvgl.io" title="寻求帮助或帮助他人">论坛</a> |
-  <a href="https://lvgl.io/demos" title="在浏览器中运行的演示">演示</a> |
-  <a href="https://lvgl.io/services" title="图形设计、UI 实现和咨询服务">服务</a>
+  <a href="https://lvgl.io"><img src="https://lvgl.io/github-assets/logo-colored.png" height=50px/></a>
+  <h1 align="center">轻量级多功能图形库</h1>
 </p>
 
 <br/>
+<br/>
 
-## 📒 概述
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/965e8b8b-d240-45ed-9744-bdd81785967d" height="220" alt="采用矢量图形的电动自行车演示">
+  &nbsp;
+  <img src="https://github.com/user-attachments/assets/d83820ed-5448-494e-94c8-3ca1b4ddceb0" height="220" alt="带动画 3D 模型的心电图演示">
+</div>
 
-**LVGL** 是一个免费、开源的 UI 库，可用于为来自任何厂商、任何平台的 MCU 或 MPU 创建图形用户界面。
+<br/>
+<br/>
+<br/>
 
-**要求**：LVGL 无需外部依赖，因此可以轻松编译到任何现代平台上，从小型 MCU 到支持 3D 的多核 Linux MPU。简单 UI 仅需约 100kB RAM、200–300kB Flash，以及 1/10 屏幕大小的渲染缓冲区。
+<p align="center">
+  <a href="#overview" title="What LVGL is">概述</a> •
+  <a href="#features" title="What LVGL can do">功能特性</a> •
+  <a href="#lvgl-pro" title="The professional toolchain">LVGL Pro</a> •
+  <a href="#examples" title="C and XML examples">示例</a> •
+  <a href="#integration" title="How to add LVGL to your project">集成</a> •
+  <a href="#contributing" title="How to get involved">参与贡献</a> •
+  <a href="#license" title="Licensing terms">许可证</a>
+</p>
 
-**开始使用**：选择一个可直接使用的 VSCode、Eclipse 或其他项目，在 PC 上尝试 LVGL。LVGL 的 UI 代码完全平台无关，因此也可直接用于嵌入式设备。
+<a id="overview"></a>
+## 概述
 
-**LVGL Pro** 是一套完整的工具包，可让你更快地构建、测试、共享和发布 UI。它附带一个 XML 编辑器，你可以在其中快速创建和测试可重用组件，导出 C 代码，或在运行时加载 XML。了解更多信息请点击这里。
+**LVGL** 是一个免费的开源 UI 库，让你能够为任何厂商、任何平台上的任何 MCU 和 MPU 创建图形用户界面。
 
-## 💡 特性
+**需求条件**：LVGL 没有任何外部依赖，因此可以轻松编译到任何现代目标平台，从小型 MCU 到支持 3D 的多核 Linux MPU 皆可。对于*典型*的 UI，你只需要约 100kB RAM、约 200–300kB flash，以及相当于屏幕 1/10 大小的缓冲区用于渲染。
 
-**免费与可移植性**
-  - 纯 C（兼容 C++）库，无外部依赖。
-  - 可为任意 MCU 或 MPU 编译，支持任何 (RT)OS。支持 Make、CMake 和简单文件匹配。
-  - 支持单色、电子墨水、OLED、TFT 显示器，甚至是 PC 显示器。详见 [显示模块](https://docs.lvgl.io/master/main-modules/display/index.html)
-  - 采用 MIT 许可证，可自由用于商业项目。
-  - 仅需 32kB RAM、128kB Flash、一个帧缓冲区，以及至少 1/10 屏幕大小的渲染缓冲。
-  - 支持但不强制要求使用操作系统、外部存储或 GPU。
+**广泛采用**：芯片厂商（如 NXP、Espressif、Renesas 等）、RTOS 项目（Zephyr、NuttX 等）以及开发板制造商（Riverdi、Seeed Studio、VIEWE、Elecrow 等）都已经集成了 LVGL。如果一块开发板带有显示屏，那么厂商很可能也提供了 LVGL 支持。
 
-**控件、样式、布局等**
-  - 超过 30 个内置 [控件](https://docs.lvgl.io/master/widgets/index.html)：按钮、标签、滑块、图表、键盘、仪表、弧形、表格等。
-  - 灵活的 [样式系统](https://docs.lvgl.io/master/common-widget-features/styles/index.html)，提供约 100 种属性，可自定义控件任意部分与状态。
-  - [Flexbox](https://docs.lvgl.io/master/common-widget-features/layouts/flex.html) 和 [Grid](https://docs.lvgl.io/master/common-widget-features/layouts/grid.html) 布局引擎可实现自适应布局。
-  - 文本支持 UTF-8 编码，兼容中日韩、泰语、印地语、阿拉伯语、波斯语等。
-  - [数据绑定](https://docs.lvgl.io/master/main-modules/observer/index.html) 模块轻松连接 UI 与应用逻辑。
-  - 渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图像变换等。
-  - [强大的 3D 渲染引擎](https://docs.lvgl.io/master/libs/gltf.html)，可使用 OpenGL 显示 [glTF 模型](https://sketchfab.com/)。
-  - 支持鼠标、触摸板、按键、键盘、外部按钮、编码器等 [输入设备](https://docs.lvgl.io/master/main-modules/indev.html)。
-  - 支持 [多显示屏](https://docs.lvgl.io/master/main-modules/display/overview.html#how-many-displays-can-lvgl-use)。
+**专业工具**：与其编写 C 代码，你还可以使用 [LVGL Pro](#lvgl-pro) 来大幅加速并简化 UI 开发。它是一套完整的工具包，包含 Editor、Figma 集成、Online Viewer 和 CLI。它能从 XML 导出纯粹的 LVGL C 代码，没有额外的运行时，也没有隐藏的黑魔法。它对非商业用途和评估用途免费。
 
-## 📦️ 平台支持
+**开始上手**，可以浏览[示例](#examples)、启动一个[模拟器项目](https://lvgl.io/docs/open/integration/pc)、探索 LVGL Pro 的 [Online Viewer](https://viewer.lvgl.io/)、在 [LVGL Pro](https://lvgl.io/docs/pro/integration/simulator) 中一键编译并在窗口中运行 UI，或者深入阅读我们面向 AI 就绪的[文档](https://lvgl.io/docs/open)。只需点击 [**Ask AI**](https://lvgl.io/docs/open)，即可尽情提问！
 
-LVGL 无外部依赖，因此可轻松编译到任何设备，并已被多个包管理器与 RTOS 集成：
+<a id="features"></a>
+## 功能特性
 
-- [Arduino 库](https://docs.lvgl.io/master/integration/framework/arduino.html)
-- [PlatformIO 包](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr 库](https://docs.lvgl.io/master/integration/os/zephyr.html)
-- [ESP-IDF (ESP32) 组件](https://components.espressif.com/components/lvgl/lvgl)
-- [NXP MCUXpresso 组件](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX 库](https://docs.lvgl.io/master/integration/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
-- CMSIS-Pack
-- [RIOT OS 包](https://doc.riot-os.org/group__pkg__lvgl.html#details)
+**免费、可移植、可扩展**
+  - 完全可移植的 C（兼容 C++）库，没有任何外部依赖。
+  - 可为任何 MCU 或 MPU、任何 (RT)OS 编译。支持 Make、CMake 以及简单的通配（globbing）。
+  - 支持单色屏、ePaper、OLED、TFT 显示屏，甚至显示器。[显示屏](https://lvgl.io/docs/open/main-modules/display)
+  - 基于 MIT 许可证发布，因此你也可以轻松将其用于商业项目。
+  - 最低仅需 32kB RAM 和 128kB Flash、一个帧缓冲区，以及至少屏幕 1/10 大小的缓冲区用于渲染。
+  - 支持 OS、外部内存和 GPU，但并非必需。
 
-## 🚀 LVGL Pro 编辑器
+**控件、样式、布局及更多**
+  - 30 多种内置[控件](https://lvgl.io/docs/open/widgets)：Button、Label、Slider、Chart、Keyboard、Meter、Arc、Table 等等。
+  - 灵活的[样式系统](https://lvgl.io/docs/open/common-widget-features/styles)，拥有 100 多个样式属性，可在任何状态下定制控件的任何部分。
+  - 类似 [Flexbox](https://lvgl.io/docs/open/common-widget-features/layouts/flex) 和 [Grid](https://lvgl.io/docs/open/common-widget-features/layouts/grid) 的布局引擎，可自动地响应式调整控件的尺寸和位置。
+  - [数据绑定](https://lvgl.io/docs/open/main-modules/observer)，可轻松将 UI 与应用程序连接起来。
+  - 支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器等[输入设备](https://lvgl.io/docs/open/main-modules/indev)。
+  - 支持[多显示屏](https://lvgl.io/docs/open/main-modules/display/overview#how-many-displays-can-lvgl-use)。
 
-LVGL Pro 是一套完整的工具，用于高效构建、测试、共享和交付嵌入式 UI。
+**渲染**
+  - 内置 2D 渲染引擎，支持基本形状、渐变、抗锯齿、不透明度、平滑滚动、盒子阴影和投影阴影、图像变换等。
+  - [强大的 3D 渲染引擎](https://lvgl.io/docs/open/libs/gltf)，可通过 OpenGL 展示 [glTF 模型](https://sketchfab.com/)。
+  - 支持矢量图形、SVG 和 Lottie。
+  - 文本采用 UTF-8 编码渲染，支持 CJK、泰文、印地文、阿拉伯文和波斯文书写系统。
+  - 内置对 VG-Lite、Dave2D、NeoChrome、OpenGL 等 GPU 的支持。
 
-它包含四个紧密集成的工具：
+<a id="lvgl-pro"></a>
+## LVGL Pro
 
-1. **XML 编辑器**：LVGL Pro 的核心。桌面应用，用于通过 XML 构建组件与界面，管理数据绑定、翻译、动画、测试等。了解更多 [XML 格式](https://docs.lvgl.io/master/xml/xml/index.html) 和 [编辑器](https://docs.lvgl.io/master/xml/editor/index.html)。
-2. **在线预览器**：在浏览器中运行编辑器，打开 GitHub 项目，无需搭建开发环境即可共享。访问 [https://viewer.lvgl.io](https://viewer.lvgl.io)。
-3. **CLI 工具**：在 CI/CD 中生成 C 代码并运行测试。详见 [此处](https://docs.lvgl.io/master/xml/tools/cli.html)。
-4. **Figma 插件**：直接从 Figma 同步和提取样式。了解更多 [这里](https://docs.lvgl.io/master/xml/tools/figma.html)。
+用 C 构建 UI 效果不错，但随着项目变大，迭代会变慢，也更难保持一致性。[LVGL Pro](https://lvgl.io/pro) 让你能够可视化地构建可复用的组件和屏幕、即时预览变更，并在一处统一管理数据绑定、翻译、动画和测试。
 
-这些工具结合在一起，帮助开发者高效构建 UI、可靠测试，并便于团队协作。
+Pro 导出的是纯粹的 LVGL C 代码：就是你已经在用的那个 LVGL，没有额外的运行时或依赖。它能直接放入现有项目，无需改变你构建或发布的方式。
 
-了解更多：https://pro.lvgl.io
+<p align="center">
+  <img height="500" alt="在 LVGL Pro 编辑器中构建 UI 并实时预览" src="https://github.com/user-attachments/assets/8cef0f05-0ff1-4766-8dfd-1d15e47f181a" />
+</p>
 
-## 🤝 商业服务
+你可以在浏览器中通过 [viewer.lvgl.io](https://viewer.lvgl.io) 直接试用，无需安装任何东西；也可以[下载 Editor](https://lvgl.io/pro#download) 并在免费的 Community 许可证下使用。
 
-LVGL LLC 提供多种商业服务，助力 UI 开发。凭借超过 15 年的用户界面与图形经验，我们能将你的产品 UI 提升到更高水平。
+LVGL Pro 由四个紧密关联的工具组成：
 
-- **图形设计**：我们的内部设计师擅长打造美观现代的设计，兼顾产品特性与硬件能力。
-- **UI 实现**：我们可以基于你提供或我们设计的 UI 进行实现，充分发挥硬件与 LVGL 的潜力。如缺少特定功能或控件，我们也可为你开发。
-- **咨询与支持**：提供 UI 开发咨询，帮助你避免代价高昂、耗时的错误。
-- **开发板认证**：为提供开发板或量产套件的企业提供认证服务，展示该板卡的 LVGL 运行能力。
+1. **Editor**：LVGL Pro 的核心。一款桌面应用，用于以 XML 构建组件和屏幕，管理数据绑定、翻译、动画、测试等。进一步了解 [XML 格式](https://lvgl.io/docs/pro/syntax) 和[控件](https://lvgl.io/docs/pro/built_in_widgets)。
+2. **Online Viewer**：在浏览器中运行 Editor，打开 GitHub 项目，无需搭建开发环境即可轻松分享。访问 [https://viewer.lvgl.io](https://viewer.lvgl.io)。
+3. **Figma 插件**：一键将 Figma 设计迁移到 LVGL Pro。在[这里](https://lvgl.io/docs/pro/figma)查看其工作原理。
+4. **CLI 工具**：在 CI/CD 中生成 C 代码并运行测试。详情见[这里](https://lvgl.io/docs/pro/cli)。
 
-查看我们的 [演示](https://lvgl.io/demos) 以了解示例。更多信息请访问 [服务页面](https://lvgl.io/services)。
+Community 和 Evaluation 层级可免费使用；商业用途请参见[许可证](#license)。
 
-[联系我们](https://lvgl.io/#contact)，告诉我们如何帮助你。
+<a id="examples"></a>
+## 示例
 
-## 🧑‍💻 集成 LVGL
+你可以在 https://lvgl.io/docs/open/examples 查看 100 多个 C 和 XML 示例
 
-集成 LVGL 非常简单。将其添加到项目中并像其他源文件一样编译即可。
-配置时复制 `lv_conf_template.h` 为 `lv_conf.h`，启用第一个 `#if 0` 并按需修改配置。
-（默认配置通常已足够。）LVGL 也支持通过 Kconfig 配置。
+LVGL Pro 的 [Online Viewer](https://viewer.lvgl.io/) 还包含许多教程以及这些相同的示例，你可以进行交互式体验。
 
-项目中可按以下方式初始化 LVGL 并创建显示和输入设备：
+作为预告，下面是用 C 和 XML 编写的同一个简单 UI：
+
+<p align="center">
+  <img width="311" height="232" alt="一个居中的按钮，点击时会打印" src="https://github.com/user-attachments/assets/5948b485-e3f7-4a63-bb21-984381417c4a" />
+</p>
+
+<!-- GitHub renders fenced code blocks inside table cells, so this shows C and XML side by side. -->
+<table>
+<tr>
+<td width="50%">
 
 ```c
-#include "lvgl/lvgl.h" /*定义 LV_LVGL_H_INCLUDE_SIMPLE 可直接使用 "lvgl.h"*/
+static void button_clicked_cb(lv_event_t * e)
+{
+    printf("Clicked\n");
+}
+
+/* ... */
+
+lv_obj_t * button = lv_button_create(lv_screen_active());
+lv_obj_center(button);
+lv_obj_add_event_cb(button, button_clicked_cb,
+                    LV_EVENT_CLICKED, NULL);
+
+lv_obj_t * label = lv_label_create(button);
+lv_label_set_text(label, "Hello from LVGL!");
+```
+
+</td>
+<td width="50%">
+
+```xml
+<screen>
+  <view>
+    <lv_button align="center">
+      <event_cb callback="button_clicked_cb" />
+      <lv_label text="Hello from LVGL!" />
+    </lv_button>
+  </view>
+</screen>
+```
+
+</td>
+</tr>
+</table>
+
+上面的 XML 正是 [LVGL Pro](#lvgl-pro) 所使用的：你可视化地构建屏幕，它就会为你生成 C 代码。
+
+<a id="integration"></a>
+## 集成
+
+LVGL 没有任何外部依赖，因此可以轻松地为任何设备编译。它自带内置驱动，可在众多包管理器和 RTOS 中获取，也很容易移植到任何新设备上。
+
+### 预集成
+
+- **芯片厂商**：[ESP32](https://components.espressif.com/components/lvgl/lvgl)、[NXP MCUXpresso 组件](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)、[Renesas FSP](https://lvgl.io/docs/open/integration/chip/renesas)、[STM32](https://lvgl.io/docs/open/integration/chip/stm32)
+
+- **RTOS**：[Zephyr](https://lvgl.io/docs/open/integration/os/zephyr)、[NuttX](https://lvgl.io/docs/open/integration/os/nuttx)、[RT-Thread](https://lvgl.io/docs/open/integration/os/rt-thread)
+
+- **框架**：[Arduino](https://lvgl.io/docs/open/integration/framework/arduino)、[PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl)、[CMSIS-Pack](https://lvgl.io/docs/open/integration/framework/cmsis-pack)
+
+- **开发板制造商**：[Seeed Studio](https://www.seeedstudio.com)、[Elecrow](https://www.elecrow.com/display/esp-hmi-display.html)、[Riverdi](https://lvgl.io/docs/open/integration/boards/manufacturers/riverdi)、[VIEWE](https://lvgl.io/docs/open/integration/boards/manufacturers/viewe)，以及[更多](https://lvgl.io/boards)
+
+### 内置驱动
+LVGL 附带了开箱即用的驱动，因此在常见平台上，你无需自己编写显示和输入处理代码：
+
+- **模拟器 / 桌面**：[SDL](https://lvgl.io/docs/open/integration/pc/sdl)、X11 和 [Wayland](https://lvgl.io/docs/open/integration/embedded_linux/drivers/wayland) 窗口，可在 PC 上开发和预览你的 UI。
+- **显示控制器**：通用的 MIPI-DBI/SPI LCD（[ILI9341](https://lvgl.io/docs/open/integration/external_display_controllers/ili9341)、ST7789 及类似型号），以及厂商控制器，如 ST 的 [LTDC](https://lvgl.io/docs/open/integration/chip_vendors/stm32/ltdc) 和 NXP 的 [eLCDIF](https://lvgl.io/docs/open/integration/chip_vendors/nxp/elcdif)。
+- **嵌入式 Linux**：framebuffer (fbdev)、DRM/KMS、Wayland，以及用于触摸和指针输入的 `libinput`/`evdev`。在[这里](https://lvgl.io/docs/open/integration/embedded_linux)进一步了解。
+- **GPU / 加速器**：VG-Lite、NXP PXP、ThinkSilicon NemaGFX、Arm-2D 和 [OpenGL ES](https://lvgl.io/docs/open/integration/embedded_linux/drivers/opengl_driver)
+
+在[集成文档](https://lvgl.io/docs/open/integration)中查看完整列表和设置指南。
+
+### 在 LVGL Pro 中
+
+在 LVGL Pro 中，你只需单击一下即可创建开箱即用的纯 UI、VSCode、Zephyr 和 Linux 项目。
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/5aadb850-6b40-49d1-ba96-2296041c7e27" />
+
+### 手动移植
+
+集成 LVGL 非常简单。只需将它放入任何项目，像编译其他文件一样编译它即可。要配置 LVGL，将 `lv_conf_template.h` 复制为 `lv_conf.h`，启用开头的 `#if 0`，并根据需要调整配置。（默认配置通常就够用了。）如果可用，LVGL 也可以配合 Kconfig 使用。
+
+进入项目后，你可以按如下方式初始化 LVGL 并创建显示设备和输入设备：
+
+```c
+#include "lvgl/lvgl.h" /*Define LV_LVGL_H_INCLUDE_SIMPLE to include as "lvgl.h"*/
 
 #define TFT_HOR_RES 320
 #define TFT_VER_RES 240
@@ -131,7 +205,11 @@ static uint32_t my_tick_cb(void)
 
 static void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    /*将 px_map 写入帧缓冲或显示控制器对应区域*/
+    /*Write px_map to the area->x1, area->x2, area->y1, area->y2 area of the
+     *frame buffer or external display controller. */
+
+    /* signal LVGL that we're done */
+    lv_display_flush_ready(disp);
 }
 
 static void my_touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
@@ -149,218 +227,59 @@ void main(void)
 {
     my_hardware_init();
 
-    /*初始化 LVGL*/
+    /*Initialize LVGL*/
     lv_init();
 
-    /*设置毫秒级时钟回调，用于 LVGL 计时*/
+    /*Set millisecond-based tick source for LVGL so that it can track time.*/
     lv_tick_set_cb(my_tick_cb);
 
-    /*创建显示对象，用于添加屏幕和控件*/
+    /*Create a display where screens and widgets can be added*/
     lv_display_t * display = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
 
-    /*添加渲染缓冲，这里假设使用 16 位 RGB565 格式*/
-    static uint8_t buf[TFT_HOR_RES * TFT_VER_RES / 10 * 2];
+    /*Add rendering buffers to the screen.
+     *Here adding a smaller partial buffer assuming 16-bit (RGB565 color format)*/
+    static uint8_t buf[TFT_HOR_RES * TFT_VER_RES / 10 * 2]; /* x2 because of 16-bit color depth */
     lv_display_set_buffers(display, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
-    /*设置刷新回调，将缓冲内容写入显示设备*/
+    /*Add a callback that can flush the content from `buf` when it has been rendered*/
     lv_display_set_flush_cb(display, my_flush_cb);
 
-    /*创建输入设备用于触摸处理*/
+    /*Create an input device for touch handling*/
     lv_indev_t * indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, my_touch_read_cb);
 
-    /*驱动已就绪，创建 UI*/
+    /*The drivers are in place; now we can create the UI*/
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Hello world");
     lv_obj_center(label);
 
-    /*循环执行 LVGL 任务*/
+    /*Execute the LVGL-related tasks in a loop*/
     while(1) {
         lv_timer_handler();
-        my_sleep_ms(5);
+        my_sleep_ms(5);         /*Wait a little to let the system breathe*/
     }
 }
 ```
 
-## 🤖 示例
 
-可在 https://docs.lvgl.io/master/examples.html 查看 100+ 示例。
+<a id="contributing"></a>
+## 参与贡献
 
-在线预览器 https://viewer.lvgl.io/ 也提供了易学的 XML 教程。
+LVGL 是一个开放的项目，非常欢迎大家贡献。贡献的方式有很多，从简单地谈论你的项目、编写示例、改进文档、修复 bug，甚至到在 LVGL 组织下托管你自己的项目。
 
+有关贡献机会的详细说明，请访问文档的[参与贡献](https://lvgl.io/docs/open/contributing)章节。
 
-### Hello World 按钮事件示例
-
-<img width="311" height="232" alt="image" src="https://github.com/user-attachments/assets/5948b485-e3f7-4a63-bb21-984381417c4a" />
-
-<details>
-  <summary>C 代码</summary>
-
-  ```c
-static void button_clicked_cb(lv_event_t * e)
-{
-	printf("Clicked\n");
-}
-
-[...]
-
-  lv_obj_t * button = lv_button_create(lv_screen_active());
-  lv_obj_center(button);
-  lv_obj_add_event_cb(button, button_clicked_cb, LV_EVENT_CLICKED, NULL);
-
-  lv_obj_t * label = lv_label_create(button);
-  lv_label_set_text(label, "Hello from LVGL!");
-```
-</details>
-
-<details>
-  <summary>使用 LVGL Pro 的 XML</summary>
-
-```xml
-<screen>
-	<view>
-		<lv_button align="center">
-			<event_cb callback="button_clicked_cb" />
-			<lv_label text="Hello from LVGL!" />
-		</lv_button>
-	</view>
-</screen>
-```
-
-</details>
-
-### 带数据绑定的滑块
-
-<img width="314" height="233" alt="image" src="https://github.com/user-attachments/assets/268db1a0-946c-42e2-aee4-9550bdf5f4f9" />
-
-<details>
-  <summary>C 代码</summary>
-
-```c
-static void my_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
-{
-	printf("Slider value: %d\n", lv_subject_get_int(subject));
-}
-
-[...]
-
-static lv_subject_t subject_value;
-lv_subject_init_int(&subject_value, 35);
-lv_subject_add_observer(&subject_value, my_observer_cb, NULL);
-
-lv_style_t style_base;
-lv_style_init(&style_base);
-lv_style_set_bg_color(&style_base, lv_color_hex(0xff8800));
-lv_style_set_bg_opa(&style_base, 255);
-lv_style_set_radius(&style_base, 4);
-
-lv_obj_t * slider = lv_slider_create(lv_screen_active());
-lv_obj_center(slider);
-lv_obj_set_size(slider, lv_pct(80), 16);
-lv_obj_add_style(slider, &style_base, LV_PART_INDICATOR);
-lv_obj_add_style(slider, &style_base, LV_PART_KNOB);
-lv_obj_add_style(slider, &style_base, 0);
-lv_obj_set_style_bg_opa(slider, LV_OPA_50, 0);
-lv_obj_set_style_border_width(slider, 3, LV_PART_KNOB);
-lv_obj_set_style_border_color(slider, lv_color_hex3(0xfff), LV_PART_KNOB);
-lv_slider_bind_value(slider, &subject_value);
-
-lv_obj_t * label = lv_label_create(lv_screen_active());
-lv_obj_align(label, LV_ALIGN_CENTER, 0, -30);
-lv_label_bind_text(label, &subject_value, "Temperature: %d °C");
-```
-
-</details>
-
-<details>
-  <summary>使用 LVGL Pro 的 XML</summary>
-
-```xml
-<screen>
-	<styles>
-		<style name="style_base" bg_opa="100%" bg_color="0xff8800" radius="4" />
-		<style name="style_border" border_color="0xfff" border_width="3" />
-	</styles>
-
-	<view>
-		<lv_label bind_text="value" bind_text-fmt="Temperature: %d °C" align="center" y="-30" />
-		<lv_slider align="center" bind_value="value" style_bg_opa="30%">
-			<style name="style_base" />
-			<style name="style_base" selector="knob" />
-			<style name="style_base" selector="indicator" />
-			<style name="style_border" selector="knob" />
-		</lv_slider>
-	</view>
-</screen>
-```
-
-</details>
-
-### 布局中的复选框
-
-<img width="311" height="231" alt="image" src="https://github.com/user-attachments/assets/ba9af647-2ea1-4bc8-b53d-c7b43ce24b6e" />
-
-<details>
-  <summary>C 代码</summary>
-
-  ```c
-/*创建新屏幕并加载*/
-lv_obj_t * scr = lv_obj_create(NULL);
-lv_screen_load(scr);
-
-/*设置列布局*/
-lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_COLUMN);
-lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, /*垂直对齐*/
-						   LV_FLEX_ALIGN_START,	       /*主轴方向对齐*/
-						   LV_FLEX_ALIGN_CENTER);      /*交叉轴方向对齐*/
-
-/*创建 5 个复选框*/
-const char * texts[5] = {"Input 1", "Input 2", "Input 3", "Output 1", "Output 2"};
-for(int i = 0; i < 5; i++) {
-	lv_obj_t * cb = lv_checkbox_create(scr);
-	lv_checkbox_set_text(cb, texts[i]);
-}
-
-/*更改状态*/
-lv_obj_add_state(lv_obj_get_child(scr, 1), LV_STATE_CHECKED);
-lv_obj_add_state(lv_obj_get_child(scr, 3), LV_STATE_DISABLED);
-```
-
-</details>
-
-<details>
-  <summary>使用 LVGL Pro 的 XML</summary>
-
-```xml
-<screen>
-	<view
-		flex_flow="column"
-		style_flex_main_place="space_evenly"
-		style_flex_cross_place="start"
-		style_flex_track_place="center"
-	>
-		<lv_checkbox text="Input 1"/>
-		<lv_checkbox text="Input 2"/>
-		<lv_checkbox text="Input 3" checked="true"/>
-		<lv_checkbox text="Output 1"/>
-		<lv_checkbox text="Output 2" disabled="true"/>
-   </view>
-</screen>
-```
-
-</details>
+已经有数百人在 LVGL 上留下了他们的印记。快来成为其中一员吧！我们在这里等你！🙂
 
 
-## 🌟 贡献
+<a id="license"></a>
+## 许可证
 
-LVGL 是一个开放项目，欢迎任何形式的贡献。无论是分享你的项目、编写示例、改进文档、修复错误，还是将项目托管到 LVGL 组织下，都非常欢迎。
+LVGL 库基于 **MIT 许可证**发布，因此你可以在开源和商业产品中自由使用它，无需支付任何版税。参见 [`LICENCE.txt`](../LICENCE.txt)。
 
-更多贡献方式详见 [贡献文档](https://docs.lvgl.io/master/contributing/index.html)。
+与 LVGL 捆绑的所有第三方库也都在与 MIT 兼容的许可证下发布，因此你可以放心地使用 LVGL 及其依赖。
 
-已有超过 600 位开发者为 LVGL 留下足迹。加入我们吧！🙂
-
-<a href="https://github.com/lvgl/lvgl/graphs/contributors"> <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" /> </a>
-
-……还有更多人。
-
+**[LVGL Pro](https://lvgl.io/pro)** 采用单独的许可授权：
+- **Community** 和 **Evaluation** 层级对**非商业用途免费**，非常适合学习、业余项目以及评估这些工具。
+- LVGL Pro 的商业用途需要付费许可证。参见[价格与详情](https://lvgl.io/pro#pricing)。

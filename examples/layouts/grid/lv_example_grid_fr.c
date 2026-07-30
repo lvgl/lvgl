@@ -23,7 +23,7 @@ void lv_example_grid_fr(void)
 
     /* Main grid container with fixed and FR tracks */
     lv_obj_t * container_1 = lv_obj_create(screen);
-    static const int32_t container_1_style_grid_column_dsc_array_0[] = {60, LV_GRID_FR(1), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
+    static const int32_t container_1_style_grid_column_dsc_array_0[] = {80, LV_GRID_FR(1), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_column_dsc_array(container_1, container_1_style_grid_column_dsc_array_0, 0);
     static const int32_t container_1_style_grid_row_dsc_array_1[] = {44, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_row_dsc_array(container_1, container_1_style_grid_row_dsc_array_1, 0);
@@ -37,7 +37,7 @@ void lv_example_grid_fr(void)
     lv_obj_set_style_grid_cell_row_pos(label_1, 0, 0);
     lv_obj_set_style_bg_color(label_1, lv_color_hex(0xb8d8f8), 0);
     lv_obj_set_style_bg_opa(label_1, (255 * 100 / 100), 0);
-    lv_label_set_text(label_1, "60px");
+    lv_label_set_text(label_1, "80px");
 
     lv_obj_t * label_2 = lv_label_create(container_1);
     lv_obj_set_style_grid_cell_x_align(label_2, LV_GRID_ALIGN_STRETCH, 0);
@@ -66,7 +66,7 @@ void lv_example_grid_fr(void)
     lv_obj_set_style_bg_color(container_2, lv_color_hex(0xb8d8f8), 0);
     lv_obj_set_style_bg_opa(container_2, (255 * 100 / 100), 0);
     lv_obj_t * label_4 = lv_label_create(container_2);
-    lv_label_set_text(label_4, "60px");
+    lv_label_set_text(label_4, "80px");
     lv_obj_set_align(label_4, LV_ALIGN_CENTER);
 
     lv_obj_t * container_3 = lv_obj_create(container_1);
@@ -77,7 +77,7 @@ void lv_example_grid_fr(void)
     lv_obj_set_style_bg_color(container_3, lv_color_hex(0x7ec8ff), 0);
     lv_obj_set_style_bg_opa(container_3, (255 * 100 / 100), 0);
     lv_obj_t * label_5 = lv_label_create(container_3);
-    lv_label_set_text(label_5, "1fr row");
+    lv_label_set_text(label_5, "1fr");
     lv_obj_set_align(label_5, LV_ALIGN_CENTER);
 
     lv_obj_t * container_4 = lv_obj_create(container_1);

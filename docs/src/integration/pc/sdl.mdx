@@ -11,7 +11,7 @@ a PC.
 
 The [Eclipse](https://github.com/lvgl/lv_port_pc_eclipse),
 [VSCode](https://github.com/lvgl/lv_port_pc_vscode), and [Generic Linux](https://github.com/lvgl/lv_port_linux)
-projects of LVGL use SDL to open a window and manage input devices.
+projects of LVGL use SDL to open a window and manage [input devices](/main-modules/indev).
 
 As SDL is fully cross-platform, it is easy to integrate into any environment.
 
@@ -21,8 +21,8 @@ Install SDL according to your platform:
 
 - Linux: `sudo apt install libsdl2-dev`
 - macOS: `brew install sdl2`
-- Windows: Recommended: [vcpkg install sdl2`  
-  Alternatively, you can download prebuilt SDL2 binaries from the `SDL website](https://www.libsdl.org/download-2.0.php) and follow their installation instructions.
+- Windows: Recommended: `vcpkg install sdl2`.
+  Alternatively, you can download prebuilt SDL2 binaries from the [SDL website](https://www.libsdl.org/download-2.0.php) and follow their installation instructions.
 
 ## Configuration
 
@@ -83,15 +83,15 @@ When building for 32-bit architecture, add the following workaround at the begin
 The SDL driver supports multiple rendering backends that determine how LVGL renders content to the screen.
 Each backend offers different performance characteristics and use cases.
 
-# Standard Software Rendering (Default)
+### Standard Software Rendering (Default)
 
 By default, the SDL driver uses pure software rendering with no additional configuration required.
 
 **Configuration:**
 
-No additional configuration needed - this is the default when only `LV_USE_SDL 1` is enabled.
+No additional configuration needed - this is the default when only <ApiLink name="LV_USE_SDL" /> is enabled.
 
-# SDL Draw Unit
+### SDL Draw Unit
 
 The SDL Draw Unit uses software rendering to create SDL textures which are then cached and blended together by the GPU,
 providing a hybrid approach that combines software rendering flexibility with hardware-accelerated texture composition.
@@ -105,7 +105,7 @@ providing a hybrid approach that combines software rendering flexibility with ha
 
 For complete details, see [SDL Draw Unit](/integration/embedded_linux/draw_units/draw_sdl).
 
-# OpenGL-Based Rendering
+### OpenGL-Based Rendering
 
 The SDL driver can leverage OpenGL for hardware-accelerated rendering. LVGL provides two OpenGL-based rendering options:
 
@@ -117,7 +117,7 @@ The SDL driver can leverage OpenGL for hardware-accelerated rendering. LVGL prov
 #define LV_USE_OPENGLES 1
 
 /* For NanoVG Draw Unit*/
-#define LV_USE_DRAW_NANOVG 1 
+#define LV_USE_DRAW_NANOVG 1
 #define LV_USE_NANOVG 1
 
 /* For OpenGL Draw Unit */

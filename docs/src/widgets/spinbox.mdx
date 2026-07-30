@@ -1,15 +1,15 @@
 ---
 title: "Spinbox (lv_spinbox)"
-description: Spinbox contains an integer displayed as a decimal number with a possible fixed decimal point position and a configurable number of digits. The value can be increased or decreased by Keys or API fu...
+description: "Edit an integer digit by digit, with a configurable number of digits and an optional fixed decimal point."
 ---
 
 ## Overview
 
-Spinbox contains an integer displayed as a decimal number with a possible fixed
-decimal point position and a configurable number of digits.  The value can be
-increased or decreased by *Keys* or API functions.  Under the hood Spinbox is a
-[Text Area (lv_textarea)](/widgets/textarea) with behaviors extended to enable a numeric value
-to be viewed and modified with configurable constraints.
+A Spinbox shows an integer as a decimal number with a configurable
+number of digits and an optional fixed decimal point. The value is
+changed with keys or API calls. Under the hood it is a
+[Text Area](/widgets/textarea) extended to view and edit a numeric value
+with configurable limits.
 
 ## Value, range and step
 
@@ -104,15 +104,9 @@ To show the value live in a label next to the widget, attach a label and call <A
 
 ## Events
 
-- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when value has changed.
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent when value has changed.
 
-To update another widget on every value change without an event callback, bind both widgets to the same Subject — see the Data binding section above.
-
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
@@ -123,6 +117,4 @@ Learn more about [events](/common-widget-features/events).
 - <ApiLink name="LV_KEY_ENTER" /> With *Encoder*, move focus to next digit.  If focus
   is on last digit, focus moves to first digit.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

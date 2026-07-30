@@ -301,7 +301,7 @@ static lv_result_t window_create(lv_display_t * disp)
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
     if(!dsc->window) {
-        LV_LOG_ERROR("Failed to create SDL window");
+        LV_LOG_ERROR("Failed to create SDL window: '%s'", SDL_GetError());
         return LV_RESULT_INVALID;
     }
     if(lv_sdl_backend_ops.init_display(disp) != LV_RESULT_OK) {

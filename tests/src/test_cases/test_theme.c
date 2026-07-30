@@ -150,6 +150,11 @@ static void test_widgets(const char * img_name)
 
 void test_theme_default_resolution_change_no_recursion(void)
 {
+    /* This test changes the default display resolution, which the NanoVG headless
+     * test display (fixed-size FBO) does not support. */
+#if LV_USE_DRAW_NANOVG
+    TEST_PASS();
+#else
     lv_theme_t * theme = lv_theme_default_init(NULL,
                                                lv_palette_main(LV_PALETTE_BLUE),
                                                lv_palette_main(LV_PALETTE_RED),
@@ -171,6 +176,7 @@ void test_theme_default_resolution_change_no_recursion(void)
     TEST_ASSERT_TRUE(lv_theme_default_is_inited());
 
     lv_obj_clean(lv_screen_active());
+#endif /* LV_USE_DRAW_NANOVG */
 }
 
 void test_theme_default(void)

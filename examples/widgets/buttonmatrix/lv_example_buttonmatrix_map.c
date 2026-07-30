@@ -24,7 +24,7 @@ void lv_example_buttonmatrix_map(void)
     /* 3x3 numeric keypad: rows split by '&#10;' (XML entity = newline) inside the map */
     lv_obj_t * buttonmatrix = lv_buttonmatrix_create(screen);
     lv_obj_set_align(buttonmatrix, LV_ALIGN_CENTER);
-    lv_obj_set_size(buttonmatrix, lv_pct(90), 180);
+    lv_obj_set_size(buttonmatrix, lv_pct(90), 200);
     static const char * buttonmatrix_map_0[] = {"1", "2", "3", "\n", "4", "5", "6", "\n", "7", "8", "9", NULL};
     lv_buttonmatrix_set_map(buttonmatrix, buttonmatrix_map_0);
 }

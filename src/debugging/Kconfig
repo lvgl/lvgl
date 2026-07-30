@@ -1,0 +1,38 @@
+menu "Debugging"
+menu "System Monitoring"
+	rsource "sysmon/Kconfig"
+endmenu
+
+menu "Profiler"
+	rsource "profiler/Kconfig"
+endmenu
+
+menu "Test Utilities"
+	rsource "test/Kconfig"
+
+	config LV_USE_MONKEY
+		bool "Enable Monkey test"
+		default n
+		help
+			Enable Monkey test
+endmenu
+
+menu "Debug Rendering"
+
+config LV_USE_REFR_DEBUG
+	bool "Draw random colored rectangles over the redrawn areas"
+	help
+		Draw random colored rectangles over the redrawn areas.
+
+config LV_USE_LAYER_DEBUG
+	bool "Draw a red overlay for ARGB layers and a green overlay for RGB layers"
+	help
+		Draw a red overlay for ARGB layers and a green overlay for RGB layers
+
+config LV_USE_PARALLEL_DRAW_DEBUG
+	bool "Draw overlays with different colors for each draw_unit's tasks"
+	help
+		Also add the index number of the draw unit on white background.
+		For layers add the index number of the draw unit on black background.
+endmenu
+endmenu

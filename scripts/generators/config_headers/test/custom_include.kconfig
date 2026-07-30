@@ -1,0 +1,23 @@
+# Fixture for the custom-include convention (LV_*_USE_CUSTOM_INCLUDE gate +
+# LV_*_CUSTOM_INCLUDE path), auto-included centrally by the generator.
+
+# --- a proper pair: auto-included --------------------------------------------
+config LV_FOO_USE_CUSTOM_INCLUDE
+	bool "Use a custom foo header"
+	default n
+
+config LV_FOO_CUSTOM_INCLUDE
+	string "Path to custom foo header"
+	default ""
+	depends on LV_FOO_USE_CUSTOM_INCLUDE
+
+# --- has a gate but included by its subsystem (INCLUDED_BY_SUBSYSTEM) ---------
+# Must not be auto-included (lv_global.h includes it after lv_global_t exists).
+config LV_GLOBAL_USE_CUSTOM_INCLUDE
+	bool "Use a custom global header"
+	default n
+
+config LV_GLOBAL_CUSTOM_INCLUDE
+	string "Custom global header"
+	default "lv_global.h"
+	depends on LV_GLOBAL_USE_CUSTOM_INCLUDE

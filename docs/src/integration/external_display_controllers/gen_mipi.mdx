@@ -46,14 +46,16 @@ There are no prerequisites.
 ## Configuring the driver
 
 Enable the generic MIPI LCD driver support in lv_conf.h, by cmake compiler define or
-by KConfig
+by KConfig:
 
 ```c
 #define LV_USE_GENERIC_MIPI  1
 ```
 
 <Callout type="info">
-is enabled.
+The chip-specific drivers (e.g. ST7789, ILI9341) automatically enable the generic
+MIPI driver, so you do not need to set <ApiLink name="LV_USE_GENERIC_MIPI" /> explicitly
+when one of those is enabled.
 </Callout>
 
 ## Usage
@@ -80,10 +82,10 @@ void my_lcd_send_color(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size
 }
 ```
 
-The only difference between the <ApiLink name="my_lcd_send_cmd" />
-and <ApiLink name="my_lcd_send_color" /> functions is that <ApiLink name="my_lcd_send_cmd" /> is
+The only difference between the `my_lcd_send_cmd`
+and `my_lcd_send_color` functions is that `my_lcd_send_cmd` is
 used to send short commands and it is expected to complete the transaction when it
-returns (in other words, it should be blocking), while <ApiLink name="my_lcd_send_color" />
+returns (in other words, it should be blocking), while `my_lcd_send_color`
 is only used to send pixel data, and it is recommended to use DMA to transmit data in
 the background.  More sophisticated methods can be also implemented, like queuing
 transfers and scheduling them in the background.
@@ -107,7 +109,8 @@ end of the transfer), or by using a semaphore or other locking mechanism.
 
 Please also note that the driver does not handle the draw buffer allocation, because
 this may be platform-dependent, too. Thus you need to allocate the buffers and assign
-them to the display object as usual by calling <ApiLink name="lv_display_set_buffers" />.
+them to the display object as usual by calling <ApiLink name="lv_display_set_buffers" />
+(see [Draw Buffer(s)](/main-modules/display/setup)).
 
 The driver can be used to create multiple displays. In such a configuration the
 callbacks must be able to distinguish between the displays. Usually one would
@@ -258,7 +261,7 @@ Unfortunately, finding a good set of parameters is not easy.  Usually the
 manufacturer of the panel provides some example code with recommended register
 settings.
 
-You can use the <ApiLink name="my_lcd_send_cmd" /> function to send an arbitrary command to
+You can use the `my_lcd_send_cmd` function to send an arbitrary command to
 the LCD controller.  However, to make it easier to send a large number of parameters
 the generic MIPI driver supports sending a custom command list to the controller.
 The commands must be put into a 'uint8_t' array:

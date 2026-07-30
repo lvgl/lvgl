@@ -1,0 +1,60 @@
+config LV_USE_LINUX_DRM
+	bool "Use Linux DRM device"
+	default n
+	help
+		Driver for /dev/dri/card
+
+if LV_USE_LINUX_DRM
+
+config LV_LINUX_DRM_AUTO_BACKEND
+	bool "Auto-select the DRM backend (legacy)"
+	default y
+	help
+	  Legacy behavior, kept for backwards compatibility and slated for removal.
+	  While set, the backend is inferred from LV_USE_OPENGLES (EGL when OpenGLES
+	  is enabled).  Disable this and pick a backend explicitly via the Linux DRM
+	  "Rendering backend" choice.
+
+choice
+	prompt "Rendering backend"
+	default LV_LINUX_DRM_BACKEND_FBDEV
+	depends on !LV_LINUX_DRM_AUTO_BACKEND
+	help
+	  Select how the Linux DRM driver presents rendered frames.
+
+	config LV_LINUX_DRM_BACKEND_FBDEV
+		bool "Dumb buffers (no GPU)"
+		help
+		  Software rendering into DRM/KMS dumb buffers.
+
+	config LV_LINUX_DRM_BACKEND_GBM
+		bool "GBM DMA buffers"
+		select LV_USE_LINUX_DRM_GBM_BUFFERS
+		help
+		  Use MESA GBM for Linux DRM DMA buffers.
+
+	config LV_LINUX_DRM_BACKEND_EGL
+		bool "EGL (OpenGL ES, hardware-accelerated)"
+		select LV_LINUX_DRM_USE_EGL
+		select LV_USE_LINUX_DRM_GBM_BUFFERS
+		select LV_USE_OPENGLES
+		help
+		  Hardware-accelerated rendering via OpenGL ES 2.0 and EGL.
+		  Requires OpenGL ES 2.0 on the target hardware and linking with
+		  -lEGL.  Compatible with LVGL 3D/glTF rendering.  Implies GBM buffers.
+endchoice
+
+config LV_LINUX_DRM_BACKEND
+	int
+	default 0 if LV_LINUX_DRM_BACKEND_FBDEV
+	default 1 if LV_LINUX_DRM_BACKEND_GBM
+	default 2 if LV_LINUX_DRM_BACKEND_EGL
+
+config LV_LINUX_DRM_USE_EGL
+	bool
+	select LV_USE_EGL
+
+config LV_USE_LINUX_DRM_GBM_BUFFERS
+	bool
+
+endif # LV_USE_LINUX_DRM

@@ -28,6 +28,13 @@ void lv_example_arc_styling(void)
         lv_style_set_arc_width(&style_arc_bg, 22);
         lv_style_set_arc_rounded(&style_arc_bg, true);
         lv_style_set_arc_opa(&style_arc_bg, 180);
+        lv_style_set_bg_color(&style_arc_bg, lv_color_hex(0xffffff));
+        lv_style_set_bg_opa(&style_arc_bg, (255 * 100 / 100));
+        lv_style_set_pad_all(&style_arc_bg, 16);
+        lv_style_set_radius(&style_arc_bg, 16);
+        lv_style_set_shadow_color(&style_arc_bg, lv_color_hex(0xcacaca));
+        lv_style_set_shadow_offset_y(&style_arc_bg, 10);
+        lv_style_set_shadow_width(&style_arc_bg, 21);
 
         lv_style_init(&style_arc_indicator);
         lv_style_set_arc_color(&style_arc_indicator, lv_color_hex(0x6366f1));
@@ -57,15 +64,12 @@ void lv_example_arc_styling(void)
 
     /* 💡 Drag the knob to repaint the indicator; styling is independent of value. */
     lv_obj_t * arc = lv_arc_create(screen);
-    lv_obj_set_size(arc, 160, 160);
+    lv_obj_set_size(arc, 180, 180);
     lv_arc_set_min_value(arc, 0);
     lv_arc_set_max_value(arc, 100);
     lv_arc_set_value(arc, 65);
     lv_obj_add_style(arc, &style_arc_bg, LV_PART_MAIN);
     lv_obj_add_style(arc, &style_arc_indicator, LV_PART_INDICATOR);
     lv_obj_add_style(arc, &style_arc_knob, LV_PART_KNOB);
-    lv_obj_t * label = lv_label_create(arc);
-    lv_obj_set_align(label, LV_ALIGN_CENTER);
-    lv_label_set_text(label, "65");
 }
 #endif

@@ -31,7 +31,7 @@ void lv_example_grid_align(void)
     lv_obj_set_style_grid_column_align(container, LV_GRID_ALIGN_SPACE_BETWEEN, 0);
     lv_obj_set_style_grid_row_align(container, LV_GRID_ALIGN_END, 0);
     lv_obj_set_style_layout(container, LV_LAYOUT_GRID, 0);
-    lv_obj_set_size(container, lv_pct(100), 180);
+    lv_obj_set_size(container, 300, 180);
     /* First row */
     lv_obj_t * label_1 = lv_label_create(container);
     lv_obj_set_style_grid_cell_x_align(label_1, LV_GRID_ALIGN_STRETCH, 0);

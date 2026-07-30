@@ -261,6 +261,7 @@ void lv_nanovg_clean_up(struct _lv_draw_nanovg_unit_t * u)
     LV_PROFILER_DRAW_BEGIN;
 
     lv_pending_remove_all(u->image_pending);
+    lv_pending_remove_all(u->image_uncached_pending);
     lv_pending_remove_all(u->letter_pending);
     u->is_started = false;
 

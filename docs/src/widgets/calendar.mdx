@@ -1,24 +1,22 @@
 ---
 title: "Calendar (lv_calendar)"
-description: "The Calendar Widget is a classic calendar which can:"
+description: "A classic month calendar that can show day names, highlight today, and mark any user-defined dates."
 ---
 
 ## Overview
 
-The Calendar Widget is a classic calendar which can:
+Calendar is a classic month calendar. It can:
 
-- show the days of any month in a 7x7 matrix;
-- show the name of the days;
-- highlight the current day (today);
+- show the days of any month in a 7x7 grid,
+- show the name of each day,
+- highlight today, and
 - highlight any user-defined dates.
 
-The Calendar is added to the default group (if one is set). Calendar is
-an editable Widget which allows selecting and clicking the dates with
-encoder or keyboard navigation as well as pointer-type input devices.
+Calendar is added to the default group (if one is set). It is an editable
+widget — dates can be picked with a pointer, an encoder, or a keyboard.
 
-To make the Calendar flexible, by default it does not show the current
-year or month. Instead, there are optional "headers" that can be
-attached to the calendar.
+To stay flexible, Calendar does not show the current year or month by
+default. Optional "headers" can be attached to add this.
 
 ## Styling
 
@@ -108,20 +106,14 @@ solar-term annotations alongside each Gregorian day. Requires
    date currently being pressed. Returns <ApiLink name="LV_RESULT_OK" /> if there is a
    valid pressed date; otherwise it returns <ApiLink name="LV_RESULT_INVALID" />.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
 - `LV_KEY_DOWN/UP/LEFT/RIGHT` To navigate among the buttons to dates
 - <ApiLink name="LV_KEY_ENTER" /> To press/release the selected date
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
 
 ## Headers
 

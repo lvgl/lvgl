@@ -3,6 +3,14 @@ title: Flags
 description: Some widget attributes can be enabled or disabled using lv_obj_add_flag and lv_obj_remove_flag.
 ---
 
+<Callout type="warning" title="Deprecating Flags">
+Flags are deprecated in LVGL v9.6 and will be removed in LVGL v10.
+Use a dedicated function instead, such as <ApiLink name="lv_obj_set_hidden"/>.
+
+<ApiLink name="lv_obj_set_user_flag"/> and <ApiLink name="lv_obj_get_user_flag"/>
+can be used to replace `LV_OBJ_FLAG_USER_1-4`.
+</Callout>
+
 Some widget attributes can be enabled or disabled using
 <ApiLink name="lv_obj_add_flag" display="lv_obj_add_flag(widget, LV_OBJ_FLAG_...)" /> and
 <ApiLink name="lv_obj_remove_flag" display="lv_obj_remove_flag(widget, LV_OBJ_FLAG_...)" />.
@@ -35,7 +43,7 @@ The available flags are:
 - <ApiLink name="LV_OBJ_FLAG_IGNORE_LAYOUT" />: Exclude the widget from layout positioning.
 - <ApiLink name="LV_OBJ_FLAG_FLOATING" />: Do not scroll with the parent and ignore layout.
 - <ApiLink name="LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS" />: Enable sending <ApiLink name="LV_EVENT_DRAW_TASK_ADDED" /> events.
-- <ApiLink name="LV_OBJ_FLAG_OVERFLOW_VISIBLE" />: Allow children to overflow outside the widget's bounds.
+- <ApiLink name="LV_OBJ_FLAG_OVERFLOW_VISIBLE" />: Allow children to overflow outside the widget's bounds. See <ApiLink name="lv_obj_set_ext_draw_size"/>.
 - <ApiLink name="LV_OBJ_FLAG_RADIO_BUTTON" />: Allow only one `RADIO_BUTTON` sibling to be checked.
 - <ApiLink name="LV_OBJ_FLAG_FLEX_IN_NEW_TRACK" />: Start a new flex track on this item.
 - <ApiLink name="LV_OBJ_FLAG_LAYOUT_1" />: Custom flag, free to use by layouts.

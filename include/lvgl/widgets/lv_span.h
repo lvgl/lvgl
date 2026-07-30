@@ -176,6 +176,7 @@ void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_styl
  * @param obj   pointer to a spangroup object.
  * @param align see lv_text_align_t for details.
  */
+LV_DEPRECATED("Use text_align style property instead")
 void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align);
 
 /**
@@ -198,6 +199,7 @@ void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent);
  * @param obj       pointer to a spangroup object.
  * @param mode      see lv_span_mode_t for details.
  */
+LV_DEPRECATED("set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping")
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
 
 /**

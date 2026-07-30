@@ -92,6 +92,21 @@ void lv_evdev_set_swap_axes(lv_indev_t * indev, bool swap_axes);
 void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_x, int max_y);
 
 /**
+ * Returns the status indicating whether an LV_KEY could not be processed.
+ * @param e         pointer to an event
+ * @return true     if it is a raw key
+ * @return false    if it is not a raw key
+ */
+bool lv_evdev_is_raw_key(lv_event_t * e);
+
+/**
+ * Returns the raw keycode if LV_KEY could not be processed
+ * @param e         pointer to an event
+ * @return uint16_t raw keycode
+ */
+uint16_t lv_evdev_get_raw_key(lv_event_t * e);
+
+/**
  * Remove evdev input device.
  * @param indev evdev input device to close and free
  */

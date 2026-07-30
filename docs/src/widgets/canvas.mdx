@@ -1,13 +1,13 @@
 ---
 title: "Canvas (lv_canvas)"
-description: "A Canvas inherits from Image and extends it, enabling the user to draw anything. Rectangles, text, images, lines, arcs, etc."
+description: "Draw rectangles, text, images, lines, arcs, and more using LVGL's drawing engine."
 ---
 
 ## Overview
 
-A Canvas inherits from [Image](/widgets/image) and extends it, enabling the user to draw
-anything. Rectangles, text, images, lines, arcs, etc. can be drawn using
-LVGL's drawing engine.
+Canvas inherits from [Image](/widgets/image) and adds drawing on top.
+With LVGL's drawing engine you can draw rectangles, text, images, lines,
+arcs, and more straight into the canvas.
 
 ## Buffer
 
@@ -118,19 +118,3 @@ The draw functions work with any format LVGL can render to — typically
 
 - <ApiLink name="LV_PART_MAIN" /> Uses the [typical background](/common-widget-features/styles/overview)
    and image style properties.
-
-## Events
-
-No special events are sent by Canvas Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Canvas Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

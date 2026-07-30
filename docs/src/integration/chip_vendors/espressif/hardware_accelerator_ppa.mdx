@@ -19,7 +19,7 @@ The Espressif targets that support the PPA are:
 
 LVGL supports, in experimental level, the filling and the image blending
 acceleration through the PPA, the user can enable it in their `sdkconfig.defaults` by
-adding the following option to enable the PPA draw unit in conjunction with the software renderer, also:
+adding the following option to enable the PPA [draw unit](/main-modules/draw) in conjunction with the software renderer, also:
 don't forget to make the draw buffers aligned with the cache line size, typically 64bytes:
 
 ```c
@@ -30,7 +30,7 @@ CONFIG_LV_DRAW_BUF_ALIGN=64
 Save the file and then rebuild the project, this will be sufficient to add the PPA code and it will start to run automatically, so
 no further steps are required from the user code perspective.
 
-Is it suggested to use PPA with the double buffer support of the ESP LVGL Port since it will not offer performance increase when using it in partial mode due
+It is suggested to use PPA with the double buffer support of the ESP LVGL Port since it will not offer performance increase when using it in partial mode due
 to DMA2D memory bandwidth. To have the best performance and experience you can use the following snippet code to start the LVGL subsystem
 for ESP-IDF:
 

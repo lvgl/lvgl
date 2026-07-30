@@ -36,14 +36,14 @@ void lv_example_tabview_tab_button_content(void)
     lv_obj_t * lv_tabview_tab_button_0 = lv_tabview_get_tab_button(tabview, 0);
     lv_obj_t * sw_1 = lv_switch_create(lv_tabview_tab_button_0);
     lv_obj_set_size(sw_1, 40, 20);
-    lv_obj_set_flag(sw_1, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
+    lv_obj_set_ignore_layout(sw_1, true);
     lv_obj_set_align(sw_1, LV_ALIGN_RIGHT_MID);
     lv_obj_set_x(sw_1, -10);
 
     lv_obj_t * lv_tabview_tab_button_1 = lv_tabview_get_tab_button(tabview, 1);
     lv_obj_t * sw_2 = lv_switch_create(lv_tabview_tab_button_1);
     lv_obj_set_size(sw_2, 40, 20);
-    lv_obj_set_flag(sw_2, LV_OBJ_FLAG_IGNORE_LAYOUT, true);
+    lv_obj_set_ignore_layout(sw_2, true);
     lv_obj_set_align(sw_2, LV_ALIGN_RIGHT_MID);
     lv_obj_set_x(sw_2, -10);
 }

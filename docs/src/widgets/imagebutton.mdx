@@ -1,16 +1,15 @@
 ---
 title: "Image Button (lv_imagebutton)"
-description: "The Image Button is very similar to the simple 'Button' Widget. The only difference is that it displays user-defined images for each state instead of drawing a rectangle."
+description: "Like Button, but draws user-defined images per state instead of a plain rectangle."
 ---
 
 ## Overview
 
-The Image Button is very similar to the simple 'Button' Widget. The only
-difference is that it displays user-defined images for each state instead
-of drawing a rectangle.
+The Image Button behaves like a regular [Button](/widgets/button), but
+draws user-defined images for each state instead of a plain rectangle.
 
-You can set a left, right and middle image; the middle image is tiled to
-match the widget's width.
+You can set a left, middle, and right image. The middle image is tiled to
+fill the widget's width.
 
 ## Image sources
 
@@ -43,17 +42,15 @@ instead of the regular <ApiLink name="lv_obj_add_state" /> / <ApiLink name="lv_o
 
 ## Styling
 
-- <ApiLink name="LV_PART_MAIN" /> Refers to the image(s). If background style
-   properties are used, a rectangle is drawn behind the Image Button.
+<ApiLink name="LV_PART_MAIN" /> Refers to the image(s). If background style
+properties are used, a rectangle is drawn behind the Image Button.
 
 ## Events
 
-- <ApiLink name="LV_EVENT_VALUE_CHANGED" /> Sent when the CHECKED state is toggled.
-   Requires the <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> flag to be set.
+<ApiLink name="LV_EVENT_VALUE_CHANGED" /> is sent when the CHECKED state is toggled.
+Requires the <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> flag to be set.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-</Callout>
 
 ## Keys
 
@@ -61,6 +58,4 @@ Learn more about [Events](/common-widget-features/events) emitted by all Widgets
 - `LV_KEY_LEFT/DOWN` Go to un-CHECKED state if <ApiLink name="LV_OBJ_FLAG_CHECKABLE" /> is enabled.
 - <ApiLink name="LV_KEY_ENTER" /> Clicks the Image Button.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

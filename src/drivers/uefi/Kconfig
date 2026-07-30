@@ -1,0 +1,17 @@
+config LV_USE_UEFI
+	bool "Use LVGL UEFI backend"
+	default n
+	help
+		LVGL UEFI backend
+
+if LV_USE_UEFI
+
+config LV_USE_UEFI_INCLUDE
+	string "Header that hides the actual framework (EDK2, gnu-efi, ...)"
+	default "myefi.h"
+
+config LV_UEFI_USE_MEMORY_SERVICES
+	bool "Use the memory services from the boot services table"
+	default n
+
+endif #LV_USE_UEFI

@@ -3,7 +3,7 @@ title: GLFW
 description: "The GLFW display/input driver offers support for creating LVGL displays and keyboard/mouse inputs that can be used in an OpenGL context. It can be used like Wayland, XCB, SDL or Qt or it can be use..."
 ---
 
-### Overview
+## Overview
 
 The **GLFW** display/input driver offers support for creating
 LVGL displays and keyboard/mouse inputs that can be used in an OpenGL context.
@@ -11,23 +11,23 @@ It can be used like **Wayland**, **XCB**, **SDL** or **Qt** or it can be used fo
 
 The GLFW driver is a quick way to get started on PC-like platforms.
 
-### Getting Started with GLFW
+## Getting Started with GLFW
 
-##### Prerequisites
+### Prerequisites
 
-1. Install GLFW: `sudo apt-get install libglfw3-dev`
+Install GLFW: `sudo apt-get install libglfw3-dev`
 
-##### Configure GLFW Driver
+### Configure GLFW Driver
 
 1. Required linked libraries: -lglfw
 2. Enable the GLFW driver and Opengles support in `lv_conf.h`, via cmake compiler define or via KConfig
-   
+
 ```c
 #define LV_USE_GLFW  1
 #define LV_USE_OPENGLES  1
 ```
 
-##### Basic Usage
+### Basic Usage
 
 ```c
 #include "lvgl/lvgl.h"
@@ -76,7 +76,7 @@ int main()
 }
 ```
 
-##### Advanced Usage
+### Advanced Usage
 
 The GLFW driver can draw textures from the user. A third-party library could be
 used to add content to a texture and the driver will draw the texture in the window.
@@ -194,7 +194,7 @@ void custom_texture_example(void)
 }
 ```
 
-### Improving Performance
+## Improving Performance
 
 There is a renderer in LVGL which caches software-rendered areas as OpenGL textures.
 See [OpenGL Texture Caching Renderer](/integration/embedded_linux/drivers/opengl_driver) to learn more about it.

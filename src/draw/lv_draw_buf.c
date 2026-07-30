@@ -347,9 +347,16 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
     LV_PROFILER_DRAW_BEGIN;
     if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_ALLOCATED)) {
         LV_ASSERT_NULL(draw_buf->handlers);
+        LV_ASSERT_FORMAT_MSG(draw_buf->header.magic == LV_IMAGE_HEADER_MAGIC,
+                             "Invalid draw buf magic: 0x%02X", draw_buf->header.magic);
 
         const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
         draw_buf_free(handlers, draw_buf->unaligned_data);
+        draw_buf->unaligned_data = NULL;
+        draw_buf->data = NULL;
+
+        /*Poison the magic before freeing so UAF access can be detected*/
+        draw_buf->header.magic = LV_IMAGE_HEADER_DEADBEEF;
         lv_free(draw_buf);
     }
     else {
@@ -528,13 +535,13 @@ void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
 
 void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
 {
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
+    LV_LOG_DEPRECATED("Use lv_draw_buf_set_palette instead.");
     lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
 }
 
 void lv_image_buf_free(lv_image_dsc_t * dsc)
 {
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
+    LV_LOG_DEPRECATED("Use lv_draw_buf_destroy instead.");
     if(dsc != NULL) {
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);

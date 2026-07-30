@@ -28,7 +28,7 @@ void lv_example_table_width(void)
     lv_obj_t * table = lv_table_create(screen);
     lv_table_set_row_count(table, 3);
     lv_table_set_column_count(table, 3);
-    lv_table_set_column_width(table, 0, 50);
+    lv_table_set_column_width(table, 0, 60);
     lv_table_set_column_width(table, 1, 180);
     lv_table_set_column_width(table, 2, 80);
     lv_table_set_cell_value(table, 0, 0, "No.");

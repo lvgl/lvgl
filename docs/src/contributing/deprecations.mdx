@@ -1,0 +1,139 @@
+---
+title: Deprecating Symbols
+description: "How to mark functions, macros, and other symbols as deprecated in LVGL's codebase."
+---
+
+When removing or replacing a public API symbol, LVGL requires four steps so
+that users get clear, actionable guidance at every level: docs, compile time,
+runtime, and migration guides. Every step is mandatory; skipping one leaves
+users without a signal they would otherwise rely on.
+
+---
+
+## Steps to take for each deprecation
+
+### 1. Add a `@deprecated` Doxygen tag to the API comment
+
+Add a `@deprecated` line to the symbol's Doxygen comment. The tag is picked up
+by the docs pipeline and surfaces the symbol on
+[lvgl.io/docs/open/deprecated](https://lvgl.io/docs/open/deprecated).
+
+```c
+/**
+ * Get the label text.
+ * @param obj   pointer to a label object
+ * @return      the text content
+ * @deprecated  Use `lv_label_get_text_v2()` instead.
+ */
+const char * lv_label_get_text(const lv_obj_t * obj);
+```
+
+The message should name the replacement directly so the reader never has to
+search for it.
+
+---
+
+### 2. Mark the declaration with `LV_DEPRECATED`
+
+Wrap the declaration with `LV_DEPRECATED("...")` so the compiler emits a
+warning every time the symbol is used. The string is the human-readable
+migration hint shown in the warning.
+
+```c
+LV_DEPRECATED("Use lv_label_get_text_v2() instead.")
+const char * lv_label_get_text(const lv_obj_t * obj);
+```
+
+This catches uses at build time, before the code even runs. The warning
+message appears in the compiler output alongside the file and line number of
+every affected call site.
+
+---
+
+### 3. Add `LV_LOG_DEPRECATED` as the first line of the function body
+
+`LV_LOG_DEPRECATED` emits a **one-time runtime warning** the first time the
+deprecated function is actually called. This catches paths that are only
+exercised at runtime (e.g. calls from dynamically loaded code or scripting
+bindings) and makes the deprecation visible even in pre-built binaries.
+
+```c
+const char * lv_label_get_text(const lv_obj_t * obj)
+{
+    LV_LOG_DEPRECATED("use lv_label_get_text_v2 instead.")
+    return lv_label_get_text_v2(obj);
+}
+```
+
+"One-time" means the warning fires once per program run, not on every call,
+so it does not flood logs in hot paths.
+
+---
+
+### 4. Add an entry to `docs/src/migration-v10.mdx`
+
+Document the change in the migration guide so users upgrading to v10 have a
+single, searchable reference. State the old symbol, the new symbol, and any
+behavioral difference worth noting.
+
+```mdx
+### `lv_label_get_text` -> `lv_label_get_text_v2`
+
+`lv_label_get_text` is deprecated. Use `lv_label_get_text_v2(obj)` instead.
+The new function returns a `lv_string_t` rather than a raw `const char *`,
+which is safe when the label text is allocated on the heap.
+```
+
+---
+
+## Deprecating macros with `LV_DEPRECATED_MACRO_WARN`
+
+Functions use `LV_DEPRECATED` on the declaration and `LV_LOG_DEPRECATED` in
+the body. Macros cannot be decorated the same way, instead, emit the warning
+from **inside** the macro expansion using `LV_DEPRECATED_MACRO_WARN`.
+
+```c
+#if LV_USE_ASSERT_OBJ
+  /**
+   * @deprecated Use `LV_CHECK_OBJ(obj, cls, return)` instead.
+   *             `LV_ASSERT_OBJ` aborts on failure; `LV_CHECK_OBJ` logs a warning
+   *             and executes the supplied action, which is safer in production.
+   */
+  #define LV_ASSERT_OBJ(obj_p, obj_class)                                                             \
+    do {                                                                                              \
+      LV_DEPRECATED_MACRO_WARN("LV_ASSERT_OBJ is deprecated. Use LV_CHECK_OBJ instead.");             \
+      LV_ASSERT_MSG(obj_p != NULL, "The object is NULL");                                             \
+      LV_ASSERT_MSG(lv_obj_has_class(obj_p, obj_class) == true, "Incompatible object type.");         \
+      LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
+    } while(0)
+#endif
+```
+
+The same four-step checklist still applies, the only difference is in step 2
+and 3: instead of `LV_DEPRECATED` on the declaration and `LV_LOG_DEPRECATED`
+in the body, you use `LV_DEPRECATED_MACRO_WARN` inside the macro body.
+
+---
+
+## Quick-reference checklist
+
+Use this when deprecating any symbol.
+
+| Step | What to do | Where |
+| --- | --- | --- |
+| 1 | Add `@deprecated Use X instead.` to the Doxygen comment | Header file |
+| 2 | Add `LV_DEPRECATED("...")` on the function declaration **or** `LV_DEPRECATED_MACRO_WARN("...")` inside the macro body | Header file |
+| 3 | Add `LV_LOG_DEPRECATED` as the **first line** of the function body (functions only; macros handled in step 2) | Source file |
+| 4 | Add a migration entry in `docs/src/migration-v10.mdx` | Docs |
+
+---
+
+## Tool summary
+
+| Tool | Scope | Signal level |
+| --- | --- | --- |
+| `@deprecated` Doxygen tag | Docs | Listed on [lvgl.io/docs/open/deprecated](https://lvgl.io/docs/open/deprecated) |
+| `LV_DEPRECATED("...")` | Functions | Compiler warning at every call site |
+| `LV_LOG_DEPRECATED` | Functions | One-time runtime warning in the log |
+| `LV_DEPRECATED_MACRO_WARN("...")` | Macros | One-time runtime warning in the log |
+| Migration guide entry | `migration-v10.mdx` | Human-readable upgrade instructions |

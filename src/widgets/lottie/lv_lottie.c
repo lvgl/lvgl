@@ -11,15 +11,6 @@
 
 #if LV_USE_LOTTIE
 
-#if LV_USE_THORVG_EXTERNAL
-    #include <thorvg_capi.h>
-#else
-    #include "../../libs/thorvg/thorvg_capi.h"
-#endif
-
-#include "../../core/lv_obj_class_private.h"
-#include "../../misc/cache/lv_cache.h"
-
 /*Check dependencies*/
 #if LV_USE_CANVAS == 0
     #error "lv_lottie: lv_canvas is required. Enable it in lv_conf.h (LV_USE_CANVAS 1)"
@@ -28,6 +19,15 @@
 #if LV_USE_THORVG == 0
     #error "lv_lottie: ThorVG is required. Enable it in lv_conf.h (LV_USE_THORVG_INTERNAL/EXTERNAL 1)"
 #endif
+
+#if LV_USE_THORVG_INTERNAL
+    #include "../../libs/thorvg/thorvg_capi.h"
+#else
+    #include <thorvg_capi.h>
+#endif
+
+#include "../../core/lv_obj_class_private.h"
+#include "../../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES
@@ -199,6 +199,13 @@ static void lv_lottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     lv_lottie_t * lottie = (lv_lottie_t *)obj;
+
+    /*Drop the cached image so a later widget reusing the same draw_buf address
+     *doesn't hit a stale entry (e.g. NanoVG's GPU texture keyed by the buffer).*/
+    const void * src = lv_image_get_src(obj);
+    if(src) {
+        lv_image_cache_drop(src);
+    }
 
     tvg_animation_del(lottie->tvg_anim);
     tvg_canvas_destroy(lottie->tvg_canvas);

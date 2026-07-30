@@ -43,7 +43,7 @@ void lv_example_grid_subgrid(void)
     static const int32_t container_1_style_grid_row_dsc_array_1[] = {40, 40, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_style_grid_row_dsc_array(container_1, container_1_style_grid_row_dsc_array_1, 0);
     lv_obj_set_style_layout(container_1, LV_LAYOUT_GRID, 0);
-    lv_obj_set_size(container_1, lv_pct(100), LV_SIZE_CONTENT);
+    lv_obj_set_size(container_1, 280, LV_SIZE_CONTENT);
     /* Label in the parent grid: left tile */
     lv_obj_t * label_1 = lv_label_create(container_1);
     lv_obj_set_style_grid_cell_column_pos(label_1, 0, 0);

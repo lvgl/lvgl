@@ -17,12 +17,13 @@
 void lv_example_arc_mode(void)
 {
     lv_obj_t * screen = lv_screen_active();
+    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_SPACE_EVENLY, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
 
     /* Normal mode: clockwise from minimum to current value */
     lv_obj_t * arc_1 = lv_arc_create(screen);
-    lv_obj_set_align(arc_1, LV_ALIGN_LEFT_MID);
-    lv_obj_set_size(arc_1, 90, 90);
-    lv_obj_set_x(arc_1, 10);
+    lv_obj_set_size(arc_1, 95, 95);
     lv_arc_set_mode(arc_1, LV_ARC_MODE_NORMAL);
     lv_arc_set_value(arc_1, 75);
     lv_obj_t * label_1 = lv_label_create(arc_1);
@@ -31,8 +32,7 @@ void lv_example_arc_mode(void)
 
     /* Reverse mode: counter-clockwise from maximum to current value */
     lv_obj_t * arc_2 = lv_arc_create(screen);
-    lv_obj_set_align(arc_2, LV_ALIGN_CENTER);
-    lv_obj_set_size(arc_2, 90, 90);
+    lv_obj_set_size(arc_2, 95, 95);
     lv_arc_set_mode(arc_2, LV_ARC_MODE_REVERSE);
     lv_arc_set_value(arc_2, 75);
     lv_obj_t * label_2 = lv_label_create(arc_2);
@@ -41,9 +41,7 @@ void lv_example_arc_mode(void)
 
     /* Symmetrical mode: indicator grows from the middle */
     lv_obj_t * arc_3 = lv_arc_create(screen);
-    lv_obj_set_align(arc_3, LV_ALIGN_RIGHT_MID);
-    lv_obj_set_size(arc_3, 90, 90);
-    lv_obj_set_x(arc_3, -10);
+    lv_obj_set_size(arc_3, 95, 95);
     lv_arc_set_mode(arc_3, LV_ARC_MODE_SYMMETRICAL);
     lv_arc_set_value(arc_3, 75);
     lv_obj_t * label_3 = lv_label_create(arc_3);

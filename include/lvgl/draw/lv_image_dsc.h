@@ -25,6 +25,17 @@ extern "C" {
 #define LV_IMAGE_HEADER_MAGIC (0x19)
 LV_EXPORT_CONST_INT(LV_IMAGE_HEADER_MAGIC);
 
+/** Magic number for legacy image resources that don't set magic field (v8 compatible).
+ *  `lv_image_src_get_type` accepts this value as a valid image source.
+ */
+#define LV_IMAGE_HEADER_LEGACY (0x00)
+
+/** Magic number set after lv_draw_buf is freed, used to detect use-after-free.
+ *  If `lv_image_src_get_type` sees this value, the buffer has already been destroyed.
+ *  Must be < 0x20 and != LV_IMAGE_HEADER_MAGIC and != LV_IMAGE_HEADER_LEGACY.
+ */
+#define LV_IMAGE_HEADER_DEADBEEF (0x1D)
+
 /**
  * Flags reserved for user, lvgl won't use these bits.
  */

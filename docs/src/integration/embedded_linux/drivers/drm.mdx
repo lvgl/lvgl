@@ -3,10 +3,10 @@ title: DRM
 description: "The DRM (Direct Rendering Manager) display driver provides support for rendering LVGL directly to Linux framebuffer devices through the DRM/KMS subsystem. It enables running LVGL without a windowin..."
 ---
 
-### Overview
+## Overview
 
 The **DRM** (Direct Rendering Manager) display driver provides support for rendering
-LVGL directly to Linux framebuffer devices through the DRM/KMS subsystem.  
+LVGL directly to Linux framebuffer devices through the DRM/KMS subsystem.
 It enables running LVGL without a windowing system such as X11 or Wayland,
 making it suitable for embedded devices, single-board computers, and direct-to-display
 applications.
@@ -14,9 +14,9 @@ applications.
 The DRM driver interacts directly with the GPU or display controller through
 `/dev/dri/cardX` nodes.
 
-### Getting Started with DRM
+## Getting Started with DRM
 
-##### Prerequisites
+### Prerequisites
 
 The DRM driver requires:
 
@@ -31,17 +31,17 @@ On Debian/Ubuntu-based systems:
 sudo apt-get install libdrm-dev
 ```
 
-##### Configure DRM Driver
+### Configure DRM Driver
 
 1. Enable the DRM driver support in `lv_conf.h`, by CMake compiler define, or by KConfig:
-   
+
 ```c
 #define LV_USE_LINUX_DRM   1
 ```
 
 2. Link against `libdrm` when building.
 
-##### Basic Usage
+### Basic Usage
 
 ```c
 #include "lvgl/lvgl.h"
@@ -79,9 +79,9 @@ int main(void)
 }
 ```
 
-##### Notes
+### Notes
 
-- `connector_id` specifies which display output (HDMI, eDP, DP, etc.) should be used.  
+- `connector_id` specifies which display output (HDMI, eDP, DP, etc.) should be used.
   If `-1` is passed, the DRM driver will try to automatically pick the first available connector.
 - DRM requires proper modesetting. By default, LVGL will select a preferred display mode.
 
@@ -98,9 +98,9 @@ lv_linux_drm_set_file(disp, device, -1);
 lv_free(device);
 ```
 
-### Using DRM with GBM
+## Using DRM with GBM
 
-The DRM driver can optionally use **GBM** (Generic Buffer Management) for buffer allocation.  
+The DRM driver can optionally use **GBM** (Generic Buffer Management) for buffer allocation.
 This allows the driver to use GPU-friendly buffer objects instead of simple dumb framebuffers.
 
 1. Enable the following option in your `lv_conf.h` (or via Kconfig/CMake):
@@ -109,14 +109,14 @@ This allows the driver to use GPU-friendly buffer objects instead of simple dumb
 #define LV_USE_LINUX_DRM_GBM_BUFFERS 1
 ```
 
-1. Link against `libgbm` when building.
+2. Link against `libgbm` when building.
 
 When this option is enabled:
 
 - Buffers will be allocated using GBM.
 - This can improve performance and compatibility on platforms where GBM is supported.
 
-### Using DRM with EGL
+## Using DRM with EGL
 
 The DRM driver can also be combined with [EGL](/integration/embedded_linux/drivers/egl) for hardware-accelerated
 rendering via EGL/GLES.
@@ -134,17 +134,17 @@ No special setup is required beyond the basic DRM initialization shown in [Basic
 
 For a detailed overview of EGL usage and configuration, see [EGL](/integration/embedded_linux/drivers/egl).
 
-### Selecting Display Mode
+## Selecting Display Mode
 
 <Callout type="info">
-Custom mode selection is currently only supported when using DRM with EGL 
+Custom mode selection is currently only supported when using DRM with EGL
 (<ApiLink name="LV_USE_OPENGLES" /> enabled). When using DRM without EGL, the driver
 will always use the preferred display mode.
 </Callout>
 
 By default, the DRM driver automatically selects the preferred display mode for the connected display. However, you can customize this behavior by providing a mode selection callback.
 
-##### Custom Mode Selection
+### Custom Mode Selection
 
 To implement custom mode selection logic, define a callback function and register it with <ApiLink name="lv_linux_drm_set_mode_cb" />:
 
@@ -186,7 +186,7 @@ int main(void)
 
 The callback receives an array of available modes and must return the index of the desired mode.
 
-##### Mode Information API
+### Mode Information API
 
 The following functions are available to query mode properties:
 
@@ -195,7 +195,7 @@ The following functions are available to query mode properties:
 - <ApiLink name="lv_linux_drm_mode_get_refresh_rate" /> - Get refresh rate in Hz
 - <ApiLink name="lv_linux_drm_mode_is_preferred" /> - Check if mode is the display's preferred/native mode
 
-##### Example: Selecting Preferred Mode
+### Example: Selecting Preferred Mode
 
 ```c
 size_t select_preferred_mode(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
@@ -212,7 +212,7 @@ size_t select_preferred_mode(lv_display_t * disp, const lv_linux_drm_mode_t * mo
 }
 ```
 
-##### Example: Selecting Highest Resolution
+### Example: Selecting Highest Resolution
 
 ```c
 size_t select_highest_resolution(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
@@ -235,7 +235,7 @@ size_t select_highest_resolution(lv_display_t * disp, const lv_linux_drm_mode_t 
 }
 ```
 
-##### Notes
+### Notes
 
 - The mode selection callback is called before the display is initialized.
 - If no callback is set, the driver uses the preferred mode by default.

@@ -1,0 +1,4 @@
+config LV_USE_DEMO_KEYPAD_AND_ENCODER
+	bool "Demonstrate the usage of encoder and keyboard"
+	default n
+

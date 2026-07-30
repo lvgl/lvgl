@@ -1,28 +1,20 @@
 ---
 title: "Menu (lv_menu)"
-description: "The Menu Widget can be used to create multi-level menus that automatically handle navigation among menu levels, and enable its user to capture page navigation and click events."
+description: "Multi-level menu widget. Handles navigation between pages automatically and reports page changes and clicks."
 ---
 
 ## Overview
 
-The Menu Widget can be used to create multi-level menus that automatically handle
-navigation among menu levels, and enable its user to capture page navigation and
-click events.
+The Menu widget builds multi-level menus. It handles navigation between
+pages automatically and lets you react to page changes and item clicks.
 
 ## Styling
 
-The Menu Widget is built from the following Widgets:
-
-- Main container: <ApiLink name="lv_menu_main_cont" />
-- Main header: <ApiLink name="lv_menu_main_header_cont" />
-- Back button: [Button (lv_button)](/widgets/button)
-- Back button icon: [Image (lv_image)](/widgets/image)
-- Main Page: <ApiLink name="lv_menu_page" />
-- Sidebar container: <ApiLink name="lv_menu_sidebar_cont" />
-- Sidebar header: <ApiLink name="lv_menu_sidebar_header_cont" />
-- Back button: [Button (lv_button)](/widgets/button)
-- Back button icon: [Image (lv_image)](/widgets/image)
-- Sidebar Page: <ApiLink name="lv_menu_page" />
+A Menu is made of standard building blocks — a main container, an optional
+sidebar, headers, back buttons, and one or more pages. Each block is a
+regular widget, so styling follows the same rules as
+[Base Widget](/widgets/base_widget), [Button](/widgets/button), and
+[Image](/widgets/image). See *Create a Menu* below for the full tree.
 
 ## Create a Menu
 
@@ -111,19 +103,7 @@ Menu:
    -  <ApiLink name="lv_menu_back_button_is_root" display="lv_menu_back_button_is_root(menu, button)" /> to check if button is root
       back button.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Menu Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
 
 ## Examples
 

@@ -21,7 +21,7 @@ void lv_example_buttonmatrix_one_checked(void)
     /* Weekday selector with single-checked semantics */
     lv_obj_t * buttonmatrix = lv_buttonmatrix_create(screen);
     lv_obj_set_align(buttonmatrix, LV_ALIGN_CENTER);
-    lv_obj_set_size(buttonmatrix, lv_pct(90), 60);
+    lv_obj_set_size(buttonmatrix, lv_pct(90), 80);
     lv_buttonmatrix_set_one_checked(buttonmatrix, true);
     static const char * buttonmatrix_map_0[] = {"Mon", "Tue", "Wed", "Thu", "Fri", NULL};
     lv_buttonmatrix_set_map(buttonmatrix, buttonmatrix_map_0);

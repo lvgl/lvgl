@@ -20,6 +20,12 @@
         #elif defined(__aarch64__)
             #define __LV_UEFI_ARCH_AARCH64__
             #define __LV_UEFI_64BIT__
+        #elif defined(__loongarch_lp64)
+            #define __LV_UEFI_ARCH_LOONGARCH64__
+            #define __LV_UEFI_64BIT__
+        #elif defined(__riscv) && (__riscv_xlen == 64)
+            #define __LV_UEFI_ARCH_RISCV64__
+            #define __LV_UEFI_64BIT__
         #else
             #error Architecture is not supported
         #endif

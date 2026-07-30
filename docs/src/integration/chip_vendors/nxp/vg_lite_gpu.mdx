@@ -7,11 +7,11 @@ This is a generic VG-Lite rendering backend implementation that is designed to u
 [VeriSilicon](https://verisilicon.com/)'s generic API to operate GPU hardware as much as possible.
 
 Even with different chip manufacturers, as long as they use the same version of VG-Lite API as the rendering backend,
-LVGL rendering acceleration can be supported without the need for LVGL adaptation work.
+LVGL [rendering](/main-modules/draw) acceleration can be supported without the need for LVGL adaptation work.
 
 ## Configuration
 
-1. Set <ApiLink name="LV_USE_DRAW_VG_LITE" /> to 1 in `lv_conf.h` to enabled the VG-Lite rendering backend.
+1. Set <ApiLink name="LV_USE_DRAW_VG_LITE" /> to 1 in `lv_conf.h` to enable the VG-Lite rendering backend.
    Make sure that your hardware has been adapted to the VG-Lite API and that the absolute path to `vg_lite.h`, which can be directly referenced by lvgl, has been exposed.
 2. Confirm the GPU initialization method, there are two ways:
 
@@ -43,10 +43,10 @@ LVGL rendering acceleration can be supported without the need for LVGL adaptatio
 6. Set the <ApiLink name="LV_VG_LITE_GRAD_CACHE_CNT" /> configuration to specify the number of gradient cache entries.
    Gradient drawing includes linear gradients and radial gradients. Using a cache can effectively reduce the number of times the gradient image is created and improve drawing efficiency.
    Each individual gradient consumes around 4K of GPU memory pool. If there are many gradients used in the interface, you can try increasing the number of gradient cache entries.
-   If the VG-Lite API returns the <ApiLink name="VG_LITE_OUT_OF_RESOURCES" /> error, you can try increasing the size of the GPU memory pool or reducing the number of gradient cache entries.
+   If the VG-Lite API returns the `VG_LITE_OUT_OF_RESOURCES` error, you can try increasing the size of the GPU memory pool or reducing the number of gradient cache entries.
 7. Set the <ApiLink name="LV_VG_LITE_STROKE_CACHE_CNT" /> configuration to specify the number of stroke path caches.
    When the stroke parameters do not change, the previously generated stroke parameters are automatically retrieved from the cache to improve rendering performance.
-   The memory occupied by the stroke is strongly related to the path length. If the VG-Lite API returns the <ApiLink name="VG_LITE_OUT_OF_RESOURCES" /> error,
+   The memory occupied by the stroke is strongly related to the path length. If the VG-Lite API returns the `VG_LITE_OUT_OF_RESOURCES` error,
    you can try increasing the size of the GPU memory pool or reducing the number of stroke cache entries.
 
 NOTE: VG-Lite rendering backend does not support multi-threaded calls, please make sure <ApiLink name="LV_USE_OS" /> is always configured as <ApiLink name="LV_OS_NONE" />.

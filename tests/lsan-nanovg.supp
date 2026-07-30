@@ -1,0 +1,7 @@
+# LeakSanitizer suppressions for NanoVG headless tests.
+# Mesa/EGL drivers have known internal allocations that persist for the
+# lifetime of the GL context. These are not application-level leaks.
+# Targeted by specific Mesa internal functions where possible.
+leak:libgallium
+leak:libEGL_mesa
+leak:dri2_initialize

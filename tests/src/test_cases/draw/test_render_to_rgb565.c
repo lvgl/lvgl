@@ -18,6 +18,10 @@ void tearDown(void)
 
 void test_render_to_rgb565(void)
 {
+    /*NanoVG reads back the FBO as 32bpp BGRA, so non-XRGB8888 targets don't apply*/
+#if LV_USE_DRAW_NANOVG
+    TEST_PASS();
+#else
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_RGB565);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
@@ -40,6 +44,7 @@ void test_render_to_rgb565(void)
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
         }
     }
+#endif /* LV_USE_DRAW_NANOVG */
 }
 
 #endif

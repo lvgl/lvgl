@@ -207,7 +207,7 @@ void test_roller_keypad_events(void)
 void test_roller_with_overlay_and_bubble_events_enabled(void)
 {
     lv_obj_t * overlay = lv_obj_create(roller);
-    lv_obj_add_flag(overlay, LV_OBJ_FLAG_EVENT_BUBBLE);
+    lv_obj_set_event_bubble(overlay, true);
 
     lv_obj_send_event(overlay, LV_EVENT_PRESSED, NULL);
 }
@@ -296,8 +296,8 @@ void test_roller_transformed_click(void)
     lv_obj_set_parent(roller_mouse, rotated);
 
     lv_obj_t * click_dot = lv_obj_create(active_screen);
-    lv_obj_add_flag(click_dot, LV_OBJ_FLAG_FLOATING);
-    lv_obj_remove_flag(click_dot, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_floating(click_dot, true);
+    lv_obj_set_clickable(click_dot, false);
     lv_obj_set_size(click_dot, 10, 10);
     lv_obj_set_style_border_width(click_dot, 0, 0);
     lv_obj_set_style_radius(click_dot, LV_RADIUS_CIRCLE, 0);
@@ -316,7 +316,7 @@ void test_roller_appearance(void)
     const char * opts =
         "0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg";
 
-    lv_obj_add_flag(roller_mouse, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_hidden(roller_mouse, true);
 
     lv_obj_t * rollers[10] = {roller, roller_infinite};
     uint32_t i = 2;

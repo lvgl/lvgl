@@ -23,7 +23,9 @@ extern "C" {
 #define LV_USE_OS                   LV_OS_PTHREAD
 #define LV_OBJ_STYLE_CACHE          0
 #define LV_BIN_DECODER_RAM_LOAD     1   /* Run test with bin image loaded to RAM */
+#ifndef LV_DRAW_BUF_STRIDE_ALIGN
 #define LV_DRAW_BUF_STRIDE_ALIGN    64  /* Use a large value to be sure any issues will cause crash */
+#endif
 #endif
 
 #ifdef LVGL_CI_USING_DEF_HEAP
@@ -32,6 +34,7 @@ extern "C" {
 #define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
 #define LV_OBJ_STYLE_CACHE      1
 #define LV_BIN_DECODER_RAM_LOAD 0
+#define LV_USE_MEM_MONITOR      1
 #endif
 
 #ifdef MICROPYTHON
@@ -82,11 +85,23 @@ typedef void * lv_user_data_t;
 #include "lv_test_conf_vg_lite.h"
 #include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 7
+#define  LV_COLOR_DEPTH      32
+#define  LV_DPI_DEF          160
+#define  LV_USE_DRAW_SDL     1
+#define  LV_USE_SDL          1
+#define  LV_SDL_AUTO_BACKEND 0
+#define  LV_SDL_BACKEND      LV_SDL_BACKEND_SW
+#define  LV_USE_NUTTX        1
+#include "lv_test_conf_full.h"
+#elif LV_TEST_OPTION == 8
 #define  LV_COLOR_DEPTH     32
 #define  LV_DPI_DEF         160
-#define  LV_USE_DRAW_SDL    1
-#define  LV_USE_SDL         1
-#define  LV_USE_NUTTX       1
+#define  LV_USE_NANOVG_TEST_HEADLESS 1
+#define  LV_USE_OPENGLES    1
+#define  LV_USE_NANOVG      1
+#define  LV_USE_DRAW_NANOVG 1
+#undef   LV_DRAW_BUF_STRIDE_ALIGN
+#define  LV_DRAW_BUF_STRIDE_ALIGN  1  /* NanoVG expects compact stride (no padding) */
 #include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 4
 #define  LV_COLOR_DEPTH     24

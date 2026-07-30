@@ -20,7 +20,7 @@ void lv_example_roller_visible_rows(void)
     lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_ROW);
     lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_SPACE_EVENLY, 0);
     lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_column(screen, 32, 0);
+    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
 
     /* 💡 Edit `visible_row_count` on either roller to compare its overall height. */
     lv_obj_t * roller_1 = lv_roller_create(screen);
@@ -31,7 +31,7 @@ void lv_example_roller_visible_rows(void)
 
     lv_obj_t * roller_2 = lv_roller_create(screen);
     lv_obj_set_width(roller_2, 120);
-    lv_roller_set_visible_row_count(roller_2, 7);
+    lv_roller_set_visible_row_count(roller_2, 5);
     lv_roller_set_options(roller_2, "Jan\nFeb\nMar\nApr\nMay\nJun\nJul", LV_ROLLER_MODE_NORMAL);
     lv_roller_set_selected(roller_2, 3, false);
 }

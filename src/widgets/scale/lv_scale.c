@@ -504,7 +504,7 @@ void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * sec
 
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style)
 {
-    LV_LOG_WARN("Deprecated, use lv_scale_set_section_style_main/indicator/items instead");
+    LV_LOG_DEPRECATED("use lv_scale_set_section_style_main/indicator/items instead");
 
     if(NULL == section) return;
 
@@ -694,7 +694,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->txt_src = NULL;
     lv_array_init(&scale->needles, 0, sizeof(lv_scale_needle_t));
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollable(obj, false);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

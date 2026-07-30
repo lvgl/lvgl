@@ -18,7 +18,7 @@
 #include "lv_vg_lite_bitmap_font_cache.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_area_private.h"
-#include "../../libs/freetype/lv_freetype_private.h"
+#include "../../font/freetype/lv_freetype_private.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_image_private.h"
 
@@ -195,6 +195,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     image_dsc.opa = glyph_draw_dsc->opa;
                     image_dsc.src = glyph_draw_dsc->glyph_data;
                     image_dsc.rotation = glyph_draw_dsc->rotation;
+                    image_dsc.pivot = glyph_draw_dsc->pivot;
                     lv_draw_vg_lite_img(t, &image_dsc, glyph_draw_dsc->letter_coords, false);
                 }
                 break;
@@ -637,8 +638,18 @@ static void freetype_outline_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
     switch(code) {
-        case LV_EVENT_CREATE:
-            param->outline = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+        case LV_EVENT_CREATE: {
+                lv_vg_lite_path_t * path = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+                param->outline = path;
+
+                /* Pre-allocate path memory using sizes info to avoid realloc during decompose */
+                if(param->sizes.segments_size > 0) {
+                    const uint8_t fmt_len = lv_vg_lite_path_format_len(PATH_DATA_COORD_FORMAT);
+                    /* Each segment has 1 op code, plus all coordinate data, plus 1 end op */
+                    const size_t total_size = (param->sizes.segments_size + param->sizes.data_size + 1) * fmt_len;
+                    lv_vg_lite_path_reserve_space(path, total_size);
+                }
+            }
             break;
         case LV_EVENT_DELETE:
             if(param->outline) lv_vg_lite_path_destroy(param->outline);

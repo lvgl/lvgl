@@ -79,7 +79,7 @@ void lv_example_scroll_floating(void)
     lv_obj_t * button_7 = lv_button_create(container);
     lv_obj_set_size(button_7, 44, 44);
     lv_obj_set_align(button_7, LV_ALIGN_BOTTOM_RIGHT);
-    lv_obj_set_flag(button_7, LV_OBJ_FLAG_FLOATING, true);
+    lv_obj_set_floating(button_7, true);
     lv_obj_set_style_bg_color(button_7, lv_color_hex(0x9429ff), 0);
     lv_obj_add_style(button_7, &style_fab, 0);
     lv_obj_t * label_7 = lv_label_create(button_7);

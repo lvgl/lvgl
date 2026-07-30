@@ -102,7 +102,7 @@ The NuttX simulator allows you to run NuttX and LVGL on your PC.
 This can be especially useful for developing LVGL UIs with immediate
 visual feedback, and also developing platform independent NuttX apps.
 
-##### Configure NuttX to use the `sim` board and the LVGL Demo
+#### Configure NuttX to use the `sim` board and the LVGL Demo
 
 ```bash
 $ ./tools/configure.sh sim:lvgl_fb
@@ -116,7 +116,7 @@ $ ls -l nuttx
 -rwxr-xr-x 1 root root 2819920 May 12 15:01 nuttx
 ```
 
-##### Running the NuttX Simulator
+#### Running the NuttX Simulator
 
 ```bash
 $ ./nuttx
@@ -133,7 +133,7 @@ nsh> lvgldemo
 If you don't have an STM32F429I-DISCO, this process will be similar
 for other boards.
 
-##### Configure NuttX to use the stm32f429i-disco board and the LVGL Demo
+#### Configure NuttX to use the stm32f429i-disco board and the LVGL Demo
 
 ```bash
 $ ./tools/configure.sh stm32f429i-disco:lvgl
@@ -148,7 +148,7 @@ $ ls -l nuttx.bin
 -rwxrwxr-x 1 alan alan 287144 Jun 27 09:26 nuttx.bin
 ```
 
-##### Flashing the firmware in the board using OpenOCD
+#### Flashing the firmware in the board using OpenOCD
 
 ```bash
 $ sudo openocd -f interface/stlink-v2.cfg -f target/stm32f4x.cfg -c init -c "reset halt" -c "flash write_image erase nuttx.bin 0x08000000"
@@ -165,7 +165,7 @@ nsh> lvgldemo
 The example app called `lvgldemo` uses LVGL's NuttX integration
 to run the demos in NuttX.
 
-https://github.com/apache/nuttx-apps/tree/master/examples/lvgldemo
+[examples/lvgldemo](https://github.com/apache/nuttx-apps/tree/master/examples/lvgldemo)
 
 It is used by all LVGL defconfigs. See `sim:lvgl_fb` and `sim:lvgl_lcd`.
 
@@ -224,7 +224,7 @@ to allocate from the NuttX global heap or use its own.
 NuttX tries to be POSIX compliant where possible, meaning it supports
 pthreads (POSIX threads). To enable OS features in LVGL on NuttX,
 set <ApiLink name="LV_USE_OS" /> to <ApiLink name="LV_OS_PTHREAD" />.
-The main reason for enabling OS features is for multi-core rendering.
+The main reason for enabling OS features is for [multi-core rendering](/main-modules/draw/draw_units).
 See <ApiLink name="LV_DRAW_SW_DRAW_UNIT_CNT" />. Otherwise there is no case
 for setting it.
 

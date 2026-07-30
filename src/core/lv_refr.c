@@ -140,7 +140,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 #endif
 
     const lv_area_t * obj_coords;
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+    if(lv_obj_is_overflow_visible(obj)) {
         obj_coords = &obj_coords_ext;
     }
     else {
@@ -463,7 +463,7 @@ lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_obj_t * found_p = NULL;
 
     if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
+    if(lv_obj_is_hidden(obj)) return NULL;
     if(lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
     if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return NULL;
 
@@ -500,7 +500,7 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
     LV_CHECK_ARG(layer != NULL, return);
     LV_CHECK_ARG(obj != NULL, return);
 
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
+    if(lv_obj_is_hidden(obj)) return;
 
     /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/
     const lv_opa_t opa_layered = lv_obj_get_style_opa_layered(obj, LV_PART_MAIN);
@@ -1473,9 +1473,23 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
 
     lv_display_send_event(disp, LV_EVENT_FLUSH_START, &offset_area);
 
-    /*For backward compatibility support LV_COLOR_16_SWAP (from v8)*/
+    /*
+     * For backward compatibility support LV_COLOR_16_SWAP (from v8)
+     * TODO:(v10) remove this
+     */
 #if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP
-    lv_draw_sw_rgb565_swap(px_map, lv_area_get_size(&offset_area));
+    if(lv_display_get_render_mode(disp) == LV_DISPLAY_RENDER_MODE_DIRECT) {
+        uint16_t * fb = (uint16_t *)px_map;
+        uint32_t stride_px = disp->buf_act->header.stride / 2; /* RGB565: 2 bytes/px */
+        int32_t w = lv_area_get_width(area);
+        int32_t h = lv_area_get_height(area);
+        for(int32_t y = 0; y < h; y++) {
+            lv_draw_sw_rgb565_swap(fb + (uint32_t)(area->y1 + y) * stride_px + area->x1, w);
+        }
+    }
+    else {
+        lv_draw_sw_rgb565_swap(px_map, lv_area_get_size(&offset_area));
+    }
 #endif
 
     disp->flush_cb(disp, &offset_area, px_map);

@@ -11,7 +11,7 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_G2D
+#if LV_USE_DRAW_G2D
 #include "../../../misc/lv_area_private.h"
 #include <g2d.h>
 #include "lv_g2d_buf_map.h"
@@ -28,7 +28,7 @@
  * Note: enum value is the same in either case
  * See https://github.com/nxp-imx/imx-g2d-pxp/commit/d7af84b5c8ad161b6898ffabe23918cb59fe2fe9
  */
-#if defined(LV_USE_PXP)
+#if LV_USE_DRAW_PXP
     #if (G2D_VERSION_MAJOR >= 2) && (G2D_VERSION_MINOR < 3)
         #define G2D_HARDWARE_PXP_V1 G2D_HARDWARE_PXP
     #endif
@@ -114,7 +114,6 @@ void lv_draw_g2d_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if LV_USE_DRAW_G2D
 static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
@@ -356,7 +355,6 @@ static void _g2d_render_thread_cb(void * ptr)
     lv_thread_sync_delete(&thread_dsc->sync);
     LV_LOG_INFO("Exit G2D draw thread.");
 }
-#endif
+#endif /*LV_USE_G2D_DRAW_THREAD*/
 
 #endif /*LV_USE_DRAW_G2D */
-#endif /*LV_USE_G2D*/

@@ -1,13 +1,13 @@
 ---
 title: "Spangroup (lv_spangroup)"
-description: "The Spangroup Widget is used to display rich text. Different from the Label Widget, Spangroups can render text styled with different fonts, colors, and sizes into the Spangroup Widget."
+description: "Display rich text where each part (Span) has its own font, color, and size."
 ---
 
 ## Overview
 
-The Spangroup Widget is used to display rich text. Unlike a Label, each Span within
-a Spangroup has its own text, font, color, and size. Spans can be added and removed
-at any time.
+A Spangroup displays rich text. Unlike a Label, each Span inside the group
+has its own text, font, color, and size. Spans can be added or removed at
+any time.
 
 ## Create spans
 
@@ -123,18 +123,10 @@ Spangroup and the Span need to be specified in the bind call:
 Note that before calling <ApiLink name="lv_spangroup_delete_span" />, <ApiLink name="lv_observer_remove" />
 needs to be called manually as LVGL can't remove the binding automatically.
 
+
 ## Events
 
-No special events are sent by Span Widgets.
+By default, Spangroup Widgets are created without the  <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag,
+but you can add it to make the Widget detect and send events <ApiLink name="LV_EVENT_CLICKED" />.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-</Callout>
-
-## Keys
-
-No *Keys* are processed by Span Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

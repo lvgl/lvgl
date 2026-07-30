@@ -1,13 +1,13 @@
 ---
 title: "Keyboard (lv_keyboard)"
-description: "The Keyboard Widget is a special Button Matrix (lv_buttonmatrix) with predefined keymaps and other features to provide an on-screen virtual keyboard to write text into a Text Area (lv_textarea)."
+description: "On-screen virtual keyboard that writes into a Text Area. Built on top of Button Matrix with preset keymaps."
 ---
 
 ## Overview
 
-The Keyboard Widget is a special [Button Matrix (lv_buttonmatrix)](/widgets/buttonmatrix)
-with predefined keymaps and other features to provide an on-screen virtual keyboard
-to write text into a [Text Area (lv_textarea)](/widgets/textarea).
+The Keyboard is an on-screen virtual keyboard built on top of
+[Button Matrix](/widgets/buttonmatrix). It ships with preset keymaps and
+writes the typed characters into a [Text Area](/widgets/textarea).
 
 ## Styling
 
@@ -107,17 +107,7 @@ The Keyboard has a **default event handler** callback called
 changing, sending events to the assigned text area, etc. You can remove it and replace it
 with a custom event handler if you wish, or add an additional call-back of your own.
 
-<Callout type="info">
-In LVGL v8.0 and newer, adding an event handler to the Keyboard does not remove the
-default event handler. This behavior differs from v7, where adding an event
-handler would replace the previous one.
-</Callout>
-
-<Callout type="info" title="Further Reading">
 Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
 
 ## Keys
 
@@ -125,6 +115,4 @@ Learn more about [events](/common-widget-features/events).
    selecting the one navigated to.
 - <ApiLink name="LV_KEY_ENTER" /> To press/release the selected button.
 
-<Callout type="info" title="Further Reading">
 Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>

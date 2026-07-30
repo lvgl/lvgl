@@ -19,7 +19,6 @@ void lv_example_slider_img_indicator(void)
 {
     LV_IMAGE_DECLARE(img_bar_bg);
     LV_IMAGE_DECLARE(img_bar_indicator);
-    LV_FONT_DECLARE(font_example_large);
 
     static lv_style_t style_slider_track;
     static lv_style_t style_slider_indicator;
@@ -74,6 +73,5 @@ void lv_example_slider_img_indicator(void)
 
     lv_obj_t * label = lv_label_create(screen);
     lv_label_bind_text(label, &subject_value2, "%d");
-    lv_obj_set_style_text_font(label, &font_example_large, 0);
 }
 #endif

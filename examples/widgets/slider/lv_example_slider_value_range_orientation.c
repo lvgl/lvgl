@@ -26,18 +26,18 @@ void lv_example_slider_value_range_orientation(void)
 
     /* Horizontal slider with custom range */
     lv_obj_t * slider_1 = lv_slider_create(screen);
-    lv_obj_set_size(slider_1, lv_pct(90), 16);
+    lv_obj_set_size(slider_1, lv_pct(90), 20);
     lv_slider_set_min_value(slider_1, -20);
     lv_slider_set_max_value(slider_1, 80);
     lv_slider_set_value(slider_1, 35, false);
     lv_obj_t * label_1 = lv_label_create(slider_1);
     lv_obj_set_align(label_1, LV_ALIGN_CENTER);
-    lv_label_set_text(label_1, "-20..80");
+    lv_label_set_text(label_1, "Horizontal");
     lv_obj_set_style_text_color(label_1, TEXT_COLOR, 0);
 
     /* Vertical slider with explicit vertical orientation */
     lv_obj_t * slider_2 = lv_slider_create(screen);
-    lv_obj_set_size(slider_2, 18, 130);
+    lv_obj_set_size(slider_2, 20, 130);
     lv_slider_set_orientation(slider_2, LV_SLIDER_ORIENTATION_VERTICAL);
     lv_slider_set_min_value(slider_2, 0);
     lv_slider_set_max_value(slider_2, 100);
@@ -46,5 +46,6 @@ void lv_example_slider_value_range_orientation(void)
     lv_obj_set_align(label_2, LV_ALIGN_CENTER);
     lv_label_set_text(label_2, "V\ne\nr");
     lv_obj_set_style_text_color(label_2, TEXT_COLOR, 0);
+    lv_obj_set_style_text_align(label_2, LV_TEXT_ALIGN_CENTER, 0);
 }
 #endif

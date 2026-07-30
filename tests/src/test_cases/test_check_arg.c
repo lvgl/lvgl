@@ -97,8 +97,10 @@ void test_check_arg_condition_false(void)
     int x = 0;
     LV_CHECK_ARG(1 == 0, x = -1, ": test failure action");
     TEST_ASSERT_EQUAL_INT(-1, x);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed: 1 == 0 : test failure action");
+#endif /*LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE*/
 }
 
 /**********************
@@ -113,8 +115,10 @@ void test_check_arg_printf_args(void)
     LV_UNUSED(val);
     LV_CHECK_ARG(val > 10, x = -1, ": val=%d", val);
     TEST_ASSERT_EQUAL_INT(-1, x);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed: val > 10 : val=7");
+#endif /* LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE*/
 }
 
 /**********************
@@ -129,8 +133,10 @@ void test_check_arg_action_break(void)
         LV_CHECK_ARG(i < 3, break, ": breaking at i=%d", i);
     }
     TEST_ASSERT_EQUAL_INT(3, i);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed: i < 3 : breaking at i=3");
+#endif /*LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE*/
 }
 
 /**********************
@@ -152,8 +158,10 @@ void test_check_arg_return_void_condition_false(void)
     bool reached = false;
     helper_return_void_on_null(NULL, &reached);
     TEST_ASSERT_FALSE(reached);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed: ptr != NULL ptr is NULL");
+#endif /*LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE*/
 }
 
 /**********************
@@ -173,8 +181,10 @@ void test_check_arg_return_val_condition_false(void)
 {
     int result = helper_return_val_on_null(NULL);
     TEST_ASSERT_EQUAL_INT(-1, result);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed: ptr != NULL ptr is NULL");
+#endif /*LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE*/
 }
 
 /**********************
@@ -189,9 +199,11 @@ void test_check_arg_multiple_in_sequence(void)
     TEST_ASSERT_FALSE(log_warned);
 
     LV_CHECK_ARG(1 == 0, x = 2, ": second");
-    TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_EQUAL_INT(2, x);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
+    TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed: 1 == 0 : second");
+#endif /*LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE*/
 }
 
 /* Complex expression as error value in return */
@@ -206,8 +218,10 @@ void test_check_arg_return_val_complex_expr(void)
 {
     int result = helper_return_val_complex_expr(NULL);
     TEST_ASSERT_EQUAL_INT(-100, result);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed: ptr != NULL complex expr");
+#endif /*LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE*/
 }
 
 /* Zero as error return value is not confused with success */
@@ -222,8 +236,10 @@ void test_check_arg_return_val_zero(void)
 {
     int result = helper_return_val_zero(NULL);
     TEST_ASSERT_EQUAL_INT(0, result);
+#if LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE
     TEST_ASSERT_TRUE(log_warned);
     TEST_ASSERT_LOG_CONTAINS("Check failed: ptr != NULL returns zero");
+#endif /*LV_CHECK_ARG_LOG_MODE != LV_CHECK_ARG_LOG_MODE_NONE*/
 }
 
 #endif

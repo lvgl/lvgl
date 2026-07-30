@@ -21,6 +21,8 @@
  */
 void lv_example_roller_styling(void)
 {
+    LV_FONT_DECLARE(font_example_large);
+
     static lv_style_t style_roller_main;
     static lv_style_t style_roller_selected;
 
@@ -40,6 +42,7 @@ void lv_example_roller_styling(void)
         lv_style_set_bg_color(&style_roller_selected, lv_color_hex(0x6366f1));
         lv_style_set_bg_opa(&style_roller_selected, (255 * 100 / 100));
         lv_style_set_text_color(&style_roller_selected, lv_color_hex(0xffffff));
+        lv_style_set_text_font(&style_roller_selected, &font_example_large);
 
         inited = true;
     }

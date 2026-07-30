@@ -31,8 +31,16 @@ extern "C" {
 /* The ppa driver depends heavily on the esp-idf headers*/
 #include <sdkconfig.h>
 
-#if (CONFIG_LV_DRAW_BUF_ALIGN != CONFIG_CACHE_L2_CACHE_LINE_SIZE)
-#error "CONFIG_LV_DRAW_BUF_ALIGN must be equal to CONFIG_CACHE_L2_CACHE_LINE_SIZE!"
+#if defined(CONFIG_CACHE_L2_CACHE_LINE_SIZE)
+#define LV_DRAW_PPA_CACHE_LINE_SIZE CONFIG_CACHE_L2_CACHE_LINE_SIZE
+#elif defined(CONFIG_CACHE_L1_DCACHE_LINE_SIZE)
+#define LV_DRAW_PPA_CACHE_LINE_SIZE CONFIG_CACHE_L1_DCACHE_LINE_SIZE
+#else
+#error "Cannot determine the data cache line size for the PPA draw unit"
+#endif
+
+#if (CONFIG_LV_DRAW_BUF_ALIGN != LV_DRAW_PPA_CACHE_LINE_SIZE)
+#error "CONFIG_LV_DRAW_BUF_ALIGN must be equal to the data cache line size!"
 #endif
 
 

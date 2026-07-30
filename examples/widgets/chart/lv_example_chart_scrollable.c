@@ -26,11 +26,11 @@ void lv_example_chart_scrollable(void)
 
     /* Viewport: small fixed width; clips its scrollable child. */
     lv_obj_t * container_1 = lv_obj_create(screen);
-    lv_obj_set_size(container_1, 220, 180);
+    lv_obj_set_size(container_1, 300, 180);
     lv_obj_set_style_pad_all(container_1, 0, 0);
     /* Wrapper: wider than the viewport so it scrolls. Hosts both chart and scale stacked vertically. */
     lv_obj_t * container_2 = lv_obj_create(container_1);
-    lv_obj_set_size(container_2, lv_pct(300), lv_pct(100));
+    lv_obj_set_size(container_2, lv_pct(200), lv_pct(100));
     lv_obj_set_flex_flow(container_2, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_bg_opa(container_2, 0, 0);
     lv_obj_set_style_border_width(container_2, 0, 0);
@@ -49,7 +49,9 @@ void lv_example_chart_scrollable(void)
     lv_chart_set_axis_max_value(chart, LV_CHART_AXIS_PRIMARY_Y, 100);
 
     lv_obj_t * scale = lv_scale_create(container_2);
-    lv_obj_set_size(scale, lv_pct(100), 22);
+    lv_obj_set_width(scale, lv_pct(100));
+    lv_obj_set_style_pad_hor(scale, 30, 0);
+    lv_obj_set_height(scale, 22);
     lv_scale_set_mode(scale, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
     lv_scale_set_total_tick_count(scale, 12);
     lv_scale_set_major_tick_every(scale, 1);

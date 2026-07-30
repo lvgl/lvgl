@@ -19,14 +19,10 @@
 void lv_example_table_scroll(void)
 {
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Drag the table vertically to reveal the lower rows. */
     lv_obj_t * table = lv_table_create(screen);
+    lv_obj_set_align(table, LV_ALIGN_CENTER);
     lv_obj_set_size(table, 240, 160);
     lv_table_set_row_count(table, 12);
     lv_table_set_column_count(table, 2);

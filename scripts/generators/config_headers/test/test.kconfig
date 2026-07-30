@@ -1,0 +1,247 @@
+# Fixture exercising one instance of each config type the generator supports.
+# Kept deliberately small: one representative per type, with the edge cases that
+# distinguish the emit paths (e.g. a default-y bool vs a default-n bool).
+
+# --- BoolConfig: plain on/off, default off (LV_USE_WAYLAND pattern) ----------
+config LV_USE_WAYLAND
+	bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
+	default n
+	help
+	  Use Wayland to open a window and handle input on Linux or BSD desktops
+
+# --- BoolConfig: default on, exercises the LV_KCONFIG_PRESENT ladder ----------
+config LV_USE_LOG
+	bool "Enable the log module"
+	default y
+	help
+	  Enable the log module and the LV_LOG_* macros
+
+# --- IntConfig: plain integer ------------------------------------------------
+config LV_DEF_REFR_PERIOD
+	int "Default refresh period (ms)"
+	default 33
+	help
+	  Default display refresh, input device read and animation step period.
+
+# --- IntConfig: hex value ----------------------------------------------------
+config LV_VG_LITE_HAL_GPU_REVISION
+	hex "VG-Lite GPU revision"
+	default 0x40
+
+# --- StringConfig ------------------------------------------------------------
+config LV_TXT_BREAK_CHARS
+	string "Can break (wrap) texts on these chars"
+	default " ,.;:-_)}"
+	help
+	  While rendering text strings, break (wrap) text on these chars.
+
+# --- EnumChoice: named int-const tokens, member != token (stdlib pattern) -----
+config LV_STDLIB_BUILTIN
+	int
+	default 0
+config LV_STDLIB_CLIB
+	int
+	default 1
+config LV_STDLIB_CUSTOM
+	int
+	default 255
+
+choice
+	prompt "Malloc functions source"
+	default LV_USE_BUILTIN_MALLOC
+	config LV_USE_BUILTIN_MALLOC
+		bool "LVGL's built in implementation"
+	config LV_USE_CLIB_MALLOC
+		bool "Standard C malloc/realloc/free"
+	config LV_USE_CUSTOM_MALLOC
+		bool "Implement the functions externally"
+endchoice
+
+config LV_USE_STDLIB_MALLOC
+	int
+	default LV_STDLIB_BUILTIN if LV_USE_BUILTIN_MALLOC
+	default LV_STDLIB_CLIB    if LV_USE_CLIB_MALLOC
+	default LV_STDLIB_CUSTOM  if LV_USE_CUSTOM_MALLOC
+
+# --- EnumChoice: member == token, tokens defined here (LV_USE_OS pattern) ------
+# Bare-literal defaults; emits the member name as token via MEMBER_IS_TOKEN.
+choice LV_USE_OS
+	prompt "Default operating system to use"
+	default LV_OS_NONE
+	config LV_OS_NONE
+		bool "0: NONE"
+	config LV_OS_PTHREAD
+		bool "1: PTHREAD"
+	config LV_OS_CUSTOM
+		bool "255: CUSTOM"
+endchoice
+
+config LV_USE_OS
+	int
+	default 0   if LV_OS_NONE
+	default 1   if LV_OS_PTHREAD
+	default 255 if LV_OS_CUSTOM
+
+# --- EnumChoice: value-alias, emit the number (LV_COLOR_DEPTH pattern) ---------
+choice LV_COLOR_DEPTH
+	prompt "Color depth"
+	default LV_COLOR_DEPTH_16
+	config LV_COLOR_DEPTH_32
+		bool "32: XRGB8888"
+	config LV_COLOR_DEPTH_16
+		bool "16: RGB565"
+	config LV_COLOR_DEPTH_8
+		bool "8: L8"
+endchoice
+
+config LV_COLOR_DEPTH
+	int
+	default 32 if LV_COLOR_DEPTH_32
+	default 16 if LV_COLOR_DEPTH_16
+	default 8  if LV_COLOR_DEPTH_8
+
+# --- EnumChoice: member == token, tokens owned by a C header (LV_LOG_LEVEL) ----
+# Like LV_USE_OS (member name is the token) but the LV_LOG_LEVEL_* tokens are
+# defined in lv_log.h, so they must NOT be re-emitted in the options block.
+choice
+	bool "Default log verbosity"
+	default LV_LOG_LEVEL_WARN
+	config LV_LOG_LEVEL_TRACE
+		bool "LOG_LEVEL_TRACE: A lot of logs to give detailed information"
+	config LV_LOG_LEVEL_WARN
+		bool "LOG_LEVEL_WARN: Log if something unwanted happened"
+	config LV_LOG_LEVEL_NONE
+		bool "LOG_LEVEL_NONE: Do not log anything"
+endchoice
+
+config LV_LOG_LEVEL
+	int
+	default 0 if LV_LOG_LEVEL_TRACE
+	default 2 if LV_LOG_LEVEL_WARN
+	default 5 if LV_LOG_LEVEL_NONE
+
+# --- DerivedFlag: internal capability flag set via `select` -------------------
+# Two draw units `select` it; it is derived from those selectors, never set by
+# the user, so it has no prompt and is absent from the template.
+config LV_USE_DRAW_VG_LITE
+	bool "Enable the VG-Lite draw unit"
+	default n
+	select LV_DRAW_HAS_VECTOR_SUPPORT
+
+config LV_USE_DRAW_NANOVG
+	bool "Enable the NanoVG draw unit"
+	default n
+	select LV_DRAW_HAS_VECTOR_SUPPORT
+
+config LV_DRAW_HAS_VECTOR_SUPPORT
+	bool
+	default n
+
+# --- Driver rendering backend (the LV_<DRIVER>_BACKEND pattern) ----------------
+# A LV_<DRIVER>_BACKEND enum choice the user picks; each member `select`s a
+# hidden per-backend LV_<DRIVER>_USE_* flag (emitted as a DerivedFlag rewritten
+# to `LV_<DRIVER>_BACKEND == ..._<X>` via the guard) plus the capability configs
+# it needs.  LV_USE_EGL aggregates the per-driver EGL flags (ordering).  The
+# deprecated LV_<DRIVER>_AUTO_BACKEND is a LegacyBoolConfig: default-on even
+# though it is gated.  Real names so they fall under MEMBER_IS_TOKEN /
+# LEGACY_DEFAULT_ON.
+config LV_USE_OPENGLES
+	bool "Use LVGL's OpenGL Driver"
+	default n
+
+config LV_USE_EGL
+	bool
+
+config LV_USE_LINUX_DRM
+	bool "Use Linux DRM device"
+	default n
+
+if LV_USE_LINUX_DRM
+
+choice
+	prompt "Rendering backend"
+	default LV_LINUX_DRM_BACKEND_FBDEV
+	depends on !LV_LINUX_DRM_AUTO_BACKEND
+	config LV_LINUX_DRM_BACKEND_FBDEV
+		bool "Dumb buffers (no GPU)"
+	config LV_LINUX_DRM_BACKEND_EGL
+		bool "EGL (OpenGL ES, hardware-accelerated)"
+		# `depends on` (not just `select`) to exercise the per-member "requires"
+		# note; a single-select macro isn't #if-gated per member in the template.
+		depends on LV_USE_DRAW_NANOVG
+		select LV_LINUX_DRM_USE_EGL
+		select LV_USE_OPENGLES
+endchoice
+
+config LV_LINUX_DRM_BACKEND
+	int
+	default 0 if LV_LINUX_DRM_BACKEND_FBDEV
+	default 1 if LV_LINUX_DRM_BACKEND_EGL
+
+config LV_LINUX_DRM_USE_EGL
+	bool
+	select LV_USE_EGL
+
+config LV_LINUX_DRM_AUTO_BACKEND
+	bool "Auto-select the DRM backend (legacy)"
+	default y
+
+endif # LV_USE_LINUX_DRM
+
+# --- Named choice with NO derived int, member == token -------------
+# Tokens (LV_TXT_ENC_*) live in a C header; emit one macro, define nothing.
+choice LV_TXT_ENC
+	prompt "Select a character encoding for strings"
+	default LV_TXT_ENC_UTF8
+	config LV_TXT_ENC_UTF8
+		bool "UTF8"
+	config LV_TXT_ENC_ASCII
+		bool "ASCII"
+endchoice
+
+# --- Anonymous choice, member != token (CHOICE_TOKEN_MAP) ----------
+# Members LV_SDL_RENDER_MODE_* map to header tokens LV_DISPLAY_RENDER_MODE_*.
+choice
+	prompt "SDL rendering mode"
+	default LV_SDL_RENDER_MODE_DIRECT
+	config LV_SDL_RENDER_MODE_PARTIAL
+		bool "Render in smaller parts"
+	config LV_SDL_RENDER_MODE_DIRECT
+		bool "Direct mode"
+	config LV_SDL_RENDER_MODE_FULL
+		bool "Full mode"
+endchoice
+
+# --- Deprecated Symbols -----------------------------------------------------
+config LV_MEM_SIZE_KILOBYTES
+	int "Memory size (KB) [DEPRECATED: use LV_MEM_SIZE]"
+	default 0
+
+# --- Direct int + deprecated optional choice (the LV_SDL_BUF_COUNT pattern) ---
+# The option is a plain int with its own default.  The old buffer-size choice is
+# kept only so existing defconfigs still parse; its members are in IGNORE_SYMBOLS
+# (mapped to LV_SDL_BUF_COUNT by the lv_conf_kconfig.h shim), so they must not
+# appear in the generated output.
+config LV_SDL_BUF_COUNT
+	int "Number of screen-sized buffers (1 or 2)"
+	range 1 2
+	default 1
+
+choice
+	prompt "SDL buffer count [DEPRECATED: use LV_SDL_BUF_COUNT]"
+	optional
+	config LV_SDL_SINGLE_BUFFER
+		bool "One screen-sized buffer"
+	config LV_SDL_DOUBLE_BUFFER
+		bool "Two screen-sized buffers"
+endchoice
+
+# --- Font default (named choice; tokens map to pointers) handled via special logic ------------
+choice LV_FONT_DEFAULT
+	prompt "Default font"
+	default LV_FONT_DEFAULT_MONTSERRAT_14
+	config LV_FONT_DEFAULT_MONTSERRAT_14
+		bool "Montserrat 14"
+	config LV_FONT_DEFAULT_UNSCII_8
+		bool "UNSCII 8"
+endchoice

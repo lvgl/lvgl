@@ -1,12 +1,12 @@
 ---
 title: "LED (lv_led)"
-description: "LEDs are rectangle-like (or circle) Widgets whose brightness can be adjusted. With lower brightness the color of the LED becomes darker."
+description: "A small rectangle or circle that mimics an LED. Brightness controls how dark the color appears."
 ---
 
 ## Overview
 
-LEDs are rectangle-like (or circle) Widgets whose brightness can be
-adjusted. With lower brightness the color of the LED becomes darker.
+An LED is a small rectangle or circle with adjustable brightness. Lower
+brightness makes the color darker.
 
 ## Color
 
@@ -51,18 +51,5 @@ looks — round with halo, square with hard border, and a dimmed
 
 ## Events
 
-No special events are sent by LED Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Events](/common-widget-features/events) emitted by all Widgets.
-
-Learn more about [events](/common-widget-features/events).
-</Callout>
-
-## Keys
-
-No *Keys* are processed by LED Widgets.
-
-<Callout type="info" title="Further Reading">
-Learn more about [Keys](/main-modules/indev/keypad).
-</Callout>
+By default, LED Widgets are created without the  <ApiLink name="LV_OBJ_FLAG_CLICKABLE" /> flag,
+but you can add it to make the Widget detect and send events <ApiLink name="LV_EVENT_CLICKED" />.

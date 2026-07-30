@@ -1,0 +1,74 @@
+menu "Compiler Settings"
+config LV_BIG_ENDIAN_SYSTEM
+	bool "For big endian systems set to 1"
+	help
+		For big endian systems set to 1
+
+config LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
+	bool "Include a custom attributes header"
+	default n
+	help
+	  Include the header given by LV_ATTRIBUTE_CUSTOM_INCLUDE to override the
+	  LV_ATTRIBUTE_* macros for your platform.
+
+config LV_ATTRIBUTE_CUSTOM_INCLUDE
+	string "Path to custom attributes header"
+	default ""
+	depends on LV_ATTRIBUTE_USE_CUSTOM_INCLUDE
+	help
+	  Optional header to override LV_ATTRIBUTE_* macros for your platform.
+	  Leave empty to use defaults (all expand to nothing).
+
+	  Create a header file and set this to its path, e.g. "my_lv_attr.h".
+	  The following macros can be defined in it:
+
+	  LV_ATTRIBUTE_MEM_ALIGN
+	    Where memory needs to be aligned (e.g. with -Os, data may not be
+	    aligned to the required boundary by default).
+	    e.g. __attribute__((aligned(4)))
+
+	  LV_ATTRIBUTE_TICK_INC
+	    Applied to lv_tick_inc(). Often called from a timer ISR, so fast
+	    memory placement can reduce latency.
+	    e.g. __attribute__((section(".itcm"))) or __ramfunc (IAR)
+
+	  LV_ATTRIBUTE_TIMER_HANDLER
+	    Applied to lv_timer_handler().
+	    e.g. __attribute__((section(".itcm")))
+
+	  LV_ATTRIBUTE_FLUSH_READY
+	    Applied to lv_display_flush_ready(). Often called from a DMA or
+	    display ISR.
+	    e.g. __attribute__((section(".itcm")))
+
+	  LV_ATTRIBUTE_SYNC_READY
+	    Applied to lv_display_sync_ready(). Similar to FLUSH_READY, useful
+	    when called from an ISR context.
+	    e.g. __attribute__((section(".itcm")))
+
+	  LV_ATTRIBUTE_LARGE_CONST
+	    Applied to large read-only arrays such as font bitmaps. Use to place
+	    them in a specific flash region or external memory.
+	    e.g. __attribute__((section(".ext_flash")))
+
+	  LV_ATTRIBUTE_LARGE_RAM_ARRAY
+	    Applied to large arrays allocated in RAM.
+	    e.g. __attribute__((section(".ext_ram")))
+
+	  LV_ATTRIBUTE_FAST_MEM
+	    Applied to performance-critical functions to place them in faster
+	    memory such as ITCM or SRAM.
+	    e.g. __attribute__((section(".itcm"))) or __ramfunc (IAR)
+
+	  LV_ATTRIBUTE_EXTERN_DATA
+	    Prefix for all global extern data declarations. Useful for placing
+	    shared data in a named section or applying export attributes.
+	    e.g. __attribute__((section(".shared_mem")))
+
+	  LV_EXPORT_CONST_INT(int_value)
+	    Exports an integer constant to a language binding API such as
+	    MicroPython. Called for all constants in the form LV_<CONST>.
+	    Leave undefined if not using a binding.
+	    e.g. mp_rom_map_elem_t entry = {MP_ROM_QSTR(MP_QSTR_##int_value), MP_ROM_INT(int_value)}
+
+endmenu #"Compiler Settings"

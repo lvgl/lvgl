@@ -104,9 +104,12 @@ FORBIDDEN_SYSTEM_HEADERS: set[str] = {
 # This is the exhaustive allow-list; anything not here (and not forbidden)
 # is still an error so the list stays intentional and auditable.
 ALLOWED_EXTERNAL_HEADERS: set[str] = {
+    "EGL/egl.h",
+    "EGL/eglext.h",
     "FreeRTOS.h",
     "GL/glew.h",
     "GLES2/gl2.h",
+    "GLES2/gl2ext.h",
     "GLES3/gl3.h",
     "GLFW/glfw3.h",
     "LVGL_thread.h",
@@ -156,11 +159,6 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "freertos/semphr.h",
     "freertos/task.h",
     "freetype/config/ftheader.h",
-    "freetype/fterrors.h",
-    "freetype/ftsystem.h",
-    "freetype/fttypes.h",
-    "freetype/internal/ftdebug.h",
-    "freetype/internal/ftstream.h",
     "fsl_cache.h",
     "fsl_elcdif.h",
     "fsl_pxp.h",

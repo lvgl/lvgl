@@ -35,14 +35,10 @@ void lv_example_style_shadow(void)
     }
 
     lv_obj_t * screen = lv_screen_active();
-    lv_obj_set_flex_flow(screen, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_flex_main_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_cross_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_flex_track_place(screen, LV_FLEX_ALIGN_CENTER, 0);
-    lv_obj_set_style_pad_row(screen, 16, 0);
 
     /* 💡 Set `shadow_offset_x`/`shadow_offset_y` to 0 to turn the elevation into an even glow. */
     lv_obj_t * container = lv_obj_create(screen);
+    lv_obj_set_align(container, LV_ALIGN_CENTER);
     lv_obj_set_size(container, 210, 130);
     lv_obj_add_style(container, &style_elevated, 0);
     lv_obj_t * label = lv_label_create(container);

@@ -186,12 +186,13 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
 
 void lv_timer_set_cb(lv_timer_t * timer, lv_timer_cb_t timer_cb)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->timer_cb = timer_cb;
 }
 
 void lv_timer_delete(lv_timer_t * timer)
 {
+    if(timer == NULL) return;
     lv_ll_remove(timer_ll_p, timer);
     state.timer_deleted = true;
 
@@ -207,52 +208,52 @@ void lv_timer_delete(lv_timer_t * timer)
 
 void lv_timer_pause(lv_timer_t * timer)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->paused = true;
 }
 
 void lv_timer_resume(lv_timer_t * timer)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->paused = false;
     lv_timer_handler_resume();
 }
 
 void lv_timer_set_period(lv_timer_t * timer, uint32_t period)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->period = period;
     lv_timer_handler_resume();
 }
 
 void lv_timer_ready(lv_timer_t * timer)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->last_run = lv_tick_get() - timer->period - 1;
     lv_timer_handler_resume();
 }
 
 void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->repeat_count = repeat_count;
 }
 
 void lv_timer_set_auto_delete(lv_timer_t * timer, bool auto_delete)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->auto_delete = auto_delete;
 }
 
 void lv_timer_set_user_data(lv_timer_t * timer, void * user_data)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->user_data = user_data;
 }
 
 void lv_timer_reset(lv_timer_t * timer)
 {
-    LV_ASSERT_NULL(timer);
+    LV_CHECK_ARG(timer != NULL, return);
     timer->last_run = lv_tick_get();
     lv_timer_handler_resume();
 }
@@ -299,22 +300,20 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period(uint32_t peri
 
 void * lv_timer_get_user_data(lv_timer_t * timer)
 {
+    LV_CHECK_ARG(timer != NULL, return NULL);
     return timer->user_data;
 }
 
 bool lv_timer_get_paused(lv_timer_t * timer)
 {
+    LV_CHECK_ARG(timer != NULL, return false);
     return timer->paused;
 }
 
 #if LV_USE_EXT_DATA
 void lv_timer_set_external_data(lv_timer_t * timer, void * data, void (* free_cb)(void * data))
 {
-    if(!timer) {
-        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL timer");
-        return;
-    }
-
+    LV_CHECK_ARG(timer != NULL, return);
     timer->ext_data.data = data;
     timer->ext_data.free_cb = free_cb;
 }

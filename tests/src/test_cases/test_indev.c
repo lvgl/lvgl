@@ -122,6 +122,101 @@ void test_indev_long_pressed(void)
     TEST_ASSERT_EQUAL_UINT32(1, long_pressed_cnt);
 }
 
+void test_indev_long_press_time(void)
+{
+    uint32_t long_pressed_cnt = 0;
+    lv_indev_t * mouse = lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
+
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
+    lv_obj_set_size(btn, 100, 100);
+    lv_obj_add_event_cb(btn, indev_long_pressed_event_cb, LV_EVENT_LONG_PRESSED, &long_pressed_cnt);
+
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    lv_test_mouse_move_to(50, 50);
+
+    /*With a short long press time 250 ms is enough to trigger*/
+    lv_indev_set_long_press_time(mouse, 200);
+    lv_test_mouse_press();
+    lv_test_wait(150);
+    TEST_ASSERT_EQUAL_UINT32(0, long_pressed_cnt);
+    lv_test_wait(100);
+    TEST_ASSERT_EQUAL_UINT32(1, long_pressed_cnt);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    /*With a long long press time even 450 ms (more than the default 400 ms) is not enough*/
+    lv_indev_set_long_press_time(mouse, 600);
+    lv_test_mouse_press();
+    lv_test_wait(450);
+    TEST_ASSERT_EQUAL_UINT32(1, long_pressed_cnt);
+    lv_test_wait(250);
+    TEST_ASSERT_EQUAL_UINT32(2, long_pressed_cnt);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+
+    /*Restore the default value*/
+    lv_indev_set_long_press_time(mouse, 400);
+}
+
+static void indev_double_clicked_event_cb(lv_event_t * e)
+{
+    uint32_t * double_clicked_cnt = lv_event_get_user_data(e);
+    (*double_clicked_cnt)++;
+}
+
+static void indev_short_click(void)
+{
+    lv_test_mouse_press();
+    lv_test_wait(30);
+    lv_test_mouse_release();
+    lv_test_wait(30);
+}
+
+void test_indev_double_click_time(void)
+{
+    uint32_t double_clicked_cnt = 0;
+    lv_indev_t * mouse = lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER);
+
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
+    lv_obj_set_size(btn, 100, 100);
+    lv_obj_add_event_cb(btn, indev_double_clicked_event_cb, LV_EVENT_DOUBLE_CLICKED, &double_clicked_cnt);
+
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    lv_test_mouse_move_to(50, 50);
+
+    lv_indev_set_double_click_time(mouse, 300);
+
+    /*Two clicks ~160 ms apart are within the 300 ms double click time*/
+    indev_short_click();
+    lv_test_wait(100);
+    indev_short_click();
+    TEST_ASSERT_EQUAL_UINT32(1, double_clicked_cnt);
+
+    /*Wait long enough to reset the click streak*/
+    lv_test_wait(400);
+
+    /*Two clicks ~410 ms apart are outside of the 300 ms double click time*/
+    indev_short_click();
+    lv_test_wait(350);
+    indev_short_click();
+    TEST_ASSERT_EQUAL_UINT32(1, double_clicked_cnt);
+
+    /*Wait long enough to reset the click streak*/
+    lv_test_wait(700);
+
+    /*With a larger double click time the same ~410 ms gap results in a double click*/
+    lv_indev_set_double_click_time(mouse, 600);
+    indev_short_click();
+    lv_test_wait(350);
+    indev_short_click();
+    TEST_ASSERT_EQUAL_UINT32(2, double_clicked_cnt);
+
+    /*Restore the default value*/
+    lv_indev_set_double_click_time(mouse, 400);
+}
+
 static void indev_scroll_press_event_cb(lv_event_t * e)
 {
     uint32_t * pressed_count = lv_event_get_user_data(e);
@@ -156,7 +251,7 @@ void test_indev_scroll_between_two_buttons_with_and_without_press_lock(void)
     uint32_t pressed_lost_count_2 = 0;
 
     lv_obj_t * btn1 = lv_button_create(lv_screen_active());
-    lv_obj_remove_flag(btn1, LV_OBJ_FLAG_PRESS_LOCK);
+    lv_obj_set_press_lock(btn1, false);
     lv_obj_set_size(btn1, 120, 100);
     lv_obj_set_pos(btn1, 300, 200);
     lv_obj_add_event_cb(btn1, indev_scroll_press_event_cb, LV_EVENT_PRESSED,

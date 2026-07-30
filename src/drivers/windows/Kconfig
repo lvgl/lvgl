@@ -1,0 +1,6 @@
+config LV_USE_WINDOWS
+	bool "Use LVGL Windows backend"
+	depends on LV_OS_WINDOWS
+	default n
+	help
+		LVGL Windows backend

@@ -8,6 +8,7 @@ title: STM32 LTDC Display Driver
 
 Some STM32s have a specialized peripheral called
 LTDC (LCD-TFT Display Controller) for driving displays.
+See the [Display](/main-modules/display) module for general background on LVGL displays.
 
 ## Usage Modes With LVGL
 
@@ -58,7 +59,7 @@ size as the default framebuffer for double-buffered
 mode, or `NULL` otherwise. `my_ltdc_layer_index` is the layer index of the
 LTDC layer to create the display for.
 
-For the best visial results, `optional_other_full_size_buffer` should be used
+For the best visual results, `optional_other_full_size_buffer` should be used
 if enough memory is available. Single-buffered mode is what you should use
 if memory is very scarce. Chips with a CPU data cache have unavoidable visual
 artifacts when using single-buffered direct mode. If there is almost enough
@@ -134,13 +135,13 @@ disp = lv_st_ltdc_create_partial(partial_buf1,
 
 The driver supports display rotation with
 <ApiLink name="lv_display_set_rotation" display="lv_display_set_rotation(disp, rotation)" /> where rotation is one of
-<ApiLink name="LV_DISP_ROTATION_90" />, <ApiLink name="LV_DISP_ROTATION_180" />,
-or <ApiLink name="LV_DISP_ROTATION_270" />. The rotation is initially
-<ApiLink name="LV_DISP_ROTATION_0" />.
+<ApiLink name="LV_DISPLAY_ROTATION_90" />, <ApiLink name="LV_DISPLAY_ROTATION_180" />,
+or <ApiLink name="LV_DISPLAY_ROTATION_270" />. The rotation is initially
+<ApiLink name="LV_DISPLAY_ROTATION_0" />.
 
 The rotation is done in software and only works if the display was
 created using <ApiLink name="lv_st_ltdc_create_partial" />.
-<ApiLink name="LV_ST_LTDC_USE_DMA2D_FLUSH" /> will be have no effect if rotation
+<ApiLink name="LV_ST_LTDC_USE_DMA2D_FLUSH" /> will have no effect if rotation
 is used.
 
 ## Interop with the DMA2D and NeoChrom Draw Units
