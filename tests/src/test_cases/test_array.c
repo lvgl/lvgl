@@ -305,4 +305,115 @@ void test_array_assign(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_assign(&array, 5, &v));
 }
 
+void test_array_init_oom(void)
+{
+    lv_array_t a;
+    lv_result_t res;
+#ifdef LVGL_CI_USING_DEF_HEAP
+    res = lv_array_init(&a, (LV_MEM_SIZE / sizeof(int32_t)) + 1, sizeof(int32_t));
+#else
+    res = lv_array_init(&a, 0x3FFFFFFF, sizeof(int32_t));
+#endif
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+    TEST_ASSERT_NULL(a.data);
+    TEST_ASSERT_EQUAL_UINT32(0, a.size);
+    TEST_ASSERT_EQUAL_UINT32(0, a.capacity);
+
+    /* Safe to call deinit on inert array */
+    lv_array_deinit(&a);
+}
+
+void test_array_concat_overflow(void)
+{
+    lv_array_t a, b;
+    lv_array_init(&a, 2, sizeof(int32_t));
+    lv_array_init(&b, 2, sizeof(int32_t));
+    int32_t v = 42;
+    lv_array_push_back(&a, &v);
+    lv_array_push_back(&b, &v);
+
+    /* Fake the sizes of b to force addition overflow */
+    b.size = UINT32_MAX;
+
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_concat(&a, &b));
+
+    /* Restore sizes so deinit does not crash or complain */
+    b.size = 1;
+    lv_array_deinit(&a);
+    lv_array_deinit(&b);
+}
+
+void test_array_init_from_buf_oom(void)
+{
+    lv_array_t a;
+    lv_result_t res;
+
+    /* NULL buf with zero capacity should succeed */
+    res = lv_array_init_from_buf(&a, NULL, 0, sizeof(int32_t));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+    TEST_ASSERT_NULL(a.data);
+    TEST_ASSERT_EQUAL_UINT32(0, a.capacity);
+    lv_array_deinit(&a);
+
+    /* NULL buf with non-zero capacity should fail */
+    res = lv_array_init_from_buf(&a, NULL, 4, sizeof(int32_t));
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+    TEST_ASSERT_NULL(a.data);
+    TEST_ASSERT_EQUAL_UINT32(0, a.capacity);
+    lv_array_deinit(&a);
+}
+
+void test_array_copy_oom(void)
+{
+    lv_array_t src, dest;
+    lv_result_t res;
+    
+    res = lv_array_init(&src, 4, sizeof(int32_t));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+    
+    res = lv_array_init(&dest, 2, sizeof(int32_t));
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+    
+    int32_t val1 = 11, val2 = 22;
+    lv_array_push_back(&src, &val1);
+    lv_array_push_back(&dest, &val2);
+
+    /* Modify src capacity to trigger OOM during copy */
+#ifdef LVGL_CI_USING_DEF_HEAP
+    src.capacity = (LV_MEM_SIZE / sizeof(int32_t)) + 1;
+#else
+    src.capacity = 0x3FFFFFFF;
+#endif
+
+    res = lv_array_copy(&dest, &src);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+
+    /* dest array should remain untouched (retaining its capacity and element) */
+    TEST_ASSERT_EQUAL_UINT32(2, lv_array_capacity(&dest));
+    TEST_ASSERT_EQUAL_UINT32(1, lv_array_size(&dest));
+    int32_t * v = lv_array_at(&dest, 0);
+    TEST_ASSERT_EQUAL_INT32(22, *v);
+
+    /* Reset src capacity so deinit is clean */
+    src.capacity = 4;
+    lv_array_deinit(&src);
+    lv_array_deinit(&dest);
+}
+
+void test_array_zero_element_size(void)
+{
+    lv_array_t a;
+    lv_result_t res;
+
+    res = lv_array_init(&a, 4, 0);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+    TEST_ASSERT_NULL(a.data);
+    TEST_ASSERT_EQUAL_UINT32(0, a.capacity);
+
+    res = lv_array_init_from_buf(&a, NULL, 0, 0);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+    TEST_ASSERT_NULL(a.data);
+    TEST_ASSERT_EQUAL_UINT32(0, a.capacity);
+}
+
 #endif
