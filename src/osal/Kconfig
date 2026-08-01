@@ -1,24 +1,24 @@
 menu "Operating System (OS)"
 choice LV_USE_OS
-	prompt "Default operating system to use"
+	prompt "Operating system"
 	default LV_OS_NONE
 
 	config LV_OS_NONE
-		bool "NONE"
+		bool "None"
 	config LV_OS_PTHREAD
-		bool "PTHREAD"
+		bool "POSIX threads (pthread)"
 		select LV_OS_USE_PTHREAD
 	config LV_OS_FREERTOS
-		bool "FREERTOS"
+		bool "FreeRTOS"
 		select LV_OS_USE_FREERTOS
 	config LV_OS_CMSIS_RTOS2
-		bool "CMSIS_RTOS2"
+		bool "CMSIS-RTOS2"
 		select LV_OS_USE_CMSIS_RTOS2
 	config LV_OS_RTTHREAD
-		bool "RTTHREAD"
+		bool "RT-Thread"
 		select LV_OS_USE_RTTHREAD
 	config LV_OS_WINDOWS
-		bool "WINDOWS"
+		bool "Windows"
 		select LV_OS_USE_WINDOWS
 	config LV_OS_MQX
 		bool "MQX"
@@ -27,7 +27,7 @@ choice LV_USE_OS
 		bool "SDL2"
 		select LV_OS_USE_SDL2
 	config LV_OS_CUSTOM
-		bool "CUSTOM"
+		bool "Custom"
 		select LV_OS_USE_CUSTOM_INCLUDE
 endchoice
 
@@ -43,8 +43,6 @@ config LV_USE_OS
 	default 7 if LV_OS_SDL2
 	default 255 if LV_OS_CUSTOM
 
-# Internal flags that can be used to
-# generate cmake variables during build
 config LV_OS_USE_PTHREAD
 	bool
 
@@ -68,8 +66,6 @@ config LV_OS_USE_SDL2
 
 config LV_OS_USE_CUSTOM_INCLUDE
 	bool
-config LV_OS_USE_CUSTOM_INCLUDE
-	bool
 
 config LV_OS_CUSTOM_INCLUDE
 	string "Custom OS include header"
@@ -80,20 +76,19 @@ if LV_OS_FREERTOS
 menu "FreeRTOS Configuration"
 
 config LV_USE_FREERTOS_TASK_NOTIFY
-	bool "Use RTOS task with a direct notification for synchronization"
+	bool "Direct task notifications"
 	default y
-help
-	Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
-	than unblocking a task using an intermediary object such as a binary semaphore.
-	RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+	help
+		Synchronize with direct task notifications instead of an intermediary object such as a
+		binary semaphore: 45% faster and less RAM, but only usable when a single task can be
+		the recipient of the event.
 
 config LV_OS_IDLE_PERCENT_CUSTOM
 	bool "Custom idle percentage calculation"
 	default n
 	help
-		Enable this to provide a custom implementation of lv_os_get_idle_percent.
-		This is useful for multi-core systems where the default
-		FreeRTOS implementation might not sufficiently track idle time across all cores.
+		Provide your own lv_os_get_idle_percent(). Useful on multi-core systems, where the
+		default FreeRTOS implementation may not track idle time across all cores.
 endmenu
 endif #LV_OS_FREERTOS
 endmenu

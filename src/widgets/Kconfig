@@ -1,7 +1,7 @@
 menu "Widgets"
 
 config LV_WIDGETS_HAS_DEFAULT_VALUE
-	bool "Widgets has default value"
+	bool "Default values for widgets"
 	default y
 	help
 		Causes these widgets to be given default values at creation time.
@@ -13,11 +13,11 @@ config LV_WIDGETS_HAS_DEFAULT_VALUE
 		- lv_arclabel_t   :  Text set to "Arced Text", else empty string.
 
 config LV_USE_3DTEXTURE
-	bool "3D Texture"
+	bool "3D texture"
 	depends on LV_DRAW_HAS_3D_SUPPORT
 
 config LV_USE_ANIMIMG
-	bool "Anim image"
+	bool "Animated image"
 	default y
 
 config LV_USE_ARC
@@ -25,7 +25,7 @@ config LV_USE_ARC
 	default y
 
 config LV_USE_ARCLABEL
-	bool "Arc Label"
+	bool "Arc label"
 	default y
 
 config LV_USE_BAR
@@ -33,10 +33,10 @@ config LV_USE_BAR
 	default y
 
 config LV_USE_BARCODE
-	bool "Barcode library"
+	bool "Barcode"
 	select LV_USE_CANVAS
 	help
-		Barcode code library
+		Generates Code 128 barcodes.
 
 config LV_USE_BUTTON
 	bool "Button"
@@ -58,74 +58,76 @@ config LV_USE_CHART
 	default y
 
 config LV_USE_CHECKBOX
-	bool "Check Box"
+	bool "Checkbox"
 	default y
 
 config LV_USE_DROPDOWN
-	bool "Drop down list"
+	bool "Dropdown"
 	select LV_USE_LABEL
 	default y
 
 config LV_USE_FFMPEG
-	bool "FFmpeg player widget"
+	bool "FFmpeg player"
 	default n
 	help
-		FFmpeg library for image decoding and playing videos.
-		Supports all major image formats so do not enable other image decoder with it.
+		Decodes images and plays videos with FFmpeg. It supports all major image
+		formats, so do not enable other image decoders together with it.
 
 if LV_USE_FFMPEG
 
 config LV_FFMPEG_DUMP_FORMAT
 	bool "Dump format"
 	default n
+	help
+		Print the input stream information to stderr and keep FFmpeg logging
+		enabled (it is silenced otherwise).
 
 config LV_FFMPEG_PLAYER_USE_LV_FS
-	bool "Use lvgl file path in FFmpeg Player widget"
+	bool "LVGL file system paths in the player"
 	default n
 	help
-		You won't be able to open URLs after enabling this feature.
-		Note that FFmpeg image decoder will always use lvgl file system.
+		URLs can no longer be opened once this is enabled. The FFmpeg image
+		decoder always uses the LVGL file system regardless of this option.
 
 endif #LV_USE_FFMPEG
 
 config LV_USE_GIF
-	bool "GIF decoder library"
-	help
-		GIF decoder library
+	bool "GIF decoder"
 
 config LV_GIF_CACHE_DECODE_DATA
-	bool "Use extra 16KB RAM to cache decoded data to accelerate"
+	bool "Cache decoded data"
 	depends on LV_USE_GIF
+	help
+		Speeds up playback at the cost of an extra 16KB of RAM.
 
 config LV_GIF_MAX_WIDTH
 	int "Maximum GIF canvas width in pixels"
 	depends on LV_USE_GIF
 	default 480
-	help 
-		Increasing this value will consume more memory.
-		GIFs wider than this are rejected
+	help
+		Wider GIFs are rejected; raising this value increases memory usage.
 
 config LV_GIF_MAX_HEIGHT
 	int "Maximum GIF canvas height in pixels"
 	depends on LV_USE_GIF
 	default 32768
-	help 
-		This value has no impact on memory usage
-		GIFs taller than this are rejected
+	help
+		Taller GIFs are rejected; this value has no impact on memory usage.
 
 config LV_USE_GLTF
-	bool "glTF support"
+	bool "glTF"
 	select LV_USE_3DTEXTURE
 	depends on LV_DRAW_HAS_3D_SUPPORT
 	help
-		Enables parsing and rendering of 3D models (.gltf/.glb).
+		Parses and renders 3D models (.gltf/.glb).
 
 config LV_USE_GSTREAMER
-	bool "GStreamer widget"
+	bool "GStreamer player"
 	select LV_USE_IMAGE
 	default n
 	help
-		GStreamer library
+		Requires the gstreamer-1.0, gstreamer-video-1.0 and gstreamer-app-1.0
+		development libraries.
 
 config LV_USE_IMAGE
 	bool "Image"
@@ -133,7 +135,7 @@ config LV_USE_IMAGE
 	default y
 
 config LV_USE_IMAGEBUTTON
-	bool "ImageButton"
+	bool "Image button"
 	default y
 
 rsource "ime/Kconfig"
@@ -163,27 +165,25 @@ config LV_USE_LOTTIE
 	depends on LV_USE_THORVG # we require thorvg lottie parser
 	select LV_USE_VECTOR_GRAPHIC
 	help
-		Enable Lottie animations
+		Plays Lottie JSON animations using the ThorVG Lottie parser.
 
 config LV_USE_MENU
 	bool "Menu"
 	default y
 
 config LV_USE_MSGBOX
-	bool "Msgbox"
+	bool "Message box"
 	default y
 
 config LV_USE_QRCODE
-	bool "QR code library"
+	bool "QR code"
 	select LV_USE_CANVAS
-	help
-		QR code library
 
 config LV_USE_RLOTTIE
-	bool "Lottie library. Deprecated: use LV_USE_LOTTIE instead"
+	bool "Lottie (rlottie, legacy)"
 	default n
 	help
-		Rlottie library (Deprecated: use LV_USE_LOTTIE instead)
+		Legacy rlottie binding, kept for compatibility. Use LV_USE_LOTTIE instead.
 
 config LV_USE_ROLLER
 	bool "Roller"
@@ -204,7 +204,7 @@ config LV_USE_SPAN
 	default y
 
 config LV_SPAN_SNIPPET_STACK_SIZE
-	int "Maximum number of span descriptor"
+	int "Maximum number of span descriptors"
 	default 64
 	depends on LV_USE_SPAN
 
@@ -226,7 +226,7 @@ config LV_USE_TEXTAREA
 	default y
 
 config LV_TEXTAREA_DEF_PWD_SHOW_TIME
-	int "Text area def. pwd show time [ms]"
+	int "Default password show time (ms)"
 	default 1500
 	depends on LV_USE_TEXTAREA
 
@@ -243,6 +243,6 @@ config LV_USE_TILEVIEW
 	default y
 
 config LV_USE_WIN
-	bool "Win"
+	bool "Window"
 	default y
 endmenu

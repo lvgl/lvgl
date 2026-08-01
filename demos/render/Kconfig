@@ -1,5 +1,8 @@
 config LV_USE_DEMO_RENDER
-	bool "Render test for each primitives. Requires at least 480x272 display"
+	bool "Render demo"
 	select LV_USE_GRID
 	default n
+	help
+		Renders each drawing primitive for visual comparison.
+		Requires a display of at least 480x272.
 

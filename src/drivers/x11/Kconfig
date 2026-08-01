@@ -1,36 +1,36 @@
 config LV_USE_X11
-	bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"
+	bool "X11"
 	default n
 	help
-		Use X11 to open window on Linux desktop and handle mouse and keyboard
+		Open a window on an X11 desktop and read mouse and keyboard input.
 
 if LV_USE_X11
 
 config LV_X11_DOUBLE_BUFFER
-	bool "Use double buffers for lvgl rendering"
+	bool "Double buffering"
 	default y
 config LV_X11_DIRECT_EXIT
-	bool "Exit the application when all X11 windows have been closed"
+	bool "Exit when all windows are closed"
 	default y
 choice
-	prompt "X11 device render mode"
+	prompt "Render mode"
 	default LV_X11_RENDER_MODE_PARTIAL
 
 	config LV_X11_RENDER_MODE_PARTIAL
-		bool "Partial render mode"
+		bool "Partial mode"
 		help
-			Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM.
-			Appr. 1/10 screen size buffer(s) are used.
+			Render the screen in smaller parts so the buffer(s) can be smaller than the display and save RAM.
+			The driver uses buffer(s) of about 1/10 of the screen size.
 	config LV_X11_RENDER_MODE_DIRECT
-		bool "Direct render mode"
+		bool "Direct mode"
 		help
-			The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image. Only the changed ares will be updated.
-			With 2 buffers the buffers' content are kept in sync automatically and in flush_cb only address change is required.
+			Render into the correct location of screen-sized buffer(s) so they always hold the whole image, and flush only the changed areas.
+			With 2 buffers their content is kept in sync automatically and flush_cb only has to change the address.
 	config LV_X11_RENDER_MODE_FULL
-		bool "Full render mode"
+		bool "Full mode"
 		help
-			Always redraw the whole screen even if only one pixel has been changed.
-			With 2 buffers in flush_cb only and address change is required.
+			Always redraw the whole screen even if only one pixel has changed.
+			With 2 buffers flush_cb only has to change the address.
 endchoice
 
 endif #LV_USE_X11

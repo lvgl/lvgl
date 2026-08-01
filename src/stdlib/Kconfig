@@ -25,19 +25,19 @@ choice
 	default LV_USE_BUILTIN_MALLOC
 
 config LV_USE_BUILTIN_MALLOC
-	bool "LVGL's built in implementation"
+	bool "LVGL built-in"
 
 config LV_USE_CLIB_MALLOC
-	bool "Standard C functions malloc/realloc/free"
+	bool "C standard library (malloc/realloc/free)"
 
 config LV_USE_MICROPYTHON_MALLOC
-	bool "MicroPython functions malloc/realloc/free"
+	bool "MicroPython"
 
 config LV_USE_RTTHREAD_MALLOC
-	bool "RT-Thread functions malloc/realloc/free"
+	bool "RT-Thread"
 
 config LV_USE_CUSTOM_MALLOC
-	bool "Implement the functions externally"
+	bool "Custom (implemented externally)"
 
 endchoice # "Malloc functions"
 
@@ -54,16 +54,16 @@ choice
 	default LV_USE_BUILTIN_STRING
 
 config LV_USE_BUILTIN_STRING
-	bool "LVGL's built in implementation"
+	bool "LVGL built-in"
 
 config LV_USE_CLIB_STRING
-	bool "Standard C functions memcpy/memset/strlen/strcpy"
+	bool "C standard library (memcpy/memset/strlen/strcpy)"
 
 config LV_USE_RTTHREAD_STRING
-	bool "RT-Thread functions rt_memcpy/rt_memset/rt_strlen/rt_strcpy"
+	bool "RT-Thread (rt_memcpy/rt_memset/rt_strlen/rt_strcpy)"
 
 config LV_USE_CUSTOM_STRING
-	bool "Implement the functions externally"
+	bool "Custom (implemented externally)"
 
 endchoice
 
@@ -79,16 +79,16 @@ choice
 	default LV_USE_BUILTIN_SPRINTF
 
 config LV_USE_BUILTIN_SPRINTF
-	bool "LVGL's built in implementation"
+	bool "LVGL built-in"
 
 config LV_USE_CLIB_SPRINTF
-	bool "Standard C function vsnprintf"
+	bool "C standard library (vsnprintf)"
 
 config LV_USE_RTTHREAD_SPRINTF
-	bool "RT-Thread function rt_vsnprintf"
+	bool "RT-Thread (rt_vsnprintf)"
 
 config LV_USE_CUSTOM_SPRINTF
-	bool "Implement the functions externally"
+	bool "Custom (implemented externally)"
 
 endchoice # "Sprintf functions"
 
@@ -104,8 +104,10 @@ if LV_USE_BUILTIN_MALLOC
 menu "Builtin Malloc Settings"
 
 config LV_MEM_SIZE
-	int "Memory size in bytes (Needs to be at least 2kB (2048))"
+	int "Memory size (bytes)"
 	default 65536
+	help
+	  Size of the pool `lv_malloc()` allocates from. Needs to be at least 2kB (2048).
 
 config LV_MEM_SIZE_KILOBYTES
 	int "Memory size (KB) [DEPRECATED: use LV_MEM_SIZE]"
@@ -114,20 +116,22 @@ config LV_MEM_SIZE_KILOBYTES
 	  Deprecated. Use LV_MEM_SIZE (in bytes) instead.
 
 config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
-	int "Size of the memory expand for `lv_malloc()` in kilobytes [DEPRECATED: use LV_MEM_SIZE directly]"
+	int "Memory pool expand size (KB) [DEPRECATED: use LV_MEM_SIZE directly]"
 	default 0
 	help
 	  Deprecated. Modify LV_MEM_SIZE (in bytes) directly instead.
 
 config LV_MEM_ADR
-	hex "Address for the memory pool instead of allocating it as a normal array. 0: unused"
+	hex "Memory pool address"
 	default 0x0
+	help
+	  Place the pool at a fixed address instead of allocating it as a normal array.
+	  0: unused.
 endmenu
 
 endif #LV_USE_BUILTIN_MALLOC
 
-# Standard library headers LVGL includes.  Keep the angle brackets / quotes in
-# the value: it is emitted verbatim (unquoted) as the #include argument.
+# Emitted verbatim (unquoted) as the #include argument.
 config LV_STDINT_INCLUDE
 	string "Header for integer types (stdint)"
 	default "stdint.h"

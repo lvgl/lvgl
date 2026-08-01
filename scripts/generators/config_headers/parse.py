@@ -28,12 +28,12 @@ from .config_entry import (
 )
 from .kconfig_utils import (
     choice_default,
+    choice_int_value,
     dep_terms,
     doc_text,
     int_const_value,
     is_int_const,
     member_requires,
-    resolve_int_value,
     rev_dep_c_expr,
     select_targets,
     term_key,
@@ -274,13 +274,13 @@ def _build_enum_choice(sym, node) -> EnumChoice | None:
     choice, pairs = derived
     resolved = [_member_token(sym.name, member, value) for member, value in pairs]
     # A value-alias (members map to bare numbers, e.g. LV_COLOR_DEPTH or the
-    # buffer counts) emits the *resolved* number - gating-aware, so a disabled
-    # driver's count reads 0 - and documents itself with the int symbol's own
-    # help (no "Possible values" list, which only fits symbolic tokens).
+    # buffer counts) emits the selected member's number and documents itself
+    # with the int symbol's own help (no "Possible values" list, which only fits
+    # symbolic tokens).
     value_alias = sym.name not in MEMBER_IS_TOKEN and not any(
         isinstance(v, Symbol) and is_int_const(v) for _, v in pairs
     )
-    selected = resolve_int_value(sym) if value_alias else None
+    selected = choice_int_value(sym, choice, pairs) if value_alias else None
     doc = doc_text(node) if value_alias else None
     return _assemble_enum(
         sym.name, choice, node, resolved, needs_bridge=False, selected=selected, doc=doc
@@ -349,6 +349,7 @@ def classify(node, enum_choices: frozenset = frozenset()) -> ConfigEntry | None:
     # Choice members are owned by their choice, not classified standalone.
     if item.choice is not None:
         return None
+
     # Build-system-only / internally-derived / specially-handled symbols.
     if item.name in IGNORE_SYMBOLS:
         return None

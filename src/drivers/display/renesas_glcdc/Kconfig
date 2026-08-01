@@ -1,5 +1,5 @@
 config LV_USE_RENESAS_GLCDC
-	bool "Use Renesas GLCDC driver"
+	bool "Renesas GLCDC"
 	default n
 	help
-		Driver for Renesas GLCD
+		Create a display driven by the Renesas GLCDC peripheral.
