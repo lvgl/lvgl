@@ -717,17 +717,17 @@ static void refr_sync_areas(void)
     lv_draw_buf_t * queued_screen = NULL;
     /*The next buffer that still might be on-screen, modifying this before
       the queued screen is activated might cause tearing*/
-    lv_draw_buf_t * on_screen = NULL;
+    /*lv_draw_buf_t * on_screen = NULL;*/
 
     if(off_screen == disp_refr->buf_3) {
         queued_screen = disp_refr->buf_2;
-        on_screen = disp_refr->buf_1;
+        /*on_screen = disp_refr->buf_1;*/
     } else if(off_screen == disp_refr->buf_2) {
         queued_screen = disp_refr->buf_1;
-        on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : off_screen;
+        /*on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : off_screen;*/
     } else {
         queued_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
-        on_screen = disp_refr->buf_3 ? disp_refr->buf_2 : off_screen;
+        /*on_screen = disp_refr->buf_3 ? disp_refr->buf_2 : off_screen;*/
     }
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
