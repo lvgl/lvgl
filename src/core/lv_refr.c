@@ -43,7 +43,7 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 static void draw_buf_flush(lv_display_t * disp);
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void wait_for_flushing(lv_display_t * disp);
-static void call_sync_cb(lv_display_t * disp, const lv_area_t * area);
+static void call_sync_cb(lv_display_t * disp, uint8_t *dest, const uint8_t *src, const lv_area_t * area);
 static void wait_for_syncing(lv_display_t * disp);
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
                                   lv_area_t * layer_area_out, lv_area_t * obj_draw_size_out);
@@ -712,21 +712,22 @@ static void refr_sync_areas(void)
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
     lv_draw_buf_t * off_screen = disp_refr->buf_act;
-    /*Triple buffer sync buffer for off-screen2 updates.*/
-    lv_draw_buf_t * off_screen2 = NULL;
+    /*The previous buffer that flushed recently, might be on-screen only
+     *after the next VSYNC, shall not be modified*/
+    lv_draw_buf_t * queued_screen = NULL;
+    /*The next buffer that still might be on-screen, modifying this before
+      the queued screen is activated might cause tearing*/
     lv_draw_buf_t * on_screen = NULL;
 
-    if(disp_refr->buf_act == disp_refr->buf_1) {
-        off_screen2 = disp_refr->buf_2;
-        on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
-    }
-    else if(disp_refr->buf_act == disp_refr->buf_2) {
-        off_screen2 = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_1;
+    if(off_screen == disp_refr->buf_3) {
+        queued_screen = disp_refr->buf_2;
         on_screen = disp_refr->buf_1;
-    }
-    else {
-        off_screen2 = disp_refr->buf_1;
-        on_screen = disp_refr->buf_2;
+    } else if(off_screen == disp_refr->buf_2) {
+        queued_screen = disp_refr->buf_1;
+        on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : off_screen;
+    } else {
+        queued_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
+        on_screen = disp_refr->buf_3 ? disp_refr->buf_2 : off_screen;
     }
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
@@ -754,16 +755,19 @@ static void refr_sync_areas(void)
             disp_refr->syncing_last = lv_ll_get_tail(&disp_refr->sync_areas) == sync_area;
 
             /*Call sync callback and wait for sync to complete*/
-            call_sync_cb(disp_refr, sync_area);
+            call_sync_cb(disp_refr, off_screen->data, queued_screen->data, sync_area);
             wait_for_syncing(disp_refr);
         }
         /*Fallback to internal double buffered direct mode sync*/
         else {
-            lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
-            if(off_screen2 != on_screen)
-                lv_draw_buf_copy(off_screen2, sync_area, on_screen, sync_area);
+            lv_draw_buf_copy(off_screen, sync_area, queued_screen, sync_area);
         }
     }
+
+    /*Now the buffers in sync and the off screen buffer is ready to be updated.
+     *If it is flushed just in time before the queued screen is swapped to at a
+     *VSYNC, it shall override it and be the latest frame. If it is too late to
+     *override, it shall be the next frame (unless overridden by the next flush.*/
 
     /*Clear sync areas*/
     lv_ll_clear(&disp_refr->sync_areas);
@@ -1517,7 +1521,7 @@ static void wait_for_flushing(lv_display_t * disp)
     LV_PROFILER_REFR_END;
 }
 
-static void call_sync_cb(lv_display_t * disp, const lv_area_t * area)
+static void call_sync_cb(lv_display_t * disp, uint8_t *dest, const uint8_t *src, const lv_area_t * area)
 {
     LV_PROFILER_REFR_BEGIN;
 
@@ -1528,13 +1532,14 @@ static void call_sync_cb(lv_display_t * disp, const lv_area_t * area)
     offset_area.y1 += disp->offset_y;
     offset_area.y2 += disp->offset_y;
 
-    LV_TRACE_REFR("Calling sync_cb on (%d;%d)(%d;%d) area",
+    LV_TRACE_REFR("Calling sync_cb on (%d;%d)(%d;%d) area to copy from %p to %p",
                   (int)offset_area.x1, (int)offset_area.y1,
-                  (int)offset_area.x2, (int)offset_area.y2);
+                  (int)offset_area.x2, (int)offset_area.y2,
+                  src, dest);
 
     lv_display_send_event(disp, LV_EVENT_SYNC_START, (void *)&offset_area);
 
-    disp->sync_cb(disp, &offset_area);
+    disp->sync_cb(disp, dest, src, &offset_area);
 
     lv_display_send_event(disp, LV_EVENT_SYNC_FINISH, (void *)&offset_area);
 

@@ -80,7 +80,7 @@ typedef enum {
 
 typedef void (*lv_display_flush_cb_t)(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 typedef void (*lv_display_flush_wait_cb_t)(lv_display_t * disp);
-typedef void (*lv_display_sync_cb_t)(lv_display_t * disp, const lv_area_t * area);
+typedef void (*lv_display_sync_cb_t)(lv_display_t * disp, uint8_t *dest, const uint8_t *src, const lv_area_t * area);
 typedef void (*lv_display_sync_wait_cb_t)(lv_display_t * disp);
 
 /**********************
