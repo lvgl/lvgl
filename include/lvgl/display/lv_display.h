@@ -335,7 +335,7 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
 /**
  * Set the sync callback which will be called to synchronize invalidated areas between frame buffers pre-render.
  * @param disp     pointer to a display
- * @param sync_cb  the sync callback (pointer to `area` needing to be synchronized)
+ * @param sync_cb  the sync callback (`dest` to copy the area to, `src` to copy the area from, pointer to the `area` needing to be synchronized)
  */
 void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb);
 
