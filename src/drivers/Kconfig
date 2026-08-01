@@ -20,9 +20,9 @@ rsource "windows/Kconfig"
 rsource "x11/Kconfig"
 
 config LV_USE_NANOVG
-	bool "NanoVG library"
+	bool "NanoVG"
 	default n
 	help
-		Enable NanoVG (vector graphics library)
+		Build the bundled NanoVG vector graphics library. Required by the NanoVG renderer.
 
 endmenu

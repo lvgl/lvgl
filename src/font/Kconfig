@@ -1,8 +1,8 @@
 menu "Text & Font Settings"
 choice LV_TXT_ENC
-	prompt "Select a character encoding for strings"
+	prompt "Character encoding for strings"
 	help
-		Select a character encoding for strings. Your IDE or editor should have the same character encoding.
+		Your IDE or editor should be set to the same character encoding.
 	default LV_TXT_ENC_UTF8
 
 	config LV_TXT_ENC_UTF8
@@ -12,10 +12,8 @@ choice LV_TXT_ENC
 endchoice
 
 config LV_TXT_BREAK_CHARS
-	string "Can break (wrap) texts on these chars"
+	string "Characters to break (wrap) text on"
 	default " ,.;:-_)]}"
-	help
-		While rendering text strings, break (wrap) text on these chars.
 
 config LV_TXT_LINE_BREAK_LONG_LEN
 	int "Line break long length"
@@ -39,20 +37,18 @@ config LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
 		Minimum number of characters in a long word to put on a line after a break
 
 config LV_TXT_COLOR_CMD
-	string "The control character to use for signalling text recoloring"
+	string "Text recoloring control character"
 	default "\#"
-	help
-		The control character to use for signaling text recoloring
 
 config LV_USE_BIDI
-	bool "Support bidirectional texts"
+	bool "Bidirectional text"
 	help
 		Allows mixing Left-to-Right and Right-to-Left texts.
 		The direction will be processed according to the Unicode Bidirectional Algorithm:
 		https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
 
 choice LV_BIDI_BASE_DIR_DEF
-	prompt "Set the default BIDI base direction"
+	prompt "Default base direction"
 	depends on LV_USE_BIDI
 	default LV_BASE_DIR_AUTO
 
@@ -65,77 +61,77 @@ choice LV_BIDI_BASE_DIR_DEF
 endchoice
 
 config LV_USE_ARABIC_PERSIAN_CHARS
-	bool "Enable Arabic/Persian processing"
+	bool "Arabic/Persian character shaping"
 	help
 		In these languages characters should be replaced with
 		another form based on their position in the text.
 menu "Built-in Fonts"
 	config LV_FONT_MONTSERRAT_8
-		bool "Enable Montserrat 8"
+		bool "Montserrat 8"
 		help
 			Montserrat fonts with ASCII range and some symbols using bpp = 4
 			https://fonts.google.com/specimen/Montserrat
 	config LV_FONT_MONTSERRAT_10
-		bool "Enable Montserrat 10"
+		bool "Montserrat 10"
 	config LV_FONT_MONTSERRAT_12
-		bool "Enable Montserrat 12"
+		bool "Montserrat 12"
 	config LV_FONT_MONTSERRAT_14
-		bool "Enable Montserrat 14"
+		bool "Montserrat 14"
 		default y
 	config LV_FONT_MONTSERRAT_16
-		bool "Enable Montserrat 16"
+		bool "Montserrat 16"
 	config LV_FONT_MONTSERRAT_18
-		bool "Enable Montserrat 18"
+		bool "Montserrat 18"
 	config LV_FONT_MONTSERRAT_20
-		bool "Enable Montserrat 20"
+		bool "Montserrat 20"
 	config LV_FONT_MONTSERRAT_22
-		bool "Enable Montserrat 22"
+		bool "Montserrat 22"
 	config LV_FONT_MONTSERRAT_24
-		bool "Enable Montserrat 24"
+		bool "Montserrat 24"
 	config LV_FONT_MONTSERRAT_26
-		bool "Enable Montserrat 26"
+		bool "Montserrat 26"
 	config LV_FONT_MONTSERRAT_28
-		bool "Enable Montserrat 28"
+		bool "Montserrat 28"
 	config LV_FONT_MONTSERRAT_30
-		bool "Enable Montserrat 30"
+		bool "Montserrat 30"
 	config LV_FONT_MONTSERRAT_32
-		bool "Enable Montserrat 32"
+		bool "Montserrat 32"
 	config LV_FONT_MONTSERRAT_34
-		bool "Enable Montserrat 34"
+		bool "Montserrat 34"
 	config LV_FONT_MONTSERRAT_36
-		bool "Enable Montserrat 36"
+		bool "Montserrat 36"
 	config LV_FONT_MONTSERRAT_38
-		bool "Enable Montserrat 38"
+		bool "Montserrat 38"
 	config LV_FONT_MONTSERRAT_40
-		bool "Enable Montserrat 40"
+		bool "Montserrat 40"
 	config LV_FONT_MONTSERRAT_42
-		bool "Enable Montserrat 42"
+		bool "Montserrat 42"
 	config LV_FONT_MONTSERRAT_44
-		bool "Enable Montserrat 44"
+		bool "Montserrat 44"
 	config LV_FONT_MONTSERRAT_46
-		bool "Enable Montserrat 46"
+		bool "Montserrat 46"
 	config LV_FONT_MONTSERRAT_48
-		bool "Enable Montserrat 48"
+		bool "Montserrat 48"
 
 	config LV_FONT_MONTSERRAT_28_COMPRESSED
-		bool "Enable Montserrat 28 compressed"
+		bool "Montserrat 28 (compressed)"
 	config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
-		bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
+		bool "Dejavu 16 (Persian, Hebrew, Arabic)"
 	config LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
-		bool "Enable SourceHanSansSC 14 CJK"
+		bool "SourceHanSansSC 14 (CJK)"
 	config LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
-		bool "Enable SourceHanSansSC 16 CJK"
+		bool "SourceHanSansSC 16 (CJK)"
 
 	config LV_FONT_UNSCII_8
-		bool "Enable UNSCII 8 (Perfect monospace font)"
+		bool "UNSCII 8"
 		help
 			Pixel perfect monospaced fonts
 	config LV_FONT_UNSCII_16
-		bool "Enable UNSCII 16 (Perfect monospace font)"
+		bool "UNSCII 16"
 endmenu
 
 config LV_FONT_USE_CUSTOM_INCLUDE
-	bool "Include a custom font declaration header"
+	bool "Custom font declaration header"
 	default n
 	help
 	  Include the header given by LV_FONT_CUSTOM_INCLUDE to declare custom
@@ -155,7 +151,7 @@ config LV_FONT_CUSTOM_INCLUDE
 	      #define LV_FONT_DEFAULT         &my_font_24
 
 config LV_USE_CUSTOM_FONT_DEFAULT
-	bool "Provide a custom default font instead of using a built-in one"
+	bool "Custom default font"
 	default n
 	help
 		Enable this to set LV_FONT_DEFAULT to a font you define yourself
@@ -172,11 +168,11 @@ config LV_USE_CUSTOM_FONT_DEFAULT
 
 
 choice LV_FONT_DEFAULT
-	prompt "Select theme default text font"
-	default LV_FONT_DEFAULT_MONTSERRAT_14 
+	prompt "Default font"
+	default LV_FONT_DEFAULT_MONTSERRAT_14
 	depends on !LV_USE_CUSTOM_FONT_DEFAULT
 	help
-		Select theme default text font
+		Font used by the themes and by widgets that do not set one explicitly.
 
 	config LV_FONT_DEFAULT_MONTSERRAT_8
 		bool "Montserrat 8"
@@ -242,61 +238,59 @@ choice LV_FONT_DEFAULT
 		bool "Montserrat 48"
 		select LV_FONT_MONTSERRAT_48
 	config LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED
-		bool "Montserrat 28 compressed"
+		bool "Montserrat 28 (compressed)"
 		select LV_FONT_MONTSERRAT_28_COMPRESSED
 	config LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
-		bool "Dejavu 16 Persian, Hebrew, Arabic letters"
+		bool "Dejavu 16 (Persian, Hebrew, Arabic)"
 		select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 	config LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK
-		bool "SourceHanSansSC 14 CJK"
+		bool "SourceHanSansSC 14 (CJK)"
 		select LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
 	config LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK
-		bool "SourceHanSansSC 16 CJK"
+		bool "SourceHanSansSC 16 (CJK)"
 		select LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
 	config LV_FONT_DEFAULT_UNSCII_8
-		bool "UNSCII 8 (Perfect monospace font)"
+		bool "UNSCII 8"
 		select LV_FONT_UNSCII_8
 	config LV_FONT_DEFAULT_UNSCII_16
-		bool "UNSCII 16 (Perfect monospace font)"
+		bool "UNSCII 16"
 		select LV_FONT_UNSCII_16
 endchoice
 
 config LV_FONT_FMT_TXT_LARGE
-	bool "Enable it if you have fonts with a lot of characters"
+	bool "Large font format"
 	help
-		The limit depends on the font size, font face and format
-		but with > 10,000 characters if you see issues probably you
-		need to enable it.
+		Use larger internal offsets so fonts with many glyphs stay addressable.
+		The exact limit depends on font size, face and format, but enable it if
+		you see issues with fonts above roughly 10,000 characters.
 
 config LV_USE_FONT_COMPRESSED
-	bool "Sets support for compressed fonts"
-	help
-		Enables/disables support for compressed fonts.
+	bool "Compressed fonts"
 
 config LV_USE_FONT_PLACEHOLDER
-	bool "Enable drawing placeholders when glyph dsc is not found"
+	bool "Glyph placeholders"
 	default y
 	help
-		Enable drawing placeholders when glyph dsc is not found.
+		Draw a placeholder rectangle instead of nothing when a glyph is missing
+		from the font.
 
 config LV_USE_FONT_MANAGER
-	bool "Enable Font manager"
+	bool "Font manager"
 	default n
 	help
-		Enable Font manager
+		Load fonts by name, share them between widgets and free them by reference
+		counting.
 
 config LV_FONT_MANAGER_NAME_MAX_LEN
-	int "Font manager name max length"
+	int "Font name max length (characters)"
 	depends on LV_USE_FONT_MANAGER
 	default 32
-	help
-		Font manager name max length
 
 config LV_USE_IMGFONT
-	bool "Support using images as font in label or span widgets"
+	bool "Image font"
 	default n
 	help
-		Support using images as font in label or span widgets
+		Use images as glyphs in label and span widgets, e.g. to render emojis.
 
 
 rsource "freetype/Kconfig"

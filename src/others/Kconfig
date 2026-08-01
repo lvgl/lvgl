@@ -1,30 +1,26 @@
 menu "Others"
 config LV_USE_FRAGMENT
-	bool "Enable lv_obj fragment"
+	bool "Fragment"
 	default n
 	help
-		Enable `lv_obj` fragment logic
+		Manage a widget subtree with its own lifecycle and back stack, similar to Android fragments.
 
 config LV_USE_FILE_EXPLORER
-	bool "Enable file explorer"
+	bool "File explorer"
 	default n
 	select LV_USE_TABLE
-	help
-		Enable file explorer.
 
 if LV_USE_FILE_EXPLORER
 config LV_FILE_EXPLORER_PATH_MAX_LEN
-	int "Maximum length of path"
+	int "Maximum path length (bytes)"
 	default 128
 
 config LV_FILE_EXPLORER_QUICK_ACCESS
-	bool "Enable quick access bar"
+	bool "Quick access bar"
 	default y
 	help
-		This can save some memory, but not much.
-		After the quick access bar is created, it can be hidden
-		by clicking the button at the top left corner of
-		the browsing area, which is very useful for small screen devices.
+		Add a sidebar with shortcuts to common places. It can be hidden by clicking the
+		button at the top left corner of the browsing area, which is useful on small screens.
 
 endif #LV_USE_FILE_EXPLORER
 

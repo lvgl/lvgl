@@ -1,5 +1,5 @@
 config LV_USE_DEMO_BENCHMARK
-	bool "Benchmark your system"
+	bool "Benchmark demo"
 	default n
 	select LV_FONT_MONTSERRAT_14
 	select LV_FONT_MONTSERRAT_20
@@ -9,5 +9,8 @@ config LV_USE_DEMO_BENCHMARK
 
 config LV_DEMO_BENCHMARK_ALIGNED_FONTS
 	depends on LV_USE_DEMO_BENCHMARK
-	bool "Use static aligned fonts"
+	bool "Aligned fonts"
 	default n
+	help
+		Use the demo's own Montserrat fonts with aligned glyph bitmaps instead
+		of the LV_FONT_MONTSERRAT_* fonts.

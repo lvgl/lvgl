@@ -2,8 +2,6 @@ menu "Demos"
 config LV_BUILD_DEMOS
 	bool "Build demos"
 	default y
-	help
-		Build the demos
 
 if LV_BUILD_DEMOS
 
@@ -17,20 +15,20 @@ rsource "vector_graphic/Kconfig"
 rsource "widgets/Kconfig"
 
 	config LV_USE_DEMO_FLEX_LAYOUT
-		bool "Flex layout previewer"
+		bool "Flex layout demo"
 		default n
 	config LV_USE_DEMO_MULTILANG
-		bool "multi-language demo"
+		bool "Multi-language demo"
 		default n
 
 	config LV_USE_DEMO_SMARTWATCH
 		bool "Smartwatch demo"
 
 	config LV_USE_DEMO_EBIKE
-		bool "Ebike demo"
+		bool "E-bike demo"
 
 	config LV_DEMO_EBIKE_PORTRAIT
-		bool "Ebike portrait layout"
+		bool "Portrait layout"
 		depends on LV_USE_DEMO_EBIKE
 		default n
 

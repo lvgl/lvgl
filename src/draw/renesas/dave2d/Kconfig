@@ -1,5 +1,5 @@
 config LV_USE_DRAW_DAVE2D
-	bool "Use Renesas Dave2D on RA platforms"
+	bool "Dave2D renderer"
 	default n
 	help
-		Use Renesas Dave2D on RA  platforms.
+		Accelerate drawing with the Dave2D GPU found on Renesas RA platforms.
