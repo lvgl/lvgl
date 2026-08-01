@@ -86,6 +86,8 @@ static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh);
 
 static void make_small_magenta_texture(uint32_t new_magenta_tex);
 
+static bool check_if_unlit(lv_gltf_model_t * data, fastgltf::Primitive * prim);
+
 template <typename T, typename Func>
 static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_index, lv_gltf_model_t * data,
                                    const fastgltf::Primitive * prim, const char * attrib_id, GLuint primitive_vertex_buffer,
@@ -653,6 +655,28 @@ static void injest_light(lv_gltf_model_t * data, size_t light_index, fastgltf::L
     });
 }
 
+static bool check_if_unlit(lv_gltf_model_t * data, fastgltf::Primitive * prim)
+{
+    const auto & asset = data->asset;
+    if(prim->materialIndex.has_value()) {
+        const auto & material = asset.materials[prim->materialIndex.value()];
+        if(material.unlit) {
+            return true;
+        }
+        else {
+            if(material.pbrData.baseColorFactor.x() == 0.0f
+               && material.pbrData.baseColorFactor.y() == 0.0f
+               && material.pbrData.baseColorFactor.z() == 0.0f
+               && material.pbrData.metallicFactor == 1.0f
+               && material.pbrData.roughnessFactor == 1.0f
+               && material.emissiveStrength > 0.0f) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
 {
     /*const auto &asset = GET_ASSET(data);*/
@@ -761,11 +785,13 @@ static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
             [&](fastgltf::math::fvec4 vec, size_t idx) {
                 vertices[idx].weights2 = vec;
             });
-            attr_index = injest_vec_attribute<fastgltf::math::fvec3>(
-                             3, attr_index, data, &(*it), "NORMAL", primitive.vertexBuffer, offsetof(vertex_t, normal),
-            [&](fastgltf::math::fvec3 vec, std::size_t idx) {
-                vertices[idx].normal = vec;
-            });
+            if(!check_if_unlit(data, &*it)) {
+                attr_index = injest_vec_attribute<fastgltf::math::fvec3>(
+                                 3, attr_index, data, &(*it), "NORMAL", primitive.vertexBuffer, offsetof(vertex_t, normal),
+                [&](fastgltf::math::fvec3 vec, std::size_t idx) {
+                    vertices[idx].normal = vec;
+                });
+            }
             attr_index = injest_vec_attribute<fastgltf::math::fvec4>(
                              4, attr_index, data, &(*it), "TANGENT", primitive.vertexBuffer, offsetof(vertex_t, tangent),
             [&](fastgltf::math::fvec4 vec, size_t idx) {
