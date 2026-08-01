@@ -147,7 +147,7 @@ static const lv_opengl_shader_t src_includes[] = {
             return linearTosRGB(color);
         }
 
-    )"
+        )"
     },
     {
         "textures1.glsl", R"(
@@ -2011,7 +2011,11 @@ static const lv_opengl_shader_t src_includes[] = {
 
 
         #ifdef HAS_NORMAL_VEC3
-        vec3 getNormal()
+        #ifdef USE_SKINNING
+            vec3 getNormal(mat4 skinning_normal_matrix)
+        #else
+            vec3 getNormal()
+        #endif /*USE_SKINNING*/
         {
             vec3 normal = a_normal;
 
@@ -2020,35 +2024,36 @@ static const lv_opengl_shader_t src_includes[] = {
         #endif
 
         #ifdef USE_SKINNING
-            normal = mat3(getSkinningNormalMatrix()) * normal;
+            normal = mat3(skinning_normal_matrix) * normal;
         #endif
 
             return normalize(normal);
         }
         #endif
-
+    )"
+    },
+    {
+        "vert_v1_chunk_01.glsl", R"(
         #ifdef HAS_NORMAL_VEC3
         #ifdef HAS_TANGENT_VEC4
+        #ifdef USE_SKINNING
+        vec3 getTangent(mat4 skinning_matrix)
+        #else
         vec3 getTangent()
+        #endif /*USE_SKINNING*/
         {
             vec3 tangent = a_tangent.xyz;
 
         #ifdef USE_MORPHING
             tangent += getTargetTangent(gl_VertexID);
         #endif
-        
-    )"
-    },
-    {
-        "vert_v1_chunk_01.glsl", R"(
         #ifdef USE_SKINNING
-            tangent = mat3(getSkinningMatrix()) * tangent;
+            tangent = mat3(skinning_matrix) * tangent;
         #endif
-
             return normalize(tangent);
         }
-        #endif
-        #endif
+        #endif /*HAS_TANGENT_VEC4*/
+        #endif /*HAS_NORMAL_VEC3*/
 
         mat4 temp_makeNormalMatrixFromViewProj(mat4 _viewProjModelMatrix) {
             mat4 normMat = _viewProjModelMatrix ;
@@ -2084,31 +2089,44 @@ static const lv_opengl_shader_t src_includes[] = {
 
         #ifdef HAS_NORMAL_VEC3
         #ifdef HAS_TANGENT_VEC4
+        #ifdef USE_SKINNING
+            mat4 skinMatrix = getSkinningMatrix();
+            mat4 skinNormalMatrix = getSkinningNormalMatrix();
+            vec3 tangent = getTangent(skinMatrix);
+            vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(skinNormalMatrix), 0.0)));
+        #else
             vec3 tangent = getTangent();
             vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));
+        #endif /* USE_SKINNING */
+
             vec3 tangentW = vec3(modelMatrix * vec4(tangent, 0.0));
             vec3 bitangentW = cross(normalW, tangentW) * a_tangent.w;
 
         #ifdef HAS_VERT_NORMAL_UV_TRANSFORM
             tangentW = u_vertNormalUVTransform * tangentW;
             bitangentW = u_vertNormalUVTransform * bitangentW;
-        #endif
+        #endif /* HAS_VERT_NORMAL_UV_TRANSFORM*/
 
             bitangentW = normalize(bitangentW);
             tangentW = normalize(tangentW);
 
             v_TBN = mat3(tangentW, bitangentW, normalW);
         #else
+        #ifdef USE_SKINNING
+            mat4 skinNormalMatrix = getSkinningNormalMatrix();
+            v_Normal = normalize(vec3(normalMatrix * vec4(getNormal(skinNormalMatrix), 0.0)));
+        #else
             v_Normal = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));
-        #endif
-        #endif
+        #endif /*USE_SKINNING*/
+        #endif /*HAS_TANGENT_VEC4*/
+        #endif /*HAS_NORMAL_VEC3*/
 
             v_texcoord_0 = vec2(0.0, 0.0);
             v_texcoord_1 = vec2(0.0, 0.0);
 
         #ifdef HAS_TEXCOORD_0_VEC2
             v_texcoord_0 = a_texcoord_0;
-        #endif
+        #endif /*HAS_TEXCOORD_0_VEC2*/
 
         #ifdef HAS_TEXCOORD_1_VEC2
             v_texcoord_1 = a_texcoord_1;
