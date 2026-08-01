@@ -250,7 +250,8 @@ void test_array_erase(void)
         int32_t * v = lv_array_at(&array, i);
         if(i < 3) {
             TEST_ASSERT_EQUAL_INT32(i, *v);
-        } else {
+        }
+        else {
             TEST_ASSERT_EQUAL_INT32(i + 4, *v);
         }
     }
@@ -366,13 +367,13 @@ void test_array_copy_oom(void)
 {
     lv_array_t src, dest;
     lv_result_t res;
-    
+
     res = lv_array_init(&src, 4, sizeof(int32_t));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
-    
+
     res = lv_array_init(&dest, 2, sizeof(int32_t));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
-    
+
     int32_t val1 = 11, val2 = 22;
     lv_array_push_back(&src, &val1);
     lv_array_push_back(&dest, &val2);
