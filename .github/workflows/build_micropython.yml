@@ -75,6 +75,23 @@ jobs:
       if: matrix.port == 'esp32'
       run: |
         source tools/ci.sh && ci_esp32_idf_setup
+        TINYUSB_CONFIG="shared/tinyusb/tusb_config.h"
+        if [ -f "$TINYUSB_CONFIG" ]; then
+          if ! grep -q "CFG_TUD_CDC_EP_BUFSIZE" "$TINYUSB_CONFIG"; then
+            sed -i '/#define CFG_TUD_CDC_TX_BUFSIZE/a #define CFG_TUD_CDC_EP_BUFSIZE 64' "$TINYUSB_CONFIG"
+          fi
+        else
+          TINYUSB_CONFIG=$(find . -name "tusb_config.h" | head -1)
+          if [ -f "$TINYUSB_CONFIG" ]; then
+            if ! grep -q "CFG_TUD_CDC_EP_BUFSIZE" "$TINYUSB_CONFIG"; then
+              if grep -q "CFG_TUD_CDC_TX_BUFSIZE" "$TINYUSB_CONFIG"; then
+                sed -i '/#define CFG_TUD_CDC_TX_BUFSIZE/a #define CFG_TUD_CDC_EP_BUFSIZE 64' "$TINYUSB_CONFIG"
+              else
+                sed -i '/#endif \/\/ MICROPY_INCLUDED_SHARED_TINYUSB_TUSB_CONFIG_H/i #define CFG_TUD_CDC_EP_BUFSIZE 64' "$TINYUSB_CONFIG" || echo "#define CFG_TUD_CDC_EP_BUFSIZE 64" >> "$TINYUSB_CONFIG"
+              fi
+            fi
+          fi
+        fi
         source tools/ci.sh && ci_esp32_build_cmod_spiram_s2
         source tools/ci.sh && ci_esp32_build_s3_c3
 
