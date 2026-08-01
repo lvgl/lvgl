@@ -250,8 +250,7 @@ void test_array_erase(void)
         int32_t * v = lv_array_at(&array, i);
         if(i < 3) {
             TEST_ASSERT_EQUAL_INT32(i, *v);
-        }
-        else {
+        } else {
             TEST_ASSERT_EQUAL_INT32(i + 4, *v);
         }
     }
@@ -312,7 +311,7 @@ void test_array_init_oom(void)
 #ifdef LVGL_CI_USING_DEF_HEAP
     res = lv_array_init(&a, (LV_MEM_SIZE / sizeof(int32_t)) + 1, sizeof(int32_t));
 #else
-    res = lv_array_init(&a, 0x3FFFFFFF, sizeof(int32_t));
+    res = lv_array_init(&a, 0x40000000, sizeof(int32_t));
 #endif
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
     TEST_ASSERT_NULL(a.data);
@@ -382,7 +381,7 @@ void test_array_copy_oom(void)
 #ifdef LVGL_CI_USING_DEF_HEAP
     src.capacity = (LV_MEM_SIZE / sizeof(int32_t)) + 1;
 #else
-    src.capacity = 0x3FFFFFFF;
+    src.capacity = 0x40000000;
 #endif
 
     res = lv_array_copy(&dest, &src);

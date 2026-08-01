@@ -74,7 +74,6 @@ lv_result_t lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t elemen
     }
 
     array->data = lv_malloc(capacity * element_size);
-    LV_ASSERT_MALLOC(array->data);
     if(array->data == NULL) {
         array->capacity = 0;
         return LV_RESULT_INVALID;
@@ -86,9 +85,6 @@ lv_result_t lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t elemen
 
 lv_result_t lv_array_init_from_buf(lv_array_t * array, void * buf, uint32_t capacity, uint32_t element_size)
 {
-    if(capacity > 0) {
-        LV_ASSERT_NULL(buf);
-    }
     array->size = 0;
     array->element_size = element_size;
     array->data = buf;
@@ -248,8 +244,6 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
     }
 
     uint8_t * data = lv_realloc(array->data, new_capacity * array->element_size);
-    LV_ASSERT_NULL(data);
-
     if(data == NULL) return false;
 
     array->data = data;
@@ -262,7 +256,6 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
 {
-    LV_ASSERT_NULL(array->data);
     uint32_t size = other->size;
     if(size == 0) {
         return LV_RESULT_OK;
@@ -285,8 +278,6 @@ lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
 
 lv_result_t lv_array_push_back(lv_array_t * array, const void * element)
 {
-    LV_ASSERT_NULL(array->data);
-
     if(array->size == array->capacity) {
         /*array is full*/
         if(array->capacity > UINT32_MAX - LV_ARRAY_DEFAULT_CAPACITY) {
