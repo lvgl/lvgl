@@ -177,14 +177,14 @@ void test_calloc_overflow(void)
     TEST_ASSERT_NOT_NULL(p);
     lv_free(p);
 
-    extern void (*_lv_test_assert_fail_cb)(void);
-    _lv_test_assert_fail_cb = test_assert_cb;
+    extern void (*lv_test_assert_fail_cb)(void);
+    lv_test_assert_fail_cb = test_assert_cb;
     assert_fired = false;
 
     p = lv_calloc((size_t) -1, 2);
     TEST_ASSERT_NULL(p);
 
-    _lv_test_assert_fail_cb = NULL;
+    lv_test_assert_fail_cb = NULL;
     TEST_ASSERT_TRUE(assert_fired);
 }
 

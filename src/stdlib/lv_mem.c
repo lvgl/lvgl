@@ -113,18 +113,13 @@ void * lv_malloc_zeroed(size_t size)
     return alloc;
 }
 
-void * lv_malloc_zeroed_array(size_t num, size_t size)
+void * lv_calloc(size_t num, size_t size)
 {
+    LV_TRACE_MEM("allocating number of %zu each %zu bytes", num, size);
     if(num == 0 || size == 0) return &zero_mem;
     LV_ASSERT_MSG(size <= SIZE_MAX / num, "allocation size overflow");
     if(size > SIZE_MAX / num) return NULL;
     return lv_malloc_zeroed(num * size);
-}
-
-void * lv_calloc(size_t num, size_t size)
-{
-    LV_TRACE_MEM("allocating number of %zu each %zu bytes", num, size);
-    return lv_malloc_zeroed_array(num, size);
 }
 
 void * lv_zalloc(size_t size)

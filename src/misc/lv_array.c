@@ -38,7 +38,17 @@ void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size)
     array->capacity = capacity;
     array->element_size = element_size;
 
-    array->data = lv_malloc_zeroed_array(capacity, element_size);
+    if(capacity != 0) {
+        LV_ASSERT_MSG(element_size <= SIZE_MAX / capacity, "lv_array capacity overflow");
+        if(element_size > SIZE_MAX / capacity) {
+            array->data = NULL;
+            array->inner_alloc = true;
+            LV_ASSERT_MALLOC(array->data);
+            return;
+        }
+    }
+
+    array->data = lv_malloc((size_t)capacity * element_size);
     array->inner_alloc = true;
     LV_ASSERT_MALLOC(array->data);
 }
@@ -176,7 +186,7 @@ bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
         }
     }
 
-    uint8_t * data = lv_realloc(array->data, new_capacity * array->element_size);
+    uint8_t * data = lv_realloc(array->data, (size_t)new_capacity * array->element_size);
     LV_ASSERT_NULL(data);
 
     if(data == NULL) return false;
