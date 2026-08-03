@@ -83,6 +83,17 @@ void lv_gltf_model_delete(lv_gltf_model_t * model)
     model->animation_update_timer = NULL;
 
     lv_gltf_data_delete_textures(model);
+
+    /* The geometry buffers belong to the model. The material textures do not, they are
+     * owned and reused by the loader cache. */
+    for(auto & mesh : model->meshes) {
+        for(auto & primitive : mesh.primitives) {
+            GL_CALL(glDeleteVertexArrays(1, &primitive.vertexArray));
+            const GLuint buffers[2] = { primitive.vertexBuffer, primitive.indexBuffer };
+            GL_CALL(glDeleteBuffers(2, buffers));
+        }
+    }
+
     uint32_t node_count = lv_array_size(&model->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
         lv_gltf_model_node_t * node  = (lv_gltf_model_node_t *) lv_array_at(&model->nodes, i);
@@ -267,10 +278,10 @@ void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value)
     if(!model) {
         return;
     }
-    if(model->animation_speed_ratio == value) {
+    if(model->animation_speed_ratio == (int32_t)value) {
         return;
     }
-    model->animation_speed_ratio = value;
+    model->animation_speed_ratio = (int32_t)value;
     lv_gltf_model_invalidate(model);
 }
 uint32_t lv_gltf_model_get_animation_speed(const lv_gltf_model_t * model)

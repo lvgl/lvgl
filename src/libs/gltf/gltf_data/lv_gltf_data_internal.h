@@ -80,6 +80,7 @@ typedef struct {
     GLint env_sheen_sampler;
     GLint env_ggx_lut_sampler;
     GLint env_charlie_lut_sampler;
+    GLint env_sheen_e_lut_sampler;
     GLint env_mip_count;
 
     GLint exposure;

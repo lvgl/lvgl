@@ -65,6 +65,14 @@ void lv_gltf_model_loader_delete(lv_gltf_model_loader_t * loader)
     if(!loader) {
         return;
     }
+
+    lv_rb_node_t * node;
+    while((node = loader->textures_map.root)) {
+        lv_opengl_texture_t * texture = node->data;
+        GL_CALL(glDeleteTextures(1, &texture->id));
+        lv_rb_drop_node(&loader->textures_map, node);
+    }
+
     lv_rb_destroy(&loader->textures_map);
     lv_free(loader);
 }
