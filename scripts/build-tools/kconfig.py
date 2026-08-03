@@ -18,6 +18,7 @@ import os
 import re
 import sys
 import textwrap
+import subprocess
 
 # Lvgl doesn't use tristate symbols. They're supported here just to make the
 # script a bit more generic.
@@ -37,12 +38,13 @@ from kconfiglib import (
     split_expr,
 )
 
+def log(msg):
+    print("LVGL Kconfig:", msg)
 
 def main():
-    print(sys.argv)
     args = parse_args()
 
-    print("Parsing " + args.kconfig_file)
+    log("Parsing " + args.kconfig_file)
     kconf = Kconfig(args.kconfig_file, warn_to_stderr=False, suppress_traceback=True)
 
     if args.handwritten_input_configs:
@@ -66,10 +68,10 @@ def main():
         kconf.warn_assign_redun = False
 
     # Load files
-    print(kconf.load_config(args.configs_in[0]))
+    log(kconf.load_config(args.configs_in[0]))
     for config in args.configs_in[1:]:
         # replace=False creates a merged configuration
-        print(kconf.load_config(config, replace=False))
+        log(kconf.load_config(config, replace=False))
 
     if args.handwritten_input_configs:
         # Check that there are no assignments to promptless symbols, which
@@ -126,8 +128,8 @@ def main():
             err("Aborting due to Kconfig warnings")
 
     # Write the merged configuration and the C header
-    print(kconf.write_config(args.config_out))
-    print(kconf.write_autoconf(args.header_out))
+    log(kconf.write_config(args.config_out))
+    log(kconf.write_autoconf(args.header_out))
 
     # Write the list of parsed Kconfig files to a file
     write_kconfig_filenames(kconf, args.kconfig_list_out)
