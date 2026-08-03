@@ -29,7 +29,9 @@ jobs:
           python-version: 3.12
 
       - name: Install dependencies
-        run: python3 -m pip install kconfiglib pytest
+        # sbom/requirements.txt pins the SBOM validator so an unreviewed
+        # upstream release cannot silently change or break the compliance gate.
+        run: python3 -m pip install kconfiglib pytest -r sbom/requirements.txt
 
       # ------------------------------------------------------------------
       # Unit tests for the config-headers generator itself.
@@ -58,6 +60,28 @@ jobs:
           || (echo "::error::Generated config headers are out of date. Run scripts/generators/config_headers.py and commit the result."; exit 1)
 
       # ------------------------------------------------------------------
+      # COPYRIGHTS.md and the SPDX SBOM (sbom/) are generated from
+      # sbom/third_party.json. These fail if a committed output is stale.
+      # ------------------------------------------------------------------
+      - name: "Check: COPYRIGHTS.md is up to date"
+        id: copyrights
+        continue-on-error: true
+        run: python3 scripts/generate_copyrights.py --check
+
+      - name: "Check: SPDX SBOM is up to date"
+        id: sbom
+        continue-on-error: true
+        run: python3 scripts/generate_sbom.py --check
+
+      # ------------------------------------------------------------------
+      # The SBOM validates against the official SPDX 3.0.1 JSON Schema.
+      # ------------------------------------------------------------------
+      - name: "Check: SPDX SBOM is schema-valid"
+        id: sbom_schema
+        continue-on-error: true
+        run: python3 scripts/validate_sbom.py
+
+      # ------------------------------------------------------------------
       # Final gate – fail the job if any generator above is out of date.
       # This gives us full output from every generator before failing.
       # New generators: add a step above and a line here.
@@ -65,7 +89,10 @@ jobs:
       - name: "Gate: fail if any generator check failed"
         if: |
           steps.config-headers-tests.outcome == 'failure' ||
-          steps.config-headers.outcome       == 'failure'
+          steps.config-headers.outcome       == 'failure' ||
+          steps.copyrights.outcome           == 'failure' ||
+          steps.sbom.outcome                 == 'failure' ||
+          steps.sbom_schema.outcome          == 'failure'
         run: |
           echo "Code generation results:"
           echo "------------------------"
@@ -81,6 +108,9 @@ jobs:
 
           print_result "config-headers-tests" "${{ steps.config-headers-tests.outcome }}"
           print_result "config-headers"       "${{ steps.config-headers.outcome }}"
+          print_result "copyrights"           "${{ steps.copyrights.outcome }}"
+          print_result "sbom"                 "${{ steps.sbom.outcome }}"
+          print_result "sbom_schema"          "${{ steps.sbom_schema.outcome }}"
 
           echo "------------------------"
           echo "A generator test failed, or a generated file is out of date. See above for details."
