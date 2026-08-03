@@ -207,6 +207,10 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                             dsc->touch_data_changed = true;
                             LV_LOG_TRACE("Touch slot %d released", dsc->current_slot);
 
+                            /* RELEASED slots count too: the SYN_REPORT loops below iterate up to
+                             * touch_count, so a slot that has just been lifted must stay in range
+                             * long enough for the gesture recogniser to see the release.  The slot
+                             * is dropped from the count later, once it has been invalidated. */
                             dsc->touch_count = 0;
                             for(int i = 0; i < MAX_TOUCH_POINTS; i++) {
                                 if(dsc->touch_data[i].state == LV_INDEV_STATE_PRESSED ||
