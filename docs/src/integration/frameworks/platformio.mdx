@@ -43,9 +43,13 @@ into the `lib/` directory of your PlatformIO project.
 
 ## Set up drivers
 
-To get started, the recommended option is to use the `LovyanGFX library` as the TFT driver,
-since it makes testing much easier.
-In PlatformIO, you’ll add both `LVGL` and `LovyanGFX` as dependencies in your `platformio.ini`:
+LVGL needs a display driver that knows how to send rendered pixels to your
+hardware. You can use LVGL's built-in display drivers, the
+[LovyanGFX driver](/integration/external_display_controllers/lovyan),
+[TFT_eSPI](https://github.com/Bodmer/TFT_eSPI), or an application-specific
+driver registered with LVGL's display API.
+
+To use the LovyanGFX driver, add both LVGL and LovyanGFX to `platformio.ini`:
 
 ```ini
 lib_deps =
@@ -53,35 +57,22 @@ lib_deps =
     lovyan03/LovyanGFX
 ```
 
-Another popular option is the `TFT_eSPI library`, which supports a wide range of displays.
-
-In addition, LVGL also provides its own inbuilt display drivers that can be used directly in your project.
-See the [supported drivers section](/integration/external_display_controllers) for a full list.
+See the [supported drivers section](/integration/external_display_controllers)
+for LVGL's other built-in display drivers.
 
 ## Display Configuration
 
-You’ll need to create a display configuration file, such as `my_display.hpp`, similar to the example in
-[LovyanGFX's `user_setting.ino`](https://github.com/lovyan03/LovyanGFX/blob/master/examples/HowToUse/2_user_setting/2_user_setting.ino).
-
-In PlatformIO, you can place this file in the `include/` folder of your project (e.g., `include/my_display.hpp`).
-
-If you prefer not to use LovyanGFX, you can integrate other graphics libraries as well by
-implementing a wrapper class in the same way LovyanGFX is handled;
-[`lv_lgfx_user.hpp`](https://github.com/lvgl/lvgl/blob/master/src/drivers/display/lovyan_gfx/lv_lgfx_user.hpp)
-provides a good example of this.
-
-Once your configuration file is ready, update `lv_conf.h` to include it, for example:
+When using LovyanGFX, create a configuration header that defines your `LGFX`
+class. A common PlatformIO layout is `include/my_display.hpp`. Enable the driver
+from `lv_conf.h` and point `LV_LGFX_USER_INCLUDE` at that header:
 
 ```c
-/* Interface for Lovyan_GFX */
 #define LV_USE_LOVYAN_GFX 1
-
-#if LV_USE_LOVYAN_GFX
-    #define LV_LGFX_USER_INCLUDE "my_display.hpp"
-#endif /*LV_USE_LOVYAN_GFX*/
+#define LV_LGFX_USER_INCLUDE "my_display.hpp"
 ```
 
-When using the LovyanGFX interface, you need to add the following to your `platformio.ini`:
+Make sure the directory containing `my_display.hpp` is in the compiler include
+path:
 
 ```ini
 build_flags =
@@ -89,17 +80,13 @@ build_flags =
     -I .pio/libdeps/${PIOENV}/LovyanGFX/src  ; so that PIO includes this when compiling LVGL
 ```
 
-Alternatively, you can use the [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI) library.
-To make it work, set up TFT_eSPI according to your TFT display type via editing either:
+The dedicated [LovyanGFX driver page](/integration/external_display_controllers/lovyan)
+describes the required `LGFX` class and the LVGL initialization call.
 
-- `User_Setup.h`
-- or by selecting a configuration in the `User_Setup_Select.h`
-
-Both files are located in `TFT_eSPI` library's folder inside PlatformIO’s `.pio/libdeps/<env>/TFT_eSPI/` directory.
-
-With PlatformIO, you can also override the configuration using build_flags in
-`platformio.ini`, which avoids editing library files directly.
-For example:
+When using TFT_eSPI, configure the library for your display by editing
+`User_Setup.h`, selecting a setup from `User_Setup_Select.h`, or defining the
+setup in `platformio.ini` with build flags. Keeping the setup in
+`platformio.ini` makes it easier to version with your project:
 
 ```ini
 build_flags =
@@ -113,8 +100,6 @@ build_flags =
     -D TFT_DC=16
     -D TFT_RST=17
 ```
-
-This approach keeps your configuration under version control.
 
 ## Configure LVGL
 
@@ -152,8 +137,11 @@ In your `main.cpp`, initialize LVGL and the display driver:
 #include <Arduino.h>
 #include <lvgl.h>
 
-#define BUF_SIZE 320 * 50
-uint8_t lv_buffer[BUF_SIZE];
+#define HOR_RES 320
+#define VER_RES 480
+#define BUF_SIZE (HOR_RES * 40 * 2)
+
+static uint8_t lv_buffer[BUF_SIZE];
 
 /* Tick source, tell LVGL how much time (milliseconds) has passed */
 static uint32_t my_tick(void)
@@ -167,8 +155,8 @@ void setup() {
     lv_init();
     /* Set the tick callback */
     lv_tick_set_cb(my_tick);
-    /* Initialize the display driver */
-    lv_lovyan_gfx_create(320, 480, lv_buffer, BUF_SIZE, true);
+    /* Initialize and register the LovyanGFX display driver */
+    lv_lovyan_gfx_create(HOR_RES, VER_RES, lv_buffer, sizeof(lv_buffer), true);
 
     lv_obj_t *label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Hello PlatformIO, I'm LVGL!");
@@ -177,7 +165,7 @@ void setup() {
 }
 
 void loop() {
-    lv_timer_handler(); // Update the UI-
+    lv_timer_handler(); // Update the UI
     delay(5);
 }
 ```

@@ -112,6 +112,8 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "GLES2/gl2ext.h",
     "GLES3/gl3.h",
     "GLFW/glfw3.h",
+    "LGFX_AUTODETECT.hpp",
+    "LovyanGFX.hpp",
     "LVGL_thread.h",
     "LittleFS.h",
     "Pre_Include_Global.h",
