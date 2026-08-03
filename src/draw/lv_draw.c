@@ -237,7 +237,11 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
     bool remove_task = false;
     while(t) {
         t_next = t->next;
-        if(t->state == LV_DRAW_TASK_STATE_FINISHED) {
+        if(t->state == LV_DRAW_TASK_STATE_FINISHED || t->state == LV_DRAW_TASK_STATE_FAILED) {
+            if(t->state == LV_DRAW_TASK_STATE_FAILED) {
+                LV_LOG_ERROR("draw task failed, type: %d", (int)t->type);
+            }
+
             cleanup_task(t, disp);
             remove_task = true;
             if(t_prev != NULL)

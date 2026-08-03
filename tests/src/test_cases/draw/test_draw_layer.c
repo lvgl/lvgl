@@ -96,4 +96,46 @@ void test_draw_layer_dispatch(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_layer_dispatch.png");
 }
 
+/**
+ * Test that rendering completes without deadlock when layer buffer
+ * allocation fails due to memory exhaustion.
+ *
+ * Before the fix, lv_draw_layer_alloc_buf returning NULL left the draw
+ * task in WAITING state forever, causing draw_buf_flush to spin in an
+ * infinite loop. The fix sets the task to LV_DRAW_TASK_STATE_FAILED so
+ * it gets cleaned up and rendering proceeds.
+ *
+ * Strategy: temporarily replace buf_malloc_cb with a stub that always
+ * returns NULL, create a rotated widget to trigger layer allocation,
+ * then call lv_refr_now(). If it returns, the fix works.
+ */
+static void * fake_buf_malloc_fail(size_t size, lv_color_format_t cf)
+{
+    LV_UNUSED(size);
+    LV_UNUSED(cf);
+    return NULL;
+}
+
+void test_draw_layer_alloc_failed_no_deadlock(void)
+{
+    /*Create a widget with transform_rotation to force LV_LAYER_TYPE_TRANSFORM path*/
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(obj, 200, 200);
+    lv_obj_center(obj);
+    lv_obj_set_style_transform_rotation(obj, 450, 0); /*45 degrees*/
+    lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0); /*Force layer even with matrix path*/
+
+    /*Hook buf_malloc_cb to always fail*/
+    lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    lv_draw_buf_malloc_cb_t original_malloc_cb = handlers->buf_malloc_cb;
+    handlers->buf_malloc_cb = fake_buf_malloc_fail;
+
+    /*This must return without deadlock - the FAILED state allows the
+     *render pipeline to clean up the failed task and proceed.*/
+    lv_refr_now(NULL);
+
+    /*Restore original handler*/
+    handlers->buf_malloc_cb = original_malloc_cb;
+}
+
 #endif
