@@ -833,14 +833,11 @@
 /** WebP decoder */
 #define LV_USE_LIBWEBP 0
 
-#if LV_DRAW_HAS_VECTOR_SUPPORT
 /** SVG
  *
  *  Enable: LV_USE_VECTOR_GRAPHIC
  */
 #define LV_USE_SVG 0
-
-#endif /*LV_DRAW_HAS_VECTOR_SUPPORT*/
 
 #if LV_USE_SVG
 /** SVG animation */
@@ -1132,11 +1129,8 @@
  */
 #define LV_WIDGETS_HAS_DEFAULT_VALUE 1
 
-#if LV_DRAW_HAS_3D_SUPPORT
 /** 3D texture */
 #define LV_USE_3DTEXTURE 0
-
-#endif /*LV_DRAW_HAS_3D_SUPPORT*/
 
 /** Animated image */
 #define LV_USE_ANIMIMG 1
@@ -1288,14 +1282,11 @@
 
 #endif /*LV_USE_GIF*/
 
-#if LV_DRAW_HAS_3D_SUPPORT
 /** Parses and renders 3D models (.gltf/.glb).
  *
  *  Enable: LV_USE_3DTEXTURE
  */
 #define LV_USE_GLTF 0
-
-#endif /*LV_DRAW_HAS_3D_SUPPORT*/
 
 /** Requires the gstreamer-1.0, gstreamer-video-1.0 and gstreamer-app-1.0
  *  development libraries.
@@ -1369,7 +1360,6 @@
 /** List */
 #define LV_USE_LIST 1
 
-#if LV_DRAW_HAS_VECTOR_SUPPORT
 #if LV_USE_THORVG
 /** Plays Lottie JSON animations using the ThorVG Lottie parser.
  *
@@ -1378,7 +1368,6 @@
 #define LV_USE_LOTTIE 0
 
 #endif /*LV_USE_THORVG*/
-#endif /*LV_DRAW_HAS_VECTOR_SUPPORT*/
 
 /** Menu */
 #define LV_USE_MENU 1
@@ -2460,14 +2449,11 @@
 /** Stress demo */
 #define LV_USE_DEMO_STRESS 0
 
-#if LV_DRAW_HAS_VECTOR_SUPPORT
 /** Vector graphic demo
  *
  *  Enable: LV_USE_VECTOR_GRAPHIC
  */
 #define LV_USE_DEMO_VECTOR_GRAPHIC 0
-
-#endif /*LV_DRAW_HAS_VECTOR_SUPPORT*/
 
 /** Widgets demo */
 #define LV_USE_DEMO_WIDGETS 0
