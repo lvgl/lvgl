@@ -1,0 +1,16 @@
+# A deliberately small feature set, used by the low colour depth build tests to
+# make sure LVGL still compiles when most of it is switched off.
+
+CONFIG_LV_MEM_SIZE=65535
+
+# CONFIG_LV_USE_ASSERT_NULL is not set
+# CONFIG_LV_USE_ASSERT_MALLOC is not set
+
+CONFIG_LV_USE_THEME_SIMPLE=y
+# CONFIG_LV_USE_THEME_DEFAULT is not set
+
+CONFIG_LV_USE_LODEPNG=y
+CONFIG_LV_USE_BMP=y
+CONFIG_LV_USE_RLE=y
+CONFIG_LV_USE_GIF=y
+CONFIG_LV_USE_QRCODE=y

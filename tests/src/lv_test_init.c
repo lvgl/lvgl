@@ -18,7 +18,7 @@ void lv_test_init(void)
     lv_profiler_builtin_set_enable(false);
 #endif
 
-#if defined(LV_USE_DRAW_NANOVG) && LV_USE_DRAW_NANOVG && defined(LV_USE_NANOVG_TEST_HEADLESS) && LV_USE_NANOVG_TEST_HEADLESS
+#if LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
     lv_display_t * egl_disp = lv_test_display_egl_create(LV_TEST_DISPLAY_HOR_RES, LV_TEST_DISPLAY_VER_RES);
     /* LV_ASSERT_MSG is always compiled in (unlike assert() under NDEBUG) and
      * triggers LV_ASSERT_HANDLER, so a fatal setup failure is reported reliably. */
@@ -50,7 +50,7 @@ void lv_test_deinit(void)
 #endif
     lv_test_indev_delete_all();
 
-#if defined(LV_USE_DRAW_NANOVG) && LV_USE_DRAW_NANOVG && defined(LV_USE_NANOVG_TEST_HEADLESS) && LV_USE_NANOVG_TEST_HEADLESS
+#if LV_USE_DRAW_NANOVG && LV_USE_NANOVG_TEST_HEADLESS
     /* Capture the EGL context before lv_deinit() deletes the display, then release
      * the EGL/GL resources after lv_deinit() has destroyed the NanoVG draw unit. */
     void * egl_ctx = lv_display_get_driver_data(lv_display_get_default());

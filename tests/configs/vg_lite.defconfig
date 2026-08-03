@@ -1,0 +1,32 @@
+# VG-Lite GPU rendering, simulated with ThorVG.
+
+CONFIG_LV_USE_DRAW_VG_LITE=y
+CONFIG_LV_USE_VG_LITE_THORVG=y
+CONFIG_LV_USE_THORVG_INTERNAL=y
+CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX=y
+
+# Enable the VG-Lite custom external 'gpu_init()' function
+CONFIG_LV_VG_LITE_USE_GPU_INIT=y
+CONFIG_LV_VG_LITE_USE_ASSERT=y
+
+# Let the GPU batch as many draw tasks as it can
+CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT=0
+
+# Simulate shadows with a border. Usually faster, but does not render
+# identically to the software renderer.
+CONFIG_LV_VG_LITE_USE_BOX_SHADOW=y
+
+# 4K bytes per cached gradient image
+CONFIG_LV_VG_LITE_GRAD_CACHE_CNT=32
+
+# CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN is not set
+# CONFIG_LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET is not set
+
+# VG-Lite needs 64 byte aligned buffers. The draw buffers get this from
+# LV_DRAW_BUF_ALIGN, the static font and image data from LV_ATTRIBUTE_MEM_ALIGN,
+# which is not an lv_conf.h option of its own and so comes from a header.
+CONFIG_LV_DRAW_BUF_ALIGN=64
+CONFIG_LV_ATTRIBUTE_USE_CUSTOM_INCLUDE=y
+CONFIG_LV_ATTRIBUTE_CUSTOM_INCLUDE="tests/src/lv_test_attributes.h"
+
+CONFIG_LV_USE_PERF_MONITOR_LOG_MODE=y

@@ -1,0 +1,7 @@
+# Windows host overrides. Added instead of unix.defconfig and linux.defconfig.
+
+CONFIG_LV_USE_WINDOWS=y
+CONFIG_LV_OS_WINDOWS=y
+
+CONFIG_LV_USE_FS_WIN32=y
+CONFIG_LV_FS_WIN32_LETTER=67

@@ -2129,6 +2129,15 @@
 #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 1
 
 #endif /*LV_USE_TEST_SCREENSHOT_COMPARE*/
+
+#if LV_USE_DRAW_NANOVG
+/** Render into an off-screen EGL pbuffer instead of a window and read the
+ *  pixels back into the LVGL draw buffer, so screenshot compares work the
+ *  same way as with the software renderer. Requires EGL and GLESv2.
+ */
+#define LV_USE_NANOVG_TEST_HEADLESS 0
+
+#endif /*LV_USE_DRAW_NANOVG*/
 #endif /*LV_USE_TEST*/
 
 /** Feed random input events to the UI for stress testing. */

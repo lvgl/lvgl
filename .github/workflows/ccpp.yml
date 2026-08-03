@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
-        # See BUILD_OPTIONS in tests/CMakeLists.txt.
+        # See build_only_options and test_options in tests/main.py.
         build_option: ['OPTIONS_NORMAL_8BIT',
                        'OPTIONS_16BIT',
                        'OPTIONS_24BIT',
@@ -48,7 +48,7 @@ jobs:
       fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
-        # See BUILD_OPTIONS in tests/CMakeLists.txt.
+        # See build_only_options and test_options in tests/main.py.
         build_option: ['OPTIONS_16BIT',
                        'OPTIONS_24BIT',
                        'OPTIONS_FULL_32BIT']
@@ -108,7 +108,7 @@ jobs:
     strategy:
      matrix:
        # A valid option parameter to the cmake file.
-       # See BUILD_OPTIONS in tests/CMakeLists.txt.
+       # See build_only_options and test_options in tests/main.py.
        build_config: ['64bit build',
                       '32bit build']
     name: Run tests with ${{ matrix.build_config }}

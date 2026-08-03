@@ -10,8 +10,14 @@ set(LV_BUILD_CONF_DIR "" CACHE PATH
     "Can be used to specify the include dir containing lv_conf.h, to be used in conjunction with LV_CONF_INCLUDE_SIMPLE")
 
 option(LV_BUILD_USE_KCONFIG "Use Kconfig" OFF)
-set(LV_BUILD_DEFCONFIG_PATH "" CACHE PATH
-    "Supply the default Kconfig configuration - used with Kconfig")
+set(LV_BUILD_DEFCONFIG_PATH "" CACHE STRING
+    "Supply the default Kconfig configuration - used with Kconfig. Accepts a \
+\";\"-separated list of defconfigs, merged in order so later ones override earlier ones")
+
+option(LV_BUILD_DEFCONFIG_STRICT
+    "Fail if a defconfig assigns an unknown or promptless symbol, or a value \
+that ends up having no effect. Off by default so that existing configurations \
+keep working" OFF)
 
 set(LV_BUILD_DOTCONFIG_PATH "" CACHE PATH
     "Path to .config path - used with Kconfig")
@@ -41,6 +47,8 @@ option(LV_USE_FIND_PACKAGE "Resolve dependencies via find_package" ON)
 option(LV_USE_PKG_CONFIG "Resolve dependencies via pkg-config (requires pkg-config to be installed)" ON)
 option(LV_FETCH_DEPENDENCIES "Fetch dependencies from source if not found on the system" ON)
 
+option(LV_BUILD_TESTS "Build the unit tests in the tests directory" OFF)
+
 option(CONFIG_LV_BUILD_DEMOS "Build demos" ON)
 option(CONFIG_LV_BUILD_EXAMPLES "Build examples" ON)
 option(CONFIG_LV_USE_THORVG_INTERNAL "Use the internal version of ThorVG" ON)
@@ -50,6 +58,31 @@ option(CONFIG_LV_USE_PRIVATE_API "If set - install the private headers" OFF)
 
 if (LV_BUILD_CONF_PATH AND LV_BUILD_CONF_DIR)
     message(FATAL_ERROR "can not use LV_BUILD_CONF_DIR and LV_BUILD_CONF_PATH at the same time")
+endif()
+
+if (LV_BUILD_TESTS)
+    if (NOT EXISTS ${LVGL_ROOT_DIR}/tests/CMakeLists.txt)
+        message(FATAL_ERROR "LV_BUILD_TESTS is set but the tests directory is missing")
+    endif()
+
+    # Every test configuration is a set of Kconfig defconfigs, see
+    # tests/configs and the recipes in tests/main.py
+    set(LV_BUILD_USE_KCONFIG ON)
+    set(LV_BUILD_DEFCONFIG_STRICT ON)
+
+    set(CMAKE_C_STANDARD 99)
+    set(CMAKE_CXX_STANDARD 14)
+
+    # Lets `ctest -T memcheck` work. include(CTest) reads this, so it has to be
+    # found here rather than in tests/CMakeLists.txt.
+    find_program(VALGRIND_EXECUTABLE valgrind)
+    if (VALGRIND_EXECUTABLE)
+        set(MEMORYCHECK_COMMAND ${VALGRIND_EXECUTABLE})
+        set(MEMORYCHECK_COMMAND_OPTIONS --error-exitcode=1)
+    endif()
+
+    enable_testing()
+    include(CTest)
 endif()
 
 if (LV_BUILD_USE_KCONFIG)
@@ -510,10 +543,17 @@ if (HAS_PARENT_SCOPE)
     set(LVGL_COMPILER_DEFINES ${COMP_DEF} PARENT_SCOPE)
 
 else()
-    # The file has been included by tests/CMakeLists.txt -
-    # or somewhere else, set variable containing the normalized path of the include dir
-    # containing the configuration file
+    # Building LVGL as the top-level project, set variable containing the
+    # normalized path of the include dir containing the configuration file
     set(LVGL_CONF_INC_DIR ${CONF_INC_DIR})
     set(LVGL_CONF_PATH ${CONF_PATH})
     set(LVGL_COMPILER_DEFINES ${COMP_DEF})
+endif()
+
+############################## TESTS ######################################
+
+# Added last so that the tests can adjust the targets created above, e.g. to
+# compile LVGL itself with the sanitizers and the strict warning set.
+if (LV_BUILD_TESTS)
+    add_subdirectory(${LVGL_ROOT_DIR}/tests tests)
 endif()

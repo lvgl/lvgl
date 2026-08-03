@@ -1,0 +1,18 @@
+# Shared by every unit test build. Combined with the other fragments in this
+# directory by tests/main.py - see build_only_options and test_options there for
+# the exact recipes.
+#
+# The fragments are merged in the order main.py lists them, so a later fragment
+# overrides a value set by an earlier one.
+
+# Route failed asserts to lv_test_assert_fail() so they fail the test case
+# instead of halting. The path is relative to the LVGL root directory.
+CONFIG_LV_ASSERT_USE_CUSTOM_INCLUDE=y
+CONFIG_LV_ASSERT_CUSTOM_INCLUDE="tests/src/lv_test_assert.h"
+
+# Test helpers: emulated input devices, time emulation and screenshot compare.
+CONFIG_LV_USE_TEST=y
+CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE=y
+CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE=y
+
+CONFIG_LV_USE_LOG=y
