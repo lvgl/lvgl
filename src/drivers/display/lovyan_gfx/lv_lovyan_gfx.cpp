@@ -91,7 +91,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
 
     if(dsc->tft->getStartCount() == 0) {
-        dsc->tft->endWrite();
+        dsc->tft->startWrite();
     }
     dsc->tft->pushImageDMA(area->x1, area->y1, w, h, (uint16_t *)px_map);
     dsc->tft->waitDMA();
