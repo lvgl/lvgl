@@ -150,28 +150,28 @@ lv_result_t lv_gltf_model_node_set_position_y(lv_gltf_model_node_t * node, float
 lv_result_t lv_gltf_model_node_set_position_z(lv_gltf_model_node_t * node, float z);
 
 /**
- * @brief Set the X component of a glTF model node's rotation quaternion. The operation is queued and applied on the next rendering phase.
+ * @brief Set the rotation of a glTF model node around the X axis. The operation is queued and applied on the next rendering phase.
  *
  * @param node Pointer to the glTF model node structure
- * @param x The X rotation component value
+ * @param x The rotation around the X axis, in radians
  * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_rotation_x(lv_gltf_model_node_t * node, float x);
 
 /**
- * @brief Set the Y component of a glTF model node's rotation quaternion. The operation is queued and applied on the next rendering phase.
+ * @brief Set the rotation of a glTF model node around the Y axis. The operation is queued and applied on the next rendering phase.
  *
  * @param node Pointer to the glTF model node structure
- * @param y The Y rotation component value
+ * @param y The rotation around the Y axis, in radians
  * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_rotation_y(lv_gltf_model_node_t * node, float y);
 
 /**
- * @brief Set the Z component of a glTF model node's rotation quaternion. The operation is queued and applied on the next rendering phase.
+ * @brief Set the rotation of a glTF model node around the Z axis. The operation is queued and applied on the next rendering phase.
  *
  * @param node Pointer to the glTF model node structure
- * @param z The Z rotation component value
+ * @param z The rotation around the Z axis, in radians
  * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_rotation_z(lv_gltf_model_node_t * node, float z);

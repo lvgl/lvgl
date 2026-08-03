@@ -87,6 +87,10 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * model, 
 
 lv_gltf_model_node_t * lv_gltf_model_node_get_by_numeric_path(lv_gltf_model_t * model, const char * num_path)
 {
+    if(!model) {
+        LV_LOG_WARN("Can't get node from NULL model");
+        return nullptr;
+    }
 
     const uint32_t node_count = lv_array_size(&model->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
@@ -170,6 +174,11 @@ lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv
                                                  lv_event_code_t filter_list,
                                                  void * user_data)
 {
+    if(!node) {
+        LV_LOG_WARN("Can't add an event callback to a NULL node");
+        return nullptr;
+    }
+
     if(!node->read_attrs) {
         node->read_attrs = (lv_gltf_model_node_attr_t *) lv_zalloc(sizeof(*node->read_attrs));
         LV_ASSERT_MALLOC(node->read_attrs);
@@ -177,7 +186,7 @@ lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv
             LV_LOG_WARN("Failed to allocate memory for read attributes");
             return nullptr;
         }
-        lv_array_init(&node->read_attrs->event_list.array, 1, sizeof(lv_event_dsc_t *));
+        /* The event list array is allocated by lv_event_add() on the first callback */
     }
     return lv_event_add(&node->read_attrs->event_list, cb, filter_list, user_data);
 }

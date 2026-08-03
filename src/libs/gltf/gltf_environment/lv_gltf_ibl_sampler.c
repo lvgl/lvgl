@@ -150,12 +150,19 @@ lv_gltf_environment_t * lv_gltf_environment_create(lv_gltf_ibl_sampler_t * sampl
         LV_LOG_WARN("Failed to create environment");
         return NULL;
     }
+
+    GLint prev_framebuffer = 0;
+    GL_CALL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_framebuffer));
+
     if(ibl_sampler_load(sampler, file_path) != LV_RESULT_OK) {
         LV_LOG_WARN("Failed to initialize ibl sampler");
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
         lv_free(env);
         return NULL;
     }
     ibl_sampler_filter(sampler);
+
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, prev_framebuffer));
 
     env->diffuse = sampler->lambertian_texture_id;
     env->specular = sampler->ggx_texture_id;
@@ -169,8 +176,16 @@ lv_gltf_environment_t * lv_gltf_environment_create(lv_gltf_ibl_sampler_t * sampl
 
 void lv_gltf_environment_delete(lv_gltf_environment_t * environment)
 {
-    const unsigned int d[3] = { environment->diffuse, environment->specular, environment->sheen };
-    GL_CALL(glDeleteTextures(3, d));
+    if(!environment) {
+        return;
+    }
+    const unsigned int d[5] = { environment->diffuse,
+                                environment->specular,
+                                environment->sheen,
+                                environment->ggxLut,
+                                environment->charlie_lut
+                              };
+    GL_CALL(glDeleteTextures(5, d));
     lv_free(environment);
 }
 
@@ -194,7 +209,29 @@ static lv_result_t ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char 
 
     float * data = NULL;
     if(path) {
-        data = stbi_loadf(path, &src_width, &src_height, &src_nrChannels, 3);
+        /* Read the image through the LVGL file system, so environment images take the
+         * same paths as the models do */
+        uint32_t file_size = 0;
+        if(lv_fs_path_get_size(path, &file_size) == LV_FS_RES_OK && file_size > 0) {
+            uint8_t * file_data = lv_malloc(file_size);
+            LV_ASSERT_MALLOC(file_data);
+            if(file_data) {
+                if(lv_fs_load_to_buf(file_data, file_size, path) == LV_FS_RES_OK) {
+                    data = stbi_loadf_from_memory(file_data, (int32_t)file_size, &src_width, &src_height,
+                                                  &src_nrChannels, 3);
+                }
+                lv_free(file_data);
+            }
+        }
+
+        if(!data) {
+            /* TODO:(v10) kept for backwards compatibility with original gltf integration. remove this
+             * for v10 */
+            data = stbi_loadf(path, &src_width, &src_height, &src_nrChannels, 3);
+            if(data) {
+                LV_LOG_DEPRECATED("Passing a raw path to lv_gltf_environment_create is deprecated. Pass an LVGL filesystem path instead");
+            }
+        }
     }
 
     if(!data) {
@@ -316,15 +353,15 @@ static void ibl_texture_from_image(lv_gltf_ibl_sampler_t * sampler, lv_gltf_ibl_
         const float b = image->data[src + 2];
         const float max_component = LV_MAX(LV_MAX(r, g), b);
 
-        if(max_component > 1.0) {
-            diff_sum += max_component - 1.0;
+        if(max_component > 1.0f) {
+            diff_sum += max_component - 1.0f;
         }
         clamped_sum += LV_MIN(max_component, 1.0f);
         max_value = LV_MAX(max_component, max_value);
 
-        texture->data[dst + 0] = LV_MIN(r * 255, 255);
-        texture->data[dst + 1] = LV_MIN(g * 255, 255);
-        texture->data[dst + 2] = LV_MIN(b * 255, 255);
+        texture->data[dst + 0] = (uint8_t)LV_MIN(r * 255.0f, 255.0f);
+        texture->data[dst + 1] = (uint8_t)LV_MIN(g * 255.0f, 255.0f);
+        texture->data[dst + 2] = (uint8_t)LV_MIN(b * 255.0f, 255.0f);
         texture->data[dst + 3] = 0xFF;
 
         src += src_format_bpp;
@@ -550,6 +587,7 @@ static void ibl_sample_lut(lv_gltf_ibl_sampler_t * sampler, uint32_t distributio
     program->update_uniform_1i(program, "u_isGeneratingLUT", 1);
     //fullscreen triangle
     draw_fullscreen_quad(sampler, program_id);
+
 }
 static void ibl_sample_ggx_lut(lv_gltf_ibl_sampler_t * sampler)
 {

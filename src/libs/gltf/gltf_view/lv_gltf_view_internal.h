@@ -129,6 +129,7 @@ typedef struct {
     GLuint current_vbo;
     GLuint current_ibo;
     GLuint current_program;
+    GLuint current_framebuffer;
 
     /* Texture state */
     GLint active_texture;
@@ -186,6 +187,7 @@ struct _lv_gltf_t {
  **********************/
 
 GLuint lv_gltf_view_render(lv_gltf_t * viewer);
+void lv_gltf_view_render_deinit(lv_gltf_t * viewer);
 lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_gltf_model_t * data,
                                                         fastgltf::Node * node,
                                                         fastgltf::Primitive * prim);

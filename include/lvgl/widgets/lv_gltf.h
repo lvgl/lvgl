@@ -330,17 +330,37 @@ void lv_gltf_set_background_blur(lv_obj_t * obj, uint32_t value);
 uint32_t lv_gltf_get_background_blur(const lv_obj_t * obj);
 
 /**
- * Set the environmental brightness/power
- * @param obj pointer to a glTF viewer object
- * @param value brightness multiplier
+ * Set the environment brightness of a glTF viewer.
+ * @param obj       pointer to a glTF viewer object
+ * @param value     brightness multiplier, 1.0 = neutral. Default: 1.8
  */
+void lv_gltf_set_environment_brightness(lv_obj_t * obj, float value);
+
+/**
+ * Get the environment brightness of a glTF viewer.
+ * @param obj       pointer to a glTF viewer object
+ * @return          brightness multiplier, 1.0 = neutral
+ */
+float lv_gltf_get_environment_brightness(const lv_obj_t * obj);
+
+/**
+ * Set the environment brightness.
+ * @param obj       pointer to a glTF viewer object
+ * @param value     brightness percentage, 100 = neutral
+ * @deprecated      Use lv_gltf_set_environment_brightness() instead,
+ *                  which takes a multiplier (1.0 = neutral).
+ */
+LV_DEPRECATED("Use lv_gltf_set_environment_brightness() instead")
 void lv_gltf_set_env_brightness(lv_obj_t * obj, uint32_t value);
 
 /**
- * Get the environmental brightness/power
- * @param obj pointer to a glTF viewer object
- * @return brightness multiplier
+ * Get the environment brightness.
+ * @param obj       pointer to a glTF viewer object
+ * @return          brightness percentage, 100 = neutral
+ * @deprecated      Use lv_gltf_get_environment_brightness() instead,
+ *                  which returns a multiplier (1.0 = neutral).
  */
+LV_DEPRECATED("Use lv_gltf_get_environment_brightness() instead")
 uint32_t lv_gltf_get_env_brightness(const lv_obj_t * obj);
 
 /**
