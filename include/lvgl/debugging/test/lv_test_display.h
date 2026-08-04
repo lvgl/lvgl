@@ -53,10 +53,19 @@ lv_display_t * lv_test_display_create(int32_t hor_res, int32_t ver_res);
 lv_display_t * lv_test_display_egl_create(int32_t hor_res, int32_t ver_res);
 
 /**
+ * Get the EGL context of a headless test display, so that it can be cleaned up after
+ * the display itself has been deleted. See `lv_test_display_egl_cleanup`.
+ * @param disp      a display created by `lv_test_display_egl_create`
+ * @return          the context, or NULL if `disp` is not a headless EGL display
+ */
+void * lv_test_display_egl_get_context(lv_display_t * disp);
+
+/**
  * Clean up EGL/GL resources after lv_deinit() has destroyed the NanoVG draw unit.
- * Must be called from lv_test_deinit() after lv_deinit(), passing the context that
- * was captured from the display's driver data before lv_deinit() deleted the display.
- * @param egl_ctx   the context returned via lv_display_get_driver_data(), may be NULL
+ * Must be called from lv_test_deinit() after lv_deinit(), passing the context that was
+ * captured with `lv_test_display_egl_get_context()` before lv_deinit() deleted the
+ * display.
+ * @param egl_ctx   the context from `lv_test_display_egl_get_context()`, may be NULL
  */
 void lv_test_display_egl_cleanup(void * egl_ctx);
 #endif

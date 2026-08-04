@@ -2196,6 +2196,7 @@ PREDEFINED             = DOXYGEN                         \
                          LV_USE_OBSERVER=1               \
                          LV_USE_OPENGLES=1               \
                          LV_USE_OPENGLES_DEBUG=1          \
+                         LV_USE_OPENGLES_PBUFFER=1       \
                          LV_USE_OS=1                     \
                          LV_USE_PARALLEL_DRAW_DEBUG=1    \
                          LV_USE_PERF_MONITOR=1           \

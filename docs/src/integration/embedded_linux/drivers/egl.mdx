@@ -1,45 +1,41 @@
 ---
 title: EGL
-description: "The EGL driver provides support for creating LVGL displays using the EGL (Embedded-System Graphics Library) API. EGL is a lower-level API that is more closely tied to the underlying drivers of the ..."
+description: "EGL is the platform layer that binds OpenGL ES to a native windowing system. LVGL uses it as the hardware-accelerated backend of the DRM, Wayland and SDL drivers rather than as a driver of its own."
 ---
 
 ## Overview
 
-The **EGL** driver provides support for creating LVGL displays using the EGL (Embedded-System Graphics Library) API.
-EGL is a lower-level API that is more closely tied to the underlying drivers of the platform.
-The OpenGL support in LVGL is intended to be portable between different APIs. Currently, there is support for GLFW and EGL.
-Using EGL requires some additional platform integration.
+**EGL** (Embedded-System Graphics Library) is the platform layer that binds OpenGL ES to a native
+windowing system. It creates the GL context, allocates the surface the GPU renders into, and hands the
+finished frame to the platform. It sits lower than GLFW and is tied more closely to the platform's own
+drivers, which is why it is the path LVGL uses for GPU rendering on embedded Linux.
 
-`lv_opengles_egl_window_create` can be used to create a <ApiLink name="lv_opengles_window_t" />
-which can be used with the same generic LVGL OpenGL APIs as a GLFW window.
+EGL is not a driver you select on its own. It is the hardware-accelerated backend of the drivers that
+have one:
 
-## EGL with DRM
+- [DRM](/integration/embedded_linux/drivers/drm) for rendering straight to a display
+- [Wayland](/integration/embedded_linux/drivers/wayland) for rendering under a compositor
+- [SDL](/integration/pc/sdl) for a desktop window
 
-EGL can be used together with the DRM driver for hardware-accelerated rendering.
+## Configuration
 
-When <ApiLink name="LV_USE_OPENGLES" /> is enabled, the DRM driver will automatically set up EGL.
-No additional initialization is required beyond the normal DRM setup.
+There is nothing to enable directly. <ApiLink name="LV_USE_EGL" /> is selected for you based on the drivers
+you enable.
 
-See [DRM](/integration/embedded_linux/drivers/drm) for configuration and a basic usage example.
+EGL and OpenGL ES are loaded at runtime with `dlopen` (`libEGL.so` and `libGLESv2.so`), so enabling
+<ApiLink name="LV_USE_EGL" /> adds no link-time dependency and nothing appears for it in LVGL's dependency
+resolution. Both libraries must be present on the target at run time.
 
-## EGL without DRM (Experimental)
-
-<Callout type="warn">
-This feature is experimental and the API is private. Expect breaking changes.
+<Callout type="info">
+<ApiLink name="LV_USE_GLFW" /> depends on <ApiLink name="LV_USE_EGL" /> being off, the two windowing
+paths are mutually exclusive and cannot be built into the same binary.
 </Callout>
 
-If you want to use EGL without being tied to DRM, you can enable <ApiLink name="LV_USE_EGL" /> using a compiler definition.
-This API is currently private and experimental, and people should expect breaking changes.
+## See Also
 
-```bash
-# Enable standalone EGL (experimental)
--DLV_USE_EGL=1
-```
-
-This allows you to use EGL with your own context management or other platforms, but the API may change
-without notice in future versions.
-
-## Improving Performance
-
-There is a renderer in LVGL which caches software-rendered areas as OpenGL textures.
-See [OpenGL Texture Caching Renderer](/integration/embedded_linux/drivers/opengl_driver) to learn more about it.
+- [DRM](/integration/embedded_linux/drivers/drm) - EGL backend for direct-to-display rendering
+- [Wayland](/integration/embedded_linux/drivers/wayland) - EGL backend under a compositor
+- [OpenGL Driver](/integration/embedded_linux/drivers/opengl_driver) - use when you already own the context
+- [GLFW](/integration/embedded_linux/drivers/glfw) - the desktop alternative, mutually exclusive with EGL
+- [OpenGL Overview](/integration/embedded_linux/opengl) - how the drivers and draw units fit together
+- [CMake](/integration/building/cmake) - how LVGL resolves and links driver dependencies
