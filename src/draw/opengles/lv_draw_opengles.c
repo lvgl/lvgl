@@ -542,15 +542,6 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *)t->draw_unit;
     cache_data_t data_to_find;
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
-    bool h_flip = false;
-    bool v_flip = false;
-#if LV_USE_3DTEXTURE
-    if(t->type == LV_DRAW_TASK_TYPE_3D) {
-        lv_draw_3d_dsc_t * _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
-        h_flip = _3d_dsc->h_flip;
-        v_flip = _3d_dsc->v_flip;
-    }
-#endif
     data_to_find.w = lv_area_get_width(&t->_real_area);
     data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = 0;
@@ -639,8 +630,8 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                     }
 
                     if(fill_dsc->opa >= LV_OPA_MAX) {
-                        float tex_w = (float)lv_area_get_width(&fill_area);
-                        float tex_h = (float)lv_area_get_height(&fill_area);
+                        int32_t tex_w = lv_area_get_width(&fill_area);
+                        int32_t tex_h = lv_area_get_height(&fill_area);
                         GL_CALL(glEnable(GL_SCISSOR_TEST));
                         GL_CALL(glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h));
                         /* swap red and blue channels here as they will be swapped back during flushing*/
