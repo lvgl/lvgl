@@ -1,8 +1,5 @@
 # Enable as much of LVGL as possible, so that the test suite exercises the
-# widest feature set. 
-
-# Platform specific drivers live in linux.defconfig,
-# unix.defconfig, windows.defconfig and opengles.defconfig.
+# widest feature set.
 
 CONFIG_LV_CACHE_DEF_SIZE=10485760
 CONFIG_LV_DRAW_SW_SHADOW_CACHE_SIZE=8
