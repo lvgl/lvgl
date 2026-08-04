@@ -142,6 +142,26 @@ static lv_result_t resize_display(lv_display_t * display)
     if(cf == LV_COLOR_FORMAT_I1) {
         cf = LV_COLOR_FORMAT_ARGB8888;
     }
+
+    SDL_PixelFormatEnum px_format;
+    switch(cf) {
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
+            px_format = SDL_PIXELFORMAT_RGB888;
+            break;
+        case LV_COLOR_FORMAT_RGB888:
+            px_format = SDL_PIXELFORMAT_BGR24;
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+            px_format = SDL_PIXELFORMAT_RGB565;
+            break;
+        default:
+            LV_LOG_WARN("Unsupported color format: %d", cf);
+            return LV_RESULT_INVALID;
+    }
+
+
     uint32_t stride = lv_draw_buf_width_to_stride(display->hor_res, cf);
     lv_sdl_sw_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
 
@@ -161,16 +181,6 @@ static lv_result_t resize_display(lv_display_t * display)
     }
     if(ddata->texture) SDL_DestroyTexture(ddata->texture);
 
-#if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 1
-    SDL_PixelFormatEnum px_format =
-        SDL_PIXELFORMAT_RGB888; /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
-#elif LV_COLOR_DEPTH == 24
-    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_BGR24;
-#elif LV_COLOR_DEPTH == 16
-    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_RGB565;
-#else
-#error("Unsupported color format")
-#endif
 
     ddata->texture = SDL_CreateTexture(ddata->renderer, px_format,
                                        SDL_TEXTUREACCESS_STATIC, display->hor_res, display->ver_res);
