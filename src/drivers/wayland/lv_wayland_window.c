@@ -302,10 +302,17 @@ static void delete_event(lv_event_t * e)
     wl_backend_ops.deinit_display(window->backend_display_data, window->lv_disp);
     window->backend_display_data = NULL;
 
-    if(LV_WAYLAND_DIRECT_EXIT) {
-        lv_display_set_driver_data(window->lv_disp, NULL);
+    lv_indev_t * indevs[] = { window->lv_indev_keyboard,
+                              window->lv_indev_pointer,
+                              window->lv_indev_pointeraxis,
+                              window->lv_indev_touch
+                            };
+
+    for(size_t i = 0; i < sizeof(indevs) / sizeof(indevs[0]); ++i) {
+        lv_indev_delete(indevs[i]);
     }
 
+    lv_display_set_driver_data(window->lv_disp, NULL);
     lv_ll_remove(&lv_wl_ctx.window_ll, window);
     lv_free(window);
 

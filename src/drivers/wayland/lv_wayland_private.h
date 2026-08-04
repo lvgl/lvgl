@@ -31,6 +31,10 @@ extern "C" {
 #define LV_WAYLAND_DEFAULT_CURSOR_NAME "left_ptr"
 #define LV_WAYLAND_MAX_OUTPUTS 8
 
+#ifndef LV_WAYLAND_KEY_EVENT_MAX_COUNT
+#define LV_WAYLAND_KEY_EVENT_MAX_COUNT (64)
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -67,9 +71,11 @@ typedef struct {
     struct xkb_keymap * xkb_keymap;
     struct xkb_state * xkb_state;
 
-    lv_key_t key;
-    lv_indev_state_t state;
-    bool is_pressed;
+    struct {
+        lv_key_t key;
+        lv_indev_state_t state;
+    } events[LV_WAYLAND_KEY_EVENT_MAX_COUNT];
+    uint8_t event_count;
 } lv_wl_seat_keyboard_t;
 
 
