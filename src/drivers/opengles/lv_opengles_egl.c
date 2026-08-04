@@ -90,8 +90,24 @@ void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
         ctx->egl_context = EGL_NO_CONTEXT;
     }
     if(ctx->egl_surface && ctx->egl_display) {
-        eglDestroySurface(ctx->egl_display, ctx->egl_surface);
+        if(ctx->interface.destroy_surface_cb) {
+            ctx->interface.destroy_surface_cb(ctx->interface.driver_data, ctx->egl_surface);
+        }
+        else {
+            eglDestroySurface(ctx->egl_display, ctx->egl_surface);
+        }
         ctx->egl_surface = EGL_NO_SURFACE;
+    }
+
+    if(ctx->native_window && ctx->interface.destroy_window_cb) {
+        ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
+        ctx->native_window = 0;
+    }
+
+    eglReleaseThread();
+    if(ctx->egl_display) {
+        eglTerminate(ctx->egl_display);
+        ctx->egl_display = EGL_NO_DISPLAY;
     }
 
     if(ctx->egl_lib_handle) {
@@ -100,17 +116,14 @@ void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
     if(ctx->opengl_lib_handle) {
         dlclose(ctx->opengl_lib_handle);
     }
-
-    if(ctx->native_window && ctx->interface.destroy_window_cb) {
-        ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
-        ctx->native_window = 0;
-    }
-    if(ctx->egl_display) {
-        eglTerminate(ctx->egl_display);
-        ctx->egl_display = EGL_NO_DISPLAY;
-    }
     ctx->egl_config = NULL;
     lv_free(ctx);
+}
+
+uint8_t lv_opengles_egl_get_gles_version(lv_opengles_egl_t * ctx)
+{
+    LV_ASSERT_NULL(ctx);
+    return ctx->gles_version;
 }
 
 void lv_opengles_egl_clear(lv_opengles_egl_t * ctx)
@@ -178,7 +191,7 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
 
     if(eglBindAPI && !eglBindAPI(EGL_OPENGL_ES_API)) {
         LV_LOG_ERROR("Failed to bind api");
-        goto err;
+        goto load_egl_functions_err;
     }
 
     ctx->opengl_lib_handle = load_gl_lib();
@@ -193,11 +206,12 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
         goto egl_config_err;
     }
 
-    ctx->native_window = (EGLNativeWindowType)create_native_window(ctx);
-    if(!ctx->native_window) {
-        LV_LOG_ERROR("Failed to create native window");
-        goto create_window_err;
-
+    if(ctx->interface.create_window_cb) {
+        ctx->native_window = (EGLNativeWindowType) create_native_window(ctx);
+        if(!ctx->native_window) {
+            LV_LOG_ERROR("Failed to create native window");
+            goto create_window_err;
+        }
     }
     ctx->egl_surface = create_egl_surface(ctx);
     if(!ctx->egl_surface) {
@@ -216,7 +230,9 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
         goto egl_make_current_context_err;
     }
 
-    if(!eglSwapInterval(ctx->egl_display, 0)) {
+    /* The swap interval only applies to window surfaces. Calling it on an offscreen
+     * surface latches an EGL_BAD_SURFACE error for no reason, so skip it there. */
+    if(ctx->native_window && !eglSwapInterval(ctx->egl_display, 0)) {
         LV_LOG_WARN("Can't set egl swap interval");
     }
 
@@ -235,8 +251,10 @@ egl_make_current_context_err:
 egl_context_err:
     ctx->egl_surface = NULL;
 egl_surface_err:
-    ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
-    ctx->native_window = 0;
+    if(ctx->native_window && ctx->interface.destroy_window_cb) {
+        ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
+        ctx->native_window = 0;
+    }
 create_window_err:
     ctx->egl_config = NULL;
 egl_config_err:
@@ -369,6 +387,8 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
     const EGLint config_attribs[] = {
         EGL_RENDERABLE_TYPE,
         EGL_OPENGL_ES2_BIT,
+        EGL_SURFACE_TYPE,
+        EGL_DONT_CARE,
         EGL_NONE
     };
 
@@ -392,6 +412,7 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
 
     if(!eglChooseConfig(ctx->egl_display, config_attribs, egl_configs, num_configs, &num_configs)) {
         LV_LOG_ERROR("Failed to get configs: %d", eglGetError());
+        lv_free(egl_configs);
         return NULL;
     }
 
@@ -405,8 +426,9 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
 
     size_t valid_config_count = 0;
     for(size_t i = 0; i < (size_t)num_configs; ++i) {
-        lv_result_t err = lv_egl_config_from_egl_config(ctx, configs + i, egl_configs[i]);
+        lv_result_t err = lv_egl_config_from_egl_config(ctx, configs + valid_config_count, egl_configs[i]);
         if(err == LV_RESULT_OK) {
+            egl_configs[valid_config_count] = egl_configs[i];
             valid_config_count ++;
         }
     }
@@ -420,7 +442,7 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
 
     size_t config_id = ctx->interface.select_config(ctx->interface.driver_data, configs, valid_config_count);
 
-    if(config_id >= (size_t)num_configs) {
+    if(config_id >= valid_config_count) {
         LV_LOG_ERROR("Failed to find suitable EGL config");
         lv_free(egl_configs);
         lv_free(configs);
@@ -436,18 +458,44 @@ static EGLSurface create_egl_surface(lv_opengles_egl_t * ctx)
 {
     LV_ASSERT_NULL(ctx->egl_display);
     LV_ASSERT_NULL(ctx->egl_config);
+
+    if(ctx->interface.create_surface_cb) {
+        lv_egl_create_surface_params_t params = {
+            .config = ctx->egl_config,
+            .display = ctx->egl_display,
+        };
+        return ctx->interface.create_surface_cb(ctx->interface.driver_data, &params);
+    }
+
     LV_ASSERT(ctx->native_window != 0);
     return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->native_window, NULL);
 }
 
 static EGLContext create_egl_context(lv_opengles_egl_t * ctx)
 {
-    static const EGLint context_attribs[] = {
-        EGL_CONTEXT_CLIENT_VERSION, 2,
+    /* Try ES3 first */
+    EGLint context_attribs[] = {
+        EGL_CONTEXT_CLIENT_VERSION, 3,
         EGL_NONE
     };
-    return eglCreateContext(ctx->egl_display, ctx->egl_config,
-                            EGL_NO_CONTEXT, context_attribs);
+
+    EGLContext context = eglCreateContext(ctx->egl_display, ctx->egl_config,
+                                          EGL_NO_CONTEXT, context_attribs);
+    if(context != EGL_NO_CONTEXT) {
+        ctx->gles_version = 3;
+        return context;
+    }
+
+    LV_LOG_INFO("Failed to create an OpenGL ES 3 context (error %#x). Falling back to ES 2", eglGetError());
+
+    /* fallback to ES2 */
+    context_attribs[1] = 2;
+    context = eglCreateContext(ctx->egl_display, ctx->egl_config,
+                               EGL_NO_CONTEXT, context_attribs);
+    if(context != EGL_NO_CONTEXT) {
+        ctx->gles_version = 2;
+    }
+    return context;
 }
 
 lv_color_format_t lv_opengles_egl_color_format_from_egl_config(const lv_egl_config_t * config)
@@ -515,8 +563,6 @@ static void * create_native_window(lv_opengles_egl_t * ctx)
     void * native_window = ctx->interface.create_window_cb(ctx->interface.driver_data, &properties);
     if(!native_window) {
         LV_LOG_ERROR("Failed to create window");
-        lv_free(mods);
-        return NULL;
     }
     lv_free(mods);
     return native_window;
