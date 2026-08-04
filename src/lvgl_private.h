@@ -121,6 +121,7 @@
 #include "drivers/opengles/lv_opengles_debug.h"
 #include "drivers/opengles/lv_opengles_egl.h"
 #include "drivers/opengles/lv_opengles_egl_private.h"
+#include "drivers/opengles/lv_opengles_pbuffer.h"
 #include "drivers/opengles/lv_opengles_private.h"
 #include "drivers/opengles/lv_opengles_texture_private.h"
 #include "drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
