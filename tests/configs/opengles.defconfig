@@ -1,4 +1,0 @@
-# OpenGL ES driver. Only added on 64-bit non-Windows hosts, the 32-bit CI
-# images do not ship the i386 GL packages.
-
-CONFIG_LV_USE_OPENGLES=y

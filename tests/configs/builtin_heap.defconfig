@@ -1,6 +1,3 @@
-# Use LVGL's own allocator and string/sprintf implementations. This is the
-# default, so it is also what the compile-only configurations build with.
-
 CONFIG_LV_USE_BUILTIN_MALLOC=y
 CONFIG_LV_USE_BUILTIN_STRING=y
 CONFIG_LV_USE_BUILTIN_SPRINTF=y

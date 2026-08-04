@@ -4,11 +4,6 @@
 CONFIG_LV_USE_CLIB_MALLOC=y
 CONFIG_LV_USE_CLIB_STRING=y
 CONFIG_LV_USE_CLIB_SPRINTF=y
-CONFIG_LV_OS_PTHREAD=y
-
-# Increase the draw thread stack size to 64KB in order to run ThorVG. Only
-# configurable once an OS is selected, which is why it lives here.
-CONFIG_LV_DRAW_THREAD_STACK_SIZE=65536
 
 # CONFIG_LV_OBJ_STYLE_CACHE is not set
 

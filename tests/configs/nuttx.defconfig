@@ -1,10 +1,4 @@
-# SDL simulator. This build test also covers the NuttX port, which has no
-# dedicated CI target of its own.
-
-CONFIG_LV_USE_SDL=y
-CONFIG_LV_USE_DRAW_SDL=y
-# CONFIG_LV_SDL_AUTO_BACKEND is not set
-CONFIG_LV_SDL_BACKEND_SW=y
+# NuttX port
 
 CONFIG_LV_USE_NUTTX=y
 CONFIG_LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP=y

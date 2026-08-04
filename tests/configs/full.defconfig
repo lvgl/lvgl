@@ -1,9 +1,13 @@
 # Enable as much of LVGL as possible, so that the test suite exercises the
-# widest feature set. Platform specific drivers live in linux.defconfig,
+# widest feature set. 
+
+# Platform specific drivers live in linux.defconfig,
 # unix.defconfig, windows.defconfig and opengles.defconfig.
 
 CONFIG_LV_CACHE_DEF_SIZE=10485760
 CONFIG_LV_DRAW_SW_SHADOW_CACHE_SIZE=8
+# Increase the draw thread stack size to 64KB in order to run ThorVG
+CONFIG_LV_DRAW_THREAD_STACK_SIZE=65536
 CONFIG_LV_USE_DRAW_SW_COMPLEX_GRADIENTS=y
 CONFIG_LV_USE_FLOAT=y
 CONFIG_LV_USE_MATRIX=y
@@ -113,8 +117,6 @@ CONFIG_LV_USE_SVG_ANIMATION=y
 CONFIG_LV_USE_SVG_DEBUG=y
 
 # Demos. Several test cases render them and compare against a reference image.
-# Only the in-tree demos: the rest live in the lvgl/lv_demos repository, which
-# LVGL fetches when they are enabled, and they do not build warning free.
 CONFIG_LV_USE_DEMO_WIDGETS=y
 CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER=y
 CONFIG_LV_USE_DEMO_STRESS=y

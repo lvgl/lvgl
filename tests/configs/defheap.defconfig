@@ -1,5 +1,4 @@
-# The executed test configuration that runs on LVGL's own allocator, on top of
-# builtin_heap.defconfig.
+# Test configuration to be added on top of builtin_heap.defconfig.
 
 CONFIG_LV_USE_MEM_MONITOR=y
 CONFIG_LV_OBJ_STYLE_CACHE=y

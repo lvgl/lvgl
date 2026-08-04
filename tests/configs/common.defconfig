@@ -1,10 +1,3 @@
-# Shared by every unit test build. Combined with the other fragments in this
-# directory by tests/main.py - see build_only_options and test_options there for
-# the exact recipes.
-#
-# The fragments are merged in the order main.py lists them, so a later fragment
-# overrides a value set by an earlier one.
-
 # Route failed asserts to lv_test_assert_fail() so they fail the test case
 # instead of halting. The path is relative to the LVGL root directory.
 CONFIG_LV_ASSERT_USE_CUSTOM_INCLUDE=y

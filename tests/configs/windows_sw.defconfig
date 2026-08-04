@@ -1,0 +1,9 @@
+# Counterpart of linux_sw.defconfig. Enables every driver that can run on windows
+
+CONFIG_LV_USE_WINDOWS=y
+
+CONFIG_LV_USE_SDL=y
+# CONFIG_LV_SDL_AUTO_BACKEND is not set
+CONFIG_LV_SDL_BACKEND_SW=y
+
+CONFIG_LV_USE_GLFW=y
