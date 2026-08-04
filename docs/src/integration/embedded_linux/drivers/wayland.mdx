@@ -71,13 +71,26 @@ enabling GPU-accelerated graphics on Wayland compositors that support the necess
 
 To enable the EGL backend:
 
-1. Enable OpenGL ES support in your LVGL configuration:
+1. Select the EGL backend explicitly. `LV_WAYLAND_AUTO_BACKEND` defaults to `1`, in
+   which case the driver falls back to the SHM backend unless a backend is
+   selected; set it to `0` and pick `LV_WAYLAND_BACKEND_EGL`:
+
+    ```c
+    #define LV_WAYLAND_AUTO_BACKEND 0
+    #define LV_WAYLAND_BACKEND      LV_WAYLAND_BACKEND_EGL
+    ```
+
+   If you configure LVGL through Kconfig/menuconfig instead of `lv_conf.h`, pick
+   the **EGL (OpenGL ES, hardware-accelerated)** option under the Wayland driver's
+   "Rendering backend" choice instead.
+
+2. Enable OpenGL ES support in your LVGL configuration:
 
     ```c
     #define LV_USE_OPENGLES 1
     ```
 
-2. Link your application with the `wayland-egl` library (add to your build system):
+3. Link your application with the `wayland-egl` library (add to your build system):
 
     ```bash
     -lwayland-egl
@@ -85,6 +98,32 @@ To enable the EGL backend:
 
 **Note:** If your target board has OpenGL ES 2.0 support, this backend can be used with LVGL's 3D rendering
 capabilities for glTF model visualization. See [3D/glTF Support](/integration/embedded_linux/opengl) for details on 3D rendering support.
+
+#### DMA-BUF Software Fast-Path
+
+When the EGL backend is used for software rendering, it automatically uses the
+Linux DMA-BUF protocol to present frames, improving performance on platforms
+that support zero-copy buffer sharing. If the required support is unavailable,
+the backend automatically falls back to the classic software path.
+
+**Requirements:**
+
+- A Wayland compositor with `zwp_linux_dmabuf_v1` support
+- GPU/display driver support for DMA-BUF
+- EGL/OpenGL ES support
+- `libdrm` and `gbm` (used to allocate the shared buffers)
+- The `linux-dmabuf` Wayland protocol generated at build time
+
+When building with LVGL's CMake build system, the `linux-dmabuf` protocol is
+generated and `libdrm`/`gbm` are resolved automatically — no extra steps are
+needed. For other build systems, generate the `linux-dmabuf` protocol with
+`wayland-scanner` and link the additional libraries:
+
+```bash
+-lwayland-egl
+-ldrm
+-lgbm
+```
 
 ### G2D Backend
 
@@ -236,7 +275,9 @@ wayland-scanner client-header $SYSROOT/usr/share/wayland-protocols/stable/xdg-sh
 wayland-scanner private-code $SYSROOT/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml wayland_xdg_shell.c
 ```
 
-When `LV_WAYLAND_USE_DMABUF` is set to `1`, the following protocols must also be generated:
+When using the [G2D backend](#g2d-backend), or the [EGL backend](#egl-backend)'s
+[DMA-BUF software fast-path](#dma-buf-software-fast-path), the following protocols
+must also be generated:
 
 ```sh
 wayland-scanner client-header $SYSROOT/usr/share/wayland-protocols/stable/linux-dmabuf/linux-dmabuf-v1.xml wayland_linux_dmabuf.h

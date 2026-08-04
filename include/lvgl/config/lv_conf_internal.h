@@ -4926,6 +4926,14 @@
     #endif
 #endif
 
+#ifndef LV_WAYLAND_USE_DMABUF
+    #if (((LV_WAYLAND_USE_EGL && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) || (LV_WAYLAND_USE_G2D && LV_USE_WAYLAND)) && (LV_USE_WAYLAND))
+        #define LV_WAYLAND_USE_DMABUF 1
+    #else
+        #define LV_WAYLAND_USE_DMABUF 0
+    #endif
+#endif
+
 /* Optional user headers (LV_*_USE_CUSTOM_INCLUDE) overriding config macros. */
 #if LV_OS_USE_CUSTOM_INCLUDE
     #include LV_OS_CUSTOM_INCLUDE

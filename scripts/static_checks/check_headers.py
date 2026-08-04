@@ -110,6 +110,7 @@ ALLOWED_EXTERNAL_HEADERS: set[str] = {
     "GL/glew.h",
     "GLES2/gl2.h",
     "GLES2/gl2ext.h",
+    "GLES2/gl2platform.h",
     "GLES3/gl3.h",
     "GLFW/glfw3.h",
     "LGFX_AUTODETECT.hpp",
