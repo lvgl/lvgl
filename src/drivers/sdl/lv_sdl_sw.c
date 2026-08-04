@@ -146,6 +146,8 @@ static lv_result_t resize_display(lv_display_t * display)
     SDL_PixelFormatEnum px_format;
     switch(cf) {
         case LV_COLOR_FORMAT_ARGB8888:
+            px_format = SDL_PIXELFORMAT_ARGB8888;
+            break;
         case LV_COLOR_FORMAT_XRGB8888:
             /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
             px_format = SDL_PIXELFORMAT_RGB888;
@@ -157,7 +159,9 @@ static lv_result_t resize_display(lv_display_t * display)
             px_format = SDL_PIXELFORMAT_RGB565;
             break;
         default:
-            LV_LOG_WARN("Unsupported color format: %d", cf);
+            /*The display has an unsupported color format. We can't do anything with it.*/
+            LV_LOG_ERROR("Unsupported color format: %d", cf);
+            LV_ASSERT(0);
             return LV_RESULT_INVALID;
     }
 
