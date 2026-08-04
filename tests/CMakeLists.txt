@@ -249,7 +249,11 @@ endif()
 
 # Generate one test executable per test case source file. The runner source is
 # produced by Unity's ruby script into the build directory.
-find_package(Ruby REQUIRED)
+find_package(Ruby)
+if(NOT RUBY_EXECUTABLE)
+    message(FATAL_ERROR "Ruby interpreter not found")
+endif()
+
 set(generate_test_runner_rb ${LVGL_TEST_DIR}/unity/generate_test_runner.rb)
 set(generate_test_runner_config ${LVGL_TEST_DIR}/config.yml)
 

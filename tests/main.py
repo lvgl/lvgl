@@ -119,7 +119,9 @@ def host_defconfigs():
     opted into per configuration, see linux_sw.defconfig."""
     if platform.system() == "Windows":
         return ["windows"]
-    return ["unix"]
+    if non_amd64_build():
+        return ["unix"]
+    return ["unix", "gstreamer"]
 
 
 def target_cmake_args():
