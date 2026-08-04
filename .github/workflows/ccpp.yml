@@ -104,8 +104,8 @@ jobs:
   test-native:
     runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         # A valid option parameter to the cmake file.
         # See build_only_options and test_options in tests/main.py.
         build_config: ['64bit build',
