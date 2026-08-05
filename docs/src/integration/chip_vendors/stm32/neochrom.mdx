@@ -1,11 +1,22 @@
 ---
 title: NeoChrom
-description: LVGL integrates NeoChrom as a draw unit.
+description: "NeoChrom is the 2D GPU of some STM32 chips. LVGL integrates it as a draw unit, with optional vector graphics and TSC compressed image support."
+faqs:
+  - question: "How do I enable the NeoChrom renderer?"
+    answer: "Set LV_USE_NEMA_GFX to 1 in lv_conf.h, and set LV_USE_NEMA_LIB to the version matching the core in your MCU. If it is left as LV_NEMA_LIB_NONE, M33 RevC is assumed."
+  - question: "Which pre-compiled binary should I link?"
+    answer: "cortex_m33_revC works on all STM32 Cortex-M33 devices with a NeoChrom core, cortex_m33_NemaPVG additionally supports the tessellation and matrix multiplication acceleration of the U5F and U5G cores, cortex_m7 is for Cortex-M7 MCUs, and cortex_m55 for Cortex-M55 MCUs."
+  - question: "The linker reports cannot find -lnemagfx-float-abi-hard. What is wrong?"
+    answer: "The library version for ST was updated to revC, so the path component cortex_m33 must be updated to cortex_m33_revC in STM32CubeIDE."
+  - question: "How do I draw vector graphics or SVGs with NeoChrom?"
+    answer: "Enable LV_USE_NEMA_GFX, LV_USE_NEMA_VG, LV_USE_VECTOR_GRAPHIC, LV_USE_MATRIX, and LV_USE_FLOAT, plus LV_USE_SVG for the SVG widget. Set LV_NEMA_GFX_MAX_RESX and LV_NEMA_GFX_MAX_RESY to your display size so enough static memory is reserved."
+  - question: "My core has a data cache. What do I need to configure?"
+    answer: "Either set LV_NEMA_STM32_HAL_ATTRIBUTE_POOL_MEM to an attribute that places the CPU/GPU shared memory in a non-cached region, which needs linker script and MPU coordination, or set LV_NEMA_USE_CACHE to 1 and LV_NEMA_CACHE_HAL_INCLUDE to a HAL header exposing the CMSIS cache functions."
 ---
 
 LVGL integrates NeoChrom as a [draw unit](/main-modules/draw/draw_pipeline).
 
-## Ready-to-use Projects that have NeoChrom enabled
+## Ready-to-Use Projects that have NeoChrom enabled
 
 [lv_port_riverdi_stm32u5](https://github.com/lvgl/lv_port_riverdi_stm32u5)
 is a ready-to-use port for the Riverdi STM32 5.0" Embedded Display
@@ -56,8 +67,12 @@ by right-clicking the project in the "Project Explorer" sidebar, clicking
 "Properties", navigating to "C/C++ Build", "Settings", "MCU G++ Linker", and then
 "Libraries". Add an entry under "Libraries (-l)" that is "nemagfx-float-abi-hard".
 Add an entry under "Library search path (-L)" which is a path to
-"libs/nema_gfx/lib/core/cortex_m33_revC/gcc" e.g.
-"$\{workspace_loc:/$\{ProjName\}/Middlewares/LVGL/lvgl/libs/nema_gfx/lib/core/cortex_m33_revC/gcc\}".
+"libs/nema_gfx/lib/core/cortex_m33_revC/gcc", e.g.
+
+```text
+${workspace_loc:/${ProjName}/Middlewares/LVGL/lvgl/libs/nema_gfx/lib/core/cortex_m33_revC/gcc}
+```
+
 Click "Apply and Close".
 
 <Callout type="info">
@@ -67,7 +82,7 @@ The library version for ST was updated to `revC` so the path component
 `cortex_m33` must be updated to `cortex_m33_revC` in STM32CubeIDE.
 </Callout>
 
-32 and 16 bit <ApiLink name="LV_COLOR_DEPTH" /> is supported.
+32 and 16 bit <ApiLink name="LV_COLOR_DEPTH" /> are supported.
 
 NeoChrom requires a simple HAL implementation to allocate memory and optionally
 lock resources. You may use a custom HAL implementation for your platform or use one of the

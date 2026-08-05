@@ -1,40 +1,47 @@
 ---
 title: "2D Direct Memory Access (DMA2D) Support"
-description: "Some chips from Espressif such as the ESP32-P4 family features a peripheral that enhances the copy of 2-D data from a place to another, including output this 2-D data to other peripherals."
+description: "The DMA2D peripheral of chips like the ESP32-P4 copies 2-D data without CPU intervention. The Espressif LVGL port uses it to move rendered buffers to the display."
+faqs:
+  - question: "Does LVGL talk to the DMA2D peripheral directly?"
+    answer: "No. The display driver of the Espressif LVGL port component uses DMA2D to copy the drawn buffer to the display buffer without CPU intervention."
+  - question: "How do I enable the DMA2D transfer in the LVGL port?"
+    answer: "Set CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR in sdkconfig.defaults. It is only available with PSRAM and double buffer mode, otherwise the build fails with a compiler error."
+  - question: "Can I enable DMA2D when configuring the display manually?"
+    answer: "Yes, set dpi_config.flags.use_dma2d to true in the panel configuration at runtime."
 ---
 
 ## Overview
 
-Some chips from Espressif such as the ESP32-P4 family features a peripheral
-that enhances the copy of 2-D data from a place to another, including output
-this 2-D data to other peripherals.
+Some Espressif chips, such as the ESP32-P4 family, feature a peripheral that speeds up
+copying 2-D data from one place to another, including sending that 2-D data to other
+peripherals.
 
-This peripheral is the 2-D direct memory access, or DMA2D, the Espressif
-SDK, the IDF, offers a full featured driver for the DMA2D that is automatically
-enabled on the supported chips.
+This peripheral is the 2-D direct memory access, or DMA2D. ESP-IDF offers a full-featured
+driver for it that is automatically enabled on the supported chips.
 
-One of its primary roles is to serve as support for the Pixel Processor Accelerator
-the PPA, being used to copy the source image data to the desired PPA client splitting
-these data into fixed size blocks, called bursts. Also the DMA2D is used to pick the
-output chunks from the PPA client and copy over to the destination buffer, or the display
-frame-buffer.
+One of its primary roles is to support the Pixel Processing Accelerator (PPA): it copies the
+source image data to the desired PPA client, splitting the data into fixed size blocks called
+bursts. The DMA2D is also used to pick the output chunks from the PPA client and copy them to
+the destination buffer, or the display frame buffer.
 
 More information about PPA can be found in: [PPA (Pixel Processing Accelerator) Support](/integration/chip_vendors/espressif/hardware_accelerator_ppa).
 
-### Interacting to the DMA2D
+## Interacting with the DMA2D
 
-The LVGL does not interact directly to the DMA2D, instead, the Espressif LVGL port component
-display driver uses the DMA2D to copy the target drawn buffer to the display buffer without CPU
-intervention. Even though this option is available the user is responsible to explicitly enable
-it on the display driver of the LVGL port component.
+LVGL does not interact with the DMA2D directly. Instead, the display driver of the Espressif
+LVGL port component uses the DMA2D to copy the drawn buffer to the display buffer without CPU
+intervention. This has to be enabled explicitly on the display driver of the port component.
 
-To enabling it the user should set on its `sdkconfig.defaults` the `CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR`,
-which will tell the driver to use the DMA2D to optimize transfer. Please notice that enabling
-this option will be only available when using the PSRAM memory and double buffer mode, otherwise
-a compiler error will be raised.
+To enable it, set `CONFIG_BSP_DISPLAY_LVGL_AVOID_TEAR` in your `sdkconfig.defaults`, which tells
+the driver to use the DMA2D to optimize the transfer.
 
-If the user is configuring the display manually, it is possible to enable the DMA2D in runtime by
-setting the DMA2D flag to true:
+<Callout type="warn">
+This option is only available when using PSRAM memory and double buffer mode, otherwise a
+compiler error is raised.
+</Callout>
+
+If you configure the display manually, the DMA2D can be enabled at runtime by setting the DMA2D
+flag to true:
 
 ```c
 /* Gets the default configuration for the MIPI display controller */
