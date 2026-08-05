@@ -116,6 +116,10 @@ void * lv_malloc_zeroed(size_t size)
 void * lv_calloc(size_t num, size_t size)
 {
     LV_TRACE_MEM("allocating number of %zu each %zu bytes", num, size);
+    if (num != 0 && size > ((size_t)-1) / num) {
+        LV_LOG_WARN("lv_calloc: overflow detected (num=%zu, size=%zu)", num, size);
+        return NULL;
+    }
     return lv_malloc_zeroed(num * size);
 }
 

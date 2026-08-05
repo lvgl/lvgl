@@ -70,7 +70,7 @@ void * lv_malloc(size_t size);
  * Allocate a block of zeroed memory dynamically
  * @param num requested number of element to be allocated.
  * @param size requested size of each element in bytes.
- * @return pointer to allocated zeroed memory, or NULL on failure
+ * @return pointer to allocated zeroed memory, or NULL on failure or overflow
  */
 void * lv_calloc(size_t num, size_t size);
 
