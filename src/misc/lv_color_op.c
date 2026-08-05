@@ -67,7 +67,7 @@ lv_color32_t lv_color_mix32_premultiplied(lv_color32_t fg, lv_color32_t bg)
         return bg;  /* Fully transparent foreground, return background */
     }
 
-    uint32_t inv_fg_alpha = LV_OPA_MAX - fg.alpha;
+    uint32_t inv_fg_alpha = 255 - fg.alpha;
 
     /* Premultiplied blending */
     bg.red   = fg.red   + ((bg.red   * inv_fg_alpha) >> 8);

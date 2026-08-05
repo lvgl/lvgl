@@ -245,14 +245,23 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                 uint8_t * dest_buf_ori = dsc->dest_buf;
                 w *= dest_px_size;
 
-                for(x = 0; x < w; x += 3) {
+                /*Render the first row by writing the first few pixels byte-by-byte
+                 *and doubling them with memcpy (it copies words instead of bytes)*/
+                int32_t filled = w < 12 ? w : 12;
+                for(x = 0; x < filled; x += 3) {
                     dest_buf_u8[x + 0] = dsc->color.blue;
                     dest_buf_u8[x + 1] = dsc->color.green;
                     dest_buf_u8[x + 2] = dsc->color.red;
                 }
+                while(filled * 2 <= w) {
+                    lv_memcpy(dest_buf_u8 + filled, dest_buf_u8, filled);
+                    filled *= 2;
+                }
+                if(filled < w) lv_memcpy(dest_buf_u8 + filled, dest_buf_u8, w - filled);
 
                 dest_buf_u8 += dest_stride;
 
+                /*Copy the first row to all other rows*/
                 for(y = 1; y < h; y++) {
                     lv_memcpy(dest_buf_u8, dest_buf_ori, w);
                     dest_buf_u8 += dest_stride;
@@ -295,12 +304,22 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
     /*Opacity only*/
     else if(mask == NULL && opa < LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA(dsc, dest_px_size)) {
-            uint32_t color32 = lv_color_to_u32(dsc->color);
             uint8_t * dest_buf = dsc->dest_buf;
             w *= dest_px_size;
+
+            /*As the color and the opacity are constant for the whole fill premultiply them once.
+             *The per-pixel blend is branch-free and the channels are independent,
+             *so the compiler can vectorize the loop.*/
+            uint32_t mix_inv = 255 - opa;
+            uint32_t fg_b_premult = (uint32_t)dsc->color.blue * opa;
+            uint32_t fg_g_premult = (uint32_t)dsc->color.green * opa;
+            uint32_t fg_r_premult = (uint32_t)dsc->color.red * opa;
+
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x += dest_px_size) {
-                    lv_color_24_24_mix((const uint8_t *)&color32, &dest_buf[x], opa);
+                    dest_buf[x + 0] = (uint8_t)((fg_b_premult + dest_buf[x + 0] * mix_inv) >> 8);
+                    dest_buf[x + 1] = (uint8_t)((fg_g_premult + dest_buf[x + 1] * mix_inv) >> 8);
+                    dest_buf[x + 2] = (uint8_t)((fg_r_premult + dest_buf[x + 2] * mix_inv) >> 8);
                 }
 
                 dest_buf = drawbuf_next_row(dest_buf, dest_stride);
@@ -955,10 +974,13 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_24_24_mix_premult(const uint8_
         dest[2] = src[2];
     }
     else {
+        /*Weight the first and third background channels in one 32 bit value with
+         *a single multiplication. The 16 bit lanes can't overflow as their max value is 255 * 255*/
         lv_opa_t mix_inv = 255 - mix;
-        dest[0] = (uint32_t)src[0] + ((uint32_t)(dest[0] * mix_inv) >> 8);
+        uint32_t rb = (((uint32_t)dest[2] << 16) | dest[0]) * mix_inv;
+        dest[0] = (uint8_t)(src[0] + ((rb >> 8) & 0xFF));
         dest[1] = (uint32_t)src[1] + ((uint32_t)(dest[1] * mix_inv) >> 8);
-        dest[2] = (uint32_t)src[2] + ((uint32_t)(dest[2] * mix_inv) >> 8);
+        dest[2] = (uint8_t)(src[2] + (rb >> 24));
     }
 }
 
@@ -999,11 +1021,13 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
                         lv_color32_t src_pixel = src_buf_c32[src_x];
                         if(src_pixel.alpha > 0) {
-                            uint16_t reciprocal = (255 * 256) / src_pixel.alpha;
-                            src_pixel.red   = (src_pixel.red   * reciprocal) >> 8;
-                            src_pixel.green = (src_pixel.green * reciprocal) >> 8;
-                            src_pixel.blue  = (src_pixel.blue  * reciprocal) >> 8;
-                            lv_color_24_24_mix((const uint8_t *)&src_pixel, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, opa));
+                            /*No need to unpremultiply: scale the premultiplied channels by `opa` and
+                             *blend the background with the remaining (255 - alpha * opa) weight*/
+                            uint8_t src_scaled[3];
+                            src_scaled[0] = LV_OPA_MIX2(src_pixel.blue, opa);
+                            src_scaled[1] = LV_OPA_MIX2(src_pixel.green, opa);
+                            src_scaled[2] = LV_OPA_MIX2(src_pixel.red, opa);
+                            lv_color_24_24_mix_premult(src_scaled, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, opa));
                         }
                     }
                     dest_buf += dest_stride;
@@ -1017,11 +1041,13 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
                         lv_color32_t src_pixel = src_buf_c32[src_x];
                         if(src_pixel.alpha > 0) {
-                            uint16_t reciprocal = (255 * 256) / src_pixel.alpha;
-                            src_pixel.red   = (src_pixel.red   * reciprocal) >> 8;
-                            src_pixel.green = (src_pixel.green * reciprocal) >> 8;
-                            src_pixel.blue  = (src_pixel.blue  * reciprocal) >> 8;
-                            lv_color_24_24_mix((const uint8_t *)&src_pixel, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, mask_buf[src_x]));
+                            /*No need to unpremultiply: scale the premultiplied channels by the mask and
+                             *blend the background with the remaining (255 - alpha * mask) weight*/
+                            uint8_t src_scaled[3];
+                            src_scaled[0] = LV_OPA_MIX2(src_pixel.blue, mask_buf[src_x]);
+                            src_scaled[1] = LV_OPA_MIX2(src_pixel.green, mask_buf[src_x]);
+                            src_scaled[2] = LV_OPA_MIX2(src_pixel.red, mask_buf[src_x]);
+                            lv_color_24_24_mix_premult(src_scaled, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, mask_buf[src_x]));
                         }
                     }
                     dest_buf += dest_stride;
@@ -1036,11 +1062,14 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
                         lv_color32_t src_pixel = src_buf_c32[src_x];
                         if(src_pixel.alpha > 0) {
-                            uint16_t reciprocal = (255 * 256) / src_pixel.alpha;
-                            src_pixel.red   = (src_pixel.red   * reciprocal) >> 8;
-                            src_pixel.green = (src_pixel.green * reciprocal) >> 8;
-                            src_pixel.blue  = (src_pixel.blue  * reciprocal) >> 8;
-                            lv_color_24_24_mix((const uint8_t *)&src_pixel, &dest_buf[dest_x], LV_OPA_MIX3(src_pixel.alpha, mask_buf[src_x], opa));
+                            /*No need to unpremultiply: scale the premultiplied channels by mask * opa and
+                             *blend the background with the remaining (255 - alpha * mask * opa) weight*/
+                            uint8_t scale = LV_OPA_MIX2(mask_buf[src_x], opa);
+                            uint8_t src_scaled[3];
+                            src_scaled[0] = LV_OPA_MIX2(src_pixel.blue, scale);
+                            src_scaled[1] = LV_OPA_MIX2(src_pixel.green, scale);
+                            src_scaled[2] = LV_OPA_MIX2(src_pixel.red, scale);
+                            lv_color_24_24_mix_premult(src_scaled, &dest_buf[dest_x], LV_OPA_MIX2(src_pixel.alpha, scale));
                         }
                     }
                     dest_buf += dest_stride;
@@ -1117,10 +1146,14 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_8_24_mix(const uint8_t src, ui
         dest[2] = src;
     }
     else {
+        /*Mix the first and third channels in one 32 bit value with a single
+         *multiplication each. The 16 bit lanes can't overflow as their max value is 255 * 255*/
         lv_opa_t mix_inv = 255 - mix;
-        dest[0] = (uint32_t)((uint32_t)src * mix + dest[0] * mix_inv) >> 8;
+        uint32_t rb = ((((uint32_t)src << 16) | src) * mix) +
+                      ((((uint32_t)dest[2] << 16) | dest[0]) * mix_inv);
+        dest[0] = (uint8_t)(rb >> 8);
         dest[1] = (uint32_t)((uint32_t)src * mix + dest[1] * mix_inv) >> 8;
-        dest[2] = (uint32_t)((uint32_t)src * mix + dest[2] * mix_inv) >> 8;
+        dest[2] = (uint8_t)(rb >> 24);
     }
 }
 
@@ -1135,10 +1168,14 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_24_24_mix(const uint8_t * src,
         dest[2] = src[2];
     }
     else {
+        /*Mix the first and third channels in one 32 bit value with a single
+         *multiplication each. The 16 bit lanes can't overflow as their max value is 255 * 255*/
         lv_opa_t mix_inv = 255 - mix;
-        dest[0] = (uint32_t)((uint32_t)src[0] * mix + dest[0] * mix_inv) >> 8;
+        uint32_t rb = ((((uint32_t)src[2] << 16) | src[0]) * mix) +
+                      ((((uint32_t)dest[2] << 16) | dest[0]) * mix_inv);
+        dest[0] = (uint8_t)(rb >> 8);
         dest[1] = (uint32_t)((uint32_t)src[1] * mix + dest[1] * mix_inv) >> 8;
-        dest[2] = (uint32_t)((uint32_t)src[2] * mix + dest[2] * mix_inv) >> 8;
+        dest[2] = (uint8_t)(rb >> 24);
     }
 }
 

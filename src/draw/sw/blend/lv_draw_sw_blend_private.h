@@ -79,6 +79,84 @@ struct _lv_draw_sw_blend_image_dsc_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Inlined version of lv_color_16_16_mix() for the per-pixel blend loops.
+ * Identical to the public function, but being in a header it can be inlined
+ * and loop-invariant parts (e.g. a constant fill color) can be hoisted out of the loops.
+ * @param c1        the first color (typically the foreground color)
+ * @param c2        the second color (typically the background color)
+ * @param mix       0..255, the opacity of `c1`
+ * @return          the mixed color
+ */
+static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_16_16_mix_inlined(uint16_t c1, uint16_t c2, uint8_t mix)
+{
+    if(mix == 255) return c1;
+    if(mix == 0) return c2;
+    if(c1 == c2) return c1;
+
+    /* Source: https://stackoverflow.com/a/50012418/1999969*/
+    uint32_t mix5 = ((uint32_t)mix + 4) >> 3;
+
+    /*0x7E0F81F = 0b00000111111000001111100000011111*/
+    uint32_t bg = (uint32_t)(c2 | ((uint32_t)c2 << 16)) & 0x7E0F81F;
+    uint32_t fg = (uint32_t)(c1 | ((uint32_t)c1 << 16)) & 0x7E0F81F;
+    uint32_t result = ((((fg - bg) * mix5) >> 5) + bg) & 0x7E0F81F;
+
+    return (uint16_t)((result >> 16) | result);
+}
+
+/**
+ * Inlined version of lv_color_mix32() for the per-pixel blend loops.
+ * Identical to the public function, but being in a header it can be inlined,
+ * sparing a function call per pixel.
+ * The channels are mixed independently on purpose: superscalar CPUs can compute
+ * them in parallel, which is faster than packing them into one 32 bit value.
+ * @param fg        the foreground color, fg.alpha is the mix ratio
+ * @param bg        the background color
+ * @return          the mixed color, the alpha of `bg` is kept
+ */
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_mix32_inlined(lv_color32_t fg, lv_color32_t bg)
+{
+    if(fg.alpha >= LV_OPA_MAX) {
+        fg.alpha = bg.alpha;
+        return fg;
+    }
+    if(fg.alpha <= LV_OPA_MIN) {
+        return bg;
+    }
+
+    uint32_t mix_inv = 255 - fg.alpha;
+    bg.red = (uint8_t)LV_UDIV255((uint32_t)fg.red * fg.alpha + (uint32_t)bg.red * mix_inv);
+    bg.green = (uint8_t)LV_UDIV255((uint32_t)fg.green * fg.alpha + (uint32_t)bg.green * mix_inv);
+    bg.blue = (uint8_t)LV_UDIV255((uint32_t)fg.blue * fg.alpha + (uint32_t)bg.blue * mix_inv);
+    return bg;
+}
+
+/**
+ * Inlined version of lv_color_mix32_premultiplied() for the per-pixel blend loops.
+ * The premultiplied foreground is added as is and the background is weighted
+ * with the remaining alpha.
+ * @param fg        the premultiplied foreground color, fg.alpha is the mix ratio
+ * @param bg        the background color
+ * @return          the mixed color, the alpha of `bg` is kept
+ */
+static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_mix32_premultiplied_inlined(lv_color32_t fg,
+                                                                                      lv_color32_t bg)
+{
+    if(fg.alpha >= LV_OPA_MAX) {
+        return fg;
+    }
+    if(fg.alpha <= LV_OPA_MIN) {
+        return bg;
+    }
+
+    uint32_t mix_inv = 255 - fg.alpha;
+    bg.red = (uint8_t)(fg.red + (((uint32_t)bg.red * mix_inv) >> 8));
+    bg.green = (uint8_t)(fg.green + (((uint32_t)bg.green * mix_inv) >> 8));
+    bg.blue = (uint8_t)(fg.blue + (((uint32_t)bg.blue * mix_inv) >> 8));
+    return bg;
+}
+
 /**********************
  *      MACROS
  **********************/

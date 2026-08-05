@@ -186,8 +186,12 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                         img_dsc.opa = glyph_draw_dsc->opa;
                         img_dsc.src = glyph_draw_dsc->glyph_data;
                         img_dsc.recolor = glyph_draw_dsc->color;
+                        /* The letter_coords box is the glyph bitmap (the ink box), not the advance
+                         * box, so the pivot must be relative to the ink box: subtract the left side
+                         * bearing on X (mirror of `box_h + ofs_y` on Y). Without it the glyph rotates
+                         * around a per-glyph wrong point, misaligning rotated text (e.g. arc labels). */
                         img_dsc.pivot = (lv_point_t) {
-                            .x = glyph_draw_dsc->pivot.x,
+                            .x = glyph_draw_dsc->pivot.x - glyph_draw_dsc->g->ofs_x,
                             .y = glyph_draw_dsc->g->box_h + glyph_draw_dsc->g->ofs_y
                         };
                         lv_draw_sw_image(t, &img_dsc, glyph_draw_dsc->letter_coords);
