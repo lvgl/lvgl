@@ -43,6 +43,13 @@ void test_calloc(void)
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
 }
 
+void test_calloc_overflow(void)
+{
+    const size_t max_half = ((size_t) -1) / 2 + 1;
+    TEST_ASSERT_NULL(lv_calloc(max_half, 2));
+    TEST_ASSERT_NULL(lv_calloc(2, max_half));
+}
+
 void test_zalloc(void)
 {
     uint32_t mem = lv_test_get_free_mem();
