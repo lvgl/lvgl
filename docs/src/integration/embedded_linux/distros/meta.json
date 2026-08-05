@@ -1,4 +1,4 @@
 {
   "title": "Distro and OS Support",
-  "pages": ["buildroot", "yocto", "torizon"]
+  "pages": ["ubuntu", "buildroot", "yocto", "torizon"]
 }
