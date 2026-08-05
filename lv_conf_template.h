@@ -1778,6 +1778,15 @@
  */
 #define LV_WAYLAND_USE_SHM 1
 
+/** Presents software-rendered frames through linear DMA-BUFs that the
+ *  compositor can scan out directly, saving its copy out of shared memory.
+ *  Requires a compositor with zwp_linux_dmabuf_v1 and a gbm implementation
+ *  able to allocate CPU-mappable buffers, plus libdrm and gbm (-ldrm -lgbm).
+ *  Needs no GPU API: unavailable with the OpenGL ES and NanoVG renderers,
+ *  which can only render into a GPU surface.
+ */
+#define LV_WAYLAND_USE_DMABUF 0
+
 #endif /*!LV_USE_DRAW_NANOVG*/
 #endif /*!LV_USE_DRAW_OPENGLES*/
 

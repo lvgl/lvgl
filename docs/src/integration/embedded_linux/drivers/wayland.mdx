@@ -1,6 +1,6 @@
 ---
 title: Wayland
-description: "The Wayland driver renders LVGL into a Wayland surface and reads keyboard, pointer and touch input from the compositor. It supports shared-memory, OpenGL ES and NXP G2D rendering backends, and picks between the ones you compile in at runtime."
+description: "The Wayland driver renders LVGL into a Wayland surface and reads keyboard, pointer and touch input from the compositor. It supports shared-memory, DMA-BUF, OpenGL ES and NXP G2D rendering backends, and picks between the ones you compile in at runtime."
 ---
 
 ## Overview
@@ -10,9 +10,10 @@ It suits production deployments, kiosk interfaces, control panels, and other emb
 Wayland compositor. Additionally it can be useful for development on a Linux desktop, as an alternative to the
 [X11](/integration/embedded_linux/drivers/X11) and [SDL](/integration/pc/sdl) drivers.
 
-The driver offers three rendering backends: **SHM** (shared memory, the default), **EGL** (OpenGL ES) and
-**G2D** (NXP i.MX 2D accelerator). Which one produces the frames determines whether that work lands on the
-CPU or on hardware; everything else about the driver stays the same.
+The driver offers four rendering backends: **SHM** (shared memory, the default), **DMA-BUF**, **EGL**
+(OpenGL ES) and **G2D** (NXP i.MX 2D accelerator). Which one produces the frames determines how they reach
+the compositor and whether that work lands on the CPU or on hardware; everything else about the driver
+stays the same.
 
 You do not have to commit to one at build time. Compile in as many as make sense for your target and the
 driver probes them when it opens a window, taking the first one that works.
@@ -38,23 +39,20 @@ Turn on every one you want compiled into the binary:
 | Symbol | Backend | Default |
 |---|---|---|
 | `LV_WAYLAND_USE_SHM` | Shared memory via `wl_shm` | on, except with a GPU draw unit |
-| `LV_WAYLAND_USE_EGL` | OpenGL ES via EGL | off; under Kconfig, on with a GPU draw unit |
+| `LV_WAYLAND_USE_DMABUF` | Software frames presented as linear DMA-BUFs | off |
+| `LV_WAYLAND_USE_EGL` | OpenGL ES via EGL | off; on with a GPU draw unit |
 | `LV_WAYLAND_USE_G2D` | NXP i.MX G2D accelerator | off |
 
 At least one has to be enabled; the build fails otherwise. Enabling several is the interesting case, see
 [Runtime backend selection](#runtime-backend-selection) for how the driver chooses between them.
 
-Each accelerated backend requires some extra libraries:
+Some backends require some extra libraries:
 
 | Backend | Extra libraries |
 |---|---|
-| `LV_WAYLAND_USE_EGL` | `wayland-egl`, plus `libdrm` and `gbm` for the [DMA-BUF fast path](#dma-buf-fast-path) |
+| `LV_WAYLAND_USE_EGL` | `wayland-egl` |
 | `LV_WAYLAND_USE_G2D` | `g2d`, `libdrm` |
-
-<Callout type="info">
-`LV_USE_G2D` is deprecated and has no effect. The G2D backend is driven entirely by
-<ApiLink name="LV_USE_DRAW_G2D" />.
-</Callout>
+| `LV_WAYLAND_USE_DMABUF` | `libdrm`, `libgbm` |
 
 <Callout type="warning" title="A GPU draw unit leaves EGL as the only option">
 SHM and G2D hand LVGL a CPU buffer, which the <ApiLink name="LV_USE_DRAW_OPENGLES" /> and
@@ -70,11 +68,12 @@ Backend selection happens in two steps.
 compiled-in backend is initialized and gets to bind the compositor globals it needs. A backend that fails
 here is dropped for the rest of the process and is not considered again.
 
-**At window creation** the surviving backends are tried in a fixed order, fastest first:
+**At window creation** the surviving backends are tried in a fixed order of preference:
 
-1. EGL
-2. G2D
-3. SHM
+1. G2D
+2. DMA-BUF
+3. EGL
+4. SHM
 
 The first one that can set up a display for that window owns it. If none can,
 <ApiLink name="lv_wayland_window_create" /> returns `NULL`.
@@ -90,8 +89,9 @@ At this time, the EGL backend can only drive one window. The work to support mul
 | Enable | Result |
 |---|---|
 | SHM | The default. Works on any compositor, no hardware requirements. |
-| SHM + EGL | Zero-copy DMA-BUF presentation where the GPU stack supports it, plain shared memory where it does not. One binary for both. |
+| SHM + DMA-BUF | Software rendering either way, but the compositor scans the frames out directly where DMA-BUF works and copies them out of shared memory where it does not. One binary for both. |
 | SHM + G2D | Hardware blits and rotation on i.MX parts, shared memory elsewhere or when DMA-BUF is unavailable. |
+| SHM + EGL | GPU rendering where the GPU stack is usable, shared memory where it is not. Under a software renderer this also pulls in DMA-BUF, which is tried ahead of EGL. |
 | EGL | Required when <ApiLink name="LV_USE_DRAW_OPENGLES" /> or <ApiLink name="LV_USE_DRAW_NANOVG" /> is enabled. No fallback is possible. |
 
 ### Other options
@@ -173,33 +173,12 @@ compositor's file descriptor to poll.
 
 ## Rendering Backends
 
-Listed in the order the driver tries them.
-
 ### EGL
 
 Renders through OpenGL ES 2.0 and EGL, and is the backend to use with LVGL's GPU draw units and
 [3D/glTF content](/integration/embedded_linux/opengl). Rotation is done by the GPU at no extra copy.
 
-Requires OpenGL ES 2.0 on the target and the `wayland-egl` library. It bows out at window creation when no
-EGL context can be created — no driver, no usable config — which is what makes it safe to pair with SHM in
-a binary that has to run on machines with and without a working GPU stack.
-
-#### DMA-BUF fast path
-
-When the EGL backend is enabled but **no GPU draw unit** is, LVGL still renders in
-software, and the EGL backend presents those frames through the `zwp_linux_dmabuf_v1` protocol instead of
-copying them. On platforms with zero-copy buffer sharing this is measurably faster than the classic path,
-and the backend falls back to the classic path automatically when the support is missing.
-
-This is derived, not configured: LVGL turns on `LV_WAYLAND_USE_DMABUF` for you and adds `libdrm` and `gbm`
-to the build. Enabling a GPU draw unit turns the fast path off, because rendering then happens on the GPU
-and there is nothing to blit.
-
-Requirements, all handled by LVGL's CMake integration:
-
-- A compositor advertising `zwp_linux_dmabuf_v1`, and a GPU/display driver that supports DMA-BUF
-- `libdrm` and `gbm`, used to allocate the shared buffers
-- The `linux-dmabuf-v1` protocol bindings, generated at build time
+Requires linking with `wayland-egl` and OpenGL ES 2.0 on the target.
 
 ### G2D
 
@@ -207,14 +186,31 @@ Uses NXP's G2D 2D accelerator, available on i.MX 6 and i.MX 8 parts, for hardwar
 rotation, presenting frames through DMA-BUF. It needs the `g2d` library on the system and the
 [G2D draw unit](/integration/chip_vendors/nxp/g2d_gpu) enabled alongside the display path.
 
-Because it presents through DMA-BUF it drops out on a compositor that does not advertise
-`zwp_linux_dmabuf_v1`, or when the buffers cannot be allocated.
+Requires linking with `g2d` and a compositor with `zwp_linux_dmabuf_v1` support.
+
+### DMA-BUF
+
+A software backend that changes how finished frames reach the compositor rather than how they are drawn.
+LVGL renders on the CPU as usual; on flush the frame is copied into a linear DMA-BUF allocated through GBM
+and posted with `zwp_linux_dmabuf_v1`. The compositor can scan that buffer out directly, which saves it the
+copy out of shared memory that `wl_shm` costs, the win is on the compositor's side of the connection, not
+in LVGL's rendering.
+
+It needs no GPU API of any kind, only `libdrm` and `libgbm` to allocate the buffers, so it is available on
+plenty of targets that cannot run the EGL backend. What it does need at runtime is a DRM primary node it
+can open, which means the process must have permission to do so. 
+
+Rotation is handled in software, folded into that flush copy — unlike SHM there is no extra full-frame
+buffer and no additional pass.
+
+Requires linking with `libdrm` and `libgbm` and a compositor with `zwp_linux_dmabuf_v1` support.
+
 
 ### SHM (default)
 
-Renders into `wl_shm` shared-memory buffers. Works on every Wayland compositor and needs no particular
-hardware, at the cost of CPU blitting. It is tried last precisely because it is the one that always works,
-keep it enabled as the safety net under an accelerated backend.
+Renders into `wl_shm` shared-memory buffers.
+
+No extra requirements.
 
 ## Window Decorations
 
@@ -228,16 +224,16 @@ widgets. For fullscreen and kiosk applications, you can simply omit them.
 
 ## Support
 
-| Capability | EGL | G2D | SHM |
-|---|---|---|---|
-| Rotation | Hardware (GPU) | Hardware (G2D) | Software (extra full-frame copy) |
-| Runtime resolution change | Yes | Yes | Yes |
-| Runtime color format change | Yes | Yes | Yes |
-| Color formats | RGB565 or ARGB8888, from <ApiLink name="LV_COLOR_DEPTH" /> | RGB565, XRGB8888, ARGB8888 | RGB565, XRGB8888, ARGB8888 |
-| Multiple displays / windows | Yes | Yes | Yes |
-| Hardware acceleration | OpenGL ES | NXP G2D | None |
-| Render mode | Full with NanoVG, otherwise Direct — fixed | Direct — fixed | Direct — fixed |
-| Input | Built in — keyboard, pointer, touch, encoder per window | Built in | Built in |
+| Capability | DMA-BUF | EGL | G2D | SHM |
+|---|---|---|---|---|
+| Rotation | Software (folded into the flush copy) | Hardware (GPU) | Hardware (G2D) | Software (extra full-frame copy) |
+| Runtime resolution change | Yes | Yes | Yes | Yes |
+| Runtime color format change | Yes | Yes | Yes | Yes |
+| Color formats | RGB565, XRGB8888, ARGB8888 | RGB565 or ARGB8888, from <ApiLink name="LV_COLOR_DEPTH" /> | RGB565, XRGB8888, ARGB8888 | RGB565, XRGB8888, ARGB8888 |
+| Multiple displays / windows | Yes | Yes | Yes | Yes |
+| Hardware acceleration | None — presentation only | OpenGL ES | NXP G2D | None |
+| Render mode | Direct — fixed | Full with NanoVG, otherwise Direct — fixed | Direct — fixed | Direct — fixed |
+| Input | Built in — keyboard, pointer, touch, encoder per window | Built in | Built in | Built in |
 
 ## Reporting Bugs
 
