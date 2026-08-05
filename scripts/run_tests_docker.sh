@@ -14,7 +14,7 @@
 #   --64                  Build/run as 64-bit (default).
 #   --both                Run both 64-bit and 32-bit, back to back.
 #   --build-option <OPT>  Pass --build-options=<OPT> to tests/main.py
-#                         (e.g. OPTIONS_TEST_SYSHEAP, OPTIONS_16BIT, ...).
+#                         (e.g. OPTIONS_TEST_SYSHEAP, OPTIONS_MINIMAL, ...).
 #                         When omitted, main.py runs its full matrix.
 #   --test-suite <REGEX>  Pass --test-suite=<REGEX> to tests/main.py
 #                         (ctest --tests-regex filter).

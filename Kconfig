@@ -3253,6 +3253,14 @@ config LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
 		When a reference image does not exist yet, create it from the rendered
 		screen instead of failing the compare.
 
+config LV_USE_NANOVG_TEST_HEADLESS
+	bool "Headless EGL display for NanoVG"
+	depends on LV_USE_DRAW_NANOVG
+	help
+		Render into an off-screen EGL pbuffer instead of a window and read the
+		pixels back into the LVGL draw buffer, so screenshot compares work the
+		same way as with the software renderer. Requires EGL and GLESv2.
+
 endif #LV_USE_TEST
 
 	config LV_USE_MONKEY

@@ -54,6 +54,17 @@ if(CONFIG_LV_USE_GLFW)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/glfw.cmake)
 endif()
 
+# LV_USE_EGL dynamically loads egl so it doesn't appear here
+if(CONFIG_LV_USE_NANOVG_TEST_HEADLESS)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/egl.cmake)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/glesv2.cmake)
+endif()
+
+# ====== OS ====== #
+if(CONFIG_LV_USE_NUTTX_LIBUV)
+  include(${CMAKE_CURRENT_LIST_DIR}/dependencies/libuv.cmake)
+endif()
+
 # ====== Indev ====== #
 if(CONFIG_LV_USE_WAYLAND OR CONFIG_LV_USE_LIBINPUT)
   include(${CMAKE_CURRENT_LIST_DIR}/dependencies/xkbcommon.cmake)

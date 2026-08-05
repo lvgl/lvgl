@@ -20,12 +20,11 @@ jobs:
       fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
-        # See BUILD_OPTIONS in tests/CMakeLists.txt.
-        build_option: ['OPTIONS_NORMAL_8BIT',
-                       'OPTIONS_16BIT',
-                       'OPTIONS_24BIT',
-                       'OPTIONS_FULL_32BIT',
-                       'OPTIONS_SDL']
+        # See build_only_options and test_options in tests/main.py.
+        build_option: ['OPTIONS_MINIMAL',
+                       'OPTIONS_LINUX_SW',
+                       'OPTIONS_LINUX_OPENGLES',
+                       'OPTIONS_NUTTX']
     name: Build ${{ matrix.build_option }} - Ubuntu
     steps:
     - uses: actions/checkout@v7
@@ -48,10 +47,9 @@ jobs:
       fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
-        # See BUILD_OPTIONS in tests/CMakeLists.txt.
-        build_option: ['OPTIONS_16BIT',
-                       'OPTIONS_24BIT',
-                       'OPTIONS_FULL_32BIT']
+        # See build_only_options and test_options in tests/main.py.
+        build_option: ['OPTIONS_MINIMAL',
+                       'OPTIONS_WINDOWS_SW']
         compiler: [gcc, cl]
 
     name: Build ${{ matrix.build_option }} - ${{matrix.compiler }} - Windows
@@ -106,11 +104,12 @@ jobs:
   test-native:
     runs-on: ubuntu-24.04
     strategy:
-     matrix:
-       # A valid option parameter to the cmake file.
-       # See BUILD_OPTIONS in tests/CMakeLists.txt.
-       build_config: ['64bit build',
-                      '32bit build']
+      fail-fast: false
+      matrix:
+        # A valid option parameter to the cmake file.
+        # See build_only_options and test_options in tests/main.py.
+        build_config: ['64bit build',
+                       '32bit build']
     name: Run tests with ${{ matrix.build_config }}
     steps:
     - uses: actions/checkout@v7

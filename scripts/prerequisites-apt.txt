@@ -10,11 +10,13 @@ libwebp-dev
 libfreetype-dev
 libglfw3-dev
 libsdl2-dev
+libsdl2-image-dev
 libpng-dev:i386
 libjpeg-dev:i386
 libwebp-dev:i386
 libfreetype-dev:i386
 libsdl2-dev:i386
+libsdl2-image-dev:i386
 ruby-full
 gcovr
 cmake
@@ -46,3 +48,9 @@ libgl1-mesa-dri
 libegl-dev:i386
 libgles-dev:i386
 libgl1-mesa-dri:i386
+libx11-dev
+libx11-dev:i386
+libgbm-dev
+libgbm-dev:i386
+libgstreamer1.0-dev
+libgstreamer-plugins-base1.0-dev
