@@ -1,6 +1,15 @@
 ---
 title: Overview
-description: "Arm is a leading semiconductor and software design company, renowned for creating the Cortex-M microcontroller (MCU) cores and Cortex-A/R (MPU) processor cores, which are integral to a wide range o..."
+description: "Compiling LVGL for Arm Cortex-M, Cortex-A, and Cortex-R cores, and accelerating rendering with Helium, Neon, and Arm-2D."
+faqs:
+  - question: "Does LVGL need anything special to compile for Arm?"
+    answer: "No. Any compiler that supports the target Arm architecture works, including GCC, LLVM, and AC6. LVGL can also be cross-compiled for an MPU or built as a shared library."
+  - question: "Which compiler gives the best performance?"
+    answer: "AC6, because it is a proprietary toolchain with many Arm-specific optimizations. It is not free, but it offers a community license. GCC also has known issues with Helium intrinsics, so AC6 or LLVM is recommended for Helium code."
+  - question: "Which IDEs can I use?"
+    answer: "There are no limitations. LVGL works with Arm's Keil MDK, IAR, Renesas e² studio, NXP MCUXpresso, ST CubeIDE, and plain make or CMake projects."
+  - question: "How do I enable Neon acceleration?"
+    answer: "Set LV_USE_DRAW_SW_ASM to LV_DRAW_SW_ASM_NEON in lv_conf.h. Both 32-bit and 64-bit Arm architectures are supported, and Neon is mandatory on all 64-bit Cortex-A and Cortex-R processors from Armv8 on."
 ---
 
 Arm is a leading semiconductor and software design company, renowned for creating the Cortex-M microcontroller (MCU) cores and Cortex-A/R (MPU) processor cores, which are integral to a wide range of devices. These cores are at the heart of many embedded systems, powering chips from industry giants such as STMicroelectronics, NXP, and Renesas. Arm's energy-efficient designs are used in billions of devices worldwide, from microcontrollers to smartphones and servers. By licensing their processor designs, Arm enables a broad ecosystem of partners to develop customized solutions optimized for performance, power, and size. Arm's architecture is highly compatible with various operating systems and software libraries, including LVGL, making it a versatile choice for developers creating efficient, high-performance graphical user interfaces.
@@ -17,8 +26,20 @@ Since AC6 is a proprietary toolchain, it contains many specific optimizations, s
 
 AC6 is not free, but it offers a community license that can be activated as follows:
 
-1. Download and install the AC6 compiler from [Arm's website](https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Embedded).
-2. To register a community license, go to the `bin` folder of the compiler and, in a terminal, run `armlm.exe activate -server https://mdk-preview.keil.arm.com -product KEMDK-COM0` (On Linux, use `./armlm`).
+<Steps>
+
+<Step>
+**Install AC6**: Download and install the AC6 compiler from
+[Arm's website](https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Embedded).
+</Step>
+
+<Step>
+**Register a community license**: Go to the `bin` folder of the compiler and, in a terminal, run
+`armlm.exe activate -server https://mdk-preview.keil.arm.com -product KEMDK-COM0`. On Linux, use
+`./armlm`.
+</Step>
+
+</Steps>
 
 ## IDE Support
 
@@ -33,15 +54,57 @@ Note that GCC has some known issues with Helium intrinsics. It is recommended to
 
 To add Arm2D to your project, follow these steps:
 
-1. To utilize its power, ensure that `mcpu` is set to `cortex-m85`, `cortex-m55`, or `cortex-m52` and add the `-fvectorize` flag. To test without SIMD, use e.g. `cortex-m85+nomve`.
-2. Arm2D can be downloaded from [https://github.com/ARM-software/Arm-2D](https://github.com/ARM-software/Arm-2D). Consider using the `developing` branch, which contains the latest updates.
-3. Add `Arm-2D/Library/Include` to the include paths.
-4. Copy `Arm-2D/Library/Include/template/arm_2d_cfg.h` to any location you prefer to provide the default configuration for Arm2D. Ensure that the folder containing `arm_2d_cfg.h` is added to the include path.
-5. The Arm2D repository contains several examples and templates; however, ensure that only `Arm-2D/Library/Source` is compiled.
-6. The CMSIS DSP library also needs to be added to the project. You can use CMSIS-PACKS or add it manually.
-7. For better performance, enable `LTO` (Link Time Optimization) and use `-Omax` or `-Ofast`.
-8. Arm2D tries to read/write multiple data with a single instruction. Therefore, it's important to use the fastest memory (e.g., `BSS` or `TCM`) for LVGL's buffer to avoid memory bandwidth bottlenecks.
-9. Enable <ApiLink name="LV_USE_DRAW_ARM2D_SYNC" /> and set <ApiLink name="LV_USE_DRAW_SW_ASM" /> to <ApiLink name="LV_DRAW_SW_ASM_HELIUM" /> in `lv_conf.h`.
+<Steps>
+
+<Step>
+**Set the compiler flags**: To utilize its power, ensure that `mcpu` is set to `cortex-m85`,
+`cortex-m55`, or `cortex-m52` and add the `-fvectorize` flag. To test without SIMD, use e.g.
+`cortex-m85+nomve`.
+</Step>
+
+<Step>
+**Download Arm2D**: Arm2D can be downloaded from
+[ARM-software/Arm-2D](https://github.com/ARM-software/Arm-2D). Consider using the `developing`
+branch, which contains the latest updates.
+</Step>
+
+<Step>
+**Add the include paths**: Add `Arm-2D/Library/Include` to the include paths.
+</Step>
+
+<Step>
+**Add the configuration file**: Copy `Arm-2D/Library/Include/template/arm_2d_cfg.h` to any location
+you prefer to provide the default configuration for Arm2D. Ensure that the folder containing
+`arm_2d_cfg.h` is added to the include path.
+</Step>
+
+<Step>
+**Compile only the library sources**: The Arm2D repository contains several examples and templates;
+however, ensure that only `Arm-2D/Library/Source` is compiled.
+</Step>
+
+<Step>
+**Add CMSIS DSP**: The CMSIS DSP library also needs to be added to the project. You can use
+CMSIS-PACKS or add it manually.
+</Step>
+
+<Step>
+**Optimize the build**: For better performance, enable `LTO` (Link Time Optimization) and use
+`-Omax` or `-Ofast`.
+</Step>
+
+<Step>
+**Place the buffers in fast memory**: Arm2D tries to read/write multiple data with a single
+instruction. Therefore, it's important to use the fastest memory (e.g., `BSS` or `TCM`) for LVGL's
+buffer to avoid memory bandwidth bottlenecks.
+</Step>
+
+<Step>
+**Enable it in LVGL**: Enable <ApiLink name="LV_USE_DRAW_ARM2D_SYNC" /> and set
+<ApiLink name="LV_USE_DRAW_SW_ASM" /> to <ApiLink name="LV_DRAW_SW_ASM_HELIUM" /> in `lv_conf.h`.
+</Step>
+
+</Steps>
 
 ## Neon Acceleration
 

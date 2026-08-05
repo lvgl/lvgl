@@ -1,13 +1,25 @@
 ---
 title: "PPA (Pixel Processing Accelerator) Support"
-description: "Some ESP32 chip series, like the ESP32-P4 support the Pixel Processing Accelerator hardware (PPA), which is capable of speeding-up the filling and image blending operations, this peripheral works w..."
+description: "The PPA of chips like the ESP32-P4 accelerates fill and image blending operations. LVGL has an experimental PPA draw unit, and the Espressif port can also rotate and mirror with it."
+faqs:
+  - question: "How do I enable the PPA draw unit?"
+    answer: "Add CONFIG_LV_USE_PPA=y and CONFIG_LV_DRAW_BUF_ALIGN=64 to sdkconfig.defaults and rebuild. The draw unit then runs automatically alongside the software renderer, no application code is needed."
+  - question: "Why does my application crash after enabling the PPA?"
+    answer: "The draw buffer is probably not aligned to the 64-byte cache line size. Set CONFIG_LV_DRAW_BUF_ALIGN to 64."
+  - question: "How much performance does the PPA gain?"
+    answer: "About 30% of the rendering time on average for image and rectangle fill draw tasks, and up to 9x for pure fills on integer multiples of the display size. Image blending is operational but shows no significant gain because of DMA2D memory bandwidth."
+  - question: "Should I use the PPA in partial render mode?"
+    answer: "No. Use it with the double buffer support of the ESP LVGL port; in partial mode it offers no performance increase because of DMA2D memory bandwidth."
+  - question: "Can the PPA rotate and mirror the display?"
+    answer: "Yes, but that is a feature of the Espressif LVGL port display driver rather than of the draw unit. Enable CONFIG_LVGL_PORT_ENABLE_PPA and the rotation and mirroring become automatic."
 ---
 
 ## Overview
 
-Some ESP32 chip series, like the ESP32-P4 support the Pixel Processing Accelerator hardware (PPA), which is capable of
-speeding-up the filling and image blending operations, this peripheral works with the
-DMA-2D hardware which is responsible to move the input/output buffers into/from the PPA processing engine.
+Some ESP32 chip series, like the ESP32-P4, have a Pixel Processing Accelerator (PPA), which speeds
+up fill and image blending operations. This peripheral works together with the
+[DMA2D](/integration/chip_vendors/espressif/hardware_accelerator_dma2d) hardware, which moves the
+input and output buffers into and from the PPA processing engine.
 
 ### Supported devices
 
@@ -17,22 +29,22 @@ The Espressif targets that support the PPA are:
 
 ## Using the LVGL PPA draw unit on your ESP-IDF project
 
-LVGL supports, in experimental level, the filling and the image blending
-acceleration through the PPA, the user can enable it in their `sdkconfig.defaults` by
-adding the following option to enable the PPA [draw unit](/main-modules/draw) in conjunction with the software renderer, also:
-don't forget to make the draw buffers aligned with the cache line size, typically 64bytes:
+LVGL has experimental support for accelerating fills and image blending with the PPA. Enable the
+PPA [draw unit](/main-modules/draw), which runs in conjunction with the software renderer, by
+adding the following options to your `sdkconfig.defaults`. Don't forget to align the draw buffers
+to the cache line size, typically 64 bytes:
 
-```c
+```ini
 CONFIG_LV_USE_PPA=y
 CONFIG_LV_DRAW_BUF_ALIGN=64
 ```
 
-Save the file and then rebuild the project, this will be sufficient to add the PPA code and it will start to run automatically, so
-no further steps are required from the user code perspective.
+Save the file and rebuild the project. That is all that is needed: the PPA code starts to run
+automatically, no further steps are required in the application code.
 
-It is suggested to use PPA with the double buffer support of the ESP LVGL Port since it will not offer performance increase when using it in partial mode due
-to DMA2D memory bandwidth. To have the best performance and experience you can use the following snippet code to start the LVGL subsystem
-for ESP-IDF:
+It is recommended to use the PPA with the double buffer support of the ESP LVGL port, since it
+offers no performance increase in partial mode due to DMA2D memory bandwidth. For the best
+performance, use the following snippet to start the LVGL subsystem for ESP-IDF:
 
 ```c
 #include "lvgl.h"
@@ -40,49 +52,49 @@ for ESP-IDF:
 
 void app_main(void)
 {
-      bsp_display_cfg_t cfg = {
-      .lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
+    bsp_display_cfg_t cfg = {
+        .lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
 
-      /* Use buffers with the same size of the screen in pixels */
-      .buffer_size = BSP_LCD_H_RES * BSP_LCD_V_RES,
-      /* Use double buffer (possible with SPIRAM) */
-      .double_buffer = 1,
-      .hw_cfg = {
-   #if CONFIG_BSP_LCD_TYPE_HDMI
-   #if CONFIG_BSP_LCD_HDMI_800x600_60HZ
+        /* Use buffers with the same size as the screen in pixels */
+        .buffer_size = BSP_LCD_H_RES * BSP_LCD_V_RES,
+        /* Use double buffer (possible with SPIRAM) */
+        .double_buffer = 1,
+        .hw_cfg = {
+#if CONFIG_BSP_LCD_TYPE_HDMI
+#if CONFIG_BSP_LCD_HDMI_800x600_60HZ
             .hdmi_resolution = BSP_HDMI_RES_800x600,
-   #elif CONFIG_BSP_LCD_HDMI_1280x720_60HZ
+#elif CONFIG_BSP_LCD_HDMI_1280x720_60HZ
             .hdmi_resolution = BSP_HDMI_RES_1280x720,
-   #elif CONFIG_BSP_LCD_HDMI_1280x800_60HZ
+#elif CONFIG_BSP_LCD_HDMI_1280x800_60HZ
             .hdmi_resolution = BSP_HDMI_RES_1280x800,
-   #elif CONFIG_BSP_LCD_HDMI_1920x1080_30HZ
+#elif CONFIG_BSP_LCD_HDMI_1920x1080_30HZ
             .hdmi_resolution = BSP_HDMI_RES_1920x1080,
-   #endif
-   #else
+#endif
+#else
             .hdmi_resolution = BSP_HDMI_RES_NONE,
-   #endif
+#endif
             .dsi_bus = {
-               .phy_clk_src = MIPI_DSI_PHY_CLK_SRC_DEFAULT,
-               .lane_bit_rate_mbps = BSP_LCD_MIPI_DSI_LANE_BITRATE_MBPS,
+                .phy_clk_src = MIPI_DSI_PHY_CLK_SRC_DEFAULT,
+                .lane_bit_rate_mbps = BSP_LCD_MIPI_DSI_LANE_BITRATE_MBPS,
             }
-      },
-      .flags = {
-   #if CONFIG_BSP_LCD_COLOR_FORMAT_RGB888
+        },
+        .flags = {
+#if CONFIG_BSP_LCD_COLOR_FORMAT_RGB888
             .buff_dma = false,
-   #else
+#else
             .buff_dma = true,
-   #endif
+#endif
             /* Use SPIRAM when available */
             .buff_spiram = true,
             .sw_rotate = true,
-      }
-   };
+        }
+    };
 
-   bsp_display_start_with_config(&cfg);
-   bsp_display_backlight_on();
-   bsp_display_lock(0);
-   lv_demo_widgets();
-   bsp_display_unlock();
+    bsp_display_start_with_config(&cfg);
+    bsp_display_backlight_on();
+    bsp_display_lock(0);
+    lv_demo_widgets();
+    bsp_display_unlock();
 }
 ```
 
@@ -90,41 +102,34 @@ void app_main(void)
 
 When running the `lv_demo_benchmark` from LVGL the user can compare the performance when
 the PPA is enabled versus the pure software rendering, by using the latest version of the
-LVGL and LVGL port component it can be observed an average saving of 30% of the rendering
-time for draw tasks that are image and rectangle fill. On some cases for pure filling on
-integer multiples of the display size it is possible to observe up 9x of speed increase when
-the PPA is enabled.
+LVGL and LVGL port component, an average saving of 30% of the rendering time can be observed
+for image and rectangle fill draw tasks. In some cases, for pure fills on integer multiples of
+the display size, up to 9x speed increase is possible when the PPA is enabled.
 
 ### Limitations
 
-Please notice that the PPA is at experimental level where some performance gains are expected on drawing tasks related
-to rectangle copy or filling, while for image blending, even though it is operational, there are no significant gains,
-the initial cause for that according to the PPA section from reference manual is due to the DMA-2D memory bandwidth.
+The PPA support is experimental. Performance gains are expected on drawing tasks related to
+rectangle copy or filling. Image blending is operational but shows no significant gain; according
+to the PPA section of the reference manual, this is caused by the DMA2D memory bandwidth.
 
 ## Using the Espressif LVGL component PPA features
 
-The Espressif IDF LVGL port component also offers hardware acceleration
-for the display operations, that is it, once the LVGL render completes
-an operation and the draw buffer is already handled to the display driver,
-the Espressif component can optionally perform mirror and rotation of
-the rendered data using hardware assistance.
+The Espressif IDF LVGL port component also offers hardware acceleration for the display
+operations: once LVGL has finished rendering and the draw buffer has been handed to the display
+driver, the Espressif component can optionally mirror and rotate the rendered data with hardware
+assistance.
 
-The LVGL display driver for Espressif operates by reading the
-descriptor of the drawn data to check if rotation and mirror are flags
-set on the data properties, in positive case, before sending the data
-to the display, the mirror and rotation are performed first using the
-PPA rotation and mirror client.
+The LVGL display driver for Espressif reads the descriptor of the drawn data to check whether the
+rotation and mirror flags are set on the data properties. If they are, the mirroring and rotation
+are performed with the PPA rotation and mirror client before the data is sent to the display.
 
-When compared to pure software rotation, using the PPA to rotate the objects
-can save up 40% of rendering time in average, while keeping the CPU in idle
-saving power, or using it to perform other tasks, PPA rotation is asynchronous,
-and once started it will signal the application using its dedicated interrupt.
+Compared to pure software rotation, using the PPA to rotate saves up to 40% of the rendering time
+on average, while the CPU stays idle to save power or to perform other tasks. PPA rotation is
+asynchronous: once started, it signals the application through its dedicated interrupt.
 
-To enable such behavior on the display driver, the PPA acceleration should
-be set on the project `sdkconfig.defaults` via the symbol `CONFIG_LVGL_PORT_ENABLE_PPA`,
-setting it to true will make the hardware assistance for image rotation and mirroring
-automatic. No extra code is required.
+To enable this behavior on the display driver, set `CONFIG_LVGL_PORT_ENABLE_PPA` in the project's
+`sdkconfig.defaults`. Setting it to true makes the hardware assistance for image rotation and
+mirroring automatic. No extra code is required.
 
-Please notice that such option can be set via menuconfig using the
-standard IDF command for configuration: `idf.py menuconfig`.
+The option can also be set via `idf.py menuconfig`.
 

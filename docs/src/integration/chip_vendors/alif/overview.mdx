@@ -1,6 +1,17 @@
 ---
 title: Overview
 description: "Alif Semiconductor is a next-generation chip vendor making chips that come in a variety of configurations. Their chips are designed to excel at multiple aspects at once."
+faqs:
+  - question: "Which Alif project should I start from?"
+    answer: "The alif_m55-lvgl example project, which is based on the Alif VS Code Template. Any project based on that template has a nearly identical setup process."
+  - question: "Do I need the Alif Security Toolkit?"
+    answer: "Yes. Flashing goes through the Security Toolkit, and its extracted path has to be set as alif.setools.root in the VS Code settings.json."
+  - question: "Flashing fails or asks for a COM port again. What should I do?"
+    answer: "The serial port chosen on the first flash is saved as the default. Run the Program with Security Toolkit (select COM port) configuration to override it."
+  - question: "Should I build for the HP or the HE core?"
+    answer: "Build for the HP (High Performance) core and pick the release build type for the best LVGL performance. The HE (High Efficiency) core is the choice when power usage matters more."
+  - question: "Is the GPU used for rendering?"
+    answer: "Yes, the example project renders with LVGL's D/AVE 2D draw unit. See the Dave2D GPU page."
 ---
 
 Alif Semiconductor is a next-generation chip vendor making chips that come in a
@@ -23,11 +34,15 @@ such as with Zephyr RTOS. See [Alif's GitHub repos](https://github.com/orgs/alif
 
 This guide is for Linux and Windows.
 
-This project uses D/AVE 2D rendering acceleration with LVGL's D/AVE 2D [draw unit](/main-modules/draw).
+This project uses D/AVE 2D rendering acceleration with LVGL's
+[D/AVE 2D draw unit](/integration/chip_vendors/alif/dave2d_gpu).
 
 ### Step-by-Step Guide
 
-#### Install Visual Studio Code
+<Steps>
+
+<Step>
+**Install Visual Studio Code**
 
 Install Visual Studio code. There are different ways of installing it depending on your platform.
 [See here](https://code.visualstudio.com/docs/setup/setup-overview).
@@ -44,22 +59,26 @@ ports so you can flash from it.
 Install the "Dev Containers" VS Code extension. Select your container from the "Remote Explorer" on the left
 side panel.
 </Callout>
+</Step>
 
-#### Install Prerequisite tools
+<Step>
+**Install the Prerequisite Tools**
 
 Make sure these are installed in your environment. The VS Code extensions rely on these being present.
 
 - `git`
 - `curl`
 - `unzip`
+</Step>
 
-#### Install the Alif SE Tools
+<Step>
+**Install the Alif SE Tools**
 
 Create an Alif account and download the tools from
 [here](https://alifsemi.com/support/software-tools/ensemble/) under "Alif Security Toolkit".
 Extract it. The path where it was extracted will be needed later.
 
-On Linux, extracting can be done by running the following
+On Linux, extracting can be done by running the following:
 
 ```bash
 cd
@@ -69,21 +88,27 @@ pwd
 ```
 
 Among the results of `ls` you should see `app-release-exec-linux`. That, combined
-with the output of `pwd`, is the path you need to use later. I.e.,
+with the output of `pwd`, is the path you need to use later, e.g.
 `/home/you/app-release-exec-linux`.
+</Step>
 
-#### Install J-Link Software (optional)
+<Step>
+**Install J-Link Software (optional)**
 
 Download the latest stable version of the [J-Link Software](https://www.segger.com/downloads/jlink).
 Its installation path will be needed later.
+</Step>
 
-#### Clone the `alif_m55-lvgl` Project
+<Step>
+**Clone the `alif_m55-lvgl` Project**
 
 ```bash
 git clone --recursive https://github.com/alifsemi/alif_m55-lvgl
 ```
+</Step>
 
-#### Open `alif_m55-lvgl` in VS Code
+<Step>
+**Open `alif_m55-lvgl` in VS Code**
 
 Open the cloned repo in VS Code. For the VS Code extensions to work properly,
 it's recommended to open the folder in VS Code instead of opening a
@@ -93,35 +118,44 @@ containing parent directory.
 code alif_m55-lvgl
 ```
 
-or navigate to **File \> Open Folder** in VS Code and open `alif_m55-lvgl`.
+or navigate to **File > Open Folder** in VS Code and open `alif_m55-lvgl`.
 
 If you are prompted to automatically install recommended extensions, click
 "install" so you can skip the next step.
+</Step>
 
-#### Install Required VS Code Extensions
+<Step>
+**Install Required VS Code Extensions**
 
-Install the following VS Code extensions from the "Extensions" side panel
+Install the following VS Code extensions from the "Extensions" side panel:
 
 - Arm Tools Environment Manager
 - Arm CMSIS Solution
 - C/C++ Extension Pack
-- Cortex-Debug (optional. needed for debugging)
+- Cortex-Debug (optional, needed for debugging)
+</Step>
 
-#### Activate Environment
+<Step>
+**Activate Environment**
 
-If it hasn't happened automatically, Click "Arm Tools" on the bottom bar and then
+If it hasn't happened automatically, click "Arm Tools" on the bottom bar and then
 click "Activate Environment" in the list that appears. It will install CMake,
 ninja-build, a GCC ARM compiler, and cmsis-toolbox.
 
 If you only see "Reactivate Environment" then it is likely already active.
+</Step>
 
-#### Set the Paths of Installed Tools
+<Step>
+**Set the Paths of Installed Tools**
 
-Press ctrl + shift + p. Type "preferences" and select the option
+Press <Kbd>Ctrl</Kbd> + <Kbd>Shift</Kbd> + <Kbd>P</Kbd>. Type "preferences" and select the option
 "Preferences: Open User Settings (JSON)" from the choices.
-A `settings.json` will open. Note: if using a Docker container,
-it's better to edit the JSON file in the project directory at
+A `settings.json` will open.
+
+<Callout type="info">
+If using a Docker container, it's better to edit the JSON file in the project directory at
 `.vscode/settings.json`.
+</Callout>
 
 You need to add some entries (at least `"alif.setools.root"`)
 to the JSON you see.
@@ -148,29 +182,37 @@ If your `settings.json` looks like this initially...
 
 The above uses Windows paths as an example. A Linux path to the Alif SE Tools may look
 something like `"/home/you/app-release-exec-linux"`.
+</Step>
 
-#### Configure the Board Variant
+<Step>
+**Configure the Board Variant**
 
 Open the
 [board.h file](https://github.com/alifsemi/alif_vscode-template/blob/ce5423dbd15f62cb0aa4462533a960d79a014f97/board/board.h#L23-L30).
 
 Identify your board variant in the list and set `BOARD_ALIF_DEVKIT_VARIANT` to the correct value.
 You may also need to set `BOARD_ILI9806E_PANEL_VARIANT` if the default does not match yours.
+</Step>
 
-#### Set Up the Build Context, Compile, and Flash
+<Step>
+**Set Up the Build Context**
 
 Get to the "Manage Solution" view from the CMSIS Solution extension. You can reach
 it by either clicking the gear icon on the bottom bar or by navigating to the CMSIS panel
 on the left and clicking the gear at the top of that view. When it's open, it's a
 graphical editor tab called "Manage Solution" with a gear icon.
 
-**Important**
-
-Under "Run and Debug" \> "Run Configuration" (column) \> "alif" (row), click the dropdown and select
+<Callout type="warn">
+Under "Run and Debug" > "Run Configuration" (column) > "alif" (row), click the dropdown and select
 "First time pack installation". Click the play icon at the top of the CMSIS left side panel.
 In your terminal you should see CMSIS packs being installed. Wait for it to complete.
+</Callout>
+</Step>
 
-Now you can click the hammer icon next to the play icon to compile the project.
+<Step>
+**Compile and Flash**
+
+Click the hammer icon next to the play icon to compile the project.
 A few hundred files will be compiled. Wait for it to complete.
 
 Open the dropdown from before and choose "Prepare program with Security Toolkit". Click the
@@ -183,6 +225,9 @@ need to open the dropdown and choose "Program with Security Toolkit (select COM 
 to override the previous one which was saved as default.
 
 The LVGL benchmark should run on your Alif board after flashing completes.
+</Step>
+
+</Steps>
 
 ### More Info
 

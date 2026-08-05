@@ -1,6 +1,15 @@
 ---
 title: RZ/G Family
-description: "Supported boards in the RZ/G Family:"
+description: "Build and run the ready-to-use LVGL projects of the Linux-capable RZ/G2L, RZ/G2UL, and RZ/G3E evaluation kits with their cross-compiler SDKs."
+faqs:
+  - question: "Which display driver is used on the RZ/G boards?"
+    answer: "The G2L has a Wayland desktop so the project appears as a Wayland window. The G2UL has no desktop, so the project runs fullscreen with the fbdev driver. The G3E project runs fullscreen with the OpenGL EGL+DRM driver."
+  - question: "Why does the G2L and G2UL project use LVGL v8.3?"
+    answer: "The SDK of these boards currently ships LVGL v8.3, and the project mirrors the SDK version even though LVGL is statically linked. Newer versions can be used, see the v8-to-v9 migration guide for what needs to be addressed."
+  - question: "Why is the screen still showing the vendor demo instead of my application?"
+    answer: "A demo started automatically at boot is still using the display. On the G2UL run systemctl stop demo-launcher, and on the G3E stop the Wayland desktop with systemctl stop weston before starting the project."
+  - question: "Can I download the projects as a .zip from GitHub?"
+    answer: "No. The LVGL sources come from a git submodule and a GitHub .zip does not contain submodules, so clone the repositories with --recurse-submodules instead."
 ---
 
 Supported boards in the RZ/G Family:
@@ -11,35 +20,55 @@ Supported boards in the RZ/G Family:
 
 ## G2L and G2UL
 
+The RZ/G2L and RZ/G2UL are MPUs with support for running Linux. Projects are built for them
+using a cross-compiler CLI toolchain SDK in a Linux PC environment (WSL, Docker,
+etc. can be used on Windows).
+
+The G2L has a Wayland desktop and the project appears as a Wayland window. The G2UL
+does not have a desktop so the project is fullscreen and uses the `fbdev` driver.
+
+<Callout type="info">
+The SDK currently uses LVGL v8.3 so this project uses this version to mirror the SDK
+version, even though LVGL is statically linked. You may try using newer versions of LVGL.
+See the [v8-to-v9 Migration Guide](https://docs.lvgl.io/9.0/CHANGELOG.html#migration-guide)
+for things you will need to address.
+</Callout>
+
 ### Run the Project
 
-- The RZ/G2L and RZ/G2UL are MPUs with support for running Linux. Projects are built for them
-  using a cross-compiler CLI toolchain SDK in a Linux PC environment (WSL, Docker,
-  etc. can be used on Windows).
-- The G2L has a Wayland desktop and the project appears as a Wayland window. The G2UL
-  does not have a desktop so the project is fullscreen and uses the `fbdev` driver.
-- The SDK currently uses LVGL v8.3 so this project uses this version to mirror the SDK
-  version, even though LVGL is statically linked. You may try using newer versions of LVGL.
-  See the [v8-to-v9 Migration Guide](https://docs.lvgl.io/9.0/CHANGELOG.html#migration-guide) for things you will need to address.
-- Clone the ready-to-use repository for your selected board:
+<Steps>
 
+<Step>
+**Clone the project**: Clone the ready-to-use repository for your selected board:
 
 ```bash
-    git clone https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit --recurse-submodules
+git clone https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit --recurse-submodules
 ```
 
 Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
+</Step>
 
-- Follow the instructions in the project README.md to obtain the SD Card image and toolchain installer,
-  build, and upload the project to the board.
-- Stop any automatically started demos (on G2UL run `systemctl stop demo-launcher` in the terminal).
-- Run the project:
+<Step>
+**Build and upload**: Follow the instructions in the project's `README.md` to obtain the SD Card
+image and toolchain installer, build, and upload the project to the board.
+</Step>
+
+<Step>
+**Free up the display**: Stop any automatically started demos. On the G2UL run
+`systemctl stop demo-launcher` in the terminal.
+</Step>
+
+<Step>
+**Run the project**:
 
 ```bash
-    ./lvgl_demo_benchmark
+./lvgl_demo_benchmark
 ```
+</Step>
 
-### Modify the project
+</Steps>
+
+### Modify the Project
 
 #### Open a demo
 
@@ -56,34 +85,53 @@ LVGL statically for customizability and to port the LVGL v9 benchmark from LVGL 
 
 ## G3E
 
+The RZ/G3E is a high-performance quad-core MPU. Projects are built for it using an
+SDK that was generated with Yocto. You can customize a Yocto image+SDK or use the
+pre-built ones. The SDK is intended for a Linux PC environment (WSL, Docker,
+etc. can be used on Windows).
+
+The G3E has a Wayland desktop but it should be stopped with `systemctl stop weston`
+before running the default project, since that runs in fullscreen using the OpenGL EGL+DRM driver.
+
+LVGL is not included in the SDK so you should build whichever version you need. Later
+versions of LVGL include the optimal OpenGL driver.
+
 ### Run the Project
 
-- The RZ/G3E is a high-performance quad-core MPU. Projects are built for it using an
-  SDK that was generated with Yocto. You can customize a Yocto image+SDK or use the
-  pre-built ones. The SDK is intended for a Linux PC environment (WSL, Docker,
-  etc. can be used on Windows).
-- The G3E has a Wayland desktop but it should be stopped with `systemctl stop weston`
-  before running the default project since it runs in fullscreen using the OpenGL EGL+DRM driver.
-- LVGL is not included in the SDK so you should build whichever version you need. Later
-  versions of LVGL include the optimal OpenGL driver.
-- Clone the ready-to-use repository:
+<Steps>
+
+<Step>
+**Clone the project**: Clone the ready-to-use repository:
 
 ```bash
-    git clone https://github.com/lvgl/lv_port_renesas_rz-g3e-evkit --recurse-submodules
+git clone https://github.com/lvgl/lv_port_renesas_rz-g3e-evkit --recurse-submodules
 ```
 
 Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
+</Step>
 
-- Follow the instructions in the project README.md to flash the board bootloader and obtain the
-  Yocto SD Card image and SDK (pre-built or custom-built), build, and upload the project to the board.
-- Stop the Wayland desktop if using the OpenGL, DRM, or fbdev drivers. Run `systemctl stop weston` in the terminal.
-- Run the project:
+<Step>
+**Build and upload**: Follow the instructions in the project's `README.md` to flash the board
+bootloader and obtain the Yocto SD Card image and SDK (pre-built or custom-built), build, and
+upload the project to the board.
+</Step>
+
+<Step>
+**Free up the display**: Stop the Wayland desktop if using the OpenGL, DRM, or fbdev drivers.
+Run `systemctl stop weston` in the terminal.
+</Step>
+
+<Step>
+**Run the project**:
 
 ```bash
 ./lvglsim
 ```
+</Step>
 
-### Modify the project
+</Steps>
+
+### Modify the Project
 
 #### Open a demo
 
@@ -94,7 +142,7 @@ and call some `lv_example_...()` functions, or add your own custom code.
 
 #### Configuration
 
-Edit `lv_conf.h` to configure LVGL. You can edit `lv_conf.defaults` --- a sparse
+Edit `lv_conf.h` to configure LVGL. You can edit `lv_conf.defaults` — a sparse
 version of `lv_conf.h` which you can use to regenerate `lv_conf.h` by running
 
 ```bash
