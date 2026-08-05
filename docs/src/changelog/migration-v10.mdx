@@ -138,9 +138,10 @@ Set it to one of the predefined GPU/revision combinations:
 
 #### Drivers
 
-Each backend-selecting driver (SDL, Wayland and DRM) now exposes an explicit `LV_<DRIVER>_BACKEND` choice instead of inferring the backend automatically.
+No driver infers its rendering backend from the enabled draw units any more. SDL and DRM now expose an explicit `LV_<DRIVER>_BACKEND` choice; Wayland instead lets you
+enable each of its backends individually and resolves between them at runtime. See below.
 
-The `LV_<DRIVER>_AUTO_BACKEND` flags (enabled by default) exist purely to ease migration: they let LVGL reproduce the old auto-detected backend so existing projects
+Their `LV_<DRIVER>_AUTO_BACKEND` flags (enabled by default) exist purely to ease migration: they let LVGL reproduce the old auto-detected backend so existing projects
 don't silently switch to a different backend on update simply because they never set one explicitly. Leaving an `_AUTO_BACKEND` flag enabled triggers a build-time warning.
 These flags are not meant to be relied on going forward and will be removed for v10, every project should set its backend explicitly with `LV_<DRIVER>_BACKEND` and then
 disable the corresponding `_AUTO_BACKEND` flag to silence the warning.
@@ -172,14 +173,29 @@ Set `LV_LINUX_DRM_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_LI
 
   `LV_USE_LINUX_DRM_GBM_BUFFERS` is no longer a user-facing setting. It is now set internally and automatically enabled whenever the `EGL` or `GBM` backend is selected; it should no longer be set directly in `lv_conf.h`.
 
-- **Wayland** — while `LV_WAYLAND_AUTO_BACKEND` is enabled, the backend is inferred the legacy way: EGL when `LV_USE_OPENGLES` is enabled, otherwise G2D when `LV_USE_DRAW_G2D` is enabled, otherwise SHM.
-Set `LV_WAYLAND_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_WAYLAND_BACKEND`:
+- **Wayland** — the backend is no longer inferred, and no longer has to be a single one.
 
-  | Value | Backend |
-  |---|---|
-  | `LV_WAYLAND_BACKEND_SHM` | SHM (Shared Memory) |
-  | `LV_WAYLAND_BACKEND_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) |
-  | `LV_WAYLAND_BACKEND_G2D` | G2D (NXP i.MX hardware accelerator; enable: `LV_USE_DRAW_G2D`) |
+  Previously `LV_WAYLAND_USE_SHM`, `LV_WAYLAND_USE_EGL` and `LV_WAYLAND_USE_G2D` were derived internally and mutually exclusive: enabling `LV_USE_OPENGLES` gave you EGL,
+  otherwise enabling `LV_USE_G2D` gave you G2D, otherwise you got SHM. Setting them in `lv_conf.h` had no effect.
+
+  They are now ordinary options that you set yourself, and **more than one may be enabled at a time**:
+
+  | Symbol | Backend | Default |
+  |---|---|---|
+  | `LV_WAYLAND_USE_SHM` | SHM (Shared Memory) | on, except with a GPU draw unit |
+  | `LV_WAYLAND_USE_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) | off; under Kconfig, on with a GPU draw unit |
+  | `LV_WAYLAND_USE_G2D` | G2D (NXP i.MX hardware accelerator; enable: `LV_USE_DRAW_G2D`) | off |
+
+  To reproduce exactly what you had before, enable the one backend the old rules would have picked for your config. `LV_USE_G2D` no longer plays a part in the choice:
+  it is a deprecated no-op (see [No-op options kept for compatibility](#no-op-options-kept-for-compatibility)) and the G2D backend is now tied to `LV_USE_DRAW_G2D`.
+
+  | You had | Backend you got | Add |
+  |---|---|---|
+  | `LV_USE_OPENGLES` = 1 | EGL | `LV_WAYLAND_USE_EGL` = 1 (keep `LV_USE_OPENGLES`) |
+  | `LV_USE_G2D` = 1 | G2D | `LV_WAYLAND_USE_G2D` = 1 and `LV_USE_DRAW_G2D` = 1 |
+  | neither | SHM | nothing — `LV_WAYLAND_USE_SHM` is on by default |
+
+  See the [Wayland driver docs](/integration/embedded_linux/drivers/wayland#runtime-backend-selection) for more information.
 
 - **X11** — render mode (unrelated to backend selection) is now a single value mapped onto the standard `LV_DISPLAY_RENDER_MODE_*` constants:
 

@@ -12,63 +12,38 @@ config LV_WAYLAND_DIRECT_EXIT
 	help
 		LVGL is deinitialized before the application exits.
 
-config LV_WAYLAND_AUTO_BACKEND
-	bool "Auto-select the Wayland backend (legacy)"
-	default y
-	help
-	  Legacy behavior, slated for removal: the backend defaults to SHM and any
-	  LV_WAYLAND_USE_* set directly in lv_conf.h is honored. Disable this and pick
-	  a backend explicitly in the "Rendering backend" choice.
-
-choice
-	prompt "Rendering backend"
-	default LV_WAYLAND_BACKEND_SHM
-	depends on !LV_WAYLAND_AUTO_BACKEND
-	help
-	  Select the rendering backend used by the Wayland driver.
-
-	config LV_WAYLAND_BACKEND_SHM
-		bool "SHM (Shared Memory)"
-		select LV_WAYLAND_USE_SHM
-		help
-		  Default backend, using wl_shm for double-buffered direct rendering.
-		  Compatible with all Wayland compositors; no special hardware required.
-
-	config LV_WAYLAND_BACKEND_EGL
-		bool "EGL (OpenGL ES, hardware-accelerated)"
-		select LV_WAYLAND_USE_EGL
-		select LV_USE_OPENGLES
-		help
-		  Hardware-accelerated rendering via OpenGL ES 2.0 and EGL, compatible
-		  with LVGL 3D/glTF rendering. Requires OpenGL ES 2.0 on the target
-		  hardware and linking with wayland-egl (-lwayland-egl).
-
-	config LV_WAYLAND_BACKEND_G2D
-		bool "G2D (NXP i.MX hardware accelerator)"
-		select LV_WAYLAND_USE_G2D
-		select LV_USE_DRAW_G2D
-		help
-		  Hardware-accelerated 2D rendering via NXP's G2D engine.
-		  Supports NXP i.MX6/i.MX8 platforms with G2D library installed.
-endchoice
-
-config LV_WAYLAND_BACKEND
-	int
-	default 0 if LV_WAYLAND_BACKEND_SHM
-	default 1 if LV_WAYLAND_BACKEND_EGL
-	default 2 if LV_WAYLAND_BACKEND_G2D
-
 config LV_WAYLAND_USE_SHM
-	bool
+	bool "SHM (Shared Memory) Backend"
+	default y
+	depends on !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
+	help
+		Default backend, using wl_shm for double-buffered direct rendering.
+		Compatible with all Wayland compositors; no special hardware required.
+		Unavailable with the OpenGL ES and NanoVG renderers, which can only
+		render into a GPU surface.
 
 config LV_WAYLAND_USE_EGL
-	bool
+	bool "EGL (OpenGL ES, hardware-accelerated) Backend"
+	default y if LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
 	select LV_USE_EGL
+	select LV_USE_OPENGLES
 	select LV_WAYLAND_USE_DMABUF if !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
+	help
+	  Hardware-accelerated rendering via OpenGL ES 2.0 and EGL, compatible
+	  with LVGL 3D/glTF rendering. Requires OpenGL ES 2.0 on the target
+	  hardware and linking with wayland-egl (-lwayland-egl).
+	  The only backend available with the OpenGL ES and NanoVG renderers.
 
 config LV_WAYLAND_USE_G2D
-	bool
+	bool "G2D (NXP i.MX hardware accelerator)"
+	depends on !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG
+	select LV_USE_DRAW_G2D
 	select LV_WAYLAND_USE_DMABUF
+	help
+	  Hardware-accelerated 2D rendering via NXP's G2D engine.
+	  Supports NXP i.MX6/i.MX8 platforms with G2D library installed.
+	  Unavailable with the OpenGL ES and NanoVG renderers, which can only
+	  render into a GPU surface.
 
 config LV_WAYLAND_USE_DMABUF
 	bool
