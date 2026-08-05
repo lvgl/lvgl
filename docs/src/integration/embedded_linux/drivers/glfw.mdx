@@ -1,74 +1,86 @@
 ---
 title: GLFW
-description: "The GLFW display/input driver offers support for creating LVGL displays and keyboard/mouse inputs that can be used in an OpenGL context. It can be used like Wayland, XCB, SDL or Qt or it can be use..."
+description: "The GLFW driver opens a window with an OpenGL context and reads mouse and keyboard input. It is the quickest way to get LVGL running with GPU rendering on a PC-like platform."
 ---
 
 ## Overview
 
-The **GLFW** display/input driver offers support for creating
-LVGL displays and keyboard/mouse inputs that can be used in an OpenGL context.
-It can be used like **Wayland**, **XCB**, **SDL** or **Qt** or it can be used for more embedded applications.
+The **GLFW** display/input driver opens a window with an OpenGL context and reads mouse and keyboard input.
 
-The GLFW driver is a quick way to get started on PC-like platforms.
+## Configuration
 
-## Getting Started with GLFW
+Enable <ApiLink name="LV_USE_GLFW" />.
 
-### Prerequisites
+<Callout type="warning" title="GLFW and EGL are mutually exclusive">
+<ApiLink name="LV_USE_GLFW" /> cannot be combined with `EGL`.
+GLFW manages the context itself, so the two window-system layers would collide.
+</Callout>
 
-Install GLFW: `sudo apt-get install libglfw3-dev`
 
-### Configure GLFW Driver
+## Building
 
-1. Required linked libraries: -lglfw
-2. Enable the GLFW driver and Opengles support in `lv_conf.h`, via cmake compiler define or via KConfig
+The driver always requires `GLFW`.
 
-```c
-#define LV_USE_GLFW  1
-#define LV_USE_OPENGLES  1
-```
+<Callout type="tip">
+LVGL's CMake integration resolves it for you.
+It can be fetched at compile time by LVGL so it doesn't have to be present on your system.
 
-### Basic Usage
+See [Dependency Management](/integration/building/cmake).
+</Callout>
+
+## GPU Rendering
+
+To render on the GPU rather than blitting software-rendered pixels, also enable one of the draw units:
+
+| Symbol | Effect |
+|---|---|
+| <ApiLink name="LV_USE_DRAW_NANOVG" /> | Vector rendering on the GPU. Recommended — best performance and feature coverage. |
+| <ApiLink name="LV_USE_DRAW_OPENGLES" /> | Caches software-rendered areas as GPU textures. |
+
+Neither is required: with no draw unit enabled the driver still works, rendering in software and uploading
+the result to the window.
+
+## Usage
+
+<Callout type="tip">
+[LVGL's linux port](https://github.com/lvgl/lv_port_linux) can be used to quickly get started with LVGL's GLFW backend.
+</Callout>
+
+<ApiLink name="lv_opengles_glfw_window_create" /> opens the window and initializes OpenGL. The third
+argument enables the mouse input device. <ApiLink name="lv_opengles_window_display_create" /> then gives you
+a display that renders into that window.
 
 ```c
 #include "lvgl/lvgl.h"
-#include "lvgl/examples/lv_examples.h"
 #include "lvgl/demos/lv_demos.h"
 
-#define WIDTH 640
+#define WIDTH  640
 #define HEIGHT 480
 
-int main()
+int main(void)
 {
-    /* initialize lvgl */
     lv_init();
 
-    /* create a window and initialize OpenGL */
+    /* Create a window and initialize OpenGL */
     lv_opengles_window_t * window = lv_opengles_glfw_window_create(WIDTH, HEIGHT, true);
 
-    /* create a display that flushes to a texture */
-    lv_display_t * texture = lv_opengles_texture_create(WIDTH, HEIGHT);
-    lv_display_set_default(texture);
+    /* Create a display that renders into the window */
+    lv_display_t * disp = lv_opengles_window_display_create(window, WIDTH, HEIGHT);
+    lv_display_set_default(disp);
 
-    /* add the texture to the window */
-    unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
-    lv_opengles_window_texture_t * window_texture = lv_opengles_window_add_texture(window, texture_id, WIDTH, HEIGHT);
-
-    /* get the mouse indev of the window texture */
-    lv_indev_t * mouse = lv_opengles_window_texture_get_mouse_indev(window_texture);
-
-    /* add a cursor to the mouse indev */
+    /* Add a cursor to the window's mouse indev */
+    lv_opengles_window_texture_t * wt = lv_opengles_window_display_get_window_texture(disp);
+    lv_indev_t * mouse = lv_opengles_window_texture_get_mouse_indev(wt);
     LV_IMAGE_DECLARE(mouse_cursor_icon);
     lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());
     lv_image_set_src(cursor_obj, &mouse_cursor_icon);
     lv_indev_set_cursor(mouse, cursor_obj);
 
-    /* create Widgets on the screen */
     lv_demo_widgets();
 
-    while (1)
-    {
+    while(1) {
         uint32_t time_until_next = lv_timer_handler();
-        if(time_until_next == LV_NO_TIMER_READY) time_until_next = LV_DEF_REFR_PERIOD; /*handle LV_NO_TIMER_READY. Another option is to `sleep` for longer*/
+        if(time_until_next == LV_NO_TIMER_READY) time_until_next = LV_DEF_REFR_PERIOD;
         lv_delay_ms(time_until_next);
     }
 
@@ -76,125 +88,75 @@ int main()
 }
 ```
 
-### Advanced Usage
+Multiple windows can be created, each with its own displays.
 
-The GLFW driver can draw textures from the user. A third-party library could be
-used to add content to a texture and the driver will draw the texture in the window.
+## Compositing Textures in a Window
+
+A GLFW window can draw any number of OpenGL textures, positioned and blended independently. That covers two
+cases: several LVGL displays in one window, and LVGL displaying textures produced by another library.
+
+Use <ApiLink name="lv_opengles_texture_create" /> for an LVGL display that renders into its own texture, and
+<ApiLink name="lv_opengles_window_add_texture" /> to place any texture id in the window.
 
 ```c
 #include "lvgl/lvgl.h"
-#include <GLFW/glfw3.h>
 
-#define WIDTH 640
+#define WIDTH  640
 #define HEIGHT 480
 
-void custom_texture_example(void)
+void composite_example(lv_opengles_window_t * window)
 {
-    /*****************
-    *  MAIN WINDOW
-    *****************/
+    /* A second LVGL display, rendering into its own texture */
+    const int32_t sub_w = 300, sub_h = 300;
+    lv_display_t * sub = lv_opengles_texture_create(sub_w, sub_h);
+    unsigned int sub_id = lv_opengles_texture_get_texture_id(sub);
+    lv_opengles_window_texture_t * sub_wt =
+        lv_opengles_window_add_texture(window, sub_id, sub_w, sub_h);
 
-    /* create a window and initialize OpenGL */
-    /* multiple windows can be created */
-    lv_opengles_window_t * window = lv_opengles_glfw_window_create(WIDTH, HEIGHT, true);
-
-    /****************************
-    *   OPTIONAL MAIN TEXTURE
-    ****************************/
-
-    /* create a main display that flushes to a texture */
-    lv_display_t * main_texture = lv_opengles_texture_create(WIDTH, HEIGHT);
-    lv_display_set_default(main_texture);
-
-    /* add the main texture to the window */
-    unsigned int main_texture_id = lv_opengles_texture_get_texture_id(main_texture);
-    lv_opengles_window_texture_t * window_main_texture = lv_opengles_window_add_texture(window, main_texture_id, WIDTH, HEIGHT);
-
-    /* get the mouse indev of this main texture */
-    lv_indev_t * main_texture_mouse = lv_opengles_window_texture_get_mouse_indev(window_main_texture);
-
-    /* add a cursor to the mouse indev */
-    LV_IMAGE_DECLARE(mouse_cursor_icon);
-    lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());
-    lv_image_set_src(cursor_obj, &mouse_cursor_icon);
-    lv_indev_set_cursor(main_texture_mouse, cursor_obj);
-
-    /* create Widgets on the screen of the main texture */
-    lv_demo_widgets();
-
-    /**********************
-    *   ANOTHER TEXTURE
-    **********************/
-
-    /* create a sub display that flushes to a texture */
-    const int32_t sub_texture_w = 300;
-    const int32_t sub_texture_h = 300;
-    lv_display_t * sub_texture = lv_opengles_texture_create(sub_texture_w, sub_texture_h);
-
-    /* add the sub texture to the window */
-    unsigned int sub_texture_id = lv_opengles_texture_get_texture_id(sub_texture);
-    lv_opengles_window_texture_t * window_sub_texture = lv_opengles_window_add_texture(window, sub_texture_id, sub_texture_w, sub_texture_h);
-
-    /* create Widgets on the screen of the sub texture */
-    lv_display_set_default(sub_texture);
+    /* Build its UI */
+    lv_display_t * saved = lv_display_get_default();
+    lv_display_set_default(sub);
     lv_example_keyboard_2();
-    lv_display_set_default(main_texture);
+    lv_display_set_default(saved);
 
-    /* position the sub texture within the window */
-    lv_opengles_window_texture_set_x(window_sub_texture, 250);
-    lv_opengles_window_texture_set_y(window_sub_texture, 150);
+    /* Position it in the window and make it translucent */
+    lv_opengles_window_texture_set_x(sub_wt, 250);
+    lv_opengles_window_texture_set_y(sub_wt, 150);
+    lv_opengles_window_texture_set_opa(sub_wt, LV_OPA_80);
 
-    /* optionally change the opacity of the sub texture */
-    lv_opengles_window_texture_set_opa(window_sub_texture, LV_OPA_80);
+    /* A texture owned by some other library can be added the same way */
+    lv_opengles_window_add_texture(window, external_texture_id, ext_w, ext_h);
 
-    /*********************************************
-    *   USE AN EXTERNAL OPENGL TEXTURE IN LVGL
-    *********************************************/
-
-    unsigned int external_texture_id;
-    glGenTextures(1, &external_texture_id);
-    glBindTexture(GL_TEXTURE_2D, external_texture_id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    LV_IMAGE_DECLARE(img_cogwheel_argb);
-#if LV_COLOR_DEPTH == 8
-    const int texture_format = GL_R8;
-#elif LV_COLOR_DEPTH == 16
-    const int texture_format = GL_RGB565;
-#elif LV_COLOR_DEPTH == 24
-    const int texture_format = GL_RGB;
-#elif LV_COLOR_DEPTH == 32
-    const int texture_format = GL_RGBA;
-#else
-#error("Unsupported color format")
-#endif
-    glTexImage2D(GL_TEXTURE_2D, 0, texture_format, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_cogwheel_argb.data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    /* add the external texture to the window */
-    lv_opengles_window_texture_t * window_external_texture = lv_opengles_window_add_texture(window, external_texture_id, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h);
-
-    /* set the position and opacity of the external texture within the window */
-    lv_opengles_window_texture_set_x(window_external_texture, 20);
-    lv_opengles_window_texture_set_y(window_external_texture, 20);
-    lv_opengles_window_texture_set_opa(window_external_texture, LV_OPA_70);
-
-    /*********************************************
-    *   USE AN LVGL TEXTURE IN ANOTHER LIBRARY
-    *********************************************/
-
-    lv_refr_now(sub_texture);
-
-    /* the texture is drawn on by LVGL and can be used by anything that uses OpenGL textures */
-    third_party_lib_use_texture(sub_texture_id);
+    /* Going the other way: render the LVGL texture, then hand it to another library */
+    lv_refr_now(sub);
+    third_party_lib_use_texture(sub_id);
 }
 ```
 
-## Improving Performance
+<ApiLink name="lv_opengles_window_texture_remove" /> takes a texture back out of the window.
 
-There is a renderer in LVGL which caches software-rendered areas as OpenGL textures.
-See [OpenGL Texture Caching Renderer](/integration/embedded_linux/drivers/opengl_driver) to learn more about it.
+To wrap a texture your own code allocated in an LVGL display instead, use
+<ApiLink name="lv_opengles_texture_create_from_texture_id" />. See
+[OpenGL Driver](/integration/embedded_linux/drivers/opengl_driver) for the texture-only driver, which
+assumes you manage the context and the window yourself.
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Rotation | Hardware (GPU) |
+| Runtime resolution change | No |
+| Runtime color format change | No |
+| Color formats | Derived from <ApiLink name="LV_COLOR_DEPTH" /> |
+| Multiple displays / windows | Yes |
+| Hardware acceleration | OpenGL ES, via <ApiLink name="LV_USE_DRAW_NANOVG" /> or <ApiLink name="LV_USE_DRAW_OPENGLES" /> |
+| Render mode | Full with <ApiLink name="LV_USE_DRAW_OPENGLES" />, otherwise Direct |
+| Input | Built in, mouse per window, keyboard |
+
+## See Also
+
+- [Dependency Management](/integration/building/cmake) - how LVGL resolves or fetches GLFW
+- [OpenGL Driver](/integration/embedded_linux/drivers/opengl_driver) - texture-only driver for an existing context
+- [OpenGL Overview](/integration/embedded_linux/opengl) - how the drivers and draw units fit together
+- [NanoVG Draw Unit](/integration/embedded_linux/draw_units/draw_nanovg) - the recommended GPU renderer
+- [EGL](/integration/embedded_linux/drivers/egl) - use instead of GLFW when you need EGL

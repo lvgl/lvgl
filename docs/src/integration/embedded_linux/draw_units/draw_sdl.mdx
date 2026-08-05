@@ -1,42 +1,40 @@
 ---
 title: SDL Draw Unit
-description: "The SDL Draw Unit provides a hardware-accelerated rendering backend for LVGL that leverages SDL2's texture system. It uses software rendering to create SDL textures which are then cached and effici..."
+description: "The SDL draw unit renders widgets in software, caches them as SDL textures, and lets SDL's renderer composite them on the GPU."
 ---
 
 ## Overview
 
-The SDL Draw Unit provides a hardware-accelerated rendering backend for LVGL that leverages SDL2's texture system.
-It uses software rendering to create SDL textures which are then cached and efficiently blended together by the GPU to compose the final UI.
-This approach combines the flexibility of software rendering with the performance benefits of hardware-accelerated texture blending.
+The SDL draw unit renders widgets in software, caches the result as an SDL texture, and lets SDL's own
+renderer blend those textures into the final frame. It is a hybrid: software rasterization,
+hardware compositing.
 
-### Key Features
+It is the natural choice when your application already uses SDL and you want cheap acceleration without
+introducing an OpenGL dependency. It works best with static or slowly-changing UIs, where most textures are
+reused between frames, and offers little for content that changes every frame.
 
-- **Texture Caching**: Rendered elements are cached as SDL textures, reducing redundant rendering operations
-- **Hardware Blending**: SDL's GPU-accelerated texture blending provides smooth compositing
-- **Cross-Platform**: Works on any platform that supports SDL2
-- **Easy Integration**: Seamless integration with SDL-based LVGL applications
-
-### Performance Characteristics
-
-The SDL Draw Unit excels in scenarios with:
-
-- **Best Performance**: Static or infrequently changing UI elements that benefit from texture caching
-- **Good Performance**: UIs with moderate animation and updates
-- **Consider Alternatives**: Heavily dynamic content that changes every frame may not benefit as much from caching
-
-## Prerequisites
-
-- SDL2 library installed (see [SDL Driver](/integration/pc/sdl) for installation instructions)
-- LVGL configured with SDL support (`LV_USE_SDL 1`)
+For genuinely GPU-accelerated rendering, use [NanoVG](/integration/embedded_linux/draw_units/draw_nanovg)
+through the SDL driver's EGL backend instead. It rasterizes on the GPU rather than only compositing there.
 
 ## Configuration
 
-Enable the SDL draw unit in `lv_conf.h`:
+Enable <ApiLink name="LV_USE_DRAW_SDL" /> and <ApiLink name="LV_USE_SDL" /> and select `LV_SDL_BACKEND_TEXTURE` 
+as your <ApiLink name="LV_SDL_BACKEND" />
 
-```c
-#define LV_USE_SDL 1
-#define LV_USE_DRAW_SDL 1
-#define LV_USE_DRAW_SW 1
-```
+## Building
 
-The SDL Draw Unit automatically integrates with the SDL display driver when both are enabled.
+The renderer requires `sdl2_image`.
+
+<Callout type="tip">
+LVGL's CMake integration resolves it for you.
+It can be fetched at compile time by LVGL so it doesn't have to be present on your system.
+
+See [Dependency Management](/integration/building/cmake).
+</Callout>
+
+## See Also
+
+- [SDL Driver](/integration/pc/sdl) - the display driver this draw unit pairs with
+- [NanoVG Draw Unit](/integration/embedded_linux/draw_units/draw_nanovg) - true GPU rasterization, via SDL's EGL backend
+- [OpenGL Overview](/integration/embedded_linux/opengl) - how drivers and draw units fit together
+- [Dependency Management](/integration/building/cmake) - how LVGL resolves or fetches SDL2_image
