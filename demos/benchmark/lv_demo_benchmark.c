@@ -127,14 +127,13 @@ static void multiple_rectangles_cb(void)
     }
 }
 
-static void multiple_rgb_images_cb(void)
+static void multiple_images_cb(const lv_image_dsc_t * img)
 {
     lv_obj_t * scr = lv_screen_active();
     lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_rgb);
     int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 160;
     int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 160;
 
@@ -146,7 +145,7 @@ static void multiple_rgb_images_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_image_create(lv_screen_active());
-            lv_image_set_src(obj, &img_benchmark_lvgl_logo_rgb);
+            lv_image_set_src(obj, img);
             if(x == 0) lv_obj_set_flex_in_new_track(obj, true);
 
             fall_anim(obj, 80);
@@ -154,31 +153,16 @@ static void multiple_rgb_images_cb(void)
     }
 }
 
+static void multiple_rgb_images_cb(void)
+{
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_rgb);
+    multiple_images_cb(&img_benchmark_lvgl_logo_rgb);
+}
+
 static void multiple_argb_images_cb(void)
 {
-    lv_obj_t * scr = lv_screen_active();
-    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
-    lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
-
     LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_argb);
-    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 160;
-    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 160;
-
-    if(hor_cnt < 1) hor_cnt = 1;
-    if(ver_cnt < 1) ver_cnt = 1;
-
-    int32_t y;
-    for(y = 0; y < ver_cnt; y++) {
-        int32_t x;
-        for(x = 0; x < hor_cnt; x++) {
-            lv_obj_t * obj = lv_image_create(lv_screen_active());
-            lv_image_set_src(obj, &img_benchmark_lvgl_logo_argb);
-            if(x == 0) lv_obj_set_flex_in_new_track(obj, true);
-
-            fall_anim(obj, 80);
-        }
-    }
+    multiple_images_cb(&img_benchmark_lvgl_logo_argb);
 }
 
 static void rotated_argb_image_cb(void)
