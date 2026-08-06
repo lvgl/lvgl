@@ -542,7 +542,10 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
     lv_obj_set_scroll_dir(wrapper, LV_DIR_HOR);
 
     lv_obj_t * chart = lv_chart_create(wrapper);
-    lv_group_add_obj(lv_group_get_default(), chart);
+    lv_group_t * group = lv_group_get_default();
+    if(group) {
+        lv_group_add_obj(group, chart);
+    }
     lv_obj_set_scroll_on_focus(chart, true);
     lv_obj_set_send_draw_task_events(chart, true);
     lv_chart_set_div_line_count(chart, 0, 12);
