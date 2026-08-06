@@ -111,11 +111,6 @@
 #define LV_SDL_MOUSEWHEEL_MODE_ENCODER   0
 #define LV_SDL_MOUSEWHEEL_MODE_CROWN     1
 
-/* Rendering backend */
-#define LV_WAYLAND_BACKEND_SHM   0
-#define LV_WAYLAND_BACKEND_EGL   1
-#define LV_WAYLAND_BACKEND_G2D   2
-
 /* Log behavior on LV_CHECK_ARG failure */
 #define LV_CHECK_ARG_LOG_MODE_NONE      0
 #define LV_CHECK_ARG_LOG_MODE_MINIMAL   1
@@ -3544,23 +3539,31 @@
     #endif
 #endif
 
-#ifndef LV_WAYLAND_AUTO_BACKEND
+#ifndef LV_WAYLAND_USE_SHM
     #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_WAYLAND_AUTO_BACKEND
-            #define LV_WAYLAND_AUTO_BACKEND CONFIG_LV_WAYLAND_AUTO_BACKEND
+        #ifdef CONFIG_LV_WAYLAND_USE_SHM
+            #define LV_WAYLAND_USE_SHM CONFIG_LV_WAYLAND_USE_SHM
         #else
-            #define LV_WAYLAND_AUTO_BACKEND 0
+            #define LV_WAYLAND_USE_SHM 0
         #endif
     #else
-          #define LV_WAYLAND_AUTO_BACKEND LV_USE_WAYLAND
+          #define LV_WAYLAND_USE_SHM !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND
     #endif
 #endif
 
-#ifndef LV_WAYLAND_BACKEND
-    #ifdef CONFIG_LV_WAYLAND_BACKEND
-        #define LV_WAYLAND_BACKEND CONFIG_LV_WAYLAND_BACKEND
+#ifndef LV_WAYLAND_USE_EGL
+    #ifdef CONFIG_LV_WAYLAND_USE_EGL
+        #define LV_WAYLAND_USE_EGL CONFIG_LV_WAYLAND_USE_EGL
     #else
-        #define LV_WAYLAND_BACKEND LV_WAYLAND_BACKEND_SHM
+        #define LV_WAYLAND_USE_EGL 0
+    #endif
+#endif
+
+#ifndef LV_WAYLAND_USE_G2D
+    #ifdef CONFIG_LV_WAYLAND_USE_G2D
+        #define LV_WAYLAND_USE_G2D CONFIG_LV_WAYLAND_USE_G2D
+    #else
+        #define LV_WAYLAND_USE_G2D 0
     #endif
 #endif
 
@@ -4756,28 +4759,14 @@
     #endif
 #endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
 
-/* Wayland never inferred its backend from LV_USE_OPENGLES; the legacy interface
- * was setting LV_WAYLAND_USE_* directly.  While LV_WAYLAND_AUTO_BACKEND is set we
- * honor any such define, default to SHM, and keep the three mutually exclusive.
- * The #warning fires only if a legacy LV_WAYLAND_USE_* was set by hand. */
-#if LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND
-    #if defined(LV_WAYLAND_USE_EGL) || defined(LV_WAYLAND_USE_G2D) || defined(LV_WAYLAND_USE_SHM)
-        #warning Setting LV_WAYLAND_USE_* directly is deprecated and will be removed in a future release. Set LV_WAYLAND_AUTO_BACKEND to 0 and select a backend with LV_WAYLAND_BACKEND.
-    #endif
-    #ifndef LV_WAYLAND_USE_EGL
-        #define LV_WAYLAND_USE_EGL 0
-    #endif
-    #ifndef LV_WAYLAND_USE_G2D
-        #define LV_WAYLAND_USE_G2D 0
-    #endif
-    #ifndef LV_WAYLAND_USE_SHM
-        #if LV_WAYLAND_USE_EGL || LV_WAYLAND_USE_G2D
-            #define LV_WAYLAND_USE_SHM 0
-        #else
-            #define LV_WAYLAND_USE_SHM 1
-        #endif
-    #endif
-#endif /*LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND*/
+/* The Wayland backends used to be mutually exclusive: LV_WAYLAND_BACKEND picked
+ * exactly one of them, and the deprecated LV_WAYLAND_AUTO_BACKEND kept the older
+ * behavior of setting LV_WAYLAND_USE_* by hand.  Several backends can now be
+ * enabled at once and the driver probes them at runtime, so both symbols are
+ * gone.  Warn rather than let an old lv_conf.h silently fall back to SHM. */
+#if LV_USE_WAYLAND && defined(LV_WAYLAND_BACKEND)
+    #warning LV_WAYLAND_BACKEND is deprecated and has no effect. Enable each backend you want with LV_WAYLAND_USE_SHM, LV_WAYLAND_USE_EGL and LV_WAYLAND_USE_G2D instead; the driver initializes the first one that works.
+#endif /*LV_USE_WAYLAND && defined(LV_WAYLAND_BACKEND) */
 
 #if defined(LV_ASSERT_HANDLER_INCLUDE) && !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
 #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."
@@ -4902,27 +4891,11 @@
     #endif
 #endif
 
-#ifndef LV_WAYLAND_USE_SHM
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_SHM) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_SHM 1
+#ifndef LV_WAYLAND_USE_DMABUF
+    #if (((LV_WAYLAND_USE_EGL && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) || (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)) && (LV_USE_WAYLAND))
+        #define LV_WAYLAND_USE_DMABUF 1
     #else
-        #define LV_WAYLAND_USE_SHM 0
-    #endif
-#endif
-
-#ifndef LV_WAYLAND_USE_EGL
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_EGL 1
-    #else
-        #define LV_WAYLAND_USE_EGL 0
-    #endif
-#endif
-
-#ifndef LV_WAYLAND_USE_G2D
-    #if ((LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_G2D 1
-    #else
-        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_DMABUF 0
     #endif
 #endif
 
@@ -4931,14 +4904,6 @@
         #define LV_USE_EGL 1
     #else
         #define LV_USE_EGL 0
-    #endif
-#endif
-
-#ifndef LV_WAYLAND_USE_DMABUF
-    #if (((LV_WAYLAND_USE_EGL && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) || (LV_WAYLAND_USE_G2D && LV_USE_WAYLAND)) && (LV_USE_WAYLAND))
-        #define LV_WAYLAND_USE_DMABUF 1
-    #else
-        #define LV_WAYLAND_USE_DMABUF 0
     #endif
 #endif
 
@@ -5154,8 +5119,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_DRAW_DMA2D_INTERRUPT requires LV_USE_DRAW_DMA2D (Kconfig depends on)"
 #endif
 
-#if (LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D) && !LV_USE_DRAW_G2D
-    #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_G2D"
+#if (LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND) && !LV_USE_DRAW_G2D
+    #error "LV_USE_DRAW_G2D must be enabled: Kconfig selects it from LV_WAYLAND_USE_G2D && !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND"
 #endif
 
 #if LV_USE_G2D_ASSERT && !(LV_USE_DRAW_G2D && LV_USE_DRAW_G2D)
@@ -5318,8 +5283,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_NUTTX_TRACE_FILE requires LV_USE_PROFILER_BUILTIN && LV_USE_NUTTX (Kconfig depends on)"
 #endif
 
-#if (LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL) && !LV_USE_OPENGLES
-    #error "LV_USE_OPENGLES must be enabled: Kconfig selects it from LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || LV_WAYLAND_BACKEND == LV_WAYLAND_BACKEND_EGL"
+#if (LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || (LV_WAYLAND_USE_EGL && LV_USE_WAYLAND)) && !LV_USE_OPENGLES
+    #error "LV_USE_OPENGLES must be enabled: Kconfig selects it from LV_USE_DRAW_NANOVG || LV_USE_DRAW_OPENGLES || LV_LINUX_DRM_BACKEND == LV_LINUX_DRM_BACKEND_EGL || (LV_USE_GLFW && !LV_USE_EGL) || (LV_WAYLAND_USE_EGL && LV_USE_WAYLAND)"
 #endif
 
 #if LV_USE_OPENGLES_DEBUG && !(LV_USE_OPENGLES)
@@ -5336,6 +5301,14 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_UEFI_USE_MEMORY_SERVICES && !(LV_USE_UEFI)
     #error "LV_UEFI_USE_MEMORY_SERVICES requires LV_USE_UEFI (Kconfig depends on)"
+#endif
+
+#if LV_WAYLAND_USE_EGL && !(LV_USE_WAYLAND)
+    #error "LV_WAYLAND_USE_EGL requires LV_USE_WAYLAND (Kconfig depends on)"
+#endif
+
+#if LV_WAYLAND_USE_G2D && !(!LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND)
+    #error "LV_WAYLAND_USE_G2D requires !LV_USE_DRAW_OPENGLES && !LV_USE_DRAW_NANOVG && LV_USE_WAYLAND (Kconfig depends on)"
 #endif
 
 #if LV_USE_WINDOWS && !(LV_USE_OS == LV_OS_WINDOWS)

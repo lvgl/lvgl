@@ -267,28 +267,14 @@ INTERNAL_COMPATIBILITY_BLOCK = r"""
     #endif
 #endif /*LV_USE_SDL && LV_SDL_AUTO_BACKEND*/
 
-/* Wayland never inferred its backend from LV_USE_OPENGLES; the legacy interface
- * was setting LV_WAYLAND_USE_* directly.  While LV_WAYLAND_AUTO_BACKEND is set we
- * honor any such define, default to SHM, and keep the three mutually exclusive.
- * The #warning fires only if a legacy LV_WAYLAND_USE_* was set by hand. */
-#if LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND
-    #if defined(LV_WAYLAND_USE_EGL) || defined(LV_WAYLAND_USE_G2D) || defined(LV_WAYLAND_USE_SHM)
-        #warning Setting LV_WAYLAND_USE_* directly is deprecated and will be removed in a future release. Set LV_WAYLAND_AUTO_BACKEND to 0 and select a backend with LV_WAYLAND_BACKEND.
-    #endif
-    #ifndef LV_WAYLAND_USE_EGL
-        #define LV_WAYLAND_USE_EGL 0
-    #endif
-    #ifndef LV_WAYLAND_USE_G2D
-        #define LV_WAYLAND_USE_G2D 0
-    #endif
-    #ifndef LV_WAYLAND_USE_SHM
-        #if LV_WAYLAND_USE_EGL || LV_WAYLAND_USE_G2D
-            #define LV_WAYLAND_USE_SHM 0
-        #else
-            #define LV_WAYLAND_USE_SHM 1
-        #endif
-    #endif
-#endif /*LV_USE_WAYLAND && LV_WAYLAND_AUTO_BACKEND*/
+/* The Wayland backends used to be mutually exclusive: LV_WAYLAND_BACKEND picked
+ * exactly one of them, and the deprecated LV_WAYLAND_AUTO_BACKEND kept the older
+ * behavior of setting LV_WAYLAND_USE_* by hand.  Several backends can now be
+ * enabled at once and the driver probes them at runtime, so both symbols are
+ * gone.  Warn rather than let an old lv_conf.h silently fall back to SHM. */
+#if LV_USE_WAYLAND && defined(LV_WAYLAND_BACKEND)
+    #warning LV_WAYLAND_BACKEND is deprecated and has no effect. Enable each backend you want with LV_WAYLAND_USE_SHM, LV_WAYLAND_USE_EGL and LV_WAYLAND_USE_G2D instead; the driver initializes the first one that works.
+#endif /*LV_USE_WAYLAND && defined(LV_WAYLAND_BACKEND) */
 
 #if defined(LV_ASSERT_HANDLER_INCLUDE) && !LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING
 #warning "LV_ASSERT_HANDLER_INCLUDE is deprecated and will be removed in a future release. Use LV_ASSERT_CUSTOM_INCLUDE and define LV_ASSERT_HANDLER inside. To suppress this warning, remove LV_ASSERT_HANDLER_INCLUDE or enable LV_DISABLE_ASSERT_HANDLER_INCLUDE_WARNING."

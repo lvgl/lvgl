@@ -101,7 +101,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void * wl_egl_init(void);
+static lv_result_t wl_egl_init(void ** backend_data);
 static void wl_egl_deinit(void * backend_ctx);
 static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height);
 static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display);
@@ -144,14 +144,22 @@ static void delete_buffer(lv_opengles_egl_t * egl_ctx, lv_wl_buffer_t * buffer);
  *  STATIC VARIABLES
  **********************/
 
+
+/* TODO: the opengl driver doesn't support multiple instances
+ * so we can only handle one display per EGL instance
+ * WIP: https://github.com/lvgl/lvgl/pull/9854 */
+static bool has_display;
 static const struct wl_callback_listener frame_listener = {
     .done = frame_done,
 };
 
-const lv_wayland_backend_ops_t wl_backend_ops = {
+const lv_wayland_backend_ops_t wl_egl_ops = {
     .init = wl_egl_init,
     .deinit = wl_egl_deinit,
     .global_handler = wl_egl_global_handler,
+};
+
+const lv_wayland_backend_display_ops_t wl_egl_display_ops = {
     .init_display = wl_egl_init_display,
     .deinit_display = wl_egl_deinit_display,
     .resize_display = wl_egl_resize_display,
@@ -184,14 +192,17 @@ static void frame_done(void * data, struct wl_callback * callback, uint32_t time
     lv_display_flush_ready(display);
 }
 
-static void * wl_egl_init(void)
+static lv_result_t wl_egl_init(void ** backend_data)
 {
+    has_display = false;
 #if LV_WL_EGL_DMABUF_ENABLED
     lv_wayland_dmabuf_ctx_init(&ctx);
-    return &ctx;
+    *backend_data = &ctx;
 #else
-    return NULL;
+    /* Without the DMA-BUF fast-path the backend keeps no global state */
+    *backend_data = NULL;
 #endif
+    return LV_RESULT_OK;
 }
 
 static void wl_egl_deinit(void * backend_ctx)
@@ -208,7 +219,7 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
 {
     lv_wl_egl_display_data_t * ddata = lv_zalloc(sizeof(*ddata));
     if(!ddata) {
-        LV_LOG_ERROR("Failed to allocate data for display");
+        LV_LOG_WARN("Failed to allocate data for display");
         return NULL;
     }
 
@@ -224,7 +235,7 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
     lv_egl_interface_t egl_interface = wl_egl_get_interface(display);
     ddata->egl_ctx = lv_opengles_egl_context_create(&egl_interface);
     if(!ddata->egl_ctx) {
-        LV_LOG_ERROR("Failed to create EGL context");
+        LV_LOG_WARN("Failed to create EGL context");
         goto egl_ctx_err;
     }
 
@@ -244,7 +255,7 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
     /*Initialize the draw buffers and texture*/
     lv_result_t res = lv_opengles_texture_reshape(&ddata->texture, display, width, height);
     if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to create draw buffers");
+        LV_LOG_WARN("Failed to create draw buffers");
         goto texture_err;
     }
     return ddata;
@@ -360,7 +371,7 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
          * full-screen quad pass and no eglSwapBuffers copy. */
         lv_wl_buffer_t * buf = get_next_buffer(ddata);
         if(!buf) {
-            LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
+            LV_LOG_WARN("Failed to acquire a wayland window body buffer");
             lv_display_flush_ready(disp);
             return;
         }
@@ -434,9 +445,13 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
 static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height)
 {
     LV_UNUSED(backend_ctx);
+    if(has_display) {
+        LV_LOG_INFO("The EGL backend can only handle one display at a time");
+        return NULL;
+    }
     lv_wl_egl_display_data_t * ddata = egl_create_display_data(display, width, height);
     if(!ddata) {
-        LV_LOG_ERROR("Failed to create display data");
+        LV_LOG_WARN("Failed to create display data");
         return NULL;
     }
 
@@ -451,7 +466,7 @@ static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, in
         LV_ASSERT_MALLOC(buf1);
         LV_ASSERT_MALLOC(buf2);
         if(!buf1 || !buf2) {
-            LV_LOG_ERROR("Failed to allocate display buffer");
+            LV_LOG_WARN("Failed to allocate display buffer");
             lv_free(buf1);
             lv_free(buf2);
             egl_destroy_display_data(ddata);
@@ -464,6 +479,7 @@ static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, in
         lv_display_set_buffers(display, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
         lv_display_set_flush_cb(display, egl_flush_cb);
         lv_display_set_flush_wait_cb(display, flush_wait_cb);
+        has_display = true;
         return ddata;
     }
 #endif /*LV_WL_EGL_DMABUF_ENABLED*/
@@ -472,6 +488,7 @@ static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, in
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
     lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
 
+    has_display = true;
     return ddata;
 }
 
@@ -547,6 +564,7 @@ static void wl_egl_deinit_display(void * backend_ctx, lv_display_t * display)
 #endif
 
     egl_destroy_display_data(ddata);
+    has_display = false;
 }
 
 static void wl_egl_global_handler(void * backend_ctx, struct wl_registry * registry, uint32_t name,
@@ -629,7 +647,7 @@ static void * wl_egl_create_window(void * driver_data, const lv_egl_native_windo
     lv_wl_egl_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
 
     if(!wl_surface) {
-        LV_LOG_ERROR("Failed to get Wayland surface");
+        LV_LOG_WARN("Failed to get Wayland surface");
         return NULL;
     }
 
@@ -637,7 +655,7 @@ static void * wl_egl_create_window(void * driver_data, const lv_egl_native_windo
                                              lv_display_get_horizontal_resolution(display),
                                              lv_display_get_vertical_resolution(display));
     if(!ddata->egl_window) {
-        LV_LOG_ERROR("Failed to create wl_egl_window");
+        LV_LOG_WARN("Failed to create wl_egl_window");
         return NULL;
     }
 
@@ -704,13 +722,13 @@ static bool egl_dmabuf_setup(lv_wl_egl_display_data_t * ddata, lv_display_t * di
 
     ddata->drm_fd = open_drm_device();
     if(ddata->drm_fd < 0) {
-        LV_LOG_ERROR("Failed to open DRM device");
+        LV_LOG_WARN("Failed to open DRM device");
         return false;
     }
 
     ddata->gbm_device = gbm_create_device(ddata->drm_fd);
     if(!ddata->gbm_device) {
-        LV_LOG_ERROR("Failed to create GBM device");
+        LV_LOG_WARN("Failed to create GBM device");
         close(ddata->drm_fd);
         ddata->drm_fd = -1;
         return false;
@@ -740,7 +758,7 @@ static bool egl_dmabuf_setup(lv_wl_egl_display_data_t * ddata, lv_display_t * di
     }
 
     if(!ok) {
-        LV_LOG_ERROR("DMA-BUF creation failed");
+        LV_LOG_WARN("DMA-BUF creation failed");
         egl_dmabuf_teardown(ddata);
         return false;
     }
@@ -876,7 +894,7 @@ static void load_egl_extensions(void)
                                    eglGetProcAddress("glEGLImageTargetTexture2DOES");
 
     if(!glEGLImageTargetTexture2DOES) {
-        LV_LOG_ERROR("Failed to load glEGLImageTargetTexture2DOES extension");
+        LV_LOG_WARN("Failed to load glEGLImageTargetTexture2DOES extension");
     }
     else {
         LV_LOG_INFO("Loaded glEGLImageTargetTexture2DOES extension");
@@ -890,7 +908,7 @@ static int open_drm_device(void)
 
     num_devices = drmGetDevices2(0, devices, 64);
     if(num_devices < 0) {
-        LV_LOG_ERROR("drmGetDevices2 failed: %s", strerror(-num_devices));
+        LV_LOG_WARN("drmGetDevices2 failed: %s", strerror(-num_devices));
         return -1;
     }
 
@@ -909,7 +927,7 @@ static int open_drm_device(void)
 
     drmFreeDevices(devices, num_devices);
     if(fd < 0) {
-        LV_LOG_ERROR("Failed to open DRM device");
+        LV_LOG_WARN("Failed to open DRM device");
     }
 
     return fd;
@@ -927,7 +945,7 @@ static bool init_buffer(lv_wayland_dmabuf_ctx_t * dmabuf_ctx, lv_wl_buffer_t * b
 
     buffer->bo = gbm_bo_create(ddata->gbm_device, width, height, gbm_cf, gbm_flags);
     if(!buffer->bo) {
-        LV_LOG_ERROR("Failed to create GBM buffer object");
+        LV_LOG_WARN("Failed to create GBM buffer object");
         return false;
     }
 
@@ -935,7 +953,7 @@ static bool init_buffer(lv_wayland_dmabuf_ctx_t * dmabuf_ctx, lv_wl_buffer_t * b
     buffer->offset = gbm_bo_get_offset(buffer->bo, 0);
     buffer->dmabuf_fd = gbm_bo_get_fd(buffer->bo);
     if(buffer->dmabuf_fd < 0) {
-        LV_LOG_ERROR("Failed to export GBM buffer object as a DMA-BUF fd");
+        LV_LOG_WARN("Failed to export GBM buffer object as a DMA-BUF fd");
         return false;
     }
 
@@ -953,7 +971,7 @@ static bool init_buffer(lv_wayland_dmabuf_ctx_t * dmabuf_ctx, lv_wl_buffer_t * b
     buffer->egl_image = eglCreateImageKHR(ddata->egl_ctx->egl_display, EGL_NO_CONTEXT,
                                           EGL_LINUX_DMA_BUF_EXT, NULL, attribs);
     if(buffer->egl_image == EGL_NO_IMAGE_KHR) {
-        LV_LOG_ERROR("Failed to create EGL image from DMA-BUF");
+        LV_LOG_WARN("Failed to create EGL image from DMA-BUF");
         return false;
     }
 

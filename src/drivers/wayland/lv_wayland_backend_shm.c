@@ -54,7 +54,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void * shm_init(void);
+static lv_result_t shm_init(void ** backend_data);
 static void shm_deinit(void *);
 static void * shm_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height);
 static void * shm_resize_display(void * backend_ctx, lv_display_t * display);
@@ -86,10 +86,13 @@ static const struct wl_buffer_listener buffer_listener = {
     .release = buffer_release
 };
 
-const lv_wayland_backend_ops_t wl_backend_ops = {
+const lv_wayland_backend_ops_t wl_shm_ops = {
     .init = shm_init,
     .deinit = shm_deinit,
     .global_handler = shm_global_handler,
+};
+
+const lv_wayland_backend_display_ops_t wl_shm_display_ops = {
     .init_display = shm_init_display,
     .deinit_display = shm_deinit_display,
     .resize_display = shm_resize_display,
@@ -145,15 +148,19 @@ static int32_t lv_cf_to_shm_cf(lv_color_format_t cf)
     }
 }
 
-static void * shm_init(void)
+static lv_result_t shm_init(void ** backend_data)
 {
     lv_memzero(&shm_ctx, sizeof(shm_ctx));
-    return &shm_ctx;
+    *backend_data = &shm_ctx;
+    return LV_RESULT_OK;
 }
 
 static void shm_deinit(void * backend_ctx)
 {
     lv_wl_shm_ctx_t * ctx = backend_ctx;
+    if(!ctx) {
+        return;
+    }
     if(ctx->shm) {
         wl_shm_destroy(ctx->shm);
         ctx->shm = NULL;
@@ -459,4 +466,4 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     ddata->curr_wl_buffer_idx = (ddata->curr_wl_buffer_idx + 1) % LV_WL_SHM_BUF_COUNT;
 }
 
-#endif /*LV_WAYLAND_USE_SHM*/
+#endif /*LV_USE_WAYLAND*/
