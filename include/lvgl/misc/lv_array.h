@@ -50,19 +50,25 @@ typedef struct _lv_array_t {
  * @param array pointer to an `lv_array_t` variable to initialize
  * @param capacity the initial capacity of the array
  * @param element_size the size of an element in bytes
+ * @return LV_RESULT_OK: success, LV_RESULT_INVALID: out of memory or overflow.
+ *         On failure, the array is left in an inert state (data = NULL, size = 0, capacity = 0).
  */
-void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size);
+lv_result_t lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size);
 
 /**
  * Init an array from a buffer.
  * @note The buffer must be large enough to store `capacity` elements. The array will not release the buffer and reallocate it.
  *       The user must ensure that the buffer is valid during the lifetime of the array. And release the buffer when the array is no longer needed.
+ *       If buf is NULL and asserts are disabled, the function returns LV_RESULT_INVALID and leaves the array in an inert state.
+ *       Passing a NULL buffer with capacity > 0 is always a programming error.
  * @param array pointer to an `lv_array_t` variable to initialize
  * @param buf pointer to a buffer to use as the array's data
  * @param capacity the initial capacity of the array
  * @param element_size the size of an element in bytes
+ * @return LV_RESULT_OK: success, LV_RESULT_INVALID: invalid buffer or capacity.
+ *         On failure, the array is left in an inert state (data = NULL, size = 0, capacity = 0).
  */
-void lv_array_init_from_buf(lv_array_t * array, void * buf, uint32_t capacity, uint32_t element_size);
+lv_result_t lv_array_init_from_buf(lv_array_t * array, void * buf, uint32_t capacity, uint32_t element_size);
 
 /**
  * Resize the array to the given capacity.
@@ -123,8 +129,10 @@ static inline bool lv_array_is_full(const lv_array_t * array)
  * @note this will create a new array with the same capacity and size as the source array.
  * @param target pointer to an `lv_array_t` variable to copy to
  * @param source pointer to an `lv_array_t` variable to copy from
+ * @return LV_RESULT_OK: success, LV_RESULT_INVALID: out of memory or overflow.
+ *         On failure, the target array is left in an inert state.
  */
-void lv_array_copy(lv_array_t * target, const lv_array_t * source);
+lv_result_t lv_array_copy(lv_array_t * target, const lv_array_t * source);
 
 /**
  * Remove all elements in array.
