@@ -153,6 +153,30 @@ static void multiple_images_cb(const lv_image_dsc_t * img)
     }
 }
 
+static void multiple_i1_images_cb(void)
+{
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_i1);
+    multiple_images_cb(&img_benchmark_lvgl_logo_i1);
+}
+
+static void multiple_i2_images_cb(void)
+{
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_i2);
+    multiple_images_cb(&img_benchmark_lvgl_logo_i2);
+}
+
+static void multiple_i4_images_cb(void)
+{
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_i4);
+    multiple_images_cb(&img_benchmark_lvgl_logo_i4);
+}
+
+static void multiple_i8_images_cb(void)
+{
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_i8);
+    multiple_images_cb(&img_benchmark_lvgl_logo_i8);
+}
+
 static void multiple_rgb_images_cb(void)
 {
     LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_rgb);
@@ -452,6 +476,10 @@ static lv_demo_benchmark_scene_dsc_t scenes[] = {
     {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
     {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
     {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
+    {.name = "Multiple I1 images",         .scene_time = 3000, .create_cb = multiple_i1_images_cb},
+    {.name = "Multiple I2 images",         .scene_time = 3000, .create_cb = multiple_i2_images_cb},
+    {.name = "Multiple I4 images",         .scene_time = 3000, .create_cb = multiple_i4_images_cb},
+    {.name = "Multiple I8 images",         .scene_time = 3000, .create_cb = multiple_i8_images_cb},
     {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
     {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
     {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
