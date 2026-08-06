@@ -149,7 +149,6 @@ static lv_result_t resize_display(lv_display_t * display)
             px_format = SDL_PIXELFORMAT_ARGB8888;
             break;
         case LV_COLOR_FORMAT_XRGB8888:
-            /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
             px_format = SDL_PIXELFORMAT_RGB888;
             break;
         case LV_COLOR_FORMAT_RGB888:
