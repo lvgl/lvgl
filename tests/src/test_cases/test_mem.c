@@ -119,7 +119,7 @@ void test_malloc_failed(void)
 
 void test_malloc_size_overflow(void)
 {
-#ifdef LVGL_CI_USING_DEF_HEAP
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     uint32_t mem = lv_test_get_free_mem();
 
     /* Aligning these up wraps around, which must not turn them into a tiny request */
@@ -135,7 +135,7 @@ void test_malloc_size_overflow(void)
 
 void test_realloc_size_overflow(void)
 {
-#ifdef LVGL_CI_USING_DEF_HEAP
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     const size_t len = 100;
     uint32_t mem = lv_test_get_free_mem();
 
@@ -170,7 +170,7 @@ void test_realloc_size_overflow(void)
 
 void test_mem_add_pool_size_limits(void)
 {
-#ifdef LVGL_CI_USING_DEF_HEAP
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     const size_t overhead = lv_tlsf_pool_overhead();
     const size_t block_max = lv_tlsf_block_size_max();
     uint32_t mem = lv_test_get_free_mem();
