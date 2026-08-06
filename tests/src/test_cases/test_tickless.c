@@ -48,15 +48,23 @@ static void timer_async_demo_cb(lv_timer_t * t)
 
 void test_tickless(void)
 {
+    /* Install our own tick callback so we can control ticks*/
     lv_tick_set_cb(test_tick_cb);
 
+    /* LVGL typically has a few timers by this point */
+    /* Test with a relatively short period that should fit between them */
     const uint32_t MAX_PERIOD = 5;
     uint32_t period = MAX_PERIOD;
+
+    /* First process any pending work to do */
     for(unsigned i = 0; i < 100; ++i) {
         if(lv_timer_handler() > period) {
             break;
         }
+        test_tick_value++;
     }
+
+    /* If this fires, the above loop failed to find an idle interval */
     TEST_ASSERT_GREATER_THAN(MAX_PERIOD, lv_timer_get_time_to_next());
     test_timer = lv_timer_create(timer_async_demo_cb, period, NULL);
     while(period >= 1) {
@@ -68,11 +76,11 @@ void test_tickless(void)
         test_tick_value++;
     }
 
-    /* It is time to trigger the callback */
+    /* It is time to run the callback. Verify has not run yet */
     TEST_ASSERT_EQUAL(0, lv_timer_get_time_to_next());
     TEST_ASSERT_EQUAL(0, test_async_cb_count);
 
-    /* Run the callback */
+    /* Run the callback. Verify it ran */
     TEST_ASSERT_GREATER_THAN(MAX_PERIOD, lv_timer_handler());
     TEST_ASSERT_GREATER_THAN(MAX_PERIOD, lv_timer_get_time_to_next());
     TEST_ASSERT_EQUAL(1, test_async_cb_count);
