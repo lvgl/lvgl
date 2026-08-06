@@ -2541,6 +2541,18 @@ config LV_USE_EGL
 	bool
 	default n
 
+# Promptless as it's not part of the public API
+config LV_USE_OPENGLES_PBUFFER
+	bool
+	default n
+	depends on LV_USE_DRAW_NANOVG
+	select LV_USE_EGL
+	select LV_USE_OPENGLES
+	help
+		Render on the GPU into an off-screen EGL pbuffer with no window system at
+		all, and read the frame back into the display's draw buffer. For headless
+		rendering, screenshot testing and server-side image generation.
+
 config LV_USE_GLFW
 	bool "GLFW"
 	default n
@@ -3256,6 +3268,7 @@ config LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
 config LV_USE_NANOVG_TEST_HEADLESS
 	bool "Headless EGL display for NanoVG"
 	depends on LV_USE_DRAW_NANOVG
+	select LV_USE_OPENGLES_PBUFFER
 	help
 		Render into an off-screen EGL pbuffer instead of a window and read the
 		pixels back into the LVGL draw buffer, so screenshot compares work the
