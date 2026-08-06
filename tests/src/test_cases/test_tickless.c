@@ -53,12 +53,11 @@ void test_tickless(void)
 
     /* LVGL typically has a few timers by this point */
     /* Test with a relatively short period that should fit between them */
-    const uint32_t MAX_PERIOD = 5;
-    uint32_t period = MAX_PERIOD;
+    const uint32_t MAX_PERIOD = 3;
 
     /* First process any pending work to do */
     for(unsigned i = 0; i < 100; ++i) {
-        if(lv_timer_handler() > period) {
+        if(lv_timer_handler() > 2 * MAX_PERIOD) {
             break;
         }
         test_tick_value++;
@@ -66,7 +65,10 @@ void test_tickless(void)
 
     /* If this fires, the above loop failed to find an idle interval */
     TEST_ASSERT_GREATER_THAN(MAX_PERIOD, lv_timer_get_time_to_next());
-    test_timer = lv_timer_create(timer_async_demo_cb, period, NULL);
+
+    /* Install a timer. Advance ticks until almost ready to fire */
+    test_timer = lv_timer_create(timer_async_demo_cb, MAX_PERIOD, NULL);
+    uint32_t period = MAX_PERIOD;
     while(period >= 1) {
         TEST_ASSERT_EQUAL(period, lv_timer_get_time_to_next());
         TEST_ASSERT_EQUAL(period, lv_timer_handler());
