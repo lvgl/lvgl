@@ -15,6 +15,7 @@ lvgl_script_path = os.path.join(lvgl_test_dir, "../scripts")
 sys.path.append(lvgl_script_path)
 
 from LVGLImage import ColorFormat, CompressMethod, LVGLImage
+
 from perf import perf_test_options
 
 lvgl_configs_dir = os.path.join(lvgl_test_dir, "configs")
@@ -90,7 +91,7 @@ test_options = {
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "riscv_v"],
     },
     "OPTIONS_TEST_NANOVG": {
-        "description": "NanoVG headless rendering with EGL, 32 bit color depth",
+        "description": "NanoVG headless rendering with EGL and glTF, 32 bit color depth",
         "defconfigs": ["full", "depth_32", HOST, "sys_heap", "run_tests", "nanovg"],
     },
 }
@@ -373,6 +374,13 @@ def generate_test_images():
                     )
 
 
+def generate_gltf_assets():
+    """Write the glTF models the tests in src/test_cases/3d load."""
+
+    script = os.path.join(lvgl_test_dir, "gen_gltf_assets.py")
+    subprocess.check_call([sys.executable, script])
+
+
 def clean_dir_with_filter(directory, clean_filters):
     for entry in os.listdir(directory):
         entry_path = os.path.join(directory, entry)
@@ -454,6 +462,8 @@ if __name__ == "__main__":
 
     if args.update_image:
         generate_test_images()
+
+    generate_gltf_assets()
 
     if args.build_options:
         options_to_build = args.build_options

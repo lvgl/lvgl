@@ -58,8 +58,12 @@ void lv_gltf_ibl_sampler_delete(lv_gltf_ibl_sampler_t * sampler);
  * Create an environment from an HDR or JPEG panoramic image for IBL rendering
  * @param   sampler IBL sampler defining output resolution (can be deleted after this call)
  * @param   file_path path to equirectangular environment image, or NULL to use default embedded image
- * @return  pointer to the created environment, or NULL on failure
+ * @return  pointer to the created environment, or NULL if the sampler is NULL
  *
+ * @note The image is read through the LVGL file system, so `file_path` takes a drive
+ *       letter like any other LVGL path.
+ * @note An image that cannot be read is reported with a warning and the default
+ *       embedded image is used instead
  * @note The source image will be downsampled to the sampler's texture_size
  * @note The environment can be shared across multiple glTF objects
  */
