@@ -186,6 +186,9 @@ Set `LV_LINUX_DRM_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_LI
   | `LV_WAYLAND_USE_EGL` | EGL (OpenGL ES, hardware-accelerated; enable: `LV_USE_OPENGLES`) | off; under Kconfig, on with a GPU draw unit |
   | `LV_WAYLAND_USE_G2D` | G2D (NXP i.MX hardware accelerator; enable: `LV_USE_DRAW_G2D`) | off |
 
+  There is also a new fourth backend, `LV_WAYLAND_USE_DMABUF`, which presents software-rendered frames as linear DMA-BUFs.
+  See the [Wayland driver docs](/integration/embedded_linux/drivers/wayland#dma-buf).
+
   To reproduce exactly what you had before, enable the one backend the old rules would have picked for your config. `LV_USE_G2D` no longer plays a part in the choice:
   it is a deprecated no-op (see [No-op options kept for compatibility](#no-op-options-kept-for-compatibility)) and the G2D backend is now tied to `LV_USE_DRAW_G2D`.
 

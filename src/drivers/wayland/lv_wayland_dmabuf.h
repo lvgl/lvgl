@@ -16,7 +16,7 @@ extern "C" {
 
 #include "lv_wayland_private.h"
 
-#if LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF
+#if LV_WAYLAND_USE_DMABUF_PROTOCOL
 
 #include <wayland-client.h>
 #include LV_STDBOOL_INCLUDE
@@ -107,12 +107,77 @@ uint32_t lv_wayland_dmabuf_cf_to_drm(lv_color_format_t cf);
  * @param stride     row stride in bytes
  * @param offset     plane offset in bytes
  * @param drm_cf     DRM fourcc of the buffer
+ * @param modifier   DRM format modifier of the buffer. The caller must pass the
+ *                   modifier the allocation actually has, not the one it asked
+ *                   for, as the compositor interprets the memory layout with it.
  */
 void lv_wayland_dmabuf_create_buffer(lv_wayland_dmabuf_ctx_t * ctx, lv_wayland_dmabuf_buffer_t * buf,
                                      int dmabuf_fd, uint32_t width, uint32_t height,
-                                     uint32_t stride, uint32_t offset, uint32_t drm_cf);
+                                     uint32_t stride, uint32_t offset, uint32_t drm_cf,
+                                     uint64_t modifier);
 
-#endif /*LV_USE_WAYLAND && LV_WAYLAND_USE_DMABUF*/
+/**
+ * @brief Flush pending buffer-creation requests and wait for the compositor
+ *        to respond.
+ *
+ * Performs a wl_display_roundtrip() so that any zwp_linux_buffer_params_v1
+ * requests queued by prior calls to lv_wayland_dmabuf_create_buffer() are
+ * sent and their `created`/`failed` events are processed. Call this once
+ * after creating one or more buffers, before touching buf->wl_buffer.
+ *
+ * After this function the caller is expected to call
+ * @ref lv_wayland_dmabuf_buffer_is_valid to ensure the buffer was created
+ * successfully.
+ *
+ * @param ctx  DMA-BUF context
+ * @return     true if the roundtrip itself completed (e.g. no disconnect)
+ */
+bool lv_wayland_dmabuf_commit_creation(lv_wayland_dmabuf_ctx_t * ctx);
+
+/**
+ * @brief Check whether a buffer's asynchronous creation succeeded.
+ *
+ * Only meaningful after lv_wayland_dmabuf_commit_creation() has returned for the
+ * roundtrip in which @p buf was created. Returns false if creation is still
+ * pending (shouldn't happen post-commit) or if the compositor sent
+ * zwp_linux_buffer_params_v1::failed.
+ *
+ * @param buf  per-buffer protocol state previously passed to
+ *             lv_wayland_dmabuf_create_buffer()
+ * @return     true if buffer is ready to use
+ */
+bool lv_wayland_dmabuf_buffer_is_valid(const lv_wayland_dmabuf_buffer_t * buf);
+
+/**
+ * @brief Check whether a buffer's is ready to be attached again.
+ *
+ * @param buf  per-buffer protocol state previously passed to
+ *             lv_wayland_dmabuf_create_buffer()
+ * @return     true if buffer is ready to be attached again
+ */
+bool lv_wayland_dmabuf_buffer_is_ready(const lv_wayland_dmabuf_buffer_t * buf);
+
+/**
+ * @brief Attach a buffer to a surface and mark it busy.
+ *
+ * Wraps wl_surface_attach() + wl_surface_damage() + wl_surface_commit(),
+ * setting buf->busy = true beforehand so the caller can immediately treat the
+ * buffer as in-flight. buf->busy is cleared later by the release listener
+ * registered in lv_wayland_dmabuf_create_buffer(), when the compositor sends
+ * wl_buffer::release.
+ *
+ * @param ctx      DMA-BUF context
+ * @param surface  wl_surface to attach the buffer to
+ * @param buf      per-buffer protocol state; caller must ensure
+ *                 lv_wayland_dmabuf_buffer_is_valid(buf) is true
+ * @param width    damage width in pixels
+ * @param height   damage height in pixels
+ */
+void lv_wayland_dmabuf_buffer_attach(lv_wayland_dmabuf_ctx_t * ctx, struct wl_surface * surface,
+                                     lv_wayland_dmabuf_buffer_t * buf,
+                                     uint32_t width, uint32_t height);
+
+#endif /*LV_WAYLAND_USE_DMABUF_PROTOCOL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
