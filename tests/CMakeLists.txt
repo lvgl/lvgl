@@ -293,10 +293,11 @@ foreach(test_case_fname ${TEST_CASE_FILES})
         COMMAND ${test_name})
 
     if(CONFIG_LV_USE_NANOVG_TEST_HEADLESS)
-        # Force the Mesa driver so that rendering is reproducible, and suppress
-        # the allocations the GL stack makes once per process.
-        set_tests_properties(${test_name} PROPERTIES ENVIRONMENT
-            "LSAN_OPTIONS=suppressions=${LVGL_TEST_DIR}/lsan-nanovg.supp:fast_unwind_on_malloc=0;__EGL_VENDOR_LIBRARY_FILENAMES=${LVGL_TEST_DIR}/egl_vendor_mesa_only.json")
+        # Force the Mesa driver so that rendering is reproducible
+        set(nanovg_test_env
+            "LSAN_OPTIONS=fast_unwind_on_malloc=0"
+            "__EGL_VENDOR_LIBRARY_FILENAMES=${LVGL_TEST_DIR}/egl_vendor_mesa_only.json")
+        set_tests_properties(${test_name} PROPERTIES ENVIRONMENT "${nanovg_test_env}")
     endif()
 endforeach()
 
