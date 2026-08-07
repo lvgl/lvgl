@@ -395,6 +395,20 @@ lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer);
 void * lv_observer_get_user_data(const lv_observer_t * observer);
 
 /**
+ * Set Observer's user data and its auto-free flag.
+ * If the previous user data was marked for auto-free it will be freed before
+ * being replaced, following the same ownership rules as `lv_observer_remove()`.
+ * @param observer      pointer to Observer
+ * @param user_data     new user data pointer (may be NULL)
+ * @param auto_free     true: the new `user_data` will be freed when the Observer
+ *                      is removed (must be heap-allocated); false: ownership stays
+ *                      with the caller
+ * @note                When `auto_free` is true the previous data is freed, so
+ *                      the caller must not use it afterwards.
+ */
+void lv_observer_set_user_data(lv_observer_t * observer, void * user_data, bool auto_free);
+
+/**
  * Notify all Observers of Subject.
  * @param subject       pointer to Subject
  */
