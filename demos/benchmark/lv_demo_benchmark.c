@@ -64,7 +64,7 @@ static void next_scene_timer_cb(lv_timer_t * timer);
 #endif
 
 
-static void summary_create(lv_demo_benchmark_summary_t * summary);
+static void summary_create(lv_obj_t * screen, lv_demo_benchmark_summary_t * summary);
 
 
 static void table_draw_task_event_cb(lv_event_t * e);
@@ -655,7 +655,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
         lv_demo_benchmark_summary_t summary;
 
         lv_timer_delete(timer);
-        summary_create(&summary);
+        summary_create(scr, &summary);
         /*
          * Don't display the summary if the user sets a callback function
          * He can always call this function himself inside the callback
@@ -744,11 +744,12 @@ static void table_draw_task_event_cb(lv_event_t * e)
 
 }
 
-static void summary_create(lv_demo_benchmark_summary_t * summary)
+static void summary_create(lv_obj_t * screen, lv_demo_benchmark_summary_t * summary)
 {
     lv_memset(summary, 0, sizeof(*summary));
 
     summary->scenes = scenes;
+    summary->screen = screen;
 
     for(size_t i = 0; scenes[i].create_cb; i++) {
         /*the first measurement was ignored as it contains data from the previous scene*/
