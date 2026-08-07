@@ -415,4 +415,25 @@ void test_roller_properties(void)
 #endif
 }
 
+void test_roller_single_option_should_leave_edit_mode_if_released(void)
+{
+    lv_obj_t * roller_one_opt = lv_roller_create(active_screen);
+    lv_roller_set_options(roller_one_opt, "Single", LV_ROLLER_MODE_NORMAL);
+
+    lv_group_t * temp_g = lv_group_create();
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_ENCODER), temp_g);
+    lv_group_add_obj(temp_g, roller_one_opt);
+
+    lv_group_set_editing(temp_g, true);
+    TEST_ASSERT_TRUE(lv_group_get_editing(temp_g));
+
+    lv_test_encoder_click();
+
+    /* A roller with a single option must still be able to leave edit mode on
+     * release, just like a roller with multiple options. */
+    TEST_ASSERT_FALSE(lv_group_get_editing(temp_g));
+
+    lv_group_delete(temp_g);
+}
+
 #endif
