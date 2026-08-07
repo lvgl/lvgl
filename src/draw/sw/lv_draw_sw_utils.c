@@ -272,6 +272,7 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 #if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
+            case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
                 rotate90_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
@@ -302,6 +303,7 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 #if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
+            case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
                 rotate180_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
@@ -332,6 +334,7 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 #if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
+            case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
                 rotate270_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
