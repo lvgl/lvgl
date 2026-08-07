@@ -219,9 +219,10 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
 
     if(ta->pwd_mode) {
         size_t realloc_size = lv_strlen(ta->pwd_tmp) + lv_strlen(txt) + 1;
-        ta->pwd_tmp = lv_realloc(ta->pwd_tmp, realloc_size);
-        LV_ASSERT_MALLOC(ta->pwd_tmp);
-        if(ta->pwd_tmp == NULL) return;
+        char * new_buf = lv_realloc(ta->pwd_tmp, realloc_size);
+        LV_ASSERT_MALLOC(new_buf);
+        if(!new_buf) return;
+        ta->pwd_tmp = new_buf;
 
         lv_text_ins(ta->pwd_tmp, ta->cursor.pos, txt);
 
@@ -267,9 +268,10 @@ void lv_textarea_delete_char(lv_obj_t * obj)
     if(ta->pwd_mode) {
         lv_text_cut(ta->pwd_tmp, ta->cursor.pos - 1, 1);
 
-        ta->pwd_tmp = lv_realloc(ta->pwd_tmp, lv_strlen(ta->pwd_tmp) + 1);
-        LV_ASSERT_MALLOC(ta->pwd_tmp);
-        if(ta->pwd_tmp == NULL) return;
+        char * new_buf = lv_realloc(ta->pwd_tmp, lv_strlen(ta->pwd_tmp) + 1);
+        LV_ASSERT_MALLOC(new_buf);
+        if(!new_buf) return;
+        ta->pwd_tmp = new_buf;
     }
 
     /*Move the cursor to the place of the deleted character*/
@@ -389,7 +391,6 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(ta->pwd_mode == en) return;
 
-    ta->pwd_mode = en ? 1U : 0U;
     /*Pwd mode is now enabled*/
     if(en) {
         char * txt = lv_label_get_text(ta->label);
@@ -398,12 +399,14 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
 
+        ta->pwd_mode = 1U;
         pwd_char_hider(obj);
 
         lv_textarea_clear_selection(obj);
     }
     /*Pwd mode is now disabled*/
     else {
+        ta->pwd_mode = 0U;
         lv_textarea_clear_selection(obj);
         lv_label_set_text(ta->label, ta->pwd_tmp);
         lv_free(ta->pwd_tmp);
