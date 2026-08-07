@@ -57,6 +57,15 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void);
  */
 LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period(uint32_t period);
 
+
+/**
+ * Calculate the time to the soonest LVGL timer.
+ * @return time till it needs to be run next timer (in ms)
+ * @note A good use case it use it as `lv_timer_handler(lv_timer_get_time_to_next());`
+ */
+LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_get_time_to_next(void);
+
+
 /**
  * Call it in the super-loop of main() or threads. It will automatically call lv_timer_handler() at the right time.
  * This function is used to simplify the porting.
