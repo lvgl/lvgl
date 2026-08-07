@@ -54,6 +54,20 @@ shows that string regardless of selection. Pass `NULL` to revert.
 
 <LvglExample name="lv_example_dropdown_text" path="widgets/dropdown/lv_example_dropdown_text" />
 
+## Set translation tag
+
+When using LVGL's [translation module](/main-modules/translation), you can bind a translation tag to a drop-down list directly.
+After binding, future changes to the language will automatically update the bound text or options to
+display the corresponding translation for that tag in the new language.
+
+- <ApiLink name="lv_dropdown_set_text_translation_tag" display="lv_dropdown_set_text_translation_tag(dd, tag)" /> binds the
+  button's fixed text (see [Show selected](#show-selected)).
+- <ApiLink name="lv_dropdown_set_options_translation_tag" display="lv_dropdown_set_options_translation_tag(dd, tag)" /> binds the
+  options. The translation should contain the options in a `\n` separated list, e.g. `"One\nTwo\nThree"`.
+
+Calling any of the regular `lv_dropdown_set_text…`/`lv_dropdown_set_options…` functions (or
+`lv_dropdown_add_option`/`lv_dropdown_clear_options`) afterwards removes the binding.
+
 ## Programmatically open/close
 
 <ApiLink name="lv_dropdown_open" display="lv_dropdown_open(dd)" /> and <ApiLink name="lv_dropdown_close" display="lv_dropdown_close(dd)" />.
