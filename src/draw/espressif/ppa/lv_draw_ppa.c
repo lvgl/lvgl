@@ -96,7 +96,8 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_FILL: {
                 const lv_draw_fill_dsc_t * dsc = (lv_draw_fill_dsc_t *)t->draw_dsc;
                 if((dsc->radius != 0 || dsc->grad.dir != LV_GRAD_DIR_NONE)) return 0;
-                if(dsc->opa <= (lv_opa_t)LV_OPA_MAX) return 0;
+                /* Only fully-opaque fills: the PPA fill writes solid pixels. */
+                if(dsc->opa < (lv_opa_t)LV_OPA_MAX) return 0;
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
                     t->preference_score = DRAW_UNIT_PPA_PREF_SCORE;
@@ -108,6 +109,10 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 #if LV_USE_PPA_IMG
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                /* Common constraints shared by the plain blend, scale (SRM) and
+                 * rotation paths. Scale and rotation are no longer required to be
+                 * identity here: the PPA SRM engine handles arbitrary scaling and
+                 * 90-degree rotation steps (see the dispatch below). */
                 if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
                      && dsc->clip_radius == 0
                      && dsc->bitmap_mask_src == NULL
@@ -118,15 +123,26 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                      && dsc->opa >= (lv_opa_t)LV_OPA_MAX
                      && dsc->skew_y == 0
                      && dsc->skew_x == 0
-                     && dsc->scale_x == 256
-                     && dsc->scale_y == 256
-                     && dsc->rotation == 0
                      && lv_image_src_get_type(dsc->src) == LV_IMAGE_SRC_VARIABLE
                      && (dsc->header.cf == LV_COLOR_FORMAT_RGB888
                          || dsc->header.cf == LV_COLOR_FORMAT_RGB565)
                      && (dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
                          || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
                     return 0;
+                }
+
+                /* PPA SRM can only rotate in exact 90-degree steps. */
+                if(dsc->rotation != 0) {
+                    int32_t angle = dsc->rotation % 3600;
+                    if(angle < 0) angle += 3600;
+                    if(angle != 900 && angle != 1800 && angle != 2700) return 0;
+
+                    /* Rotation combined with scaling is not supported: the dispatcher
+                     * routes any rotated task to the rotate path, which transforms the
+                     * full source block and does not reproduce the SRM clip/gap handling
+                     * needed for a scaled tile. Reject the combination so another draw
+                     * unit handles it instead of producing a wrong result. */
+                    if(dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE) return 0;
                 }
 
                 if(t->preference_score > DRAW_UNIT_PPA_PREF_SCORE) {
@@ -184,7 +200,23 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
     lv_draw_buf_t * buf        = layer->draw_buf;
     lv_area_t area;
 
-    if(!lv_area_intersect(&area, &t->area, &t->clip_area)) return;
+    /* Transformed images (rotate / scale) write the transformed on-screen
+     * bounding box t->_real_area, which differs from the un-transformed t->area.
+     * Clip and invalidate THAT region so the guard does not skip a visible
+     * transformed image and the cache maintenance matches the pixels the PPA
+     * actually wrote. The individual paths still clamp to the buffer. */
+    const lv_area_t * task_area = &t->area;
+#if LV_USE_PPA_IMG
+    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+        const lv_draw_image_dsc_t * img_dsc = (const lv_draw_image_dsc_t *)t->draw_dsc;
+        if(img_dsc->rotation != 0 ||
+           img_dsc->scale_x != LV_SCALE_NONE || img_dsc->scale_y != LV_SCALE_NONE) {
+            task_area = &t->_real_area;
+        }
+    }
+#endif
+
+    if(!lv_area_intersect(&area, task_area, &t->clip_area)) return;
     lv_draw_buf_invalidate_cache(buf, &area);
 
     switch(t->type) {
@@ -192,10 +224,28 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
             lv_draw_ppa_fill(t, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
             lv_draw_buf_invalidate_cache(buf, &area);
             break;
-        case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &area);
-            lv_draw_buf_invalidate_cache(buf, &area);
-            break;
+        case LV_DRAW_TASK_TYPE_IMAGE: {
+                lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)t->draw_dsc;
+#if LV_USE_PPA_IMG
+                /* Rotate/scale take the transformed box (t->_real_area): the
+                 * rotate geometry needs the rotated box (dims swapped for
+                 * 90/270) and the scale geometry needs the scaled box as its
+                 * origin. Using t->area collapses non-square rotations and
+                 * mis-places / drops down-scaled images. */
+                if(img_dsc->rotation != 0) {
+                    lv_draw_ppa_img_rotate(t, img_dsc, &t->_real_area);
+                }
+                else if(img_dsc->scale_x != LV_SCALE_NONE || img_dsc->scale_y != LV_SCALE_NONE) {
+                    lv_draw_ppa_img_srm(t, img_dsc, &t->_real_area);
+                }
+                else
+#endif
+                {
+                    lv_draw_ppa_img(t, img_dsc, &area);
+                }
+                lv_draw_buf_invalidate_cache(buf, &area);
+                break;
+            }
         default:
             break;
     }
