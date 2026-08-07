@@ -933,8 +933,8 @@ static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int3
            ys_int + y_next >= 0 &&
            ys_int + y_next <= src_h - 1) {
 
-            lv_opa_t a_ver = src_tmp[x_next];
-            lv_opa_t a_hor = src_tmp[y_next * src_stride];
+            lv_opa_t a_hor = src_tmp[x_next];
+            lv_opa_t a_ver = src_tmp[y_next * src_stride];
 
             if(a_ver != abuf[x]) a_ver = ((a_ver * ys_fract) + (abuf[x] * (0x100 - ys_fract))) >> 8;
             if(a_hor != abuf[x]) a_hor = ((a_hor * xs_fract) + (abuf[x] * (0x100 - xs_fract))) >> 8;
