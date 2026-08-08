@@ -605,7 +605,7 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
     disp->flush_wait_cb = wait_cb;
 }
 
-void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb)
+void lv_display_set_partial_sync_cb(lv_display_t * disp, lv_display_partial_sync_cb_t sync_cb)
 {
     if(disp == NULL) {
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
@@ -613,10 +613,10 @@ void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb)
     }
     LV_CHECK_ARG(disp != NULL, return);
 
-    disp->sync_cb = sync_cb;
+    disp->partial_sync_cb = sync_cb;
 }
 
-void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t wait_cb)
+void lv_display_set_partial_sync_wait_cb(lv_display_t * disp, lv_display_partial_sync_wait_cb_t wait_cb)
 {
     if(disp == NULL) {
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
@@ -624,7 +624,7 @@ void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t 
     }
     LV_CHECK_ARG(disp != NULL, return);
 
-    disp->sync_wait_cb = wait_cb;
+    disp->partial_sync_wait_cb = wait_cb;
 }
 
 void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format)
@@ -735,16 +735,16 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
     return disp->flushing_last;
 }
 
-LV_ATTRIBUTE_SYNC_READY void lv_display_sync_ready(lv_display_t * disp)
+LV_ATTRIBUTE_PARTIAL_SYNC_READY void lv_display_partial_sync_ready(lv_display_t * disp)
 {
     LV_CHECK_ARG(disp != NULL, return);
-    disp->syncing = 0;
+    disp->partial_syncing = 0;
 }
 
-LV_ATTRIBUTE_SYNC_READY bool lv_display_sync_is_last(lv_display_t * disp)
+LV_ATTRIBUTE_PARTIAL_SYNC_READY bool lv_display_partial_sync_is_last(lv_display_t * disp)
 {
     LV_CHECK_ARG(disp != NULL, return false);
-    return disp->syncing_last;
+    return disp->partial_syncing_last;
 }
 
 bool lv_display_is_double_buffered(lv_display_t * disp)

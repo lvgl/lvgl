@@ -70,10 +70,10 @@ typedef struct {
     bool defer_flush_ready;
 
     /*Syncing*/
-    uint32_t sync_cnt;
-    lv_area_t sync_area[REFR_LOG_MAX];
-    uint32_t sync_wait_cnt;
-    bool defer_sync_ready;
+    uint32_t partial_sync_cnt;
+    lv_area_t partial_sync_area[REFR_LOG_MAX];
+    uint32_t partial_sync_wait_cnt;
+    bool defer_partial_sync_ready;
 
     /*Events*/
     uint32_t ev_cnt;
