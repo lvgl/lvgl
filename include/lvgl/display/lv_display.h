@@ -340,7 +340,7 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
  * still implement multiple full frame buffers under the hood, keeping track of them and choosing the target of
  * its flush_cb() callback without the upper layers' knowledge about it. To keep the buffers in sync and use
  * the previous frame as a base for rendering the next one, normally the driver would have to copy the full
- * contents of the old phyisically rotated frame buffer to the new one, taking a severe performance it.
+ * contents of the old phyisically rotated frame buffer to the new one, taking a severe performance hit.
  * If this callback is set, the dirty areas are collected during the rendering phase (just as if it were in
  * direct rendering mode) and before the rendering of the next frame starts, the callback is called to inform
  * the driver to synchronize them between its frame buffers. It is the driver's responsibility to identify the

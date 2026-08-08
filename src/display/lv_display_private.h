@@ -90,7 +90,7 @@ struct _lv_display_t {
     volatile uint32_t last_part         : 1; /**< 1: last part of the current area is being rendered */
 
     /**
-     * Used to synchronize changes between frame buffers between renders in LV_DISP_RENDER_MODE_PARTIAL.
+     * Used to synchronize changes between frame buffers between renders in LV_DISPLAY_RENDER_MODE_PARTIAL.
      * For an extended documentation see `lv_display_set_partial_sync_cb()`.
      * Called for each area needing to be synchronized before rendering next frame. */
     lv_display_partial_sync_cb_t partial_sync_cb;
