@@ -718,30 +718,6 @@ static void refr_sync_areas(void)
         }
     }
 
-    /*The buffers are already swapped.
-     *So the active buffer is the off screen buffer where LVGL will render*/
-    lv_draw_buf_t * off_screen = disp_refr->buf_act;
-    /*Triple buffer sync buffer for off-screen2 updates.*/
-    lv_draw_buf_t * off_screen2 = NULL;
-    lv_draw_buf_t * on_screen = NULL;
-
-    /* Only compute buffer relationships when auto_sync (direct double-buffered) is used.
-     * Doing this in partial mode while partial syncing would corrupt its rendering state*/
-    if(auto_sync) {
-        if(disp_refr->buf_act == disp_refr->buf_1) {
-            off_screen2 = disp_refr->buf_2;
-            on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
-        }
-        else if(disp_refr->buf_act == disp_refr->buf_2) {
-            off_screen2 = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_1;
-            on_screen = disp_refr->buf_1;
-        }
-        else {
-            off_screen2 = disp_refr->buf_1;
-            on_screen = disp_refr->buf_2;
-        }
-    }
-
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
 
@@ -772,11 +748,39 @@ static void refr_sync_areas(void)
         }
         /*Or do the internal double buffered direct mode sync*/
         else {
-            lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
-            if(off_screen2 != on_screen)
-                lv_draw_buf_copy(off_screen2, sync_area, on_screen, sync_area);
+            /*The buffers are already swapped.
+             *So the active buffer is the off screen buffer where LVGL will render*/
+            lv_draw_buf_t * off_screen = disp_refr->buf_act;
+            /*The previous buffer that flushed recently, might be on-screen only
+             *after the next VSYNC, shall not be modified*/
+            lv_draw_buf_t * queued_screen = NULL;
+            /*The next buffer that still might be on-screen, modifying this before
+              the queued screen is activated might cause tearing.
+              The variable is not needed in the actual process and would cause
+              'set but unused' warnings, so it's been kept only for reference*/
+            /*lv_draw_buf_t * on_screen = NULL;*/
+
+            if(off_screen == disp_refr->buf_3) {
+                queued_screen = disp_refr->buf_2;
+                /*on_screen = disp_refr->buf_1;*/
+            }
+            else if(off_screen == disp_refr->buf_2) {
+                queued_screen = disp_refr->buf_1;
+                /*on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : off_screen;*/
+            }
+            else {
+                queued_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
+                /*on_screen = disp_refr->buf_3 ? disp_refr->buf_2 : off_screen;*/
+            }
+
+            lv_draw_buf_copy(off_screen, sync_area, queued_screen, sync_area);
         }
     }
+
+    /*Now the buffers in sync and the off screen buffer is ready to be updated.
+     *If it is flushed just in time before the queued screen is swapped to at a
+     *VSYNC, it shall override it and be the latest frame. If it is too late to
+     *override, it shall be the next frame (unless overridden by the next flush.*/
 
     /*Clear sync areas*/
     lv_ll_clear(&disp_refr->sync_areas);
