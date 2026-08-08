@@ -90,23 +90,24 @@ struct _lv_display_t {
     volatile uint32_t last_part         : 1; /**< 1: last part of the current area is being rendered */
 
     /**
-     * Used to synchronize changes between frame buffers between renders.
+     * Used to synchronize changes between frame buffers between renders in LV_DISP_RENDER_MODE_PARTIAL.
+     * For an extended documentation see `lv_display_set_partial_sync_cb()`.
      * Called for each area needing to be synchronized before rendering next frame. */
-    lv_display_sync_cb_t sync_cb;
+    lv_display_partial_sync_cb_t partial_sync_cb;
 
     /**
-     * Used to wait while syncing is ready.
+     * Used to wait while partial syncing is ready.
      * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
-     * If not set `syncing` flag is used which can be cleared with `lv_display_sync_ready()` */
-    lv_display_sync_wait_cb_t sync_wait_cb;
+     * If not set `partial_syncing` flag is used which can be cleared with `lv_display_partial_sync_ready()` */
+    lv_display_partial_sync_wait_cb_t partial_sync_wait_cb;
 
-    /** 1: syncing is in progress. (It can't be a bit field because when it's cleared from IRQ
+    /** 1: partial syncing is in progress. (It can't be a bit field because when it's cleared from IRQ
      * Read-Modify-Write issue might occur) */
-    volatile int syncing;
+    volatile int partial_syncing;
 
     /** 1: It was the last chunk to sync. (It can't be a bit field because when it's cleared
      * from IRQ Read-Modify-Write issue might occur) */
-    volatile int syncing_last;
+    volatile int partial_syncing_last;
 
     /** Sync areas (redrawn during last refresh) */
     lv_ll_t sync_areas;
