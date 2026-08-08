@@ -336,15 +336,15 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
  * Set the partial sync callback which will be called to synchronize invalidated areas between frame buffers.
  * In case the underlying hardware does not support frame buffer rotation, the only viable option to implement it
  * is by reverting to LV_DISPLAY_RENDER_MODE_PARTIAL and rotating the reported dirty areas in the driver's
- * flush_cb() callback in software by using lv_draw_sw_rotate(). To accellerate the rendering, the driver can
+ * flush_cb() callback in software by using lv_draw_sw_rotate(). To accelerate the rendering, the driver can
  * still implement multiple full frame buffers under the hood, keeping track of them and choosing the target of
  * its flush_cb() callback without the upper layers' knowledge about it. To keep the buffers in sync and use
  * the previous frame as a base for rendering the next one, normally the driver would have to copy the full
- * contents of the old phyisically rotated frame buffer to the new one, taking a severe performance hit.
+ * contents of the old physically rotated frame buffer to the new one, taking a severe performance hit.
  * If this callback is set, the dirty areas are collected during the rendering phase (just as if it were in
  * direct rendering mode) and before the rendering of the next frame starts, the callback is called to inform
  * the driver to synchronize them between its frame buffers. It is the driver's responsibility to identify the
- * source and destination frame buffers based on its internal bokkeeping. The driver is free to do the task in
+ * source and destination frame buffers based on its internal bookkeeping. The driver is free to do the task in
  * software or with the help of a DMA 2D engine.
  * @param disp     pointer to a display
  * @param sync_cb  the sync callback (pointer to `area` needing to be synchronized)
