@@ -679,9 +679,6 @@ static void refr_sync_areas(void)
     if(lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
     LV_PROFILER_REFR_BEGIN;
-    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
-    /*We need to wait for ready here to not mess up the active screen*/
-    wait_for_flushing(disp_refr);
 
     /*Iterate through invalidated areas to see if sync area should be copied*/
     uint16_t i;
@@ -722,6 +719,11 @@ static void refr_sync_areas(void)
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
 
     lv_area_t disp_area = {0, 0, (int32_t)hor_res - 1, (int32_t)ver_res - 1};
+
+    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
+    /*We need to wait for ready here to not mess up the active screen*/
+    wait_for_flushing(disp_refr);
+
     /*Copy sync areas (if any remaining)*/
     for(sync_area = lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
         sync_area = lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
