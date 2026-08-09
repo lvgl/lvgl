@@ -15,6 +15,25 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
                                  const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                  const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 
+/**
+ * Describe one input picture of a blend: a block_w x block_h region taken at
+ * (off_x, off_y) inside a pic_w x pic_h picture. Both blend paths use it so the
+ * geometry cannot drift between them.
+ */
+static inline void ppa_set_in_blk(ppa_in_pic_blk_config_t * blk, const void * buffer,
+                                  int32_t pic_w, int32_t pic_h, int32_t off_x, int32_t off_y,
+                                  int32_t block_w, int32_t block_h, ppa_blend_color_mode_t cm)
+{
+    blk->buffer         = (void *)buffer;
+    blk->pic_w          = pic_w;
+    blk->pic_h          = pic_h;
+    blk->block_w        = block_w;
+    blk->block_h        = block_h;
+    blk->block_offset_x = off_x;
+    blk->block_offset_y = off_y;
+    blk->blend_cm       = cm;
+}
+
 
 void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                      const lv_area_t * coords)
@@ -73,31 +92,26 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     ppa_blend_oper_config_t cfg;
     lv_memzero(&cfg, sizeof(cfg));
 
+    /* Both paths blend the same clipped region; only the roles differ. The
+     * image sits at src_area inside its own picture, the destination region at
+     * dest_area inside the layer buffer. Filling the geometry through one
+     * helper keeps that invariant in a single place. */
     if(needs_compositing) {
         /* Composite: the background is what the destination already holds and
          * the foreground is the image drawn over it. The copy path below uses
-         * the opposite assignment, which is why it cannot honour a source
-         * alpha channel - it overwrites that alpha with 0xFF. */
-        cfg.in_bg.buffer         = (void *)dest_buf;
-        cfg.in_bg.pic_w          = draw_buf->header.w;
-        cfg.in_bg.pic_h          = draw_buf->header.h;
-        cfg.in_bg.block_w        = block_w;
-        cfg.in_bg.block_h        = block_h;
-        cfg.in_bg.block_offset_x = dest_area.x1;
-        cfg.in_bg.block_offset_y = dest_area.y1;
-        cfg.in_bg.blend_cm       = lv_color_format_to_ppa_blend(dest_cf);
-        /* The backdrop is opaque whatever its format claims. */
+         * the opposite assignment, which is why it cannot honour a source alpha
+         * channel - it overwrites that alpha with 0xFF. */
+        ppa_set_in_blk(&cfg.in_bg, dest_buf, draw_buf->header.w, draw_buf->header.h,
+                       dest_area.x1, dest_area.y1, block_w, block_h,
+                       lv_color_format_to_ppa_blend(dest_cf));
+        ppa_set_in_blk(&cfg.in_fg, src_buf, draw_dsc->header.w, draw_dsc->header.h,
+                       src_area.x1, src_area.y1, block_w, block_h,
+                       lv_color_format_to_ppa_blend(src_cf));
+
+        /* ppa_evaluate() only accepts RGB565 destinations for this path, and
+         * RGB565 carries no alpha, so the backdrop is opaque by construction. */
         cfg.bg_alpha_update_mode = PPA_ALPHA_FIX_VALUE;
         cfg.bg_alpha_fix_val     = 0xFF;
-
-        cfg.in_fg.buffer         = (void *)src_buf;
-        cfg.in_fg.pic_w          = draw_dsc->header.w;
-        cfg.in_fg.pic_h          = draw_dsc->header.h;
-        cfg.in_fg.block_w        = block_w;
-        cfg.in_fg.block_h        = block_h;
-        cfg.in_fg.block_offset_x = src_area.x1;
-        cfg.in_fg.block_offset_y = src_area.y1;
-        cfg.in_fg.blend_cm       = lv_color_format_to_ppa_blend(src_cf);
 
         if(src_has_alpha && !opa_is_partial) {
             /* The image's own per-pixel alpha, unchanged. */
@@ -120,29 +134,18 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
     }
     else {
         /* Opaque copy: the source is the background and the foreground is a
-         * fully transparent dummy, so the output is the converted source. */
-        cfg.in_bg.buffer         = (void *)src_buf;
-        cfg.in_bg.pic_w          = draw_dsc->header.w;
-        cfg.in_bg.pic_h          = draw_dsc->header.h;
-        cfg.in_bg.block_w        = block_w;
-        cfg.in_bg.block_h        = block_h;
-        cfg.in_bg.block_offset_x = src_area.x1;
-        cfg.in_bg.block_offset_y = src_area.y1;
-        cfg.in_bg.blend_cm       = lv_color_format_to_ppa_blend(src_cf);
+         * fully transparent dummy, so the output is the converted source. The
+         * dummy still has to describe a region that exists in the destination
+         * buffer - the PPA fetches it even though it contributes nothing. */
+        ppa_set_in_blk(&cfg.in_bg, src_buf, draw_dsc->header.w, draw_dsc->header.h,
+                       src_area.x1, src_area.y1, block_w, block_h,
+                       lv_color_format_to_ppa_blend(src_cf));
+        ppa_set_in_blk(&cfg.in_fg, dest_buf, draw_buf->header.w, draw_buf->header.h,
+                       dest_area.x1, dest_area.y1, block_w, block_h,
+                       PPA_BLEND_COLOR_MODE_A8);
+
         cfg.bg_alpha_update_mode = PPA_ALPHA_FIX_VALUE;
         cfg.bg_alpha_fix_val     = 0xFF;
-
-        /* Dummy A8 foreground. It must describe a region that really exists in
-         * the destination buffer: the PPA still fetches it even though
-         * fg_alpha_fix_val = 0 makes it contribute nothing. */
-        cfg.in_fg.buffer         = (void *)dest_buf;
-        cfg.in_fg.pic_w          = draw_buf->header.w;
-        cfg.in_fg.pic_h          = draw_buf->header.h;
-        cfg.in_fg.block_w        = block_w;
-        cfg.in_fg.block_h        = block_h;
-        cfg.in_fg.block_offset_x = dest_area.x1;
-        cfg.in_fg.block_offset_y = dest_area.y1;
-        cfg.in_fg.blend_cm       = PPA_BLEND_COLOR_MODE_A8;
         cfg.fg_alpha_update_mode = PPA_ALPHA_FIX_VALUE;
         cfg.fg_alpha_fix_val     = 0;
     }
