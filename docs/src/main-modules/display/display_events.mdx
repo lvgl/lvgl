@@ -41,6 +41,11 @@ The following events are sent for Display (lv_display_t) objects:
   Call returns immediately if `disp->flushing == 0`.
 - <ApiLink name="LV_EVENT_FLUSH_WAIT_FINISH" />: Sent when the call to `wait_for_flushing()`
   is about to return, regardless whether any actual waiting occurred.
+- <ApiLink name="LV_EVENT_PARTIAL_SYNC_WAIT_START" />: Sent at the beginning of internal call to
+  `wait_for_partial_syncing()` -- happens whether or not any waiting will actually occur.
+  Call returns immediately if `disp->partial_syncing == 0`.
+- <ApiLink name="LV_EVENT_PARTIAL_SYNC_WAIT_FINISH" />: Sent when the call to `wait_for_partial_syncing()`
+  is about to return, regardless whether any actual waiting occurred.
 - <ApiLink name="LV_EVENT_SCREEN_UNLOAD_START" />: Sent when a screen starts to be unloaded on this display
 - <ApiLink name="LV_EVENT_SCREEN_LOAD_START" />: Sent when a screen starts to be loaded on this display
 - <ApiLink name="LV_EVENT_SCREEN_LOADED" />: Sent when a screen finishes being loaded on this display
