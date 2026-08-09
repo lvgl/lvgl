@@ -362,7 +362,7 @@ void test_array_copy_zero_capacity(void)
 
 void test_array_copy_allocation_failure(void)
 {
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && !LV_USE_ASSERT_MALLOC
     lv_array_t target;
     lv_array_init(&target, 2, sizeof(int32_t));
     int32_t val = 42;
