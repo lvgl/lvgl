@@ -351,7 +351,7 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
  * source and destination frame buffers based on its internal bookkeeping. The driver is free to do the task in
  * software or with the help of a DMA 2D engine.
  * @param disp     pointer to a display
- * @param sync_cb  the sync callback (pointer to `area` needing to be synchronized)
+ * @param sync_cb  the sync callback (pointer to `area` needing to be synchronized, already in translated physical frame buffer space)
  */
 void lv_display_set_partial_sync_cb(lv_display_t * disp, lv_display_partial_sync_cb_t sync_cb);
 

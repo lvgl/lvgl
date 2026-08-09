@@ -726,11 +726,14 @@ static void refr_sync_areas(void)
         if(!lv_area_intersect(sync_area, sync_area, &disp_area)) {
             continue;
         }
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-        if(lv_display_get_matrix_rotation(disp_refr)) {
+
+        /*In case the synchronization happens between physically rotated frame buffers,
+         *the area shall be rotated first to convert from the internal logical pixel space
+         *to the physical frame buffer space*/
+        if(partial_sync || lv_display_get_matrix_rotation(disp_refr)) {
             lv_display_rotate_area(disp_refr, sync_area);
         }
-#endif
+
         /*Do the partial syncing if configured*/
         if(partial_sync) {
             /*Set syncing flags*/
