@@ -27,6 +27,10 @@ extern "C" {
 #define LV_ATTRIBUTE_FLUSH_READY
 #endif
 
+#ifndef LV_ATTRIBUTE_PARTIAL_SYNC_READY
+#define LV_ATTRIBUTE_PARTIAL_SYNC_READY
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
