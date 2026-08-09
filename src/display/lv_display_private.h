@@ -96,7 +96,9 @@ struct _lv_display_t {
     /**
      * Used to synchronize changes between frame buffers between renders in LV_DISPLAY_RENDER_MODE_PARTIAL.
      * For an extended documentation see `lv_display_set_partial_sync_cb()`.
-     * Called for each area needing to be synchronized before rendering next frame. */
+     * Called for each area needing to be synchronized before rendering the next frame, with
+     * the areas converted to the physical frame buffer space and translated to provide the
+     * same interface as `flush_cb` does. */
     lv_display_partial_sync_cb_t partial_sync_cb;
 
     /**
