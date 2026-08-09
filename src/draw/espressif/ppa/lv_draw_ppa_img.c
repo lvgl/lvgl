@@ -56,54 +56,106 @@ static void lv_draw_img_ppa_core(lv_draw_task_t * t, const lv_draw_image_dsc_t *
 
     extern const lv_image_dsc_t img_benchmark_lvgl_logo_rgb;
 
-    ppa_blend_oper_config_t cfg = {
-        .in_bg = {
-            .buffer          = (void *)src_buf,
-            .pic_w           = draw_dsc->header.w,
-            .pic_h           = draw_dsc->header.h,
-            .block_w         = lv_area_get_width(clipped_img_area),
-            .block_h         = lv_area_get_height(clipped_img_area),
-            .block_offset_x  = src_area.x1,
-            .block_offset_y  = src_area.y1,
-            .blend_cm        = lv_color_format_to_ppa_blend(src_cf),
-        },
-        .bg_rgb_swap           = false,
-        .bg_byte_swap          = false,
-        .bg_alpha_update_mode  = PPA_ALPHA_FIX_VALUE,
-        .bg_alpha_fix_val      = 0xFF,
-        .bg_ck_en              = false,
-        .in_fg = {
-            .buffer          = (void *)dest_buf,
-            .pic_w           = draw_dsc->header.w,
-            .pic_h           = draw_dsc->header.h,
-            .block_w         = lv_area_get_width(clipped_img_area),
-            .block_h         = lv_area_get_height(clipped_img_area),
-            .block_offset_x  = src_area.x1,
-            .block_offset_y  = src_area.y1,
-            .blend_cm        = PPA_BLEND_COLOR_MODE_A8,
-        },
-        .fg_fix_rgb_val = {
-            .r = 0,
-            .g = 0,
-            .b = 0,
-        },
-        .fg_rgb_swap           = false,
-        .fg_byte_swap          = false,
-        .fg_alpha_update_mode  = PPA_ALPHA_FIX_VALUE,
-        .fg_alpha_fix_val      = 0,
-        .fg_ck_en              = false,
-        .out = {
-            .buffer          = dest_buf,
-            .buffer_size     = draw_buf->data_size,
-            .pic_w           = draw_buf->header.w,
-            .pic_h           = draw_buf->header.h,
-            .block_offset_x  = dest_area.x1,
-            .block_offset_y  = dest_area.y1,
-            .blend_cm        = lv_color_format_to_ppa_blend(dest_cf),
-        },
-        .mode            = PPA_TRANS_MODE_BLOCKING,
-        .user_data       = u,
-    };
+    const int32_t block_w = lv_area_get_width(clipped_img_area);
+    const int32_t block_h = lv_area_get_height(clipped_img_area);
+
+    /* Does this draw need real compositing, or is a plain copy enough?
+     * - a source alpha channel has to be honoured against what the destination
+     *   already holds;
+     * - a global opacity has to fade the image into it.
+     * LVGL treats opa >= LV_OPA_MAX as fully covering, so only a value below
+     * that is worth a compositing pass. Everything else keeps the copy. */
+    const lv_opa_t opa = draw_dsc->opa;
+    const bool src_has_alpha = lv_ppa_cf_has_alpha(src_cf);
+    const bool opa_is_partial = opa < (lv_opa_t)LV_OPA_MAX;
+    const bool needs_compositing = src_has_alpha || opa_is_partial;
+
+    ppa_blend_oper_config_t cfg;
+    lv_memzero(&cfg, sizeof(cfg));
+
+    if(needs_compositing) {
+        /* Composite: the background is what the destination already holds and
+         * the foreground is the image drawn over it. The copy path below uses
+         * the opposite assignment, which is why it cannot honour a source
+         * alpha channel - it overwrites that alpha with 0xFF. */
+        cfg.in_bg.buffer         = (void *)dest_buf;
+        cfg.in_bg.pic_w          = draw_buf->header.w;
+        cfg.in_bg.pic_h          = draw_buf->header.h;
+        cfg.in_bg.block_w        = block_w;
+        cfg.in_bg.block_h        = block_h;
+        cfg.in_bg.block_offset_x = dest_area.x1;
+        cfg.in_bg.block_offset_y = dest_area.y1;
+        cfg.in_bg.blend_cm       = lv_color_format_to_ppa_blend(dest_cf);
+        /* The backdrop is opaque whatever its format claims. */
+        cfg.bg_alpha_update_mode = PPA_ALPHA_FIX_VALUE;
+        cfg.bg_alpha_fix_val     = 0xFF;
+
+        cfg.in_fg.buffer         = (void *)src_buf;
+        cfg.in_fg.pic_w          = draw_dsc->header.w;
+        cfg.in_fg.pic_h          = draw_dsc->header.h;
+        cfg.in_fg.block_w        = block_w;
+        cfg.in_fg.block_h        = block_h;
+        cfg.in_fg.block_offset_x = src_area.x1;
+        cfg.in_fg.block_offset_y = src_area.y1;
+        cfg.in_fg.blend_cm       = lv_color_format_to_ppa_blend(src_cf);
+
+        if(src_has_alpha && !opa_is_partial) {
+            /* The image's own per-pixel alpha, unchanged. */
+            cfg.fg_alpha_update_mode = PPA_ALPHA_NO_CHANGE;
+        }
+        else if(src_has_alpha) {
+            /* Per-pixel alpha scaled by the global opacity. alpha_scale_ratio is
+             * a float in the OPEN range (0, 1): opa is above LV_OPA_MIN (the
+             * caller returns early at or below it) and below LV_OPA_MAX here, so
+             * the quotient stays strictly inside it. */
+            cfg.fg_alpha_update_mode = PPA_ALPHA_SCALE;
+            cfg.fg_alpha_scale_ratio = (float)opa / 255.0f;
+        }
+        else {
+            /* No alpha channel, or an undefined X byte: the global opacity is
+             * the alpha of every pixel. */
+            cfg.fg_alpha_update_mode = PPA_ALPHA_FIX_VALUE;
+            cfg.fg_alpha_fix_val     = opa;
+        }
+    }
+    else {
+        /* Opaque copy: the source is the background and the foreground is a
+         * fully transparent dummy, so the output is the converted source. */
+        cfg.in_bg.buffer         = (void *)src_buf;
+        cfg.in_bg.pic_w          = draw_dsc->header.w;
+        cfg.in_bg.pic_h          = draw_dsc->header.h;
+        cfg.in_bg.block_w        = block_w;
+        cfg.in_bg.block_h        = block_h;
+        cfg.in_bg.block_offset_x = src_area.x1;
+        cfg.in_bg.block_offset_y = src_area.y1;
+        cfg.in_bg.blend_cm       = lv_color_format_to_ppa_blend(src_cf);
+        cfg.bg_alpha_update_mode = PPA_ALPHA_FIX_VALUE;
+        cfg.bg_alpha_fix_val     = 0xFF;
+
+        /* Dummy A8 foreground. It must describe a region that really exists in
+         * the destination buffer: the PPA still fetches it even though
+         * fg_alpha_fix_val = 0 makes it contribute nothing. */
+        cfg.in_fg.buffer         = (void *)dest_buf;
+        cfg.in_fg.pic_w          = draw_buf->header.w;
+        cfg.in_fg.pic_h          = draw_buf->header.h;
+        cfg.in_fg.block_w        = block_w;
+        cfg.in_fg.block_h        = block_h;
+        cfg.in_fg.block_offset_x = dest_area.x1;
+        cfg.in_fg.block_offset_y = dest_area.y1;
+        cfg.in_fg.blend_cm       = PPA_BLEND_COLOR_MODE_A8;
+        cfg.fg_alpha_update_mode = PPA_ALPHA_FIX_VALUE;
+        cfg.fg_alpha_fix_val     = 0;
+    }
+
+    cfg.out.buffer          = dest_buf;
+    cfg.out.buffer_size     = draw_buf->data_size;
+    cfg.out.pic_w           = draw_buf->header.w;
+    cfg.out.pic_h           = draw_buf->header.h;
+    cfg.out.block_offset_x  = dest_area.x1;
+    cfg.out.block_offset_y  = dest_area.y1;
+    cfg.out.blend_cm        = lv_color_format_to_ppa_blend(dest_cf);
+    cfg.mode                = PPA_TRANS_MODE_BLOCKING;
+    cfg.user_data           = u;
 
     esp_err_t ret = ppa_do_blend(u->blend_client, &cfg);
     if(ret != ESP_OK) {
