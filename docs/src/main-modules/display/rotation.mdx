@@ -103,7 +103,7 @@ multiple full frame buffers under the hood, keeping track of them and choosing t
 target of its flush_cb() callback without the upper layers' knowledge about it.
 To keep the buffers in sync and use the previous frame as a base for rendering the
 next one, normally the driver would have to copy the full contents of the old
-physically rotated frame buffer to the new one, taking a severe performance it.
+physically rotated frame buffer to the new one, taking a severe performance hit.
 However, if the partial syncing callback is set:
 
 ```c
@@ -124,7 +124,7 @@ axis reflections and shifts.
 
 Below is an example for synchronizing the private frame buffers of a driver
 when the rendering mode is <ApiLink name="LV_DISPLAY_RENDER_MODE_PARTIAL" />.
-The driver's flush_cb() callback is assumed to render to ˙frame_buffer[frame_buffer_active]`
+The driver's flush_cb() callback is assumed to render to `frame_buffer[frame_buffer_active]`
 and to flip the active buffer by doing `frame_buffer_active ^= 1` after the flushing
 of the last area has completed.
 
