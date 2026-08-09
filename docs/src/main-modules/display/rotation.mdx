@@ -140,6 +140,10 @@ static void lvgl_partial_sync_cb(lv_display_t * disp, const lv_area_t * area)
     int32_t area_h = lv_area_get_height(area);
 
     /*Calculate the properties of the source and destination buffers*/
+    /*flush_cb() renders to frame_buffer[frame_buffer_active] and by
+     *this time it has already swapped the buffers. Have to copy from
+     *the previous buffer (determined by countering the flip) to the
+     *current, which is going to be the destination of the next flush_cb().*/
     uint8_t *fb_src = (uint8_t *)frame_buffer[frame_buffer_active ^ 1];
     fb_src += ((area->y1 * FRAME_BUF_STRIDE) + area->x1) * FRAME_BUF_BPP;
     uint8_t *fb_dst = (uint8_t *)frame_buffer[frame_buffer_active];
