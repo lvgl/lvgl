@@ -142,10 +142,21 @@ static inline ppa_blend_color_mode_t lv_color_format_to_ppa_blend(lv_color_forma
         case LV_COLOR_FORMAT_RGB888:
             return PPA_BLEND_COLOR_MODE_RGB888;
         case LV_COLOR_FORMAT_ARGB8888:
+        /* XRGB8888 is 4 bytes/pixel like ARGB8888, only its alpha byte is
+         * undefined. Letting it reach the RGB565 default would make the PPA
+         * read a 4 B/px buffer as 2 B/px. Callers force the alpha for this
+         * format since the X byte carries no meaning. */
+        case LV_COLOR_FORMAT_XRGB8888:
             return PPA_BLEND_COLOR_MODE_ARGB8888;
         default:
             return PPA_BLEND_COLOR_MODE_RGB565;
     }
+}
+
+/** True if the format carries a meaningful per-pixel alpha channel. */
+static inline bool lv_ppa_cf_has_alpha(lv_color_format_t lv_fmt)
+{
+    return lv_fmt == LV_COLOR_FORMAT_ARGB8888;
 }
 
 static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t lv_fmt)
