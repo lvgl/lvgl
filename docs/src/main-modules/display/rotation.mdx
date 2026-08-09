@@ -136,14 +136,14 @@ lv_display_set_partial_sync_cb(disp, lvgl_partial_sync_cb);
 static void lvgl_partial_sync_cb(lv_display_t * disp, const lv_area_t * area)
 {
     /*Calculate the properties of the sync area*/
-    int32_t area_w = lv_area_get_width(&rotated_area);
-    int32_t area_h = lv_area_get_height(&rotated_area);
+    int32_t area_w = lv_area_get_width(area);
+    int32_t area_h = lv_area_get_height(area);
 
     /*Calculate the properties of the source and destination buffers*/
     uint8_t *fb_src = (uint8_t *)frame_buffer[frame_buffer_active ^ 1];
-    fb_src += ((rotated_area.y1 * FRAME_BUF_STRIDE) + rotated_area.x1) * FRAME_BUF_BPP;
+    fb_src += ((area->y1 * FRAME_BUF_STRIDE) + area->x1) * FRAME_BUF_BPP;
     uint8_t *fb_dst = (uint8_t *)frame_buffer[frame_buffer_active];
-    fb_dst += ((rotated_area.y1 * FRAME_BUF_STRIDE) + rotated_area.x1) * FRAME_BUF_BPP;
+    fb_dst += ((area->y1 * FRAME_BUF_STRIDE) + area->x1) * FRAME_BUF_BPP;
 
     /*Copy the sync area from source buffer to destination buffer*/
     int32_t fb_stride = FRAME_BUF_STRIDE * FRAME_BUF_BPP;
@@ -156,5 +156,5 @@ static void lvgl_partial_sync_cb(lv_display_t * disp, const lv_area_t * area)
 
     /*Call sync ready when done syncing all areas*/
     lv_display_partial_sync_ready(disp);
-}``
-
+}
+```
