@@ -119,7 +119,9 @@ static inline bool lv_array_is_full(const lv_array_t * array)
 
 /**
  * Copy an array to another.
- * @note this will create a new array with the same capacity and size as the source array.
+ * @note target is always made an exact copy of source. Any existing content in target is
+ *       deinitialized. If source is empty, target will also be empty. If target's previous
+ *       contents need to be preserved when source is empty, check `lv_array_is_empty` first.
  * @param target pointer to an `lv_array_t` variable to copy to
  * @param source pointer to an `lv_array_t` variable to copy from
  */

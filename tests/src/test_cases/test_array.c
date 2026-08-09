@@ -305,4 +305,107 @@ void test_array_assign(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_array_assign(&array, 5, &v));
 }
 
+void test_array_copy_empty_to_uninitialized(void)
+{
+    lv_array_t target = {0};
+    lv_array_t source;
+    lv_array_init(&source, 2, sizeof(int32_t));
+
+    lv_array_copy(&target, &source);
+
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_size(&target));
+    TEST_ASSERT_EQUAL_UINT32(2, lv_array_capacity(&target));
+    TEST_ASSERT_NOT_NULL(target.data);
+
+    lv_array_deinit(&target);
+    lv_array_deinit(&source);
+}
+
+void test_array_copy_empty_to_populated(void)
+{
+    lv_array_t target;
+    lv_array_init(&target, 4, sizeof(int32_t));
+    int32_t val = 42;
+    lv_array_push_back(&target, &val);
+
+    lv_array_t source;
+    lv_array_init(&source, 2, sizeof(int32_t));
+
+    uint32_t mem_before = lv_test_get_free_mem();
+    lv_array_copy(&target, &source);
+
+    /* Verify old target memory was freed and new empty capacity was allocated */
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_size(&target));
+    TEST_ASSERT_EQUAL_UINT32(2, lv_array_capacity(&target));
+    TEST_ASSERT_NOT_NULL(target.data);
+
+    lv_array_deinit(&target);
+    lv_array_deinit(&source);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+}
+
+void test_array_copy_zero_capacity(void)
+{
+    lv_array_t target = {0};
+    lv_array_t source;
+    lv_array_init(&source, 0, 0);
+
+    lv_array_copy(&target, &source);
+
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_size(&target));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_capacity(&target));
+    TEST_ASSERT_NOT_NULL(target.data);
+
+    lv_array_deinit(&target);
+    lv_array_deinit(&source);
+}
+
+void test_array_copy_allocation_failure(void)
+{
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    lv_array_t target;
+    lv_array_init(&target, 2, sizeof(int32_t));
+    int32_t val = 42;
+    lv_array_push_back(&target, &val);
+
+    lv_array_t source;
+    uint8_t dummy_buf[4];
+    lv_array_init_from_buf(&source, dummy_buf, LV_MEM_SIZE + 1, 1);
+
+    uint32_t mem_before = lv_test_get_free_mem();
+
+    /* Copying source with huge capacity should cause allocation failure in init */
+    lv_array_copy(&target, &source);
+
+    /* Verify target was zeroed/safe-to-deinit, and no memory was leaked */
+    TEST_ASSERT_NULL(target.data);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_size(&target));
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_capacity(&target));
+
+    lv_array_deinit(&target);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+#endif
+}
+
+void test_array_copy_self(void)
+{
+    lv_array_t target;
+    lv_array_init(&target, 4, sizeof(int32_t));
+    int32_t val = 42;
+    lv_array_push_back(&target, &val);
+
+    uint32_t mem_before = lv_test_get_free_mem();
+
+    /* Copying to self should be a no-op */
+    lv_array_copy(&target, &target);
+
+    TEST_ASSERT_EQUAL_UINT32(1, lv_array_size(&target));
+    TEST_ASSERT_EQUAL_UINT32(4, lv_array_capacity(&target));
+    int32_t * r = lv_array_at(&target, 0);
+    TEST_ASSERT_EQUAL_INT32(42, *r);
+
+    lv_array_deinit(&target);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+}
+
 #endif
