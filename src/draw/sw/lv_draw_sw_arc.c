@@ -124,6 +124,10 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
     int32_t blend_w = lv_area_get_width(&clipped_area);
     int32_t h;
     lv_opa_t * mask_buf = lv_malloc(blend_w);
+    if(!mask_buf) {
+        LV_LOG_WARN("Couldn't allocate arc mask buffer");
+        goto mask_buf_alloc_fail;
+    }
 
     lv_area_t blend_area = clipped_area;
     lv_area_t img_area;
@@ -246,6 +250,10 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
     if(circle_mask) lv_free(circle_mask);
     return;
 
+mask_buf_alloc_fail:
+    if(mask_in_param_valid) {
+        lv_draw_sw_mask_free_param(&mask_in_param);
+    }
 inner_arc_mask_fail:
     lv_draw_sw_mask_free_param(&mask_out_param);
 outer_arc_mask_fail:
