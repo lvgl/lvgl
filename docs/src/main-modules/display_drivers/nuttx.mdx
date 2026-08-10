@@ -1,0 +1,116 @@
+---
+title: NuttX
+description: "The NuttX driver creates an LVGL display from a /dev/fb* framebuffer or a /dev/lcd* device, and can bring up the matching touchscreen and mouse input devices in one call."
+faqs:
+  - question: "Should I use the fbdev or the lcd device?"
+    answer: "Use /dev/fb* when the board exposes a framebuffer, and /dev/lcd* for the character-LCD style interface. The lvgldemo example handles both, and the sim:lvgl_fb and sim:lvgl_lcd defconfigs show each."
+  - question: "Do I have to create the display and input devices separately?"
+    answer: "No. lv_nuttx_init() takes an lv_nuttx_dsc_t of device paths and brings up the display plus the touchscreen and mouse indevs together, returning them in an lv_nuttx_result_t."
+  - question: "Are keyboards supported?"
+    answer: "Not yet. The NuttX X11 sim keyboard driver emits non-standard keycodes, so a generic LVGL integration is not possible today."
+---
+
+## Overview
+
+The [NuttX driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/nuttx) binds LVGL to
+NuttX's display and input device nodes. It can create a display from either interface NuttX
+exposes:
+
+- **fbdev** — a framebuffer at `/dev/fb*`
+- **lcd** — an LCD device at `/dev/lcd*`
+
+It also creates the matching input devices, so a full setup usually needs one call. For the OS
+side of the integration --- building LVGL as a NuttX app, `menuconfig`, libuv and the profiler
+--- see [NuttX](/integration/rtos/nuttx) under RTOS support.
+
+### Prerequisites
+
+A NuttX build with a framebuffer or LCD driver enabled for your board, and the corresponding
+device nodes present.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_NUTTX" />, then the interfaces you need.
+
+| Symbol | Default | Effect |
+|---|---|---|
+| `LV_USE_NUTTX` | off | NuttX support. Required for everything below. |
+| `LV_USE_NUTTX_LCD` | off | Display from a `/dev/lcd*` device. Framebuffer support is always available. |
+| `LV_USE_NUTTX_TOUCHSCREEN` | off | Touchscreen indev from the NuttX input/uinput system. |
+| `LV_USE_NUTTX_MOUSE` | off | Mouse indev. |
+| `LV_USE_NUTTX_MOUSE_MOVE_STEP` | `1` | Pixels per mouse movement step. |
+| `LV_USE_NUTTX_LIBUV` | off | Use libuv as the event loop manager. |
+| `LV_USE_NUTTX_CUSTOM_INIT` | off | Provide your own init/deinit instead of the built-in one. |
+| `LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP` | off | Give the image cache a dedicated heap. |
+| `LV_USE_NUTTX_TRACE_FILE` | off | Write profiler trace output to a file. |
+
+<Callout type="info" title="No LV_OS_NUTTX">
+NuttX is POSIX compliant, so set <ApiLink name="LV_USE_OS" /> to `LV_OS_PTHREAD` rather than
+looking for a NuttX-specific value. This is only needed for
+[multi-core rendering](/main-modules/renderers/sw#multi-core-rendering).
+</Callout>
+
+## Usage
+
+### All at once
+
+<ApiLink name="lv_nuttx_init" /> takes a descriptor of device paths and brings up the display and
+input devices together.
+
+```c
+lv_nuttx_dsc_t dsc;
+lv_nuttx_result_t result;
+
+lv_nuttx_dsc_init(&dsc);
+dsc.fb_path    = "/dev/fb0";
+dsc.utouch_path = "/dev/utouch0";
+
+lv_nuttx_init(&dsc, &result);
+
+/* result.disp, result.indev, result.utouch_indev and result.mouse_indev are now set */
+```
+
+<ApiLink name="lv_nuttx_run" /> then runs the event loop, and
+<ApiLink name="lv_nuttx_deinit" /> tears everything down.
+
+### Individually
+
+The display and input devices can also be created one by one:
+
+```c
+lv_display_t * disp = lv_nuttx_fbdev_create();
+lv_nuttx_fbdev_set_file(disp, "/dev/fb0");
+
+/* or, for an LCD device */
+lv_display_t * disp = lv_nuttx_lcd_create("/dev/lcd0");
+
+lv_indev_t * touch = lv_nuttx_touchscreen_create("/dev/utouch0");
+```
+
+<Callout type="tip">
+[examples/lvgldemo](https://github.com/apache/nuttx-apps/tree/master/examples/lvgldemo) in
+`nuttx-apps` is the reference application. It handles both fb and lcd displays, the touchscreen
+indev and libuv, and is used by every LVGL defconfig — start by copying `lvgldemo.c`.
+</Callout>
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Rotation | Software |
+| Runtime resolution change | No |
+| Runtime color format change | No |
+| Color formats | Taken from the framebuffer or LCD device |
+| Multiple displays / windows | Yes |
+| Hardware acceleration | None in the driver itself |
+| Input | Touchscreen and mouse. **No keyboard support** — see below |
+
+<Callout type="warn">
+There is no support for input/uinput keyboards yet. The NuttX X11 sim keyboard driver emits
+non-standard keycodes, so an LVGL integration with it would not be generic.
+</Callout>
+
+## See Also
+
+- [NuttX](/integration/rtos/nuttx) - building and configuring LVGL as a NuttX app
+- [Input devices](/main-modules/indev) - how LVGL consumes the input this driver provides

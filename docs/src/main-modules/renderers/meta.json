@@ -1,0 +1,19 @@
+{
+  "title": "Renderers and GPUs",
+  "pages": [
+    "overview",
+    "sw",
+    "arm2d",
+    "nanovg",
+    "opengles",
+    "sdl",
+    "vg_lite",
+    "dave2d",
+    "nema_gfx",
+    "pxp",
+    "g2d",
+    "dma2d",
+    "ppa",
+    "eve"
+  ]
+}

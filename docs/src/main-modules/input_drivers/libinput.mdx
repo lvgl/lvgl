@@ -1,0 +1,137 @@
+---
+title: libinput
+description: "The libinput driver reads pointer, touch and keyboard input through libinput, which handles device-specific quirks and offers full keyboard support through XKB."
+---
+
+## Overview
+
+[libinput](https://wiki.archlinux.org/title/Libinput) is the input stack used by most Linux desktops.
+It covers mice, keyboards, touchpads, touchscreens and graphics tablets, absorbing device-specific quirks
+and normalizing everything into a uniform event stream.
+
+Compared with [evdev](/main-modules/input_drivers/evdev), libinput gives you two things that matter:
+quirk handling for devices that need it, and real keyboard support (layouts, modifiers and non-US
+keyboards) through XKB. In exchange it adds a dependency and gives up automatic device discovery.
+Use [evdev](/main-modules/input_drivers/evdev) for a minimal system with a known touchscreen;
+use libinput when you need proper text entry or a device with quirks.
+
+### Prerequisites
+
+libinput must be available in the build (usually the `libinput` development package). If your device needs
+quirks, make sure those are installed too, normally under `/usr/share/libinput/*.quirks`.
+
+Check that libinput sees your device:
+
+```bash
+libinput list-devices
+...
+Device:           ETPS/2 Elantech Touchpad
+Kernel:           /dev/input/event5
+Group:            10
+Seat:             seat0, default
+Size:             102x74mm
+Capabilities:     pointer gesture
+Tap-to-click:     disabled
+Tap-and-drag:     enabled
+...
+```
+
+If it does not appear, you likely need udev rules to connect it.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_LIBINPUT" />.
+
+### Full keyboard support
+
+Letters, modifiers and non-US layouts need XKB, which is off by default. Enable `LV_LIBINPUT_XKB`, then
+describe your keyboard with these options:
+
+| Symbol | Default | Meaning |
+|---|---|---|
+| `LV_LIBINPUT_XKB_RULES` | `""` | XKB rules file |
+| `LV_LIBINPUT_XKB_MODEL` | `"pc101"` | Keyboard model |
+| `LV_LIBINPUT_XKB_LAYOUT` | `"us"` | Layout |
+| `LV_LIBINPUT_XKB_VARIANT` | `""` | Layout variant |
+| `LV_LIBINPUT_XKB_OPTIONS_USE_DEFAULT` | on | Use the system default options, e.g. from `XKB_DEFAULT_OPTIONS` |
+| `LV_LIBINPUT_XKB_OPTIONS` | `""` | Explicit options; only used when the above is off |
+
+Run `setxkbmap -query` on a working system to find the right values.
+
+### Other options
+
+| Symbol | Default | Effect |
+|---|---|---|
+| `LV_LIBINPUT_BSD` | off | Use the BSD variant of libinput. |
+
+## Building
+
+The driver always requires `libinput`.
+Additionally you may use XKB support which requires `libxbkcommon`.
+
+<Callout type="tip">
+LVGL's CMake integration resolves both.
+Make sure the required libraries  are present on your system or in your sysroot.
+
+See [Dependency Management](/integration/building/cmake).
+</Callout>
+
+## Usage
+
+Call <ApiLink name="lv_libinput_create" /> with the device type and the node path.
+
+```c
+lv_indev_t * indev = lv_libinput_create(LV_INDEV_TYPE_POINTER, "/dev/input/event5");
+```
+
+The type is <ApiLink name="LV_INDEV_TYPE_POINTER" /> or <ApiLink name="LV_INDEV_TYPE_KEYPAD" />. Note that
+libinput treats touchscreens as absolute pointer devices, so a touchscreen also needs
+<ApiLink name="LV_INDEV_TYPE_POINTER" />. <ApiLink name="lv_libinput_delete" /> removes a device.
+
+### Finding devices without hard-coded paths
+
+Device node paths are not necessarily stable across reboots. Look a device up by what it can do instead, with
+<ApiLink name="lv_libinput_find_dev" />:
+
+```c
+char * path = lv_libinput_find_dev(LV_LIBINPUT_CAPABILITY_TOUCH, true);
+```
+
+The capability is one of `LV_LIBINPUT_CAPABILITY_KEYBOARD`, `LV_LIBINPUT_CAPABILITY_POINTER` or
+`LV_LIBINPUT_CAPABILITY_TOUCH`. The second argument controls whether all devices are rescanned; scanning is
+slow with many devices, so pass `true` only on the first of a series of calls.
+
+<ApiLink name="lv_libinput_find_devs" /> returns every device with a given capability, and
+<ApiLink name="lv_libinput_query_capability" /> reports what a specific device supports.
+
+### Connecting a keyboard to a text area
+
+Keyboard input reaches a widget through a group. Create one, set it on the input device, and add the widget:
+
+```c
+lv_obj_t * textarea = lv_textarea_create(lv_screen_active());
+
+lv_group_t * g = lv_group_create();
+lv_indev_set_group(indev, g);
+lv_group_add_obj(g, textarea);
+```
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Device types | Pointer (mouse, touchpad, touchscreen) and keypad |
+| Automatic discovery | No |
+| Hotplug | No |
+| Full keyboard (layouts, modifiers) | With `LV_LIBINPUT_XKB` |
+| Touch calibration | Automatic |
+| Axis swap | With libinput quirks or udev rules |
+| Find device by capability | <ApiLink name="lv_libinput_find_dev" /> and <ApiLink name="lv_libinput_find_devs" /> |
+| BSD | With `LV_LIBINPUT_BSD` |
+
+## See Also
+
+- [evdev](/main-modules/input_drivers/evdev) - lighter alternative, with discovery and hotplug
+- [Linux Framebuffer](/main-modules/display_drivers/fbdev) - display driver needing a separate input driver
+- [DRM](/main-modules/display_drivers/drm) - display driver needing a separate input driver
+- [Dependency Management](/integration/building/cmake) - how LVGL resolves libinput and xkbcommon

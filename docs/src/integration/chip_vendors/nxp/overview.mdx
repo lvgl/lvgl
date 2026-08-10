@@ -32,28 +32,35 @@ today and get started with your next GUI application. It comes fully configured
 with LVGL (and with PXP/G2D support if the modules are present), no
 additional integration work is required.
 
-## HW acceleration for NXP iMX RT platforms
+## Drivers and Renderers
 
-Depending on the RT platform used, the acceleration can be done by NXP PXP
-(PiXel Pipeline) and/or the Verisilicon GPU through an API named VGLite. Each
-accelerator has its own context that allows them to be used individually as well as
-simultaneously (in LVGL multithreading mode).
+The NXP-specific pieces LVGL supports are documented with the rest of the drivers and renderers:
 
-- [PXP GPU](/integration/chip_vendors/nxp/pxp_gpu) — configuration, supported
-  features, and limitations of the PXP draw unit.
-- [VG-Lite General GPU](/integration/chip_vendors/nxp/vg_lite_gpu) — the generic
-  VG-Lite draw unit, which replaced the NXP-specific VGLite draw unit in LVGL v9.4.
+| What you need | Use |
+|---|---|
+| Display output over RGB or MIPI-DSI | **[NXP eLCDIF](/main-modules/display_drivers/nxp_elcdif)** |
+| GPU on i.MX RT (MCU) | **[PXP](/main-modules/renderers/pxp)** |
+| Vector graphics on i.MX RT with a Verisilicon GPU | **[VG-Lite](/main-modules/renderers/vg_lite)** |
+| GPU on i.MX (MPU) | **[G2D](/main-modules/renderers/g2d)** |
+| Display on i.MX running Linux | **[DRM](/main-modules/display_drivers/drm)** or **[Wayland](/main-modules/display_drivers/wayland)** — Wayland has a G2D backend |
+| Touch and keyboard on i.MX running Linux | **[evdev](/main-modules/input_drivers/evdev)** or **[libinput](/main-modules/input_drivers/libinput)** |
 
-## HW acceleration for NXP iMX platforms
+### On i.MX RT (MCU) platforms
 
-On MPU platforms, the acceleration can be done (hardware independent) by NXP G2D
-library. This accelerator has its own context that allows them to be used
-individually as well as simultaneously with the CPU (in LVGL multithreading mode).
+Acceleration is done by the NXP PXP (PiXel Pipeline) and/or the Verisilicon GPU through an API
+named VG-Lite. Each accelerator has its own context, which allows them to be used individually as
+well as simultaneously (in LVGL multithreading mode).
 
-- [G2D GPU](/integration/chip_vendors/nxp/g2d_gpu) — configuration, supported
-  features, and limitations of the G2D draw unit.
+<Callout type="info">
+The NXP-specific VGLite draw unit was removed in LVGL v9.4. Use the generic
+[VG-Lite](/main-modules/renderers/vg_lite) draw unit (<ApiLink name="LV_USE_DRAW_VG_LITE" />)
+instead — it talks to the same Verisilicon VG-Lite API.
+</Callout>
 
-## Display Output
+### On i.MX (MPU) platforms
 
-Displays connected through the RGB interface, or through MIPI-DSI on capable devices, can be
-driven with the [eLCDIF driver](/integration/chip_vendors/nxp/elcdif).
+Acceleration is done, hardware independently, by the NXP G2D library. It has its own context, so
+it can be used individually as well as simultaneously with the CPU (in LVGL multithreading mode).
+
+i.MX MPUs normally run Linux, so the display and input side is the standard Linux stack — see
+[Embedded Linux](/integration/embedded_linux).

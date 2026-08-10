@@ -35,7 +35,7 @@ such as with Zephyr RTOS. See [Alif's GitHub repos](https://github.com/orgs/alif
 This guide is for Linux and Windows.
 
 This project uses D/AVE 2D rendering acceleration with LVGL's
-[D/AVE 2D draw unit](/integration/chip_vendors/alif/dave2d_gpu).
+[D/AVE 2D draw unit](/main-modules/renderers/dave2d).
 
 ### Step-by-Step Guide
 
@@ -257,3 +257,16 @@ If debugging you will want "debug".
 
 To maximize the score on the LVGL benchmark and maximize the performance of an LVGL
 application in general, ensure the HP core is selected and the build type is release.
+
+## Drivers and Renderers
+
+| What you need | Use |
+|---|---|
+| 2D GPU acceleration | **[Dave2D](/main-modules/renderers/dave2d)** — Ensemble chips contain a TES D/AVE 2D GPU |
+| Helium acceleration on the CPU | **[Arm-2D](/main-modules/renderers/arm2d)**, or `LV_USE_DRAW_SW_ASM` — see [Arm](/integration/chip_vendors/arm) |
+| An SPI panel | **[LCD controllers](/main-modules/display_drivers/lcd)** |
+| Touch input | Write a short read callback — see [Touchpad and Mouse](/main-modules/indev/pointer) |
+
+The [alif_m55-lvgl](https://github.com/alifsemi/alif_m55-lvgl) project used above already has the
+Dave2D draw unit enabled, so it accelerates rendering out of the box. No Alif-specific draw unit
+is needed — Alif and Renesas expose the same D/AVE 2D driver API.

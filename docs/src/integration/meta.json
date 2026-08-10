@@ -9,7 +9,6 @@
     "frameworks",
     "boards",
     "chip_vendors",
-    "external_display_controllers",
     "building",
     "bindings"
   ]

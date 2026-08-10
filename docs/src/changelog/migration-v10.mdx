@@ -187,7 +187,7 @@ Set `LV_LINUX_DRM_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_LI
   | `LV_WAYLAND_USE_G2D` | G2D (NXP i.MX hardware accelerator; enable: `LV_USE_DRAW_G2D`) | off |
 
   There is also a new fourth backend, `LV_WAYLAND_USE_DMABUF`, which presents software-rendered frames as linear DMA-BUFs.
-  See the [Wayland driver docs](/integration/embedded_linux/drivers/wayland#dma-buf).
+  See the [Wayland driver docs](/main-modules/display_drivers/wayland#dma-buf).
 
   To reproduce exactly what you had before, enable the one backend the old rules would have picked for your config. `LV_USE_G2D` no longer plays a part in the choice:
   it is a deprecated no-op (see [No-op options kept for compatibility](#no-op-options-kept-for-compatibility)) and the G2D backend is now tied to `LV_USE_DRAW_G2D`.
@@ -198,7 +198,7 @@ Set `LV_LINUX_DRM_AUTO_BACKEND` to 0 and select a backend explicitly with `LV_LI
   | `LV_USE_G2D` = 1 | G2D | `LV_WAYLAND_USE_G2D` = 1 and `LV_USE_DRAW_G2D` = 1 |
   | neither | SHM | nothing — `LV_WAYLAND_USE_SHM` is on by default |
 
-  See the [Wayland driver docs](/integration/embedded_linux/drivers/wayland#runtime-backend-selection) for more information.
+  See the [Wayland driver docs](/main-modules/display_drivers/wayland#runtime-backend-selection) for more information.
 
 - **X11** — render mode (unrelated to backend selection) is now a single value mapped onto the standard `LV_DISPLAY_RENDER_MODE_*` constants:
 

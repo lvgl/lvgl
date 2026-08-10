@@ -48,7 +48,7 @@ There are no limitations on the supported IDEs. LVGL works in various vendors' I
 ## Arm2D and the Helium instruction set
 
 Arm Cortex-M55 and Cortex-M85 have the [SIMD Helium](https://www.arm.com/technologies/helium) instruction set.
-Among many others, this can effectively speed up UI rendering. [Arm2D](/integration/chip_vendors/arm/arm2d) is a library maintained by Arm that leverages the Helium instruction set.
+Among many others, this can effectively speed up UI rendering. [Arm2D](/main-modules/renderers/arm2d) is a library maintained by Arm that leverages the Helium instruction set.
 
 Note that GCC has some known issues with Helium intrinsics. It is recommended to use AC6 or LLVM when dealing with Helium code.
 
@@ -118,3 +118,16 @@ Both 32-bit and 64-bit ARM architectures are supported. Simply set <ApiLink name
 <Callout type="info">
 All ARM Cortex-A and Cortex-R 64-bit processors include Neon support as a mandatory feature starting with the ARMv8 architecture specification. This makes Neon acceleration universally available on all 64-bit ARM platforms, including current and future ARM architectures.
 </Callout>
+
+## Drivers and Renderers
+
+Arm supplies cores rather than display peripherals, so the display and input drivers come from
+whoever made the chip around the core — see [Chip Vendor Support](/integration/chip_vendors).
+What is Arm-specific is the rendering acceleration:
+
+| Your core | Use |
+|---|---|
+| Cortex-M55, M52, M85 (Helium) | **[Arm-2D](/main-modules/renderers/arm2d)** |
+| Cortex-M with an Arm-2D backed accelerator (e.g. DMAC-350) | **[Arm-2D](/main-modules/renderers/arm2d)** in asynchronous mode |
+| Cortex-A with Neon | **[Software renderer](/main-modules/renderers/sw#assembly-acceleration)** with `LV_DRAW_SW_ASM_NEON` |
+| A plain Cortex-M with no accelerator | **[Software renderer](/main-modules/renderers/sw)** — Arm-2D would give close to nothing here |

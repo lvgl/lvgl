@@ -4,8 +4,6 @@
     "linux",
     "windows",
     "macos",
-    "browser",
-    "sdl",
-    "uefi"
+    "browser"
   ]
 }

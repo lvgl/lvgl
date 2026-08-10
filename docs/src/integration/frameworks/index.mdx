@@ -1,6 +1,34 @@
 ---
 title: Framework Support
+description: "Using LVGL from Arduino, PlatformIO and Tasmota, and which display drivers those ecosystems typically pair with."
 ---
 
+## Overview
+
+These frameworks wrap a toolchain and a package manager around your project. LVGL is available as a
+library in each of them, so the framework page covers installation and configuration --- not the
+display itself.
+
+| Framework | Page |
+|---|---|
+| Arduino IDE | [Arduino](/integration/frameworks/arduino) |
+| PlatformIO | [PlatformIO](/integration/frameworks/platformio) |
+| Tasmota with Berry scripting | [Tasmota and berry](/integration/frameworks/tasmota-berry) |
+
+## Drivers in an Arduino Project
+
+Arduino projects usually drive a small SPI panel, and there are three routes:
+
+| Your situation | Use |
+|---|---|
+| Starting fresh, controller has a native LVGL driver | **[LCD controllers](/main-modules/display_drivers/lcd)** — [ST7789](/main-modules/display_drivers/lcd/st7789), [ILI9341](/main-modules/display_drivers/lcd/ili9341) and friends |
+| Already have a working TFT_eSPI setup | **[TFT_eSPI](/main-modules/display_drivers/lcd/tft_espi)** |
+| Already have a working LovyanGFX setup | **[LovyanGFX](/main-modules/display_drivers/lcd/lovyan_gfx)** |
+
+Touch input is normally a short read callback around your touch controller's library --- see
+[Touchpad and Mouse](/main-modules/indev/pointer).
+
+Rendering is the [software renderer](/main-modules/renderers/sw); the boards these frameworks
+target rarely have a GPU LVGL can use. On an ESP32-P4 see [Espressif](/integration/chip_vendors/espressif).
 
 <DirectoryIndex />

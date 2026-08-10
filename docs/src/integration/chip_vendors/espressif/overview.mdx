@@ -49,20 +49,26 @@ flash instructions.
 These demo projects use Espressif's Board Support Packages (BSPs).
 Additional BSPs and examples are available in the [esp-bsp](https://github.com/espressif/esp-bsp) repository.
 
-## LVGL Support for ESP32 Graphical Peripherals
+## Drivers and Renderers
 
-Some ESP32 chips, like the ESP32-P4 family, have built-in support for driving
-displays through standard interfaces like RGB and MIPI. ESP-IDF provides the
-necessary drivers, leaving it to the user to integrate them into the LVGL
-[display](/main-modules/display) subsystem.
+Some ESP32 chips, like the ESP32-P4 family, have built-in support for driving displays through
+standard interfaces like RGB and MIPI. ESP-IDF provides the necessary drivers, leaving it to the
+user to integrate them into the LVGL [display](/main-modules/display) subsystem.
 
-Via its component manager, Espressif provides a ready-to-use LVGL porting component,
-which is the recommended way of connecting the input and output devices of an ESP32
-chip to LVGL. That component is covered in
-[Add LVGL to an ESP32 IDF project](/integration/chip_vendors/espressif/add_lvgl_to_esp32_idf_project).
+| What you need | Use |
+|---|---|
+| Display and input wiring, the easy way | The **`esp_lvgl_port` component** — see [Add LVGL to an ESP32 IDF project](/integration/chip_vendors/espressif/add_lvgl_to_esp32_idf_project) |
+| An SPI panel | **[LCD controllers](/main-modules/display_drivers/lcd)**, or **[TFT_eSPI](/main-modules/display_drivers/lcd/tft_espi)** in an Arduino project |
+| Fill and image blend acceleration (ESP32-P4) | **[Espressif PPA](/main-modules/renderers/ppa)** (experimental) |
+| Tear-free buffer transfer (ESP32-P4) | **[DMA2D](/integration/chip_vendors/espressif/hardware_accelerator_dma2d)** — a port feature, not a draw unit |
+| Touch input | The port component, or a read callback — see [Touchpad and Mouse](/main-modules/indev/pointer) |
 
-Besides the display controller, some ESP32 chips offer graphical hardware
-acceleration peripherals:
+Via its component manager, Espressif provides a ready-to-use LVGL porting component, which is the
+recommended way of connecting the input and output devices of an ESP32 chip to LVGL.
 
-- [2D Direct Memory Access (DMA2D)](/integration/chip_vendors/espressif/hardware_accelerator_dma2d)
-- [PPA (Pixel Processing Accelerator)](/integration/chip_vendors/espressif/hardware_accelerator_ppa)
+<Callout type="info" title="DMA2D is not a renderer">
+Unlike the PPA, LVGL does not talk to the DMA2D peripheral as a draw unit. The display driver of
+the Espressif port component uses it to copy the drawn buffer to the display without CPU
+intervention, which is why it stays documented here rather than under
+[Renderers](/main-modules/renderers).
+</Callout>

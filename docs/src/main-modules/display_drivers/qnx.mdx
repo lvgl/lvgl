@@ -1,0 +1,94 @@
+---
+title: QNX
+description: "The QNX driver creates an LVGL display as a QNX Screen window and reads keyboard and pointer input from it, with an event loop that integrates with QNX Screen."
+faqs:
+  - question: "What color depth does the QNX driver need?"
+    answer: "LV_COLOR_DEPTH must be 32. The driver renders through QNX Screen, which expects 32-bit buffers."
+  - question: "Can I double-buffer the QNX display?"
+    answer: "Yes, set LV_QNX_BUF_COUNT to 2."
+  - question: "Do I need to write my own event loop?"
+    answer: "No. lv_qnx_event_loop() runs the loop, pumping QNX Screen events into LVGL and calling lv_timer_handler() for you."
+---
+
+## Overview
+
+The [QNX driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/qnx) creates an LVGL display
+as a window on [QNX Screen](https://www.qnx.com), QNX's compositing windowing system, and provides
+keyboard and pointer input from it.
+
+QNX is a commercial micro-kernel operating system with full POSIX compatibility and safety
+certification for automotive, industrial and medical use. For the OS side of the integration ---
+building LVGL as a shared or static library, the `env_support/qnx` makefiles, and the toolchain ---
+see [QNX](/integration/rtos/qnx) under RTOS support.
+
+### Prerequisites
+
+A QNX system with Screen running, and the `libscreen` development files.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_QNX" /> and set the color depth to 32.
+
+```c
+#define LV_USE_QNX     1
+#define LV_COLOR_DEPTH 32
+```
+
+### Options
+
+| Symbol | Default | Effect |
+|---|---|---|
+| `LV_QNX_BUF_COUNT` | `1` | `1` or `2` screen-sized buffers. `2` enables double buffering. |
+
+## Usage
+
+Create the window, add the input devices, build the UI, then hand control to the driver's event
+loop.
+
+```c
+#include <lvgl.h>
+
+int main(int argc, char **argv)
+{
+    /* Initialize the library. */
+    lv_init();
+
+    /* Create a 800x480 window. */
+    lv_display_t * disp = lv_qnx_window_create(800, 480);
+    lv_qnx_window_set_title(disp, "LVGL Example");
+
+    /* Add keyboard and mouse devices. */
+    lv_qnx_add_keyboard_device(disp);
+    lv_qnx_add_pointer_device(disp);
+
+    /* Generate the UI. */
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Hello world");
+    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
+    /* Run the event loop until it exits. */
+    return lv_qnx_event_loop(disp);
+}
+```
+
+<ApiLink name="lv_qnx_event_loop" /> does not return until the window is closed. It pumps QNX
+Screen events into LVGL and calls <ApiLink name="lv_timer_handler" />, so you do not write a loop
+of your own.
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Rotation | Software |
+| Runtime resolution change | No |
+| Runtime color format change | No |
+| Color formats | XRGB8888 only (`LV_COLOR_DEPTH 32`) |
+| Multiple displays / windows | Yes |
+| Hardware acceleration | None |
+| Render mode | Partial, or direct with `LV_QNX_BUF_COUNT 2` |
+| Input | Built in — keyboard and pointer |
+
+## See Also
+
+- [QNX](/integration/rtos/qnx) - building LVGL for QNX, as a project or a library
+- [Input devices](/main-modules/indev) - how LVGL consumes the input this driver provides
