@@ -100,14 +100,22 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
 
     /*Create an outer mask*/
     lv_draw_sw_mask_radius_param_t mask_out_param;
-    lv_draw_sw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
+    lv_result_t res = lv_draw_sw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
     mask_list[1] = &mask_out_param;
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("Couldn't create outer arc mask");
+        goto outer_arc_mask_fail;
+    }
 
     /*Create inner the mask*/
     lv_draw_sw_mask_radius_param_t mask_in_param;
     bool mask_in_param_valid = false;
     if(lv_area_get_width(&area_in) > 0 && lv_area_get_height(&area_in) > 0) {
-        lv_draw_sw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+        res = lv_draw_sw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+        if(res != LV_RESULT_OK) {
+            LV_LOG_WARN("Couldn't create inner arc mask");
+            goto inner_arc_mask_fail;
+        }
         mask_list[2] = &mask_in_param;
         mask_in_param_valid = true;
     }
@@ -131,7 +139,7 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
         blend_dsc.color = dsc->color;
     }
     else {
-        lv_result_t res = lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
+        res = lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
         if(res == LV_RESULT_INVALID || decoder_dsc.decoded == NULL) {
             LV_LOG_WARN("Can't decode the background image");
             blend_dsc.color = dsc->color;
@@ -236,6 +244,13 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
     lv_free(mask_buf);
     if(dsc->img_src) lv_image_decoder_close(&decoder_dsc);
     if(circle_mask) lv_free(circle_mask);
+    return;
+
+inner_arc_mask_fail:
+    lv_draw_sw_mask_free_param(&mask_out_param);
+outer_arc_mask_fail:
+    lv_draw_sw_mask_free_param(&mask_angle_param);
+
 #else
     LV_LOG_WARN("Can't draw arc with LV_DRAW_SW_COMPLEX == 0");
     LV_UNUSED(center);
