@@ -872,8 +872,8 @@ void lv_observer_set_user_data(lv_observer_t * observer, void * user_data,
 {
     LV_CHECK_ARG(observer != NULL, return);
 
-    /* Free the previous data if it was set to auto-free before replacing it */
-    if(observer->auto_free_user_data) {
+    /* Keep the allocation when only its ownership flag is changing. */
+    if(observer->auto_free_user_data && observer->user_data != user_data) {
         lv_free(observer->user_data);
     }
 

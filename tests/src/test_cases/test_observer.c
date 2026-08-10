@@ -1097,6 +1097,12 @@ void test_observer_set_user_data_auto_free_replace(void)
     TEST_ASSERT_NOT_NULL(old_data);
     lv_observer_set_user_data(observer, old_data, true);
 
+    /* Reusing the current pointer must not free it or create a dangling pointer. */
+    uint32_t mem_with_old_data = lv_test_get_free_mem();
+    lv_observer_set_user_data(observer, old_data, true);
+    TEST_ASSERT_EQUAL_PTR(old_data, lv_observer_get_user_data(observer));
+    TEST_ASSERT_EQUAL_UINT32(mem_with_old_data, lv_test_get_free_mem());
+
     /* Replacing with another auto-free allocation must free the old one */
     void * new_data = lv_malloc(64);
     TEST_ASSERT_NOT_NULL(new_data);
