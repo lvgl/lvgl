@@ -100,12 +100,20 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
         /*Use the cache if available*/
         sh_buf = lv_malloc(corner_size * corner_size);
         LV_ASSERT_MALLOC(sh_buf);
+        if(!sh_buf) {
+            LV_LOG_WARN("Failed to allocate memory for shadow buffer");
+            return;
+        }
         lv_memcpy(sh_buf, cache->cache, corner_size * corner_size);
     }
     else {
         /*A larger buffer is required for calculation*/
         sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
         LV_ASSERT_MALLOC(sh_buf);
+        if(!sh_buf) {
+            LV_LOG_WARN("Failed to allocate memory for shadow buffer");
+            return;
+        }
         shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->width, r_sh);
 
         /*Cache the corner if it fits into the cache size*/
@@ -118,6 +126,10 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
 #else
     sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
     LV_ASSERT_MALLOC(sh_buf);
+    if(!sh_buf) {
+        LV_LOG_WARN("Failed to allocate memory for shadow buffer");
+        return;
+    }
     shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->width, r_sh);
 #endif /*LV_DRAW_SW_SHADOW_CACHE_SIZE*/
 
@@ -125,7 +137,6 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
     bool simple = dsc->bg_cover;
 
     /*Create a radius mask to clip remove shadow on the bg area*/
-
     lv_draw_sw_mask_radius_param_t mask_rout_param;
     void * masks[2] = {0};
     if(!simple) {
@@ -134,6 +145,14 @@ void lv_draw_sw_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * 
     }
 
     lv_opa_t * mask_buf = lv_malloc(lv_area_get_width(&shadow_area));
+    if(!mask_buf) {
+        LV_LOG_WARN("Failed to allocate memory for shadow mask buffer");
+        lv_free(sh_buf);
+        if(!simple) {
+            lv_draw_sw_mask_free_param(&mask_rout_param);
+        }
+        return;
+    }
     lv_area_t blend_area;
     lv_area_t clip_area_sub;
     lv_opa_t * sh_buf_tmp;
