@@ -25,7 +25,7 @@ library folder.
 LVGL needs a display driver that knows how to send rendered pixels to your
 hardware. On Arduino projects, common choices are:
 
-- the built-in [LovyanGFX driver](/integration/external_display_controllers/lovyan)
+- the built-in [LovyanGFX driver](/main-modules/display_drivers/lcd/lovyan_gfx)
 - the [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI) library
 - a custom display driver registered with LVGL's display API
 - another Arduino graphics library wrapped by your application
@@ -35,7 +35,7 @@ configuration header that defines your `LGFX` class. In the Arduino IDE, this ca
 be another sketch tab, for example `my_display.hpp`. Enable the driver from
 `lv_conf.h` and point `LV_LGFX_USER_INCLUDE` at that header. The detailed
 LovyanGFX setup and initialization flow is documented on the
-[LovyanGFX driver page](/integration/external_display_controllers/lovyan).
+[LovyanGFX driver page](/main-modules/display_drivers/lcd/lovyan_gfx).
 
 When using TFT_eSPI, configure the TFT_eSPI library for your display by editing
 `User_Setup.h` or selecting a setup from `User_Setup_Select.h` in the TFT_eSPI

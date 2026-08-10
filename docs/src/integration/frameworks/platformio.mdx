@@ -45,7 +45,7 @@ into the `lib/` directory of your PlatformIO project.
 
 LVGL needs a display driver that knows how to send rendered pixels to your
 hardware. You can use LVGL's built-in display drivers, the
-[LovyanGFX driver](/integration/external_display_controllers/lovyan),
+[LovyanGFX driver](/main-modules/display_drivers/lcd/lovyan_gfx),
 [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI), or an application-specific
 driver registered with LVGL's display API.
 
@@ -57,7 +57,7 @@ lib_deps =
     lovyan03/LovyanGFX
 ```
 
-See the [supported drivers section](/integration/external_display_controllers)
+See the [supported drivers section](/main-modules/display_drivers/lcd)
 for LVGL's other built-in display drivers.
 
 ## Display Configuration
@@ -80,7 +80,7 @@ build_flags =
     -I .pio/libdeps/${PIOENV}/LovyanGFX/src  ; so that PIO includes this when compiling LVGL
 ```
 
-The dedicated [LovyanGFX driver page](/integration/external_display_controllers/lovyan)
+The dedicated [LovyanGFX driver page](/main-modules/display_drivers/lcd/lovyan_gfx)
 describes the required `LGFX` class and the LVGL initialization call.
 
 When using TFT_eSPI, configure the library for your display by editing

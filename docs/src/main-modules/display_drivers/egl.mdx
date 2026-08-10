@@ -1,0 +1,45 @@
+---
+title: EGL
+description: "EGL is the platform layer that binds OpenGL ES to a native windowing system. In LVGL it underpins the hardware-accelerated backends of the DRM, Wayland and SDL drivers, and can also render off-screen with no display server at all."
+---
+
+## Overview
+
+[**EGL**](https://en.wikipedia.org/wiki/EGL_(API)) (Embedded-System Graphics Library) is the platform layer that binds OpenGL ES to a native windowing
+system. It sits lower than GLFW and is more closely tied to the platform's own drivers, which is why it is
+the path LVGL uses for GPU rendering on embedded Linux.
+
+You rarely enable EGL on its own. It underpins the hardware-accelerated backends of the other drivers:
+
+- [DRM](/integration/embedded_linux/drivers/drm) with `LV_LINUX_DRM_BACKEND_EGL`
+- [Wayland](/integration/embedded_linux/drivers/wayland) with `LV_WAYLAND_USE_EGL`
+- [SDL](/integration/pc/sdl) with `LV_SDL_BACKEND_EGL`
+
+Selecting any of those backends turns EGL on for you and sets up the context during normal driver
+initialization. Beyond that, EGL offers two things the other drivers do
+not: a standalone window path for platforms LVGL does not otherwise cover, and off-screen rendering with no
+display server at all.
+
+## Building
+
+LVGL loads `libEGL.so` and `libGLESv2.so` at runtime with `dlopen`, so EGL doesn't have any build-time dependencies.
+
+<Callout type="warning" title="EGL and GLFW are mutually exclusive">
+<ApiLink name="LV_USE_GLFW" /> cannot be combined with <ApiLink name="LV_USE_EGL" />
+each wants to own context creation.
+</Callout>
+
+## Usage
+
+With a driver backend, EGL is invisible: configure the driver as its own page describes and it initializes
+EGL during setup. See [DRM](/main-modules/display_drivers/drm) or
+[Wayland](/main-modules/display_drivers/wayland) for working examples.
+
+## See Also
+
+- [DRM](/main-modules/display_drivers/drm) - EGL backend for direct-to-display rendering
+- [Wayland](/main-modules/display_drivers/wayland) - EGL backend under a compositor
+- [OpenGL Driver](/main-modules/display_drivers/opengl_texture) - use when you already own the context
+- [OpenGL Overview](/integration/embedded_linux/opengl) - how the drivers and draw units fit together
+- [NanoVG Draw Unit](/main-modules/renderers/nanovg) - the renderer used for off-screen rendering
+- [glTF](/libs/gltf) - 3D content, the strongest case for headless GPU rendering

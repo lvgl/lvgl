@@ -1,0 +1,124 @@
+---
+title: Windows
+description: "The Windows driver renders LVGL into a Win32 window and reads mouse, touch, keyboard and encoder input. It runs either as a hardware simulator or as a native desktop application."
+faqs:
+  - question: "What is the difference between simulator mode and application mode?"
+    answer: "Simulator mode keeps the LVGL display resolution constant to simulate a production panel and uses Windows DPI scaling to stretch the content. Application mode follows the window size, so resizing the window changes the LVGL display resolution."
+  - question: "Which Windows versions does the driver support?"
+    answer: "The minimum is Windows Vista RTM. With API shim libraries such as YY-Thunks it has been tested down to Windows XP RTM, and because it uses GDI the theoretical minimum is Windows 2000 RTM."
+  - question: "Should I use the Windows driver or the SDL driver on Windows?"
+    answer: "Use the Windows driver for native Win32 integration, touch input, IME support and per-monitor DPI awareness. Use SDL when you want the same code to also run on Linux and macOS."
+---
+
+## Overview
+
+The [Windows driver](https://github.com/lvgl/lvgl/tree/master/src/drivers/windows) creates an
+LVGL display inside a Win32 window and provides pointer, keypad and encoder input from it. It is
+both the way to simulate an embedded UI on a Windows development machine and the way to ship LVGL
+as a native Windows desktop application.
+
+The alternative on Windows is the [SDL driver](/main-modules/display_drivers/sdl), which is
+cross-platform but does not offer Win32 touch, IME or per-monitor DPI integration.
+
+### Prerequisites
+
+Windows Vista RTM or newer. With API shim libraries such as
+[YY-Thunks](https://github.com/Chuyu-Team/YY-Thunks) the tested minimum is Windows XP RTM, and
+because the driver uses Windows GDI the theoretical minimum is Windows 2000 RTM.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_WINDOWS" />.
+
+```c
+#define LV_USE_WINDOWS 1
+```
+
+## Modes
+
+The mode is chosen by the last argument of <ApiLink name="lv_windows_create_display" />.
+
+Both modes support LVGL pointer, keypad and encoder devices, Windows touch input, Windows input
+method (IME) integration, per-monitor DPI awareness (V1 and V2), and HWND-based interoperability
+with other Windows UI frameworks.
+
+| | Simulator mode | Application mode |
+|---|---|---|
+| Intended for | Simulating a hardware panel | Native desktop applications |
+| LVGL resolution | Constant, to match a production layout | Follows the window size |
+| Window resizing | Content is stretched via Windows DPI scaling | Display resolution changes with the window |
+| DPI changes | Handled by scaling | LVGL display DPI is updated |
+| Resolution argument | Client area | Window size |
+
+<Callout type="warn">
+In application mode your code has to handle display resolution changes, since the resolution
+follows the window.
+</Callout>
+
+## Usage
+
+Create the display, then acquire the input devices from it.
+
+```c
+#include <windows.h>
+#include "lvgl/lvgl.h"
+#include "lvgl/examples/lv_examples.h"
+#include "lvgl/demos/lv_demos.h"
+
+int main()
+{
+    lv_init();
+
+    int32_t zoom_level = 100;
+    bool allow_dpi_override = false;
+    bool simulator_mode = false;
+    lv_display_t * display = lv_windows_create_display(
+        L"LVGL Display Window",
+        800, 480,
+        zoom_level, allow_dpi_override, simulator_mode);
+
+    if (!display) return -1;
+
+    lv_lock();
+
+    lv_indev_t * pointer_device = lv_windows_acquire_pointer_indev(display);
+    if (!pointer_device) return -1;
+
+    lv_indev_t * keypad_device = lv_windows_acquire_keypad_indev(display);
+    if (!keypad_device) return -1;
+
+    lv_indev_t * encoder_device = lv_windows_acquire_encoder_indev(display);
+    if (!encoder_device) return -1;
+
+    lv_demo_widgets();
+
+    lv_unlock();
+
+    while (1)
+    {
+        uint32_t time_till_next = lv_timer_handler();
+        /* handle LV_NO_TIMER_READY. Another option is to always sleep a few milliseconds */
+        if(time_till_next == LV_NO_TIMER_READY) time_till_next = LV_DEF_REFR_PERIOD;
+        lv_sleep_ms(time_till_next);
+    }
+
+    return 0;
+}
+```
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Rotation | Software |
+| Runtime resolution change | Yes, in application mode |
+| Runtime color format change | No |
+| Multiple displays / windows | Yes |
+| Hardware acceleration | None |
+| Input | Built in — pointer, touch, keypad with IME, encoder |
+
+## See Also
+
+- [Running on PC](/integration/pc) - ready-to-use Windows projects for Visual Studio, VSCode and Eclipse
+- [SDL](/main-modules/display_drivers/sdl) - the cross-platform alternative
+- [Input devices](/main-modules/indev) - how LVGL consumes the input this driver provides

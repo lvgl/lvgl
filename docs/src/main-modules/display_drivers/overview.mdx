@@ -1,0 +1,133 @@
+---
+title: Overview
+description: "A display driver connects an lv_display_t to real hardware. This page lists every driver LVGL ships and helps you pick the one your system calls for."
+faqs:
+  - question: "Do I need to write a display driver?"
+    answer: "Only if your hardware is not covered. LVGL ships drivers for the common OS backends, several SoC display controllers and most popular SPI/MIPI LCD controller ICs. Check the tables here first; if nothing fits, see Setting Up Your Display for how to write a flush callback yourself."
+  - question: "Can I use more than one display driver at once?"
+    answer: "Yes. LVGL supports multiple displays, and they do not have to use the same driver. See Extending/Combining Displays."
+  - question: "Is a display driver the same thing as a renderer?"
+    answer: "No. The driver decides where pixels go; the renderer decides how they are produced. You pick one of each, independently."
+---
+
+## What is a Display Driver?
+
+A display driver is what connects an [`lv_display_t`](/main-modules/display) to actual hardware.
+It provides the draw buffers and a flush callback, so when LVGL has rendered an area, the driver
+knows how to get those pixels onto the panel.
+
+LVGL ships drivers in three families:
+
+- **OS and windowing backends** — the display path is owned by an operating system or windowing
+  system: Linux fbdev and DRM, Wayland, X11, SDL, Windows, and so on.
+- **SoC display controllers** — the display peripheral built into an MCU or MPU, driving a
+  parallel or RGB panel directly.
+- **External LCD controllers** — a controller IC on the panel itself, talked to over SPI, I8080
+  or MIPI DSI.
+
+If nothing here fits your hardware, [Setting Up Your Display](/main-modules/display/setup)
+describes how to write the flush callback yourself, it is usually a short function.
+
+<Callout type="info" title="A driver is not a renderer">
+A display driver decides *where* pixels go. A [renderer](/main-modules/renderers) decides *how*
+they are produced. You choose one of each, and they are largely independent, with one
+exception noted in [Renderer pairing](#renderer-pairing) below.
+</Callout>
+
+## Choosing a Driver
+
+Pick from what your system already has, not from what sounds fastest.
+
+| Your target | Use |
+|---|---|
+| Embedded Linux, modern kernel with DRM/KMS, no compositor | **[DRM](/main-modules/display_drivers/drm)** — the production default |
+| Embedded Linux, only `/dev/fb` | **[fbdev](/main-modules/display_drivers/fbdev)** — simplest possible path |
+| A Wayland compositor is already running | **[Wayland](/main-modules/display_drivers/wayland)** |
+| An X11 desktop, for development | **[X11](/main-modules/display_drivers/x11)** |
+| A dev machine, want a window fast | **[SDL](/main-modules/display_drivers/sdl)** or **[GLFW](/main-modules/display_drivers/glfw)** |
+| Windows desktop or simulator | **[Windows](/main-modules/display_drivers/windows)** |
+| An OpenGL context you already own | **[OpenGL texture](/main-modules/display_drivers/opengl_texture)** |
+| No display at all — CI, thumbnails, servers | **[EGL pbuffer](/main-modules/display_drivers/egl)** |
+| NuttX | **[NuttX](/main-modules/display_drivers/nuttx)** |
+| QNX | **[QNX](/main-modules/display_drivers/qnx)** |
+| UEFI firmware environment | **[UEFI](/main-modules/display_drivers/uefi)** |
+| STM32 with an LTDC peripheral | **[STM32 LTDC](/main-modules/display_drivers/st_ltdc)** |
+| NXP i.MX RT with eLCDIF | **[NXP eLCDIF](/main-modules/display_drivers/nxp_elcdif)** |
+| Renesas RA / RZ with GLCDC | **[Renesas GLCDC](/main-modules/display_drivers/renesas_glcdc)** |
+| An SPI or MIPI panel on an MCU | **[LCD controllers](/main-modules/display_drivers/lcd)** — find your IC |
+
+## OS and Windowing Backends
+
+| Driver | Best for | Rotation | Hardware acceleration | Runtime resolution change | Input |
+|---|---|---|---|---|---|
+| **[fbdev](/main-modules/display_drivers/fbdev)** | Minimal Linux systems exposing only `/dev/fb` | Software, but it disables direct mode | None | No | Pair separately |
+| **[DRM](/main-modules/display_drivers/drm)** | Production embedded Linux | EGL backend only | EGL backend | EGL backend only | Pair separately |
+| **[Wayland](/main-modules/display_drivers/wayland)** | Systems running a compositor | Yes, all backends | EGL or G2D backend | Yes | Built in |
+| **[X11](/main-modules/display_drivers/x11)** | Development on an X desktop | None | None | Yes | Built in |
+| **[SDL](/main-modules/display_drivers/sdl)** | Cross-platform development on PC | Software | Via the SDL renderer | Yes | Built in |
+| **[GLFW](/main-modules/display_drivers/glfw)** | Development with an instant GL context | Hardware | OpenGL ES | No | Built in |
+| **[OpenGL texture](/main-modules/display_drivers/opengl_texture)** | Embedding LVGL in your own GL application | Hardware | OpenGL ES | Manual | None — you own the window |
+| **[EGL](/main-modules/display_drivers/egl)** | The layer under the accelerated backends, and headless rendering | Hardware | OpenGL ES | Depends on the driver | Depends on the driver |
+| **[Windows](/main-modules/display_drivers/windows)** | Win32 simulator or desktop app | Software | None | Yes, in application mode | Built in |
+| **[NuttX](/main-modules/display_drivers/nuttx)** | NuttX `/dev/fb*` or `/dev/lcd*` | Software | None | No | Touch and mouse, no keyboard |
+| **[QNX](/main-modules/display_drivers/qnx)** | QNX Screen | Software | None | No | Built in |
+| **[UEFI](/main-modules/display_drivers/uefi)** | Pre-boot firmware UIs | Software | None | No | Built in |
+
+Each driver page carries a fuller **Support** table, including color formats, multiple-display
+support and the render mode.
+
+## SoC Display Controllers
+
+The display peripheral integrated into the chip, driving a parallel or RGB panel.
+
+| Driver | Hardware | Notes |
+|---|---|---|
+| **[STM32 LTDC](/main-modules/display_drivers/st_ltdc)** | STM32 with LTDC | Binds to a layer of an already-configured peripheral; direct or partial, single or double buffered |
+| **[NXP eLCDIF](/main-modules/display_drivers/nxp_elcdif)** | NXP i.MX and i.MX RT | Wraps the MCUXpresso SDK low-level driver |
+| **[Renesas GLCDC](/main-modules/display_drivers/renesas_glcdc)** | Renesas RA, RZ | Direct or partial render mode |
+
+## External LCD Controllers
+
+Controller ICs on the panel, driven over SPI, I8080 or MIPI DSI. See
+[LCD Controllers](/main-modules/display_drivers/lcd) for the full list. It covers the
+[generic MIPI DCS](/main-modules/display_drivers/lcd/gen_mipi) driver that many panels work with,
+the specific ST77xx / ILI9341 / NV3007 drivers, and adapters for the
+[LovyanGFX](/main-modules/display_drivers/lcd/lovyan_gfx) and
+[TFT_eSPI](/main-modules/display_drivers/lcd/tft_espi) Arduino libraries.
+
+## Input Pairing
+
+Some display drivers bring their own input; others need to be paired with an
+[input driver](/main-modules/input_drivers).
+
+**Input is built in** for Wayland, X11, SDL, GLFW, Windows, QNX, UEFI, and NuttX (touch and mouse
+only).
+
+**Pair separately** for DRM, fbdev, the SoC controllers and the LCD controllers.
+
+On linux specifically, you can use [evdev](/main-modules/input_drivers/evdev) for the simple case,
+[libinput](/main-modules/input_drivers/libinput) when you need full keyboard layouts or device
+quirks. Attach it to the display:
+
+```c
+lv_indev_t * touch = lv_evdev_create(LV_INDEV_TYPE_POINTER, "/dev/input/event0");
+lv_indev_set_display(touch, disp);
+```
+
+## Renderer Pairing
+
+Drivers decide how a frame reaches the screen; [renderers](/main-modules/renderers) decide who
+rasterizes it.
+
+The OpenGL-based renderers need a driver that provides an OpenGL context, see
+[OpenGL on Linux](/integration/embedded_linux/opengl) for which ones do.
+
+## See Also
+
+- [Display (lv_display)](/main-modules/display) - the display module these drivers plug into
+- [Setting Up Your Display](/main-modules/display/setup) - writing a driver yourself
+- [Renderers and GPUs](/main-modules/renderers) - who does the rasterizing
+- [Input Drivers](/main-modules/input_drivers) - the other half of most setups
+- [Dependency Management](/integration/building/cmake) - how enabling a driver pulls in its libraries
+
+<DirectoryIndex />

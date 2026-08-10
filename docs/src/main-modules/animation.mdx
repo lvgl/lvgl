@@ -7,7 +7,7 @@ Animations allow you to define the way something should move or change over time
 let LVGL do the heavy lifting of making it happen.  What makes it so powerful is that
 the thing being changed can be virtually anything in your system.  It is very
 convenient to apply this to LVGL Widgets in your user interface (UI), to change their
-appearance, size or location over time.  But because it is --- at its core --- a
+appearance, size or location over time.  But because it is, at its core, a
 generic change-over-time manager, complete with a variety of optional event
 callbacks, its application can be wider than just to UI components.
 
@@ -256,7 +256,7 @@ lv_anim_delete(running_anim->var, running_anim->exec_cb);
 
 In the event that the Animation completes *after* you have determined it needs to be
 deleted, and before the call to <ApiLink name="lv_anim_delete" /> is made, it does no harm
-to call it a second time --- no damage will occur.
+to call it a second time, no damage will occur.
 
 This function returns a Boolean value indicating whether any *live, running*
 Animations were deleted.

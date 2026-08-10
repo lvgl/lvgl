@@ -1,0 +1,76 @@
+---
+title: Overview
+description: "A renderer (draw unit) is anything that can turn LVGL's draw tasks into pixels: a CPU core, a GPU, or an external graphics IC. This page lists every renderer LVGL supports and how to pick one."
+faqs:
+  - question: "Do I have to pick a renderer?"
+    answer: "No. The software renderer is enabled by default and can draw everything. A GPU draw unit is something you add on top when you have the hardware for it."
+  - question: "Can I enable more than one renderer at a time?"
+    answer: "Yes, and it is the normal case. The software renderer stays enabled and takes any draw task the GPU draw unit cannot handle, so nothing goes unrendered."
+  - question: "Which renderer is fastest?"
+    answer: "The one matching your hardware. A GPU draw unit only helps if the chip has that GPU; on a plain CPU the software renderer with an assembly accelerator is the fastest option."
+---
+
+## What is a Renderer?
+
+A renderer, called a **draw unit** (<ApiLink name="lv_draw_unit_t" />) in LVGL's API, is
+anything that can turn a draw task into pixels. That can be a CPU core, a GPU, an external
+graphics IC, or a third-party rendering library.
+
+LVGL's [draw pipeline](/main-modules/draw/draw_pipeline) breaks rendering into individual draw
+tasks (fill this rectangle, blend this image, draw this glyph) and then offers each task to the
+enabled draw units. A draw unit takes the tasks it can accelerate and leaves the rest.
+
+This has two consequences worth knowing up front:
+
+- **You never enable a GPU draw unit *instead of* the software renderer.** The software renderer
+  stays on and acts as the fallback, so a task no GPU supports still gets drawn.
+- **Enabling a draw unit needs no application changes.** Widgets, styles and layouts are
+  unaffected, only your config changes.
+
+## Choosing a Renderer
+
+| What you have | Use |
+|---|---|
+| A CPU and nothing else | **[Software](/main-modules/renderers/sw)**. The default |
+| Cortex-M55/M52/M85, Helium, or a DMAC-350 | **[Arm-2D](/main-modules/renderers/arm2d)** on top of the software renderer |
+| Cortex-A with Neon, or a RISC-V core with SIMD | **[Software](/main-modules/renderers/sw)** with `LV_USE_DRAW_SW_ASM` |
+| A GPU with OpenGL ES, on Linux or PC | **[NanoVG](/main-modules/renderers/nanovg)**, the recommended GPU renderer |
+| Renesas RA / RZ-A, or Alif Ensemble | **[Dave2D](/main-modules/renderers/dave2d)** |
+| STM32 with NeoChrom, or an Ambiq MCU | **[NemaGFX](/main-modules/renderers/nema_gfx)** |
+| STM32 with Chrom-ART | **[DMA2D](/main-modules/renderers/dma2d)** |
+| NXP i.MX RT | **[PXP](/main-modules/renderers/pxp)**, or **[VG-Lite](/main-modules/renderers/vg_lite)** for vector graphics |
+| NXP i.MX MPU | **[G2D](/main-modules/renderers/g2d)** |
+| ESP32-P4 | **[PPA](/main-modules/renderers/ppa)** (experimental) |
+| An EVE graphics IC on SPI | **[EVE](/main-modules/renderers/eve)** |
+
+<Callout type="info" title="A renderer is not a display driver">
+A renderer decides *how* pixels are produced; a
+[display driver](/main-modules/display_drivers) decides *where* they go. You need one of each.
+The OpenGL-based renderers additionally need a display driver that provides an OpenGL context,
+see [OpenGL on Linux](/integration/embedded_linux/opengl).
+</Callout>
+
+## Vector Graphics
+
+Vector drawing (<ApiLink name="LV_USE_VECTOR_GRAPHIC" />, and formats like
+[SVG](/libs/image_support/svg) and [Lottie](/libs/image_support/rlottie)) needs a renderer that
+can draw paths. The renderers that can are:
+
+- **[Software](/main-modules/renderers/sw)** with [ThorVG](https://github.com/thorvg/thorvg) (<ApiLink name="LV_USE_THORVG" />)
+- **[VG-Lite](/main-modules/renderers/vg_lite)**
+- **[NemaGFX](/main-modules/renderers/nema_gfx)** with NemaVG (`LV_USE_NEMA_VG`)
+- **[NanoVG](/main-modules/renderers/nanovg)**
+
+## 3D Content
+
+3D and [glTF](/libs/gltf) content requires a GPU renderer:
+[NanoVG](/main-modules/renderers/nanovg) or [OpenGL ES](/main-modules/renderers/opengles).
+
+## Multi-Core Rendering
+
+The software renderer can render several areas in parallel, one per core. Set
+<ApiLink name="LV_DRAW_SW_DRAW_UNIT_CNT" /> above `1` and <ApiLink name="LV_USE_OS" /> to
+something other than `LV_OS_NONE`. See [Tiled Rendering](/main-modules/display/tiling) for how
+LVGL splits the work.
+
+<DirectoryIndex />

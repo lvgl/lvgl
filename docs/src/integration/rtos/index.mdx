@@ -1,6 +1,51 @@
 ---
 title: RTOS Support
+description: "Which RTOSes LVGL integrates with, what each integration provides, and which display and input drivers to use on them."
 ---
 
+## Overview
+
+LVGL needs an operating system for exactly two things: threads, so rendering can be spread across
+cores, and locking, so the UI can be touched from more than one task. Both are configured with
+<ApiLink name="LV_USE_OS" />.
+
+Everything else, displays, input, rendering, is independent of the RTOS. That means for most
+RTOSes the integration is a one-line config change, and the interesting choice is which
+[display driver](/main-modules/display_drivers) and [renderer](/main-modules/renderers) your
+hardware calls for.
+
+## What Each Integration Provides
+
+| RTOS | `LV_USE_OS` | Display and input driver |
+|---|---|---|
+| [FreeRTOS](/integration/rtos/freertos) | <ApiLink name="LV_OS_FREERTOS" /> | From your hardware — an [LCD controller](/main-modules/display_drivers/lcd) or a [SoC controller](/main-modules/display_drivers/overview#soc-display-controllers) |
+| [Zephyr](/integration/rtos/zephyr) | Not set by the Zephyr module | Zephyr's own display API, configured in the devicetree |
+| [NuttX](/integration/rtos/nuttx) | <ApiLink name="LV_OS_PTHREAD" /> | **[NuttX driver](/main-modules/display_drivers/nuttx)** — `/dev/fb*` or `/dev/lcd*`, plus touch and mouse |
+| [QNX](/integration/rtos/qnx) | <ApiLink name="LV_OS_PTHREAD" /> | **[QNX driver](/main-modules/display_drivers/qnx)** — QNX Screen, with keyboard and pointer |
+| [RT-Thread](/integration/rtos/rt-thread) | <ApiLink name="LV_OS_RTTHREAD" /> | From your hardware, or RT-Thread's own drivers |
+| [PX5](/integration/rtos/px5) | <ApiLink name="LV_OS_PTHREAD" /> — PX5 is POSIX | From your hardware |
+| [MQX](/integration/rtos/mqx) | <ApiLink name="LV_OS_MQX" /> | From your hardware |
+
+There is also `LV_OS_CMSIS_RTOS2` for any RTOS exposing the CMSIS-RTOS2 API, and `LV_OS_CUSTOM`
+for wiring up one that is not listed.
+
+<Callout type="info" title="NuttX and QNX are the exceptions">
+Most RTOSes leave the display to you. NuttX and QNX are different: they expose an OS-level display
+interface, so LVGL ships a driver for each. Those two driver pages live with the other
+[display drivers](/main-modules/display_drivers); the pages in this section cover building LVGL
+for the OS itself.
+</Callout>
+
+## Do You Even Need an RTOS?
+
+No. LVGL runs perfectly bare metal with `LV_USE_OS` left at `LV_OS_NONE`, call
+<ApiLink name="lv_timer_handler" /> from your main loop and feed it a tick. Reach for an RTOS when
+you want [multi-core rendering](/main-modules/renderers/sw#multi-core-rendering) or your
+application already needs one for other reasons.
+
+<Callout type="warn" title="Locking">
+As soon as more than one task touches LVGL, every access must be wrapped in
+<ApiLink name="lv_lock" /> / <ApiLink name="lv_unlock" />. LVGL is not thread-safe on its own.
+</Callout>
 
 <DirectoryIndex />

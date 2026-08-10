@@ -258,7 +258,7 @@ There may be a better solution for this, but for the moment the
 recommendation is to make local modifications to the LVGL component in
 your espressif project. This is as simple as swapping
 <ApiLink name="lv_alloc" display="lv_alloc/lv_realloc" /> calls in `lv_rlottie.c`` with <ApiLink name="heap_caps_malloc" /> (for
-IDF) with the appropriate <ApiLink name="MALLOC_CAP" /> call --- for SPIRAM usage this is
+IDF) with the appropriate <ApiLink name="MALLOC_CAP" /> call, for SPIRAM usage this is
 <ApiLink name="MALLOC_CAP_SPIRAM" />.
 
 ```c

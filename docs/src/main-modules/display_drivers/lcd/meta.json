@@ -1,0 +1,14 @@
+{
+  "title": "LCD Controllers",
+  "pages": [
+    "gen_mipi",
+    "st7735",
+    "st7789",
+    "st7796",
+    "ili9341",
+    "nv3007",
+    "ft81x",
+    "lovyan_gfx",
+    "tft_espi"
+  ]
+}

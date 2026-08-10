@@ -33,23 +33,14 @@ a static library.
 Follow the generic instructions for [getting started](/getting_started/porting) with LVGL. After copying
 `lv_conf_template.h` to  `lv_conf.h` make the following changes to the latter:
 
-1. Enable QNX support:
-
 ```c
-#define LV_USE_QNX 1
+#define LV_USE_QNX      1   /* Enable QNX support */
+#define LV_COLOR_DEPTH  32  /* Required by the driver */
+#define LV_QNX_BUF_COUNT 2  /* Optional: double buffering */
 ```
 
-2. Set colour depth to 32:
-
-```c
-#define LV_COLOR_DEPTH 32
-```
-
-3. (Optional) Enable double-buffering:
-
-```c
-#define LV_QNX_BUF_COUNT 2
-```
+These options are documented on the
+[QNX display driver](/main-modules/display_drivers/qnx) page.
 
 ### Build LVGL as a Library
 
@@ -96,36 +87,20 @@ To create a LVGL application for QNX, follow these steps in your code:
 Steps 2, 3 and 5 use QNX-specific calls, but the rest of the code should be
 identical to that of a LVGL application written for any other platform.
 
-The following code shows how to create a "Hello World" application:
+Those QNX-specific calls belong to the QNX display driver. See
+**[QNX display driver](/main-modules/display_drivers/qnx)** for the configuration options, a
+complete "Hello World", and the support table.
 
 ```c
-#include <lvgl.h>
+lv_display_t * disp = lv_qnx_window_create(800, 480);
+lv_qnx_window_set_title(disp, "LVGL Example");
 
-int
-main(int argc, char **argv)
-{
-    /* Initialize the library. */
-    lv_init();
+lv_qnx_add_keyboard_device(disp);
+lv_qnx_add_pointer_device(disp);
 
-    /* Create a 800x480 window. */
-    lv_display_t *disp = lv_qnx_window_create(800, 480);
-    lv_qnx_window_set_title(disp, "LVGL Example");
+/* ... build the UI ... */
 
-    /* Add keyboard and mouse devices. */
-    lv_qnx_add_keyboard_device(disp);
-    lv_qnx_add_pointer_device(disp);
-
-    /* Generate the UI. */
-    lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
-
-    lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "Hello world");
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-
-    /* Run the event loop until it exits. */
-    return lv_qnx_event_loop(disp);
-}
+return lv_qnx_event_loop(disp);
 ```
 
 ### Build the Application
