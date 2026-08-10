@@ -1,66 +1,78 @@
 ---
 title: "Generic MIPI DCS"
-description: "From the Wikipedia:"
+description: "A common framework for LCD controllers that speak the MIPI DCS command set over SPI or I8080. It is the base of the ST77xx, ILI9341 and NV3007 drivers, and it can drive compatible chips that have no dedicated driver."
+faqs:
+  - question: "Is this a driver for MIPI DSI displays?"
+    answer: "No. Despite the name it is not a hardware driver for the DSI serial interface. It implements the MIPI DCS command set, which a large number of LCD controllers accept over an SPI or I8080 bus."
+  - question: "My controller has no dedicated LVGL driver. Can I use this?"
+    answer: "Very likely yes. If the datasheet shows standard DCS commands, this driver will drive it — send the panel's vendor-specific init sequence with lv_lcd_generic_mipi_send_cmd_list()."
+  - question: "Do I need to enable LV_USE_GENERIC_MIPI when I use the ST7789 driver?"
+    answer: "No. Each chip-specific driver selects LV_USE_GENERIC_MIPI automatically."
+  - question: "My colors are wrong — red and blue look swapped, or everything looks scrambled."
+    answer: "Two different causes. Swapped red and blue is panel RGB/BGR order, fixed with LV_LCD_FLAG_BGR. Scrambled colors are usually byte order on the SPI bus, fixed by setting the LVGL color format to LV_COLOR_FORMAT_RGB565_SWAPPED."
 ---
 
 ## Overview
 
-From the [Wikipedia](https://en.wikipedia.org/wiki/MIPI_Alliance):
+[MIPI Alliance](https://www.mipi.org/) publishes a series of display specifications,
+including DBI (Display Bus Interface), DSI (Display Serial Interface) and DCS (Display Command
+Set). The DCS specification defines a standard command set --- configure orientation, color
+resolution, power modes, and access video memory --- that a large number of legacy TFT LCD
+controllers implement, including the popular Sitronix (ST7735, ST7789, ST7796) and Ilitek
+(ILI9341) parts. On top of the standard set, each controller adds vendor-specific commands for
+voltage levels, timings and gamma curves.
 
-[MIPI Alliance](https://www.mipi.org/) is a global business alliance that
-    develops technical specifications for the mobile ecosystem, particularly smart
-    phones but including mobile-influenced industries. MIPI was founded in 2003 by
-    Arm, Intel, Nokia, Samsung, STMicroelectronics and Texas Instruments.
+This driver implements that command set and provides the common framework the chip-specific LVGL
+drivers are built on.
 
-MIPI Alliance published a series of specifications related to display devices,
-including DBI (Display Bus Interface), DSI (Display Serial Interface) and DCS
-(Display Command Set).  Usually when one talks about a MIPI-compatible display, one
-thinks of a device with a DSI serial interface. However, the Display Bus Interface
-specification includes a number of other, legacy interfaces, like SPI serial, or
-i8080-compatible parallel interface, which are often used to interface LCD displays
-to lower-end microcontrollers.  Furthermore, the DCS specification contains a standard
-command set, which is supported by a large number of legacy TFT LCD controllers,
-including the popular Sitronix (ST7735, ST7789, ST7796) and Ilitek (ILI9341) SOCs.
-These commands provide a common interface to configure display orientation, color
-resolution, various power modes, and provide generic video memory access.  On top of
-that standard command set each LCD controller chip has a number of vendor-specific
-commands to configure voltage generator levels, timings, or gamma curves.
-
-<Callout type="info">
-It is important to understand that this generic MIPI LCD driver is not a hardware
-driver for displays with the DSI ("MIPI") serial interface.  Instead, it
-implements the MIPI DCS command set used in many LCD controllers with an SPI or
-i8080 bus, and provides a common framework for chip-specific display
-controllers.
+<Callout type="warn" title="Not a DSI driver">
+Despite the name, this is **not** a hardware driver for displays with the DSI ("MIPI") serial
+interface. It implements the MIPI DCS command set used by many LCD controllers on an **SPI or
+I8080** bus.
 </Callout>
 
-<Callout type="info">
-Although this is a generic driver, it can be used to support compatible chips
-which do not have a specific driver.
-</Callout>
+Its second use is as a fallback: if your controller has no dedicated driver but its datasheet
+shows standard DCS commands, this driver will very likely drive it once you feed it the panel's
+init sequence.
 
-## Prerequisites
+### Prerequisites
 
-There are no prerequisites.
+None. You supply two bus transfer functions, so no third-party library is involved.
 
-## Configuring the driver
+## Configuration
 
-Enable the generic MIPI LCD driver support in lv_conf.h, by cmake compiler define or
-by KConfig:
+Enable <ApiLink name="LV_USE_GENERIC_MIPI" />.
+
+### Create flags
+
+The third argument of <ApiLink name="lv_lcd_generic_mipi_create" /> configures the panel's
+orientation and color handling. OR them together as needed.
+
+| Flag | Effect |
+|---|---|
+| <ApiLink name="LV_LCD_FLAG_NONE" /> | Defaults: no mirroring, RGB order, RGB565 |
+| <ApiLink name="LV_LCD_FLAG_MIRROR_X" /> | Mirror horizontally |
+| <ApiLink name="LV_LCD_FLAG_MIRROR_Y" /> | Mirror vertically |
+| <ApiLink name="LV_LCD_FLAG_BGR" /> | Panel wires the subpixels as BGR rather than RGB |
+| <ApiLink name="LV_LCD_FLAG_RGB666" /> | Set the controller's pixel format to RGB666 instead of RGB565 |
 
 ```c
-#define LV_USE_GENERIC_MIPI  1
+lv_display_t * disp = lv_lcd_generic_mipi_create(MY_WIDTH, MY_HEIGHT,
+                                                LV_LCD_FLAG_MIRROR_X | LV_LCD_FLAG_BGR,
+                                                my_lcd_send_cmd, my_lcd_send_color);
 ```
 
-<Callout type="info">
-The chip-specific drivers (e.g. ST7789, ILI9341) automatically enable the generic
-MIPI driver, so you do not need to set <ApiLink name="LV_USE_GENERIC_MIPI" /> explicitly
-when one of those is enabled.
+<Callout type="warn" title="RGB666 needs a matching LVGL color format">
+The flag only sets the controller's `COLMOD` register. The driver sizes each transfer from the
+**LVGL** display color format, so you must also set one whose pixel size matches the bus format,
+or the transfer length will be wrong.
 </Callout>
 
 ## Usage
 
-You need to implement two platform-dependent functions:
+### The two transfer functions
+
+You implement two platform-dependent functions:
 
 ```c
 /* Send short command to the LCD. This function shall wait until the
@@ -82,53 +94,71 @@ void my_lcd_send_color(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size
 }
 ```
 
-The only difference between the `my_lcd_send_cmd`
-and `my_lcd_send_color` functions is that `my_lcd_send_cmd` is
-used to send short commands and it is expected to complete the transaction when it
-returns (in other words, it should be blocking), while `my_lcd_send_color`
-is only used to send pixel data, and it is recommended to use DMA to transmit data in
-the background.  More sophisticated methods can be also implemented, like queuing
-transfers and scheduling them in the background.
+The only difference between them is timing. `my_lcd_send_cmd` sends short commands and must have
+completed the transaction by the time it returns --- in other words it is blocking.
+`my_lcd_send_color` only sends pixel data, and it is recommended to use DMA and transfer in the
+background. More sophisticated schemes work too, such as queuing transfers and scheduling them.
 
-Please note that while display flushing is handled by the driver, it is the user's
-responsibility to call <ApiLink name="lv_display_flush_ready" /> when the color transfer
-completes.  In case of a DMA transfer this call is usually made in an interrupt
-service routine (ISR) that fires when the DMA transfer is complete.
+Typically both are implemented by calling the appropriate SDK functions for your platform.
 
-<Callout type="info">
-While it is acceptable to use a blocking implementation for the pixel transfer as
-well, performance will suffer.
+<Callout type="warn" title="You must signal the end of the transfer">
+Display flushing is handled by the driver, but calling
+<ApiLink name="lv_display_flush_ready" /> when the color transfer completes is **your**
+responsibility. With DMA this call usually goes in the transfer-complete interrupt handler.
 </Callout>
 
 <Callout type="info">
-Care must be taken to avoid sending a command while there is an active transfer
-going on in the background.  It is the user's responsibility to implement this
-either by polling the hardware, polling a global variable (which is reset at the
-end of the transfer), or by using a semaphore or other locking mechanism.
+A blocking implementation of the pixel transfer is acceptable, but performance will suffer.
 </Callout>
 
-Please also note that the driver does not handle the draw buffer allocation, because
-this may be platform-dependent, too. Thus you need to allocate the buffers and assign
-them to the display object as usual by calling <ApiLink name="lv_display_set_buffers" />
-(see [Draw Buffer(s)](/main-modules/display/setup)).
+<Callout type="warn" title="Do not overlap a command with a running transfer">
+Care must be taken to avoid sending a command while a background transfer is still going on. It
+is your responsibility to arbitrate this — by polling the hardware, polling a flag reset at the
+end of the transfer, or with a semaphore.
+</Callout>
 
-The driver can be used to create multiple displays. In such a configuration the
-callbacks must be able to distinguish between the displays. Usually one would
-implement a separate set of callbacks for each display. Also note that the user must
-take care of arbitrating the bus when multiple devices are connected to it.
+### Draw buffers
+
+The driver does not allocate draw buffers, because that can be platform-dependent too. Allocate
+them yourself and assign them with <ApiLink name="lv_display_set_buffers" /> as usual — see
+[Draw Buffer(s)](/main-modules/display/setup#draw-buffers).
+
+The driver also does not set the LVGL color format. On many SPI panels the bus byte order means
+you want <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED" />:
+
+```c
+lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
+```
+
+### Multiple displays
+
+The driver can create multiple displays. The callbacks must then distinguish between them ---
+usually by implementing a separate set per display. Arbitrating the bus between several devices
+is also up to you.
+
+### Runtime API
+
+| Function | Purpose |
+|---|---|
+| <ApiLink name="lv_lcd_generic_mipi_set_gap" /> | Offset of the (0,0) pixel in the controller's VRAM |
+| <ApiLink name="lv_lcd_generic_mipi_set_invert" /> | Invert the displayed colors |
+| <ApiLink name="lv_lcd_generic_mipi_set_address_mode" /> | Mirroring, axis swap and RGB/BGR order |
+| <ApiLink name="lv_lcd_generic_mipi_set_gamma_curve" /> | Select one of the predefined gamma curves |
+| <ApiLink name="lv_lcd_generic_mipi_send_cmd_list" /> | Send a custom command list; see below |
+
+Rotation goes through the standard <ApiLink name="lv_display_set_rotation" /> --- the driver
+handles it in hardware by rewriting the controller's address mode.
 
 ## Example
 
 ```c
-#include "src/drivers/display/st7789/lv_st7789.h"
+#include "lvgl.h"
 
 #define LCD_H_RES        240
 #define LCD_V_RES        320
 #define LCD_BUF_LINES    60
 
 lv_display_t * my_disp;
-
-...
 
 /* Initialize LCD I/O bus, reset LCD */
 static int32_t my_lcd_io_init(void)
@@ -139,7 +169,7 @@ static int32_t my_lcd_io_init(void)
 
 /* Send command to the LCD controller */
 static void my_lcd_send_cmd(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size,
-                            const uint8_t *param, size_t param_size)
+                            const uint8_t * param, size_t param_size)
 {
     MY_PIN_PREP_TO_SEND_CMD();
     MY_PIN_LCD_CONTROLLER_CHIP_SELECT();
@@ -179,14 +209,12 @@ static void my_lcd_send_color(lv_display_t * disp, const uint8_t * cmd, size_t c
 
 int main(int argc, char ** argv)
 {
-    ...
-
     /* Initialize LVGL */
     lv_init();
 
     /* Initialize LCD bus I/O */
-    if (my_lcd_io_init() != 0)
-        return;
+    if(my_lcd_io_init() != 0)
+        return -1;
 
     /* Create the LVGL display object and the LCD display driver */
     my_disp = lv_lcd_generic_mipi_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE,
@@ -195,76 +223,39 @@ int main(int argc, char ** argv)
     /* Set display orientation to landscape */
     lv_display_set_rotation(my_disp, LV_DISPLAY_ROTATION_90);
 
-    /* Configure draw buffers, etc. */
-    uint8_t * buf1 = NULL;
-    uint8_t * buf2 = NULL;
-
+    /* Configure draw buffers */
     uint32_t buf_size = LCD_H_RES * LCD_BUF_LINES
             * lv_color_format_get_size(lv_display_get_color_format(my_disp));
 
-    buf1 = lv_malloc(buf_size);
+    uint8_t * buf1 = lv_malloc(buf_size);
     if(buf1 == NULL) {
         LV_LOG_ERROR("display draw buffer malloc failed");
-        return;
+        return -1;
     }
 
     /* Allocate secondary buffer if needed */
-    ...
+    uint8_t * buf2 = NULL;
 
     lv_display_set_buffers(my_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     ui_init(my_disp);
 
     while(true) {
-        ...
-
         /* Periodically call the lv_timer handler */
         lv_timer_handler();
     }
 }
 ```
 
-## Advanced topics
+## Custom command lists
 
-### Create flags
+While the chip-specific drivers do their best to initialize the controller correctly, different
+TFT panels need different configurations. A correct gamma setup in particular is crucial for good
+color reproduction, and finding a good set of parameters is not easy --- usually the panel
+manufacturer provides example code with recommended register settings.
 
-The third argument of the <ApiLink name="lv_lcd_generic_mipi_create" /> function is a flag
-array.  This can be used to configure the orientation and RGB ordering of the panel if
-the default settings do not work for you.  In particular, the generic MIPI driver
-accepts the following flags:
-
-```c
-LV_LCD_FLAG_NONE
-LV_LCD_FLAG_MIRROR_X
-LV_LCD_FLAG_MIRROR_Y
-LV_LCD_FLAG_BGR
-```
-
-You can pass multiple flags by ORing them together:
-
-```c
-lv_display_t * disp;
-
-disp = lv_lcd_generic_mipi_create(MY_DISPLAY_PIXEL_WIDTH,
-                                  MY_DISPLAY_PIXEL_HEIGHT,
-                                  LV_LCD_FLAG_MIRROR_X | LV_LCD_FLAG_BGR,
-                                  my_lcd_send_cmd,
-                                  my_lcd_send_color);
-```
-
-### Custom command lists
-
-While the chip-specific drivers do their best to initialize the LCD controller
-correctly, it is possible, that different TFT panels need different configurations.
-In particular a correct gamma setup is crucial for good color reproduction.
-Unfortunately, finding a good set of parameters is not easy.  Usually the
-manufacturer of the panel provides some example code with recommended register
-settings.
-
-You can use the `my_lcd_send_cmd` function to send an arbitrary command to
-the LCD controller.  However, to make it easier to send a large number of parameters
-the generic MIPI driver supports sending a custom command list to the controller.
-The commands must be put into a 'uint8_t' array:
+You can send an arbitrary command with your own `my_lcd_send_cmd`, but for a large number of
+parameters the driver supports sending a command list. Put the commands in a `uint8_t` array:
 
 ```c
 static const uint8_t init_cmd_list[] = {
@@ -274,15 +265,33 @@ static const uint8_t init_cmd_list[] = {
     LV_LCD_CMD_DELAY_MS, LV_LCD_CMD_EOF     /* Terminate list: this is required! */
 };
 
-...
-
 lv_lcd_generic_mipi_send_cmd_list(my_disp, init_cmd_list);
 ```
 
-You can add a delay between the commands by using the pseudo-command
-<ApiLink name="LV_LCD_CMD_DELAY_MS" />, which must be followed by the delay given in 10ms units.  To
-terminate the command list you must use a delay with a value of <ApiLink name="LV_LCD_CMD_EOF" />,
-as shown above.
+Insert a delay between commands with the pseudo-command <ApiLink name="LV_LCD_CMD_DELAY_MS" />,
+followed by the delay in 10 ms units. Terminate the list with a delay whose value is
+<ApiLink name="LV_LCD_CMD_EOF" />, as shown above.
 
-See an actual example of sending a command list
-[here](https://github.com/lvgl/lvgl/blob/master/src/drivers/display/st7789/lv_st7789.c).
+For a real example of sending a command list, see
+[`lv_st7789.c`](https://github.com/lvgl/lvgl/blob/master/src/drivers/display/st7789/lv_st7789.c).
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Bus | SPI or I8080 parallel — you provide the transfer functions |
+| Rotation | Hardware, via the controller's address mode |
+| Runtime resolution change | Yes |
+| Runtime color format change | No |
+| Color formats | RGB565, or RGB666 with `LV_LCD_FLAG_RGB666`. Set the LVGL color format yourself |
+| Multiple displays / windows | Yes — one per controller |
+| Hardware acceleration | None |
+| Render mode | Partial — you allocate the buffers |
+| Input | None. Pair with your touch controller's driver |
+
+## See Also
+
+- [LCD Controllers](/main-modules/display_drivers/lcd) - the chip-specific drivers built on this one
+- [Setting Up Your Display](/main-modules/display/setup) - draw buffers and flush callbacks
+- [Color Format](/main-modules/display/color_format) - including the swapped RGB565 variant
+- [Constraints on Redrawn Area](/main-modules/display/redraw_area) - for controllers with alignment requirements
