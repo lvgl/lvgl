@@ -4778,6 +4778,14 @@
  -----------------------------------*/
 
 /* Derived capability flags (set via Kconfig `select`). */
+#ifndef LV_USE_TLSF
+    #if (LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN)
+        #define LV_USE_TLSF 1
+    #else
+        #define LV_USE_TLSF 0
+    #endif
+#endif
+
 #ifndef LV_OS_USE_PTHREAD
     #if (LV_USE_OS == LV_OS_PTHREAD)
         #define LV_OS_USE_PTHREAD 1
