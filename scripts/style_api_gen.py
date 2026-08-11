@@ -582,6 +582,24 @@ props = [
 
 
 # =========================================================================
+# Validation
+# =========================================================================
+
+
+explain = False
+for prop in props:
+    if not 'section' in prop:
+        if not prop['dsc'].endswith('.'):
+            print(f'dsc does not end with "." for: [{prop["name"]}]')
+            explain = True
+
+if explain:
+    print()
+    print('A "." is needed at the end of "dsc" values so that it separates the end')
+    print('of the description in the function API documentation from the extra info')
+    print('at the end:  default, inherited, layout and ext draw information.')
+
+# =========================================================================
 # Data
 # =========================================================================
 
@@ -1080,18 +1098,3 @@ for prop in props:
 # -------------------------------------------------------------------------
 sys.stdout = orig_stdout
 print(f'Total functions commented:  {_total_func_count}.')
-print('Checking for problems... ')
-explain = False
-for prop in props:
-    if not 'section' in prop:
-        if not prop['dsc'].endswith('.'):
-            print(f'dsc does not end with "." for: [{prop["name"]}]')
-            explain = True
-
-if explain:
-    print()
-    print('A "." is needed at the end of "dsc" values so that it separates the end')
-    print('of the description in the function API documentation from the extra info')
-    print('at the end:  default, inherited, layout and ext draw information.')
-else:
-    print('OK.')
