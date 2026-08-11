@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-REPO_ROOT = Path(BASE_DIR).parents[0]
+REPO_ROOT = Path(BASE_DIR).parents[1]
 
 EXAMPLES_ROOT = REPO_ROOT / "examples"
 STYLE_PROPERTIES_MDX = REPO_ROOT.joinpath("docs/src/common-widget-features/styles/style-properties.mdx")
