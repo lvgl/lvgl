@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-""" Generate these 5 files:
-
-- lvgl/include/lvgl/core/lv_obj_style_gen.h
-- lvgl/include/lvgl/core/lv_style_gen.h
-- lvgl/src/core/lv_obj_style_gen.c
-- lvgl/src/misc/lv_style_gen.c
-- lvgl/docs/src/common-widget-features/styles/style-properties.mdx
-
-This script effectively "factors out" what would be duplicate code and
-documentation in all 5 of the above files, into 1 place:  below.
-"""
 import os
 import sys
+from pathlib import Path
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+REPO_ROOT = Path(BASE_DIR).parents[0]
+
+EXAMPLES_ROOT = REPO_ROOT / "examples"
+STYLE_PROPERTIES_MDX = REPO_ROOT.joinpath("docs/src/common-widget-features/styles/style-properties.mdx")
+OBJ_STYLE_GEN_H = REPO_ROOT.joinpath("include/lvgl/core/lv_obj_style_gen.h")
+OBJ_STYLE_GEN_C = REPO_ROOT.joinpath("src/core/lv_obj_style_gen.c")
+STYLE_GEN_H = REPO_ROOT.joinpath("include/lvgl/core/lv_style_gen.h")
+STYLE_GEN_C = REPO_ROOT.joinpath("src/misc/lv_style_gen.c")
 
 # =========================================================================
 # Style Property Database
@@ -961,9 +961,8 @@ def guard_close():
 # -------------------------------------------------------------------------
 # lv_obj_style_gen.h
 # -------------------------------------------------------------------------
-base_dir = os.path.abspath(os.path.dirname(__file__))
 orig_stdout = sys.stdout
-sys.stdout = open(base_dir + '/../include/lvgl/core/lv_obj_style_gen.h', 'w')
+sys.stdout = open(OBJ_STYLE_GEN_H, 'w')
 
 print(HEADING)
 print('#ifndef LV_OBJ_STYLE_GEN_H')
@@ -1005,7 +1004,7 @@ print('#endif /* LV_OBJ_STYLE_GEN_H */')
 # -------------------------------------------------------------------------
 # lv_obj_style_gen.c
 # -------------------------------------------------------------------------
-sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
+sys.stdout = open(OBJ_STYLE_GEN_C, 'w')
 
 print(HEADING)
 print('#include "../lvgl_public.h"')
@@ -1019,7 +1018,7 @@ guard_close()
 # -------------------------------------------------------------------------
 # lv_style_gen.c
 # -------------------------------------------------------------------------
-sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.c', 'w')
+sys.stdout = open(STYLE_GEN_C, 'w')
 
 print(HEADING)
 print('#include "../lvgl_public.h"')
@@ -1033,7 +1032,7 @@ guard_close()
 # -------------------------------------------------------------------------
 # lv_style_gen.h
 # -------------------------------------------------------------------------
-sys.stdout = open(base_dir + '/../include/lvgl/core/lv_style_gen.h', 'w')
+sys.stdout = open(STYLE_GEN_H, 'w')
 
 print(HEADING)
 print('#ifndef LV_STYLE_GEN_H')
@@ -1068,7 +1067,7 @@ print('#endif /* LV_STYLE_GEN_H */')
 # -------------------------------------------------------------------------
 # style-properties.mdx
 # -------------------------------------------------------------------------
-sys.stdout = open(base_dir + '/../docs/src/common-widget-features/styles/style-properties.mdx', 'w')
+sys.stdout = open(STYLE_PROPERTIES_MDX, "w")
 
 print(MDX_HEADING)
 print()
