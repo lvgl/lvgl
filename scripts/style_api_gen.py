@@ -585,6 +585,13 @@ props = [
 # Validation
 # =========================================================================
 
+assert os.path.exists(EXAMPLES_ROOT)
+for prop in props:
+    if "example_path" in prop:
+        for ext in [".c", ".xml"]:
+            full_path = EXAMPLES_ROOT / (prop["example_path"] + ext)
+            if not os.path.exists(full_path):
+                raise FileNotFoundError(full_path)
 
 explain = False
 for prop in props:
