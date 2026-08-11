@@ -93,6 +93,8 @@ void lv_qrcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
+
+    if(qrcode->light_color == color) return;
     qrcode->dark_color = color;
 
     /*Apply the color right away so it takes effect even if the QR code has
@@ -107,6 +109,8 @@ void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
+
+    if(qrcode->light_color == color) return;
     qrcode->light_color = color;
 
     /*Apply the color right away so it takes effect even if the QR code has
@@ -177,11 +181,13 @@ void lv_qrcode_set_quiet_zone(lv_obj_t * obj, bool enable)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
+
+    if(qrcode->quite_zone == enable) return;
     qrcode->quiet_zone = enable;
     qrcode_mark_dirty(obj);
 }
 
-lv_result_t lv_qrcode_set_auto_update(lv_obj_t * obj, bool enable)
+void lv_qrcode_set_auto_update(lv_obj_t * obj, bool enable)
 {
     LV_CHECK_OBJ(obj, MY_CLASS, return LV_RESULT_INVALID);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
@@ -189,8 +195,7 @@ lv_result_t lv_qrcode_set_auto_update(lv_obj_t * obj, bool enable)
 
     /*If auto update is turned back on while the bitmap is out of date, regenerate
      *right away and report the result of that update*/
-    if(enable && qrcode->needs_update) return lv_qrcode_update(obj);
-    return LV_RESULT_OK;
+    if(enable && qrcode->needs_update) lv_qrcode_update(obj);
 }
 
 bool lv_qrcode_get_auto_update(lv_obj_t * obj)
@@ -286,6 +291,7 @@ static void lv_qrcode_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_t * obj = lv_event_get_current_target(e);
         lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
         if(qrcode->needs_update) {
+            LV_ASSERT(!qrcode->auto_mode);
             LV_LOG_WARN("QR code properties changed without a manual lv_qrcode_update(); "
                         "regenerating on redraw. Call lv_qrcode_update() after setting properties.");
             /*Fill the buffer only; invalidating during the draw pass is not needed*/
@@ -323,13 +329,17 @@ static bool qrcode_store_data(lv_qrcode_t * qrcode, const void * data, uint32_t 
      *Both public setters keep `data_len` <= qrcodegen_BUFFER_LEN_MAX via LV_CHECK_ARG (the string
      *setter caps the string itself one byte lower to make room for the NUL), so it fits the
      *12-bit `data_len` field. Only skipped when arg checks are disabled.*/
-    uint8_t * new_data = lv_malloc(data_len);
-    LV_ASSERT_MALLOC(new_data);
+
+    if(data == qrcode->data) {
+        qrcode->data_len = data_len;
+        return true;
+    }
+
+    uint8_t * new_data = lv_realloc(qrcode->data, data_len);
     if(new_data == NULL) return false;
 
     lv_memcpy(new_data, data, data_len);
 
-    if(qrcode->data) lv_free(qrcode->data);
     qrcode->data = new_data;
     qrcode->data_len = data_len;
     return true;
@@ -354,6 +364,7 @@ static uint32_t qrcode_payload_len(const lv_qrcode_t * qrcode)
 
 static void qrcode_mark_dirty(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
     /*Nothing to regenerate until there is data*/
@@ -426,8 +437,6 @@ static lv_result_t qrcode_render(lv_obj_t * obj)
     uint8_t * data_tmp = lv_malloc(qrcodegen_BUFFER_LEN_FOR_VERSION(qr_version));
     LV_ASSERT_MALLOC(data_tmp);
 
-    /*Asserts can be compiled out, so check explicitly. `lv_free(NULL)` is a no-op,
-     *which makes this safe for a partially allocated pair as well.*/
     if(qr0 == NULL || data_tmp == NULL) {
         LV_LOG_ERROR("malloc failed for the QR code encoder buffers");
         lv_free(qr0);

@@ -129,10 +129,8 @@ void lv_qrcode_set_quiet_zone(lv_obj_t * obj, bool enable);
  * Enabling it while the bitmap is out of date regenerates it immediately.
  * @param obj pointer to a QR code object
  * @param enable true: update automatically; false: update manually
- * @return the result of the immediate update triggered by enabling it (the
- *         `lv_qrcode_update()` result), otherwise LV_RESULT_OK
  */
-lv_result_t lv_qrcode_set_auto_update(lv_obj_t * obj, bool enable);
+void lv_qrcode_set_auto_update(lv_obj_t * obj, bool enable);
 
 /**
  * Get whether automatic updating of the bitmap is enabled.

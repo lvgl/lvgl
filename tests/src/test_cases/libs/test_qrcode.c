@@ -264,6 +264,31 @@ void test_qrcode_update_reports_render_failure(void)
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_update(qr));
 }
 
+void test_qrcode_set_data_from_stored_buffer(void)
+{
+    lv_obj_t * qr = lv_qrcode_create(active_screen);
+    TEST_ASSERT_NOT_NULL(qr);
+    lv_qrcode_set_size(qr, 150);
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io"));
+
+    /*Re-set a shorter payload taken from the object's own buffer. The stored buffer is
+     *resized in place rather than reallocated, so this must not read freed memory
+     *(the sanitizers in this build fail the test if it does).*/
+    const char * stored = lv_qrcode_get_data(qr);
+    TEST_ASSERT_NOT_NULL(stored);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data_binary(qr, stored, 5));
+
+    uint8_t out[8];
+    lv_memset(out, 0, sizeof(out));
+    TEST_ASSERT_EQUAL(5, lv_qrcode_get_data_binary(qr, out, sizeof(out)));
+    TEST_ASSERT_EQUAL_MEMORY("https", out, 5);
+
+    /*Growing the payload again exercises the reallocation path*/
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_qrcode_set_data(qr, "https://lvgl.io/docs"));
+    TEST_ASSERT_EQUAL_STRING("https://lvgl.io/docs", lv_qrcode_get_data(qr));
+}
+
 void test_qrcode_canvas_too_small_is_reported(void)
 {
     lv_obj_t * qr = lv_qrcode_create(active_screen);
