@@ -867,18 +867,17 @@ void * lv_observer_get_user_data(const lv_observer_t * observer)
     return observer->user_data;
 }
 
-void lv_observer_set_user_data(lv_observer_t * observer, void * user_data,
-                               bool auto_free)
+void lv_observer_set_user_data(lv_observer_t * observer, void * user_data)
 {
     LV_CHECK_ARG(observer != NULL, return);
 
-    /* Keep the allocation when only its ownership flag is changing. */
+    /* Release internally-owned data only when replacing it. */
     if(observer->auto_free_user_data && observer->user_data != user_data) {
         lv_free(observer->user_data);
     }
 
     observer->user_data = user_data;
-    observer->auto_free_user_data = auto_free;
+    observer->auto_free_user_data = 0;
 }
 
 /**********************

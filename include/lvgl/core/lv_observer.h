@@ -395,18 +395,11 @@ lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer);
 void * lv_observer_get_user_data(const lv_observer_t * observer);
 
 /**
- * Set Observer's user data and ownership.
- * If the previous data is owned by the Observer and a different pointer is
- * supplied, it is released before being replaced.
+ * Set Observer's user data.
  * @param observer      pointer to Observer
- * @param user_data     new user data pointer (may be NULL)
- * @param auto_free     true: the Observer owns the new data and releases it when
- *                      removed (must be heap-allocated); false: ownership stays
- *                      with the caller
- * @note                When replacing owned data, the previous pointer is released
- *                      before this function returns and must not be used afterwards.
+ * @param user_data     pointer to user-owned data (may be NULL)
  */
-void lv_observer_set_user_data(lv_observer_t * observer, void * user_data, bool auto_free);
+void lv_observer_set_user_data(lv_observer_t * observer, void * user_data);
 
 /**
  * Notify all Observers of Subject.

@@ -1044,21 +1044,21 @@ void test_observer_set_user_data(void)
         lv_subject_add_observer(&subject, observer_basic, NULL);
     TEST_ASSERT_NOT_NULL(observer);
 
-    /* Initially NULL with no auto-free */
+    /* Initially NULL */
     TEST_ASSERT_EQUAL_PTR(NULL, lv_observer_get_user_data(observer));
 
     static int32_t a;
     static int32_t b;
-    lv_observer_set_user_data(observer, &a, false);
+    lv_observer_set_user_data(observer, &a);
     TEST_ASSERT_EQUAL_PTR(&a, lv_observer_get_user_data(observer));
 
-    lv_observer_set_user_data(observer, &b, false);
+    lv_observer_set_user_data(observer, &b);
     TEST_ASSERT_EQUAL_PTR(&b, lv_observer_get_user_data(observer));
 
     lv_observer_remove(observer);
 }
 
-void test_observer_set_user_data_auto_free(void)
+void test_observer_set_user_data_user_owned(void)
 {
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 5);
@@ -1070,17 +1070,18 @@ void test_observer_set_user_data_auto_free(void)
         lv_subject_add_observer(&subject, observer_basic, NULL);
     TEST_ASSERT_NOT_NULL(observer);
 
-    /* Set auto-free data; it must be freed again on removal */
+    /* The observer must not free user-owned data on removal. */
     void * data = lv_malloc(64);
     TEST_ASSERT_NOT_NULL(data);
-    lv_observer_set_user_data(observer, data, true);
+    lv_observer_set_user_data(observer, data);
     TEST_ASSERT_EQUAL_PTR(data, lv_observer_get_user_data(observer));
 
     lv_observer_remove(observer);
+    lv_free(data);
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
 }
 
-void test_observer_set_user_data_auto_free_replace(void)
+void test_observer_set_user_data_replaces_internal_data(void)
 {
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 5);
@@ -1092,24 +1093,49 @@ void test_observer_set_user_data_auto_free_replace(void)
         lv_subject_add_observer(&subject, observer_basic, NULL);
     TEST_ASSERT_NOT_NULL(observer);
 
-    /* First auto-free allocation */
+    /* Simulate an observer whose data is owned by an internal binding. */
     void * old_data = lv_malloc(64);
     TEST_ASSERT_NOT_NULL(old_data);
-    lv_observer_set_user_data(observer, old_data, true);
+    observer->user_data = old_data;
+    observer->auto_free_user_data = 1;
 
-    /* Reusing the current pointer must not free it or create a dangling pointer. */
-    uint32_t mem_with_old_data = lv_test_get_free_mem();
-    lv_observer_set_user_data(observer, old_data, true);
-    TEST_ASSERT_EQUAL_PTR(old_data, lv_observer_get_user_data(observer));
-    TEST_ASSERT_EQUAL_UINT32(mem_with_old_data, lv_test_get_free_mem());
-
-    /* Replacing with another auto-free allocation must free the old one */
     void * new_data = lv_malloc(64);
     TEST_ASSERT_NOT_NULL(new_data);
-    lv_observer_set_user_data(observer, new_data, true);
+    uint32_t mem_with_both_data = lv_test_get_free_mem();
+    lv_observer_set_user_data(observer, new_data);
     TEST_ASSERT_EQUAL_PTR(new_data, lv_observer_get_user_data(observer));
+    TEST_ASSERT_FALSE(observer->auto_free_user_data);
+    TEST_ASSERT_GREATER_THAN_UINT32(mem_with_both_data, lv_test_get_free_mem());
 
     lv_observer_remove(observer);
+    lv_free(new_data);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
+}
+
+void test_observer_set_user_data_same_internal_data(void)
+{
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 5);
+
+    uint32_t mem = lv_test_get_free_mem();
+
+    lv_observer_t * observer =
+        lv_subject_add_observer(&subject, observer_basic, NULL);
+    TEST_ASSERT_NOT_NULL(observer);
+
+    void * data = lv_malloc(64);
+    TEST_ASSERT_NOT_NULL(data);
+    observer->user_data = data;
+    observer->auto_free_user_data = 1;
+
+    uint32_t mem_with_data = lv_test_get_free_mem();
+    lv_observer_set_user_data(observer, data);
+    TEST_ASSERT_EQUAL_PTR(data, lv_observer_get_user_data(observer));
+    TEST_ASSERT_FALSE(observer->auto_free_user_data);
+    TEST_ASSERT_EQUAL_UINT32(mem_with_data, lv_test_get_free_mem());
+
+    lv_observer_remove(observer);
+    lv_free(data);
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
 }
 
