@@ -58,6 +58,18 @@ jobs:
             include/lvgl/config/lv_conf_internal.h \
             include/lvgl/config/lv_conf_kconfig.h \
           || (echo "::error::Generated config headers are out of date. Run scripts/generators/config_headers.py and commit the result."; exit 1)
+          git restore .
+
+      # ------------------------------------------------------------------
+      # Style API: style_gen.c/h and documentation
+      # ------------------------------------------------------------------
+      - name: "Generate: style api"
+        id: style-api
+        continue-on-error: true
+        run: |
+          python3 scripts/generators/style_api.py
+          git diff --exit-code || (echo "::error::Generated styles are out of date. Run scripts/generators/style_api.py and commit the result."; exit 1)
+          git restore .
 
       # ------------------------------------------------------------------
       # COPYRIGHTS.md and the SPDX SBOM (sbom/) are generated from
@@ -90,6 +102,7 @@ jobs:
         if: |
           steps.config-headers-tests.outcome == 'failure' ||
           steps.config-headers.outcome       == 'failure' ||
+          steps.style-api.outcome            == 'failure' ||
           steps.copyrights.outcome           == 'failure' ||
           steps.sbom.outcome                 == 'failure' ||
           steps.sbom_schema.outcome          == 'failure'
@@ -108,6 +121,7 @@ jobs:
 
           print_result "config-headers-tests" "${{ steps.config-headers-tests.outcome }}"
           print_result "config-headers"       "${{ steps.config-headers.outcome }}"
+          print_result "style-api"            "${{ steps.style-api.outcome }}"
           print_result "copyrights"           "${{ steps.copyrights.outcome }}"
           print_result "sbom"                 "${{ steps.sbom.outcome }}"
           print_result "sbom_schema"          "${{ steps.sbom_schema.outcome }}"
