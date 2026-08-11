@@ -1105,7 +1105,7 @@ void test_observer_set_user_data_replaces_internal_data(void)
     lv_observer_set_user_data(observer, new_data);
     TEST_ASSERT_EQUAL_PTR(new_data, lv_observer_get_user_data(observer));
     TEST_ASSERT_FALSE(observer->auto_free_user_data);
-    TEST_ASSERT_GREATER_THAN_UINT32(mem_with_both_data, lv_test_get_free_mem());
+    LV_HEAP_CHECK(TEST_ASSERT_GREATER_THAN_UINT32(mem_with_both_data, lv_test_get_free_mem()));
 
     lv_observer_remove(observer);
     lv_free(new_data);
