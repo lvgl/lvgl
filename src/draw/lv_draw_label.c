@@ -596,6 +596,9 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
 
     LV_PROFILER_DRAW_BEGIN;
     if(dsc->g == NULL) {
+        /* cppcheck-suppress autoVariables
+         * here we store a stack variable on a pointer that outlives this function
+         * we correctly reset it to NULL at `exit:` but cpp-check chokes on it and warns us*/
         dsc->g = &g;
         /*If the glyph dsc is not set then get it from the font*/
         bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, 0);
@@ -666,6 +669,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
 
     dsc->letter_coords = &letter_coords;
     cb(t, dsc, NULL, NULL);
+    dsc->letter_coords = NULL;
 
     lv_font_glyph_release_draw_data(dsc->g);
 
