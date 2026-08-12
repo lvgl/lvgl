@@ -1035,6 +1035,111 @@ void test_observer_scale_image_needle_value(void)
     TEST_ASSERT_EQUAL(40, scale_needle->value);
 }
 
+void test_observer_set_user_data(void)
+{
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 5);
+
+    lv_observer_t * observer =
+        lv_subject_add_observer(&subject, observer_basic, NULL);
+    TEST_ASSERT_NOT_NULL(observer);
+
+    /* Initially NULL */
+    TEST_ASSERT_EQUAL_PTR(NULL, lv_observer_get_user_data(observer));
+
+    static int32_t a;
+    static int32_t b;
+    lv_observer_set_user_data(observer, &a);
+    TEST_ASSERT_EQUAL_PTR(&a, lv_observer_get_user_data(observer));
+
+    lv_observer_set_user_data(observer, &b);
+    TEST_ASSERT_EQUAL_PTR(&b, lv_observer_get_user_data(observer));
+
+    lv_observer_remove(observer);
+}
+
+void test_observer_set_user_data_user_owned(void)
+{
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 5);
+
+    /* Record the baseline before any allocation so removal returns to it */
+    uint32_t mem = lv_test_get_free_mem();
+
+    lv_observer_t * observer =
+        lv_subject_add_observer(&subject, observer_basic, NULL);
+    TEST_ASSERT_NOT_NULL(observer);
+
+    /* The observer must not free user-owned data on removal. */
+    void * data = lv_malloc(64);
+    TEST_ASSERT_NOT_NULL(data);
+    lv_observer_set_user_data(observer, data);
+    TEST_ASSERT_EQUAL_PTR(data, lv_observer_get_user_data(observer));
+
+    lv_observer_remove(observer);
+    lv_free(data);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
+}
+
+void test_observer_set_user_data_replaces_internal_data(void)
+{
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 5);
+
+    /* Record the baseline before any allocation so removal returns to it */
+    uint32_t mem = lv_test_get_free_mem();
+
+    lv_observer_t * observer =
+        lv_subject_add_observer(&subject, observer_basic, NULL);
+    TEST_ASSERT_NOT_NULL(observer);
+
+    /* Simulate an observer whose data is owned by an internal binding. */
+    void * old_data = lv_malloc(64);
+    TEST_ASSERT_NOT_NULL(old_data);
+    observer->user_data = old_data;
+    observer->auto_free_user_data = 1;
+
+    void * new_data = lv_malloc(64);
+    TEST_ASSERT_NOT_NULL(new_data);
+    uint32_t mem_with_both_data = lv_test_get_free_mem();
+    lv_observer_set_user_data(observer, new_data);
+    TEST_ASSERT_EQUAL_PTR(new_data, lv_observer_get_user_data(observer));
+    TEST_ASSERT_FALSE(observer->auto_free_user_data);
+    LV_UNUSED(mem_with_both_data);
+    LV_HEAP_CHECK(TEST_ASSERT_GREATER_THAN_UINT32(mem_with_both_data, lv_test_get_free_mem()));
+
+    lv_observer_remove(observer);
+    lv_free(new_data);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
+}
+
+void test_observer_set_user_data_same_internal_data(void)
+{
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 5);
+
+    uint32_t mem = lv_test_get_free_mem();
+
+    lv_observer_t * observer =
+        lv_subject_add_observer(&subject, observer_basic, NULL);
+    TEST_ASSERT_NOT_NULL(observer);
+
+    void * data = lv_malloc(64);
+    TEST_ASSERT_NOT_NULL(data);
+    observer->user_data = data;
+    observer->auto_free_user_data = 1;
+
+    uint32_t mem_with_data = lv_test_get_free_mem();
+    lv_observer_set_user_data(observer, data);
+    TEST_ASSERT_EQUAL_PTR(data, lv_observer_get_user_data(observer));
+    TEST_ASSERT_FALSE(observer->auto_free_user_data);
+    TEST_ASSERT_EQUAL_UINT32(mem_with_data, lv_test_get_free_mem());
+
+    lv_observer_remove(observer);
+    lv_free(data);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 32);
+}
+
 void test_observer_deinit(void)
 {
     static lv_subject_t subject;

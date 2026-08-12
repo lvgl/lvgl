@@ -395,6 +395,13 @@ lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer);
 void * lv_observer_get_user_data(const lv_observer_t * observer);
 
 /**
+ * Set Observer's user data.
+ * @param observer      pointer to Observer
+ * @param user_data     pointer to user-owned data (may be NULL)
+ */
+void lv_observer_set_user_data(lv_observer_t * observer, void * user_data);
+
+/**
  * Notify all Observers of Subject.
  * @param subject       pointer to Subject
  */
