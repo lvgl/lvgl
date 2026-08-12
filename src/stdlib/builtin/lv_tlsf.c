@@ -1,5 +1,5 @@
 #include "../../lvgl_public.h"
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_USE_TLSF
 
 #include "lv_tlsf_private.h"
 #include "../../lvgl_public.h"
@@ -1241,4 +1241,4 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
     return p;
 }
 
-#endif /*LV_STDLIB_BUILTIN*/
+#endif /*LV_USE_TLSF*/

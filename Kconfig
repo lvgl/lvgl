@@ -28,6 +28,7 @@ choice
 	default LV_USE_BUILTIN_MALLOC
 
 config LV_USE_BUILTIN_MALLOC
+	select LV_USE_TLSF
 	bool "LVGL built-in"
 
 config LV_USE_CLIB_MALLOC
@@ -158,6 +159,10 @@ config LV_LIMITS_INCLUDE
 config LV_STDARG_INCLUDE
 	string "Header for variadic argument handling (stdarg)"
 	default "stdarg.h"
+
+config LV_USE_TLSF
+	bool
+	default n
 endmenu
 menu "Operating System (OS)"
 choice LV_USE_OS
