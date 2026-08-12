@@ -136,7 +136,7 @@ void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
     float duration;
     tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
     tvg_animation_get_duration(lottie->tvg_anim, &duration);
-    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f));
+    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
     lottie->anim->act_time = 0;
     lottie->anim->end_value = (int32_t)f_total;
     lottie->anim->reverse_play_in_progress = false;
@@ -156,7 +156,7 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
     float duration;
     tvg_animation_get_total_frame(lottie->tvg_anim, &f_total);
     tvg_animation_get_duration(lottie->tvg_anim, &duration);
-    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f));
+    lv_anim_set_duration(lottie->anim, (uint32_t)(duration * 1000.0f + 0.5f)); /*0.5f rounds to the nearest ms*/
     lottie->anim->act_time = 0;
     lottie->anim->end_value = (int32_t)f_total;
     lottie->anim->reverse_play_in_progress = false;
