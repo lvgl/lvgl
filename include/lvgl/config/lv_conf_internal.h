@@ -5218,8 +5218,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #error "LV_USE_KEYBOARD must be enabled: Kconfig selects it from LV_USE_IME_PINYIN"
 #endif
 
-#if (LV_USE_DROPDOWN || LV_USE_IMAGE || LV_USE_ROLLER || LV_USE_TEXTAREA) && !LV_USE_LABEL
-    #error "LV_USE_LABEL must be enabled: Kconfig selects it from LV_USE_DROPDOWN || LV_USE_IMAGE || LV_USE_ROLLER || LV_USE_TEXTAREA"
+#if (LV_USE_DROPDOWN || LV_USE_ROLLER || LV_USE_TEXTAREA) && !LV_USE_LABEL
+    #error "LV_USE_LABEL must be enabled: Kconfig selects it from LV_USE_DROPDOWN || LV_USE_ROLLER || LV_USE_TEXTAREA"
 #endif
 
 #if LV_USE_LOTTIE && !(LV_DRAW_HAS_VECTOR_SUPPORT && LV_USE_THORVG)

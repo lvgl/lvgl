@@ -1976,7 +1976,6 @@ config LV_USE_GSTREAMER
 
 config LV_USE_IMAGE
 	bool "Image"
-	select LV_USE_LABEL
 	default y
 
 config LV_USE_IMAGEBUTTON
