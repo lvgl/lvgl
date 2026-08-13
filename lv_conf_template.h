@@ -1295,10 +1295,7 @@
  */
 #define LV_USE_GSTREAMER 0
 
-/** Image
- *
- *  Enable: LV_USE_LABEL
- */
+/** Image */
 #define LV_USE_IMAGE 1
 
 /** Image button */
