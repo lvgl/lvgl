@@ -16,6 +16,8 @@ https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit
 https://github.com/lvgl/lv_port_renesas_ek-ra6m3g
 https://github.com/lvgl/lv_port_renesas-ek-rz_a3m
 https://github.com/lvgl/lv_port_renesas_ek_ra8p1
+https://github.com/lvgl/lv_port_renesas_ek-ra8d1_llvm
+https://github.com/lvgl/lv_port_renesas_ek-ra8d2
 https://github.com/lvgl/lv_port_riverdi_stm32u5
 https://github.com/lvgl/lv_port_riverdi_101-stm32h7
 https://github.com/lvgl/lv_port_riverdi_70-stm32h7
