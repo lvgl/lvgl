@@ -51,7 +51,6 @@
 #include "../../lvgl.h"
 #if LV_USE_QOI
 
-#include "../../include/lvgl/image/lv_qoi.h"
 #include "../core/lv_global.h"
 #include LV_LIMITS_INCLUDE
 
