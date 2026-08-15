@@ -1701,6 +1701,14 @@
     #endif
 #endif
 
+#ifndef LV_QOI_MAX_PIXELS
+    #ifdef CONFIG_LV_QOI_MAX_PIXELS
+        #define LV_QOI_MAX_PIXELS CONFIG_LV_QOI_MAX_PIXELS
+    #else
+        #define LV_QOI_MAX_PIXELS 100000000
+    #endif
+#endif
+
 #ifndef LV_USE_LIBWEBP
     #ifdef CONFIG_LV_USE_LIBWEBP
         #define LV_USE_LIBWEBP CONFIG_LV_USE_LIBWEBP

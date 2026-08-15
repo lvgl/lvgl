@@ -200,6 +200,22 @@ void test_qoi_corrupted_data(void)
     TEST_ASSERT_NULL(decoder_dsc.decoded);
 }
 
+void test_qoi_oversized_dimensions(void)
+{
+    /* Test QOI file with dimensions exceeding LV_QOI_MAX_PIXELS.
+     * A 20000x20000 image would require ~1.6GB allocation without the
+     * pixel limit guard. The decoder must reject it before allocating. */
+    lv_image_decoder_dsc_t decoder_dsc;
+    const char * image_path = "A:src/test_assets/test_qoi_oversized.qoi";
+    lv_image_cache_drop(image_path);
+
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, image_path, NULL);
+
+    /* Should fail with invalid due to pixel limit */
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+    TEST_ASSERT_NULL(decoder_dsc.decoded);
+}
+
 void test_qoi_repeated_open_close(void)
 {
     /* Test repeated open/close to detect resource leaks */
@@ -346,6 +362,11 @@ void test_qoi_invalid_header(void)
 }
 
 void test_qoi_corrupted_data(void)
+{
+    TEST_PASS_MESSAGE("QOI decoder not enabled (LV_USE_QOI == 0)");
+}
+
+void test_qoi_oversized_dimensions(void)
 {
     TEST_PASS_MESSAGE("QOI decoder not enabled (LV_USE_QOI == 0)");
 }

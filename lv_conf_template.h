@@ -837,6 +837,9 @@
 /** Maximum file size for QOI images (bytes) */
 #define LV_QOI_MAX_FILE_SIZE 67108864
 
+/** Maximum number of pixels for QOI images (width * height) */
+#define LV_QOI_MAX_PIXELS 100000000
+
 #endif /*LV_USE_QOI*/
 
 /** WebP decoder */

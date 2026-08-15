@@ -331,6 +331,13 @@ pixel, rounded down to a nice clean value. 400 million pixels ought to be
 enough for anybody. */
 #define QOI_PIXELS_MAX ((unsigned int)400000000)
 
+/* Configurable pixel limit to prevent excessive memory allocation from
+untrusted image headers. This can be overridden before including this header
+(e.g. by the LVGL wrapper) to enforce a stricter, user-configurable limit. */
+#ifndef QOI_PIXELS_LIMIT
+#define QOI_PIXELS_LIMIT QOI_PIXELS_MAX
+#endif
+
 typedef union {
         struct {
             unsigned char r, g, b, a;
@@ -521,7 +528,8 @@ void * qoi_decode(const void * data, int size, qoi_desc * desc, int channels)
         desc->channels < 3 || desc->channels > 4 ||
         desc->colorspace > 1 ||
         header_magic != QOI_MAGIC ||
-        desc->height >= QOI_PIXELS_MAX / desc->width
+        desc->height >= QOI_PIXELS_MAX / desc->width ||
+        desc->height >= QOI_PIXELS_LIMIT / desc->width
     ) {
         return NULL;
     }

@@ -63,6 +63,10 @@
 #define QOI_FREE(p)    lv_free(p)
 #define QOI_ZEROARR(a) lv_memset((a), 0, sizeof(a))
 
+/* Enforce a user-configurable pixel limit to prevent excessive memory
+ * allocation from untrusted QOI headers. This is checked before QOI_MALLOC. */
+#define QOI_PIXELS_LIMIT LV_QOI_MAX_PIXELS
+
 #define QOI_IMPLEMENTATION
 #include "../libs/qoi/qoi.h"
 
@@ -162,6 +166,15 @@ static lv_result_t parse_qoi_header(const uint8_t * buf, size_t buf_size, lv_ima
         return LV_RESULT_INVALID;
     }
 
+    /* Enforce the user-configurable pixel limit to prevent excessive
+     * memory allocation from untrusted image headers. */
+    if(h >= LV_QOI_MAX_PIXELS / w) {
+        LV_LOG_WARN("QOI image dimensions %" LV_PRIu32 "x%" LV_PRIu32
+                    " exceed pixel limit %" LV_PRIu32,
+                    w, h, (uint32_t)LV_QOI_MAX_PIXELS);
+        return LV_RESULT_INVALID;
+    }
+
     if(header != NULL) {
         header->w = w;
         header->h = h;
@@ -192,7 +205,11 @@ static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size)
     }
 
     if(desc.width == 0 || desc.height == 0 || desc.width > (UINT32_MAX / QOI_RGBA_BPP) ||
-       desc.height >= QOI_PIXELS_MAX / desc.width) {
+       desc.height >= QOI_PIXELS_MAX / desc.width ||
+       desc.height >= LV_QOI_MAX_PIXELS / desc.width) {
+        LV_LOG_WARN("QOI image dimensions %" LV_PRIu32 "x%" LV_PRIu32
+                    " exceed pixel limit %" LV_PRIu32,
+                    desc.width, desc.height, (uint32_t)LV_QOI_MAX_PIXELS);
         QOI_FREE(pixels);
         return NULL;
     }

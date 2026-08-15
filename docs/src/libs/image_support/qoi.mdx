@@ -34,6 +34,11 @@ The maximum file size that can be decoded is limited by
 <ApiLink name="LV_QOI_MAX_FILE_SIZE" /> (default 64 MB). This can be adjusted in
 `lv_conf.h` to suit the available memory of the target platform.
 
+The maximum number of pixels (`width × height`) that can be decoded is limited by
+<ApiLink name="LV_QOI_MAX_PIXELS" /> (default 100 million pixels). This prevents
+untrusted image headers from triggering excessive memory allocations, and can be
+adjusted in `lv_conf.h` to suit the available memory of the target platform.
+
 ## Example
 
 ### Open a QOI image from file and variable
