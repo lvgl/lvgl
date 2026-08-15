@@ -217,7 +217,7 @@
       "sources": [{"url": "https://github.com/phoboslab/qoi"}],
       "version": "NOASSERTION",
       "license": "MIT",
-      "copyright": "Copyright (c) 2021, Dominic Szablewski - https://phoboslab.org",
+      "copyright": "Copyright (c) 2022 Dominic Szablewski",
       "purl": "pkg:github/phoboslab/qoi",
       "purpose": "library",
       "supplier": {"name": "Dominic Szablewski", "type": "person"}

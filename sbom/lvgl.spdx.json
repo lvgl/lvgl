@@ -5,7 +5,7 @@
       "type": "CreationInfo",
       "@id": "_:creationinfo",
       "specVersion": "3.0.1",
-      "created": "2026-08-15T18:16:03Z",
+      "created": "2026-08-15T20:25:15Z",
       "createdBy": [
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft"
       ],
@@ -446,7 +446,7 @@
       "creationInfo": "_:creationinfo",
       "name": "QOI (Quite OK Image decoder)",
       "software_packageVersion": "NOASSERTION",
-      "software_copyrightText": "Copyright (c) 2021, Dominic Szablewski - https://phoboslab.org",
+      "software_copyrightText": "Copyright (c) 2022 Dominic Szablewski",
       "software_primaryPurpose": "library",
       "comment": "In-tree path: src/libs/qoi",
       "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Dominic-Szablewski",
