@@ -1692,13 +1692,12 @@
         #define LV_USE_QOI 0
     #endif
 #endif
-#if LV_USE_QOI
-    #ifndef LV_QOI_MAX_FILE_SIZE
-        #ifdef CONFIG_LV_QOI_MAX_FILE_SIZE
-            #define LV_QOI_MAX_FILE_SIZE CONFIG_LV_QOI_MAX_FILE_SIZE
-        #else
-            #define LV_QOI_MAX_FILE_SIZE (64U * 1024U * 1024U)
-        #endif
+
+#ifndef LV_QOI_MAX_FILE_SIZE
+    #ifdef CONFIG_LV_QOI_MAX_FILE_SIZE
+        #define LV_QOI_MAX_FILE_SIZE CONFIG_LV_QOI_MAX_FILE_SIZE
+    #else
+        #define LV_QOI_MAX_FILE_SIZE 67108864
     #endif
 #endif
 

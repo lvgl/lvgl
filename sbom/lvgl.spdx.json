@@ -5,7 +5,7 @@
       "type": "CreationInfo",
       "@id": "_:creationinfo",
       "specVersion": "3.0.1",
-      "created": "2026-07-20T16:40:55Z",
+      "created": "2026-08-15T18:16:03Z",
       "createdBy": [
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft"
       ],
@@ -437,6 +437,26 @@
           "type": "ExternalIdentifier",
           "externalIdentifierType": "packageUrl",
           "identifier": "pkg:github/jkent/frogfs@1.0"
+        }
+      ]
+    },
+    {
+      "type": "software_Package",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qoi",
+      "creationInfo": "_:creationinfo",
+      "name": "QOI (Quite OK Image decoder)",
+      "software_packageVersion": "NOASSERTION",
+      "software_copyrightText": "Copyright (c) 2021, Dominic Szablewski - https://phoboslab.org",
+      "software_primaryPurpose": "library",
+      "comment": "In-tree path: src/libs/qoi",
+      "suppliedBy": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Dominic-Szablewski",
+      "software_downloadLocation": "https://github.com/phoboslab/qoi",
+      "software_homePage": "https://github.com/phoboslab/qoi",
+      "externalIdentifier": [
+        {
+          "type": "ExternalIdentifier",
+          "externalIdentifierType": "packageUrl",
+          "identifier": "pkg:github/phoboslab/qoi"
         }
       ]
     },
@@ -922,6 +942,36 @@
     },
     {
       "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-qoi",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
+      "relationshipType": "contains",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qoi"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-qoi",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qoi",
+      "relationshipType": "hasDeclaredLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-qoi",
+      "creationInfo": "_:creationinfo",
+      "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qoi",
+      "relationshipType": "hasConcludedLicense",
+      "to": [
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#LicenseExpression-MIT"
+      ]
+    },
+    {
+      "type": "Relationship",
       "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lvgl",
       "creationInfo": "_:creationinfo",
       "from": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-lvgl",
@@ -1043,6 +1093,12 @@
       "name": "Jeff Kent"
     },
     {
+      "type": "Person",
+      "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Dominic-Szablewski",
+      "creationInfo": "_:creationinfo",
+      "name": "Dominic Szablewski"
+    },
+    {
       "type": "software_Sbom",
       "spdxId": "https://lvgl.io/spdx/lvgl-9.6.0-dev#SBOM",
       "creationInfo": "_:creationinfo",
@@ -1083,6 +1139,7 @@
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-gif",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-nanovg",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qoi",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-barcode",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-barcode",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-barcode",
@@ -1131,6 +1188,9 @@
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-frogfs",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-frogfs",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-qoi",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-qoi",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-qoi",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lvgl",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lvgl",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft",
@@ -1149,7 +1209,8 @@
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Rudolph-Riedel",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-BitBank-Software-Inc",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Mikko-Mononen",
-        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Jeff-Kent"
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Jeff-Kent",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Dominic-Szablewski"
       ]
     },
     {
@@ -1197,6 +1258,7 @@
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-gif",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-nanovg",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Package-qoi",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-barcode",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-barcode",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-barcode",
@@ -1245,6 +1307,9 @@
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-frogfs",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-frogfs",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-frogfs",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-contains-qoi",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-qoi",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-qoi",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasDeclaredLicense-lvgl",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Relationship-hasConcludedLicense-lvgl",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-LVGL-Kft",
@@ -1264,6 +1329,7 @@
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-BitBank-Software-Inc",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Mikko-Mononen",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Jeff-Kent",
+        "https://lvgl.io/spdx/lvgl-9.6.0-dev#Agent-Dominic-Szablewski",
         "https://lvgl.io/spdx/lvgl-9.6.0-dev#SBOM"
       ]
     }

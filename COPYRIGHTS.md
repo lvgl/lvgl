@@ -76,11 +76,6 @@ Each entry lists its SPDX license expression below. The full license text is, fo
 - Source: https://github.com/bitbank2/AnimatedGIF
 - License: Apache-2.0
 
-**QOI (Quite OK Image decoder)**
-- Path: src/libs/qoi
-- Source: https://github.com/phoboslab/qoi
-- License: MIT
-
 **NanoVG (Anti-aliased vector graphics rendering)**
 - Path: src/libs/nanovg
 - Source: https://github.com/memononen/nanovg
@@ -91,3 +86,8 @@ Each entry lists its SPDX license expression below. The full license text is, fo
 - Path: src/libs/frogfs
 - Source: https://github.com/jkent/frogfs
 - License: MPL-2.0
+
+**QOI (Quite OK Image decoder)**
+- Path: src/libs/qoi
+- Source: https://github.com/phoboslab/qoi
+- License: MIT
