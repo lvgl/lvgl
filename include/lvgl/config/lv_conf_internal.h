@@ -1685,6 +1685,23 @@
     #endif
 #endif
 
+#ifndef LV_USE_QOI
+    #ifdef CONFIG_LV_USE_QOI
+        #define LV_USE_QOI CONFIG_LV_USE_QOI
+    #else
+        #define LV_USE_QOI 0
+    #endif
+#endif
+#if LV_USE_QOI
+    #ifndef LV_QOI_MAX_FILE_SIZE
+        #ifdef CONFIG_LV_QOI_MAX_FILE_SIZE
+            #define LV_QOI_MAX_FILE_SIZE CONFIG_LV_QOI_MAX_FILE_SIZE
+        #else
+            #define LV_QOI_MAX_FILE_SIZE (64U * 1024U * 1024U)
+        #endif
+    #endif
+#endif
+
 #ifndef LV_USE_LIBWEBP
     #ifdef CONFIG_LV_USE_LIBWEBP
         #define LV_USE_LIBWEBP CONFIG_LV_USE_LIBWEBP

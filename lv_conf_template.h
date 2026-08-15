@@ -830,6 +830,15 @@
 /** High-performance decoder supporting the complete JPEG specifications. */
 #define LV_USE_LIBJPEG_TURBO 0
 
+/** QOI decoder library */
+#define LV_USE_QOI 0
+
+#if LV_USE_QOI
+/** Maximum file size for QOI images (bytes) */
+#define LV_QOI_MAX_FILE_SIZE 64 * 1024 * 1024
+
+#endif /*LV_USE_QOI*/
+
 /** WebP decoder */
 #define LV_USE_LIBWEBP 0
 

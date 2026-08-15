@@ -370,6 +370,10 @@ void lv_init(void)
     lv_libjpeg_turbo_init();
 #endif
 
+#if LV_USE_QOI
+    lv_qoi_init();
+#endif
+
 #if LV_USE_LIBWEBP
     lv_libwebp_init();
 #endif
@@ -492,6 +496,10 @@ void lv_deinit(void)
 
 #if LV_USE_TRANSLATION
     lv_translation_deinit();
+#endif
+
+#if LV_USE_QOI
+    lv_qoi_deinit();
 #endif
 
 #if LV_USE_FS_FROGFS

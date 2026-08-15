@@ -8,6 +8,7 @@
     "lodepng",
     "libwebp",
     "lz4",
+    "qoi",
     "rle",
     "rlottie",
     "svg",
