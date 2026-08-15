@@ -51,7 +51,7 @@
 #include "../../lvgl.h"
 #if LV_USE_QOI
 
-#include "../libs/qoi/lv_qoi.h"
+#include "../../include/lvgl/image/lv_qoi.h"
 #include "../core/lv_global.h"
 #include LV_LIMITS_INCLUDE
 
@@ -86,6 +86,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t parse_qoi_header(const uint8_t * buf, size_t buf_size, lv_image_header_t * header);
+static void convert_rgba_to_argb8888(uint8_t * img_p, uint32_t width, uint32_t height, uint32_t stride);
 static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size);
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
@@ -191,9 +192,31 @@ static lv_result_t parse_qoi_header(const uint8_t * buf, size_t buf_size, lv_ima
  * @param  data_size  length of the data in bytes.
  * @return pointer to decoded lv_draw_buf_t, or NULL on error.
  */
+static void convert_rgba_to_argb8888(uint8_t * img_p, uint32_t width, uint32_t height, uint32_t stride)
+{
+    /* QOI decodes to RGBA byte order (R,G,B,A) in memory.
+     * LVGL's ARGB8888 (lv_color32_t) stores bytes as B,G,R,A in memory.
+     * Swap the red and blue channels to match LVGL's expected layout.
+     * Process row-by-row to respect the draw buffer's stride alignment. */
+    uint32_t y;
+    for(y = 0; y < height; y++) {
+        uint8_t * row = img_p + y * stride;
+        uint32_t x;
+        for(x = 0; x < width; x++) {
+            uint8_t * px = row + x * 4;
+            uint8_t tmp = px[0]; /* red */
+            px[0] = px[2];       /* blue -> red position */
+            px[2] = tmp;         /* red -> blue position */
+        }
+    }
+}
+
 static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size)
 {
-    if(data == NULL || data_size < QOI_MIN_FILE_SIZE || data_size > INT_MAX) {
+    if(data == NULL || data_size < QOI_MIN_FILE_SIZE ||
+       data_size > LV_QOI_MAX_FILE_SIZE || data_size > INT_MAX) {
+        LV_LOG_WARN("QOI data size %u out of bounds (min: %u, max: %u)",
+                    (unsigned int)data_size, QOI_MIN_FILE_SIZE, (uint32_t)LV_QOI_MAX_FILE_SIZE);
         return NULL;
     }
 
@@ -234,6 +257,10 @@ static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size)
         dst_row += decoded->header.stride;
         src_row += row_size;
     }
+
+    /* Convert from QOI's RGBA byte order to LVGL's ARGB8888 (BGRA in memory) layout */
+    convert_rgba_to_argb8888((uint8_t *)decoded->data, desc.width, desc.height, decoded->header.stride);
+
     QOI_FREE(pixels);
 
     return decoded;

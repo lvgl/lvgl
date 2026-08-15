@@ -139,7 +139,6 @@
 #include "libs/gltf/gltf_environment/lv_gltf_environment_private.h"
 #include "libs/gltf/gltf_view/assets/lv_gltf_view_shader.h"
 #include "libs/gltf/gltf_view/lv_gltf_view_internal.h"
-#include "libs/qoi/lv_qoi.h"
 #include "libs/rle/lv_rle_private.h"
 #include "libs/rlottie/lv_rlottie_private.h"
 #include "image/svg/lv_svg_decoder.h"

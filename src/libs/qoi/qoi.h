@@ -559,11 +559,21 @@ void * qoi_decode(const void * data, int size, qoi_desc * desc, int channels)
             int b1 = bytes[p++];
 
             if(b1 == QOI_OP_RGB) {
+                /* QOI_OP_RGB has 3 payload bytes */
+                if(p + 3 > chunks_len) {
+                    QOI_FREE(pixels);
+                    return NULL;
+                }
                 px.rgba.r = bytes[p++];
                 px.rgba.g = bytes[p++];
                 px.rgba.b = bytes[p++];
             }
             else if(b1 == QOI_OP_RGBA) {
+                /* QOI_OP_RGBA has 4 payload bytes */
+                if(p + 4 > chunks_len) {
+                    QOI_FREE(pixels);
+                    return NULL;
+                }
                 px.rgba.r = bytes[p++];
                 px.rgba.g = bytes[p++];
                 px.rgba.b = bytes[p++];
@@ -578,6 +588,11 @@ void * qoi_decode(const void * data, int size, qoi_desc * desc, int channels)
                 px.rgba.b += (b1       & 0x03) - 2;
             }
             else if((b1 & QOI_MASK_2) == QOI_OP_LUMA) {
+                /* QOI_OP_LUMA has 1 payload byte */
+                if(p + 1 > chunks_len) {
+                    QOI_FREE(pixels);
+                    return NULL;
+                }
                 int b2 = bytes[p++];
                 int vg = (b1 & 0x3f) - 32;
                 px.rgba.r += vg - 8 + ((b2 >> 4) & 0x0f);
@@ -590,6 +605,11 @@ void * qoi_decode(const void * data, int size, qoi_desc * desc, int channels)
 
             index[QOI_COLOR_HASH(px) & (64 - 1)] = px;
         }
+        else {
+            /* Ran out of encoded data before all pixels were decoded */
+            QOI_FREE(pixels);
+            return NULL;
+        }
 
         pixels[px_pos + 0] = px.rgba.r;
         pixels[px_pos + 1] = px.rgba.g;
@@ -597,6 +617,23 @@ void * qoi_decode(const void * data, int size, qoi_desc * desc, int channels)
 
         if(channels == 4) {
             pixels[px_pos + 3] = px.rgba.a;
+        }
+    }
+
+    /* Validate the QOI end marker (8 bytes: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x01).
+     * The stream must contain exactly the end marker after the last pixel chunk. */
+    if(p + (int)sizeof(qoi_padding) > size) {
+        QOI_FREE(pixels);
+        return NULL;
+    }
+
+    {
+        int i;
+        for(i = 0; i < (int)sizeof(qoi_padding); i++) {
+            if(bytes[p + i] != qoi_padding[i]) {
+                QOI_FREE(pixels);
+                return NULL;
+            }
         }
     }
 
