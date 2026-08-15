@@ -53,7 +53,7 @@
 
 #include "../libs/qoi/lv_qoi.h"
 #include "../core/lv_global.h"
-#include <limits.h>
+#include LV_LIMITS_INCLUDE
 
 /* Exclude stdio functions from qoi.h as LVGL uses its own VFS (lv_fs) */
 #define QOI_NO_STDIO
