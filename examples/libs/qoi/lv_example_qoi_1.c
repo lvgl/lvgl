@@ -1,5 +1,7 @@
 #include "../../lv_examples.h"
-#if LV_USE_QOI && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
+
+#if LV_USE_QOI
 
 /**
  * @title Open a QOI image from file and variable
@@ -25,5 +27,16 @@ void lv_example_qoi_1(void)
     lv_image_set_src(img, "A:lvgl/examples/libs/qoi/qoi_demo.qoi");
     lv_obj_align(img, LV_ALIGN_RIGHT_MID, -10, 0);
 }
+
+#else
+
+void lv_example_qoi_1(void)
+{
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "QOI is not installed");
+    lv_obj_center(label);
+}
+
+#endif
 
 #endif
