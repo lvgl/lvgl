@@ -349,6 +349,10 @@ void lv_init(void)
     lv_fs_frogfs_init();
 #endif
 
+#if LV_USE_QOI
+    lv_qoi_init();
+#endif
+
     /*Use the earlier initialized position of FFmpeg decoder as a fallback decoder*/
 #if LV_USE_FFMPEG
     lv_ffmpeg_init();
@@ -368,10 +372,6 @@ void lv_init(void)
 
 #if LV_USE_LIBJPEG_TURBO
     lv_libjpeg_turbo_init();
-#endif
-
-#if LV_USE_QOI
-    lv_qoi_init();
 #endif
 
 #if LV_USE_LIBWEBP
