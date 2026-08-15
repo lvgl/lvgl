@@ -335,7 +335,7 @@ enough for anybody. */
 untrusted image headers. This can be overridden before including this header
 (e.g. by the LVGL wrapper) to enforce a stricter, user-configurable limit. */
 #ifndef QOI_PIXELS_LIMIT
-#define QOI_PIXELS_LIMIT QOI_PIXELS_MAX
+    #define QOI_PIXELS_LIMIT QOI_PIXELS_MAX
 #endif
 
 typedef union {
