@@ -362,16 +362,16 @@ void lv_init(void)
     lv_libpng_init();
 #endif
 
+#if LV_USE_QOI
+    lv_qoi_init();
+#endif
+
 #if LV_USE_TJPGD
     lv_tjpgd_init();
 #endif
 
 #if LV_USE_LIBJPEG_TURBO
     lv_libjpeg_turbo_init();
-#endif
-
-#if LV_USE_QOI
-    lv_qoi_init();
 #endif
 
 #if LV_USE_LIBWEBP

@@ -280,7 +280,7 @@ static enum NVGcompositeOperation lv_blend_to_nvg(lv_vector_blend_t blend)
 {
     switch(blend) {
         case LV_VECTOR_BLEND_SRC_OVER:
-            return NVG_SOURCE_OVER;
+                    return NVG_SOURCE_OVER;
         case LV_VECTOR_BLEND_SRC_IN:
             return NVG_SOURCE_IN;
         case LV_VECTOR_BLEND_DST_OVER:
@@ -299,7 +299,7 @@ static enum NVGwinding lv_fill_to_nvg(lv_vector_fill_t fill_rule)
 {
     switch(fill_rule) {
         case LV_VECTOR_FILL_NONZERO:
-            return NVG_CCW;
+                    return NVG_CCW;
         case LV_VECTOR_FILL_EVENODD:
             return NVG_CW;
         default:

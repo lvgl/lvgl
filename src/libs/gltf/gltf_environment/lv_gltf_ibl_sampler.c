@@ -609,10 +609,10 @@ static void init_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler)
     /* Vertices go from -1 -1 (left bottom) to 1 1 (right top)*/
     GLfloat vertices[] = {
         -1.0f, -1.0f,
-        1.0f, -1.0f,
-        -1.0f,  1.0f,
-        1.0f,  1.0f
-    };
+            1.0f, -1.0f,
+            -1.0f,  1.0f,
+            1.0f,  1.0f
+        };
 
     /* Texture coords go from 0 0 (left bottom) to 1 1 (right top)*/
     GLfloat texCoords[] = {

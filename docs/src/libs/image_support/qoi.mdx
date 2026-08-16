@@ -28,7 +28,7 @@ The whole QOI image is decoded, so `width × height × 4` bytes of RAM is requir
 from the LVGL heap. The decoded image is stored in RGBA pixel format.
 
 Since it might take significant time to decode QOI images, LVGL's
-[image caching](/main-modules/image#caching) feature can be useful.
+[image caching](/main-modules/images/caching) feature can be useful.
 
 The maximum file size that can be decoded is limited by
 <ApiLink name="LV_QOI_MAX_FILE_SIZE" /> (default 64 MB). This can be adjusted in
