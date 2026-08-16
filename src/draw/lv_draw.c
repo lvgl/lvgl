@@ -117,6 +117,8 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
 
         tail->next = new_task;
     }
+    LV_LOG_TRACE("Added task %p (type %d), layer (%p) layer head (%p)", (void *)new_task, new_task->type,
+                 (void *) layer, (void *)layer->draw_task_head);
 
     LV_PROFILER_DRAW_END;
     return new_task;
@@ -124,6 +126,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
 
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
+    LV_LOG_TRACE("Finalize task %p (type %d)", (void *)t, t->type);
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
@@ -752,8 +755,10 @@ static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
 void lv_draw_cleanup_task(lv_draw_task_t * t)
 {
     LV_PROFILER_DRAW_BEGIN;
-    LV_ASSERT_MSG(t->state != LV_DRAW_TASK_STATE_IN_PROGRESS, "the task is still used by a draw unit");
+    LV_LOG_TRACE("Cleanup task %p (type %d)", (void *)t, t->type);
 
+    LV_ASSERT_FORMAT_MSG(t->state != LV_DRAW_TASK_STATE_IN_PROGRESS, "task %p (type %d) is still used by a draw unit",
+                         (void *)t, t->type);
     if(t->type == LV_DRAW_TASK_TYPE_LINE) {
         lv_draw_line_dsc_t * draw_line_dsc = t->draw_dsc;
         if(draw_line_dsc->points) {
