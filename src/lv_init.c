@@ -349,13 +349,15 @@ void lv_init(void)
     lv_fs_frogfs_init();
 #endif
 
-#if LV_USE_QOI
-    lv_qoi_init();
-#endif
-
-    /*Use the earlier initialized position of FFmpeg decoder as a fallback decoder*/
+    /*FFmpeg decoder is registered first so it acts as a fallback decoder.
+     *Specific decoders (e.g. QOI) are registered after so they take priority
+     *since lv_image_decoder_create() inserts at the head of the decoder list.*/
 #if LV_USE_FFMPEG
     lv_ffmpeg_init();
+#endif
+
+#if LV_USE_QOI
+    lv_qoi_init();
 #endif
 
 #if LV_USE_LODEPNG
@@ -500,6 +502,10 @@ void lv_deinit(void)
 
 #if LV_USE_QOI
     lv_qoi_deinit();
+#endif
+
+#if LV_USE_FFMPEG
+    lv_ffmpeg_deinit();
 #endif
 
 #if LV_USE_FS_FROGFS

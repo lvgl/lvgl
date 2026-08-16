@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2021, Dominic Szablewski - https://phoboslab.org
+Copyright (c) 2022 Dominic Szablewski
 SPDX-License-Identifier: MIT
 
 
@@ -378,7 +378,7 @@ void * qoi_encode(const void * data, const qoi_desc * desc, int * out_len)
         desc->width == 0 || desc->height == 0 ||
         desc->channels < 3 || desc->channels > 4 ||
         desc->colorspace > 1 ||
-        desc->height >= QOI_PIXELS_MAX / desc->width
+        desc->height > (QOI_PIXELS_MAX - 1) / desc->width
     ) {
         return NULL;
     }
@@ -528,8 +528,8 @@ void * qoi_decode(const void * data, int size, qoi_desc * desc, int channels)
         desc->channels < 3 || desc->channels > 4 ||
         desc->colorspace > 1 ||
         header_magic != QOI_MAGIC ||
-        desc->height >= QOI_PIXELS_MAX / desc->width ||
-        desc->height >= QOI_PIXELS_LIMIT / desc->width
+        desc->height > (QOI_PIXELS_MAX - 1) / desc->width ||
+        desc->height > (QOI_PIXELS_LIMIT - 1) / desc->width
     ) {
         return NULL;
     }
@@ -538,7 +538,15 @@ void * qoi_decode(const void * data, int size, qoi_desc * desc, int channels)
         channels = desc->channels;
     }
 
+    /* Reject decoded buffers that exceed the configured byte limit to
+     * prevent excessive memory allocation from untrusted image headers. */
+    if(desc->width > (QOI_PIXELS_LIMIT - 1) / desc->height) {
+        return NULL;
+    }
     px_len = desc->width * desc->height * channels;
+    if(px_len > (int)(QOI_PIXELS_LIMIT * 4)) {
+        return NULL;
+    }
     pixels = (unsigned char *) QOI_MALLOC(px_len);
     if(!pixels) {
         return NULL;
