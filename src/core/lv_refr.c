@@ -509,6 +509,9 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
     const lv_opa_t opa_layered = lv_obj_get_style_opa_layered(obj, LV_PART_MAIN);
     if(opa_layered <= LV_OPA_MIN) return;
 
+    if(lv_obj_get_style_transform_scale_x(obj, LV_PART_MAIN) <= 0) return;
+    if(lv_obj_get_style_transform_scale_y(obj, LV_PART_MAIN) <= 0) return;
+
     const lv_opa_t layer_opa_ori = layer->opa;
     const lv_color32_t layer_recolor = layer->recolor;
 
@@ -1274,10 +1277,8 @@ static bool obj_get_matrix(lv_obj_t * obj, lv_matrix_t * matrix)
     int32_t skew_x = lv_obj_get_style_transform_skew_x(obj, LV_PART_MAIN);
     int32_t skew_y = lv_obj_get_style_transform_skew_y(obj, LV_PART_MAIN);
 
-    if(scale_x <= 0 || scale_y <= 0) {
-        /* NOT draw if scale is negative or zero */
-        return false;
-    }
+    /* Checked by caller */
+    LV_ASSERT(scale_x > 0 && scale_y > 0);
 
     /* generate the obj matrix */
     lv_matrix_translate(matrix, pivot.x, pivot.y);
