@@ -13,19 +13,20 @@ class LVTabview(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_tabview_t", ptr=True) or self
+        self._wv_lv_tabview_t = self.cast("lv_tabview_t", ptr=True) or self
+        self._wv = self._wv_lv_tabview_t
 
     @property
     def tab_cur(self):
-        return int(self._wv.safe_field("tab_cur", 0))
+        return int(self._wv_lv_tabview_t.safe_field("tab_cur", 0))
 
     @property
     def tab_pos(self):
-        return int(self._wv.safe_field("tab_pos", 0))
+        return int(self._wv_lv_tabview_t.safe_field("tab_pos", 0))
 
     @property
     def tab_bar_size(self):
-        return int(self._wv.safe_field("tab_bar_size", 0))
+        return int(self._wv_lv_tabview_t.safe_field("tab_bar_size", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

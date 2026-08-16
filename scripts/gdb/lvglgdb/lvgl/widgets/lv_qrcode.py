@@ -14,19 +14,20 @@ class LVQrcode(LVCanvas):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_qrcode_t", ptr=True) or self
+        self._wv_lv_qrcode_t = self.cast("lv_qrcode_t", ptr=True) or self
+        self._wv = self._wv_lv_qrcode_t
 
     @property
     def dark_color(self):
-        return safe_color(self._wv, "dark_color")
+        return safe_color(self._wv_lv_qrcode_t, "dark_color")
 
     @property
     def light_color(self):
-        return safe_color(self._wv, "light_color")
+        return safe_color(self._wv_lv_qrcode_t, "light_color")
 
     @property
     def quiet_zone(self):
-        return int(self._wv.safe_field("quiet_zone", 0))
+        return int(self._wv_lv_qrcode_t.safe_field("quiet_zone", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

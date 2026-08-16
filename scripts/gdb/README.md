@@ -1,7 +1,7 @@
 # lvglgdb
 
-GDB Python extension for inspecting and debugging LVGL internals. 
-Works with live debugging sessions, core dumps, and other 
+GDB Python extension for inspecting and debugging LVGL internals.
+Works with live debugging sessions, core dumps, and other
 GDB-compatible targets.
 
 ## Installation
@@ -42,6 +42,7 @@ dump dashboard -o out.html      # Save dashboard to file
 ```bash
 info style my_style             # Inspect a single lv_style_t
 info style --obj my_obj         # Inspect all styles of an lv_obj_t
+                                # sizes as 100%/content, enums and fonts by name
 info draw_unit                  # Show draw unit information
 info obj_class obj->class_p     # Show object class hierarchy
 info subject &my_subject        # Show subject and its observers
