@@ -972,18 +972,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
                 lv_draw_dispatch_wait_for_request();
                 lv_draw_dispatch();
             }
-
-            lv_layer_t * layer_i = disp_refr->layer_head;
-            while(layer_i) {
-                if(layer_i->next == tile_layer) {
-                    layer_i->next = tile_layer->next;
-                    break;
-                }
-                layer_i = layer_i->next;
-            }
-
-            lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, tile_layer);
-            if(disp_refr->layer_deinit) disp_refr->layer_deinit(disp_refr, tile_layer);
+            lv_draw_layer_deinit(tile_layer);
         }
         lv_free(tile_layers);
 
