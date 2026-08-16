@@ -339,10 +339,11 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(entry == NULL) {
         /* Uncached fallback: open succeeds, decoder_close will destroy decoded buffer */
-        dsc->cache_entry = NULL;
-        return LV_RESULT_OK;
+    if(entry == NULL) {
+        lv_draw_buf_destroy(decoded);
+        dsc->decoded = NULL;
+        return LV_RESULT_INVALID;
     }
-
     dsc->cache_entry = entry;
     return LV_RESULT_OK;
 }
