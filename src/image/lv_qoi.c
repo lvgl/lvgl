@@ -51,7 +51,6 @@
 #include "../../lvgl.h"
 #if LV_USE_QOI
 
-#include "../../include/lvgl/image/lv_qoi.h"
 #include "../core/lv_global.h"
 #include LV_LIMITS_INCLUDE
 
@@ -82,7 +81,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t parse_qoi_header(const uint8_t * buf, size_t buf_size, lv_image_header_t * header);
-static void convert_rgba_to_argb8888(uint8_t * img_p, uint32_t width, uint32_t height, uint32_t stride);
 static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size);
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
@@ -161,7 +159,7 @@ static lv_result_t parse_qoi_header(const uint8_t * buf, size_t buf_size, lv_ima
     /* Validate against qoi.h QOI_PIXELS_MAX guard.
      * Use an overflow-safe check: h * w > LIMIT is equivalent
      * to h > LIMIT / w for positive integers. */
-    if(h > QOI_PIXELS_MAX / w) {
+    if(h >= QOI_PIXELS_MAX / w) {
         return LV_RESULT_INVALID;
     }
 
@@ -181,51 +179,6 @@ static lv_result_t parse_qoi_header(const uint8_t * buf, size_t buf_size, lv_ima
     }
 
     return LV_RESULT_OK;
-}
-
-/**
- * @brief Convert QOI's RGBA byte order to LVGL's ARGB8888 layout.
- *
- * QOI decodes to RGBA byte order (R,G,B,A) in memory, whereas LVGL's
- * ARGB8888 (lv_color32_t) stores bytes as B,G,R,A. This function swaps
- * the red and blue channels in-place to match LVGL's expected layout.
- * Rows are processed independently to respect the draw buffer's stride
- * alignment.
- *
- * @param  img_p   pointer to the pixel buffer to convert in-place.
- * @param  width   width of the image in pixels.
- * @param  height  height of the image in pixels.
- * @param  stride  byte stride between consecutive rows (must be >= width * 4).
- */
-static void convert_rgba_to_argb8888(uint8_t * img_p, uint32_t width, uint32_t height, uint32_t stride)
-{
-    if(img_p == NULL || width == 0 || height == 0) return;
-    if(stride < width * QOI_RGBA_BPP) return;
-
-    uint32_t y;
-    for(y = 0; y < height; y++) {
-        uint8_t * row = img_p + y * stride;
-        uint32_t x;
-        /* Process two pixels per iteration using a 64-bit channel swap */
-        for(x = 0; x + 1 < width; x += 2) {
-            uint8_t * px = row + x * QOI_RGBA_BPP;
-            uint64_t pair;
-            lv_memcpy(&pair, px, sizeof(pair));
-            /* Swap red (bits 0-7, 32-39) and blue (bits 16-23, 48-55) channels
-             * in both pixels simultaneously using bit masks. */
-            pair = (pair & 0xFF00FF00FF00FF00ull) |
-                   ((pair & 0x000000FF000000FFull) << 16) |
-                   ((pair & 0x00FF000000FF0000ull) >> 16);
-            lv_memcpy(px, &pair, sizeof(pair));
-        }
-        /* Handle the remaining odd pixel when width is not even */
-        if(x < width) {
-            uint8_t * px = row + x * QOI_RGBA_BPP;
-            uint8_t tmp = px[0]; /* red */
-            px[0] = px[2];       /* blue -> red position */
-            px[2] = tmp;         /* red -> blue position */
-        }
-    }
 }
 
 /**
@@ -252,7 +205,7 @@ static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size)
     }
 
     if(desc.width == 0 || desc.height == 0 || desc.width > (UINT32_MAX / QOI_RGBA_BPP) ||
-       desc.height > QOI_PIXELS_MAX / desc.width ||
+       desc.height >= QOI_PIXELS_MAX / desc.width ||
        desc.height > LV_QOI_MAX_PIXELS / desc.width) {
         LV_LOG_WARN("QOI image dimensions %" LV_PRIu32 "x%" LV_PRIu32
                     " exceed pixel limit %" LV_PRIu32,
@@ -281,9 +234,6 @@ static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size)
         dst_row += decoded->header.stride;
         src_row += row_size;
     }
-
-    /* Convert RGBA to ARGB8888 in-place */
-    convert_rgba_to_argb8888((uint8_t *)decoded->data, desc.width, desc.height, decoded->header.stride);
 
     QOI_FREE(pixels);
 

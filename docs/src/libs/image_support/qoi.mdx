@@ -25,7 +25,7 @@ to open images from files. Follow the instructions in [File System (lv_fs_drv)](
 ## Memory Requirements
 
 The whole QOI image is decoded, so `width × height × 4` bytes of RAM is required
-from the LVGL heap. The decoded image is stored in RGBA pixel format.
+from the LVGL heap. The decoded image is stored in ARGB8888 pixel format (converted from QOI's internal RGBA).
 
 Since it might take significant time to decode QOI images, LVGL's
 [image caching](/main-modules/images/caching) feature can be useful.

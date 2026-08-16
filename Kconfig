@@ -1415,6 +1415,11 @@ config LV_QOI_MAX_FILE_SIZE
 	depends on LV_USE_QOI
 	default 67108864
 
+config LV_QOI_MAX_PIXELS
+	int "Maximum number of pixels for QOI images"
+	depends on LV_USE_QOI
+	default 400000000
+
 config LV_USE_LIBWEBP
 	bool "WebP decoder"
 

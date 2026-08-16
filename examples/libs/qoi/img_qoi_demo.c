@@ -2405,11 +2405,11 @@ uint8_t img_qoi_demo_map[] = {
     0x31, 0x35, 0x09, 0x3e, 0x26, 0x17, 0x26, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
 };
 
-/* Note: header field is intentionally omitted here.
- * The QOI decoder (see lv_qoi.c, parse_qoi_header()) parses
- * the image header from the raw QOI data at runtime, so
- * pre-populating it would be redundant. */
 const lv_image_dsc_t img_qoi_demo = {
+    .header = {
+        .magic = LV_IMAGE_HEADER_MAGIC,
+        .cf = LV_COLOR_FORMAT_RAW,
+    },
     .data_size = sizeof(img_qoi_demo_map),
     .data = img_qoi_demo_map,
 };
