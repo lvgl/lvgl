@@ -14,67 +14,68 @@ class LVDropdown(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_dropdown_t", ptr=True) or self
+        self._wv_lv_dropdown_t = self.cast("lv_dropdown_t", ptr=True) or self
+        self._wv = self._wv_lv_dropdown_t
 
     @property
     def list(self):
         """The dropped down list"""
-        return ptr_or_none(self._wv.safe_field("list"))
+        return ptr_or_none(self._wv_lv_dropdown_t.safe_field("list"))
 
     @property
     def text(self):
         """Text to display on the dropdown's button"""
-        return safe_string(self._wv, "text")
+        return safe_string(self._wv_lv_dropdown_t, "text")
 
     @property
     def symbol(self):
         """Arrow or other icon when the drop-down list is closed"""
-        return ptr_or_none(self._wv.safe_field("symbol"))
+        return ptr_or_none(self._wv_lv_dropdown_t.safe_field("symbol"))
 
     @property
     def options(self):
         """Options in a '\n' separated list"""
-        return safe_string(self._wv, "options")
+        return safe_string(self._wv_lv_dropdown_t, "options")
 
     @property
     def option_cnt(self):
         """Number of options"""
-        return int(self._wv.safe_field("option_cnt", 0))
+        return int(self._wv_lv_dropdown_t.safe_field("option_cnt", 0))
 
     @property
     def sel_opt_id(self):
         """Index of the currently selected option"""
-        return int(self._wv.safe_field("sel_opt_id", 0))
+        return int(self._wv_lv_dropdown_t.safe_field("sel_opt_id", 0))
 
     @property
     def sel_opt_id_orig(self):
         """Store the original index on focus"""
-        return int(self._wv.safe_field("sel_opt_id_orig", 0))
+        return int(self._wv_lv_dropdown_t.safe_field("sel_opt_id_orig", 0))
 
     @property
     def pr_opt_id(self):
         """Index of the currently pressed option"""
-        return int(self._wv.safe_field("pr_opt_id", 0))
+        return int(self._wv_lv_dropdown_t.safe_field("pr_opt_id", 0))
 
     @property
     def dir(self):
         """Direction in which the list should open"""
-        return int(self._wv.safe_field("dir", 0))
+        return int(self._wv_lv_dropdown_t.safe_field("dir", 0))
 
     @property
     def static_options(self):
         """1: Only a pointer is saved in `options`"""
-        return int(self._wv.safe_field("static_options", 0))
+        return int(self._wv_lv_dropdown_t.safe_field("static_options", 0))
 
     @property
     def selected_highlight(self):
         """1: Make the selected option highlighted in the list"""
-        return int(self._wv.safe_field("selected_highlight", 0))
+        return int(self._wv_lv_dropdown_t.safe_field("selected_highlight", 0))
 
     @property
     def static_text(self):
         """1: Only a pointer is saved in `text`"""
-        return int(self._wv.safe_field("static_text", 0))
+        return int(self._wv_lv_dropdown_t.safe_field("static_text", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

@@ -14,31 +14,32 @@ class LVBarcode(LVCanvas):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_barcode_t", ptr=True) or self
+        self._wv_lv_barcode_t = self.cast("lv_barcode_t", ptr=True) or self
+        self._wv = self._wv_lv_barcode_t
 
     @property
     def dark_color(self):
-        return safe_color(self._wv, "dark_color")
+        return safe_color(self._wv_lv_barcode_t, "dark_color")
 
     @property
     def light_color(self):
-        return safe_color(self._wv, "light_color")
+        return safe_color(self._wv_lv_barcode_t, "light_color")
 
     @property
     def scale(self):
-        return int(self._wv.safe_field("scale", 0))
+        return int(self._wv_lv_barcode_t.safe_field("scale", 0))
 
     @property
     def direction(self):
-        return int(self._wv.safe_field("direction", 0))
+        return int(self._wv_lv_barcode_t.safe_field("direction", 0))
 
     @property
     def tiled(self):
-        return int(self._wv.safe_field("tiled", 0))
+        return int(self._wv_lv_barcode_t.safe_field("tiled", 0))
 
     @property
     def encoding(self):
-        return int(self._wv.safe_field("encoding", 0))
+        return int(self._wv_lv_barcode_t.safe_field("encoding", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

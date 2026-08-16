@@ -60,8 +60,11 @@ def safe_collect(
         for item in items_or_label:
             try:
                 result.append(transform(item))
-            except Exception:
+            except Exception as e:
+                # Dropping an object drops everything below it too, so say so
+                # rather than letting a whole subtree vanish from a dump.
+                gdb.write(f"Warning: skipped an item: {type(e).__name__}: {e}\n")
                 continue
-    except Exception:
-        pass
+    except Exception as e:
+        gdb.write(f"Warning: stopped collecting early: {type(e).__name__}: {e}\n")
     return result

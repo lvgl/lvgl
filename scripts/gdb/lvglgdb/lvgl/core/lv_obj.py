@@ -91,9 +91,26 @@ class LVObject(Value):
 
     @property
     def flags_raw(self) -> int:
-        """Return raw flags bitmask, 0 if corrupted."""
-        raw = self.safe_field("flags", 0)
-        return int(raw)
+        """Return raw flags bitmask, 0 if corrupted.
+
+        Up to LVGL 9.5 this was a single `flags` bitmask. Since 9.6 each flag
+        is its own bitfield named after it, so the mask is rebuilt from them.
+        Without this every object reports no flags at all, because safe_field()
+        cannot tell a missing field from a clear one.
+        """
+        from .lv_obj_flag_consts import OBJ_FLAG_NAMES
+
+        raw = self.safe_field("flags")
+        if raw is not None:
+            return int(raw)
+
+        value = 0
+        for bit, name in OBJ_FLAG_NAMES.items():
+            # Composite names (SCROLL_CHAIN) have no field of their own.
+            field = self.safe_field(name.lower())
+            if field is not None and int(field):
+                value |= bit
+        return value
 
     @property
     def flags_list(self) -> list[str]:

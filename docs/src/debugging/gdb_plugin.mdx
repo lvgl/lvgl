@@ -70,7 +70,14 @@ be supported.
 ## Inspect Style
 
 `info style <style_var>`: Inspect a single `lv_style_t` variable. Properties are
-displayed with resolved names and formatted values (colors shown as hex).
+displayed with resolved names and formatted values:
+
+- colors as hex,
+- sizes as written in the source, so `LV_PCT(100)` shows as `100%` and
+  `LV_SIZE_CONTENT` as `content`,
+- enums by name, with bitmasks such as `BORDER_SIDE` combined as `BOTTOM|TOP`,
+- pointers as their C symbol, e.g. `TEXT_FONT` as `lv_font_montserrat_16`, or as
+  the string an image source points at.
 
 `info style --obj <obj_var>`: Inspect all styles of an `lv_obj_t`, grouped by
 style slot with selector and flags.
@@ -79,12 +86,15 @@ Example:
 
 ```bash
 (gdb) info style my_style
-+-----------+---------+
-| prop      | value   |
-+-----------+---------+
-| BG_COLOR  | #ff0000 |
-| BG_OPA    | 255     |
-+-----------+---------+
++-----------+-----------------------+
+| prop      | value                 |
++-----------+-----------------------+
+| BG_COLOR  | #ff0000               |
+| BG_OPA    | 255                   |
+| WIDTH     | 100%                  |
+| FLEX_FLOW | COLUMN                |
+| TEXT_FONT | lv_font_montserrat_16 |
++-----------+-----------------------+
 
 (gdb) info style --obj lv_global->disp_default->act_scr
 [0] MAIN|DEFAULT  local
@@ -213,7 +223,7 @@ ObjClass: lv_button -> lv_obj -> lv_obj
   editable       = 0
   group_def      = 2
   default_size   = (CONTENT, CONTENT) theme_inheritable=True
-  theme_inh      = True
+  theme_in      = True
 ```
 
 ## Inspect Subject

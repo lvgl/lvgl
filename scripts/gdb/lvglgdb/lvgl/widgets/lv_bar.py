@@ -14,47 +14,48 @@ class LVBar(LVObject):
 
     def __init__(self, obj):
         super().__init__(obj)
-        self._wv = self.cast("lv_bar_t", ptr=True) or self
+        self._wv_lv_bar_t = self.cast("lv_bar_t", ptr=True) or self
+        self._wv = self._wv_lv_bar_t
 
     @property
     def cur_value(self):
         """Current value of the bar"""
-        return int(self._wv.safe_field("cur_value", 0))
+        return int(self._wv_lv_bar_t.safe_field("cur_value", 0))
 
     @property
     def min_value(self):
         """Minimum value of the bar"""
-        return int(self._wv.safe_field("min_value", 0))
+        return int(self._wv_lv_bar_t.safe_field("min_value", 0))
 
     @property
     def max_value(self):
         """Maximum value of the bar"""
-        return int(self._wv.safe_field("max_value", 0))
+        return int(self._wv_lv_bar_t.safe_field("max_value", 0))
 
     @property
     def start_value(self):
         """Start value of the bar"""
-        return int(self._wv.safe_field("start_value", 0))
+        return int(self._wv_lv_bar_t.safe_field("start_value", 0))
 
     @property
     def indic_area(self):
         """Save the indicator area. Might be used by derived types"""
-        return safe_area(self._wv, "indic_area")
+        return safe_area(self._wv_lv_bar_t, "indic_area")
 
     @property
     def val_reversed(self):
         """Whether value been reversed"""
-        return int(self._wv.safe_field("val_reversed", 0))
+        return int(self._wv_lv_bar_t.safe_field("val_reversed", 0))
 
     @property
     def mode(self):
         """Type of bar"""
-        return int(self._wv.safe_field("mode", 0))
+        return int(self._wv_lv_bar_t.safe_field("mode", 0))
 
     @property
     def orientation(self):
         """Orientation of bar"""
-        return int(self._wv.safe_field("orientation", 0))
+        return int(self._wv_lv_bar_t.safe_field("orientation", 0))
 
     def snapshot(self, include_children=False, include_styles=False):
         """Snapshot with widget-specific fields in widget_data."""

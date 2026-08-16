@@ -33,6 +33,9 @@ def parse_enum(path: Path, enum_type: str, prefix: str,
         raise RuntimeError(f"Cannot find {enum_type} enum in {path}")
 
     entries = {}
+    # #defines of the header, plus the members already seen: an enum member is
+    # commonly defined in terms of earlier ones.
+    known = _defines(text)
     current_val = 0
     for line in m.group(1).splitlines():
         line = line.strip().rstrip(",")
@@ -45,12 +48,12 @@ def parse_enum(path: Path, enum_type: str, prefix: str,
         ):
             continue
 
-        match = re.match(
-            rf"({re.escape(prefix)}\w+)\s*=\s*(0x[\da-fA-F]+|\d+)", line
-        )
+        match = re.match(rf"({re.escape(prefix)}\w+)\s*=\s*(.+)$", line)
         if match:
             name = match.group(1)
-            current_val = int(match.group(2), 0)
+            value = eval_c_expr(match.group(2), known)
+            if value is not None:
+                current_val = value
         else:
             match = re.match(rf"({re.escape(prefix)}\w+)", line)
             if not match:
@@ -63,9 +66,52 @@ def parse_enum(path: Path, enum_type: str, prefix: str,
 
         short = name.removeprefix(prefix)
         entries[current_val] = short
+        known[name] = current_val
         current_val += 1
 
     return entries
+
+
+_DEFINE = re.compile(r"^#define\s+(_?LV_[A-Z0-9_]+)\s+(.+)$", re.M)
+
+
+def _defines(text: str) -> dict:
+    """The #define constants of a header, so enum values can reference them."""
+    return {name: value.split("/*")[0].strip()
+            for name, value in _DEFINE.findall(text)}
+
+
+def eval_c_expr(expr: str, known: dict) -> "int | None":
+    """Evaluate a C constant expression, or None if it cannot be resolved.
+
+    Enum members are regularly defined in terms of others -
+    `LV_FLEX_FLOW_ROW_WRAP = LV_FLEX_FLOW_ROW | LV_FLEX_WRAP` - and a parser
+    that only accepts literals silently numbers them sequentially instead,
+    which turns a bitmask into consecutive integers.
+    """
+    expr = expr.strip().rstrip(",")
+    if not expr:
+        return None
+    for _ in range(8):
+        replaced = re.sub(
+            r"_?LV_[A-Z0-9_]+",
+            lambda m: f"({known[m.group(0)]})" if m.group(0) in known else m.group(0),
+            expr,
+        )
+        if replaced == expr:
+            break
+        expr = replaced
+    # Integer suffixes, then blank out hex literals so their letters are not
+    # mistaken for an unresolved identifier.
+    expr = re.sub(r"\b(0[xX][0-9a-fA-F]+|\d+)[uUlL]+\b", r"\1", expr)
+    if re.search(r"[A-Za-z_]", re.sub(r"0[xX][0-9a-fA-F]+", "0", expr)):
+        return None
+    if not re.fullmatch(r"[\d\sxXa-fA-F|&^~<>+\-*/()]+", expr):
+        return None
+    try:
+        return int(eval(expr, {"__builtins__": {}}, {}))
+    except Exception:
+        return None
 
 
 def parse_bitmask_enum(path: Path, enum_type: str, prefix: str,
