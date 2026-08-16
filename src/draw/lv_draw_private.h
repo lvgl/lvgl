@@ -201,16 +201,11 @@ typedef struct {
  **********************/
 
 /**
- * Free a draw task and everything it owns: any descriptor-owned allocation
- * (line points, locally-copied label text), and, for a `LV_DRAW_TASK_TYPE_LAYER`
- * task, the sub-layer it targets (its draw buffer, layer-memory accounting and
- * `LV_EVENT_CHILD_DELETED`/`layer_deinit` bookkeeping included).  Used both by
- * the normal dispatch path and to unwind a redraw that is being abandoned.
+ * Free a draw task and everything it owns
+ * Used both by the normal dispatch path and to unwind a redraw that is being abandoned.
  * @param  t      draw task to free
- * @param  disp   display the task belongs to, needed to release a sub-layer.
- *                May be `NULL`, in which case sub-layer bookkeeping is skipped.
  */
-void lv_draw_cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
+void lv_draw_cleanup_task(lv_draw_task_t * t);
 
 /**********************
  *      MACROS
