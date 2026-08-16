@@ -5,7 +5,7 @@
 
 /**
  * @title Open a QOI image from file and variable
- * @brief Load a QOI image from a file and from a variable source and display them side by side.
+ * @brief Load a QOI image from a file and from a variable source.
  *
  * An image widget is created on the active screen. The first image is loaded
  * from a variable (in-memory) source, and the second image is loaded from a
