@@ -303,10 +303,10 @@ static const char * nvglu__blur_fs_src =
 
 static const float nvglu__blur_quad[] = {
     -1.0f, -1.0f, 0.0f, 0.0f,
-        1.0f, -1.0f, 1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f, 1.0f,
-        1.0f,  1.0f, 1.0f, 1.0f,
-    };
+    1.0f, -1.0f, 1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f, 1.0f,
+    1.0f,  1.0f, 1.0f, 1.0f,
+};
 
 static GLuint nvglu__compile_shader(GLenum type, const char * src)
 {
