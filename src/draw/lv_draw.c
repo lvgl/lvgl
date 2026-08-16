@@ -157,8 +157,8 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             u = u->next;
         }
         if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
-            LV_LOG_WARN("the draw task was not taken by any units");
-            t->state = LV_DRAW_TASK_STATE_FINISHED;
+            t->state = LV_DRAW_TASK_STATE_FAILED;
+            LV_LOG_WARN("Draw task failed (%p, type %d): not taken by any unit", (void *)t, t->type);
         }
         else {
             lv_draw_dispatch();
