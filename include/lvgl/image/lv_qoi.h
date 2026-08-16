@@ -33,6 +33,9 @@ extern "C" {
  */
 void lv_qoi_init(void);
 
+/**
+ * Unregister the QOI decoder functions from LVGL
+ */
 void lv_qoi_deinit(void);
 
 /**********************

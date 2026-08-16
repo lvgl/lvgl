@@ -48,7 +48,7 @@
  *      INCLUDES
  *********************/
 #include "lv_image_decoder_private.h"
-#include "../../lvgl.h"
+#include "../lvgl_public.h"
 #if LV_USE_QOI
 
 #include "../libs/qoi/lv_qoi.h"
