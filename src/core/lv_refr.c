@@ -1430,6 +1430,9 @@ static void draw_buf_flush(lv_display_t * disp)
         lv_draw_dispatch();
     }
 
+    /* Every layer must've been drawn*/
+    LV_ASSERT_MSG(layer->next == NULL, "Expected every layer to have been drawn at this point");
+
     /* In double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer.
      * If we need to wait here it means that the content of one buffer is being sent to display
