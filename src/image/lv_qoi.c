@@ -80,6 +80,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void convert_rgba_to_argb8888(uint8_t * img_p, uint32_t width, uint32_t height, uint32_t stride);
 static lv_result_t parse_qoi_header(const uint8_t * buf, size_t buf_size, lv_image_header_t * header);
 static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size);
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header);
@@ -126,6 +127,35 @@ void lv_qoi_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ * @brief Convert QOI's RGBA byte order to LVGL's ARGB8888 byte layout.
+ *
+ * QOI decodes to RGBA byte order (R,G,B,A) in memory. LVGL's ARGB8888
+ * (lv_color32_t) stores bytes as B,G,R,A in memory. This function swaps the
+ * red and blue channels to match LVGL's expected layout.
+ *
+ * The conversion is performed byte-by-byte to remain endian-independent.
+ *
+ * @param img_p   pointer to the start of the image buffer.
+ * @param width   image width in pixels.
+ * @param height  image height in pixels.
+ * @param stride  row stride in bytes (may include alignment padding).
+ */
+static void convert_rgba_to_argb8888(uint8_t * img_p, uint32_t width, uint32_t height, uint32_t stride)
+{
+    uint32_t y;
+    for(y = 0; y < height; y++) {
+        uint8_t * row = img_p + y * stride;
+        uint32_t x;
+        for(x = 0; x < width; x++) {
+            uint8_t * px = row + x * 4;
+            uint8_t tmp = px[0]; /* red */
+            px[0] = px[2];       /* blue -> red position */
+            px[2] = tmp;         /* red -> blue position */
+        }
+    }
+}
 
 /**
  * @brief Parse and validate QOI header bytes.
@@ -234,6 +264,12 @@ static lv_draw_buf_t * decode_qoi_memory(const void * data, size_t data_size)
         dst_row += decoded->header.stride;
         src_row += row_size;
     }
+
+    /* Convert QOI's RGBA byte order to LVGL's ARGB8888 byte layout.
+     * QOI decodes to R,G,B,A in memory while LVGL's ARGB8888 stores
+     * bytes as B,G,R,A. Swap red and blue channels byte-by-byte to
+     * remain endian-independent. */
+    convert_rgba_to_argb8888((uint8_t *)decoded->data, desc.width, desc.height, decoded->header.stride);
 
     QOI_FREE(pixels);
 
