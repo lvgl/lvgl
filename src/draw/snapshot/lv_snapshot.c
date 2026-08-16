@@ -37,7 +37,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static uint32_t snapshot_pending_task_count(const lv_layer_t * layer);
-static void snapshot_discard_layer_tasks(lv_layer_t * layer, lv_display_t * disp);
+static void snapshot_discard_layer_tasks(lv_layer_t * layer);
 
 /**********************
  *  STATIC VARIABLES
@@ -201,7 +201,8 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
         }
         else if(++stalled_dispatches > LV_SNAPSHOT_MAX_STALLED_DISPATCHES) {
             LV_LOG_WARN("Snapshot draw queue stalled, aborting");
-            snapshot_discard_layer_tasks(&layer, disp_new);
+            lv_draw_wait_for_finish();
+            snapshot_discard_layer_tasks(&layer);
             disp_new->layer_head = layer_old;
             lv_refr_set_disp_refreshing(disp_old);
 
@@ -300,9 +301,8 @@ static uint32_t snapshot_pending_task_count(const lv_layer_t * layer)
  *                 is left untouched: for the snapshot's top layer it belongs to
  *                 the caller, and a sub-layer's buffer is freed by the parent
  *                 LAYER task that owns it.
- * @param  disp    display being refreshed, needed to release the sub-layers
  */
-static void snapshot_discard_layer_tasks(lv_layer_t * layer, lv_display_t * disp)
+static void snapshot_discard_layer_tasks(lv_layer_t * layer)
 {
     lv_draw_task_t * task = layer->draw_task_head;
 
@@ -312,10 +312,10 @@ static void snapshot_discard_layer_tasks(lv_layer_t * layer, lv_display_t * disp
         if(task->type == LV_DRAW_TASK_TYPE_LAYER) {
             lv_draw_image_dsc_t * image_dsc = task->draw_dsc;
             lv_layer_t * sub_layer = (lv_layer_t *)image_dsc->src;
-            if(sub_layer) snapshot_discard_layer_tasks(sub_layer, disp);
+            if(sub_layer) snapshot_discard_layer_tasks(sub_layer);
         }
 
-        lv_draw_cleanup_task(task, disp);
+        lv_draw_cleanup_task(task);
 
         task = task_next;
     }

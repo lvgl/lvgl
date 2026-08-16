@@ -93,17 +93,20 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->tile_cnt = 1;
 #endif
 
-    disp->layer_head = lv_malloc(sizeof(lv_layer_t));
-    LV_ASSERT_MALLOC(disp->layer_head);
-    if(disp->layer_head == NULL) return NULL;
-    lv_layer_init(disp->layer_head);
+    lv_area_t disp_area = {
+        0, 0, hor_res - 1, ver_res - 1
+    };
 
-    if(disp->layer_init) disp->layer_init(disp, disp->layer_head);
-    disp->layer_head->buf_area.x1 = 0;
-    disp->layer_head->buf_area.y1 = 0;
-    disp->layer_head->buf_area.x2 = hor_res - 1;
-    disp->layer_head->buf_area.y2 = ver_res - 1;
-    disp->layer_head->color_format = disp->color_format;
+    /* TODO: (v10) make `lv_draw_layer_init` take in a display pointer
+    * instead of assuming it needs to be bound to the refreshing display*/
+    lv_display_t * original_refr_disp = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(disp);
+    disp->layer_head = lv_draw_layer_create(NULL, disp->color_format, &disp_area);
+    if(!disp->layer_head) {
+        lv_ll_remove(disp_ll_p, disp);
+        return NULL;
+    }
+    lv_refr_set_disp_refreshing(original_refr_disp);
 
     disp->inv_en_cnt = 1;
     disp->last_activity_time = lv_tick_get();
@@ -234,8 +237,7 @@ void lv_display_delete(lv_display_t * disp)
     lv_ll_remove(disp_ll_p, disp);
     if(disp->refr_timer) lv_timer_delete(disp->refr_timer);
 
-    if(disp->layer_deinit) disp->layer_deinit(disp, disp->layer_head);
-    lv_free(disp->layer_head);
+    lv_draw_layer_delete(disp->layer_head);
 
 #if LV_USE_EXT_DATA
     if(disp->ext_data.free_cb) {
