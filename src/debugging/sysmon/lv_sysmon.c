@@ -74,7 +74,6 @@ extern uint32_t LV_SYSMON_GET_IDLE(void);
 
 void lv_sysmon_builtin_init(void)
 {
-
 #if LV_USE_MEM_MONITOR
     static lv_mem_monitor_t mem_info;
     lv_subject_init_pointer(&sysmon_mem.subject, &mem_info);
@@ -96,10 +95,7 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        LV_LOG_WARN("There is no default display");
-        return NULL;
-    }
+    LV_CHECK_ARG(disp != NULL, return NULL);
 
     lv_obj_t * label = lv_label_create(lv_display_get_layer_sys(disp));
     lv_obj_set_style_bg_opa(label, LV_OPA_50, 0);
@@ -118,10 +114,7 @@ void lv_sysmon_show_performance(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        LV_LOG_WARN("There is no default display");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
 
     if(disp->perf_label == NULL) {
         disp->perf_label = lv_sysmon_create(disp);
@@ -146,10 +139,7 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        LV_LOG_WARN("There is no default display");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
 
     lv_obj_set_hidden(disp->perf_label, true);
 }
@@ -160,20 +150,27 @@ void lv_sysmon_performance_dump(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        LV_LOG_WARN("There is no default display");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
     perf_dump_info(disp);
 }
 
 void lv_sysmon_performance_resume(lv_display_t * disp)
 {
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return);
     perf_control(disp, true);
 }
 
 void lv_sysmon_performance_pause(lv_display_t * disp)
 {
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
+    LV_CHECK_ARG(disp != NULL, return);
     perf_control(disp, false);
 }
 
@@ -187,11 +184,7 @@ void lv_sysmon_show_memory(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        LV_LOG_WARN("There is no default display");
-        return;
-    }
-
+    LV_CHECK_ARG(disp != NULL, return);
     if(disp->mem_label == NULL) {
         disp->mem_label = lv_sysmon_create(disp);
         if(disp->mem_label == NULL) {
@@ -212,10 +205,7 @@ void lv_sysmon_hide_memory(lv_display_t * disp)
         LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
         disp = lv_display_get_default();
     }
-    if(disp == NULL) {
-        LV_LOG_WARN("There is no default display");
-        return;
-    }
+    LV_CHECK_ARG(disp != NULL, return);
 
     lv_obj_set_hidden(disp->mem_label, true);
 }
@@ -230,9 +220,13 @@ void lv_sysmon_hide_memory(lv_display_t * disp)
 
 static void perf_monitor_disp_event_cb(lv_event_t * e)
 {
+    LV_ASSERT(e != NULL);
     lv_display_t * disp = lv_event_get_target(e);
-    lv_event_code_t code = lv_event_get_code(e);
+    LV_ASSERT(disp != NULL);
     lv_sysmon_perf_info_t * info = &disp->perf_sysmon_info;
+    LV_ASSERT(info != NULL);
+
+    lv_event_code_t code = lv_event_get_code(e);
 
     switch(code) {
         case LV_EVENT_REFR_START:
@@ -281,12 +275,13 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
 
 static void perf_dump_info(lv_display_t * disp)
 {
-
+    LV_ASSERT(disp != NULL);
     lv_sysmon_perf_info_t * info = &disp->perf_sysmon_info;
+    LV_ASSERT(info != NULL);
     info->calculated.run_cnt++;
 
     uint32_t time_since_last_report = lv_tick_elaps(info->measured.last_report_timestamp);
-    lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(NULL);
+    lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(lv_display_get_default());
     uint32_t disp_refr_period = disp_refr_timer ? disp_refr_timer->period : LV_DEF_REFR_PERIOD;
 
     info->calculated.fps = time_since_last_report ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
@@ -330,14 +325,19 @@ static void perf_dump_info(lv_display_t * disp)
 
 static void perf_update_timer_cb(lv_timer_t * t)
 {
+    LV_ASSERT(t != NULL);
     lv_display_t * disp = lv_timer_get_user_data(t);
+    LV_ASSERT(disp != NULL);
 
     perf_dump_info(disp);
 }
 
 static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_ASSERT(observer != NULL);
+    LV_ASSERT(subject != NULL);
     const lv_sysmon_perf_info_t * perf = lv_subject_get_pointer(subject);
+    LV_ASSERT(perf != NULL);
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
     LV_UNUSED(observer);
@@ -360,6 +360,7 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 #endif
 #else
     lv_obj_t * label = lv_observer_get_target(observer);
+    LV_ASSERT(label != NULL);
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
     lv_label_set_text_fmt(
         label,
@@ -384,15 +385,7 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 static void perf_control(lv_display_t * disp, bool start)
 {
-    if(disp == NULL) {
-        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
-        disp = lv_display_get_default();
-    }
-    if(disp == NULL) {
-        LV_LOG_WARN("There is no default display");
-        return;
-    }
-
+    LV_ASSERT(disp != NULL);
     if(disp->perf_sysmon_backend.timer == NULL) return;
 
     if(start) {
@@ -409,15 +402,21 @@ static void perf_control(lv_display_t * disp, bool start)
 
 static void mem_update_timer_cb(lv_timer_t * t)
 {
+    LV_ASSERT(t != NULL);
     lv_mem_monitor_t * mem_mon = lv_timer_get_user_data(t);
+    LV_ASSERT(mem_mon != NULL);
     lv_mem_monitor(mem_mon);
     lv_subject_set_pointer(&sysmon_mem.subject, mem_mon);
 }
 
 static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_ASSERT(observer != NULL);
+    LV_ASSERT(subject != NULL);
     lv_obj_t * label = lv_observer_get_target(observer);
     const lv_mem_monitor_t * mon = lv_subject_get_pointer(subject);
+    LV_ASSERT(label != NULL);
+    LV_ASSERT(mon != NULL);
 
     size_t used_size = mon->total_size - mon->free_size;
     size_t used_kb = used_size / 1024;
