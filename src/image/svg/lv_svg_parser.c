@@ -385,7 +385,7 @@ static void _process_string(lv_svg_node_t * node, lv_svg_attr_type_t type, const
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_PTR;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
     char * str = lv_malloc(len + 1);
@@ -403,7 +403,7 @@ static void _process_xlink(lv_svg_node_t * node, lv_svg_attr_type_t type, const 
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_PTR;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     if(*val_start == '#') {
         val_start++;
@@ -823,12 +823,12 @@ static void _process_view_box(lv_svg_node_t * node, lv_svg_attr_type_t type, con
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_PTR;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
     if(len >= 4 && strncmp(val_start, "none", 4) == 0) {
         attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-        attr->class_type = LV_SVG_ATTR_VALUE_NONE;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_NONE;
         return;
     }
 
@@ -839,7 +839,7 @@ static void _process_view_box(lv_svg_node_t * node, lv_svg_attr_type_t type, con
         ptr = _parse_number(ptr, val_end, &vals[i]);
         if(!ptr) {
             attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-            attr->class_type = LV_SVG_ATTR_VALUE_NONE;
+            attr->class_type = LV_SVG_ATTR_VALUE_CLASS_NONE;
             lv_free(vals);
             return;
         }
@@ -856,7 +856,7 @@ static void _process_points_value(lv_svg_node_t * node, lv_svg_attr_type_t type,
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_PTR;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t list_cap = 4;
     lv_svg_attr_values_list_t * list = lv_malloc(sizeof(lv_svg_point_t) * list_cap + sizeof(uint32_t));
@@ -962,7 +962,7 @@ static void _process_path_value(lv_svg_node_t * node, lv_svg_attr_type_t type, c
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_PTR;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t list_cap = 4;
     uint32_t list_size = sizeof(lv_svg_point_t) * list_cap + sizeof(uint32_t) * list_cap + sizeof(uint32_t);
@@ -1266,7 +1266,7 @@ static void _process_gradient_units(lv_svg_node_t * node, lv_svg_attr_type_t typ
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
     int32_t val = 0;
@@ -1289,16 +1289,16 @@ static void _process_paint_dasharray(lv_svg_node_t * node, lv_svg_attr_type_t ty
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
 
     if(len >= 4 && strncmp(val_start, "none", 4) == 0) {
-        attr->class_type = LV_SVG_ATTR_VALUE_NONE;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_NONE;
         return;
     }
     else if(len >= 7 && strncmp(val_start, "inherit", 7) == 0) {
-        attr->class_type = LV_SVG_ATTR_VALUE_INHERIT;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INHERIT;
         return;
     }
     else {
@@ -1337,12 +1337,12 @@ static void _process_font_attrs(lv_svg_node_t * node, lv_svg_attr_type_t type, c
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
 
     if(len >= 7 && strncmp(val_start, "inherit", 7) == 0) {
-        attr->class_type = LV_SVG_ATTR_VALUE_INHERIT;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INHERIT;
         return;
     }
 
@@ -1371,22 +1371,22 @@ static void _process_paint_attrs(lv_svg_node_t * node, lv_svg_attr_type_t type, 
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
 
     if(len >= 7 && strncmp(val_start, "inherit", 7) == 0) {
-        attr->class_type = LV_SVG_ATTR_VALUE_INHERIT;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INHERIT;
         return;
     }
 
     if(type == LV_SVG_ATTR_FILL_RULE) {
         int32_t val = 0;
         if(strncmp(val_start, "evenodd", 7) == 0) {
-            val = LV_SVG_FILL_EVENODD;
+            val = LV_SVG_FILL_RULE_EVENODD;
         }
         else {
-            val = LV_SVG_FILL_NONZERO;
+            val = LV_SVG_FILL_RULE_NONZERO;
         }
         attr->value.ival = val;
     }
@@ -1453,15 +1453,15 @@ static void _process_paint(lv_svg_node_t * node, lv_svg_attr_type_t type, const 
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
     if(len >= 4 && strncmp(val_start, "none", 4) == 0) {
-        attr->class_type = LV_SVG_ATTR_VALUE_NONE;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_NONE;
         return;
     }
     else if(len >= 7 && strncmp(val_start, "inherit", 7) == 0) {
-        attr->class_type = LV_SVG_ATTR_VALUE_INHERIT;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INHERIT;
         return;
     }
     else if(len > 4 && strncmp(val_start, "url(", 4) == 0) {
@@ -1472,7 +1472,7 @@ static void _process_paint(lv_svg_node_t * node, lv_svg_attr_type_t type, const 
 
         ptr = _skip_space(ptr, val_end);
         if(ptr == val_end) {
-            attr->class_type = LV_SVG_ATTR_VALUE_NONE;
+            attr->class_type = LV_SVG_ATTR_VALUE_CLASS_NONE;
             return;
         }
 
@@ -1526,12 +1526,12 @@ static void _process_opacity_value(lv_svg_node_t * node, lv_svg_attr_type_t type
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
 
     if(len >= 7 && strncmp(val_start, "inherit", 7) == 0) {
-        attr->class_type = LV_SVG_ATTR_VALUE_INHERIT;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INHERIT;
         return;
     }
 
@@ -1553,7 +1553,7 @@ static void _process_length_value(lv_svg_node_t * node, lv_svg_attr_type_t type,
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     float val_number = 0.0f;
     val_start = _parse_length(val_start, val_end, dpi, &val_number);
@@ -1569,12 +1569,12 @@ static void _process_transform(lv_svg_node_t * node, lv_svg_attr_type_t type, co
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_PTR;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
     if(len >= 4 && strncmp(val_start, "none", 4) == 0) {
         attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-        attr->class_type = LV_SVG_ATTR_VALUE_NONE;
+        attr->class_type = LV_SVG_ATTR_VALUE_CLASS_NONE;
         return;
     }
 
@@ -1622,7 +1622,7 @@ static void _process_preserve_aspect_ratio(lv_svg_node_t * node, lv_svg_attr_typ
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     lv_svg_aspect_ratio_t ratio = LV_SVG_ASPECT_RATIO_XMID_YMID;
     uint32_t len = MAP_LEN(_svg_attr_aspect_ratio_map);
@@ -1716,7 +1716,7 @@ static void _process_clock_time(lv_svg_node_t * node, lv_svg_attr_type_t type, c
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
     if(len == 10 && strncmp(val_start, "indefinite", 10) == 0) {
@@ -1738,7 +1738,7 @@ static void _process_anim_attr_number(lv_svg_node_t * node, lv_svg_attr_type_t t
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     if(type == LV_SVG_ATTR_REPEAT_COUNT) {
         uint32_t len = val_end - val_start;
@@ -1755,13 +1755,13 @@ static void _process_anim_attr_number(lv_svg_node_t * node, lv_svg_attr_type_t t
         uint32_t len = val_end - val_start;
         if(len == 4 && strncmp(val_start, "auto", 4) == 0) {
             attr->class_type =
-                LV_SVG_ATTR_VALUE_INHERIT; // rotated over time by the angle of the direction (i.e., directional tangent vector) of the motion path
+                LV_SVG_ATTR_VALUE_CLASS_INHERIT; // rotated over time by the angle of the direction (i.e., directional tangent vector) of the motion path
             attr->value.fval = 0.0f;
             return;
         }
         else if(len == 12 && strncmp(val_start, "auto-reverse", 12) == 0) {
             attr->class_type =
-                LV_SVG_ATTR_VALUE_INHERIT; // rotated over time by the angle of the direction (i.e., directional tangent vector) of the motion path plus 180 degrees.
+                LV_SVG_ATTR_VALUE_CLASS_INHERIT; // rotated over time by the angle of the direction (i.e., directional tangent vector) of the motion path plus 180 degrees.
             attr->value.fval = 180.0f;
             return;
         }
@@ -1781,7 +1781,7 @@ static void _process_anim_attr_names(lv_svg_node_t * node, lv_svg_attr_type_t ty
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
     attr->value.ival = _get_svg_attr_type(val_start, val_end);
 }
 
@@ -1794,7 +1794,7 @@ static void _process_anim_attr_options(lv_svg_node_t * node, lv_svg_attr_type_t 
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     uint32_t len = val_end - val_start;
     switch(type) {
@@ -2076,7 +2076,7 @@ static void _process_anim_attr_values(lv_svg_node_t * node, lv_svg_attr_type_t t
     lv_svg_attr_t * attr = lv_array_at(&node->attrs, node->attrs.size - 1);
     attr->id = type;
     attr->val_type = LV_SVG_ATTR_VALUE_DATA;
-    attr->class_type = LV_SVG_ATTR_VALUE_INITIAL;
+    attr->class_type = LV_SVG_ATTR_VALUE_CLASS_INITIAL;
 
     if(type == LV_SVG_ATTR_VALUES) {
         attr->val_type = LV_SVG_ATTR_VALUE_PTR;

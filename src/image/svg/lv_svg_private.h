@@ -215,8 +215,8 @@ typedef struct {
 typedef uint32_t lv_svg_color_t;
 
 enum _lv_svg_fill_rule_t {
-    LV_SVG_FILL_NONZERO = 0,
-    LV_SVG_FILL_EVENODD,
+    LV_SVG_FILL_RULE_NONZERO = 0,
+    LV_SVG_FILL_RULE_EVENODD,
 };
 typedef uint8_t lv_svg_fill_rule_t;
 
@@ -283,9 +283,9 @@ enum _lv_svg_attr_value_type_t {
 typedef uint8_t lv_svg_attr_value_type_t;
 
 enum _lv_svg_attr_value_class_t {
-    LV_SVG_ATTR_VALUE_NONE = 0,
-    LV_SVG_ATTR_VALUE_INITIAL,
-    LV_SVG_ATTR_VALUE_INHERIT,
+    LV_SVG_ATTR_VALUE_CLASS_NONE = 0,
+    LV_SVG_ATTR_VALUE_CLASS_INITIAL,
+    LV_SVG_ATTR_VALUE_CLASS_INHERIT,
 };
 typedef uint8_t lv_svg_attr_value_class_t;
 
