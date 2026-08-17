@@ -6,10 +6,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from lvgl_paths import include_dir, lvgl_root
 from enum_parser import parse_enum
 
-LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
-LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
+LVGL_ROOT = lvgl_root(__file__)
+LVGL_INC = include_dir(LVGL_ROOT)
+LVGL_SRC = LVGL_ROOT / "src"
 GDB_ROOT = Path(__file__).parent.parent.parent
 OUTPUT = GDB_ROOT / "lvglgdb" / "lvgl" / "misc" / "lv_style_consts.py"
 

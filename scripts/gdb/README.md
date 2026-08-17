@@ -40,6 +40,7 @@ dump dashboard -o out.html      # Save dashboard to file
 ### Info Commands
 
 ```bash
+info lvgl_version               # LVGL version of the target, and this plugin's
 info style my_style             # Inspect a single lv_style_t
 info style --obj my_obj         # Inspect all styles of an lv_obj_t
                                 # sizes as 100%/content, enums and fonts by name

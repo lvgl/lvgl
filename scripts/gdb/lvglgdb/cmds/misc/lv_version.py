@@ -1,3 +1,6 @@
+import os
+import re
+
 import gdb
 
 import lvglgdb
@@ -10,13 +13,52 @@ def _call(expression):
         return None
 
 
+_VERSION_MACRO = re.compile(
+    r"#define\s+LVGL_VERSION_(MAJOR|MINOR|PATCH|INFO)\s+(\S+)")
+
+
+def version_from_sources():
+    """The version read from the lv_version.h the target was built against.
+
+    Neither way of asking the binary is dependable. lv_version_major() is
+    `static inline`, so it is dropped unless something calls it, and the macros
+    need -g3 *and* a stop inside a translation unit that included lv_version.h -
+    lv_timer.c, where a breakpoint on lv_timer_handler lands, does not.
+
+    DWARF does record the path of every source file, so the LVGL tree can be
+    found through any of its symbols and the version header read from disk.
+    Returns (major, minor, patch, info) or None.
+    """
+    for symbol in ("lv_obj_create", "lv_timer_handler", "lv_init"):
+        try:
+            found = gdb.lookup_global_symbol(symbol)
+            if found is None or found.symtab is None:
+                continue
+            path = found.symtab.fullname()
+            marker = f"{os.sep}src{os.sep}"
+            if marker not in path:
+                continue
+            header = os.path.join(path[:path.rindex(marker)], "lv_version.h")
+            if not os.path.exists(header):
+                continue
+            with open(header) as f:
+                macros = dict(_VERSION_MACRO.findall(f.read()))
+            if not {"MAJOR", "MINOR", "PATCH"} <= set(macros):
+                continue
+            return (int(macros["MAJOR"]), int(macros["MINOR"]),
+                    int(macros["PATCH"]), macros.get("INFO", '""').strip('"'))
+        except (gdb.error, OSError, ValueError):
+            continue
+    return None
+
+
 def lvgl_version():
     """The LVGL version of the target, as (major, minor, patch, info).
 
-    lv_version_major() and friends in lvgl.h are the intended way to ask. They
-    are `static inline`, so whether each one survives into the binary depends
-    on the build; the version macros are used for anything missing, and those
-    need -g3. Fields that cannot be read come back as None.
+    lv_version_major() and friends in lvgl.h are the intended way to ask, with
+    the version macros as a second try. Both depend on how the target was
+    built, so lv_version.h itself is the third and most dependable one.
+    Fields that cannot be read come back as None.
     """
     parts = []
     for name in ("major", "minor", "patch"):
@@ -31,15 +73,20 @@ def lvgl_version():
     except gdb.error:
         info = None
 
+    if any(p is None for p in parts):
+        from_sources = version_from_sources()
+        if from_sources is not None:
+            return from_sources
+
     return (*parts, info)
 
 
 def version_string():
-    """"9.6.0-dev", or as much of it as the build makes readable."""
+    """"9.6.0-dev", or as much of it as the target makes readable."""
     major, minor, patch, info = lvgl_version()
     if major is None:
-        return ("unknown: lv_version_major() was inlined away and the version "
-                "macros need a -g3 build")
+        return ("unknown: lv_version_major() was inlined away, the version "
+                "macros need a -g3 build, and LVGL's sources are not on disk")
     numbers = ".".join("?" if p is None else str(p) for p in (major, minor, patch))
     return numbers + (f"-{info}" if info else "")
 

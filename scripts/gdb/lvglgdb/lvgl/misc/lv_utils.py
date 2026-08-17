@@ -96,7 +96,9 @@ def format_coord(val):
         if plain <= _PCT_POS_MAX:
             return f"{plain}%"
         return f"{_PCT_POS_MAX - plain}%"
-    if coord_type == _COORD_TYPE_PX_NEG:
-        plain = val & ~_COORD_TYPE_MASK
-        return str(-plain) if plain else "0"
+    # LV_COORD_TYPE_PX_NEG needs no branch of its own. There is no
+    # LV_COORD_SET_PX_NEG: the tag exists so LV_COORD_IS_PX() accepts negatives,
+    # and in two's complement every negative int32 already has those top bits,
+    # so such a value is an ordinary negative pixel count. Taking
+    # LV_COORD_PLAIN() of it and negating turned -5 into -536870907.
     return str(val)

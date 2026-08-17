@@ -24,9 +24,11 @@ from pathlib import Path
 from dataclasses import dataclass, field as dc_field
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from lvgl_paths import include_dir, lvgl_root  # noqa: E402
 
-LVGL_SRC = Path(__file__).parent.parent.parent.parent.parent / "src"
-LVGL_INC = Path(__file__).parent.parent.parent.parent.parent / "include" / "lvgl"
+LVGL_ROOT = lvgl_root(__file__)
+LVGL_SRC = LVGL_ROOT / "src"
+LVGL_INC = include_dir(LVGL_ROOT)
 WIDGETS_DIR = LVGL_SRC / "widgets"
 OUTPUT_DIR = Path(__file__).parent.parent.parent / "lvglgdb" / "lvgl" / "widgets"
 SPECS_JSON = Path(__file__).parent / "widget_specs.json"

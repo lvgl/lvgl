@@ -51,9 +51,21 @@ def parse_enum(path: Path, enum_type: str, prefix: str,
         match = re.match(rf"({re.escape(prefix)}\w+)\s*=\s*(.+)$", line)
         if match:
             name = match.group(1)
-            value = eval_c_expr(match.group(2), known)
-            if value is not None:
-                current_val = value
+            # A comment can start on the same line as the value, and a Doxygen
+            # one often runs on to the next; only the expression before it is
+            # the value. LV_EVENT_PREPROCESS = 0x8000 is written that way.
+            expression = re.split(r"//|/\*", match.group(2), maxsplit=1)[0]
+            value = eval_c_expr(expression.rstrip().rstrip(","), known)
+            if value is None:
+                # Falling back to the running counter would give this member a
+                # plausible wrong number and shift every implicit member after
+                # it, which is impossible to notice in the generated table.
+                raise ValueError(
+                    f"{name} is assigned `{expression.strip()}`, which this "
+                    f"parser cannot evaluate. Teach eval_c_expr about it rather "
+                    f"than letting the value be guessed."
+                )
+            current_val = value
         else:
             match = re.match(rf"({re.escape(prefix)}\w+)", line)
             if not match:
@@ -151,9 +163,14 @@ def parse_bitmask_enum(path: Path, enum_type: str, prefix: str,
         ):
             continue
 
-        # Match: NAME = (1u << N) or NAME = 1 << N (parens optional)
+        # Match: NAME = (1u << N) or NAME = 1 << N (parens optional), and only
+        # that. Without anchoring the end, `NAME = (1 << 5) | (1 << 6)` would
+        # match its first shift and be recorded as a single-bit flag, which is
+        # worse than leaving a combination out of a bit table.
         match = re.match(
-            rf"({re.escape(prefix)}\w+)\s*=\s*\(?1u?\s*<<\s*(\d+)\)?", line
+            rf"({re.escape(prefix)}\w+)\s*=\s*\(?1u?\s*<<\s*(\d+)\)?"
+            r"\s*,?\s*(?:/[/*].*)?$",
+            line,
         )
         if not match:
             continue
