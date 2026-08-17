@@ -13,7 +13,7 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
-    lv_display_set_color_format(NULL, LV_COLOR_FORMAT_XRGB8888);
+    lv_display_set_color_format(lv_display_get_default(), LV_COLOR_FORMAT_XRGB8888);
 }
 
 void test_render_to_l8(void)
@@ -22,7 +22,7 @@ void test_render_to_l8(void)
 #if LV_USE_DRAW_NANOVG
     TEST_PASS();
 #else
-    lv_display_set_color_format(NULL, LV_COLOR_FORMAT_L8);
+    lv_display_set_color_format(lv_display_get_default(), LV_COLOR_FORMAT_L8);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
     uint32_t opa;

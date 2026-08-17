@@ -22,8 +22,9 @@ void lv_example_style_gradient_radial(void)
         LV_COLOR_MAKE(0x00, 0x00, 0x00),
     };
 
-    int32_t width = lv_display_get_horizontal_resolution(NULL);
-    int32_t height = lv_display_get_vertical_resolution(NULL);
+    lv_display_t * display = lv_display_get_default();
+    int32_t width = lv_display_get_horizontal_resolution(display);
+    int32_t height = lv_display_get_vertical_resolution(display);
 
     static lv_style_t style;
     lv_style_init(&style);

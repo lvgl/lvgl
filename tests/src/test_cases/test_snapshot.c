@@ -466,8 +466,9 @@ void test_snapshot_refresh_logic_edge_cases(void)
     TEST_ASSERT_NOT_NULL(draw_buf1);
 
     /* Verify screen snapshot size */
-    int32_t screen_w = lv_display_get_horizontal_resolution(NULL);
-    int32_t screen_h = lv_display_get_vertical_resolution(NULL);
+    lv_display_t * display = lv_display_get_default();
+    int32_t screen_w = lv_display_get_horizontal_resolution(display);
+    int32_t screen_h = lv_display_get_vertical_resolution(display);
     int32_t ext_size = lv_obj_get_ext_draw_size(lv_screen_active());
     TEST_ASSERT_EQUAL_UINT32(screen_w + ext_size * 2, draw_buf1->header.w);
     TEST_ASSERT_EQUAL_UINT32(screen_h + ext_size * 2, draw_buf1->header.h);

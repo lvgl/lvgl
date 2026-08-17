@@ -182,7 +182,7 @@ In this case, the main `while(1)` could look like this:
 ```c
 while(1) {
     /* Normal operation (no sleep) if < 5 sec inactivity */
-    if(lv_display_get_inactive_time(NULL) < 5000) {
+    if(lv_display_get_inactive_time(lv_display_get_default()) < 5000) {
         lv_timer_handler();
     }
     /* Sleep after 5 sec inactivity */

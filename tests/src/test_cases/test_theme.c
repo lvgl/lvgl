@@ -25,7 +25,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 void test_theme(void)
 {
-    lv_theme_t * theme = lv_display_get_theme(NULL);
+    lv_display_t * display = lv_display_get_default();
+    lv_theme_t * theme = lv_display_get_theme(display);
     TEST_ASSERT_NOT_NULL(theme);
 
     lv_theme_t new_theme;
@@ -44,8 +45,7 @@ void test_theme(void)
 
     lv_theme_set_apply_cb(&new_theme, NULL);
     TEST_ASSERT_NULL(new_theme.apply_cb);
-
-    lv_display_set_theme(NULL, &new_theme);
+    lv_display_set_theme(display, &new_theme);
 
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_16, lv_theme_get_font_small(obj));
@@ -55,7 +55,7 @@ void test_theme(void)
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0x00FF00), lv_theme_get_color_secondary(NULL));
 
     /* Verify default values */
-    lv_display_set_theme(NULL, NULL);
+    lv_display_set_theme(display, NULL);
     TEST_ASSERT_EQUAL_PTR(LV_FONT_DEFAULT, lv_theme_get_font_small(obj));
     TEST_ASSERT_EQUAL_PTR(LV_FONT_DEFAULT, lv_theme_get_font_normal(obj));
     TEST_ASSERT_EQUAL_PTR(LV_FONT_DEFAULT, lv_theme_get_font_large(obj));
@@ -162,18 +162,18 @@ void test_theme_default_resolution_change_no_recursion(void)
                                                lv_palette_main(LV_PALETTE_BLUE),
                                                lv_palette_main(LV_PALETTE_RED),
                                                true, LV_FONT_DEFAULT);
-    lv_display_set_theme(NULL, theme);
+    lv_display_set_theme(lv_display_get_default(), theme);
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Resolution change test");
     lv_button_create(lv_screen_active());
 
-    lv_display_set_resolution(NULL, 320, 240);
+    lv_display_set_resolution(lv_display_get_default(), 320, 240);
 
     TEST_ASSERT_NOT_NULL(lv_screen_active());
     TEST_ASSERT_TRUE(lv_theme_default_is_inited());
 
-    lv_display_set_resolution(NULL, 800, 480);
+    lv_display_set_resolution(lv_display_get_default(), 800, 480);
 
     TEST_ASSERT_NOT_NULL(lv_screen_active());
     TEST_ASSERT_TRUE(lv_theme_default_is_inited());
@@ -192,7 +192,8 @@ void test_theme_default(void)
                                                lv_palette_main(LV_PALETTE_RED),
                                                false, LV_FONT_DEFAULT);
     TEST_ASSERT_EQUAL_PTR(theme, lv_theme_default_get());
-    lv_display_set_theme(NULL, theme);
+    lv_display_t * display = lv_display_get_default();
+    lv_display_set_theme(display, theme);
     test_widgets("theme_default_light.png");
 
     theme = lv_theme_default_init(NULL,
@@ -200,10 +201,10 @@ void test_theme_default(void)
                                   lv_palette_main(LV_PALETTE_RED),
                                   true, LV_FONT_DEFAULT);
     TEST_ASSERT_EQUAL_PTR(theme, lv_theme_default_get());
-    lv_display_set_theme(NULL, theme);
+    lv_display_set_theme(display, theme);
     test_widgets("theme_default_dark.png");
 
-    lv_display_set_theme(NULL, NULL);
+    lv_display_set_theme(display, NULL);
 
     lv_theme_default_deinit();
     TEST_ASSERT_FALSE(lv_theme_default_is_inited());
@@ -214,15 +215,16 @@ void test_theme_mono(void)
 {
     lv_theme_t * theme = lv_theme_mono_init(NULL, false, LV_FONT_DEFAULT);
     TEST_ASSERT_EQUAL_PTR(theme, lv_theme_mono_get());
-    lv_display_set_theme(NULL, theme);
+    lv_display_t * display = lv_display_get_default();
+    lv_display_set_theme(display, theme);
     test_widgets("theme_mono_light.png");
 
     theme = lv_theme_mono_init(NULL, true, LV_FONT_DEFAULT);
     TEST_ASSERT_EQUAL_PTR(theme, lv_theme_mono_get());
-    lv_display_set_theme(NULL, theme);
+    lv_display_set_theme(display, theme);
     test_widgets("theme_mono_dark.png");
 
-    lv_display_set_theme(NULL, NULL);
+    lv_display_set_theme(display, NULL);
 
     lv_theme_mono_deinit();
     TEST_ASSERT_FALSE(lv_theme_mono_is_inited());
@@ -233,10 +235,11 @@ void test_theme_simple(void)
 {
     lv_theme_t * theme = lv_theme_simple_init(NULL);
     TEST_ASSERT_EQUAL_PTR(theme, lv_theme_simple_get());
-    lv_display_set_theme(NULL, theme);
+    lv_display_t * display = lv_display_get_default();
+    lv_display_set_theme(display, theme);
     test_widgets("theme_simple.png");
 
-    lv_display_set_theme(NULL, NULL);
+    lv_display_set_theme(display, NULL);
 
     lv_theme_simple_deinit();
     TEST_ASSERT_FALSE(lv_theme_simple_is_inited());

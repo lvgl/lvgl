@@ -35,7 +35,7 @@ static void new_theme_init_and_set(void)
 
     /* Initialize the new theme with the current theme as its parent
      * The user is responsible for freeing the theme when it's no longer needed */
-    lv_theme_t * th_act = lv_display_get_theme(NULL);
+    lv_theme_t * th_act = lv_display_get_theme(display);
     lv_theme_t * th_new = lv_theme_create();
     lv_theme_copy(th_new, th_act);
     lv_theme_set_parent(th_new, th_act);
