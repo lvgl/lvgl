@@ -1,4 +1,0 @@
-{
-  "title": "Draw Units",
-  "pages": ["draw_nanovg", "draw_opengl", "draw_sdl"]
-}

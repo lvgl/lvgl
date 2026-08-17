@@ -1,0 +1,63 @@
+---
+title: Overview
+description: "Renesas is an official partner of LVGL. LVGL has built-in support for the Dave2D GPU and the GLCDC display controller, and maintains ready-to-use projects for RA, RX, RZ/A and RZ/G boards."
+faqs:
+  - question: "Which Renesas boards have a ready-to-use LVGL project?"
+    answer: "See Supported Boards for the full list with CPU, memory, display and demo repository. The RA, RX, RZ/A and RZ/G family pages cover building, flashing and debugging each of them."
+  - question: "Do I have to configure Dave2D myself?"
+    answer: "On the boards LVGL maintains a project for, no — the D/AVE 2D driver is already added in the FSP configurator. In your own project you have to add it, or the build fails on missing FSP headers."
+  - question: "What do I use on a Linux-capable Renesas MPU?"
+    answer: "The standard Linux stack. On RZ/G boards use Wayland if a compositor is running, or fbdev otherwise, and pair it with evdev or libinput. The OpenGL path is the most performant where its prerequisites are met."
+---
+
+## About
+
+[Renesas](https://www.renesas.com/) is an official partner of LVGL. LVGL contains built-in support
+for the Renesas graphics peripherals, and LVGL maintains ready-to-use projects for a range of
+Renesas boards.
+
+Start from [Supported Boards](/integration/chip_vendors/renesas/supported_boards) to find your
+board, then follow the page for its family:
+[RA](/integration/chip_vendors/renesas/ra_family),
+[RX](/integration/chip_vendors/renesas/rx_family),
+[RZ/A](/integration/chip_vendors/renesas/rza_family) or
+[RZ/G](/integration/chip_vendors/renesas/rzg_family).
+
+## Drivers and Renderers
+
+### MCUs — RA, RX and RZ/A
+
+| What you need | Use |
+|---|---|
+| Display output over the RGB interface | **[Renesas GLCDC](/main-modules/display_drivers/renesas_glcdc)** |
+| 2D GPU acceleration | **[Dave2D](/main-modules/renderers/dave2d)** |
+| An SPI panel instead | **[LCD controllers](/main-modules/display_drivers/lcd)** |
+| Touch input | Write a short read callback — see [Touchpad and Mouse](/main-modules/indev/pointer) |
+
+Dave2D accelerates most of LVGL's drawing operations --- rectangles including gradients, images
+with scaling and rotation, letters, triangles and lines. Because it works in the background, the
+CPU is free for other tasks: in practice CPU usage during rendering drops to one half or one third,
+depending on the application.
+
+GLCDC is a multi-stage graphics output peripheral available in several Renesas MCUs, able to drive
+LCD panels through a highly configurable RGB interface.
+
+### MPUs — RZ/G
+
+The Linux-capable MPUs use the standard Linux stack rather than the MCU drivers above:
+
+| What you have | Use |
+|---|---|
+| A Wayland compositor running | **[Wayland](/main-modules/display_drivers/wayland)** |
+| No compositor | **[fbdev](/main-modules/display_drivers/fbdev)** — almost always available |
+| A GPU and its prerequisites met | **[NanoVG](/main-modules/renderers/nanovg)** or **[OpenGL ES](/main-modules/renderers/opengles)** — the most performant path in at least one measured case |
+| Touch and keyboard | **[evdev](/main-modules/input_drivers/evdev)** or **[libinput](/main-modules/input_drivers/libinput)** |
+
+See [Embedded Linux](/integration/embedded_linux) for the full picture, including distribution
+support.
+
+## See Also
+
+- [Supported Boards](/integration/chip_vendors/renesas/supported_boards) - which boards have a project
+- [Dave2D](/main-modules/renderers/dave2d) - the GPU draw unit, including its FSP prerequisites
+- [Renesas GLCDC](/main-modules/display_drivers/renesas_glcdc) - the display driver

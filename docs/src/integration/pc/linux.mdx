@@ -7,9 +7,20 @@ description: "LVGL comes with a lot of built-in Linux-related drivers and suppor
 
 LVGL comes with a lot of built-in Linux-related drivers and support:
 
-- Wayland, DRM, SDL, and fbdev display drivers
+- [Wayland](/main-modules/display_drivers/wayland), [DRM](/main-modules/display_drivers/drm),
+  [SDL](/main-modules/display_drivers/sdl), [X11](/main-modules/display_drivers/x11),
+  [GLFW](/main-modules/display_drivers/glfw) and [fbdev](/main-modules/display_drivers/fbdev)
+  display drivers
+- [evdev](/main-modules/input_drivers/evdev) and
+  [libinput](/main-modules/input_drivers/libinput) input drivers
+- GPU rendering through [NanoVG](/main-modules/renderers/nanovg),
+  [OpenGL ES](/main-modules/renderers/opengles) and [SDL](/main-modules/renderers/sdl)
 - `pthread` integration
 - [CMake](/integration/building/cmake) support
+
+This page covers running LVGL on a Linux **development machine**. For Linux on target hardware ---
+choosing between the drivers above, distributions, and cross-compilation --- see
+[Embedded Linux](/integration/embedded_linux).
 
 Multiple repositories are available to help you get started easily.
 Just follow the README of the repositories listed below.

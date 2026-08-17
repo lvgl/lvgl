@@ -1,0 +1,106 @@
+---
+title: Software Renderer
+description: "LVGL's built-in CPU renderer, written in C. It is enabled by default, can draw every LVGL feature, and accelerates on Neon, Helium, Arm-2D and RISC-V SIMD."
+faqs:
+  - question: "Can I disable the software renderer if I have a GPU?"
+    answer: "In practice, no. GPU draw units accelerate a subset of draw tasks and leave the rest to the software renderer, so disabling it means those tasks are never drawn. LV_USE_DRAW_SW is 1 by default for that reason."
+  - question: "How much does an assembly accelerator help?"
+    answer: "Typically 10-30% faster rendering. Arm-2D on a plain Cortex-M without Helium or a 2D accelerator gives close to nothing, sometimes a small loss."
+  - question: "How do I get vector graphics with the software renderer?"
+    answer: "Enable LV_USE_THORVG and LV_USE_VECTOR_GRAPHIC. ThorVG is a third-party vector library that LVGL can build from the copy it ships."
+---
+
+## Overview
+
+The software renderer is a highly optimized rasterizer written in C. It is the only renderer that
+is enabled by default, and the only one that can draw *every* LVGL feature --- which is why it
+stays enabled even when a GPU draw unit is added on top.
+
+It needs no hardware beyond a CPU, and on most MCU projects it is the whole rendering story.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_DRAW_SW" />. It defaults to `1`.
+
+### Options
+
+| Symbol | Default | Effect |
+|---|---|---|
+| `LV_DRAW_SW_SUPPORT_RGB565` | on | Per-color-format support switches. Disabling unused formats shrinks the binary. |
+| `LV_DRAW_SW_DRAW_UNIT_CNT` | `1` | Number of parallel rendering units; see [Multi-Core Rendering](#multi-core-rendering). |
+| `LV_USE_DRAW_SW_ASM` | `LV_DRAW_SW_ASM_NONE` | Assembly accelerator; see [Assembly Acceleration](#assembly-acceleration). |
+| `LV_USE_DRAW_SW_COMPLEX_GRADIENTS` | off | Linear, radial and conical gradients. |
+| `LV_USE_DRAW_ARM2D_SYNC` | off | Arm-2D synchronous acceleration; see [Arm-2D](/main-modules/renderers/arm2d). |
+
+The full set of per-format and per-feature switches is in the `LV_USE_DRAW_SW` block of
+`lv_conf.h`.
+
+## Rendering Features
+
+The software renderer handles the complete set of LVGL draw tasks:
+
+- fill rectangles with a color or gradient
+- rounded rectangles and borders
+- box shadows, and drop shadows for any shape
+- blend, rotate, scale or recolor images
+- draw labels, including rotated letters
+- skew lines with perpendicular endings and any thickness
+- arcs with rounded or straight endings
+- blur an area
+- anti-aliasing throughout
+
+### Color Format Support
+
+Supported as both source and destination: RGB888, XRGB8888, ARGB8888, RGB565, L8, A8, I1 and
+more. See [Color Formats](/main-modules/display/color_format).
+
+## Assembly Acceleration
+
+The renderer can use SIMD instruction sets through <ApiLink name="LV_USE_DRAW_SW_ASM" />:
+
+| Value | Hardware |
+|---|---|
+| `LV_DRAW_SW_ASM_NEON` | Arm Neon — most Cortex-A cores |
+| `LV_DRAW_SW_ASM_HELIUM` | Arm Helium — Cortex-M52, M55, M85 |
+| `LV_DRAW_SW_ASM_RISCV_V` | RISC-V vector extension |
+| `LV_DRAW_SW_ASM_CUSTOM` | Your own implementation, via `LV_DRAW_SW_ASM_CUSTOM_INCLUDE` |
+
+These typically give 10-30% faster rendering. On Cortex-M cores with Helium,
+[Arm-2D](/main-modules/renderers/arm2d) is the better-supported route and brings its own
+acceleration modes.
+
+## Vector Graphics
+
+To draw vector content (SVG, Lottie, the <ApiLink name="lv_vector_dsc_t" /> API), the software
+renderer uses [ThorVG](https://github.com/thorvg/thorvg). Enable
+<ApiLink name="LV_USE_THORVG" /> and <ApiLink name="LV_USE_VECTOR_GRAPHIC" />;
+`LV_USE_THORVG_INTERNAL` builds the copy of ThorVG shipped with LVGL rather than linking an
+external one.
+
+ThorVG supports paths from lines, arcs and Bézier curves, stroking with dashes and joint
+settings, and filling with a color, image or gradient.
+
+## Multi-Core Rendering
+
+On a multi-core system each core can rasterize a different area in parallel. Set
+<ApiLink name="LV_DRAW_SW_DRAW_UNIT_CNT" /> to the number of cores you want to use, and
+<ApiLink name="LV_USE_OS" /> to something other than `LV_OS_NONE` --- LVGL needs threads to
+distribute the work.
+
+How the screen is split is described in [Tiled Rendering](/main-modules/display/tiling).
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Hardware required | None, any CPU |
+| Vector graphics | With ThorVG |
+| 3D / glTF | No |
+| Multi-core | Yes, via `LV_DRAW_SW_DRAW_UNIT_CNT` |
+| Acceleration | Neon, Helium, RISC-V SIMD, Arm-2D, or custom assembly |
+
+## See Also
+
+- [Arm-2D](/main-modules/renderers/arm2d) - acceleration layer for Cortex-M
+- [Draw Pipeline](/main-modules/draw/draw_pipeline) - how draw tasks reach a renderer
+- [Tiled Rendering](/main-modules/display/tiling) - splitting work across cores

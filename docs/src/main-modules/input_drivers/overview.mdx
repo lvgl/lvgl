@@ -1,0 +1,83 @@
+---
+title: Overview
+description: "Which input driver to use, and when you need one at all — several display drivers already provide input, in which case you do not add a separate input driver."
+faqs:
+  - question: "Do I always need an input driver?"
+    answer: "No. The Wayland, X11, SDL, GLFW, Windows, QNX and UEFI display drivers already create their own input devices. You only add a separate input driver when your display driver does not bring one — DRM, fbdev, the SoC controllers and the LCD controllers."
+  - question: "evdev or libinput?"
+    answer: "Use evdev unless you need real keyboard support with layouts and modifiers, or your device needs libinput's quirk handling. evdev is lighter and is the only one of the two with automatic device discovery and hotplug."
+  - question: "Where are pointer, keypad and encoder documented?"
+    answer: "Those are input device types in the lv_indev module, not drivers. See Input devices for how LVGL interprets events once a driver has delivered them."
+---
+
+## Do You Need One?
+
+An input driver reads events from hardware and feeds them into an
+[`lv_indev_t`](/main-modules/indev). Whether you need one depends entirely on your
+[display driver](/main-modules/display_drivers), because several of them already do it.
+
+**Input is already built in** --- do not add a driver from this section:
+
+| Display driver | Provides |
+|---|---|
+| [Wayland](/main-modules/display_drivers/wayland) | Keyboard, pointer, touch |
+| [X11](/main-modules/display_drivers/x11) | Mouse, mousewheel, keyboard |
+| [SDL](/main-modules/display_drivers/sdl) | Mouse, mousewheel, keyboard |
+| [GLFW](/main-modules/display_drivers/glfw) | Mouse, keyboard |
+| [Windows](/main-modules/display_drivers/windows) | Pointer, touch, keypad with IME, encoder |
+| [QNX](/main-modules/display_drivers/qnx) | Keyboard, pointer |
+| [UEFI](/main-modules/display_drivers/uefi) | Pointer, keyboard |
+| [NuttX](/main-modules/display_drivers/nuttx) | Touchscreen, mouse (no keyboard) |
+
+**You need an input driver** with:
+[DRM](/main-modules/display_drivers/drm), [fbdev](/main-modules/display_drivers/fbdev), the
+[SoC display controllers](/main-modules/display_drivers/overview#soc-display-controllers) and the
+[LCD controllers](/main-modules/display_drivers/lcd) --- these are display-only.
+
+## Choosing a Driver
+
+On Linux there are two, and they overlap heavily.
+
+| Driver | Best for | Discovery and hotplug | Full keyboard | Touch calibration | Find device by capability |
+|---|---|---|---|---|---|
+| **[evdev](/main-modules/input_drivers/evdev)** | The common case — a known touchscreen or mouse | Yes | No | Yes | No |
+| **[libinput](/main-modules/input_drivers/libinput)** | Text entry, or devices needing quirks | No | Yes, via XKB | Not needed | Yes |
+
+Use **evdev** unless you need real keyboard support --- layouts and modifiers --- or your device
+requires libinput's quirk handling. evdev is lighter and is the only one of the two with automatic
+device discovery and hotplug.
+
+## Attaching to a Display
+
+Create the input device, then bind it to the display it belongs to:
+
+```c
+lv_indev_t * touch = lv_evdev_create(LV_INDEV_TYPE_POINTER, "/dev/input/event0");
+lv_indev_set_display(touch, disp);
+```
+
+Binding matters as soon as there is more than one display --- it tells LVGL which screen the
+coordinates refer to.
+
+<Callout type="info" title="Drivers versus device types">
+This section is about *drivers* — the code that reads hardware. The *types* of input LVGL
+understands ([pointer](/main-modules/indev/pointer), [keypad](/main-modules/indev/keypad),
+[encoder](/main-modules/indev/encoder), [button](/main-modules/indev/button)) and what it does with
+them (focus [groups](/main-modules/indev/groups), [gestures](/main-modules/indev/gestures),
+[grid navigation](/main-modules/indev/gridnav)) belong to the
+[lv_indev module](/main-modules/indev).
+</Callout>
+
+## Writing Your Own
+
+On an MCU with an I2C or SPI touch controller there is usually no driver to enable --- you write a
+short read callback. [Input devices](/main-modules/indev/overview) covers the callback contract,
+and [Touchpad and Mouse](/main-modules/indev/pointer) has a worked example.
+
+## See Also
+
+- [Input devices (lv_indev)](/main-modules/indev) - how LVGL interprets input events
+- [Display Drivers](/main-modules/display_drivers) - which ones bring input with them
+- [NuttX](/main-modules/display_drivers/nuttx) - NuttX touchscreen and mouse setup
+
+<DirectoryIndex />

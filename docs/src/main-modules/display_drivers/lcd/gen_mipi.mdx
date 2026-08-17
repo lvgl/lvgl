@@ -1,0 +1,297 @@
+---
+title: "Generic MIPI DCS"
+description: "A common framework for LCD controllers that speak the MIPI DCS command set over SPI or I8080. It is the base of the ST77xx, ILI9341 and NV3007 drivers, and it can drive compatible chips that have no dedicated driver."
+faqs:
+  - question: "Is this a driver for MIPI DSI displays?"
+    answer: "No. Despite the name it is not a hardware driver for the DSI serial interface. It implements the MIPI DCS command set, which a large number of LCD controllers accept over an SPI or I8080 bus."
+  - question: "My controller has no dedicated LVGL driver. Can I use this?"
+    answer: "Very likely yes. If the datasheet shows standard DCS commands, this driver will drive it — send the panel's vendor-specific init sequence with lv_lcd_generic_mipi_send_cmd_list()."
+  - question: "Do I need to enable LV_USE_GENERIC_MIPI when I use the ST7789 driver?"
+    answer: "No. Each chip-specific driver selects LV_USE_GENERIC_MIPI automatically."
+  - question: "My colors are wrong — red and blue look swapped, or everything looks scrambled."
+    answer: "Two different causes. Swapped red and blue is panel RGB/BGR order, fixed with LV_LCD_FLAG_BGR. Scrambled colors are usually byte order on the SPI bus, fixed by setting the LVGL color format to LV_COLOR_FORMAT_RGB565_SWAPPED."
+---
+
+## Overview
+
+[MIPI Alliance](https://www.mipi.org/) publishes a series of display specifications,
+including DBI (Display Bus Interface), DSI (Display Serial Interface) and DCS (Display Command
+Set). The DCS specification defines a standard command set --- configure orientation, color
+resolution, power modes, and access video memory --- that a large number of legacy TFT LCD
+controllers implement, including the popular Sitronix (ST7735, ST7789, ST7796) and Ilitek
+(ILI9341) parts. On top of the standard set, each controller adds vendor-specific commands for
+voltage levels, timings and gamma curves.
+
+This driver implements that command set and provides the common framework the chip-specific LVGL
+drivers are built on.
+
+<Callout type="warn" title="Not a DSI driver">
+Despite the name, this is **not** a hardware driver for displays with the DSI ("MIPI") serial
+interface. It implements the MIPI DCS command set used by many LCD controllers on an **SPI or
+I8080** bus.
+</Callout>
+
+Its second use is as a fallback: if your controller has no dedicated driver but its datasheet
+shows standard DCS commands, this driver will very likely drive it once you feed it the panel's
+init sequence.
+
+### Prerequisites
+
+None. You supply two bus transfer functions, so no third-party library is involved.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_GENERIC_MIPI" />.
+
+### Create flags
+
+The third argument of <ApiLink name="lv_lcd_generic_mipi_create" /> configures the panel's
+orientation and color handling. OR them together as needed.
+
+| Flag | Effect |
+|---|---|
+| <ApiLink name="LV_LCD_FLAG_NONE" /> | Defaults: no mirroring, RGB order, RGB565 |
+| <ApiLink name="LV_LCD_FLAG_MIRROR_X" /> | Mirror horizontally |
+| <ApiLink name="LV_LCD_FLAG_MIRROR_Y" /> | Mirror vertically |
+| <ApiLink name="LV_LCD_FLAG_BGR" /> | Panel wires the subpixels as BGR rather than RGB |
+| <ApiLink name="LV_LCD_FLAG_RGB666" /> | Set the controller's pixel format to RGB666 instead of RGB565 |
+
+```c
+lv_display_t * disp = lv_lcd_generic_mipi_create(MY_WIDTH, MY_HEIGHT,
+                                                LV_LCD_FLAG_MIRROR_X | LV_LCD_FLAG_BGR,
+                                                my_lcd_send_cmd, my_lcd_send_color);
+```
+
+<Callout type="warn" title="RGB666 needs a matching LVGL color format">
+The flag only sets the controller's `COLMOD` register. The driver sizes each transfer from the
+**LVGL** display color format, so you must also set one whose pixel size matches the bus format,
+or the transfer length will be wrong.
+</Callout>
+
+## Usage
+
+### The two transfer functions
+
+You implement two platform-dependent functions:
+
+```c
+/* Send short command to the LCD. This function shall wait until the
+ * transaction finishes. */
+void my_lcd_send_cmd(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size,
+                     const uint8_t * param, size_t param_size)
+{
+    ...
+}
+
+/* Send large array of pixel data to the LCD controller.  If necessary, this
+ * function has to do the byte-swapping.  This function can do the transfer in
+ * the background.  If so, the user must guarantee that it cannot be called while
+ * another background transfer is still in progress. */
+void my_lcd_send_color(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size,
+                       uint8_t * param, size_t param_size)
+{
+    ...
+}
+```
+
+The only difference between them is timing. `my_lcd_send_cmd` sends short commands and must have
+completed the transaction by the time it returns --- in other words it is blocking.
+`my_lcd_send_color` only sends pixel data, and it is recommended to use DMA and transfer in the
+background. More sophisticated schemes work too, such as queuing transfers and scheduling them.
+
+Typically both are implemented by calling the appropriate SDK functions for your platform.
+
+<Callout type="warn" title="You must signal the end of the transfer">
+Display flushing is handled by the driver, but calling
+<ApiLink name="lv_display_flush_ready" /> when the color transfer completes is **your**
+responsibility. With DMA this call usually goes in the transfer-complete interrupt handler.
+</Callout>
+
+<Callout type="info">
+A blocking implementation of the pixel transfer is acceptable, but performance will suffer.
+</Callout>
+
+<Callout type="warn" title="Do not overlap a command with a running transfer">
+Care must be taken to avoid sending a command while a background transfer is still going on. It
+is your responsibility to arbitrate this — by polling the hardware, polling a flag reset at the
+end of the transfer, or with a semaphore.
+</Callout>
+
+### Draw buffers
+
+The driver does not allocate draw buffers, because that can be platform-dependent too. Allocate
+them yourself and assign them with <ApiLink name="lv_display_set_buffers" /> as usual — see
+[Draw Buffer(s)](/main-modules/display/setup#draw-buffers).
+
+The driver also does not set the LVGL color format. On many SPI panels the bus byte order means
+you want <ApiLink name="LV_COLOR_FORMAT_RGB565_SWAPPED" />:
+
+```c
+lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
+```
+
+### Multiple displays
+
+The driver can create multiple displays. The callbacks must then distinguish between them ---
+usually by implementing a separate set per display. Arbitrating the bus between several devices
+is also up to you.
+
+### Runtime API
+
+| Function | Purpose |
+|---|---|
+| <ApiLink name="lv_lcd_generic_mipi_set_gap" /> | Offset of the (0,0) pixel in the controller's VRAM |
+| <ApiLink name="lv_lcd_generic_mipi_set_invert" /> | Invert the displayed colors |
+| <ApiLink name="lv_lcd_generic_mipi_set_address_mode" /> | Mirroring, axis swap and RGB/BGR order |
+| <ApiLink name="lv_lcd_generic_mipi_set_gamma_curve" /> | Select one of the predefined gamma curves |
+| <ApiLink name="lv_lcd_generic_mipi_send_cmd_list" /> | Send a custom command list; see below |
+
+Rotation goes through the standard <ApiLink name="lv_display_set_rotation" /> --- the driver
+handles it in hardware by rewriting the controller's address mode.
+
+## Example
+
+```c
+#include "lvgl.h"
+
+#define LCD_H_RES        240
+#define LCD_V_RES        320
+#define LCD_BUF_LINES    60
+
+lv_display_t * my_disp;
+
+/* Initialize LCD I/O bus, reset LCD */
+static int32_t my_lcd_io_init(void)
+{
+    ...
+    return HAL_OK;
+}
+
+/* Send command to the LCD controller */
+static void my_lcd_send_cmd(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size,
+                            const uint8_t * param, size_t param_size)
+{
+    MY_PIN_PREP_TO_SEND_CMD();
+    MY_PIN_LCD_CONTROLLER_CHIP_SELECT();
+    /* Any delay here needed to meet LCD controller requirements. */
+
+    /* Send command to LCD controller here. */
+
+    MY_PIN_PREP_TO_SEND_DATA();
+    /* Any delay here needed to meet LCD controller requirements. */
+
+    /* Send data to LCD controller here. */
+
+    MY_PIN_LCD_CONTROLLER_CHIP_DESELECT();
+    /* Any delay here needed to meet LCD controller requirements. */
+}
+
+/* Send pixel data to the LCD controller */
+static void my_lcd_send_color(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size,
+                              uint8_t * param, size_t param_size)
+{
+    MY_PIN_PREP_TO_SEND_CMD();
+    MY_PIN_LCD_CONTROLLER_CHIP_SELECT();
+    /* Any delay here needed to meet LCD controller requirements. */
+
+    /* Send command to LCD controller here. */
+
+    MY_PIN_PREP_TO_SEND_DATA();
+    /* Any delay here needed to meet LCD controller requirements. */
+
+    /* Send data to LCD controller here in a manner efficient for large blocks of data. */
+
+    /* If data transfer is done with DMA, these 2 steps are not made here, but
+     * are instead made immediately after the DMA transfer completes. */
+    MY_PIN_LCD_CONTROLLER_CHIP_DESELECT();
+    lv_display_flush_ready(disp);
+}
+
+int main(int argc, char ** argv)
+{
+    /* Initialize LVGL */
+    lv_init();
+
+    /* Initialize LCD bus I/O */
+    if(my_lcd_io_init() != 0)
+        return -1;
+
+    /* Create the LVGL display object and the LCD display driver */
+    my_disp = lv_lcd_generic_mipi_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE,
+                                         my_lcd_send_cmd, my_lcd_send_color);
+
+    /* Set display orientation to landscape */
+    lv_display_set_rotation(my_disp, LV_DISPLAY_ROTATION_90);
+
+    /* Configure draw buffers */
+    uint32_t buf_size = LCD_H_RES * LCD_BUF_LINES
+            * lv_color_format_get_size(lv_display_get_color_format(my_disp));
+
+    uint8_t * buf1 = lv_malloc(buf_size);
+    if(buf1 == NULL) {
+        LV_LOG_ERROR("display draw buffer malloc failed");
+        return -1;
+    }
+
+    /* Allocate secondary buffer if needed */
+    uint8_t * buf2 = NULL;
+
+    lv_display_set_buffers(my_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+    ui_init(my_disp);
+
+    while(true) {
+        /* Periodically call the lv_timer handler */
+        lv_timer_handler();
+    }
+}
+```
+
+## Custom command lists
+
+While the chip-specific drivers do their best to initialize the controller correctly, different
+TFT panels need different configurations. A correct gamma setup in particular is crucial for good
+color reproduction, and finding a good set of parameters is not easy --- usually the panel
+manufacturer provides example code with recommended register settings.
+
+You can send an arbitrary command with your own `my_lcd_send_cmd`, but for a large number of
+parameters the driver supports sending a command list. Put the commands in a `uint8_t` array:
+
+```c
+static const uint8_t init_cmd_list[] = {
+    <command 1>, <number of parameters>, <parameter 1>, ... <parameter N>,
+    <command 2>, <number of parameters>, <parameter 1>, ... <parameter N>,
+    ...
+    LV_LCD_CMD_DELAY_MS, LV_LCD_CMD_EOF     /* Terminate list: this is required! */
+};
+
+lv_lcd_generic_mipi_send_cmd_list(my_disp, init_cmd_list);
+```
+
+Insert a delay between commands with the pseudo-command <ApiLink name="LV_LCD_CMD_DELAY_MS" />,
+followed by the delay in 10 ms units. Terminate the list with a delay whose value is
+<ApiLink name="LV_LCD_CMD_EOF" />, as shown above.
+
+For a real example of sending a command list, see
+[`lv_st7789.c`](https://github.com/lvgl/lvgl/blob/master/src/drivers/display/st7789/lv_st7789.c).
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Bus | SPI or I8080 parallel — you provide the transfer functions |
+| Rotation | Hardware, via the controller's address mode |
+| Runtime resolution change | Yes |
+| Runtime color format change | No |
+| Color formats | RGB565, or RGB666 with `LV_LCD_FLAG_RGB666`. Set the LVGL color format yourself |
+| Multiple displays / windows | Yes — one per controller |
+| Hardware acceleration | None |
+| Render mode | Partial — you allocate the buffers |
+| Input | None. Pair with your touch controller's driver |
+
+## See Also
+
+- [LCD Controllers](/main-modules/display_drivers/lcd) - the chip-specific drivers built on this one
+- [Setting Up Your Display](/main-modules/display/setup) - draw buffers and flush callbacks
+- [Color Format](/main-modules/display/color_format) - including the swapped RGB565 variant
+- [Constraints on Redrawn Area](/main-modules/display/redraw_area) - for controllers with alignment requirements

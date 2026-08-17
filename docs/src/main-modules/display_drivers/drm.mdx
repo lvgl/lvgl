@@ -1,0 +1,189 @@
+---
+title: "DRM/KMS"
+description: "The DRM display driver renders LVGL straight to a display through the Linux DRM/KMS subsystem, with no windowing system in between. It supports dumb buffers, GBM buffers and hardware-accelerated EGL rendering."
+---
+
+## Overview
+
+The **DRM** (Direct Rendering Manager) display driver renders LVGL straight to a display through the Linux
+[DRM/KMS subsystem](https://en.wikipedia.org/wiki/Direct_Rendering_Manager), talking to the GPU or display
+controller through a `/dev/dri/cardX` node. No windowing system is involved, which makes it the recommended
+choice for production embedded targets: single-board computers, panels, and any direct-to-display application.
+
+The driver offers three backends: 
+
+1. **Dumb buffers**: software rendering into DRM/KMS dumb framebuffers
+2. **GBM**: (GPU-friendly DMA buffers)
+3. **EGL** (OpenGL ES rendering on the GPU).
+
+Compared with the [framebuffer driver](/main-modules/display_drivers/fbdev), DRM gives you proper
+modesetting, atomic page flips, and a path to GPU acceleration.
+
+### Prerequisites
+
+- A kernel with DRM/KMS support.
+- A DRM device node, typically `/dev/dri/card0`.
+- Permission to open it, either run as root, or add the user to the `video` group.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_LINUX_DRM" />, and set <ApiLink name="LV_COLOR_DEPTH" /> to `32` or `16`.
+
+## Building
+
+The driver always requires `libdrm`.
+The GBM and EGL backends additionally require `libgbm`.
+
+<Callout type="tip">
+LVGL's CMake integration resolves both.
+Make sure the required libraries  are present on your system or in your sysroot.
+
+See [Dependency Management](/integration/building/cmake).
+</Callout>
+
+## Selecting a rendering backend
+
+Disable `LV_LINUX_DRM_AUTO_BACKEND` and set `LV_LINUX_DRM_BACKEND` to one of:
+
+| Value | Backend |
+|---|---|
+| `LV_LINUX_DRM_BACKEND_FBDEV` | Software rendering into DRM/KMS dumb buffers |
+| `LV_LINUX_DRM_BACKEND_GBM` | Buffers allocated through Mesa GBM as DMA buffers |
+| `LV_LINUX_DRM_BACKEND_EGL` | Hardware-accelerated rendering via OpenGL ES 2.0 and EGL |
+
+<Callout type="warning" title="Turn off the legacy auto-backend first">
+`LV_LINUX_DRM_AUTO_BACKEND` infers the backend from <ApiLink name="LV_USE_OPENGLES" />,
+picking EGL when that is enabled and dumb buffers otherwise.
+
+Set `LV_LINUX_DRM_AUTO_BACKEND` to `0` whenever you select a backend explicitly. Auto mode will be removed in LVGL v10.
+</Callout>
+
+For the GPU draw units that run on top of the EGL backend, see
+[OpenGL Overview](/integration/embedded_linux/opengl).
+
+## Usage
+
+<Callout type="tip">
+[LVGL's linux port](https://github.com/lvgl/lv_port_linux) can be used to quickly get started with LVGL's DRM backend.
+</Callout>
+
+Create the display with <ApiLink name="lv_linux_drm_create" />, then bind it to a device node and connector
+with <ApiLink name="lv_linux_drm_set_file" />.
+
+```c
+#include <lvgl/lvgl.h>
+#include "lvgl/demos/lv_demos.h"
+
+int main(void)
+{
+    lv_init();
+
+    lv_display_t * disp = lv_linux_drm_create();
+
+    /* 2nd argument: DRM device path
+     * 3rd argument: connector id, or -1 to auto-select the first available one */
+    lv_linux_drm_set_file(disp, "/dev/dri/card0", -1);
+
+    lv_demo_widgets();
+
+    while(1) {
+        uint32_t time_until_next = lv_timer_handler();
+        if(time_until_next == LV_NO_TIMER_READY) {
+            time_until_next = LV_DEF_REFR_PERIOD;
+        }
+        lv_delay_ms(time_until_next);
+    }
+
+    return 0;
+}
+```
+
+The connector id selects which output (HDMI, eDP, DP, ...) to drive. Passing `-1` picks the first available
+one.
+
+Rather than hard-coding the card path, ask LVGL to find a connected one with
+<ApiLink name="lv_linux_drm_find_device_path" />. It scans `/sys/class/drm` and returns the first connected
+card; free the result with `lv_free`.
+
+```c
+lv_display_t * disp = lv_linux_drm_create();
+
+char * device = lv_linux_drm_find_device_path();
+lv_linux_drm_set_file(disp, device, -1);
+lv_free(device);
+```
+
+## Selecting a Display Mode
+
+By default the driver uses the display's preferred mode. To choose differently, register a callback with
+<ApiLink name="lv_linux_drm_set_mode_cb" /> before calling <ApiLink name="lv_linux_drm_set_file" />. It
+receives every mode the connector reports and returns the index of the one to use.
+
+<Callout type="info">
+Custom mode selection only takes effect with the EGL backend. With dumb buffers or GBM the driver always
+uses the preferred mode.
+</Callout>
+
+```c
+static size_t my_mode_selector(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
+{
+    /* Pick 1920x1080@60Hz if the display offers it */
+    for(size_t i = 0; i < mode_count; i++) {
+        if(lv_linux_drm_mode_get_horizontal_resolution(&modes[i]) == 1920 &&
+           lv_linux_drm_mode_get_vertical_resolution(&modes[i]) == 1080 &&
+           lv_linux_drm_mode_get_refresh_rate(&modes[i]) == 60) {
+            return i;
+        }
+    }
+
+    /* Fall back to the first mode */
+    return 0;
+}
+
+int main(void)
+{
+    lv_init();
+
+    lv_display_t * disp = lv_linux_drm_create();
+    lv_linux_drm_set_mode_cb(disp, my_mode_selector);
+    lv_linux_drm_set_file(disp, "/dev/dri/card0", -1);
+
+    /* ... */
+}
+```
+
+These functions query a mode:
+
+| Function | Returns |
+|---|---|
+| <ApiLink name="lv_linux_drm_mode_get_horizontal_resolution" /> | Width in pixels |
+| <ApiLink name="lv_linux_drm_mode_get_vertical_resolution" /> | Height in pixels |
+| <ApiLink name="lv_linux_drm_mode_get_refresh_rate" /> | Refresh rate in Hz |
+| <ApiLink name="lv_linux_drm_mode_is_preferred" /> | Whether this is the display's native mode |
+| <ApiLink name="lv_linux_drm_mode_get_raw" /> | The underlying mode info, for anything not covered above |
+
+The callback must always return a valid index in `0 .. mode_count - 1`. Passing `NULL` to
+<ApiLink name="lv_linux_drm_set_mode_cb" /> restores the default behaviour.
+
+## Support
+
+| Capability | Dumb buffers | GBM | EGL |
+|---|---|---|---|
+| Rotation | None | None | Hardware (GPU) |
+| Runtime resolution change | No | No | Yes |
+| Runtime color format change | No | No | No |
+| Color formats | RGB565 or XRGB8888, from <ApiLink name="LV_COLOR_DEPTH" /> | RGB565 or XRGB8888, from <ApiLink name="LV_COLOR_DEPTH" /> | RGB565 or ARGB8888, from <ApiLink name="LV_COLOR_DEPTH" /> |
+| Multiple displays / windows | One display per DRM device | One display per DRM device | One display per DRM device |
+| Hardware acceleration | None | Buffer allocation only | OpenGL ES |
+| Render mode | Direct | Direct | Full with NanoVG, otherwise Direct |
+| Input | None built in. Pair with [evdev](/main-modules/input_drivers/evdev) or [libinput](/main-modules/input_drivers/libinput) | Same | Same |
+| Custom mode selection | No | No | Yes |
+
+## See Also
+
+- [lv_port_linux](https://github.com/lvgl/lv_port_linux): reference project with a working DRM build
+- [Dependency Management](/integration/building/cmake): how LVGL resolves `libdrm` and `libgbm`
+- [EGL](/main-modules/display_drivers/egl): the EGL layer underneath the EGL backend
+- [OpenGL Overview](/integration/embedded_linux/opengl): GPU draw units usable with the EGL backend
+- [Linux Framebuffer](/main-modules/display_drivers/fbdev): simpler alternative when only `/dev/fb` exists
+- [evdev](/main-modules/input_drivers/evdev): input to pair with this driver

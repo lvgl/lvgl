@@ -1,0 +1,98 @@
+---
+title: Dave2D
+description: "Dave2D (D/AVE 2D) is the 2D GPU of Renesas RA and RZ/A devices and Alif Ensemble chips. LVGL has a built-in draw unit for it that offloads most drawing operations from the CPU."
+faqs:
+  - question: "How do I enable the Dave2D GPU in LVGL?"
+    answer: "Set LV_USE_DRAW_DAVE2D to 1 in lv_conf.h. On Renesas the D/AVE 2D driver also has to be added to the project in the FSP configurator, because the LVGL draw unit includes the FSP headers bsp_api.h and dave_driver.h."
+  - question: "Do I have to change my drawing code to use Dave2D?"
+    answer: "No. Dave2D is a draw unit, so LVGL dispatches the supported drawing tasks to it automatically and renders the rest with the CPU. The result is identical, only faster."
+  - question: "Does the same draw unit work on Alif chips?"
+    answer: "Yes. Alif Ensemble devices expose the same D/AVE 2D driver API as Renesas, so the same LVGL draw unit is used and no Alif-specific one is needed."
+  - question: "Which image color formats are accelerated?"
+    answer: "A8, RGB565, ARGB1555, ARGB4444, ARGB8888, and XRGB8888. The 3 byte RGB888 format is not supported by the hardware, so images in other formats are drawn by the software renderer."
+  - question: "How much CPU time does Dave2D save?"
+    answer: "In practice CPU usage during rendering drops to one half or one third, depending on how much of the screen is covered by accelerated operations."
+---
+
+## Overview
+
+[Dave2D](https://www.renesas.com/document/mas/tes-dave2d-driver-documentation) (also written as
+D/AVE 2D) is a 2D GPU developed by TES. It is found in **Renesas RA and RZ/A** devices and in
+**Alif Ensemble** chips. Both platforms expose the same D/AVE 2D driver API, so LVGL uses one
+built-in draw unit for both.
+
+Accelerated operations are dispatched to the GPU while the CPU stays free to run the rest of the
+application.
+
+## Configuration
+
+Enable <ApiLink name="LV_USE_DRAW_DAVE2D" />.
+
+```c
+#define LV_USE_DRAW_DAVE2D 1
+```
+
+There is nothing else to do. No platform-specific function needs to be implemented and no drawing
+code needs to be changed.
+
+### Options
+
+| Symbol | Default | Effect |
+|---|---|---|
+| `LV_DAVE2D_MAX_DRAW_PRESSURE` | `256` | How many pending draw tasks are collected into one display list before it is submitted to the GPU. `256` is also the minimum — with smaller values the Dave engine may crash. |
+
+### Prerequisites
+
+On **Renesas**, the D/AVE 2D driver has to be added to the project in the `Configuration Window`
+of e² studio. The LVGL draw unit includes the FSP headers `bsp_api.h` and `dave_driver.h`, so
+missing this step causes a compilation error. The boards LVGL maintains a project for already
+have the driver configured — see [RA Family](/integration/chip_vendors/renesas/ra_family) and
+[RZ/A Family](/integration/chip_vendors/renesas/rza_family).
+
+On **Alif**, the [alif_m55-lvgl](https://github.com/alifsemi/alif_m55-lvgl) project used in the
+[Alif overview](/integration/chip_vendors/alif/overview) already has the draw unit enabled, so it
+accelerates rendering out of the box.
+
+## Accelerated Operations
+
+Dave2D can accelerate most of LVGL's [drawing](/main-modules/draw/draw_pipeline) operations:
+
+- Rectangle drawing, even with gradients
+- Image drawing, scaling, and rotation
+- Letter drawing
+- Triangle drawing
+- Line drawing
+
+Everything Dave2D cannot handle is rendered by the
+[software renderer](/main-modules/renderers/sw), so no operation is lost by enabling the GPU.
+
+### Supported image color formats
+
+Images are accelerated in the following color formats:
+
+- <ApiLink name="LV_COLOR_FORMAT_A8" />
+- <ApiLink name="LV_COLOR_FORMAT_RGB565" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB1555" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB4444" />
+- <ApiLink name="LV_COLOR_FORMAT_ARGB8888" />
+- <ApiLink name="LV_COLOR_FORMAT_XRGB8888" />
+
+<Callout type="info">
+<ApiLink name="LV_COLOR_FORMAT_RGB888" /> is a 3 byte format, while the matching Dave2D mode is
+a 4 byte format. Therefore RGB888 images are drawn by the software renderer.
+</Callout>
+
+## Support
+
+| Capability | Value |
+|---|---|
+| Hardware | Renesas RA / RZ-A, Alif Ensemble |
+| Vector graphics | No |
+| 3D / glTF | No |
+| Fallback | Software renderer handles unsupported tasks |
+
+## See Also
+
+- [Renesas](/integration/chip_vendors/renesas) - board projects and toolchain setup
+- [Alif](/integration/chip_vendors/alif) - board projects and toolchain setup
+- [Renesas GLCDC](/main-modules/display_drivers/renesas_glcdc) - the matching display driver
