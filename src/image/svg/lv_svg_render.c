@@ -275,7 +275,7 @@ static void _set_viewport_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t *
             view->height = attr->value.fval;
             break;
         case LV_SVG_ATTR_VIEWBOX: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) {
                     float * vals = attr->value.val;
                     float scale_x = 1.0f;
                     float scale_y = 1.0f;
@@ -297,18 +297,18 @@ static void _set_viewport_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t *
             }
             break;
         case LV_SVG_ATTR_VIEWPORT_FILL: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL
                    && attr->val_type == LV_SVG_ATTR_VALUE_DATA) {
                     dsc->fill_dsc.color = lv_color_to_32(lv_color_hex(attr->value.uval), 0xFF);
                     view->viewport_fill = true;
                 }
-                else if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+                else if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
                     view->viewport_fill = false;
                 }
             }
             break;
         case LV_SVG_ATTR_VIEWPORT_FILL_OPACITY: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) {
                     dsc->fill_dsc.opa = (lv_opa_t)(attr->value.fval * 255.0f);
                 }
             }
@@ -601,7 +601,7 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 } \
                 break; \
             case LV_SVG_ATTR_FONT_SIZE: \
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) { \
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) { \
                     if(attr->val_type == LV_SVG_ATTR_VALUE_DATA) { \
                         if((obj)->font) { \
                             lv_freetype_font_delete((obj)->font); \
@@ -613,7 +613,7 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 } \
                 break; \
             case LV_SVG_ATTR_FONT_STYLE: \
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) { \
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) { \
                     if(attr->val_type == LV_SVG_ATTR_VALUE_PTR) { \
                         if((obj)->font) { \
                             lv_freetype_font_delete((obj)->font); \
@@ -627,7 +627,7 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 } \
                 break; \
             case LV_SVG_ATTR_FONT_WEIGHT: \
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) { \
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) { \
                     if(attr->val_type == LV_SVG_ATTR_VALUE_PTR) { \
                         if((obj)->font) { \
                             lv_freetype_font_delete((obj)->font); \
@@ -641,7 +641,7 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
                 } \
                 break; \
             case LV_SVG_ATTR_FONT_VARIANT: \
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) { \
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) { \
                     if(attr->val_type == LV_SVG_ATTR_VALUE_PTR) { \
                         if((obj)->font) { \
                             lv_freetype_font_delete((obj)->font); \
@@ -711,7 +711,7 @@ static void _set_image_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * ds
             }
             break;
         case LV_SVG_ATTR_PRESERVE_ASPECT_RATIO: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INITIAL) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INITIAL) {
                     image->ratio = attr->value.uval;
                 }
             }
@@ -724,13 +724,13 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
     LV_UNUSED(obj);
     switch(attr->id) {
         case LV_SVG_ATTR_FILL: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
                     dsc->fill_dsc.opa = LV_OPA_0;
                     obj->flags |= _RENDER_ATTR_FILL_OPACITY;
                     obj->flags |= _RENDER_ATTR_FILL;
                     return;
                 }
-                else if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                else if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_FILL;
                     return;
                 }
@@ -755,13 +755,13 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
                     dsc->stroke_dsc.opa = LV_OPA_0;
                     obj->flags |= _RENDER_ATTR_STROKE_OPACITY;
                     obj->flags |= _RENDER_ATTR_STROKE;
                     return;
                 }
-                else if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                else if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE;
                     return;
                 }
@@ -787,7 +787,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_FILL_OPACITY: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_FILL_OPACITY;
                     return;
                 }
@@ -796,7 +796,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_OPACITY: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_OPACITY;
                     return;
                 }
@@ -805,7 +805,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_FILL_RULE: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_FILL_RULE;
                     return;
                 }
@@ -814,7 +814,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_WIDTH: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_WIDTH;
                     return;
                 }
@@ -823,7 +823,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_LINECAP: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_LINECAP;
                     return;
                 }
@@ -832,7 +832,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_LINEJOIN: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_LINEJOIN;
                     return;
                 }
@@ -841,7 +841,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_MITER_LIMIT: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_MITER_LIMIT;
                     return;
                 }
@@ -850,12 +850,12 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
             }
             break;
         case LV_SVG_ATTR_STROKE_DASH_ARRAY: {
-                if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+                if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
                     lv_array_clear(&(dsc->stroke_dsc.dash_pattern));
                     obj->flags |= _RENDER_ATTR_STROKE_DASH_ARRAY;
                     return;
                 }
-                else if(attr->class_type == LV_SVG_ATTR_VALUE_INHERIT) {
+                else if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_INHERIT) {
                     obj->flags &= ~_RENDER_ATTR_STROKE_DASH_ARRAY;
                     return;
                 }
@@ -891,7 +891,7 @@ static void _set_draw_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc
 static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_path_ctx_t * dsc, const lv_svg_attr_t * attr)
 {
     if(attr->id == LV_SVG_ATTR_TRANSFORM) {
-        if(attr->class_type == LV_SVG_ATTR_VALUE_NONE) {
+        if(attr->class_type == LV_SVG_ATTR_VALUE_CLASS_NONE) {
             return;
         }
         lv_memcpy(&(obj->matrix), attr->value.val, sizeof(lv_matrix_t));
