@@ -12,6 +12,32 @@ flexibility to target anything from a minimal framebuffer setup to a fully GPU-a
 The recommended way to get started is the [lv_port_linux](https://github.com/lvgl/lv_port_linux) reference project. It provides a
 ready-to-build CMake project with the most common drivers pre-configured, and is the fastest path to a running LVGL application on Linux hardware.
 
+## Choosing a Display Driver
+
+Pick the driver from what your system already has, not from what sounds fastest. On Linux there is usually
+exactly one right answer.
+
+| What you have | Use | Why |
+|---|---|---|
+| A modern kernel with DRM/KMS, no compositor | **[DRM](/integration/embedded_linux/drivers/drm)** | The production default. Real modesetting, and an EGL backend when there is a GPU. |
+| Only `/dev/fb`, no DRM | **[fbdev](/integration/embedded_linux/drivers/fbdev)** | Simplest possible path. No libraries, no GPU, no modesetting. |
+| A Wayland compositor already running | **[Wayland](/integration/embedded_linux/drivers/wayland)** | SHM everywhere, EGL for the GPU, G2D on NXP i.MX. |
+| An X11 desktop, for development | **[X11](/integration/embedded_linux/drivers/X11)** | Window on your dev machine. CPU-only, no rotation. |
+| A dev machine, want a window fast | **[SDL](/integration/pc/sdl)** or **[GLFW](/integration/embedded_linux/drivers/glfw)** | Cross-platform. GLFW brings an OpenGL context with it. |
+| An OpenGL context you already own | **[OpenGL Driver](/integration/embedded_linux/drivers/opengl_driver)** | Renders into a texture for embedding in your own GL application. |
+| No display at all — CI, thumbnails, servers | **[EGL pbuffer](/integration/embedded_linux/drivers/egl)** | The only way to get GPU-rendered frames with no display server. |
+
+Then decide whether you want GPU rendering on top: see
+[Rendering acceleration](#rendering-acceleration) below. Enabling a driver's EGL backend without a GPU draw
+unit is valid — LVGL renders in software and uses OpenGL only to present the result.
+
+<Callout type="info" title="Input is separate">
+Only the Wayland, X11, SDL and GLFW drivers come with input. With DRM or fbdev you pair a display driver
+with an input driver yourself — [evdev](/integration/embedded_linux/drivers/evdev) for the simple case,
+[libinput](/integration/embedded_linux/drivers/libinput) when you need full keyboard layouts or device
+quirks.
+</Callout>
+
 ## What LVGL supports
 
 ### Display and input drivers
@@ -22,9 +48,13 @@ LVGL provides drivers for the most common Linux display and input interfaces:
 - **[DRM/KMS](/integration/embedded_linux/drivers/drm)**: modern direct rendering, recommended for production embedded targets
 - **[Wayland](/integration/embedded_linux/drivers/wayland)**: suitable for systems running a Wayland compositor, with SHM, EGL, and G2D backends. Also useful for development
 - **[X11](/integration/embedded_linux/drivers/X11)**: useful for development and desktop simulation
-- **[EGL](/integration/embedded_linux/drivers/egl)**: hardware-accelerated OpenGL ES rendering, usable via DRM or Wayland
+- **[EGL](/integration/embedded_linux/drivers/egl)**: the OpenGL ES layer under the DRM, Wayland and SDL hardware-accelerated backends, and the way to render off-screen with no display server
 - **[evdev](/integration/embedded_linux/drivers/evdev) / [libinput](/integration/embedded_linux/drivers/libinput)**: touchscreen, mouse, and keyboard input
 - **[GLFW](/integration/embedded_linux/drivers/glfw)**: cross-platform windowing, primarily for development
+
+Each driver page carries a **Support** table listing what it can and cannot do — rotation, runtime resolution
+and color format changes, multiple displays, hardware acceleration and input. The
+[driver index](/integration/embedded_linux/drivers) collects the highlights into one comparison table.
 
 ### Rendering acceleration
 
@@ -34,6 +64,11 @@ Beyond the CPU-based software renderer, LVGL supports GPU-accelerated draw units
 - **[OpenGL](/integration/embedded_linux/draw_units/draw_opengl)** (`draw_opengl`): direct OpenGL ES rendering, including 3D/glTF support
 - **[SDL](/integration/embedded_linux/draw_units/draw_sdl)** (`draw_sdl`):  SDL2-based rendering
 
+A draw unit needs a driver that provides an OpenGL context, see [OpenGL Overview](/integration/embedded_linux/opengl) for which drivers do.
+
+3D and [glTF](/libs/gltf) content requires one of the GPU draw units; the software renderer cannot draw it
+at all.
+
 ### OS and distribution support
 
 LVGL works with standard Linux distributions and embedded build systems. Dedicated integration guides are available for:
@@ -42,6 +77,12 @@ LVGL works with standard Linux distributions and embedded build systems. Dedicat
 - **[Buildroot](/integration/embedded_linux/distros/buildroot)**: minimal embedded Linux images
 - **[Yocto](/integration/embedded_linux/distros/yocto)**: layer-based embedded Linux build system
 - **[Torizon](/integration/embedded_linux/distros/torizon)**: container-based embedded Linux platform by Toradex
+
+### Building and dependencies
+
+Enabling a driver's config symbol is also what pulls its libraries into the build — LVGL resolves them with
+`find_package`, then `pkg-config`, then by fetching sources where that is possible. See
+[Dependency Management](/integration/building/cmake) rather than installing packages by hand.
 
 ### Multimedia
 
