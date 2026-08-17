@@ -20,6 +20,9 @@ extern "C" {
 #include "../debugging/sysmon/lv_sysmon_private.h"
 #endif
 
+#define LOG_NULL_DISPLAY_DEPRECATED_MESSAGE() \
+    LV_LOG_DEPRECATED("Calling this function with a NULL display is deprecated. You can retrieve the default display with `lv_display_get_default()`")
+
 /*********************
  *      DEFINES
  *********************/
