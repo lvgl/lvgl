@@ -32,7 +32,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t draw_unit_id);
-static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
 static inline size_t get_draw_dsc_size(lv_draw_task_type_t type);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
 
@@ -242,7 +241,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
                 LV_LOG_ERROR("draw task failed, type: %d", (int)t->type);
             }
 
-            cleanup_task(t, disp);
+            lv_draw_cleanup_task(t, disp);
             remove_task = true;
             if(t_prev != NULL)
                 t_prev->next = t_next;
@@ -676,7 +675,7 @@ static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
  * @param t         pointer to a draw task
  * @param disp      pointer to a display on which the task was drawn
  */
-static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
+void lv_draw_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
 {
     LV_PROFILER_DRAW_BEGIN;
     if(t->type == LV_DRAW_TASK_TYPE_LINE) {
