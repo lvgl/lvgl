@@ -59,6 +59,10 @@ def decode_coord(raw: int) -> str:
     the top bits, so a percentage never has to be inferred from geometry.
     """
     bits = raw & 0xFFFFFFFF
+    # Only LV_COORD_TYPE_SPEC carries an encoding. LV_COORD_TYPE_PX_NEG is not a
+    # second one: there is no LV_COORD_SET_PX_NEG, and in two's complement every
+    # negative int32 already has those top bits, so a "PX_NEG" value is just a
+    # negative number and prints as itself.
     if bits & _COORD_TYPE_MASK != _COORD_TYPE_SPEC:
         return str(raw)
     plain = bits & ~_COORD_TYPE_MASK

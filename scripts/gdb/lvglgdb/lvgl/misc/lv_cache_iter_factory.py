@@ -30,3 +30,9 @@ def create_cache_iterator(cache) -> LVCacheIteratorBase | None:
 
     except Exception:
         raise TypeError(f"Unsupported cache type {cache}")
+
+    # An unknown or null class reached the end without returning. Falling out of
+    # here with None makes the caller's `for` raise TypeError about NoneType,
+    # which says nothing about the cache; an empty iterator and a warning do.
+    print(f"lvglgdb: cache {cache} has no iterator for its class, listing nothing")
+    return iter(())
