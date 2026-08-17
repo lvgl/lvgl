@@ -49,6 +49,13 @@ struct _lv_event_t {
 #endif
 };
 
+struct _lv_event_list_t {
+    lv_array_t array;
+    uint8_t is_traversing: 1;          /**< True: the list is being nested traversed */
+    uint8_t has_marked_deleting: 1;    /**< True: the list has marked deleting objects
+                                         when some of events are marked as deleting */
+};
+
 
 /**********************
  * GLOBAL PROTOTYPES
