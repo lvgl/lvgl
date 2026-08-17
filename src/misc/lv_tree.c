@@ -1,7 +1,5 @@
 /**
  * @file lv_tree.c
- * Tree.
- * The nodes are dynamically allocated by the 'lv_mem' module,
  */
 
 /*********************
@@ -9,6 +7,7 @@
  *********************/
 
 #include "../lvgl_public.h"
+#include "lv_tree.h"
 
 /*********************
  *      DEFINES

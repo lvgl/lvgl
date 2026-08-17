@@ -169,6 +169,7 @@
 #include "misc/lv_text_ap.h"
 #include "misc/lv_text_private.h"
 #include "misc/lv_timer_private.h"
+#include "misc/lv_tree.h"
 #include "misc/lv_utils.h"
 #include "osal/lv_cmsis_rtos2.h"
 #include "osal/lv_freertos.h"

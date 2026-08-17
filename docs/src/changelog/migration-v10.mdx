@@ -513,6 +513,16 @@ if you were simply using the public API, this doesn't change anything for you.
 
 ---
 
+## Misc
+
+### Tree
+
+The `lv_tree` module was previously leaked to the public LVGL API through the SVG module.
+v9.6 moves it to the private API. If you have code that relies on this module, you
+can enable LVGL's private api by including `lvgl_private.h` or simply enabling `LV_USE_PRIVATE_API`
+
+---
+
 ## Others
 
 ### lv_file_explorer

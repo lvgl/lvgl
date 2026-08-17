@@ -17,6 +17,8 @@ extern "C" {
 #include "../../lvgl_public.h"
 #if LV_USE_SVG
 
+#include "../../misc/lv_tree.h"
+
 /*********************
  *      DEFINES
  *********************/
