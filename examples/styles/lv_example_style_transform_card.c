@@ -101,7 +101,7 @@ void lv_example_style_transform_card(void)
     card_to_transform = card_create();
     lv_obj_center(card_to_transform);
 
-    int32_t disp_w = lv_display_get_horizontal_resolution(NULL);
+    int32_t disp_w = lv_display_get_horizontal_resolution(lv_display_get_default());
     lv_obj_t * arc = lv_arc_create(lv_screen_active());
     lv_obj_set_size(arc, disp_w - 20, disp_w - 20);
     lv_arc_set_range(arc, 0, 270);

@@ -89,6 +89,7 @@ static void empty_screen_cb(lv_obj_t * screen)
 
 static void moving_wallpaper_cb(lv_obj_t * scr)
 {
+    lv_display_t * display = lv_obj_get_display(scr);
     lv_obj_set_style_pad_all(scr, 0, 0);
     LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_rgb);
 
@@ -96,7 +97,7 @@ static void moving_wallpaper_cb(lv_obj_t * scr)
     lv_obj_set_size(img, lv_pct(150), lv_pct(150));
     lv_image_set_src(img, &img_benchmark_lvgl_logo_rgb);
     lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TILE);
-    fall_anim(img, - lv_display_get_vertical_resolution(NULL) / 3);
+    fall_anim(img, - lv_display_get_vertical_resolution(display) / 3);
 }
 
 static void single_rectangle_cb(lv_obj_t * scr)
@@ -211,8 +212,9 @@ static void multiple_labels_cb(lv_obj_t * scr)
     lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
 
-    int32_t hor_res = lv_display_get_horizontal_resolution(NULL);
-    int32_t ver_res = lv_display_get_vertical_resolution(NULL);
+    lv_display_t * display = lv_obj_get_display(scr);
+    int32_t hor_res = lv_display_get_horizontal_resolution(display);
+    int32_t ver_res = lv_display_get_vertical_resolution(display);
 
 #if LV_DEMO_BENCHMARK_ALIGNED_FONTS
     if(hor_res * ver_res > 800 * 480) lv_obj_set_style_text_font(scr, &lv_font_benchmark_montserrat_26_aligned, 0);
@@ -256,8 +258,9 @@ static void screen_sized_text_cb(lv_obj_t * scr)
         "Morbi erat libero, commodo sit amet turpis eget, efficitur pulvinar dolor. Pellentesque vehicula, velit eget auctor scelerisque, sem risus aliquam lectus, sit amet dapibus massa ex non magna. Donec magna leo, laoreet quis erat vitae, consequat aliquet tellus. Etiam vitae lectus erat. Mauris interdum feugiat aliquet. Nunc justo augue, mattis id finibus eu, sagittis id enim. Vivamus malesuada mauris sed nibh luctus, porta bibendum quam ornare. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus malesuada magna nec diam tempus, laoreet imperdiet magna faucibus. Aliquam erat volutpat.\n\n"
         "Aenean mattis lobortis quam in venenatis. Sed euismod convallis lectus vel euismod. Vestibulum consequat luctus neque. Quisque consequat bibendum neque eget mollis. Vivamus viverra vehicula eros vel dapibus. Nullam id lectus aliquam, sagittis mi efficitur, interdum mauris. Nunc at felis lobortis, lobortis erat a, euismod augue. In id purus malesuada, tempus magna at, porta mi. Sed tristique nunc eget placerat luctus. Pellentesque posuere non purus vitae malesuada. Curabitur hendrerit dolor metus, nec posuere orci placerat ac.\n\n";
 
-    int32_t hor_res = lv_display_get_horizontal_resolution(NULL);
-    int32_t ver_res = lv_display_get_vertical_resolution(NULL);
+    lv_display_t * display = lv_obj_get_display(scr);
+    int32_t hor_res = lv_display_get_horizontal_resolution(display);
+    int32_t ver_res = lv_display_get_vertical_resolution(display);
 
 #if LV_DEMO_BENCHMARK_ALIGNED_FONTS
     if(hor_res * ver_res > 800 * 480) lv_obj_set_style_text_font(scr, &lv_font_benchmark_montserrat_26_aligned, 0);
@@ -817,7 +820,9 @@ static void scroll_anim_y_cb(void * var, int32_t v)
 
 static void scroll_anim(lv_obj_t * obj, int32_t y_max)
 {
-    uint32_t t = lv_anim_speed(lv_display_get_dpi(NULL));
+    lv_display_t * display = lv_obj_get_display(obj);
+    const int32_t dpi = lv_display_get_dpi(display);
+    uint32_t t = lv_anim_speed(dpi);
 
     lv_anim_t a;
     lv_anim_init(&a);
@@ -1042,10 +1047,10 @@ static void add_warnings(lv_obj_t * scr)
 #if LV_USE_ASSERT_MEM_INTEGRITY
     add_warning_label(scr, "LV_USE_ASSERT_MEM_INTEGRITY is enabled making rendering slower");
 #endif
-
-    lv_color_format_t cf = lv_display_get_color_format(NULL);
+    lv_display_t * display = lv_obj_get_display(scr);
+    lv_color_format_t cf = lv_display_get_color_format(display);
     uint32_t screen_size_byte = LV_HOR_RES * LV_VER_RES * lv_color_format_get_size(cf);
-    uint32_t draw_buf_size = lv_display_get_draw_buf_size(NULL);
+    uint32_t draw_buf_size = lv_display_get_draw_buf_size(display);
     if(draw_buf_size < screen_size_byte / 10) {
         add_warning_label(scr, "The draw buffer's size is smaller than 1/10 screen size making rendering slower");
     }

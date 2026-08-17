@@ -555,7 +555,7 @@ lv_obj_t * lv_obj_find_by_name(const lv_obj_t * parent, const char * name)
 {
     LV_CHECK_ARG(name != NULL, return NULL);
 
-    if(parent == NULL) parent = lv_display_get_screen_active(NULL);
+    if(parent == NULL) parent = lv_display_get_screen_active(lv_display_get_default());
     if(parent == NULL) return NULL;
 
     lv_obj_t * child = find_by_name_direct(parent, name, UINT16_MAX);

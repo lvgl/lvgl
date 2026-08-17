@@ -241,11 +241,11 @@ void test_anim_vsync_mode(void)
 
     /*Use vsync events to notify anim updates*/
     lv_tick_inc(10);
-    lv_display_send_vsync_event(NULL, NULL);
+    lv_display_send_vsync_event(lv_display_get_default(), NULL);
     TEST_ASSERT_EQUAL(9, var);
 
     lv_tick_inc(10);
-    lv_display_send_vsync_event(NULL, NULL);
+    lv_display_send_vsync_event(lv_display_get_default(), NULL);
     TEST_ASSERT_EQUAL(19, var);
 
     lv_anim_enable_vsync_mode(false);
@@ -253,7 +253,7 @@ void test_anim_vsync_mode(void)
 
     /* Should not update the animation with vsync events when vsync mode is disabled */
     lv_tick_inc(20);
-    lv_display_send_vsync_event(NULL, NULL);
+    lv_display_send_vsync_event(lv_display_get_default(), NULL);
     TEST_ASSERT_EQUAL(19, var);
 
     /* Test normal timer mode */
