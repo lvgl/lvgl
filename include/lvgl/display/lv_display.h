@@ -509,7 +509,7 @@ lv_obj_t * lv_display_get_screen_by_name(const lv_display_t * disp, const char *
  * Load a screen on the default display
  * @param scr       pointer to a screen
  */
-void lv_screen_load(struct _lv_obj_t * scr);
+void lv_screen_load(lv_obj_t * scr);
 
 /**
  * Switch screen with animation
