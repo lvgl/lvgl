@@ -92,7 +92,10 @@ void lv_sysmon_builtin_deinit(void)
 lv_obj_t * lv_sysmon_create(lv_display_t * disp)
 {
     LV_LOG_INFO("begin");
-    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
     if(disp == NULL) {
         LV_LOG_WARN("There is no default display");
         return NULL;
@@ -111,7 +114,10 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp)
 
 void lv_sysmon_show_performance(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
     if(disp == NULL) {
         LV_LOG_WARN("There is no default display");
         return;
@@ -136,7 +142,10 @@ void lv_sysmon_show_performance(lv_display_t * disp)
 
 void lv_sysmon_hide_performance(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
     if(disp == NULL) {
         LV_LOG_WARN("There is no default display");
         return;
@@ -147,7 +156,10 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
 
 void lv_sysmon_performance_dump(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
     if(disp == NULL) {
         LV_LOG_WARN("There is no default display");
         return;
@@ -171,7 +183,10 @@ void lv_sysmon_performance_pause(lv_display_t * disp)
 
 void lv_sysmon_show_memory(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
     if(disp == NULL) {
         LV_LOG_WARN("There is no default display");
         return;
@@ -193,7 +208,10 @@ void lv_sysmon_show_memory(lv_display_t * disp)
 
 void lv_sysmon_hide_memory(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
     if(disp == NULL) {
         LV_LOG_WARN("There is no default display");
         return;
@@ -366,7 +384,10 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 static void perf_control(lv_display_t * disp, bool start)
 {
-    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LOG_NULL_DISPLAY_DEPRECATED_MESSAGE();
+        disp = lv_display_get_default();
+    }
     if(disp == NULL) {
         LV_LOG_WARN("There is no default display");
         return;
