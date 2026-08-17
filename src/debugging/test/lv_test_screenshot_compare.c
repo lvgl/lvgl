@@ -95,7 +95,7 @@ lv_test_screenshot_result_t lv_test_screenshot_compare_core(const char * fn_ref)
     create_folders_if_needed(fn_ref_full);
 #endif
 
-    lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
+    lv_draw_buf_t * draw_buf = lv_display_get_buf_active(lv_display_get_default());
 
     uint8_t * screen_buf_xrgb8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);
     if(!screen_buf_xrgb8888) {
